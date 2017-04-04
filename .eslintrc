@@ -1,0 +1,134 @@
+{
+  "env": {
+    "es6": true,
+    "mocha": true,
+    "browser": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-console": "off"
+  },
+  "globals": {
+    "componentHandler": true,
+    "SwaggerClient": true
+  },
+  "quotes": [
+    "error",
+    "single", // シングルクオートの強制
+    "avoid-escape"
+  ],
+  "key-spacing": [
+    "error",
+    {
+      // JSONオブジェクトのキー名との間にスペースをいれるかどうか
+      "singleLine": {
+        // 一行の場合
+        "beforeColon": true,
+        "afterColon": true
+      },
+      "multiLine": {
+        // 複数行の場合
+        "beforeColon": true,
+        "afterColon": true,
+        "align": "colon"
+      }
+    }
+  ],
+  "eqeqeq": "error", // === !==など比較演算子にはより厳密性の高い演算子の強制
+  "block-scoped-var": "error", // ブロックスコープ内でのvar宣言を禁止
+  "complexity": [
+    "error",
+    {
+      // 循環的複雑度の最大値強制
+      "maximum": 4
+    }
+  ],
+  "curly": "error",
+  // 括弧の強制。つけないでif,whileなど禁止
+  "default-case": "error",
+  // switch構文でdefaultを強制
+  "dot-location": [
+    "error",
+    "property"
+  ],
+  // ドットの位置を強制
+  "guard-for-in": "error",
+  // for-in内でのkeyをhasOwnPropertyでチェックするのを強制
+  "no-eval": "error",
+  // eval禁止
+  "block-spacing": "error",
+  // ブロック内側のスペースを強制
+  "brace-style": "error",
+  // http://eslint.org/docs/rules/brace-style
+  "comma-spacing": [
+    "error",
+    {
+      // カンマの後ろに空白を強制
+      "before": false,
+      "after": true
+    }
+  ],
+  "id-length": [
+    "error",
+    {
+      // 変数名の文字列長の強制
+      "min": 2,
+      //"max": 16, // 最大文字列長なし。
+      "properties": "never",
+      "exceptions": []
+      //除外変数名
+    }
+  ],
+  "indent": [
+    "error",
+    2
+  ],
+  // インデント2個ずつの強制
+  "space-before-function-paren": [
+    // 関数とブロックの間のスペースを強制
+    "error",
+    "never"
+  ],
+  "space-before-blocks": "error",
+  // ブロックの前にスペースを強制
+  "prefer-const": "error",
+  // 一度も変更されていない宣言をconstに強制
+  "no-var": "error",
+  // varによる宣言禁止
+  "arrow-body-style": [
+    "error"
+  ],
+  // ()=>{}アロー関数スタイル
+  "arrow-spacing": "error",
+  // アロー関数の前後にスペースを強制 () => {}
+  "strict": [
+    "error"
+  ],
+  // 'use strict';を強制
+  "no-warning-comments": [
+    "warn",
+    {
+      // コメント内のワードを検出し警告
+      "terms": [
+        //検出ワードリスト
+        "todo",
+        //あとで手を付ける
+        "fixme",
+        //既知の不具合がある
+        "hack"
+        //あまり綺麗じゃない解決策
+      ],
+      "location": "anywhere"
+    }
+  ],
+  "semi": [
+    "error"
+  ],
+  // セミコロンの強制
+}
