@@ -35,3 +35,13 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+dist/dmc*
+
+.DS_Store
+*.iml
+.idea
+.realize/
+src/github.com/cam-inc/dmc/common/
+src/github.com/cam-inc/dmc/controller/
+
