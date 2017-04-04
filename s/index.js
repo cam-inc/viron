@@ -1,7 +1,7 @@
 // import _ from 'underscore'
 import riot from 'riot'
 // import route from 'riot-route'
-//import swagger from './swagger'
+import swagger from './swagger'
 
 // css
 import './styles/index.pcss'
@@ -16,6 +16,14 @@ import './components/dmc.tag'
 
 console.log("index.js");
 
-riot.mount('dmc') // root mount!!!
+swagger.setup(null, (err, swagger) => {
+  if (err) {
+    console.log('Setup swagger error.', err);
+    return;
+  }
+  console.log("[SWAGGER] Name", swagger.getName());
+  console.log("[SWAGGER] Pages", swagger.getPage());
+  riot.mount('dmc') // root mount!!!
+})
 
 
