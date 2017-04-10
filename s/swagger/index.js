@@ -26,7 +26,7 @@ class Swagger {
 
   setup(url, callback) {
     const request = {
-      url: url || 'http://localhost:8080/swagger.json',
+      url: url || 'http://localhost:3000/swagger.json',
       //query,
       //method,
       //body,
