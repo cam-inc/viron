@@ -6,5 +6,5 @@ import (
 
 var _ = Resource("swagger", func() {
 	Origin(OriginURL, OriginAllowAll)
-	Files("/swagger.json", "public/swagger/swagger.json")
+	Files("/swagger.json", "gen/swagger/swagger.json")
 })

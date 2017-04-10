@@ -42,6 +42,15 @@ dist/dmc*
 *.iml
 .idea
 .realize/
-src/github.com/cam-inc/dmc/common/
-src/github.com/cam-inc/dmc/controller/
 
+/example-go/src/*
+!/example-go/src/github.com
+/example-go/src/github.com/*
+!/example-go/src/github.com/cam-inc
+/example-go/src/github.com/cam-inc/*
+!/example-go/src/github.com/cam-inc/dmc
+/example-go/src/github.com/cam-inc/dmc/*
+!/example-go/src/github.com/cam-inc/dmc/example-go
+/example-go/src/github.com/cam-inc/dmc/example-go/*
+!/example-go/src/github.com/cam-inc/dmc/example-go/*
+/example-go/src/github.com/cam-inc/dmc/example-go/gen
