@@ -1,0 +1,591 @@
+consumes:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+definitions:
+  CreateUserPayload:
+    example:
+      name: Maxime dolorum id dolores illum autem ea.
+    properties:
+      name:
+        example: Maxime dolorum id dolores illum autem ea.
+        type: string
+    title: CreateUserPayload
+    type: object
+  Dmc:
+    description: A DMC settings data (default view)
+    example:
+      name:
+        long: Design-based Management Console
+        short: DMC
+      pages:
+      - api: post
+        display: Layout of display
+        drawer: true
+        name:
+          long: Design-based Management Console
+          short: DMC
+        operation: post_list
+        primary: Et est iure et omnis rerum fugiat.
+        search:
+        - field: Field
+          path: In nam vel.
+      pagination:
+        X-Pagination-Limit: 1
+        X-Pagination-Next: Omnis ut architecto.
+        X-Pagination-Page: 2
+        X-Pagination-Prev: Omnis qui voluptatem omnis esse.
+        X-Pagination-Total: 2
+    properties:
+      name:
+        $ref: '#/definitions/name'
+      pages:
+        description: A Pages format
+        example:
+        - api: post
+          display: Layout of display
+          drawer: true
+          name:
+            long: Design-based Management Console
+            short: DMC
+          operation: post_list
+          primary: Et est iure et omnis rerum fugiat.
+          search:
+          - field: Field
+            path: In nam vel.
+        items:
+          $ref: '#/definitions/page'
+        type: array
+      pagination:
+        $ref: '#/definitions/pagination'
+    required:
+    - name
+    - pages
+    - pagination
+    title: 'Mediatype identifier: application/vnd.dmc+json; view=default'
+    type: object
+  Overview:
+    description: A Overview page data (default view)
+    example:
+      componets:
+      - api: post
+        display: Layout of display
+        name:
+          long: Design-based Management Console
+          short: DMC
+        operation: post_list
+        url: /#/overview
+      - api: post
+        display: Layout of display
+        name:
+          long: Design-based Management Console
+          short: DMC
+        operation: post_list
+        url: /#/overview
+      - api: post
+        display: Layout of display
+        name:
+          long: Design-based Management Console
+          short: DMC
+        operation: post_list
+        url: /#/overview
+      name:
+        long: Design-based Management Console
+        short: DMC
+    properties:
+      componets:
+        description: A Componets format
+        example:
+        - api: post
+          display: Layout of display
+          name:
+            long: Design-based Management Console
+            short: DMC
+          operation: post_list
+          url: /#/overview
+        - api: post
+          display: Layout of display
+          name:
+            long: Design-based Management Console
+            short: DMC
+          operation: post_list
+          url: /#/overview
+        - api: post
+          display: Layout of display
+          name:
+            long: Design-based Management Console
+            short: DMC
+          operation: post_list
+          url: /#/overview
+        items:
+          $ref: '#/definitions/component'
+        type: array
+      name:
+        $ref: '#/definitions/name'
+    required:
+    - name
+    - componets
+    title: 'Mediatype identifier: application/vnd.overview+json; view=default'
+    type: object
+  UpdateUserPayload:
+    example:
+      name: Qui ipsa voluptatibus repellendus.
+    properties:
+      name:
+        example: Qui ipsa voluptatibus repellendus.
+        type: string
+    title: UpdateUserPayload
+    type: object
+  User:
+    description: A User (default view)
+    example:
+      id: 5.9291786e+18
+      name: Nulla ipsam quis.
+    properties:
+      id:
+        description: id
+        example: 5.9291786e+18
+        format: int64
+        type: integer
+      name:
+        description: user name
+        example: Nulla ipsam quis.
+        type: string
+    required:
+    - id
+    - name
+    title: 'Mediatype identifier: application/vnd.user+json; view=default'
+    type: object
+  UserCollection:
+    description: UserCollection is the media type for an array of User (default view)
+    example:
+    - id: 5.9291786e+18
+      name: Nulla ipsam quis.
+    items:
+      $ref: '#/definitions/User'
+    title: 'Mediatype identifier: application/vnd.user+json; type=collection; view=default'
+    type: array
+  component:
+    description: A Component type
+    example:
+      api: post
+      display: Layout of display
+      name:
+        long: Design-based Management Console
+        short: DMC
+      operation: post_list
+      url: /#/overview
+    properties:
+      api:
+        description: Swagger api key
+        example: post
+        type: string
+      display:
+        default: table
+        description: Layout of display
+        enum:
+        - table
+        - list
+        - card
+        example: Layout of display
+        type: string
+      name:
+        $ref: '#/definitions/name'
+      operation:
+        description: Swagger api.operation key
+        example: post_list
+        type: string
+      url:
+        description: href of component
+        example: /#/overview
+        type: string
+    required:
+    - api
+    - operation
+    - name
+    - display
+    title: component
+    type: object
+  error:
+    description: Error response media type (default view)
+    example:
+      code: invalid_value
+      detail: Value of ID must be an integer
+      id: 3F1FKVRR
+      meta:
+        timestamp: 1.458609e+09
+      status: "400"
+    properties:
+      code:
+        description: an application-specific error code, expressed as a string value.
+        example: invalid_value
+        type: string
+      detail:
+        description: a human-readable explanation specific to this occurrence of the
+          problem.
+        example: Value of ID must be an integer
+        type: string
+      id:
+        description: a unique identifier for this particular occurrence of the problem.
+        example: 3F1FKVRR
+        type: string
+      meta:
+        additionalProperties: true
+        description: a meta object containing non-standard meta-information about
+          the error.
+        example:
+          timestamp: 1.458609e+09
+        type: object
+      status:
+        description: the HTTP status code applicable to this problem, expressed as
+          a string value.
+        example: "400"
+        type: string
+    title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    type: object
+  name:
+    description: A Name format
+    example:
+      long: Design-based Management Console
+      short: DMC
+    properties:
+      long:
+        description: Long name
+        example: Design-based Management Console
+        type: string
+      short:
+        description: Short name
+        example: DMC
+        type: string
+    required:
+    - short
+    title: name
+    type: object
+  page:
+    description: A page type
+    example:
+      api: post
+      display: Layout of display
+      drawer: true
+      name:
+        long: Design-based Management Console
+        short: DMC
+      operation: post_list
+      primary: Et est iure et omnis rerum fugiat.
+      search:
+      - field: Field
+        path: In nam vel.
+    properties:
+      api:
+        description: Swagger api key
+        example: post
+        type: string
+      display:
+        default: table
+        description: Layout of display
+        enum:
+        - table
+        - list
+        - card
+        example: Layout of display
+        type: string
+      drawer:
+        description: Displayed in the drawer
+        example: true
+        type: boolean
+      name:
+        $ref: '#/definitions/name'
+      operation:
+        description: Swagger api.operation key
+        example: post_list
+        type: string
+      primary:
+        description: recode primary key
+        example: Et est iure et omnis rerum fugiat.
+        type: string
+      search:
+        description: Search of page
+        example:
+        - field: Field
+          path: In nam vel.
+        items:
+          $ref: '#/definitions/search'
+        type: array
+    required:
+    - api
+    - operation
+    - name
+    - primary
+    - display
+    - drawer
+    title: page
+    type: object
+  pagination:
+    description: A Pagination definition
+    example:
+      X-Pagination-Limit: 1
+      X-Pagination-Next: Omnis ut architecto.
+      X-Pagination-Page: 2
+      X-Pagination-Prev: Omnis qui voluptatem omnis esse.
+      X-Pagination-Total: 2
+    properties:
+      X-Pagination-Limit:
+        example: 1
+        minimum: 1
+        type: integer
+      X-Pagination-Next:
+        example: Omnis ut architecto.
+        type: string
+      X-Pagination-Page:
+        example: 2
+        minimum: 0
+        type: integer
+      X-Pagination-Prev:
+        example: Omnis qui voluptatem omnis esse.
+        type: string
+      X-Pagination-Total:
+        example: 2
+        minimum: 0
+        type: integer
+    title: pagination
+    type: object
+  search:
+    description: A Search format
+    example:
+      field: Field
+      path: In nam vel.
+    properties:
+      field:
+        default: default
+        description: field
+        enum:
+        - default
+        - date
+        - time
+        - datetime
+        example: Field
+        type: string
+      path:
+        description: path
+        example: In nam vel.
+        type: string
+    required:
+    - path
+    - field
+    title: search
+    type: object
+host: localhost:3000
+info:
+  description: A simple goa service
+  title: The virtual wine example-go
+  version: 0.0.1
+paths:
+  /dmc:
+    get:
+      description: dmc setting data
+      operationId: dmc#show
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.dmc+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Dmc'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show dmc
+      tags:
+      - dmc
+  /overview:
+    get:
+      description: dmc setting data
+      operationId: overview#show
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.overview+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Overview'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show overview
+      tags:
+      - overview
+  /swagger.json:
+    get:
+      operationId: swagger#/swagger.json
+      responses:
+        "200":
+          description: File downloaded
+          schema:
+            type: file
+      schemes:
+      - http
+      summary: Download gen/swagger/swagger.json
+  /user:
+    get:
+      description: get users
+      operationId: user#list
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: list user
+      tags:
+      - user
+    post:
+      description: create a user
+      operationId: user#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateUserPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: create user
+      tags:
+      - user
+  /user/{id}:
+    delete:
+      description: delete the user
+      operationId: user#delete
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: delete user
+      tags:
+      - user
+    get:
+      description: get the user
+      operationId: user#show
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show user
+      tags:
+      - user
+    put:
+      description: update the user
+      operationId: user#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUserPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: update user
+      tags:
+      - user
+produces:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+responses:
+  NoContent:
+    description: No Content
+  NotFound:
+    description: Not Found
+schemes:
+- http
+swagger: "2.0"
