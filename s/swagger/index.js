@@ -4,6 +4,9 @@
  * Tips: swagger-client(swagger-js) は、ブラウザの外部ファイル読み込み
  */
 
+// APIは必須でサポートしなければならない URI
+const DMC_URI = '/dmc';
+
 class Swagger {
 
   constructor() {
@@ -39,18 +42,24 @@ class Swagger {
     this._endpoint = SwaggerClient(request.url);
 
     this._endpoint.then(client => {
-      // Tips: dmc_show は仕様で必須
-      if (!client.apis.dmc || !client.apis.dmc["dmc#show"]) {
+      let dmcOID = client.spec.paths[DMC_URI].get.operationId;
+      if (!dmcOID || !client.apis.dmc || !client.apis.dmc[dmcOID]) {
         return callback(new Error(`Fetching resource list: ${client.url}; system entry point not found. (uri: /dmc)`), client);
 
       }
-      console.log(`Fetching resource list: ${client.url}; Success.`)
-      client.apis.dmc["dmc#show"]().then(res => {
+      console.log(`Fetching resource list: ${client.url}; Success.`);
+      client.apis.dmc[dmcOID]().then(res => {
         this._dmc = res;
         this._client = client;
         this.setuped = true;
         callback(null, this);
+
+      }).catch(err => {
+        return callback(err, this);
       });
+
+    }).catch(err => {
+      return callback(err, this);
     });
 
   }
