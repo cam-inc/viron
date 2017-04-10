@@ -43,6 +43,10 @@ dist/dmc*
 .idea
 .realize/
 
+dist
+pkg
+bin
+
 /example-go/src/*
 !/example-go/src/github.com
 /example-go/src/github.com/*

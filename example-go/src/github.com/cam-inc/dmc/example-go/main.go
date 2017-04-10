@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/controller"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	"github.com/goadesign/goa"
@@ -10,6 +11,9 @@ import (
 )
 
 func main() {
+	// db connection
+	common.InitDB()
+
 	// Create service
 	service := goa.New("example-go")
 

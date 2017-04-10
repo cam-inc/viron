@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	"github.com/goadesign/goa"
 )
@@ -22,6 +23,43 @@ func (c *OverviewController) Show(ctx *app.ShowOverviewContext) error {
 	// Put your logic here
 
 	// OverviewController_Show: end_implement
-	res := &app.Overview{}
+	res := &app.Overview{
+		Name: &app.Name{
+			Long:  common.String("Dashboard"),
+			Short: "Dashboard",
+		},
+		Componets: []*app.Component{
+			{
+				Display: "dmc-chartjs-doughnut-text-inside",
+				//Drawer:    true,
+				API:       "crash",
+				Operation: "crash_overview",
+				Name: &app.Name{
+					Long:  common.String("Native Android Crash"),
+					Short: "Cash (Android)",
+				},
+			},
+			{
+				Display: "dmc-chartjs-doughnut-text-inside",
+				//Drawer:    true,
+				API:       "crash",
+				Operation: "crash_overview",
+				Name: &app.Name{
+					Long:  common.String("Native iOS Crash"),
+					Short: "Cash (iOS)",
+				},
+			},
+			{
+				Display: "dmc-chartjs-doughnut-text-inside",
+				//Drawer:    true,
+				API:       "crash",
+				Operation: "crash_overview",
+				Name: &app.Name{
+					Long:  common.String("Native Web Crash"),
+					Short: "Cash (Web)",
+				},
+			},
+		},
+	}
 	return ctx.OK(res)
 }
