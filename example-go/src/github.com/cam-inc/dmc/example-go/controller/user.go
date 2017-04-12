@@ -31,7 +31,7 @@ func (c *UserController) Create(ctx *app.CreateUserContext) error {
 		panic(err)
 	}
 
-	// Usereaetaee:t aeened:_ti mapeleement
+	// UserController_Create: end_implement
 	res := &app.User{}
 	return ctx.OK(res)
 }

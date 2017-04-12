@@ -43,6 +43,9 @@ dist/dmc*
 .idea
 .realize/
 
+*.key
+*.key.pub
+
 dist
 pkg
 bin
