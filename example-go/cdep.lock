@@ -1,0 +1,24 @@
+# {scm} {repository url} {repository name} {recursive flag}
+# - scm (Required)
+# - repository url (Required)
+# - repository name (Required)
+# - recursive flag (Optional)
+#
+# sparator:space
+#
+# ex) git github.com/goadesign/goa 8f0fdca409904318050f9e03579c3878f8928826 recursive
+
+# deps:gorma
+#git bitbucket.org/pkg/inflect HEAD recursive
+
+
+# Production package
+git github.com/goadesign/goa HEAD recursive
+git github.com/goadesign/gorma HEAD recursive
+git github.com/jinzhu/gorm HEAD recursive
+
+
+# Development package
+git github.com/tockins/realize HEAD
+git github.com/smartystreets/goconvey HEAD
+git github.com/golang/lint/golint HEAD

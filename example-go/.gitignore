@@ -12,17 +12,17 @@ bin
 *.key.pub
 
 # source code
-/example-go/src/*
-!/example-go/src/github.com
-/example-go/src/github.com/*
-!/example-go/src/github.com/cam-inc
-/example-go/src/github.com/cam-inc/*
-!/example-go/src/github.com/cam-inc/dmc
-/example-go/src/github.com/cam-inc/dmc/*
-!/example-go/src/github.com/cam-inc/dmc/example-go
-/example-go/src/github.com/cam-inc/dmc/example-go/*
-!/example-go/src/github.com/cam-inc/dmc/example-go/*
-/example-go/src/github.com/cam-inc/dmc/example-go/gen
+/src/*
+!src/github.com
+/src/github.com/*
+!/src/github.com/cam-inc
+/src/github.com/cam-inc/*
+!/src/github.com/cam-inc/dmc
+/src/github.com/cam-inc/dmc/*
+!/src/github.com/cam-inc/dmc/example-go
+/src/github.com/cam-inc/dmc/example-go/*
+!/src/github.com/cam-inc/dmc/example-go/*
+/src/github.com/cam-inc/dmc/example-go/gen
 
 # OSX Finder
 .DS_Store

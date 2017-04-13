@@ -1,5 +1,5 @@
 __PWD=$(shell pwd)
-
+__hg=$(shell which hg)
 __OS_NAME=$(shell uname -s)
 
 __BIN=bin
@@ -29,30 +29,29 @@ __CDEP=$(__PWD)/cdep
 __SERVICE=$(shell $(__CDEP) print_SERVICE)
 __ORGANIZATION=$(shell $(__CDEP) print_ORGANIZATION)
 __REPOSITORY=$(shell $(__CDEP) print_REPOSITORY)
+__TARGET_HOME=example-go
 __CDEP_LOCK_FILE=$(shell $(__CDEP) xprint_CDEP_LOCK_FILE)
 
 __DESIGN=design
 __CONTROLLER=controller
 __GEN=gen
 
-
-__JWTKEY=jwtkey
-__JWTKEY_DIR=$(__SRC)/$(__PKG_PROJECT_HOME)/$(__JWTKEY)
-__JWTKEY_SECRET=$(__JWTKEY_DIR)/jwt.key
-__JWTKEY_PUBLIC=$(__JWTKEY_DIR)/jwt.key.pub
-
-
-__PKG_PROJECT_HOME=$(__SERVICE)/$(__ORGANIZATION)/$(__REPOSITORY)
-__SRC_PROJECT_HOME=$(__SRC)/$(__PKG_PROJECT_HOME)
+__PKG_PROJECT_HOME=$(__SERVICE)/$(__ORGANIZATION)/$(__REPOSITORY)/$(__TARGET_HOME)
+__SRC_PROJECT_HOME=$(__SRC)/$(__SERVICE)/$(__ORGANIZATION)/$(__REPOSITORY)/$(__TARGET_HOME)
 
 __PKG_PROJECT_DESIGN=$(__PKG_PROJECT_HOME)/$(__DESIGN)
-__SRC_PROJECT_DEAIGN=$(__SRC)/$(__PKG_PROJECT_DESIGN)
+__SRC_PROJECT_DEAIGN=$(__SRC_PROJECT_HOME)/$(__DESIGN)
 
 __PKG_PROJECT_CONTROLLER=$(__PKG_PROJECT_HOME)/$(__CONTROLLER)
-__SRC_PROJECT_CONTROLLER=$(__SRC)/$(__PKG_PROJECT_CONTROLLER)
+__SRC_PROJECT_CONTROLLER=$(__SRC_PROJECT_HOME)/$(__CONTROLLER)
 
 __PKG_PROJECT_GEN=$(__PKG_PROJECT_HOME)/$(__GEN)
-__SRC_PROJECT_GEN=$(__SRC)/$(__PKG_PROJECT_GEN)
+__SRC_PROJECT_GEN=$(__SRC_PROJECT_HOME)/$(__GEN)
+
+__JWTKEY=jwtkey
+__JWTKEY_DIR=$(__SRC_PROJECT_HOME)/$(__JWTKEY)
+__JWTKEY_SECRET=$(__JWTKEY_DIR)/jwt.key
+__JWTKEY_PUBLIC=$(__JWTKEY_DIR)/jwt.key.pub
 
 
 all: help
@@ -69,7 +68,13 @@ vendor-install: ## Vendor package install and update(cdep)
 vendor-uninstall: ## Vendor package uninstall(cdep)
 	$(__CDEP) uninstall
 
-setup: vendor-install setup-key ## Setup
+setup-pre:
+	@if [ "x$(__hg)" == "x" ]; then \
+	 	echo "[ERROR] hg command not found. brew install hg"; \
+	 	exit 1; \
+	fi
+
+setup: setup-pre vendor-install setup-key ## Setup
 	@if [ ! -f $(__GOAGEN) ]; then \
 		cd $(__SRC_DIR)/github.com/goadesign/goa; \
 		make goagen; \
@@ -153,14 +158,18 @@ bench: ## Benchmark
 #
 # -- goa
 #
-gen: gen-app gen-client gen-swagger gen-schema gen-js gen-model ## Generate goa all (ignore: gen-main)
+gen: gen-controller gen-app gen-client gen-swagger gen-schema gen-js gen-model ## Generate goa all (ignore: gen-main)
 	@#GOPATH=$(__GOPATH) $(__GOAGEN) bootstrap -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_DIR)
 	@echo "Finish :p"
 
 gen-main: ## Generate goa [main]
 	@echo "[INFO ] >>>>> gen-main"
-	GOPATH=$(__GOPATH) $(__GOAGEN) main -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_CONTROLLER)
+	GOPATH=$(__GOPATH) $(__GOAGEN) main -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_DIR)
 	@echo "[INFO ] Manual move file -> $(__SRC_PROJECT_CONTROLLER)/main.go"
+
+gen-controller: ## Generate goa [controller]
+	@echo "[INFO ] >>>>> gen-controller"
+	GOPATH=$(__GOPATH) $(__GOAGEN) controller --app-pkg ../gen/app --pkg $(__CONTROLLER) -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_CONTROLLER)
 
 gen-app: ## Generate goa [app]
 	@echo "[INFO ] >>>>> gen-app"

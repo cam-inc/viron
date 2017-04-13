@@ -1,0 +1,178 @@
+#!/bin/bash
+
+export LANG=C
+
+# environment variable
+_DEBUG=0
+if [ "x${DEBUG}" != "x" ]; then
+  _DEBUG=1
+fi
+
+debug() {
+  if [ ${_DEBUG} -eq 1 ]; then
+    echo "[DEBUG] $@"
+  fi
+}
+
+log() {
+  echo "[INFO ] $@"
+}
+
+err() {
+  echo "[ERROR] $@"
+}
+
+__execpath(){
+  if [ ! -e "$1" ]; then
+    return 1
+  fi
+  pushd `dirname $1` >/dev/null 2>&1
+  [ $? -eq 1 ] && exit 1
+  _dir=`pwd`
+  popd >/dev/null 2>&1
+  echo ${_dir}
+}
+__SCRIPT_DIR=`__execpath $0`
+#log "script dir: ${__SCRIPT_DIR}"
+
+
+init() {
+  if [ "x${CDEP_LOCK_FILE}" == "x" ]; then
+     CDEP_LOCK_FILE="${__SCRIPT_DIR}/cdep.lock"
+  fi
+
+  if [ ! -f ${CDEP_LOCK_FILE} ]; then
+    err "cdep lock file not found. read file path: '${CDEP_LOCK_FILE}'"
+    exit 2
+  fi
+  debug "CDEP_LOCK_FILE=${CDEP_LOCK_FILE}"
+
+  #
+  if [ "x${CDEP_CONF_FILE}" == "x" ]; then
+     CDEP_CONF_FILE="${__SCRIPT_DIR}/cdep.conf"
+  fi
+
+  if [ ! -f ${CDEP_CONF_FILE} ]; then
+    err "cdep conf file not found. read file path: '${CDEP_CONF_FILE}'"
+    exit 2
+  fi
+  debug "CDEP_CONF_FILE=${CDEP_CONF_FILE}"
+  source ${CDEP_CONF_FILE}
+
+}
+init
+
+
+__goget() {
+  vcs=$1
+  pkg=$2
+  rev=$3
+  recursive=$4
+
+  debug "go get parameters. vcs=${vcs} pkg=${pkg} rev=${rev} recursive=${recursive}"
+
+  if [ "x${vcs}" == "x" -o "x${pkg}" == "x" -o "x${rev}" == "x" ]; then
+    err "go get parameter error. parameter=$@"
+    exit 1
+  fi
+
+  [ "x${recursive}" == "xrecursive" ] && recursive="/..."
+
+  pkg_url=https://${pkg}
+  target_dir=${__SCRIPT_DIR}/src/${pkg}
+
+
+  if [ ! -d ${target_dir} ]; then
+    log "go get <-- ${vcs}:${pkg}${recursive}@${rev}"
+    echo "GOPATH=${__SCRIPT_DIR} go get ${pkg}${recursive}"
+    GOPATH=${__SCRIPT_DIR} go get ${pkg}${recursive}
+  fi
+
+  case ${vcs} in
+    git)
+      pushd ${target_dir} >/dev/null 2>&1
+      git reset --quiet --hard ${rev}
+      # log "git reset --quiet --hard ${rev}"
+      [ $? -ne 0 ] && echo "[ERROR] git reset error. git reset --quiet --hard ${rev}" && exit 1
+
+      rev_reset=`git --no-pager log -n 1 --pretty=format:"%H"`
+
+      if [ "x${rev}" == "x${rev_reset}" ]; then
+        log "check [success] git reset: ${rev} == ${rev_reset}"
+      elif [ "x${rev}" == "xHEAD" ]; then
+        log "check [skip]    git reset: ${rev}"
+      else
+        log "check [failure] git reset: ${rev} != ${rev_reset}"
+      fi
+      #git --no-pager log -n 1 --pretty=oneline
+
+      GOPATH=${__SCRIPT_DIR} go install
+
+      popd >/dev/null 2>&1
+      ;;
+  esac
+}
+
+# --
+install() {
+  PRE_IFS=$IFS
+  IFS=$'\n'
+  # Exclude comment(#) and blank lines
+  for line in `cat ${CDEP_LOCK_FILE} | grep -v '^#\|^$'`
+  do
+    _line=`echo ${line} | sed -e 's/  */ /g'`
+    vcs=`echo ${_line} | cut -d ' ' -f 1`
+    pkg=`echo ${_line} | cut -d ' ' -f 2`
+    rev=`echo ${_line} | cut -d ' ' -f 3`
+    recursive=`echo ${_line} | cut -d ' ' -f 4`
+
+    __goget ${vcs} ${pkg} ${rev} ${recursive}
+  done
+  IFS=$PRE_IFS
+}
+
+uninstall() {
+  pushd src >/dev/null 2>&1
+  echo ">>>>> [Remove Start]"
+  find . -mindepth 3 -maxdepth 3 -type d | grep -v '^./'${SERVICE}'/'${ORGANIZATION}'/'${REPOSITORY}'$' | tee /dev/stderr | xargs rm -rf
+  find . -mindepth 2 -maxdepth 2 -type d | grep -v '^./'${SERVICE}'/'${ORGANIZATION}'$' | tee /dev/stderr | xargs rm -rf
+  find . -mindepth 1 -maxdepth 1 -type d | grep -v '^./'${SERVICE}'$'  | tee /dev/stderr | xargs rm -rf
+  echo "<<<<< [Remove End]"
+  popd >/dev/null 2>&1
+}
+
+# main
+
+init
+
+usage() {
+  cat <<_EOT_
+Usage:
+  $0 [install|uninstall|print_SERVICE|print_ORGANIZATION|print_REPOSITORY|print_CDEP_LOCK_FILE]
+Description:
+  Go dependency package management tool
+Settings:
+  SERVICE:                ${SERVICE}
+  ORGANIZATION:           ${ORGANIZATION}
+  REPOSITORY:             ${REPOSITORY}
+  CDEP_LOCK_FILE(env):    ${CDEP_LOCK_FILE}
+
+_EOT_
+  exit 1
+}
+
+if [ "x$1" == "xinstall" ]; then
+  install
+elif [ "x$1" == "xuninstall" ]; then
+  uninstall
+elif [ "x$1" == "xprint_SERVICE" ]; then
+  echo "${SERVICE}"
+elif [ "x$1" == "xprint_ORGANIZATION" ]; then
+  echo "${ORGANIZATION}"
+elif [ "x$1" == "xprint_REPOSITORY" ]; then
+  echo "${REPOSITORY}"
+elif [ "x$1" == "xprint_CDEP_LOCK_FILE" ]; then
+  echo "${CDEP_LOCK_FILE}"
+else
+  usage
+fi
