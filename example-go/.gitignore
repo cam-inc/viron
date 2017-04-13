@@ -1,0 +1,38 @@
+
+# realize
+.realize/
+
+# go ignore
+dist
+pkg
+bin
+
+# key
+*.key
+*.key.pub
+
+# source code
+/example-go/src/*
+!/example-go/src/github.com
+/example-go/src/github.com/*
+!/example-go/src/github.com/cam-inc
+/example-go/src/github.com/cam-inc/*
+!/example-go/src/github.com/cam-inc/dmc
+/example-go/src/github.com/cam-inc/dmc/*
+!/example-go/src/github.com/cam-inc/dmc/example-go
+/example-go/src/github.com/cam-inc/dmc/example-go/*
+!/example-go/src/github.com/cam-inc/dmc/example-go/*
+/example-go/src/github.com/cam-inc/dmc/example-go/gen
+
+# OSX Finder
+.DS_Store
+
+# Eidtor
+*.iml
+.idea
+.vscode
+
+# Docker mysql data
+docker/mysql/data/*
+!docker/mysql/data/.gitkeep
+
