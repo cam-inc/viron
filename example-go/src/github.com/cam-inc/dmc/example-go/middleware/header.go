@@ -3,8 +3,9 @@ package middleware
 import (
 	"net/http"
 
+	"context"
+
 	"github.com/goadesign/goa"
-	"golang.org/x/net/context"
 )
 
 func SetHeader() goa.Middleware {

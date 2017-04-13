@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"golang.org/x/net/context"
+	"context"
 
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	jwtgo "github.com/dgrijalva/jwt-go"
