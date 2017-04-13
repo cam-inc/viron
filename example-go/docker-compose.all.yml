@@ -1,11 +1,10 @@
 version: '2'
 services:
 
-  camplat-guid:
+  example-go:
     # 240*1024*1024 = 251658240 Byte = 240 MB
     mem_limit: 251658240
     build: docker/local
-    container_name: example-go
     working_dir: "/go"
     depends_on:
       - mysql
@@ -31,7 +30,6 @@ services:
   mysql:
     # 512*1024*1024 = 536870912 Byte = 512 MB
     mem_limit: 536870912
-    container_name: mysql
     build: docker/mysql
     ports:
       - 3306:3306

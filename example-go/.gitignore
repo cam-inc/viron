@@ -1,11 +1,10 @@
-
-# realize
-.realize/
-
 # go ignore
 dist
 pkg
 bin
+
+# go test(cover)
+cover.out
 
 # key
 *.key
@@ -23,6 +22,11 @@ bin
 /src/github.com/cam-inc/dmc/example-go/*
 !/src/github.com/cam-inc/dmc/example-go/*
 /src/github.com/cam-inc/dmc/example-go/gen
+
+# realize
+.realize/
+src/github.com/cam-inc/dmc/example-go/example-go
+
 
 # OSX Finder
 .DS_Store

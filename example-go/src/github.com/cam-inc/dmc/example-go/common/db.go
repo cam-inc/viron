@@ -12,7 +12,7 @@ var DB *gorm.DB
 
 func getConnectionString() string {
 	return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s?parseTime=true",
-		"user", "pass", "tcp", "localhost", "3306", "dmc_local")
+		"user", "password", "tcp", "mysql", "3306", "dmc_local")
 }
 
 func InitDB() {

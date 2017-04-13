@@ -1,0 +1,15 @@
+version: '2'
+services:
+  mysql:
+    # 512*1024*1024 = 536870912 Byte = 512 MB
+    mem_limit: 536870912
+    build: docker/mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - $PWD/docker/mysql/data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=dmc_local
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password

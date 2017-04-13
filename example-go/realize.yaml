@@ -17,7 +17,7 @@ projects:
   generate: false
   build: true
   fmt: true
-  test: true
+  test: false
   params: []
   watcher:
     before:
