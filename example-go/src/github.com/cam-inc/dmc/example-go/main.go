@@ -6,6 +6,7 @@ import (
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/controller"
 	"github.com/cam-inc/dmc/example-go/gen/app"
+	dmcMiddleware "github.com/cam-inc/dmc/example-go/middleware"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 )
@@ -22,6 +23,8 @@ func main() {
 	service.Use(middleware.LogRequest(true))
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
+	app.UseJWTMiddleware(service, dmcMiddleware.JWT())
+	service.Use(dmcMiddleware.SetHeader())
 
 	// Mount "dmc" controller
 	c := controller.NewDmcController(service)
@@ -35,6 +38,15 @@ func main() {
 	// Mount "user" controller
 	c4 := controller.NewUserController(service)
 	app.MountUserController(service, c4)
+	// Mount "admin_user" controller
+	c5 := controller.NewAdminUserController(service)
+	app.MountAdminUserController(service, c5)
+	// Mount "admin_role" controller
+	c6 := controller.NewAdminRoleController(service)
+	app.MountAdminRoleController(service, c6)
+	// Mount "auth" controller
+	c7 := controller.NewAuthController(service)
+	app.MountAuthController(service, c7)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {

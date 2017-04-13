@@ -17,6 +17,7 @@ __PUBLIC=public
 __MODEL=model
 __CONTROLLER=controller
 __GEN=gen
+__JWTKEY=jwtkey
 
 __PROG=$(__DIST)/$(__NAME)
 __PATH=$(__BIN):$$PATH
@@ -38,6 +39,10 @@ __SRC_PROJECT_CONTROLLER=$(__SRC)/$(__PKG_PROJECT_CONTROLLER)
 __PKG_PROJECT_GEN=$(__PKG_PROJECT_HOME)/$(__GEN)
 __SRC_PROJECT_GEN=$(__SRC)/$(__PKG_PROJECT_GEN)
 
+__JWTKEY_DIR=$(__SRC)/$(__PKG_PROJECT_HOME)/$(__JWTKEY)
+__JWTKEY_SECRET=$(__JWTKEY_DIR)/jwt.key
+__JWTKEY_PUBLIC=$(__JWTKEY_DIR)/jwt.key.pub
+
 TARGET=$(target)
 
 all:
@@ -51,6 +56,12 @@ clean:
 
 deps:
 	$(__VENDOR_SHELL) install
+
+	@if [ ! -d "$(__JWTKEY_DIR)" ]; then \
+		mkdir -p $(__JWTKEY_DIR); \
+		openssl genrsa 2048 > $(__JWTKEY_SECRET); \
+		openssl rsa -in $(__JWTKEY_SECRET) -pubout -out $(__JWTKEY_PUBLIC); \
+	fi
 
 realize:
 	GOPATH=${__GOPATH} $(__REALIZE) list

@@ -24,4 +24,6 @@ func InitDB() {
 	}
 	DB.LogMode(true)
 	DB.AutoMigrate(&models.User{})
+	DB.AutoMigrate(&models.AdminUser{})
+	DB.AutoMigrate(&models.AdminRole{})
 }

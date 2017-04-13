@@ -5,34 +5,35 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
-// UserMediaType of media type.
-var UserMediaType = MediaType("application/vnd.user+json", func() {
-	Description("A User")
+var AdminUserMediaType = MediaType("application/vnd.admin_user+json", func() {
+	Description("A Admin User")
 
 	Attributes(func() {
-		Attribute("id", Integer, "id")
-		Attribute("name", String, "user name")
-		//Attribute("createdAt", DateTime, "user created date-time")
-		//Attribute("updatedAt", DateTime, "user updated date-time")
-		Required("id", "name")
+		Attribute("id", Integer, "unique id")
+		Attribute("login_id", String, "login id")
+		Attribute("password", String, "password")
+		Attribute("role_id", String, "role id")
+		Attribute("salt", String, "password salt")
+
+		Required("id", "login_id", "password")
 	})
 
 	View("default", func() {
 		Attribute("id")
-		Attribute("name")
-		//Attribute("createdAt")
-		//Attribute("updatedAt")
+		Attribute("login_id")
+		Attribute("role_id")
 	})
+
 	View("tiny", func() {
-		Attribute("id")
-		Attribute("name")
+		Attribute("login_id")
+		Attribute("role_id")
 	})
 })
 
-var _ = Resource("user", func() {
+var _ = Resource("admin_user", func() {
 	Origin(OriginURL, OriginAllowAll)
-	BasePath("/user")
-	DefaultMedia(UserMediaType)
+	BasePath("/adminuser")
+	DefaultMedia(AdminUserMediaType)
 
 	// TODO: ログイン画面できるまでは外しておく
 	//Security(JWT, func() {
@@ -40,10 +41,10 @@ var _ = Resource("user", func() {
 	//})
 
 	Action("list", func() {
-		Description("get users")
+		Description("get admin users")
 		Routing(GET(""))
 		Response(OK, func() {
-			Media(CollectionOf(UserMediaType, func() {
+			Media(CollectionOf(AdminUserMediaType, func() {
 				View("default")
 				View("tiny")
 			}))
@@ -53,37 +54,39 @@ var _ = Resource("user", func() {
 	})
 
 	Action("show", func() {
-		Description("get the user")
+		Description("get the admin user")
 		Routing(GET("/:id"))
 		Params(func() {
 			Param("id", Integer, "id")
 		})
-		Response(OK, func() { Media(UserMediaType) })
+		Response(OK, func() { Media(AdminUserMediaType) })
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
 	})
 
 	Action("create", func() {
-		Description("create a user")
+		Description("create a admin user")
 		Routing(POST(""))
 		Payload(func() {
-			Member("name", String)
+			Member("login_id", String)
+			Member("password", String)
 		})
-		Response(OK, func() { Media(UserMediaType) })
+		Response(OK, func() { Media(AdminUserMediaType) })
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
 	})
 
 	Action("update", func() {
-		Description("update the user")
+		Description("update the admin user")
 		Routing(PUT("/:id"))
 		Params(func() {
 			Param("id", Integer, "id")
 		})
 		Payload(func() {
-			Member("name", String)
+			Member("password", String)
+			Member("role_id", String)
 		})
-		Response(OK, func() { Media(UserMediaType) })
+		Response(OK, func() { Media(AdminUserMediaType) })
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
 	})

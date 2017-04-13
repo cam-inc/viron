@@ -25,6 +25,12 @@ var _ = Resource("overview", func() {
 	Origin(OriginURL, OriginAllowAll)
 	BasePath("/overview")
 	DefaultMedia(OverviewMediaType)
+
+	// TODO: ログイン画面できるまでは外しておく
+	//Security(JWT, func() {
+	//	Scope("api:access")
+	//})
+
 	Action("show", func() {
 		Routing(GET(""))
 		// Metadata("swagger:tag:dmc_show")
