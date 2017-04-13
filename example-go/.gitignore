@@ -1,0 +1,42 @@
+# go ignore
+dist
+pkg
+bin
+
+# go test(cover)
+cover.out
+
+# key
+*.key
+*.key.pub
+
+# source code
+/src/*
+!src/github.com
+/src/github.com/*
+!/src/github.com/cam-inc
+/src/github.com/cam-inc/*
+!/src/github.com/cam-inc/dmc
+/src/github.com/cam-inc/dmc/*
+!/src/github.com/cam-inc/dmc/example-go
+/src/github.com/cam-inc/dmc/example-go/*
+!/src/github.com/cam-inc/dmc/example-go/*
+/src/github.com/cam-inc/dmc/example-go/gen
+
+# realize
+.realize/
+src/github.com/cam-inc/dmc/example-go/example-go
+
+
+# OSX Finder
+.DS_Store
+
+# Eidtor
+*.iml
+.idea
+.vscode
+
+# Docker mysql data
+docker/mysql/data/*
+!docker/mysql/data/.gitkeep
+
