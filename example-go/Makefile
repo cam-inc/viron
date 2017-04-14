@@ -34,7 +34,6 @@ __CDEP_LOCK_FILE=$(shell $(__CDEP) xprint_CDEP_LOCK_FILE)
 __DESIGN=design
 __CONTROLLER=controller
 __GEN=gen
-__JWTKEY=jwtkey
 
 __PKG_PROJECT_HOME=$(__SERVICE)/$(__ORGANIZATION)/$(__REPOSITORY)/$(__TARGET_HOME)
 __SRC_PROJECT_HOME=$(__SRC)/$(__SERVICE)/$(__ORGANIZATION)/$(__REPOSITORY)/$(__TARGET_HOME)
@@ -47,13 +46,6 @@ __SRC_PROJECT_CONTROLLER=$(__SRC_PROJECT_HOME)/$(__CONTROLLER)
 
 __PKG_PROJECT_GEN=$(__PKG_PROJECT_HOME)/$(__GEN)
 __SRC_PROJECT_GEN=$(__SRC_PROJECT_HOME)/$(__GEN)
-
-__PKG_PROJECT_JWTKEY=$(__PKG_PROJECT_HOME)/$(__JWTKEY)
-__SRC_PROJECT_JWTKEY=$(__SRC_PROJECT_HOME)/$(__JWTKEY)
-
-__JWTKEY_DIR=$(__SRC_PROJECT_HOME)/$(__JWTKEY)
-__JWTKEY_SECRET=$(__JWTKEY_DIR)/jwt.key
-__JWTKEY_PUBLIC=$(__JWTKEY_DIR)/jwt.key.pub
 
 
 all: help
@@ -77,7 +69,7 @@ setup-pre:
 	 	exit 1; \
 	fi
 
-setup: setup-pre vendor-install setup-pre-key ## Setup
+setup: setup-pre vendor-install ## Setup
 	@if [ ! -f $(__GOAGEN) ]; then \
 		cd $(__SRC_DIR)/github.com/goadesign/goa; \
 		make goagen; \
@@ -86,12 +78,8 @@ setup: setup-pre vendor-install setup-pre-key ## Setup
 		cd $(__SRC_DIR)/github.com/tockins/realize; \
 		go install; \
 	fi
-
-setup-pre-key:
-	@if [ ! -d "$(__JWTKEY_DIR)" ]; then \
-		mkdir -p $(__JWTKEY_DIR); \
-		openssl genrsa 2048 > $(__JWTKEY_SECRET); \
-		openssl rsa -in $(__JWTKEY_SECRET) -pubout -out $(__JWTKEY_PUBLIC); \
+	@if [ ! -f $(__SRC_PROJECT_HOME)/common/jwtkey_gen.go ]; then \
+		GOPATH=$(__GOPATH) go generate $(__SRC_PROJECT_HOME)/common/jwtkey.go; \
 	fi
 
 #
@@ -220,10 +208,6 @@ realize-docker: clean-realize setup ## Hot-reload run on Docker Container
 	@if [ ! -L /go/$(__GEN) ]; then \
 		ln -s $(__GOPATH)/$(__SRC_PROJECT_GEN) /go/$(__GEN); \
 		echo "[symlink] $(__GOPATH)/$(__SRC_PROJECT_GEN) /go/$(__GEN)"; \
-	fi
-	@if [ ! -L /go/$(__JWTKEY) ]; then \
-		ln -s $(__GOPATH)/$(__SRC_PROJECT_JWTKEY) /go/$(__JWTKEY); \
-		echo "[symlink] $(__GOPATH)/$(__SRC_PROJECT_JWTKEY) /go/$(__JWTKEY)"; \
 	fi
 	GOPATH=$(__GOPATH) $(__REALIZE) run
 

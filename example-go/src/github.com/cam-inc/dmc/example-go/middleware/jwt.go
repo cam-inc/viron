@@ -1,13 +1,11 @@
 package middleware
 
 import (
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"path/filepath"
 
 	"context"
 
+	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
@@ -44,34 +42,11 @@ func validation() goa.Middleware {
 }
 
 func JWT() goa.Middleware {
-	keys, err := LoadJWTPublicKeys()
+	pem := common.GetPublicKey()
+	key, err := jwtgo.ParseRSAPublicKeyFromPEM([]byte(pem))
 	if err != nil {
 		panic(err)
 	}
+	keys := []jwt.Key{key}
 	return jwt.New(jwt.NewSimpleResolver(keys), validation(), app.NewJWTSecurity())
-}
-
-// LoadJWTPublicKeys loads PEM encoded RSA public keys used to validata and decrypt the JWT.
-func LoadJWTPublicKeys() ([]jwt.Key, error) {
-	keyFiles, err := filepath.Glob("./jwtkey/*.pub")
-	if err != nil {
-		return nil, err
-	}
-	keys := make([]jwt.Key, len(keyFiles))
-	for i, keyFile := range keyFiles {
-		pem, err := ioutil.ReadFile(keyFile)
-		if err != nil {
-			return nil, err
-		}
-		key, err := jwtgo.ParseRSAPublicKeyFromPEM([]byte(pem))
-		if err != nil {
-			return nil, fmt.Errorf("failed to load key %s: %s", keyFile, err)
-		}
-		keys[i] = key
-	}
-	if len(keys) == 0 {
-		return nil, fmt.Errorf("couldn't load public keys for JWT security")
-	}
-
-	return keys, nil
 }
