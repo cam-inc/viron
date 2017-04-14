@@ -15,7 +15,7 @@ services:
       # goconvey
       - 4001:4001
     environment:
-      - SERVICE_ENV=local
+      - SERVICE_ENV=docker-local
     volumes:
       - $PWD/dist/Linux:/go/dist/Linux
       - $PWD/src:/go/src
