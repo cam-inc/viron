@@ -77,7 +77,7 @@ setup-pre:
 	 	exit 1; \
 	fi
 
-setup: setup-pre vendor-install setup-key ## Setup
+setup: setup-pre vendor-install setup-pre-key ## Setup
 	@if [ ! -f $(__GOAGEN) ]; then \
 		cd $(__SRC_DIR)/github.com/goadesign/goa; \
 		make goagen; \
