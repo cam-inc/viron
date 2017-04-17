@@ -80,7 +80,7 @@ setup-pre:
 setup: setup-pre vendor-install setup-pre-key ## Setup
 	@if [ ! -f $(__GOAGEN) ]; then \
 		cd $(__SRC_DIR)/github.com/goadesign/goa; \
-		make goagen; \
+		GOPATH=$(__GOPATH) make goagen; \
 	fi
 	@if [ ! -f $(__REALIZE) ]; then \
 		cd $(__SRC_DIR)/github.com/tockins/realize; \
