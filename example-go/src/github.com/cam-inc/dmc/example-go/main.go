@@ -44,6 +44,9 @@ func main() {
 	// Mount "auth" controller
 	c7 := controller.NewAuthController(service)
 	app.MountAuthController(service, c7)
+	// Mount "quickview" controller
+	c8 := controller.NewQuickviewController(service)
+	app.MountQuickviewController(service, c8)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {

@@ -22,6 +22,17 @@ var Layout = func() {
 	)
 }
 
+var Style = func () {
+	Example("Style of Web Component")
+	Default(bridge.StyleNumber)
+	Enum(
+		bridge.StyleNumber,
+		bridge.StyleList,
+		bridge.StyleTable,
+	)
+}
+
+
 // PageSection of enum
 // ページのセクジョン
 var PageSection = func() {
@@ -89,16 +100,24 @@ var APIType = Type("api", func() {
 	Required("id", "operation")
 })
 
+var OptionType = Type("option", func() {
+	Attribute("key", String, "Key", func() {
+		Example("key")
+	})
+	Attribute("value", String, "Value", func() {
+		Example("value")
+	})
+	Required("key", "value")
+})
+
 // ComponentType of type
 var ComponentType = Type("component", func() {
 	Description("A Component type")
 	Attribute("api", APIType, "Access api of page")
 	Attribute("name", String, "Title of page")
-	Attribute("layout", Layout) // ページの表示スタイル
-	//Attribute("url", String, "href of component", func() {
-	//	Example("/#/overview")
-	//})
-	Required("api", "name", "layout")
+	Attribute("style", Style) // Web Component style
+	Attribute("options", ArrayOf(OptionType), "style options") // Web Component Style options
+	Required("api", "name", "style")
 })
 
 

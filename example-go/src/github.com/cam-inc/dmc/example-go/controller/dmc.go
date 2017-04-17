@@ -1,9 +1,9 @@
 package controller
 
 import (
+	"github.com/cam-inc/dmc/example-go/bridge"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	"github.com/goadesign/goa"
-	"github.com/cam-inc/dmc/example-go/bridge"
 )
 
 // DmcController implements the dmc resource.
@@ -29,67 +29,66 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 			// Dashboard
 			{
 				Section: bridge.SectionDashboard,
-				Group: bridge.GroupEmpty,
-				Name: "Overview",
+				Group:   bridge.GroupEmpty,
+				Name:    "Quick View",
 				API: &app.API{
-					ID: "overview",
-					Operation: "overview",
+					ID:        "quickview",
+					Operation: "quickview",
 				},
-				Layout: bridge.LayoutCard,
-				Drawer:    true,
+				Layout:  bridge.LayoutCard,
+				Drawer:  true,
 				Primary: "id",
 			},
 			{
 				Section: bridge.SectionDashboard,
-				Group: bridge.GroupEmpty,
-				Name: "指標",
+				Group:   bridge.GroupEmpty,
+				Name:    "指標",
 				API: &app.API{
-					ID: "kpi",
+					ID:        "kpi",
 					Operation: "kpi",
 				},
-				Layout: bridge.LayoutCard,
-				Drawer:    true,
+				Layout:  bridge.LayoutCard,
+				Drawer:  true,
 				Primary: "id",
 			},
 
 			// Mange
 			{
 				Section: bridge.SectionManage,
-				Group: bridge.GroupBlog,
-				Name: "記事",
+				Group:   bridge.GroupBlog,
+				Name:    "記事",
 				API: &app.API{
-					ID: "blog",
+					ID:        "blog",
 					Operation: "posts",
 				},
-				Layout: bridge.LayoutTable,
-				Drawer:    true,
+				Layout:  bridge.LayoutTable,
+				Drawer:  true,
 				Primary: "id",
 			},
 			{
 				Section: bridge.SectionManage,
-				Group: bridge.GroupUser,
-				Name: "ユーザ",
+				Group:   bridge.GroupUser,
+				Name:    "ユーザ",
 				API: &app.API{
-					ID: "user",
+					ID:        "user",
 					Operation: "user",
 				},
-				Layout: bridge.LayoutTable,
-				Drawer:    true,
+				Layout:  bridge.LayoutTable,
+				Drawer:  true,
 				Primary: "id",
 			},
 			{
 				Section: bridge.SectionManage,
-				Group: bridge.GroupAdmin,
-				Name: "管理者",
+				Group:   bridge.GroupAdmin,
+				Name:    "管理者",
 				API: &app.API{
-					ID: "admin",
+					ID:        "admin",
 					Operation: "admin",
 				},
-				Layout: bridge.LayoutTable,
-				Drawer:    true,
+				Layout:  bridge.LayoutTable,
+				Drawer:  true,
 				Primary: "id",
 			},
-
 		},
 	}
 	return ctx.OK(res)

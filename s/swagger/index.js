@@ -56,6 +56,7 @@ class Swagger {
         this._dmc = res;
         this._client = client;
         this.setuped = true;
+
         callback(null, this);
 
       }).catch(err => {
