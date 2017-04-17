@@ -31,9 +31,8 @@ projects:
     exts:
     - .go
     preview: true
-  cli:
-    streams: true
-  file:
-    streams: false
-    logs: false
-    errors: false
+  streams:
+    cli_out: true
+    flie_out: false
+    file_log: false
+    file_err: false
