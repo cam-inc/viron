@@ -29,9 +29,6 @@ func main() {
 	// Mount "dmc" controller
 	c := controller.NewDmcController(service)
 	app.MountDmcController(service, c)
-	// Mount "overview" controller
-	c2 := controller.NewOverviewController(service)
-	app.MountOverviewController(service, c2)
 	// Mount "swagger" controller
 	c3 := controller.NewSwaggerController(service)
 	app.MountSwaggerController(service, c3)
