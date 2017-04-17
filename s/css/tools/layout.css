@@ -1,0 +1,9 @@
+/* レイアウト */
+:root {
+  /* 天地中央配置 */
+  --layout-center-center: {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

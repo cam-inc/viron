@@ -6,8 +6,6 @@ import riotx from './riotx';
 
 import swagger from './swagger/Index'
 
-// css
-import './styles/index.pcss'
 // atoms
 import './components/atoms/dmc-text.tag'
 // organisms
