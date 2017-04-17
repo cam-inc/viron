@@ -42,6 +42,10 @@ class Swagger {
     this._endpoint = SwaggerClient(request.url);
 
     this._endpoint.then(client => {
+
+      if (client.errors && 0 < client.errors.length) {
+        return callback(client.errors);
+      }
       let dmcOID = client.spec.paths[DMC_URI].get.operationId;
       if (!dmcOID || !client.apis.dmc || !client.apis.dmc[dmcOID]) {
         return callback(new Error(`Fetching resource list: ${client.url}; system entry point not found. (uri: /dmc)`), client);
