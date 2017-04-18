@@ -1,0 +1,39 @@
+{
+  "plugins": [
+    "stylelint-suitcss"
+  ],
+  "rules": {
+    "color-hex-length": "short",
+    "color-no-invalid-hex": true,
+    "media-feature-name-no-vendor-prefix": true,
+    "no-unknown-animations": true,
+    "number-leading-zero": "always",
+    "number-no-trailing-zeros": true,
+    "length-zero-no-unit": true,
+    "property-no-unknown": [
+      true,
+      {
+        "ignoreProperties": [
+          "overflow-scrolling",
+          "user-drag"
+        ]
+      }
+    ],
+    "property-no-vendor-prefix": true,
+    "selector-no-vendor-prefix": true,
+    "selector-pseudo-element-colon-notation": "double",
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        ignorePseudoClasses: [
+          "window-inactive"
+        ]
+      }
+    ],
+    "selector-pseudo-element-no-unknown": true,
+    "string-quotes": "double",
+    "unit-no-unknown": true,
+    "suitcss/custom-property-no-outside-root": true,
+    "suitcss/selector-root-no-composition": true
+  }
+}

@@ -1,0 +1,16 @@
+/* テキスト */
+:root {
+  /* はみ出した部分を三点リーダー化 */
+  /* `max-width`等と一緒に使用すること */
+  --text-truncate: {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* overflow時にtext-breakさせる */
+  --text-break: {
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+}
