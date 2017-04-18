@@ -12,11 +12,9 @@
 
 ```
 $ make dressup
-
 ```
 
 > 初回のみ 10min ぐらいかかります
-
 
 ### ブラウザアクセス
 
@@ -54,7 +52,7 @@ $ make check
 
 # Tools
 
-- `$ make example-go-ssh` SSH example-go on docker-compose 
+- `$ make example-go-ssh` SSH example-go on docker-compose
 - `$ mysql-ssh` SSH mysql on docker-compose
 - `$ mysql-client` Access mysql client on docker-compose
 - `$ goconvey` Start web visualize go testing tools. [experiments]

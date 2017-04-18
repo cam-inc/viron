@@ -1,5 +1,3 @@
-//go:generate goagen bootstrap -d github.com/cam-inc/dmc/example-go/design
-
 package main
 
 import (

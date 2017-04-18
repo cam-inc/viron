@@ -6,9 +6,6 @@ bin
 # go test(cover)
 cover.out
 
-# key
-*.key
-*.key.pub
 
 # source code
 /src/*
@@ -22,6 +19,7 @@ cover.out
 /src/github.com/cam-inc/dmc/example-go/*
 !/src/github.com/cam-inc/dmc/example-go/*
 /src/github.com/cam-inc/dmc/example-go/gen
+*_gen.go
 
 # realize
 .realize/

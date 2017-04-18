@@ -4,7 +4,6 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"time"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -27,11 +26,8 @@ type AuthController struct {
 
 // NewAuthController creates a auth controller.
 func NewAuthController(service *goa.Service) *AuthController {
-	b, err := ioutil.ReadFile("./jwtkey/jwt.key")
-	if err != nil {
-		panic(err)
-	}
-	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM(b)
+	b := common.GetPrivateKey()
+	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM([]byte(b))
 	if err != nil {
 		panic(err)
 	}
