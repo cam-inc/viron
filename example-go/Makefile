@@ -13,6 +13,9 @@ __PKG_DIR=$(__PWD)/$(__PKG)
 __DIST=dist
 __DIST_DIR=$(__PWD)/$(__DIST)
 
+__PUBLIC=public
+__PUBLIC_DIR=$(__PWD)/$(__PUBLIC)
+
 __REALIZE=$(__BIN_DIR)/realize
 __GOAGEN=$(__BIN_DIR)/goagen
 __GOCONVEY=$(__BIN_DIR)/goconvey
@@ -170,7 +173,7 @@ gen-client: ## Generate goa [client]
 
 gen-swagger: ## Generate goa [swagger]
 	@echo "[INFO ] >>>>> gen-swagger"
-	GOPATH=$(__GOPATH) $(__GOAGEN) swagger -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN)
+	GOPATH=$(__GOPATH) $(__GOAGEN) swagger -d $(__PKG_PROJECT_DESIGN) -o $(__PUBLIC_DIR)
 
 gen-schema: ## Generate goa [schema]
 	@echo "[INFO ] >>>>> gen-schema"
@@ -203,12 +206,8 @@ run-docker: setup gen ## Basic run on Docker Container
 	cd $(__SRC_PROJECT_HOME); \
 		GOPATH=$(__GOPATH) go run *.go
 
-realize-docker: clean-realize setup ## Hot-reload run on Docker Container
+realize-docker: clean-realize setup gen ## Hot-reload run on Docker Container
 	$(__REALIZE) list
-	@if [ ! -L /go/$(__GEN) ]; then \
-		ln -s $(__GOPATH)/$(__SRC_PROJECT_GEN) /go/$(__GEN); \
-		echo "[symlink] $(__GOPATH)/$(__SRC_PROJECT_GEN) /go/$(__GEN)"; \
-	fi
 	GOPATH=$(__GOPATH) $(__REALIZE) run
 
 
@@ -230,8 +229,8 @@ build-local: ## Build on Host
 	fi
 
 	mkdir -p $(__DIST_DIR)/$(__OS_NAME)
-	GOPATH=$(__GOPATH) go build -o $(__DIST_DIR)/$(__OS_NAME)/$(__REPOSITORY) $(__PKG_PROJECT_HOME)
-	GOPATH=$(__GOPATH) go build -o $(__DIST_DIR)/$(__OS_NAME)/$(__REPOSITORY)-cli $(__PKG_PROJECT_GEN)/tool/$(__REPOSITORY)-cli
+	GOPATH=$(__GOPATH) go build -o $(__DIST_DIR)/$(__OS_NAME)/$(__TARGET_HOME) $(__PKG_PROJECT_HOME)
+	GOPATH=$(__GOPATH) go build -o $(__DIST_DIR)/$(__OS_NAME)/$(__TARGET_HOME)-cli $(__PKG_PROJECT_GEN)/tool/$(__TARGET_HOME)-cli
 	@echo "[Success] Output directory. :p \t$(__DIST)/$(__OS_NAME)"
 
 build-docker: ## Build on docker container

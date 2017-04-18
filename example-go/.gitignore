@@ -21,6 +21,8 @@ cover.out
 /src/github.com/cam-inc/dmc/example-go/gen
 *_gen.go
 
+public
+
 # realize
 .realize/
 src/github.com/cam-inc/dmc/example-go/example-go
