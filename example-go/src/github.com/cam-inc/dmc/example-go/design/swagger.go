@@ -10,5 +10,5 @@ var _ = Resource("swagger", func() {
 	//Security(JWT, func() {
 	//	Scope("api:access")
 	//})
-	Files("/swagger.json", "gen/swagger/swagger.json")
+	Files("/swagger.json", "public/swagger/swagger.json")
 })

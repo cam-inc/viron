@@ -20,9 +20,6 @@ projects:
   test: false
   params: []
   watcher:
-    before:
-      -
-    after: []
     paths:
     - /
     ignore_paths:
