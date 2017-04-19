@@ -21,6 +21,4 @@ var _ = Resource("swagger", func() {
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
 	})
-
-	//Files("/swagger.json", "public/swagger/swagger.json")
 })

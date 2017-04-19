@@ -16,6 +16,8 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"golang.org/x/crypto/scrypt"
+	"strings"
+	"encoding/json"
 )
 
 // AuthController implements the auth resource.
@@ -44,16 +46,61 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	// Put your logic here
 	// Authorize
 	adminUserTable := models.NewAdminUserDB(common.DB)
-	m, err := adminUserTable.GetByLoginID(ctx.Context, *ctx.Payload.LoginID)
+	adminUserModel, err := adminUserTable.GetByLoginID(ctx.Context, *ctx.Payload.LoginID)
 	if err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {
 		panic(err)
 	}
 
-	hash, err := scrypt.Key([]byte(*ctx.Payload.Password), []byte(m.Salt), 16384, 8, 1, 64)
-	if m.Password != base64.StdEncoding.EncodeToString(hash) {
+	hash, err := scrypt.Key([]byte(*ctx.Payload.Password), []byte(adminUserModel.Salt), 16384, 8, 1, 64)
+	if adminUserModel.Password != base64.StdEncoding.EncodeToString(hash) {
 		return ctx.Unauthorized()
+	}
+
+	// Get Role
+	roles := map[string][]string{}
+	if adminUserModel.RoleID == "super" {
+		// super権限の場合は全許可
+		roles["get"] = []string{"*"}
+		roles["post"] = []string{"*"}
+		roles["put"] = []string{"*"}
+		roles["delete"] = []string{"*"}
+		roles["patch"] = []string{"*"}
+	} else {
+	    adminRoleTable := models.NewAdminRoleDB(common.DB)
+	    adminRoleModels, err := adminRoleTable.ListByRoleID(ctx.Context, adminUserModel.RoleID)
+	    if err != nil {
+			panic(err)
+		}
+
+	    for _, m := range adminRoleModels {
+			/*
+			Roleをチェックしやすい構造に整形する
+			roles:
+				get: ["*"]
+				post: ["item"]
+				put: ["item", "user"]
+				delete: ["item"]
+				patch: ["item"]
+			*/
+			method := strings.ToLower(m.Method)
+			if m.Resource == "*" {
+				if len(roles[method]) <= 0 {
+					roles[method] = append(roles[method], m.Resource)
+				}
+			} else {
+				if len(roles[method]) > 0 && roles[method][0] == "*" {
+					// ワイルドカード以外のリソースが設定されている場合はワイルドカード権限を無効にする
+					roles[method] = roles[method][1:]
+				}
+				roles[method] = append(roles[method], m.Resource)
+			}
+	    }
+	}
+	rolesStr, err := json.Marshal(roles)
+	if err != nil {
+		panic(err)
 	}
 
 	// Generate JWT
@@ -68,7 +115,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 		"nbf":    0,                     // Tokenが有効になるのが何分後か
 		"sub":    *ctx.Payload.LoginID,  // ユーザー識別子
 		"scopes": "api:access",          // このTokenが有効なSCOPE - not a standard claim
-		// TODO: roleも入れる
+		"roles":  string(rolesStr),      // ユーザー権限 - not a standard claim
 	}
 	signedToken, err := token.SignedString(c.privateKey)
 	if err != nil {
