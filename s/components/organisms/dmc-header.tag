@@ -1,15 +1,32 @@
 dmc-header
   .dmc-header
-    .page(each="{ item, url in endpoint; }" onclick="{ evEntry }")
-  script.
-    import { forOwn } from "mout/object";
-    let store = this.riotx.get();
-    store.on("dmc_show", (err, state, store) => {
+    .page(each="{ pages }" onclick="{ evSelect }")
+      | api.id : { api.id }
+      | api.operation : { api.operation }
+      | drawer : { drawer }
+      | group : { group }
+      | layout : { layout }
+      | name : { name }
+      | primary : { primary }
+      | section : { section }
+  style.
+    .dmc-header .page {
+      margin: 18px;
+    }
 
+  script.
+    let store = this.riotx.get();
+
+    this.pages = [];
+
+    store.on("dmc_show", (err, state, store) => {
       this.dmc = state.dmc;
-      console.log(this.dmc)
-      console.log(forOwn)
-      this.riotx.getters.dmc_dashboard();
-      debugger;
-      this.update()
+      this.pages = store.getters.dmc_dashboard(state);
+      console.log(this.pages);
+      this.update();
     })
+
+    this.evSelect = (ev) => {
+      debugger;
+      location.href = "#" + ev.item.api.id + "/" + ev.item.api.operation;
+    }

@@ -1,4 +1,4 @@
-import every from "mout/object";
+import { filter, values } from "mout/object";
 
 export default {
   show: function (state) {
@@ -11,9 +11,16 @@ export default {
     return state.dmc.name
   },
   // Display dashboard data for drawer
-  dashboard: function (drawer = true) {
-    console.log(every)
-    debugger;
-    state.dmc.pages
+  dashboard: function (state, drawer = true) {
+    return values(filter(state.dmc.pages, (v, k, arr) => {
+      if (v.section !== "dashboard") {
+        return false;
+      }
+      if (drawer && !v.drawer) {
+        return false;
+      }
+      return true;
+
+    }));
   }
 }
