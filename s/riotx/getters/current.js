@@ -1,6 +1,5 @@
 export default {
-  show: function (state) {
+  show: state => {
     return state.current;
-  },
-
-}
+  }
+};

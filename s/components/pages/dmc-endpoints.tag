@@ -12,9 +12,9 @@ dmc-endpoints
     }
 
   script.
-    let store = this.riotx.get();
+    const store = this.riotx.get();
     this.endpoint = {};
-    store.on("endpoint_show", (err, state, store) => {
+    store.on('endpoint_show', (err, state, store) => {
       this.endpoint = state.endpoint;
       this.update()
     })
@@ -22,9 +22,8 @@ dmc-endpoints
     this.evEntry = (ev) => {
       Promise
         .resolve()
-        .then(() => store.action("current_update", ev.item.url))
+        .then(() => store.action('current_update', ev.item.url))
         .catch((err) => {
           // TODO
         });
-
     }

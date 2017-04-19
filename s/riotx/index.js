@@ -1,17 +1,23 @@
-'use strict';
+import ObjectAssign from 'object-assign';
+import riot from 'riot';
 
-import riot from 'riot'
-
+/**
+ * settings for riotx
+ * @type {{debug: boolean, default: string}}
+ */
+const settings = {
+  debug: true,
+  default: '@'
+};
 
 /**
  * log output
  */
-let log = function() {
+const log = (...args) => {
   if (!settings.debug) {
     return;
   }
 
-  let args = Array.prototype.slice.call(arguments);
   args.unshift('[riotx]');
   //args.push(new Error('stack')); // stack trace
   try {
@@ -21,129 +27,143 @@ let log = function() {
   }
 };
 
-/**
- * settings for riotx
- * @type {{debug: boolean, default: string}}
- */
-let settings = {
-  debug: true,
-  default: '@'
-};
 
 class Store {
-
   /**
    * @param { name: 'Store Name', state: { default state data }, actions: { TODO } mutations: { TODO }, getters: { TODO } }
    */
   constructor(_store) {
-
+    /**
+     * name of the store.
+     * @type {String}
+     */
     this.name = _store.name;
     if (!this.name) {
       this.name = settings.default;
-      log('Default store name. name=' + this.name);
+      log(`Default store name. name=${this.name}`);
     }
 
-    this.state = _store.state ? Object.assign({}, _store.state) : {};
-    this._actions = _store.actions ? _store.actions : {};
-    this._mutations = _store.mutations ? _store.mutations : {};
-    this._getters = _store.getters ? _store.getters : {};
+    /**
+     * a object that represents full application state.
+     * @type {Object}
+     */
+    this.state = ObjectAssign({}, _store.state);
+
+    /**
+     * functions to mutate application state.
+     * @type {Object}
+     */
+    this._actions = ObjectAssign({}, _store.actions);
+
+    /**
+     * mutaions.
+     * mutaion = a function which mutates the state.
+     * all mutation functions take two parameters which are `state` and `obj`.
+     * `state` will be TODO.
+     * `obj` will be TODO.
+     * @type {Object}
+     */
+    this._mutations = ObjectAssign({}, _store.mutations);
+
+    /**
+     * TODO
+     * @type {Object}
+     */
+    this._getters = ObjectAssign({}, _store.getters);
 
     riot.observable(this);
-
   }
 
   /**
    * Getter state
+   * @param {String} name TODO
+   * @param {...*} args
    */
-  getter() {
-    let _state = Object.assign({}, this.state);
-    let args = [].slice.call(arguments);
-    let name = args.shift();
+  getter(name, ...args) {
+    const _state = ObjectAssign({}, this.state);
     args.unshift(_state);
     log('[getter]', name, args);
     return this._getters[name].apply(this, args);
   }
 
   /**
-   * Commit mutation
-   * @param name mutation name
-   * @param obj commit data object
+   * Commit mutation.
+   * only actions are allowed to execute this function.
+   * @param {String} name mutation name
+   * @param {Object} obj commit data object
    */
   commit(name, obj) {
-    let _state = Object.assign({}, this.state);
-    log('[commit]', name, _state, obj);
-    this._mutations[name].apply(this, [_state, obj]);
-    Object.assign(this.state, _state); // commit!!!
+    const newState = ObjectAssign({}, this.state);
+    log('[commit(before)]', name, newState, obj);
+    this._mutations[name](newState, obj);
+    log('[commit(after)]', name, newState, obj);
+    ObjectAssign(this.state, newState);
+    this.trigger(name, null, this.state, this);
   }
 
   /**
-   * emit action
-   * @param [0] action name
-   * @param [1...] parameter's to action
+   * emit action.
+   * only ui components are allowed to execute this function.
+   * @param {Stting} name action name
+   * @param {...*} args parameter's to action
+   * @return {Promise}
    */
-  action() {
-    return new Promise((resolve, reject) => {
-      let args = [].slice.call(arguments);
-      let name = args.shift();
-      // args.push(Object.assign({}, this.state));
+  action(name, ...args) {
+    log('[action]', name, args);
 
-      args.push((err/*, _state*/) => {
-        // TODO err
-        if (err) {
-          return reject(err);
-        }
-
-        // let res = Object.assign(this.state, _state);
-        log('[trigger]', name, this.state);
-        // return emit view component's
-        this.trigger(name, null, this.state, this)
-        resolve(this.state);
-      });
-
-      // emit action
-      log('[action]', name, args);
-      this._actions[name].apply(this, args);
-    });
+    return Promise
+      .resolve()
+      .then(() => this._actions[name]((...args) => {
+        this.commit(...args);
+      }, ...args));
+      //.then(() => this._actions[name].apply(this, args));
   }
-
 }
 
 class RiotX {
-
   constructor() {
-    this.settings = settings;
+    /**
+     * constructor of RiotX.Store.
+     * @type {Class}
+     */
     this.Store = Store;
+
+    /**
+     * instances of RiotX.Store.
+     * @type {Object}
+     */
     this.stores = {};
 
-    let self = this;
+    // register a mixin globally.
     riot.mixin({
+      // intendedly use `function`.
+      // switch the context of `this` from `riotx` to `riot tag instance`.
       init: function () {
-        let self = this;
-        this.on('unmount', function () {
-          self.off('*');
+        // the context of `this` will be equal to riot tag instant.
+        this.on('unmount', () => {
+          this.off('*');
         });
 
-        if (self.debug) {
-          // curious about all events ?
-          this.on('*', function (eventName) {
-            console.log('events.*', eventName)
-          })
+        if (settings.debug) {
+          this.on('*', eventName => {
+            log(eventName, this);
+          });
         }
       },
-      riotx: self,
+      // give each riot instance the ability to access the globally defined singleton RiotX instance.
+      riotx: this
     });
   }
 
 
   /**
-   * Add store instance
-   * @param store RiotX.Store instance
+   * Add a store instance
+   * @param {RiotX.Store} store instance of RiotX.Store
    * @returns {RiotX}
    */
   add(store) {
     if (this.stores[store.name]) {
-      let err = new Error('The store has been overwritten. name=' + store.name);
-      throw err;
+      throw new Error(`The store instance named \`${store.name}\` already exists.`);
     }
 
     this.stores[store.name] = store;
@@ -152,14 +172,12 @@ class RiotX {
 
   /**
    * Get store instance
-   * @param name store name
+   * @param {String} name store name
    * @returns {RiotX.Store} store instance
    */
-  get(name) {
-    name = name ? name : settings.default;
+  get(name = settings.default) {
     return this.stores[name];
   }
-
 }
 
 export default new RiotX();

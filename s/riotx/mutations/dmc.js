@@ -5,5 +5,4 @@ export default {
   remove: function (state) {
     state.dmc = null;
   }
-
-}
+};

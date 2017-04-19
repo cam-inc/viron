@@ -6,5 +6,5 @@ export default {
   dmc_pages: dmc.pages,
   dmc_name: dmc.name,
   dmc_dashboard: dmc.dashboard,
-  current_show: current.show,
-}
+  current_show: current.show
+};
