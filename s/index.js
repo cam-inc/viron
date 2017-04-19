@@ -1,6 +1,5 @@
 // import _ from 'underscore'
 import riot from 'riot'
-import route from 'riot-route'
 
 import swagger from './swagger/index'
 
@@ -10,7 +9,7 @@ import mutations from './riotx/mutations';
 import getters from './riotx/getters';
 
 // core
-import Router from './core/Router';
+import router from './core/router';
 // atoms
 import './components/atoms/dmc-text.tag'
 // organisms
@@ -27,8 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
   Promise
     .resolve()
     .then(() => {
-      Router.start();
-      window.router = Router;
+      router.start();
+      // TODO: just for debug
+      window.router = router;
     })
     .catch(err => console.error(err));
 
@@ -48,13 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   riotx.add(store);
   riot.mount('dmc'); // root mount!!!
-
-  //route
-  route((collection, id, action) => {
-    // debugger;
-  });
-
-  route.start(true);
 
   // Changed Endpoint
   store.on("current_update", (err, state, store) => {
