@@ -53,6 +53,18 @@ class Store {
   }
 
   /**
+   * Getter state
+   */
+  getter() {
+    let _state = Object.assign({}, this.state);
+    let args = [].slice.call(arguments);
+    let name = args.shift();
+    args.unshift(_state);
+    log('[getter]', name, args);
+    return this.getters[name].apply(this, args);
+  }
+
+  /**
    * Commit mutation
    * @param name mutation name
    * @param obj commit data object

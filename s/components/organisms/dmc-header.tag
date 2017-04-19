@@ -21,7 +21,7 @@ dmc-header
 
     store.on("dmc_show", (err, state, store) => {
       this.dmc = state.dmc;
-      this.pages = store.getters.dmc_dashboard(state);
+      this.pages = store.getter("dmc_dashboard");
       console.log(this.pages);
       this.update();
     })
