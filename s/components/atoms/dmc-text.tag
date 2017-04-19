@@ -11,6 +11,6 @@ dmc-text
     let store = this.riotx.get()
 
     store.on('login', (err, state, store) => {
-      let res = store.getters.login(state);
+      let res = store.getter("login");
       console.log('dmc-text `login` on store', res);
     })
