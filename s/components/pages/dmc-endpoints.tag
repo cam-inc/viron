@@ -13,11 +13,6 @@ dmc-endpoints
 
   script.
     let store = this.riotx.get();
-    <!--store.on("dmc_show", (err, state, store) => {-->
-      <!--console.log(store.getters.dmc_show(state));-->
-      <!--console.log(store.getters.dmc_pages(state));-->
-      <!--console.log(store.getters.dmc_name(state));-->
-    <!--});-->
     this.endpoint = {};
     store.on("endpoint_show", (err, state, store) => {
       this.endpoint = state.endpoint;

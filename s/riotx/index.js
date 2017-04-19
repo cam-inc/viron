@@ -44,9 +44,9 @@ class Store {
     }
 
     this.state = _store.state ? Object.assign({}, _store.state) : {};
-    this.actions = _store.actions ? _store.actions : {};
-    this.mutations = _store.mutations ? _store.mutations : {};
-    this.getters = _store.getters ? _store.getters : {};
+    this._actions = _store.actions ? _store.actions : {};
+    this._mutations = _store.mutations ? _store.mutations : {};
+    this._getters = _store.getters ? _store.getters : {};
 
     riot.observable(this);
 
@@ -61,7 +61,7 @@ class Store {
     let name = args.shift();
     args.unshift(_state);
     log('[getter]', name, args);
-    return this.getters[name].apply(this, args);
+    return this._getters[name].apply(this, args);
   }
 
   /**
@@ -72,7 +72,7 @@ class Store {
   commit(name, obj) {
     let _state = Object.assign({}, this.state);
     log('[commit]', name, _state, obj);
-    this.mutations[name].apply(this, [_state, obj]);
+    this._mutations[name].apply(this, [_state, obj]);
     Object.assign(this.state, _state); // commit!!!
   }
 
@@ -102,7 +102,7 @@ class Store {
 
       // emit action
       log('[action]', name, args);
-      this.actions[name].apply(this, args);
+      this._actions[name].apply(this, args);
     });
   }
 

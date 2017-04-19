@@ -9,7 +9,8 @@ import actions from './riotx/actions';
 import mutations from './riotx/mutations';
 import getters from './riotx/getters';
 
-
+// core
+import Router from './core/Router';
 // atoms
 import './components/atoms/dmc-text.tag'
 // organisms
@@ -22,59 +23,68 @@ import './components/pages/dmc-page.tag'
 // root
 import './components/dmc.tag'
 
-var current = null;
-
-// riotx setup store
-let store = new riotx.Store({
-  state: {
-    current: current,
-    endpoint: {},
-    dmc: null,
-  },
-  actions: actions,
-  mutations: mutations,
-  getters: getters,
-});
-
-riotx.add(store);
-riot.mount('dmc'); // root mount!!!
-
-//route
-route((collection, id, action) => {
-  // debugger;
-});
-
-route.start(true);
-
-// Changed Endpoint
-store.on("current_update", (err, state, store) => {
-  let current = state.current;
-  // TODO Promise あってる？
+document.addEventListener('DOMContentLoaded', () => {
   Promise
     .resolve()
-    .then(() => store.action("dmc_remove"))
-    .then(() => swagger.setup(current))
-    .then(() => store.action("dmc_show"))
-    .catch((err) => {
-      console.log('Update state(current) error', err);
+    .then(() => {
+      Router.start();
+      window.router = Router;
     })
-  ;
+    .catch(err => console.error(err));
 
+  var current = null;
+
+  // riotx setup store
+  let store = new riotx.Store({
+    state: {
+      current: current,
+      endpoint: {},
+      dmc: null,
+    },
+    actions: actions,
+    mutations: mutations,
+    getters: getters,
+  });
+
+  riotx.add(store);
+  riot.mount('dmc'); // root mount!!!
+
+  //route
+  route((collection, id, action) => {
+    // debugger;
+  });
+
+  route.start(true);
+
+  // Changed Endpoint
+  store.on("current_update", (err, state, store) => {
+    let current = state.current;
+    // TODO Promise あってる？
+    Promise
+      .resolve()
+      .then(() => store.action("dmc_remove"))
+      .then(() => swagger.setup(current))
+      .then(() => store.action("dmc_show"))
+      .catch((err) => {
+        console.log('Update state(current) error', err);
+      })
+    ;
+  });
+
+  // Entry to the endpoint
+  store.on("dmc_show", (err, state, store) => {
+    let targetTagString = 'dmc-empty'; // TODO
+    let currentTag = riot.mount('dmc-page', targetTagString)[0]; // default page
+  });
+
+  if (current) {
+    // Endpoint エントリー済み
+  } else {
+    debugger;
+    // Endpoint エントリー前
+    let targetTagString = 'dmc-endpoints';
+    let currentTag = riot.mount('dmc-page', targetTagString)[0]; // default page
+
+    store.action('endpoint_show');
+  }
 });
-
-// Entry to the endpoint
-store.on("dmc_show", (err, state, store) => {
-  let targetTagString = 'dmc-empty'; // TODO
-  let currentTag = riot.mount('dmc-page', targetTagString)[0]; // default page
-});
-
-if (current) {
-  // Endpoint エントリー済み
-} else {
-  // Endpoint エントリー前
-  let targetTagString = 'dmc-endpoints';
-  let currentTag = riot.mount('dmc-page', targetTagString)[0]; // default page
-
-  store.action('endpoint_show');
-}
-
