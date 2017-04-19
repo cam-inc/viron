@@ -7,6 +7,27 @@ import serve from 'rollup-plugin-serve';
 import filesize from 'rollup-plugin-filesize';
 import replace from 'rollup-plugin-replace';
 
+const mout = require('mout');
+
+let namedExports = {};
+mout.object.forOwn(mout, (v,k) => {
+
+  if(!mout.lang.isObject(v)) {
+    return;
+  }
+
+  let key = 'node_modules/mout/' + k + '.js';
+  if (!namedExports[key]) {
+    namedExports[key] = [];
+  }
+
+  mout.object.forOwn(v, (v1, k1) => {
+    if (mout.lang.isFunction(v1)) {
+      namedExports[key].push(k1)
+    }
+  });
+});
+
 // import uglify from 'rollup-plugin-uglify'
 import eslint from 'rollup-plugin-eslint';
 
@@ -32,7 +53,8 @@ export default {
       // browser: true
     }),
     commonjs({
-      include: 'node_modules/**'
+      include: 'node_modules/**',
+      namedExports: namedExports
     }),
     buble({
       target: {
@@ -42,7 +64,7 @@ export default {
     }),
     filesize(),
     // uglify(),
-    eslint({ exclude: ['**/*.tag'] }),
+    eslint({exclude: ['**/*.tag']}),
     serve({
       contentBase: 'dist', // Folder to serve files from,
       historyApiFallback: false, // Set to true to return index.html instead of 404

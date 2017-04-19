@@ -47,10 +47,10 @@
   "dependencies": {
     "history": "^4.6.1",
     "marked": ">=0.3.6",
+    "mout": "^1.0.0",
     "riot": ">=3.4.0",
     "store": "=1.3.20",
-    "suitcss-base": "^2.0.0",
-    "underscore": ">=1.8.3"
+    "suitcss-base": "^2.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.7",
