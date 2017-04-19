@@ -67,8 +67,8 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 			Field("role_id", gorma.String, func() {
 				SQLTag("index")
 			})
-			Field("allow_type", gorma.String, func() {}) // "method" or "page"
-			Field("target", gorma.String, func() {})
+			Field("method", gorma.String, func() {})
+			Field("resource", gorma.String, func() {})
 		})
 
 	})

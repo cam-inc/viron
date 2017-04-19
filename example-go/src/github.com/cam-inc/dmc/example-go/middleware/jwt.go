@@ -33,7 +33,8 @@ func validation() goa.Middleware {
 
 			// TODO: claimからrole取り出して権限のチェック
 
-			return nextHandler(ctx, rw, req)
+			newCtx := context.WithValue(ctx, "claims", claims)
+			return nextHandler(newCtx, rw, req)
 		}
 	}
 

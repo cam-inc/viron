@@ -11,8 +11,8 @@ var AdminRoleMediaType = MediaType("application/vnd.admin_role+json", func() {
 	Attributes(func() {
 		Attribute("id", Integer, "unique id")
 		Attribute("role_id", String, "role id")
-		Attribute("allow_type", String, "method or page")
-		Attribute("target", String, "allow function (method or page)")
+		Attribute("method", String, "http method")
+		Attribute("resource", String, "resource name")
 
 		Required("id", "role_id")
 	})
@@ -20,14 +20,14 @@ var AdminRoleMediaType = MediaType("application/vnd.admin_role+json", func() {
 	View("default", func() {
 		Attribute("id")
 		Attribute("role_id")
-		Attribute("allow_type")
-		Attribute("target")
+		Attribute("method")
+		Attribute("resource")
 	})
 
 	View("tiny", func() {
 		Attribute("role_id")
-		Attribute("allow_type")
-		Attribute("target")
+		Attribute("method")
+		Attribute("resource")
 	})
 })
 
@@ -70,8 +70,8 @@ var _ = Resource("admin_role", func() {
 		Routing(POST(""))
 		Payload(func() {
 			Member("role_id", String)
-			Member("allow_type", String)
-			Member("target", String)
+			Member("method", String)
+			Member("resource", String)
 		})
 		Response(OK, func() { Media(AdminRoleMediaType) })
 		Response(NotFound)
@@ -86,8 +86,8 @@ var _ = Resource("admin_role", func() {
 		})
 		Payload(func() {
 			Member("role_id", String)
-			Member("allow_type", String)
-			Member("target", String)
+			Member("method", String)
+			Member("resource", String)
 		})
 		Response(OK, func() { Media(AdminRoleMediaType) })
 		Response(NotFound)

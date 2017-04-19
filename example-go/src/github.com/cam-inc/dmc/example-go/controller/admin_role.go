@@ -26,8 +26,8 @@ func (c *AdminRoleController) Create(ctx *app.CreateAdminRoleContext) error {
 	adminRoleTable := models.NewAdminRoleDB(common.DB)
 	m := models.AdminRole{}
 	m.RoleID = *ctx.Payload.RoleID
-	m.AllowType = *ctx.Payload.AllowType
-	m.Target = *ctx.Payload.Target
+	m.Method = *ctx.Payload.Method
+	m.Resource = *ctx.Payload.Resource
 	err := adminRoleTable.Add(ctx.Context, &m)
 	if err != nil {
 		panic(err)
@@ -98,11 +98,11 @@ func (c *AdminRoleController) Update(ctx *app.UpdateAdminRoleContext) error {
 	if &ctx.Payload.RoleID != nil {
 		m.RoleID = *ctx.Payload.RoleID
 	}
-	if &ctx.Payload.AllowType != nil {
-		m.AllowType = *ctx.Payload.AllowType
+	if &ctx.Payload.Method != nil {
+		m.Method = *ctx.Payload.Method
 	}
-	if &ctx.Payload.Target != nil {
-		m.Target = *ctx.Payload.Target
+	if &ctx.Payload.Resource != nil {
+		m.Resource = *ctx.Payload.Resource
 	}
 	err = adminRoleTable.Update(ctx.Context, m)
 	if err != nil {
