@@ -5,5 +5,6 @@ dmc-page
   script.
     this.on('unmount', () => {
       const me = this;
-      debugger
+      // TODO: debug用なので後で消すこと。
+      console.log(me);
     });

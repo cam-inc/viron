@@ -18,7 +18,6 @@ dmc
 
   script.
     import swagger from '../swagger';
-    debugger;
     let store = this.riotx.get();
 
     store.on('*', (name, err, state, store) => {

@@ -80,7 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
     store
       .action('endpoint_show')
       .then(() => {
-        debugger;
+        // TODO: debug用なので後で消すこと。
+        console.log('should be called after all action calls.');
       });
   }
 });

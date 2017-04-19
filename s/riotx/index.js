@@ -66,7 +66,7 @@ class Store {
     this._mutations = ObjectAssign({}, _store.mutations);
 
     /**
-     * TODO
+     * functions to get data from states.
      * @type {Object}
      */
     this._getters = ObjectAssign({}, _store.getters);
@@ -114,7 +114,8 @@ class Store {
     return Promise
       .resolve()
       .then(() => this._actions[name]((...args) => {
-        this.commit(...args);
+        this.commit(...arg
+                    s);
       }, ...args));
       //.then(() => this._actions[name].apply(this, args));
   }
@@ -124,7 +125,7 @@ class RiotX {
   constructor() {
     /**
      * constructor of RiotX.Store.
-     * @type {Class}
+     * @type {RiotX.Store}
      */
     this.Store = Store;
 
