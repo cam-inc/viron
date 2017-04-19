@@ -28,7 +28,6 @@ mout.object.forOwn(mout, (v,k) => {
   });
 });
 
-console.log(namedExports)
 // import uglify from 'rollup-plugin-uglify'
 import eslint from 'rollup-plugin-eslint';
 

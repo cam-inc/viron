@@ -71,7 +71,6 @@ store.on("dmc_show", (err, state, store) => {
 if (current) {
   // Endpoint エントリー済み
 } else {
-  debugger;
   // Endpoint エントリー前
   let targetTagString = 'dmc-endpoints';
   let currentTag = riot.mount('dmc-page', targetTagString)[0]; // default page
