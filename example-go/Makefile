@@ -78,7 +78,7 @@ setup: setup-pre vendor-install ## Setup
 		cd $(__SRC_DIR)/github.com/tockins/realize; \
 		go install; \
 	fi
-	@if [ ! -f $(__SRC_PROJECT_HOME)/common/jwtkey_gen.go ]; then \
+	if [ ! -f $(__SRC_PROJECT_HOME)/common/jwtkey_gen.go ]; then \
 		GOPATH=$(__GOPATH) go generate $(__SRC_PROJECT_HOME)/common/jwtkey.go; \
 	fi
 

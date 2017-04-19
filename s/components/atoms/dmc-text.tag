@@ -1,9 +1,10 @@
 dmc-text
-  .dmc-text-inner
+  .dmc-text
     | dmc text component
     input(type="text")
+
   style.
-    .dmc-text-inner {
+    .dmc-text {
       background-color: red;
     }
   script.

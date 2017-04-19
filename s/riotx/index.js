@@ -59,6 +59,7 @@ class Store {
    */
   commit(name, obj) {
     let _state = Object.assign({}, this.state);
+    log('[commit]', name, _state, obj);
     this.mutations[name].apply(this, [_state, obj]);
     Object.assign(this.state, _state); // commit!!!
   }
@@ -69,20 +70,28 @@ class Store {
    * @param [1...] parameter's to action
    */
   action() {
-    let args = [].slice.call(arguments);
-    let name = args.shift();
-    // args.push(Object.assign({}, this.state));
+    return new Promise((resolve, reject) => {
+      let args = [].slice.call(arguments);
+      let name = args.shift();
+      // args.push(Object.assign({}, this.state));
 
-    args.push((err, _state) => {
-      // TODO err
-      let res = Object.assign(this.state, _state);
-      log('[trigger]', name, res);
-      // return emit view component's
-      this.trigger(name, null, res, this)
+      args.push((err/*, _state*/) => {
+        // TODO err
+        if (err) {
+          return reject(err);
+        }
+
+        // let res = Object.assign(this.state, _state);
+        log('[trigger]', name, this.state);
+        // return emit view component's
+        this.trigger(name, null, this.state, this)
+        resolve(this.state);
+      });
+
+      // emit action
+      log('[action]', name, args);
+      this.actions[name].apply(this, args);
     });
-
-    // emit action
-    this.actions[name].apply(this, args);
   }
 
 }

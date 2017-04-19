@@ -1,0 +1,35 @@
+dmc-endpoints
+  .dmc-endpoints
+    .endpoint(each="{ item, url in endpoint; }" onclick="{ evEntry }")
+      | Name: { item.name }
+      | Tags: { item.tags.join(', ') }
+      | URL: { url }
+
+  style.
+    .endpoint {
+      margin: 10px;
+      border: solid 1px green;
+    }
+
+  script.
+    let store = this.riotx.get();
+    <!--store.on("dmc_show", (err, state, store) => {-->
+      <!--console.log(store.getters.dmc_show(state));-->
+      <!--console.log(store.getters.dmc_pages(state));-->
+      <!--console.log(store.getters.dmc_name(state));-->
+    <!--});-->
+    this.endpoint = {};
+    store.on("endpoint_show", (err, state, store) => {
+      this.endpoint = state.endpoint;
+      this.update()
+    })
+
+    this.evEntry = (ev) => {
+      Promise
+        .resolve()
+        .then(() => store.action("current_update", ev.item.url))
+        .catch((err) => {
+          // TODO
+        });
+
+    }

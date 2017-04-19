@@ -4,69 +4,46 @@
  * Tips: swagger-client(swagger-js) は、ブラウザの外部ファイル読み込み
  */
 
-// APIは必須でサポートしなければならない URI
-const DMC_URI = '/dmc';
-
 class Swagger {
 
   constructor() {
     this._endpoint = null;
-    this._client = null;
-    this._dmc = null;
-    this.setuped = false
+    this.client = null;
   }
 
-  getPage() {
-    return this._dmc.body.pages
-  }
+  setup(url) {
+    return new Promise((resolve, reject) => {
+      const request = {
+        url: url || 'http://localhost:3000/swagger.json',
+        //query,
+        //method,
+        //body,
+        //headers,
+        requestInterceptor: (req) => {
+          console.log('Interceptor(request):', req);
+        },
+        responseInterceptor: (res) => {
+          console.log('Interceptor(response):', res);
+        }
+      };
 
-  getName() {
-    return this._dmc.body.name
-  }
+      this._endpoint = SwaggerClient(request.url);
 
-  setup(url, callback) {
-    const request = {
-      url: url || 'http://localhost:3000/swagger.json',
-      //query,
-      //method,
-      //body,
-      //headers,
-      requestInterceptor: (req) => {
-        console.log('Interceptor(request):', req);
-      },
-      responseInterceptor: (res) => {
-        console.log('Interceptor(response):', res);
-      }
-    };
+      this._endpoint.then(client => {
 
-    this._endpoint = SwaggerClient(request.url);
+        if (client.errors && 0 < client.errors.length) {
+          return reject(client.errors);
+        }
 
-    this._endpoint.then(client => {
+        console.log(`[fetch] ${client.url} success.`);
+        this.client = client;
 
-      if (client.errors && 0 < client.errors.length) {
-        return callback(client.errors);
-      }
-      let dmcOID = client.spec.paths[DMC_URI].get.operationId;
-      if (!dmcOID || !client.apis.dmc || !client.apis.dmc[dmcOID]) {
-        return callback(new Error(`Fetching resource list: ${client.url}; system entry point not found. (uri: /dmc)`), client);
-
-      }
-      console.log(`Fetching resource list: ${client.url}; Success.`);
-      client.apis.dmc[dmcOID]().then(res => {
-        this._dmc = res;
-        this._client = client;
-        this.setuped = true;
-
-        callback(null, this);
+        resolve();
 
       }).catch(err => {
-        return callback(err, this);
+        return reject(err);
       });
-
-    }).catch(err => {
-      return callback(err, this);
     });
-
   }
 }
 

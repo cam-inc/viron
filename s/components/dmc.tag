@@ -1,34 +1,35 @@
 dmc
-  .dmc-inner
+  .dmc
+    //- Example
     h1 dmc components
     dmc-text
     button(type='button' onclick="{evTestRiotX}") Test RiotX fire!!
 
+    //
+    dmc-header
+    dmc-drawer
+    main
+      dmc-page
 
   style.
-    .dmc-inner {
+    .dmc {
       background-color: yellow;
     }
 
   script.
-    let store = this.riotx.get()
-    store.on('rename', (err, state, store) => {
-      let res = store.getters.rename(state);
-      console.log('dmc `rename` on store', res);
-    });
-    store.on('count', (err, state, store) => {
-      let res = store.getters.count(state);
-      console.log('dmc `count` on store', res);
-    });
+    import swagger from '../swagger';
+    let store = this.riotx.get();
+
     store.on('*', (name, err, state, store) => {
       console.log('dmc `*` on store', err, state, store);
     });
 
-    this.on('mount', () => {
-      // emit action's
-      store.action('login', "dmc", "password");
-      store.action('rename', "go");
-      store.action('counter');
-    });
+    <!--this.on('mount', () => {-->
+      <!--// emit action's-->
+      <!--&lt;!&ndash;store.action('login', "dmc", "password");&ndash;&gt;-->
+      <!--&lt;!&ndash;store.action('rename', "go");&ndash;&gt;-->
+      <!--&lt;!&ndash;store.action('counter');&ndash;&gt;-->
+      <!--store.action('dmc_show')-->
+    <!--});-->
 
 
