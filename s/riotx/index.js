@@ -114,8 +114,7 @@ class Store {
     return Promise
       .resolve()
       .then(() => this._actions[name]((...args) => {
-        this.commit(...arg
-                    s);
+        this.commit(...args);
       }, ...args));
       //.then(() => this._actions[name].apply(this, args));
   }
