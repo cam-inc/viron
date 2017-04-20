@@ -1,5 +1,5 @@
 export default {
-  update: function (context, state, obj) {
-    state.current = obj;
+  update: function (context, obj) {
+    context.state.current = obj;
   }
 }
