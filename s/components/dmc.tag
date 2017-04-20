@@ -22,7 +22,7 @@ dmc
 
     let store = this.riotx.get();
 
-    store.on('*', (name, err, state, store) => {
+    store.change('*', (name, err, state, store) => {
       console.log('dmc `*` on store', err, state, store);
     });
 
@@ -30,6 +30,5 @@ dmc
       store.action(constants.ACTION_CURRENT_REMOVE);
     };
     this.evResetEndpointALL = () => {
-      store.action(constants.ACTION_ENDPOINT_REMOVE_ALL)
-      .then(() => store.action(constants.ACTION_ENDPOINT_SHOW))
+      store.action(constants.ACTION_ENDPOINT_REMOVE_ALL);
     }

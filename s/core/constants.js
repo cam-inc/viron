@@ -37,5 +37,9 @@ export default {
   GETTER_CURRENT_SHOW: 'current_show',
 
   // riotx#mutated
-  MUTATED_ENDPOINT: 'endpoint',
+  CHANGE_DMC: 'dmc',
+
+  CHANGE_ENDPOINT: 'endpoint',
+
+  CHANGE_CURRENT: 'current'
 };

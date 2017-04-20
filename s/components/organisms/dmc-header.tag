@@ -21,12 +21,11 @@ dmc-header
 
     this.pages = [];
 
-    store.on(constants.ACTION_DMC_SHOW, (err, state, store) => {
-      this.dmc = state.dmc;
+    store.change(constants.CHANGE_DMC, (err, state, store) => {
       this.pages = store.getter(constants.GETTER_DMC_DASHBOARD);
       console.log(this.pages);
       this.update();
-    })
+    });
 
     this.evSelect = (ev) => {
       location.href = "#" + ev.item.api.id + "/" + ev.item.api.operation;

@@ -1,3 +1,4 @@
+import { forEach } from 'mout/array';
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
 
@@ -127,6 +128,14 @@ class Store {
     return Promise
       .resolve()
       .then(() => this._actions[name].apply(null, [context, ...args]));
+  }
+
+  /**
+   * shorthand for `store.on('event', () => {})`.
+   * @param {...*} args
+   */
+  change(...args) {
+    this.on(...args);
   }
 }
 
