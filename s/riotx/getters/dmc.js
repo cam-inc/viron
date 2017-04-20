@@ -12,7 +12,7 @@ export default {
   },
   // Display dashboard data for drawer
   dashboard: (state, drawer = true) => {
-    return values(filter(state.dmc.pages, (v, k) => {
+    return values(filter(state.dmc.pages, v => {
       if (v.section !== "dashboard") {
         return false;
       }

@@ -93,13 +93,14 @@ class Store {
    * @param {Object} obj commit data object
    */
   commit(name, obj) {
-    const newState = ObjectAssign({}, this.state);
-    log('[commit(before)]', name, newState, obj);
-    this._mutations[name].apply(null, [{
+    const _state = ObjectAssign({}, this.state);
+    log('[commit(before)]', name, _state, obj);
+    const context = {
       state : this.state
-    }, newState, obj]);
-    log('[commit(after)]', name, newState, obj);
-    ObjectAssign(this.state, newState);
+    };
+    this._mutations[name].apply(null, [context, _state, obj]);
+    log('[commit(after)]', name, _state, obj);
+    ObjectAssign(this.state, _state);
     this.trigger(name, null, this.state, this);
   }
 
@@ -113,14 +114,15 @@ class Store {
   action(name, ...args) {
     log('[action]', name, args);
 
+    const context = {
+      state: this.state,
+      commit: (...args) => {
+        this.commit(...args);
+      }
+    };
     return Promise
       .resolve()
-      .then(() => this._actions[name].apply(null, [{
-        state: this.state,
-        commit: (...args) => {
-          this.commit(...args);
-        }
-      }, ...args]));
+      .then(() => this._actions[name].apply(null, [context, ...args]));
   }
 }
 
@@ -158,7 +160,6 @@ class RiotX {
       riotx: this
     });
   }
-
 
   /**
    * Add a store instance
