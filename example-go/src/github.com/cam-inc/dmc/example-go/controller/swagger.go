@@ -43,7 +43,7 @@ func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger 
 				continue
 			}
 
-			resource := strings.Split(uri,"/")[1]
+			resource := strings.Split(uri, "/")[1]
 			raw, _ := path.MarshalJSON()
 			mt := map[string]interface{}{}
 			json.Unmarshal(raw, &mt)
@@ -52,7 +52,7 @@ func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger 
 				if roles[method] == nil || (inStringArray("*", roles[method]) < 0 && inStringArray(resource, roles[method]) < 0) {
 					delete(mt, method)
 				}
- 			}
+			}
 
 			newRaw, _ := json.Marshal(&mt)
 			var newPath genswagger.Path
