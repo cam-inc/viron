@@ -95,7 +95,9 @@ class Store {
   commit(name, obj) {
     const newState = ObjectAssign({}, this.state);
     log('[commit(before)]', name, newState, obj);
-    this._mutations[name](newState, obj);
+    this._mutations[name].apply(null, [{
+      state : this.state
+    }, newState, obj]);
     log('[commit(after)]', name, newState, obj);
     ObjectAssign(this.state, newState);
     this.trigger(name, null, this.state, this);
@@ -113,10 +115,12 @@ class Store {
 
     return Promise
       .resolve()
-      .then(() => this._actions[name]((...args) => {
-        this.commit(...args);
-      }, ...args));
-      //.then(() => this._actions[name].apply(this, args));
+      .then(() => this._actions[name].apply(null, [{
+        state: this.state,
+        commit: (...args) => {
+          this.commit(...args);
+        }
+      }, ...args]));
   }
 }
 

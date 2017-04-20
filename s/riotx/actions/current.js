@@ -3,11 +3,11 @@ export default {
     return Promise
       .resolve();
   },
-  update: (mutate, key) => {
+  update: (context, key) => {
     return Promise
       .resolve()
       .then(() => {
-        mutate('current_update', key);
+        context.commit('current_update', key);
       });
   }
 };

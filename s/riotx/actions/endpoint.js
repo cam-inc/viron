@@ -1,5 +1,5 @@
 export default {
-  show: mutate => {
+  show: context => {
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
@@ -18,7 +18,7 @@ export default {
         }, 1000 * 3);
       }))
       .then(endpoints => {
-        mutate('endpoint_show', endpoints);
+        context.commit('endpoint_show', endpoints);
         // TODO
         return {
           foo: 'sample response from acion.'

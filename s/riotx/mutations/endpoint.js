@@ -1,5 +1,5 @@
 export default {
-  show: function (state, obj) {
+  show: function (context, state, obj) {
     state.endpoint = obj;
   }
-}
+};

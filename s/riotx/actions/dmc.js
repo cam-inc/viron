@@ -4,7 +4,7 @@ import swagger from '../../swagger';
 const DMC_URI = '/dmc';
 
 export default {
-  show: mutate => {
+  show: context => {
     return new Promise((resolve, reject) => {
       const dmcOID = swagger.client.spec.paths[DMC_URI].get.operationId;
       if (!dmcOID || !swagger.client.apis.dmc || !swagger.client.apis.dmc[dmcOID]) {
@@ -25,14 +25,14 @@ export default {
         });
     })
       .then(res => {
-        mutate('dmc_show', res.obj);
+        context.commit('dmc_show', res.obj);
       });
   },
-  remove: mutate => {
+  remove: context => {
     return Promise
       .resolve()
       .then(() => {
-        mutate('dmc_remove');
+        context.commit('dmc_remove');
       });
   }
 }
