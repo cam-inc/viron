@@ -23,11 +23,3 @@ dmc
     store.on('*', (name, err, state, store) => {
       console.log('dmc `*` on store', err, state, store);
     });
-
-    <!--this.on('mount', () => {-->
-      <!--// emit action's-->
-      <!--&lt;!&ndash;store.action('login', "dmc", "password");&ndash;&gt;-->
-      <!--&lt;!&ndash;store.action('rename', "go");&ndash;&gt;-->
-      <!--&lt;!&ndash;store.action('counter');&ndash;&gt;-->
-      <!--store.action('dmc_show')-->
-    <!--});-->

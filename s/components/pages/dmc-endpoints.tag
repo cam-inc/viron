@@ -12,9 +12,11 @@ dmc-endpoints
     }
 
   script.
+    import constants from '../../core/constants';
+
     const store = this.riotx.get();
     this.endpoint = {};
-    store.on('endpoint_show', (err, state, store) => {
+    store.on(constants.ACTION_ENDPOINT_SHOW, (err, state, store) => {
       this.endpoint = state.endpoint;
       this.update()
     })
@@ -22,7 +24,7 @@ dmc-endpoints
     this.evEntry = (ev) => {
       Promise
         .resolve()
-        .then(() => store.action('current_update', ev.item.url))
+        .then(() => store.action(constants.ACTION_CURRENT_UPDATE, ev.item.url))
         .catch((err) => {
           // TODO
         });

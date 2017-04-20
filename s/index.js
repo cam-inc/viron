@@ -1,5 +1,7 @@
 import riot from 'riot';
+import storage from 'store';
 
+import constants from './core/constants';
 import swagger from './swagger/index';
 
 // riotx
@@ -32,12 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => console.error(err));
 
-  let current = null;
-
   // riotx setup store
   const store = new riotx.Store({
     state: {
-      current: current,
+      current: storage.get(constants.STORAGE_CURRENT),
       endpoint: {},
       dmc: null
     },
@@ -45,19 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
     mutations: mutations,
     getters: getters
   });
-
+debugger;
   riotx.add(store);
   riot.mount('dmc'); // root mount!!!
 
   // Changed Endpoint
-  store.on('current_update', (err, state, store) => {
+  store.on(constants.ACTION_CURRENT_UPDATE, (err, state, store) => {
     const current = state.current;
 
     Promise
       .resolve()
-      .then(() => store.action('dmc_remove'))
+      .then(() => store.action(constants.ACTION_DMC_REMOVE))
       .then(() => swagger.setup(current))
-      .then(() => store.action('dmc_show'))
+      .then(() => store.action(constants.ACTION_DMC_SHOW))
       .catch((err) => {
         console.log('Update state(current) error', err);
       })
@@ -65,12 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Entry to the endpoint
-  store.on('dmc_show', (err, state, store) => {
+  store.on(constants.ACTION_DMC_SHOW, (err, state, store) => {
     const targetTagString = 'dmc-empty'; // TODO
     riot.mount('dmc-page', targetTagString);
   });
 
-  if (current) {
+  if (store.getter(constants.GETTER_CURRENT_SHOW)) {
     // Endpoint エントリー済み
   } else {
     // Endpoint エントリー前
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     riot.mount('dmc-page', targetTagString);
 
     store
-      .action('endpoint_show')
+      .action(constants.ACTION_ENDPOINT_SHOW)
       .then(() => {
         // TODO: debug用なので後で消すこと。
         console.log('should be called after all action calls.');

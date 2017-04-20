@@ -1,3 +1,5 @@
+import constants from '../../core/constants';
+
 import swagger from '../../swagger';
 
 // APIは必須でサポートしなければならない URI
@@ -25,14 +27,14 @@ export default {
         });
     })
       .then(res => {
-        context.commit('dmc_show', res.obj);
+        context.commit(constants.MUTATION_DMC_SHOW, res.obj);
       });
   },
   remove: context => {
     return Promise
       .resolve()
       .then(() => {
-        context.commit('dmc_remove');
+        context.commit(constants.MUTATION_DMC_REMOVE);
       });
   }
 }

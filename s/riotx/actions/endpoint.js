@@ -1,3 +1,5 @@
+import constants from '../../core/constants';
+
 export default {
   show: context => {
     return Promise
@@ -15,10 +17,10 @@ export default {
             'http://localhost:3006/swagger.json': { name: 'Service B', tags: ['Staging'] },
             'http://localhost:3007/swagger.json': { name: 'Service B', tags: ['Production'] }
           });
-        }, 1000 * 3);
+        }, 1000 * 1);
       }))
       .then(endpoints => {
-        context.commit('endpoint_show', endpoints);
+        context.commit(constants.MUTATION_ENDPOINT_SHOW, endpoints);
         // TODO
         return {
           foo: 'sample response from acion.'
