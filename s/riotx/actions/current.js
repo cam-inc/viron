@@ -1,10 +1,13 @@
 export default {
-  show: function (callback) {
-
+  show: () => {
+    return Promise
+      .resolve();
   },
-  update: function (key, callback) {
-    this.commit("current_update", key);
-
-    callback(null);
+  update: (context, key) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('current_update', key);
+      });
   }
-}
+};

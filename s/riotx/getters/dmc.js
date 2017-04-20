@@ -1,18 +1,18 @@
-import { filter, values } from "mout/object";
+import { filter, values } from 'mout/object';
 
 export default {
-  show: function (state) {
+  show: state => {
     return state.dmc;
   },
-  pages: function (state) {
-    return state.dmc.pages
+  pages: state => {
+    return state.dmc.pages;
   },
-  name: function (state) {
-    return state.dmc.name
+  name: state => {
+    return state.dmc.name;
   },
   // Display dashboard data for drawer
-  dashboard: function (state, drawer = true) {
-    return values(filter(state.dmc.pages, (v, k, arr) => {
+  dashboard: (state, drawer = true) => {
+    return values(filter(state.dmc.pages, v => {
       if (v.section !== "dashboard") {
         return false;
       }
@@ -20,7 +20,6 @@ export default {
         return false;
       }
       return true;
-
     }));
   }
-}
+};

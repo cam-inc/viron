@@ -6,6 +6,5 @@ export default {
   dmc_show: dmc.show,
   dmc_remove: dmc.remove,
   endpoint_show: endpoint.show,
-  current_update: current.update,
-
-}
+  current_update: current.update
+};

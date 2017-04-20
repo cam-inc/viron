@@ -27,6 +27,5 @@ dmc-header
     })
 
     this.evSelect = (ev) => {
-      debugger;
       location.href = "#" + ev.item.api.id + "/" + ev.item.api.operation;
     }

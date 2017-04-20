@@ -15,9 +15,9 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/jinzhu/gorm"
 
+	"encoding/json"
 	"golang.org/x/crypto/scrypt"
 	"strings"
-	"encoding/json"
 )
 
 // AuthController implements the auth resource.
@@ -68,21 +68,21 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 		roles["delete"] = []string{"*"}
 		roles["patch"] = []string{"*"}
 	} else {
-	    adminRoleTable := models.NewAdminRoleDB(common.DB)
-	    adminRoleModels, err := adminRoleTable.ListByRoleID(ctx.Context, adminUserModel.RoleID)
-	    if err != nil {
+		adminRoleTable := models.NewAdminRoleDB(common.DB)
+		adminRoleModels, err := adminRoleTable.ListByRoleID(ctx.Context, adminUserModel.RoleID)
+		if err != nil {
 			panic(err)
 		}
 
-	    for _, m := range adminRoleModels {
+		for _, m := range adminRoleModels {
 			/*
-			Roleをチェックしやすい構造に整形する
-			roles:
-				get: ["*"]
-				post: ["item"]
-				put: ["item", "user"]
-				delete: ["item"]
-				patch: ["item"]
+				Roleをチェックしやすい構造に整形する
+				roles:
+					get: ["*"]
+					post: ["item"]
+					put: ["item", "user"]
+					delete: ["item"]
+					patch: ["item"]
 			*/
 			method := strings.ToLower(m.Method)
 			if m.Resource == "*" {
@@ -96,7 +96,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 				}
 				roles[method] = append(roles[method], m.Resource)
 			}
-	    }
+		}
 	}
 	rolesStr, err := json.Marshal(roles)
 	if err != nil {

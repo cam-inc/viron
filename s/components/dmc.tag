@@ -31,5 +31,3 @@ dmc
       <!--&lt;!&ndash;store.action('counter');&ndash;&gt;-->
       <!--store.action('dmc_show')-->
     <!--});-->
-
-
