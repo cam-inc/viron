@@ -13,9 +13,6 @@ __PKG_DIR=$(__PWD)/$(__PKG)
 __DIST=dist
 __DIST_DIR=$(__PWD)/$(__DIST)
 
-__PUBLIC=public
-__PUBLIC_DIR=$(__PWD)/$(__PUBLIC)
-
 __REALIZE=$(__BIN_DIR)/realize
 __GOAGEN=$(__BIN_DIR)/goagen
 __GOCONVEY=$(__BIN_DIR)/goconvey
@@ -173,7 +170,7 @@ gen-client: ## Generate goa [client]
 
 gen-swagger: ## Generate goa [swagger]
 	@echo "[INFO ] >>>>> gen-swagger"
-	GOPATH=$(__GOPATH) $(__GOAGEN) swagger -d $(__PKG_PROJECT_DESIGN) -o $(__PUBLIC_DIR)
+	GOPATH=$(__GOPATH) $(__GOAGEN) swagger -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN)
 
 gen-schema: ## Generate goa [schema]
 	@echo "[INFO ] >>>>> gen-schema"
