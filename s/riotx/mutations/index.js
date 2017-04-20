@@ -8,5 +8,6 @@ export default {
   [constants.MUTATION_DMC_SHOW]: dmc.show,
   [constants.MUTATION_DMC_REMOVE]: dmc.remove,
   [constants.MUTATION_ENDPOINT_SHOW]: endpoint.show,
-  [constants.MUTATION_CURRENT_UPDATE]: current.update
+  [constants.MUTATION_CURRENT_UPDATE]: current.update,
+    [constants.MUTATION_CURRENT_REMOVE]: current.remove,
 };

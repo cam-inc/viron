@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mutations: mutations,
     getters: getters
   });
-debugger;
+
   riotx.add(store);
   riot.mount('dmc'); // root mount!!!
 
@@ -72,6 +72,7 @@ debugger;
 
   if (store.getter(constants.GETTER_CURRENT_SHOW)) {
     // Endpoint エントリー済み
+    store.action(constants.ACTION_CURRENT_UPDATE, store.getter(constants.GETTER_CURRENT_SHOW));
   } else {
     // Endpoint エントリー前
     const targetTagString = 'dmc-endpoints';

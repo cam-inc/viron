@@ -10,12 +10,14 @@ export default {
   ACTION_DMC_REMOVE: 'dmc_remove',
   ACTION_ENDPOINT_SHOW: 'endpoint_show',
   ACTION_CURRENT_UPDATE: 'current_update',
+  ACTION_CURRENT_REMOVE: 'current_remove',
 
   // riotx#mutations
   MUTATION_DMC_SHOW: 'dmc_show',
   MUTATION_DMC_REMOVE: 'dmc_remove',
   MUTATION_ENDPOINT_SHOW: 'endpoint_show',
   MUTATION_CURRENT_UPDATE: 'current_update',
+  MUTATION_CURRENT_REMOVE: 'current_remove',
 
   // riotx#getters
   GETTER_DMC_SHOW: 'dmc_show',
