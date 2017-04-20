@@ -99,10 +99,13 @@ class Store {
     const context = {
       state : _state
     };
-    this._mutations[name].apply(null, [context, obj]);
+    const triggers = this._mutations[name].apply(null, [context, obj]);
     log('[commit(after)]', name, _state, obj);
     ObjectAssign(this.state, _state);
-    this.trigger(name, null, this.state, this);
+
+    forEach(triggers, (v) => {
+      this.trigger(v, null, this.state, this);
+    });
   }
 
   /**

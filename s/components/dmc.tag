@@ -1,9 +1,9 @@
 dmc
   .dmc
-    //- Example
-    h1 dmc components
-    dmc-text
-    button(type='button' onclick="{ evResetCurrent }") Current Endpoint リセット
+    //- Debug
+    h2 Debug
+      button(type='button' onclick="{ evResetCurrent }") Storage->Current リセット
+      button(type='button' onclick="{ evResetEndpointALL }") Storage->Endpoint リセット
 
     //
     dmc-header
@@ -29,3 +29,7 @@ dmc
     this.evResetCurrent = (ev) => {
       store.action(constants.ACTION_CURRENT_REMOVE);
     };
+    this.evResetEndpointALL = () => {
+      store.action(constants.ACTION_ENDPOINT_REMOVE_ALL)
+      .then(() => store.action(constants.ACTION_ENDPOINT_SHOW))
+    }

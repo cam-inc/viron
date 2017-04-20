@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const store = new riotx.Store({
     state: {
       current: storage.get(constants.STORAGE_CURRENT),
-      endpoint: {},
+      endpoint: storage.get(constants.STORAGE_ENDPOINT),
       dmc: null
     },
     actions: actions,
