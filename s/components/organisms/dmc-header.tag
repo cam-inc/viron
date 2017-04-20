@@ -15,13 +15,15 @@ dmc-header
     }
 
   script.
+    import constants from '../../core/constants';
+
     let store = this.riotx.get();
 
     this.pages = [];
 
-    store.on("dmc_show", (err, state, store) => {
+    store.on(constants.ACTION_DMC_SHOW, (err, state, store) => {
       this.dmc = state.dmc;
-      this.pages = store.getter("dmc_dashboard");
+      this.pages = store.getter(constants.GETTER_DMC_DASHBOARD);
       console.log(this.pages);
       this.update();
     })

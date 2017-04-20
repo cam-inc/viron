@@ -1,5 +1,5 @@
 export default {
-  show: state => {
-    return state.endpoint;
+  show: context => {
+    return context.state.endpoint;
   }
 };

@@ -1,3 +1,5 @@
+import constants from '../../core/constants';
+
 export default {
   show: () => {
     return Promise
@@ -7,7 +9,14 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit('current_update', key);
+        context.commit(constants.MUTATION_CURRENT_UPDATE, key);
       });
-  }
+  },
+  remove: (context) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants.MUTATION_CURRENT_REMOVE);
+      });
+  },
 };

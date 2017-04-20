@@ -80,10 +80,11 @@ class Store {
    * @param {...*} args
    */
   getter(name, ...args) {
-    const _state = ObjectAssign({}, this.state);
-    args.unshift(_state);
     log('[getter]', name, args);
-    return this._getters[name].apply(this, args);
+    const context = {
+      state : ObjectAssign({}, this.state)
+    };
+    return this._getters[name].apply(null, [context, ...args]);
   }
 
   /**
@@ -96,9 +97,9 @@ class Store {
     const _state = ObjectAssign({}, this.state);
     log('[commit(before)]', name, _state, obj);
     const context = {
-      state : this.state
+      state : _state
     };
-    this._mutations[name].apply(null, [context, _state, obj]);
+    this._mutations[name].apply(null, [context, obj]);
     log('[commit(after)]', name, _state, obj);
     ObjectAssign(this.state, _state);
     this.trigger(name, null, this.state, this);

@@ -3,7 +3,7 @@ dmc
     //- Example
     h1 dmc components
     dmc-text
-    button(type='button' onclick="{evTestRiotX}") Test RiotX fire!!
+    button(type='button' onclick="{ evResetCurrent }") Current Endpoint リセット
 
     //
     dmc-header
@@ -28,16 +28,14 @@ dmc
     import './pages/dmc-samplepageA.tag';
     import './pages/dmc-samplepageB.tag';
     import './pages/dmc-samplepageC.tag';
+    import constants from '../core/constants';
+
     let store = this.riotx.get();
 
     store.on('*', (name, err, state, store) => {
       console.log('dmc `*` on store', err, state, store);
     });
 
-    <!--this.on('mount', () => {-->
-      <!--// emit action's-->
-      <!--&lt;!&ndash;store.action('login', "dmc", "password");&ndash;&gt;-->
-      <!--&lt;!&ndash;store.action('rename', "go");&ndash;&gt;-->
-      <!--&lt;!&ndash;store.action('counter');&ndash;&gt;-->
-      <!--store.action('dmc_show')-->
-    <!--});-->
+    this.evResetCurrent = (ev) => {
+      store.action(constants.ACTION_CURRENT_REMOVE);
+    };

@@ -1,8 +1,8 @@
 export default {
-  show: function (context, state, obj) {
-    state.dmc = obj;
+  show: function (context, obj) {
+    context.state.dmc = obj;
   },
-  remove: function (context, state) {
-    state.dmc = null;
+  remove: function (context) {
+    context.state.dmc = null;
   }
 };
