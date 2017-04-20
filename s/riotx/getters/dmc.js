@@ -1,18 +1,18 @@
 import { filter, values } from 'mout/object';
 
 export default {
-  show: state => {
-    return state.dmc;
+  show: context => {
+    return context.state.dmc;
   },
-  pages: state => {
-    return state.dmc.pages;
+  pages: context => {
+    return context.state.dmc.pages;
   },
-  name: state => {
-    return state.dmc.name;
+  name: context => {
+    return context.state.dmc.name;
   },
   // Display dashboard data for drawer
-  dashboard: (state, drawer = true) => {
-    return values(filter(state.dmc.pages, v => {
+  dashboard: (context, drawer = true) => {
+    return values(filter(context.state.dmc.pages, v => {
       if (v.section !== "dashboard") {
         return false;
       }
