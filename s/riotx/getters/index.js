@@ -4,7 +4,7 @@ import dmc from './dmc';
 import current from './current';
 
 export default {
-  [constants.GETTER_CURRENT_SHOW]: dmc.show,
+  [constants.GETTER_DMC_SHOW]: dmc.show,
   [constants.GETTER_DMC_PAGES]: dmc.pages,
   [constants.GETTER_DMC_NAME]: dmc.name,
   [constants.GETTER_DMC_DASHBOARD]: dmc.dashboard,

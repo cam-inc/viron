@@ -1,3 +1,4 @@
+import { forEach } from 'mout/array';
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
 
@@ -99,10 +100,13 @@ class Store {
     const context = {
       state : _state
     };
-    this._mutations[name].apply(null, [context, obj]);
+    const triggers = this._mutations[name].apply(null, [context, obj]);
     log('[commit(after)]', name, _state, obj);
     ObjectAssign(this.state, _state);
-    this.trigger(name, null, this.state, this);
+
+    forEach(triggers, (v) => {
+      this.trigger(v, null, this.state, this);
+    });
   }
 
   /**
@@ -124,6 +128,14 @@ class Store {
     return Promise
       .resolve()
       .then(() => this._actions[name].apply(null, [context, ...args]));
+  }
+
+  /**
+   * shorthand for `store.on('event', () => {})`.
+   * @param {...*} args
+   */
+  change(...args) {
+    this.on(...args);
   }
 }
 

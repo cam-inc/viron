@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const store = new riotx.Store({
     state: {
       current: storage.get(constants.STORAGE_CURRENT),
-      endpoint: {},
+      endpoint: storage.get(constants.STORAGE_ENDPOINT),
       dmc: null
     },
     actions: actions,
@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
   riot.mount('dmc'); // root mount!!!
 
   // Changed Endpoint
-  store.on(constants.ACTION_CURRENT_UPDATE, (err, state, store) => {
-    const current = state.current;
+  store.change(constants.CHANGE_CURRENT, (err, state, store) => {
+    const current = store.getter(constants.GETTER_CURRENT_SHOW);
 
     Promise
       .resolve()
@@ -65,7 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Entry to the endpoint
-  store.on(constants.ACTION_DMC_SHOW, (err, state, store) => {
+  store.change(constants.CHANGE_DMC, (err, state, store) => {
+    if (!!store.getter(constants.GETTER_DMC_SHOW)) {
+      return;
+    }
     const targetTagString = 'dmc-empty'; // TODO
     riot.mount('dmc-page', targetTagString);
   });

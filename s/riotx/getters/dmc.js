@@ -12,7 +12,8 @@ export default {
   },
   // Display dashboard data for drawer
   dashboard: (context) => {
-    return values(filter(context.state.dmc.pages, v => {
+    const pages = (context.state.dmc && context.state.dmc.pages) || [];
+    return values(filter(pages, v => {
 
       if (v.section !== "dashboard") {
         return false;

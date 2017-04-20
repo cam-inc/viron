@@ -1,9 +1,9 @@
 dmc
   .dmc
-    //- Example
-    h1 dmc components
-    dmc-text
-    button(type='button' onclick="{ evResetCurrent }") Current Endpoint リセット
+    //- Debug
+    h2 Debug
+      button(type='button' onclick="{ evResetCurrent }") Storage->Current リセット
+      button(type='button' onclick="{ evResetEndpointALL }") Storage->Endpoint リセット
 
     //
     dmc-header
@@ -22,10 +22,13 @@ dmc
 
     let store = this.riotx.get();
 
-    store.on('*', (name, err, state, store) => {
+    store.change('*', (name, err, state, store) => {
       console.log('dmc `*` on store', err, state, store);
     });
 
     this.evResetCurrent = (ev) => {
       store.action(constants.ACTION_CURRENT_REMOVE);
     };
+    this.evResetEndpointALL = () => {
+      store.action(constants.ACTION_ENDPOINT_REMOVE_ALL);
+    }
