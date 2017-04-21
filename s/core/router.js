@@ -66,8 +66,19 @@ class Router {
   /**
    * navigate to target location.
    * @param {String|Object} path e.g.) '/foo' or { pathname, search, hash }
+   * @param {Boolean} forceChange
    */
-  navigateTo(path) {
+  navigateTo(path, forceChange = false) {
+    if (forceChange && this.getCurrentLocation().pathname === path) {
+      this.refresh();
+      return;
+    }
+
+    if (this.getCurrentLocation().pathname === path) {
+      console.warn('same path is passed.');
+      return;
+    }
+
     this._history.push(path);
   }
 
