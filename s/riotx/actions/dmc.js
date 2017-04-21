@@ -27,7 +27,7 @@ export default {
         });
     })
       .then(res => {
-        context.commit(constants.MUTATION_DMC_SHOW, res.obj);
+        context.commit(constants.MUTATION_DMC, res.obj);
       });
   },
   remove: context => {

@@ -23,7 +23,7 @@ export default {
 
       }))
       .then(endpoints => {
-        context.commit(constants.MUTATION_ENDPOINT_SHOW, endpoints);
+        context.commit(constants.MUTATION_ENDPOINT, endpoints);
       });
   },
   remove: (context, key) => {

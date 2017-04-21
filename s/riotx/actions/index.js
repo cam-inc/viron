@@ -5,10 +5,10 @@ import endpoint from './endpoint';
 import dmc from './dmc';
 
 export default {
-  [constants.ACTION_DMC_SHOW]: dmc.show,
+  [constants.ACTION_DMC_GET]: dmc.show,
   [constants.ACTION_DMC_REMOVE]: dmc.remove,
 
-  [constants.ACTION_ENDPOINT_SHOW]: endpoint.show,
+  [constants.ACTION_ENDPOINT_GET]: endpoint.show,
   [constants.ACTION_ENDPOINT_REMOVE]: endpoint.remove,
   [constants.ACTION_ENDPOINT_REMOVE_ALL]: endpoint.removeAll,
 

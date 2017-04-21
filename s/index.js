@@ -75,13 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Changed Endpoint
   store.change(constants.CHANGE_CURRENT, (err, state, store) => {
-    const current = store.getter(constants.GETTER_CURRENT_SHOW);
+    const current = store.getter(constants.GETTER_CURRENT);
 
     Promise
       .resolve()
       .then(() => store.action(constants.ACTION_DMC_REMOVE))
       .then(() => swagger.setup(current))
-      .then(() => store.action(constants.ACTION_DMC_SHOW))
+      .then(() => store.action(constants.ACTION_DMC_GET))
       .catch((err) => {
         console.log('Update state(current) error', err);
       })
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Entry to the endpoint
   store.change(constants.CHANGE_DMC, (err, state, store) => {
-    if (!!store.getter(constants.GETTER_DMC_SHOW)) {
+    if (!!store.getter(constants.GETTER_DMC)) {
       return;
     }
     debugger;
@@ -99,16 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // riot.mount('dmc-page', targetTagString);
   });
 
-  if (store.getter(constants.GETTER_CURRENT_SHOW)) {
+  if (store.getter(constants.GETTER_CURRENT)) {
     // Endpoint エントリー済み
-    store.action(constants.ACTION_CURRENT_UPDATE, store.getter(constants.GETTER_CURRENT_SHOW));
+    store.action(constants.ACTION_CURRENT_UPDATE, store.getter(constants.GETTER_CURRENT));
   } else {
     // Endpoint エントリー前
     const targetTagString = 'dmc-endpoints';
     riot.mount('dmc-page', targetTagString);
 
     store
-      .action(constants.ACTION_ENDPOINT_SHOW)
+      .action(constants.ACTION_ENDPOINT_GET)
       .then(() => {
         // TODO: debug用なので後で消すこと。
         console.log('should be called after all action calls.');
