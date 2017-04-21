@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/cam-inc/dmc/example-go/bridge"
+	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
@@ -28,16 +29,6 @@ func init() {
 	swaggerAll = sw
 }
 
-func inStringArray(val string, array []string) int {
-	index := -1
-	for i, v := range array {
-		if val == v {
-			return i
-		}
-	}
-	return index
-}
-
 func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger {
 	if s.Paths != nil {
 		for uri, p := range s.Paths {
@@ -52,7 +43,7 @@ func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger 
 			json.Unmarshal(raw, &mt)
 
 			for method := range mt {
-				if roles[method] == nil || (inStringArray("*", roles[method]) < 0 && inStringArray(resource, roles[method]) < 0) {
+				if roles[method] == nil || (common.InStringArray("*", roles[method]) < 0 && common.InStringArray(resource, roles[method]) < 0) {
 					delete(mt, method)
 				}
 			}

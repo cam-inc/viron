@@ -1,11 +1,15 @@
 package middleware
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"context"
 
+	"strings"
+
 	"github.com/cam-inc/dmc/example-go/bridge"
+
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -17,6 +21,7 @@ import (
 func validation() goa.Middleware {
 	logger := common.GetLogger("default")
 	errValidationFailed := goa.NewErrorClass("validation_failed", 401)
+	errForbidden := goa.NewErrorClass("forbidden", 403)
 
 	validate := func(nextHandler goa.Handler) goa.Handler {
 		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -36,7 +41,16 @@ func validation() goa.Middleware {
 				return errValidationFailed("JWT invalid")
 			}
 
-			// TODO: claimからrole取り出して権限のチェック
+			// 権限チェック
+			var roles map[string][]string
+			json.Unmarshal([]byte(claims["roles"].(string)), &roles)
+
+			reqMethod := strings.ToLower(req.Method)
+			resource := strings.Split(req.RequestURI, "/")[1]
+			if common.InStringArray("*", roles[reqMethod]) < 0 || common.InStringArray(resource, roles[reqMethod]) < 0 {
+				// 権限がないリクエスト
+				return errForbidden("permission denied")
+			}
 
 			newCtx := context.WithValue(ctx, bridge.JwtClaims, claims)
 			return nextHandler(newCtx, rw, req)
