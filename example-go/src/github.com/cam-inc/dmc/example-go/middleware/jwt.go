@@ -10,9 +10,11 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
+	"go.uber.org/zap"
 )
 
 func validation() goa.Middleware {
+	logger := common.GetLogger("default")
 	errValidationFailed := goa.NewErrorClass("validation_failed", 401)
 
 	validate := func(nextHandler goa.Handler) goa.Handler {
@@ -25,9 +27,11 @@ func validation() goa.Middleware {
 			claims := token.Claims.(jwtgo.MapClaims)
 
 			if claims["iss"] != "DMC" {
+				logger.Error("invalid JWT.iss requested", zap.String("iss", claims["iss"].(string)))
 				return errValidationFailed("JWT invalid")
 			}
 			if claims["aud"] != "dmc.local" {
+				logger.Error("invalid JWT.aud requested", zap.String("aud", claims["aud"].(string)))
 				return errValidationFailed("JWT invalid")
 			}
 
