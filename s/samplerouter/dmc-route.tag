@@ -9,8 +9,8 @@ dmc-route
     this.isVisible = false;
     this.routeInfo = {};
 
-    // register a route.
-    router.register(
+    // listen to the route change event.
+    router.on(
       opts.path,
       routeInfo => {
         this.isVisible = true;

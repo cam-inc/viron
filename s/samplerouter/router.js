@@ -97,7 +97,7 @@ class Router {
    * @param {Function} onEnter a function that will be executed when the route is about to enter.
    * @param {Function} onLeave a function that will be executed when the route is abount to leave.
    */
-  register(pattern, onEnter, onLeave) {
+  on(pattern, onEnter, onLeave) {
     this._routes.push({
       pattern,
       regexp: pathToRegexp(pattern),
