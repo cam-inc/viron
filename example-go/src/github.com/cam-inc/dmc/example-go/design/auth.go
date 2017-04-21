@@ -16,6 +16,7 @@ var JWT = JWTSecurity("jwt", func() {
 // action used to create JWTs.
 //var SigninBasicAuth = BasicAuthSecurity("SigninBasicAuth")
 
+// SecuritySuccessMediaType of media type.
 var SecuritySuccessMediaType = MediaType("application/vnd.security.success", func() {
 	Description("The common media type to all request responses for this example")
 	TypeName("Success")

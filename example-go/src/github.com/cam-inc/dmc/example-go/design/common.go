@@ -1,12 +1,15 @@
 package design
 
 import (
+	"github.com/cam-inc/dmc/example-go/bridge"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
-	"github.com/cam-inc/dmc/example-go/bridge"
 )
 
+// OriginURL response header
 var OriginURL = "*"
+
+// OriginAllowAll response header
 var OriginAllowAll = func() {
 	Methods("GET", "OPTIONS", "PUT", "POST", "DELETE") // Allow all origins to retrieve the Swagger JSON (CORS)
 }
@@ -22,7 +25,8 @@ var Layout = func() {
 	)
 }
 
-var Style = func () {
+// Style of enum
+var Style = func() {
 	Example("Style of Web Component")
 	Default(bridge.StyleNumber)
 	Enum(
@@ -31,7 +35,6 @@ var Style = func () {
 		bridge.StyleTable,
 	)
 }
-
 
 // PageSection of enum
 // ページのセクジョン
@@ -43,6 +46,7 @@ var PageSection = func() {
 		bridge.SectionDashboard,
 	)
 }
+
 // PageGroup of enum
 // ページのグループ
 var PageGroup = func() {
@@ -61,8 +65,8 @@ var SearchField = func() {
 	Example("Field")
 	Default("default")
 	Enum("default", // definition
-		"date", // yyyy mm dd - yyyy mm dd
-		"time", // hh mm - hh mm
+		"date",     // yyyy mm dd - yyyy mm dd
+		"time",     // hh mm - hh mm
 		"datetime", // yyyy mm dd hh mm - yyyy mm dd hh mm
 	)
 }
@@ -100,6 +104,7 @@ var APIType = Type("api", func() {
 	Required("id", "operation")
 })
 
+// OptionType of type
 var OptionType = Type("option", func() {
 	Attribute("key", String, "Key", func() {
 		Example("key")
@@ -115,11 +120,10 @@ var ComponentType = Type("component", func() {
 	Description("A Component type")
 	Attribute("api", APIType, "Access api of page")
 	Attribute("name", String, "Title of page")
-	Attribute("style", Style) // Web Component style
+	Attribute("style", Style)                                  // Web Component style
 	Attribute("options", ArrayOf(OptionType), "style options") // Web Component Style options
 	Required("api", "name", "style")
 })
-
 
 // PageType of type
 var PageType = Type("page", func() {
@@ -128,13 +132,14 @@ var PageType = Type("page", func() {
 	Attribute("name", String, "Title of page")
 	Attribute("section", PageSection)
 	Attribute("group", PageGroup)
-	Attribute("primary", String, "recode primary key") // TODO 主キー
-	Attribute("layout", Layout) // ページの表示スタイル
+	Attribute("primary", String, "recode primary key")      // TODO 主キー
+	Attribute("layout", Layout)                             // ページの表示スタイル
 	Attribute("drawer", Boolean, "Displayed in the drawer") // Drowerに表示するか
 	//Attribute("search", ArrayOf(SearchType), "Search of page") // 検索があるか
 	Required("api", "name", "section", "group", "primary", "layout", "drawer")
 })
 
+// PaginationType of type
 var PaginationType = Type("pagination", func() {
 	Description("A Pagination definition")
 	Attribute("X-Pagination-Total", Integer, func() {

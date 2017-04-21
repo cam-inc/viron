@@ -12,43 +12,44 @@ func init() {
 	loggers = make(map[string]*zap.Logger)
 	loggersConfig = make(map[string]zap.Config)
 	loggersConfig["default"] = zap.Config{
-		Level: getLevel(zapcore.DebugLevel),
+		Level:    getLevel(zapcore.DebugLevel),
 		Encoding: "json",
 		EncoderConfig: zapcore.EncoderConfig{
-			TimeKey:		"Time",
-			LevelKey:	   "Level",
-			NameKey:		"Name",
-			CallerKey:	  "Caller",
-			MessageKey:	 "Msg",
+			TimeKey:        "Time",
+			LevelKey:       "Level",
+			NameKey:        "Name",
+			CallerKey:      "Caller",
+			MessageKey:     "Msg",
 			StacktraceKey:  "St",
-			EncodeLevel:	zapcore.CapitalLevelEncoder,
-			EncodeTime:	 zapcore.ISO8601TimeEncoder,
+			EncodeLevel:    zapcore.CapitalLevelEncoder,
+			EncodeTime:     zapcore.ISO8601TimeEncoder,
 			EncodeDuration: zapcore.StringDurationEncoder,
 			EncodeCaller:   zapcore.ShortCallerEncoder,
 		},
-		OutputPaths:	  []string{"stdout"},
+		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
 	loggersConfig["audit"] = zap.Config{
-		Level: getLevel(zapcore.DebugLevel),
+		Level:    getLevel(zapcore.DebugLevel),
 		Encoding: "json",
 		EncoderConfig: zapcore.EncoderConfig{
-			TimeKey:		"Time",
-			LevelKey:	   "Level",
-			NameKey:		"Name",
-			CallerKey:	  "Caller",
-			MessageKey:	 "Msg",
+			TimeKey:        "Time",
+			LevelKey:       "Level",
+			NameKey:        "Name",
+			CallerKey:      "Caller",
+			MessageKey:     "Msg",
 			StacktraceKey:  "St",
-			EncodeLevel:	zapcore.CapitalLevelEncoder,
-			EncodeTime:	 zapcore.ISO8601TimeEncoder,
+			EncodeLevel:    zapcore.CapitalLevelEncoder,
+			EncodeTime:     zapcore.ISO8601TimeEncoder,
 			EncodeDuration: zapcore.StringDurationEncoder,
 			EncodeCaller:   zapcore.ShortCallerEncoder,
 		},
-		OutputPaths:	  []string{"stdout"},
+		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
 }
 
+// GetLogger creates and returns logger
 func GetLogger(name string) *zap.Logger {
 	if loggers[name] != nil {
 		return loggers[name]

@@ -5,6 +5,7 @@ import (
 
 	"context"
 
+	"github.com/cam-inc/dmc/example-go/bridge"
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -37,7 +38,7 @@ func validation() goa.Middleware {
 
 			// TODO: claimからrole取り出して権限のチェック
 
-			newCtx := context.WithValue(ctx, "claims", claims)
+			newCtx := context.WithValue(ctx, bridge.JwtClaims, claims)
 			return nextHandler(newCtx, rw, req)
 		}
 	}
@@ -46,6 +47,7 @@ func validation() goa.Middleware {
 	return fm
 }
 
+// JWT of middleware
 func JWT() goa.Middleware {
 	pem := common.GetPublicKey()
 	key, err := jwtgo.ParseRSAPublicKeyFromPEM([]byte(pem))

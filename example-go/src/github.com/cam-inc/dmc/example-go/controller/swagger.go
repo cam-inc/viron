@@ -3,15 +3,18 @@ package controller
 import (
 	"encoding/json"
 
+	// for codegen.ParseDSL
 	_ "github.com/cam-inc/dmc/example-go/design"
 
+	"strings"
+
+	"github.com/cam-inc/dmc/example-go/bridge"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/design"
 	"github.com/goadesign/goa/goagen/codegen"
 	"github.com/goadesign/goa/goagen/gen_swagger"
-	"strings"
 )
 
 var swaggerAll *genswagger.Swagger
@@ -85,7 +88,7 @@ func (c *SwaggerController) Show(ctx *app.ShowSwaggerContext) error {
 	// Put your logic here
 	var sw genswagger.Swagger
 
-	cl := ctx.Context.Value("claims")
+	cl := ctx.Context.Value(bridge.JwtClaims)
 	if cl == nil {
 		// swagger.json自体に認証をかけていないときは全部返す
 		sw = *swaggerAll

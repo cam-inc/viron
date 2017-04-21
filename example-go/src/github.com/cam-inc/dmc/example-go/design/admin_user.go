@@ -5,6 +5,7 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+// AdminUserMediaType of media type.
 var AdminUserMediaType = MediaType("application/vnd.admin_user+json", func() {
 	Description("A Admin User")
 
