@@ -60,6 +60,7 @@ class Router {
       regexp: pathToRegexp(pattern),
       onChange
     });
+    return this;
   }
 
   /**
@@ -84,6 +85,10 @@ class Router {
    */
   getCurrentAction() {
     return this._history.action;
+  }
+
+  refresh() {
+    this._change(this.getCurrentLocation(), this.getCurrentAction());
   }
 
   /**

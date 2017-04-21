@@ -34,16 +34,17 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => {
       router.on('/samplepageA', () => {
         // riot.mount('dmc-page', 'samplepageA');
-      });
-      router.on('/samplepageB', () => {
+      }).on('/samplepageB', () => {
         // riot.mount('dmc-page', 'samplepageB');
-      });
-      router.on('/samplepageC/:paramA/:paramB', (paramA, paramB) => {
+      }).on('/samplepageC/:paramA/:paramB', (paramA, paramB) => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
-      });
-      router.on('*', () => {
+      }).on('/', () => {
+        debugger;
+      }).on('*', () => {
         //riot.mount('dmc-page', 'notFound' });
-      });
+      })
+      ;
+
       router.start();
       // TODO: just for debug
       window.router = router;
@@ -92,8 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!!store.getter(constants.GETTER_DMC_SHOW)) {
       return;
     }
-    const targetTagString = 'dmc-empty'; // TODO
-    riot.mount('dmc-page', targetTagString);
+    debugger;
+    router.navigateTo('/', true);
+    // const targetTagString = 'dmc-empty'; // TODO
+    // riot.mount('dmc-page', targetTagString);
   });
 
   if (store.getter(constants.GETTER_CURRENT_SHOW)) {
