@@ -13,7 +13,7 @@ dmc
         dmc-samplepageA
       dmc-route(path="/samplepageB")
         dmc-samplepageB
-      dmc-route(path="/samplepageC")
+      dmc-route(path="/samplepageC/:paramOne/:paramTwo")
         dmc-samplepageC
     main
       dmc-page

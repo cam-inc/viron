@@ -1,6 +1,7 @@
-import { forEach } from 'mout/array';
-import { equals, keys } from 'mout/object';
+import { find } from 'mout/array';
+import { equals } from 'mout/object';
 import ObjectAssign from 'object-assign';
+import pathToRegexp from 'path-to-regexp';
 import riot from 'riot';
 import createHashHistory from 'history/createHashHistory';
 
@@ -31,11 +32,11 @@ class Router {
     };
 
     /**
-     * functions that will be executed when the route matches.
+     * routing definitions.
      * @private
-     * @type {Object}
+     * @type {Array}
      */
-    this._routes = {};
+    this._routes = [];
 
     /**
      * function to stop listening for the changes.
@@ -52,8 +53,7 @@ class Router {
      */
     this._unblocker = null;
 
-    // TODO: 強制globalじゃないほうがいいかも
-    // TODO: ページinstance毎にmixin登録するのも面倒だな..
+    // make children act as page.
     riot.mixin({
       init: function () {
         const isPage = (this.parent && this.parent.isRoute);
@@ -93,15 +93,18 @@ class Router {
 
   /**
    * register a route.
-   * @param {String} path
+   * @param {String} pattern express-like url pattern.
    * @param {Function} onEnter a function that will be executed when the route is about to enter.
    * @param {Function} onLeave a function that will be executed when the route is abount to leave.
    */
-  register(path, onEnter, onLeave) {
-    this._routes[path] = {
+  register(pattern, onEnter, onLeave) {
+    // TODO: 重複とソート
+    this._routes.push({
+      pattern,
+      regexp: pathToRegexp(pattern),
       onEnter,
       onLeave
-    };
+    });
   }
 
   /**
@@ -182,16 +185,15 @@ class Router {
    * @param {String} action i.e.) history.action
    */
   _enter(location, action) {
-    let routePathnames = keys(this._routes);
-
-    // TODO: routePathnamesをソートすること。
-
-    forEach(routePathnames, pattern => {
-      if (!this._match(pattern, location)) {
-        return;
-      }
-      this._routes[pattern].onEnter(this._parseLocation(location));
+    const route = find(this._routes, route => {
+      return !!route.regexp.exec(location.pathname);
     });
+
+    if (!route) {
+      return;
+    }
+
+    route.onEnter(this._parseLocation(location, route));
   }
 
   /**
@@ -201,16 +203,15 @@ class Router {
    * @param {String} action i.e.) history.action
    */
   _leave(location, action) {
-    let routePathnames = keys(this._routes);
-
-    // TODO: routePathnamesをソートすること。
-
-    forEach(routePathnames, pattern => {
-      if (!this._match(pattern, location)) {
-        return;
-      }
-      this._routes[pattern].onLeave();
+    const route = find(this._routes, route => {
+      return !!route.regexp.exec(location.pathname);
     });
+
+    if (!route) {
+      return;
+    }
+
+    route.onLeave(this._parseLocation(location, route));
   }
 
   /**
@@ -225,29 +226,18 @@ class Router {
   }
 
   /**
-   * validate pathname.
-   * TODO: `**`とか使えるようにすること。
-   * @private
-   * @param {String} pattern same string as `<dmc-route path="/foo" />`'s `path` value.
-   * @param {Object} location
-   */
-  _match(pattern, location) {
-    const pathname = location.pathname;
-    return (pattern === pathname);
-  }
-
-  /**
    * parse location object so riot tag instances can use it with ease.
    * @private
    * @param {Object} location
+   * @param {Object} route
    * @return {Object}
    */
-  _parseLocation(location) {
+  _parseLocation(location, route) {
     return {
       pathname: location.pathname,
       hash: location.hash,
-      search: location.search,// TODO: location.search("?eee=bbb")を{ eee : 'bbb' }な形に変換したい
-      params: {}// TODO: `/foo/:hoge/:piyo`を{ hoge : 'hoge', piyo : 'piyo'}な形に変換したい
+      search: location.search,
+      params: route.regexp.exec(location.pathname).slice(1)
     };
   }
 }

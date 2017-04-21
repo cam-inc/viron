@@ -1,5 +1,5 @@
 dmc-samplepageC
-  div sample page C
+  div sample page C(param受取)
   div "{JSON.stringify(routeInfo)}"
   ul
     button(type="button" onclick="{handleClickA}") Aページへ

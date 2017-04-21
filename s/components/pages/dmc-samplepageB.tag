@@ -19,5 +19,5 @@ dmc-samplepageB
     }
 
     handleClickC() {
-      router.navigateTo('/samplepageC');
+      router.navigateTo('/samplepageC/orange/peach');
     }

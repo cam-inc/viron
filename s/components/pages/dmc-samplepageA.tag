@@ -13,5 +13,5 @@ dmc-samplepageA
     }
 
     handleClickC() {
-      router.navigateTo('/samplepageC');
+      router.navigateTo('/samplepageC/apple/grape');
     }
