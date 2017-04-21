@@ -12,6 +12,10 @@ import getters from './riotx/getters';
 
 // core
 import router from './core/router';
+
+// sample
+// TODO: ただのサンプル。不要になったタイミングで消すこと。
+import samplerouter from './samplerouter/router';
 // atoms
 import './components/atoms/dmc-text.tag';
 // organisms
@@ -28,11 +32,30 @@ document.addEventListener('DOMContentLoaded', () => {
   Promise
     .resolve()
     .then(() => {
+      router.on('/samplepageA', () => {
+        // riot.mount('dmc-page', 'samplepageA');
+      });
+      router.on('/samplepageB', () => {
+        // riot.mount('dmc-page', 'samplepageB');
+      });
+      router.on('/samplepageC/:paramA/:paramB', (paramA, paramB) => {
+        //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
+      });
+      router.on('*', () => {
+        //riot.mount('dmc-page', 'notFound' });
+      });
       router.start();
       // TODO: just for debug
       window.router = router;
+
+      // TODO: ただのサンプル。不要になったタイミングで消すこと。
+      samplerouter.start();
+      // TODO: just for debug
+      window.samplerouter = samplerouter;
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+      console.error(err);
+    });
 
   // riotx setup store
   const store = new riotx.Store({

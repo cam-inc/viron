@@ -8,6 +8,8 @@ dmc
     //
     dmc-header
     dmc-drawer
+    dmc-samplerouter
+
     main
       dmc-page
 
@@ -18,7 +20,7 @@ dmc
 
   script.
     import constants from '../core/constants';
-    import swagger from '../swagger';
+    import '../samplerouter/dmc-samplerouter.tag';
 
     let store = this.riotx.get();
 
