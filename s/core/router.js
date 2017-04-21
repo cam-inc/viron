@@ -42,6 +42,14 @@ class Router {
   }
 
   /**
+   * stop listening.
+   */
+  stop() {
+    this._unlistener();
+    this._unlistener = null;
+  }
+
+  /**
    * register a route.
    * @param {String} pattern express-like url pattern.
    * @param {Function} onRoute a function that will be executed when the route changes.
