@@ -10,7 +10,7 @@ dmc-text
   script.
     let store = this.riotx.get()
 
-    store.on('login', (err, state, store) => {
-      let res = store.getter("login");
+    store.change('TODO', (err, state, store) => {
+      let res = store.getter('TODO');
       console.log('dmc-text `login` on store', res);
     })

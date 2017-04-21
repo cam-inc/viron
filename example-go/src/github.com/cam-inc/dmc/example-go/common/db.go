@@ -2,13 +2,14 @@ package common
 
 import (
 	"fmt"
-
 	"github.com/cam-inc/dmc/example-go/gen/models"
 	"github.com/jinzhu/gorm"
+	// mysql driver
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"os"
 )
 
+// DB is mysql connection
 var DB *gorm.DB
 
 func getConnectionString() string {
@@ -17,12 +18,13 @@ func getConnectionString() string {
 		// on docker
 		return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s?parseTime=true",
 			"user", "password", "tcp", "mysql", "3306", "dmc_local")
-	} else {
-		return fmt.Sprintf("%s:%s@%s(%s:%s)/%s?parseTime=true",
-			"user", "password", "tcp", "localhost", "3306", "dmc_local")
 	}
+
+	return fmt.Sprintf("%s:%s@%s(%s:%s)/%s?parseTime=true",
+		"user", "password", "tcp", "localhost", "3306", "dmc_local")
 }
 
+// InitDB initialize db connection
 func InitDB() {
 	var err error
 	connectionString := getConnectionString()

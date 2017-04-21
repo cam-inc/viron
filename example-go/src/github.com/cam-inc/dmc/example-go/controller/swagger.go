@@ -3,15 +3,19 @@ package controller
 import (
 	"encoding/json"
 
+	// for codegen.ParseDSL
 	_ "github.com/cam-inc/dmc/example-go/design"
 
+	"strings"
+
+	"github.com/cam-inc/dmc/example-go/bridge"
+	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/design"
 	"github.com/goadesign/goa/goagen/codegen"
 	"github.com/goadesign/goa/goagen/gen_swagger"
-	"strings"
 )
 
 var swaggerAll *genswagger.Swagger
@@ -23,16 +27,6 @@ func init() {
 		panic(err)
 	}
 	swaggerAll = sw
-}
-
-func inStringArray(val string, array []string) int {
-	index := -1
-	for i, v := range array {
-		if val == v {
-			return i
-		}
-	}
-	return index
 }
 
 func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger {
@@ -49,7 +43,7 @@ func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger 
 			json.Unmarshal(raw, &mt)
 
 			for method := range mt {
-				if roles[method] == nil || (inStringArray("*", roles[method]) < 0 && inStringArray(resource, roles[method]) < 0) {
+				if roles[method] == nil || (common.InStringArray("*", roles[method]) < 0 && common.InStringArray(resource, roles[method]) < 0) {
 					delete(mt, method)
 				}
 			}
@@ -85,7 +79,7 @@ func (c *SwaggerController) Show(ctx *app.ShowSwaggerContext) error {
 	// Put your logic here
 	var sw genswagger.Swagger
 
-	cl := ctx.Context.Value("claims")
+	cl := ctx.Context.Value(bridge.JwtClaims)
 	if cl == nil {
 		// swagger.json自体に認証をかけていないときは全部返す
 		sw = *swaggerAll

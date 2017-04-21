@@ -16,7 +16,7 @@ dmc-endpoints
 
     const store = this.riotx.get();
     this.endpoint = {};
-    store.on(constants.ACTION_ENDPOINT_SHOW, (err, state, store) => {
+    store.change(constants.CHANGE_ENDPOINT, (err, state, store) => {
       this.endpoint = state.endpoint;
       this.update()
     })

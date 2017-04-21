@@ -16,4 +16,6 @@ const (
 
 	SectionDashboard = "dashboard" // ダッシュボードセクション
 	SectionManage    = "manage"    // 管理セクション
+
+	JwtClaims = "claims" // JWT claims
 )
