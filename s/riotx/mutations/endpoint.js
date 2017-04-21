@@ -12,7 +12,8 @@ export default {
   },
 
   remove: function (context, key) {
-    // TODO
-    throw new Error('TODO not support.')
+    delete context.state.endpoint[key]
+    context.state.endpoint = storage.set(constants.STORAGE_ENDPOINT, context.state.endpoint);
+    return [constants.CHANGE_ENDPOINT];
   }
 };

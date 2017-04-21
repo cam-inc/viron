@@ -40,10 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
       }).on('/', () => {
         debugger;
+        const targetTagString = 'dmc-empty'; // TODO
+        riot.mount('dmc-page', targetTagString);
       }).on('*', () => {
         //riot.mount('dmc-page', 'notFound' });
-      })
-      ;
+      });
 
       router.start();
       // TODO: just for debug
@@ -93,10 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!!store.getter(constants.GETTER_DMC)) {
       return;
     }
-    debugger;
     router.navigateTo('/', true);
-    // const targetTagString = 'dmc-empty'; // TODO
-    // riot.mount('dmc-page', targetTagString);
   });
 
   if (store.getter(constants.GETTER_CURRENT)) {
