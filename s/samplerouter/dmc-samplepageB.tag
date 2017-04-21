@@ -6,7 +6,7 @@ dmc-samplepageB
     button(type="button" onclick="{handleClickC}") Cページへ
 
   script.
-    import router from '../../core/router';
+    import router from './router';
 
     this.on('mount', () => {
       router.block(() => {

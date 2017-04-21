@@ -11,7 +11,7 @@ import mutations from './riotx/mutations';
 import getters from './riotx/getters';
 
 // core
-import router from './core/router';
+import samplerouter from './samplerouter/router';
 // atoms
 import './components/atoms/dmc-text.tag';
 // organisms
@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
   Promise
     .resolve()
     .then(() => {
-      router.start();
+      samplerouter.start();
       // TODO: just for debug
-      window.router = router;
+      window.samplerouter = samplerouter;
     })
     .catch(err => console.error(err));
 

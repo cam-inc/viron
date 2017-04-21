@@ -6,7 +6,7 @@ dmc-samplepageC
     button(type="button" onclick="{handleClickB}") Bページへ
 
   script.
-    import router from '../../core/router';
+    import router from './router';
 
     handleClickA() {
       router.navigateTo('/samplepageA');

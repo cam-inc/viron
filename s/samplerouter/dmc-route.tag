@@ -3,7 +3,7 @@ dmc-route
     yield.
 
   script.
-    import router from '../../core/router';
+    import router from './router';
 
     this.isRoute = true;
     this.isVisible = false;
