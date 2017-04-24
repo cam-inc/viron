@@ -1,3 +1,17 @@
 /* ITCSS: Base */
 /* Unclassed HTML elements(type selectors). */
-@import "font";
+html,
+body {
+  height: 100%;
+  overflow-y: hidden;
+}
+
+body {
+  position: relative;
+  min-width: 1280px;
+  font-family: 游ゴシック体, "Yu Gothic", YuGothic, "ヒラギノ角ゴシック Pro", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--color-text-default);
+  background-color: var(--color-basic-darkPurple);
+}

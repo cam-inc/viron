@@ -1,0 +1,30 @@
+.Drawer {
+  display: block;
+  width: var(--component-application-asideColumn-width);
+  /* TODO: debug用なので後で消すこと。 */
+  height: 1500px;
+  min-height: 100%;
+  background-color: var(--color-basic-white);
+}
+
+.Drawer__sectionTitle {
+  padding: 14px 16px;
+  font-size: 11px;
+}
+
+/**
+ * =================================================
+ * テーマ
+ * =================================================
+ */
+.Drawer--production {
+  background-color: var(--color-basic-black);
+}
+
+.Drawer--staging {
+  background-color: var(--color-basic-darkPurple);
+}
+
+.Drawer--development {
+  background-color: var(--color-basic-white);
+}

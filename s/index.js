@@ -75,6 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // riotx setup store
   const store = new riotx.Store({
     state: {
+      drawer: {
+        opened: true
+      },
       current: storage.get(constants.STORAGE_CURRENT),
       endpoint: storage.get(constants.STORAGE_ENDPOINT),
       dmc: null,

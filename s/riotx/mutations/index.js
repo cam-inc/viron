@@ -1,11 +1,14 @@
 import constants from '../../core/constants';
 
+import drawer from './drawer';
 import current from './current';
 import endpoint from './endpoint';
 import dmc from './dmc';
 import page from './page';
 
 export default {
+  [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
+
   [constants.MUTATION_DMC]: dmc.show,
   [constants.MUTATION_DMC_REMOVE]: dmc.remove,
 

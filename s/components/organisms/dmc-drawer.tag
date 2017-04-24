@@ -1,34 +1,29 @@
-dmc-drawer
-  .dmc-drawer
-    .page.dashboard(each="{ dashboard }" onclick="{ evSelect }")
-      | api.id : { api.id }
-      | api.operation : { api.operation }
-      | drawer : { drawer }
-      | group : { group }
-      | layout : { layout }
-      | name : { name }
-      | primary : { primary }
-      | section : { section }
+dmc-drawer.Drawer
+  .Dwawer__section
+    .Drawer__sectionTitle ダッシュボード
+    .Drawer__list
+      .Drawer__listItem(each="{ dashboard }" onclick="{ evSelect }")
+        | api.id : { api.id }
+        | api.operation : { api.operation }
+        | drawer : { drawer }
+        | group : { group }
+        | layout : { layout }
+        | name : { name }
+        | primary : { primary }
+        | section : { section }
 
-    .page.manage(each="{ manage }" onclick="{ evSelect }")
-      | api.id : { api.id }
-      | api.operation : { api.operation }
-      | drawer : { drawer }
-      | group : { group }
-      | layout : { layout }
-      | name : { name }
-      | primary : { primary }
-      | section : { section }
-
-  style.
-    .dmc-drawer .dashboard {
-      margin: 18px;
-      background: green;
-    }
-    .dmc-drawer .manage {
-      margin: 18px;
-      background: blue;
-    }
+  .Drawer__section
+    .Drawer__sectionTitle 管理画面
+    .Drawer__list
+      .Drawer__listItem(each="{ manage }" onclick="{ evSelect }")
+        | api.id : { api.id }
+        | api.operation : { api.operation }
+        | drawer : { drawer }
+        | group : { group }
+        | layout : { layout }
+        | name : { name }
+        | primary : { primary }
+        | section : { section }
 
   script.
     import constants from '../../core/constants';
