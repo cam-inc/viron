@@ -12,6 +12,7 @@ var UserMediaType = MediaType("application/vnd.user+json", func() {
 	Attributes(func() {
 		Attribute("id", Integer, "id")
 		Attribute("name", String, "user name")
+		Attribute("sex", String, "male or female")
 		Attribute("birthday", DateTime, "user birthday")
 		Attribute("blood_type", String, "blood type")
 		Attribute("job", String, "job")
@@ -29,6 +30,7 @@ var UserMediaType = MediaType("application/vnd.user+json", func() {
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
+		Attribute("sex")
 		Attribute("birthday")
 		Attribute("blood_type")
 		Attribute("job")
@@ -84,20 +86,7 @@ var _ = Resource("user", func() {
 	Action("create", func() {
 		Description("create a user")
 		Routing(POST(""))
-		Payload(func() {
-			Member("name", String)
-			Member("sex", String)
-			Member("blood_type", String)
-			Member("birthday", DateTime)
-			Member("job", String)
-			Member("home_town", String)
-			Member("living_region", String)
-			Member("married", Boolean)
-			Member("appear_area", String)
-			Member("school", String)
-			Member("homepage", String)
-			//Attribute("createdAt", DateTime, "user creat
-		})
+		Payload(UserPayload)
 		Response(OK, func() { Media(UserMediaType) })
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
@@ -109,19 +98,7 @@ var _ = Resource("user", func() {
 		Params(func() {
 			Param("id", Integer, "id")
 		})
-		Payload(func() {
-			Member("name", String)
-			Member("sex", String)
-			Member("blood_type", String)
-			Member("birthday", DateTime)
-			Member("job", String)
-			Member("home_town", String)
-			Member("living_region", String)
-			Member("married", Boolean)
-			Member("appear_area", String)
-			Member("school", String)
-			Member("homepage", String)
-		})
+		Payload(UserPayload)
 		Response(OK, func() { Media(UserMediaType) })
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
@@ -137,4 +114,24 @@ var _ = Resource("user", func() {
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
 	})
+})
+
+var UserPayload = Type("UserPayload", func() {
+	Member("name", String)
+	Member("sex", String, func() {
+		Enum("male", "female")
+	})
+	Member("blood_type", String, func() {
+		Enum("A", "B", "O", "AB")
+	})
+	Member("birthday", DateTime, func() {
+		Format("date-time")
+	})
+	Member("job", String)
+	Member("home_town", String)
+	Member("living_region", String)
+	Member("married", Boolean)
+	Member("appear_area", String)
+	Member("school", String)
+	Member("homepage", String)
 })
