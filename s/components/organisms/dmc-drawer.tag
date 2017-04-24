@@ -1,8 +1,8 @@
 dmc-drawer
   .dmc-drawer
     .page.dashboard(each="{ dashboard }" onclick="{ evSelect }")
-      | api.id : { api.id }
-      | api.operation : { api.operation }
+      | api.path : { api.path }
+      | path.method : { api.method }
       | drawer : { drawer }
       | group : { group }
       | layout : { layout }
@@ -11,8 +11,8 @@ dmc-drawer
       | section : { section }
 
     .page.manage(each="{ manage }" onclick="{ evSelect }")
-      | api.id : { api.id }
-      | api.operation : { api.operation }
+      | api.path : { api.path }
+      | api.method : { api.method }
       | drawer : { drawer }
       | group : { group }
       | layout : { layout }
@@ -45,6 +45,6 @@ dmc-drawer
     });
 
     this.evSelect = (ev) => {
-      //router.navigateTo('/' + ev.item.api.id + "/" + ev.item.api.operation);
-      router.navigateTo('/' + ev.item.api.id + "/" + window.encodeURIComponent(ev.item.api.operation));
+      //router.navigateTo(ev.item.api.path + "/" + ev.item.api.method);
+      router.navigateTo(ev.item.api.path + "/" + window.encodeURIComponent(ev.item.api.method) + '/' + ev.item.layout);
     }

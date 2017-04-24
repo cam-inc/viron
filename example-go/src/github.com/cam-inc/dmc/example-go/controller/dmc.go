@@ -30,10 +30,10 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 			{
 				Section: bridge.SectionDashboard,
 				Group:   bridge.GroupEmpty,
-				Name:    "Quick View",
+				Name:    "クイックビュー",
 				API: &app.API{
-					ID:        "quickview",
-					Operation: "quickview#show",
+					Path:        "/quickview",
+					Method: "get",
 				},
 				Layout:  bridge.LayoutCard,
 				Drawer:  true,
@@ -42,10 +42,10 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 			{
 				Section: bridge.SectionDashboard,
 				Group:   bridge.GroupEmpty,
-				Name:    "指標",
+				Name:    "DMC ユーザー権限",
 				API: &app.API{
-					ID:        "kpi",
-					Operation: "kpi#show",
+					Path:        "/adminrole",
+					Method: "get",
 				},
 				Layout:  bridge.LayoutCard,
 				Drawer:  true,
@@ -56,10 +56,10 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 			{
 				Section: bridge.SectionManage,
 				Group:   bridge.GroupBlog,
-				Name:    "記事",
+				Name:    "DMC ユーザー",
 				API: &app.API{
-					ID:        "blog",
-					Operation: "posts#show",
+					Path:        "/adminuser",
+					Method: "get",
 				},
 				Layout:  bridge.LayoutTable,
 				Drawer:  true,
@@ -70,20 +70,8 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupUser,
 				Name:    "ユーザ",
 				API: &app.API{
-					ID:        "user",
-					Operation: "user#show",
-				},
-				Layout:  bridge.LayoutTable,
-				Drawer:  true,
-				Primary: "id",
-			},
-			{
-				Section: bridge.SectionManage,
-				Group:   bridge.GroupAdmin,
-				Name:    "管理者",
-				API: &app.API{
-					ID:        "admin",
-					Operation: "admin#show",
+					Path:        "/user",
+					Method: "get",
 				},
 				Layout:  bridge.LayoutTable,
 				Drawer:  true,

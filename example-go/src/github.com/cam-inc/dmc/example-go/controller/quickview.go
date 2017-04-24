@@ -28,10 +28,10 @@ func (c *QuickviewController) Show(ctx *app.ShowQuickviewContext) error {
 		Name: "Quick View",
 		Componets: []*app.Component{
 			{
-				Name: "Quick View",
+				Name: "DAU",
 				API: &app.API{
-					ID:        "quickview",
-					Operation: "quickview",
+					Path:        "/stats/dau",
+					Method: "get",
 				},
 				Style: bridge.StyleNumber,
 				Options: []*app.Option{
@@ -42,30 +42,16 @@ func (c *QuickviewController) Show(ctx *app.ShowQuickviewContext) error {
 				},
 			},
 			{
-				Name: "Quick View1",
+				Name: "MAU",
 				API: &app.API{
-					ID:        "quickview1",
-					Operation: "quickview1",
+					Path:        "/stats/mau",
+					Method: "get",
 				},
 				Style: bridge.StyleNumber,
 				Options: []*app.Option{
 					{
-						Key:   "key1",
-						Value: "value1",
-					},
-				},
-			},
-			{
-				Name: "Quick View2",
-				API: &app.API{
-					ID:        "quickview2",
-					Operation: "quickview2",
-				},
-				Style: bridge.StyleNumber,
-				Options: []*app.Option{
-					{
-						Key:   "key2",
-						Value: "value2",
+						Key:   "key",
+						Value: "value",
 					},
 				},
 			},

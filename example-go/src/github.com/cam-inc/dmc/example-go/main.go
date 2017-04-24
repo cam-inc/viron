@@ -45,6 +45,12 @@ func main() {
 	// Mount "quickview" controller
 	c8 := controller.NewQuickviewController(service)
 	app.MountQuickviewController(service, c8)
+	// Mount "quickview" controller
+	c9 := controller.NewStatsDauController(service)
+	app.MountStatsDauController(service, c9)
+	// Mount "quickview" controller
+	c10 := controller.NewStatsMauController(service)
+	app.MountStatsMauController(service, c10)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {

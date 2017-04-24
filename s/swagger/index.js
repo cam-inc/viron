@@ -1,3 +1,5 @@
+import { forOwn } from 'mout/object';
+
 /**
  * Swaggerファイルをロードして解析しデータ/操作を一元管理
  *
@@ -9,6 +11,21 @@ class Swagger {
   constructor() {
     this._endpoint = null;
     this.client = null;
+  }
+
+  apisArray() {
+    if (!this.client) {
+      return [];
+    }
+    let apis = {};
+    forOwn(this.client.apis, (v) => {
+      forOwn(v, (v1, k1) => {
+        apis[k1] = v1;
+      });
+    });
+
+    return apis;
+
   }
 
   setup(url) {
