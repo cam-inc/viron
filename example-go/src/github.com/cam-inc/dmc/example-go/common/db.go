@@ -36,4 +36,5 @@ func InitDB() {
 	DB.AutoMigrate(&models.User{})
 	DB.AutoMigrate(&models.AdminUser{})
 	DB.AutoMigrate(&models.AdminRole{})
+	DB.AutoMigrate(&models.AuditLog{})
 }

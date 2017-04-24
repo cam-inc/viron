@@ -23,6 +23,7 @@ func main() {
 	service.Use(middleware.Recover())
 	app.UseJWTMiddleware(service, dmcMiddleware.JWT())
 	service.Use(dmcMiddleware.SetHeader())
+	service.Use(dmcMiddleware.AuditLog())
 
 	// Mount "dmc" controller
 	c := controller.NewDmcController(service)
@@ -45,6 +46,9 @@ func main() {
 	// Mount "quickview" controller
 	c8 := controller.NewQuickviewController(service)
 	app.MountQuickviewController(service, c8)
+	// Mount "auditLog" controller
+	c9 := controller.NewAuditLogController(service)
+	app.MountAuditLogController(service, c9)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {
