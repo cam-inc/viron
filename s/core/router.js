@@ -147,7 +147,7 @@ class Router {
       queries[pair[0]] = pair[1];
     });
 
-    const hash = location.hash;
+    const hash = location.hash.slice(1);
 
     return [params, queries, hash];
   }
