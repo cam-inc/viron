@@ -1,4 +1,4 @@
-import { find } from 'mout/array';
+import { find, forEach } from 'mout/array';
 import pathToRegexp from 'path-to-regexp';
 import createHashHistory from 'history/createHashHistory';
 
@@ -55,9 +55,12 @@ class Router {
    * @param {Function} onRoute a function that will be executed when the route changes.
    */
   on(pattern, onChange) {
+    const keys = [];
+    const regexp = pathToRegexp(pattern, keys);
     this._routes.push({
       pattern,
-      regexp: pathToRegexp(pattern),
+      regexp,
+      keys,
       onChange
     });
     return this;
@@ -129,7 +132,24 @@ class Router {
    * @return {Object}
    */
   _parseLocation(location, route) {
-    return route.regexp.exec(location.pathname).slice(1);
+    const params = {};
+    const list = route.regexp.exec(location.pathname).slice(1);
+    forEach(route.keys, (v, i) => {
+      params[v.name] = list[i];
+    });
+
+    const queries = {};
+    forEach(location.search.slice(1).split('&'), v => {
+      if (!v) {
+        return;
+      }
+      const pair = v.split('=');
+      queries[pair[0]] = pair[1];
+    });
+
+    const hash = location.hash;
+
+    return [params, queries, hash];
   }
 }
 
