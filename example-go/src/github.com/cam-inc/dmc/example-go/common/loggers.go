@@ -29,24 +29,6 @@ func init() {
 		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
-	loggersConfig["audit"] = zap.Config{
-		Level:    getLevel(zapcore.DebugLevel),
-		Encoding: "json",
-		EncoderConfig: zapcore.EncoderConfig{
-			TimeKey:        "Time",
-			LevelKey:       "Level",
-			NameKey:        "Name",
-			CallerKey:      "Caller",
-			MessageKey:     "Msg",
-			StacktraceKey:  "St",
-			EncodeLevel:    zapcore.CapitalLevelEncoder,
-			EncodeTime:     zapcore.ISO8601TimeEncoder,
-			EncodeDuration: zapcore.StringDurationEncoder,
-			EncodeCaller:   zapcore.ShortCallerEncoder,
-		},
-		OutputPaths:      []string{"stdout"},
-		ErrorOutputPaths: []string{"stderr"},
-	}
 }
 
 // GetLogger creates and returns logger

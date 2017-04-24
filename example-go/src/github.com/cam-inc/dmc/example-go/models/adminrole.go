@@ -3,10 +3,11 @@ package models
 import (
 	"time"
 
+	"context"
+
 	genModels "github.com/cam-inc/dmc/example-go/gen/models"
 	"github.com/goadesign/goa"
 	"github.com/jinzhu/gorm"
-	"golang.org/x/net/context"
 )
 
 // NewAdminRole creates a new admin_role storage
