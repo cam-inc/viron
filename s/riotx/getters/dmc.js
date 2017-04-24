@@ -1,4 +1,5 @@
 import { filter, values } from 'mout/object';
+import constants from '../../core/constants';
 
 export default {
   show: context => {
@@ -15,7 +16,19 @@ export default {
     const pages = (context.state.dmc && context.state.dmc.pages) || [];
     return values(filter(pages, v => {
 
-      if (v.section !== "dashboard") {
+      if (v.section !== constants.SECTION_DASHBOARD) {
+        return false;
+      }
+      return v.drawer;
+
+    }));
+  },
+  // Display dashboard data for drawer
+  manage: (context) => {
+    const pages = (context.state.dmc && context.state.dmc.pages) || [];
+    return values(filter(pages, v => {
+
+      if (v.section !== constants.SECTION_MANAGE) {
         return false;
       }
       return v.drawer;

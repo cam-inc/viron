@@ -39,8 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }).on('/samplepageC/:paramA/:paramB', (paramA, paramB) => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
       }).on('/', () => {
-        debugger;
-        const targetTagString = 'dmc-empty'; // TODO
+        const targetTagString = 'dmc-empty';
         riot.mount('dmc-page', targetTagString);
       }).on('*', () => {
         //riot.mount('dmc-page', 'notFound' });

@@ -1,5 +1,6 @@
 export default {
   SECTION_DASHBOARD: 'dashboard',
+  SECTION_MANAGE: 'manage',
 
   // store.js
   STORAGE_CURRENT: 'current',
@@ -32,6 +33,7 @@ export default {
   GETTER_DMC_PAGES: 'dmc_pages',
   GETTER_DMC_NAME: 'dmc_name',
   GETTER_DMC_DASHBOARD: 'dmc_dashboard',
+  GETTER_DMC_MANAGE: 'dmc_manage',
 
   GETTER_CURRENT: 'current',
 
