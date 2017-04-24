@@ -33,7 +33,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Name:    "Quick View",
 				API: &app.API{
 					ID:        "quickview",
-					Operation: "quickview",
+					Operation: "quickview#show",
 				},
 				Layout:  bridge.LayoutCard,
 				Drawer:  true,
@@ -45,7 +45,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Name:    "指標",
 				API: &app.API{
 					ID:        "kpi",
-					Operation: "kpi",
+					Operation: "kpi#show",
 				},
 				Layout:  bridge.LayoutCard,
 				Drawer:  true,
@@ -59,7 +59,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Name:    "記事",
 				API: &app.API{
 					ID:        "blog",
-					Operation: "posts",
+					Operation: "posts#show",
 				},
 				Layout:  bridge.LayoutTable,
 				Drawer:  true,
@@ -71,7 +71,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Name:    "ユーザ",
 				API: &app.API{
 					ID:        "user",
-					Operation: "user",
+					Operation: "user#show",
 				},
 				Layout:  bridge.LayoutTable,
 				Drawer:  true,
@@ -83,7 +83,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Name:    "管理者",
 				API: &app.API{
 					ID:        "admin",
-					Operation: "admin",
+					Operation: "admin#show",
 				},
 				Layout:  bridge.LayoutTable,
 				Drawer:  true,

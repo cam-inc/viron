@@ -17,6 +17,8 @@ export default {
   ACTION_CURRENT_UPDATE: 'current_update',
   ACTION_CURRENT_REMOVE: 'current_remove',
 
+  ACTION_PAGE_GET: 'page_get',
+
   // riotx#mutations
   MUTATION_DMC: 'dmc',
   MUTATION_DMC_REMOVE: 'dmc_remove',
@@ -28,6 +30,8 @@ export default {
   MUTATION_CURRENT_UPDATE: 'current_update',
   MUTATION_CURRENT_REMOVE: 'current_remove',
 
+  MUTATION_PAGE_GET: 'page_get',
+
   // riotx#getters
   GETTER_DMC: 'dmc',
   GETTER_DMC_PAGES: 'dmc_pages',
@@ -37,10 +41,14 @@ export default {
 
   GETTER_CURRENT: 'current',
 
+  GETTER_PAGE_GET: 'page_get',
+
   // riotx#mutated
   CHANGE_DMC: 'dmc',
 
   CHANGE_ENDPOINT: 'endpoint',
 
-  CHANGE_CURRENT: 'current'
+  CHANGE_CURRENT: 'current',
+
+  CHANGE_PAGE: 'page',
 };

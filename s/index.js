@@ -28,8 +28,8 @@ import './components/pages/dmc-page.tag';
 // root
 import './components/dmc.tag';
 
-document.addEventListener('DOMContentLoaded', () => {
-  Promise
+let setupRouter = () => {
+  return Promise
     .resolve()
     .then(() => {
       router.on('/samplepageA', () => {
@@ -38,6 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // riot.mount('dmc-page', 'samplepageB');
       }).on('/samplepageC/:paramA/:paramB', (paramA, paramB) => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
+      }).on('/:id/:operationId', (id, operationId) => {
+        //const api = swagger.client.apis[id][operationId]
+        const _id = window.decodeURIComponent(id);
+        const _operationId = window.decodeURIComponent(operationId);
+        // Load page
+        const store = riotx.get();
+        store.action(constants.ACTION_PAGE_GET, _id, _operationId);
+
       }).on('/', () => {
         const targetTagString = 'dmc-empty';
         riot.mount('dmc-page', targetTagString);
@@ -45,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         //riot.mount('dmc-page', 'notFound' });
       });
 
-      router.start();
       // TODO: just for debug
       window.router = router;
 
@@ -54,16 +61,24 @@ document.addEventListener('DOMContentLoaded', () => {
       // TODO: just for debug
       window.samplerouter = samplerouter;
     })
+    .then(() => {
+      router.start();
+    })
     .catch(err => {
       console.error(err);
     });
+
+};
+
+document.addEventListener('DOMContentLoaded', () => {
 
   // riotx setup store
   const store = new riotx.Store({
     state: {
       current: storage.get(constants.STORAGE_CURRENT),
       endpoint: storage.get(constants.STORAGE_ENDPOINT),
-      dmc: null
+      dmc: null,
+      page: null,
     },
     actions: actions,
     mutations: mutations,
@@ -82,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(() => store.action(constants.ACTION_DMC_REMOVE))
       .then(() => swagger.setup(current))
       .then(() => store.action(constants.ACTION_DMC_GET))
+      .then(() => setupRouter())
       .catch((err) => {
         console.log('Update state(current) error', err);
       })
@@ -89,12 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Entry to the endpoint
-  store.change(constants.CHANGE_DMC, (err, state, store) => {
-    if (!!store.getter(constants.GETTER_DMC)) {
-      return;
-    }
-    router.navigateTo('/', true);
-  });
+  // store.change(constants.CHANGE_DMC, (err, state, store) => {
+  //   if (!!store.getter(constants.GETTER_DMC)) {
+  //     return;
+  //   }
+  //   router.navigateTo('/', true);
+  // });
 
   if (store.getter(constants.GETTER_CURRENT)) {
     // Endpoint エントリー済み

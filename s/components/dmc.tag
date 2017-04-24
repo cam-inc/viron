@@ -24,8 +24,13 @@ dmc
 
     let store = this.riotx.get();
 
-    store.change('*', (name, err, state, store) => {
+    store.change('*', (err, state, store) => {
       console.log('dmc `*` on store', err, state, store);
+    });
+
+    store.change(constants.CHANGE_PAGE, (err, state, store) => {
+      // TODO
+      console.log("dmc.tag change page!!!")
     });
 
     this.evResetCurrent = (ev) => {

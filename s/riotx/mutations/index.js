@@ -3,6 +3,7 @@ import constants from '../../core/constants';
 import current from './current';
 import endpoint from './endpoint';
 import dmc from './dmc';
+import page from './page';
 
 export default {
   [constants.MUTATION_DMC]: dmc.show,
@@ -14,4 +15,6 @@ export default {
 
   [constants.MUTATION_CURRENT_UPDATE]: current.update,
   [constants.MUTATION_CURRENT_REMOVE]: current.remove,
+
+  [constants.MUTATION_PAGE_GET]: page.show,
 };

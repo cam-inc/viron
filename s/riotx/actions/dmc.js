@@ -16,7 +16,7 @@ export default {
       swagger.client.apis.dmc[dmcOID]()
         .then(res => {
           if (!res.ok) {
-            throw new Error("[fetch] ${DMC_URI} error.");
+            throw new Error(`[fetch] ${DMC_URI} error.`);
           }
 
           console.log(`[fetch] ${DMC_URI} success.`);
@@ -25,10 +25,9 @@ export default {
         .catch(err => {
           reject(err);
         });
-    })
-      .then(res => {
-        context.commit(constants.MUTATION_DMC, res.obj);
-      });
+    }).then(res => {
+      context.commit(constants.MUTATION_DMC, res.obj);
+    });
   },
   remove: context => {
     return Promise

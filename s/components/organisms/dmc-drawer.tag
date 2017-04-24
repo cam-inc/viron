@@ -32,7 +32,7 @@ dmc-drawer
 
   script.
     import constants from '../../core/constants';
-
+    import router from '../../core/router';
     let store = this.riotx.get();
 
     this.dashboard = [];
@@ -45,5 +45,6 @@ dmc-drawer
     });
 
     this.evSelect = (ev) => {
-      location.href = "#" + ev.item.api.id + "/" + ev.item.api.operation;
+      //router.navigateTo('/' + ev.item.api.id + "/" + ev.item.api.operation);
+      router.navigateTo('/' + ev.item.api.id + "/" + window.encodeURIComponent(ev.item.api.operation));
     }
