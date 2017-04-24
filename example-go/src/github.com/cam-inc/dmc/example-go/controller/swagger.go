@@ -62,6 +62,45 @@ func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger 
 	return s
 }
 
+func replaceSeparator(str string) string {
+	return strings.Replace(str, "#", "@", -1)
+}
+
+// OperationIdに含まれる＃を＠に変換する
+// クライアントサイドでoperationIdをフラグメントハッシュに渡すときに＃だと都合が悪いため。
+func replaceOperationId(s genswagger.Swagger) genswagger.Swagger {
+	if s.Paths != nil {
+		for _, p := range s.Paths {
+			if path, ok := p.(*genswagger.Path); ok != true {
+				continue
+			} else {
+				if path.Get != nil {
+					path.Get.OperationID = replaceSeparator(path.Get.OperationID)
+				}
+				if path.Put != nil {
+					path.Put.OperationID = replaceSeparator(path.Put.OperationID)
+				}
+				if path.Post != nil {
+					path.Post.OperationID = replaceSeparator(path.Post.OperationID)
+				}
+				if path.Delete != nil {
+					path.Delete.OperationID = replaceSeparator(path.Delete.OperationID)
+				}
+				if path.Options != nil {
+					path.Options.OperationID = replaceSeparator(path.Options.OperationID)
+				}
+				if path.Head != nil {
+					path.Head.OperationID = replaceSeparator(path.Head.OperationID)
+				}
+				if path.Patch != nil {
+					path.Patch.OperationID = replaceSeparator(path.Patch.OperationID)
+				}
+			}
+		}
+	}
+	return s
+}
+
 // SwaggerController implements the swagger resource.
 type SwaggerController struct {
 	*goa.Controller
@@ -90,6 +129,8 @@ func (c *SwaggerController) Show(ctx *app.ShowSwaggerContext) error {
 		json.Unmarshal([]byte(claims["roles"].(string)), &roles)
 		sw = filter(*swaggerAll, roles)
 	}
+	// operationIdに含まれる#を＠に変換する
+	sw = replaceOperationId(sw)
 	res, err := json.Marshal(&sw)
 	if err != nil {
 		panic(err)
