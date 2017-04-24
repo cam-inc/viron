@@ -36,12 +36,12 @@ let setupRouter = () => {
         // riot.mount('dmc-page', 'samplepageA');
       }).on('/samplepageB', () => {
         // riot.mount('dmc-page', 'samplepageB');
-      }).on('/samplepageC/:paramA/:paramB', (paramA, paramB) => {
+      }).on('/samplepageC/:paramA/:paramB', (params, queries, hash) => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
-      }).on('/:id/:operationId', (id, operationId) => {
+      }).on('/:id/:operationId', (params, queries, hash) => {
         //const api = swagger.client.apis[id][operationId]
-        const _id = window.decodeURIComponent(id);
-        const _operationId = window.decodeURIComponent(operationId);
+        const _id = window.decodeURIComponent(params.id);
+        const _operationId = window.decodeURIComponent(params.operationId);
         // Load page
         const store = riotx.get();
         store.action(constants.ACTION_PAGE_GET, _id, _operationId);
