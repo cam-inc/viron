@@ -25,6 +25,7 @@ func (c *UserController) Create(ctx *app.CreateUserContext) error {
 	// Put your logic here
 	userTable := models.NewUserDB(common.DB)
 	m := models.User{}
+
 	if ctx.Payload.Name != nil {
 		m.Name = *ctx.Payload.Name
 	}

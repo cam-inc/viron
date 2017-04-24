@@ -124,9 +124,7 @@ var UserPayload = Type("UserPayload", func() {
 	Member("blood_type", String, func() {
 		Enum("A", "B", "O", "AB")
 	})
-	Member("birthday", DateTime, func() {
-		Format("date-time")
-	})
+	Member("birthday", DateTime)
 	Member("job", String)
 	Member("home_town", String)
 	Member("living_region", String)
