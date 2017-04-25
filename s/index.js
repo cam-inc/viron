@@ -78,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // riotx setup store
   const store = new riotx.Store({
     state: {
+      drawer: {
+        opened: true
+      },
       current: storage.get(constants.STORAGE_CURRENT),
       endpoint: storage.get(constants.STORAGE_ENDPOINT),
       dmc: null,
@@ -90,6 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   riotx.add(store);
   riot.mount('dmc'); // root mount!!!
+
+  // TODO: debug用なので後で消すこと。
+  window.store = store;
 
   // Changed Endpoint
   store.change(constants.CHANGE_CURRENT, (err, state, store) => {

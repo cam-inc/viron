@@ -1,22 +1,18 @@
-dmc
-  .dmc
-    //- Debug
-    h2 Debug
-      button(type='button' onclick="{ evResetCurrent }") Storage->Current リセット
-      button(type='button' onclick="{ evResetEndpointALL }") Storage->Endpoint リセット
-
-    //
-    dmc-header
-    dmc-drawer
-    dmc-samplerouter
-
-    main
-      dmc-page
-
-  style.
-    .dmc {
-      background-color: yellow;
-    }
+dmc.Application
+  .Application__contents
+    .Application__asideColumn(class="{ Application__asideColumn--opened : isMenuOpened }")
+      dmc-drawer
+    .Application__mainColumn
+      .Application__head
+        dmc-header
+      .Application__page
+        i am main column
+        h2 Debug
+          button(type='button' onclick="{ evResetCurrent }") Storage->Current リセット
+          button(type='button' onclick="{ evResetEndpointALL }") Storage->Endpoint リセット
+        dmc-samplerouter
+        main
+          dmc-page
 
   script.
     import constants from '../core/constants';
@@ -24,10 +20,15 @@ dmc
 
     let store = this.riotx.get();
 
+    this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+    store.change(constants.CHANGE_DRAWER, (err, state, store) => {
+      this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+      this.update();
+    });
+
     store.change('*', (err, state, store) => {
       console.log('dmc `*` on store', err, state, store);
     });
-
     store.change(constants.CHANGE_PAGE, (err, state, store) => {
       // TODO
       const targetTagString = 'dmc-' + state.page.layout;

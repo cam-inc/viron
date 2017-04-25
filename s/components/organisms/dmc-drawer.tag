@@ -1,34 +1,42 @@
-dmc-drawer
-  .dmc-drawer
-    .page.dashboard(each="{ dashboard }" onclick="{ evSelect }")
-      | api.path : { api.path }
-      | path.method : { api.method }
-      | drawer : { drawer }
-      | group : { group }
-      | layout : { layout }
-      | name : { name }
-      | primary : { primary }
-      | section : { section }
+dmc-drawer.Drawer
+  .Drawer__head
+    .media.Drawer__endpoint
+      .media__image.Drawer__endpointImage
+      .media__body.Drawer__endpointBody
+        .Drawer__endpointBodyHead
+          .Drawer__endpointTitle
+            | endpoint title
+          .Drawer__endpointHost
+            | https://foo.com:3000
+        .Drawer__endpointBodyTail
+          .Drawer__endpointDescription
+            | description
+  .Drawer__body
+    .Dwawer__section
+      .Drawer__sectionTitle ダッシュボード
+      .Drawer__list
+        .Drawer__listItem(each="{ dashboard }" onclick="{ evSelect }")
+          | api.path : { api.path }
+          | api.method : { api.method }
+          | drawer : { drawer }
+          | group : { group }
+          | layout : { layout }
+          | name : { name }
+          | primary : { primary }
+          | section : { section }
 
-    .page.manage(each="{ manage }" onclick="{ evSelect }")
-      | api.path : { api.path }
-      | api.method : { api.method }
-      | drawer : { drawer }
-      | group : { group }
-      | layout : { layout }
-      | name : { name }
-      | primary : { primary }
-      | section : { section }
-
-  style.
-    .dmc-drawer .dashboard {
-      margin: 18px;
-      background: green;
-    }
-    .dmc-drawer .manage {
-      margin: 18px;
-      background: blue;
-    }
+    .Drawer__section
+      .Drawer__sectionTitle 管理画面
+      .Drawer__list
+        .Drawer__listItem(each="{ manage }" onclick="{ evSelect }")
+          | api.path : { api.path }
+          | api.method : { api.method }
+          | drawer : { drawer }
+          | group : { group }
+          | layout : { layout }
+          | name : { name }
+          | primary : { primary }
+          | section : { section }
 
   script.
     import constants from '../../core/constants';

@@ -1,10 +1,13 @@
 import constants from '../../core/constants';
 
+import drawer from './drawer';
 import dmc from './dmc';
 import current from './current';
 import page from './page';
 
 export default {
+  [constants.GETTER_DRAWER_OPENED]: drawer.opened,
+
   [constants.GETTER_DMC]: dmc.show,
   [constants.GETTER_DMC_PAGES]: dmc.pages,
   [constants.GETTER_DMC_NAME]: dmc.name,

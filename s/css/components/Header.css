@@ -1,0 +1,32 @@
+.Header {
+  display: block;
+  background-color: var(--color-basic-white);
+}
+
+.Header__groups {
+  @apply --layout-between-center;
+  width: 100%;
+  height: 100%;
+}
+
+.Header__group {
+  @apply --layout-center-center;
+}
+
+.Header__opener {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  background-color: gray;
+}
+
+.Header__opener--opened {
+  background-color: red;
+}
+
+.Header__test {
+  width: 24px;
+  height: 24px;
+  margin-left: 12px;
+  background-color: gray;
+}

@@ -30,7 +30,7 @@ func (c *QuickviewController) Show(ctx *app.ShowQuickviewContext) error {
 			{
 				Name: "DAU",
 				API: &app.API{
-					Path:        "/stats/dau",
+					Path:   "/stats/dau",
 					Method: "get",
 				},
 				Style: bridge.StyleNumber,
@@ -44,7 +44,7 @@ func (c *QuickviewController) Show(ctx *app.ShowQuickviewContext) error {
 			{
 				Name: "MAU",
 				API: &app.API{
-					Path:        "/stats/mau",
+					Path:   "/stats/mau",
 					Method: "get",
 				},
 				Style: bridge.StyleNumber,
