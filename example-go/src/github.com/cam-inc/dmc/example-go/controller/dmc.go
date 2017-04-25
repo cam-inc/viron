@@ -32,7 +32,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupEmpty,
 				Name:    "クイックビュー",
 				API: &app.API{
-					Path:        "/quickview",
+					Path:   "/quickview",
 					Method: "get",
 				},
 			},
@@ -41,7 +41,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupEmpty,
 				Name:    "DMC ユーザー権限",
 				API: &app.API{
-					Path:        "/adminrole",
+					Path:   "/adminrole",
 					Method: "get",
 				},
 			},
@@ -52,7 +52,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupBlog,
 				Name:    "DMC ユーザー",
 				API: &app.API{
-					Path:        "/adminuser",
+					Path:   "/adminuser",
 					Method: "get",
 				},
 			},
@@ -61,7 +61,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupUser,
 				Name:    "ユーザ",
 				API: &app.API{
-					Path:        "/user",
+					Path:   "/user",
 					Method: "get",
 				},
 			},

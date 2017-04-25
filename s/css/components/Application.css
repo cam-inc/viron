@@ -1,0 +1,50 @@
+:root {
+  --component-application-asideColumn-width: 328px;
+  --component-application-head-height: 64px;
+}
+
+.Application {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-basic-lightGray);
+}
+
+.Application__contents {
+  @apply --layout-center-stretch;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.Application__asideColumn {
+  width: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  transition-duration: 100ms;
+  transition-property: width;
+}
+
+.Application__asideColumn--opened {
+  width: var(--component-application-asideColumn-width);
+}
+
+.Application__mainColumn {
+  @apply --layout-column-stretch-center;
+  flex-grow: 1;
+}
+
+.Application__head {
+  height: var(--component-application-head-height);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.Application__head .Header {
+  height: 100%;
+}
+
+.Application__page {
+  flex-grow: 1;
+  overflow-y: scroll;
+}

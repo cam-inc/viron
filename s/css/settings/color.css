@@ -1,5 +1,15 @@
 /* 色情報 */
 :root {
-  /* メインカラー(サンプル) */
-  --color-brand: #f00;
+  /* 基本色 */
+  --color-basic-white: #fff;
+  --color-basic-lightGray: #e4e4e4;
+  --color-basic-gray: #bebebe;
+  --color-basic-black: #1b1b1b;
+  --color-basic-red: #ef4856;
+  --color-basic-lightPurple: #c289ff;
+  --color-basic-purple: #7519ff;
+  --color-basic-darkPurple: #341496;
+  --color-basic-skyblue: #00b2ff;
+  /* テキスト色 */
+  --color-text-default: #484848;
 }

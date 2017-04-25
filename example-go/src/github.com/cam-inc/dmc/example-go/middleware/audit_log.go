@@ -2,15 +2,15 @@ package middleware
 
 import (
 	"context"
-	"net/http"
-	"github.com/goadesign/goa"
+	"encoding/json"
 	"github.com/cam-inc/dmc/example-go/bridge"
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	"github.com/cam-inc/dmc/example-go/gen/models"
 	jwtgo "github.com/dgrijalva/jwt-go"
+	"github.com/goadesign/goa"
 	"go.uber.org/zap"
-	"encoding/json"
+	"net/http"
 )
 
 // AuditLog writes a audit log

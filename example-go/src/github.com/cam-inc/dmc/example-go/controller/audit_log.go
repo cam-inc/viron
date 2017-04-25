@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"github.com/cam-inc/dmc/example-go/gen/app"
-	"github.com/goadesign/goa"
 	"github.com/cam-inc/dmc/example-go/common"
+	"github.com/cam-inc/dmc/example-go/gen/app"
 	"github.com/cam-inc/dmc/example-go/models"
+	"github.com/goadesign/goa"
 )
 
 // AuditLogController implements the audit_log resource.
