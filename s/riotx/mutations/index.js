@@ -9,6 +9,7 @@ import component from './component';
 
 export default {
   [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
+  [constants.MUTATION_DRAWER_CLOSE]: drawer.close,
 
   [constants.MUTATION_DMC]: dmc.show,
   [constants.MUTATION_DMC_REMOVE]: dmc.remove,

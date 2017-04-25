@@ -1,13 +1,13 @@
 .Drawer {
-  display: block;
+  @apply --layout-column-stretch-center;
   width: var(--component-application-asideColumn-width);
-  /* TODO: debug用なので後で消すこと。 */
-  min-height: 100%;
+  height: 100%;
   background-color: var(--color-basic-white);
 }
 
 .Drawer__head {
-  padding: 24px 16px;
+  position: relative;
+  padding: 24px 16px 0;
 }
 
 .Drawer__endpoint {
@@ -18,12 +18,13 @@
 .Drawer__endpointImage {
   width: 56px;
   height: 56px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 4px;
-  box-shadow: 0 3px 2px rgba(0,0,0,0.16);
   margin-right: 16px;
+  background-image: url(../img/sample_thumbnail.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 4px;
+  box-shadow: 0 3px 2px rgba(0, 0, 0, 0.16);
 }
 
 .Drawer__endpointBody {
@@ -33,14 +34,15 @@
 
 .Drawer__endpointBodyHead {
   flex-grow: 1;
+  margin-right: 24px;
 }
 
 .Drawer__endpointTitle {
   @apply --text-truncate;
+  margin-bottom: 4px;
   font-size: 12px;
   font-weight: bold;
   color: var(--color-basic-black);
-  margin-bottom: 4px;
 }
 
 .Drawer__endpointHost {
@@ -55,24 +57,145 @@
   color: var(--color-basic-black);
 }
 
+.Drawer__closeButton {
+  @apply --layout-center-center;
+  position: absolute;
+  top: 24px;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  color: var(--color-basic-black);
+  cursor: pointer;
+}
+
+.Drawer__closeButton:hover {
+  opacity: 0.5;
+}
+
+.Drawer__body {
+  flex-grow: 1;
+  padding: 24px 0;
+  overflow-y: scroll;
+}
+
 .Drawer__sectionTitle {
   padding: 14px 16px;
   font-size: 11px;
+  color: var(--color-basic-black);
+}
+
+.Drawer__listItem {
+  @apply --layout-center-center;
+  padding: 14px 16px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: var(--color-basic-black);
+  cursor: pointer;
+  border-radius: 0 8px 8px 0;
+  transition-duration: 100ms;
+  transition-property: color, background-color;
+}
+
+.Drawer__listItem:last-child {
+  margin-bottom: 0;
+}
+
+.Drawer__listItem:hover,
+.Drawer__listItem--selected {
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-black);
+}
+
+.Drawer__listItemIcon {
+  margin-right: 8px;
+}
+
+.Drawer__listItemTitle {
+  flex-grow: 1;
 }
 
 /**
  * =================================================
- * テーマ
+ * テーマ(production)
  * =================================================
  */
 .Drawer--production {
   background-color: var(--color-basic-black);
 }
 
+.Drawer--production .Drawer__endpoint {
+  border-bottom: 1px solid var(--color-basic-skyblue);
+}
+
+.Drawer--production .Drawer__endpointTitle,
+.Drawer--production .Drawer__endpointHost,
+.Drawer--production .Drawer__endpointDescription,
+.Drawer--production .Drawer__closeButton,
+.Drawer--production .Drawer__sectionTitle,
+.Drawer--production .Drawer__listItem {
+  color: var(--color-basic-skyblue);
+}
+
+.Drawer--production .Drawer__listItem:hover,
+.Drawer--production .Drawer__listItem--selected {
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-darkGray);
+}
+
+/**
+ * =================================================
+ * テーマ(staging)
+ * =================================================
+ */
 .Drawer--staging {
   background-color: var(--color-basic-darkPurple);
 }
 
+.Drawer--staging .Drawer__endpoint {
+  border-bottom: 1px solid var(--color-basic-lightPurple);
+}
+
+.Drawer--staging .Drawer__endpointTitle,
+.Drawer--staging .Drawer__endpointHost,
+.Drawer--staging .Drawer__endpointDescription,
+.Drawer--staging .Drawer__closeButton,
+.Drawer--staging .Drawer__sectionTitle,
+.Drawer--staging .Drawer__listItem {
+  color: var(--color-basic-lightPurple);
+}
+
+.Drawer--staging .Drawer__listItem:hover,
+.Drawer--staging .Drawer__listItem--selected {
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-purple);
+}
+
+/**
+ * =================================================
+ * テーマ(development)
+ * =================================================
+ */
 .Drawer--development {
   background-color: var(--color-basic-white);
+}
+
+.Drawer--development .Drawer__endpoint {
+  border-bottom: 1px solid var(--color-basic-black);
+}
+
+.Drawer--development .Drawer__endpointTitle,
+.Drawer--development .Drawer__endpointHost,
+.Drawer--development .Drawer__endpointDescription,
+.Drawer--development .Drawer__closeButton,
+.Drawer--development .Drawer__sectionTitle,
+.Drawer--development .Drawer__listItem {
+  color: var(--color-basic-black);
+}
+
+.Drawer--development .Drawer__listItem:hover,
+.Drawer--development .Drawer__listItem--selected {
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-black);
 }
