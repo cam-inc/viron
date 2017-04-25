@@ -25,7 +25,40 @@ func (c *UserController) Create(ctx *app.CreateUserContext) error {
 	// Put your logic here
 	userTable := models.NewUserDB(common.DB)
 	m := models.User{}
-	m.Name = *ctx.Payload.Name
+
+	if ctx.Payload.Name != nil {
+		m.Name = *ctx.Payload.Name
+	}
+	if ctx.Payload.Sex != nil {
+		m.Sex = *ctx.Payload.Sex
+	}
+	if ctx.Payload.Birthday != nil {
+		m.Birthday = ctx.Payload.Birthday
+	}
+	if ctx.Payload.BloodType != nil {
+		m.BloodType = *ctx.Payload.BloodType
+	}
+	if ctx.Payload.Job != nil {
+		m.Job = *ctx.Payload.Job
+	}
+	if ctx.Payload.HomeTown != nil {
+		m.HomeTown = *ctx.Payload.HomeTown
+	}
+	if ctx.Payload.LivingRegion != nil {
+		m.LivingRegion = *ctx.Payload.LivingRegion
+	}
+	if ctx.Payload.Married != nil {
+		m.Married = *ctx.Payload.Married
+	}
+	if ctx.Payload.AppearArea != nil {
+		m.AppearArea = *ctx.Payload.AppearArea
+	}
+	if ctx.Payload.School != nil {
+		m.School = *ctx.Payload.School
+	}
+	if ctx.Payload.Homepage != nil {
+		m.Homepage = *ctx.Payload.Homepage
+	}
 	err := userTable.Add(ctx.Context, &m)
 	if err != nil {
 		panic(err)
@@ -93,7 +126,39 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 		panic(err)
 	}
 
-	m.Name = *ctx.Payload.Name
+	if ctx.Payload.Name != nil {
+		m.Name = *ctx.Payload.Name
+	}
+	if ctx.Payload.Sex != nil {
+		m.Sex = *ctx.Payload.Sex
+	}
+	if ctx.Payload.Birthday != nil {
+		m.Birthday = ctx.Payload.Birthday
+	}
+	if ctx.Payload.BloodType != nil {
+		m.BloodType = *ctx.Payload.BloodType
+	}
+	if ctx.Payload.Job != nil {
+		m.Job = *ctx.Payload.Job
+	}
+	if ctx.Payload.HomeTown != nil {
+		m.HomeTown = *ctx.Payload.HomeTown
+	}
+	if ctx.Payload.LivingRegion != nil {
+		m.LivingRegion = *ctx.Payload.LivingRegion
+	}
+	if ctx.Payload.Married != nil {
+		m.Married = *ctx.Payload.Married
+	}
+	if ctx.Payload.AppearArea != nil {
+		m.AppearArea = *ctx.Payload.AppearArea
+	}
+	if ctx.Payload.School != nil {
+		m.School = *ctx.Payload.School
+	}
+	if ctx.Payload.Homepage != nil {
+		m.Homepage = *ctx.Payload.Homepage
+	}
 	err = userTable.Update(ctx.Context, m)
 	if err != nil {
 		panic(err)
