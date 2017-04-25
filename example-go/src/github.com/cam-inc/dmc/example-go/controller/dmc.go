@@ -35,9 +35,6 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					Path:   "/quickview",
 					Method: "get",
 				},
-				Layout:  bridge.LayoutCard,
-				Drawer:  true,
-				Primary: "id",
 			},
 			{
 				Section: bridge.SectionDashboard,
@@ -47,9 +44,6 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					Path:   "/adminrole",
 					Method: "get",
 				},
-				Layout:  bridge.LayoutCard,
-				Drawer:  true,
-				Primary: "id",
 			},
 
 			// Mange
@@ -61,9 +55,6 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					Path:   "/adminuser",
 					Method: "get",
 				},
-				Layout:  bridge.LayoutTable,
-				Drawer:  true,
-				Primary: "id",
 			},
 			{
 				Section: bridge.SectionManage,
@@ -73,9 +64,6 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					Path:   "/user",
 					Method: "get",
 				},
-				Layout:  bridge.LayoutTable,
-				Drawer:  true,
-				Primary: "id",
 			},
 		},
 	}

@@ -1,3 +1,5 @@
+const CHANGE_COMPONENT_PREFIX = 'component_';
+
 export default {
   SECTION_DASHBOARD: 'dashboard',
   SECTION_MANAGE: 'manage',
@@ -5,6 +7,11 @@ export default {
   // store.js
   STORAGE_CURRENT: 'current',
   STORAGE_ENDPOINT: 'endpoint',
+
+  // Component#Style
+  STYLE_NUMBER: 'number',
+  STYLE_TABLE: 'table',
+
 
   // riotx#actions
   ACTION_DRAWER_TOGGLE: 'drawer_toggle',
@@ -21,6 +28,8 @@ export default {
 
   ACTION_PAGE_GET: 'page_get',
 
+  ACTION_COMPONENT_GET: 'component_get',
+
   // riotx#mutations
   MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
 
@@ -35,6 +44,8 @@ export default {
   MUTATION_CURRENT_REMOVE: 'current_remove',
 
   MUTATION_PAGE_GET: 'page_get',
+
+  MUTATION_COMPONENT_GET: 'component_get',
 
   // riotx#getters
   GETTER_DRAWER_OPENED: 'drawer_opened',
@@ -59,4 +70,8 @@ export default {
   CHANGE_CURRENT: 'current',
 
   CHANGE_PAGE: 'page',
+
+  changeComponentName: name => {
+    return CHANGE_COMPONENT_PREFIX + name;
+  }
 };

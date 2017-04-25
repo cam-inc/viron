@@ -61,5 +61,5 @@ dmc-drawer.Drawer(class="{ Drawer--development : isDevelopmentMode, Drawer--stag
 
     this.evSelect = (ev) => {
       //router.navigateTo(ev.item.api.path + "/" + ev.item.api.method);
-      router.navigateTo(ev.item.api.path + "/" + window.encodeURIComponent(ev.item.api.method) + '/' + ev.item.layout);
+      router.navigateTo(ev.item.api.path + "/" + window.encodeURIComponent(ev.item.api.method));
     }

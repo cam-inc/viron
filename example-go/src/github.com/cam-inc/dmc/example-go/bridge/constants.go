@@ -5,9 +5,6 @@ const (
 	StyleTable  = "table"  // WebComponent テーブル表示
 	StyleNumber = "number" // WebComponent 数字表示
 
-	LayoutTable = "table" // テーブルレイアウト
-	LayoutCard  = "card"  // カードレイアウト
-
 	GroupEmpty = ""      // グループなし
 	GroupKPI   = "kpi"   // KPI
 	GroupUser  = "user"  // ユーザ

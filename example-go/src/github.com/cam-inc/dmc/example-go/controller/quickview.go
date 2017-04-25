@@ -26,7 +26,7 @@ func (c *QuickviewController) Show(ctx *app.ShowQuickviewContext) error {
 	// QuickviewController_Show: end_implement
 	res := &app.Quickview{
 		Name: "Quick View",
-		Componets: []*app.Component{
+		Components: []*app.Component{
 			{
 				Name: "DAU",
 				API: &app.API{

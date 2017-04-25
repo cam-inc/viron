@@ -1,4 +1,6 @@
-import { forOwn } from 'mout/object';
+import {forOwn} from 'mout/object';
+
+import constants from '../core/constants';
 
 /**
  * Swaggerファイルをロードして解析しデータ/操作を一元管理
@@ -11,21 +13,6 @@ class Swagger {
   constructor() {
     this._endpoint = null;
     this.client = null;
-  }
-
-  apisArray() {
-    if (!this.client) {
-      return [];
-    }
-    let apis = {};
-    forOwn(this.client.apis, (v) => {
-      forOwn(v, (v1, k1) => {
-        apis[k1] = v1;
-      });
-    });
-
-    return apis;
-
   }
 
   setup(url) {
@@ -61,6 +48,71 @@ class Swagger {
         return reject(err);
       });
     });
+  }
+
+  apisArray() {
+    if (!this.client) {
+      return [];
+    }
+    let apis = {};
+    forOwn(this.client.apis, (v) => {
+      forOwn(v, (v1, k1) => {
+        apis[k1] = v1;
+      });
+    });
+
+    return apis;
+
+  }
+
+  /**
+   * 定義情報とデータをマージ
+   * @param properties
+   * @param response
+   * @param key
+   * @returns {*}
+   */
+  mergePropertiesAndResponse(properties, response, key) {
+    if (properties.type === 'array') {
+      let res = [];
+      forOwn(response, (v, k) => {
+        let ret = this.mergePropertiesAndResponse(properties.items, v, k);
+        res.push(ret);
+      });
+      return res;
+    }
+
+    let res = {};
+
+    if (properties.type === 'object') {
+      forOwn(properties.properties, (v, k) => {
+        let ret = this.mergePropertiesAndResponse(v, response[k], k);
+        res[k] = ret;
+      });
+      return res;
+    }
+
+    //
+    res.key = key;
+    res.definition = properties;
+    // TODO definition チェッカー
+    res.value = response;
+
+    return res;
+
+  }
+
+  isComponentStyleNumber(obj) {
+    return obj.value == constants.STYLE_NUMBER;
+  }
+
+  isComponentStyleTable(obj) {
+    return obj.value == constants.STYLE_TABLE;
+  }
+
+  getStringValue(obj) {
+    // TODO チェック入れる
+    return obj.value;
   }
 }
 

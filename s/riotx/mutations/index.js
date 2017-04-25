@@ -5,6 +5,7 @@ import current from './current';
 import endpoint from './endpoint';
 import dmc from './dmc';
 import page from './page';
+import component from './component';
 
 export default {
   [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
@@ -21,4 +22,6 @@ export default {
   [constants.MUTATION_CURRENT_REMOVE]: current.remove,
 
   [constants.MUTATION_PAGE_GET]: page.show,
+
+  [constants.MUTATION_COMPONENT_GET]: component.show,
 };
