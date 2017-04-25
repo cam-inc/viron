@@ -24,7 +24,13 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 
 	// DmcController_Show: end_implement
 	res := &app.Dmc{
-		Name: "Example",
+		Name: "Example Project",
+		Theme: bridge.ThemeDark,
+		Tags: []string{
+			"develop",
+			"dmc",
+			"example",
+		},
 		Pages: []*app.Page{
 			// Dashboard
 			{
