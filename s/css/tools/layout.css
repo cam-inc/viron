@@ -3,7 +3,7 @@
   /* 左揃え & 上揃え */
   --layout-start-start: {
     display: flex;
-    align-item: flex-start;
+    align-items: flex-start;
     justify-content: flex-start;
   }
 
@@ -24,7 +24,14 @@
   /* 左右に吸着 & 上揃え */
   --layout-between-start: {
     display: flex;
-    align-item: flex-start;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  /* 左右に吸着 & 上下いっぱいまで広がる */
+  --layout-between-stretch: {
+    display: flex;
+    align-items: stretch;
     justify-content: space-between;
   }
 

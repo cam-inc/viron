@@ -1,11 +1,14 @@
 dmc-endpoints.EndpointsPage
   .EndpointsPage__list
+    .EndpointsPage__addCard(click="{handleEndpointAdd}")
+      dmc-icon(type="plus")
     virtual(each="{ item, url in endpoint }")
       dmc-endpoint(host="{ url }" title="{ item.title }" description="{ item.description }" tags="{ item.tags }" onentry="{ handleEndpointEntry }" onedit="{ handleEndpointEdit }" onremove="{ handleEndpointRemove }")
 
   script.
     import constants from '../../core/constants';
     import '../organisms/dmc-endpoint.tag';
+    import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
     this.endpoint = {};
@@ -13,6 +16,10 @@ dmc-endpoints.EndpointsPage
       this.endpoint = state.endpoint;
       this.update()
     })
+
+    handleEndpointAdd() {
+      alert('作成 -> ログイン -> endpoint一覧に追加する');
+    }
 
     handleEndpointEntry(url) {
       Promise
