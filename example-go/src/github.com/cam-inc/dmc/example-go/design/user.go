@@ -23,12 +23,12 @@ var UserMediaType = MediaType("application/vnd.user+json", func() {
 		Attribute("appear_area", String, "appear area")
 		Attribute("school", String, "school")
 		Attribute("homepage", String, "homepage")
-		//Attribute("createdAt", DateTime, "user created date-time")
-		//Attribute("updatedAt", DateTime, "user updated date-time")
+		Attribute("created_at", DateTime, "user created date-time")
+		Attribute("updated_at", DateTime, "user updated date-time")
 		Required("id", "name")
 	})
 
-	View("default", func() {
+	largeView := func() {
 		Attribute("id")
 		Attribute("name")
 		Attribute("sex")
@@ -41,10 +41,18 @@ var UserMediaType = MediaType("application/vnd.user+json", func() {
 		Attribute("appear_area")
 		Attribute("school")
 		Attribute("homepage")
-		//Attribute("createdAt")
-		//Attribute("updatedAt")
+		Attribute("created_at")
+		Attribute("updated_at")
+	}
+	View("default", largeView)
+	View("large", largeView)
+	View("medium", func() {
+		Attribute("id")
+		Attribute("name")
+		Attribute("created_at")
+		Attribute("updated_at")
 	})
-	View("tiny", func() {
+	View("small", func() {
 		Attribute("id")
 		Attribute("name")
 	})
@@ -66,7 +74,9 @@ var _ = Resource("user", func() {
 		Response(OK, func() {
 			Media(CollectionOf(UserMediaType, func() {
 				View("default")
-				View("tiny")
+				View("large")
+				View("medium")
+				View("small")
 			}))
 		})
 		Response(NotFound)

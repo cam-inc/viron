@@ -12,22 +12,27 @@ var AdminUserMediaType = MediaType("application/vnd.admin_user+json", func() {
 	Attributes(func() {
 		Attribute("id", Integer, "unique id")
 		Attribute("login_id", String, "login id")
-		Attribute("password", String, "password")
 		Attribute("role_id", String, "role id")
-		Attribute("salt", String, "password salt")
 
-		Required("id", "login_id", "password")
+		Required("id", "login_id")
 	})
 
-	View("default", func() {
+	largeView := func() {
+		Attribute("id")
+		Attribute("login_id")
+		Attribute("role_id")
+	}
+
+	View("default", largeView)
+	View("large", largeView)
+	View("medium", func() {
 		Attribute("id")
 		Attribute("login_id")
 		Attribute("role_id")
 	})
-
-	View("tiny", func() {
+	View("small", func() {
+		Attribute("id")
 		Attribute("login_id")
-		Attribute("role_id")
 	})
 })
 
@@ -47,7 +52,9 @@ var _ = Resource("admin_user", func() {
 		Response(OK, func() {
 			Media(CollectionOf(AdminUserMediaType, func() {
 				View("default")
-				View("tiny")
+				View("large")
+				View("medium")
+				View("small")
 			}))
 		})
 		Response(NotFound)
