@@ -28,7 +28,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 		Pages: []*app.Page{
 			// Dashboard
 			{
-				ID: "quickview",
+				ID:      "quickview",
 				Name:    "クイックビュー",
 				Section: bridge.SectionDashboard,
 				Group:   bridge.GroupEmpty,
@@ -65,7 +65,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 			},
 			// Mange
 			{
-				ID: "user",
+				ID:      "user",
 				Section: bridge.SectionManage,
 				Group:   bridge.GroupUser,
 				Name:    "ユーザ",
@@ -88,7 +88,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 			},
 
 			{
-				ID: "adminrole",
+				ID:      "adminrole",
 				Name:    "DMC ユーザー権限",
 				Section: bridge.SectionManage,
 				Group:   bridge.GroupEmpty,
@@ -110,7 +110,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				},
 			},
 			{
-				ID: "adminuser",
+				ID:      "adminuser",
 				Name:    "DMC ユーザー",
 				Section: bridge.SectionManage,
 				Group:   bridge.GroupBlog,
