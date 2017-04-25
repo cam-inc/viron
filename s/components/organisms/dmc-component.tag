@@ -2,7 +2,7 @@ dmc-component
   .dmc-component
     | dmc-component
 
-    dmc-component-number(each="{ ifNumber }" component="{  parent.component}" data="{ parent.data }" index="{ parent.index }")
+    dmc-component-number(each="{ ifNumber }" component="{  parent.component }" data="{ parent.data }" index="{ parent.index }")
     dmc-component-table(each="{ ifTable }" data="{ parent.data }" index="{ parent.index }")
 
   script.
@@ -19,7 +19,6 @@ dmc-component
 
     store.change(constants.changeComponentName(this._riot_id), (err, state, store) => {
       this.data = state.component[this._riot_id];
-      debugger;
       this.update();
     });
 
