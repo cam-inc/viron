@@ -1,0 +1,70 @@
+.Endpoint {
+  display: block;
+  cursor: pointer;
+  background-color: var(--color-basic-white);
+  border-radius: 6px;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+  transition-duration: 100ms;
+  transition-property: background-color;
+}
+
+.Endpoint:hover {
+  background-color: #fff;
+}
+
+.Endpoint__head {
+  @apply --layout-between-center;
+  padding: 8px;
+  border-bottom: 1px solid var(--color-basic-black);
+}
+
+.Endpoint__thumbnail {
+  width: 24px;
+  height: 24px;
+  background-image: url(../img/sample_thumbnail.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 4px;
+  box-shadow: 0 3px 2px rgba(0, 0, 0, 0.16);
+}
+
+.Endpoint__menuButton {
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  color: var(--color-basic-black);
+  cursor: pointer;
+}
+
+.Endpoint__menuButton:hover {
+  color: var(--color-basic-gray);
+}
+
+.Endpoint__body {
+  padding: 16px;
+}
+
+.Endpoint__tags {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-basic-black);
+}
+
+.Endpoint__host {
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--color-basic-black);
+}
+
+.Endpoint__title {
+  margin-bottom: 4px;
+  font-size: 18px;
+  color: var(--color-basic-black);
+}
+
+.Endpoint__description {
+  font-size: 12px;
+  color: var(--color-basic-black);
+}

@@ -1,26 +1,14 @@
-dmc-endpoints
-  .dmc-endpoints(style="margin:20px")
-    .endpoint(each="{ item, url in endpoint; }")
-      img(src="{ item.thumbnail }" width="50px" height="50px")
-      | Name: { item.title }
-      | Description: { item.description }
-      | Version: { item.version }
-      | Theme: { item.theme }
-      | Tags: { item.tags.join(', ') }
-      | URL: { url }
-
-      button(type='button' onclick="{ evEntry }") 入場
-      button(type='button' onclick="{ evEdit }") 編集
-      button(type='button' onclick="{ evRemove }") 削除
-
-  style.
-    .endpoint {
-      margin: 10px;
-      border: solid 1px green;
-    }
+dmc-endpoints.EndpointsPage
+  .EndpointsPage__list
+    .EndpointsPage__addCard(click="{handleEndpointAdd}")
+      dmc-icon(type="plus")
+    virtual(each="{ item, url in endpoint }")
+      dmc-endpoint(host="{ url }" title="{ item.title }" thumbnail="{ item.thumbnail }" description="{ item.description }" tags="{ item.tags }" onentry="{ handleEndpointEntry }" onedit="{ handleEndpointEdit }" onremove="{ handleEndpointRemove }")
 
   script.
     import constants from '../../core/constants';
+    import '../organisms/dmc-endpoint.tag';
+    import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
     this.endpoint = {};
@@ -29,25 +17,28 @@ dmc-endpoints
       this.update()
     })
 
-    this.evEntry = (ev) => {
+    handleEndpointAdd() {
+      alert('作成 -> ログイン -> endpoint一覧に追加する');
+    }
+
+    handleEndpointEntry(url) {
       Promise
         .resolve()
-        .then(() => store.action(constants.ACTION_CURRENT_UPDATE, ev.item.url))
+        .then(() => store.action(constants.ACTION_CURRENT_UPDATE, url))
         .catch((err) => {
           // TODO
         })
       ;
     }
 
-    this.evEdit = (ev) => {
+    handleEndpointEdit(url) {
       throw new Error("TODO not support ... :P ");
     }
 
-    this.evRemove = (ev) => {
-      ev.item.url
+    handleEndpointRemove(url) {
       Promise
         .resolve()
-        .then(() => store.action(constants.ACTION_ENDPOINT_REMOVE, ev.item.url))
+        .then(() => store.action(constants.ACTION_ENDPOINT_REMOVE, url))
         .catch((err) => {
           // TODO
         })
