@@ -46,13 +46,10 @@ let setupRouter = () => {
         // riot.mount('dmc-page', 'samplepageB');
       }).on('/samplepageC/:paramA/:paramB', (params, queries) => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
-      }).on('/:path/:method', (params) => {
-        // encode/decode path string
-        const _path = window.decodeURIComponent(params.path);
-        const _method = window.decodeURIComponent(params.method);
+      }).on('/:id', (params) => {
         // Load page
         const store = riotx.get();
-        store.action(constants.ACTION_PAGE_GET, _path, _method);
+        store.action(constants.ACTION_PAGE_GET, params.id);
 
       }).on('/', () => {
         const targetTagString = 'dmc-empty';

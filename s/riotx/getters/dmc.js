@@ -15,8 +15,7 @@ export default {
   dashboard: (context) => {
     const pages = (context.state.dmc && context.state.dmc.pages) || [];
     return values(filter(pages, v => {
-
-      if (v.section !== constants.SECTION_DASHBOARD) {
+      if (v.section.get() !== constants.SECTION_DASHBOARD) {
         return false;
       }
       return true;
@@ -28,7 +27,7 @@ export default {
     const pages = (context.state.dmc && context.state.dmc.pages) || [];
     return values(filter(pages, v => {
 
-      if (v.section !== constants.SECTION_MANAGE) {
+      if (v.section.get() !== constants.SECTION_MANAGE) {
         return false;
       }
       return true;

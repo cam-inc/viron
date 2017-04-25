@@ -8,25 +8,33 @@ const DMC_URI = '/dmc';
 export default {
   show: context => {
     return new Promise((resolve, reject) => {
-      const dmcOID = swagger.client.spec.paths[DMC_URI].get.operationId;
-      if (!dmcOID || !swagger.client.apis.dmc || !swagger.client.apis.dmc[dmcOID]) {
+      const model = swagger.client.spec.paths[DMC_URI].get;
+
+      if (!model || !swagger.client.apis.dmc || !swagger.client.apis.dmc[model.operationId]) {
         return reject(new Error(`[fetch] ${swagger.client.url}; system entry point not found. (uri: ${DMC_URI})`));
       }
 
-      swagger.client.apis.dmc[dmcOID]()
+      const apis = swagger.apisArray();
+      const api = apis[model.operationId];
+
+      api()
         .then(res => {
           if (!res.ok) {
-            throw new Error(`[fetch] ${DMC_URI} error.`);
+            throw new Error(`[fetch] ${res.url} error.`);
           }
 
-          console.log(`[fetch] ${DMC_URI} success.`);
-          resolve(res);
+          console.log(`[fetch] ${res.url} success.`);
+
+          resolve({
+            response: res.obj,
+            model: model,
+          });
         })
         .catch(err => {
           reject(err);
         });
     }).then(res => {
-      context.commit(constants.MUTATION_DMC, res.obj);
+      context.commit(constants.MUTATION_DMC, res);
     });
   },
   remove: context => {
