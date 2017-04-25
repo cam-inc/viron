@@ -43,18 +43,15 @@ func main() {
 	// Mount "auth" controller
 	c7 := controller.NewAuthController(service)
 	app.MountAuthController(service, c7)
-	// Mount "quickview" controller
-	c8 := controller.NewQuickviewController(service)
-	app.MountQuickviewController(service, c8)
-	// Mount "quickview" controller
+	// Mount "auditLog" controller
+	c8 := controller.NewAuditLogController(service)
+	app.MountAuditLogController(service, c8)
+	// Mount "stats/dau" controller
 	c9 := controller.NewStatsDauController(service)
 	app.MountStatsDauController(service, c9)
-	// Mount "quickview" controller
+	// Mount "stats/mau" controller
 	c10 := controller.NewStatsMauController(service)
 	app.MountStatsMauController(service, c10)
-	// Mount "auditLog" controller
-	c11 := controller.NewAuditLogController(service)
-	app.MountAuditLogController(service, c11)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {

@@ -28,41 +28,107 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 		Pages: []*app.Page{
 			// Dashboard
 			{
-				Section: bridge.SectionDashboard,
-				Group:   bridge.GroupEmpty,
+				ID: "quickview",
 				Name:    "クイックビュー",
-				API: &app.API{
-					Path:   "/quickview",
-					Method: "get",
-				},
-			},
-			{
 				Section: bridge.SectionDashboard,
 				Group:   bridge.GroupEmpty,
-				Name:    "DMC ユーザー権限",
-				API: &app.API{
-					Path:   "/adminrole",
-					Method: "get",
+				Components: []*app.Component{
+					{
+						Name: "DAU",
+						API: &app.API{
+							Path:   "/stats/dau",
+							Method: "get",
+						},
+						Style: bridge.StyleNumber,
+						Options: []*app.Option{
+							{
+								Key:   "key",
+								Value: "value",
+							},
+						},
+					},
+					{
+						Name: "MAU",
+						API: &app.API{
+							Path:   "/stats/mau",
+							Method: "get",
+						},
+						Style: bridge.StyleNumber,
+						Options: []*app.Option{
+							{
+								Key:   "key",
+								Value: "value",
+							},
+						},
+					},
 				},
 			},
-
 			// Mange
 			{
-				Section: bridge.SectionManage,
-				Group:   bridge.GroupBlog,
-				Name:    "DMC ユーザー",
-				API: &app.API{
-					Path:   "/adminuser",
-					Method: "get",
-				},
-			},
-			{
+				ID: "user",
 				Section: bridge.SectionManage,
 				Group:   bridge.GroupUser,
 				Name:    "ユーザ",
-				API: &app.API{
-					Path:   "/user",
-					Method: "get",
+				Components: []*app.Component{
+					{
+						Name: "ユーザ",
+						API: &app.API{
+							Path:   "/user",
+							Method: "get",
+						},
+						Style: bridge.StyleTable,
+						Options: []*app.Option{
+							{
+								Key:   "key",
+								Value: "value",
+							},
+						},
+					},
+				},
+			},
+
+			{
+				ID: "adminrole",
+				Name:    "DMC ユーザー権限",
+				Section: bridge.SectionManage,
+				Group:   bridge.GroupEmpty,
+				Components: []*app.Component{
+					{
+						Name: "DMC ユーザー権限",
+						API: &app.API{
+							Path:   "/adminrole",
+							Method: "get",
+						},
+						Style: bridge.StyleNumber,
+						Options: []*app.Option{
+							{
+								Key:   "key",
+								Value: "value",
+							},
+						},
+					},
+				},
+			},
+			{
+				ID: "adminuser",
+				Name:    "DMC ユーザー",
+				Section: bridge.SectionManage,
+				Group:   bridge.GroupBlog,
+				Components: []*app.Component{
+					{
+						Name: "DMC ユーザー権限",
+						API: &app.API{
+							Path:   "/adminuser",
+							Method: "get",
+						},
+						Style: bridge.StyleNumber,
+						Options: []*app.Option{
+							{
+								Key:   "key",
+								Value: "value",
+							},
+						},
+					},
 				},
 			},
 		},
