@@ -1,9 +1,14 @@
 dmc-endpoints
-  .dmc-endpoints
+  .dmc-endpoints(style="margin:20px")
     .endpoint(each="{ item, url in endpoint; }")
-      | Name: { item.name }
+      img(src="{ item.thumbnail }" width="50px" height="50px")
+      | Name: { item.title }
+      | Description: { item.description }
+      | Version: { item.version }
+      | Theme: { item.theme }
       | Tags: { item.tags.join(', ') }
       | URL: { url }
+
       button(type='button' onclick="{ evEntry }") 入場
       button(type='button' onclick="{ evEdit }") 編集
       button(type='button' onclick="{ evRemove }") 削除
