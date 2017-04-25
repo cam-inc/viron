@@ -1,7 +1,2 @@
-dmc-icon(class="{ classes }")
+dmc-icon(class="Icon Icon--{opts.type || 'question'} {opts.class}")
   script.
-    this.classes = {
-      Icon: true,
-      [`Icon--${opts.type}`]: true,
-      [opts.class]: true
-    };
