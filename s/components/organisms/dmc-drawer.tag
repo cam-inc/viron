@@ -1,4 +1,4 @@
-dmc-drawer.Drawer(class="{ Drawer--development : isDevelopmentMode, Drawer--staging : isStagingMode, Drawer--production : isProductionMode }")
+dmc-drawer.Drawer
   .Drawer__head
     .media.Drawer__endpoint
       .media__image.Drawer__endpointImage
@@ -38,10 +38,6 @@ dmc-drawer.Drawer(class="{ Drawer--development : isDevelopmentMode, Drawer--stag
 
     let store = this.riotx.get();
 
-    // TODO: 適切な環境をstate参照すること。
-    this.isDevelopmentMode = false;
-    this.isStagingMode = true;
-    this.isProductionMode = false;
     this.dashboard = [];
     this.manage = [];
 
