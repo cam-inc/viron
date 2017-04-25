@@ -20,7 +20,7 @@ dmc-drawer.Drawer(class="{ Drawer--development : isDevelopmentMode, Drawer--stag
         .Drawer__listItem(each="{ dashboard }" onclick="{ evSelect }")
           dmc-icon.Drawer__listItemIcon(type="codeSquareO")
           .Drawer__listItemTitle
-            | { name }
+            | { name.get() }
           dmc-icon(type="up")
     .Drawer__section
       .Drawer__sectionTitle 管理画面
@@ -28,7 +28,7 @@ dmc-drawer.Drawer(class="{ Drawer--development : isDevelopmentMode, Drawer--stag
         .Drawer__listItem(each="{ manage }" onclick="{ evSelect }")
           dmc-icon.Drawer__listItemIcon(type="codeSquareO")
           .Drawer__listItemTitle
-            | { name }
+            | { name.get() }
           dmc-icon(type="up")
 
   script.
