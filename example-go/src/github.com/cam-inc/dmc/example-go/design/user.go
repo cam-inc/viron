@@ -1,7 +1,6 @@
 package design
 
 import (
-	_ "github.com/cam-inc/dmc/example-go/bridge"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 	"github.com/cam-inc/dmc/example-go/bridge"
