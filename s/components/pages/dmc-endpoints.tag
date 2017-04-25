@@ -3,7 +3,7 @@ dmc-endpoints.EndpointsPage
     .EndpointsPage__addCard(click="{handleEndpointAdd}")
       dmc-icon(type="plus")
     virtual(each="{ item, url in endpoint }")
-      dmc-endpoint(host="{ url }" title="{ item.title }" description="{ item.description }" tags="{ item.tags }" onentry="{ handleEndpointEntry }" onedit="{ handleEndpointEdit }" onremove="{ handleEndpointRemove }")
+      dmc-endpoint(host="{ url }" title="{ item.title }" thumbnail="{ item.thumbnail }" description="{ item.description }" tags="{ item.tags }" onentry="{ handleEndpointEntry }" onedit="{ handleEndpointEdit }" onremove="{ handleEndpointRemove }")
 
   script.
     import constants from '../../core/constants';
