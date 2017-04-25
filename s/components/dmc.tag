@@ -31,7 +31,10 @@ dmc.Application
     });
     store.change(constants.CHANGE_PAGE, (err, state, store) => {
       // TODO
-      console.log("dmc.tag change page!!!")
+      const targetTagString = 'dmc-' + state.page.layout;
+      console.log(`[page] dmc.tag change page! ${targetTagString}`)
+      riot.mount('dmc-page', targetTagString, state.page);
+
     });
 
     this.evResetCurrent = (ev) => {

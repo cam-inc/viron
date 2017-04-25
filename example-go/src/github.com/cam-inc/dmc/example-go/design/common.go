@@ -95,13 +95,13 @@ var SearchType = Type("search", func() {
 // クライアントが使用する、アクセス情報
 var APIType = Type("api", func() {
 	Description("Accessing api information type")
-	Attribute("id", String, "Access apis[id] of swagger.json", func() {
-		Example("user")
+	Attribute("path", String, "Access paths[path] of swagger.json", func() {
+		Example("/quickview")
 	})
-	Attribute("operation", String, "Access api[id].operation of swagger.json", func() {
-		Example("user#list")
+	Attribute("method", String, "Access paths[path][method] of swagger.json", func() {
+		Example("get")
 	})
-	Required("id", "operation")
+	Required("path", "method")
 })
 
 // OptionType of type
@@ -118,7 +118,7 @@ var OptionType = Type("option", func() {
 // ComponentType of type
 var ComponentType = Type("component", func() {
 	Description("A Component type")
-	Attribute("api", APIType, "Access api of page")
+	Attribute("api", APIType, "Access path of page")
 	Attribute("name", String, "Title of page")
 	Attribute("style", Style)                                  // Web Component style
 	Attribute("options", ArrayOf(OptionType), "style options") // Web Component Style options
@@ -128,7 +128,7 @@ var ComponentType = Type("component", func() {
 // PageType of type
 var PageType = Type("page", func() {
 	Description("A page type")
-	Attribute("api", APIType, "Access api of page")
+	Attribute("api", APIType, "Access path of page")
 	Attribute("name", String, "Title of page")
 	Attribute("section", PageSection)
 	Attribute("group", PageGroup)

@@ -25,6 +25,8 @@ import './components/organisms/dmc-drawer.tag';
 import './components/pages/dmc-empty.tag';
 import './components/pages/dmc-endpoints.tag';
 import './components/pages/dmc-page.tag';
+import './components/pages/dmc-card.tag';
+
 // root
 import './components/dmc.tag';
 
@@ -36,15 +38,16 @@ let setupRouter = () => {
         // riot.mount('dmc-page', 'samplepageA');
       }).on('/samplepageB', () => {
         // riot.mount('dmc-page', 'samplepageB');
-      }).on('/samplepageC/:paramA/:paramB', (params, queries, hash) => {
+      }).on('/samplepageC/:paramA/:paramB', (params, queries) => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
-      }).on('/:id/:operationId', (params, queries, hash) => {
-        //const api = swagger.client.apis[id][operationId]
-        const _id = window.decodeURIComponent(params.id);
-        const _operationId = window.decodeURIComponent(params.operationId);
+      }).on('/:path/:method/:layout', (params) => {
+        // encode/decode path string
+        const _path = window.decodeURIComponent(params.path);
+        const _method = window.decodeURIComponent(params.method);
+        const _layout = window.decodeURIComponent(params.layout);
         // Load page
         const store = riotx.get();
-        store.action(constants.ACTION_PAGE_GET, _id, _operationId);
+        store.action(constants.ACTION_PAGE_GET, _path, _method, _layout);
 
       }).on('/', () => {
         const targetTagString = 'dmc-empty';

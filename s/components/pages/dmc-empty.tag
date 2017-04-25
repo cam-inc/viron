@@ -1,3 +1,3 @@
 dmc-empty
   .dmc-empty
-    | aaaaa
+    | dmc-empty

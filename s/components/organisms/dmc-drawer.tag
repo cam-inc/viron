@@ -3,8 +3,8 @@ dmc-drawer.Drawer
     .Drawer__sectionTitle ダッシュボード
     .Drawer__list
       .Drawer__listItem(each="{ dashboard }" onclick="{ evSelect }")
-        | api.id : { api.id }
-        | api.operation : { api.operation }
+        | api.path : { api.path }
+        | api.method : { api.method }
         | drawer : { drawer }
         | group : { group }
         | layout : { layout }
@@ -16,8 +16,8 @@ dmc-drawer.Drawer
     .Drawer__sectionTitle 管理画面
     .Drawer__list
       .Drawer__listItem(each="{ manage }" onclick="{ evSelect }")
-        | api.id : { api.id }
-        | api.operation : { api.operation }
+        | api.path : { api.path }
+        | api.method : { api.method }
         | drawer : { drawer }
         | group : { group }
         | layout : { layout }
@@ -40,6 +40,6 @@ dmc-drawer.Drawer
     });
 
     this.evSelect = (ev) => {
-      //router.navigateTo('/' + ev.item.api.id + "/" + ev.item.api.operation);
-      router.navigateTo('/' + ev.item.api.id + "/" + window.encodeURIComponent(ev.item.api.operation));
+      //router.navigateTo(ev.item.api.path + "/" + ev.item.api.method);
+      router.navigateTo(ev.item.api.path + "/" + window.encodeURIComponent(ev.item.api.method) + '/' + ev.item.layout);
     }
