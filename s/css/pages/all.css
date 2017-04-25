@@ -5,4 +5,5 @@
 @import "common";
 
 /* 各ページのスタイル */
+@import "Endpoints";
 @import "NotFound";

@@ -1,21 +1,11 @@
-dmc-endpoints
-  .dmc-endpoints
-    .endpoint(each="{ item, url in endpoint; }")
-      | Name: { item.name }
-      | Tags: { item.tags.join(', ') }
-      | URL: { url }
-      button(type='button' onclick="{ evEntry }") 入場
-      button(type='button' onclick="{ evEdit }") 編集
-      button(type='button' onclick="{ evRemove }") 削除
-
-  style.
-    .endpoint {
-      margin: 10px;
-      border: solid 1px green;
-    }
+dmc-endpoints.EndpointsPage
+  .EndpointsPage__list
+    virtual(each="{ item, url in endpoint }")
+      dmc-endpoint(host="{ url }" name="{ item.name }" onentry="{ handleEndpointEntry }" onedit="{ handleEndpointEdit }" onremove="{ handleEndpointRemove }")
 
   script.
     import constants from '../../core/constants';
+    import '../organisms/dmc-endpoint.tag';
 
     const store = this.riotx.get();
     this.endpoint = {};
@@ -24,25 +14,24 @@ dmc-endpoints
       this.update()
     })
 
-    this.evEntry = (ev) => {
+    handleEndpointEntry(url) {
       Promise
         .resolve()
-        .then(() => store.action(constants.ACTION_CURRENT_UPDATE, ev.item.url))
+        .then(() => store.action(constants.ACTION_CURRENT_UPDATE, url))
         .catch((err) => {
           // TODO
         })
       ;
     }
 
-    this.evEdit = (ev) => {
+    handleEndpointEdit(url) {
       throw new Error("TODO not support ... :P ");
     }
 
-    this.evRemove = (ev) => {
-      ev.item.url
+    handleEndpointRemove(url) {
       Promise
         .resolve()
-        .then(() => store.action(constants.ACTION_ENDPOINT_REMOVE, ev.item.url))
+        .then(() => store.action(constants.ACTION_ENDPOINT_REMOVE, url))
         .catch((err) => {
           // TODO
         })

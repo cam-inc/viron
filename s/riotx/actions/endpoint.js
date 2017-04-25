@@ -8,7 +8,7 @@ export default {
 
         // TODO: あとで store.js に変える
         const data = {
-          'http://localhost:3000/swagger.json': { name: 'Service A', tags: ['local'] },
+          'http://localhost:3000/swagger.json': { name: 'Service A', tags: ['Local'] },
           'http://localhost:3001/swagger.json': { name: 'Service A', tags: ['Development'] },
           'http://localhost:3002/swagger.json': { name: 'Service A', tags: ['Staging'] },
           'http://localhost:3003/swagger.json': { name: 'Service A', tags: ['Production'] },
