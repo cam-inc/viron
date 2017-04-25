@@ -95,6 +95,10 @@ class Swagger {
     //
     res.key = key;
     res.definition = properties;
+    res.get = function () {
+      return this.value;
+    };
+
     // TODO definition チェッカー
     res.value = response;
 
@@ -103,17 +107,13 @@ class Swagger {
   }
 
   isComponentStyleNumber(obj) {
-    return obj.value == constants.STYLE_NUMBER;
+    return obj.get() == constants.STYLE_NUMBER;
   }
 
   isComponentStyleTable(obj) {
-    return obj.value == constants.STYLE_TABLE;
+    return obj.get() == constants.STYLE_TABLE;
   }
 
-  getStringValue(obj) {
-    // TODO チェック入れる
-    return obj.value;
-  }
 }
 
 export default new Swagger();

@@ -22,7 +22,6 @@ dmc-drawer.Drawer(class="{ Drawer--development : isDevelopmentMode, Drawer--stag
           .Drawer__listItemTitle
             | { name }
           dmc-icon(type="up")
-
     .Drawer__section
       .Drawer__sectionTitle 管理画面
       .Drawer__list
@@ -60,6 +59,6 @@ dmc-drawer.Drawer(class="{ Drawer--development : isDevelopmentMode, Drawer--stag
     }
 
     this.evSelect = (ev) => {
-      //router.navigateTo(ev.item.api.path + "/" + ev.item.api.method);
-      router.navigateTo(ev.item.api.path + "/" + window.encodeURIComponent(ev.item.api.method));
+      ev.item.id.get()
+      router.navigateTo(ev.item.id.get());
     }

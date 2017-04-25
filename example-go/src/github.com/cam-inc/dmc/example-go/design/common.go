@@ -117,11 +117,12 @@ var ComponentType = Type("component", func() {
 // PageType of type
 var PageType = Type("page", func() {
 	Description("A page type")
-	Attribute("api", APIType, "Access path of page")
+	Attribute("id", String, "id of page")
 	Attribute("name", String, "Title of page")
 	Attribute("section", PageSection)
 	Attribute("group", PageGroup)
-	Required("api", "name", "section", "group")
+	Attribute("components", ArrayOf(ComponentType), "A components format")
+	Required("id", "name", "section", "group", "components")
 })
 
 // PaginationType of type
