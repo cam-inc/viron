@@ -2,7 +2,7 @@ import { filter, values } from 'mout/object';
 import constants from '../../core/constants';
 
 export default {
-  all: context => {
+  show: context => {
     return context.state.dmc;
   },
   pages: context => {

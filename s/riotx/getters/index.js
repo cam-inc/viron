@@ -8,7 +8,7 @@ import page from './page';
 export default {
   [constants.GETTER_DRAWER_OPENED]: drawer.opened,
 
-  [constants.GETTER_DMC]: dmc.all,
+  [constants.GETTER_DMC]: dmc.show,
   [constants.GETTER_DMC_PAGES]: dmc.pages,
   [constants.GETTER_DMC_NAME]: dmc.name,
   [constants.GETTER_DMC_DASHBOARD]: dmc.dashboard,

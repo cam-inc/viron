@@ -6,7 +6,7 @@ import swagger from '../../swagger';
 const DMC_URI = '/dmc';
 
 export default {
-  get: context => {
+  show: context => {
     return new Promise((resolve, reject) => {
       const dmcOID = swagger.client.spec.paths[DMC_URI].get.operationId;
       if (!dmcOID || !swagger.client.apis.dmc || !swagger.client.apis.dmc[dmcOID]) {

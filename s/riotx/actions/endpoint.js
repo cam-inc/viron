@@ -1,7 +1,7 @@
 import constants from '../../core/constants';
 
 export default {
-  get: context => {
+  show: context => {
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
