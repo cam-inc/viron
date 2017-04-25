@@ -24,8 +24,8 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 
 	// DmcController_Show: end_implement
 	res := &app.Dmc{
-		Name:  "Example Project",
-		Theme: bridge.ThemeDark,
+		Name:      "Example Project",
+		Theme:     bridge.ThemeDark,
 		Thumbnail: "https://avatars3.githubusercontent.com/u/23251378?v=3&s=200",
 		Tags: []string{
 			"develop",
