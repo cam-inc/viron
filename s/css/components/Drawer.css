@@ -1,13 +1,13 @@
 .Drawer {
-  display: block;
+  @apply --layout-column-stretch-center;
   width: var(--component-application-asideColumn-width);
-  /* TODO: debug用なので後で消すこと。 */
-  min-height: 100%;
+  height: 100%;
   background-color: var(--color-basic-white);
 }
 
 .Drawer__head {
-  padding: 24px 16px;
+  position: relative;
+  padding: 24px 16px 0;
 }
 
 .Drawer__endpoint {
@@ -18,6 +18,7 @@
 .Drawer__endpointImage {
   width: 56px;
   height: 56px;
+  background-image: url(../img/sample_thumbnail.png);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -33,6 +34,7 @@
 
 .Drawer__endpointBodyHead {
   flex-grow: 1;
+  margin-right: 24px;
 }
 
 .Drawer__endpointTitle {
@@ -55,24 +57,145 @@
   color: var(--color-basic-black);
 }
 
+.Drawer__closeButton {
+  @apply --layout-center-center;
+  position: absolute;
+  top: 24px;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--color-basic-black);
+}
+
+.Drawer__closeButton:hover {
+  opacity: 0.5;
+}
+
+.Drawer__body {
+  flex-grow: 1;
+  padding: 24px 0;
+  overflow-y: scroll;
+}
+
 .Drawer__sectionTitle {
   padding: 14px 16px;
   font-size: 11px;
+  color: var(--color-basic-black);
+}
+
+.Drawer__listItem {
+  @apply --layout-center-center;
+  padding: 14px 16px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  border-radius: 0 8px 8px 0;
+  font-size: 15px;
+  cursor: pointer;
+  transition-property: color, background-color;
+  transition-duration: 100ms;
+  color: var(--color-basic-black);
+}
+
+.Drawer__listItem:last-child {
+  margin-bottom: 0;
+}
+
+.Drawer__listItem:hover,
+.Drawer__listItem--selected {
+  background-color: var(--color-basic-black);
+  color: var(--color-basic-white);
+}
+
+.Drawer__listItemIcon {
+  margin-right: 8px;
+}
+
+.Drawer__listItemTitle {
+  flex-grow: 1;
 }
 
 /**
  * =================================================
- * テーマ
+ * テーマ(production)
  * =================================================
  */
 .Drawer--production {
   background-color: var(--color-basic-black);
 }
 
+.Drawer--production .Drawer__endpoint {
+  border-bottom: 1px solid var(--color-basic-skyblue);
+}
+
+.Drawer--production .Drawer__endpointTitle,
+.Drawer--production .Drawer__endpointHost,
+.Drawer--production .Drawer__endpointDescription,
+.Drawer--production .Drawer__closeButton,
+.Drawer--production .Drawer__sectionTitle,
+.Drawer--production .Drawer__listItem {
+  color: var(--color-basic-skyblue);
+}
+
+.Drawer--production .Drawer__listItem:hover,
+.Drawer--production .Drawer__listItem--selected {
+  background-color: var(--color-basic-darkGray);
+  color: var(--color-basic-white);
+}
+
+/**
+ * =================================================
+ * テーマ(staging)
+ * =================================================
+ */
 .Drawer--staging {
   background-color: var(--color-basic-darkPurple);
 }
 
+.Drawer--staging .Drawer__endpoint {
+  border-bottom: 1px solid var(--color-basic-lightPurple);
+}
+
+.Drawer--staging .Drawer__endpointTitle,
+.Drawer--staging .Drawer__endpointHost,
+.Drawer--staging .Drawer__endpointDescription,
+.Drawer--staging .Drawer__closeButton,
+.Drawer--staging .Drawer__sectionTitle,
+.Drawer--staging .Drawer__listItem {
+  color: var(--color-basic-lightPurple);
+}
+
+.Drawer--staging .Drawer__listItem:hover,
+.Drawer--staging .Drawer__listItem--selected {
+  background-color: var(--color-basic-purple);
+  color: var(--color-basic-white);
+}
+
+/**
+ * =================================================
+ * テーマ(development)
+ * =================================================
+ */
 .Drawer--development {
   background-color: var(--color-basic-white);
+}
+
+.Drawer--development .Drawer__endpoint {
+  border-bottom: 1px solid var(--color-basic-black);
+}
+
+.Drawer--development .Drawer__endpointTitle,
+.Drawer--development .Drawer__endpointHost,
+.Drawer--development .Drawer__endpointDescription,
+.Drawer--development .Drawer__closeButton,
+.Drawer--development .Drawer__sectionTitle,
+.Drawer--development .Drawer__listItem {
+  color: var(--color-basic-black);
+}
+
+.Drawer--development .Drawer__listItem:hover,
+.Drawer--development .Drawer__listItem--selected {
+  background-color: var(--color-basic-black);
+  color: var(--color-basic-white);
 }

@@ -1,4 +1,4 @@
-dmc-drawer.Drawer
+dmc-drawer.Drawer(class="{ Drawer--development : isDevelopmentMode, Drawer--staging : isStagingMode, Drawer--production : isProductionMode }")
   .Drawer__head
     .media.Drawer__endpoint
       .media__image.Drawer__endpointImage
@@ -11,38 +11,38 @@ dmc-drawer.Drawer
         .Drawer__endpointBodyTail
           .Drawer__endpointDescription
             | description
+    .Drawer__closeButton(click="{handleCloseButtonClick}")
+      dmc-icon(type="close")
   .Drawer__body
     .Dwawer__section
       .Drawer__sectionTitle ダッシュボード
       .Drawer__list
         .Drawer__listItem(each="{ dashboard }" onclick="{ evSelect }")
-          | api.path : { api.path }
-          | api.method : { api.method }
-          | drawer : { drawer }
-          | group : { group }
-          | layout : { layout }
-          | name : { name }
-          | primary : { primary }
-          | section : { section }
+          dmc-icon.Drawer__listItemIcon(type="codeSquareO")
+          .Drawer__listItemTitle
+            | { name }
+          dmc-icon(type="up")
 
     .Drawer__section
       .Drawer__sectionTitle 管理画面
       .Drawer__list
         .Drawer__listItem(each="{ manage }" onclick="{ evSelect }")
-          | api.path : { api.path }
-          | api.method : { api.method }
-          | drawer : { drawer }
-          | group : { group }
-          | layout : { layout }
-          | name : { name }
-          | primary : { primary }
-          | section : { section }
+          dmc-icon.Drawer__listItemIcon(type="codeSquareO")
+          .Drawer__listItemTitle
+            | { name }
+          dmc-icon(type="up")
 
   script.
     import constants from '../../core/constants';
     import router from '../../core/router';
+    import '../atoms/dmc-icon.tag';
+
     let store = this.riotx.get();
 
+    // TODO: 適切な環境をstate参照すること。
+    this.isDevelopmentMode = false;
+    this.isStagingMode = true;
+    this.isProductionMode = false;
     this.dashboard = [];
     this.manage = [];
 
@@ -51,6 +51,13 @@ dmc-drawer.Drawer
       this.manage = store.getter(constants.GETTER_DMC_MANAGE);
       this.update();
     });
+
+    handleCloseButtonClick(e) {
+      e.preventDefault();
+      Promise
+        .resolve()
+        .then(() => store.action(constants.ACTION_DRAWER_CLOSE));
+    }
 
     this.evSelect = (ev) => {
       //router.navigateTo(ev.item.api.path + "/" + ev.item.api.method);

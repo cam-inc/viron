@@ -8,11 +8,12 @@ import page from './page';
 
 export default {
   [constants.ACTION_DRAWER_TOGGLE]: drawer.toggle,
+  [constants.ACTION_DRAWER_CLOSE]: drawer.close,
 
-  [constants.ACTION_DMC_GET]: dmc.show,
+  [constants.ACTION_DMC_GET]: dmc.get,
   [constants.ACTION_DMC_REMOVE]: dmc.remove,
 
-  [constants.ACTION_ENDPOINT_GET]: endpoint.show,
+  [constants.ACTION_ENDPOINT_GET]: endpoint.get,
   [constants.ACTION_ENDPOINT_REMOVE]: endpoint.remove,
   [constants.ACTION_ENDPOINT_REMOVE_ALL]: endpoint.removeAll,
 

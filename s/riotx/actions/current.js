@@ -1,10 +1,6 @@
 import constants from '../../core/constants';
 
 export default {
-  show: () => {
-    return Promise
-      .resolve();
-  },
   update: (context, key) => {
     return Promise
       .resolve()
