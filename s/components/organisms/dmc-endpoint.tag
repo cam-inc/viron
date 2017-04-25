@@ -1,6 +1,6 @@
 dmc-endpoint.Endpoint(click="{handleClick}")
   .Endpoint__head
-    .Endpoint__thumbnail
+    .Endpoint__thumbnail(style="background-image:url({ opts.thumbnail })")
     .Endpoint__menuButton(click="{handleMenuButtonClick}")
       dmc-icon(type="ellipsis")
   .Endpoint__body
