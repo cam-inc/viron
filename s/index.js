@@ -94,6 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
   riotx.add(store);
   riot.mount('dmc'); // root mount!!!
 
+  // TODO: debug用なので後で消すこと。
+  window.store = store;
+
   // Changed Endpoint
   store.change(constants.CHANGE_CURRENT, (err, state, store) => {
     const current = store.getter(constants.GETTER_CURRENT);
