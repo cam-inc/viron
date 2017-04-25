@@ -1,6 +1,5 @@
 @font-face {
   font-family: "anticon";
-
   src: url("../font/anticon.eot"); /* IE9*/
   src: url("../font/anticon.eot?#iefix") format("embedded-opentype"), url("../font/anticon.woff") format("woff"), url("../font/anticon.ttf") format("truetype"), url("../font/anticon.svg#iconfont") format("svg");
 }

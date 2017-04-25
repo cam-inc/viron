@@ -18,13 +18,13 @@
 .Drawer__endpointImage {
   width: 56px;
   height: 56px;
-  background-image: url(../img/sample_thumbnail.png);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 4px;
-  box-shadow: 0 3px 2px rgba(0,0,0,0.16);
   margin-right: 16px;
+  background-image: url(../img/sample_thumbnail.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 4px;
+  box-shadow: 0 3px 2px rgba(0, 0, 0, 0.16);
 }
 
 .Drawer__endpointBody {
@@ -39,10 +39,10 @@
 
 .Drawer__endpointTitle {
   @apply --text-truncate;
+  margin-bottom: 4px;
   font-size: 12px;
   font-weight: bold;
   color: var(--color-basic-black);
-  margin-bottom: 4px;
 }
 
 .Drawer__endpointHost {
@@ -64,9 +64,9 @@
   right: 16px;
   width: 24px;
   height: 24px;
-  cursor: pointer;
   font-size: 24px;
   color: var(--color-basic-black);
+  cursor: pointer;
 }
 
 .Drawer__closeButton:hover {
@@ -90,12 +90,12 @@
   padding: 14px 16px;
   margin-right: 8px;
   margin-bottom: 8px;
-  border-radius: 0 8px 8px 0;
   font-size: 15px;
-  cursor: pointer;
-  transition-property: color, background-color;
-  transition-duration: 100ms;
   color: var(--color-basic-black);
+  cursor: pointer;
+  border-radius: 0 8px 8px 0;
+  transition-duration: 100ms;
+  transition-property: color, background-color;
 }
 
 .Drawer__listItem:last-child {
@@ -104,8 +104,8 @@
 
 .Drawer__listItem:hover,
 .Drawer__listItem--selected {
-  background-color: var(--color-basic-black);
   color: var(--color-basic-white);
+  background-color: var(--color-basic-black);
 }
 
 .Drawer__listItemIcon {
@@ -140,8 +140,8 @@
 
 .Drawer--production .Drawer__listItem:hover,
 .Drawer--production .Drawer__listItem--selected {
-  background-color: var(--color-basic-darkGray);
   color: var(--color-basic-white);
+  background-color: var(--color-basic-darkGray);
 }
 
 /**
@@ -168,8 +168,8 @@
 
 .Drawer--staging .Drawer__listItem:hover,
 .Drawer--staging .Drawer__listItem--selected {
-  background-color: var(--color-basic-purple);
   color: var(--color-basic-white);
+  background-color: var(--color-basic-purple);
 }
 
 /**
@@ -196,6 +196,6 @@
 
 .Drawer--development .Drawer__listItem:hover,
 .Drawer--development .Drawer__listItem--selected {
-  background-color: var(--color-basic-black);
   color: var(--color-basic-white);
+  background-color: var(--color-basic-black);
 }
