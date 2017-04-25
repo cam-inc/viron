@@ -35,8 +35,8 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 			Field("appear_area", gorma.String, func() {})
 			Field("school", gorma.String, func() {})
 			Field("homepage", gorma.String, func() {})
-			//Field("createdAt", gorma.Timestamp, func() {})
-			//Field("updatedAt", gorma.Timestamp, func() {})
+			Field("created_at", gorma.Timestamp, func() {})
+			Field("updated_at", gorma.Timestamp, func() {})
 		})
 
 		Model("AdminUser", func() {

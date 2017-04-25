@@ -52,6 +52,9 @@ func main() {
 	// Mount "stats/mau" controller
 	c10 := controller.NewStatsMauController(service)
 	app.MountStatsMauController(service, c10)
+	// Mount "root" controller
+	c11 := controller.NewRootController(service)
+	app.MountRootController(service, c11)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {

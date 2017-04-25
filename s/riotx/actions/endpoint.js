@@ -8,14 +8,34 @@ export default {
 
         // TODO: あとで store.js に変える
         const data = {
-          'http://localhost:3000/swagger.json': { name: 'Service A', tags: ['Local'] },
-          'http://localhost:3001/swagger.json': { name: 'Service A', tags: ['Development'] },
-          'http://localhost:3002/swagger.json': { name: 'Service A', tags: ['Staging'] },
-          'http://localhost:3003/swagger.json': { name: 'Service A', tags: ['Production'] },
-          'http://localhost:3004/swagger.json': { name: 'Service B', tags: ['Local'] },
-          'http://localhost:3005/swagger.json': { name: 'Service B', tags: ['Development'] },
-          'http://localhost:3006/swagger.json': { name: 'Service B', tags: ['Staging'] },
-          'http://localhost:3007/swagger.json': { name: 'Service B', tags: ['Production'] }
+          'http://localhost:3000/swagger.json': {
+            title: 'Service A', // @see /swagger.json/info/title
+            description: 'Service A - Manage Console', // @see swagger.json/info/description
+            version: '0.0.1', // @see /swagger.json/info/version
+            theme: 'dark',// @see /dmc#theme
+            tags: ['dmc', 'example', 'develop', 'A'], // @see /dmc#tags
+          },
+          'http://localhost:3001/swagger.json': {
+            title: 'Service A',
+            description: 'Service A - Manage Console',
+            version: '43.1.1',
+            theme: 'dark',
+            tags: ['dmc', 'example', 'develop', 'A'],
+          },
+          'http://localhost:3002/swagger.json': {
+            title: 'Service B',
+            description: 'Service B - Manage Console',
+            version: '1.3.1',
+            theme: 'light',
+            tags: ['dmc', 'example', 'staging', 'B'],
+          },
+          'http://localhost:3003/swagger.json': {
+            title: 'Service C',
+            description: 'Service C - Manage Console',
+            version: '2.0.1',
+            theme: 'dark',
+            tags: ['dmc', 'example', 'production', 'C'],
+          },
         };
         //const data = storage.get(constants.STORAGE_ENDPOINT, {});
 

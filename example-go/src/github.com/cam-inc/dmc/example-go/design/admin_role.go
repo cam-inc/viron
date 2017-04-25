@@ -18,17 +18,23 @@ var AdminRoleMediaType = MediaType("application/vnd.admin_role+json", func() {
 		Required("id", "role_id")
 	})
 
-	View("default", func() {
+	largeView := func() {
 		Attribute("id")
 		Attribute("role_id")
 		Attribute("method")
 		Attribute("resource")
-	})
+	}
 
-	View("tiny", func() {
+	View("default", largeView)
+	View("large", largeView)
+	View("medium", func() {
+		Attribute("id")
 		Attribute("role_id")
 		Attribute("method")
-		Attribute("resource")
+	})
+	View("small", func() {
+		Attribute("id")
+		Attribute("role_id")
 	})
 })
 
@@ -47,8 +53,10 @@ var _ = Resource("admin_role", func() {
 		Routing(GET(""))
 		Response(OK, func() {
 			Media(CollectionOf(AdminRoleMediaType, func() {
+				View("large")
+				View("medium")
+				View("small")
 				View("default")
-				View("tiny")
 			}))
 		})
 		Response(NotFound)

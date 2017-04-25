@@ -19,7 +19,7 @@ var AuditLogMediaType = MediaType("application/vnd.audit_log+json", func() {
 		Attribute("created_at", DateTime, "created time")
 	})
 
-	View("default", func() {
+	largeView := func() {
 		Attribute("request_method")
 		Attribute("request_uri")
 		Attribute("source_ip")
@@ -28,13 +28,20 @@ var AuditLogMediaType = MediaType("application/vnd.audit_log+json", func() {
 		Attribute("status")
 		Attribute("created_at")
 
-	})
+	}
 
-	View("tiny", func() {
+	View("default", largeView)
+	View("large", largeView)
+	View("medium", func() {
 		Attribute("request_method")
 		Attribute("request_uri")
 		Attribute("user_id")
 		Attribute("created_at")
+	})
+	View("small", func() {
+		Attribute("request_method")
+		Attribute("request_uri")
+		Attribute("user_id")
 	})
 })
 
@@ -54,7 +61,9 @@ var _ = Resource("audit_log", func() {
 		Response(OK, func() {
 			Media(CollectionOf(AuditLogMediaType, func() {
 				View("default")
-				View("tiny")
+				View("large")
+				View("medium")
+				View("small")
 			}))
 		})
 		Response(NotFound)
