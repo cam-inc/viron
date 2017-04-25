@@ -14,6 +14,16 @@ var OriginAllowAll = func() {
 	Methods("GET", "OPTIONS", "PUT", "POST", "DELETE") // Allow all origins to retrieve the Swagger JSON (CORS)
 }
 
+// Theme of enum
+var Theme = func() {
+	Example("Theme of Endpoint")
+	Default(bridge.ThemeLight)
+	Enum(
+		bridge.ThemeLight,
+		bridge.ThemeDark,
+	)
+}
+
 // Style of enum
 var Style = func() {
 	Example("Style of Web Component")
