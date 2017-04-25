@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
       endpoint: storage.get(constants.STORAGE_ENDPOINT),
       dmc: null,
       page: null,
+      component: {},
     },
     actions: actions,
     mutations: mutations,

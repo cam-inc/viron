@@ -1,3 +1,5 @@
+const CHANGE_COMPONENT_PREFIX = 'component_';
+
 export default {
   SECTION_DASHBOARD: 'dashboard',
   SECTION_MANAGE: 'manage',
@@ -68,4 +70,8 @@ export default {
   CHANGE_CURRENT: 'current',
 
   CHANGE_PAGE: 'page',
+
+  changeComponentName: name => {
+    return CHANGE_COMPONENT_PREFIX + name;
+  }
 };

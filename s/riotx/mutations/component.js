@@ -9,10 +9,8 @@ export default {
 
     let merge = swagger.mergePropertiesAndResponse(schema, response);
 
-    context.state.page = {
-      data: merge,
-    };
+    context.state.component[obj.component_uid] = merge;
 
-    return [constants.CHANGE_PAGE];
+    return [constants.changeComponentName(obj.component_uid)];
   },
 };

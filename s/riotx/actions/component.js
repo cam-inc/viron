@@ -29,18 +29,18 @@ export default {
           if (!res.ok) {
             throw new Error(`[fetch] ${res.url} error.`);
           }
-          debugger;
           console.log(`[fetch] ${res.url} success.`);
           resolve({
             response: res.obj,
             model: model,
+            component_uid: component_uid,
           });
         })
         .catch(err => {
           reject(err);
         });
     }).then(res => {
-      context.commit(constants.MUTATION_PAGE_GET, res);
+      context.commit(constants.MUTATION_COMPONENT_GET, res);
     });
   },
 
