@@ -1,8 +1,10 @@
 package design
 
 import (
+	_ "github.com/cam-inc/dmc/example-go/bridge"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
+	"github.com/cam-inc/dmc/example-go/bridge"
 )
 
 // UserMediaType of media type.
@@ -119,10 +121,18 @@ var _ = Resource("user", func() {
 var UserPayload = Type("UserPayload", func() {
 	Member("name", String)
 	Member("sex", String, func() {
-		Enum("male", "female")
+		Enum(
+			bridge.UserMale,
+			bridge.UserFemale,
+		)
 	})
 	Member("blood_type", String, func() {
-		Enum("A", "B", "O", "AB")
+		Enum(
+			bridge.UserBloodTypeA,
+			bridge.UserBloodTypeB,
+			bridge.UserBloodTypeO,
+			bridge.UserBloodTypeAB,
+		)
 	})
 	Member("birthday", DateTime)
 	Member("job", String)

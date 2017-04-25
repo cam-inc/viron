@@ -18,4 +18,11 @@ const (
 	SectionManage    = "manage"    // 管理セクション
 
 	JwtClaims = "claims" // JWT claims
+
+	UserMale        = "male"
+	UserFemale      = "female"
+	UserBloodTypeA  = "A"
+	UserBloodTypeB  = "B"
+	UserBloodTypeO  = "O"
+	UserBloodTypeAB = "AB"
 )
