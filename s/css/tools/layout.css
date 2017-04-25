@@ -1,5 +1,12 @@
 /* レイアウト */
 :root {
+  /* 左揃え & 上揃え */
+  --layout-start-start: {
+    display: flex;
+    align-item: flex-start;
+    justify-content: flex-start;
+  }
+
   /* 天地中央配置 */
   --layout-center-center: {
     display: flex;
@@ -12,6 +19,13 @@
     display: flex;
     align-items: stretch;
     justify-content: center;
+  }
+
+  /* 左右に吸着 & 上揃え */
+  --layout-between-start: {
+    display: flex;
+    align-item: flex-start;
+    justify-content: space-between;
   }
 
   /* 左右に吸着 & 天地中央*/

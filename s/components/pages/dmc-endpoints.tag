@@ -1,7 +1,7 @@
 dmc-endpoints.EndpointsPage
   .EndpointsPage__list
     virtual(each="{ item, url in endpoint }")
-      dmc-endpoint(host="{ url }" name="{ item.name }" onentry="{ handleEndpointEntry }" onedit="{ handleEndpointEdit }" onremove="{ handleEndpointRemove }")
+      dmc-endpoint(host="{ url }" title="{ item.title }" description="{ item.description }" tags="{ item.tags }" onentry="{ handleEndpointEntry }" onedit="{ handleEndpointEdit }" onremove="{ handleEndpointRemove }")
 
   script.
     import constants from '../../core/constants';

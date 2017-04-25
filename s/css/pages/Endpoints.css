@@ -1,5 +1,14 @@
-.EndpointsPage {}
+.EndpointsPage {
+  display: block;
+  padding: 32px;
+}
 
 .EndpointsPage__list {
+  @apply --layout-between-start;
+  flex-wrap: wrap;
+}
 
+.EndpointsPage__list .Endpoint {
+  width: 320px;
+  margin-bottom: 24px;
 }

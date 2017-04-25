@@ -1,20 +1,29 @@
-dmc-endpoint.Endpoint
-  | tetete
-  .Endpoint__name { opts.name }
-  .Endpoint__host { opts.host }
-  .Endpoint__description { opts.description }
-  div(click="{handleEntryButtonClick}")
-    | 入場
-  div(click="{handleEditButtonClick}")
-    | 編集
-  div(click="{handleRemoveButtonClick}")
-    | 削除
+dmc-endpoint.Endpoint(click="{handleClick}")
+  .Endpoint__head
+    .Endpoint__thumbnail
+    .Endpoint__menuButton(click="{handleMenuButtonClick}")
+      dmc-icon(type="ellipsis")
+  .Endpoint__body
+    .Endpoint__tags { (opts.tags || []).join(', ') }
+    .Endpoint__host { opts.host }
+    .Endpoint__title { opts.title }
+    .Endpoint__description { opts.description }
+
+    div(style="margin-top:24px")
+      div(click="{handleEditButtonClick}")
+        | 編集
+      div(click="{handleRemoveButtonClick}")
+        | 削除
 
   script.
     import '../atoms/dmc-icon.tag';
 
-    handleEntryButtonClick() {
+    handleClick() {
       this.opts.onentry(this.opts.url);
+    }
+
+    handleMenuButtonClick(e) {
+      e.preventDefault();
     }
 
     handleEditButtonClick() {
