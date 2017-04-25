@@ -1,10 +1,15 @@
-import swagger from '../../swagger';
-
 import constants from '../../core/constants';
 
+import swagger from '../../swagger';
+
 export default {
-  show: (context, path, method) => {
+  show: (context, component_uid, component_index) => {
     return new Promise((resolve, reject) => {
+      const component = context.state.page.data.components[component_index]; // TODO getters 化する
+
+      let path = component.api.path.value;
+      const method = component.api.method.value;
+
       if (path.indexOf('/') !== 0) {
         path = '/' + path;
       }
@@ -18,12 +23,13 @@ export default {
 
       const apis = swagger.apisArray();
       const api = apis[model.operationId];
+
       api()
         .then(res => {
           if (!res.ok) {
             throw new Error(`[fetch] ${res.url} error.`);
           }
-
+          debugger;
           console.log(`[fetch] ${res.url} success.`);
           resolve({
             response: res.obj,
@@ -37,4 +43,6 @@ export default {
       context.commit(constants.MUTATION_PAGE_GET, res);
     });
   },
-};
+
+
+}

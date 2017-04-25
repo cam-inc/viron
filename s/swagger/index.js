@@ -1,5 +1,7 @@
 import { forOwn } from 'mout/object';
 
+import constants from '../core/constants';
+
 /**
  * Swaggerファイルをロードして解析しデータ/操作を一元管理
  *
@@ -11,21 +13,6 @@ class Swagger {
   constructor() {
     this._endpoint = null;
     this.client = null;
-  }
-
-  apisArray() {
-    if (!this.client) {
-      return [];
-    }
-    let apis = {};
-    forOwn(this.client.apis, (v) => {
-      forOwn(v, (v1, k1) => {
-        apis[k1] = v1;
-      });
-    });
-
-    return apis;
-
   }
 
   setup(url) {
@@ -61,6 +48,33 @@ class Swagger {
         return reject(err);
       });
     });
+  }
+
+  apisArray() {
+    if (!this.client) {
+      return [];
+    }
+    let apis = {};
+    forOwn(this.client.apis, (v) => {
+      forOwn(v, (v1, k1) => {
+        apis[k1] = v1;
+      });
+    });
+
+    return apis;
+
+  }
+
+  isComponentStyleNumber(obj) {
+    return obj.value == constants.STYLE_NUMBER;
+  }
+  isComponentStyleTable(obj) {
+    return obj.value == constants.STYLE_TABLE;
+  }
+
+  getStringValue(obj) {
+    // TODO チェック入れる
+    return obj.value;
   }
 }
 

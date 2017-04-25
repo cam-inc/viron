@@ -14,17 +14,6 @@ var OriginAllowAll = func() {
 	Methods("GET", "OPTIONS", "PUT", "POST", "DELETE") // Allow all origins to retrieve the Swagger JSON (CORS)
 }
 
-// Layout of enum
-// 表示レイアウト
-var Layout = func() {
-	Example("Layout of display")
-	Default(bridge.LayoutTable)
-	Enum(
-		bridge.LayoutTable,
-		bridge.LayoutCard,
-	)
-}
-
 // Style of enum
 var Style = func() {
 	Example("Style of Web Component")
@@ -132,11 +121,7 @@ var PageType = Type("page", func() {
 	Attribute("name", String, "Title of page")
 	Attribute("section", PageSection)
 	Attribute("group", PageGroup)
-	Attribute("primary", String, "recode primary key")      // TODO 主キー
-	Attribute("layout", Layout)                             // ページの表示スタイル
-	Attribute("drawer", Boolean, "Displayed in the drawer") // Drowerに表示するか
-	//Attribute("search", ArrayOf(SearchType), "Search of page") // 検索があるか
-	Required("api", "name", "section", "group", "primary", "layout", "drawer")
+	Required("api", "name", "section", "group")
 })
 
 // PaginationType of type

@@ -26,6 +26,7 @@ let mergePropertiesAndResponse = (properties, response, key) => {
   //
   res.key = key;
   res.definition = properties;
+  // TODO definition チェッカー
   res.value = response;
 
   return res;
@@ -42,7 +43,6 @@ export default {
 
     context.state.page = {
       data: merge,
-      layout: obj.layout,
     };
 
     return [constants.CHANGE_PAGE];

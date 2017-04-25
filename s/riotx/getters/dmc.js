@@ -19,7 +19,7 @@ export default {
       if (v.section !== constants.SECTION_DASHBOARD) {
         return false;
       }
-      return v.drawer;
+      return true;
 
     }));
   },
@@ -31,7 +31,7 @@ export default {
       if (v.section !== constants.SECTION_MANAGE) {
         return false;
       }
-      return v.drawer;
+      return true;
 
     }));
   }

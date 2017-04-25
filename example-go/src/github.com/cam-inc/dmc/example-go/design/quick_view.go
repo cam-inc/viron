@@ -11,13 +11,13 @@ var QuickViewMediaType = MediaType("application/vnd.quickview+json", func() {
 
 	Attributes(func() {
 		Attribute("name", String, "Name of QickView")
-		Attribute("componets", ArrayOf(ComponentType), "A Componets format")
-		Required("name", "componets")
+		Attribute("components", ArrayOf(ComponentType), "A components format")
+		Required("name", "components")
 	})
 
 	View("default", func() {
 		Attribute("name")
-		Attribute("componets")
+		Attribute("components")
 	})
 })
 

@@ -6,6 +6,11 @@ export default {
   STORAGE_CURRENT: 'current',
   STORAGE_ENDPOINT: 'endpoint',
 
+  // Component#Style
+  STYLE_NUMBER: 'number',
+  STYLE_TABLE: 'table',
+
+
   // riotx#actions
   ACTION_DMC_GET: 'dmc_get',
   ACTION_DMC_REMOVE: 'dmc_remove',
@@ -19,6 +24,8 @@ export default {
 
   ACTION_PAGE_GET: 'page_get',
 
+  ACTION_COMPONENT_GET: 'component_get',
+
   // riotx#mutations
   MUTATION_DMC: 'dmc',
   MUTATION_DMC_REMOVE: 'dmc_remove',
@@ -31,6 +38,8 @@ export default {
   MUTATION_CURRENT_REMOVE: 'current_remove',
 
   MUTATION_PAGE_GET: 'page_get',
+
+  MUTATION_COMPONENT_GET: 'component_get',
 
   // riotx#getters
   GETTER_DMC: 'dmc',

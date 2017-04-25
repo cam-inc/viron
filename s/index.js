@@ -16,16 +16,22 @@ import router from './core/router';
 // sample
 // TODO: ただのサンプル。不要になったタイミングで消すこと。
 import samplerouter from './samplerouter/router';
+
 // atoms
 import './components/atoms/dmc-text.tag';
+
 // organisms
 import './components/organisms/dmc-header.tag';
 import './components/organisms/dmc-drawer.tag';
+import './components/organisms/dmc-component.tag';
+import './components/organisms/dmc-component-number.tag';
+import './components/organisms/dmc-component-table.tag';
+
 // pages
 import './components/pages/dmc-empty.tag';
 import './components/pages/dmc-endpoints.tag';
 import './components/pages/dmc-page.tag';
-import './components/pages/dmc-card.tag';
+import './components/pages/dmc-components.tag';
 
 // root
 import './components/dmc.tag';
@@ -40,14 +46,13 @@ let setupRouter = () => {
         // riot.mount('dmc-page', 'samplepageB');
       }).on('/samplepageC/:paramA/:paramB', (params, queries) => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
-      }).on('/:path/:method/:layout', (params) => {
+      }).on('/:path/:method', (params) => {
         // encode/decode path string
         const _path = window.decodeURIComponent(params.path);
         const _method = window.decodeURIComponent(params.method);
-        const _layout = window.decodeURIComponent(params.layout);
         // Load page
         const store = riotx.get();
-        store.action(constants.ACTION_PAGE_GET, _path, _method, _layout);
+        store.action(constants.ACTION_PAGE_GET, _path, _method);
 
       }).on('/', () => {
         const targetTagString = 'dmc-empty';
