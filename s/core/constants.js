@@ -30,6 +30,9 @@ export default {
 
   ACTION_COMPONENT_GET: 'component_get',
 
+  ACTION_TOAST_SHOW: 'toast_show',
+  ACTION_TOAST_HIDE: 'toast_hide',
+
   // riotx#mutations
   MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
 
@@ -47,6 +50,9 @@ export default {
 
   MUTATION_COMPONENT_GET: 'component_get',
 
+  MUTATION_TOAST_ADD: 'toast_add',
+  MUTATION_TOAST_REMOVE: 'toast_remove',
+
   // riotx#getters
   GETTER_DRAWER_OPENED: 'drawer_opened',
 
@@ -59,6 +65,8 @@ export default {
   GETTER_CURRENT: 'current',
 
   GETTER_PAGE_GET: 'page_get',
+
+  GETTER_TOAST_LIST: 'toast_list',
 
   // riotx#mutated
   CHANGE_DRAWER: 'drawer',
@@ -73,5 +81,7 @@ export default {
 
   changeComponentName: name => {
     return CHANGE_COMPONENT_PREFIX + name;
-  }
+  },
+
+  CHANGE_TOAST: 'toast'
 };

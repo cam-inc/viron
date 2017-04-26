@@ -4,6 +4,7 @@ import drawer from './drawer';
 import dmc from './dmc';
 import current from './current';
 import page from './page';
+import toast from './toast';
 
 export default {
   [constants.GETTER_DRAWER_OPENED]: drawer.opened,
@@ -18,4 +19,5 @@ export default {
 
   [constants.GETTER_PAGE_GET]: page.show,
 
+  [constants.GETTER_TOAST_LIST]: toast.list
 };
