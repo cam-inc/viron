@@ -55,6 +55,9 @@ func main() {
 	// Mount "root" controller
 	c11 := controller.NewRootController(service)
 	app.MountRootController(service, c11)
+	// Mount "authType" controller
+	c12 := controller.NewAuthTypeController(service)
+	app.MountAuthTypeController(service, c12)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {
