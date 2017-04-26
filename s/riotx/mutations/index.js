@@ -6,6 +6,7 @@ import endpoint from './endpoint';
 import dmc from './dmc';
 import page from './page';
 import component from './component';
+import modal from './modal';
 
 export default {
   [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
@@ -24,4 +25,7 @@ export default {
   [constants.MUTATION_PAGE_GET]: page.show,
 
   [constants.MUTATION_COMPONENT_GET]: component.show,
+
+  [constants.MUTATION_MODAL_ADD]: modal.add,
+  [constants.MUTATION_MODAL_REMOVE]: modal.remove
 };

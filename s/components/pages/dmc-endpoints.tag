@@ -18,7 +18,9 @@ dmc-endpoints.EndpointsPage
     })
 
     handleEndpointAdd() {
-      alert('作成 -> ログイン -> endpoint一覧に追加する');
+      store.action(constants.ACTION_MODAL_SHOW, {
+        foo: 100
+      });
     }
 
     handleEndpointEntry(url) {

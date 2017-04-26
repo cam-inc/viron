@@ -6,6 +6,7 @@ import endpoint from './endpoint';
 import dmc from './dmc';
 import page from './page';
 import component from './component';
+import modal from './modal';
 
 export default {
   [constants.ACTION_DRAWER_TOGGLE]: drawer.toggle,
@@ -24,5 +25,8 @@ export default {
   [constants.ACTION_PAGE_GET]: page.show,
 
   [constants.ACTION_COMPONENT_GET]: component.show,
+
+  [constants.ACTION_MODAL_SHOW]: modal.show,
+  [constants.ACTION_MODAL_HIDE]: modal.hide
 
 };

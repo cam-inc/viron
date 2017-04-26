@@ -88,6 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
       dmc: null,
       page: null,
       component: {},
+      modal: {
+        list: []
+      }
     },
     actions: actions,
     mutations: mutations,

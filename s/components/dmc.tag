@@ -13,9 +13,11 @@ dmc.Application
         dmc-samplerouter
         main
           dmc-page
+  dmc-modals
 
   script.
     import constants from '../core/constants';
+    import './organisms/dmc-modals.tag';
     import '../samplerouter/dmc-samplerouter.tag';
 
     let store = this.riotx.get();
