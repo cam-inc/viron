@@ -1,5 +1,4 @@
 import { reject } from 'mout/array';
-import ObjectAssign from 'object-assign';
 import constants from '../../core/constants';
 
 let counter = 0;
@@ -9,10 +8,13 @@ const generateID = () => {
 };
 
 export default {
-  add: (context, obj) => {
-    context.state.modal.list.push(ObjectAssign({}, obj, {
-      id: generateID()
-    }));
+  add: (context, tagName, tagOpts = {}, modalOpts = {}) => {
+    context.state.modal.list.push({
+      id : generateID(),
+      tagName,
+      tagOpts,
+      modalOpts
+    });
     return [constants.CHANGE_MODAL];
   },
 

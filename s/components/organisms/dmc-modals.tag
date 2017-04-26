@@ -1,6 +1,6 @@
 dmc-modals.Modals
   virtual(each="{ modals }")
-    dmc-modal(id="{ id }")
+    dmc-modal(id="{ id }" tagname="{ tagName }" tagopts="{ tagOpts }" theme="{ modalOpts.theme }")
 
   script.
     import constants from '../../core/constants';

@@ -1,11 +1,13 @@
 .Modal {
   @apply --layout-center-center;
+  pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
   transition-duration: 300ms;
   transition-property: background-color;
 }
 
 .Modal--visible {
+  pointer-events: auto;
   background-color: rgba(0, 0, 0, 0.5);
 }
 

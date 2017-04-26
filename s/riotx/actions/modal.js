@@ -1,11 +1,11 @@
 import constants from '../../core/constants';
 
 export default {
-  show: (context, obj) => {
+  show: (context, tagName, tagOpts, modalOpts) => {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_MODAL_ADD, obj);
+        context.commit(constants.MUTATION_MODAL_ADD, tagName, tagOpts, modalOpts);
       });
   },
 

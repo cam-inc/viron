@@ -8,6 +8,7 @@ dmc-endpoints.EndpointsPage
   script.
     import constants from '../../core/constants';
     import '../organisms/dmc-endpoint.tag';
+    import '../organisms/dmc-login.tag';
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
@@ -18,8 +19,12 @@ dmc-endpoints.EndpointsPage
     })
 
     handleEndpointAdd() {
-      store.action(constants.ACTION_MODAL_SHOW, {
-        foo: 100
+      store.action(constants.ACTION_MODAL_SHOW, 'dmc-login', {
+        onLogin: () => {
+          alert('login success');
+        }
+      }, {
+        theme : 'normal'
       });
     }
 
