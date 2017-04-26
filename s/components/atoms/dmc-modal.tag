@@ -13,10 +13,11 @@ dmc-modal(class="Modal" click="{ handleClick }")
 
     this.on('mount', () => {
       this.show();
+      window.addEventListener('keydown', this.handleKeyDown);
     });
 
     this.on('unmount', () => {
-      // TODO
+      window.removeEventListener('keydown', this.handleKeyDown);
     });
 
     show() {
@@ -43,4 +44,14 @@ dmc-modal(class="Modal" click="{ handleClick }")
 
     handleCloseButtonClick() {
       this.hide();
+    }
+
+    handleKeyDown(e) {
+      switch (e.keyCode) {
+        case 27: `Esc`
+          this.hide();
+          break;
+        default:
+          break;
+      }
     }
