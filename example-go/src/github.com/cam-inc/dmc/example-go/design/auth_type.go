@@ -10,12 +10,19 @@ var AuthTypeMediaType = MediaType("application/vnd.auth_type+json", func() {
 	Description("A Auth Type")
 
 	Attributes(func() {
-		Attribute("auth_types", ArrayOf(String), "list of auth_type")
-		Required("auth_types")
+		Attribute("type", String, "auth type")
+		Attribute("url", String, "request url")
+		Attribute("method", String, "request method")
+		Attribute("provider", String, "auth provider")
+
+		Required("type", "url", "method", "provider")
 	})
 
 	View("default", func() {
-		Attribute("auth_types")
+		Attribute("type")
+		Attribute("url")
+		Attribute("method")
+		Attribute("provider")
 	})
 })
 
@@ -23,8 +30,12 @@ var _ = Resource("auth_type", func() {
 	Origin(OriginURL, OriginAllowAll)
 
 	Action("list", func() {
-		Routing(GET("/authtypes"))
+		Routing(GET("/dmc_auth"))
 		Description("get auth types")
-		Response(OK, func() { Media(AuthTypeMediaType) })
+		Response(OK, func() {
+			Media(CollectionOf(AuthTypeMediaType, func() {
+				View("default")
+			}))
+		})
 	})
 })

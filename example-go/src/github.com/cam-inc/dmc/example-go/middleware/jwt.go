@@ -1,17 +1,17 @@
 package middleware
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
-
-	"context"
-
 	"strings"
 
-	"github.com/cam-inc/dmc/example-go/bridge"
+	"golang.org/x/oauth2"
 
+	"github.com/cam-inc/dmc/example-go/bridge"
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
+	"github.com/cam-inc/dmc/example-go/service"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
@@ -36,9 +36,18 @@ func validation() goa.Middleware {
 				logger.Error("invalid JWT.iss requested", zap.String("iss", claims["iss"].(string)))
 				return errValidationFailed("JWT invalid")
 			}
-			if claims["aud"] != "dmc.local" {
+			if claims["aud"] != "dmc.1" {
 				logger.Error("invalid JWT.aud requested", zap.String("aud", claims["aud"].(string)))
 				return errValidationFailed("JWT invalid")
+			}
+			if claims["googleOAuthToken"] != nil {
+				// Google認証の場合はOauthTokenが有効かをチェックする
+				var oauthToken oauth2.Token
+				json.Unmarshal([]byte(claims["googleOAuthToken"].(string)), &oauthToken)
+				if _, err := service.GetGoogleOAuthUser(ctx, &oauthToken); err != nil {
+					logger.Error("invalid google oauth token")
+					return errValidationFailed("oauth token invalid")
+				}
 			}
 
 			// 権限チェック
@@ -47,7 +56,7 @@ func validation() goa.Middleware {
 
 			reqMethod := strings.ToLower(req.Method)
 			resource := strings.Split(req.RequestURI, "/")[1]
-			if common.InStringArray("*", roles[reqMethod]) < 0 || common.InStringArray(resource, roles[reqMethod]) < 0 {
+			if common.InStringArray("*", roles[reqMethod]) < 0 && common.InStringArray(resource, roles[reqMethod]) < 0 {
 				// 権限がないリクエスト
 				return errForbidden("permission denied")
 			}

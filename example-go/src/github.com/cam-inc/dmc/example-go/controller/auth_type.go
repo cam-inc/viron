@@ -20,10 +20,23 @@ func (c *AuthTypeController) List(ctx *app.ListAuthTypeContext) error {
 	// AuthTypeController_List: start_implement
 
 	// Put your logic here
-	res := &app.AuthType{
-		AuthTypes: []string{
-			"google",
-			"idpassword",
+	res := []*app.AuthType{
+		{
+			Type:     "email",
+			Provider: "example-go",
+			URL:      "/signin",
+			Method:   "POST",
+		},
+		{
+			Type:     "oauth",
+			Provider: "google",
+			URL:      "/googlesignin",
+			Method:   "POST",
+		},
+		{
+			Type:   "signout",
+			URL:    "/signout",
+			Method: "POST",
 		},
 	}
 

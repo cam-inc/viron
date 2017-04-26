@@ -16,6 +16,8 @@ services:
       - 4001:4001
     environment:
       - SERVICE_ENV=docker-local
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
     volumes:
       - $PWD/dist/Linux:/go/dist/Linux
       - $PWD/src:/go/src
