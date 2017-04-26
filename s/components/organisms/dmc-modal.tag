@@ -10,11 +10,15 @@ dmc-modal(class="Modal Modal--{ opts.theme }" click="{ handleClick }")
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
+    // `tag` = a tag instance that will be shown inside this modal.
     let tag;
 
     this.on('mount', () => {
+      // mount a tag to the reserved area(i.e. this.refs.content) and store returned tag instance.
       tag = riot.mount(this.refs.content, this.opts.tagname, ObjectAssign({
+        // boolean to tell the inner tag instance that it is wrapped in this modal.
         isModal: true,
+        // function to close this modal. this is the only way for the inner tag instance to close this modal.
         modalCloser: this.hide
       }, this.opts.tagopts))[0];
       this.show();
@@ -22,6 +26,7 @@ dmc-modal(class="Modal Modal--{ opts.theme }" click="{ handleClick }")
     });
 
     this.on('before-unmount', () => {
+      // unmount the inner tag instance manually so `unmount flow` will be processed exactly with correct order.
       tag.unmount(true);
     });
 
