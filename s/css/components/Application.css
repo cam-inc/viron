@@ -19,6 +19,7 @@
 }
 
 .Application__asideColumn {
+  flex-shrink: 0;
   width: 0;
   overflow-x: hidden;
   overflow-y: scroll;

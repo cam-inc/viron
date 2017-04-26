@@ -22,14 +22,16 @@ dmc-toast(class="Toast Toast--{ opts.type }" click="{ handleClick }")
     });
 
     show() {
+      // need to set delay after dom mountation.
       setTimeout(() => {
         this.root.classList.add('Toast--visible');
-      }, 0);
+      }, 100);
     }
 
     hide() {
       this.root.classList.remove('Toast--visible');
 
+      // call action after the hide animation completes.
       setTimeout(() => {
         store.action(constants.ACTION_TOAST_HIDE, this.opts.id)
       }, 1000);

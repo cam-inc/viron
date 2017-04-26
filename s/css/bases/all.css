@@ -13,5 +13,5 @@ body {
   font-size: 10px;
   line-height: 1;
   color: var(--color-text-default);
-  background-color: var(--color-basic-darkPurple);
+  background-color: var(--color-basic-black);
 }
