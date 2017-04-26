@@ -4,7 +4,7 @@ dmc-modals.Modals
 
   script.
     import constants from '../../core/constants';
-    import '../atoms/dmc-modal.tag';
+    import '../organisms/dmc-modal.tag';
 
     const store = this.riotx.get();
 

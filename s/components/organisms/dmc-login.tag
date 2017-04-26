@@ -1,6 +1,5 @@
 dmc-login
   div ログイン
-  div modalID is { opts.modalID }
   div userID is { userID }
   div password is { password }
   div(click="{ handleLoginButtonClick }") [login]
