@@ -10,13 +10,12 @@ dmc-endpoint.Endpoint(click="{handleClick}")
     .Endpoint__description { opts.description }
 
     div(style="margin-top:24px")
-      div(click="{handleEditButtonClick}")
-        | 編集
-      div(click="{handleRemoveButtonClick}")
-        | 削除
+      dmc-button(click="{ handleEditButtonClick }") 編集
+      dmc-button(click="{ handleRemoveButtonClick }") 削除
 
   script.
     import '../atoms/dmc-icon.tag';
+    import '../atoms/dmc-button.tag';
 
     handleClick() {
       this.opts.onentry(this.opts.url);

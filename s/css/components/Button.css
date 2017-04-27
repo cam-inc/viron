@@ -1,2 +1,15 @@
 .Button {
+  display: inline-block;
+  background-color: var(--color-basic-skyblue);
+  border-radius: 6px;
+  color: var(--color-basic-white);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 16px;
+  text-align: center;
+}
+
+.Button:hover {
+  /* TODO: デザイン完成後に正しい色に変更すること */
+  background-color: var(--color-basic-lightPurple);
 }
