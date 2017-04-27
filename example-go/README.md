@@ -11,10 +11,16 @@
 ## 起動 on Docker
 
 ```
-$ make dressup
+$ GOOGLE_OAUTH_CLIENT_ID={ClientID} GOOGLE_OAUTH_CLIENT_SECRET={ClientSecret} make dressup
 ```
 
 > 初回のみ 10min ぐらいかかります
+
+> ClientID, ClientSecretはわかる人に聞いてください
+
+> .bashrc等でexportしておいてもOKです
+
+> IDEを使用する場合は別途IDEの実行/デバッグ時の設定が必要です
 
 ### ブラウザアクセス
 

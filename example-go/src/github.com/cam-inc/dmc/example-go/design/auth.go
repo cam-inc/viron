@@ -49,6 +49,7 @@ var _ = Resource("auth", func() {
 		})
 		Response(Unauthorized)
 		Response(NotFound)
+		Response(TemporaryRedirect)
 	})
 
 	Action("signout", func() {
@@ -56,4 +57,32 @@ var _ = Resource("auth", func() {
 		Routing(POST("/signout"))
 		Response(NoContent)
 	})
+
+	// Google認証
+	Action("googlesignin", func() {
+		Description("signin with google")
+		Routing(POST("/googlesignin"))
+		Response(MovedPermanently, func() {
+			Headers(func() {
+				Header("Location", String, "redirect url")
+				Header("Content-Type", String, "content type")
+			})
+		})
+	})
+
+	Action("googleoauth2callback", func() {
+		Description("callback function from google oauth2")
+		Routing(GET("/googleoauth2callback"))
+		Params(func() {
+			Param("code", String, "authorization code")
+			Param("state", String, "check state for CSRF")
+		})
+		Response(NoContent, func() {
+			Headers(func() {
+				Header("Authorization", String, "Generated JWT")
+			})
+		})
+		Response(TemporaryRedirect)
+	})
+
 })
