@@ -18,7 +18,12 @@ dmc-endpoints.EndpointsPage
     })
 
     handleEndpointAdd() {
-      alert('作成 -> ログイン -> endpoint一覧に追加する');
+      Promise
+        .resolve()
+        .then(() => store.action(constants.ACTION_TOAST_SHOW, {
+          type: 'error',
+          message: 'message here'
+        }));
     }
 
     handleEndpointEntry(url) {

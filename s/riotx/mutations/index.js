@@ -6,6 +6,7 @@ import endpoint from './endpoint';
 import dmc from './dmc';
 import page from './page';
 import component from './component';
+import toast from './toast';
 
 export default {
   [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
@@ -24,4 +25,7 @@ export default {
   [constants.MUTATION_PAGE_GET]: page.show,
 
   [constants.MUTATION_COMPONENT_GET]: component.show,
+
+  [constants.MUTATION_TOAST_ADD]: toast.add,
+  [constants.MUTATION_TOAST_REMOVE]: toast.remove
 };
