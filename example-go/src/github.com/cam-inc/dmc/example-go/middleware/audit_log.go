@@ -3,6 +3,11 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+
+	"net"
+	"strings"
+
 	"github.com/cam-inc/dmc/example-go/bridge"
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
@@ -10,8 +15,27 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"go.uber.org/zap"
-	"net/http"
+	"golang.org/x/blog/content/context/userip"
 )
+
+func getIpAddress(req *http.Request) string {
+	for _, h := range []string{"x-forwarded-for", "x-real-ip"} {
+		addresses := strings.Split(req.Header.Get(h), ",")
+		for i := len(addresses) - 1; i >= 0; i-- {
+			ip := strings.TrimSpace(addresses[i])
+			realIP := net.ParseIP(ip)
+			if !realIP.IsGlobalUnicast() {
+				continue
+			}
+			return ip
+		}
+	}
+	if ip, err := userip.FromRequest(req); err != nil {
+		return req.RemoteAddr
+	} else {
+		return ip.String()
+	}
+}
 
 // AuditLog writes a audit log
 func AuditLog() goa.Middleware {
@@ -46,7 +70,7 @@ func AuditLog() goa.Middleware {
 				m.UserID = userID
 				m.RequestURI = req.RequestURI
 				m.ReuquestMethod = req.Method
-				m.SourceIP = req.RemoteAddr
+				m.SourceIP = getIpAddress(req)
 				m.RequestBody = requestBody
 				m.StatusCode = res.Status
 

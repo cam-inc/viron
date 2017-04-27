@@ -40,6 +40,8 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 		})
 
 		Model("AdminUser", func() {
+			// Aliasを指定するとテーブル名を明示的に決定できる
+			//Alias("admin_user")
 			Description("This is the admin-user model")
 
 			BuildsFrom(func() {
