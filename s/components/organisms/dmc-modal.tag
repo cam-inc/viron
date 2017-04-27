@@ -19,9 +19,9 @@ dmc-modal(class="Modal Modal--{ opts.theme }" click="{ handleClick }")
         // boolean to tell the inner tag instance that it is wrapped in this modal.
         isModal: true,
         // function to close this modal. this is the only way for the inner tag instance to close this modal.
-        modalCloser: this.hide
+        modalCloser: this.fadeOut
       }, this.opts.tagopts))[0];
-      this.show();
+      this.fadeIn();
       window.addEventListener('keydown', this.handleKeyDown);
     });
 
@@ -34,13 +34,16 @@ dmc-modal(class="Modal Modal--{ opts.theme }" click="{ handleClick }")
       window.removeEventListener('keydown', this.handleKeyDown);
     });
 
-    show() {
+    // fade in with animation.
+    fadeIn() {
       setTimeout(() => {
         this.root.classList.add('Modal--visible');
       }, 100);
     }
 
-    hide() {
+    // fade out with animation.
+    // once completed, automatically remove this modal.
+    fadeOut() {
       this.root.classList.remove('Modal--visible');
 
       setTimeout(() => {
@@ -49,7 +52,7 @@ dmc-modal(class="Modal Modal--{ opts.theme }" click="{ handleClick }")
     }
 
     handleClick() {
-      this.hide();
+      this.fadeOut();
     }
 
     handleFrameClick(e) {
@@ -57,13 +60,13 @@ dmc-modal(class="Modal Modal--{ opts.theme }" click="{ handleClick }")
     }
 
     handleCloseButtonClick() {
-      this.hide();
+      this.fadeOut();
     }
 
     handleKeyDown(e) {
       switch (e.keyCode) {
         case 27: `Esc`
-          this.hide();
+          this.fadeOut();
           break;
         default:
           break;
