@@ -12,7 +12,7 @@ export default {
             title: 'Service A', // @see /swagger.json/info/title
             description: 'Service A - Manage Console', // @see swagger.json/info/description
             version: '0.0.1', // @see /swagger.json/info/version
-            theme: 'dark',// @see /dmc#theme
+            color: 'red',// @see /dmc#color
             thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
             tags: ['dmc', 'example', 'develop', 'A'], // @see /dmc#tags
           },
@@ -20,7 +20,7 @@ export default {
             title: 'Service A',
             description: 'Service A - Manage Console',
             version: '43.1.1',
-            theme: 'dark',
+            color: 'red',
             thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
             tags: ['dmc', 'example', 'develop', 'A'],
           },
@@ -28,7 +28,7 @@ export default {
             title: 'Service B',
             description: 'Service B - Manage Console',
             version: '1.3.1',
-            theme: 'light',
+            color: 'blue',
             thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
             tags: ['dmc', 'example', 'staging', 'B'],
           },
@@ -36,7 +36,7 @@ export default {
             title: 'Service C',
             description: 'Service C - Manage Console',
             version: '2.0.1',
-            theme: 'dark',
+            color: 'green',
             thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
             tags: ['dmc', 'example', 'production', 'C'],
           },
