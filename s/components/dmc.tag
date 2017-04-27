@@ -5,6 +5,7 @@ dmc.Application
     .Application__mainColumn
       .Application__head
         dmc-header
+        dmc-toasts
       .Application__page
         i am main column
         h2 Debug
@@ -17,6 +18,7 @@ dmc.Application
 
   script.
     import constants from '../core/constants';
+    import './organisms/dmc-toasts.tag';
     import './organisms/dmc-modals.tag';
     import '../samplerouter/dmc-samplerouter.tag';
 

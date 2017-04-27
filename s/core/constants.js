@@ -30,6 +30,9 @@ export default {
 
   ACTION_COMPONENT_GET: 'component_get',
 
+  ACTION_TOAST_SHOW: 'toast_show',
+  ACTION_TOAST_HIDE: 'toast_hide',
+
   ACTION_MODAL_SHOW: 'modal_show',
   ACTION_MODAL_HIDE: 'modal_hide',
 
@@ -50,6 +53,9 @@ export default {
 
   MUTATION_COMPONENT_GET: 'component_get',
 
+  MUTATION_TOAST_ADD: 'toast_add',
+  MUTATION_TOAST_REMOVE: 'toast_remove',
+
   MUTATION_MODAL_ADD: 'modal_add',
   MUTATION_MODAL_REMOVE: 'modal_remove',
 
@@ -65,6 +71,8 @@ export default {
   GETTER_CURRENT: 'current',
 
   GETTER_PAGE_GET: 'page_get',
+
+  GETTER_TOAST_LIST: 'toast_list',
 
   GETTER_MODAL_LIST: 'modal_list',
 
@@ -82,6 +90,8 @@ export default {
   changeComponentName: name => {
     return CHANGE_COMPONENT_PREFIX + name;
   },
+
+  CHANGE_TOAST: 'toast',
 
   CHANGE_MODAL: 'modal'
 };

@@ -6,6 +6,7 @@ import endpoint from './endpoint';
 import dmc from './dmc';
 import page from './page';
 import component from './component';
+import toast from './toast';
 import modal from './modal';
 
 export default {
@@ -25,6 +26,9 @@ export default {
   [constants.ACTION_PAGE_GET]: page.show,
 
   [constants.ACTION_COMPONENT_GET]: component.show,
+
+  [constants.ACTION_TOAST_SHOW]: toast.show,
+  [constants.ACTION_TOAST_HIDE]: toast.hide,
 
   [constants.ACTION_MODAL_SHOW]: modal.show,
   [constants.ACTION_MODAL_HIDE]: modal.hide

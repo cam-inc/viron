@@ -88,6 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
       dmc: null,
       page: null,
       component: {},
+      toast: {
+        list: []
+      },
       modal: {
         list: []
       }
