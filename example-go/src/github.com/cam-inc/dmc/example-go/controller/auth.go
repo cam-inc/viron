@@ -1,23 +1,24 @@
 package controller
 
 import (
+	"context"
 	"crypto/rsa"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
-
-	jwtgo "github.com/dgrijalva/jwt-go"
-	uuid "github.com/satori/go.uuid"
 
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	"github.com/cam-inc/dmc/example-go/models"
+	"github.com/cam-inc/dmc/example-go/service"
+	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/jinzhu/gorm"
-
-	"encoding/json"
+	uuid "github.com/satori/go.uuid"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/scrypt"
-	"strings"
 )
 
 // AuthController implements the auth resource.
@@ -26,41 +27,9 @@ type AuthController struct {
 	privateKey *rsa.PrivateKey
 }
 
-// NewAuthController creates a auth controller.
-func NewAuthController(service *goa.Service) *AuthController {
-	b := common.GetPrivateKey()
-	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM([]byte(b))
-	if err != nil {
-		panic(err)
-	}
-	return &AuthController{
-		Controller: service.NewController("AuthController"),
-		privateKey: privateKey,
-	}
-}
-
-// Signin runs the signin action.
-func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
-	// AuthController_Signin: start_implement
-
-	// Put your logic here
-	// Authorize
-	adminUserTable := models.NewAdminUserDB(common.DB)
-	adminUserModel, err := adminUserTable.GetByLoginID(ctx.Context, *ctx.Payload.LoginID)
-	if err == gorm.ErrRecordNotFound {
-		return ctx.NotFound()
-	} else if err != nil {
-		panic(err)
-	}
-
-	hash, err := scrypt.Key([]byte(*ctx.Payload.Password), []byte(adminUserModel.Salt), 16384, 8, 1, 64)
-	if adminUserModel.Password != base64.StdEncoding.EncodeToString(hash) {
-		return ctx.Unauthorized()
-	}
-
-	// Get Role
+func getRoles(ctx context.Context, roleID string) ([]byte, error) {
 	roles := map[string][]string{}
-	if adminUserModel.RoleID == "super" {
+	if roleID == "super" {
 		// super権限の場合は全許可
 		roles["get"] = []string{"*"}
 		roles["post"] = []string{"*"}
@@ -69,9 +38,9 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 		roles["patch"] = []string{"*"}
 	} else {
 		adminRoleTable := models.NewAdminRoleDB(common.DB)
-		adminRoleModels, err := adminRoleTable.ListByRoleID(ctx.Context, adminUserModel.RoleID)
+		adminRoleModels, err := adminRoleTable.ListByRoleID(ctx, roleID)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		for _, m := range adminRoleModels {
@@ -98,35 +67,84 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 			}
 		}
 	}
-	rolesStr, err := json.Marshal(roles)
-	if err != nil {
-		panic(err)
-	}
+	return json.Marshal(roles)
+}
 
-	// Generate JWT
+func generateJwt(customClaims map[string]interface{}, privateKey *rsa.PrivateKey) (string, error) {
 	token := jwtgo.New(jwtgo.SigningMethodRS512)
 	in1day := time.Now().Add(time.Duration(24) * time.Hour).Unix()
-	token.Claims = jwtgo.MapClaims{
+	claims := jwtgo.MapClaims{
 		"iss":    "DMC",                 // Token発行者
-		"aud":    "dmc.local",           // このTokenを利用する対象の識別子
+		"aud":    "dmc.1",               // このTokenを利用する対象の識別子
 		"exp":    in1day,                // Tokenの有効期限
 		"jti":    uuid.NewV4().String(), // Tokenを一意に識別するためのID
 		"iat":    time.Now().Unix(),     // Tokenを発行した日時(now)
 		"nbf":    0,                     // Tokenが有効になるのが何分後か
-		"sub":    *ctx.Payload.LoginID,  // ユーザー識別子
 		"scopes": "api:access",          // このTokenが有効なSCOPE - not a standard claim
-		"roles":  string(rolesStr),      // ユーザー権限 - not a standard claim
 	}
-	signedToken, err := token.SignedString(c.privateKey)
+	for k, v := range customClaims {
+		claims[k] = v
+	}
+	token.Claims = claims
+	return token.SignedString(privateKey)
+}
+
+// NewAuthController creates a auth controller.
+func NewAuthController(service *goa.Service) *AuthController {
+	b := common.GetPrivateKey()
+	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM([]byte(b))
 	if err != nil {
-		return fmt.Errorf("failed to sign token: %s", err)
+		panic(err)
+	}
+	return &AuthController{
+		Controller: service.NewController("AuthController"),
+		privateKey: privateKey,
+	}
+}
+
+// Signin runs the signin action.
+func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
+	// AuthController_Signin: start_implement
+	logger := common.GetLogger("default")
+	// Authorize
+	adminUserTable := models.NewAdminUserDB(common.DB)
+	adminUserModel, err := adminUserTable.GetByLoginID(ctx.Context, *ctx.Payload.LoginID)
+	if err == gorm.ErrRecordNotFound {
+		return ctx.NotFound()
+	} else if err != nil {
+		logger.Error("Signin GetByLoginID failure.", zap.String("loginID", *ctx.Payload.LoginID))
+		ctx.ResponseWriter.Header().Set("location", "/")
+		return ctx.TemporaryRedirect()
 	}
 
-	// Set auth header for client retrieval
-	ctx.ResponseData.Header().Set("Authorization", fmt.Sprintf("Bearer %s", signedToken))
+	hash, err := scrypt.Key([]byte(*ctx.Payload.Password), []byte(adminUserModel.Salt), 16384, 8, 1, 64)
+	if adminUserModel.Password != base64.StdEncoding.EncodeToString(hash) {
+		return ctx.Unauthorized()
+	}
 
-	// AuthController_Signin: end_implement
-	return nil
+	if roles, err := getRoles(ctx.Context, adminUserModel.RoleID); err != nil {
+		logger.Error("Signin getRoles failure.",
+			zap.String("loginID", *ctx.Payload.LoginID),
+			zap.String("roleID", adminUserModel.RoleID))
+		ctx.ResponseWriter.Header().Set("location", "/")
+		return ctx.TemporaryRedirect()
+	} else {
+		// Generate JWT
+		claims := map[string]interface{}{
+			"sub":   *ctx.Payload.LoginID, // ユーザー識別子
+			"roles": string(roles),        // ユーザー権限 - not a standard claim
+		}
+		if jwt, err := generateJwt(claims, c.privateKey); err != nil {
+			logger.Error("Signin failed to sign token", zap.Error(err))
+			ctx.ResponseWriter.Header().Set("location", "/")
+			return ctx.TemporaryRedirect()
+		} else {
+			// Set auth header for client retrieval
+			ctx.ResponseData.Header().Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
+			// AuthController_Signin: end_implement
+			return ctx.NoContent()
+		}
+	}
 }
 
 // Signout runs the signout action.
@@ -137,5 +155,90 @@ func (c *AuthController) Signout(ctx *app.SignoutAuthContext) error {
 	ctx.ResponseData.Header().Del("Authorization")
 
 	// AuthController_Signout: end_implement
-	return nil
+	return ctx.NoContent()
+}
+
+// Googlesignin runs the googlesignin action.
+func (c *AuthController) Googlesignin(ctx *app.GooglesigninAuthContext) error {
+	config := service.GetOAuth2Config()
+	redirectUrl := config.AuthCodeURL("dmc_1")
+
+	ctx.ResponseWriter.Header().Set("Content-Type", "text/html")
+	ctx.ResponseWriter.Header().Set("location", redirectUrl)
+	return ctx.MovedPermanently()
+}
+
+// Googleoauth2callback runs the googleoauth2callback action.
+func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthContext) error {
+	logger := common.GetLogger("default")
+
+	if *ctx.State != "dmc_1" {
+		logger.Error("GoogleSignin invalid state.", zap.String("state", *ctx.State))
+		ctx.ResponseWriter.Header().Set("location", "/")
+		return ctx.TemporaryRedirect()
+	}
+
+	// OAuthTokenを取得
+	config := service.GetOAuth2Config()
+	token, err := config.Exchange(ctx.Context, *ctx.Code)
+	if err != nil {
+		logger.Error("GoogleSignin get token failure.", zap.Error(err))
+		ctx.ResponseWriter.Header().Set("location", "/")
+		return ctx.TemporaryRedirect()
+	}
+
+	// GoogleのUser情報を取得
+	if userInfo, err := service.GetGoogleOAuthUser(ctx.Context, token); err != nil {
+		ctx.ResponseWriter.Header().Set("location", "/")
+		return ctx.TemporaryRedirect()
+	} else if isAllow := service.IsAllowEMailAddress(userInfo.EMail); isAllow == false {
+		ctx.ResponseWriter.Header().Set("location", "/")
+		return ctx.TemporaryRedirect()
+	} else {
+		loginID := userInfo.EMail
+
+		adminUserTable := models.NewAdminUserDB(common.DB)
+		adminUserModel, err := adminUserTable.GetByLoginID(ctx.Context, loginID)
+		if err == gorm.ErrRecordNotFound {
+			// 新規ユーザーの場合はユーザー作成
+			m := models.NewAdminUser()
+			m.LoginID = loginID
+			m.RoleID = common.GetDefaultRole()
+			if err = adminUserTable.Add(ctx.Context, &m); err != nil {
+				logger.Error("GoogleSignin add admin_user failure.", zap.String("loginID", loginID))
+				ctx.ResponseWriter.Header().Set("location", "/")
+				return ctx.TemporaryRedirect()
+			}
+			adminUserModel = &m
+		} else if err != nil {
+			logger.Error("GoogleSignin GetByLoginID failure.", zap.String("loginID", loginID))
+			ctx.ResponseWriter.Header().Set("location", "/")
+			return ctx.TemporaryRedirect()
+		}
+
+		if roles, err := getRoles(ctx.Context, adminUserModel.RoleID); err != nil {
+			logger.Error("GoogleSignin getRoles failure.",
+				zap.String("loginID", adminUserModel.LoginID),
+				zap.String("roleID", adminUserModel.RoleID))
+			ctx.ResponseWriter.Header().Set("location", "/")
+			return ctx.TemporaryRedirect()
+		} else {
+			// Generate JWT
+			tokenBytes, _ := json.Marshal(token)
+			claims := map[string]interface{}{
+				"sub":              adminUserModel.LoginID, // ユーザー識別子
+				"roles":            string(roles),          // ユーザー権限 - not a standard claim
+				"googleOAuthToken": string(tokenBytes),     // googleOAuthToken - not a standard claim
+			}
+			if jwt, err := generateJwt(claims, c.privateKey); err != nil {
+				logger.Error("GoogleSignin failed to sign token", zap.Error(err))
+				ctx.ResponseWriter.Header().Set("location", "/")
+				return ctx.TemporaryRedirect()
+			} else {
+				// Set auth header for client retrieval
+				ctx.ResponseData.Header().Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
+				return ctx.NoContent()
+			}
+		}
+	}
 }

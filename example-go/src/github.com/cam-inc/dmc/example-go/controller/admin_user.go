@@ -46,7 +46,7 @@ func (c *AdminUserController) Create(ctx *app.CreateAdminUserContext) error {
 	}
 	m.Salt = salt
 	m.Password = base64.StdEncoding.EncodeToString(passwordHash)
-	m.RoleID = "viewer"
+	m.RoleID = common.GetDefaultRole()
 
 	err = adminUserTable.Add(ctx.Context, &m)
 	if err != nil {
