@@ -1,10 +1,8 @@
 import { reject } from 'mout/array';
 import constants from '../../core/constants';
 
-let counter = 0;
 const generateID = () => {
-  counter = counter + 1;
-  return `modal_${counter}`;
+  return `modal_${Date.now()}`;
 };
 
 export default {
