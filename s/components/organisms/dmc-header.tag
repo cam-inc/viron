@@ -11,7 +11,7 @@ dmc-header.Header
   script.
     import constants from '../../core/constants';
     import router from '../../core/router';
-    import '../organisms/dmc-debug.tag';
+    import '../organisms/dmc-devtool.tag';
     import '../atoms/dmc-icon.tag';
     import '../atoms/dmc-button.tag';
 
@@ -27,7 +27,7 @@ dmc-header.Header
     }
 
     handleDebugButtonClick() {
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-debug');
+      store.action(constants.ACTION_MODAL_SHOW, 'dmc-devtool');
     }
 
     handleHomeButtonClick(e) {
