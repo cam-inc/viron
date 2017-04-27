@@ -2,10 +2,8 @@ import { reject } from 'mout/array';
 import ObjectAssign from 'object-assign';
 import constants from '../../core/constants';
 
-let counter = 0;
 const generateID = () => {
-  counter = counter + 1;
-  return `toast_${counter}`;
+  return `toast_${Date.now()}`;
 };
 
 export default {

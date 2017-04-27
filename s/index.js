@@ -90,6 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
       component: {},
       toast: {
         list: []
+      },
+      modal: {
+        list: []
       }
     },
     actions: actions,

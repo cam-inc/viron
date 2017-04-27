@@ -92,16 +92,16 @@ class Store {
    * Commit mutation.
    * only actions are allowed to execute this function.
    * @param {String} name mutation name
-   * @param {Object} obj commit data object
+   * @param {...*} args
    */
-  commit(name, obj) {
+  commit(name, ...args) {
     const _state = ObjectAssign({}, this.state);
-    log('[commit(before)]', name, _state, obj);
+    log('[commit(before)]', name, _state, ...args);
     const context = {
       state : _state
     };
-    const triggers = this._mutations[name].apply(null, [context, obj]);
-    log('[commit(after)]', name, _state, obj);
+    const triggers = this._mutations[name].apply(null, [context, ...args]);
+    log('[commit(after)]', name, _state, ...args);
     ObjectAssign(this.state, _state);
 
     forEach(triggers, (v) => {

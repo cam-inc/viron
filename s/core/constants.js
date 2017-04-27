@@ -33,6 +33,9 @@ export default {
   ACTION_TOAST_SHOW: 'toast_show',
   ACTION_TOAST_HIDE: 'toast_hide',
 
+  ACTION_MODAL_SHOW: 'modal_show',
+  ACTION_MODAL_HIDE: 'modal_hide',
+
   // riotx#mutations
   MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
 
@@ -53,6 +56,9 @@ export default {
   MUTATION_TOAST_ADD: 'toast_add',
   MUTATION_TOAST_REMOVE: 'toast_remove',
 
+  MUTATION_MODAL_ADD: 'modal_add',
+  MUTATION_MODAL_REMOVE: 'modal_remove',
+
   // riotx#getters
   GETTER_DRAWER_OPENED: 'drawer_opened',
 
@@ -67,6 +73,8 @@ export default {
   GETTER_PAGE_GET: 'page_get',
 
   GETTER_TOAST_LIST: 'toast_list',
+
+  GETTER_MODAL_LIST: 'modal_list',
 
   // riotx#mutated
   CHANGE_DRAWER: 'drawer',
@@ -83,5 +91,7 @@ export default {
     return CHANGE_COMPONENT_PREFIX + name;
   },
 
-  CHANGE_TOAST: 'toast'
+  CHANGE_TOAST: 'toast',
+
+  CHANGE_MODAL: 'modal'
 };

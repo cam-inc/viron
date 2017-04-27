@@ -8,6 +8,7 @@ dmc-endpoints.EndpointsPage
   script.
     import constants from '../../core/constants';
     import '../organisms/dmc-endpoint.tag';
+    import '../organisms/dmc-login.tag';
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
@@ -18,12 +19,13 @@ dmc-endpoints.EndpointsPage
     })
 
     handleEndpointAdd() {
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_TOAST_SHOW, {
-          type: 'error',
-          message: 'message here'
-        }));
+      // TODO: endpoint作成 -> ログイン -> 成功 -> endpoint一覧に追加される。
+      //store.action(constants.ACTION_MODAL_SHOW, 'dmc-endpoint-create', {
+      store.action(constants.ACTION_MODAL_SHOW, 'dmc-login', {
+        onLogin: () => {
+          alert('login success');
+        }
+      });
     }
 
     handleEndpointEntry(url) {

@@ -5,6 +5,7 @@ import dmc from './dmc';
 import current from './current';
 import page from './page';
 import toast from './toast';
+import modal from './modal';
 
 export default {
   [constants.GETTER_DRAWER_OPENED]: drawer.opened,
@@ -19,5 +20,7 @@ export default {
 
   [constants.GETTER_PAGE_GET]: page.show,
 
-  [constants.GETTER_TOAST_LIST]: toast.list
+  [constants.GETTER_TOAST_LIST]: toast.list,
+
+  [constants.GETTER_MODAL_LIST]: modal.list
 };

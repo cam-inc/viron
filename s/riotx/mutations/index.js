@@ -7,6 +7,7 @@ import dmc from './dmc';
 import page from './page';
 import component from './component';
 import toast from './toast';
+import modal from './modal';
 
 export default {
   [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
@@ -27,5 +28,8 @@ export default {
   [constants.MUTATION_COMPONENT_GET]: component.show,
 
   [constants.MUTATION_TOAST_ADD]: toast.add,
-  [constants.MUTATION_TOAST_REMOVE]: toast.remove
+  [constants.MUTATION_TOAST_REMOVE]: toast.remove,
+
+  [constants.MUTATION_MODAL_ADD]: modal.add,
+  [constants.MUTATION_MODAL_REMOVE]: modal.remove
 };
