@@ -4,15 +4,16 @@ dmc-header.Header
       .Header__menuButton(click="{handleMenuButtonClick}")
         dmc-icon(type="{isMenuOpened ? 'menuUnfold' : 'menuFold'}")
     .Header__group
-      .Header__test
-      .Header__test
+      dmc-button(click="{ handleDebugButtonClick }") debug
       .Header__homeButton(click="{handleHomeButtonClick}")
         dmc-icon(type="home")
 
   script.
     import constants from '../../core/constants';
     import router from '../../core/router';
+    import '../organisms/dmc-devtool.tag';
     import '../atoms/dmc-icon.tag';
+    import '../atoms/dmc-button.tag';
 
     const store = this.riotx.get();
 
@@ -23,6 +24,10 @@ dmc-header.Header
       Promise
         .resolve()
         .then(() => store.action(constants.ACTION_DRAWER_TOGGLE));
+    }
+
+    handleDebugButtonClick() {
+      store.action(constants.ACTION_MODAL_SHOW, 'dmc-devtool');
     }
 
     handleHomeButtonClick(e) {

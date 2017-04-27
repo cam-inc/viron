@@ -7,20 +7,13 @@ dmc.Application
         dmc-header
         dmc-toasts
       .Application__page
-        i am main column
-        h2 Debug
-          button(type='button' onclick="{ evResetCurrent }") Storage->Current リセット
-          button(type='button' onclick="{ evResetEndpointALL }") Storage->Endpoint リセット
-        dmc-samplerouter
-        main
-          dmc-page
+        dmc-page
   dmc-modals
 
   script.
     import constants from '../core/constants';
     import './organisms/dmc-toasts.tag';
     import './organisms/dmc-modals.tag';
-    import '../samplerouter/dmc-samplerouter.tag';
 
     let store = this.riotx.get();
 
@@ -41,10 +34,3 @@ dmc.Application
       riot.mount('dmc-page', targetTagString, state.page);
 
     });
-
-    this.evResetCurrent = (ev) => {
-      store.action(constants.ACTION_CURRENT_REMOVE);
-    };
-    this.evResetEndpointALL = () => {
-      store.action(constants.ACTION_ENDPOINT_REMOVE_ALL);
-    }
