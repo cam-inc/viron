@@ -19,12 +19,12 @@ dmc-endpoints.EndpointsPage
     })
 
     handleEndpointAdd() {
+      // TODO: endpoint作成 -> ログイン -> 成功 -> endpoint一覧に追加される。
+      //store.action(constants.ACTION_MODAL_SHOW, 'dmc-endpoint-create', {
       store.action(constants.ACTION_MODAL_SHOW, 'dmc-login', {
         onLogin: () => {
           alert('login success');
         }
-      }, {
-        theme : 'normal'
       });
     }
 
