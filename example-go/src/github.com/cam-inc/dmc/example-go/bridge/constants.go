@@ -1,8 +1,9 @@
 package bridge
 
 const (
-	ThemeLight = "light" // Endpoint Theme,
-	ThemeDark  = "dark"  // Endpoint Theme,
+	ColorRed   = "red"   // Endpoint Color,
+	ColorBlue  = "blud"  // Endpoint Color,
+	ColorGreen = "green" // Endpoint Color,
 
 	StyleList   = "list"   // WebComponent リスト表示
 	StyleTable  = "table"  // WebComponent テーブル表示
