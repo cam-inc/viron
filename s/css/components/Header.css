@@ -27,10 +27,3 @@
 .Header__homeButton:hover {
   color: var(--color-basic-gray);
 }
-
-.Header__test {
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
-  background-color: gray;
-}
