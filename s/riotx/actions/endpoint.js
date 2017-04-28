@@ -4,50 +4,8 @@ export default {
   show: context => {
     return Promise
       .resolve()
-      .then(() => new Promise(resolve => {
-
-        // TODO: あとで store.js に変える
-        const data = {
-          'http://localhost:3000/swagger.json': {
-            title: 'Service A', // @see /swagger.json/info/title
-            description: 'Service A - Manage Console', // @see swagger.json/info/description
-            version: '0.0.1', // @see /swagger.json/info/version
-            color: 'red',// @see /dmc#color
-            thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
-            tags: ['dmc', 'example', 'develop', 'A'], // @see /dmc#tags
-          },
-          'http://localhost:3001/swagger.json': {
-            title: 'Service A',
-            description: 'Service A - Manage Console',
-            version: '43.1.1',
-            color: 'red',
-            thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
-            tags: ['dmc', 'example', 'develop', 'A'],
-          },
-          'http://localhost:3002/swagger.json': {
-            title: 'Service B',
-            description: 'Service B - Manage Console',
-            version: '1.3.1',
-            color: 'blue',
-            thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
-            tags: ['dmc', 'example', 'staging', 'B'],
-          },
-          'http://localhost:3003/swagger.json': {
-            title: 'Service C',
-            description: 'Service C - Manage Console',
-            version: '2.0.1',
-            color: 'green',
-            thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
-            tags: ['dmc', 'example', 'production', 'C'],
-          },
-        };
-        //const data = storage.get(constants.STORAGE_ENDPOINT, {});
-
-        resolve(data);
-
-      }))
-      .then(endpoints => {
-        context.commit(constants.MUTATION_ENDPOINT, endpoints);
+      .then(() => {
+        context.commit(constants.MUTATION_ENDPOINT);
       });
   },
   remove: (context, key) => {
@@ -64,4 +22,32 @@ export default {
         context.commit(constants.MUTATION_ENDPOINT_REMOVE_ALL);
       });
   },
+  add: (context, url, memo) => {
+    // TODO URLにping チェックだけする処理を入れる
+    // TODO https://github.com/github/fetch
+    return new Promise((resolve, reject) => {
+      let endpoint = context.state.endpoint;
+      // TODO 上書きチェック　上書きしたときどうするかは相談
+      if (!endpoint[url]) {
+        endpoint[url] = {
+          memo: '',
+          token: null,
+          title: '',
+          description: '',
+          version: '',
+          color: '',
+          thumbnail: '',
+          tags: [],
+        };
+      }
+      endpoint[url].memo = memo;
+      resolve({
+        url: url,
+        endpoint: endpoint[url]
+      })
+
+    }).then(res => {
+      context.commit(constants.MUTATION_ENDPOINT_ADD, res);
+    });
+  }
 };

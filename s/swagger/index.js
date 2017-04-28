@@ -34,7 +34,6 @@ class Swagger {
       this._endpoint = SwaggerClient(request.url);
 
       this._endpoint.then(client => {
-
         if (client.errors && 0 < client.errors.length) {
           return reject(client.errors);
         }
