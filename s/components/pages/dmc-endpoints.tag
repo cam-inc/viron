@@ -29,9 +29,10 @@ dmc-endpoints.EndpointsPage
     }
 
     handleEndpointEntry(url) {
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_CURRENT_UPDATE, url))
+      store.action(constants.ACTION_AUTH_UPDATE, url)
+        .then(() => {
+          store.action(constants.ACTION_CURRENT_UPDATE, url)
+        })
         .catch((err) => {
           // TODO
         })

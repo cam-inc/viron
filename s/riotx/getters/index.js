@@ -6,6 +6,7 @@ import current from './current';
 import page from './page';
 import toast from './toast';
 import modal from './modal';
+import endpoint from './endpoint';
 
 export default {
   [constants.GETTER_DRAWER_OPENED]: drawer.opened,
@@ -22,5 +23,8 @@ export default {
 
   [constants.GETTER_TOAST_LIST]: toast.list,
 
-  [constants.GETTER_MODAL_LIST]: modal.list
+  [constants.GETTER_MODAL_LIST]: modal.list,
+
+  [constants.GETTER_ENDPOINT_LIST]: endpoint.list,
+  [constants.GETTER_ENDPOINT_ONE]: endpoint.one,
 };

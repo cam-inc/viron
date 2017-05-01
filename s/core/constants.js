@@ -36,6 +36,8 @@ export default {
   ACTION_MODAL_SHOW: 'modal_show',
   ACTION_MODAL_HIDE: 'modal_hide',
 
+  ACTION_AUTH_UPDATE: 'auth_update',
+
   // riotx#mutations
   MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
 
@@ -59,6 +61,8 @@ export default {
   MUTATION_MODAL_ADD: 'modal_add',
   MUTATION_MODAL_REMOVE: 'modal_remove',
 
+  MUTATION_AUTH_UPDATE: 'auth_update',
+
   // riotx#getters
   GETTER_DRAWER_OPENED: 'drawer_opened',
 
@@ -75,6 +79,9 @@ export default {
   GETTER_TOAST_LIST: 'toast_list',
 
   GETTER_MODAL_LIST: 'modal_list',
+
+  GETTER_ENDPOINT_LIST: 'endpoint_list',
+  GETTER_ENDPOINT_ONE: 'endpoint_one',
 
   // riotx#mutated
   CHANGE_DRAWER: 'drawer',

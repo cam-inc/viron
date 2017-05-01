@@ -120,6 +120,7 @@ class Store {
     log('[action]', name, args);
 
     const context = {
+      getter: this.getter,
       state: this.state,
       commit: (...args) => {
         this.commit(...args);
