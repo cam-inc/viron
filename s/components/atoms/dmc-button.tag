@@ -1,4 +1,4 @@
-dmc-button(class="Button {opts.class}" click="{ handleClick }")
+dmc-button(class="Button Button--{opts.type || 'primary'} {opts.class}" click="{ handleClick }")
   yield.
 
   script.
