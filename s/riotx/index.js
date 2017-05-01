@@ -121,7 +121,7 @@ class Store {
 
     const context = {
       getter: this.getter,
-      state: this.state,
+      state: ObjectAssign({}, this.state),
       commit: (...args) => {
         this.commit(...args);
       }

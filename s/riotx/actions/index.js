@@ -21,6 +21,7 @@ export default {
   [constants.ACTION_ENDPOINT_GET]: endpoint.show,
   [constants.ACTION_ENDPOINT_REMOVE]: endpoint.remove,
   [constants.ACTION_ENDPOINT_REMOVE_ALL]: endpoint.removeAll,
+  [constants.ACTION_ENDPOINT_ADD]: endpoint.add,
 
   [constants.ACTION_CURRENT_UPDATE]: current.update,
   [constants.ACTION_CURRENT_REMOVE]: current.remove,

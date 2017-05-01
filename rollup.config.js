@@ -39,6 +39,7 @@ export default {
   // exports: 'default',
   exports: 'none',
   format: 'iife',
+  moduleContext: { 'node_modules/whatwg-fetch/fetch.js': 'window' },
   plugins: [
     json(),
     replace({

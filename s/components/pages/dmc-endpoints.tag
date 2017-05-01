@@ -3,12 +3,17 @@ dmc-endpoints.EndpointsPage
     .EndpointsPage__addCard(click="{handleEndpointAdd}")
       dmc-icon(type="plus")
     virtual(each="{ item, url in endpoint }")
-      dmc-endpoint(host="{ url }" title="{ item.title }" thumbnail="{ item.thumbnail }" description="{ item.description }" tags="{ item.tags }" onentry="{ handleEndpointEntry }" onedit="{ handleEndpointEdit }" onremove="{ handleEndpointRemove }")
+      dmc-endpoint(url="{ url }" title="{ item.title }"
+        thumbnail="{ item.thumbnail }"
+        description="{ item.description }"
+        tags="{ item.tags }" onentry="{ handleEndpointEntry }"
+        onedit="{ handleEndpointEdit }"
+        onremove="{ handleEndpointRemove }")
 
   script.
     import constants from '../../core/constants';
     import '../organisms/dmc-endpoint.tag';
-    import '../organisms/dmc-login.tag';
+    import '../organisms/dmc-entry.tag';
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
@@ -21,7 +26,7 @@ dmc-endpoints.EndpointsPage
     handleEndpointAdd() {
       // TODO: endpoint作成 -> ログイン -> 成功 -> endpoint一覧に追加される。
       //store.action(constants.ACTION_MODAL_SHOW, 'dmc-endpoint-create', {
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-login', {
+      store.action(constants.ACTION_MODAL_SHOW, 'dmc-entry', {
         onLogin: () => {
           alert('login success');
         }
@@ -32,9 +37,6 @@ dmc-endpoints.EndpointsPage
       store.action(constants.ACTION_AUTH_UPDATE, url)
         .then(() => {
           store.action(constants.ACTION_CURRENT_UPDATE, url)
-        })
-        .catch((err) => {
-          // TODO
         })
       ;
     }
