@@ -15,6 +15,7 @@ export default {
 
   // riotx#actions
   ACTION_DRAWER_TOGGLE: 'drawer_toggle',
+  ACTION_DRAWER_CLOSE: 'drawer_close',
 
   ACTION_DMC_GET: 'dmc_get',
   ACTION_DMC_REMOVE: 'dmc_remove',
