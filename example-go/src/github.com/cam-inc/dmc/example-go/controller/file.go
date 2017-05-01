@@ -76,7 +76,7 @@ func (c *FileController) Download(ctx *app.DownloadFileContext) error {
 		return ctx.InternalServerError()
 	} else {
 		ctx.ResponseWriter.Header().Set("Content-Length", strconv.Itoa(len(data)))
-		ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment; filename=\"" + filepath.Base(path) + "\"")
+		ctx.ResponseWriter.Header().Set("Content-Disposition", "attachment; filename=\""+filepath.Base(path)+"\"")
 		return ctx.OK(data)
 	}
 }
