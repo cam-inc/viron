@@ -2,6 +2,7 @@
 /* Designed components, chunks of UI. */
 @import "Application";
 @import "Button";
+@import "Checkbox";
 @import "Drawer";
 @import "Endpoint";
 @import "Header";
