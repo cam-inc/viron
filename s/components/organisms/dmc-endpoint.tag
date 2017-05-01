@@ -5,7 +5,7 @@ dmc-endpoint.Endpoint(click="{handleClick}")
       dmc-icon(type="ellipsis")
   .Endpoint__body
     .Endpoint__tags { (opts.tags || []).join(', ') }
-    .Endpoint__host { opts.host }
+    .Endpoint__host { opts.url }
     .Endpoint__title { opts.title }
     .Endpoint__description { opts.description }
 

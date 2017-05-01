@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         opened: true
       },
       current: storage.get(constants.STORAGE_CURRENT),
-      endpoint: storage.get(constants.STORAGE_ENDPOINT),
+      endpoint: storage.get(constants.STORAGE_ENDPOINT, {}),
       dmc: null,
       page: null,
       component: {},

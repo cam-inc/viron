@@ -22,6 +22,7 @@ export default {
   ACTION_ENDPOINT_GET: 'endpoint_get',
   ACTION_ENDPOINT_REMOVE: 'endpoint_remove',
   ACTION_ENDPOINT_REMOVE_ALL: 'endpoint_remove_all',
+  ACTION_ENDPOINT_ADD: 'endpoint_add',
 
   ACTION_CURRENT_UPDATE: 'current_update',
   ACTION_CURRENT_REMOVE: 'current_remove',
@@ -36,6 +37,8 @@ export default {
   ACTION_MODAL_SHOW: 'modal_show',
   ACTION_MODAL_HIDE: 'modal_hide',
 
+
+
   // riotx#mutations
   MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
 
@@ -45,6 +48,7 @@ export default {
   MUTATION_ENDPOINT: 'endpoint',
   MUTATION_ENDPOINT_REMOVE: 'endpoint_remove',
   MUTATION_ENDPOINT_REMOVE_ALL: 'endpoint_remove_all',
+  MUTATION_ENDPOINT_ADD: "endpoint_add",
 
   MUTATION_CURRENT_UPDATE: 'current_update',
   MUTATION_CURRENT_REMOVE: 'current_remove',
