@@ -46,12 +46,17 @@ dmc-entry
       this.closeModal();
     });
 
-
+    const self = this;
     // Event: Endpoint 登録
     this.handleRegisterButtonClick = (ev) => {
-      store.action(constants.ACTION_ENDPOINT_ADD, this.refs.url.value, this.refs.memo.value);
+      store.action(constants.ACTION_ENDPOINT_ADD, this.refs.url.value, this.refs.memo.value)
+      .then(() => {
+        self.closeModal();
+      }).catch((err) => {
+        // TODO 登録エラー通知を出す
+        alert(err.message);
+      })
     }
-
 
     this.userID = 'userID';
     this.password = 'password';

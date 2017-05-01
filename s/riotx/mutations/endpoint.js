@@ -19,7 +19,9 @@ export default {
 
   add: function (context, url, endpoint) {
     context.state.endpoint[url] = endpoint;
-    // TODO 開発用に言ったにれておく
+
+    //////////////////
+    // TODO 開発用に一旦入れておくだけ
     context.state.endpoint['http://localhost:3000/swagger.json'] = {
       title: 'Service A', // @see /swagger.json/info/title
       description: 'Service A - Manage Console', // @see swagger.json/info/description
@@ -28,8 +30,9 @@ export default {
       thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
       tags: ['dmc', 'example', 'develop', 'A'], // @see /dmc#tags
     };
+    //////////////////
 
     context.state.endpoint = storage.set(constants.STORAGE_ENDPOINT, context.state.endpoint);
-    return [constants.CHANGE_ENDPOINT]; // TODO: モーダルチェンジイベントを入れるか相談
+    return [constants.CHANGE_ENDPOINT];
   }
 };

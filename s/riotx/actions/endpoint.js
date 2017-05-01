@@ -1,3 +1,5 @@
+import 'whatwg-fetch';
+
 import constants from '../../core/constants';
 
 export default {
@@ -23,12 +25,15 @@ export default {
       });
   },
   add: (context, url, memo) => {
-    // TODO URLにping チェックだけする処理を入れる
-    // TODO https://github.com/github/fetch
-    return new Promise((resolve, reject) => {
-      let endpoint = context.state.endpoint;
-      // TODO 上書きチェック　上書きしたときどうするかは相談
-      if (!endpoint[url]) {
+    return fetch(url)
+      .then((response) => {
+        // ping ok!
+        //return response;
+        return;
+      })
+      .then(() => {
+        // TODO 上書きの場合は、そもそも登録ボタンを押せなくする
+        let endpoint = context.state.endpoint;
         endpoint[url] = {
           memo: '',
           token: null,
@@ -39,15 +44,15 @@ export default {
           thumbnail: '',
           tags: [],
         };
-      }
-      endpoint[url].memo = memo;
-      resolve({
-        url: url,
-        endpoint: endpoint[url]
+        endpoint[url].memo = memo;
+        return {
+          url: url,
+          endpoint: endpoint[url]
+        };
       })
-
-    }).then(res => {
-      context.commit(constants.MUTATION_ENDPOINT_ADD, res);
-    });
+      .then((res) => {
+        context.commit(constants.MUTATION_ENDPOINT_ADD, res);
+      })
+    ;
   }
 };
