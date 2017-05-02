@@ -72,7 +72,12 @@ let setupRouter = (store) => {
       }).on('/:endpoint/:id', (params) => {
         // Load page
         const store = riotx.get();
-        store.action(constants.ACTION_PAGE_GET, params.id);
+        // TODO DMCのロードがまだの場合の処理
+        store.action(constants.ACTION_PAGE_GET, params.id)
+          .catch((err) => {
+            // TODO
+            console.error(err);
+          });
 
       }).on('/:endpoint', (params) => {
         //const current = store.getter(constants.GETTER_CURRENT);

@@ -105,6 +105,23 @@ class Router {
     this._change(this.getCurrentLocation(), this.getCurrentAction());
   }
 
+  resolveCurrentPath(pattern) {
+    const keys = [];
+    const regexp = pathToRegexp(pattern, keys);
+    const pathname = this.getCurrentLocation().pathname
+    const params = {};
+    try {
+      const list = regexp.exec(pathname).slice(1);
+      forEach(keys, (v, i) => {
+        params[v.name] = list[i];
+      });
+    } catch(e) {
+      throw new Error(`couldn't parse. pattern was "${pattern}" and pathname was "${pathname}"`);
+    }
+
+    return params;
+  }
+
   /**
    * fire route enter event.
    * @private

@@ -55,9 +55,6 @@ dmc-drawer.Drawer
     }
 
     this.evSelect = (ev) => {
-      ev.item.id.get()
-      debugger;
-
-      console.log(router)
-      router.navigateTo(ev.item.id.get());
+      let param = router.resolveCurrentPath('/:endpoint/:page?')
+      router.navigateTo(`/${param.endpoint}/${ev.item.id.get()}`);
     }

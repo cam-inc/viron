@@ -9,7 +9,6 @@ export default {
       }
     })
       .then((response) => {
-      debugger;
         if (response.status === 401) {
           context.commit(constants.MUTATION_ENDPOINT_TOKEN_UPDATE, key, null);
           return;
@@ -23,7 +22,7 @@ export default {
   signInGoogle: (context, key, authtype) => {
     const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
     const url = new URL(endpoint.url);
-    let fetchUrl = `${url.origin}${authtype.url}?redirect_url=http://localhost:8080/AAAAA/`; // TODO: 良い感じにしてください
+    let fetchUrl = `${url.origin}${authtype.url}?redirect_url=http://localhost:8080/#/signin/${key}`;
     location.href = fetchUrl;
   },
 

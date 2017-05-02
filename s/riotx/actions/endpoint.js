@@ -57,10 +57,6 @@ export default {
         context.commit(constants.MUTATION_ENDPOINT_ADD, res);
         return res;
       })
-      // .then((res) => {
-      //   debugger;
-      //   router.navigateTo('/signin', true); // TODO force refresh
-      // })
     ;
   }
 };

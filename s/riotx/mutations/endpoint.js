@@ -22,7 +22,7 @@ export default {
 
     //////////////////
     // TODO 開発用に一旦入れておくだけ
-    context.state.endpoint[100] = {
+    context.state.endpoint['zzzzzzzzzz'] = {
       url: 'http://localhost:3000/swagger.json',
       title: 'Service A', // @see /swagger.json/info/title
       description: 'Service A - Manage Console', // @see swagger.json/info/description
