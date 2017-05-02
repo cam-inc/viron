@@ -48,6 +48,7 @@ export default {
     return fetch(fetchUrl, {
       method: 'POST',
       mode: 'cors',
+      body: JSON.stringify({ login_id: email, password: password })
     })
       .then((response) => {
         // TODO サーバー動いたら実装する

@@ -27,12 +27,12 @@ type AdminUserDB struct {
 	genModels.AdminUserDB
 }
 
-// GetByLoginID returns a single AdminUser as a Database Model
-func (m *AdminUserDB) GetByLoginID(ctx context.Context, loginID string) (*genModels.AdminUser, error) {
+// GetByEmail returns a single AdminUser as a Database Model
+func (m *AdminUserDB) GetByEmail(ctx context.Context, email string) (*genModels.AdminUser, error) {
 	defer goa.MeasureSince([]string{"goa", "db", "adminUser", "get"}, time.Now())
 
 	var native genModels.AdminUser
-	err := m.Db.Table(m.TableName()).Where("login_id = ?", loginID).Find(&native).Error
+	err := m.Db.Table(m.TableName()).Where("email = ?", email).Find(&native).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, err
 	}
