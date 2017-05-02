@@ -49,17 +49,17 @@ let setupRouter = (store) => {
       }).on('/samplepageC/:paramA/:paramB', () => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
       }).on('/signin/:endpoint', (params) => {
+        // 認証
         const endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, params.endpoint);
         if (!endpoint) {
           console.error('endpoint not found.');
           router.navigateTo('/', true);
         }
-        // 認証エラー
         store.action(constants.ACTION_AUTHTYPE_GET, params.endpoint)
           .then((authtype) => {
             store.action(constants.ACTION_MODAL_SHOW, 'dmc-signin', {
               onSignIn: () => {
-                alert('Sing In success');
+                router.navigateTo(`/${params.endpoint}`, true);
               },
               key: params.endpoint,
               endpoint: endpoint,
@@ -90,6 +90,11 @@ let setupRouter = (store) => {
             // TODO ここの位置で良いかは最終的に決める
             const targetTagString = 'dmc-empty';
             riot.mount('dmc-page', targetTagString);
+          }).catch((err) => {
+            if (err.status === 401) {
+              router.navigateTo(`/signin/${params.endpoint}`, true);
+              return;
+            }
           })
         ;
       }).on('/', () => {

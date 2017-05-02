@@ -8,6 +8,7 @@ import (
 
 // OriginURL response header
 var OriginURL = "*"
+//var OriginURL = "http://localhost:8080"
 
 // OriginAllowAll response header
 var OriginAllowAll = func() {
