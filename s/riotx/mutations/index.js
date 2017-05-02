@@ -32,5 +32,7 @@ export default {
   [constants.MUTATION_TOAST_REMOVE]: toast.remove,
 
   [constants.MUTATION_MODAL_ADD]: modal.add,
-  [constants.MUTATION_MODAL_REMOVE]: modal.remove
+  [constants.MUTATION_MODAL_REMOVE]: modal.remove,
+
+  [constants.MUTATION_ENDPOINT_TOKEN_UPDATE]: endpoint.updateToken,
 };

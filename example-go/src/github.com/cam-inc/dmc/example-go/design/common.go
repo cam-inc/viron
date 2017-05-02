@@ -12,6 +12,7 @@ var OriginURL = "*"
 // OriginAllowAll response header
 var OriginAllowAll = func() {
 	Methods("GET", "OPTIONS", "PUT", "POST", "DELETE") // Allow all origins to retrieve the Swagger JSON (CORS)
+	Headers("Authorization", "Origin", "X-Requested-With", "Content-Type", "Accept")
 }
 
 // Color of enum

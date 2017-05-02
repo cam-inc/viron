@@ -5,7 +5,7 @@ dmc-endpoint.Endpoint(click="{handleClick}")
       dmc-icon(type="ellipsis")
   .Endpoint__body
     .Endpoint__tags { (opts.tags || []).join(', ') }
-    .Endpoint__host { opts.url }
+    .Endpoint__host { opts.key }
     .Endpoint__title { opts.title }
     .Endpoint__description { opts.description }
 
@@ -18,7 +18,7 @@ dmc-endpoint.Endpoint(click="{handleClick}")
     import '../atoms/dmc-button.tag';
 
     handleClick() {
-      this.opts.onentry(this.opts.url);
+      this.opts.onentry(this.opts.key);
     }
 
     handleMenuButtonClick(e) {
@@ -26,9 +26,9 @@ dmc-endpoint.Endpoint(click="{handleClick}")
     }
 
     handleEditButtonClick() {
-      this.opts.onedit(this.opts.url);
+      this.opts.onedit(this.opts.key);
     }
 
     handleRemoveButtonClick() {
-      this.opts.onremove(this.opts.url);
+      this.opts.onremove(this.opts.key);
     }
