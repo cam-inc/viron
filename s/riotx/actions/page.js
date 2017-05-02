@@ -1,7 +1,4 @@
 import { find } from 'mout/object';
-
-import swagger from '../../swagger';
-
 import constants from '../../core/constants';
 
 export default {

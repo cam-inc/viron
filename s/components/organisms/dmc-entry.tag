@@ -75,7 +75,7 @@ dmc-entry
           // return store.action(constants.ACTION_ENDPOINT_LOGIN, this.userID, this.password);
         })
         .then(() => {
-          this.opts.onLogin();
+          this.opts.onSignIn();
           this.closeModal();
         });
     }
