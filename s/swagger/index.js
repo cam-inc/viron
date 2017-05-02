@@ -38,6 +38,13 @@ class Swagger {
           return reject(client.errors);
         }
 
+        if (client.spec.status === 401) {
+          const err = new Error()
+          err.name = '401 Authorization Required';
+          err.status = client.spec.status;
+          return reject(err);
+        }
+
         console.log(`[fetch] ${client.url} success.`);
         this.client = client;
 

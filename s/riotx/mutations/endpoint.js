@@ -45,7 +45,7 @@ export default {
     if (!token) {
       return [constants.CHANGE_ENDPOINT_TOKEN_ERROR];
     }
-
+    // TODO いらない
     context.state.current = storage.set(constants.STORAGE_CURRENT, key);
     return [constants.CHANGE_CURRENT];
 

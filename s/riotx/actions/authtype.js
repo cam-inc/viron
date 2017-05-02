@@ -5,7 +5,7 @@ export default {
   get: (context, key) => {
     const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
     const url = new URL(endpoint.url)
-    let fetchUrl = `${url.origin}/dmc_auth`;
+    let fetchUrl = `${url.origin}/dmc_authtype`;
     return fetch(fetchUrl)
       .then((response) => {
         return response.json();

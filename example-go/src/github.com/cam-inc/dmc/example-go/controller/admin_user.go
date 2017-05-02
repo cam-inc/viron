@@ -1,17 +1,13 @@
 package controller
 
 import (
-	"crypto/rand"
-	"encoding/base64"
-	"io"
-
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	"github.com/cam-inc/dmc/example-go/models"
 	"github.com/goadesign/goa"
 	"github.com/jinzhu/gorm"
 
-	"golang.org/x/crypto/scrypt"
+	"github.com/cam-inc/dmc/example-go/service"
 )
 
 // AdminUserController implements the admin_user resource.
@@ -29,36 +25,15 @@ func (c *AdminUserController) Create(ctx *app.CreateAdminUserContext) error {
 	// AdminUserController_Create: start_implement
 
 	// Put your logic here
-	adminUserTable := models.NewAdminUserDB(common.DB)
-	m := models.NewAdminUser()
-	m.LoginID = *ctx.Payload.LoginID
-
-	// generate password hash with salt
-	ary := make([]byte, 32)
-	_, err := io.ReadFull(rand.Reader, ary)
-	if err != nil {
-		panic(err)
+	if m, err := service.CreateAdminUserByIdPassword(ctx.Context, *ctx.Payload.Email, *ctx.Payload.Password, common.GetDefaultRole()); err != nil {
+		return ctx.InternalServerError()
+	} else {
+		res := &app.AdminUser{
+			Email: m.Email,
+			RoleID:  &m.RoleID,
+		}
+		return ctx.OK(res)
 	}
-	salt := base64.StdEncoding.EncodeToString(ary)
-	passwordHash, err := scrypt.Key([]byte(*ctx.Payload.Password), []byte(salt), 16384, 8, 1, 64)
-	if err != nil {
-		panic(err)
-	}
-	m.Salt = salt
-	m.Password = base64.StdEncoding.EncodeToString(passwordHash)
-	m.RoleID = common.GetDefaultRole()
-
-	err = adminUserTable.Add(ctx.Context, &m)
-	if err != nil {
-		panic(err)
-	}
-
-	// AdminUserController_Create: end_implement
-	res := &app.AdminUser{
-		LoginID: m.LoginID,
-		RoleID:  &m.RoleID,
-	}
-	return ctx.OK(res)
 }
 
 // Delete runs the delete action.

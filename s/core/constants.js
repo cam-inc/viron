@@ -12,6 +12,9 @@ export default {
   STYLE_NUMBER: 'number',
   STYLE_TABLE: 'table',
 
+  // Auth type
+  AUTH_TYPE_EMAIL: 'email',
+  AUTH_TYPE_OAUTH: 'oauth',
 
   // riotx#actions
   ACTION_DRAWER_TOGGLE: 'drawer_toggle',
@@ -39,6 +42,8 @@ export default {
   ACTION_MODAL_HIDE: 'modal_hide',
 
   ACTION_AUTH_UPDATE: 'auth_update',
+  ACTION_AUTH_SIGN_IN_GOOGLE: 'auth_sign_in_google',
+  ACTION_AUTH_SIGN_IN_EMAIL: 'auth_sign_in_email',
   ACTION_AUTHTYPE_GET: 'authtype_get',
 
 
