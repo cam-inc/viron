@@ -10,6 +10,8 @@
 @import "Input";
 @import "Modals";
 @import "Modal";
+@import "Radio";
+@import "Radios";
 @import "Switch";
 @import "Tag";
 @import "Toasts";
