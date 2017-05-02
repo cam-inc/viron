@@ -20,24 +20,8 @@ export default {
   signInGoogle: (context, key, authtype) => {
     const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
     const url = new URL(endpoint.url);
-    let fetchUrl = `${url.origin}${authtype.url}`;
-    return fetch(fetchUrl, {
-      method: 'POST',
-      // redirect: 'manual',
-      mode: 'cors',
-    })
-      .then((response) => {
-        if (response.type === 'opaqueredirect') {
-          return response.blob();
-        }
-
-        throw new Error('TODO error....................');
-      })
-      .then(json => {
-        debugger;
-        return json; // TODO state管理するかは後で決める
-      })
-      ;
+    let fetchUrl = `${url.origin}${authtype.url}?redirect_url=http://localhost:8080/AAAAA/`; // TODO: 良い感じにしてください
+    location.href = fetchUrl;
   },
 
   signInEMail: (context, key, authtype, email, password) => {
@@ -48,7 +32,7 @@ export default {
     return fetch(fetchUrl, {
       method: 'POST',
       mode: 'cors',
-      body: JSON.stringify({ login_id: email, password: password })
+      body: JSON.stringify({ email, password })
     })
       .then((response) => {
         // TODO サーバー動いたら実装する
