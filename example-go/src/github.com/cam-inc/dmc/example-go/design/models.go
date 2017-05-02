@@ -54,7 +54,7 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 			Field("id", gorma.Integer, func() {
 				PrimaryKey()
 			})
-			Field("login_id", gorma.String, func() {
+			Field("email", gorma.String, func() {
 				SQLTag("index")
 				SQLTag("unique")
 			})

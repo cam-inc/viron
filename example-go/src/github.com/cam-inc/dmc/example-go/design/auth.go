@@ -39,7 +39,7 @@ var _ = Resource("auth", func() {
 		//Security(SigninBasicAuth)
 		Routing(POST("/signin"))
 		Payload(func() {
-			Member("login_id")
+			Member("email")
 			Member("password")
 		})
 		Response(NoContent, func() {

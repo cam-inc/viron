@@ -12,10 +12,10 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-func CreateAdminUserByIdPassword(ctx context.Context, loginID string, password string, role string) (*genModels.AdminUser, error) {
+func CreateAdminUserByIdPassword(ctx context.Context, email string, password string, role string) (*genModels.AdminUser, error) {
 	adminUserTable := models.NewAdminUserDB(common.DB)
 	m := models.NewAdminUser()
-	m.LoginID = loginID
+	m.Email = email
 
 	// generate password hash with salt
 	ary := make([]byte, 32)

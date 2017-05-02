@@ -58,7 +58,7 @@ func AuditLog() goa.Middleware {
 					// passwordをログ出力したくないのでrequestBodyは出さない
 					if payload != nil {
 						_payload := payload.(*app.SigninAuthPayload)
-						userID = *_payload.LoginID
+						userID = *_payload.Email
 					}
 				} else {
 					// 非認証API

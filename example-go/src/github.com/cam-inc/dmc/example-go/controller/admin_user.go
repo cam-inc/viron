@@ -25,11 +25,11 @@ func (c *AdminUserController) Create(ctx *app.CreateAdminUserContext) error {
 	// AdminUserController_Create: start_implement
 
 	// Put your logic here
-	if m, err := service.CreateAdminUserByIdPassword(ctx.Context, *ctx.Payload.LoginID, *ctx.Payload.Password, common.GetDefaultRole()); err != nil {
+	if m, err := service.CreateAdminUserByIdPassword(ctx.Context, *ctx.Payload.Email, *ctx.Payload.Password, common.GetDefaultRole()); err != nil {
 		return ctx.InternalServerError()
 	} else {
 		res := &app.AdminUser{
-			LoginID: m.LoginID,
+			Email: m.Email,
 			RoleID:  &m.RoleID,
 		}
 		return ctx.OK(res)

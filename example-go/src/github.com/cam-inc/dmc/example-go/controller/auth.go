@@ -108,18 +108,18 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	logger := common.GetLogger("default")
 	// Authorize
 	adminUserTable := models.NewAdminUserDB(common.DB)
-	adminUserModel, err := adminUserTable.GetByLoginID(ctx.Context, *ctx.Payload.LoginID)
+	adminUserModel, err := adminUserTable.GetByEmail(ctx.Context, *ctx.Payload.Email)
 	if err == gorm.ErrRecordNotFound {
 		if adminUsers := adminUserTable.ListAdminUserSmall(ctx.Context); len(adminUsers) > 0 {
 			return ctx.NotFound()
 		}
 		// DBに1人も管理者がいないときは、このユーザーをスーパーユーザーとして登録する
-		adminUserModel, err = service.CreateAdminUserByIdPassword(ctx.Context, *ctx.Payload.LoginID, *ctx.Payload.Password, common.GetSuperRole())
+		adminUserModel, err = service.CreateAdminUserByIdPassword(ctx.Context, *ctx.Payload.Email, *ctx.Payload.Password, common.GetSuperRole())
 		if err != nil {
 			return ctx.InternalServerError()
 		}
 	} else if err != nil {
-		logger.Error("Signin GetByLoginID failure.", zap.String("loginID", *ctx.Payload.LoginID))
+		logger.Error("Signin GetByEmail failure.", zap.String("email", *ctx.Payload.Email))
 		ctx.ResponseWriter.Header().Set("location", "/")
 		return ctx.TemporaryRedirect()
 	}
@@ -131,14 +131,14 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 
 	if roles, err := getRoles(ctx.Context, adminUserModel.RoleID); err != nil {
 		logger.Error("Signin getRoles failure.",
-			zap.String("loginID", *ctx.Payload.LoginID),
+			zap.String("email", *ctx.Payload.Email),
 			zap.String("roleID", adminUserModel.RoleID))
 		ctx.ResponseWriter.Header().Set("location", "/")
 		return ctx.TemporaryRedirect()
 	} else {
 		// Generate JWT
 		claims := map[string]interface{}{
-			"sub":   *ctx.Payload.LoginID, // ユーザー識別子
+			"sub":   *ctx.Payload.Email, // ユーザー識別子
 			"roles": string(roles),        // ユーザー権限 - not a standard claim
 		}
 		if jwt, err := generateJwt(claims, c.privateKey); err != nil {
@@ -202,30 +202,30 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 		ctx.ResponseWriter.Header().Set("location", "/")
 		return ctx.TemporaryRedirect()
 	} else {
-		loginID := userInfo.EMail
+		email := userInfo.EMail
 
 		adminUserTable := models.NewAdminUserDB(common.DB)
-		adminUserModel, err := adminUserTable.GetByLoginID(ctx.Context, loginID)
+		adminUserModel, err := adminUserTable.GetByEmail(ctx.Context, email)
 		if err == gorm.ErrRecordNotFound {
 			// 新規ユーザーの場合はユーザー作成
 			m := models.NewAdminUser()
-			m.LoginID = loginID
+			m.Email = email
 			m.RoleID = common.GetDefaultRole()
 			if err = adminUserTable.Add(ctx.Context, &m); err != nil {
-				logger.Error("GoogleSignin add admin_user failure.", zap.String("loginID", loginID))
+				logger.Error("GoogleSignin add admin_user failure.", zap.String("email", email))
 				ctx.ResponseWriter.Header().Set("location", "/")
 				return ctx.TemporaryRedirect()
 			}
 			adminUserModel = &m
 		} else if err != nil {
-			logger.Error("GoogleSignin GetByLoginID failure.", zap.String("loginID", loginID))
+			logger.Error("GoogleSignin GetByEmail failure.", zap.String("email", email))
 			ctx.ResponseWriter.Header().Set("location", "/")
 			return ctx.TemporaryRedirect()
 		}
 
 		if roles, err := getRoles(ctx.Context, adminUserModel.RoleID); err != nil {
 			logger.Error("GoogleSignin getRoles failure.",
-				zap.String("loginID", adminUserModel.LoginID),
+				zap.String("email", adminUserModel.Email),
 				zap.String("roleID", adminUserModel.RoleID))
 			ctx.ResponseWriter.Header().Set("location", "/")
 			return ctx.TemporaryRedirect()
@@ -233,7 +233,7 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 			// Generate JWT
 			tokenBytes, _ := json.Marshal(token)
 			claims := map[string]interface{}{
-				"sub":              adminUserModel.LoginID, // ユーザー識別子
+				"sub":              adminUserModel.Email, // ユーザー識別子
 				"roles":            string(roles),          // ユーザー権限 - not a standard claim
 				"googleOAuthToken": string(tokenBytes),     // googleOAuthToken - not a standard claim
 			}
