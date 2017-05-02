@@ -41,12 +41,19 @@ dmc-signin
       return v.type === constants.AUTH_TYPE_EMAIL;
     }));
 
+    this.closeModal = () => {
+      if (this.opts.isModal) {
+        this.opts.modalCloser();
+      }
+    }
+
     this.handleSignInEMail = (ev) => {
       const idx = parseInt(ev.currentTarget.getAttribute('data-idx'));
       const email = this.refs[`email_${idx}`].value;
       const password = this.refs[`password_${idx}`].value;
       store.action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, ev.item.authtype, email, password)
         .then(() => {
+          this.closeModal();
           this.opts.onSignIn();
         })
         .catch((err) => {

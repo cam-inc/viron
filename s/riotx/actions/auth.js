@@ -4,9 +4,12 @@ export default {
   update: (context, key) => {
     const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
     return fetch(endpoint.url, {
-      headers: {"Authorization": `Bearer: ${endpoint.token}`}
+      headers: {
+        "Authorization": endpoint.token
+      }
     })
       .then((response) => {
+      debugger;
         if (response.status === 401) {
           context.commit(constants.MUTATION_ENDPOINT_TOKEN_UPDATE, key, null);
           return;
@@ -48,12 +51,10 @@ export default {
     return fetch(fetchUrl, {
       method: 'POST',
       mode: 'cors',
-      body: JSON.stringify({ login_id: email, password: password })
+      body: JSON.stringify({ email: email, password: password })
     })
       .then((response) => {
-        // TODO サーバー動いたら実装する
-        throw new Error('aaa');
-        return 'ABCDEFGHIJKLMN';
+        return response.headers.get("Authorization");
       })
       .then(token => {
         context.commit(constants.MUTATION_ENDPOINT_TOKEN_UPDATE, key, token);

@@ -40,6 +40,8 @@ export default {
   exports: 'none',
   format: 'iife',
   moduleContext: { 'node_modules/whatwg-fetch/fetch.js': 'window' },
+  // external: null,
+  // globals: { },
   plugins: [
     json(),
     replace({
@@ -49,9 +51,9 @@ export default {
       template: 'pug'
     }),
     nodeResolve({
-      jsnext: true
-      // main: true,
-      // browser: true
+      jsnext: true,
+      main: true,
+      browser: true
     }),
     commonjs({
       include: 'node_modules/**',
@@ -59,7 +61,7 @@ export default {
     }),
     buble({
       target: {
-        // chrome: 49, firefox: 45, safari: 9, edge: 12, ie: 11
+        //chrome: 49, firefox: 45, safari: 9, edge: 12, ie: 11
         chrome: 52
       }
     }),

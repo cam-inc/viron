@@ -56,5 +56,8 @@ dmc-drawer.Drawer
 
     this.evSelect = (ev) => {
       ev.item.id.get()
+      debugger;
+
+      console.log(router)
       router.navigateTo(ev.item.id.get());
     }

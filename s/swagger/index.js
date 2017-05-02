@@ -15,14 +15,16 @@ class Swagger {
     this.client = null;
   }
 
-  setup(url) {
+  setup(endpoint) {
     return new Promise((resolve, reject) => {
       const request = {
-        url: url || 'http://localhost:3000/swagger.json',
+        url: endpoint.url || 'http://localhost:3000/swagger.json',
         //query,
         //method,
         //body,
-        //headers,
+        headers: {
+          'Authorization': endpoint.token,
+        },
         requestInterceptor: (req) => {
           console.log('Interceptor(request):', req);
         },
@@ -31,14 +33,13 @@ class Swagger {
         }
       };
 
-      this._endpoint = SwaggerClient(request.url);
+      this._endpoint = SwaggerClient.http(request);
 
       this._endpoint.then(client => {
         if (client.errors && 0 < client.errors.length) {
           return reject(client.errors);
         }
-
-        if (client.spec.status === 401) {
+        if (client.status === 401) {
           const err = new Error()
           err.name = '401 Authorization Required';
           err.status = client.spec.status;
@@ -46,9 +47,11 @@ class Swagger {
         }
 
         console.log(`[fetch] ${client.url} success.`);
-        this.client = client;
 
-        resolve();
+        SwaggerClient({spec: client.body}).then((_client) => {
+          this.client = _client;
+          resolve();
+        });
 
       }).catch(err => {
         return reject(err);

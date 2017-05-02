@@ -84,7 +84,7 @@ let setupRouter = (store) => {
         Promise
           .resolve()
           .then(() => store.action(constants.ACTION_DMC_REMOVE))
-          .then(() => swagger.setup(endpoint.url))
+          .then(() => swagger.setup(endpoint))
           .then(() => store.action(constants.ACTION_DMC_GET))
           .then(() => {
             // TODO ここの位置で良いかは最終的に決める

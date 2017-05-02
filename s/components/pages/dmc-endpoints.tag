@@ -39,6 +39,7 @@ dmc-endpoints.EndpointsPage
     handleEndpointEntry(key) {
       store.action(constants.ACTION_AUTH_UPDATE, key)
         .then(() => {
+          debugger;
           if (!store.getter(constants.GETTER_ENDPOINT_ONE, key).token) {
             router.navigateTo(`/signin/${key}`, true); // href hash #/
             return;
