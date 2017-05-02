@@ -34,7 +34,9 @@ export default {
       .then(() => {
         // TODO 上書きの場合は、そもそも登録ボタンを押せなくする
         let endpoint = context.state.endpoint;
-        endpoint[url] = {
+        const key = context.getter(constants.GETTER_ENDPOINT_NEXT_KEY);
+        endpoint[key] = {
+          url: url,
           memo: '',
           token: null,
           title: '',
@@ -44,15 +46,21 @@ export default {
           thumbnail: '',
           tags: [],
         };
-        endpoint[url].memo = memo;
+        endpoint[key].memo = memo;
         return {
-          url: url,
-          endpoint: endpoint[url]
+          key: key,
+          endpoint: endpoint[key]
         };
+
       })
       .then((res) => {
         context.commit(constants.MUTATION_ENDPOINT_ADD, res);
+        return res;
       })
+      // .then((res) => {
+      //   debugger;
+      //   router.navigateTo('/signin', true); // TODO force refresh
+      // })
     ;
   }
 };

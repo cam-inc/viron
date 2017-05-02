@@ -30,7 +30,7 @@ var _ = Resource("auth_type", func() {
 	Origin(OriginURL, OriginAllowAll)
 
 	Action("list", func() {
-		Routing(GET("/dmc_auth"))
+		Routing(GET("/dmc_authtype"))
 		Description("get auth types")
 		Response(OK, func() {
 			Media(CollectionOf(AuthTypeMediaType, func() {
