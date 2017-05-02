@@ -139,7 +139,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 		// Generate JWT
 		claims := map[string]interface{}{
 			"sub":   *ctx.Payload.Email, // ユーザー識別子
-			"roles": string(roles),        // ユーザー権限 - not a standard claim
+			"roles": string(roles),      // ユーザー権限 - not a standard claim
 		}
 		if jwt, err := generateJwt(claims, c.privateKey); err != nil {
 			logger.Error("Signin failed to sign token", zap.Error(err))
@@ -234,8 +234,8 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 			tokenBytes, _ := json.Marshal(token)
 			claims := map[string]interface{}{
 				"sub":              adminUserModel.Email, // ユーザー識別子
-				"roles":            string(roles),          // ユーザー権限 - not a standard claim
-				"googleOAuthToken": string(tokenBytes),     // googleOAuthToken - not a standard claim
+				"roles":            string(roles),        // ユーザー権限 - not a standard claim
+				"googleOAuthToken": string(tokenBytes),   // googleOAuthToken - not a standard claim
 			}
 			if jwt, err := generateJwt(claims, c.privateKey); err != nil {
 				logger.Error("GoogleSignin failed to sign token", zap.Error(err))

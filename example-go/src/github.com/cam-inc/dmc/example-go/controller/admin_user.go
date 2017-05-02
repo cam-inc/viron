@@ -29,8 +29,8 @@ func (c *AdminUserController) Create(ctx *app.CreateAdminUserContext) error {
 		return ctx.InternalServerError()
 	} else {
 		res := &app.AdminUser{
-			Email: m.Email,
-			RoleID:  &m.RoleID,
+			Email:  m.Email,
+			RoleID: &m.RoleID,
 		}
 		return ctx.OK(res)
 	}
