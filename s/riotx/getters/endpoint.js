@@ -1,11 +1,24 @@
 import { keys } from 'mout/object';
 
+const number = '1234567890';
+const alphabet = 'abcdefghiz';
+
+const number2alphabet = (str) => {
+  str += '';
+  for (let i = 0; i < number.length; i++) {
+    const re = new RegExp(number[i], 'g');
+    str = str.replace(re, alphabet[i]);
+  }
+  return str;
+
+};
+
 export default {
   list: context => {
     return context.state.endpoint;
   },
   nextKey: (context) => {
-    return keys(context.state.endpoint).length;
+    return number2alphabet(keys(context.state.endpoint).length + 1);
   },
   one: (context, key) => {
     return context.state.endpoint[key];

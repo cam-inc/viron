@@ -9,6 +9,8 @@ import (
 // OriginURL response header
 var OriginURL = "*"
 
+//var OriginURL = "http://localhost:8080"
+
 // OriginAllowAll response header
 var OriginAllowAll = func() {
 	Methods("GET", "OPTIONS", "PUT", "POST", "DELETE") // Allow all origins to retrieve the Swagger JSON (CORS)
