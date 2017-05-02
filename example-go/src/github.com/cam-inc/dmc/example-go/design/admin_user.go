@@ -81,6 +81,7 @@ var _ = Resource("admin_user", func() {
 		})
 		Response(OK, func() { Media(AdminUserMediaType) })
 		Response(NotFound)
+		Response(InternalServerError)
 		Response(BadRequest, ErrorMedia)
 	})
 

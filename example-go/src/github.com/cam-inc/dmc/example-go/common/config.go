@@ -12,6 +12,7 @@ type Config struct {
 	Port   int16
 	GoogleOAuth
 	DefaultRole string
+	SuperRole   string
 }
 
 // GoogleOAuth of
@@ -31,6 +32,7 @@ func init() {
 		Host:        "localhost",
 		Port:        3000,
 		DefaultRole: "viewer", // AdminUser作成時の初期ロール
+		SuperRole:   "super",  // SuperUserのロール
 
 		GoogleOAuth: GoogleOAuth{
 			ClientID:     os.Getenv("GOOGLE_OAUTH_CLIENT_ID"),
@@ -60,4 +62,9 @@ func GetGoogleOAuth() GoogleOAuth {
 // GetDefaultRole of
 func GetDefaultRole() string {
 	return config.DefaultRole
+}
+
+// GetSuperRole of
+func GetSuperRole() string {
+	return config.SuperRole
 }

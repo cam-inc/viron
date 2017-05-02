@@ -49,6 +49,7 @@ var _ = Resource("auth", func() {
 		})
 		Response(Unauthorized)
 		Response(NotFound)
+		Response(InternalServerError)
 		Response(TemporaryRedirect)
 	})
 
