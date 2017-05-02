@@ -147,7 +147,7 @@ bench: ## Benchmark
 #
 # -- goa
 #
-gen: gen-controller gen-app gen-client gen-swagger gen-schema gen-js gen-model ## Generate goa all (ignore: gen-main)
+gen: gen-controller gen-app gen-client gen-swagger gen-schema gen-js gen-model gen-js-model ## Generate goa all (ignore: gen-main)
 	@#GOPATH=$(__GOPATH) $(__GOAGEN) bootstrap -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_DIR)
 	@echo "Finish :p"
 
@@ -184,6 +184,9 @@ gen-model: ## Generate goa [gorma]
 	@echo "[INFO ] >>>>> gen-model"
 	GOPATH=$(__GOPATH) $(__GOAGEN) gen -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN) --pkg-path=github.com/goadesign/gorma
 
+gen-js-model: ## Generate goa [js-model]
+	@echo "[INFO ] >>>>> gen-js-model"
+	GOPATH=$(__GOPATH) $(__GOAGEN) gen -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN) --pkg-path=$(__PKG_PROJECT_HOME)/generator/jsmodel
 
 #
 # -- Start Server

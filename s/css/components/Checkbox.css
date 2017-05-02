@@ -1,0 +1,54 @@
+.Checkbox {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.Checkbox__content {
+  @apply --layout-center-center;
+}
+
+.Checkbox__mark {
+  @apply --layout-center-center;
+  width: 18px;
+  height: 18px;
+  font-size: 16px;
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-white);
+  border: 1px solid var(--color-basic-gray);
+  border-radius: 2px;
+  transition-duration: 100ms;
+  transition-property: border-color, background-color;
+}
+
+.Checkbox--disabled {
+  cursor: not-allowed;
+}
+
+.Checkbox--disabled .Checkbox__mark {
+  background-color: var(--color-basic-lightGray);
+}
+
+.Checkbox--checked:not(.Checkbox--disabled) .Checkbox__mark {
+  background-color: var(--color-basic-skyblue);
+  border-color: var(--color-basic-skyblue);
+}
+
+.Checkbox__mark .Icon {
+  transition-duration: 100ms;
+  transition-property: transform;
+  transform: scale(0);
+}
+
+.Checkbox--checked .Checkbox__mark .Icon {
+  transform: scale(1);
+}
+
+.Checkbox__label {
+  flex-grow: 1;
+  margin-left: 4px;
+  color: var(--color-basic-black);
+}
+
+.Checkbox--disabled .Checkbox__label {
+  color: var(--color-basic-gray);
+}
