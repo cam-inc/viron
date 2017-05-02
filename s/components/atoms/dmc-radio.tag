@@ -10,5 +10,5 @@ dmc-radio(class="Radio { opts.isselected ? 'Radio--selected' : '' } { opts.isdis
       if (this.opts.isdisabled) {
         return;
       }
-      this.opts.onchange && this.opts.onchange(!this.opts.isselected);
+      this.opts.onchange && this.opts.onchange(!this.opts.isselected, this.opts.id);
     }
