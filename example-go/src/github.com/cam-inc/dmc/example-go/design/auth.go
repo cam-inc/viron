@@ -62,7 +62,10 @@ var _ = Resource("auth", func() {
 	// Google認証
 	Action("googlesignin", func() {
 		Description("signin with google")
-		Routing(POST("/googlesignin"))
+		Routing(GET("/googlesignin"))
+		Params(func() {
+			Param("redirect_url", String, "redirect url")
+		})
 		Response(MovedPermanently, func() {
 			Headers(func() {
 				Header("Location", String, "redirect url")
@@ -78,9 +81,11 @@ var _ = Resource("auth", func() {
 			Param("code", String, "authorization code")
 			Param("state", String, "check state for CSRF")
 		})
-		Response(NoContent, func() {
+		Response(MovedPermanently, func() {
 			Headers(func() {
 				Header("Authorization", String, "Generated JWT")
+				Header("Location", String, "redirect url")
+				Header("Content-Type", String, "content type")
 			})
 		})
 		Response(TemporaryRedirect)

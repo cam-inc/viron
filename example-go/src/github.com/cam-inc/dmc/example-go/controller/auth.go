@@ -139,7 +139,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 		// Generate JWT
 		claims := map[string]interface{}{
 			"sub":   *ctx.Payload.Email, // ユーザー識別子
-			"roles": string(roles),        // ユーザー権限 - not a standard claim
+			"roles": string(roles),      // ユーザー権限 - not a standard claim
 		}
 		if jwt, err := generateJwt(claims, c.privateKey); err != nil {
 			logger.Error("Signin failed to sign token", zap.Error(err))
@@ -168,7 +168,7 @@ func (c *AuthController) Signout(ctx *app.SignoutAuthContext) error {
 // Googlesignin runs the googlesignin action.
 func (c *AuthController) Googlesignin(ctx *app.GooglesigninAuthContext) error {
 	config := service.GetOAuth2Config()
-	redirectUrl := config.AuthCodeURL("dmc_1")
+	redirectUrl := config.AuthCodeURL(*ctx.RedirectURL)
 
 	ctx.ResponseWriter.Header().Set("Content-Type", "text/html")
 	ctx.ResponseWriter.Header().Set("location", redirectUrl)
@@ -178,12 +178,6 @@ func (c *AuthController) Googlesignin(ctx *app.GooglesigninAuthContext) error {
 // Googleoauth2callback runs the googleoauth2callback action.
 func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthContext) error {
 	logger := common.GetLogger("default")
-
-	if *ctx.State != "dmc_1" {
-		logger.Error("GoogleSignin invalid state.", zap.String("state", *ctx.State))
-		ctx.ResponseWriter.Header().Set("location", "/")
-		return ctx.TemporaryRedirect()
-	}
 
 	// OAuthTokenを取得
 	config := service.GetOAuth2Config()
@@ -234,8 +228,8 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 			tokenBytes, _ := json.Marshal(token)
 			claims := map[string]interface{}{
 				"sub":              adminUserModel.Email, // ユーザー識別子
-				"roles":            string(roles),          // ユーザー権限 - not a standard claim
-				"googleOAuthToken": string(tokenBytes),     // googleOAuthToken - not a standard claim
+				"roles":            string(roles),        // ユーザー権限 - not a standard claim
+				"googleOAuthToken": string(tokenBytes),   // googleOAuthToken - not a standard claim
 			}
 			if jwt, err := generateJwt(claims, c.privateKey); err != nil {
 				logger.Error("GoogleSignin failed to sign token", zap.Error(err))
@@ -244,7 +238,8 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 			} else {
 				// Set auth header for client retrieval
 				ctx.ResponseData.Header().Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
-				return ctx.NoContent()
+				ctx.ResponseWriter.Header().Set("location", *ctx.State)
+				return ctx.MovedPermanently()
 			}
 		}
 	}
