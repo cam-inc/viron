@@ -9,6 +9,7 @@ import component from './component';
 import toast from './toast';
 import modal from './modal';
 import auth from './auth';
+import authtype from './authtype';
 
 
 export default {
@@ -37,5 +38,6 @@ export default {
   [constants.ACTION_MODAL_HIDE]: modal.hide,
 
   [constants.ACTION_AUTH_UPDATE]: auth.update,
+  [constants.ACTION_AUTHTYPE_GET]: authtype.get,
 
 };

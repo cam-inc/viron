@@ -27,4 +27,6 @@ export default {
 
   [constants.GETTER_ENDPOINT_LIST]: endpoint.list,
   [constants.GETTER_ENDPOINT_ONE]: endpoint.one,
+  [constants.GETTER_ENDPOINT_NEXT_KEY]: endpoint.nextKey,
+
 };

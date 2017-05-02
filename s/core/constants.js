@@ -39,6 +39,8 @@ export default {
   ACTION_MODAL_HIDE: 'modal_hide',
 
   ACTION_AUTH_UPDATE: 'auth_update',
+  ACTION_AUTHTYPE_GET: 'authtype_get',
+
 
   // riotx#mutations
   MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
@@ -50,6 +52,7 @@ export default {
   MUTATION_ENDPOINT_REMOVE: 'endpoint_remove',
   MUTATION_ENDPOINT_REMOVE_ALL: 'endpoint_remove_all',
   MUTATION_ENDPOINT_ADD: "endpoint_add",
+  MUTATION_ENDPOINT_TOKEN_UPDATE: 'endpoint_token_update',
 
   MUTATION_CURRENT_UPDATE: 'current_update',
   MUTATION_CURRENT_REMOVE: 'current_remove',
@@ -64,7 +67,6 @@ export default {
   MUTATION_MODAL_ADD: 'modal_add',
   MUTATION_MODAL_REMOVE: 'modal_remove',
 
-  MUTATION_AUTH_UPDATE: 'auth_update',
 
   // riotx#getters
   GETTER_DRAWER_OPENED: 'drawer_opened',
@@ -85,6 +87,7 @@ export default {
 
   GETTER_ENDPOINT_LIST: 'endpoint_list',
   GETTER_ENDPOINT_ONE: 'endpoint_one',
+  GETTER_ENDPOINT_NEXT_KEY: 'endpoint_next_key',
 
   // riotx#mutated
   CHANGE_DRAWER: 'drawer',
@@ -96,6 +99,8 @@ export default {
   CHANGE_CURRENT: 'current',
 
   CHANGE_PAGE: 'page',
+
+  CHANGE_ENDPOINT_TOKEN_ERROR: 'endpoint_token_error',
 
   changeComponentName: name => {
     return CHANGE_COMPONENT_PREFIX + name;
