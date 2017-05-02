@@ -29,7 +29,7 @@ type AuthController struct {
 
 func getRoles(ctx context.Context, roleID string) ([]byte, error) {
 	roles := map[string][]string{}
-	if roleID == "super" {
+	if roleID == common.GetSuperRole() {
 		// super権限の場合は全許可
 		roles["get"] = []string{"*"}
 		roles["post"] = []string{"*"}
@@ -110,7 +110,14 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	adminUserTable := models.NewAdminUserDB(common.DB)
 	adminUserModel, err := adminUserTable.GetByLoginID(ctx.Context, *ctx.Payload.LoginID)
 	if err == gorm.ErrRecordNotFound {
-		return ctx.NotFound()
+		if adminUsers := adminUserTable.ListAdminUserSmall(ctx.Context); len(adminUsers) > 0 {
+			return ctx.NotFound()
+		}
+		// DBに1人も管理者がいないときは、このユーザーをスーパーユーザーとして登録する
+		adminUserModel, err = service.CreateAdminUserByIdPassword(ctx.Context, *ctx.Payload.LoginID, *ctx.Payload.Password, common.GetSuperRole())
+		if err != nil {
+			return ctx.InternalServerError()
+		}
 	} else if err != nil {
 		logger.Error("Signin GetByLoginID failure.", zap.String("loginID", *ctx.Payload.LoginID))
 		ctx.ResponseWriter.Header().Set("location", "/")

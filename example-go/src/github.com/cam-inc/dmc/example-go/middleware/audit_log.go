@@ -56,12 +56,16 @@ func AuditLog() goa.Middleware {
 				} else if req.Method == "POST" && req.RequestURI == "/signin" {
 					// `/signin` の場合はrequestBodyからuserIDを取り出す
 					// passwordをログ出力したくないのでrequestBodyは出さない
-					_payload := payload.(*app.SigninAuthPayload)
-					userID = *_payload.LoginID
+					if payload != nil {
+						_payload := payload.(*app.SigninAuthPayload)
+						userID = *_payload.LoginID
+					}
 				} else {
 					// 非認証API
-					jsonBytes, _ := json.Marshal(payload)
-					requestBody = string(jsonBytes)
+					if payload != nil {
+						jsonBytes, _ := json.Marshal(payload)
+						requestBody = string(jsonBytes)
+					}
 				}
 
 				res := goa.ContextResponse(ctx)
