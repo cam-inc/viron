@@ -38,6 +38,8 @@ export default {
   [constants.ACTION_MODAL_HIDE]: modal.hide,
 
   [constants.ACTION_AUTH_UPDATE]: auth.update,
+  [constants.ACTION_AUTH_SIGN_IN_GOOGLE]: auth.signInGoogle,
+
   [constants.ACTION_AUTHTYPE_GET]: authtype.get,
 
 };

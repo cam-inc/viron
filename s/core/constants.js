@@ -39,6 +39,7 @@ export default {
   ACTION_MODAL_HIDE: 'modal_hide',
 
   ACTION_AUTH_UPDATE: 'auth_update',
+  ACTION_AUTH_SIGN_IN_GOOGLE: 'auth_google_sign_in',
   ACTION_AUTHTYPE_GET: 'authtype_get',
 
 

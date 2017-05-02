@@ -42,7 +42,7 @@ dmc-signin
 
     this.evSignIn = (ev) => {
       console.log(ev.item.authtype);
-      alert('TODO Sign In.');
+      store.action(constants.ACTION_AUTH_SIGN_IN_GOOGLE, this.opts.key, ev.item.authtype);
     }
 
 
