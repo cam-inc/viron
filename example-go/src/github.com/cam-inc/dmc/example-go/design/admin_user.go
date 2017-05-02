@@ -11,15 +11,15 @@ var AdminUserMediaType = MediaType("application/vnd.admin_user+json", func() {
 
 	Attributes(func() {
 		Attribute("id", Integer, "unique id")
-		Attribute("login_id", String, "login id")
+		Attribute("email", String, "login id")
 		Attribute("role_id", String, "role id")
 
-		Required("id", "login_id")
+		Required("id", "email")
 	})
 
 	largeView := func() {
 		Attribute("id")
-		Attribute("login_id")
+		Attribute("email")
 		Attribute("role_id")
 	}
 
@@ -27,12 +27,12 @@ var AdminUserMediaType = MediaType("application/vnd.admin_user+json", func() {
 	View("large", largeView)
 	View("medium", func() {
 		Attribute("id")
-		Attribute("login_id")
+		Attribute("email")
 		Attribute("role_id")
 	})
 	View("small", func() {
 		Attribute("id")
-		Attribute("login_id")
+		Attribute("email")
 	})
 })
 
@@ -76,11 +76,12 @@ var _ = Resource("admin_user", func() {
 		Description("create a admin user")
 		Routing(POST(""))
 		Payload(func() {
-			Member("login_id", String)
+			Member("email", String)
 			Member("password", String)
 		})
 		Response(OK, func() { Media(AdminUserMediaType) })
 		Response(NotFound)
+		Response(InternalServerError)
 		Response(BadRequest, ErrorMedia)
 	})
 

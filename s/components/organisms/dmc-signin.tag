@@ -5,15 +5,16 @@ dmc-signin
 
   hr
 
-  div.__email(each="{ authtype in emails }")
+  div.__email(each="{ authtype, idx in emails }")
     h2 { authtype.provider }
-    input.__field(type="text" value="" placeholder="e-mail")
-    input.__field(type="password" value="")
-    input.__button(type="button" value="Sing In" onclick="{ evSignIn }")
+    input.__field(ref="email_{idx}" type="email" placeholder="e-mail" value="fkei@example.com")
+    input.__field(ref="password_{idx}" type="password" value="1234567890")
+    input.__button(type="button" value="Sing In" onclick="{ handleSignInEMail }" data-idx="{ idx }")
+
     hr
 
   div.__oauth(each="{ authtype in oauths }")
-    input.__button(type="button" value="Google Auth" onclick="{ evSignIn }")
+    input.__button(type="button" value="{ authtype.provider } Auth" onclick="{ handleSignInOAuth }")
     hr
 
   style.
@@ -33,15 +34,29 @@ dmc-signin
     const store = this.riotx.get();
 
     this.oauths = values(filter(this.opts.authtype, v => {
-      return v.type === 'oauth';
+      return v.type === constants.AUTH_TYPE_OAUTH;
     }));
 
     this.emails = values(filter(this.opts.authtype, v => {
-      return v.type === 'email';
+      return v.type === constants.AUTH_TYPE_EMAIL;
     }));
 
-    this.evSignIn = (ev) => {
-      console.log(ev.item.authtype);
+    this.handleSignInEMail = (ev) => {
+      const idx = parseInt(ev.currentTarget.getAttribute('data-idx'));
+      const email = this.refs[`email_${idx}`].value;
+      const password = this.refs[`password_${idx}`].value;
+      store.action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, ev.item.authtype, email, password)
+        .then(() => {
+          this.opts.onSignIn();
+        })
+        .catch((err) => {
+          // TODO SingIn 失敗通知
+          debugger;
+        })
+      ;
+    }
+
+    this.handleSignInOAuth = (ev) => {
       store.action(constants.ACTION_AUTH_SIGN_IN_GOOGLE, this.opts.key, ev.item.authtype);
     }
 
