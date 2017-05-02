@@ -98,6 +98,9 @@ class Store {
     const _state = ObjectAssign({}, this.state);
     log('[commit(before)]', name, _state, ...args);
     const context = {
+      getter: (name, ...args) => {
+        return this.getter.apply(this, [name, ...args]);
+      },
       state : _state
     };
     const triggers = this._mutations[name].apply(null, [context, ...args]);
@@ -120,6 +123,9 @@ class Store {
     log('[action]', name, args);
 
     const context = {
+      getter: (name, ...args) => {
+        return this.getter.apply(this, [name, ...args]);
+      },
       state: ObjectAssign({}, this.state),
       commit: (...args) => {
         this.commit(...args);
