@@ -89,10 +89,14 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 			RendersTo(AuditLogMediaType)
 
 			Field("reuquest_method", gorma.String, func() {})
-			Field("request_uri", gorma.String, func() {})
+			Field("request_uri", gorma.String, func() {
+				SQLTag("size:2048")
+			})
 			Field("source_ip", gorma.String, func() {})
 			Field("user_id", gorma.String, func() {})
-			Field("request_body", gorma.String, func() {})
+			Field("request_body", gorma.String, func() {
+				SQLTag("type:text")
+			})
 			Field("status_code", gorma.Integer, func() {})
 			Field("created_at", gorma.Timestamp, func() {})
 		})

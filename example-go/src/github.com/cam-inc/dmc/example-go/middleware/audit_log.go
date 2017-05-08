@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"math"
 	"net/http"
 
 	"net"
@@ -72,7 +73,7 @@ func AuditLog() goa.Middleware {
 				auditLogTable := models.NewAuditLogDB(common.DB)
 				m := models.AuditLog{}
 				m.UserID = userID
-				m.RequestURI = req.RequestURI
+				m.RequestURI = req.RequestURI[0:int(math.Min(float64(len(req.RequestURI)), float64(2048)))]
 				m.ReuquestMethod = req.Method
 				m.SourceIP = getIpAddress(req)
 				m.RequestBody = requestBody
