@@ -10,6 +10,7 @@ import endpoint from './endpoint';
 
 export default {
   [constants.GETTER_DRAWER_OPENED]: drawer.opened,
+  [constants.GETTER_DRAWER_ENABLED]: drawer.enabled,
 
   [constants.GETTER_DMC]: dmc.show,
   [constants.GETTER_DMC_PAGES]: dmc.pages,

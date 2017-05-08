@@ -19,7 +19,10 @@ export default {
 
   // riotx#actions
   ACTION_DRAWER_TOGGLE: 'drawer_toggle',
+  ACTION_DRAWER_OPEN: 'drawer_open',
   ACTION_DRAWER_CLOSE: 'drawer_close',
+  ACTION_DRAWER_ENABLE: 'drawer_enable',
+  ACTION_DRAWER_DISABLE: 'drawer_disable',
 
   ACTION_DMC_GET: 'dmc_get',
   ACTION_DMC_REMOVE: 'dmc_remove',
@@ -53,6 +56,10 @@ export default {
 
   // riotx#mutations
   MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
+  MUTATION_DRAWER_OPEN: 'drawer_open',
+  MUTATION_DRAWER_CLOSE: 'drawer_close',
+  MUTATION_DRAWER_ENABLE: 'drawer_enable',
+  MUTATION_DRAWER_DISABLE: 'drawer_disable',
 
   MUTATION_DMC: 'dmc',
   MUTATION_DMC_REMOVE: 'dmc_remove',
@@ -81,6 +88,7 @@ export default {
 
   // riotx#getters
   GETTER_DRAWER_OPENED: 'drawer_opened',
+  GETTER_DRAWER_ENABLED: 'drawer_enabled',
 
   GETTER_DMC: 'dmc',
   GETTER_DMC_PAGES: 'dmc_pages',

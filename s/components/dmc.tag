@@ -17,9 +17,14 @@ dmc.Application
 
     let store = this.riotx.get();
 
-    this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+    const isEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
+    const isOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+    this.isMenuOpened = isEnabled && isOpened;
+
     store.change(constants.CHANGE_DRAWER, (err, state, store) => {
-      this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+      const isEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
+      const isOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+      this.isMenuOpened = isEnabled && isOpened;
       this.update();
     });
 

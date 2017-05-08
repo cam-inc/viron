@@ -12,7 +12,10 @@ import auth from './auth';
 
 export default {
   [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
+  [constants.MUTATION_DRAWER_OPEN]: drawer.open,
   [constants.MUTATION_DRAWER_CLOSE]: drawer.close,
+  [constants.MUTATION_DRAWER_ENABLE]: drawer.enable,
+  [constants.MUTATION_DRAWER_DISABLE]: drawer.disable,
 
   [constants.MUTATION_DMC]: dmc.show,
   [constants.MUTATION_DMC_REMOVE]: dmc.remove,

@@ -69,7 +69,10 @@ let setupRouter = (store) => {
             location.href = href;
           });
       }).onAfter((splitedPathname, pathname) => {
-        return Promise.resolve();
+        if (pathname === '/') {
+          return store.action(constants.ACTION_DRAWER_DISABLE);
+        }
+        return store.action(constants.ACTION_DRAWER_ENABLE);
       }).on('/samplepageA', () => {
         // riot.mount('dmc-page', 'samplepageA');
       }).on('/samplepageB', () => {
@@ -145,7 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const store = new riotx.Store({
     state: {
       drawer: {
-        opened: true
+        isOpened: true,
+        isEnabled : true
       },
       current: storage.get(constants.STORAGE_CURRENT),
       endpoint: storage.get(constants.STORAGE_ENDPOINT, {}),

@@ -1,7 +1,7 @@
 dmc-header.Header
   .Header__groups
     .Header__group
-      .Header__menuButton(click="{handleMenuButtonClick}")
+      .Header__menuButton(if="{ isMenuEnabled }" click="{handleMenuButtonClick}")
         dmc-icon(type="{isMenuOpened ? 'menuUnfold' : 'menuFold'}")
     .Header__group
       dmc-button(onclick="{ handleDebugButtonClick }" label="debug")
@@ -17,6 +17,7 @@ dmc-header.Header
 
     const store = this.riotx.get();
 
+    this.isMenuEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
     this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
 
     handleMenuButtonClick(e) {
@@ -36,6 +37,7 @@ dmc-header.Header
     }
 
     store.change(constants.CHANGE_DRAWER, (err, state, store) => {
+      this.isMenuEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
       this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
       this.update();
     });

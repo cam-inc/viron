@@ -14,7 +14,10 @@ import authtype from './authtype';
 
 export default {
   [constants.ACTION_DRAWER_TOGGLE]: drawer.toggle,
+  [constants.ACTION_DRAWER_OPEN]: drawer.open,
   [constants.ACTION_DRAWER_CLOSE]: drawer.close,
+  [constants.ACTION_DRAWER_ENABLE]: drawer.enable,
+  [constants.ACTION_DRAWER_DISABLE]: drawer.disable,
 
   [constants.ACTION_DMC_GET]: dmc.get,
   [constants.ACTION_DMC_REMOVE]: dmc.remove,
