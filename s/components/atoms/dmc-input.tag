@@ -2,7 +2,7 @@ dmc-input(class="Input { opts.isfocused ? 'Input--focused' : '' } { opts.isdisab
   form.Input__content(submit="{ handleFormSubmit }")
     .Input__icon(if="{ !!opts.icon }")
       dmc-icon(type="{ opts.icon }")
-    input.Input__input(ref="input" type="{ opts.type || 'text' }" value="{ opts.text }" placeholder="{ opts.placeholder || '' }" disabled="{ opts.isdisabled }" input="{ handleInputChange }" focus="{ handleInputFocus }" blur="{ handleInputBlur }")
+    input.Input__input(ref="input" type="{ opts.type || 'text' }" value="{ opts.text }" placeholder="{ opts.placeholder || '' }" disabled="{ opts.isdisabled }" pattern="{ opts.pattern }" input="{ handleInputChange }" focus="{ handleInputFocus }" blur="{ handleInputBlur }")
     .Input__resetButton(if="{ opts.isresetable }" click="{ handleResetButtonClick }")
       dmc-icon(type="close")
 

@@ -106,14 +106,6 @@ let setupRouter = (store) => {
         // Endpoint エントリー前
         const targetTagString = 'dmc-endpoints';
         riot.mount('dmc-page', targetTagString);
-
-        store.action(constants.ACTION_ENDPOINT_GET)
-          .then(() => {
-            // TODO: debug用なので後で消すこと。
-            console.log('should be called after all action calls.');
-          })
-        ;
-
       }).on('*', () => {
         console.error('url not supported!!');
         //riot.mount('dmc-page', 'notFound' });

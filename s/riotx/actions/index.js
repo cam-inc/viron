@@ -19,7 +19,7 @@ export default {
   [constants.ACTION_DMC_GET]: dmc.show,
   [constants.ACTION_DMC_REMOVE]: dmc.remove,
 
-  [constants.ACTION_ENDPOINT_GET]: endpoint.show,
+  [constants.ACTION_ENDPOINT_GET]: endpoint.get,
   [constants.ACTION_ENDPOINT_REMOVE]: endpoint.remove,
   [constants.ACTION_ENDPOINT_REMOVE_ALL]: endpoint.removeAll,
   [constants.ACTION_ENDPOINT_ADD]: endpoint.add,

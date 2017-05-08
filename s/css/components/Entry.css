@@ -1,0 +1,33 @@
+.Entry {
+  display: block;
+  width: 504px;
+}
+
+.Entry__title {
+  font-size: 36px;
+  color: var(--color-text-default);
+  margin-bottom: 24px;
+}
+
+.Entry__form .Input,
+.Entry__form .Textarea {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.Entry__form .Input {
+  margin-bottom: 12px;
+}
+
+.Entry__controls {
+  @apply --layout-center-center;
+}
+
+.Entry__controls .Button {
+  display: block;
+  flex-grow: 1;
+}
+
+.Entry__controls .Button:first-child {
+  margin-right: 12px;
+}

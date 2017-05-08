@@ -4,7 +4,7 @@ dmc-header.Header
       .Header__menuButton(click="{handleMenuButtonClick}")
         dmc-icon(type="{isMenuOpened ? 'menuUnfold' : 'menuFold'}")
     .Header__group
-      dmc-button(click="{ handleDebugButtonClick }") debug
+      dmc-button(onclick="{ handleDebugButtonClick }") debug
       .Header__homeButton(click="{handleHomeButtonClick}")
         dmc-icon(type="home")
 

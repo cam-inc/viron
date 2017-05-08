@@ -1,6 +1,6 @@
 dmc-endpoints.EndpointsPage
   .EndpointsPage__list
-    .EndpointsPage__addCard(click="{handleEndpointAdd}")
+    .EndpointsPage__addCard(click="{ handleEndpointAdd }")
       dmc-icon(type="plus")
     virtual(each="{ item, key in endpoint }")
       dmc-endpoint(key="{ key }" title="{ item.title }"
@@ -27,8 +27,6 @@ dmc-endpoints.EndpointsPage
     })
 
     handleEndpointAdd() {
-      // TODO: endpoint作成 -> ログイン -> 成功 -> endpoint一覧に追加される。
-      //store.action(constants.ACTION_MODAL_SHOW, 'dmc-endpoint-create', {
       store.action(constants.ACTION_MODAL_SHOW, 'dmc-entry', {
         onSignIn: () => {
           alert('login success');
