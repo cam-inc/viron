@@ -10,7 +10,6 @@ const number2alphabet = (str) => {
     str = str.replace(re, alphabet[i]);
   }
   return str;
-
 };
 
 export default {

@@ -1,25 +1,11 @@
-dmc-entry
-  //- エンドポイント登録
-  div
-    div.field
-      label.__label Endpoint URL
-      input.__input(ref="url" type='text' value="http://127.0.0.1:3000/swagger.json" pattern="https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
-        placeholder="https://example.com/swagger.json"
-        disabled=false
-        autofocus=true
-        )
-    div.field
-      label.__label Memo ...
-      textarea.__input(ref="memo" cols="40" rows="4" maxlength="20" placeholder="Writing....")
-        | ローカル API
-
-    input.__input.__button(type='button' onclick="{ handleRegisterButtonClick }" value="Register")
-    input.__input.__button(type='button' onclick="{ handleCancelButtonClick }" value="Cancel")
-
-  br
-  br
-  br
-
+dmc-entry.Entry
+  .Entry__title 新しい管理画面を<br />作成する
+  .Entry__form
+    dmc-input(text="{ endpointURL }" placeholder="エンドポイントURL" pattern="https?://[\w/:%#\$&\?\(\)~\.=\+\-]+" onTextChange="{ handleEndpointURLChange }")
+    dmc-textarea(text="{ memo }" placeholder="Writing..." maxlength="20" onTextChange="{ handleMemoChange }")
+  .Entry__controls
+    dmc-button(type="primary" onClick="{ handleRegisterButtonClick }") 新規作成
+    dmc-button(type="secondary" onClick="{ handleCancelButtonClick }") キャンセル
 
 
   div ログイン
@@ -28,44 +14,9 @@ dmc-entry
   div(click="{ handleLoginButtonClick }") [login]
   div(click="{ handleCancelButtonClick }") [cancel]
 
-  style.
-    .field {
-      border: 1px solid gray;
-      margin-bottom: 12px;
-    }
-    .__button {
-      border: 1px solid gray;
-      margin-bottom: 12px;
-    }
-
   script.
-    import constants from '../../core/constants';
-    const store = this.riotx.get();
-
-    store.change(constants.CHANGE_ENDPOINT, (err, state, store) => {
-      this.closeModal();
-    });
-
-    const self = this;
-    // Event: Endpoint 登録
-    this.handleRegisterButtonClick = (ev) => {
-      store.action(constants.ACTION_ENDPOINT_ADD, this.refs.url.value, this.refs.memo.value)
-      .then(() => {
-        self.closeModal();
-      }).catch((err) => {
-        // TODO 登録エラー通知を出す
-        alert(err.message);
-      })
-    }
-
     this.userID = 'userID';
     this.password = 'password';
-
-    closeModal() {
-      if (this.opts.isModal) {
-        this.opts.modalCloser();
-      }
-    }
 
     handleLoginButtonClick() {
       Promise
@@ -78,6 +29,47 @@ dmc-entry
           this.opts.onSignIn();
           this.closeModal();
         });
+    }
+
+
+
+    ///////
+    import constants from '../../core/constants';
+    import '../atoms/dmc-button.tag';
+    import '../atoms/dmc-input.tag';
+    import '../atoms/dmc-textarea.tag';
+
+    const store = this.riotx.get();
+
+    this.endpointURL = 'http://127.0.0.1:3000/swagger.json';
+    this.memo = '';
+
+    closeModal() {
+      if (this.opts.isModal) {
+        this.opts.modalCloser();
+      }
+    }
+
+    handleEndpointURLChange(endpointURL) {
+      this.endpointURL = endpointURL;
+      this.update();
+    }
+
+    handleMemoChange(memo) {
+      this.memo = memo;
+      this.update();
+    }
+
+    // TODO: 上書きの場合は、そもそも登録ボタンを押せなくする
+    handleRegisterButtonClick() {
+      store.action(constants.ACTION_ENDPOINT_ADD, this.endpointURL, this.memo)
+      .then(() => {
+        this.closeModal();
+      }).catch(err => {
+        store.action(constants.ACTION_TOAST_SHOW, {
+          message: err.message
+        });
+      })
     }
 
     handleCancelButtonClick() {

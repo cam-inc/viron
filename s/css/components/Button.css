@@ -21,12 +21,11 @@
 }
 
 .Button--secondary {
-  color: var(--color-basic-lightGray);
+  color: var(--color-basic-white);
   background-color: var(--color-basic-gray);
 }
 
 .Button--secondary:hover {
-  color: var(--color-basic-white);
   /* TODO: デザイン完成後に正しい色に変更すること */
   background-color: var(--color-basic-lightGray);
 }

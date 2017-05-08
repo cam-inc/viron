@@ -1,6 +1,6 @@
 dmc-textarea(class="Textarea { opts.isfocused ? 'Textarea--focused' : '' } { opts.isdisabled ? 'Textarea--disabled' : '' }" click="{ handleClick }")
   form.Textarea__content
-    textarea.Textarea__input(ref="input" value="{ opts.text }" placeholder="{ opts.placeholder || '' }" disabled="{ opts.isdisabled }" input="{ handleInputChange }" focus="{ handleInputFocus }" blur="{ handleInputBlur }")
+    textarea.Textarea__input(ref="input" value="{ opts.text }" maxlength="{ opts.maxlength }" placeholder="{ opts.placeholder || '' }" disabled="{ opts.isdisabled }" input="{ handleInputChange }" focus="{ handleInputFocus }" blur="{ handleInputBlur }")
 
   script.
     handleClick() {

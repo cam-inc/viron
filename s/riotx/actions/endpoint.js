@@ -3,7 +3,7 @@ import 'whatwg-fetch';
 import constants from '../../core/constants';
 
 export default {
-  show: context => {
+  get: context => {
     return Promise
       .resolve()
       .then(() => {
@@ -32,31 +32,25 @@ export default {
         return;
       })
       .then(() => {
-        // TODO 上書きの場合は、そもそも登録ボタンを押せなくする
-        let endpoint = context.state.endpoint;
         const key = context.getter(constants.GETTER_ENDPOINT_NEXT_KEY);
-        endpoint[key] = {
+        const newEndpoint = {
           url: url,
-          memo: '',
+          memo: memo,
           token: null,
           title: '',
           description: '',
           version: '',
           color: '',
           thumbnail: '',
-          tags: [],
+          tags: []
         };
-        endpoint[key].memo = memo;
         return {
-          key: key,
-          endpoint: endpoint[key]
+          key,
+          endpoint: newEndpoint
         };
-
       })
       .then((res) => {
-        context.commit(constants.MUTATION_ENDPOINT_ADD, res);
-        return res;
-      })
-    ;
+        context.commit(constants.MUTATION_ENDPOINT_ADD, res.key, res.endpoint);
+      });
   }
 };
