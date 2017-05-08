@@ -236,9 +236,14 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 		adminUserModel, err := adminUserTable.GetByEmail(ctx.Context, email)
 		if err == gorm.ErrRecordNotFound {
 			// 新規ユーザーの場合はユーザー作成
+			roleId := common.GetDefaultRole()
+			if adminUsers := adminUserTable.ListAdminUserSmall(ctx.Context); len(adminUsers) <= 0 {
+				// 1人目はスーパーユーザーにする
+				roleId = common.GetSuperRole()
+			}
 			m := models.NewAdminUser()
 			m.Email = email
-			m.RoleID = common.GetDefaultRole()
+			m.RoleID = roleId
 			if err = adminUserTable.Add(ctx.Context, &m); err != nil {
 				logger.Error("GoogleSignin add admin_user failure.", zap.String("email", email))
 				ctx.ResponseWriter.Header().Set("location", redirectUrl)
