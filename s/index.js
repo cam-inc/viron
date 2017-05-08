@@ -44,7 +44,31 @@ let setupRouter = (store) => {
     .resolve()
     .then(() => {
       router.onBefore((splitedPathname, pathname) => {
-        return Promise.resolve();
+        const token = new URL(decodeURIComponent(location.href)).searchParams.get(constants.QUERYSTRING_KEY_TOKEN);
+
+        if (!token) {
+          return;
+        }
+        // Save auth token
+        let tmpUrl = new URL(location.href);
+        tmpUrl.searchParams.delete(constants.QUERYSTRING_KEY_TOKEN);
+        const href = tmpUrl.href;
+
+        history.replaceState('', href); // Safari/Opera/IE検証 referrer
+
+        return Promise
+          .resolve()
+          .then(() => {
+            return store.action(constants.ACTION_AUTH_UPDATE, store.getter(constants.GETTER_CURRENT), token);
+          })
+          .then(() => {
+            location.href = href;
+          })
+          .catch((err) => {
+            console.error(err);
+            location.href = href;
+          })
+          ;
       }).onAfter((splitedPathname, pathname) => {
         return Promise.resolve();
       }).on('/samplepageA', () => {
@@ -53,16 +77,17 @@ let setupRouter = (store) => {
         // riot.mount('dmc-page', 'samplepageB');
       }).on('/samplepageC/:paramA/:paramB', () => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
-      }).on('/:endpoint/:id', (params) => {
-        // Load page
-        const store = riotx.get();
-        // TODO DMCのロードがまだの場合の処理
-        store.action(constants.ACTION_PAGE_GET, params.id)
-          .catch((err) => {
-            // TODO
-            console.error(err);
-          });
-      }).on('/:endpoint', (params) => {
+      // }).on('/:endpoint/:id', (params) => {
+      //   // Load page
+      //   const store = riotx.get();
+      //   // TODO DMCのロードがまだの場合の処理
+      //   store.action(constants.ACTION_PAGE_GET, params.id)
+      //     .catch((err) => {
+      //       // TODO
+      //       console.error(err);
+      //     });
+      //
+      }).on('/:endpoint/:id?', (params) => {
         //const current = store.getter(constants.GETTER_CURRENT);
         const endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, params.endpoint);
         if (!endpoint) {
@@ -77,14 +102,17 @@ let setupRouter = (store) => {
           .then(() => swagger.setup(endpoint))
           .then(() => store.action(constants.ACTION_DMC_GET))
           .then(() => {
+            if (params.id) {
+              return store.action(constants.ACTION_PAGE_GET, params.id);
+            }
+          })
+          .then(() => {
             // TODO ここの位置で良いかは最終的に決める
             const targetTagString = 'dmc-empty';
             riot.mount('dmc-page', targetTagString);
           }).catch((err) => {
             if (err.status === 401) {
-              debugger;
               store.action(constants.ACTION_AUTH_SIGN_IN_SHOW);
-              return;
             }
           })
         ;
@@ -136,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mutations: mutations,
     getters: getters
   });
-
+  window.store = store;
   riotx.add(store);
   riot.mount('dmc'); // root mount!!!
 

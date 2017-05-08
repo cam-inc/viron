@@ -24,7 +24,18 @@ export default {
       const apis = swagger.apisArray();
       const api = apis[model.operationId];
 
-      api()
+      const token = context.getter(constants.GETTER_ENDPOINT_ONE, context.getter(constants.GETTER_CURRENT)).token;
+
+      api({/** TODO get only support. */}, {
+        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
+        requestInterceptor: (req) => {
+          req.headers['Authorization'] = token;
+          console.log('Interceptor(request):', req);
+        },
+        responseInterceptor: (res) => {
+          console.log('Interceptor(response):', res);
+        },
+      })
         .then(res => {
           if (!res.ok) {
             throw new Error(`[fetch] ${res.url} error.`);

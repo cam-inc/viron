@@ -49,6 +49,7 @@ export default {
   ACTION_AUTHTYPE_GET: 'authtype_get',
   ACTION_AUTH_SIGN_IN_SHOW: 'auth_sign_in_show',
 
+  QUERYSTRING_KEY_TOKEN: 'token',
 
   // riotx#mutations
   MUTATION_DRAWER_TOGGLE: 'drawer_toggle',

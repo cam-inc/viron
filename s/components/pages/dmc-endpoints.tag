@@ -44,6 +44,7 @@ dmc-endpoints.EndpointsPage
           if (!store.getter(constants.GETTER_ENDPOINT_ONE, key).token) {
             return store.action(constants.ACTION_AUTH_SIGN_IN_SHOW);
           }
+          // TODO router#promiseになったら変える
           router.navigateTo(`/${key}`); // href hash #/
         })
       ;

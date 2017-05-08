@@ -16,6 +16,7 @@ class Swagger {
   }
 
   setup(endpoint) {
+
     return new Promise((resolve, reject) => {
       const request = {
         url: endpoint.url || 'http://localhost:3000/swagger.json',
