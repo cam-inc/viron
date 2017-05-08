@@ -138,6 +138,29 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					},
 				},
 			},
+			{
+				ID:      "auditlog",
+				Name:    "DMC 監査ログ",
+				Section: bridge.SectionManage,
+				Group:   bridge.GroupAdmin,
+				Components: []*app.Component{
+					{
+						Name: "DMC 監査ログ",
+						API: &app.API{
+							Path:   "/auditlog",
+							Method: "get",
+						},
+						Style: bridge.StyleTable,
+						Options: []*app.Option{
+							{
+								Key:   "key",
+								Value: "value",
+
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 	return ctx.OK(res)
