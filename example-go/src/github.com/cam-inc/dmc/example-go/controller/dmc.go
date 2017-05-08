@@ -155,7 +155,6 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 							{
 								Key:   "key",
 								Value: "value",
-
 							},
 						},
 					},
