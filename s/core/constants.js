@@ -7,6 +7,7 @@ export default {
   // store.js
   STORAGE_CURRENT: 'current',
   STORAGE_ENDPOINT: 'endpoint',
+  STORAGE_TOAST: 'toast',
 
   // Component#Style
   STYLE_NUMBER: 'number',
@@ -37,6 +38,7 @@ export default {
 
   ACTION_TOAST_SHOW: 'toast_show',
   ACTION_TOAST_HIDE: 'toast_hide',
+  ACTION_TOAST_RESET: 'toast_reset',
 
   ACTION_MODAL_SHOW: 'modal_show',
   ACTION_MODAL_HIDE: 'modal_hide',

@@ -1,5 +1,5 @@
 export default {
   list: context => {
-    return context.state.toast.list;
+    return context.state.toast;
   }
 };

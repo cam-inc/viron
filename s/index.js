@@ -149,9 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       dmc: null,
       page: null,
       component: {},
-      toast: {
-        list: []
-      },
+      toast: storage.get(constants.STORAGE_TOAST, []),
       modal: {
         list: []
       }
