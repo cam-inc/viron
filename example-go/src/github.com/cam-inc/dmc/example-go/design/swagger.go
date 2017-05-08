@@ -15,9 +15,7 @@ var _ = Resource("swagger", func() {
 	Action("show", func() {
 		Routing(GET("/swagger.json"))
 		Description("get swagger.json")
-		Response(OK, func() {
-			HashOf(String, String)
-		})
+		Response(OK, "application/json")
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
 	})
