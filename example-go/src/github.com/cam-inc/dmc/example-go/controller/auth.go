@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"net/url"
+
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	"github.com/cam-inc/dmc/example-go/models"
@@ -237,8 +239,16 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 				return ctx.TemporaryRedirect()
 			} else {
 				// Set auth header for client retrieval
-				ctx.ResponseData.Header().Set("Authorization", fmt.Sprintf("Bearer %s", jwt))
-				ctx.ResponseWriter.Header().Set("location", *ctx.State)
+				authToken := fmt.Sprintf("Bearer %s", jwt)
+				redirectUrl := *ctx.State
+
+				u, _ := url.Parse(redirectUrl)
+				q := u.Query()
+				q.Set("token", url.QueryEscape(authToken))
+				u.RawQuery = q.Encode()
+
+				ctx.ResponseData.Header().Set("Authorization", authToken)
+				ctx.ResponseWriter.Header().Set("location", u.String())
 				return ctx.MovedPermanently()
 			}
 		}
