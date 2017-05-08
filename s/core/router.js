@@ -1,5 +1,4 @@
-import { find, forEach } from 'mout/array';
-import ObjectAssign from 'object-assign';
+import { filter, find, forEach } from 'mout/array';
 import pathToRegexp from 'path-to-regexp';
 import createHashHistory from 'history/createHashHistory';
 
@@ -178,12 +177,15 @@ class Router {
     }
 
     const params = this._parseLocation(location, route);
+    const splitedPathname = filter(location.pathname.split('/'), v => {
+      return !!v;
+    });
 
     Promise
       .resolve()
-      .then(() => this._onBefore(ObjectAssign({}, location)))
+      .then(() => this._onBefore(splitedPathname))
       .then(() => route.onChange(...params))
-      .then(() => this._onAfter(ObjectAssign({}, location)))
+      .then(() => this._onAfter(splitedPathname))
       .catch(err => {
         console.error(err.message || 'couldn\'t route. check the onBefore and onAfter functions.');
       });
