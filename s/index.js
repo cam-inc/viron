@@ -47,7 +47,7 @@ let setupRouter = (store) => {
         const token = new URL(decodeURIComponent(location.href)).searchParams.get(constants.QUERYSTRING_KEY_TOKEN);
 
         if (!token) {
-          return;
+          return Promise.resolve();
         }
         // Save auth token
         let tmpUrl = new URL(location.href);
@@ -67,8 +67,7 @@ let setupRouter = (store) => {
           .catch((err) => {
             console.error(err);
             location.href = href;
-          })
-          ;
+          });
       }).onAfter((splitedPathname, pathname) => {
         return Promise.resolve();
       }).on('/samplepageA', () => {
@@ -105,8 +104,6 @@ let setupRouter = (store) => {
             if (params.id) {
               return store.action(constants.ACTION_PAGE_GET, params.id);
             }
-          })
-          .then(() => {
             // TODO ここの位置で良いかは最終的に決める
             const targetTagString = 'dmc-empty';
             riot.mount('dmc-page', targetTagString);
