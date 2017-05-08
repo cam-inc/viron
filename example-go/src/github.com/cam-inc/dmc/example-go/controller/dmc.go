@@ -1,14 +1,41 @@
 package controller
 
 import (
+	"encoding/json"
+
+	"strings"
+
 	"github.com/cam-inc/dmc/example-go/bridge"
+	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
+	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 )
 
 // DmcController implements the dmc resource.
 type DmcController struct {
 	*goa.Controller
+}
+
+func apiFilter(pages []*app.Page, roles map[string][]string) []*app.Page {
+	newPages := []*app.Page{}
+	for _, page := range pages {
+		newComponents := []*app.Component{}
+		for _, component := range page.Components {
+			api := component.API
+			method := api.Method
+			resource := strings.Split(api.Path, "/")[1]
+			if roles[method] != nil && (common.InStringArray("*", roles[method]) >= 0 || common.InStringArray(resource, roles[method]) >= 0) {
+				newComponents = append(newComponents, component)
+			}
+		}
+		if len(newComponents) > 0 {
+			// componentが1つもない場合はpageも返さない
+			page.Components = newComponents
+			newPages = append(newPages, page)
+		}
+	}
+	return newPages
 }
 
 // NewDmcController creates a dmc controller.
@@ -162,5 +189,15 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 			},
 		},
 	}
+
+	cl := ctx.Context.Value(bridge.JwtClaims)
+	if cl != nil {
+		// JWTclaimsからRoleを取り出す
+		var roles map[string][]string
+		claims := cl.(jwtgo.MapClaims)
+		json.Unmarshal([]byte(claims["roles"].(string)), &roles)
+		res.Pages = apiFilter(res.Pages, roles)
+	}
+
 	return ctx.OK(res)
 }

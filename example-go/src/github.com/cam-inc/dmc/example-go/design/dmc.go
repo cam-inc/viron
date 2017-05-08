@@ -31,6 +31,10 @@ var _ = Resource("dmc", func() {
 	Origin(OriginURL, OriginAllowAll)
 	BasePath("/dmc")
 	DefaultMedia(DMCMediaType)
+	Security(JWT, func() {
+		Scope("api:access")
+	})
+
 	Action("show", func() {
 		Routing(GET(""))
 		Description("dmc settings")

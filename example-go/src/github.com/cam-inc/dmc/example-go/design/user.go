@@ -62,8 +62,6 @@ var _ = Resource("user", func() {
 	Origin(OriginURL, OriginAllowAll)
 	BasePath("/user")
 	DefaultMedia(UserMediaType)
-
-	// TODO: ログイン画面できるまでは外しておく
 	Security(JWT, func() {
 		Scope("api:access")
 	})
