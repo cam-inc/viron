@@ -1,0 +1,55 @@
+.Signin {
+  display: block;
+  width: 504px;
+}
+
+.Signin__title {
+  font-size: 36px;
+  color: var(--color-text-default);
+  margin-bottom: 24px;
+}
+
+.Signin__endpointTitle {
+  font-size: 18px;
+  color: var(--color-text-default);
+}
+
+.Signin__emails {
+  margin-top: 24px;
+}
+
+.Signin__email {
+  @apply --layout-center-center;
+  margin-bottom: 12px;
+}
+
+.Signin__email .Input,
+.Signin__email .Button {
+  display: block;
+}
+
+.Signin__email .Input {
+  margin-right: 12px;
+  flex-grow: 1;
+}
+
+.Signin__email .Button {
+  flex-shrink: 0;
+}
+
+.Signin__email:last-child {
+  margin-bottom: 0;
+}
+
+.Signin__oauths {
+  margin-top: 24px;
+}
+
+.Signin__oauth {
+  display: inline-block;
+  margin-right: 12px;
+}
+
+.Signin__oauth:last-child {
+  margin-right: 0;
+}

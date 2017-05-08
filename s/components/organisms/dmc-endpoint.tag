@@ -1,17 +1,16 @@
-dmc-endpoint.Endpoint(click="{handleClick}")
+dmc-endpoint.Endpoint(click="{ handleClick }")
   .Endpoint__head
     .Endpoint__thumbnail(style="background-image:url({ opts.thumbnail })")
-    .Endpoint__menuButton(click="{handleMenuButtonClick}")
+    .Endpoint__menuButton(click="{ handleMenuButtonClick }")
       dmc-icon(type="ellipsis")
   .Endpoint__body
     .Endpoint__tags { (opts.tags || []).join(', ') }
-    .Endpoint__host { opts.key }
+    .Endpoint__host { opts.url }
     .Endpoint__title { opts.title }
     .Endpoint__description { opts.description }
-
-    div(style="margin-top:24px")
-      dmc-button(onclick="{ handleEditButtonClick }") 編集
-      dmc-button(onclick="{ handleRemoveButtonClick }") 削除
+    .Endpoint__controls
+      dmc-button(onclick="{ handleEditButtonClick }" label="編集")
+      dmc-button(onclick="{ handleRemoveButtonClick }" label="削除")
 
   script.
     import '../atoms/dmc-icon.tag';

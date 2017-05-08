@@ -2,14 +2,13 @@ dmc-devtool
   div(style="margin-bottom:10px;") TODO: デバッグ目的のview。不要になったら消すこと。
 
 
-  dmc-button(onclick="{ handleResetCurrentButtonClick}") Storage->Current リセット
-  dmc-button(onclick="{ handleResetEndpointsButtonClick}") Storage->Endpoint リセット
+  dmc-button(onclick="{ handleResetCurrentButtonClick}" label="Storage->Current リセット")
+  dmc-button(onclick="{ handleResetEndpointsButtonClick}" label="Storage->Endpoint リセット")
 
   br
   br
 
-  dmc-button(click="{ handleShowToastButtonClick}") Show Toast
-
+  dmc-button(click="{ handleShowToastButtonClick}" label="Show Toast")
 
   script.
     import constants from '../../core/constants';

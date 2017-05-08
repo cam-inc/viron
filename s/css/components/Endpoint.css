@@ -68,3 +68,17 @@
   font-size: 12px;
   color: var(--color-basic-black);
 }
+
+.Endpoint__controls {
+  margin-top: 24px;
+  @apply --layout-center-center;
+}
+
+.Endpoint__controls .Button {
+  display: block;
+  flex-grow: 1;
+}
+
+.Endpoint__controls .Button:first-child {
+  margin-right: 12px;
+}

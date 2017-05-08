@@ -1,6 +1,7 @@
 import constants from '../../core/constants';
 
 export default {
+  // check if the local stored endpoint token is valid.
   update: (context, key) => {
     const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
     return fetch(endpoint.url, {
@@ -18,6 +19,7 @@ export default {
       ;
   },
 
+  // show signin modal.
   signInShow: context => {
     return  Promise
       .resolve()

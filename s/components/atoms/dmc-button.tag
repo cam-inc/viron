@@ -1,5 +1,5 @@
-dmc-button(class="Button Button--{opts.type || 'primary'} {opts.class}" onclick="{ handleClick }")
-  yield.
+dmc-button(class="Button Button--{ opts.type || 'primary' } { opts.class }" onclick="{ handleClick }")
+  span { opts.label }
 
   script.
     handleClick(e) {

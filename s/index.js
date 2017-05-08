@@ -146,26 +146,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   store.change(constants.CHANGE_SIGN_IN, (err, state, store) => {
     // 認証
-    debugger;
     const endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, state.current);
     if (!endpoint) {
       console.error('endpoint not found.');
       router.navigateTo('/', true);
+      return;
     }
     store.action(constants.ACTION_AUTHTYPE_GET, state.current)
-      .then((authtype) => {
+      .then(authtypes => {
         store.action(constants.ACTION_MODAL_SHOW, 'dmc-signin', {
           onSignIn: () => {
             router.navigateTo(`/${state.current}`, true);
           },
           key: state.current,
           endpoint: endpoint,
-          authtype: authtype,
-        })
-
-      })
-    ;
-
+          authtypes: authtypes
+        });
+      });
   });
   // // Changed Endpoint
   // store.change(constants.CHANGE_CURRENT, (err, state, store) => {

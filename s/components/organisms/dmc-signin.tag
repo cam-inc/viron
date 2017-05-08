@@ -1,70 +1,83 @@
-dmc-signin
-  h1 { opts.key }
-
-  pre { JSON.stringify(opts.endpoint, null, '    ') }
-
-  hr
-
-  div.__email(each="{ authtype, idx in emails }")
-    h2 { authtype.provider }
-    input.__field(ref="email_{idx}" type="email" placeholder="e-mail" value="fkei@example.com")
-    input.__field(ref="password_{idx}" type="password" value="1234567890")
-    input.__button(type="button" value="Sing In" onclick="{ handleSignInEMail }" data-idx="{ idx }")
-
-    hr
-
-  div.__oauth(each="{ authtype in oauths }")
-    input.__button(type="button" value="{ authtype.provider } Auth" onclick="{ handleSignInOAuth }")
-    hr
-
-  style.
-    .__field {
-      border: 1px solid gray;
-      margin-bottom: 12px;
-    }
-
-    .__button {
-      border: 1px solid gray;
-      margin-bottom: 12px;
-    }
+dmc-signin.Signin
+  .Signin__title サインイン
+  .Signin__endpointTitle { opts.endpoint.title }
+  .Signin__emails(if="{ !!emails.length }")
+    virtual(each="{ authtype in emails}")
+      dmc-signinemail(authtype="{ authtype }" onSigninClick="{ parent.handleEmailSigninClick }")
+  .Signin__oauths(if="{ !!oauths.length }")
+    virtual(each="{ authtype in oauths }")
+      dmc-signinoauth(authtype="{ authtype }" onClick="{ parent.handleOAuthClick }")
 
   script.
     import { filter, values } from 'mout/object';
     import constants from '../../core/constants';
+
     const store = this.riotx.get();
 
-    this.oauths = values(filter(this.opts.authtype, v => {
+    this.oauths = values(filter(this.opts.authtypes, v => {
       return v.type === constants.AUTH_TYPE_OAUTH;
     }));
 
-    this.emails = values(filter(this.opts.authtype, v => {
+    this.emails = values(filter(this.opts.authtypes, v => {
       return v.type === constants.AUTH_TYPE_EMAIL;
     }));
 
-    this.closeModal = () => {
+    closeModal() {
       if (this.opts.isModal) {
         this.opts.modalCloser();
       }
     }
 
-    this.handleSignInEMail = (ev) => {
-      const idx = parseInt(ev.currentTarget.getAttribute('data-idx'));
-      const email = this.refs[`email_${idx}`].value;
-      const password = this.refs[`password_${idx}`].value;
-      store.action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, ev.item.authtype, email, password)
+    handleEmailSigninClick(email, password, authtype) {
+      store.action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, authtype, email, password)
         .then(() => {
           this.closeModal();
           this.opts.onSignIn();
         })
-        .catch((err) => {
-          // TODO SingIn 失敗通知
-          debugger;
+        .catch(err => {
+          store.action(constants.ACTION_TOAST_SHOW, {
+            message: err.message
+          });
         })
       ;
     }
 
-    this.handleSignInOAuth = (ev) => {
-      store.action(constants.ACTION_AUTH_SIGN_IN_GOOGLE, this.opts.key, ev.item.authtype);
+    handleOAuthClick(authtype) {
+      store.action(constants.ACTION_AUTH_SIGN_IN_GOOGLE, this.opts.key, authtype);
     }
 
+dmc-signinemail.Signin__email
+  dmc-input(text="{ email }" type="email" placeholder="e-mail" onTextChange="{ handleEmailChange }")
+  dmc-input(text="{ password }" type="password" placeholder="password" onTextChange="{ handlePasswordChange }")
+  dmc-button(onClick="{ handleSigninClick }" label="サインイン")
 
+  script.
+    import '../atoms/dmc-button.tag';
+    import '../atoms/dmc-input.tag';
+
+    this.email = 'fkei@example.com';
+    this.password = '1234567890';
+
+    handleEmailChange(email) {
+      this.email = email;
+      this.update();
+    }
+
+    handlePasswordChange(password) {
+      this.password = password;
+      this.update();
+    }
+
+    handleSigninClick() {
+      this.opts.onsigninclick(this.email, this.password, this.opts.authtype);
+    }
+
+dmc-signinoauth.Signin__oauth
+  dmc-button(onClick="{ handleButtonClick }" label="{ opts.authtype.provider }")
+
+  script.
+    import '../atoms/dmc-button.tag';
+
+    handleButtonClick() {
+      this.opts.onclick(this.opts.authtype);
+    }

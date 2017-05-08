@@ -5,8 +5,10 @@ dmc-endpoints.EndpointsPage
     virtual(each="{ item, key in endpoint }")
       dmc-endpoint(key="{ key }" title="{ item.title }"
         thumbnail="{ item.thumbnail }"
+        url="{ item.url }"
         description="{ item.description }"
-        tags="{ item.tags }" onentry="{ handleEndpointEntry }"
+        tags="{ item.tags }"
+        onentry="{ handleEndpointEntry }"
         onedit="{ handleEndpointEdit }"
         onremove="{ handleEndpointRemove }")
 
@@ -19,7 +21,8 @@ dmc-endpoints.EndpointsPage
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
-    this.endpoint = store.getter(constants.GETTER_ENDPOINT_LIST) || {};
+
+    this.endpoint = store.getter(constants.GETTER_ENDPOINT_LIST);
 
     store.change(constants.CHANGE_ENDPOINT, (err, state, store) => {
       this.endpoint = state.endpoint;
@@ -27,11 +30,7 @@ dmc-endpoints.EndpointsPage
     })
 
     handleEndpointAdd() {
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-entry', {
-        onSignIn: () => {
-          alert('login success');
-        }
-      });
+      store.action(constants.ACTION_MODAL_SHOW, 'dmc-entry');
     }
 
     handleEndpointEntry(key) {
@@ -40,10 +39,12 @@ dmc-endpoints.EndpointsPage
         .then(() => store.action(constants.ACTION_CURRENT_UPDATE, key))
         .then(() => store.action(constants.ACTION_AUTH_UPDATE, key))
         .then(() => {
+          // navigate to dmc page when local stored endpoint token is valid.
+          // if not valid, show signin modal.
           if (!store.getter(constants.GETTER_ENDPOINT_ONE, key).token) {
             return store.action(constants.ACTION_AUTH_SIGN_IN_SHOW);
           }
-          router.navigateTo(`/${key}`, true); // href hash #/
+          router.navigateTo(`/${key}`); // href hash #/
         })
       ;
     }
@@ -56,9 +57,8 @@ dmc-endpoints.EndpointsPage
       Promise
         .resolve()
         .then(() => store.action(constants.ACTION_ENDPOINT_REMOVE, key))
-        .catch((err) => {
-          // TODO
-          debugger;
-        })
+        .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
+          message: err.message
+        }))
       ;
     }
