@@ -8,6 +8,7 @@ import page from './page';
 import component from './component';
 import toast from './toast';
 import modal from './modal';
+import auth from './auth';
 
 export default {
   [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
@@ -35,4 +36,6 @@ export default {
   [constants.MUTATION_MODAL_REMOVE]: modal.remove,
 
   [constants.MUTATION_ENDPOINT_TOKEN_UPDATE]: endpoint.updateToken,
+
+  [constants.MUTATION_AUTH_SIGN_IN_SHOW]: auth.signInShow,
 };

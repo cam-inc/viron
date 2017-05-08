@@ -48,27 +48,6 @@ let setupRouter = (store) => {
         // riot.mount('dmc-page', 'samplepageB');
       }).on('/samplepageC/:paramA/:paramB', () => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
-      }).on('/signin/:endpoint', (params) => {
-        // 認証
-        const endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, params.endpoint);
-        if (!endpoint) {
-          console.error('endpoint not found.');
-          router.navigateTo('/', true);
-        }
-        store.action(constants.ACTION_AUTHTYPE_GET, params.endpoint)
-          .then((authtype) => {
-            store.action(constants.ACTION_MODAL_SHOW, 'dmc-signin', {
-              onSignIn: () => {
-                router.navigateTo(`/${params.endpoint}`, true);
-              },
-              key: params.endpoint,
-              endpoint: endpoint,
-              authtype: authtype,
-            })
-
-          })
-        ;
-
       }).on('/:endpoint/:id', (params) => {
         // Load page
         const store = riotx.get();
@@ -80,14 +59,17 @@ let setupRouter = (store) => {
           });
 
       }).on('/:endpoint', (params) => {
+
         //const current = store.getter(constants.GETTER_CURRENT);
         const endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, params.endpoint);
         if (!endpoint) {
           // TODO 想定していない Endpoint
           throw new Error('endpoint not found.');
         }
+
         Promise
           .resolve()
+          .then(() => store.action(constants.ACTION_CURRENT_UPDATE, store.getter(constants.GETTER_CURRENT)))
           .then(() => store.action(constants.ACTION_DMC_REMOVE))
           .then(() => swagger.setup(endpoint))
           .then(() => store.action(constants.ACTION_DMC_GET))
@@ -97,7 +79,8 @@ let setupRouter = (store) => {
             riot.mount('dmc-page', targetTagString);
           }).catch((err) => {
             if (err.status === 401) {
-              router.navigateTo(`/signin/${params.endpoint}`, true);
+              debugger;
+              store.action(constants.ACTION_AUTH_SIGN_IN_SHOW);
               return;
             }
           })
@@ -157,6 +140,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // TODO: debug用なので後で消すこと。
   window.store = store;
 
+  store.change(constants.CHANGE_SIGN_IN, (err, state, store) => {
+    // 認証
+    debugger;
+    const endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, state.current);
+    if (!endpoint) {
+      console.error('endpoint not found.');
+      router.navigateTo('/', true);
+    }
+    store.action(constants.ACTION_AUTHTYPE_GET, state.current)
+      .then((authtype) => {
+        store.action(constants.ACTION_MODAL_SHOW, 'dmc-signin', {
+          onSignIn: () => {
+            router.navigateTo(`/${state.current}`, true);
+          },
+          key: state.current,
+          endpoint: endpoint,
+          authtype: authtype,
+        })
+
+      })
+    ;
+
+  });
   // // Changed Endpoint
   // store.change(constants.CHANGE_CURRENT, (err, state, store) => {
   //   const current = store.getter(constants.GETTER_CURRENT);

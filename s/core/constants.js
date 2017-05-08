@@ -47,6 +47,7 @@ export default {
   ACTION_AUTH_SIGN_IN_GOOGLE: 'auth_sign_in_google',
   ACTION_AUTH_SIGN_IN_EMAIL: 'auth_sign_in_email',
   ACTION_AUTHTYPE_GET: 'authtype_get',
+  ACTION_AUTH_SIGN_IN_SHOW: 'auth_sign_in_show',
 
 
   // riotx#mutations
@@ -73,6 +74,8 @@ export default {
 
   MUTATION_MODAL_ADD: 'modal_add',
   MUTATION_MODAL_REMOVE: 'modal_remove',
+
+  MUTATION_AUTH_SIGN_IN_SHOW: 'auth_sign_in_show',
 
 
   // riotx#getters
@@ -108,6 +111,9 @@ export default {
   CHANGE_PAGE: 'page',
 
   CHANGE_ENDPOINT_TOKEN_ERROR: 'endpoint_token_error',
+
+
+  CHANGE_SIGN_IN: 'sign_in',
 
   changeComponentName: name => {
     return CHANGE_COMPONENT_PREFIX + name;

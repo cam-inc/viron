@@ -18,6 +18,15 @@ export default {
       ;
   },
 
+  signInShow: context => {
+    return  Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants.MUTATION_AUTH_SIGN_IN_SHOW);
+      })
+    ;
+  },
+
   //
   signInGoogle: (context, key, authtype) => {
     const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);

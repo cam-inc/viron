@@ -19,7 +19,7 @@ dmc-endpoints.EndpointsPage
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
-    this.endpoint = {};
+    this.endpoint = store.getter(constants.GETTER_ENDPOINT_LIST) || {};
 
     store.change(constants.CHANGE_ENDPOINT, (err, state, store) => {
       this.endpoint = state.endpoint;
@@ -35,11 +35,13 @@ dmc-endpoints.EndpointsPage
     }
 
     handleEndpointEntry(key) {
-      store.action(constants.ACTION_AUTH_UPDATE, key)
+      Promise
+        .resolve()
+        .then(() => store.action(constants.ACTION_CURRENT_UPDATE, key))
+        .then(() => store.action(constants.ACTION_AUTH_UPDATE, key))
         .then(() => {
           if (!store.getter(constants.GETTER_ENDPOINT_ONE, key).token) {
-            router.navigateTo(`/signin/${key}`, true); // href hash #/
-            return;
+            return store.action(constants.ACTION_AUTH_SIGN_IN_SHOW);
           }
           router.navigateTo(`/${key}`, true); // href hash #/
         })
