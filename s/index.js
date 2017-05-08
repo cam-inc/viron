@@ -42,7 +42,11 @@ let setupRouter = (store) => {
   return Promise
     .resolve()
     .then(() => {
-      router.on('/samplepageA', () => {
+      router.onBefore(location => {
+        return Promise.resolve();
+      }).onAfter(location => {
+        return Promise.resolve();
+      }).on('/samplepageA', () => {
         // riot.mount('dmc-page', 'samplepageA');
       }).on('/samplepageB', () => {
         // riot.mount('dmc-page', 'samplepageB');
@@ -67,7 +71,7 @@ let setupRouter = (store) => {
           throw new Error('endpoint not found.');
         }
 
-        Promise
+        return Promise
           .resolve()
           .then(() => store.action(constants.ACTION_CURRENT_UPDATE, store.getter(constants.GETTER_CURRENT)))
           .then(() => store.action(constants.ACTION_DMC_REMOVE))

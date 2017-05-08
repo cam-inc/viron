@@ -1,4 +1,5 @@
 import { find, forEach } from 'mout/array';
+import ObjectAssign from 'object-assign';
 import pathToRegexp from 'path-to-regexp';
 import createHashHistory from 'history/createHashHistory';
 
@@ -25,6 +26,22 @@ class Router {
      * @type {Function|null}
      */
     this._unlistener = null;
+
+    /**
+     * function that will be called on ahead of every routing.
+     * @type {Function}
+     */
+    this._onBefore = () => {
+      return Promise.resolve();
+    };
+
+    /**
+     * function that will be called on behind of every routing.
+     * @type {Function}
+     */
+    this._onAfter = () => {
+      return Promise.resolve();
+    };
   }
 
   /**
@@ -53,6 +70,7 @@ class Router {
    * register a route.
    * @param {String} pattern express-like url pattern.
    * @param {Function} onRoute a function that will be executed when the route changes.
+   * @return {Router}
    */
   on(pattern, onChange) {
     const keys = [];
@@ -63,6 +81,28 @@ class Router {
       keys,
       onChange
     });
+    return this;
+  }
+
+  /**
+   * register a function to hook just before routing.
+   * this function is called on every routing.
+   * @param {Function} func
+   * @return {Router}
+   */
+  onBefore(func) {
+    this._onBefore = func;
+    return this;
+  }
+
+  /**
+   * register a function to hook just after routing.
+   * this function is called on every routing.
+   * @param {Function} func
+   * @return {Router}
+   */
+  onAfter(func) {
+    this._onAfter = func;
     return this;
   }
 
@@ -108,7 +148,7 @@ class Router {
   resolveCurrentPath(pattern) {
     const keys = [];
     const regexp = pathToRegexp(pattern, keys);
-    const pathname = this.getCurrentLocation().pathname
+    const pathname = this.getCurrentLocation().pathname;
     const params = {};
     try {
       const list = regexp.exec(pathname).slice(1);
@@ -138,7 +178,15 @@ class Router {
     }
 
     const params = this._parseLocation(location, route);
-    route.onChange(...params);
+
+    Promise
+      .resolve()
+      .then(() => this._onBefore(ObjectAssign({}, location)))
+      .then(() => route.onChange(...params))
+      .then(() => this._onAfter(ObjectAssign({}, location)))
+      .catch(err => {
+        console.error(err.message || 'couldn\'t route. check the onBefore and onAfter functions.');
+      });
   }
 
   /**
