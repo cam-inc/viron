@@ -22,7 +22,7 @@ export default {
   signInGoogle: (context, key, authtype) => {
     const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
     const url = new URL(endpoint.url);
-    let fetchUrl = `${url.origin}${authtype.url}?redirect_url=http://localhost:8080/#/signin/${key}`;
+    let fetchUrl = `${url.origin}${authtype.url}?redirect_url=${encodeURIComponent(location.href)}`;
     location.href = fetchUrl;
   },
 
