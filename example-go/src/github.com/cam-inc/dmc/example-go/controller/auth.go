@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bytes"
 	"context"
 	"crypto/rsa"
 	"encoding/base64"
@@ -10,6 +11,8 @@ import (
 	"time"
 
 	"net/url"
+
+	"sort"
 
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
@@ -89,6 +92,27 @@ func generateJwt(customClaims map[string]interface{}, privateKey *rsa.PrivateKey
 	}
 	token.Claims = claims
 	return token.SignedString(privateKey)
+}
+
+func encode(v url.Values) string {
+	var buf bytes.Buffer
+	keys := make([]string, 0, len(v))
+	for k := range v {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		vs := v[k]
+		prefix := url.PathEscape(k) + "="
+		for _, v := range vs {
+			if buf.Len() > 0 {
+				buf.WriteByte('&')
+			}
+			buf.WriteString(prefix)
+			buf.WriteString(url.PathEscape(v))
+		}
+	}
+	return buf.String()
 }
 
 // NewAuthController creates a auth controller.
@@ -249,8 +273,8 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 				// Set auth header for client retrieval
 				authToken := fmt.Sprintf("Bearer %s", jwt)
 
-				q.Set("token", url.QueryEscape(authToken))
-				u.RawQuery = q.Encode()
+				q.Set("token", authToken)
+				u.RawQuery = encode(q)
 
 				ctx.ResponseData.Header().Set("Authorization", authToken)
 				ctx.ResponseWriter.Header().Set("location", u.String())
