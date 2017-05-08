@@ -181,21 +181,29 @@ func (c *AuthController) Googlesignin(ctx *app.GooglesigninAuthContext) error {
 func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthContext) error {
 	logger := common.GetLogger("default")
 
+	// エラー時のリダイレクトURLを組み立て
+	r := *ctx.State
+	u, _ := url.Parse(r)
+	q := u.Query()
+	q.Set("token", "")
+	u.RawQuery = q.Encode()
+	redirectUrl := u.String()
+
 	// OAuthTokenを取得
 	config := service.GetOAuth2Config()
 	token, err := config.Exchange(ctx.Context, *ctx.Code)
 	if err != nil {
 		logger.Error("GoogleSignin get token failure.", zap.Error(err))
-		ctx.ResponseWriter.Header().Set("location", "/")
+		ctx.ResponseWriter.Header().Set("location", redirectUrl)
 		return ctx.TemporaryRedirect()
 	}
 
 	// GoogleのUser情報を取得
 	if userInfo, err := service.GetGoogleOAuthUser(ctx.Context, token); err != nil {
-		ctx.ResponseWriter.Header().Set("location", "/")
+		ctx.ResponseWriter.Header().Set("location", redirectUrl)
 		return ctx.TemporaryRedirect()
 	} else if isAllow := service.IsAllowEMailAddress(userInfo.EMail); isAllow == false {
-		ctx.ResponseWriter.Header().Set("location", "/")
+		ctx.ResponseWriter.Header().Set("location", redirectUrl)
 		return ctx.TemporaryRedirect()
 	} else {
 		email := userInfo.EMail
@@ -209,13 +217,13 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 			m.RoleID = common.GetDefaultRole()
 			if err = adminUserTable.Add(ctx.Context, &m); err != nil {
 				logger.Error("GoogleSignin add admin_user failure.", zap.String("email", email))
-				ctx.ResponseWriter.Header().Set("location", "/")
+				ctx.ResponseWriter.Header().Set("location", redirectUrl)
 				return ctx.TemporaryRedirect()
 			}
 			adminUserModel = &m
 		} else if err != nil {
 			logger.Error("GoogleSignin GetByEmail failure.", zap.String("email", email))
-			ctx.ResponseWriter.Header().Set("location", "/")
+			ctx.ResponseWriter.Header().Set("location", redirectUrl)
 			return ctx.TemporaryRedirect()
 		}
 
@@ -223,7 +231,7 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 			logger.Error("GoogleSignin getRoles failure.",
 				zap.String("email", adminUserModel.Email),
 				zap.String("roleID", adminUserModel.RoleID))
-			ctx.ResponseWriter.Header().Set("location", "/")
+			ctx.ResponseWriter.Header().Set("location", redirectUrl)
 			return ctx.TemporaryRedirect()
 		} else {
 			// Generate JWT
@@ -235,15 +243,12 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 			}
 			if jwt, err := generateJwt(claims, c.privateKey); err != nil {
 				logger.Error("GoogleSignin failed to sign token", zap.Error(err))
-				ctx.ResponseWriter.Header().Set("location", "/")
+				ctx.ResponseWriter.Header().Set("location", redirectUrl)
 				return ctx.TemporaryRedirect()
 			} else {
 				// Set auth header for client retrieval
 				authToken := fmt.Sprintf("Bearer %s", jwt)
-				redirectUrl := *ctx.State
 
-				u, _ := url.Parse(redirectUrl)
-				q := u.Query()
 				q.Set("token", url.QueryEscape(authToken))
 				u.RawQuery = q.Encode()
 
