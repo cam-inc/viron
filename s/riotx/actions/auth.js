@@ -2,8 +2,12 @@ import constants from '../../core/constants';
 
 export default {
   // check if the local stored endpoint token is valid.
-  update: (context, key) => {
-    const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
+  update: (context, key, token) => {
+    let endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
+    if (token) {
+      endpoint.token = token
+    }
+
     return fetch(endpoint.url, {
       headers: {
         "Authorization": endpoint.token

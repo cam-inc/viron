@@ -27,7 +27,6 @@ dmc.Application
       console.log('dmc `*` on store', err, state, store);
     });
     store.change(constants.CHANGE_PAGE, (err, state, store) => {
-    debugger;
       // TODO
       //-- const targetTagString = 'dmc-' + state.page.layout;
       const targetTagString = 'dmc-components';

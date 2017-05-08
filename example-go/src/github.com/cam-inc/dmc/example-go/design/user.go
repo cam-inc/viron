@@ -64,9 +64,9 @@ var _ = Resource("user", func() {
 	DefaultMedia(UserMediaType)
 
 	// TODO: ログイン画面できるまでは外しておく
-	//Security(JWT, func() {
-	//	Scope("api:access")
-	//})
+	Security(JWT, func() {
+		Scope("api:access")
+	})
 
 	Action("list", func() {
 		Description("get users")
