@@ -1,0 +1,24 @@
+/* Components = dmc.pages[x].componentsのこと */
+/* 紛らわしいので注意すること */
+.ComponentsPage {
+  display: block;
+}
+
+.ComponentsPage__title {
+  padding: 32px;
+  font-size: 24px;
+  color: var(--color-text-default);
+  background-color: var(--color-basic-white);
+}
+
+.ComponentsPage__list {
+
+  @apply --layout-between-stretch;
+  flex-wrap: wrap;
+  padding: 32px;
+}
+
+.ComponentsPage__list .Component {
+  width: 320px;
+  margin-bottom: 24px;
+}

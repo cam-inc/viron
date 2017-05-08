@@ -3,6 +3,8 @@
 @import "Application";
 @import "Button";
 @import "Checkbox";
+@import "Component";
+@import "ComponentNumber";
 @import "Drawer";
 @import "Endpoint";
 @import "Entry";

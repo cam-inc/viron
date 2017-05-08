@@ -4,9 +4,9 @@
 }
 
 .Entry__title {
+  margin-bottom: 24px;
   font-size: 36px;
   color: var(--color-text-default);
-  margin-bottom: 24px;
 }
 
 .Entry__form .Input,

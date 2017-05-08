@@ -1,5 +1,6 @@
 import riot from 'riot';
 import storage from 'store';
+import 'whatwg-fetch';
 
 import constants from './core/constants';
 import swagger from './swagger/index';
@@ -61,9 +62,7 @@ let setupRouter = (store) => {
             // TODO
             console.error(err);
           });
-
       }).on('/:endpoint', (params) => {
-
         //const current = store.getter(constants.GETTER_CURRENT);
         const endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, params.endpoint);
         if (!endpoint) {

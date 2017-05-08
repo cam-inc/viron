@@ -4,9 +4,9 @@
 }
 
 .Signin__title {
+  margin-bottom: 24px;
   font-size: 36px;
   color: var(--color-text-default);
-  margin-bottom: 24px;
 }
 
 .Signin__endpointTitle {
@@ -29,8 +29,8 @@
 }
 
 .Signin__email .Input {
-  margin-right: 12px;
   flex-grow: 1;
+  margin-right: 12px;
 }
 
 .Signin__email .Button {

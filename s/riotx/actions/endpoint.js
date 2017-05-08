@@ -1,5 +1,3 @@
-import 'whatwg-fetch';
-
 import constants from '../../core/constants';
 
 export default {
@@ -41,7 +39,7 @@ export default {
           description: '',
           version: '',
           color: '',
-          thumbnail: '',
+          thumbnail: 'https://dummyimage.com/600x400/000/fff',
           tags: []
         };
         return {

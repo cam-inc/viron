@@ -25,9 +25,9 @@ export default {
   [constants.MUTATION_CURRENT_UPDATE]: current.update,
   [constants.MUTATION_CURRENT_REMOVE]: current.remove,
 
-  [constants.MUTATION_PAGE_GET]: page.show,
+  [constants.MUTATION_PAGE]: page.show,
 
-  [constants.MUTATION_COMPONENT_GET]: component.show,
+  [constants.MUTATION_COMPONENT_ONE]: component.one,
 
   [constants.MUTATION_TOAST_ADD]: toast.add,
   [constants.MUTATION_TOAST_REMOVE]: toast.remove,

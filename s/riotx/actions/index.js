@@ -16,7 +16,7 @@ export default {
   [constants.ACTION_DRAWER_TOGGLE]: drawer.toggle,
   [constants.ACTION_DRAWER_CLOSE]: drawer.close,
 
-  [constants.ACTION_DMC_GET]: dmc.show,
+  [constants.ACTION_DMC_GET]: dmc.get,
   [constants.ACTION_DMC_REMOVE]: dmc.remove,
 
   [constants.ACTION_ENDPOINT_GET]: endpoint.get,
@@ -27,9 +27,9 @@ export default {
   [constants.ACTION_CURRENT_UPDATE]: current.update,
   [constants.ACTION_CURRENT_REMOVE]: current.remove,
 
-  [constants.ACTION_PAGE_GET]: page.show,
+  [constants.ACTION_PAGE_GET]: page.get,
 
-  [constants.ACTION_COMPONENT_GET]: component.show,
+  [constants.ACTION_COMPONENT_GET]: component.get,
 
   [constants.ACTION_TOAST_SHOW]: toast.show,
   [constants.ACTION_TOAST_HIDE]: toast.hide,

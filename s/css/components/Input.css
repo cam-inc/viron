@@ -37,9 +37,9 @@
 
 .Input__input {
   display: block;
+  flex-grow: 1;
   width: 0;
   min-width: 0;
-  flex-grow: 1;
   font-size: 18px;
   color: var(--color-text-default);
 }

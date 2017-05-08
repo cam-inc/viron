@@ -70,8 +70,9 @@
 }
 
 .Endpoint__controls {
-  margin-top: 24px;
+
   @apply --layout-center-center;
+  margin-top: 24px;
 }
 
 .Endpoint__controls .Button {

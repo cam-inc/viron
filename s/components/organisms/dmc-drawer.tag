@@ -55,6 +55,7 @@ dmc-drawer.Drawer
     }
 
     this.evSelect = (ev) => {
+      // TODO: current値を参照できるかも
       let param = router.resolveCurrentPath('/:endpoint/:page?')
       router.navigateTo(`/${param.endpoint}/${ev.item.id.get()}`);
     }

@@ -3,7 +3,7 @@ import constants from '../../core/constants';
 import swagger from '../../swagger';
 
 export default {
-  show: (context, component_uid, component_index) => {
+  get: (context, component_uid, component_index) => {
     return new Promise((resolve, reject) => {
       const component = context.state.page.components[component_index]; // TODO getters 化する
 
@@ -33,16 +33,15 @@ export default {
           resolve({
             response: res.obj,
             model: model,
-            component_uid: component_uid,
+            component_uid: component_uid
           });
         })
         .catch(err => {
           reject(err);
         });
     }).then(res => {
-      context.commit(constants.MUTATION_COMPONENT_GET, res);
+      context.commit(constants.MUTATION_COMPONENT_ONE, res);
     });
-  },
+  }
 
-
-}
+};

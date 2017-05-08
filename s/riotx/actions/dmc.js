@@ -6,7 +6,7 @@ import swagger from '../../swagger';
 const DMC_URI = '/dmc';
 
 export default {
-  show: context => {
+  get: context => {
     return new Promise((resolve, reject) => {
       const model = swagger.client.spec.paths[DMC_URI].get;
 

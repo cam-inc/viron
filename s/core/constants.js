@@ -65,9 +65,9 @@ export default {
   MUTATION_CURRENT_UPDATE: 'current_update',
   MUTATION_CURRENT_REMOVE: 'current_remove',
 
-  MUTATION_PAGE_GET: 'page_get',
+  MUTATION_PAGE: 'page',
 
-  MUTATION_COMPONENT_GET: 'component_get',
+  MUTATION_COMPONENT_ONE: 'component_one',
 
   MUTATION_TOAST_ADD: 'toast_add',
   MUTATION_TOAST_REMOVE: 'toast_remove',

@@ -116,11 +116,11 @@ class Swagger {
   }
 
   isComponentStyleNumber(obj) {
-    return obj.get() == constants.STYLE_NUMBER;
+    return obj.get() === constants.STYLE_NUMBER;
   }
 
   isComponentStyleTable(obj) {
-    return obj.get() == constants.STYLE_TABLE;
+    return obj.get() === constants.STYLE_TABLE;
   }
 
 }
