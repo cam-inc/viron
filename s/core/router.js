@@ -183,9 +183,9 @@ class Router {
 
     Promise
       .resolve()
-      .then(() => this._onBefore(splitedPathname))
+      .then(() => this._onBefore(splitedPathname, location.pathname))
       .then(() => route.onChange(...params))
-      .then(() => this._onAfter(splitedPathname))
+      .then(() => this._onAfter(splitedPathname, location.pathname))
       .catch(err => {
         console.error(err.message || 'couldn\'t route. check the onBefore and onAfter functions.');
       });

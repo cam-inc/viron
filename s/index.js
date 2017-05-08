@@ -42,9 +42,9 @@ let setupRouter = (store) => {
   return Promise
     .resolve()
     .then(() => {
-      router.onBefore(splitedPathname => {
+      router.onBefore((splitedPathname, pathname) => {
         return Promise.resolve();
-      }).onAfter(splitedPathname => {
+      }).onAfter((splitedPathname, pathname) => {
         return Promise.resolve();
       }).on('/samplepageA', () => {
         // riot.mount('dmc-page', 'samplepageA');
