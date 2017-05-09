@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
+	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	genModels "github.com/cam-inc/dmc/example-go/gen/models"
 	"github.com/goadesign/goa"
 	"github.com/jinzhu/gorm"
-	"github.com/cam-inc/dmc/example-go/common"
 	"go.uber.org/zap"
 )
 
