@@ -24,9 +24,6 @@ import './components/atoms/dmc-text.tag';
 // organisms
 import './components/organisms/dmc-header.tag';
 import './components/organisms/dmc-drawer.tag';
-import './components/organisms/dmc-component.tag';
-import './components/organisms/dmc-component-number.tag';
-import './components/organisms/dmc-component-table.tag';
 import './components/organisms/dmc-signin.tag';
 
 // pages

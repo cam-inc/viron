@@ -1,5 +1,7 @@
 /* ITCSS: Base */
 /* Unclassed HTML elements(type selectors). */
+@import "taucharts/build/production/tauCharts.min";
+
 html,
 body {
   height: 100%;

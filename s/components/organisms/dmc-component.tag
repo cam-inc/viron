@@ -4,10 +4,14 @@ dmc-component.Component(onclick="{ handleClick }")
   virtual(if="{ !isPending }")
     dmc-component-number(if="{ isComponentStyleNumber }" data="{ data }")
     dmc-component-table(if="{ isComponentStyleTable }" data="{ data }")
+    dmc-component-graph-bar(if="{ isComponentStyleGraphBar }" data="{ data }")
 
   script.
     import swagger from '../../swagger';
     import constants from '../../core/constants';
+    import '../organisms/dmc-component-number.tag';
+    import '../organisms/dmc-component-table.tag';
+    import '../organisms/dmc-component-graph-bar.tag';
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
@@ -20,6 +24,7 @@ dmc-component.Component(onclick="{ handleClick }")
     this.component = this.opts.component;
     this.isComponentStyleNumber = swagger.isComponentStyleNumber(this.component.style);
     this.isComponentStyleTable = swagger.isComponentStyleTable(this.component.style);
+    this.isComponentStyleGraphBar = swagger.isComponentStyleGraphBar(this.component.style);
 
     this.on('mount', () => {
       // TODO: debug用なので後でtimeout処理を外すこと。
@@ -30,6 +35,7 @@ dmc-component.Component(onclick="{ handleClick }")
     });
 
     this.on('unmount', () => {
+      // TODO: ここに処理が来ない。。why...
       // TODO: state.component内の対象物を削除する？
     });
 
@@ -38,7 +44,7 @@ dmc-component.Component(onclick="{ handleClick }")
         return;
       }
 
-      alert('TODO: 詳細面に遷移すること');
+      // TODO: 何かする？
     }
 
     store.change(constants.changeComponentName(this._riot_id), (err, state, store) => {

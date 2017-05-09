@@ -53,8 +53,9 @@
     "riot": ">=3.4.0",
     "store": "=1.3.20",
     "suitcss-base": "^2.0.0",
-    "whatwg-fetch": "^2.0.3",
-    "url-polyfill": "git+https://github.com/webcomponents/URL.git"
+    "taucharts": "^1.1.3",
+    "url-polyfill": "git+https://github.com/webcomponents/URL.git",
+    "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.7",

@@ -12,6 +12,7 @@ export default {
   // Component#Style
   STYLE_NUMBER: 'number',
   STYLE_TABLE: 'table',
+  STYLE_GRAPH_BAR: 'graph-bar',
 
   // Auth type
   AUTH_TYPE_EMAIL: 'email',

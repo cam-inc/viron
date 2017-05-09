@@ -37,5 +37,4 @@ dmc.Application
       const targetTagString = 'dmc-components';
       console.log(`[page] dmc.tag change page! ${targetTagString}`)
       riot.mount('dmc-page', targetTagString, state.page);
-
     });

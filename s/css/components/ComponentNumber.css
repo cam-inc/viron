@@ -8,13 +8,8 @@
 }
 
 .ComponentNumber__name {
-  margin-bottom: 8px;
   font-size: 14px;
   font-weight: bold;
-}
-
-.ComponentNumber__description {
-  font-size: 12px;
 }
 
 .ComponentNumber__body {

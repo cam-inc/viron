@@ -23,7 +23,7 @@ mout.object.forOwn(mout, (v,k) => {
 
   mout.object.forOwn(v, (v1, k1) => {
     if (mout.lang.isFunction(v1)) {
-      namedExports[key].push(k1)
+      namedExports[key].push(k1);
     }
   });
 });
@@ -39,6 +39,7 @@ export default {
   // exports: 'default',
   exports: 'none',
   format: 'iife',
+  useStrict: false,
   moduleContext: { 'node_modules/whatwg-fetch/fetch.js': 'window' },
   // external: null,
   // globals: { },

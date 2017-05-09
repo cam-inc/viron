@@ -124,6 +124,10 @@ class Swagger {
     return obj.get() === constants.STYLE_TABLE;
   }
 
+  isComponentStyleGraphBar(obj) {
+    return obj.get() === constants.STYLE_GRAPH_BAR;
+  }
+
 }
 
 export default new Swagger();
