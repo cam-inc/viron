@@ -5,9 +5,16 @@ const (
 	ColorBlue  = "blud"  // Endpoint Color,
 	ColorGreen = "green" // Endpoint Color,
 
-	StyleList   = "list"   // WebComponent リスト表示
-	StyleTable  = "table"  // WebComponent テーブル表示
-	StyleNumber = "number" // WebComponent 数字表示
+	StyleList                      = "list"   // WebComponent リスト表示
+	StyleTable                     = "table"  // WebComponent テーブル表示
+	StyleNumber                    = "number" // WebComponent 数字表示
+	StyleGraphScatterplot          = "graph-scatterplot"
+	StyleGraphLine                 = "graph-line"
+	StyleGraphBar                  = "graph-bar"
+	StyleGraphHorizontalBar        = "graph-horizontal-bar"
+	StyleGraphStackedBar           = "graph-stacked-bar"
+	StyleGraphHorizontalStackedBar = "graph-horizontal-stacked-bar"
+	StyleGraphStackedArea          = "graph-stacked-area"
 
 	GroupEmpty = ""      // グループなし
 	GroupKPI   = "kpi"   // KPI

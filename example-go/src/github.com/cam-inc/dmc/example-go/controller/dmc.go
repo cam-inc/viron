@@ -95,6 +95,21 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 							},
 						},
 					},
+					{
+
+						Name: "Planet",
+						API: &app.API{
+							Path: "/stats/planet",
+							Method: "get",
+						},
+						Style: bridge.StyleGraphBar,
+						Options: []*app.Option{
+							{
+								Key: "key",
+								Value: "value",
+							},
+						},
+					},
 				},
 			},
 			// Mange
