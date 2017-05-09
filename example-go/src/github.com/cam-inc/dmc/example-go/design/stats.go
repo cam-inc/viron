@@ -33,6 +33,22 @@ var StatsMAUMediaType = MediaType("application/vnd.statsmau+json", func() {
 	})
 })
 
+// StatsPlanetMediaType of media type.
+var StatsPlanetMediaType = MediaType("application/vnd.statsplanet+json", func() {
+	Description("Planets data")
+
+	Attributes(func() {
+		Attribute("keys", ArrayOf(String), "key names of graph data")
+		Attribute("data", ArrayOf(ArrayOf(Any)), "graph data")
+		Required("keys", "data")
+	})
+
+	View("default", func() {
+		Attribute("keys")
+		Attribute("data")
+	})
+})
+
 var _ = Resource("stats_dau", func() {
 	Origin(OriginURL, OriginAllowAll)
 	BasePath("/stats/dau")
@@ -57,6 +73,21 @@ var _ = Resource("stats_mau", func() {
 		Description("Service Monthly Activity User")
 		Response(OK, func() {
 			Media(StatsMAUMediaType)
+		})
+		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+	})
+})
+
+var _ = Resource("stats_planet", func() {
+	Origin(OriginURL, OriginAllowAll)
+	BasePath("/stats/planet")
+	DefaultMedia(StatsPlanetMediaType)
+	Action("show", func() {
+		Routing(GET(""))
+		Description("Planets Information")
+		Response(OK, func() {
+			Media(StatsPlanetMediaType)
 		})
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)

@@ -22,8 +22,16 @@ func (c *AuditLogController) List(ctx *app.ListAuditLogContext) error {
 	// AuditLogController_List: start_implement
 
 	// Put your logic here
+	pager := common.Pager{}
+	pager.SetLimit(ctx.Limit)
+	pager.SetOffset(ctx.Offset)
+
 	auditLogTable := models.NewAuditLogDB(common.DB)
-	list := auditLogTable.ListAuditLog(ctx.Context)
+	list := auditLogTable.ListPage(ctx.Context, pager.Limit, pager.Offset)
+	count := auditLogTable.Count(ctx.Context)
+
+	pager.SetCount(count)
+	pager.SetPaginationHeader(ctx.ResponseWriter)
 
 	// AuditLogController_List: end_implement
 	return ctx.OK(list)

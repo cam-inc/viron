@@ -58,6 +58,10 @@ var _ = Resource("audit_log", func() {
 	Action("list", func() {
 		Description("get admin roles")
 		Routing(GET(""))
+		Params(func() {
+			Param("limit", Integer, "number of items per page")
+			Param("offset", Integer, "offset number of page")
+		})
 		Response(OK, func() {
 			Media(CollectionOf(AuditLogMediaType, func() {
 				View("default")
@@ -69,5 +73,4 @@ var _ = Resource("audit_log", func() {
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
 	})
-
 })
