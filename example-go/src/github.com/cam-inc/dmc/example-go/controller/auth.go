@@ -281,7 +281,7 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 				q.Set("token", authToken)
 				u.RawQuery = encode(q)
 
-				ctx.ResponseData.Header().Set("Authorization", authToken)
+				ctx.ResponseWriter.Header().Set("Authorization", authToken)
 				ctx.ResponseWriter.Header().Set("location", u.String())
 				return ctx.MovedPermanently()
 			}
