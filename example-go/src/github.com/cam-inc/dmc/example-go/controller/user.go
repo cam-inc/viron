@@ -3,7 +3,8 @@ package controller
 import (
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
-	"github.com/cam-inc/dmc/example-go/gen/models"
+	genModels "github.com/cam-inc/dmc/example-go/gen/models"
+	"github.com/cam-inc/dmc/example-go/models"
 	"github.com/goadesign/goa"
 	"github.com/jinzhu/gorm"
 )
@@ -24,7 +25,7 @@ func (c *UserController) Create(ctx *app.CreateUserContext) error {
 
 	// Put your logic here
 	userTable := models.NewUserDB(common.DB)
-	m := models.User{}
+	m := genModels.User{}
 
 	if ctx.Payload.Name != nil {
 		m.Name = *ctx.Payload.Name
@@ -90,7 +91,7 @@ func (c *UserController) List(ctx *app.ListUserContext) error {
 
 	// Put your logic here
 	userTable := models.NewUserDB(common.DB)
-	list := userTable.ListUser(ctx.Context)
+	list := userTable.ListUser(ctx.Context, ctx.Params)
 	// UserController_List: end_implement
 
 	return ctx.OK(list)
