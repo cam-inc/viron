@@ -69,6 +69,9 @@ var _ = Resource("user", func() {
 	Action("list", func() {
 		Description("get users")
 		Routing(GET(""))
+		Params(func() {
+			Param("name", String)
+		})
 		Response(OK, func() {
 			Media(CollectionOf(UserMediaType, func() {
 				View("default")

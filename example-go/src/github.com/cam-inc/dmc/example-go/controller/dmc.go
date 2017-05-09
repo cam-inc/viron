@@ -126,6 +126,12 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 							Method: "get",
 						},
 						Style: bridge.StyleTable,
+						Query: []*app.Query{
+							{
+								Key:  "name",
+								Type: "string",
+							},
+						},
 						Options: []*app.Option{
 							{
 								Key:   "key",
