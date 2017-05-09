@@ -102,7 +102,6 @@
 }
 
 .Endpoint__memo {
-
   @apply --text-break;
   margin-top: 16px;
   font-size: 14px;

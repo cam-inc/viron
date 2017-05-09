@@ -13,31 +13,54 @@ dmc-drawer.Drawer
   .Drawer__body
     .Dwawer__section
       .Drawer__sectionTitle ダッシュボード
-      .Drawer__list
-        .Drawer__listItem(each="{ dashboard }" onclick="{ evSelect }")
-          dmc-icon.Drawer__listItemIcon(type="codeSquareO")
-          .Drawer__listItemTitle
-            | { name.get() }
-          dmc-icon(type="up")
+      .Drawer__groups
+        dmc-drawer-group(each="{ group in groupedDashboard }" group="{ group }")
     .Drawer__section
       .Drawer__sectionTitle 管理画面
-      .Drawer__list
-        .Drawer__listItem(each="{ manage }" onclick="{ evSelect }")
-          dmc-icon.Drawer__listItemIcon(type="codeSquareO")
-          .Drawer__listItemTitle
-            | { name.get() }
-          dmc-icon(type="up")
+      .Drawer__groups
+        dmc-drawer-group(each="{ group in groupedManage }" group="{ group }")
 
   script.
+    import { forEach } from 'mout/array';
+    import { forOwn } from 'mout/object';
     import constants from '../../core/constants';
     import router from '../../core/router';
     import '../atoms/dmc-icon.tag';
 
     let store = this.riotx.get();
 
+    const group = (items) => {
+      const groups = {};
+      let counter = 0;
+      forEach(items, (item, idx) => {
+        const assignment = item.group.get() || `independent_${idx}`;
+        if (!groups[assignment]) {
+          groups[assignment] = {
+            name: assignment,
+            index: counter,
+            list: [],
+            isIndependent: !item.group.get()
+          };
+          counter = counter + 1;
+        }
+        groups[assignment].list.push(item);
+      });
+
+      const ret = [];
+      forOwn(groups, val => {
+        const index = val.index;
+        delete val.index;
+        ret[index] = val;
+      });
+
+      return ret;
+    }
+
     this.endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, store.getter(constants.GETTER_CURRENT));
-    this.dashboard = [];
-    this.manage = [];
+    const dashboard = store.getter(constants.GETTER_DMC_DASHBOARD);
+    const manage = store.getter(constants.GETTER_DMC_MANAGE);
+    this.groupedDashboard = group(dashboard);
+    this.groupedManage = group(manage);
 
     store.change(constants.CHANGE_ENDPOINT, (err, state, store) => {
       const current = store.getter(constants.GETTER_CURRENT);
@@ -46,8 +69,10 @@ dmc-drawer.Drawer
     });
 
     store.change(constants.CHANGE_DMC, (err, state, store) => {
-      this.dashboard = store.getter(constants.GETTER_DMC_DASHBOARD);
-      this.manage = store.getter(constants.GETTER_DMC_MANAGE);
+      const dashboard = store.getter(constants.GETTER_DMC_DASHBOARD);
+      const manage = store.getter(constants.GETTER_DMC_MANAGE);
+      this.groupedDashboard = group(dashboard);
+      this.groupedManage = group(manage);
       this.update();
     });
 
@@ -58,8 +83,31 @@ dmc-drawer.Drawer
         .then(() => store.action(constants.ACTION_DRAWER_CLOSE));
     }
 
-    this.evSelect = (ev) => {
-      // TODO: current値を参照できるかも
+dmc-drawer-group(class="Drawer__group")
+  .Drawer__groupToggle(onClick="{ handleToggleClick }")
+    dmc-icon(type="codeSquareO" class="Drawer__groupIconHead")
+    .Drawer__groupName { opts.group.isIndependent ? opts.group.list[0].name.get() : opts.group.name }
+    dmc-icon(if="{ !opts.group.isIndependent }" type="up" class="Drawer__groupIconTail { isOpened ? 'Drawer__groupIconTail--opened' : '' }")
+  div(class="Drawer__groupList { isOpened ? 'Drawer__groupList--opened' : '' }" if="{ !opts.group.isIndependent }")
+    .Drawer__groupListItem(each="{ opts.group.list }" onClick="{ handleGroupItemClick }") { name.get() }
+
+  script.
+    import '../atoms/dmc-icon.tag';
+
+    this.isOpened = false;
+
+    handleToggleClick() {
+      if (this.opts.group.isIndependent) {
+        // TODO: current値を参照できるかも
+        let param = router.resolveCurrentPath('/:endpoint/:page?')
+        router.navigateTo(`/${param.endpoint}/${this.opts.group.list[0].id.get()}`);
+      } else {
+        this.isOpened = !this.isOpened;
+        this.update();
+      }
+    }
+
+    handleGroupItemClick(e) {
       let param = router.resolveCurrentPath('/:endpoint/:page?')
-      router.navigateTo(`/${param.endpoint}/${ev.item.id.get()}`);
+      router.navigateTo(`/${param.endpoint}/${e.item.id.get()}`);
     }
