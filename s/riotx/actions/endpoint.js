@@ -26,6 +26,7 @@ export default {
     return fetch(url)
       .then((response) => {
         // ping ok!
+        // 401 is expected because we didn't have a authorization token yet.
         //return response;
         return;
       })
@@ -35,7 +36,7 @@ export default {
           url: url,
           memo: memo,
           token: null,
-          title: '',
+          name: '',
           description: '',
           version: '',
           color: '',

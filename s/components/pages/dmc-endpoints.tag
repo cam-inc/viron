@@ -3,10 +3,13 @@ dmc-endpoints.EndpointsPage
     .EndpointsPage__addCard(click="{ handleEndpointAdd }")
       dmc-icon(type="plus")
     virtual(each="{ item, key in endpoint }")
-      dmc-endpoint(key="{ key }" title="{ item.title }"
+      dmc-endpoint(key="{ key }"
+        name="{ item.name }"
         thumbnail="{ item.thumbnail }"
+        token="{ item.token }"
         url="{ item.url }"
         description="{ item.description }"
+        memo="{ item.memo }"
         tags="{ item.tags }"
         onentry="{ handleEndpointEntry }"
         onedit="{ handleEndpointEdit }"
@@ -37,7 +40,7 @@ dmc-endpoints.EndpointsPage
       Promise
         .resolve()
         .then(() => store.action(constants.ACTION_CURRENT_UPDATE, key))
-        .then(() => store.action(constants.ACTION_AUTH_UPDATE, key))
+        .then(() => store.action(constants.ACTION_AUTH_VALIDATE, key))
         .then(() => {
           // navigate to dmc page when local stored endpoint token is valid.
           // if not valid, show signin modal.
@@ -46,8 +49,7 @@ dmc-endpoints.EndpointsPage
           }
           // TODO router#promiseになったら変える
           router.navigateTo(`/${key}`); // href hash #/
-        })
-      ;
+        });
     }
 
     handleEndpointEdit(key) {

@@ -12,7 +12,6 @@
 }
 
 .ComponentsPage__list {
-
   @apply --layout-between-stretch;
   flex-wrap: wrap;
   padding: 32px;

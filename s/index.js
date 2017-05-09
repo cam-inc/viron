@@ -29,7 +29,6 @@ import './components/organisms/dmc-component-number.tag';
 import './components/organisms/dmc-component-table.tag';
 import './components/organisms/dmc-signin.tag';
 
-
 // pages
 import './components/pages/dmc-empty.tag';
 import './components/pages/dmc-endpoints.tag';
@@ -73,24 +72,13 @@ let setupRouter = (store) => {
           return store.action(constants.ACTION_DRAWER_DISABLE);
         }
         return store.action(constants.ACTION_DRAWER_ENABLE);
-      }).on('/samplepageA', () => {
+      //}).on('/samplepageA', () => {
         // riot.mount('dmc-page', 'samplepageA');
-      }).on('/samplepageB', () => {
+      //}).on('/samplepageB', () => {
         // riot.mount('dmc-page', 'samplepageB');
-      }).on('/samplepageC/:paramA/:paramB', () => {
+      //}).on('/samplepageC/:paramA/:paramB', () => {
         //riot.mount('dmc-page', 'samplepageC', { paramA, paramB });
-      // }).on('/:endpoint/:id', (params) => {
-      //   // Load page
-      //   const store = riotx.get();
-      //   // TODO DMCのロードがまだの場合の処理
-      //   store.action(constants.ACTION_PAGE_GET, params.id)
-      //     .catch((err) => {
-      //       // TODO
-      //       console.error(err);
-      //     });
-      //
       }).on('/:endpoint/:id?', (params) => {
-        //const current = store.getter(constants.GETTER_CURRENT);
         const endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, params.endpoint);
         if (!endpoint) {
           // TODO 想定していない Endpoint

@@ -1,8 +1,8 @@
-import swagger from '../../swagger'
+import swagger from '../../swagger';
 import constants from '../../core/constants';
 
 export default {
-  show: function (context, obj) {
+  show: (context, obj) => {
     const schema = obj.model.responses[200].schema;
     // const properties = schema.properties;
     const response = obj.response;
@@ -12,7 +12,8 @@ export default {
     context.state.dmc = merge;
     return [constants.CHANGE_DMC];
   },
-  remove: function (context) {
+
+  remove: context => {
     context.state.dmc = null;
     return [constants.CHANGE_DMC];
   }

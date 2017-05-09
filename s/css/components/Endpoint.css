@@ -18,15 +18,40 @@
   border-bottom: 1px solid var(--color-basic-black);
 }
 
-.Endpoint__thumbnail {
+.Endpoint__avatar {
+  position: relative;
   width: 24px;
   height: 24px;
+}
+
+.Endpoint__thumbnail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background-image: url(../img/sample_thumbnail.png);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   border-radius: 4px;
   box-shadow: 0 3px 2px rgba(0, 0, 0, 0.16);
+}
+
+.Endpoint__token {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-basic-white);
+  border: 2px solid var(--color-basic-gray);
+  border-radius: 50%;
+}
+
+.Endpoint__token--active {
+  background-color: var(--color-basic-skyblue);
+  border-color: var(--color-basic-skyblue);
 }
 
 .Endpoint__menuButton {
@@ -52,25 +77,39 @@
   color: var(--color-basic-black);
 }
 
-.Endpoint__host {
+.Endpoint__tags .Tag {
+  margin-right: 4px;
+}
+
+.Endpoint__url {
+  @apply --text-truncate;
   margin-bottom: 16px;
   font-size: 12px;
   color: var(--color-basic-black);
 }
 
-.Endpoint__title {
-  margin-bottom: 4px;
+.Endpoint__name {
+  @apply --text-break;
   font-size: 18px;
   color: var(--color-basic-black);
 }
 
 .Endpoint__description {
+  @apply --text-break;
+  margin-top: 4px;
   font-size: 12px;
   color: var(--color-basic-black);
 }
 
-.Endpoint__controls {
+.Endpoint__memo {
 
+  @apply --text-break;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--color-basic-black);
+}
+
+.Endpoint__controls {
   @apply --layout-center-center;
   margin-top: 24px;
 }

@@ -24,6 +24,7 @@ export default {
   [constants.MUTATION_ENDPOINT_REMOVE]: endpoint.remove,
   [constants.MUTATION_ENDPOINT_REMOVE_ALL]: endpoint.removeAll,
   [constants.MUTATION_ENDPOINT_ADD]: endpoint.add,
+  [constants.MUTATION_ENDPOINT_UPDATE]: endpoint.update,
 
   [constants.MUTATION_CURRENT_UPDATE]: current.update,
   [constants.MUTATION_CURRENT_REMOVE]: current.remove,

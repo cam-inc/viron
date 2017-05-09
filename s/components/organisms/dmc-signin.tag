@@ -29,7 +29,8 @@ dmc-signin.Signin
     }
 
     handleEmailSigninClick(email, password, authtype) {
-      store.action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, authtype, email, password)
+      store
+        .action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, authtype, email, password)
         .then(() => {
           this.closeModal();
           this.opts.onSignIn();

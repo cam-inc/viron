@@ -1,17 +1,14 @@
 dmc-drawer.Drawer
   .Drawer__head
     .media.Drawer__endpoint
-      .media__image.Drawer__endpointImage
+      .media__image.Drawer__endpointImage(style="background-image:url({ endpoint.thumbnail })")
       .media__body.Drawer__endpointBody
         .Drawer__endpointBodyHead
-          .Drawer__endpointTitle
-            | endpoint title
-          .Drawer__endpointHost
-            | https://foo.com:3000
+          .Drawer__endpointTitle { endpoint.name }
+          .Drawer__endpointHost { endpoint.url }
         .Drawer__endpointBodyTail
-          .Drawer__endpointDescription
-            | description
-    .Drawer__closeButton(click="{handleCloseButtonClick}")
+          .Drawer__endpointDescription { endpoint.description }
+    .Drawer__closeButton(click="{ handleCloseButtonClick }")
       dmc-icon(type="close")
   .Drawer__body
     .Dwawer__section
@@ -38,8 +35,15 @@ dmc-drawer.Drawer
 
     let store = this.riotx.get();
 
+    this.endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, store.getter(constants.GETTER_CURRENT));
     this.dashboard = [];
     this.manage = [];
+
+    store.change(constants.CHANGE_ENDPOINT, (err, state, store) => {
+      const current = store.getter(constants.GETTER_CURRENT);
+      this.endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, current);
+      this.update();
+    });
 
     store.change(constants.CHANGE_DMC, (err, state, store) => {
       this.dashboard = store.getter(constants.GETTER_DMC_DASHBOARD);

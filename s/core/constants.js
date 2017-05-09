@@ -47,6 +47,7 @@ export default {
   ACTION_MODAL_HIDE: 'modal_hide',
 
   ACTION_AUTH_UPDATE: 'auth_update',
+  ACTION_AUTH_VALIDATE: 'auth_validate',
   ACTION_AUTH_SIGN_IN_GOOGLE: 'auth_sign_in_google',
   ACTION_AUTH_SIGN_IN_EMAIL: 'auth_sign_in_email',
   ACTION_AUTHTYPE_GET: 'authtype_get',
@@ -68,6 +69,7 @@ export default {
   MUTATION_ENDPOINT_REMOVE: 'endpoint_remove',
   MUTATION_ENDPOINT_REMOVE_ALL: 'endpoint_remove_all',
   MUTATION_ENDPOINT_ADD: "endpoint_add",
+  MUTATION_ENDPOINT_UPDATE: "endpoint_update",
   MUTATION_ENDPOINT_TOKEN_UPDATE: 'endpoint_token_update',
 
   MUTATION_CURRENT_UPDATE: 'current_update',

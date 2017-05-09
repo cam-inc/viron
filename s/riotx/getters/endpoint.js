@@ -20,6 +20,10 @@ export default {
     return number2alphabet(keys(context.state.endpoint).length + 1);
   },
   one: (context, key) => {
-    return context.state.endpoint[key];
+    const endpoints = context.state.endpoint;
+    if (!endpoints || !endpoints[key]) {
+      return {};
+    }
+    return endpoints[key];
   }
 };

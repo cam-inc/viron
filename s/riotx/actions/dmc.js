@@ -1,6 +1,6 @@
-import constants from '../../core/constants';
-
+import ObjectAssign from 'object-assign';
 import swagger from '../../swagger';
+import constants from '../../core/constants';
 
 // APIは必須でサポートしなければならない URI
 const DMC_URI = '/dmc';
@@ -47,8 +47,12 @@ export default {
         });
     }).then(res => {
       context.commit(constants.MUTATION_DMC, res);
+      const key = context.getter(constants.GETTER_CURRENT);
+      const endpoint = context.getter(constants.GETTER_ENDPOINT_ONE, key);
+      context.commit(constants.MUTATION_ENDPOINT_UPDATE, key, ObjectAssign({}, endpoint, res.response));
     });
   },
+
   remove: context => {
     return Promise
       .resolve()
@@ -56,4 +60,4 @@ export default {
         context.commit(constants.MUTATION_DMC_REMOVE);
       });
   }
-}
+};
