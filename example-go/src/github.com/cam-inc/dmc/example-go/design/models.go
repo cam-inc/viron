@@ -66,11 +66,6 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 		Model("AdminRole", func() {
 			Description("This is the admin-role model")
 
-			BuildsFrom(func() {
-				Payload("admin_role", "create")
-				Payload("admin_role", "update")
-			})
-
 			RendersTo(AdminRoleMediaType)
 
 			Field("id", gorma.Integer, func() {

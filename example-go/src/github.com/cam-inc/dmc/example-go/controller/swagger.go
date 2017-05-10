@@ -3,8 +3,7 @@ package controller
 import (
 	"encoding/json"
 
-	// for codegen.ParseDSL
-	_ "github.com/cam-inc/dmc/example-go/design"
+	"github.com/cam-inc/dmc/example-go/service"
 
 	"strings"
 
@@ -13,21 +12,8 @@ import (
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
-	"github.com/goadesign/goa/design"
-	"github.com/goadesign/goa/goagen/codegen"
 	"github.com/goadesign/goa/goagen/gen_swagger"
 )
-
-var swaggerAll *genswagger.Swagger
-
-func init() {
-	codegen.ParseDSL()
-	sw, err := genswagger.New(design.Design)
-	if err != nil {
-		panic(err)
-	}
-	swaggerAll = sw
-}
 
 func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger {
 	if s.Paths != nil {
@@ -116,6 +102,7 @@ func (c *SwaggerController) Show(ctx *app.ShowSwaggerContext) error {
 	// DmcController_Show: start_implement
 
 	// Put your logic here
+	swaggerAll := service.GetSwagger()
 	var sw genswagger.Swagger
 
 	cl := ctx.Context.Value(bridge.JwtClaims)

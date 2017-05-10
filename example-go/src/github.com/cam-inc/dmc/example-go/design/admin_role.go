@@ -11,30 +11,22 @@ var AdminRoleMediaType = MediaType("application/vnd.admin_role+json", func() {
 	ContentType("application/json")
 
 	Attributes(func() {
-		Attribute("id", Integer, "unique id")
 		Attribute("role_id", String, "role id")
-		Attribute("method", String, "http method")
-		Attribute("resource", String, "resource name")
-
-		Required("id", "role_id")
+		Attribute("paths", ArrayOf(AdminRolePathType), "target path")
+		Required("role_id", "paths")
 	})
 
 	largeView := func() {
-		Attribute("id")
 		Attribute("role_id")
-		Attribute("method")
-		Attribute("resource")
+		Attribute("paths")
 	}
 
 	View("default", largeView)
 	View("large", largeView)
 	View("medium", func() {
-		Attribute("id")
 		Attribute("role_id")
-		Attribute("method")
 	})
 	View("small", func() {
-		Attribute("id")
 		Attribute("role_id")
 	})
 })
@@ -43,15 +35,17 @@ var _ = Resource("admin_role", func() {
 	Origin(OriginURL, OriginAllowAll)
 	BasePath("/adminrole")
 	DefaultMedia(AdminRoleMediaType)
-
-	// TODO: ログイン画面できるまでは外しておく
-	//Security(JWT, func() {
-	//	Scope("api:access")
-	//})
+	Security(JWT, func() {
+		Scope("api:access")
+	})
 
 	Action("list", func() {
 		Description("get admin roles")
 		Routing(GET(""))
+		Params(func() {
+			Param("limit", Integer, "number of items per page")
+			Param("offset", Integer, "offset number of page")
+		})
 		Response(OK, func() {
 			Media(CollectionOf(AdminRoleMediaType, func() {
 				ContentType("application/json")
@@ -67,12 +61,13 @@ var _ = Resource("admin_role", func() {
 
 	Action("show", func() {
 		Description("get the admin role")
-		Routing(GET("/:id"))
+		Routing(GET("/:role_id"))
 		Params(func() {
-			Param("id", Integer, "id")
+			Param("role_id", String, "role id")
 		})
 		Response(OK, func() { Media(AdminRoleMediaType) })
 		Response(NotFound)
+		Response(InternalServerError)
 		Response(BadRequest, ErrorMedia)
 	})
 
@@ -81,38 +76,48 @@ var _ = Resource("admin_role", func() {
 		Routing(POST(""))
 		Payload(func() {
 			Member("role_id", String)
-			Member("method", String)
-			Member("resource", String)
+			Member("paths", ArrayOf(AdminRolePathType))
 		})
 		Response(OK, func() { Media(AdminRoleMediaType) })
 		Response(NotFound)
+		Response(InternalServerError)
 		Response(BadRequest, ErrorMedia)
 	})
 
 	Action("update", func() {
 		Description("update the admin user")
-		Routing(PUT("/:id"))
+		Routing(PUT("/:role_id"))
 		Params(func() {
-			Param("id", Integer, "id")
+			Param("role_id", String, "role id")
 		})
 		Payload(func() {
-			Member("role_id", String)
-			Member("method", String)
-			Member("resource", String)
+			Member("paths", ArrayOf(AdminRolePathType))
 		})
 		Response(OK, func() { Media(AdminRoleMediaType) })
 		Response(NotFound)
+		Response(InternalServerError)
 		Response(BadRequest, ErrorMedia)
 	})
 
 	Action("delete", func() {
 		Description("delete the user")
-		Routing(DELETE("/:id"))
+		Routing(DELETE("/:role_id"))
 		Params(func() {
-			Param("id", Integer, "id")
+			Param("role_id", String, "role id")
 		})
 		Response(NoContent)
 		Response(NotFound)
+		Response(InternalServerError)
 		Response(BadRequest, ErrorMedia)
 	})
+})
+
+var AdminRolePathType = Type("adminrolepath", func() {
+	Attribute("path", String, "path", func() {
+		Example("GET:/user")
+	})
+	Attribute("allow", Boolean, "allow the path", func() {
+		Example(true)
+	})
+	Required("path", "allow")
 })
