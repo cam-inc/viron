@@ -19,6 +19,7 @@ var JWT = JWTSecurity("jwt", func() {
 // SecuritySuccessMediaType of media type.
 var SecuritySuccessMediaType = MediaType("application/vnd.security.success", func() {
 	Description("The common media type to all request responses for this example")
+	ContentType("application/json")
 	TypeName("Success")
 	Attributes(func() {
 		Attribute("ok", Boolean, "Always true")

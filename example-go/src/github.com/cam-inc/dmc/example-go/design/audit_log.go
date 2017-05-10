@@ -8,6 +8,7 @@ import (
 // AuditLogMediaType of media type.
 var AuditLogMediaType = MediaType("application/vnd.audit_log+json", func() {
 	Description("A Audit Log")
+	ContentType("application/json")
 
 	Attributes(func() {
 		Attribute("request_method", String, "http request method")
@@ -64,6 +65,7 @@ var _ = Resource("audit_log", func() {
 		})
 		Response(OK, func() {
 			Media(CollectionOf(AuditLogMediaType, func() {
+				ContentType("application/json")
 				View("default")
 				View("large")
 				View("medium")

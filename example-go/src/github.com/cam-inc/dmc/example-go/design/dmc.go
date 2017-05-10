@@ -8,6 +8,7 @@ import (
 // DMCMediaType of media type.
 var DMCMediaType = MediaType("application/vnd.dmc+json", func() {
 	Description("A DMC settings data")
+	ContentType("application/json")
 
 	Attributes(func() {
 		Attribute("name", String, "Name pattern")

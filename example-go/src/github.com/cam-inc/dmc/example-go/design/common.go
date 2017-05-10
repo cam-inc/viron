@@ -159,19 +159,3 @@ var PageType = Type("page", func() {
 	Attribute("components", ArrayOf(ComponentType), "A components format")
 	Required("id", "name", "section", "group", "components")
 })
-
-// PaginationType of type
-var PaginationType = Type("pagination", func() {
-	Description("A Pagination definition")
-	Attribute("X-Pagination-Total", Integer, func() {
-		Minimum(0)
-	})
-	Attribute("X-Pagination-Page", Integer, func() {
-		Minimum(0)
-	})
-	Attribute("X-Pagination-Limit", Integer, func() {
-		Minimum(1)
-	})
-	Attribute("X-Pagination-Next", String)
-	Attribute("X-Pagination-Prev", String)
-})

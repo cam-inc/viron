@@ -8,6 +8,7 @@ import (
 // StatsDAUMediaType of media type.
 var StatsDAUMediaType = MediaType("application/vnd.statsdau+json", func() {
 	Description("A DAU data")
+	ContentType("application/json")
 
 	Attributes(func() {
 		Attribute("value", Number, "DAU of Stats")
@@ -22,6 +23,7 @@ var StatsDAUMediaType = MediaType("application/vnd.statsdau+json", func() {
 // StatsMAUMediaType of media type.
 var StatsMAUMediaType = MediaType("application/vnd.statsmau+json", func() {
 	Description("A MAU data")
+	ContentType("application/json")
 
 	Attributes(func() {
 		Attribute("value", Number, "MAU of Stats")
@@ -36,6 +38,7 @@ var StatsMAUMediaType = MediaType("application/vnd.statsmau+json", func() {
 // StatsPlanetMediaType of media type.
 var StatsPlanetMediaType = MediaType("application/vnd.statsplanet+json", func() {
 	Description("Planets data")
+	ContentType("application/json")
 
 	Attributes(func() {
 		Attribute("keys", ArrayOf(String), "key names of graph data")

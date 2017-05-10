@@ -8,6 +8,7 @@ import (
 // AdminUserMediaType of media type.
 var AdminUserMediaType = MediaType("application/vnd.admin_user+json", func() {
 	Description("A Admin User")
+	ContentType("application/json")
 
 	Attributes(func() {
 		Attribute("id", Integer, "unique id")
@@ -51,6 +52,7 @@ var _ = Resource("admin_user", func() {
 		Routing(GET(""))
 		Response(OK, func() {
 			Media(CollectionOf(AdminUserMediaType, func() {
+				ContentType("application/json")
 				View("default")
 				View("large")
 				View("medium")

@@ -9,6 +9,7 @@ import (
 // UserMediaType of media type.
 var UserMediaType = MediaType("application/vnd.user+json", func() {
 	Description("A User")
+	ContentType("application/json")
 
 	Attributes(func() {
 		Attribute("id", Integer, "id")
@@ -74,6 +75,7 @@ var _ = Resource("user", func() {
 		})
 		Response(OK, func() {
 			Media(CollectionOf(UserMediaType, func() {
+				ContentType("application/json")
 				View("default")
 				View("large")
 				View("medium")

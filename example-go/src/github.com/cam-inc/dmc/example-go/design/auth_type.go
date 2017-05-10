@@ -8,6 +8,7 @@ import (
 // AuthTypeMediaType of media type.
 var AuthTypeMediaType = MediaType("application/vnd.auth_type+json", func() {
 	Description("A Auth Type")
+	ContentType("application/json")
 
 	Attributes(func() {
 		Attribute("type", String, "auth type")
@@ -34,6 +35,7 @@ var _ = Resource("auth_type", func() {
 		Description("get auth types")
 		Response(OK, func() {
 			Media(CollectionOf(AuthTypeMediaType, func() {
+				ContentType("application/json")
 				View("default")
 			}))
 		})
