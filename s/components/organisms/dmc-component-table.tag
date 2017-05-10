@@ -20,10 +20,7 @@ dmc-component-table.ComponentTable
   script.
     import { forEach } from 'mout/array';
     import { forOwn } from 'mout/object';
-    import constants from '../../core/constants';
     import '../atoms/dmc-button.tag';
-
-    const store = this.riotx.get();
 
     getColumns() {
       const columns = [];
@@ -49,13 +46,13 @@ dmc-component-table.ComponentTable
     }
 
     handlePrevButtonClick(e) {
-      store.action(constants.ACTION_COMPONENT_GET, this.opts.componentinfo.id, this.opts.componentinfo.idx, {
-        offset: (this.opts.pagination.currentPage - 1) * this.opts.pagination.size
+      this.opts.updater({
+        offset: (this.opts.pagination.currentPage - 2) * this.opts.pagination.size
       });
     }
 
     handleNextButtonClick(e) {
-      store.action(constants.ACTION_COMPONENT_GET, this.opts.componentinfo.id, this.opts.componentinfo.idx, {
+      this.opts.updater({
         offset: this.opts.pagination.currentPage * this.opts.pagination.size
       });
     }
