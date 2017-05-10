@@ -3,7 +3,7 @@ dmc-component.Component(onclick="{ handleClick }")
     dmc-icon(type="loading")
   virtual(if="{ !isPending }")
     dmc-component-number(if="{ isComponentStyleNumber }" data="{ data }")
-    dmc-component-table(if="{ isComponentStyleTable }" data="{ data }")
+    dmc-component-table(if="{ isComponentStyleTable }" data="{ data }" pagination="{ pagination }" componentInfo="{ componentInfo }")
     dmc-component-graph-bar(if="{ isComponentStyleGraphBar }" data="{ data }")
 
   script.
@@ -16,10 +16,17 @@ dmc-component.Component(onclick="{ handleClick }")
 
     const store = this.riotx.get();
 
+    // TODO: dmc-component-fooに渡すやつ
+    // TODO: ベターな方法を模索すること。
+    this.componentInfo = {
+      id: this._riot_id,
+      idx: this.opts.idx
+    };
     // `pending` means the status of fetching data.
     this.isPending = true;
-    // `data` will be filled with detail info after fetching.
+    // `data` and `pagination` will be filled with detail info after fetching.
     this.data = {};
+    this.pagination = {};
     // `component` is kind of a raw data.
     this.component = this.opts.component;
     this.isComponentStyleNumber = swagger.isComponentStyleNumber(this.component.style);
@@ -49,6 +56,7 @@ dmc-component.Component(onclick="{ handleClick }")
 
     store.change(constants.changeComponentName(this._riot_id), (err, state, store) => {
       this.isPending = false;
-      this.data = state.component[this._riot_id];
+      this.data = state.component[this._riot_id].data;
+      this.pagination = state.component[this._riot_id].pagination;
       this.update();
     });

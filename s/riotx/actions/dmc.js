@@ -14,7 +14,7 @@ export default {
         return reject(new Error(`[fetch] ${swagger.client.url}; system entry point not found. (uri: ${DMC_URI})`));
       }
 
-      const apis = swagger.apisArray();
+      const apis = swagger.apisFlatObject();
       const api = apis[model.operationId];
 
       const token = context.getter(constants.GETTER_ENDPOINT_ONE, context.getter(constants.GETTER_CURRENT)).token;

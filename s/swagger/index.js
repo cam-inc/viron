@@ -60,11 +60,11 @@ class Swagger {
     });
   }
 
-  apisArray() {
+  apisFlatObject() {
     if (!this.client) {
-      return [];
+      return {};
     }
-    let apis = {};
+    const apis = {};
     forOwn(this.client.apis, (v) => {
       forOwn(v, (v1, k1) => {
         apis[k1] = v1;
@@ -72,7 +72,6 @@ class Swagger {
     });
 
     return apis;
-
   }
 
   /**

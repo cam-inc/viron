@@ -1,0 +1,25 @@
+.ComponentTable {
+  display: block;
+}
+
+.ComponentTable__head {
+  padding: 8px;
+  border-bottom: 1px solid var(--color-basic-black);
+}
+
+.ComponentTable__name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.ComponentTable__body {
+  padding: 16px;
+}
+
+.ComponentTable__table {
+}
+
+.ComponentTable__tail {
+  padding: 8px;
+  border-top: 1px solid var(--color-basic-black);
+}

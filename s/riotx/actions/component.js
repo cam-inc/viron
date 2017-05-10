@@ -3,7 +3,7 @@ import constants from '../../core/constants';
 import swagger from '../../swagger';
 
 export default {
-  get: (context, component_uid, component_index) => {
+  get: (context, component_uid, component_index, query = {}) => {
     return new Promise((resolve, reject) => {
       const component = context.state.page.components[component_index]; // TODO getters 化する
 
@@ -21,12 +21,13 @@ export default {
 
       const model = swagger.client.spec.paths[path][method];
 
-      const apis = swagger.apisArray();
+      const apis = swagger.apisFlatObject();
       const api = apis[model.operationId];
 
       const token = context.getter(constants.GETTER_ENDPOINT_ONE, context.getter(constants.GETTER_CURRENT)).token;
 
-      api({/** TODO get only support. */}, {
+      // TODO get only support
+      api(query, {
         // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
         requestInterceptor: (req) => {
           req.headers['Authorization'] = token;
@@ -34,7 +35,7 @@ export default {
         },
         responseInterceptor: (res) => {
           console.log('Interceptor(response):', res);
-        },
+        }
       })
         .then(res => {
           if (!res.ok) {
@@ -43,6 +44,11 @@ export default {
           console.log(`[fetch] ${res.url} success.`);
           resolve({
             response: res.obj,
+            pagination: {
+              currentPage: Number(res.headers['x-pagination-current-page'] || 0),
+              size: Number(res.headers['x-pagination-limit'] || 0),
+              maxPage: Number(res.headers['x-pagination-total-pages'] || 0)
+            },
             model: model,
             component_uid: component_uid
           });

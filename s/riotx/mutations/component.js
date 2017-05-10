@@ -9,8 +9,10 @@ export default {
 
     let merge = swagger.mergePropertiesAndResponse(schema, response);
 
-    context.state.component[obj.component_uid] = merge;
+    context.state.component[obj.component_uid] = context.state.component[obj.component_uid] || {};
+    context.state.component[obj.component_uid].data = merge;
+    context.state.component[obj.component_uid].pagination = obj.pagination;
 
     return [constants.changeComponentName(obj.component_uid)];
-  },
+  }
 };

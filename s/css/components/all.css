@@ -6,6 +6,7 @@
 @import "Component";
 @import "ComponentGraphBar";
 @import "ComponentNumber";
+@import "ComponentTable";
 @import "Drawer";
 @import "Endpoint";
 @import "Entry";
