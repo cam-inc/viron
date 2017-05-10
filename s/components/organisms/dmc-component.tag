@@ -1,10 +1,9 @@
 dmc-component.Component(onclick="{ handleClick }")
   .Component__spinner(if="{ isPending }")
     dmc-icon(type="loading")
-  virtual(if="{ !isPending }")
-    dmc-component-number(if="{ isComponentStyleNumber }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
-    dmc-component-table(if="{ isComponentStyleTable }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
-    dmc-component-graph-bar(if="{ isComponentStyleGraphBar }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
+  dmc-component-number(if="{ !isPending && isComponentStyleNumber }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
+  dmc-component-table(if="{ !isPending && isComponentStyleTable }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
+  dmc-component-graph-bar(if="{ !isPending && isComponentStyleGraphBar }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
 
   script.
     import swagger from '../../swagger';
@@ -28,6 +27,8 @@ dmc-component.Component(onclick="{ handleClick }")
     this.isComponentStyleGraphBar = swagger.isComponentStyleGraphBar(this.component.style);
     // `updater` will be passed to the child component,(i.e. dmc-component-*) so the child component has the ability to update data.
     this.updater = (query = {}) => {
+      this.isPending = true;
+      this.update();
       store.action(constants.ACTION_COMPONENT_GET, this._riot_id, this.opts.idx, query);
     };
 
@@ -35,7 +36,7 @@ dmc-component.Component(onclick="{ handleClick }")
       // TODO: debug用なので後でtimeout処理を外すこと。
       setTimeout(() => {
         store.action(constants.ACTION_COMPONENT_GET, this._riot_id, this.opts.idx);
-      }, 1000 * 2);
+      }, 1000);
       //store.action(constants.ACTION_COMPONENT_GET, this._riot_id, this.opts.idx);
     });
 

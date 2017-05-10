@@ -2,13 +2,7 @@ dmc-component-table.ComponentTable
   .ComponentTable__head
     .ComponentTable__name TODO
   .ComponentTable__body
-    table.ComponentTable__table
-      thead.ComponentTable__tableHead
-        tr
-          td(each="{ getColumns() }") { name }
-      tbody.ComponentTable__tableBody
-        tr(each="{ data in getDataset() }")
-          td(each="{ d in data }") { d }
+    dmc-table(columns="{ getColumns() }" rows="{ getRows() }")
   .ComponentTable__tail
       div paging info
       div currentPage is { opts.pagination.currentPage }
@@ -20,39 +14,42 @@ dmc-component-table.ComponentTable
   script.
     import { forEach } from 'mout/array';
     import { forOwn } from 'mout/object';
+    import '../organisms/dmc-table.tag';
     import '../atoms/dmc-button.tag';
 
     getColumns() {
       const columns = [];
       forOwn(this.opts.data[0], (v, k) => {
         columns.push({
-          name: k,
-          targetKey: k
+          title: k,
+          key: k
         });
       });
       return columns;
     }
 
-    getDataset() {
-      const dataset = [];
-      forEach(this.opts.data, data => {
-        const row = [];
-        forEach(this.getColumns(), column => {
-          row.push(data[column.name].get());
+    getRows() {
+      const rows = [];
+      forEach(this.opts.data, cells => {
+        const row = {};
+        forOwn(cells, cell => {
+          row[cell.key] = cell.get();
         });
-        dataset.push(row);
+        rows.push(row);
       });
-      return dataset;
+      return rows;
     }
 
     handlePrevButtonClick(e) {
       this.opts.updater({
+        limit: this.opts.pagination.size,
         offset: (this.opts.pagination.currentPage - 2) * this.opts.pagination.size
       });
     }
 
     handleNextButtonClick(e) {
       this.opts.updater({
+        limit: this.opts.pagination.size,
         offset: this.opts.pagination.currentPage * this.opts.pagination.size
       });
     }

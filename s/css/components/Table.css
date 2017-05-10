@@ -1,0 +1,42 @@
+.Table {
+  display: block;
+}
+
+.Table table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.Table__head {
+  background-color: var(--color-basic-gray);
+}
+
+.Table__headRow {
+}
+
+.Table__headCell {
+  padding: 10px 20px;
+  font-size: 11px;
+  color: var(--color-basic-white);
+}
+
+.Table__row {
+  transition-duration: 100ms;
+  transition-property: background-color;
+}
+
+.Table__row:hover {
+  background-color: var(--color-basic-lightGray);
+}
+
+.Table__body {
+  background-color: var(--color-basic-white);
+}
+
+.Table__cell {
+  padding: 40px 20px;
+  font-size: 13px;
+  color: var(--color-text-default);
+  border-bottom: 1px solid var(--color-basic-lightGray);
+}
