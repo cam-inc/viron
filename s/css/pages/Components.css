@@ -18,6 +18,6 @@
 }
 
 .ComponentsPage__list .Component {
-  width: 320px;
+  min-width: 320px;
   margin-bottom: 24px;
 }

@@ -7,16 +7,18 @@ dmc-component.Component
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
     div(data-is="{ childComponentName }" if="{ !isPending }" data="{ data }" updater="{ updater }")
-    dmc-component-pagination(if="{ !isPending && !!pagination }" pagination="{ pagination }" updater="{ updater }")
+    dmc-pagination(if="{ !isPending && !!pagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ 5 }" onChange="{ handlePaginationChange }")
   .Component__tail TODO
 
   script.
     import { forEach } from 'mout/array';
     import swagger from '../../swagger';
     import constants from '../../core/constants';
+    import '../organisms/dmc-component-graph-bar.tag';
     import '../organisms/dmc-component-number.tag';
     import '../organisms/dmc-component-table.tag';
-    import '../organisms/dmc-component-graph-bar.tag';
+    import '../organisms/dmc-pagination.tag';
+
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
@@ -86,6 +88,13 @@ dmc-component.Component
       });
     }
 
+    handlePaginationChange(page) {
+      this.updater({
+        limit: this.pagination.size,
+        offset: (page - 1) * this.pagination.size
+      });
+    }
+
 dmc-component-searchbox.Component__searchBox
   .Component__searchBoxInputs
     .Component__searchBoxInput(each="{ query in queries }")
@@ -129,28 +138,4 @@ dmc-component-searchbox.Component__searchBox
 
     handleCancelButtonClick() {
       this.closeModal();
-    }
-
-dmc-component-pagination.Component__pagination
-  div currentPage is { opts.pagination.currentPage }
-  div size is { opts.pagination.size }
-  div maxPage is { opts.pagination.maxPage }
-  dmc-button(label="prev" onClick="{ handlePrevButtonClick }")
-  dmc-button(label="next" onClick="{ handleNextButtonClick }")
-
-  script.
-    import '../atoms/dmc-button.tag';
-
-    handlePrevButtonClick() {
-      this.opts.updater({
-        limit: this.opts.pagination.size,
-        offset: (this.opts.pagination.currentPage - 2) * this.opts.pagination.size
-      });
-    }
-
-    handleNextButtonClick() {
-      this.opts.updater({
-        limit: this.opts.pagination.size,
-        offset: this.opts.pagination.currentPage * this.opts.pagination.size
-      });
     }
