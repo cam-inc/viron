@@ -49,7 +49,7 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 			})
 
 			RendersTo(UserBlogMediaType)
-			//HasMany("UserBlogEntries", "UserBlogEntry")
+			HasMany("UserBlogEntries", "UserBlogEntry")
 
 			Field("id", gorma.Integer, func() {
 				PrimaryKey()
@@ -59,6 +59,25 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 			Field("sub_title", gorma.String, func() {})
 			Field("genre", gorma.String, func() {})
 			Field("design_id", gorma.String, func() {})
+		})
+
+		Model("UserBlogEntry", func() {
+			Description("This is the user_blog_entry model")
+
+			BuildsFrom(func() {
+				Payload("user_blog_entry", "create")
+				Payload("user_blog_entry", "update")
+			})
+
+			RendersTo(UserBlogEntryMediaType)
+
+			Field("id", gorma.Integer, func() {
+				PrimaryKey()
+			})
+			Field("user_blog_id", gorma.Integer, func() {})
+			Field("title", gorma.String, func() {})
+			Field("theme", gorma.String, func() {})
+			Field("content", gorma.String, func() {})
 		})
 
 		Model("AdminUser", func() {

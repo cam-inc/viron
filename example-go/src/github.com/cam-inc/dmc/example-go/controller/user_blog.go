@@ -33,7 +33,7 @@ func (c *UserBlogController) Create(ctx *app.CreateUserBlogContext) error {
 	m.DesignID = *ctx.Payload.DesignID
 
 	if err := userBlogTable.Add(ctx.Context, &m); err != nil {
-		ctx.InternalServerError()
+		return ctx.InternalServerError()
 	}
 
 	// UserBlogController_Create: end_implement

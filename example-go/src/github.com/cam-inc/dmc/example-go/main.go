@@ -64,8 +64,12 @@ func main() {
 	// Mount "stats/planet" controller
 	c14 := controller.NewStatsPlanetController(service)
 	app.MountStatsPlanetController(service, c14)
+	// Mount userBlog" controller
 	c15 := controller.NewUserBlogController(service)
-	app.MountUserBlogController(service ,c15)
+	app.MountUserBlogController(service, c15)
+	// Mount userBlogEntry" controller
+	c16 := controller.NewUserBlogEntryController(service)
+	app.MountUserBlogEntryController(service, c16)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {

@@ -39,7 +39,7 @@ func (m *UserBlogDB) Count(ctx context.Context) uint64 {
 	err := m.Db.Table(m.TableName()).Count(&count).Error
 
 	if err != nil {
-		logger.Error("err CountUserBlog", zap.Error(err))
+		logger.Error("error Count", zap.Error(err))
 		return 0
 	}
 	return *count

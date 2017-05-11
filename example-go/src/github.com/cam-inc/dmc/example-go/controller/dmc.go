@@ -141,6 +141,21 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					},
 				},
 			},
+			{
+				ID:      "userblogentry",
+				Section: bridge.SectionManage,
+				Group:   bridge.GroupUser,
+				Name:    "ユーザブログ記事",
+				Components: []*app.Component{
+					{
+						Name: "ユーザーブログ記事",
+						API: api("/userblogentry", "get"),
+						Style: bridge.StyleTable,
+						Options: defaultOptions,
+						Pagination: true,
+					},
+				},
+			},
 
 			{
 				ID:      "adminrole",
