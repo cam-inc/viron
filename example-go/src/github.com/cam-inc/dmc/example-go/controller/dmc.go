@@ -115,7 +115,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					},
 				},
 			},
-			// Mange
+			// Manage
 			{
 				ID:      "user",
 				Section: bridge.SectionManage,
@@ -142,6 +142,29 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 							},
 						},
 						Pagination: false,
+					},
+				},
+			},
+			{
+				ID:      "userblog",
+				Section: bridge.SectionManage,
+				Group:   bridge.GroupUser,
+				Name:    "ユーザブログ",
+				Components: []*app.Component{
+					{
+						Name: "ユーザーブログ",
+						API: &app.API{
+							Path:   "/userblog",
+							Method: "get",
+						},
+						Style: bridge.StyleTable,
+						Options: []*app.Option{
+							{
+								Key:   "key",
+								Value: "value",
+							},
+						},
+						Pagination: true,
 					},
 				},
 			},
