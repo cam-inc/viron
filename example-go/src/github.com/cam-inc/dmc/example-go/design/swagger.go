@@ -18,5 +18,6 @@ var _ = Resource("swagger", func() {
 		Response(OK, "application/json")
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
+		Response(InternalServerError)
 	})
 })

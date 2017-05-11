@@ -48,6 +48,19 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 	// DmcController_Show: start_implement
 
 	// Put your logic here
+	defaultOptions := []*app.Option{
+		{
+			Key: "key",
+			Value: "value",
+		},
+	}
+
+	api := func(path string, method string) *app.API {
+		return &app.API{
+			Path: path,
+			Method: method,
+		}
+	}
 
 	// DmcController_Show: end_implement
 	res := &app.Dmc{
@@ -69,48 +82,24 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Components: []*app.Component{
 					{
 						Name: "DAU",
-						API: &app.API{
-							Path:   "/stats/dau",
-							Method: "get",
-						},
+						API: api("/stats/dau", "get"),
 						Style: bridge.StyleNumber,
-						Options: []*app.Option{
-							{
-								Key:   "key",
-								Value: "value",
-							},
-						},
+						Options: defaultOptions,
 						Pagination: false,
 					},
 					{
 						Name: "MAU",
-						API: &app.API{
-							Path:   "/stats/mau",
-							Method: "get",
-						},
+						API: api("/stats/mau", "get"),
 						Style: bridge.StyleNumber,
-						Options: []*app.Option{
-							{
-								Key:   "key",
-								Value: "value",
-							},
-						},
+						Options: defaultOptions,
 						Pagination: false,
 					},
 					{
 
 						Name: "Planet",
-						API: &app.API{
-							Path:   "/stats/planet",
-							Method: "get",
-						},
+						API: api("/stats/planet", "get"),
 						Style: bridge.StyleGraphBar,
-						Options: []*app.Option{
-							{
-								Key:   "key",
-								Value: "value",
-							},
-						},
+						Options: defaultOptions,
 						Pagination: false,
 					},
 				},
@@ -124,10 +113,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Components: []*app.Component{
 					{
 						Name: "ユーザ",
-						API: &app.API{
-							Path:   "/user",
-							Method: "get",
-						},
+						API: api("/user", "get"),
 						Style: bridge.StyleTable,
 						Query: []*app.Query{
 							{
@@ -135,12 +121,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 								Type: "string",
 							},
 						},
-						Options: []*app.Option{
-							{
-								Key:   "key",
-								Value: "value",
-							},
-						},
+						Options: defaultOptions,
 						Pagination: false,
 					},
 				},
@@ -153,17 +134,9 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Components: []*app.Component{
 					{
 						Name: "ユーザーブログ",
-						API: &app.API{
-							Path:   "/userblog",
-							Method: "get",
-						},
+						API: api("/userblog", "get"),
 						Style: bridge.StyleTable,
-						Options: []*app.Option{
-							{
-								Key:   "key",
-								Value: "value",
-							},
-						},
+						Options: defaultOptions,
 						Pagination: true,
 					},
 				},
@@ -177,17 +150,9 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Components: []*app.Component{
 					{
 						Name: "DMC ユーザー権限",
-						API: &app.API{
-							Path:   "/adminrole",
-							Method: "get",
-						},
+						API: api("/adminrole", "get"),
 						Style: bridge.StyleNumber,
-						Options: []*app.Option{
-							{
-								Key:   "key",
-								Value: "value",
-							},
-						},
+						Options: defaultOptions,
 						Pagination: false,
 					},
 				},
@@ -200,17 +165,9 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Components: []*app.Component{
 					{
 						Name: "DMC ユーザー権限",
-						API: &app.API{
-							Path:   "/adminuser",
-							Method: "get",
-						},
+						API: api("/adminuser", "get"),
 						Style: bridge.StyleNumber,
-						Options: []*app.Option{
-							{
-								Key:   "key",
-								Value: "value",
-							},
-						},
+						Options: defaultOptions,
 						Pagination: false,
 					},
 				},
@@ -223,17 +180,9 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Components: []*app.Component{
 					{
 						Name: "DMC 監査ログ",
-						API: &app.API{
-							Path:   "/auditlog",
-							Method: "get",
-						},
+						API: api("/auditlog", "get"),
 						Style: bridge.StyleTable,
-						Options: []*app.Option{
-							{
-								Key:   "key",
-								Value: "value",
-							},
-						},
+						Options: defaultOptions,
 						Pagination: true,
 					},
 				},

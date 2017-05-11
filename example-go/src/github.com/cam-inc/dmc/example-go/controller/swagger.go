@@ -99,7 +99,7 @@ func NewSwaggerController(service *goa.Service) *SwaggerController {
 
 // Show runs the show action.
 func (c *SwaggerController) Show(ctx *app.ShowSwaggerContext) error {
-	// DmcController_Show: start_implement
+	// SwaggerController_Show: start_implement
 
 	// Put your logic here
 	swaggerAll := service.GetSwagger()
@@ -118,11 +118,9 @@ func (c *SwaggerController) Show(ctx *app.ShowSwaggerContext) error {
 	}
 	// operationIdに含まれる#を＠に変換する
 	sw = replaceOperationId(sw)
-	res, err := json.Marshal(&sw)
-	if err != nil {
-		panic(err)
+	if res, err := json.Marshal(&sw); err != nil {
+		return ctx.InternalServerError()
+	} else {
+		return ctx.OK(res)
 	}
-
-	// DmcController_Show: end_implement
-	return ctx.OK(res)
 }
