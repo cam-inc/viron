@@ -3,7 +3,7 @@ import swagger from '../../swagger';
 
 export default {
   one: function (context, params) {
-    const schema = params.model.responses[200].schema;
+    const schema = params.operationObject.responses[200].schema;
     // const properties = schema.properties;
     const responseObj = params.response.obj;
 
@@ -24,6 +24,10 @@ export default {
     // if supported then manually add pagination information from headers.
     if (params.component.query.length && !!params.component.query.length) {
       context.state.component[params.component_uid].search = params.component.query;
+    }
+    // manually add operationIDs that component can execute.
+    if (params.executableOperationIDs && params.executableOperationIDs.length) {
+      context.state.component[params.component_uid].actions = params.executableOperationIDs;
     }
 
     return [constants.changeComponentName(params.component_uid)];

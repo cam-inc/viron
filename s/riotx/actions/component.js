@@ -1,5 +1,6 @@
+import { contains, forEach, unique } from 'mout/array';
+import { forOwn } from 'mout/object';
 import constants from '../../core/constants';
-
 import swagger from '../../swagger';
 
 export default {
@@ -19,10 +20,23 @@ export default {
         throw new Error(`[fetch] API define not found. ${path}/${method}`);
       }
 
-      const model = swagger.client.spec.paths[path][method];
-
+      const pathItemObject = swagger.client.spec.paths[path];
+      let executableOperationIDs = [];
+      forOwn(pathItemObject, (operationObject, key) => {
+        if (!contains(['get', 'put', 'post', 'delete', 'options', 'head', 'patch'], key)) {
+          return;
+        }
+        if (key !== 'get') {
+          executableOperationIDs.push(operationObject.operationId);
+        }
+        forEach(operationObject.tags || [], tag => {
+          executableOperationIDs.push(tag);
+        });
+      });
+      executableOperationIDs = unique(executableOperationIDs);
+      const operationObject = swagger.client.spec.paths[path][method];
       const apis = swagger.apisFlatObject();
-      const api = apis[model.operationId];
+      const api = apis[operationObject.operationId];
 
       const token = context.getter(constants.GETTER_ENDPOINT_ONE, context.getter(constants.GETTER_CURRENT)).token;
 
@@ -44,7 +58,8 @@ export default {
           console.log(`[fetch] ${res.url} success.`);
           resolve({
             response: res,
-            model: model,
+            operationObject,
+            executableOperationIDs,
             component,
             component_uid: component_uid
           });
