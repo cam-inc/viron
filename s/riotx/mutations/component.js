@@ -2,17 +2,25 @@ import constants from '../../core/constants';
 import swagger from '../../swagger';
 
 export default {
-  one: function (context, obj) {
-    const schema = obj.model.responses[200].schema;
+  one: function (context, params) {
+    const schema = params.model.responses[200].schema;
     // const properties = schema.properties;
-    const response = obj.response;
+    const responseObj = params.response.obj;
 
-    let merge = swagger.mergePropertiesAndResponse(schema, response);
+    let merge = swagger.mergePropertiesAndResponse(schema, responseObj);
 
-    context.state.component[obj.component_uid] = context.state.component[obj.component_uid] || {};
-    context.state.component[obj.component_uid].data = merge;
-    context.state.component[obj.component_uid].pagination = obj.pagination;
+    context.state.component[params.component_uid] = context.state.component[params.component_uid] || {};
+    context.state.component[params.component_uid].data = merge;
+    // `component.pagination` value indicates whether the component supports pagination or not.
+    // if supported then manually add pagination information from headers.
+    if (params.component.pagination.get()) {
+      context.state.component[params.component_uid].pagination = {
+        currentPage: Number(params.response.headers['x-pagination-current-page'] || 0),
+        size: Number(params.response.headers['x-pagination-limit'] || 0),
+        maxPage: Number(params.response.headers['x-pagination-total-pages'] || 0)
+      };
+    }
 
-    return [constants.changeComponentName(obj.component_uid)];
+    return [constants.changeComponentName(params.component_uid)];
   }
 };

@@ -1,8 +1,5 @@
 dmc-component-graph-bar.ComponentGraphBar
-  .ComponentGraphBar__head
-    .ComponentGraphBar__name Barグラフ(TODO:)
-  .ComponentGraphBar__body
-    .ComponentGraphBar__canvas(ref="canvas")
+  .ComponentGraphBar__canvas(ref="canvas")
 
   script.
     import { forEach } from 'mout/array';

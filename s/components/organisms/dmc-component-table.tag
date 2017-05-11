@@ -1,15 +1,12 @@
 dmc-component-table.ComponentTable
-  .ComponentTable__head
-    .ComponentTable__name TODO
-  .ComponentTable__body
-    dmc-table(columns="{ getColumns() }" rows="{ getRows() }")
-  .ComponentTable__tail
-      div paging info
-      div currentPage is { opts.pagination.currentPage }
-      div size is { opts.pagination.size }
-      div maxPage is { opts.pagination.maxPage }
-      dmc-button(label="prev" onClick="{ handlePrevButtonClick }")
-      dmc-button(label="next" onClick="{ handleNextButtonClick }")
+  dmc-table(columns="{ getColumns() }" rows="{ getRows() }")
+  virtual(if="{ !!opts.pagination }")
+    div paging info
+    div currentPage is { opts.pagination.currentPage }
+    div size is { opts.pagination.size }
+    div maxPage is { opts.pagination.maxPage }
+    dmc-button(label="prev" onClick="{ handlePrevButtonClick }")
+    dmc-button(label="next" onClick="{ handleNextButtonClick }")
 
   script.
     import { forEach } from 'mout/array';

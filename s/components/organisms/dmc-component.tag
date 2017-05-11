@@ -1,9 +1,13 @@
 dmc-component.Component(onclick="{ handleClick }")
-  .Component__spinner(if="{ isPending }")
-    dmc-icon(type="loading")
-  dmc-component-number(if="{ !isPending && isComponentStyleNumber }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
-  dmc-component-table(if="{ !isPending && isComponentStyleTable }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
-  dmc-component-graph-bar(if="{ !isPending && isComponentStyleGraphBar }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
+  .Component__head
+    .Component__name { component.name.get() }
+  .Component__body
+    .Component__spinner(if="{ isPending }")
+      dmc-icon(type="loading")
+    dmc-component-number(if="{ !isPending && isComponentStyleNumber }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
+    dmc-component-table(if="{ !isPending && isComponentStyleTable }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
+    dmc-component-graph-bar(if="{ !isPending && isComponentStyleGraphBar }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
+  .Component__tail TODO
 
   script.
     import swagger from '../../swagger';

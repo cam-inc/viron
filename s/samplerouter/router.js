@@ -191,7 +191,7 @@ class Router {
    * @param {Object} location i.e.) history.location
    * @param {String} action i.e.) history.action
    */
-  _enter(location, action) {
+  _enter(location/*, action*/) {
     const route = find(this._routes, route => {
       return !!route.regexp.exec(location.pathname);
     });
@@ -209,7 +209,7 @@ class Router {
    * @param {Object} location i.e.) history.location
    * @param {String} action i.e.) history.action
    */
-  _leave(location, action) {
+  _leave(location/*, action*/) {
     const route = find(this._routes, route => {
       return !!route.regexp.exec(location.pathname);
     });
