@@ -1,18 +1,4 @@
 .ComponentNumber {
-  display: block;
-}
-
-.ComponentNumber__head {
-  padding: 8px;
-  border-bottom: 1px solid var(--color-basic-black);
-}
-
-.ComponentNumber__name {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.ComponentNumber__body {
   @apply --layout-center-center;
   padding: 16px;
 }

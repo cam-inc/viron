@@ -43,13 +43,9 @@ export default {
           }
           console.log(`[fetch] ${res.url} success.`);
           resolve({
-            response: res.obj,
-            pagination: {
-              currentPage: Number(res.headers['x-pagination-current-page'] || 0),
-              size: Number(res.headers['x-pagination-limit'] || 0),
-              maxPage: Number(res.headers['x-pagination-total-pages'] || 0)
-            },
+            response: res,
             model: model,
+            component,
             component_uid: component_uid
           });
         })

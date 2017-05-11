@@ -2,20 +2,6 @@
   display: block;
 }
 
-.ComponentGraphBar__head {
-  padding: 8px;
-  border-bottom: 1px solid var(--color-basic-black);
-}
-
-.ComponentGraphBar__name {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.ComponentGraphBar__body {
-  padding: 16px;
-}
-
 .ComponentGraphBar__canvas {
   height: 600px;
 }
