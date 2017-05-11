@@ -39,7 +39,7 @@ let setupRouter = (store) => {
   return Promise
     .resolve()
     .then(() => {
-      router.onBefore((splitedPathname, pathname) => {
+      router.onBefore((/*splitedPathname, pathname */) => {
         const token = new URL(decodeURIComponent(location.href)).searchParams.get(constants.QUERYSTRING_KEY_TOKEN);
 
         if (!token) {

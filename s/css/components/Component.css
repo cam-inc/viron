@@ -23,3 +23,22 @@
 .Component__spinner .Icon {
   @apply --animation-spin;
 }
+
+.Component__head {
+  padding: 8px;
+  border-bottom: 1px solid var(--color-basic-black);
+}
+
+.Component__name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.Component__body {
+  padding: 16px;
+}
+
+.Component__tail {
+  padding: 8px;
+  border-top: 1px solid var(--color-basic-black);
+}

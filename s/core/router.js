@@ -167,7 +167,7 @@ class Router {
    * @param {Object} location i.e.) history.location
    * @param {String} action i.e.) history.action
    */
-  _change(location, action) {
+  _change(location/*, action */) {
     const route = find(this._routes, route => {
       return !!route.regexp.exec(location.pathname);
     });
