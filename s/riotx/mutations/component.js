@@ -20,6 +20,11 @@ export default {
         maxPage: Number(params.response.headers['x-pagination-total-pages'] || 0)
       };
     }
+    // `component.query`(array) value indicates whether the component supports searching or not.
+    // if supported then manually add pagination information from headers.
+    if (params.component.query.length && !!params.component.query.length) {
+      context.state.component[params.component_uid].search = params.component.query;
+    }
 
     return [constants.changeComponentName(params.component_uid)];
   }
