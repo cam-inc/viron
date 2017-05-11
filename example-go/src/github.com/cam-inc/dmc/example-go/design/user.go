@@ -70,7 +70,7 @@ var _ = Resource("user", func() {
 	Action("list", func() {
 		Description("get users")
 		Routing(GET("", func() {
-			Metadata("swagger:extension:x-ref", "/user/{id}")
+			Metadata("swagger:extension:x-ref", `["/user/{id}"]`)
 		}))
 		Params(func() {
 			Param("name", String)
