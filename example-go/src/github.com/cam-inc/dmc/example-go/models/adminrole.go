@@ -82,3 +82,32 @@ func (m *AdminRoleDB) CountRoleID(ctx context.Context) int {
 	}
 	return len(native)
 }
+
+// CleanInsertByRoleID removes and insert records by a role
+func (m *AdminRoleDB) CleanInsertByRoleID(ctx context.Context, roleID string, models []genModels.AdminRole) error {
+	logger := common.GetLogger("default")
+	tx := m.Db.Begin()
+
+	if err := tx.Table(m.TableName()).Where("role_id = ?", roleID).Delete(app.AdminRole{}).Error; err != nil {
+		tx.Rollback()
+		logger.Error("error adminRole.CleanInsertByRoleID.Delete", zap.Error(err))
+		return err
+	}
+
+	// BulkInsertがgormでサポートされていないので仕方なく
+	// @see https://github.com/jinzhu/gorm/issues/255
+	for _, mdl := range models {
+		mdl.RoleID = roleID
+		if err := tx.Create(&mdl).Error; err != nil {
+			tx.Rollback()
+			logger.Error("error adminRole.CleanInsertByRoleID.Create", zap.Error(err))
+			return err
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		logger.Error("error adminRole.CleanInsertByRoleID.Commit", zap.Error(err))
+		return err
+	}
+	return nil
+}
