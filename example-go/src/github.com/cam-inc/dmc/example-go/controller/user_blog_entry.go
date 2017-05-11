@@ -3,9 +3,9 @@ package controller
 import (
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
+	genModels "github.com/cam-inc/dmc/example-go/gen/models"
 	"github.com/cam-inc/dmc/example-go/models"
 	"github.com/goadesign/goa"
-	genModels "github.com/cam-inc/dmc/example-go/gen/models"
 	"github.com/jinzhu/gorm"
 )
 

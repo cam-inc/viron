@@ -34,8 +34,8 @@ const (
 	UserBloodTypeO  = "O"
 	UserBloodTypeAB = "AB"
 
-	BlogDesignSimple = "simple"
-	BlogDesignTile = "tile"
+	BlogDesignSimple  = "simple"
+	BlogDesignTile    = "tile"
 	BlogDesign2Column = "2column"
 	BlogDesign3Column = "3column"
 )

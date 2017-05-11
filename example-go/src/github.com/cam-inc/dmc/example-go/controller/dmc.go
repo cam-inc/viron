@@ -50,14 +50,14 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 	// Put your logic here
 	defaultOptions := []*app.Option{
 		{
-			Key: "key",
+			Key:   "key",
 			Value: "value",
 		},
 	}
 
 	api := func(path string, method string) *app.API {
 		return &app.API{
-			Path: path,
+			Path:   path,
 			Method: method,
 		}
 	}
@@ -81,25 +81,25 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupEmpty,
 				Components: []*app.Component{
 					{
-						Name: "DAU",
-						API: api("/stats/dau", "get"),
-						Style: bridge.StyleNumber,
-						Options: defaultOptions,
+						Name:       "DAU",
+						API:        api("/stats/dau", "get"),
+						Style:      bridge.StyleNumber,
+						Options:    defaultOptions,
 						Pagination: false,
 					},
 					{
-						Name: "MAU",
-						API: api("/stats/mau", "get"),
-						Style: bridge.StyleNumber,
-						Options: defaultOptions,
+						Name:       "MAU",
+						API:        api("/stats/mau", "get"),
+						Style:      bridge.StyleNumber,
+						Options:    defaultOptions,
 						Pagination: false,
 					},
 					{
 
-						Name: "Planet",
-						API: api("/stats/planet", "get"),
-						Style: bridge.StyleGraphBar,
-						Options: defaultOptions,
+						Name:       "Planet",
+						API:        api("/stats/planet", "get"),
+						Style:      bridge.StyleGraphBar,
+						Options:    defaultOptions,
 						Pagination: false,
 					},
 				},
@@ -112,8 +112,8 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Name:    "ユーザ",
 				Components: []*app.Component{
 					{
-						Name: "ユーザ",
-						API: api("/user", "get"),
+						Name:  "ユーザ",
+						API:   api("/user", "get"),
 						Style: bridge.StyleTable,
 						Query: []*app.Query{
 							{
@@ -121,7 +121,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 								Type: "string",
 							},
 						},
-						Options: defaultOptions,
+						Options:    defaultOptions,
 						Pagination: false,
 					},
 				},
@@ -133,10 +133,10 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Name:    "ユーザブログ",
 				Components: []*app.Component{
 					{
-						Name: "ユーザーブログ",
-						API: api("/userblog", "get"),
-						Style: bridge.StyleTable,
-						Options: defaultOptions,
+						Name:       "ユーザーブログ",
+						API:        api("/userblog", "get"),
+						Style:      bridge.StyleTable,
+						Options:    defaultOptions,
 						Pagination: true,
 					},
 				},
@@ -148,10 +148,10 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Name:    "ユーザブログ記事",
 				Components: []*app.Component{
 					{
-						Name: "ユーザーブログ記事",
-						API: api("/userblogentry", "get"),
-						Style: bridge.StyleTable,
-						Options: defaultOptions,
+						Name:       "ユーザーブログ記事",
+						API:        api("/userblogentry", "get"),
+						Style:      bridge.StyleTable,
+						Options:    defaultOptions,
 						Pagination: true,
 					},
 				},
@@ -164,10 +164,10 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupEmpty,
 				Components: []*app.Component{
 					{
-						Name: "DMC ユーザー権限",
-						API: api("/adminrole", "get"),
-						Style: bridge.StyleNumber,
-						Options: defaultOptions,
+						Name:       "DMC ユーザー権限",
+						API:        api("/adminrole", "get"),
+						Style:      bridge.StyleNumber,
+						Options:    defaultOptions,
 						Pagination: false,
 					},
 				},
@@ -179,10 +179,10 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupBlog,
 				Components: []*app.Component{
 					{
-						Name: "DMC ユーザー権限",
-						API: api("/adminuser", "get"),
-						Style: bridge.StyleNumber,
-						Options: defaultOptions,
+						Name:       "DMC ユーザー権限",
+						API:        api("/adminuser", "get"),
+						Style:      bridge.StyleNumber,
+						Options:    defaultOptions,
 						Pagination: false,
 					},
 				},
@@ -194,10 +194,10 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				Group:   bridge.GroupAdmin,
 				Components: []*app.Component{
 					{
-						Name: "DMC 監査ログ",
-						API: api("/auditlog", "get"),
-						Style: bridge.StyleTable,
-						Options: defaultOptions,
+						Name:       "DMC 監査ログ",
+						API:        api("/auditlog", "get"),
+						Style:      bridge.StyleTable,
+						Options:    defaultOptions,
 						Pagination: true,
 					},
 				},
