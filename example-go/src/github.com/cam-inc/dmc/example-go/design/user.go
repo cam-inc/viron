@@ -67,9 +67,6 @@ var _ = Resource("user", func() {
 		Scope("api:access")
 	})
 
-	Metadata("swagger:tag:user#delete")
-	Metadata("swagger:tag:user#put")
-
 	Action("list", func() {
 		Description("get users")
 		Routing(GET("", func() {

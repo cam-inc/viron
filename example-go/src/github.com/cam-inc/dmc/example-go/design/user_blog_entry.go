@@ -55,7 +55,9 @@ var _ = Resource("user_blog_entry", func() {
 
 	Action("list", func() {
 		Description("get user blog entries")
-		Routing(GET(""))
+		Routing(GET("", func() {
+			Metadata("swagger:extension:x-ref", "/userblogentry/{id}")
+		}))
 		Params(func() {
 			Param("limit", Integer, "number of items per page")
 			Param("offset", Integer, "offset number of page")
