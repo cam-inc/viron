@@ -14,7 +14,6 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/goagen/gen_swagger"
 	"github.com/jinzhu/gorm"
-	"go.uber.org/zap"
 )
 
 var pathList []string
@@ -91,22 +90,21 @@ func (c *AdminRoleController) Create(ctx *app.CreateAdminRoleContext) error {
 	// AdminRoleController_Create: start_implement
 
 	// Put your logic here
-	logger := common.GetLogger("default")
-	adminRoleTable := models.NewAdminRoleDB(common.DB)
-
 	paths := ctx.Payload.Paths
+	data := []genModels.AdminRole{}
 	for _, path := range paths {
 		if path.Allow != true {
 			continue
 		}
 
 		m := genModels.AdminRole{}
-		m.RoleID = *ctx.Payload.RoleID
 		m.Method, m.Resource = getResource(path.Path)
-		if err := adminRoleTable.Add(ctx.Context, &m); err != nil {
-			logger.Error("AdminRole Create error.", zap.Error(err))
-			return ctx.InternalServerError()
-		}
+		data = append(data, m)
+	}
+
+	adminRoleTable := models.NewAdminRoleDB(common.DB)
+	if err := adminRoleTable.CleanInsertByRoleID(ctx.Context, *ctx.Payload.RoleID, data); err != nil {
+		return ctx.InternalServerError()
 	}
 
 	// AdminRoleController_Create: end_implement
@@ -181,25 +179,21 @@ func (c *AdminRoleController) Update(ctx *app.UpdateAdminRoleContext) error {
 	// AdminRoleController_Update: start_implement
 
 	// Put your logic here
-	logger := common.GetLogger("default")
-	adminRoleTable := models.NewAdminRoleDB(common.DB)
-	if err := adminRoleTable.DeleteByRoleID(ctx.Context, ctx.RoleID); err != nil {
-		return ctx.InternalServerError()
-	}
-
 	paths := ctx.Payload.Paths
+	data := []genModels.AdminRole{}
 	for _, path := range paths {
 		if path.Allow != true {
 			continue
 		}
 
 		m := genModels.AdminRole{}
-		m.RoleID = ctx.RoleID
 		m.Method, m.Resource = getResource(path.Path)
-		if err := adminRoleTable.Add(ctx.Context, &m); err != nil {
-			logger.Error("AdminRole Create error.", zap.Error(err))
-			return ctx.InternalServerError()
-		}
+		data = append(data, m)
+	}
+
+	adminRoleTable := models.NewAdminRoleDB(common.DB)
+	if err := adminRoleTable.CleanInsertByRoleID(ctx.Context, ctx.RoleID, data); err != nil {
+		return ctx.InternalServerError()
 	}
 
 	// AdminRoleController_Update: end_implement
