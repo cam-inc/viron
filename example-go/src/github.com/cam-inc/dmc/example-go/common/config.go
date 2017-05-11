@@ -7,12 +7,13 @@ import (
 
 // Config of
 type Config struct {
-	Scheme string
-	Host   string
-	Port   int16
-	GoogleOAuth
+	Scheme      string
+	Host        string
+	Port        int16
 	DefaultRole string
 	SuperRole   string
+	GoogleOAuth
+	MySQL
 }
 
 // GoogleOAuth of
@@ -22,6 +23,15 @@ type GoogleOAuth struct {
 	RedirectURL       string
 	Scopes            []string
 	AllowEmailDomains []string
+}
+
+// MySQL of
+type MySQL struct {
+	UserName     string
+	Password     string
+	Host         string
+	Port         int16
+	DatabaseName string
 }
 
 var config *Config
@@ -46,6 +56,14 @@ func init() {
 				"camobile.com",
 			},
 		},
+
+		MySQL: MySQL{
+			UserName:     "user",
+			Password:     "password",
+			Host:         "localhost",
+			Port:         3306,
+			DatabaseName: "dmc_local",
+		},
 	}
 }
 
@@ -67,4 +85,9 @@ func GetDefaultRole() string {
 // GetSuperRole of
 func GetSuperRole() string {
 	return config.SuperRole
+}
+
+// GetMySQLConfig of
+func GetMySQLConfig() MySQL {
+	return config.MySQL
 }

@@ -14,14 +14,15 @@ var DB *gorm.DB
 
 func getConnectionString() string {
 	service := os.Getenv("SERVICE_ENV")
+	c := GetMySQLConfig()
 	if service == "docker-local" {
 		// on docker
-		return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s?parseTime=true",
-			"user", "password", "tcp", "mysql", "3306", "dmc_local")
+		return fmt.Sprintf("%s:%s@%s([%s]:%d)/%s?parseTime=true",
+			c.UserName, c.Password, "tcp", "mysql", c.Port, c.DatabaseName)
 	}
 
-	return fmt.Sprintf("%s:%s@%s(%s:%s)/%s?parseTime=true",
-		"user", "password", "tcp", "localhost", "3306", "dmc_local")
+	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?parseTime=true",
+		c.UserName, c.Password, "tcp", c.Host, c.Port, c.DatabaseName)
 }
 
 // InitDB initialize db connection
