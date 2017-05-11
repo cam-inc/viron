@@ -1,6 +1,4 @@
 dmc-component-table.ComponentTable
-  virtual(if="{ !!opts.search }")
-    dmc-button(label="search" onClick="{ handleSearchButtonClick }")
   dmc-table(columns="{ getColumns() }" rows="{ getRows() }")
   virtual(if="{ !!opts.pagination }")
     div paging info
@@ -37,15 +35,6 @@ dmc-component-table.ComponentTable
         rows.push(row);
       });
       return rows;
-    }
-
-    handleSearchButtonClick() {
-      // TODO: 現状は適当な値。修正すること。
-      const key = this.opts.search[0].key.get();
-      const type = this.opts.search[0].type.get();
-      this.opts.updater({
-        [key]: 'testname'
-      });
     }
 
     handlePrevButtonClick() {
