@@ -4,9 +4,9 @@ dmc-component.Component(onclick="{ handleClick }")
   .Component__body
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
-    dmc-component-number(if="{ !isPending && isComponentStyleNumber }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
-    dmc-component-table(if="{ !isPending && isComponentStyleTable }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
-    dmc-component-graph-bar(if="{ !isPending && isComponentStyleGraphBar }" data="{ data }" pagination="{ pagination }" updater="{ updater }")
+    dmc-component-number(if="{ !isPending && isComponentStyleNumber }" data="{ data }" pagination="{ pagination }" search="{ search }" updater="{ updater }")
+    dmc-component-table(if="{ !isPending && isComponentStyleTable }" data="{ data }" pagination="{ pagination }" search="{ search }" updater="{ updater }")
+    dmc-component-graph-bar(if="{ !isPending && isComponentStyleGraphBar }" data="{ data }" pagination="{ pagination }" search="{ search }" updater="{ updater }")
   .Component__tail TODO
 
   script.
@@ -21,9 +21,10 @@ dmc-component.Component(onclick="{ handleClick }")
 
     // `pending` means the status of fetching data.
     this.isPending = true;
-    // `data` and `pagination` will be filled with detail info after fetching.
+    // `data` and others will be filled with detail info after fetching.
     this.data = {};
     this.pagination = {};
+    this.search = null;
     // `component` is kind of a raw data.
     this.component = this.opts.component;
     this.isComponentStyleNumber = swagger.isComponentStyleNumber(this.component.style);
@@ -61,5 +62,6 @@ dmc-component.Component(onclick="{ handleClick }")
       this.isPending = false;
       this.data = state.component[this._riot_id].data;
       this.pagination = state.component[this._riot_id].pagination;
+      this.search = state.component[this._riot_id].search;
       this.update();
     });
