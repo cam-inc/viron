@@ -4,9 +4,7 @@ dmc-component.Component(onclick="{ handleClick }")
   .Component__body
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
-    dmc-component-number(if="{ !isPending && isComponentStyleNumber }" data="{ data }" pagination="{ pagination }" search="{ search }" updater="{ updater }")
-    dmc-component-table(if="{ !isPending && isComponentStyleTable }" data="{ data }" pagination="{ pagination }" search="{ search }" updater="{ updater }")
-    dmc-component-graph-bar(if="{ !isPending && isComponentStyleGraphBar }" data="{ data }" pagination="{ pagination }" search="{ search }" updater="{ updater }")
+    div(data-is="{ childComponentName }" if="{ !isPending }" data="{ data }" pagination="{ pagination }" search="{ search }" updater="{ updater }")
   .Component__tail TODO
 
   script.
@@ -27,9 +25,15 @@ dmc-component.Component(onclick="{ handleClick }")
     this.search = null;
     // `component` is kind of a raw data.
     this.component = this.opts.component;
-    this.isComponentStyleNumber = swagger.isComponentStyleNumber(this.component.style);
-    this.isComponentStyleTable = swagger.isComponentStyleTable(this.component.style);
-    this.isComponentStyleGraphBar = swagger.isComponentStyleGraphBar(this.component.style);
+    // used to render riot component.
+    this.childComponentName = null;
+    if (swagger.isComponentStyleNumber(this.component.style)) {
+      this.childComponentName = 'dmc-component-number';
+    } else if (swagger.isComponentStyleTable(this.component.style)) {
+      this.childComponentName = 'dmc-component-table';
+    } else if (swagger.isComponentStyleGraphBar(this.component.style)) {
+      this.childComponentName = 'dmc-component-graph-bar';
+    }
     // `updater` will be passed to the child component,(i.e. dmc-component-*) so the child component has the ability to update data.
     this.updater = (query = {}) => {
       this.isPending = true;
