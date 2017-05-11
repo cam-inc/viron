@@ -12,6 +12,7 @@ dmc-component.Component
     dmc-component-action(each="{ action in selfActions }" action="{ action }")
 
   script.
+    import { forEach } from 'mout/array';
     import swagger from '../../swagger';
     import constants from '../../core/constants';
     import '../organisms/dmc-component-graph-bar.tag';
