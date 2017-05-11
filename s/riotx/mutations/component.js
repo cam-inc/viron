@@ -1,3 +1,5 @@
+import { contains, filter, forEach, map } from 'mout/array';
+import { forOwn } from 'mout/object';
 import constants from '../../core/constants';
 import swagger from '../../swagger';
 
@@ -25,10 +27,29 @@ export default {
     if (params.component.query.length && !!params.component.query.length) {
       context.state.component[params.component_uid].search = params.component.query;
     }
-    // manually add operationIDs that component can execute.
-    if (params.executableOperationIDs && params.executableOperationIDs.length) {
-      context.state.component[params.component_uid].actions = params.executableOperationIDs;
-    }
+    // manually add paths that component can execute.
+    const actions = [];
+    forEach(params.pathRefs, ref => {
+      const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
+      forOwn(pathItemObject, (value, key) => {
+        if (contains(['put', 'post', 'delete', 'options', 'head', 'patch'], key)) {
+          actions.push({
+            isSelf: ref.isSelf,
+            operationObject: value
+          });
+        }
+      });
+    });
+    context.state.component[params.component_uid].selfActions = map(filter(actions, action => {
+      return action.isSelf;
+    }), action => {
+      return action.operationObject;
+    });
+    context.state.component[params.component_uid].childActions = map(filter(actions, action => {
+      return !action.isSelf;
+    }), action => {
+      return action.operationObject;
+    });
 
     return [constants.changeComponentName(params.component_uid)];
   }

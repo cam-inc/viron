@@ -1,5 +1,6 @@
 dmc-component-table.ComponentTable
   dmc-table(columns="{ getColumns() }" rows="{ getRows() }")
+  div(each="{ action in opts.actions }") { action.operationId }
 
   script.
     import { forEach } from 'mout/array';

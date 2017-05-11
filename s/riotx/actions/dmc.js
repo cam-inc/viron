@@ -8,14 +8,13 @@ const DMC_URI = '/dmc';
 export default {
   get: context => {
     return new Promise((resolve, reject) => {
-      const model = swagger.client.spec.paths[DMC_URI].get;
+      const operationObject = swagger.client.spec.paths[DMC_URI].get;
 
-      if (!model || !swagger.client.apis.dmc || !swagger.client.apis.dmc[model.operationId]) {
+      if (!operationObject || !swagger.client.apis.dmc || !swagger.client.apis.dmc[operationObject.operationId]) {
         return reject(new Error(`[fetch] ${swagger.client.url}; system entry point not found. (uri: ${DMC_URI})`));
       }
 
-      const apis = swagger.apisFlatObject();
-      const api = apis[model.operationId];
+      const api = swagger.getApiByOperationID(operationObject.operationId);
 
       const token = context.getter(constants.GETTER_ENDPOINT_ONE, context.getter(constants.GETTER_CURRENT)).token;
 
@@ -39,7 +38,7 @@ export default {
 
           resolve({
             response: res.obj,
-            model: model,
+            operationObject
           });
         })
         .catch(err => {

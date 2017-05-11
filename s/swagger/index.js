@@ -1,4 +1,4 @@
-import {forOwn} from 'mout/object';
+import { get, forOwn } from 'mout/object';
 
 import constants from '../core/constants';
 
@@ -72,6 +72,26 @@ class Swagger {
     });
 
     return apis;
+  }
+
+  getApiByOperationID(operationID) {
+    return this.apisFlatObject()[operationID];
+  }
+
+  getOperationObjectByOperationID(operationID) {
+    let operationObject;
+    forOwn(this.client.spec.paths, pathItemObject => {
+      forOwn(pathItemObject, v => {
+        if (get(v, 'operationId') === operationID) {
+          operationObject = v;
+        }
+      });
+    });
+    return operationObject;
+  }
+
+  getPathItemObjectByPath(path) {
+    return this.client.spec.paths[path];
   }
 
   /**

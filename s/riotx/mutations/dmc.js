@@ -3,7 +3,7 @@ import constants from '../../core/constants';
 
 export default {
   show: (context, obj) => {
-    const schema = obj.model.responses[200].schema;
+    const schema = obj.operationObject.responses[200].schema;
     // const properties = schema.properties;
     const response = obj.response;
 

@@ -6,13 +6,12 @@ dmc-component.Component
   .Component__body
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
-    div(data-is="{ childComponentName }" if="{ !isPending }" data="{ data }" updater="{ updater }")
+    div(data-is="{ childComponentName }" if="{ !isPending }" data="{ data }" actions="{ childActions }" updater="{ updater }")
     dmc-pagination(if="{ !isPending && !!pagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ 5 }" onChange="{ handlePaginationChange }")
-  .Component__tail(if="{ actions }")
-    dmc-component-action(each="{ action in actions }" action="{ action }")
+  .Component__tail(if="{ !!selfActions }")
+    dmc-component-action(each="{ action in selfActions }" action="{ action }")
 
   script.
-    import { forEach } from 'mout/array';
     import swagger from '../../swagger';
     import constants from '../../core/constants';
     import '../organisms/dmc-component-graph-bar.tag';
@@ -32,7 +31,8 @@ dmc-component.Component
     this.search = null;
     // `component` is kind of a raw data.
     this.component = this.opts.component;
-    this.actions = null;
+    this.selfActions = null;
+    this.childActions = null;
     // used to render riot component.
     this.childComponentName = null;
     if (swagger.isComponentStyleNumber(this.component.style)) {
@@ -67,7 +67,8 @@ dmc-component.Component
       this.data = state.component[this._riot_id].data;
       this.pagination = state.component[this._riot_id].pagination;
       this.search = state.component[this._riot_id].search;
-      this.actions = state.component[this._riot_id].actions;
+      this.selfActions = state.component[this._riot_id].selfActions;
+      this.childActions = state.component[this._riot_id].childActions;
       this.update();
     });
 
@@ -144,11 +145,11 @@ dmc-component-searchbox.Component__searchBox
     }
 
 dmc-component-action.Component__action
-  dmc-button(label="{ opts.action }" onClick="{ handleButtonClick }")
+  dmc-button(label="{ opts.action.operationId }" onClick="{ handleButtonClick }")
 
   script.
     import '../atoms/dmc-button.tag';
 
     handleButtonClick() {
-      alert(this.opts.action);
+      debugger;
     }
