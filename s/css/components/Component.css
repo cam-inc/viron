@@ -79,6 +79,10 @@
   padding: 16px;
 }
 
+.Component__pagination {
+  margin-top: 16px;
+}
+
 .Component__tail {
   padding: 8px;
   border-top: 1px solid var(--color-basic-black);

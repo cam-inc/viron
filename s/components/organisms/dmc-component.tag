@@ -6,7 +6,8 @@ dmc-component.Component
   .Component__body
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
-    div(data-is="{ childComponentName }" if="{ !isPending }" data="{ data }" pagination="{ pagination }" search="{ search }" updater="{ updater }")
+    div(data-is="{ childComponentName }" if="{ !isPending }" data="{ data }" updater="{ updater }")
+    dmc-component-pagination(if="{ !isPending && !!pagination }" pagination="{ pagination }" updater="{ updater }")
   .Component__tail TODO
 
   script.
@@ -128,4 +129,28 @@ dmc-component-searchbox.Component__searchBox
 
     handleCancelButtonClick() {
       this.closeModal();
+    }
+
+dmc-component-pagination.Component__pagination
+  div currentPage is { opts.pagination.currentPage }
+  div size is { opts.pagination.size }
+  div maxPage is { opts.pagination.maxPage }
+  dmc-button(label="prev" onClick="{ handlePrevButtonClick }")
+  dmc-button(label="next" onClick="{ handleNextButtonClick }")
+
+  script.
+    import '../atoms/dmc-button.tag';
+
+    handlePrevButtonClick() {
+      this.opts.updater({
+        limit: this.opts.pagination.size,
+        offset: (this.opts.pagination.currentPage - 2) * this.opts.pagination.size
+      });
+    }
+
+    handleNextButtonClick() {
+      this.opts.updater({
+        limit: this.opts.pagination.size,
+        offset: this.opts.pagination.currentPage * this.opts.pagination.size
+      });
     }
