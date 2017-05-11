@@ -34,6 +34,7 @@ func InitDB() {
 	}
 	DB.LogMode(true)
 	DB.AutoMigrate(&models.User{})
+	DB.AutoMigrate(&models.UserBlog{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 	DB.AutoMigrate(&models.AdminUser{})
 	DB.AutoMigrate(&models.AdminRole{})
 	DB.AutoMigrate(&models.AuditLog{})
