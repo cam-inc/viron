@@ -45,7 +45,7 @@ func (m *UserDB) ListUser(ctx context.Context, params map[string][]string) []*ap
 	err := db.Find(&native).Error
 
 	if err != nil {
-		logger.Error("error auditlog.ListPage", zap.Error(err))
+		logger.Error("error ListUser", zap.Error(err))
 		return objs
 	}
 

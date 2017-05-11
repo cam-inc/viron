@@ -60,9 +60,8 @@ func (c *UserController) Create(ctx *app.CreateUserContext) error {
 	if ctx.Payload.Homepage != nil {
 		m.Homepage = *ctx.Payload.Homepage
 	}
-	err := userTable.Add(ctx.Context, &m)
-	if err != nil {
-		panic(err)
+	if err := userTable.Add(ctx.Context, &m); err != nil {
+		return ctx.InternalServerError()
 	}
 
 	// UserController_Create: end_implement
@@ -76,9 +75,8 @@ func (c *UserController) Delete(ctx *app.DeleteUserContext) error {
 
 	// Put your logic here
 	userTable := models.NewUserDB(common.DB)
-	err := userTable.Delete(ctx.Context, ctx.ID)
-	if err != nil {
-		panic(err)
+	if err := userTable.Delete(ctx.Context, ctx.ID); err != nil {
+		return ctx.InternalServerError()
 	}
 
 	// UserController_Delete: end_implement
@@ -103,15 +101,13 @@ func (c *UserController) Show(ctx *app.ShowUserContext) error {
 
 	// Put your logic here
 	userTable := models.NewUserDB(common.DB)
-	m, err := userTable.OneUser(ctx.Context, ctx.ID)
-	if err == gorm.ErrRecordNotFound {
+	if m, err := userTable.OneUser(ctx.Context, ctx.ID); err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {
-		panic(err)
+		return ctx.InternalServerError()
+	} else {
+		return ctx.OK(m)
 	}
-
-	// UserController_Show: end_implement
-	return ctx.OK(m)
 }
 
 // Update runs the update action.
@@ -124,7 +120,7 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 	if err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {
-		panic(err)
+		return ctx.InternalServerError()
 	}
 
 	if ctx.Payload.Name != nil {
@@ -160,16 +156,13 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 	if ctx.Payload.Homepage != nil {
 		m.Homepage = *ctx.Payload.Homepage
 	}
-	err = userTable.Update(ctx.Context, m)
-	if err != nil {
-		panic(err)
+	if err = userTable.Update(ctx.Context, m); err != nil {
+		return ctx.InternalServerError()
 	}
 
-	r, err := userTable.OneUser(ctx.Context, ctx.ID)
-	if err != nil {
-		panic(err)
+	if r, err := userTable.OneUser(ctx.Context, ctx.ID); err != nil {
+		return ctx.InternalServerError()
+	} else {
+		return ctx.OK(r)
 	}
-
-	// UserController_Update: end_implement
-	return ctx.OK(r)
 }

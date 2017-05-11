@@ -42,9 +42,8 @@ func (c *AdminUserController) Delete(ctx *app.DeleteAdminUserContext) error {
 
 	// Put your logic here
 	adminUserTable := models.NewAdminUserDB(common.DB)
-	err := adminUserTable.Delete(ctx.Context, ctx.ID)
-	if err != nil {
-		panic(err)
+	if err := adminUserTable.Delete(ctx.Context, ctx.ID); err != nil {
+		return ctx.InternalServerError()
 	}
 
 	// AdminUserController_Delete: end_implement
@@ -69,15 +68,13 @@ func (c *AdminUserController) Show(ctx *app.ShowAdminUserContext) error {
 
 	// Put your logic here
 	adminUserTable := models.NewAdminUserDB(common.DB)
-	m, err := adminUserTable.OneAdminUser(ctx.Context, ctx.ID)
-	if err == gorm.ErrRecordNotFound {
+	if m, err := adminUserTable.OneAdminUser(ctx.Context, ctx.ID); err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {
-		panic(err)
+		return ctx.InternalServerError()
+	} else {
+		return ctx.OK(m)
 	}
-
-	// AdminUserController_Show: end_implement
-	return ctx.OK(m)
 }
 
 // Update runs the update action.
@@ -86,29 +83,25 @@ func (c *AdminUserController) Update(ctx *app.UpdateAdminUserContext) error {
 
 	// Put your logic here
 	adminUserTable := models.NewAdminUserDB(common.DB)
-	m, err := adminUserTable.Get(ctx.Context, ctx.ID)
-	if err == gorm.ErrRecordNotFound {
+	if m, err := adminUserTable.Get(ctx.Context, ctx.ID); err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {
-		panic(err)
-	}
+		return ctx.InternalServerError()
+	} else {
+		if &ctx.Payload.Password != nil {
+			m.Password = *ctx.Payload.Password
+		}
+		if &ctx.Payload.RoleID != nil {
+			m.RoleID = *ctx.Payload.RoleID
+		}
+		if err = adminUserTable.Update(ctx.Context, m); err != nil {
+			return ctx.InternalServerError()
+		}
 
-	if &ctx.Payload.Password != nil {
-		m.Password = *ctx.Payload.Password
+		if r, err := adminUserTable.OneAdminUser(ctx.Context, ctx.ID); err != nil {
+			return ctx.InternalServerError()
+		} else {
+			return ctx.OK(r)
+		}
 	}
-	if &ctx.Payload.RoleID != nil {
-		m.RoleID = *ctx.Payload.RoleID
-	}
-	err = adminUserTable.Update(ctx.Context, m)
-	if err != nil {
-		panic(err)
-	}
-
-	r, err := adminUserTable.OneAdminUser(ctx.Context, ctx.ID)
-	if err != nil {
-		panic(err)
-	}
-
-	// AdminUserController_Update: end_implement
-	return ctx.OK(r)
 }

@@ -84,6 +84,7 @@ var _ = Resource("user", func() {
 		})
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
+		Response(InternalServerError)
 	})
 
 	Action("show", func() {
@@ -95,6 +96,7 @@ var _ = Resource("user", func() {
 		Response(OK, func() { Media(UserMediaType) })
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
+		Response(InternalServerError)
 	})
 
 	Action("create", func() {
@@ -104,6 +106,7 @@ var _ = Resource("user", func() {
 		Response(OK, func() { Media(UserMediaType) })
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
+		Response(InternalServerError)
 	})
 
 	Action("update", func() {
@@ -116,6 +119,7 @@ var _ = Resource("user", func() {
 		Response(OK, func() { Media(UserMediaType) })
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
+		Response(InternalServerError)
 	})
 
 	Action("delete", func() {
@@ -127,6 +131,7 @@ var _ = Resource("user", func() {
 		Response(NoContent)
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
+		Response(InternalServerError)
 	})
 })
 
