@@ -1,12 +1,5 @@
 dmc-component-table.ComponentTable
   dmc-table(columns="{ getColumns() }" rows="{ getRows() }")
-  virtual(if="{ !!opts.pagination }")
-    div paging info
-    div currentPage is { opts.pagination.currentPage }
-    div size is { opts.pagination.size }
-    div maxPage is { opts.pagination.maxPage }
-    dmc-button(label="prev" onClick="{ handlePrevButtonClick }")
-    dmc-button(label="next" onClick="{ handleNextButtonClick }")
 
   script.
     import { forEach } from 'mout/array';
@@ -35,18 +28,4 @@ dmc-component-table.ComponentTable
         rows.push(row);
       });
       return rows;
-    }
-
-    handlePrevButtonClick() {
-      this.opts.updater({
-        limit: this.opts.pagination.size,
-        offset: (this.opts.pagination.currentPage - 2) * this.opts.pagination.size
-      });
-    }
-
-    handleNextButtonClick() {
-      this.opts.updater({
-        limit: this.opts.pagination.size,
-        offset: this.opts.pagination.currentPage * this.opts.pagination.size
-      });
     }
