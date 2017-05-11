@@ -17,23 +17,23 @@ dmc-input(class="Input { opts.isfocused ? 'Input--focused' : '' } { opts.isdisab
 
     handleFormSubmit(e) {
       e.preventDefault();
-      this.opts.onenter && this.opts.onenter(this.opts.text);
+      this.opts.onenter && this.opts.onenter(this.opts.text, this.opts.id);
     }
 
     handleInputChange(e) {
       const newText = e.target.value.replace(/　/g, ' ');
-      this.opts.ontextchange && this.opts.ontextchange(newText);
+      this.opts.ontextchange && this.opts.ontextchange(newText, this.opts.id);
     }
 
     handleInputFocus() {
-      this.opts.onfocustoggle && this.opts.onfocustoggle(true);
+      this.opts.onfocustoggle && this.opts.onfocustoggle(true, this.opts.id);
     }
 
     handleInputBlur() {
-      this.opts.onfocustoggle && this.opts.onfocustoggle(false);
+      this.opts.onfocustoggle && this.opts.onfocustoggle(false, this.opts.id);
     }
 
     handleResetButtonClick(e) {
       e.stopPropagation();
-      this.opts.onreset && this.opts.onreset(initialText);
+      this.opts.onreset && this.opts.onreset(initialText, this.opts.id);
     }
