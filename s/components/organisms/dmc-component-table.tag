@@ -1,4 +1,6 @@
 dmc-component-table.ComponentTable
+  virtual(if="{ !!opts.search }")
+    div enable to search!!!
   dmc-table(columns="{ getColumns() }" rows="{ getRows() }")
   virtual(if="{ !!opts.pagination }")
     div paging info
