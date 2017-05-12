@@ -9,7 +9,7 @@ dmc-component.Component
     div(data-is="{ childComponentName }" if="{ !isPending }" data="{ data }" actions="{ childActions }" updater="{ updater }")
     dmc-pagination(if="{ !isPending && !!pagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ 5 }" onChange="{ handlePaginationChange }")
   .Component__tail(if="{ !!selfActions }")
-    dmc-component-action(each="{ action in selfActions }" action="{ action }")
+    dmc-component-action(each="{ action in selfActions }" action="{ action }" updater="{ parent.updater }")
 
   script.
     import { forEach } from 'mout/array';
@@ -156,6 +156,9 @@ dmc-component-action.Component__action
 
     handleButtonClick() {
       store.action(constants.ACTION_MODAL_SHOW, 'dmc-operation', {
-        operation: this.opts.action
+        operation: this.opts.action,
+        onSuccess: () => {
+          this.opts.updater();
+        }
       });
     }

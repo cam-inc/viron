@@ -1,0 +1,64 @@
+.Operation {
+  display: block;
+}
+
+.Operation__parameters {
+  margin-bottom: 24px;
+}
+
+.Operation__parameter {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.Operation__parameter:last-child {
+  margin-bottom: 0;
+}
+
+.Operation__parameterHead {
+  @apply --layout-between-center;
+  padding: 8px;
+  margin-bottom: 8px;
+  background-color: var(--color-basic-lightGray);
+}
+
+.Operation__parameterName {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-text-default);
+}
+
+.Operation__parameterRequired {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--color-basic-red);
+}
+
+.Operation__schema {
+  display: block;
+}
+
+.Operation__input {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.Operation__input:last-child {
+  margin-bottom: 0;
+}
+
+.Operation__inputName {
+  margin-bottom: 4px;
+}
+
+.Operation__input .Input {
+  display: block;
+}
+
+.Operation__control {
+  @apply --layout-center-center;
+}
+
+.Operation__control .Button:first-child {
+  margin-right: 8px;
+}
