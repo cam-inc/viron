@@ -22,6 +22,10 @@ dmc-operation.Operation
 
     handleParameterChange(key, value) {
       this.queries[key] = value;
+      // TODO: deleteするためのもっと良い方法を模索すること。
+      if (typeof value === 'string' && !value.length) {
+        delete this.queries[key];
+      }
       this.update();
     }
 
@@ -66,6 +70,7 @@ dmc-operation-schema.Operation__schema
 
   script.
     import { contains } from 'mout/array';
+    import { forOwn } from 'mout/object';
 
     this.propertyKeys = Object.keys(opts.schema.properties);
 
@@ -87,41 +92,93 @@ dmc-operation-schema.Operation__schema
       const values = ObjectAssign({}, this.opts.parametervalues, {
         [name]: value
       });
+      forOwn(values, (v, k) => {
+        // TODO: deleteするためのもっと良い方法を模索すること。
+        if (typeof v === 'string' && !v.length) {
+          delete values[k];
+        }
+      });
       this.opts.onchange(this.opts.name, values);
     }
 
 dmc-operation-input.Operation__input
-  .Operation__inputName { opts.parameterobject.name }{ opts.parameterobject.required ? '(required)' : '' }
-  virtual(if="{ opts.parameterobject.type === 'string' }")
+  .Operation__inputName { opts.parameterobject.name }({ opts.parameterobject.type }){ opts.parameterobject.required ? '(required)' : '' }
+  virtual(if="{ uiType === 'input' }")
     dmc-input(text="{ opts.parametervalue }" onTextChange="{ handleInputChange }")
-  virtual(if="{ opts.parameterobject.type === 'number' }")
-    dmc-input(text="{ opts.parametervalue }" onTextChange="{ handleInputChange }")
-  virtual(if="{ opts.parameterobject.type === 'integer' }")
-    dmc-input(text="{ opts.parametervalue }" onTextChange="{ handleInputChange }")
-  virtual(if="{ opts.parameterobject.type === 'boolean' }")
+  virtual(if="{ uiType === 'checkbox' }")
     dmc-checkbox(isChecked="{ opts.parametervalue }" onChange="{ handleCheckboxChange }")
-  virtual(if="{ opts.parameterobject.type === 'array' }")
-    div array
-  virtual(if="{ opts.parameterobject.type === 'file' }")
-    div file
+  virtual(if="{ uiType === 'select' }")
+    dmc-select(isOpened="{ isOpened }" options="{ getSelectOptions() }" onToggle="{ handleSelectToggle }" onChange="{ handleSelectChange }")
 
   script.
+    import { find, forEach } from 'mout/array';
     import '../atoms/dmc-checkbox.tag';
     import '../atoms/dmc-input.tag';
+    import '../atoms/dmc-select.tag';
 
-    handleInputChange(value) {
-      // TODO: validate
-      switch (this.opts.parameterobject.type) {
+    const type = opts.parameterobject.type;
+    this.uiType = null;
+    this.isOpened = false;
+    if (!!opts.parameterobject.enum) {
+      this.uiType = 'select';
+    } else {
+      switch (type) {
+        case 'string':
         case 'number':
         case 'integer':
-          value = Number(value);
+          this.uiType = 'input';
+          break;
+        case 'boolean':
+          this.uiType = 'checkbox';
+          break;
+        case 'array':
+          this.uiType = 'TODO';
+          break;
+        case 'file':
+          this.uiType = 'TODO';
           break;
         default:
           break;
       }
+    }
+
+    getSelectOptions() {
+      const options = [];
+      forEach(this.opts.parameterobject.enum, (v, idx) => {
+        options.push({
+          id: `select_${idx}`,
+          label: v,
+          isSelected: (v === this.opts.parametervalue)
+        });
+      });
+      return options;
+    }
+
+    change(value) {
+      // TODO: format, validate
+      if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
+        value = Number(value);
+      }
       this.opts.onchange(this.opts.parameterobject.name, value);
     }
 
+    handleInputChange(value) {
+      this.change(value);
+    }
+
     handleCheckboxChange(isChecked) {
-      this.opts.onchange(this.opts.parameterobject.name, isChecked);
+      this.change(isChecked);
+    }
+
+    handleSelectToggle(isOpened) {
+      this.isOpened = isOpened;
+      this.update();
+    }
+
+    handleSelectChange(options) {
+      const option = find(options, option => {
+        return option.isSelected;
+      });
+      const value = (option ? option.label : undefined);
+      this.change(value);
     }
