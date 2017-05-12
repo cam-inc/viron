@@ -11,7 +11,7 @@ dmc-component-table.ComponentTable
 
     getColumns() {
       const columns = [];
-      if (!!this.opts.actions) {
+      if (!!this.opts.actions && this.opts.actions.length) {
         columns.push({
           title: 'action',
           key: constants.DMC_TABLE_ACTION_KEY
@@ -30,7 +30,7 @@ dmc-component-table.ComponentTable
       const rows = [];
       forEach(this.opts.data, cells => {
         const row = {};
-        if (!!this.opts.actions) {
+        if (!!this.opts.actions && this.opts.actions.length) {
           row[constants.DMC_TABLE_ACTION_KEY] = {
             isAction: true,
             actions: []
