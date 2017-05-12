@@ -25,51 +25,54 @@ func main() {
 	service.Use(dmcMiddleware.SetHeader())
 	service.Use(dmcMiddleware.AuditLog())
 
+	//- DMC standard controllers (do not remove!)
 	// Mount "dmc" controller
-	c := controller.NewDmcController(service)
-	app.MountDmcController(service, c)
+	dc1 := controller.NewDmcController(service)
+	app.MountDmcController(service, dc1)
 	// Mount "swagger" controller
-	c3 := controller.NewSwaggerController(service)
-	app.MountSwaggerController(service, c3)
-	// Mount "user" controller
-	c4 := controller.NewUserController(service)
-	app.MountUserController(service, c4)
-	// Mount "admin_user" controller
-	c5 := controller.NewAdminUserController(service)
-	app.MountAdminUserController(service, c5)
-	// Mount "admin_role" controller
-	c6 := controller.NewAdminRoleController(service)
-	app.MountAdminRoleController(service, c6)
-	// Mount "auth" controller
-	c7 := controller.NewAuthController(service)
-	app.MountAuthController(service, c7)
-	// Mount "auditLog" controller
-	c8 := controller.NewAuditLogController(service)
-	app.MountAuditLogController(service, c8)
-	// Mount "stats/dau" controller
-	c9 := controller.NewStatsDauController(service)
-	app.MountStatsDauController(service, c9)
-	// Mount "stats/mau" controller
-	c10 := controller.NewStatsMauController(service)
-	app.MountStatsMauController(service, c10)
+	dc2 := controller.NewSwaggerController(service)
+	app.MountSwaggerController(service, dc2)
 	// Mount "root" controller
-	c11 := controller.NewRootController(service)
-	app.MountRootController(service, c11)
+	dc3 := controller.NewRootController(service)
+	app.MountRootController(service, dc3)
 	// Mount "authType" controller
-	c12 := controller.NewAuthTypeController(service)
-	app.MountAuthTypeController(service, c12)
+	dc4 := controller.NewAuthTypeController(service)
+	app.MountAuthTypeController(service, dc4)
+	// Mount "auth" controller
+	dc5 := controller.NewAuthController(service)
+	app.MountAuthController(service, dc5)
+	// Mount "admin_user" controller
+	dc6 := controller.NewAdminUserController(service)
+	app.MountAdminUserController(service, dc6)
+	// Mount "admin_role" controller
+	dc7 := controller.NewAdminRoleController(service)
+	app.MountAdminRoleController(service, dc7)
+	// Mount "auditLog" controller
+	dc8 := controller.NewAuditLogController(service)
+	app.MountAuditLogController(service, dc8)
+
+	//- Service specific controllers
+	// Mount "user" controller
+	sc1 := controller.NewUserController(service)
+	app.MountUserController(service, sc1)
+	// Mount "stats/dau" controller
+	sc2 := controller.NewStatsDauController(service)
+	app.MountStatsDauController(service, sc2)
+	// Mount "stats/mau" controller
+	sc3 := controller.NewStatsMauController(service)
+	app.MountStatsMauController(service, sc3)
 	// Mount "file" controller
-	c13 := controller.NewFileController(service)
-	app.MountFileController(service, c13)
+	sc4 := controller.NewFileController(service)
+	app.MountFileController(service, sc4)
 	// Mount "stats/planet" controller
-	c14 := controller.NewStatsPlanetController(service)
-	app.MountStatsPlanetController(service, c14)
+	sc5 := controller.NewStatsPlanetController(service)
+	app.MountStatsPlanetController(service, sc5)
 	// Mount userBlog" controller
-	c15 := controller.NewUserBlogController(service)
-	app.MountUserBlogController(service, c15)
+	sc6 := controller.NewUserBlogController(service)
+	app.MountUserBlogController(service, sc6)
 	// Mount userBlogEntry" controller
-	c16 := controller.NewUserBlogEntryController(service)
-	app.MountUserBlogEntryController(service, c16)
+	sc7 := controller.NewUserBlogEntryController(service)
+	app.MountUserBlogEntryController(service, sc7)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {
