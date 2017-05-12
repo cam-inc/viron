@@ -163,4 +163,6 @@ var UserPayload = Type("UserPayload", func() {
 	Member("appear_area", String)
 	Member("school", String)
 	Member("homepage", String)
+
+	Required("name")
 })

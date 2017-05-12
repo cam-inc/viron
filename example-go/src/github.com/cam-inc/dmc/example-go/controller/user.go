@@ -26,10 +26,8 @@ func (c *UserController) Create(ctx *app.CreateUserContext) error {
 	// Put your logic here
 	userTable := models.NewUserDB(common.DB)
 	m := genModels.User{}
+	m.Name = ctx.Payload.Name
 
-	if ctx.Payload.Name != nil {
-		m.Name = *ctx.Payload.Name
-	}
 	if ctx.Payload.Sex != nil {
 		m.Sex = *ctx.Payload.Sex
 	}
@@ -123,9 +121,7 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 		return ctx.InternalServerError()
 	}
 
-	if ctx.Payload.Name != nil {
-		m.Name = *ctx.Payload.Name
-	}
+	m.Name = ctx.Payload.Name
 	if ctx.Payload.Sex != nil {
 		m.Sex = *ctx.Payload.Sex
 	}
