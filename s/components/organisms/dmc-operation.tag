@@ -6,12 +6,13 @@ dmc-operation.Operation
     dmc-button(label="cancel" type="secondary" onClick="{ handleCancelButtonClick }")
 
   script.
+    import ObjectAssign from 'object-assign';
     import constants from '../../core/constants';
     import '../atoms/dmc-button.tag';
 
     const store = this.riotx.get();
 
-    this.queries = {};
+    this.queries = ObjectAssign({}, this.opts.initialQueries);
 
     closeModal() {
       if (this.opts.isModal) {
@@ -65,7 +66,6 @@ dmc-operation-schema.Operation__schema
 
   script.
     import { contains } from 'mout/array';
-    import ObjectAssign from 'object-assign';
 
     this.propertyKeys = Object.keys(opts.schema.properties);
 
@@ -99,7 +99,7 @@ dmc-operation-input.Operation__input
   virtual(if="{ opts.parameterobject.type === 'integer' }")
     dmc-input(text="{ opts.parametervalue }" onTextChange="{ handleInputChange }")
   virtual(if="{ opts.parameterobject.type === 'boolean' }")
-    dmc-checkbox(isChecked="{ opts.parametervalue }" onClick="{ handleCheckboxClick }")
+    dmc-checkbox(isChecked="{ opts.parametervalue }" onChange="{ handleCheckboxChange }")
   virtual(if="{ opts.parameterobject.type === 'array' }")
     div array
   virtual(if="{ opts.parameterobject.type === 'file' }")
@@ -122,6 +122,6 @@ dmc-operation-input.Operation__input
       this.opts.onchange(this.opts.parameterobject.name, value);
     }
 
-    handleCheckboxClick(isChecked) {
+    handleCheckboxChange(isChecked) {
       this.opts.onchange(this.opts.parameterobject.name, isChecked);
     }

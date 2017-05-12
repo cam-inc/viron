@@ -18,6 +18,9 @@ export default {
   AUTH_TYPE_EMAIL: 'email',
   AUTH_TYPE_OAUTH: 'oauth',
 
+  // DMC's special constants
+  DMC_TABLE_ACTION_KEY: 'dmc_table_action_key',
+
   // riotx#actions
   ACTION_DRAWER_TOGGLE: 'drawer_toggle',
   ACTION_DRAWER_OPEN: 'drawer_open',

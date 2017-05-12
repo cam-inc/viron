@@ -3,7 +3,8 @@ dmc-table.Table
     .Table__headRow
       .Table__headCell(each="{ getColumns() }") { title }
   .Table__body
-    dmc-table-row(each="{ row in getRows() }" row="{ row }")
+    .Table__row(each="{ row in getRows() }")
+      dmc-table-cell(each="{ cell in row }" cell="{ cell }")
 
   script.
     import { forEach } from 'mout/array';
@@ -27,5 +28,17 @@ dmc-table.Table
       return rows;
     }
 
-dmc-table-row.Table__row
-  .Table__cell(each="{ cell in opts.row }") { cell }
+dmc-table-cell.Table__cell
+  virtual(if="{ opts.cell.isText }") { cell.value }
+  virtual(if="{ opts.cell.isAction }")
+    dmc-table-cell-action(each="{ action in opts.cell.actions }" action="{ action }")
+
+dmc-table-cell-action
+  dmc-button(label="{ opts.action.value }" onClick="{ handleButtonClick }")
+
+  script.
+    import '../atoms/dmc-button.tag';
+
+    handleButtonClick() {
+      this.opts.action.onClick(this.opts.action.id, this.opts.action.rowData);
+    }
