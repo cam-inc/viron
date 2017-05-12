@@ -39,6 +39,7 @@ export default {
   ACTION_PAGE_GET: 'page_get',
 
   ACTION_COMPONENT_GET: 'component_get',
+  ACTION_COMPONENT_OPERATE: 'component_operate',
 
   ACTION_TOAST_SHOW: 'toast_show',
   ACTION_TOAST_HIDE: 'toast_hide',

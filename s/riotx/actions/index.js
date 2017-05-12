@@ -33,6 +33,7 @@ export default {
   [constants.ACTION_PAGE_GET]: page.get,
 
   [constants.ACTION_COMPONENT_GET]: component.get,
+  [constants.ACTION_COMPONENT_OPERATE]: component.operate,
 
   [constants.ACTION_TOAST_SHOW]: toast.show,
   [constants.ACTION_TOAST_HIDE]: toast.hide,

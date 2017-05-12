@@ -65,6 +65,23 @@ export default {
     }).then(res => {
       context.commit(constants.MUTATION_COMPONENT_ONE, res);
     });
+  },
+
+  operate: (context, operationObject, query) => {
+    const api = swagger.getApiByOperationID(operationObject.operationId);
+    const token = context.getter(constants.GETTER_ENDPOINT_ONE, context.getter(constants.GETTER_CURRENT)).token;
+
+    // TODO: 共通化したいな
+    return api(query, {
+      requestInterceptor: (req) => {
+        // TODO: queryに含めることは可能か..?
+        req.headers['Authorization'] = token;
+        console.log('Interceptor(request):', req);
+      },
+      responseInterceptor: (res) => {
+        console.log('Interceptor(response):', res);
+      }
+    });
   }
 
 };

@@ -149,8 +149,13 @@ dmc-component-action.Component__action
   dmc-button(label="{ opts.action.operationId }" onClick="{ handleButtonClick }")
 
   script.
+    import '../organisms/dmc-operation.tag';
     import '../atoms/dmc-button.tag';
 
+    const store = this.riotx.get();
+
     handleButtonClick() {
-      debugger;
+      store.action(constants.ACTION_MODAL_SHOW, 'dmc-operation', {
+        operation: this.opts.action
+      });
     }

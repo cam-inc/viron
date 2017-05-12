@@ -12,12 +12,9 @@
 }
 
 .ComponentsPage__list {
-  @apply --layout-between-stretch;
-  flex-wrap: wrap;
   padding: 32px;
 }
 
 .ComponentsPage__list .Component {
-  min-width: 320px;
   margin-bottom: 24px;
 }
