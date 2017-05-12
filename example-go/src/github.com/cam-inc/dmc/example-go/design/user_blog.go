@@ -11,6 +11,8 @@ var UserBlogMediaType = MediaType("application/vnd.user_blog+json", func() {
 	Description("A User Blog")
 	ContentType("application/json")
 
+	Reference(UserBlogPayload)
+
 	Attributes(func() {
 		Attribute("id", Integer, "user blog id")
 		Attribute("user_id", Integer, "user id")
@@ -122,6 +124,18 @@ var _ = Resource("user_blog", func() {
 		})
 		Response(NoContent)
 		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+		Response(InternalServerError)
+	})
+
+	Action("autocomplete", func() {
+		Description("autocomplete user data")
+		Routing(GET("/autocomplete/:field"))
+		Params(func() {
+			Param("field", String, "field name in userblog model")
+			Param("search", String, "search query string")
+		})
+		Response(OK, "application/json")
 		Response(BadRequest, ErrorMedia)
 		Response(InternalServerError)
 	})

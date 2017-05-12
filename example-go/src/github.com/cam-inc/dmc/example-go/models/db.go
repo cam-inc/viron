@@ -1,12 +1,14 @@
-package common
+package models
 
 import (
 	"fmt"
-	"github.com/cam-inc/dmc/example-go/gen/models"
+	"os"
+
+	"github.com/cam-inc/dmc/example-go/common"
+	genModels "github.com/cam-inc/dmc/example-go/gen/models"
 	"github.com/jinzhu/gorm"
 	// mysql driver
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"os"
 )
 
 // DB is mysql connection
@@ -14,7 +16,7 @@ var DB *gorm.DB
 
 func getConnectionString() string {
 	service := os.Getenv("SERVICE_ENV")
-	c := GetMySQLConfig()
+	c := common.GetMySQLConfig()
 	if service == "docker-local" {
 		// on docker
 		return fmt.Sprintf("%s:%s@%s([%s]:%d)/%s?parseTime=true",
@@ -34,10 +36,11 @@ func InitDB() {
 		panic(err)
 	}
 	DB.LogMode(true)
-	DB.AutoMigrate(&models.User{})
-	DB.AutoMigrate(&models.UserBlog{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
-	DB.AutoMigrate(&models.UserBlogEntry{}).AddForeignKey("user_blog_id", "user_blogs(id)", "RESTRICT", "RESTRICT")
-	DB.AutoMigrate(&models.AdminUser{})
-	DB.AutoMigrate(&models.AdminRole{})
-	DB.AutoMigrate(&models.AuditLog{})
+	DB.AutoMigrate(&genModels.User{})
+	DB.AutoMigrate(&genModels.UserBlog{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
+	DB.AutoMigrate(&genModels.UserBlogEntry{}).AddForeignKey("user_blog_id", "user_blogs(id)", "RESTRICT", "RESTRICT")
+	DB.AutoMigrate(&genModels.AdminUser{})
+	DB.AutoMigrate(&genModels.AdminRole{})
+	DB.AutoMigrate(&genModels.AuditLog{})
+	DB.AutoMigrate(&BlogDesign{})
 }

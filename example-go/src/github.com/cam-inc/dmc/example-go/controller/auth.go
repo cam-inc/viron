@@ -42,7 +42,7 @@ func getRoles(ctx context.Context, roleID string) ([]byte, error) {
 		roles["delete"] = []string{"*"}
 		roles["patch"] = []string{"*"}
 	} else {
-		adminRoleTable := models.NewAdminRoleDB(common.DB)
+		adminRoleTable := models.NewAdminRoleDB(models.DB)
 		adminRoleModels, err := adminRoleTable.ListByRoleID(ctx, roleID)
 		if err != nil {
 			return nil, err
@@ -133,7 +133,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	// AuthController_Signin: start_implement
 	logger := common.GetLogger("default")
 	// Authorize
-	adminUserTable := models.NewAdminUserDB(common.DB)
+	adminUserTable := models.NewAdminUserDB(models.DB)
 	adminUserModel, err := adminUserTable.GetByEmail(ctx.Context, *ctx.Payload.Email)
 	if err == gorm.ErrRecordNotFound {
 		if adminUsers := adminUserTable.ListAdminUserSmall(ctx.Context); len(adminUsers) > 0 {
@@ -232,7 +232,7 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 	} else {
 		email := userInfo.EMail
 
-		adminUserTable := models.NewAdminUserDB(common.DB)
+		adminUserTable := models.NewAdminUserDB(models.DB)
 		adminUserModel, err := adminUserTable.GetByEmail(ctx.Context, email)
 		if err == gorm.ErrRecordNotFound {
 			// 新規ユーザーの場合はユーザー作成

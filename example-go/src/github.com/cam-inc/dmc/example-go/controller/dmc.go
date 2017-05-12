@@ -158,10 +158,26 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 			},
 
 			{
+				ID:      "blogdesign",
+				Name:    "ブログ デザイン",
+				Section: bridge.SectionManage,
+				Group:   bridge.GroupBlog,
+				Components: []*app.Component{
+					{
+						Name:       "ブログ デザイン",
+						API:        api("/blogdesign", "get"),
+						Style:      bridge.StyleTable,
+						Options:    defaultOptions,
+						Pagination: true,
+					},
+				},
+			},
+
+			{
 				ID:      "adminrole",
 				Name:    "DMC ユーザー権限",
 				Section: bridge.SectionManage,
-				Group:   bridge.GroupEmpty,
+				Group:   bridge.GroupAdmin,
 				Components: []*app.Component{
 					{
 						Name:       "DMC ユーザー権限",
@@ -176,7 +192,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 				ID:      "adminuser",
 				Name:    "DMC ユーザー",
 				Section: bridge.SectionManage,
-				Group:   bridge.GroupBlog,
+				Group:   bridge.GroupAdmin,
 				Components: []*app.Component{
 					{
 						Name:       "DMC ユーザー権限",

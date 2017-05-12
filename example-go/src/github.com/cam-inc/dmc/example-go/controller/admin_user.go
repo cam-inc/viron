@@ -41,7 +41,7 @@ func (c *AdminUserController) Delete(ctx *app.DeleteAdminUserContext) error {
 	// AdminUserController_Delete: start_implement
 
 	// Put your logic here
-	adminUserTable := models.NewAdminUserDB(common.DB)
+	adminUserTable := models.NewAdminUserDB(models.DB)
 	if err := adminUserTable.Delete(ctx.Context, ctx.ID); err != nil {
 		return ctx.InternalServerError()
 	}
@@ -55,7 +55,7 @@ func (c *AdminUserController) List(ctx *app.ListAdminUserContext) error {
 	// AdminUserController_List: start_implement
 
 	// Put your logic here
-	adminUserTable := models.NewAdminUserDB(common.DB)
+	adminUserTable := models.NewAdminUserDB(models.DB)
 	list := adminUserTable.ListAdminUser(ctx.Context)
 	// AdminUserController_List: end_implement
 
@@ -67,7 +67,7 @@ func (c *AdminUserController) Show(ctx *app.ShowAdminUserContext) error {
 	// AdminUserController_Show: start_implement
 
 	// Put your logic here
-	adminUserTable := models.NewAdminUserDB(common.DB)
+	adminUserTable := models.NewAdminUserDB(models.DB)
 	if m, err := adminUserTable.OneAdminUser(ctx.Context, ctx.ID); err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {
@@ -82,7 +82,7 @@ func (c *AdminUserController) Update(ctx *app.UpdateAdminUserContext) error {
 	// AdminUserController_Update: start_implement
 
 	// Put your logic here
-	adminUserTable := models.NewAdminUserDB(common.DB)
+	adminUserTable := models.NewAdminUserDB(models.DB)
 	if m, err := adminUserTable.Get(ctx.Context, ctx.ID); err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {

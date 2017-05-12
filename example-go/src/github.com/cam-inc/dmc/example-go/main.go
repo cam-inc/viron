@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/controller"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	dmcMiddleware "github.com/cam-inc/dmc/example-go/middleware"
+	"github.com/cam-inc/dmc/example-go/models"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 )
 
 func main() {
 	// db connection
-	common.InitDB()
+	models.InitDB()
 
 	// Create service
 	service := goa.New("example-go")
@@ -73,6 +73,9 @@ func main() {
 	// Mount userBlogEntry" controller
 	sc7 := controller.NewUserBlogEntryController(service)
 	app.MountUserBlogEntryController(service, sc7)
+	// Mount blogDesignEntry" controller
+	sc8 := controller.NewBlogDesignController(service)
+	app.MountBlogDesignController(service, sc8)
 
 	// Start service
 	if err := service.ListenAndServe(":3000"); err != nil {

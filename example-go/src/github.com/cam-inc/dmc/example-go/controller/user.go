@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	genModels "github.com/cam-inc/dmc/example-go/gen/models"
 	"github.com/cam-inc/dmc/example-go/models"
@@ -24,7 +23,7 @@ func (c *UserController) Create(ctx *app.CreateUserContext) error {
 	// UserController_Create: start_implement
 
 	// Put your logic here
-	userTable := models.NewUserDB(common.DB)
+	userTable := models.NewUserDB(models.DB)
 	m := genModels.User{}
 	m.Name = ctx.Payload.Name
 
@@ -72,7 +71,7 @@ func (c *UserController) Delete(ctx *app.DeleteUserContext) error {
 	// UserController_Delete: start_implement
 
 	// Put your logic here
-	userTable := models.NewUserDB(common.DB)
+	userTable := models.NewUserDB(models.DB)
 	if err := userTable.Delete(ctx.Context, ctx.ID); err != nil {
 		return ctx.InternalServerError()
 	}
@@ -86,7 +85,7 @@ func (c *UserController) List(ctx *app.ListUserContext) error {
 	// UserController_List: start_implement
 
 	// Put your logic here
-	userTable := models.NewUserDB(common.DB)
+	userTable := models.NewUserDB(models.DB)
 	list := userTable.ListUser(ctx.Context, ctx.Params)
 	// UserController_List: end_implement
 
@@ -98,7 +97,7 @@ func (c *UserController) Show(ctx *app.ShowUserContext) error {
 	// UserController_Show: start_implement
 
 	// Put your logic here
-	userTable := models.NewUserDB(common.DB)
+	userTable := models.NewUserDB(models.DB)
 	if m, err := userTable.OneUser(ctx.Context, ctx.ID); err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {
@@ -113,7 +112,7 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 	// UserController_Update: start_implement
 
 	// Put your logic here
-	userTable := models.NewUserDB(common.DB)
+	userTable := models.NewUserDB(models.DB)
 	m, err := userTable.Get(ctx.Context, ctx.ID)
 	if err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()

@@ -12,7 +12,8 @@ import (
 	"github.com/cam-inc/dmc/example-go/bridge"
 	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
-	"github.com/cam-inc/dmc/example-go/gen/models"
+	genModels "github.com/cam-inc/dmc/example-go/gen/models"
+	"github.com/cam-inc/dmc/example-go/models"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"go.uber.org/zap"
@@ -70,8 +71,8 @@ func AuditLog() goa.Middleware {
 				}
 
 				res := goa.ContextResponse(ctx)
-				auditLogTable := models.NewAuditLogDB(common.DB)
-				m := models.AuditLog{}
+				auditLogTable := genModels.NewAuditLogDB(models.DB)
+				m := genModels.AuditLog{}
 				m.UserID = userID
 				m.RequestURI = req.RequestURI[0:int(math.Min(float64(len(req.RequestURI)), float64(2048)))]
 				m.ReuquestMethod = req.Method

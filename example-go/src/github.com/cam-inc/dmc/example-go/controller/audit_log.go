@@ -26,7 +26,7 @@ func (c *AuditLogController) List(ctx *app.ListAuditLogContext) error {
 	pager.SetLimit(ctx.Limit)
 	pager.SetOffset(ctx.Offset)
 
-	auditLogTable := models.NewAuditLogDB(common.DB)
+	auditLogTable := models.NewAuditLogDB(models.DB)
 	list := auditLogTable.ListPage(ctx.Context, pager.Limit, pager.Offset)
 	count := auditLogTable.Count(ctx.Context)
 

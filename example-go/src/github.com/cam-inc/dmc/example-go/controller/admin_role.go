@@ -102,7 +102,7 @@ func (c *AdminRoleController) Create(ctx *app.CreateAdminRoleContext) error {
 		data = append(data, m)
 	}
 
-	adminRoleTable := models.NewAdminRoleDB(common.DB)
+	adminRoleTable := models.NewAdminRoleDB(models.DB)
 	if err := adminRoleTable.CleanInsertByRoleID(ctx.Context, *ctx.Payload.RoleID, data); err != nil {
 		return ctx.InternalServerError()
 	}
@@ -117,7 +117,7 @@ func (c *AdminRoleController) Delete(ctx *app.DeleteAdminRoleContext) error {
 	// AdminRoleController_Delete: start_implement
 
 	// Put your logic here
-	adminRoleTable := models.NewAdminRoleDB(common.DB)
+	adminRoleTable := models.NewAdminRoleDB(models.DB)
 	if err := adminRoleTable.DeleteByRoleID(ctx.Context, ctx.RoleID); err != nil {
 		return ctx.InternalServerError()
 	}
@@ -135,7 +135,7 @@ func (c *AdminRoleController) List(ctx *app.ListAdminRoleContext) error {
 	pager.SetLimit(ctx.Limit)
 	pager.SetOffset(ctx.Offset)
 
-	adminRoleTable := models.NewAdminRoleDB(common.DB)
+	adminRoleTable := models.NewAdminRoleDB(models.DB)
 	list := adminRoleTable.ListPage(ctx.Context, pager.Limit, pager.Offset)
 	tmp := getAdminRolePathList(list)
 	var res []*app.AdminRole
@@ -159,7 +159,7 @@ func (c *AdminRoleController) Show(ctx *app.ShowAdminRoleContext) error {
 	// AdminRoleController_Show: start_implement
 
 	// Put your logic here
-	adminRoleTable := models.NewAdminRoleDB(common.DB)
+	adminRoleTable := models.NewAdminRoleDB(models.DB)
 	if list, err := adminRoleTable.ListByRoleID(ctx.Context, ctx.RoleID); err == gorm.ErrRecordNotFound {
 		return ctx.NotFound()
 	} else if err != nil {
@@ -191,7 +191,7 @@ func (c *AdminRoleController) Update(ctx *app.UpdateAdminRoleContext) error {
 		data = append(data, m)
 	}
 
-	adminRoleTable := models.NewAdminRoleDB(common.DB)
+	adminRoleTable := models.NewAdminRoleDB(models.DB)
 	if err := adminRoleTable.CleanInsertByRoleID(ctx.Context, ctx.RoleID, data); err != nil {
 		return ctx.InternalServerError()
 	}
