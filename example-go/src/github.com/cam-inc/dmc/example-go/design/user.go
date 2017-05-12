@@ -11,6 +11,8 @@ var UserMediaType = MediaType("application/vnd.user+json", func() {
 	Description("A User")
 	ContentType("application/json")
 
+	Reference(UserPayload)
+
 	Attributes(func() {
 		Attribute("id", Integer, "id")
 		Attribute("name", String, "user name")
