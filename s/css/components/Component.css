@@ -76,7 +76,9 @@
 }
 
 .Component__body {
+  max-height: 400px;
   padding: 16px;
+  overflow: scroll;
 }
 
 .Component__body .Pagination {

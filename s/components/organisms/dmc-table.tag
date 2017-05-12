@@ -1,10 +1,9 @@
 dmc-table.Table
-  table
-    thead.Table__head
-      tr.Table__headRow
-        td.Table__headCell(each="{ getColumns() }") { title }
-    tbody.Table__body
-      tr(data-is="dmc-table-row" each="{ row in getRows() }" row="{ row }")
+  .Table__head
+    .Table__headRow
+      .Table__headCell(each="{ getColumns() }") { title }
+  .Table__body
+    dmc-table-row(each="{ row in getRows() }" row="{ row }")
 
   script.
     import { forEach } from 'mout/array';
@@ -29,7 +28,4 @@ dmc-table.Table
     }
 
 dmc-table-row.Table__row
-  td(data-is="dmc-table-cell" each="{ cell in opts.row }" cell="{ cell }")
-
-dmc-table-cell.Table__cell
-  | { opts.cell }
+  .Table__cell(each="{ cell in opts.row }") { cell }

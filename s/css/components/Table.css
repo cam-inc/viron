@@ -1,27 +1,33 @@
 .Table {
+  /* TODO: 正しいscroll対応*/
   display: block;
-}
-
-.Table table {
+  width: 0;
+  /*
+  display: table;
   width: 100%;
+*/
   border-spacing: 0;
   border-collapse: collapse;
 }
 
 .Table__head {
+  display: table-header-group;
   background-color: var(--color-basic-gray);
 }
 
 .Table__headRow {
+  display: table-row;
 }
 
 .Table__headCell {
+  display: table-cell;
   padding: 10px 20px;
   font-size: 11px;
   color: var(--color-basic-white);
 }
 
 .Table__row {
+  display: table-row;
   transition-duration: 100ms;
   transition-property: background-color;
 }
@@ -31,10 +37,12 @@
 }
 
 .Table__body {
+  display: table-row-group;
   background-color: var(--color-basic-white);
 }
 
 .Table__cell {
+  display: table-cell;
   padding: 40px 20px;
   font-size: 13px;
   color: var(--color-text-default);
