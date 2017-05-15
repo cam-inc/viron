@@ -25,15 +25,15 @@ func (c *StatsPlanetController) Bar(ctx *app.BarStatsPlanetContext) error {
 	res := &app.Statsplanet{
 		Keys: []string{"Name", "Distance"},
 		Data: [][]interface{}{
-			{"Mercury", 0.387},
-			{"Venus", 0.723},
-			{"Earth", 1.000},
-			{"Mars", 1.524},
-			{"Jupiter", 5.203},
-			{"Saturn", 9.539},
-			{"Uranus", 19.180},
-			{"Neptune", 30.060},
-			{"Pluto", 39.530},
+			{"水星", 0.387},
+			{"金星", 0.723},
+			{"地球", 1.000},
+			{"火星", 1.524},
+			{"木星", 5.203},
+			{"土星", 9.539},
+			{"天王星", 19.180},
+			{"海王星", 30.060},
+			{"冥王星", 39.530},
 		},
 	}
 	return ctx.OK(res)
@@ -169,15 +169,15 @@ func (c *StatsPlanetController) StackedBar(ctx *app.StackedBarStatsPlanetContext
 	res := &app.Statsplanet{
 		Keys: []string{"Name", "Distance"},
 		Data: [][]interface{}{
-			{"Mars", 0.387},
-			{"Mars", 0.723},
-			{"Mars", 1.000},
-			{"Mars", 1.524},
-			{"Saturn", 5.203},
-			{"Saturn", 9.539},
-			{"Pluto", 19.180},
-			{"Pluto", 30.060},
-			{"Pluto", 39.530},
+			{"火星", 0.387},
+			{"火星", 0.723},
+			{"火星", 1.000},
+			{"火星", 1.524},
+			{"土星", 5.203},
+			{"土星", 9.539},
+			{"冥王星", 19.180},
+			{"冥王星", 30.060},
+			{"冥王星", 39.530},
 		},
 	}
 	return ctx.OK(res)

@@ -14,14 +14,14 @@ var UserBlogMediaType = MediaType("application/vnd.user_blog+json", func() {
 	Reference(UserBlogPayload)
 
 	Attributes(func() {
-		Attribute("id", Integer, "user blog id")
-		Attribute("user_id", Integer, "user id")
-		Attribute("title", String, "blog title")
-		Attribute("sub_title", String, "blog sub title")
-		Attribute("genre", String, "blog genre")
-		Attribute("design_id", String, "blog design id")
-		Attribute("created_at", DateTime, "user created date-time")
-		Attribute("updated_at", DateTime, "user updated date-time")
+		Attribute("id", Integer, "ユーザーブログID")
+		Attribute("user_id", Integer)
+		Attribute("title", String)
+		Attribute("sub_title", String)
+		Attribute("genre", String)
+		Attribute("design_id", String)
+		Attribute("created_at", DateTime, "作成日時")
+		Attribute("updated_at", DateTime, "更新日時")
 		Required("id", "user_id", "title", "design_id")
 	})
 
@@ -142,11 +142,23 @@ var _ = Resource("user_blog", func() {
 })
 
 var UserBlogPayload = Type("UserBlogPayload", func() {
-	Member("user_id", Integer)
-	Member("title", String, func() {})
-	Member("sub_title", String, func() {})
-	Member("genre", String, func() {})
+	Member("user_id", Integer, func() {
+		Description("ユーザーID")
+	})
+	Member("title", String, func() {
+		Description("タイトル")
+		Example("user's blog")
+	})
+	Member("sub_title", String, func() {
+		Description("サブタイトル")
+		Example("diary")
+	})
+	Member("genre", String, func() {
+		Description("ジャンル")
+		Example("game")
+	})
 	Member("design_id", String, func() {
+		Description("デザインID")
 		Example(bridge.BlogDesignSimple)
 		Enum(
 			bridge.BlogDesignSimple,

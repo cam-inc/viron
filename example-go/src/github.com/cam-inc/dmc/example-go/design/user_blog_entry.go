@@ -10,14 +10,16 @@ var UserBlogEntryMediaType = MediaType("application/vnd.user_blog_entry+json", f
 	Description("A User Blog Entry")
 	ContentType("application/json")
 
+	Reference(UserBlogEntryPayload)
+
 	Attributes(func() {
-		Attribute("id", Integer, "user blog id")
-		Attribute("user_blog_id", Integer, "user blog id")
-		Attribute("title", String, "blog title")
-		Attribute("content", String, "blog content")
-		Attribute("theme", String, "blog theme")
-		Attribute("created_at", DateTime, "user created date-time")
-		Attribute("updated_at", DateTime, "user updated date-time")
+		Attribute("id", Integer, "ユーザーブログ記事ID")
+		Attribute("user_blog_id", Integer)
+		Attribute("title", String)
+		Attribute("content", String)
+		Attribute("theme", String)
+		Attribute("created_at", DateTime, "作成日時")
+		Attribute("updated_at", DateTime, "更新日時")
 		Required("id", "user_blog_id", "title", "content")
 	})
 
@@ -125,8 +127,18 @@ var _ = Resource("user_blog_entry", func() {
 })
 
 var UserBlogEntryPayload = Type("UserBlogEntryPayload", func() {
-	Member("user_blog_id", Integer)
-	Member("title", String, func() {})
-	Member("content", String, func() {})
-	Member("theme", String, func() {})
+	Member("user_blog_id", Integer, func() {
+		Description("ユーザーブログID")
+	})
+	Member("title", String, func() {
+		Description("タイトル")
+		Example("今日の日記")
+	})
+	Member("content", String, func() {
+		Description("内容")
+	})
+	Member("theme", String, func() {
+		Description("テーマ")
+		Example("diary")
+	})
 })

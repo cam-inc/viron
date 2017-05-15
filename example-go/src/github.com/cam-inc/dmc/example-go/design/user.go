@@ -14,20 +14,20 @@ var UserMediaType = MediaType("application/vnd.user+json", func() {
 	Reference(UserPayload)
 
 	Attributes(func() {
-		Attribute("id", Integer, "id")
-		Attribute("name", String, "user name")
-		Attribute("sex", String, "male or female")
-		Attribute("birthday", DateTime, "user birthday")
-		Attribute("blood_type", String, "blood type")
-		Attribute("job", String, "job")
-		Attribute("home_town", String, "homeTown")
-		Attribute("living_region", String, "living region")
-		Attribute("married", Boolean, "is married")
-		Attribute("appear_area", String, "appear area")
-		Attribute("school", String, "school")
-		Attribute("homepage", String, "homepage")
-		Attribute("created_at", DateTime, "user created date-time")
-		Attribute("updated_at", DateTime, "user updated date-time")
+		Attribute("id", Integer, "ユーザーID")
+		Attribute("name", String)
+		Attribute("sex", String)
+		Attribute("birthday", DateTime)
+		Attribute("blood_type", String)
+		Attribute("job", String)
+		Attribute("home_town", String)
+		Attribute("living_region", String)
+		Attribute("married", Boolean)
+		Attribute("appear_area", String)
+		Attribute("school", String)
+		Attribute("homepage", String)
+		Attribute("created_at", DateTime, "作成日時")
+		Attribute("updated_at", DateTime, "更新日時")
 		Required("id", "name")
 	})
 
@@ -140,14 +140,21 @@ var _ = Resource("user", func() {
 })
 
 var UserPayload = Type("UserPayload", func() {
-	Member("name", String)
+	Member("name", String, func() {
+		Description("名前")
+		Example("山田 太郎")
+	})
 	Member("sex", String, func() {
+		Description("性別")
+		Example(bridge.UserMale)
 		Enum(
 			bridge.UserMale,
 			bridge.UserFemale,
 		)
 	})
 	Member("blood_type", String, func() {
+		Description("血液型")
+		Example(bridge.UserBloodTypeA)
 		Enum(
 			bridge.UserBloodTypeA,
 			bridge.UserBloodTypeB,
@@ -155,14 +162,38 @@ var UserPayload = Type("UserPayload", func() {
 			bridge.UserBloodTypeAB,
 		)
 	})
-	Member("birthday", DateTime)
-	Member("job", String)
-	Member("home_town", String)
-	Member("living_region", String)
-	Member("married", Boolean)
-	Member("appear_area", String)
-	Member("school", String)
-	Member("homepage", String)
+	Member("birthday", DateTime, func() {
+		Description("誕生日")
+		Example("1995-05-12T09:45:56Z")
+	})
+	Member("job", String, func() {
+		Description("職業")
+		Example("大学生")
+	})
+	Member("home_town", String, func() {
+		Description("出身地")
+		Example("静岡県")
+	})
+	Member("living_region", String, func() {
+		Description("地域")
+		Example("渋谷")
+	})
+	Member("married", Boolean, func() {
+		Description("未既婚")
+		Example(false)
+	})
+	Member("appear_area", String, func() {
+		Description("出没地")
+		Example("東京")
+	})
+	Member("school", String, func() {
+		Description("出身校")
+		Example("東京○○大学")
+	})
+	Member("homepage", String, func() {
+		Description("ホームページURL")
+		Example("http://test.com/index.html")
+	})
 
 	Required("name")
 })

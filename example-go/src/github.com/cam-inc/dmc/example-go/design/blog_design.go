@@ -13,12 +13,12 @@ var BlogDesignMediaType = MediaType("application/vnd.blog_design+json", func() {
 	Reference(BlogDesignPayload)
 
 	Attributes(func() {
-		Attribute("id", String, "blog design id")
-		Attribute("name", String, "blog design name")
-		Attribute("base_color", String, "base color of blog design")
-		Attribute("background_image", String, "background image of blog design")
-		Attribute("created_at", DateTime, "created time")
-		Attribute("updated_at", DateTime, "updated time")
+		Attribute("id", String)
+		Attribute("name", String)
+		Attribute("base_color", String)
+		Attribute("background_image", String)
+		Attribute("created_at", DateTime, "作成日時")
+		Attribute("updated_at", DateTime, "更新日時")
 	})
 
 	largeView := func() {
@@ -124,9 +124,21 @@ var _ = Resource("blog_design", func() {
 })
 
 var BlogDesignPayload = Type("BlogDesignPayload", func() {
-	Member("id", String, func() {})
-	Member("name", String, func() {})
-	Member("base_color", String, func() {})
-	Member("background_image", String, func() {})
+	Member("id", String, func() {
+		Description("デザインID")
+		Example("des_001")
+	})
+	Member("name", String, func() {
+		Description("名前")
+		Example("design name")
+	})
+	Member("base_color", String, func() {
+		Description("ベースカラー")
+		Example("blue")
+	})
+	Member("background_image", String, func() {
+		Description("背景画像")
+		Example("http://hoge.com/a.png")
+	})
 	Required("id", "name", "base_color")
 })
