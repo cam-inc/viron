@@ -1,14 +1,22 @@
 import constants from '../../core/constants';
 
+import location from './location';
 import drawer from './drawer';
 import dmc from './dmc';
 import current from './current';
+import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
+import components from './components';
 import toast from './toast';
 import modal from './modal';
-import endpoint from './endpoint';
+import endpoints from './endpoints';
+import auth from './auth';
 
 export default {
+  [constants.GETTER_LOCATION]: location._,
+  [constants.GETTER_LOCATION_TAG]: location.tag,
+  [constants.GETTER_LOCATION_DMCPAGE]: location.dmcPage,
+
   [constants.GETTER_DRAWER_OPENED]: drawer.opened,
   [constants.GETTER_DRAWER_ENABLED]: drawer.enabled,
 
@@ -18,16 +26,24 @@ export default {
   [constants.GETTER_DMC_DASHBOARD]: dmc.dashboard,
   [constants.GETTER_DMC_MANAGE]: dmc.manage,
 
-  [constants.GETTER_CURRENT]: current.show,
+  [constants.GETTER_CURRENT]: current._,
 
-  [constants.GETTER_PAGE_GET]: page.show,
+  [constants.GETTER_OAUTHENDPOINTKEY]: oauthEndpointKey._,
+
+  [constants.GETTER_PAGE]: page._,
+  [constants.GETTER_PAGE_NAME]: page.name,
+  [constants.GETTER_PAGE_COMPONENTS]: page.components,
+
+  [constants.GETTER_COMPONENTS_ONE]: components.one,
 
   [constants.GETTER_TOAST_LIST]: toast.list,
 
   [constants.GETTER_MODAL_LIST]: modal.list,
 
-  [constants.GETTER_ENDPOINT_LIST]: endpoint.list,
-  [constants.GETTER_ENDPOINT_ONE]: endpoint.one,
-  [constants.GETTER_ENDPOINT_NEXT_KEY]: endpoint.nextKey,
+  [constants.GETTER_ENDPOINTS]: endpoints._,
+  [constants.GETTER_ENDPOINTS_ONE]: endpoints.one,
+  [constants.GETTER_ENDPOINTS_NEXT_KEY]: endpoints.nextKey,
+
+  [constants.GETTER_AUTH_SIGN_IN_SHOW_KEY]: auth.signinShowKey
 
 };

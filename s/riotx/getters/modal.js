@@ -1,5 +1,5 @@
 export default {
   list: context => {
-    return context.state.modal.list;
+    return context.state.modals;
   }
 };

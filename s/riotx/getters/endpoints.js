@@ -13,17 +13,17 @@ const number2alphabet = (str) => {
 };
 
 export default {
-  list: context => {
-    return context.state.endpoint;
+  _: context => {
+    return context.state.endpoints;
   },
-  nextKey: (context) => {
-    return number2alphabet(keys(context.state.endpoint).length + 1);
-  },
+
   one: (context, key) => {
-    const endpoints = context.state.endpoint;
-    if (!endpoints || !endpoints[key]) {
-      return {};
-    }
+    const endpoints = context.state.endpoints;
     return endpoints[key];
+  },
+
+  nextKey: (context) => {
+    return number2alphabet(keys(context.state.endpoints).length + 1);
   }
+
 };

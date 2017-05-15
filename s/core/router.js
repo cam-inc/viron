@@ -1,6 +1,7 @@
 import { filter, find, forEach } from 'mout/array';
 import pathToRegexp from 'path-to-regexp';
 import createHashHistory from 'history/createHashHistory';
+import constants from './constants';
 
 class Router {
   constructor() {
@@ -9,7 +10,7 @@ class Router {
      * @private
      * @type {Object|null}
      */
-    this._history = createHashHistory();
+    this._history = null;
 
     /**
      * routing definitions.
@@ -17,6 +18,12 @@ class Router {
      * @type {Array}
      */
     this._routes = [];
+
+    /**
+     * riotx store instance.
+     * @type {riotx.Store}
+     */
+    this._store = null;
 
     /**
      * function to stop listening for the changes.
@@ -44,10 +51,20 @@ class Router {
   }
 
   /**
+   * set riotx.store
+   * @param {Store} store
+   */
+  setStore(store) {
+    this._store = store;
+    return this;
+  }
+
+  /**
    * start listening for changes to the current location.
    * @param {Boolean} autoExec to decide whether routing is executed with the current url.
    */
   start(autoExec = true) {
+    this._history = createHashHistory();
     this._unlistener = this._history.listen((location, action) => {
       this._change(location, action);
     });
@@ -111,17 +128,33 @@ class Router {
    * @param {Boolean} forceChange
    */
   navigateTo(path, forceChange = false) {
-    if (forceChange && this.getCurrentLocation().pathname === path) {
-      this.refresh();
-      return;
-    }
+    return Promise
+      .resolve()
+      .then(() => {
+        if (path !== '/') {
+          return Promise.resolve();
+        }
+        const store = this._store;
+        return Promise.all([
+          store.action(constants.ACTION_CURRENT_REMOVE),
+          store.action(constants.ACTION_DMC_REMOVE),
+          store.action(constants.ACTION_PAGE_REMOVE),
+          store.action(constants.ACTION_COMPONENTS_REMOVE_ALL)
+        ]);
+      })
+      .then(() => {
+        if (forceChange && this.getCurrentLocation().pathname === path) {
+          this.refresh();
+          return;
+        }
 
-    if (this.getCurrentLocation().pathname === path) {
-      console.warn('same path is passed.');
-      return;
-    }
+        if (this.getCurrentLocation().pathname === path) {
+          console.warn('same path is passed.');
+          return;
+        }
 
-    this._history.push(path);
+        this._history.push(path);
+      });
   }
 
   /**
@@ -142,6 +175,16 @@ class Router {
 
   refresh() {
     this._change(this.getCurrentLocation(), this.getCurrentAction());
+  }
+
+  /**
+   * hash version of `location.href`.
+   * @param {String} pathname
+   */
+  createHref(pathname) {
+    return this._history.createHref({
+      pathname
+    });
   }
 
   resolveCurrentPath(pattern) {

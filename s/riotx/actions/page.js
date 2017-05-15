@@ -3,14 +3,21 @@ import constants from '../../core/constants';
 
 export default {
   get: (context, id) => {
-    return new Promise((resolve) => {
-      const page = find(context.state.dmc.pages, (v) => {
-        return v.id.get() === id
+    return Promise
+      .resolve()
+      .then(() => {
+        const page = find(context.state.dmc.pages, v => {
+          return v.id.get() === id;
+        });
+        context.commit(constants.MUTATION_PAGE, page);
       });
-      resolve(page);
-
-    }).then(res => {
-      context.commit(constants.MUTATION_PAGE, res);
-    });
   },
+
+  remove: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants.MUTATION_PAGE, null);
+      });
+  }
 };

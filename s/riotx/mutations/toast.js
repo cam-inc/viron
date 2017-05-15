@@ -17,23 +17,23 @@ export default {
     const data = ObjectAssign({
       type: TOAST_TYPE_NORMAL,
       timeout: TOAST_TIMEOUT,
-      autoHide: TOAST_AUTO_HIDE,
+      autoHide: TOAST_AUTO_HIDE
     }, obj, {
       id: generateID()
     });
 
     console.log('add toast', data); // TODO
 
-    context.state.toast.push(data);
-    context.state.toast = storage.set(constants.STORAGE_TOAST, context.state.toast);
+    context.state.toasts.push(data);
+    storage.set(constants.STORAGE_TOAST, context.state.toasts);
     return [constants.CHANGE_TOAST];
   },
 
   remove: (context, toastID) => {
-    context.state.toast = reject(context.state.toast, toast => {
+    context.state.toasts = reject(context.state.toasts, toast => {
       return toast.id === toastID;
     });
-    context.state.toast = storage.set(constants.STORAGE_TOAST, context.state.toast);
+    storage.set(constants.STORAGE_TOAST, context.state.toasts);
 
     return [constants.CHANGE_TOAST];
   }

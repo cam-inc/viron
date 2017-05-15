@@ -11,12 +11,12 @@ export default {
 
     let merge = swagger.mergePropertiesAndResponse(schema, responseObj);
 
-    context.state.component[params.component_uid] = context.state.component[params.component_uid] || {};
-    context.state.component[params.component_uid].data = merge;
+    context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
+    context.state.components[params.component_uid].data = merge;
     // `component.pagination` value indicates whether the component supports pagination or not.
     // if supported then manually add pagination information from headers.
     if (params.component.pagination.get()) {
-      context.state.component[params.component_uid].pagination = {
+      context.state.components[params.component_uid].pagination = {
         currentPage: Number(params.response.headers['x-pagination-current-page'] || 0),
         size: Number(params.response.headers['x-pagination-limit'] || 0),
         maxPage: Number(params.response.headers['x-pagination-total-pages'] || 0)
@@ -25,7 +25,7 @@ export default {
     // `component.query`(array) value indicates whether the component supports searching or not.
     // if supported then manually add pagination information from headers.
     if (params.component.query.length && !!params.component.query.length) {
-      context.state.component[params.component_uid].search = params.component.query;
+      context.state.components[params.component_uid].search = params.component.query;
     }
     // manually add paths that component can execute.
     const actions = [];
@@ -40,17 +40,22 @@ export default {
         }
       });
     });
-    context.state.component[params.component_uid].selfActions = map(filter(actions, action => {
+    context.state.components[params.component_uid].selfActions = map(filter(actions, action => {
       return action.isSelf;
     }), action => {
       return action.operationObject;
     });
-    context.state.component[params.component_uid].childActions = map(filter(actions, action => {
+    context.state.components[params.component_uid].childActions = map(filter(actions, action => {
       return !action.isSelf;
     }), action => {
       return action.operationObject;
     });
 
-    return [constants.changeComponentName(params.component_uid)];
+    return [constants.changeComponentsName(params.component_uid)];
+  },
+
+  removeAll: context => {
+    context.state.components = {};
+    return [constants.CHANGE_COMPONENTS];
   }
 };

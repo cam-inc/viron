@@ -1,5 +1,5 @@
 dmc-toast(class="Toast Toast--{ opts.type }" click="{ handleClick }")
-  div { opts.id } / { opts.type} / { opts.message }
+  div { opts.message }
 
   script.
     import constants from '../../core/constants';

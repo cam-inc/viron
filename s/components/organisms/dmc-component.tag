@@ -47,7 +47,7 @@ dmc-component.Component
     this.updater = (query = {}) => {
       this.isPending = true;
       this.update();
-      store.action(constants.ACTION_COMPONENT_GET, this._riot_id, this.opts.idx, query);
+      store.action(constants.ACTION_COMPONENTS_GET, this._riot_id, this.opts.idx, query);
     };
 
     this.on('mount', () => {
@@ -55,21 +55,20 @@ dmc-component.Component
       setTimeout(() => {
         this.updater();
       }, 1000);
-      //store.action(constants.ACTION_COMPONENT_GET, this._riot_id, this.opts.idx);
     });
 
     this.on('unmount', () => {
-      // TODO: ここに処理が来ない。。why...
       // TODO: state.component内の対象物を削除する？
     });
 
-    store.change(constants.changeComponentName(this._riot_id), (err, state, store) => {
+    store.change(constants.changeComponentsName(this._riot_id), (err, state, store) => {
       this.isPending = false;
-      this.data = state.component[this._riot_id].data;
-      this.pagination = state.component[this._riot_id].pagination;
-      this.search = state.component[this._riot_id].search;
-      this.selfActions = state.component[this._riot_id].selfActions;
-      this.childActions = state.component[this._riot_id].childActions;
+      const component = store.getter(constants.GETTER_COMPONENTS_ONE, this._riot_id);
+      this.data = component.data;
+      this.pagination = component.pagination;
+      this.search = component.search;
+      this.selfActions = component.selfActions;
+      this.childActions = component.childActions;
       this.update();
     });
 

@@ -33,7 +33,7 @@ export default {
       const operationObject = swagger.client.spec.paths[path][method];
       const api = swagger.getApiByOperationID(operationObject.operationId);
 
-      const token = context.getter(constants.GETTER_ENDPOINT_ONE, context.getter(constants.GETTER_CURRENT)).token;
+      const token = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
 
       // TODO get only support
       api(query, {
@@ -63,13 +63,13 @@ export default {
           reject(err);
         });
     }).then(res => {
-      context.commit(constants.MUTATION_COMPONENT_ONE, res);
+      context.commit(constants.MUTATION_COMPONENTS_ONE, res);
     });
   },
 
   operate: (context, operationObject, query) => {
     const api = swagger.getApiByOperationID(operationObject.operationId);
-    const token = context.getter(constants.GETTER_ENDPOINT_ONE, context.getter(constants.GETTER_CURRENT)).token;
+    const token = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
 
     // TODO: 共通化したいな
     return api(query, {
@@ -82,6 +82,14 @@ export default {
         console.log('Interceptor(response):', res);
       }
     });
+  },
+
+  removeAll: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants.MUTATION_COMPONENTS_REMOVE_ALL);
+      });
   }
 
 };

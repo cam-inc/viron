@@ -29,8 +29,9 @@ dmc-signin.Signin
     }
 
     handleEmailSigninClick(email, password, authtype) {
-      store
-        .action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, authtype, email, password)
+      Promise
+        .resolve()
+        .then(() => store.action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, authtype, email, password))
         .then(() => {
           this.closeModal();
           this.opts.onSignIn();
@@ -39,12 +40,18 @@ dmc-signin.Signin
           store.action(constants.ACTION_TOAST_SHOW, {
             message: err.message
           });
-        })
-      ;
+        });
     }
 
     handleOAuthClick(authtype) {
-      store.action(constants.ACTION_AUTH_SIGN_IN_GOOGLE, this.opts.key, authtype);
+      Promise
+        .resolve()
+        .then(() => store.action(constants.ACTION_AUTH_SIGN_IN_OAUTH, this.opts.key, authtype))
+        .catch(err => {
+          store.action(constants.ACTION_TOAST_SHOW, {
+            message: err.message
+          });
+        });
     }
 
 dmc-signinemail.Signin__email

@@ -21,7 +21,7 @@ dmc-devtool
     };
 
     handleResetEndpointsButtonClick() {
-      store.action(constants.ACTION_ENDPOINT_REMOVE_ALL);
+      store.action(constants.ACTION_ENDPOINTS_REMOVE_ALL);
     }
 
     handleShowToastButtonClick() {

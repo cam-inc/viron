@@ -35,7 +35,7 @@ dmc-entry.Entry
 
     // TODO: 上書きの場合は、そもそも登録ボタンを押せなくする
     handleRegisterButtonClick() {
-      store.action(constants.ACTION_ENDPOINT_ADD, this.endpointURL, this.memo)
+      store.action(constants.ACTION_ENDPOINTS_ADD, this.endpointURL, this.memo)
       .then(() => {
         this.closeModal();
       }).catch(err => {

@@ -1,5 +1,5 @@
 export default {
-  show: context => {
+  _: context => {
     return context.state.current;
   }
 };

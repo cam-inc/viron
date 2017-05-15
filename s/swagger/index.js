@@ -11,20 +11,18 @@ import constants from '../core/constants';
 class Swagger {
 
   constructor() {
-    this._endpoint = null;
     this.client = null;
   }
 
   setup(endpoint) {
-
     return new Promise((resolve, reject) => {
       const request = {
-        url: endpoint.url || 'http://localhost:3000/swagger.json',
+        url: endpoint.url,
         //query,
         //method,
         //body,
         headers: {
-          'Authorization': endpoint.token,
+          'Authorization': endpoint.token
         },
         requestInterceptor: (req) => {
           console.log('Interceptor(request):', req);
@@ -34,29 +32,33 @@ class Swagger {
         }
       };
 
-      this._endpoint = SwaggerClient.http(request);
+      debugger;
+      SwaggerClient
+        .http(request)
+        .then(client => {
+          debugger;
+          if (client.errors && client.errors.length > 0) {
+            return reject(client.errors);
+          }
+          if (client.status === 401) {
+            // TODO: 要確認。
+            const err = new Error();
+            err.name = '401 Authorization Required';
+            err.status = client.spec.status;
+            return reject(err);
+          }
 
-      this._endpoint.then(client => {
-        if (client.errors && 0 < client.errors.length) {
-          return reject(client.errors);
-        }
-        if (client.status === 401) {
-          const err = new Error()
-          err.name = '401 Authorization Required';
-          err.status = client.spec.status;
-          return reject(err);
-        }
+          console.log(`[fetch] ${client.url} success.`);
 
-        console.log(`[fetch] ${client.url} success.`);
-
-        SwaggerClient({spec: client.body}).then((_client) => {
-          this.client = _client;
-          resolve();
+          SwaggerClient({spec: client.body}).then((_client) => {
+            this.client = _client;
+            resolve();
+          });
+        })
+        .catch(err => {
+          debugger;
+          reject(err);
         });
-
-      }).catch(err => {
-        return reject(err);
-      });
     });
   }
 

@@ -5,23 +5,26 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_ENDPOINT);
+        context.commit(constants.MUTATION_ENDPOINTS);
       });
   },
+
   remove: (context, key) => {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_ENDPOINT_REMOVE, key);
+        context.commit(constants.MUTATION_ENDPOINTS_REMOVE, key);
       });
   },
+
   removeAll: (context) => {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_ENDPOINT_REMOVE_ALL);
+        context.commit(constants.MUTATION_ENDPOINTS_REMOVE_ALL);
       });
   },
+
   add: (context, url, memo) => {
     return fetch(url)
       .then(() => {
@@ -31,7 +34,7 @@ export default {
         return;
       })
       .then(() => {
-        const key = context.getter(constants.GETTER_ENDPOINT_NEXT_KEY);
+        const key = context.getter(constants.GETTER_ENDPOINTS_NEXT_KEY);
         const newEndpoint = {
           url: url,
           memo: memo,
@@ -49,7 +52,7 @@ export default {
         };
       })
       .then((res) => {
-        context.commit(constants.MUTATION_ENDPOINT_ADD, res.key, res.endpoint);
+        context.commit(constants.MUTATION_ENDPOINTS_ADD, res.key, res.endpoint);
       });
   }
 };

@@ -1,8 +1,8 @@
 import constants from '../../core/constants';
 
 export default {
-  show: function (context, obj) {
-    context.state.page = obj;
+  _: function (context, page) {
+    context.state.page = page;
     return [constants.CHANGE_PAGE];
-  },
+  }
 };

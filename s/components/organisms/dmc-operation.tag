@@ -32,7 +32,7 @@ dmc-operation.Operation
     handleExecuteButtonClick() {
       Promise
         .resolve()
-        .then(() => store.action(constants.ACTION_COMPONENT_OPERATE, this.opts.operation, this.queries))
+        .then(() => store.action(constants.ACTION_COMPONENTS_OPERATE, this.opts.operation, this.queries))
         .then(() => {
           this.closeModal();
           this.opts.onSuccess();

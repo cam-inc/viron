@@ -7,7 +7,7 @@ const generateID = () => {
 
 export default {
   add: (context, tagName, tagOpts = {}, modalOpts = {}) => {
-    context.state.modal.list.push({
+    context.state.modals.push({
       id : generateID(),
       tagName,
       tagOpts,
@@ -17,7 +17,7 @@ export default {
   },
 
   remove: (context, modalID) => {
-    context.state.modal.list = reject(context.state.modal.list, modal => {
+    context.state.modals = reject(context.state.modals, modal => {
       if (modal.id === modalID) {
         return true;
       }

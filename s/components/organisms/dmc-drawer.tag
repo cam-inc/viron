@@ -1,13 +1,13 @@
 dmc-drawer.Drawer
   .Drawer__head
     .media.Drawer__endpoint
-      .media__image.Drawer__endpointImage(style="background-image:url({ endpoint.thumbnail })")
+      .media__image.Drawer__endpointImage(if="{ !!endpoint }" style="background-image:url({ endpoint.thumbnail })")
       .media__body.Drawer__endpointBody
         .Drawer__endpointBodyHead
-          .Drawer__endpointTitle { endpoint.name }
-          .Drawer__endpointHost { endpoint.url }
+          .Drawer__endpointTitle(if="{ !!endpoint }") { endpoint.name }
+          .Drawer__endpointHost(if="{ !!endpoint }") { endpoint.url }
         .Drawer__endpointBodyTail
-          .Drawer__endpointDescription { endpoint.description }
+          .Drawer__endpointDescription(if="{ !!endpoint }") { endpoint.description }
     .Drawer__closeButton(click="{ handleCloseButtonClick }")
       dmc-icon(type="close")
   .Drawer__body
@@ -27,7 +27,7 @@ dmc-drawer.Drawer
     import router from '../../core/router';
     import '../atoms/dmc-icon.tag';
 
-    let store = this.riotx.get();
+    const store = this.riotx.get();
 
     const group = (items) => {
       const groups = {};
@@ -56,15 +56,15 @@ dmc-drawer.Drawer
       return ret;
     }
 
-    this.endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, store.getter(constants.GETTER_CURRENT));
+    this.endpoint = store.getter(constants.GETTER_ENDPOINTS_ONE, store.getter(constants.GETTER_CURRENT));
     const dashboard = store.getter(constants.GETTER_DMC_DASHBOARD);
     const manage = store.getter(constants.GETTER_DMC_MANAGE);
     this.groupedDashboard = group(dashboard);
     this.groupedManage = group(manage);
 
-    store.change(constants.CHANGE_ENDPOINT, (err, state, store) => {
+    store.change(constants.CHANGE_ENDPOINTS, (err, state, store) => {
       const current = store.getter(constants.GETTER_CURRENT);
-      this.endpoint = store.getter(constants.GETTER_ENDPOINT_ONE, current);
+      this.endpoint = store.getter(constants.GETTER_ENDPOINTS_ONE, current);
       this.update();
     });
 

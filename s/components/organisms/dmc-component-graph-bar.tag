@@ -33,6 +33,5 @@ dmc-component-graph-bar.ComponentGraphBar
     });
 
     this.on('unmount', () => {
-      // TODO: ここに処理が来ない。。why...
       // TODO: dispose chart.
     });
