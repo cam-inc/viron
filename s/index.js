@@ -97,13 +97,7 @@ const setupRouter = (store) => {
             return Promise
               .resolve()
               .then(() => swagger.setup(endpoint))
-              .then(() => {
-                debugger;
-              })
-              .then(() => store.action(constants.ACTION_DMC_GET))
-              .then(() => {
-                debugger;
-              });
+              .then(() => store.action(constants.ACTION_DMC_GET));
           })
           .then(() => {
             const dmcPage = params.page;
@@ -126,7 +120,6 @@ const setupRouter = (store) => {
             }
             return store.action(constants.ACTION_LOCATION_SET, tag, dmcPage);
           }).catch((err) => {
-            debugger;
             // TODO: 動作確認すること。
             if (err.status === 401) {
               store.action(constants.ACTION_AUTH_SIGN_IN_SHOW);
@@ -150,12 +143,10 @@ const setupRouter = (store) => {
 
 // entry point!!
 document.addEventListener('DOMContentLoaded', () => {
-  debugger;
   Promise
     .resolve()
     .then(() => setupStore())
     .then(store => {
-      debugger;
       const oauthEndpointKey = store.getter(constants.GETTER_OAUTHENDPOINTKEY);
       const token = new URL(decodeURIComponent(location.href)).searchParams.get(constants.QUERYSTRING_KEY_TOKEN);
       if (token) {

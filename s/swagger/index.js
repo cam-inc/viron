@@ -32,11 +32,9 @@ class Swagger {
         }
       };
 
-      debugger;
       SwaggerClient
         .http(request)
         .then(client => {
-          debugger;
           if (client.errors && client.errors.length > 0) {
             return reject(client.errors);
           }
@@ -56,7 +54,6 @@ class Swagger {
           });
         })
         .catch(err => {
-          debugger;
           reject(err);
         });
     });
