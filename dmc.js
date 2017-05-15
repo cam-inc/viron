@@ -3535,10 +3535,7 @@ var _dontEnums;
 
     var forIn_1 = forIn;
 
-/**
-     * return a list of all enumerable properties that have function values
-     */
-    function functions(obj){
+function functions(obj){
         var keys = [];
         forIn_1(obj, function(val, key){
             if (typeof val === 'function'){
@@ -3582,14 +3579,7 @@ var _dontEnums;
 
     var slice_1 = slice;
 
-/**
-     * Return a function that will execute in the given context, optionally adding any additional supplied parameters to the beginning of the arguments collection.
-     * @param {Function} fn  Function.
-     * @param {object} context   Execution context.
-     * @param {rest} args    Arguments (0...n arguments).
-     * @return {Function} Wrapped Function.
-     */
-    function bind(fn, context, args){
+function bind(fn, context, args){
         var argsArr = slice_1(arguments, 2); //curried args
         return function(){
             return fn.apply(context, argsArr.concat(slice_1(arguments)));
@@ -3618,10 +3608,7 @@ var _dontEnums;
 
     var forEach_1 = forEach;
 
-/**
-     * Binds methods of the object to be run in it's own context.
-     */
-    function bindAll(obj, rest_methodNames){
+function bindAll(obj, rest_methodNames){
         var keys = arguments.length > 1?
                     slice_1(arguments, 1) : functions_1(obj);
         forEach_1(keys, function(key){
@@ -3631,12 +3618,7 @@ var _dontEnums;
 
     var bindAll_1 = bindAll;
 
-/**
-     * Similar to Array/forEach but works over object properties and fixes Don't
-     * Enum bug on IE.
-     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
-     */
-    function forOwn(obj, fn, thisObj){
+function forOwn(obj, fn, thisObj){
         forIn_1(obj, function(val, key){
             if (hasOwn_1(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
@@ -3684,17 +3666,12 @@ var UNDEF;
     }
     var kindOf_1 = kindOf;
 
-/**
-     * Check if value is from a specific "kind".
-     */
-    function isKind(val, kind){
+function isKind(val, kind){
         return kindOf_1(val) === kind;
     }
     var isKind_1 = isKind;
 
-/**
-     */
-    var isArray = Array.isArray || function (val) {
+var isArray = Array.isArray || function (val) {
         return isKind_1(val, 'Array');
     };
     var isArray_1 = isArray;
@@ -3751,12 +3728,7 @@ function containsMatch(array, pattern) {
 
     var deepMatches_1 = deepMatches;
 
-/**
-     * Converts argument into a valid iterator.
-     * Used internally on most array/object/collection methods that receives a
-     * callback/iterator providing a shortcut syntax.
-     */
-    function makeIterator(src, thisObj){
+function makeIterator(src, thisObj){
         if (src == null) {
             return identity_1;
         }
@@ -3780,10 +3752,7 @@ function containsMatch(array, pattern) {
 
     var makeIterator_ = makeIterator;
 
-/**
-     * Object some
-     */
-    function some(obj, callback, thisObj) {
+function some(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var result = false;
         forOwn_1(obj, function(val, key) {
@@ -3797,10 +3766,7 @@ function containsMatch(array, pattern) {
 
     var some_1 = some;
 
-/**
-     * Check if object contains value
-     */
-    function contains(obj, needle) {
+function contains(obj, needle) {
         return some_1(obj, function(val) {
             return (val === needle);
         });
@@ -3817,10 +3783,7 @@ function containsMatch(array, pattern) {
 
     var isPlainObject_1 = isPlainObject;
 
-/**
-     * Deeply copy missing properties in the target from the defaults.
-     */
-    function deepFillIn(target, defaults){
+function deepFillIn(target, defaults){
         var i = 0,
             n = arguments.length,
             obj;
@@ -3846,11 +3809,7 @@ function containsMatch(array, pattern) {
 
     var deepFillIn_1 = deepFillIn;
 
-/**
-     * Mixes objects into the target object, recursively mixing existing child
-     * objects.
-     */
-    function deepMixIn(target, objects) {
+function deepMixIn(target, objects) {
         var i = 0,
             n = arguments.length,
             obj;
@@ -3876,10 +3835,7 @@ function containsMatch(array, pattern) {
 
     var deepMixIn_1 = deepMixIn;
 
-/**
-     * Object every
-     */
-    function every(obj, callback, thisObj) {
+function every(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var result = true;
         forOwn_1(obj, function(val, key) {
@@ -3895,9 +3851,7 @@ function containsMatch(array, pattern) {
 
     var every_1 = every;
 
-/**
-     */
-    function isObject$1(val) {
+function isObject$1(val) {
         return isKind_1(val, 'Object');
     }
     var isObject_1 = isObject$1;
@@ -3922,9 +3876,7 @@ function containsMatch(array, pattern) {
 
     var is_1 = is;
 
-// Makes a function to compare the object values from the specified compare
-    // operation callback.
-    function makeCompare(callback) {
+function makeCompare(callback) {
         return function(value, key) {
             return hasOwn_1(this, key) && callback(value, this[key]);
         };
@@ -3950,10 +3902,7 @@ function containsMatch(array, pattern) {
 
     var equals_1 = equals;
 
-/**
-     * Copy missing properties in the obj from the defaults.
-     */
-    function fillIn(obj, var_defaults){
+function fillIn(obj, var_defaults){
         forEach_1(slice_1(arguments, 1), function(base){
             forOwn_1(base, function(val, key){
                 if (obj[key] == null) {
@@ -3966,11 +3915,7 @@ function containsMatch(array, pattern) {
 
     var fillIn_1 = fillIn;
 
-/**
-     * Creates a new object with all the properties where the callback returns
-     * true.
-     */
-    function filterValues(obj, callback, thisObj) {
+function filterValues(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var output = {};
         forOwn_1(obj, function(value, key, obj) {
@@ -3983,10 +3928,7 @@ function containsMatch(array, pattern) {
     }
     var filter = filterValues;
 
-/**
-     * Returns first item that matches criteria
-     */
-    function find$1(obj, callback, thisObj) {
+function find$1(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var result;
         some_1(obj, function(value, key, obj) {
@@ -4000,11 +3942,7 @@ function containsMatch(array, pattern) {
 
     var find_1 = find$1;
 
-/*
-     * Helper function to flatten to a destination object.
-     * Used to remove the need to create intermediate objects while flattening.
-     */
-    function flattenTo(obj, result, prefix, level) {
+function flattenTo(obj, result, prefix, level) {
         forOwn_1(obj, function (value, key) {
             var nestedPrefix = prefix ? prefix + '.' + key : key;
 
@@ -4038,10 +3976,7 @@ function containsMatch(array, pattern) {
      * Checks if the object is a primitive
      */
 
-/**
-     * get "nested" object property
-     */
-    function get$1(obj, prop){
+function get$1(obj, prop){
         var parts = prop.split('.'),
             last = parts.pop();
 
@@ -4066,10 +4001,7 @@ var UNDEF$1;
 
     var has_1 = has;
 
-/**
-     * Get object keys
-     */
-     var keys = Object.keys || function (obj) {
+var keys = Object.keys || function (obj) {
             var keys = [];
             forOwn_1(obj, function(val, key){
                 keys.push(key);
@@ -4079,11 +4011,7 @@ var UNDEF$1;
 
     var keys_1 = keys;
 
-/**
-     * Creates a new object where all the values are the result of calling
-     * `callback`.
-     */
-    function mapValues(obj, callback, thisObj) {
+function mapValues(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var output = {};
         forOwn_1(obj, function(val, key, obj) {
@@ -4094,10 +4022,7 @@ var UNDEF$1;
     }
     var map = mapValues;
 
-/**
-     * checks if a object contains all given properties/values
-     */
-    function matches(target, props){
+function matches(target, props){
         // can't use "object/every" because of circular dependency
         var result = true;
         forOwn_1(props, function(val, key){
@@ -4111,10 +4036,7 @@ var UNDEF$1;
 
     var matches_1 = matches;
 
-/**
-     * Return maximum value inside array
-     */
-    function max$1(arr, iterator, thisObj){
+function max$1(arr, iterator, thisObj){
         if (arr == null || !arr.length) {
             return Infinity;
         } else if (arr.length && !iterator) {
@@ -4142,10 +4064,7 @@ var UNDEF$1;
 
     var max_1$2 = max$1;
 
-/**
-     * Get object values
-     */
-    function values(obj) {
+function values(obj) {
         var vals = [];
         forOwn_1(obj, function(val, key){
             vals.push(val);
@@ -4155,23 +4074,13 @@ var UNDEF$1;
 
     var values_1 = values;
 
-/**
-     * Returns maximum value inside object.
-     */
-    function max(obj, compareFn) {
+function max(obj, compareFn) {
         return max_1$2(values_1(obj), compareFn);
     }
 
     var max_1 = max;
 
-/**
-    * Combine properties from all the objects into first one.
-    * - This method affects target object in place, if you want to create a new Object pass an empty object as first param.
-    * @param {object} target    Target Object
-    * @param {...object} objects    Objects to be combined (0...n objects).
-    * @return {object} Target Object.
-    */
-    function mixIn(target, objects){
+function mixIn(target, objects){
         var i = 0,
             n = arguments.length,
             obj;
@@ -4190,10 +4099,7 @@ var UNDEF$1;
 
     var mixIn_1 = mixIn;
 
-/**
-     * Clone native types.
-     */
-    function clone$1(val){
+function clone$1(val){
         switch (kindOf_1(val)) {
             case 'Object':
                 return cloneObject$2(val);
@@ -4234,10 +4140,7 @@ var UNDEF$1;
 
     var clone_1 = clone$1;
 
-/**
-     * Recursively clone native types.
-     */
-    function deepClone(val, instanceClone) {
+function deepClone(val, instanceClone) {
         switch ( kindOf_1(val) ) {
             case 'Object':
                 return cloneObject$1(val, instanceClone);
@@ -4275,10 +4178,7 @@ var UNDEF$1;
 
     var deepClone_1 = deepClone;
 
-/**
-     * Deep merge objects.
-     */
-    function merge() {
+function merge() {
         var i = 1,
             key, val, obj, target;
 
@@ -4310,10 +4210,7 @@ var UNDEF$1;
 
     var merge_1 = merge;
 
-/**
-     * Return minimum value inside array
-     */
-    function min$1(arr, iterator, thisObj){
+function min$1(arr, iterator, thisObj){
         if (arr == null || !arr.length) {
             return -Infinity;
         } else if (arr.length && !iterator) {
@@ -4341,19 +4238,13 @@ var UNDEF$1;
 
     var min_1$2 = min$1;
 
-/**
-     * Returns minimum value inside object.
-     */
-    function min(obj, iterator) {
+function min(obj, iterator) {
         return min_1$2(values_1(obj), iterator);
     }
 
     var min_1 = min;
 
-/**
-     * Create nested object if non-existent
-     */
-    function namespace(obj, path){
+function namespace(obj, path){
         if (!path) { return obj; }
         forEach_1(path.split('.'), function(key){
             if (!obj[key]) {
@@ -4392,18 +4283,12 @@ var UNDEF$1;
 
     var indexOf_1 = indexOf;
 
-/**
-     * If array contains values.
-     */
-    function contains$1(arr, val) {
+function contains$1(arr, val) {
         return indexOf_1(arr, val) !== -1;
     }
     var contains_1$2 = contains$1;
 
-/**
-     * Return a copy of the object, filtered to only contain properties except the blacklisted keys.
-     */
-    function omit$1(obj, var_keys){
+function omit$1(obj, var_keys){
         var keys = typeof arguments[1] !== 'string'? arguments[1] : slice_1(arguments, 1),
             out = {};
 
@@ -4417,10 +4302,7 @@ var UNDEF$1;
 
     var omit_1 = omit$1;
 
-/**
-     * Return a copy of the object, filtered to only have values for the whitelisted keys.
-     */
-    function pick$1(obj, var_keys){
+function pick$1(obj, var_keys){
         var keys = typeof arguments[1] !== 'string'? arguments[1] : slice_1(arguments, 1),
             out = {},
             i = 0, key;
@@ -4432,19 +4314,13 @@ var UNDEF$1;
 
     var pick_1 = pick$1;
 
-/**
-     * Extract a list of property values.
-     */
-    function pluck(obj, propName){
+function pluck(obj, propName){
         return map(obj, prop_1(propName));
     }
 
     var pluck_1 = pluck;
 
-/**
-     * Get object size
-     */
-    function size$1(obj) {
+function size$1(obj) {
         var count = 0;
         forOwn_1(obj, function(){
             count++;
@@ -4454,10 +4330,7 @@ var UNDEF$1;
 
     var size_1 = size$1;
 
-/**
-     * Object reduce
-     */
-    function reduce$1(obj, callback, memo, thisObj) {
+function reduce$1(obj, callback, memo, thisObj) {
         var initial = arguments.length > 2;
 
         if (!size_1(obj) && !initial) {
@@ -4479,10 +4352,7 @@ var UNDEF$1;
 
     var reduce_1 = reduce$1;
 
-/**
-     * Object reject
-     */
-    function reject(obj, callback, thisObj) {
+function reject(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         return filter(obj, function(value, index, obj) {
             return !callback(value, index, obj);
@@ -4491,9 +4361,7 @@ var UNDEF$1;
 
     var reject_1 = reject;
 
-/**
-     */
-    function isFunction(val) {
+function isFunction(val) {
         return isKind_1(val, 'Function');
     }
     var isFunction_1 = isFunction;
@@ -4510,10 +4378,7 @@ function result(obj, prop) {
 
     var result_1 = result;
 
-/**
-     * set "nested" object property
-     */
-    function set(obj, prop, val){
+function set(obj, prop, val){
         var parts = (/^(.+)\.(.+)$/).exec(prop);
         if (parts){
             namespace_1(obj, parts[1])[parts[2]] = val;
@@ -4524,10 +4389,7 @@ function result(obj, prop) {
 
     var set_1 = set;
 
-/**
-     * Unset object property.
-     */
-    function unset(obj, prop){
+function unset(obj, prop){
         if (has_1(obj, prop)) {
             var parts = prop.split('.'),
                 last = parts.pop();
@@ -4544,8 +4406,6 @@ function result(obj, prop) {
 
     var unset_1 = unset;
 
-//automatically generated, do not edit!
-//run `node build` instead
 var object = {
     'bindAll' : bindAll_1,
     'contains' : contains_1,
@@ -4760,12 +4620,6 @@ var constants = {
   CHANGE_MODAL: 'modal'
 };
 
-/**
- * Swaggerファイルをロードして解析しデータ/操作を一元管理
- *
- * Tips: swagger-client(swagger-js) は、ブラウザの外部ファイル読み込み
- */
-
 class Swagger {
 
   constructor() {
@@ -4927,10 +4781,7 @@ var swagger = new Swagger();
     }
     var append_1 = append;
 
-/**
-     * Maps the items in the array and concatenates the result arrays.
-     */
-    function collect(arr, callback, thisObj){
+function collect(arr, callback, thisObj){
         callback = makeIterator_(callback, thisObj);
         var results = [];
         if (arr == null) {
@@ -4950,11 +4801,7 @@ var swagger = new Swagger();
 
     var collect_1 = collect;
 
-/**
-     * Combines an array with all the items of another.
-     * Does not allow duplicates and is case and type sensitive.
-     */
-    function combine(arr1, arr2) {
+function combine(arr1, arr2) {
         if (arr2 == null) {
             return arr1;
         }
@@ -4970,10 +4817,7 @@ var swagger = new Swagger();
     }
     var combine_1 = combine;
 
-/**
-     * Array filter
-     */
-    function filter$3(arr, callback, thisObj) {
+function filter$3(arr, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var results = [];
         if (arr == null) {
@@ -4993,10 +4837,7 @@ var swagger = new Swagger();
 
     var filter_1 = filter$3;
 
-/**
-     * Remove all null/undefined items from array.
-     */
-    function compact(arr) {
+function compact(arr) {
         return filter_1(arr, function(val){
             return (val != null);
         });
@@ -5004,10 +4845,7 @@ var swagger = new Swagger();
 
     var compact_1 = compact;
 
-/**
-     * @return {array} Array of unique items
-     */
-    function unique$1(arr, compare){
+function unique$1(arr, compare){
         compare = compare || isEqual;
         return filter_1(arr, function(item, i, arr){
             var n = arr.length;
@@ -5026,10 +4864,7 @@ var swagger = new Swagger();
 
     var unique_1 = unique$1;
 
-/**
-     * Array some
-     */
-    function some$2(arr, callback, thisObj) {
+function some$2(arr, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var result = false;
         if (arr == null) {
@@ -5051,10 +4886,7 @@ var swagger = new Swagger();
 
     var some_1$2 = some$2;
 
-/**
-     * Return a new Array with elements that aren't present in the other Arrays.
-     */
-    function difference(arr) {
+function difference(arr) {
         var arrs = slice_1(arguments, 1),
             result = filter_1(unique_1(arr), function(needle){
                 return !some_1$2(arrs, function(haystack){
@@ -5066,10 +4898,7 @@ var swagger = new Swagger();
 
     var difference_1 = difference;
 
-/**
-     * Array every
-     */
-    function every$2(arr, callback, thisObj) {
+function every$2(arr, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var result = true;
         if (arr == null) {
@@ -5091,10 +4920,7 @@ var swagger = new Swagger();
 
     var every_1$2 = every$2;
 
-/**
-     * Compares if both arrays have the same elements
-     */
-    function equals$1(a, b, callback){
+function equals$1(a, b, callback){
         callback = callback || is_1;
 
         if (!isArray_1(a) || !isArray_1(b)) {
@@ -5116,10 +4942,7 @@ var swagger = new Swagger();
 
     var equals_1$2 = equals$1;
 
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex(arr, iterator, thisObj){
+function findIndex(arr, iterator, thisObj){
         iterator = makeIterator_(iterator, thisObj);
         if (arr == null) {
             return -1;
@@ -5137,20 +4960,14 @@ var swagger = new Swagger();
 
     var findIndex_1 = findIndex;
 
-/**
-     * Returns first item that matches criteria
-     */
-    function find$2(arr, iterator, thisObj){
+function find$2(arr, iterator, thisObj){
         var idx = findIndex_1(arr, iterator, thisObj);
         return idx >= 0? arr[idx] : void(0);
     }
 
     var find_1$2 = find$2;
 
-/**
-     * Returns the index of the last item that matches criteria
-     */
-    function findLastIndex(arr, iterator, thisObj){
+function findLastIndex(arr, iterator, thisObj){
         iterator = makeIterator_(iterator, thisObj);
         if (arr == null) {
             return -1;
@@ -5168,21 +4985,14 @@ var swagger = new Swagger();
 
     var findLastIndex_1 = findLastIndex;
 
-/**
-     * Returns last item that matches criteria
-     */
-    function findLast(arr, iterator, thisObj){
+function findLast(arr, iterator, thisObj){
         var idx = findLastIndex_1(arr, iterator, thisObj);
         return idx >= 0? arr[idx] : void(0);
     }
 
     var findLast_1 = findLast;
 
-/*
-     * Helper function to flatten to a destination array.
-     * Used to remove the need to create intermediate arrays while flattening.
-     */
-    function flattenTo$1(arr, result, level) {
+function flattenTo$1(arr, result, level) {
         if (level === 0) {
             append_1(result, arr);
             return result;
@@ -5218,10 +5028,7 @@ var swagger = new Swagger();
 
     var flatten_1$2 = flatten$2;
 
-/**
-     * Bucket the array values.
-     */
-    function groupBy$1(arr, categorize, thisObj) {
+function groupBy$1(arr, categorize, thisObj) {
         if (categorize) {
             categorize = makeIterator_(categorize, thisObj);
         } else {
@@ -5270,10 +5077,7 @@ var swagger = new Swagger();
 
     var indicesOf_1 = indicesOf;
 
-/**
-     * Insert item into array if not already present.
-     */
-    function insert(arr, rest_items) {
+function insert(arr, rest_items) {
         var diff = difference_1(slice_1(arguments, 1), arr);
         if (diff.length) {
             Array.prototype.push.apply(arr, diff);
@@ -5282,11 +5086,7 @@ var swagger = new Swagger();
     }
     var insert_1 = insert;
 
-/**
-     * Return a new Array with elements common to all Arrays.
-     * - based on underscore.js implementation
-     */
-    function intersection$1(arr) {
+function intersection$1(arr) {
         var arrs = slice_1(arguments, 1),
             result = filter_1(unique_1(arr), function(needle){
                 return every_1$2(arrs, function(haystack){
@@ -5298,11 +5098,7 @@ var swagger = new Swagger();
 
     var intersection_1 = intersection$1;
 
-/**
-     * Call `methodName` on each item of the array passing custom arguments if
-     * needed.
-     */
-    function invoke(arr, methodName, var_args){
+function invoke(arr, methodName, var_args){
         if (arr == null) {
             return arr;
         }
@@ -5373,10 +5169,7 @@ function isValidString(val) {
 
     var lastIndexOf_1 = lastIndexOf;
 
-/**
-     * Array map
-     */
-    function map$3(arr, callback, thisObj) {
+function map$3(arr, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var results = [];
         if (arr == null){
@@ -5420,10 +5213,7 @@ function isValidString(val) {
 
     var random_1 = random;
 
-/**
-     * Returns random number inside range
-     */
-    function rand(min, max){
+function rand(min, max){
         min = min == null? MIN_INT : min;
         max = max == null? MAX_INT : max;
         return min + (max - min) * random_1();
@@ -5431,10 +5221,7 @@ function isValidString(val) {
 
     var rand_1 = rand;
 
-/**
-     * Gets random integer inside range or snap to min/max values.
-     */
-    function randInt(min, max){
+function randInt(min, max){
         min = min == null? MIN_INT : ~~min;
         max = max == null? MAX_INT : ~~max;
         // can't be max + 0.5 otherwise it will round up if `rand`
@@ -5445,12 +5232,7 @@ function isValidString(val) {
 
     var randInt_1 = randInt;
 
-/**
-     * Remove random item(s) from the Array and return it.
-     * Returns an Array of items if [nItems] is provided or a single item if
-     * it isn't specified.
-     */
-    function pick$2(arr, nItems){
+function pick$2(arr, nItems){
         if (nItems != null) {
             var result = [];
             if (nItems > 0 && arr && arr.length) {
@@ -5473,10 +5255,7 @@ function isValidString(val) {
 
     var pick_1$2 = pick$2;
 
-/**
-     * Extract a list of property values.
-     */
-    function pluck$1(arr, propName){
+function pluck$1(arr, propName){
         return map_1(arr, propName);
     }
 
@@ -5497,10 +5276,7 @@ function isValidString(val) {
 
     var countSteps_1 = countSteps;
 
-/**
-     * Returns an Array of numbers inside range.
-     */
-    function range$1(start, stop, step) {
+function range$1(start, stop, step) {
         if (stop == null) {
             stop = start;
             start = 0;
@@ -5584,10 +5360,7 @@ function isValidString(val) {
 
     var reduceRight_1 = reduceRight;
 
-/**
-     * Array reject
-     */
-    function reject$1(arr, callback, thisObj) {
+function reject$1(arr, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var results = [];
         if (arr == null) {
@@ -5607,21 +5380,14 @@ function isValidString(val) {
 
     var reject_1$2 = reject$1;
 
-/**
-     * Remove a single item from the array.
-     * (it won't remove duplicates, just a single item)
-     */
-    function remove$1(arr, item){
+function remove$1(arr, item){
         var idx = indexOf_1(arr, item);
         if (idx !== -1) { arr.splice(idx, 1); }
     }
 
     var remove_1 = remove$1;
 
-/**
-     * Remove all instances of an item from array.
-     */
-    function removeAll(arr, item){
+function removeAll(arr, item){
         var idx = indexOf_1(arr, item);
         while (idx !== -1) {
             arr.splice(idx, 1);
@@ -5642,10 +5408,7 @@ function isValidString(val) {
 
     var reverse_1 = reverse;
 
-/**
-     * Shuffle array items.
-     */
-    function shuffle(arr) {
+function shuffle(arr) {
         var results = [],
             rnd;
         if (arr == null) {
@@ -5720,10 +5483,7 @@ function isValidString(val) {
 
     var sort = mergeSort;
 
-/*
-     * Sort array by the result of the callback
-     */
-    function sortBy(arr, callback, context){
+function sortBy(arr, callback, context){
         callback = makeIterator_(callback, context);
 
         return sort(arr, function(a, b) {
@@ -5789,10 +5549,7 @@ function isValidString(val) {
 
     var take_1 = take;
 
-/**
-     * Creates an object that holds a lookup for the objects in the array.
-     */
-    function toLookup(arr, key) {
+function toLookup(arr, key) {
         var result = {};
         if (arr == null) {
             return result;
@@ -5815,10 +5572,7 @@ function isValidString(val) {
     }
     var toLookup_1 = toLookup;
 
-/**
-     * Concat multiple arrays and remove duplicates
-     */
-    function union$1(arrs) {
+function union$1(arrs) {
         var results = [];
         var i = -1, len = arguments.length;
         while (++i < len) {
@@ -5830,11 +5584,7 @@ function isValidString(val) {
 
     var union_1 = union$1;
 
-/**
-     * Exclusive OR. Returns items that are present in a single array.
-     * - like ptyhon's `symmetric_difference`
-     */
-    function xor(arr1, arr2) {
+function xor(arr1, arr2) {
         arr1 = unique_1(arr1);
         arr2 = unique_1(arr2);
 
@@ -5874,8 +5624,6 @@ function getLength(arr) {
 
     var zip_1 = zip;
 
-//automatically generated, do not edit!
-//run `node build` instead
 var array$1 = {
     'append' : append_1,
     'collect' : collect_1,
@@ -5940,7 +5688,6 @@ object-assign
 @license MIT
 */
 
-/* eslint-disable no-unused-vars */
 var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var propIsEnumerable = Object.prototype.propertyIsEnumerable;
@@ -6024,10 +5771,6 @@ var index = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-/**
- * settings for riotx
- * @type {{debug: boolean, default: string}}
- */
 const settings = {
   debug: true,
   default: '@'
@@ -6378,7 +6121,6 @@ var endpoints = {
   }
 };
 
-// APIは必須でサポートしなければならない URI
 const DMC_URI = '/dmc';
 
 var dmc = {
@@ -7795,9 +7537,6 @@ var index$2 = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-/**
- * Expose `pathToRegexp`.
- */
 var index$1 = pathToRegexp;
 var parse_1 = parse;
 var compile_1 = compile;
@@ -8234,13 +7973,6 @@ index$1.tokensToRegExp = tokensToRegExp_1;
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-/**
- * Similar to invariant but only logs a warning if the condition is not met.
- * This can be used to log issues in development environments in critical
- * paths. Removing the logging code for production environments will keep the
- * same logic and follow the same code paths.
- */
-
 var warning = function() {};
 
 {
@@ -8291,17 +8023,6 @@ var browser = warning;
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
- */
-
-/**
- * Use invariant() to assert state which your program assumes to be true.
- *
- * Provide sprintf-style format (only %s is supported) and arguments
- * to provide information about what broke and what you were
- * expecting.
- *
- * The invariant message will be stripped in production, but the invariant
- * will remain to ensure logic does not differ in production.
  */
 
 var invariant = function(condition, format, a, b, c, d, e, f) {
@@ -38171,7 +37892,8 @@ document.addEventListener('DOMContentLoaded', () => {
             store.action(constants.ACTION_OAUTHENDPOINTKEY_REMOVE)
           ])
           .then(() => {
-            location.href = location.origin;
+            // TODO: 網羅出来てるか再度チェックすること。
+            location.href = `${location.origin}${location.pathname}`;
           });
       }
       return Promise
