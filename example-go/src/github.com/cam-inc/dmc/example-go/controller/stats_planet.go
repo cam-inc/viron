@@ -23,17 +23,17 @@ func (c *StatsPlanetController) Bar(ctx *app.BarStatsPlanetContext) error {
 
 	// StatsPlanetController_Bar: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature", "Albedo"},
+		Keys: []string{"Name", "Distance"},
 		Data: [][]interface{}{
-			{"Mercury", 0.387, 452, 0.12},
-			{"Venus", 0.723, 726, 0.59},
-			{"Earth", 1.000, 281, 0.39},
-			{"Mars", 1.524, 230, 0.15},
-			{"Jupiter", 5.203, 120, 0.44},
-			{"Saturn", 9.539, 88, 0.46},
-			{"Uranus", 19.180, 59, 0.56},
-			{"Neptune", 30.060, 48, 0.51},
-			{"Pluto", 39.530, 37, 0.50},
+			{"Mercury", 0.387},
+			{"Venus", 0.723},
+			{"Earth", 1.000},
+			{"Mars", 1.524},
+			{"Jupiter", 5.203},
+			{"Saturn", 9.539},
+			{"Uranus", 19.180},
+			{"Neptune", 30.060},
+			{"Pluto", 39.530},
 		},
 	}
 	return ctx.OK(res)
@@ -47,17 +47,17 @@ func (c *StatsPlanetController) HorizontalBar(ctx *app.HorizontalBarStatsPlanetC
 
 	// StatsPlanetController_HorizontalBar: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature", "Albedo"},
+		Keys: []string{"Name", "Distance"},
 		Data: [][]interface{}{
-			{"Mercury", 0.387, 452, 0.12},
-			{"Venus", 0.723, 726, 0.59},
-			{"Earth", 1.000, 281, 0.39},
-			{"Mars", 1.524, 230, 0.15},
-			{"Jupiter", 5.203, 120, 0.44},
-			{"Saturn", 9.539, 88, 0.46},
-			{"Uranus", 19.180, 59, 0.56},
-			{"Neptune", 30.060, 48, 0.51},
-			{"Pluto", 39.530, 37, 0.50},
+			{"Mercury", 0.387},
+			{"Venus", 0.723},
+			{"Earth", 1.000},
+			{"Mars", 1.524},
+			{"Jupiter", 5.203},
+			{"Saturn", 9.539},
+			{"Uranus", 19.180},
+			{"Neptune", 30.060},
+			{"Pluto", 39.530},
 		},
 	}
 	return ctx.OK(res)
@@ -71,17 +71,17 @@ func (c *StatsPlanetController) HorizontalStackedBar(ctx *app.HorizontalStackedB
 
 	// StatsPlanetController_HorizontalStackedBar: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature", "Albedo"},
+		Keys: []string{"Name", "Distance"},
 		Data: [][]interface{}{
-			{"Mercury", 0.387, 452, 0.12},
-			{"Venus", 0.723, 726, 0.59},
-			{"Earth", 1.000, 281, 0.39},
-			{"Mars", 1.524, 230, 0.15},
-			{"Jupiter", 5.203, 120, 0.44},
-			{"Saturn", 9.539, 88, 0.46},
-			{"Uranus", 19.180, 59, 0.56},
-			{"Neptune", 30.060, 48, 0.51},
-			{"Pluto", 39.530, 37, 0.50},
+			{"Mars", 0.387},
+			{"Mars", 0.723},
+			{"Mars", 1.000},
+			{"Mars", 1.524},
+			{"Pluto", 5.203},
+			{"Pluto", 9.539},
+			{"Pluto", 19.180},
+			{"Pluto", 30.060},
+			{"Pluto", 39.530},
 		},
 	}
 	return ctx.OK(res)
@@ -95,17 +95,17 @@ func (c *StatsPlanetController) Line(ctx *app.LineStatsPlanetContext) error {
 
 	// StatsPlanetController_Line: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature", "Albedo"},
+		Keys: []string{"Name", "Distance", "Temperature"},
 		Data: [][]interface{}{
-			{"Mercury", 0.387, 452, 0.12},
-			{"Venus", 0.723, 726, 0.59},
-			{"Earth", 1.000, 281, 0.39},
-			{"Mars", 1.524, 230, 0.15},
-			{"Jupiter", 5.203, 120, 0.44},
-			{"Saturn", 9.539, 88, 0.46},
-			{"Uranus", 19.180, 59, 0.56},
-			{"Neptune", 30.060, 48, 0.51},
-			{"Pluto", 39.530, 37, 0.50},
+			{"Earth", 0.387, 452},
+			{"Earth", 0.723, 726},
+			{"Earth", 1.000, 281},
+			{"Saturn", 1.524, 230},
+			{"Saturn", 5.203, 120},
+			{"Saturn", 9.539, 88},
+			{"Pluto", 19.180, 59},
+			{"Pluto", 30.060, 48},
+			{"Pluto", 39.530, 37},
 		},
 	}
 	return ctx.OK(res)
@@ -121,14 +121,14 @@ func (c *StatsPlanetController) Scatterplot(ctx *app.ScatterplotStatsPlanetConte
 	res := &app.Statsplanet{
 		Keys: []string{"Name", "Distance", "Temperature", "Albedo"},
 		Data: [][]interface{}{
-			{"Mercury", 0.387, 452, 0.12},
-			{"Venus", 0.723, 726, 0.59},
+			{"Earth", 0.387, 452, 0.12},
+			{"Earth", 0.723, 726, 0.59},
 			{"Earth", 1.000, 281, 0.39},
-			{"Mars", 1.524, 230, 0.15},
-			{"Jupiter", 5.203, 120, 0.44},
+			{"Saturn", 1.524, 230, 0.15},
+			{"Saturn", 5.203, 120, 0.44},
 			{"Saturn", 9.539, 88, 0.46},
-			{"Uranus", 19.180, 59, 0.56},
-			{"Neptune", 30.060, 48, 0.51},
+			{"Pluto", 19.180, 59, 0.56},
+			{"Pluto", 30.060, 48, 0.51},
 			{"Pluto", 39.530, 37, 0.50},
 		},
 	}
@@ -143,17 +143,17 @@ func (c *StatsPlanetController) StackedArea(ctx *app.StackedAreaStatsPlanetConte
 
 	// StatsPlanetController_StackedArea: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature", "Albedo"},
+		Keys: []string{"Name", "Distance", "Temperature"},
 		Data: [][]interface{}{
-			{"Mercury", 0.387, 452, 0.12},
-			{"Venus", 0.723, 726, 0.59},
-			{"Earth", 1.000, 281, 0.39},
-			{"Mars", 1.524, 230, 0.15},
-			{"Jupiter", 5.203, 120, 0.44},
-			{"Saturn", 9.539, 88, 0.46},
-			{"Uranus", 19.180, 59, 0.56},
-			{"Neptune", 30.060, 48, 0.51},
-			{"Pluto", 39.530, 37, 0.50},
+			{"Earth", 1, 452},
+			{"Earth", 2, 726},
+			{"Earth", 3, 281},
+			{"Saturn", 1, 230},
+			{"Saturn", 2, 120},
+			{"Saturn", 3, 88},
+			{"Pluto", 1, 59},
+			{"Pluto", 2, 48},
+			{"Pluto", 3, 37},
 		},
 	}
 	return ctx.OK(res)
@@ -167,17 +167,17 @@ func (c *StatsPlanetController) StackedBar(ctx *app.StackedBarStatsPlanetContext
 
 	// StatsPlanetController_StackedBar: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature", "Albedo"},
+		Keys: []string{"Name", "Distance"},
 		Data: [][]interface{}{
-			{"Mercury", 0.387, 452, 0.12},
-			{"Venus", 0.723, 726, 0.59},
-			{"Earth", 1.000, 281, 0.39},
-			{"Mars", 1.524, 230, 0.15},
-			{"Jupiter", 5.203, 120, 0.44},
-			{"Saturn", 9.539, 88, 0.46},
-			{"Uranus", 19.180, 59, 0.56},
-			{"Neptune", 30.060, 48, 0.51},
-			{"Pluto", 39.530, 37, 0.50},
+			{"Mars", 0.387},
+			{"Mars", 0.723},
+			{"Mars", 1.000},
+			{"Mars", 1.524},
+			{"Saturn", 5.203},
+			{"Saturn", 9.539},
+			{"Pluto", 19.180},
+			{"Pluto", 30.060},
+			{"Pluto", 39.530},
 		},
 	}
 	return ctx.OK(res)
