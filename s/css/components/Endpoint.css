@@ -1,4 +1,5 @@
 .Endpoint {
+  position: relative;
   display: block;
   cursor: pointer;
   background-color: var(--color-basic-white);
@@ -6,6 +7,7 @@
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   transition-duration: 100ms;
   transition-property: background-color;
+  overflow: hidden;
 }
 
 .Endpoint:hover {
@@ -108,16 +110,25 @@
   color: var(--color-basic-black);
 }
 
-.Endpoint__controls {
-  @apply --layout-center-center;
-  margin-top: 24px;
+.Endpoint__menus {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.5);
 }
 
-.Endpoint__controls .Button {
+.Endpoint__menuFrame {
+  position: absolute;
+  padding: 12px;
+  background-color: var(--color-basic-white);
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  top: 8px;
+  right: 8px;
+}
+
+.Endpoint__menuFrame .Button {
   display: block;
-  flex-grow: 1;
-}
-
-.Endpoint__controls .Button:first-child {
-  margin-right: 12px;
 }

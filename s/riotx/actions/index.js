@@ -51,6 +51,7 @@ export default {
   [constants.ACTION_MODAL_HIDE]: modal.hide,
 
   [constants.ACTION_AUTH_UPDATE]: auth.update,
+  [constants.ACTION_AUTH_REMOVE]: auth.remove,
   [constants.ACTION_AUTH_VALIDATE]: auth.validate,
   [constants.ACTION_AUTH_SIGN_IN_OAUTH]: auth.signInOAuth,
   [constants.ACTION_AUTH_SIGN_IN_EMAIL]: auth.signInEMail,

@@ -60,6 +60,7 @@ export default {
   ACTION_MODAL_HIDE: 'modal_hide',
 
   ACTION_AUTH_UPDATE: 'auth_update',
+  ACTION_AUTH_REMOVE: 'auth_remove',
   ACTION_AUTH_VALIDATE: 'auth_validate',
   ACTION_AUTH_SIGN_IN_OAUTH: 'auth_sign_in_oauth',
   ACTION_AUTH_SIGN_IN_EMAIL: 'auth_sign_in_email',

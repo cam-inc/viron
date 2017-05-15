@@ -33,6 +33,6 @@ export default {
   updateToken: function (context, key, token) {
     context.state.endpoints[key].token = token;
     storage.set(constants.STORAGE_ENDPOINTS, context.state.endpoints);
-    return [constants.CHANGE_ENDPOINTS_TOKEN_ERROR];
+    return [constants.CHANGE_ENDPOINTS];
   }
 };

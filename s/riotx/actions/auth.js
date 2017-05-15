@@ -5,6 +5,10 @@ export default {
     context.commit(constants.MUTATION_ENDPOINTS_TOKEN_UPDATE, key, token);
   },
 
+  remove: (context, key) => {
+    context.commit(constants.MUTATION_ENDPOINTS_TOKEN_UPDATE, key, null);
+  },
+
   // check if the local stored endpoint token is valid.
   validate: (context, key) => {
     const endpoint = context.getter(constants.GETTER_ENDPOINTS_ONE, key);

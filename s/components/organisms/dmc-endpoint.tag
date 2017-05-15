@@ -12,21 +12,34 @@ dmc-endpoint.Endpoint(click="{ handleClick }")
     .Endpoint__name { opts.name }
     .Endpoint__description { opts.description }
     .Endpoint__memo { opts.memo }
-    .Endpoint__controls
+  .Endpoint__menus(if="{ isMenuOpened }" onClick="{ handleMenusClick }")
+    .Endpoint__menuFrame
       dmc-button(onclick="{ handleEditButtonClick }" label="編集")
       dmc-button(onclick="{ handleRemoveButtonClick }" label="削除")
+      dmc-button(onclick="{ handleLogoutButtonClick }" label="ログアウト")
 
   script.
     import '../atoms/dmc-icon.tag';
     import '../atoms/dmc-button.tag';
     import '../atoms/dmc-tag.tag';
 
+    this.isMenuOpened = false;
+
     handleClick() {
       this.opts.onentry(this.opts.key);
     }
 
+    handleMenusClick(e) {
+      e.stopPropagation();
+      this.isMenuOpened = false;
+      this.update();
+    }
+
     handleMenuButtonClick(e) {
       e.preventDefault();
+      e.stopPropagation();
+      this.isMenuOpened = true;
+      this.update();
     }
 
     handleEditButtonClick() {
@@ -35,4 +48,10 @@ dmc-endpoint.Endpoint(click="{ handleClick }")
 
     handleRemoveButtonClick() {
       this.opts.onremove(this.opts.key);
+    }
+
+    handleLogoutButtonClick() {
+      this.isMenuOpened = false;
+      this.update();
+      this.opts.onlogout(this.opts.key);
     }

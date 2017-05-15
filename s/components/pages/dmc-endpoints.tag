@@ -11,9 +11,10 @@ dmc-endpoints.EndpointsPage
         description="{ endpoint.description }"
         memo="{ endpoint.memo }"
         tags="{ endpoint.tags }"
-        onentry="{ handleEndpointEntry }"
-        onedit="{ handleEndpointEdit }"
-        onremove="{ handleEndpointRemove }")
+        onEntry="{ handleEndpointEntry }"
+        onEdit="{ handleEndpointEdit }"
+        onRemove="{ handleEndpointRemove }"
+        onLogout="{ handleEndpointLogout }")
 
   script.
     import router from '../../core/router';
@@ -61,4 +62,13 @@ dmc-endpoints.EndpointsPage
           message: err.message
         }))
       ;
+    }
+
+    handleEndpointLogout(key) {
+      Promise
+        .resolve()
+        .then(() => store.action(constants.ACTION_AUTH_REMOVE, key))
+        .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
+          message: err.message
+        }));
     }
