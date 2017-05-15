@@ -33,3 +33,10 @@ $ ls browser/swagger-client.js
 ```
 
 > TODO もっといい組み込み方があるはず
+
+# Release
+
+```
+$ npm run release
+```
+> access : [DMC](https://cam-inc.github.io/dmc/)
