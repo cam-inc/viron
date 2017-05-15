@@ -86,8 +86,62 @@ var _ = Resource("stats_planet", func() {
 	Origin(OriginURL, OriginAllowAll)
 	BasePath("/stats/planet")
 	DefaultMedia(StatsPlanetMediaType)
-	Action("show", func() {
-		Routing(GET(""))
+	Action("bar", func() {
+		Routing(GET("/bar"))
+		Description("Planets Information")
+		Response(OK, func() {
+			Media(StatsPlanetMediaType)
+		})
+		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+	})
+	Action("scatterplot", func() {
+		Routing(GET("/scatterplot"))
+		Description("Planets Information")
+		Response(OK, func() {
+			Media(StatsPlanetMediaType)
+		})
+		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+	})
+	Action("line", func() {
+		Routing(GET("/line"))
+		Description("Planets Information")
+		Response(OK, func() {
+			Media(StatsPlanetMediaType)
+		})
+		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+	})
+	Action("horizontal-bar", func() {
+		Routing(GET("/horizontal-bar"))
+		Description("Planets Information")
+		Response(OK, func() {
+			Media(StatsPlanetMediaType)
+		})
+		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+	})
+	Action("stacked-bar", func() {
+		Routing(GET("/stacked-bar"))
+		Description("Planets Information")
+		Response(OK, func() {
+			Media(StatsPlanetMediaType)
+		})
+		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+	})
+	Action("horizontal-stacked-bar", func() {
+		Routing(GET("/horizontal-stacked-bar"))
+		Description("Planets Information")
+		Response(OK, func() {
+			Media(StatsPlanetMediaType)
+		})
+		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+	})
+	Action("stacked-area", func() {
+		Routing(GET("/stacked-area"))
 		Description("Planets Information")
 		Response(OK, func() {
 			Media(StatsPlanetMediaType)
