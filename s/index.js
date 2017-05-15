@@ -157,7 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
             store.action(constants.ACTION_OAUTHENDPOINTKEY_REMOVE)
           ])
           .then(() => {
-            location.href = location.origin;
+            // TODO: 網羅出来てるか再度チェックすること。
+            location.href = `${location.origin}${location.pathname}`;
           });
       }
       return Promise

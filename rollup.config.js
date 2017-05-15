@@ -28,6 +28,8 @@ mout.object.forOwn(mout, (v,k) => {
   });
 });
 
+// TODO: 開発時とリリース時でconfigを変更すること。
+
 // import uglify from 'rollup-plugin-uglify'
 import eslint from 'rollup-plugin-eslint';
 
