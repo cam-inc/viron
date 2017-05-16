@@ -223,7 +223,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					{
 						Name:       "DMC ユーザー権限",
 						API:        api("/adminrole", "get"),
-						Style:      bridge.StyleNumber,
+						Style:      bridge.StyleTable,
 						Options:    defaultOptions,
 						Pagination: false,
 					},
@@ -238,7 +238,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					{
 						Name:       "DMC ユーザー権限",
 						API:        api("/adminuser", "get"),
-						Style:      bridge.StyleNumber,
+						Style:      bridge.StyleTable,
 						Options:    defaultOptions,
 						Pagination: false,
 					},
