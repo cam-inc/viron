@@ -14,7 +14,7 @@ dmc-entry.Entry
 
     const store = this.riotx.get();
 
-    this.endpointURL = 'http://127.0.0.1:3000/swagger.json';
+    this.endpointURL = 'https://localhost:3000/swagger.json';
     this.memo = '';
 
     closeModal() {
@@ -40,7 +40,8 @@ dmc-entry.Entry
         this.closeModal();
       }).catch(err => {
         store.action(constants.ACTION_TOAST_SHOW, {
-          message: err.message
+          message: err.message,
+          autoHide: false,
         });
       })
     }

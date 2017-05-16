@@ -1,6 +1,9 @@
 package main
 
 import (
+	"strconv"
+
+	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/controller"
 	"github.com/cam-inc/dmc/example-go/gen/app"
 	dmcMiddleware "github.com/cam-inc/dmc/example-go/middleware"
@@ -78,7 +81,14 @@ func main() {
 	app.MountBlogDesignController(service, sc8)
 
 	// Start service
-	if err := service.ListenAndServe(":3000"); err != nil {
-		service.LogError("startup", "err", err)
+	if common.GetScheme() == "https" {
+		sslConfig := common.GetSSLConfig()
+		if err := service.ListenAndServeTLS(":"+strconv.Itoa(int(common.GetPort())), sslConfig.CertificateFilePath, sslConfig.PrivateKeyFilePath); err != nil {
+			service.LogError("startup", "err", err)
+		}
+	} else {
+		if err := service.ListenAndServe(":" + strconv.Itoa(int(common.GetPort()))); err != nil {
+			service.LogError("startup", "err", err)
+		}
 	}
 }

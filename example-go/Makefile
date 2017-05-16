@@ -81,6 +81,9 @@ setup: setup-pre vendor-install ## Setup
 	if [ ! -f $(__SRC_PROJECT_HOME)/common/jwtkey_gen.go ]; then \
 		GOPATH=$(__GOPATH) go generate $(__SRC_PROJECT_HOME)/common/jwtkey.go; \
 	fi
+	if [ ! -f $(__SRC_PROJECT_HOME)/gen/server.key ]; then \
+		GOPATH=$(__GOPATH) go generate $(__SRC_PROJECT_HOME)/common/ssl.go; \
+	fi
 
 #
 # -- Clean
