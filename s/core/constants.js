@@ -51,6 +51,7 @@ export default {
   ACTION_COMPONENTS_GET: 'components_get',
   ACTION_COMPONENTS_OPERATE: 'components_operate',
   ACTION_COMPONENTS_REMOVE_ALL: 'components_remove_all',
+  ACTION_COMPONENTS_REMOVE_ONE: 'components_remove_one',
 
   ACTION_TOAST_SHOW: 'toast_show',
   ACTION_TOAST_HIDE: 'toast_hide',
@@ -96,6 +97,7 @@ export default {
 
   MUTATION_COMPONENTS_ONE: 'components_one',
   MUTATION_COMPONENTS_REMOVE_ALL: 'components_remove_all',
+  MUTATION_COMPONENTS_REMOVE_ONE: 'components_remove_one',
 
   MUTATION_TOAST_ADD: 'toast_add',
   MUTATION_TOAST_REMOVE: 'toast_remove',

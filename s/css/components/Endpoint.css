@@ -1,13 +1,13 @@
 .Endpoint {
   position: relative;
   display: block;
+  overflow: hidden;
   cursor: pointer;
   background-color: var(--color-basic-white);
   border-radius: 6px;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   transition-duration: 100ms;
   transition-property: background-color;
-  overflow: hidden;
 }
 
 .Endpoint:hover {
@@ -116,17 +116,17 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .Endpoint__menuFrame {
   position: absolute;
-  padding: 12px;
-  background-color: var(--color-basic-white);
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
   top: 8px;
   right: 8px;
+  padding: 12px;
+  background-color: var(--color-basic-white);
+  border-radius: 6px;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .Endpoint__menuFrame .Button {

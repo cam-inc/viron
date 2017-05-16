@@ -76,9 +76,24 @@
 }
 
 .Component__body {
-  max-height: 400px;
   padding: 16px;
   overflow: scroll;
+}
+
+.Component__alert {
+  padding: 12px 0;
+}
+
+.Component__alertApi {
+  margin-bottom: 8px;
+  font-size: 10px;
+  color: var(--color-basic-red);
+}
+
+.Component__alertText {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-basic-red);
 }
 
 .Component__body .Pagination {
