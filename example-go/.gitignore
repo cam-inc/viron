@@ -29,7 +29,7 @@ src/github.com/cam-inc/dmc/example-go/example-go
 # OSX Finder
 .DS_Store
 
-# Eidtor
+# Editor
 *.iml
 .idea
 .vscode

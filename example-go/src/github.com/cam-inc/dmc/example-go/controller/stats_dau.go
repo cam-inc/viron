@@ -22,8 +22,5 @@ func (c *StatsDauController) Show(ctx *app.ShowStatsDauContext) error {
 	// Put your logic here
 
 	// StatsDauController_Show: end_implement
-	res := &app.Statsdau{
-		Value: 1234567,
-	}
-	return ctx.OK(res)
+	return ctx.OK(1234567)
 }
