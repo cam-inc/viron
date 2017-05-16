@@ -26,6 +26,8 @@ dmc-devtool
 
     handleShowToastButtonClick() {
       store.action(constants.ACTION_TOAST_SHOW, {
-        message : 'devtools - toast test'
+        message : 'devtools - toast test',
+        autoHide: false,
+        type: 'error'
       })
     }

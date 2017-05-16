@@ -5,10 +5,10 @@ dmc.Application
     .Application__mainColumn
       .Application__head
         dmc-header
-        dmc-toasts
       .Application__page
         div(data-is="{ pageTagName }")
   dmc-modals
+  dmc-toasts
 
   script.
     import constants from '../core/constants';
