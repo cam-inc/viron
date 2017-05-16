@@ -3454,6 +3454,45 @@ var store$1 = createCommonjsModule(function (module, exports) {
 })(typeof self !== 'undefined' ? self : window);
 
 /**
+     * Appends an array to the end of another.
+     * The first array will be modified.
+     */
+    function append(arr1, arr2) {
+        if (arr2 == null) {
+            return arr1;
+        }
+
+        var pad = arr1.length,
+            i = -1,
+            len = arr2.length;
+        while (++i < len) {
+            arr1[pad + i] = arr2[i];
+        }
+        return arr1;
+    }
+    var append_1 = append;
+
+/**
+     * Returns the first argument provided to it.
+     */
+    function identity(val){
+        return val;
+    }
+
+    var identity_1 = identity;
+
+/**
+     * Returns a function that gets a property of the passed object
+     */
+    function prop(name){
+        return function(obj){
+            return obj[name];
+        };
+    }
+
+    var prop_1 = prop;
+
+/**
      * Safer Object.hasOwnProperty
      */
      function hasOwn(obj, prop){
@@ -3536,102 +3575,6 @@ var _dontEnums;
     var forIn_1 = forIn;
 
 /**
-     * return a list of all enumerable properties that have function values
-     */
-    function functions(obj){
-        var keys = [];
-        forIn_1(obj, function(val, key){
-            if (typeof val === 'function'){
-                keys.push(key);
-            }
-        });
-        return keys.sort();
-    }
-
-    var functions_1 = functions;
-
-/**
-     * Create slice of source array or array-like object
-     */
-    function slice(arr, start, end){
-        var len = arr.length;
-
-        if (start == null) {
-            start = 0;
-        } else if (start < 0) {
-            start = Math.max(len + start, 0);
-        } else {
-            start = Math.min(start, len);
-        }
-
-        if (end == null) {
-            end = len;
-        } else if (end < 0) {
-            end = Math.max(len + end, 0);
-        } else {
-            end = Math.min(end, len);
-        }
-
-        var result = [];
-        while (start < end) {
-            result.push(arr[start++]);
-        }
-
-        return result;
-    }
-
-    var slice_1 = slice;
-
-/**
-     * Return a function that will execute in the given context, optionally adding any additional supplied parameters to the beginning of the arguments collection.
-     * @param {Function} fn  Function.
-     * @param {object} context   Execution context.
-     * @param {rest} args    Arguments (0...n arguments).
-     * @return {Function} Wrapped Function.
-     */
-    function bind(fn, context, args){
-        var argsArr = slice_1(arguments, 2); //curried args
-        return function(){
-            return fn.apply(context, argsArr.concat(slice_1(arguments)));
-        };
-    }
-
-    var bind_1 = bind;
-
-/**
-     * Array forEach
-     */
-    function forEach(arr, callback, thisObj) {
-        if (arr == null) {
-            return;
-        }
-        var i = -1,
-            len = arr.length;
-        while (++i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if ( callback.call(thisObj, arr[i], i, arr) === false ) {
-                break;
-            }
-        }
-    }
-
-    var forEach_1 = forEach;
-
-/**
-     * Binds methods of the object to be run in it's own context.
-     */
-    function bindAll(obj, rest_methodNames){
-        var keys = arguments.length > 1?
-                    slice_1(arguments, 1) : functions_1(obj);
-        forEach_1(keys, function(key){
-            obj[key] = bind_1(obj[key], obj);
-        });
-    }
-
-    var bindAll_1 = bindAll;
-
-/**
      * Similar to Array/forEach but works over object properties and fixes Don't
      * Enum bug on IE.
      * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
@@ -3645,26 +3588,6 @@ var _dontEnums;
     }
 
     var forOwn_1 = forOwn;
-
-/**
-     * Returns the first argument provided to it.
-     */
-    function identity(val){
-        return val;
-    }
-
-    var identity_1 = identity;
-
-/**
-     * Returns a function that gets a property of the passed object
-     */
-    function prop(name){
-        return function(obj){
-            return obj[name];
-        };
-    }
-
-    var prop_1 = prop;
 
 var _rKind = /^\[object (.*)\]$/;
 var _toString = Object.prototype.toString;
@@ -3781,9 +3704,1235 @@ function containsMatch(array, pattern) {
     var makeIterator_ = makeIterator;
 
 /**
+     * Maps the items in the array and concatenates the result arrays.
+     */
+    function collect(arr, callback, thisObj){
+        callback = makeIterator_(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            var value = callback(arr[i], i, arr);
+            if (value != null) {
+                append_1(results, value);
+            }
+        }
+
+        return results;
+    }
+
+    var collect_1 = collect;
+
+/**
+     * Array.indexOf
+     */
+    function indexOf(arr, item, fromIndex) {
+        fromIndex = fromIndex || 0;
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length,
+            i = fromIndex < 0 ? len + fromIndex : fromIndex;
+        while (i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[i] === item) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    var indexOf_1 = indexOf;
+
+/**
+     * Combines an array with all the items of another.
+     * Does not allow duplicates and is case and type sensitive.
+     */
+    function combine(arr1, arr2) {
+        if (arr2 == null) {
+            return arr1;
+        }
+
+        var i = -1, len = arr2.length;
+        while (++i < len) {
+            if (indexOf_1(arr1, arr2[i]) === -1) {
+                arr1.push(arr2[i]);
+            }
+        }
+
+        return arr1;
+    }
+    var combine_1 = combine;
+
+/**
+     * Array filter
+     */
+    function filter(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var filter_1 = filter;
+
+/**
+     * Remove all null/undefined items from array.
+     */
+    function compact(arr) {
+        return filter_1(arr, function(val){
+            return (val != null);
+        });
+    }
+
+    var compact_1 = compact;
+
+/**
+     * If array contains values.
+     */
+    function contains(arr, val) {
+        return indexOf_1(arr, val) !== -1;
+    }
+    var contains_1 = contains;
+
+/**
+     * @return {array} Array of unique items
+     */
+    function unique$1(arr, compare){
+        compare = compare || isEqual;
+        return filter_1(arr, function(item, i, arr){
+            var n = arr.length;
+            while (++i < n) {
+                if ( compare(item, arr[i]) ) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    function isEqual(a, b){
+        return a === b;
+    }
+
+    var unique_1 = unique$1;
+
+/**
+     * Array some
+     */
+    function some(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var result = false;
+        if (arr == null) {
+            return result;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if ( callback(arr[i], i, arr) ) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    var some_1 = some;
+
+/**
+     * Create slice of source array or array-like object
+     */
+    function slice(arr, start, end){
+        var len = arr.length;
+
+        if (start == null) {
+            start = 0;
+        } else if (start < 0) {
+            start = Math.max(len + start, 0);
+        } else {
+            start = Math.min(start, len);
+        }
+
+        if (end == null) {
+            end = len;
+        } else if (end < 0) {
+            end = Math.max(len + end, 0);
+        } else {
+            end = Math.min(end, len);
+        }
+
+        var result = [];
+        while (start < end) {
+            result.push(arr[start++]);
+        }
+
+        return result;
+    }
+
+    var slice_1 = slice;
+
+/**
+     * Return a new Array with elements that aren't present in the other Arrays.
+     */
+    function difference(arr) {
+        var arrs = slice_1(arguments, 1),
+            result = filter_1(unique_1(arr), function(needle){
+                return !some_1(arrs, function(haystack){
+                    return contains_1(haystack, needle);
+                });
+            });
+        return result;
+    }
+
+    var difference_1 = difference;
+
+/**
+     * Check if both arguments are egal.
+     */
+    function is(x, y){
+        // implementation borrowed from harmony:egal spec
+        if (x === y) {
+          // 0 === -0, but they are not identical
+          return x !== 0 || 1 / x === 1 / y;
+        }
+
+        // NaN !== NaN, but they are identical.
+        // NaNs are the only non-reflexive value, i.e., if x !== x,
+        // then x is a NaN.
+        // isNaN is broken: it converts its argument to number, so
+        // isNaN("foo") => true
+        return x !== x && y !== y;
+    }
+
+    var is_1 = is;
+
+/**
+     * Array every
+     */
+    function every(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var result = true;
+        if (arr == null) {
+            return result;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (!callback(arr[i], i, arr) ) {
+                result = false;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    var every_1 = every;
+
+/**
+     * Compares if both arrays have the same elements
+     */
+    function equals(a, b, callback){
+        callback = callback || is_1;
+
+        if (!isArray_1(a) || !isArray_1(b)) {
+            return callback(a, b);
+        }
+
+        if (a.length !== b.length) {
+            return false;
+        }
+
+        return every_1(a, makeCompare(callback), b);
+    }
+
+    function makeCompare(callback) {
+        return function(value, i) {
+            return i in this && callback(value, this[i]);
+        };
+    }
+
+    var equals_1 = equals;
+
+/**
+     * Returns the index of the first item that matches criteria
+     */
+    function findIndex(arr, iterator, thisObj){
+        iterator = makeIterator_(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (iterator(arr[i], i, arr)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    var findIndex_1 = findIndex;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$1(arr, iterator, thisObj){
+        var idx = findIndex_1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var find_1 = find$1;
+
+/**
+     * Returns the index of the last item that matches criteria
+     */
+    function findLastIndex(arr, iterator, thisObj){
+        iterator = makeIterator_(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var n = arr.length;
+        while (--n >= 0) {
+            if (iterator(arr[n], n, arr)) {
+                return n;
+            }
+        }
+
+        return -1;
+    }
+
+    var findLastIndex_1 = findLastIndex;
+
+/**
+     * Returns last item that matches criteria
+     */
+    function findLast(arr, iterator, thisObj){
+        var idx = findLastIndex_1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var findLast_1 = findLast;
+
+/*
+     * Helper function to flatten to a destination array.
+     * Used to remove the need to create intermediate arrays while flattening.
+     */
+    function flattenTo(arr, result, level) {
+        if (level === 0) {
+            append_1(result, arr);
+            return result;
+        }
+
+        var value,
+            i = -1,
+            len = arr.length;
+        while (++i < len) {
+            value = arr[i];
+            if (isArray_1(value)) {
+                flattenTo(value, result, level - 1);
+            } else {
+                result.push(value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Recursively flattens an array.
+     * A new array containing all the elements is returned.
+     * If level is specified, it will only flatten up to that level.
+     */
+    function flatten$1(arr, level) {
+        if (arr == null) {
+            return [];
+        }
+
+        level = level == null ? -1 : level;
+        return flattenTo(arr, [], level);
+    }
+
+    var flatten_1 = flatten$1;
+
+/**
+     * Array forEach
+     */
+    function forEach(arr, callback, thisObj) {
+        if (arr == null) {
+            return;
+        }
+        var i = -1,
+            len = arr.length;
+        while (++i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if ( callback.call(thisObj, arr[i], i, arr) === false ) {
+                break;
+            }
+        }
+    }
+
+    var forEach_1 = forEach;
+
+/**
+     * Bucket the array values.
+     */
+    function groupBy$1(arr, categorize, thisObj) {
+        if (categorize) {
+            categorize = makeIterator_(categorize, thisObj);
+        } else {
+            // Default to identity function.
+            categorize = identity_1;
+        }
+
+        var buckets = {};
+        forEach_1(arr, function(element) {
+            var bucket = categorize(element);
+            if (!(bucket in buckets)) {
+                buckets[bucket] = [];
+            }
+
+            buckets[bucket].push(element);
+        });
+
+        return buckets;
+    }
+
+    var groupBy_1 = groupBy$1;
+
+/**
+     * Array indicesOf
+     */
+    function indicesOf(arr, item, fromIndex) {
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        fromIndex = typeof fromIndex === 'number' ? fromIndex : 0;
+
+        var length = arr.length;
+        var cursor = fromIndex >= 0 ? fromIndex : length + fromIndex;
+
+        while (cursor < length) {
+            if (arr[cursor] === item) {
+                results.push(cursor);
+            }
+            cursor++;
+        }
+
+        return results;
+    }
+
+    var indicesOf_1 = indicesOf;
+
+/**
+     * Insert item into array if not already present.
+     */
+    function insert(arr, rest_items) {
+        var diff = difference_1(slice_1(arguments, 1), arr);
+        if (diff.length) {
+            Array.prototype.push.apply(arr, diff);
+        }
+        return arr.length;
+    }
+    var insert_1 = insert;
+
+/**
+     * Return a new Array with elements common to all Arrays.
+     * - based on underscore.js implementation
+     */
+    function intersection$1(arr) {
+        var arrs = slice_1(arguments, 1),
+            result = filter_1(unique_1(arr), function(needle){
+                return every_1(arrs, function(haystack){
+                    return contains_1(haystack, needle);
+                });
+            });
+        return result;
+    }
+
+    var intersection_1 = intersection$1;
+
+/**
+     * Call `methodName` on each item of the array passing custom arguments if
+     * needed.
+     */
+    function invoke(arr, methodName, var_args){
+        if (arr == null) {
+            return arr;
+        }
+
+        var args = slice_1(arguments, 2);
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            value[methodName].apply(value, args);
+        }
+
+        return arr;
+    }
+
+    var invoke_1 = invoke;
+
+function isValidString(val) {
+        return (val != null && val !== '');
+    }
+
+    /**
+     * Joins strings with the specified separator inserted between each value.
+     * Null values and empty strings will be excluded.
+     */
+    function join(items, separator) {
+        separator = separator || '';
+        return filter_1(items, isValidString).join(separator);
+    }
+
+    var join_1 = join;
+
+/**
+     * Returns last element of array.
+     */
+    function last(arr){
+        if (arr == null || arr.length < 1) {
+            return undefined;
+        }
+
+        return arr[arr.length - 1];
+    }
+
+    var last_1 = last;
+
+/**
+     * Array lastIndexOf
+     */
+    function lastIndexOf(arr, item, fromIndex) {
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length;
+        fromIndex = (fromIndex == null || fromIndex >= len)? len - 1 : fromIndex;
+        fromIndex = (fromIndex < 0)? len + fromIndex : fromIndex;
+
+        while (fromIndex >= 0) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[fromIndex] === item) {
+                return fromIndex;
+            }
+            fromIndex--;
+        }
+
+        return -1;
+    }
+
+    var lastIndexOf_1 = lastIndexOf;
+
+/**
+     * Array map
+     */
+    function map(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var results = [];
+        if (arr == null){
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            results[i] = callback(arr[i], i, arr);
+        }
+
+        return results;
+    }
+
+     var map_1 = map;
+
+/**
+     * Return maximum value inside array
+     */
+    function max(arr, iterator, thisObj){
+        if (arr == null || !arr.length) {
+            return Infinity;
+        } else if (arr.length && !iterator) {
+            return Math.max.apply(Math, arr);
+        } else {
+            iterator = makeIterator_(iterator, thisObj);
+            var result,
+                compare = -Infinity,
+                value,
+                temp;
+
+            var i = -1, len = arr.length;
+            while (++i < len) {
+                value = arr[i];
+                temp = iterator(value, i, arr);
+                if (temp > compare) {
+                    compare = temp;
+                    result = value;
+                }
+            }
+
+            return result;
+        }
+    }
+
+    var max_1 = max;
+
+/**
+     * Return minimum value inside array
+     */
+    function min(arr, iterator, thisObj){
+        if (arr == null || !arr.length) {
+            return -Infinity;
+        } else if (arr.length && !iterator) {
+            return Math.min.apply(Math, arr);
+        } else {
+            iterator = makeIterator_(iterator, thisObj);
+            var result,
+                compare = Infinity,
+                value,
+                temp;
+
+            var i = -1, len = arr.length;
+            while (++i < len) {
+                value = arr[i];
+                temp = iterator(value, i, arr);
+                if (temp < compare) {
+                    compare = temp;
+                    result = value;
+                }
+            }
+
+            return result;
+        }
+    }
+
+    var min_1 = min;
+
+/**
+ * @constant Minimum 32-bit signed integer value (-2^31).
+ */
+
+    var MIN_INT = -2147483648;
+
+/**
+ * @constant Maximum 32-bit signed integer value. (2^31 - 1)
+ */
+
+    var MAX_INT = 2147483647;
+
+/**
+     * Just a wrapper to Math.random. No methods inside mout/random should call
+     * Math.random() directly so we can inject the pseudo-random number
+     * generator if needed (ie. in case we need a seeded random or a better
+     * algorithm than the native one)
+     */
+    function random(){
+        return random.get();
+    }
+
+    // we expose the method so it can be swapped if needed
+    random.get = Math.random;
+
+    var random_1 = random;
+
+/**
+     * Returns random number inside range
+     */
+    function rand(min, max){
+        min = min == null? MIN_INT : min;
+        max = max == null? MAX_INT : max;
+        return min + (max - min) * random_1();
+    }
+
+    var rand_1 = rand;
+
+/**
+     * Gets random integer inside range or snap to min/max values.
+     */
+    function randInt(min, max){
+        min = min == null? MIN_INT : ~~min;
+        max = max == null? MAX_INT : ~~max;
+        // can't be max + 0.5 otherwise it will round up if `rand`
+        // returns `max` causing it to overflow range.
+        // -0.5 and + 0.49 are required to avoid bias caused by rounding
+        return Math.round( rand_1(min - 0.5, max + 0.499999999999) );
+    }
+
+    var randInt_1 = randInt;
+
+/**
+     * Remove random item(s) from the Array and return it.
+     * Returns an Array of items if [nItems] is provided or a single item if
+     * it isn't specified.
+     */
+    function pick$1(arr, nItems){
+        if (nItems != null) {
+            var result = [];
+            if (nItems > 0 && arr && arr.length) {
+                nItems = nItems > arr.length? arr.length : nItems;
+                while (nItems--) {
+                    result.push( pickOne(arr) );
+                }
+            }
+            return result;
+        }
+        return (arr && arr.length)? pickOne(arr) : void(0);
+    }
+
+
+    function pickOne(arr){
+        var idx = randInt_1(0, arr.length - 1);
+        return arr.splice(idx, 1)[0];
+    }
+
+
+    var pick_1 = pick$1;
+
+/**
+     * Extract a list of property values.
+     */
+    function pluck(arr, propName){
+        return map_1(arr, propName);
+    }
+
+    var pluck_1 = pluck;
+
+/**
+    * Count number of full steps.
+    */
+    function countSteps(val, step, overflow){
+        val = Math.floor(val / step);
+
+        if (overflow) {
+            return val % overflow;
+        }
+
+        return val;
+    }
+
+    var countSteps_1 = countSteps;
+
+/**
+     * Returns an Array of numbers inside range.
+     */
+    function range$1(start, stop, step) {
+        if (stop == null) {
+            stop = start;
+            start = 0;
+        }
+        step = step || 1;
+
+        var result = [],
+            nSteps = countSteps_1(stop - start, step),
+            i = start;
+
+        while (i <= stop) {
+            result.push(i);
+            i += step;
+        }
+
+        return result;
+    }
+
+    var range_1 = range$1;
+
+/**
+     * Array reduce
+     */
+    function reduce$1(arr, fn, initVal) {
+        // check for args.length since initVal might be "undefined" see #gh-57
+        var hasInit = arguments.length > 2,
+            result = initVal;
+
+        if (arr == null || !arr.length) {
+            if (!hasInit) {
+                throw new Error('reduce of empty array with no initial value');
+            } else {
+                return initVal;
+            }
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (!hasInit) {
+                result = arr[i];
+                hasInit = true;
+            } else {
+                result = fn(result, arr[i], i, arr);
+            }
+        }
+
+        return result;
+    }
+
+    var reduce_1 = reduce$1;
+
+/**
+     * Array reduceRight
+     */
+    function reduceRight(arr, fn, initVal) {
+        // check for args.length since initVal might be "undefined" see #gh-57
+        var hasInit = arguments.length > 2;
+
+        if (arr == null || !arr.length) {
+            if (hasInit) {
+                return initVal;
+            } else {
+                throw new Error('reduce of empty array with no initial value');
+            }
+        }
+
+        var i = arr.length, result = initVal, value;
+        while (--i >= 0) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            value = arr[i];
+            if (!hasInit) {
+                result = value;
+                hasInit = true;
+            } else {
+                result = fn(result, value, i, arr);
+            }
+        }
+        return result;
+    }
+
+    var reduceRight_1 = reduceRight;
+
+/**
+     * Array reject
+     */
+    function reject(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (!callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var reject_1 = reject;
+
+/**
+     * Remove a single item from the array.
+     * (it won't remove duplicates, just a single item)
+     */
+    function remove$1(arr, item){
+        var idx = indexOf_1(arr, item);
+        if (idx !== -1) { arr.splice(idx, 1); }
+    }
+
+    var remove_1 = remove$1;
+
+/**
+     * Remove all instances of an item from array.
+     */
+    function removeAll(arr, item){
+        var idx = indexOf_1(arr, item);
+        while (idx !== -1) {
+            arr.splice(idx, 1);
+            idx = indexOf_1(arr, item, idx);
+        }
+    }
+
+    var removeAll_1 = removeAll;
+
+/**
+     * Returns a copy of the array in reversed order.
+     */
+    function reverse(array) {
+        var copy = array.slice();
+        copy.reverse();
+        return copy;
+    }
+
+    var reverse_1 = reverse;
+
+/**
+     * Shuffle array items.
+     */
+    function shuffle(arr) {
+        var results = [],
+            rnd;
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (!i) {
+                results[0] = arr[0];
+            } else {
+                rnd = randInt_1(0, i);
+                results[i] = results[rnd];
+                results[rnd] = arr[i];
+            }
+        }
+
+        return results;
+    }
+
+    var shuffle_1 = shuffle;
+
+/**
+     * Merge sort (http://en.wikipedia.org/wiki/Merge_sort)
+     */
+    function mergeSort(arr, compareFn) {
+        if (arr == null) {
+            return [];
+        } else if (arr.length < 2) {
+            return arr;
+        }
+
+        if (compareFn == null) {
+            compareFn = defaultCompare;
+        }
+
+        var mid, left, right;
+
+        mid   = ~~(arr.length / 2);
+        left  = mergeSort( arr.slice(0, mid), compareFn );
+        right = mergeSort( arr.slice(mid, arr.length), compareFn );
+
+        return merge(left, right, compareFn);
+    }
+
+    function defaultCompare(a, b) {
+        return a < b ? -1 : (a > b? 1 : 0);
+    }
+
+    function merge(left, right, compareFn) {
+        var result = [];
+
+        while (left.length && right.length) {
+            if (compareFn(left[0], right[0]) <= 0) {
+                // if 0 it should preserve same order (stable)
+                result.push(left.shift());
+            } else {
+                result.push(right.shift());
+            }
+        }
+
+        if (left.length) {
+            result.push.apply(result, left);
+        }
+
+        if (right.length) {
+            result.push.apply(result, right);
+        }
+
+        return result;
+    }
+
+    var sort = mergeSort;
+
+/*
+     * Sort array by the result of the callback
+     */
+    function sortBy(arr, callback, context){
+        callback = makeIterator_(callback, context);
+
+        return sort(arr, function(a, b) {
+            a = callback(a);
+            b = callback(b);
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        });
+    }
+
+    var sortBy_1 = sortBy;
+
+/**
+     * Split array into a fixed number of segments.
+     */
+    function split$1(array, segments) {
+        segments = segments || 2;
+        var results = [];
+        if (array == null) {
+            return results;
+        }
+
+        var minLength = Math.floor(array.length / segments),
+            remainder = array.length % segments,
+            i = 0,
+            len = array.length,
+            segmentIndex = 0,
+            segmentLength;
+
+        while (i < len) {
+            segmentLength = minLength;
+            if (segmentIndex < remainder) {
+                segmentLength++;
+            }
+
+            results.push(array.slice(i, i + segmentLength));
+
+            segmentIndex++;
+            i += segmentLength;
+        }
+
+        return results;
+    }
+    var split_1 = split$1;
+
+/**
+     * Iterates over a callback a set amount of times
+     * returning the results
+     */
+    function take(n, callback, thisObj){
+        var i = -1;
+        var arr = [];
+        if( !thisObj ){
+            while(++i < n){
+                arr[i] = callback(i, n);
+            }
+        } else {
+            while(++i < n){
+                arr[i] = callback.call(thisObj, i, n);
+            }
+        }
+        return arr;
+    }
+
+    var take_1 = take;
+
+/**
+     */
+    function isFunction(val) {
+        return isKind_1(val, 'Function');
+    }
+    var isFunction_1 = isFunction;
+
+/**
+     * Creates an object that holds a lookup for the objects in the array.
+     */
+    function toLookup(arr, key) {
+        var result = {};
+        if (arr == null) {
+            return result;
+        }
+
+        var i = -1, len = arr.length, value;
+        if (isFunction_1(key)) {
+            while (++i < len) {
+                value = arr[i];
+                result[key(value)] = value;
+            }
+        } else {
+            while (++i < len) {
+                value = arr[i];
+                result[value[key]] = value;
+            }
+        }
+
+        return result;
+    }
+    var toLookup_1 = toLookup;
+
+/**
+     * Concat multiple arrays and remove duplicates
+     */
+    function union$1(arrs) {
+        var results = [];
+        var i = -1, len = arguments.length;
+        while (++i < len) {
+            append_1(results, arguments[i]);
+        }
+
+        return unique_1(results);
+    }
+
+    var union_1 = union$1;
+
+/**
+     * Exclusive OR. Returns items that are present in a single array.
+     * - like ptyhon's `symmetric_difference`
+     */
+    function xor(arr1, arr2) {
+        arr1 = unique_1(arr1);
+        arr2 = unique_1(arr2);
+
+        var a1 = filter_1(arr1, function(item){
+                return !contains_1(arr2, item);
+            }),
+            a2 = filter_1(arr2, function(item){
+                return !contains_1(arr1, item);
+            });
+
+        return a1.concat(a2);
+    }
+
+    var xor_1 = xor;
+
+function getLength(arr) {
+        return arr == null ? 0 : arr.length;
+    }
+
+    /**
+     * Merges together the values of each of the arrays with the values at the
+     * corresponding position.
+     */
+    function zip(arr){
+        var len = arr ? max_1(map_1(arguments, getLength)) : 0,
+            results = [],
+            i = -1;
+        while (++i < len) {
+            // jshint loopfunc: true
+            results.push(map_1(arguments, function(item) {
+                return item == null ? undefined : item[i];
+            }));
+        }
+
+        return results;
+    }
+
+    var zip_1 = zip;
+
+//automatically generated, do not edit!
+//run `node build` instead
+var array$1 = {
+    'append' : append_1,
+    'collect' : collect_1,
+    'combine' : combine_1,
+    'compact' : compact_1,
+    'contains' : contains_1,
+    'difference' : difference_1,
+    'equals' : equals_1,
+    'every' : every_1,
+    'filter' : filter_1,
+    'find' : find_1,
+    'findIndex' : findIndex_1,
+    'findLast' : findLast_1,
+    'findLastIndex' : findLastIndex_1,
+    'flatten' : flatten_1,
+    'forEach' : forEach_1,
+    'groupBy' : groupBy_1,
+    'indexOf' : indexOf_1,
+    'indicesOf' : indicesOf_1,
+    'insert' : insert_1,
+    'intersection' : intersection_1,
+    'invoke' : invoke_1,
+    'join' : join_1,
+    'last' : last_1,
+    'lastIndexOf' : lastIndexOf_1,
+    'map' : map_1,
+    'max' : max_1,
+    'min' : min_1,
+    'pick' : pick_1,
+    'pluck' : pluck_1,
+    'range' : range_1,
+    'reduce' : reduce_1,
+    'reduceRight' : reduceRight_1,
+    'reject' : reject_1,
+    'remove' : remove_1,
+    'removeAll' : removeAll_1,
+    'reverse' : reverse_1,
+    'shuffle' : shuffle_1,
+    'slice' : slice_1,
+    'some' : some_1,
+    'sort' : sort,
+    'sortBy' : sortBy_1,
+    'split' : split_1,
+    'take' : take_1,
+    'toLookup' : toLookup_1,
+    'union' : union_1,
+    'unique' : unique_1,
+    'xor' : xor_1,
+    'zip' : zip_1
+};
+
+var array_5 = array$1.contains;
+var array_9 = array$1.filter;
+var array_10 = array$1.find;
+var array_15 = array$1.forEach;
+var array_25 = array$1.map;
+var array_33 = array$1.reject;
+
+/**
+     * return a list of all enumerable properties that have function values
+     */
+    function functions(obj){
+        var keys = [];
+        forIn_1(obj, function(val, key){
+            if (typeof val === 'function'){
+                keys.push(key);
+            }
+        });
+        return keys.sort();
+    }
+
+    var functions_1 = functions;
+
+/**
+     * Return a function that will execute in the given context, optionally adding any additional supplied parameters to the beginning of the arguments collection.
+     * @param {Function} fn  Function.
+     * @param {object} context   Execution context.
+     * @param {rest} args    Arguments (0...n arguments).
+     * @return {Function} Wrapped Function.
+     */
+    function bind(fn, context, args){
+        var argsArr = slice_1(arguments, 2); //curried args
+        return function(){
+            return fn.apply(context, argsArr.concat(slice_1(arguments)));
+        };
+    }
+
+    var bind_1 = bind;
+
+/**
+     * Binds methods of the object to be run in it's own context.
+     */
+    function bindAll(obj, rest_methodNames){
+        var keys = arguments.length > 1?
+                    slice_1(arguments, 1) : functions_1(obj);
+        forEach_1(keys, function(key){
+            obj[key] = bind_1(obj[key], obj);
+        });
+    }
+
+    var bindAll_1 = bindAll;
+
+/**
      * Object some
      */
-    function some(obj, callback, thisObj) {
+    function some$2(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var result = false;
         forOwn_1(obj, function(val, key) {
@@ -3795,17 +4944,17 @@ function containsMatch(array, pattern) {
         return result;
     }
 
-    var some_1 = some;
+    var some_1$2 = some$2;
 
 /**
      * Check if object contains value
      */
-    function contains(obj, needle) {
-        return some_1(obj, function(val) {
+    function contains$2(obj, needle) {
+        return some_1$2(obj, function(val) {
             return (val === needle);
         });
     }
-    var contains_1 = contains;
+    var contains_1$2 = contains$2;
 
 /**
      * Checks if the value is created by the `Object` constructor.
@@ -3879,7 +5028,7 @@ function containsMatch(array, pattern) {
 /**
      * Object every
      */
-    function every(obj, callback, thisObj) {
+    function every$2(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var result = true;
         forOwn_1(obj, function(val, key) {
@@ -3893,7 +5042,7 @@ function containsMatch(array, pattern) {
         return result;
     }
 
-    var every_1 = every;
+    var every_1$2 = every$2;
 
 /**
      */
@@ -3902,29 +5051,9 @@ function containsMatch(array, pattern) {
     }
     var isObject_1 = isObject$1;
 
-/**
-     * Check if both arguments are egal.
-     */
-    function is(x, y){
-        // implementation borrowed from harmony:egal spec
-        if (x === y) {
-          // 0 === -0, but they are not identical
-          return x !== 0 || 1 / x === 1 / y;
-        }
-
-        // NaN !== NaN, but they are identical.
-        // NaNs are the only non-reflexive value, i.e., if x !== x,
-        // then x is a NaN.
-        // isNaN is broken: it converts its argument to number, so
-        // isNaN("foo") => true
-        return x !== x && y !== y;
-    }
-
-    var is_1 = is;
-
 // Makes a function to compare the object values from the specified compare
     // operation callback.
-    function makeCompare(callback) {
+    function makeCompare$1(callback) {
         return function(value, key) {
             return hasOwn_1(this, key) && callback(value, this[key]);
         };
@@ -3937,18 +5066,18 @@ function containsMatch(array, pattern) {
     /**
      * Checks if two objects have the same keys and values.
      */
-    function equals(a, b, callback) {
+    function equals$1(a, b, callback) {
         callback = callback || is_1;
 
         if (!isObject_1(a) || !isObject_1(b)) {
             return callback(a, b);
         }
 
-        return (every_1(a, makeCompare(callback), b) &&
-                every_1(b, checkProperties, a));
+        return (every_1$2(a, makeCompare$1(callback), b) &&
+                every_1$2(b, checkProperties, a));
     }
 
-    var equals_1 = equals;
+    var equals_1$2 = equals$1;
 
 /**
      * Copy missing properties in the obj from the defaults.
@@ -3981,15 +5110,15 @@ function containsMatch(array, pattern) {
 
         return output;
     }
-    var filter = filterValues;
+    var filter$2 = filterValues;
 
 /**
      * Returns first item that matches criteria
      */
-    function find$1(obj, callback, thisObj) {
+    function find$2(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
         var result;
-        some_1(obj, function(value, key, obj) {
+        some_1$2(obj, function(value, key, obj) {
             if (callback(value, key, obj)) {
                 result = value;
                 return true; //break
@@ -3998,18 +5127,18 @@ function containsMatch(array, pattern) {
         return result;
     }
 
-    var find_1 = find$1;
+    var find_1$2 = find$2;
 
 /*
      * Helper function to flatten to a destination object.
      * Used to remove the need to create intermediate objects while flattening.
      */
-    function flattenTo(obj, result, prefix, level) {
+    function flattenTo$1(obj, result, prefix, level) {
         forOwn_1(obj, function (value, key) {
             var nestedPrefix = prefix ? prefix + '.' + key : key;
 
             if (level !== 0 && isPlainObject_1(value)) {
-                flattenTo(value, result, nestedPrefix, level - 1);
+                flattenTo$1(value, result, nestedPrefix, level - 1);
             } else {
                 result[nestedPrefix] = value;
             }
@@ -4023,16 +5152,16 @@ function containsMatch(array, pattern) {
      * A new object containing all the elements is returned.
      * If level is specified, it will only flatten up to that level.
      */
-    function flatten$1(obj, level) {
+    function flatten$2(obj, level) {
         if (obj == null) {
             return {};
         }
 
         level = level == null ? -1 : level;
-        return flattenTo(obj, {}, '', level);
+        return flattenTo$1(obj, {}, '', level);
     }
 
-    var flatten_1 = flatten$1;
+    var flatten_1$2 = flatten$2;
 
 /**
      * Checks if the object is a primitive
@@ -4092,7 +5221,7 @@ var UNDEF$1;
 
         return output;
     }
-    var map = mapValues;
+    var map$2 = mapValues;
 
 /**
      * checks if a object contains all given properties/values
@@ -4112,37 +5241,6 @@ var UNDEF$1;
     var matches_1 = matches;
 
 /**
-     * Return maximum value inside array
-     */
-    function max$1(arr, iterator, thisObj){
-        if (arr == null || !arr.length) {
-            return Infinity;
-        } else if (arr.length && !iterator) {
-            return Math.max.apply(Math, arr);
-        } else {
-            iterator = makeIterator_(iterator, thisObj);
-            var result,
-                compare = -Infinity,
-                value,
-                temp;
-
-            var i = -1, len = arr.length;
-            while (++i < len) {
-                value = arr[i];
-                temp = iterator(value, i, arr);
-                if (temp > compare) {
-                    compare = temp;
-                    result = value;
-                }
-            }
-
-            return result;
-        }
-    }
-
-    var max_1$2 = max$1;
-
-/**
      * Get object values
      */
     function values(obj) {
@@ -4158,11 +5256,11 @@ var UNDEF$1;
 /**
      * Returns maximum value inside object.
      */
-    function max(obj, compareFn) {
-        return max_1$2(values_1(obj), compareFn);
+    function max$1(obj, compareFn) {
+        return max_1(values_1(obj), compareFn);
     }
 
-    var max_1 = max;
+    var max_1$2 = max$1;
 
 /**
     * Combine properties from all the objects into first one.
@@ -4278,7 +5376,7 @@ var UNDEF$1;
 /**
      * Deep merge objects.
      */
-    function merge() {
+    function merge$1() {
         var i = 1,
             key, val, obj, target;
 
@@ -4296,7 +5394,7 @@ var UNDEF$1;
 
                 if ( isObject_1(val) && isObject_1(target[key]) ){
                     // inception, deep merge objects
-                    target[key] = merge(target[key], val);
+                    target[key] = merge$1(target[key], val);
                 } else {
                     // make sure arrays, regexp, date, objects are cloned
                     target[key] = deepClone_1(val);
@@ -4308,47 +5406,16 @@ var UNDEF$1;
         return target;
     }
 
-    var merge_1 = merge;
-
-/**
-     * Return minimum value inside array
-     */
-    function min$1(arr, iterator, thisObj){
-        if (arr == null || !arr.length) {
-            return -Infinity;
-        } else if (arr.length && !iterator) {
-            return Math.min.apply(Math, arr);
-        } else {
-            iterator = makeIterator_(iterator, thisObj);
-            var result,
-                compare = Infinity,
-                value,
-                temp;
-
-            var i = -1, len = arr.length;
-            while (++i < len) {
-                value = arr[i];
-                temp = iterator(value, i, arr);
-                if (temp < compare) {
-                    compare = temp;
-                    result = value;
-                }
-            }
-
-            return result;
-        }
-    }
-
-    var min_1$2 = min$1;
+    var merge_1 = merge$1;
 
 /**
      * Returns minimum value inside object.
      */
-    function min(obj, iterator) {
-        return min_1$2(values_1(obj), iterator);
+    function min$1(obj, iterator) {
+        return min_1(values_1(obj), iterator);
     }
 
-    var min_1 = min;
+    var min_1$2 = min$1;
 
 /**
      * Create nested object if non-existent
@@ -4367,40 +5434,6 @@ var UNDEF$1;
     var namespace_1 = namespace;
 
 /**
-     * Array.indexOf
-     */
-    function indexOf(arr, item, fromIndex) {
-        fromIndex = fromIndex || 0;
-        if (arr == null) {
-            return -1;
-        }
-
-        var len = arr.length,
-            i = fromIndex < 0 ? len + fromIndex : fromIndex;
-        while (i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (arr[i] === item) {
-                return i;
-            }
-
-            i++;
-        }
-
-        return -1;
-    }
-
-    var indexOf_1 = indexOf;
-
-/**
-     * If array contains values.
-     */
-    function contains$1(arr, val) {
-        return indexOf_1(arr, val) !== -1;
-    }
-    var contains_1$2 = contains$1;
-
-/**
      * Return a copy of the object, filtered to only contain properties except the blacklisted keys.
      */
     function omit$1(obj, var_keys){
@@ -4408,7 +5441,7 @@ var UNDEF$1;
             out = {};
 
         for (var property in obj) {
-            if (obj.hasOwnProperty(property) && !contains_1$2(keys, property)) {
+            if (obj.hasOwnProperty(property) && !contains_1(keys, property)) {
                 out[property] = obj[property];
             }
         }
@@ -4420,7 +5453,7 @@ var UNDEF$1;
 /**
      * Return a copy of the object, filtered to only have values for the whitelisted keys.
      */
-    function pick$1(obj, var_keys){
+    function pick$2(obj, var_keys){
         var keys = typeof arguments[1] !== 'string'? arguments[1] : slice_1(arguments, 1),
             out = {},
             i = 0, key;
@@ -4430,16 +5463,16 @@ var UNDEF$1;
         return out;
     }
 
-    var pick_1 = pick$1;
+    var pick_1$2 = pick$2;
 
 /**
      * Extract a list of property values.
      */
-    function pluck(obj, propName){
-        return map(obj, prop_1(propName));
+    function pluck$1(obj, propName){
+        return map$2(obj, prop_1(propName));
     }
 
-    var pluck_1 = pluck;
+    var pluck_1$2 = pluck$1;
 
 /**
      * Get object size
@@ -4457,7 +5490,7 @@ var UNDEF$1;
 /**
      * Object reduce
      */
-    function reduce$1(obj, callback, memo, thisObj) {
+    function reduce$2(obj, callback, memo, thisObj) {
         var initial = arguments.length > 2;
 
         if (!size_1(obj) && !initial) {
@@ -4477,26 +5510,19 @@ var UNDEF$1;
         return memo;
     }
 
-    var reduce_1 = reduce$1;
+    var reduce_1$2 = reduce$2;
 
 /**
      * Object reject
      */
-    function reject(obj, callback, thisObj) {
+    function reject$1(obj, callback, thisObj) {
         callback = makeIterator_(callback, thisObj);
-        return filter(obj, function(value, index, obj) {
+        return filter$2(obj, function(value, index, obj) {
             return !callback(value, index, obj);
         }, thisObj);
     }
 
-    var reject_1 = reject;
-
-/**
-     */
-    function isFunction(val) {
-        return isKind_1(val, 'Function');
-    }
-    var isFunction_1 = isFunction;
+    var reject_1$2 = reject$1;
 
 function result(obj, prop) {
         var property = obj[prop];
@@ -4548,16 +5574,16 @@ function result(obj, prop) {
 //run `node build` instead
 var object = {
     'bindAll' : bindAll_1,
-    'contains' : contains_1,
+    'contains' : contains_1$2,
     'deepFillIn' : deepFillIn_1,
     'deepMatches' : deepMatches_1,
     'deepMixIn' : deepMixIn_1,
-    'equals' : equals_1,
-    'every' : every_1,
+    'equals' : equals_1$2,
+    'every' : every_1$2,
     'fillIn' : fillIn_1,
-    'filter' : filter,
-    'find' : find_1,
-    'flatten' : flatten_1,
+    'filter' : filter$2,
+    'find' : find_1$2,
+    'flatten' : flatten_1$2,
     'forIn' : forIn_1,
     'forOwn' : forOwn_1,
     'functions' : functions_1,
@@ -4565,22 +5591,22 @@ var object = {
     'has' : has_1,
     'hasOwn' : hasOwn_1,
     'keys' : keys_1,
-    'map' : map,
+    'map' : map$2,
     'matches' : matches_1,
-    'max' : max_1,
+    'max' : max_1$2,
     'merge' : merge_1,
-    'min' : min_1,
+    'min' : min_1$2,
     'mixIn' : mixIn_1,
     'namespace' : namespace_1,
     'omit' : omit_1,
-    'pick' : pick_1,
-    'pluck' : pluck_1,
-    'reduce' : reduce_1,
-    'reject' : reject_1,
+    'pick' : pick_1$2,
+    'pluck' : pluck_1$2,
+    'reduce' : reduce_1$2,
+    'reject' : reject_1$2,
     'result' : result_1,
     'set' : set_1,
     'size' : size_1,
-    'some' : some_1,
+    'some' : some_1$2,
     'unset' : unset_1,
     'values' : values_1
 };
@@ -4645,6 +5671,7 @@ var constants = {
   ACTION_COMPONENTS_GET: 'components_get',
   ACTION_COMPONENTS_OPERATE: 'components_operate',
   ACTION_COMPONENTS_REMOVE_ALL: 'components_remove_all',
+  ACTION_COMPONENTS_REMOVE_ONE: 'components_remove_one',
 
   ACTION_TOAST_SHOW: 'toast_show',
   ACTION_TOAST_HIDE: 'toast_hide',
@@ -4690,6 +5717,7 @@ var constants = {
 
   MUTATION_COMPONENTS_ONE: 'components_one',
   MUTATION_COMPONENTS_REMOVE_ALL: 'components_remove_all',
+  MUTATION_COMPONENTS_REMOVE_ONE: 'components_remove_one',
 
   MUTATION_TOAST_ADD: 'toast_add',
   MUTATION_TOAST_REMOVE: 'toast_remove',
@@ -4852,6 +5880,115 @@ class Swagger {
   }
 
   /**
+   * dmc-component-*.tagが扱いやすいデータ構造に変換する。
+   * @param {Object} schema
+   * @param {*} response
+   */
+  mergeSchemaAndResponse(schema, response) {
+    // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+    // type will be one of "null", "boolean", "object", "array", "number" or "string".
+    const type = schema.type;
+    const ret = {
+      // dmc customs.
+      _type: null,
+      _value: null,
+      _keys: null,
+      _length: null,
+      getType: function() {
+        return this._type;
+      },
+      getValue: function(k) {
+        if (k === undefined) {
+          return this._value;
+        }
+        return this._value[k];
+      },
+      getKeys: function() {
+        return this._keys;
+      },
+      getLength: function() {
+        return this._length;
+      }
+    };
+    // @see: http://swagger.io/specification/#schemaObject
+    const schemaObjectKeys = [
+      'example',
+      'format',// @see: http://swagger.io/specification/#dataTypeFormat
+      'title',
+      'description',
+      'default',
+      'multipleOf',
+      'maximum',
+      'exclusiveMaximum',
+      'minimum',
+      'exclusiveMinimum',
+      'maxLength',
+      'minLength',
+      'pattern',
+      'maxItems',
+      'minItems',
+      'uniqueItems',
+      'maxProperties',
+      'minProperties',
+      'required',
+      'enum',
+      //'type',// removed on purpose. type will be customized by dmc.
+      'items',
+      'allOf',
+      'properties',
+      'additionalProperties'
+    ];
+    array_15(schemaObjectKeys, v => {
+      ret[`_${v}`] = schema[v];
+      ret[`get${v.charAt(0).toUpperCase()}${v.slice(1)}`] = function() {
+        return this[`_${v}`];
+      };
+    });
+
+    switch (type) {
+    case 'null':
+      ret._type = 'null';
+      ret._value = null;
+      break;
+    case 'boolean':
+      ret._type = 'boolean';
+      ret._value = response;
+      break;
+    case 'object':
+      ret._type = 'object';
+      ret._value = {};
+      ret._keys = [];
+      object_13(response, (v, k) => {
+        ret._keys.push(k);
+        ret._value[k] = this.mergeSchemaAndResponse(schema.properties[k], v);
+        ret._value[k].key = k;
+      });
+      break;
+    case 'array':
+      ret._type = 'array';
+      ret._value = [];
+      ret._length = response.length;
+      array_15(response, (v, i) => {
+        ret._value[i] = this.mergeSchemaAndResponse(schema.items, v);
+        ret._value[i].idx = i;
+      });
+      break;
+    case 'number':
+      ret._type = 'number';
+      ret._value = response;
+      break;
+    case 'string':
+      ret._type = 'number';
+      ret._value = response;
+      break;
+    default:
+      break;
+    }
+
+    return ret;
+  }
+
+  /**
    * 定義情報とデータをマージ
    * @param properties
    * @param response
@@ -4859,6 +5996,7 @@ class Swagger {
    * @returns {*}
    */
   mergePropertiesAndResponse(properties, response, key) {
+
     if (properties.type === 'array') {
       let res = [];
       object_13(response, (v, k) => {
@@ -4907,1032 +6045,6 @@ class Swagger {
 }
 
 var swagger = new Swagger();
-
-/**
-     * Appends an array to the end of another.
-     * The first array will be modified.
-     */
-    function append(arr1, arr2) {
-        if (arr2 == null) {
-            return arr1;
-        }
-
-        var pad = arr1.length,
-            i = -1,
-            len = arr2.length;
-        while (++i < len) {
-            arr1[pad + i] = arr2[i];
-        }
-        return arr1;
-    }
-    var append_1 = append;
-
-/**
-     * Maps the items in the array and concatenates the result arrays.
-     */
-    function collect(arr, callback, thisObj){
-        callback = makeIterator_(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            var value = callback(arr[i], i, arr);
-            if (value != null) {
-                append_1(results, value);
-            }
-        }
-
-        return results;
-    }
-
-    var collect_1 = collect;
-
-/**
-     * Combines an array with all the items of another.
-     * Does not allow duplicates and is case and type sensitive.
-     */
-    function combine(arr1, arr2) {
-        if (arr2 == null) {
-            return arr1;
-        }
-
-        var i = -1, len = arr2.length;
-        while (++i < len) {
-            if (indexOf_1(arr1, arr2[i]) === -1) {
-                arr1.push(arr2[i]);
-            }
-        }
-
-        return arr1;
-    }
-    var combine_1 = combine;
-
-/**
-     * Array filter
-     */
-    function filter$3(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            if (callback(value, i, arr)) {
-                results.push(value);
-            }
-        }
-
-        return results;
-    }
-
-    var filter_1 = filter$3;
-
-/**
-     * Remove all null/undefined items from array.
-     */
-    function compact(arr) {
-        return filter_1(arr, function(val){
-            return (val != null);
-        });
-    }
-
-    var compact_1 = compact;
-
-/**
-     * @return {array} Array of unique items
-     */
-    function unique$1(arr, compare){
-        compare = compare || isEqual;
-        return filter_1(arr, function(item, i, arr){
-            var n = arr.length;
-            while (++i < n) {
-                if ( compare(item, arr[i]) ) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
-
-    function isEqual(a, b){
-        return a === b;
-    }
-
-    var unique_1 = unique$1;
-
-/**
-     * Array some
-     */
-    function some$2(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var result = false;
-        if (arr == null) {
-            return result;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if ( callback(arr[i], i, arr) ) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    var some_1$2 = some$2;
-
-/**
-     * Return a new Array with elements that aren't present in the other Arrays.
-     */
-    function difference(arr) {
-        var arrs = slice_1(arguments, 1),
-            result = filter_1(unique_1(arr), function(needle){
-                return !some_1$2(arrs, function(haystack){
-                    return contains_1$2(haystack, needle);
-                });
-            });
-        return result;
-    }
-
-    var difference_1 = difference;
-
-/**
-     * Array every
-     */
-    function every$2(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var result = true;
-        if (arr == null) {
-            return result;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (!callback(arr[i], i, arr) ) {
-                result = false;
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    var every_1$2 = every$2;
-
-/**
-     * Compares if both arrays have the same elements
-     */
-    function equals$1(a, b, callback){
-        callback = callback || is_1;
-
-        if (!isArray_1(a) || !isArray_1(b)) {
-            return callback(a, b);
-        }
-
-        if (a.length !== b.length) {
-            return false;
-        }
-
-        return every_1$2(a, makeCompare$1(callback), b);
-    }
-
-    function makeCompare$1(callback) {
-        return function(value, i) {
-            return i in this && callback(value, this[i]);
-        };
-    }
-
-    var equals_1$2 = equals$1;
-
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex(arr, iterator, thisObj){
-        iterator = makeIterator_(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (iterator(arr[i], i, arr)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    var findIndex_1 = findIndex;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$2(arr, iterator, thisObj){
-        var idx = findIndex_1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var find_1$2 = find$2;
-
-/**
-     * Returns the index of the last item that matches criteria
-     */
-    function findLastIndex(arr, iterator, thisObj){
-        iterator = makeIterator_(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var n = arr.length;
-        while (--n >= 0) {
-            if (iterator(arr[n], n, arr)) {
-                return n;
-            }
-        }
-
-        return -1;
-    }
-
-    var findLastIndex_1 = findLastIndex;
-
-/**
-     * Returns last item that matches criteria
-     */
-    function findLast(arr, iterator, thisObj){
-        var idx = findLastIndex_1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var findLast_1 = findLast;
-
-/*
-     * Helper function to flatten to a destination array.
-     * Used to remove the need to create intermediate arrays while flattening.
-     */
-    function flattenTo$1(arr, result, level) {
-        if (level === 0) {
-            append_1(result, arr);
-            return result;
-        }
-
-        var value,
-            i = -1,
-            len = arr.length;
-        while (++i < len) {
-            value = arr[i];
-            if (isArray_1(value)) {
-                flattenTo$1(value, result, level - 1);
-            } else {
-                result.push(value);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Recursively flattens an array.
-     * A new array containing all the elements is returned.
-     * If level is specified, it will only flatten up to that level.
-     */
-    function flatten$2(arr, level) {
-        if (arr == null) {
-            return [];
-        }
-
-        level = level == null ? -1 : level;
-        return flattenTo$1(arr, [], level);
-    }
-
-    var flatten_1$2 = flatten$2;
-
-/**
-     * Bucket the array values.
-     */
-    function groupBy$1(arr, categorize, thisObj) {
-        if (categorize) {
-            categorize = makeIterator_(categorize, thisObj);
-        } else {
-            // Default to identity function.
-            categorize = identity_1;
-        }
-
-        var buckets = {};
-        forEach_1(arr, function(element) {
-            var bucket = categorize(element);
-            if (!(bucket in buckets)) {
-                buckets[bucket] = [];
-            }
-
-            buckets[bucket].push(element);
-        });
-
-        return buckets;
-    }
-
-    var groupBy_1 = groupBy$1;
-
-/**
-     * Array indicesOf
-     */
-    function indicesOf(arr, item, fromIndex) {
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        fromIndex = typeof fromIndex === 'number' ? fromIndex : 0;
-
-        var length = arr.length;
-        var cursor = fromIndex >= 0 ? fromIndex : length + fromIndex;
-
-        while (cursor < length) {
-            if (arr[cursor] === item) {
-                results.push(cursor);
-            }
-            cursor++;
-        }
-
-        return results;
-    }
-
-    var indicesOf_1 = indicesOf;
-
-/**
-     * Insert item into array if not already present.
-     */
-    function insert(arr, rest_items) {
-        var diff = difference_1(slice_1(arguments, 1), arr);
-        if (diff.length) {
-            Array.prototype.push.apply(arr, diff);
-        }
-        return arr.length;
-    }
-    var insert_1 = insert;
-
-/**
-     * Return a new Array with elements common to all Arrays.
-     * - based on underscore.js implementation
-     */
-    function intersection$1(arr) {
-        var arrs = slice_1(arguments, 1),
-            result = filter_1(unique_1(arr), function(needle){
-                return every_1$2(arrs, function(haystack){
-                    return contains_1$2(haystack, needle);
-                });
-            });
-        return result;
-    }
-
-    var intersection_1 = intersection$1;
-
-/**
-     * Call `methodName` on each item of the array passing custom arguments if
-     * needed.
-     */
-    function invoke(arr, methodName, var_args){
-        if (arr == null) {
-            return arr;
-        }
-
-        var args = slice_1(arguments, 2);
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            value[methodName].apply(value, args);
-        }
-
-        return arr;
-    }
-
-    var invoke_1 = invoke;
-
-function isValidString(val) {
-        return (val != null && val !== '');
-    }
-
-    /**
-     * Joins strings with the specified separator inserted between each value.
-     * Null values and empty strings will be excluded.
-     */
-    function join(items, separator) {
-        separator = separator || '';
-        return filter_1(items, isValidString).join(separator);
-    }
-
-    var join_1 = join;
-
-/**
-     * Returns last element of array.
-     */
-    function last(arr){
-        if (arr == null || arr.length < 1) {
-            return undefined;
-        }
-
-        return arr[arr.length - 1];
-    }
-
-    var last_1 = last;
-
-/**
-     * Array lastIndexOf
-     */
-    function lastIndexOf(arr, item, fromIndex) {
-        if (arr == null) {
-            return -1;
-        }
-
-        var len = arr.length;
-        fromIndex = (fromIndex == null || fromIndex >= len)? len - 1 : fromIndex;
-        fromIndex = (fromIndex < 0)? len + fromIndex : fromIndex;
-
-        while (fromIndex >= 0) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (arr[fromIndex] === item) {
-                return fromIndex;
-            }
-            fromIndex--;
-        }
-
-        return -1;
-    }
-
-    var lastIndexOf_1 = lastIndexOf;
-
-/**
-     * Array map
-     */
-    function map$3(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var results = [];
-        if (arr == null){
-            return results;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            results[i] = callback(arr[i], i, arr);
-        }
-
-        return results;
-    }
-
-     var map_1 = map$3;
-
-/**
- * @constant Minimum 32-bit signed integer value (-2^31).
- */
-
-    var MIN_INT = -2147483648;
-
-/**
- * @constant Maximum 32-bit signed integer value. (2^31 - 1)
- */
-
-    var MAX_INT = 2147483647;
-
-/**
-     * Just a wrapper to Math.random. No methods inside mout/random should call
-     * Math.random() directly so we can inject the pseudo-random number
-     * generator if needed (ie. in case we need a seeded random or a better
-     * algorithm than the native one)
-     */
-    function random(){
-        return random.get();
-    }
-
-    // we expose the method so it can be swapped if needed
-    random.get = Math.random;
-
-    var random_1 = random;
-
-/**
-     * Returns random number inside range
-     */
-    function rand(min, max){
-        min = min == null? MIN_INT : min;
-        max = max == null? MAX_INT : max;
-        return min + (max - min) * random_1();
-    }
-
-    var rand_1 = rand;
-
-/**
-     * Gets random integer inside range or snap to min/max values.
-     */
-    function randInt(min, max){
-        min = min == null? MIN_INT : ~~min;
-        max = max == null? MAX_INT : ~~max;
-        // can't be max + 0.5 otherwise it will round up if `rand`
-        // returns `max` causing it to overflow range.
-        // -0.5 and + 0.49 are required to avoid bias caused by rounding
-        return Math.round( rand_1(min - 0.5, max + 0.499999999999) );
-    }
-
-    var randInt_1 = randInt;
-
-/**
-     * Remove random item(s) from the Array and return it.
-     * Returns an Array of items if [nItems] is provided or a single item if
-     * it isn't specified.
-     */
-    function pick$2(arr, nItems){
-        if (nItems != null) {
-            var result = [];
-            if (nItems > 0 && arr && arr.length) {
-                nItems = nItems > arr.length? arr.length : nItems;
-                while (nItems--) {
-                    result.push( pickOne(arr) );
-                }
-            }
-            return result;
-        }
-        return (arr && arr.length)? pickOne(arr) : void(0);
-    }
-
-
-    function pickOne(arr){
-        var idx = randInt_1(0, arr.length - 1);
-        return arr.splice(idx, 1)[0];
-    }
-
-
-    var pick_1$2 = pick$2;
-
-/**
-     * Extract a list of property values.
-     */
-    function pluck$1(arr, propName){
-        return map_1(arr, propName);
-    }
-
-    var pluck_1$2 = pluck$1;
-
-/**
-    * Count number of full steps.
-    */
-    function countSteps(val, step, overflow){
-        val = Math.floor(val / step);
-
-        if (overflow) {
-            return val % overflow;
-        }
-
-        return val;
-    }
-
-    var countSteps_1 = countSteps;
-
-/**
-     * Returns an Array of numbers inside range.
-     */
-    function range$1(start, stop, step) {
-        if (stop == null) {
-            stop = start;
-            start = 0;
-        }
-        step = step || 1;
-
-        var result = [],
-            nSteps = countSteps_1(stop - start, step),
-            i = start;
-
-        while (i <= stop) {
-            result.push(i);
-            i += step;
-        }
-
-        return result;
-    }
-
-    var range_1 = range$1;
-
-/**
-     * Array reduce
-     */
-    function reduce$2(arr, fn, initVal) {
-        // check for args.length since initVal might be "undefined" see #gh-57
-        var hasInit = arguments.length > 2,
-            result = initVal;
-
-        if (arr == null || !arr.length) {
-            if (!hasInit) {
-                throw new Error('reduce of empty array with no initial value');
-            } else {
-                return initVal;
-            }
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (!hasInit) {
-                result = arr[i];
-                hasInit = true;
-            } else {
-                result = fn(result, arr[i], i, arr);
-            }
-        }
-
-        return result;
-    }
-
-    var reduce_1$2 = reduce$2;
-
-/**
-     * Array reduceRight
-     */
-    function reduceRight(arr, fn, initVal) {
-        // check for args.length since initVal might be "undefined" see #gh-57
-        var hasInit = arguments.length > 2;
-
-        if (arr == null || !arr.length) {
-            if (hasInit) {
-                return initVal;
-            } else {
-                throw new Error('reduce of empty array with no initial value');
-            }
-        }
-
-        var i = arr.length, result = initVal, value;
-        while (--i >= 0) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            value = arr[i];
-            if (!hasInit) {
-                result = value;
-                hasInit = true;
-            } else {
-                result = fn(result, value, i, arr);
-            }
-        }
-        return result;
-    }
-
-    var reduceRight_1 = reduceRight;
-
-/**
-     * Array reject
-     */
-    function reject$1(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            if (!callback(value, i, arr)) {
-                results.push(value);
-            }
-        }
-
-        return results;
-    }
-
-    var reject_1$2 = reject$1;
-
-/**
-     * Remove a single item from the array.
-     * (it won't remove duplicates, just a single item)
-     */
-    function remove$1(arr, item){
-        var idx = indexOf_1(arr, item);
-        if (idx !== -1) { arr.splice(idx, 1); }
-    }
-
-    var remove_1 = remove$1;
-
-/**
-     * Remove all instances of an item from array.
-     */
-    function removeAll(arr, item){
-        var idx = indexOf_1(arr, item);
-        while (idx !== -1) {
-            arr.splice(idx, 1);
-            idx = indexOf_1(arr, item, idx);
-        }
-    }
-
-    var removeAll_1 = removeAll;
-
-/**
-     * Returns a copy of the array in reversed order.
-     */
-    function reverse(array) {
-        var copy = array.slice();
-        copy.reverse();
-        return copy;
-    }
-
-    var reverse_1 = reverse;
-
-/**
-     * Shuffle array items.
-     */
-    function shuffle(arr) {
-        var results = [],
-            rnd;
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (!i) {
-                results[0] = arr[0];
-            } else {
-                rnd = randInt_1(0, i);
-                results[i] = results[rnd];
-                results[rnd] = arr[i];
-            }
-        }
-
-        return results;
-    }
-
-    var shuffle_1 = shuffle;
-
-/**
-     * Merge sort (http://en.wikipedia.org/wiki/Merge_sort)
-     */
-    function mergeSort(arr, compareFn) {
-        if (arr == null) {
-            return [];
-        } else if (arr.length < 2) {
-            return arr;
-        }
-
-        if (compareFn == null) {
-            compareFn = defaultCompare;
-        }
-
-        var mid, left, right;
-
-        mid   = ~~(arr.length / 2);
-        left  = mergeSort( arr.slice(0, mid), compareFn );
-        right = mergeSort( arr.slice(mid, arr.length), compareFn );
-
-        return merge$1(left, right, compareFn);
-    }
-
-    function defaultCompare(a, b) {
-        return a < b ? -1 : (a > b? 1 : 0);
-    }
-
-    function merge$1(left, right, compareFn) {
-        var result = [];
-
-        while (left.length && right.length) {
-            if (compareFn(left[0], right[0]) <= 0) {
-                // if 0 it should preserve same order (stable)
-                result.push(left.shift());
-            } else {
-                result.push(right.shift());
-            }
-        }
-
-        if (left.length) {
-            result.push.apply(result, left);
-        }
-
-        if (right.length) {
-            result.push.apply(result, right);
-        }
-
-        return result;
-    }
-
-    var sort = mergeSort;
-
-/*
-     * Sort array by the result of the callback
-     */
-    function sortBy(arr, callback, context){
-        callback = makeIterator_(callback, context);
-
-        return sort(arr, function(a, b) {
-            a = callback(a);
-            b = callback(b);
-            return (a < b) ? -1 : ((a > b) ? 1 : 0);
-        });
-    }
-
-    var sortBy_1 = sortBy;
-
-/**
-     * Split array into a fixed number of segments.
-     */
-    function split$1(array, segments) {
-        segments = segments || 2;
-        var results = [];
-        if (array == null) {
-            return results;
-        }
-
-        var minLength = Math.floor(array.length / segments),
-            remainder = array.length % segments,
-            i = 0,
-            len = array.length,
-            segmentIndex = 0,
-            segmentLength;
-
-        while (i < len) {
-            segmentLength = minLength;
-            if (segmentIndex < remainder) {
-                segmentLength++;
-            }
-
-            results.push(array.slice(i, i + segmentLength));
-
-            segmentIndex++;
-            i += segmentLength;
-        }
-
-        return results;
-    }
-    var split_1 = split$1;
-
-/**
-     * Iterates over a callback a set amount of times
-     * returning the results
-     */
-    function take(n, callback, thisObj){
-        var i = -1;
-        var arr = [];
-        if( !thisObj ){
-            while(++i < n){
-                arr[i] = callback(i, n);
-            }
-        } else {
-            while(++i < n){
-                arr[i] = callback.call(thisObj, i, n);
-            }
-        }
-        return arr;
-    }
-
-    var take_1 = take;
-
-/**
-     * Creates an object that holds a lookup for the objects in the array.
-     */
-    function toLookup(arr, key) {
-        var result = {};
-        if (arr == null) {
-            return result;
-        }
-
-        var i = -1, len = arr.length, value;
-        if (isFunction_1(key)) {
-            while (++i < len) {
-                value = arr[i];
-                result[key(value)] = value;
-            }
-        } else {
-            while (++i < len) {
-                value = arr[i];
-                result[value[key]] = value;
-            }
-        }
-
-        return result;
-    }
-    var toLookup_1 = toLookup;
-
-/**
-     * Concat multiple arrays and remove duplicates
-     */
-    function union$1(arrs) {
-        var results = [];
-        var i = -1, len = arguments.length;
-        while (++i < len) {
-            append_1(results, arguments[i]);
-        }
-
-        return unique_1(results);
-    }
-
-    var union_1 = union$1;
-
-/**
-     * Exclusive OR. Returns items that are present in a single array.
-     * - like ptyhon's `symmetric_difference`
-     */
-    function xor(arr1, arr2) {
-        arr1 = unique_1(arr1);
-        arr2 = unique_1(arr2);
-
-        var a1 = filter_1(arr1, function(item){
-                return !contains_1$2(arr2, item);
-            }),
-            a2 = filter_1(arr2, function(item){
-                return !contains_1$2(arr1, item);
-            });
-
-        return a1.concat(a2);
-    }
-
-    var xor_1 = xor;
-
-function getLength(arr) {
-        return arr == null ? 0 : arr.length;
-    }
-
-    /**
-     * Merges together the values of each of the arrays with the values at the
-     * corresponding position.
-     */
-    function zip(arr){
-        var len = arr ? max_1$2(map_1(arguments, getLength)) : 0,
-            results = [],
-            i = -1;
-        while (++i < len) {
-            // jshint loopfunc: true
-            results.push(map_1(arguments, function(item) {
-                return item == null ? undefined : item[i];
-            }));
-        }
-
-        return results;
-    }
-
-    var zip_1 = zip;
-
-//automatically generated, do not edit!
-//run `node build` instead
-var array$1 = {
-    'append' : append_1,
-    'collect' : collect_1,
-    'combine' : combine_1,
-    'compact' : compact_1,
-    'contains' : contains_1$2,
-    'difference' : difference_1,
-    'equals' : equals_1$2,
-    'every' : every_1$2,
-    'filter' : filter_1,
-    'find' : find_1$2,
-    'findIndex' : findIndex_1,
-    'findLast' : findLast_1,
-    'findLastIndex' : findLastIndex_1,
-    'flatten' : flatten_1$2,
-    'forEach' : forEach_1,
-    'groupBy' : groupBy_1,
-    'indexOf' : indexOf_1,
-    'indicesOf' : indicesOf_1,
-    'insert' : insert_1,
-    'intersection' : intersection_1,
-    'invoke' : invoke_1,
-    'join' : join_1,
-    'last' : last_1,
-    'lastIndexOf' : lastIndexOf_1,
-    'map' : map_1,
-    'max' : max_1$2,
-    'min' : min_1$2,
-    'pick' : pick_1$2,
-    'pluck' : pluck_1$2,
-    'range' : range_1,
-    'reduce' : reduce_1$2,
-    'reduceRight' : reduceRight_1,
-    'reject' : reject_1$2,
-    'remove' : remove_1,
-    'removeAll' : removeAll_1,
-    'reverse' : reverse_1,
-    'shuffle' : shuffle_1,
-    'slice' : slice_1,
-    'some' : some_1$2,
-    'sort' : sort,
-    'sortBy' : sortBy_1,
-    'split' : split_1,
-    'take' : take_1,
-    'toLookup' : toLookup_1,
-    'union' : union_1,
-    'unique' : unique_1,
-    'xor' : xor_1,
-    'zip' : zip_1
-};
-
-var array_5 = array$1.contains;
-var array_9 = array$1.filter;
-var array_10 = array$1.find;
-var array_15 = array$1.forEach;
-var array_25 = array$1.map;
-var array_33 = array$1.reject;
 
 /*
 object-assign
@@ -6348,10 +6460,11 @@ var endpoints = {
 
   add: (context, url, memo) => {
     return fetch(url)
-      .then(() => {
+      .then(res => {
         // ping ok!
         // 401 is expected because we didn't have a authorization token yet.
         //return response;
+        debugger;
         return;
       })
       .then(() => {
@@ -6460,67 +6573,67 @@ var page = {
 };
 
 var components = {
-  get: (context, component_uid, component_index, query = {}) => {
+  get: (context, component_uid, component, query = {}) => {
     return new Promise((resolve, reject$$1) => {
-      const component = context.state.page.components[component_index]; // TODO getters 化する
+      const method = component.api.method.get();
+      // only `get` method is allowed.
+      if (method !== 'get') {
+        return reject$$1('only `get` method is allowed.');
+      }
 
       let path = component.api.path.get();
-      const method = component.api.method.get();
-
       if (path.indexOf('/') !== 0) {
         path = '/' + path;
       }
 
-      if (!swagger.client.spec.paths[path] || !swagger.client.spec.paths[path][method]) {
-        // TODO
-        throw new Error(`[fetch] API define not found. ${path}/${method}`);
-      }
-
+      // for more detail, @see: http://swagger.io/specification/#itemsObject
       const pathItemObject = swagger.client.spec.paths[path];
-      let pathRefs = [{
+      if (!pathItemObject || !pathItemObject[method]) {
+        return reject$$1(`[fetch] API define not found. ${method} ${path}`);
+      }
+      // `pathRefs` is a collection of paths that is related to the component.
+      const pathRefs = [{
+        // `isSelf` is a flag that is used to determine whether the path is related to this component or others.
         isSelf: true,
         path
       }];
+      // `x-ref` is a custom key that is used to link paths.
       array_15(pathItemObject['get']['x-ref'] || [], path => {
         pathRefs.push({
           isSelf: false,
           path
         });
       });
-      const operationObject = swagger.client.spec.paths[path][method];
+      // for more detail, @see: http://swagger.io/specification/#operationObject
+      const operationObject = pathItemObject[method];
       const api = swagger.getApiByOperationID(operationObject.operationId);
 
-      const token = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
-
-      // TODO get only support
       api(query, {
         // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
         requestInterceptor: (req) => {
-          req.headers['Authorization'] = token;
+          // TODO: `headers`とかでtokenのセットが可能か？？
+          req.headers['Authorization'] = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
           console.log('Interceptor(request):', req);
         },
         responseInterceptor: (res) => {
           console.log('Interceptor(response):', res);
         }
-      })
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`[fetch] ${res.url} error.`);
-          }
-          console.log(`[fetch] ${res.url} success.`);
-          resolve({
-            response: res,
-            operationObject,
-            pathRefs,
-            component,
-            component_uid: component_uid
-          });
-        })
-        .catch(err => {
-          reject$$1(err);
+      }).then(res => {
+        if (!res.ok) {
+          return reject$$1(`[fetch] ${res.url} error.`);
+        }
+        console.log(`[fetch] ${res.url} success.`);
+        context.commit(constants.MUTATION_COMPONENTS_ONE, {
+          response: res,
+          operationObject,
+          pathRefs,
+          component,
+          component_uid: component_uid
         });
-    }).then(res => {
-      context.commit(constants.MUTATION_COMPONENTS_ONE, res);
+        resolve();
+      }).catch(err => {
+        reject$$1(err);
+      });
     });
   },
 
@@ -6547,6 +6660,14 @@ var components = {
       .then(() => {
         context.commit(constants.MUTATION_COMPONENTS_REMOVE_ALL);
       });
+  },
+
+  removeOne: (context, component_uid) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants.MUTATION_COMPONENTS_REMOVE_ONE, component_uid);
+      });
   }
 
 };
@@ -6566,7 +6687,7 @@ var toast = {
       .then(() => {
         context.commit(constants.MUTATION_TOAST_REMOVE, toastID);
       });
-  },
+  }
 
 };
 
@@ -7321,6 +7442,7 @@ var actions = {
   [constants.ACTION_COMPONENTS_GET]: components.get,
   [constants.ACTION_COMPONENTS_OPERATE]: components.operate,
   [constants.ACTION_COMPONENTS_REMOVE_ALL]: components.removeAll,
+  [constants.ACTION_COMPONENTS_REMOVE_ONE]: components.removeOne,
 
   [constants.ACTION_TOAST_SHOW]: toast.show,
   [constants.ACTION_TOAST_HIDE]: toast.hide,
@@ -7455,10 +7577,12 @@ var components$1 = {
     // const properties = schema.properties;
     const responseObj = params.response.obj;
 
-    let merge$$1 = swagger.mergePropertiesAndResponse(schema, responseObj);
+    const merge$$1 = swagger.mergePropertiesAndResponse(schema, responseObj);
+    const _data = swagger.mergeSchemaAndResponse(schema, responseObj);
 
     context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
     context.state.components[params.component_uid].data = merge$$1;
+    context.state.components[params.component_uid]._data = _data;
     // `component.pagination` value indicates whether the component supports pagination or not.
     // if supported then manually add pagination information from headers.
     if (params.component.pagination.get()) {
@@ -7503,6 +7627,11 @@ var components$1 = {
   removeAll: context => {
     context.state.components = {};
     return [constants.CHANGE_COMPONENTS];
+  },
+
+  removeOne: (context, component_uid) => {
+    delete context.state.components[component_uid];
+    return [constants.changeComponentsName(component_uid)];
   }
 };
 
@@ -7524,10 +7653,9 @@ var toast$1 = {
       id: generateID()
     });
 
-    console.log('add toast', data); // TODO
-
     context.state.toasts.push(data);
-    store$1.set(constants.STORAGE_TOAST, context.state.toasts);
+    // TODO: 一時的に外す
+    //storage.set(constants.STORAGE_TOAST, context.state.toasts);
     return [constants.CHANGE_TOAST];
   },
 
@@ -7535,7 +7663,8 @@ var toast$1 = {
     context.state.toasts = array_33(context.state.toasts, toast => {
       return toast.id === toastID;
     });
-    store$1.set(constants.STORAGE_TOAST, context.state.toasts);
+    // TODO: 一時的に外す
+    //storage.set(constants.STORAGE_TOAST, context.state.toasts);
 
     return [constants.CHANGE_TOAST];
   }
@@ -7601,6 +7730,7 @@ var mutations = {
 
   [constants.MUTATION_COMPONENTS_ONE]: components$1.one,
   [constants.MUTATION_COMPONENTS_REMOVE_ALL]: components$1.removeAll,
+  [constants.MUTATION_COMPONENTS_REMOVE_ONE]: components$1.removeOne,
 
   [constants.MUTATION_TOAST_ADD]: toast$1.add,
   [constants.MUTATION_TOAST_REMOVE]: toast$1.remove,
@@ -7683,6 +7813,9 @@ var oauthEndpointKey$2 = {
   }
 };
 
+// TODO `#/definitions/page`内のpropertiesやrequired定義は全サービス共通という認識でOK？
+// swagger.jsonの$ref`#/definitions/page`に該当する。
+// state内のデータはparse済みのもの。
 var page$2 = {
   _: context => {
     return context.state.page;
@@ -36909,10 +37042,7 @@ riot$1.tag2('dmc-component-graph-bar', '<div class="ComponentGraphBar__canvas" r
     });
 });
 
-riot$1.tag2('dmc-component-number', '<div class="ComponentNumber__value">{value}</div>', '', 'class="ComponentNumber"', function(opts) {
-
-    this.name = 'Name Name';
-    this.value = this.opts.data.value.get();
+riot$1.tag2('dmc-component-number', '<div class="ComponentNumber__value">{opts._data.getValue()}</div>', '', 'class="ComponentNumber"', function(opts) {
 });
 
 riot$1.tag2('dmc-button', '<span>{opts.label}</span>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class}" onclick="{handleClick}"', function(opts) {
@@ -37345,34 +37475,98 @@ riot$1.tag2('dmc-pagination', '<div class="Pagination__control"> <div class="Pag
     }.bind(this);
 });
 
-riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{component.name.get()}</div> <div class="Component__search" if="{!!search}" onclick="{handleSearchButtonClick}"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <div data-is="{childComponentName}" if="{!isPending}" data="{data}" actions="{childActions}" updater="{updater}"></div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{5}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
+riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name.get()}</div> <div class="Component__search" if="{!!search}" onclick="{handleSearchButtonClick}"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" _data="{_data}" actions="{childActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{5}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
 
     const store = this.riotx.get();
 
     this.isPending = true;
 
-    this.data = {};
-    this.pagination = {};
-    this.search = null;
+    this.isValidData = false;
 
-    this.component = this.opts.component;
+    this.alertApi = '';
+    this.alertText = '';
+
+    this.data = null;
+    this._data = null;
+    this.pagination = null;
+    this.search = null;
     this.selfActions = null;
     this.childActions = null;
 
     this.childComponentName = null;
-    if (swagger.isComponentStyleNumber(this.component.style)) {
+    if (swagger.isComponentStyleNumber(this.opts.component.style)) {
       this.childComponentName = 'dmc-component-number';
-    } else if (swagger.isComponentStyleTable(this.component.style)) {
+    } else if (swagger.isComponentStyleTable(this.opts.component.style)) {
       this.childComponentName = 'dmc-component-table';
-    } else if (swagger.isComponentStyleGraphBar(this.component.style)) {
+    } else if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
       this.childComponentName = 'dmc-component-graph-bar';
     }
 
     this.updater = (query = {}) => {
       this.isPending = true;
       this.update();
-      store.action(constants.ACTION_COMPONENTS_GET, this._riot_id, this.opts.idx, query);
+      Promise
+        .resolve()
+        .then(() => store.action(constants.ACTION_COMPONENTS_GET, this._riot_id, this.opts.component, query))
+        .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
+          message: err.message
+        }));
     };
+
+    this.validateResponse = function(data) {
+      const type = data.getType();
+      const method = this.opts.component.api.method.get();
+      const path = this.opts.component.api.path.get();
+      const style = this.opts.component.style.get();
+
+      if (swagger.isComponentStyleNumber(this.opts.component.style)) {
+        if (type !== 'number') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be form of "number".`;
+          return;
+        }
+      }
+
+      if (swagger.isComponentStyleTable(this.opts.component.style)) {
+        if (type !== 'array') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be form of "array".`;
+          return;
+        }
+        if (!data.getLength() || data.getValue(0).getType() !== 'object') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be composed with "object".`;
+          return;
+        }
+      }
+
+      if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
+        if (type !== 'object') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be form of "object".`;
+          return;
+        }
+        if (!data.getValue('keys') || !data.getValue('data') || data.getValue('keys').getType() !== 'array' || data.getValue('data').getType() !== 'array') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be composed with "keys" and "data". value sholud be an "array".`;
+          return;
+        }
+        if (!data.getValue('data').getLength() || data.getValue('keys').getLength() !== data.getValue('data').getValue(0).getLength()) {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be composed with "keys" and "data". "keys" and "data[idx]" should have same length.`;
+          return;
+        }
+      }
+
+      this.isValidData = true;
+      this.alertText = '';
+    }.bind(this);
 
     this.on('mount', () => {
 
@@ -37381,18 +37575,20 @@ riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Componen
       }, 1000);
     });
 
-    this.on('unmount', () => {
-
-    });
-
     store.change(constants.changeComponentsName(this._riot_id), (err, state, store) => {
       this.isPending = false;
       const component = store.getter(constants.GETTER_COMPONENTS_ONE, this._riot_id);
       this.data = component.data;
-      this.pagination = component.pagination;
+      this._data = component._data;
+      if (component.pagination && component.pagination.maxPage > 1) {
+        this.pagination = component.pagination;
+      } else {
+        this.pagination = null;
+      }
       this.search = component.search;
       this.selfActions = component.selfActions;
       this.childActions = component.childActions;
+      this.validateResponse(this._data);
       this.update();
     });
 
@@ -37552,7 +37748,7 @@ riot$1.tag2('dmc-entry', '<div class="Entry__title">新しい管理画面を<br>
 
     const store = this.riotx.get();
 
-    this.endpointURL = 'http://127.0.0.1:3000/swagger.json';
+    this.endpointURL = 'https://localhost:3000/swagger.json';
     this.memo = '';
 
     this.closeModal = function() {
@@ -37576,8 +37772,19 @@ riot$1.tag2('dmc-entry', '<div class="Entry__title">新しい管理画面を<br>
       .then(() => {
         this.closeModal();
       }).catch(err => {
+         let message;
+         let autoHide;
+         if (this.endpointURL.startsWith('https://')) {
+
+           message = `もしかして:${this.endpointURL}`;
+           autoHide = false;
+         } else {
+           message = err.message;
+           autoHide = true;
+         }
         store.action(constants.ACTION_TOAST_SHOW, {
-          message: err.message
+          message,
+          autoHide
         });
       });
     }.bind(this);
@@ -38157,6 +38364,8 @@ const setupRouter = (store) => {
 
 // entry point!!
 document.addEventListener('DOMContentLoaded', () => {
+  //TODO: debug用なので後で消すこと。
+  window.swagger = swagger;
   Promise
     .resolve()
     .then(() => setupStore())
