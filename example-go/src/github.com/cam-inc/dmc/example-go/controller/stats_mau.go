@@ -22,8 +22,5 @@ func (c *StatsMauController) Show(ctx *app.ShowStatsMauContext) error {
 	// Put your logic here
 
 	// StatsMauController_Show: end_implement
-	res := &app.Statsmau{
-		Value: 9876543,
-	}
-	return ctx.OK(res)
+	return ctx.OK(9876543)
 }
