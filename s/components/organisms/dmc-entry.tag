@@ -43,7 +43,7 @@ dmc-entry.Entry
          let autoHide;
          if (this.endpointURL.startsWith('https://')) {
            // サーバが自己証明書を使用している場合にページ遷移を促す
-           message = `もしかして:${url}`
+           message = `もしかして:${this.endpointURL}`
            autoHide = false;
          } else {
            message = err.message;
