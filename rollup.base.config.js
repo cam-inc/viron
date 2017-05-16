@@ -3,7 +3,6 @@ import riot from 'rollup-plugin-riot';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import buble from 'rollup-plugin-buble';
-import serve from 'rollup-plugin-serve';
 import filesize from 'rollup-plugin-filesize';
 import replace from 'rollup-plugin-replace';
 
@@ -27,8 +26,6 @@ mout.object.forOwn(mout, (v,k) => {
     }
   });
 });
-
-// TODO: 開発時とリリース時でconfigを変更すること。
 
 // import uglify from 'rollup-plugin-uglify'
 import eslint from 'rollup-plugin-eslint';
@@ -70,12 +67,6 @@ export default {
     }),
     filesize(),
     // uglify(),
-    eslint({exclude: ['**/*.tag']}),
-    serve({
-      contentBase: 'dist', // Folder to serve files from,
-      historyApiFallback: false, // Set to true to return index.html instead of 404
-      host: 'localhost', // Options used in setting up server
-      port: 8080
-    })
+    eslint({exclude: ['**/*.tag']})
   ]
 };
