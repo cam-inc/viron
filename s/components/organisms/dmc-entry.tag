@@ -39,9 +39,19 @@ dmc-entry.Entry
       .then(() => {
         this.closeModal();
       }).catch(err => {
+         let message;
+         let autoHide;
+         if (this.endpointURL.startsWith('https://')) {
+           // サーバが自己証明書を使用している場合にページ遷移を促す
+           message = `もしかして:${url}`
+           autoHide = false;
+         } else {
+           message = err.message;
+           autoHide = true;
+         }
         store.action(constants.ACTION_TOAST_SHOW, {
-          message: err.message,
-          autoHide: false,
+          message,
+          autoHide
         });
       })
     }
