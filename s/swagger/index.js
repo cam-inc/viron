@@ -102,7 +102,15 @@ class Swagger {
   mergeSchemaAndResponse(schema, response) {
     // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
     // type will be one of "null", "boolean", "object", "array", "number" or "string".
-    const type = schema.type;
+    let type = schema.type;
+    // if type is not defined or an array, expect type by response.
+    if (!type || Array.isArray(type)) {
+      if (Array.isArray(response)) {
+        type = 'array';
+      } else {
+        type = typeof response;
+      }
+    }
     const ret = {
       // dmc customs.
       _type: null,
