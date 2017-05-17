@@ -68,10 +68,10 @@ dmc-component.Component
       const style = this.opts.component.style.get();
 
       if (swagger.isComponentStyleNumber(this.opts.component.style)) {
-        if (type !== 'number') {
+      if (type !== 'object' || data.getValue('value') === undefined) {
           this.isValidData = false;
           this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be form of "number".`;
+          this.alertText = `response of component styled "${style}" should be form of "object" and have "value" key.`;
           return;
         }
       }
