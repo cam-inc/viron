@@ -1,8 +1,8 @@
-dmc-input(class="Input { opts.isfocused ? 'Input--focused' : '' } { opts.isdisabled ? 'Input--disabled' : '' }" click="{ handleClick }")
+dmc-input(ref="form" class="Input { opts.isfocused ? 'Input--focused' : '' } { opts.isdisabled ? 'Input--disabled' : '' }" click="{ handleClick }")
   form.Input__content(submit="{ handleFormSubmit }")
     .Input__icon(if="{ !!opts.icon }")
       dmc-icon(type="{ opts.icon }")
-    input.Input__input(ref="input" type="{ opts.type || 'text' }" value="{ opts.text }" placeholder="{ opts.placeholder || '' }" disabled="{ opts.isdisabled }" pattern="{ opts.pattern }" input="{ handleInputChange }" focus="{ handleInputFocus }" blur="{ handleInputBlur }")
+    input.Input__input(type="{ opts.type || 'text' }" value="{ opts.text }" placeholder="{ opts.placeholder || '' }" disabled="{ opts.isdisabled }" pattern="{ opts.pattern }" input="{ handleInputChange }" focus="{ handleInputFocus }" blur="{ handleInputBlur }")
     .Input__resetButton(if="{ opts.isresetable }" click="{ handleResetButtonClick }")
       dmc-icon(type="close")
 
@@ -12,7 +12,7 @@ dmc-input(class="Input { opts.isfocused ? 'Input--focused' : '' } { opts.isdisab
     const initialText = opts.text || '';
 
     handleClick() {
-      this.refs.input.focus();
+      this.refs.form.focus();
     }
 
     handleFormSubmit(e) {

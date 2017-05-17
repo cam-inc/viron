@@ -17,7 +17,7 @@ dmc-component-table.ComponentTable
           key: constants.DMC_TABLE_ACTION_KEY
         });
       }
-      forOwn(this.opts.data[0], (v, k) => {
+      forEach(this.opts._data.getValue(0).getKeys(), k => {
         columns.push({
           title: k,
           key: k
@@ -28,7 +28,7 @@ dmc-component-table.ComponentTable
 
     getRows() {
       const rows = [];
-      forEach(this.opts.data, cells => {
+      forEach(this.opts._data.getValue(), cells => {
         const row = {};
         if (!!this.opts.actions && this.opts.actions.length) {
           row[constants.DMC_TABLE_ACTION_KEY] = {
@@ -44,10 +44,10 @@ dmc-component-table.ComponentTable
             });
           });
         }
-        forOwn(cells, cell => {
-          row[cell.key] = {
+        forOwn(cells.getValue(), cell => {
+          row[cell.getKey()] = {
             isText: true,
-            value: cell.get()
+            value: cell.getValue()
           };
         });
         rows.push(row);
@@ -63,15 +63,15 @@ dmc-component-table.ComponentTable
         if (parameter.in === 'body') {
           queries[name] = {};
           forOwn(parameter.schema.properties, (v, k) => {
-            if (rowData[k]) {
-              queries[name][k] = rowData[k].get();
+            if (rowData.getValue(k)) {
+              queries[name][k] = rowData.getValue(k).getValue();
             }
           });
         } else {
-          if (!rowData[name]) {
+          if (!rowData.getValue(name)) {
             return;
           }
-          queries[name] = rowData[name].get()
+          queries[name] = rowData.getValue(name).getValue();
         }
       });
 

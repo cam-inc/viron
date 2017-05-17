@@ -115,6 +115,8 @@ class Swagger {
       // dmc customs.
       _type: null,
       _value: null,
+      _index: null,
+      _key: null,
       _keys: null,
       _length: null,
       getType: function() {
@@ -125,6 +127,12 @@ class Swagger {
           return this._value;
         }
         return this._value[k];
+      },
+      getIndex: function() {
+        return this._index;
+      },
+      getKey: function() {
+        return this._key;
       },
       getKeys: function() {
         return this._keys;
@@ -184,7 +192,7 @@ class Swagger {
       forOwn(response, (v, k) => {
         ret._keys.push(k);
         ret._value[k] = this.mergeSchemaAndResponse(schema.properties[k], v);
-        ret._value[k].key = k;
+        ret._value[k]._key = k;
       });
       break;
     case 'array':
@@ -193,7 +201,7 @@ class Swagger {
       ret._length = response.length;
       forEach(response, (v, i) => {
         ret._value[i] = this.mergeSchemaAndResponse(schema.items, v);
-        ret._value[i].idx = i;
+        ret._value[i]._index = i;
       });
       break;
     case 'number':
@@ -205,6 +213,8 @@ class Swagger {
       ret._value = response;
       break;
     default:
+      // irregular case. e.g.) レスポンス内容がproperties内に定義されていない場合など。
+      ret._value = response;
       break;
     }
 
