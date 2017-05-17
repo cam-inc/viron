@@ -139,7 +139,7 @@ func (c *DmcController) Show(ctx *app.ShowDmcContext) error {
 					{
 						Name:       "Planet(stacked-area)",
 						API:        api("/stats/planet/stacked-area", "get"),
-						Style:      bridge.StyleGraphBar,
+						Style:      bridge.StyleGraphStackedArea,
 						Options:    defaultOptions,
 						Pagination: false,
 					},
