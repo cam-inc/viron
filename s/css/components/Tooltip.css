@@ -4,9 +4,30 @@
 
 .Tooltip {
   position: relative;
+  display: none;
   display: block;
   width: 0;
   height: 0;
+}
+
+.Tooltip--visible {
+  display: block;
+}
+
+.Tooltip__wrapper {
+  position: absolute;
+  bottom: var(--component-tooltip-triangle-height);
+  left: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  transition-duration: 300ms;
+  transition-property: opacity, bottom;
+}
+
+.Tooltip--active .Tooltip__wrapper {
+  bottom: 0;
+  opacity: 1;
 }
 
 .Tooltip__triangle {
