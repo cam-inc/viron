@@ -143,6 +143,8 @@ const setupRouter = (store) => {
 
 // entry point!!
 document.addEventListener('DOMContentLoaded', () => {
+  //TODO: debug用なので後で消すこと。
+  window.swagger = swagger;
   Promise
     .resolve()
     .then(() => setupStore())

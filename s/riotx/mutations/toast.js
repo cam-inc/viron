@@ -22,10 +22,9 @@ export default {
       id: generateID()
     });
 
-    console.log('add toast', data); // TODO
-
     context.state.toasts.push(data);
-    storage.set(constants.STORAGE_TOAST, context.state.toasts);
+    // TODO: 一時的に外す
+    //storage.set(constants.STORAGE_TOAST, context.state.toasts);
     return [constants.CHANGE_TOAST];
   },
 
@@ -33,7 +32,8 @@ export default {
     context.state.toasts = reject(context.state.toasts, toast => {
       return toast.id === toastID;
     });
-    storage.set(constants.STORAGE_TOAST, context.state.toasts);
+    // TODO: 一時的に外す
+    //storage.set(constants.STORAGE_TOAST, context.state.toasts);
 
     return [constants.CHANGE_TOAST];
   }

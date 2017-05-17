@@ -3,67 +3,67 @@ import constants from '../../core/constants';
 import swagger from '../../swagger';
 
 export default {
-  get: (context, component_uid, component_index, query = {}) => {
+  get: (context, component_uid, component, query = {}) => {
     return new Promise((resolve, reject) => {
-      const component = context.state.page.components[component_index]; // TODO getters 化する
+      const method = component.api.method.get();
+      // only `get` method is allowed.
+      if (method !== 'get') {
+        return reject('only `get` method is allowed.');
+      }
 
       let path = component.api.path.get();
-      const method = component.api.method.get();
-
       if (path.indexOf('/') !== 0) {
         path = '/' + path;
       }
 
-      if (!swagger.client.spec.paths[path] || !swagger.client.spec.paths[path][method]) {
-        // TODO
-        throw new Error(`[fetch] API define not found. ${path}/${method}`);
-      }
-
+      // for more detail, @see: http://swagger.io/specification/#itemsObject
       const pathItemObject = swagger.client.spec.paths[path];
-      let pathRefs = [{
+      if (!pathItemObject || !pathItemObject[method]) {
+        return reject(`[fetch] API define not found. ${method} ${path}`);
+      }
+      // `pathRefs` is a collection of paths that is related to the component.
+      const pathRefs = [{
+        // `isSelf` is a flag that is used to determine whether the path is related to this component or others.
         isSelf: true,
         path
       }];
+      // `x-ref` is a custom key that is used to link paths.
       forEach(pathItemObject['get']['x-ref'] || [], path => {
         pathRefs.push({
           isSelf: false,
           path
         });
       });
-      const operationObject = swagger.client.spec.paths[path][method];
+      // for more detail, @see: http://swagger.io/specification/#operationObject
+      const operationObject = pathItemObject[method];
       const api = swagger.getApiByOperationID(operationObject.operationId);
 
-      const token = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
-
-      // TODO get only support
       api(query, {
         // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
         requestInterceptor: (req) => {
-          req.headers['Authorization'] = token;
+          // TODO: `headers`とかでtokenのセットが可能か？？
+          req.headers['Authorization'] = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
           console.log('Interceptor(request):', req);
         },
         responseInterceptor: (res) => {
           console.log('Interceptor(response):', res);
         }
-      })
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`[fetch] ${res.url} error.`);
-          }
-          console.log(`[fetch] ${res.url} success.`);
-          resolve({
-            response: res,
-            operationObject,
-            pathRefs,
-            component,
-            component_uid: component_uid
-          });
-        })
-        .catch(err => {
-          reject(err);
+      }).then(res => {
+        if (!res.ok) {
+          return reject(`[fetch] ${res.url} error.`);
+        }
+        console.log(`[fetch] ${res.url} success.`);
+        context.commit(constants.MUTATION_COMPONENTS_ONE, {
+          response: res,
+          operationObject,
+          pathRefs,
+          component,
+          component_uid: component_uid
         });
-    }).then(res => {
-      context.commit(constants.MUTATION_COMPONENTS_ONE, res);
+        resolve();
+      }).catch(err => {
+        reject(err);
+      });
     });
   },
 
@@ -89,6 +89,14 @@ export default {
       .resolve()
       .then(() => {
         context.commit(constants.MUTATION_COMPONENTS_REMOVE_ALL);
+      });
+  },
+
+  removeOne: (context, component_uid) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants.MUTATION_COMPONENTS_REMOVE_ONE, component_uid);
       });
   }
 

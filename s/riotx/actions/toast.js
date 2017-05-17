@@ -15,6 +15,6 @@ export default {
       .then(() => {
         context.commit(constants.MUTATION_TOAST_REMOVE, toastID);
       });
-  },
+  }
 
 };

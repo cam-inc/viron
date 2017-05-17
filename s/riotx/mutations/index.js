@@ -39,6 +39,7 @@ export default {
 
   [constants.MUTATION_COMPONENTS_ONE]: components.one,
   [constants.MUTATION_COMPONENTS_REMOVE_ALL]: components.removeAll,
+  [constants.MUTATION_COMPONENTS_REMOVE_ONE]: components.removeOne,
 
   [constants.MUTATION_TOAST_ADD]: toast.add,
   [constants.MUTATION_TOAST_REMOVE]: toast.remove,

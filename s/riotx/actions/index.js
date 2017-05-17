@@ -43,6 +43,7 @@ export default {
   [constants.ACTION_COMPONENTS_GET]: components.get,
   [constants.ACTION_COMPONENTS_OPERATE]: components.operate,
   [constants.ACTION_COMPONENTS_REMOVE_ALL]: components.removeAll,
+  [constants.ACTION_COMPONENTS_REMOVE_ONE]: components.removeOne,
 
   [constants.ACTION_TOAST_SHOW]: toast.show,
   [constants.ACTION_TOAST_HIDE]: toast.hide,

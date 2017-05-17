@@ -53,13 +53,6 @@ export default {
       })
       .then((res) => {
         context.commit(constants.MUTATION_ENDPOINTS_ADD, res.key, res.endpoint);
-      })
-      .catch((e) => {
-        if (url.startsWith('https://')) {
-          // サーバが自己証明書を使用している場合にページ遷移を促す
-          e = new Error('もしかして: ' + url);
-        }
-        throw e;
       });
   }
 };

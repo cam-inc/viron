@@ -1,12 +1,15 @@
 dmc-component.Component
   .Component__head
-    .Component__name { component.name.get() }
+    .Component__name { opts.component.name.get() }
     .Component__search(if="{ !!search }" onClick="{ handleSearchButtonClick }")
       dmc-icon(type="search")
   .Component__body
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
-    div(data-is="{ childComponentName }" if="{ !isPending }" data="{ data }" actions="{ childActions }" updater="{ updater }")
+    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" data="{ data }" _data="{ _data }" actions="{ childActions }" updater="{ updater }")
+    .Component__alert(if="{ !isPending && !isValidData }")
+      .Component__alertApi { alertApi }
+      .Component__alertText { alertText }
     dmc-pagination(if="{ !isPending && !!pagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ 5 }" onChange="{ handlePaginationChange }")
   .Component__tail(if="{ !!selfActions }")
     dmc-component-action(each="{ action in selfActions }" action="{ action }" updater="{ parent.updater }")
@@ -19,36 +22,99 @@ dmc-component.Component
     import '../organisms/dmc-component-number.tag';
     import '../organisms/dmc-component-table.tag';
     import '../organisms/dmc-pagination.tag';
-
     import '../atoms/dmc-icon.tag';
 
     const store = this.riotx.get();
 
     // `pending` means the status of fetching data.
     this.isPending = true;
+    // whether the response is valid or not.
+    this.isValidData = false;
+    // alert info if not valid.
+    this.alertApi = '';
+    this.alertText = '';
     // `data` and others will be filled with detail info after fetching.
-    this.data = {};
-    this.pagination = {};
+    this.data = null;
+    this._data = null;
+    this.pagination = null;
     this.search = null;
-    // `component` is kind of a raw data.
-    this.component = this.opts.component;
     this.selfActions = null;
     this.childActions = null;
     // used to render riot component.
     this.childComponentName = null;
-    if (swagger.isComponentStyleNumber(this.component.style)) {
+    if (swagger.isComponentStyleNumber(this.opts.component.style)) {
       this.childComponentName = 'dmc-component-number';
-    } else if (swagger.isComponentStyleTable(this.component.style)) {
+    } else if (swagger.isComponentStyleTable(this.opts.component.style)) {
       this.childComponentName = 'dmc-component-table';
-    } else if (swagger.isComponentStyleGraphBar(this.component.style)) {
+    } else if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
       this.childComponentName = 'dmc-component-graph-bar';
     }
     // `updater` will be passed to the child component,(i.e. dmc-component-*) so the child component has the ability to update data.
     this.updater = (query = {}) => {
       this.isPending = true;
       this.update();
-      store.action(constants.ACTION_COMPONENTS_GET, this._riot_id, this.opts.idx, query);
+      Promise
+        .resolve()
+        .then(() => store.action(constants.ACTION_COMPONENTS_GET, this._riot_id, this.opts.component, query))
+        .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
+          message: err.message
+        }));
     };
+
+    validateResponse(data) {
+      const type = data.getType();
+      const method = this.opts.component.api.method.get();
+      const path = this.opts.component.api.path.get();
+      const style = this.opts.component.style.get();
+
+      if (swagger.isComponentStyleNumber(this.opts.component.style)) {
+        if (type !== 'number') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be form of "number".`;
+          return;
+        }
+      }
+
+      if (swagger.isComponentStyleTable(this.opts.component.style)) {
+        if (type !== 'array') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be form of "array".`;
+          return;
+        }
+        if (!data.getLength() || data.getValue(0).getType() !== 'object') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be composed with "object".`;
+          return;
+        }
+      }
+
+      if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
+        if (type !== 'object') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be form of "object".`;
+          return;
+        }
+        if (!data.getValue('keys') || !data.getValue('data') || data.getValue('keys').getType() !== 'array' || data.getValue('data').getType() !== 'array') {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be composed with "keys" and "data". value sholud be an "array".`;
+          return;
+        }
+        if (!data.getValue('data').getLength() || data.getValue('keys').getLength() !== data.getValue('data').getValue(0).getLength()) {
+          this.isValidData = false;
+          this.alertApi = `${method}: ${path}`;
+          this.alertText = `response of component styled "${style}" should be composed with "keys" and "data". "keys" and "data[idx]" should have same length.`;
+          return;
+        }
+      }
+
+      this.isValidData = true;
+      this.alertText = '';
+    }
 
     this.on('mount', () => {
       // TODO: debug用なので後でtimeout処理を外すこと。
@@ -57,18 +123,20 @@ dmc-component.Component
       }, 1000);
     });
 
-    this.on('unmount', () => {
-      // TODO: state.component内の対象物を削除する？
-    });
-
     store.change(constants.changeComponentsName(this._riot_id), (err, state, store) => {
       this.isPending = false;
       const component = store.getter(constants.GETTER_COMPONENTS_ONE, this._riot_id);
       this.data = component.data;
-      this.pagination = component.pagination;
+      this._data = component._data;
+      if (component.pagination && component.pagination.maxPage > 1) {
+        this.pagination = component.pagination;
+      } else {
+        this.pagination = null;
+      }
       this.search = component.search;
       this.selfActions = component.selfActions;
       this.childActions = component.childActions;
+      this.validateResponse(this._data);
       this.update();
     });
 

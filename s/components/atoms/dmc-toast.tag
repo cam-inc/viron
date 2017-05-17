@@ -1,5 +1,8 @@
 dmc-toast(class="Toast Toast--{ opts.type }" click="{ handleClick }")
-  div { opts.message }
+  .Toast__icon
+    dmc-icon(if="{ opts.type === 'normal' }" type="close")
+    dmc-icon(if="{ opts.type === 'error' }" type="exclamation")
+  .Toast__message { opts.message }
 
   script.
     import constants from '../../core/constants';

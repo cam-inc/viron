@@ -1,3 +1,4 @@
+import { forEach } from 'mout/array';
 import { get, forOwn } from 'mout/object';
 
 import constants from '../core/constants';
@@ -94,6 +95,115 @@ class Swagger {
   }
 
   /**
+   * dmc-component-*.tagが扱いやすいデータ構造に変換する。
+   * @param {Object} schema
+   * @param {*} response
+   */
+  mergeSchemaAndResponse(schema, response) {
+    // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+    // type will be one of "null", "boolean", "object", "array", "number" or "string".
+    const type = schema.type;
+    const ret = {
+      // dmc customs.
+      _type: null,
+      _value: null,
+      _keys: null,
+      _length: null,
+      getType: function() {
+        return this._type;
+      },
+      getValue: function(k) {
+        if (k === undefined) {
+          return this._value;
+        }
+        return this._value[k];
+      },
+      getKeys: function() {
+        return this._keys;
+      },
+      getLength: function() {
+        return this._length;
+      }
+    };
+    // @see: http://swagger.io/specification/#schemaObject
+    const schemaObjectKeys = [
+      'example',
+      'format',// @see: http://swagger.io/specification/#dataTypeFormat
+      'title',
+      'description',
+      'default',
+      'multipleOf',
+      'maximum',
+      'exclusiveMaximum',
+      'minimum',
+      'exclusiveMinimum',
+      'maxLength',
+      'minLength',
+      'pattern',
+      'maxItems',
+      'minItems',
+      'uniqueItems',
+      'maxProperties',
+      'minProperties',
+      'required',
+      'enum',
+      //'type',// removed on purpose. type will be customized by dmc.
+      'items',
+      'allOf',
+      'properties',
+      'additionalProperties'
+    ];
+    forEach(schemaObjectKeys, v => {
+      ret[`_${v}`] = schema[v];
+      ret[`get${v.charAt(0).toUpperCase()}${v.slice(1)}`] = function() {
+        return this[`_${v}`];
+      };
+    });
+
+    switch (type) {
+    case 'null':
+      ret._type = 'null';
+      ret._value = null;
+      break;
+    case 'boolean':
+      ret._type = 'boolean';
+      ret._value = response;
+      break;
+    case 'object':
+      ret._type = 'object';
+      ret._value = {};
+      ret._keys = [];
+      forOwn(response, (v, k) => {
+        ret._keys.push(k);
+        ret._value[k] = this.mergeSchemaAndResponse(schema.properties[k], v);
+        ret._value[k].key = k;
+      });
+      break;
+    case 'array':
+      ret._type = 'array';
+      ret._value = [];
+      ret._length = response.length;
+      forEach(response, (v, i) => {
+        ret._value[i] = this.mergeSchemaAndResponse(schema.items, v);
+        ret._value[i].idx = i;
+      });
+      break;
+    case 'number':
+      ret._type = 'number';
+      ret._value = response;
+      break;
+    case 'string':
+      ret._type = 'number';
+      ret._value = response;
+      break;
+    default:
+      break;
+    }
+
+    return ret;
+  }
+
+  /**
    * 定義情報とデータをマージ
    * @param properties
    * @param response
@@ -101,6 +211,7 @@ class Swagger {
    * @returns {*}
    */
   mergePropertiesAndResponse(properties, response, key) {
+
     if (properties.type === 'array') {
       let res = [];
       forOwn(response, (v, k) => {
