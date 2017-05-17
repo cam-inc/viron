@@ -94,6 +94,19 @@ class Swagger {
     return this.client.spec.paths[path];
   }
 
+  getMethodAndPathByOperationID(operationID) {
+    const ret = {};
+    forOwn(this.client.spec.paths, (pathItemObject, path) => {
+      forOwn(pathItemObject, (v, k) => {
+        if (get(v, 'operationId') === operationID) {
+          ret.method = k;
+          ret.path = path;
+        }
+      });
+    });
+    return ret;
+  }
+
   /**
    * dmc-component-*.tagが扱いやすいデータ構造に変換する。
    * @param {Object} schema

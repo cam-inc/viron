@@ -106,3 +106,18 @@
   padding: 8px;
   border-top: 1px solid var(--color-basic-black);
 }
+
+.Component__action {
+  position: relative;
+  display: block;
+}
+
+.Component__action .Button {
+  display: block;
+}
+
+.Component__action .Tooltip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+}

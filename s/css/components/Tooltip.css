@@ -50,6 +50,7 @@
 .Tooltip__content {
   position: relative;
   left: -50%;
+  width: 100px;
   padding: 8px;
   color: var(--color-basic-white);
   background-color: var(--color-basic-black);

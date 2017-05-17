@@ -237,14 +237,36 @@ dmc-component-searchbox.Component__searchBox
       this.closeModal();
     }
 
-dmc-component-action.Component__action
-  dmc-button(label="{ opts.action.operationId }" onClick="{ handleButtonClick }")
+dmc-component-action.Component__action(mouseover="{ handleMouseOver }" mouseout="{ handleMouseOut }")
+  dmc-button(label="{ label }" onClick="{ handleButtonClick }")
+  dmc-tooltip(if="{ isTooltipOpened }" message="{ tooltipMessage }")
 
   script.
     import '../organisms/dmc-operation.tag';
     import '../atoms/dmc-button.tag';
+    import '../atoms/dmc-tooltip.tag';
 
     const store = this.riotx.get();
+
+    this.isTooltipOpened = false;
+    this.label = this.opts.action.summary;
+    if (!this.label) {
+      const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
+      this.label = `${obj.method} ${obj.path}`;
+    }
+    this.tooltipMessage = this.opts.action.description;
+
+    handleMouseOver() {
+      if (!!this.tooltipMessage) {
+        this.isTooltipOpened = true;
+      }
+      this.update();
+    }
+
+    handleMouseOut() {
+      this.isTooltipOpened = false;
+      this.update();
+    }
 
     handleButtonClick() {
       store.action(constants.ACTION_MODAL_SHOW, 'dmc-operation', {
