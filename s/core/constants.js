@@ -14,6 +14,12 @@ export default {
   STYLE_NUMBER: 'number',
   STYLE_TABLE: 'table',
   STYLE_GRAPH_BAR: 'graph-bar',
+  STYLE_GRAPH_SCATTERPLOT: 'graph-scatterplot',
+  STYLE_GRAPH_LINE: 'graph-line',
+  STYLE_GRAPH_HORIZONTAL_BAR: 'graph-horizontal-bar',
+  STYLE_GRAPH_STACKED_BAR: 'graph-stacked-bar',
+  STYLE_GRAPH_HORIZONTAL_STACKED_BAR: 'graph-horizontal-stacked-bar',
+  STYLE_GRAPH_STACKED_AREA: 'graph-stacked-area',
 
   // Auth type
   AUTH_TYPE_EMAIL: 'email',

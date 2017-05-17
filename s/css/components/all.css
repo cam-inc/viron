@@ -5,6 +5,12 @@
 @import "Checkbox";
 @import "Component";
 @import "ComponentGraphBar";
+@import "ComponentGraphHorizontalBar";
+@import "ComponentGraphHorizontalStackedBar";
+@import "ComponentGraphLine";
+@import "ComponentGraphScatterplot";
+@import "ComponentGraphStackedArea";
+@import "ComponentGraphStackedBar";
 @import "ComponentNumber";
 @import "ComponentTable";
 @import "Drawer";

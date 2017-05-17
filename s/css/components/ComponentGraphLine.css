@@ -1,0 +1,7 @@
+.ComponentGraphLine {
+  display: block;
+}
+
+.ComponentGraphLine__canvas {
+  height: 600px;
+}

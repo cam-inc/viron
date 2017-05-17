@@ -275,6 +275,30 @@ class Swagger {
     return obj.get() === constants.STYLE_GRAPH_BAR;
   }
 
+  isComponentStyleGraphScatterplot(obj) {
+    return obj.get() === constants.STYLE_GRAPH_SCATTERPLOT;
+  }
+
+  isComponentStyleGraphLine(obj) {
+    return obj.get() === constants.STYLE_GRAPH_LINE;
+  }
+
+  isComponentStyleGraphHorizontalBar(obj) {
+    return obj.get() === constants.STYLE_GRAPH_HORIZONTAL_BAR;
+  }
+
+  isComponentStyleGraphStackedBar(obj) {
+    return obj.get() === constants.STYLE_GRAPH_STACKED_BAR;
+  }
+
+  isComponentStyleGraphHorizontalStackedBar(obj) {
+    return obj.get() === constants.STYLE_GRAPH_HORIZONTAL_STACKED_BAR;
+  }
+
+  isComponentStyleGraphStackedArea(obj) {
+    return obj.get() === constants.STYLE_GRAPH_STACKED_AREA;
+  }
+
 }
 
 export default new Swagger();

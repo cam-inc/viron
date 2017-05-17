@@ -1,0 +1,7 @@
+.ComponentGraphHorizontalBar {
+  display: block;
+}
+
+.ComponentGraphHorizontalBar__canvas {
+  height: 600px;
+}

@@ -19,6 +19,12 @@ dmc-component.Component
     import swagger from '../../swagger';
     import constants from '../../core/constants';
     import '../organisms/dmc-component-graph-bar.tag';
+    import '../organisms/dmc-component-graph-horizontal-bar.tag';
+    import '../organisms/dmc-component-graph-horizontal-stacked-bar.tag';
+    import '../organisms/dmc-component-graph-line.tag';
+    import '../organisms/dmc-component-graph-scatterplot.tag';
+    import '../organisms/dmc-component-graph-stacked-area.tag';
+    import '../organisms/dmc-component-graph-stacked-bar.tag';
     import '../organisms/dmc-component-number.tag';
     import '../organisms/dmc-component-table.tag';
     import '../organisms/dmc-pagination.tag';
@@ -48,6 +54,18 @@ dmc-component.Component
       this.childComponentName = 'dmc-component-table';
     } else if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
       this.childComponentName = 'dmc-component-graph-bar';
+    } else if (swagger.isComponentStyleGraphScatterplot(this.opts.component.style)) {
+      this.childComponentName = 'dmc-component-graph-scatterplot';
+    } else if (swagger.isComponentStyleGraphLine(this.opts.component.style)) {
+      this.childComponentName = 'dmc-component-graph-line';
+    } else if (swagger.isComponentStyleGraphHorizontalBar(this.opts.component.style)) {
+      this.childComponentName = 'dmc-component-graph-horizontal-bar';
+    } else if (swagger.isComponentStyleGraphStackedBar(this.opts.component.style)) {
+      this.childComponentName = 'dmc-component-graph-stacked-bar';
+    } else if (swagger.isComponentStyleGraphHorizontalStackedBar(this.opts.component.style)) {
+      this.childComponentName = 'dmc-component-graph-horizontal-stacked-bar';
+    } else if (swagger.isComponentStyleGraphStackedArea(this.opts.component.style)) {
+      this.childComponentName = 'dmc-component-graph-stacked-area';
     }
     // `updater` will be passed to the child component,(i.e. dmc-component-*) so the child component has the ability to update data.
     this.updater = (query = {}) => {
@@ -91,6 +109,7 @@ dmc-component.Component
         }
       }
 
+      // TODO: 全タイプ
       if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
         if (type !== 'object') {
           this.isValidData = false;

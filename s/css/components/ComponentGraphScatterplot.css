@@ -1,0 +1,7 @@
+.ComponentGraphScatterplot {
+  display: block;
+}
+
+.ComponentGraphScatterplot__canvas {
+  height: 600px;
+}
