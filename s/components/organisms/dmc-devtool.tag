@@ -4,6 +4,7 @@ dmc-devtool
 
   dmc-button(onclick="{ handleResetCurrentButtonClick}" label="Storage->Current リセット")
   dmc-button(onclick="{ handleResetEndpointsButtonClick}" label="Storage->Endpoint リセット")
+  dmc-tooltip(message="message here...")
 
   br
   br
@@ -13,6 +14,7 @@ dmc-devtool
   script.
     import constants from '../../core/constants';
     import '../atoms/dmc-button.tag';
+    import '../atoms/dmc-tooltip.tag';
 
     const store = this.riotx.get();
 
