@@ -1,6 +1,8 @@
 dmc-component.Component
   .Component__head
     .Component__name { opts.component.name.get() }
+    .Component__refresh(onClick="{ handleRefreshButtonClick }")
+      dmc-icon(type="reload")
     .Component__search(if="{ !!search }" onClick="{ handleSearchButtonClick }")
       dmc-icon(type="search")
   .Component__body
@@ -158,6 +160,10 @@ dmc-component.Component
       this.validateResponse(this._data);
       this.update();
     });
+
+    handleRefreshButtonClick() {
+      this.updater();
+    }
 
     handleSearchButtonClick() {
       if (this.isPending) {

@@ -24,12 +24,13 @@
 }
 
 .Component__name {
-  @apply --text-truncate;
   flex-grow: 1;
+  width: 0;
   font-size: 14px;
   font-weight: bold;
 }
 
+.Component__refresh,
 .Component__search {
   @apply --layout-center-center;
   margin-left: 4px;
@@ -37,7 +38,7 @@
   color: var(--color-text-default);
   cursor: pointer;
 }
-
+.Component__refresh:hover,
 .Component__search:hover {
   color: var(--color-basic-gray);
 }
