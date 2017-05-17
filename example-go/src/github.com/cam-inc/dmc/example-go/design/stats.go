@@ -11,7 +11,7 @@ var StatsDAUMediaType = MediaType("application/vnd.statsdau+json", func() {
 	ContentType("application/json")
 
 	Attributes(func() {
-		Attribute("value", Number, "DAU of Stats")
+		Attribute("value", Integer, "DAU of Stats")
 		Required("value")
 	})
 
@@ -26,7 +26,7 @@ var StatsMAUMediaType = MediaType("application/vnd.statsmau+json", func() {
 	ContentType("application/json")
 
 	Attributes(func() {
-		Attribute("value", Number, "MAU of Stats")
+		Attribute("value", Integer, "MAU of Stats")
 		Required("value")
 	})
 
