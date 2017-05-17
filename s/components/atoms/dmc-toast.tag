@@ -3,6 +3,7 @@ dmc-toast(class="Toast Toast--{ opts.type }" click="{ handleClick }")
     dmc-icon(if="{ opts.type === 'normal' }" type="close")
     dmc-icon(if="{ opts.type === 'error' }" type="exclamation")
   .Toast__message { opts.message }
+  .Toast__link(if="{ !!opts.link }" onClick="{ handleLinkClick }") { opts.linktext }
 
   script.
     import constants from '../../core/constants';
@@ -43,4 +44,9 @@ dmc-toast(class="Toast Toast--{ opts.type }" click="{ handleClick }")
     handleClick() {
       clearTimeout(autoHideTimerID);
       this.hide();
+    }
+
+    handleLinkClick(e) {
+      e.stopPropagation();
+      window.open(this.opts.link);
     }

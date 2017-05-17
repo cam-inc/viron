@@ -28,6 +28,8 @@ dmc-devtool
       store.action(constants.ACTION_TOAST_SHOW, {
         message : 'devtools - toast test',
         autoHide: false,
-        type: 'error'
-      })
+        type: 'error',
+        link: 'https://google.com',
+        linkText: 'linklink'
+      });
     }

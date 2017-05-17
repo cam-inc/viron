@@ -7,10 +7,10 @@
 
 .Toasts .Toast {
   position: absolute;
-  top: -56px;
+  top: -58px;
   left: 0;
   width: 100%;
-  height: 56px;
+  min-height: 58px;
   pointer-events: auto;
   transition-duration: 300ms;
   transition-property: top, opacity;

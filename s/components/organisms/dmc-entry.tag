@@ -39,19 +39,20 @@ dmc-entry.Entry
       .then(() => {
         this.closeModal();
       }).catch(err => {
-         let message;
-         let autoHide;
-         if (this.endpointURL.startsWith('https://')) {
-           // サーバが自己証明書を使用している場合にページ遷移を促す
-           message = `もしかして:${this.endpointURL}`
-           autoHide = false;
-         } else {
-           message = err.message;
-           autoHide = true;
-         }
+        let autoHide = true;
+        let linkText;
+        let link;
+        // サーバが自己証明書を使用している場合にページ遷移を促す。
+        if (this.endpointURL.startsWith('https://')) {
+          autoHide = false;
+          linkText = 'Self-Signed Certificate?';
+          link = this.endpointURL;
+        }
         store.action(constants.ACTION_TOAST_SHOW, {
-          message,
-          autoHide
+          message: err.message,
+          autoHide,
+          linkText,
+          link
         });
       })
     }

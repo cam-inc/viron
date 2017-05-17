@@ -1,6 +1,12 @@
 dmc-toasts.Toasts
   virtual(each="{ toasts }")
-    dmc-toast(id="{ id }" type="{ type }" message="{ message }" autohide="{ autoHide }" timeout="{ timeout }")
+    dmc-toast(id="{ id }"
+      type="{ type }"
+      message="{ message }"
+      autohide="{ autoHide }"
+      timeout="{ timeout }"
+      link="{ link }"
+      linkText="{ linkText }")
 
   script.
     import constants from '../../core/constants';

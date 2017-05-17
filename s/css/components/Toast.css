@@ -1,5 +1,4 @@
 .Toast {
-
   @apply --layout-center-center;
   padding: 0 12px;
   cursor: pointer;
@@ -37,4 +36,15 @@
   flex-grow: 1;
   font-size: 13px;
   color: var(--color-text-default);
+}
+
+.Toast__link {
+  font-size: 12px;
+  color: var(--color-basic-gray);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.Toast__link:hover {
+  color: var(--color-basic-lightGray);
 }
