@@ -33,12 +33,25 @@ dmc-table-cell.Table__cell
   virtual(if="{ opts.cell.isAction }")
     dmc-table-cell-action(each="{ action in opts.cell.actions }" action="{ action }")
 
-dmc-table-cell-action
-  dmc-button(label="{ opts.action.value }" onClick="{ handleButtonClick }")
+dmc-table-cell-action.Table__action
+  dmc-button(label="{ opts.action.value }" onClick="{ handleButtonClick }" onHoverToggle="{ handleButtonHoverToggle }" )
+  dmc-tooltip(if="{ isTooltipOpened }" message="{ tooltipMessage }")
 
   script.
     import '../atoms/dmc-button.tag';
+    import '../atoms/dmc-tooltip.tag';
+
+    this.isTooltipOpened = false;
+    this.tooltipMessage = this.opts.action.tooltip;
 
     handleButtonClick() {
       this.opts.action.onClick(this.opts.action.id, this.opts.action.rowData);
+    }
+
+    handleButtonHoverToggle(isHovered) {
+      if (!this.tooltipMessage) {
+        return;
+      }
+      this.isTooltipOpened = isHovered;
+      this.update();
     }

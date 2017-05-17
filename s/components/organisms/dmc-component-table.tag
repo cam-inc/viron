@@ -4,6 +4,7 @@ dmc-component-table.ComponentTable
   script.
     import { find, forEach } from 'mout/array';
     import { forOwn } from 'mout/object';
+    import swagger from '../../swagger';
     import constants from '../../core/constants';
     import '../organisms/dmc-operation.tag';
     import '../organisms/dmc-table.tag';
@@ -36,9 +37,15 @@ dmc-component-table.ComponentTable
             actions: []
           };
           forEach(this.opts.actions, action => {
+            let value = action.summary;
+            if (!value) {
+              const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
+              value = `${obj.method} ${obj.path}`;
+            }
             row[constants.DMC_TABLE_ACTION_KEY].actions.push({
               id: action.operationId,
-              value: action.operationId,
+              value,
+              tooltip: action.description,
               rowData: cells,
               onClick: this.handleActionButtonClick
             });

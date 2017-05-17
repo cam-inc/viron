@@ -237,8 +237,8 @@ dmc-component-searchbox.Component__searchBox
       this.closeModal();
     }
 
-dmc-component-action.Component__action(mouseover="{ handleMouseOver }" mouseout="{ handleMouseOut }")
-  dmc-button(label="{ label }" onClick="{ handleButtonClick }")
+dmc-component-action.Component__action()
+  dmc-button(label="{ label }" onClick="{ handleButtonClick }" onHoverToggle="{ handleButtonHoverToggle }")
   dmc-tooltip(if="{ isTooltipOpened }" message="{ tooltipMessage }")
 
   script.
@@ -256,18 +256,6 @@ dmc-component-action.Component__action(mouseover="{ handleMouseOver }" mouseout=
     }
     this.tooltipMessage = this.opts.action.description;
 
-    handleMouseOver() {
-      if (!!this.tooltipMessage) {
-        this.isTooltipOpened = true;
-      }
-      this.update();
-    }
-
-    handleMouseOut() {
-      this.isTooltipOpened = false;
-      this.update();
-    }
-
     handleButtonClick() {
       store.action(constants.ACTION_MODAL_SHOW, 'dmc-operation', {
         operation: this.opts.action,
@@ -275,4 +263,12 @@ dmc-component-action.Component__action(mouseover="{ handleMouseOver }" mouseout=
           this.opts.updater();
         }
       });
+    }
+
+    handleButtonHoverToggle(isHovered) {
+      if (!this.tooltipMessage) {
+        return;
+      }
+      this.isTooltipOpened = isHovered;
+      this.update();
     }
