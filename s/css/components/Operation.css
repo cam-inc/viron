@@ -2,13 +2,32 @@
   display: block;
 }
 
+.Operation__info {
+  margin-bottom: 24px;
+}
+
+.Operation__summary {
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-text-default);
+}
+
+.Operation__description {
+  font-size: 12px;
+  color: var(--color-text-default);
+}
+
 .Operation__parameters {
   margin-bottom: 24px;
 }
 
 .Operation__parameter {
   display: block;
+  padding: 12px;
   margin-bottom: 12px;
+  border: 1px solid var(--color-basic-lightGray);
+  border-radius: 8px;
 }
 
 .Operation__parameter:last-child {
@@ -23,14 +42,27 @@
 }
 
 .Operation__parameterName {
+  margin-bottom: 4px;
   font-size: 12px;
   font-weight: bold;
+  color: var(--color-text-default);
+}
+
+.Operation__parameterDescription {
+  margin-bottom: 4px;
+  font-size: 10px;
+  color: var(--color-text-default);
+}
+
+.Operation__parameterIn {
+  font-size: 10px;
   color: var(--color-text-default);
 }
 
 .Operation__parameterRequired {
   font-size: 10px;
   font-style: italic;
+  font-weight: bold;
   color: var(--color-basic-red);
 }
 
@@ -38,20 +70,43 @@
   display: block;
 }
 
-.Operation__input {
+.Operation__schemaForm {
   display: block;
-  margin-bottom: 8px;
+  padding: 12px 0;
+  border-top: 1px dashed var(--color-basic-lightGray);
 }
 
-.Operation__input:last-child {
-  margin-bottom: 0;
-}
-
-.Operation__inputName {
+.Operation__schemaFormDescription {
   margin-bottom: 4px;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-text-default);
 }
 
-.Operation__input .Input {
+.Operation__schemaFormRequired {
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-basic-red);
+}
+
+.Operation__schemaFormName {
+  margin-bottom: 4px;
+  font-size: 10px;
+  color: var(--color-text-default);
+}
+
+.Operation__schemaForm .Input {
+  display: block;
+}
+
+.Operation__parameterForm {
+  display: block;
+}
+
+.Operation__parameterForm .Input {
   display: block;
 }
 
