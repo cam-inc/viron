@@ -32,7 +32,9 @@ var _ = Resource("admin_role", func() {
 
 	Action("list", func() {
 		Description("get admin roles")
-		Routing(GET(""))
+		Routing(GET("", func() {
+			Metadata("swagger:extension:x-ref", `["/adminrole/{role_id}"]`)
+		}))
 		Params(func() {
 			Param("limit", Integer, "number of items per page")
 			Param("offset", Integer, "offset number of page")
@@ -103,6 +105,42 @@ var _ = Resource("admin_role", func() {
 var AdminRolePathType = Type("adminrolepath", func() {
 	Attribute("path", String, "path", func() {
 		Example("GET:/user")
+
+		Enum(
+			// QuickView
+			"GET:/stats",
+			// user
+			"GET:/user",
+			"POST:/user",
+			"PUT:/user",
+			"DELETE:/user",
+			"GET:/userblog",
+			"POST:/userblog",
+			"PUT:/userblog",
+			"DELETE:/userblog",
+			"GET:/userblogentry",
+			"POST:/userblogentry",
+			"PUT:/userblogentry",
+			"DELETE:/userblogentry",
+			// blog
+			"GET:/blogdesign",
+			"POST:/blogdesign",
+			"PUT:/blogdesign",
+			"DELETE:/blogdesign",
+			// admin
+			"GET:/adminrole",
+			"POST:/adminrole",
+			"PUT:/adminrole",
+			"DELETE:/adminrole",
+			"GET:/adminuser",
+			"POST:/adminuser",
+			"PUT:/adminuser",
+			"DELETE:/adminuser",
+			"GET:/auditlog",
+			"POST:/auditlog",
+			"PUT:/auditolog",
+			"DELETE:/auditlog",
+		)
 	})
 	Attribute("allow", Boolean, "allow the path", func() {
 		Example(true)
