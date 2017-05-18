@@ -13,12 +13,12 @@
 @import "ComponentGraphStackedBar";
 @import "ComponentNumber";
 @import "ComponentTable";
-@import "Drawer";
 @import "Endpoint";
 @import "Entry";
 @import "Header";
 @import "Icon";
 @import "Input";
+@import "Menu";
 @import "Modals";
 @import "Modal";
 @import "Operation";

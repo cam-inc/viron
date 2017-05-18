@@ -22,12 +22,12 @@ const setupStore = () => {
             tag: 'dmc-loading',
             dmcPage: null
           },
-          // `drawer` is left side column.
-          drawer: {
+          // `menu` is left side column.
+          menu: {
             // open or not.
             isOpened: true,
-            // is drawer enabled.
-            // if false, drawer is not visible.
+            // is menu enabled.
+            // if false, menu is not visible.
             isEnabled : true
           },
           // TODO
@@ -69,9 +69,9 @@ const setupRouter = (store) => {
         return Promise.resolve();
       }).onAfter((splitedPathname, pathname) => {
         if (pathname === '/') {
-          return store.action(constants.ACTION_DRAWER_DISABLE);
+          return store.action(constants.ACTION_MENU_DISABLE);
         }
-        return store.action(constants.ACTION_DRAWER_ENABLE);
+        return store.action(constants.ACTION_MENU_ENABLE);
       }).on('/:endpointKey/:page?', (params) => {
         const endpointKey = params.endpointKey;
         const endpoint = store.getter(constants.GETTER_ENDPOINTS_ONE, params.endpointKey);

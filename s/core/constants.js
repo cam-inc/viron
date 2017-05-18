@@ -31,11 +31,11 @@ export default {
   // riotx#actions
   ACTION_LOCATION_SET: 'action_location_set',
 
-  ACTION_DRAWER_TOGGLE: 'drawer_toggle',
-  ACTION_DRAWER_OPEN: 'drawer_open',
-  ACTION_DRAWER_CLOSE: 'drawer_close',
-  ACTION_DRAWER_ENABLE: 'drawer_enable',
-  ACTION_DRAWER_DISABLE: 'drawer_disable',
+  ACTION_MENU_TOGGLE: 'menu_toggle',
+  ACTION_MENU_OPEN: 'menu_open',
+  ACTION_MENU_CLOSE: 'menu_close',
+  ACTION_MENU_ENABLE: 'menu_enable',
+  ACTION_MENU_DISABLE: 'menu_disable',
 
   ACTION_DMC_GET: 'dmc_get',
   ACTION_DMC_REMOVE: 'dmc_remove',
@@ -79,11 +79,11 @@ export default {
   // riotx#mutations
   MUTATION_LOCATION: 'location',
 
-  MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
-  MUTATION_DRAWER_OPEN: 'drawer_open',
-  MUTATION_DRAWER_CLOSE: 'drawer_close',
-  MUTATION_DRAWER_ENABLE: 'drawer_enable',
-  MUTATION_DRAWER_DISABLE: 'drawer_disable',
+  MUTATION_MENU_TOGGLE: 'menu_toggle',
+  MUTATION_MENU_OPEN: 'menu_open',
+  MUTATION_MENU_CLOSE: 'menu_close',
+  MUTATION_MENU_ENABLE: 'menu_enable',
+  MUTATION_MENU_DISABLE: 'menu_disable',
 
   MUTATION_DMC: 'dmc',
   MUTATION_DMC_REMOVE: 'dmc_remove',
@@ -118,8 +118,8 @@ export default {
   GETTER_LOCATION_TAG: 'location_tag',
   GETTER_LOCATION_DMCPAGE: 'location_dmcpage',
 
-  GETTER_DRAWER_OPENED: 'drawer_opened',
-  GETTER_DRAWER_ENABLED: 'drawer_enabled',
+  GETTER_MENU_OPENED: 'menu_opened',
+  GETTER_MENU_ENABLED: 'menu_enabled',
 
   GETTER_DMC: 'dmc',
   GETTER_DMC_PAGES: 'dmc_pages',
@@ -150,7 +150,7 @@ export default {
   // riotx#mutated
   CHANGE_LOCATION: 'location',
 
-  CHANGE_DRAWER: 'drawer',
+  CHANGE_MENU: 'menu',
 
   CHANGE_DMC: 'dmc',
 

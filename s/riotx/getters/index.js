@@ -1,7 +1,7 @@
 import constants from '../../core/constants';
 
 import location from './location';
-import drawer from './drawer';
+import menu from './menu';
 import dmc from './dmc';
 import current from './current';
 import oauthEndpointKey from './oauthEndpointKey';
@@ -17,8 +17,8 @@ export default {
   [constants.GETTER_LOCATION_TAG]: location.tag,
   [constants.GETTER_LOCATION_DMCPAGE]: location.dmcPage,
 
-  [constants.GETTER_DRAWER_OPENED]: drawer.opened,
-  [constants.GETTER_DRAWER_ENABLED]: drawer.enabled,
+  [constants.GETTER_MENU_OPENED]: menu.opened,
+  [constants.GETTER_MENU_ENABLED]: menu.enabled,
 
   [constants.GETTER_DMC]: dmc._,
   [constants.GETTER_DMC_PAGES]: dmc.pages,

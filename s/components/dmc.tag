@@ -1,7 +1,7 @@
 dmc.Application
   .Application__contents
     .Application__asideColumn(class="{ Application__asideColumn--opened : isMenuOpened }")
-      dmc-drawer
+      dmc-menu
     .Application__mainColumn
       .Application__head
         dmc-header
@@ -18,7 +18,7 @@ dmc.Application
     import './pages/dmc-endpoints.tag';
     import './pages/dmc-loading.tag';
     import './pages/dmc-notfound.tag';
-    import './organisms/dmc-drawer.tag';
+    import './organisms/dmc-menu.tag';
     import './organisms/dmc-header.tag';
     import './organisms/dmc-signin.tag';
     import './organisms/dmc-toasts.tag';
@@ -28,13 +28,13 @@ dmc.Application
 
     this.pageTagName = store.getter(constants.GETTER_LOCATION_TAG);
 
-    const isEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
-    const isOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+    const isEnabled = store.getter(constants.GETTER_MENU_ENABLED);
+    const isOpened = store.getter(constants.GETTER_MENU_OPENED);
     this.isMenuOpened = isEnabled && isOpened;
 
-    store.change(constants.CHANGE_DRAWER, (err, state, store) => {
-      const isEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
-      const isOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+    store.change(constants.CHANGE_MENU, (err, state, store) => {
+      const isEnabled = store.getter(constants.GETTER_MENU_ENABLED);
+      const isOpened = store.getter(constants.GETTER_MENU_OPENED);
       this.isMenuOpened = isEnabled && isOpened;
       this.update();
     });

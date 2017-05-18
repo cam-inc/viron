@@ -19,7 +19,7 @@ export default {
     return rawData.name;
   },
 
-  // Display dashboard data for drawer
+  // Display dashboard data for menu
   dashboard: (context) => {
     if (!context.state.dmc) {
       return [];
@@ -34,7 +34,7 @@ export default {
     }));
   },
 
-  // Display dashboard data for drawer
+  // Display dashboard data for menu
   manage: (context) => {
     if (!context.state.dmc) {
       return [];

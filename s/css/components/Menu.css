@@ -1,21 +1,21 @@
-.Drawer {
+.Menu {
   @apply --layout-column-stretch-center;
   width: var(--component-application-asideColumn-width);
   height: 100%;
   background-color: var(--color-basic-white);
 }
 
-.Drawer__head {
+.Menu__head {
   position: relative;
   padding: 24px 16px 0;
 }
 
-.Drawer__endpoint {
+.Menu__endpoint {
   padding-bottom: 24px;
   border-bottom: 1px solid var(--color-basic-black);
 }
 
-.Drawer__endpointImage {
+.Menu__endpointImage {
   width: 56px;
   height: 56px;
   margin-right: 16px;
@@ -27,17 +27,17 @@
   box-shadow: 0 3px 2px rgba(0, 0, 0, 0.16);
 }
 
-.Drawer__endpointBody {
+.Menu__endpointBody {
   @apply --layout-column-stretch-center;
   height: 54px;
 }
 
-.Drawer__endpointBodyHead {
+.Menu__endpointBodyHead {
   flex-grow: 1;
   margin-right: 24px;
 }
 
-.Drawer__endpointTitle {
+.Menu__endpointTitle {
   @apply --text-truncate;
   margin-bottom: 4px;
   font-size: 12px;
@@ -45,19 +45,19 @@
   color: var(--color-basic-black);
 }
 
-.Drawer__endpointHost {
+.Menu__endpointHost {
   @apply --text-truncate;
   font-size: 12px;
   color: var(--color-basic-black);
 }
 
-.Drawer__endpointDescription {
+.Menu__endpointDescription {
   @apply --text-truncate;
   font-size: 15px;
   color: var(--color-basic-black);
 }
 
-.Drawer__closeButton {
+.Menu__closeButton {
   @apply --layout-center-center;
   position: absolute;
   top: 24px;
@@ -69,27 +69,27 @@
   cursor: pointer;
 }
 
-.Drawer__closeButton:hover {
+.Menu__closeButton:hover {
   opacity: 0.5;
 }
 
-.Drawer__body {
+.Menu__body {
   flex-grow: 1;
   padding: 24px 0;
   overflow-y: scroll;
 }
 
-.Drawer__sectionTitle {
+.Menu__sectionTitle {
   padding: 14px 16px;
   font-size: 11px;
   color: var(--color-basic-black);
 }
 
-.Drawer__group {
+.Menu__group {
   display: block;
 }
 
-.Drawer__groupToggle {
+.Menu__groupToggle {
   @apply --layout-center-center;
   padding: 14px 16px;
   margin-right: 8px;
@@ -101,31 +101,31 @@
   transition-property: color, background-color;
 }
 
-.Drawer__groupToggle:hover,
-.Drawer__groupToggle--selected {
+.Menu__groupToggle:hover,
+.Menu__groupToggle--selected {
   color: var(--color-basic-white);
   background-color: var(--color-basic-black);
 }
 
-.Drawer__groupIconHead {
+.Menu__groupIconHead {
   margin-right: 8px;
 }
 
-.Drawer__groupName {
+.Menu__groupName {
   flex-grow: 1;
 }
 
-.Drawer__groupIconTail {
+.Menu__groupIconTail {
   margin-right: 8px;
   transition-duration: 100ms;
   transition-property: transform;
 }
 
-.Drawer__groupIconTail--opened {
+.Menu__groupIconTail--opened {
   transform: rotate(180deg);
 }
 
-.Drawer__groupList {
+.Menu__groupList {
   position: relative;
   display: none;
   padding: 12px 0;
@@ -133,11 +133,11 @@
   background-color: var(--color-basic-lightGray);
 }
 
-.Drawer__groupList--opened {
+.Menu__groupList--opened {
   display: block;
 }
 
-.Drawer__groupList::before {
+.Menu__groupList::before {
   position: absolute;
   top: -4px;
   left: 30px;
@@ -149,7 +149,7 @@
   transform: rotate(45deg);
 }
 
-.Drawer__groupListItem {
+.Menu__groupListItem {
   position: relative;
   padding: 14px 16px 14px 48px;
   margin-right: 8px;
@@ -162,6 +162,6 @@
   transition-property: background-color;
 }
 
-.Drawer__groupListItem:hover {
+.Menu__groupListItem:hover {
   background-color: var(--color-basic-gray);
 }

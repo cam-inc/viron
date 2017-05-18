@@ -17,14 +17,14 @@ dmc-header.Header
 
     const store = this.riotx.get();
 
-    this.isMenuEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
-    this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+    this.isMenuEnabled = store.getter(constants.GETTER_MENU_ENABLED);
+    this.isMenuOpened = store.getter(constants.GETTER_MENU_OPENED);
 
     handleMenuButtonClick(e) {
       e.preventDefault();
       Promise
         .resolve()
-        .then(() => store.action(constants.ACTION_DRAWER_TOGGLE));
+        .then(() => store.action(constants.ACTION_MENU_TOGGLE));
     }
 
     handleDebugButtonClick() {
@@ -36,8 +36,8 @@ dmc-header.Header
       router.navigateTo('/');
     }
 
-    store.change(constants.CHANGE_DRAWER, (err, state, store) => {
-      this.isMenuEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
-      this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
+    store.change(constants.CHANGE_MENU, (err, state, store) => {
+      this.isMenuEnabled = store.getter(constants.GETTER_MENU_ENABLED);
+      this.isMenuOpened = store.getter(constants.GETTER_MENU_OPENED);
       this.update();
     });

@@ -5,7 +5,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_DRAWER_TOGGLE);
+        context.commit(constants.MUTATION_MENU_TOGGLE);
       });
   },
 
@@ -13,7 +13,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_DRAWER_OPEN);
+        context.commit(constants.MUTATION_MENU_OPEN);
       });
   },
 
@@ -21,7 +21,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_DRAWER_CLOSE);
+        context.commit(constants.MUTATION_MENU_CLOSE);
       });
   },
 
@@ -29,7 +29,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_DRAWER_ENABLE);
+        context.commit(constants.MUTATION_MENU_ENABLE);
       });
   },
 
@@ -37,7 +37,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants.MUTATION_DRAWER_DISABLE);
+        context.commit(constants.MUTATION_MENU_DISABLE);
       });
   }
 };

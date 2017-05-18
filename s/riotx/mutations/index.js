@@ -1,7 +1,7 @@
 import constants from '../../core/constants';
 
 import location from './location';
-import drawer from './drawer';
+import menu from './menu';
 import current from './current';
 import oauthEndpointKey from './oauthEndpointKey';
 import endpoints from './endpoints';
@@ -15,11 +15,11 @@ import auth from './auth';
 export default {
   [constants.MUTATION_LOCATION]: location._,
 
-  [constants.MUTATION_DRAWER_TOGGLE]: drawer.toggle,
-  [constants.MUTATION_DRAWER_OPEN]: drawer.open,
-  [constants.MUTATION_DRAWER_CLOSE]: drawer.close,
-  [constants.MUTATION_DRAWER_ENABLE]: drawer.enable,
-  [constants.MUTATION_DRAWER_DISABLE]: drawer.disable,
+  [constants.MUTATION_MENU_TOGGLE]: menu.toggle,
+  [constants.MUTATION_MENU_OPEN]: menu.open,
+  [constants.MUTATION_MENU_CLOSE]: menu.close,
+  [constants.MUTATION_MENU_ENABLE]: menu.enable,
+  [constants.MUTATION_MENU_DISABLE]: menu.disable,
 
   [constants.MUTATION_DMC]: dmc.show,
   [constants.MUTATION_DMC_REMOVE]: dmc.remove,

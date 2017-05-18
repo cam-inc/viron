@@ -1,24 +1,24 @@
-dmc-drawer.Drawer
-  .Drawer__head
-    .media.Drawer__endpoint
-      .media__image.Drawer__endpointImage(if="{ !!endpoint }" style="background-image:url({ endpoint.thumbnail })")
-      .media__body.Drawer__endpointBody
-        .Drawer__endpointBodyHead
-          .Drawer__endpointTitle(if="{ !!endpoint }") { endpoint.name }
-          .Drawer__endpointHost(if="{ !!endpoint }") { endpoint.url }
-        .Drawer__endpointBodyTail
-          .Drawer__endpointDescription(if="{ !!endpoint }") { endpoint.description }
-    .Drawer__closeButton(click="{ handleCloseButtonClick }")
+dmc-menu.Menu
+  .Menu__head
+    .media.Menu__endpoint
+      .media__image.Menu__endpointImage(if="{ !!endpoint }" style="background-image:url({ endpoint.thumbnail })")
+      .media__body.Menu__endpointBody
+        .Menu__endpointBodyHead
+          .Menu__endpointTitle(if="{ !!endpoint }") { endpoint.name }
+          .Menu__endpointHost(if="{ !!endpoint }") { endpoint.url }
+        .Menu__endpointBodyTail
+          .Menu__endpointDescription(if="{ !!endpoint }") { endpoint.description }
+    .Menu__closeButton(click="{ handleCloseButtonClick }")
       dmc-icon(type="close")
-  .Drawer__body
-    .Dwawer__section
-      .Drawer__sectionTitle ダッシュボード
-      .Drawer__groups
-        dmc-drawer-group(each="{ group in groupedDashboard }" group="{ group }")
-    .Drawer__section
-      .Drawer__sectionTitle 管理画面
-      .Drawer__groups
-        dmc-drawer-group(each="{ group in groupedManage }" group="{ group }")
+  .Menu__body
+    .Menu__section
+      .Menu__sectionTitle ダッシュボード
+      .Menu__groups
+        dmc-menu-group(each="{ group in groupedDashboard }" group="{ group }")
+    .Menu__section
+      .Menu__sectionTitle 管理画面
+      .Menu__groups
+        dmc-menu-group(each="{ group in groupedManage }" group="{ group }")
 
   script.
     import { forEach } from 'mout/array';
@@ -80,16 +80,16 @@ dmc-drawer.Drawer
       e.preventDefault();
       Promise
         .resolve()
-        .then(() => store.action(constants.ACTION_DRAWER_CLOSE));
+        .then(() => store.action(constants.ACTION_MENU_CLOSE));
     }
 
-dmc-drawer-group(class="Drawer__group")
-  .Drawer__groupToggle(onClick="{ handleToggleClick }")
-    dmc-icon(type="codeSquareO" class="Drawer__groupIconHead")
-    .Drawer__groupName { opts.group.isIndependent ? opts.group.list[0].name : opts.group.name }
-    dmc-icon(if="{ !opts.group.isIndependent }" type="up" class="Drawer__groupIconTail { isOpened ? 'Drawer__groupIconTail--opened' : '' }")
-  div(class="Drawer__groupList { isOpened ? 'Drawer__groupList--opened' : '' }" if="{ !opts.group.isIndependent }")
-    .Drawer__groupListItem(each="{ opts.group.list }" onClick="{ handleGroupItemClick }") { name }
+dmc-menu-group(class="Menu__group")
+  .Menu__groupToggle(onClick="{ handleToggleClick }")
+    dmc-icon(type="codeSquareO" class="Menu__groupIconHead")
+    .Menu__groupName { opts.group.isIndependent ? opts.group.list[0].name : opts.group.name }
+    dmc-icon(if="{ !opts.group.isIndependent }" type="up" class="Menu__groupIconTail { isOpened ? 'Menu__groupIconTail--opened' : '' }")
+  div(class="Menu__groupList { isOpened ? 'Menu__groupList--opened' : '' }" if="{ !opts.group.isIndependent }")
+    .Menu__groupListItem(each="{ opts.group.list }" onClick="{ handleGroupItemClick }") { name }
 
   script.
     import '../atoms/dmc-icon.tag';
