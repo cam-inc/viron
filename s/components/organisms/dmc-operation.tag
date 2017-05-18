@@ -162,6 +162,9 @@ dmc-operation-schema-form.Operation__schemaForm
           break;
         case 'array':
           this.uiType = 'multi';
+          if (this.opts.parametervalue) {
+            this.multiData = this.opts.parametervalue;
+          }
           this.multiSchema = opts.parameterobject.items;
           this.multiPropertyKeys = Object.keys(opts.parameterobject.items.properties);
           break;

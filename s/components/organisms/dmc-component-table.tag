@@ -71,14 +71,14 @@ dmc-component-table.ComponentTable
           queries[name] = {};
           forOwn(parameter.schema.properties, (v, k) => {
             if (rowData.getValue(k)) {
-              queries[name][k] = rowData.getValue(k).getValue();
+              queries[name][k] = rowData.getValue(k).getRawValue();
             }
           });
         } else {
           if (!rowData.getValue(name)) {
             return;
           }
-          queries[name] = rowData.getValue(name).getValue();
+          queries[name] = rowData.getValue(name).getRawValue();
         }
       });
 
