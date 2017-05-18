@@ -1,7 +1,7 @@
 dmc-drawer(class="Drawer Drawer--{ opts.theme }" click="{ handleClick }")
+  .Drawer__closeButton(click="{ handleCloseButtonClick }")
+    dmc-icon(type="close")
   .Drawer__frame(click="{ handleFrameClick }")
-    .Drawer__closeButton(click="{ handleCloseButtonClick }")
-      dmc-icon(type="close")
     .Drawer__content(ref="content")
 
   script.

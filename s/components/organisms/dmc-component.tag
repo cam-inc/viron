@@ -255,7 +255,7 @@ dmc-component-action.Component__action()
     this.tooltipMessage = this.opts.action.description;
 
     handleButtonClick() {
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-operation', {
+      store.action(constants.ACTION_DRAWER_SHOW, 'dmc-operation', {
         operation: this.opts.action,
         onSuccess: () => {
           this.opts.updater();

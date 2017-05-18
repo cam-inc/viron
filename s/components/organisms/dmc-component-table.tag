@@ -90,7 +90,7 @@ dmc-component-table.ComponentTable
         return (action.operationId === operationID);
       });
       const initialQueries = this.createInitialQueries(operation, rowData);
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-operation', {
+      store.action(constants.ACTION_DRAWER_SHOW, 'dmc-operation', {
         operation,
         initialQueries,
         onSuccess: () => {
