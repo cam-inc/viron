@@ -211,7 +211,15 @@ class Swagger {
       ret._keys = [];
       forOwn(response, (v, k) => {
         ret._keys.push(k);
-        ret._value[k] = this.mergeSchemaAndResponse(schema.properties[k], v);
+        let nextSchema;
+        if (!!schema.properties) {
+          nextSchema = schema.properties[k];
+        } else if (schema.additionalProperties) {
+          nextSchema = {};
+        } else {
+          // TODO: swagger定義が間違っているので警告を出す。
+        }
+        ret._value[k] = this.mergeSchemaAndResponse(nextSchema, v);
         ret._value[k]._key = k;
       });
       break;
