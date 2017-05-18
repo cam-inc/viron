@@ -6,8 +6,9 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        const page = find(context.state.dmc.pages, v => {
-          return v.id.get() === id;
+        const pages = context.state.dmc.getValue('pages').getValue();
+        const page = find(pages, v => {
+          return v.getValue('id').getValue() === id;
         });
         context.commit(constants.MUTATION_PAGE, page);
       });

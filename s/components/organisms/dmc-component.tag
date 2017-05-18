@@ -1,6 +1,6 @@
 dmc-component.Component
   .Component__head
-    .Component__name { opts.component.name.get() }
+    .Component__name { opts.component.name }
     .Component__refresh(onClick="{ handleRefreshButtonClick }")
       dmc-icon(type="reload")
     .Component__search(if="{ !!search }" onClick="{ handleSearchButtonClick }")
@@ -82,9 +82,9 @@ dmc-component.Component
 
     validateResponse(data) {
       const type = data.getType();
-      const method = this.opts.component.api.method.get();
-      const path = this.opts.component.api.path.get();
-      const style = this.opts.component.style.get();
+      const method = this.opts.component.api.method;
+      const path = this.opts.component.api.path;
+      const style = this.opts.component.style;
 
       if (swagger.isComponentStyleNumber(this.opts.component.style)) {
       if (type !== 'object' || data.getValue('value') === undefined) {
@@ -171,8 +171,8 @@ dmc-component.Component
       const queries = [];
       forEach(this.search, query => {
         queries.push({
-          key: query.key.get(),
-          type: query.type.get()
+          key: query.key,
+          type: query.type
         });
       });
       store.action(constants.ACTION_MODAL_SHOW, 'dmc-component-searchbox', {

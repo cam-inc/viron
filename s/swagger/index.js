@@ -245,82 +245,40 @@ class Swagger {
     return ret;
   }
 
-  /**
-   * 定義情報とデータをマージ
-   * @param properties
-   * @param response
-   * @param key
-   * @returns {*}
-   */
-  mergePropertiesAndResponse(properties, response, key) {
-
-    if (properties.type === 'array') {
-      let res = [];
-      forOwn(response, (v, k) => {
-        let ret = this.mergePropertiesAndResponse(properties.items, v, k);
-        res.push(ret);
-      });
-      return res;
-    }
-
-    let res = {};
-
-    if (properties.type === 'object') {
-      forOwn(properties.properties, (v, k) => {
-        let ret = this.mergePropertiesAndResponse(v, response[k], k);
-        res[k] = ret;
-      });
-      return res;
-    }
-
-    //
-    res.key = key;
-    res.definition = properties;
-    res.get = function () {
-      return this.value;
-    };
-
-    // TODO definition チェッカー
-    res.value = response;
-
-    return res;
-
+  isComponentStyleNumber(style) {
+    return style === constants.STYLE_NUMBER;
   }
 
-  isComponentStyleNumber(obj) {
-    return obj.get() === constants.STYLE_NUMBER;
+  isComponentStyleTable(style) {
+    return style === constants.STYLE_TABLE;
   }
 
-  isComponentStyleTable(obj) {
-    return obj.get() === constants.STYLE_TABLE;
+  isComponentStyleGraphBar(style) {
+    return style === constants.STYLE_GRAPH_BAR;
   }
 
-  isComponentStyleGraphBar(obj) {
-    return obj.get() === constants.STYLE_GRAPH_BAR;
+  isComponentStyleGraphScatterplot(style) {
+    return style === constants.STYLE_GRAPH_SCATTERPLOT;
   }
 
-  isComponentStyleGraphScatterplot(obj) {
-    return obj.get() === constants.STYLE_GRAPH_SCATTERPLOT;
+  isComponentStyleGraphLine(style) {
+    return style === constants.STYLE_GRAPH_LINE;
   }
 
-  isComponentStyleGraphLine(obj) {
-    return obj.get() === constants.STYLE_GRAPH_LINE;
+  isComponentStyleGraphHorizontalBar(style) {
+    return style === constants.STYLE_GRAPH_HORIZONTAL_BAR;
   }
 
-  isComponentStyleGraphHorizontalBar(obj) {
-    return obj.get() === constants.STYLE_GRAPH_HORIZONTAL_BAR;
+  isComponentStyleGraphStackedBar(style) {
+    return style === constants.STYLE_GRAPH_STACKED_BAR;
   }
 
-  isComponentStyleGraphStackedBar(obj) {
-    return obj.get() === constants.STYLE_GRAPH_STACKED_BAR;
+  isComponentStyleGraphHorizontalStackedBar(style) {
+    return style === constants.STYLE_GRAPH_HORIZONTAL_STACKED_BAR;
   }
 
-  isComponentStyleGraphHorizontalStackedBar(obj) {
-    return obj.get() === constants.STYLE_GRAPH_HORIZONTAL_STACKED_BAR;
-  }
-
-  isComponentStyleGraphStackedArea(obj) {
-    return obj.get() === constants.STYLE_GRAPH_STACKED_AREA;
+  isComponentStyleGraphStackedArea(style) {
+    return style === constants.STYLE_GRAPH_STACKED_AREA;
   }
 
 }

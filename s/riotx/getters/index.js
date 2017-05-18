@@ -20,7 +20,7 @@ export default {
   [constants.GETTER_DRAWER_OPENED]: drawer.opened,
   [constants.GETTER_DRAWER_ENABLED]: drawer.enabled,
 
-  [constants.GETTER_DMC]: dmc.show,
+  [constants.GETTER_DMC]: dmc._,
   [constants.GETTER_DMC_PAGES]: dmc.pages,
   [constants.GETTER_DMC_NAME]: dmc.name,
   [constants.GETTER_DMC_DASHBOARD]: dmc.dashboard,

@@ -2,23 +2,32 @@ import { filter, values } from 'mout/object';
 import constants from '../../core/constants';
 
 export default {
-  show: context => {
-    return context.state.dmc;
+  _: context => {
+    if (!context.state.dmc) {
+      return null;
+    }
+    return context.state.dmc.getRawValue();
   },
 
   pages: context => {
-    return context.state.dmc.pages;
+    const rawData = context.state.dmc.getRawValue();
+    return rawData.pages;
   },
 
   name: context => {
-    return context.state.dmc.name;
+    const rawData = context.state.dmc.getRawValue();
+    return rawData.name;
   },
 
   // Display dashboard data for drawer
   dashboard: (context) => {
-    const pages = (context.state.dmc && context.state.dmc.pages) || [];
+    if (!context.state.dmc) {
+      return [];
+    }
+    const rawData = context.state.dmc.getRawValue();
+    const pages = rawData.pages;
     return values(filter(pages, v => {
-      if (v.section.get() !== constants.SECTION_DASHBOARD) {
+      if (v.section !== constants.SECTION_DASHBOARD) {
         return false;
       }
       return true;
@@ -27,9 +36,13 @@ export default {
 
   // Display dashboard data for drawer
   manage: (context) => {
-    const pages = (context.state.dmc && context.state.dmc.pages) || [];
+    if (!context.state.dmc) {
+      return [];
+    }
+    const rawData = context.state.dmc.getRawValue();
+    const pages = rawData.pages;
     return values(filter(pages, v => {
-      if (v.section.get() !== constants.SECTION_MANAGE) {
+      if (v.section !== constants.SECTION_MANAGE) {
         return false;
       }
       return true;

@@ -6,16 +6,14 @@ import swagger from '../../swagger';
 export default {
   one: function (context, params) {
     const schema = params.operationObject.responses[200].schema;
-    // const properties = schema.properties;
     const responseObj = params.response.obj;
-
     const data = swagger.mergeSchemaAndResponse(schema, responseObj);
 
     context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
     context.state.components[params.component_uid].data = data;
     // `component.pagination` value indicates whether the component supports pagination or not.
     // if supported then manually add pagination information from headers.
-    if (params.component.pagination.get()) {
+    if (params.component.pagination) {
       context.state.components[params.component_uid].pagination = {
         currentPage: Number(params.response.headers['x-pagination-current-page'] || 0),
         size: Number(params.response.headers['x-pagination-limit'] || 0),
@@ -24,7 +22,7 @@ export default {
     }
     // `component.query`(array) value indicates whether the component supports searching or not.
     // if supported then manually add pagination information from headers.
-    if (params.component.query.length && !!params.component.query.length) {
+    if (params.component.query && !!params.component.query.length) {
       context.state.components[params.component_uid].search = params.component.query;
     }
     // manually add paths that component can execute.

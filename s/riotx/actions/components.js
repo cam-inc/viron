@@ -5,13 +5,13 @@ import swagger from '../../swagger';
 export default {
   get: (context, component_uid, component, query = {}) => {
     return new Promise((resolve, reject) => {
-      const method = component.api.method.get();
+      const method = component.api.method;
       // only `get` method is allowed.
       if (method !== 'get') {
         return reject('only `get` method is allowed.');
       }
 
-      let path = component.api.path.get();
+      let path = component.api.path;
       if (path.indexOf('/') !== 0) {
         path = '/' + path;
       }

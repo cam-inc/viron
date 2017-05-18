@@ -1,7 +1,7 @@
 dmc-components.ComponentsPage
   .ComponentsPage__title { name }
   .ComponentsPage__list
-    dmc-component(each="{ component, idx in components }" component="{ component }" idx="{ idx }")
+    dmc-component(each="{ component, idx in components }" component="{ component }")
 
   script.
     import constants from '../../core/constants';

@@ -33,13 +33,13 @@ dmc-drawer.Drawer
       const groups = {};
       let counter = 0;
       forEach(items, (item, idx) => {
-        const assignment = item.group.get() || `independent_${idx}`;
+        const assignment = item.group || `independent_${idx}`;
         if (!groups[assignment]) {
           groups[assignment] = {
             name: assignment,
             index: counter,
             list: [],
-            isIndependent: !item.group.get()
+            isIndependent: !item.group
           };
           counter = counter + 1;
         }
@@ -86,21 +86,21 @@ dmc-drawer.Drawer
 dmc-drawer-group(class="Drawer__group")
   .Drawer__groupToggle(onClick="{ handleToggleClick }")
     dmc-icon(type="codeSquareO" class="Drawer__groupIconHead")
-    .Drawer__groupName { opts.group.isIndependent ? opts.group.list[0].name.get() : opts.group.name }
+    .Drawer__groupName { opts.group.isIndependent ? opts.group.list[0].name : opts.group.name }
     dmc-icon(if="{ !opts.group.isIndependent }" type="up" class="Drawer__groupIconTail { isOpened ? 'Drawer__groupIconTail--opened' : '' }")
   div(class="Drawer__groupList { isOpened ? 'Drawer__groupList--opened' : '' }" if="{ !opts.group.isIndependent }")
-    .Drawer__groupListItem(each="{ opts.group.list }" onClick="{ handleGroupItemClick }") { name.get() }
+    .Drawer__groupListItem(each="{ opts.group.list }" onClick="{ handleGroupItemClick }") { name }
 
   script.
     import '../atoms/dmc-icon.tag';
 
     this.isOpened = false;
 
+    const store = this.riotx.get();
+
     handleToggleClick() {
       if (this.opts.group.isIndependent) {
-        // TODO: current値を参照できるかも
-        let param = router.resolveCurrentPath('/:endpoint/:page?')
-        router.navigateTo(`/${param.endpoint}/${this.opts.group.list[0].id.get()}`);
+        router.navigateTo(`/${store.getter(constants.GETTER_CURRENT)}/${this.opts.group.list[0].id}`);
       } else {
         this.isOpened = !this.isOpened;
         this.update();
@@ -108,6 +108,5 @@ dmc-drawer-group(class="Drawer__group")
     }
 
     handleGroupItemClick(e) {
-      let param = router.resolveCurrentPath('/:endpoint/:page?')
-      router.navigateTo(`/${param.endpoint}/${e.item.id.get()}`);
+      router.navigateTo(`/${store.getter(constants.GETTER_CURRENT)}/${e.item.id}`);
     }
