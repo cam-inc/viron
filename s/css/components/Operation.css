@@ -68,6 +68,7 @@
 
 .Operation__schema {
   display: block;
+  padding: 0 12px;
 }
 
 .Operation__schemaForm {
@@ -96,6 +97,35 @@
   margin-bottom: 4px;
   font-size: 10px;
   color: var(--color-text-default);
+}
+
+.Operation__schemaFormType {
+  margin-bottom: 4px;
+  font-size: 10px;
+  color: var(--color-text-default);
+}
+
+.Operation__schemaFormFormat {
+  margin-bottom: 4px;
+  font-size: 10px;
+  color: var(--color-text-default);
+}
+
+.Operation__schemaFormMultiPlusButton,
+.Operation__schemaFormMultiMinusButton {
+  @apply --layout-center-center;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  color: var(--color-basic-white);
+  cursor: pointer;
+  background-color: var(--color-basic-darkGray);
+  border-radius: 50%;
+}
+
+.Operation__schemaFormMultiPlusButton:hover,
+.Operation__schemaFormMultiMinusButton:hover {
+  background-color: var(--color-basic-gray);
 }
 
 .Operation__schemaForm .Input {

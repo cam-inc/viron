@@ -21,6 +21,7 @@ dmc-input(class="Input { opts.isfocused ? 'Input--focused' : '' } { opts.isdisab
     }
 
     handleInputChange(e) {
+      e.stopPropagation();
       const newText = e.target.value.replace(/　/g, ' ');
       this.opts.ontextchange && this.opts.ontextchange(newText, this.opts.id);
     }

@@ -1,4 +1,5 @@
 dmc-operation.Operation
+  div { JSON.stringify(this.queries) }
   .Operation__info
     .Operation__summary { summary }
     .Operation__description { opts.operation.description }
@@ -114,15 +115,23 @@ dmc-operation-schema.Operation__schema
     }
 
 dmc-operation-schema-form.Operation__schemaForm
-  .Operation__schemaFormDescription { opts.parameterobject.description }
+  .Operation__schemaFormDescription { opts.parameterobject.description || '-' }
   .Operation__schemaFormRequired(if="{ opts.parameterobject.required }") required
-  .Operation__schemaFormName { opts.parameterobject.name }
+  .Operation__schemaFormName name: { opts.parameterobject.name }
+  .Operation__schemaFormType type: { opts.parameterobject.type }
+  .Operation__schemaFormFormat format: { opts.parameterobject.format || '-' }
+  .Operation__schemaFormMultiPlusButton(if="{ uiType === 'multi' }" onClick="{ handleMultiPlusButtonClick }")
+    dmc-icon(type="plus")
   virtual(if="{ uiType === 'input' }")
     dmc-input(text="{ opts.parametervalue }" placeholder="{ opts.parameterobject.example }" onTextChange="{ handleInputChange }")
   virtual(if="{ uiType === 'checkbox' }")
     dmc-checkbox(isChecked="{ opts.parametervalue }" onChange="{ handleCheckboxChange }")
   virtual(if="{ uiType === 'select' }")
     dmc-select(isOpened="{ isOpened }" options="{ getSelectOptions() }" onToggle="{ handleSelectToggle }" onChange="{ handleSelectChange }")
+  virtual(if="{ uiType === 'multi' }" each="{ p, idx in multiData }")
+    .Operation__schemaFormMultiMinusButton(onClick="{ handleMultiMinusButtonClick }")
+      dmc-icon(type="minus")
+    dmc-operation-schema-form(each="{ propertyKey in parent.multiPropertyKeys }" multiIdx="{ parent.idx }" parameterObject="{ parent.getParameterObject(propertyKey) }" parameterValue="{ parent.getValue(propertyKey, parent.idx) }" onChange="{ parent.handleMultiChange }")
 
   script.
     import { find, forEach } from 'mout/array';
@@ -130,30 +139,48 @@ dmc-operation-schema-form.Operation__schemaForm
     import '../atoms/dmc-input.tag';
     import '../atoms/dmc-select.tag';
 
+    // type will be one of 'null', 'boolean', 'object', 'array', 'number' or 'string'.
     const type = opts.parameterobject.type;
     this.uiType = null;
     this.isOpened = false;
+    this.multiSchema = null;
+    this.multiData = null;
+    this.multiPropertyKeys = null;
     if (!!opts.parameterobject.enum) {
       this.uiType = 'select';
     } else {
       switch (type) {
         case 'string':
         case 'number':
-        case 'integer':
           this.uiType = 'input';
           break;
         case 'boolean':
           this.uiType = 'checkbox';
           break;
         case 'array':
-          this.uiType = 'TODO';
+          this.uiType = 'multi';
+          this.multiSchema = opts.parameterobject.items;
+          this.multiPropertyKeys = Object.keys(opts.parameterobject.items.properties);
           break;
-        case 'file':
-          this.uiType = 'TODO';
-          break;
+        case 'object':
+        case 'null':
         default:
           break;
       }
+    }
+
+    getParameterObject(propertyKey) {
+      return ObjectAssign({}, this.multiSchema.properties[propertyKey], {
+        name: propertyKey,
+        required : contains(this.multiSchema.required, propertyKey)
+      });
+    }
+
+    getValue(propertyKey, idx) {
+      if (!this.multiData[idx][propertyKey]) {
+        return;
+      }
+      return this.multiData[idx][propertyKey];
     }
 
     getSelectOptions() {
@@ -173,7 +200,18 @@ dmc-operation-schema-form.Operation__schemaForm
       if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
         value = Number(value);
       }
-      this.opts.onchange(this.opts.parameterobject.name, value);
+      this.opts.onchange(this.opts.parameterobject.name, value, this.opts.multiidx);
+    }
+
+    handleMultiPlusButtonClick() {
+      this.multiData = this.multiData || [];
+      this.multiData.push({});
+      this.change(this.multiData);
+    }
+
+    handleMultiMinusButtonClick(e) {
+      this.multiData.splice(e.item.idx, 1);
+      this.change(this.multiData);
     }
 
     handleInputChange(value) {
@@ -195,6 +233,15 @@ dmc-operation-schema-form.Operation__schemaForm
       });
       const value = (option ? option.label : undefined);
       this.change(value);
+    }
+
+    handleMultiChange(key, value, idx) {
+      if (value === undefined || idx === undefined) {
+        // TODO: 原因調査
+        return;
+      }
+      this.multiData[idx][key] = value;
+      this.change(this.multiData);
     }
 
 dmc-operation-parameter-form.Operation__parameterForm
