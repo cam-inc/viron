@@ -240,6 +240,8 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 			if adminUsers := adminUserTable.ListAdminUser(ctx.Context); len(adminUsers) <= 0 {
 				// 1人目はスーパーユーザーにする
 				roleId = common.GetSuperRole()
+			} else {
+				service.CreateDefaultRole(ctx.Context)
 			}
 			m := models.NewAdminUser()
 			m.Email = email
