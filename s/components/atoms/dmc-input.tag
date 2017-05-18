@@ -1,5 +1,5 @@
-dmc-input(ref="form" class="Input { opts.isfocused ? 'Input--focused' : '' } { opts.isdisabled ? 'Input--disabled' : '' }" click="{ handleClick }")
-  form.Input__content(submit="{ handleFormSubmit }")
+dmc-input(class="Input { opts.isfocused ? 'Input--focused' : '' } { opts.isdisabled ? 'Input--disabled' : '' }" click="{ handleClick }")
+  form.Input__content(ref="form" submit="{ handleFormSubmit }")
     .Input__icon(if="{ !!opts.icon }")
       dmc-icon(type="{ opts.icon }")
     input.Input__input(type="{ opts.type || 'text' }" value="{ opts.text }" placeholder="{ opts.placeholder || '' }" disabled="{ opts.isdisabled }" pattern="{ opts.pattern }" input="{ handleInputChange }" focus="{ handleInputFocus }" blur="{ handleInputBlur }")
