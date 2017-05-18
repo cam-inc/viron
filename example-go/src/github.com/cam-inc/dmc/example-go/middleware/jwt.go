@@ -24,11 +24,16 @@ func validation() goa.Middleware {
 	errForbidden := goa.NewErrorClass("forbidden", 403)
 
 	validate := func(nextHandler goa.Handler) goa.Handler {
+		after := func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+			// jwt認証よりも後で実行したいmiddleware
+			return AuditLogHandler(nextHandler)(ctx, rw, req)
+		}
+
 		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 			token := jwt.ContextJWT(ctx)
 			if token == nil {
 				// 認可を必要としないAPIの場合はこっちに入る
-				return nextHandler(ctx, rw, req)
+				return after(ctx, rw, req)
 			}
 			claims := token.Claims.(jwtgo.MapClaims)
 
@@ -62,7 +67,7 @@ func validation() goa.Middleware {
 			}
 
 			newCtx := context.WithValue(ctx, bridge.JwtClaims, claims)
-			return nextHandler(newCtx, rw, req)
+			return after(newCtx, rw, req)
 		}
 	}
 

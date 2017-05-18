@@ -26,7 +26,6 @@ func main() {
 	service.Use(middleware.Recover())
 	app.UseJWTMiddleware(service, dmcMiddleware.JWT())
 	service.Use(dmcMiddleware.SetHeader())
-	service.Use(dmcMiddleware.AuditLog())
 
 	//- DMC standard controllers (do not remove!)
 	// Mount "dmc" controller
