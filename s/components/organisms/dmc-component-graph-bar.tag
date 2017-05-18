@@ -6,11 +6,11 @@ dmc-component-graph-bar.ComponentGraphBar
     import chart from '../../core/chart';
 
     const keys = [];
-    forEach(this.opts._data.getValue('keys').getValue(), key => {
+    forEach(this.opts.data.getValue('keys').getValue(), key => {
       keys.push(key.getValue());
     });
     const defData = [];
-    forEach(this.opts._data.getValue('data').getValue(), (data, idx) => {
+    forEach(this.opts.data.getValue('data').getValue(), (data, idx) => {
       defData[idx] = {};
       forEach(keys, (key, i) => {
         defData[idx][key] = data.getValue(i).getValue();

@@ -8,7 +8,7 @@ dmc-button(class="Button Button--{ opts.type || 'primary' } { opts.class }" oncl
     }
 
     handleMouseOver() {
-      this.opts.onhovertoggle(true);
+      this.opts.onhovertoggle && this.opts.onhovertoggle(true);
       if (!!this.tooltipMessage) {
         this.isTooltipOpened = true;
       }

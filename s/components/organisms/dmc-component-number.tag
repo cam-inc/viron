@@ -3,4 +3,4 @@ dmc-component-number.ComponentNumber
 
   script.
     import { currencyFormat } from 'mout/number';
-    this.value = currencyFormat(opts._data.getValue('value').getValue(), 0);
+    this.value = currencyFormat(opts.data.getValue('value').getValue(), 0);

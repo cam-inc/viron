@@ -18,7 +18,7 @@ dmc-component-table.ComponentTable
           key: constants.DMC_TABLE_ACTION_KEY
         });
       }
-      forEach(this.opts._data.getValue(0).getKeys(), k => {
+      forEach(this.opts.data.getValue(0).getKeys(), k => {
         columns.push({
           title: k,
           key: k
@@ -29,7 +29,7 @@ dmc-component-table.ComponentTable
 
     getRows() {
       const rows = [];
-      forEach(this.opts._data.getValue(), cells => {
+      forEach(this.opts.data.getValue(), cells => {
         const row = {};
         if (!!this.opts.actions && this.opts.actions.length) {
           row[constants.DMC_TABLE_ACTION_KEY] = {

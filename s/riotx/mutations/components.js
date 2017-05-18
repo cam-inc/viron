@@ -9,12 +9,10 @@ export default {
     // const properties = schema.properties;
     const responseObj = params.response.obj;
 
-    const merge = swagger.mergePropertiesAndResponse(schema, responseObj);
-    const _data = swagger.mergeSchemaAndResponse(schema, responseObj);
+    const data = swagger.mergeSchemaAndResponse(schema, responseObj);
 
     context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
-    context.state.components[params.component_uid].data = merge;
-    context.state.components[params.component_uid]._data = _data;
+    context.state.components[params.component_uid].data = data;
     // `component.pagination` value indicates whether the component supports pagination or not.
     // if supported then manually add pagination information from headers.
     if (params.component.pagination.get()) {

@@ -8,7 +8,7 @@ dmc-component.Component
   .Component__body
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
-    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" data="{ data }" _data="{ _data }" actions="{ childActions }" updater="{ updater }")
+    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" data="{ data }" actions="{ childActions }" updater="{ updater }")
     .Component__alert(if="{ !isPending && !isValidData }")
       .Component__alertApi { alertApi }
       .Component__alertText { alertText }
@@ -43,7 +43,6 @@ dmc-component.Component
     this.alertText = '';
     // `data` and others will be filled with detail info after fetching.
     this.data = null;
-    this._data = null;
     this.pagination = null;
     this.search = null;
     this.selfActions = null;
@@ -148,7 +147,6 @@ dmc-component.Component
       this.isPending = false;
       const component = store.getter(constants.GETTER_COMPONENTS_ONE, this._riot_id);
       this.data = component.data;
-      this._data = component._data;
       if (component.pagination && component.pagination.maxPage > 1) {
         this.pagination = component.pagination;
       } else {
@@ -157,7 +155,7 @@ dmc-component.Component
       this.search = component.search;
       this.selfActions = component.selfActions;
       this.childActions = component.childActions;
-      this.validateResponse(this._data);
+      this.validateResponse(this.data);
       this.update();
     });
 
