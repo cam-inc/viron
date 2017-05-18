@@ -47,7 +47,9 @@ const setupStore = () => {
           // toasts data.
           toasts: storage.get(constants.STORAGE_TOAST, []),
           // modal data.
-          modals: []
+          modals: [],
+          // drawers data.
+          drawers: []
         },
         actions: actions,
         mutations: mutations,

@@ -66,6 +66,9 @@ export default {
   ACTION_MODAL_SHOW: 'modal_show',
   ACTION_MODAL_HIDE: 'modal_hide',
 
+  ACTION_DRAWER_SHOW: 'drawer_show',
+  ACTION_DRAWER_HIDE: 'drawer_hide',
+
   ACTION_AUTH_UPDATE: 'auth_update',
   ACTION_AUTH_REMOVE: 'auth_remove',
   ACTION_AUTH_VALIDATE: 'auth_validate',
@@ -111,6 +114,9 @@ export default {
   MUTATION_MODAL_ADD: 'modal_add',
   MUTATION_MODAL_REMOVE: 'modal_remove',
 
+  MUTATION_DRAWER_ADD: 'drawer_add',
+  MUTATION_DRAWER_REMOVE: 'drawer_remove',
+
   MUTATION_AUTH_SIGN_IN_SHOW: 'auth_sign_in_show',
 
   // riotx#getters
@@ -140,6 +146,8 @@ export default {
   GETTER_TOAST_LIST: 'toast_list',
 
   GETTER_MODAL_LIST: 'modal_list',
+
+  GETTER_DRAWER_LIST: 'drawer_list',
 
   GETTER_ENDPOINTS: 'endpoints',
   GETTER_ENDPOINTS_ONE: 'endpoints_one',
@@ -171,5 +179,7 @@ export default {
 
   CHANGE_TOAST: 'toast',
 
-  CHANGE_MODAL: 'modal'
+  CHANGE_MODAL: 'modal',
+
+  CHANGE_DRAWER: 'modal'
 };

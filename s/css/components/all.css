@@ -13,6 +13,8 @@
 @import "ComponentGraphStackedBar";
 @import "ComponentNumber";
 @import "ComponentTable";
+@import "Drawers";
+@import "Drawer";
 @import "Endpoint";
 @import "Entry";
 @import "Header";

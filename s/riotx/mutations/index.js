@@ -10,6 +10,7 @@ import page from './page';
 import components from './components';
 import toast from './toast';
 import modal from './modal';
+import drawer from './drawer';
 import auth from './auth';
 
 export default {
@@ -46,6 +47,9 @@ export default {
 
   [constants.MUTATION_MODAL_ADD]: modal.add,
   [constants.MUTATION_MODAL_REMOVE]: modal.remove,
+
+  [constants.MUTATION_DRAWER_ADD]: drawer.add,
+  [constants.MUTATION_DRAWER_REMOVE]: drawer.remove,
 
   [constants.MUTATION_AUTH_SIGN_IN_SHOW]: auth.signInShow
 };

@@ -10,6 +10,7 @@ import page from './page';
 import components from './components';
 import toast from './toast';
 import modal from './modal';
+import drawer from './drawer';
 import auth from './auth';
 import authtype from './authtype';
 
@@ -50,6 +51,9 @@ export default {
 
   [constants.ACTION_MODAL_SHOW]: modal.show,
   [constants.ACTION_MODAL_HIDE]: modal.hide,
+
+  [constants.ACTION_DRAWER_SHOW]: drawer.show,
+  [constants.ACTION_DRAWER_HIDE]: drawer.hide,
 
   [constants.ACTION_AUTH_UPDATE]: auth.update,
   [constants.ACTION_AUTH_REMOVE]: auth.remove,

@@ -7,6 +7,7 @@ dmc.Application
         dmc-header
       .Application__page
         div(data-is="{ pageTagName }")
+  dmc-drawers
   dmc-modals
   dmc-toasts
 
@@ -18,6 +19,7 @@ dmc.Application
     import './pages/dmc-endpoints.tag';
     import './pages/dmc-loading.tag';
     import './pages/dmc-notfound.tag';
+    import './organisms/dmc-drawers.tag';
     import './organisms/dmc-menu.tag';
     import './organisms/dmc-header.tag';
     import './organisms/dmc-signin.tag';

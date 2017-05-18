@@ -9,6 +9,7 @@ import page from './page';
 import components from './components';
 import toast from './toast';
 import modal from './modal';
+import drawer from './drawer';
 import endpoints from './endpoints';
 import auth from './auth';
 
@@ -39,6 +40,8 @@ export default {
   [constants.GETTER_TOAST_LIST]: toast.list,
 
   [constants.GETTER_MODAL_LIST]: modal.list,
+
+  [constants.GETTER_DRAWER_LIST]: drawer.list,
 
   [constants.GETTER_ENDPOINTS]: endpoints._,
   [constants.GETTER_ENDPOINTS_ONE]: endpoints.one,

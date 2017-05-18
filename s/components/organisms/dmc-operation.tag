@@ -24,9 +24,12 @@ dmc-operation.Operation
     }
     this.queries = ObjectAssign({}, this.opts.initialQueries);
 
-    closeModal() {
+    close() {
       if (this.opts.isModal) {
         this.opts.modalCloser();
+      }
+      if (this.opts.isDrawer) {
+        this.opts.drawerCloser();
       }
     }
 
@@ -44,7 +47,7 @@ dmc-operation.Operation
         .resolve()
         .then(() => store.action(constants.ACTION_COMPONENTS_OPERATE, this.opts.operation, this.queries))
         .then(() => {
-          this.closeModal();
+          this.close();
           this.opts.onSuccess();
         })
         .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
@@ -53,7 +56,7 @@ dmc-operation.Operation
     }
 
     handleCancelButtonClick() {
-      this.closeModal();
+      this.close();
     }
 
 dmc-operation-parameter.Operation__parameter
