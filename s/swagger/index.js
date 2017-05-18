@@ -128,6 +128,7 @@ class Swagger {
       // dmc customs.
       _type: null,
       _value: null,
+      _rawValue: null,
       _index: null,
       _key: null,
       _keys: null,
@@ -140,6 +141,9 @@ class Swagger {
           return this._value;
         }
         return this._value[k];
+      },
+      getRawValue: function() {
+        return this._rawValue;
       },
       getIndex: function() {
         return this._index;
@@ -193,14 +197,17 @@ class Swagger {
     case 'null':
       ret._type = 'null';
       ret._value = null;
+      ret._rawValue = null;
       break;
     case 'boolean':
       ret._type = 'boolean';
       ret._value = response;
+      ret._rawValue = response;
       break;
     case 'object':
       ret._type = 'object';
       ret._value = {};
+      ret._rawValue = response;
       ret._keys = [];
       forOwn(response, (v, k) => {
         ret._keys.push(k);
@@ -211,6 +218,7 @@ class Swagger {
     case 'array':
       ret._type = 'array';
       ret._value = [];
+      ret._rawValue = response;
       ret._length = response.length;
       forEach(response, (v, i) => {
         ret._value[i] = this.mergeSchemaAndResponse(schema.items, v);
@@ -220,14 +228,17 @@ class Swagger {
     case 'number':
       ret._type = 'number';
       ret._value = response;
+      ret._rawValue = response;
       break;
     case 'string':
       ret._type = 'number';
       ret._value = response;
+      ret._rawValue = response;
       break;
     default:
       // irregular case. e.g.) レスポンス内容がproperties内に定義されていない場合など。
       ret._value = response;
+      ret._rawValue = response;
       break;
     }
 
