@@ -124,7 +124,7 @@ var _ = StorageGroup("DmcStorageGroup", func() {
 
 			RendersTo(AuditLogMediaType)
 
-			Field("reuquest_method", gorma.String, func() {})
+			Field("request_method", gorma.String, func() {})
 			Field("request_uri", gorma.String, func() {
 				SQLTag("size:2048")
 			})

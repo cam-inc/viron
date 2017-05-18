@@ -41,58 +41,61 @@ func getIpAddress(req *http.Request) string {
 
 // AuditLog writes a audit log
 func AuditLog() goa.Middleware {
-	logger := common.GetLogger("default")
-	logging := func(nextHandler goa.Handler) goa.Handler {
-		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-			defer func() {
-				userID := "unknown"
-				requestBody := ""
-				payload := goa.ContextRequest(ctx).Payload
-
-				cl := ctx.Value(bridge.JwtClaims)
-				if cl != nil {
-					claims := cl.(jwtgo.MapClaims)
-					userID = claims["sub"].(string)
-					jsonBytes, _ := json.Marshal(payload)
-					requestBody = string(jsonBytes)
-				} else if req.Method == "POST" && req.RequestURI == "/signin" {
-					// `/signin` の場合はrequestBodyからuserIDを取り出す
-					// passwordをログ出力したくないのでrequestBodyは出さない
-					if payload != nil {
-						_payload := payload.(*app.SigninAuthPayload)
-						userID = *_payload.Email
-					}
-				} else {
-					// 非認証API
-					if payload != nil {
-						jsonBytes, _ := json.Marshal(payload)
-						requestBody = string(jsonBytes)
-					}
-				}
-
-				res := goa.ContextResponse(ctx)
-				auditLogTable := genModels.NewAuditLogDB(models.DB)
-				m := genModels.AuditLog{}
-				m.UserID = userID
-				m.RequestURI = req.RequestURI[0:int(math.Min(float64(len(req.RequestURI)), float64(2048)))]
-				m.ReuquestMethod = req.Method
-				m.SourceIP = getIpAddress(req)
-				m.RequestBody = requestBody
-				m.StatusCode = res.Status
-
-				err := auditLogTable.Add(ctx, &m)
-				if err != nil {
-					logger.Error("AuditLog save failure.",
-						zap.String("method", req.Method),
-						zap.String("uri", req.RequestURI),
-						zap.String("userID", userID),
-						zap.Error(err))
-				}
-			}()
-			return nextHandler(ctx, rw, req)
-		}
-	}
-
-	fm, _ := goa.NewMiddleware(logging)
+	fm, _ := goa.NewMiddleware(AuditLogHandler)
 	return fm
+}
+
+// AuditLogHandler returns a handler for audit log
+func AuditLogHandler(nextHandler goa.Handler) goa.Handler {
+	logger := common.GetLogger("default")
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		if req.Method == "OPTIONS" {
+			return nil
+		}
+
+		userID := "unknown"
+		requestBody := ""
+		payload := goa.ContextRequest(ctx).Payload
+
+		cl := ctx.Value(bridge.JwtClaims)
+		if cl != nil {
+			claims := cl.(jwtgo.MapClaims)
+			userID = claims["sub"].(string)
+			jsonBytes, _ := json.Marshal(payload)
+			requestBody = string(jsonBytes)
+		} else if req.Method == "POST" && req.RequestURI == "/signin" {
+			// `/signin` の場合はrequestBodyからuserIDを取り出す
+			// passwordをログ出力したくないのでrequestBodyは出さない
+			if payload != nil {
+				_payload := payload.(*app.SigninAuthPayload)
+				userID = *_payload.Email
+			}
+		} else {
+			// 非認証API
+			if payload != nil {
+				jsonBytes, _ := json.Marshal(payload)
+				requestBody = string(jsonBytes)
+			}
+		}
+
+		res := goa.ContextResponse(ctx)
+		auditLogTable := genModels.NewAuditLogDB(models.DB)
+		m := genModels.AuditLog{}
+		m.UserID = userID
+		m.RequestURI = req.RequestURI[0:int(math.Min(float64(len(req.RequestURI)), float64(2048)))]
+		m.RequestMethod = req.Method
+		m.SourceIP = getIpAddress(req)
+		m.RequestBody = requestBody
+		m.StatusCode = res.Status
+
+		if err := auditLogTable.Add(ctx, &m); err != nil {
+			logger.Error("AuditLog save failure.",
+				zap.String("method", req.Method),
+				zap.String("uri", req.RequestURI),
+				zap.String("userID", userID),
+				zap.Error(err))
+		}
+		return nextHandler(ctx, rw, req)
+	}
 }
