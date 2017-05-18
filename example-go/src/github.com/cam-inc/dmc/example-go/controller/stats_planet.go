@@ -23,17 +23,26 @@ func (c *StatsPlanetController) Bar(ctx *app.BarStatsPlanetContext) error {
 
 	// StatsPlanetController_Bar: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance"},
-		Data: [][]interface{}{
-			{"水星", 0.387},
-			{"金星", 0.723},
-			{"地球", 1.000},
-			{"火星", 1.524},
-			{"木星", 5.203},
-			{"土星", 9.539},
-			{"天王星", 19.180},
-			{"海王星", 30.060},
-			{"冥王星", 39.530},
+		Data: []map[string]interface{}{
+			{"name": "水星", "distance": 0.387},
+			{"name": "金星", "distance": 0.723},
+			{"name": "地球", "distance": 1.000},
+			{"name": "火星", "distance": 1.524},
+			{"name": "木星", "distance": 5.203},
+			{"name": "土星", "distance": 9.539},
+			{"name": "天王星", "distance": 19.180},
+			{"name": "海王星", "distance": 30.060},
+			{"name": "冥王星", "distance": 39.530},
+		},
+		X: "name",
+		Y: "distance",
+		Guide: &app.StatsGuideType{
+			X: &app.StatsLabelType{
+				Label: "名前",
+			},
+			Y: &app.StatsLabelType{
+				Label: "距離",
+			},
 		},
 	}
 	return ctx.OK(res)
@@ -47,17 +56,26 @@ func (c *StatsPlanetController) HorizontalBar(ctx *app.HorizontalBarStatsPlanetC
 
 	// StatsPlanetController_HorizontalBar: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance"},
-		Data: [][]interface{}{
-			{"Mercury", 0.387},
-			{"Venus", 0.723},
-			{"Earth", 1.000},
-			{"Mars", 1.524},
-			{"Jupiter", 5.203},
-			{"Saturn", 9.539},
-			{"Uranus", 19.180},
-			{"Neptune", 30.060},
-			{"Pluto", 39.530},
+		Data: []map[string]interface{}{
+			{"name": "水星", "distance": 0.387},
+			{"name": "金星", "distance": 0.723},
+			{"name": "地球", "distance": 1.000},
+			{"name": "火星", "distance": 1.524},
+			{"name": "木星", "distance": 5.203},
+			{"name": "土星", "distance": 9.539},
+			{"name": "天王星", "distance": 19.180},
+			{"name": "海王星", "distance": 30.060},
+			{"name": "冥王星", "distance": 39.530},
+		},
+		X: "name",
+		Y: "distance",
+		Guide: &app.StatsGuideType{
+			X: &app.StatsLabelType{
+				Label: "名前",
+			},
+			Y: &app.StatsLabelType{
+				Label: "距離",
+			},
 		},
 	}
 	return ctx.OK(res)
@@ -71,17 +89,26 @@ func (c *StatsPlanetController) HorizontalStackedBar(ctx *app.HorizontalStackedB
 
 	// StatsPlanetController_HorizontalStackedBar: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance"},
-		Data: [][]interface{}{
-			{"Mars", 0.387},
-			{"Mars", 0.723},
-			{"Mars", 1.000},
-			{"Mars", 1.524},
-			{"Pluto", 5.203},
-			{"Pluto", 9.539},
-			{"Pluto", 19.180},
-			{"Pluto", 30.060},
-			{"Pluto", 39.530},
+		Data: []map[string]interface{}{
+			{"name": "水星", "distance": 0.387},
+			{"name": "金星", "distance": 0.723},
+			{"name": "地球", "distance": 1.000},
+			{"name": "火星", "distance": 1.524},
+			{"name": "木星", "distance": 5.203},
+			{"name": "土星", "distance": 9.539},
+			{"name": "天王星", "distance": 19.180},
+			{"name": "海王星", "distance": 30.060},
+			{"name": "冥王星", "distance": 39.530},
+		},
+		X: "name",
+		Y: "distance",
+		Guide: &app.StatsGuideType{
+			X: &app.StatsLabelType{
+				Label: "名前",
+			},
+			Y: &app.StatsLabelType{
+				Label: "距離",
+			},
 		},
 	}
 	return ctx.OK(res)
@@ -95,17 +122,27 @@ func (c *StatsPlanetController) Line(ctx *app.LineStatsPlanetContext) error {
 
 	// StatsPlanetController_Line: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature"},
-		Data: [][]interface{}{
-			{"Earth", 0.387, 452},
-			{"Earth", 0.723, 726},
-			{"Earth", 1.000, 281},
-			{"Saturn", 1.524, 230},
-			{"Saturn", 5.203, 120},
-			{"Saturn", 9.539, 88},
-			{"Pluto", 19.180, 59},
-			{"Pluto", 30.060, 48},
-			{"Pluto", 39.530, 37},
+		Data: []map[string]interface{}{
+			{"name": "水星", "distance": 0.387, "temperature": 452},
+			{"name": "金星", "distance": 0.723, "temperature": 726},
+			{"name": "地球", "distance": 1.000, "temperature": 281},
+			{"name": "火星", "distance": 1.524, "temperature": 230},
+			{"name": "木星", "distance": 5.203, "temperature": 120},
+			{"name": "土星", "distance": 9.539, "temperature": 88},
+			{"name": "天王星", "distance": 19.180, "temperature": 59},
+			{"name": "海王星", "distance": 30.060, "temperature": 48},
+			{"name": "冥王星", "distance": 39.530, "temperature": 37},
+		},
+		X:     "name",
+		Y:     "distance",
+		Color: "albedo",
+		Guide: &app.StatsGuideType{
+			X: &app.StatsLabelType{
+				Label: "名前",
+			},
+			Y: &app.StatsLabelType{
+				Label: "距離",
+			},
 		},
 	}
 	return ctx.OK(res)
@@ -119,17 +156,28 @@ func (c *StatsPlanetController) Scatterplot(ctx *app.ScatterplotStatsPlanetConte
 
 	// StatsPlanetController_Scatterplot: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature", "Albedo"},
-		Data: [][]interface{}{
-			{"Earth", 0.387, 452, 0.12},
-			{"Earth", 0.723, 726, 0.59},
-			{"Earth", 1.000, 281, 0.39},
-			{"Saturn", 1.524, 230, 0.15},
-			{"Saturn", 5.203, 120, 0.44},
-			{"Saturn", 9.539, 88, 0.46},
-			{"Pluto", 19.180, 59, 0.56},
-			{"Pluto", 30.060, 48, 0.51},
-			{"Pluto", 39.530, 37, 0.50},
+		Data: []map[string]interface{}{
+			{"name": "水星", "distance": 0.387, "temperature": 452, "albedo": 0.1},
+			{"name": "金星", "distance": 0.723, "temperature": 726, "albedo": 0.6},
+			{"name": "地球", "distance": 1.000, "temperature": 281, "albedo": 0.4},
+			{"name": "火星", "distance": 1.524, "temperature": 230, "albedo": 0.2},
+			{"name": "木星", "distance": 5.203, "temperature": 120, "albedo": 0.4},
+			{"name": "土星", "distance": 9.539, "temperature": 88, "albedo": 0.5},
+			{"name": "天王星", "distance": 19.180, "temperature": 59, "albedo": 0.6},
+			{"name": "海王星", "distance": 30.060, "temperature": 48, "albedo": 0.5},
+			{"name": "冥王星", "distance": 39.530, "temperature": 37, "albedo": 0.5},
+		},
+		X:     "name",
+		Y:     "distance",
+		Size:  "temperature",
+		Color: "albedo",
+		Guide: &app.StatsGuideType{
+			X: &app.StatsLabelType{
+				Label: "名前",
+			},
+			Y: &app.StatsLabelType{
+				Label: "距離",
+			},
 		},
 	}
 	return ctx.OK(res)
@@ -143,17 +191,27 @@ func (c *StatsPlanetController) StackedArea(ctx *app.StackedAreaStatsPlanetConte
 
 	// StatsPlanetController_StackedArea: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance", "Temperature"},
-		Data: [][]interface{}{
-			{"Earth", 1, 452},
-			{"Earth", 2, 726},
-			{"Earth", 3, 281},
-			{"Saturn", 1, 230},
-			{"Saturn", 2, 120},
-			{"Saturn", 3, 88},
-			{"Pluto", 1, 59},
-			{"Pluto", 2, 48},
-			{"Pluto", 3, 37},
+		Data: []map[string]interface{}{
+			{"name": "水星", "distance": 0.387, "temperature": 452},
+			{"name": "金星", "distance": 0.723, "temperature": 726},
+			{"name": "地球", "distance": 1.000, "temperature": 281},
+			{"name": "火星", "distance": 1.524, "temperature": 230},
+			{"name": "木星", "distance": 5.203, "temperature": 120},
+			{"name": "土星", "distance": 9.539, "temperature": 88},
+			{"name": "天王星", "distance": 19.180, "temperature": 59},
+			{"name": "海王星", "distance": 30.060, "temperature": 48},
+			{"name": "冥王星", "distance": 39.530, "temperature": 37},
+		},
+		X:     "name",
+		Y:     "distance",
+		Color: "albedo",
+		Guide: &app.StatsGuideType{
+			X: &app.StatsLabelType{
+				Label: "名前",
+			},
+			Y: &app.StatsLabelType{
+				Label: "距離",
+			},
 		},
 	}
 	return ctx.OK(res)
@@ -167,18 +225,18 @@ func (c *StatsPlanetController) StackedBar(ctx *app.StackedBarStatsPlanetContext
 
 	// StatsPlanetController_StackedBar: end_implement
 	res := &app.Statsplanet{
-		Keys: []string{"Name", "Distance"},
-		Data: [][]interface{}{
-			{"火星", 0.387},
-			{"火星", 0.723},
-			{"火星", 1.000},
-			{"火星", 1.524},
-			{"土星", 5.203},
-			{"土星", 9.539},
-			{"冥王星", 19.180},
-			{"冥王星", 30.060},
-			{"冥王星", 39.530},
-		},
+	//	Keys: []string{"Name", "Distance"},
+	//	Data: [][]interface{}{
+	//		{"火星", 0.387},
+	//		{"火星", 0.723},
+	//		{"火星", 1.000},
+	//		{"火星", 1.524},
+	//		{"土星", 5.203},
+	//		{"土星", 9.539},
+	//		{"冥王星", 19.180},
+	//		{"冥王星", 30.060},
+	//		{"冥王星", 39.530},
+	//	},
 	}
 	return ctx.OK(res)
 }

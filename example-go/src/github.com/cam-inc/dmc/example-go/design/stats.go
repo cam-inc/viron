@@ -41,14 +41,22 @@ var StatsPlanetMediaType = MediaType("application/vnd.statsplanet+json", func() 
 	ContentType("application/json")
 
 	Attributes(func() {
-		Attribute("keys", ArrayOf(String), "key names of graph data")
-		Attribute("data", ArrayOf(ArrayOf(Any)), "graph data")
-		Required("keys", "data")
+		Attribute("data", ArrayOf(HashOf(String, Any)), "グラフデータ")
+		Attribute("x", String, "X軸に使用するkey")
+		Attribute("y", String, "Y軸に使用するkey")
+		Attribute("size", String, "ドットの大きさに使用するkey")
+		Attribute("color", String, "ドットの色分けに使用するkey")
+		Attribute("guide", GuideType)
+		Required("data", "x", "y", "size", "color", "guide")
 	})
 
 	View("default", func() {
-		Attribute("keys")
 		Attribute("data")
+		Attribute("x")
+		Attribute("y")
+		Attribute("size")
+		Attribute("color")
+		Attribute("guide")
 	})
 })
 
@@ -149,4 +157,14 @@ var _ = Resource("stats_planet", func() {
 		Response(NotFound)
 		Response(BadRequest, ErrorMedia)
 	})
+})
+
+var GuideType = Type("StatsGuideType", func() {
+	Member("x", LabelType)
+	Member("y", LabelType)
+})
+
+var LabelType = Type("StatsLabelType", func() {
+	Member("label", String)
+	Required("label")
 })
