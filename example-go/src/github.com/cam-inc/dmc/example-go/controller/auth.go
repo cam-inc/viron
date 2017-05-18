@@ -136,7 +136,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	adminUserTable := models.NewAdminUserDB(models.DB)
 	adminUserModel, err := adminUserTable.GetByEmail(ctx.Context, *ctx.Payload.Email)
 	if err == gorm.ErrRecordNotFound {
-		if adminUsers := adminUserTable.ListAdminUserSmall(ctx.Context); len(adminUsers) > 0 {
+		if adminUsers := adminUserTable.ListAdminUser(ctx.Context); len(adminUsers) > 0 {
 			return ctx.NotFound()
 		}
 		// DBに1人も管理者がいないときは、このユーザーをスーパーユーザーとして登録する
@@ -237,7 +237,7 @@ func (c *AuthController) Googleoauth2callback(ctx *app.Googleoauth2callbackAuthC
 		if err == gorm.ErrRecordNotFound {
 			// 新規ユーザーの場合はユーザー作成
 			roleId := common.GetDefaultRole()
-			if adminUsers := adminUserTable.ListAdminUserSmall(ctx.Context); len(adminUsers) <= 0 {
+			if adminUsers := adminUserTable.ListAdminUser(ctx.Context); len(adminUsers) <= 0 {
 				// 1人目はスーパーユーザーにする
 				roleId = common.GetSuperRole()
 			}

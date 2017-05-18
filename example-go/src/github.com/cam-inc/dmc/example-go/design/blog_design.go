@@ -21,26 +21,13 @@ var BlogDesignMediaType = MediaType("application/vnd.blog_design+json", func() {
 		Attribute("updated_at", DateTime, "更新日時")
 	})
 
-	largeView := func() {
+	View("default", func() {
 		Attribute("id")
 		Attribute("name")
 		Attribute("base_color")
 		Attribute("background_image")
 		Attribute("created_at")
 		Attribute("updated_at")
-	}
-
-	View("default", largeView)
-	View("large", largeView)
-	View("medium", func() {
-		Attribute("id")
-		Attribute("name")
-		Attribute("base_color")
-		Attribute("background_image")
-	})
-	View("small", func() {
-		Attribute("id")
-		Attribute("name")
 	})
 })
 
@@ -65,9 +52,6 @@ var _ = Resource("blog_design", func() {
 			Media(CollectionOf(BlogDesignMediaType, func() {
 				ContentType("application/json")
 				View("default")
-				View("large")
-				View("medium")
-				View("small")
 			}))
 		})
 		Response(NotFound)
