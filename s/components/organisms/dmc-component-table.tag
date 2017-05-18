@@ -53,8 +53,8 @@ dmc-component-table.ComponentTable
         }
         forOwn(cells.getValue(), cell => {
           row[cell.getKey()] = {
-            isText: true,
-            value: cell.getValue()
+            isAction: false,
+            data: cell
           };
         });
         rows.push(row);
