@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"io"
 
+	"github.com/cam-inc/dmc/example-go/common"
 	genModels "github.com/cam-inc/dmc/example-go/gen/models"
 	"github.com/cam-inc/dmc/example-go/models"
 	"golang.org/x/crypto/scrypt"
@@ -28,6 +29,10 @@ func CreateAdminUserByIdPassword(ctx context.Context, email string, password str
 		m.Salt = salt
 		m.Password = base64.StdEncoding.EncodeToString(passwordHash)
 		m.RoleID = role
+
+		if role == common.GetDefaultRole() {
+			CreateDefaultRole(ctx)
+		}
 
 		return &m, adminUserTable.Add(ctx, &m)
 	}

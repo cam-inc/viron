@@ -25,7 +25,7 @@ var UserBlogMediaType = MediaType("application/vnd.user_blog+json", func() {
 		Required("id", "user_id", "title", "design_id")
 	})
 
-	largeView := func() {
+	View("default", func() {
 		Attribute("id")
 		Attribute("user_id")
 		Attribute("title")
@@ -34,19 +34,6 @@ var UserBlogMediaType = MediaType("application/vnd.user_blog+json", func() {
 		Attribute("design_id")
 		Attribute("created_at")
 		Attribute("updated_at")
-	}
-	View("default", largeView)
-	View("large", largeView)
-	View("medium", func() {
-		Attribute("id")
-		Attribute("user_id")
-		Attribute("title")
-		Attribute("created_at")
-		Attribute("updated_at")
-	})
-	View("small", func() {
-		Attribute("id")
-		Attribute("title")
 	})
 })
 
@@ -71,9 +58,6 @@ var _ = Resource("user_blog", func() {
 			Media(CollectionOf(UserBlogMediaType, func() {
 				ContentType("application/json")
 				View("default")
-				View("large")
-				View("medium")
-				View("small")
 			}))
 		})
 		Response(NotFound)

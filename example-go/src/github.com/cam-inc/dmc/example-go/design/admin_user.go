@@ -18,22 +18,10 @@ var AdminUserMediaType = MediaType("application/vnd.admin_user+json", func() {
 		Required("id", "email")
 	})
 
-	largeView := func() {
+	View("default", func() {
 		Attribute("id")
 		Attribute("email")
 		Attribute("role_id")
-	}
-
-	View("default", largeView)
-	View("large", largeView)
-	View("medium", func() {
-		Attribute("id")
-		Attribute("email")
-		Attribute("role_id")
-	})
-	View("small", func() {
-		Attribute("id")
-		Attribute("email")
 	})
 })
 
@@ -42,10 +30,9 @@ var _ = Resource("admin_user", func() {
 	BasePath("/adminuser")
 	DefaultMedia(AdminUserMediaType)
 
-	// TODO: ログイン画面できるまでは外しておく
-	//Security(JWT, func() {
-	//	Scope("api:access")
-	//})
+	Security(JWT, func() {
+		Scope("api:access")
+	})
 
 	Action("list", func() {
 		Description("get admin users")
@@ -54,9 +41,6 @@ var _ = Resource("admin_user", func() {
 			Media(CollectionOf(AdminUserMediaType, func() {
 				ContentType("application/json")
 				View("default")
-				View("large")
-				View("medium")
-				View("small")
 			}))
 		})
 		Response(NotFound)

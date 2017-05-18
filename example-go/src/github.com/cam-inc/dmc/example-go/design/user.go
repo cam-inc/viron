@@ -31,7 +31,7 @@ var UserMediaType = MediaType("application/vnd.user+json", func() {
 		Required("id", "name")
 	})
 
-	largeView := func() {
+	View("default", func() {
 		Attribute("id")
 		Attribute("name")
 		Attribute("sex")
@@ -46,18 +46,6 @@ var UserMediaType = MediaType("application/vnd.user+json", func() {
 		Attribute("homepage")
 		Attribute("created_at")
 		Attribute("updated_at")
-	}
-	View("default", largeView)
-	View("large", largeView)
-	View("medium", func() {
-		Attribute("id")
-		Attribute("name")
-		Attribute("created_at")
-		Attribute("updated_at")
-	})
-	View("small", func() {
-		Attribute("id")
-		Attribute("name")
 	})
 })
 
@@ -81,9 +69,6 @@ var _ = Resource("user", func() {
 			Media(CollectionOf(UserMediaType, func() {
 				ContentType("application/json")
 				View("default")
-				View("large")
-				View("medium")
-				View("small")
 			}))
 		})
 		Response(NotFound)
