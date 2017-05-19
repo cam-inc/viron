@@ -28,8 +28,8 @@ dmc-table.Table
       return rows;
     }
 
-dmc-table-cell.Table__cell(onClick="{ handleClick }")
-  div(if="{ !opts.cell.isAction }") { value }
+dmc-table-cell.Table__cell
+  div(if="{ !opts.cell.isAction }" onClick="{ handleClick }") { value }
   virtual(if="{ opts.cell.isAction }")
     dmc-table-cell-action(each="{ action in opts.cell.actions }" action="{ action }")
 

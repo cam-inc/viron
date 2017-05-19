@@ -1,13 +1,13 @@
 dmc-operation.Operation
-  div { JSON.stringify(this.queries) }
   .Operation__info
-    .Operation__summary { summary }
-    .Operation__description { opts.operation.description }
-  .Operation__parameters
-    dmc-operation-parameter(each="{ parameter in opts.operation.parameters }" parameter="{ parameter }" parameterValue="{ parent.queries[parameter.name] }" onChange="{ parent.handleParameterChange }")
+    div
+      .Operation__summary { summary }
+      .Operation__description { opts.operation.description }
   .Operation__control
     dmc-button(label="{ opts.operation.operationId }" onClick="{ handleExecuteButtonClick }")
     dmc-button(label="cancel" type="secondary" onClick="{ handleCancelButtonClick }")
+  .Operation__parameters
+    dmc-operation-parameter(each="{ parameter in opts.operation.parameters }" parameter="{ parameter }" parameterValue="{ parent.queries[parameter.name] }" onChange="{ parent.handleParameterChange }")
 
   script.
     import ObjectAssign from 'object-assign';
@@ -131,7 +131,7 @@ dmc-operation-schema-form.Operation__schemaForm
     dmc-checkbox(isChecked="{ opts.parametervalue }" onChange="{ handleCheckboxChange }")
   virtual(if="{ uiType === 'select' }")
     dmc-select(isOpened="{ isOpened }" options="{ getSelectOptions() }" onToggle="{ handleSelectToggle }" onChange="{ handleSelectChange }")
-  virtual(if="{ uiType === 'multi' }" each="{ p, idx in multiData }")
+  .Operation__schemaFormChildren(if="{ uiType === 'multi' }" each="{ p, idx in multiData }")
     .Operation__schemaFormMultiMinusButton(onClick="{ handleMultiMinusButtonClick }")
       dmc-icon(type="minus")
     dmc-operation-schema-form(each="{ propertyKey in parent.multiPropertyKeys }" multiIdx="{ parent.idx }" parameterObject="{ parent.getParameterObject(propertyKey) }" parameterValue="{ parent.getValue(propertyKey, parent.idx) }" onChange="{ parent.handleMultiChange }")

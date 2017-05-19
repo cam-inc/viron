@@ -39,7 +39,6 @@
   right: 0;
   width: 90%;
   height: 100%;
-  padding: 32px;
   overflow: scroll;
   background-color: var(--color-basic-white);
   opacity: 0;

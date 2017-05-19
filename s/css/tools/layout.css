@@ -7,7 +7,14 @@
     justify-content: flex-start;
   }
 
-  /* 天地中央配置 */
+  /* 天地中央配置 & 左揃え */
+  --layout-center-start: {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  /* 天地左右中央配置 */
   --layout-center-center: {
     display: flex;
     align-items: center;
