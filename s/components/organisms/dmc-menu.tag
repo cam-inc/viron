@@ -8,7 +8,7 @@ dmc-menu.Menu
           .Menu__endpointHost(if="{ !!endpoint }") { endpoint.url }
         .Menu__endpointBodyTail
           .Menu__endpointDescription(if="{ !!endpoint }") { endpoint.description }
-    .Menu__closeButton(click="{ handleCloseButtonClick }")
+    .Menu__closeButton(onClick="{ handleCloseButtonClick }")
       dmc-icon(type="close")
   .Menu__body
     .Menu__section
@@ -77,6 +77,7 @@ dmc-menu.Menu
     });
 
     handleCloseButtonClick(e) {
+      e.preventUpdate = false;
       e.preventDefault();
       Promise
         .resolve()
@@ -98,7 +99,8 @@ dmc-menu-group(class="Menu__group")
 
     const store = this.riotx.get();
 
-    handleToggleClick() {
+    handleToggleClick(e) {
+      e.preventUpdate = false;
       if (this.opts.group.isIndependent) {
         router.navigateTo(`/${store.getter(constants.GETTER_CURRENT)}/${this.opts.group.list[0].id}`);
       } else {
@@ -108,5 +110,6 @@ dmc-menu-group(class="Menu__group")
     }
 
     handleGroupItemClick(e) {
+      e.preventUpdate = false;
       router.navigateTo(`/${store.getter(constants.GETTER_CURRENT)}/${e.item.id}`);
     }

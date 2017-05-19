@@ -1,4 +1,4 @@
-dmc-slider(class="Slider { opts.isdisabled ? 'Slider--disabled' : '' }" mousedown="{ handleMouseDown }" mousemove="{ handleMouseMove }" mouseup="{ handleMouseUp }" mouseleave="{ handleMouseLeave }")
+dmc-slider(class="Slider { opts.isdisabled ? 'Slider--disabled' : '' }" onMouseDown="{ handleMouseDown }" onMouseMove="{ handleMouseMove }" onMouseUp="{ handleMouseUp }" onMouseLeave="{ handleMouseLeave }")
   .Slider__groove
   .Slider__bar(style="width: { getPosX() }%;")
   .Slider__knob(style="left: { getPosX() }%;")
@@ -33,6 +33,7 @@ dmc-slider(class="Slider { opts.isdisabled ? 'Slider--disabled' : '' }" mousedow
     }
 
     handleMouseDown(e) {
+      e.preventUpdate = false;
       if (this.opts.isdisabled) {
         return;
       }
@@ -42,6 +43,7 @@ dmc-slider(class="Slider { opts.isdisabled ? 'Slider--disabled' : '' }" mousedow
     }
 
     handleMouseMove(e) {
+      e.preventUpdate = false;
       if (!isSlidable) {
         return;
       }
@@ -50,11 +52,13 @@ dmc-slider(class="Slider { opts.isdisabled ? 'Slider--disabled' : '' }" mousedow
     }
 
     handleMouseUp(e) {
+      e.preventUpdate = false;
       isSlidable = false;
       const newCurrent = this.calculateCurrent(e.clientX, e.currentTarget.getBoundingClientRect());
       this.updateCurrent(newCurrent);
     }
 
-    handleMouseLeave() {
+    handleMouseLeave(e) {
+      e.preventUpdate = false;
       isSlidable = false;
     }

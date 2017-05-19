@@ -65,6 +65,7 @@ dmc-table-cell.Table__cell(onClick="{ handleClick }")
     }
 
     handleClick(e) {
+      e.preventUpdate = false;
       e.stopPropagation();
       const type = this.opts.cell.data.getType();
       if (type !== 'object' && type !== 'array') {

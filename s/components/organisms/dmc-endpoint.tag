@@ -1,9 +1,9 @@
-dmc-endpoint.Endpoint(click="{ handleClick }")
+dmc-endpoint.Endpoint(onClick="{ handleClick }")
   .Endpoint__head
     .Endpoint__avatar
       .Endpoint__thumbnail(style="background-image:url({ opts.thumbnail })")
       div(class="Endpoint__token { !!opts.token ? 'Endpoint__token--active' : '' }")
-    .Endpoint__menuButton(click="{ handleMenuButtonClick }")
+    .Endpoint__menuButton(onClick="{ handleMenuButtonClick }")
       dmc-icon(type="ellipsis")
   .Endpoint__body
     .Endpoint__tags(if="{ !!opts.tags.length }")
@@ -25,7 +25,8 @@ dmc-endpoint.Endpoint(click="{ handleClick }")
 
     this.isMenuOpened = false;
 
-    handleClick() {
+    handleClick(e) {
+      e.preventUpdate = false;
       this.opts.onentry(this.opts.key);
     }
 

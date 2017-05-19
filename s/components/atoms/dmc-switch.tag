@@ -1,4 +1,4 @@
-dmc-switch(class="Switch { opts.isactive ? 'Switch--active' : '' } { opts.isdisabled ? 'Switch--disabled' : ''}" click="{ handleClick }")
+dmc-switch(class="Switch { opts.isactive ? 'Switch--active' : '' } { opts.isdisabled ? 'Switch--disabled' : ''}" onClick="{ handleClick }")
   .Switch__content
     .Switch__toggle
       .Switch__groove
@@ -7,7 +7,8 @@ dmc-switch(class="Switch { opts.isactive ? 'Switch--active' : '' } { opts.isdisa
       .Switch__label { opts.label }
 
   script.
-    handleClick() {
+    handleClick(e) {
+      e.preventUpdate = false;
       if (this.opts.isdisabled) {
         return;
       }

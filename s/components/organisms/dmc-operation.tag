@@ -209,13 +209,15 @@ dmc-operation-schema-form.Operation__schemaForm
       this.opts.onchange(this.opts.parameterobject.name, value, this.opts.multiidx);
     }
 
-    handleMultiPlusButtonClick() {
+    handleMultiPlusButtonClick(e) {
+      e.preventUpdate = false;
       this.multiData = this.multiData || [];
       this.multiData.push({});
       this.change(this.multiData);
     }
 
     handleMultiMinusButtonClick(e) {
+      e.preventUpdate = false;
       this.multiData.splice(e.item.idx, 1);
       this.change(this.multiData);
     }

@@ -2,7 +2,7 @@ dmc-signin.Signin
   .Signin__title サインイン
   .Signin__endpointTitle { opts.endpoint.title }
   .Signin__emails(if="{ !!emails.length }")
-    virtual(each="{ authtype in emails}")
+    virtual(each="{ authtype in emails }")
       dmc-signinemail(authtype="{ authtype }" onSigninClick="{ parent.handleEmailSigninClick }")
   .Signin__oauths(if="{ !!oauths.length }")
     virtual(each="{ authtype in oauths }")

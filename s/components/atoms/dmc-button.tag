@@ -3,18 +3,21 @@ dmc-button(class="Button Button--{ opts.type || 'primary' } { opts.class }" oncl
 
   script.
     handleClick(e) {
+      e.preventUpdate = true;
       e.stopPropagation();
       this.opts.onclick && this.opts.onclick();
     }
 
-    handleMouseOver() {
+    handleMouseOver(e) {
+      e.preventUpdate = true;
       this.opts.onhovertoggle && this.opts.onhovertoggle(true);
       if (!!this.tooltipMessage) {
         this.isTooltipOpened = true;
+        this.update();
       }
-      this.update();
     }
 
-    handleMouseOut() {
+    handleMouseOut(e) {
+      e.preventUpdate = true;
       this.opts.onhovertoggle && this.opts.onhovertoggle(false);
     }

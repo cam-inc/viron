@@ -1,4 +1,4 @@
-dmc-checkbox(class="Checkbox { opts.ischecked ? 'Checkbox--checked' : '' } { opts.isdisabled ? 'Checkbox--disabled' : ''}" click="{ handleClick }")
+dmc-checkbox(class="Checkbox { opts.ischecked ? 'Checkbox--checked' : '' } { opts.isdisabled ? 'Checkbox--disabled' : ''}" onClick="{ handleClick }")
   .Checkbox__content
     .Checkbox__mark
       dmc-icon(type="check")
@@ -8,7 +8,8 @@ dmc-checkbox(class="Checkbox { opts.ischecked ? 'Checkbox--checked' : '' } { opt
   script.
     import '../atoms/dmc-icon.tag';
 
-    handleClick() {
+    handleClick(e) {
+      e.preventUpdate = false;
       if (this.opts.isdisabled) {
         return;
       }

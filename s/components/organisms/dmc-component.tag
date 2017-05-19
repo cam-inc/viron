@@ -158,11 +158,13 @@ dmc-component.Component
       this.update();
     });
 
-    handleRefreshButtonClick() {
+    handleRefreshButtonClick(e) {
+      e.preventUpdate = false;
       this.updater();
     }
 
-    handleSearchButtonClick() {
+    handleSearchButtonClick(e) {
+      e.preventUpdate = false;
       if (this.isPending) {
         return;
       }

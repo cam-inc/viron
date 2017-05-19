@@ -1,6 +1,6 @@
-dmc-modal(class="Modal Modal--{ opts.theme }" click="{ handleClick }")
-  .Modal__frame(click="{ handleFrameClick }")
-    .Modal__closeButton(click="{ handleCloseButtonClick }")
+dmc-modal(class="Modal Modal--{ opts.theme }" onClick="{ handleClick }")
+  .Modal__frame(onClick="{ handleFrameClick }")
+    .Modal__closeButton(onClick="{ handleCloseButtonClick }")
       dmc-icon(type="close")
     .Modal__content(ref="content")
 
@@ -51,15 +51,18 @@ dmc-modal(class="Modal Modal--{ opts.theme }" click="{ handleClick }")
       }, 1000);
     }
 
-    handleClick() {
+    handleClick(e) {
+      e.preventUpdate = false;
       this.fadeOut();
     }
 
     handleFrameClick(e) {
+      e.preventUpdate = false;
       e.stopPropagation();
     }
 
-    handleCloseButtonClick() {
+    handleCloseButtonClick(e) {
+      e.preventUpdate = false;
       this.fadeOut();
     }
 

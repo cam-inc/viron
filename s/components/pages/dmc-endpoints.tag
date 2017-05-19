@@ -1,6 +1,6 @@
 dmc-endpoints.EndpointsPage
   .EndpointsPage__list
-    .EndpointsPage__addCard(click="{ handleEndpointAdd }")
+    .EndpointsPage__addCard(onClick="{ handleEndpointAdd }")
       dmc-icon(type="plus")
     virtual(each="{ endpoint, key in endpoints }")
       dmc-endpoint(key="{ key }"
@@ -32,7 +32,8 @@ dmc-endpoints.EndpointsPage
       this.update()
     })
 
-    handleEndpointAdd() {
+    handleEndpointAdd(e) {
+      e.preventUpdate = false;
       store.action(constants.ACTION_MODAL_SHOW, 'dmc-entry');
     }
 

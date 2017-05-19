@@ -1,4 +1,4 @@
-dmc-radio(class="Radio { opts.isselected ? 'Radio--selected' : '' } { opts.isdisabled ? 'Radio--disabled' : '' }" click="{ handleClick }")
+dmc-radio(class="Radio { opts.isselected ? 'Radio--selected' : '' } { opts.isdisabled ? 'Radio--disabled' : '' }" onClick="{ handleClick }")
   .Radio__content
     .Radio__mark
       .Radio__ball
@@ -6,7 +6,8 @@ dmc-radio(class="Radio { opts.isselected ? 'Radio--selected' : '' } { opts.isdis
       .Radio__label { opts.label }
 
   script.
-    handleClick() {
+    handleClick(e) {
+      e.preventUpdate = false;
       if (this.opts.isdisabled) {
         return;
       }

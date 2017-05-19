@@ -43,7 +43,8 @@ dmc-pagination.Pagination
       return ret;
     }
 
-    handlePrevButtonClick() {
+    handlePrevButtonClick(e) {
+      e.preventUpdate = false;
       let newPage = this.opts.currentpage - 1;
       if (newPage < 1) {
         newPage = 1;
@@ -51,7 +52,8 @@ dmc-pagination.Pagination
       this.opts.onchange(newPage);
     }
 
-    handleRecedeButtonClick() {
+    handleRecedeButtonClick(e) {
+      e.preventUpdate = false;
       let newPage = this.opts.currentpage - this.opts.size;
       if (newPage < 1) {
         newPage = 1;
@@ -60,11 +62,13 @@ dmc-pagination.Pagination
     }
 
     handlePageButtonClick(e) {
+      e.preventUpdate = false;
       const newPage = Number(e.currentTarget.getAttribute('data-page'));
       this.opts.onchange(newPage);
     }
 
-    handleProceedButtonClick() {
+    handleProceedButtonClick(e) {
+      e.preventUpdate = false;
       let newPage = this.opts.currentpage + this.opts.size;
       if (newPage > this.opts.maxpage) {
         newPage = this.opts.maxpage;
@@ -72,7 +76,8 @@ dmc-pagination.Pagination
       this.opts.onchange(newPage);
     }
 
-    handleNextButtonClick() {
+    handleNextButtonClick(e) {
+      e.preventUpdate = false;
       let newPage = this.opts.currentpage + 1;
       if (newPage > this.opts.maxpage) {
         newPage = this.opts.maxpage;

@@ -1,11 +1,11 @@
 dmc-select(class="Select { opts.isopened ? 'Select--opened' : '' } { opts.isdisabled ? 'Select--disabled' : '' }")
-  .Select__box(click="{ handleBoxClick }")
+  .Select__box(onClick="{ handleBoxClick }")
     .Select__label { getSelectedLabel() }
     .Select__icon
       dmc-icon(type="down")
   .Select__options
     virtual(each="{ opts.options }")
-      div(class="Select__option { isSelected ? 'Select__option--selected' : ''  } { isDisabled ? 'Select__option--disabled' : '' }" data-id="{ id }" click="{ parent.handleOptionClick }")
+      div(class="Select__option { isSelected ? 'Select__option--selected' : ''  } { isDisabled ? 'Select__option--disabled' : '' }" data-id="{ id }" onClick="{ parent.handleOptionClick }")
         .Select__optionIcon
           dmc-icon(type="check")
         .Select__optionLabel { label }
@@ -34,7 +34,8 @@ dmc-select(class="Select { opts.isopened ? 'Select--opened' : '' } { opts.isdisa
       this.opts.ontoggle && this.opts.ontoggle(false);
     }
 
-    handleBoxClick() {
+    handleBoxClick(e) {
+      e.preventUpdate = false;
       if (this.opts.isdisabled) {
         return;
       }
@@ -42,6 +43,7 @@ dmc-select(class="Select { opts.isopened ? 'Select--opened' : '' } { opts.isdisa
     }
 
     handleOptionClick(e) {
+      e.preventUpdate = false;
       const selectedOptionID = e.currentTarget.dataset.id;
       const options = map(this.opts.options, option => {
         if (option.id === selectedOptionID) {

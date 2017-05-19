@@ -1,11 +1,11 @@
 dmc-header.Header
   .Header__groups
     .Header__group
-      .Header__menuButton(if="{ isMenuEnabled }" click="{handleMenuButtonClick}")
+      .Header__menuButton(if="{ isMenuEnabled }" onClick="{ handleMenuButtonClick }")
         dmc-icon(type="{isMenuOpened ? 'menuUnfold' : 'menuFold'}")
     .Header__group
-      dmc-button(onclick="{ handleDebugButtonClick }" label="debug")
-      .Header__homeButton(click="{handleHomeButtonClick}")
+      dmc-button(onClick="{ handleDebugButtonClick }" label="debug")
+      .Header__homeButton(onClick="{ handleHomeButtonClick }")
         dmc-icon(type="home")
 
   script.
@@ -21,6 +21,7 @@ dmc-header.Header
     this.isMenuOpened = store.getter(constants.GETTER_MENU_OPENED);
 
     handleMenuButtonClick(e) {
+      e.preventUpdate = false;
       e.preventDefault();
       Promise
         .resolve()
@@ -32,6 +33,7 @@ dmc-header.Header
     }
 
     handleHomeButtonClick(e) {
+      e.preventUpdate = false;
       e.preventDefault();
       router.navigateTo('/');
     }

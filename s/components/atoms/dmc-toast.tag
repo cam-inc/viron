@@ -1,4 +1,4 @@
-dmc-toast(class="Toast Toast--{ opts.type }" click="{ handleClick }")
+dmc-toast(class="Toast Toast--{ opts.type }" onClick="{ handleClick }")
   .Toast__icon
     dmc-icon(if="{ opts.type === 'normal' }" type="close")
     dmc-icon(if="{ opts.type === 'error' }" type="exclamation")
@@ -41,12 +41,14 @@ dmc-toast(class="Toast Toast--{ opts.type }" click="{ handleClick }")
       }, 1000);
     }
 
-    handleClick() {
+    handleClick(e) {
+      e.preventUpdate = false;
       clearTimeout(autoHideTimerID);
       this.hide();
     }
 
     handleLinkClick(e) {
+      e.preventUpdate = false;
       e.stopPropagation();
       window.open(this.opts.link);
     }

@@ -1,7 +1,7 @@
-dmc-drawer(class="Drawer Drawer--{ opts.theme }" click="{ handleClick }")
-  .Drawer__closeButton(click="{ handleCloseButtonClick }")
+dmc-drawer(class="Drawer Drawer--{ opts.theme }" onClick="{ handleClick }")
+  .Drawer__closeButton(onClick="{ handleCloseButtonClick }")
     dmc-icon(type="close")
-  .Drawer__frame(click="{ handleFrameClick }")
+  .Drawer__frame(onClick="{ handleFrameClick }")
     .Drawer__content(ref="content")
 
   script.
@@ -51,15 +51,18 @@ dmc-drawer(class="Drawer Drawer--{ opts.theme }" click="{ handleClick }")
       }, 1000);
     }
 
-    handleClick() {
+    handleClick(e) {
+      e.preventUpdate = false;
       this.fadeOut();
     }
 
     handleFrameClick(e) {
+      e.preventUpdate = false;
       e.stopPropagation();
     }
 
-    handleCloseButtonClick() {
+    handleCloseButtonClick(e) {
+      e.preventUpdate = false;
       this.fadeOut();
     }
 
