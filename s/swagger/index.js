@@ -1,4 +1,4 @@
-import { forEach } from 'mout/array';
+import { contains, forEach } from 'mout/array';
 import { get, forOwn } from 'mout/object';
 
 import constants from '../core/constants';
@@ -10,7 +10,6 @@ import constants from '../core/constants';
  */
 
 class Swagger {
-
   constructor() {
     this.client = null;
   }
@@ -259,6 +258,18 @@ class Swagger {
 
   isComponentStyleTable(style) {
     return style === constants.STYLE_TABLE;
+  }
+
+  isComponentStyleGraph(style) {
+    return contains([
+      constants.STYLE_GRAPH_BAR,
+      constants.STYLE_GRAPH_SCATTERPLOT,
+      constants.STYLE_GRAPH_LINE,
+      constants.STYLE_GRAPH_HORIZONTAL_BAR,
+      constants.STYLE_GRAPH_STACKED_BAR,
+      constants.STYLE_GRAPH_HORIZONTAL_STACKED_BAR,
+      constants.STYLE_GRAPH_STACKED_AREA
+    ], style);
   }
 
   isComponentStyleGraphBar(style) {

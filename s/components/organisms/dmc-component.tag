@@ -110,24 +110,23 @@ dmc-component.Component
         }
       }
 
-      // TODO: 全タイプ
-      if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
+      if (swagger.isComponentStyleGraph(this.opts.component.style)) {
         if (type !== 'object') {
           this.isValidData = false;
           this.alertApi = `${method}: ${path}`;
           this.alertText = `response of component styled "${style}" should be form of "object".`;
           return;
         }
-        if (!data.getValue('keys') || !data.getValue('data') || data.getValue('keys').getType() !== 'array' || data.getValue('data').getType() !== 'array') {
+        if (!data.getValue('data') || !data.getValue('x') || !data.getValue('y') || data.getValue('data').getType() !== 'array') {
           this.isValidData = false;
           this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be composed with "keys" and "data". value sholud be an "array".`;
+          this.alertText = `response of component styled "${style}" should be composed with at least "x", "y" and "data". "data" value type sholud be an "array".`;
           return;
         }
-        if (!data.getValue('data').getLength() || data.getValue('keys').getLength() !== data.getValue('data').getValue(0).getLength()) {
+        if (!data.getValue('data').getLength()) {
           this.isValidData = false;
           this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be composed with "keys" and "data". "keys" and "data[idx]" should have same length.`;
+          this.alertText = 'empty';
           return;
         }
       }
