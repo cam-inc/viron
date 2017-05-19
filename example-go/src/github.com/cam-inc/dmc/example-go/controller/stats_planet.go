@@ -67,14 +67,14 @@ func (c *StatsPlanetController) HorizontalBar(ctx *app.HorizontalBarStatsPlanetC
 			{"name": "海王星", "distance": 30.060},
 			{"name": "冥王星", "distance": 39.530},
 		},
-		X: "name",
-		Y: "distance",
+		X: "distance",
+		Y: "name",
 		Guide: &app.StatsGuideType{
 			X: &app.StatsLabelType{
-				Label: "名前",
+				Label: "距離",
 			},
 			Y: &app.StatsLabelType{
-				Label: "距離",
+				Label: "名前",
 			},
 		},
 	}
@@ -91,23 +91,23 @@ func (c *StatsPlanetController) HorizontalStackedBar(ctx *app.HorizontalStackedB
 	res := &app.Statsplanet{
 		Data: []map[string]interface{}{
 			{"name": "水星", "distance": 0.387},
-			{"name": "金星", "distance": 0.723},
-			{"name": "地球", "distance": 1.000},
+			{"name": "水星", "distance": 0.723},
+			{"name": "水星", "distance": 1.000},
 			{"name": "火星", "distance": 1.524},
-			{"name": "木星", "distance": 5.203},
-			{"name": "土星", "distance": 9.539},
+			{"name": "火星", "distance": 5.203},
+			{"name": "火星", "distance": 9.539},
 			{"name": "天王星", "distance": 19.180},
-			{"name": "海王星", "distance": 30.060},
-			{"name": "冥王星", "distance": 39.530},
+			{"name": "天王星", "distance": 30.060},
+			{"name": "天王星", "distance": 39.530},
 		},
-		X: "name",
-		Y: "distance",
+		X: "distance",
+		Y: "name",
 		Guide: &app.StatsGuideType{
 			X: &app.StatsLabelType{
-				Label: "名前",
+				Label: "距離",
 			},
 			Y: &app.StatsLabelType{
-				Label: "距離",
+				Label: "名前",
 			},
 		},
 	}
@@ -192,25 +192,25 @@ func (c *StatsPlanetController) StackedArea(ctx *app.StackedAreaStatsPlanetConte
 	// StatsPlanetController_StackedArea: end_implement
 	res := &app.Statsplanet{
 		Data: []map[string]interface{}{
-			{"name": "水星", "distance": 0.387, "temperature": 452},
-			{"name": "金星", "distance": 0.723, "temperature": 726},
-			{"name": "地球", "distance": 1.000, "temperature": 281},
-			{"name": "火星", "distance": 1.524, "temperature": 230},
-			{"name": "木星", "distance": 5.203, "temperature": 120},
-			{"name": "土星", "distance": 9.539, "temperature": 88},
-			{"name": "天王星", "distance": 19.180, "temperature": 59},
-			{"name": "海王星", "distance": 30.060, "temperature": 48},
-			{"name": "冥王星", "distance": 39.530, "temperature": 37},
+			{"name": "水星", "distance": 0, "temperature": 452},
+			{"name": "水星", "distance": 1, "temperature": 726},
+			{"name": "水星", "distance": 2, "temperature": 281},
+			{"name": "火星", "distance": 0, "temperature": 230},
+			{"name": "火星", "distance": 1, "temperature": 120},
+			{"name": "火星", "distance": 2, "temperature": 88},
+			{"name": "天王星", "distance": 0, "temperature": 59},
+			{"name": "天王星", "distance": 1, "temperature": 48},
+			{"name": "天王星", "distance": 2, "temperature": 37},
 		},
-		X:     "name",
-		Y:     "distance",
-		Color: "albedo",
+		X:     "distance",
+		Y:     "temperature",
+		Color: "name",
 		Guide: &app.StatsGuideType{
 			X: &app.StatsLabelType{
-				Label: "名前",
+				Label: "距離",
 			},
 			Y: &app.StatsLabelType{
-				Label: "距離",
+				Label: "温度",
 			},
 		},
 	}
@@ -225,18 +225,27 @@ func (c *StatsPlanetController) StackedBar(ctx *app.StackedBarStatsPlanetContext
 
 	// StatsPlanetController_StackedBar: end_implement
 	res := &app.Statsplanet{
-	//	Keys: []string{"Name", "Distance"},
-	//	Data: [][]interface{}{
-	//		{"火星", 0.387},
-	//		{"火星", 0.723},
-	//		{"火星", 1.000},
-	//		{"火星", 1.524},
-	//		{"土星", 5.203},
-	//		{"土星", 9.539},
-	//		{"冥王星", 19.180},
-	//		{"冥王星", 30.060},
-	//		{"冥王星", 39.530},
-	//	},
+		Data: []map[string]interface{}{
+			{"name": "水星", "distance": 0.387},
+			{"name": "水星", "distance": 0.723},
+			{"name": "水星", "distance": 1.000},
+			{"name": "火星", "distance": 1.524},
+			{"name": "火星", "distance": 5.203},
+			{"name": "火星", "distance": 9.539},
+			{"name": "天王星", "distance": 19.180},
+			{"name": "天王星", "distance": 30.060},
+			{"name": "天王星", "distance": 39.530},
+		},
+		X: "name",
+		Y: "distance",
+		Guide: &app.StatsGuideType{
+			X: &app.StatsLabelType{
+				Label: "名前",
+			},
+			Y: &app.StatsLabelType{
+				Label: "距離",
+			},
+		},
 	}
 	return ctx.OK(res)
 }
