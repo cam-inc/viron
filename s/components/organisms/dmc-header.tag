@@ -4,14 +4,12 @@ dmc-header.Header
       .Header__menuButton(if="{ isMenuEnabled }" onClick="{ handleMenuButtonClick }")
         dmc-icon(type="{isMenuOpened ? 'menuUnfold' : 'menuFold'}")
     .Header__group
-      dmc-button(onClick="{ handleDebugButtonClick }" label="debug")
       .Header__homeButton(onClick="{ handleHomeButtonClick }")
         dmc-icon(type="home")
 
   script.
     import constants from '../../core/constants';
     import router from '../../core/router';
-    import '../organisms/dmc-devtool.tag';
     import '../atoms/dmc-icon.tag';
     import '../atoms/dmc-button.tag';
 
@@ -26,10 +24,6 @@ dmc-header.Header
       Promise
         .resolve()
         .then(() => store.action(constants.ACTION_MENU_TOGGLE));
-    }
-
-    handleDebugButtonClick() {
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-devtool');
     }
 
     handleHomeButtonClick(e) {

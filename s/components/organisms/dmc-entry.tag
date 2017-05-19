@@ -1,10 +1,11 @@
 dmc-entry.Entry
   .Entry__title 新しい管理画面を<br />作成する
+  .Entry__message(if="{ isExist }") そのエンドポイントは既に登録済みです。
   .Entry__form
-    dmc-input(text="{ endpointURL }" placeholder="エンドポイントURL" pattern="https?://[\w/:%#\$&\?\(\)~\.=\+\-]+" onTextChange="{ handleEndpointURLChange }")
+    dmc-input(text="{ endpointURL }" placeholder="https://localhost:3000/swagger.json" pattern="https?://[\w/:%#\$&\?\(\)~\.=\+\-]+" onTextChange="{ handleEndpointURLChange }")
     dmc-textarea(text="{ memo }" placeholder="Writing..." maxlength="20" onTextChange="{ handleMemoChange }")
   .Entry__controls
-    dmc-button(type="primary" onClick="{ handleRegisterButtonClick }" label="新規作成")
+    dmc-button(type="primary" isDisabled="{ isExist }" onClick="{ handleRegisterButtonClick }" label="新規作成")
     dmc-button(type="secondary" onClick="{ handleCancelButtonClick }" label="キャンセル")
   script.
     import constants from '../../core/constants';
@@ -14,7 +15,9 @@ dmc-entry.Entry
 
     const store = this.riotx.get();
 
-    this.endpointURL = 'https://localhost:3000/swagger.json';
+
+    this.endpointURL = '';
+    this.isExist = false;
     this.memo = '';
 
     closeModal() {
@@ -25,6 +28,7 @@ dmc-entry.Entry
 
     handleEndpointURLChange(endpointURL) {
       this.endpointURL = endpointURL;
+      this.isExist = !!store.getter(constants.GETTER_ENDPOINTS_ONE_BY_URL, endpointURL);
       this.update();
     }
 

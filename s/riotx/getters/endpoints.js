@@ -1,4 +1,4 @@
-import { keys } from 'mout/object';
+import { find, keys } from 'mout/object';
 
 const number = '1234567890';
 const alphabet = 'abcdefghiz';
@@ -20,6 +20,13 @@ export default {
   one: (context, key) => {
     const endpoints = context.state.endpoints;
     return endpoints[key];
+  },
+
+  oneByURL: (context, url) => {
+    const endpoints = context.state.endpoints;
+    return find(endpoints, endpoint => {
+      return endpoint.url === url;
+    });
   },
 
   nextKey: (context) => {

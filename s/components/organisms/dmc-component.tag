@@ -136,10 +136,7 @@ dmc-component.Component
     }
 
     this.on('mount', () => {
-      // TODO: debug用なので後でtimeout処理を外すこと。
-      setTimeout(() => {
-        this.updater();
-      }, 1000);
+      this.updater();
     });
 
     store.change(constants.changeComponentsName(this._riot_id), (err, state, store) => {

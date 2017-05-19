@@ -45,6 +45,7 @@ export default {
 
   [constants.GETTER_ENDPOINTS]: endpoints._,
   [constants.GETTER_ENDPOINTS_ONE]: endpoints.one,
+  [constants.GETTER_ENDPOINTS_ONE_BY_URL]: endpoints.oneByURL,
   [constants.GETTER_ENDPOINTS_NEXT_KEY]: endpoints.nextKey,
 
   [constants.GETTER_AUTH_SIGN_IN_SHOW_KEY]: auth.signinShowKey

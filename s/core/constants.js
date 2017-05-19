@@ -151,6 +151,7 @@ export default {
 
   GETTER_ENDPOINTS: 'endpoints',
   GETTER_ENDPOINTS_ONE: 'endpoints_one',
+  GETTER_ENDPOINTS_ONE_BY_URL: 'endpoints_one_by_url',
   GETTER_ENDPOINTS_NEXT_KEY: 'endpoints_next_key',
 
   GETTER_AUTH_SIGN_IN_SHOW_KEY: 'auth_sign_in_show_key',

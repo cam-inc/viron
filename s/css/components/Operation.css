@@ -10,7 +10,6 @@
 }
 
 .Operation__info {
-
   @apply --layout-center-start;
   position: absolute;
   top: 0;

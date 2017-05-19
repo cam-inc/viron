@@ -9,6 +9,14 @@
   color: var(--color-text-default);
 }
 
+.Entry__message {
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-basic-red);
+}
+
 .Entry__form .Input,
 .Entry__form .Textarea {
   display: block;
