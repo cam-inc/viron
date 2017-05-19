@@ -36,7 +36,9 @@ var _ = Resource("admin_user", func() {
 
 	Action("list", func() {
 		Description("get admin users")
-		Routing(GET(""))
+		Routing(GET("", func() {
+			Metadata("swagger:extension:x-ref", `["/adminuser/{id}"]`)
+		}))
 		Response(OK, func() {
 			Media(CollectionOf(AdminUserMediaType, func() {
 				ContentType("application/json")
@@ -64,8 +66,15 @@ var _ = Resource("admin_user", func() {
 		Description("create a admin user")
 		Routing(POST(""))
 		Payload(func() {
-			Member("email", String)
-			Member("password", String)
+			Member("email", String, func() {
+				Description("login user mail address")
+				Example("user@sample.com")
+			})
+			Member("password", String, func() {
+				Description("password for email auth")
+				Example("XXXXXXXXXXXXXXXX")
+			})
+			Required("email", "password")
 		})
 		Response(OK, func() { Media(AdminUserMediaType) })
 		Response(NotFound)
@@ -80,8 +89,15 @@ var _ = Resource("admin_user", func() {
 			Param("id", Integer, "id")
 		})
 		Payload(func() {
-			Member("password", String)
-			Member("role_id", String)
+			Member("password", String, func() {
+				Description("password for email auth")
+				Example("XXXXXXXXXXXXXXXX")
+			})
+			Member("role_id", String, func() {
+				Description("admin role id")
+				Example("viewer")
+			})
+			Required("role_id")
 		})
 		Response(OK, func() { Media(AdminUserMediaType) })
 		Response(NotFound)

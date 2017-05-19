@@ -25,7 +25,7 @@ func (c *AdminUserController) Create(ctx *app.CreateAdminUserContext) error {
 	// AdminUserController_Create: start_implement
 
 	// Put your logic here
-	if m, err := service.CreateAdminUserByIdPassword(ctx.Context, *ctx.Payload.Email, *ctx.Payload.Password, common.GetDefaultRole()); err != nil {
+	if m, err := service.CreateAdminUserByIdPassword(ctx.Context, ctx.Payload.Email, ctx.Payload.Password, common.GetDefaultRole()); err != nil {
 		return ctx.InternalServerError()
 	} else {
 		res := &app.AdminUser{
@@ -88,12 +88,10 @@ func (c *AdminUserController) Update(ctx *app.UpdateAdminUserContext) error {
 	} else if err != nil {
 		return ctx.InternalServerError()
 	} else {
-		if &ctx.Payload.Password != nil {
+		if ctx.Payload.Password != nil {
 			m.Password = *ctx.Payload.Password
 		}
-		if &ctx.Payload.RoleID != nil {
-			m.RoleID = *ctx.Payload.RoleID
-		}
+		m.RoleID = ctx.Payload.RoleID
 		if err = adminUserTable.Update(ctx.Context, m); err != nil {
 			return ctx.InternalServerError()
 		}

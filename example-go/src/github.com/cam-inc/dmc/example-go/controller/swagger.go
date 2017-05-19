@@ -29,7 +29,7 @@ func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger 
 			json.Unmarshal(raw, &mt)
 
 			for method := range mt {
-				if roles[method] == nil || (common.InStringArray("*", roles[method]) < 0 && common.InStringArray(resource, roles[method]) < 0) {
+				if roles[method] == nil || (common.InStringArray(resource, service.GetApiWhiteList()) < 0 && common.InStringArray("*", roles[method]) < 0 && common.InStringArray(resource, roles[method]) < 0) {
 					switch method {
 					case "get":
 						path.Get = nil
@@ -43,6 +43,9 @@ func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger 
 						path.Delete = nil
 					}
 				}
+			}
+			if path.Get == nil && path.Options == nil && path.Put == nil && path.Post == nil && path.Delete == nil {
+				s.Paths[uri] = nil
 			}
 		}
 	}

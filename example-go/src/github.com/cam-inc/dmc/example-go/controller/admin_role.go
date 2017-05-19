@@ -20,6 +20,11 @@ var pathList []string
 
 func init() {
 	sw := service.GetSwagger()
+
+	targetPaths := []string{}
+	for _, p := range sw.Definitions["adminrolepath"].Properties["path"].Enum {
+		targetPaths = append(targetPaths, p.(string))
+	}
 	for uri, p := range sw.Paths {
 		if path, ok := p.(*genswagger.Path); ok != true {
 			continue
@@ -31,7 +36,7 @@ func init() {
 
 			for method := range mt {
 				rolePath := getRolePath(method, resource)
-				if common.InStringArray(rolePath, pathList) < 0 {
+				if common.InStringArray(rolePath, targetPaths) >= 0 && common.InStringArray(rolePath, pathList) < 0 {
 					pathList = append(pathList, rolePath)
 				}
 			}

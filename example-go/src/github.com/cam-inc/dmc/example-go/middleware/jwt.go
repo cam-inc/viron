@@ -61,7 +61,7 @@ func validation() goa.Middleware {
 
 			reqMethod := strings.ToLower(req.Method)
 			resource := strings.Split(req.RequestURI, "/")[1]
-			if common.InStringArray("*", roles[reqMethod]) < 0 && common.InStringArray(resource, roles[reqMethod]) < 0 {
+			if common.InStringArray(resource, service.GetApiWhiteList()) < 0 && common.InStringArray("*", roles[reqMethod]) < 0 && common.InStringArray(resource, roles[reqMethod]) < 0 {
 				// 権限がないリクエスト
 				return errForbidden("permission denied")
 			}

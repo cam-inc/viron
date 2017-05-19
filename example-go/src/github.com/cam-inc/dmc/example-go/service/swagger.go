@@ -8,6 +8,7 @@ import (
 )
 
 var swagger *genswagger.Swagger
+var whiteList []string
 
 func init() {
 	codegen.ParseDSL()
@@ -16,8 +17,21 @@ func init() {
 	} else {
 		swagger = sw
 	}
+	whiteList = []string{
+		"dmc",
+		"swagger.json",
+		"dmc_authtype",
+		"signin",
+		"signout",
+		"googlesignin",
+		"googleoauth2callback",
+	}
 }
 
 func GetSwagger() *genswagger.Swagger {
 	return swagger
+}
+
+func GetApiWhiteList() []string {
+	return whiteList
 }
