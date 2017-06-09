@@ -191,6 +191,18 @@ gen-js-model: ## Generate goa [js-model]
 	@echo "[INFO ] >>>>> gen-js-model"
 	GOPATH=$(__GOPATH) $(__GOAGEN) gen -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN) --pkg-path=$(__PKG_PROJECT_HOME)/generator/jsmodel
 
+gen-gorma-template: gen-gorma-design-template gen-gorma-controller-template ## Generate gorma template
+	@#GOPATH=$(__GOPATH) $(__GOAGEN) bootstrap -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_DIR)
+	@echo "Finish :p"
+
+gen-gorma-design-template: ## Generate goa [gorma-design-tempate]
+	@echo "[INFO ] >>>>> gen-gorma-design-template"
+	GOPATH=$(__GOPATH) $(__GOAGEN) gen -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN) --pkg-path=$(__PKG_PROJECT_HOME)/generator/gorma-template/design
+
+gen-gorma-controller-template: ## Generate goa [gorma-controller-tempate]
+	@echo "[INFO ] >>>>> gen-gorma-controller-template"
+	GOPATH=$(__GOPATH) $(__GOAGEN) gen -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN) --pkg-path=$(__PKG_PROJECT_HOME)/generator/gorma-template/controller
+
 #
 # -- Start Server
 #
