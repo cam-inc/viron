@@ -1,0 +1,67 @@
+/* レイアウト */
+:root {
+  /* 左揃え & 上揃え */
+  --layout-start-start: {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  /* 天地中央配置 & 左揃え */
+  --layout-center-start: {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  /* 天地左右中央配置 */
+  --layout-center-center: {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 天地中央配置 & 下揃え */
+  --layout-center-end: {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  /* 天地いっぱいまで広がる & 左右中央*/
+  --layout-center-stretch: {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  /* 左右に吸着 & 上揃え */
+  --layout-between-start: {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  /* 左右に吸着 & 上下いっぱいまで広がる */
+  --layout-between-stretch: {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+
+  /* 左右に吸着 & 天地中央*/
+  --layout-between-center: {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* 縦方向*/
+  /* 天地中央 & 左右いっぱいまで広がる */
+  --layout-column-stretch-center: {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+  }
+}
