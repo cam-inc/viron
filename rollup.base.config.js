@@ -3,7 +3,6 @@ import riot from 'rollup-plugin-riot';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import buble from 'rollup-plugin-buble';
-import filesize from 'rollup-plugin-filesize';
 import replace from 'rollup-plugin-replace';
 
 const mout = require('mout');
@@ -27,21 +26,15 @@ mout.object.forOwn(mout, (v,k) => {
   });
 });
 
-// import uglify from 'rollup-plugin-uglify'
-import eslint from 'rollup-plugin-eslint';
-
 // @see https://github.com/rollup/rollup/wiki/JavaScript-API
 export default {
-  entry: 's/index.js',
-  dest: 'dist/dmc.js',
+  entry: 'src/app.js',
+  dest: 'dist/js/app.js',
   sourceMap: false,
-  // exports: 'default',
   exports: 'none',
   format: 'iife',
   useStrict: false,
-  moduleContext: { 'node_modules/whatwg-fetch/fetch.js': 'window' },
-  // external: null,
-  // globals: { },
+  context: 'window',
   plugins: [
     json(),
     replace({
@@ -64,9 +57,6 @@ export default {
         //chrome: 49, firefox: 45, safari: 9, edge: 12, ie: 11
         chrome: 52
       }
-    }),
-    filesize(),
-    // uglify(),
-    eslint({exclude: ['**/*.tag']})
+    })
   ]
 };
