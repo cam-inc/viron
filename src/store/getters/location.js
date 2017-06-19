@@ -5,7 +5,7 @@ export default {
    * @return {Object}
    */
   all: context => {
-    return context.state.page;
+    return context.state.location;
   },
 
   /**
@@ -14,7 +14,7 @@ export default {
    * @return {String}
    */
   name: context => {
-    return context.state.page.name;
+    return context.state.location.name;
   },
 
   /**
@@ -23,6 +23,6 @@ export default {
    * @return {Object}
    */
   route: context => {
-    return context.state.page.route;
+    return context.state.location.route;
   }
 };

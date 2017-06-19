@@ -1,21 +1,20 @@
-import application from './application';
+import location from './location';
 import modal from './modal';
-import page from './page';
 
 const constants = {
+  LOCATION_ALL: 'LOCATION_ALL',
+  LOCATION_NAME: 'LOCATION_NAME',
+  LOCATION_ROUTE: 'LOCATION_ROUTE',
   MODAL_ADD: 'MODAL_ADD',
-  MODAL_REMOVE: 'MODAL_REMOVE',
-  PAGE_ALL: 'PAGE_ALL',
-  PAGE_NAME: 'PAGE_NAME',
-  PAGE_ROUTE: 'PAGE_ROUTE'
+  MODAL_REMOVE: 'MODAL_REMOVE'
 };
 
 export default {
+  [constants.LOCATION_ALL]: location.all,
+  [constants.LOCATION_NAME]: location.name,
+  [constants.LOCATION_ROUTE]: location.route,
   [constants.MODAL_ADD]: modal.add,
-  [constants.MODAL_REMOVE]: modal.remove,
-  [constants.PAGE_ALL]: page.all,
-  [constants.PAGE_NAME]: page.name,
-  [constants.PAGE_ROUTE]: page.route
+  [constants.MODAL_REMOVE]: modal.remove
 };
 
 export {

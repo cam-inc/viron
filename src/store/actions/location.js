@@ -2,7 +2,7 @@ import { constants as mutations } from '../mutations';
 
 export default {
   /**
-   * ページ情報を更新します。
+   * 更新します。
    * @param {riotx.Context} context
    * @param {Object} obj
    * @return {Promise}
@@ -11,7 +11,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.PAGE_ALL, obj);
+        context.commit(mutations.LOCATION_ALL, obj);
       });
   }
 };

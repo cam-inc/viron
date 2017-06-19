@@ -1,5 +1,5 @@
 dmc-notfound.Page.NotfoundPage
-  div TODO
+  div NOT FOUND...
 
   script.
     import script from './index';

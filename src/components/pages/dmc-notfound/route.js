@@ -7,8 +7,8 @@ export default {
    * @param {Object} route
    * @return {Promise}
    */
-  onEnter: (store, route) => {// eslint-disable-line no-unused-vars
-    return store.action(actions.PAGE_UPDATE, {
+  onEnter: (store, route) => {
+    return store.action(actions.LOCATION_UPDATE, {
       name: 'notfound',
       route
     });

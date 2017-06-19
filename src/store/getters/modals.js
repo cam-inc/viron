@@ -5,6 +5,6 @@ export default {
    * @return {Array}
    */
   all: context => {
-    return context.state.modal;
+    return context.state.modals;
   }
 };

@@ -1,8 +1,4 @@
-import filter from 'mout/array/filter';
-import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
-import reject from 'mout/array/reject';
-import lowerCase from 'mout/string/lowerCase';
 import riot from 'riot';
 import router from './router';
 
