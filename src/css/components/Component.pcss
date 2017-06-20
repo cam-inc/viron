@@ -1,0 +1,123 @@
+/* Component = dmc.pages[x].components[x]のこと */
+/* 紛らわしいので注意すること */
+.Component {
+  display: block;
+  background-color: var(--color-basic-white);
+  border-radius: 6px;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.Component__spinner {
+  @apply --layout-center-center;
+  height: 100px;
+  font-size: 18px;
+}
+
+.Component__spinner .Icon {
+  @apply --animation-spin;
+}
+
+.Component__head {
+  @apply --layout-center-center;
+  padding: 8px;
+  border-bottom: 1px solid var(--color-basic-black);
+}
+
+.Component__name {
+  flex-grow: 1;
+  width: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.Component__refresh,
+.Component__search {
+  @apply --layout-center-center;
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--color-text-default);
+  cursor: pointer;
+}
+
+.Component__refresh:hover,
+.Component__search:hover {
+  color: var(--color-basic-gray);
+}
+
+.Component__searchBoxControls {
+  @apply --layout-center-center;
+}
+
+.Component__searchBoxControls .Button:first-child {
+  margin-right: 8px;
+}
+
+.Component__searchBoxInputs {
+  width: 280px;
+  margin-bottom: 24px;
+}
+
+.Component__searchBoxInput {
+  @apply --layout-center-center;
+  margin-bottom: 8px;
+}
+
+.Component__searchBoxInput:last-child {
+  margin-bottom: 0;
+}
+
+.Component__searchBoxInputLabel {
+  margin-right: 8px;
+  font-size: 12px;
+  color: var(--color-text-default);
+}
+
+.Component__searchBoxInput .Input {
+  display: block;
+  flex-grow: 1;
+}
+
+.Component__body {
+  padding: 16px;
+  overflow: scroll;
+}
+
+.Component__alert {
+  padding: 12px 0;
+}
+
+.Component__alertApi {
+  margin-bottom: 8px;
+  font-size: 10px;
+  color: var(--color-basic-red);
+}
+
+.Component__alertText {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-basic-red);
+}
+
+.Component__body .Pagination {
+  margin-top: 16px;
+}
+
+.Component__tail {
+  padding: 8px;
+  border-top: 1px solid var(--color-basic-black);
+}
+
+.Component__action {
+  position: relative;
+  display: block;
+}
+
+.Component__action .Button {
+  display: block;
+}
+
+.Component__action .Tooltip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+}

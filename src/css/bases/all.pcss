@@ -1,5 +1,28 @@
 /* ITCSS: Base */
 /* Unclassed HTML elements(type selectors). */
+@import "taucharts/build/production/tauCharts.min";
+
+@font-face {
+  font-family: "NotoSansCJKjp-Jxck";
+  font-style: normal;
+  font-weight: 400;
+  src: resolve("font/NotoSansCJKjp-Jxck-Regular.woff2") format("woff2"), resolve("font/NotoSansCJKjp-Jxck-Regular.woff") format("woff"), resolve("font/NotoSansCJKjp-Jxck-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NotoSansCJKjp-Jxck2";
+  font-style: normal;
+  font-weight: 700;
+  src: resolve("font/NotoSansCJKjp-Jxck-Medium.woff2") format("woff2"), resolve("font/NotoSansCJKjp-Jxck-Medium.woff") format("woff"), resolve("font/NotoSansCJKjp-Jxck-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NotoSansCJKjp-Jxck";
+  font-style: normal;
+  font-weight: 900;
+  src: resolve("font/NotoSansCJKjp-Jxck-Bold.woff2") format("woff2"), resolve("font/NotoSansCJKjp-Jxck-Bold.woff") format("woff"), resolve("font/NotoSansCJKjp-Jxck-Bold.ttf") format("truetype");
+}
+
 html,
 body {
   height: 100%;
@@ -7,8 +30,11 @@ body {
 }
 
 body {
-  font-family: 游ゴシック体, "Yu Gothic", YuGothic, "ヒラギノ角ゴシック Pro", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+  position: relative;
+  min-width: 320px;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
   font-size: 10px;
   line-height: 1.5em;
-  color: var(--color-text-primary);
+  color: var(--color-text-default);
+  background-color: var(--color-basic-black);
 }

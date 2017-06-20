@@ -1,0 +1,41 @@
+.Entry {
+  display: block;
+  width: 504px;
+}
+
+.Entry__title {
+  margin-bottom: 24px;
+  font-size: 36px;
+  color: var(--color-text-default);
+}
+
+.Entry__message {
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-basic-red);
+}
+
+.Entry__form .Input,
+.Entry__form .Textarea {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.Entry__form .Input {
+  margin-bottom: 12px;
+}
+
+.Entry__controls {
+  @apply --layout-center-center;
+}
+
+.Entry__controls .Button {
+  display: block;
+  flex-grow: 1;
+}
+
+.Entry__controls .Button:first-child {
+  margin-right: 12px;
+}

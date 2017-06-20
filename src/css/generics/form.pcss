@@ -14,3 +14,15 @@ select {
   outline: none;
   appearance: none;
 }
+
+/* Chromeのautofill機能で背景色がyellowに設定される問題への対応 */
+@keyframes autofill {
+  to {
+    background: transparent;
+  }
+}
+
+input:-webkit-autofill {
+  animation-name: autofill;
+  animation-fill-mode: both;
+}

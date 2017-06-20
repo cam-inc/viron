@@ -1,0 +1,28 @@
+.Textarea {
+  display: inline-block;
+}
+
+.Textarea--disabled {
+  cursor: not-allowed;
+}
+
+.Textarea__input {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  color: var(--color-text-default);
+  resize: vertical;
+  background-color: var(--color-basic-white);
+  border: 1px solid var(--color-basic-gray);
+  border-radius: 3px;
+}
+
+.Textarea--focused .Textarea__input {
+  border-color: var(--color-basic-darkGray);
+}
+
+.Textarea--disabled .Textarea__input {
+  color: var(--color-basic-gray);
+  cursor: not-allowed;
+  background-color: var(--color-basic-lightGray);
+}
