@@ -20,6 +20,8 @@ __GOLINT=$(__BIN_DIR)/golint
 __GOFMT=gofmt
 __GOVET=go vet
 
+__DMCODEGEN=$(__BIN_DIR)/dmcodegen
+
 __BINARY_PROG=$(__DIST)/$(__NAME)
 __PATH=$(__BIN):$$PATH
 __GOPATH=$(__PWD)
@@ -79,10 +81,13 @@ setup: setup-pre vendor-install ## Setup
 		go install; \
 	fi
 	if [ ! -f $(__SRC_PROJECT_HOME)/common/jwtkey_gen.go ]; then \
-		GOPATH=$(__GOPATH) go generate $(__SRC_PROJECT_HOME)/common/jwtkey.go; \
+		GOPATH=$(__GOPATH) $(__DMCODEGEN) jwtkey -o $(__SRC_PROJECT_HOME)/common/jwtkey_gen.go -p common; \
 	fi
-	if [ ! -f $(__SRC_PROJECT_HOME)/gen/server.key ]; then \
-		GOPATH=$(__GOPATH) go generate $(__SRC_PROJECT_HOME)/common/ssl.go; \
+	if [ ! -e $(__GOPATH)/$(__SRC_PROJECT_HOME)/gen ]; then \
+	  mkdir $(__GOPATH)/$(__SRC_PROJECT_HOME)/gen; \
+	fi
+	if [ ! -f $(__GOPATH)/$(__SRC_PROJECT_HOME)/gen/server.key ]; then \
+		GOPATH=$(__GOPATH) $(__DMCODEGEN) ssl -k $(__GOPATH)/$(__SRC_PROJECT_HOME)/gen/server.key -c $(__GOPATH)/$(__SRC_PROJECT_HOME)/gen/server.crt; \
 	fi
 
 #
@@ -189,7 +194,15 @@ gen-model: ## Generate goa [gorma]
 
 gen-js-model: ## Generate goa [js-model]
 	@echo "[INFO ] >>>>> gen-js-model"
-	GOPATH=$(__GOPATH) $(__GOAGEN) gen -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN) --pkg-path=$(__PKG_PROJECT_HOME)/generator/jsmodel
+	GOPATH=$(__GOPATH) $(__DMCODEGEN) jsmodel -d $(__PKG_PROJECT_DESIGN) -o $(__SRC_PROJECT_GEN)
+
+gen-design-template: ## Generate goa [design-template:]
+	@echo "[INFO ] >>>>> gen-design-template:"
+	GOPATH=$(__GOPATH) $(__DMCODEGEN) gorma-design-template -d $(__PKG_PROJECT_DESIGN)
+
+gen-controller-template: ## Generate goa [controller-template:]
+	@echo "[INFO ] >>>>> gen-controller-template:"
+	GOPATH=$(__GOPATH) $(__DMCODEGEN) gorma-controller-template -d $(__PKG_PROJECT_DESIGN)
 
 #
 # -- Start Server

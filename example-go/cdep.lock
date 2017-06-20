@@ -15,9 +15,7 @@
 # Production package
 git github.com/goadesign/goa HEAD recursive
 git github.com/goadesign/gorma HEAD recursive
-git github.com/jinzhu/gorm HEAD recursive
-git github.com/noritama/gen-keypair HEAD recursive
-git github.com/noritama/gen-fakecert HEAD recursive
+git github.com/cam-inc/dmcodegen HEAD recursive
 git go.uber.org/zap HEAD recursive
 git golang.org/x/oauth2 HEAD recursive
 git golang.org/x/blog/content/context/userip HEAD
