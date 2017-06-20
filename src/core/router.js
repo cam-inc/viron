@@ -1,5 +1,8 @@
 import Esr from 'esr';
-import IndexRoute from '../components/pages/dmc-index/route';
+import { constants as actions } from '../store/actions';
+import ComponentsRoute from '../components/pages/dmc-components/route';
+import EmptyRoute from '../components/pages/dmc-empty/route';
+import EndpointsRoute from '../components/pages/dmc-endpoints/route';
 import NotfoundRoute from '../components/pages/dmc-notfound/route';
 
 let _routerInstance;
@@ -16,8 +19,17 @@ export default {
       .then(() => {
         const router = new Esr(Esr.HASH);
         router
-          .on('/', route => IndexRoute.onEnter(store, route))
-          .on('*', route => NotfoundRoute.onEnter(store, route));
+          .on('/', route => EndpointsRoute.onEnter(store, route), (route, replace) => EndpointsRoute.onBefore(store, route, replace))
+          .on('/:endpointKey', route => EmptyRoute.onEnter(store, route), (route, replace) => EmptyRoute.onBefore(store, route, replace))
+          .on('/:endpointKey/:page', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
+          .on('*', route => NotfoundRoute.onEnter(store, route))
+          .onAfter(() => {
+            // TODO: esrに組み込みたい。
+            if (location.pathname === '/') {
+              return store.action(actions.MENU_DISABLE);
+            }
+            return store.action(actions.MENU_ENABLE);
+          });
         return router;
       })
       .then(router => {

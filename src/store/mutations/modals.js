@@ -11,13 +11,13 @@ export default {
    * @return {Array}
    */
   add: (context, tagName, tagOpts = {}, modalOpts = {}) => {
-    context.state.modal.push({
+    context.state.modals.push({
       id: `modal_${Date.now()}`,
       tagName,
       tagOpts,
       modalOpts
     });
-    return [states.MODAL];
+    return [states.MODALS];
   },
 
   /**
@@ -27,9 +27,9 @@ export default {
    * @return {Array}
    */
   remove: (context, modalID) => {
-    context.state.modal = reject(context.state.modal, modal => {
+    context.state.modals = reject(context.state.modal, modal => {
       return (modal.id === modalID);
     });
-    return [states.MODAL];
+    return [states.MODALS];
   }
 };

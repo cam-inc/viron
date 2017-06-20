@@ -14,7 +14,7 @@ export default function() {
 
   // TODO: riotx update後に修正すること。
   this.on('mount', () => {
-    store.change(states.APPLaICATION, this.handleApplicationStateChange);
+    store.change(states.APPLICATION, this.handleApplicationStateChange);
     store.change(states.LOCATION, this.handleLocationStateChange);
     store.change(states.MENU, this.handleMenuStateChange);
   }).on('unmount', () => {
@@ -34,8 +34,8 @@ export default function() {
 
   // `location`情報が変更された時の処理。
   this.handleLocationStateChange = () => {
-    this.pageName = store.getter(getters.PAGE_NAME);
-    this.pageRoute = store.getter(getters.PAGE_ROUTE);
+    this.pageName = store.getter(getters.LOCATION_NAME);
+    this.pageRoute = store.getter(getters.LOCATION_ROUTE);
     this.update();
   };
 

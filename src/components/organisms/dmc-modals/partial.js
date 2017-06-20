@@ -17,7 +17,7 @@ export default function() {
     this.root.classList.remove('Modal--visible');
 
     setTimeout(() => {
-      store.action(actions.MODAL_HIDE, this.opts.id);
+      store.action(actions.MODALS_REMOVE, this.opts.id);
     }, 1000);
   };
 

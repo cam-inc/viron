@@ -5,6 +5,7 @@ import endpoints from './endpoints';
 import location from './location';
 import menu from './menu';
 import modals from './modals';
+import oauthEndpointKey from './oauthEndpointKey';
 import toasts from './toasts';
 
 const constants = {
@@ -19,12 +20,13 @@ const constants = {
   ENDPOINTS_ONE: 'ENDPOINTS_ONE',
   ENDPOINTS_ONE_BY_URL: 'ENDPOINTS_ONE_BY_URL',
   ENDPOINTS_NEXT_KEY: 'ENDPOINTS_NEXT_KEY',
-  LOCATION_ALL: 'LOCATION_ALL',
+  LOCATION: 'LOCATION',
   LOCATION_NAME: 'LOCATION_NAME',
   LOCATION_ROUTE: 'LOCATION_ROUTE',
   MENU_OPENED: 'MENU_OPENED',
   MENU_ENABLED: 'MENU_ENABLED',
   MODALS: 'MODALS',
+  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   TOASTS: 'TOASTS'
 };
 
@@ -40,12 +42,13 @@ export default {
   [constants.ENDPOINTS_ONE]: endpoints.one,
   [constants.ENDPOINTS_ONE_BY_URL]: endpoints.oneByURL,
   [constants.ENDPOINTS_NEXT_KEY]: endpoints.nextKey,
-  [constants.LOCATION_ALL]: location.all,
+  [constants.LOCATION]: location.all,
   [constants.LOCATION_NAME]: location.name,
   [constants.LOCATION_ROUTE]: location.route,
   [constants.MENU_OPENED]: menu.opened,
   [constants.MENU_ENABLED]: menu.enabled,
   [constants.MODALS]: modals.all,
+  [constants.OAUTH_ENDPOINT_KEY]: oauthEndpointKey.all,
   [constants.TOASTS]: toasts.all
 };
 

@@ -13,21 +13,21 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.MODAL_ADD, tagName, tagOpts, modalOpts);
+        context.commit(mutations.MODALS_ADD, tagName, tagOpts, modalOpts);
       });
   },
 
   /**
    * モーダルを削除します。
    * @param {riotx.Context} context
-   * @param {String} modalID
+   * @param {String} modalId
    * @return {Promise}
    */
-  remove: (context, modalID) => {
+  remove: (context, modalId) => {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.MODAL_REMOVE, modalID);
+        context.commit(mutations.MODALS_REMOVE, modalId);
       });
   }
 };

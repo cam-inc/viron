@@ -9,8 +9,8 @@ export default {
    * @return {Array}
    */
   all: (context, obj) => {
-    context.state.page = ObjectAssign({}, context.state.page, obj);
-    return [states.PAGE];
+    context.state.location = ObjectAssign({}, context.state.location, obj);
+    return [states.LOCATION];
   },
 
   /**
@@ -20,8 +20,8 @@ export default {
    * @return {Array}
    */
   name: (context, name) => {
-    context.state.page.name = name;
-    return [states.PAGE];
+    context.state.location.name = name;
+    return [states.LOCATION];
   },
 
   /**
@@ -31,7 +31,7 @@ export default {
    * @return {Array}
    */
   route: (context, route) => {
-    context.state.page.route = route;
-    return [states.PAGE];
+    context.state.location.route = route;
+    return [states.LOCATION];
   }
 };

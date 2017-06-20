@@ -11,7 +11,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.LOCATION_ALL, obj);
+        context.commit(mutations.LOCATION, obj);
       });
   }
 };

@@ -1,4 +1,4 @@
-dmc-index.Page.IndexPage
+dmc-empty.Page.EmptyPage
   div TODO
 
   script.
