@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
       window.store = store;
     })
     .then(() => {
-      // TODO: 説明文here.
+      // OAuth認証後のリダイレクトではクエリにtokenが格納されている。
+      // tokenがあれっばOAuth認証とみなす。
       const token = getParam(location.href, 'token');
       if (!token) {
         return Promise.resolve();

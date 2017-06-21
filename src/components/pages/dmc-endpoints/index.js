@@ -3,6 +3,7 @@ import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../atoms/dmc-message/index.tag';
 import './entry.tag';
+import './signin.tag';
 
 export default function() {
   const store = this.riotx.get();
@@ -41,8 +42,17 @@ export default function() {
           this.getRouter().navigateTo(`/${key}`);
           return Promise.resolve();
         }
-        // TODO: サインインモーダルを表示すること。
-        return store.action(actions.MODALS_ADD, 'dmc-message');
+        return Promise
+          .resolve()
+          .then(() => store.action(actions.AUTH_GET_TYPES, key))
+          .then(authtypes => store.action(actions.MODALS_ADD, 'dmc-signin', {
+            key,
+            endpoint: store.getter(getters.ENDPOINTS_ONE, key),
+            authtypes,
+            onSignin: () => {
+              this.getRouter().navigateTo(`/${key}`);
+            }
+          }));
       })
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err

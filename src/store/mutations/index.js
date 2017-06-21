@@ -1,11 +1,23 @@
+import application from './application';
 import current from './current';
+import endpoints from './endpoints';
 import location from './location';
 import menu from './menu';
 import modals from './modals';
+import oauthEndpointKey from './oauthEndpointKey';
 import toasts from './toasts';
 
 const constants = {
+  APPLICATION_LAUNCH: 'APPLICATION_LAUNCH',
+  APPLICATION_NAVIGATION: 'APPLICATION_NAVIGATION',
+  APPLICATION_NETWORKING_ADD: 'APPLICATION_NETWORKINGS_ADD',
+  APPLICATION_NETWORKING_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
   CURRENT: 'CURRENT',
+  ENDPOINTS_ADD: 'ENDPOINTS_ADD',
+  ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
+  ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
+  ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
+  ENDPOINTS_UPDATE_TOKEN: 'ENDPOINTS_UPDATE_TOKEN',
   LOCATION: 'LOCATION',
   LOCATION_NAME: 'LOCATION_NAME',
   LOCATION_ROUTE: 'LOCATION_ROUTE',
@@ -16,12 +28,22 @@ const constants = {
   MENU_DISABLE: 'MENU_DISABLE',
   MODALS_ADD: 'MODALS_ADD',
   MODALS_REMOVE: 'MODALS_REMOVE',
+  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   TOASTS_ADD: 'TOASTS_ADD',
   TOASTS_REMOVE: 'TOASTS_REMOVE'
 };
 
 export default {
+  [constants.APPLICATION_LAUNCH]: application.launch,
+  [constants.APPLICATION_NAVIGATION]: application.navigation,
+  [constants.APPLICATION_NETWORKINGS_ADD]: application.addNetworking,
+  [constants.APPLICATION_NETWORKINGS_REMOVE]: application.removeNetworking,
   [constants.CURRENT]: current.all,
+  [constants.ENDPOINTS_ADD]: endpoints.add,
+  [constants.ENDPOINTS_REMOVE]: endpoints.remove,
+  [constants.ENDPOINTS_REMOVE_ALL]: endpoints.removeAll,
+  [constants.ENDPOINTS_UPDATE]: endpoints.update,
+  [constants.ENDPOINTS_UPDATE_TOKEN]: endpoints.updateToken,
   [constants.LOCATION]: location.all,
   [constants.LOCATION_NAME]: location.name,
   [constants.LOCATION_ROUTE]: location.route,
@@ -32,6 +54,7 @@ export default {
   [constants.MENU_DISABLE]: menu.disable,
   [constants.MODALS_ADD]: modals.add,
   [constants.MODALS_REMOVE]: modals.remove,
+  [constants.OAUTH_ENDPOINT_KEY]: oauthEndpointKey.all,
   [constants.TOASTS_ADD]: toasts.add,
   [constants.TOASTS_REMOVE]: toasts.remove
 };

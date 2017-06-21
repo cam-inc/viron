@@ -1,8 +1,8 @@
 export default {
   /**
-   * TODO: 説明文here
+   * OAuth認証中のendpointKeyを返します。
    * @param {riotx.Context} context
-   * @return {Boolean}
+   * @return {String}
    */
   all: context => {
     return context.state.oauthEndpointKey;

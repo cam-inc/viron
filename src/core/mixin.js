@@ -58,10 +58,12 @@ const closureEventListener = (() => {
 const bindTouchEvents = tag => {
   forEach(getTouchableElements(tag), elm => {
     const touchStartEventId = closureEventListener.add(elm, EVENT_TOUCHSTART, e => {
+      e.stopPropagation();
       e.currentTarget.classList.add('hover');
     });
 
     const touchMoveEventId = closureEventListener.add(elm, EVENT_TOUCHMOVE, e => {
+      e.stopPropagation();
       const isPressed = e.currentTarget.classList.contains('hover');
       if (!isPressed) {
         return;
@@ -70,6 +72,7 @@ const bindTouchEvents = tag => {
     });
 
     const touchEndEventId = closureEventListener.add(elm, EVENT_TOUCHEND, e => {
+      e.stopPropagation();
       // TODO: 2回発火しているかも。。
       const isPressed = e.currentTarget.classList.contains('hover');
       if (isPressed) {
