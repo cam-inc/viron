@@ -1,6 +1,7 @@
 import application from './application';
 import auth from './auth';
 import current from './current';
+import dmc from './dmc';
 import endpoints from './endpoints';
 import location from './location';
 import menu from './menu';
@@ -20,6 +21,8 @@ const constants = {
   AUTH_SIGNIN_EMAIL: 'AUTH_SIGNIN_EMAIL',
   CURRENT_UPDATE: 'CURRENT_UPDATE',
   CURRENT_REMOVE: 'CURRENT_REMOVE',
+  DMC_GET: 'DMC_GET',
+  DMC_REMOVE: 'DMC_REMOVE',
   ENDPOINTS_ADD: 'ENDPOINTS_ADD',
   ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
@@ -48,6 +51,8 @@ export default {
   [constants.AUTH_SIGNIN_EMAIL]: auth.signinEmail,
   [constants.CURRENT_UPDATE]: current.update,
   [constants.CURRENT_REMOVE]: current.remove,
+  [constants.DMC_GET]: dmc.get,
+  [constants.DMC_REMOVE]: dmc.remove,
   [constants.ENDPOINTS_ADD]: endpoints.add,
   [constants.ENDPOINTS_REMOVE]: endpoints.remove,
   [constants.ENDPOINTS_REMOVE_ALL]: endpoints.removeAll,

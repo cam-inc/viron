@@ -42,7 +42,7 @@ export default function() {
   this.groupedManage = group(manage);
 
   // TODO: riotx update後に修正すること。
-  this.on('mout', () => {
+  this.on('mount', () => {
     store.change(states.ENDPOINTS, this.handleEndpointsStateChange);
     store.change(states.DMC, this.handleDmcStateChange);
   }).on('unmount', () => {

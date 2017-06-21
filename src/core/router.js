@@ -25,9 +25,11 @@ export default {
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(() => {
             // TODO: esrに組み込みたい。
+            /*
             if (location.pathname === '/') {
               return store.action(actions.MENU_DISABLE);
             }
+            */
             return store.action(actions.MENU_ENABLE);
           });
         return router;

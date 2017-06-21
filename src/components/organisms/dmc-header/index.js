@@ -27,7 +27,7 @@ export default function() {
       .then(() => store.action(actions.MENU_TOGGLE));
   };
 
-  this.handleHomeButtonClick = () => {
+  this.handleHomeButtonTap = () => {
     this.getRouter().navigateTo('/');
   };
 }

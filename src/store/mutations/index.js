@@ -1,5 +1,6 @@
 import application from './application';
 import current from './current';
+import dmc from './dmc';
 import endpoints from './endpoints';
 import location from './location';
 import menu from './menu';
@@ -13,6 +14,7 @@ const constants = {
   APPLICATION_NETWORKING_ADD: 'APPLICATION_NETWORKINGS_ADD',
   APPLICATION_NETWORKING_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
   CURRENT: 'CURRENT',
+  DMC: 'DMC',
   ENDPOINTS_ADD: 'ENDPOINTS_ADD',
   ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
@@ -39,6 +41,7 @@ export default {
   [constants.APPLICATION_NETWORKINGS_ADD]: application.addNetworking,
   [constants.APPLICATION_NETWORKINGS_REMOVE]: application.removeNetworking,
   [constants.CURRENT]: current.all,
+  [constants.DMC]: dmc.all,
   [constants.ENDPOINTS_ADD]: endpoints.add,
   [constants.ENDPOINTS_REMOVE]: endpoints.remove,
   [constants.ENDPOINTS_REMOVE_ALL]: endpoints.removeAll,
