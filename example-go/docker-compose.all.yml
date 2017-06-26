@@ -18,6 +18,7 @@ services:
       - SERVICE_ENV=docker-local
       - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
       - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
     volumes:
       - $PWD/dist/Linux:/go/dist/Linux
       - $PWD/src:/go/src
