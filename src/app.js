@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
           _store.action(actions.OAUTH_ENDPOINT_KEY_REMOVE)
         ])
         .then(() => {
-          location.href = `${location.origin}${location.pathname}`;
+          location.href = `${location.origin}${location.pathname}#/${oauthEndpointKey}`;
         });
     })
     .then(() => {

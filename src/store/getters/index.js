@@ -7,6 +7,7 @@ import location from './location';
 import menu from './menu';
 import modals from './modals';
 import oauthEndpointKey from './oauthEndpointKey';
+import page from './page';
 import toasts from './toasts';
 
 const constants = {
@@ -32,6 +33,9 @@ const constants = {
   MENU_ENABLED: 'MENU_ENABLED',
   MODALS: 'MODALS',
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
+  PAGE: 'PAGE',
+  PAGE_NAME: 'PAGE_NAME',
+  PAGE_COMPONENTS: 'PAGE_COMPONENTS',
   TOASTS: 'TOASTS'
 };
 
@@ -58,6 +62,9 @@ export default {
   [constants.MENU_ENABLED]: menu.enabled,
   [constants.MODALS]: modals.all,
   [constants.OAUTH_ENDPOINT_KEY]: oauthEndpointKey.all,
+  [constants.PAGE]: page.all,
+  [constants.PAGE_NAME]: page.name,
+  [constants.PAGE_COMPONENTS]: page.components,
   [constants.TOASTS]: toasts.all
 };
 

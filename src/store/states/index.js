@@ -15,6 +15,9 @@ import toasts from './toasts';
 const constants = {
   APPLICATION: 'APPLICATION',
   COMPONENTS: 'COMPONENTS',
+  COMPONENT: riotId => {
+    return `component_${riotId}`;
+  },
   CURRENT: 'CURRENT',
   DMC: 'DMC',
   DRAWERS: 'DRAWERS',
