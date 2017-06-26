@@ -70,6 +70,9 @@ setup-pre:
 	 	echo "[ERROR] 'hg' command not found. brew install hg"; \
 	 	exit 1; \
 	fi
+	if [ "x${GITHUB_PERSONAL_ACCESS_TOKEN}" != "x" ]; then \
+		git config --global url."https://${GITHUB_PERSONAL_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"; \
+	fi
 
 setup: setup-pre vendor-install ## Setup
 	@if [ ! -f $(__GOAGEN) ]; then \
