@@ -41,28 +41,18 @@ export default function() {
   this.groupedDashboard = group(dashboard);
   this.groupedManage = group(manage);
 
-  // TODO: riotx update後に修正すること。
-  this.on('mount', () => {
-    store.change(states.ENDPOINTS, this.handleEndpointsStateChange);
-    store.change(states.DMC, this.handleDmcStateChange);
-  }).on('unmount', () => {
-    store.off(states.ENDPOINTS, this.handleEndpointsStateChange);
-    store.off(states.DMC, this.handleDmcStateChange);
-  });
-
-  this.handleEndpointsStateChange = () => {
+  this.listen(states.ENDPOINTS, () => {
     const current = store.getter(getters.CURRENT);
     this.endpoint = store.getter(getters.ENDPOINTS_ONE, current);
     this.update();
-  };
-
-  this.handleDmcStateChange = () => {
+  });
+  this.listen(states.DMC, () => {
     const dashboard = store.getter(getters.DMC_DASHBOARD);
     const manage = store.getter(getters.DMC_MANAGE);
     this.groupedDashboard = group(dashboard);
     this.groupedManage = group(manage);
     this.update();
-  };
+  });
 
   this.handleCloseButtonTap = () => {
     Promise

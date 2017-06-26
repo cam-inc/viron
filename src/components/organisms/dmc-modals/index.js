@@ -6,15 +6,8 @@ export default function() {
 
   this.modals = store.getter(getters.MODALS);
 
-  // TODO: riotx update後に修正すること。
-  this.on('mount', () => {
-    store.change(states.MODALS, this.handleModalsStateChange);
-  }).on('unmount', () => {
-    store.off(states.MODALS, this.handleModalsStateChange);
-  });
-
-  this.handleModalsStateChange = () => {
+  this.listen(states.MODALS, () => {
     this.modals = store.getter(getters.MODALS);
     this.update();
-  };
+  });
 }

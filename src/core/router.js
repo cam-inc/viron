@@ -19,17 +19,14 @@ export default {
       .then(() => {
         const router = new Esr(Esr.HASH);
         router
-          .on('/', route => EndpointsRoute.onEnter(store, route), (route, replace) => EndpointsRoute.onBefore(store, route, replace))
+          .on('/', route => EndpointsRoute.onEnter(store, route))
           .on('/:endpointKey', route => EmptyRoute.onEnter(store, route), (route, replace) => EmptyRoute.onBefore(store, route, replace))
           .on('/:endpointKey/:page', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
-          .onAfter(() => {
-            // TODO: esrに組み込みたい。
-            /*
-            if (location.pathname === '/') {
+          .onAfter(route => {
+            if (route.pathname === '/') {
               return store.action(actions.MENU_DISABLE);
             }
-            */
             return store.action(actions.MENU_ENABLE);
           });
         return router;

@@ -10,17 +10,10 @@ export default function() {
 
   this.endpoints = store.getter(getters.ENDPOINTS);
 
-  // TODO: riotx update後に修正すること。
-  this.on('mount', () => {
-    store.change(states.ENDPOINTS, this.handleEndpointsStateChange);
-  }).on('unmount', () => {
-    store.off(states.ENDPOINTS, this.handleEndpointsStateChange);
-  });
-
-  this.handleEndpointsStateChange = () => {
+  this.listen(states.ENDPOINTS, () => {
     this.endpoints = store.getter(getters.ENDPOINTS);
     this.update();
-  };
+  });
 
   this.handleEndpointAddTap = () => {
     Promise

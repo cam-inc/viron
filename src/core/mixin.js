@@ -114,6 +114,11 @@ export default {
               unbindTouchEvents(this);
             });
           },
+          // riotx.riotxChange(store, evtName, func)のショートカット。
+          listen: function(...args) {
+            const store = this.riotx.get();
+            this.riotxChange(store, ...args);
+          },
           // pugファイルとjsファイルを分離して実装可能にするため。
           external: function(script) {
             const tag = this;

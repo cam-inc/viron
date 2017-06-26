@@ -6,15 +6,8 @@ export default function() {
 
   this.toasts = store.getter(getters.TOASTS);
 
-  // TODO: riotx update後に修正すること。
-  this.on('mount', () => {
-    store.change(states.TOASTS, this.handleToastsStateChange);
-  }).on('unmount', () => {
-    store.off(states.TOASTS, this.handleToastsStateChange);
-  });
-
-  this.handleToastsStateChange = () => {
+  this.listen(states.TOASTS, () => {
     this.toasts = store.getter(getters.TOASTS);
     this.update();
-  };
+  });
 }

@@ -6,15 +6,8 @@ export default function() {
 
   this.drawers = store.getter(getters.DRAWERS);
 
-  // TODO: riotx update後に修正すること。
-  this.on('mount', () => {
-    store.change(states.DRAWERS, this.handleDrawersStateChange);
-  }).on('unmount', () => {
-    store.off(states.DRAWERS, this.handleDrawersStateChange);
-  });
-
-  this.handleDrawersStateChange = () => {
+  this.listen(states.DRAWERS, () => {
     this.drawers = store.getter(getters.DRAWERS);
     this.update();
-  };
+  });
 }

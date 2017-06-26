@@ -8,18 +8,11 @@ export default function() {
   this.isMenuEnabled = store.getter(getters.MENU_ENABLED);
   this.isMenuOpened = store.getter(getters.MENU_OPENED);
 
-  // TODO: riotx update後に修正すること。
-  this.on('mount', () => {
-    store.change(states.MENU, this.handleMenuStateChange);
-  }).on('unmount', () => {
-    store.off(states.MENU, this.handleMenuStateChange);
-  });
-
-  this.handleMenuStateChange = () => {
+  this.listen(states.MENU, () => {
     this.isMenuEnabled = store.getter(getters.MENU_ENABLED);
     this.isMenuOpened = store.getter(getters.MENU_OPENED);
     this.update();
-  };
+  });
 
   this.handleMenuButtonTap = () => {
     Promise
