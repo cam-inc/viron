@@ -90,7 +90,11 @@ const bindTouchEvents = tag => {
 };
 const unbindTouchEvents = tag => {
   forEach(getTouchableElements(tag), elm => {
-    const touchEventIds = elm.getAttribute('touchevents').split('/');
+    const touchEvents = elm.getAttribute('touchevents');
+    if (!touchEvents) {
+      return;
+    }
+    const touchEventIds = touchEvents.split('/');
     forEach(touchEventIds, touchEventId => {
       closureEventListener.remove(touchEventId);
     });
