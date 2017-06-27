@@ -118,6 +118,8 @@ export default function() {
 
   this.on('mount', () => {
     this.updater();
+  }).on('updated', () => {
+    this.rebindTouchEvents();
   });
 
   this.listen(states.COMPONENTS_ONE(this._riot_id), () => {

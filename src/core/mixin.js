@@ -57,6 +57,11 @@ const closureEventListener = (() => {
 })();
 const bindTouchEvents = tag => {
   forEach(getTouchableElements(tag), elm => {
+    // bind済みであれば何もしない。
+    if (!!elm.getAttribute('touchevents')) {
+      return;
+    }
+
     const touchStartEventId = closureEventListener.add(elm, EVENT_TOUCHSTART, e => {
       e.stopPropagation();
       e.currentTarget.classList.add('hover');
@@ -117,6 +122,11 @@ export default {
             }).on('before-unmount', () => {
               unbindTouchEvents(this);
             });
+          },
+          // 再度touchイベントをbindする関数。
+          // mount後に要素が追加された際に用いる。
+          rebindTouchEvents: function() {
+            bindTouchEvents(this);
           },
           // riotx.riotxChange(store, evtName, func)のショートカット。
           listen: function(...args) {

@@ -32,8 +32,6 @@ export default {
       .then(router => {
         router.start();
         _routerInstance = router;
-        // TODO: あとで消す。
-        window.router = router;
         return router;
       });
   },
