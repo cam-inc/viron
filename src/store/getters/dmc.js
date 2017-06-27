@@ -25,6 +25,18 @@ export default {
   },
 
   /**
+   * 指定idx値のpageのidを返します。
+   * @param {riotx.Context} context
+   * @param {Number} idx
+   * @return {String}
+   */
+  pageIdOf: (context, idx) => {
+    const rawData = context.state.dmc.getRawValue();
+    const page = rawData.pages[idx];
+    return page.id;
+  },
+
+  /**
    * 名前を返します。
    * @param {riotx.Context} context
    * @return {String}

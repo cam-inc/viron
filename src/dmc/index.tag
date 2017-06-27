@@ -13,7 +13,6 @@ dmc.Application
 
   script.
     import '../components/pages/dmc-components/index.tag';
-    import '../components/pages/dmc-empty/index.tag';
     import '../components/pages/dmc-endpoints/index.tag';
     import '../components/pages/dmc-notfound/index.tag';
     import '../components/organisms/dmc-drawers/index.tag';

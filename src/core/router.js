@@ -1,7 +1,6 @@
 import Esr from 'esr';
 import { constants as actions } from '../store/actions';
 import ComponentsRoute from '../components/pages/dmc-components/route';
-import EmptyRoute from '../components/pages/dmc-empty/route';
 import EndpointsRoute from '../components/pages/dmc-endpoints/route';
 import NotfoundRoute from '../components/pages/dmc-notfound/route';
 
@@ -20,8 +19,7 @@ export default {
         const router = new Esr(Esr.HASH);
         router
           .on('/', route => EndpointsRoute.onEnter(store, route))
-          .on('/:endpointKey', route => EmptyRoute.onEnter(store, route), (route, replace) => EmptyRoute.onBefore(store, route, replace))
-          .on('/:endpointKey/:page', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
+          .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(route => {
             if (route.pathname === '/') {

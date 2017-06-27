@@ -59,7 +59,16 @@ export default {
               .then(() => swagger.setup(endpoint))
               .then(() => store.action(actions.DMC_GET));
           })
-          .then(() => store.action(actions.PAGE_GET, route.params.page));
+          .then(() => {
+            // pageが指定されていない場合は`dmc`のpageリストの先頭項目を自動選択する。
+            if (!route.params.page) {
+              return Promise.resolve().then(() => {
+                const pageName = store.getter(getters.DMC_PAGES_ID_OF, 0);
+                replace(`/${endpointKey}/${pageName}`);
+              });
+            }
+            return store.action(actions.PAGE_GET, route.params.page);
+          });
       })
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
