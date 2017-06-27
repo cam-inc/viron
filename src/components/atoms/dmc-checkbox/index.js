@@ -1,5 +1,5 @@
 export default function() {
-  this.handleClickb = () => {
+  this.handleTap = () => {
     if (this.opts.isdisabled) {
       return;
     }
