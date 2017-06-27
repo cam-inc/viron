@@ -14,6 +14,7 @@ export default function() {
     this.icon = 'info';
     break;
   }
+
   // タイトル。
   this.title = this.opts.title;
   // メッセージ。

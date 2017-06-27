@@ -30,17 +30,35 @@ export default {
 
     return Promise
       .resolve()
-      .then(() => store.action(actions.CURRENT_UPDATE, endpointKey))
-      .then(() => {
-        // 無駄な通信を減らすために、`dmc`データを未取得の場合のみfetchする。
-        const dmc = store.getter(getters.DMC);
-        if (!!dmc) {
-          return Promise.resolve();
+      .then(() => store.action(actions.AUTH_VALIDATE, endpointKey))
+      .then(isSignined => {
+        // 認証切れ or 非ログ時はTOPに戻す。
+        if (!isSignined) {
+          return Promise
+            .resolve()
+            .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+              type: 'error',
+              title: 'Unauthorized',
+              message: 'You are not authorized. Check if your token is expired. '
+            }))
+            .then(() => {
+              replace('/');
+            });
         }
         return Promise
           .resolve()
-          .then(() => swagger.setup(endpoint))
-          .then(() => store.action(actions.DMC_GET));
+          .then(() => store.action(actions.CURRENT_UPDATE, endpointKey))
+          .then(() => {
+            // 無駄な通信を減らすために、`dmc`データを未取得の場合のみfetchする。
+            const dmc = store.getter(getters.DMC);
+            if (!!dmc) {
+              return Promise.resolve();
+            }
+            return Promise
+              .resolve()
+              .then(() => swagger.setup(endpoint))
+              .then(() => store.action(actions.DMC_GET));
+          });
       })
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
