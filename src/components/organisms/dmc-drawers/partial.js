@@ -39,7 +39,11 @@ export default function() {
     window.removeEventListener('keydown', this.handleKeyDown);
   });
 
-  this.handleTap = () => {
+  this.handleTap = e => {
+    if (!e.target.classList.contains('Drawer')) {
+      return;
+    }
+
     this.fadeOut();
   };
 

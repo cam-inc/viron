@@ -24,6 +24,10 @@ export default function() {
     return ret;
   };
 
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
   this.handlePrevButtonTap = () => {
     let newPage = this.opts.currentpage - 1;
     if (newPage < 1) {

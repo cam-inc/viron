@@ -5,7 +5,7 @@ dmc-select(class="Select { opts.isopened ? 'Select--opened' : '' } { opts.isdisa
       dmc-icon(type="down")
   .Select__options
     virtual(each="{ opts.options }")
-      div(class="Select__option { isSelected ? 'Select__option--selected' : ''  } { isDisabled ? 'Select__option--disabled' : '' }" data-id="{ id }" ref="touch" onTap="{ parent.handleOptionTap }")
+      div(class="Select__option { isSelected ? 'Select__option--selected' : ''  } { isDisabled ? 'Select__option--disabled' : '' }" data-id="{ id }" ref="touch" onTap="parent.handleOptionTap")
         .Select__optionIcon
           dmc-icon(type="check")
         .Select__optionLabel { label }

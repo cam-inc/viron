@@ -78,11 +78,14 @@ const bindTouchEvents = tag => {
 
     const touchEndEventId = closureEventListener.add(elm, EVENT_TOUCHEND, e => {
       e.stopPropagation();
-      // TODO: 2回発火しているかも。。
       const isPressed = e.currentTarget.classList.contains('hover');
       if (isPressed) {
         // ハンドラーを取得。無ければ何もしない。
-        const handlerName = elm.getAttribute('ontap');
+        let handlerName = elm.getAttribute('ontap');
+        // `parent.handleFoo`形式への対応。
+        if (handlerName.indexOf('parent.') === 0) {
+          handlerName = handlerName.replace('parent.', '');
+        }
         if (!!handlerName && !!tag[handlerName]) {
           tag[handlerName](e);
         }

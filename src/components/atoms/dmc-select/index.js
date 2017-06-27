@@ -10,14 +10,18 @@ export default function() {
     return selectedOption.label;
   };
 
-  this.handleBoxClick = () => {
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.handleBoxTap = () => {
     if (this.opts.isdisabled) {
       return;
     }
     this.opts.ontoggle && this.opts.ontoggle(!this.opts.isopened);
   };
 
-  this.handleOptionClick = e => {
+  this.handleOptionTap = e => {
     const selectedOptionID = e.currentTarget.dataset.id;
     const options = map(this.opts.options, option => {
       if (option.id === selectedOptionID) {
