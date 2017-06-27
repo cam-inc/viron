@@ -1,4 +1,5 @@
 import application from './application';
+import components from './components';
 import current from './current';
 import dmc from './dmc';
 import drawers from './drawers';
@@ -15,6 +16,8 @@ const constants = {
   APPLICATION_ISLAUNCHED: 'APPLICATION_ISLAUNCHED',
   APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
+  COMPONENTS: 'COMPONENTS',
+  COMPONENTS_GET: 'COMPONENTS_GET',
   CURRENT: 'CURRENT',
   DMC: 'DMC',
   DMC_PAGES: 'DMC_PAGES',
@@ -44,6 +47,8 @@ export default {
   [constants.APPLICATION_ISLAUNCHED]: application.isLaunched,
   [constants.APPLICATION_ISNAVIGATING]: application.isNavigating,
   [constants.APPLICATION_ISNETWORKING]: application.isNetworking,
+  [constants.COMPONENTS]: components.all,
+  [constants.COMPONENTS_ONE]: components.one,
   [constants.CURRENT]: current.all,
   [constants.DMC]: dmc.all,
   [constants.DMC_PAGES]: dmc.pages,

@@ -55,7 +55,7 @@ export default function() {
     this.update();
     Promise
       .resolve()
-      .then(() => store.action(actions.COMPONENTS_GET, this._riot_id, this.opts.component, query))
+      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, query))
       .catch(err => store.action(actions.MODALS_ADD, {
         error: err
       }));
@@ -120,7 +120,7 @@ export default function() {
     this.updater();
   });
 
-  store.change(states.changeComponentsName(this._riot_id), () => {
+  this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
     this.isPending = false;
     const component = store.getter(getters.COMPONENTS_ONE, this._riot_id);
     this.data = component.data;

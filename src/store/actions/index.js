@@ -1,5 +1,6 @@
 import application from './application';
 import auth from './auth';
+import components from './components';
 import current from './current';
 import dmc from './dmc';
 import endpoints from './endpoints';
@@ -20,6 +21,10 @@ const constants = {
   AUTH_GET_TYPES: 'AUTH_GET_TYPES',
   AUTH_SIGNIN_OAUTH: 'AUTH_SIGNIN_OAUTH',
   AUTH_SIGNIN_EMAIL: 'AUTH_SIGNIN_EMAIL',
+  COMPONENTS_GET_ONE: 'COMPONENTS_GET_ONE',
+  COMPONENTS_OPERATE_ONE: 'COMPONENTS_OPERATE_ONE',
+  COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
+  COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
   CURRENT_UPDATE: 'CURRENT_UPDATE',
   CURRENT_REMOVE: 'CURRENT_REMOVE',
   DMC_GET: 'DMC_GET',
@@ -52,6 +57,10 @@ export default {
   [constants.AUTH_GET_TYPES]: auth.getTypes,
   [constants.AUTH_SIGNIN_OAUTH]: auth.signinOAuth,
   [constants.AUTH_SIGNIN_EMAIL]: auth.signinEmail,
+  [constants.COMPONENTS_GET_ONE]: components.get,
+  [constants.COMPONENTS_OPERATE_ONE]: components.operate,
+  [constants.COMPONENTS_REMOVE_ONE]: components.remove,
+  [constants.COMPONENTS_REMOVE_ALL]: components.removeAll,
   [constants.CURRENT_UPDATE]: current.update,
   [constants.CURRENT_REMOVE]: current.remove,
   [constants.DMC_GET]: dmc.get,

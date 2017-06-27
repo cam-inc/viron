@@ -1,4 +1,5 @@
 import application from './application';
+import components from './components';
 import current from './current';
 import dmc from './dmc';
 import endpoints from './endpoints';
@@ -14,6 +15,9 @@ const constants = {
   APPLICATION_NAVIGATION: 'APPLICATION_NAVIGATION',
   APPLICATION_NETWORKING_ADD: 'APPLICATION_NETWORKINGS_ADD',
   APPLICATION_NETWORKING_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
+  COMPONENTS_UPDATE_ONE: 'COMPONENTS_UPDATE_ONE',
+  COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
+  COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
   CURRENT: 'CURRENT',
   DMC: 'DMC',
   ENDPOINTS_ADD: 'ENDPOINTS_ADD',
@@ -42,6 +46,9 @@ export default {
   [constants.APPLICATION_NAVIGATION]: application.navigation,
   [constants.APPLICATION_NETWORKINGS_ADD]: application.addNetworking,
   [constants.APPLICATION_NETWORKINGS_REMOVE]: application.removeNetworking,
+  [constants.COMPONENTS_UPDATE_ONE]: components.updateOne,
+  [constants.COMPONENTS_REMOVE_ONE]: components.removeOne,
+  [constants.COMPONENTS_REMOVE_ALL]: components.removeAll,
   [constants.CURRENT]: current.all,
   [constants.DMC]: dmc.all,
   [constants.ENDPOINTS_ADD]: endpoints.add,

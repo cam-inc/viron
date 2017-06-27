@@ -3,4 +3,4 @@ dmc-component-number.ComponentNumber
 
   script.
     import script from './number';
-    this.external(number);
+    this.external(script);
