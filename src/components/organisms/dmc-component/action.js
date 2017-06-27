@@ -14,7 +14,7 @@ export default function() {
   this.tooltipMessage = this.opts.action.description;
 
   this.handleButtonPat = () => {
-    store.action(actions.DRAWERS_ADD, 'dmc-component-operation', {
+    store.action(actions.DRAWERS_ADD, 'dmc-operation', {
       operation: this.opts.action,
       onSuccess: () => {
         this.opts.updater();

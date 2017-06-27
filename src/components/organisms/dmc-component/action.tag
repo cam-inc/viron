@@ -1,5 +1,5 @@
 dmc-component-action.Component__action
-  dmc-button(label="{ label }" onPat="{ handleButtonClick }" onHoverToggle="{ handleButtonHoverToggle }")
+  dmc-button(label="{ label }" onPat="{ handleButtonPat }" onHoverToggle="{ handleButtonHoverToggle }")
   dmc-tooltip(if="{ isTooltipOpened }" message="{ tooltipMessage }")
 
   script.

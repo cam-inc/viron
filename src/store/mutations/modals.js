@@ -27,7 +27,7 @@ export default {
    * @return {Array}
    */
   remove: (context, modalID) => {
-    context.state.modals = reject(context.state.modal, modal => {
+    context.state.modals = reject(context.state.modals, modal => {
       return (modal.id === modalID);
     });
     return [states.MODALS];

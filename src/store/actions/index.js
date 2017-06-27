@@ -3,6 +3,7 @@ import auth from './auth';
 import components from './components';
 import current from './current';
 import dmc from './dmc';
+import drawers from './drawers';
 import endpoints from './endpoints';
 import location from './location';
 import menu from './menu';
@@ -29,6 +30,8 @@ const constants = {
   CURRENT_REMOVE: 'CURRENT_REMOVE',
   DMC_GET: 'DMC_GET',
   DMC_REMOVE: 'DMC_REMOVE',
+  DRAWERS_ADD: 'DRAWERS_ADD',
+  DRAWERS_REMOVE: 'DRAWERS_REMOVE',
   ENDPOINTS_ADD: 'ENDPOINTS_ADD',
   ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
@@ -65,6 +68,8 @@ export default {
   [constants.CURRENT_REMOVE]: current.remove,
   [constants.DMC_GET]: dmc.get,
   [constants.DMC_REMOVE]: dmc.remove,
+  [constants.DRAWERS_ADD]: drawers.add,
+  [constants.DRAWERS_REMOVE]: drawers.remove,
   [constants.ENDPOINTS_ADD]: endpoints.add,
   [constants.ENDPOINTS_REMOVE]: endpoints.remove,
   [constants.ENDPOINTS_REMOVE_ALL]: endpoints.removeAll,

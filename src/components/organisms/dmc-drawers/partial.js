@@ -18,7 +18,7 @@ export default function() {
     this.root.classList.remove('Drawer--visible');
 
     setTimeout(() => {
-      store.action(actions.DRAWER_HIDE, this.opts.id);
+      store.action(actions.DRAWERS_REMOVE, this.opts.id);
     }, 1000);
   };
 
@@ -43,7 +43,7 @@ export default function() {
     this.fadeOut();
   };
 
-  this.handleCloseButtonClick = () => {
+  this.handleCloseButtonTap = () => {
     this.fadeOut();
   };
 
