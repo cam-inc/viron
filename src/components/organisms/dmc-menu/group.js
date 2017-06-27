@@ -15,6 +15,7 @@ export default function() {
   };
 
   this.handleGroupItemTap = e => {
-    this.getRouter().navigateTo(`/${store.getter(getters.CURRENT)}/${e.item.id}`);
+    const pageName = this.opts.group.list[Number(e.currentTarget.getAttribute('data-idx'))].id;
+    this.getRouter().navigateTo(`/${store.getter(getters.CURRENT)}/${pageName}`);
   };
 }
