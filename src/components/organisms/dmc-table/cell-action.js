@@ -3,7 +3,7 @@ export default function() {
   this.tooltipMessage = this.opts.action.tooltip;
 
   this.handleButtonPat = () => {
-    this.opts.action.onClick(this.opts.action.id, this.opts.action.rowData);
+    this.opts.action.onPat(this.opts.action.id, this.opts.action.rowData);
   };
 
   this.handleButtonHoverToggle = isHovered => {

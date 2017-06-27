@@ -25,12 +25,12 @@ export default function() {
   this.handleExecuteButtonPat = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.COMPONENTS_OPERATE, this.opts.operation, this.queries))
+      .then(() => store.action(actions.COMPONENTS_OPERATE_ONE, this.opts.operation, this.queries))
       .then(() => {
         this.close();
         this.opts.onSuccess();
       })
-      .catch(err => store.action(actions.MODAL_ADD, 'dmc-message', {
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
       }));
   };
