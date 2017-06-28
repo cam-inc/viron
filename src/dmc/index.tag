@@ -10,6 +10,7 @@ dmc.Application
   dmc-drawers
   dmc-modals
   dmc-toasts
+  dmc-splash(if="{ isLaunched }")
 
   script.
     import '../components/pages/dmc-components/index.tag';
@@ -19,6 +20,7 @@ dmc.Application
     import '../components/organisms/dmc-header/index.tag';
     import '../components/organisms/dmc-menu/index.tag';
     import '../components/organisms/dmc-modals/index.tag';
+    import '../components/organisms/dmc-splash/index.tag';
     import '../components/organisms/dmc-toasts/index.tag';
     import script from './index';
     this.external(script);
