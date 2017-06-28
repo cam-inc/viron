@@ -21,12 +21,10 @@ export default {
           .on('/', route => EndpointsRoute.onEnter(store, route))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
-          .onAfter(route => {
-            if (route.pathname === '/') {
-              return store.action(actions.MENU_DISABLE);
-            }
-            return store.action(actions.MENU_ENABLE);
-          });
+          .onAfter(route => Promise.all([
+            store.action((route.pathname === '/' ? actions.MENU_DISABLE : actions.MENU_ENABLE)),
+            store.action(actions.MENU_CLOSE)
+          ]));
         return router;
       })
       .then(router => {

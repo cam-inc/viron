@@ -8,6 +8,10 @@ export default function() {
   this.isMenuEnabled = store.getter(getters.MENU_ENABLED);
   this.isMenuOpened = store.getter(getters.MENU_OPENED);
 
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
   this.listen(states.MENU, () => {
     this.isMenuEnabled = store.getter(getters.MENU_ENABLED);
     this.isMenuOpened = store.getter(getters.MENU_OPENED);
