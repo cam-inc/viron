@@ -8,8 +8,6 @@ dmc-menu.Menu
           .Menu__endpointHost(if="{ !!endpoint }") { endpoint.url }
         .Menu__endpointBodyTail
           .Menu__endpointDescription(if="{ !!endpoint }") { endpoint.description }
-    .Menu__closeButton(ref="touch" onTap="handleCloseButtonTap")
-      dmc-icon(type="close")
   .Menu__body
     .Menu__section
       .Menu__sectionTitle ダッシュボード
@@ -21,7 +19,6 @@ dmc-menu.Menu
         dmc-menu-group(each="{ group in groupedManage }" group="{ group }")
 
   script.
-    import '../../atoms/dmc-icon/index.tag';
     import './group.tag';
     import script from './index';
     this.external(script);

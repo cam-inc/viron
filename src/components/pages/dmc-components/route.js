@@ -56,7 +56,11 @@ export default {
             }
             return Promise
               .resolve()
-              .then(() => swagger.setup(endpoint))
+              .then(() => {
+                return swagger
+                  .setup(endpoint)
+                  .then(info => store.action(actions.ENDPOINTS_UPDATE, endpointKey, info));
+              })
               .then(() => store.action(actions.DMC_GET));
           })
           .then(() => {

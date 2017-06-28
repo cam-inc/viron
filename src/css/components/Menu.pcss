@@ -34,7 +34,6 @@
 
 .Menu__endpointBodyHead {
   flex-grow: 1;
-  margin-right: 24px;
 }
 
 .Menu__endpointTitle {
@@ -55,22 +54,6 @@
   @apply --text-truncate;
   font-size: 15px;
   color: var(--color-basic-black);
-}
-
-.Menu__closeButton {
-  @apply --layout-center-center;
-  position: absolute;
-  top: 24px;
-  right: 16px;
-  width: 24px;
-  height: 24px;
-  font-size: 24px;
-  color: var(--color-basic-black);
-  cursor: pointer;
-}
-
-.Menu__closeButton:hover {
-  opacity: 0.5;
 }
 
 .Menu__body {
@@ -101,7 +84,7 @@
   transition-property: color, background-color;
 }
 
-.Menu__groupToggle:hover,
+.Menu__groupToggle.hover,
 .Menu__groupToggle--selected {
   color: var(--color-basic-white);
   background-color: var(--color-basic-black);
@@ -161,6 +144,7 @@
   transition-property: background-color;
 }
 
-.Menu__groupListItem:hover {
+.Menu__groupListItem--selected,
+.Menu__groupListItem.hover {
   background-color: var(--color-basic-gray);
 }

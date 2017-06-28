@@ -12,6 +12,19 @@ export default {
   },
 
   /**
+   * ページIDを返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  id: context => {
+    if (!context.state.page) {
+      return '';
+    }
+    const rawData = context.state.page.getRawValue();
+    return rawData.id;
+  },
+
+  /**
    * ページ名を返します。
    * @param {riotx.Context} context
    * @return {String}

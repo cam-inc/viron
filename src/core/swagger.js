@@ -48,7 +48,7 @@ class Swagger {
 
           SwaggerClient({spec: client.body}).then((_client) => {// eslint-disable-line no-undef
             this.client = _client;
-            resolve();
+            resolve(_client.spec.info);
           });
         })
         .catch(err => {

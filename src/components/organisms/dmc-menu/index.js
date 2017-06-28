@@ -1,6 +1,5 @@
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
-import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 
@@ -53,10 +52,4 @@ export default function() {
     this.groupedManage = group(manage);
     this.update();
   });
-
-  this.handleCloseButtonTap = () => {
-    Promise
-      .resolve()
-      .then(() => store.action(actions.MENU_CLOSE));
-  };
 }
