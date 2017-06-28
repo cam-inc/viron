@@ -1,4 +1,5 @@
 import reject from 'mout/array/reject';
+import ObjectAssign from 'object-assign';
 import { constants as states } from '../states';
 
 export default {
@@ -26,9 +27,9 @@ export default {
    * @return {Array}
    */
   addNetworking: (context, info) => {
-    context.state.application.networkings.push({
+    context.state.application.networkings.push(ObjectAssign({
       id: `networking_${Date.now()}`
-    }, info);
+    }, info));
     context.state.application.isNetworking = true;
     return [states.APPLICATION];
   },
