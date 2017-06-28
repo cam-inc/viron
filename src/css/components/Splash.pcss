@@ -1,4 +1,15 @@
 .Splash {
-  display: block;
+  @apply --layout-center-center;
   background-color: var(--color-bg-primary);
+}
+
+.Splash__logo {
+  width: 48px;
+  height: 48px;
+  background-image: url("../img/logo.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  border-radius: 4px;
+  box-shadow: 0 0 4px var(--color-bg-primary);
 }
