@@ -11,6 +11,7 @@ import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import signinShowKey from './signinShowKey';
 import toasts from './toasts';
+import ua from './ua';
 
 const constants = {
   APPLICATION: 'APPLICATION',
@@ -28,7 +29,8 @@ const constants = {
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   SIGNIN_SHOW_KEY: 'SIGNIN_SHOW_KEY',
-  TOASTS: 'TOASTS'
+  TOASTS: 'TOASTS',
+  UA: 'UA'
 };
 
 export default {
@@ -44,7 +46,8 @@ export default {
   oauthEndpointKey,
   page,
   signinShowKey,
-  toasts
+  toasts,
+  ua
 };
 
 export {

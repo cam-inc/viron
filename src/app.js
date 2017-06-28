@@ -12,9 +12,6 @@ import './components/atoms/dmc-message/index.tag';
 
 // エントリーポイント。
 document.addEventListener('DOMContentLoaded', () => {
-  // TODO: debug用なので後で消すこと。
-  window.swagger = swagger;
-
   let _store;
   Promise
     .resolve()
@@ -27,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(() => {
       // OAuth認証後のリダイレクトではクエリにtokenが格納されている。
-      // tokenがあれっばOAuth認証とみなす。
+      // tokenがあればOAuth認証とみなす。
       const token = getParam(location.href, 'token');
       if (!token) {
         return Promise.resolve();
@@ -47,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => {
       riot.mount('dmc');
     })
+    .then(() => _store.action(actions.UA_SETUP))
     .then(() => router.init(_store))
     .catch(err => _store.action(actions.MODALS_ADD, 'dmc-message', {
       error: err

@@ -10,6 +10,7 @@ import modals from './modals';
 import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import toasts from './toasts';
+import ua from './ua';
 
 const constants = {
   APPLICATION_LAUNCH: 'APPLICATION_LAUNCH',
@@ -41,7 +42,8 @@ const constants = {
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   TOASTS_ADD: 'TOASTS_ADD',
-  TOASTS_REMOVE: 'TOASTS_REMOVE'
+  TOASTS_REMOVE: 'TOASTS_REMOVE',
+  UA: 'UA'
 };
 
 export default {
@@ -74,7 +76,8 @@ export default {
   [constants.OAUTH_ENDPOINT_KEY]: oauthEndpointKey.all,
   [constants.PAGE]: page.all,
   [constants.TOASTS_ADD]: toasts.add,
-  [constants.TOASTS_REMOVE]: toasts.remove
+  [constants.TOASTS_REMOVE]: toasts.remove,
+  [constants.UA]: ua.all
 };
 
 export {

@@ -21,6 +21,7 @@ export default function() {
   this.message = this.opts.message;
 
   // errorが渡された場合は最適化処理を行う。
+  // TODO: prettyprintを使っても良いかも。
   if (!!this.opts.error) {
     this.type = 'error';
     this.icon = 'exclamation';

@@ -16,7 +16,6 @@ export default function() {
     this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
     this.isNavigating = store.getter(getters.APPLICATION_ISNAVIGATING);
     this.isNetworking = store.getter(getters.APPLICATION_ISNETWORKING);
-    this.isBlocked = this.isLaunched && !this.isNavigating && !this.isNetworking;
     this.update();
   });
   this.listen(states.LOCATION, () => {

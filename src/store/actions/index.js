@@ -11,6 +11,7 @@ import modals from './modals';
 import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import toasts from './toasts';
+import ua from './ua';
 
 const constants = {
   APPLICATION_LAUNCH: 'APPLICATION_LAUNCH',
@@ -47,7 +48,8 @@ const constants = {
   PAGE_GET: 'PAGE_GET',
   PAGE_REMOVE: 'PAGE_REMOVE',
   TOASTS_ADD: 'TOASTS_ADD',
-  TOASTS_REMOVE: 'TOASTS_REMOVE'
+  TOASTS_REMOVE: 'TOASTS_REMOVE',
+  UA_SETUP: 'UA_SETUP'
 };
 
 export default {
@@ -85,7 +87,8 @@ export default {
   [constants.PAGE_GET]: page.get,
   [constants.PAGE_REMOVE]: page.remove,
   [constants.TOASTS_ADD]: toasts.add,
-  [constants.TOASTS_REMOVE]: toasts.remove
+  [constants.TOASTS_REMOVE]: toasts.remove,
+  [constants.UA_SETUP]: ua.setup
 };
 
 export {

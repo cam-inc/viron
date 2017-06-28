@@ -10,6 +10,7 @@ import modals from './modals';
 import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import toasts from './toasts';
+import ua from './ua';
 
 const constants = {
   APPLICATION: 'APPLICATION',
@@ -40,7 +41,8 @@ const constants = {
   PAGE: 'PAGE',
   PAGE_NAME: 'PAGE_NAME',
   PAGE_COMPONENTS: 'PAGE_COMPONENTS',
-  TOASTS: 'TOASTS'
+  TOASTS: 'TOASTS',
+  UA: 'UA'
 };
 
 export default {
@@ -72,7 +74,8 @@ export default {
   [constants.PAGE]: page.all,
   [constants.PAGE_NAME]: page.name,
   [constants.PAGE_COMPONENTS]: page.components,
-  [constants.TOASTS]: toasts.all
+  [constants.TOASTS]: toasts.all,
+  [constants.UA]: ua.all
 };
 
 export {
