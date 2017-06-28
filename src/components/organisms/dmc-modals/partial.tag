@@ -1,5 +1,5 @@
 dmc-modal(class="Modal Modal--{ opts.theme  }" ref="touch" onTap="handleTap")
-  .Modal__frame
+  .Modal__frame(ref="touch" onTap="handleFrameTap")
     .Modal__closeButton(ref="touch" onTap="handleCloseButtonTap")
       dmc-icon(type="close")
     .Modal__content(ref="content")

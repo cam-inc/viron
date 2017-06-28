@@ -42,6 +42,14 @@ export default function() {
     this.fadeOut();
   };
 
+  this.handleFrameTap = e => {
+    // frameの内側のイベントを外側に伝播させない。
+    if (!e.target.classList.contains('Modal__frame')) {
+      return;
+    }
+    this.fadeOut();
+  };
+
   this.handleCloseButtonTap = () => {
     this.fadeOut();
   };
