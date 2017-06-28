@@ -2,6 +2,7 @@ import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../atoms/dmc-message/index.tag';
+import './edit.tag';
 import './entry.tag';
 import './signin.tag';
 
@@ -18,7 +19,7 @@ export default function() {
   this.handleEndpointAddTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'dmc-entry'))
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-endpoint-entry'))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
       }));
@@ -38,7 +39,7 @@ export default function() {
         return Promise
           .resolve()
           .then(() => store.action(actions.AUTH_GET_TYPES, key))
-          .then(authtypes => store.action(actions.MODALS_ADD, 'dmc-signin', {
+          .then(authtypes => store.action(actions.MODALS_ADD, 'dmc-endpoint-signin', {
             key,
             endpoint: store.getter(getters.ENDPOINTS_ONE, key),
             authtypes,
@@ -52,14 +53,26 @@ export default function() {
       }));
   };
 
-  this.handleEndpointEdit = () => {
-    // TODO:
+  this.handleEndpointEdit = (key, url, memo) => {
+    Promise
+      .resolve()
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-endpoint-edit', {
+        endpointKey: key,
+        url,
+        memo
+      }))
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
   };
 
   this.handleEndpointRemove = key => {
     Promise
       .resolve()
       .then(() => store.action(actions.ENDPOINTS_REMOVE, key))
+      .then(() => store.action(actions.TOASTS_ADD, {
+        message: 'エンドポイントを削除しました。'
+      }))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
       }));
@@ -69,6 +82,9 @@ export default function() {
     Promise
       .resolve()
       .then(() => store.action(actions.AUTH_REMOVE, key))
+      .then(() => store.action(actions.TOASTS_ADD, {
+        message: 'エンドポイントからログアウトしました。'
+      }))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
       }));

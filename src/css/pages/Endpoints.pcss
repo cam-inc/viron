@@ -105,42 +105,38 @@
   padding: 16px;
 }
 
+.EndpointsPage__itemName {
+  @apply --text-break;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.EndpointsPage__itemUrl {
+  @apply --text-truncate;
+  margin-bottom: 4px;
+}
+
 .EndpointsPage__itemTags {
   margin-bottom: 4px;
   font-size: 12px;
   font-weight: bold;
-  color: var(--color-basic-black);
 }
 
 .EndpointsPage__itemTags .Tag {
   margin-right: 4px;
 }
 
-.EndpointsPage__itemUrl {
-  @apply --text-truncate;
-  margin-bottom: 16px;
-  font-size: 12px;
-  color: var(--color-basic-black);
-}
-
-.EndpointsPage__itemName {
-  @apply --text-break;
-  font-size: 18px;
-  color: var(--color-basic-black);
-}
-
 .EndpointsPage__itemDescription {
   @apply --text-break;
   margin-top: 4px;
   font-size: 12px;
-  color: var(--color-basic-black);
 }
 
 .EndpointsPage__itemMemo {
   @apply --text-break;
-  margin-top: 16px;
-  font-size: 14px;
-  color: var(--color-basic-black);
+  font-size: 10px;
+  color: var(--color-text-secondary);
 }
 
 .EndpointsPage__itemMenus {
@@ -162,10 +158,23 @@
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-.EndpointsPage__itemMenuFrame .Button {
-  display: block;
+.EndpointsPage__itemMenu {
+  padding: 4px;
+  background-color: transparent;
+  transition-property: background-color;
+  transition-duration: 100ms;
+  cursor: pointer;
+  margin-bottom: 4px;
+  font-size: 12px;
 }
 
+.EndpointsPage__itemMenu.hover {
+  background-color: rgba(200, 200, 200, 0.5);
+}
+
+.EndpointsPage__itemMenus .EndpointsPage__itemMenu:last-child {
+  margin-bottom: 0;
+}
 
 /* ============================== */
 /* Entry */
@@ -207,6 +216,44 @@
 }
 
 .EndpointsPage__entryControls .Button:first-child {
+  margin-right: 12px;
+}
+
+/* ============================== */
+/* Edit */
+/* ============================== */
+.EndpointsPage__edit {
+  display: block;
+}
+
+.EndpointsPage__editTitle {
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+.EndpointsPage__editUrl {
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.EndpointsPage__editForm {
+  margin-bottom: 24px;
+}
+
+.EndpointsPage__editForm .Textarea {
+  display: block;
+}
+
+.EndpointsPage__editControls {
+  @apply --layout-center-center;
+}
+
+.EndpointsPage__editControls .Button {
+  display: block;
+  flex-grow: 1;
+}
+
+.EndpointsPage__editControls .Button:first-child {
   margin-right: 12px;
 }
 

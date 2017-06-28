@@ -1,4 +1,4 @@
-dmc-signin.EndpointsPage__signin
+dmc-endpoint-signin.EndpointsPage__signin
   .EndpointsPage__signinTitle サインイン
   .EndpointsPage__signinEmails(if="{ !!emails.length }")
     virtual(each="{ authtype in emails }")

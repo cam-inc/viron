@@ -16,6 +16,8 @@ export default {
       .then(() => fetch(context, url))
       .catch(err => {
         // 401エラーは想定内。
+        // 401 = endpointが存在しているので認証エラーになる。
+        // 401以外 = endpointが存在しない。
         if (err.status !== 401) {
           throw err;
         }
@@ -24,15 +26,29 @@ export default {
           url: url,
           memo: memo,
           token: null,
-          name: '',
-          description: '',
+          name: '-',
+          description: '-',
           version: '',
           color: '',
-          // TODO: デフォルト画像を用意すること。
-          thumbnail: 'https://dummyimage.com/600x400/000/fff',
+          thumbnail: './img/dmc_default.png',
           tags: []
         };
         context.commit(mutations.ENDPOINTS_ADD, key, newEndpoint);
+      });
+  },
+
+  /**
+   * 1件のエンドポイントを更新します
+   * @param {riotx.Context} context
+   * @param {String} url
+   * @param {Object} newEndpoint
+   * @return {Promise}
+   */
+  update: (context, key, newEndpoint) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.ENDPOINTS_UPDATE, key, newEndpoint);
       });
   },
 

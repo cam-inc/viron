@@ -1,3 +1,4 @@
+import ObjectAssign from 'object-assign';
 import storage from 'store';
 import { constants as states } from '../states';
 
@@ -46,7 +47,11 @@ export default {
    * @return {Array}
    */
   update: (context, endpointKey, endpoint) => {
-    context.state.endpoints[endpointKey] = endpoint;
+    if (!endpoint) {
+      context.state.endpoints[endpointKey] = null;
+    } else {
+      context.state.endpoints[endpointKey] = ObjectAssign({}, context.state.endpoints[endpointKey], endpoint);
+    }
     storage.set('endpoints', context.state.endpoints);
     return [states.ENDPOINTS];
   },

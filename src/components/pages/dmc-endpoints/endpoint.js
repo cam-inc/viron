@@ -1,11 +1,18 @@
 export default function() {
   this.isMenuOpened = false;
 
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
   this.handleTap = () => {
     this.opts.onentry(this.opts.key);
   };
 
-  this.handleMenusTap = () => {
+  this.handleMenusTap = e => {
+    if (!e.target.classList.contains('EndpointsPage__itemMenus')) {
+      return;
+    }
     this.isMenuOpened = false;
     this.update();
   };
@@ -16,7 +23,9 @@ export default function() {
   };
 
   this.handleEditButtonPat = () => {
-    this.opts.onedit(this.opts.key);
+    this.isMenuOpened = false;
+    this.update();
+    this.opts.onedit(this.opts.key, this.opts.url, this.opts.memo);
   };
 
   this.handleRemoveButtonPat = () => {

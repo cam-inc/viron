@@ -17,7 +17,7 @@ export default function() {
 
     // call action after the hide animation completes.
     setTimeout(() => {
-      store.action(actions.TOAST_HIDE, this.opts.id);
+      store.action(actions.TOASTS_REMOVE, this.opts.id);
     }, 1000);
   };
 

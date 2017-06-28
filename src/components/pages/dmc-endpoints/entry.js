@@ -4,8 +4,8 @@ import { constants as getters } from '../../../store/getters';
 export default function() {
   const store = this.riotx.get();
 
-  this.endpointURL = '';
   this.isExist = false;
+  this.endpointURL = '';
   this.memo = '';
 
   this.handleEndpointURLChange = newEndpointURL => {
@@ -23,6 +23,9 @@ export default function() {
     Promise
       .resolve()
       .then(() => store.action(actions.ENDPOINTS_ADD, this.endpointURL, this.memo))
+      .then(() => store.action(actions.TOASTS_ADD, {
+        message: 'エンドポイントを追加しました。'
+      }))
       .then(() => {
         this.close();
       })
