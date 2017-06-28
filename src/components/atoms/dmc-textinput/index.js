@@ -1,6 +1,4 @@
 export default function() {
-  const initialText = this.opts.text || '';
-
   this.handleTap = () => {
     this.refs.form.focus();
   };
@@ -22,17 +20,5 @@ export default function() {
     // `blur`時に`change`イベントが発火する。
     // 不都合な挙動なのでイベント伝播を止める。
     e.stopPropagation();
-  };
-
-  this.handleInputFocus = () => {
-    this.opts.onfocustoggle && this.opts.onfocustoggle(true, this.opts.id);
-  };
-
-  this.handleInputBlur = () => {
-    this.opts.onfocustoggle && this.opts.onfocustoggle(false, this.opts.id);
-  };
-
-  this.handleResetButtonClick = () => {
-    this.opts.onreset && this.opts.onreset(initialText, this.opts.id);
   };
 }

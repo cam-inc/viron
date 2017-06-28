@@ -1,5 +1,5 @@
 dmc-entry.EndpointsPage__entry
-  .EndpointsPage__entryTitle 新しい管理画面を<br />作成する
+  .EndpointsPage__entryTitle 新しい管理画面を作成する
   .EndpointsPage__entryMessage(if="{ isExist }") そのエンドポイントは既に登録済みです。
   .EndpointsPage__entryForm
     dmc-textinput(text="{ endpointURL }" placeholder="https://localhost:3000/swagger.json" onChange="{ handleEndpointURLChange }")

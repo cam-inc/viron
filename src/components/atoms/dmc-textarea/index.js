@@ -15,12 +15,4 @@ export default function() {
     // 不都合な挙動なのでイベント伝播を止める。
     e.stopPropagation();
   };
-
-  this.handleInputFocus = () => {
-    this.opts.onfocustoggle && this.opts.onfocustoggle(true);
-  };
-
-  this.handleInputBlur = () => {
-    this.opts.onfocustoggle && this.opts.onfocustoggle(false);
-  };
 }

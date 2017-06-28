@@ -4,8 +4,6 @@
 }
 
 .EndpointsPage__list {
-  @apply --layout-between-stretch;
-  flex-wrap: wrap;
 }
 
 .EndpointsPage__addCard {
@@ -18,6 +16,7 @@
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   transition-duration: 100ms;
   transition-property: background-color;
+  height: 100px;
 }
 
 .EndpointsPage__addCard:hover {
@@ -26,7 +25,6 @@
 
 .EndpointsPage__addCard,
 .EndpointsPage__list .Endpoint {
-  width: 320px;
   margin-bottom: 24px;
 }
 
@@ -91,6 +89,7 @@
 }
 
 .EndpointsPage__itemMenuButton {
+  @apply --layout-center-center;
   width: 32px;
   height: 32px;
   font-size: 32px;
@@ -173,13 +172,11 @@
 /* ============================== */
 .EndpointsPage__entry {
   display: block;
-  width: 504px;
 }
 
 .EndpointsPage__entryTitle {
   margin-bottom: 24px;
-  font-size: 36px;
-  color: var(--color-text-default);
+  font-size: 24px;
 }
 
 .EndpointsPage__entryMessage {
@@ -190,13 +187,13 @@
   color: var(--color-basic-red);
 }
 
-.EndpointsPage__entryForm .Input,
+.EndpointsPage__entryForm .Textinput,
 .EndpointsPage__entryForm .Textarea {
   display: block;
   margin-bottom: 24px;
 }
 
-.EndpointsPage__entryForm .Input {
+.EndpointsPage__entryForm .Textinput {
   margin-bottom: 12px;
 }
 
@@ -224,7 +221,6 @@
 .EndpointsPage__signinTitle {
   margin-bottom: 24px;
   font-size: 36px;
-  color: var(--color-text-default);
 }
 
 .EndpointsPage__signinEmails {
@@ -236,12 +232,12 @@
   margin-bottom: 12px;
 }
 
-.EndpointsPage__signinEmail .Input,
+.EndpointsPage__signinEmail .Textinput,
 .EndpointsPage__signinEmail .Button {
   display: block;
 }
 
-.EndpointsPage__signinEmail .Input {
+.EndpointsPage__signinEmail .Textinput {
   flex-grow: 1;
   margin-right: 12px;
 }

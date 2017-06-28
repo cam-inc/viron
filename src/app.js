@@ -3,7 +3,6 @@ import riot from 'riot';
 import mixin from './core/mixin';
 import './core/polyfill';
 import router from './core/router';
-import swagger from './core/swagger';
 import store from './store';
 import { constants as actions } from './store/actions';
 import { constants as getters } from './store/getters';
