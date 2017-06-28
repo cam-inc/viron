@@ -262,35 +262,36 @@
 /* ============================== */
 .EndpointsPage__signin {
   display: block;
-  width: 504px;
 }
 
 .EndpointsPage__signinTitle {
   margin-bottom: 24px;
-  font-size: 36px;
+  font-size: 24px;
 }
 
 .EndpointsPage__signinEmails {
   margin-top: 24px;
 }
 
+.EndpointsPage__signinEmailsTitle {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
 .EndpointsPage__signinEmail {
-  @apply --layout-center-center;
+  display: block;
   margin-bottom: 12px;
 }
 
 .EndpointsPage__signinEmail .Textinput,
 .EndpointsPage__signinEmail .Button {
   display: block;
+  width: 100%;
 }
 
 .EndpointsPage__signinEmail .Textinput {
-  flex-grow: 1;
-  margin-right: 12px;
-}
-
-.EndpointsPage__signinEmail .Button {
-  flex-shrink: 0;
+  margin-bottom: 8px;
 }
 
 .EndpointsPage__signinEmail:last-child {
@@ -299,6 +300,12 @@
 
 .EndpointsPage__signinOauths {
   margin-top: 24px;
+}
+
+.EndpointsPage__signinOauthsTitle {
+  font-size: 16px;
+  margin-bottom: 8px;
+  font-weight: bold;
 }
 
 .EndpointsPage__signinOauth {
