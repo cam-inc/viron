@@ -1,12 +1,12 @@
 dmc.Application
   .Application__contents
-    .Application__asideColumn(class="{ Application__asideColumn--opened : isMenuOpened }")
-      dmc-menu
     .Application__mainColumn
-      .Application__head
-        dmc-header
       .Application__page
         div(data-is="dmc-{ pageName }" route="{ pageRoute }")
+    .Application__asideColumn(class="{ Application__asideColumn--opened : isMenuOpened }")
+      dmc-menu
+    .Application__head
+      dmc-header
   dmc-drawers
   dmc-modals
   dmc-toasts
