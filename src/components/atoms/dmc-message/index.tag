@@ -1,7 +1,7 @@
 dmc-message(class="Message Message--{ type }")
   .Message__head
     .Message__icon
-      vam-icon(type="{ icon }")
+      dmc-icon(type="{ icon }")
     .Message__title { title }
   .Message__text(if="{ !!message }") { message }
 

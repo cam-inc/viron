@@ -18,13 +18,19 @@ export default {
       .then(() => {
         const router = new Esr(Esr.HASH);
         router
+          .onBefore(() => Promise.all([
+            store.action(actions.APPLICATION_NAVIGATION_START),
+            store.action(actions.MENU_CLOSE)
+          ]))
+          .onBefore(() => store.action(actions.MENU_CLOSE))
           .on('/', route => EndpointsRoute.onEnter(store, route))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(route => Promise.all([
-            store.action((route.pathname === '/' ? actions.MENU_DISABLE : actions.MENU_ENABLE)),
-            store.action(actions.MENU_CLOSE)
-          ]));
+            store.action(actions.APPLICATION_NAVIGATION_END),
+            store.action((route.pathname === '/' ? actions.MENU_DISABLE : actions.MENU_ENABLE))
+          ]))
+          .onAfterOnce(() => store.action(actions.APPLICATION_LAUNCH));
         return router;
       })
       .then(router => {
