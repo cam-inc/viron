@@ -5,6 +5,7 @@ export default function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
+  this.isNavigating = store.getter(getters.APPLICATION_ISNAVIGATING);
   const isEnabled = store.getter(getters.MENU_ENABLED);
   const isOpened = store.getter(getters.MENU_OPENED);
   this.isMenuOpened = isEnabled && isOpened;

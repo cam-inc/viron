@@ -10,12 +10,14 @@ dmc.Application
   dmc-drawers
   dmc-modals
   dmc-toasts
-  dmc-splash(if="{ isLaunched }")
+  dmc-blocker(if="{ isNavigating }")
+  dmc-splash(if="{ !isLaunched }")
 
   script.
     import '../components/pages/dmc-components/index.tag';
     import '../components/pages/dmc-endpoints/index.tag';
     import '../components/pages/dmc-notfound/index.tag';
+    import '../components/organisms/dmc-blocker/index.tag';
     import '../components/organisms/dmc-drawers/index.tag';
     import '../components/organisms/dmc-header/index.tag';
     import '../components/organisms/dmc-menu/index.tag';
