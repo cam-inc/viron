@@ -1,5 +1,5 @@
 dmc-table.Table
-  dmc-table-items(each="{ items in getItemList() }" items="{ items }" actions="{ actions }")
+  dmc-table-items(each="{ items, idx in getItemList() }" items="{ items }" actions="{ parent.opts.actions }" idx="{ idx }")
 
   script.
     import './items.tag';

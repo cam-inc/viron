@@ -1,7 +1,7 @@
 dmc-table-items.Table__items(class="{ isOpened ? 'Table__items--opened' : '' }")
   .Table__itemsHeader
     .Table__itemsTitle(ref="touch" onTap="handleHeaderTitleTap") { title }
-    .Table__itemsButton(if="{ isEditable }" ref="touch" onTap="handleEditButtonTap")
+    .Table__itemsButton(if="{ !!opts.actions }" ref="touch" onTap="handleActionButtonTap")
       dmc-icon(type="edit")
     .Table__itemsButton(ref="touch" onTap="handleFilterButtonTap")
       dmc-icon(type="filter")

@@ -1,5 +1,5 @@
 dmc-component-table.ComponentTable
-  dmc-table(columns="{ getColumns() }" rows="{ getRows() }")
+  dmc-table(columns="{ getColumns() }" rows="{ getRows() }" actions="{ getActions()}")
 
   script.
     import '../../organisms/dmc-table/index.tag';

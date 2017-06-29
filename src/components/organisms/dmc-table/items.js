@@ -2,14 +2,13 @@ import filter from 'mout/array/filter';
 import find from 'mout/array/find';
 import map from 'mout/array/map';
 import { constants as actions } from '../../../store/actions';
+import './action.tag';
 import './filter.tag';
 
 export default function() {
   const store = this.riotx.get();
 
   this.isOpened = false;
-  // 編集可能か否か。
-  this.isEditable = !!this.opts.actions;
   this.title = '';
   // `id`を優先する。
   let item = find(this.opts.items, item => {
@@ -19,7 +18,7 @@ export default function() {
   if (!item) {
     item = this.opts.items[0];
   }
-  this.title = `${item.value.data.getValue()}(${item.title})`;
+  this.title = `${item.cell.getValue()}(${item.title})`;
   this.visibleKeys = map(this.opts.items, item => {
     return item.key;
   });
@@ -41,9 +40,11 @@ export default function() {
     this.update();
   };
 
-  this.handleOpenShutButtonTap = () => {
-    this.isOpened = !this.isOpened;
-    this.update();
+  this.handleActionButtonTap = () => {
+    store.action(actions.MODALS_ADD, 'dmc-table-action', {
+      actions: this.opts.actions,
+      idx: this.opts.idx
+    });
   };
 
   this.handleFilterButtonTap = () => {
@@ -58,5 +59,10 @@ export default function() {
         this.update();
       }
     });
+  };
+
+  this.handleOpenShutButtonTap = () => {
+    this.isOpened = !this.isOpened;
+    this.update();
   };
 }

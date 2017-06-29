@@ -10,12 +10,6 @@ export default function() {
 
   this.getColumns = () => {
     const columns = [];
-    if (!!this.opts.actions && this.opts.actions.length) {
-      columns.push({
-        title: 'action',
-        key: 'dmc_table_action_key'
-      });
-    }
     forEach(this.opts.data.getValue(0).getKeys(), k => {
       columns.push({
         title: k,
@@ -29,35 +23,31 @@ export default function() {
     const rows = [];
     forEach(this.opts.data.getValue(), cells => {
       const row = {};
-      if (!!this.opts.actions && this.opts.actions.length) {
-        row['dmc_table_action_key'] = {
-          isAction: true,
-          actions: []
-        };
-        forEach(this.opts.actions, action => {
-          let value = action.summary;
-          if (!value) {
-            const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
-            value = `${obj.method} ${obj.path}`;
-          }
-          row['dmc_table_action_key'].actions.push({
-            id: action.operationId,
-            value,
-            tooltip: action.description,
-            rowData: cells,
-            onPat: this.handleActionButtonPat
-          });
-        });
-      }
       forOwn(cells.getValue(), cell => {
-        row[cell.getKey()] = {
-          isAction: false,
-          data: cell
-        };
+        row[cell.getKey()] = cell;
       });
       rows.push(row);
     });
     return rows;
+  };
+
+  this.getActions = () => {
+    const actions = [];
+    forEach(this.opts.actions, action => {
+      let value = action.summary;
+      if (!value) {
+        const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
+        value = `${obj.method} ${obj.path}`;
+      }
+      actions.push({
+        id: action.operationId,
+        value,
+        description: action.description,
+        rowData: this.opts.data,
+        onPat: this.handleActionButtonPat
+      });
+    });
+    return actions;
   };
 
   this.createInitialQueries = (operation, rowData) => {
