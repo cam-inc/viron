@@ -1,4 +1,54 @@
 (function () {
+var UNDEF;
+
+    /**
+     * Parses string and convert it into a native value.
+     */
+    function typecast(val) {
+        var r;
+        if ( val === null || val === 'null' ) {
+            r = null;
+        } else if ( val === 'true' ) {
+            r = true;
+        } else if ( val === 'false' ) {
+            r = false;
+        } else if ( val === UNDEF || val === 'undefined' ) {
+            r = UNDEF;
+        } else if ( val === '' || isNaN(val) ) {
+            //isNaN('') returns false
+            r = val;
+        } else {
+            //parseFloat(null || '') returns NaN
+            r = parseFloat(val);
+        }
+        return r;
+    }
+
+    var typecast_1 = typecast;
+
+/**
+     * Gets full query as string with all special chars decoded.
+     */
+    function getQuery(url) {
+        // url = url.replace(/#.*\?/, '?'); //removes hash (to avoid getting hash query)
+        var queryString = /\?[a-zA-Z0-9\=\&\%\$\-\_\.\+\!\*\'\(\)\,]+/.exec(url); //valid chars according to: http://www.ietf.org/rfc/rfc1738.txt
+        return (queryString)? decodeURIComponent(queryString[0].replace(/\+/g,' ')) : '';
+    }
+
+    var getQuery_1 = getQuery;
+
+/**
+     * Get query parameter value.
+     */
+    function getParam(url, param, shouldTypecast){
+        var regexp = new RegExp('(\\?|&)'+ param + '=([^&]*)'), //matches `?param=value` or `&param=value`, value = $2
+            result = regexp.exec( getQuery_1(url) ),
+            val = (result && result[2])? result[2] : null;
+        return shouldTypecast === false? val : typecast_1(val);
+    }
+
+    var getParam_1 = getParam;
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -12,11 +62,9 @@ function createCommonjsModule(fn, module) {
 }
 
 var riot_1 = createCommonjsModule(function (module, exports) {
-/* Riot v3.5.0, @license MIT */
+/* Riot v3.6.0, @license MIT */
 (function (global, factory) {
-	'object' === 'object' && 'object' !== 'undefined' ? factory(exports) :
-	typeof undefined === 'function' && undefined.amd ? undefined(['exports'], factory) :
-	(factory((global.riot = global.riot || {})));
+	factory(exports);
 }(commonjsGlobal, (function (exports) { 'use strict';
 
 var __TAGS_CACHE = [];
@@ -397,8 +445,87 @@ var styleManager = {
 
 /**
  * The riot template engine
- * @version v3.0.4
+ * @version v3.0.8
  */
+
+var skipRegex = (function () { //eslint-disable-line no-unused-vars
+
+  var beforeReChars = '[{(,;:?=|&!^~>%*/';
+
+  var beforeReWords = [
+    'case',
+    'default',
+    'do',
+    'else',
+    'in',
+    'instanceof',
+    'prefix',
+    'return',
+    'typeof',
+    'void',
+    'yield'
+  ];
+
+  var wordsLastChar = beforeReWords.reduce(function (s, w) {
+    return s + w.slice(-1)
+  }, '');
+
+  var RE_REGEX = /^\/(?=[^*>/])[^[/\\]*(?:(?:\\.|\[(?:\\.|[^\]\\]*)*\])[^[\\/]*)*?\/[gimuy]*/;
+  var RE_VN_CHAR = /[$\w]/;
+
+  function prev (code, pos) {
+    while (--pos >= 0 && /\s/.test(code[pos])){  }
+    return pos
+  }
+
+  function _skipRegex (code, start) {
+
+    var re = /.*/g;
+    var pos = re.lastIndex = start++;
+    var match = re.exec(code)[0].match(RE_REGEX);
+
+    if (match) {
+      var next = pos + match[0].length;
+
+      pos = prev(code, pos);
+      var c = code[pos];
+
+      if (pos < 0 || ~beforeReChars.indexOf(c)) {
+        return next
+      }
+
+      if (c === '.') {
+
+        if (code[pos - 1] === '.') {
+          start = next;
+        }
+
+      } else if (c === '+' || c === '-') {
+
+        if (code[--pos] !== c ||
+            (pos = prev(code, pos)) < 0 ||
+            !RE_VN_CHAR.test(code[pos])) {
+          start = next;
+        }
+
+      } else if (~wordsLastChar.indexOf(c)) {
+
+        var end = pos + 1;
+
+        while (--pos >= 0 && RE_VN_CHAR.test(code[pos])){  }
+        if (~beforeReWords.indexOf(code.slice(pos + 1, end))) {
+          start = next;
+        }
+      }
+    }
+
+    return start
+  }
+
+  return _skipRegex
+
+})();
+
 /**
  * riot.util.brackets
  *
@@ -422,16 +549,18 @@ var brackets = (function (UNDEF) {
 
     S_QBLOCKS = R_STRINGS.source + '|' +
       /(?:\breturn\s+|(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/]))/.source + '|' +
-      /\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?(\/)[gim]*/.source,
+      /\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?([^<]\/)[gim]*/.source,
 
     UNSUPPORTED = RegExp('[\\' + 'x00-\\x1F<>a-zA-Z0-9\'",;\\\\]'),
 
     NEED_ESCAPE = /(?=[[\]()*+?.^$|])/g,
 
+    S_QBLOCK2 = R_STRINGS.source + '|' + /(\/)(?![*\/])/.source,
+
     FINDBRACES = {
-      '(': RegExp('([()])|'   + S_QBLOCKS, REGLOB),
-      '[': RegExp('([[\\]])|' + S_QBLOCKS, REGLOB),
-      '{': RegExp('([{}])|'   + S_QBLOCKS, REGLOB)
+      '(': RegExp('([()])|'   + S_QBLOCK2, REGLOB),
+      '[': RegExp('([[\\]])|' + S_QBLOCK2, REGLOB),
+      '{': RegExp('([{}])|'   + S_QBLOCK2, REGLOB)
     },
 
     DEFAULT = '{ }';
@@ -442,7 +571,7 @@ var brackets = (function (UNDEF) {
     /{[^}]*}/,
     /\\([{}])/g,
     /\\({)|{/g,
-    RegExp('\\\\(})|([[({])|(})|' + S_QBLOCKS, REGLOB),
+    RegExp('\\\\(})|([[({])|(})|' + S_QBLOCK2, REGLOB),
     DEFAULT,
     /^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S.*)\s*}/,
     /(^|[^\\]){=[\S\s]*?}/
@@ -476,7 +605,7 @@ var brackets = (function (UNDEF) {
     arr[4] = _rewrite(arr[1].length > 1 ? /{[\S\s]*?}/ : _pairs[4], arr);
     arr[5] = _rewrite(pair.length > 3 ? /\\({|})/g : _pairs[5], arr);
     arr[6] = _rewrite(_pairs[6], arr);
-    arr[7] = RegExp('\\\\(' + arr[3] + ')|([[({])|(' + arr[3] + ')|' + S_QBLOCKS, REGLOB);
+    arr[7] = RegExp('\\\\(' + arr[3] + ')|([[({])|(' + arr[3] + ')|' + S_QBLOCK2, REGLOB);
     arr[8] = pair;
     return arr
   }
@@ -497,19 +626,40 @@ var brackets = (function (UNDEF) {
       pos,
       re = _bp[6];
 
+    var qblocks = [];
+    var prevStr = '';
+    var mark, lastIndex;
+
     isexpr = start = re.lastIndex = 0;
 
     while ((match = re.exec(str))) {
 
+      lastIndex = re.lastIndex;
       pos = match.index;
 
       if (isexpr) {
 
         if (match[2]) {
-          re.lastIndex = skipBraces(str, match[2], re.lastIndex);
+
+          var ch = match[2];
+          var rech = FINDBRACES[ch];
+          var ix = 1;
+
+          rech.lastIndex = lastIndex;
+          while ((match = rech.exec(str))) {
+            if (match[1]) {
+              if (match[1] === ch) { ++ix; }
+              else if (!--ix) { break }
+            } else {
+              rech.lastIndex = pushQBlock(match.index, rech.lastIndex, match[2]);
+            }
+          }
+          re.lastIndex = ix ? str.length : rech.lastIndex;
           continue
         }
+
         if (!match[3]) {
+          re.lastIndex = pushQBlock(pos, lastIndex, match[4]);
           continue
         }
       }
@@ -526,9 +676,15 @@ var brackets = (function (UNDEF) {
       unescapeStr(str.slice(start));
     }
 
+    parts.qblocks = qblocks;
+
     return parts
 
     function unescapeStr (s) {
+      if (prevStr) {
+        s = prevStr + s;
+        prevStr = '';
+      }
       if (tmpl || isexpr) {
         parts.push(s && s.replace(_bp[5], '$1'));
       } else {
@@ -536,18 +692,18 @@ var brackets = (function (UNDEF) {
       }
     }
 
-    function skipBraces (s, ch, ix) {
-      var
-        match,
-        recch = FINDBRACES[ch];
-
-      recch.lastIndex = ix;
-      ix = 1;
-      while ((match = recch.exec(s))) {
-        if (match[1] &&
-          !(match[1] === ch ? ++ix : --ix)) { break }
+    function pushQBlock(_pos, _lastIndex, slash) { //eslint-disable-line
+      if (slash) {
+        _lastIndex = skipRegex(str, _pos);
       }
-      return ix ? s.length : recch.lastIndex
+
+      if (tmpl && _lastIndex > _pos + 2) {
+        mark = '\u2057' + qblocks.length + '~';
+        qblocks.push(str.slice(_pos, _lastIndex));
+        prevStr += str.slice(start, _pos) + mark;
+        start = _lastIndex;
+      }
+      return _lastIndex
     }
   };
 
@@ -598,10 +754,12 @@ var brackets = (function (UNDEF) {
   /* istanbul ignore next: in the browser riot is always in the scope */
   _brackets.settings = typeof riot !== 'undefined' && riot.settings || {};
   _brackets.set = _reset;
+  _brackets.skipRegex = skipRegex;
 
   _brackets.R_STRINGS = R_STRINGS;
   _brackets.R_MLCOMMS = R_MLCOMMS;
   _brackets.S_QBLOCKS = S_QBLOCKS;
+  _brackets.S_QBLOCK2 = S_QBLOCK2;
 
   return _brackets
 
@@ -666,18 +824,13 @@ var tmpl = (function () {
     return new Function('E', expr + ';')    // eslint-disable-line no-new-func
   }
 
-  var
-    CH_IDEXPR = String.fromCharCode(0x2057),
-    RE_CSNAME = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\u2057(\d+)~):/,
-    RE_QBLOCK = RegExp(brackets.S_QBLOCKS, 'g'),
-    RE_DQUOTE = /\u2057/g,
-    RE_QBMARK = /\u2057(\d+)~/g;
+  var RE_DQUOTE = /\u2057/g;
+  var RE_QBMARK = /\u2057(\d+)~/g;
 
   function _getTmpl (str) {
-    var
-      qstr = [],
-      expr,
-      parts = brackets.split(str.replace(RE_DQUOTE, '"'), 1);
+    var parts = brackets.split(str.replace(RE_DQUOTE, '"'), 1);
+    var qstr = parts.qblocks;
+    var expr;
 
     if (parts.length > 2 || parts[0]) {
       var i, j, list = [];
@@ -708,7 +861,7 @@ var tmpl = (function () {
       expr = _parseExpr(parts[1], 0, qstr);
     }
 
-    if (qstr[0]) {
+    if (qstr.length) {
       expr = expr.replace(RE_QBMARK, function (_, pos) {
         return qstr[pos]
           .replace(/\r/g, '\\r')
@@ -718,6 +871,7 @@ var tmpl = (function () {
     return expr
   }
 
+  var RE_CSNAME = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\u2057(\d+)~):/;
   var
     RE_BREND = {
       '(': /[()]/g,
@@ -728,11 +882,8 @@ var tmpl = (function () {
   function _parseExpr (expr, asText, qstr) {
 
     expr = expr
-          .replace(RE_QBLOCK, function (s, div) {
-            return s.length > 2 && !div ? CH_IDEXPR + (qstr.push(s) - 1) + '~' : s
-          })
-          .replace(/\s+/g, ' ').trim()
-          .replace(/\ ?([[\({},?\.:])\ ?/g, '$1');
+      .replace(/\s+/g, ' ').trim()
+      .replace(/\ ?([[\({},?\.:])\ ?/g, '$1');
 
     if (expr) {
       var
@@ -823,7 +974,7 @@ var tmpl = (function () {
     return expr
   }
 
-  _tmpl.version = brackets.version = 'v3.0.4';
+  _tmpl.version = brackets.version = 'v3.0.8';
 
   return _tmpl
 
@@ -1052,7 +1203,9 @@ var misc = Object.freeze({
 });
 
 var settings$1 = extend(Object.create(brackets.settings), {
-  skipAnonymousTags: true
+  skipAnonymousTags: true,
+  // handle the auto updates on any DOM event
+  autoUpdate: true
 });
 
 /**
@@ -1082,6 +1235,9 @@ function handleEvent(dom, handler, e) {
   e.item = item;
 
   handler.call(this, e);
+
+  // avoid auto updates
+  if (!settings$1.autoUpdate) { return }
 
   if (!e.preventUpdate) {
     var p = getImmediateCustomParentTag(this);
@@ -1312,7 +1468,7 @@ var IfExpr = {
     remAttr(dom, CONDITIONAL_DIRECTIVE);
     this.tag = tag;
     this.expr = expr;
-    this.stub = document.createTextNode('');
+    this.stub = createDOMPlaceholder();
     this.pristine = dom;
 
     var p = dom.parentNode;
@@ -2059,7 +2215,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.5.0';
+var version$1 = 'v3.6.0';
 
 
 var core = Object.freeze({
@@ -2491,10 +2647,6 @@ function initChildTag(child, opts, innerHTML, parent) {
   if (ptag !== parent)
     { arrayishAdd(parent.tags, tagName, tag); }
 
-  // empty the child node once we got its template
-  // to avoid that its children get compiled multiple times
-  opts.root.innerHTML = '';
-
   return tag
 }
 
@@ -2800,7 +2952,4058 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var riot$1 = unwrapExports(riot_1);
 
-var store$1 = createCommonjsModule(function (module, exports) {
+/**
+     * Array forEach
+     */
+    function forEach(arr, callback, thisObj) {
+        if (arr == null) {
+            return;
+        }
+        var i = -1,
+            len = arr.length;
+        while (++i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if ( callback.call(thisObj, arr[i], i, arr) === false ) {
+                break;
+            }
+        }
+    }
+
+    var forEach_1 = forEach;
+
+/* esr version 0.9.2 */
+/**
+     * Appends an array to the end of another.
+     * The first array will be modified.
+     */
+    function append(arr1, arr2) {
+        if (arr2 == null) {
+            return arr1;
+        }
+
+        var pad = arr1.length,
+            i = -1,
+            len = arr2.length;
+        while (++i < len) {
+            arr1[pad + i] = arr2[i];
+        }
+        return arr1;
+    }
+    var append_1 = append;
+
+/**
+     * Returns the first argument provided to it.
+     */
+    function identity(val){
+        return val;
+    }
+
+    var identity_1 = identity;
+
+/**
+     * Returns a function that gets a property of the passed object
+     */
+    function prop(name){
+        return function(obj){
+            return obj[name];
+        };
+    }
+
+    var prop_1 = prop;
+
+/**
+     * Safer Object.hasOwnProperty
+     */
+     function hasOwn(obj, prop){
+         return Object.prototype.hasOwnProperty.call(obj, prop);
+     }
+
+     var hasOwn_1 = hasOwn;
+
+var _hasDontEnumBug;
+var _dontEnums;
+
+    function checkDontEnum(){
+        _dontEnums = [
+                'toString',
+                'toLocaleString',
+                'valueOf',
+                'hasOwnProperty',
+                'isPrototypeOf',
+                'propertyIsEnumerable',
+                'constructor'
+            ];
+
+        _hasDontEnumBug = true;
+
+        for (var key in {'toString': null}) {
+            _hasDontEnumBug = false;
+        }
+    }
+
+    /**
+     * Similar to Array/forEach but works over object properties and fixes Don't
+     * Enum bug on IE.
+     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
+     */
+    function forIn(obj, fn, thisObj){
+        var key, i = 0;
+        // no need to check if argument is a real object that way we can use
+        // it for arrays, functions, date, etc.
+
+        //post-pone check till needed
+        if (_hasDontEnumBug == null) { checkDontEnum(); }
+
+        for (key in obj) {
+            if (exec(fn, obj, key, thisObj) === false) {
+                break;
+            }
+        }
+
+
+        if (_hasDontEnumBug) {
+            var ctor = obj.constructor,
+                isProto = !!ctor && obj === ctor.prototype;
+
+            while (key = _dontEnums[i++]) {
+                // For constructor, if it is a prototype object the constructor
+                // is always non-enumerable unless defined otherwise (and
+                // enumerated above).  For non-prototype objects, it will have
+                // to be defined on this object, since it cannot be defined on
+                // any prototype objects.
+                //
+                // For other [[DontEnum]] properties, check if the value is
+                // different than Object prototype value.
+                if (
+                    (key !== 'constructor' ||
+                        (!isProto && hasOwn_1(obj, key))) &&
+                    obj[key] !== Object.prototype[key]
+                ) {
+                    if (exec(fn, obj, key, thisObj) === false) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function exec(fn, obj, key, thisObj){
+        return fn.call(thisObj, obj[key], key, obj);
+    }
+
+    var forIn_1 = forIn;
+
+/**
+     * Similar to Array/forEach but works over object properties and fixes Don't
+     * Enum bug on IE.
+     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
+     */
+    function forOwn(obj, fn, thisObj){
+        forIn_1(obj, function(val, key){
+            if (hasOwn_1(obj, key)) {
+                return fn.call(thisObj, obj[key], key, obj);
+            }
+        });
+    }
+
+    var forOwn_1 = forOwn;
+
+var _rKind = /^\[object (.*)\]$/;
+var _toString = Object.prototype.toString;
+var UNDEF$1;
+
+    /**
+     * Gets the "kind" of value. (e.g. "String", "Number", etc)
+     */
+    function kindOf(val) {
+        if (val === null) {
+            return 'Null';
+        } else if (val === UNDEF$1) {
+            return 'Undefined';
+        } else {
+            return _rKind.exec( _toString.call(val) )[1];
+        }
+    }
+    var kindOf_1 = kindOf;
+
+/**
+     * Check if value is from a specific "kind".
+     */
+    function isKind(val, kind){
+        return kindOf_1(val) === kind;
+    }
+    var isKind_1 = isKind;
+
+/**
+     */
+    var isArray = Array.isArray || function (val) {
+        return isKind_1(val, 'Array');
+    };
+    var isArray_1 = isArray;
+
+function containsMatch(array, pattern) {
+        var i = -1, length = array.length;
+        while (++i < length) {
+            if (deepMatches(array[i], pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function matchArray(target, pattern) {
+        var i = -1, patternLength = pattern.length;
+        while (++i < patternLength) {
+            if (!containsMatch(target, pattern[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function matchObject(target, pattern) {
+        var result = true;
+        forOwn_1(pattern, function(val, key) {
+            if (!deepMatches(target[key], val)) {
+                // Return false to break out of forOwn early
+                return (result = false);
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Recursively check if the objects match.
+     */
+    function deepMatches(target, pattern){
+        if (target && typeof target === 'object' &&
+            pattern && typeof pattern === 'object') {
+            if (isArray_1(target) && isArray_1(pattern)) {
+                return matchArray(target, pattern);
+            } else {
+                return matchObject(target, pattern);
+            }
+        } else {
+            return target === pattern;
+        }
+    }
+
+    var deepMatches_1 = deepMatches;
+
+/**
+     * Converts argument into a valid iterator.
+     * Used internally on most array/object/collection methods that receives a
+     * callback/iterator providing a shortcut syntax.
+     */
+    function makeIterator(src, thisObj){
+        if (src == null) {
+            return identity_1;
+        }
+        switch(typeof src) {
+            case 'function':
+                // function is the first to improve perf (most common case)
+                // also avoid using `Function#call` if not needed, which boosts
+                // perf a lot in some cases
+                return (typeof thisObj !== 'undefined')? function(val, i, arr){
+                    return src.call(thisObj, val, i, arr);
+                } : src;
+            case 'object':
+                return function(val){
+                    return deepMatches_1(val, src);
+                };
+            case 'string':
+            case 'number':
+                return prop_1(src);
+        }
+    }
+
+    var makeIterator_ = makeIterator;
+
+/**
+     * Maps the items in the array and concatenates the result arrays.
+     */
+    function collect(arr, callback, thisObj){
+        callback = makeIterator_(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            var value = callback(arr[i], i, arr);
+            if (value != null) {
+                append_1(results, value);
+            }
+        }
+
+        return results;
+    }
+
+    var collect_1 = collect;
+
+/**
+     * Array.indexOf
+     */
+    function indexOf(arr, item, fromIndex) {
+        fromIndex = fromIndex || 0;
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length,
+            i = fromIndex < 0 ? len + fromIndex : fromIndex;
+        while (i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[i] === item) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    var indexOf_1 = indexOf;
+
+/**
+     * Combines an array with all the items of another.
+     * Does not allow duplicates and is case and type sensitive.
+     */
+    function combine(arr1, arr2) {
+        if (arr2 == null) {
+            return arr1;
+        }
+
+        var i = -1, len = arr2.length;
+        while (++i < len) {
+            if (indexOf_1(arr1, arr2[i]) === -1) {
+                arr1.push(arr2[i]);
+            }
+        }
+
+        return arr1;
+    }
+    var combine_1 = combine;
+
+/**
+     * Array filter
+     */
+    function filter(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var filter_1 = filter;
+
+/**
+     * Remove all null/undefined items from array.
+     */
+    function compact(arr) {
+        return filter_1(arr, function(val){
+            return (val != null);
+        });
+    }
+
+    var compact_1 = compact;
+
+/**
+     * If array contains values.
+     */
+    function contains(arr, val) {
+        return indexOf_1(arr, val) !== -1;
+    }
+    var contains_1 = contains;
+
+/**
+     * @return {array} Array of unique items
+     */
+    function unique(arr, compare){
+        compare = compare || isEqual;
+        return filter_1(arr, function(item, i, arr){
+            var n = arr.length;
+            while (++i < n) {
+                if ( compare(item, arr[i]) ) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    function isEqual(a, b){
+        return a === b;
+    }
+
+    var unique_1 = unique;
+
+/**
+     * Array some
+     */
+    function some(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var result = false;
+        if (arr == null) {
+            return result;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if ( callback(arr[i], i, arr) ) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    var some_1 = some;
+
+/**
+     * Create slice of source array or array-like object
+     */
+    function slice(arr, start, end){
+        var len = arr.length;
+
+        if (start == null) {
+            start = 0;
+        } else if (start < 0) {
+            start = Math.max(len + start, 0);
+        } else {
+            start = Math.min(start, len);
+        }
+
+        if (end == null) {
+            end = len;
+        } else if (end < 0) {
+            end = Math.max(len + end, 0);
+        } else {
+            end = Math.min(end, len);
+        }
+
+        var result = [];
+        while (start < end) {
+            result.push(arr[start++]);
+        }
+
+        return result;
+    }
+
+    var slice_1 = slice;
+
+/**
+     * Return a new Array with elements that aren't present in the other Arrays.
+     */
+    function difference(arr) {
+        var arrs = slice_1(arguments, 1),
+            result = filter_1(unique_1(arr), function(needle){
+                return !some_1(arrs, function(haystack){
+                    return contains_1(haystack, needle);
+                });
+            });
+        return result;
+    }
+
+    var difference_1 = difference;
+
+/**
+     * Check if both arguments are egal.
+     */
+    function is(x, y){
+        // implementation borrowed from harmony:egal spec
+        if (x === y) {
+          // 0 === -0, but they are not identical
+          return x !== 0 || 1 / x === 1 / y;
+        }
+
+        // NaN !== NaN, but they are identical.
+        // NaNs are the only non-reflexive value, i.e., if x !== x,
+        // then x is a NaN.
+        // isNaN is broken: it converts its argument to number, so
+        // isNaN("foo") => true
+        return x !== x && y !== y;
+    }
+
+    var is_1 = is;
+
+/**
+     * Array every
+     */
+    function every(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var result = true;
+        if (arr == null) {
+            return result;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (!callback(arr[i], i, arr) ) {
+                result = false;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    var every_1 = every;
+
+/**
+     * Compares if both arrays have the same elements
+     */
+    function equals(a, b, callback){
+        callback = callback || is_1;
+
+        if (!isArray_1(a) || !isArray_1(b)) {
+            return callback(a, b);
+        }
+
+        if (a.length !== b.length) {
+            return false;
+        }
+
+        return every_1(a, makeCompare(callback), b);
+    }
+
+    function makeCompare(callback) {
+        return function(value, i) {
+            return i in this && callback(value, this[i]);
+        };
+    }
+
+    var equals_1 = equals;
+
+/**
+     * Returns the index of the first item that matches criteria
+     */
+    function findIndex(arr, iterator, thisObj){
+        iterator = makeIterator_(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (iterator(arr[i], i, arr)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    var findIndex_1 = findIndex;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find(arr, iterator, thisObj){
+        var idx = findIndex_1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var find_1 = find;
+
+/**
+     * Returns the index of the last item that matches criteria
+     */
+    function findLastIndex(arr, iterator, thisObj){
+        iterator = makeIterator_(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var n = arr.length;
+        while (--n >= 0) {
+            if (iterator(arr[n], n, arr)) {
+                return n;
+            }
+        }
+
+        return -1;
+    }
+
+    var findLastIndex_1 = findLastIndex;
+
+/**
+     * Returns last item that matches criteria
+     */
+    function findLast(arr, iterator, thisObj){
+        var idx = findLastIndex_1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var findLast_1 = findLast;
+
+/*
+     * Helper function to flatten to a destination array.
+     * Used to remove the need to create intermediate arrays while flattening.
+     */
+    function flattenTo(arr, result, level) {
+        if (level === 0) {
+            append_1(result, arr);
+            return result;
+        }
+
+        var value,
+            i = -1,
+            len = arr.length;
+        while (++i < len) {
+            value = arr[i];
+            if (isArray_1(value)) {
+                flattenTo(value, result, level - 1);
+            } else {
+                result.push(value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Recursively flattens an array.
+     * A new array containing all the elements is returned.
+     * If level is specified, it will only flatten up to that level.
+     */
+    function flatten(arr, level) {
+        if (arr == null) {
+            return [];
+        }
+
+        level = level == null ? -1 : level;
+        return flattenTo(arr, [], level);
+    }
+
+    var flatten_1 = flatten;
+
+/**
+     * Array forEach
+     */
+    function forEach$2(arr, callback, thisObj) {
+        if (arr == null) {
+            return;
+        }
+        var i = -1,
+            len = arr.length;
+        while (++i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if ( callback.call(thisObj, arr[i], i, arr) === false ) {
+                break;
+            }
+        }
+    }
+
+    var forEach_1$1 = forEach$2;
+
+/**
+     * Bucket the array values.
+     */
+    function groupBy(arr, categorize, thisObj) {
+        if (categorize) {
+            categorize = makeIterator_(categorize, thisObj);
+        } else {
+            // Default to identity function.
+            categorize = identity_1;
+        }
+
+        var buckets = {};
+        forEach_1$1(arr, function(element) {
+            var bucket = categorize(element);
+            if (!(bucket in buckets)) {
+                buckets[bucket] = [];
+            }
+
+            buckets[bucket].push(element);
+        });
+
+        return buckets;
+    }
+
+    var groupBy_1 = groupBy;
+
+/**
+     * Array indicesOf
+     */
+    function indicesOf(arr, item, fromIndex) {
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        fromIndex = typeof fromIndex === 'number' ? fromIndex : 0;
+
+        var length = arr.length;
+        var cursor = fromIndex >= 0 ? fromIndex : length + fromIndex;
+
+        while (cursor < length) {
+            if (arr[cursor] === item) {
+                results.push(cursor);
+            }
+            cursor++;
+        }
+
+        return results;
+    }
+
+    var indicesOf_1 = indicesOf;
+
+/**
+     * Insert item into array if not already present.
+     */
+    function insert(arr, rest_items) {
+        var diff = difference_1(slice_1(arguments, 1), arr);
+        if (diff.length) {
+            Array.prototype.push.apply(arr, diff);
+        }
+        return arr.length;
+    }
+    var insert_1 = insert;
+
+/**
+     * Return a new Array with elements common to all Arrays.
+     * - based on underscore.js implementation
+     */
+    function intersection(arr) {
+        var arrs = slice_1(arguments, 1),
+            result = filter_1(unique_1(arr), function(needle){
+                return every_1(arrs, function(haystack){
+                    return contains_1(haystack, needle);
+                });
+            });
+        return result;
+    }
+
+    var intersection_1 = intersection;
+
+/**
+     * Call `methodName` on each item of the array passing custom arguments if
+     * needed.
+     */
+    function invoke(arr, methodName, var_args){
+        if (arr == null) {
+            return arr;
+        }
+
+        var args = slice_1(arguments, 2);
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            value[methodName].apply(value, args);
+        }
+
+        return arr;
+    }
+
+    var invoke_1 = invoke;
+
+function isValidString(val) {
+        return (val != null && val !== '');
+    }
+
+    /**
+     * Joins strings with the specified separator inserted between each value.
+     * Null values and empty strings will be excluded.
+     */
+    function join(items, separator) {
+        separator = separator || '';
+        return filter_1(items, isValidString).join(separator);
+    }
+
+    var join_1 = join;
+
+/**
+     * Returns last element of array.
+     */
+    function last(arr){
+        if (arr == null || arr.length < 1) {
+            return undefined;
+        }
+
+        return arr[arr.length - 1];
+    }
+
+    var last_1 = last;
+
+/**
+     * Array lastIndexOf
+     */
+    function lastIndexOf(arr, item, fromIndex) {
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length;
+        fromIndex = (fromIndex == null || fromIndex >= len)? len - 1 : fromIndex;
+        fromIndex = (fromIndex < 0)? len + fromIndex : fromIndex;
+
+        while (fromIndex >= 0) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[fromIndex] === item) {
+                return fromIndex;
+            }
+            fromIndex--;
+        }
+
+        return -1;
+    }
+
+    var lastIndexOf_1 = lastIndexOf;
+
+/**
+     * Array map
+     */
+    function map(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var results = [];
+        if (arr == null){
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            results[i] = callback(arr[i], i, arr);
+        }
+
+        return results;
+    }
+
+     var map_1 = map;
+
+/**
+     * Return maximum value inside array
+     */
+    function max(arr, iterator, thisObj){
+        if (arr == null || !arr.length) {
+            return Infinity;
+        } else if (arr.length && !iterator) {
+            return Math.max.apply(Math, arr);
+        } else {
+            iterator = makeIterator_(iterator, thisObj);
+            var result,
+                compare = -Infinity,
+                value,
+                temp;
+
+            var i = -1, len = arr.length;
+            while (++i < len) {
+                value = arr[i];
+                temp = iterator(value, i, arr);
+                if (temp > compare) {
+                    compare = temp;
+                    result = value;
+                }
+            }
+
+            return result;
+        }
+    }
+
+    var max_1 = max;
+
+/**
+     * Return minimum value inside array
+     */
+    function min(arr, iterator, thisObj){
+        if (arr == null || !arr.length) {
+            return -Infinity;
+        } else if (arr.length && !iterator) {
+            return Math.min.apply(Math, arr);
+        } else {
+            iterator = makeIterator_(iterator, thisObj);
+            var result,
+                compare = Infinity,
+                value,
+                temp;
+
+            var i = -1, len = arr.length;
+            while (++i < len) {
+                value = arr[i];
+                temp = iterator(value, i, arr);
+                if (temp < compare) {
+                    compare = temp;
+                    result = value;
+                }
+            }
+
+            return result;
+        }
+    }
+
+    var min_1 = min;
+
+/**
+ * @constant Minimum 32-bit signed integer value (-2^31).
+ */
+
+    var MIN_INT = -2147483648;
+
+/**
+ * @constant Maximum 32-bit signed integer value. (2^31 - 1)
+ */
+
+    var MAX_INT = 2147483647;
+
+/**
+     * Just a wrapper to Math.random. No methods inside mout/random should call
+     * Math.random() directly so we can inject the pseudo-random number
+     * generator if needed (ie. in case we need a seeded random or a better
+     * algorithm than the native one)
+     */
+    function random(){
+        return random.get();
+    }
+
+    // we expose the method so it can be swapped if needed
+    random.get = Math.random;
+
+    var random_1 = random;
+
+/**
+     * Returns random number inside range
+     */
+    function rand(min, max){
+        min = min == null? MIN_INT : min;
+        max = max == null? MAX_INT : max;
+        return min + (max - min) * random_1();
+    }
+
+    var rand_1 = rand;
+
+/**
+     * Gets random integer inside range or snap to min/max values.
+     */
+    function randInt(min, max){
+        min = min == null? MIN_INT : ~~min;
+        max = max == null? MAX_INT : ~~max;
+        // can't be max + 0.5 otherwise it will round up if `rand`
+        // returns `max` causing it to overflow range.
+        // -0.5 and + 0.49 are required to avoid bias caused by rounding
+        return Math.round( rand_1(min - 0.5, max + 0.499999999999) );
+    }
+
+    var randInt_1 = randInt;
+
+/**
+     * Remove random item(s) from the Array and return it.
+     * Returns an Array of items if [nItems] is provided or a single item if
+     * it isn't specified.
+     */
+    function pick(arr, nItems){
+        if (nItems != null) {
+            var result = [];
+            if (nItems > 0 && arr && arr.length) {
+                nItems = nItems > arr.length? arr.length : nItems;
+                while (nItems--) {
+                    result.push( pickOne(arr) );
+                }
+            }
+            return result;
+        }
+        return (arr && arr.length)? pickOne(arr) : void(0);
+    }
+
+
+    function pickOne(arr){
+        var idx = randInt_1(0, arr.length - 1);
+        return arr.splice(idx, 1)[0];
+    }
+
+
+    var pick_1 = pick;
+
+/**
+     * Extract a list of property values.
+     */
+    function pluck(arr, propName){
+        return map_1(arr, propName);
+    }
+
+    var pluck_1 = pluck;
+
+/**
+    * Count number of full steps.
+    */
+    function countSteps(val, step, overflow){
+        val = Math.floor(val / step);
+
+        if (overflow) {
+            return val % overflow;
+        }
+
+        return val;
+    }
+
+    var countSteps_1 = countSteps;
+
+/**
+     * Returns an Array of numbers inside range.
+     */
+    function range(start, stop, step) {
+        if (stop == null) {
+            stop = start;
+            start = 0;
+        }
+        step = step || 1;
+
+        var result = [],
+            nSteps = countSteps_1(stop - start, step),
+            i = start;
+
+        while (i <= stop) {
+            result.push(i);
+            i += step;
+        }
+
+        return result;
+    }
+
+    var range_1 = range;
+
+/**
+     * Array reduce
+     */
+    function reduce(arr, fn, initVal) {
+        // check for args.length since initVal might be "undefined" see #gh-57
+        var hasInit = arguments.length > 2,
+            result = initVal;
+
+        if (arr == null || !arr.length) {
+            if (!hasInit) {
+                throw new Error('reduce of empty array with no initial value');
+            } else {
+                return initVal;
+            }
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (!hasInit) {
+                result = arr[i];
+                hasInit = true;
+            } else {
+                result = fn(result, arr[i], i, arr);
+            }
+        }
+
+        return result;
+    }
+
+    var reduce_1 = reduce;
+
+/**
+     * Array reduceRight
+     */
+    function reduceRight(arr, fn, initVal) {
+        // check for args.length since initVal might be "undefined" see #gh-57
+        var hasInit = arguments.length > 2;
+
+        if (arr == null || !arr.length) {
+            if (hasInit) {
+                return initVal;
+            } else {
+                throw new Error('reduce of empty array with no initial value');
+            }
+        }
+
+        var i = arr.length, result = initVal, value;
+        while (--i >= 0) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            value = arr[i];
+            if (!hasInit) {
+                result = value;
+                hasInit = true;
+            } else {
+                result = fn(result, value, i, arr);
+            }
+        }
+        return result;
+    }
+
+    var reduceRight_1 = reduceRight;
+
+/**
+     * Array reject
+     */
+    function reject(arr, callback, thisObj) {
+        callback = makeIterator_(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (!callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var reject_1 = reject;
+
+/**
+     * Remove a single item from the array.
+     * (it won't remove duplicates, just a single item)
+     */
+    function remove(arr, item){
+        var idx = indexOf_1(arr, item);
+        if (idx !== -1) { arr.splice(idx, 1); }
+    }
+
+    var remove_1 = remove;
+
+/**
+     * Remove all instances of an item from array.
+     */
+    function removeAll(arr, item){
+        var idx = indexOf_1(arr, item);
+        while (idx !== -1) {
+            arr.splice(idx, 1);
+            idx = indexOf_1(arr, item, idx);
+        }
+    }
+
+    var removeAll_1 = removeAll;
+
+/**
+     * Returns a copy of the array in reversed order.
+     */
+    function reverse(array) {
+        var copy = array.slice();
+        copy.reverse();
+        return copy;
+    }
+
+    var reverse_1 = reverse;
+
+/**
+     * Shuffle array items.
+     */
+    function shuffle(arr) {
+        var results = [],
+            rnd;
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (!i) {
+                results[0] = arr[0];
+            } else {
+                rnd = randInt_1(0, i);
+                results[i] = results[rnd];
+                results[rnd] = arr[i];
+            }
+        }
+
+        return results;
+    }
+
+    var shuffle_1 = shuffle;
+
+/**
+     * Merge sort (http://en.wikipedia.org/wiki/Merge_sort)
+     */
+    function mergeSort(arr, compareFn) {
+        if (arr == null) {
+            return [];
+        } else if (arr.length < 2) {
+            return arr;
+        }
+
+        if (compareFn == null) {
+            compareFn = defaultCompare;
+        }
+
+        var mid, left, right;
+
+        mid   = ~~(arr.length / 2);
+        left  = mergeSort( arr.slice(0, mid), compareFn );
+        right = mergeSort( arr.slice(mid, arr.length), compareFn );
+
+        return merge(left, right, compareFn);
+    }
+
+    function defaultCompare(a, b) {
+        return a < b ? -1 : (a > b? 1 : 0);
+    }
+
+    function merge(left, right, compareFn) {
+        var result = [];
+
+        while (left.length && right.length) {
+            if (compareFn(left[0], right[0]) <= 0) {
+                // if 0 it should preserve same order (stable)
+                result.push(left.shift());
+            } else {
+                result.push(right.shift());
+            }
+        }
+
+        if (left.length) {
+            result.push.apply(result, left);
+        }
+
+        if (right.length) {
+            result.push.apply(result, right);
+        }
+
+        return result;
+    }
+
+    var sort = mergeSort;
+
+/*
+     * Sort array by the result of the callback
+     */
+    function sortBy(arr, callback, context){
+        callback = makeIterator_(callback, context);
+
+        return sort(arr, function(a, b) {
+            a = callback(a);
+            b = callback(b);
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        });
+    }
+
+    var sortBy_1 = sortBy;
+
+/**
+     * Split array into a fixed number of segments.
+     */
+    function split(array, segments) {
+        segments = segments || 2;
+        var results = [];
+        if (array == null) {
+            return results;
+        }
+
+        var minLength = Math.floor(array.length / segments),
+            remainder = array.length % segments,
+            i = 0,
+            len = array.length,
+            segmentIndex = 0,
+            segmentLength;
+
+        while (i < len) {
+            segmentLength = minLength;
+            if (segmentIndex < remainder) {
+                segmentLength++;
+            }
+
+            results.push(array.slice(i, i + segmentLength));
+
+            segmentIndex++;
+            i += segmentLength;
+        }
+
+        return results;
+    }
+    var split_1 = split;
+
+/**
+     * Iterates over a callback a set amount of times
+     * returning the results
+     */
+    function take(n, callback, thisObj){
+        var i = -1;
+        var arr = [];
+        if( !thisObj ){
+            while(++i < n){
+                arr[i] = callback(i, n);
+            }
+        } else {
+            while(++i < n){
+                arr[i] = callback.call(thisObj, i, n);
+            }
+        }
+        return arr;
+    }
+
+    var take_1 = take;
+
+/**
+     */
+    function isFunction(val) {
+        return isKind_1(val, 'Function');
+    }
+    var isFunction_1 = isFunction;
+
+/**
+     * Creates an object that holds a lookup for the objects in the array.
+     */
+    function toLookup(arr, key) {
+        var result = {};
+        if (arr == null) {
+            return result;
+        }
+
+        var i = -1, len = arr.length, value;
+        if (isFunction_1(key)) {
+            while (++i < len) {
+                value = arr[i];
+                result[key(value)] = value;
+            }
+        } else {
+            while (++i < len) {
+                value = arr[i];
+                result[value[key]] = value;
+            }
+        }
+
+        return result;
+    }
+    var toLookup_1 = toLookup;
+
+/**
+     * Concat multiple arrays and remove duplicates
+     */
+    function union(arrs) {
+        var arguments$1 = arguments;
+
+        var results = [];
+        var i = -1, len = arguments.length;
+        while (++i < len) {
+            append_1(results, arguments$1[i]);
+        }
+
+        return unique_1(results);
+    }
+
+    var union_1 = union;
+
+/**
+     * Exclusive OR. Returns items that are present in a single array.
+     * - like ptyhon's `symmetric_difference`
+     */
+    function xor(arr1, arr2) {
+        arr1 = unique_1(arr1);
+        arr2 = unique_1(arr2);
+
+        var a1 = filter_1(arr1, function(item){
+                return !contains_1(arr2, item);
+            }),
+            a2 = filter_1(arr2, function(item){
+                return !contains_1(arr1, item);
+            });
+
+        return a1.concat(a2);
+    }
+
+    var xor_1 = xor;
+
+function getLength(arr) {
+        return arr == null ? 0 : arr.length;
+    }
+
+    /**
+     * Merges together the values of each of the arrays with the values at the
+     * corresponding position.
+     */
+    function zip(arr){
+        var arguments$1 = arguments;
+
+        var len = arr ? max_1(map_1(arguments, getLength)) : 0,
+            results = [],
+            i = -1;
+        while (++i < len) {
+            // jshint loopfunc: true
+            results.push(map_1(arguments$1, function(item) {
+                return item == null ? undefined : item[i];
+            }));
+        }
+
+        return results;
+    }
+
+    var zip_1 = zip;
+
+//automatically generated, do not edit!
+//run `node build` instead
+var array = {
+    'append' : append_1,
+    'collect' : collect_1,
+    'combine' : combine_1,
+    'compact' : compact_1,
+    'contains' : contains_1,
+    'difference' : difference_1,
+    'equals' : equals_1,
+    'every' : every_1,
+    'filter' : filter_1,
+    'find' : find_1,
+    'findIndex' : findIndex_1,
+    'findLast' : findLast_1,
+    'findLastIndex' : findLastIndex_1,
+    'flatten' : flatten_1,
+    'forEach' : forEach_1$1,
+    'groupBy' : groupBy_1,
+    'indexOf' : indexOf_1,
+    'indicesOf' : indicesOf_1,
+    'insert' : insert_1,
+    'intersection' : intersection_1,
+    'invoke' : invoke_1,
+    'join' : join_1,
+    'last' : last_1,
+    'lastIndexOf' : lastIndexOf_1,
+    'map' : map_1,
+    'max' : max_1,
+    'min' : min_1,
+    'pick' : pick_1,
+    'pluck' : pluck_1,
+    'range' : range_1,
+    'reduce' : reduce_1,
+    'reduceRight' : reduceRight_1,
+    'reject' : reject_1,
+    'remove' : remove_1,
+    'removeAll' : removeAll_1,
+    'reverse' : reverse_1,
+    'shuffle' : shuffle_1,
+    'slice' : slice_1,
+    'some' : some_1,
+    'sort' : sort,
+    'sortBy' : sortBy_1,
+    'split' : split_1,
+    'take' : take_1,
+    'toLookup' : toLookup_1,
+    'union' : union_1,
+    'unique' : unique_1,
+    'xor' : xor_1,
+    'zip' : zip_1
+};
+
+var array_1 = array.find;
+var array_2 = array.forEach;
+
+var index$1 = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+/**
+ * Expose `pathToRegexp`.
+ */
+var index = pathToRegexp;
+var parse_1 = parse;
+var compile_1 = compile;
+var tokensToFunction_1 = tokensToFunction;
+var tokensToRegExp_1 = tokensToRegExp;
+
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
+var PATH_REGEXP = new RegExp([
+  // Match escaped characters that would otherwise appear in future matches.
+  // This allows the user to escape special characters that won't transform.
+  '(\\\\.)',
+  // Match Express-style parameters and un-named parameters with a prefix
+  // and optional suffixes. Matches appear as:
+  //
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
+  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
+  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
+  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
+].join('|'), 'g');
+
+/**
+ * Parse a string for the raw tokens.
+ *
+ * @param  {string}  str
+ * @param  {Object=} options
+ * @return {!Array}
+ */
+function parse (str, options) {
+  var tokens = [];
+  var key = 0;
+  var index = 0;
+  var path = '';
+  var defaultDelimiter = options && options.delimiter || '/';
+  var res;
+
+  while ((res = PATH_REGEXP.exec(str)) != null) {
+    var m = res[0];
+    var escaped = res[1];
+    var offset = res.index;
+    path += str.slice(index, offset);
+    index = offset + m.length;
+
+    // Ignore already escaped sequences.
+    if (escaped) {
+      path += escaped[1];
+      continue
+    }
+
+    var next = str[index];
+    var prefix = res[2];
+    var name = res[3];
+    var capture = res[4];
+    var group = res[5];
+    var modifier = res[6];
+    var asterisk = res[7];
+
+    // Push the current path onto the tokens.
+    if (path) {
+      tokens.push(path);
+      path = '';
+    }
+
+    var partial = prefix != null && next != null && next !== prefix;
+    var repeat = modifier === '+' || modifier === '*';
+    var optional = modifier === '?' || modifier === '*';
+    var delimiter = res[2] || defaultDelimiter;
+    var pattern = capture || group;
+
+    tokens.push({
+      name: name || key++,
+      prefix: prefix || '',
+      delimiter: delimiter,
+      optional: optional,
+      repeat: repeat,
+      partial: partial,
+      asterisk: !!asterisk,
+      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
+    });
+  }
+
+  // Match any characters still remaining.
+  if (index < str.length) {
+    path += str.substr(index);
+  }
+
+  // If the path exists, push it onto the end.
+  if (path) {
+    tokens.push(path);
+  }
+
+  return tokens
+}
+
+/**
+ * Compile a string to a template function for the path.
+ *
+ * @param  {string}             str
+ * @param  {Object=}            options
+ * @return {!function(Object=, Object=)}
+ */
+function compile (str, options) {
+  return tokensToFunction(parse(str, options))
+}
+
+/**
+ * Prettier encoding of URI path segments.
+ *
+ * @param  {string}
+ * @return {string}
+ */
+function encodeURIComponentPretty (str) {
+  return encodeURI(str).replace(/[\/?#]/g, function (c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  })
+}
+
+/**
+ * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
+ *
+ * @param  {string}
+ * @return {string}
+ */
+function encodeAsterisk (str) {
+  return encodeURI(str).replace(/[?#]/g, function (c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  })
+}
+
+/**
+ * Expose a method for transforming tokens into the path function.
+ */
+function tokensToFunction (tokens) {
+  // Compile all the tokens into regexps.
+  var matches = new Array(tokens.length);
+
+  // Compile all the patterns before compilation.
+  for (var i = 0; i < tokens.length; i++) {
+    if (typeof tokens[i] === 'object') {
+      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$');
+    }
+  }
+
+  return function (obj, opts) {
+    var path = '';
+    var data = obj || {};
+    var options = opts || {};
+    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent;
+
+    for (var i = 0; i < tokens.length; i++) {
+      var token = tokens[i];
+
+      if (typeof token === 'string') {
+        path += token;
+
+        continue
+      }
+
+      var value = data[token.name];
+      var segment;
+
+      if (value == null) {
+        if (token.optional) {
+          // Prepend partial segment prefixes.
+          if (token.partial) {
+            path += token.prefix;
+          }
+
+          continue
+        } else {
+          throw new TypeError('Expected "' + token.name + '" to be defined')
+        }
+      }
+
+      if (index$1(value)) {
+        if (!token.repeat) {
+          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
+        }
+
+        if (value.length === 0) {
+          if (token.optional) {
+            continue
+          } else {
+            throw new TypeError('Expected "' + token.name + '" to not be empty')
+          }
+        }
+
+        for (var j = 0; j < value.length; j++) {
+          segment = encode(value[j]);
+
+          if (!matches[i].test(segment)) {
+            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
+          }
+
+          path += (j === 0 ? token.prefix : token.delimiter) + segment;
+        }
+
+        continue
+      }
+
+      segment = token.asterisk ? encodeAsterisk(value) : encode(value);
+
+      if (!matches[i].test(segment)) {
+        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
+      }
+
+      path += token.prefix + segment;
+    }
+
+    return path
+  }
+}
+
+/**
+ * Escape a regular expression string.
+ *
+ * @param  {string} str
+ * @return {string}
+ */
+function escapeString (str) {
+  return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
+}
+
+/**
+ * Escape the capturing group by escaping special characters and meaning.
+ *
+ * @param  {string} group
+ * @return {string}
+ */
+function escapeGroup (group) {
+  return group.replace(/([=!:$\/()])/g, '\\$1')
+}
+
+/**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {!RegExp} re
+ * @param  {Array}   keys
+ * @return {!RegExp}
+ */
+function attachKeys (re, keys) {
+  re.keys = keys;
+  return re
+}
+
+/**
+ * Get the flags for a regexp from the options.
+ *
+ * @param  {Object} options
+ * @return {string}
+ */
+function flags (options) {
+  return options.sensitive ? '' : 'i'
+}
+
+/**
+ * Pull out keys from a regexp.
+ *
+ * @param  {!RegExp} path
+ * @param  {!Array}  keys
+ * @return {!RegExp}
+ */
+function regexpToRegexp (path, keys) {
+  // Use a negative lookahead to match only capturing groups.
+  var groups = path.source.match(/\((?!\?)/g);
+
+  if (groups) {
+    for (var i = 0; i < groups.length; i++) {
+      keys.push({
+        name: i,
+        prefix: null,
+        delimiter: null,
+        optional: false,
+        repeat: false,
+        partial: false,
+        asterisk: false,
+        pattern: null
+      });
+    }
+  }
+
+  return attachKeys(path, keys)
+}
+
+/**
+ * Transform an array into a regexp.
+ *
+ * @param  {!Array}  path
+ * @param  {Array}   keys
+ * @param  {!Object} options
+ * @return {!RegExp}
+ */
+function arrayToRegexp (path, keys, options) {
+  var parts = [];
+
+  for (var i = 0; i < path.length; i++) {
+    parts.push(pathToRegexp(path[i], keys, options).source);
+  }
+
+  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
+
+  return attachKeys(regexp, keys)
+}
+
+/**
+ * Create a path regexp from string input.
+ *
+ * @param  {string}  path
+ * @param  {!Array}  keys
+ * @param  {!Object} options
+ * @return {!RegExp}
+ */
+function stringToRegexp (path, keys, options) {
+  return tokensToRegExp(parse(path, options), keys, options)
+}
+
+/**
+ * Expose a function for taking tokens and returning a RegExp.
+ *
+ * @param  {!Array}          tokens
+ * @param  {(Array|Object)=} keys
+ * @param  {Object=}         options
+ * @return {!RegExp}
+ */
+function tokensToRegExp (tokens, keys, options) {
+  if (!index$1(keys)) {
+    options = /** @type {!Object} */ (keys || options);
+    keys = [];
+  }
+
+  options = options || {};
+
+  var strict = options.strict;
+  var end = options.end !== false;
+  var route = '';
+
+  // Iterate over the tokens and create our regexp string.
+  for (var i = 0; i < tokens.length; i++) {
+    var token = tokens[i];
+
+    if (typeof token === 'string') {
+      route += escapeString(token);
+    } else {
+      var prefix = escapeString(token.prefix);
+      var capture = '(?:' + token.pattern + ')';
+
+      keys.push(token);
+
+      if (token.repeat) {
+        capture += '(?:' + prefix + capture + ')*';
+      }
+
+      if (token.optional) {
+        if (!token.partial) {
+          capture = '(?:' + prefix + '(' + capture + '))?';
+        } else {
+          capture = prefix + '(' + capture + ')?';
+        }
+      } else {
+        capture = prefix + '(' + capture + ')';
+      }
+
+      route += capture;
+    }
+  }
+
+  var delimiter = escapeString(options.delimiter || '/');
+  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter;
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
+  // match already ends with a slash, we remove it for consistency. The slash
+  // is valid at the end of a path match, not in the middle. This is important
+  // in non-ending mode, where "/test/" shouldn't match "/test//route".
+  if (!strict) {
+    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?';
+  }
+
+  if (end) {
+    route += '$';
+  } else {
+    // In non-ending mode, we need the capturing groups to match as much as
+    // possible by using a positive lookahead to the end or next path segment.
+    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)';
+  }
+
+  return attachKeys(new RegExp('^' + route, flags(options)), keys)
+}
+
+/**
+ * Normalize the given path string, returning a regular expression.
+ *
+ * An empty array can be passed in for the keys, which will hold the
+ * placeholder key descriptions. For example, using `/user/:id`, `keys` will
+ * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
+ *
+ * @param  {(string|RegExp|Array)} path
+ * @param  {(Array|Object)=}       keys
+ * @param  {Object=}               options
+ * @return {!RegExp}
+ */
+function pathToRegexp (path, keys, options) {
+  if (!index$1(keys)) {
+    options = /** @type {!Object} */ (keys || options);
+    keys = [];
+  }
+
+  options = options || {};
+
+  if (path instanceof RegExp) {
+    return regexpToRegexp(path, /** @type {!Array} */ (keys))
+  }
+
+  if (index$1(path)) {
+    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
+  }
+
+  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
+}
+
+index.parse = parse_1;
+index.compile = compile_1;
+index.tokensToFunction = tokensToFunction_1;
+index.tokensToRegExp = tokensToRegExp_1;
+
+var commonjsGlobal$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+
+
+function unwrapExports$1 (x) {
+	return x && x.__esModule ? x['default'] : x;
+}
+
+function createCommonjsModule$1(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var promise = createCommonjsModule$1(function (module) {
+(function (root) {
+
+  // Store setTimeout reference so promise-polyfill will be unaffected by
+  // other code modifying setTimeout (like sinon.useFakeTimers())
+  var setTimeoutFunc = setTimeout;
+
+  function noop() {}
+  
+  // Polyfill for Function.prototype.bind
+  function bind(fn, thisArg) {
+    return function () {
+      fn.apply(thisArg, arguments);
+    };
+  }
+
+  function Promise(fn) {
+    if (typeof this !== 'object') { throw new TypeError('Promises must be constructed via new'); }
+    if (typeof fn !== 'function') { throw new TypeError('not a function'); }
+    this._state = 0;
+    this._handled = false;
+    this._value = undefined;
+    this._deferreds = [];
+
+    doResolve(fn, this);
+  }
+
+  function handle(self, deferred) {
+    while (self._state === 3) {
+      self = self._value;
+    }
+    if (self._state === 0) {
+      self._deferreds.push(deferred);
+      return;
+    }
+    self._handled = true;
+    Promise._immediateFn(function () {
+      var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+      if (cb === null) {
+        (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+        return;
+      }
+      var ret;
+      try {
+        ret = cb(self._value);
+      } catch (e) {
+        reject(deferred.promise, e);
+        return;
+      }
+      resolve(deferred.promise, ret);
+    });
+  }
+
+  function resolve(self, newValue) {
+    try {
+      // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+      if (newValue === self) { throw new TypeError('A promise cannot be resolved with itself.'); }
+      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+        var then = newValue.then;
+        if (newValue instanceof Promise) {
+          self._state = 3;
+          self._value = newValue;
+          finale(self);
+          return;
+        } else if (typeof then === 'function') {
+          doResolve(bind(then, newValue), self);
+          return;
+        }
+      }
+      self._state = 1;
+      self._value = newValue;
+      finale(self);
+    } catch (e) {
+      reject(self, e);
+    }
+  }
+
+  function reject(self, newValue) {
+    self._state = 2;
+    self._value = newValue;
+    finale(self);
+  }
+
+  function finale(self) {
+    if (self._state === 2 && self._deferreds.length === 0) {
+      Promise._immediateFn(function() {
+        if (!self._handled) {
+          Promise._unhandledRejectionFn(self._value);
+        }
+      });
+    }
+
+    for (var i = 0, len = self._deferreds.length; i < len; i++) {
+      handle(self, self._deferreds[i]);
+    }
+    self._deferreds = null;
+  }
+
+  function Handler(onFulfilled, onRejected, promise) {
+    this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+    this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+    this.promise = promise;
+  }
+
+  /**
+   * Take a potentially misbehaving resolver function and make sure
+   * onFulfilled and onRejected are only called once.
+   *
+   * Makes no guarantees about asynchrony.
+   */
+  function doResolve(fn, self) {
+    var done = false;
+    try {
+      fn(function (value) {
+        if (done) { return; }
+        done = true;
+        resolve(self, value);
+      }, function (reason) {
+        if (done) { return; }
+        done = true;
+        reject(self, reason);
+      });
+    } catch (ex) {
+      if (done) { return; }
+      done = true;
+      reject(self, ex);
+    }
+  }
+
+  Promise.prototype['catch'] = function (onRejected) {
+    return this.then(null, onRejected);
+  };
+
+  Promise.prototype.then = function (onFulfilled, onRejected) {
+    var prom = new (this.constructor)(noop);
+
+    handle(this, new Handler(onFulfilled, onRejected, prom));
+    return prom;
+  };
+
+  Promise.all = function (arr) {
+    var args = Array.prototype.slice.call(arr);
+
+    return new Promise(function (resolve, reject) {
+      if (args.length === 0) { return resolve([]); }
+      var remaining = args.length;
+
+      function res(i, val) {
+        try {
+          if (val && (typeof val === 'object' || typeof val === 'function')) {
+            var then = val.then;
+            if (typeof then === 'function') {
+              then.call(val, function (val) {
+                res(i, val);
+              }, reject);
+              return;
+            }
+          }
+          args[i] = val;
+          if (--remaining === 0) {
+            resolve(args);
+          }
+        } catch (ex) {
+          reject(ex);
+        }
+      }
+
+      for (var i = 0; i < args.length; i++) {
+        res(i, args[i]);
+      }
+    });
+  };
+
+  Promise.resolve = function (value) {
+    if (value && typeof value === 'object' && value.constructor === Promise) {
+      return value;
+    }
+
+    return new Promise(function (resolve) {
+      resolve(value);
+    });
+  };
+
+  Promise.reject = function (value) {
+    return new Promise(function (resolve, reject) {
+      reject(value);
+    });
+  };
+
+  Promise.race = function (values) {
+    return new Promise(function (resolve, reject) {
+      for (var i = 0, len = values.length; i < len; i++) {
+        values[i].then(resolve, reject);
+      }
+    });
+  };
+
+  // Use polyfill for setImmediate for performance gains
+  Promise._immediateFn = (typeof setImmediate === 'function' && function (fn) { setImmediate(fn); }) ||
+    function (fn) {
+      setTimeoutFunc(fn, 0);
+    };
+
+  Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+    if (typeof console !== 'undefined' && console) {
+      console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
+    }
+  };
+
+  /**
+   * Set the immediate function to execute callbacks
+   * @param fn {function} Function to execute
+   * @deprecated
+   */
+  Promise._setImmediateFn = function _setImmediateFn(fn) {
+    Promise._immediateFn = fn;
+  };
+
+  /**
+   * Change the function to execute on unhandled rejection
+   * @param {function} fn Function to execute on unhandled rejection
+   * @deprecated
+   */
+  Promise._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
+    Promise._unhandledRejectionFn = fn;
+  };
+  
+  if ('object' !== 'undefined' && module.exports) {
+    module.exports = Promise;
+  } else if (!root.Promise) {
+    root.Promise = Promise;
+  }
+
+})(commonjsGlobal$1);
+});
+
+/**
+ * Copyright 2014-2015, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ */
+
+/**
+ * Similar to invariant but only logs a warning if the condition is not met.
+ * This can be used to log issues in development environments in critical
+ * paths. Removing the logging code for production environments will keep the
+ * same logic and follow the same code paths.
+ */
+
+var warning = function() {};
+
+{
+  warning = function(condition, format, args) {
+    var arguments$1 = arguments;
+
+    var len = arguments.length;
+    args = new Array(len > 2 ? len - 2 : 0);
+    for (var key = 2; key < len; key++) {
+      args[key - 2] = arguments$1[key];
+    }
+    if (format === undefined) {
+      throw new Error(
+        '`warning(condition, format, ...args)` requires a warning ' +
+        'message argument'
+      );
+    }
+
+    if (format.length < 10 || (/^[s\W]*$/).test(format)) {
+      throw new Error(
+        'The warning format should be able to uniquely identify this ' +
+        'warning. Please, use a more descriptive format than: ' + format
+      );
+    }
+
+    if (!condition) {
+      var argIndex = 0;
+      var message = 'Warning: ' +
+        format.replace(/%s/g, function() {
+          return args[argIndex++];
+        });
+      if (typeof console !== 'undefined') {
+        console.error(message);
+      }
+      try {
+        // This error was thrown as a convenience so that you can use this stack
+        // to find the callsite that caused this warning to fire.
+        throw new Error(message);
+      } catch(x) {}
+    }
+  };
+}
+
+var browser = warning;
+
+/**
+ * Copyright 2013-2015, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ */
+
+/**
+ * Use invariant() to assert state which your program assumes to be true.
+ *
+ * Provide sprintf-style format (only %s is supported) and arguments
+ * to provide information about what broke and what you were
+ * expecting.
+ *
+ * The invariant message will be stripped in production, but the invariant
+ * will remain to ensure logic does not differ in production.
+ */
+
+var invariant = function(condition, format, a, b, c, d, e, f) {
+  {
+    if (format === undefined) {
+      throw new Error('invariant requires an error message argument');
+    }
+  }
+
+  if (!condition) {
+    var error;
+    if (format === undefined) {
+      error = new Error(
+        'Minified exception occurred; use the non-minified dev environment ' +
+        'for the full error message and additional helpful warnings.'
+      );
+    } else {
+      var args = [a, b, c, d, e, f];
+      var argIndex = 0;
+      error = new Error(
+        format.replace(/%s/g, function() { return args[argIndex++]; })
+      );
+      error.name = 'Invariant Violation';
+    }
+
+    error.framesToPop = 1; // we don't care about invariant's own frame
+    throw error;
+  }
+};
+
+var browser$1 = invariant;
+
+var isAbsolute = function isAbsolute(pathname) {
+  return pathname.charAt(0) === '/';
+};
+
+// About 1.5x faster than the two-arg version of Array#splice()
+var spliceOne = function spliceOne(list, index) {
+  for (var i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1) {
+    list[i] = list[k];
+  }list.pop();
+};
+
+// This implementation is based heavily on node's url.parse
+var resolvePathname = function resolvePathname(to) {
+  var from = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+  var toParts = to && to.split('/') || [];
+  var fromParts = from && from.split('/') || [];
+
+  var isToAbs = to && isAbsolute(to);
+  var isFromAbs = from && isAbsolute(from);
+  var mustEndAbs = isToAbs || isFromAbs;
+
+  if (to && isAbsolute(to)) {
+    // to is absolute
+    fromParts = toParts;
+  } else if (toParts.length) {
+    // to is relative, drop the filename
+    fromParts.pop();
+    fromParts = fromParts.concat(toParts);
+  }
+
+  if (!fromParts.length) { return '/'; }
+
+  var hasTrailingSlash = void 0;
+  if (fromParts.length) {
+    var last = fromParts[fromParts.length - 1];
+    hasTrailingSlash = last === '.' || last === '..' || last === '';
+  } else {
+    hasTrailingSlash = false;
+  }
+
+  var up = 0;
+  for (var i = fromParts.length; i >= 0; i--) {
+    var part = fromParts[i];
+
+    if (part === '.') {
+      spliceOne(fromParts, i);
+    } else if (part === '..') {
+      spliceOne(fromParts, i);
+      up++;
+    } else if (up) {
+      spliceOne(fromParts, i);
+      up--;
+    }
+  }
+
+  if (!mustEndAbs) { for (; up--; up) {
+    fromParts.unshift('..');
+  } }if (mustEndAbs && fromParts[0] !== '' && (!fromParts[0] || !isAbsolute(fromParts[0]))) { fromParts.unshift(''); }
+
+  var result = fromParts.join('/');
+
+  if (hasTrailingSlash && result.substr(-1) !== '/') { result += '/'; }
+
+  return result;
+};
+
+var index$3 = resolvePathname;
+
+var index$4 = createCommonjsModule$1(function (module, exports) {
+'use strict';
+
+exports.__esModule = true;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var valueEqual = function valueEqual(a, b) {
+  if (a === b) { return true; }
+
+  if (a == null || b == null) { return false; }
+
+  if (Array.isArray(a)) { return Array.isArray(b) && a.length === b.length && a.every(function (item, index) {
+    return valueEqual(item, b[index]);
+  }); }
+
+  var aType = typeof a === 'undefined' ? 'undefined' : _typeof(a);
+  var bType = typeof b === 'undefined' ? 'undefined' : _typeof(b);
+
+  if (aType !== bType) { return false; }
+
+  if (aType === 'object') {
+    var aValue = a.valueOf();
+    var bValue = b.valueOf();
+
+    if (aValue !== a || bValue !== b) { return valueEqual(aValue, bValue); }
+
+    var aKeys = Object.keys(a);
+    var bKeys = Object.keys(b);
+
+    if (aKeys.length !== bKeys.length) { return false; }
+
+    return aKeys.every(function (key) {
+      return valueEqual(a[key], b[key]);
+    });
+  }
+
+  return false;
+};
+
+exports.default = valueEqual;
+});
+
+var valueEqual = unwrapExports$1(index$4);
+
+var addLeadingSlash = function addLeadingSlash(path) {
+  return path.charAt(0) === '/' ? path : '/' + path;
+};
+
+var stripLeadingSlash = function stripLeadingSlash(path) {
+  return path.charAt(0) === '/' ? path.substr(1) : path;
+};
+
+var hasBasename = function hasBasename(path, prefix) {
+  return new RegExp('^' + prefix + '(\\/|\\?|#|$)', 'i').test(path);
+};
+
+var stripBasename = function stripBasename(path, prefix) {
+  return hasBasename(path, prefix) ? path.substr(prefix.length) : path;
+};
+
+var stripTrailingSlash = function stripTrailingSlash(path) {
+  return path.charAt(path.length - 1) === '/' ? path.slice(0, -1) : path;
+};
+
+var parsePath = function parsePath(path) {
+  var pathname = path || '/';
+  var search = '';
+  var hash = '';
+
+  var hashIndex = pathname.indexOf('#');
+  if (hashIndex !== -1) {
+    hash = pathname.substr(hashIndex);
+    pathname = pathname.substr(0, hashIndex);
+  }
+
+  var searchIndex = pathname.indexOf('?');
+  if (searchIndex !== -1) {
+    search = pathname.substr(searchIndex);
+    pathname = pathname.substr(0, searchIndex);
+  }
+
+  return {
+    pathname: pathname,
+    search: search === '?' ? '' : search,
+    hash: hash === '#' ? '' : hash
+  };
+};
+
+var createPath = function createPath(location) {
+  var pathname = location.pathname,
+      search = location.search,
+      hash = location.hash;
+
+
+  var path = pathname || '/';
+
+  if (search && search !== '?') { path += search.charAt(0) === '?' ? search : '?' + search; }
+
+  if (hash && hash !== '#') { path += hash.charAt(0) === '#' ? hash : '#' + hash; }
+
+  return path;
+};
+
+var _extends$1 = Object.assign || function (target) {
+var arguments$1 = arguments;
+ for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var createLocation = function createLocation(path, state, key, currentLocation) {
+  var location = void 0;
+  if (typeof path === 'string') {
+    // Two-arg form: push(path, state)
+    location = parsePath(path);
+    location.state = state;
+  } else {
+    // One-arg form: push(location)
+    location = _extends$1({}, path);
+
+    if (location.pathname === undefined) { location.pathname = ''; }
+
+    if (location.search) {
+      if (location.search.charAt(0) !== '?') { location.search = '?' + location.search; }
+    } else {
+      location.search = '';
+    }
+
+    if (location.hash) {
+      if (location.hash.charAt(0) !== '#') { location.hash = '#' + location.hash; }
+    } else {
+      location.hash = '';
+    }
+
+    if (state !== undefined && location.state === undefined) { location.state = state; }
+  }
+
+  try {
+    location.pathname = decodeURI(location.pathname);
+  } catch (e) {
+    if (e instanceof URIError) {
+      throw new URIError('Pathname "' + location.pathname + '" could not be decoded. ' + 'This is likely caused by an invalid percent-encoding.');
+    } else {
+      throw e;
+    }
+  }
+
+  if (key) { location.key = key; }
+
+  if (currentLocation) {
+    // Resolve incomplete/relative pathname relative to current location.
+    if (!location.pathname) {
+      location.pathname = currentLocation.pathname;
+    } else if (location.pathname.charAt(0) !== '/') {
+      location.pathname = index$3(location.pathname, currentLocation.pathname);
+    }
+  } else {
+    // When there is no prior location and pathname is empty, set it to /
+    if (!location.pathname) {
+      location.pathname = '/';
+    }
+  }
+
+  return location;
+};
+
+var locationsAreEqual = function locationsAreEqual(a, b) {
+  return a.pathname === b.pathname && a.search === b.search && a.hash === b.hash && a.key === b.key && valueEqual(a.state, b.state);
+};
+
+var createTransitionManager = function createTransitionManager() {
+  var prompt = null;
+
+  var setPrompt = function setPrompt(nextPrompt) {
+    browser(prompt == null, 'A history supports only one prompt at a time');
+
+    prompt = nextPrompt;
+
+    return function () {
+      if (prompt === nextPrompt) { prompt = null; }
+    };
+  };
+
+  var confirmTransitionTo = function confirmTransitionTo(location, action, getUserConfirmation, callback) {
+    // TODO: If another transition starts while we're still confirming
+    // the previous one, we may end up in a weird state. Figure out the
+    // best way to handle this.
+    if (prompt != null) {
+      var result = typeof prompt === 'function' ? prompt(location, action) : prompt;
+
+      if (typeof result === 'string') {
+        if (typeof getUserConfirmation === 'function') {
+          getUserConfirmation(result, callback);
+        } else {
+          browser(false, 'A history needs a getUserConfirmation function in order to use a prompt message');
+
+          callback(true);
+        }
+      } else {
+        // Return false from a transition hook to cancel the transition.
+        callback(result !== false);
+      }
+    } else {
+      callback(true);
+    }
+  };
+
+  var listeners = [];
+
+  var appendListener = function appendListener(fn) {
+    var isActive = true;
+
+    var listener = function listener() {
+      if (isActive) { fn.apply(undefined, arguments); }
+    };
+
+    listeners.push(listener);
+
+    return function () {
+      isActive = false;
+      listeners = listeners.filter(function (item) {
+        return item !== listener;
+      });
+    };
+  };
+
+  var notifyListeners = function notifyListeners() {
+    var arguments$1 = arguments;
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments$1[_key];
+    }
+
+    listeners.forEach(function (listener) {
+      return listener.apply(undefined, args);
+    });
+  };
+
+  return {
+    setPrompt: setPrompt,
+    confirmTransitionTo: confirmTransitionTo,
+    appendListener: appendListener,
+    notifyListeners: notifyListeners
+  };
+};
+
+var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
+
+var addEventListener = function addEventListener(node, event, listener) {
+  return node.addEventListener ? node.addEventListener(event, listener, false) : node.attachEvent('on' + event, listener);
+};
+
+var removeEventListener = function removeEventListener(node, event, listener) {
+  return node.removeEventListener ? node.removeEventListener(event, listener, false) : node.detachEvent('on' + event, listener);
+};
+
+var getConfirmation = function getConfirmation(message, callback) {
+  return callback(window.confirm(message));
+}; // eslint-disable-line no-alert
+
+/**
+ * Returns true if the HTML5 history API is supported. Taken from Modernizr.
+ *
+ * https://github.com/Modernizr/Modernizr/blob/master/LICENSE
+ * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/history.js
+ * changed to avoid false negatives for Windows Phones: https://github.com/reactjs/react-router/issues/586
+ */
+var supportsHistory = function supportsHistory() {
+  var ua = window.navigator.userAgent;
+
+  if ((ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) && ua.indexOf('Mobile Safari') !== -1 && ua.indexOf('Chrome') === -1 && ua.indexOf('Windows Phone') === -1) { return false; }
+
+  return window.history && 'pushState' in window.history;
+};
+
+/**
+ * Returns true if browser fires popstate on hash change.
+ * IE10 and IE11 do not.
+ */
+var supportsPopStateOnHashChange = function supportsPopStateOnHashChange() {
+  return window.navigator.userAgent.indexOf('Trident') === -1;
+};
+
+/**
+ * Returns false if using go(n) with hash history causes a full page reload.
+ */
+var supportsGoWithoutReloadUsingHash = function supportsGoWithoutReloadUsingHash() {
+  return window.navigator.userAgent.indexOf('Firefox') === -1;
+};
+
+/**
+ * Returns true if a given popstate event is an extraneous WebKit event.
+ * Accounts for the fact that Chrome on iOS fires real popstate events
+ * containing undefined state when pressing the back button.
+ */
+var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
+  return event.state === undefined && navigator.userAgent.indexOf('CriOS') === -1;
+};
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _extends = Object.assign || function (target) {
+var arguments$1 = arguments;
+ for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var PopStateEvent = 'popstate';
+var HashChangeEvent = 'hashchange';
+
+var getHistoryState = function getHistoryState() {
+  try {
+    return window.history.state || {};
+  } catch (e) {
+    // IE 11 sometimes throws when accessing window.history.state
+    // See https://github.com/ReactTraining/history/pull/289
+    return {};
+  }
+};
+
+/**
+ * Creates a history object that uses the HTML5 history API including
+ * pushState, replaceState, and the popstate event.
+ */
+var createBrowserHistory = function createBrowserHistory() {
+  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  browser$1(canUseDOM, 'Browser history needs a DOM');
+
+  var globalHistory = window.history;
+  var canUseHistory = supportsHistory();
+  var needsHashChangeListener = !supportsPopStateOnHashChange();
+
+  var _props$forceRefresh = props.forceRefresh,
+      forceRefresh = _props$forceRefresh === undefined ? false : _props$forceRefresh,
+      _props$getUserConfirm = props.getUserConfirmation,
+      getUserConfirmation = _props$getUserConfirm === undefined ? getConfirmation : _props$getUserConfirm,
+      _props$keyLength = props.keyLength,
+      keyLength = _props$keyLength === undefined ? 6 : _props$keyLength;
+
+  var basename = props.basename ? stripTrailingSlash(addLeadingSlash(props.basename)) : '';
+
+  var getDOMLocation = function getDOMLocation(historyState) {
+    var _ref = historyState || {},
+        key = _ref.key,
+        state = _ref.state;
+
+    var _window$location = window.location,
+        pathname = _window$location.pathname,
+        search = _window$location.search,
+        hash = _window$location.hash;
+
+
+    var path = pathname + search + hash;
+
+    browser(!basename || hasBasename(path, basename), 'You are attempting to use a basename on a page whose URL path does not begin ' + 'with the basename. Expected path "' + path + '" to begin with "' + basename + '".');
+
+    if (basename) { path = stripBasename(path, basename); }
+
+    return createLocation(path, state, key);
+  };
+
+  var createKey = function createKey() {
+    return Math.random().toString(36).substr(2, keyLength);
+  };
+
+  var transitionManager = createTransitionManager();
+
+  var setState = function setState(nextState) {
+    _extends(history, nextState);
+
+    history.length = globalHistory.length;
+
+    transitionManager.notifyListeners(history.location, history.action);
+  };
+
+  var handlePopState = function handlePopState(event) {
+    // Ignore extraneous popstate events in WebKit.
+    if (isExtraneousPopstateEvent(event)) { return; }
+
+    handlePop(getDOMLocation(event.state));
+  };
+
+  var handleHashChange = function handleHashChange() {
+    handlePop(getDOMLocation(getHistoryState()));
+  };
+
+  var forceNextPop = false;
+
+  var handlePop = function handlePop(location) {
+    if (forceNextPop) {
+      forceNextPop = false;
+      setState();
+    } else {
+      var action = 'POP';
+
+      transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+        if (ok) {
+          setState({ action: action, location: location });
+        } else {
+          revertPop(location);
+        }
+      });
+    }
+  };
+
+  var revertPop = function revertPop(fromLocation) {
+    var toLocation = history.location;
+
+    // TODO: We could probably make this more reliable by
+    // keeping a list of keys we've seen in sessionStorage.
+    // Instead, we just default to 0 for keys we don't know.
+
+    var toIndex = allKeys.indexOf(toLocation.key);
+
+    if (toIndex === -1) { toIndex = 0; }
+
+    var fromIndex = allKeys.indexOf(fromLocation.key);
+
+    if (fromIndex === -1) { fromIndex = 0; }
+
+    var delta = toIndex - fromIndex;
+
+    if (delta) {
+      forceNextPop = true;
+      go(delta);
+    }
+  };
+
+  var initialLocation = getDOMLocation(getHistoryState());
+  var allKeys = [initialLocation.key];
+
+  // Public interface
+
+  var createHref = function createHref(location) {
+    return basename + createPath(location);
+  };
+
+  var push = function push(path, state) {
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+
+    var action = 'PUSH';
+    var location = createLocation(path, state, createKey(), history.location);
+
+    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+      if (!ok) { return; }
+
+      var href = createHref(location);
+      var key = location.key,
+          state = location.state;
+
+
+      if (canUseHistory) {
+        globalHistory.pushState({ key: key, state: state }, null, href);
+
+        if (forceRefresh) {
+          window.location.href = href;
+        } else {
+          var prevIndex = allKeys.indexOf(history.location.key);
+          var nextKeys = allKeys.slice(0, prevIndex === -1 ? 0 : prevIndex + 1);
+
+          nextKeys.push(location.key);
+          allKeys = nextKeys;
+
+          setState({ action: action, location: location });
+        }
+      } else {
+        browser(state === undefined, 'Browser history cannot push state in browsers that do not support HTML5 history');
+
+        window.location.href = href;
+      }
+    });
+  };
+
+  var replace = function replace(path, state) {
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+
+    var action = 'REPLACE';
+    var location = createLocation(path, state, createKey(), history.location);
+
+    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+      if (!ok) { return; }
+
+      var href = createHref(location);
+      var key = location.key,
+          state = location.state;
+
+
+      if (canUseHistory) {
+        globalHistory.replaceState({ key: key, state: state }, null, href);
+
+        if (forceRefresh) {
+          window.location.replace(href);
+        } else {
+          var prevIndex = allKeys.indexOf(history.location.key);
+
+          if (prevIndex !== -1) { allKeys[prevIndex] = location.key; }
+
+          setState({ action: action, location: location });
+        }
+      } else {
+        browser(state === undefined, 'Browser history cannot replace state in browsers that do not support HTML5 history');
+
+        window.location.replace(href);
+      }
+    });
+  };
+
+  var go = function go(n) {
+    globalHistory.go(n);
+  };
+
+  var goBack = function goBack() {
+    return go(-1);
+  };
+
+  var goForward = function goForward() {
+    return go(1);
+  };
+
+  var listenerCount = 0;
+
+  var checkDOMListeners = function checkDOMListeners(delta) {
+    listenerCount += delta;
+
+    if (listenerCount === 1) {
+      addEventListener(window, PopStateEvent, handlePopState);
+
+      if (needsHashChangeListener) { addEventListener(window, HashChangeEvent, handleHashChange); }
+    } else if (listenerCount === 0) {
+      removeEventListener(window, PopStateEvent, handlePopState);
+
+      if (needsHashChangeListener) { removeEventListener(window, HashChangeEvent, handleHashChange); }
+    }
+  };
+
+  var isBlocked = false;
+
+  var block = function block() {
+    var prompt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    var unblock = transitionManager.setPrompt(prompt);
+
+    if (!isBlocked) {
+      checkDOMListeners(1);
+      isBlocked = true;
+    }
+
+    return function () {
+      if (isBlocked) {
+        isBlocked = false;
+        checkDOMListeners(-1);
+      }
+
+      return unblock();
+    };
+  };
+
+  var listen = function listen(listener) {
+    var unlisten = transitionManager.appendListener(listener);
+    checkDOMListeners(1);
+
+    return function () {
+      checkDOMListeners(-1);
+      unlisten();
+    };
+  };
+
+  var history = {
+    length: globalHistory.length,
+    action: 'POP',
+    location: initialLocation,
+    createHref: createHref,
+    push: push,
+    replace: replace,
+    go: go,
+    goBack: goBack,
+    goForward: goForward,
+    block: block,
+    listen: listen
+  };
+
+  return history;
+};
+
+var _extends$2 = Object.assign || function (target) {
+var arguments$1 = arguments;
+ for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var HashChangeEvent$1 = 'hashchange';
+
+var HashPathCoders = {
+  hashbang: {
+    encodePath: function encodePath(path) {
+      return path.charAt(0) === '!' ? path : '!/' + stripLeadingSlash(path);
+    },
+    decodePath: function decodePath(path) {
+      return path.charAt(0) === '!' ? path.substr(1) : path;
+    }
+  },
+  noslash: {
+    encodePath: stripLeadingSlash,
+    decodePath: addLeadingSlash
+  },
+  slash: {
+    encodePath: addLeadingSlash,
+    decodePath: addLeadingSlash
+  }
+};
+
+var getHashPath = function getHashPath() {
+  // We can't use window.location.hash here because it's not
+  // consistent across browsers - Firefox will pre-decode it!
+  var href = window.location.href;
+  var hashIndex = href.indexOf('#');
+  return hashIndex === -1 ? '' : href.substring(hashIndex + 1);
+};
+
+var pushHashPath = function pushHashPath(path) {
+  return window.location.hash = path;
+};
+
+var replaceHashPath = function replaceHashPath(path) {
+  var hashIndex = window.location.href.indexOf('#');
+
+  window.location.replace(window.location.href.slice(0, hashIndex >= 0 ? hashIndex : 0) + '#' + path);
+};
+
+var createHashHistory = function createHashHistory() {
+  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  browser$1(canUseDOM, 'Hash history needs a DOM');
+
+  var globalHistory = window.history;
+  var canGoWithoutReload = supportsGoWithoutReloadUsingHash();
+
+  var _props$getUserConfirm = props.getUserConfirmation,
+      getUserConfirmation = _props$getUserConfirm === undefined ? getConfirmation : _props$getUserConfirm,
+      _props$hashType = props.hashType,
+      hashType = _props$hashType === undefined ? 'slash' : _props$hashType;
+
+  var basename = props.basename ? stripTrailingSlash(addLeadingSlash(props.basename)) : '';
+
+  var _HashPathCoders$hashT = HashPathCoders[hashType],
+      encodePath = _HashPathCoders$hashT.encodePath,
+      decodePath = _HashPathCoders$hashT.decodePath;
+
+
+  var getDOMLocation = function getDOMLocation() {
+    var path = decodePath(getHashPath());
+
+    browser(!basename || hasBasename(path, basename), 'You are attempting to use a basename on a page whose URL path does not begin ' + 'with the basename. Expected path "' + path + '" to begin with "' + basename + '".');
+
+    if (basename) { path = stripBasename(path, basename); }
+
+    return createLocation(path);
+  };
+
+  var transitionManager = createTransitionManager();
+
+  var setState = function setState(nextState) {
+    _extends$2(history, nextState);
+
+    history.length = globalHistory.length;
+
+    transitionManager.notifyListeners(history.location, history.action);
+  };
+
+  var forceNextPop = false;
+  var ignorePath = null;
+
+  var handleHashChange = function handleHashChange() {
+    var path = getHashPath();
+    var encodedPath = encodePath(path);
+
+    if (path !== encodedPath) {
+      // Ensure we always have a properly-encoded hash.
+      replaceHashPath(encodedPath);
+    } else {
+      var location = getDOMLocation();
+      var prevLocation = history.location;
+
+      if (!forceNextPop && locationsAreEqual(prevLocation, location)) { return; } // A hashchange doesn't always == location change.
+
+      if (ignorePath === createPath(location)) { return; } // Ignore this change; we already setState in push/replace.
+
+      ignorePath = null;
+
+      handlePop(location);
+    }
+  };
+
+  var handlePop = function handlePop(location) {
+    if (forceNextPop) {
+      forceNextPop = false;
+      setState();
+    } else {
+      var action = 'POP';
+
+      transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+        if (ok) {
+          setState({ action: action, location: location });
+        } else {
+          revertPop(location);
+        }
+      });
+    }
+  };
+
+  var revertPop = function revertPop(fromLocation) {
+    var toLocation = history.location;
+
+    // TODO: We could probably make this more reliable by
+    // keeping a list of paths we've seen in sessionStorage.
+    // Instead, we just default to 0 for paths we don't know.
+
+    var toIndex = allPaths.lastIndexOf(createPath(toLocation));
+
+    if (toIndex === -1) { toIndex = 0; }
+
+    var fromIndex = allPaths.lastIndexOf(createPath(fromLocation));
+
+    if (fromIndex === -1) { fromIndex = 0; }
+
+    var delta = toIndex - fromIndex;
+
+    if (delta) {
+      forceNextPop = true;
+      go(delta);
+    }
+  };
+
+  // Ensure the hash is encoded properly before doing anything else.
+  var path = getHashPath();
+  var encodedPath = encodePath(path);
+
+  if (path !== encodedPath) { replaceHashPath(encodedPath); }
+
+  var initialLocation = getDOMLocation();
+  var allPaths = [createPath(initialLocation)];
+
+  // Public interface
+
+  var createHref = function createHref(location) {
+    return '#' + encodePath(basename + createPath(location));
+  };
+
+  var push = function push(path, state) {
+    browser(state === undefined, 'Hash history cannot push state; it is ignored');
+
+    var action = 'PUSH';
+    var location = createLocation(path, undefined, undefined, history.location);
+
+    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+      if (!ok) { return; }
+
+      var path = createPath(location);
+      var encodedPath = encodePath(basename + path);
+      var hashChanged = getHashPath() !== encodedPath;
+
+      if (hashChanged) {
+        // We cannot tell if a hashchange was caused by a PUSH, so we'd
+        // rather setState here and ignore the hashchange. The caveat here
+        // is that other hash histories in the page will consider it a POP.
+        ignorePath = path;
+        pushHashPath(encodedPath);
+
+        var prevIndex = allPaths.lastIndexOf(createPath(history.location));
+        var nextPaths = allPaths.slice(0, prevIndex === -1 ? 0 : prevIndex + 1);
+
+        nextPaths.push(path);
+        allPaths = nextPaths;
+
+        setState({ action: action, location: location });
+      } else {
+        browser(false, 'Hash history cannot PUSH the same path; a new entry will not be added to the history stack');
+
+        setState();
+      }
+    });
+  };
+
+  var replace = function replace(path, state) {
+    browser(state === undefined, 'Hash history cannot replace state; it is ignored');
+
+    var action = 'REPLACE';
+    var location = createLocation(path, undefined, undefined, history.location);
+
+    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+      if (!ok) { return; }
+
+      var path = createPath(location);
+      var encodedPath = encodePath(basename + path);
+      var hashChanged = getHashPath() !== encodedPath;
+
+      if (hashChanged) {
+        // We cannot tell if a hashchange was caused by a REPLACE, so we'd
+        // rather setState here and ignore the hashchange. The caveat here
+        // is that other hash histories in the page will consider it a POP.
+        ignorePath = path;
+        replaceHashPath(encodedPath);
+      }
+
+      var prevIndex = allPaths.indexOf(createPath(history.location));
+
+      if (prevIndex !== -1) { allPaths[prevIndex] = path; }
+
+      setState({ action: action, location: location });
+    });
+  };
+
+  var go = function go(n) {
+    browser(canGoWithoutReload, 'Hash history go(n) causes a full page reload in this browser');
+
+    globalHistory.go(n);
+  };
+
+  var goBack = function goBack() {
+    return go(-1);
+  };
+
+  var goForward = function goForward() {
+    return go(1);
+  };
+
+  var listenerCount = 0;
+
+  var checkDOMListeners = function checkDOMListeners(delta) {
+    listenerCount += delta;
+
+    if (listenerCount === 1) {
+      addEventListener(window, HashChangeEvent$1, handleHashChange);
+    } else if (listenerCount === 0) {
+      removeEventListener(window, HashChangeEvent$1, handleHashChange);
+    }
+  };
+
+  var isBlocked = false;
+
+  var block = function block() {
+    var prompt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    var unblock = transitionManager.setPrompt(prompt);
+
+    if (!isBlocked) {
+      checkDOMListeners(1);
+      isBlocked = true;
+    }
+
+    return function () {
+      if (isBlocked) {
+        isBlocked = false;
+        checkDOMListeners(-1);
+      }
+
+      return unblock();
+    };
+  };
+
+  var listen = function listen(listener) {
+    var unlisten = transitionManager.appendListener(listener);
+    checkDOMListeners(1);
+
+    return function () {
+      checkDOMListeners(-1);
+      unlisten();
+    };
+  };
+
+  var history = {
+    length: globalHistory.length,
+    action: 'POP',
+    location: initialLocation,
+    createHref: createHref,
+    push: push,
+    replace: replace,
+    go: go,
+    goBack: goBack,
+    goForward: goForward,
+    block: block,
+    listen: listen
+  };
+
+  return history;
+};
+
+var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _extends$3 = Object.assign || function (target) {
+var arguments$1 = arguments;
+ for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var clamp = function clamp(n, lowerBound, upperBound) {
+  return Math.min(Math.max(n, lowerBound), upperBound);
+};
+
+/**
+ * Creates a history object that stores locations in memory.
+ */
+var createMemoryHistory = function createMemoryHistory() {
+  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var getUserConfirmation = props.getUserConfirmation,
+      _props$initialEntries = props.initialEntries,
+      initialEntries = _props$initialEntries === undefined ? ['/'] : _props$initialEntries,
+      _props$initialIndex = props.initialIndex,
+      initialIndex = _props$initialIndex === undefined ? 0 : _props$initialIndex,
+      _props$keyLength = props.keyLength,
+      keyLength = _props$keyLength === undefined ? 6 : _props$keyLength;
+
+
+  var transitionManager = createTransitionManager();
+
+  var setState = function setState(nextState) {
+    _extends$3(history, nextState);
+
+    history.length = history.entries.length;
+
+    transitionManager.notifyListeners(history.location, history.action);
+  };
+
+  var createKey = function createKey() {
+    return Math.random().toString(36).substr(2, keyLength);
+  };
+
+  var index = clamp(initialIndex, 0, initialEntries.length - 1);
+  var entries = initialEntries.map(function (entry) {
+    return typeof entry === 'string' ? createLocation(entry, undefined, createKey()) : createLocation(entry, undefined, entry.key || createKey());
+  });
+
+  // Public interface
+
+  var createHref = createPath;
+
+  var push = function push(path, state) {
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+
+    var action = 'PUSH';
+    var location = createLocation(path, state, createKey(), history.location);
+
+    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+      if (!ok) { return; }
+
+      var prevIndex = history.index;
+      var nextIndex = prevIndex + 1;
+
+      var nextEntries = history.entries.slice(0);
+      if (nextEntries.length > nextIndex) {
+        nextEntries.splice(nextIndex, nextEntries.length - nextIndex, location);
+      } else {
+        nextEntries.push(location);
+      }
+
+      setState({
+        action: action,
+        location: location,
+        index: nextIndex,
+        entries: nextEntries
+      });
+    });
+  };
+
+  var replace = function replace(path, state) {
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+
+    var action = 'REPLACE';
+    var location = createLocation(path, state, createKey(), history.location);
+
+    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+      if (!ok) { return; }
+
+      history.entries[history.index] = location;
+
+      setState({ action: action, location: location });
+    });
+  };
+
+  var go = function go(n) {
+    var nextIndex = clamp(history.index + n, 0, history.entries.length - 1);
+
+    var action = 'POP';
+    var location = history.entries[nextIndex];
+
+    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
+      if (ok) {
+        setState({
+          action: action,
+          location: location,
+          index: nextIndex
+        });
+      } else {
+        // Mimic the behavior of DOM histories by
+        // causing a render after a cancelled POP.
+        setState();
+      }
+    });
+  };
+
+  var goBack = function goBack() {
+    return go(-1);
+  };
+
+  var goForward = function goForward() {
+    return go(1);
+  };
+
+  var canGo = function canGo(n) {
+    var nextIndex = history.index + n;
+    return nextIndex >= 0 && nextIndex < history.entries.length;
+  };
+
+  var block = function block() {
+    var prompt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    return transitionManager.setPrompt(prompt);
+  };
+
+  var listen = function listen(listener) {
+    return transitionManager.appendListener(listener);
+  };
+
+  var history = {
+    length: entries.length,
+    action: 'POP',
+    location: entries[index],
+    index: index,
+    entries: entries,
+    createHref: createHref,
+    push: push,
+    replace: replace,
+    go: go,
+    goBack: goBack,
+    goForward: goForward,
+    canGo: canGo,
+    block: block,
+    listen: listen
+  };
+
+  return history;
+};
+
+var constants = {
+  BROWSER: 'BROWSER',
+  MEMORY: 'MEMORY',
+  HASH: 'HASH'
+};
+
+var Router = function Router(type) {
+  if ( type === void 0 ) { type = constants.BROWSER; }
+
+  /**
+   * hash history object.
+   * @private
+   * @type {Object}
+   */
+  switch (type) {
+  case constants.BROWSER:
+    this._history = createBrowserHistory();
+    break;
+  case constants.MEMORY:
+    this._history = createMemoryHistory();
+    break;
+  case constants.HASH:
+    this._history = createHashHistory();
+    break;
+  default:
+    break;
+  }
+
+  /**
+   * routing definitions.
+   * @private
+   * @type {Array}
+   */
+  this._routes = [];
+
+  /**
+   * function to stop listening for the changes.
+   * to stop, just execute this function.
+   * @private
+   * @type {Function|null}
+   */
+  this._unlistener = null;
+
+  /**
+   * function that will be called on ahead of every routing.
+   * @type {Function|null}
+   */
+  this._onBefore = null;
+
+  /**
+   * function that will be called only once on ahead of routing.
+   * @type {Function|null}
+   */
+  this._onBeforeOnce = null;
+
+  /**
+   * function that will be called on behind of every routing.
+   * @type {Function|null}
+   */
+  this._onAfter = null;
+
+  /**
+   * function that will be called only once on behind of routing.
+   * @type {Function|null}
+   */
+  this._onAfterOnce = null;
+};
+
+/**
+ * start listening for changes to the current location.
+ * @param {Boolean} autoExec to decide whether routing is executed with the current url.
+ */
+Router.prototype.start = function start (autoExec) {
+    var this$1 = this;
+    if ( autoExec === void 0 ) { autoExec = true; }
+
+  this._unlistener = this._history.listen(function (location, action) {
+    this$1._change(location, action);
+  });
+
+  if (autoExec) {
+    this._change(this.getCurrentLocation(), this.getCurrentAction());
+  }
+};
+
+/**
+ * stop listening.
+ */
+Router.prototype.stop = function stop () {
+  if (!this._unlistener) {
+    return;
+  }
+  this._unlistener();
+  this._unlistener = null;
+};
+
+/**
+ * register a route.
+ * @param {String} pattern express-like url pattern.
+ * @param {Function} onEnter a function that will be executed when the route changes.
+ * @param {Function} onBefore a function that will be executed before the route changes.
+ * @param {Function} onAfter a function that will be executed after the route changes.
+ * @return {Router}
+ */
+Router.prototype.on = function on (pattern, onEnter, onBefore, onAfter) {
+  var keys = [];
+  var regexp = index(pattern, keys);
+  this._routes.push({
+    pattern: pattern,
+    regexp: regexp,
+    keys: keys,
+    onEnter: onEnter,
+    onBefore: onBefore,
+    onAfter: onAfter
+  });
+  return this;
+};
+
+/**
+ * register a function to hook just before routing.
+ * this function is called on every routing.
+ * @param {Function} func
+ * @return {Router}
+ */
+Router.prototype.onBefore = function onBefore (func) {
+  this._onBefore = func;
+  return this;
+};
+
+/**
+ * register a function to hook just before routing.
+ * this function is called before routing only once.
+ * @param {Function} func
+ * @return {Router}
+ */
+Router.prototype.onBeforeOnce = function onBeforeOnce (func) {
+  this._onBeforeOnce = func;
+  return this;
+};
+
+/**
+ * register a function to hook just after routing.
+ * this function is called on every routing.
+ * @param {Function} func
+ * @return {Router}
+ */
+Router.prototype.onAfter = function onAfter (func) {
+  this._onAfter = func;
+  return this;
+};
+
+/**
+ * register a function to hook just after routing.
+ * this function is called after routing only once.
+ * @param {Function} func
+ * @return {Router}
+ */
+Router.prototype.onAfterOnce = function onAfterOnce (func) {
+  this._onAfterOnce = func;
+  return this;
+};
+
+/**
+ * navigate to target location.
+ * @param {String|Object} path e.g.) '/foo' or { pathname, search, hash }
+ */
+Router.prototype.navigateTo = function navigateTo (path) {
+    var this$1 = this;
+
+  return promise
+    .resolve()
+    .then(function () {
+      if (this$1.getCurrentLocation().pathname === path) {
+        console.warn('same path is passed.');
+        return;
+      }
+
+      this$1._history.push(path);
+    });
+};
+
+/**
+ * replace current location.
+ * @param {String|Object} path e.g.) '/foo' or { pathname, search, hash }
+ */
+Router.prototype.replace = function replace (path) {
+    var this$1 = this;
+
+  return promise
+    .resolve()
+    .then(function () {
+      if (this$1.getCurrentLocation().pathname === path) {
+        console.warn('same path is passed.');
+        return;
+      }
+
+      this$1._history.replace(path);
+    });
+};
+
+/**
+ * returns current location.
+ * @return {String}
+ */
+Router.prototype.getCurrentLocation = function getCurrentLocation () {
+  return this._history.location;
+};
+
+/**
+ * returns current action.
+ * @return {String}
+ */
+Router.prototype.getCurrentAction = function getCurrentAction () {
+  return this._history.action;
+};
+
+/**
+ * hash version of `location.href`.
+ * @param {String} pathname
+ */
+Router.prototype.createHref = function createHref (pathname) {
+  return this._history.createHref({
+    pathname: pathname
+  });
+};
+
+/**
+ * fire route enter event.
+ * @private
+ * @param {Object} location i.e.) history.location
+ * @param {String} action i.e.) history.action
+ */
+Router.prototype._change = function _change (location/*, action */) {
+    var this$1 = this;
+
+  var route = array_1(this._routes, function (route) {
+    return !!route.regexp.exec(location.pathname);
+  });
+
+  if (!route) {
+    return;
+  }
+
+  var data = this._parseLocation(location, route);
+
+  // whether the routing was canceled and replaced.
+  var isReplaced = false;
+  var replace = function (path) {
+    isReplaced = true;
+    this$1.replace(path);
+  };
+
+  promise
+    .resolve()
+    .then(function () {// onBeforeOnce
+      if (!this$1._onBeforeOnce) {
+        return promise.resolve();
+      }
+      var onBeforeOnce = this$1._onBeforeOnce;
+      this$1._onBeforeOnce = null;
+      return onBeforeOnce(data);
+    })
+    .then(function () {// onBefore
+      if (!this$1._onBefore) {
+        return promise.resolve();
+      }
+      return this$1._onBefore(data);
+    })
+    .then(function () {// route.onBefore
+      if (!route.onBefore) {
+        return promise.resolve();
+      }
+      return route.onBefore(data, replace);
+    })
+    .then(function () {// route.onEnter
+      if (isReplaced || !route.onEnter) {
+        return promise.resolve();
+      }
+      return route.onEnter(data);
+    })
+    .then(function () {// route.onAfter
+      if (isReplaced || !route.onAfter) {
+        return promise.resolve();
+      }
+      return route.onAfter(data);
+    })
+    .then(function () {// onAfter
+      if (isReplaced || !this$1._onAfter) {
+        return promise.resolve();
+      }
+      return this$1._onAfter(data);
+    })
+    .then(function () {// onAfterOnce
+      if (isReplaced || !this$1._onAfterOnce) {
+        return promise.resolve();
+      }
+      var onAfterOnce = this$1._onAfterOnce;
+      this$1._onAfterOnce = null;
+      return onAfterOnce(data);
+    })
+    .catch(function (err) {
+      console.error(err.message || 'couldn\'t route. check the onBefore and onAfter functions.');
+    });
+};
+
+/**
+ * parse location object.
+ * @private
+ * @param {Object} location
+ * @param {Object} route
+ * @return {Object}
+ */
+Router.prototype._parseLocation = function _parseLocation (location, route) {
+  var params = {};
+  var list = route.regexp.exec(location.pathname).slice(1);
+  array_2(route.keys, function (v, i) {
+    params[v.name] = list[i];
+  });
+
+  var queries = {};
+  array_2(location.search.slice(1).split('&'), function (v) {
+    if (!v) {
+      return;
+    }
+    var pair = v.split('=');
+    queries[pair[0]] = pair[1];
+  });
+
+  var hash = location.hash.slice(1);
+
+  return {
+    params: params,
+    queries: queries,
+    hash: hash,
+    pathname: location.pathname
+  };
+};
+
+Router.BROWSER = constants.BROWSER;
+Router.MEMORY = constants.MEMORY;
+Router.HASH = constants.HASH;
+
+/**
+     * Returns the first argument provided to it.
+     */
+    function identity$1(val){
+        return val;
+    }
+
+    var identity_1$1 = identity$1;
+
+/**
+     * Returns a function that gets a property of the passed object
+     */
+    function prop$1(name){
+        return function(obj){
+            return obj[name];
+        };
+    }
+
+    var prop_1$1 = prop$1;
+
+/**
+     * Safer Object.hasOwnProperty
+     */
+     function hasOwn$1(obj, prop){
+         return Object.prototype.hasOwnProperty.call(obj, prop);
+     }
+
+     var hasOwn_1$1 = hasOwn$1;
+
+var _hasDontEnumBug$1;
+var _dontEnums$1;
+
+    function checkDontEnum$1(){
+        _dontEnums$1 = [
+                'toString',
+                'toLocaleString',
+                'valueOf',
+                'hasOwnProperty',
+                'isPrototypeOf',
+                'propertyIsEnumerable',
+                'constructor'
+            ];
+
+        _hasDontEnumBug$1 = true;
+
+        for (var key in {'toString': null}) {
+            _hasDontEnumBug$1 = false;
+        }
+    }
+
+    /**
+     * Similar to Array/forEach but works over object properties and fixes Don't
+     * Enum bug on IE.
+     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
+     */
+    function forIn$1(obj, fn, thisObj){
+        var key, i = 0;
+        // no need to check if argument is a real object that way we can use
+        // it for arrays, functions, date, etc.
+
+        //post-pone check till needed
+        if (_hasDontEnumBug$1 == null) { checkDontEnum$1(); }
+
+        for (key in obj) {
+            if (exec$1(fn, obj, key, thisObj) === false) {
+                break;
+            }
+        }
+
+
+        if (_hasDontEnumBug$1) {
+            var ctor = obj.constructor,
+                isProto = !!ctor && obj === ctor.prototype;
+
+            while (key = _dontEnums$1[i++]) {
+                // For constructor, if it is a prototype object the constructor
+                // is always non-enumerable unless defined otherwise (and
+                // enumerated above).  For non-prototype objects, it will have
+                // to be defined on this object, since it cannot be defined on
+                // any prototype objects.
+                //
+                // For other [[DontEnum]] properties, check if the value is
+                // different than Object prototype value.
+                if (
+                    (key !== 'constructor' ||
+                        (!isProto && hasOwn_1$1(obj, key))) &&
+                    obj[key] !== Object.prototype[key]
+                ) {
+                    if (exec$1(fn, obj, key, thisObj) === false) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function exec$1(fn, obj, key, thisObj){
+        return fn.call(thisObj, obj[key], key, obj);
+    }
+
+    var forIn_1$1 = forIn$1;
+
+/**
+     * Similar to Array/forEach but works over object properties and fixes Don't
+     * Enum bug on IE.
+     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
+     */
+    function forOwn$1(obj, fn, thisObj){
+        forIn_1$1(obj, function(val, key){
+            if (hasOwn_1$1(obj, key)) {
+                return fn.call(thisObj, obj[key], key, obj);
+            }
+        });
+    }
+
+    var forOwn_1$1 = forOwn$1;
+
+var _rKind$1 = /^\[object (.*)\]$/;
+var _toString$1 = Object.prototype.toString;
+var UNDEF$2;
+
+    /**
+     * Gets the "kind" of value. (e.g. "String", "Number", etc)
+     */
+    function kindOf$1(val) {
+        if (val === null) {
+            return 'Null';
+        } else if (val === UNDEF$2) {
+            return 'Undefined';
+        } else {
+            return _rKind$1.exec( _toString$1.call(val) )[1];
+        }
+    }
+    var kindOf_1$1 = kindOf$1;
+
+/**
+     * Check if value is from a specific "kind".
+     */
+    function isKind$1(val, kind){
+        return kindOf_1$1(val) === kind;
+    }
+    var isKind_1$1 = isKind$1;
+
+/**
+     */
+    var isArray$1 = Array.isArray || function (val) {
+        return isKind_1$1(val, 'Array');
+    };
+    var isArray_1$1 = isArray$1;
+
+function containsMatch$1(array, pattern) {
+        var i = -1, length = array.length;
+        while (++i < length) {
+            if (deepMatches$1(array[i], pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function matchArray$1(target, pattern) {
+        var i = -1, patternLength = pattern.length;
+        while (++i < patternLength) {
+            if (!containsMatch$1(target, pattern[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function matchObject$1(target, pattern) {
+        var result = true;
+        forOwn_1$1(pattern, function(val, key) {
+            if (!deepMatches$1(target[key], val)) {
+                // Return false to break out of forOwn early
+                return (result = false);
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Recursively check if the objects match.
+     */
+    function deepMatches$1(target, pattern){
+        if (target && typeof target === 'object' &&
+            pattern && typeof pattern === 'object') {
+            if (isArray_1$1(target) && isArray_1$1(pattern)) {
+                return matchArray$1(target, pattern);
+            } else {
+                return matchObject$1(target, pattern);
+            }
+        } else {
+            return target === pattern;
+        }
+    }
+
+    var deepMatches_1$1 = deepMatches$1;
+
+/**
+     * Converts argument into a valid iterator.
+     * Used internally on most array/object/collection methods that receives a
+     * callback/iterator providing a shortcut syntax.
+     */
+    function makeIterator$1(src, thisObj){
+        if (src == null) {
+            return identity_1$1;
+        }
+        switch(typeof src) {
+            case 'function':
+                // function is the first to improve perf (most common case)
+                // also avoid using `Function#call` if not needed, which boosts
+                // perf a lot in some cases
+                return (typeof thisObj !== 'undefined')? function(val, i, arr){
+                    return src.call(thisObj, val, i, arr);
+                } : src;
+            case 'object':
+                return function(val){
+                    return deepMatches_1$1(val, src);
+                };
+            case 'string':
+            case 'number':
+                return prop_1$1(src);
+        }
+    }
+
+    var makeIterator_$1 = makeIterator$1;
+
+/**
+     * Array reject
+     */
+    function reject$1(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (!callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var reject_1$1 = reject$1;
+
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+/* eslint-disable no-unused-vars */
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (err) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+var index$1$1 = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (getOwnPropertySymbols) {
+			symbols = getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+var application$2 = {
+  // 起動状態。
+  isLaunched: false,
+  // 画面遷移中か否か。
+  isNavigating: false,
+  // 通信中のAPI群。
+  networkings: [],
+  // 通信中か否か(i.e. 一つでも通信中のAPIが存在するか?)
+  isNetworking: false
+};
+
+// 選択された`page`に関する`component`群。
+// `component` = 画面中央に表示される各要素。
+var components = {};
+
+var store = createCommonjsModule(function (module, exports) {
 "use strict"
 // Module export pattern from
 // https://github.com/umdjs/umd/blob/master/returnExports.js
@@ -2989,6 +7192,3536 @@ var store$1 = createCommonjsModule(function (module, exports) {
 	
 	return store
 }));
+});
+
+// 選択されているエンドポイント。
+var current = store.get('current', null);
+
+// `/dmc`のデータ。
+var dmc = null;
+
+var drawers = [];
+
+// ローカルに保存されているエンドポイント一覧。
+var endpoints = store.get('endpoints', {});
+
+var location$1 = {
+  // 表示中のページ名。
+  name: '',
+  // ルーティング情報。
+  route: {
+    params: {},
+    queries: {},
+    hash: ''
+  }
+};
+
+var menu = {
+  // メニューの開閉状態。
+  isOpened: false,
+  // メニューが有効か否か。
+  // 無効状態では画面に表示されない。
+  isEnabled: false
+};
+
+var modals = [];
+
+var oauthEndpointKey = store.get('oauth_endpoint_key', null);
+
+// 選択中の`page`情報。
+// `page` = 左メニュー(dmc)の一要素。
+var page = null;
+
+var signinShowKey = null;
+
+var toasts = [];
+
+var ua = {};
+
+const constants$3 = {
+  APPLICATION: 'APPLICATION',
+  COMPONENTS: 'COMPONENTS',
+  COMPONENTS_ONE: riotId => {
+    return `component_${riotId}`;
+  },
+  CURRENT: 'CURRENT',
+  DMC: 'DMC',
+  DRAWERS: 'DRAWERS',
+  ENDPOINTS: 'ENDPOINTS',
+  LOCATION: 'LOCATION',
+  MENU: 'MENU',
+  MODALS: 'MODALS',
+  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
+  PAGE: 'PAGE',
+  SIGNIN_SHOW_KEY: 'SIGNIN_SHOW_KEY',
+  TOASTS: 'TOASTS',
+  UA: 'UA'
+};
+
+var states = {
+  application: application$2,
+  components,
+  current,
+  dmc,
+  drawers,
+  endpoints,
+  location: location$1,
+  menu,
+  modals,
+  oauthEndpointKey,
+  page,
+  signinShowKey,
+  toasts,
+  ua
+};
+
+var application$1 = {
+  /**
+   * 起動ステータスを変更します。
+   * @return {Array}
+   */
+  launch: (context, bool) => {
+    context.state.application.isLaunched = bool;
+    return [constants$3.APPLICATION];
+  },
+
+  /**
+   * 画面遷移ステータスを変更します。
+   * @return {Array}
+   */
+  navigation: (context, bool) => {
+    context.state.application.isNavigating = bool;
+    return [constants$3.APPLICATION];
+  },
+
+  /**
+   * 通信中APIを追加します。
+   * @param {Object} info
+   * @return {Array}
+   */
+  addNetworking: (context, info) => {
+    context.state.application.networkings.push(index$1$1({
+      id: `networking_${Date.now()}`
+    }, info));
+    context.state.application.isNetworking = true;
+    return [constants$3.APPLICATION];
+  },
+
+  /**
+   * 通信中APIを削除します。
+   * @param {String} networkingId
+   * @return {Array}
+   */
+  removeNetworking: (context, networkingId) => {
+    context.state.application.networkings = reject_1$1(context.state.application.networkings, networking => {
+      return (networking.id === networkingId);
+    });
+    if (!context.state.application.networkings.length) {
+      context.state.application.isNetworking = false;
+    }
+    return [constants$3.APPLICATION];
+  }
+};
+
+/**
+     * Array.indexOf
+     */
+    function indexOf$1(arr, item, fromIndex) {
+        fromIndex = fromIndex || 0;
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length,
+            i = fromIndex < 0 ? len + fromIndex : fromIndex;
+        while (i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[i] === item) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    var indexOf_1$1 = indexOf$1;
+
+/**
+     * If array contains values.
+     */
+    function contains$1(arr, val) {
+        return indexOf_1$1(arr, val) !== -1;
+    }
+    var contains_1$1 = contains$1;
+
+/**
+     * Array filter
+     */
+    function filter$1(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var filter_1$1 = filter$1;
+
+/**
+     * Array map
+     */
+    function map$1(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null){
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            results[i] = callback(arr[i], i, arr);
+        }
+
+        return results;
+    }
+
+     var map_1$1 = map$1;
+
+/**
+     * Checks if the object is a primitive
+     */
+
+/**
+     * get "nested" object property
+     */
+    function get(obj, prop){
+        var parts = prop.split('.'),
+            last = parts.pop();
+
+        while (prop = parts.shift()) {
+            obj = obj[prop];
+            if (obj == null) { return; }
+        }
+
+        return obj[last];
+    }
+
+    var get_1 = get;
+
+/**
+ * Swaggerファイルをロードして解析しデータ/操作を一元管理。
+ * Tips: swagger-client(swagger-js) は、ブラウザの外部ファイル読み込み
+ */
+class Swagger {
+  constructor() {
+    this.client = null;
+  }
+
+  setup(endpoint) {
+    return new Promise((resolve, reject) => {
+      const request = {
+        url: endpoint.url,
+        //query,
+        //method,
+        //body,
+        headers: {
+          'Authorization': endpoint.token
+        },
+        requestInterceptor: (req) => {
+          console.log('Interceptor(request):', req);
+        },
+        responseInterceptor: (res) => {
+          console.log('Interceptor(response):', res);
+        }
+      };
+
+      SwaggerClient// eslint-disable-line no-undef
+        .http(request)
+        .then(client => {
+          if (client.errors && client.errors.length > 0) {
+            return reject(client.errors);
+          }
+          if (client.status === 401) {
+            // TODO: 要確認。
+            const err = new Error();
+            err.name = '401 Authorization Required';
+            err.status = client.spec.status;
+            return reject(err);
+          }
+
+          console.log(`[fetch] ${client.url} success.`);
+
+          SwaggerClient({spec: client.body}).then((_client) => {// eslint-disable-line no-undef
+            this.client = _client;
+            resolve(_client.spec.info);
+          });
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  apisFlatObject() {
+    if (!this.client) {
+      return {};
+    }
+    const apis = {};
+    forOwn_1$1(this.client.apis, (v) => {
+      forOwn_1$1(v, (v1, k1) => {
+        apis[k1] = v1;
+      });
+    });
+
+    return apis;
+  }
+
+  getApiByOperationID(operationID) {
+    return this.apisFlatObject()[operationID];
+  }
+
+  getOperationObjectByOperationID(operationID) {
+    let operationObject;
+    forOwn_1$1(this.client.spec.paths, pathItemObject => {
+      forOwn_1$1(pathItemObject, v => {
+        if (get_1(v, 'operationId') === operationID) {
+          operationObject = v;
+        }
+      });
+    });
+    return operationObject;
+  }
+
+  getPathItemObjectByPath(path) {
+    return this.client.spec.paths[path];
+  }
+
+  getMethodAndPathByOperationID(operationID) {
+    const ret = {};
+    forOwn_1$1(this.client.spec.paths, (pathItemObject, path) => {
+      forOwn_1$1(pathItemObject, (v, k) => {
+        if (get_1(v, 'operationId') === operationID) {
+          ret.method = k;
+          ret.path = path;
+        }
+      });
+    });
+    return ret;
+  }
+
+  /**
+   * dmc-component-*.tagが扱いやすいデータ構造に変換する。
+   * @param {Object} schema
+   * @param {*} response
+   */
+  mergeSchemaAndResponse(schema, response) {
+    // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+    // type will be one of "null", "boolean", "object", "array", "number", "string" or "integer".
+    let type = schema.type;
+    // if type is not defined or an array, expect type by response.
+    if (!type || Array.isArray(type)) {
+      if (Array.isArray(response)) {
+        type = 'array';
+      } else {
+        type = typeof response;
+      }
+    }
+    const ret = {
+      // dmc customs.
+      _type: null,
+      _value: null,
+      _rawValue: null,
+      _index: null,
+      _key: null,
+      _keys: null,
+      _length: null,
+      getType: function() {
+        return this._type;
+      },
+      getValue: function(k) {
+        if (k === undefined) {
+          return this._value;
+        }
+        return this._value[k];
+      },
+      getRawValue: function() {
+        return this._rawValue;
+      },
+      getIndex: function() {
+        return this._index;
+      },
+      getKey: function() {
+        return this._key;
+      },
+      getKeys: function() {
+        return this._keys;
+      },
+      getLength: function() {
+        return this._length;
+      }
+    };
+    // @see: http://swagger.io/specification/#schemaObject
+    const schemaObjectKeys = [
+      'example',
+      'format',// @see: http://swagger.io/specification/#dataTypeFormat
+      'title',
+      'description',
+      'default',
+      'multipleOf',
+      'maximum',
+      'exclusiveMaximum',
+      'minimum',
+      'exclusiveMinimum',
+      'maxLength',
+      'minLength',
+      'pattern',
+      'maxItems',
+      'minItems',
+      'uniqueItems',
+      'maxProperties',
+      'minProperties',
+      'required',
+      'enum',
+      //'type',// removed on purpose. type will be customized by dmc.
+      'items',
+      'allOf',
+      'properties',
+      'additionalProperties'
+    ];
+    forEach_1(schemaObjectKeys, v => {
+      ret[`_${v}`] = schema[v];
+      ret[`get${v.charAt(0).toUpperCase()}${v.slice(1)}`] = function() {
+        return this[`_${v}`];
+      };
+    });
+
+    switch (type) {
+    case 'null':
+      ret._type = 'null';
+      ret._value = null;
+      ret._rawValue = null;
+      break;
+    case 'boolean':
+      ret._type = 'boolean';
+      ret._value = response;
+      ret._rawValue = response;
+      break;
+    case 'object':
+      ret._type = 'object';
+      ret._value = {};
+      ret._rawValue = response;
+      ret._keys = [];
+      forOwn_1$1(response, (v, k) => {
+        ret._keys.push(k);
+        let nextSchema;
+        if (!!schema.properties) {
+          nextSchema = schema.properties[k];
+        } else if (schema.additionalProperties) {
+          nextSchema = {};
+        } else {
+          // TODO: swagger定義が間違っているので警告を出す。
+        }
+        ret._value[k] = this.mergeSchemaAndResponse(nextSchema, v);
+        ret._value[k]._key = k;
+      });
+      break;
+    case 'array':
+      ret._type = 'array';
+      ret._value = [];
+      ret._rawValue = response;
+      ret._length = response.length;
+      forEach_1(response, (v, i) => {
+        ret._value[i] = this.mergeSchemaAndResponse(schema.items, v);
+        ret._value[i]._index = i;
+      });
+      break;
+    case 'number':
+      ret._type = 'number';
+      ret._value = response;
+      ret._rawValue = response;
+      break;
+    case 'string':
+      ret._type = 'string';
+      ret._value = response;
+      ret._rawValue = response;
+      break;
+    case 'integer':
+      ret._type = 'integer';
+      ret._value = response;
+      ret._rawValue = response;
+      break;
+    default:
+      // irregular case. e.g.) レスポンス内容がproperties内に定義されていない場合など。
+      ret._value = response;
+      ret._rawValue = response;
+      break;
+    }
+
+    return ret;
+  }
+
+  isComponentStyleNumber(style) {
+    return style === 'number';
+  }
+
+  isComponentStyleTable(style) {
+    return style === 'table';
+  }
+
+  isComponentStyleGraph(style) {
+    return contains_1$1([
+      'graph-bar',
+      'graph-scatterplot',
+      'graph-line',
+      'graph-horizontal-bar',
+      'graph-stacked-bar',
+      'graph-horizontal-stacked-bar',
+      'graph-stacked-area'
+    ], style);
+  }
+
+  isComponentStyleGraphBar(style) {
+    return style === 'graph-bar';
+  }
+
+  isComponentStyleGraphScatterplot(style) {
+    return style === 'graph-scatterplot';
+  }
+
+  isComponentStyleGraphLine(style) {
+    return style === 'graph-line';
+  }
+
+  isComponentStyleGraphHorizontalBar(style) {
+    return style === 'graph-horizontal-bar';
+  }
+
+  isComponentStyleGraphStackedBar(style) {
+    return style === 'graph-stacked-bar';
+  }
+
+  isComponentStyleGraphHorizontalStackedBar(style) {
+    return style === 'graph-horizontal-stacked-bar';
+  }
+
+  isComponentStyleGraphStackedArea(style) {
+    return style === 'graph-stacked-area';
+  }
+
+}
+
+var swagger = new Swagger();
+
+var components$1 = {
+  /**
+   * 一件更新します。
+   * @param {riotx.Context} context
+   * @param {Object} params
+   * @return {Array}
+   */
+  updateOne: (context, params) => {
+    const schema = params.operationObject.responses[200].schema;
+    const responseObj = params.response.obj;
+    const data = swagger.mergeSchemaAndResponse(schema, responseObj);
+
+    context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
+    context.state.components[params.component_uid].data = data;
+    // `component.pagination`からページングをサポートしているか判断する。
+    // サポートしていれば手動でページング情報を付加する。
+    if (params.component.pagination) {
+      context.state.components[params.component_uid].pagination = {
+        // `x-pagination-current-page`等は独自仕様。
+        // DMCを使用するサービスはこの仕様に沿う必要がある。
+        currentPage: Number(params.response.headers['x-pagination-current-page'] || 0),
+        size: Number(params.response.headers['x-pagination-limit'] || 0),
+        maxPage: Number(params.response.headers['x-pagination-total-pages'] || 0)
+      };
+    }
+    // `component.query`(array)からクエリ検索をサポートしているか判断する。
+    // サポートしていれば手動でクエリ情報を付加する。
+    if (params.component.query && !!params.component.query.length) {
+      context.state.components[params.component_uid].search = params.component.query;
+    }
+    // 関連API(path)群を付与する。
+    const actions = [];
+    forEach_1(params.pathRefs, ref => {
+      const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
+      forOwn_1$1(pathItemObject, (value, key) => {
+        // GETメソッドはサポートしない。
+        if (contains_1$1(['put', 'post', 'delete', 'options', 'head', 'patch'], key)) {
+          actions.push({
+            isSelf: ref.isSelf,
+            operationObject: value
+          });
+        }
+      });
+    });
+    context.state.components[params.component_uid].selfActions = map_1$1(filter_1$1(actions, action => {
+      return action.isSelf;
+    }), action => {
+      return action.operationObject;
+    });
+    context.state.components[params.component_uid].childActions = map_1$1(filter_1$1(actions, action => {
+      return !action.isSelf;
+    }), action => {
+      return action.operationObject;
+    });
+
+    return [constants$3.COMPONENTS_ONE(params.component_uid)];
+  },
+
+  /**
+   * 一件削除します。
+   * @param {riotx.Context} context
+   * @param {String} component_uid
+   * @return {Array}
+   */
+  removeOne: (context, component_uid) => {
+    delete context.state.components[component_uid];
+    return [constants$3.COMPONENTS_ONE(component_uid)];
+  },
+
+  /**
+   * 全件削除します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  removeAll: context => {
+    context.state.components = {};
+    return [constants$3.COMPONENTS];
+  }
+};
+
+var current$1 = {
+  /**
+   * 値書き換え。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Array}
+   */
+  all: (context, endpointKey) => {
+    context.state.current = store.set(constants$3.CURRENT, endpointKey);
+    return [constants$3.CURRENT];
+  }
+};
+
+var dmc$1 = {
+  /**
+   * @param {riotx.Context} context
+   * @param {Object|null} dmc
+   * @return {Array}
+   */
+  all: (context, dmc) => {
+    if (!dmc) {
+      context.state.dmc = null;
+    } else {
+      const schema = dmc.operationObject.responses[200].schema;
+      const response = dmc.response;
+      const data = swagger.mergeSchemaAndResponse(schema, response);
+      context.state.dmc = data;
+    }
+    return [constants$3.DMC];
+  }
+};
+
+var drawers$1 = {
+  /**
+   * ドローワーを追加します。
+   * @param {riotx.Context} context
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} drawerOpts
+   * @return {Array}
+   */
+  add: (context, tagName, tagOpts = {}, drawerOpts = {}) => {
+    context.state.drawers.push({
+      id: `drawer_${Date.now()}`,
+      tagName,
+      tagOpts,
+      drawerOpts
+    });
+    return [constants$3.DRAWERS];
+  },
+
+  /**
+   * ドローワーを削除します。
+   * @param {riotx.Context} context
+   * @param {String} drawerID
+   * @return {Array}
+   */
+  remove: (context, drawerID) => {
+    context.state.drawers = reject_1$1(context.state.drawers, drawer => {
+      return (drawer.id === drawerID);
+    });
+    return [constants$3.DRAWERS];
+  }
+};
+
+var endpoints$1 = {
+  /**
+   * 1件のエンドポイントを追加します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Object} endpoint
+   * @return {Array}
+   */
+  add: (context, endpointKey, endpoint) => {
+    context.state.endpoints[endpointKey] = endpoint;
+    store.set('endpoints', context.state.endpoints);
+    return [constants$3.ENDPOINTS];
+  },
+
+  /**
+   * 指定されたエンドポイントを削除します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Array}
+   */
+  remove: (context, endpointKey) => {
+    delete context.state.endpoints[endpointKey];
+    store.set('endpoints', context.state.endpoints);
+    return [constants$3.ENDPOINTS];
+  },
+
+  /**
+   * 全てのエンドポイントを削除します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  removeAll: context => {
+    context.state.endpoints = {};
+    store.set('endpoints', context.state.endpoints);
+    return [constants$3.ENDPOINTS];
+  },
+
+  /**
+   * 指定されたエンドポイントを更新します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Object} endpoint
+   * @return {Array}
+   */
+  update: (context, endpointKey, endpoint) => {
+    if (!endpoint) {
+      context.state.endpoints[endpointKey] = null;
+    } else {
+      context.state.endpoints[endpointKey] = index$1$1({}, context.state.endpoints[endpointKey], endpoint);
+    }
+    store.set('endpoints', context.state.endpoints);
+    return [constants$3.ENDPOINTS];
+  },
+
+  /**
+   * 指定されたエンドポイントのtokenを更新します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {String|null} token
+   * @return {Array}
+   */
+  updateToken: (context, endpointKey, token) => {
+    context.state.endpoints[endpointKey].token = token;
+    store.set('endpoints', context.state.endpoints);
+    return [constants$3.ENDPOINTS];
+  }
+};
+
+var location$2 = {
+  /**
+   * ページ情報を更新します。
+   * @param {riotx.Context} context
+   * @param {Object} obj
+   * @return {Array}
+   */
+  all: (context, obj) => {
+    context.state.location = index$1$1({}, context.state.location, obj);
+    return [constants$3.LOCATION];
+  },
+
+  /**
+   * ページ名を更新します。
+   * @param {riotx.Context} context
+   * @param {String} name
+   * @return {Array}
+   */
+  name: (context, name) => {
+    context.state.location.name = name;
+    return [constants$3.LOCATION];
+  },
+
+  /**
+   * ルーティング情報を更新します。
+   * @param {riotx.Context} context
+   * @param {Object} route
+   * @return {Array}
+   */
+  route: (context, route) => {
+    context.state.location.route = route;
+    return [constants$3.LOCATION];
+  }
+};
+
+var menu$1 = {
+  /**
+   * 開閉状態をトグルします。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  toggle: context => {
+    context.state.menu.isOpened = !context.state.menu.isOpened;
+    return [constants$3.MENU];
+  },
+
+  /**
+   * 開状態にします。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  open: context => {
+    context.state.menu.isOpened = true;
+    return [constants$3.MENU];
+  },
+
+  /**
+   * 閉状態にします。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  close: context => {
+    context.state.menu.isOpened = false;
+    return [constants$3.MENU];
+  },
+
+  /**
+   * 有効状態にします。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  enable: context => {
+    context.state.menu.isEnabled = true;
+    return [constants$3.MENU];
+  },
+
+  /**
+   * 無効状態にします。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  disable: context => {
+    context.state.menu.isEnabled = false;
+    return [constants$3.MENU];
+  }
+};
+
+var modals$1 = {
+  /**
+   * モーダルを追加します。
+   * @param {riotx.Context} context
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} modalOpts
+   * @return {Array}
+   */
+  add: (context, tagName, tagOpts = {}, modalOpts = {}) => {
+    context.state.modals.push({
+      id: `modal_${Date.now()}`,
+      tagName,
+      tagOpts,
+      modalOpts
+    });
+    return [constants$3.MODALS];
+  },
+
+  /**
+   * モーダルを削除します。
+   * @param {riotx.Context} context
+   * @param {String} modalID
+   * @return {Array}
+   */
+  remove: (context, modalID) => {
+    context.state.modals = reject_1$1(context.state.modals, modal => {
+      return (modal.id === modalID);
+    });
+    return [constants$3.MODALS];
+  }
+};
+
+var oauthEndpointKey$1 = {
+  /**
+   * OAuth認証中のエンドポイントkeyを変更します。
+   * @param {riotx.Context} context
+   * @param {String|null} endpointKey
+   * @return {Array}
+   */
+  all: (context, endpointKey) => {
+    context.state.oauthEndpointKey = store.set('oauth_endpoint_key', endpointKey);
+    return [constants$3.OAUTHENDPOINTKEY];
+  }
+};
+
+var page$1 = {
+  /**
+   * ページ情報を書き換えます。
+   * @param {riotx.Context} context
+   * @param {Object|null} page
+   * @return {Array}
+   */
+  all: (context, page) => {
+    context.state.page = page;
+    return [constants$3.PAGE];
+  }
+};
+
+const generateId = () => {
+  return `toast_${Date.now()}`;
+};
+
+const TOAST_TYPE_NORMAL = 'normal';
+const TOAST_TIMEOUT = 3 * 1000;
+const TOAST_AUTO_HIDE = true;
+
+var toasts$1 = {
+  /**
+   * トーストを追加します。
+   * @param {riotx.Context} context
+   * @param {Object} obj
+   * @return {Array}
+   */
+  add: (context, obj) => {
+    const data = index$1$1({
+      type: TOAST_TYPE_NORMAL,
+      timeout: TOAST_TIMEOUT,
+      autoHide: TOAST_AUTO_HIDE
+    }, obj, {
+      id: generateId()
+    });
+
+    context.state.toasts.push(data);
+    return [constants$3.TOASTS];
+  },
+
+  /**
+   * トーストを削除します。
+   * @param {riotx.Context} context
+   * @param {String} toastId
+   * @return {Array}
+   */
+  remove: (context, toastId) => {
+    context.state.toasts = reject_1$1(context.state.toasts, toast => {
+      return toast.id === toastId;
+    });
+
+    return [constants$3.TOASTS];
+  }
+};
+
+var ua$1 = {
+  /**
+   * UA情報を書き換えます。
+   * @param {riotx.Context} context
+   * @param {Object} ua
+   * @return {Array}
+   */
+  all: (context, ua) => {
+    context.state.ua = ua;
+    return [constants$3.UA];
+  }
+};
+
+const constants$2 = {
+  APPLICATION_LAUNCH: 'APPLICATION_LAUNCH',
+  APPLICATION_NAVIGATION: 'APPLICATION_NAVIGATION',
+  APPLICATION_NETWORKINGS_ADD: 'APPLICATION_NETWORKINGS_ADD',
+  APPLICATION_NETWORKINGS_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
+  COMPONENTS_UPDATE_ONE: 'COMPONENTS_UPDATE_ONE',
+  COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
+  COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
+  CURRENT: 'CURRENT',
+  DMC: 'DMC',
+  DRAWERS_ADD: 'DRAWERS_ADD',
+  DRAWERS_REMOVE: 'DRAWERS_REMOVE',
+  ENDPOINTS_ADD: 'ENDPOINTS_ADD',
+  ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
+  ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
+  ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
+  ENDPOINTS_UPDATE_TOKEN: 'ENDPOINTS_UPDATE_TOKEN',
+  LOCATION: 'LOCATION',
+  LOCATION_NAME: 'LOCATION_NAME',
+  LOCATION_ROUTE: 'LOCATION_ROUTE',
+  MENU_TOGGLE: 'MENU_TOGGLE',
+  MENU_OPEN: 'MENU_OPEN',
+  MENU_CLOSE: 'MENU_CLOSE',
+  MENU_ENABLE: 'MENU_ENABLE',
+  MENU_DISABLE: 'MENU_DISABLE',
+  MODALS_ADD: 'MODALS_ADD',
+  MODALS_REMOVE: 'MODALS_REMOVE',
+  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
+  PAGE: 'PAGE',
+  TOASTS_ADD: 'TOASTS_ADD',
+  TOASTS_REMOVE: 'TOASTS_REMOVE',
+  UA: 'UA'
+};
+
+var mutations = {
+  [constants$2.APPLICATION_LAUNCH]: application$1.launch,
+  [constants$2.APPLICATION_NAVIGATION]: application$1.navigation,
+  [constants$2.APPLICATION_NETWORKINGS_ADD]: application$1.addNetworking,
+  [constants$2.APPLICATION_NETWORKINGS_REMOVE]: application$1.removeNetworking,
+  [constants$2.COMPONENTS_UPDATE_ONE]: components$1.updateOne,
+  [constants$2.COMPONENTS_REMOVE_ONE]: components$1.removeOne,
+  [constants$2.COMPONENTS_REMOVE_ALL]: components$1.removeAll,
+  [constants$2.CURRENT]: current$1.all,
+  [constants$2.DMC]: dmc$1.all,
+  [constants$2.DRAWERS_ADD]: drawers$1.add,
+  [constants$2.DRAWERS_REMOVE]: drawers$1.remove,
+  [constants$2.ENDPOINTS_ADD]: endpoints$1.add,
+  [constants$2.ENDPOINTS_REMOVE]: endpoints$1.remove,
+  [constants$2.ENDPOINTS_REMOVE_ALL]: endpoints$1.removeAll,
+  [constants$2.ENDPOINTS_UPDATE]: endpoints$1.update,
+  [constants$2.ENDPOINTS_UPDATE_TOKEN]: endpoints$1.updateToken,
+  [constants$2.LOCATION]: location$2.all,
+  [constants$2.LOCATION_NAME]: location$2.name,
+  [constants$2.LOCATION_ROUTE]: location$2.route,
+  [constants$2.MENU_TOGGLE]: menu$1.toggle,
+  [constants$2.MENU_OPEN]: menu$1.open,
+  [constants$2.MENU_CLOSE]: menu$1.close,
+  [constants$2.MENU_ENABLE]: menu$1.enable,
+  [constants$2.MENU_DISABLE]: menu$1.disable,
+  [constants$2.MODALS_ADD]: modals$1.add,
+  [constants$2.MODALS_REMOVE]: modals$1.remove,
+  [constants$2.OAUTH_ENDPOINT_KEY]: oauthEndpointKey$1.all,
+  [constants$2.PAGE]: page$1.all,
+  [constants$2.TOASTS_ADD]: toasts$1.add,
+  [constants$2.TOASTS_REMOVE]: toasts$1.remove,
+  [constants$2.UA]: ua$1.all
+};
+
+var application = {
+  /**
+   * 起動状態にします。
+   * @return {Promise}
+   */
+  launch: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_LAUNCH, true);
+      });
+  },
+
+  /**
+   * 画面遷移状態にします。
+   * @return {Promise}
+   */
+  startNavigation: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_NAVIGATION, true);
+      });
+  },
+
+  /**
+   * 画面遷移完了状態にします。
+   * @return {Promise}
+   */
+  endNavigation: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_NAVIGATION, false);
+      });
+  }
+};
+
+/**
+     */
+    function isObject(val) {
+        return isKind_1$1(val, 'Object');
+    }
+    var isObject_1 = isObject;
+
+/**
+ * body値をContent-Type `application/json`に最適化します。
+ * @param {*} body
+ * @return {*}
+ */
+const jsonConverter = body => {
+  return JSON.stringify(body);
+};
+
+/**
+ * body値をContent-Type `application/x-www-form-urlencoded`に最適化します。
+ * @param {*} body
+ * @return {*}
+ */
+const urlEncodedStandardQueryStringConverter = body => {
+  const strings = [];
+  const keys = Object.keys(body);
+
+  keys.forEach(key => {
+    const value = body[key];
+    const string = `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+
+    strings.push(string);
+  });
+
+  return strings.join('&');
+};
+
+/**
+ * body値をContent-Type `multipart/form-data`に最適化します。
+ * @param {*} body
+ * @return {*}
+ */
+const formDataConverter = body => {
+  const formData = new FormData();
+  const keys = Object.keys(body);
+
+  keys.forEach(key => {
+    const value = body[key];
+
+    if (isObject_1(value) || Array.isArray(value)) {
+      formData.append(key, JSON.stringify(value));
+    } else if (value != null) {
+      formData.append(key, value);
+    }
+  });
+
+  return formData;
+};
+
+/**
+ * 共通設定が施されたFetch API。
+ * @param {riotx.Context} context
+ * @param {String} url
+ * @param {Object} options
+ * @return {Promise}
+ */
+const commonFetch = (context, url, options) => {
+  options = index$1$1({
+    mode: 'cors',
+    // redirect方法はレスポンスにそう形にする。
+    redirect: 'follow',
+    headers: {
+      // 何も指定しない場合はこれをデフォルトにする。
+      'Content-Type': 'application/json'
+    }
+  }, options);
+
+  // `Content-Type`に応じてbody内容を書き換えます。
+  if (!!options.body && (options.method === 'POST' || options.method === 'PUT')) {
+    switch (options.headers['Content-Type']) {
+    case 'application/json':
+      options.body = jsonConverter(options.body);
+      break;
+    case 'application/x-www-form-urlencoded':
+      options.body = urlEncodedStandardQueryStringConverter(options.body);
+      break;
+    case 'multipart/form-data':
+      options.body = formDataConverter(options.body);
+      break;
+    default:
+      break;
+    }
+  }
+
+  const networkingId = `networking_${Date.now()}`;
+  return Promise
+    .resolve()
+    .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
+      id: networkingId,
+      url,
+      options
+    }))
+    .then(() => fetch(url, options))
+    .then(response => {
+      context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      return response;
+    })
+    .then(response => { // status check.
+      if (!response.ok) {
+        return Promise.reject(response);
+      }
+      return Promise.resolve(response);
+    });
+};
+
+var application$3 = {
+  /**
+   * `application`情報を返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  all: context => {
+    return context.state.application;
+  },
+
+  /**
+   * 起動状態を返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isLaunched: context => {
+    return context.state.application.isLaunched;
+  },
+
+  /**
+   * 遷移中か否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isNavigating: context => {
+    return context.state.application.isNavigating;
+  },
+
+  /**
+   * API通信中か否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isNetworking: context => {
+    return context.state.application.isNetworking;
+  }
+};
+
+var components$2 = {
+  /**
+   * 全情報を返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  all: context => {
+    return context.state.components;
+  },
+
+  /**
+   * 指定riotIDに対する要素を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Object}
+   */
+  one: (context, riotId) => {
+    return context.state.components[riotId];
+  }
+};
+
+var current$2 = {
+  /**
+   * 選択中のendpointIDを返します。
+   * @param {riotx.Context} context
+   * @return {String|null}
+   */
+  all: context => {
+    return context.state.current;
+  }
+};
+
+/**
+     * Creates a new object with all the properties where the callback returns
+     * true.
+     */
+    function filterValues(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var output = {};
+        forOwn_1$1(obj, function(value, key, obj) {
+            if (callback(value, key, obj)) {
+                output[key] = value;
+            }
+        });
+
+        return output;
+    }
+    var filter$3 = filterValues;
+
+/**
+     * Get object values
+     */
+    function values(obj) {
+        var vals = [];
+        forOwn_1$1(obj, function(val, key){
+            vals.push(val);
+        });
+        return vals;
+    }
+
+    var values_1 = values;
+
+var dmc$2 = {
+  /**
+   * 全て返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  all: context => {
+    if (!context.state.dmc) {
+      return null;
+    }
+    return context.state.dmc.getRawValue();
+  },
+
+  /**
+   * page群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  pages: context => {
+    const rawData = context.state.dmc.getRawValue();
+    return rawData.pages;
+  },
+
+  /**
+   * 指定idx値のpageのidを返します。
+   * @param {riotx.Context} context
+   * @param {Number} idx
+   * @return {String}
+   */
+  pageIdOf: (context, idx) => {
+    const rawData = context.state.dmc.getRawValue();
+    const page = rawData.pages[idx];
+    return page.id;
+  },
+
+  /**
+   * 名前を返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  name: context => {
+    const rawData = context.state.dmc.getRawValue();
+    return rawData.name;
+  },
+
+  /**
+   * ダッシュボードメニュー群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  dashboard: context => {
+    if (!context.state.dmc) {
+      return [];
+    }
+    const rawData = context.state.dmc.getRawValue();
+    const pages = rawData.pages;
+    return values_1(filter$3(pages, v => {
+      if (v.section !== 'dashboard') {
+        return false;
+      }
+      return true;
+    }));
+  },
+
+  /**
+   * 管理画面メニュー群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  manage: context => {
+    if (!context.state.dmc) {
+      return [];
+    }
+    const rawData = context.state.dmc.getRawValue();
+    const pages = rawData.pages;
+    return values_1(filter$3(pages, v => {
+      if (v.section !== 'manage') {
+        return false;
+      }
+      return true;
+    }));
+  }
+};
+
+var drawers$2 = {
+  /**
+   * 全てのドローワー情報を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  all: context => {
+    return context.state.drawers;
+  }
+};
+
+/**
+     * Object some
+     */
+    function some$1(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var result = false;
+        forOwn_1$1(obj, function(val, key) {
+            if (callback(val, key, obj)) {
+                result = true;
+                return false; // break
+            }
+        });
+        return result;
+    }
+
+    var some_1$1 = some$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$1(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var result;
+        some_1$1(obj, function(value, key, obj) {
+            if (callback(value, key, obj)) {
+                result = value;
+                return true; //break
+            }
+        });
+        return result;
+    }
+
+    var find_1$1 = find$1;
+
+/**
+     * Get object keys
+     */
+     var keys = Object.keys || function (obj) {
+            var keys = [];
+            forOwn_1$1(obj, function(val, key){
+                keys.push(key);
+            });
+            return keys;
+        };
+
+    var keys_1 = keys;
+
+const number = '1234567890';
+const alphabet = 'abcdefghij';
+
+const number2alphabet = str => {
+  str += '';
+  for (let i = 0; i < number.length; i++) {
+    const re = new RegExp(number[i], 'g');
+    str = str.replace(re, alphabet[i]);
+  }
+  return str;
+};
+
+var endpoints$2 = {
+  /**
+   * 全endpointを返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  all: context => {
+    return context.state.endpoints;
+  },
+
+  /**
+   * 指定keyにマッチするendpointを返します。
+   * @param {riotx.Context} context
+   * @param {String} key
+   * @return {Object}
+   */
+  one: (context, key) => {
+    return context.state.endpoints[key];
+  },
+
+  /**
+   * 指定urlにマッチするendpointを返します。
+   * @param {riotx.Context} context
+   * @param {String} url
+   * @return {Object}
+   */
+  oneByURL: (context, url) => {
+    const endpoints = context.state.endpoints;
+    return find_1$1(endpoints, endpoint => {
+      return endpoint.url === url;
+    });
+  },
+
+  /**
+   * 次のkeyを返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  nextKey: context => {
+    return number2alphabet(keys_1(context.state.endpoints).length + 1);
+  }
+
+};
+
+var location$3 = {
+  /**
+   * 全情報を返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  all: context => {
+    return context.state.location;
+  },
+
+  /**
+   * ページ名を返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  name: context => {
+    return context.state.location.name;
+  },
+
+  /**
+   * ルーティング情報を返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  route: context => {
+    return context.state.location.route;
+  }
+};
+
+var menu$2 = {
+  /**
+   * 開閉状態を返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  opened: context => {
+    return context.state.menu.isOpened;
+  },
+
+  /**
+   * 有効状態を返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  enabled: context => {
+    return context.state.menu.isEnabled;
+  }
+};
+
+var modals$2 = {
+  /**
+   * 全てのモーダル情報を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  all: context => {
+    return context.state.modals;
+  }
+};
+
+var oauthEndpointKey$2 = {
+  /**
+   * OAuth認証中のendpointKeyを返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  all: context => {
+    return context.state.oauthEndpointKey;
+  }
+};
+
+var page$2 = {
+  /**
+   * 全情報を返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  all: context => {
+    if (!context.state.page) {
+      return {};
+    }
+    return context.state.page.getRawValue();
+  },
+
+  /**
+   * ページIDを返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  id: context => {
+    if (!context.state.page) {
+      return '';
+    }
+    const rawData = context.state.page.getRawValue();
+    return rawData.id;
+  },
+
+  /**
+   * ページ名を返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  name: context => {
+    if (!context.state.page) {
+      return '';
+    }
+    const rawData = context.state.page.getRawValue();
+    return rawData.name;
+  },
+
+  /**
+   * コンポーネント群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  components: context => {
+    if (!context.state.page) {
+      return [];
+    }
+    const rawData = context.state.page.getRawValue();
+    return rawData.components;
+  }
+};
+
+var toasts$2 = {
+  /**
+   * 全てのトースト情報を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  all: context => {
+    return context.state.toasts;
+  }
+};
+
+var ua$2 = {
+  /**
+   * 全情報を返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  all: context => {
+    return context.state.ua;
+  }
+};
+
+const constants$4 = {
+  APPLICATION: 'APPLICATION',
+  APPLICATION_ISLAUNCHED: 'APPLICATION_ISLAUNCHED',
+  APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
+  APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
+  COMPONENTS: 'COMPONENTS',
+  COMPONENTS_GET: 'COMPONENTS_GET',
+  CURRENT: 'CURRENT',
+  DMC: 'DMC',
+  DMC_PAGES: 'DMC_PAGES',
+  DMC_PAGES_ID_OF: 'DMC_PAGES_ID_OF',
+  DMC_NAME: 'DMC_NAME',
+  DMC_DASHBOARD: 'DMC_DASHBOARD',
+  DMC_MANAGE: 'DMC_MANAGE',
+  DRAWERS: 'DRAWERS',
+  ENDPOINTS: 'ENDPOINTS',
+  ENDPOINTS_ONE: 'ENDPOINTS_ONE',
+  ENDPOINTS_ONE_BY_URL: 'ENDPOINTS_ONE_BY_URL',
+  ENDPOINTS_NEXT_KEY: 'ENDPOINTS_NEXT_KEY',
+  LOCATION: 'LOCATION',
+  LOCATION_NAME: 'LOCATION_NAME',
+  LOCATION_ROUTE: 'LOCATION_ROUTE',
+  MENU_OPENED: 'MENU_OPENED',
+  MENU_ENABLED: 'MENU_ENABLED',
+  MODALS: 'MODALS',
+  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
+  PAGE: 'PAGE',
+  PAGE_ID: 'PAGE_ID',
+  PAGE_NAME: 'PAGE_NAME',
+  PAGE_COMPONENTS: 'PAGE_COMPONENTS',
+  TOASTS: 'TOASTS',
+  UA: 'UA'
+};
+
+var getters = {
+  [constants$4.APPLICATION]: application$3.all,
+  [constants$4.APPLICATION_ISLAUNCHED]: application$3.isLaunched,
+  [constants$4.APPLICATION_ISNAVIGATING]: application$3.isNavigating,
+  [constants$4.APPLICATION_ISNETWORKING]: application$3.isNetworking,
+  [constants$4.COMPONENTS]: components$2.all,
+  [constants$4.COMPONENTS_ONE]: components$2.one,
+  [constants$4.CURRENT]: current$2.all,
+  [constants$4.DMC]: dmc$2.all,
+  [constants$4.DMC_PAGES]: dmc$2.pages,
+  [constants$4.DMC_PAGES_ID_OF]: dmc$2.pageIdOf,
+  [constants$4.DMC_NAME]: dmc$2.name,
+  [constants$4.DMC_DASHBOARD]: dmc$2.dashboard,
+  [constants$4.DMC_MANAGE]: dmc$2.manage,
+  [constants$4.DRAWERS]: drawers$2.all,
+  [constants$4.ENDPOINTS]: endpoints$2.all,
+  [constants$4.ENDPOINTS_ONE]: endpoints$2.one,
+  [constants$4.ENDPOINTS_ONE_BY_URL]: endpoints$2.oneByURL,
+  [constants$4.ENDPOINTS_NEXT_KEY]: endpoints$2.nextKey,
+  [constants$4.LOCATION]: location$3.all,
+  [constants$4.LOCATION_NAME]: location$3.name,
+  [constants$4.LOCATION_ROUTE]: location$3.route,
+  [constants$4.MENU_OPENED]: menu$2.opened,
+  [constants$4.MENU_ENABLED]: menu$2.enabled,
+  [constants$4.MODALS]: modals$2.all,
+  [constants$4.OAUTH_ENDPOINT_KEY]: oauthEndpointKey$2.all,
+  [constants$4.PAGE]: page$2.all,
+  [constants$4.PAGE_ID]: page$2.id,
+  [constants$4.PAGE_NAME]: page$2.name,
+  [constants$4.PAGE_COMPONENTS]: page$2.components,
+  [constants$4.TOASTS]: toasts$2.all,
+  [constants$4.UA]: ua$2.all
+};
+
+var auth = {
+  /**
+   * 指定されたエンドポイントのtokenを更新します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {String} token
+   * @return {Promise}
+   */
+  update: (context, endpointKey, token) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントのtokenを削除します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Promise}
+   */
+  remove: (context, endpointKey) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントのtokenが有効か確認します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Promise}
+   */
+  validate: (context, endpointKey) => {
+    const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, endpoint.url, {
+        headers: {
+          'Authorization': endpoint.token
+        }
+      }))
+      .then(() => {
+        return true;
+      })
+      .catch(err => {
+        if (err.status !== 401) {
+          throw err;
+        }
+        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
+        return false;
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントの認証手段を調べます。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Promise}
+   */
+  getTypes: (context, endpointKey) => {
+    const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+    const anchorElm = document.createElement('a');
+    anchorElm.href = endpoint.url;
+    const fetchUrl = `${anchorElm.origin}/dmc_authtype`;
+
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, fetchUrl))
+      .then(response => response.json());
+  },
+
+  /**
+   * OAuth認証を行います。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Object} authtype
+   * @return {Promise}
+   */
+  signinOAuth: (context, endpointKey, authtype) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.OAUTH_ENDPOINT_KEY, endpointKey);
+      })
+      .then(() => {
+        const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+        const anchorElm = document.createElement('a');
+        anchorElm.href = endpoint.url;
+        const fetchUrl = `${anchorElm.origin}${authtype.url}?redirect_url=${encodeURIComponent(location.href)}`;
+        location.href = fetchUrl;
+      });
+  },
+
+  /**
+   * メールxパスワード認証を行います。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Object} authtype
+   * @param {String} email
+   * @param {String} password
+   * @return {Promise}
+   */
+  signinEmail: (context, endpointKey, authtype, email, password) => {
+    const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+    const anchorElm = document.createElement('a');
+    anchorElm.href = endpoint.url;
+    const fetchUrl = `${anchorElm.origin}${authtype.url}`;
+
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, fetchUrl, {
+        method: authtype.method,
+        body: {
+          email,
+          password
+        }
+      }))
+      .then(response => {
+        const token = response.headers.get('Authorization');
+        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+      });
+  }
+};
+
+var components$3 = {
+  /**
+   * 一つのコンポーネント情報を取得します。
+   * @param {riotx.Context} context
+   * @param {String} component_uid
+   * @param {Object} component
+   * @param {Object} query
+   * @return {Promise}
+   */
+  get: (context, component_uid, component, query) => {
+    return new Promise((resolve, reject) => {
+      const method = component.api.method;
+      // GETメソッドのみサポート。
+      if (method !== 'get') {
+        return reject('only `get` method is allowed.');
+      }
+
+      let path = component.api.path;
+      if (path.indexOf('/') !== 0) {
+        path = '/' + path;
+      }
+
+      // @see: http://swagger.io/specification/#itemsObject
+      const pathItemObject = swagger.client.spec.paths[path];
+      if (!pathItemObject || !pathItemObject[method]) {
+        return reject(`[fetch] API definition is not found. ${method} ${path}`);
+      }
+      // 関連のあるpath情報を取得します。
+      const pathRefs = [{
+        // `isSelf`はpath情報が自身のpathか関連APIのpathかを判断するためのフラグ。
+        isSelf: true,
+        path
+      }];
+      // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
+      forEach_1(pathItemObject['get']['x-ref'] || [], path => {
+        pathRefs.push({
+          isSelf: false,
+          path
+        });
+      });
+      // @see: http://swagger.io/specification/#operationObject
+      const operationObject = pathItemObject[method];
+      const api = swagger.getApiByOperationID(operationObject.operationId);
+
+      api(query, {
+        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
+        requestInterceptor: req => {
+          // TODO: `headers`とかでtokenのセットが可能か？？
+          req.headers['Authorization'] = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
+        }
+      }).then(res => {
+        if (!res.ok) {
+          return reject(`[fetch] ${res.url} error.`);
+        }
+        context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
+          response: res,
+          operationObject,
+          pathRefs,
+          component,
+          component_uid: component_uid
+        });
+        return resolve();
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  },
+
+  /**
+   * APIコールします。
+   * @param {riotx.Context} context
+   * @param {Object} operationObject
+   * @param {Object} query
+   * @return {Promise}
+   */
+  operate: (context, operationObject, query) => {
+    const api = swagger.getApiByOperationID(operationObject.operationId);
+    const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
+
+    // TODO: 共通化したいな
+    return api(query, {
+      requestInterceptor: req => {
+        // TODO: queryに含めることは可能か..?
+        req.headers['Authorization'] = token;
+      }
+    });
+  },
+
+  /**
+   * 一件削除します。
+   * @param {riotx.Context} context
+   * @param {String} component_uid
+   * @return {Promise}
+   */
+  remove: (context, component_uid) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.COMPONENTS_REMOVE_ONE, component_uid);
+      });
+  },
+
+  /**
+   * 全件削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  removeAll: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.COMPONENTS_REMOVE_ALL);
+      });
+  }
+};
+
+var current$3 = {
+  /**
+   * 選択中endpointKeyを更新します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Promise}
+   */
+  update: (context, endpointKey) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.CURRENT, endpointKey);
+      });
+  },
+
+  /**
+   * 選択中endpointKeyを削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  remove: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.CURRENT, null);
+      });
+  }
+};
+
+// APIは必須でサポートしなければならない URI
+const DMC_URI = '/dmc';
+
+var dmc$3 = {
+  /**
+   * dmc情報を取得します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  get: context => {
+    return new Promise((resolve, reject) => {
+      const operationObject = swagger.client.spec.paths[DMC_URI].get;
+
+      if (!operationObject || !swagger.client.apis.dmc || !swagger.client.apis.dmc[operationObject.operationId]) {
+        return reject(new Error(`[fetch] ${swagger.client.url}; system entry point not found. (uri: ${DMC_URI})`));
+      }
+
+      const api = swagger.getApiByOperationID(operationObject.operationId);
+
+      const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
+
+      api({/** TODO get only support. */}, {
+        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
+        // TODO component.jsと共通化したい
+        requestInterceptor: (req) => {
+          req.headers['Authorization'] = token;
+          console.log('Interceptor(request):', req);
+        },
+        responseInterceptor: (res) => {
+          console.log('Interceptor(response):', res);
+        }
+      }).then(res => {
+        if (!res.ok) {
+          throw new Error(`[fetch] ${res.url} error.`);
+        }
+
+        console.log(`[fetch] ${res.url} success.`);
+
+        return {
+          response: res.obj,
+          operationObject
+        };
+      }).then(res => {
+        context.commit(constants$2.DMC, res);
+        const key = context.getter(constants$2.CURRENT);
+        const endpoint = context.getter(constants$4.ENDPOINTS_ONE, key);
+        context.commit(constants$2.ENDPOINTS_UPDATE, key, index$1$1({}, endpoint, res.response));
+      }).then(() => {
+        resolve();
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  },
+
+  /**
+   * dmc情報を削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  remove: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.DMC, null);
+      });
+  }
+};
+
+var drawers$3 = {
+  /**
+   * ドローワーを追加します。
+   * @param {riotx.Context} context
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} drawerOpts
+   * @return {Promise}
+   */
+  add: (context, tagName, tagOpts, drawerOpts) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.DRAWERS_ADD, tagName, tagOpts, drawerOpts);
+      });
+  },
+
+  /**
+   * ドローワーを削除します。
+   * @param {riotx.Context} context
+   * @param {String} drawerId
+   * @return {Promise}
+   */
+  remove: (context, drawerId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.DRAWERS_REMOVE, drawerId);
+      });
+  }
+};
+
+var endpoints$3 = {
+  /**
+   * 1件のエンドポイントを追加します。
+   * @param {riotx.Context} context
+   * @param {String} url
+   * @param {String} memo
+   * @return {Promise}
+   */
+  add: (context, url, memo) => {
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, url))
+      .catch(err => {
+        // 401エラーは想定内。
+        // 401 = endpointが存在しているので認証エラーになる。
+        // 401以外 = endpointが存在しない。
+        if (err.status !== 401) {
+          throw err;
+        }
+        const key = context.getter(constants$4.ENDPOINTS_NEXT_KEY);
+        const newEndpoint = {
+          url: url,
+          memo: memo,
+          token: null,
+          title: '',
+          name: '',
+          description: '',
+          version: '',
+          color: '',
+          thumbnail: './img/dmc_default.png',
+          tags: []
+        };
+        context.commit(constants$2.ENDPOINTS_ADD, key, newEndpoint);
+      });
+  },
+
+  /**
+   * 1件のエンドポイントを更新します
+   * @param {riotx.Context} context
+   * @param {String} url
+   * @param {Object} newEndpoint
+   * @return {Promise}
+   */
+  update: (context, key, newEndpoint) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.ENDPOINTS_UPDATE, key, newEndpoint);
+      });
+  },
+
+  /**
+   * 1件のエンドポイントを削除します。
+   * @param {riotx.Context} context
+   * @param {String} key
+   * @return {Promise}
+   */
+  remove: (context, key) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.ENDPOINTS_REMOVE, key);
+      });
+  },
+
+  /**
+   * 全てのエンドポイントを削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  removeAll: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.ENDPOINTS_REMOVE_ALL);
+      });
+  }
+};
+
+var location$4 = {
+  /**
+   * 更新します。
+   * @param {riotx.Context} context
+   * @param {Object} obj
+   * @return {Promise}
+   */
+  update: (context, obj) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.LOCATION, obj);
+      });
+  }
+};
+
+var menu$3 = {
+  /**
+   * 開閉状態をトグルします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  toggle: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.MENU_TOGGLE);
+      });
+  },
+
+  /**
+   * 開状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  open: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.MENU_OPEN);
+      });
+  },
+
+  /**
+   * 閉状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  close: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.MENU_CLOSE);
+      });
+  },
+
+  /**
+   * 有効状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  enable: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.MENU_ENABLE);
+      });
+  },
+
+  /**
+   * 無効状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  disable: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.MENU_DISABLE);
+      });
+  }
+};
+
+var modals$3 = {
+  /**
+   * モーダルを追加します。
+   * @param {riotx.Context} context
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} modalOpts
+   * @return {Promise}
+   */
+  add: (context, tagName, tagOpts, modalOpts) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.MODALS_ADD, tagName, tagOpts, modalOpts);
+      });
+  },
+
+  /**
+   * モーダルを削除します。
+   * @param {riotx.Context} context
+   * @param {String} modalId
+   * @return {Promise}
+   */
+  remove: (context, modalId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.MODALS_REMOVE, modalId);
+      });
+  }
+};
+
+var oauthEndpointKey$3 = {
+  /**
+   * OAuth認証用のエンドポイントkeyを削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  remove: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.OAUTH_ENDPOINT_KEY, null);
+      });
+  }
+};
+
+var page$3 = {
+  /**
+   * ページ情報を取得します。
+   * @param {riotx.Context} context
+   * @param {String} pageId
+   * @return {Promise}
+   */
+  get: (context, pageId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const pages = context.state.dmc.getValue('pages').getValue();
+        const page = find_1$1(pages, v => {
+          return (v.getValue('id').getValue() === pageId);
+        });
+        context.commit(constants$2.PAGE, page);
+      });
+  },
+
+  /**
+   * ページ情報を削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  remove: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.PAGE, null);
+      });
+  }
+};
+
+var toasts$3 = {
+  /**
+   * トーストを追加します。
+   * @param {riotx.Context} context
+   * @param {Object} obj
+   * @return {Promise}
+   */
+  add: (context, obj) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.TOASTS_ADD, obj);
+      });
+  },
+
+  /**
+   * トーストを削除します。
+   * @param {riotx.Context} context
+   * @param {String} toastId
+   * @return {Promise}
+   */
+  remove: (context, toastId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.TOASTS_REMOVE, toastId);
+      });
+  }
+
+};
+
+var sua = createCommonjsModule(function (module) {
+/* Zepto v1.0-1-ga3cab6c - polyfill zepto detect event ajax form fx - zeptojs.com/license */
+/**
+ * @name sua.js
+ * @author Kei Funagayama <kei.topaz@gmail.com>
+ * @overview UserAgent decision for browser. fork zepto.js(http://zeptojs.com/)
+ * @license MIT
+ */
+
+(function (global) {
+  'use strict';
+
+  /**
+   * UserAgent decision
+   *
+   * @method
+   * @param {String} useragent user agent
+   */
+  function SUA(useragent) {
+    if (!useragent && global && global.navigator && global.navigator.userAgent) {
+      // set browser user agent
+      useragent = global.navigator.userAgent;
+    }
+    if (!useragent) {
+      throw new Error('useragent setup error. useragent not found.');
+    }
+
+    /**
+     * Decision: ie
+     * @name ie
+     * @memberof ua
+     * @return {Boolean}
+     */
+    this.ie = !!(useragent.indexOf('MSIE') >= 0 || useragent.indexOf('Trident') >= 0 || useragent.indexOf('Edge') >= 0),
+
+      /**
+       * Decision: webkit
+       * @name webkit
+       * @memberof ua
+       * @return {Array}
+       */
+      this.webkit = useragent.match(/(WebKit|Webkit)\/([\d.]+)/),
+      /**
+       * Decision: android
+       * @name android
+       * @memberof ua
+       * @return {Array}
+       */
+      this.android = useragent.match(/(Android)\s+([\d.]+)/),
+      /**
+       * Decision: android2.3
+       * @name android
+       * @memberof ua
+       * @return {Array}
+       */
+      this.android23 = useragent.match(/(Android)\s+(2\.3)([\d.]+)/),
+      /**
+       * Decision: android4.x
+       * @name android
+       * @memberof ua
+       * @return {Array}
+       */
+      this.android4 = useragent.match(/(Android)\s+(4)([\d.]+)/),
+      /**
+       * Decision: android5.x
+       * @name android
+       * @memberof ua
+       * @return {Array}
+       */
+      this.android5 = useragent.match(/(Android)\s+(5)([\d.]+)/),
+      /**
+       * Decision: android6.x
+       * @name android
+       * @memberof ua
+       * @return {Array}
+       */
+      this.android6 = useragent.match(/(Android)\s+(6)([\d.]+)/),
+      /**
+       * Decision: android6.x
+       * @name android
+       * @memberof ua
+       * @return {Array}
+       */
+      this.android7 = useragent.match(/(Android)\s+(7)([\d.]+)/),
+      /**
+       * Decision: ipad
+       * @name ipad
+       * @memberof ua
+       * @return {Array}
+       */
+      this.ipad = useragent.match(/(iPad).*OS\s([\d_]+)/),
+      /**
+       * Decision: iphone
+       * @name iphone
+       * @memberof ua
+       * @return {Array}
+       */
+      this.iphone = !this.ipad && useragent.match(/(iPhone\sOS)\s([\d_]+)/),
+
+      /**
+       * Decision: webos
+       * @name webos
+       * @memberof ua
+       * @return {Array}
+       */
+      this.webos = useragent.match(/(webOS|hpwOS)[\s\/]([\d.]+)/),
+      /**
+       * Decision: touchpad
+       * @name touchpad
+       * @memberof ua
+       * @return {Array}
+       */
+      this.touchpad = this.webos && useragent.match(/TouchPad/),
+      /**
+       * Decision: kindle
+       * @name kindle
+       * @memberof ua
+       * @return {Array}
+       */
+      //this.kindle = useragent.match(/Kindle\/([\d.]+)/),
+      this.kindle = useragent.match(/(Kindle)/),
+      /**
+       * Decision: silk
+       * @name silk
+       * @memberof ua
+       * @return {Array}
+       */
+      //this.silk = useragent.match(/Silk\/([\d._]+)/),
+      this.silk = useragent.match(/(Silk)/),
+
+      /**
+       * Decision: blackberry
+       * @name blackberry
+       * @memberof ua
+       * @return {Array}
+       */
+      //this.blackberry = useragent.match(/(BlackBerry).*Version\/([\d.]+)/),
+      this.blackberry = useragent.match(/(BlackBerry).*/),
+
+      /**
+       * Decision: bb10
+       * @name bb10
+       * @memberof ua
+       * @return {Array}
+       */
+      this.bb10 = useragent.match(/(BB10).*Version\/([\d.]+)/),
+      /**
+       * Decision: rimtabletos
+       * @name rimtabletos
+       * @memberof ua
+       * @return {Array}
+       */
+      this.rimtabletos = useragent.match(/(RIM\sTablet\sOS)\s([\d.]+)/),
+      /**
+       * Decision: playbook
+       * @name playbook
+       * @memberof ua
+       * @return {Array}
+       */
+      this.playbook = useragent.match(/PlayBook/),
+      /**
+       * Decision: chrome
+       * @name chrome
+       * @memberof ua
+       * @return {Array}
+       */
+      this.chrome = useragent.match(/Chrome\/([\d.]+)/) || useragent.match(/CriOS\/([\d.]+)/),
+      /**
+       * Decision: firefox
+       * @name firefox
+       * @memberof ua
+       * @return {Array}
+       */
+      this.firefox = useragent.match(/Firefox\/([\d.]+)/),
+      /**
+       * Decision: wii
+       * @name wii
+       * @memberof ua
+       * @return {Array}
+       */
+      this.wii = useragent.match(/Nintendo (Wii);/),
+      /**
+       * Decision: Wii U
+       * @name wii
+       * @memberof ua
+       * @return {Array}
+       */
+      this.wiiu = useragent.match(/Nintendo (WiiU)/),
+
+      /**
+       * Decision: ds
+       * @name ds
+       * @memberof ua
+       * @return {Array}
+       */
+      this.ds = useragent.match(/Nintendo (DS|3DS|DSi);/),
+
+      /**
+       * Decision: Nintendo Switch
+       * @name nintendo_switch
+       * @memberof ua
+       * @return {Array}
+       */
+      this.nintendo_switch = useragent.match(/Nintendo (Switch);/),
+      /**
+       * Decision: ps3
+       * @name ps3
+       * @memberof ua
+       * @return {Array}
+       */
+      this.ps3 = useragent.match(/PLAYSTATION 3/),
+      /**
+       * Decision: psp
+       * @name psp
+       * @memberof ua
+       * @return {Array}
+       */
+      this.psp = useragent.match(/(PlayStation Portable)/),
+      /**
+       * Decision: psvita
+       * @name psvita
+       * @memberof ua
+       * @return {Array}
+       */
+      this.psvita = useragent.match(/(PlayStation Vita)/),
+      /**
+       * Decision: Windows Phone
+       * @name windowsphone
+       * @memberof ua
+       * @return {Array}
+       */
+      this.windowsphone = useragent.match(/(Windows Phone |Windows Phone OS )([\d.]+)/),
+      /**
+       * Decision: safari
+       * @name safari
+       * @memberof ua
+       * @return {Array}
+       */
+      this.safari = useragent.match(/(Version)\/([0-9\.]+).*Safari\/([0-9\.]+)/),
+      /**
+       * Decision: trident
+       * @name trident
+       * @memberof ua
+       * @return {Array}
+       */
+      this.trident = useragent.match(/Trident\/([\d\.]+)/),
+      /**
+       * Decision: xbox
+       * @name xbox
+       * @memberof ua
+       * @return {Array}
+       */
+      this.xbox = useragent.match(/Xbox/),
+
+      /**
+       * Decision: iphone5
+       * ToDo: need to check the evaluation method again after the release of iPhone5S(and later version)
+       * @name iphone5
+       * @memberof ua
+       * @return {boolean}
+       */
+      this.iphone5 = !('object' !== 'undefined' && module.exports) && this.iphone && screen && screen.width === 320 && screen.height === 568,
+
+      /**
+       * Decision: Vivaldi
+       * @name vivaldi
+       * @memberof ua
+       * @return {Array}
+       */
+      this.vivaldi = useragent.match(/Vivaldi\/([\d.]+)/)
+
+    ;
+
+
+    /**
+     * Decision: iphone3
+     * @name iphone3
+     * @memberof ua
+     * @return {boolean}
+     */
+    this.iphone3 = this.iphone && global.devicePixelRatio === 1 ? true : false;
+
+
+    /**
+     * browser information
+     * @name browser
+     * @memberof ua
+     * @return {Object}
+     */
+    this.browser = {
+      locale: undefined, // ja-JP, en-us
+      lang: undefined, // ja, en ....
+      country: undefined // JP, us ...
+    };
+
+    /**
+     * os infomation
+     * @name os
+     * @memberof ua
+     * @return {Object}
+     */
+    this.os = {};
+
+    if (this.webkit && !this.ie) {
+      this.browser.webkit = true;
+      this.browser.version = this.webkit[1];
+    }
+
+    if (this.trident) {
+      this.browser.trident = true;
+      this.browser.version = this.trident[1];
+    }
+
+    if (this.android) {
+      this.os.android = true;
+      this.os.version = this.android[2];
+      try {
+        this.browser.locale = useragent.match(/(Android)\s(.+);\s([^;]+);/)[3];
+        this.browser.lang = this.browser.locale.substring(0, 2);
+        this.browser.country = this.browser.locale.substring(3);
+      } catch (e) {
+        //console.log('Failed to parse user agent string of Android.', useragent);
+      }
+    }
+    if (this.iphone) {
+      this.os.ios = this.os.iphone = true;
+      this.os.version = this.iphone[2].replace(/_/g, '.');
+    }
+
+    if (this.ipad) {
+      this.os.ios = this.os.ipad = true;
+      this.os.version = this.ipad[2].replace(/_/g, '.');
+    }
+
+    if (this.os.ios) {
+      var __ios_v_0 = null;
+      if (this.os.version) {
+        __ios_v_0 = this.os.version.substring(0, 1);
+      }
+      for (var i = 3; i < 10; i++) { // IOS 3->9
+        /**
+         * Decision: ios 3-9
+         * @name ios3-9
+         * @memberof ua
+         * @return {boolean}
+         */
+        this['ios' + i] = __ios_v_0 === "" + i;
+      }
+    }
+
+    if (this.webos) {
+      this.os.webos = true;
+      this.os.version = this.webos[2];
+    }
+    if (this.touchpad) {
+      this.os.touchpad = true;
+    }
+    if (this.blackberry) {
+      this.os.blackberry = true;
+    }
+    if (this.bb10) {
+      this.os.bb10 = true;
+      this.os.version = this.bb10[2];
+    }
+    if (this.rimtabletos) {
+      this.os.rimtabletos = true;
+      this.os.version = this.rimtabletos[2];
+    }
+    if (this.playbook) {
+      this.browser.playbook = true;
+    }
+    if (this.kindle) {
+      this.os.kindle = true;
+    }
+    if (this.silk) {
+      this.browser.silk = true;
+    }
+    if (!this.silk && this.os.android && useragent.match(/Kindle Fire/)) {
+      this.browser.silk = true;
+    }
+    if (this.chrome && !this.ie) {
+      this.browser.chrome = true;
+      this.browser.version = this.chrome[1];
+    }
+    if (this.firefox) {
+      this.browser.firefox = true;
+      this.browser.version = this.firefox[1];
+      if (useragent.match(/Android/)) { // firefox on android
+        this.android = ["Android", "Android", ""];
+      }
+    }
+    if (this.wii || this.ds || this.wiiu || this.nintendo_switch) {
+      this.os.nintendo = true;
+
+      if (this.wiiu || this.nintendo_switch) {
+        this.browser.nintendo = useragent.match(/NintendoBrowser\/([\d.]+)/);
+        this.browser.version = this.browser.nintendo[1];
+      }
+    }
+
+    if (this.windowsphone) {
+      this.browser.windowsphone = true;
+      this.browser.version = this.windowsphone[2];
+    }
+    if (this.safari) {
+      this.browser.safari = true;
+      this.browser.version = this.safari[2];
+    }
+
+    if (this.ie) {
+      this.browser.ie = /(MSIE|rv:?)\s?([\d\.]+)/.exec(useragent);
+      this.edge = false;
+
+      if (!this.browser.ie) { // Edge
+        this.browser.ie = /(Edge\/)(\d.+)/.exec(useragent);
+        this.browser.version = this.browser.ie[2];
+        this.edge = true;
+        // reset
+        this.chrome = false;
+        this.webkit = false;
+
+      } else if (!this.windowsphone) {
+        this.browser.version = (this.browser.ie) ? this.browser.ie[2] : '';
+      }
+
+      if (0 < this.browser.version.indexOf('.')) {
+        this.browser.majorversion = this.browser.version.substring(0, this.browser.version.indexOf('.'));
+      } else {
+        this.browser.majorversion = this.browser.version;
+      }
+    }
+
+    if (this.vivaldi) {
+      this.browser.vivaldi = true;
+      this.browser.version = this.vivaldi[1];
+    }
+
+    /**
+     * Decision: table
+     * @name table
+     * @memberof ua
+     * @return {boolean}
+     */
+    this.os.tablet = !!(this.ipad || this.kindle || this.playbook || (this.android && !useragent.match(/Mobile/)) || (this.firefox && useragent.match(/Tablet/)));
+
+    /**
+     * Decision: phone
+     * @name phone
+     * @memberof ua
+     * @return {boolean}
+     */
+    this.os.phone = !!(!this.os.tablet && (this.android || this.iphone || this.webos || this.blackberry || this.bb10 ||
+    (this.chrome && useragent.match(/Android/)) || (this.chrome && useragent.match(/CriOS\/([\d.]+)/)) || (this.firefox && useragent.match(/Mobile/)) || (this.windowsphone && useragent.match(/IEMobile/))));
+
+    /**
+     * Decision mobile (tablet or phone)
+     * @type {boolean}
+     */
+    this.mobile = !!(this.os.tablet || this.os.phone);
+
+    this.webview = {};
+    /**
+     * Decision: TwitterWebView
+     * @name twitterwebview
+     * @memberof ua
+     * @return {boolean}
+     */
+    if (useragent.match(/Twitter/)) {
+      this.webview.twitter = true;
+    }
+  }
+
+  SUA.VERSION = '2.1.0';
+
+  if ('object' !== 'undefined' && module.exports) {
+    // node
+    module.exports = SUA;
+  }
+
+  if (!global.SUA) {
+    // browser
+    global.SUA = SUA;
+  }
+
+})(commonjsGlobal);
+});
+
+var ua$3 = {
+  /**
+   * 初期設定を行います。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  setup: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const ua = new sua(navigator.userAgent);
+        context.commit(constants$2.UA, ua);
+      });
+  }
+};
+
+const constants$1 = {
+  APPLICATION_LAUNCH: 'APPLICATION_LAUNCH',
+  APPLICATION_NAVIGATION_START: 'APPLICATION_NAVIGATION_START',
+  APPLICATION_NAVIGATION_END: 'APPLICATION_NAVIGATION_END',
+  AUTH_UPDATE: 'AUTH_UPADTE',
+  AUTH_REMOVE: 'AUTH_REMOVE',
+  AUTH_VALIDATE: 'AUTH_VALIDATE',
+  AUTH_GET_TYPES: 'AUTH_GET_TYPES',
+  AUTH_SIGNIN_OAUTH: 'AUTH_SIGNIN_OAUTH',
+  AUTH_SIGNIN_EMAIL: 'AUTH_SIGNIN_EMAIL',
+  COMPONENTS_GET_ONE: 'COMPONENTS_GET_ONE',
+  COMPONENTS_OPERATE_ONE: 'COMPONENTS_OPERATE_ONE',
+  COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
+  COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
+  CURRENT_UPDATE: 'CURRENT_UPDATE',
+  CURRENT_REMOVE: 'CURRENT_REMOVE',
+  DMC_GET: 'DMC_GET',
+  DMC_REMOVE: 'DMC_REMOVE',
+  DRAWERS_ADD: 'DRAWERS_ADD',
+  DRAWERS_REMOVE: 'DRAWERS_REMOVE',
+  ENDPOINTS_ADD: 'ENDPOINTS_ADD',
+  ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
+  ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
+  ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
+  LOCATION_UPDATE: 'LOCATION_UPDATE',
+  MENU_TOGGLE: 'MENU_TOGGLE',
+  MENU_OPEN: 'MENU_OPEN',
+  MENU_CLOSE: 'MENU_CLOSE',
+  MENU_ENABLE: 'MENU_ENABLE',
+  MENU_DISABLE: 'MENU_DISABLE',
+  MODALS_ADD: 'MODALS_ADD',
+  MODALS_REMOVE: 'MODALS_REMOVE',
+  OAUTH_ENDPOINT_KEY_REMOVE: 'OAUTH_ENDPOINT_KEY_REMOVE',
+  PAGE_GET: 'PAGE_GET',
+  PAGE_REMOVE: 'PAGE_REMOVE',
+  TOASTS_ADD: 'TOASTS_ADD',
+  TOASTS_REMOVE: 'TOASTS_REMOVE',
+  UA_SETUP: 'UA_SETUP'
+};
+
+var actions = {
+  [constants$1.APPLICATION_LAUNCH]: application.launch,
+  [constants$1.APPLICATION_NAVIGATION_START]: application.startNavigation,
+  [constants$1.APPLICATION_NAVIGATION_END]: application.endNavigation,
+  [constants$1.AUTH_UPDATE]: auth.update,
+  [constants$1.AUTH_REMOVE]: auth.remove,
+  [constants$1.AUTH_VALIDATE]: auth.validate,
+  [constants$1.AUTH_GET_TYPES]: auth.getTypes,
+  [constants$1.AUTH_SIGNIN_OAUTH]: auth.signinOAuth,
+  [constants$1.AUTH_SIGNIN_EMAIL]: auth.signinEmail,
+  [constants$1.COMPONENTS_GET_ONE]: components$3.get,
+  [constants$1.COMPONENTS_OPERATE_ONE]: components$3.operate,
+  [constants$1.COMPONENTS_REMOVE_ONE]: components$3.remove,
+  [constants$1.COMPONENTS_REMOVE_ALL]: components$3.removeAll,
+  [constants$1.CURRENT_UPDATE]: current$3.update,
+  [constants$1.CURRENT_REMOVE]: current$3.remove,
+  [constants$1.DMC_GET]: dmc$3.get,
+  [constants$1.DMC_REMOVE]: dmc$3.remove,
+  [constants$1.DRAWERS_ADD]: drawers$3.add,
+  [constants$1.DRAWERS_REMOVE]: drawers$3.remove,
+  [constants$1.ENDPOINTS_ADD]: endpoints$3.add,
+  [constants$1.ENDPOINTS_UPDATE]: endpoints$3.update,
+  [constants$1.ENDPOINTS_REMOVE]: endpoints$3.remove,
+  [constants$1.ENDPOINTS_REMOVE_ALL]: endpoints$3.removeAll,
+  [constants$1.LOCATION_UPDATE]: location$4.update,
+  [constants$1.MENU_TOGGLE]: menu$3.toggle,
+  [constants$1.MENU_OPEN]: menu$3.open,
+  [constants$1.MENU_CLOSE]: menu$3.close,
+  [constants$1.MENU_ENABLE]: menu$3.enable,
+  [constants$1.MENU_DISABLE]: menu$3.disable,
+  [constants$1.MODALS_ADD]: modals$3.add,
+  [constants$1.MODALS_REMOVE]: modals$3.remove,
+  [constants$1.OAUTH_ENDPOINT_KEY_REMOVE]: oauthEndpointKey$3.remove,
+  [constants$1.PAGE_GET]: page$3.get,
+  [constants$1.PAGE_REMOVE]: page$3.remove,
+  [constants$1.TOASTS_ADD]: toasts$3.add,
+  [constants$1.TOASTS_REMOVE]: toasts$3.remove,
+  [constants$1.UA_SETUP]: ua$3.setup
+};
+
+var script = function() {};
+
+riot$1.tag2('dmc-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {opts.class}"', function(opts) {
+    this.external(script);
+});
+
+var script$1 = function() {
+  // タイプ。
+  this.type = this.opts.type || 'info';
+  // iconの種類。
+  this.icon = '';
+  switch (this.opts.type) {
+  case 'info':
+    this.icon = 'info';
+    break;
+  case 'error':
+    this.icon = 'exclamation';
+    break;
+  default:
+    this.icon = 'info';
+    break;
+  }
+
+  // タイトル。
+  this.title = this.opts.title;
+  // メッセージ。
+  this.message = this.opts.message;
+
+  // errorが渡された場合は最適化処理を行う。
+  // TODO: prettyprintを使っても良いかも。
+  if (!!this.opts.error) {
+    this.type = 'error';
+    this.icon = 'exclamation';
+    if (this.opts.error instanceof Error) {
+      this.title = this.opts.error.name;
+      this.message = this.opts.error.message;
+    } else {
+      // TODO: どーしようかな。。
+      this.title = `${this.opts.error.code} ${this.opts.error.name}`;
+      this.message = `[${this.opts.error.id}] ${this.opts.error.message}`;
+    }
+  }
+};
+
+riot$1.tag2('dmc-message', '<div class="Message__head"> <div class="Message__icon"> <dmc-icon type="{icon}"></dmc-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message}">{message}</div>', '', 'class="Message Message--{type}"', function(opts) {
+    this.external(script$1);
+});
+
+var ComponentsRoute = {
+  /**
+   * ページ遷移前の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @param {Function} replace
+   * @return {Promise}
+   */
+  onBefore: (store, route, replace) => {
+    const endpointKey = route.params.endpointKey;
+    const endpoint = store.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+
+    // endpointが存在しなければTOPに戻す。
+    if (!endpoint) {
+      return Promise
+        .resolve()
+        .then(() => store.action(constants$1.CURRENT_REMOVE))
+        .then(() => {
+          replace('/');
+        })
+        .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+          error: err
+        }));
+    }
+
+    return Promise
+      .resolve()
+      .then(() => store.action(constants$1.AUTH_VALIDATE, endpointKey))
+      .then(isSignined => {
+        // 認証切れ or 非ログ時はTOPに戻す。
+        if (!isSignined) {
+          return Promise
+            .resolve()
+            .then(() => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+              type: 'error',
+              title: 'Unauthorized',
+              message: 'You are not authorized. Check if your token is expired. '
+            }))
+            .then(() => {
+              replace('/');
+            });
+        }
+        return Promise
+          .resolve()
+          .then(() => store.action(constants$1.CURRENT_UPDATE, endpointKey))
+          .then(() => {
+            // 無駄な通信を減らすために、`dmc`データを未取得の場合のみfetchする。
+            const dmc = store.getter(constants$4.DMC);
+            if (!!dmc) {
+              return Promise.resolve();
+            }
+            return Promise
+              .resolve()
+              .then(() => {
+                return swagger
+                  .setup(endpoint)
+                  .then(info => store.action(constants$1.ENDPOINTS_UPDATE, endpointKey, info));
+              })
+              .then(() => store.action(constants$1.DMC_GET));
+          })
+          .then(() => {
+            // pageが指定されていない場合は`dmc`のpageリストの先頭項目を自動選択する。
+            if (!route.params.page) {
+              return Promise.resolve().then(() => {
+                const pageName = store.getter(constants$4.DMC_PAGES_ID_OF, 0);
+                replace(`/${endpointKey}/${pageName}`);
+              });
+            }
+            return store.action(constants$1.PAGE_GET, route.params.page);
+          });
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  },
+
+  /**
+   * ページ遷移時の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @return {Promise}
+   */
+  onEnter: (store, route) => {// eslint-disable-line no-unused-vars
+    return store.action(constants$1.LOCATION_UPDATE, {
+      name: 'components',
+      route
+    });
+  }
+};
+
+var EndpointsRoute = {
+  /**
+   * ページ遷移前の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @param {Function} replace
+   * @return {Promise}
+   */
+  onBefore: (store, route, replace) => {// eslint-disable-line no-unused-vars
+    return Promise
+      .resolve()
+      .then(() => Promise.all([
+        store.action(constants$1.CURRENT_REMOVE),
+        store.action(constants$1.PAGE_REMOVE)
+      ]))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  },
+  /**
+   * ページ遷移時の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @return {Promise}
+   */
+  onEnter: (store, route) => {
+    return store.action(constants$1.LOCATION_UPDATE, {
+      name: 'endpoints',
+      route
+    });
+  }
+};
+
+var NotfoundRoute = {
+  /**
+   * ページ遷移時の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @return {Promise}
+   */
+  onEnter: (store, route) => {
+    return store.action(constants$1.LOCATION_UPDATE, {
+      name: 'notfound',
+      route
+    });
+  }
+};
+
+let _routerInstance;
+
+var router = {
+  /**
+   * 初期設定。
+   * @param {riotx.Store} store
+   * @return {Promise}
+   */
+  init: store => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const router = new Router(Router.HASH);
+        router
+          .onBefore(() => Promise.all([
+            store.action(constants$1.APPLICATION_NAVIGATION_START),
+            store.action(constants$1.MENU_CLOSE)
+          ]))
+          .onBefore(() => store.action(constants$1.MENU_CLOSE))
+          .on('/', route => EndpointsRoute.onEnter(store, route))
+          .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
+          .on('*', route => NotfoundRoute.onEnter(store, route))
+          .onAfter(route => Promise.all([
+            store.action(constants$1.APPLICATION_NAVIGATION_END),
+            store.action((route.pathname === '/' ? constants$1.MENU_DISABLE : constants$1.MENU_ENABLE))
+          ]))
+          .onAfterOnce(() => store.action(constants$1.APPLICATION_LAUNCH));
+        return router;
+      })
+      .then(router => {
+        router.start();
+        _routerInstance = router;
+        return router;
+      });
+  },
+
+  /**
+   * インスタンスを返します。
+   * @return {esr}
+   */
+  getInstance: () => {
+    return _routerInstance;
+  }
+};
+
+/**
+ * touch系イベントが定義されたdom要素群を返却します。
+ * @param {Riot} tag
+ * @return {Array}
+ */
+const getTouchableElements = tag => {
+  const refs = tag.refs;
+  let elms = [];
+  if (Array.isArray(refs.touch)) {
+    elms = refs.touch;
+  } else if (!!refs.touch) {
+    elms = [refs.touch];
+  }
+  return elms;
+};
+
+/**
+ * Touch系操作に対応する。
+ * @param {Riot} tag
+ */
+const isSupportTouch = 'ontouchstart' in document;
+const EVENT_TOUCHSTART = isSupportTouch ? 'touchstart' : 'mousedown';
+const EVENT_TOUCHMOVE = isSupportTouch ? 'touchmove' : 'mousemove';
+const EVENT_TOUCHEND = isSupportTouch ? 'touchend' : 'mouseup';
+// 無名関数をaddEventListenerのハンドラーに設定した場合でも正しくremoveEventListener出来るようにする。
+const closureEventListener = (() => {
+  const events = {};
+  let key = 0;
+  return {
+    add: (target, type, listener, capture) => {
+      target.addEventListener(type, listener, capture);
+      const eventId = `t_${key}`;
+      key++;
+      events[eventId] = {
+        target: target,
+        type: type,
+        listener: listener,
+        capture: capture
+      };
+      return eventId;
+    },
+    remove: key => {
+      if (!events[key]) {
+        return;
+      }
+      events[key].target.removeEventListener(events[key].type, events[key].listener, events[key].capture);
+      delete events[key];
+    },
+    list: () => {
+      return events;
+    }
+  };
+})();
+const bindTouchEvents = tag => {
+  forEach_1(getTouchableElements(tag), elm => {
+    // bind済みであれば何もしない。
+    if (!!elm.getAttribute('touchevents')) {
+      return;
+    }
+
+    const touchStartEventId = closureEventListener.add(elm, EVENT_TOUCHSTART, e => {
+      e.stopPropagation();
+      e.currentTarget.classList.add('hover');
+    });
+
+    const touchMoveEventId = closureEventListener.add(elm, EVENT_TOUCHMOVE, e => {
+      e.stopPropagation();
+      const isPressed = e.currentTarget.classList.contains('hover');
+      if (!isPressed) {
+        return;
+      }
+      e.currentTarget.classList.remove('hover');
+    });
+
+    const touchEndEventId = closureEventListener.add(elm, EVENT_TOUCHEND, e => {
+      e.stopPropagation();
+      const isPressed = e.currentTarget.classList.contains('hover');
+      if (isPressed) {
+        // ハンドラーを取得。無ければ何もしない。
+        let handlerName = elm.getAttribute('ontap');
+        // `parent.handleFoo`形式への対応。
+        if (handlerName.indexOf('parent.') === 0) {
+          handlerName = handlerName.replace('parent.', '');
+        }
+        if (!!handlerName && !!tag[handlerName]) {
+          tag[handlerName](e);
+        }
+      }
+      e.currentTarget.classList.remove('hover');
+    });
+
+    elm.setAttribute('touchevents', `${touchStartEventId}/${touchMoveEventId}/${touchEndEventId}`);
+  });
+};
+const unbindTouchEvents = tag => {
+  forEach_1(getTouchableElements(tag), elm => {
+    const touchEvents = elm.getAttribute('touchevents');
+    if (!touchEvents) {
+      return;
+    }
+    const touchEventIds = touchEvents.split('/');
+    forEach_1(touchEventIds, touchEventId => {
+      closureEventListener.remove(touchEventId);
+    });
+  });
+};
+
+var mixin = {
+  /**
+   * riotのmixinを設定します。
+   * @return {Promise}
+   */
+  init: () => {
+    return Promise
+      .resolve()
+      .then(() => {
+        riot$1.mixin({
+          init: function() {
+            this.on('mount', () => {
+              bindTouchEvents(this);
+            }).on('before-unmount', () => {
+              unbindTouchEvents(this);
+            });
+          },
+          // 再度touchイベントをbindする関数。
+          // mount後に要素が追加された際に用いる。
+          rebindTouchEvents: function() {
+            bindTouchEvents(this);
+          },
+          // riotx.riotxChange(store, evtName, func)のショートカット。
+          listen: function(...args) {
+            const store = this.riotx.get();
+            this.riotxChange(store, ...args);
+          },
+          // pugファイルとjsファイルを分離して実装可能にするため。
+          external: function(script) {
+            const tag = this;
+            script.apply(tag);
+          },
+          // `modal`等と意識せずにcloseできるようにする。
+          close: function() {
+            if (this.opts.isModal) {
+              this.opts.modalCloser();
+            }
+            if (this.opts.isDrawer) {
+              this.opts.drawerCloser();
+            }
+          },
+          getRouter: () => {
+            return router.getInstance();
+          }
+        });
+      });
+  }
+};
+
+var promise$1 = createCommonjsModule(function (module) {
+(function (root) {
+
+  // Store setTimeout reference so promise-polyfill will be unaffected by
+  // other code modifying setTimeout (like sinon.useFakeTimers())
+  var setTimeoutFunc = setTimeout;
+
+  function noop() {}
+  
+  // Polyfill for Function.prototype.bind
+  function bind(fn, thisArg) {
+    return function () {
+      fn.apply(thisArg, arguments);
+    };
+  }
+
+  function Promise(fn) {
+    if (typeof this !== 'object') { throw new TypeError('Promises must be constructed via new'); }
+    if (typeof fn !== 'function') { throw new TypeError('not a function'); }
+    this._state = 0;
+    this._handled = false;
+    this._value = undefined;
+    this._deferreds = [];
+
+    doResolve(fn, this);
+  }
+
+  function handle(self, deferred) {
+    while (self._state === 3) {
+      self = self._value;
+    }
+    if (self._state === 0) {
+      self._deferreds.push(deferred);
+      return;
+    }
+    self._handled = true;
+    Promise._immediateFn(function () {
+      var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+      if (cb === null) {
+        (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+        return;
+      }
+      var ret;
+      try {
+        ret = cb(self._value);
+      } catch (e) {
+        reject(deferred.promise, e);
+        return;
+      }
+      resolve(deferred.promise, ret);
+    });
+  }
+
+  function resolve(self, newValue) {
+    try {
+      // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+      if (newValue === self) { throw new TypeError('A promise cannot be resolved with itself.'); }
+      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+        var then = newValue.then;
+        if (newValue instanceof Promise) {
+          self._state = 3;
+          self._value = newValue;
+          finale(self);
+          return;
+        } else if (typeof then === 'function') {
+          doResolve(bind(then, newValue), self);
+          return;
+        }
+      }
+      self._state = 1;
+      self._value = newValue;
+      finale(self);
+    } catch (e) {
+      reject(self, e);
+    }
+  }
+
+  function reject(self, newValue) {
+    self._state = 2;
+    self._value = newValue;
+    finale(self);
+  }
+
+  function finale(self) {
+    if (self._state === 2 && self._deferreds.length === 0) {
+      Promise._immediateFn(function() {
+        if (!self._handled) {
+          Promise._unhandledRejectionFn(self._value);
+        }
+      });
+    }
+
+    for (var i = 0, len = self._deferreds.length; i < len; i++) {
+      handle(self, self._deferreds[i]);
+    }
+    self._deferreds = null;
+  }
+
+  function Handler(onFulfilled, onRejected, promise) {
+    this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+    this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+    this.promise = promise;
+  }
+
+  /**
+   * Take a potentially misbehaving resolver function and make sure
+   * onFulfilled and onRejected are only called once.
+   *
+   * Makes no guarantees about asynchrony.
+   */
+  function doResolve(fn, self) {
+    var done = false;
+    try {
+      fn(function (value) {
+        if (done) { return; }
+        done = true;
+        resolve(self, value);
+      }, function (reason) {
+        if (done) { return; }
+        done = true;
+        reject(self, reason);
+      });
+    } catch (ex) {
+      if (done) { return; }
+      done = true;
+      reject(self, ex);
+    }
+  }
+
+  Promise.prototype['catch'] = function (onRejected) {
+    return this.then(null, onRejected);
+  };
+
+  Promise.prototype.then = function (onFulfilled, onRejected) {
+    var prom = new (this.constructor)(noop);
+
+    handle(this, new Handler(onFulfilled, onRejected, prom));
+    return prom;
+  };
+
+  Promise.all = function (arr) {
+    var args = Array.prototype.slice.call(arr);
+
+    return new Promise(function (resolve, reject) {
+      if (args.length === 0) { return resolve([]); }
+      var remaining = args.length;
+
+      function res(i, val) {
+        try {
+          if (val && (typeof val === 'object' || typeof val === 'function')) {
+            var then = val.then;
+            if (typeof then === 'function') {
+              then.call(val, function (val) {
+                res(i, val);
+              }, reject);
+              return;
+            }
+          }
+          args[i] = val;
+          if (--remaining === 0) {
+            resolve(args);
+          }
+        } catch (ex) {
+          reject(ex);
+        }
+      }
+
+      for (var i = 0; i < args.length; i++) {
+        res(i, args[i]);
+      }
+    });
+  };
+
+  Promise.resolve = function (value) {
+    if (value && typeof value === 'object' && value.constructor === Promise) {
+      return value;
+    }
+
+    return new Promise(function (resolve) {
+      resolve(value);
+    });
+  };
+
+  Promise.reject = function (value) {
+    return new Promise(function (resolve, reject) {
+      reject(value);
+    });
+  };
+
+  Promise.race = function (values) {
+    return new Promise(function (resolve, reject) {
+      for (var i = 0, len = values.length; i < len; i++) {
+        values[i].then(resolve, reject);
+      }
+    });
+  };
+
+  // Use polyfill for setImmediate for performance gains
+  Promise._immediateFn = (typeof setImmediate === 'function' && function (fn) { setImmediate(fn); }) ||
+    function (fn) {
+      setTimeoutFunc(fn, 0);
+    };
+
+  Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+    if (typeof console !== 'undefined' && console) {
+      console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
+    }
+  };
+
+  /**
+   * Set the immediate function to execute callbacks
+   * @param fn {function} Function to execute
+   * @deprecated
+   */
+  Promise._setImmediateFn = function _setImmediateFn(fn) {
+    Promise._immediateFn = fn;
+  };
+
+  /**
+   * Change the function to execute on unhandled rejection
+   * @param {function} fn Function to execute on unhandled rejection
+   * @deprecated
+   */
+  Promise._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
+    Promise._unhandledRejectionFn = fn;
+  };
+  
+  if ('object' !== 'undefined' && module.exports) {
+    module.exports = Promise;
+  } else if (!root.Promise) {
+    root.Promise = Promise;
+  }
+
+})(commonjsGlobal);
 });
 
 (function(self) {
@@ -3453,637 +11186,15 @@ var store$1 = createCommonjsModule(function (module, exports) {
   self.fetch.polyfill = true;
 })(typeof self !== 'undefined' ? self : window);
 
-/**
-     * Appends an array to the end of another.
-     * The first array will be modified.
-     */
-    function append(arr1, arr2) {
-        if (arr2 == null) {
-            return arr1;
-        }
+window.Promise = promise$1;
 
-        var pad = arr1.length,
-            i = -1,
-            len = arr2.length;
-        while (++i < len) {
-            arr1[pad + i] = arr2[i];
-        }
-        return arr1;
-    }
-    var append_1 = append;
-
-/**
-     * Returns the first argument provided to it.
-     */
-    function identity(val){
-        return val;
-    }
-
-    var identity_1 = identity;
-
-/**
-     * Returns a function that gets a property of the passed object
-     */
-    function prop(name){
-        return function(obj){
-            return obj[name];
-        };
-    }
-
-    var prop_1 = prop;
-
-/**
-     * Safer Object.hasOwnProperty
-     */
-     function hasOwn(obj, prop){
-         return Object.prototype.hasOwnProperty.call(obj, prop);
-     }
-
-     var hasOwn_1 = hasOwn;
-
-var _hasDontEnumBug;
-var _dontEnums;
-
-    function checkDontEnum(){
-        _dontEnums = [
-                'toString',
-                'toLocaleString',
-                'valueOf',
-                'hasOwnProperty',
-                'isPrototypeOf',
-                'propertyIsEnumerable',
-                'constructor'
-            ];
-
-        _hasDontEnumBug = true;
-
-        for (var key in {'toString': null}) {
-            _hasDontEnumBug = false;
-        }
-    }
-
-    /**
-     * Similar to Array/forEach but works over object properties and fixes Don't
-     * Enum bug on IE.
-     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
-     */
-    function forIn(obj, fn, thisObj){
-        var key, i = 0;
-        // no need to check if argument is a real object that way we can use
-        // it for arrays, functions, date, etc.
-
-        //post-pone check till needed
-        if (_hasDontEnumBug == null) { checkDontEnum(); }
-
-        for (key in obj) {
-            if (exec$1(fn, obj, key, thisObj) === false) {
-                break;
-            }
-        }
-
-
-        if (_hasDontEnumBug) {
-            var ctor = obj.constructor,
-                isProto = !!ctor && obj === ctor.prototype;
-
-            while (key = _dontEnums[i++]) {
-                // For constructor, if it is a prototype object the constructor
-                // is always non-enumerable unless defined otherwise (and
-                // enumerated above).  For non-prototype objects, it will have
-                // to be defined on this object, since it cannot be defined on
-                // any prototype objects.
-                //
-                // For other [[DontEnum]] properties, check if the value is
-                // different than Object prototype value.
-                if (
-                    (key !== 'constructor' ||
-                        (!isProto && hasOwn_1(obj, key))) &&
-                    obj[key] !== Object.prototype[key]
-                ) {
-                    if (exec$1(fn, obj, key, thisObj) === false) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    function exec$1(fn, obj, key, thisObj){
-        return fn.call(thisObj, obj[key], key, obj);
-    }
-
-    var forIn_1 = forIn;
-
-/**
-     * Similar to Array/forEach but works over object properties and fixes Don't
-     * Enum bug on IE.
-     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
-     */
-    function forOwn(obj, fn, thisObj){
-        forIn_1(obj, function(val, key){
-            if (hasOwn_1(obj, key)) {
-                return fn.call(thisObj, obj[key], key, obj);
-            }
-        });
-    }
-
-    var forOwn_1 = forOwn;
-
-var _rKind = /^\[object (.*)\]$/;
-var _toString = Object.prototype.toString;
-var UNDEF;
-
-    /**
-     * Gets the "kind" of value. (e.g. "String", "Number", etc)
-     */
-    function kindOf(val) {
-        if (val === null) {
-            return 'Null';
-        } else if (val === UNDEF) {
-            return 'Undefined';
-        } else {
-            return _rKind.exec( _toString.call(val) )[1];
-        }
-    }
-    var kindOf_1 = kindOf;
-
-/**
-     * Check if value is from a specific "kind".
-     */
-    function isKind(val, kind){
-        return kindOf_1(val) === kind;
-    }
-    var isKind_1 = isKind;
-
-/**
-     */
-    var isArray = Array.isArray || function (val) {
-        return isKind_1(val, 'Array');
-    };
-    var isArray_1 = isArray;
-
-function containsMatch(array, pattern) {
-        var i = -1, length = array.length;
-        while (++i < length) {
-            if (deepMatches(array[i], pattern)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    function matchArray(target, pattern) {
-        var i = -1, patternLength = pattern.length;
-        while (++i < patternLength) {
-            if (!containsMatch(target, pattern[i])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    function matchObject(target, pattern) {
-        var result = true;
-        forOwn_1(pattern, function(val, key) {
-            if (!deepMatches(target[key], val)) {
-                // Return false to break out of forOwn early
-                return (result = false);
-            }
-        });
-
-        return result;
-    }
-
-    /**
-     * Recursively check if the objects match.
-     */
-    function deepMatches(target, pattern){
-        if (target && typeof target === 'object' &&
-            pattern && typeof pattern === 'object') {
-            if (isArray_1(target) && isArray_1(pattern)) {
-                return matchArray(target, pattern);
-            } else {
-                return matchObject(target, pattern);
-            }
-        } else {
-            return target === pattern;
-        }
-    }
-
-    var deepMatches_1 = deepMatches;
-
-/**
-     * Converts argument into a valid iterator.
-     * Used internally on most array/object/collection methods that receives a
-     * callback/iterator providing a shortcut syntax.
-     */
-    function makeIterator(src, thisObj){
-        if (src == null) {
-            return identity_1;
-        }
-        switch(typeof src) {
-            case 'function':
-                // function is the first to improve perf (most common case)
-                // also avoid using `Function#call` if not needed, which boosts
-                // perf a lot in some cases
-                return (typeof thisObj !== 'undefined')? function(val, i, arr){
-                    return src.call(thisObj, val, i, arr);
-                } : src;
-            case 'object':
-                return function(val){
-                    return deepMatches_1(val, src);
-                };
-            case 'string':
-            case 'number':
-                return prop_1(src);
-        }
-    }
-
-    var makeIterator_ = makeIterator;
-
-/**
-     * Maps the items in the array and concatenates the result arrays.
-     */
-    function collect(arr, callback, thisObj){
-        callback = makeIterator_(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            var value = callback(arr[i], i, arr);
-            if (value != null) {
-                append_1(results, value);
-            }
-        }
-
-        return results;
-    }
-
-    var collect_1 = collect;
-
-/**
-     * Array.indexOf
-     */
-    function indexOf(arr, item, fromIndex) {
-        fromIndex = fromIndex || 0;
-        if (arr == null) {
-            return -1;
-        }
-
-        var len = arr.length,
-            i = fromIndex < 0 ? len + fromIndex : fromIndex;
-        while (i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (arr[i] === item) {
-                return i;
-            }
-
-            i++;
-        }
-
-        return -1;
-    }
-
-    var indexOf_1 = indexOf;
-
-/**
-     * Combines an array with all the items of another.
-     * Does not allow duplicates and is case and type sensitive.
-     */
-    function combine(arr1, arr2) {
-        if (arr2 == null) {
-            return arr1;
-        }
-
-        var i = -1, len = arr2.length;
-        while (++i < len) {
-            if (indexOf_1(arr1, arr2[i]) === -1) {
-                arr1.push(arr2[i]);
-            }
-        }
-
-        return arr1;
-    }
-    var combine_1 = combine;
-
-/**
-     * Array filter
-     */
-    function filter(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            if (callback(value, i, arr)) {
-                results.push(value);
-            }
-        }
-
-        return results;
-    }
-
-    var filter_1 = filter;
-
-/**
-     * Remove all null/undefined items from array.
-     */
-    function compact(arr) {
-        return filter_1(arr, function(val){
-            return (val != null);
-        });
-    }
-
-    var compact_1 = compact;
-
-/**
-     * If array contains values.
-     */
-    function contains(arr, val) {
-        return indexOf_1(arr, val) !== -1;
-    }
-    var contains_1 = contains;
-
-/**
-     * @return {array} Array of unique items
-     */
-    function unique$1(arr, compare){
-        compare = compare || isEqual;
-        return filter_1(arr, function(item, i, arr){
-            var n = arr.length;
-            while (++i < n) {
-                if ( compare(item, arr[i]) ) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
-
-    function isEqual(a, b){
-        return a === b;
-    }
-
-    var unique_1 = unique$1;
-
-/**
-     * Array some
-     */
-    function some(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var result = false;
-        if (arr == null) {
-            return result;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if ( callback(arr[i], i, arr) ) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    var some_1 = some;
-
-/**
-     * Create slice of source array or array-like object
-     */
-    function slice(arr, start, end){
-        var len = arr.length;
-
-        if (start == null) {
-            start = 0;
-        } else if (start < 0) {
-            start = Math.max(len + start, 0);
-        } else {
-            start = Math.min(start, len);
-        }
-
-        if (end == null) {
-            end = len;
-        } else if (end < 0) {
-            end = Math.max(len + end, 0);
-        } else {
-            end = Math.min(end, len);
-        }
-
-        var result = [];
-        while (start < end) {
-            result.push(arr[start++]);
-        }
-
-        return result;
-    }
-
-    var slice_1 = slice;
-
-/**
-     * Return a new Array with elements that aren't present in the other Arrays.
-     */
-    function difference(arr) {
-        var arrs = slice_1(arguments, 1),
-            result = filter_1(unique_1(arr), function(needle){
-                return !some_1(arrs, function(haystack){
-                    return contains_1(haystack, needle);
-                });
-            });
-        return result;
-    }
-
-    var difference_1 = difference;
-
-/**
-     * Check if both arguments are egal.
-     */
-    function is(x, y){
-        // implementation borrowed from harmony:egal spec
-        if (x === y) {
-          // 0 === -0, but they are not identical
-          return x !== 0 || 1 / x === 1 / y;
-        }
-
-        // NaN !== NaN, but they are identical.
-        // NaNs are the only non-reflexive value, i.e., if x !== x,
-        // then x is a NaN.
-        // isNaN is broken: it converts its argument to number, so
-        // isNaN("foo") => true
-        return x !== x && y !== y;
-    }
-
-    var is_1 = is;
-
-/**
-     * Array every
-     */
-    function every(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var result = true;
-        if (arr == null) {
-            return result;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (!callback(arr[i], i, arr) ) {
-                result = false;
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    var every_1 = every;
-
-/**
-     * Compares if both arrays have the same elements
-     */
-    function equals(a, b, callback){
-        callback = callback || is_1;
-
-        if (!isArray_1(a) || !isArray_1(b)) {
-            return callback(a, b);
-        }
-
-        if (a.length !== b.length) {
-            return false;
-        }
-
-        return every_1(a, makeCompare(callback), b);
-    }
-
-    function makeCompare(callback) {
-        return function(value, i) {
-            return i in this && callback(value, this[i]);
-        };
-    }
-
-    var equals_1 = equals;
-
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex(arr, iterator, thisObj){
-        iterator = makeIterator_(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (iterator(arr[i], i, arr)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    var findIndex_1 = findIndex;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$1(arr, iterator, thisObj){
-        var idx = findIndex_1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var find_1 = find$1;
-
-/**
-     * Returns the index of the last item that matches criteria
-     */
-    function findLastIndex(arr, iterator, thisObj){
-        iterator = makeIterator_(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var n = arr.length;
-        while (--n >= 0) {
-            if (iterator(arr[n], n, arr)) {
-                return n;
-            }
-        }
-
-        return -1;
-    }
-
-    var findLastIndex_1 = findLastIndex;
-
-/**
-     * Returns last item that matches criteria
-     */
-    function findLast(arr, iterator, thisObj){
-        var idx = findLastIndex_1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var findLast_1 = findLast;
-
-/*
-     * Helper function to flatten to a destination array.
-     * Used to remove the need to create intermediate arrays while flattening.
-     */
-    function flattenTo(arr, result, level) {
-        if (level === 0) {
-            append_1(result, arr);
-            return result;
-        }
-
-        var value,
-            i = -1,
-            len = arr.length;
-        while (++i < len) {
-            value = arr[i];
-            if (isArray_1(value)) {
-                flattenTo(value, result, level - 1);
-            } else {
-                result.push(value);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Recursively flattens an array.
-     * A new array containing all the elements is returned.
-     * If level is specified, it will only flatten up to that level.
-     */
-    function flatten$1(arr, level) {
-        if (arr == null) {
-            return [];
-        }
-
-        level = level == null ? -1 : level;
-        return flattenTo(arr, [], level);
-    }
-
-    var flatten_1 = flatten$1;
+/* riotx version 0.9.4 */
+var VERSION$1 = "0.9.4";
 
 /**
      * Array forEach
      */
-    function forEach(arr, callback, thisObj) {
+    function forEach$3(arr, callback, thisObj) {
         if (arr == null) {
             return;
         }
@@ -4098,1953 +11209,117 @@ function containsMatch(array, pattern) {
         }
     }
 
-    var forEach_1 = forEach;
+    var forEach_1$2 = forEach$3;
 
 /**
-     * Bucket the array values.
+     * Safer Object.hasOwnProperty
      */
-    function groupBy$1(arr, categorize, thisObj) {
-        if (categorize) {
-            categorize = makeIterator_(categorize, thisObj);
-        } else {
-            // Default to identity function.
-            categorize = identity_1;
+     function hasOwn$3(obj, prop){
+         return Object.prototype.hasOwnProperty.call(obj, prop);
+     }
+
+     var hasOwn_1$3 = hasOwn$3;
+
+var _hasDontEnumBug$2;
+var _dontEnums$2;
+
+    function checkDontEnum$2(){
+        _dontEnums$2 = [
+                'toString',
+                'toLocaleString',
+                'valueOf',
+                'hasOwnProperty',
+                'isPrototypeOf',
+                'propertyIsEnumerable',
+                'constructor'
+            ];
+
+        _hasDontEnumBug$2 = true;
+
+        for (var key in {'toString': null}) {
+            _hasDontEnumBug$2 = false;
         }
-
-        var buckets = {};
-        forEach_1(arr, function(element) {
-            var bucket = categorize(element);
-            if (!(bucket in buckets)) {
-                buckets[bucket] = [];
-            }
-
-            buckets[bucket].push(element);
-        });
-
-        return buckets;
-    }
-
-    var groupBy_1 = groupBy$1;
-
-/**
-     * Array indicesOf
-     */
-    function indicesOf(arr, item, fromIndex) {
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        fromIndex = typeof fromIndex === 'number' ? fromIndex : 0;
-
-        var length = arr.length;
-        var cursor = fromIndex >= 0 ? fromIndex : length + fromIndex;
-
-        while (cursor < length) {
-            if (arr[cursor] === item) {
-                results.push(cursor);
-            }
-            cursor++;
-        }
-
-        return results;
-    }
-
-    var indicesOf_1 = indicesOf;
-
-/**
-     * Insert item into array if not already present.
-     */
-    function insert(arr, rest_items) {
-        var diff = difference_1(slice_1(arguments, 1), arr);
-        if (diff.length) {
-            Array.prototype.push.apply(arr, diff);
-        }
-        return arr.length;
-    }
-    var insert_1 = insert;
-
-/**
-     * Return a new Array with elements common to all Arrays.
-     * - based on underscore.js implementation
-     */
-    function intersection$1(arr) {
-        var arrs = slice_1(arguments, 1),
-            result = filter_1(unique_1(arr), function(needle){
-                return every_1(arrs, function(haystack){
-                    return contains_1(haystack, needle);
-                });
-            });
-        return result;
-    }
-
-    var intersection_1 = intersection$1;
-
-/**
-     * Call `methodName` on each item of the array passing custom arguments if
-     * needed.
-     */
-    function invoke(arr, methodName, var_args){
-        if (arr == null) {
-            return arr;
-        }
-
-        var args = slice_1(arguments, 2);
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            value[methodName].apply(value, args);
-        }
-
-        return arr;
-    }
-
-    var invoke_1 = invoke;
-
-function isValidString(val) {
-        return (val != null && val !== '');
     }
 
     /**
-     * Joins strings with the specified separator inserted between each value.
-     * Null values and empty strings will be excluded.
+     * Similar to Array/forEach but works over object properties and fixes Don't
+     * Enum bug on IE.
+     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
      */
-    function join(items, separator) {
-        separator = separator || '';
-        return filter_1(items, isValidString).join(separator);
-    }
+    function forIn$3(obj, fn, thisObj){
+        var key, i = 0;
+        // no need to check if argument is a real object that way we can use
+        // it for arrays, functions, date, etc.
 
-    var join_1 = join;
+        //post-pone check till needed
+        if (_hasDontEnumBug$2 == null) { checkDontEnum$2(); }
 
-/**
-     * Returns last element of array.
-     */
-    function last(arr){
-        if (arr == null || arr.length < 1) {
-            return undefined;
-        }
-
-        return arr[arr.length - 1];
-    }
-
-    var last_1 = last;
-
-/**
-     * Array lastIndexOf
-     */
-    function lastIndexOf(arr, item, fromIndex) {
-        if (arr == null) {
-            return -1;
-        }
-
-        var len = arr.length;
-        fromIndex = (fromIndex == null || fromIndex >= len)? len - 1 : fromIndex;
-        fromIndex = (fromIndex < 0)? len + fromIndex : fromIndex;
-
-        while (fromIndex >= 0) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (arr[fromIndex] === item) {
-                return fromIndex;
-            }
-            fromIndex--;
-        }
-
-        return -1;
-    }
-
-    var lastIndexOf_1 = lastIndexOf;
-
-/**
-     * Array map
-     */
-    function map(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var results = [];
-        if (arr == null){
-            return results;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            results[i] = callback(arr[i], i, arr);
-        }
-
-        return results;
-    }
-
-     var map_1 = map;
-
-/**
-     * Return maximum value inside array
-     */
-    function max(arr, iterator, thisObj){
-        if (arr == null || !arr.length) {
-            return Infinity;
-        } else if (arr.length && !iterator) {
-            return Math.max.apply(Math, arr);
-        } else {
-            iterator = makeIterator_(iterator, thisObj);
-            var result,
-                compare = -Infinity,
-                value,
-                temp;
-
-            var i = -1, len = arr.length;
-            while (++i < len) {
-                value = arr[i];
-                temp = iterator(value, i, arr);
-                if (temp > compare) {
-                    compare = temp;
-                    result = value;
-                }
-            }
-
-            return result;
-        }
-    }
-
-    var max_1 = max;
-
-/**
-     * Return minimum value inside array
-     */
-    function min(arr, iterator, thisObj){
-        if (arr == null || !arr.length) {
-            return -Infinity;
-        } else if (arr.length && !iterator) {
-            return Math.min.apply(Math, arr);
-        } else {
-            iterator = makeIterator_(iterator, thisObj);
-            var result,
-                compare = Infinity,
-                value,
-                temp;
-
-            var i = -1, len = arr.length;
-            while (++i < len) {
-                value = arr[i];
-                temp = iterator(value, i, arr);
-                if (temp < compare) {
-                    compare = temp;
-                    result = value;
-                }
-            }
-
-            return result;
-        }
-    }
-
-    var min_1 = min;
-
-/**
- * @constant Minimum 32-bit signed integer value (-2^31).
- */
-
-    var MIN_INT = -2147483648;
-
-/**
- * @constant Maximum 32-bit signed integer value. (2^31 - 1)
- */
-
-    var MAX_INT = 2147483647;
-
-/**
-     * Just a wrapper to Math.random. No methods inside mout/random should call
-     * Math.random() directly so we can inject the pseudo-random number
-     * generator if needed (ie. in case we need a seeded random or a better
-     * algorithm than the native one)
-     */
-    function random(){
-        return random.get();
-    }
-
-    // we expose the method so it can be swapped if needed
-    random.get = Math.random;
-
-    var random_1 = random;
-
-/**
-     * Returns random number inside range
-     */
-    function rand(min, max){
-        min = min == null? MIN_INT : min;
-        max = max == null? MAX_INT : max;
-        return min + (max - min) * random_1();
-    }
-
-    var rand_1 = rand;
-
-/**
-     * Gets random integer inside range or snap to min/max values.
-     */
-    function randInt(min, max){
-        min = min == null? MIN_INT : ~~min;
-        max = max == null? MAX_INT : ~~max;
-        // can't be max + 0.5 otherwise it will round up if `rand`
-        // returns `max` causing it to overflow range.
-        // -0.5 and + 0.49 are required to avoid bias caused by rounding
-        return Math.round( rand_1(min - 0.5, max + 0.499999999999) );
-    }
-
-    var randInt_1 = randInt;
-
-/**
-     * Remove random item(s) from the Array and return it.
-     * Returns an Array of items if [nItems] is provided or a single item if
-     * it isn't specified.
-     */
-    function pick$1(arr, nItems){
-        if (nItems != null) {
-            var result = [];
-            if (nItems > 0 && arr && arr.length) {
-                nItems = nItems > arr.length? arr.length : nItems;
-                while (nItems--) {
-                    result.push( pickOne(arr) );
-                }
-            }
-            return result;
-        }
-        return (arr && arr.length)? pickOne(arr) : void(0);
-    }
-
-
-    function pickOne(arr){
-        var idx = randInt_1(0, arr.length - 1);
-        return arr.splice(idx, 1)[0];
-    }
-
-
-    var pick_1 = pick$1;
-
-/**
-     * Extract a list of property values.
-     */
-    function pluck(arr, propName){
-        return map_1(arr, propName);
-    }
-
-    var pluck_1 = pluck;
-
-/**
-    * Count number of full steps.
-    */
-    function countSteps(val, step, overflow){
-        val = Math.floor(val / step);
-
-        if (overflow) {
-            return val % overflow;
-        }
-
-        return val;
-    }
-
-    var countSteps_1 = countSteps;
-
-/**
-     * Returns an Array of numbers inside range.
-     */
-    function range$1(start, stop, step) {
-        if (stop == null) {
-            stop = start;
-            start = 0;
-        }
-        step = step || 1;
-
-        var result = [],
-            nSteps = countSteps_1(stop - start, step),
-            i = start;
-
-        while (i <= stop) {
-            result.push(i);
-            i += step;
-        }
-
-        return result;
-    }
-
-    var range_1 = range$1;
-
-/**
-     * Array reduce
-     */
-    function reduce$1(arr, fn, initVal) {
-        // check for args.length since initVal might be "undefined" see #gh-57
-        var hasInit = arguments.length > 2,
-            result = initVal;
-
-        if (arr == null || !arr.length) {
-            if (!hasInit) {
-                throw new Error('reduce of empty array with no initial value');
-            } else {
-                return initVal;
+        for (key in obj) {
+            if (exec$2(fn, obj, key, thisObj) === false) {
+                break;
             }
         }
 
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (!hasInit) {
-                result = arr[i];
-                hasInit = true;
-            } else {
-                result = fn(result, arr[i], i, arr);
-            }
-        }
 
-        return result;
-    }
-
-    var reduce_1 = reduce$1;
-
-/**
-     * Array reduceRight
-     */
-    function reduceRight(arr, fn, initVal) {
-        // check for args.length since initVal might be "undefined" see #gh-57
-        var hasInit = arguments.length > 2;
-
-        if (arr == null || !arr.length) {
-            if (hasInit) {
-                return initVal;
-            } else {
-                throw new Error('reduce of empty array with no initial value');
-            }
-        }
-
-        var i = arr.length, result = initVal, value;
-        while (--i >= 0) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            value = arr[i];
-            if (!hasInit) {
-                result = value;
-                hasInit = true;
-            } else {
-                result = fn(result, value, i, arr);
-            }
-        }
-        return result;
-    }
-
-    var reduceRight_1 = reduceRight;
-
-/**
-     * Array reject
-     */
-    function reject(arr, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            if (!callback(value, i, arr)) {
-                results.push(value);
-            }
-        }
-
-        return results;
-    }
-
-    var reject_1 = reject;
-
-/**
-     * Remove a single item from the array.
-     * (it won't remove duplicates, just a single item)
-     */
-    function remove$1(arr, item){
-        var idx = indexOf_1(arr, item);
-        if (idx !== -1) { arr.splice(idx, 1); }
-    }
-
-    var remove_1 = remove$1;
-
-/**
-     * Remove all instances of an item from array.
-     */
-    function removeAll(arr, item){
-        var idx = indexOf_1(arr, item);
-        while (idx !== -1) {
-            arr.splice(idx, 1);
-            idx = indexOf_1(arr, item, idx);
-        }
-    }
-
-    var removeAll_1 = removeAll;
-
-/**
-     * Returns a copy of the array in reversed order.
-     */
-    function reverse(array) {
-        var copy = array.slice();
-        copy.reverse();
-        return copy;
-    }
-
-    var reverse_1 = reverse;
-
-/**
-     * Shuffle array items.
-     */
-    function shuffle(arr) {
-        var results = [],
-            rnd;
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (!i) {
-                results[0] = arr[0];
-            } else {
-                rnd = randInt_1(0, i);
-                results[i] = results[rnd];
-                results[rnd] = arr[i];
-            }
-        }
-
-        return results;
-    }
-
-    var shuffle_1 = shuffle;
-
-/**
-     * Merge sort (http://en.wikipedia.org/wiki/Merge_sort)
-     */
-    function mergeSort(arr, compareFn) {
-        if (arr == null) {
-            return [];
-        } else if (arr.length < 2) {
-            return arr;
-        }
-
-        if (compareFn == null) {
-            compareFn = defaultCompare;
-        }
-
-        var mid, left, right;
-
-        mid   = ~~(arr.length / 2);
-        left  = mergeSort( arr.slice(0, mid), compareFn );
-        right = mergeSort( arr.slice(mid, arr.length), compareFn );
-
-        return merge(left, right, compareFn);
-    }
-
-    function defaultCompare(a, b) {
-        return a < b ? -1 : (a > b? 1 : 0);
-    }
-
-    function merge(left, right, compareFn) {
-        var result = [];
-
-        while (left.length && right.length) {
-            if (compareFn(left[0], right[0]) <= 0) {
-                // if 0 it should preserve same order (stable)
-                result.push(left.shift());
-            } else {
-                result.push(right.shift());
-            }
-        }
-
-        if (left.length) {
-            result.push.apply(result, left);
-        }
-
-        if (right.length) {
-            result.push.apply(result, right);
-        }
-
-        return result;
-    }
-
-    var sort = mergeSort;
-
-/*
-     * Sort array by the result of the callback
-     */
-    function sortBy(arr, callback, context){
-        callback = makeIterator_(callback, context);
-
-        return sort(arr, function(a, b) {
-            a = callback(a);
-            b = callback(b);
-            return (a < b) ? -1 : ((a > b) ? 1 : 0);
-        });
-    }
-
-    var sortBy_1 = sortBy;
-
-/**
-     * Split array into a fixed number of segments.
-     */
-    function split$1(array, segments) {
-        segments = segments || 2;
-        var results = [];
-        if (array == null) {
-            return results;
-        }
-
-        var minLength = Math.floor(array.length / segments),
-            remainder = array.length % segments,
-            i = 0,
-            len = array.length,
-            segmentIndex = 0,
-            segmentLength;
-
-        while (i < len) {
-            segmentLength = minLength;
-            if (segmentIndex < remainder) {
-                segmentLength++;
-            }
-
-            results.push(array.slice(i, i + segmentLength));
-
-            segmentIndex++;
-            i += segmentLength;
-        }
-
-        return results;
-    }
-    var split_1 = split$1;
-
-/**
-     * Iterates over a callback a set amount of times
-     * returning the results
-     */
-    function take(n, callback, thisObj){
-        var i = -1;
-        var arr = [];
-        if( !thisObj ){
-            while(++i < n){
-                arr[i] = callback(i, n);
-            }
-        } else {
-            while(++i < n){
-                arr[i] = callback.call(thisObj, i, n);
-            }
-        }
-        return arr;
-    }
-
-    var take_1 = take;
-
-/**
-     */
-    function isFunction(val) {
-        return isKind_1(val, 'Function');
-    }
-    var isFunction_1 = isFunction;
-
-/**
-     * Creates an object that holds a lookup for the objects in the array.
-     */
-    function toLookup(arr, key) {
-        var result = {};
-        if (arr == null) {
-            return result;
-        }
-
-        var i = -1, len = arr.length, value;
-        if (isFunction_1(key)) {
-            while (++i < len) {
-                value = arr[i];
-                result[key(value)] = value;
-            }
-        } else {
-            while (++i < len) {
-                value = arr[i];
-                result[value[key]] = value;
-            }
-        }
-
-        return result;
-    }
-    var toLookup_1 = toLookup;
-
-/**
-     * Concat multiple arrays and remove duplicates
-     */
-    function union$1(arrs) {
-        var results = [];
-        var i = -1, len = arguments.length;
-        while (++i < len) {
-            append_1(results, arguments[i]);
-        }
-
-        return unique_1(results);
-    }
-
-    var union_1 = union$1;
-
-/**
-     * Exclusive OR. Returns items that are present in a single array.
-     * - like ptyhon's `symmetric_difference`
-     */
-    function xor(arr1, arr2) {
-        arr1 = unique_1(arr1);
-        arr2 = unique_1(arr2);
-
-        var a1 = filter_1(arr1, function(item){
-                return !contains_1(arr2, item);
-            }),
-            a2 = filter_1(arr2, function(item){
-                return !contains_1(arr1, item);
-            });
-
-        return a1.concat(a2);
-    }
-
-    var xor_1 = xor;
-
-function getLength(arr) {
-        return arr == null ? 0 : arr.length;
-    }
-
-    /**
-     * Merges together the values of each of the arrays with the values at the
-     * corresponding position.
-     */
-    function zip(arr){
-        var len = arr ? max_1(map_1(arguments, getLength)) : 0,
-            results = [],
-            i = -1;
-        while (++i < len) {
-            // jshint loopfunc: true
-            results.push(map_1(arguments, function(item) {
-                return item == null ? undefined : item[i];
-            }));
-        }
-
-        return results;
-    }
-
-    var zip_1 = zip;
-
-//automatically generated, do not edit!
-//run `node build` instead
-var array$1 = {
-    'append' : append_1,
-    'collect' : collect_1,
-    'combine' : combine_1,
-    'compact' : compact_1,
-    'contains' : contains_1,
-    'difference' : difference_1,
-    'equals' : equals_1,
-    'every' : every_1,
-    'filter' : filter_1,
-    'find' : find_1,
-    'findIndex' : findIndex_1,
-    'findLast' : findLast_1,
-    'findLastIndex' : findLastIndex_1,
-    'flatten' : flatten_1,
-    'forEach' : forEach_1,
-    'groupBy' : groupBy_1,
-    'indexOf' : indexOf_1,
-    'indicesOf' : indicesOf_1,
-    'insert' : insert_1,
-    'intersection' : intersection_1,
-    'invoke' : invoke_1,
-    'join' : join_1,
-    'last' : last_1,
-    'lastIndexOf' : lastIndexOf_1,
-    'map' : map_1,
-    'max' : max_1,
-    'min' : min_1,
-    'pick' : pick_1,
-    'pluck' : pluck_1,
-    'range' : range_1,
-    'reduce' : reduce_1,
-    'reduceRight' : reduceRight_1,
-    'reject' : reject_1,
-    'remove' : remove_1,
-    'removeAll' : removeAll_1,
-    'reverse' : reverse_1,
-    'shuffle' : shuffle_1,
-    'slice' : slice_1,
-    'some' : some_1,
-    'sort' : sort,
-    'sortBy' : sortBy_1,
-    'split' : split_1,
-    'take' : take_1,
-    'toLookup' : toLookup_1,
-    'union' : union_1,
-    'unique' : unique_1,
-    'xor' : xor_1,
-    'zip' : zip_1
-};
-
-var array_5 = array$1.contains;
-var array_9 = array$1.filter;
-var array_10 = array$1.find;
-var array_15 = array$1.forEach;
-var array_25 = array$1.map;
-var array_33 = array$1.reject;
-
-/**
-     * return a list of all enumerable properties that have function values
-     */
-    function functions(obj){
-        var keys = [];
-        forIn_1(obj, function(val, key){
-            if (typeof val === 'function'){
-                keys.push(key);
-            }
-        });
-        return keys.sort();
-    }
-
-    var functions_1 = functions;
-
-/**
-     * Return a function that will execute in the given context, optionally adding any additional supplied parameters to the beginning of the arguments collection.
-     * @param {Function} fn  Function.
-     * @param {object} context   Execution context.
-     * @param {rest} args    Arguments (0...n arguments).
-     * @return {Function} Wrapped Function.
-     */
-    function bind(fn, context, args){
-        var argsArr = slice_1(arguments, 2); //curried args
-        return function(){
-            return fn.apply(context, argsArr.concat(slice_1(arguments)));
-        };
-    }
-
-    var bind_1 = bind;
-
-/**
-     * Binds methods of the object to be run in it's own context.
-     */
-    function bindAll(obj, rest_methodNames){
-        var keys = arguments.length > 1?
-                    slice_1(arguments, 1) : functions_1(obj);
-        forEach_1(keys, function(key){
-            obj[key] = bind_1(obj[key], obj);
-        });
-    }
-
-    var bindAll_1 = bindAll;
-
-/**
-     * Object some
-     */
-    function some$2(obj, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var result = false;
-        forOwn_1(obj, function(val, key) {
-            if (callback(val, key, obj)) {
-                result = true;
-                return false; // break
-            }
-        });
-        return result;
-    }
-
-    var some_1$2 = some$2;
-
-/**
-     * Check if object contains value
-     */
-    function contains$2(obj, needle) {
-        return some_1$2(obj, function(val) {
-            return (val === needle);
-        });
-    }
-    var contains_1$2 = contains$2;
-
-/**
-     * Checks if the value is created by the `Object` constructor.
-     */
-    function isPlainObject(value) {
-        return (!!value && typeof value === 'object' &&
-            value.constructor === Object);
-    }
-
-    var isPlainObject_1 = isPlainObject;
-
-/**
-     * Deeply copy missing properties in the target from the defaults.
-     */
-    function deepFillIn(target, defaults){
-        var i = 0,
-            n = arguments.length,
-            obj;
-
-        while(++i < n) {
-            obj = arguments[i];
-            if (obj) {
-                // jshint loopfunc: true
-                forOwn_1(obj, function(newValue, key) {
-                    var curValue = target[key];
-                    if (curValue == null) {
-                        target[key] = newValue;
-                    } else if (isPlainObject_1(curValue) &&
-                               isPlainObject_1(newValue)) {
-                        deepFillIn(curValue, newValue);
+        if (_hasDontEnumBug$2) {
+            var ctor = obj.constructor,
+                isProto = !!ctor && obj === ctor.prototype;
+
+            while (key = _dontEnums$2[i++]) {
+                // For constructor, if it is a prototype object the constructor
+                // is always non-enumerable unless defined otherwise (and
+                // enumerated above).  For non-prototype objects, it will have
+                // to be defined on this object, since it cannot be defined on
+                // any prototype objects.
+                //
+                // For other [[DontEnum]] properties, check if the value is
+                // different than Object prototype value.
+                if (
+                    (key !== 'constructor' ||
+                        (!isProto && hasOwn_1$3(obj, key))) &&
+                    obj[key] !== Object.prototype[key]
+                ) {
+                    if (exec$2(fn, obj, key, thisObj) === false) {
+                        break;
                     }
-                });
-            }
-        }
-
-        return target;
-    }
-
-    var deepFillIn_1 = deepFillIn;
-
-/**
-     * Mixes objects into the target object, recursively mixing existing child
-     * objects.
-     */
-    function deepMixIn(target, objects) {
-        var i = 0,
-            n = arguments.length,
-            obj;
-
-        while(++i < n){
-            obj = arguments[i];
-            if (obj) {
-                forOwn_1(obj, copyProp, target);
-            }
-        }
-
-        return target;
-    }
-
-    function copyProp(val, key) {
-        var existing = this[key];
-        if (isPlainObject_1(val) && isPlainObject_1(existing)) {
-            deepMixIn(existing, val);
-        } else {
-            this[key] = val;
-        }
-    }
-
-    var deepMixIn_1 = deepMixIn;
-
-/**
-     * Object every
-     */
-    function every$2(obj, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var result = true;
-        forOwn_1(obj, function(val, key) {
-            // we consider any falsy values as "false" on purpose so shorthand
-            // syntax can be used to check property existence
-            if (!callback(val, key, obj)) {
-                result = false;
-                return false; // break
-            }
-        });
-        return result;
-    }
-
-    var every_1$2 = every$2;
-
-/**
-     */
-    function isObject$1(val) {
-        return isKind_1(val, 'Object');
-    }
-    var isObject_1 = isObject$1;
-
-// Makes a function to compare the object values from the specified compare
-    // operation callback.
-    function makeCompare$1(callback) {
-        return function(value, key) {
-            return hasOwn_1(this, key) && callback(value, this[key]);
-        };
-    }
-
-    function checkProperties(value, key) {
-        return hasOwn_1(this, key);
-    }
-
-    /**
-     * Checks if two objects have the same keys and values.
-     */
-    function equals$1(a, b, callback) {
-        callback = callback || is_1;
-
-        if (!isObject_1(a) || !isObject_1(b)) {
-            return callback(a, b);
-        }
-
-        return (every_1$2(a, makeCompare$1(callback), b) &&
-                every_1$2(b, checkProperties, a));
-    }
-
-    var equals_1$2 = equals$1;
-
-/**
-     * Copy missing properties in the obj from the defaults.
-     */
-    function fillIn(obj, var_defaults){
-        forEach_1(slice_1(arguments, 1), function(base){
-            forOwn_1(base, function(val, key){
-                if (obj[key] == null) {
-                    obj[key] = val;
                 }
-            });
-        });
-        return obj;
-    }
-
-    var fillIn_1 = fillIn;
-
-/**
-     * Creates a new object with all the properties where the callback returns
-     * true.
-     */
-    function filterValues(obj, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var output = {};
-        forOwn_1(obj, function(value, key, obj) {
-            if (callback(value, key, obj)) {
-                output[key] = value;
             }
-        });
-
-        return output;
-    }
-    var filter$2 = filterValues;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$2(obj, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var result;
-        some_1$2(obj, function(value, key, obj) {
-            if (callback(value, key, obj)) {
-                result = value;
-                return true; //break
-            }
-        });
-        return result;
-    }
-
-    var find_1$2 = find$2;
-
-/*
-     * Helper function to flatten to a destination object.
-     * Used to remove the need to create intermediate objects while flattening.
-     */
-    function flattenTo$1(obj, result, prefix, level) {
-        forOwn_1(obj, function (value, key) {
-            var nestedPrefix = prefix ? prefix + '.' + key : key;
-
-            if (level !== 0 && isPlainObject_1(value)) {
-                flattenTo$1(value, result, nestedPrefix, level - 1);
-            } else {
-                result[nestedPrefix] = value;
-            }
-        });
-
-        return result;
-    }
-
-    /**
-     * Recursively flattens an object.
-     * A new object containing all the elements is returned.
-     * If level is specified, it will only flatten up to that level.
-     */
-    function flatten$2(obj, level) {
-        if (obj == null) {
-            return {};
         }
-
-        level = level == null ? -1 : level;
-        return flattenTo$1(obj, {}, '', level);
     }
 
-    var flatten_1$2 = flatten$2;
+    function exec$2(fn, obj, key, thisObj){
+        return fn.call(thisObj, obj[key], key, obj);
+    }
+
+    var forIn_1$3 = forIn$3;
 
 /**
-     * Checks if the object is a primitive
+     * Similar to Array/forEach but works over object properties and fixes Don't
+     * Enum bug on IE.
+     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
      */
-
-/**
-     * get "nested" object property
-     */
-    function get$1(obj, prop){
-        var parts = prop.split('.'),
-            last = parts.pop();
-
-        while (prop = parts.shift()) {
-            obj = obj[prop];
-            if (obj == null) { return; }
-        }
-
-        return obj[last];
+    function forOwn$4(obj, fn, thisObj){
+        forIn_1$3(obj, function(val, key){
+            if (hasOwn_1$3(obj, key)) {
+                return fn.call(thisObj, obj[key], key, obj);
+            }
+        });
     }
 
-    var get_1 = get$1;
-
-var UNDEF$1;
-
-    /**
-     * Check if object has nested property.
-     */
-    function has(obj, prop){
-        return get_1(obj, prop) !== UNDEF$1;
-    }
-
-    var has_1 = has;
+    var forOwn_1$2 = forOwn$4;
 
 /**
      * Get object keys
      */
-     var keys = Object.keys || function (obj) {
+     var keys$2 = Object.keys || function (obj) {
             var keys = [];
-            forOwn_1(obj, function(val, key){
+            forOwn_1$2(obj, function(val, key){
                 keys.push(key);
             });
             return keys;
         };
 
-    var keys_1 = keys;
-
-/**
-     * Creates a new object where all the values are the result of calling
-     * `callback`.
-     */
-    function mapValues(obj, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        var output = {};
-        forOwn_1(obj, function(val, key, obj) {
-            output[key] = callback(val, key, obj);
-        });
-
-        return output;
-    }
-    var map$2 = mapValues;
-
-/**
-     * checks if a object contains all given properties/values
-     */
-    function matches(target, props){
-        // can't use "object/every" because of circular dependency
-        var result = true;
-        forOwn_1(props, function(val, key){
-            if (target[key] !== val) {
-                // break loop at first difference
-                return (result = false);
-            }
-        });
-        return result;
-    }
-
-    var matches_1 = matches;
-
-/**
-     * Get object values
-     */
-    function values(obj) {
-        var vals = [];
-        forOwn_1(obj, function(val, key){
-            vals.push(val);
-        });
-        return vals;
-    }
-
-    var values_1 = values;
-
-/**
-     * Returns maximum value inside object.
-     */
-    function max$1(obj, compareFn) {
-        return max_1(values_1(obj), compareFn);
-    }
-
-    var max_1$2 = max$1;
-
-/**
-    * Combine properties from all the objects into first one.
-    * - This method affects target object in place, if you want to create a new Object pass an empty object as first param.
-    * @param {object} target    Target Object
-    * @param {...object} objects    Objects to be combined (0...n objects).
-    * @return {object} Target Object.
-    */
-    function mixIn(target, objects){
-        var i = 0,
-            n = arguments.length,
-            obj;
-        while(++i < n){
-            obj = arguments[i];
-            if (obj != null) {
-                forOwn_1(obj, copyProp$1, target);
-            }
-        }
-        return target;
-    }
-
-    function copyProp$1(val, key){
-        this[key] = val;
-    }
-
-    var mixIn_1 = mixIn;
-
-/**
-     * Clone native types.
-     */
-    function clone$1(val){
-        switch (kindOf_1(val)) {
-            case 'Object':
-                return cloneObject$2(val);
-            case 'Array':
-                return cloneArray$1(val);
-            case 'RegExp':
-                return cloneRegExp(val);
-            case 'Date':
-                return cloneDate(val);
-            default:
-                return val;
-        }
-    }
-
-    function cloneObject$2(source) {
-        if (isPlainObject_1(source)) {
-            return mixIn_1({}, source);
-        } else {
-            return source;
-        }
-    }
-
-    function cloneRegExp(r) {
-        var flags = '';
-        flags += r.multiline ? 'm' : '';
-        flags += r.global ? 'g' : '';
-        flags += r.ignoreCase ? 'i' : '';
-        return new RegExp(r.source, flags);
-    }
-
-    function cloneDate(date) {
-        return new Date(+date);
-    }
-
-    function cloneArray$1(arr) {
-        return arr.slice();
-    }
-
-    var clone_1 = clone$1;
-
-/**
-     * Recursively clone native types.
-     */
-    function deepClone(val, instanceClone) {
-        switch ( kindOf_1(val) ) {
-            case 'Object':
-                return cloneObject$1(val, instanceClone);
-            case 'Array':
-                return cloneArray(val, instanceClone);
-            default:
-                return clone_1(val);
-        }
-    }
-
-    function cloneObject$1(source, instanceClone) {
-        if (isPlainObject_1(source)) {
-            var out = {};
-            forOwn_1(source, function(val, key) {
-                this[key] = deepClone(val, instanceClone);
-            }, out);
-            return out;
-        } else if (instanceClone) {
-            return instanceClone(source);
-        } else {
-            return source;
-        }
-    }
-
-    function cloneArray(arr, instanceClone) {
-        var out = [],
-            i = -1,
-            n = arr.length,
-            val;
-        while (++i < n) {
-            out[i] = deepClone(arr[i], instanceClone);
-        }
-        return out;
-    }
-
-    var deepClone_1 = deepClone;
-
-/**
-     * Deep merge objects.
-     */
-    function merge$1() {
-        var i = 1,
-            key, val, obj, target;
-
-        // make sure we don't modify source element and it's properties
-        // objects are passed by reference
-        target = deepClone_1( arguments[0] );
-
-        while (obj = arguments[i++]) {
-            for (key in obj) {
-                if ( ! hasOwn_1(obj, key) ) {
-                    continue;
-                }
-
-                val = obj[key];
-
-                if ( isObject_1(val) && isObject_1(target[key]) ){
-                    // inception, deep merge objects
-                    target[key] = merge$1(target[key], val);
-                } else {
-                    // make sure arrays, regexp, date, objects are cloned
-                    target[key] = deepClone_1(val);
-                }
-
-            }
-        }
-
-        return target;
-    }
-
-    var merge_1 = merge$1;
-
-/**
-     * Returns minimum value inside object.
-     */
-    function min$1(obj, iterator) {
-        return min_1(values_1(obj), iterator);
-    }
-
-    var min_1$2 = min$1;
-
-/**
-     * Create nested object if non-existent
-     */
-    function namespace(obj, path){
-        if (!path) { return obj; }
-        forEach_1(path.split('.'), function(key){
-            if (!obj[key]) {
-                obj[key] = {};
-            }
-            obj = obj[key];
-        });
-        return obj;
-    }
-
-    var namespace_1 = namespace;
-
-/**
-     * Return a copy of the object, filtered to only contain properties except the blacklisted keys.
-     */
-    function omit$1(obj, var_keys){
-        var keys = typeof arguments[1] !== 'string'? arguments[1] : slice_1(arguments, 1),
-            out = {};
-
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property) && !contains_1(keys, property)) {
-                out[property] = obj[property];
-            }
-        }
-        return out;
-    }
-
-    var omit_1 = omit$1;
-
-/**
-     * Return a copy of the object, filtered to only have values for the whitelisted keys.
-     */
-    function pick$2(obj, var_keys){
-        var keys = typeof arguments[1] !== 'string'? arguments[1] : slice_1(arguments, 1),
-            out = {},
-            i = 0, key;
-        while (key = keys[i++]) {
-            out[key] = obj[key];
-        }
-        return out;
-    }
-
-    var pick_1$2 = pick$2;
-
-/**
-     * Extract a list of property values.
-     */
-    function pluck$1(obj, propName){
-        return map$2(obj, prop_1(propName));
-    }
-
-    var pluck_1$2 = pluck$1;
-
-/**
-     * Get object size
-     */
-    function size$1(obj) {
-        var count = 0;
-        forOwn_1(obj, function(){
-            count++;
-        });
-        return count;
-    }
-
-    var size_1 = size$1;
-
-/**
-     * Object reduce
-     */
-    function reduce$2(obj, callback, memo, thisObj) {
-        var initial = arguments.length > 2;
-
-        if (!size_1(obj) && !initial) {
-            throw new Error('reduce of empty object with no initial value');
-        }
-
-        forOwn_1(obj, function(value, key, list) {
-            if (!initial) {
-                memo = value;
-                initial = true;
-            }
-            else {
-                memo = callback.call(thisObj, memo, value, key, list);
-            }
-        });
-
-        return memo;
-    }
-
-    var reduce_1$2 = reduce$2;
-
-/**
-     * Object reject
-     */
-    function reject$1(obj, callback, thisObj) {
-        callback = makeIterator_(callback, thisObj);
-        return filter$2(obj, function(value, index, obj) {
-            return !callback(value, index, obj);
-        }, thisObj);
-    }
-
-    var reject_1$2 = reject$1;
-
-function result(obj, prop) {
-        var property = obj[prop];
-
-        if(property === undefined) {
-            return;
-        }
-
-        return isFunction_1(property) ? property.call(obj) : property;
-    }
-
-    var result_1 = result;
-
-/**
-     * set "nested" object property
-     */
-    function set(obj, prop, val){
-        var parts = (/^(.+)\.(.+)$/).exec(prop);
-        if (parts){
-            namespace_1(obj, parts[1])[parts[2]] = val;
-        } else {
-            obj[prop] = val;
-        }
-    }
-
-    var set_1 = set;
-
-/**
-     * Unset object property.
-     */
-    function unset(obj, prop){
-        if (has_1(obj, prop)) {
-            var parts = prop.split('.'),
-                last = parts.pop();
-            while (prop = parts.shift()) {
-                obj = obj[prop];
-            }
-            return (delete obj[last]);
-
-        } else {
-            // if property doesn't exist treat as deleted
-            return true;
-        }
-    }
-
-    var unset_1 = unset;
-
-//automatically generated, do not edit!
-//run `node build` instead
-var object = {
-    'bindAll' : bindAll_1,
-    'contains' : contains_1$2,
-    'deepFillIn' : deepFillIn_1,
-    'deepMatches' : deepMatches_1,
-    'deepMixIn' : deepMixIn_1,
-    'equals' : equals_1$2,
-    'every' : every_1$2,
-    'fillIn' : fillIn_1,
-    'filter' : filter$2,
-    'find' : find_1$2,
-    'flatten' : flatten_1$2,
-    'forIn' : forIn_1,
-    'forOwn' : forOwn_1,
-    'functions' : functions_1,
-    'get' : get_1,
-    'has' : has_1,
-    'hasOwn' : hasOwn_1,
-    'keys' : keys_1,
-    'map' : map$2,
-    'matches' : matches_1,
-    'max' : max_1$2,
-    'merge' : merge_1,
-    'min' : min_1$2,
-    'mixIn' : mixIn_1,
-    'namespace' : namespace_1,
-    'omit' : omit_1,
-    'pick' : pick_1$2,
-    'pluck' : pluck_1$2,
-    'reduce' : reduce_1$2,
-    'reject' : reject_1$2,
-    'result' : result_1,
-    'set' : set_1,
-    'size' : size_1,
-    'some' : some_1$2,
-    'unset' : unset_1,
-    'values' : values_1
-};
-
-var object_9 = object.filter;
-var object_10 = object.find;
-var object_13 = object.forOwn;
-var object_15 = object.get;
-var object_18 = object.keys;
-var object_36 = object.values;
-
-const CHANGE_COMPONENTS_PREFIX = 'components_';
-
-var constants = {
-  SECTION_DASHBOARD: 'dashboard',
-  SECTION_MANAGE: 'manage',
-
-  // store.js
-  STORAGE_CURRENT: 'current',
-  STORAGE_ENDPOINTS: 'endpoints',
-  STORAGE_TOAST: 'toast',
-  STORAGE_OAUTH_ENDPOINT_KEY: 'oauth_endpoint_key',
-
-  // Component#Style
-  STYLE_NUMBER: 'number',
-  STYLE_TABLE: 'table',
-  STYLE_GRAPH_BAR: 'graph-bar',
-
-  // Auth type
-  AUTH_TYPE_EMAIL: 'email',
-  AUTH_TYPE_OAUTH: 'oauth',
-
-  // DMC's special constants
-  DMC_TABLE_ACTION_KEY: 'dmc_table_action_key',
-
-  // riotx#actions
-  ACTION_LOCATION_SET: 'action_location_set',
-
-  ACTION_DRAWER_TOGGLE: 'drawer_toggle',
-  ACTION_DRAWER_OPEN: 'drawer_open',
-  ACTION_DRAWER_CLOSE: 'drawer_close',
-  ACTION_DRAWER_ENABLE: 'drawer_enable',
-  ACTION_DRAWER_DISABLE: 'drawer_disable',
-
-  ACTION_DMC_GET: 'dmc_get',
-  ACTION_DMC_REMOVE: 'dmc_remove',
-
-  ACTION_ENDPOINTS_GET: 'endpoints_get',
-  ACTION_ENDPOINTS_REMOVE: 'endpoints_remove',
-  ACTION_ENDPOINTS_REMOVE_ALL: 'endpoints_remove_all',
-  ACTION_ENDPOINTS_ADD: 'endpoints_add',
-
-  ACTION_CURRENT_UPDATE: 'current_update',
-  ACTION_CURRENT_REMOVE: 'current_remove',
-
-  ACTION_OAUTHENDPOINTKEY_UPDATE: 'oauthendpointkey_update',
-  ACTION_OAUTHENDPOINTKEY_REMOVE: 'oauthendpointkey_remove',
-
-  ACTION_PAGE_GET: 'page_get',
-  ACTION_PAGE_REMOVE: 'page_remove',
-
-  ACTION_COMPONENTS_GET: 'components_get',
-  ACTION_COMPONENTS_OPERATE: 'components_operate',
-  ACTION_COMPONENTS_REMOVE_ALL: 'components_remove_all',
-  ACTION_COMPONENTS_REMOVE_ONE: 'components_remove_one',
-
-  ACTION_TOAST_SHOW: 'toast_show',
-  ACTION_TOAST_HIDE: 'toast_hide',
-  ACTION_TOAST_RESET: 'toast_reset',
-
-  ACTION_MODAL_SHOW: 'modal_show',
-  ACTION_MODAL_HIDE: 'modal_hide',
-
-  ACTION_AUTH_UPDATE: 'auth_update',
-  ACTION_AUTH_REMOVE: 'auth_remove',
-  ACTION_AUTH_VALIDATE: 'auth_validate',
-  ACTION_AUTH_SIGN_IN_OAUTH: 'auth_sign_in_oauth',
-  ACTION_AUTH_SIGN_IN_EMAIL: 'auth_sign_in_email',
-  ACTION_AUTHTYPE_GET: 'authtype_get',
-  ACTION_AUTH_SIGN_IN_SHOW: 'auth_sign_in_show',
-
-  QUERYSTRING_KEY_TOKEN: 'token',
-
-  // riotx#mutations
-  MUTATION_LOCATION: 'location',
-
-  MUTATION_DRAWER_TOGGLE: 'drawer_toggle',
-  MUTATION_DRAWER_OPEN: 'drawer_open',
-  MUTATION_DRAWER_CLOSE: 'drawer_close',
-  MUTATION_DRAWER_ENABLE: 'drawer_enable',
-  MUTATION_DRAWER_DISABLE: 'drawer_disable',
-
-  MUTATION_DMC: 'dmc',
-  MUTATION_DMC_REMOVE: 'dmc_remove',
-
-  MUTATION_ENDPOINTS: 'endpoints',
-  MUTATION_ENDPOINTS_REMOVE: 'endpoints_remove',
-  MUTATION_ENDPOINTS_REMOVE_ALL: 'endpoints_remove_all',
-  MUTATION_ENDPOINTS_ADD: "endpoints_add",
-  MUTATION_ENDPOINTS_UPDATE: "endpoints_update",
-  MUTATION_ENDPOINTS_TOKEN_UPDATE: 'endpoints_token_update',
-
-  MUTATION_CURRENT: 'current',
-
-  MUTATION_OAUTHENDPOINTKEY: 'oauthendpointkey',
-
-  MUTATION_PAGE: 'page',
-
-  MUTATION_COMPONENTS_ONE: 'components_one',
-  MUTATION_COMPONENTS_REMOVE_ALL: 'components_remove_all',
-  MUTATION_COMPONENTS_REMOVE_ONE: 'components_remove_one',
-
-  MUTATION_TOAST_ADD: 'toast_add',
-  MUTATION_TOAST_REMOVE: 'toast_remove',
-
-  MUTATION_MODAL_ADD: 'modal_add',
-  MUTATION_MODAL_REMOVE: 'modal_remove',
-
-  MUTATION_AUTH_SIGN_IN_SHOW: 'auth_sign_in_show',
-
-  // riotx#getters
-  GETTER_LOCATION: 'location',
-  GETTER_LOCATION_TAG: 'location_tag',
-  GETTER_LOCATION_DMCPAGE: 'location_dmcpage',
-
-  GETTER_DRAWER_OPENED: 'drawer_opened',
-  GETTER_DRAWER_ENABLED: 'drawer_enabled',
-
-  GETTER_DMC: 'dmc',
-  GETTER_DMC_PAGES: 'dmc_pages',
-  GETTER_DMC_NAME: 'dmc_name',
-  GETTER_DMC_DASHBOARD: 'dmc_dashboard',
-  GETTER_DMC_MANAGE: 'dmc_manage',
-
-  GETTER_CURRENT: 'current',
-
-  GETTER_OAUTHENDPOINTKEY: 'oauthendpointkey',
-
-  GETTER_PAGE: 'page',
-  GETTER_PAGE_NAME: 'page_name',
-  GETTER_PAGE_COMPONENTS: 'page_components',
-
-  GETTER_COMPONENTS_ONE: 'components_one',
-
-  GETTER_TOAST_LIST: 'toast_list',
-
-  GETTER_MODAL_LIST: 'modal_list',
-
-  GETTER_ENDPOINTS: 'endpoints',
-  GETTER_ENDPOINTS_ONE: 'endpoints_one',
-  GETTER_ENDPOINTS_NEXT_KEY: 'endpoints_next_key',
-
-  GETTER_AUTH_SIGN_IN_SHOW_KEY: 'auth_sign_in_show_key',
-
-  // riotx#mutated
-  CHANGE_LOCATION: 'location',
-
-  CHANGE_DRAWER: 'drawer',
-
-  CHANGE_DMC: 'dmc',
-
-  CHANGE_ENDPOINTS: 'endpoints',
-
-  CHANGE_CURRENT: 'current',
-
-  CHANGE_OAUTHENDPOINTKEY: 'oauthendpointkey',
-
-  CHANGE_PAGE: 'page',
-
-  CHANGE_SIGN_IN: 'sign_in',
-
-  CHANGE_COMPONENTS: 'components',
-  changeComponentsName: name => {
-    return CHANGE_COMPONENTS_PREFIX + name;
-  },
-
-  CHANGE_TOAST: 'toast',
-
-  CHANGE_MODAL: 'modal'
-};
-
-/**
- * Swaggerファイルをロードして解析しデータ/操作を一元管理
- *
- * Tips: swagger-client(swagger-js) は、ブラウザの外部ファイル読み込み
- */
-
-class Swagger {
-
-  constructor() {
-    this.client = null;
-  }
-
-  setup(endpoint) {
-    return new Promise((resolve, reject$$1) => {
-      const request = {
-        url: endpoint.url,
-        //query,
-        //method,
-        //body,
-        headers: {
-          'Authorization': endpoint.token
-        },
-        requestInterceptor: (req) => {
-          console.log('Interceptor(request):', req);
-        },
-        responseInterceptor: (res) => {
-          console.log('Interceptor(response):', res);
-        }
-      };
-
-      SwaggerClient
-        .http(request)
-        .then(client => {
-          if (client.errors && client.errors.length > 0) {
-            return reject$$1(client.errors);
-          }
-          if (client.status === 401) {
-            // TODO: 要確認。
-            const err = new Error();
-            err.name = '401 Authorization Required';
-            err.status = client.spec.status;
-            return reject$$1(err);
-          }
-
-          console.log(`[fetch] ${client.url} success.`);
-
-          SwaggerClient({spec: client.body}).then((_client) => {
-            this.client = _client;
-            resolve();
-          });
-        })
-        .catch(err => {
-          reject$$1(err);
-        });
-    });
-  }
-
-  apisFlatObject() {
-    if (!this.client) {
-      return {};
-    }
-    const apis = {};
-    object_13(this.client.apis, (v) => {
-      object_13(v, (v1, k1) => {
-        apis[k1] = v1;
-      });
-    });
-
-    return apis;
-  }
-
-  getApiByOperationID(operationID) {
-    return this.apisFlatObject()[operationID];
-  }
-
-  getOperationObjectByOperationID(operationID) {
-    let operationObject;
-    object_13(this.client.spec.paths, pathItemObject => {
-      object_13(pathItemObject, v => {
-        if (object_15(v, 'operationId') === operationID) {
-          operationObject = v;
-        }
-      });
-    });
-    return operationObject;
-  }
-
-  getPathItemObjectByPath(path) {
-    return this.client.spec.paths[path];
-  }
-
-  /**
-   * dmc-component-*.tagが扱いやすいデータ構造に変換する。
-   * @param {Object} schema
-   * @param {*} response
-   */
-  mergeSchemaAndResponse(schema, response) {
-    // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
-    // type will be one of "null", "boolean", "object", "array", "number" or "string".
-    const type = schema.type;
-    const ret = {
-      // dmc customs.
-      _type: null,
-      _value: null,
-      _keys: null,
-      _length: null,
-      getType: function() {
-        return this._type;
-      },
-      getValue: function(k) {
-        if (k === undefined) {
-          return this._value;
-        }
-        return this._value[k];
-      },
-      getKeys: function() {
-        return this._keys;
-      },
-      getLength: function() {
-        return this._length;
-      }
-    };
-    // @see: http://swagger.io/specification/#schemaObject
-    const schemaObjectKeys = [
-      'example',
-      'format',// @see: http://swagger.io/specification/#dataTypeFormat
-      'title',
-      'description',
-      'default',
-      'multipleOf',
-      'maximum',
-      'exclusiveMaximum',
-      'minimum',
-      'exclusiveMinimum',
-      'maxLength',
-      'minLength',
-      'pattern',
-      'maxItems',
-      'minItems',
-      'uniqueItems',
-      'maxProperties',
-      'minProperties',
-      'required',
-      'enum',
-      //'type',// removed on purpose. type will be customized by dmc.
-      'items',
-      'allOf',
-      'properties',
-      'additionalProperties'
-    ];
-    array_15(schemaObjectKeys, v => {
-      ret[`_${v}`] = schema[v];
-      ret[`get${v.charAt(0).toUpperCase()}${v.slice(1)}`] = function() {
-        return this[`_${v}`];
-      };
-    });
-
-    switch (type) {
-    case 'null':
-      ret._type = 'null';
-      ret._value = null;
-      break;
-    case 'boolean':
-      ret._type = 'boolean';
-      ret._value = response;
-      break;
-    case 'object':
-      ret._type = 'object';
-      ret._value = {};
-      ret._keys = [];
-      object_13(response, (v, k) => {
-        ret._keys.push(k);
-        ret._value[k] = this.mergeSchemaAndResponse(schema.properties[k], v);
-        ret._value[k].key = k;
-      });
-      break;
-    case 'array':
-      ret._type = 'array';
-      ret._value = [];
-      ret._length = response.length;
-      array_15(response, (v, i) => {
-        ret._value[i] = this.mergeSchemaAndResponse(schema.items, v);
-        ret._value[i].idx = i;
-      });
-      break;
-    case 'number':
-      ret._type = 'number';
-      ret._value = response;
-      break;
-    case 'string':
-      ret._type = 'number';
-      ret._value = response;
-      break;
-    default:
-      break;
-    }
-
-    return ret;
-  }
-
-  /**
-   * 定義情報とデータをマージ
-   * @param properties
-   * @param response
-   * @param key
-   * @returns {*}
-   */
-  mergePropertiesAndResponse(properties, response, key) {
-
-    if (properties.type === 'array') {
-      let res = [];
-      object_13(response, (v, k) => {
-        let ret = this.mergePropertiesAndResponse(properties.items, v, k);
-        res.push(ret);
-      });
-      return res;
-    }
-
-    let res = {};
-
-    if (properties.type === 'object') {
-      object_13(properties.properties, (v, k) => {
-        let ret = this.mergePropertiesAndResponse(v, response[k], k);
-        res[k] = ret;
-      });
-      return res;
-    }
-
-    //
-    res.key = key;
-    res.definition = properties;
-    res.get = function () {
-      return this.value;
-    };
-
-    // TODO definition チェッカー
-    res.value = response;
-
-    return res;
-
-  }
-
-  isComponentStyleNumber(obj) {
-    return obj.get() === constants.STYLE_NUMBER;
-  }
-
-  isComponentStyleTable(obj) {
-    return obj.get() === constants.STYLE_TABLE;
-  }
-
-  isComponentStyleGraphBar(obj) {
-    return obj.get() === constants.STYLE_GRAPH_BAR;
-  }
-
-}
-
-var swagger = new Swagger();
+    var keys_1$1 = keys$2;
 
 /*
 object-assign
@@ -6053,11 +11328,11 @@ object-assign
 */
 
 /* eslint-disable no-unused-vars */
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+var getOwnPropertySymbols$1 = Object.getOwnPropertySymbols;
+var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+var propIsEnumerable$1 = Object.prototype.propertyIsEnumerable;
 
-function toObject(val) {
+function toObject$1(val) {
 	if (val === null || val === undefined) {
 		throw new TypeError('Object.assign cannot be called with null or undefined');
 	}
@@ -6065,7 +11340,7 @@ function toObject(val) {
 	return Object(val);
 }
 
-function shouldUseNative() {
+function shouldUseNative$1() {
 	try {
 		if (!Object.assign) {
 			return false;
@@ -6109,24 +11384,26 @@ function shouldUseNative() {
 	}
 }
 
-var index = shouldUseNative() ? Object.assign : function (target, source) {
+var index$1$2 = shouldUseNative$1() ? Object.assign : function (target, source) {
+	var arguments$1 = arguments;
+
 	var from;
-	var to = toObject(target);
+	var to = toObject$1(target);
 	var symbols;
 
 	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
+		from = Object(arguments$1[s]);
 
 		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
+			if (hasOwnProperty$1.call(from, key)) {
 				to[key] = from[key];
 			}
 		}
 
-		if (getOwnPropertySymbols) {
-			symbols = getOwnPropertySymbols(from);
+		if (getOwnPropertySymbols$1) {
+			symbols = getOwnPropertySymbols$1(from);
 			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
+				if (propIsEnumerable$1.call(from, symbols[i])) {
 					to[symbols[i]] = from[symbols[i]];
 				}
 			}
@@ -6136,25 +11413,274 @@ var index = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
+var commonjsGlobal$2 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+
+
+
+
+function createCommonjsModule$2(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var promise$2 = createCommonjsModule$2(function (module) {
+(function (root) {
+
+  // Store setTimeout reference so promise-polyfill will be unaffected by
+  // other code modifying setTimeout (like sinon.useFakeTimers())
+  var setTimeoutFunc = setTimeout;
+
+  function noop() {}
+  
+  // Polyfill for Function.prototype.bind
+  function bind(fn, thisArg) {
+    return function () {
+      fn.apply(thisArg, arguments);
+    };
+  }
+
+  function Promise(fn) {
+    if (typeof this !== 'object') { throw new TypeError('Promises must be constructed via new'); }
+    if (typeof fn !== 'function') { throw new TypeError('not a function'); }
+    this._state = 0;
+    this._handled = false;
+    this._value = undefined;
+    this._deferreds = [];
+
+    doResolve(fn, this);
+  }
+
+  function handle(self, deferred) {
+    while (self._state === 3) {
+      self = self._value;
+    }
+    if (self._state === 0) {
+      self._deferreds.push(deferred);
+      return;
+    }
+    self._handled = true;
+    Promise._immediateFn(function () {
+      var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+      if (cb === null) {
+        (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+        return;
+      }
+      var ret;
+      try {
+        ret = cb(self._value);
+      } catch (e) {
+        reject(deferred.promise, e);
+        return;
+      }
+      resolve(deferred.promise, ret);
+    });
+  }
+
+  function resolve(self, newValue) {
+    try {
+      // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+      if (newValue === self) { throw new TypeError('A promise cannot be resolved with itself.'); }
+      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+        var then = newValue.then;
+        if (newValue instanceof Promise) {
+          self._state = 3;
+          self._value = newValue;
+          finale(self);
+          return;
+        } else if (typeof then === 'function') {
+          doResolve(bind(then, newValue), self);
+          return;
+        }
+      }
+      self._state = 1;
+      self._value = newValue;
+      finale(self);
+    } catch (e) {
+      reject(self, e);
+    }
+  }
+
+  function reject(self, newValue) {
+    self._state = 2;
+    self._value = newValue;
+    finale(self);
+  }
+
+  function finale(self) {
+    if (self._state === 2 && self._deferreds.length === 0) {
+      Promise._immediateFn(function() {
+        if (!self._handled) {
+          Promise._unhandledRejectionFn(self._value);
+        }
+      });
+    }
+
+    for (var i = 0, len = self._deferreds.length; i < len; i++) {
+      handle(self, self._deferreds[i]);
+    }
+    self._deferreds = null;
+  }
+
+  function Handler(onFulfilled, onRejected, promise) {
+    this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+    this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+    this.promise = promise;
+  }
+
+  /**
+   * Take a potentially misbehaving resolver function and make sure
+   * onFulfilled and onRejected are only called once.
+   *
+   * Makes no guarantees about asynchrony.
+   */
+  function doResolve(fn, self) {
+    var done = false;
+    try {
+      fn(function (value) {
+        if (done) { return; }
+        done = true;
+        resolve(self, value);
+      }, function (reason) {
+        if (done) { return; }
+        done = true;
+        reject(self, reason);
+      });
+    } catch (ex) {
+      if (done) { return; }
+      done = true;
+      reject(self, ex);
+    }
+  }
+
+  Promise.prototype['catch'] = function (onRejected) {
+    return this.then(null, onRejected);
+  };
+
+  Promise.prototype.then = function (onFulfilled, onRejected) {
+    var prom = new (this.constructor)(noop);
+
+    handle(this, new Handler(onFulfilled, onRejected, prom));
+    return prom;
+  };
+
+  Promise.all = function (arr) {
+    var args = Array.prototype.slice.call(arr);
+
+    return new Promise(function (resolve, reject) {
+      if (args.length === 0) { return resolve([]); }
+      var remaining = args.length;
+
+      function res(i, val) {
+        try {
+          if (val && (typeof val === 'object' || typeof val === 'function')) {
+            var then = val.then;
+            if (typeof then === 'function') {
+              then.call(val, function (val) {
+                res(i, val);
+              }, reject);
+              return;
+            }
+          }
+          args[i] = val;
+          if (--remaining === 0) {
+            resolve(args);
+          }
+        } catch (ex) {
+          reject(ex);
+        }
+      }
+
+      for (var i = 0; i < args.length; i++) {
+        res(i, args[i]);
+      }
+    });
+  };
+
+  Promise.resolve = function (value) {
+    if (value && typeof value === 'object' && value.constructor === Promise) {
+      return value;
+    }
+
+    return new Promise(function (resolve) {
+      resolve(value);
+    });
+  };
+
+  Promise.reject = function (value) {
+    return new Promise(function (resolve, reject) {
+      reject(value);
+    });
+  };
+
+  Promise.race = function (values) {
+    return new Promise(function (resolve, reject) {
+      for (var i = 0, len = values.length; i < len; i++) {
+        values[i].then(resolve, reject);
+      }
+    });
+  };
+
+  // Use polyfill for setImmediate for performance gains
+  Promise._immediateFn = (typeof setImmediate === 'function' && function (fn) { setImmediate(fn); }) ||
+    function (fn) {
+      setTimeoutFunc(fn, 0);
+    };
+
+  Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+    if (typeof console !== 'undefined' && console) {
+      console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
+    }
+  };
+
+  /**
+   * Set the immediate function to execute callbacks
+   * @param fn {function} Function to execute
+   * @deprecated
+   */
+  Promise._setImmediateFn = function _setImmediateFn(fn) {
+    Promise._immediateFn = fn;
+  };
+
+  /**
+   * Change the function to execute on unhandled rejection
+   * @param {function} fn Function to execute on unhandled rejection
+   * @deprecated
+   */
+  Promise._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
+    Promise._unhandledRejectionFn = fn;
+  };
+  
+  if ('object' !== 'undefined' && module.exports) {
+    module.exports = Promise;
+  } else if (!root.Promise) {
+    root.Promise = Promise;
+  }
+
+})(commonjsGlobal$2);
+});
+
 /**
  * settings for riotx
  * @type {{debug: boolean, default: string}}
  */
-const settings = {
-  debug: true,
-  default: '@'
+var settings = {
+  debug: false,
+  default: '@',
+  changeBindName: 'riotxChange'
 };
 
 /**
  * log output
  */
-const log$1 = (...args) => {
+var log = function () {
+  var args = [], len = arguments.length;
+  while ( len-- ) { args[ len ] = arguments[ len ]; }
+
   if (!settings.debug) {
     return;
   }
 
   args.unshift('[riotx]');
-  //args.push(new Error('stack')); // stack trace
   try {
     console.log.apply(console, args); // eslint-disable-line
   } catch (e) {
@@ -6163,3288 +11689,824 @@ const log$1 = (...args) => {
 };
 
 
-class Store {
+var Store = function Store(_store) {
   /**
-   * @param { name: 'Store Name', state: { default state data }, actions: { TODO } mutations: { TODO }, getters: { TODO } }
+   * name of the store.
+   * @type {String}
    */
-  constructor(_store) {
-    /**
-     * name of the store.
-     * @type {String}
-     */
-    this.name = _store.name;
-    if (!this.name) {
-      this.name = settings.default;
-      log$1(`Default store name. name=${this.name}`);
+  this.name = _store.name;
+  if (!this.name) {
+    this.name = settings.default;
+    log(("Default store name. name=" + (this.name)));
+  }
+
+  /**
+   * a object that represents full application state.
+   * @type {Object}
+   */
+  this.state = index$1$2({}, _store.state);
+
+  /**
+   * functions to mutate application state.
+   * @type {Object}
+   */
+  this._actions = index$1$2({}, _store.actions);
+
+  /**
+   * mutaions.
+   * mutaion = a function which mutates the state.
+   * all mutation functions take two parameters which are `state` and `obj`.
+   * `state` will be TODO.
+   * `obj` will be TODO.
+   * @type {Object}
+   */
+  this._mutations = index$1$2({}, _store.mutations);
+
+  /**
+   * functions to get data from states.
+   * @type {Object}
+   */
+  this._getters = index$1$2({}, _store.getters);
+
+  riot$1.observable(this);
+};
+
+/**
+ * Getter state
+ * @param {String} name TODO
+ * @param {...*} args
+ */
+Store.prototype.getter = function getter (name) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) { args[ len ] = arguments[ len + 1 ]; }
+
+  log('[getter]', name, args);
+  var context = {
+    state : index$1$2({}, this.state)
+  };
+  return this._getters[name].apply(null, [context ].concat( args));
+};
+
+/**
+ * Commit mutation.
+ * only actions are allowed to execute this function.
+ * @param {String} name mutation name
+ * @param {...*} args
+ */
+Store.prototype.commit = function commit (name) {
+    var this$1 = this;
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) { args[ len ] = arguments[ len + 1 ]; }
+
+  var _state = index$1$2({}, this.state);
+  log.apply(void 0, [ '[commit(before)]', name, _state ].concat( args ));
+  var context = {
+    getter: function (name) {
+        var args = [], len = arguments.length - 1;
+        while ( len-- > 0 ) { args[ len ] = arguments[ len + 1 ]; }
+
+      return this$1.getter.apply(this$1, [name ].concat( args));
+    },
+    state : _state
+  };
+  var triggers = this._mutations[name].apply(null, [context ].concat( args));
+  log.apply(void 0, [ '[commit(after)]', name, _state ].concat( args ));
+  index$1$2(this.state, _state);
+
+  forEach_1$2(triggers, function (v) {
+    // this.trigger(v, null, this.state, this);
+    this$1.trigger(v, this$1.state, this$1);
+  });
+};
+
+/**
+ * emit action.
+ * only ui components are allowed to execute this function.
+ * @param {Stting} name action name
+ * @param {...*} args parameter's to action
+ * @return {Promise}
+ */
+Store.prototype.action = function action (name) {
+    var this$1 = this;
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) { args[ len ] = arguments[ len + 1 ]; }
+
+  log('[action]', name, args);
+
+  var context = {
+    getter: function (name) {
+        var args = [], len = arguments.length - 1;
+        while ( len-- > 0 ) { args[ len ] = arguments[ len + 1 ]; }
+
+      return this$1.getter.apply(this$1, [name ].concat( args));
+    },
+    state: index$1$2({}, this.state),
+    commit: function () {
+        var args = [], len = arguments.length;
+        while ( len-- ) { args[ len ] = arguments[ len ]; }
+
+      (ref = this$1).commit.apply(ref, args);
+        var ref;
     }
+  };
+  return promise$2
+    .resolve()
+    .then(function () { return this$1._actions[name].apply(null, [context ].concat( args)); });
+};
 
-    /**
-     * a object that represents full application state.
-     * @type {Object}
-     */
-    this.state = index({}, _store.state);
+/**
+ * shorthand for `store.on('event', () => {})`.
+ * @param {...*} args
+ */
+Store.prototype.change = function change () {
+    var args = [], len = arguments.length;
+    while ( len-- ) { args[ len ] = arguments[ len ]; }
 
-    /**
-     * functions to mutate application state.
-     * @type {Object}
-     */
-    this._actions = index({}, _store.actions);
+  (ref = this).on.apply(ref, args);
+    var ref;
+};
 
-    /**
-     * mutaions.
-     * mutaion = a function which mutates the state.
-     * all mutation functions take two parameters which are `state` and `obj`.
-     * `state` will be TODO.
-     * `obj` will be TODO.
-     * @type {Object}
-     */
-    this._mutations = index({}, _store.mutations);
-
-    /**
-     * functions to get data from states.
-     * @type {Object}
-     */
-    this._getters = index({}, _store.getters);
-
-    riot$1.observable(this);
-  }
+var RiotX = function RiotX() {
+  this.version = VERSION$1 || '';
 
   /**
-   * Getter state
-   * @param {String} name TODO
-   * @param {...*} args
+   * constructor of RiotX.Store.
+   * @type {RiotX.Store}
    */
-  getter(name, ...args) {
-    log$1('[getter]', name, args);
-    const context = {
-      state : index({}, this.state)
-    };
-    return this._getters[name].apply(null, [context, ...args]);
-  }
+  this.Store = Store;
 
   /**
-   * Commit mutation.
-   * only actions are allowed to execute this function.
-   * @param {String} name mutation name
-   * @param {...*} args
+   * instances of RiotX.Store.
+   * @type {Object}
    */
-  commit(name, ...args) {
-    const _state = index({}, this.state);
-    log$1('[commit(before)]', name, _state, ...args);
-    const context = {
-      getter: (name, ...args) => {
-        return this.getter.apply(this, [name, ...args]);
-      },
-      state : _state
-    };
-    const triggers = this._mutations[name].apply(null, [context, ...args]);
-    log$1('[commit(after)]', name, _state, ...args);
-    index(this.state, _state);
+  this.stores = {};
 
-    array_15(triggers, (v) => {
-      this.trigger(v, null, this.state, this);
+  // add and keep event listener for store changes.
+  // through this function the event listeners will be unbinded automatically.
+  var riotxChange = function(store, evtName, handler) {
+    var args = [], len = arguments.length - 3;
+    while ( len-- > 0 ) { args[ len ] = arguments[ len + 3 ]; }
+
+    this._riotx_change_handlers.push({
+      store: store,
+      evtName: evtName,
+      handler: handler
     });
+    args.unshift(handler);
+    args.unshift(evtName);
+    store.change.apply(store, args);
+  };
+
+  // register a mixin globally.
+  riot$1.mixin({
+    // intendedly use `function`.
+    // switch the context of `this` from `riotx` to `riot tag instance`.
+    init: function () {
+      var this$1 = this;
+
+      // the context of `this` will be equal to riot tag instant.
+      this.on('unmount', function () {
+        this$1.off('*');
+        forEach_1$2(this$1._riotx_change_handlers, function (obj) {
+          obj.store.off(obj.evtName, obj.handler);
+        });
+        delete this$1.riotx;
+        delete this$1._riotx_change_handlers;
+        delete this$1[settings.changeBindName];
+      });
+
+      if (settings.debug) {
+        this.on('*', function (eventName) {
+          log(eventName, this$1);
+        });
+      }
+
+      this._riotx_change_handlers = [];
+      // let users set the name.
+      this[settings.changeBindName] = riotxChange;
+    },
+    // give each riot instance the ability to access the globally defined singleton RiotX instance.
+    riotx: this
+  });
+};
+
+/**
+ * Add a store instance
+ * @param {RiotX.Store} store instance of RiotX.Store
+ * @returns {RiotX}
+ */
+RiotX.prototype.add = function add (store) {
+  if (this.stores[store.name]) {
+    throw new Error(("The store instance named `" + (store.name) + "` already exists."));
   }
 
+  this.stores[store.name] = store;
+  return this;
+};
+
+/**
+ * Get store instance
+ * @param {String} name store name
+ * @returns {RiotX.Store} store instance
+ */
+RiotX.prototype.get = function get (name) {
+    if ( name === void 0 ) { name = settings.default; }
+
+  return this.stores[name];
+};
+
+/**
+ * Set debug flag
+ * @param flag
+ * @returns {RiotX}
+ */
+RiotX.prototype.debug = function debug (flag) {
+  settings.debug = !!flag;
+  return this;
+};
+
+/**
+ * Set function name to bind store change event.
+ * @param {String} name
+ * @returns {RiotX}
+ */
+RiotX.prototype.setChangeBindName = function setChangeBindName (name) {
+  settings.changeBindName = name;
+  return this;
+};
+
+/**
+ * Reset riotx instance
+ * @returns {RiotX} instance
+ */
+RiotX.prototype.reset = function reset () {
+  this.stores = {};
+  return this;
+};
+
+/**
+ * Store's count
+ * @returns {int} size
+ */
+RiotX.prototype.size = function size () {
+  return keys_1$1(this.stores).length;
+};
+
+var index$2 = new RiotX();
+
+var store$1 = {
   /**
-   * emit action.
-   * only ui components are allowed to execute this function.
-   * @param {Stting} name action name
-   * @param {...*} args parameter's to action
+   * riotx初期設定。
    * @return {Promise}
    */
-  action(name, ...args) {
-    log$1('[action]', name, args);
-
-    const context = {
-      getter: (name, ...args) => {
-        return this.getter.apply(this, [name, ...args]);
-      },
-      state: index({}, this.state),
-      commit: (...args) => {
-        this.commit(...args);
-      }
-    };
+  init: () => {
     return Promise
       .resolve()
-      .then(() => this._actions[name].apply(null, [context, ...args]));
-  }
-
-  /**
-   * shorthand for `store.on('event', () => {})`.
-   * @param {...*} args
-   */
-  change(...args) {
-    this.on(...args);
-  }
-}
-
-class RiotX {
-  constructor() {
-    /**
-     * constructor of RiotX.Store.
-     * @type {RiotX.Store}
-     */
-    this.Store = Store;
-
-    /**
-     * instances of RiotX.Store.
-     * @type {Object}
-     */
-    this.stores = {};
-
-    // register a mixin globally.
-    riot$1.mixin({
-      // intendedly use `function`.
-      // switch the context of `this` from `riotx` to `riot tag instance`.
-      init: function () {
-        // the context of `this` will be equal to riot tag instant.
-        this.on('unmount', () => {
-          this.off('*');
+      .then(() => {
+        const store = new index$2.Store({
+          state: states,
+          actions,
+          mutations,
+          getters
         });
-
-        if (settings.debug) {
-          this.on('*', eventName => {
-            log$1(eventName, this);
-          });
-        }
-      },
-      // give each riot instance the ability to access the globally defined singleton RiotX instance.
-      riotx: this
-    });
+        index$2.add(store);
+        // TODO: あとでけす。
+        window.store = store;
+        return store;
+      });
   }
+};
 
-  /**
-   * Add a store instance
-   * @param {RiotX.Store} store instance of RiotX.Store
-   * @returns {RiotX}
-   */
-  add(store) {
-    if (this.stores[store.name]) {
-      throw new Error(`The store instance named \`${store.name}\` already exists.`);
+var script$2 = function() {
+  this.getBasePages = () => {
+    const size = this.opts.size;
+    const currentPage = this.opts.currentpage;
+    const maxPage = this.opts.maxpage;
+    let startPage = currentPage - Math.floor(size / 2);
+    let endPage = currentPage + Math.floor(size / 2) - ((size % 2) ? 0 : 1);
+    if (startPage < 1) {
+      endPage = endPage + Math.abs(startPage + 1);
+      startPage = 1;
+    }
+    if (endPage > maxPage) {
+      startPage = startPage - (endPage - maxPage);
+      endPage = maxPage;
     }
 
-    this.stores[store.name] = store;
-    return this;
-  }
-
-  /**
-   * Get store instance
-   * @param {String} name store name
-   * @returns {RiotX.Store} store instance
-   */
-  get(name = settings.default) {
-    return this.stores[name];
-  }
-}
-
-var riotx = new RiotX();
-
-var location$1 = {
-  set: (context, tag, dmcPage) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_LOCATION, `dmc-${tag}`, dmcPage);
+    const ret = [];
+    for (let i = startPage; i <= endPage; i++) {
+      ret.push({
+        num: i,
+        isSelected: (i === this.opts.currentpage)
       });
-  }
-};
-
-var drawer = {
-  toggle: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_DRAWER_TOGGLE);
-      });
-  },
-
-  open: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_DRAWER_OPEN);
-      });
-  },
-
-  close: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_DRAWER_CLOSE);
-      });
-  },
-
-  enable: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_DRAWER_ENABLE);
-      });
-  },
-
-  disable: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_DRAWER_DISABLE);
-      });
-  }
-};
-
-var current = {
-  show: () => {
-    return Promise
-      .resolve();
-  },
-
-  update: (context, key) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_CURRENT, key);
-      });
-  },
-
-  remove: (context) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_CURRENT, null);
-      });
-  }
-};
-
-var oauthEndpointKey = {
-  update: (context, key) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_OAUTHENDPOINTKEY, key);
-      });
-  },
-
-  remove: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_OAUTHENDPOINTKEY, null);
-      });
-  }
-};
-
-var endpoints = {
-  get: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_ENDPOINTS);
-      });
-  },
-
-  remove: (context, key) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_ENDPOINTS_REMOVE, key);
-      });
-  },
-
-  removeAll: (context) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_ENDPOINTS_REMOVE_ALL);
-      });
-  },
-
-  add: (context, url, memo) => {
-    return fetch(url)
-      .then(res => {
-        // ping ok!
-        // 401 is expected because we didn't have a authorization token yet.
-        //return response;
-        debugger;
-        return;
-      })
-      .then(() => {
-        const key = context.getter(constants.GETTER_ENDPOINTS_NEXT_KEY);
-        const newEndpoint = {
-          url: url,
-          memo: memo,
-          token: null,
-          name: '',
-          description: '',
-          version: '',
-          color: '',
-          thumbnail: 'https://dummyimage.com/600x400/000/fff',
-          tags: []
-        };
-        return {
-          key,
-          endpoint: newEndpoint
-        };
-      })
-      .then((res) => {
-        context.commit(constants.MUTATION_ENDPOINTS_ADD, res.key, res.endpoint);
-      });
-  }
-};
-
-// APIは必須でサポートしなければならない URI
-const DMC_URI = '/dmc';
-
-var dmc = {
-  get: context => {
-    // TODO: apiがpromiseであればもうちょいキレイに書き直せる。
-    return new Promise((resolve, reject) => {
-      const operationObject = swagger.client.spec.paths[DMC_URI].get;
-
-      if (!operationObject || !swagger.client.apis.dmc || !swagger.client.apis.dmc[operationObject.operationId]) {
-        return reject(new Error(`[fetch] ${swagger.client.url}; system entry point not found. (uri: ${DMC_URI})`));
-      }
-
-      const api = swagger.getApiByOperationID(operationObject.operationId);
-
-      const token = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
-
-      api({/** TODO get only support. */}, {
-        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
-        // TODO component.jsと共通化したい
-        requestInterceptor: (req) => {
-          req.headers['Authorization'] = token;
-          console.log('Interceptor(request):', req);
-        },
-        responseInterceptor: (res) => {
-          console.log('Interceptor(response):', res);
-        }
-      }).then(res => {
-        if (!res.ok) {
-          throw new Error(`[fetch] ${res.url} error.`);
-        }
-
-        console.log(`[fetch] ${res.url} success.`);
-
-        return {
-          response: res.obj,
-          operationObject
-        };
-      }).then(res => {
-        context.commit(constants.MUTATION_DMC, res);
-        const key = context.getter(constants.GETTER_CURRENT);
-        const endpoint = context.getter(constants.GETTER_ENDPOINTS_ONE, key);
-        context.commit(constants.MUTATION_ENDPOINTS_UPDATE, key, index({}, endpoint, res.response));
-      }).then(() => {
-        resolve();
-      }).catch(err => {
-        reject(err);
-      });
-    });
-  },
-
-  remove: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_DMC_REMOVE);
-      });
-  }
-};
-
-var page = {
-  get: (context, id) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        const page = object_10(context.state.dmc.pages, v => {
-          return v.id.get() === id;
-        });
-        context.commit(constants.MUTATION_PAGE, page);
-      });
-  },
-
-  remove: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_PAGE, null);
-      });
-  }
-};
-
-var components = {
-  get: (context, component_uid, component, query = {}) => {
-    return new Promise((resolve, reject$$1) => {
-      const method = component.api.method.get();
-      // only `get` method is allowed.
-      if (method !== 'get') {
-        return reject$$1('only `get` method is allowed.');
-      }
-
-      let path = component.api.path.get();
-      if (path.indexOf('/') !== 0) {
-        path = '/' + path;
-      }
-
-      // for more detail, @see: http://swagger.io/specification/#itemsObject
-      const pathItemObject = swagger.client.spec.paths[path];
-      if (!pathItemObject || !pathItemObject[method]) {
-        return reject$$1(`[fetch] API define not found. ${method} ${path}`);
-      }
-      // `pathRefs` is a collection of paths that is related to the component.
-      const pathRefs = [{
-        // `isSelf` is a flag that is used to determine whether the path is related to this component or others.
-        isSelf: true,
-        path
-      }];
-      // `x-ref` is a custom key that is used to link paths.
-      array_15(pathItemObject['get']['x-ref'] || [], path => {
-        pathRefs.push({
-          isSelf: false,
-          path
-        });
-      });
-      // for more detail, @see: http://swagger.io/specification/#operationObject
-      const operationObject = pathItemObject[method];
-      const api = swagger.getApiByOperationID(operationObject.operationId);
-
-      api(query, {
-        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
-        requestInterceptor: (req) => {
-          // TODO: `headers`とかでtokenのセットが可能か？？
-          req.headers['Authorization'] = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
-          console.log('Interceptor(request):', req);
-        },
-        responseInterceptor: (res) => {
-          console.log('Interceptor(response):', res);
-        }
-      }).then(res => {
-        if (!res.ok) {
-          return reject$$1(`[fetch] ${res.url} error.`);
-        }
-        console.log(`[fetch] ${res.url} success.`);
-        context.commit(constants.MUTATION_COMPONENTS_ONE, {
-          response: res,
-          operationObject,
-          pathRefs,
-          component,
-          component_uid: component_uid
-        });
-        resolve();
-      }).catch(err => {
-        reject$$1(err);
-      });
-    });
-  },
-
-  operate: (context, operationObject, query) => {
-    const api = swagger.getApiByOperationID(operationObject.operationId);
-    const token = context.getter(constants.GETTER_ENDPOINTS_ONE, context.getter(constants.GETTER_CURRENT)).token;
-
-    // TODO: 共通化したいな
-    return api(query, {
-      requestInterceptor: (req) => {
-        // TODO: queryに含めることは可能か..?
-        req.headers['Authorization'] = token;
-        console.log('Interceptor(request):', req);
-      },
-      responseInterceptor: (res) => {
-        console.log('Interceptor(response):', res);
-      }
-    });
-  },
-
-  removeAll: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_COMPONENTS_REMOVE_ALL);
-      });
-  },
-
-  removeOne: (context, component_uid) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_COMPONENTS_REMOVE_ONE, component_uid);
-      });
-  }
-
-};
-
-var toast = {
-  show: (context, obj) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_TOAST_ADD, obj);
-      });
-  },
-
-  hide: (context, toastID) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_TOAST_REMOVE, toastID);
-      });
-  }
-
-};
-
-var modal = {
-  show: (context, tagName, tagOpts, modalOpts) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_MODAL_ADD, tagName, tagOpts, modalOpts);
-      });
-  },
-
-  hide: (context, modalID) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_MODAL_REMOVE, modalID);
-      });
-  }
-};
-
-var auth = {
-  update: (context, key, token) => {
-    context.commit(constants.MUTATION_ENDPOINTS_TOKEN_UPDATE, key, token);
-  },
-
-  remove: (context, key) => {
-    context.commit(constants.MUTATION_ENDPOINTS_TOKEN_UPDATE, key, null);
-  },
-
-  // check if the local stored endpoint token is valid.
-  validate: (context, key) => {
-    const endpoint = context.getter(constants.GETTER_ENDPOINTS_ONE, key);
-
-    return fetch(endpoint.url, {
-      headers: {
-        'Authorization': endpoint.token
-      }
-    })
-      .then(response => {
-        if (response.status !== 401) {
-          return true;
-        }
-        context.commit(constants.MUTATION_ENDPOINTS_TOKEN_UPDATE, key, null);
-        return false;
-      });
-  },
-
-  // show signin modal.
-  signInShow: (context, key) => {
-    return  Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_AUTH_SIGN_IN_SHOW, key);
-      })
-    ;
-  },
-
-  //
-  signInOAuth: (context, key, authtype) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants.MUTATION_OAUTHENDPOINTKEY, key);
-      })
-      .then(() => {
-        const endpoint = context.getter(constants.GETTER_ENDPOINTS_ONE, key);
-        const url = new URL(endpoint.url);
-        let fetchUrl = `${url.origin}${authtype.url}?redirect_url=${encodeURIComponent(location.href)}`;
-        location.href = fetchUrl;
-      });
-  },
-
-  // sign in with email and password.
-  signInEMail: (context, key, authtype, email, password) => {
-    const endpoint = context.getter(constants.GETTER_ENDPOINTS_ONE, key);
-    const url = new URL(endpoint.url);
-    const fetchUrl = `${url.origin}${authtype.url}`;
-
-    return fetch(fetchUrl, {
-      method: authtype.method,
-      mode: 'cors',
-      body: JSON.stringify({ email, password })
-    }).then(response => {
-      if (!response.ok) {
-        throw new Error('login failed.');
-      }
-      return response.headers.get('Authorization');
-    }).then(token => {
-      context.commit(constants.MUTATION_ENDPOINTS_TOKEN_UPDATE, key, token);
-    });
-  }
-
-};
-
-/* Any copyright is dedicated to the Public Domain.
- * http://creativecommons.org/publicdomain/zero/1.0/ */
-
-(function(scope) {
-  'use strict';
-
-  // feature detect for URL constructor
-  var hasWorkingUrl = false;
-  if (!scope.forceJURL) {
-    try {
-      var u = new URL('b', 'http://a');
-      u.pathname = 'c%20d';
-      hasWorkingUrl = u.href === 'http://a/c%20d';
-    } catch(e) {}
-  }
-
-  if (hasWorkingUrl)
-    { return; }
-
-  var relative = Object.create(null);
-  relative['ftp'] = 21;
-  relative['file'] = 0;
-  relative['gopher'] = 70;
-  relative['http'] = 80;
-  relative['https'] = 443;
-  relative['ws'] = 80;
-  relative['wss'] = 443;
-
-  var relativePathDotMapping = Object.create(null);
-  relativePathDotMapping['%2e'] = '.';
-  relativePathDotMapping['.%2e'] = '..';
-  relativePathDotMapping['%2e.'] = '..';
-  relativePathDotMapping['%2e%2e'] = '..';
-
-  function isRelativeScheme(scheme) {
-    return relative[scheme] !== undefined;
-  }
-
-  function invalid() {
-    clear.call(this);
-    this._isInvalid = true;
-  }
-
-  function IDNAToASCII(h) {
-    if ('' == h) {
-      invalid.call(this);
     }
-    // XXX
-    return h.toLowerCase()
-  }
-
-  function percentEscape(c) {
-    var unicode = c.charCodeAt(0);
-    if (unicode > 0x20 &&
-       unicode < 0x7F &&
-       // " # < > ? `
-       [0x22, 0x23, 0x3C, 0x3E, 0x3F, 0x60].indexOf(unicode) == -1
-      ) {
-      return c;
-    }
-    return encodeURIComponent(c);
-  }
-
-  function percentEscapeQuery(c) {
-    // XXX This actually needs to encode c using encoding and then
-    // convert the bytes one-by-one.
-
-    var unicode = c.charCodeAt(0);
-    if (unicode > 0x20 &&
-       unicode < 0x7F &&
-       // " # < > ` (do not escape '?')
-       [0x22, 0x23, 0x3C, 0x3E, 0x60].indexOf(unicode) == -1
-      ) {
-      return c;
-    }
-    return encodeURIComponent(c);
-  }
-
-  var EOF = undefined,
-      ALPHA = /[a-zA-Z]/,
-      ALPHANUMERIC = /[a-zA-Z0-9\+\-\.]/;
-
-  function parse(input, stateOverride, base) {
-    function err(message) {
-      errors.push(message);
-    }
-
-    var state = stateOverride || 'scheme start',
-        cursor = 0,
-        buffer = '',
-        seenAt = false,
-        seenBracket = false,
-        errors = [];
-
-    loop: while ((input[cursor - 1] != EOF || cursor == 0) && !this._isInvalid) {
-      var c = input[cursor];
-      switch (state) {
-        case 'scheme start':
-          if (c && ALPHA.test(c)) {
-            buffer += c.toLowerCase(); // ASCII-safe
-            state = 'scheme';
-          } else if (!stateOverride) {
-            buffer = '';
-            state = 'no scheme';
-            continue;
-          } else {
-            err('Invalid scheme.');
-            break loop;
-          }
-          break;
-
-        case 'scheme':
-          if (c && ALPHANUMERIC.test(c)) {
-            buffer += c.toLowerCase(); // ASCII-safe
-          } else if (':' == c) {
-            this._scheme = buffer;
-            buffer = '';
-            if (stateOverride) {
-              break loop;
-            }
-            if (isRelativeScheme(this._scheme)) {
-              this._isRelative = true;
-            }
-            if ('file' == this._scheme) {
-              state = 'relative';
-            } else if (this._isRelative && base && base._scheme == this._scheme) {
-              state = 'relative or authority';
-            } else if (this._isRelative) {
-              state = 'authority first slash';
-            } else {
-              state = 'scheme data';
-            }
-          } else if (!stateOverride) {
-            buffer = '';
-            cursor = 0;
-            state = 'no scheme';
-            continue;
-          } else if (EOF == c) {
-            break loop;
-          } else {
-            err('Code point not allowed in scheme: ' + c);
-            break loop;
-          }
-          break;
-
-        case 'scheme data':
-          if ('?' == c) {
-            this._query = '?';
-            state = 'query';
-          } else if ('#' == c) {
-            this._fragment = '#';
-            state = 'fragment';
-          } else {
-            // XXX error handling
-            if (EOF != c && '\t' != c && '\n' != c && '\r' != c) {
-              this._schemeData += percentEscape(c);
-            }
-          }
-          break;
-
-        case 'no scheme':
-          if (!base || !(isRelativeScheme(base._scheme))) {
-            err('Missing scheme.');
-            invalid.call(this);
-          } else {
-            state = 'relative';
-            continue;
-          }
-          break;
-
-        case 'relative or authority':
-          if ('/' == c && '/' == input[cursor+1]) {
-            state = 'authority ignore slashes';
-          } else {
-            err('Expected /, got: ' + c);
-            state = 'relative';
-            continue
-          }
-          break;
-
-        case 'relative':
-          this._isRelative = true;
-          if ('file' != this._scheme)
-            { this._scheme = base._scheme; }
-          if (EOF == c) {
-            this._host = base._host;
-            this._port = base._port;
-            this._path = base._path.slice();
-            this._query = base._query;
-            this._username = base._username;
-            this._password = base._password;
-            break loop;
-          } else if ('/' == c || '\\' == c) {
-            if ('\\' == c)
-              { err('\\ is an invalid code point.'); }
-            state = 'relative slash';
-          } else if ('?' == c) {
-            this._host = base._host;
-            this._port = base._port;
-            this._path = base._path.slice();
-            this._query = '?';
-            this._username = base._username;
-            this._password = base._password;
-            state = 'query';
-          } else if ('#' == c) {
-            this._host = base._host;
-            this._port = base._port;
-            this._path = base._path.slice();
-            this._query = base._query;
-            this._fragment = '#';
-            this._username = base._username;
-            this._password = base._password;
-            state = 'fragment';
-          } else {
-            var nextC = input[cursor+1];
-            var nextNextC = input[cursor+2];
-            if (
-              'file' != this._scheme || !ALPHA.test(c) ||
-              (nextC != ':' && nextC != '|') ||
-              (EOF != nextNextC && '/' != nextNextC && '\\' != nextNextC && '?' != nextNextC && '#' != nextNextC)) {
-              this._host = base._host;
-              this._port = base._port;
-              this._username = base._username;
-              this._password = base._password;
-              this._path = base._path.slice();
-              this._path.pop();
-            }
-            state = 'relative path';
-            continue;
-          }
-          break;
-
-        case 'relative slash':
-          if ('/' == c || '\\' == c) {
-            if ('\\' == c) {
-              err('\\ is an invalid code point.');
-            }
-            if ('file' == this._scheme) {
-              state = 'file host';
-            } else {
-              state = 'authority ignore slashes';
-            }
-          } else {
-            if ('file' != this._scheme) {
-              this._host = base._host;
-              this._port = base._port;
-              this._username = base._username;
-              this._password = base._password;
-            }
-            state = 'relative path';
-            continue;
-          }
-          break;
-
-        case 'authority first slash':
-          if ('/' == c) {
-            state = 'authority second slash';
-          } else {
-            err("Expected '/', got: " + c);
-            state = 'authority ignore slashes';
-            continue;
-          }
-          break;
-
-        case 'authority second slash':
-          state = 'authority ignore slashes';
-          if ('/' != c) {
-            err("Expected '/', got: " + c);
-            continue;
-          }
-          break;
-
-        case 'authority ignore slashes':
-          if ('/' != c && '\\' != c) {
-            state = 'authority';
-            continue;
-          } else {
-            err('Expected authority, got: ' + c);
-          }
-          break;
-
-        case 'authority':
-          if ('@' == c) {
-            if (seenAt) {
-              err('@ already seen.');
-              buffer += '%40';
-            }
-            seenAt = true;
-            for (var i = 0; i < buffer.length; i++) {
-              var cp = buffer[i];
-              if ('\t' == cp || '\n' == cp || '\r' == cp) {
-                err('Invalid whitespace in authority.');
-                continue;
-              }
-              // XXX check URL code points
-              if (':' == cp && null === this._password) {
-                this._password = '';
-                continue;
-              }
-              var tempC = percentEscape(cp);
-              (null !== this._password) ? this._password += tempC : this._username += tempC;
-            }
-            buffer = '';
-          } else if (EOF == c || '/' == c || '\\' == c || '?' == c || '#' == c) {
-            cursor -= buffer.length;
-            buffer = '';
-            state = 'host';
-            continue;
-          } else {
-            buffer += c;
-          }
-          break;
-
-        case 'file host':
-          if (EOF == c || '/' == c || '\\' == c || '?' == c || '#' == c) {
-            if (buffer.length == 2 && ALPHA.test(buffer[0]) && (buffer[1] == ':' || buffer[1] == '|')) {
-              state = 'relative path';
-            } else if (buffer.length == 0) {
-              state = 'relative path start';
-            } else {
-              this._host = IDNAToASCII.call(this, buffer);
-              buffer = '';
-              state = 'relative path start';
-            }
-            continue;
-          } else if ('\t' == c || '\n' == c || '\r' == c) {
-            err('Invalid whitespace in file host.');
-          } else {
-            buffer += c;
-          }
-          break;
-
-        case 'host':
-        case 'hostname':
-          if (':' == c && !seenBracket) {
-            // XXX host parsing
-            this._host = IDNAToASCII.call(this, buffer);
-            buffer = '';
-            state = 'port';
-            if ('hostname' == stateOverride) {
-              break loop;
-            }
-          } else if (EOF == c || '/' == c || '\\' == c || '?' == c || '#' == c) {
-            this._host = IDNAToASCII.call(this, buffer);
-            buffer = '';
-            state = 'relative path start';
-            if (stateOverride) {
-              break loop;
-            }
-            continue;
-          } else if ('\t' != c && '\n' != c && '\r' != c) {
-            if ('[' == c) {
-              seenBracket = true;
-            } else if (']' == c) {
-              seenBracket = false;
-            }
-            buffer += c;
-          } else {
-            err('Invalid code point in host/hostname: ' + c);
-          }
-          break;
-
-        case 'port':
-          if (/[0-9]/.test(c)) {
-            buffer += c;
-          } else if (EOF == c || '/' == c || '\\' == c || '?' == c || '#' == c || stateOverride) {
-            if ('' != buffer) {
-              var temp = parseInt(buffer, 10);
-              if (temp != relative[this._scheme]) {
-                this._port = temp + '';
-              }
-              buffer = '';
-            }
-            if (stateOverride) {
-              break loop;
-            }
-            state = 'relative path start';
-            continue;
-          } else if ('\t' == c || '\n' == c || '\r' == c) {
-            err('Invalid code point in port: ' + c);
-          } else {
-            invalid.call(this);
-          }
-          break;
-
-        case 'relative path start':
-          if ('\\' == c)
-            { err("'\\' not allowed in path."); }
-          state = 'relative path';
-          if ('/' != c && '\\' != c) {
-            continue;
-          }
-          break;
-
-        case 'relative path':
-          if (EOF == c || '/' == c || '\\' == c || (!stateOverride && ('?' == c || '#' == c))) {
-            if ('\\' == c) {
-              err('\\ not allowed in relative path.');
-            }
-            var tmp;
-            if (tmp = relativePathDotMapping[buffer.toLowerCase()]) {
-              buffer = tmp;
-            }
-            if ('..' == buffer) {
-              this._path.pop();
-              if ('/' != c && '\\' != c) {
-                this._path.push('');
-              }
-            } else if ('.' == buffer && '/' != c && '\\' != c) {
-              this._path.push('');
-            } else if ('.' != buffer) {
-              if ('file' == this._scheme && this._path.length == 0 && buffer.length == 2 && ALPHA.test(buffer[0]) && buffer[1] == '|') {
-                buffer = buffer[0] + ':';
-              }
-              this._path.push(buffer);
-            }
-            buffer = '';
-            if ('?' == c) {
-              this._query = '?';
-              state = 'query';
-            } else if ('#' == c) {
-              this._fragment = '#';
-              state = 'fragment';
-            }
-          } else if ('\t' != c && '\n' != c && '\r' != c) {
-            buffer += percentEscape(c);
-          }
-          break;
-
-        case 'query':
-          if (!stateOverride && '#' == c) {
-            this._fragment = '#';
-            state = 'fragment';
-          } else if (EOF != c && '\t' != c && '\n' != c && '\r' != c) {
-            this._query += percentEscapeQuery(c);
-          }
-          break;
-
-        case 'fragment':
-          if (EOF != c && '\t' != c && '\n' != c && '\r' != c) {
-            this._fragment += c;
-          }
-          break;
-      }
-
-      cursor++;
-    }
-  }
-
-  function clear() {
-    this._scheme = '';
-    this._schemeData = '';
-    this._username = '';
-    this._password = null;
-    this._host = '';
-    this._port = '';
-    this._path = [];
-    this._query = '';
-    this._fragment = '';
-    this._isInvalid = false;
-    this._isRelative = false;
-  }
-
-  // Does not process domain names or IP addresses.
-  // Does not handle encoding for the query parameter.
-  function jURL(url, base /* , encoding */) {
-    if (base !== undefined && !(base instanceof jURL))
-      { base = new jURL(String(base)); }
-
-    this._url = url;
-    clear.call(this);
-
-    var input = url.replace(/^[ \t\r\n\f]+|[ \t\r\n\f]+$/g, '');
-    // encoding = encoding || 'utf-8'
-
-    parse.call(this, input, null, base);
-  }
-
-  jURL.prototype = {
-    toString: function() {
-      return this.href;
-    },
-    get href() {
-      if (this._isInvalid)
-        { return this._url; }
-
-      var authority = '';
-      if ('' != this._username || null != this._password) {
-        authority = this._username +
-            (null != this._password ? ':' + this._password : '') + '@';
-      }
-
-      return this.protocol +
-          (this._isRelative ? '//' + authority + this.host : '') +
-          this.pathname + this._query + this._fragment;
-    },
-    set href(href) {
-      clear.call(this);
-      parse.call(this, href);
-    },
-
-    get protocol() {
-      return this._scheme + ':';
-    },
-    set protocol(protocol) {
-      if (this._isInvalid)
-        { return; }
-      parse.call(this, protocol + ':', 'scheme start');
-    },
-
-    get host() {
-      return this._isInvalid ? '' : this._port ?
-          this._host + ':' + this._port : this._host;
-    },
-    set host(host) {
-      if (this._isInvalid || !this._isRelative)
-        { return; }
-      parse.call(this, host, 'host');
-    },
-
-    get hostname() {
-      return this._host;
-    },
-    set hostname(hostname) {
-      if (this._isInvalid || !this._isRelative)
-        { return; }
-      parse.call(this, hostname, 'hostname');
-    },
-
-    get port() {
-      return this._port;
-    },
-    set port(port) {
-      if (this._isInvalid || !this._isRelative)
-        { return; }
-      parse.call(this, port, 'port');
-    },
-
-    get pathname() {
-      return this._isInvalid ? '' : this._isRelative ?
-          '/' + this._path.join('/') : this._schemeData;
-    },
-    set pathname(pathname) {
-      if (this._isInvalid || !this._isRelative)
-        { return; }
-      this._path = [];
-      parse.call(this, pathname, 'relative path start');
-    },
-
-    get search() {
-      return this._isInvalid || !this._query || '?' == this._query ?
-          '' : this._query;
-    },
-    set search(search) {
-      if (this._isInvalid || !this._isRelative)
-        { return; }
-      this._query = '?';
-      if ('?' == search[0])
-        { search = search.slice(1); }
-      parse.call(this, search, 'query');
-    },
-
-    get hash() {
-      return this._isInvalid || !this._fragment || '#' == this._fragment ?
-          '' : this._fragment;
-    },
-    set hash(hash) {
-      if (this._isInvalid)
-        { return; }
-      this._fragment = '#';
-      if ('#' == hash[0])
-        { hash = hash.slice(1); }
-      parse.call(this, hash, 'fragment');
-    },
-
-    get origin() {
-      var host;
-      if (this._isInvalid || !this._scheme) {
-        return '';
-      }
-      // javascript: Gecko returns String(""), WebKit/Blink String("null")
-      // Gecko throws error for "data://"
-      // data: Gecko returns "", Blink returns "data://", WebKit returns "null"
-      // Gecko returns String("") for file: mailto:
-      // WebKit/Blink returns String("SCHEME://") for file: mailto:
-      switch (this._scheme) {
-        case 'data':
-        case 'file':
-        case 'javascript':
-        case 'mailto':
-          return 'null';
-      }
-      host = this.host;
-      if (!host) {
-        return '';
-      }
-      return this._scheme + '://' + host;
-    }
+    return ret;
   };
 
-  // Copy over the static methods
-  var OriginalURL = scope.URL;
-  if (OriginalURL) {
-    jURL.createObjectURL = function(blob) {
-      // IE extension allows a second optional options argument.
-      // http://msdn.microsoft.com/en-us/library/ie/hh772302(v=vs.85).aspx
-      return OriginalURL.createObjectURL.apply(OriginalURL, arguments);
-    };
-    jURL.revokeObjectURL = function(url) {
-      OriginalURL.revokeObjectURL(url);
-    };
-  }
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
 
-  scope.URL = jURL;
-
-})(window);
-
-var authtype = {
-  get: (context, key) => {
-    const endpoint = context.getter(constants.GETTER_ENDPOINTS_ONE, key);
-    const url = new URL(endpoint.url);
-    const fetchUrl = `${url.origin}/dmc_authtype`;
-    return fetch(fetchUrl)
-      .then(response => {
-        const authtypes = response.json();
-        return authtypes;
-      });
-  }
-};
-
-var actions = {
-  [constants.ACTION_LOCATION_SET]: location$1.set,
-
-  [constants.ACTION_DRAWER_TOGGLE]: drawer.toggle,
-  [constants.ACTION_DRAWER_OPEN]: drawer.open,
-  [constants.ACTION_DRAWER_CLOSE]: drawer.close,
-  [constants.ACTION_DRAWER_ENABLE]: drawer.enable,
-  [constants.ACTION_DRAWER_DISABLE]: drawer.disable,
-
-  [constants.ACTION_DMC_GET]: dmc.get,
-  [constants.ACTION_DMC_REMOVE]: dmc.remove,
-
-  [constants.ACTION_ENDPOINTS_GET]: endpoints.get,
-  [constants.ACTION_ENDPOINTS_REMOVE]: endpoints.remove,
-  [constants.ACTION_ENDPOINTS_REMOVE_ALL]: endpoints.removeAll,
-  [constants.ACTION_ENDPOINTS_ADD]: endpoints.add,
-
-  [constants.ACTION_CURRENT_UPDATE]: current.update,
-  [constants.ACTION_CURRENT_REMOVE]: current.remove,
-
-  [constants.ACTION_OAUTHENDPOINTKEY_UPDATE]: oauthEndpointKey.update,
-  [constants.ACTION_OAUTHENDPOINTKEY_REMOVE]: oauthEndpointKey.remove,
-
-  [constants.ACTION_PAGE_GET]: page.get,
-  [constants.ACTION_PAGE_REMOVE]: page.remove,
-
-  [constants.ACTION_COMPONENTS_GET]: components.get,
-  [constants.ACTION_COMPONENTS_OPERATE]: components.operate,
-  [constants.ACTION_COMPONENTS_REMOVE_ALL]: components.removeAll,
-  [constants.ACTION_COMPONENTS_REMOVE_ONE]: components.removeOne,
-
-  [constants.ACTION_TOAST_SHOW]: toast.show,
-  [constants.ACTION_TOAST_HIDE]: toast.hide,
-
-  [constants.ACTION_MODAL_SHOW]: modal.show,
-  [constants.ACTION_MODAL_HIDE]: modal.hide,
-
-  [constants.ACTION_AUTH_UPDATE]: auth.update,
-  [constants.ACTION_AUTH_REMOVE]: auth.remove,
-  [constants.ACTION_AUTH_VALIDATE]: auth.validate,
-  [constants.ACTION_AUTH_SIGN_IN_OAUTH]: auth.signInOAuth,
-  [constants.ACTION_AUTH_SIGN_IN_EMAIL]: auth.signInEMail,
-  [constants.ACTION_AUTH_SIGN_IN_SHOW]: auth.signInShow,
-
-  [constants.ACTION_AUTHTYPE_GET]: authtype.get
-
-};
-
-var location$2 = {
-  _: function (context, tag, dmcPage) {
-    context.state.location.tag = tag;
-    context.state.location.dmcPage = dmcPage;
-    return [constants.CHANGE_LOCATION];
-  }
-};
-
-var drawer$1 = {
-  toggle: context => {
-    context.state.drawer.isOpened = !context.state.drawer.isOpened;
-    return [constants.CHANGE_DRAWER];
-  },
-
-  open: context => {
-    context.state.drawer.isOpened = true;
-    return [constants.CHANGE_DRAWER];
-  },
-
-  close: context => {
-    context.state.drawer.isOpened = false;
-    return [constants.CHANGE_DRAWER];
-  },
-
-  enable: context => {
-    context.state.drawer.isEnabled = true;
-    return [constants.CHANGE_DRAWER];
-  },
-
-  disable: context => {
-    context.state.drawer.isEnabled = false;
-    return [constants.CHANGE_DRAWER];
-  }
-};
-
-var current$1 = {
-  _: function (context, key) {
-    context.state.current = store$1.set(constants.STORAGE_CURRENT, key);
-    return [constants.CHANGE_CURRENT];
-  }
-};
-
-var oauthEndpointKey$1 = {
-  _: function (context, key) {
-    context.state.oauthEndpointKey = store$1.set(constants.STORAGE_OAUTH_ENDPOINT_KEY, key);
-    return [constants.CHANGE_OAUTHENDPOINTKEY];
-  }
-};
-
-var endpoints$1 = {
-  show: function (context) {
-    context.state.endpoints = store$1.get(constants.STORAGE_ENDPOINTS, {});
-    return [constants.CHANGE_ENDPOINTS];
-  },
-
-  removeAll: function (context) {
-    context.state.endpoints = store$1.set(constants.STORAGE_ENDPOINTS, {});
-    return [constants.CHANGE_ENDPOINTS];
-  },
-
-  remove: function (context, key) {
-    delete context.state.endpoints[key];
-    store$1.set(constants.STORAGE_ENDPOINTS, context.state.endpoints);
-    return [constants.CHANGE_ENDPOINTS];
-  },
-
-  add: function (context, key, endpoint) {
-    context.state.endpoints[key] = endpoint;
-    store$1.set(constants.STORAGE_ENDPOINTS, context.state.endpoints);
-    return [constants.CHANGE_ENDPOINTS];
-  },
-
-  update: function (context, key, endpoint) {
-    context.state.endpoints[key] = endpoint;
-    store$1.set(constants.STORAGE_ENDPOINTS, context.state.endpoints);
-    return [constants.CHANGE_ENDPOINTS];
-  },
-
-  updateToken: function (context, key, token) {
-    context.state.endpoints[key].token = token;
-    store$1.set(constants.STORAGE_ENDPOINTS, context.state.endpoints);
-    return [constants.CHANGE_ENDPOINTS];
-  }
-};
-
-var dmc$1 = {
-  show: (context, obj) => {
-    const schema = obj.operationObject.responses[200].schema;
-    // const properties = schema.properties;
-    const response = obj.response;
-
-    let merge = swagger.mergePropertiesAndResponse(schema, response);
-
-    context.state.dmc = merge;
-    return [constants.CHANGE_DMC];
-  },
-
-  remove: context => {
-    context.state.dmc = null;
-    return [constants.CHANGE_DMC];
-  }
-};
-
-var page$1 = {
-  _: function (context, page) {
-    context.state.page = page;
-    return [constants.CHANGE_PAGE];
-  }
-};
-
-var components$1 = {
-  one: function (context, params) {
-    const schema = params.operationObject.responses[200].schema;
-    // const properties = schema.properties;
-    const responseObj = params.response.obj;
-
-    const merge$$1 = swagger.mergePropertiesAndResponse(schema, responseObj);
-    const _data = swagger.mergeSchemaAndResponse(schema, responseObj);
-
-    context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
-    context.state.components[params.component_uid].data = merge$$1;
-    context.state.components[params.component_uid]._data = _data;
-    // `component.pagination` value indicates whether the component supports pagination or not.
-    // if supported then manually add pagination information from headers.
-    if (params.component.pagination.get()) {
-      context.state.components[params.component_uid].pagination = {
-        currentPage: Number(params.response.headers['x-pagination-current-page'] || 0),
-        size: Number(params.response.headers['x-pagination-limit'] || 0),
-        maxPage: Number(params.response.headers['x-pagination-total-pages'] || 0)
-      };
+  this.handlePrevButtonTap = () => {
+    let newPage = this.opts.currentpage - 1;
+    if (newPage < 1) {
+      newPage = 1;
     }
-    // `component.query`(array) value indicates whether the component supports searching or not.
-    // if supported then manually add pagination information from headers.
-    if (params.component.query.length && !!params.component.query.length) {
-      context.state.components[params.component_uid].search = params.component.query;
-    }
-    // manually add paths that component can execute.
-    const actions = [];
-    array_15(params.pathRefs, ref => {
-      const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
-      object_13(pathItemObject, (value, key) => {
-        if (array_5(['put', 'post', 'delete', 'options', 'head', 'patch'], key)) {
-          actions.push({
-            isSelf: ref.isSelf,
-            operationObject: value
-          });
-        }
-      });
-    });
-    context.state.components[params.component_uid].selfActions = array_25(array_9(actions, action => {
-      return action.isSelf;
-    }), action => {
-      return action.operationObject;
-    });
-    context.state.components[params.component_uid].childActions = array_25(array_9(actions, action => {
-      return !action.isSelf;
-    }), action => {
-      return action.operationObject;
-    });
-
-    return [constants.changeComponentsName(params.component_uid)];
-  },
-
-  removeAll: context => {
-    context.state.components = {};
-    return [constants.CHANGE_COMPONENTS];
-  },
-
-  removeOne: (context, component_uid) => {
-    delete context.state.components[component_uid];
-    return [constants.changeComponentsName(component_uid)];
-  }
-};
-
-const generateID = () => {
-  return `toast_${Date.now()}`;
-};
-
-const TOAST_TYPE_NORMAL = 'normal';
-const TOAST_TIMEOUT = 3 * 1000;
-const TOAST_AUTO_HIDE = true;
-
-var toast$1 = {
-  add: (context, obj) => {
-    const data = index({
-      type: TOAST_TYPE_NORMAL,
-      timeout: TOAST_TIMEOUT,
-      autoHide: TOAST_AUTO_HIDE
-    }, obj, {
-      id: generateID()
-    });
-
-    context.state.toasts.push(data);
-    // TODO: 一時的に外す
-    //storage.set(constants.STORAGE_TOAST, context.state.toasts);
-    return [constants.CHANGE_TOAST];
-  },
-
-  remove: (context, toastID) => {
-    context.state.toasts = array_33(context.state.toasts, toast => {
-      return toast.id === toastID;
-    });
-    // TODO: 一時的に外す
-    //storage.set(constants.STORAGE_TOAST, context.state.toasts);
-
-    return [constants.CHANGE_TOAST];
-  }
-};
-
-const generateID$1 = () => {
-  return `modal_${Date.now()}`;
-};
-
-var modal$1 = {
-  add: (context, tagName, tagOpts = {}, modalOpts = {}) => {
-    context.state.modals.push({
-      id : generateID$1(),
-      tagName,
-      tagOpts,
-      modalOpts
-    });
-    return [constants.CHANGE_MODAL];
-  },
-
-  remove: (context, modalID) => {
-    context.state.modals = array_33(context.state.modals, modal => {
-      if (modal.id === modalID) {
-        return true;
-      }
-      return false;
-    });
-    return [constants.CHANGE_MODAL];
-  }
-};
-
-var auth$1 = {
-  signInShow: (context, key) => {
-    context.state.signinShowKey = key;
-    return [constants.CHANGE_SIGN_IN];
-  }
-};
-
-var mutations = {
-  [constants.MUTATION_LOCATION]: location$2._,
-
-  [constants.MUTATION_DRAWER_TOGGLE]: drawer$1.toggle,
-  [constants.MUTATION_DRAWER_OPEN]: drawer$1.open,
-  [constants.MUTATION_DRAWER_CLOSE]: drawer$1.close,
-  [constants.MUTATION_DRAWER_ENABLE]: drawer$1.enable,
-  [constants.MUTATION_DRAWER_DISABLE]: drawer$1.disable,
-
-  [constants.MUTATION_DMC]: dmc$1.show,
-  [constants.MUTATION_DMC_REMOVE]: dmc$1.remove,
-
-  [constants.MUTATION_ENDPOINTS]: endpoints$1.show,
-  [constants.MUTATION_ENDPOINTS_REMOVE]: endpoints$1.remove,
-  [constants.MUTATION_ENDPOINTS_REMOVE_ALL]: endpoints$1.removeAll,
-  [constants.MUTATION_ENDPOINTS_ADD]: endpoints$1.add,
-  [constants.MUTATION_ENDPOINTS_UPDATE]: endpoints$1.update,
-  [constants.MUTATION_ENDPOINTS_TOKEN_UPDATE]: endpoints$1.updateToken,
-
-  [constants.MUTATION_CURRENT]: current$1._,
-
-  [constants.MUTATION_OAUTHENDPOINTKEY]: oauthEndpointKey$1._,
-
-  [constants.MUTATION_PAGE]: page$1._,
-
-  [constants.MUTATION_COMPONENTS_ONE]: components$1.one,
-  [constants.MUTATION_COMPONENTS_REMOVE_ALL]: components$1.removeAll,
-  [constants.MUTATION_COMPONENTS_REMOVE_ONE]: components$1.removeOne,
-
-  [constants.MUTATION_TOAST_ADD]: toast$1.add,
-  [constants.MUTATION_TOAST_REMOVE]: toast$1.remove,
-
-  [constants.MUTATION_MODAL_ADD]: modal$1.add,
-  [constants.MUTATION_MODAL_REMOVE]: modal$1.remove,
-
-  [constants.MUTATION_AUTH_SIGN_IN_SHOW]: auth$1.signInShow
-};
-
-var location$3 = {
-  _: context => {
-    return context.state.location;
-  },
-
-  tag: context => {
-    return context.state.location.tag;
-  },
-
-  dmcPage: context => {
-    return context.state.location.dmcPage;
-  }
-};
-
-var drawer$2 = {
-  opened: context => {
-    return context.state.drawer.isOpened;
-  },
-
-  enabled: context => {
-    return context.state.drawer.isEnabled;
-  }
-};
-
-var dmc$2 = {
-  show: context => {
-    return context.state.dmc;
-  },
-
-  pages: context => {
-    return context.state.dmc.pages;
-  },
-
-  name: context => {
-    return context.state.dmc.name;
-  },
-
-  // Display dashboard data for drawer
-  dashboard: (context) => {
-    const pages = (context.state.dmc && context.state.dmc.pages) || [];
-    return object_36(object_9(pages, v => {
-      if (v.section.get() !== constants.SECTION_DASHBOARD) {
-        return false;
-      }
-      return true;
-    }));
-  },
-
-  // Display dashboard data for drawer
-  manage: (context) => {
-    const pages = (context.state.dmc && context.state.dmc.pages) || [];
-    return object_36(object_9(pages, v => {
-      if (v.section.get() !== constants.SECTION_MANAGE) {
-        return false;
-      }
-      return true;
-    }));
-  }
-};
-
-var current$2 = {
-  _: context => {
-    return context.state.current;
-  }
-};
-
-var oauthEndpointKey$2 = {
-  _: context => {
-    return context.state.oauthEndpointKey;
-  }
-};
-
-// TODO `#/definitions/page`内のpropertiesやrequired定義は全サービス共通という認識でOK？
-// swagger.jsonの$ref`#/definitions/page`に該当する。
-// state内のデータはparse済みのもの。
-var page$2 = {
-  _: context => {
-    return context.state.page;
-  },
-
-  name: context => {
-    if (!context.state.page) {
-      return '';
-    }
-    return context.state.page.name.get();
-  },
-
-  components: context => {
-    if (!context.state.page) {
-      return [];
-    }
-    return context.state.page.components;
-  }
-};
-
-var components$2 = {
-  one: (context, riotID) => {
-    return context.state.components[riotID];
-  }
-};
-
-var toast$2 = {
-  list: context => {
-    return context.state.toasts;
-  }
-};
-
-var modal$2 = {
-  list: context => {
-    return context.state.modals;
-  }
-};
-
-const number = '1234567890';
-const alphabet = 'abcdefghiz';
-
-const number2alphabet = (str) => {
-  str += '';
-  for (let i = 0; i < number.length; i++) {
-    const re = new RegExp(number[i], 'g');
-    str = str.replace(re, alphabet[i]);
-  }
-  return str;
-};
-
-var endpoints$2 = {
-  _: context => {
-    return context.state.endpoints;
-  },
-
-  one: (context, key) => {
-    const endpoints = context.state.endpoints;
-    return endpoints[key];
-  },
-
-  nextKey: (context) => {
-    return number2alphabet(object_18(context.state.endpoints).length + 1);
-  }
-
-};
-
-var auth$2 = {
-  signinShowKey: context => {
-    return context.state.signinShowKey;
-  }
-};
-
-var getters = {
-  [constants.GETTER_LOCATION]: location$3._,
-  [constants.GETTER_LOCATION_TAG]: location$3.tag,
-  [constants.GETTER_LOCATION_DMCPAGE]: location$3.dmcPage,
-
-  [constants.GETTER_DRAWER_OPENED]: drawer$2.opened,
-  [constants.GETTER_DRAWER_ENABLED]: drawer$2.enabled,
-
-  [constants.GETTER_DMC]: dmc$2.show,
-  [constants.GETTER_DMC_PAGES]: dmc$2.pages,
-  [constants.GETTER_DMC_NAME]: dmc$2.name,
-  [constants.GETTER_DMC_DASHBOARD]: dmc$2.dashboard,
-  [constants.GETTER_DMC_MANAGE]: dmc$2.manage,
-
-  [constants.GETTER_CURRENT]: current$2._,
-
-  [constants.GETTER_OAUTHENDPOINTKEY]: oauthEndpointKey$2._,
-
-  [constants.GETTER_PAGE]: page$2._,
-  [constants.GETTER_PAGE_NAME]: page$2.name,
-  [constants.GETTER_PAGE_COMPONENTS]: page$2.components,
-
-  [constants.GETTER_COMPONENTS_ONE]: components$2.one,
-
-  [constants.GETTER_TOAST_LIST]: toast$2.list,
-
-  [constants.GETTER_MODAL_LIST]: modal$2.list,
-
-  [constants.GETTER_ENDPOINTS]: endpoints$2._,
-  [constants.GETTER_ENDPOINTS_ONE]: endpoints$2.one,
-  [constants.GETTER_ENDPOINTS_NEXT_KEY]: endpoints$2.nextKey,
-
-  [constants.GETTER_AUTH_SIGN_IN_SHOW_KEY]: auth$2.signinShowKey
-
-};
-
-var index$2 = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
-};
-
-/**
- * Expose `pathToRegexp`.
- */
-var index$1 = pathToRegexp;
-var parse_1 = parse;
-var compile_1 = compile;
-var tokensToFunction_1 = tokensToFunction;
-var tokensToRegExp_1 = tokensToRegExp;
-
-/**
- * The main path matching regexp utility.
- *
- * @type {RegExp}
- */
-var PATH_REGEXP = new RegExp([
-  // Match escaped characters that would otherwise appear in future matches.
-  // This allows the user to escape special characters that won't transform.
-  '(\\\\.)',
-  // Match Express-style parameters and un-named parameters with a prefix
-  // and optional suffixes. Matches appear as:
-  //
-  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
-  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
-  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
-  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
-].join('|'), 'g');
-
-/**
- * Parse a string for the raw tokens.
- *
- * @param  {string}  str
- * @param  {Object=} options
- * @return {!Array}
- */
-function parse (str, options) {
-  var tokens = [];
-  var key = 0;
-  var index = 0;
-  var path = '';
-  var defaultDelimiter = options && options.delimiter || '/';
-  var res;
-
-  while ((res = PATH_REGEXP.exec(str)) != null) {
-    var m = res[0];
-    var escaped = res[1];
-    var offset = res.index;
-    path += str.slice(index, offset);
-    index = offset + m.length;
-
-    // Ignore already escaped sequences.
-    if (escaped) {
-      path += escaped[1];
-      continue
-    }
-
-    var next = str[index];
-    var prefix = res[2];
-    var name = res[3];
-    var capture = res[4];
-    var group = res[5];
-    var modifier = res[6];
-    var asterisk = res[7];
-
-    // Push the current path onto the tokens.
-    if (path) {
-      tokens.push(path);
-      path = '';
-    }
-
-    var partial = prefix != null && next != null && next !== prefix;
-    var repeat = modifier === '+' || modifier === '*';
-    var optional = modifier === '?' || modifier === '*';
-    var delimiter = res[2] || defaultDelimiter;
-    var pattern = capture || group;
-
-    tokens.push({
-      name: name || key++,
-      prefix: prefix || '',
-      delimiter: delimiter,
-      optional: optional,
-      repeat: repeat,
-      partial: partial,
-      asterisk: !!asterisk,
-      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
-    });
-  }
-
-  // Match any characters still remaining.
-  if (index < str.length) {
-    path += str.substr(index);
-  }
-
-  // If the path exists, push it onto the end.
-  if (path) {
-    tokens.push(path);
-  }
-
-  return tokens
-}
-
-/**
- * Compile a string to a template function for the path.
- *
- * @param  {string}             str
- * @param  {Object=}            options
- * @return {!function(Object=, Object=)}
- */
-function compile (str, options) {
-  return tokensToFunction(parse(str, options))
-}
-
-/**
- * Prettier encoding of URI path segments.
- *
- * @param  {string}
- * @return {string}
- */
-function encodeURIComponentPretty (str) {
-  return encodeURI(str).replace(/[\/?#]/g, function (c) {
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-  })
-}
-
-/**
- * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
- *
- * @param  {string}
- * @return {string}
- */
-function encodeAsterisk (str) {
-  return encodeURI(str).replace(/[?#]/g, function (c) {
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-  })
-}
-
-/**
- * Expose a method for transforming tokens into the path function.
- */
-function tokensToFunction (tokens) {
-  // Compile all the tokens into regexps.
-  var matches = new Array(tokens.length);
-
-  // Compile all the patterns before compilation.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] === 'object') {
-      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$');
-    }
-  }
-
-  return function (obj, opts) {
-    var path = '';
-    var data = obj || {};
-    var options = opts || {};
-    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent;
-
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i];
-
-      if (typeof token === 'string') {
-        path += token;
-
-        continue
-      }
-
-      var value = data[token.name];
-      var segment;
-
-      if (value == null) {
-        if (token.optional) {
-          // Prepend partial segment prefixes.
-          if (token.partial) {
-            path += token.prefix;
-          }
-
-          continue
-        } else {
-          throw new TypeError('Expected "' + token.name + '" to be defined')
-        }
-      }
-
-      if (index$2(value)) {
-        if (!token.repeat) {
-          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
-        }
-
-        if (value.length === 0) {
-          if (token.optional) {
-            continue
-          } else {
-            throw new TypeError('Expected "' + token.name + '" to not be empty')
-          }
-        }
-
-        for (var j = 0; j < value.length; j++) {
-          segment = encode(value[j]);
-
-          if (!matches[i].test(segment)) {
-            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
-          }
-
-          path += (j === 0 ? token.prefix : token.delimiter) + segment;
-        }
-
-        continue
-      }
-
-      segment = token.asterisk ? encodeAsterisk(value) : encode(value);
-
-      if (!matches[i].test(segment)) {
-        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
-      }
-
-      path += token.prefix + segment;
-    }
-
-    return path
-  }
-}
-
-/**
- * Escape a regular expression string.
- *
- * @param  {string} str
- * @return {string}
- */
-function escapeString (str) {
-  return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
-}
-
-/**
- * Escape the capturing group by escaping special characters and meaning.
- *
- * @param  {string} group
- * @return {string}
- */
-function escapeGroup (group) {
-  return group.replace(/([=!:$\/()])/g, '\\$1')
-}
-
-/**
- * Attach the keys as a property of the regexp.
- *
- * @param  {!RegExp} re
- * @param  {Array}   keys
- * @return {!RegExp}
- */
-function attachKeys (re, keys) {
-  re.keys = keys;
-  return re
-}
-
-/**
- * Get the flags for a regexp from the options.
- *
- * @param  {Object} options
- * @return {string}
- */
-function flags (options) {
-  return options.sensitive ? '' : 'i'
-}
-
-/**
- * Pull out keys from a regexp.
- *
- * @param  {!RegExp} path
- * @param  {!Array}  keys
- * @return {!RegExp}
- */
-function regexpToRegexp (path, keys) {
-  // Use a negative lookahead to match only capturing groups.
-  var groups = path.source.match(/\((?!\?)/g);
-
-  if (groups) {
-    for (var i = 0; i < groups.length; i++) {
-      keys.push({
-        name: i,
-        prefix: null,
-        delimiter: null,
-        optional: false,
-        repeat: false,
-        partial: false,
-        asterisk: false,
-        pattern: null
-      });
-    }
-  }
-
-  return attachKeys(path, keys)
-}
-
-/**
- * Transform an array into a regexp.
- *
- * @param  {!Array}  path
- * @param  {Array}   keys
- * @param  {!Object} options
- * @return {!RegExp}
- */
-function arrayToRegexp (path, keys, options) {
-  var parts = [];
-
-  for (var i = 0; i < path.length; i++) {
-    parts.push(pathToRegexp(path[i], keys, options).source);
-  }
-
-  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
-
-  return attachKeys(regexp, keys)
-}
-
-/**
- * Create a path regexp from string input.
- *
- * @param  {string}  path
- * @param  {!Array}  keys
- * @param  {!Object} options
- * @return {!RegExp}
- */
-function stringToRegexp (path, keys, options) {
-  return tokensToRegExp(parse(path, options), keys, options)
-}
-
-/**
- * Expose a function for taking tokens and returning a RegExp.
- *
- * @param  {!Array}          tokens
- * @param  {(Array|Object)=} keys
- * @param  {Object=}         options
- * @return {!RegExp}
- */
-function tokensToRegExp (tokens, keys, options) {
-  if (!index$2(keys)) {
-    options = /** @type {!Object} */ (keys || options);
-    keys = [];
-  }
-
-  options = options || {};
-
-  var strict = options.strict;
-  var end = options.end !== false;
-  var route = '';
-
-  // Iterate over the tokens and create our regexp string.
-  for (var i = 0; i < tokens.length; i++) {
-    var token = tokens[i];
-
-    if (typeof token === 'string') {
-      route += escapeString(token);
-    } else {
-      var prefix = escapeString(token.prefix);
-      var capture = '(?:' + token.pattern + ')';
-
-      keys.push(token);
-
-      if (token.repeat) {
-        capture += '(?:' + prefix + capture + ')*';
-      }
-
-      if (token.optional) {
-        if (!token.partial) {
-          capture = '(?:' + prefix + '(' + capture + '))?';
-        } else {
-          capture = prefix + '(' + capture + ')?';
-        }
-      } else {
-        capture = prefix + '(' + capture + ')';
-      }
-
-      route += capture;
-    }
-  }
-
-  var delimiter = escapeString(options.delimiter || '/');
-  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter;
-
-  // In non-strict mode we allow a slash at the end of match. If the path to
-  // match already ends with a slash, we remove it for consistency. The slash
-  // is valid at the end of a path match, not in the middle. This is important
-  // in non-ending mode, where "/test/" shouldn't match "/test//route".
-  if (!strict) {
-    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?';
-  }
-
-  if (end) {
-    route += '$';
-  } else {
-    // In non-ending mode, we need the capturing groups to match as much as
-    // possible by using a positive lookahead to the end or next path segment.
-    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)';
-  }
-
-  return attachKeys(new RegExp('^' + route, flags(options)), keys)
-}
-
-/**
- * Normalize the given path string, returning a regular expression.
- *
- * An empty array can be passed in for the keys, which will hold the
- * placeholder key descriptions. For example, using `/user/:id`, `keys` will
- * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
- *
- * @param  {(string|RegExp|Array)} path
- * @param  {(Array|Object)=}       keys
- * @param  {Object=}               options
- * @return {!RegExp}
- */
-function pathToRegexp (path, keys, options) {
-  if (!index$2(keys)) {
-    options = /** @type {!Object} */ (keys || options);
-    keys = [];
-  }
-
-  options = options || {};
-
-  if (path instanceof RegExp) {
-    return regexpToRegexp(path, /** @type {!Array} */ (keys))
-  }
-
-  if (index$2(path)) {
-    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
-  }
-
-  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
-}
-
-index$1.parse = parse_1;
-index$1.compile = compile_1;
-index$1.tokensToFunction = tokensToFunction_1;
-index$1.tokensToRegExp = tokensToRegExp_1;
-
-/**
- * Copyright 2014-2015, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
-
-/**
- * Similar to invariant but only logs a warning if the condition is not met.
- * This can be used to log issues in development environments in critical
- * paths. Removing the logging code for production environments will keep the
- * same logic and follow the same code paths.
- */
-
-var warning = function() {};
-
-{
-  warning = function(condition, format, args) {
-    var len = arguments.length;
-    args = new Array(len > 2 ? len - 2 : 0);
-    for (var key = 2; key < len; key++) {
-      args[key - 2] = arguments[key];
-    }
-    if (format === undefined) {
-      throw new Error(
-        '`warning(condition, format, ...args)` requires a warning ' +
-        'message argument'
-      );
-    }
-
-    if (format.length < 10 || (/^[s\W]*$/).test(format)) {
-      throw new Error(
-        'The warning format should be able to uniquely identify this ' +
-        'warning. Please, use a more descriptive format than: ' + format
-      );
-    }
-
-    if (!condition) {
-      var argIndex = 0;
-      var message = 'Warning: ' +
-        format.replace(/%s/g, function() {
-          return args[argIndex++];
-        });
-      if (typeof console !== 'undefined') {
-        console.error(message);
-      }
-      try {
-        // This error was thrown as a convenience so that you can use this stack
-        // to find the callsite that caused this warning to fire.
-        throw new Error(message);
-      } catch(x) {}
-    }
+    this.opts.onchange(newPage);
   };
-}
 
-var browser = warning;
-
-/**
- * Copyright 2013-2015, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
-
-/**
- * Use invariant() to assert state which your program assumes to be true.
- *
- * Provide sprintf-style format (only %s is supported) and arguments
- * to provide information about what broke and what you were
- * expecting.
- *
- * The invariant message will be stripped in production, but the invariant
- * will remain to ensure logic does not differ in production.
- */
-
-var invariant = function(condition, format, a, b, c, d, e, f) {
-  {
-    if (format === undefined) {
-      throw new Error('invariant requires an error message argument');
+  this.handleRecedeButtonTap = () => {
+    let newPage = this.opts.currentpage - this.opts.size;
+    if (newPage < 1) {
+      newPage = 1;
     }
-  }
+    this.opts.onchange(newPage);
+  };
 
-  if (!condition) {
-    var error;
-    if (format === undefined) {
-      error = new Error(
-        'Minified exception occurred; use the non-minified dev environment ' +
-        'for the full error message and additional helpful warnings.'
-      );
-    } else {
-      var args = [a, b, c, d, e, f];
-      var argIndex = 0;
-      error = new Error(
-        format.replace(/%s/g, function() { return args[argIndex++]; })
-      );
-      error.name = 'Invariant Violation';
+  this.handlePageButtonTap = e => {
+    const newPage = Number(e.currentTarget.getAttribute('data-page'));
+    this.opts.onchange(newPage);
+  };
+
+  this.handleProceedButtonTap = () => {
+    let newPage = this.opts.currentpage + this.opts.size;
+    if (newPage > this.opts.maxpage) {
+      newPage = this.opts.maxpage;
     }
+    this.opts.onchange(newPage);
+  };
 
-    error.framesToPop = 1; // we don't care about invariant's own frame
-    throw error;
-  }
-};
-
-var browser$2 = invariant;
-
-var isAbsolute = function isAbsolute(pathname) {
-  return pathname.charAt(0) === '/';
-};
-
-// About 1.5x faster than the two-arg version of Array#splice()
-var spliceOne = function spliceOne(list, index) {
-  for (var i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1) {
-    list[i] = list[k];
-  }list.pop();
-};
-
-// This implementation is based heavily on node's url.parse
-var resolvePathname = function resolvePathname(to) {
-  var from = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-
-  var toParts = to && to.split('/') || [];
-  var fromParts = from && from.split('/') || [];
-
-  var isToAbs = to && isAbsolute(to);
-  var isFromAbs = from && isAbsolute(from);
-  var mustEndAbs = isToAbs || isFromAbs;
-
-  if (to && isAbsolute(to)) {
-    // to is absolute
-    fromParts = toParts;
-  } else if (toParts.length) {
-    // to is relative, drop the filename
-    fromParts.pop();
-    fromParts = fromParts.concat(toParts);
-  }
-
-  if (!fromParts.length) { return '/'; }
-
-  var hasTrailingSlash = void 0;
-  if (fromParts.length) {
-    var last = fromParts[fromParts.length - 1];
-    hasTrailingSlash = last === '.' || last === '..' || last === '';
-  } else {
-    hasTrailingSlash = false;
-  }
-
-  var up = 0;
-  for (var i = fromParts.length; i >= 0; i--) {
-    var part = fromParts[i];
-
-    if (part === '.') {
-      spliceOne(fromParts, i);
-    } else if (part === '..') {
-      spliceOne(fromParts, i);
-      up++;
-    } else if (up) {
-      spliceOne(fromParts, i);
-      up--;
+  this.handleNextButtonTap = () => {
+    let newPage = this.opts.currentpage + 1;
+    if (newPage > this.opts.maxpage) {
+      newPage = this.opts.maxpage;
     }
-  }
-
-  if (!mustEndAbs) { for (; up--; up) {
-    fromParts.unshift('..');
-  } }if (mustEndAbs && fromParts[0] !== '' && (!fromParts[0] || !isAbsolute(fromParts[0]))) { fromParts.unshift(''); }
-
-  var result = fromParts.join('/');
-
-  if (hasTrailingSlash && result.substr(-1) !== '/') { result += '/'; }
-
-  return result;
+    this.opts.onchange(newPage);
+  };
 };
 
-var index$4 = resolvePathname;
-
-var index$6 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-exports.__esModule = true;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var valueEqual = function valueEqual(a, b) {
-  if (a === b) { return true; }
-
-  if (a == null || b == null) { return false; }
-
-  if (Array.isArray(a)) {
-    if (!Array.isArray(b) || a.length !== b.length) { return false; }
-
-    return a.every(function (item, index) {
-      return valueEqual(item, b[index]);
-    });
-  }
-
-  var aType = typeof a === 'undefined' ? 'undefined' : _typeof(a);
-  var bType = typeof b === 'undefined' ? 'undefined' : _typeof(b);
-
-  if (aType !== bType) { return false; }
-
-  if (aType === 'object') {
-    var aValue = a.valueOf();
-    var bValue = b.valueOf();
-
-    if (aValue !== a || bValue !== b) { return valueEqual(aValue, bValue); }
-
-    var aKeys = Object.keys(a);
-    var bKeys = Object.keys(b);
-
-    if (aKeys.length !== bKeys.length) { return false; }
-
-    return aKeys.every(function (key) {
-      return valueEqual(a[key], b[key]);
-    });
-  }
-
-  return false;
-};
-
-exports.default = valueEqual;
+riot$1.tag2('dmc-pagination', '<div class="Pagination__control"> <div class="Pagination__button {opts.currentpage === 1 ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handlePrevButtonTap"> <dmc-icon type="left"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[0].num !== 1}" data-page="1" ref="touch" ontap="handlePageButtonTap">1</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[0].num &gt;= 3}" ref="touch" ontap="handleRecedeButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__recedeIcon" type="doubleLeft"></dmc-icon> </div> <div class="Pagination__button {page.isSelected ? \'Pagination__button--selected\' : \'\'}" each="{page in getBasePages()}" data-page="{page.num}" ref="touch" ontap="parent.handlePageButtonTap">{page.num}</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[getBasePages().length - 1].num &lt;= opts.maxpage - 2}" ref="touch" ontap="handleProceedButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__proceedIcon" type="doubleRight"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[getBasePages().length - 1].num !== opts.maxpage}" data-page="{opts.maxpage}" ref="touch" ontap="handlePageButtonTap">{opts.maxpage}</div> <div class="Pagination__button {opts.currentpage === opts.maxpage ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handleNextButtonTap"> <dmc-icon type="right"></dmc-icon> </div> </div> <div class="Pagination__info">{opts.currentpage} / {opts.maxpage}</div>', '', 'class="Pagination"', function(opts) {
+    this.external(script$2);
 });
 
-var PathUtils = createCommonjsModule(function (module, exports) {
-'use strict';
-
-exports.__esModule = true;
-var addLeadingSlash = exports.addLeadingSlash = function addLeadingSlash(path) {
-  return path.charAt(0) === '/' ? path : '/' + path;
-};
-
-var stripLeadingSlash = exports.stripLeadingSlash = function stripLeadingSlash(path) {
-  return path.charAt(0) === '/' ? path.substr(1) : path;
-};
-
-var stripPrefix = exports.stripPrefix = function stripPrefix(path, prefix) {
-  return path.indexOf(prefix) === 0 ? path.substr(prefix.length) : path;
-};
-
-var stripTrailingSlash = exports.stripTrailingSlash = function stripTrailingSlash(path) {
-  return path.charAt(path.length - 1) === '/' ? path.slice(0, -1) : path;
-};
-
-var parsePath = exports.parsePath = function parsePath(path) {
-  var pathname = path || '/';
-  var search = '';
-  var hash = '';
-
-  var hashIndex = pathname.indexOf('#');
-  if (hashIndex !== -1) {
-    hash = pathname.substr(hashIndex);
-    pathname = pathname.substr(0, hashIndex);
-  }
-
-  var searchIndex = pathname.indexOf('?');
-  if (searchIndex !== -1) {
-    search = pathname.substr(searchIndex);
-    pathname = pathname.substr(0, searchIndex);
-  }
-
-  pathname = decodeURI(pathname);
-
-  return {
-    pathname: pathname,
-    search: search === '?' ? '' : search,
-    hash: hash === '#' ? '' : hash
-  };
-};
-
-var createPath = exports.createPath = function createPath(location) {
-  var pathname = location.pathname,
-      search = location.search,
-      hash = location.hash;
-
-
-  var path = encodeURI(pathname || '/');
-
-  if (search && search !== '?') { path += search.charAt(0) === '?' ? search : '?' + search; }
-
-  if (hash && hash !== '#') { path += hash.charAt(0) === '#' ? hash : '#' + hash; }
-
-  return path;
-};
-});
-
-var LocationUtils = createCommonjsModule(function (module, exports) {
-'use strict';
-
-exports.__esModule = true;
-exports.locationsAreEqual = exports.createLocation = undefined;
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-
-
-var _resolvePathname2 = _interopRequireDefault(index$4);
-
-
-
-var _valueEqual2 = _interopRequireDefault(index$6);
-
-
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var createLocation = exports.createLocation = function createLocation(path, state, key, currentLocation) {
-  var location = void 0;
-  if (typeof path === 'string') {
-    // Two-arg form: push(path, state)
-    location = (0, PathUtils.parsePath)(path);
-    location.state = state;
-  } else {
-    // One-arg form: push(location)
-    location = _extends({}, path);
-
-    if (location.pathname === undefined) { location.pathname = ''; }
-
-    if (location.search) {
-      if (location.search.charAt(0) !== '?') { location.search = '?' + location.search; }
-    } else {
-      location.search = '';
-    }
-
-    if (location.hash) {
-      if (location.hash.charAt(0) !== '#') { location.hash = '#' + location.hash; }
-    } else {
-      location.hash = '';
-    }
-
-    if (state !== undefined && location.state === undefined) { location.state = state; }
-  }
-
-  location.key = key;
-
-  if (currentLocation) {
-    // Resolve incomplete/relative pathname relative to current location.
-    if (!location.pathname) {
-      location.pathname = currentLocation.pathname;
-    } else if (location.pathname.charAt(0) !== '/') {
-      location.pathname = (0, _resolvePathname2.default)(location.pathname, currentLocation.pathname);
-    }
-  }
-
-  return location;
-};
-
-var locationsAreEqual = exports.locationsAreEqual = function locationsAreEqual(a, b) {
-  return a.pathname === b.pathname && a.search === b.search && a.hash === b.hash && a.key === b.key && (0, _valueEqual2.default)(a.state, b.state);
-};
-});
-
-var createTransitionManager_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-exports.__esModule = true;
-
-
-
-var _warning2 = _interopRequireDefault(browser);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var createTransitionManager = function createTransitionManager() {
-  var prompt = null;
-
-  var setPrompt = function setPrompt(nextPrompt) {
-    (0, _warning2.default)(prompt == null, 'A history supports only one prompt at a time');
-
-    prompt = nextPrompt;
-
-    return function () {
-      if (prompt === nextPrompt) { prompt = null; }
-    };
-  };
-
-  var confirmTransitionTo = function confirmTransitionTo(location, action, getUserConfirmation, callback) {
-    // TODO: If another transition starts while we're still confirming
-    // the previous one, we may end up in a weird state. Figure out the
-    // best way to handle this.
-    if (prompt != null) {
-      var result = typeof prompt === 'function' ? prompt(location, action) : prompt;
-
-      if (typeof result === 'string') {
-        if (typeof getUserConfirmation === 'function') {
-          getUserConfirmation(result, callback);
-        } else {
-          (0, _warning2.default)(false, 'A history needs a getUserConfirmation function in order to use a prompt message');
-
-          callback(true);
-        }
-      } else {
-        // Return false from a transition hook to cancel the transition.
-        callback(result !== false);
-      }
-    } else {
-      callback(true);
-    }
-  };
-
-  var listeners = [];
-
-  var appendListener = function appendListener(fn) {
-    var isActive = true;
-
-    var listener = function listener() {
-      if (isActive) { fn.apply(undefined, arguments); }
-    };
-
-    listeners.push(listener);
-
-    return function () {
-      isActive = false;
-      listeners = listeners.filter(function (item) {
-        return item !== listener;
-      });
-    };
-  };
-
-  var notifyListeners = function notifyListeners() {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    listeners.forEach(function (listener) {
-      return listener.apply(undefined, args);
-    });
-  };
-
-  return {
-    setPrompt: setPrompt,
-    confirmTransitionTo: confirmTransitionTo,
-    appendListener: appendListener,
-    notifyListeners: notifyListeners
-  };
-};
-
-exports.default = createTransitionManager;
-});
-
-var DOMUtils = createCommonjsModule(function (module, exports) {
-'use strict';
-
-exports.__esModule = true;
-var canUseDOM = exports.canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
-
-var addEventListener = exports.addEventListener = function addEventListener(node, event, listener) {
-  return node.addEventListener ? node.addEventListener(event, listener, false) : node.attachEvent('on' + event, listener);
-};
-
-var removeEventListener = exports.removeEventListener = function removeEventListener(node, event, listener) {
-  return node.removeEventListener ? node.removeEventListener(event, listener, false) : node.detachEvent('on' + event, listener);
-};
-
-var getConfirmation = exports.getConfirmation = function getConfirmation(message, callback) {
-  return callback(window.confirm(message));
-}; // eslint-disable-line no-alert
-
-/**
- * Returns true if the HTML5 history API is supported. Taken from Modernizr.
- *
- * https://github.com/Modernizr/Modernizr/blob/master/LICENSE
- * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/history.js
- * changed to avoid false negatives for Windows Phones: https://github.com/reactjs/react-router/issues/586
- */
-var supportsHistory = exports.supportsHistory = function supportsHistory() {
-  var ua = window.navigator.userAgent;
-
-  if ((ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) && ua.indexOf('Mobile Safari') !== -1 && ua.indexOf('Chrome') === -1 && ua.indexOf('Windows Phone') === -1) { return false; }
-
-  return window.history && 'pushState' in window.history;
-};
-
-/**
- * Returns true if browser fires popstate on hash change.
- * IE10 and IE11 do not.
- */
-var supportsPopStateOnHashChange = exports.supportsPopStateOnHashChange = function supportsPopStateOnHashChange() {
-  return window.navigator.userAgent.indexOf('Trident') === -1;
-};
-
-/**
- * Returns false if using go(n) with hash history causes a full page reload.
- */
-var supportsGoWithoutReloadUsingHash = exports.supportsGoWithoutReloadUsingHash = function supportsGoWithoutReloadUsingHash() {
-  return window.navigator.userAgent.indexOf('Firefox') === -1;
-};
-
-/**
- * Returns true if a given popstate event is an extraneous WebKit event.
- * Accounts for the fact that Chrome on iOS fires real popstate events
- * containing undefined state when pressing the back button.
- */
-var isExtraneousPopstateEvent = exports.isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
-  return event.state === undefined && navigator.userAgent.indexOf('CriOS') === -1;
-};
-});
-
-var createHashHistory_1 = createCommonjsModule(function (module, exports) {
-'use strict';
-
-exports.__esModule = true;
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-
-
-var _warning2 = _interopRequireDefault(browser);
-
-
-
-var _invariant2 = _interopRequireDefault(browser$2);
-
-
-
-
-
-
-
-var _createTransitionManager2 = _interopRequireDefault(createTransitionManager_1);
-
-
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var HashChangeEvent = 'hashchange';
-
-var HashPathCoders = {
-  hashbang: {
-    encodePath: function encodePath(path) {
-      return path.charAt(0) === '!' ? path : '!/' + (0, PathUtils.stripLeadingSlash)(path);
-    },
-    decodePath: function decodePath(path) {
-      return path.charAt(0) === '!' ? path.substr(1) : path;
-    }
-  },
-  noslash: {
-    encodePath: PathUtils.stripLeadingSlash,
-    decodePath: PathUtils.addLeadingSlash
-  },
-  slash: {
-    encodePath: PathUtils.addLeadingSlash,
-    decodePath: PathUtils.addLeadingSlash
-  }
-};
-
-var getHashPath = function getHashPath() {
-  // We can't use window.location.hash here because it's not
-  // consistent across browsers - Firefox will pre-decode it!
-  var href = window.location.href;
-  var hashIndex = href.indexOf('#');
-  return hashIndex === -1 ? '' : href.substring(hashIndex + 1);
-};
-
-var pushHashPath = function pushHashPath(path) {
-  return window.location.hash = path;
-};
-
-var replaceHashPath = function replaceHashPath(path) {
-  var hashIndex = window.location.href.indexOf('#');
-
-  window.location.replace(window.location.href.slice(0, hashIndex >= 0 ? hashIndex : 0) + '#' + path);
-};
-
-var createHashHistory = function createHashHistory() {
-  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  (0, _invariant2.default)(DOMUtils.canUseDOM, 'Hash history needs a DOM');
-
-  var globalHistory = window.history;
-  var canGoWithoutReload = (0, DOMUtils.supportsGoWithoutReloadUsingHash)();
-
-  var _props$getUserConfirm = props.getUserConfirmation,
-      getUserConfirmation = _props$getUserConfirm === undefined ? DOMUtils.getConfirmation : _props$getUserConfirm,
-      _props$hashType = props.hashType,
-      hashType = _props$hashType === undefined ? 'slash' : _props$hashType;
-
-  var basename = props.basename ? (0, PathUtils.stripTrailingSlash)((0, PathUtils.addLeadingSlash)(props.basename)) : '';
-
-  var _HashPathCoders$hashT = HashPathCoders[hashType],
-      encodePath = _HashPathCoders$hashT.encodePath,
-      decodePath = _HashPathCoders$hashT.decodePath;
-
-
-  var getDOMLocation = function getDOMLocation() {
-    var path = decodePath(getHashPath());
-
-    if (basename) { path = (0, PathUtils.stripPrefix)(path, basename); }
-
-    return (0, PathUtils.parsePath)(path);
-  };
-
-  var transitionManager = (0, _createTransitionManager2.default)();
-
-  var setState = function setState(nextState) {
-    _extends(history, nextState);
-
-    history.length = globalHistory.length;
-
-    transitionManager.notifyListeners(history.location, history.action);
-  };
-
-  var forceNextPop = false;
-  var ignorePath = null;
-
-  var handleHashChange = function handleHashChange() {
-    var path = getHashPath();
-    var encodedPath = encodePath(path);
-
-    if (path !== encodedPath) {
-      // Ensure we always have a properly-encoded hash.
-      replaceHashPath(encodedPath);
-    } else {
-      var location = getDOMLocation();
-      var prevLocation = history.location;
-
-      if (!forceNextPop && (0, LocationUtils.locationsAreEqual)(prevLocation, location)) { return; } // A hashchange doesn't always == location change.
-
-      if (ignorePath === (0, PathUtils.createPath)(location)) { return; } // Ignore this change; we already setState in push/replace.
-
-      ignorePath = null;
-
-      handlePop(location);
-    }
-  };
-
-  var handlePop = function handlePop(location) {
-    if (forceNextPop) {
-      forceNextPop = false;
-      setState();
-    } else {
-      var action = 'POP';
-
-      transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-        if (ok) {
-          setState({ action: action, location: location });
-        } else {
-          revertPop(location);
-        }
-      });
-    }
-  };
-
-  var revertPop = function revertPop(fromLocation) {
-    var toLocation = history.location;
-
-    // TODO: We could probably make this more reliable by
-    // keeping a list of paths we've seen in sessionStorage.
-    // Instead, we just default to 0 for paths we don't know.
-
-    var toIndex = allPaths.lastIndexOf((0, PathUtils.createPath)(toLocation));
-
-    if (toIndex === -1) { toIndex = 0; }
-
-    var fromIndex = allPaths.lastIndexOf((0, PathUtils.createPath)(fromLocation));
-
-    if (fromIndex === -1) { fromIndex = 0; }
-
-    var delta = toIndex - fromIndex;
-
-    if (delta) {
-      forceNextPop = true;
-      go(delta);
-    }
-  };
-
-  // Ensure the hash is encoded properly before doing anything else.
-  var path = getHashPath();
-  var encodedPath = encodePath(path);
-
-  if (path !== encodedPath) { replaceHashPath(encodedPath); }
-
-  var initialLocation = getDOMLocation();
-  var allPaths = [(0, PathUtils.createPath)(initialLocation)];
-
-  // Public interface
-
-  var createHref = function createHref(location) {
-    return '#' + encodePath(basename + (0, PathUtils.createPath)(location));
-  };
-
-  var push = function push(path, state) {
-    (0, _warning2.default)(state === undefined, 'Hash history cannot push state; it is ignored');
-
-    var action = 'PUSH';
-    var location = (0, LocationUtils.createLocation)(path, undefined, undefined, history.location);
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (!ok) { return; }
-
-      var path = (0, PathUtils.createPath)(location);
-      var encodedPath = encodePath(basename + path);
-      var hashChanged = getHashPath() !== encodedPath;
-
-      if (hashChanged) {
-        // We cannot tell if a hashchange was caused by a PUSH, so we'd
-        // rather setState here and ignore the hashchange. The caveat here
-        // is that other hash histories in the page will consider it a POP.
-        ignorePath = path;
-        pushHashPath(encodedPath);
-
-        var prevIndex = allPaths.lastIndexOf((0, PathUtils.createPath)(history.location));
-        var nextPaths = allPaths.slice(0, prevIndex === -1 ? 0 : prevIndex + 1);
-
-        nextPaths.push(path);
-        allPaths = nextPaths;
-
-        setState({ action: action, location: location });
-      } else {
-        (0, _warning2.default)(false, 'Hash history cannot PUSH the same path; a new entry will not be added to the history stack');
-
-        setState();
-      }
-    });
-  };
-
-  var replace = function replace(path, state) {
-    (0, _warning2.default)(state === undefined, 'Hash history cannot replace state; it is ignored');
-
-    var action = 'REPLACE';
-    var location = (0, LocationUtils.createLocation)(path, undefined, undefined, history.location);
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (!ok) { return; }
-
-      var path = (0, PathUtils.createPath)(location);
-      var encodedPath = encodePath(basename + path);
-      var hashChanged = getHashPath() !== encodedPath;
-
-      if (hashChanged) {
-        // We cannot tell if a hashchange was caused by a REPLACE, so we'd
-        // rather setState here and ignore the hashchange. The caveat here
-        // is that other hash histories in the page will consider it a POP.
-        ignorePath = path;
-        replaceHashPath(encodedPath);
-      }
-
-      var prevIndex = allPaths.indexOf((0, PathUtils.createPath)(history.location));
-
-      if (prevIndex !== -1) { allPaths[prevIndex] = path; }
-
-      setState({ action: action, location: location });
-    });
-  };
-
-  var go = function go(n) {
-    (0, _warning2.default)(canGoWithoutReload, 'Hash history go(n) causes a full page reload in this browser');
-
-    globalHistory.go(n);
-  };
-
-  var goBack = function goBack() {
-    return go(-1);
-  };
-
-  var goForward = function goForward() {
-    return go(1);
-  };
-
-  var listenerCount = 0;
-
-  var checkDOMListeners = function checkDOMListeners(delta) {
-    listenerCount += delta;
-
-    if (listenerCount === 1) {
-      (0, DOMUtils.addEventListener)(window, HashChangeEvent, handleHashChange);
-    } else if (listenerCount === 0) {
-      (0, DOMUtils.removeEventListener)(window, HashChangeEvent, handleHashChange);
-    }
-  };
-
-  var isBlocked = false;
-
-  var block = function block() {
-    var prompt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-    var unblock = transitionManager.setPrompt(prompt);
-
-    if (!isBlocked) {
-      checkDOMListeners(1);
-      isBlocked = true;
-    }
-
-    return function () {
-      if (isBlocked) {
-        isBlocked = false;
-        checkDOMListeners(-1);
-      }
-
-      return unblock();
-    };
-  };
-
-  var listen = function listen(listener) {
-    var unlisten = transitionManager.appendListener(listener);
-    checkDOMListeners(1);
-
-    return function () {
-      checkDOMListeners(-1);
-      unlisten();
-    };
-  };
-
-  var history = {
-    length: globalHistory.length,
-    action: 'POP',
-    location: initialLocation,
-    createHref: createHref,
-    push: push,
-    replace: replace,
-    go: go,
-    goBack: goBack,
-    goForward: goForward,
-    block: block,
-    listen: listen
-  };
-
-  return history;
-};
-
-exports.default = createHashHistory;
-});
-
-var createHashHistory = unwrapExports(createHashHistory_1);
-
-class Router {
-  constructor() {
-    /**
-     * hash history object.
-     * @private
-     * @type {Object|null}
-     */
-    this._history = null;
-
-    /**
-     * routing definitions.
-     * @private
-     * @type {Array}
-     */
-    this._routes = [];
-
-    /**
-     * riotx store instance.
-     * @type {riotx.Store}
-     */
-    this._store = null;
-
-    /**
-     * function to stop listening for the changes.
-     * to stop, just execute this function.
-     * @private
-     * @type {Function|null}
-     */
-    this._unlistener = null;
-
-    /**
-     * function that will be called on ahead of every routing.
-     * @type {Function}
-     */
-    this._onBefore = () => {
-      return Promise.resolve();
-    };
-
-    /**
-     * function that will be called on behind of every routing.
-     * @type {Function}
-     */
-    this._onAfter = () => {
-      return Promise.resolve();
-    };
-  }
-
-  /**
-   * set riotx.store
-   * @param {Store} store
-   */
-  setStore(store) {
-    this._store = store;
-    return this;
-  }
-
-  /**
-   * start listening for changes to the current location.
-   * @param {Boolean} autoExec to decide whether routing is executed with the current url.
-   */
-  start(autoExec = true) {
-    this._history = createHashHistory();
-    this._unlistener = this._history.listen((location, action) => {
-      this._change(location, action);
-    });
-
-    if (autoExec) {
-      this._change(this.getCurrentLocation(), this.getCurrentAction());
-    }
-  }
-
-  /**
-   * stop listening.
-   */
-  stop() {
-    this._unlistener();
-    this._unlistener = null;
-  }
-
-  /**
-   * register a route.
-   * @param {String} pattern express-like url pattern.
-   * @param {Function} onRoute a function that will be executed when the route changes.
-   * @return {Router}
-   */
-  on(pattern, onChange) {
-    const keys = [];
-    const regexp = index$1(pattern, keys);
-    this._routes.push({
-      pattern,
-      regexp,
-      keys,
-      onChange
-    });
-    return this;
-  }
-
-  /**
-   * register a function to hook just before routing.
-   * this function is called on every routing.
-   * @param {Function} func
-   * @return {Router}
-   */
-  onBefore(func) {
-    this._onBefore = func;
-    return this;
-  }
-
-  /**
-   * register a function to hook just after routing.
-   * this function is called on every routing.
-   * @param {Function} func
-   * @return {Router}
-   */
-  onAfter(func) {
-    this._onAfter = func;
-    return this;
-  }
-
-  /**
-   * navigate to target location.
-   * @param {String|Object} path e.g.) '/foo' or { pathname, search, hash }
-   * @param {Boolean} forceChange
-   */
-  navigateTo(path, forceChange = false) {
-    return Promise
-      .resolve()
-      .then(() => {
-        if (path !== '/') {
-          return Promise.resolve();
-        }
-        const store = this._store;
-        return Promise.all([
-          store.action(constants.ACTION_CURRENT_REMOVE),
-          store.action(constants.ACTION_DMC_REMOVE),
-          store.action(constants.ACTION_PAGE_REMOVE),
-          store.action(constants.ACTION_COMPONENTS_REMOVE_ALL)
-        ]);
-      })
-      .then(() => {
-        if (forceChange && this.getCurrentLocation().pathname === path) {
-          this.refresh();
-          return;
-        }
-
-        if (this.getCurrentLocation().pathname === path) {
-          console.warn('same path is passed.');
-          return;
-        }
-
-        this._history.push(path);
-      });
-  }
-
-  /**
-   * returns current location.
-   * @return {String}
-   */
-  getCurrentLocation() {
-    return this._history.location;
-  }
-
-  /**
-   * returns current action.
-   * @return {String}
-   */
-  getCurrentAction() {
-    return this._history.action;
-  }
-
-  refresh() {
-    this._change(this.getCurrentLocation(), this.getCurrentAction());
-  }
-
-  /**
-   * hash version of `location.href`.
-   * @param {String} pathname
-   */
-  createHref(pathname) {
-    return this._history.createHref({
-      pathname
-    });
-  }
-
-  resolveCurrentPath(pattern) {
-    const keys = [];
-    const regexp = index$1(pattern, keys);
-    const pathname = this.getCurrentLocation().pathname;
-    const params = {};
-    try {
-      const list = regexp.exec(pathname).slice(1);
-      array_15(keys, (v, i) => {
-        params[v.name] = list[i];
-      });
-    } catch(e) {
-      throw new Error(`couldn't parse. pattern was "${pattern}" and pathname was "${pathname}"`);
-    }
-
-    return params;
-  }
-
-  /**
-   * fire route enter event.
-   * @private
-   * @param {Object} location i.e.) history.location
-   * @param {String} action i.e.) history.action
-   */
-  _change(location/*, action */) {
-    const route = array_10(this._routes, route => {
-      return !!route.regexp.exec(location.pathname);
-    });
-
-    if (!route) {
+var script$3 = function() {
+  this.handleTap = () => {
+    if (this.opts.isdisabled) {
       return;
     }
+    this.opts.onpat && this.opts.onpat(this.opts.id);
+  };
+};
 
-    const params = this._parseLocation(location, route);
-    const splitedPathname = array_9(location.pathname.split('/'), v => {
-      return !!v;
+riot$1.tag2('dmc-button', '<span>{opts.label}</span>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$3);
+});
+
+var script$4 = function() {
+  this.show = () => {
+    // need to set delay after dom mountation.
+    new Promise(resolve => {
+      setTimeout(() => {
+        this.root.classList.add('Tooltip--visible');
+        resolve();
+      }, 0);
+    }).then(() => {
+      this.root.classList.add('Tooltip--active');
     });
+  };
 
+  this.on('mount', () => {
+    this.show();
+  });
+};
+
+riot$1.tag2('dmc-tooltip', '<div class="Tooltip__wrapper"> <div class="Tooltip__triangle"></div> <div class="Tooltip__contentWrapper"> <div class="Tooltip__content">{opts.message}</div> </div> </div>', '', 'class="Tooltip"', function(opts) {
+    this.external(script$4);
+});
+
+var script$6 = function() {
+  this.handleTap = () => {
+    if (this.opts.isdisabled) {
+      return;
+    }
+    this.opts.onchange && this.opts.onchange(!this.opts.ischecked, this.opts.id);
+  };
+};
+
+riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <dmc-icon type="check"></dmc-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$6);
+});
+
+/**
+     * Returns the index of the first item that matches criteria
+     */
+    function findIndex$1(arr, iterator, thisObj){
+        iterator = makeIterator_$1(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (iterator(arr[i], i, arr)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    var findIndex_1$1 = findIndex$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$3(arr, iterator, thisObj){
+        var idx = findIndex_1$1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var find_1$2 = find$3;
+
+var script$7 = function() {
+  this.getSelectedLabel = () => {
+    const selectedOption = find_1$2(this.opts.options, { isSelected: true });
+    if (!selectedOption) {
+      return '-';
+    }
+    return selectedOption.label;
+  };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.handleBoxTap = () => {
+    if (this.opts.isdisabled) {
+      return;
+    }
+    this.opts.ontoggle && this.opts.ontoggle(!this.opts.isopened);
+  };
+
+  this.handleOptionTap = e => {
+    const selectedOptionID = e.currentTarget.dataset.id;
+    const options = map_1$1(this.opts.options, option => {
+      if (option.id === selectedOptionID) {
+        option.isSelected = true;
+      } else {
+        option.isSelected = false;
+      }
+      return option;
+    });
+    this.opts.onchange && this.opts.onchange(options);
+    this.opts.ontoggle && this.opts.ontoggle(false);
+  };
+};
+
+riot$1.tag2('dmc-select', '<div class="Select__box" ref="touch" ontap="handleBoxTap"> <div class="Select__label">{getSelectedLabel()}</div> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </div> <div class="Select__options"> <virtual each="{opts.options}"> <div class="Select__option {isSelected ? \'Select__option--selected\' : \'\'} {isDisabled ? \'Select__option--disabled\' : \'\'}" data-id="{id}" ref="touch" ontap="parent.handleOptionTap"> <div class="Select__optionIcon"> <dmc-icon type="check"></dmc-icon> </div> <div class="Select__optionLabel">{label}</div> </div> </virtual> </div>', '', 'class="Select {opts.isopened ? \'Select--opened\' : \'\'} {opts.isdisabled ? \'Select--disabled\' : \'\'}"', function(opts) {
+    this.external(script$7);
+});
+
+var script$8 = function() {
+  this.handleTap = () => {
+    this.refs.form.focus();
+  };
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    this.opts.onchange && this.opts.onchange(this.opts.text, this.opts.id);
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    const newText = e.target.value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    this.opts.onchange && this.opts.onchange(newText, this.opts.id);
+  };
+
+  this.handleInputChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
+  };
+};
+
+riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" type="{opts.type || \'text\'}" riot-value="{opts.text}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$8);
+});
+
+var script$9 = function() {
+  const type = this.opts.parameterobject.type;
+  this.uiType = null;
+  this.isOpened = false;
+  if (!!this.opts.parameterobject.enum) {
+    this.uiType = 'select';
+  } else {
+    switch (type) {
+    case 'string':
+    case 'number':
+    case 'integer':
+      this.uiType = 'input';
+      break;
+    case 'boolean':
+      this.uiType = 'checkbox';
+      break;
+    case 'array':
+      this.uiType = 'TODO';
+      break;
+    case 'file':
+      this.uiType = 'TODO';
+      break;
+    default:
+      break;
+    }
+  }
+
+  this.getSelectOptions = () => {
+    const options = [];
+    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
+      options.push({
+        id: `select_${idx}`,
+        label: v,
+        isSelected: (v === this.opts.parametervalue)
+      });
+    });
+    return options;
+  };
+
+  this.change = value => {
+    // TODO: format, validate
+    if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
+      value = Number(value);
+    }
+    this.opts.onchange(this.opts.parameterobject.name, value);
+  };
+
+  this.handleInputChange = value => {
+    this.change(value);
+  };
+
+  this.handleCheckboxChange = isChecked => {
+    this.change(isChecked);
+  };
+
+  this.handleSelectToggle = isOpened => {
+    this.isOpened = isOpened;
+    this.update();
+  };
+
+  this.handleSelectChange = options => {
+    const option = find_1$2(options, option => {
+      return option.isSelected;
+    });
+    const value = (option ? option.label : undefined);
+    this.change(value);
+  };
+};
+
+riot$1.tag2('dmc-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" ontoggle="{handleSelectToggle}" onchange="{handleSelectChange}"></dmc-select> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
+    this.external(script$9);
+});
+
+var script$10 = function() {
+  // typeは'null', 'boolean', 'object', 'array', 'number' or 'string'.
+  const type = this.opts.parameterobject.type;
+  this.uiType = null;
+  this.isOpened = false;
+  this.multiSchema = null;
+  this.multiData = null;
+  this.multiPropertyKeys = null;
+  if (!!this.opts.parameterobject.enum) {
+    this.uiType = 'select';
+  } else {
+    switch (type) {
+    case 'string':
+    case 'number':
+      this.uiType = 'input';
+      break;
+    case 'boolean':
+      this.uiType = 'checkbox';
+      break;
+    case 'array':
+      this.uiType = 'multi';
+      if (this.opts.parametervalue) {
+        this.multiData = this.opts.parametervalue;
+      }
+      this.multiSchema = this.opts.parameterobject.items;
+      this.multiPropertyKeys = Object.keys(this.opts.parameterobject.items.properties);
+      break;
+    case 'object':
+    case 'null':
+    default:
+      break;
+    }
+  }
+
+  this.getParameterObject = propertyKey => {
+    return index$1$1({}, this.multiSchema.properties[propertyKey], {
+      name: propertyKey,
+      required : contains_1$1(this.multiSchema.required, propertyKey)
+    });
+  };
+
+  this.getValue = (propertyKey, idx) => {
+    if (!this.multiData[idx][propertyKey]) {
+      return;
+    }
+    return this.multiData[idx][propertyKey];
+  };
+
+  this.getSelectOptions = () => {
+    const options = [];
+    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
+      options.push({
+        id: `select_${idx}`,
+        label: v,
+        isSelected: (v === this.opts.parametervalue)
+      });
+    });
+    return options;
+  };
+
+  this.change = value => {
+    // TODO: format, validate
+    if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
+      value = Number(value);
+    }
+    this.opts.onchange(this.opts.parameterobject.name, value, this.opts.multiidx);
+  };
+
+  this.handleMultiPlusButtonTap = () => {
+    this.multiData = this.multiData || [];
+    this.multiData.push({});
+    this.change(this.multiData);
+  };
+
+  this.handleMultiMinusButtonTap = e => {
+    this.multiData.splice(e.item.idx, 1);
+    this.change(this.multiData);
+  };
+
+  this.handleInputChange = value => {
+    this.change(value);
+  };
+
+  this.handleCheckboxChange = isChecked => {
+    this.change(isChecked);
+  };
+
+  this.handleSelectToggle = isOpened => {
+    this.isOpened = isOpened;
+    this.update();
+  };
+
+  this.handleSelectChange = options => {
+    const option = find_1$2(options, option => {
+      return option.isSelected;
+    });
+    const value = (option ? option.label : undefined);
+    this.change(value);
+  };
+
+  this.handleMultiChange = (key, value, idx) => {
+    if (value === undefined || idx === undefined) {
+      // TODO: 原因調査
+      return;
+    }
+    this.multiData[idx][key] = value;
+    this.change(this.multiData);
+  };
+};
+
+riot$1.tag2('dmc-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" ref="touch" ontap="handleMultiPlusButtonTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" ontoggle="{handleSelectToggle}" onchange="{handleSelectChange}"></dmc-select> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" ref="touch" ontap="handleMultiMinusButtonTap"> <dmc-icon type="minus"></dmc-icon> </div> <dmc-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></dmc-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
+    this.external(script$10);
+});
+
+var script$11 = function() {
+  this.propertyKeys = Object.keys(this.opts.schema.properties);
+
+  this.getParameterObject = propertyKey => {
+    return index$1$1({}, this.opts.schema.properties[propertyKey], {
+      name: propertyKey,
+      required : contains_1$1(this.opts.schema.required, propertyKey)
+    });
+  };
+
+  this.getValue = propertyKey => {
+    if (!this.opts.parametervalues) {
+      return;
+    }
+    return this.opts.parametervalues[propertyKey];
+  };
+
+  this.handleChange = (name, value) => {
+    const values = index$1$1({}, this.opts.parametervalues, {
+      [name]: value
+    });
+    forOwn_1$1(values, (v, k) => {
+      // TODO: deleteするためのもっと良い方法を模索すること。
+      if (typeof v === 'string' && !v.length) {
+        delete values[k];
+      }
+    });
+    this.opts.onchange(this.opts.name, values);
+  };
+};
+
+riot$1.tag2('dmc-operation-schema', '<dmc-operation-schema-form each="{propertyKey in propertyKeys}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey)}" onchange="{parent.handleChange}"></dmc-operation-schema-form>', '', 'class="Operation__schema"', function(opts) {
+    this.external(script$11);
+});
+
+var script$12 = function() {
+  this.isUseBody = false;
+  // "query", "header", "path", "formData" or "body"のどれか。
+  if (this.opts.parameter.in === 'body') {
+    this.isUseBody = true;
+  }
+
+  this.handleChange = (key, value) => {
+    this.opts.onchange(key, value);
+  };
+};
+
+riot$1.tag2('dmc-operation-parameter', '<div class="Operation__parameterHead"> <div> <div class="Operation__parameterName">name: {opts.parameter.name}</div> <div class="Operation__parameterDescription">description: {opts.parameter.description}</div> <div class="Operation__parameterIn">in: {opts.parameter.in}</div> </div> <div class="Operation__parameterRequired" if="{opts.parameter.required}">required</div> </div> <div class="Operation__parameterBody"> <dmc-operation-schema if="{isUseBody}" name="{opts.parameter.name}" schema="{opts.parameter.schema}" parametervalues="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-schema> <dmc-operation-parameter-form if="{!isUseBody}" parameterobject="{this.opts.parameter}" parametervalue="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-parameter-form> </div>', '', 'class="Operation__parameter"', function(opts) {
+    this.external(script$12);
+});
+
+var script$13 = function() {
+  const store = this.riotx.get();
+
+  this.summary = this.opts.operation.summary;
+  if (!this.summary) {
+    const obj = swagger.getMethodAndPathByOperationID(this.opts.operation.operationId);
+    this.summary = `${obj.method} ${obj.path}`;
+  }
+  this.queries = index$1$1({}, this.opts.initialQueries);
+
+  this.handleParameterChange = (key, value) => {
+    this.queries[key] = value;
+    // TODO: deleteするためのもっと良い方法を模索すること。
+    if (typeof value === 'string' && !value.length) {
+      delete this.queries[key];
+    }
+    this.update();
+  };
+
+  this.handleExecuteButtonPat = () => {
     Promise
       .resolve()
-      .then(() => this._onBefore(splitedPathname, location.pathname))
-      .then(() => route.onChange(...params))
-      .then(() => this._onAfter(splitedPathname, location.pathname))
-      .catch(err => {
-        console.error(err.message || 'couldn\'t route. check the onBefore and onAfter functions.');
-      });
+      .then(() => store.action(constants$1.COMPONENTS_OPERATE_ONE, this.opts.operation, this.queries))
+      .then(() => {
+        this.close();
+        this.opts.onSuccess();
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleCancelButtonPat = () => {
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-operation', '<div class="Operation__info"> <div> <div class="Operation__summary">{summary}</div> <div class="Operation__description">{opts.operation.description}</div> </div> </div> <div class="Operation__control"> <dmc-button label="{opts.operation.operationId}" onpat="{handleExecuteButtonPat}"></dmc-button> <dmc-button label="cancel" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div> <div class="Operation__parameters"> <dmc-operation-parameter each="{parameter in opts.operation.parameters}" parameter="{parameter}" parametervalue="{parent.queries[parameter.name]}" onchange="{parent.handleParameterChange}"></dmc-operation-parameter> </div>', '', 'class="Operation"', function(opts) {
+    this.external(script$13);
+});
+
+var script$5 = function() {
+  const store = this.riotx.get();
+
+  this.isTooltipOpened = false;
+  this.label = this.opts.action.summary;
+  if (!this.label) {
+    const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
+    this.label = `${obj.method} ${obj.path}`;
   }
+  this.tooltipMessage = this.opts.action.description;
 
-  /**
-   * parse location object so riot tag instances can use it with ease.
-   * @private
-   * @param {Object} location
-   * @param {Object} route
-   * @return {Object}
-   */
-  _parseLocation(location, route) {
-    const params = {};
-    const list = route.regexp.exec(location.pathname).slice(1);
-    array_15(route.keys, (v, i) => {
-      params[v.name] = list[i];
-    });
-
-    const queries = {};
-    array_15(location.search.slice(1).split('&'), v => {
-      if (!v) {
-        return;
+  this.handleButtonPat = () => {
+    store.action(constants$1.DRAWERS_ADD, 'dmc-operation', {
+      operation: this.opts.action,
+      onSuccess: () => {
+        this.opts.updater();
       }
-      const pair = v.split('=');
-      queries[pair[0]] = pair[1];
     });
+  };
 
-    const hash = location.hash.slice(1);
+  this.handleButtonHoverToggle = isHovered => {
+    if (!this.tooltipMessage) {
+      return;
+    }
+    this.isTooltipOpened = isHovered;
+    this.update();
+  };
+};
 
-    return [params, queries, hash];
-  }
-}
-
-var router = new Router();
+riot$1.tag2('dmc-component-action', '<dmc-button label="{label}" onpat="{handleButtonPat}" onhovertoggle="{handleButtonHoverToggle}"></dmc-button> <dmc-tooltip if="{isTooltipOpened}" message="{tooltipMessage}"></dmc-tooltip>', '', 'class="Component__action"', function(opts) {
+    this.external(script$5);
+});
 
 var d3 = createCommonjsModule(function (module) {
 !function() {
@@ -19004,15 +22066,11 @@ var d3 = createCommonjsModule(function (module) {
 });
 
 var tauCharts = createCommonjsModule(function (module, exports) {
-/*! taucharts - v1.1.3 - 2017-05-04
+/*! taucharts - v1.2.2 - 2017-06-01
 * https://github.com/TargetProcess/tauCharts
 * Copyright (c) 2017 Taucraft Limited; Licensed Apache License 2.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
-	if('object' === 'object' && 'object' === 'object')
-		{ module.exports = factory(d3); }
-	else if(typeof undefined === 'function' && undefined.amd)
-		{ undefined(["d3"], factory); }
-	else { exports["tauCharts"] = factory(d3); }
+	{ module.exports = factory(d3); }
 })(commonjsGlobal, function(__WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -19389,7 +22447,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}]));
 
 	/* global VERSION:false */
-	var version = ("1.1.3");
+	var version = ("1.2.2");
 	exports.GPL = _tau.GPL;
 	exports.Plot = _tau2.Plot;
 	exports.Chart = _tau3.Chart;
@@ -20696,7 +23754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var defaultDecorators = [config.flip && _grammarRegistry.GrammarRegistry.get('flip'), enableStack && _grammarRegistry.GrammarRegistry.get('stack'), enableColorPositioning && _grammarRegistry.GrammarRegistry.get('positioningByColor')];
 
 	        _this.decorators = (_this.config.transformRules || defaultDecorators).concat(config.transformModel || []);
-	        _this.adjusters = _this.config.adjustRules || [];
+	        _this.adjusters = (_this.config.adjustRules || []).concat(config.adjustScales || []);
 	        return _this;
 	    }
 
@@ -22018,7 +25076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var svg = axisNode.node();
-	    while (svg.tagName !== 'svg') {
+	    while (svg && svg.tagName !== 'svg') {
 	        svg = svg.parentNode;
 	    }
 	    var svgRect = svg.getBoundingClientRect();
@@ -22531,7 +25589,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var translate = { x: 0, y: 0 };
 	        var parent = node;
 	        var tr, attr;
-	        while (parent.nodeName.toUpperCase() !== 'SVG') {
+	        while (parent && parent.nodeName.toUpperCase() !== 'SVG') {
 	            attr = parent.getAttribute('transform');
 	            if (attr) {
 	                tr = parseTransformTranslate(attr);
@@ -31062,7 +34120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return isHorizontal ? _grammarRegistry.GrammarRegistry.get('flip')(prevModel) : _grammarRegistry.GrammarRegistry.get('identity')(prevModel);
 	        }, config.stack && _grammarRegistry.GrammarRegistry.get('stack'), enableColorPositioning && _grammarRegistry.GrammarRegistry.get('positioningByColor')].filter(function (x) {
 	            return x;
-	        }).concat(config.transformModel || []);
+	        });
 
 	        config.adjustRules = [config.stack && _grammarRegistry.GrammarRegistry.get('adjustYScale'), function (prevModel, args) {
 	            var isEmptySize = prevModel.scaleSize.isEmptyScale();
@@ -31951,6 +35009,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var isNegative = function isNegative(scale, row) {
 	    return !scale.discrete && row[scale.dim] < 0;
 	};
+	var getXPad = function getXPad(prev, row) {
+	    return prev.w(row) / 2 + Math.floor(prev.model.size(row) / 5);
+	};
+	var getYPad = function getYPad(prev, row) {
+	    return prev.h(row) / 2 + Math.floor(prev.model.size(row) / 5);
+	};
 	var alignByX = function alignByX(exp) {
 	    return function (prev) {
 	        return {
@@ -31969,7 +35033,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var k = exp[1];
 	                var u = exp[0] === exp[0].toUpperCase() ? 1 : 0;
 
-	                return prev.dx(row) + k * (prev.w(row) / 2) + k * u * prev.model.size(row) / 2 + k * 2;
+	                return prev.dx(row) + k * u * prev.model.size(row) / 2 + k * getXPad(prev, row);
 	            }
 	        };
 	    };
@@ -31993,7 +35057,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var k = exp[1];
 	                var u = exp[0] === exp[0].toUpperCase() ? 1 : 0;
 
-	                return prev.dy(row) + k * (prev.h(row) / 2) + k * u * prev.model.size(row) / 2 + k * 2;
+	                return prev.dy(row) + k * u * prev.model.size(row) / 2 + k * getYPad(prev, row);
 	            }
 	        };
 	    };
@@ -32178,6 +35242,65 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return prevDy;
 	        }
 	    };
+	}).regRule('from-beginning', function (prev) {
+	    var y0 = function y0(row) {
+	        return prev.model.y0(row);
+	    };
+	    return prev.model.flip ? { x: y0 } : { y: y0 };
+	}).regRule('to-end', function (prev) {
+	    var yi = function yi(row) {
+	        return prev.model.yi(row);
+	    };
+	    return prev.model.flip ? { x: yi } : { y: yi };
+	}).regRule('towards', function (prev) {
+	    var getSign = function getSign(prev, row) {
+	        return prev.model.yi(row) - prev.model.y0(row) >= 0 ? 1 : -1;
+	    };
+	    var getPad = prev.model.flip ? getXPad : getYPad;
+	    var dy = function dy(row) {
+	        return getSign(prev, row) * getPad(prev, row);
+	    };
+	    return prev.model.flip ? { dx: dy } : { dy: dy };
+	}).regRule('inside-start-then-outside-end-horizontal', function (prev, args) {
+
+	    var innerStart = [LayerLabelsRules.getRule('from-beginning'), LayerLabelsRules.getRule('towards'), LayerLabelsRules.getRule('cut-label-horizontal')].reduce(function (p, r) {
+	        return _layerLabelsModel.LayerLabelsModel.compose(p, r(p, args));
+	    }, prev);
+
+	    var outerEnd = [LayerLabelsRules.getRule('to-end'), LayerLabelsRules.getRule('towards'), LayerLabelsRules.getRule('cut-outer-label-horizontal')].reduce(function (p, r) {
+	        return _layerLabelsModel.LayerLabelsModel.compose(p, r(p, args));
+	    }, prev);
+
+	    var betterInside = function betterInside(row) {
+	        return innerStart.label(row).length >= outerEnd.label(row).length;
+	    };
+
+	    return Object.assign({}, innerStart, ['x', 'dx', 'hide', 'label'].reduce(function (obj, prop) {
+	        obj[prop] = function (row) {
+	            return (betterInside(row) ? innerStart : outerEnd)[prop](row);
+	        };
+	        return obj;
+	    }, {}));
+	}).regRule('inside-start-then-outside-end-vertical', function (prev, args) {
+
+	    var innerStart = [LayerLabelsRules.getRule('from-beginning'), LayerLabelsRules.getRule('towards'), LayerLabelsRules.getRule('cut-label-vertical')].reduce(function (p, r) {
+	        return _layerLabelsModel.LayerLabelsModel.compose(p, r(p, args));
+	    }, prev);
+
+	    var outerEnd = [LayerLabelsRules.getRule('to-end'), LayerLabelsRules.getRule('towards'), LayerLabelsRules.getRule('cut-outer-label-vertical')].reduce(function (p, r) {
+	        return _layerLabelsModel.LayerLabelsModel.compose(p, r(p, args));
+	    }, prev);
+
+	    var betterInside = function betterInside(row) {
+	        return innerStart.label(row).length >= outerEnd.label(row).length;
+	    };
+
+	    return Object.assign({}, innerStart, ['y', 'dy', 'hide', 'label'].reduce(function (obj, prop) {
+	        obj[prop] = function (row) {
+	            return (betterInside(row) ? innerStart : outerEnd)[prop](row);
+	        };
+	        return obj;
+	    }, {}));
 	}).regRule('outside-then-inside-horizontal', function (prev, args) {
 
 	    var outer = ['r+', 'l-', 'cut-outer-label-horizontal'].map(LayerLabelsRules.getRule).reduce(function (p, r) {
@@ -32582,7 +35705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var config = _elementPath.BasePath.init(xConfig);
 	        var enableStack = config.stack;
 
-	        config.transformRules = [config.flip && _grammarRegistry.GrammarRegistry.get('flip'), !enableStack && _grammarRegistry.GrammarRegistry.get('groupOrderByAvg'), enableStack && _elementPath.BasePath.grammarRuleFillGaps, enableStack && _grammarRegistry.GrammarRegistry.get('stack')].concat(config.transformModel || []);
+	        config.transformRules = [config.flip && _grammarRegistry.GrammarRegistry.get('flip'), !enableStack && _grammarRegistry.GrammarRegistry.get('groupOrderByAvg'), enableStack && _elementPath.BasePath.grammarRuleFillGaps, enableStack && _grammarRegistry.GrammarRegistry.get('stack')];
 
 	        config.adjustRules = [function (prevModel, args) {
 	            var isEmptySize = prevModel.scaleSize.isEmptyScale();
@@ -33374,7 +36497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var config = _elementPath.BasePath.init(xConfig);
 
-	        config.transformRules = [config.flip && _grammarRegistry.GrammarRegistry.get('flip')].concat(config.transformModel || []);
+	        config.transformRules = [config.flip && _grammarRegistry.GrammarRegistry.get('flip')];
 
 	        config.adjustRules = [function (prevModel, args) {
 	            var isEmptySize = prevModel.scaleSize.isEmptyScale();
@@ -33501,7 +36624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            interpolate: 'linear'
 	        });
 
-	        config.transformRules = [config.flip && _grammarRegistry.GrammarRegistry.get('flip'), !enableStack && _grammarRegistry.GrammarRegistry.get('groupOrderByAvg'), enableStack && _elementPath.BasePath.grammarRuleFillGaps, enableStack && _grammarRegistry.GrammarRegistry.get('stack')].concat(config.transformModel || []);
+	        config.transformRules = [config.flip && _grammarRegistry.GrammarRegistry.get('flip'), !enableStack && _grammarRegistry.GrammarRegistry.get('groupOrderByAvg'), enableStack && _elementPath.BasePath.grammarRuleFillGaps, enableStack && _grammarRegistry.GrammarRegistry.get('stack')];
 
 	        var avoidScalesOverflow = config.guide.avoidScalesOverflow;
 	        var isEmptySize = function isEmptySize(model) {
@@ -33858,7 +36981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            maxHighlightDistance: 32,
 	            prettify: true,
 	            sortByBarHeight: true,
-	            enableColorToBarPosition: !config.stack
+	            enableColorToBarPosition: config.guide.enableColorToBarPosition != null ? config.guide.enableColorToBarPosition : !config.stack
 	        });
 
 	        config.guide.size = _utils.utils.defaults(config.guide.size || {}, {
@@ -33875,7 +36998,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        config.transformRules = [config.flip && _grammarRegistry.GrammarRegistry.get('flip'), config.stack && _grammarRegistry.GrammarRegistry.get('stack'), enableColorPositioning && _grammarRegistry.GrammarRegistry.get('positioningByColor')].filter(function (x) {
 	            return x;
-	        }).concat(config.transformModel || []);
+	        });
 
 	        config.adjustRules = [enableDistributeEvenly && function (prevModel, args) {
 	            var sizeCfg = _utils.utils.defaults(config.guide.size || {}, {
@@ -37006,1394 +40129,1499 @@ return /******/ (function(modules) { // webpackBootstrap
 
 });
 
-var taucharts = unwrapExports(tauCharts);
+var chart$1 = unwrapExports(tauCharts);
+
+var script$14 = function() {
+  this.on('mount', () => {
+    const rawData = this.opts.data.getRawValue();
+    new chart$1.Chart(index$1$1({
+      type: 'bar'
+    }, rawData)).renderTo(this.refs.canvas);
+  });
+};
 
 riot$1.tag2('dmc-component-graph-bar', '<div class="ComponentGraphBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphBar"', function(opts) {
-
-    const keys = [];
-    array_15(this.opts.data.keys, key => {
-      keys.push(key.get());
-    });
-    const defData = [];
-    array_15(this.opts.data.data, (data, idx) => {
-      defData[idx] = {};
-      array_15(keys, (key, i) => {
-        defData[idx][key] = data[i].get();
-      });
-    });
-
-    this.barChart = null;
-
-    this.on('mount', () => {
-      this.barChart = new taucharts.Chart({
-        type: 'bar',
-        data: defData,
-        guide: {
-          x: { label: keys[0] },
-          y: { label: keys[1] }
-        },
-        x: keys[0],
-        y: keys[1]
-      }).renderTo(this.refs.canvas);
-    });
-
-    this.on('unmount', () => {
-
-    });
+    this.external(script$14);
 });
 
-riot$1.tag2('dmc-component-number', '<div class="ComponentNumber__value">{opts._data.getValue()}</div>', '', 'class="ComponentNumber"', function(opts) {
+var script$15 = function() {
+  this.on('mount', () => {
+    const rawData = this.opts.data.getRawValue();
+    new chart$1.Chart(index$1$1({
+      type: 'horizontalBar'
+    }, rawData)).renderTo(this.refs.canvas);
+  });
+};
+
+riot$1.tag2('dmc-component-graph-horizontal-bar', '<div class="ComponentGraphHorizontalBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalBar"', function(opts) {
+    this.external(script$15);
 });
 
-riot$1.tag2('dmc-button', '<span>{opts.label}</span>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class}" onclick="{handleClick}"', function(opts) {
-    this.handleClick = function(e) {
-      e.stopPropagation();
-      this.opts.onclick && this.opts.onclick();
-    }.bind(this);
+var script$16 = function() {
+  this.on('mount', () => {
+    const rawData = this.opts.data.getRawValue();
+    new chart$1.Chart(index$1$1({
+      type: 'horizontal-stacked-bar'
+    }, rawData)).renderTo(this.refs.canvas);
+  });
+};
+
+riot$1.tag2('dmc-component-graph-horizontal-stacked-bar', '<div class="ComponentGraphHorizontalStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalStackedBar"', function(opts) {
+    this.external(script$16);
 });
 
-riot$1.tag2('dmc-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {opts.class}"', function(opts) {
-});
-
-riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <dmc-icon type="check"></dmc-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" click="{handleClick}"', function(opts) {
-
-    this.handleClick = function() {
-      if (this.opts.isdisabled) {
-        return;
+var script$17 = function() {
+  this.on('mount', () => {
+    const rawData = this.opts.data.getRawValue();
+    new chart$1.Chart(index$1$1({
+      type: 'line',
+      guide: {
+        interpolate: 'smooth'
       }
-      this.opts.onchange && this.opts.onchange(!this.opts.ischecked);
-    }.bind(this);
+    }, rawData)).renderTo(this.refs.canvas);
+  });
+};
+
+riot$1.tag2('dmc-component-graph-line', '<div class="ComponentGraphLine__canvas" ref="canvas"></div>', '', 'class="ComponentGraphLine"', function(opts) {
+    this.external(script$17);
 });
 
-riot$1.tag2('dmc-input', '<form class="Input__content" submit="{handleFormSubmit}"> <div class="Input__icon" if="{!!opts.icon}"> <dmc-icon type="{opts.icon}"></dmc-icon> </div> <input class="Input__input" ref="input" type="{opts.type || \'text\'}" riot-value="{opts.text}" placeholder="{opts.placeholder || \'\'}" disabled="{opts.isdisabled}" pattern="{opts.pattern}" input="{handleInputChange}" focus="{handleInputFocus}" blur="{handleInputBlur}"> <div class="Input__resetButton" if="{opts.isresetable}" click="{handleResetButtonClick}"> <dmc-icon type="close"></dmc-icon> </div> </form>', '', 'class="Input {opts.isfocused ? \'Input--focused\' : \'\'} {opts.isdisabled ? \'Input--disabled\' : \'\'}" click="{handleClick}"', function(opts) {
+var script$18 = function() {
+  this.on('mount', () => {
+    const rawData = this.opts.data.getRawValue();
+    new chart$1.Chart(index$1$1({
+      type: 'scatterplot'
+    }, rawData)).renderTo(this.refs.canvas);
+  });
+};
 
-    const initialText = opts.text || '';
-
-    this.handleClick = function() {
-      this.refs.input.focus();
-    }.bind(this);
-
-    this.handleFormSubmit = function(e) {
-      e.preventDefault();
-      this.opts.onenter && this.opts.onenter(this.opts.text, this.opts.id);
-    }.bind(this);
-
-    this.handleInputChange = function(e) {
-      const newText = e.target.value.replace(/　/g, ' ');
-      this.opts.ontextchange && this.opts.ontextchange(newText, this.opts.id);
-    }.bind(this);
-
-    this.handleInputFocus = function() {
-      this.opts.onfocustoggle && this.opts.onfocustoggle(true, this.opts.id);
-    }.bind(this);
-
-    this.handleInputBlur = function() {
-      this.opts.onfocustoggle && this.opts.onfocustoggle(false, this.opts.id);
-    }.bind(this);
-
-    this.handleResetButtonClick = function(e) {
-      e.stopPropagation();
-      this.opts.onreset && this.opts.onreset(initialText, this.opts.id);
-    }.bind(this);
+riot$1.tag2('dmc-component-graph-scatterplot', '<div class="ComponentGraphScatterplot__canvas" ref="canvas"></div>', '', 'class="ComponentGraphScatterplot"', function(opts) {
+    this.external(script$18);
 });
 
-riot$1.tag2('dmc-select', '<div class="Select__box" click="{handleBoxClick}"> <div class="Select__label">{getSelectedLabel()}</div> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </div> <div class="Select__options"> <virtual each="{opts.options}"> <div class="Select__option {isSelected ? \'Select__option--selected\' : \'\'} {isDisabled ? \'Select__option--disabled\' : \'\'}" data-id="{id}" click="{parent.handleOptionClick}"> <div class="Select__optionIcon"> <dmc-icon type="check"></dmc-icon> </div> <div class="Select__optionLabel">{label}</div> </div> </virtual> </div>', '', 'class="Select {opts.isopened ? \'Select--opened\' : \'\'} {opts.isdisabled ? \'Select--disabled\' : \'\'}"', function(opts) {
+var script$19 = function() {
+  this.on('mount', () => {
+    const rawData = this.opts.data.getRawValue();
+    new chart$1.Chart(index$1$1({
+      type: 'stacked-area'
+    }, rawData)).renderTo(this.refs.canvas);
+  });
+};
 
-    this.on('mount', () => {
-      window.addEventListener('click', this.handleOutsideClick);
-    });
+riot$1.tag2('dmc-component-graph-stacked-area', '<div class="ComponentGraphStackedArea__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedArea"', function(opts) {
+    this.external(script$19);
+});
 
-    this.on('unmount', () => {
-      window.removeEventListener('click', this.handleOutsideClick);
-    });
+var script$20 = function() {
+  this.on('mount', () => {
+    const rawData = this.opts.data.getRawValue();
+    new chart$1.Chart(index$1$1({
+      type: 'stacked-bar'
+    }, rawData)).renderTo(this.refs.canvas);
+  });
+};
 
-    this.getSelectedLabel = function() {
-      const selectedOption = array_10(this.opts.options, { isSelected: true });
-      if (!selectedOption) {
-        return '-';
-      }
-      return selectedOption.label;
-    }.bind(this);
+riot$1.tag2('dmc-component-graph-stacked-bar', '<div class="ComponentGraphStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedBar"', function(opts) {
+    this.external(script$20);
+});
 
-    this.handleOutsideClick = function() {
-      this.opts.ontoggle && this.opts.ontoggle(false);
-    }.bind(this);
+/**
+     * covert value into number if numeric
+     */
+    function toNumber(val){
+        // numberic values should come first because of -0
+        if (typeof val === 'number') { return val; }
+        // we want all falsy values (besides -0) to return zero to avoid
+        // headaches
+        if (!val) { return 0; }
+        if (typeof val === 'string') { return parseFloat(val); }
+        // arrays are edge cases. `Number([4]) === 4`
+        if (isArray_1$1(val)) { return NaN; }
+        return Number(val);
+    }
 
-    this.handleBoxClick = function() {
-      if (this.opts.isdisabled) {
-        return;
-      }
-      this.opts.ontoggle && this.opts.ontoggle(!this.opts.isopened);
-    }.bind(this);
+    var toNumber_1 = toNumber;
 
-    this.handleOptionClick = function(e) {
-      const selectedOptionID = e.currentTarget.dataset.id;
-      const options = array_25(this.opts.options, option => {
-        if (option.id === selectedOptionID) {
-          option.isSelected = true;
+/**
+     * Converts number into currency format
+     */
+    function currencyFormat(val, nDecimalDigits, decimalSeparator, thousandsSeparator) {
+        val = toNumber_1(val);
+        nDecimalDigits = nDecimalDigits == null? 2 : nDecimalDigits;
+        decimalSeparator = decimalSeparator == null? '.' : decimalSeparator;
+        thousandsSeparator = thousandsSeparator == null? ',' : thousandsSeparator;
+
+        //can't use enforce precision since it returns a number and we are
+        //doing a RegExp over the string
+        var fixed = val.toFixed(nDecimalDigits),
+            //separate begin [$1], middle [$2] and decimal digits [$4]
+            parts = new RegExp('^(-?\\d{1,3})((?:\\d{3})+)(\\.(\\d{'+ nDecimalDigits +'}))?$').exec( fixed );
+
+        if(parts){ //val >= 1000 || val <= -1000
+            return parts[1] + parts[2].replace(/\d{3}/g, thousandsSeparator + '$&') + (parts[4] ? decimalSeparator + parts[4] : '');
+        }else{
+            return fixed.replace('.', decimalSeparator);
+        }
+    }
+
+    var currencyFormat_1 = currencyFormat;
+
+var script$21 = function() {
+  this.value = currencyFormat_1(this.opts.data.getValue('value').getValue(), 0);
+};
+
+riot$1.tag2('dmc-component-number', '<div class="ComponentNumber__value">{value}</div>', '', 'class="ComponentNumber"', function(opts) {
+    this.external(script$21);
+});
+
+var script$23 = function() {
+  const str = (json => {
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+      let cls = 'number';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'key';
         } else {
-          option.isSelected = false;
+          cls = 'string';
         }
-        return option;
-      });
-      this.opts.onchange && this.opts.onchange(options);
-      this.opts.ontoggle && this.opts.ontoggle(false);
-    }.bind(this);
+      } else if (/true|false/.test(match)) {
+        cls = 'boolean';
+      } else if (/null/.test(match)) {
+        cls = 'null';
+      }
+      return '<span class="PrettyPrint__' + cls + '">' + match + '</span>';
+    });
+  })(JSON.stringify(this.opts.data, undefined, 4));
+
+  this.on('mount', () => {
+    this.refs.canvas.innerHTML = str;
+  });
+};
+
+riot$1.tag2('dmc-prettyprint', '<pre class="PrettyPrint__pre" ref="canvas"></pre>', '', 'class="PrettyPrint"', function(opts) {
+    this.external(script$23);
 });
 
-riot$1.tag2('dmc-operation', '<div class="Operation__parameters"> <dmc-operation-parameter each="{parameter in opts.operation.parameters}" parameter="{parameter}" parametervalue="{parent.queries[parameter.name]}" onchange="{parent.handleParameterChange}"></dmc-operation-parameter> </div> <div class="Operation__control"> <dmc-button label="{opts.operation.operationId}" onclick="{handleExecuteButtonClick}"></dmc-button> <dmc-button label="cancel" type="secondary" onclick="{handleCancelButtonClick}"></dmc-button> </div>', '', 'class="Operation"', function(opts) {
+var script$22 = function() {
+  const store = this.riotx.get();
 
-    const store = this.riotx.get();
+  this.value = null;
+  switch (this.opts.cell.getType()) {
+  case 'null':
+    this.value = 'null';
+    break;
+  case 'boolean':
+    this.value = this.opts.cell.getValue() ? 'O' : 'X';
+    break;
+  case 'number':
+  case 'integer':
+    this.value = String(this.opts.cell.getValue());
+    break;
+  case 'string':
+    // TODO: 画像表示
+    this.value = this.opts.cell.getValue() || '-';
+    break;
+  case 'object':
+  case 'array':
+    this.value = '[詳細を見る]';
+    break;
+  default:
+    break;
+  }
 
-    this.queries = index({}, this.opts.initialQueries);
+  this.handleTap = ()  => {
+    const type = this.opts.cell.getType();
+    if (type !== 'object' && type !== 'array') {
+      return;
+    }
+    store.action(constants$1.MODALS_ADD, 'dmc-prettyprint', {
+      data : this.opts.cell.getRawValue()
+    });
+  };
+};
 
-    this.closeModal = function() {
-      if (this.opts.isModal) {
-        this.opts.modalCloser();
-      }
-    }.bind(this);
-
-    this.handleParameterChange = function(key, value) {
-      this.queries[key] = value;
-
-      if (typeof value === 'string' && !value.length) {
-        delete this.queries[key];
-      }
-      this.update();
-    }.bind(this);
-
-    this.handleExecuteButtonClick = function() {
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_COMPONENTS_OPERATE, this.opts.operation, this.queries))
-        .then(() => {
-          this.closeModal();
-          this.opts.onSuccess();
-        })
-        .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
-          message: err.message
-        }));
-    }.bind(this);
-
-    this.handleCancelButtonClick = function() {
-      this.closeModal();
-    }.bind(this);
-
+riot$1.tag2('dmc-table-cell', '<div ref="touch" ontap="handleTap">{value}</div>', '', 'class="Table__cell"', function(opts) {
+    this.external(script$22);
 });
-riot$1.tag2('dmc-operation-parameter', '<div class="Operation__parameterHead"> <div class="Operation__parameterName">{opts.parameter.name}</div> <div class="Operation__parameterRequired" if="{opts.parameter.required}">required</div> </div> <div class="Operation__parameterBody"> <dmc-operation-schema if="{isUseBody}" name="{opts.parameter.name}" schema="{opts.parameter.schema}" parametervalues="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-schema> <dmc-operation-input if="{!isUseBody}" parameterobject="{this.opts.parameter}" parametervalue="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-input> </div>', '', 'class="Operation__parameter"', function(opts) {
-    this.isUseBody = false;
 
-    if (this.opts.parameter.in === 'body') {
-      this.isUseBody = true;
+var script$24 = function() {
+  this.isOpened = true;
+
+  this.handleHeaderTap = () => {
+    this.isOpened = !this.isOpened;
+    this.update();
+  };
+};
+
+riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap="handleHeaderTap"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemOpenShut"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-cell cell="{opts.item.cell}"></dmc-table-cell> </virtual>', '', 'class="Table__item {isOpened ? \'Table__item--opened\' : \'\'}"', function(opts) {
+    this.external(script$24);
+});
+
+var script$26 = function() {
+  this.handleActionButtonPat = id => {
+    this.opts.actions[id].onPat(this.opts.actions[id].id, this.opts.actions[id].rowData.getValue(this.opts.idx));
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-table-action', '<dmc-button each="{action, idx in opts.actions}" id="{idx}" label="{action.value}" onpat="{parent.handleActionButtonPat}"></dmc-button>', '', 'class="Table__action"', function(opts) {
+    this.external(script$26);
+});
+
+/**
+     * Remove a single item from the array.
+     * (it won't remove duplicates, just a single item)
+     */
+    function remove$1(arr, item){
+        var idx = indexOf_1$1(arr, item);
+        if (idx !== -1) { arr.splice(idx, 1); }
     }
 
-    this.handleChange = function(key, value) {
-      this.opts.onchange(key, value);
-    }.bind(this);
+    var remove_1$1 = remove$1;
 
-});
-riot$1.tag2('dmc-operation-schema', '<dmc-operation-input each="{propertyKey in propertyKeys}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey)}" onchange="{parent.handleChange}"></dmc-operation-input>', '', 'class="Operation__schema"', function(opts) {
-
-    this.propertyKeys = Object.keys(opts.schema.properties);
-
-    this.getParameterObject = function(propertyKey) {
-      return index({}, this.opts.schema.properties[propertyKey], {
-        name: propertyKey,
-        required : array_5(this.opts.schema.required, propertyKey)
-      });
-    }.bind(this);
-
-    this.getValue = function(propertyKey) {
-      if (!this.opts.parametervalues) {
-        return;
-      }
-      return this.opts.parametervalues[propertyKey];
-    }.bind(this);
-
-    this.handleChange = function(name, value) {
-      const values$$1 = index({}, this.opts.parametervalues, {
-        [name]: value
-      });
-      object_13(values$$1, (v, k) => {
-
-        if (typeof v === 'string' && !v.length) {
-          delete values$$1[k];
-        }
-      });
-      this.opts.onchange(this.opts.name, values$$1);
-    }.bind(this);
-
-});
-riot$1.tag2('dmc-operation-input', '<div class="Operation__inputName">{opts.parameterobject.name}({opts.parameterobject.type}){opts.parameterobject.required ? \'(required)\' : \'\'}</div> <virtual if="{uiType === \'input\'}"> <dmc-input text="{opts.parametervalue}" ontextchange="{handleInputChange}"></dmc-input> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" ontoggle="{handleSelectToggle}" onchange="{handleSelectChange}"></dmc-select> </virtual>', '', 'class="Operation__input"', function(opts) {
-
-    const type = opts.parameterobject.type;
-    this.uiType = null;
-    this.isOpened = false;
-    if (!!opts.parameterobject.enum) {
-      this.uiType = 'select';
-    } else {
-      switch (type) {
-        case 'string':
-        case 'number':
-        case 'integer':
-          this.uiType = 'input';
-          break;
-        case 'boolean':
-          this.uiType = 'checkbox';
-          break;
-        case 'array':
-          this.uiType = 'TODO';
-          break;
-        case 'file':
-          this.uiType = 'TODO';
-          break;
-        default:
-          break;
-      }
-    }
-
-    this.getSelectOptions = function() {
-      const options = [];
-      array_15(this.opts.parameterobject.enum, (v, idx) => {
-        options.push({
-          id: `select_${idx}`,
-          label: v,
-          isSelected: (v === this.opts.parametervalue)
-        });
-      });
-      return options;
-    }.bind(this);
-
-    this.change = function(value) {
-
-      if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
-        value = Number(value);
-      }
-      this.opts.onchange(this.opts.parameterobject.name, value);
-    }.bind(this);
-
-    this.handleInputChange = function(value) {
-      this.change(value);
-    }.bind(this);
-
-    this.handleCheckboxChange = function(isChecked) {
-      this.change(isChecked);
-    }.bind(this);
-
-    this.handleSelectToggle = function(isOpened) {
-      this.isOpened = isOpened;
-      this.update();
-    }.bind(this);
-
-    this.handleSelectChange = function(options) {
-      const option = array_10(options, option => {
-        return option.isSelected;
-      });
-      const value = (option ? option.label : undefined);
-      this.change(value);
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-table', '<div class="Table__head"> <div class="Table__headRow"> <div class="Table__headCell" each="{getColumns()}">{title}</div> </div> </div> <div class="Table__body"> <div class="Table__row" each="{row in getRows()}"> <dmc-table-cell each="{cell in row}" cell="{cell}"></dmc-table-cell> </div> </div>', '', 'class="Table"', function(opts) {
-
-    this.getColumns = function() {
-
-      return this.opts.columns;
-    }.bind(this);
-
-    this.getRows = function() {
-      const columns = this.getColumns();
-      const rows = [];
-      array_15(this.opts.rows, row => {
-        const arrayedRow = [];
-        array_15(columns, column => {
-          arrayedRow.push(row[column.key]);
-        });
-        rows.push(arrayedRow);
-      });
-      return rows;
-    }.bind(this);
-
-});
-riot$1.tag2('dmc-table-cell', '<virtual if="{opts.cell.isText}">{cell.value}</virtual> <virtual if="{opts.cell.isAction}"> <dmc-table-cell-action each="{action in opts.cell.actions}" action="{action}"></dmc-table-cell-action> </virtual>', '', 'class="Table__cell"', function(opts) {
-});
-riot$1.tag2('dmc-table-cell-action', '<dmc-button label="{opts.action.value}" onclick="{handleButtonClick}"></dmc-button>', '', '', function(opts) {
-
-    this.handleButtonClick = function() {
-      this.opts.action.onClick(this.opts.action.id, this.opts.action.rowData);
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
-
-    this.getColumns = function() {
-      const columns = [];
-      if (!!this.opts.actions && this.opts.actions.length) {
-        columns.push({
-          title: 'action',
-          key: constants.DMC_TABLE_ACTION_KEY
-        });
-      }
-      object_13(this.opts.data[0], (v, k) => {
-        columns.push({
-          title: k,
-          key: k
-        });
-      });
-      return columns;
-    }.bind(this);
-
-    this.getRows = function() {
-      const rows = [];
-      array_15(this.opts.data, cells => {
-        const row = {};
-        if (!!this.opts.actions && this.opts.actions.length) {
-          row[constants.DMC_TABLE_ACTION_KEY] = {
-            isAction: true,
-            actions: []
-          };
-          array_15(this.opts.actions, action => {
-            row[constants.DMC_TABLE_ACTION_KEY].actions.push({
-              id: action.operationId,
-              value: action.operationId,
-              rowData: cells,
-              onClick: this.handleActionButtonClick
-            });
-          });
-        }
-        object_13(cells, cell => {
-          row[cell.key] = {
-            isText: true,
-            value: cell.get()
-          };
-        });
-        rows.push(row);
-      });
-      return rows;
-    }.bind(this);
-
-    this.createInitialQueries = function(operation, rowData) {
-      const queries = {};
-      const parameters = operation.parameters;
-      array_15(parameters, parameter => {
-        const name = parameter.name;
-        if (parameter.in === 'body') {
-          queries[name] = {};
-          object_13(parameter.schema.properties, (v, k) => {
-            if (rowData[k]) {
-              queries[name][k] = rowData[k].get();
-            }
-          });
-        } else {
-          if (!rowData[name]) {
-            return;
-          }
-          queries[name] = rowData[name].get();
-        }
-      });
-
-      return queries;
-    }.bind(this);
-
-    this.handleActionButtonClick = function(operationID, rowData) {
-      const operation = array_10(this.opts.actions, action => {
-        return (action.operationId === operationID);
-      });
-      const initialQueries = this.createInitialQueries(operation, rowData);
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-operation', {
-        operation,
-        initialQueries,
-        onSuccess: () => {
-          this.opts.updater();
-        }
-      });
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-pagination', '<div class="Pagination__control"> <div class="Pagination__button {opts.currentpage === 1 ? \'Pagination__button--disabled\' : \'\'}" onclick="{handlePrevButtonClick}"> <dmc-icon type="left"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[0].num !== 1}" data-page="1" onclick="{handlePageButtonClick}">1</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[0].num &gt;= 3}" onclick="{handleRecedeButtonClick}"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__recedeIcon" type="doubleLeft"></dmc-icon> </div> <div class="Pagination__button {page.isSelected ? \'Pagination__button--selected\' : \'\'}" each="{page in getBasePages()}" data-page="{page.num}" onclick="{parent.handlePageButtonClick}">{page.num}</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[getBasePages().length - 1].num &lt;= opts.maxpage - 2}" onclick="{handleProceedButtonClick}"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__proceedIcon" type="doubleRight"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[getBasePages().length - 1].num !== opts.maxpage}" data-page="{opts.maxpage}" onclick="{handlePageButtonClick}">{opts.maxpage}</div> <div class="Pagination__button {opts.currentpage === opts.maxpage ? \'Pagination__button--disabled\' : \'\'}" onclick="{handleNextButtonClick}"> <dmc-icon type="right"></dmc-icon> </div> </div> <div class="Pagination__info">{opts.currentpage} / {opts.maxpage}</div>', '', 'class="Pagination"', function(opts) {
-
-    this.getBasePages = function() {
-      const size = this.opts.size;
-      const currentPage = this.opts.currentpage;
-      const maxPage = this.opts.maxpage;
-      let startPage = currentPage - Math.floor(size / 2);
-      let endPage = currentPage + Math.floor(size / 2) - ((size % 2) ? 0 : 1);
-      if (startPage < 1) {
-        endPage = endPage + Math.abs(startPage + 1);
-        startPage = 1;
-      }
-      if (endPage > maxPage) {
-        startPage = startPage - (endPage - maxPage);
-        endPage = maxPage;
-      }
-
-      const ret = [];
-      for (let i = startPage; i <= endPage; i++) {
-        ret.push({
-          num: i,
-          isSelected: (i === opts.currentpage)
-        });
-      }
-      return ret;
-    }.bind(this);
-
-    this.handlePrevButtonClick = function() {
-      let newPage = this.opts.currentpage - 1;
-      if (newPage < 1) {
-        newPage = 1;
-      }
-      this.opts.onchange(newPage);
-    }.bind(this);
-
-    this.handleRecedeButtonClick = function() {
-      let newPage = this.opts.currentpage - this.opts.size;
-      if (newPage < 1) {
-        newPage = 1;
-      }
-      this.opts.onchange(newPage);
-    }.bind(this);
-
-    this.handlePageButtonClick = function(e) {
-      const newPage = Number(e.currentTarget.getAttribute('data-page'));
-      this.opts.onchange(newPage);
-    }.bind(this);
-
-    this.handleProceedButtonClick = function() {
-      let newPage = this.opts.currentpage + this.opts.size;
-      if (newPage > this.opts.maxpage) {
-        newPage = this.opts.maxpage;
-      }
-      this.opts.onchange(newPage);
-    }.bind(this);
-
-    this.handleNextButtonClick = function() {
-      let newPage = this.opts.currentpage + 1;
-      if (newPage > this.opts.maxpage) {
-        newPage = this.opts.maxpage;
-      }
-      this.opts.onchange(newPage);
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name.get()}</div> <div class="Component__search" if="{!!search}" onclick="{handleSearchButtonClick}"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" _data="{_data}" actions="{childActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{5}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.isPending = true;
-
-    this.isValidData = false;
-
-    this.alertApi = '';
-    this.alertText = '';
-
-    this.data = null;
-    this._data = null;
-    this.pagination = null;
-    this.search = null;
-    this.selfActions = null;
-    this.childActions = null;
-
-    this.childComponentName = null;
-    if (swagger.isComponentStyleNumber(this.opts.component.style)) {
-      this.childComponentName = 'dmc-component-number';
-    } else if (swagger.isComponentStyleTable(this.opts.component.style)) {
-      this.childComponentName = 'dmc-component-table';
-    } else if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
-      this.childComponentName = 'dmc-component-graph-bar';
-    }
-
-    this.updater = (query = {}) => {
-      this.isPending = true;
-      this.update();
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_COMPONENTS_GET, this._riot_id, this.opts.component, query))
-        .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
-          message: err.message
-        }));
+var script$27 = function() {
+  this.items = map_1$1(this.opts.options, option => {
+    return {
+      label: option,
+      id: option,
+      isChecked: find_1$2(this.opts.selectedOptions, selectedOption => {
+        return (selectedOption === option);
+      })
     };
+  });
+  this.selectedItems = [].concat(this.opts.selectedOptions);
 
-    this.validateResponse = function(data) {
-      const type = data.getType();
-      const method = this.opts.component.api.method.get();
-      const path = this.opts.component.api.path.get();
-      const style = this.opts.component.style.get();
-
-      if (swagger.isComponentStyleNumber(this.opts.component.style)) {
-        if (type !== 'number') {
-          this.isValidData = false;
-          this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be form of "number".`;
-          return;
-        }
-      }
-
-      if (swagger.isComponentStyleTable(this.opts.component.style)) {
-        if (type !== 'array') {
-          this.isValidData = false;
-          this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be form of "array".`;
-          return;
-        }
-        if (!data.getLength() || data.getValue(0).getType() !== 'object') {
-          this.isValidData = false;
-          this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be composed with "object".`;
-          return;
-        }
-      }
-
-      if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
-        if (type !== 'object') {
-          this.isValidData = false;
-          this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be form of "object".`;
-          return;
-        }
-        if (!data.getValue('keys') || !data.getValue('data') || data.getValue('keys').getType() !== 'array' || data.getValue('data').getType() !== 'array') {
-          this.isValidData = false;
-          this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be composed with "keys" and "data". value sholud be an "array".`;
-          return;
-        }
-        if (!data.getValue('data').getLength() || data.getValue('keys').getLength() !== data.getValue('data').getValue(0).getLength()) {
-          this.isValidData = false;
-          this.alertApi = `${method}: ${path}`;
-          this.alertText = `response of component styled "${style}" should be composed with "keys" and "data". "keys" and "data[idx]" should have same length.`;
-          return;
-        }
-      }
-
-      this.isValidData = true;
-      this.alertText = '';
-    }.bind(this);
-
-    this.on('mount', () => {
-
-      setTimeout(() => {
-        this.updater();
-      }, 1000);
-    });
-
-    store.change(constants.changeComponentsName(this._riot_id), (err, state, store) => {
-      this.isPending = false;
-      const component = store.getter(constants.GETTER_COMPONENTS_ONE, this._riot_id);
-      this.data = component.data;
-      this._data = component._data;
-      if (component.pagination && component.pagination.maxPage > 1) {
-        this.pagination = component.pagination;
-      } else {
-        this.pagination = null;
-      }
-      this.search = component.search;
-      this.selfActions = component.selfActions;
-      this.childActions = component.childActions;
-      this.validateResponse(this._data);
-      this.update();
-    });
-
-    this.handleSearchButtonClick = function() {
-      if (this.isPending) {
+  this.handleCheckboxChange = (isChecked, id) => {
+    if (isChecked) {
+      this.selectedItems.push(id);
+    } else {
+      remove_1$1(this.selectedItems, id);
+    }
+    forEach_1(this.items, item => {
+      if (item.id !== id) {
         return;
       }
+      item.isChecked = isChecked;
+    });
+    this.update();
+    this.opts.onChange(this.selectedItems);
+  };
+};
 
-      const queries = [];
-      array_15(this.search, query => {
-        queries.push({
-          key: query.key.get(),
-          type: query.type.get()
+riot$1.tag2('dmc-table-filter', '<dmc-checkbox each="{item in items}" label="{item.label}" ischecked="{item.isChecked}" id="{item.id}" onchange="{parent.handleCheckboxChange}"></dmc-checkbox>', '', 'class="Table__filter"', function(opts) {
+    this.external(script$27);
+});
+
+var script$25 = function() {
+  const store = this.riotx.get();
+
+  this.isOpened = false;
+  this.title = '';
+  // `id`を優先する。
+  let item = find_1$2(this.opts.items, item => {
+    return (item.key === 'id');
+  });
+  // `id`が無ければ適当に選ぶ。
+  if (!item) {
+    item = this.opts.items[0];
+  }
+  this.title = `${item.cell.getValue()}(${item.title})`;
+  this.visibleKeys = map_1$1(this.opts.items, item => {
+    return item.key;
+  });
+  // filterを通したリスト。
+  this.getItems = () => {
+    return filter_1$1(this.opts.items, item => {
+      if (!find_1$2(this.visibleKeys, key => {
+        return (key === item.key);
+      })) {
+        return false;
+      }
+      return true;
+    });
+  };
+  this.filteredItems = this.getItems();
+
+  this.handleHeaderTitleTap = () => {
+    this.isOpened = !this.isOpened;
+    this.update();
+  };
+
+  this.handleActionButtonTap = () => {
+    store.action(constants$1.MODALS_ADD, 'dmc-table-action', {
+      actions: this.opts.actions,
+      idx: this.opts.idx
+    });
+  };
+
+  this.handleFilterButtonTap = () => {
+    store.action(constants$1.MODALS_ADD, 'dmc-table-filter', {
+      options: map_1$1(this.opts.items, item => {
+        return item.key;
+      }),
+      selectedOptions: this.visibleKeys,
+      onChange: selectedOptions => {
+        this.visibleKeys = selectedOptions;
+        this.filteredItems = this.getItems();
+        this.update();
+      }
+    });
+  };
+
+  this.handleOpenShutButtonTap = () => {
+    this.isOpened = !this.isOpened;
+    this.update();
+  };
+};
+
+riot$1.tag2('dmc-table-items', '<div class="Table__itemsHeader"> <div class="Table__itemsTitle" ref="touch" ontap="handleHeaderTitleTap">{title}</div> <div class="Table__itemsButton" if="{!!opts.actions}" ref="touch" ontap="handleActionButtonTap"> <dmc-icon type="edit"></dmc-icon> </div> <div class="Table__itemsButton" ref="touch" ontap="handleFilterButtonTap"> <dmc-icon type="filter"></dmc-icon> </div> <div class="Table__itemsButton Table__itemsOpenShutButton" ref="touch" ontap="handleOpenShutButtonTap"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-item each="{item in filteredItems}" item="{item}"></dmc-table-item> </virtual>', '', 'class="Table__items {isOpened ? \'Table__items--opened\' : \'\'}"', function(opts) {
+    this.external(script$25);
+});
+
+var script$28 = function() {
+  this.getItemList = () => {
+    const columns = this.opts.columns;
+    const list = [];
+    forEach_1(this.opts.rows, row => {
+      const items = [];
+      forEach_1(columns, column => {
+        items.push({
+          key: column.key,
+          title: column.title,
+          cell: row[column.key]
         });
       });
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-component-searchbox', {
+      list.push(items);
+    });
+    return list;
+  };
+};
+
+riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}"></dmc-table-items>', '', 'class="Table"', function(opts) {
+    this.external(script$28);
+});
+
+var script$29 = function() {
+  const store = this.riotx.get();
+
+  this.getColumns = () => {
+    const columns = [];
+    forEach_1(this.opts.data.getValue(0).getKeys(), k => {
+      columns.push({
+        title: k,
+        key: k
+      });
+    });
+    return columns;
+  };
+
+  this.getRows = () => {
+    const rows = [];
+    forEach_1(this.opts.data.getValue(), cells => {
+      const row = {};
+      forOwn_1$1(cells.getValue(), cell => {
+        row[cell.getKey()] = cell;
+      });
+      rows.push(row);
+    });
+    return rows;
+  };
+
+  this.getActions = () => {
+    const actions = [];
+    forEach_1(this.opts.actions, action => {
+      let value = action.summary;
+      if (!value) {
+        const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
+        value = `${obj.method} ${obj.path}`;
+      }
+      actions.push({
+        id: action.operationId,
+        value,
+        description: action.description,
+        rowData: this.opts.data,
+        onPat: this.handleActionButtonPat
+      });
+    });
+    return actions;
+  };
+
+  this.createInitialQueries = (operation, rowData) => {
+    const queries = {};
+    const parameters = operation.parameters;
+    forEach_1(parameters, parameter => {
+      const name = parameter.name;
+      if (parameter.in === 'body') {
+        queries[name] = {};
+        forOwn_1$1(parameter.schema.properties, (v, k) => {
+          if (rowData.getValue(k)) {
+            queries[name][k] = rowData.getValue(k).getRawValue();
+          }
+        });
+      } else {
+        if (!rowData.getValue(name)) {
+          return;
+        }
+        queries[name] = rowData.getValue(name).getRawValue();
+      }
+    });
+
+    return queries;
+  };
+
+  this.handleActionButtonPat = (operationID, rowData) => {
+    const operation = find_1$2(this.opts.actions, action => {
+      return (action.operationId === operationID);
+    });
+    const initialQueries = this.createInitialQueries(operation, rowData);
+    store.action(constants$1.DRAWERS_ADD, 'dmc-operation', {
+      operation,
+      initialQueries,
+      onSuccess: () => {
+        this.opts.updater();
+      }
+    });
+  };
+};
+
+riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
+    this.external(script$29);
+});
+
+var script$31 = function() {
+  this.queries = this.opts.queries;
+
+  this.handleInputChange = (value, id) => {
+    const query = find_1$2(this.queries, query => {
+      return (query.key === id);
+    });
+    if (!query) {
+      return;
+    }
+    query.value = value;
+    this.update();
+  };
+
+  this.handleSearchButtonPat = () => {
+    this.close();
+    const ret = {};
+    forEach_1(this.queries, query => {
+      ret[query.key] = query.value;
+    });
+    this.opts.onSearch(ret);
+  };
+
+  this.handleCancelButtonPat = () => {
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-component-searchbox', '<div class="Component__searchBoxInputs"> <div class="Component__searchBoxInput" each="{query in queries}"> <div class="Component__searchBoxInputLabel">{query.key}</div> <dmc-textinput id="{query.key}" text="{query.value}" placeholder="{query.type}" onchange="{parent.handleInputChange}"></dmc-textinput> </div> </div> <div class="Component__searchBoxControls"> <dmc-button label="search" onpat="{handleSearchButtonPat}"></dmc-button> <dmc-button label="cancel" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="Component__searchBox"', function(opts) {
+    this.external(script$31);
+});
+
+var script$30 = function() {
+  const store = this.riotx.get();
+
+  // データ取得中か否か。
+  this.isPending = true;
+  // レスポンスデータが有効か否か。
+  this.isValidData = false;
+  // レスポンスデータが不正の時に表示するエラー文言。
+  this.alertApi = '';
+  this.alertText = '';
+  // レスポンスデータ。
+  this.data = null;
+  // ページング情報。
+  this.pagination = null;
+  // ページング情報。
+  this.search = null;
+  // 自身のAPIに対するアクション群。
+  this.selfActions = null;
+  // 子のAPIに対するアクション群。
+  this.childActions = null;
+  // コンポーネントにrenderするRiotタグ名。
+  this.childComponentName = null;
+  if (swagger.isComponentStyleNumber(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-number';
+  } else if (swagger.isComponentStyleTable(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-table';
+  } else if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-graph-bar';
+  } else if (swagger.isComponentStyleGraphScatterplot(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-graph-scatterplot';
+  } else if (swagger.isComponentStyleGraphLine(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-graph-line';
+  } else if (swagger.isComponentStyleGraphHorizontalBar(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-graph-horizontal-bar';
+  } else if (swagger.isComponentStyleGraphStackedBar(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-graph-stacked-bar';
+  } else if (swagger.isComponentStyleGraphHorizontalStackedBar(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-graph-horizontal-stacked-bar';
+  } else if (swagger.isComponentStyleGraphStackedArea(this.opts.component.style)) {
+    this.childComponentName = 'dmc-component-graph-stacked-area';
+  }
+
+  // コンポーネントを更新するための関数。
+  // 子コンポーネントに渡されます。
+  this.updater = (query = {}) => {
+    this.isPending = true;
+    this.update();
+    return Promise
+      .resolve()
+      .then(() => new Promise(resolve => {
+        // 通信が速すぎると見た目がチカチカするので、意図的に通信を遅らせる。
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      }))
+      .then(() => store.action(constants$1.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, query))
+      .catch(err => store.action(constants$1.MODALS_ADD, {
+        error: err
+      }));
+  };
+
+  this.validateResponse = data => {
+    const type = data.getType();
+    const method = this.opts.component.api.method;
+    const path = this.opts.component.api.path;
+    const style = this.opts.component.style;
+
+    if (swagger.isComponentStyleNumber(this.opts.component.style)) {
+      if (type !== 'object' || data.getValue('value') === undefined) {
+        this.isValidData = false;
+        this.alertApi = `${method}: ${path}`;
+        this.alertText = `response of component styled "${style}" should be form of "object" and have "value" key.`;
+        return;
+      }
+    }
+
+    if (swagger.isComponentStyleTable(this.opts.component.style)) {
+      if (type !== 'array') {
+        this.isValidData = false;
+        this.alertApi = `${method}: ${path}`;
+        this.alertText = `response of component styled "${style}" should be form of "array".`;
+        return;
+      }
+      if (!data.getLength() || data.getValue(0).getType() !== 'object') {
+        this.isValidData = false;
+        this.alertApi = `${method}: ${path}`;
+        this.alertText = `response of component styled "${style}" should be composed with "object".`;
+        return;
+      }
+    }
+
+    if (swagger.isComponentStyleGraph(this.opts.component.style)) {
+      if (type !== 'object') {
+        this.isValidData = false;
+        this.alertApi = `${method}: ${path}`;
+        this.alertText = `response of component styled "${style}" should be form of "object".`;
+        return;
+      }
+      if (!data.getValue('data') || !data.getValue('x') || !data.getValue('y') || data.getValue('data').getType() !== 'array') {
+        this.isValidData = false;
+        this.alertApi = `${method}: ${path}`;
+        this.alertText = `response of component styled "${style}" should be composed with at least "x", "y" and "data". "data" value type sholud be an "array".`;
+        return;
+      }
+      if (!data.getValue('data').getLength()) {
+        this.isValidData = false;
+        this.alertApi = `${method}: ${path}`;
+        this.alertText = 'empty';
+        return;
+      }
+    }
+
+    this.isValidData = true;
+    this.alertText = '';
+  };
+
+  this.on('mount', () => {
+    this.updater();
+  }).on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.listen(constants$3.COMPONENTS_ONE(this._riot_id), () => {
+    this.isPending = false;
+    const component = store.getter(constants$4.COMPONENTS_ONE, this._riot_id);
+    this.data = component.data;
+    if (component.pagination && component.pagination.maxPage > 1) {
+      this.pagination = component.pagination;
+    } else {
+      this.pagination = null;
+    }
+    this.search = component.search;
+    this.selfActions = component.selfActions;
+    this.childActions = component.childActions;
+    this.validateResponse(this.data);
+    this.update();
+  });
+
+  this.handleRefreshButtonTap = () => {
+    Promise
+      .resolve()
+      .then(() => {
+        // 更新時に高さが変わらないように。
+        const rect = this.refs.body.getBoundingClientRect();
+        this.refs.body.style.height = `${rect.height}px`;
+      })
+      .then(() => this.updater())
+      .then(() => {
+        this.refs.body.style.height = '';
+      });
+  };
+
+  this.handleSearchButtonTap = () => {
+    if (this.isPending) {
+      return;
+    }
+
+    const queries = [];
+    forEach_1(this.search, query => {
+      queries.push({
+        key: query.key,
+        type: query.type
+      });
+    });
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-component-searchbox', {
         queries,
         onSearch: queries => {
           this.updater(queries);
         }
-      });
-    }.bind(this);
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
 
-    this.handlePaginationChange = function(page) {
-      this.updater({
-        limit: this.pagination.size,
-        offset: (page - 1) * this.pagination.size
-      });
-    }.bind(this);
-
-});
-riot$1.tag2('dmc-component-searchbox', '<div class="Component__searchBoxInputs"> <div class="Component__searchBoxInput" each="{query in queries}"> <div class="Component__searchBoxInputLabel">{query.key}</div> <dmc-input id="{query.key}" text="{query.value}" placeholder="{query.type}" ontextchange="{parent.handleInputChange}"></dmc-input> </div> </div> <div class="Component__searchBoxControls"> <dmc-button label="search" onclick="{handleSearchButtonClick}"></dmc-button> <dmc-button label="cancel" type="secondary" onclick="{handleCancelButtonClick}"></dmc-button> </div>', '', 'class="Component__searchBox"', function(opts) {
-
-    this.queries = this.opts.queries;
-
-    this.closeModal = function() {
-      if (this.opts.isModal) {
-        this.opts.modalCloser();
-      }
-    }.bind(this);
-
-    this.handleInputChange = function(value, id) {
-      const query = array_10(this.queries, query => {
-        return (query.key === id);
-      });
-      if (!query) {
-        return;
-      }
-      query.value = value;
-      this.update();
-    }.bind(this);
-
-    this.handleSearchButtonClick = function() {
-      this.closeModal();
-      const ret = {};
-      array_15(this.queries, query => {
-        ret[query.key] = query.value;
-      });
-      this.opts.onSearch(ret);
-    }.bind(this);
-
-    this.handleCancelButtonClick = function() {
-      this.closeModal();
-    }.bind(this);
-
-});
-riot$1.tag2('dmc-component-action', '<dmc-button label="{opts.action.operationId}" onclick="{handleButtonClick}"></dmc-button>', '', 'class="Component__action"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.handleButtonClick = function() {
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-operation', {
-        operation: this.opts.action,
-        onSuccess: () => {
-          this.opts.updater();
-        }
-      });
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-components', '<div class="ComponentsPage__title">{name}</div> <div class="ComponentsPage__list"> <dmc-component each="{component, idx in components}" component="{component}" idx="{idx}"></dmc-component> </div>', '', 'class="ComponentsPage"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.name = store.getter(constants.GETTER_PAGE_NAME);
-    this.components = store.getter(constants.GETTER_PAGE_COMPONENTS);
-
-    store.change(constants.CHANGE_PAGE, (err, state, store) => {
-      this.name = store.getter(constants.GETTER_PAGE_NAME);
-      this.components = store.getter(constants.GETTER_PAGE_COMPONENTS);
-      this.update();
+  this.handlePaginationChange = page => {
+    this.updater({
+      limit: this.pagination.size,
+      offset: (page - 1) * this.pagination.size
     });
+  };
+};
+
+riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search" if="{!!search}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" actions="{childActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{5}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
+    this.external(script$30);
 });
 
-riot$1.tag2('dmc-empty', '<div class="dmc-empty">dmc-empty</div>', '', '', function(opts) {
+var script$32 = function() {
+  const store = this.riotx.get();
+
+  this.name = store.getter(constants$4.PAGE_NAME);
+  this.components = store.getter(constants$4.PAGE_COMPONENTS);
+
+  this.listen(constants$3.PAGE, () => {
+    this.name = store.getter(constants$4.PAGE_NAME);
+    this.components = store.getter(constants$4.PAGE_COMPONENTS);
+    this.update();
+  });
+};
+
+riot$1.tag2('dmc-components', '<div class="ComponentsPage__title">{name}</div> <div class="ComponentsPage__list"> <dmc-component each="{component, idx in components}" component="{component}"></dmc-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+    this.external(script$32);
 });
+
+var script$33 = function() {};
 
 riot$1.tag2('dmc-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
+    this.external(script$33);
 });
 
-riot$1.tag2('dmc-endpoint', '<div class="Endpoint__head"> <div class="Endpoint__avatar"> <div class="Endpoint__thumbnail" riot-style="background-image:url({opts.thumbnail});"></div> <div class="Endpoint__token {!!opts.token ? \'Endpoint__token--active\' : \'\'}"></div> </div> <div class="Endpoint__menuButton" click="{handleMenuButtonClick}"> <dmc-icon type="ellipsis"></dmc-icon> </div> </div> <div class="Endpoint__body"> <div class="Endpoint__tags" if="{!!opts.tags.length}"> <dmc-tag label="{label}" each="{label in opts.tags}"></dmc-tag> </div> <div class="Endpoint__url">{opts.url}</div> <div class="Endpoint__name">{opts.name}</div> <div class="Endpoint__description">{opts.description}</div> <div class="Endpoint__memo">{opts.memo}</div> </div> <div class="Endpoint__menus" if="{isMenuOpened}" onclick="{handleMenusClick}"> <div class="Endpoint__menuFrame"> <dmc-button onclick="{handleEditButtonClick}" label="編集"></dmc-button> <dmc-button onclick="{handleRemoveButtonClick}" label="削除"></dmc-button> <dmc-button onclick="{handleLogoutButtonClick}" label="ログアウト"></dmc-button> </div> </div>', '', 'class="Endpoint" click="{handleClick}"', function(opts) {
+var script$34 = function() {
+  this.isMenuOpened = false;
 
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.handleTap = () => {
+    this.opts.onentry(this.opts.key);
+  };
+
+  this.handleMenusTap = e => {
+    if (!e.target.classList.contains('EndpointsPage__itemMenus')) {
+      return;
+    }
     this.isMenuOpened = false;
-
-    this.handleClick = function() {
-      this.opts.onentry(this.opts.key);
-    }.bind(this);
-
-    this.handleMenusClick = function(e) {
-      e.stopPropagation();
-      this.isMenuOpened = false;
-      this.update();
-    }.bind(this);
-
-    this.handleMenuButtonClick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      this.isMenuOpened = true;
-      this.update();
-    }.bind(this);
-
-    this.handleEditButtonClick = function() {
-      this.opts.onedit(this.opts.key);
-    }.bind(this);
-
-    this.handleRemoveButtonClick = function() {
-      this.opts.onremove(this.opts.key);
-    }.bind(this);
-
-    this.handleLogoutButtonClick = function() {
-      this.isMenuOpened = false;
-      this.update();
-      this.opts.onlogout(this.opts.key);
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-textarea', '<form class="Textarea__content"> <textarea class="Textarea__input" ref="input" riot-value="{opts.text}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" disabled="{opts.isdisabled}" input="{handleInputChange}" focus="{handleInputFocus}" blur="{handleInputBlur}"></textarea> </form>', '', 'class="Textarea {opts.isfocused ? \'Textarea--focused\' : \'\'} {opts.isdisabled ? \'Textarea--disabled\' : \'\'}" click="{handleClick}"', function(opts) {
-    this.handleClick = function() {
-      this.refs.input.focus();
-    }.bind(this);
-
-    this.handleInputChange = function(e) {
-      const newText = e.target.value.replace(/　/g, ' ');
-      this.opts.ontextchange && this.opts.ontextchange(newText);
-    }.bind(this);
-
-    this.handleInputFocus = function() {
-      this.opts.onfocustoggle && this.opts.onfocustoggle(true);
-    }.bind(this);
-
-    this.handleInputBlur = function() {
-      this.opts.onfocustoggle && this.opts.onfocustoggle(false);
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-entry', '<div class="Entry__title">新しい管理画面を<br>作成する</div> <div class="Entry__form"> <dmc-input text="{endpointURL}" placeholder="エンドポイントURL" pattern="https?://[w/:%#$&amp;?()~.=+-]+" ontextchange="{handleEndpointURLChange}"></dmc-input> <dmc-textarea text="{memo}" placeholder="Writing..." maxlength="20" ontextchange="{handleMemoChange}"></dmc-textarea> </div> <div class="Entry__controls"> <dmc-button type="primary" onclick="{handleRegisterButtonClick}" label="新規作成"></dmc-button> <dmc-button type="secondary" onclick="{handleCancelButtonClick}" label="キャンセル"></dmc-button> </div>', '', 'class="Entry"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.endpointURL = 'https://localhost:3000/swagger.json';
-    this.memo = '';
-
-    this.closeModal = function() {
-      if (this.opts.isModal) {
-        this.opts.modalCloser();
-      }
-    }.bind(this);
-
-    this.handleEndpointURLChange = function(endpointURL) {
-      this.endpointURL = endpointURL;
-      this.update();
-    }.bind(this);
-
-    this.handleMemoChange = function(memo) {
-      this.memo = memo;
-      this.update();
-    }.bind(this);
-
-    this.handleRegisterButtonClick = function() {
-      store.action(constants.ACTION_ENDPOINTS_ADD, this.endpointURL, this.memo)
-      .then(() => {
-        this.closeModal();
-      }).catch(err => {
-         let message;
-         let autoHide;
-         if (this.endpointURL.startsWith('https://')) {
-
-           message = `もしかして:${this.endpointURL}`;
-           autoHide = false;
-         } else {
-           message = err.message;
-           autoHide = true;
-         }
-        store.action(constants.ACTION_TOAST_SHOW, {
-          message,
-          autoHide
-        });
-      });
-    }.bind(this);
-
-    this.handleCancelButtonClick = function() {
-      this.closeModal();
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__list"> <div class="EndpointsPage__addCard" click="{handleEndpointAdd}"> <dmc-icon type="plus"></dmc-icon> </div> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" name="{endpoint.name}" thumbnail="{endpoint.thumbnail}" token="{endpoint.token}" url="{endpoint.url}" description="{endpoint.description}" memo="{endpoint.memo}" tags="{endpoint.tags}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="EndpointsPage"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.endpoints = store.getter(constants.GETTER_ENDPOINTS);
-
-    store.change(constants.CHANGE_ENDPOINTS, (err, state, store) => {
-      this.endpoints = store.getter(constants.GETTER_ENDPOINTS);
-      this.update();
-    });
-
-    this.handleEndpointAdd = function() {
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-entry');
-    }.bind(this);
-
-    this.handleEndpointEntry = function(key) {
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_AUTH_VALIDATE, key))
-        .then(isValid => {
-
-          if (!isValid) {
-            return store.action(constants.ACTION_AUTH_SIGN_IN_SHOW, key);
-          }
-          return router.navigateTo(`/${key}`);
-        });
-    }.bind(this);
-
-    this.handleEndpointEdit = function(key) {
-
-    }.bind(this);
-
-    this.handleEndpointRemove = function(key) {
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_ENDPOINTS_REMOVE, key))
-        .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
-          message: err.message
-        }))
-      ;
-    }.bind(this);
-
-    this.handleEndpointLogout = function(key) {
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_AUTH_REMOVE, key))
-        .catch(err => store.action(constants.ACTION_TOAST_SHOW, {
-          message: err.message
-        }));
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-loading', 'LOADING...', '', 'class="LoadingPage"', function(opts) {
-});
-
-riot$1.tag2('dmc-notfound', 'NOT FOUND', '', 'class="NotfoundPage"', function(opts) {
-});
-
-riot$1.tag2('dmc-drawer', '<div class="Drawer__head"> <div class="media Drawer__endpoint"> <div class="media__image Drawer__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Drawer__endpointBody"> <div class="Drawer__endpointBodyHead"> <div class="Drawer__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Drawer__endpointHost" if="{!!endpoint}">{endpoint.url}</div> </div> <div class="Drawer__endpointBodyTail"> <div class="Drawer__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> <div class="Drawer__closeButton" click="{handleCloseButtonClick}"> <dmc-icon type="close"></dmc-icon> </div> </div> <div class="Drawer__body"> <div class="Dwawer__section"> <div class="Drawer__sectionTitle">ダッシュボード</div> <div class="Drawer__groups"> <dmc-drawer-group each="{group in groupedDashboard}" group="{group}"></dmc-drawer-group> </div> </div> <div class="Drawer__section"> <div class="Drawer__sectionTitle">管理画面</div> <div class="Drawer__groups"> <dmc-drawer-group each="{group in groupedManage}" group="{group}"></dmc-drawer-group> </div> </div> </div>', '', 'class="Drawer"', function(opts) {
-
-    const store = this.riotx.get();
-
-    const group = (items) => {
-      const groups = {};
-      let counter = 0;
-      array_15(items, (item, idx) => {
-        const assignment = item.group.get() || `independent_${idx}`;
-        if (!groups[assignment]) {
-          groups[assignment] = {
-            name: assignment,
-            index: counter,
-            list: [],
-            isIndependent: !item.group.get()
-          };
-          counter = counter + 1;
-        }
-        groups[assignment].list.push(item);
-      });
-
-      const ret = [];
-      object_13(groups, val => {
-        const index = val.index;
-        delete val.index;
-        ret[index] = val;
-      });
-
-      return ret;
-    };
-
-    this.endpoint = store.getter(constants.GETTER_ENDPOINTS_ONE, store.getter(constants.GETTER_CURRENT));
-    const dashboard = store.getter(constants.GETTER_DMC_DASHBOARD);
-    const manage = store.getter(constants.GETTER_DMC_MANAGE);
-    this.groupedDashboard = group(dashboard);
-    this.groupedManage = group(manage);
-
-    store.change(constants.CHANGE_ENDPOINTS, (err, state, store) => {
-      const current = store.getter(constants.GETTER_CURRENT);
-      this.endpoint = store.getter(constants.GETTER_ENDPOINTS_ONE, current);
-      this.update();
-    });
-
-    store.change(constants.CHANGE_DMC, (err, state, store) => {
-      const dashboard = store.getter(constants.GETTER_DMC_DASHBOARD);
-      const manage = store.getter(constants.GETTER_DMC_MANAGE);
-      this.groupedDashboard = group(dashboard);
-      this.groupedManage = group(manage);
-      this.update();
-    });
-
-    this.handleCloseButtonClick = function(e) {
-      e.preventDefault();
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_DRAWER_CLOSE));
-    }.bind(this);
-
-});
-riot$1.tag2('dmc-drawer-group', '<div class="Drawer__groupToggle" onclick="{handleToggleClick}"> <dmc-icon class="Drawer__groupIconHead" type="codeSquareO"></dmc-icon> <div class="Drawer__groupName">{opts.group.isIndependent ? opts.group.list[0].name.get() : opts.group.name}</div> <dmc-icon class="Drawer__groupIconTail {isOpened ? \'Drawer__groupIconTail--opened\' : \'\'}" if="{!opts.group.isIndependent}" type="up"></dmc-icon> </div> <div class="Drawer__groupList {isOpened ? \'Drawer__groupList--opened\' : \'\'}" if="{!opts.group.isIndependent}"> <div class="Drawer__groupListItem" each="{opts.group.list}" onclick="{handleGroupItemClick}">{name.get()}</div> </div>', '', 'class="Drawer__group"', function(opts) {
-
-    this.isOpened = false;
-
-    this.handleToggleClick = function() {
-      if (this.opts.group.isIndependent) {
-
-        let param = router.resolveCurrentPath('/:endpoint/:page?');
-        router.navigateTo(`/${param.endpoint}/${this.opts.group.list[0].id.get()}`);
-      } else {
-        this.isOpened = !this.isOpened;
-        this.update();
-      }
-    }.bind(this);
-
-    this.handleGroupItemClick = function(e) {
-      let param = router.resolveCurrentPath('/:endpoint/:page?');
-      router.navigateTo(`/${param.endpoint}/${e.item.id.get()}`);
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-devtool', '<div style="margin-bottom:10px;">TODO: デバッグ目的のview。不要になったら消すこと。</div> <dmc-button onclick="{handleResetCurrentButtonClick}" label="Storage-&gt;Current リセット"></dmc-button> <dmc-button onclick="{handleResetEndpointsButtonClick}" label="Storage-&gt;Endpoint リセット"></dmc-button><br><br> <dmc-button click="{handleShowToastButtonClick}" label="Show Toast"></dmc-button>', '', '', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.handleResetCurrentButtonClick = function() {
-      store.action(constants.ACTION_CURRENT_REMOVE);
-    }.bind(this);
-
-    this.handleResetEndpointsButtonClick = function() {
-      store.action(constants.ACTION_ENDPOINTS_REMOVE_ALL);
-    }.bind(this);
-
-    this.handleShowToastButtonClick = function() {
-      store.action(constants.ACTION_TOAST_SHOW, {
-        message : 'devtools - toast test'
-      });
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-header', '<div class="Header__groups"> <div class="Header__group"> <div class="Header__menuButton" if="{isMenuEnabled}" click="{handleMenuButtonClick}"> <dmc-icon type="{isMenuOpened ? \'menuUnfold\' : \'menuFold\'}"></dmc-icon> </div> </div> <div class="Header__group"> <dmc-button onclick="{handleDebugButtonClick}" label="debug"></dmc-button> <div class="Header__homeButton" click="{handleHomeButtonClick}"> <dmc-icon type="home"></dmc-icon> </div> </div> </div>', '', 'class="Header"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.isMenuEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
-    this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
-
-    this.handleMenuButtonClick = function(e) {
-      e.preventDefault();
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_DRAWER_TOGGLE));
-    }.bind(this);
-
-    this.handleDebugButtonClick = function() {
-      store.action(constants.ACTION_MODAL_SHOW, 'dmc-devtool');
-    }.bind(this);
-
-    this.handleHomeButtonClick = function(e) {
-      e.preventDefault();
-      router.navigateTo('/');
-    }.bind(this);
-
-    store.change(constants.CHANGE_DRAWER, (err, state, store) => {
-      this.isMenuEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
-      this.isMenuOpened = store.getter(constants.GETTER_DRAWER_OPENED);
-      this.update();
-    });
-});
-
-riot$1.tag2('dmc-signin', '<div class="Signin__title">サインイン</div> <div class="Signin__endpointTitle">{opts.endpoint.title}</div> <div class="Signin__emails" if="{!!emails.length}"> <virtual each="{authtype in emails}"> <dmc-signinemail authtype="{authtype}" onsigninclick="{parent.handleEmailSigninClick}"></dmc-signinemail> </virtual> </div> <div class="Signin__oauths" if="{!!oauths.length}"> <virtual each="{authtype in oauths}"> <dmc-signinoauth authtype="{authtype}" onclick="{parent.handleOAuthClick}"></dmc-signinoauth> </virtual> </div>', '', 'class="Signin"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.oauths = object_36(object_9(this.opts.authtypes, v => {
-      return v.type === constants.AUTH_TYPE_OAUTH;
-    }));
-
-    this.emails = object_36(object_9(this.opts.authtypes, v => {
-      return v.type === constants.AUTH_TYPE_EMAIL;
-    }));
-
-    this.closeModal = function() {
-      if (this.opts.isModal) {
-        this.opts.modalCloser();
-      }
-    }.bind(this);
-
-    this.handleEmailSigninClick = function(email, password, authtype) {
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_AUTH_SIGN_IN_EMAIL, this.opts.key, authtype, email, password))
-        .then(() => {
-          this.closeModal();
-          this.opts.onSignIn();
-        })
-        .catch(err => {
-          store.action(constants.ACTION_TOAST_SHOW, {
-            message: err.message
-          });
-        });
-    }.bind(this);
-
-    this.handleOAuthClick = function(authtype) {
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_AUTH_SIGN_IN_OAUTH, this.opts.key, authtype))
-        .catch(err => {
-          store.action(constants.ACTION_TOAST_SHOW, {
-            message: err.message
-          });
-        });
-    }.bind(this);
-
-});
-riot$1.tag2('dmc-signinemail', '<dmc-input text="{email}" placeholder="e-mail" ontextchange="{handleEmailChange}" type="email"></dmc-input> <dmc-input text="{password}" type="password" placeholder="password" ontextchange="{handlePasswordChange}"></dmc-input> <dmc-button onclick="{handleSigninClick}" label="サインイン"></dmc-button>', '', 'class="Signin__email"', function(opts) {
-
-    this.email = 'fkei@example.com';
-    this.password = '1234567890';
-
-    this.handleEmailChange = function(email) {
-      this.email = email;
-      this.update();
-    }.bind(this);
-
-    this.handlePasswordChange = function(password) {
-      this.password = password;
-      this.update();
-    }.bind(this);
-
-    this.handleSigninClick = function() {
-      this.opts.onsigninclick(this.email, this.password, this.opts.authtype);
-    }.bind(this);
-
-});
-riot$1.tag2('dmc-signinoauth', '<dmc-button onclick="{handleButtonClick}" label="{opts.authtype.provider}"></dmc-button>', '', 'class="Signin__oauth"', function(opts) {
-
-    this.handleButtonClick = function() {
-      this.opts.onclick(this.opts.authtype);
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-toast', '<div>{opts.message}</div>', '', 'class="Toast Toast--{opts.type}" click="{handleClick}"', function(opts) {
-
-    const store = this.riotx.get();
-    let autoHideTimerID;
-
-    this.on('mount', () => {
-      this.show();
-
-      if (this.opts.autohide) {
-        autoHideTimerID = setTimeout(() => {
-          this.hide();
-        }, this.opts.timeout);
-      }
-    });
-
-    this.on('unmount', () => {
-      clearTimeout(autoHideTimerID);
-    });
-
-    this.show = function() {
-
-      setTimeout(() => {
-        this.root.classList.add('Toast--visible');
-      }, 100);
-    }.bind(this);
-
-    this.hide = function() {
-      this.root.classList.remove('Toast--visible');
-
-      setTimeout(() => {
-        store.action(constants.ACTION_TOAST_HIDE, this.opts.id);
-      }, 1000);
-    }.bind(this);
-
-    this.handleClick = function() {
-      clearTimeout(autoHideTimerID);
-      this.hide();
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-toasts', '<virtual each="{toasts}"> <dmc-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}"></dmc-toast> </virtual>', '', 'class="Toasts"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.toasts = store.getter(constants.GETTER_TOAST_LIST);
-
-    store.change(constants.CHANGE_TOAST, (err, state, store) => {
-      this.toasts = store.getter(constants.GETTER_TOAST_LIST);
-      this.update();
-    });
-});
-
-riot$1.tag2('dmc-modal', '<div class="Modal__frame" click="{handleFrameClick}"> <div class="Modal__closeButton" click="{handleCloseButtonClick}"> <dmc-icon type="close"></dmc-icon> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal Modal--{opts.theme}" click="{handleClick}"', function(opts) {
-
-    const store = this.riotx.get();
-
-    let tag;
-
-    this.on('mount', () => {
-
-      tag = riot$1.mount(this.refs.content, this.opts.tagname, index({
-
-        isModal: true,
-
-        modalCloser: this.fadeOut
-      }, this.opts.tagopts))[0];
-      this.fadeIn();
-      window.addEventListener('keydown', this.handleKeyDown);
-    });
-
-    this.on('before-unmount', () => {
-
-      tag.unmount(true);
-    });
-
-    this.on('unmount', () => {
-      window.removeEventListener('keydown', this.handleKeyDown);
-    });
-
-    this.fadeIn = function() {
-      setTimeout(() => {
-        this.root.classList.add('Modal--visible');
-      }, 100);
-    }.bind(this);
-
-    this.fadeOut = function() {
-      this.root.classList.remove('Modal--visible');
-
-      setTimeout(() => {
-        store.action(constants.ACTION_MODAL_HIDE, this.opts.id);
-      }, 1000);
-    }.bind(this);
-
-    this.handleClick = function() {
-      this.fadeOut();
-    }.bind(this);
-
-    this.handleFrameClick = function(e) {
-      e.stopPropagation();
-    }.bind(this);
-
-    this.handleCloseButtonClick = function() {
-      this.fadeOut();
-    }.bind(this);
-
-    this.handleKeyDown = function(e) {
-      switch (e.keyCode) {
-        case 27: `Esc`;
-          this.fadeOut();
-          break;
-        default:
-          break;
-      }
-    }.bind(this);
-});
-
-riot$1.tag2('dmc-modals', '<virtual each="{modals}"> <dmc-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{modalOpts.theme}"></dmc-modal> </virtual>', '', 'class="Modals"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.modals = store.getter(constants.GETTER_MODAL_LIST);
-
-    store.change(constants.CHANGE_MODAL, (err, state, store) => {
-      this.modals = store.getter(constants.GETTER_MODAL_LIST);
-      this.update();
-    });
-});
-
-riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn {Application__asideColumn--opened : isMenuOpened}"> <dmc-drawer></dmc-drawer> </div> <div class="Application__mainColumn"> <div class="Application__head"> <dmc-header></dmc-header> <dmc-toasts></dmc-toasts> </div> <div class="Application__page"> <div data-is="{pageTagName}"></div> </div> </div> </div> <dmc-modals></dmc-modals>', '', 'class="Application"', function(opts) {
-
-    const store = this.riotx.get();
-
-    this.pageTagName = store.getter(constants.GETTER_LOCATION_TAG);
-
-    const isEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
-    const isOpened = store.getter(constants.GETTER_DRAWER_OPENED);
-    this.isMenuOpened = isEnabled && isOpened;
-
-    store.change(constants.CHANGE_DRAWER, (err, state, store) => {
-      const isEnabled = store.getter(constants.GETTER_DRAWER_ENABLED);
-      const isOpened = store.getter(constants.GETTER_DRAWER_OPENED);
-      this.isMenuOpened = isEnabled && isOpened;
-      this.update();
-    });
-
-    store.change(constants.CHANGE_LOCATION, (err, state, store) => {
-      this.pageTagName = store.getter(constants.GETTER_LOCATION_TAG);
-      this.update();
-    });
-
-    store.change(constants.CHANGE_SIGN_IN, (err, state, store) => {
-
-      const key = store.getter(constants.GETTER_AUTH_SIGN_IN_SHOW_KEY);
-      const endpoint = store.getter(constants.GETTER_ENDPOINTS_ONE, key);
-      if (!endpoint) {
-        return router.navigateTo('/');
-      }
-      Promise
-        .resolve()
-        .then(() => store.action(constants.ACTION_AUTHTYPE_GET, key))
-        .then(authtypes => {
-          store.action(constants.ACTION_MODAL_SHOW, 'dmc-signin', {
-            key,
-            endpoint,
-            authtypes,
-            onSignIn: () => {
-              router.navigateTo(`/${key}`);
-            }
-          });
-        })
-        .catch(err => {
-          store.action(constants.ACTION_TOAST_SHOW, {
-            message: err.message
-          });
-        });
-    });
-});
-
-// store definition.
-const setupStore = () => {
-  return Promise
-    .resolve()
-    .then(() => {
-      const store = new riotx.Store({
-        state: {
-          // which page to show.
-          location: {
-            tag: 'dmc-loading',
-            dmcPage: null
-          },
-          // `drawer` is left side column.
-          drawer: {
-            // open or not.
-            isOpened: true,
-            // is drawer enabled.
-            // if false, drawer is not visible.
-            isEnabled : true
-          },
-          // TODO
-          signinShowKey: null,
-          // current selected endpoint.
-          current: store$1.get(constants.STORAGE_CURRENT, null),
-          // TODO
-          oauthEndpointKey: store$1.get(constants.STORAGE_OAUTH_ENDPOINT_KEY, null),
-          // local stored endpoints data.
-          endpoints: store$1.get(constants.STORAGE_ENDPOINTS, {}),
-          // selected endpoint's `/dmc` data.
-          dmc: null,
-          // selected page data in the dmc.
-          page: null,
-          // selected components data in the page.
-          components: {},
-          // toasts data.
-          toasts: store$1.get(constants.STORAGE_TOAST, []),
-          // modal data.
-          modals: []
-        },
-        actions: actions,
-        mutations: mutations,
-        getters: getters
-      });
-      riotx.add(store);
-      // TODO: debug用なので後で消すこと。
-      window.store = store;
-      return store;
-    });
+    this.update();
+  };
+
+  this.handleMenuButtonTap = () => {
+    this.isMenuOpened = true;
+    this.update();
+  };
+
+  this.handleEditButtonPat = () => {
+    this.isMenuOpened = false;
+    this.update();
+    this.opts.onedit(this.opts.key, this.opts.url, this.opts.memo);
+  };
+
+  this.handleRemoveButtonPat = () => {
+    this.opts.onremove(this.opts.key);
+  };
+
+  this.handleLogoutButtonPat = () => {
+    this.isMenuOpened = false;
+    this.update();
+    this.opts.onlogout(this.opts.key);
+  };
 };
 
-// routing definition.
-const setupRouter = (store) => {
-  return Promise
-    .resolve()
-    .then(() => {
-      router.setStore(store).onBefore((/*splitedPathname, pathname */) => {
-        return Promise.resolve();
-      }).onAfter((splitedPathname, pathname) => {
-        if (pathname === '/') {
-          return store.action(constants.ACTION_DRAWER_DISABLE);
-        }
-        return store.action(constants.ACTION_DRAWER_ENABLE);
-      }).on('/:endpointKey/:page?', (params) => {
-        const endpointKey = params.endpointKey;
-        const endpoint = store.getter(constants.GETTER_ENDPOINTS_ONE, params.endpointKey);
-        // unexpected endpoint.
-        if (!endpoint) {
-          return Promise
-            .resolve()
-            .then(() => store.action(constants.ACTION_CURRENT_REMOVE))
-            .then(() => {
-              router.navigateTo('/');
-            });
-        }
+riot$1.tag2('dmc-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemMenuButton" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="ellipsis"></dmc-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemName">{opts.name}</div> <div class="EndpointsPage__itemUrl">{opts.url}</div> <div class="EndpointsPage__itemTags" if="{!!opts.tags.length}"> <dmc-tag each="{label in opts.tags}" label="{label}"></dmc-tag> </div> <div class="EndpointsPage__itemDescription">{opts.description}</div> <div class="EndpointsPage__itemMemo">{opts.memo}</div> </div> <div class="EndpointsPage__itemMenus" if="{isMenuOpened}" ref="touch" ontap="handleMenusTap"> <div class="EndpointsPage__itemMenuFrame"> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleEditButtonPat">編集</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleRemoveButtonPat">削除</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleLogoutButtonPat">ログアウト</div> </div> </div>', '', 'class="EndpointsPage__item" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$34);
+});
 
+var script$36 = function() {
+  this.handleTap = () => {
+    this.refs.form.focus();
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleTextareaInput = e => {
+    const newText = e.target.value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    this.opts.onchange && this.opts.onchange(newText);
+  };
+
+  this.handleTextareaChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
+  };
+};
+
+riot$1.tag2('dmc-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form"> <textarea class="Textarea__input" riot-value="{opts.text}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$36);
+});
+
+var script$37 = function() {
+  const store = this.riotx.get();
+
+  this.memo = this.opts.memo || '';
+
+  this.handleMemoChange = newMemo => {
+    this.memo = newMemo;
+    this.update();
+  };
+
+  this.handleEditButtonPat = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.ENDPOINTS_UPDATE, this.opts.endpointKey, {
+        memo: this.memo
+      }))
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'エンドポイントを編集しました。'
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => store.action(constants$1.TOASTS_ADD, {
+        type: 'error',
+        message: err.message
+      }));
+  };
+
+  this.handleCancelButtonPat = () => {
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-endpoint-edit', '<div class="EndpointsPage__editTitle">管理画面を編集する</div> <div class="EndpointsPage__editUrl">{opts.url}</div> <div class="EndpointsPage__editForm"> <dmc-textarea label="メモ" text="{memo}" placeholder="メモを入力" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__editControls"> <dmc-button type="primary" onpat="{handleEditButtonPat}" label="編集"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
+    this.external(script$37);
+});
+
+var script$38 = function() {
+  const store = this.riotx.get();
+
+  this.isExist = false;
+  this.endpointURL = '';
+  this.memo = '';
+
+  this.handleEndpointURLChange = newEndpointURL => {
+    this.endpointURL = newEndpointURL;
+    this.isExist = !!store.getter(constants$4.ENDPOINTS_ONE_BY_URL, newEndpointURL);
+    this.update();
+  };
+
+  this.handleMemoChange = newMemo => {
+    this.memo = newMemo;
+    this.update();
+  };
+
+  this.handleRegisterButtonPat = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.ENDPOINTS_ADD, this.endpointURL, this.memo))
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'エンドポイントを追加しました。'
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => {
+        let autoHide = true;
+        let linkText;
+        let link;
+        // サーバが自己証明書を使用している場合にページ遷移を促す。
+        if (this.endpointURL.startsWith('https://')) {
+          autoHide = false;
+          linkText = 'Self-Signed Certificate?';
+          link = this.endpointURL;
+        }
+        store.action(constants$1.TOASTS_ADD, {
+          message: err.message,
+          autoHide,
+          linkText,
+          link
+        });
+      });
+  };
+
+  this.handleCancelButtonPat = () => {
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-endpoint-entry', '<div class="EndpointsPage__entryTitle">新しい管理画面を作成する</div> <div class="EndpointsPage__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="EndpointsPage__entryForm"> <dmc-textinput label="エンドポイント" text="{endpointURL}" placeholder="https://localhost:3000/swagger.json" onchange="{handleEndpointURLChange}"></dmc-textinput> <dmc-textarea label="メモ" text="{memo}" placeholder="メモを入力" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__entryControls"> <dmc-button type="primary" isdisabled="{isExist}" onpat="{handleRegisterButtonPat}" label="新規作成"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__entry"', function(opts) {
+    this.external(script$38);
+});
+
+var script$39 = function() {
+  this.email = 'fkei@example.com';
+  this.password = '1234567890';
+
+  this.handleEmailChange = newEmail => {
+    this.email = newEmail;
+    this.update();
+  };
+
+  this.handlePasswordChange = newPassword => {
+    this.password = newPassword;
+    this.update();
+  };
+
+  this.handleSigninPat = () => {
+    this.opts.onsigninpat(this.email, this.password, this.opts.authtype);
+  };
+};
+
+riot$1.tag2('dmc-signinemail', '<dmc-textinput label="メールアドレス" text="{email}" placeholder="e-mail" onchange="{handleEmailChange}" type="email"></dmc-textinput> <dmc-textinput label="パスワード" text="{password}" type="password" placeholder="password" onchange="{handlePasswordChange}"></dmc-textinput> <dmc-button onpat="{handleSigninPat}" label="サインイン"></dmc-button>', '', 'class="EndpointsPage__signinEmail"', function(opts) {
+    this.external(script$39);
+});
+
+var script$40 = function() {
+  this.handleButtonPat = () => {
+    this.opts.onpat(this.opts.authtype);
+  };
+};
+
+riot$1.tag2('dmc-signinoauth', '<dmc-button onpat="{handleButtonPat}" label="{opts.authtype.provider}"></dmc-button>', '', 'class="EndpointsPage__signinOauth"', function(opts) {
+    this.external(script$40);
+});
+
+var script$41 = function() {
+  const store = this.riotx.get();
+
+  this.oauths = values_1(filter$3(this.opts.authtypes, v => {
+    return v.type === 'oauth';
+  }));
+  this.emails = values_1(filter$3(this.opts.authtypes, v => {
+    return v.type === 'email';
+  }));
+
+  this.handleEmailSigninPat = (email, password, authtype) => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.AUTH_SIGNIN_EMAIL, this.opts.key, authtype, email, password))
+      .then(() => {
+        this.close();
+        this.opts.onSignin();
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleOAuthPat = authtype => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.AUTH_SIGNIN_OAUTH, this.opts.key, authtype))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+};
+
+riot$1.tag2('dmc-endpoint-signin', '<div class="EndpointsPage__signinTitle">サインイン</div> <div class="EndpointsPage__signinEmails" if="{!!emails.length}"> <div class="EndpointsPage__signinEmailsTitle">メールアドレス認証</div> <virtual each="{authtype in emails}"> <dmc-signinemail authtype="{authtype}" onsigninpat="{parent.handleEmailSigninPat}"></dmc-signinemail> </virtual> </div> <div class="EndpointsPage__signinOauths" if="{!!oauths.length}"> <div class="EndpointsPage__signinOauthsTitle">OAuth認証</div> <virtual each="{authtype in oauths}"> <dmc-signinoauth authtype="{authtype}" onpat="{parent.handleOAuthPat}"></dmc-signinoauth> </virtual> </div>', '', 'class="EndpointsPage__signin"', function(opts) {
+    this.external(script$41);
+});
+
+var script$35 = function() {
+  const store = this.riotx.get();
+
+  this.endpoints = store.getter(constants$4.ENDPOINTS);
+
+  this.listen(constants$3.ENDPOINTS, () => {
+    this.endpoints = store.getter(constants$4.ENDPOINTS);
+    this.update();
+  });
+
+  this.handleEndpointAddTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-endpoint-entry'))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleEndpointEntry = key => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.AUTH_VALIDATE, key))
+      .then(isValid => {
+        // tokenが有効ならばendpointページに遷移させる。
+        // 無効ならサインイン用のモーダルを表示させる。
+        if (isValid) {
+          this.getRouter().navigateTo(`/${key}`);
+          return Promise.resolve();
+        }
         return Promise
           .resolve()
-          .then(() => store.action(constants.ACTION_CURRENT_UPDATE, endpointKey))
-          .then(() => {
-            // fetch dmc data only when it is not present.
-            const dmc = store.getter(constants.GETTER_DMC);
-            if (!!dmc) {
-              return Promise.resolve();
+          .then(() => store.action(constants$1.AUTH_GET_TYPES, key))
+          .then(authtypes => store.action(constants$1.MODALS_ADD, 'dmc-endpoint-signin', {
+            key,
+            endpoint: store.getter(constants$4.ENDPOINTS_ONE, key),
+            authtypes,
+            onSignin: () => {
+              this.getRouter().navigateTo(`/${key}`);
             }
-            return Promise
-              .resolve()
-              .then(() => swagger.setup(endpoint))
-              .then(() => store.action(constants.ACTION_DMC_GET));
-          })
-          .then(() => {
-            const dmcPage = params.page;
-            if (!dmcPage) {
-              return Promise.resolve();
-            }
-            return Promise
-              .resolve()
-              .then(() => store.action(constants.ACTION_PAGE_GET, dmcPage));
-          })
-          .then(() => {
-            let tag;
-            let dmcPage;
-            if (!!params.page) {
-              tag = 'components';
-              dmcPage = params.page;
-            } else {
-              tag = 'empty';
-              dmcPage = null;
-            }
-            return store.action(constants.ACTION_LOCATION_SET, tag, dmcPage);
-          }).catch((err) => {
-            // TODO: 動作確認すること。
-            if (err.status === 401) {
-              store.action(constants.ACTION_AUTH_SIGN_IN_SHOW);
-            }
-          })
-        ;
-      }).on('/', () => {
-        const current = store.getter(constants.GETTER_CURRENT);
-        if (!!current) {
-          return router.navigateTo(`/${current}`);
-        }
-        return store.action(constants.ACTION_LOCATION_SET, 'endpoints', null);
-      }).on('*', () => {
-        return store.action(constants.ACTION_LOCATION_SET, 'notfound', null);
-      });
-    })
-    .then(() => {
-      router.start();
-    });
+          }));
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleEndpointEdit = (key, url, memo) => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-endpoint-edit', {
+        endpointKey: key,
+        url,
+        memo
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleEndpointRemove = key => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.ENDPOINTS_REMOVE, key))
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'エンドポイントを削除しました。'
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleEndpointLogout = key => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.AUTH_REMOVE, key))
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'エンドポイントからログアウトしました。'
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
 };
 
-// entry point!!
+riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__list"> <div class="EndpointsPage__addCard" ref="touch" ontap="handleEndpointAddTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" name="{endpoint.name}" thumbnail="{endpoint.thumbnail}" token="{endpoint.token}" url="{endpoint.url}" description="{endpoint.description}" memo="{endpoint.memo}" tags="{endpoint.tags}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
+    this.external(script$35);
+});
+
+var script$42 = function() {};
+
+riot$1.tag2('dmc-notfound', '<div>NOT FOUND...</div>', '', 'class="Page NotfoundPage"', function(opts) {
+    this.external(script$42);
+});
+
+var script$43 = function() {};
+
+riot$1.tag2('dmc-blocker', '', '', 'class="Blocker"', function(opts) {
+    this.external(script$43);
+});
+
+var script$44 = function() {
+  const store = this.riotx.get();
+
+  // `tag` = drawer内に展開されるriot tagインスタンス。
+  let tag;
+
+  this.fadeIn = () => {
+    setTimeout(() => {
+      this.root.classList.add('Drawer--visible');
+    }, 100);
+  };
+
+  this.fadeOut = () => {
+    this.root.classList.remove('Drawer--visible');
+
+    setTimeout(() => {
+      store.action(constants$1.DRAWERS_REMOVE, this.opts.id);
+    }, 1000);
+  };
+
+  this.on('mount', () => {
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, index$1$1({
+      isDrawer: true,
+      drawerCloser: this.fadeOut
+    }, this.opts.tagopts))[0];
+    this.fadeIn();
+    window.addEventListener('keydown', this.handleKeyDown);
+  });
+
+  this.on('before-unmount', () => {
+    tag.unmount(true);
+  });
+
+  this.on('unmount', () => {
+    window.removeEventListener('keydown', this.handleKeyDown);
+  });
+
+  this.handleTap = e => {
+    if (!e.target.classList.contains('Drawer')) {
+      return;
+    }
+
+    this.fadeOut();
+  };
+
+  this.handleCloseButtonTap = () => {
+    this.fadeOut();
+  };
+
+  this.handleKeyDown = e => {
+    switch (e.keyCode) {
+    case 27:// Esc
+      this.fadeOut();
+      break;
+    default:
+      break;
+    }
+  };
+};
+
+riot$1.tag2('dmc-drawer', '<div class="Drawer__closeButton" ref="touch" ontap="handleCloseButtonTap"> <dmc-icon type="close"></dmc-icon> </div> <div class="Drawer__frame"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$44);
+});
+
+var script$45 = function() {
+  const store = this.riotx.get();
+
+  this.drawers = store.getter(constants$4.DRAWERS);
+
+  this.listen(constants$3.DRAWERS, () => {
+    this.drawers = store.getter(constants$4.DRAWERS);
+    this.update();
+  });
+};
+
+riot$1.tag2('dmc-drawers', '<virtual each="{drawers}"> <dmc-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}"></dmc-drawer> </virtual>', '', 'class="Drawers"', function(opts) {
+    this.external(script$45);
+});
+
+var script$46 = function() {
+  const store = this.riotx.get();
+
+  this.isMenuEnabled = store.getter(constants$4.MENU_ENABLED);
+  this.isMenuOpened = store.getter(constants$4.MENU_OPENED);
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.listen(constants$3.MENU, () => {
+    this.isMenuEnabled = store.getter(constants$4.MENU_ENABLED);
+    this.isMenuOpened = store.getter(constants$4.MENU_OPENED);
+    this.update();
+  });
+
+  this.handleMenuButtonTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MENU_TOGGLE));
+  };
+
+  this.handleHomeButtonTap = () => {
+    this.getRouter().navigateTo('/');
+  };
+};
+
+riot$1.tag2('dmc-header', '<div class="Header__groups"> <div class="Header_group"> <div class="Header__menuButton" if="{isMenuEnabled}" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="{isMenuOpened ? \'menuUnfold\' : \'menuFold\'}"></dmc-icon> </div> </div> <div class="Header__group"> <div class="Header__homeButton" ref="touch" ontap="handleHomeButtonTap"> <dmc-icon type="home"></dmc-icon> </div> </div> </div>', '', 'class="Header"', function(opts) {
+    this.external(script$46);
+});
+
+var script$47 = function() {
+  const store = this.riotx.get();
+
+  this.isOpened = false;
+  const pageId = store.getter(constants$4.PAGE_ID);
+  if (!!find_1$2(this.opts.group.list, item => {
+    return (item.id === pageId);
+  })) {
+    this.isOpened = true;
+  }
+  map_1$1(this.opts.group.list, item => {
+    if (item.id === pageId) {
+      item.isSelected = true;
+    } else {
+      item.isSelected = false;
+    }
+    return item;
+  });
+
+  this.listen(constants$3.PAGE, () => {
+    const pageId = store.getter(constants$4.PAGE_ID);
+    if (!!find_1$2(this.opts.group.list, item => {
+      return (item.id === pageId);
+    })) {
+      this.isOpened = true;
+    }
+    map_1$1(this.opts.group.list, item => {
+      if (item.id === pageId) {
+        item.isSelected = true;
+      } else {
+        item.isSelected = false;
+      }
+      return item;
+    });
+    this.update();
+  });
+
+  this.handleToggleTap = () => {
+    if (this.opts.group.isIndependent) {
+      this.getRouter().navigateTo(`/${store.getter(constants$4.CURRENT)}/${this.opts.group.list[0].id}`);
+    } else {
+      this.isOpened = !this.isOpened;
+      this.update();
+    }
+  };
+
+  this.handleGroupItemTap = e => {
+    const pageName = this.opts.group.list[Number(e.currentTarget.getAttribute('data-idx'))].id;
+    this.getRouter().navigateTo(`/${store.getter(constants$4.CURRENT)}/${pageName}`);
+  };
+};
+
+riot$1.tag2('dmc-menu-group', '<div class="Menu__groupToggle {opts.group.isIndependent &amp;&amp; opts.group.list[0].isSelected ? \'Menu__groupToggle--selected\' : \'\'}" ref="touch" ontap="handleToggleTap"> <dmc-icon class="Menu__groupIconHead" type="codeSquareO"></dmc-icon> <div class="Menu__groupName">{opts.group.isIndependent ? opts.group.list[0].name : opts.group.name}</div> <dmc-icon class="Menu__groupIconTail {isOpened ? \'Menu__groupIconTail--opened\' : \'\'}" if="{!opts.group.isIndependent}" type="up"></dmc-icon> </div> <div class="Menu__groupList {isOpened ? \'Menu__groupList--opened\' : \'\'}" if="{!opts.group.isIndependent}"> <div class="Menu__groupListItem {item.isSelected ? \'Menu__groupListItem--selected\' : \'\'}" each="{item, idx in opts.group.list}" data-idx="{idx}" ref="touch" ontap="handleGroupItemTap">{item.name}</div> </div>', '', 'class="Menu__group"', function(opts) {
+    this.external(script$47);
+});
+
+var script$48 = function() {
+  const store = this.riotx.get();
+
+  const group = items => {
+    const groups = {};
+    let counter = 0;
+    forEach_1(items, (item, idx) => {
+      const assignment = item.group || `independent_${idx}`;
+      if (!groups[assignment]) {
+        groups[assignment] = {
+          name: assignment,
+          index: counter,
+          list: [],
+          isIndependent: !item.group
+        };
+        counter = counter + 1;
+      }
+      groups[assignment].list.push(item);
+    });
+
+    const ret = [];
+    forOwn_1$1(groups, val => {
+      const index = val.index;
+      delete val.index;
+      ret[index] = val;
+    });
+
+    return ret;
+  };
+
+  const current = store.getter(constants$4.CURRENT);
+  this.endpoint = store.getter(constants$4.ENDPOINTS_ONE, current);
+  const dashboard = store.getter(constants$4.DMC_DASHBOARD);
+  const manage = store.getter(constants$4.DMC_MANAGE);
+  this.groupedDashboard = group(dashboard);
+  this.groupedManage = group(manage);
+
+  this.listen(constants$3.ENDPOINTS, () => {
+    const current = store.getter(constants$4.CURRENT);
+    this.endpoint = store.getter(constants$4.ENDPOINTS_ONE, current);
+    this.update();
+  });
+  this.listen(constants$3.DMC, () => {
+    const dashboard = store.getter(constants$4.DMC_DASHBOARD);
+    const manage = store.getter(constants$4.DMC_MANAGE);
+    this.groupedDashboard = group(dashboard);
+    this.groupedManage = group(manage);
+    this.update();
+  });
+};
+
+riot$1.tag2('dmc-menu', '<div class="Menu__head"> <div class="media Menu__endpoint"> <div class="media__image Menu__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Menu__endpointBody"> <div class="Menu__endpointBodyHead"> <div class="Menu__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Menu__endpointHost" if="{!!endpoint}">{endpoint.url}</div> </div> <div class="Menu__endpointBodyTail"> <div class="Menu__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> </div> <div class="Menu__body"> <div class="Menu__section"> <div class="Menu__sectionTitle">ダッシュボード</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedDashboard}" group="{group}"></dmc-menu-group> </div> </div> <div class="Menu__section"> <div class="Menu__sectionTitle">管理画面</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedManage}" group="{group}"></dmc-menu-group> </div> </div> </div>', '', 'class="Menu"', function(opts) {
+    this.external(script$48);
+});
+
+var script$49 = function() {
+  const store = this.riotx.get();
+
+  let tag;
+
+  this.fadeIn = () => {
+    setTimeout(() => {
+      this.root.classList.add('Modal--visible');
+    }, 100);
+  };
+
+  this.fadeOut = () => {
+    this.root.classList.remove('Modal--visible');
+
+    setTimeout(() => {
+      store.action(constants$1.MODALS_REMOVE, this.opts.id);
+    }, 1000);
+  };
+
+  this.on('mount', () => {
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, index$1$1({
+      isModal: true,
+      modalCloser: this.fadeOut
+    }, this.opts.tagopts))[0];
+    this.fadeIn();
+    window.addEventListener('keydown', this.handleKeyDown);
+  });
+
+  this.on('before-unmount', () => {
+    tag.unmount(true);
+  });
+
+  this.on('unmount', () => {
+    window.removeEventListener('keydown', this.handleKeyDown);
+  });
+
+  this.handleTap = () => {
+    this.fadeOut();
+  };
+
+  this.handleFrameTap = e => {
+    // frameの内側のイベントを外側に伝播させない。
+    if (!e.target.classList.contains('Modal__frame')) {
+      return;
+    }
+    this.fadeOut();
+  };
+
+  this.handleCloseButtonTap = () => {
+    this.fadeOut();
+  };
+
+  this.handleKeyDown = e => {
+    switch (e.keyCode) {
+    case 27: // Esc
+      this.fadeOut();
+      break;
+    default:
+      break;
+    }
+  };
+};
+
+riot$1.tag2('dmc-modal', '<div class="Modal__frame" ref="touch" ontap="handleFrameTap"> <div class="Modal__closeButton" ref="touch" ontap="handleCloseButtonTap"> <dmc-icon type="close"></dmc-icon> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal Modal--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$49);
+});
+
+var script$50 = function() {
+  const store = this.riotx.get();
+
+  this.modals = store.getter(constants$4.MODALS);
+
+  this.listen(constants$3.MODALS, () => {
+    this.modals = store.getter(constants$4.MODALS);
+    this.update();
+  });
+};
+
+riot$1.tag2('dmc-modals', '<virtual each="{modals}"> <dmc-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{modalOpts.theme}"></dmc-modal> </virtual>', '', 'class="Modals"', function(opts) {
+    this.external(script$50);
+});
+
+var script$51 = function() {
+};
+
+riot$1.tag2('dmc-progress', '<div class="Progress__spinner"> <dmc-icon type="loading"></dmc-icon> </div>', '', 'class="Progress"', function(opts) {
+    this.external(script$51);
+});
+
+var script$52 = function() {
+};
+
+riot$1.tag2('dmc-splash', '<div class="Splash__logo"></div>', '', 'class="Splash"', function(opts) {
+    this.external(script$52);
+});
+
+var script$53 = function() {
+  const store = this.riotx.get();
+
+  let autoHideTimerID;
+
+  this.show = () => {
+    // need to set delay after dom mountation.
+    setTimeout(() => {
+      this.root.classList.add('Toast--visible');
+    }, 100);
+  };
+
+  this.hide = () => {
+    this.root.classList.remove('Toast--visible');
+
+    // call action after the hide animation completes.
+    setTimeout(() => {
+      store.action(constants$1.TOASTS_REMOVE, this.opts.id);
+    }, 1000);
+  };
+
+  this.on('mount', () => {
+    this.show();
+
+    if (this.opts.autohide) {
+      autoHideTimerID = setTimeout(() => {
+        this.hide();
+      }, this.opts.timeout);
+    }
+  });
+
+  this.on('unmount', () => {
+    clearTimeout(autoHideTimerID);
+  });
+
+  this.handleTap = () => {
+    clearTimeout(autoHideTimerID);
+    this.hide();
+  };
+
+  this.handleLinkClick = () => {
+    window.open(this.opts.link);
+  };
+};
+
+riot$1.tag2('dmc-toast', '<div class="Toast__icon"> <dmc-icon if="{opts.type === \'normal\'}" type="close"></dmc-icon> <dmc-icon if="{opts.type === \'error\'}" type="exclamation"></dmc-icon> </div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" ref="touch" ontap="handleLinkTap">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$53);
+});
+
+var script$54 = function() {
+  const store = this.riotx.get();
+
+  this.toasts = store.getter(constants$4.TOASTS);
+
+  this.listen(constants$3.TOASTS, () => {
+    this.toasts = store.getter(constants$4.TOASTS);
+    this.update();
+  });
+};
+
+riot$1.tag2('dmc-toasts', '<virtual each="{toasts}"> <dmc-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></dmc-toast> </virtual>', '', 'class="Toasts"', function(opts) {
+    this.external(script$54);
+});
+
+var script$55 = function() {
+  const store = this.riotx.get();
+
+  this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
+  this.isNavigating = store.getter(constants$4.APPLICATION_ISNAVIGATING);
+  this.isNetworking = store.getter(constants$4.APPLICATION_ISNETWORKING);
+  const isEnabled = store.getter(constants$4.MENU_ENABLED);
+  const isOpened = store.getter(constants$4.MENU_OPENED);
+  this.isMenuOpened = isEnabled && isOpened;
+  // 表示すべきページの名前。
+  this.pageName = store.getter(constants$4.LOCATION_NAME);
+  // 表示すべきページのルーティング情報。
+  this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
+
+  this.listen(constants$3.APPLICATION, () => {
+    this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
+    this.isNavigating = store.getter(constants$4.APPLICATION_ISNAVIGATING);
+    this.isNetworking = store.getter(constants$4.APPLICATION_ISNETWORKING);
+    this.update();
+  });
+  this.listen(constants$3.LOCATION, () => {
+    this.pageName = store.getter(constants$4.LOCATION_NAME);
+    this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
+    this.update();
+  });
+  this.listen(constants$3.MENU, () => {
+    const isEnabled = store.getter(constants$4.MENU_ENABLED);
+    const isOpened = store.getter(constants$4.MENU_OPENED);
+    this.isMenuOpened = isEnabled && isOpened;
+    this.update();
+  });
+};
+
+riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> <div class="Application__asideColumn {Application__asideColumn--opened : isMenuOpened}"> <dmc-menu></dmc-menu> </div> <div class="Application__head"> <dmc-header></dmc-header> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
+    this.external(script$55);
+});
+
+// エントリーポイント。
 document.addEventListener('DOMContentLoaded', () => {
-  //TODO: debug用なので後で消すこと。
-  window.swagger = swagger;
+  let _store;
   Promise
     .resolve()
-    .then(() => setupStore())
+    .then(() => mixin.init())
+    .then(() => store$1.init())
     .then(store => {
-      const oauthEndpointKey = store.getter(constants.GETTER_OAUTHENDPOINTKEY);
-      const token = new URL(decodeURIComponent(location.href)).searchParams.get(constants.QUERYSTRING_KEY_TOKEN);
-      if (token) {
-        return Promise
-          .all([
-            store.action(constants.ACTION_CURRENT_UPDATE, oauthEndpointKey),
-            store.action(constants.ACTION_AUTH_UPDATE, oauthEndpointKey, token),
-            store.action(constants.ACTION_OAUTHENDPOINTKEY_REMOVE)
-          ])
-          .then(() => {
-            // TODO: 網羅出来てるか再度チェックすること。
-            location.href = `${location.origin}${location.pathname}`;
-          });
-      }
-      return Promise
-        .resolve()
-        .then(() => {
-          riot$1.mount('dmc');
-        })
-        .then(() => setupRouter(store));
+      _store = store;
+      // TODO: debug用なので後で消すこと。
+      window.store = store;
     })
-    .catch(err => {
-      console.error(err);
-    });
+    .then(() => {
+      // OAuth認証後のリダイレクトではクエリにtokenが格納されている。
+      // tokenがあればOAuth認証とみなす。
+      const token = getParam_1(location.href, 'token');
+      if (!token) {
+        return Promise.resolve();
+      }
+
+      const oauthEndpointKey = _store.getter(constants$4.OAUTH_ENDPOINT_KEY);
+      return Promise
+        .all([
+          _store.action(constants$1.CURRENT_UPDATE, oauthEndpointKey),
+          _store.action(constants$1.AUTH_UPDATE, oauthEndpointKey, token),
+          _store.action(constants$1.OAUTH_ENDPOINT_KEY_REMOVE)
+        ])
+        .then(() => {
+          location.href = `${location.origin}${location.pathname}#/${oauthEndpointKey}`;
+        });
+    })
+    .then(() => {
+      riot$1.mount('dmc');
+    })
+    .then(() => _store.action(constants$1.UA_SETUP))
+    .then(() => router.init(_store))
+    .catch(err => _store.action(constants$1.MODALS_ADD, 'dmc-message', {
+      error: err
+    }));
 });
 
 }());
