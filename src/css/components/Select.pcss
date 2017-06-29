@@ -19,7 +19,7 @@
   border-radius: 3px;
 }
 
-.Select:not(.Select--disabled) .Select__box:hover {
+.Select:not(.Select--disabled) .Select__box.hover {
   border-color: var(--color-basic-darkGray);
 }
 
@@ -102,11 +102,11 @@
   cursor: not-allowed;
 }
 
-.Select__option:not(.Select__option--disabled):hover {
+.Select__option:not(.Select__option--disabled).hover {
   background-color: var(--color-basic-skyblue);
 }
 
-.Select__option:not(.Select__option--disabled):hover .Select__optionLabel,
-.Select__option:not(.Select__option--disabled):hover .Select__optionIcon {
+.Select__option:not(.Select__option--disabled).hover .Select__optionLabel,
+.Select__option:not(.Select__option--disabled).hover .Select__optionIcon {
   color: var(--color-basic-white);
 }
