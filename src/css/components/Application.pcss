@@ -23,14 +23,27 @@
   left: 0;
   width: 0;
   height: calc(100% - var(--component-application-head-height));
+  box-shadow: 0 0 1px rgba(0,0,0,0.1);
   overflow-x: hidden;
   overflow-y: scroll;
-  transition-duration: 100ms;
+  transition-duration: 150ms;
   transition-property: width;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.Application__asideColumn .Menu {
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .Application__asideColumn--opened {
   width: var(--component-application-asideColumn-width);
+}
+
+.Application__asideColumn--opened .Menu {
+  opacity: 1;
 }
 
 .Application__mainColumn {
