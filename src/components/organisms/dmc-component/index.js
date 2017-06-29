@@ -53,8 +53,14 @@ export default function() {
   this.updater = (query = {}) => {
     this.isPending = true;
     this.update();
-    Promise
+    return Promise
       .resolve()
+      .then(() => new Promise(resolve => {
+        // 通信が速すぎると見た目がチカチカするので、意図的に通信を遅らせる。
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      }))
       .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, query))
       .catch(err => store.action(actions.MODALS_ADD, {
         error: err
@@ -139,7 +145,17 @@ export default function() {
   });
 
   this.handleRefreshButtonTap = () => {
-    this.updater();
+    Promise
+      .resolve()
+      .then(() => {
+        // 更新時に高さが変わらないように。
+        const rect = this.refs.body.getBoundingClientRect();
+        this.refs.body.style.height = `${rect.height}px`;
+      })
+      .then(() => this.updater())
+      .then(() => {
+        this.refs.body.style.height = '';
+      });
   };
 
   this.handleSearchButtonTap = () => {

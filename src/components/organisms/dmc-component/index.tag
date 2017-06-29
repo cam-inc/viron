@@ -5,7 +5,7 @@ dmc-component.Component
       dmc-icon(type="reload")
     .Component__search(if="{ !!search }" ref="touch" onTap="handleSearchButtonTap")
       dmc-icon(type="search")
-  .Component__body
+  .Component__body(ref="body")
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
     div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" data="{ data }" actions="{ childActions }" updater="{ updater }")
