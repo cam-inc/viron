@@ -14,11 +14,12 @@ export default function() {
       this.value = this.opts.cell.data.getValue() ? 'O' : 'X';
       break;
     case 'number':
-      this.value = this.opts.cell.data.getValue();
+    case 'integer':
+      this.value = String(this.opts.cell.data.getValue());
       break;
     case 'string':
       // TODO: 画像表示
-      this.value = this.opts.cell.data.getValue();
+      this.value = this.opts.cell.data.getValue() || '-';
       break;
     case 'object':
     case 'array':

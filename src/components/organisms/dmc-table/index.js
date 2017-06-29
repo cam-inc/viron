@@ -1,22 +1,30 @@
+import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
 
 export default function() {
   this.getColumns = () => {
     // TODO: 必要に応じて機能と追加すること。
     // TODO: columnsを編集すればrowsも自動的に変更される想定
-    return this.opts.columns;
+    // TODO: 見直すこと
+    return filter(this.opts.columns, column => {
+      return (column.key !== 'dmc_table_action_key');
+    });
   };
 
-  this.getRows = () => {
+  this.getItemList = () => {
     const columns = this.getColumns();
-    const rows = [];
+    const list = [];
     forEach(this.opts.rows, row => {
-      const arrayedRow = [];
+      const items = [];
       forEach(columns, column => {
-        arrayedRow.push(row[column.key]);
+        items.push({
+          key: column.key,
+          title: column.title,
+          value: row[column.key]
+        });
       });
-      rows.push(arrayedRow);
+      list.push(items);
     });
-    return rows;
+    return list;
   };
 }

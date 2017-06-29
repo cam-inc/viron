@@ -3,6 +3,6 @@ export default function() {
     if (this.opts.isdisabled) {
       return;
     }
-    this.opts.onchange && this.opts.onchange(!this.opts.ischecked);
+    this.opts.onchange && this.opts.onchange(!this.opts.ischecked, this.opts.id);
   };
 }

@@ -111,7 +111,7 @@ class Swagger {
    */
   mergeSchemaAndResponse(schema, response) {
     // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
-    // type will be one of "null", "boolean", "object", "array", "number" or "string".
+    // type will be one of "null", "boolean", "object", "array", "number", "string" or "integer".
     let type = schema.type;
     // if type is not defined or an array, expect type by response.
     if (!type || Array.isArray(type)) {
@@ -236,7 +236,12 @@ class Swagger {
       ret._rawValue = response;
       break;
     case 'string':
-      ret._type = 'number';
+      ret._type = 'string';
+      ret._value = response;
+      ret._rawValue = response;
+      break;
+    case 'integer':
+      ret._type = 'integer';
       ret._value = response;
       ret._rawValue = response;
       break;

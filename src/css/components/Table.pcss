@@ -1,68 +1,124 @@
 .Table {
-  /* TODO: 正しいscroll対応*/
   display: block;
-  width: 0;
-  /*
-  display: table;
-  width: 100%;
-*/
-  border-spacing: 0;
-  border-collapse: collapse;
 }
 
-.Table__head {
-  display: table-header-group;
-  background-color: var(--color-basic-gray);
+/* ============================== */
+/* items */
+/* ============================== */
+
+.Table__items {
+  display: block;
+  margin-bottom: 12px;
+  padding: 8px;
+  background-color: var(--color-bg-tertiaryLight);
+  border-radius: 4px;
 }
 
-.Table__headRow {
-  display: table-row;
+.Table .Table__items:last-child {
+  margin-bottom: 0;
 }
 
-.Table__headCell {
-  display: table-cell;
-  padding: 10px 20px;
-  font-size: 11px;
-  color: var(--color-basic-white);
+.Table__itemsHeader {
+  @apply --layout-center-center;
 }
 
-.Table__row {
-  display: table-row;
+.Table__items--opened .Table__itemsHeader {
+  margin-bottom: 8px;
+}
+
+.Table__itemsTitle {
+  @apply --text-truncate;
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+.Table__itemsTitle.hover {
+  opacity: 0.5;
+}
+
+.Table__itemsButton {
+  @apply --layout-center-center;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  background-color: #fff;
+  border-radius: 2px;
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+.Table__itemsButton.hover {
+  opacity: 0.5;
+}
+
+.Table__itemsOpenShutButton .Icon {
+  transition-property: transform;
   transition-duration: 100ms;
-  transition-property: background-color;
 }
 
-.Table__row.hover {
-  background-color: var(--color-basic-lightGray);
+.Table__items--opened .Table__itemsOpenShutButton .Icon {
+  transform: rotate(180deg);
 }
 
-.Table__body {
-  display: table-row-group;
-  background-color: var(--color-basic-white);
+/* ============================== */
+/* item */
+/* ============================== */
+
+.Table__item {
+  display: block;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-left: 2px solid var(--color-bg-tertiary);
+  border-right: 2px solid var(--color-bg-tertiary);
+  background-color: #fff;
+}
+
+.Table__items .Table__item:last-child {
+  margin-bottom: 0;
+}
+
+.Table__itemHeader {
+  @apply --layout-center-center;
+  cursor: pointer;
+}
+
+.Table__itemHeader.hover {
+  opacity: 0.5;
+}
+
+.Table__itemTitle {
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.Table__item--opened .Table__itemHeader {
+  margin-bottom: 4px;
+}
+
+.Table__itemOpenShut {
+  @apply --layout-center-center;
+  width: 12px;
+  height: 12px;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.Table__itemOpenShut .Icon {
+  transition-property: transform;
+  transition-duration: 100ms;
+}
+
+.Table__item--opened .Table__itemOpenShut .Icon {
+  transform: rotate(180deg);
 }
 
 .Table__cell {
-  display: table-cell;
-  padding: 40px 20px;
-  font-size: 13px;
-  border-bottom: 1px solid var(--color-basic-lightGray);
-}
-
-.Table__cellValue {
   display: block;
 }
 
-.Table__action {
-  position: relative;
+/* ============================== */
+/* filter */
+/* ============================== */
+.Table__filter {
   display: block;
-}
-
-.Table__action .Button {
-  display: block;
-}
-
-.Table__action .Tooltip {
-  position: absolute;
-  top: 0;
-  left: 50%;
 }
