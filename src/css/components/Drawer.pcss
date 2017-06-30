@@ -1,0 +1,56 @@
+.Drawer {
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;
+}
+
+.Drawer--visible {
+  pointer-events: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.Drawer__closeButton {
+  @apply --layout-center-center;
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  color: var(--color-basic-white);
+  cursor: pointer;
+  opacity: 0;
+  transition-duration: 300ms;
+  transition-property: transform, opacity;
+}
+
+.Drawer--visible .Drawer__closeButton {
+  opacity: 1;
+}
+
+.Drawer__closeButton.hover {
+  opacity: 0.5;
+}
+
+.Drawer__frame {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 90%;
+  height: 100%;
+  overflow: scroll;
+  background-color: var(--color-basic-white);
+  opacity: 0;
+  transition-duration: 300ms;
+  transition-property: transform, opacity;
+  transform: translateX(100px);
+}
+
+.Drawer--visible .Drawer__frame {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.Drawer__content {
+}

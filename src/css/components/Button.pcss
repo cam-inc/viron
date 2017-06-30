@@ -1,0 +1,78 @@
+.Button {
+  display: inline-block;
+  padding: 16px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.Button--disabled {
+  cursor: not-allowed;
+}
+
+/* ============================== */
+/* theme */
+/* ============================== */
+.Button--primary {
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-skyblue);
+}
+
+.Button--primary.Button--disabled,
+.Button--primary.hover {
+  background-color: var(--color-basic-lightPurple);
+}
+
+.Button--secondary {
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-gray);
+}
+
+.Button--secondary.Button--disabled,
+.Button--secondary.hover {
+  background-color: var(--color-basic-lightGray);
+}
+
+.Button--emphasis {
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-red);
+}
+
+.Button--emphasis.Button--disabled,
+.Button--emphasis.hover {
+  background-color: var(--color-basic-lightGray);
+}
+
+.Button--primaryGhost {
+  color: var(--color-basic-skyblue);
+  border: 3px solid var(--color-basic-skyblue);
+}
+
+.Button--primaryGhost.Button--disabled,
+.Button--primaryGhost.hover {
+  color: var(--color-basic-lightPurple);
+  border-color: var(--color-basic-lightPurple);
+}
+
+.Button--secondaryGhost {
+  color: var(--color-basic-gray);
+  border: 3px solid var(--color-basic-gray);
+}
+
+.Button--secondaryGhost.Button--disabled,
+.Button--secondaryGhost.hover {
+  color: var(--color-basic-lightGray);
+  border-color: var(--color-basic-lightGray);
+}
+
+.Button--emphasisGhost {
+  color: var(--color-basic-red);
+  border: 3px solid var(--color-basic-red);
+}
+
+.Button--emphasisGhost.Button--disabled,
+.Button--emphasisGhost.hover {
+  color: var(--color-basic-lightGray);
+  border-color: var(--color-basic-lightGray);
+}

@@ -1,0 +1,30 @@
+.Header {
+  display: block;
+  background-color: var(--color-basic-white);
+}
+
+.Header__groups {
+  @apply --layout-between-center;
+  width: 100%;
+  height: 100%;
+  padding: 0 16px;
+}
+
+.Header__group {
+  @apply --layout-center-center;
+}
+
+.Header__menuButton,
+.Header__homeButton {
+  @apply --layout-between-center;
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  color: var(--color-basic-black);
+  cursor: pointer;
+}
+
+.Header__menuButton.hover,
+.Header__homeButton.hover {
+  color: var(--color-basic-gray);
+}

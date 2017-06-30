@@ -1,0 +1,175 @@
+:root {
+  --component-operation-info-height: 80px;
+  --component-operation-control-height: 80px;
+}
+
+.Operation {
+  position: relative;
+  display: block;
+  height: 100%;
+}
+
+.Operation__info {
+  @apply --layout-center-start;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--component-operation-info-height);
+  padding: 0 32px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+}
+
+.Operation__summary {
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.Operation__description {
+  @apply --text-truncate;
+  font-size: 12px;
+}
+
+.Operation__control {
+  @apply --layout-center-center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--component-operation-control-height);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+}
+
+.Operation__control .Button:first-child {
+  margin-right: 8px;
+}
+
+.Operation__parameters {
+  position: absolute;
+  top: var(--component-operation-info-height);
+  left: 0;
+  width: 100%;
+  height: calc(100% - var(--component-operation-info-height) - var(--component-operation-control-height));
+  padding: 32px;
+  overflow-y: scroll;
+}
+
+.Operation__parameter {
+  display: block;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--color-basic-lightGray);
+  border-radius: 8px;
+}
+
+.Operation__parameter:last-child {
+  margin-bottom: 0;
+}
+
+.Operation__parameterHead {
+  @apply --layout-between-center;
+  padding: 8px;
+  margin-bottom: 8px;
+  background-color: var(--color-basic-lightGray);
+}
+
+.Operation__parameterName {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.Operation__parameterDescription {
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.Operation__parameterIn {
+  font-size: 10px;
+}
+
+.Operation__parameterRequired {
+  font-size: 10px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-basic-red);
+}
+
+.Operation__schema {
+  display: block;
+}
+
+.Operation__schemaForm {
+  display: block;
+  padding: 12px 0 12px 12px;
+  margin: 12px 0;
+  border-left: 2px dotted var(--color-basic-lightGray);
+}
+
+.Operation__schemaFormDescription {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.Operation__schemaFormRequired {
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-basic-red);
+}
+
+.Operation__schemaFormName {
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.Operation__schemaFormType {
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.Operation__schemaFormFormat {
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.Operation__schemaFormChildren {
+  padding-left: 12px;
+  margin: 12px 0;
+  border-left: 2px solid var(--color-basic-lightGray);
+}
+
+.Operation__schemaFormMultiPlusButton,
+.Operation__schemaFormMultiMinusButton {
+  @apply --layout-center-center;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  color: var(--color-basic-white);
+  cursor: pointer;
+  background-color: var(--color-basic-darkGray);
+  border-radius: 50%;
+}
+
+.Operation__schemaFormMultiPlusButton.hover,
+.Operation__schemaFormMultiMinusButton.hover {
+  background-color: var(--color-basic-gray);
+}
+
+.Operation__schemaForm .Textinput {
+  display: block;
+}
+
+.Operation__parameterForm {
+  display: block;
+  padding: 12px 0 12px 12px;
+  border-left: 2px dotted var(--color-basic-lightGray);
+}
+
+.Operation__parameterForm .Textinput {
+  display: block;
+}

@@ -1,8 +1,0 @@
-.Tag {
-  display: inline-block;
-  padding: 4px 6px;
-  font-size: 14px;
-  color: var(--color-text-default);
-  background-color: var(--color-basic-lightGray);
-  border-radius: 4px;
-}
