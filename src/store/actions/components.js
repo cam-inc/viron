@@ -31,18 +31,16 @@ export default {
         return reject(`[fetch] API definition is not found. ${method} ${path}`);
       }
       // 関連のあるpath情報を取得します。
-      const pathRefs = [{
-        // `isSelf`はpath情報が自身のpathか関連APIのpathかを判断するためのフラグ。
-        isSelf: true,
-        path
-      }];
-      // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
-      forEach(pathItemObject['get']['x-ref'] || [], path => {
+      let pathRefs = [];
+      forEach(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
         pathRefs.push({
-          isSelf: false,
-          path
+          path,
+          method,
+          appendTo: 'self'
         });
       });
+      // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
+      pathRefs = pathRefs.concat(pathItemObject['get']['x-ref'] || []);
       // @see: http://swagger.io/specification/#operationObject
       const operationObject = pathItemObject[method];
       const api = swagger.getApiByOperationID(operationObject.operationId);

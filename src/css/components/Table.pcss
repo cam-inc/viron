@@ -5,7 +5,6 @@
 /* ============================== */
 /* items */
 /* ============================== */
-
 .Table__items {
   display: block;
   margin-bottom: 12px;
@@ -121,4 +120,45 @@
 /* ============================== */
 .Table__filter {
   display: block;
+}
+
+/* ============================== */
+/* action */
+/* ============================== */
+.Table__action {
+  display: block;
+}
+
+.Table__actionItem {
+  @apply --layout-center-center;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-left: 2px solid var(--color-bg-tertiary);
+  background-color: #fff;
+}
+
+.Table__actionItem:last-child {
+  margin-bottom: 0;
+}
+
+.Table__actionInner {
+  flex-grow: 1;
+  margin-right: 8px;
+}
+
+.Table__actionTitle {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.Table__actionExecuteButton {
+  padding: 8px;
+  background-color: var(--color-basic-skyblue);
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.Table__actionExecuteButton.hover {
+  background-color: var(--color-basic-lightPurple);
 }

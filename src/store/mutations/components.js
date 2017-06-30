@@ -1,8 +1,5 @@
-import contains from 'mout/array/contains';
-import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
-import map from 'mout/array/map';
-import forOwn from 'mout/object/forOwn';
+import ObjectAssign from 'object-assign';
 import swagger from '../../core/swagger';
 import { constants as states } from '../states';
 
@@ -40,26 +37,14 @@ export default {
     const actions = [];
     forEach(params.pathRefs, ref => {
       const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
-      forOwn(pathItemObject, (value, key) => {
-        // GETメソッドはサポートしない。
-        if (contains(['put', 'post', 'delete', 'options', 'head', 'patch'], key)) {
-          actions.push({
-            isSelf: ref.isSelf,
-            operationObject: value
-          });
-        }
-      });
+      if (!pathItemObject[ref.method]) {
+        return;
+      }
+      actions.push(ObjectAssign({
+        pathItemObject: pathItemObject[ref.method]
+      }, ref));
     });
-    context.state.components[params.component_uid].selfActions = map(filter(actions, action => {
-      return action.isSelf;
-    }), action => {
-      return action.operationObject;
-    });
-    context.state.components[params.component_uid].childActions = map(filter(actions, action => {
-      return !action.isSelf;
-    }), action => {
-      return action.operationObject;
-    });
+    context.state.components[params.component_uid].actions = actions;
 
     return [states.COMPONENTS_ONE(params.component_uid)];
   },

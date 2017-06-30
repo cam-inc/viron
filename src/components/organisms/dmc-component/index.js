@@ -22,10 +22,10 @@ export default function() {
   this.pagination = null;
   // ページング情報。
   this.search = null;
-  // 自身のAPIに対するアクション群。
+  // 自身に関するアクション群。
   this.selfActions = null;
-  // 子のAPIに対するアクション群。
-  this.childActions = null;
+  // テーブル行に関するアクション群。
+  this.rowActions = null;
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   if (swagger.isComponentStyleNumber(this.opts.component.style)) {
@@ -138,8 +138,8 @@ export default function() {
       this.pagination = null;
     }
     this.search = component.search;
-    this.selfActions = component.selfActions;
-    this.childActions = component.childActions;
+    this.selfActions = store.getter(getters.COMPONENTS_ONE_SELF_ACTIONS, this._riot_id);
+    this.rowActions = store.getter(getters.COMPONENTS_ONE_ROW_ACTIONS, this._riot_id);
     this.validateResponse(this.data);
     this.update();
   });

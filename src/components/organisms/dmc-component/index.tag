@@ -8,7 +8,7 @@ dmc-component.Component
   .Component__body(ref="body")
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
-    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" data="{ data }" actions="{ childActions }" updater="{ updater }")
+    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" data="{ data }" rowActions="{ rowActions }" updater="{ updater }")
     .Component__alert(if="{ !isPending && !isValidData }")
       .Component__alertApi { alertApi }
       .Component__alertText { alertText }

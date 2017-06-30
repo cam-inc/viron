@@ -1,5 +1,9 @@
 dmc-table-action.Table__action
-  dmc-button(each="{ action, idx in opts.actions }" id="{ idx }" label="{ action.value }" onPat="{ parent.handleActionButtonPat }")
+  .Table__actionItem(each="{ action, idx in opts.actions }")
+    .Table__actionInner
+      .Table__actionTitle { action.value }
+      .Table__actionDescription { action.description }
+    .Table__actionExecuteButton(id="{ idx }" ref="touch" onTap="parent.handleActionButtonPat") execute
 
   script.
     import script from './action';

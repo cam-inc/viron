@@ -33,10 +33,10 @@ export default function() {
 
   this.getActions = () => {
     const actions = [];
-    forEach(this.opts.actions, action => {
+    forEach(this.opts.rowactions, action => {
       let value = action.summary;
       if (!value) {
-        const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
+        const obj = swagger.getMethodAndPathByOperationID(action.operationId);
         value = `${obj.method} ${obj.path}`;
       }
       actions.push({
@@ -74,7 +74,7 @@ export default function() {
   };
 
   this.handleActionButtonPat = (operationID, rowData) => {
-    const operation = find(this.opts.actions, action => {
+    const operation = find(this.opts.rowactions, action => {
       return (action.operationId === operationID);
     });
     const initialQueries = this.createInitialQueries(operation, rowData);
