@@ -7358,49 +7358,6 @@ var application$1 = {
     var contains_1$1 = contains$1;
 
 /**
-     * Array filter
-     */
-    function filter$1(arr, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            if (callback(value, i, arr)) {
-                results.push(value);
-            }
-        }
-
-        return results;
-    }
-
-    var filter_1$1 = filter$1;
-
-/**
-     * Array map
-     */
-    function map$1(arr, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var results = [];
-        if (arr == null){
-            return results;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            results[i] = callback(arr[i], i, arr);
-        }
-
-        return results;
-    }
-
-     var map_1$1 = map$1;
-
-/**
      * Checks if the object is a primitive
      */
 
@@ -7759,26 +7716,14 @@ var components$1 = {
     const actions = [];
     forEach_1(params.pathRefs, ref => {
       const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
-      forOwn_1$1(pathItemObject, (value, key) => {
-        // GETメソッドはサポートしない。
-        if (contains_1$1(['put', 'post', 'delete', 'options', 'head', 'patch'], key)) {
-          actions.push({
-            isSelf: ref.isSelf,
-            operationObject: value
-          });
-        }
-      });
+      if (!pathItemObject[ref.method]) {
+        return;
+      }
+      actions.push(index$1$1({
+        pathItemObject: pathItemObject[ref.method]
+      }, ref));
     });
-    context.state.components[params.component_uid].selfActions = map_1$1(filter_1$1(actions, action => {
-      return action.isSelf;
-    }), action => {
-      return action.operationObject;
-    });
-    context.state.components[params.component_uid].childActions = map_1$1(filter_1$1(actions, action => {
-      return !action.isSelf;
-    }), action => {
-      return action.operationObject;
-    });
+    context.state.components[params.component_uid].actions = actions;
 
     return [constants$3.COMPONENTS_ONE(params.component_uid)];
   },
@@ -8356,6 +8301,10 @@ const commonFetch = (context, url, options) => {
         return Promise.reject(response);
       }
       return Promise.resolve(response);
+    })
+    .catch(err => {
+      context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      throw err;
     });
 };
 
@@ -8397,6 +8346,49 @@ var application$3 = {
   }
 };
 
+/**
+     * Array filter
+     */
+    function filter$1(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var filter_1$1 = filter$1;
+
+/**
+     * Array map
+     */
+    function map$1(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null){
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            results[i] = callback(arr[i], i, arr);
+        }
+
+        return results;
+    }
+
+     var map_1$1 = map$1;
+
 var components$2 = {
   /**
    * 全情報を返します。
@@ -8415,6 +8407,38 @@ var components$2 = {
    */
   one: (context, riotId) => {
     return context.state.components[riotId];
+  },
+
+  /**
+   * 自身に関連するactionを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  selfActions: (context, riotId) => {
+    const actions = context.state.components[riotId].actions;
+    const selfActions = filter_1$1(actions, action => {
+      return (!action.appendTo || action.appendTo === 'self');
+    });
+    return map_1$1(selfActions, action => {
+      return action.pathItemObject;
+    });
+  },
+
+  /**
+   * テーブル行に関連するactionを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  rowActions: (context, riotId) => {
+    const actions = context.state.components[riotId].actions;
+    const selfActions = filter_1$1(actions, action => {
+      return (action.appendTo === 'row');
+    });
+    return map_1$1(selfActions, action => {
+      return action.pathItemObject;
+    });
   }
 };
 
@@ -8809,7 +8833,9 @@ const constants$4 = {
   APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
   COMPONENTS: 'COMPONENTS',
-  COMPONENTS_GET: 'COMPONENTS_GET',
+  COMPONENTS_ONE: 'COMPONENTS_ONE',
+  COMPONENTS_ONE_SELF_ACTIONS: 'COMPONENTS_ONE_SELF_ACTIONS',
+  COMPONENTS_ONE_ROW_ACTIONS: 'COMPONENTS_ONE_ROW_ACTIONS',
   CURRENT: 'CURRENT',
   DMC: 'DMC',
   DMC_PAGES: 'DMC_PAGES',
@@ -8844,6 +8870,8 @@ var getters = {
   [constants$4.APPLICATION_ISNETWORKING]: application$3.isNetworking,
   [constants$4.COMPONENTS]: components$2.all,
   [constants$4.COMPONENTS_ONE]: components$2.one,
+  [constants$4.COMPONENTS_ONE_SELF_ACTIONS]: components$2.selfActions,
+  [constants$4.COMPONENTS_ONE_ROW_ACTIONS]: components$2.rowActions,
   [constants$4.CURRENT]: current$2.all,
   [constants$4.DMC]: dmc$2.all,
   [constants$4.DMC_PAGES]: dmc$2.pages,
@@ -9027,18 +9055,16 @@ var components$3 = {
         return reject(`[fetch] API definition is not found. ${method} ${path}`);
       }
       // 関連のあるpath情報を取得します。
-      const pathRefs = [{
-        // `isSelf`はpath情報が自身のpathか関連APIのpathかを判断するためのフラグ。
-        isSelf: true,
-        path
-      }];
-      // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
-      forEach_1(pathItemObject['get']['x-ref'] || [], path => {
+      let pathRefs = [];
+      forEach_1(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
         pathRefs.push({
-          isSelf: false,
-          path
+          path,
+          method,
+          appendTo: 'self'
         });
       });
+      // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
+      pathRefs = pathRefs.concat(pathItemObject['get']['x-ref'] || []);
       // @see: http://swagger.io/specification/#operationObject
       const operationObject = pathItemObject[method];
       const api = swagger.getApiByOperationID(operationObject.operationId);
@@ -40359,13 +40385,14 @@ riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap=
 });
 
 var script$26 = function() {
-  this.handleActionButtonPat = id => {
+  this.handleActionButtonPat = e => {
+    const id = e.target.getAttribute('id');
     this.opts.actions[id].onPat(this.opts.actions[id].id, this.opts.actions[id].rowData.getValue(this.opts.idx));
     this.close();
   };
 };
 
-riot$1.tag2('dmc-table-action', '<dmc-button each="{action, idx in opts.actions}" id="{idx}" label="{action.value}" onpat="{parent.handleActionButtonPat}"></dmc-button>', '', 'class="Table__action"', function(opts) {
+riot$1.tag2('dmc-table-action', '<div class="Table__actionItem" each="{action, idx in opts.actions}"> <div class="Table__actionInner"> <div class="Table__actionTitle">{action.value}</div> <div class="Table__actionDescription">{action.description}</div> </div> <div class="Table__actionExecuteButton" id="{idx}" ref="touch" ontap="parent.handleActionButtonPat">execute</div> </div>', '', 'class="Table__action"', function(opts) {
     this.external(script$26);
 });
 
@@ -40530,10 +40557,10 @@ var script$29 = function() {
 
   this.getActions = () => {
     const actions = [];
-    forEach_1(this.opts.actions, action => {
+    forEach_1(this.opts.rowactions, action => {
       let value = action.summary;
       if (!value) {
-        const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
+        const obj = swagger.getMethodAndPathByOperationID(action.operationId);
         value = `${obj.method} ${obj.path}`;
       }
       actions.push({
@@ -40571,7 +40598,7 @@ var script$29 = function() {
   };
 
   this.handleActionButtonPat = (operationID, rowData) => {
-    const operation = find_1$2(this.opts.actions, action => {
+    const operation = find_1$2(this.opts.rowactions, action => {
       return (action.operationId === operationID);
     });
     const initialQueries = this.createInitialQueries(operation, rowData);
@@ -40637,10 +40664,10 @@ var script$30 = function() {
   this.pagination = null;
   // ページング情報。
   this.search = null;
-  // 自身のAPIに対するアクション群。
+  // 自身に関するアクション群。
   this.selfActions = null;
-  // 子のAPIに対するアクション群。
-  this.childActions = null;
+  // テーブル行に関するアクション群。
+  this.rowActions = null;
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   if (swagger.isComponentStyleNumber(this.opts.component.style)) {
@@ -40753,8 +40780,8 @@ var script$30 = function() {
       this.pagination = null;
     }
     this.search = component.search;
-    this.selfActions = component.selfActions;
-    this.childActions = component.childActions;
+    this.selfActions = store.getter(constants$4.COMPONENTS_ONE_SELF_ACTIONS, this._riot_id);
+    this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ROW_ACTIONS, this._riot_id);
     this.validateResponse(this.data);
     this.update();
   });
@@ -40806,7 +40833,7 @@ var script$30 = function() {
   };
 };
 
-riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search" if="{!!search}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" actions="{childActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{5}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
+riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search" if="{!!search}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{5}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
     this.external(script$30);
 });
 
