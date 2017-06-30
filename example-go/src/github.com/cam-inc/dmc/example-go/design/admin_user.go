@@ -1,6 +1,8 @@
 package design
 
 import (
+	"encoding/json"
+
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 )
@@ -37,7 +39,19 @@ var _ = Resource("admin_user", func() {
 	Action("list", func() {
 		Description("get admin users")
 		Routing(GET("", func() {
-			Metadata("swagger:extension:x-ref", `["/adminuser/{id}"]`)
+			xref, _ := json.Marshal([]*XRef{
+				{
+					Path:     "/adminuser/{id}",
+					Method:   "put",
+					AppendTo: "row",
+				},
+				{
+					Path:     "/adminuser/{id}",
+					Method:   "delete",
+					AppendTo: "row",
+				},
+			})
+			Metadata("swagger:extension:x-ref", string(xref))
 		}))
 		Response(OK, func() {
 			Media(CollectionOf(AdminUserMediaType, func() {

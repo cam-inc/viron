@@ -160,3 +160,10 @@ var PageType = Type("page", func() {
 	Attribute("components", ArrayOf(ComponentType), "A components format")
 	Required("id", "name", "section", "group", "components")
 })
+
+// XRef of struct
+type XRef struct {
+	Path     string `json:"path"`
+	Method   string `json:"method"`
+	AppendTo string `json:"appendTo"`
+}
