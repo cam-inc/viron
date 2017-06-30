@@ -147,6 +147,7 @@ var ComponentType = Type("component", func() {
 	Attribute("options", ArrayOf(OptionType), "style options") // Web Component Style options
 	Attribute("query", ArrayOf(QueryType), "query for request")
 	Attribute("pagination", Boolean, "allow pagination")
+	Attribute("table_labels", ArrayOf(String), "keys of table row")
 	Required("api", "name", "style", "pagination")
 })
 
