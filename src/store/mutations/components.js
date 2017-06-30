@@ -33,11 +33,15 @@ export default {
     if (params.component.query && !!params.component.query.length) {
       context.state.components[params.component_uid].search = params.component.query;
     }
+    // テーブル表示でどのkeyをラベルに用いるか。
+    if (!!params.component.table_labels) {
+      context.state.components[params.component_uid].table_labels = params.component.table_labels;
+    }
     // 関連API(path)群を付与する。
     const actions = [];
     forEach(params.pathRefs, ref => {
       const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
-      if (!pathItemObject[ref.method]) {
+      if (!pathItemObject || !pathItemObject[ref.method]) {
         return;
       }
       actions.push(ObjectAssign({

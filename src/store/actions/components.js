@@ -33,6 +33,9 @@ export default {
       // 関連のあるpath情報を取得します。
       let pathRefs = [];
       forEach(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
+        if (!pathItemObject || !pathItemObject[method]) {
+          return;
+        }
         pathRefs.push({
           path,
           method,

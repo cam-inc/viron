@@ -26,6 +26,8 @@ export default function() {
   this.selfActions = null;
   // テーブル行に関するアクション群。
   this.rowActions = null;
+  // テーブルのrow表示ラベル。
+  this.tableLabels = null;
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   if (swagger.isComponentStyleNumber(this.opts.component.style)) {
@@ -140,6 +142,7 @@ export default function() {
     this.search = component.search;
     this.selfActions = store.getter(getters.COMPONENTS_ONE_SELF_ACTIONS, this._riot_id);
     this.rowActions = store.getter(getters.COMPONENTS_ONE_ROW_ACTIONS, this._riot_id);
+    this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
     this.validateResponse(this.data);
     this.update();
   });

@@ -51,5 +51,15 @@ export default {
     return map(selfActions, action => {
       return action.pathItemObject;
     });
+  },
+
+  /**
+   * テーブル行のラベルに使用するkey群を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  tableLabels: (context, riotId) => {
+    return context.state.components[riotId].table_labels || [];
   }
 };

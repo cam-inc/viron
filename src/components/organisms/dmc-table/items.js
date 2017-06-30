@@ -1,5 +1,6 @@
 import filter from 'mout/array/filter';
 import find from 'mout/array/find';
+import forEach from 'mout/array/forEach';
 import map from 'mout/array/map';
 import { constants as actions } from '../../../store/actions';
 import './action.tag';
@@ -10,15 +11,27 @@ export default function() {
 
   this.isOpened = false;
   this.title = '';
-  // `id`を優先する。
-  let item = find(this.opts.items, item => {
-    return (item.key === 'id');
+  // keyを指定されていればそれを使う。
+  let item;
+  forEach(this.opts.tablelabels, key => {
+    if (!!item) {
+      return;
+    }
+    item = find(this.opts.items, item => {
+      return (item.key === key);
+    });
   });
-  // `id`が無ければ適当に選ぶ。
+  // `id`を優先する。
+  if (!item) {
+    item = find(this.opts.items, item => {
+      return (item.key === 'id');
+    });
+  }
+  // 適当に選ぶ。
   if (!item) {
     item = this.opts.items[0];
   }
-  this.title = `${item.cell.getValue()}(${item.title})`;
+  this.title = `${item.cell.getValue()}`;
   this.visibleKeys = map(this.opts.items, item => {
     return item.key;
   });
