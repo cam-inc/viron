@@ -7712,11 +7712,15 @@ var components$1 = {
     if (params.component.query && !!params.component.query.length) {
       context.state.components[params.component_uid].search = params.component.query;
     }
+    // テーブル表示でどのkeyをラベルに用いるか。
+    if (!!params.component.table_labels) {
+      context.state.components[params.component_uid].table_labels = params.component.table_labels;
+    }
     // 関連API(path)群を付与する。
     const actions = [];
     forEach_1(params.pathRefs, ref => {
       const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
-      if (!pathItemObject[ref.method]) {
+      if (!pathItemObject || !pathItemObject[ref.method]) {
         return;
       }
       actions.push(index$1$1({
@@ -8439,6 +8443,16 @@ var components$2 = {
     return map_1$1(selfActions, action => {
       return action.pathItemObject;
     });
+  },
+
+  /**
+   * テーブル行のラベルに使用するkey群を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  tableLabels: (context, riotId) => {
+    return context.state.components[riotId].table_labels || [];
   }
 };
 
@@ -8836,6 +8850,7 @@ const constants$4 = {
   COMPONENTS_ONE: 'COMPONENTS_ONE',
   COMPONENTS_ONE_SELF_ACTIONS: 'COMPONENTS_ONE_SELF_ACTIONS',
   COMPONENTS_ONE_ROW_ACTIONS: 'COMPONENTS_ONE_ROW_ACTIONS',
+  COMPONENTS_ONE_TABLE_LABELS: 'COMPONENTS_ONE_TABLE_LABELS',
   CURRENT: 'CURRENT',
   DMC: 'DMC',
   DMC_PAGES: 'DMC_PAGES',
@@ -8872,6 +8887,7 @@ var getters = {
   [constants$4.COMPONENTS_ONE]: components$2.one,
   [constants$4.COMPONENTS_ONE_SELF_ACTIONS]: components$2.selfActions,
   [constants$4.COMPONENTS_ONE_ROW_ACTIONS]: components$2.rowActions,
+  [constants$4.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
   [constants$4.CURRENT]: current$2.all,
   [constants$4.DMC]: dmc$2.all,
   [constants$4.DMC_PAGES]: dmc$2.pages,
@@ -9057,6 +9073,9 @@ var components$3 = {
       // 関連のあるpath情報を取得します。
       let pathRefs = [];
       forEach_1(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
+        if (!pathItemObject || !pathItemObject[method]) {
+          return;
+        }
         pathRefs.push({
           path,
           method,
@@ -40445,15 +40464,27 @@ var script$25 = function() {
 
   this.isOpened = false;
   this.title = '';
-  // `id`を優先する。
-  let item = find_1$2(this.opts.items, item => {
-    return (item.key === 'id');
+  // keyを指定されていればそれを使う。
+  let item;
+  forEach_1(this.opts.tablelabels, key => {
+    if (!!item) {
+      return;
+    }
+    item = find_1$2(this.opts.items, item => {
+      return (item.key === key);
+    });
   });
-  // `id`が無ければ適当に選ぶ。
+  // `id`を優先する。
+  if (!item) {
+    item = find_1$2(this.opts.items, item => {
+      return (item.key === 'id');
+    });
+  }
+  // 適当に選ぶ。
   if (!item) {
     item = this.opts.items[0];
   }
-  this.title = `${item.cell.getValue()}(${item.title})`;
+  this.title = `${item.cell.getValue()}`;
   this.visibleKeys = map_1$1(this.opts.items, item => {
     return item.key;
   });
@@ -40525,7 +40556,7 @@ var script$28 = function() {
   };
 };
 
-riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}"></dmc-table-items>', '', 'class="Table"', function(opts) {
+riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}" tablelabels="{parent.opts.tablelabels}"></dmc-table-items>', '', 'class="Table"', function(opts) {
     this.external(script$28);
 });
 
@@ -40612,7 +40643,7 @@ var script$29 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
+riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}" tablelabels="{opts.tablelabels}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
     this.external(script$29);
 });
 
@@ -40668,6 +40699,8 @@ var script$30 = function() {
   this.selfActions = null;
   // テーブル行に関するアクション群。
   this.rowActions = null;
+  // テーブルのrow表示ラベル。
+  this.tableLabels = null;
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   if (swagger.isComponentStyleNumber(this.opts.component.style)) {
@@ -40782,6 +40815,7 @@ var script$30 = function() {
     this.search = component.search;
     this.selfActions = store.getter(constants$4.COMPONENTS_ONE_SELF_ACTIONS, this._riot_id);
     this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ROW_ACTIONS, this._riot_id);
+    this.tableLabels = store.getter(constants$4.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
     this.validateResponse(this.data);
     this.update();
   });
@@ -40833,7 +40867,7 @@ var script$30 = function() {
   };
 };
 
-riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search" if="{!!search}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{5}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
+riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search" if="{!!search}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" tablelabels="{tableLabels}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{5}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
     this.external(script$30);
 });
 
