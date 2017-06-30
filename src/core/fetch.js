@@ -105,6 +105,10 @@ const commonFetch = (context, url, options) => {
         return Promise.reject(response);
       }
       return Promise.resolve(response);
+    })
+    .catch(err => {
+      context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      throw err;
     });
 };
 
