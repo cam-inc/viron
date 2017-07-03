@@ -1,4 +1,5 @@
 dmc-endpoints.Page.EndpointsPage
+  dmc-uploader
   .EndpointsPage__list
     .EndpointsPage__addCard(ref="touch" onTap="handleEndpointAddTap")
       dmc-icon(type="plus")
@@ -20,6 +21,7 @@ dmc-endpoints.Page.EndpointsPage
 
   script.
     import '../../atoms/dmc-icon/index.tag';
+    import '../../atoms/dmc-uploader/index.tag';
     import './endpoint.tag';
     import script from './index';
     this.external(script);
