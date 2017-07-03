@@ -9043,6 +9043,864 @@ var auth = {
   }
 };
 
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// Split a filename into [root, dir, basename, ext], unix version
+// 'root' is just a slash, or nothing.
+var splitPathRe =
+    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+var splitPath = function(filename) {
+  return splitPathRe.exec(filename).slice(1);
+};
+
+// path.resolve([from ...], to)
+// posix version
+function resolve() {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = (i >= 0) ? arguments[i] : '/';
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter$5(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+}
+
+// path.normalize(path)
+// posix version
+function normalize(path) {
+  var isPathAbsolute = isAbsolute$1(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter$5(path.split('/'), function(p) {
+    return !!p;
+  }), !isPathAbsolute).join('/');
+
+  if (!path && !isPathAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isPathAbsolute ? '/' : '') + path;
+}
+
+// posix version
+function isAbsolute$1(path) {
+  return path.charAt(0) === '/';
+}
+
+// posix version
+function join$1() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return normalize(filter$5(paths, function(p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+}
+
+
+// path.relative(from, to)
+// posix version
+function relative(from, to) {
+  from = resolve(from).substr(1);
+  to = resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') { break; }
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') { break; }
+    }
+
+    if (start > end) { return []; }
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+}
+
+var sep = '/';
+var delimiter = ':';
+
+function dirname(path) {
+  var result = splitPath(path),
+      root = result[0],
+      dir = result[1];
+
+  if (!root && !dir) {
+    // No dirname whatsoever
+    return '.';
+  }
+
+  if (dir) {
+    // It has a dirname, strip trailing slash
+    dir = dir.substr(0, dir.length - 1);
+  }
+
+  return root + dir;
+}
+
+function basename$1(path, ext) {
+  var f = splitPath(path)[2];
+  // TODO: make this comparison case-insensitive on windows?
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+}
+
+
+function extname(path) {
+  return splitPath(path)[3];
+}
+var path = {
+  extname: extname,
+  basename: basename$1,
+  dirname: dirname,
+  sep: sep,
+  delimiter: delimiter,
+  relative: relative,
+  join: join$1,
+  isAbsolute: isAbsolute$1,
+  normalize: normalize,
+  resolve: resolve
+};
+function filter$5 (xs, f) {
+    if (xs.filter) { return xs.filter(f); }
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (f(xs[i], i, xs)) { res.push(xs[i]); }
+    }
+    return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b' ?
+    function (str, start, len) { return str.substr(start, len) } :
+    function (str, start, len) {
+        if (start < 0) { start = str.length + start; }
+        return str.substr(start, len);
+    };
+
+
+var path$1 = Object.freeze({
+	resolve: resolve,
+	normalize: normalize,
+	isAbsolute: isAbsolute$1,
+	join: join$1,
+	relative: relative,
+	sep: sep,
+	delimiter: delimiter,
+	dirname: dirname,
+	basename: basename$1,
+	extname: extname,
+	default: path
+});
+
+var require$$0 = ( path$1 && path ) || path$1;
+
+/**
+ * Module exports.
+ */
+
+var index$2 = contentDisposition;
+var parse_1$1 = parse$1;
+
+/**
+ * Module dependencies.
+ */
+
+var basename = require$$0.basename;
+
+/**
+ * RegExp to match non attr-char, *after* encodeURIComponent (i.e. not including "%")
+ */
+
+var ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g; // eslint-disable-line no-control-regex
+
+/**
+ * RegExp to match percent encoding escape.
+ */
+
+var HEX_ESCAPE_REGEXP = /%[0-9A-Fa-f]{2}/;
+var HEX_ESCAPE_REPLACE_REGEXP = /%([0-9A-Fa-f]{2})/g;
+
+/**
+ * RegExp to match non-latin1 characters.
+ */
+
+var NON_LATIN1_REGEXP = /[^\x20-\x7e\xa0-\xff]/g;
+
+/**
+ * RegExp to match quoted-pair in RFC 2616
+ *
+ * quoted-pair = "\" CHAR
+ * CHAR        = <any US-ASCII character (octets 0 - 127)>
+ */
+
+var QESC_REGEXP = /\\([\u0000-\u007f])/g;
+
+/**
+ * RegExp to match chars that must be quoted-pair in RFC 2616
+ */
+
+var QUOTE_REGEXP = /([\\"])/g;
+
+/**
+ * RegExp for various RFC 2616 grammar
+ *
+ * parameter     = token "=" ( token | quoted-string )
+ * token         = 1*<any CHAR except CTLs or separators>
+ * separators    = "(" | ")" | "<" | ">" | "@"
+ *               | "," | ";" | ":" | "\" | <">
+ *               | "/" | "[" | "]" | "?" | "="
+ *               | "{" | "}" | SP | HT
+ * quoted-string = ( <"> *(qdtext | quoted-pair ) <"> )
+ * qdtext        = <any TEXT except <">>
+ * quoted-pair   = "\" CHAR
+ * CHAR          = <any US-ASCII character (octets 0 - 127)>
+ * TEXT          = <any OCTET except CTLs, but including LWS>
+ * LWS           = [CRLF] 1*( SP | HT )
+ * CRLF          = CR LF
+ * CR            = <US-ASCII CR, carriage return (13)>
+ * LF            = <US-ASCII LF, linefeed (10)>
+ * SP            = <US-ASCII SP, space (32)>
+ * HT            = <US-ASCII HT, horizontal-tab (9)>
+ * CTL           = <any US-ASCII control character (octets 0 - 31) and DEL (127)>
+ * OCTET         = <any 8-bit sequence of data>
+ */
+
+var PARAM_REGEXP = /;[\x09\x20]*([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*=[\x09\x20]*("(?:[\x20!\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"|[!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*/g; // eslint-disable-line no-control-regex
+var TEXT_REGEXP = /^[\x20-\x7e\x80-\xff]+$/;
+var TOKEN_REGEXP = /^[!#$%&'*+.0-9A-Z^_`a-z|~-]+$/;
+
+/**
+ * RegExp for various RFC 5987 grammar
+ *
+ * ext-value     = charset  "'" [ language ] "'" value-chars
+ * charset       = "UTF-8" / "ISO-8859-1" / mime-charset
+ * mime-charset  = 1*mime-charsetc
+ * mime-charsetc = ALPHA / DIGIT
+ *               / "!" / "#" / "$" / "%" / "&"
+ *               / "+" / "-" / "^" / "_" / "`"
+ *               / "{" / "}" / "~"
+ * language      = ( 2*3ALPHA [ extlang ] )
+ *               / 4ALPHA
+ *               / 5*8ALPHA
+ * extlang       = *3( "-" 3ALPHA )
+ * value-chars   = *( pct-encoded / attr-char )
+ * pct-encoded   = "%" HEXDIG HEXDIG
+ * attr-char     = ALPHA / DIGIT
+ *               / "!" / "#" / "$" / "&" / "+" / "-" / "."
+ *               / "^" / "_" / "`" / "|" / "~"
+ */
+
+var EXT_VALUE_REGEXP = /^([A-Za-z0-9!#$%&+\-^_`{}~]+)'(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)'((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+.^_`|~-])+)$/;
+
+/**
+ * RegExp for various RFC 6266 grammar
+ *
+ * disposition-type = "inline" | "attachment" | disp-ext-type
+ * disp-ext-type    = token
+ * disposition-parm = filename-parm | disp-ext-parm
+ * filename-parm    = "filename" "=" value
+ *                  | "filename*" "=" ext-value
+ * disp-ext-parm    = token "=" value
+ *                  | ext-token "=" ext-value
+ * ext-token        = <the characters in token, followed by "*">
+ */
+
+var DISPOSITION_TYPE_REGEXP = /^([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*(?:$|;)/; // eslint-disable-line no-control-regex
+
+/**
+ * Create an attachment Content-Disposition header.
+ *
+ * @param {string} [filename]
+ * @param {object} [options]
+ * @param {string} [options.type=attachment]
+ * @param {string|boolean} [options.fallback=true]
+ * @return {string}
+ * @api public
+ */
+
+function contentDisposition (filename, options) {
+  var opts = options || {};
+
+  // get type
+  var type = opts.type || 'attachment';
+
+  // get parameters
+  var params = createparams(filename, opts.fallback);
+
+  // format into string
+  return format(new ContentDisposition(type, params))
+}
+
+/**
+ * Create parameters object from filename and fallback.
+ *
+ * @param {string} [filename]
+ * @param {string|boolean} [fallback=true]
+ * @return {object}
+ * @api private
+ */
+
+function createparams (filename, fallback) {
+  if (filename === undefined) {
+    return
+  }
+
+  var params = {};
+
+  if (typeof filename !== 'string') {
+    throw new TypeError('filename must be a string')
+  }
+
+  // fallback defaults to true
+  if (fallback === undefined) {
+    fallback = true;
+  }
+
+  if (typeof fallback !== 'string' && typeof fallback !== 'boolean') {
+    throw new TypeError('fallback must be a string or boolean')
+  }
+
+  if (typeof fallback === 'string' && NON_LATIN1_REGEXP.test(fallback)) {
+    throw new TypeError('fallback must be ISO-8859-1 string')
+  }
+
+  // restrict to file base name
+  var name = basename(filename);
+
+  // determine if name is suitable for quoted string
+  var isQuotedString = TEXT_REGEXP.test(name);
+
+  // generate fallback name
+  var fallbackName = typeof fallback !== 'string'
+    ? fallback && getlatin1(name)
+    : basename(fallback);
+  var hasFallback = typeof fallbackName === 'string' && fallbackName !== name;
+
+  // set extended filename parameter
+  if (hasFallback || !isQuotedString || HEX_ESCAPE_REGEXP.test(name)) {
+    params['filename*'] = name;
+  }
+
+  // set filename parameter
+  if (isQuotedString || hasFallback) {
+    params.filename = hasFallback
+      ? fallbackName
+      : name;
+  }
+
+  return params
+}
+
+/**
+ * Format object to Content-Disposition header.
+ *
+ * @param {object} obj
+ * @param {string} obj.type
+ * @param {object} [obj.parameters]
+ * @return {string}
+ * @api private
+ */
+
+function format (obj) {
+  var parameters = obj.parameters;
+  var type = obj.type;
+
+  if (!type || typeof type !== 'string' || !TOKEN_REGEXP.test(type)) {
+    throw new TypeError('invalid type')
+  }
+
+  // start with normalized type
+  var string = String(type).toLowerCase();
+
+  // append parameters
+  if (parameters && typeof parameters === 'object') {
+    var param;
+    var params = Object.keys(parameters).sort();
+
+    for (var i = 0; i < params.length; i++) {
+      param = params[i];
+
+      var val = param.substr(-1) === '*'
+        ? ustring(parameters[param])
+        : qstring(parameters[param]);
+
+      string += '; ' + param + '=' + val;
+    }
+  }
+
+  return string
+}
+
+/**
+ * Decode a RFC 6987 field value (gracefully).
+ *
+ * @param {string} str
+ * @return {string}
+ * @api private
+ */
+
+function decodefield (str) {
+  var match = EXT_VALUE_REGEXP.exec(str);
+
+  if (!match) {
+    throw new TypeError('invalid extended field value')
+  }
+
+  var charset = match[1].toLowerCase();
+  var encoded = match[2];
+  var value;
+
+  // to binary string
+  var binary = encoded.replace(HEX_ESCAPE_REPLACE_REGEXP, pdecode);
+
+  switch (charset) {
+    case 'iso-8859-1':
+      value = getlatin1(binary);
+      break
+    case 'utf-8':
+      value = new Buffer(binary, 'binary').toString('utf8');
+      break
+    default:
+      throw new TypeError('unsupported charset in extended field')
+  }
+
+  return value
+}
+
+/**
+ * Get ISO-8859-1 version of string.
+ *
+ * @param {string} val
+ * @return {string}
+ * @api private
+ */
+
+function getlatin1 (val) {
+  // simple Unicode -> ISO-8859-1 transformation
+  return String(val).replace(NON_LATIN1_REGEXP, '?')
+}
+
+/**
+ * Parse Content-Disposition header string.
+ *
+ * @param {string} string
+ * @return {object}
+ * @api private
+ */
+
+function parse$1 (string) {
+  if (!string || typeof string !== 'string') {
+    throw new TypeError('argument string is required')
+  }
+
+  var match = DISPOSITION_TYPE_REGEXP.exec(string);
+
+  if (!match) {
+    throw new TypeError('invalid type format')
+  }
+
+  // normalize type
+  var index = match[0].length;
+  var type = match[1].toLowerCase();
+
+  var key;
+  var names = [];
+  var params = {};
+  var value;
+
+  // calculate index to start at
+  index = PARAM_REGEXP.lastIndex = match[0].substr(-1) === ';'
+    ? index - 1
+    : index;
+
+  // match parameters
+  while ((match = PARAM_REGEXP.exec(string))) {
+    if (match.index !== index) {
+      throw new TypeError('invalid parameter format')
+    }
+
+    index += match[0].length;
+    key = match[1].toLowerCase();
+    value = match[2];
+
+    if (names.indexOf(key) !== -1) {
+      throw new TypeError('invalid duplicate parameter')
+    }
+
+    names.push(key);
+
+    if (key.indexOf('*') + 1 === key.length) {
+      // decode extended value
+      key = key.slice(0, -1);
+      value = decodefield(value);
+
+      // overwrite existing value
+      params[key] = value;
+      continue
+    }
+
+    if (typeof params[key] === 'string') {
+      continue
+    }
+
+    if (value[0] === '"') {
+      // remove quotes and escapes
+      value = value
+        .substr(1, value.length - 2)
+        .replace(QESC_REGEXP, '$1');
+    }
+
+    params[key] = value;
+  }
+
+  if (index !== -1 && index !== string.length) {
+    throw new TypeError('invalid parameter format')
+  }
+
+  return new ContentDisposition(type, params)
+}
+
+/**
+ * Percent decode a single character.
+ *
+ * @param {string} str
+ * @param {string} hex
+ * @return {string}
+ * @api private
+ */
+
+function pdecode (str, hex) {
+  return String.fromCharCode(parseInt(hex, 16))
+}
+
+/**
+ * Percent encode a single character.
+ *
+ * @param {string} char
+ * @return {string}
+ * @api private
+ */
+
+function pencode (char) {
+  var hex = String(char)
+    .charCodeAt(0)
+    .toString(16)
+    .toUpperCase();
+  return hex.length === 1
+    ? '%0' + hex
+    : '%' + hex
+}
+
+/**
+ * Quote a string for HTTP.
+ *
+ * @param {string} val
+ * @return {string}
+ * @api private
+ */
+
+function qstring (val) {
+  var str = String(val);
+
+  return '"' + str.replace(QUOTE_REGEXP, '\\$1') + '"'
+}
+
+/**
+ * Encode a Unicode string for HTTP (RFC 5987).
+ *
+ * @param {string} val
+ * @return {string}
+ * @api private
+ */
+
+function ustring (val) {
+  var str = String(val);
+
+  // percent encode as UTF-8
+  var encoded = encodeURIComponent(str)
+    .replace(ENCODE_URL_ATTR_CHAR_REGEXP, pencode);
+
+  return 'UTF-8\'\'' + encoded
+}
+
+/**
+ * Class for parsed Content-Disposition header for v8 optimization
+ */
+
+function ContentDisposition (type, parameters) {
+  this.type = type;
+  this.parameters = parameters;
+}
+
+index$2.parse = parse_1$1;
+
+var download = createCommonjsModule(function (module, exports) {
+//download.js v4.2, by dandavis; 2008-2016. [MIT] see http://danml.com/download.html for tests/usage
+// v1 landed a FF+Chrome compat way of downloading strings to local un-named files, upgraded to use a hidden frame and optional mime
+// v2 added named files via a[download], msSaveBlob, IE (10+) support, and window.URL support for larger+faster saves than dataURLs
+// v3 added dataURL and Blob Input, bind-toggle arity, and legacy dataURL fallback was improved with force-download mime and base64 support. 3.1 improved safari handling.
+// v4 adds AMD/UMD, commonJS, and plain browser support
+// v4.1 adds url download capability via solo URL argument (same domain/CORS only)
+// v4.2 adds semantic variable names, long (over 2MB) dataURL support, and hidden by default temp anchors
+// https://github.com/rndme/download
+
+(function (root, factory) {
+	if (typeof undefined === 'function' && undefined.amd) {
+		// AMD. Register as an anonymous module.
+		undefined([], factory);
+	} else {
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like environments that support module.exports,
+		// like Node.
+		module.exports = factory();
+	}
+}(commonjsGlobal, function () {
+
+	return function download(data, strFileName, strMimeType) {
+
+		var self = window, // this script is only for browsers anyway...
+			defaultMime = "application/octet-stream", // this default mime also triggers iframe downloads
+			mimeType = strMimeType || defaultMime,
+			payload = data,
+			url = !strFileName && !strMimeType && payload,
+			anchor = document.createElement("a"),
+			toString = function(a){return String(a);},
+			myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString),
+			fileName = strFileName || "download",
+			blob,
+			reader;
+			myBlob= myBlob.call ? myBlob.bind(self) : Blob ;
+	  
+		if(String(this)==="true"){ //reverse arguments, allowing download.bind(true, "text/xml", "export.xml") to act as a callback
+			payload=[payload, mimeType];
+			mimeType=payload[0];
+			payload=payload[1];
+		}
+
+
+		if(url && url.length< 2048){ // if no filename and no mime, assume a url was passed as the only argument
+			fileName = url.split("/").pop().split("?")[0];
+			anchor.href = url; // assign href prop to temp anchor
+		  	if(anchor.href.indexOf(url) !== -1){ // if the browser determines that it's a potentially valid url path:
+        		var ajax=new XMLHttpRequest();
+        		ajax.open( "GET", url, true);
+        		ajax.responseType = 'blob';
+        		ajax.onload= function(e){ 
+				  download(e.target.response, fileName, defaultMime);
+				};
+        		setTimeout(function(){ ajax.send();}, 0); // allows setting custom ajax headers using the return:
+			    return ajax;
+			} // end if valid url?
+		} // end if url?
+
+
+		//go ahead and download dataURLs right away
+		if(/^data:([\w+-]+\/[\w+.-]+)?[,;]/.test(payload)){
+		
+			if(payload.length > (1024*1024*1.999) && myBlob !== toString ){
+				payload=dataUrlToBlob(payload);
+				mimeType=payload.type || defaultMime;
+			}else{			
+				return navigator.msSaveBlob ?  // IE10 can't do a[download], only Blobs:
+					navigator.msSaveBlob(dataUrlToBlob(payload), fileName) :
+					saver(payload) ; // everyone else can save dataURLs un-processed
+			}
+			
+		}else{//not data url, is it a string with special needs?
+			if(/([\x80-\xff])/.test(payload)){			  
+				var i=0, tempUiArr= new Uint8Array(payload.length), mx=tempUiArr.length;
+				for(i;i<mx;++i) { tempUiArr[i]= payload.charCodeAt(i); }
+			 	payload=new myBlob([tempUiArr], {type: mimeType});
+			}		  
+		}
+		blob = payload instanceof myBlob ?
+			payload :
+			new myBlob([payload], {type: mimeType}) ;
+
+
+		function dataUrlToBlob(strUrl) {
+			var parts= strUrl.split(/[:;,]/),
+			type= parts[1],
+			decoder= parts[2] == "base64" ? atob : decodeURIComponent,
+			binData= decoder( parts.pop() ),
+			mx= binData.length,
+			i= 0,
+			uiArr= new Uint8Array(mx);
+
+			for(i;i<mx;++i) { uiArr[i]= binData.charCodeAt(i); }
+
+			return new myBlob([uiArr], {type: type});
+		 }
+
+		function saver(url, winMode){
+
+			if ('download' in anchor) { //html5 A[download]
+				anchor.href = url;
+				anchor.setAttribute("download", fileName);
+				anchor.className = "download-js-link";
+				anchor.innerHTML = "downloading...";
+				anchor.style.display = "none";
+				document.body.appendChild(anchor);
+				setTimeout(function() {
+					anchor.click();
+					document.body.removeChild(anchor);
+					if(winMode===true){setTimeout(function(){ self.URL.revokeObjectURL(anchor.href);}, 250 );}
+				}, 66);
+				return true;
+			}
+
+			// handle non-a[download] safari as best we can:
+			if(/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)) {
+				if(/^data:/.test(url))	{ url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime); }
+				if(!window.open(url)){ // popup blocked, offer direct download:
+					if(confirm("Displaying New Document\n\nUse Save As... to download, then click back to return to this page.")){ location.href=url; }
+				}
+				return true;
+			}
+
+			//do iframe dataURL download (old ch+FF):
+			var f = document.createElement("iframe");
+			document.body.appendChild(f);
+
+			if(!winMode && /^data:/.test(url)){ // force a mime that will download:
+				url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
+			}
+			f.src=url;
+			setTimeout(function(){ document.body.removeChild(f); }, 333);
+
+		}//end saver
+
+
+
+
+		if (navigator.msSaveBlob) { // IE10+ : (has Blob, but not a[download] or URL)
+			return navigator.msSaveBlob(blob, fileName);
+		}
+
+		if(self.URL){ // simple fast and modern way using Blob and URL:
+			saver(self.URL.createObjectURL(blob), true);
+		}else{
+			// handle non-Blob()+non-URL browsers:
+			if(typeof blob === "string" || blob.constructor===toString ){
+				try{
+					return saver( "data:" +  mimeType   + ";base64,"  +  self.btoa(blob)  );
+				}catch(y){
+					return saver( "data:" +  mimeType   + "," + encodeURIComponent(blob)  );
+				}
+			}
+
+			// Blob but not URL support:
+			reader=new FileReader();
+			reader.onload=function(e){
+				saver(this.result);
+			};
+			reader.readAsDataURL(blob);
+		}
+		return true;
+	}; /* end download() */
+}));
+});
+
 var components$3 = {
   /**
    * 一つのコンポーネント情報を取得します。
@@ -9129,6 +9987,19 @@ var components$3 = {
         // TODO: queryに含めることは可能か..?
         req.headers['Authorization'] = token;
       }
+    }).then(res => {
+      const contentDispositionHeader = res.headers['content-disposition'];
+      if (!index$2) {
+        return res;
+      }
+
+      const downloadFileInfo = index$2.parse(contentDispositionHeader);
+      if (downloadFileInfo.type !== 'attachment') {
+        return res;
+      }
+
+      download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
+      return res;
     });
   },
 
@@ -11997,7 +12868,7 @@ RiotX.prototype.size = function size () {
   return keys_1$1(this.stores).length;
 };
 
-var index$2 = new RiotX();
+var index$3$1 = new RiotX();
 
 var store$1 = {
   /**
@@ -12008,13 +12879,13 @@ var store$1 = {
     return Promise
       .resolve()
       .then(() => {
-        const store = new index$2.Store({
+        const store = new index$3$1.Store({
           state: states,
           actions,
           mutations,
           getters
         });
-        index$2.add(store);
+        index$3$1.add(store);
         // TODO: あとでけす。
         window.store = store;
         return store;
