@@ -1,3 +1,5 @@
+import contentDisposition from 'content-disposition';
+import download from 'downloadjs';
 import forEach from 'mout/array/forEach';
 import swagger from '../../core/swagger';
 import { constants as getters } from '../getters';
@@ -89,6 +91,19 @@ export default {
         // TODO: queryに含めることは可能か..?
         req.headers['Authorization'] = token;
       }
+    }).then(res => {
+      const contentDispositionHeader = res.headers['content-disposition'];
+      if (!contentDisposition) {
+        return res;
+      }
+
+      const downloadFileInfo = contentDisposition.parse(contentDispositionHeader);
+      if (downloadFileInfo.type !== 'attachment') {
+        return res;
+      }
+
+      download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
+      return res;
     });
   },
 
