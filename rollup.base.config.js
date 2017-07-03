@@ -1,3 +1,4 @@
+import builtins from 'rollup-plugin-node-builtins';
 import json from 'rollup-plugin-json';
 import riot from 'rollup-plugin-riot';
 import nodeResolve from 'rollup-plugin-node-resolve';
@@ -36,6 +37,7 @@ export default {
   useStrict: false,
   context: 'window',
   plugins: [
+    builtins(),
     json(),
     replace({
       'process.env.NODE_ENV': '"local"' // local/development/staging/production
