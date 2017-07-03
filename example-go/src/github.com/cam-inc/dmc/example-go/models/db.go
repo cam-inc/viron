@@ -19,11 +19,11 @@ func getConnectionString() string {
 	c := common.GetMySQLConfig()
 	if service == "docker-local" {
 		// on docker
-		return fmt.Sprintf("%s:%s@%s([%s]:%d)/%s?parseTime=true",
+		return fmt.Sprintf("%s:%s@%s([%s]:%d)/%s?charset=utf8&parseTime=true",
 			c.UserName, c.Password, "tcp", "mysql", c.Port, c.DatabaseName)
 	}
 
-	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?parseTime=true",
+	return fmt.Sprintf("%s:%s@%s(%s:%d)/%s?charset=utf8&parseTime=true",
 		c.UserName, c.Password, "tcp", c.Host, c.Port, c.DatabaseName)
 }
 
