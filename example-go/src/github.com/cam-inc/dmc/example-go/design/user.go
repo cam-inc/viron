@@ -1,6 +1,8 @@
 package design
 
 import (
+	"encoding/json"
+
 	"github.com/cam-inc/dmc/example-go/bridge"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
@@ -60,7 +62,19 @@ var _ = Resource("user", func() {
 	Action("list", func() {
 		Description("get users")
 		Routing(GET("", func() {
-			Metadata("swagger:extension:x-ref", `["/user/{id}"]`)
+			xref, _ := json.Marshal([]*XRef{
+				{
+					Path:     "/user/{id}",
+					Method:   "put",
+					AppendTo: "row",
+				},
+				{
+					Path:     "/user/{id}",
+					Method:   "delete",
+					AppendTo: "row",
+				},
+			})
+			Metadata("swagger:extension:x-ref", string(xref))
 		}))
 		Params(func() {
 			Param("name", String)

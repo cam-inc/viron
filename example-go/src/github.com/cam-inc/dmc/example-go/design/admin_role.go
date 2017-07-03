@@ -1,6 +1,8 @@
 package design
 
 import (
+	"encoding/json"
+
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 )
@@ -33,7 +35,19 @@ var _ = Resource("admin_role", func() {
 	Action("list", func() {
 		Description("get admin roles")
 		Routing(GET("", func() {
-			Metadata("swagger:extension:x-ref", `["/adminrole/{role_id}"]`)
+			xref, _ := json.Marshal([]*XRef{
+				{
+					Path:     "/adminrole/{role_id}",
+					Method:   "put",
+					AppendTo: "row",
+				},
+				{
+					Path:     "/adminrole/{role_id}",
+					Method:   "delete",
+					AppendTo: "row",
+				},
+			})
+			Metadata("swagger:extension:x-ref", string(xref))
 		}))
 		Params(func() {
 			Param("limit", Integer, "number of items per page")

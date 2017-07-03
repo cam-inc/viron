@@ -147,6 +147,7 @@ var ComponentType = Type("component", func() {
 	Attribute("options", ArrayOf(OptionType), "style options") // Web Component Style options
 	Attribute("query", ArrayOf(QueryType), "query for request")
 	Attribute("pagination", Boolean, "allow pagination")
+	Attribute("table_labels", ArrayOf(String), "keys of table row")
 	Required("api", "name", "style", "pagination")
 })
 
@@ -160,3 +161,10 @@ var PageType = Type("page", func() {
 	Attribute("components", ArrayOf(ComponentType), "A components format")
 	Required("id", "name", "section", "group", "components")
 })
+
+// XRef of struct
+type XRef struct {
+	Path     string `json:"path"`
+	Method   string `json:"method"`
+	AppendTo string `json:"appendTo"`
+}

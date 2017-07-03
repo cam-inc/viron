@@ -1,6 +1,8 @@
 package design
 
 import (
+	"encoding/json"
+
 	"github.com/cam-inc/dmc/example-go/bridge"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
@@ -48,7 +50,19 @@ var _ = Resource("user_blog", func() {
 	Action("list", func() {
 		Description("get user blogs")
 		Routing(GET("", func() {
-			Metadata("swagger:extension:x-ref", `["/userblog/{id}"]`)
+			xref, _ := json.Marshal([]*XRef{
+				{
+					Path:     "/userblog/{id}",
+					Method:   "put",
+					AppendTo: "row",
+				},
+				{
+					Path:     "/userblog/{id}",
+					Method:   "delete",
+					AppendTo: "row",
+				},
+			})
+			Metadata("swagger:extension:x-ref", string(xref))
 		}))
 		Params(func() {
 			Param("limit", Integer, "number of items per page")

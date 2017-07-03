@@ -1,6 +1,8 @@
 package design
 
 import (
+	"encoding/json"
+
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 )
@@ -45,7 +47,19 @@ var _ = Resource("user_blog_entry", func() {
 	Action("list", func() {
 		Description("get user blog entries")
 		Routing(GET("", func() {
-			Metadata("swagger:extension:x-ref", `["/userblogentry/{id}"]`)
+			xref, _ := json.Marshal([]*XRef{
+				{
+					Path:     "/userblogentry/{id}",
+					Method:   "put",
+					AppendTo: "row",
+				},
+				{
+					Path:     "/userblogentry/{id}",
+					Method:   "delete",
+					AppendTo: "row",
+				},
+			})
+			Metadata("swagger:extension:x-ref", string(xref))
 		}))
 		Params(func() {
 			Param("limit", Integer, "number of items per page")
