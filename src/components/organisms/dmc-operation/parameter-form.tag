@@ -5,10 +5,13 @@ dmc-operation-parameter-form.Operation__parameterForm
     dmc-checkbox(isChecked="{ opts.parametervalue }" onChange="{ handleCheckboxChange }")
   virtual(if="{ uiType === 'select' }")
     dmc-select(isOpened="{ isOpened }" options="{ getSelectOptions() }" onToggle="{ handleSelectToggle }" onChange="{ handleSelectChange }")
+  virtual(if="{ uiType === 'uploader' }")
+    dmc-uploader(accept="*" onFileChange="{ handleFileChange }")
 
   script.
     import '../../atoms/dmc-checkbox/index.tag';
     import '../../atoms/dmc-select/index.tag';
     import '../../atoms/dmc-textinput/index.tag';
+    import '../../atoms/dmc-uploader/index.tag';
     import script from './parameter-form';
     this.external(script);

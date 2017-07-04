@@ -21,7 +21,7 @@ export default function() {
       this.uiType = 'TODO';
       break;
     case 'file':
-      this.uiType = 'TODO';
+      this.uiType = 'uploader';
       break;
     default:
       break;
@@ -67,5 +67,9 @@ export default function() {
     });
     const value = (option ? option.label : undefined);
     this.change(value);
+  };
+
+  this.handleFileChange = file => {
+    this.change(file);
   };
 }

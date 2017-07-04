@@ -78,30 +78,27 @@ export default {
    * APIコールします。
    * @param {riotx.Context} context
    * @param {Object} operationObject
-   * @param {Object} query
+   * @param {Object} params
    * @return {Promise}
    */
-  operate: (context, operationObject, query) => {
+  operate: (context, operationObject, params) => {
     const api = swagger.getApiByOperationID(operationObject.operationId);
     const token = context.getter(getters.ENDPOINTS_ONE, context.getter(getters.CURRENT)).token;
 
-    // TODO: 共通化したいな
-    return api(query, {
+    return api(params, {
       requestInterceptor: req => {
-        // TODO: queryに含めることは可能か..?
         req.headers['Authorization'] = token;
       }
     }).then(res => {
+      // ダウンロード指定されていればダウンロードする。
       const contentDispositionHeader = res.headers['content-disposition'];
-      if (!contentDisposition) {
+      if (!contentDispositionHeader) {
         return res;
       }
-
       const downloadFileInfo = contentDisposition.parse(contentDispositionHeader);
       if (downloadFileInfo.type !== 'attachment') {
         return res;
       }
-
       download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
       return res;
     });
