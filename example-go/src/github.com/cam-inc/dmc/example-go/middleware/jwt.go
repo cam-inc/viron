@@ -82,6 +82,5 @@ func JWT() goa.Middleware {
 	if err != nil {
 		panic(err)
 	}
-	keys := []jwt.Key{key}
-	return jwt.New(jwt.NewSimpleResolver(keys), validation(), app.NewJWTSecurity())
+	return jwt.New(key, validation(), app.NewJWTSecurity())
 }
