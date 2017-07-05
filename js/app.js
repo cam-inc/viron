@@ -42123,7 +42123,7 @@ var script$36 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoints', '<dmc-uploader></dmc-uploader> <div class="EndpointsPage__list"> <div class="EndpointsPage__addCard" ref="touch" ontap="handleEndpointAddTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" name="{endpoint.name}" thumbnail="{endpoint.thumbnail}" token="{endpoint.token}" url="{endpoint.url}" description="{endpoint.description}" memo="{endpoint.memo}" tags="{endpoint.tags}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
+riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__list"> <div class="EndpointsPage__addCard" ref="touch" ontap="handleEndpointAddTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" name="{endpoint.name}" thumbnail="{endpoint.thumbnail}" token="{endpoint.token}" url="{endpoint.url}" description="{endpoint.description}" memo="{endpoint.memo}" tags="{endpoint.tags}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
     this.external(script$36);
 });
 
