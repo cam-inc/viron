@@ -1,0 +1,16 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="description" content="A front-end template that helps you build fast, modern mobile web apps.")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0")
+    meta(name="referrer" content="origin-when-cross-origin")
+    meta(http-equiv="Cache-Control" content="no-cache")
+    title DMC - Automated design-based management console
+    link(rel="stylesheet" href=`./css/app.min.css?_=${version}`)
+
+  body
+    dmc
+    script(src=`./js/swagger-client.js?_=${version}`)
+    script(src=`./js/app.js?_=${version}`)
