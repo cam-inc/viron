@@ -1,18 +1,4 @@
 import find from 'mout/object/find';
-import keys from 'mout/object/keys';
-
-const number = '1234567890';
-const alphabet = 'abcdefghij';
-
-const number2alphabet = str => {
-  str += '';
-  for (let i = 0; i < number.length; i++) {
-    const re = new RegExp(number[i], 'g');
-    str = str.replace(re, alphabet[i]);
-  }
-  return str;
-};
-
 export default {
   /**
    * 全endpointを返します。
@@ -44,15 +30,6 @@ export default {
     return find(endpoints, endpoint => {
       return endpoint.url === url;
     });
-  },
-
-  /**
-   * 次のkeyを返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  nextKey: context => {
-    return number2alphabet(keys(context.state.endpoints).length + 1);
   }
 
 };

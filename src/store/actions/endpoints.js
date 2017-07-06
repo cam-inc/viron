@@ -1,5 +1,5 @@
+import shortid from 'shortid';
 import { fetch } from '../../core/fetch';
-import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
 export default {
@@ -21,7 +21,8 @@ export default {
         if (err.status !== 401) {
           throw err;
         }
-        const key = context.getter(getters.ENDPOINTS_NEXT_KEY);
+        //
+        const key = shortid.generate();
         const newEndpoint = {
           url: url,
           memo: memo,
