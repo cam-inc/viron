@@ -8626,31 +8626,6 @@ var drawers$2 = {
 
     var find_1$1 = find$1;
 
-/**
-     * Get object keys
-     */
-     var keys = Object.keys || function (obj) {
-            var keys = [];
-            forOwn_1$1(obj, function(val, key){
-                keys.push(key);
-            });
-            return keys;
-        };
-
-    var keys_1 = keys;
-
-const number = '1234567890';
-const alphabet = 'abcdefghij';
-
-const number2alphabet = str => {
-  str += '';
-  for (let i = 0; i < number.length; i++) {
-    const re = new RegExp(number[i], 'g');
-    str = str.replace(re, alphabet[i]);
-  }
-  return str;
-};
-
 var endpoints$2 = {
   /**
    * 全endpointを返します。
@@ -8682,15 +8657,6 @@ var endpoints$2 = {
     return find_1$1(endpoints, endpoint => {
       return endpoint.url === url;
     });
-  },
-
-  /**
-   * 次のkeyを返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  nextKey: context => {
-    return number2alphabet(keys_1(context.state.endpoints).length + 1);
   }
 
 };
@@ -8862,7 +8828,6 @@ const constants$4 = {
   ENDPOINTS: 'ENDPOINTS',
   ENDPOINTS_ONE: 'ENDPOINTS_ONE',
   ENDPOINTS_ONE_BY_URL: 'ENDPOINTS_ONE_BY_URL',
-  ENDPOINTS_NEXT_KEY: 'ENDPOINTS_NEXT_KEY',
   LOCATION: 'LOCATION',
   LOCATION_NAME: 'LOCATION_NAME',
   LOCATION_ROUTE: 'LOCATION_ROUTE',
@@ -8899,7 +8864,6 @@ var getters = {
   [constants$4.ENDPOINTS]: endpoints$2.all,
   [constants$4.ENDPOINTS_ONE]: endpoints$2.one,
   [constants$4.ENDPOINTS_ONE_BY_URL]: endpoints$2.oneByURL,
-  [constants$4.ENDPOINTS_NEXT_KEY]: endpoints$2.nextKey,
   [constants$4.LOCATION]: location$3.all,
   [constants$4.LOCATION_NAME]: location$3.name,
   [constants$4.LOCATION_ROUTE]: location$3.route,
@@ -10158,6 +10122,302 @@ var drawers$3 = {
   }
 };
 
+// Found this seed-based random generator somewhere
+// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
+
+var seed = 1;
+
+/**
+ * return a random number based on a seed
+ * @param seed
+ * @returns {number}
+ */
+function getNextValue() {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed/(233280.0);
+}
+
+function setSeed$1(_seed_) {
+    seed = _seed_;
+}
+
+var randomFromSeed = {
+    nextValue: getNextValue,
+    seed: setSeed$1
+};
+
+var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
+var alphabet;
+var previousSeed;
+
+var shuffled;
+
+function reset() {
+    shuffled = false;
+}
+
+function setCharacters(_alphabet_) {
+    if (!_alphabet_) {
+        if (alphabet !== ORIGINAL) {
+            alphabet = ORIGINAL;
+            reset();
+        }
+        return;
+    }
+
+    if (_alphabet_ === alphabet) {
+        return;
+    }
+
+    if (_alphabet_.length !== ORIGINAL.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
+    }
+
+    var unique = _alphabet_.split('').filter(function(item, ind, arr){
+       return ind !== arr.lastIndexOf(item);
+    });
+
+    if (unique.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
+    }
+
+    alphabet = _alphabet_;
+    reset();
+}
+
+function characters(_alphabet_) {
+    setCharacters(_alphabet_);
+    return alphabet;
+}
+
+function setSeed(seed) {
+    randomFromSeed.seed(seed);
+    if (previousSeed !== seed) {
+        reset();
+        previousSeed = seed;
+    }
+}
+
+function shuffle$1() {
+    if (!alphabet) {
+        setCharacters(ORIGINAL);
+    }
+
+    var sourceArray = alphabet.split('');
+    var targetArray = [];
+    var r = randomFromSeed.nextValue();
+    var characterIndex;
+
+    while (sourceArray.length > 0) {
+        r = randomFromSeed.nextValue();
+        characterIndex = Math.floor(r * sourceArray.length);
+        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
+    }
+    return targetArray.join('');
+}
+
+function getShuffled() {
+    if (shuffled) {
+        return shuffled;
+    }
+    shuffled = shuffle$1();
+    return shuffled;
+}
+
+/**
+ * lookup shuffled letter
+ * @param index
+ * @returns {string}
+ */
+function lookup(index) {
+    var alphabetShuffled = getShuffled();
+    return alphabetShuffled[index];
+}
+
+var alphabet_1 = {
+    characters: characters,
+    seed: setSeed,
+    lookup: lookup,
+    shuffled: getShuffled
+};
+
+var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
+
+function randomByte() {
+    if (!crypto || !crypto.getRandomValues) {
+        return Math.floor(Math.random() * 256) & 0x30;
+    }
+    var dest = new Uint8Array(1);
+    crypto.getRandomValues(dest);
+    return dest[0] & 0x30;
+}
+
+var randomByteBrowser = randomByte;
+
+function encode(lookup, number) {
+    var loopCounter = 0;
+    var done;
+
+    var str = '';
+
+    while (!done) {
+        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByteBrowser() );
+        done = number < (Math.pow(16, loopCounter + 1 ) );
+        loopCounter++;
+    }
+    return str;
+}
+
+var encode_1 = encode;
+
+/**
+ * Decode the id to get the version and worker
+ * Mainly for debugging and testing.
+ * @param id - the shortid-generated id.
+ */
+function decode(id) {
+    var characters = alphabet_1.shuffled();
+    return {
+        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
+        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
+    };
+}
+
+var decode_1 = decode;
+
+// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
+// This number should be updated every year or so to keep the generated id short.
+// To regenerate `new Date() - 0` and bump the version. Always bump the version!
+var REDUCE_TIME = 1459707606518;
+
+// don't change unless we change the algos or REDUCE_TIME
+// must be an integer and less than 16
+var version = 6;
+
+// Counter is used when shortid is called multiple times in one second.
+var counter;
+
+// Remember the last time shortid was called in case counter is needed.
+var previousSeconds;
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function build(clusterWorkerId) {
+
+    var str = '';
+
+    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
+
+    if (seconds === previousSeconds) {
+        counter++;
+    } else {
+        counter = 0;
+        previousSeconds = seconds;
+    }
+
+    str = str + encode_1(alphabet_1.lookup, version);
+    str = str + encode_1(alphabet_1.lookup, clusterWorkerId);
+    if (counter > 0) {
+        str = str + encode_1(alphabet_1.lookup, counter);
+    }
+    str = str + encode_1(alphabet_1.lookup, seconds);
+
+    return str;
+}
+
+var build_1 = build;
+
+function isShortId(id) {
+    if (!id || typeof id !== 'string' || id.length < 6 ) {
+        return false;
+    }
+
+    var characters = alphabet_1.characters();
+    var len = id.length;
+    for(var i = 0; i < len;i++) {
+        if (characters.indexOf(id[i]) === -1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+var isValid = isShortId;
+
+var clusterWorkerIdBrowser = 0;
+
+var index$4$1 = createCommonjsModule(function (module) {
+'use strict';
+
+
+
+
+
+
+
+// if you are using cluster or multiple servers use this to make each instance
+// has a unique value for worker
+// Note: I don't know if this is automatically set when using third
+// party cluster solutions such as pm2.
+var clusterWorkerId = clusterWorkerIdBrowser || 0;
+
+/**
+ * Set the seed.
+ * Highly recommended if you don't want people to try to figure out your id schema.
+ * exposed as shortid.seed(int)
+ * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
+ */
+function seed(seedValue) {
+    alphabet_1.seed(seedValue);
+    return module.exports;
+}
+
+/**
+ * Set the cluster worker or machine id
+ * exposed as shortid.worker(int)
+ * @param workerId worker must be positive integer.  Number less than 16 is recommended.
+ * returns shortid module so it can be chained.
+ */
+function worker(workerId) {
+    clusterWorkerId = workerId;
+    return module.exports;
+}
+
+/**
+ *
+ * sets new characters to use in the alphabet
+ * returns the shuffled alphabet
+ */
+function characters(newCharacters) {
+    if (newCharacters !== undefined) {
+        alphabet_1.characters(newCharacters);
+    }
+
+    return alphabet_1.shuffled();
+}
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function generate() {
+  return build_1(clusterWorkerId);
+}
+
+// Export all other functions as properties of the generate function
+module.exports = generate;
+module.exports.generate = generate;
+module.exports.seed = seed;
+module.exports.worker = worker;
+module.exports.characters = characters;
+module.exports.decode = decode_1;
+module.exports.isValid = isValid;
+});
+
+var index$3$1 = index$4$1;
+
 var endpoints$3 = {
   /**
    * 1件のエンドポイントを追加します。
@@ -10177,7 +10437,8 @@ var endpoints$3 = {
         if (err.status !== 401) {
           throw err;
         }
-        const key = context.getter(constants$4.ENDPOINTS_NEXT_KEY);
+        //
+        const key = index$3$1.generate();
         const newEndpoint = {
           url: url,
           memo: memo,
@@ -12224,7 +12485,7 @@ var _dontEnums$2;
 /**
      * Get object keys
      */
-     var keys$2 = Object.keys || function (obj) {
+     var keys = Object.keys || function (obj) {
             var keys = [];
             forOwn_1$2(obj, function(val, key){
                 keys.push(key);
@@ -12232,7 +12493,7 @@ var _dontEnums$2;
             return keys;
         };
 
-    var keys_1$1 = keys$2;
+    var keys_1 = keys;
 
 /*
 object-assign
@@ -12862,10 +13123,10 @@ RiotX.prototype.reset = function reset () {
  * @returns {int} size
  */
 RiotX.prototype.size = function size () {
-  return keys_1$1(this.stores).length;
+  return keys_1(this.stores).length;
 };
 
-var index$3$1 = new RiotX();
+var index$6 = new RiotX();
 
 var store$1 = {
   /**
@@ -12876,13 +13137,13 @@ var store$1 = {
     return Promise
       .resolve()
       .then(() => {
-        const store = new index$3$1.Store({
+        const store = new index$6.Store({
           state: states,
           actions,
           mutations,
           getters
         });
-        index$3$1.add(store);
+        index$6.add(store);
         // TODO: あとでけす。
         window.store = store;
         return store;
