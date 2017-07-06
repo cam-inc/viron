@@ -17,6 +17,7 @@ export default function() {
     switch (type) {
     case 'string':
     case 'number':
+    case 'integer':
       this.uiType = 'input';
       break;
     case 'boolean':
