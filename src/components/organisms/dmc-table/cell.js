@@ -8,7 +8,13 @@ export default function() {
   this.value = null;
   this.isComplex = false;
   this.isImage = false;
-  switch (this.opts.cell.getType()) {
+  let type;
+  if (!!this.opts.cell) {
+    type = this.opts.cell.getType();
+  } else {
+    type = 'null';
+  }
+  switch (type) {
   case 'null':
     this.value = 'null';
     break;

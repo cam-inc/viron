@@ -17,6 +17,7 @@ export default {
 
     context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
     context.state.components[params.component_uid].data = data;
+    context.state.components[params.component_uid].schema = schema;
     // `component.pagination`からページングをサポートしているか判断する。
     // サポートしていれば手動でページング情報を付加する。
     if (params.component.pagination) {

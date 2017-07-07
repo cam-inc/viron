@@ -10,9 +10,9 @@ export default function() {
 
   this.getColumns = () => {
     const columns = [];
-    forEach(this.opts.data.getValue(0).getKeys(), k => {
+    forOwn(this.opts.schema.items.properties, (v, k) => {
       columns.push({
-        title: k,
+        title: v.description || k,
         key: k
       });
     });

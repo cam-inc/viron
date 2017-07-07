@@ -20,6 +20,8 @@ export default function() {
   this.alertText = '';
   // レスポンスデータ。
   this.data = null;
+  // レスポンスの構造。
+  this.schema = null;
   // ページング情報。
   this.pagination = null;
   // 現在のページング情報。
@@ -161,6 +163,7 @@ export default function() {
       this.pagination = null;
     }
     this.search = component.search;
+    this.schema = store.getter(getters.COMPONENTS_ONE_SCHEMA, this._riot_id);
     this.selfActions = store.getter(getters.COMPONENTS_ONE_SELF_ACTIONS, this._riot_id);
     this.rowActions = store.getter(getters.COMPONENTS_ONE_ROW_ACTIONS, this._riot_id);
     this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);

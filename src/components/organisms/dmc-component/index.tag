@@ -9,7 +9,7 @@ dmc-component.Component
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
     dmc-pagination(if="{ !isPending && !!pagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ 3 }" onChange="{ handlePaginationChange }")
-    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" data="{ data }" tableLabels="{ tableLabels }" rowActions="{ rowActions }" updater="{ updater }")
+    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" data="{ data }" schema="{ schema }" tableLabels="{ tableLabels }" rowActions="{ rowActions }" updater="{ updater }")
     .Component__alert(if="{ !isPending && !isValidData }")
       .Component__alertApi { alertApi }
       .Component__alertText { alertText }

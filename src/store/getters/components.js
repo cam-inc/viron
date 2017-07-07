@@ -22,6 +22,16 @@ export default {
   },
 
   /**
+   * 指定riotIDに対する要素のレスポンス構造を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Object}
+   */
+  schema: (context, riotId) => {
+    return context.state.components[riotId].schema;
+  },
+
+  /**
    * 自身に関連するactionを返します。
    * @param {riotx.Context} context
    * @param {String} riotId
