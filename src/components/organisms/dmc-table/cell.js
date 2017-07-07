@@ -11,8 +11,6 @@ export default function() {
   let type;
   if (!!this.opts.cell) {
     type = this.opts.cell.getType();
-  } else {
-    type = 'null';
   }
   switch (type) {
   case 'null':
@@ -39,6 +37,7 @@ export default function() {
     this.isComplex = true;
     break;
   default:
+    this.value = '(no response)';
     break;
   }
 

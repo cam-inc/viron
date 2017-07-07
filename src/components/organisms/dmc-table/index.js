@@ -10,6 +10,7 @@ export default function() {
         items.push({
           key: column.key,
           title: column.title,
+          type: column.type,
           cell: row[column.key]
         });
       });

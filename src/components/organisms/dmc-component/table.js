@@ -13,6 +13,7 @@ export default function() {
     forOwn(this.opts.schema.items.properties, (v, k) => {
       columns.push({
         title: v.description || k,
+        type: v.type,
         key: k
       });
     });
