@@ -4,7 +4,7 @@ dmc-operation-parameter-form.Operation__parameterForm
   virtual(if="{ uiType === 'checkbox' }")
     dmc-checkbox(isChecked="{ opts.parametervalue }" onChange="{ handleCheckboxChange }")
   virtual(if="{ uiType === 'select' }")
-    dmc-select(isOpened="{ isOpened }" options="{ getSelectOptions() }" onToggle="{ handleSelectToggle }" onChange="{ handleSelectChange }")
+    dmc-select(isOpened="{ isOpened }" options="{ getSelectOptions() }" onChange="{ handleSelectChange }")
   virtual(if="{ uiType === 'uploader' }")
     dmc-uploader(accept="*" onFileChange="{ handleFileChange }")
 

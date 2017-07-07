@@ -11,9 +11,9 @@ dmc-operation-schema-form.Operation__schemaForm
   virtual(if="{ uiType === 'checkbox' }")
     dmc-checkbox(isChecked="{ opts.parametervalue }" onChange="{ handleCheckboxChange }")
   virtual(if="{ uiType === 'select' }")
-    dmc-select(isOpened="{ isOpened }" options="{ getSelectOptions() }" onToggle="{ handleSelectToggle }" onChange="{ handleSelectChange }")
+    dmc-select(options="{ getSelectOptions() }" onChange="{ handleSelectChange }")
   .Operation__schemaFormChildren(if="{ uiType === 'multi' }" each="{ p, idx in multiData }")
-    .Operation__schemaFormMultiMinusButton(ref="touch" onTap="handleMultiMinusButtonTap")
+    .Operation__schemaFormMultiMinusButton(ref="touch" idx="{ idx }" onTap="handleMultiMinusButtonTap")
       dmc-icon(type="minus")
     dmc-operation-schema-form(each="{ propertyKey in parent.multiPropertyKeys }" multiIdx="{ parent.idx }" parameterObject="{ parent.getParameterObject(propertyKey) }" parameterValue="{ parent.getValue(propertyKey, parent.idx) }" onChange="{ parent.handleMultiChange }")
 

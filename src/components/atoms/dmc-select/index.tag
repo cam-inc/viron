@@ -1,14 +1,10 @@
-dmc-select(class="Select { opts.isopened ? 'Select--opened' : '' } { opts.isdisabled ? 'Select--disabled' : '' }")
-  .Select__box(ref="touch" onTap="handleBoxTap")
-    .Select__label { getSelectedLabel() }
+dmc-select.Select
+  .Select__label(if="{ !!opts.label || opts.isrequired }") { opts.label }{ (opts.isrequired !== undefined) ? ' *' : '' }
+  form.Select__content(onSubmit="{ handleFormSubmit }")
+    select.Select__input(ref="select" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
+      option(each="{ option in opts.options }" selected="{ option.isSelected }" disabled="{ option.isDisabled }") { option.label }
     .Select__icon
-      dmc-icon(type="down")
-  .Select__options
-    virtual(each="{ opts.options }")
-      div(class="Select__option { isSelected ? 'Select__option--selected' : ''  } { isDisabled ? 'Select__option--disabled' : '' }" data-id="{ id }" ref="touch" onTap="parent.handleOptionTap")
-        .Select__optionIcon
-          dmc-icon(type="check")
-        .Select__optionLabel { label }
+      dmv-icon(type="down")
 
   script.
     import '../../atoms/dmc-icon/index.tag';

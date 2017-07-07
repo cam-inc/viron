@@ -4,10 +4,9 @@ import forEach from 'mout/array/forEach';
 import ObjectAssign from 'object-assign';
 
 export default function() {
-  // typeは'null', 'boolean', 'object', 'array', 'number' or 'string'.
+  // typeは'null', 'boolean', 'object', 'array', 'number', 'integer', or 'string'.
   const type = this.opts.parameterobject.type;
   this.uiType = null;
-  this.isOpened = false;
   this.multiSchema = null;
   this.multiData = null;
   this.multiPropertyKeys = null;
@@ -54,6 +53,13 @@ export default function() {
 
   this.getSelectOptions = () => {
     const options = [];
+    if (this.opts.parametervalue === undefined) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
     forEach(this.opts.parameterobject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
@@ -63,6 +69,10 @@ export default function() {
     });
     return options;
   };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
 
   this.change = value => {
     // TODO: format, validate
@@ -79,7 +89,7 @@ export default function() {
   };
 
   this.handleMultiMinusButtonTap = e => {
-    this.multiData.splice(e.item.idx, 1);
+    this.multiData.splice(Number(e.currentTarget.getAttribute('idx')), 1);
     this.change(this.multiData);
   };
 
@@ -89,11 +99,6 @@ export default function() {
 
   this.handleCheckboxChange = isChecked => {
     this.change(isChecked);
-  };
-
-  this.handleSelectToggle = isOpened => {
-    this.isOpened = isOpened;
-    this.update();
   };
 
   this.handleSelectChange = options => {

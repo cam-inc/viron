@@ -30,6 +30,13 @@ export default function() {
 
   this.getSelectOptions = () => {
     const options = [];
+    if (this.opts.parametervalue === undefined) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
     forEach(this.opts.parameterobject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
@@ -39,6 +46,10 @@ export default function() {
     });
     return options;
   };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
 
   this.change = value => {
     // TODO: format, validate

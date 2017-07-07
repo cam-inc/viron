@@ -1,37 +1,30 @@
-import find from 'mout/array/find';
-import map from 'mout/array/map';
+import forEach from 'mout/array/forEach';
 
 export default function() {
-  this.getSelectedLabel = () => {
-    const selectedOption = find(this.opts.options, { isSelected: true });
-    if (!selectedOption) {
-      return '-';
-    }
-    return selectedOption.label;
-  };
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
-  this.handleBoxTap = () => {
-    if (this.opts.isdisabled) {
-      return;
-    }
-    this.opts.ontoggle && this.opts.ontoggle(!this.opts.isopened);
-  };
-
-  this.handleOptionTap = e => {
-    const selectedOptionID = e.currentTarget.dataset.id;
-    const options = map(this.opts.options, option => {
-      if (option.id === selectedOptionID) {
-        option.isSelected = true;
-      } else {
-        option.isSelected = false;
-      }
-      return option;
+  this.handleFormSubmit = e => {
+    e.preventUpdate = true;
+    e.preventDefault();
+    const selectedIndex = this.refs.select.selectedIndex;
+    forEach(this.opts.options, (option, idx) => {
+      option.isSelected = (idx === selectedIndex);
     });
-    this.opts.onchange && this.opts.onchange(options);
-    this.opts.ontoggle && this.opts.ontoggle(false);
+    this.opts.onchange && this.opts.onchange(this.opts.options);
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    const selectedIndex = this.refs.select.selectedIndex;
+    forEach(this.opts.options, (option, idx) => {
+      option.isSelected = (idx === selectedIndex);
+    });
+    this.opts.onchange && this.opts.onchange(this.opts.options);
+  };
+
+  this.handleInputChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
   };
 }
