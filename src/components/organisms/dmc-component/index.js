@@ -85,7 +85,7 @@ export default function() {
       if (type !== 'object' || data.getValue('value') === undefined) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be form of "object" and have "value" key.`;
+        this.alertText = 'unexpected response.';
         return;
       }
     }
@@ -94,13 +94,19 @@ export default function() {
       if (type !== 'array') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be form of "array".`;
+        this.alertText = 'unexpected response.';
         return;
       }
-      if (!data.getLength() || data.getValue(0).getType() !== 'object') {
+      if (!data.getLength()) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be composed with "object".`;
+        this.alertText = 'Length is 0.';
+        return;
+      }
+      if (data.getValue(0).getType() !== 'object') {
+        this.isValidData = false;
+        this.alertApi = `${method}: ${path}`;
+        this.alertText = 'unexpected response.';
         return;
       }
     }
@@ -109,19 +115,19 @@ export default function() {
       if (type !== 'object') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be form of "object".`;
+        this.alertText = 'unexpected response.';
         return;
       }
       if (!data.getValue('data') || !data.getValue('x') || !data.getValue('y') || data.getValue('data').getType() !== 'array') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be composed with at least "x", "y" and "data". "data" value type sholud be an "array".`;
+        this.alertText = 'unexpected response.';
         return;
       }
       if (!data.getValue('data').getLength()) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = 'empty';
+        this.alertText = 'Length is 0.';
         return;
       }
     }
