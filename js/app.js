@@ -9911,9 +9911,7 @@ var components$3 = {
       const api = swagger.getApiByOperationID(operationObject.operationId);
 
       api(query, {
-        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
         requestInterceptor: req => {
-          // TODO: `headers`とかでtokenのセットが可能か？？
           req.headers['Authorization'] = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
         }
       }).then(res => {
