@@ -32,21 +32,18 @@ class Swagger {
 
       SwaggerClient// eslint-disable-line no-undef
         .http(request)
-        .then(client => {
-          if (client.errors && client.errors.length > 0) {
-            return reject(client.errors);
+        .then(res => {
+          if (res.errors && res.errors.length > 0) {
+            return reject(res.errors);
           }
-          if (client.status === 401) {
-            // TODO: 要確認。
+          if (res.status === 401) {
             const err = new Error();
             err.name = '401 Authorization Required';
-            err.status = client.spec.status;
+            err.status = res.spec.status;
             return reject(err);
           }
 
-          console.log(`[fetch] ${client.url} success.`);
-
-          SwaggerClient({spec: client.body}).then((_client) => {// eslint-disable-line no-undef
+          SwaggerClient({spec: res.body}).then(_client => {// eslint-disable-line no-undef
             this.client = _client;
             resolve(_client.spec.info);
           });

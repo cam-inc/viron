@@ -24,23 +24,14 @@ export default {
 
       const token = context.getter(getters.ENDPOINTS_ONE, context.getter(getters.CURRENT)).token;
 
-      api({/** TODO get only support. */}, {
-        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
-        // TODO component.jsと共通化したい
+      api({}, {
         requestInterceptor: (req) => {
           req.headers['Authorization'] = token;
-          console.log('Interceptor(request):', req);
-        },
-        responseInterceptor: (res) => {
-          console.log('Interceptor(response):', res);
         }
       }).then(res => {
         if (!res.ok) {
           throw new Error(`[fetch] ${res.url} error.`);
         }
-
-        console.log(`[fetch] ${res.url} success.`);
-
         return {
           response: res.obj,
           operationObject

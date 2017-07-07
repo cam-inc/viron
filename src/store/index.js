@@ -20,8 +20,6 @@ export default {
           getters
         });
         riotx.add(store);
-        // TODO: あとでけす。
-        window.store = store;
         return store;
       });
   }

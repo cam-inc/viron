@@ -1,4 +1,5 @@
 import forEach from 'mout/array/forEach';
+import forOwn from 'mout/object/forOwn';
 import ObjectAssign from 'object-assign';
 import swagger from '../../../core/swagger';
 import { constants as actions } from '../../../store/actions';
@@ -27,6 +28,15 @@ export default function() {
   this.search = null;
   // 現在の検索条件。
   this.currentSearch = {};
+  this.isCurrentSearchEmpty = () => {
+    let isEmpty = true;
+    forOwn(this.currentSearch, val => {
+      if (!!val) {
+        isEmpty = false;
+      }
+    });
+    return isEmpty;
+  };
   // 自身に関するアクション群。
   this.selfActions = null;
   // テーブル行に関するアクション群。
