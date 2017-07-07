@@ -21,17 +21,9 @@ export default function() {
   this.message = this.opts.message;
 
   // errorが渡された場合は最適化処理を行う。
-  // TODO: prettyprintを使っても良いかも。
   if (!!this.opts.error) {
     this.type = 'error';
-    this.icon = 'exclamation';
-    if (this.opts.error instanceof Error) {
-      this.title = this.opts.error.name;
-      this.message = this.opts.error.message;
-    } else {
-      // TODO: どーしようかな。。
-      this.title = `${this.opts.error.code} ${this.opts.error.name}`;
-      this.message = `[${this.opts.error.id}] ${this.opts.error.message}`;
-    }
+    this.icon = 'close';
+    this.title = this.opts.error.name || 'Error';
   }
 }

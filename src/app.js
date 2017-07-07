@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => store.init())
     .then(store => {
       _store = store;
-      // TODO: debug用なので後で消すこと。
+      // debug用にglobal公開しておく。
       window.store = store;
       window.swagger = swagger;
     })

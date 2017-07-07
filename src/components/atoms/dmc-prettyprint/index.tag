@@ -1,4 +1,4 @@
-dmc-prettyprint.PrettyPrint
+dmc-prettyprint.PrettyPrint(class="{ opts.class }")
   pre.PrettyPrint__pre(ref="canvas")
 
   script.
