@@ -13290,73 +13290,36 @@ riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbo
     this.external(script$7);
 });
 
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex$1(arr, iterator, thisObj){
-        iterator = makeIterator_$1(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (iterator(arr[i], i, arr)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    var findIndex_1$1 = findIndex$1;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$3(arr, iterator, thisObj){
-        var idx = findIndex_1$1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var find_1$2 = find$3;
-
 var script$8 = function() {
-  this.getSelectedLabel = () => {
-    const selectedOption = find_1$2(this.opts.options, { isSelected: true });
-    if (!selectedOption) {
-      return '-';
-    }
-    return selectedOption.label;
-  };
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
-  this.handleBoxTap = () => {
-    if (this.opts.isdisabled) {
-      return;
-    }
-    this.opts.ontoggle && this.opts.ontoggle(!this.opts.isopened);
-  };
-
-  this.handleOptionTap = e => {
-    const selectedOptionID = e.currentTarget.dataset.id;
-    const options = map_1$1(this.opts.options, option => {
-      if (option.id === selectedOptionID) {
-        option.isSelected = true;
-      } else {
-        option.isSelected = false;
-      }
-      return option;
+  this.handleFormSubmit = e => {
+    e.preventUpdate = true;
+    e.preventDefault();
+    const selectedIndex = this.refs.select.selectedIndex;
+    forEach_1(this.opts.options, (option, idx) => {
+      option.isSelected = (idx === selectedIndex);
     });
-    this.opts.onchange && this.opts.onchange(options);
-    this.opts.ontoggle && this.opts.ontoggle(false);
+    this.opts.onchange && this.opts.onchange(this.opts.options);
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    const selectedIndex = this.refs.select.selectedIndex;
+    forEach_1(this.opts.options, (option, idx) => {
+      option.isSelected = (idx === selectedIndex);
+    });
+    this.opts.onchange && this.opts.onchange(this.opts.options);
+  };
+
+  this.handleInputChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
   };
 };
 
-riot$1.tag2('dmc-select', '<div class="Select__box" ref="touch" ontap="handleBoxTap"> <div class="Select__label">{getSelectedLabel()}</div> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </div> <div class="Select__options"> <virtual each="{opts.options}"> <div class="Select__option {isSelected ? \'Select__option--selected\' : \'\'} {isDisabled ? \'Select__option--disabled\' : \'\'}" data-id="{id}" ref="touch" ontap="parent.handleOptionTap"> <div class="Select__optionIcon"> <dmc-icon type="check"></dmc-icon> </div> <div class="Select__optionLabel">{label}</div> </div> </virtual> </div>', '', 'class="Select {opts.isopened ? \'Select--opened\' : \'\'} {opts.isdisabled ? \'Select--disabled\' : \'\'}"', function(opts) {
+riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <dmv-icon type="down"></dmv-icon> </div> </form>', '', 'class="Select"', function(opts) {
     this.external(script$8);
 });
 
@@ -13430,6 +13393,37 @@ riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input cla
     this.external(script$10);
 });
 
+/**
+     * Returns the index of the first item that matches criteria
+     */
+    function findIndex$1(arr, iterator, thisObj){
+        iterator = makeIterator_$1(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (iterator(arr[i], i, arr)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    var findIndex_1$1 = findIndex$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$3(arr, iterator, thisObj){
+        var idx = findIndex_1$1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var find_1$2 = find$3;
+
 var script$11 = function() {
   const type = this.opts.parameterobject.type;
   this.uiType = null;
@@ -13459,6 +13453,13 @@ var script$11 = function() {
 
   this.getSelectOptions = () => {
     const options = [];
+    if (this.opts.parametervalue === undefined) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
     forEach_1(this.opts.parameterobject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
@@ -13468,6 +13469,10 @@ var script$11 = function() {
     });
     return options;
   };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
 
   this.change = value => {
     // TODO: format, validate
@@ -13503,15 +13508,14 @@ var script$11 = function() {
   };
 };
 
-riot$1.tag2('dmc-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" ontoggle="{handleSelectToggle}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleFileChange}"></dmc-uploader> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
+riot$1.tag2('dmc-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleFileChange}"></dmc-uploader> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
     this.external(script$11);
 });
 
 var script$12 = function() {
-  // typeは'null', 'boolean', 'object', 'array', 'number' or 'string'.
+  // typeは'null', 'boolean', 'object', 'array', 'number', 'integer', or 'string'.
   const type = this.opts.parameterobject.type;
   this.uiType = null;
-  this.isOpened = false;
   this.multiSchema = null;
   this.multiData = null;
   this.multiPropertyKeys = null;
@@ -13558,6 +13562,13 @@ var script$12 = function() {
 
   this.getSelectOptions = () => {
     const options = [];
+    if (this.opts.parametervalue === undefined) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
     forEach_1(this.opts.parameterobject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
@@ -13567,6 +13578,10 @@ var script$12 = function() {
     });
     return options;
   };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
 
   this.change = value => {
     // TODO: format, validate
@@ -13583,7 +13598,7 @@ var script$12 = function() {
   };
 
   this.handleMultiMinusButtonTap = e => {
-    this.multiData.splice(e.item.idx, 1);
+    this.multiData.splice(Number(e.currentTarget.getAttribute('idx')), 1);
     this.change(this.multiData);
   };
 
@@ -13593,11 +13608,6 @@ var script$12 = function() {
 
   this.handleCheckboxChange = isChecked => {
     this.change(isChecked);
-  };
-
-  this.handleSelectToggle = isOpened => {
-    this.isOpened = isOpened;
-    this.update();
   };
 
   this.handleSelectChange = options => {
@@ -13618,7 +13628,7 @@ var script$12 = function() {
   };
 };
 
-riot$1.tag2('dmc-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" ref="touch" ontap="handleMultiPlusButtonTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" ontoggle="{handleSelectToggle}" onchange="{handleSelectChange}"></dmc-select> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" ref="touch" ontap="handleMultiMinusButtonTap"> <dmc-icon type="minus"></dmc-icon> </div> <dmc-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></dmc-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
+riot$1.tag2('dmc-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" ref="touch" ontap="handleMultiPlusButtonTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" ref="touch" idx="{idx}" ontap="handleMultiMinusButtonTap"> <dmc-icon type="minus"></dmc-icon> </div> <dmc-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></dmc-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
     this.external(script$12);
 });
 
