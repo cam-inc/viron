@@ -79,7 +79,6 @@ export default function() {
     const type = data.getType();
     const method = this.opts.component.api.method;
     const path = this.opts.component.api.path;
-    const style = this.opts.component.style;
 
     if (swagger.isComponentStyleNumber(this.opts.component.style)) {
       if (type !== 'object' || data.getValue('value') === undefined) {
