@@ -11280,6 +11280,35 @@ riot$1.tag2('dmc-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {
 });
 
 var script$1 = function() {
+  const str = (json => {
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+      let cls = 'number';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'key';
+        } else {
+          cls = 'string';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'boolean';
+      } else if (/null/.test(match)) {
+        cls = 'null';
+      }
+      return '<span class="PrettyPrint__' + cls + '">' + match + '</span>';
+    });
+  })(JSON.stringify(this.opts.data, undefined, 4));
+
+  this.on('mount', () => {
+    this.refs.canvas.innerHTML = str;
+  });
+};
+
+riot$1.tag2('dmc-prettyprint', '<pre class="PrettyPrint__pre" ref="canvas"></pre>', '', 'class="PrettyPrint {opts.class}"', function(opts) {
+    this.external(script$1);
+});
+
+var script$2 = function() {
   // タイプ。
   this.type = this.opts.type || 'info';
   // iconの種類。
@@ -11302,23 +11331,15 @@ var script$1 = function() {
   this.message = this.opts.message;
 
   // errorが渡された場合は最適化処理を行う。
-  // TODO: prettyprintを使っても良いかも。
   if (!!this.opts.error) {
     this.type = 'error';
-    this.icon = 'exclamation';
-    if (this.opts.error instanceof Error) {
-      this.title = this.opts.error.name;
-      this.message = this.opts.error.message;
-    } else {
-      // TODO: どーしようかな。。
-      this.title = `${this.opts.error.code} ${this.opts.error.name}`;
-      this.message = `[${this.opts.error.id}] ${this.opts.error.message}`;
-    }
+    this.icon = 'close';
+    this.title = this.opts.error.name || 'Error';
   }
 };
 
-riot$1.tag2('dmc-message', '<div class="Message__head"> <div class="Message__icon"> <dmc-icon type="{icon}"></dmc-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message}">{message}</div>', '', 'class="Message Message--{type}"', function(opts) {
-    this.external(script$1);
+riot$1.tag2('dmc-message', '<div class="Message__head"> <div class="Message__icon"> <dmc-icon type="{icon}"></dmc-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message &amp;&amp; !opts.error}">{message}</div> <dmc-prettyprint class="Message__error" if="{!!opts.error}" data="{opts.error}"></dmc-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
+    this.external(script$2);
 });
 
 var ComponentsRoute = {
@@ -13149,7 +13170,7 @@ var store$1 = {
   }
 };
 
-var script$2 = function() {
+var script$3 = function() {
   this.getBasePages = () => {
     const size = this.opts.size;
     const currentPage = this.opts.currentpage;
@@ -13218,10 +13239,10 @@ var script$2 = function() {
 };
 
 riot$1.tag2('dmc-pagination', '<div class="Pagination__control"> <div class="Pagination__button {opts.currentpage === 1 ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handlePrevButtonTap"> <dmc-icon type="left"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[0].num !== 1}" data-page="1" ref="touch" ontap="handlePageButtonTap">1</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[0].num &gt;= 3}" ref="touch" ontap="handleRecedeButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__recedeIcon" type="doubleLeft"></dmc-icon> </div> <div class="Pagination__button {page.isSelected ? \'Pagination__button--selected\' : \'\'}" each="{page in getBasePages()}" data-page="{page.num}" ref="touch" ontap="parent.handlePageButtonTap">{page.num}</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[getBasePages().length - 1].num &lt;= opts.maxpage - 2}" ref="touch" ontap="handleProceedButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__proceedIcon" type="doubleRight"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[getBasePages().length - 1].num !== opts.maxpage}" data-page="{opts.maxpage}" ref="touch" ontap="handlePageButtonTap">{opts.maxpage}</div> <div class="Pagination__button {opts.currentpage === opts.maxpage ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handleNextButtonTap"> <dmc-icon type="right"></dmc-icon> </div> </div> <div class="Pagination__info">{opts.currentpage} / {opts.maxpage}</div>', '', 'class="Pagination"', function(opts) {
-    this.external(script$2);
+    this.external(script$3);
 });
 
-var script$3 = function() {
+var script$4 = function() {
   this.handleTap = () => {
     if (this.opts.isdisabled) {
       return;
@@ -13231,10 +13252,10 @@ var script$3 = function() {
 };
 
 riot$1.tag2('dmc-button', '<span>{opts.label}</span>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$3);
+    this.external(script$4);
 });
 
-var script$4 = function() {
+var script$5 = function() {
   this.show = () => {
     // need to set delay after dom mountation.
     new Promise(resolve => {
@@ -13253,10 +13274,10 @@ var script$4 = function() {
 };
 
 riot$1.tag2('dmc-tooltip', '<div class="Tooltip__wrapper"> <div class="Tooltip__triangle"></div> <div class="Tooltip__contentWrapper"> <div class="Tooltip__content">{opts.message}</div> </div> </div>', '', 'class="Tooltip"', function(opts) {
-    this.external(script$4);
+    this.external(script$5);
 });
 
-var script$6 = function() {
+var script$7 = function() {
   this.handleTap = () => {
     if (this.opts.isdisabled) {
       return;
@@ -13266,7 +13287,7 @@ var script$6 = function() {
 };
 
 riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <dmc-icon type="check"></dmc-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$6);
+    this.external(script$7);
 });
 
 /**
@@ -13300,7 +13321,7 @@ riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbo
 
     var find_1$2 = find$3;
 
-var script$7 = function() {
+var script$8 = function() {
   this.getSelectedLabel = () => {
     const selectedOption = find_1$2(this.opts.options, { isSelected: true });
     if (!selectedOption) {
@@ -13336,10 +13357,10 @@ var script$7 = function() {
 };
 
 riot$1.tag2('dmc-select', '<div class="Select__box" ref="touch" ontap="handleBoxTap"> <div class="Select__label">{getSelectedLabel()}</div> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </div> <div class="Select__options"> <virtual each="{opts.options}"> <div class="Select__option {isSelected ? \'Select__option--selected\' : \'\'} {isDisabled ? \'Select__option--disabled\' : \'\'}" data-id="{id}" ref="touch" ontap="parent.handleOptionTap"> <div class="Select__optionIcon"> <dmc-icon type="check"></dmc-icon> </div> <div class="Select__optionLabel">{label}</div> </div> </virtual> </div>', '', 'class="Select {opts.isopened ? \'Select--opened\' : \'\'} {opts.isdisabled ? \'Select--disabled\' : \'\'}"', function(opts) {
-    this.external(script$7);
+    this.external(script$8);
 });
 
-var script$8 = function() {
+var script$9 = function() {
   this.handleTap = () => {
     this.refs.form.focus();
   };
@@ -13365,10 +13386,10 @@ var script$8 = function() {
 };
 
 riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" type="{opts.type || \'text\'}" riot-value="{opts.text}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$8);
+    this.external(script$9);
 });
 
-var script$9 = function() {
+var script$10 = function() {
   this.inputId = `Uploader__input${Date.now()}`;
   this.file = null;
   this.blobURL = this.opts.initialbloburl || null;
@@ -13406,10 +13427,10 @@ var script$9 = function() {
 };
 
 riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL}" riot-style="background-image:url({blobURL});"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div>', '', 'class="Uploader"', function(opts) {
-    this.external(script$9);
+    this.external(script$10);
 });
 
-var script$10 = function() {
+var script$11 = function() {
   const type = this.opts.parameterobject.type;
   this.uiType = null;
   this.isOpened = false;
@@ -13483,10 +13504,10 @@ var script$10 = function() {
 };
 
 riot$1.tag2('dmc-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" ontoggle="{handleSelectToggle}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleFileChange}"></dmc-uploader> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
-    this.external(script$10);
+    this.external(script$11);
 });
 
-var script$11 = function() {
+var script$12 = function() {
   // typeは'null', 'boolean', 'object', 'array', 'number' or 'string'.
   const type = this.opts.parameterobject.type;
   this.uiType = null;
@@ -13598,10 +13619,10 @@ var script$11 = function() {
 };
 
 riot$1.tag2('dmc-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" ref="touch" ontap="handleMultiPlusButtonTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" ontoggle="{handleSelectToggle}" onchange="{handleSelectChange}"></dmc-select> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" ref="touch" ontap="handleMultiMinusButtonTap"> <dmc-icon type="minus"></dmc-icon> </div> <dmc-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></dmc-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
-    this.external(script$11);
+    this.external(script$12);
 });
 
-var script$12 = function() {
+var script$13 = function() {
   this.propertyKeys = Object.keys(this.opts.schema.properties);
 
   this.getParameterObject = propertyKey => {
@@ -13633,10 +13654,10 @@ var script$12 = function() {
 };
 
 riot$1.tag2('dmc-operation-schema', '<dmc-operation-schema-form each="{propertyKey in propertyKeys}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey)}" onchange="{parent.handleChange}"></dmc-operation-schema-form>', '', 'class="Operation__schema"', function(opts) {
-    this.external(script$12);
+    this.external(script$13);
 });
 
-var script$13 = function() {
+var script$14 = function() {
   this.isUseBody = false;
   // "query", "header", "path", "formData" or "body"のどれか。
   if (this.opts.parameter.in === 'body') {
@@ -13649,10 +13670,10 @@ var script$13 = function() {
 };
 
 riot$1.tag2('dmc-operation-parameter', '<div class="Operation__parameterHead"> <div> <div class="Operation__parameterName">name: {opts.parameter.name}</div> <div class="Operation__parameterDescription">description: {opts.parameter.description}</div> <div class="Operation__parameterIn">in: {opts.parameter.in}</div> </div> <div class="Operation__parameterRequired" if="{opts.parameter.required}">required</div> </div> <div class="Operation__parameterBody"> <dmc-operation-schema if="{isUseBody}" name="{opts.parameter.name}" schema="{opts.parameter.schema}" parametervalues="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-schema> <dmc-operation-parameter-form if="{!isUseBody}" parameterobject="{this.opts.parameter}" parametervalue="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-parameter-form> </div>', '', 'class="Operation__parameter"', function(opts) {
-    this.external(script$13);
+    this.external(script$14);
 });
 
-var script$14 = function() {
+var script$15 = function() {
   const store = this.riotx.get();
 
   this.summary = this.opts.operation.summary;
@@ -13690,10 +13711,10 @@ var script$14 = function() {
 };
 
 riot$1.tag2('dmc-operation', '<div class="Operation__info"> <div> <div class="Operation__summary">{summary}</div> <div class="Operation__description">{opts.operation.description}</div> </div> </div> <div class="Operation__control"> <dmc-button label="{opts.operation.operationId}" onpat="{handleExecuteButtonPat}"></dmc-button> <dmc-button label="cancel" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div> <div class="Operation__parameters"> <dmc-operation-parameter each="{parameter in opts.operation.parameters}" parameter="{parameter}" parametervalue="{parent.queries[parameter.name]}" onchange="{parent.handleParameterChange}"></dmc-operation-parameter> </div>', '', 'class="Operation"', function(opts) {
-    this.external(script$14);
+    this.external(script$15);
 });
 
-var script$5 = function() {
+var script$6 = function() {
   const store = this.riotx.get();
 
   this.isTooltipOpened = false;
@@ -13723,7 +13744,7 @@ var script$5 = function() {
 };
 
 riot$1.tag2('dmc-component-action', '<dmc-button label="{label}" onpat="{handleButtonPat}" onhovertoggle="{handleButtonHoverToggle}"></dmc-button> <dmc-tooltip if="{isTooltipOpened}" message="{tooltipMessage}"></dmc-tooltip>', '', 'class="Component__action"', function(opts) {
-    this.external(script$5);
+    this.external(script$6);
 });
 
 var d3 = createCommonjsModule(function (module) {
@@ -41349,7 +41370,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 var chart$1 = unwrapExports(tauCharts);
 
-var script$15 = function() {
+var script$16 = function() {
   this.on('mount', () => {
     const rawData = this.opts.data.getRawValue();
     new chart$1.Chart(index$1$1({
@@ -41359,10 +41380,10 @@ var script$15 = function() {
 };
 
 riot$1.tag2('dmc-component-graph-bar', '<div class="ComponentGraphBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphBar"', function(opts) {
-    this.external(script$15);
+    this.external(script$16);
 });
 
-var script$16 = function() {
+var script$17 = function() {
   this.on('mount', () => {
     const rawData = this.opts.data.getRawValue();
     new chart$1.Chart(index$1$1({
@@ -41372,10 +41393,10 @@ var script$16 = function() {
 };
 
 riot$1.tag2('dmc-component-graph-horizontal-bar', '<div class="ComponentGraphHorizontalBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalBar"', function(opts) {
-    this.external(script$16);
+    this.external(script$17);
 });
 
-var script$17 = function() {
+var script$18 = function() {
   this.on('mount', () => {
     const rawData = this.opts.data.getRawValue();
     new chart$1.Chart(index$1$1({
@@ -41385,10 +41406,10 @@ var script$17 = function() {
 };
 
 riot$1.tag2('dmc-component-graph-horizontal-stacked-bar', '<div class="ComponentGraphHorizontalStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalStackedBar"', function(opts) {
-    this.external(script$17);
+    this.external(script$18);
 });
 
-var script$18 = function() {
+var script$19 = function() {
   this.on('mount', () => {
     const rawData = this.opts.data.getRawValue();
     new chart$1.Chart(index$1$1({
@@ -41401,10 +41422,10 @@ var script$18 = function() {
 };
 
 riot$1.tag2('dmc-component-graph-line', '<div class="ComponentGraphLine__canvas" ref="canvas"></div>', '', 'class="ComponentGraphLine"', function(opts) {
-    this.external(script$18);
+    this.external(script$19);
 });
 
-var script$19 = function() {
+var script$20 = function() {
   this.on('mount', () => {
     const rawData = this.opts.data.getRawValue();
     new chart$1.Chart(index$1$1({
@@ -41414,10 +41435,10 @@ var script$19 = function() {
 };
 
 riot$1.tag2('dmc-component-graph-scatterplot', '<div class="ComponentGraphScatterplot__canvas" ref="canvas"></div>', '', 'class="ComponentGraphScatterplot"', function(opts) {
-    this.external(script$19);
+    this.external(script$20);
 });
 
-var script$20 = function() {
+var script$21 = function() {
   this.on('mount', () => {
     const rawData = this.opts.data.getRawValue();
     new chart$1.Chart(index$1$1({
@@ -41427,10 +41448,10 @@ var script$20 = function() {
 };
 
 riot$1.tag2('dmc-component-graph-stacked-area', '<div class="ComponentGraphStackedArea__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedArea"', function(opts) {
-    this.external(script$20);
+    this.external(script$21);
 });
 
-var script$21 = function() {
+var script$22 = function() {
   this.on('mount', () => {
     const rawData = this.opts.data.getRawValue();
     new chart$1.Chart(index$1$1({
@@ -41440,7 +41461,7 @@ var script$21 = function() {
 };
 
 riot$1.tag2('dmc-component-graph-stacked-bar', '<div class="ComponentGraphStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedBar"', function(opts) {
-    this.external(script$21);
+    this.external(script$22);
 });
 
 /**
@@ -41484,44 +41505,15 @@ riot$1.tag2('dmc-component-graph-stacked-bar', '<div class="ComponentGraphStacke
 
     var currencyFormat_1 = currencyFormat;
 
-var script$22 = function() {
+var script$23 = function() {
   this.value = currencyFormat_1(this.opts.data.getValue('value').getValue(), 0);
 };
 
 riot$1.tag2('dmc-component-number', '<div class="ComponentNumber__value">{value}</div>', '', 'class="ComponentNumber"', function(opts) {
-    this.external(script$22);
+    this.external(script$23);
 });
 
 var script$24 = function() {
-  const str = (json => {
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
-      let cls = 'number';
-      if (/^"/.test(match)) {
-        if (/:$/.test(match)) {
-          cls = 'key';
-        } else {
-          cls = 'string';
-        }
-      } else if (/true|false/.test(match)) {
-        cls = 'boolean';
-      } else if (/null/.test(match)) {
-        cls = 'null';
-      }
-      return '<span class="PrettyPrint__' + cls + '">' + match + '</span>';
-    });
-  })(JSON.stringify(this.opts.data, undefined, 4));
-
-  this.on('mount', () => {
-    this.refs.canvas.innerHTML = str;
-  });
-};
-
-riot$1.tag2('dmc-prettyprint', '<pre class="PrettyPrint__pre" ref="canvas"></pre>', '', 'class="PrettyPrint"', function(opts) {
-    this.external(script$24);
-});
-
-var script$23 = function() {
   const store = this.riotx.get();
 
   this.value = null;
@@ -41560,7 +41552,7 @@ var script$23 = function() {
 };
 
 riot$1.tag2('dmc-table-cell', '<div ref="touch" ontap="handleTap">{value}</div>', '', 'class="Table__cell"', function(opts) {
-    this.external(script$23);
+    this.external(script$24);
 });
 
 var script$25 = function() {
@@ -42826,7 +42818,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => store$1.init())
     .then(store => {
       _store = store;
-      // TODO: debug用なので後で消すこと。
+      // debug用にglobal公開しておく。
       window.store = store;
       window.swagger = swagger;
     })
