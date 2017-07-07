@@ -1,4 +1,5 @@
 import forEach from 'mout/array/forEach';
+import ObjectAssign from 'object-assign';
 import swagger from '../../../core/swagger';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
@@ -20,8 +21,12 @@ export default function() {
   this.data = null;
   // ページング情報。
   this.pagination = null;
-  // ページング情報。
+  // 現在のページング情報。
+  this.currentPaging = {};
+  // 検索情報。
   this.search = null;
+  // 現在の検索条件。
+  this.currentSearch = {};
   // 自身に関するアクション群。
   this.selfActions = null;
   // テーブル行に関するアクション群。
@@ -55,6 +60,7 @@ export default function() {
   this.updater = (query = {}) => {
     this.isPending = true;
     this.update();
+    query = ObjectAssign({}, this.currentPaging, this.currentSearch, query);
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
@@ -170,7 +176,8 @@ export default function() {
     forEach(this.search, query => {
       queries.push({
         key: query.key,
-        type: query.type
+        type: query.type,
+        value: this.currentSearch[query.key] || ''
       });
     });
     Promise
@@ -178,6 +185,9 @@ export default function() {
       .then(() => store.action(actions.MODALS_ADD, 'dmc-component-searchbox', {
         queries,
         onSearch: queries => {
+          // キーワード変更後は1ページ目に戻す。
+          this.currentPaging = {};
+          this.currentSearch = queries;
           this.updater(queries);
         }
       }))
@@ -187,9 +197,10 @@ export default function() {
   };
 
   this.handlePaginationChange = page => {
-    this.updater({
+    const paging = this.currentPaging = {
       limit: this.pagination.size,
       offset: (page - 1) * this.pagination.size
-    });
+    };
+    this.updater(paging);
   };
 }
