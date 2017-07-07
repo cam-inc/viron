@@ -41531,8 +41531,6 @@ var script$24 = function() {
   let type;
   if (!!this.opts.cell) {
     type = this.opts.cell.getType();
-  } else {
-    type = 'null';
   }
   switch (type) {
   case 'null':
@@ -41559,6 +41557,7 @@ var script$24 = function() {
     this.isComplex = true;
     break;
   default:
+    this.value = '(no response)';
     break;
   }
 
@@ -41582,7 +41581,7 @@ var script$25 = function() {
   };
 };
 
-riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap="handleHeaderTap"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemOpenShut"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-cell cell="{opts.item.cell}"></dmc-table-cell> </virtual>', '', 'class="Table__item {isOpened ? \'Table__item--opened\' : \'\'}"', function(opts) {
+riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap="handleHeaderTap"> <div class="Table__itemInfo"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <div class="Table__itemOpenShut"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-cell cell="{opts.item.cell}"></dmc-table-cell> </virtual>', '', 'class="Table__item {isOpened ? \'Table__item--opened\' : \'\'}"', function(opts) {
     this.external(script$25);
 });
 
@@ -41730,6 +41729,7 @@ var script$29 = function() {
         items.push({
           key: column.key,
           title: column.title,
+          type: column.type,
           cell: row[column.key]
         });
       });
@@ -41751,6 +41751,7 @@ var script$30 = function() {
     forOwn_1$1(this.opts.schema.items.properties, (v, k) => {
       columns.push({
         title: v.description || k,
+        type: v.type,
         key: k
       });
     });
