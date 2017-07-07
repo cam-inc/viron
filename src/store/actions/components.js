@@ -51,9 +51,7 @@ export default {
       const api = swagger.getApiByOperationID(operationObject.operationId);
 
       api(query, {
-        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
         requestInterceptor: req => {
-          // TODO: `headers`とかでtokenのセットが可能か？？
           req.headers['Authorization'] = context.getter(getters.ENDPOINTS_ONE, context.getter(getters.CURRENT)).token;
         }
       }).then(res => {
