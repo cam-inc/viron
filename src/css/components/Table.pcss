@@ -7,8 +7,8 @@
 /* ============================== */
 .Table__items {
   display: block;
-  margin-bottom: 12px;
   padding: 8px;
+  margin-bottom: 12px;
   background-color: var(--color-bg-tertiaryLight);
   border-radius: 4px;
 }
@@ -39,11 +39,11 @@
   @apply --layout-center-center;
   width: 18px;
   height: 18px;
+  margin-left: 4px;
+  font-size: 14px;
   cursor: pointer;
   background-color: #fff;
   border-radius: 2px;
-  font-size: 14px;
-  margin-left: 4px;
 }
 
 .Table__itemsButton.hover {
@@ -51,8 +51,8 @@
 }
 
 .Table__itemsOpenShutButton .Icon {
-  transition-property: transform;
   transition-duration: 100ms;
+  transition-property: transform;
 }
 
 .Table__items--opened .Table__itemsOpenShutButton .Icon {
@@ -67,9 +67,9 @@
   display: block;
   padding: 8px;
   margin-bottom: 8px;
-  border-left: 2px solid var(--color-bg-tertiary);
-  border-right: 2px solid var(--color-bg-tertiary);
   background-color: #fff;
+  border-right: 2px solid var(--color-bg-tertiary);
+  border-left: 2px solid var(--color-bg-tertiary);
 }
 
 .Table__items .Table__item:last-child {
@@ -98,13 +98,13 @@
   @apply --layout-center-center;
   width: 12px;
   height: 12px;
-  font-size: 12px;
   margin-left: 4px;
+  font-size: 12px;
 }
 
 .Table__itemOpenShut .Icon {
-  transition-property: transform;
   transition-duration: 100ms;
+  transition-property: transform;
 }
 
 .Table__item--opened .Table__itemOpenShut .Icon {
@@ -142,8 +142,8 @@
   @apply --layout-center-center;
   padding: 8px;
   margin-bottom: 8px;
-  border-left: 2px solid var(--color-bg-tertiary);
   background-color: #fff;
+  border-left: 2px solid var(--color-bg-tertiary);
 }
 
 .Table__actionItem:last-child {
@@ -156,16 +156,16 @@
 }
 
 .Table__actionTitle {
-  font-weight: bold;
   margin-bottom: 4px;
+  font-weight: bold;
 }
 
 .Table__actionExecuteButton {
   padding: 8px;
-  background-color: var(--color-basic-skyblue);
   color: #fff;
-  border-radius: 4px;
   cursor: pointer;
+  background-color: var(--color-basic-skyblue);
+  border-radius: 4px;
 }
 
 .Table__actionExecuteButton.hover {

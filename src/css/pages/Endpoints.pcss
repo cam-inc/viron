@@ -8,6 +8,7 @@
 
 .EndpointsPage__addCard {
   @apply --layout-center-center;
+  height: 100px;
   font-size: 20px;
   color: var(--color-basic-white);
   cursor: pointer;
@@ -16,7 +17,6 @@
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   transition-duration: 100ms;
   transition-property: background-color;
-  height: 100px;
 }
 
 .EndpointsPage__addCard.hover {
@@ -32,9 +32,10 @@
 /* Endpoint */
 /* ============================== */
 .EndpointsPage__item {
-  min-height: 140px;
   position: relative;
   display: block;
+  min-height: 140px;
+  margin-bottom: 24px;
   overflow: hidden;
   cursor: pointer;
   background-color: var(--color-basic-white);
@@ -42,7 +43,6 @@
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   transition-duration: 100ms;
   transition-property: background-color;
-  margin-bottom: 24px;
 }
 
 .EndpointsPage__item:last-child {
@@ -113,9 +113,9 @@
 
 .EndpointsPage__itemName {
   @apply --text-break;
+  margin-bottom: 4px;
   font-size: 18px;
   font-weight: bold;
-  margin-bottom: 4px;
 }
 
 .EndpointsPage__itemUrl {
@@ -166,12 +166,12 @@
 
 .EndpointsPage__itemMenu {
   padding: 4px;
-  background-color: transparent;
-  transition-property: background-color;
-  transition-duration: 100ms;
-  cursor: pointer;
   margin-bottom: 4px;
   font-size: 12px;
+  cursor: pointer;
+  background-color: transparent;
+  transition-duration: 100ms;
+  transition-property: background-color;
 }
 
 .EndpointsPage__itemMenu.hover {
@@ -280,9 +280,9 @@
 }
 
 .EndpointsPage__signinEmailsTitle {
-  font-weight: bold;
-  font-size: 16px;
   margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .EndpointsPage__signinEmail {
@@ -309,8 +309,8 @@
 }
 
 .EndpointsPage__signinOauthsTitle {
-  font-size: 16px;
   margin-bottom: 8px;
+  font-size: 16px;
   font-weight: bold;
 }
 
