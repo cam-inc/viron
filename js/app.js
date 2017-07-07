@@ -7407,21 +7407,18 @@ class Swagger {
 
       SwaggerClient// eslint-disable-line no-undef
         .http(request)
-        .then(client => {
-          if (client.errors && client.errors.length > 0) {
-            return reject(client.errors);
+        .then(res => {
+          if (res.errors && res.errors.length > 0) {
+            return reject(res.errors);
           }
-          if (client.status === 401) {
-            // TODO: 要確認。
+          if (res.status === 401) {
             const err = new Error();
             err.name = '401 Authorization Required';
-            err.status = client.spec.status;
+            err.status = res.spec.status;
             return reject(err);
           }
 
-          console.log(`[fetch] ${client.url} success.`);
-
-          SwaggerClient({spec: client.body}).then((_client) => {// eslint-disable-line no-undef
+          SwaggerClient({spec: res.body}).then(_client => {// eslint-disable-line no-undef
             this.client = _client;
             resolve(_client.spec.info);
           });
@@ -7696,6 +7693,7 @@ var components$1 = {
 
     context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
     context.state.components[params.component_uid].data = data;
+    context.state.components[params.component_uid].schema = schema;
     // `component.pagination`からページングをサポートしているか判断する。
     // サポートしていれば手動でページング情報を付加する。
     if (params.component.pagination) {
@@ -8414,6 +8412,16 @@ var components$2 = {
   },
 
   /**
+   * 指定riotIDに対する要素のレスポンス構造を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Object}
+   */
+  schema: (context, riotId) => {
+    return context.state.components[riotId].schema;
+  },
+
+  /**
    * 自身に関連するactionを返します。
    * @param {riotx.Context} context
    * @param {String} riotId
@@ -8814,6 +8822,7 @@ const constants$4 = {
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
   COMPONENTS: 'COMPONENTS',
   COMPONENTS_ONE: 'COMPONENTS_ONE',
+  COMPONENTS_ONE_SCHEMA: 'COMPONENTS_ONE_SCHEMA',
   COMPONENTS_ONE_SELF_ACTIONS: 'COMPONENTS_ONE_SELF_ACTIONS',
   COMPONENTS_ONE_ROW_ACTIONS: 'COMPONENTS_ONE_ROW_ACTIONS',
   COMPONENTS_ONE_TABLE_LABELS: 'COMPONENTS_ONE_TABLE_LABELS',
@@ -8850,6 +8859,7 @@ var getters = {
   [constants$4.APPLICATION_ISNETWORKING]: application$3.isNetworking,
   [constants$4.COMPONENTS]: components$2.all,
   [constants$4.COMPONENTS_ONE]: components$2.one,
+  [constants$4.COMPONENTS_ONE_SCHEMA]: components$2.schema,
   [constants$4.COMPONENTS_ONE_SELF_ACTIONS]: components$2.selfActions,
   [constants$4.COMPONENTS_ONE_ROW_ACTIONS]: components$2.rowActions,
   [constants$4.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
@@ -10040,23 +10050,14 @@ var dmc$3 = {
 
       const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
 
-      api({/** TODO get only support. */}, {
-        // TODO https://github.com/swagger-api/swagger-js/issues/1036 でやりたい
-        // TODO component.jsと共通化したい
+      api({}, {
         requestInterceptor: (req) => {
           req.headers['Authorization'] = token;
-          console.log('Interceptor(request):', req);
-        },
-        responseInterceptor: (res) => {
-          console.log('Interceptor(response):', res);
         }
       }).then(res => {
         if (!res.ok) {
           throw new Error(`[fetch] ${res.url} error.`);
         }
-
-        console.log(`[fetch] ${res.url} success.`);
-
         return {
           response: res.obj,
           operationObject
@@ -13163,8 +13164,6 @@ var store$1 = {
           getters
         });
         index$6.add(store);
-        // TODO: あとでけす。
-        window.store = store;
         return store;
       });
   }
@@ -41529,7 +41528,13 @@ var script$24 = function() {
   this.value = null;
   this.isComplex = false;
   this.isImage = false;
-  switch (this.opts.cell.getType()) {
+  let type;
+  if (!!this.opts.cell) {
+    type = this.opts.cell.getType();
+  } else {
+    type = 'null';
+  }
+  switch (type) {
   case 'null':
     this.value = 'null';
     break;
@@ -41743,9 +41748,9 @@ var script$30 = function() {
 
   this.getColumns = () => {
     const columns = [];
-    forEach_1(this.opts.data.getValue(0).getKeys(), k => {
+    forOwn_1$1(this.opts.schema.items.properties, (v, k) => {
       columns.push({
-        title: k,
+        title: v.description || k,
         key: k
       });
     });
@@ -41869,6 +41874,8 @@ var script$31 = function() {
   this.alertText = '';
   // レスポンスデータ。
   this.data = null;
+  // レスポンスの構造。
+  this.schema = null;
   // ページング情報。
   this.pagination = null;
   // 現在のページング情報。
@@ -41877,6 +41884,15 @@ var script$31 = function() {
   this.search = null;
   // 現在の検索条件。
   this.currentSearch = {};
+  this.isCurrentSearchEmpty = () => {
+    let isEmpty = true;
+    forOwn_1$1(this.currentSearch, val => {
+      if (!!val) {
+        isEmpty = false;
+      }
+    });
+    return isEmpty;
+  };
   // 自身に関するアクション群。
   this.selfActions = null;
   // テーブル行に関するアクション群。
@@ -42001,6 +42017,7 @@ var script$31 = function() {
       this.pagination = null;
     }
     this.search = component.search;
+    this.schema = store.getter(constants$4.COMPONENTS_ONE_SCHEMA, this._riot_id);
     this.selfActions = store.getter(constants$4.COMPONENTS_ONE_SELF_ACTIONS, this._riot_id);
     this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ROW_ACTIONS, this._riot_id);
     this.tableLabels = store.getter(constants$4.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
@@ -42060,7 +42077,7 @@ var script$31 = function() {
   };
 };
 
-riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search" if="{!!search}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" tablelabels="{tableLabels}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
+riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search {!isCurrentSearchEmpty() ? \'Component__search--active\' : \'\'}" if="{!!search}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" schema="{schema}" tablelabels="{tableLabels}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
     this.external(script$31);
 });
 
