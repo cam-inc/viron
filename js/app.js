@@ -41527,41 +41527,44 @@ var script$24 = function() {
   const store = this.riotx.get();
 
   this.value = null;
+  this.isComplex = false;
+  this.isImage = false;
   switch (this.opts.cell.getType()) {
   case 'null':
     this.value = 'null';
     break;
   case 'boolean':
-    this.value = this.opts.cell.getValue() ? 'O' : 'X';
+    this.value = this.opts.cell.getValue() ? 'true' : 'false';
     break;
   case 'number':
   case 'integer':
     this.value = String(this.opts.cell.getValue());
     break;
-  case 'string':
-    // TODO: 画像表示
+  case 'string': {
     this.value = this.opts.cell.getValue() || '-';
+    const split = this.value.split('.');
+    if (!!split.length && contains_1$1(['jpg', 'png', 'gif'], split[split.length - 1])) {
+      this.isImage = true;
+    }
     break;
+  }
   case 'object':
   case 'array':
     this.value = '[詳細を見る]';
+    this.isComplex = true;
     break;
   default:
     break;
   }
 
   this.handleTap = ()  => {
-    const type = this.opts.cell.getType();
-    if (type !== 'object' && type !== 'array') {
-      return;
-    }
     store.action(constants$1.MODALS_ADD, 'dmc-prettyprint', {
       data : this.opts.cell.getRawValue()
     });
   };
 };
 
-riot$1.tag2('dmc-table-cell', '<div ref="touch" ontap="handleTap">{value}</div>', '', 'class="Table__cell"', function(opts) {
+riot$1.tag2('dmc-table-cell', '<div class="Table__cellValue" if="{!isComplex &amp;&amp; !isImage}">{value}</div> <div class="Table__cellButton" if="{isComplex}" ref="touch" ontap="handleTap">{value}</div> <div class="Table__cellImage" if="{isImage}"> <div riot-style="background-image:url({value});"></div> </div>', '', 'class="Table__cell"', function(opts) {
     this.external(script$24);
 });
 
@@ -41926,13 +41929,12 @@ var script$31 = function() {
     const type = data.getType();
     const method = this.opts.component.api.method;
     const path = this.opts.component.api.path;
-    const style = this.opts.component.style;
 
     if (swagger.isComponentStyleNumber(this.opts.component.style)) {
       if (type !== 'object' || data.getValue('value') === undefined) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be form of "object" and have "value" key.`;
+        this.alertText = 'unexpected response.';
         return;
       }
     }
@@ -41941,13 +41943,19 @@ var script$31 = function() {
       if (type !== 'array') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be form of "array".`;
+        this.alertText = 'unexpected response.';
         return;
       }
-      if (!data.getLength() || data.getValue(0).getType() !== 'object') {
+      if (!data.getLength()) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be composed with "object".`;
+        this.alertText = 'Length is 0.';
+        return;
+      }
+      if (data.getValue(0).getType() !== 'object') {
+        this.isValidData = false;
+        this.alertApi = `${method}: ${path}`;
+        this.alertText = 'unexpected response.';
         return;
       }
     }
@@ -41956,19 +41964,19 @@ var script$31 = function() {
       if (type !== 'object') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be form of "object".`;
+        this.alertText = 'unexpected response.';
         return;
       }
       if (!data.getValue('data') || !data.getValue('x') || !data.getValue('y') || data.getValue('data').getType() !== 'array') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = `response of component styled "${style}" should be composed with at least "x", "y" and "data". "data" value type sholud be an "array".`;
+        this.alertText = 'unexpected response.';
         return;
       }
       if (!data.getValue('data').getLength()) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
-        this.alertText = 'empty';
+        this.alertText = 'Length is 0.';
         return;
       }
     }
