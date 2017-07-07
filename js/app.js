@@ -41858,8 +41858,12 @@ var script$31 = function() {
   this.data = null;
   // ページング情報。
   this.pagination = null;
-  // ページング情報。
+  // 現在のページング情報。
+  this.currentPaging = {};
+  // 検索情報。
   this.search = null;
+  // 現在の検索条件。
+  this.currentSearch = {};
   // 自身に関するアクション群。
   this.selfActions = null;
   // テーブル行に関するアクション群。
@@ -41893,6 +41897,7 @@ var script$31 = function() {
   this.updater = (query = {}) => {
     this.isPending = true;
     this.update();
+    query = index$1$1({}, this.currentPaging, this.currentSearch, query);
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
@@ -42008,7 +42013,8 @@ var script$31 = function() {
     forEach_1(this.search, query => {
       queries.push({
         key: query.key,
-        type: query.type
+        type: query.type,
+        value: this.currentSearch[query.key] || ''
       });
     });
     Promise
@@ -42016,6 +42022,9 @@ var script$31 = function() {
       .then(() => store.action(constants$1.MODALS_ADD, 'dmc-component-searchbox', {
         queries,
         onSearch: queries => {
+          // キーワード変更後は1ページ目に戻す。
+          this.currentPaging = {};
+          this.currentSearch = queries;
           this.updater(queries);
         }
       }))
@@ -42025,10 +42034,11 @@ var script$31 = function() {
   };
 
   this.handlePaginationChange = page => {
-    this.updater({
+    const paging = this.currentPaging = {
       limit: this.pagination.size,
       offset: (page - 1) * this.pagination.size
-    });
+    };
+    this.updater(paging);
   };
 };
 
