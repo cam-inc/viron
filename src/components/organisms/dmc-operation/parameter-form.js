@@ -3,6 +3,8 @@ import forEach from 'mout/array/forEach';
 
 export default function() {
   const type = this.opts.parameterobject.type;
+  // @see: https://swagger.io/specification/#dataTypeFormat
+  const format = this.opts.parameterobject.format;
   this.uiType = null;
   this.isOpened = false;
   if (!!this.opts.parameterobject.enum) {
@@ -10,6 +12,14 @@ export default function() {
   } else {
     switch (type) {
     case 'string':
+      if (format === 'byte') {
+        this.uiType = 'uploader';
+      } else if (format === 'date' || format === 'date-time') {
+        this.uiType = 'datepicker';
+      } else {
+        this.uiType = 'input';
+      }
+      break;
     case 'number':
     case 'integer':
       this.uiType = 'input';
@@ -53,6 +63,7 @@ export default function() {
 
   this.change = value => {
     // TODO: format, validate
+    // TODO: byteならbase64化する
     if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
       value = Number(value);
     }
