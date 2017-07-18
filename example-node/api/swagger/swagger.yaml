@@ -1,60 +1,3433 @@
-swagger: "2.0"
-info:
-  version: "0.0.1"
-  title: Hello World App
-# during dev, should point to your local machine
-host: localhost:10010
-# basePath prefixes all resource paths 
-basePath: /
-# 
-schemes:
-  # tip: remove http to make production-grade
-  - http
-  - https
-# format of bodies a client can send (Content-Type)
 consumes:
-  - application/json
-# format of the responses to the client (Accepts)
-produces:
-  - application/json
-paths:
-  /hello:
-    # binds a127 app logic to a route
-    x-swagger-router-controller: hello_world
-    get:
-      description: Returns 'Hello' to the caller
-      # used as the method name of the controller
-      operationId: hello
-      parameters:
-        - name: name
-          in: query
-          description: The name of the person to whom to say hello
-          required: false
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+definitions:
+  Admin_role:
+    description: A Admin Role (default view)
+    example:
+      paths:
+      - allow: true
+        path: GET:/user
+      role_id: Laborum et est iure et.
+    properties:
+      paths:
+        description: target path
+        example:
+        - allow: true
+          path: GET:/user
+        items:
+          $ref: '#/definitions/adminrolepath'
+        type: array
+      role_id:
+        description: role id
+        example: Laborum et est iure et.
+        type: string
+    required:
+    - role_id
+    - paths
+    title: 'Mediatype identifier: application/vnd.admin_role+json; view=default'
+    type: object
+  Admin_roleCollection:
+    description: Admin_roleCollection is the media type for an array of Admin_role
+      (default view)
+    example:
+    - paths:
+      - allow: true
+        path: GET:/user
+      role_id: Laborum et est iure et.
+    - paths:
+      - allow: true
+        path: GET:/user
+      role_id: Laborum et est iure et.
+    items:
+      $ref: '#/definitions/Admin_role'
+    title: 'Mediatype identifier: application/vnd.admin_role+json; type=collection;
+      view=default'
+    type: array
+  Admin_user:
+    description: A Admin User (default view)
+    example:
+      email: Fugiat qui enim in nam.
+      id: 8.5222217e+18
+      role_id: Voluptates omnis ut architecto.
+    properties:
+      email:
+        description: login id
+        example: Fugiat qui enim in nam.
+        type: string
+      id:
+        description: unique id
+        example: 8.5222217e+18
+        format: int64
+        type: integer
+      role_id:
+        description: role id
+        example: Voluptates omnis ut architecto.
+        type: string
+    required:
+    - id
+    - email
+    title: 'Mediatype identifier: application/vnd.admin_user+json; view=default'
+    type: object
+  Admin_userCollection:
+    description: Admin_userCollection is the media type for an array of Admin_user
+      (default view)
+    example:
+    - email: Fugiat qui enim in nam.
+      id: 8.5222217e+18
+      role_id: Voluptates omnis ut architecto.
+    - email: Fugiat qui enim in nam.
+      id: 8.5222217e+18
+      role_id: Voluptates omnis ut architecto.
+    - email: Fugiat qui enim in nam.
+      id: 8.5222217e+18
+      role_id: Voluptates omnis ut architecto.
+    items:
+      $ref: '#/definitions/Admin_user'
+    title: 'Mediatype identifier: application/vnd.admin_user+json; type=collection;
+      view=default'
+    type: array
+  Audit_log:
+    description: A Audit Log (default view)
+    example:
+      created_at: 2006-02-12T07:09:13+09:00
+      request_body: Qui voluptatem omnis esse consectetur.
+      request_method: Molestias harum nulla ipsam quis dolorem quidem.
+      request_uri: Dolorum id dolores illum.
+      source_ip: Ea sed qui ipsa voluptatibus.
+      status_code: Impedit est.
+      user_id: Et saepe nihil in earum sint.
+    properties:
+      created_at:
+        description: created time
+        example: 2006-02-12T07:09:13+09:00
+        format: date-time
+        type: string
+      request_body:
+        description: request body
+        example: Qui voluptatem omnis esse consectetur.
+        type: string
+      request_method:
+        description: http request method
+        example: Molestias harum nulla ipsam quis dolorem quidem.
+        type: string
+      request_uri:
+        description: request uri
+        example: Dolorum id dolores illum.
+        type: string
+      source_ip:
+        description: source ip address
+        example: Ea sed qui ipsa voluptatibus.
+        type: string
+      status_code:
+        description: http status code
+        example: Impedit est.
+        type: string
+      user_id:
+        description: user id
+        example: Et saepe nihil in earum sint.
+        type: string
+    title: 'Mediatype identifier: application/vnd.audit_log+json; view=default'
+    type: object
+  Audit_logCollection:
+    description: Audit_logCollection is the media type for an array of Audit_log (default
+      view)
+    example:
+    - created_at: 2006-02-12T07:09:13+09:00
+      request_body: Qui voluptatem omnis esse consectetur.
+      request_method: Molestias harum nulla ipsam quis dolorem quidem.
+      request_uri: Dolorum id dolores illum.
+      source_ip: Ea sed qui ipsa voluptatibus.
+      status_code: Impedit est.
+      user_id: Et saepe nihil in earum sint.
+    items:
+      $ref: '#/definitions/Audit_log'
+    title: 'Mediatype identifier: application/vnd.audit_log+json; type=collection;
+      view=default'
+    type: array
+  Auth_type:
+    description: A Auth Type (default view)
+    example:
+      method: Dolorum quia odit rerum facere nisi.
+      provider: Molestias at vel.
+      type: Harum tempora nesciunt aut.
+      url: Necessitatibus perferendis suscipit laudantium.
+    properties:
+      method:
+        description: request method
+        example: Dolorum quia odit rerum facere nisi.
+        type: string
+      provider:
+        description: auth provider
+        example: Molestias at vel.
+        type: string
+      type:
+        description: auth type
+        example: Harum tempora nesciunt aut.
+        type: string
+      url:
+        description: request url
+        example: Necessitatibus perferendis suscipit laudantium.
+        type: string
+    required:
+    - type
+    - url
+    - method
+    - provider
+    title: 'Mediatype identifier: application/vnd.auth_type+json; view=default'
+    type: object
+  Auth_typeCollection:
+    description: Auth_typeCollection is the media type for an array of Auth_type (default
+      view)
+    example:
+    - method: Dolorum quia odit rerum facere nisi.
+      provider: Molestias at vel.
+      type: Harum tempora nesciunt aut.
+      url: Necessitatibus perferendis suscipit laudantium.
+    - method: Dolorum quia odit rerum facere nisi.
+      provider: Molestias at vel.
+      type: Harum tempora nesciunt aut.
+      url: Necessitatibus perferendis suscipit laudantium.
+    - method: Dolorum quia odit rerum facere nisi.
+      provider: Molestias at vel.
+      type: Harum tempora nesciunt aut.
+      url: Necessitatibus perferendis suscipit laudantium.
+    items:
+      $ref: '#/definitions/Auth_type'
+    title: 'Mediatype identifier: application/vnd.auth_type+json; type=collection;
+      view=default'
+    type: array
+  Blog_design:
+    description: A BlogDesign Master (default view)
+    example:
+      background_image: http://hoge.com/a.png
+      base_color: blue
+      created_at: 1990-04-23T00:18:19+09:00
+      id: des_001
+      name: design name
+      updated_at: 1971-03-24T08:40:07+09:00
+    properties:
+      background_image:
+        description: 背景画像
+        example: http://hoge.com/a.png
+        type: string
+      base_color:
+        description: ベースカラー
+        example: blue
+        type: string
+      created_at:
+        description: 作成日時
+        example: 1990-04-23T00:18:19+09:00
+        format: date-time
+        type: string
+      id:
+        description: デザインID
+        example: des_001
+        type: string
+      name:
+        description: 名前
+        example: design name
+        type: string
+      updated_at:
+        description: 更新日時
+        example: 1971-03-24T08:40:07+09:00
+        format: date-time
+        type: string
+    title: 'Mediatype identifier: application/vnd.blog_design+json; view=default'
+    type: object
+  Blog_designCollection:
+    description: Blog_designCollection is the media type for an array of Blog_design
+      (default view)
+    example:
+    - background_image: http://hoge.com/a.png
+      base_color: blue
+      created_at: 1990-04-23T00:18:19+09:00
+      id: des_001
+      name: design name
+      updated_at: 1971-03-24T08:40:07+09:00
+    - background_image: http://hoge.com/a.png
+      base_color: blue
+      created_at: 1990-04-23T00:18:19+09:00
+      id: des_001
+      name: design name
+      updated_at: 1971-03-24T08:40:07+09:00
+    - background_image: http://hoge.com/a.png
+      base_color: blue
+      created_at: 1990-04-23T00:18:19+09:00
+      id: des_001
+      name: design name
+      updated_at: 1971-03-24T08:40:07+09:00
+    items:
+      $ref: '#/definitions/Blog_design'
+    title: 'Mediatype identifier: application/vnd.blog_design+json; type=collection;
+      view=default'
+    type: array
+  BlogDesignPayload:
+    example:
+      background_image: http://hoge.com/a.png
+      base_color: blue
+      id: des_001
+      name: design name
+    properties:
+      background_image:
+        description: 背景画像
+        example: http://hoge.com/a.png
+        type: string
+      base_color:
+        description: ベースカラー
+        example: blue
+        type: string
+      id:
+        description: デザインID
+        example: des_001
+        type: string
+      name:
+        description: 名前
+        example: design name
+        type: string
+    required:
+    - id
+    - name
+    - base_color
+    title: BlogDesignPayload
+    type: object
+  CreateAdminRolePayload:
+    example:
+      paths:
+      - allow: true
+        path: GET:/user
+      - allow: true
+        path: GET:/user
+      role_id: Libero omnis et.
+    properties:
+      paths:
+        description: target path
+        example:
+        - allow: true
+          path: GET:/user
+        - allow: true
+          path: GET:/user
+        items:
+          $ref: '#/definitions/adminrolepath'
+        type: array
+      role_id:
+        description: role id
+        example: Libero omnis et.
+        type: string
+    title: CreateAdminRolePayload
+    type: object
+  CreateAdminUserPayload:
+    example:
+      email: user@sample.com
+      password: XXXXXXXXXXXXXXXX
+    properties:
+      email:
+        description: login user mail address
+        example: user@sample.com
+        type: string
+      password:
+        description: password for email auth
+        example: XXXXXXXXXXXXXXXX
+        type: string
+    required:
+    - email
+    - password
+    title: CreateAdminUserPayload
+    type: object
+  Dmc:
+    description: A DMC settings data (default view)
+    example:
+      color: Color of Endpoint
+      name: Similique libero distinctio qui et laborum.
+      pages:
+      - components:
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        group: Group of page
+        id: Repellat iure non.
+        name: Maxime consequuntur quia aliquid omnis aut.
+        section: Section of page
+      - components:
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        group: Group of page
+        id: Repellat iure non.
+        name: Maxime consequuntur quia aliquid omnis aut.
+        section: Section of page
+      tags:
+      - Minus rerum odio exercitationem.
+      thumbnail: Iure nisi.
+    properties:
+      color:
+        default: red
+        enum:
+        - red
+        - blud
+        - green
+        example: Color of Endpoint
+        type: string
+      name:
+        description: Name pattern
+        example: Similique libero distinctio qui et laborum.
+        type: string
+      pages:
+        description: A Pages format
+        example:
+        - components:
+          - api:
+              method: get
+              path: /quickview
+            name: Sint molestiae animi corporis aliquid vero corrupti.
+            options:
+            - key: key
+              value: value
+            - key: key
+              value: value
+            - key: key
+              value: value
+            pagination: true
+            query:
+            - key: key
+              type: string
+            - key: key
+              type: string
+            - key: key
+              type: string
+            style: Style of Web Component
+            table_labels:
+            - Aut et.
+            - Aut et.
+          - api:
+              method: get
+              path: /quickview
+            name: Sint molestiae animi corporis aliquid vero corrupti.
+            options:
+            - key: key
+              value: value
+            - key: key
+              value: value
+            - key: key
+              value: value
+            pagination: true
+            query:
+            - key: key
+              type: string
+            - key: key
+              type: string
+            - key: key
+              type: string
+            style: Style of Web Component
+            table_labels:
+            - Aut et.
+            - Aut et.
+          - api:
+              method: get
+              path: /quickview
+            name: Sint molestiae animi corporis aliquid vero corrupti.
+            options:
+            - key: key
+              value: value
+            - key: key
+              value: value
+            - key: key
+              value: value
+            pagination: true
+            query:
+            - key: key
+              type: string
+            - key: key
+              type: string
+            - key: key
+              type: string
+            style: Style of Web Component
+            table_labels:
+            - Aut et.
+            - Aut et.
+          group: Group of page
+          id: Repellat iure non.
+          name: Maxime consequuntur quia aliquid omnis aut.
+          section: Section of page
+        - components:
+          - api:
+              method: get
+              path: /quickview
+            name: Sint molestiae animi corporis aliquid vero corrupti.
+            options:
+            - key: key
+              value: value
+            - key: key
+              value: value
+            - key: key
+              value: value
+            pagination: true
+            query:
+            - key: key
+              type: string
+            - key: key
+              type: string
+            - key: key
+              type: string
+            style: Style of Web Component
+            table_labels:
+            - Aut et.
+            - Aut et.
+          - api:
+              method: get
+              path: /quickview
+            name: Sint molestiae animi corporis aliquid vero corrupti.
+            options:
+            - key: key
+              value: value
+            - key: key
+              value: value
+            - key: key
+              value: value
+            pagination: true
+            query:
+            - key: key
+              type: string
+            - key: key
+              type: string
+            - key: key
+              type: string
+            style: Style of Web Component
+            table_labels:
+            - Aut et.
+            - Aut et.
+          - api:
+              method: get
+              path: /quickview
+            name: Sint molestiae animi corporis aliquid vero corrupti.
+            options:
+            - key: key
+              value: value
+            - key: key
+              value: value
+            - key: key
+              value: value
+            pagination: true
+            query:
+            - key: key
+              type: string
+            - key: key
+              type: string
+            - key: key
+              type: string
+            style: Style of Web Component
+            table_labels:
+            - Aut et.
+            - Aut et.
+          group: Group of page
+          id: Repellat iure non.
+          name: Maxime consequuntur quia aliquid omnis aut.
+          section: Section of page
+        items:
+          $ref: '#/definitions/page'
+        type: array
+      tags:
+        description: tags
+        example:
+        - Minus rerum odio exercitationem.
+        items:
+          example: Minus rerum odio exercitationem.
           type: string
+        type: array
+      thumbnail:
+        description: thumbnail of endpoint
+        example: Iure nisi.
+        type: string
+    required:
+    - name
+    - color
+    - thumbnail
+    - tags
+    - pages
+    title: 'Mediatype identifier: application/vnd.dmc+json; view=default'
+    type: object
+  SigninAuthPayload:
+    example:
+      email: Sed laudantium officiis tempora aut.
+      password: Asperiores iste occaecati quis beatae quia.
+    properties:
+      email:
+        example: Sed laudantium officiis tempora aut.
+        type: string
+      password:
+        example: Asperiores iste occaecati quis beatae quia.
+        type: string
+    title: SigninAuthPayload
+    type: object
+  StatsGuideType:
+    example:
+      x:
+        label: Corrupti sit voluptas voluptatibus quas.
+      "y":
+        label: Corrupti sit voluptas voluptatibus quas.
+    properties:
+      x:
+        $ref: '#/definitions/StatsLabelType'
+      "y":
+        $ref: '#/definitions/StatsLabelType'
+    title: StatsGuideType
+    type: object
+  StatsLabelType:
+    example:
+      label: Corrupti sit voluptas voluptatibus quas.
+    properties:
+      label:
+        example: Corrupti sit voluptas voluptatibus quas.
+        type: string
+    required:
+    - label
+    title: StatsLabelType
+    type: object
+  Statsdau:
+    description: A DAU data (default view)
+    example:
+      value: 9.0515915e+18
+    properties:
+      value:
+        description: DAU of Stats
+        example: 9.0515915e+18
+        format: int64
+        type: integer
+    required:
+    - value
+    title: 'Mediatype identifier: application/vnd.statsdau+json; view=default'
+    type: object
+  Statsmau:
+    description: A MAU data (default view)
+    example:
+      value: 6.540823e+18
+    properties:
+      value:
+        description: MAU of Stats
+        example: 6.540823e+18
+        format: int64
+        type: integer
+    required:
+    - value
+    title: 'Mediatype identifier: application/vnd.statsmau+json; view=default'
+    type: object
+  Statsplanet:
+    description: Planets data (default view)
+    example:
+      color: Eos et.
+      data:
+      - Sed deleniti iste.: db770d8d-dff8-4300-bb79-69122b678868
+      guide:
+        x:
+          label: Corrupti sit voluptas voluptatibus quas.
+        "y":
+          label: Corrupti sit voluptas voluptatibus quas.
+      size: Facere at rerum odit consequatur.
+      x: Quos maxime sint beatae ut officia.
+      "y": Debitis corporis dolorum ducimus ipsa doloribus.
+    properties:
+      color:
+        description: ドットの色分けに使用するkey
+        example: Eos et.
+        type: string
+      data:
+        description: グラフデータ
+        example:
+        - Sed deleniti iste.: db770d8d-dff8-4300-bb79-69122b678868
+        items:
+          additionalProperties: true
+          example:
+            Sed deleniti iste.: db770d8d-dff8-4300-bb79-69122b678868
+          type: object
+        type: array
+      guide:
+        $ref: '#/definitions/StatsGuideType'
+      size:
+        description: ドットの大きさに使用するkey
+        example: Facere at rerum odit consequatur.
+        type: string
+      x:
+        description: X軸に使用するkey
+        example: Quos maxime sint beatae ut officia.
+        type: string
+      "y":
+        description: Y軸に使用するkey
+        example: Debitis corporis dolorum ducimus ipsa doloribus.
+        type: string
+    required:
+    - data
+    - x
+    - "y"
+    - size
+    - color
+    - guide
+    title: 'Mediatype identifier: application/vnd.statsplanet+json; view=default'
+    type: object
+  UpdateAdminRolePayload:
+    example:
+      paths:
+      - allow: true
+        path: GET:/user
+      - allow: true
+        path: GET:/user
+    properties:
+      paths:
+        description: target path
+        example:
+        - allow: true
+          path: GET:/user
+        - allow: true
+          path: GET:/user
+        items:
+          $ref: '#/definitions/adminrolepath'
+        type: array
+    title: UpdateAdminRolePayload
+    type: object
+  UpdateAdminUserPayload:
+    example:
+      password: XXXXXXXXXXXXXXXX
+      role_id: viewer
+    properties:
+      password:
+        description: password for email auth
+        example: XXXXXXXXXXXXXXXX
+        type: string
+      role_id:
+        description: admin role id
+        example: viewer
+        type: string
+    required:
+    - role_id
+    title: UpdateAdminUserPayload
+    type: object
+  UploadFilePayload:
+    example:
+      data: Deserunt laudantium atque veniam rerum dolor.
+      path: Voluptas in ducimus quibusdam in cum debitis.
+    properties:
+      data:
+        description: base64 encoded binary data
+        example: Deserunt laudantium atque veniam rerum dolor.
+        type: string
+      path:
+        description: file path
+        example: Voluptas in ducimus quibusdam in cum debitis.
+        type: string
+    title: UploadFilePayload
+    type: object
+  User:
+    description: A User (default view)
+    example:
+      appear_area: 東京
+      birthday: 1995-05-12T09:45:56Z
+      blood_type: A
+      created_at: 2010-04-14T11:16:32+09:00
+      home_town: 静岡県
+      homepage: http://test.com/index.html
+      id: 5.801194e+18
+      job: 大学生
+      living_region: 渋谷
+      married: false
+      name: 山田 太郎
+      school: 東京○○大学
+      sex: male
+      updated_at: 1994-04-27T12:25:11+09:00
+    properties:
+      appear_area:
+        description: 出没地
+        example: 東京
+        type: string
+      birthday:
+        description: 誕生日
+        example: 1995-05-12T09:45:56Z
+        format: date-time
+        type: string
+      blood_type:
+        description: 血液型
+        enum:
+        - A
+        - B
+        - O
+        - AB
+        example: A
+        type: string
+      created_at:
+        description: 作成日時
+        example: 2010-04-14T11:16:32+09:00
+        format: date-time
+        type: string
+      home_town:
+        description: 出身地
+        example: 静岡県
+        type: string
+      homepage:
+        description: ホームページURL
+        example: http://test.com/index.html
+        type: string
+      id:
+        description: ユーザーID
+        example: 5.801194e+18
+        format: int64
+        type: integer
+      job:
+        description: 職業
+        example: 大学生
+        type: string
+      living_region:
+        description: 地域
+        example: 渋谷
+        type: string
+      married:
+        description: 未既婚
+        example: false
+        type: boolean
+      name:
+        description: 名前
+        example: 山田 太郎
+        type: string
+      school:
+        description: 出身校
+        example: 東京○○大学
+        type: string
+      sex:
+        description: 性別
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+      updated_at:
+        description: 更新日時
+        example: 1994-04-27T12:25:11+09:00
+        format: date-time
+        type: string
+    required:
+    - id
+    - name
+    title: 'Mediatype identifier: application/vnd.user+json; view=default'
+    type: object
+  User_blog:
+    description: A User Blog (default view)
+    example:
+      created_at: 1993-07-26T02:54:17+09:00
+      design_id: simple
+      genre: game
+      id: 2.438025e+18
+      sub_title: diary
+      title: user's blog
+      updated_at: 1979-11-12T02:46:55+09:00
+      user_id: 8.574263e+18
+    properties:
+      created_at:
+        description: 作成日時
+        example: 1993-07-26T02:54:17+09:00
+        format: date-time
+        type: string
+      design_id:
+        description: デザインID
+        enum:
+        - simple
+        - tile
+        - 2column
+        - 3column
+        example: simple
+        type: string
+      genre:
+        description: ジャンル
+        example: game
+        type: string
+      id:
+        description: ユーザーブログID
+        example: 2.438025e+18
+        format: int64
+        type: integer
+      sub_title:
+        description: サブタイトル
+        example: diary
+        type: string
+      title:
+        description: タイトル
+        example: user's blog
+        type: string
+      updated_at:
+        description: 更新日時
+        example: 1979-11-12T02:46:55+09:00
+        format: date-time
+        type: string
+      user_id:
+        description: ユーザーID
+        example: 8.574263e+18
+        format: int64
+        type: integer
+    required:
+    - id
+    - user_id
+    - title
+    - design_id
+    title: 'Mediatype identifier: application/vnd.user_blog+json; view=default'
+    type: object
+  User_blog_entry:
+    description: A User Blog Entry (default view)
+    example:
+      content: Velit iure doloribus.
+      created_at: 1991-02-16T10:17:41+09:00
+      id: 5.1847856e+18
+      theme: diary
+      title: 今日の日記
+      updated_at: 2003-10-21T03:42:51+09:00
+      user_blog_id: 8.21865e+17
+    properties:
+      content:
+        description: 内容
+        example: Velit iure doloribus.
+        type: string
+      created_at:
+        description: 作成日時
+        example: 1991-02-16T10:17:41+09:00
+        format: date-time
+        type: string
+      id:
+        description: ユーザーブログ記事ID
+        example: 5.1847856e+18
+        format: int64
+        type: integer
+      theme:
+        description: テーマ
+        example: diary
+        type: string
+      title:
+        description: タイトル
+        example: 今日の日記
+        type: string
+      updated_at:
+        description: 更新日時
+        example: 2003-10-21T03:42:51+09:00
+        format: date-time
+        type: string
+      user_blog_id:
+        description: ユーザーブログID
+        example: 8.21865e+17
+        format: int64
+        type: integer
+    required:
+    - id
+    - user_blog_id
+    - title
+    - content
+    title: 'Mediatype identifier: application/vnd.user_blog_entry+json; view=default'
+    type: object
+  User_blog_entryCollection:
+    description: User_blog_entryCollection is the media type for an array of User_blog_entry
+      (default view)
+    example:
+    - content: Velit iure doloribus.
+      created_at: 1991-02-16T10:17:41+09:00
+      id: 5.1847856e+18
+      theme: diary
+      title: 今日の日記
+      updated_at: 2003-10-21T03:42:51+09:00
+      user_blog_id: 8.21865e+17
+    items:
+      $ref: '#/definitions/User_blog_entry'
+    title: 'Mediatype identifier: application/vnd.user_blog_entry+json; type=collection;
+      view=default'
+    type: array
+  User_blogCollection:
+    description: User_blogCollection is the media type for an array of User_blog (default
+      view)
+    example:
+    - created_at: 1993-07-26T02:54:17+09:00
+      design_id: simple
+      genre: game
+      id: 2.438025e+18
+      sub_title: diary
+      title: user's blog
+      updated_at: 1979-11-12T02:46:55+09:00
+      user_id: 8.574263e+18
+    - created_at: 1993-07-26T02:54:17+09:00
+      design_id: simple
+      genre: game
+      id: 2.438025e+18
+      sub_title: diary
+      title: user's blog
+      updated_at: 1979-11-12T02:46:55+09:00
+      user_id: 8.574263e+18
+    - created_at: 1993-07-26T02:54:17+09:00
+      design_id: simple
+      genre: game
+      id: 2.438025e+18
+      sub_title: diary
+      title: user's blog
+      updated_at: 1979-11-12T02:46:55+09:00
+      user_id: 8.574263e+18
+    items:
+      $ref: '#/definitions/User_blog'
+    title: 'Mediatype identifier: application/vnd.user_blog+json; type=collection;
+      view=default'
+    type: array
+  UserBlogEntryPayload:
+    example:
+      content: Corporis officiis distinctio optio voluptatem.
+      theme: diary
+      title: 今日の日記
+      user_blog_id: 3.2696925e+18
+    properties:
+      content:
+        description: 内容
+        example: Corporis officiis distinctio optio voluptatem.
+        type: string
+      theme:
+        description: テーマ
+        example: diary
+        type: string
+      title:
+        description: タイトル
+        example: 今日の日記
+        type: string
+      user_blog_id:
+        description: ユーザーブログID
+        example: 3.2696925e+18
+        format: int64
+        type: integer
+    title: UserBlogEntryPayload
+    type: object
+  UserBlogPayload:
+    example:
+      design_id: simple
+      genre: game
+      sub_title: diary
+      title: user's blog
+      user_id: 1.8461636e+18
+    properties:
+      design_id:
+        description: デザインID
+        enum:
+        - simple
+        - tile
+        - 2column
+        - 3column
+        example: simple
+        type: string
+      genre:
+        description: ジャンル
+        example: game
+        type: string
+      sub_title:
+        description: サブタイトル
+        example: diary
+        type: string
+      title:
+        description: タイトル
+        example: user's blog
+        type: string
+      user_id:
+        description: ユーザーID
+        example: 1.8461636e+18
+        format: int64
+        type: integer
+    title: UserBlogPayload
+    type: object
+  UserCollection:
+    description: UserCollection is the media type for an array of User (default view)
+    example:
+    - appear_area: 東京
+      birthday: 1995-05-12T09:45:56Z
+      blood_type: A
+      created_at: 2010-04-14T11:16:32+09:00
+      home_town: 静岡県
+      homepage: http://test.com/index.html
+      id: 5.801194e+18
+      job: 大学生
+      living_region: 渋谷
+      married: false
+      name: 山田 太郎
+      school: 東京○○大学
+      sex: male
+      updated_at: 1994-04-27T12:25:11+09:00
+    items:
+      $ref: '#/definitions/User'
+    title: 'Mediatype identifier: application/vnd.user+json; type=collection; view=default'
+    type: array
+  UserPayload:
+    example:
+      appear_area: 東京
+      birthday: 1995-05-12T09:45:56Z
+      blood_type: A
+      home_town: 静岡県
+      homepage: http://test.com/index.html
+      job: 大学生
+      living_region: 渋谷
+      married: false
+      name: 山田 太郎
+      school: 東京○○大学
+      sex: male
+    properties:
+      appear_area:
+        description: 出没地
+        example: 東京
+        type: string
+      birthday:
+        description: 誕生日
+        example: 1995-05-12T09:45:56Z
+        format: date-time
+        type: string
+      blood_type:
+        description: 血液型
+        enum:
+        - A
+        - B
+        - O
+        - AB
+        example: A
+        type: string
+      home_town:
+        description: 出身地
+        example: 静岡県
+        type: string
+      homepage:
+        description: ホームページURL
+        example: http://test.com/index.html
+        type: string
+      job:
+        description: 職業
+        example: 大学生
+        type: string
+      living_region:
+        description: 地域
+        example: 渋谷
+        type: string
+      married:
+        description: 未既婚
+        example: false
+        type: boolean
+      name:
+        description: 名前
+        example: 山田 太郎
+        type: string
+      school:
+        description: 出身校
+        example: 東京○○大学
+        type: string
+      sex:
+        description: 性別
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+    required:
+    - name
+    title: UserPayload
+    type: object
+  adminrolepath:
+    example:
+      allow: true
+      path: GET:/user
+    properties:
+      allow:
+        description: allow the path
+        example: true
+        type: boolean
+      path:
+        description: path
+        enum:
+        - GET:/stats
+        - GET:/user
+        - POST:/user
+        - PUT:/user
+        - DELETE:/user
+        - GET:/userblog
+        - POST:/userblog
+        - PUT:/userblog
+        - DELETE:/userblog
+        - GET:/userblogentry
+        - POST:/userblogentry
+        - PUT:/userblogentry
+        - DELETE:/userblogentry
+        - GET:/blogdesign
+        - POST:/blogdesign
+        - PUT:/blogdesign
+        - DELETE:/blogdesign
+        - GET:/adminrole
+        - POST:/adminrole
+        - PUT:/adminrole
+        - DELETE:/adminrole
+        - GET:/adminuser
+        - POST:/adminuser
+        - PUT:/adminuser
+        - DELETE:/adminuser
+        - GET:/auditlog
+        - POST:/auditlog
+        - PUT:/auditolog
+        - DELETE:/auditlog
+        example: GET:/user
+        type: string
+    required:
+    - path
+    - allow
+    title: adminrolepath
+    type: object
+  api:
+    description: Accessing api information type
+    example:
+      method: get
+      path: /quickview
+    properties:
+      method:
+        description: Access paths[path][method] of swagger.json
+        example: get
+        type: string
+      path:
+        description: Access paths[path] of swagger.json
+        example: /quickview
+        type: string
+    required:
+    - path
+    - method
+    title: api
+    type: object
+  component:
+    description: A Component type
+    example:
+      api:
+        method: get
+        path: /quickview
+      name: Sint molestiae animi corporis aliquid vero corrupti.
+      options:
+      - key: key
+        value: value
+      - key: key
+        value: value
+      - key: key
+        value: value
+      pagination: true
+      query:
+      - key: key
+        type: string
+      - key: key
+        type: string
+      - key: key
+        type: string
+      style: Style of Web Component
+      table_labels:
+      - Aut et.
+      - Aut et.
+    properties:
+      api:
+        $ref: '#/definitions/api'
+      name:
+        description: Title of page
+        example: Sint molestiae animi corporis aliquid vero corrupti.
+        type: string
+      options:
+        description: style options
+        example:
+        - key: key
+          value: value
+        - key: key
+          value: value
+        - key: key
+          value: value
+        items:
+          $ref: '#/definitions/option'
+        type: array
+      pagination:
+        description: allow pagination
+        example: true
+        type: boolean
+      query:
+        description: query for request
+        example:
+        - key: key
+          type: string
+        - key: key
+          type: string
+        - key: key
+          type: string
+        items:
+          $ref: '#/definitions/query'
+        type: array
+      style:
+        default: number
+        enum:
+        - number
+        - list
+        - table
+        example: Style of Web Component
+        type: string
+      table_labels:
+        description: keys of table row
+        example:
+        - Aut et.
+        - Aut et.
+        items:
+          example: Aut et.
+          type: string
+        type: array
+    required:
+    - api
+    - name
+    - style
+    - pagination
+    title: component
+    type: object
+  error:
+    description: Error response media type (default view)
+    example:
+      code: invalid_value
+      detail: Value of ID must be an integer
+      id: 3F1FKVRR
+      meta:
+        timestamp: 1.458609e+09
+      status: "400"
+    properties:
+      code:
+        description: an application-specific error code, expressed as a string value.
+        example: invalid_value
+        type: string
+      detail:
+        description: a human-readable explanation specific to this occurrence of the
+          problem.
+        example: Value of ID must be an integer
+        type: string
+      id:
+        description: a unique identifier for this particular occurrence of the problem.
+        example: 3F1FKVRR
+        type: string
+      meta:
+        additionalProperties: true
+        description: a meta object containing non-standard meta-information about
+          the error.
+        example:
+          timestamp: 1.458609e+09
+        type: object
+      status:
+        description: the HTTP status code applicable to this problem, expressed as
+          a string value.
+        example: "400"
+        type: string
+    title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    type: object
+  option:
+    example:
+      key: key
+      value: value
+    properties:
+      key:
+        description: Key
+        example: key
+        type: string
+      value:
+        description: Value
+        example: value
+        type: string
+    required:
+    - key
+    - value
+    title: option
+    type: object
+  page:
+    description: A page type
+    example:
+      components:
+      - api:
+          method: get
+          path: /quickview
+        name: Sint molestiae animi corporis aliquid vero corrupti.
+        options:
+        - key: key
+          value: value
+        - key: key
+          value: value
+        - key: key
+          value: value
+        pagination: true
+        query:
+        - key: key
+          type: string
+        - key: key
+          type: string
+        - key: key
+          type: string
+        style: Style of Web Component
+        table_labels:
+        - Aut et.
+        - Aut et.
+      - api:
+          method: get
+          path: /quickview
+        name: Sint molestiae animi corporis aliquid vero corrupti.
+        options:
+        - key: key
+          value: value
+        - key: key
+          value: value
+        - key: key
+          value: value
+        pagination: true
+        query:
+        - key: key
+          type: string
+        - key: key
+          type: string
+        - key: key
+          type: string
+        style: Style of Web Component
+        table_labels:
+        - Aut et.
+        - Aut et.
+      - api:
+          method: get
+          path: /quickview
+        name: Sint molestiae animi corporis aliquid vero corrupti.
+        options:
+        - key: key
+          value: value
+        - key: key
+          value: value
+        - key: key
+          value: value
+        pagination: true
+        query:
+        - key: key
+          type: string
+        - key: key
+          type: string
+        - key: key
+          type: string
+        style: Style of Web Component
+        table_labels:
+        - Aut et.
+        - Aut et.
+      group: Group of page
+      id: Repellat iure non.
+      name: Maxime consequuntur quia aliquid omnis aut.
+      section: Section of page
+    properties:
+      components:
+        description: A components format
+        example:
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        - api:
+            method: get
+            path: /quickview
+          name: Sint molestiae animi corporis aliquid vero corrupti.
+          options:
+          - key: key
+            value: value
+          - key: key
+            value: value
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          - key: key
+            type: string
+          - key: key
+            type: string
+          style: Style of Web Component
+          table_labels:
+          - Aut et.
+          - Aut et.
+        items:
+          $ref: '#/definitions/component'
+        type: array
+      group:
+        enum:
+        - ""
+        - kpi
+        - user
+        - blog
+        - admin
+        example: Group of page
+        type: string
+      id:
+        description: id of page
+        example: Repellat iure non.
+        type: string
+      name:
+        description: Title of page
+        example: Maxime consequuntur quia aliquid omnis aut.
+        type: string
+      section:
+        default: manage
+        enum:
+        - manage
+        - dashboard
+        example: Section of page
+        type: string
+    required:
+    - id
+    - name
+    - section
+    - group
+    - components
+    title: page
+    type: object
+  query:
+    example:
+      key: key
+      type: string
+    properties:
+      key:
+        description: Key
+        example: key
+        type: string
+      type:
+        default: string
+        description: Type
+        enum:
+        - string
+        - integer
+        - number
+        - boolean
+        - date
+        - datetime
+        - time
+        example: string
+        type: string
+    required:
+    - key
+    - type
+    title: query
+    type: object
+host: localhost:3000
+info:
+  description: A simple goa service
+  title: The virtual wine example-go
+  version: 0.0.1
+paths:
+  /:
+    get:
+      description: get root
+      operationId: root#show
+      responses:
+        "301":
+          description: Moved Permanently
+      schemes:
+      - https
+      summary: show root
+      tags:
+      - root
+  /adminrole:
+    get:
+      description: |-
+        get admin roles
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_role#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.admin_role+json; type=collection
       responses:
         "200":
-          description: Success
+          description: OK
           schema:
-            # a pointer to a definition
-            $ref: "#/definitions/HelloWorldResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
+            $ref: '#/definitions/Admin_roleCollection'
+        "400":
+          description: Bad Request
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /swagger:
-    x-swagger-pipe: swagger_raw
-# complex objects have schema definitions
-definitions:
-  HelloWorldResponse:
-    required:
-      - message
-    properties:
-      message:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list admin_role
+      tags:
+      - admin_role
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /adminrole/{role_id}
+      - appendTo: row
+        method: delete
+        path: /adminrole/{role_id}
+    post:
+      description: |-
+        create a admin role
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_role#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateAdminRolePayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.admin_role+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Admin_role'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create admin_role
+      tags:
+      - admin_role
+  /adminrole/{role_id}:
+    delete:
+      description: |-
+        delete the user
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_role#delete
+      parameters:
+      - description: role id
+        in: path
+        name: role_id
+        required: true
         type: string
-  ErrorResponse:
-    required:
-      - message
-    properties:
-      message:
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete admin_role
+      tags:
+      - admin_role
+    get:
+      description: |-
+        get the admin role
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_role#show
+      parameters:
+      - description: role id
+        in: path
+        name: role_id
+        required: true
         type: string
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.admin_role+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Admin_role'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: show admin_role
+      tags:
+      - admin_role
+    put:
+      description: |-
+        update the admin user
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_role#update
+      parameters:
+      - description: role id
+        in: path
+        name: role_id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAdminRolePayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.admin_role+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Admin_role'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update admin_role
+      tags:
+      - admin_role
+  /adminuser:
+    get:
+      description: |-
+        get admin users
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_user#list
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.admin_user+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Admin_userCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list admin_user
+      tags:
+      - admin_user
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /adminuser/{id}
+      - appendTo: row
+        method: delete
+        path: /adminuser/{id}
+    post:
+      description: |-
+        create a admin user
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_user#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateAdminUserPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.admin_user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Admin_user'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create admin_user
+      tags:
+      - admin_user
+  /adminuser/{id}:
+    delete:
+      description: |-
+        delete the user
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_user#delete
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete admin_user
+      tags:
+      - admin_user
+    get:
+      description: |-
+        get the admin user
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_user#show
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.admin_user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Admin_user'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: show admin_user
+      tags:
+      - admin_user
+    put:
+      description: |-
+        update the admin user
+
+        Required security scopes:
+          * `api:access`
+      operationId: admin_user#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAdminUserPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.admin_user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Admin_user'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update admin_user
+      tags:
+      - admin_user
+  /auditlog:
+    get:
+      description: |-
+        get admin roles
+
+        Required security scopes:
+          * `api:access`
+      operationId: audit_log#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.audit_log+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Audit_logCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list audit_log
+      tags:
+      - audit_log
+  /blogdesign:
+    get:
+      description: |-
+        get blog designs
+
+        Required security scopes:
+          * `api:access`
+      operationId: blog_design#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.blog_design+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Blog_designCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list blog_design
+      tags:
+      - blog_design
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /blogdesign/{id}
+      - appendTo: row
+        method: delete
+        path: /blogdesign/{id}
+    post:
+      description: |-
+        create a blog design
+
+        Required security scopes:
+          * `api:access`
+      operationId: blog_design#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/BlogDesignPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.blog_design+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Blog_design'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create blog_design
+      tags:
+      - blog_design
+  /blogdesign/{id}:
+    delete:
+      description: |-
+        delete the blog design
+
+        Required security scopes:
+          * `api:access`
+      operationId: blog_design#delete
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete blog_design
+      tags:
+      - blog_design
+    get:
+      description: |-
+        get the blog design
+
+        Required security scopes:
+          * `api:access`
+      operationId: blog_design#show
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.blog_design+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Blog_design'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: show blog_design
+      tags:
+      - blog_design
+    put:
+      description: |-
+        update the blog design
+
+        Required security scopes:
+          * `api:access`
+      operationId: blog_design#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/BlogDesignPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.blog_design+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Blog_design'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update blog_design
+      tags:
+      - blog_design
+  /dmc:
+    get:
+      description: |-
+        dmc settings
+
+        Required security scopes:
+          * `api:access`
+      operationId: dmc#show
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.dmc+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Dmc'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: show dmc
+      tags:
+      - dmc
+  /dmc_authtype:
+    get:
+      description: get auth types
+      operationId: auth_type#list
+      produces:
+      - application/vnd.auth_type+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Auth_typeCollection'
+      schemes:
+      - https
+      summary: list auth_type
+      tags:
+      - auth_type
+  /file:
+    post:
+      description: file upload
+      operationId: file#upload
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UploadFilePayload'
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      summary: upload file
+      tags:
+      - file
+  /file/{path}:
+    get:
+      description: file download
+      operationId: file#download
+      parameters:
+      - in: path
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/vnd.goa.error
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Disposition:
+              description: content disposition
+              type: string
+            Content-Length:
+              description: content size
+              type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      summary: download file
+      tags:
+      - file
+  /googleoauth2callback:
+    get:
+      description: callback function from google oauth2
+      operationId: auth#googleoauth2callback
+      parameters:
+      - description: authorization code
+        in: query
+        name: code
+        required: false
+        type: string
+      - description: check state for CSRF
+        in: query
+        name: state
+        required: false
+        type: string
+      responses:
+        "301":
+          description: Moved Permanently
+          headers:
+            Authorization:
+              description: Generated JWT
+              type: string
+            Content-Type:
+              description: content type
+              type: string
+            Location:
+              description: redirect url
+              type: string
+        "307":
+          description: Temporary Redirect
+      schemes:
+      - https
+      summary: googleoauth2callback auth
+      tags:
+      - auth
+  /googlesignin:
+    get:
+      description: signin with google
+      operationId: auth#googlesignin
+      parameters:
+      - description: redirect url
+        in: query
+        name: redirect_url
+        required: false
+        type: string
+      responses:
+        "301":
+          description: Moved Permanently
+          headers:
+            Content-Type:
+              description: content type
+              type: string
+            Location:
+              description: redirect url
+              type: string
+      schemes:
+      - https
+      summary: googlesignin auth
+      tags:
+      - auth
+  /signin:
+    post:
+      description: signin with JWT
+      operationId: auth#signin
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/SigninAuthPayload'
+      responses:
+        "204":
+          description: No Content
+          headers:
+            Authorization:
+              description: Generated JWT
+              type: string
+        "307":
+          description: Temporary Redirect
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      summary: signin auth
+      tags:
+      - auth
+  /signout:
+    post:
+      description: signout
+      operationId: auth#signout
+      responses:
+        "204":
+          description: No Content
+      schemes:
+      - https
+      summary: signout auth
+      tags:
+      - auth
+  /stats/dau:
+    get:
+      description: Service Daily Activity User
+      operationId: stats_dau#show
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsdau+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsdau'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: show stats_dau
+      tags:
+      - stats_dau
+  /stats/mau:
+    get:
+      description: Service Monthly Activity User
+      operationId: stats_mau#show
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsmau+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsmau'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: show stats_mau
+      tags:
+      - stats_mau
+  /stats/planet/bar:
+    get:
+      description: Planets Information
+      operationId: stats_planet#bar
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsplanet+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsplanet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: bar stats_planet
+      tags:
+      - stats_planet
+  /stats/planet/horizontal-bar:
+    get:
+      description: Planets Information
+      operationId: stats_planet#horizontal-bar
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsplanet+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsplanet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: horizontal-bar stats_planet
+      tags:
+      - stats_planet
+  /stats/planet/horizontal-stacked-bar:
+    get:
+      description: Planets Information
+      operationId: stats_planet#horizontal-stacked-bar
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsplanet+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsplanet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: horizontal-stacked-bar stats_planet
+      tags:
+      - stats_planet
+  /stats/planet/line:
+    get:
+      description: Planets Information
+      operationId: stats_planet#line
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsplanet+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsplanet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: line stats_planet
+      tags:
+      - stats_planet
+  /stats/planet/scatterplot:
+    get:
+      description: Planets Information
+      operationId: stats_planet#scatterplot
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsplanet+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsplanet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: scatterplot stats_planet
+      tags:
+      - stats_planet
+  /stats/planet/stacked-area:
+    get:
+      description: Planets Information
+      operationId: stats_planet#stacked-area
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsplanet+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsplanet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: stacked-area stats_planet
+      tags:
+      - stats_planet
+  /stats/planet/stacked-bar:
+    get:
+      description: Planets Information
+      operationId: stats_planet#stacked-bar
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.statsplanet+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Statsplanet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+      schemes:
+      - https
+      summary: stacked-bar stats_planet
+      tags:
+      - stats_planet
+  /swagger.json:
+    get:
+      description: |-
+        get swagger.json
+
+        Required security scopes:
+          * `api:access`
+      operationId: swagger#show
+      produces:
+      - application/vnd.goa.error
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: show swagger
+      tags:
+      - swagger
+  /user:
+    get:
+      description: |-
+        get users
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#list
+      parameters:
+      - description: 名前
+        in: query
+        name: name
+        required: false
+        type: string
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list user
+      tags:
+      - user
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /user/{id}
+      - appendTo: row
+        method: delete
+        path: /user/{id}
+    post:
+      description: |-
+        create a user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create user
+      tags:
+      - user
+  /user/{id}:
+    delete:
+      description: |-
+        delete the user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#delete
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete user
+      tags:
+      - user
+    get:
+      description: |-
+        get the user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#show
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: show user
+      tags:
+      - user
+    put:
+      description: |-
+        update the user
+
+        Required security scopes:
+          * `api:access`
+      operationId: user#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update user
+      tags:
+      - user
+  /userblog:
+    get:
+      description: |-
+        get user blogs
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user_blog+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User_blogCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list user_blog
+      tags:
+      - user_blog
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /userblog/{id}
+      - appendTo: row
+        method: delete
+        path: /userblog/{id}
+    post:
+      description: |-
+        create a user blog
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserBlogPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user_blog+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User_blog'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create user_blog
+      tags:
+      - user_blog
+  /userblog/{id}:
+    delete:
+      description: |-
+        delete the user blog
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog#delete
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete user_blog
+      tags:
+      - user_blog
+    get:
+      description: |-
+        get the user blog
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog#show
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user_blog+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User_blog'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: show user_blog
+      tags:
+      - user_blog
+    put:
+      description: |-
+        update the user blog
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserBlogPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user_blog+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User_blog'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update user_blog
+      tags:
+      - user_blog
+  /userblog/autocomplete/{field}:
+    get:
+      description: |-
+        autocomplete user data
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog#autocomplete
+      parameters:
+      - description: field name in userblog model
+        in: path
+        name: field
+        required: true
+        type: string
+      - description: search query string
+        in: query
+        name: search
+        required: false
+        type: string
+      produces:
+      - application/vnd.goa.error
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: autocomplete user_blog
+      tags:
+      - user_blog
+  /userblogentry:
+    get:
+      description: |-
+        get user blog entries
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog_entry#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user_blog_entry+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User_blog_entryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list user_blog_entry
+      tags:
+      - user_blog_entry
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /userblogentry/{id}
+      - appendTo: row
+        method: delete
+        path: /userblogentry/{id}
+    post:
+      description: |-
+        create a user blog entry
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog_entry#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserBlogEntryPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user_blog_entry+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User_blog_entry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create user_blog_entry
+      tags:
+      - user_blog_entry
+  /userblogentry/{id}:
+    delete:
+      description: |-
+        delete the user blog entry
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog_entry#delete
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: delete user_blog_entry
+      tags:
+      - user_blog_entry
+    get:
+      description: |-
+        get the user blog entry
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog_entry#show
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user_blog_entry+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User_blog_entry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: show user_blog_entry
+      tags:
+      - user_blog_entry
+    put:
+      description: |-
+        update the user blog entry
+
+        Required security scopes:
+          * `api:access`
+      operationId: user_blog_entry#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserBlogEntryPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user_blog_entry+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User_blog_entry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update user_blog_entry
+      tags:
+      - user_blog_entry
+produces:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+responses:
+  InternalServerError:
+    description: Internal Server Error
+  MovedPermanently:
+    description: Moved Permanently
+  NoContent:
+    description: No Content
+  NotFound:
+    description: Not Found
+  TemporaryRedirect:
+    description: Temporary Redirect
+  Unauthorized:
+    description: Unauthorized
+schemes:
+- https
+securityDefinitions:
+  jwt:
+    type: oauth2
+    authorizationUrl: /dialog
+    flow: implicit
+    scopes:
+      api:access: API access
+    
+swagger: "2.0"
