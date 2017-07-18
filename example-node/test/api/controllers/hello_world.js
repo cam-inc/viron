@@ -1,44 +1,41 @@
-var should = require('should');
-var request = require('supertest');
-var server = require('../../../app');
+const should = require('should'); // eslint-disable-line
+const supertest = require('supertest');
+const server = require('../../../app');
 
-describe('controllers', function() {
+describe('controllers', () => {
+  let request;
 
-  describe('hello_world', function() {
+  before(() => {
+    request = supertest(server);
+  });
 
-    describe('GET /hello', function() {
+  describe('hello_world', () => {
 
-      it('should return a default string', function(done) {
+    describe('GET /hello', () => {
 
-        request(server)
+      it('should return a default string', async() => {
+        await request
           .get('/hello')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
-          .end(function(err, res) {
-            should.not.exist(err);
-
+          .then(res => {
             res.body.should.eql('Hello, stranger!');
-
-            done();
-          });
+          })
+        ;
       });
 
-      it('should accept a name parameter', function(done) {
-
-        request(server)
+      it('should accept a name parameter', async() => {
+        await request
           .get('/hello')
-          .query({ name: 'Scott'})
+          .query({name: 'Scott'})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
-          .end(function(err, res) {
-            should.not.exist(err);
-
+          .then(res => {
             res.body.should.eql('Hello, Scott!');
-
-            done();
-          });
+          })
+        ;
       });
 
     });

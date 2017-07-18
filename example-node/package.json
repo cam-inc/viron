@@ -2,7 +2,7 @@
   "name": "example-node",
   "version": "0.0.1",
   "private": true,
-  "description": "New Swagger API Project",
+  "description": "DMC Server Example Project for Node.js",
   "keywords": [],
   "author": "",
   "license": "",
@@ -12,8 +12,9 @@
     "swagger-express-mw": "^0.1.0"
   },
   "devDependencies": {
+    "eslint": "^4.2.0",
     "should": "^7.1.0",
-    "supertest": "^1.0.0"
+    "supertest": "^3.0.0"
   },
   "scripts": {
     "start": "node app.js",
