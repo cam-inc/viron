@@ -1,5 +1,7 @@
 const SwaggerExpress = require('swagger-express-mw');
 const app = require('express')();
+const helperSwagger = require('./api/helpers/swagger');
+
 module.exports = app; // for testing
 
 const config = {
@@ -22,7 +24,7 @@ SwaggerExpress.create(config, (err, swaggerExpress) => {
     next(err);
   });
 
-  const port = process.env.PORT || 3000;
+  let port = helperSwagger.getPort(swaggerExpress, process.env.PORT);
   app.listen(port);
 
   console.log(`Added Paths: ${Object.keys(swaggerExpress.runner.swagger.paths)}`);
