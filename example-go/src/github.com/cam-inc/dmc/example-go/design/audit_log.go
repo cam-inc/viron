@@ -16,7 +16,7 @@ var AuditLogMediaType = MediaType("application/vnd.audit_log+json", func() {
 		Attribute("source_ip", String, "source ip address")
 		Attribute("user_id", String, "user id")
 		Attribute("request_body", String, "request body")
-		Attribute("status_code", String, "http status code")
+		Attribute("status_code", Integer, "http status code")
 		Attribute("created_at", DateTime, "created time")
 	})
 
