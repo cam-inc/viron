@@ -4,6 +4,7 @@ import current from './current';
 import dmc from './dmc';
 import drawers from './drawers';
 import endpoints from './endpoints';
+import layout from './layout';
 import location from './location';
 import menu from './menu';
 import modals from './modals';
@@ -23,6 +24,7 @@ const constants = {
   DMC: 'DMC',
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
+  LAYOUT: 'LAYOUT',
   LOCATION: 'LOCATION',
   MENU: 'MENU',
   MODALS: 'MODALS',
@@ -40,6 +42,7 @@ export default {
   dmc,
   drawers,
   endpoints,
+  layout,
   location,
   menu,
   modals,

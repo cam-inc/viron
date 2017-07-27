@@ -3,6 +3,7 @@ import { constants as mutations } from '../mutations';
 export default {
   /**
    * 起動状態にします。
+   * @param {riotx.Context} context
    * @return {Promise}
    */
   launch: context => {
@@ -15,6 +16,7 @@ export default {
 
   /**
    * 画面遷移状態にします。
+   * @param {riotx.Context} context
    * @return {Promise}
    */
   startNavigation: context => {
@@ -27,6 +29,7 @@ export default {
 
   /**
    * 画面遷移完了状態にします。
+   * @param {riotx.Context} context
    * @return {Promise}
    */
   endNavigation: context => {

@@ -5,6 +5,8 @@ import { constants as states } from '../states';
 export default {
   /**
    * 起動ステータスを変更します。
+   * @param {riotx.Context} context
+   * @param {Boolean} bool
    * @return {Array}
    */
   launch: (context, bool) => {
@@ -14,6 +16,8 @@ export default {
 
   /**
    * 画面遷移ステータスを変更します。
+   * @param {riotx.Context} context
+   * @param {Boolean} bool
    * @return {Array}
    */
   navigation: (context, bool) => {
@@ -23,6 +27,7 @@ export default {
 
   /**
    * 通信中APIを追加します。
+   * @param {riotx.Context} context
    * @param {Object} info
    * @return {Array}
    */
@@ -36,6 +41,7 @@ export default {
 
   /**
    * 通信中APIを削除します。
+   * @param {riotx.Context} context
    * @param {String} networkingId
    * @return {Array}
    */
