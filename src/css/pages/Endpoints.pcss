@@ -1,14 +1,25 @@
+:root {
+  /* jsによって値が操作される*/
+  --page-endpoints-grid-column-count: 1;
+  --page-endpoints-grid-column-width: 256px;
+}
+
 .EndpointsPage {
   display: block;
   padding: 32px;
 }
 
 .EndpointsPage__list {
+  display: grid;
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+  grid-template-columns: repeat(var(--page-endpoints-grid-column-count), var(--page-endpoints-grid-column-width));
+  justify-content: space-between;
 }
 
 .EndpointsPage__addCard {
   @apply --layout-center-center;
-  height: 100px;
+  min-height: 100px;
   font-size: 20px;
   color: var(--color-basic-white);
   cursor: pointer;
@@ -23,11 +34,6 @@
   background-color: #323232;
 }
 
-.EndpointsPage__addCard,
-.EndpointsPage__list .Endpoint {
-  margin-bottom: 24px;
-}
-
 /* ============================== */
 /* Endpoint */
 /* ============================== */
@@ -35,7 +41,6 @@
   position: relative;
   display: block;
   min-height: 140px;
-  margin-bottom: 24px;
   overflow: hidden;
   cursor: pointer;
   background-color: var(--color-basic-white);
@@ -43,10 +48,6 @@
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   transition-duration: 100ms;
   transition-property: background-color;
-}
-
-.EndpointsPage__item:last-child {
-  margin-bottom: 0;
 }
 
 .EndpointsPage__item.hover {

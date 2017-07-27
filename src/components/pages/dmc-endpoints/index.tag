@@ -1,5 +1,5 @@
 dmc-endpoints.Page.EndpointsPage
-  .EndpointsPage__list
+  .EndpointsPage__list(ref="list")
     .EndpointsPage__addCard(ref="touch" onTap="handleEndpointAddTap")
       dmc-icon(type="plus")
     virtual(each="{ endpoint, key in endpoints }")

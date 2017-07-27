@@ -1,3 +1,4 @@
+import throttle from 'mout/function/throttle';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
@@ -10,6 +11,28 @@ export default function() {
   const store = this.riotx.get();
 
   this.endpoints = store.getter(getters.ENDPOINTS);
+
+  const htmlStyles = window.getComputedStyle(document.querySelector('html'));
+  const columnBaseWidth = Number(htmlStyles.getPropertyValue('--page-endpoints-grid-column-width').replace('px', ''));
+  // resizeイベントハンドラーの発火回数を減らす。
+  const updateGridColumnCount = throttle(() => {
+    const containerWidth = this.refs.list.getBoundingClientRect().width;
+    const newColumnCount = Math.floor(containerWidth / columnBaseWidth);
+    if (newColumnCount === 1) {
+      document.documentElement.style.setProperty('--page-endpoints-grid-column-width', `${containerWidth}px`);
+    } else {
+      document.documentElement.style.setProperty('--page-endpoints-grid-column-width', `${columnBaseWidth}px`);
+    }
+    document.documentElement.style.setProperty('--page-endpoints-grid-column-count', newColumnCount);
+  }, 1000);
+
+  this.on('mount', () => {
+    // 初回にcolumn数を設定する。
+    updateGridColumnCount();
+    window.addEventListener('resize', updateGridColumnCount);
+  }).on('unmount', () => {
+    window.removeEventListener('resize', updateGridColumnCount);
+  });
 
   this.listen(states.ENDPOINTS, () => {
     this.endpoints = store.getter(getters.ENDPOINTS);
