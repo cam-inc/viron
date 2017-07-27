@@ -23,6 +23,7 @@ class Context {
     const task = (name, configStore) => {
       const type = configStore.type;
       const store = stores[type];
+
       return store.init(configStore)
         .then(instance => {
           this.stores[name] = {
@@ -31,6 +32,7 @@ class Context {
             functions: store.functions,
             models: store.functions.defineModels && store.functions.defineModels(instance, store.models),
           };
+
           // TODO: logger
           console.log(`Connection has been established successfully to the '${name}' store.`, JSON.stringify(store.functions.getOptions(instance)));
         })

@@ -3,7 +3,9 @@ const https = require('https');
 
 const app = require('express')();
 const SwaggerExpress = require('swagger-express-mw');
-const helperSwagger = require('./api/helpers/swagger');
+
+const lib = require('./lib');
+const helperSwagger = require('./lib/swagger');
 const shared = require('./shared');
 
 const context = shared.context;
@@ -22,7 +24,7 @@ const config = {
      * @param {function} next
      */
     jwt: (req, def, scopes, next) => {
-      middlewares.auth_jwt(context.getConfigAuthJwt())(req, req.res, next);
+      lib.auth.jwt.middleware(context.getConfigAuthJwt())(req, req.res, next);
     },
   },
 };

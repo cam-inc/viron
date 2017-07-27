@@ -1,18 +1,23 @@
+const lib = require('../lib');
+
 module.exports = {
   COLOR_RED: 'red', // Endpoint Color,
   COLOR_BLUE: 'blud', // Endpoint Color,
   COLOR_GREEN: 'green', // Endpoint Color,
 
-  STYLE_LIST: 'list', // WebComponent リスト表示
-  STYLE_TABLE: 'table', // WebComponent テーブル表示
-  STYLE_NUMBER: 'number', // WebComponent 数字表示
-  STYLE_GRAPH_SCATTERPLOT: 'graph-scatterplot',
-  STYLE_GRAPH_LINE: 'graph-line',
-  STYLE_GRAPH_BAR: 'graph-bar',
-  STYLE_GRAPH_HORIZONTAL_BAR: 'graph-horizontal-bar',
-  STYLE_GRAPH_STACKED_BAR: 'graph-stacked-bar',
-  STYLE_GRAPH_HORIZONTAL_STACKED_BAR: 'graph-horizontal-stacked-bar',
-  STYLE_GRAPH_STACKED_AREA: 'graph-stacked-area',
+  DMC_STYLE_LIST: lib.constants.DMC_STYLE_LIST,
+  DMC_STYLE_TABLE: lib.constants.DMC_STYLE_TABLE,
+  DMC_STYLE_NUMBER: lib.constants.DMC_STYLE_NUMBER,
+  DMC_STYLE_GRAPH_SCATTERPLOT: lib.constants.DMC_STYLE_GRAPH_SCATTERPLOT,
+  DMC_STYLE_GRAPH_LINE: lib.constants.DMC_STYLE_GRAPH_LINE,
+  DMC_STYLE_GRAPH_BAR: lib.constants.DMC_STYLE_GRAPH_BAR,
+  DMC_STYLE_GRAPH_HORIZONTAL_BAR: lib.constants.DMC_STYLE_GRAPH_HORIZONTAL_BAR,
+  DMC_STYLE_GRAPH_STACKED_BAR: lib.constants.DMC_STYLE_GRAPH_STACKED_BAR,
+  DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR: lib.constants.DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR,
+  DMC_STYLE_GRAPH_STACKED_AREA: lib.constants.DMC_STYLE_GRAPH_STACKED_AREA,
+  DMC_SECTION_DASHBOARD: lib.constants.DMC_SECTION_DASHBOARD,
+  DMC_SECTION_MANAGE: lib.constants.DMC_SECTION_MANAGE,
+  DMC_JWT_CLAIMS: lib.constants.DMC_JWT_CLAIMS,
 
   GROUP_EMPTY: '', // グループなし
   GROUP_KPI: 'kpi', // KPI
@@ -20,10 +25,6 @@ module.exports = {
   GROUP_BLOG: 'blog', // ブログ
   GROUP_ADMIN: 'admin', // 管理権限
 
-  SECTION_DASHBOARD: 'dashboard', // ダッシュボードセクション
-  SECTION_MANAGE: 'manage', // 管理セクション
-
-  JWT_CLAIMS: 'claims', // JWT claims
 
   USER_MALE: 'male',
   USER_FEMALE: 'female',
