@@ -12,17 +12,10 @@ export default function() {
 
   this.endpoints = store.getter(getters.ENDPOINTS);
 
-  const htmlStyles = window.getComputedStyle(document.querySelector('html'));
-  const columnBaseWidth = Number(htmlStyles.getPropertyValue('--page-endpoints-grid-column-width').replace('px', ''));
   // resizeイベントハンドラーの発火回数を減らす。
   const updateGridColumnCount = throttle(() => {
     const containerWidth = this.refs.list.getBoundingClientRect().width;
-    const newColumnCount = Math.floor(containerWidth / columnBaseWidth);
-    if (newColumnCount === 1) {
-      document.documentElement.style.setProperty('--page-endpoints-grid-column-width', `${containerWidth}px`);
-    } else {
-      document.documentElement.style.setProperty('--page-endpoints-grid-column-width', `${columnBaseWidth}px`);
-    }
+    const newColumnCount = Math.floor(containerWidth / 250) || 1;
     document.documentElement.style.setProperty('--page-endpoints-grid-column-count', newColumnCount);
   }, 1000);
 

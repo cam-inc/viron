@@ -1,7 +1,6 @@
 :root {
   /* jsによって値が操作される*/
   --page-endpoints-grid-column-count: 1;
-  --page-endpoints-grid-column-width: 256px;
 }
 
 .EndpointsPage {
@@ -13,8 +12,7 @@
   display: grid;
   grid-row-gap: 10px;
   grid-column-gap: 10px;
-  grid-template-columns: repeat(var(--page-endpoints-grid-column-count), var(--page-endpoints-grid-column-width));
-  justify-content: space-between;
+  grid-template-columns: repeat(var(--page-endpoints-grid-column-count), 1fr);
 }
 
 .EndpointsPage__addCard {

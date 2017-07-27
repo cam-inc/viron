@@ -1,5 +1,5 @@
 dmc-component-number.ComponentNumber
-  .ComponentNumber__value { value }
+  div { value }
 
   script.
     import script from './number';
