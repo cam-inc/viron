@@ -8,16 +8,29 @@
   "license": "",
   "main": "app.js",
   "dependencies": {
+    "axios": "^0.16.2",
     "express": "^4.12.3",
+    "express-jwt": "^5.3.0",
+    "googleapis": "^20.1.0",
+    "jsonwebtoken": "^7.4.1",
+    "moment-timezone": "^0.5.13",
+    "mout": "^1.0.0",
+    "mysql2": "^1.3.6",
+    "sequelize": "^4.3.2",
     "swagger-express-mw": "^0.1.0"
   },
   "devDependencies": {
     "eslint": "^4.2.0",
     "should": "^7.1.0",
-    "supertest": "^3.0.0"
+    "supertest": "^3.0.0",
+    "supervisor": "^0.12.0"
   },
   "scripts": {
     "start": "node app.js",
-    "test": "swagger project test"
+    "test": "swagger project test",
+    "dressup": "docker-compose -f docker-compose.all.yml up --build",
+    "dressup-db": "docker-compose -f docker-compose.db.yml up --build",
+    "connect-main": "mysql -u user -ppassword -h 127.0.0.1 -P 3306",
+    "debug": "supervisor --verbose --debug=0.0.0.0:53000 --watch . --extensions 'node,js,yaml' --ignore node_modules -- ./app.js"
   }
 }

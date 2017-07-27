@@ -3,6 +3,8 @@ consumes:
 - application/xml
 - application/gob
 - application/x-gob
+- text/html
+- text/plain
 definitions:
   Admin_role:
     description: A Admin Role (default view)
@@ -350,136 +352,8 @@ definitions:
           options:
           - key: key
             value: value
-          - key: key
-            value: value
-          - key: key
-            value: value
           pagination: true
           query:
-          - key: key
-            type: string
-          - key: key
-            type: string
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - Aut et.
-          - Aut et.
-        - api:
-            method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
-          options:
-          - key: key
-            value: value
-          - key: key
-            value: value
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          - key: key
-            type: string
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - Aut et.
-          - Aut et.
-        - api:
-            method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
-          options:
-          - key: key
-            value: value
-          - key: key
-            value: value
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          - key: key
-            type: string
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - Aut et.
-          - Aut et.
-        group: Group of page
-        id: Repellat iure non.
-        name: Maxime consequuntur quia aliquid omnis aut.
-        section: Section of page
-      - components:
-        - api:
-            method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
-          options:
-          - key: key
-            value: value
-          - key: key
-            value: value
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          - key: key
-            type: string
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - Aut et.
-          - Aut et.
-        - api:
-            method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
-          options:
-          - key: key
-            value: value
-          - key: key
-            value: value
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          - key: key
-            type: string
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - Aut et.
-          - Aut et.
-        - api:
-            method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
-          options:
-          - key: key
-            value: value
-          - key: key
-            value: value
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          - key: key
-            type: string
           - key: key
             type: string
           style: Style of Web Component
@@ -495,11 +369,11 @@ definitions:
       thumbnail: Iure nisi.
     properties:
       color:
-        default: red
+        default: white
         enum:
-        - red
-        - blud
-        - green
+        - white
+        - black
+        - perple
         example: Color of Endpoint
         type: string
       name:
@@ -510,126 +384,6 @@ definitions:
         description: A Pages format
         example:
         - components:
-          - api:
-              method: get
-              path: /quickview
-            name: Sint molestiae animi corporis aliquid vero corrupti.
-            options:
-            - key: key
-              value: value
-            - key: key
-              value: value
-            - key: key
-              value: value
-            pagination: true
-            query:
-            - key: key
-              type: string
-            - key: key
-              type: string
-            - key: key
-              type: string
-            style: Style of Web Component
-            table_labels:
-            - Aut et.
-            - Aut et.
-          - api:
-              method: get
-              path: /quickview
-            name: Sint molestiae animi corporis aliquid vero corrupti.
-            options:
-            - key: key
-              value: value
-            - key: key
-              value: value
-            - key: key
-              value: value
-            pagination: true
-            query:
-            - key: key
-              type: string
-            - key: key
-              type: string
-            - key: key
-              type: string
-            style: Style of Web Component
-            table_labels:
-            - Aut et.
-            - Aut et.
-          - api:
-              method: get
-              path: /quickview
-            name: Sint molestiae animi corporis aliquid vero corrupti.
-            options:
-            - key: key
-              value: value
-            - key: key
-              value: value
-            - key: key
-              value: value
-            pagination: true
-            query:
-            - key: key
-              type: string
-            - key: key
-              type: string
-            - key: key
-              type: string
-            style: Style of Web Component
-            table_labels:
-            - Aut et.
-            - Aut et.
-          group: Group of page
-          id: Repellat iure non.
-          name: Maxime consequuntur quia aliquid omnis aut.
-          section: Section of page
-        - components:
-          - api:
-              method: get
-              path: /quickview
-            name: Sint molestiae animi corporis aliquid vero corrupti.
-            options:
-            - key: key
-              value: value
-            - key: key
-              value: value
-            - key: key
-              value: value
-            pagination: true
-            query:
-            - key: key
-              type: string
-            - key: key
-              type: string
-            - key: key
-              type: string
-            style: Style of Web Component
-            table_labels:
-            - Aut et.
-            - Aut et.
-          - api:
-              method: get
-              path: /quickview
-            name: Sint molestiae animi corporis aliquid vero corrupti.
-            options:
-            - key: key
-              value: value
-            - key: key
-              value: value
-            - key: key
-              value: value
-            pagination: true
-            query:
-            - key: key
-              type: string
-            - key: key
-              type: string
-            - key: key
-              type: string
-            style: Style of Web Component
-            table_labels:
-            - Aut et.
-            - Aut et.
           - api:
               method: get
               path: /quickview
@@ -697,12 +451,12 @@ definitions:
     example:
       x:
         label: Corrupti sit voluptas voluptatibus quas.
-      "y":
+      y:
         label: Corrupti sit voluptas voluptatibus quas.
     properties:
       x:
         $ref: '#/definitions/StatsLabelType'
-      "y":
+      y:
         $ref: '#/definitions/StatsLabelType'
     title: StatsGuideType
     type: object
@@ -754,11 +508,11 @@ definitions:
       guide:
         x:
           label: Corrupti sit voluptas voluptatibus quas.
-        "y":
+        y:
           label: Corrupti sit voluptas voluptatibus quas.
       size: Facere at rerum odit consequatur.
       x: Quos maxime sint beatae ut officia.
-      "y": Debitis corporis dolorum ducimus ipsa doloribus.
+      y: Debitis corporis dolorum ducimus ipsa doloribus.
     properties:
       color:
         description: ドットの色分けに使用するkey
@@ -784,17 +538,14 @@ definitions:
         description: X軸に使用するkey
         example: Quos maxime sint beatae ut officia.
         type: string
-      "y":
+      y:
         description: Y軸に使用するkey
         example: Debitis corporis dolorum ducimus ipsa doloribus.
         type: string
     required:
     - data
     - x
-    - "y"
-    - size
-    - color
-    - guide
+    - y
     title: 'Mediatype identifier: application/vnd.statsplanet+json; view=default'
     type: object
   UpdateAdminRolePayload:
@@ -1330,16 +1081,8 @@ definitions:
       options:
       - key: key
         value: value
-      - key: key
-        value: value
-      - key: key
-        value: value
       pagination: true
       query:
-      - key: key
-        type: string
-      - key: key
-        type: string
       - key: key
         type: string
       style: Style of Web Component
@@ -1358,10 +1101,6 @@ definitions:
         example:
         - key: key
           value: value
-        - key: key
-          value: value
-        - key: key
-          value: value
         items:
           $ref: '#/definitions/option'
         type: array
@@ -1374,10 +1113,6 @@ definitions:
         example:
         - key: key
           type: string
-        - key: key
-          type: string
-        - key: key
-          type: string
         items:
           $ref: '#/definitions/query'
         type: array
@@ -1387,6 +1122,13 @@ definitions:
         - number
         - list
         - table
+        - graph-scatterplot
+        - graph-line
+        - graph-bar
+        - graph-horizontal-bar
+        - graph-stacked-bar
+        - graph-horizontal-stacked-bar
+        - graph-stacked-area
         example: Style of Web Component
         type: string
       table_labels:
@@ -1487,52 +1229,6 @@ definitions:
         table_labels:
         - Aut et.
         - Aut et.
-      - api:
-          method: get
-          path: /quickview
-        name: Sint molestiae animi corporis aliquid vero corrupti.
-        options:
-        - key: key
-          value: value
-        - key: key
-          value: value
-        - key: key
-          value: value
-        pagination: true
-        query:
-        - key: key
-          type: string
-        - key: key
-          type: string
-        - key: key
-          type: string
-        style: Style of Web Component
-        table_labels:
-        - Aut et.
-        - Aut et.
-      - api:
-          method: get
-          path: /quickview
-        name: Sint molestiae animi corporis aliquid vero corrupti.
-        options:
-        - key: key
-          value: value
-        - key: key
-          value: value
-        - key: key
-          value: value
-        pagination: true
-        query:
-        - key: key
-          type: string
-        - key: key
-          type: string
-        - key: key
-          type: string
-        style: Style of Web Component
-        table_labels:
-        - Aut et.
-        - Aut et.
       group: Group of page
       id: Repellat iure non.
       name: Maxime consequuntur quia aliquid omnis aut.
@@ -1541,52 +1237,6 @@ definitions:
       components:
         description: A components format
         example:
-        - api:
-            method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
-          options:
-          - key: key
-            value: value
-          - key: key
-            value: value
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          - key: key
-            type: string
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - Aut et.
-          - Aut et.
-        - api:
-            method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
-          options:
-          - key: key
-            value: value
-          - key: key
-            value: value
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          - key: key
-            type: string
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - Aut et.
-          - Aut et.
         - api:
             method: get
             path: /quickview
@@ -1680,6 +1330,7 @@ info:
 paths:
   /:
     get:
+      x-swagger-router-controller: root
       description: get root
       operationId: root#show
       responses:
@@ -1891,6 +1542,7 @@ paths:
       - admin_role
   /adminuser:
     get:
+      x-swagger-router-controller: dmc_admin_user
       description: |-
         get admin users
 
@@ -1929,6 +1581,7 @@ paths:
         method: delete
         path: /adminuser/{id}
     post:
+      x-swagger-router-controller: dmc_admin_user
       description: |-
         create a admin user
 
@@ -1967,12 +1620,13 @@ paths:
       - admin_user
   /adminuser/{id}:
     delete:
+      x-swagger-router-controller: dmc_admin_user
       description: |-
         delete the user
 
         Required security scopes:
           * `api:access`
-      operationId: admin_user#delete
+      operationId: admin_user#remove
       parameters:
       - description: id
         in: path
@@ -2001,6 +1655,7 @@ paths:
       tags:
       - admin_user
     get:
+      x-swagger-router-controller: dmc_admin_user
       description: |-
         get the admin user
 
@@ -2038,6 +1693,7 @@ paths:
       tags:
       - admin_user
     put:
+      x-swagger-router-controller: dmc_admin_user
       description: |-
         update the admin user
 
@@ -2323,6 +1979,7 @@ paths:
       - blog_design
   /dmc:
     get:
+      x-swagger-router-controller: dmc
       description: |-
         dmc settings
 
@@ -2353,6 +2010,7 @@ paths:
       - dmc
   /dmc_authtype:
     get:
+      x-swagger-router-controller: dmc_authtype
       description: get auth types
       operationId: auth_type#list
       produces:
@@ -2428,8 +2086,9 @@ paths:
       - file
   /googleoauth2callback:
     get:
+      x-swagger-router-controller: dmc_auth
       description: callback function from google oauth2
-      operationId: auth#googleoauth2callback
+      operationId: dmc_auth#googleoauth2callback
       parameters:
       - description: authorization code
         in: query
@@ -2463,8 +2122,9 @@ paths:
       - auth
   /googlesignin:
     get:
+      x-swagger-router-controller: dmc_auth
       description: signin with google
-      operationId: auth#googlesignin
+      operationId: dmc_auth#googlesignin
       parameters:
       - description: redirect url
         in: query
@@ -2486,10 +2146,28 @@ paths:
       summary: googlesignin auth
       tags:
       - auth
+  /ping:
+    get:
+      x-swagger-router-controller: ping
+      description: check alive
+      operationId: ping#show
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      schemes:
+      - https
+      summary: show ping
+      tags:
+      - ping
   /signin:
     post:
+      x-swagger-router-controller: dmc_auth
       description: signin with JWT
-      operationId: auth#signin
+      operationId: dmc_auth#signin
       parameters:
       - in: body
         name: payload
@@ -2518,8 +2196,9 @@ paths:
       - auth
   /signout:
     post:
+      x-swagger-router-controller: dmc_auth
       description: signout
-      operationId: auth#signout
+      operationId: dmc_auth#signout
       responses:
         "204":
           description: No Content
@@ -2530,8 +2209,9 @@ paths:
       - auth
   /stats/dau:
     get:
+      x-swagger-router-controller: stats
       description: Service Daily Activity User
-      operationId: stats_dau#show
+      operationId: stats#dau
       produces:
       - application/vnd.goa.error
       - application/vnd.statsdau+json
@@ -2553,8 +2233,9 @@ paths:
       - stats_dau
   /stats/mau:
     get:
+      x-swagger-router-controller: stats
       description: Service Monthly Activity User
-      operationId: stats_mau#show
+      operationId: stats#mau
       produces:
       - application/vnd.goa.error
       - application/vnd.statsmau+json
@@ -2576,6 +2257,7 @@ paths:
       - stats_mau
   /stats/planet/bar:
     get:
+      x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#bar
       produces:
@@ -2599,8 +2281,9 @@ paths:
       - stats_planet
   /stats/planet/horizontal-bar:
     get:
+      x-swagger-router-controller: stats_planet
       description: Planets Information
-      operationId: stats_planet#horizontal-bar
+      operationId: stats_planet#horizontal_bar
       produces:
       - application/vnd.goa.error
       - application/vnd.statsplanet+json
@@ -2622,8 +2305,9 @@ paths:
       - stats_planet
   /stats/planet/horizontal-stacked-bar:
     get:
+      x-swagger-router-controller: stats_planet
       description: Planets Information
-      operationId: stats_planet#horizontal-stacked-bar
+      operationId: stats_planet#horizontal_stacked_bar
       produces:
       - application/vnd.goa.error
       - application/vnd.statsplanet+json
@@ -2645,6 +2329,7 @@ paths:
       - stats_planet
   /stats/planet/line:
     get:
+      x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#line
       produces:
@@ -2668,6 +2353,7 @@ paths:
       - stats_planet
   /stats/planet/scatterplot:
     get:
+      x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#scatterplot
       produces:
@@ -2691,8 +2377,9 @@ paths:
       - stats_planet
   /stats/planet/stacked-area:
     get:
+      x-swagger-router-controller: stats_planet
       description: Planets Information
-      operationId: stats_planet#stacked-area
+      operationId: stats_planet#stacked_area
       produces:
       - application/vnd.goa.error
       - application/vnd.statsplanet+json
@@ -2714,6 +2401,7 @@ paths:
       - stats_planet
   /stats/planet/stacked-bar:
     get:
+      x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#stacked-bar
       produces:
@@ -2737,6 +2425,7 @@ paths:
       - stats_planet
   /swagger.json:
     get:
+      x-swagger-router-controller: swagger
       description: |-
         get swagger.json
 
@@ -2749,6 +2438,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -3407,6 +3098,8 @@ produces:
 - application/xml
 - application/gob
 - application/x-gob
+- text/html
+- text/plain
 responses:
   InternalServerError:
     description: Internal Server Error
@@ -3425,9 +3118,9 @@ schemes:
 securityDefinitions:
   jwt:
     type: oauth2
-    authorizationUrl: /dialog
+    authorizationUrl: /signin
     flow: implicit
     scopes:
       api:access: API access
-    
+
 swagger: "2.0"
