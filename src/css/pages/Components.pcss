@@ -1,3 +1,8 @@
+:root {
+  /* jsによって値が操作される*/
+  --page-components-grid-column-count: 1;
+}
+
 /* Components = dmc.pages[x].componentsのこと */
 /* 紛らわしいので注意すること */
 .ComponentsPage {
@@ -10,10 +15,13 @@
   background-color: var(--color-basic-white);
 }
 
-.ComponentsPage__list {
+.ComponentsPage__listWrapper {
   padding: 32px;
 }
 
-.ComponentsPage__list .Component {
-  margin-bottom: 24px;
+.ComponentsPage__list {
+  display: grid;
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+  grid-template-columns: repeat(var(--page-components-grid-column-count), minmax(0, 1fr));
 }

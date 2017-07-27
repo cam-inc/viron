@@ -14,6 +14,7 @@ RUN npm install --no-progress && npm cache clean
 
 # Copy source files
 ADD shared /example-node/shared
+ADD lib /example-node/lib
 ADD api /example-node/api
 ADD config /example-node/config
 ADD app.js /example-node/app.js

@@ -4,6 +4,7 @@ import current from './current';
 import dmc from './dmc';
 import drawers from './drawers';
 import endpoints from './endpoints';
+import layout from './layout';
 import location from './location';
 import menu from './menu';
 import modals from './modals';
@@ -34,6 +35,8 @@ const constants = {
   ENDPOINTS: 'ENDPOINTS',
   ENDPOINTS_ONE: 'ENDPOINTS_ONE',
   ENDPOINTS_ONE_BY_URL: 'ENDPOINTS_ONE_BY_URL',
+  LAYOUT_ENDPOINTS_GRID_COLUMN_COUNT: 'LAYOUT_ENDPOINTS_GRID_COLUMN_COUNT',
+  LAYOUT_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION: 'LOCATION',
   LOCATION_NAME: 'LOCATION_NAME',
   LOCATION_ROUTE: 'LOCATION_ROUTE',
@@ -71,6 +74,8 @@ export default {
   [constants.ENDPOINTS]: endpoints.all,
   [constants.ENDPOINTS_ONE]: endpoints.one,
   [constants.ENDPOINTS_ONE_BY_URL]: endpoints.oneByURL,
+  [constants.LAYOUT_ENDPOINTS_GRID_COLUMN_COUNT]: layout.endpointsGridColumnCount,
+  [constants.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout.componentsGridColumnCount,
   [constants.LOCATION]: location.all,
   [constants.LOCATION_NAME]: location.name,
   [constants.LOCATION_ROUTE]: location.route,

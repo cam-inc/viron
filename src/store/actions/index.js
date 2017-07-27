@@ -5,6 +5,7 @@ import current from './current';
 import dmc from './dmc';
 import drawers from './drawers';
 import endpoints from './endpoints';
+import layout from './layout';
 import location from './location';
 import menu from './menu';
 import modals from './modals';
@@ -37,6 +38,8 @@ const constants = {
   ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
   ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
+  LAYOUT_UPDATE_ENDPOINTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_ENDPOINTS_GRID_COLUMN_COUNT',
+  LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION_UPDATE: 'LOCATION_UPDATE',
   MENU_TOGGLE: 'MENU_TOGGLE',
   MENU_OPEN: 'MENU_OPEN',
@@ -77,6 +80,8 @@ export default {
   [constants.ENDPOINTS_UPDATE]: endpoints.update,
   [constants.ENDPOINTS_REMOVE]: endpoints.remove,
   [constants.ENDPOINTS_REMOVE_ALL]: endpoints.removeAll,
+  [constants.LAYOUT_UPDATE_ENDPOINTS_GRID_COLUMN_COUNT]: layout.updateEndpointsGridColumnCount,
+  [constants.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT]: layout.updateComponentsGridColumnCount,
   [constants.LOCATION_UPDATE]: location.update,
   [constants.MENU_TOGGLE]: menu.toggle,
   [constants.MENU_OPEN]: menu.open,

@@ -26,7 +26,6 @@ const sign = (claims, options) => {
     resolve(token);
   });
 };
-
 module.exports = {
-  sign,
+  sign
 };

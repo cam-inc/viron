@@ -1,10 +1,6 @@
-const Sequelize = require('sequelize');
 const reduce = require('mout/object/reduce');
 
-const lib = require('../../../lib');
-
 const models = require('./models');
-const associations = models.associations;
 
 const initModel = model => {
   return new Promise((resolve, reject) => {
@@ -32,53 +28,29 @@ const initModels = sequelize => {
         resolve(sequelize);
       })
       .catch(reject)
-    ;
+      ;
   });
 };
-
-const initAssociations = sequelize => {
-  return new Promise((resolve, reject) => {
-    const tasks = Object.keys(associations).map(name => {
-      return associations[name](sequelize);
-    });
-    return Promise.all(tasks)
-      .then(() => {
-        resolve(sequelize);
-      })
-      .catch(reject)
-    ;
-  });
-};
-
 
 module.exports = {
   /**
    * Model Define
    */
-  models: Object.assign(models, lib.stores.mysql.models),
+  models: models,
 
   /**
-   * MySQL コネクション作成
-   * @param options http://docs.sequelizejs.com/class/lib/sequelize.js~Sequelize.html#instance-constructor-constructor
-   * @returns {Bluebird<U>|Bluebird<U2|U1>|Bluebird<R>|Thenable<U>|Promise.<TResult>}
+   * 初期化
+   * @param sequelize Sequelize instance
    */
-  init: options => {
-    const sequelize = new Sequelize(options.config);
-
-    return sequelize.authenticate()
+  init: sequelize => {
+    return Promise.resolve()
       .then(() => {
         return sequelize;
-      })
-      .then((sequelize) => {
-        return lib.stores.mysql.init(sequelize); // import dmc library
       })
       .then(sequelize => {
         return initModels(sequelize);
       })
-      .then(sequelize => {
-        return initAssociations(sequelize);
-      })
-    ;
+      ;
   },
 
   functions: {

@@ -1,7 +1,7 @@
 /* Component = dmc.pages[x].components[x]のこと */
 /* 紛らわしいので注意すること */
 .Component {
-  display: block;
+  @apply --layout-column-stretch-center;
   background-color: var(--color-basic-white);
   border-radius: 6px;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
@@ -80,8 +80,9 @@
 }
 
 .Component__body {
+  @apply --layout-center-center;
+  flex-grow: 1;
   padding: 16px;
-  overflow: scroll;
 }
 
 .Component__alert {

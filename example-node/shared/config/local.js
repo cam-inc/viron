@@ -14,7 +14,7 @@ module.exports = helper => {
       scope: [
         'https://www.googleapis.com/auth/userinfo.email',
       ],
-      state_url: 'https://cam-inc.github.io/dmc/#/',
+      state_url: 'http://localhost:8080',
       allow_email_domains: [
         // ここに書いたドメインがGoogle認証で利用可能
         'camobile.com',
@@ -22,7 +22,7 @@ module.exports = helper => {
     },
 
     cors: {
-      allow_origin: 'https://cam-inc.github.io',
+      allow_origin: 'http://localhost:8080',
       allow_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
       expose_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
     },
