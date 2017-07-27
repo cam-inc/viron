@@ -42,4 +42,4 @@ services:
     networks:
       default:
         aliases:
-          - local-dmc-mysql.in.ldh-m.biz
+          - local-dmc-mysql.in.dmc.biz
