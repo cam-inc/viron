@@ -190,7 +190,7 @@ const show = (req, res) => {
             api: api('/adminuser', 'get'),
             style: constant.DMC_STYLE_TABLE,
             options: [defaultOptions],
-            pagination: false,
+            pagination: true,
             table_labels: ['email', 'role_id'],
           },
         ],

@@ -43,7 +43,7 @@ const getRoles = (AdminRoles, roleId) => {
  * @returns {function(*, *, *)}
  */
 const registerSignIn = (AdminUsers, AdminRoles, superRole, configAuthJwt) => {
-  return (req, res, next) => {
+  return (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -73,14 +73,14 @@ const registerSignIn = (AdminUsers, AdminRoles, superRole, configAuthJwt) => {
               .then(password => {
                 return {password, salt};
               })
-              ;
+            ;
           })
           .then(data => {
             data.email = email;
             data.role_id = superRole;
             return AdminUsers.create(data);
           })
-          ;
+        ;
       })
       .then(adminUser => {
         // パスワード検証
@@ -91,7 +91,7 @@ const registerSignIn = (AdminUsers, AdminRoles, superRole, configAuthJwt) => {
             }
             return adminUser;
           })
-          ;
+        ;
       })
       .then(adminUser => {
         // ロールを取得
@@ -112,7 +112,7 @@ const registerSignIn = (AdminUsers, AdminRoles, superRole, configAuthJwt) => {
       })
     ;
   };
-}
+};
 
 /**
  * Controller : Sing Out
@@ -122,7 +122,7 @@ const registerSignIn = (AdminUsers, AdminRoles, superRole, configAuthJwt) => {
  * @returns {function(*, *, *)}
  */
 const registerSignOut = () => {
-  return (req, res, next) => {
+  return (req, res) => {
     res.end();
   };
 };
@@ -135,8 +135,8 @@ const registerSignOut = () => {
  * @param configGoogleOAuth
  * @returns {function(*, *, *)}
  */
-const registerGoogleSignIn = (configGoogleOAuth) => {
-  return (req, res, next) => {
+const registerGoogleSignIn = configGoogleOAuth => {
+  return (req, res) => {
     // Googleの認証画面にリダイレクト
     const authUrl = helperGoogle.genAuthUrl(configGoogleOAuth);
     return res.redirect(authUrl); // 301
@@ -147,7 +147,7 @@ const registerGoogleSignIn = (configGoogleOAuth) => {
  * GET: /googleoauth2callback
  */
 const registerGoogleOAuth2Callback = (AdminUsers, AdminRoles, configGoogleOAuth, configAuthJwt) => {
-  return (req, res, next) => {
+  return (req, res) => {
     const redirectUrl = req.query.state;
 
     // アクセストークンを取得
@@ -161,7 +161,7 @@ const registerGoogleOAuth2Callback = (AdminUsers, AdminRoles, configGoogleOAuth,
             }
             return {token, email};
           })
-          ;
+        ;
       })
       .then(data => {
         // メアドでユーザ検索
@@ -181,7 +181,7 @@ const registerGoogleOAuth2Callback = (AdminUsers, AdminRoles, configGoogleOAuth,
                 // 1人目の場合はスーパーユーザーとして登録する
                 return AdminUsers.create({email: data.email, role_id: constant.DMC_SUPER_ROLE});
               })
-              ;
+            ;
           })
           .then(adminUser => {
             // ロールを取得
@@ -196,7 +196,7 @@ const registerGoogleOAuth2Callback = (AdminUsers, AdminRoles, configGoogleOAuth,
             };
             return helperJwt.sign(claims, configAuthJwt);
           })
-          ;
+        ;
       })
       .then(token => {
         const authToken = `Bearer ${token}`;
@@ -208,7 +208,7 @@ const registerGoogleOAuth2Callback = (AdminUsers, AdminRoles, configGoogleOAuth,
         res.redirect(redirectUrl);
       })
     ;
-  }
+  };
 };
 
 module.exports = {

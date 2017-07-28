@@ -9,7 +9,6 @@ const helperSwagger = require('./lib/swagger');
 const shared = require('./shared');
 
 const context = shared.context;
-const middlewares = shared.middlewares;
 
 module.exports = app; // for testing
 
@@ -37,12 +36,7 @@ context.init()
       }
 
       // add middlewares here.
-      app.use(middlewares.cors(context.getConfigCors()));
-
-      app.use((req, res, next) => {
-        req._swagger = swaggerExpress.runner.swagger;
-        next();
-      });
+      app.use(lib.acl.middleware(context.getConfigAcl()));
 
       app.use((req, res, next) => {
         if (req.method === 'OPTIONS') {
@@ -50,6 +44,8 @@ context.init()
         }
         next();
       });
+
+      app.use(lib.audit_log.middleware(context.getStoreMain().models.AuditLogs));
 
       // add routing
       swaggerExpress.register(app);

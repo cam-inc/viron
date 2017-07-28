@@ -1,3 +1,9 @@
+/**
+ * Middleware : Set Access-Control Response Headers
+ *
+ * @param {object} options - {allow_origin: '', allow_headers: '', expose_headers: ''}
+ * @returns {function(*, *, *)}
+ */
 module.exports = options => {
   return (req, res, next) => {
     res.header('Access-Control-Allow-Origin', options.allow_origin);

@@ -18,7 +18,7 @@ module.exports = sequelize => {
         allowNull: true,
       },
       user_id: {
-        type: Sequelize.INTEGER.UNSIGNED,
+        type: Sequelize.STRING,
         allowNull: true,
       },
       request_body: {

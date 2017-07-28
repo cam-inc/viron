@@ -106,10 +106,10 @@ class Context {
   }
 
   /**
-   * config cors 取得
+   * config acl 取得
    */
-  getConfigCors() {
-    return config.cors;
+  getConfigAcl() {
+    return config.acl;
   }
 
 }

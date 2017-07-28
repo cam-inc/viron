@@ -94,15 +94,15 @@ definitions:
   Audit_log:
     description: A Audit Log (default view)
     example:
-      created_at: 2006-02-12T07:09:13+09:00
+      createdAt: 2006-02-12T07:09:13+09:00
       request_body: Qui voluptatem omnis esse consectetur.
       request_method: Molestias harum nulla ipsam quis dolorem quidem.
       request_uri: Dolorum id dolores illum.
       source_ip: Ea sed qui ipsa voluptatibus.
-      status_code: Impedit est.
+      status_code: 200
       user_id: Et saepe nihil in earum sint.
     properties:
-      created_at:
+      createdAt:
         description: created time
         example: 2006-02-12T07:09:13+09:00
         format: date-time
@@ -125,8 +125,8 @@ definitions:
         type: string
       status_code:
         description: http status code
-        example: Impedit est.
-        type: string
+        example: 200
+        type: integer
       user_id:
         description: user id
         example: Et saepe nihil in earum sint.
@@ -137,12 +137,12 @@ definitions:
     description: Audit_logCollection is the media type for an array of Audit_log (default
       view)
     example:
-    - created_at: 2006-02-12T07:09:13+09:00
+    - createdAt: 2006-02-12T07:09:13+09:00
       request_body: Qui voluptatem omnis esse consectetur.
       request_method: Molestias harum nulla ipsam quis dolorem quidem.
       request_uri: Dolorum id dolores illum.
       source_ip: Ea sed qui ipsa voluptatibus.
-      status_code: Impedit est.
+      status_code: 200
       user_id: Et saepe nihil in earum sint.
     items:
       $ref: '#/definitions/Audit_log'
@@ -1042,9 +1042,6 @@ definitions:
         - PUT:/adminuser
         - DELETE:/adminuser
         - GET:/auditlog
-        - POST:/auditlog
-        - PUT:/auditolog
-        - DELETE:/auditlog
         example: GET:/user
         type: string
     required:
@@ -1737,6 +1734,7 @@ paths:
       - admin_user
   /auditlog:
     get:
+      x-swagger-router-controller: dmc_audit_log
       description: |-
         get admin roles
 

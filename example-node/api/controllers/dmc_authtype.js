@@ -3,6 +3,8 @@
  */
 const list = (req, res) => {
   const result = [
+    // サポートしている認証を定義
+    // - emailとgoogleOAuthはDMCがデフォルトで提供
     {
       type: 'email',
       provider: 'example-node',
@@ -15,6 +17,7 @@ const list = (req, res) => {
       url: '/googlesignin',
       method: 'POST',
     },
+    // signoutは必須
     {
       type: 'signout',
       provider: '',

@@ -1,6 +1,6 @@
 
 const show = (req, res) => {
-  res.json(req._swagger);
+  res.json(req.swagger.swaggerObject);
 };
 
 module.exports = {
