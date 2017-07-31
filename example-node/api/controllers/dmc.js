@@ -207,7 +207,7 @@ const show = (req, res) => {
             style: constant.DMC_STYLE_TABLE,
             options: [defaultOptions],
             pagination: true,
-            table_labels: ['created_at', 'request_uri', 'request_method'],
+            table_labels: ['createdAt', 'request_uri', 'request_method'],
           },
         ],
       },

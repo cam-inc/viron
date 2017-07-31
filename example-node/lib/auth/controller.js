@@ -31,7 +31,6 @@ const getRoles = (AdminRoles, roleId) => {
   ;
 };
 
-
 /**
  * Controller : Sing In
  * HTTP Method : POST

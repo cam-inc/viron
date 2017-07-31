@@ -6,7 +6,7 @@ const shared = require('../../shared');
  * @type {{audit_log#list (function(*, *, *))}}
  */
 module.exports = {
-  'audit_log#list': lib.audit_log.controller.list(
+  'audit_log#list': lib.auditLog.controller.list(
     shared.context.getStoreMain().models.AuditLogs
   ),
 };

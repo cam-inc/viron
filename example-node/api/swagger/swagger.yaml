@@ -1015,7 +1015,7 @@ definitions:
         type: boolean
       path:
         description: path
-        enum:
+        enum: # TODO: 自動生成できないか？
         - GET:/stats
         - GET:/user
         - POST:/user
@@ -1340,23 +1340,14 @@ paths:
       - root
   /adminrole:
     get:
+      x-swagger-router-controller: dmc_admin_role
       description: |-
         get admin roles
 
         Required security scopes:
           * `api:access`
       operationId: admin_role#list
-      parameters:
-      - description: number of items per page
-        in: query
-        name: limit
-        required: false
-        type: integer
-      - description: offset number of page
-        in: query
-        name: offset
-        required: false
-        type: integer
+      parameters: []
       produces:
       - application/vnd.goa.error
       - application/vnd.admin_role+json; type=collection
@@ -1387,6 +1378,7 @@ paths:
         method: delete
         path: /adminrole/{role_id}
     post:
+      x-swagger-router-controller: dmc_admin_role
       description: |-
         create a admin role
 
@@ -1425,12 +1417,13 @@ paths:
       - admin_role
   /adminrole/{role_id}:
     delete:
+      x-swagger-router-controller: dmc_admin_role
       description: |-
         delete the user
 
         Required security scopes:
           * `api:access`
-      operationId: admin_role#delete
+      operationId: admin_role#remove
       parameters:
       - description: role id
         in: path
@@ -1459,6 +1452,7 @@ paths:
       tags:
       - admin_role
     get:
+      x-swagger-router-controller: dmc_admin_role
       description: |-
         get the admin role
 
@@ -1496,6 +1490,7 @@ paths:
       tags:
       - admin_role
     put:
+      x-swagger-router-controller: dmc_admin_role
       description: |-
         update the admin user
 

@@ -45,7 +45,7 @@ context.init()
         next();
       });
 
-      app.use(lib.audit_log.middleware(context.getStoreMain().models.AuditLogs));
+      app.use(lib.auditLog.middleware(context.getStoreMain().models.AuditLogs));
 
       // add routing
       swaggerExpress.register(app);
