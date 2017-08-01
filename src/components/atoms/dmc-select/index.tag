@@ -4,7 +4,7 @@ dmc-select.Select
     select.Select__input(ref="select" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
       option(each="{ option in opts.options }" selected="{ option.isSelected }" disabled="{ option.isDisabled }") { option.label }
     .Select__icon
-      dmv-icon(type="down")
+      dmc-icon(type="down")
 
   script.
     import '../../atoms/dmc-icon/index.tag';
