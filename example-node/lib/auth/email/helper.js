@@ -34,7 +34,7 @@ const verify = (password, currentPassword, currentSalt) => {
     .then(hashedPassword => {
       return currentPassword === hashedPassword;
     })
-  ;
+    ;
 };
 
 module.exports = {

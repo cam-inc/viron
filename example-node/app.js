@@ -3,11 +3,12 @@ const https = require('https');
 
 const app = require('express')();
 const SwaggerExpress = require('swagger-express-mw');
-const helperSwagger = require('./api/helpers/swagger');
+
+const lib = require('./lib');
+const helperSwagger = require('./lib/swagger');
 const shared = require('./shared');
 
 const context = shared.context;
-const middlewares = shared.middlewares;
 
 module.exports = app; // for testing
 
@@ -22,7 +23,7 @@ const config = {
      * @param {function} next
      */
     jwt: (req, def, scopes, next) => {
-      middlewares.auth_jwt(context.getConfigAuthJwt())(req, req.res, next);
+      lib.auth.jwt.middleware(context.getConfigAuthJwt())(req, req.res, next);
     },
   },
 };
@@ -35,12 +36,7 @@ context.init()
       }
 
       // add middlewares here.
-      app.use(middlewares.cors(context.getConfigCors()));
-
-      app.use((req, res, next) => {
-        req._swagger = swaggerExpress.runner.swagger;
-        next();
-      });
+      app.use(lib.acl.middleware(context.getConfigAcl()));
 
       app.use((req, res, next) => {
         if (req.method === 'OPTIONS') {
@@ -48,6 +44,8 @@ context.init()
         }
         next();
       });
+
+      app.use(lib.auditLog.middleware(context.getStoreMain().models.AuditLogs));
 
       // add routing
       swaggerExpress.register(app);
