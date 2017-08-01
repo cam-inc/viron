@@ -9,49 +9,35 @@ import get from 'mout/object/get';
  */
 class Swagger {
   constructor() {
+    // SwaggerClientインスタンス。
     this.client = null;
   }
 
   setup(endpoint) {
-    return new Promise((resolve, reject) => {
-      const request = {
-        url: endpoint.url,
-        //query,
-        //method,
-        //body,
-        headers: {
-          'Authorization': endpoint.token
-        },
-        requestInterceptor: (req) => {
-          console.log('Interceptor(request):', req);
-        },
-        responseInterceptor: (res) => {
-          console.log('Interceptor(response):', res);
+    const request = {
+      url: endpoint.url,
+      headers: {
+        'Authorization': endpoint.token
+      }
+    };
+    // SwaggerClientのHTTPクライアント。
+    // @see: https://github.com/swagger-api/swagger-js#http-client
+    return window.SwaggerClient// eslint-disable-line no-undef
+      .http(request)
+      .then(res => {
+        if (res.status === 401) {
+          const err = new Error();
+          err.name = '401 Authorization Required';
+          err.status = res.spec.status;
+          return Promise.reject(err);
         }
-      };
-
-      SwaggerClient// eslint-disable-line no-undef
-        .http(request)
-        .then(res => {
-          if (res.errors && res.errors.length > 0) {
-            return reject(res.errors);
-          }
-          if (res.status === 401) {
-            const err = new Error();
-            err.name = '401 Authorization Required';
-            err.status = res.spec.status;
-            return reject(err);
-          }
-
-          SwaggerClient({spec: res.body}).then(_client => {// eslint-disable-line no-undef
-            this.client = _client;
-            resolve(_client.spec.info);
-          });
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+        return res;
+      })
+      .then(res => window.SwaggerClient({ spec: res.body }))
+      .then(client => {
+        this.client = client;
+        return client.spec.info;
+      });
   }
 
   apisFlatObject() {
