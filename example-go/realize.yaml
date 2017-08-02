@@ -2,31 +2,33 @@ settings:
   resources:
     output: output.log
     log: logs.log
+    errors: errors.log
   server:
-    enable: true
+    status: true
     open: false
     host: 0.0.0.0
     port: 4000
-  config:
-    flimit: 0
 projects:
 - name: example-go
   path: src/github.com/cam-inc/dmc/example-go
-  run: true
-  bin: true
-  generate: false
-  build: true
-  fmt: true
-  test: false
-  params: []
+  commands:
+    vet: true
+    fmt: true
+    test: false
+    generate: false
+    bin:
+      status: true
+    build:
+      status: false
+    run: true
   watcher:
+    preview: true
     paths:
     - /
     ignore_paths:
     - design
     exts:
     - .go
-    preview: true
   streams:
     cli_out: true
     flie_out: false

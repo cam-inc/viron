@@ -22,6 +22,6 @@ git golang.org/x/oauth2 HEAD recursive
 git golang.org/x/blog/content/context/userip HEAD
 
 # Development package
-git github.com/tockins/realize HEAD
+git github.com/tockins/realize 2aeeddbc157bcca0eb7d4eb07367f1fa35121ad9
 git github.com/smartystreets/goconvey HEAD
 git github.com/golang/lint/golint HEAD
