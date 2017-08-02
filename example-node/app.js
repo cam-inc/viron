@@ -51,12 +51,6 @@ context.init()
       // add routing
       swaggerExpress.register(app);
 
-      // error handler
-      app.use((err, req, res, next) => {
-        res.status(err.statusCode || 500).json({error: err});
-        next(err);
-      });
-
       const port = helperSwagger.getPort(swaggerExpress, process.env.PORT);
       const ssl = context.getConfigSsl();
       if (ssl.use) {

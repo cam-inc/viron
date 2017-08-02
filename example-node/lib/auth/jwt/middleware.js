@@ -1,5 +1,7 @@
 const jwt = require('express-jwt');
 
+const errors = require('../../errors');
+
 const getToken = options => {
   return req => {
     const jwtHeader = req.get(options.header_key);
@@ -29,7 +31,7 @@ module.exports = options => {
     })(req, res, err => {
       if (err instanceof jwt.UnauthorizedError) {
         res.setHeader('WWW-Authenticate', 'Bearer token_type="JWT" realm="Authorization Required"');
-        err.statusCode = 401;
+        return next(errors.frontend.Unauthorized());
       }
       if (err) {
         return next(err);

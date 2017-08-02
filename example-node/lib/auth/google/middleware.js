@@ -1,6 +1,8 @@
 const get = require('mout/object/get');
 const helper = require('./helper');
 
+const errors = require('../../errors');
+
 /**
  * Middleware : Check Google OAuth token
  *
@@ -21,7 +23,7 @@ module.exports = () => {
     helper.getMailAddress(token)
       .then(email => {
         if (!email) {
-          return next(new Error('invalid token'));
+          return next(errors.frontend.Unauthorized());
         }
         next();
       })

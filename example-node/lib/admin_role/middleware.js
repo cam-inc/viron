@@ -1,6 +1,6 @@
 const get = require('mout/object/get');
+const errors = require('../errors');
 const helper = require('./helper');
-
 
 /**
  * Middleware : Check Admin Role
@@ -16,7 +16,7 @@ module.exports = () => {
 
     const roles = get(req, 'auth.roles');
     if (!helper.canAccess(req.path, req.method, roles)) {
-      return next(new Error('permission denied'));
+      return next(errors.frontend.Forbidden());
     }
     next();
   };
