@@ -73,6 +73,11 @@ const bindTouchEvents = tag => {
 
     const touchMoveEventId = closureEventListener.add(elm, EVENT_TOUCHMOVE, e => {
       e.stopPropagation();
+      const isPressed = e.currentTarget.classList.contains('hover');
+      if (!isPressed) {
+        e.currentTarget.classList.remove('hover');
+        return;
+      }
     });
 
     const touchEndEventId = closureEventListener.add(elm, EVENT_TOUCHEND, e => {
