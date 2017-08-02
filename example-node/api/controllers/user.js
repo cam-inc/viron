@@ -48,7 +48,6 @@ const list = (req, res) => {
 const create = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
-  process.on('unhandledRejection', console.dir);
   return Promise.resolve()
     .then(() => {
       var date = new Object();
@@ -65,7 +64,28 @@ const create = (req, res) => {
     ;
 }
 
+/**
+ * Controller : Delete  User
+ * HTTP Method : DELETE
+ * PATH : /user
+ *
+ * @param Users Sequelize.model
+ * @returns {function(*)}
+ */
+
+const remove = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const Users = store.models.Users;
+  const id = req.swagger.params.id.value;
+  return Users.destroy({where: {id}, force: true})
+    .then(() => {
+      res.status(204).end();
+    })
+  ;
+}
+
 module.exports = {
   'user#list': list,
   'user#create': create,
+  'user#delete': remove,
 };
