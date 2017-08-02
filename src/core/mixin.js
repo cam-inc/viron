@@ -26,6 +26,7 @@ const isSupportTouch = 'ontouchstart' in document;
 const EVENT_TOUCHSTART = isSupportTouch ? 'touchstart' : 'mousedown';
 const EVENT_TOUCHMOVE = isSupportTouch ? 'touchmove' : 'mousemove';
 const EVENT_TOUCHEND = isSupportTouch ? 'touchend' : 'mouseup';
+const TOUCH_ALLOW_RANGE = 10;
 // 無名関数をaddEventListenerのハンドラーに設定した場合でも正しくremoveEventListener出来るようにする。
 const closureEventListener = (() => {
   const events = {};
@@ -57,6 +58,7 @@ const closureEventListener = (() => {
 })();
 const bindTouchEvents = tag => {
   forEach(getTouchableElements(tag), elm => {
+    let touchX = 0, touchY = 0;
     // bind済みであれば何もしない。
     if (!!elm.getAttribute('touchevents')) {
       return;
@@ -64,30 +66,33 @@ const bindTouchEvents = tag => {
 
     const touchStartEventId = closureEventListener.add(elm, EVENT_TOUCHSTART, e => {
       e.stopPropagation();
+      touchX = e.clientX;
+      touchY = e.clientY;
       e.currentTarget.classList.add('hover');
     });
 
     const touchMoveEventId = closureEventListener.add(elm, EVENT_TOUCHMOVE, e => {
       e.stopPropagation();
-      const isPressed = e.currentTarget.classList.contains('hover');
-      if (!isPressed) {
-        return;
-      }
-      e.currentTarget.classList.remove('hover');
     });
 
     const touchEndEventId = closureEventListener.add(elm, EVENT_TOUCHEND, e => {
       e.stopPropagation();
       const isPressed = e.currentTarget.classList.contains('hover');
       if (isPressed) {
-        // ハンドラーを取得。無ければ何もしない。
-        let handlerName = elm.getAttribute('ontap');
-        // `parent.handleFoo`形式への対応。
-        if (handlerName.indexOf('parent.') === 0) {
-          handlerName = handlerName.replace('parent.', '');
-        }
-        if (!!handlerName && !!tag[handlerName]) {
-          tag[handlerName](e);
+        const distanceX = e.clientX - touchX;
+        const distanceY = e.clientY - touchY;
+        const hypotenuse = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+        if (hypotenuse <= TOUCH_ALLOW_RANGE) {
+          console.log('yes');
+          // ハンドラーを取得。無ければ何もしない。
+          let handlerName = elm.getAttribute('ontap');
+          // `parent.handleFoo`形式への対応。
+          if (handlerName.indexOf('parent.') === 0) {
+            handlerName = handlerName.replace('parent.', '');
+          }
+          if (!!handlerName && !!tag[handlerName]) {
+            tag[handlerName](e);
+          }
         }
       }
       e.currentTarget.classList.remove('hover');
