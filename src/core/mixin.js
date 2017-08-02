@@ -78,6 +78,12 @@ const bindTouchEvents = tag => {
         e.currentTarget.classList.remove('hover');
         return;
       }
+      const distanceX = e.pageX - touchX;
+      const distanceY = e.pageY - touchY;
+      const hypotenuse = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+      if (hypotenuse >= TOUCH_ALLOW_RANGE) {
+        e.currentTarget.classList.remove('hover');
+      }
     });
 
     const touchEndEventId = closureEventListener.add(elm, EVENT_TOUCHEND, e => {
