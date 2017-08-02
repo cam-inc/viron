@@ -82,16 +82,18 @@ const bindTouchEvents = tag => {
         const distanceX = e.clientX - touchX;
         const distanceY = e.clientY - touchY;
         const hypotenuse = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
-        if (hypotenuse <= TOUCH_ALLOW_RANGE) {
-          // ハンドラーを取得。無ければ何もしない。
-          let handlerName = elm.getAttribute('ontap');
-          // `parent.handleFoo`形式への対応。
-          if (handlerName.indexOf('parent.') === 0) {
-            handlerName = handlerName.replace('parent.', '');
-          }
-          if (!!handlerName && !!tag[handlerName]) {
-            tag[handlerName](e);
-          }
+        if (hypotenuse >= TOUCH_ALLOW_RANGE) {
+          e.currentTarget.classList.remove('hover');
+          return;
+        }
+        // ハンドラーを取得。無ければ何もしない。
+        let handlerName = elm.getAttribute('ontap');
+        // `parent.handleFoo`形式への対応。
+        if (handlerName.indexOf('parent.') === 0) {
+          handlerName = handlerName.replace('parent.', '');
+        }
+        if (!!handlerName && !!tag[handlerName]) {
+          tag[handlerName](e);
         }
       }
       e.currentTarget.classList.remove('hover');
