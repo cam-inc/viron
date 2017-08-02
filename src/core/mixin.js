@@ -66,8 +66,8 @@ const bindTouchEvents = tag => {
 
     const touchStartEventId = closureEventListener.add(elm, EVENT_TOUCHSTART, e => {
       e.stopPropagation();
-      touchX = e.clientX;
-      touchY = e.clientY;
+      touchX = e.pageX;
+      touchY = e.pageY;
       e.currentTarget.classList.add('hover');
     });
 
@@ -79,8 +79,8 @@ const bindTouchEvents = tag => {
       e.stopPropagation();
       const isPressed = e.currentTarget.classList.contains('hover');
       if (isPressed) {
-        const distanceX = e.clientX - touchX;
-        const distanceY = e.clientY - touchY;
+        const distanceX = e.pageX - touchX;
+        const distanceY = e.pageY - touchY;
         const hypotenuse = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
         if (hypotenuse >= TOUCH_ALLOW_RANGE) {
           e.currentTarget.classList.remove('hover');
