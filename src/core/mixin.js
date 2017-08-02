@@ -83,7 +83,6 @@ const bindTouchEvents = tag => {
         const distanceY = e.clientY - touchY;
         const hypotenuse = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
         if (hypotenuse <= TOUCH_ALLOW_RANGE) {
-          console.log('yes');
           // ハンドラーを取得。無ければ何もしない。
           let handlerName = elm.getAttribute('ontap');
           // `parent.handleFoo`形式への対応。
