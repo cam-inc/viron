@@ -20,7 +20,7 @@ module.exports = {
       "error",
       "always"
     ],
-    "no-console": "off",
+    "no-console": 2,
     "no-extra-boolean-cast": "off"
   }
 };
