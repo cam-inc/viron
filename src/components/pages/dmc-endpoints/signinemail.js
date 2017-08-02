@@ -1,6 +1,6 @@
 export default function() {
-  this.email = 'fkei@example.com';
-  this.password = '1234567890';
+  this.email = '';
+  this.password = '';
 
   this.handleEmailChange = newEmail => {
     this.email = newEmail;
