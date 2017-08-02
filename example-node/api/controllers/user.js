@@ -36,6 +36,36 @@ const list = (req, res) => {
     ;
 };
 
+/**
+ * Controller : Create  User
+ * HTTP Method : POST
+ * PATH : /user
+ *
+ * @param Users Sequelize.model
+ * @returns {function(*, *)}
+ */
+
+const create = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const Users = store.models.Users;
+  process.on('unhandledRejection', console.dir);
+  return Promise.resolve()
+    .then(() => {
+      var date = new Object();
+      date.birthday = req.body.birthday;
+      date.blood_type = req.body.blood_type;
+      date.job = req.body.job;
+      date.name = req.body.name;
+      date.sex = req.body.sex;
+      return Users.create(date);
+    })
+    .then(date => {
+      res.json(date);
+    })
+    ;
+}
+
 module.exports = {
   'user#list': list,
+  'user#create': create,
 };
