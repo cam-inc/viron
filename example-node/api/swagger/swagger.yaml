@@ -603,25 +603,16 @@ definitions:
   User:
     description: A User (default view)
     example:
-      appear_area: 東京
       birthday: 1995-05-12T09:45:56Z
       blood_type: A
-      created_at: 2010-04-14T11:16:32+09:00
-      home_town: 静岡県
-      homepage: http://test.com/index.html
+      createdAt: 2010-04-14T11:16:32+09:00
+      deletedAt: 2014-04-27T12:25:11+09:00
       id: 5.801194e+18
       job: 大学生
-      living_region: 渋谷
-      married: false
       name: 山田 太郎
-      school: 東京○○大学
       sex: male
-      updated_at: 1994-04-27T12:25:11+09:00
+      updatedAt: 1994-04-27T12:25:11+09:00
     properties:
-      appear_area:
-        description: 出没地
-        example: 東京
-        type: string
       birthday:
         description: 誕生日
         example: 1995-05-12T09:45:56Z
@@ -636,18 +627,15 @@ definitions:
         - AB
         example: A
         type: string
-      created_at:
+      createdAt:
         description: 作成日時
         example: 2010-04-14T11:16:32+09:00
         format: date-time
         type: string
-      home_town:
-        description: 出身地
-        example: 静岡県
-        type: string
-      homepage:
-        description: ホームページURL
-        example: http://test.com/index.html
+      deletedAt:
+        description: 削除日時
+        example: 2014-04-27T12:25:11+09:00
+        format: date-time
         type: string
       id:
         description: ユーザーID
@@ -658,21 +646,9 @@ definitions:
         description: 職業
         example: 大学生
         type: string
-      living_region:
-        description: 地域
-        example: 渋谷
-        type: string
-      married:
-        description: 未既婚
-        example: false
-        type: boolean
       name:
         description: 名前
         example: 山田 太郎
-        type: string
-      school:
-        description: 出身校
-        example: 東京○○大学
         type: string
       sex:
         description: 性別
@@ -681,7 +657,7 @@ definitions:
         - female
         example: male
         type: string
-      updated_at:
+      updatedAt:
         description: 更新日時
         example: 1994-04-27T12:25:11+09:00
         format: date-time
@@ -915,20 +891,15 @@ definitions:
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
-    - appear_area: 東京
-      birthday: 1995-05-12T09:45:56Z
+    - birthday: 1995-05-12T09:45:56Z
       blood_type: A
-      created_at: 2010-04-14T11:16:32+09:00
-      home_town: 静岡県
-      homepage: http://test.com/index.html
+      createdAt: 2010-04-14T11:16:32+09:00
+      deletedAt: 2014-04-27T12:25:11+09:00
       id: 5.801194e+18
       job: 大学生
-      living_region: 渋谷
-      married: false
       name: 山田 太郎
-      school: 東京○○大学
       sex: male
-      updated_at: 1994-04-27T12:25:11+09:00
+      updatedAt: 1994-04-27T12:25:11+09:00
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.user+json; type=collection; view=default'
@@ -2451,6 +2422,7 @@ paths:
       - swagger
   /user:
     get:
+      x-swagger-router-controller: user
       description: |-
         get users
 
