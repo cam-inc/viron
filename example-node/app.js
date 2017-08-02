@@ -35,6 +35,9 @@ context.init()
         throw err;
       }
 
+      // swagger.jsonを動的に書き換える
+      helperSwagger.autoGenerate(swaggerExpress);
+
       // add middlewares here.
       // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
 
@@ -58,6 +61,7 @@ context.init()
       } else {
         http.createServer(app).listen(port);
       }
+
 
       for (let path in swaggerExpress.runner.swagger.paths) {
         for (let method in swaggerExpress.runner.swagger.paths[path]) {

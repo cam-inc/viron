@@ -1015,33 +1015,8 @@ definitions:
         type: boolean
       path:
         description: path
-        enum: # TODO: 自動生成できないか？
-        - GET:/stats
-        - GET:/user
-        - POST:/user
-        - PUT:/user
-        - DELETE:/user
-        - GET:/userblog
-        - POST:/userblog
-        - PUT:/userblog
-        - DELETE:/userblog
-        - GET:/userblogentry
-        - POST:/userblogentry
-        - PUT:/userblogentry
-        - DELETE:/userblogentry
-        - GET:/blogdesign
-        - POST:/blogdesign
-        - PUT:/blogdesign
-        - DELETE:/blogdesign
-        - GET:/adminrole
-        - POST:/adminrole
-        - PUT:/adminrole
-        - DELETE:/adminrole
-        - GET:/adminuser
-        - POST:/adminuser
-        - PUT:/adminuser
-        - DELETE:/adminuser
-        - GET:/auditlog
+        enum:
+        - AutoGenerate # @see node-dmclib/swagger.js
         example: GET:/user
         type: string
     required:

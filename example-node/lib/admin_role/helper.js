@@ -9,6 +9,7 @@ const whiteList = [
   'signout',
   'googlesignin',
   'googleoauth2callback',
+  'ping',
 ];
 
 /**
@@ -26,4 +27,5 @@ const canAccess = (path, method, roles) => {
 
 module.exports = {
   canAccess,
+  whiteList,
 };
