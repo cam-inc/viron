@@ -10,19 +10,19 @@ const getRoles = (AdminRoles, roleId) => {
   if (roleId === constant.DMC_SUPER_ROLE) {
     return new Promise(resolve => {
       resolve({
-        get: '*',
-        post: '*',
-        put: '*',
-        delete: '*',
-        patch: '*',
+        get: ['*'],
+        post: ['*'],
+        put: ['*'],
+        delete: ['*'],
+        patch: ['*'],
       });
     });
   }
 
-  AdminRoles.findAll()
+  return AdminRoles.findAll({where: {role_id: roleId}})
     .then(roles => {
       return reduce(roles, (ret, role) => {
-        const method = ret.method.toLowerCase();
+        const method = role.method.toLowerCase();
         ret[method] = ret[method] || [];
         ret[method].push(role.resource);
         return ret;

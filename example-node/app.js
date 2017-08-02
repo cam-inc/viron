@@ -36,6 +36,9 @@ context.init()
       }
 
       // add middlewares here.
+      // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
+
+      // add acl response headers
       app.use(lib.acl.middleware(context.getConfigAcl()));
 
       app.use((req, res, next) => {
@@ -44,8 +47,6 @@ context.init()
         }
         next();
       });
-
-      app.use(lib.auditLog.middleware(context.getStoreMain().models.AuditLogs));
 
       // add routing
       swaggerExpress.register(app);
