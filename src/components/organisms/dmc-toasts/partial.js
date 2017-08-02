@@ -40,7 +40,7 @@ export default function() {
     this.hide();
   };
 
-  this.handleLinkClick = () => {
+  this.handleLinkTap = () => {
     window.open(this.opts.link);
   };
 }
