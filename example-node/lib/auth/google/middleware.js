@@ -27,7 +27,9 @@ module.exports = () => {
         }
         next();
       })
-      .catch(next)
+      .catch(() => {
+        return next(errors.frontend.Unauthorized());
+      })
     ;
   };
 };
