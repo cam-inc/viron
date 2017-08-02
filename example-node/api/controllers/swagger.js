@@ -1,8 +1,5 @@
-
-const show = (req, res) => {
-  res.json(req.swagger.swaggerObject);
-};
+const lib = require('../../lib');
 
 module.exports = {
-  'swagger#show': show,
+  'swagger#show': lib.swagger.controller.registerShow(),
 };

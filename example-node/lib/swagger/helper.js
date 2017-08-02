@@ -1,4 +1,4 @@
-const adminRoleHelper = require('./admin_role/helper');
+const adminRoleHelper = require('../admin_role/helper');
 const contains = require('mout/array/contains');
 
 /**

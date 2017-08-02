@@ -22,7 +22,7 @@ const canAccess = (path, method, roles) => {
   method = method.toLowerCase();
   const resource = path.split('/')[1];
   const _roles = roles[method] || [];
-  return contains(whiteList, resource) || contains(_roles, '*') || contains(_roles, resource);
+  return !resource || contains(whiteList, resource) || contains(_roles, '*') || contains(_roles, resource);
 };
 
 module.exports = {

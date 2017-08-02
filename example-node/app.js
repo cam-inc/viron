@@ -5,7 +5,7 @@ const app = require('express')();
 const SwaggerExpress = require('swagger-express-mw');
 
 const lib = require('./lib');
-const helperSwagger = require('./lib/swagger');
+const helperSwagger = require('./lib/swagger').helper;
 const shared = require('./shared');
 
 const context = shared.context;

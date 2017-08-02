@@ -1,4 +1,8 @@
+const compact = require('mout/array/compact');
+const isEmpty = require('mout/lang/isEmpty');
+
 const constant = require('../../shared/constant');
+const helperAdminRole = require('../../lib/admin_role').helper;
 
 const defaultOptions = {
   key: 'key',
@@ -214,7 +218,31 @@ const show = (req, res) => {
     ],
   };
 
-  // TODO: filter by admin role
+  if (!req.swagger.operation.security) {
+    // /dmc自体が非認証の場合はそのまま返す
+    return res.json(result);
+  }
+
+  // 権限がないcomponentを消してから返す
+  const roles = req.auth.roles;
+  for (let i in result.pages) {
+    const page = result.pages[i];
+    for (let j in page.components) {
+      const component = page.components[j];
+      const method = component.api.method;
+      const path = component.api.path;
+      if (!helperAdminRole.canAccess(path, method, roles)) {
+        // 権限がないcomponentを削除
+        page.components[j] = null;
+      }
+    }
+    page.components = compact(page.components);
+    if (isEmpty(page.components)) {
+      // componentが空になった場合はpage自体を削除
+      result.pages[i] = null;
+    }
+  }
+  result.pages = compact(result.pages);
 
   res.json(result);
 };
