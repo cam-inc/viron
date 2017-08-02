@@ -23,7 +23,7 @@ const genAdminRole = (roleId, paths) => {
  * @param AdminRoles Sequelize.model
  * @returns {function(*, *, *)}
  */
-const list = AdminRoles => {
+const registerList = AdminRoles => {
   return (req, res) => {
     return AdminRoles.findAll()
       .then(list => {
@@ -51,7 +51,7 @@ const list = AdminRoles => {
  * @param store Sequelize instance
  * @returns {function(*, *, *)}
  */
-const create = (AdminRoles, store) => {
+const registerCreate = (AdminRoles, store) => {
   return (req, res) => {
     const roleId = req.body.role_id;
     const paths = req.body.paths;
@@ -90,7 +90,7 @@ const create = (AdminRoles, store) => {
  * @param AdminRoles Sequelize.model
  * @returns {function(*, *, *)}
  */
-const get = AdminRoles => {
+const registerGet = AdminRoles => {
   return (req, res) => {
     const roleId = req.swagger.params.role_id.value;
     AdminRoles.findAll({where: {role_id: roleId}})
@@ -112,7 +112,7 @@ const get = AdminRoles => {
  * @param AdminRoles Sequelize.model
  * @returns {function(*, *, *)}
  */
-const remove = AdminRoles => {
+const registerRemove = AdminRoles => {
   return (req, res) => {
     const roleId = req.swagger.params.role_id.value;
     AdminRoles.destroy({where: {role_id: roleId}, force: true})
@@ -132,7 +132,7 @@ const remove = AdminRoles => {
  * @param store Sequelize instance
  * @returns {function(*, *, *)}
  */
-const update = (AdminRoles, store) => {
+const registerUpdate = (AdminRoles, store) => {
   return (req, res) => {
     const roleId = req.swagger.params.role_id.value;
     const paths = req.body.paths;
@@ -164,9 +164,9 @@ const update = (AdminRoles, store) => {
 };
 
 module.exports = {
-  list: list,
-  create: create,
-  get: get,
-  remove: remove,
-  update: update,
+  registerList,
+  registerCreate,
+  registerGet,
+  registerRemove,
+  registerUpdate,
 };

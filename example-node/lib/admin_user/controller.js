@@ -10,7 +10,7 @@ const helperEMail = require('../auth/email').helper;
  * @param AdminUsers Sequelize.model
  * @returns {function(*, *, *)}
  */
-const list = AdminUsers => {
+const registerList = AdminUsers => {
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = req.query.limit;
@@ -44,7 +44,7 @@ const list = AdminUsers => {
  * @param defaultRole
  * @returns {function(*, *, *)}
  */
-const create = (AdminUsers, defaultRole) => {
+const registerCreate = (AdminUsers, defaultRole) => {
   return (req, res) => {
     return Promise.resolve()
       .then(() => {
@@ -75,7 +75,7 @@ const create = (AdminUsers, defaultRole) => {
  * @param AdminUsers Sequelize.model
  * @returns {function(*, *, *)}
  */
-const get = AdminUsers => {
+const registerGet = AdminUsers => {
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const id = req.swagger.params.id.value;
@@ -95,7 +95,7 @@ const get = AdminUsers => {
  * @param AdminUsers Sequelize.model
  * @returns {function(*, *, *)}
  */
-const remove = AdminUsers => {
+const registerRemove = AdminUsers => {
   return (req, res) => {
     const id = req.swagger.params.id.value;
     AdminUsers.destroy({where: {id}, force: true})
@@ -114,7 +114,7 @@ const remove = AdminUsers => {
  * @param AdminUsers Sequelize.model
  * @returns {function(*, *, *)}
  */
-const update = AdminUsers => {
+const registerUpdate = AdminUsers => {
   return (req, res) => {
     Promise.resolve()
       .then(() => {
@@ -144,9 +144,9 @@ const update = AdminUsers => {
 };
 
 module.exports = {
-  list: list,
-  create: create,
-  get: get,
-  remove: remove,
-  update: update,
+  registerList,
+  registerCreate,
+  registerGet,
+  registerRemove,
+  registerUpdate,
 };
