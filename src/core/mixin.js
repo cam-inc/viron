@@ -67,7 +67,6 @@ const bindTouchEvents = tag => {
     const touchStartEventId = closureEventListener.add(elm, EVENT_TOUCHSTART, e => {
       e.stopPropagation();
       if (isSupportTouch) {
-        console.log(e.touches[0]);
         touchX = e.touches[0].pageX;
         touchY = e.touches[0].pageY;
       } else {
