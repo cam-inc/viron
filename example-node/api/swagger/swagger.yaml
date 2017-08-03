@@ -2549,6 +2549,7 @@ paths:
       tags:
       - user
     put:
+      x-swagger-router-controller: user
       description: |-
         update the user
 

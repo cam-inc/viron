@@ -48,16 +48,16 @@ const create = (req, res) => {
   const Users = store.models.Users;
   return Promise.resolve()
     .then(() => {
-      var date = new Object();
-      date.birthday = req.body.birthday;
-      date.blood_type = req.body.blood_type;
-      date.job = req.body.job;
-      date.name = req.body.name;
-      date.sex = req.body.sex;
-      return Users.create(date);
+      var data = new Object();
+      data.birthday = req.body.birthday;
+      data.blood_type = req.body.blood_type;
+      data.job = req.body.job;
+      data.name = req.body.name;
+      data.sex = req.body.sex;
+      return Users.create(data);
     })
-    .then(date => {
-      res.json(date);
+    .then(data => {
+      res.json(data);
     })
     ;
 }
@@ -101,10 +101,39 @@ const show = (req, res) => {
   ;
 }
 
+/**
+ * Controller : update  User
+ * HTTP Method : PUT
+ * PATH : /user/:id
+ *
+ * @returns {function(*, *)}
+ */
+
+const update = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const Users = store.models.Users;
+  return Promise.resolve()
+    .then(() => {
+      var data = new Object();
+      data.birthday = req.body.birthday;
+      data.blood_type = req.body.blood_type;
+      data.job = req.body.job;
+      data.name = req.body.name;
+      data.sex = req.body.sex;
+      const id = req.swagger.params.id.value;
+      return Users.update(data, {where: {id}});
+    })
+    .then(data => {
+      res.json(data);
+    })
+  ;
+}
+
 
 module.exports = {
   'user#list': list,
   'user#create': create,
   'user#remove': remove,
   'user#show': show,
+  'user#update': update,
 };
