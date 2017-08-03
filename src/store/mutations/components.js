@@ -1,6 +1,3 @@
-import forEach from 'mout/array/forEach';
-import ObjectAssign from 'object-assign';
-import swagger from '../../core/swagger';
 import { constants as states } from '../states';
 
 export default {
@@ -11,47 +8,33 @@ export default {
    * @return {Array}
    */
   updateOne: (context, params) => {
-    const schema = params.operationObject.responses[200].schema;
-    const responseObj = params.response.obj;
-    const data = swagger.mergeSchemaAndResponse(schema, responseObj);
+    const {
+      component_uid,
+      response,
+      schemaObject,
+      parameterObjects,
+      actions,
+      pagination,
+      table_labels
+    } = params;
 
-    context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
-    context.state.components[params.component_uid].data = data;
-    context.state.components[params.component_uid].schema = schema;
-    // `component.pagination`からページングをサポートしているか判断する。
-    // サポートしていれば手動でページング情報を付加する。
-    if (params.component.pagination) {
-      context.state.components[params.component_uid].pagination = {
-        // `x-pagination-current-page`等は独自仕様。
-        // DMCを使用するサービスはこの仕様に沿う必要がある。
-        currentPage: Number(params.response.headers['x-pagination-current-page'] || 0),
-        size: Number(params.response.headers['x-pagination-limit'] || 0),
-        maxPage: Number(params.response.headers['x-pagination-total-pages'] || 0)
-      };
-    }
-    // `component.query`(array)からクエリ検索をサポートしているか判断する。
-    // サポートしていれば手動でクエリ情報を付加する。
-    if (params.component.query && !!params.component.query.length) {
-      context.state.components[params.component_uid].search = params.component.query;
-    }
-    // テーブル表示でどのkeyをラベルに用いるか。
-    if (!!params.component.table_labels) {
-      context.state.components[params.component_uid].table_labels = params.component.table_labels;
-    }
-    // 関連API(path)群を付与する。
-    const actions = [];
-    forEach(params.pathRefs, ref => {
-      const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
-      if (!pathItemObject || !pathItemObject[ref.method]) {
-        return;
-      }
-      actions.push(ObjectAssign({
-        pathItemObject: pathItemObject[ref.method]
-      }, ref));
-    });
-    context.state.components[params.component_uid].actions = actions;
+    // 存在しなければ新規作成。
+    const component = context.state.components[component_uid] || {};
+    // APIレスポンス内容そのまま。
+    component.response = response;
+    // OASのschema。
+    component.schemaObject = schemaObject;
+    // OASのparameterObject群。
+    component.parameterObjects = parameterObjects;
+    // 関連API群。
+    component.actions = actions;
+    // ページング関連。
+    component.pagination = pagination;
+    // テーブル行名で優先度が高いkey群。
+    component.table_labels = table_labels;
 
-    return [states.COMPONENTS_ONE(params.component_uid)];
+    context.state.components[component_uid] = component;
+    return [states.COMPONENTS_ONE(component_uid)];
   },
 
   /**
