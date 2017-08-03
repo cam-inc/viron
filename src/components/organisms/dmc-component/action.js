@@ -5,7 +5,6 @@ import '../../organisms/dmc-operation/index.tag';
 export default function() {
   const store = this.riotx.get();
 
-  this.isTooltipOpened = false;
   this.label = this.opts.action.summary;
   if (!this.label) {
     const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
@@ -26,7 +25,6 @@ export default function() {
     if (!this.tooltipMessage) {
       return;
     }
-    this.isTooltipOpened = isHovered;
     this.update();
   };
 }
