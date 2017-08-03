@@ -32,11 +32,11 @@ export default {
         return res;
       })
       .then(res => {
-        context.commit(mutations.DMC, {
-          response: res.obj,
-          operationObject
-        });
-        context.commit(mutations.ENDPOINTS_UPDATE, currentEndpointKey, res.obj);
+        context.commit(mutations.DMC, res.obj);
+        const endpoint = ObjectAssign({}, res.obj);
+        // pagesは不要なので削除。
+        delete endpoint.pages;
+        context.commit(mutations.ENDPOINTS_UPDATE, currentEndpointKey, endpoint);
       });
   },
 

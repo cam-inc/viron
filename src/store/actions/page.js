@@ -1,4 +1,5 @@
 import find from 'mout/object/find';
+import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
 export default {
@@ -12,9 +13,9 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        const pages = context.state.dmc.getValue('pages').getValue();
-        const page = find(pages, v => {
-          return (v.getValue('id').getValue() === pageId);
+        const pages = context.getter(getters.DMC_PAGES);
+        const page = find(pages, page => {
+          return (page.id === pageId);
         });
         context.commit(mutations.PAGE, page);
       });
