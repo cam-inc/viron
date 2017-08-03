@@ -5,7 +5,7 @@ const app = require('express')();
 const SwaggerExpress = require('swagger-express-mw');
 
 const lib = require('./lib');
-const helperSwagger = require('./lib/swagger');
+const helperSwagger = require('./lib/swagger').helper;
 const shared = require('./shared');
 
 const context = shared.context;
@@ -35,7 +35,13 @@ context.init()
         throw err;
       }
 
+      // swagger.jsonを動的に書き換える
+      helperSwagger.autoGenerate(swaggerExpress);
+
       // add middlewares here.
+      // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
+
+      // add acl response headers
       app.use(lib.acl.middleware(context.getConfigAcl()));
 
       app.use((req, res, next) => {
@@ -45,16 +51,8 @@ context.init()
         next();
       });
 
-      app.use(lib.auditLog.middleware(context.getStoreMain().models.AuditLogs));
-
       // add routing
       swaggerExpress.register(app);
-
-      // error handler
-      app.use((err, req, res, next) => {
-        res.status(err.statusCode || 500).json({error: err});
-        next(err);
-      });
 
       const port = helperSwagger.getPort(swaggerExpress, process.env.PORT);
       const ssl = context.getConfigSsl();
@@ -63,6 +61,7 @@ context.init()
       } else {
         http.createServer(app).listen(port);
       }
+
 
       for (let path in swaggerExpress.runner.swagger.paths) {
         for (let method in swaggerExpress.runner.swagger.paths[path]) {

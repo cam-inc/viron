@@ -1,6 +1,7 @@
 module.exports = {
   stores: require('./stores'),
   constants: require('./constant'),
+  errors: require('./errors'),
   auth: require('./auth'),
   swagger: require('./swagger'),
   pager: require('./pager'),

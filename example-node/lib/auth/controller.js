@@ -5,24 +5,25 @@ const helperJwt = require('./jwt').helper;
 const helperEMail = require('./email').helper;
 
 const constant = require('../constant');
+const errors = require('../errors');
 
 const getRoles = (AdminRoles, roleId) => {
   if (roleId === constant.DMC_SUPER_ROLE) {
     return new Promise(resolve => {
       resolve({
-        get: '*',
-        post: '*',
-        put: '*',
-        delete: '*',
-        patch: '*',
+        get: ['*'],
+        post: ['*'],
+        put: ['*'],
+        delete: ['*'],
+        patch: ['*'],
       });
     });
   }
 
-  AdminRoles.findAll()
+  return AdminRoles.findAll({where: {role_id: roleId}})
     .then(roles => {
       return reduce(roles, (ret, role) => {
-        const method = ret.method.toLowerCase();
+        const method = role.method.toLowerCase();
         ret[method] = ret[method] || [];
         ret[method].push(role.resource);
         return ret;
@@ -58,7 +59,7 @@ const registerSignIn = (AdminUsers, AdminRoles, superRole, configAuthJwt) => {
           .then(cnt => {
             if (cnt > 0) {
               // 1人目じゃなければエラー（管理者がユーザー作成してあげる）
-              return Promise.reject(new Error('Not Found.'));
+              return Promise.reject(errors.frontend.AdminUserNotFound());
             }
           })
           .then(() => {
@@ -86,7 +87,7 @@ const registerSignIn = (AdminUsers, AdminRoles, superRole, configAuthJwt) => {
         return helperEMail.verify(password, adminUser.password, adminUser.salt)
           .then(result => {
             if (!result) {
-              return Promise.reject(new Error('Unauthorized'));
+              return Promise.reject(errors.frontend.SigninFailed());
             }
             return adminUser;
           })
@@ -156,7 +157,7 @@ const registerGoogleOAuth2Callback = (AdminUsers, AdminRoles, configGoogleOAuth,
         return helperGoogle.allowMailDomain(token, configGoogleOAuth)
           .then(email => {
             if (!email) {
-              return Promise.reject(new Error('Forbidden'));
+              return Promise.reject(errors.frontend.Forbidden());
             }
             return {token, email};
           })
@@ -175,7 +176,7 @@ const registerGoogleOAuth2Callback = (AdminUsers, AdminRoles, configGoogleOAuth,
               .then(cnt => {
                 if (cnt > 0) {
                   // 1人目じゃなければエラー（管理者がユーザー作成してあげる）
-                  return Promise.reject(new Error('Not Found.'));
+                  return Promise.reject(errors.frontend.AdminUserNotFound());
                 }
                 // 1人目の場合はスーパーユーザーとして登録する
                 return AdminUsers.create({email: data.email, role_id: constant.DMC_SUPER_ROLE});

@@ -40,7 +40,7 @@ const getMailAddress = token => {
     .then(res => {
       return res.data.email;
     })
-    ;
+  ;
 };
 
 const allowMailDomain = (token, options) => {
@@ -49,12 +49,13 @@ const allowMailDomain = (token, options) => {
       const domain = email.split('@')[1];
       return contains(options.allow_email_domains, domain) && email;
     })
-    ;
+  ;
 };
 
 module.exports = {
   getClient,
   genAuthUrl,
   getToken,
+  getMailAddress,
   allowMailDomain,
 };

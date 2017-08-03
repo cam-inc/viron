@@ -12,8 +12,9 @@ dmc-operation-schema-form.Operation__schemaForm
     dmc-checkbox(isChecked="{ opts.parametervalue }" onChange="{ handleCheckboxChange }")
   virtual(if="{ uiType === 'select' }")
     dmc-select(options="{ getSelectOptions() }" onChange="{ handleSelectChange }")
-  virtual(if="{ uiType === 'datepicker' }")
-    dmc-datepicker(onDateChange="{ handleDateChange }")
+  // datepicker表示
+  //virtual(if="{ uiType === 'datepicker' }")
+  //  dmc-datepicker(onDateChange="{ handleDateChange }")
   .Operation__schemaFormChildren(if="{ uiType === 'multi' }" each="{ p, idx in multiData }")
     .Operation__schemaFormMultiMinusButton(ref="touch" idx="{ idx }" onTap="handleMultiMinusButtonTap")
       dmc-icon(type="minus")
@@ -21,7 +22,6 @@ dmc-operation-schema-form.Operation__schemaForm
 
   script.
     import '../../atoms/dmc-checkbox/index.tag';
-    import '../../atoms/dmc-datepicker/index.tag';
     import '../../atoms/dmc-icon/index.tag';
     import '../../atoms/dmc-select/index.tag';
     import '../../atoms/dmc-textinput/index.tag';

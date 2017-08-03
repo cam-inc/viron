@@ -21,11 +21,20 @@ swagger:
       name: swagger_validator
       validateResponse: false
 
+    _middleware_after_auth:
+      type: connect-middleware
+      module: middlewares
+      function: afterAuth
+
+    _error_handler:
+      name: error_handler
+
     # pipe for all swagger-node controllers
     swagger_controllers:
-      - onError: json_error_handler
+      - onError: _error_handler
       - cors
       - swagger_security
+      - _middleware_after_auth
       - _swagger_validate
       - express_compatibility
       - _router

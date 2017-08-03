@@ -8,7 +8,7 @@ const pager = require('../pager');
  * @param AuditLogs Sequelize.model
  * @returns {function(*, *, *)}
  */
-const list = AuditLogs => {
+const registerList = AuditLogs => {
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = req.query.limit;
@@ -35,5 +35,5 @@ const list = AuditLogs => {
 };
 
 module.exports = {
-  list: list,
+  registerList,
 };

@@ -26,6 +26,7 @@ const isSupportTouch = 'ontouchstart' in document;
 const EVENT_TOUCHSTART = isSupportTouch ? 'touchstart' : 'mousedown';
 const EVENT_TOUCHMOVE = isSupportTouch ? 'touchmove' : 'mousemove';
 const EVENT_TOUCHEND = isSupportTouch ? 'touchend' : 'mouseup';
+const TOUCH_ALLOW_RANGE = 10;
 // 無名関数をaddEventListenerのハンドラーに設定した場合でも正しくremoveEventListener出来るようにする。
 const closureEventListener = (() => {
   const events = {};
@@ -57,6 +58,7 @@ const closureEventListener = (() => {
 })();
 const bindTouchEvents = tag => {
   forEach(getTouchableElements(tag), elm => {
+    let touchX = 0, touchY = 0;
     // bind済みであれば何もしない。
     if (!!elm.getAttribute('touchevents')) {
       return;
@@ -64,6 +66,13 @@ const bindTouchEvents = tag => {
 
     const touchStartEventId = closureEventListener.add(elm, EVENT_TOUCHSTART, e => {
       e.stopPropagation();
+      if (isSupportTouch) {
+        touchX = e.touches[0].pageX;
+        touchY = e.touches[0].pageY;
+      } else {
+        touchX = e.pageX;
+        touchY = e.pageY;
+      }
       e.currentTarget.classList.add('hover');
     });
 
@@ -73,7 +82,18 @@ const bindTouchEvents = tag => {
       if (!isPressed) {
         return;
       }
-      e.currentTarget.classList.remove('hover');
+      let distanceX = 0, distanceY = 0;
+      if (isSupportTouch) {
+        distanceX = e.touches[0].pageX - touchX;
+        distanceY = e.touches[0].pageY - touchY;
+      } else {
+        distanceX = e.pageX - touchX;
+        distanceY = e.pageY - touchY;
+      }
+      const hypotenuse = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+      if (hypotenuse >= TOUCH_ALLOW_RANGE) {
+        e.currentTarget.classList.remove('hover');
+      }
     });
 
     const touchEndEventId = closureEventListener.add(elm, EVENT_TOUCHEND, e => {
