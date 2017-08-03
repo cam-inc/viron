@@ -36,7 +36,7 @@ export default {
           response: res.obj,
           operationObject
         });
-        context.commit(mutations.ENDPOINTS_UPDATE, currentEndpointKey, ObjectAssign({}, currentEndpoint, res.obj));
+        context.commit(mutations.ENDPOINTS_UPDATE, currentEndpointKey, res.obj);
       });
   },
 
