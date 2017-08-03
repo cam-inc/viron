@@ -20,7 +20,8 @@ export default function() {
       if (format === 'byte') {
         this.uiType = 'uploader';
       } else if (format === 'date' || format === 'date-time') {
-        this.uiType = 'datepicker';
+        // TODO: datepicker表示
+        //this.uiType = 'datepicker';
       } else {
         this.uiType = 'input';
       }
