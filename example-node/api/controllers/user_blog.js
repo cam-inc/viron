@@ -63,7 +63,27 @@ const create = (req, res) => {
     ;
 }
 
+/**
+ * Controller : Delete  User Blog
+ * HTTP Method : DELETE
+ * PATH : /userblog/:id
+ *
+ * @returns {function(*)}
+ */
+
+const remove = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const UserBlogs = store.models.UserBlogs;
+  const id = req.swagger.params.id.value;
+  return UserBlogs.destroy({where: {id}, force: true})
+    .then(() => {
+      res.status(204).end();
+    })
+    ;
+}
+
 module.exports = {
   'user_blog#list': list,
   'user_blog#create': create,
+  'user_blog#remove': remove,
 };
