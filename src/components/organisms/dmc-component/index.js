@@ -151,6 +151,8 @@ export default function() {
     this.updater();
   }).on('updated', () => {
     this.rebindTouchEvents();
+  }).on('unmount', () => {
+    store.action(actions.COMPONENTS_REMOVE_ONE, this._riot_id);
   });
 
   this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
