@@ -15,6 +15,15 @@ export default {
   },
 
   /**
+   * DMCデータが存在する否か。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  existence: context => {
+    return !!context.state.dmc;
+  },
+
+  /**
    * page群を返します。
    * @param {riotx.Context} context
    * @return {Array}

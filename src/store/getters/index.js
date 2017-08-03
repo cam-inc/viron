@@ -8,6 +8,7 @@ import layout from './layout';
 import location from './location';
 import menu from './menu';
 import modals from './modals';
+import oas from './oas';
 import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import toasts from './toasts';
@@ -26,6 +27,7 @@ const constants = {
   COMPONENTS_ONE_TABLE_LABELS: 'COMPONENTS_ONE_TABLE_LABELS',
   CURRENT: 'CURRENT',
   DMC: 'DMC',
+  DMC_EXISTENCE: 'DMC_EXISTENCE',
   DMC_PAGES: 'DMC_PAGES',
   DMC_PAGES_ID_OF: 'DMC_PAGES_ID_OF',
   DMC_NAME: 'DMC_NAME',
@@ -43,6 +45,15 @@ const constants = {
   MENU_OPENED: 'MENU_OPENED',
   MENU_ENABLED: 'MENU_ENABLED',
   MODALS: 'MODALS',
+  OAS_CLIENT: 'OAS_CLIENT',
+  OAS_SPEC: 'OAS_SPEC',
+  OAS_ORIGINAL_SPEC: 'OAS_ORIGINAL_SPEC',
+  OAS_APIS: 'OAS_APIS',
+  OAS_FLAT_APIS: 'OAS_FLAT_APIS',
+  OAS_API: 'OAS_API',
+  OAS_API_BY_PATH_AND_METHOD: 'OAS_API_BY_PATH_AND_METHOD',
+  OAS_PATH_ITEM_OBJECT: 'OAS_PATH_ITEM_OBJECT',
+  OAS_OPERATION_OBJECT: 'OAS_OPERATION_OBJECT',
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   PAGE_ID: 'PAGE_ID',
@@ -65,6 +76,7 @@ export default {
   [constants.COMPONENTS_ONE_TABLE_LABELS]: components.tableLabels,
   [constants.CURRENT]: current.all,
   [constants.DMC]: dmc.all,
+  [constants.DMC_EXISTENCE]: dmc.existence,
   [constants.DMC_PAGES]: dmc.pages,
   [constants.DMC_PAGES_ID_OF]: dmc.pageIdOf,
   [constants.DMC_NAME]: dmc.name,
@@ -82,6 +94,15 @@ export default {
   [constants.MENU_OPENED]: menu.opened,
   [constants.MENU_ENABLED]: menu.enabled,
   [constants.MODALS]: modals.all,
+  [constants.OAS_CLIENT]: oas.client,
+  [constants.OAS_SPEC]: oas.spec,
+  [constants.OAS_ORIGINAL_SPEC]: oas.originalSpec,
+  [constants.OAS_APIS]: oas.apis,
+  [constants.OAS_FLAT_APIS]: oas.flatApis,
+  [constants.OAS_API]: oas.api,
+  [constants.OAS_API_BY_PATH_AND_METHOD]: oas.apiByPathAndMethod,
+  [constants.OAS_PATH_ITEM_OBJECT]: oas.pathItemObject,
+  [constants.OAS_OPERATION_OBJECT]: oas.operationObject,
   [constants.OAUTH_ENDPOINT_KEY]: oauthEndpointKey.all,
   [constants.PAGE]: page.all,
   [constants.PAGE_ID]: page.id,

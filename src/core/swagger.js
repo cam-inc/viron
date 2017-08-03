@@ -13,11 +13,18 @@ class Swagger {
     this.client = null;
   }
 
-  setup(endpoint) {
+  /**
+   * OAS準拠ファイルを取得/resolveし、SwaggerClientインスタンスを生成します。
+   * @see: https://github.com/swagger-api/swagger-js#swagger-specification-resolver
+   * @param {String} url
+   * @param {String} token
+   * @return {Promise}
+   */
+  setup(url, token) {
     const request = {
-      url: endpoint.url,
+      url,
       headers: {
-        'Authorization': endpoint.token
+        'Authorization': token
       }
     };
     // SwaggerClientのHTTPクライアント。
@@ -33,7 +40,7 @@ class Swagger {
         }
         return res;
       })
-      .then(res => window.SwaggerClient({ spec: res.body }))
+      .then(res => window.SwaggerClient({ spec: res.body }))// resolve
       .then(client => {
         this.client = client;
         return client.spec.info;
