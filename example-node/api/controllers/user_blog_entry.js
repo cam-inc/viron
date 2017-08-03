@@ -53,7 +53,6 @@ const create = (req, res) => {
       data.title = req.body.title;
       data.theme = req.body.theme;
       data.content = req.body.content;
-      console.log(data)
       return UserBlogEntries.create(data);
     })
     .then(data => {
@@ -101,9 +100,38 @@ const show = (req, res) => {
   ;
 }
 
+/**
+ * Controller : update  User Blog Entry
+ * HTTP Method : PUT
+ * PATH : /userblogentry/:id
+ *
+ * @returns {function(*, *)}
+ */
+
+const update = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const UserBlogEntries = store.models.UserBlogEntries;
+  return Promise.resolve()
+    .then(() => {
+      var data = new Object();
+      data.user_blog_id = req.body.user_blog_id;
+      data.title = req.body.title;
+      data.theme = req.body.theme;
+      data.content = req.body.content;
+      const id = req.swagger.params.id.value;
+      return UserBlogEntries.update(data, {where: {id}});
+    })
+    .then(data => {
+      res.json(data);
+    })
+    ;
+}
+
 module.exports = {
   'user_blog_entry#list': list,
   'user_blog_entry#create': create,
   'user_blog_entry#remove': remove,
   'user_blog_entry#show': show,
+  'user_blog_entry#update': update,
+
 };

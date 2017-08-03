@@ -3019,6 +3019,7 @@ paths:
       tags:
       - user_blog_entry
     put:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         update the user blog entry
 
