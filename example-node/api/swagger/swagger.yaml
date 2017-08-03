@@ -895,6 +895,8 @@ definitions:
         format: int64
         type: integer
     title: UserBlogPayload
+    required:
+    - user_id
     type: object
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
@@ -2651,6 +2653,7 @@ paths:
         method: delete
         path: /userblog/{id}
     post:
+      x-swagger-router-controller: user_blog
       description: |-
         create a user blog
 
