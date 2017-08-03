@@ -102,9 +102,38 @@ const show = (req, res) => {
   ;
 }
 
+/**
+ * Controller : update  User Blog
+ * HTTP Method : PUT
+ * PATH : /userblog/:id
+ *
+ * @returns {function(*, *)}
+ */
+
+const update = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const UserBlogs = store.models.UserBlogs;
+  return Promise.resolve()
+    .then(() => {
+      var data = new Object();
+      data.user_id = req.body.user_id;
+      data.title = req.body.title;
+      data.subtitle = req.body.subtitle;
+      data.genre = req.body.genre;
+      data.design_id = req.body.design_id;
+      const id = req.swagger.params.id.value;
+      return UserBlogs.update(data, {where: {id}});
+    })
+    .then(data => {
+      res.json(data);
+    })
+    ;
+}
+
 module.exports = {
   'user_blog#list': list,
   'user_blog#create': create,
   'user_blog#remove': remove,
   'user_blog#show': show,
+  'user_blog#update': update,
 };
