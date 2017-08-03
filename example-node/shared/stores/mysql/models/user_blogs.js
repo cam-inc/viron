@@ -9,6 +9,7 @@ module.exports = sequelize => {
         type: Sequelize.INTEGER.UNSIGNED,
         allowNull: false,
         primaryKey: true,
+        autoIncrement: true,
       },
       user_id: {
         type: Sequelize.INTEGER.UNSIGNED,

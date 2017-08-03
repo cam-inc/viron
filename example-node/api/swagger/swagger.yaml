@@ -679,9 +679,14 @@ definitions:
       updated_at: 1979-11-12T02:46:55+09:00
       user_id: 8.574263e+18
     properties:
-      created_at:
+      createdAt:
         description: 作成日時
         example: 1993-07-26T02:54:17+09:00
+        format: date-time
+        type: string
+      deletedAt:
+        description: 削除日時
+        example: 1999-11-12T02:46:55+09:00
         format: date-time
         type: string
       design_id:
@@ -710,7 +715,7 @@ definitions:
         description: タイトル
         example: user's blog
         type: string
-      updated_at:
+      updatedAt:
         description: 更新日時
         example: 1979-11-12T02:46:55+09:00
         format: date-time
@@ -797,7 +802,17 @@ definitions:
     description: User_blogCollection is the media type for an array of User_blog (default
       view)
     example:
+    - createdAt: 1993-07-26T02:54:17+09:00
+      deletedAt: 1999-07-26T02:54:17+09:00
+      design_id: simple
+      genre: game
+      id: 2.438025e+18
+      sub_title: diary
+      title: user's blog
+      updatedAt: 1979-11-12T02:46:55+09:00
+      user_id: 8.574263e+18
     - created_at: 1993-07-26T02:54:17+09:00
+      deletedAt: 1999-07-26T02:54:17+09:00
       design_id: simple
       genre: game
       id: 2.438025e+18
@@ -806,14 +821,7 @@ definitions:
       updated_at: 1979-11-12T02:46:55+09:00
       user_id: 8.574263e+18
     - created_at: 1993-07-26T02:54:17+09:00
-      design_id: simple
-      genre: game
-      id: 2.438025e+18
-      sub_title: diary
-      title: user's blog
-      updated_at: 1979-11-12T02:46:55+09:00
-      user_id: 8.574263e+18
-    - created_at: 1993-07-26T02:54:17+09:00
+      deletedAt: 1999-07-26T02:54:17+09:00
       design_id: simple
       genre: game
       id: 2.438025e+18
@@ -2593,6 +2601,7 @@ paths:
       - user
   /userblog:
     get:
+      x-swagger-router-controller: user_blog
       description: |-
         get user blogs
 
