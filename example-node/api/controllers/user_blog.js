@@ -82,8 +82,29 @@ const remove = (req, res) => {
     ;
 }
 
+/**
+ * Controller : Show  User Blog
+ * HTTP Method : GET
+ * PATH : /userblog/:id
+ *
+ * @returns {function(*)}
+ */
+
+const show = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const UserBlogs = store.models.UserBlogs;
+  const attributes = Object.keys(req.swagger.operation.responses['200'].schema.properties);
+  const id = req.swagger.params.id.value;
+  UserBlogs.findById(id, {attributes})
+    .then(data => {
+      res.json(data);
+    })
+  ;
+}
+
 module.exports = {
   'user_blog#list': list,
   'user_blog#create': create,
   'user_blog#remove': remove,
+  'user_blog#show': show,
 };
