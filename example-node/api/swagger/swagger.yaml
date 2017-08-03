@@ -2981,6 +2981,7 @@ paths:
       tags:
       - user_blog_entry
     get:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         get the user blog entry
 
