@@ -736,20 +736,26 @@ definitions:
     description: A User Blog Entry (default view)
     example:
       content: Velit iure doloribus.
-      created_at: 1991-02-16T10:17:41+09:00
+      createdAt: 1991-02-16T10:17:41+09:00
+      deletedAt: 2005-10-21T03:42:51+09:00
       id: 5.1847856e+18
       theme: diary
       title: 今日の日記
-      updated_at: 2003-10-21T03:42:51+09:00
+      updatedAt: 2003-10-21T03:42:51+09:00
       user_blog_id: 8.21865e+17
     properties:
       content:
         description: 内容
         example: Velit iure doloribus.
         type: string
-      created_at:
+      createdAt:
         description: 作成日時
         example: 1991-02-16T10:17:41+09:00
+        format: date-time
+        type: string
+      deletedAt:
+        description: 削除日時
+        example: 2005-02-16T10:17:41+09:00
         format: date-time
         type: string
       id:
@@ -765,7 +771,7 @@ definitions:
         description: タイトル
         example: 今日の日記
         type: string
-      updated_at:
+      updatedAt:
         description: 更新日時
         example: 2003-10-21T03:42:51+09:00
         format: date-time
@@ -787,11 +793,12 @@ definitions:
       (default view)
     example:
     - content: Velit iure doloribus.
-      created_at: 1991-02-16T10:17:41+09:00
+      createdAt: 1991-02-16T10:17:41+09:00
+      deletedAt: 2005-10-21T03:42:51+09:00
       id: 5.1847856e+18
       theme: diary
       title: 今日の日記
-      updated_at: 2003-10-21T03:42:51+09:00
+      updatedAt: 2003-10-21T03:42:51+09:00
       user_blog_id: 8.21865e+17
     items:
       $ref: '#/definitions/User_blog_entry'
@@ -2848,6 +2855,7 @@ paths:
       - user_blog
   /userblogentry:
     get:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         get user blog entries
 
