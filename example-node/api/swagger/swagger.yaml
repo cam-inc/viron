@@ -2482,7 +2482,7 @@ paths:
 
         Required security scopes:
           * `api:access`
-      operationId: user#delete
+      operationId: user#remove
       parameters:
       - description: id
         in: path
@@ -2511,6 +2511,7 @@ paths:
       tags:
       - user
     get:
+      x-swagger-router-controller: user
       description: |-
         get the user
 

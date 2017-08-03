@@ -7,7 +7,6 @@ const shared = require('../../shared');
  * HTTP Method : GET
  * PATH : /user
  *
- * @param Users Sequelize.model
  * @returns {function(*, *, *)}
  */
 
@@ -41,7 +40,6 @@ const list = (req, res) => {
  * HTTP Method : POST
  * PATH : /user
  *
- * @param Users Sequelize.model
  * @returns {function(*, *)}
  */
 
@@ -67,9 +65,8 @@ const create = (req, res) => {
 /**
  * Controller : Delete  User
  * HTTP Method : DELETE
- * PATH : /user
+ * PATH : /user/:id
  *
- * @param Users Sequelize.model
  * @returns {function(*)}
  */
 
@@ -84,8 +81,30 @@ const remove = (req, res) => {
   ;
 }
 
+/**
+ * Controller : Show  User
+ * HTTP Method : GET
+ * PATH : /user/:id
+ *
+ * @returns {function(*)}
+ */
+
+const show = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const Users = store.models.Users;
+  const attributes = Object.keys(req.swagger.operation.responses['200'].schema.properties);
+  const id = req.swagger.params.id.value;
+  Users.findById(id, {attributes})
+    .then(data => {
+      res.json(data);
+    })
+  ;
+}
+
+
 module.exports = {
   'user#list': list,
   'user#create': create,
-  'user#delete': remove,
+  'user#remove': remove,
+  'user#show': show,
 };
