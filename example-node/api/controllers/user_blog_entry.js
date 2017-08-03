@@ -7,7 +7,6 @@ const shared = require('../../shared');
  * HTTP Method : GET
  * PATH : /userblogentry
  *
- * @param UserBlogEntries Sequelize.model
  * @returns {function(*, *, *)}
  */
 
@@ -36,6 +35,34 @@ const list = (req, res) => {
     ;
 };
 
+/**
+ * Controller : Create  User Blog Entry
+ * HTTP Method : POST
+ * PATH : /userblogentry
+ *
+ * @returns {function(*, *)}
+ */
+
+const create = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const UserBlogEntries = store.models.UserBlogEntries;
+  return Promise.resolve()
+    .then(() => {
+      var data = new Object();
+      data.user_blog_id = req.body.user_blog_id;
+      data.title = req.body.title;
+      data.theme = req.body.theme;
+      data.content = req.body.content;
+      console.log(data)
+      return UserBlogEntries.create(data);
+    })
+    .then(data => {
+      res.json(data);
+    })
+    ;
+}
+
 module.exports = {
   'user_blog_entry#list': list,
+  'user_blog_entry#create': create,
 };

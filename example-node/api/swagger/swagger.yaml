@@ -866,6 +866,8 @@ definitions:
         format: int64
         type: integer
     title: UserBlogEntryPayload
+    required:
+    - user_blog_id
     type: object
   UserBlogPayload:
     example:
@@ -2905,6 +2907,7 @@ paths:
         method: delete
         path: /userblogentry/{id}
     post:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         create a user blog entry
 

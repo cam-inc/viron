@@ -7,7 +7,6 @@ const shared = require('../../shared');
  * HTTP Method : GET
  * PATH : /userblog
  *
- * @param User Sequelize.model
  * @returns {function(*, *, *)}
  */
 
