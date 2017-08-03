@@ -133,5 +133,4 @@ module.exports = {
   'user_blog_entry#remove': remove,
   'user_blog_entry#show': show,
   'user_blog_entry#update': update,
-
 };

@@ -206,10 +206,11 @@ definitions:
     example:
       background_image: http://hoge.com/a.png
       base_color: blue
-      created_at: 1990-04-23T00:18:19+09:00
+      createdAt: 1990-04-23T00:18:19+09:00
+      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
-      updated_at: 1971-03-24T08:40:07+09:00
+      updatedAt: 1971-03-24T08:40:07+09:00
     properties:
       background_image:
         description: 背景画像
@@ -219,9 +220,14 @@ definitions:
         description: ベースカラー
         example: blue
         type: string
-      created_at:
+      createdAt:
         description: 作成日時
         example: 1990-04-23T00:18:19+09:00
+        format: date-time
+        type: string
+      deletedAt:
+        description: 削除日時
+        example: 1999-04-23T00:18:19+09:00
         format: date-time
         type: string
       id:
@@ -232,12 +238,14 @@ definitions:
         description: 名前
         example: design name
         type: string
-      updated_at:
+      updatedAt:
         description: 更新日時
         example: 1971-03-24T08:40:07+09:00
         format: date-time
         type: string
     title: 'Mediatype identifier: application/vnd.blog_design+json; view=default'
+    required:
+    - name
     type: object
   Blog_designCollection:
     description: Blog_designCollection is the media type for an array of Blog_design
@@ -245,22 +253,25 @@ definitions:
     example:
     - background_image: http://hoge.com/a.png
       base_color: blue
-      created_at: 1990-04-23T00:18:19+09:00
+      createdAt: 1990-04-23T00:18:19+09:00
+      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
-      updated_at: 1971-03-24T08:40:07+09:00
+      updatedAt: 1971-03-24T08:40:07+09:00
     - background_image: http://hoge.com/a.png
       base_color: blue
-      created_at: 1990-04-23T00:18:19+09:00
+      createdAt: 1990-04-23T00:18:19+09:00
+      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
-      updated_at: 1971-03-24T08:40:07+09:00
+      updatedAt: 1971-03-24T08:40:07+09:00
     - background_image: http://hoge.com/a.png
       base_color: blue
-      created_at: 1990-04-23T00:18:19+09:00
+      createdAt: 1990-04-23T00:18:19+09:00
+      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
-      updated_at: 1971-03-24T08:40:07+09:00
+      updatedAt: 1971-03-24T08:40:07+09:00
     items:
       $ref: '#/definitions/Blog_design'
     title: 'Mediatype identifier: application/vnd.blog_design+json; type=collection;
@@ -1731,6 +1742,7 @@ paths:
       - audit_log
   /blogdesign:
     get:
+      x-swagger-router-controller: blog_design
       description: |-
         get blog designs
 
