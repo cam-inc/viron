@@ -2946,12 +2946,13 @@ paths:
       - user_blog_entry
   /userblogentry/{id}:
     delete:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         delete the user blog entry
 
         Required security scopes:
           * `api:access`
-      operationId: user_blog_entry#delete
+      operationId: user_blog_entry#remove
       parameters:
       - description: id
         in: path
