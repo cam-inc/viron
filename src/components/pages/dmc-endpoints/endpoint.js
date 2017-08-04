@@ -37,4 +37,11 @@ export default function() {
     this.update();
     this.opts.onlogout(this.opts.key);
   };
+
+  this.handleQrCodeButtonPat = () => {
+    this.isMenuOpened = false;
+    this.update();
+    this.opts.onqrcode(this.opts.key, this.opts.url, this.opts.memo);
+
+  }
 }
