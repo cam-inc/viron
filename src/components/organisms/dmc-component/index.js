@@ -1,6 +1,7 @@
 import contains from 'mout/array/contains';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
+import size from 'mout/object/size';
 import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
@@ -29,34 +30,26 @@ export default function() {
   this.alertApi = '';
   this.alertText = '';
   // レスポンスデータ。
-  this.data = null;
+  this.response = null;
   // レスポンスの構造。
-  this.schema = null;
-  // ページング情報。
-  this.pagination = null;
-  // 現在のページング情報。
-  this.currentPaging = {};
-  // 検索情報。
-  this.search = null;
-  // 現在のリクエストパラメータ値。
-  this.currentRequestParameters = {};
-  // 現在の検索条件。
-  this.currentSearch = {};
-  this.isCurrentSearchEmpty = () => {
-    let isEmpty = true;
-    forOwn(this.currentSearch, val => {
-      if (!!val) {
-        isEmpty = false;
-      }
-    });
-    return isEmpty;
-  };
+  this.schemaObject = null;
+  // リクエストパラメータ定義。
+  this.parameterObjects = null;
   // 自身に関するアクション群。
   this.selfActions = null;
   // テーブル行に関するアクション群。
   this.rowActions = null;
   // テーブルのrow表示ラベル。
   this.tableLabels = null;
+  // ページング機能ONかどうか。
+  this.hasPagination = null;
+  // ページング情報。
+  this.pagination = null;
+  // 現在のリクエストパラメータ値。
+  this.currentRequestParameters = {};
+  this.isCurrentRequestParametersEmpty = () => {
+    return !size(this.currentRequestParameters);
+  };
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   switch (this.opts.component.style) {
@@ -115,6 +108,10 @@ export default function() {
       }));
   };
 
+  /**
+   * レスポンス内容が正しい形式か確認します。
+   * @param {*} response
+   */
   this.validateResponse = response => {
     const style = this.opts.component.style;
     const method = this.opts.component.api.method;
@@ -194,19 +191,15 @@ export default function() {
 
   this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
     this.isPending = false;
-    const component = store.getter(getters.COMPONENTS_ONE, this._riot_id);
-    this.data = component.data;
-    if (component.pagination && component.pagination.maxPage > 1) {
-      this.pagination = component.pagination;
-    } else {
-      this.pagination = null;
-    }
-    this.search = component.search;
-    this.schema = store.getter(getters.COMPONENTS_ONE_SCHEMA, this._riot_id);
-    this.selfActions = store.getter(getters.COMPONENTS_ONE_SELF_ACTIONS, this._riot_id);
-    this.rowActions = store.getter(getters.COMPONENTS_ONE_ROW_ACTIONS, this._riot_id);
+    this.response = store.getter(getters.COMPONENTS_ONE_RESPONSE);
+    this.schemaObject = store.getter(getters.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
+    this.parameterObjects = store.getter(getters.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
+    this.selfActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
+    this.rowActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
+    this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION);
+    this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION);
     this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
-    this.validateResponse(this.data);
+    this.validateResponse(this.response);
     this.update();
   });
 
