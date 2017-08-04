@@ -1,13 +1,14 @@
 import ObjectAssign from 'object-assign';
-import serve from 'rollup-plugin-serve';
+import server from 'rollup-plugin-server';
 import baseConfig from './rollup.base.config.js';
 
 const config = ObjectAssign({}, baseConfig);
 
-config.plugins.push(serve({
+config.plugins.push(server({
   contentBase: 'dist', // Folder to serve files from,
   historyApiFallback: false, // Set to true to return index.html instead of 404
   host: 'localhost', // Options used in setting up server
+  ssl: true,
   port: 8080
 }));
 
