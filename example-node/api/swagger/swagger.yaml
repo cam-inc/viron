@@ -1866,6 +1866,7 @@ paths:
       tags:
       - blog_design
     get:
+      x-swagger-router-controller: blog_design
       description: |-
         get the blog design
 
