@@ -1831,12 +1831,13 @@ paths:
       - blog_design
   /blogdesign/{id}:
     delete:
+      x-swagger-router-controller: blog_design
       description: |-
         delete the blog design
 
         Required security scopes:
           * `api:access`
-      operationId: blog_design#delete
+      operationId: blog_design#remove
       parameters:
       - description: id
         in: path

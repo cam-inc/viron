@@ -35,9 +35,9 @@ const list = (req, res) => {
 };
 
 /**
- * Controller : Create  User Blog Entry
+ * Controller : Create  Blog Design
  * HTTP Method : POST
- * PATH : /userblogentry
+ * PATH : /blogdesign
  *
  * @returns {function(*, *)}
  */
@@ -59,7 +59,28 @@ const create = (req, res) => {
     ;
 }
 
+/**
+ * Controller : Delete  Blog Design
+ * HTTP Method : DELETE
+ * PATH : /blogdesign/:id
+ *
+ * @returns {function(*)}
+ */
+
+const remove = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const BlogDesigns = store.models.BlogDesigns;
+  const id = req.swagger.params.id.value;
+  return BlogDesigns.destroy({where: {id}, force: true})
+    .then(() => {
+      res.status(204).end();
+    })
+    ;
+}
+
+
 module.exports = {
   'blog_design#list': list,
   'blog_design#create': create,
+  'blog_design#remove': remove,
 };
