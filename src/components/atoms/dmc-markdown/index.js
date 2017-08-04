@@ -15,5 +15,5 @@ export default function() {
     }, this.opts.data.markedOptions));
 
     this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
-  })
+  });
 }

@@ -48,5 +48,5 @@ export default function() {
     this.update();
     this.opts.onqrcode(this.opts.key, this.opts.url, this.opts.memo);
 
-  }
+  };
 }
