@@ -8,32 +8,9 @@ export default {
    * @return {Array}
    */
   updateOne: (context, params) => {
-    const {
-      component_uid,
-      response,
-      schemaObject,
-      parameterObjects,
-      actions,
-      pagination,
-      table_labels
-    } = params;
-
+    const component_uid = params.component_uid;
     // 存在しなければ新規作成。
-    const component = context.state.components[component_uid] || {};
-    // APIレスポンス内容そのまま。
-    component.response = response;
-    // OASのschema。
-    component.schemaObject = schemaObject;
-    // OASのparameterObject群。
-    component.parameterObjects = parameterObjects;
-    // 関連API群。
-    component.actions = actions;
-    // ページング関連。
-    component.pagination = pagination;
-    // テーブル行名で優先度が高いkey群。
-    component.table_labels = table_labels;
-
-    context.state.components[component_uid] = component;
+    context.state.components[component_uid] = params;
     return [states.COMPONENTS_ONE(component_uid)];
   },
 

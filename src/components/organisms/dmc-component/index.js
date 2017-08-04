@@ -1,12 +1,22 @@
+import contains from 'mout/array/contains';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
 import ObjectAssign from 'object-assign';
-import swagger from '../../../core/swagger';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../atoms/dmc-message/index.tag';
 import './searchbox.tag';
+
+const STYLE_NUMBER = 'number';
+const STYLE_TABLE = 'table';
+const STYLE_GRAPH_BAR = 'graph-bar';
+const STYLE_GRAPH_SCATTERPLOT = 'graph-scatterplot';
+const STYLE_GRAPH_LINE = 'graph-line';
+const STYLE_GRAPH_HORIZONTAL_BAR = 'graph-horizontal-bar';
+const STYLE_GRAPH_STACKED_BAR = 'graph-stacked-bar';
+const STYLE_GRAPH_HORIZONTAL_STACKED_BAR = 'graph-horizontal-stacked-bar';
+const STYLE_GRAPH_STACKED_AREA = 'graph-stacked-area';
 
 export default function() {
   const store = this.riotx.get();
@@ -28,6 +38,8 @@ export default function() {
   this.currentPaging = {};
   // 検索情報。
   this.search = null;
+  // 現在のリクエストパラメータ値。
+  this.currentRequestParameters = {};
   // 現在の検索条件。
   this.currentSearch = {};
   this.isCurrentSearchEmpty = () => {
@@ -47,32 +59,48 @@ export default function() {
   this.tableLabels = null;
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
-  if (swagger.isComponentStyleNumber(this.opts.component.style)) {
+  switch (this.opts.component.style) {
+  case STYLE_NUMBER:
     this.childComponentName = 'dmc-component-number';
-  } else if (swagger.isComponentStyleTable(this.opts.component.style)) {
+    break;
+  case STYLE_TABLE:
     this.childComponentName = 'dmc-component-table';
-  } else if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_BAR:
     this.childComponentName = 'dmc-component-graph-bar';
-  } else if (swagger.isComponentStyleGraphScatterplot(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_SCATTERPLOT:
     this.childComponentName = 'dmc-component-graph-scatterplot';
-  } else if (swagger.isComponentStyleGraphLine(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_LINE:
     this.childComponentName = 'dmc-component-graph-line';
-  } else if (swagger.isComponentStyleGraphHorizontalBar(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_HORIZONTAL_BAR:
     this.childComponentName = 'dmc-component-graph-horizontal-bar';
-  } else if (swagger.isComponentStyleGraphStackedBar(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_STACKED_BAR:
     this.childComponentName = 'dmc-component-graph-stacked-bar';
-  } else if (swagger.isComponentStyleGraphHorizontalStackedBar(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_HORIZONTAL_STACKED_BAR:
     this.childComponentName = 'dmc-component-graph-horizontal-stacked-bar';
-  } else if (swagger.isComponentStyleGraphStackedArea(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_STACKED_AREA:
     this.childComponentName = 'dmc-component-graph-stacked-area';
+    break;
+  default:
+    this.isValidData = false;
+    this.alertApi = `${this.opts.component.api.method}: ${this.opts.component.api.path}`;
+    this.alertText = `component type of ${this.opts.component.style} is not supported.`;
+    break;
   }
 
   // コンポーネントを更新するための関数。
   // 子コンポーネントに渡されます。
-  this.updater = (query = {}) => {
+  this.updater = (requestParameters = {}) => {
     this.isPending = true;
     this.update();
-    query = ObjectAssign({}, this.currentPaging, this.currentSearch, query);
+
+    this.currentRequestParameters = ObjectAssign(this.currentRequestParameters, requestParameters);
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
@@ -81,19 +109,19 @@ export default function() {
           resolve();
         }, 1000);
       }))
-      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, query))
+      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentRequestParameters))
       .catch(err => store.action(actions.MODALS_ADD, {
         error: err
       }));
   };
 
-  this.validateResponse = data => {
-    const type = data.getType();
+  this.validateResponse = response => {
+    const style = this.opts.component.style;
     const method = this.opts.component.api.method;
     const path = this.opts.component.api.path;
 
-    if (swagger.isComponentStyleNumber(this.opts.component.style)) {
-      if (type !== 'object' || data.getValue('value') === undefined) {
+    if (style === STYLE_NUMBER) {
+      if (typeof response !== 'object' || response.value === 'undefined') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
@@ -101,20 +129,20 @@ export default function() {
       }
     }
 
-    if (swagger.isComponentStyleTable(this.opts.component.style)) {
-      if (type !== 'array') {
+    if (style === STYLE_TABLE) {
+      if (!Array.isArray(response)) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
         return;
       }
-      if (!data.getLength()) {
+      if (!response.length) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'Length is 0.';
         return;
       }
-      if (data.getValue(0).getType() !== 'object') {
+      if (typeof response[0] !== 'object') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
@@ -122,20 +150,28 @@ export default function() {
       }
     }
 
-    if (swagger.isComponentStyleGraph(this.opts.component.style)) {
-      if (type !== 'object') {
+    if (contains([
+      STYLE_GRAPH_BAR,
+      STYLE_GRAPH_SCATTERPLOT,
+      STYLE_GRAPH_LINE,
+      STYLE_GRAPH_HORIZONTAL_BAR,
+      STYLE_GRAPH_STACKED_BAR,
+      STYLE_GRAPH_HORIZONTAL_STACKED_BAR,
+      STYLE_GRAPH_STACKED_AREA
+    ], style)) {
+      if (typeof response !== 'object') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
         return;
       }
-      if (!data.getValue('data') || !data.getValue('x') || !data.getValue('y') || data.getValue('data').getType() !== 'array') {
+      if (!response.data || !response.x || !response.y || !Array.isArray(response.data)) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
         return;
       }
-      if (!data.getValue('data').getLength()) {
+      if (!response.data.length) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'Length is 0.';
@@ -148,6 +184,7 @@ export default function() {
   };
 
   this.on('mount', () => {
+    // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
     this.updater();
   }).on('updated', () => {
     this.rebindTouchEvents();

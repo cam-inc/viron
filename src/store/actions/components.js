@@ -66,8 +66,10 @@ export default {
       const response = ObjectAssign({}, res.obj);
        // `component.pagination`からページングをサポートしているか判断する。
       // サポートしていれば手動でページング情報を付加する。
+      let hasPagination = false;
       let pagination;
       if (component.pagination) {
+        hasPagination = true;
         pagination = {
           // `x-pagination-current-page`等は独自仕様。
           // DMCを使用するサービスはこの仕様に沿う必要がある。
@@ -78,12 +80,13 @@ export default {
       }
       context.commit(mutations.COMPONENTS_UPDATE_ONE, {
         component_uid,
-        response,
-        schemaObject: context.getter(getters.OAS_SCHEMA_OBJECT, path, method),
-        parameterObjects: context.getter(getters.OAS_PARAMETER_OBJECTS, path, method),
-        actions,
-        pagination,
-        table_labels: component.table_labels || []
+        response,// APIレスポンス内容そのまま。
+        schemaObject: context.getter(getters.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
+        parameterObjects: context.getter(getters.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
+        actions,// 関連API群。
+        hasPagination,
+        pagination,// ページング関連。
+        table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
       });
     });
   },
