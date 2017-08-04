@@ -27,6 +27,9 @@ const list = (req, res) => {
         limit,
         offset,
       };
+      if (req.swagger.params.name.value) {
+        options.where = {name: {$like: req.swagger.params.name.value+'%'}};
+      }
       return Users.findAll(options);
     })
     .then(list => {
