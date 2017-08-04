@@ -1,13 +1,11 @@
 import contains from 'mout/array/contains';
-import forEach from 'mout/array/forEach';
-import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
 import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
+import '../../organisms/dmc-parameters/index.tag';
 import '../../atoms/dmc-message/index.tag';
-import './searchbox.tag';
 
 const STYLE_NUMBER = 'number';
 const STYLE_TABLE = 'table';
@@ -34,17 +32,17 @@ export default function() {
   // レスポンスの構造。
   this.schemaObject = null;
   // リクエストパラメータ定義。
-  this.parameterObjects = null;
+  this.parameterObjects = [];
   // 自身に関するアクション群。
-  this.selfActions = null;
+  this.selfActions = [];
   // テーブル行に関するアクション群。
-  this.rowActions = null;
+  this.rowActions = [];
   // テーブルのrow表示ラベル。
-  this.tableLabels = null;
+  this.tableLabels = [];
   // ページング機能ONかどうか。
-  this.hasPagination = null;
+  this.hasPagination = false;
   // ページング情報。
-  this.pagination = null;
+  this.pagination = {};
   // 現在のリクエストパラメータ値。
   this.currentRequestParameters = {};
   this.isCurrentRequestParametersEmpty = () => {
@@ -191,13 +189,13 @@ export default function() {
 
   this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
     this.isPending = false;
-    this.response = store.getter(getters.COMPONENTS_ONE_RESPONSE);
+    this.response = store.getter(getters.COMPONENTS_ONE_RESPONSE, this._riot_id);
     this.schemaObject = store.getter(getters.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
     this.parameterObjects = store.getter(getters.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
     this.selfActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
     this.rowActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
-    this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION);
-    this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION);
+    this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
+    this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION, this._riot_id);
     this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
     this.validateResponse(this.response);
     this.update();
@@ -217,28 +215,18 @@ export default function() {
       });
   };
 
-  this.handleSearchButtonTap = () => {
+  this.handleParameterButtonTap = () => {
     if (this.isPending) {
       return;
     }
 
-    const queries = [];
-    forEach(this.search, query => {
-      queries.push({
-        key: query.key,
-        type: query.type,
-        value: this.currentSearch[query.key] || ''
-      });
-    });
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'dmc-component-searchbox', {
-        queries,
-        onSearch: queries => {
-          // キーワード変更後は1ページ目に戻す。
-          this.currentPaging = {};
-          this.currentSearch = queries;
-          this.updater(queries);
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-parameters', {
+        parameterObjects: this.parameterObjects,
+        initialParameters: ObjectAssign({}, this.currentRequestParameters),
+        onComplete: parameters => {
+          this.updater(parameters);
         }
       }))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
@@ -247,6 +235,7 @@ export default function() {
   };
 
   this.handlePaginationChange = page => {
+    // TODO: swagger上に定義されていないけどOK？？
     const paging = this.currentPaging = {
       limit: this.pagination.size,
       offset: (page - 1) * this.pagination.size
