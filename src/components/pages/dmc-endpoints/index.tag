@@ -15,6 +15,7 @@ dmc-endpoints.Page.EndpointsPage
         onEntry="{ handleEndpointEntry }"
         onEdit="{ handleEndpointEdit }"
         onRemove="{ handleEndpointRemove }"
+        onQrCode="{ handleEndpointQrCode }"
         onLogout="{ handleEndpointLogout }"
       )
 

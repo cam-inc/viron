@@ -16,6 +16,7 @@ dmc-endpoint.EndpointsPage__item(ref="touch" onTap="handleTap")
     .EndpointsPage__itemMenuFrame
       .EndpointsPage__itemMenu(ref="touch" onTap="handleEditButtonPat") 編集
       .EndpointsPage__itemMenu(ref="touch" onTap="handleRemoveButtonPat") 削除
+      .EndpointsPage__itemMenu(ref="touch" onTap="handleQrCodeButtonPat") QR Code
       .EndpointsPage__itemMenu(ref="touch" onTap="handleLogoutButtonPat") ログアウト
 
   script.
