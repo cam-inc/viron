@@ -1,4 +1,3 @@
-import swagger from '../../../core/swagger';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import '../../atoms/dmc-message/index.tag';
@@ -56,8 +55,6 @@ export default {
             return Promise
               .resolve()
               .then(() => store.action(actions.OAS_SETUP, endpointKey, endpoint.url, endpoint.token))
-            // TODO: 消したい。swaggerを隠蔽したい。
-              .then(() => swagger.setup(endpoint.url, endpoint.token))
               .then(() => store.action(actions.DMC_GET));
           })
           .then(() => {

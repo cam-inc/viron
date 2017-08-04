@@ -1,7 +1,6 @@
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
-import swagger from '../../../core/swagger';
 import { constants as actions } from '../../../store/actions';
 import '../../organisms/dmc-operation/index.tag';
 
@@ -10,11 +9,11 @@ export default function() {
 
   this.getColumns = () => {
     const columns = [];
-    forOwn(this.opts.schema.items.properties, (v, k) => {
+    forOwn(this.opts.schemaobject.items.properties, (obj, key) => {
       columns.push({
-        title: v.description || k,
-        type: v.type,
-        key: k
+        title: obj.description || key,
+        type: obj.type,
+        key
       });
     });
     return columns;
@@ -22,10 +21,10 @@ export default function() {
 
   this.getRows = () => {
     const rows = [];
-    forEach(this.opts.data.getValue(), cells => {
+    forEach(this.opts.response, cells => {
       const row = {};
-      forOwn(cells.getValue(), cell => {
-        row[cell.getKey()] = cell;
+      forOwn(cells, (cell, key) => {
+        row[key] = cell;
       });
       rows.push(row);
     });
@@ -34,53 +33,48 @@ export default function() {
 
   this.getActions = () => {
     const actions = [];
-    forEach(this.opts.rowactions, action => {
-      let value = action.summary;
-      if (!value) {
-        const obj = swagger.getMethodAndPathByOperationID(action.operationId);
-        value = `${obj.method} ${obj.path}`;
-      }
+    forEach(this.opts.rowactions, operationObject => {
       actions.push({
-        id: action.operationId,
-        value,
-        description: action.description,
-        rowData: this.opts.data,
+        operationId: operationObject.operationId,
+        value: operationObject.summary || operationObject.operationId,
+        description: operationObject.description,
         onPat: this.handleActionButtonPat
       });
     });
     return actions;
   };
 
-  this.createInitialQueries = (operation, rowData) => {
+  const createInitialQueries = (operationObject, rowData) => {
     const queries = {};
-    const parameters = operation.parameters;
-    forEach(parameters, parameter => {
-      const name = parameter.name;
-      if (parameter.in === 'body') {
+    const parameterObjects = operationObject.parameters;
+    forEach(parameterObjects, parameterObject => {
+      const name = parameterObject.name;
+      if (parameterObject.in === 'body') {
         queries[name] = {};
-        forOwn(parameter.schema.properties, (v, k) => {
-          if (rowData.getValue(k)) {
-            queries[name][k] = rowData.getValue(k).getRawValue();
+        forOwn(parameterObject.schema.properties, (v, k) => {
+          if (rowData[k]) {
+            queries[name][k] = rowData[k];
           }
         });
       } else {
-        if (!rowData.getValue(name)) {
+        if (!rowData[name]) {
           return;
         }
-        queries[name] = rowData.getValue(name).getRawValue();
+        queries[name] = rowData[name];
       }
     });
 
     return queries;
   };
 
-  this.handleActionButtonPat = (operationID, rowData) => {
-    const operation = find(this.opts.rowactions, action => {
-      return (action.operationId === operationID);
+  this.handleActionButtonPat = (operationId, rowIdx) => {
+    const operationObject = find(this.opts.rowactions, operationObject => {
+      return (operationObject.operationId === operationId);
     });
-    const initialQueries = this.createInitialQueries(operation, rowData);
+    const rowData = this.opts.response[rowIdx];
+    const initialQueries = createInitialQueries(operationObject, rowData);
     store.action(actions.DRAWERS_ADD, 'dmc-operation', {
-      operation,
+      operationObject,
       initialQueries,
       onSuccess: () => {
         this.opts.updater();

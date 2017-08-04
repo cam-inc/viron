@@ -31,14 +31,16 @@ export default function() {
   if (!item) {
     item = this.opts.items[0];
   }
-  this.title = `${item.cell.getValue()}`;
-  this.visibleKeys = map(this.opts.items, item => {
+  this.title = `${item.cell}`;
+
+  // 画面表示するkey群。
+  let visibleKeys = map(this.opts.items, item => {
     return item.key;
   });
-  // filterを通したリスト。
-  this.getItems = () => {
+  // filterを通したリストを返す。
+  const getItems = () => {
     return filter(this.opts.items, item => {
-      if (!find(this.visibleKeys, key => {
+      if (!find(visibleKeys, key => {
         return (key === item.key);
       })) {
         return false;
@@ -46,7 +48,7 @@ export default function() {
       return true;
     });
   };
-  this.filteredItems = this.getItems();
+  this.filteredItems = getItems();
 
   this.handleHeaderTitleTap = () => {
     this.isOpened = !this.isOpened;
@@ -65,10 +67,10 @@ export default function() {
       options: map(this.opts.items, item => {
         return item.key;
       }),
-      selectedOptions: this.visibleKeys,
+      selectedOptions: visibleKeys,
       onChange: selectedOptions => {
-        this.visibleKeys = selectedOptions;
-        this.filteredItems = this.getItems();
+        visibleKeys = selectedOptions;
+        this.filteredItems = getItems();
         this.update();
       }
     });

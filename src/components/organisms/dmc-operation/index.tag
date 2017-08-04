@@ -2,12 +2,12 @@ dmc-operation.Operation
   .Operation__info
     div
       .Operation__summary { summary }
-      .Operation__description { opts.operation.description }
+      .Operation__description { opts.operationObject.description }
   .Operation__control
-    dmc-button(label="{ opts.operation.operationId }" onPat="{ handleExecuteButtonPat }")
+    dmc-button(label="{ opts.operationObject.operationId }" onPat="{ handleExecuteButtonPat }")
     dmc-button(label="cancel" type="secondary" onPat="{ handleCancelButtonPat }")
   .Operation__parameters
-    dmc-operation-parameter(each="{ parameter in opts.operation.parameters }" parameter="{ parameter }" parameterValue="{ parent.queries[parameter.name] }" onChange="{ parent.handleParameterChange }")
+    dmc-operation-parameter(each="{ parameter in opts.operationObject.parameters }" parameter="{ parameter }" parameterValue="{ parent.queries[parameter.name] }" onChange="{ parent.handleParameterChange }")
 
   script.
     import '../../atoms/dmc-button/index.tag';

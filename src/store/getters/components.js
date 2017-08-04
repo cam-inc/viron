@@ -52,19 +52,19 @@ export default {
   },
 
   /**
-   * action(pathItemObject)群を返します。
+   * action(operationObject)群を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Array}
    */
   actions: (context, riotId) => {
     return map(context.state.components[riotId].actions, action => {
-      return action.pathItemObject;
+      return action.operationObject;
     });
   },
 
   /**
-   * 自身に関連するaction(pathItemObject)群を返します。
+   * 自身に関連するaction(operationObject)群を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Array}
@@ -75,12 +75,12 @@ export default {
       return (!action.appendTo || action.appendTo === 'self');
     });
     return map(selfActions, action => {
-      return action.pathItemObject;
+      return action.operationObject;
     });
   },
 
   /**
-   * テーブル行に関連するaction(pathItemObject)群を返します。
+   * テーブル行に関連するaction(operationObject)群を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Array}
@@ -91,7 +91,7 @@ export default {
       return (action.appendTo === 'row');
     });
     return map(selfActions, action => {
-      return action.pathItemObject;
+      return action.operationObject;
     });
   },
 

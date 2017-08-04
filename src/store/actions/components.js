@@ -63,7 +63,6 @@ export default {
       }
       return res;
     }).then(res => {
-      const response = ObjectAssign({}, res.obj);
        // `component.pagination`からページングをサポートしているか判断する。
       // サポートしていれば手動でページング情報を付加する。
       let hasPagination = false;
@@ -80,7 +79,7 @@ export default {
       }
       context.commit(mutations.COMPONENTS_UPDATE_ONE, {
         component_uid,
-        response,// APIレスポンス内容そのまま。
+        response: res.obj,// APIレスポンス内容そのまま。
         schemaObject: context.getter(getters.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
         parameterObjects: context.getter(getters.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
         actions,// 関連API群。
