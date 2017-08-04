@@ -233,7 +233,7 @@ definitions:
       id:
         description: デザインID
         example: des_001
-        type: string
+        type: integer
       name:
         description: 名前
         example: design name
@@ -1792,6 +1792,7 @@ paths:
         method: delete
         path: /blogdesign/{id}
     post:
+      x-swagger-router-controller: blog_design
       description: |-
         create a blog design
 

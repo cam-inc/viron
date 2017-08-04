@@ -34,6 +34,32 @@ const list = (req, res) => {
     ;
 };
 
+/**
+ * Controller : Create  User Blog Entry
+ * HTTP Method : POST
+ * PATH : /userblogentry
+ *
+ * @returns {function(*, *)}
+ */
+
+const create = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const BlogDesigns = store.models.BlogDesigns;
+  return Promise.resolve()
+    .then(() => {
+      var data = new Object();
+      data.name = req.body.name;
+      data.background_image = req.body.background_image;
+      data.base_color = req.body.base_color;
+      return BlogDesigns.create(data);
+    })
+    .then(data => {
+      res.json(data);
+    })
+    ;
+}
+
 module.exports = {
   'blog_design#list': list,
+  'blog_design#create': create,
 };
