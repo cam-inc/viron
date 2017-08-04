@@ -1,6 +1,11 @@
 export default function() {
   this.isMenuOpened = false;
 
+  this.descriptionsMarkdown = {
+    content: this.opts.description,
+    markedOptions: {},
+  };
+
   this.on('updated', () => {
     this.rebindTouchEvents();
   });
@@ -43,5 +48,5 @@ export default function() {
     this.update();
     this.opts.onqrcode(this.opts.key, this.opts.url, this.opts.memo);
 
-  }
+  };
 }

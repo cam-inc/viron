@@ -1296,8 +1296,14 @@ definitions:
     type: object
 host: localhost:3000
 info:
-  description: A simple goa service
-  title: The virtual wine example-go
+  description: |-
+    Design-based Management Console.
+
+      * dashboard
+      * console
+      * swagger
+      * riot
+  title: example for dmc
   version: 0.0.1
 paths:
   /:
