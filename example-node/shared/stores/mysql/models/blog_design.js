@@ -6,10 +6,9 @@ module.exports = sequelize => {
   const model = sequelize.define(TABLE,
     {
       id: {
-        type: Sequelize.INTEGER.UNSIGNED,
+        type: Sequelize.STRING,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING,

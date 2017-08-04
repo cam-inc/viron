@@ -48,6 +48,7 @@ const create = (req, res) => {
   return Promise.resolve()
     .then(() => {
       var data = new Object();
+      data.id = req.body.id;
       data.name = req.body.name;
       data.background_image = req.body.background_image;
       data.base_color = req.body.base_color;
@@ -98,10 +99,37 @@ const show = (req, res) => {
   ;
 }
 
+/**
+ * Controller : update  Blog Design
+ * HTTP Method : PUT
+ * PATH : /blogdesign/:id
+ *
+ * @returns {function(*, *)}
+ */
+
+const update = (req, res) => {
+  const store = shared.context.getStoreMain();
+  const BlogDesigns = store.models.BlogDesigns;
+  return Promise.resolve()
+    .then(() => {
+      var data = new Object();
+      data.id = req.body.id;
+      data.name = req.body.name;
+      data.background_image = req.body.background_image;
+      data.base_color = req.body.base_color;
+      const id = req.swagger.params.id.value;
+      return BlogDesigns.update(data, {where: {id}});
+    })
+    .then(data => {
+      res.json(data);
+    })
+    ;
+}
 
 module.exports = {
   'blog_design#list': list,
   'blog_design#create': create,
   'blog_design#remove': remove,
   'blog_design#show': show,
+  'blog_design#update': update,
 };
