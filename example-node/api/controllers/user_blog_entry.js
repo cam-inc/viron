@@ -7,9 +7,8 @@ const shared = require('../../shared');
  * HTTP Method : GET
  * PATH : /userblogentry
  *
- * @returns {function(*, *, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const list = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
@@ -40,19 +39,19 @@ const list = (req, res) => {
  * HTTP Method : POST
  * PATH : /userblogentry
  *
- * @returns {function(*, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const create = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
   return Promise.resolve()
     .then(() => {
-      var data = new Object();
-      data.user_blog_id = req.body.user_blog_id;
-      data.title = req.body.title;
-      data.theme = req.body.theme;
-      data.content = req.body.content;
+      const data = {
+        user_blog_id: req.body.user_blog_id,
+        title: req.body.title,
+        theme: req.body.theme,
+        content: req.body.content
+      };
       return UserBlogEntries.create(data);
     })
     .then(data => {
@@ -66,9 +65,8 @@ const create = (req, res) => {
  * HTTP Method : DELETE
  * PATH : /userblogentry/:id
  *
- * @returns {function(*)}
+ * @returns {Promise.<TResult>}
  */
-
 const remove = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
@@ -85,9 +83,8 @@ const remove = (req, res) => {
  * HTTP Method : GET
  * PATH : /userblogentry/:id
  *
- * @returns {function(*)}
+ * @returns {Promise.<TResult>}
  */
-
 const show = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
@@ -105,19 +102,19 @@ const show = (req, res) => {
  * HTTP Method : PUT
  * PATH : /userblogentry/:id
  *
- * @returns {function(*, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const update = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
   return Promise.resolve()
     .then(() => {
-      var data = new Object();
-      data.user_blog_id = req.body.user_blog_id;
-      data.title = req.body.title;
-      data.theme = req.body.theme;
-      data.content = req.body.content;
+      const data = {
+        user_blog_id: req.body.user_blog_id,
+        title: req.body.title,
+        theme: req.body.theme,
+        content: req.body.content
+      };
       const id = req.swagger.params.id.value;
       return UserBlogEntries.update(data, {where: {id}});
     })

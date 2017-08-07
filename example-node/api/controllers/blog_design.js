@@ -6,9 +6,8 @@ const shared = require('../../shared');
  * HTTP Method : GET
  * PATH : /blogdesign
  *
- * @returns {function(*, *, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const list = (req, res) => {
   const store = shared.context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
@@ -39,19 +38,19 @@ const list = (req, res) => {
  * HTTP Method : POST
  * PATH : /blogdesign
  *
- * @returns {function(*, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const create = (req, res) => {
   const store = shared.context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
   return Promise.resolve()
     .then(() => {
-      var data = new Object();
-      data.id = req.body.id;
-      data.name = req.body.name;
-      data.background_image = req.body.background_image;
-      data.base_color = req.body.base_color;
+      const data = {
+        id: req.body.id,
+        name: req.body.name,
+        background_image: req.body.background_image,
+        base_color: req.body.base_color
+      };
       return BlogDesigns.create(data);
     })
     .then(data => {
@@ -65,9 +64,8 @@ const create = (req, res) => {
  * HTTP Method : DELETE
  * PATH : /blogdesign/:id
  *
- * @returns {function(*)}
+ * @returns {Promise.<TResult>}
  */
-
 const remove = (req, res) => {
   const store = shared.context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
@@ -84,9 +82,8 @@ const remove = (req, res) => {
  * HTTP Method : GET
  * PATH : /blogdesign/:id
  *
- * @returns {function(*)}
+ * @returns {Promise.<TResult>}
  */
-
 const show = (req, res) => {
   const store = shared.context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
@@ -104,19 +101,19 @@ const show = (req, res) => {
  * HTTP Method : PUT
  * PATH : /blogdesign/:id
  *
- * @returns {function(*, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const update = (req, res) => {
   const store = shared.context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
   return Promise.resolve()
     .then(() => {
-      var data = new Object();
-      data.id = req.body.id;
-      data.name = req.body.name;
-      data.background_image = req.body.background_image;
-      data.base_color = req.body.base_color;
+      const data = {
+        id: req.body.id,
+        name: req.body.name,
+        background_image: req.body.background_image,
+        base_color: req.body.base_color
+      };
       const id = req.swagger.params.id.value;
       return BlogDesigns.update(data, {where: {id}});
     })

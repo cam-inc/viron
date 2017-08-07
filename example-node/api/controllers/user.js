@@ -7,9 +7,8 @@ const shared = require('../../shared');
  * HTTP Method : GET
  * PATH : /user
  *
- * @returns {function(*, *, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const list = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
@@ -43,20 +42,20 @@ const list = (req, res) => {
  * HTTP Method : POST
  * PATH : /user
  *
- * @returns {function(*, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const create = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
   return Promise.resolve()
     .then(() => {
-      var data = new Object();
-      data.birthday = req.body.birthday;
-      data.blood_type = req.body.blood_type;
-      data.job = req.body.job;
-      data.name = req.body.name;
-      data.sex = req.body.sex;
+      var data = {
+        birthday: req.body.birthday,
+        blood_type: req.body.blood_type,
+        job: req.body.job,
+        name: req.body.name,
+        sex: req.body.sex
+      };
       return Users.create(data);
     })
     .then(data => {
@@ -70,9 +69,8 @@ const create = (req, res) => {
  * HTTP Method : DELETE
  * PATH : /user/:id
  *
- * @returns {function(*)}
+ * @returns {Promise.<TResult>}
  */
-
 const remove = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
@@ -89,9 +87,8 @@ const remove = (req, res) => {
  * HTTP Method : GET
  * PATH : /user/:id
  *
- * @returns {function(*)}
+ * @returns {Promise.<TResult>}
  */
-
 const show = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
@@ -109,20 +106,20 @@ const show = (req, res) => {
  * HTTP Method : PUT
  * PATH : /user/:id
  *
- * @returns {function(*, *)}
+ * @returns {Promise.<TResult>}
  */
-
 const update = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
   return Promise.resolve()
     .then(() => {
-      var data = new Object();
-      data.birthday = req.body.birthday;
-      data.blood_type = req.body.blood_type;
-      data.job = req.body.job;
-      data.name = req.body.name;
-      data.sex = req.body.sex;
+      var data = {
+        birthday: req.body.birthday,
+        blood_type: req.body.blood_type,
+        job: req.body.job,
+        name: req.body.name,
+        sex: req.body.sex
+      };
       const id = req.swagger.params.id.value;
       return Users.update(data, {where: {id}});
     })
