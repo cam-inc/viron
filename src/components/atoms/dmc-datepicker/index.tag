@@ -2,7 +2,7 @@ dmc-datepicker.Datepicker
   .Datepicker__label(if="{ !!opts.label }") { opts.label }
   form(ref="form" onSubmit="{ handleFormSubmit }")
     input.Datepicker__input(onclick="{ toggle }" value="{ opts.text }" placeholder="{ opts.placeholder || '' }" pattern="{ opts.pattern }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
-    .Datepicker__calendar(if="{ isShow }")
+    .Datepicker__calendar(if="{ isShown }")
       .Datapicker__head
         span.Datapicker__trans(onclick="{ this.goPrev }") <
         span.Datapicker__month { dates.year() } 

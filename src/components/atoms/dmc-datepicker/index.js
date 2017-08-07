@@ -4,7 +4,7 @@ export default function() {
   this.dates = moment();
   this.today = moment();
   this.selectedDate = null,
-  this.isShow = false;
+  this.isShown = false;
   this.lang = 'ja';
   this.context = {
     'month': {
@@ -67,7 +67,7 @@ export default function() {
   };
 
   this.toggle = () => {
-    this.isShow = (this.isShow) ? false : true;
+    this.isShown = (this.isShown) ? false : true;
     this.refs.form.focus();
   };
 
@@ -105,7 +105,7 @@ export default function() {
     if(moment(newText, 'YYYY-MM-DD', true).isValid()) {
       this.dates = moment(newText);
       this.selectedDate = moment(newText).clone();
-      this.isShow = false;
+      this.isShown = false;
       this.update();
       this.updateCalendarView();
     } else {
