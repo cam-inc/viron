@@ -44,8 +44,12 @@ var _ = Resource("audit_log", func() {
 		Description("get admin roles")
 		Routing(GET(""))
 		Params(func() {
-			Param("limit", Integer, "number of items per page")
-			Param("offset", Integer, "offset number of page")
+			Param("limit", Integer, "number of items per page", func() {
+				Metadata("swagger:extension:x-param-for", "pagination_limit")
+			})
+			Param("offset", Integer, "offset number of page", func() {
+				Metadata("swagger:extension:x-param-for", "pagination_offset")
+			})
 		})
 		Response(OK, func() {
 			Media(CollectionOf(AuditLogMediaType, func() {

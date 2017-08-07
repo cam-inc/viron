@@ -118,26 +118,6 @@ var OptionType = Type("option", func() {
 	Required("key", "value")
 })
 
-// QueryType of type
-var QueryType = Type("query", func() {
-	Attribute("key", String, "Key", func() {
-		Example("key")
-	})
-	Attribute("type", String, "Type", func() {
-		Example("string")
-		Default("string")
-		Enum("string",
-			"integer",
-			"number",
-			"boolean",
-			"date",
-			"datetime",
-			"time",
-		)
-	})
-	Required("key", "type")
-})
-
 // ComponentType of type
 var ComponentType = Type("component", func() {
 	Description("A Component type")
@@ -145,10 +125,8 @@ var ComponentType = Type("component", func() {
 	Attribute("name", String, "Title of page")
 	Attribute("style", Style)                                  // Web Component style
 	Attribute("options", ArrayOf(OptionType), "style options") // Web Component Style options
-	Attribute("query", ArrayOf(QueryType), "query for request")
-	Attribute("pagination", Boolean, "allow pagination")
 	Attribute("table_labels", ArrayOf(String), "keys of table row")
-	Required("api", "name", "style", "pagination")
+	Required("api", "name", "style")
 })
 
 // PageType of type

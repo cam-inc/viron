@@ -9,4 +9,5 @@ module.exports = {
   auditLog: require('./audit_log'),
   adminUser: require('./admin_user'),
   adminRole: require('./admin_role'),
+  errorHandler: require('./error_handler'),
 };

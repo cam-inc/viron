@@ -5,52 +5,9 @@ import (
 
 	"github.com/cam-inc/dmc/example-go/service"
 
-	"strings"
-
-	"github.com/cam-inc/dmc/example-go/bridge"
-	"github.com/cam-inc/dmc/example-go/common"
 	"github.com/cam-inc/dmc/example-go/gen/app"
-	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
-	"github.com/goadesign/goa/goagen/gen_swagger"
 )
-
-func filter(s genswagger.Swagger, roles map[string][]string) genswagger.Swagger {
-	if s.Paths != nil {
-		for uri, p := range s.Paths {
-			path, ok := p.(*genswagger.Path)
-			if ok != true {
-				continue
-			}
-
-			resource := strings.Split(uri, "/")[1]
-			raw, _ := path.MarshalJSON()
-			mt := map[string]interface{}{}
-			json.Unmarshal(raw, &mt)
-
-			for method := range mt {
-				if roles[method] == nil || (common.InStringArray(resource, service.GetApiWhiteList()) < 0 && common.InStringArray("*", roles[method]) < 0 && common.InStringArray(resource, roles[method]) < 0) {
-					switch method {
-					case "get":
-						path.Get = nil
-					case "options":
-						path.Options = nil
-					case "put":
-						path.Put = nil
-					case "post":
-						path.Post = nil
-					case "delete":
-						path.Delete = nil
-					}
-				}
-			}
-			if path.Get == nil && path.Options == nil && path.Put == nil && path.Post == nil && path.Delete == nil {
-				s.Paths[uri] = nil
-			}
-		}
-	}
-	return s
-}
 
 // SwaggerController implements the swagger resource.
 type SwaggerController struct {
@@ -68,20 +25,7 @@ func (c *SwaggerController) Show(ctx *app.ShowSwaggerContext) error {
 
 	// Put your logic here
 	swaggerAll := service.GetSwagger()
-	var sw genswagger.Swagger
-
-	cl := ctx.Context.Value(bridge.JwtClaims)
-	if cl == nil {
-		// swagger.json自体に認証をかけていないときは全部返す
-		sw = *swaggerAll
-	} else {
-		// JWTclaimsからRoleを取り出す
-		var roles map[string][]string
-		claims := cl.(jwtgo.MapClaims)
-		json.Unmarshal([]byte(claims["roles"].(string)), &roles)
-		sw = filter(*swaggerAll, roles)
-	}
-	if res, err := json.Marshal(&sw); err != nil {
+	if res, err := json.Marshal(swaggerAll); err != nil {
 		return ctx.InternalServerError()
 	} else {
 		return ctx.OK(res)

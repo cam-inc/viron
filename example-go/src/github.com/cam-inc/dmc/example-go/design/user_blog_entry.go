@@ -62,8 +62,12 @@ var _ = Resource("user_blog_entry", func() {
 			Metadata("swagger:extension:x-ref", string(xref))
 		}))
 		Params(func() {
-			Param("limit", Integer, "number of items per page")
-			Param("offset", Integer, "offset number of page")
+			Param("limit", Integer, "number of items per page", func() {
+				Metadata("swagger:extension:x-param-for", "pagination_limit")
+			})
+			Param("offset", Integer, "offset number of page", func() {
+				Metadata("swagger:extension:x-param-for", "pagination_offset")
+			})
 		})
 		Response(OK, func() {
 			Media(CollectionOf(UserBlogEntryMediaType, func() {
