@@ -26,7 +26,7 @@ export default function() {
     },
   };
 
-  this.updateCalendarView = () => {
+  const updateCalendarView = () => {
     let firstDay = this.dates.clone().date(1).day();
     const MAX_DISPLAY_DAYS = 42;
 
@@ -73,13 +73,13 @@ export default function() {
 
   this.goPrev = () => {
     this.dates.subtract(1, 'month');
-    this.updateCalendarView();
+    updateCalendarView();
     this.update();
   };
 
   this.goNext = () => {
     this.dates.add(1, 'month');
-    this.updateCalendarView();
+    updateCalendarView();
     this.update();
   };
 
@@ -90,7 +90,7 @@ export default function() {
     this.dates = clickDate;
     this.selectedDate = clickDate.clone();
     this.toggle();
-    this.updateCalendarView();
+    updateCalendarView();
   };
 
   this.handleFormSubmit = e => {
@@ -107,7 +107,7 @@ export default function() {
       this.selectedDate = moment(newText).clone();
       this.isShown = false;
       this.update();
-      this.updateCalendarView();
+      updateCalendarView();
     } else {
       this.selectedDate = null;
     }
@@ -119,5 +119,5 @@ export default function() {
     e.stopPropagation();
   };
 
-  this.updateCalendarView();
+  updateCalendarView();
 }
