@@ -3,7 +3,7 @@ import moment from 'moment';
 export default function() {
   this.dates = moment();
   this.today = moment();
-  this.selectedDate = null,
+  this.selectedDate = null;
   this.isShown = false;
   this.lang = 'ja';
   this.data = {
