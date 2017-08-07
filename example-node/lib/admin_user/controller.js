@@ -79,7 +79,7 @@ const registerGet = AdminUsers => {
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const id = req.swagger.params.id.value;
-    AdminUsers.findById(id, {attributes})
+    return AdminUsers.findById(id, {attributes})
       .then(data => {
         res.json(data);
       })
@@ -98,7 +98,7 @@ const registerGet = AdminUsers => {
 const registerRemove = AdminUsers => {
   return (req, res) => {
     const id = req.swagger.params.id.value;
-    AdminUsers.destroy({where: {id}, force: true})
+    return AdminUsers.destroy({where: {id}, force: true})
       .then(() => {
         res.status(204).end();
       })
@@ -116,7 +116,7 @@ const registerRemove = AdminUsers => {
  */
 const registerUpdate = AdminUsers => {
   return (req, res) => {
-    Promise.resolve()
+    return Promise.resolve()
       .then(() => {
         const password = req.body.password;
         if (!password) {

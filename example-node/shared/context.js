@@ -1,3 +1,4 @@
+const lib = require('../lib');
 
 const config = require('./config');
 const stores = require('./stores');
@@ -15,6 +16,10 @@ class Context {
     return config.load()
       .then(conf => {
         return this.initStore(conf.stores);
+      })
+      .then(() => {
+        const store = this.getStoreMain();
+        return lib.adminRole.init(store.models.AdminRoles, this.getDefaultRole());
       })
     ;
   }
