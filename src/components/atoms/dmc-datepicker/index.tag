@@ -5,8 +5,8 @@ dmc-datepicker.Datepicker
     .Datepicker__calendar(if="{ isShow }")
       .Datapicker__head
         span.Datapicker__trans(onclick="{ this.goPrev }") <
-        span.Datapicker__month { context.month[lang][dates.month()] } 
-          i {dates.year() }
+        span.Datapicker__month { dates.year() } 
+          b { context.month[lang][dates.month()] }
         span.Datapicker__trans(onclick="{ this.goNext }") >
       .Datapicker__days
         span(each="{ day in context.days[lang] }") { day }
