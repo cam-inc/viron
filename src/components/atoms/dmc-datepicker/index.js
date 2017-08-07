@@ -67,7 +67,7 @@ export default function() {
   };
 
   this.toggle = () => {
-    this.isShown = (this.isShown) ? false : true;
+    this.isShown = !this.isShown;
     this.refs.form.focus();
   };
 
