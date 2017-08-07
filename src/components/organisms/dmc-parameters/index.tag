@@ -1,6 +1,8 @@
 dmc-parameters.Parameters
-  div testes
+  virtual(each="{ parameterObject in opts.parameterobjects }")
+    dmc-parameter(parameterObject="{ parameterObject }" val="{ parent.getCurrentParameter(parameterObject) }" onChange="{ parent.handleChange }")
 
   script.
+    import './parameter.tag';
     import script from './index';
     this.external(script);

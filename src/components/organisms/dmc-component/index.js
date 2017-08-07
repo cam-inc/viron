@@ -4,8 +4,8 @@ import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
-import '../../organisms/dmc-parameters/index.tag';
 import '../../atoms/dmc-message/index.tag';
+import './search.tag';
 
 const STYLE_NUMBER = 'number';
 const STYLE_TABLE = 'table';
@@ -215,14 +215,16 @@ export default function() {
       });
   };
 
-  this.handleParameterButtonTap = () => {
+  this.handleSearchButtonTap = () => {
     if (this.isPending) {
       return;
     }
 
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'dmc-parameters', {
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-component-search', {
+        name: 'TODO',
+        description: 'TODO',
         parameterObjects: this.parameterObjects,
         initialParameters: ObjectAssign({}, this.currentRequestParameters),
         onComplete: parameters => {
