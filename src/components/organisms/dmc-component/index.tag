@@ -1,8 +1,9 @@
 dmc-component.Component
   .Component__head
     .Component__name { opts.component.name }
-    .Component__refresh(ref="touch" onTap="handleRefreshButtonTap")
+    .Component__refresh(ref="touch" onTap="handleRefreshButtonTap" onmouseover="{ handleReloadIconOver }" onmouseout="{ handleReloadIconOut }")
       dmc-icon(type="reload")
+      dmc-tooltip(if="{ isTooltipVisible }" class="Tooltip Tooltip--left__bottom")
     .Component__search(if="{ !!search }" class="{ !isCurrentSearchEmpty() ? 'Component__search--active' : ''}" ref="touch" onTap="handleSearchButtonTap")
       dmc-icon(type="search")
   .Component__body(ref="body")
@@ -20,6 +21,7 @@ dmc-component.Component
   script.
     import '../../organisms/dmc-pagination/index.tag';
     import '../../atoms/dmc-icon/index.tag';
+    import '../../atoms/dmc-tooltip/index.tag';
     import './action.tag';
     import './graph-bar.tag';
     import './graph-horizontal-bar.tag';
