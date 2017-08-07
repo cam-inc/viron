@@ -9,7 +9,7 @@ dmc-datepicker.Datepicker
           b { context.month[lang][dates.month()] }
         span.Datapicker__trans(onclick="{ this.goNext }") >
       .Datapicker__days
-        span(each="{ day in context.days[lang] }") { day }
+        span(each="{ day, index in context.days[lang] }" class="{ (index == 0) ? 'Datapicker__days--sunday' : '' } { (index == 6) ? 'Datapicker__days--saturday' : '' }") { day }
       .Datapicker__container
 
         .Datapicker__cell(each="{ cell in context.calendar }") { cell.value }
