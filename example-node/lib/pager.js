@@ -1,3 +1,5 @@
+const constant = require('./constant');
+
 /**
  * @param {Response} res
  * @param {number} limit
@@ -5,7 +7,7 @@
  * @param {number} count
  */
 const setResHeader = (res, limit, offset, count) => {
-  limit = Number(limit || 100);
+  limit = Number(limit || constant.DEFAULT_PAGER_LIMIT);
   offset = Number(offset || 0);
 
   const totalPages = Math.ceil(count / limit);

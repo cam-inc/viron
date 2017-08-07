@@ -1,5 +1,6 @@
-
 const pager = require('../../lib/pager');
+const storeHelper = require('../../lib/stores').helper;
+
 const shared = require('../../shared');
 
 /**
@@ -15,23 +16,17 @@ const list = (req, res) => {
   const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
   const limit = req.query.limit;
   const offset = req.query.offset;
-  return Promise.resolve()
-    .then(() => {
-      return UserBlogs.count();
+  const options = {
+    attributes,
+    limit,
+    offset,
+  };
+  return storeHelper.list(store, UserBlogs, {}, options)
+    .then(data => {
+      pager.setResHeader(res, limit, offset, data.count);
+      res.json(data.list);
     })
-    .then(count => {
-      pager.setResHeader(res, limit, offset, count);
-      const options = {
-        attributes,
-        limit,
-        offset,
-      };
-      return UserBlogs.findAll(options);
-    })
-    .then(list => {
-      res.json(list);
-    })
-    ;
+  ;
 };
 
 /**
@@ -44,22 +39,12 @@ const list = (req, res) => {
 const create = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
-  return Promise.resolve()
-    .then(() => {
-      var data = {
-        user_id: req.body.user_id,
-        title: req.body.title,
-        subtitle: req.body.subtitle,
-        genre: req.body.genre,
-        design_id: req.body.design_id
-      };
-      return UserBlogs.create(data);
-    })
+  return storeHelper.create(store, UserBlogs, req.body)
     .then(data => {
       res.json(data);
     })
-    ;
-}
+  ;
+};
 
 /**
  * Controller : Delete  User Blog
@@ -71,13 +56,18 @@ const create = (req, res) => {
 const remove = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
-  const id = req.swagger.params.id.value;
-  return UserBlogs.destroy({where: {id}, force: true})
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  const options = {
+    force: true, // physical delete
+  };
+  return storeHelper.remove(store, UserBlogs, query, options)
     .then(() => {
       res.status(204).end();
     })
-    ;
-}
+  ;
+};
 
 /**
  * Controller : Show  User Blog
@@ -89,14 +79,18 @@ const remove = (req, res) => {
 const show = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
-  const attributes = Object.keys(req.swagger.operation.responses['200'].schema.properties);
-  const id = req.swagger.params.id.value;
-  UserBlogs.findById(id, {attributes})
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  const options = {
+    attributes: Object.keys(req.swagger.operation.responses['200'].schema.properties),
+  };
+  return storeHelper.findOne(store, UserBlogs, query, options)
     .then(data => {
       res.json(data);
     })
   ;
-}
+};
 
 /**
  * Controller : update  User Blog
@@ -108,23 +102,15 @@ const show = (req, res) => {
 const update = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
-  return Promise.resolve()
-    .then(() => {
-      var data = {
-        user_id: req.body.user_id,
-        title: req.body.title,
-        subtitle: req.body.subtitle,
-        genre: req.body.genre,
-        design_id: req.body.design_id
-      };
-      const id = req.swagger.params.id.value;
-      return UserBlogs.update(data, {where: {id}});
-    })
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  return storeHelper.update(store, UserBlogs, req.body, query)
     .then(data => {
       res.json(data);
     })
-    ;
-}
+  ;
+};
 
 module.exports = {
   'user_blog#list': list,

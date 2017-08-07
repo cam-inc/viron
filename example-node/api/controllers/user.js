@@ -1,5 +1,6 @@
-
 const pager = require('../../lib/pager');
+const storeHelper = require('../../lib/stores').helper;
+
 const shared = require('../../shared');
 
 /**
@@ -15,26 +16,21 @@ const list = (req, res) => {
   const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
   const limit = req.query.limit;
   const offset = req.query.offset;
-  return Promise.resolve()
-    .then(() => {
-      return Users.count();
+  const options = {
+    attributes,
+    limit,
+    offset,
+  };
+  const query = {};
+  if (req.swagger.params.name.value) {
+    query.where = {name: {$like: `${req.swagger.params.name.value}%`}};
+  }
+  return storeHelper.list(store, Users, query, options)
+    .then(data => {
+      pager.setResHeader(res, limit, offset, data.count);
+      res.json(data.list);
     })
-    .then(count => {
-      pager.setResHeader(res, limit, offset, count);
-      const options = {
-        attributes,
-        limit,
-        offset,
-      };
-      if (req.swagger.params.name.value) {
-        options.where = {name: {$like: req.swagger.params.name.value+'%'}};
-      }
-      return Users.findAll(options);
-    })
-    .then(list => {
-      res.json(list);
-    })
-    ;
+  ;
 };
 
 /**
@@ -47,22 +43,12 @@ const list = (req, res) => {
 const create = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
-  return Promise.resolve()
-    .then(() => {
-      var data = {
-        birthday: req.body.birthday,
-        blood_type: req.body.blood_type,
-        job: req.body.job,
-        name: req.body.name,
-        sex: req.body.sex
-      };
-      return Users.create(data);
-    })
+  return storeHelper.create(store, Users, req.body)
     .then(data => {
       res.json(data);
     })
-    ;
-}
+  ;
+};
 
 /**
  * Controller : Delete  User
@@ -74,13 +60,18 @@ const create = (req, res) => {
 const remove = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
-  const id = req.swagger.params.id.value;
-  return Users.destroy({where: {id}, force: true})
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  const options = {
+    force: true, // physical delete
+  };
+  return storeHelper.remove(store, Users, query, options)
     .then(() => {
       res.status(204).end();
     })
   ;
-}
+};
 
 /**
  * Controller : Show  User
@@ -92,14 +83,18 @@ const remove = (req, res) => {
 const show = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
-  const attributes = Object.keys(req.swagger.operation.responses['200'].schema.properties);
-  const id = req.swagger.params.id.value;
-  Users.findById(id, {attributes})
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  const options = {
+    attributes: Object.keys(req.swagger.operation.responses['200'].schema.properties),
+  };
+  return storeHelper.findOne(store, Users, query, options)
     .then(data => {
       res.json(data);
     })
   ;
-}
+};
 
 /**
  * Controller : update  User
@@ -111,23 +106,15 @@ const show = (req, res) => {
 const update = (req, res) => {
   const store = shared.context.getStoreMain();
   const Users = store.models.Users;
-  return Promise.resolve()
-    .then(() => {
-      var data = {
-        birthday: req.body.birthday,
-        blood_type: req.body.blood_type,
-        job: req.body.job,
-        name: req.body.name,
-        sex: req.body.sex
-      };
-      const id = req.swagger.params.id.value;
-      return Users.update(data, {where: {id}});
-    })
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  return storeHelper.update(store, Users, req.body, query)
     .then(data => {
       res.json(data);
     })
   ;
-}
+};
 
 
 module.exports = {

@@ -31,6 +31,7 @@ class Context {
             instance,
             functions: store.functions,
             models: store.functions.defineModels && store.functions.defineModels(instance, store.models),
+            helper: store.helper,
           };
 
           // TODO: logger

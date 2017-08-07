@@ -58,6 +58,11 @@ module.exports = {
   models: Object.assign(models, lib.stores.mysql.models),
 
   /**
+   * Helper functions
+   */
+  helper: lib.stores.mysql.helper,
+
+  /**
    * MySQL コネクション作成
    * @param options http://docs.sequelizejs.com/class/lib/sequelize.js~Sequelize.html#instance-constructor-constructor
    * @returns {Bluebird<U>|Bluebird<U2|U1>|Bluebird<R>|Thenable<U>|Promise.<TResult>}
@@ -69,7 +74,7 @@ module.exports = {
       .then(() => {
         return sequelize;
       })
-      .then((sequelize) => {
+      .then(sequelize => {
         return lib.stores.mysql.init(sequelize); // import dmc library
       })
       .then(sequelize => {

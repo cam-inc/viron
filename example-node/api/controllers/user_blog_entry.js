@@ -1,5 +1,6 @@
-
 const pager = require('../../lib/pager');
+const storeHelper = require('../../lib/stores').helper;
+
 const shared = require('../../shared');
 
 /**
@@ -12,26 +13,19 @@ const shared = require('../../shared');
 const list = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
-  const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
   const limit = req.query.limit;
   const offset = req.query.offset;
-  return Promise.resolve()
-    .then(() => {
-      return UserBlogEntries.count();
+  const options = {
+    attributes: Object.keys(req.swagger.operation.responses['200'].schema.items.properties),
+    limit,
+    offset,
+  };
+  return storeHelper.list(store, UserBlogEntries, {}, options)
+    .then(data => {
+      pager.setResHeader(res, limit, offset, data.count);
+      res.json(data.list);
     })
-    .then(count => {
-      pager.setResHeader(res, limit, offset, count);
-      const options = {
-        attributes,
-        limit,
-        offset,
-      };
-      return UserBlogEntries.findAll(options);
-    })
-    .then(list => {
-      res.json(list);
-    })
-    ;
+  ;
 };
 
 /**
@@ -44,21 +38,12 @@ const list = (req, res) => {
 const create = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
-  return Promise.resolve()
-    .then(() => {
-      const data = {
-        user_blog_id: req.body.user_blog_id,
-        title: req.body.title,
-        theme: req.body.theme,
-        content: req.body.content
-      };
-      return UserBlogEntries.create(data);
-    })
+  return storeHelper.create(store, UserBlogEntries, req.body)
     .then(data => {
       res.json(data);
     })
-    ;
-}
+  ;
+};
 
 /**
  * Controller : Delete  User Blog Entry
@@ -70,13 +55,18 @@ const create = (req, res) => {
 const remove = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
-  const id = req.swagger.params.id.value;
-  return UserBlogEntries.destroy({where: {id}, force: true})
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  const options = {
+    force: true, // physical delete
+  };
+  return storeHelper.remove(store, UserBlogEntries, query, options)
     .then(() => {
       res.status(204).end();
     })
-    ;
-}
+  ;
+};
 
 /**
  * Controller : Show  User Blog Entry
@@ -88,14 +78,18 @@ const remove = (req, res) => {
 const show = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
-  const attributes = Object.keys(req.swagger.operation.responses['200'].schema.properties);
-  const id = req.swagger.params.id.value;
-  UserBlogEntries.findById(id, {attributes})
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  const options = {
+    attributes: Object.keys(req.swagger.operation.responses['200'].schema.properties),
+  };
+  return storeHelper.findOne(store, UserBlogEntries, query, options)
     .then(data => {
       res.json(data);
     })
   ;
-}
+};
 
 /**
  * Controller : update  User Blog Entry
@@ -107,22 +101,15 @@ const show = (req, res) => {
 const update = (req, res) => {
   const store = shared.context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
-  return Promise.resolve()
-    .then(() => {
-      const data = {
-        user_blog_id: req.body.user_blog_id,
-        title: req.body.title,
-        theme: req.body.theme,
-        content: req.body.content
-      };
-      const id = req.swagger.params.id.value;
-      return UserBlogEntries.update(data, {where: {id}});
-    })
+  const query = {
+    id: req.swagger.params.id.value,
+  };
+  return storeHelper.update(store, UserBlogEntries, req.body, query)
     .then(data => {
       res.json(data);
     })
-    ;
-}
+  ;
+};
 
 module.exports = {
   'user_blog_entry#list': list,
