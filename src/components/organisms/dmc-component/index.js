@@ -221,4 +221,16 @@ export default function() {
     };
     this.updater(paging);
   };
+
+  // Tooltipの表示、非表示
+  this.isTooltipVisible = false;
+
+  this.handleReloadIconOver = () => {
+    this.isTooltipVisible = true;
+    console.log(this.isTooltipVisible);
+  };
+  this.handleReloadIconOut = () => {
+    this.isTooltipVisible = false;
+    console.log(this.isTooltipVisible);
+  };
 }
