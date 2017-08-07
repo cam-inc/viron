@@ -1,29 +1,24 @@
 const Sequelize = require('sequelize');
 
-const TABLE = 'user_blog_entries';
+const TABLE = 'blog_designs';
 
 module.exports = sequelize => {
   const model = sequelize.define(TABLE,
     {
       id: {
-        type: Sequelize.INTEGER.UNSIGNED,
+        type: Sequelize.STRING,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
       },
-      user_blog_id: {
-        type: Sequelize.INTEGER.UNSIGNED,
+      name: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      title: {
+      background_image: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      theme: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      content: {
+      base_color: {
         type: Sequelize.STRING,
         allowNull: true,
       },

@@ -206,10 +206,11 @@ definitions:
     example:
       background_image: http://hoge.com/a.png
       base_color: blue
-      created_at: 1990-04-23T00:18:19+09:00
+      createdAt: 1990-04-23T00:18:19+09:00
+      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
-      updated_at: 1971-03-24T08:40:07+09:00
+      updatedAt: 1971-03-24T08:40:07+09:00
     properties:
       background_image:
         description: 背景画像
@@ -219,9 +220,14 @@ definitions:
         description: ベースカラー
         example: blue
         type: string
-      created_at:
+      createdAt:
         description: 作成日時
         example: 1990-04-23T00:18:19+09:00
+        format: date-time
+        type: string
+      deletedAt:
+        description: 削除日時
+        example: 1999-04-23T00:18:19+09:00
         format: date-time
         type: string
       id:
@@ -232,12 +238,14 @@ definitions:
         description: 名前
         example: design name
         type: string
-      updated_at:
+      updatedAt:
         description: 更新日時
         example: 1971-03-24T08:40:07+09:00
         format: date-time
         type: string
     title: 'Mediatype identifier: application/vnd.blog_design+json; view=default'
+    required:
+    - name
     type: object
   Blog_designCollection:
     description: Blog_designCollection is the media type for an array of Blog_design
@@ -245,22 +253,25 @@ definitions:
     example:
     - background_image: http://hoge.com/a.png
       base_color: blue
-      created_at: 1990-04-23T00:18:19+09:00
+      createdAt: 1990-04-23T00:18:19+09:00
+      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
-      updated_at: 1971-03-24T08:40:07+09:00
+      updatedAt: 1971-03-24T08:40:07+09:00
     - background_image: http://hoge.com/a.png
       base_color: blue
-      created_at: 1990-04-23T00:18:19+09:00
+      createdAt: 1990-04-23T00:18:19+09:00
+      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
-      updated_at: 1971-03-24T08:40:07+09:00
+      updatedAt: 1971-03-24T08:40:07+09:00
     - background_image: http://hoge.com/a.png
       base_color: blue
-      created_at: 1990-04-23T00:18:19+09:00
+      createdAt: 1990-04-23T00:18:19+09:00
+      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
-      updated_at: 1971-03-24T08:40:07+09:00
+      updatedAt: 1971-03-24T08:40:07+09:00
     items:
       $ref: '#/definitions/Blog_design'
     title: 'Mediatype identifier: application/vnd.blog_design+json; type=collection;
@@ -603,25 +614,16 @@ definitions:
   User:
     description: A User (default view)
     example:
-      appear_area: 東京
       birthday: 1995-05-12T09:45:56Z
       blood_type: A
-      created_at: 2010-04-14T11:16:32+09:00
-      home_town: 静岡県
-      homepage: http://test.com/index.html
+      createdAt: 2010-04-14T11:16:32+09:00
+      deletedAt: 2014-04-27T12:25:11+09:00
       id: 5.801194e+18
       job: 大学生
-      living_region: 渋谷
-      married: false
       name: 山田 太郎
-      school: 東京○○大学
       sex: male
-      updated_at: 1994-04-27T12:25:11+09:00
+      updatedAt: 1994-04-27T12:25:11+09:00
     properties:
-      appear_area:
-        description: 出没地
-        example: 東京
-        type: string
       birthday:
         description: 誕生日
         example: 1995-05-12T09:45:56Z
@@ -636,18 +638,15 @@ definitions:
         - AB
         example: A
         type: string
-      created_at:
+      createdAt:
         description: 作成日時
         example: 2010-04-14T11:16:32+09:00
         format: date-time
         type: string
-      home_town:
-        description: 出身地
-        example: 静岡県
-        type: string
-      homepage:
-        description: ホームページURL
-        example: http://test.com/index.html
+      deletedAt:
+        description: 削除日時
+        example: 2014-04-27T12:25:11+09:00
+        format: date-time
         type: string
       id:
         description: ユーザーID
@@ -658,21 +657,9 @@ definitions:
         description: 職業
         example: 大学生
         type: string
-      living_region:
-        description: 地域
-        example: 渋谷
-        type: string
-      married:
-        description: 未既婚
-        example: false
-        type: boolean
       name:
         description: 名前
         example: 山田 太郎
-        type: string
-      school:
-        description: 出身校
-        example: 東京○○大学
         type: string
       sex:
         description: 性別
@@ -681,7 +668,7 @@ definitions:
         - female
         example: male
         type: string
-      updated_at:
+      updatedAt:
         description: 更新日時
         example: 1994-04-27T12:25:11+09:00
         format: date-time
@@ -703,9 +690,14 @@ definitions:
       updated_at: 1979-11-12T02:46:55+09:00
       user_id: 8.574263e+18
     properties:
-      created_at:
+      createdAt:
         description: 作成日時
         example: 1993-07-26T02:54:17+09:00
+        format: date-time
+        type: string
+      deletedAt:
+        description: 削除日時
+        example: 1999-11-12T02:46:55+09:00
         format: date-time
         type: string
       design_id:
@@ -734,7 +726,7 @@ definitions:
         description: タイトル
         example: user's blog
         type: string
-      updated_at:
+      updatedAt:
         description: 更新日時
         example: 1979-11-12T02:46:55+09:00
         format: date-time
@@ -755,20 +747,26 @@ definitions:
     description: A User Blog Entry (default view)
     example:
       content: Velit iure doloribus.
-      created_at: 1991-02-16T10:17:41+09:00
+      createdAt: 1991-02-16T10:17:41+09:00
+      deletedAt: 2005-10-21T03:42:51+09:00
       id: 5.1847856e+18
       theme: diary
       title: 今日の日記
-      updated_at: 2003-10-21T03:42:51+09:00
+      updatedAt: 2003-10-21T03:42:51+09:00
       user_blog_id: 8.21865e+17
     properties:
       content:
         description: 内容
         example: Velit iure doloribus.
         type: string
-      created_at:
+      createdAt:
         description: 作成日時
         example: 1991-02-16T10:17:41+09:00
+        format: date-time
+        type: string
+      deletedAt:
+        description: 削除日時
+        example: 2005-02-16T10:17:41+09:00
         format: date-time
         type: string
       id:
@@ -784,7 +782,7 @@ definitions:
         description: タイトル
         example: 今日の日記
         type: string
-      updated_at:
+      updatedAt:
         description: 更新日時
         example: 2003-10-21T03:42:51+09:00
         format: date-time
@@ -806,11 +804,12 @@ definitions:
       (default view)
     example:
     - content: Velit iure doloribus.
-      created_at: 1991-02-16T10:17:41+09:00
+      createdAt: 1991-02-16T10:17:41+09:00
+      deletedAt: 2005-10-21T03:42:51+09:00
       id: 5.1847856e+18
       theme: diary
       title: 今日の日記
-      updated_at: 2003-10-21T03:42:51+09:00
+      updatedAt: 2003-10-21T03:42:51+09:00
       user_blog_id: 8.21865e+17
     items:
       $ref: '#/definitions/User_blog_entry'
@@ -821,7 +820,17 @@ definitions:
     description: User_blogCollection is the media type for an array of User_blog (default
       view)
     example:
+    - createdAt: 1993-07-26T02:54:17+09:00
+      deletedAt: 1999-07-26T02:54:17+09:00
+      design_id: simple
+      genre: game
+      id: 2.438025e+18
+      sub_title: diary
+      title: user's blog
+      updatedAt: 1979-11-12T02:46:55+09:00
+      user_id: 8.574263e+18
     - created_at: 1993-07-26T02:54:17+09:00
+      deletedAt: 1999-07-26T02:54:17+09:00
       design_id: simple
       genre: game
       id: 2.438025e+18
@@ -830,14 +839,7 @@ definitions:
       updated_at: 1979-11-12T02:46:55+09:00
       user_id: 8.574263e+18
     - created_at: 1993-07-26T02:54:17+09:00
-      design_id: simple
-      genre: game
-      id: 2.438025e+18
-      sub_title: diary
-      title: user's blog
-      updated_at: 1979-11-12T02:46:55+09:00
-      user_id: 8.574263e+18
-    - created_at: 1993-07-26T02:54:17+09:00
+      deletedAt: 1999-07-26T02:54:17+09:00
       design_id: simple
       genre: game
       id: 2.438025e+18
@@ -875,6 +877,8 @@ definitions:
         format: int64
         type: integer
     title: UserBlogEntryPayload
+    required:
+    - user_blog_id
     type: object
   UserBlogPayload:
     example:
@@ -911,50 +915,37 @@ definitions:
         format: int64
         type: integer
     title: UserBlogPayload
+    required:
+    - user_id
     type: object
   UserCollection:
     description: UserCollection is the media type for an array of User (default view)
     example:
-    - appear_area: 東京
-      birthday: 1995-05-12T09:45:56Z
+    - birthday: 1995-05-12T09:45:56Z
       blood_type: A
-      created_at: 2010-04-14T11:16:32+09:00
-      home_town: 静岡県
-      homepage: http://test.com/index.html
+      createdAt: 2010-04-14T11:16:32+09:00
+      deletedAt: 2014-04-27T12:25:11+09:00
       id: 5.801194e+18
       job: 大学生
-      living_region: 渋谷
-      married: false
       name: 山田 太郎
-      school: 東京○○大学
       sex: male
-      updated_at: 1994-04-27T12:25:11+09:00
+      updatedAt: 1994-04-27T12:25:11+09:00
     items:
       $ref: '#/definitions/User'
     title: 'Mediatype identifier: application/vnd.user+json; type=collection; view=default'
     type: array
   UserPayload:
     example:
-      appear_area: 東京
       birthday: 1995-05-12T09:45:56Z
       blood_type: A
-      home_town: 静岡県
-      homepage: http://test.com/index.html
       job: 大学生
-      living_region: 渋谷
-      married: false
       name: 山田 太郎
-      school: 東京○○大学
       sex: male
     properties:
-      appear_area:
-        description: 出没地
-        example: 東京
-        type: string
       birthday:
         description: 誕生日
         example: 1995-05-12T09:45:56Z
-        format: date-time
+#        format: date-time
         type: string
       blood_type:
         description: 血液型
@@ -965,33 +956,13 @@ definitions:
         - AB
         example: A
         type: string
-      home_town:
-        description: 出身地
-        example: 静岡県
-        type: string
-      homepage:
-        description: ホームページURL
-        example: http://test.com/index.html
-        type: string
       job:
         description: 職業
         example: 大学生
         type: string
-      living_region:
-        description: 地域
-        example: 渋谷
-        type: string
-      married:
-        description: 未既婚
-        example: false
-        type: boolean
       name:
         description: 名前
         example: 山田 太郎
-        type: string
-      school:
-        description: 出身校
-        example: 東京○○大学
         type: string
       sex:
         description: 性別
@@ -1752,6 +1723,7 @@ paths:
       - audit_log
   /blogdesign:
     get:
+      x-swagger-router-controller: blog_design
       description: |-
         get blog designs
 
@@ -1801,6 +1773,7 @@ paths:
         method: delete
         path: /blogdesign/{id}
     post:
+      x-swagger-router-controller: blog_design
       description: |-
         create a blog design
 
@@ -1839,12 +1812,13 @@ paths:
       - blog_design
   /blogdesign/{id}:
     delete:
+      x-swagger-router-controller: blog_design
       description: |-
         delete the blog design
 
         Required security scopes:
           * `api:access`
-      operationId: blog_design#delete
+      operationId: blog_design#remove
       parameters:
       - description: id
         in: path
@@ -1873,6 +1847,7 @@ paths:
       tags:
       - blog_design
     get:
+      x-swagger-router-controller: blog_design
       description: |-
         get the blog design
 
@@ -1910,6 +1885,7 @@ paths:
       tags:
       - blog_design
     put:
+      x-swagger-router-controller: blog_design
       description: |-
         update the blog design
 
@@ -2432,6 +2408,7 @@ paths:
       - swagger
   /user:
     get:
+      x-swagger-router-controller: user
       description: |-
         get users
 
@@ -2476,6 +2453,7 @@ paths:
         method: delete
         path: /user/{id}
     post:
+      x-swagger-router-controller: user
       description: |-
         create a user
 
@@ -2514,12 +2492,13 @@ paths:
       - user
   /user/{id}:
     delete:
+      x-swagger-router-controller: user
       description: |-
         delete the user
 
         Required security scopes:
           * `api:access`
-      operationId: user#delete
+      operationId: user#remove
       parameters:
       - description: id
         in: path
@@ -2548,6 +2527,7 @@ paths:
       tags:
       - user
     get:
+      x-swagger-router-controller: user
       description: |-
         get the user
 
@@ -2585,6 +2565,7 @@ paths:
       tags:
       - user
     put:
+      x-swagger-router-controller: user
       description: |-
         update the user
 
@@ -2628,6 +2609,7 @@ paths:
       - user
   /userblog:
     get:
+      x-swagger-router-controller: user_blog
       description: |-
         get user blogs
 
@@ -2677,6 +2659,7 @@ paths:
         method: delete
         path: /userblog/{id}
     post:
+      x-swagger-router-controller: user_blog
       description: |-
         create a user blog
 
@@ -2715,12 +2698,13 @@ paths:
       - user_blog
   /userblog/{id}:
     delete:
+      x-swagger-router-controller: user_blog
       description: |-
         delete the user blog
 
         Required security scopes:
           * `api:access`
-      operationId: user_blog#delete
+      operationId: user_blog#remove
       parameters:
       - description: id
         in: path
@@ -2749,6 +2733,7 @@ paths:
       tags:
       - user_blog
     get:
+      x-swagger-router-controller: user_blog
       description: |-
         get the user blog
 
@@ -2786,6 +2771,7 @@ paths:
       tags:
       - user_blog
     put:
+      x-swagger-router-controller: user_blog
       description: |-
         update the user blog
 
@@ -2868,6 +2854,7 @@ paths:
       - user_blog
   /userblogentry:
     get:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         get user blog entries
 
@@ -2917,6 +2904,7 @@ paths:
         method: delete
         path: /userblogentry/{id}
     post:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         create a user blog entry
 
@@ -2955,12 +2943,13 @@ paths:
       - user_blog_entry
   /userblogentry/{id}:
     delete:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         delete the user blog entry
 
         Required security scopes:
           * `api:access`
-      operationId: user_blog_entry#delete
+      operationId: user_blog_entry#remove
       parameters:
       - description: id
         in: path
@@ -2989,6 +2978,7 @@ paths:
       tags:
       - user_blog_entry
     get:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         get the user blog entry
 
@@ -3026,6 +3016,7 @@ paths:
       tags:
       - user_blog_entry
     put:
+      x-swagger-router-controller: user_blog_entry
       description: |-
         update the user blog entry
 
