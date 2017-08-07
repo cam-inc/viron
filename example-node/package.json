@@ -30,7 +30,8 @@
     "test": "swagger project test",
     "dressup": "docker-compose -f docker-compose.all.yml up --build",
     "dressup-db": "docker-compose -f docker-compose.db.yml up --build",
-    "connect-main": "mysql -u user -ppassword -h 127.0.0.1 -P 3306",
-    "debug": "supervisor --verbose --debug=0.0.0.0:53000 --watch . --extensions 'node,js,yaml' --ignore node_modules -- ./app.js"
+    "connect-main": "mysql -u user -ppassword -h 127.0.0.1 -P 3306 -Ddmc_local",
+    "debug": "supervisor --verbose --debug=0.0.0.0:53000 --watch . --extensions 'node,js,yaml' --ignore node_modules -- ./app.js",
+    "help": "cat package.json | jq \".scripts\""
   }
 }
