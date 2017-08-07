@@ -51,12 +51,12 @@
 }
 
 .Datapicker__month {
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-text-primary);
 }
 
-.Datapicker__month > i {
-  font-weight: 500;
+.Datapicker__month > b {
+  font-weight: 700;
 }
 
 .Datapicker__days {
@@ -67,7 +67,19 @@
 .Datapicker__days > span {
   width: 40px;
   height: 26px;
+  font-weight: 700;
+}
+
+.Datapicker__days--sunday {
+  color: var(--color-text-accent);
+}
+
+.Datapicker__days--default {
   color: var(--color-text-secondary);
+}
+
+.Datapicker__days--saturday {
+  color: var(--color-text-anchor);
 }
 
 .Datapicker__container {
@@ -80,6 +92,21 @@
   height: 20px;
   line-height: 20px;
   border-radius: 4px;
+}
+
+.Datapicker__cell--today {
+  background-color: var(--color-bg-successLight);
+}
+
+.Datapicker__cell--select {
+  background-color: var(--color-bg-infoLight);
+}
+
+.Datapicker__cell--secondary {
+  height: 20px;
+  line-height: 20px;
+  border-radius: 4px;
+  color: var(--color-text-secondary);
 }
 
 .Datapicker__cell:hover {
