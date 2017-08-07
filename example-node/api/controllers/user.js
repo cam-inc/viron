@@ -109,7 +109,7 @@ const update = (req, res) => {
   const query = {
     id: req.swagger.params.id.value,
   };
-  return storeHelper.update(store, Users, req.body, query)
+  return storeHelper.update(store, Users, query, req.body)
     .then(data => {
       res.json(data);
     })
