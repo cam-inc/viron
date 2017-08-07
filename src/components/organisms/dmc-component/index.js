@@ -227,10 +227,8 @@ export default function() {
 
   this.handleReloadIconOver = () => {
     this.isTooltipVisible = true;
-    console.log(this.isTooltipVisible);
   };
   this.handleReloadIconOut = () => {
     this.isTooltipVisible = false;
-    console.log(this.isTooltipVisible);
   };
 }
