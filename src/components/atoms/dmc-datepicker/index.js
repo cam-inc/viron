@@ -6,7 +6,7 @@ export default function() {
   this.selectedDate = null,
   this.isShown = false;
   this.lang = 'ja';
-  this.context = {
+  this.data = {
     'month': {
       'ja': [
         '1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'
@@ -30,12 +30,12 @@ export default function() {
     let firstDay = this.dates.clone().date(1).day();
     const MAX_DISPLAY_DAYS = 42;
 
-    this.context.calendar = [];
+    this.data.calendar = [];
 
     let lastMonthMaxDate = this.dates.clone().subtract(1, 'month').daysInMonth();
     for(let i = 1; i <= firstDay; i += 1) {
       let lastMonth = this.dates.clone().subtract(1, 'month').date(lastMonthMaxDate - firstDay + i);
-      this.context.calendar[i - 1] = {
+      this.data.calendar[i - 1] = {
         'date': lastMonth
       };
     }
@@ -44,7 +44,7 @@ export default function() {
     let currentMonthMaxDate = this.dates.daysInMonth();
     for(let i = 0; i < currentMonthMaxDate; i += 1) {
       let thisMonth = this.dates.clone().date(i + 1);
-      this.context.calendar[firstDay + i] = {
+      this.data.calendar[firstDay + i] = {
         'date': thisMonth
       };
       lastIndex = firstDay + i;
@@ -55,7 +55,7 @@ export default function() {
 
     for(let i = 1; i <= index; i += 1) {
       let nextMonth = this.dates.clone().add(1, 'month').date(i);
-      this.context.calendar[lastIndex] = {
+      this.data.calendar[lastIndex] = {
         'date': nextMonth
       };
       lastIndex += 1;
