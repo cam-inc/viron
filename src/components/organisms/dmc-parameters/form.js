@@ -1,4 +1,3 @@
-import deepClone from 'mout/lang/deepClone';
 import ObjectAssign from 'object-assign';
 
 const UI_TEXTINPUT = 'textinput';

@@ -1,5 +1,5 @@
 import contains from 'mout/array/contains';
-import size from 'mout/object/size';
+import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
@@ -46,7 +46,7 @@ export default function() {
   // 現在のリクエストパラメータ値。
   this.currentRequestParameters = {};
   this.isCurrentRequestParametersEmpty = () => {
-    return !size(this.currentRequestParameters);
+    return !keys(this.currentRequestParameters).length;
   };
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;

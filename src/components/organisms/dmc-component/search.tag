@@ -3,7 +3,7 @@ dmc-component-search.ComponentSearch
     .ComponentSearch__name { opts.name }
     .ComponentSearch__description { opts.description }
   .ComponentSearch__body
-    dmc-parameters(parameterObjects="{ opts.parameterObjects }" initialParameters="{ opts.initialparameters }" onChange="{ handleParametersChange }")
+    dmc-parameters(parameterObjects="{ opts.parameterObjects }" parameters="{ currentParameters }" onChange="{ handleParametersChange }")
   .ComponentSearch__tail
     dmc-button(label="submit" onPat="{ handleSubmitButtonPat }")
 

@@ -1,29 +1,14 @@
 import ObjectAssign from 'object-assign';
 
 export default function() {
-  // TODO: default値を設定すること(parameterObject.default値)
-  const initialParameters = ObjectAssign({}, this.opts.initialparameters);
-
-  // parameter入力値群。
-  this.currentParameters = ObjectAssign({}, this.opts.initialparameters);
-
-  /**
-   * parameter入力値を変更します。
-   * @param {Object} parameterObject
-   * @param {*} newValue
-   */
-  this.updateCurrentParameters = (parameterObject, newValue) => {
-    // TODO: 入れ子対応。
-    this.currentParameters[parameterObject.name] = newValue;
-  };
-
+  // TODO: parameterObject.default対応。
   /**
    * 指定parameterObjectに対応するcurrentParameter値を返却します。
    * @param {Object} parameterObject
    */
-  this.getCurrentParameter = (parameterObject, newValue) => {
+  this.getParameterValue = parameterObject => {
     // TODO: 入れ子対応。
-    return this.currentParameters[parameterObject.name];
+    return this.opts.parameters[parameterObject.name];
   };
 
   /**
@@ -32,7 +17,11 @@ export default function() {
    * @param {*} newValue
    */
   this.handleChange = (parameterObject, newValue) => {
-    this.updateCurrentParameters(parameterObject, newValue);
-    this.opts.onchange(this.currentParameters);
+    // TODO: 入れ子対応
+    const newParameter = {};
+    newParameter[parameterObject.name] = newValue;
+    const newParameters = ObjectAssign({}, this.opts.parameters, newParameter);
+    // TODO: null対応等
+    this.opts.onchange(newParameters);
   };
 }
