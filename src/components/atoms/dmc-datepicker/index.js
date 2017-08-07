@@ -2,7 +2,8 @@ import moment from 'moment';
 
 export default function() {
   this.dates = moment();
-  debugger;
+  this.today = moment();
+  this.selectedDate = null,
   this.isShow = false;
   this.lang = 'ja';
   this.context = {
@@ -27,38 +28,42 @@ export default function() {
 
   this.updateCalendarView = () => {
     let firstDay = this.dates.clone().date(1).day();
-    let lastMonthMaxDate = this.dates.clone().month(-1).daysInMonth();
-    let currentMonthMaxDate = this.dates.daysInMonth();
     const MAX_DISPLAY_DAYS = 42;
 
     this.context.calendar = [];
 
+    let lastMonthMaxDate = this.dates.clone().subtract(1, 'month').daysInMonth();
     for(let i = 1; i <= firstDay; i += 1) {
+      let lastMonth = this.dates.clone().subtract(1, 'month').date(lastMonthMaxDate - firstDay + i);
       this.context.calendar[i - 1] = {
-        'value': lastMonthMaxDate - firstDay + i,
-        'month': this.dates.clone().month() - 1 
+        'date': lastMonth
       };
     }
 
     let lastIndex = 0;
+    let currentMonthMaxDate = this.dates.daysInMonth();
     for(let i = 0; i < currentMonthMaxDate; i += 1) {
+      let thisMonth = this.dates.clone().date(i + 1);
       this.context.calendar[firstDay + i] = {
-        'value': i + 1,
-        'month': this.dates.clone().month()
+        'date': thisMonth
       };
       lastIndex = firstDay + i;
     }
 
     lastIndex += 1;
-
     let index = MAX_DISPLAY_DAYS - lastIndex;
+
     for(let i = 1; i <= index; i += 1) {
+      let nextMonth = this.dates.clone().add(1, 'month').date(i);
       this.context.calendar[lastIndex] = {
-        'value': i,
-        'month': this.dates.clone().month() + 1
+        'date': nextMonth
       };
       lastIndex += 1;
     }
+  };
+
+  this.format = date => {
+    return moment(date).format('YYYY-MM-DD');
   };
 
   this.toggle = () => {
@@ -66,19 +71,52 @@ export default function() {
     this.refs.form.focus();
   };
 
-  this.goNext = () => {
-    debugger;
-    console.log(this.dates.format('YYYY-MM-DD'));
-    console.log(this.dates.month(1).format('YYYY-MM-DD'));
-    // this.dates = this.dates.month(1);
+  this.goPrev = () => {
+    this.dates.subtract(1, 'month');
     this.updateCalendarView();
     this.update();
-    //this.update();
+  };
+
+  this.goNext = () => {
+    this.dates.add(1, 'month');
+    this.updateCalendarView();
+    this.update();
+  };
+
+  this.handleDateInput = e => {
+    let clickDate = e.item.cell.date;
+    const newText = this.format(clickDate);
+    this.opts.onchange && this.opts.onchange(newText, this.opts.id);
+    this.dates = clickDate;
+    this.selectedDate = clickDate.clone();
+    this.toggle();
+    this.updateCalendarView();
   };
 
   this.handleFormSubmit = e => {
     e.preventDefault();
     this.opts.onchange && this.opts.onchange(this.opts.text, this.opts.id);
+  };
+
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    const newText = e.target.value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    this.opts.onchange && this.opts.onchange(newText, this.opts.id);
+    if(moment(newText, 'YYYY-MM-DD', true).isValid()) {
+      this.dates = moment(newText);
+      this.selectedDate = moment(newText).clone();
+      this.isShow = false;
+      this.update();
+      this.updateCalendarView();
+    } else {
+      this.selectedDate = null;
+    }
+  };
+
+  this.handleInputChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
   };
 
   this.updateCalendarView();
