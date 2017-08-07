@@ -1,13 +1,9 @@
 import moment from 'moment';
 
 export default function() {
-  this.dates = moment();
-  this.today = moment();
-  this.selectedDate = null;
-  this.isShown = false;
-  this.calendar = [];
-  this.lang = 'ja';
-  this.data = {
+  this.selectedDate = moment(this.opts.date || null);
+  this.displayDate = moment(this.opts.displaydate || {});
+  this.settingDateName = {
     'month': {
       'ja': [
         '1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'
@@ -26,26 +22,40 @@ export default function() {
     },
   };
 
-  const updateCalendarView = () => {
-    let firstDay = this.dates.clone().date(1).day();
+  this.on('update', () => {
+    this.selectedDate = moment(this.opts.date || null);
+    this.displayDate = moment(this.opts.displaydate || {});
+  });
+
+  const format = (date) => {
+    return date.format('YYYY-MM-DD');
+  };
+
+  this.generateCalendar = () => {
+    let calendar = [];
+    let firstDay = this.displayDate.clone().date(1).day();
     const MAX_DISPLAY_DAYS = 42;
 
-    this.calendar = [];
-
-    let lastMonthMaxDate = this.dates.clone().subtract(1, 'month').daysInMonth();
+    let lastMonthMaxDate = this.displayDate.clone().subtract(1, 'month').daysInMonth();
     for(let i = 1; i <= firstDay; i += 1) {
-      let lastMonth = this.dates.clone().subtract(1, 'month').date(lastMonthMaxDate - firstDay + i);
-      this.calendar[i - 1] = {
-        'date': lastMonth
+      let lastMonth = this.displayDate.clone().subtract(1, 'month').date(lastMonthMaxDate - firstDay + i);
+      calendar[i - 1] = {
+        'date': lastMonth,
+        'isCurrentMonth': false,
+        'isToday': format(lastMonth) === format(moment()),
+        'isSelected': format(lastMonth) === format(this.selectedDate)
       };
     }
 
     let lastIndex = 0;
-    let currentMonthMaxDate = this.dates.daysInMonth();
+    let currentMonthMaxDate = this.displayDate.daysInMonth();
     for(let i = 0; i < currentMonthMaxDate; i += 1) {
-      let thisMonth = this.dates.clone().date(i + 1);
-      this.calendar[firstDay + i] = {
-        'date': thisMonth
+      let thisMonth = this.displayDate.clone().date(i + 1);
+      calendar[firstDay + i] = {
+        'date': thisMonth,
+        'isCurrentMonth': true,
+        'isToday': format(thisMonth) === format(moment()),
+        'isSelected': format(thisMonth) === format(this.selectedDate)
       };
       lastIndex = firstDay + i;
     }
@@ -54,70 +64,35 @@ export default function() {
     let index = MAX_DISPLAY_DAYS - lastIndex;
 
     for(let i = 1; i <= index; i += 1) {
-      let nextMonth = this.dates.clone().add(1, 'month').date(i);
-      this.calendar[lastIndex] = {
-        'date': nextMonth
+      let nextMonth = this.displayDate.clone().add(1, 'month').date(i);
+      calendar[lastIndex] = {
+        'date': nextMonth,
+        'isCurrentMonth': false,
+        'isToday': format(nextMonth) === format(moment()),
+        'isSelected': format(nextMonth) === format(this.selectedDate)
       };
       lastIndex += 1;
     }
+
+    return calendar;
   };
 
-  this.format = date => {
-    return moment(date).format('YYYY-MM-DD');
+  this.handleNextButtonPat = () => {
+    const newDateText =  format(this.displayDate.add(1, 'month'));
+    this.opts.ondisplaychange(newDateText);
   };
 
-  this.toggle = () => {
-    this.isShown = !this.isShown;
+  this.handlePrevButtonPat = () => {
+    const newDateText = format(this.displayDate.subtract(1, 'month'));
+    this.opts.ondisplaychange(newDateText);
+  };
+
+  this.handleCellPat = (newDate) => {
+    this.opts.onchange(format(newDate));
+  };
+
+  this.handleTap = () => {
+    this.opts.ontoggle(!this.opts.isshown);
     this.refs.form.focus();
   };
-
-  this.goPrev = () => {
-    this.dates.subtract(1, 'month');
-    updateCalendarView();
-    this.update();
-  };
-
-  this.goNext = () => {
-    this.dates.add(1, 'month');
-    updateCalendarView();
-    this.update();
-  };
-
-  this.handleDateInput = e => {
-    let clickDate = e.item.cell.date;
-    const newText = this.format(clickDate);
-    this.opts.onchange && this.opts.onchange(newText, this.opts.id);
-    this.dates = clickDate;
-    this.selectedDate = clickDate.clone();
-    this.toggle();
-    updateCalendarView();
-  };
-
-  this.handleFormSubmit = e => {
-    e.preventDefault();
-    this.opts.onchange && this.opts.onchange(this.opts.text, this.opts.id);
-  };
-
-  this.handleInputInput = e => {
-    e.preventUpdate = true;
-    const newText = e.target.value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
-    this.opts.onchange && this.opts.onchange(newText, this.opts.id);
-    if(moment(newText, 'YYYY-MM-DD', true).isValid()) {
-      this.dates = moment(newText);
-      this.selectedDate = moment(newText).clone();
-      this.isShown = false;
-      this.update();
-      updateCalendarView();
-    } else {
-      this.selectedDate = null;
-    }
-  };
-
-  this.handleInputChange = e => {
-    // `blur`時に`change`イベントが発火する。
-    // 不都合な挙動なのでイベント伝播を止める。
-    e.stopPropagation();
-  };
-
-  updateCalendarView();
 }

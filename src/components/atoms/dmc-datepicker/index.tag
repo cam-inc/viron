@@ -1,17 +1,19 @@
 dmc-datepicker.Datepicker
   .Datepicker__label(if="{ !!opts.label }") { opts.label }
-  form(ref="form" onSubmit="{ handleFormSubmit }")
-    input.Datepicker__input(onclick="{ toggle }" value="{ opts.text }" placeholder="{ opts.placeholder || '' }" pattern="{ opts.pattern }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
-    .Datepicker__calendar(if="{ isShown }")
+  form.Datapicker__form(ref="form" onSubmit="{ handleFormSubmit }")
+    input.Datepicker__input(onTap="handleTap" ref="touch" value="{ opts.date }" placeholder="{ opts.placeholder || '' }" readonly="readonly" pattern="{ opts.pattern }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
+    .Datepicker__calendar(if="{ opts.isshown }")
       .Datapicker__head
-        span.Datapicker__trans(onclick="{ this.goPrev }") <
-        span.Datapicker__month { dates.year() } 
-          b { data.month[lang][dates.month()] }
-        span.Datapicker__trans(onclick="{ this.goNext }") >
+        span.Datapicker__transition(onclick="{ handlePrevButtonPat }") <
+        span.Datapicker__month { displayDate.year() } 
+          b { settingDateName.month[opts.language][displayDate.month()] }
+        span.Datapicker__transition(onclick="{ handleNextButtonPat }") >
       .Datapicker__days
-        span(each="{ day, index in data.days[lang] }" class="{ (index == 0) ? 'Datapicker__days--sunday' : '' } { (index == 6) ? 'Datapicker__days--saturday' : '' }") { day }
+        span(each="{ day, index in settingDateName.days[opts.language] }" class="{ (index == 0) ? 'Datapicker__days--sunday' : '' } { (index == 6) ? 'Datapicker__days--saturday' : '' }") { day }
       .Datapicker__container
-        .Datapicker__cell(onclick="{ handleDateInput }" each="{ cell in calendar }" class="{ (cell.date.month() !== dates.month()) ? 'Datapicker__cell--secondary' : '' } { ( this.format(cell.date) === this.format(today) ) ? 'Datapicker__cell--today' : '' } { ( this.format(cell.date) === this.format(this.selectedDate) ) ? 'Datapicker__cell--select' : '' }") { cell.date.date() }
+        virtual(each="{ cell in generateCalendar() }")
+          dmc-datepicker-cell(date="{ cell }" onCellPat="{ handleCellPat }")
   script.
+    import '../../atoms/dmc-datepicker/dmc-datepicker-cell.tag';
     import script from './index';
     this.external(script);
