@@ -1,7 +1,7 @@
 dmc-datepicker.Datepicker
   .Datepicker__label(if="{ !!opts.label }") { opts.label }
   form.Datapicker__form(ref="form" onSubmit="{ handleFormSubmit }")
-    input.Datepicker__input(onTap="handleTap" ref="touch" value="{ opts.date }" placeholder="{ opts.placeholder || '' }" readonly="readonly" pattern="{ opts.pattern }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
+    input.Datepicker__input(onTap="handleTap" ref="touch" value="{ opts.date }" placeholder="{ opts.placeholder || '' }" readonly="readonly" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
     .Datepicker__calendar(if="{ opts.isshown }")
       .Datapicker__head
         span.Datapicker__transition(onclick="{ handlePrevButtonPat }") &lt;
