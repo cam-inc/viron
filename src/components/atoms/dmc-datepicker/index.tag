@@ -12,7 +12,7 @@ dmc-datepicker.Datepicker
         span(each="{ day, index in settingDateName.days[opts.language || 'ja'] }" class="{ (index === 0) ? 'Datapicker__days--sunday' : '' } { (index === 6) ? 'Datapicker__days--saturday' : '' }") { day }
       .Datapicker__container
         virtual(each="{ cell in generateCalendar() }")
-          dmc-datepicker-cell(date="{ cell }" onCellPat="{ handleCellPat }")
+          dmc-datepicker-cell(date="{ cell.date }" isCurrentMonth="{ cell.isCurrentMonth }" isToday="{ cell.isToday }" isSelected="{ cell.isSelected }" onCellPat="{ handleCellPat }")
   script.
     import '../../atoms/dmc-datepicker/cell.tag';
     import script from './index';
