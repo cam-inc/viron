@@ -1,176 +1,150 @@
-.Tooltip {
-  background-color: var(--color-basic-gray);
-  padding: 5px 5px;
-  border-radius: 6px;
-  position: absolute;
-  animation: TooltipIn 0.5s ease 0s 1 normal;
-}
+/*
+TODO: 各数値の変数化
+*/
 
-.Tooltip__text {
-  display: inline-block;
+.Tooltip {
+  width: 0px;
+  height: 0px;
+  position: relative;
 }
 
 /*擬似クラス（吹き出しの三角）*/
+
 .Tooltip::after {
   content: "";
   position: absolute;
   border-style: solid;
 }
 
+/*擬似クラス　topRight,topLeft,topCenter*/
+
+.Tooltip--topRight::after,
+.Tooltip--topLeft::after,
+.Tooltip--topCenter::after {
+  bottom: -5px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-color: var(--color-basic-darkGray) transparent transparent transparent;
+}
+
+/*擬似クラス　bottomRight,bottomLeft,bottomCenter*/
+
+.Tooltip--bottomRight::after,
+.Tooltip--bottomLeft::after,
+.Tooltip--bottomCenter::after {
+  left: -5px;
+  top: -5px;
+  border-width: 5px;
+  border-color: transparent transparent var(--color-basic-darkGray) transparent;
+}
+
+/*擬似クラス　rightTop,rightBottom*/
+
+.Tooltip--rightTop::after,
+.Tooltip--rightBottom::after {
+  left: -5px;
+  margin-top: -5px;
+  border-width: 5px;
+  border-color: transparent var(--color-basic-darkGray) transparent transparent;
+}
+
+/*擬似クラス　leftTop,leftBotto*/
+
+.Tooltip--leftTop::after,
+.Tooltip--leftBottom::after {
+  left: -5px;
+  margin-top: -5px;
+  border-width: 5px;
+  border-color: transparent transparent transparent var(--color-basic-darkGray);
+}
+
+/*Tooltip__text*/
+
+.Tooltip__text {
+  color: var(--color-basic-white);
+  display: inline-block;
+  position: absolute;
+  background-color: var(--color-basic-darkGray);
+  padding: 5px 5px;
+  border-radius: 5px;
+  animation: TooltipIn 0.5s ease 0s 1 normal;
+}
+
 /*アニメーション*/
+
 @keyframes TooltipIn {
     0% {opacity: 0}
     100% {opacity: 1}
 }
 
-/*Tooltip　上中央寄せ*/
-.Tooltip--top__center,
-.Tooltip--top__right,
-.Tooltip--top__left {
-  bottom: 200%;
+/*表示位置指定　上下　topRight,topLeft*/
+
+.Tooltip--topRight .Tooltip__text,
+.Tooltip--topLeft .Tooltip__text {
+  bottom: 5px;
 }
 
-.Tooltip--top__center::after,
-.Tooltip--top__right::after,
-.Tooltip--top__left::after {
-  top: 100%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-color: var(--color-basic-gray) transparent transparent transparent;
+/*表示位置指定　上下　bottomRight,bottomLeft*/
+
+.Tooltip--bottomRight .Tooltip__text,
+.Tooltip--bottomLeft .Tooltip__text {
+  top: 5px;
 }
 
-.Tooltip--top__center::after {
-  left: 50%;
+/*中央配置 topCenter,bottomCenter*/
+
+.Tooltip--topCenter .Tooltip__text {
+  bottom: 0px;
+  padding: 5px 0px;
+  background-color: transparent;
 }
 
-/*Tooltip 上右寄せ*/
-.Tooltip--top__right {
-  right: -10px;
+.Tooltip--bottomCenter .Tooltip__text {
+  left: 0px;
+  padding: 5px 0px;
+  background-color: transparent;
 }
 
-.Tooltip--top__right::after {
-  right: 10px;
+.Tooltip--topCenter .Tooltip__text .Tooltip--centerHorizontal,
+.Tooltip--bottomCenter .Tooltip__text .Tooltip--centerHorizontal {
+  position: relative;
+  margin-left: -50%;
+  background-color: var(--color-basic-darkGray);
+  padding: 5px 5px;
+  border-radius: 5px;
+  display: inline-block;
 }
 
-/*Tooltip 上左寄せ*/
-.Tooltip--top__left {
-  left: -10px;
+/*表示位置指定　左右　topRight,bottomRight*/
+
+.Tooltip--topRight .Tooltip__text,
+.Tooltip--bottomRight .Tooltip__text {
+  right: -15px;
 }
 
-.Tooltip--top__left::after {
-  left: 15px;
+.Tooltip--topLeft .Tooltip__text,
+.Tooltip--bottomLeft .Tooltip__text {
+  left: -15px;
 }
 
-.Tooltip--bottom__center,
-.Tooltip--bottom__right,
-.Tooltip--bottom__left {
-  top: 150%;
+/*表示位置指定　rightTop,leftTop,rightBottom,leftBottom*/
+
+.Tooltip--rightTop .Tooltip__text {
+  top: -10px;
+  left: 5px;
 }
 
-.Tooltip--bottom__center::after,
-.Tooltip--bottom__right::after,
-.Tooltip--bottom__left::after {
-  bottom: 100%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-color: transparent transparent var(--color-basic-gray) transparent;
+.Tooltip--leftTop .Tooltip__text {
+  top: -10px;
+  right: 5px;
 }
 
-/*Tooltip　下中央寄せ*/
-.Tooltip--bottom__center::after {
-  left: 50%;
-}
-
-/*Tooltip　下右寄せ*/
-.Tooltip--bottom__right {
-  right: -10px;
-}
-
-.Tooltip--bottom__right::after {
-  right: 10px;
-}
-
-/*Tooltip　下左寄せ*/
-.Tooltip--bottom__left {
-  left: -10px;
-}
-
-.Tooltip--bottom__left::after {
-  left: 15px;
-}
-
-.Tooltip--right__top,
-.Tooltip--right__center,
-.Tooltip--right__bottom {
-  left: 150%;
-}
-
-.Tooltip--right__center::after,
-.Tooltip--right__top::after,
-.Tooltip--right__bottom::after {
-  right: 100%;
-  margin-top: -5px;
-  border-width: 5px;
-  border-color: transparent var(--color-basic-gray) transparent transparent;
-}
-
-/*Tooltip 右中央寄せ*/
-.Tooltip--right__center::after {
-  top: 50%;
-}
-
-/*Tooltip 右上寄せ*/
-.Tooltip--right__top {
+.Tooltip--rightBottom .Tooltip__text {
   top: -15px;
+  left: 5px;
 }
 
-.Tooltip--right__top::after{
-  top: 15px;
-}
-
-/*Tooltip 右下寄せ*/
-.Tooltip--right__bottom {
-  bottom: -10px;
-}
-
-.Tooltip--right__bottom::after {
-  bottom: 10px;
-}
-
-.Tooltip--left__top,
-.Tooltip--left__center,
-.Tooltip--left__bottom {
-  right: 150%;
-}
-
-.Tooltip--left__center::after,
-.Tooltip--left__top::after,
-.Tooltip--left__bottom::after {
-  left: 100%;
-  margin-top: -5px;
-  border-width: 5px;
-  border-color: transparent transparent transparent var(--color-basic-gray);
-}
-
-/*Tooltip　左中央寄せ*/
-.Tooltip--left__center::after {
-  top: 50%;
-}
-
-/*Tooltip 左上寄せ*/
-.Tooltip--left__top {
+.Tooltip--leftBottom .Tooltip__text {
   top: -15px;
-}
-
-.Tooltip--left__top::after{
-  top: 15px;
-}
-
-/*Tooltip 左下寄せ*/
-.Tooltip--left__bottom {
-  bottom: -10px;
-}
-
-.Tooltip--left__bottom::after {
-  bottom: 10px;
+  right: 5px;
 }
