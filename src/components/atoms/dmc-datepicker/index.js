@@ -1,4 +1,5 @@
 import moment from 'moment';
+import times from 'mout/function/times';
 
 export default function() {
   this.selectedDate = moment(this.opts.date || null);
@@ -32,39 +33,40 @@ export default function() {
   };
 
   this.generateCalendar = () => {
-    let calendar = [];
-    let firstDay = this.displayDate.clone().date(1).day();
+    const calendar = [];
     const MAX_DISPLAY_DAYS = 42;
+    const firstDayIndex = this.displayDate.clone().date(1).day();
+    const lastMonthMaxDate = this.displayDate.clone().subtract(1, 'month').daysInMonth();
+    const currentMonthMaxDate = this.displayDate.daysInMonth();
 
-    let lastMonthMaxDate = this.displayDate.clone().subtract(1, 'month').daysInMonth();
-    for(let i = 1; i <= firstDay; i += 1) {
-      let lastMonth = this.displayDate.clone().subtract(1, 'month').date(lastMonthMaxDate - firstDay + i);
+    times(firstDayIndex, (i) => {
+      i += 1;
+      const lastMonth = this.displayDate.clone().subtract(1, 'month').date(lastMonthMaxDate - firstDayIndex + i);
       calendar[i - 1] = {
         'date': lastMonth,
         'isCurrentMonth': false,
         'isToday': format(lastMonth) === format(moment()),
         'isSelected': format(lastMonth) === format(this.selectedDate)
       };
-    }
+    });
 
     let lastIndex = 0;
-    let currentMonthMaxDate = this.displayDate.daysInMonth();
-    for(let i = 0; i < currentMonthMaxDate; i += 1) {
+    times(currentMonthMaxDate, (i) => {
       let thisMonth = this.displayDate.clone().date(i + 1);
-      calendar[firstDay + i] = {
+      calendar[firstDayIndex + i] = {
         'date': thisMonth,
         'isCurrentMonth': true,
         'isToday': format(thisMonth) === format(moment()),
         'isSelected': format(thisMonth) === format(this.selectedDate)
       };
-      lastIndex = firstDay + i;
-    }
+      lastIndex = firstDayIndex + i;
+    });
 
     lastIndex += 1;
     let index = MAX_DISPLAY_DAYS - lastIndex;
-
-    for(let i = 1; i <= index; i += 1) {
-      let nextMonth = this.displayDate.clone().add(1, 'month').date(i);
+    times(index, (i) => {
+      i += 1;
+      const nextMonth = this.displayDate.clone().add(1, 'month').date(i);
       calendar[lastIndex] = {
         'date': nextMonth,
         'isCurrentMonth': false,
@@ -72,7 +74,7 @@ export default function() {
         'isSelected': format(nextMonth) === format(this.selectedDate)
       };
       lastIndex += 1;
-    }
+    });
 
     return calendar;
   };
