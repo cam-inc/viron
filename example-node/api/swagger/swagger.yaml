@@ -2263,6 +2263,9 @@ paths:
       - appendTo: row
         method: delete
         path: /user/{id}
+      - appendTo: ""
+        method: post
+        path: /user/upload/csv
     post:
       x-swagger-router-controller: user
       description: create a user
@@ -2295,6 +2298,32 @@ paths:
       - jwt:
         - api:access
       summary: create user
+      tags:
+      - user
+  /user/upload/csv:
+    post:
+      x-swagger-router-controller: user
+      description: upload user data
+      operationId: user#upload
+      parameters:
+      - in: formData
+        name: payload
+        required: true
+        type: file
+      consumes:
+      - "multipart/form-data"
+        #- "application/x-www-form-urlencoded"
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: upload users
       tags:
       - user
   /user/{id}:
