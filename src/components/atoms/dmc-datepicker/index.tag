@@ -6,10 +6,10 @@ dmc-datepicker.Datepicker
       .Datapicker__head
         span.Datapicker__transition(onclick="{ handlePrevButtonPat }") <
         span.Datapicker__month { displayDate.year() } 
-          b { settingDateName.month[opts.language][displayDate.month()] }
+          b { settingDateName.month[opts.language || 'ja'][displayDate.month()] }
         span.Datapicker__transition(onclick="{ handleNextButtonPat }") >
       .Datapicker__days
-        span(each="{ day, index in settingDateName.days[opts.language] }" class="{ (index == 0) ? 'Datapicker__days--sunday' : '' } { (index == 6) ? 'Datapicker__days--saturday' : '' }") { day }
+        span(each="{ day, index in settingDateName.days[opts.language || 'ja'] }" class="{ (index == 0) ? 'Datapicker__days--sunday' : '' } { (index == 6) ? 'Datapicker__days--saturday' : '' }") { day }
       .Datapicker__container
         virtual(each="{ cell in generateCalendar() }")
           dmc-datepicker-cell(date="{ cell }" onCellPat="{ handleCellPat }")
