@@ -1,16 +1,16 @@
 dmc-datepicker.Datepicker
   .Datepicker__label(if="{ !!opts.label }") { opts.label }
-  form.Datapicker__form(ref="form" onSubmit="{ handleFormSubmit }")
+  form.Datepicker__form(ref="form" onSubmit="{ handleFormSubmit }")
     input.Datepicker__input(onTap="handleTap" ref="touch" value="{ opts.date }" placeholder="{ opts.placeholder || '' }" readonly="readonly" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
     .Datepicker__calendar(if="{ opts.isshown }")
-      .Datapicker__head
-        span.Datapicker__transition(onTap="handlePrevButtonPat" ref="touch") &lt;
-        span.Datapicker__month { displayDate.year() } 
-          b { settingDateName.month[opts.language || 'ja'][displayDate.month()] }
-        span.Datapicker__transition(onTap="handleNextButtonPat" ref="touch") &gt;
-      .Datapicker__days
-        span(each="{ day, index in settingDateName.days[opts.language || 'ja'] }" class="{ (index === 0) ? 'Datapicker__days--sunday' : '' } { (index === 6) ? 'Datapicker__days--saturday' : '' }") { day }
-      .Datapicker__container
+      .Datepicker__head
+        .Datepicker__transition(onTap="handlePrevButtonPat" ref="touch") &lt;
+        .Datepicker__month { displayDate.year() } 
+          span { settingDateName.month[opts.language || 'ja'][displayDate.month()] }
+        .Datepicker__transition(onTap="handleNextButtonPat" ref="touch") &gt;
+      .Datepicker__days
+        .Datepicker__day(each="{ day, index in settingDateName.days[opts.language || 'ja'] }" class="{ (index === 0) ? 'Datepicker__day--sunday' : '' } { (index === 6) ? 'Datepicker__day--saturday' : '' }") { day }
+      .Datepicker__container
         virtual(each="{ cell in generateCalendar() }")
           dmc-datepicker-cell(date="{ cell.date }" isCurrentMonth="{ cell.isCurrentMonth }" isToday="{ cell.isToday }" isSelected="{ cell.isSelected }" onCellPat="{ handleCellPat }")
   script.
