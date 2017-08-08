@@ -18,7 +18,6 @@ services:
     volumes:
       - $PWD/package.json:/example-node/package.json
       - $PWD/shared:/example-node/shared
-      - $PWD/lib:/example-node/lib
       - $PWD/api:/example-node/api
       - $PWD/config:/example-node/config
       - $PWD/app.js:/example-node/app.js

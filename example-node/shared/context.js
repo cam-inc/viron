@@ -1,4 +1,4 @@
-const lib = require('../lib');
+const dmclib = require('node-dmclib');
 
 const config = require('./config');
 const stores = require('./stores');
@@ -19,7 +19,7 @@ class Context {
       })
       .then(() => {
         const store = this.getStoreMain();
-        return lib.adminRole.init(store.models.AdminRoles, this.getDefaultRole());
+        return dmclib.adminRole.init(store.models.AdminRoles, this.getDefaultRole());
       })
     ;
   }

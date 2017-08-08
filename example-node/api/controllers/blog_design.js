@@ -1,5 +1,6 @@
-const pager = require('../../lib/pager');
-const storeHelper = require('../../lib/stores').helper;
+const dmclib = require('node-dmclib');
+const pager = dmclib.pager;
+const storeHelper = dmclib.stores.helper;
 
 const shared = require('../../shared');
 

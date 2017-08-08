@@ -1,3 +1,3 @@
-const lib = require('../../lib');
+const dmclib = require('node-dmclib');
 
-module.exports = lib.errorHandler;
+module.exports = dmclib.errorHandler;
