@@ -20,14 +20,13 @@
   cursor: pointer;
 }
 
-.Datapicker__form {
+.Datepicker__form {
   position: relative;
 }
 
 .Datepicker__calendar {
   width: 260px;
-  height: auto;
-  margin-top: 2px;
+  user-select: none;
   background-color: var(--color-bg-base);
   border: 1px solid var(--color-basic-gray);
   color: var(--color-text-default);
@@ -39,78 +38,77 @@
   left: 0;
 }
 
-.Datapicker__transition {
+.Datepicker__transition {
   padding: 6px 10px;
   cursor: pointer;
 }
 
-.Datapicker__transition:hover {
+.Datepicker__transition:hover {
   color: var(--color-text-anchor);
 }
 
-.Datapicker__head {
+.Datepicker__head {
   font-size: 16px;
-  padding-bottom: 2px;
+  margin-bottom: 2px;
   @apply --layout-between-center;
 }
 
-.Datapicker__month {
+.Datepicker__month {
   font-weight: 500;
   color: var(--color-text-primary);
 }
 
-.Datapicker__month > b {
+.Datepicker__month > span {
   font-weight: 700;
 }
 
-.Datapicker__days {
+.Datepicker__days {
   font-size: 12px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 1fr;
+  margin-bottom:  4px;
   color: var(--color-text-secondary);
-  @apply --layout-between-center;
 }
 
-.Datapicker__days > span {
-  width: 40px;
-  height: 26px;
+.Datepicker__day {
   font-weight: 700;
 }
 
-.Datapicker__days--sunday {
+.Datepicker__day--sunday {
   color: var(--color-text-accent);
 }
 
-.Datapicker__days--saturday {
+.Datepicker__day--saturday {
   color: var(--color-text-anchor);
 }
 
-.Datapicker__container {
+.Datepicker__container {
   display: grid;
-  grid-template-columns: repeat(7, [col-start] 1fr [col-end]);
-  grid-template-rows: repeat(6, [col-start] 1fr [col-end]);
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 20px);
+  align-items: stretch;
+  justify-items: stretch;
 }
 
-.Datapicker__cell {
-  height: 20px;
-  line-height: 20px;
+.Datepicker__cell {
   border-radius: 4px;
+  @apply --layout-center-center;
 }
 
-.Datapicker__cell--today {
+.Datepicker__cell--today {
   background-color: var(--color-bg-successLight);
 }
 
-.Datapicker__cell--select {
+.Datepicker__cell--selected {
   background-color: var(--color-bg-infoLight);
 }
 
-.Datapicker__cell--secondary {
-  height: 20px;
-  line-height: 20px;
-  border-radius: 4px;
+.Datepicker__cell--secondary {
   color: var(--color-text-secondary);
 }
 
-.Datapicker__cell:hover {
+.Datepicker__cell:hover {
   background-color: var(--color-bg-tertiaryLight);
   cursor: pointer;
 }
