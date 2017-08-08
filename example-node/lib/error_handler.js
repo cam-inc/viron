@@ -37,7 +37,7 @@ module.exports = () => {
       }
     }
 
-    console.log(util.inspect(debug));
+    console.error(util.inspect(debug));
     delete context.error; // これをしないとjsonで返せない
     next(null, JSON.stringify(debug));
   };
