@@ -95,7 +95,7 @@ export default function() {
     this.opts.onchange(format(newDate));
   };
 
-  this.handleTap = () => {
+  this.handleInputTap = () => {
     this.opts.ontoggle(!this.opts.isshown);
   };
 }
