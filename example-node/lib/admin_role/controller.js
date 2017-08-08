@@ -93,7 +93,7 @@ const registerCreate = (AdminRoles, store) => {
 const registerGet = AdminRoles => {
   return (req, res) => {
     const roleId = req.swagger.params.role_id.value;
-    AdminRoles.findAll({where: {role_id: roleId}})
+    return AdminRoles.findAll({where: {role_id: roleId}})
       .then(list => {
         const paths = list.map(role => {
           return {allow: true, path: `${role.method}:/${role.resource}`};
@@ -115,7 +115,7 @@ const registerGet = AdminRoles => {
 const registerRemove = AdminRoles => {
   return (req, res) => {
     const roleId = req.swagger.params.role_id.value;
-    AdminRoles.destroy({where: {role_id: roleId}, force: true})
+    return AdminRoles.destroy({where: {role_id: roleId}, force: true})
       .then(() => {
         res.status(204).end();
       })

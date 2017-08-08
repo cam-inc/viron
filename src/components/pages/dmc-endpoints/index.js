@@ -5,6 +5,7 @@ import { constants as states } from '../../../store/states';
 import '../../atoms/dmc-message/index.tag';
 import './edit.tag';
 import './entry.tag';
+import './qrcode.tag';
 import './signin.tag';
 
 export default function() {
@@ -105,6 +106,19 @@ export default function() {
       .then(() => store.action(actions.ENDPOINTS_REMOVE, key))
       .then(() => store.action(actions.TOASTS_ADD, {
         message: 'エンドポイントを削除しました。'
+      }))
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleEndpointQrCode = (key, url, memo) => {
+    Promise
+      .resolve()
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-endpoint-qrcode', {
+        endpointKey: key,
+        url,
+        memo
       }))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err

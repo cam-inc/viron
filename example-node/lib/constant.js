@@ -18,4 +18,6 @@ module.exports = {
   DMC_SECTION_MANAGE: 'manage', // 管理セクション
 
   DMC_SUPER_ROLE: 'super',
+
+  DEFAULT_PAGER_LIMIT: 100, // リストビュー1ページあたりの表示件数
 };

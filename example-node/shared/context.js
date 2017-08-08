@@ -1,3 +1,4 @@
+const lib = require('../lib');
 
 const config = require('./config');
 const stores = require('./stores');
@@ -16,6 +17,10 @@ class Context {
       .then(conf => {
         return this.initStore(conf.stores);
       })
+      .then(() => {
+        const store = this.getStoreMain();
+        return lib.adminRole.init(store.models.AdminRoles, this.getDefaultRole());
+      })
     ;
   }
 
@@ -31,6 +36,7 @@ class Context {
             instance,
             functions: store.functions,
             models: store.functions.defineModels && store.functions.defineModels(instance, store.models),
+            helper: store.helper,
           };
 
           // TODO: logger

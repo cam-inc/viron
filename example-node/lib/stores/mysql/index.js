@@ -1,6 +1,5 @@
-const reduce = require('mout/object/reduce');
-
 const models = require('./models');
+const helper = require('./helper');
 
 const initModel = model => {
   return new Promise((resolve, reject) => {
@@ -28,7 +27,7 @@ const initModels = sequelize => {
         resolve(sequelize);
       })
       .catch(reject)
-      ;
+    ;
   });
 };
 
@@ -37,6 +36,11 @@ module.exports = {
    * Model Define
    */
   models: models,
+
+  /**
+   * Helper functions
+   */
+  helper: helper,
 
   /**
    * 初期化
@@ -50,33 +54,7 @@ module.exports = {
       .then(sequelize => {
         return initModels(sequelize);
       })
-      ;
-  },
-
-  functions: {
-    /**
-     * 接続テスト
-     */
-    ping: sequelize => {
-      return sequelize.authenticate();
-    },
-    /**
-     * オプション取得
-     */
-    getOptions: sequelize => {
-      return sequelize.config;
-    },
-    /**
-     * モデル生成
-     */
-    defineModels: (sequelize, models) => {
-      return reduce(models, (ret, model, name) => {
-        if (typeof model === 'function') {
-          ret[name] = model(sequelize);
-        }
-        return ret;
-      }, {});
-    },
+    ;
   },
 
 };
