@@ -57,6 +57,7 @@
     "content-disposition": "^0.5.2",
     "downloadjs": "^1.4.7",
     "esr": "^0.9.2",
+    "moment": "^2.18.1",
     "marked": "^0.3.6",
     "mout": "^1.0.0",
     "object-assign": "^4.1.1",
