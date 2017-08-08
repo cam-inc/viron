@@ -14,6 +14,6 @@ dmc-datepicker.Datepicker
         virtual(each="{ cell in generateCalendar() }")
           dmc-datepicker-cell(date="{ cell }" onCellPat="{ handleCellPat }")
   script.
-    import '../../atoms/dmc-datepicker/dmc-datepicker-cell.tag';
+    import '../../atoms/dmc-datepicker/cell.tag';
     import script from './index';
     this.external(script);

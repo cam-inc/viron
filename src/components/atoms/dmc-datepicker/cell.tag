@@ -2,5 +2,5 @@ dmc-datepicker-cell.Datapicker__cell(onTap="handleTap" ref="touch" class="{(opts
   virtual { date.date() }
 
   script.
-    import script from './dmc-datepicker-cell';
+    import script from './cell';
     this.external(script);
