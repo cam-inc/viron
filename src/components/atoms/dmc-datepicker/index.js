@@ -26,6 +26,8 @@ export default function() {
   this.on('update', () => {
     this.selectedDate = moment(this.opts.date || null);
     this.displayDate = moment(this.opts.displaydate || {});
+  }).on('updated', () => {
+    this.rebindTouchEvents();
   });
 
   const format = (date) => {
