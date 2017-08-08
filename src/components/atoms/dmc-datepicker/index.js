@@ -95,6 +95,5 @@ export default function() {
 
   this.handleTap = () => {
     this.opts.ontoggle(!this.opts.isshown);
-    this.refs.form.focus();
   };
 }
