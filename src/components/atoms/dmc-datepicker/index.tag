@@ -9,7 +9,7 @@ dmc-datepicker.Datepicker
           b { settingDateName.month[opts.language || 'ja'][displayDate.month()] }
         span.Datapicker__transition(onTap="handleNextButtonPat" ref="touch") &gt;
       .Datapicker__days
-        span(each="{ day, index in settingDateName.days[opts.language || 'ja'] }" class="{ (index == 0) ? 'Datapicker__days--sunday' : '' } { (index == 6) ? 'Datapicker__days--saturday' : '' }") { day }
+        span(each="{ day, index in settingDateName.days[opts.language || 'ja'] }" class="{ (index === 0) ? 'Datapicker__days--sunday' : '' } { (index === 6) ? 'Datapicker__days--saturday' : '' }") { day }
       .Datapicker__container
         virtual(each="{ cell in generateCalendar() }")
           dmc-datepicker-cell(date="{ cell }" onCellPat="{ handleCellPat }")
