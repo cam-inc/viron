@@ -1,14 +1,22 @@
+/*
+TODO: 各数値の変数化
+*/
+
 .Tooltip {
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
   position: relative;
 }
+
+/*擬似クラス（吹き出しの三角）*/
 
 .Tooltip::after {
   content: "";
   position: absolute;
   border-style: solid;
 }
+
+/*擬似クラス　topRight,topLeft,topCenter*/
 
 .Tooltip--topRight::after,
 .Tooltip--topLeft::after,
@@ -19,6 +27,8 @@
   border-color: var(--color-basic-darkGray) transparent transparent transparent;
 }
 
+/*擬似クラス　bottomRight,bottomLeft,bottomCenter*/
+
 .Tooltip--bottomRight::after,
 .Tooltip--bottomLeft::after,
 .Tooltip--bottomCenter::after {
@@ -28,6 +38,8 @@
   border-color: transparent transparent var(--color-basic-darkGray) transparent;
 }
 
+/*擬似クラス　rightTop,rightBottom*/
+
 .Tooltip--rightTop::after,
 .Tooltip--rightBottom::after {
   left: -5px;
@@ -36,6 +48,8 @@
   border-color: transparent var(--color-basic-darkGray) transparent transparent;
 }
 
+/*擬似クラス　leftTop,leftBotto*/
+
 .Tooltip--leftTop::after,
 .Tooltip--leftBottom::after {
   left: -5px;
@@ -43,6 +57,8 @@
   border-width: 5px;
   border-color: transparent transparent transparent var(--color-basic-darkGray);
 }
+
+/*Tooltip__text*/
 
 .Tooltip__text {
   color: var(--color-basic-white);
@@ -54,30 +70,38 @@
   animation: TooltipIn 0.5s ease 0s 1 normal;
 }
 
+/*アニメーション*/
+
 @keyframes TooltipIn {
     0% {opacity: 0}
     100% {opacity: 1}
 }
+
+/*表示位置指定　上下　topRight,topLeft*/
 
 .Tooltip--topRight .Tooltip__text,
 .Tooltip--topLeft .Tooltip__text {
   bottom: 5px;
 }
 
+/*表示位置指定　上下　bottomRight,bottomLeft*/
+
 .Tooltip--bottomRight .Tooltip__text,
 .Tooltip--bottomLeft .Tooltip__text {
   top: 5px;
 }
 
+/*中央配置 topCenter,bottomCenter*/
+
 .Tooltip--topCenter .Tooltip__text {
-  bottom: 0px;
-  padding: 5px 0px;
+  bottom: 0;
+  padding: 5px 0;
   background-color: transparent;
 }
 
 .Tooltip--bottomCenter .Tooltip__text {
-  left: 0px;
-  padding: 5px 0px;
+  left: 0;
+  padding: 5px 0;
   background-color: transparent;
 }
 
@@ -91,6 +115,8 @@
   display: inline-block;
 }
 
+/*表示位置指定　左右　topRight,bottomRight*/
+
 .Tooltip--topRight .Tooltip__text,
 .Tooltip--bottomRight .Tooltip__text {
   right: -15px;
@@ -100,6 +126,8 @@
 .Tooltip--bottomLeft .Tooltip__text {
   left: -15px;
 }
+
+/*表示位置指定　rightTop,leftTop,rightBottom,leftBottom*/
 
 .Tooltip--rightTop .Tooltip__text {
   top: -10px;
