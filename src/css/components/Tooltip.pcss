@@ -63,51 +63,50 @@ TODO: 各数値の変数化
   border-color: transparent transparent transparent var(--color-basic-darkGray);
 }
 
-/*Tooltip__container*/
+/*Tooltip__basePoint*/
 
-.Tooltip__container {
-  color: var(--color-basic-white);
-  display: inline-block;
+.Tooltip__basePoint {
   position: absolute;
-  background-color: var(--color-basic-darkGray);
-  padding: 5px;
-  border-radius: 5px;
 }
 
-/*Tooltip__container--centerHorizontal*/
-.Tooltip--topCenter .Tooltip__text,
-.Tooltip--bottomCenter .Tooltip__text {
+.Tooltip__text {
   position: relative;
-  margin-left: -50%;
+  color: var(--color-basic-white);
   background-color: var(--color-basic-darkGray);
   padding: 5px;
   border-radius: 5px;
   display: inline-block;
+}
+
+/*Tooltip--Center Tooltip__text*/
+.Tooltip--topCenter .Tooltip__text,
+.Tooltip--bottomCenter .Tooltip__text {
+  margin-left: -50%;
 }
 
 /*表示位置指定　上下　topRight,topLeft*/
 
-.Tooltip--topRight .Tooltip__container,
-.Tooltip--topLeft .Tooltip__container {
+.Tooltip--topRight .Tooltip__basePoint,
+.Tooltip--topLeft .Tooltip__basePoint {
   bottom: 5px;
 }
 
 /*表示位置指定　上下　bottomRight,bottomLeft*/
 
-.Tooltip--bottomRight .Tooltip__container,
-.Tooltip--bottomLeft .Tooltip__container {
+.Tooltip--bottomRight .Tooltip__basePoint,
+.Tooltip--bottomLeft .Tooltip__basePoint {
   top: 5px;
 }
 
 /*中央配置 topCenter,bottomCenter*/
 
-.Tooltip--topCenter .Tooltip__container {
+.Tooltip--topCenter .Tooltip__basePoint {
   bottom: 0;
   padding: 5px 0;
   background-color: transparent;
 }
 
-.Tooltip--bottomCenter .Tooltip__container {
+.Tooltip--bottomCenter .Tooltip__basePoint {
   left: 0;
   padding: 5px 0;
   background-color: transparent;
@@ -115,34 +114,34 @@ TODO: 各数値の変数化
 
 /*表示位置指定　左右　topRight,bottomRight*/
 
-.Tooltip--topRight .Tooltip__container,
-.Tooltip--bottomRight .Tooltip__container {
+.Tooltip--topRight .Tooltip__basePoint,
+.Tooltip--bottomRight .Tooltip__basePoint {
   right: -15px;
 }
 
-.Tooltip--topLeft .Tooltip__container,
-.Tooltip--bottomLeft .Tooltip__container {
+.Tooltip--topLeft .Tooltip__basePoint,
+.Tooltip--bottomLeft .Tooltip__basePoint {
   left: -15px;
 }
 
 /*表示位置指定　rightTop,leftTop,rightBottom,leftBottom*/
 
-.Tooltip--rightTop .Tooltip__container {
+.Tooltip--rightTop .Tooltip__basePoint {
   top: -10px;
   left: 5px;
 }
 
-.Tooltip--leftTop .Tooltip__container {
+.Tooltip--leftTop .Tooltip__basePoint {
   top: -10px;
   right: 5px;
 }
 
-.Tooltip--rightBottom .Tooltip__container {
+.Tooltip--rightBottom .Tooltip__basePoint {
   top: -15px;
   left: 5px;
 }
 
-.Tooltip--leftBottom .Tooltip__container {
+.Tooltip--leftBottom .Tooltip__basePoint {
   top: -15px;
   right: 5px;
 }
