@@ -6,6 +6,14 @@ TODO: 各数値の変数化
   width: 0;
   height: 0;
   position: relative;
+  animation: TooltipIn 0.5s ease 0s 1 normal;
+}
+
+/*アニメーション*/
+
+@keyframes TooltipIn {
+    0% {opacity: 0}
+    100% {opacity: 1}
 }
 
 /*擬似クラス（吹き出しの三角）*/
@@ -67,14 +75,6 @@ TODO: 各数値の変数化
   background-color: var(--color-basic-darkGray);
   padding: 5px 5px;
   border-radius: 5px;
-  animation: TooltipIn 0.5s ease 0s 1 normal;
-}
-
-/*アニメーション*/
-
-@keyframes TooltipIn {
-    0% {opacity: 0}
-    100% {opacity: 1}
 }
 
 /*表示位置指定　上下　topRight,topLeft*/
