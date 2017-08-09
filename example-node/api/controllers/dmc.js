@@ -152,6 +152,22 @@ const show = (req, res) => {
         ],
       },
       {
+        id: 'validator',
+        section: constant.DMC_SECTION_MANAGE,
+        group: constant.GROUP_USER,
+        name: 'バリデータ検証',
+        components: [
+          {
+            name: 'バリデータ',
+            api: api('/validator', 'get'),
+            style: constant.DMC_STYLE_TABLE,
+            options: [defaultOptions],
+            pagination: true,
+            table_labels: ['validation_type'],
+          },
+        ],
+      },
+      {
         id: 'blogdesign',
         section: constant.DMC_SECTION_MANAGE,
         group: constant.GROUP_BLOG,
