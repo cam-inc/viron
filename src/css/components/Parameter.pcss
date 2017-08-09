@@ -8,5 +8,84 @@
 .Parameter__head {
   padding: 8px;
   margin-bottom: 8px;
-  background-color: var(--color-basic-lightGray);
+  background-color: var(--color-bg-tertiaryLight);
+}
+
+.Parameter__caption {
+  @apply --layout-center-center;
+}
+
+.Parameter__name {
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.Parameter__required {
+  font-style: italic;
+  color: var(--color-text-accent);
+  margin-left: 8px;
+  font-weight: bold;
+}
+
+.Parameter__infoOpenShutButton,
+.Parameter__bodyOpenShutButton {
+  @apply --layout-center-center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-left: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #fff;
+  border-radius: 2px;
+  margin-left: 8px;
+}
+
+.Parameter__infoOpenShutButton.hover,
+.Parameter__bodyOpenShutButton.hover {
+  opacity: 0.5;
+}
+
+.Parameter__infoOpenShutButton .Icon,
+.Parameter__bodyOpenShutButton .Icon {
+  transition-duration: 100ms;
+  transition-property: transform;
+}
+
+.Parameter__info {
+  display: none;
+  margin-top: 8px;
+  padding: 8px;
+  background-color: var(--color-bg-base);
+}
+
+.Parameter__description,
+.Parameter__in {
+  margin-bbottom: 8px;
+}
+
+.Parameter__body {
+  display: none;
+}
+
+/* ============================== */
+/* info開状態 */
+/* ============================== */
+.Parameter--infoOpened .Parameter__info {
+  display: block;
+}
+
+.Parameter--infoOpened .Parameter__infoOpenShutButton .Icon {
+  transform: rotate(180deg);
+}
+
+/* ============================== */
+/* body開状態 */
+/* ============================== */
+.Parameter--bodyOpened .Parameter__body {
+  display: block;
+}
+
+.Parameter--bodyOpened .Parameter__bodyOpenShutButton .Icon {
+  transform: rotate(180deg);
 }

@@ -27,6 +27,23 @@ export default function() {
     this.isFormMode = true;
   }
 
+  // infoの開閉状態。
+  this.isInfoOpened = false;
+  // bodyの開閉状態。
+  this.isBodyOpened = true;
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleInfoOpenShutButtonTap = () => {
+    this.isInfoOpened = !this.isInfoOpened;
+    this.update();
+  };
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleBodyOpenShutButtonTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
+  };
+
   // form入力値が変更された時の処理。
   this.handleFormChange = newValue => {
     this.opts.onchange(this.parameterObject, newValue);

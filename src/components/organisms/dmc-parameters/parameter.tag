@@ -1,10 +1,16 @@
-dmc-parameter.Parameter
+dmc-parameter.Parameter(class="{ isInfoOpened ? 'Parameter--infoOpened' : '' } { isBodyOpened ? 'Parameter--bodyOpened' : '' }")
   .Parameter__head
-    .Parameter__name name: { name }
-    .Parameter__in in: { _in }
-    .Parameter__description description: { description }
-    .Parameter__required required: { required ? '必須' : 'not必須' }
-    .Parameter__type type: { type }
+    .Parameter__caption
+      .Parameter__name { name }
+      .Parameter__required(if="{ required }") required
+      .Parameter__infoOpenShutButton(ref="touch" onTap="handleInfoOpenShutButtonTap")
+        dmc-icon(type="info")
+      .Parameter__bodyOpenShutButton(ref="touch" onTap="handleBodyOpenShutButtonTap")
+        dmc-icon(type="up")
+    .Parameter__info
+      .Parameter__description(if="{ !!description }") description: { description }
+      .Parameter__in in: { _in }
+      .Parameter__type(if="{ !!type }") type: { type }
   .Parameter__body
     virtual(if="{ isFormMode }")
       dmc-parameter-form(val="{ opts.val }" parameterObject="{ parameterObject }" onChange="{ handleFormChange }")
@@ -14,6 +20,7 @@ dmc-parameter.Parameter
       dmc-parameter-items(val="{ opts.val }" itemsObject="{ itemsObject }" onChange="{ handleItemsChange }")
 
   script.
+    import '../../atoms/dmc-icon/index.tag';
     import './form.tag';
     import './items.tag';
     import './schema.tag';
