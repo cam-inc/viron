@@ -10,14 +10,14 @@
 }
 
 .Numberinput__form {
-  display: flex;
   position: relative;
+  display: flex;
 }
 
 .Numberinput__input {
+  display: block;
   flex-grow: 1;
   flex-shrink: 0;
-  display: block;
   width: 0;
   padding: 14px;
   font-size: 18px;
@@ -27,21 +27,23 @@
 }
 
 .Numberinput__handler {
-  user-select: none;
+
+  @apply --layout-column-stretch-center;
   width: 50px;
-  border-radius: 0 3px 3px 0;
   font-weight: 700;
   color: var(--color-basic-lightGray);
+  user-select: none;
   border: solid 1px var(--color-basic-gray);
   border-left: 0;
+  border-radius: 0 3px 3px 0;
   transition: opacity 0.24s linear 0.1s;
-  @apply --layout-column-stretch-center;
 }
 
 .Numberinput__handler__button {
+
+  @apply --layout-center-center;
   height: 50%;
   outline: none;
-  @apply --layout-center-center;
 }
 
 .Numberinput__handler__button:focus {
@@ -51,8 +53,8 @@
 .Numberinput__handler__button:hover {
   height: 70%;
   color: var(--color-text-anchorLight);
-  transition: all 0.1s linear;
   cursor: pointer;
+  transition: all 0.1s linear;
 }
 
 .Numberinput__handler__button:active {
