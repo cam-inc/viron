@@ -1,5 +1,6 @@
-const pager = require('../../lib/pager');
-const storeHelper = require('../../lib/stores').helper;
+const dmclib = require('node-dmclib');
+const pager = dmclib.pager;
+const storeHelper = dmclib.stores.helper;
 
 const shared = require('../../shared');
 
@@ -105,7 +106,7 @@ const update = (req, res) => {
   const query = {
     id: req.swagger.params.id.value,
   };
-  return storeHelper.update(store, UserBlogs, req.body, query)
+  return storeHelper.update(store, UserBlogs, query, req.body)
     .then(data => {
       res.json(data);
     })

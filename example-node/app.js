@@ -3,9 +3,9 @@ const https = require('https');
 
 const app = require('express')();
 const SwaggerExpress = require('swagger-express-mw');
+const dmclib = require('node-dmclib');
 
-const lib = require('./lib');
-const helperSwagger = require('./lib/swagger').helper;
+const helperSwagger = dmclib.swagger.helper;
 const shared = require('./shared');
 
 const context = shared.context;
@@ -23,7 +23,7 @@ const config = {
      * @param {function} next
      */
     jwt: (req, def, scopes, next) => {
-      lib.auth.jwt.middleware(context.getConfigAuthJwt())(req, req.res, next);
+      dmclib.auth.jwt.middleware(context.getConfigAuthJwt())(req, req.res, next);
     },
   },
 };
@@ -42,7 +42,7 @@ context.init()
       // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
 
       // add acl response headers
-      app.use(lib.acl.middleware(context.getConfigAcl()));
+      app.use(dmclib.acl.middleware(context.getConfigAcl()));
 
       app.use((req, res, next) => {
         if (req.method === 'OPTIONS') {

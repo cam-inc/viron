@@ -7,12 +7,12 @@ consumes:
 - text/plain
 definitions:
   Admin_role:
-    description: A Admin Role (default view)
+    description: A Admin Role
     example:
       paths:
       - allow: true
         path: GET:/user
-      role_id: Laborum et est iure et.
+      role_id: operator.
     properties:
       paths:
         description: target path
@@ -24,83 +24,65 @@ definitions:
         type: array
       role_id:
         description: role id
-        example: Laborum et est iure et.
+        example: operator
         type: string
     required:
     - role_id
     - paths
-    title: 'Mediatype identifier: application/vnd.admin_role+json; view=default'
     type: object
   Admin_roleCollection:
     description: Admin_roleCollection is the media type for an array of Admin_role
-      (default view)
     example:
     - paths:
       - allow: true
         path: GET:/user
-      role_id: Laborum et est iure et.
-    - paths:
-      - allow: true
-        path: GET:/user
-      role_id: Laborum et est iure et.
+      role_id: operator
     items:
       $ref: '#/definitions/Admin_role'
-    title: 'Mediatype identifier: application/vnd.admin_role+json; type=collection;
-      view=default'
     type: array
   Admin_user:
-    description: A Admin User (default view)
+    description: A Admin User
     example:
-      email: Fugiat qui enim in nam.
-      id: 8.5222217e+18
-      role_id: Voluptates omnis ut architecto.
+      email: test@dmc.com
+      id: 1
+      role_id: operator
     properties:
       email:
         description: login id
-        example: Fugiat qui enim in nam.
+        example: test@dmc.com
         type: string
       id:
         description: unique id
-        example: 8.5222217e+18
+        example: 1
         format: int64
         type: integer
       role_id:
         description: role id
-        example: Voluptates omnis ut architecto.
+        example: operator
         type: string
     required:
     - id
     - email
-    title: 'Mediatype identifier: application/vnd.admin_user+json; view=default'
     type: object
   Admin_userCollection:
     description: Admin_userCollection is the media type for an array of Admin_user
-      (default view)
     example:
-    - email: Fugiat qui enim in nam.
-      id: 8.5222217e+18
-      role_id: Voluptates omnis ut architecto.
-    - email: Fugiat qui enim in nam.
-      id: 8.5222217e+18
-      role_id: Voluptates omnis ut architecto.
-    - email: Fugiat qui enim in nam.
-      id: 8.5222217e+18
-      role_id: Voluptates omnis ut architecto.
+    - email: test@dmc.com
+      id: 1
+      role_id: operator
     items:
       $ref: '#/definitions/Admin_user'
-    title: 'Mediatype identifier: application/vnd.admin_user+json; type=collection;
-      view=default'
     type: array
   Audit_log:
-    description: A Audit Log (default view)
+    description: A Audit Log
     example:
       createdAt: 2006-02-12T07:09:13+09:00
-      request_body: Qui voluptatem omnis esse consectetur.
-      request_method: Molestias harum nulla ipsam quis dolorem quidem.
-      request_uri: Dolorum id dolores illum.
-      source_ip: Ea sed qui ipsa voluptatibus.
+      request_body: '{"name":"test", "id":1}'
+      request_method: GET
+      request_uri: '/user'
+      source_ip: 200.200.200.200
       status_code: 200
-      user_id: Et saepe nihil in earum sint.
+      user_id: test@dmc.com
     properties:
       createdAt:
         description: created time
@@ -109,19 +91,19 @@ definitions:
         type: string
       request_body:
         description: request body
-        example: Qui voluptatem omnis esse consectetur.
+        example: '{"name":"test", "id":1}'
         type: string
       request_method:
         description: http request method
-        example: Molestias harum nulla ipsam quis dolorem quidem.
+        example: GET
         type: string
       request_uri:
         description: request uri
-        example: Dolorum id dolores illum.
+        example: /user
         type: string
       source_ip:
         description: source ip address
-        example: Ea sed qui ipsa voluptatibus.
+        example: 200.200.200.200
         type: string
       status_code:
         description: http status code
@@ -131,78 +113,62 @@ definitions:
         description: user id
         example: Et saepe nihil in earum sint.
         type: string
-    title: 'Mediatype identifier: application/vnd.audit_log+json; view=default'
     type: object
   Audit_logCollection:
-    description: Audit_logCollection is the media type for an array of Audit_log (default
-      view)
+    description: Audit_logCollection is the media type for an array of Audit_log
     example:
     - createdAt: 2006-02-12T07:09:13+09:00
-      request_body: Qui voluptatem omnis esse consectetur.
-      request_method: Molestias harum nulla ipsam quis dolorem quidem.
-      request_uri: Dolorum id dolores illum.
-      source_ip: Ea sed qui ipsa voluptatibus.
+      request_body: '{"name":"test", "id":1}'
+      request_method: GET
+      request_uri: '/user'
+      source_ip: 200.200.200.200
       status_code: 200
-      user_id: Et saepe nihil in earum sint.
+      user_id: test@dmc.com
     items:
       $ref: '#/definitions/Audit_log'
-    title: 'Mediatype identifier: application/vnd.audit_log+json; type=collection;
-      view=default'
     type: array
   Auth_type:
-    description: A Auth Type (default view)
+    description: A Auth Type
     example:
-      method: Dolorum quia odit rerum facere nisi.
-      provider: Molestias at vel.
-      type: Harum tempora nesciunt aut.
-      url: Necessitatibus perferendis suscipit laudantium.
+      method: POST
+      provider: google
+      type: oauth
+      url: '/googlesignin'
     properties:
       method:
         description: request method
-        example: Dolorum quia odit rerum facere nisi.
+        example: POST
         type: string
       provider:
         description: auth provider
-        example: Molestias at vel.
+        example: google
         type: string
       type:
         description: auth type
-        example: Harum tempora nesciunt aut.
+        example: oauth
         type: string
       url:
         description: request url
-        example: Necessitatibus perferendis suscipit laudantium.
+        example: '/googlesignin'
         type: string
     required:
     - type
     - url
     - method
     - provider
-    title: 'Mediatype identifier: application/vnd.auth_type+json; view=default'
     type: object
   Auth_typeCollection:
-    description: Auth_typeCollection is the media type for an array of Auth_type (default
-      view)
+    description: Auth_typeCollection is the media type for an array of Auth_type
     example:
-    - method: Dolorum quia odit rerum facere nisi.
-      provider: Molestias at vel.
-      type: Harum tempora nesciunt aut.
-      url: Necessitatibus perferendis suscipit laudantium.
-    - method: Dolorum quia odit rerum facere nisi.
-      provider: Molestias at vel.
-      type: Harum tempora nesciunt aut.
-      url: Necessitatibus perferendis suscipit laudantium.
-    - method: Dolorum quia odit rerum facere nisi.
-      provider: Molestias at vel.
-      type: Harum tempora nesciunt aut.
-      url: Necessitatibus perferendis suscipit laudantium.
+    - method: POST
+      provider: google
+      type: oauth
+      url: '/googlesignin'
     items:
       $ref: '#/definitions/Auth_type'
-    title: 'Mediatype identifier: application/vnd.auth_type+json; type=collection;
-      view=default'
     type: array
   Blog_design:
-    description: A BlogDesign Master (default view)
+    description: A BlogDesign Master
     example:
       background_image: http://hoge.com/a.png
       base_color: blue
@@ -243,28 +209,12 @@ definitions:
         example: 1971-03-24T08:40:07+09:00
         format: date-time
         type: string
-    title: 'Mediatype identifier: application/vnd.blog_design+json; view=default'
     required:
     - name
     type: object
   Blog_designCollection:
     description: Blog_designCollection is the media type for an array of Blog_design
-      (default view)
     example:
-    - background_image: http://hoge.com/a.png
-      base_color: blue
-      createdAt: 1990-04-23T00:18:19+09:00
-      deletedAt: 1999-04-23T00:18:19+09:00
-      id: des_001
-      name: design name
-      updatedAt: 1971-03-24T08:40:07+09:00
-    - background_image: http://hoge.com/a.png
-      base_color: blue
-      createdAt: 1990-04-23T00:18:19+09:00
-      deletedAt: 1999-04-23T00:18:19+09:00
-      id: des_001
-      name: design name
-      updatedAt: 1971-03-24T08:40:07+09:00
     - background_image: http://hoge.com/a.png
       base_color: blue
       createdAt: 1990-04-23T00:18:19+09:00
@@ -274,8 +224,6 @@ definitions:
       updatedAt: 1971-03-24T08:40:07+09:00
     items:
       $ref: '#/definitions/Blog_design'
-    title: 'Mediatype identifier: application/vnd.blog_design+json; type=collection;
-      view=default'
     type: array
   BlogDesignPayload:
     example:
@@ -304,7 +252,6 @@ definitions:
     - id
     - name
     - base_color
-    title: BlogDesignPayload
     type: object
   CreateAdminRolePayload:
     example:
@@ -313,7 +260,7 @@ definitions:
         path: GET:/user
       - allow: true
         path: GET:/user
-      role_id: Libero omnis et.
+      role_id: operator
     properties:
       paths:
         description: target path
@@ -327,9 +274,8 @@ definitions:
         type: array
       role_id:
         description: role id
-        example: Libero omnis et.
+        example: operator
         type: string
-    title: CreateAdminRolePayload
     type: object
   CreateAdminUserPayload:
     example:
@@ -347,19 +293,18 @@ definitions:
     required:
     - email
     - password
-    title: CreateAdminUserPayload
     type: object
   Dmc:
-    description: A DMC settings data (default view)
+    description: A DMC settings data
     example:
-      color: Color of Endpoint
-      name: Similique libero distinctio qui et laborum.
+      color: white
+      name: DMC Example Project for Node.js
       pages:
       - components:
         - api:
             method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
+            path: /stats/dau
+          name: DAU
           options:
           - key: key
             value: value
@@ -367,16 +312,16 @@ definitions:
           query:
           - key: key
             type: string
-          style: Style of Web Component
+          style: number
           table_labels:
-          - Aut et.
-          - Aut et.
-        group: Group of page
-        id: Repellat iure non.
-        name: Maxime consequuntur quia aliquid omnis aut.
-        section: Section of page
+          - name
+        group: empty
+        id: quickview
+        name: クイックビュー
+        section: dashboard
       tags:
-      - Minus rerum odio exercitationem.
+      - dmc
+      - example
       thumbnail: Iure nisi.
     properties:
       color:
@@ -385,11 +330,11 @@ definitions:
         - white
         - black
         - perple
-        example: Color of Endpoint
+        example: white
         type: string
       name:
         description: Name pattern
-        example: Similique libero distinctio qui et laborum.
+        example: DMC Example Project for Node.js
         type: string
       pages:
         description: A Pages format
@@ -397,45 +342,36 @@ definitions:
         - components:
           - api:
               method: get
-              path: /quickview
-            name: Sint molestiae animi corporis aliquid vero corrupti.
+              path: /stats/dau
+            name: DAU
             options:
-            - key: key
-              value: value
-            - key: key
-              value: value
             - key: key
               value: value
             pagination: true
             query:
             - key: key
               type: string
-            - key: key
-              type: string
-            - key: key
-              type: string
-            style: Style of Web Component
+            style: number
             table_labels:
-            - Aut et.
-            - Aut et.
-          group: Group of page
-          id: Repellat iure non.
-          name: Maxime consequuntur quia aliquid omnis aut.
-          section: Section of page
+            - name
+          group: empty
+          id: quickview
+          name: クイックビュー
+          section: dashboard
         items:
           $ref: '#/definitions/page'
         type: array
       tags:
         description: tags
         example:
-        - Minus rerum odio exercitationem.
+        - dmc
         items:
-          example: Minus rerum odio exercitationem.
+          example: dmc
           type: string
         type: array
       thumbnail:
         description: thumbnail of endpoint
-        example: Iure nisi.
+        example: https://dmc.com/thumbnail.png
         type: string
     required:
     - name
@@ -443,127 +379,121 @@ definitions:
     - thumbnail
     - tags
     - pages
-    title: 'Mediatype identifier: application/vnd.dmc+json; view=default'
     type: object
   SigninAuthPayload:
     example:
-      email: Sed laudantium officiis tempora aut.
-      password: Asperiores iste occaecati quis beatae quia.
+      email: user1@dmc.com
+      password: XXXXXXXXXXXX
     properties:
       email:
-        example: Sed laudantium officiis tempora aut.
+        example: user1@dmc.com
         type: string
       password:
-        example: Asperiores iste occaecati quis beatae quia.
+        example: XXXXXXXXXXXX
         type: string
-    title: SigninAuthPayload
     type: object
   StatsGuideType:
     example:
       x:
-        label: Corrupti sit voluptas voluptatibus quas.
+        label: x-label
       y:
-        label: Corrupti sit voluptas voluptatibus quas.
+        label: y-label
     properties:
       x:
         $ref: '#/definitions/StatsLabelType'
       y:
         $ref: '#/definitions/StatsLabelType'
-    title: StatsGuideType
     type: object
   StatsLabelType:
     example:
-      label: Corrupti sit voluptas voluptatibus quas.
+      label: yyyymmdd
     properties:
       label:
-        example: Corrupti sit voluptas voluptatibus quas.
+        example: yyyymmdd
         type: string
     required:
     - label
-    title: StatsLabelType
     type: object
   Statsdau:
-    description: A DAU data (default view)
+    description: A DAU data
     example:
-      value: 9.0515915e+18
+      value: 12345678
     properties:
       value:
         description: DAU of Stats
-        example: 9.0515915e+18
+        example: 12345678
         format: int64
         type: integer
     required:
     - value
-    title: 'Mediatype identifier: application/vnd.statsdau+json; view=default'
     type: object
   Statsmau:
-    description: A MAU data (default view)
+    description: A MAU data
     example:
-      value: 6.540823e+18
+      value: 98765432
     properties:
       value:
         description: MAU of Stats
-        example: 6.540823e+18
+        example: 98765432
         format: int64
         type: integer
     required:
     - value
-    title: 'Mediatype identifier: application/vnd.statsmau+json; view=default'
     type: object
   Statsplanet:
-    description: Planets data (default view)
+    description: Planets data
     example:
-      color: Eos et.
+      color: blue
       data:
-      - Sed deleniti iste.: db770d8d-dff8-4300-bb79-69122b678868
+      - name: example-name
+        distance: 11111
       guide:
         x:
-          label: Corrupti sit voluptas voluptatibus quas.
+          label: distance
         y:
-          label: Corrupti sit voluptas voluptatibus quas.
-      size: Facere at rerum odit consequatur.
-      x: Quos maxime sint beatae ut officia.
-      y: Debitis corporis dolorum ducimus ipsa doloribus.
+          label: name
+      size: temperature
+      x: name
+      y: distance
     properties:
       color:
         description: ドットの色分けに使用するkey
-        example: Eos et.
+        example: blue
         type: string
       data:
         description: グラフデータ
         example:
-        - Sed deleniti iste.: db770d8d-dff8-4300-bb79-69122b678868
+        - name: example-name
+          distance: 11111
         items:
           additionalProperties: true
           example:
-            Sed deleniti iste.: db770d8d-dff8-4300-bb79-69122b678868
+            name: example-name
+            distance: 11111
           type: object
         type: array
       guide:
         $ref: '#/definitions/StatsGuideType'
       size:
         description: ドットの大きさに使用するkey
-        example: Facere at rerum odit consequatur.
+        example: temperature
         type: string
       x:
         description: X軸に使用するkey
-        example: Quos maxime sint beatae ut officia.
+        example: name
         type: string
       y:
         description: Y軸に使用するkey
-        example: Debitis corporis dolorum ducimus ipsa doloribus.
+        example: distance
         type: string
     required:
     - data
     - x
     - y
-    title: 'Mediatype identifier: application/vnd.statsplanet+json; view=default'
     type: object
   UpdateAdminRolePayload:
     example:
       paths:
-      - allow: true
-        path: GET:/user
       - allow: true
         path: GET:/user
     properties:
@@ -572,12 +502,9 @@ definitions:
         example:
         - allow: true
           path: GET:/user
-        - allow: true
-          path: GET:/user
         items:
           $ref: '#/definitions/adminrolepath'
         type: array
-    title: UpdateAdminRolePayload
     type: object
   UpdateAdminUserPayload:
     example:
@@ -594,31 +521,29 @@ definitions:
         type: string
     required:
     - role_id
-    title: UpdateAdminUserPayload
     type: object
   UploadFilePayload:
     example:
-      data: Deserunt laudantium atque veniam rerum dolor.
-      path: Voluptas in ducimus quibusdam in cum debitis.
+      data: binary-data
+      path: img/x/001.png
     properties:
       data:
         description: base64 encoded binary data
-        example: Deserunt laudantium atque veniam rerum dolor.
+        example: binary-data
         type: string
       path:
         description: file path
-        example: Voluptas in ducimus quibusdam in cum debitis.
+        example: img/x/001.png
         type: string
-    title: UploadFilePayload
     type: object
   User:
-    description: A User (default view)
+    description: A User
     example:
       birthday: 1995-05-12T09:45:56Z
       blood_type: A
       createdAt: 2010-04-14T11:16:32+09:00
       deletedAt: 2014-04-27T12:25:11+09:00
-      id: 5.801194e+18
+      id: 1
       job: 大学生
       name: 山田 太郎
       sex: male
@@ -650,7 +575,7 @@ definitions:
         type: string
       id:
         description: ユーザーID
-        example: 5.801194e+18
+        example: 1
         format: int64
         type: integer
       job:
@@ -676,19 +601,18 @@ definitions:
     required:
     - id
     - name
-    title: 'Mediatype identifier: application/vnd.user+json; view=default'
     type: object
   User_blog:
-    description: A User Blog (default view)
+    description: A User Blog
     example:
       created_at: 1993-07-26T02:54:17+09:00
       design_id: simple
       genre: game
-      id: 2.438025e+18
+      id: 11
       sub_title: diary
       title: user's blog
       updated_at: 1979-11-12T02:46:55+09:00
-      user_id: 8.574263e+18
+      user_id: 1
     properties:
       createdAt:
         description: 作成日時
@@ -715,7 +639,7 @@ definitions:
         type: string
       id:
         description: ユーザーブログID
-        example: 2.438025e+18
+        example: 11
         format: int64
         type: integer
       sub_title:
@@ -733,7 +657,7 @@ definitions:
         type: string
       user_id:
         description: ユーザーID
-        example: 8.574263e+18
+        example: 1
         format: int64
         type: integer
     required:
@@ -741,19 +665,18 @@ definitions:
     - user_id
     - title
     - design_id
-    title: 'Mediatype identifier: application/vnd.user_blog+json; view=default'
     type: object
   User_blog_entry:
-    description: A User Blog Entry (default view)
+    description: A User Blog Entry
     example:
       content: Velit iure doloribus.
       createdAt: 1991-02-16T10:17:41+09:00
       deletedAt: 2005-10-21T03:42:51+09:00
-      id: 5.1847856e+18
+      id: 111
       theme: diary
       title: 今日の日記
       updatedAt: 2003-10-21T03:42:51+09:00
-      user_blog_id: 8.21865e+17
+      user_blog_id: 11
     properties:
       content:
         description: 内容
@@ -771,7 +694,7 @@ definitions:
         type: string
       id:
         description: ユーザーブログ記事ID
-        example: 5.1847856e+18
+        example: 111
         format: int64
         type: integer
       theme:
@@ -789,7 +712,7 @@ definitions:
         type: string
       user_blog_id:
         description: ユーザーブログID
-        example: 8.21865e+17
+        example: 11
         format: int64
         type: integer
     required:
@@ -797,67 +720,60 @@ definitions:
     - user_blog_id
     - title
     - content
-    title: 'Mediatype identifier: application/vnd.user_blog_entry+json; view=default'
     type: object
   User_blog_entryCollection:
     description: User_blog_entryCollection is the media type for an array of User_blog_entry
-      (default view)
     example:
     - content: Velit iure doloribus.
       createdAt: 1991-02-16T10:17:41+09:00
       deletedAt: 2005-10-21T03:42:51+09:00
-      id: 5.1847856e+18
+      id: 111
       theme: diary
       title: 今日の日記
       updatedAt: 2003-10-21T03:42:51+09:00
-      user_blog_id: 8.21865e+17
+      user_blog_id: 11
     items:
       $ref: '#/definitions/User_blog_entry'
-    title: 'Mediatype identifier: application/vnd.user_blog_entry+json; type=collection;
-      view=default'
     type: array
   User_blogCollection:
-    description: User_blogCollection is the media type for an array of User_blog (default
-      view)
+    description: User_blogCollection is the media type for an array of User_blog
     example:
     - createdAt: 1993-07-26T02:54:17+09:00
       deletedAt: 1999-07-26T02:54:17+09:00
       design_id: simple
       genre: game
-      id: 2.438025e+18
+      id: 11
       sub_title: diary
       title: user's blog
       updatedAt: 1979-11-12T02:46:55+09:00
-      user_id: 8.574263e+18
+      user_id: 1
     - created_at: 1993-07-26T02:54:17+09:00
       deletedAt: 1999-07-26T02:54:17+09:00
       design_id: simple
       genre: game
-      id: 2.438025e+18
+      id: 11
       sub_title: diary
       title: user's blog
       updated_at: 1979-11-12T02:46:55+09:00
-      user_id: 8.574263e+18
+      user_id: 1
     - created_at: 1993-07-26T02:54:17+09:00
       deletedAt: 1999-07-26T02:54:17+09:00
       design_id: simple
       genre: game
-      id: 2.438025e+18
+      id: 11
       sub_title: diary
       title: user's blog
       updated_at: 1979-11-12T02:46:55+09:00
-      user_id: 8.574263e+18
+      user_id: 1
     items:
       $ref: '#/definitions/User_blog'
-    title: 'Mediatype identifier: application/vnd.user_blog+json; type=collection;
-      view=default'
     type: array
   UserBlogEntryPayload:
     example:
       content: Corporis officiis distinctio optio voluptatem.
       theme: diary
       title: 今日の日記
-      user_blog_id: 3.2696925e+18
+      user_blog_id: 11
     properties:
       content:
         description: 内容
@@ -873,7 +789,7 @@ definitions:
         type: string
       user_blog_id:
         description: ユーザーブログID
-        example: 3.2696925e+18
+        example: 11
         format: int64
         type: integer
     title: UserBlogEntryPayload
@@ -886,7 +802,7 @@ definitions:
       genre: game
       sub_title: diary
       title: user's blog
-      user_id: 1.8461636e+18
+      user_id: 1
     properties:
       design_id:
         description: デザインID
@@ -911,28 +827,26 @@ definitions:
         type: string
       user_id:
         description: ユーザーID
-        example: 1.8461636e+18
+        example: 1
         format: int64
         type: integer
-    title: UserBlogPayload
     required:
     - user_id
     type: object
   UserCollection:
-    description: UserCollection is the media type for an array of User (default view)
+    description: UserCollection is the media type for an array of User
     example:
     - birthday: 1995-05-12T09:45:56Z
       blood_type: A
       createdAt: 2010-04-14T11:16:32+09:00
       deletedAt: 2014-04-27T12:25:11+09:00
-      id: 5.801194e+18
+      id: 1
       job: 大学生
       name: 山田 太郎
       sex: male
       updatedAt: 1994-04-27T12:25:11+09:00
     items:
       $ref: '#/definitions/User'
-    title: 'Mediatype identifier: application/vnd.user+json; type=collection; view=default'
     type: array
   UserPayload:
     example:
@@ -973,7 +887,6 @@ definitions:
         type: string
     required:
     - name
-    title: UserPayload
     type: object
   adminrolepath:
     example:
@@ -993,7 +906,6 @@ definitions:
     required:
     - path
     - allow
-    title: adminrolepath
     type: object
   api:
     description: Accessing api information type
@@ -1012,15 +924,14 @@ definitions:
     required:
     - path
     - method
-    title: api
     type: object
   component:
     description: A Component type
     example:
       api:
         method: get
-        path: /quickview
-      name: Sint molestiae animi corporis aliquid vero corrupti.
+        path: /user
+      name: ユーザー
       options:
       - key: key
         value: value
@@ -1037,7 +948,7 @@ definitions:
         $ref: '#/definitions/api'
       name:
         description: Title of page
-        example: Sint molestiae animi corporis aliquid vero corrupti.
+        example: ユーザー
         type: string
       options:
         description: style options
@@ -1077,10 +988,9 @@ definitions:
       table_labels:
         description: keys of table row
         example:
-        - Aut et.
-        - Aut et.
+        - name
         items:
-          example: Aut et.
+          example: name
           type: string
         type: array
     required:
@@ -1088,16 +998,15 @@ definitions:
     - name
     - style
     - pagination
-    title: component
     type: object
   error:
-    description: Error response media type (default view)
+    description: Error response media type
     example:
       code: invalid_value
       detail: Value of ID must be an integer
       id: 3F1FKVRR
       meta:
-        timestamp: 1.458609e+09
+        timestamp: 1502172152
       status: "400"
     properties:
       code:
@@ -1118,14 +1027,13 @@ definitions:
         description: a meta object containing non-standard meta-information about
           the error.
         example:
-          timestamp: 1.458609e+09
+          timestamp: 1502172152
         type: object
       status:
         description: the HTTP status code applicable to this problem, expressed as
           a string value.
         example: "400"
         type: string
-    title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
   option:
     example:
@@ -1143,7 +1051,6 @@ definitions:
     required:
     - key
     - value
-    title: option
     type: object
   page:
     description: A page type
@@ -1151,27 +1058,18 @@ definitions:
       components:
       - api:
           method: get
-          path: /quickview
-        name: Sint molestiae animi corporis aliquid vero corrupti.
+          path: /user
+        name: ユーザー
         options:
-        - key: key
-          value: value
-        - key: key
-          value: value
         - key: key
           value: value
         pagination: true
         query:
         - key: key
           type: string
-        - key: key
-          type: string
-        - key: key
-          type: string
         style: Style of Web Component
         table_labels:
-        - Aut et.
-        - Aut et.
+        - name
       group: Group of page
       id: Repellat iure non.
       name: Maxime consequuntur quia aliquid omnis aut.
@@ -1182,27 +1080,18 @@ definitions:
         example:
         - api:
             method: get
-            path: /quickview
-          name: Sint molestiae animi corporis aliquid vero corrupti.
+            path: /user
+          name: ユーザー
           options:
-          - key: key
-            value: value
-          - key: key
-            value: value
           - key: key
             value: value
           pagination: true
           query:
           - key: key
             type: string
-          - key: key
-            type: string
-          - key: key
-            type: string
           style: Style of Web Component
           table_labels:
-          - Aut et.
-          - Aut et.
+          - name
         items:
           $ref: '#/definitions/component'
         type: array
@@ -1217,11 +1106,11 @@ definitions:
         type: string
       id:
         description: id of page
-        example: Repellat iure non.
+        example: quickview
         type: string
       name:
         description: Title of page
-        example: Maxime consequuntur quia aliquid omnis aut.
+        example: クイックビュー
         type: string
       section:
         default: manage
@@ -1236,7 +1125,6 @@ definitions:
     - section
     - group
     - components
-    title: page
     type: object
   query:
     example:
@@ -1263,7 +1151,6 @@ definitions:
     required:
     - key
     - type
-    title: query
     type: object
 host: localhost:3000
 info:
@@ -1293,11 +1180,7 @@ paths:
   /adminrole:
     get:
       x-swagger-router-controller: dmc_admin_role
-      description: |-
-        get admin roles
-
-        Required security scopes:
-          * `api:access`
+      description: get admin roles
       operationId: admin_role#list
       parameters: []
       produces:
@@ -1331,11 +1214,7 @@ paths:
         path: /adminrole/{role_id}
     post:
       x-swagger-router-controller: dmc_admin_role
-      description: |-
-        create a admin role
-
-        Required security scopes:
-          * `api:access`
+      description: create a admin role
       operationId: admin_role#create
       parameters:
       - in: body
@@ -1370,11 +1249,7 @@ paths:
   /adminrole/{role_id}:
     delete:
       x-swagger-router-controller: dmc_admin_role
-      description: |-
-        delete the user
-
-        Required security scopes:
-          * `api:access`
+      description: delete the user
       operationId: admin_role#remove
       parameters:
       - description: role id
@@ -1405,11 +1280,7 @@ paths:
       - admin_role
     get:
       x-swagger-router-controller: dmc_admin_role
-      description: |-
-        get the admin role
-
-        Required security scopes:
-          * `api:access`
+      description: get the admin role
       operationId: admin_role#show
       parameters:
       - description: role id
@@ -1443,11 +1314,7 @@ paths:
       - admin_role
     put:
       x-swagger-router-controller: dmc_admin_role
-      description: |-
-        update the admin user
-
-        Required security scopes:
-          * `api:access`
+      description: update the admin user
       operationId: admin_role#update
       parameters:
       - description: role id
@@ -1487,11 +1354,7 @@ paths:
   /adminuser:
     get:
       x-swagger-router-controller: dmc_admin_user
-      description: |-
-        get admin users
-
-        Required security scopes:
-          * `api:access`
+      description: get admin users
       operationId: admin_user#list
       produces:
       - application/vnd.goa.error
@@ -1526,11 +1389,7 @@ paths:
         path: /adminuser/{id}
     post:
       x-swagger-router-controller: dmc_admin_user
-      description: |-
-        create a admin user
-
-        Required security scopes:
-          * `api:access`
+      description: create a admin user
       operationId: admin_user#create
       parameters:
       - in: body
@@ -1565,11 +1424,7 @@ paths:
   /adminuser/{id}:
     delete:
       x-swagger-router-controller: dmc_admin_user
-      description: |-
-        delete the user
-
-        Required security scopes:
-          * `api:access`
+      description: delete the user
       operationId: admin_user#remove
       parameters:
       - description: id
@@ -1600,11 +1455,7 @@ paths:
       - admin_user
     get:
       x-swagger-router-controller: dmc_admin_user
-      description: |-
-        get the admin user
-
-        Required security scopes:
-          * `api:access`
+      description: get the admin user
       operationId: admin_user#show
       parameters:
       - description: id
@@ -1638,11 +1489,7 @@ paths:
       - admin_user
     put:
       x-swagger-router-controller: dmc_admin_user
-      description: |-
-        update the admin user
-
-        Required security scopes:
-          * `api:access`
+      description: update the admin user
       operationId: admin_user#update
       parameters:
       - description: id
@@ -1682,11 +1529,7 @@ paths:
   /auditlog:
     get:
       x-swagger-router-controller: dmc_audit_log
-      description: |-
-        get admin roles
-
-        Required security scopes:
-          * `api:access`
+      description: get admin roles
       operationId: audit_log#list
       parameters:
       - description: number of items per page
@@ -1724,11 +1567,7 @@ paths:
   /blogdesign:
     get:
       x-swagger-router-controller: blog_design
-      description: |-
-        get blog designs
-
-        Required security scopes:
-          * `api:access`
+      description: get blog designs
       operationId: blog_design#list
       parameters:
       - description: number of items per page
@@ -1774,11 +1613,7 @@ paths:
         path: /blogdesign/{id}
     post:
       x-swagger-router-controller: blog_design
-      description: |-
-        create a blog design
-
-        Required security scopes:
-          * `api:access`
+      description: create a blog design
       operationId: blog_design#create
       parameters:
       - in: body
@@ -1813,11 +1648,7 @@ paths:
   /blogdesign/{id}:
     delete:
       x-swagger-router-controller: blog_design
-      description: |-
-        delete the blog design
-
-        Required security scopes:
-          * `api:access`
+      description: delete the blog design
       operationId: blog_design#remove
       parameters:
       - description: id
@@ -1848,11 +1679,7 @@ paths:
       - blog_design
     get:
       x-swagger-router-controller: blog_design
-      description: |-
-        get the blog design
-
-        Required security scopes:
-          * `api:access`
+      description: get the blog design
       operationId: blog_design#show
       parameters:
       - description: id
@@ -1886,11 +1713,7 @@ paths:
       - blog_design
     put:
       x-swagger-router-controller: blog_design
-      description: |-
-        update the blog design
-
-        Required security scopes:
-          * `api:access`
+      description: update the blog design
       operationId: blog_design#update
       parameters:
       - description: id
@@ -1930,11 +1753,7 @@ paths:
   /dmc:
     get:
       x-swagger-router-controller: dmc
-      description: |-
-        dmc settings
-
-        Required security scopes:
-          * `api:access`
+      description: dmc settings
       operationId: dmc#show
       produces:
       - application/vnd.goa.error
@@ -2376,11 +2195,7 @@ paths:
   /swagger.json:
     get:
       x-swagger-router-controller: swagger
-      description: |-
-        get swagger.json
-
-        Required security scopes:
-          * `api:access`
+      description: get swagger.json
       operationId: swagger#show
       produces:
       - application/vnd.goa.error
@@ -2409,11 +2224,7 @@ paths:
   /user:
     get:
       x-swagger-router-controller: user
-      description: |-
-        get users
-
-        Required security scopes:
-          * `api:access`
+      description: get users
       operationId: user#list
       parameters:
       - description: 名前
@@ -2452,13 +2263,12 @@ paths:
       - appendTo: row
         method: delete
         path: /user/{id}
+      - appendTo: ""
+        method: post
+        path: /user/upload/csv
     post:
       x-swagger-router-controller: user
-      description: |-
-        create a user
-
-        Required security scopes:
-          * `api:access`
+      description: create a user
       operationId: user#create
       parameters:
       - in: body
@@ -2490,14 +2300,36 @@ paths:
       summary: create user
       tags:
       - user
+  /user/upload/csv:
+    post:
+      x-swagger-router-controller: user
+      description: upload user data
+      operationId: user#upload
+      parameters:
+      - in: formData
+        name: payload
+        required: true
+        type: file
+      consumes:
+      - "multipart/form-data"
+        #- "application/x-www-form-urlencoded"
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: upload users
+      tags:
+      - user
   /user/{id}:
     delete:
       x-swagger-router-controller: user
-      description: |-
-        delete the user
-
-        Required security scopes:
-          * `api:access`
+      description: delete the user
       operationId: user#remove
       parameters:
       - description: id
@@ -2528,11 +2360,7 @@ paths:
       - user
     get:
       x-swagger-router-controller: user
-      description: |-
-        get the user
-
-        Required security scopes:
-          * `api:access`
+      description: get the user
       operationId: user#show
       parameters:
       - description: id
@@ -2566,11 +2394,7 @@ paths:
       - user
     put:
       x-swagger-router-controller: user
-      description: |-
-        update the user
-
-        Required security scopes:
-          * `api:access`
+      description: update the user
       operationId: user#update
       parameters:
       - description: id
@@ -2610,11 +2434,7 @@ paths:
   /userblog:
     get:
       x-swagger-router-controller: user_blog
-      description: |-
-        get user blogs
-
-        Required security scopes:
-          * `api:access`
+      description: get user blogs
       operationId: user_blog#list
       parameters:
       - description: number of items per page
@@ -2660,11 +2480,7 @@ paths:
         path: /userblog/{id}
     post:
       x-swagger-router-controller: user_blog
-      description: |-
-        create a user blog
-
-        Required security scopes:
-          * `api:access`
+      description: create a user blog
       operationId: user_blog#create
       parameters:
       - in: body
@@ -2699,11 +2515,7 @@ paths:
   /userblog/{id}:
     delete:
       x-swagger-router-controller: user_blog
-      description: |-
-        delete the user blog
-
-        Required security scopes:
-          * `api:access`
+      description: delete the user blog
       operationId: user_blog#remove
       parameters:
       - description: id
@@ -2734,11 +2546,7 @@ paths:
       - user_blog
     get:
       x-swagger-router-controller: user_blog
-      description: |-
-        get the user blog
-
-        Required security scopes:
-          * `api:access`
+      description: get the user blog
       operationId: user_blog#show
       parameters:
       - description: id
@@ -2772,11 +2580,7 @@ paths:
       - user_blog
     put:
       x-swagger-router-controller: user_blog
-      description: |-
-        update the user blog
-
-        Required security scopes:
-          * `api:access`
+      description: update the user blog
       operationId: user_blog#update
       parameters:
       - description: id
@@ -2815,11 +2619,7 @@ paths:
       - user_blog
   /userblog/autocomplete/{field}:
     get:
-      description: |-
-        autocomplete user data
-
-        Required security scopes:
-          * `api:access`
+      description: autocomplete user data
       operationId: user_blog#autocomplete
       parameters:
       - description: field name in userblog model
@@ -2855,11 +2655,7 @@ paths:
   /userblogentry:
     get:
       x-swagger-router-controller: user_blog_entry
-      description: |-
-        get user blog entries
-
-        Required security scopes:
-          * `api:access`
+      description: get user blog entries
       operationId: user_blog_entry#list
       parameters:
       - description: number of items per page
@@ -2905,11 +2701,7 @@ paths:
         path: /userblogentry/{id}
     post:
       x-swagger-router-controller: user_blog_entry
-      description: |-
-        create a user blog entry
-
-        Required security scopes:
-          * `api:access`
+      description: create a user blog entry
       operationId: user_blog_entry#create
       parameters:
       - in: body
@@ -2944,11 +2736,7 @@ paths:
   /userblogentry/{id}:
     delete:
       x-swagger-router-controller: user_blog_entry
-      description: |-
-        delete the user blog entry
-
-        Required security scopes:
-          * `api:access`
+      description: delete the user blog entry
       operationId: user_blog_entry#remove
       parameters:
       - description: id
@@ -2979,11 +2767,7 @@ paths:
       - user_blog_entry
     get:
       x-swagger-router-controller: user_blog_entry
-      description: |-
-        get the user blog entry
-
-        Required security scopes:
-          * `api:access`
+      description: get the user blog entry
       operationId: user_blog_entry#show
       parameters:
       - description: id
@@ -3017,11 +2801,7 @@ paths:
       - user_blog_entry
     put:
       x-swagger-router-controller: user_blog_entry
-      description: |-
-        update the user blog entry
-
-        Required security scopes:
-          * `api:access`
+      description: update the user blog entry
       operationId: user_blog_entry#update
       parameters:
       - description: id

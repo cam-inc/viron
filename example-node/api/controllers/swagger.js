@@ -1,5 +1,5 @@
-const lib = require('../../lib');
+const dmclib = require('node-dmclib');
 
 module.exports = {
-  'swagger#show': lib.swagger.controller.registerShow(),
+  'swagger#show': dmclib.swagger.controller.registerShow(),
 };

@@ -1,15 +1,15 @@
-const lib = require('../../lib');
+const dmclib = require('node-dmclib');
 const shared = require('../../shared');
 
 const context = shared.context;
 
 const afterAuthMiddlewares = [
   // audit log
-  lib.auditLog.middleware(context.getStoreMain().models.AuditLogs),
+  dmclib.auditLog.middleware(context.getStoreMain().models.AuditLogs),
   // check google oauth token
-  lib.auth.google.middleware(),
+  dmclib.auth.google.middleware(),
   // check admin role
-  lib.adminRole.middleware(),
+  dmclib.adminRole.middleware(),
 ];
 
 /**

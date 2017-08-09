@@ -1,9 +1,5 @@
 module.exports = helper => {
   const config = {
-    scheme: 'https',
-    host: 'localhost',
-    port: 3000,
-
     default_role: 'viewer',
     super_role: 'super',
 

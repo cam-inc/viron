@@ -1,5 +1,7 @@
-const pager = require('../../lib/pager');
-const storeHelper = require('../../lib/stores').helper;
+const csvParse = require('csv-parse');
+const dmclib = require('node-dmclib');
+const pager = dmclib.pager;
+const storeHelper = dmclib.stores.helper;
 
 const shared = require('../../shared');
 
@@ -109,11 +111,37 @@ const update = (req, res) => {
   const query = {
     id: req.swagger.params.id.value,
   };
-  return storeHelper.update(store, Users, req.body, query)
+  return storeHelper.update(store, Users, query, req.body)
     .then(data => {
       res.json(data);
     })
   ;
+};
+
+/**
+ * Controller : upload Users
+ * HTTP Method : PUT
+ * PATH : /user/upload/csv
+ *
+ * @returns {Promise.<TResult>}
+ */
+const upload = (req, res) => {
+  const file = req.files.payload[0];
+  if (file.mimetype !== 'text/csv') {
+    console.warn(`invalid file format: ${file.originalname}`);
+    return res.json({});
+  }
+
+  csvParse(file.buffer.toString(), {columns: true}, (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.json({});
+    }
+
+    // あとはDBに入れるだけ
+    console.log(data);
+    res.json({});
+  });
 };
 
 
@@ -123,4 +151,5 @@ module.exports = {
   'user#remove': remove,
   'user#show': show,
   'user#update': update,
+  'user#upload': upload,
 };

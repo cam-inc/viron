@@ -1,0 +1,114 @@
+.Datepicker {
+  display: block;
+}
+
+.Datepicker__label {
+  padding-left: 8px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  border-left: 2px solid var(--color-bg-primary);
+}
+
+.Datepicker__input {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  background-color: var(--color-basic-white);
+  border: 1px solid var(--color-basic-gray);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.Datepicker__form {
+  position: relative;
+}
+
+.Datepicker__calendar {
+  width: 260px;
+  user-select: none;
+  background-color: var(--color-bg-base);
+  border: 1px solid var(--color-basic-gray);
+  color: var(--color-text-default);
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  top: 56px;
+  left: 0;
+}
+
+.Datepicker__transition {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.Datepicker__transition:hover {
+  color: var(--color-text-anchor);
+}
+
+.Datepicker__head {
+  font-size: 16px;
+  margin-bottom: 2px;
+  @apply --layout-between-center;
+}
+
+.Datepicker__month {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.Datepicker__month > span {
+  font-weight: 700;
+}
+
+.Datepicker__days {
+  font-size: 12px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 1fr;
+  margin-bottom:  4px;
+  color: var(--color-text-secondary);
+}
+
+.Datepicker__day {
+  font-weight: 700;
+}
+
+.Datepicker__day--sunday {
+  color: var(--color-text-accent);
+}
+
+.Datepicker__day--saturday {
+  color: var(--color-text-anchor);
+}
+
+.Datepicker__container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 20px);
+  align-items: stretch;
+  justify-items: stretch;
+}
+
+.Datepicker__cell {
+  border-radius: 4px;
+  @apply --layout-center-center;
+}
+
+.Datepicker__cell--today {
+  background-color: var(--color-bg-successLight);
+}
+
+.Datepicker__cell--selected {
+  background-color: var(--color-bg-infoLight);
+}
+
+.Datepicker__cell--secondary {
+  color: var(--color-text-secondary);
+}
+
+.Datepicker__cell:hover {
+  background-color: var(--color-bg-tertiaryLight);
+  cursor: pointer;
+}

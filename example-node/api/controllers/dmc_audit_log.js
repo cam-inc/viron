@@ -1,4 +1,4 @@
-const lib = require('../../lib');
+const dmclib = require('node-dmclib');
 const shared = require('../../shared');
 
 /**
@@ -6,7 +6,7 @@ const shared = require('../../shared');
  * @type {{audit_log#list (function(*, *, *))}}
  */
 module.exports = {
-  'audit_log#list': lib.auditLog.controller.registerList(
+  'audit_log#list': dmclib.auditLog.controller.registerList(
     shared.context.getStoreMain().models.AuditLogs
   ),
 };
