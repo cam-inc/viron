@@ -2,11 +2,8 @@
 TODO: 各数値の変数化
 */
 
-.Tooltip {
-  width: 0;
-  height: 0;
-  position: relative;
-  animation: TooltipIn 0.5s ease 0s 1 normal;
+:root {
+  --component-tooltip-triangle-height: 5px;
 }
 
 /*アニメーション*/
@@ -16,54 +13,55 @@ TODO: 各数値の変数化
     100% {opacity: 1}
 }
 
+.Tooltip {
+  width: 0;
+  height: 0;
+  position: relative;
+  animation: TooltipIn 0.5s ease 0s 1 normal;
+}
+
 /*擬似クラス（吹き出しの三角）*/
 
 .Tooltip::after {
   content: "";
+  display: block;
   position: absolute;
-  border-style: solid;
-  border-width: 5px;
+  top: calc(var(--component-tooltip-triangle-height) * -1);
+  left: calc(var(--component-tooltip-triangle-height) * -1);
+  width: calc(var(--component-tooltip-triangle-height) * 2);
+  height: calc(var(--component-tooltip-triangle-height) * 2);
+  border: var(--component-tooltip-triangle-height) solid;
 }
 
-/*擬似クラス　topRight,topLeft,topCenter*/
+/*下向き矢印*/
 
 .Tooltip--topRight::after,
 .Tooltip--topLeft::after,
 .Tooltip--topCenter::after {
-  bottom: -5px;
-  left: -5px;
   border-color: var(--color-basic-darkGray) transparent transparent transparent;
 }
 
-/*擬似クラス　bottomRight,bottomLeft,bottomCenter*/
+/*上向き矢印*/
 
 .Tooltip--bottomRight::after,
 .Tooltip--bottomLeft::after,
 .Tooltip--bottomCenter::after {
-  left: -5px;
-  top: -5px;
   border-color: transparent transparent var(--color-basic-darkGray) transparent;
 }
 
-/*擬似クラス　rightTop,rightBottom*/
+/*左向き矢印*/
 
 .Tooltip--rightTop::after,
 .Tooltip--rightBottom::after {
-  left: -5px;
-  top: -5px;
   border-color: transparent var(--color-basic-darkGray) transparent transparent;
 }
 
-/*擬似クラス　leftTop,leftBotto*/
+/*右向き矢印*/
 
 .Tooltip--leftTop::after,
 .Tooltip--leftBottom::after {
-  left: -5px;
-  top: -5px;
   border-color: transparent transparent transparent var(--color-basic-darkGray);
 }
-
-/*Tooltip__basePoint*/
 
 .Tooltip__basePoint {
   position: absolute;
@@ -75,61 +73,60 @@ TODO: 各数値の変数化
   background-color: var(--color-basic-darkGray);
   padding: 5px;
   border-radius: 5px;
-  display: inline-block;
 }
 
-/*Tooltip--Center Tooltip__text*/
-.Tooltip--topCenter .Tooltip__text,
+.Tooltip--topCenter .Tooltip__text {
+  left: -50%;
+}
+
 .Tooltip--bottomCenter .Tooltip__text {
   left: -50%;
 }
 
-/*表示位置指定　上下　topRight,topLeft*/
+.Tooltip--topCenter .Tooltip__basePoint {
+  bottom: var(--component-tooltip-triangle-height);
+}
 
-.Tooltip--topCenter .Tooltip__basePoint,
-.Tooltip--topRight .Tooltip__basePoint,
+.Tooltip--topRight .Tooltip__basePoint {
+  bottom: var(--component-tooltip-triangle-height);
+  right: calc(var(--component-tooltip-triangle-height) * -3);
+}
+
 .Tooltip--topLeft .Tooltip__basePoint {
-  bottom: 5px;
+  bottom: var(--component-tooltip-triangle-height);
+  left: calc(var(--component-tooltip-triangle-height) * -3);
 }
 
-/*表示位置指定　上下　bottomRight,bottomLeft*/
-
-.Tooltip--bottomCenter .Tooltip__basePoint,
-.Tooltip--bottomRight .Tooltip__basePoint,
-.Tooltip--bottomLeft .Tooltip__basePoint {
-  top: 5px;
+.Tooltip--bottomCenter .Tooltip__basePoint {
+  top: var(--component-tooltip-triangle-height);
 }
 
-/*表示位置指定　左右　topRight,bottomRight*/
-
-.Tooltip--topRight .Tooltip__basePoint,
 .Tooltip--bottomRight .Tooltip__basePoint {
-  right: -15px;
+  top: var(--component-tooltip-triangle-height);
+  right: calc(var(--component-tooltip-triangle-height) * -3);
 }
 
-.Tooltip--topLeft .Tooltip__basePoint,
 .Tooltip--bottomLeft .Tooltip__basePoint {
-  left: -15px;
+  top: var(--component-tooltip-triangle-height);
+  left: calc(var(--component-tooltip-triangle-height) * -3);
 }
-
-/*表示位置指定　rightTop,leftTop,rightBottom,leftBottom*/
 
 .Tooltip--rightTop .Tooltip__basePoint {
-  top: -10px;
-  left: 5px;
-}
-
-.Tooltip--leftTop .Tooltip__basePoint {
-  top: -10px;
-  right: 5px;
+  top: calc(var(--component-tooltip-triangle-height) * -2);
+  left: var(--component-tooltip-triangle-height);
 }
 
 .Tooltip--rightBottom .Tooltip__basePoint {
-  top: -15px;
-  left: 5px;
+  top: calc(var(--component-tooltip-triangle-height) * -3);
+  left: var(--component-tooltip-triangle-height);
+}
+
+.Tooltip--leftTop .Tooltip__basePoint {
+  top: calc(var(--component-tooltip-triangle-height) * -2);
+  right: var(--component-tooltip-triangle-height);
 }
 
 .Tooltip--leftBottom .Tooltip__basePoint {
-  top: -15px;
-  right: 5px;
+  top: calc(var(--component-tooltip-triangle-height) * -3);
+  right: var(--component-tooltip-triangle-height);
 }
