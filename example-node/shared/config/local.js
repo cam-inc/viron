@@ -10,7 +10,7 @@ module.exports = helper => {
       scope: [
         'https://www.googleapis.com/auth/userinfo.email',
       ],
-      state_url: 'https://cam-inc.github.io/dmc/#/',
+      //state_url: 'https://cam-inc.github.io/dmc/#/',
       allow_email_domains: [
         // ここに書いたドメインがGoogle認証で利用可能
         'camobile.com',
