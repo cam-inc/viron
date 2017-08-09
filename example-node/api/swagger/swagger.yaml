@@ -1218,6 +1218,207 @@ definitions:
     - type
     type: object
 
+  ValidatorCollection:
+    items:
+      $ref: '#/definitions/Validator'
+    type: array
+
+  Validator:
+    type: object
+    properties:
+      id:
+        description: id of validator
+        example: 1
+        type: number
+      validation_type:
+        type: string
+      multiple_of:
+        description: multipleOfの3倍であること
+        example: 9
+        type: number
+        multipleOf: 3
+      maximum:
+        description: 10以下であること
+        example: 10
+        type: number
+        maximum: 10
+        exclusiveMaximum: false
+      exclusive_maximum:
+        description: 10未満であること
+        example: 9
+        type: number
+        maximum: 10
+        exclusiveMaximum: true
+      minimum:
+        description: 1以上であること
+        example: 1
+        type: number
+        minimum: 1
+        exclusiveMinimum: false
+      exclusive_minimum:
+        description: 1を超過していること
+        example: 2
+        type: number
+        minimum: 1
+        exclusiveMinimum: true
+      min_max:
+        description: 1以上10未満であること
+        example: 5
+        type: number
+        minimum: 1
+        exclusiveMinimum: false
+        maximum: 10
+        exclusiveMaximum: true
+      max_length:
+        description: 20文字以下であること
+        example: abcdefghijklmnopqrst
+        type: string
+        maxLength: 20
+      min_length:
+        description: 5文字以上であること
+        example: abcde
+        type: string
+        minLength: 5
+      min_max_length:
+        description: 5文字以上20文字以下であること
+        example: abcdefghij
+        type: string
+        minLength: 5
+        maxLength: 20
+      pattern:
+        description: 英小文字であること
+        example: abcde
+        type: string
+        pattern: "[a-z]"
+      #additional_items:
+      #  type: array
+      #  items:
+      #    - type: object
+      #      properties:
+      #        name:
+      #          type: string
+      #        age:
+      #          type: integer
+      #  additionalItems: false
+      max_items:
+        description: 3要素以下であること
+        example:
+        - value: a
+        - value: b
+        - value: c
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              type: string
+        maxItems: 3
+      min_items:
+        description: 2要素以上であること
+        example:
+        - value: a
+        - value: b
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              type: string
+        minItems: 2
+      unique_items:
+        description: 要素が重複しないこと
+        example:
+        - value: a
+        - value: b
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              type: string
+        uniqueItems: true
+      max_properties:
+        description: 3要素以下であること
+        example:
+          key1: aaa
+          key2: 2
+          key3: true
+        type: object
+        properties:
+          key1:
+            type: string
+          key2:
+            type: number
+          key3:
+            type: boolean
+          key4:
+            type: integer
+        maxProperties: 3
+      min_properties:
+        description: 2要素以上であること
+        example:
+          key1: aaa
+          key2: 2
+        type: object
+        properties:
+          key1:
+            type: string
+          key2:
+            type: number
+          key3:
+            type: boolean
+          key4:
+            type: integer
+        minProperties: 2
+      #additional_properties:
+      #  description: ???
+      #  type: object
+      #  properties:
+      #    x-key1:
+      #      type: string
+      #    x-key2:
+      #      type: number
+      #  patternProperties:
+      #    "^x-":
+      #      type: string
+      #  additionalProperties: false
+      #dependencies:
+      #  description: ほげ
+      #  example:
+      #    name: aiueo
+      #    credit_card: 1111111111111111
+      #    billing_address: address
+      #  properties:
+      #    name:
+      #      type: string
+      #    credit_card:
+      #      type: number
+      #    billing_address:
+      #      type: string
+      #  required:
+      #  - name
+      #  dependencies:
+      #    credit_card:
+      #    - billing_address
+      all_of:
+        description: 5文字以上10文字以下
+        example: aaaaaaaaaa
+        type: string
+        allOf:
+        - type: string
+        - maxLength: 10
+        - minLength: 5
+      #any_of:
+      #  description: 5文字以上のStringもしくは3桁以下のNumber
+      #  type:
+      #    - string
+      #    - number
+      #  anyOf:
+      #  - type: string
+      #    minLength: 5
+      #  - type: number
+      #    maxLength: 3
+
 #################################################
 # paths
 # - APIの一覧
@@ -3070,6 +3271,136 @@ paths:
       summary: update user_blog_entry
       tags:
       - user_blog_entry
+
+  /validator:
+    get:
+      x-swagger-router-controller: validator
+      description: get validators
+      operationId: validator#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /validator/{id}
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ValidatorCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list validator
+      tags:
+      - validator
+
+    post:
+      x-swagger-router-controller: validator
+      description: create a validator
+      operationId: validator#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/Validator'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Validator'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create validator
+      tags:
+      - validator
+
+  /validator/{id}:
+    put:
+      x-swagger-router-controller: validator
+      description: update the validator
+      operationId: validator#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/Validator'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Validator'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update validator
+      tags:
+      - validator
 
 #################################################
 # securityDefinitions
