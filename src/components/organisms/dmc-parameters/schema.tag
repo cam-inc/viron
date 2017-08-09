@@ -1,11 +1,10 @@
 dmc-parameter-schema.ParameterSchema
-  .ParameterSchema__head
-    .ParameterSchema__title title: { title }
-    .ParameterSchema__description description: { description }
-    .ParameterSchema__required required: { required ? '必須' : 'not必須' }
-    .ParameterSchema__type type: { type }
-  div ddd
+  virtual(if="{ isSingleFrom }")
+    dmc-parameter-form(val="{ opts.val }" parameterObject="{ parameterObjectLike }" onChange="{ handleParameterChange }")
+  virtual(if="{ !isSingleFrom }")
+    div TODO
 
   script.
+    import './form.tag';
     import script from './schema';
     this.external(script);

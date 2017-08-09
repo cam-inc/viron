@@ -6,12 +6,16 @@ dmc-parameter.Parameter
     .Parameter__required required: { required ? '必須' : 'not必須' }
     .Parameter__type type: { type }
   virtual(if="{ !isSchemaMode }")
-    dmc-parameter-form(if="{ isSingleForm }" val="{ opts.val }" parameterObject="{ parameterObject }" onChange="{ handleChange }")
+    virtual(if="{ isSingleMode }")
+      dmc-parameter-form(val="{ opts.val }" parameterObject="{ parameterObject }" onChange="{ handleParameterChange }")
+    virtual(if="{ isMultiMode }")
+      dmc-parameter-items(val="{ opts.val }" itemsObject="{ items }")
   virtual(if="{ isSchemaMode }")
-    dmc-parameter-schema(schemaObject="{ schema }")
+    dmc-parameter-schema(val="{ opts.val }" schemaObject="{ schema }")
 
   script.
     import './form.tag';
+    import './items.tag';
     import './schema.tag';
     import script from './parameter';
     this.external(script);

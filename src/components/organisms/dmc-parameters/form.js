@@ -5,6 +5,7 @@ const UI_CHECKBOX = 'checkbox';
 const UI_SELECT = 'select';
 const UI_UPLOADER = 'uploader';
 
+// TODO: schemaObject or schemaObjectLikeのみを受け取るようにしたい。
 export default function() {
   const parameterObject = ObjectAssign({}, this.opts.parameterobject);
   this.parameterObject = parameterObject;

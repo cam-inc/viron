@@ -57,7 +57,12 @@ export default function() {
   }
 
   // 入力値が変更された時の処理。
-  this.handleChange = newValue => {
+  this.handleParameterChange = newValue => {
+    this.opts.onchange(this.parameterObject, newValue);
+  };
+
+  // 入力値が変更された時の処理。
+  this.handleSchemaChange = newValue => {
     this.opts.onchange(this.parameterObject, newValue);
   };
 }
