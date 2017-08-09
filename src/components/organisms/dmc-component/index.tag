@@ -20,7 +20,6 @@ dmc-component.Component
   script.
     import '../../organisms/dmc-pagination/index.tag';
     import '../../atoms/dmc-icon/index.tag';
-    import '../../atoms/dmc-tooltip/index.tag';
     import './action.tag';
     import './graph-bar.tag';
     import './graph-horizontal-bar.tag';
