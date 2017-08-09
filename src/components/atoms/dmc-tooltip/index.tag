@@ -1,6 +1,6 @@
 dmc-tooltip(class="Tooltip Tooltip--{ opts.placement || 'topCenter' }")
   .Tooltip__basePoint
-    .Tooltip__text { opts.label || 'Please specify a label' }
+    .Tooltip__text { opts.label }
 
   script.
     import script from './index';
