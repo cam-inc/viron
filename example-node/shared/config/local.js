@@ -1,9 +1,5 @@
 module.exports = helper => {
   const config = {
-    scheme: 'https',
-    host: 'localhost',
-    port: 3000,
-
     default_role: 'viewer',
     super_role: 'super',
 
@@ -22,7 +18,7 @@ module.exports = helper => {
     },
 
     acl: {
-      allow_origin: 'https://cam-inc.github.io',
+      //allow_origin: 'https://cam-inc.github.io',
       allow_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
       expose_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
     },

@@ -9,6 +9,7 @@
   "main": "app.js",
   "dependencies": {
     "axios": "^0.16.2",
+    "csv-parse": "^1.2.1",
     "express": "^4.12.3",
     "express-jwt": "^5.3.0",
     "googleapis": "^20.1.0",
@@ -16,6 +17,7 @@
     "moment-timezone": "^0.5.13",
     "mout": "^1.0.0",
     "mysql2": "^1.3.6",
+    "node-dmclib": "0.0.1",
     "sequelize": "^4.3.2",
     "swagger-express-mw": "^0.1.0"
   },
@@ -30,7 +32,8 @@
     "test": "swagger project test",
     "dressup": "docker-compose -f docker-compose.all.yml up --build",
     "dressup-db": "docker-compose -f docker-compose.db.yml up --build",
-    "connect-main": "mysql -u user -ppassword -h 127.0.0.1 -P 3306",
-    "debug": "supervisor --verbose --debug=0.0.0.0:53000 --watch . --extensions 'node,js,yaml' --ignore node_modules -- ./app.js"
+    "connect-main": "mysql -u user -ppassword -h 127.0.0.1 -P 3306 -Ddmc_local",
+    "debug": "supervisor --verbose --debug=0.0.0.0:53000 --watch . --extensions 'node,js,yaml' --ignore node_modules -- ./app.js",
+    "help": "cat package.json | jq \".scripts\""
   }
 }

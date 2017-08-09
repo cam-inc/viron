@@ -1,8 +1,9 @@
 const compact = require('mout/array/compact');
 const isEmpty = require('mout/lang/isEmpty');
+const dmclib = require('node-dmclib');
 
 const constant = require('../../shared/constant');
-const helperAdminRole = require('../../lib/admin_role').helper;
+const helperAdminRole = dmclib.adminRole.helper;
 
 const defaultOptions = {
   key: 'key',

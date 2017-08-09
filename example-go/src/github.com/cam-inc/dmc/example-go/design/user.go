@@ -78,6 +78,12 @@ var _ = Resource("user", func() {
 		}))
 		Params(func() {
 			Param("name", String)
+			Param("limit", Integer, "number of items per page", func() {
+				Metadata("swagger:extension:x-param-for", "pagination_limit")
+			})
+			Param("offset", Integer, "offset number of page", func() {
+				Metadata("swagger:extension:x-param-for", "pagination_offset")
+			})
 		})
 		Response(OK, func() {
 			Media(CollectionOf(UserMediaType, func() {
