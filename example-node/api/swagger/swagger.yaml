@@ -1,18 +1,45 @@
-consumes:
-- application/json
-- application/xml
-- application/gob
-- application/x-gob
-- text/html
-- text/plain
+#################################################
+# OpenAPI Specification Version2.0.0
+# @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
+#################################################
+swagger: "2.0"
+
+#################################################
+# host
+# - APIを提供するホスト
+# - DMCではブラウザで先にエンドポイントを登録するためこの値は参照されない
+#################################################
+host: localhost:3000
+
+#################################################
+# info
+# - API全般のメタ情報を記載
+#################################################
+info:
+  title: DMC example for Node.js
+  description: Design-based Management Console.
+  version: 0.0.1
+
+#################################################
+# schemes
+# - APIを提供する通信プロトコルのリスト
+#################################################
+schemes:
+- https
+
+#################################################
+# definitions
+# - リクエストやレスポンスのレイアウトの定義
+# - paths内から $ref で参照できる
+#################################################
 definitions:
-  Admin_role:
+  AdminRole:
     description: A Admin Role
     example:
       paths:
       - allow: true
         path: GET:/user
-      role_id: operator.
+      role_id: operator
     properties:
       paths:
         description: target path
@@ -30,17 +57,19 @@ definitions:
     - role_id
     - paths
     type: object
-  Admin_roleCollection:
-    description: Admin_roleCollection is the media type for an array of Admin_role
+
+  AdminRoleCollection:
+    description: AdminRoleCollection is the media type for an array of AdminRole
     example:
     - paths:
       - allow: true
         path: GET:/user
       role_id: operator
     items:
-      $ref: '#/definitions/Admin_role'
+      $ref: '#/definitions/AdminRole'
     type: array
-  Admin_user:
+
+  AdminUser:
     description: A Admin User
     example:
       email: test@dmc.com
@@ -64,16 +93,18 @@ definitions:
     - id
     - email
     type: object
-  Admin_userCollection:
-    description: Admin_userCollection is the media type for an array of Admin_user
+
+  AdminUserCollection:
+    description: AdminUserCollection is the media type for an array of AdminUser
     example:
     - email: test@dmc.com
       id: 1
       role_id: operator
     items:
-      $ref: '#/definitions/Admin_user'
+      $ref: '#/definitions/AdminUser'
     type: array
-  Audit_log:
+
+  AuditLog:
     description: A Audit Log
     example:
       createdAt: 2006-02-12T07:09:13+09:00
@@ -114,8 +145,9 @@ definitions:
         example: Et saepe nihil in earum sint.
         type: string
     type: object
-  Audit_logCollection:
-    description: Audit_logCollection is the media type for an array of Audit_log
+
+  AuditLogCollection:
+    description: AuditLogCollection is the media type for an array of AuditLog
     example:
     - createdAt: 2006-02-12T07:09:13+09:00
       request_body: '{"name":"test", "id":1}'
@@ -125,9 +157,10 @@ definitions:
       status_code: 200
       user_id: test@dmc.com
     items:
-      $ref: '#/definitions/Audit_log'
+      $ref: '#/definitions/AuditLog'
     type: array
-  Auth_type:
+
+  AuthType:
     description: A Auth Type
     example:
       method: POST
@@ -157,17 +190,19 @@ definitions:
     - method
     - provider
     type: object
-  Auth_typeCollection:
-    description: Auth_typeCollection is the media type for an array of Auth_type
+
+  AuthTypeCollection:
+    description: AuthTypeCollection is the media type for an array of AuthType
     example:
     - method: POST
       provider: google
       type: oauth
       url: '/googlesignin'
     items:
-      $ref: '#/definitions/Auth_type'
+      $ref: '#/definitions/AuthType'
     type: array
-  Blog_design:
+
+  BlogDesign:
     description: A BlogDesign Master
     example:
       background_image: http://hoge.com/a.png
@@ -212,8 +247,9 @@ definitions:
     required:
     - name
     type: object
-  Blog_designCollection:
-    description: Blog_designCollection is the media type for an array of Blog_design
+
+  BlogDesignCollection:
+    description: BlogDesignCollection is the media type for an array of BlogDesign
     example:
     - background_image: http://hoge.com/a.png
       base_color: blue
@@ -223,8 +259,9 @@ definitions:
       name: design name
       updatedAt: 1971-03-24T08:40:07+09:00
     items:
-      $ref: '#/definitions/Blog_design'
+      $ref: '#/definitions/BlogDesign'
     type: array
+
   BlogDesignPayload:
     example:
       background_image: http://hoge.com/a.png
@@ -253,6 +290,7 @@ definitions:
     - name
     - base_color
     type: object
+
   CreateAdminRolePayload:
     example:
       paths:
@@ -277,6 +315,7 @@ definitions:
         example: operator
         type: string
     type: object
+
   CreateAdminUserPayload:
     example:
       email: user@sample.com
@@ -294,6 +333,7 @@ definitions:
     - email
     - password
     type: object
+
   Dmc:
     description: A DMC settings data
     example:
@@ -380,6 +420,7 @@ definitions:
     - tags
     - pages
     type: object
+
   SigninAuthPayload:
     example:
       email: user1@dmc.com
@@ -392,6 +433,7 @@ definitions:
         example: XXXXXXXXXXXX
         type: string
     type: object
+
   StatsGuideType:
     example:
       x:
@@ -404,6 +446,7 @@ definitions:
       y:
         $ref: '#/definitions/StatsLabelType'
     type: object
+
   StatsLabelType:
     example:
       label: yyyymmdd
@@ -414,6 +457,7 @@ definitions:
     required:
     - label
     type: object
+
   Statsdau:
     description: A DAU data
     example:
@@ -427,6 +471,7 @@ definitions:
     required:
     - value
     type: object
+
   Statsmau:
     description: A MAU data
     example:
@@ -440,6 +485,7 @@ definitions:
     required:
     - value
     type: object
+
   Statsplanet:
     description: Planets data
     example:
@@ -491,6 +537,7 @@ definitions:
     - x
     - y
     type: object
+
   UpdateAdminRolePayload:
     example:
       paths:
@@ -506,6 +553,7 @@ definitions:
           $ref: '#/definitions/adminrolepath'
         type: array
     type: object
+
   UpdateAdminUserPayload:
     example:
       password: XXXXXXXXXXXXXXXX
@@ -522,6 +570,7 @@ definitions:
     required:
     - role_id
     type: object
+
   UploadFilePayload:
     example:
       data: binary-data
@@ -536,6 +585,7 @@ definitions:
         example: img/x/001.png
         type: string
     type: object
+
   User:
     description: A User
     example:
@@ -602,7 +652,8 @@ definitions:
     - id
     - name
     type: object
-  User_blog:
+
+  UserBlog:
     description: A User Blog
     example:
       created_at: 1993-07-26T02:54:17+09:00
@@ -666,7 +717,8 @@ definitions:
     - title
     - design_id
     type: object
-  User_blog_entry:
+
+  UserBlogEntry:
     description: A User Blog Entry
     example:
       content: Velit iure doloribus.
@@ -721,8 +773,9 @@ definitions:
     - title
     - content
     type: object
-  User_blog_entryCollection:
-    description: User_blog_entryCollection is the media type for an array of User_blog_entry
+
+  UserBlogEntryCollection:
+    description: UserBlogEntryCollection is the media type for an array of UserBlogEntry
     example:
     - content: Velit iure doloribus.
       createdAt: 1991-02-16T10:17:41+09:00
@@ -733,10 +786,11 @@ definitions:
       updatedAt: 2003-10-21T03:42:51+09:00
       user_blog_id: 11
     items:
-      $ref: '#/definitions/User_blog_entry'
+      $ref: '#/definitions/UserBlogEntry'
     type: array
-  User_blogCollection:
-    description: User_blogCollection is the media type for an array of User_blog
+
+  UserBlogCollection:
+    description: UserBlogCollection is the media type for an array of UserBlog
     example:
     - createdAt: 1993-07-26T02:54:17+09:00
       deletedAt: 1999-07-26T02:54:17+09:00
@@ -766,8 +820,9 @@ definitions:
       updated_at: 1979-11-12T02:46:55+09:00
       user_id: 1
     items:
-      $ref: '#/definitions/User_blog'
+      $ref: '#/definitions/UserBlog'
     type: array
+
   UserBlogEntryPayload:
     example:
       content: Corporis officiis distinctio optio voluptatem.
@@ -796,6 +851,7 @@ definitions:
     required:
     - user_blog_id
     type: object
+
   UserBlogPayload:
     example:
       design_id: simple
@@ -833,6 +889,7 @@ definitions:
     required:
     - user_id
     type: object
+
   UserCollection:
     description: UserCollection is the media type for an array of User
     example:
@@ -848,6 +905,7 @@ definitions:
     items:
       $ref: '#/definitions/User'
     type: array
+
   UserPayload:
     example:
       birthday: 1995-05-12T09:45:56Z
@@ -888,6 +946,7 @@ definitions:
     required:
     - name
     type: object
+
   adminrolepath:
     example:
       allow: true
@@ -907,6 +966,7 @@ definitions:
     - path
     - allow
     type: object
+
   api:
     description: Accessing api information type
     example:
@@ -925,6 +985,7 @@ definitions:
     - path
     - method
     type: object
+
   component:
     description: A Component type
     example:
@@ -999,6 +1060,7 @@ definitions:
     - style
     - pagination
     type: object
+
   error:
     description: Error response media type
     example:
@@ -1035,6 +1097,7 @@ definitions:
         example: "400"
         type: string
     type: object
+
   option:
     example:
       key: key
@@ -1052,6 +1115,7 @@ definitions:
     - key
     - value
     type: object
+
   page:
     description: A page type
     example:
@@ -1126,6 +1190,7 @@ definitions:
     - group
     - components
     type: object
+
   query:
     example:
       key: key
@@ -1152,17 +1217,11 @@ definitions:
     - key
     - type
     type: object
-host: localhost:3000
-info:
-  description: |-
-    Design-based Management Console.
 
-      * dashboard
-      * console
-      * swagger
-      * riot
-  title: example for dmc
-  version: 0.0.1
+#################################################
+# paths
+# - APIの一覧
+#################################################
 paths:
   /:
     get:
@@ -1177,6 +1236,7 @@ paths:
       summary: show root
       tags:
       - root
+
   /adminrole:
     get:
       x-swagger-router-controller: dmc_admin_role
@@ -1184,19 +1244,20 @@ paths:
       operationId: admin_role#list
       parameters: []
       produces:
-      - application/vnd.goa.error
-      - application/vnd.admin_role+json; type=collection
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Admin_roleCollection'
+            $ref: '#/definitions/AdminRoleCollection'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1212,6 +1273,7 @@ paths:
       - appendTo: row
         method: delete
         path: /adminrole/{role_id}
+
     post:
       x-swagger-router-controller: dmc_admin_role
       description: create a admin role
@@ -1223,21 +1285,24 @@ paths:
         schema:
           $ref: '#/definitions/CreateAdminRolePayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.admin_role+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Admin_role'
+            $ref: '#/definitions/AdminRole'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1246,6 +1311,7 @@ paths:
       summary: create admin_role
       tags:
       - admin_role
+
   /adminrole/{role_id}:
     delete:
       x-swagger-router-controller: dmc_admin_role
@@ -1258,7 +1324,7 @@ paths:
         required: true
         type: string
       produces:
-      - application/vnd.goa.error
+      - application/json
       responses:
         "204":
           description: No Content
@@ -1268,8 +1334,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1278,6 +1348,7 @@ paths:
       summary: delete admin_role
       tags:
       - admin_role
+
     get:
       x-swagger-router-controller: dmc_admin_role
       description: get the admin role
@@ -1289,21 +1360,24 @@ paths:
         required: true
         type: string
       produces:
-      - application/vnd.goa.error
-      - application/vnd.admin_role+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Admin_role'
+            $ref: '#/definitions/AdminRole'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1312,6 +1386,7 @@ paths:
       summary: show admin_role
       tags:
       - admin_role
+
     put:
       x-swagger-router-controller: dmc_admin_role
       description: update the admin user
@@ -1328,21 +1403,24 @@ paths:
         schema:
           $ref: '#/definitions/UpdateAdminRolePayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.admin_role+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Admin_role'
+            $ref: '#/definitions/AdminRole'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1351,27 +1429,31 @@ paths:
       summary: update admin_role
       tags:
       - admin_role
+
   /adminuser:
     get:
       x-swagger-router-controller: dmc_admin_user
       description: get admin users
       operationId: admin_user#list
       produces:
-      - application/vnd.goa.error
-      - application/vnd.admin_user+json; type=collection
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Admin_userCollection'
+            $ref: '#/definitions/AdminUserCollection'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1387,6 +1469,7 @@ paths:
       - appendTo: row
         method: delete
         path: /adminuser/{id}
+
     post:
       x-swagger-router-controller: dmc_admin_user
       description: create a admin user
@@ -1398,21 +1481,24 @@ paths:
         schema:
           $ref: '#/definitions/CreateAdminUserPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.admin_user+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Admin_user'
+            $ref: '#/definitions/AdminUser'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1421,6 +1507,7 @@ paths:
       summary: create admin_user
       tags:
       - admin_user
+
   /adminuser/{id}:
     delete:
       x-swagger-router-controller: dmc_admin_user
@@ -1433,7 +1520,7 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.goa.error
+      - application/json
       responses:
         "204":
           description: No Content
@@ -1443,8 +1530,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1453,6 +1544,7 @@ paths:
       summary: delete admin_user
       tags:
       - admin_user
+
     get:
       x-swagger-router-controller: dmc_admin_user
       description: get the admin user
@@ -1464,21 +1556,24 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.goa.error
-      - application/vnd.admin_user+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Admin_user'
+            $ref: '#/definitions/AdminUser'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1487,6 +1582,7 @@ paths:
       summary: show admin_user
       tags:
       - admin_user
+
     put:
       x-swagger-router-controller: dmc_admin_user
       description: update the admin user
@@ -1503,21 +1599,24 @@ paths:
         schema:
           $ref: '#/definitions/UpdateAdminUserPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.admin_user+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Admin_user'
+            $ref: '#/definitions/AdminUser'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1526,6 +1625,7 @@ paths:
       summary: update admin_user
       tags:
       - admin_user
+
   /auditlog:
     get:
       x-swagger-router-controller: dmc_audit_log
@@ -1543,19 +1643,20 @@ paths:
         required: false
         type: integer
       produces:
-      - application/vnd.goa.error
-      - application/vnd.audit_log+json; type=collection
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Audit_logCollection'
+            $ref: '#/definitions/AuditLogCollection'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1564,6 +1665,7 @@ paths:
       summary: list audit_log
       tags:
       - audit_log
+
   /blogdesign:
     get:
       x-swagger-router-controller: blog_design
@@ -1581,21 +1683,24 @@ paths:
         required: false
         type: integer
       produces:
-      - application/vnd.goa.error
-      - application/vnd.blog_design+json; type=collection
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Blog_designCollection'
+            $ref: '#/definitions/BlogDesignCollection'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1611,6 +1716,7 @@ paths:
       - appendTo: row
         method: delete
         path: /blogdesign/{id}
+
     post:
       x-swagger-router-controller: blog_design
       description: create a blog design
@@ -1622,21 +1728,24 @@ paths:
         schema:
           $ref: '#/definitions/BlogDesignPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.blog_design+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Blog_design'
+            $ref: '#/definitions/BlogDesign'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1645,6 +1754,7 @@ paths:
       summary: create blog_design
       tags:
       - blog_design
+
   /blogdesign/{id}:
     delete:
       x-swagger-router-controller: blog_design
@@ -1657,7 +1767,7 @@ paths:
         required: true
         type: string
       produces:
-      - application/vnd.goa.error
+      - application/json
       responses:
         "204":
           description: No Content
@@ -1667,8 +1777,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1677,6 +1791,7 @@ paths:
       summary: delete blog_design
       tags:
       - blog_design
+
     get:
       x-swagger-router-controller: blog_design
       description: get the blog design
@@ -1688,21 +1803,24 @@ paths:
         required: true
         type: string
       produces:
-      - application/vnd.goa.error
-      - application/vnd.blog_design+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Blog_design'
+            $ref: '#/definitions/BlogDesign'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1711,6 +1829,7 @@ paths:
       summary: show blog_design
       tags:
       - blog_design
+
     put:
       x-swagger-router-controller: blog_design
       description: update the blog design
@@ -1727,21 +1846,24 @@ paths:
         schema:
           $ref: '#/definitions/BlogDesignPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.blog_design+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Blog_design'
+            $ref: '#/definitions/BlogDesign'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1750,14 +1872,14 @@ paths:
       summary: update blog_design
       tags:
       - blog_design
+
   /dmc:
     get:
       x-swagger-router-controller: dmc
       description: dmc settings
       operationId: dmc#show
       produces:
-      - application/vnd.goa.error
-      - application/vnd.dmc+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -1769,6 +1891,8 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -1777,6 +1901,7 @@ paths:
       summary: show dmc
       tags:
       - dmc
+
   /dmc_authtype:
     get:
       x-swagger-router-controller: dmc_authtype
@@ -1788,12 +1913,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Auth_typeCollection'
+            $ref: '#/definitions/AuthTypeCollection'
       schemes:
       - https
       summary: list auth_type
       tags:
       - auth_type
+
   /file:
     post:
       description: file upload
@@ -1805,7 +1931,7 @@ paths:
         schema:
           $ref: '#/definitions/UploadFilePayload'
       produces:
-      - application/vnd.goa.error
+      - application/json
       responses:
         "204":
           description: No Content
@@ -1815,11 +1941,14 @@ paths:
             $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: upload file
       tags:
       - file
+
   /file/{path}:
     get:
       description: file download
@@ -1830,7 +1959,7 @@ paths:
         required: true
         type: string
       produces:
-      - application/vnd.goa.error
+      - application/json
       - text/plain
       responses:
         "200":
@@ -1848,11 +1977,14 @@ paths:
             $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: download file
       tags:
       - file
+
   /googleoauth2callback:
     get:
       x-swagger-router-controller: dmc_auth
@@ -1889,6 +2021,7 @@ paths:
       summary: googleoauth2callback auth
       tags:
       - auth
+
   /googlesignin:
     get:
       x-swagger-router-controller: dmc_auth
@@ -1915,6 +2048,7 @@ paths:
       summary: googlesignin auth
       tags:
       - auth
+
   /ping:
     get:
       x-swagger-router-controller: ping
@@ -1932,6 +2066,7 @@ paths:
       summary: show ping
       tags:
       - ping
+
   /signin:
     post:
       x-swagger-router-controller: dmc_auth
@@ -1954,15 +2089,22 @@ paths:
           description: Temporary Redirect
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: signin auth
       tags:
       - auth
+
   /signout:
     post:
       x-swagger-router-controller: dmc_auth
@@ -1976,14 +2118,14 @@ paths:
       summary: signout auth
       tags:
       - auth
+
   /stats/dau:
     get:
       x-swagger-router-controller: stats
       description: Service Daily Activity User
       operationId: stats#dau
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsdau+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -1995,19 +2137,21 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: show stats_dau
       tags:
       - stats_dau
+
   /stats/mau:
     get:
       x-swagger-router-controller: stats
       description: Service Monthly Activity User
       operationId: stats#mau
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsmau+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2019,19 +2163,21 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: show stats_mau
       tags:
       - stats_mau
+
   /stats/planet/bar:
     get:
       x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#bar
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsplanet+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2043,19 +2189,21 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: bar stats_planet
       tags:
       - stats_planet
+
   /stats/planet/horizontal-bar:
     get:
       x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#horizontal_bar
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsplanet+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2067,19 +2215,21 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: horizontal-bar stats_planet
       tags:
       - stats_planet
+
   /stats/planet/horizontal-stacked-bar:
     get:
       x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#horizontal_stacked_bar
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsplanet+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2091,19 +2241,21 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: horizontal-stacked-bar stats_planet
       tags:
       - stats_planet
+
   /stats/planet/line:
     get:
       x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#line
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsplanet+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2115,19 +2267,21 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: line stats_planet
       tags:
       - stats_planet
+
   /stats/planet/scatterplot:
     get:
       x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#scatterplot
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsplanet+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2139,19 +2293,21 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: scatterplot stats_planet
       tags:
       - stats_planet
+
   /stats/planet/stacked-area:
     get:
       x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#stacked_area
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsplanet+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2163,19 +2319,21 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: stacked-area stats_planet
       tags:
       - stats_planet
+
   /stats/planet/stacked-bar:
     get:
       x-swagger-router-controller: stats_planet
       description: Planets Information
       operationId: stats_planet#stacked-bar
       produces:
-      - application/vnd.goa.error
-      - application/vnd.statsplanet+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2187,18 +2345,20 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       summary: stacked-bar stats_planet
       tags:
       - stats_planet
+
   /swagger.json:
     get:
       x-swagger-router-controller: swagger
       description: get swagger.json
       operationId: swagger#show
       produces:
-      - application/vnd.goa.error
       - application/json
       responses:
         "200":
@@ -2211,8 +2371,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2221,6 +2385,7 @@ paths:
       summary: show swagger
       tags:
       - swagger
+
   /user:
     get:
       x-swagger-router-controller: user
@@ -2233,8 +2398,7 @@ paths:
         required: false
         type: string
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user+json; type=collection
+      - application/json
       responses:
         "200":
           description: OK
@@ -2246,8 +2410,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2266,6 +2434,7 @@ paths:
       - appendTo: ""
         method: post
         path: /user/upload/csv
+
     post:
       x-swagger-router-controller: user
       description: create a user
@@ -2277,8 +2446,7 @@ paths:
         schema:
           $ref: '#/definitions/UserPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2290,8 +2458,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2300,6 +2472,7 @@ paths:
       summary: create user
       tags:
       - user
+
   /user/upload/csv:
     post:
       x-swagger-router-controller: user
@@ -2318,6 +2491,8 @@ paths:
           description: No Content
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2326,6 +2501,7 @@ paths:
       summary: upload users
       tags:
       - user
+
   /user/{id}:
     delete:
       x-swagger-router-controller: user
@@ -2338,7 +2514,7 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.goa.error
+      - application/json
       responses:
         "204":
           description: No Content
@@ -2348,8 +2524,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2358,6 +2538,7 @@ paths:
       summary: delete user
       tags:
       - user
+
     get:
       x-swagger-router-controller: user
       description: get the user
@@ -2369,8 +2550,7 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2382,8 +2562,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2392,6 +2576,7 @@ paths:
       summary: show user
       tags:
       - user
+
     put:
       x-swagger-router-controller: user
       description: update the user
@@ -2408,8 +2593,7 @@ paths:
         schema:
           $ref: '#/definitions/UserPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user+json
+      - application/json
       responses:
         "200":
           description: OK
@@ -2421,8 +2605,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2431,6 +2619,7 @@ paths:
       summary: update user
       tags:
       - user
+
   /userblog:
     get:
       x-swagger-router-controller: user_blog
@@ -2448,21 +2637,24 @@ paths:
         required: false
         type: integer
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user_blog+json; type=collection
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/User_blogCollection'
+            $ref: '#/definitions/UserBlogCollection'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2478,6 +2670,7 @@ paths:
       - appendTo: row
         method: delete
         path: /userblog/{id}
+
     post:
       x-swagger-router-controller: user_blog
       description: create a user blog
@@ -2489,21 +2682,24 @@ paths:
         schema:
           $ref: '#/definitions/UserBlogPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user_blog+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/User_blog'
+            $ref: '#/definitions/UserBlog'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2512,6 +2708,7 @@ paths:
       summary: create user_blog
       tags:
       - user_blog
+
   /userblog/{id}:
     delete:
       x-swagger-router-controller: user_blog
@@ -2524,7 +2721,7 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.goa.error
+      - application/json
       responses:
         "204":
           description: No Content
@@ -2534,8 +2731,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2544,6 +2745,7 @@ paths:
       summary: delete user_blog
       tags:
       - user_blog
+
     get:
       x-swagger-router-controller: user_blog
       description: get the user blog
@@ -2555,21 +2757,24 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user_blog+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/User_blog'
+            $ref: '#/definitions/UserBlog'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2578,6 +2783,7 @@ paths:
       summary: show user_blog
       tags:
       - user_blog
+
     put:
       x-swagger-router-controller: user_blog
       description: update the user blog
@@ -2594,21 +2800,24 @@ paths:
         schema:
           $ref: '#/definitions/UserBlogPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user_blog+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/User_blog'
+            $ref: '#/definitions/UserBlog'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2617,6 +2826,7 @@ paths:
       summary: update user_blog
       tags:
       - user_blog
+
   /userblog/autocomplete/{field}:
     get:
       description: autocomplete user data
@@ -2633,7 +2843,6 @@ paths:
         required: false
         type: string
       produces:
-      - application/vnd.goa.error
       - application/json
       responses:
         "200":
@@ -2644,6 +2853,8 @@ paths:
             $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2652,6 +2863,7 @@ paths:
       summary: autocomplete user_blog
       tags:
       - user_blog
+
   /userblogentry:
     get:
       x-swagger-router-controller: user_blog_entry
@@ -2669,21 +2881,24 @@ paths:
         required: false
         type: integer
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user_blog_entry+json; type=collection
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/User_blog_entryCollection'
+            $ref: '#/definitions/UserBlogEntryCollection'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2699,6 +2914,7 @@ paths:
       - appendTo: row
         method: delete
         path: /userblogentry/{id}
+
     post:
       x-swagger-router-controller: user_blog_entry
       description: create a user blog entry
@@ -2710,21 +2926,24 @@ paths:
         schema:
           $ref: '#/definitions/UserBlogEntryPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user_blog_entry+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/User_blog_entry'
+            $ref: '#/definitions/UserBlogEntry'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2733,6 +2952,7 @@ paths:
       summary: create user_blog_entry
       tags:
       - user_blog_entry
+
   /userblogentry/{id}:
     delete:
       x-swagger-router-controller: user_blog_entry
@@ -2745,7 +2965,7 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.goa.error
+      - application/json
       responses:
         "204":
           description: No Content
@@ -2755,8 +2975,12 @@ paths:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2765,6 +2989,7 @@ paths:
       summary: delete user_blog_entry
       tags:
       - user_blog_entry
+
     get:
       x-swagger-router-controller: user_blog_entry
       description: get the user blog entry
@@ -2776,21 +3001,24 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user_blog_entry+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/User_blog_entry'
+            $ref: '#/definitions/UserBlogEntry'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2799,6 +3027,7 @@ paths:
       summary: show user_blog_entry
       tags:
       - user_blog_entry
+
     put:
       x-swagger-router-controller: user_blog_entry
       description: update the user blog entry
@@ -2815,21 +3044,24 @@ paths:
         schema:
           $ref: '#/definitions/UserBlogEntryPayload'
       produces:
-      - application/vnd.goa.error
-      - application/vnd.user_blog_entry+json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/User_blog_entry'
+            $ref: '#/definitions/UserBlogEntry'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - https
       security:
@@ -2838,28 +3070,11 @@ paths:
       summary: update user_blog_entry
       tags:
       - user_blog_entry
-produces:
-- application/json
-- application/xml
-- application/gob
-- application/x-gob
-- text/html
-- text/plain
-responses:
-  InternalServerError:
-    description: Internal Server Error
-  MovedPermanently:
-    description: Moved Permanently
-  NoContent:
-    description: No Content
-  NotFound:
-    description: Not Found
-  TemporaryRedirect:
-    description: Temporary Redirect
-  Unauthorized:
-    description: Unauthorized
-schemes:
-- https
+
+#################################################
+# securityDefinitions
+# - API全体で利用できる認証スキーム
+#################################################
 securityDefinitions:
   jwt:
     type: oauth2
@@ -2868,4 +3083,26 @@ securityDefinitions:
     scopes:
       api:access: API access
 
-swagger: "2.0"
+#################################################
+# produces
+# - APIが提供するMIMEタイプの一覧
+#################################################
+produces:
+  - application/json
+  - application/xml
+  - application/gob
+  - application/x-gob
+  - text/html
+  - text/plain
+
+#################################################
+# consumes
+# - APIが受け付けるMIMEタイプの一覧
+#################################################
+consumes:
+  - application/json
+  - application/xml
+  - application/gob
+  - application/x-gob
+  - text/html
+  - text/plain
