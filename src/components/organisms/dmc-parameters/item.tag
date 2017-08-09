@@ -1,5 +1,8 @@
 dmc-parameters-item.ParameterItem
-  dmc-parameter-form(val="{ opts.val }" parameterObject="{ schemaObject }" onChange="{ handleParameterChange }")
+  .ParameterItem__head
+    div item
+  .ParameterItem__body
+    dmc-parameter-form(val="{ opts.val }" parameterObject="{ itemsObject }" onChange="{ handleFormChange }")
 
   script.
     import './form.tag';

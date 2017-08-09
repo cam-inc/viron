@@ -1,4 +1,5 @@
-// @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.2
+// NOTE: OAS2.0はJSON Schema SpecのDraft4を使用している。誤って最新Draftを参照しないように注意すること。
 // TODO: i18n対応すること。
 import forEach from 'mout/array/forEach';
 import unique from 'mout/array/unique';

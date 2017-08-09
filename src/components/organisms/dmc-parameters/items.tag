@@ -3,9 +3,9 @@ dmc-parameter-items.ParameterItems
     div TODO + -
   .ParameterItems__body
     virtual(if="{ !isRecursive }")
-      dmc-parameter-item(each="{ item, idx in itemsParameters}" idx="{ idx }" schemaObject="{ parent.opts.itemsobject }")
+      dmc-parameter-item(each="{ val, idx in opts.val }" idx="{ idx }" val="{ parent.getItemValue(idx) }" itemsObject="{ parent.itemsObject }" onChange="{ parent.handleItemChange }")
     virtual(if="{ isRecursive }")
-      dmc-parameter-items(val="{ opts.val }" itemsObject="{ items }")
+      dmc-parameter-items(each="{ val, idx in opts.val }" val="{ parent.getItemValue(idx) }" itemsObject="{ parent.items }" onChange="{ parent.handleItemsChange }")
 
   script.
     import './item.tag';
