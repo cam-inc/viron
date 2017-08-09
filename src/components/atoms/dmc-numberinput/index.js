@@ -44,7 +44,6 @@ export default function() {
   this.handleInputInput = e => {
     e.preventUpdate = true;
     let newText = e.target.value.replace(/[^-^0-9]/g, '');// eslint-disable-line no-irregular-whitespace
-    console.log(newText);
     if(!newText.length || newText.match(/^([-]?[1-9][0-9]*?|-|0)$/)) {
       this.opts.onchange(newText);
     }else {
