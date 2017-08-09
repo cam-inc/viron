@@ -24,14 +24,17 @@ TODO: 各数値の変数化
   border-style: solid;
 }
 
+.Tooltip__border--width::after {
+  border-width: 5px;
+}
+
 /*擬似クラス　topRight,topLeft,topCenter*/
 
 .Tooltip--topRight::after,
 .Tooltip--topLeft::after,
 .Tooltip--topCenter::after {
   bottom: -5px;
-  margin-left: -5px;
-  border-width: 5px;
+  left: -5px;
   border-color: var(--color-basic-darkGray) transparent transparent transparent;
 }
 
@@ -42,7 +45,6 @@ TODO: 各数値の変数化
 .Tooltip--bottomCenter::after {
   left: -5px;
   top: -5px;
-  border-width: 5px;
   border-color: transparent transparent var(--color-basic-darkGray) transparent;
 }
 
@@ -51,8 +53,7 @@ TODO: 各数値の変数化
 .Tooltip--rightTop::after,
 .Tooltip--rightBottom::after {
   left: -5px;
-  margin-top: -5px;
-  border-width: 5px;
+  top: -5px;
   border-color: transparent var(--color-basic-darkGray) transparent transparent;
 }
 
@@ -61,8 +62,7 @@ TODO: 各数値の変数化
 .Tooltip--leftTop::after,
 .Tooltip--leftBottom::after {
   left: -5px;
-  margin-top: -5px;
-  border-width: 5px;
+  top: -5px;
   border-color: transparent transparent transparent var(--color-basic-darkGray);
 }
 
@@ -73,7 +73,7 @@ TODO: 各数値の変数化
   display: inline-block;
   position: absolute;
   background-color: var(--color-basic-darkGray);
-  padding: 5px 5px;
+  padding: 5px;
   border-radius: 5px;
 }
 
@@ -105,12 +105,12 @@ TODO: 各数値の変数化
   background-color: transparent;
 }
 
-.Tooltip--topCenter .Tooltip__text .Tooltip--centerHorizontal,
-.Tooltip--bottomCenter .Tooltip__text .Tooltip--centerHorizontal {
+.Tooltip--topCenter .Tooltip--centerHorizontal,
+.Tooltip--bottomCenter .Tooltip--centerHorizontal {
   position: relative;
   margin-left: -50%;
   background-color: var(--color-basic-darkGray);
-  padding: 5px 5px;
+  padding: 5px;
   border-radius: 5px;
   display: inline-block;
 }
