@@ -9,7 +9,13 @@ export default function() {
     if (number === '-') {
       number = 0;
     }
-    this.opts.onchange(Number(number) + (this.opts.step || 1) );
+    if(Number(number) >= this.opts.max) {
+      number = this.opts.max - (this.opts.step || 1);
+    }
+    if(Number(number) < this.opts.min) {
+      number = this.opts.min - (this.opts.step || 1);
+    }
+    this.opts.onchange(Number(number) + (this.opts.step || 1));
   };
 
   this.handleDecreaseButtonPat = () => {
@@ -21,7 +27,13 @@ export default function() {
     if (number === '-') {
       number = 0;
     }
-    this.opts.onchange(Number(number) - (this.opts.step || 1) );
+    if(Number(number) > this.opts.max) {
+      number = this.opts.max + (this.opts.step || 1);
+    }
+    if(Number(number) <= this.opts.min) {
+      number = this.opts.min + (this.opts.step || 1);
+    }
+    this.opts.onchange(Number(number) - (this.opts.step || 1));
   };
 
   this.handleFormKeyDown = (e) => {
