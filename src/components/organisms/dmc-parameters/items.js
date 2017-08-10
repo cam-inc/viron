@@ -29,7 +29,7 @@ export default function() {
    * @param {Number} idx
    * @return {*}
    */
-  this.getPropertyValue = idx => {
+  this.getItemValue = idx => {
     let value = this.opts.val[idx];
     // nullも値として有効なので`undefined`だけを対象とする。
     if (value === undefined) {
@@ -41,6 +41,22 @@ export default function() {
       }
     }
     return value;
+  };
+
+  // +ボタンがタップされた時の処理。
+  this.handleAddButtonTap = () => {
+    const arr = this.opts.val.concat([]);
+    // undefinedを追加することで空の入力フォームを出力できる。
+    arr.push(undefined);
+    this.opts.onchange(arr, this.opts.idx);
+  };
+
+  // +ボタンがタップされた時の処理。
+  this.handleAddButtonTap = () => {
+    const arr = this.opts.val.concat([]);
+    // undefinedを追加することで空の入力フォームを出力できる。
+    arr.push(undefined);
+    this.opts.onchange(arr, this.opts.idx);
   };
 
   // itemsが変更された時の処理。

@@ -1,6 +1,7 @@
 dmc-parameter-items.ParameterItems
   .ParameterItems__head
-    div TODO + -
+    .ParameterItems__addButton(ref="touch" onTap="handleAddButtonTap")
+      dmc-icon(type="plus")
   .ParameterItems__body
     virtual(if="{ !isRecursive }")
       dmc-parameter-item(each="{ val, idx in opts.val }" idx="{ idx }" val="{ parent.getItemValue(idx) }" itemsObject="{ parent.itemsObject }" onChange="{ parent.handleItemChange }")
