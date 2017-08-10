@@ -1,0 +1,128 @@
+:root {
+  --component-tooltip-triangle-height: 5px;
+}
+
+/*アニメーション*/
+
+@keyframes TooltipIn {
+    0% {opacity: 0}
+    100% {opacity: 1}
+}
+
+.Tooltip {
+  width: 0;
+  height: 0;
+  position: relative;
+  animation: TooltipIn 0.5s ease 0s 1 normal;
+}
+
+/*擬似クラス（吹き出しの三角）*/
+
+.Tooltip::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: calc(var(--component-tooltip-triangle-height) * -1);
+  left: calc(var(--component-tooltip-triangle-height) * -1);
+  width: calc(var(--component-tooltip-triangle-height) * 2);
+  height: calc(var(--component-tooltip-triangle-height) * 2);
+  border: var(--component-tooltip-triangle-height) solid;
+}
+
+/*下向き矢印*/
+
+.Tooltip--topRight::after,
+.Tooltip--topLeft::after,
+.Tooltip--topCenter::after {
+  border-color: var(--color-basic-darkGray) transparent transparent transparent;
+}
+
+/*上向き矢印*/
+
+.Tooltip--bottomRight::after,
+.Tooltip--bottomLeft::after,
+.Tooltip--bottomCenter::after {
+  border-color: transparent transparent var(--color-basic-darkGray) transparent;
+}
+
+/*左向き矢印*/
+
+.Tooltip--rightTop::after,
+.Tooltip--rightBottom::after {
+  border-color: transparent var(--color-basic-darkGray) transparent transparent;
+}
+
+/*右向き矢印*/
+
+.Tooltip--leftTop::after,
+.Tooltip--leftBottom::after {
+  border-color: transparent transparent transparent var(--color-basic-darkGray);
+}
+
+.Tooltip__basePoint {
+  position: absolute;
+}
+
+.Tooltip__text {
+  position: relative;
+  color: var(--color-basic-white);
+  background-color: var(--color-basic-darkGray);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.Tooltip--topCenter .Tooltip__text {
+  left: -50%;
+}
+
+.Tooltip--bottomCenter .Tooltip__text {
+  left: -50%;
+}
+
+.Tooltip--topCenter .Tooltip__basePoint {
+  bottom: var(--component-tooltip-triangle-height);
+}
+
+.Tooltip--topRight .Tooltip__basePoint {
+  bottom: var(--component-tooltip-triangle-height);
+  right: calc(var(--component-tooltip-triangle-height) * -3);
+}
+
+.Tooltip--topLeft .Tooltip__basePoint {
+  bottom: var(--component-tooltip-triangle-height);
+  left: calc(var(--component-tooltip-triangle-height) * -3);
+}
+
+.Tooltip--bottomCenter .Tooltip__basePoint {
+  top: var(--component-tooltip-triangle-height);
+}
+
+.Tooltip--bottomRight .Tooltip__basePoint {
+  top: var(--component-tooltip-triangle-height);
+  right: calc(var(--component-tooltip-triangle-height) * -3);
+}
+
+.Tooltip--bottomLeft .Tooltip__basePoint {
+  top: var(--component-tooltip-triangle-height);
+  left: calc(var(--component-tooltip-triangle-height) * -3);
+}
+
+.Tooltip--rightTop .Tooltip__basePoint {
+  top: calc(var(--component-tooltip-triangle-height) * -2);
+  left: var(--component-tooltip-triangle-height);
+}
+
+.Tooltip--rightBottom .Tooltip__basePoint {
+  top: calc(var(--component-tooltip-triangle-height) * -3);
+  left: var(--component-tooltip-triangle-height);
+}
+
+.Tooltip--leftTop .Tooltip__basePoint {
+  top: calc(var(--component-tooltip-triangle-height) * -2);
+  right: var(--component-tooltip-triangle-height);
+}
+
+.Tooltip--leftBottom .Tooltip__basePoint {
+  top: calc(var(--component-tooltip-triangle-height) * -3);
+  right: var(--component-tooltip-triangle-height);
+}
