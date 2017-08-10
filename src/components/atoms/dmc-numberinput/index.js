@@ -59,7 +59,12 @@ export default function() {
     e.preventUpdate = true;
     let newText = e.target.value.replace(/[^-^0-9]/g, '');// eslint-disable-line no-irregular-whitespace
     if(!newText.length || newText.match(/^([-]?[1-9][0-9]*?|-|0)$/)) {
-      this.opts.onchange(newText);
+      // 入力した値がmin・maxの範囲外であれば親の値を更新しない
+      if(this.opts.max < Number(newText) || this.opts.min  > Number(newText)) {
+        this.refs.input.value = this.opts.number;
+      } else {
+        this.opts.onchange(newText);
+      }
     }else {
       this.refs.input.value = this.opts.number;
     }
