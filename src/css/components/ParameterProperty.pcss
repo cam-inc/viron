@@ -1,27 +1,27 @@
-.ParameterSchema {
+.ParameterProperty {
   display: block;
   padding: 8px;
   border: 1px solid var(--color-basic-lightGray);
   border-radius: 4px;
 }
 
-.ParameterSchema__head {
+.ParameterProperty__head {
   padding: 8px;
   margin-bottom: 8px;
   background-color: var(--color-bg-tertiaryLight);
 }
 
-.ParameterSchema__caption {
+.ParameterProperty__caption {
   @apply --layout-center-center;
 }
 
-.ParameterSchema__title {
+.ParameterProperty__key {
   flex-grow: 1;
   font-weight: bold;
 }
 
-.ParameterSchema__infoOpenShutButton,
-.ParameterSchema__bodyOpenShutButton {
+.ParameterProperty__infoOpenShutButton,
+.ParameterProperty__bodyOpenShutButton {
   @apply --layout-center-center;
   flex-shrink: 0;
   width: 18px;
@@ -34,50 +34,53 @@
   border-radius: 2px;
 }
 
-.ParameterSchema__infoOpenShutButton.hover,
-.ParameterSchema__bodyOpenShutButton.hover {
+.ParameterProperty__infoOpenShutButton.hover,
+.ParameterProperty__bodyOpenShutButton.hover {
   opacity: 0.5;
 }
 
-.ParameterSchema__bodyOpenShutButton .Icon {
+.ParameterProperty__bodyOpenShutButton .Icon {
   transition-duration: 100ms;
   transition-property: transform;
 }
 
-.ParameterSchema__info {
+.ParameterProperty__info {
   display: none;
   padding: 8px;
   margin-top: 8px;
   background-color: var(--color-bg-base);
 }
 
-.ParameterSchema__description,
-.ParameterSchema__format {
+.ParameterProperty__info > div {
   margin-bottom: 8px;
 }
 
-.ParameterSchema__body {
+.ParameterProperty__info > div:last-child {
+  margin-bottom: 0;
+}
+
+.ParameterProperty__body {
   display: none;
 }
 
 /* ============================== */
 /* info開状態 */
 /* ============================== */
-.ParameterSchema--infoOpened > .ParameterSchema__head .ParameterSchema__info {
+.ParameterProperty--infoOpened > .ParameterProperty__head .ParameterProperty__info {
   display: block;
 }
 
-.ParameterSchema--infoOpened > .ParameterSchema__head .ParameterSchema__infoOpenShutButton .Icon {
+.ParameterProperty--infoOpened > .ParameterProperty__head .ParameterProperty__infoOpenShutButton .Icon {
   color: var(--color-text-positive);
 }
 
 /* ============================== */
 /* body開状態 */
 /* ============================== */
-.ParameterSchema--bodyOpened > .ParameterSchema__body {
+.ParameterProperty--bodyOpened > .ParameterProperty__body {
   display: block;
 }
 
-.ParameterSchema--bodyOpened > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton .Icon {
+.ParameterProperty--bodyOpened > .ParameterProperty__head .ParameterProperty__bodyOpenShutButton .Icon {
   transform: rotate(180deg);
 }

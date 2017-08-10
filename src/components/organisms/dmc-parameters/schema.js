@@ -6,13 +6,17 @@ export default function() {
   this.schemaObject = schemaObject;
   this.itemsObject = schemaObject.items;
   this.properties = schemaObject.properties;
+  this.required = schemaObject.required;
+  this.title = schemaObject.title;
+  this.type = schemaObject.type;
+  this.description = schemaObject.description;
 
   // @see: http://json-schema.org/latest/json-schema-core.html#rfc.section.4.2
   // ParameterObject/SchemaObject/ItemsObjectのどれを使用するか。
   this.isFormMode = false;
   this.isPropertiesMode = false;
   this.isItemsMode = false;
-  switch (schemaObject.type) {
+  switch (this.type) {
   case 'null':
   case 'boolean':
   case 'number':
@@ -30,6 +34,23 @@ export default function() {
     // JSON Schema仕様拡張時にここに到達するがサポートしない。
     break;
   }
+
+  // infoの開閉状態。
+  this.isInfoOpened = false;
+  // bodyの開閉状態。
+  this.isBodyOpened = true;
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleInfoOpenShutButtonTap = () => {
+    this.isInfoOpened = !this.isInfoOpened;
+    this.update();
+  };
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleBodyOpenShutButtonTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
+  };
 
   // formが変更された時の処理。
   this.handleFormChange = newValue => {

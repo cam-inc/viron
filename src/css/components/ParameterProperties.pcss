@@ -1,27 +1,27 @@
-.ParameterSchema {
+.ParameterProperties {
   display: block;
   padding: 8px;
   border: 1px solid var(--color-basic-lightGray);
   border-radius: 4px;
 }
 
-.ParameterSchema__head {
+.ParameterProperties__head {
   padding: 8px;
   margin-bottom: 8px;
   background-color: var(--color-bg-tertiaryLight);
 }
 
-.ParameterSchema__caption {
+.ParameterProperties__caption {
   @apply --layout-center-center;
 }
 
-.ParameterSchema__title {
+.ParameterProperties__title {
   flex-grow: 1;
   font-weight: bold;
 }
 
-.ParameterSchema__infoOpenShutButton,
-.ParameterSchema__bodyOpenShutButton {
+.ParameterProperties__infoOpenShutButton,
+.ParameterProperties__bodyOpenShutButton {
   @apply --layout-center-center;
   flex-shrink: 0;
   width: 18px;
@@ -34,50 +34,45 @@
   border-radius: 2px;
 }
 
-.ParameterSchema__infoOpenShutButton.hover,
-.ParameterSchema__bodyOpenShutButton.hover {
+.ParameterProperties__infoOpenShutButton.hover,
+.ParameterProperties__bodyOpenShutButton.hover {
   opacity: 0.5;
 }
 
-.ParameterSchema__bodyOpenShutButton .Icon {
+.ParameterProperties__bodyOpenShutButton .Icon {
   transition-duration: 100ms;
   transition-property: transform;
 }
 
-.ParameterSchema__info {
+.ParameterProperties__info {
   display: none;
   padding: 8px;
   margin-top: 8px;
   background-color: var(--color-bg-base);
 }
 
-.ParameterSchema__description,
-.ParameterSchema__format {
-  margin-bottom: 8px;
-}
-
-.ParameterSchema__body {
+.ParameterProperties__body {
   display: none;
 }
 
 /* ============================== */
 /* info開状態 */
 /* ============================== */
-.ParameterSchema--infoOpened > .ParameterSchema__head .ParameterSchema__info {
+.ParameterProperties--infoOpened > .ParameterProperties__head .ParameterProperties__info {
   display: block;
 }
 
-.ParameterSchema--infoOpened > .ParameterSchema__head .ParameterSchema__infoOpenShutButton .Icon {
+.ParameterProperties--infoOpened > .ParameterProperties__head .ParameterProperties__infoOpenShutButton .Icon {
   color: var(--color-text-positive);
 }
 
 /* ============================== */
 /* body開状態 */
 /* ============================== */
-.ParameterSchema--bodyOpened > .ParameterSchema__body {
+.ParameterProperties--bodyOpened > .ParameterProperties__body {
   display: block;
 }
 
-.ParameterSchema--bodyOpened > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton .Icon {
+.ParameterProperties--bodyOpened > .ParameterProperties__head .ParameterProperties__bodyOpenShutButton .Icon {
   transform: rotate(180deg);
 }

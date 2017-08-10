@@ -4,7 +4,7 @@ dmc-parameter.Parameter(class="{ isInfoOpened ? 'Parameter--infoOpened' : '' } {
       .Parameter__name { name }
       .Parameter__required(if="{ required }") required
       .Parameter__infoOpenShutButton(ref="touch" onTap="handleInfoOpenShutButtonTap")
-        dmc-icon(type="info")
+        dmc-icon(type="infoCirlceO")
       .Parameter__bodyOpenShutButton(ref="touch" onTap="handleBodyOpenShutButtonTap")
         dmc-icon(type="up")
     .Parameter__info

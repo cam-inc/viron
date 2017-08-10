@@ -4,6 +4,7 @@ export default function() {
   // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.18
   const properties = ObjectAssign({}, this.opts.properties);
   this.properties = properties;
+  this.required = (this.opts.required || []).concat([]);
 
   /**
    * propertyを参照してデフォルト値を返します。
@@ -53,6 +54,23 @@ export default function() {
       value = getDefaultValue(property);
     }
     return value;
+  };
+
+  // infoの開閉状態。
+  this.isInfoOpened = false;
+  // bodyの開閉状態。
+  this.isBodyOpened = true;
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleInfoOpenShutButtonTap = () => {
+    this.isInfoOpened = !this.isInfoOpened;
+    this.update();
+  };
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleBodyOpenShutButtonTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
   };
 
   // propertyが変更された時の処理。

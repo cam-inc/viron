@@ -64,4 +64,9 @@ export default function() {
   this.handleTextinputChange = newText => {
     this.opts.onchange(newText);
   };
+
+  // uploader値が変更された時の処理。
+  this.handleUploaderFileChange = newFile => {
+    this.opts.onchange(newFile);
+  };
 }
