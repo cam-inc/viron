@@ -10,8 +10,6 @@ export default function() {
       var text = text.replace(/[^\w]+/g, '-');
       return '<div class="wrapper">' + '<h' + level + '>' + text + '</h' + level + '>' + '</div>';
     },
-
-    console.log(marked('# Marked in browser\n\nRendered by **marked**.', { renderer: renderer }));
     this.refs.view.innerHTML = this.opts.data.content ? marked('# Marked in browser\n\nRendered by **marked**.', { renderer: renderer }) : '';
     // this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
