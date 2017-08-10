@@ -1,8 +1,13 @@
 import ObjectAssign from 'object-assign';
+import oas from '../../../core/oas';
 
 export default function() {
-  const schemaObject = ObjectAssign({}, this.opts.property);
-  this.schemaObject = schemaObject;
+  const propertyObject = ObjectAssign({}, this.opts.property);
+  this.schemaObject = propertyObject;
+  this.normalizedSchemaObject = oas.createSchemaObjectFromPropertyObject(propertyObject, {
+    key: this.opts.key,
+    required: (this.opts._required || []).concat([])
+  });
 
   // schemaが変更された時の処理。
   this.handleSchemaChange = newValue => {

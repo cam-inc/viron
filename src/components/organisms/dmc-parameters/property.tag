@@ -1,6 +1,6 @@
 dmc-parameter-property.ParameterProperty
   .ParameterProperty__body
-    dmc-parameter-schema(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleSchemaChange }")
+    dmc-parameter-schema(val="{ opts.val }" schemaObject="{ normalizedSchemaObject }" onChange="{ handleSchemaChange }")
 
   script.
     import script from './property';

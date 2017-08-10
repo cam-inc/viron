@@ -3,7 +3,7 @@ dmc-parameter-schema.ParameterSchema
     virtual(if="{ isFormMode }")
       dmc-parameter-form(val="{ opts.val }" parameterObject="{ schemaObject }" onChange="{ handleFormChange }")
     virtual(if="{ isPropertiesMode }")
-      dmc-parameter-properties(val="{ opts.val }" properties="{ properties }" required="{ required }" onChange="{ handlePropertiesChange }")
+      dmc-parameter-properties(val="{ opts.val }" properties="{ properties }" _required="{ required }" onChange="{ handlePropertiesChange }")
     virtual(if="{ isItemsMode }")
       dmc-parameter-items(val="{ opts.val }" itemsObject="{ itemsObject }" onChange="{ handleItemsChange }")
 

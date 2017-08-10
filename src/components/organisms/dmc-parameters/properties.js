@@ -4,7 +4,7 @@ export default function() {
   // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.18
   const properties = ObjectAssign({}, this.opts.properties);
   this.properties = properties;
-  this.required = (this.opts.required || []).concat([]);
+  this.required = (this.opts._required || []).concat([]);
 
   /**
    * propertyを参照してデフォルト値を返します。
