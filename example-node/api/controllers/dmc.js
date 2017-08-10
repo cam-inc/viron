@@ -154,7 +154,7 @@ const show = (req, res) => {
       {
         id: 'validator',
         section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_USER,
+        group: constant.GROUP_TEST,
         name: 'バリデータ検証',
         components: [
           {
@@ -164,6 +164,22 @@ const show = (req, res) => {
             options: [defaultOptions],
             pagination: true,
             table_labels: ['validation_type'],
+          },
+        ],
+      },
+      {
+        id: 'nestedarray',
+        section: constant.DMC_SECTION_MANAGE,
+        group: constant.GROUP_TEST,
+        name: 'ネスト配列',
+        components: [
+          {
+            name: 'ネスト配列',
+            api: api('/nestedarray', 'get'),
+            style: constant.DMC_STYLE_TABLE,
+            options: [defaultOptions],
+            pagination: true,
+            table_labels: ['id'],
           },
         ],
       },

@@ -917,7 +917,7 @@ definitions:
       birthday:
         description: 誕生日
         example: 1995-05-12T09:45:56Z
-#        format: date-time
+        format: date-time
         type: string
       blood_type:
         description: 血液型
@@ -1418,6 +1418,32 @@ definitions:
       #    minLength: 5
       #  - type: number
       #    maxLength: 3
+
+  NestedArrayCollection:
+    items:
+      $ref: '#/definitions/NestedArray'
+    type: array
+
+  NestedArray:
+    type: object
+    properties:
+      id:
+        description: id of nested array
+        example: 1
+        type: number
+      values:
+        type: array
+        items:
+          type: array
+          items:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                age:
+                  type: number
 
 #################################################
 # paths
@@ -3401,6 +3427,136 @@ paths:
       summary: update validator
       tags:
       - validator
+
+  /nestedarray:
+    get:
+      x-swagger-router-controller: nested_array
+      description: get nested_arrays
+      operationId: nested_array#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /nestedarray/{id}
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/NestedArrayCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list nested array
+      tags:
+      - nested_array
+
+    post:
+      x-swagger-router-controller: nested_array
+      description: create a nested_array
+      operationId: nested_array#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/NestedArray'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/NestedArray'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create nested aray
+      tags:
+      - nested_array
+
+  /nestedarray/{id}:
+    put:
+      x-swagger-router-controller: nested_array
+      description: update the nested array
+      operationId: nested_array#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/NestedArray'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/NestedArray'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update nested array
+      tags:
+      - netsted_array
 
 #################################################
 # securityDefinitions
