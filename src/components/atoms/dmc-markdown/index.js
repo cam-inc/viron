@@ -3,17 +3,16 @@ import ObjectAssign from 'object-assign';
 export default function() {
 
   this.on('update', () => {
-    marked.setOptions(ObjectAssign({}, {
-      renderer: new marked.Renderer(),
-      gfm: true,
-      tables: true,
-      breaks: false,
-      pedantic: false,
-      sanitize: false,
-      smartLists: true,
-      smartypants: false
-    }, this.opts.data.markedOptions));
 
-    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
+    var renderer = new marked.Renderer();
+
+    renderer.heading = (text, level) => {
+      var text = text.replace(/[^\w]+/g, '-');
+      return '<div class="wrapper">' + '<h' + level + '>' + text + '</h' + level + '>' + '</div>';
+    },
+
+    console.log(marked('# Marked in browser\n\nRendered by **marked**.', { renderer: renderer }));
+    this.refs.view.innerHTML = this.opts.data.content ? marked('# Marked in browser\n\nRendered by **marked**.', { renderer: renderer }) : '';
+    // this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 }
