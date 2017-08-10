@@ -32,6 +32,8 @@ export default function() {
     case 'ArrowDown':
       this.handleDecreaseButtonPat();
       break;
+    default:
+      break;
     }
   };
 
