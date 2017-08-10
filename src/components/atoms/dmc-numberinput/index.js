@@ -15,6 +15,8 @@ export default function() {
   });
 
   this.handleIncreaseButtonPat = () => {
+    // ボタンが押されたとき、inputにフォーカスすることで、矢印ボタンでも加減できるようにする
+    this.refs.input.focus();
     let number = this.opts.number;
     // numberが空文字/null/undefined/0
     if (!number) {
@@ -33,6 +35,8 @@ export default function() {
   };
 
   this.handleDecreaseButtonPat = () => {
+    // ボタンが押されたとき、inputにフォーカスすることで、矢印ボタンでも加減できるようにする
+    this.refs.input.focus();
     let number = this.opts.number;
     // numberが空文字/null/undefined/0
     if (!number) {
