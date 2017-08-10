@@ -38,8 +38,14 @@ export default function() {
     this.update();
   };
 
-  // infoの開閉ボタンがタップされた時の処理。
+  // bodyの開閉ボタンがタップされた時の処理。
   this.handleBodyOpenShutButtonTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
+  };
+
+  // nameがタップされた時の処理。
+  this.handleNameTap = () => {
     this.isBodyOpened = !this.isBodyOpened;
     this.update();
   };

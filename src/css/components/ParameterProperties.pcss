@@ -1,78 +1,11 @@
 .ParameterProperties {
   display: block;
-  padding: 8px;
-  border: 1px solid var(--color-basic-lightGray);
-  border-radius: 4px;
 }
 
-.ParameterProperties__head {
-  padding: 8px;
+.ParameterProperties__body > .ParameterProperty {
   margin-bottom: 8px;
-  background-color: var(--color-bg-tertiaryLight);
 }
 
-.ParameterProperties__caption {
-  @apply --layout-center-center;
-}
-
-.ParameterProperties__title {
-  flex-grow: 1;
-  font-weight: bold;
-}
-
-.ParameterProperties__infoOpenShutButton,
-.ParameterProperties__bodyOpenShutButton {
-  @apply --layout-center-center;
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  margin-left: 4px;
-  margin-left: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  background-color: #fff;
-  border-radius: 2px;
-}
-
-.ParameterProperties__infoOpenShutButton.hover,
-.ParameterProperties__bodyOpenShutButton.hover {
-  opacity: 0.5;
-}
-
-.ParameterProperties__bodyOpenShutButton .Icon {
-  transition-duration: 100ms;
-  transition-property: transform;
-}
-
-.ParameterProperties__info {
-  display: none;
-  padding: 8px;
-  margin-top: 8px;
-  background-color: var(--color-bg-base);
-}
-
-.ParameterProperties__body {
-  display: none;
-}
-
-/* ============================== */
-/* info開状態 */
-/* ============================== */
-.ParameterProperties--infoOpened > .ParameterProperties__head .ParameterProperties__info {
-  display: block;
-}
-
-.ParameterProperties--infoOpened > .ParameterProperties__head .ParameterProperties__infoOpenShutButton .Icon {
-  color: var(--color-text-positive);
-}
-
-/* ============================== */
-/* body開状態 */
-/* ============================== */
-.ParameterProperties--bodyOpened > .ParameterProperties__body {
-  display: block;
-}
-
-.ParameterProperties--bodyOpened > .ParameterProperties__head .ParameterProperties__bodyOpenShutButton .Icon {
-  transform: rotate(180deg);
+.ParameterProperties__body > .ParameterProperty:last-child {
+  margin-bottom: 0;
 }

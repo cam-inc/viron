@@ -1,12 +1,13 @@
 dmc-parameter.Parameter(class="{ isInfoOpened ? 'Parameter--infoOpened' : '' } { isBodyOpened ? 'Parameter--bodyOpened' : '' }")
   .Parameter__head
     .Parameter__caption
-      .Parameter__name { name }
+      .Parameter__bodyOpenShutButton(ref="touch" onTap="handleBodyOpenShutButtonTap")
+        dmc-icon(type="right")
+      .Parameter__name(ref="touch" onTap="handleNameTap") { name }
+      .Parameter__line
       .Parameter__required(if="{ required }") required
       .Parameter__infoOpenShutButton(ref="touch" onTap="handleInfoOpenShutButtonTap")
         dmc-icon(type="infoCirlceO")
-      .Parameter__bodyOpenShutButton(ref="touch" onTap="handleBodyOpenShutButtonTap")
-        dmc-icon(type="up")
     .Parameter__info
       .Parameter__description(if="{ !!description }") description: { description }
       .Parameter__in in: { _in }

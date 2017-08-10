@@ -56,23 +56,6 @@ export default function() {
     return value;
   };
 
-  // infoの開閉状態。
-  this.isInfoOpened = false;
-  // bodyの開閉状態。
-  this.isBodyOpened = true;
-
-  // infoの開閉ボタンがタップされた時の処理。
-  this.handleInfoOpenShutButtonTap = () => {
-    this.isInfoOpened = !this.isInfoOpened;
-    this.update();
-  };
-
-  // infoの開閉ボタンがタップされた時の処理。
-  this.handleBodyOpenShutButtonTap = () => {
-    this.isBodyOpened = !this.isBodyOpened;
-    this.update();
-  };
-
   // propertyが変更された時の処理。
   this.handlePropertyChange = (newValue, key) => {
     const obj = ObjectAssign({}, this.opts.val);

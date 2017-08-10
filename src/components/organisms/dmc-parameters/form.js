@@ -15,8 +15,35 @@ export default function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const parameterObject = ObjectAssign({}, this.opts.parameterobject);
   this.enum = parameterObject.enum;
+  this.name = parameterObject.name;
+  this.description = parameterObject.description;
+  this.required = parameterObject.required;
+  this.type = parameterObject.type;
 
   // TODO: validate
+
+  /**
+   * Selectコンポーネントに使用するoption群を返します。
+   * @return {Array}
+   */
+  this.getSelectOptions = () => {
+    const options = [];
+    if (this.opts.val === undefined) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
+    forEach(this.enum, (v, idx) => {
+      options.push({
+        id: `select_${idx}`,
+        label: v,
+        isSelected: (v === this.opts.val)
+      });
+    });
+    return options;
+  };
 
   /**
    * ParameterObjectの値から適切なUIコンポーネントを推測します。
@@ -58,30 +85,29 @@ export default function() {
   // 使用するUIコンポーネント名。
   this.uiType = inferUITypeByParameterObject(parameterObject);
 
-  /**
-   * Selectコンポーネントに使用するoption群を返します。
-   * @return {Array}
-   */
-  this.getSelectOptions = () => {
-    const options = [];
-    if (this.opts.val === undefined) {
-      options.push({
-        label: '-- select an option --',
-        isSelected: true,
-        isDiabled: true
-      });
-    }
-    forEach(this.enum, (v, idx) => {
-      options.push({
-        id: `select_${idx}`,
-        label: v,
-        isSelected: (v === this.opts.val)
-      });
-    });
-    return options;
+  // infoの開閉状態。
+  this.isInfoOpened = false;
+  // bodyの開閉状態。
+  this.isBodyOpened = true;
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleInfoOpenShutButtonTap = () => {
+    this.isInfoOpened = !this.isInfoOpened;
+    this.update();
   };
 
-  //
+  // bodyの開閉ボタンがタップされた時の処理。
+  this.handleBodyOpenShutButtonTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
+  };
+
+  // nameがタップされた時の処理。
+  this.handleNameTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
+  };
+
   this.on('mount', () => {
     // opts.valが何も指定されていない(i.e. undefined)
     // 且つ

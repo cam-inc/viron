@@ -1,47 +1,29 @@
 .Parameter {
   display: block;
-  padding: 8px;
-  border: 1px solid var(--color-basic-lightGray);
-  border-radius: 4px;
-}
-
-.Parameter__head {
-  padding: 8px;
-  margin-bottom: 8px;
-  background-color: var(--color-bg-tertiaryLight);
 }
 
 .Parameter__caption {
   @apply --layout-center-center;
 }
 
-.Parameter__name {
-  flex-grow: 1;
-  font-weight: bold;
+.Parameter__caption > div {
+  margin-right: 8px;
 }
 
-.Parameter__required {
-  margin-left: 8px;
-  font-style: italic;
-  font-weight: bold;
-  color: var(--color-text-accent);
+.Parameter__caption > div:last-child {
+  margin-right: 0;
 }
 
-.Parameter__infoOpenShutButton,
 .Parameter__bodyOpenShutButton {
   @apply --layout-center-center;
-  flex-shrink: 0;
   width: 18px;
   height: 18px;
-  margin-left: 4px;
-  margin-left: 8px;
   font-size: 14px;
   cursor: pointer;
-  background-color: #fff;
+  border: 1px solid var(--color-bg-tertiaryLight);
   border-radius: 2px;
 }
 
-.Parameter__infoOpenShutButton.hover,
 .Parameter__bodyOpenShutButton.hover {
   opacity: 0.5;
 }
@@ -51,20 +33,59 @@
   transition-property: transform;
 }
 
-.Parameter__info {
-  display: none;
-  padding: 8px;
-  margin-top: 8px;
-  background-color: var(--color-bg-base);
+.Parameter__name {
+  font-weight: bold;
+  cursor: pointer;
 }
 
-.Parameter__description,
-.Parameter__in {
+.Parameter__name.hover {
+  opacity: 0.5;
+}
+
+.Parameter__line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--color-bg-tertiaryLight);
+}
+
+.Parameter__required {
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-text-accent);
+}
+
+.Parameter__infoOpenShutButton {
+  @apply --layout-center-center;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.Parameter__infoOpenShutButton.hover {
+  opacity: 0.5;
+}
+
+.Parameter__info {
+  display: none;
+  padding: 8px 0 8px 16px;
+  margin-left: 8px;
+  border-left: 2px solid var(--color-bg-info);
+}
+
+.Parameter__info > div {
   margin-bottom: 8px;
+}
+
+.Parameter__info > div:last-child {
+  margin-bottom: 0;
 }
 
 .Parameter__body {
   display: none;
+  padding-top: 8px;
+  margin-left: 8px;
+  border-left: 2px solid var(--color-bg-primary);
 }
 
 /* ============================== */
@@ -85,6 +106,10 @@
   display: block;
 }
 
+.Parameter--bodyOpened .Parameter__bodyOpenShutButton {
+  border-color: var(--color-bg-primary);
+}
+
 .Parameter--bodyOpened .Parameter__bodyOpenShutButton .Icon {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
