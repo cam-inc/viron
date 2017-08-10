@@ -3,6 +3,7 @@ import ObjectAssign from 'object-assign';
 export default function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#itemsObject
   const itemsObject = ObjectAssign({}, this.opts.itemsobject);
+  this.name = this.opts.name;
   this.itemsObject = itemsObject;
   this.type = itemsObject.type;
   this.items = itemsObject.items;
@@ -41,6 +42,29 @@ export default function() {
       }
     }
     return value;
+  };
+
+  // infoの開閉状態。
+  this.isInfoOpened = false;
+  // bodyの開閉状態。
+  this.isBodyOpened = true;
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleInfoOpenShutButtonTap = () => {
+    this.isInfoOpened = !this.isInfoOpened;
+    this.update();
+  };
+
+  // bodyの開閉ボタンがタップされた時の処理。
+  this.handleBodyOpenShutButtonTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
+  };
+
+  // nameがタップされた時の処理。
+  this.handleNameTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
   };
 
   // +ボタンがタップされた時の処理。

@@ -1,8 +1,16 @@
-dmc-parameter-item.ParameterItem
+dmc-parameter-item.ParameterItem(class="{ isInfoOpened ? 'ParameterItem--infoOpened' : '' } { isBodyOpened ? 'ParameterItem--bodyOpened' : '' }")
   .ParameterItem__head
-    .ParameterItem__idx item { opts.idx }
-    .ParameterItem__removeButton(ref="touch" onTap="handleRemoveButtonTap")
-      dmc-icon(type="minus")
+    .ParameterItem__caption
+      .ParameterItem__bodyOpenShutButton(ref="touch" onTap="handleBodyOpenShutButtonTap")
+        dmc-icon(type="right")
+      .ParameterItem__idx(ref="touch" onTap="handleIdxTap") [{ opts.idx }]
+      .ParameterItem__line
+      .ParameterItem__removeButton(ref="touch" onTap="handleRemoveButtonTap")
+        dmc-icon(type="minusCircle")
+      .ParameterItem__infoOpenShutButton(ref="touch" onTap="handleInfoOpenShutButtonTap")
+        dmc-icon(type="infoCirlceO")
+    .ParameterItem__info
+      .ParameterItem__type type: { type }
   .ParameterItem__body
     virtual(if="{ isSchemaMode }")
       dmc-parameter-schema(val="{ opts.val || {} }" schemaObject="{ itemsObject }" onChange="{ handleSchemaChange }")

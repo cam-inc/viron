@@ -5,7 +5,7 @@ dmc-parameter-schema.ParameterSchema
     virtual(if="{ isPropertiesMode }")
       dmc-parameter-properties(val="{ opts.val }" properties="{ properties }" _required="{ required }" onChange="{ handlePropertiesChange }")
     virtual(if="{ isItemsMode }")
-      dmc-parameter-items(val="{ opts.val }" itemsObject="{ itemsObject }" onChange="{ handleItemsChange }")
+      dmc-parameter-items(val="{ opts.val }" name="{ itemsName }" itemsObject="{ itemsObject }" onChange="{ handleItemsChange }")
 
   script.
     import './form.tag';

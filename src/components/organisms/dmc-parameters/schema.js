@@ -5,6 +5,7 @@ export default function() {
   const schemaObject = ObjectAssign({}, this.opts.schemaobject);
   this.schemaObject = schemaObject;
   this.itemsObject = schemaObject.items;
+  this.itemsName = schemaObject.name;
   this.properties = schemaObject.properties;
   this.required = schemaObject.required;
   this.type = schemaObject.type;

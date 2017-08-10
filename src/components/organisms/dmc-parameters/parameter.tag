@@ -18,7 +18,7 @@ dmc-parameter.Parameter(class="{ isInfoOpened ? 'Parameter--infoOpened' : '' } {
     virtual(if="{ isSchemaMode }")
       dmc-parameter-schema(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleSchemaChange }")
     virtual(if="{ isItemsMode }")
-      dmc-parameter-items(val="{ opts.val }" itemsObject="{ itemsObject }" onChange="{ handleItemsChange }")
+      dmc-parameter-items(val="{ opts.val }" name="{ itemsName }" itemsObject="{ itemsObject }" onChange="{ handleItemsChange }")
 
   script.
     import '../../atoms/dmc-icon/index.tag';

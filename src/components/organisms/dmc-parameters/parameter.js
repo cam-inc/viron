@@ -8,6 +8,7 @@ export default function() {
   this.schemaObject = parameterObject.schema;
   // `type`値が`array`の時だけitemsObjectが存在。
   this.items = parameterObject.items;// Required if type is 'array'.
+  this.itemsName = parameterObject.name;
   this.name = parameterObject.name;
   this._in = parameterObject.in;
   this.description = parameterObject.description;
