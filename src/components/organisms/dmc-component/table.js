@@ -3,6 +3,7 @@ import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
 import { constants as actions } from '../../../store/actions';
 import '../../organisms/dmc-operation/index.tag';
+import './operation.tag';
 
 export default function() {
   const store = this.riotx.get();
@@ -72,11 +73,14 @@ export default function() {
       return (operationObject.operationId === operationId);
     });
     const rowData = this.opts.response[rowIdx];
-    const initialQueries = createInitialQueries(operationObject, rowData);
-    store.action(actions.DRAWERS_ADD, 'dmc-operation', {
+    const initialParameters = createInitialQueries(operationObject, rowData);
+    store.action(actions.DRAWERS_ADD, 'dmc-component-operation', {
+      name: operationObject.summary || operationObject.operationId,
+      description: operationObject.description,
       operationObject,
-      initialQueries,
-      onSuccess: () => {
+      parameterObjects: operationObject.parameters,
+      initialParameters,
+      onComplete: () => {
         this.opts.updater();
       }
     });
