@@ -51,27 +51,24 @@ export default function() {
     this.opts.onchange(arr, this.opts.idx);
   };
 
-  // +ボタンがタップされた時の処理。
-  this.handleAddButtonTap = () => {
+  // -ボタンがタップされた時の処理。
+  this.handleRemoveButtonTap = () => {
+    this.opts.onremove(this.opts.idx);
+  };
+
+  // item(s)から削除依頼を受け取った時の処理。
+  this.handleItemRemove = idx => {
     const arr = this.opts.val.concat([]);
     // undefinedを追加することで空の入力フォームを出力できる。
-    arr.push(undefined);
+    arr.splice(idx, 1);
     this.opts.onchange(arr, this.opts.idx);
   };
 
-  // itemsが変更された時の処理。
-  this.handleItemsChange = (newValue, idx) => {
-    // cloneする。
-    const arr = this.opts.val.concat([]);
-    arr[idx] = newValue;
-    this.opts.onchange(arr, this.opts.idx);
-  };
-
-  // itemが変更された時の処理。
+  // item(s)が変更された時の処理。
   this.handleItemChange = (newValue, idx) => {
     // cloneする。
     const arr = this.opts.val.concat([]);
     arr[idx] = newValue;
-    this.opts.onchange(arr);
+    this.opts.onchange(arr, this.opts.idx);
   };
 }

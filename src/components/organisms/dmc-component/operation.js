@@ -15,10 +15,6 @@ export default function() {
   this.handleSubmitButtonPat = () => {
     Promise
       .resolve()
-      .then(() => {
-        const currentParameters = this.currentParameters;
-        debugger
-      })
       .then(() => store.action(actions.COMPONENTS_OPERATE_ONE, this.opts.operationObject, this.currentParameters))
       .then(() => {
         this.opts.onComplete();
