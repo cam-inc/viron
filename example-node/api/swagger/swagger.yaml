@@ -917,7 +917,7 @@ definitions:
       birthday:
         description: 誕生日
         example: 1995-05-12T09:45:56Z
-#        format: date-time
+        format: date-time
         type: string
       blood_type:
         description: 血液型
