@@ -1,5 +1,13 @@
 export default function() {
 
+  this.on('mount', () => {
+    if(this.opts.max < this.opts.number) {
+      this.opts.onchange(this.opts.max);
+    } else if(this.opts.min > this.opts.number) {
+      this.opts.onchange(this.opts.min);
+    }
+  });
+
   this.handleIncreaseButtonPat = () => {
     let number = this.opts.number;
     // numberが空文字/null/undefined/0
