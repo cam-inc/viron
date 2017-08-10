@@ -24,7 +24,7 @@ module.exports = {
   GROUP_USER: 'user', // ユーザ
   GROUP_BLOG: 'blog', // ブログ
   GROUP_ADMIN: 'admin', // 管理権限
-
+  GROUP_TEST: 'test', // 検証用
 
   USER_MALE: 'male',
   USER_FEMALE: 'female',

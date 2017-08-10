@@ -1,5 +1,3 @@
-const find = require('mout/array/find');
-
 const data = [
   {
     id: 1,
@@ -118,7 +116,6 @@ const update = (req, res) => {
       break;
     }
   }
-  console.log(JSON.stringify(data[i]));
   res.json(data[i]);
 };
 
