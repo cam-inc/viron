@@ -3,9 +3,9 @@ dmc-numberinput.Numberinput
   form.Numberinput__form(onSubmit="{ handleFormSubmit }" onKeyDown="{ handleFormKeyDown }")
     input.Numberinput__input(ref="input" value="{ opts.number || '' }" placeholder="{ opts.placeholder || '' }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
     .Numberinput__handler
-      .Numberinput__handler__button(onTap="handleIncreaseButtonPat" ref="touch" disabled="{opts.number >= opts.max}")
+      .Numberinput__handlerButton(onTap="handleIncreaseButtonPat" ref="touch" disabled="{opts.number >= opts.max}")
         dmc-icon(type="caretUp" class="caretUp")
-      .Numberinput__handler__button(onTap="handleDecreaseButtonPat" ref="touch" disabled="{opts.number <= opts.min}")
+      .Numberinput__handlerButton(onTap="handleDecreaseButtonPat" ref="touch" disabled="{opts.number <= opts.min}")
         dmc-icon(type="caretDown" class="caretDown")
 
   script.

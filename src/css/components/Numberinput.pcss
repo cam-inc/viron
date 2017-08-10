@@ -10,7 +10,6 @@
 }
 
 .Numberinput__form {
-  position: relative;
   display: flex;
 }
 
@@ -35,32 +34,26 @@
   border: solid 1px var(--color-basic-gray);
   border-left: 0;
   border-radius: 0 3px 3px 0;
-  transition: opacity 0.24s linear 0.1s;
 }
 
-.Numberinput__handler__button {
+.Numberinput__handlerButton {
   @apply --layout-center-center;
   height: 50%;
   color: var(--color-basic-gray);
-  outline: none;
 }
 
-.Numberinput__handler__button:focus {
-  outline: none;
-}
-
-.Numberinput__handler__button:hover {
+.Numberinput__handlerButton:hover {
   height: 70%;
   color: var(--color-text-anchorLight);
   cursor: pointer;
   transition: all 0.1s linear;
 }
 
-.Numberinput__handler__button:active {
+.Numberinput__handlerButton:active {
   background-color: var(--color-basic-lightGray);
   transition: all 0.1s linear;
 }
 
-.Numberinput__handler__button:first-child {
+.Numberinput__handlerButton:first-child {
   border-bottom: solid 1px var(--color-basic-gray);
 }
