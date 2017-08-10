@@ -4,9 +4,9 @@ dmc-numberinput.Numberinput
     input.Numberinput__input(ref="input" value="{ (opts.number === 0 || opts.number) ? opts.number : '' }" placeholder="{ opts.placeholder || '' }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
     .Numberinput__handler
       .Numberinput__handlerButton(onTap="handleIncreaseButtonPat" ref="touch" disabled="{opts.number >= opts.max}")
-        dmc-icon(type="caretUp" class="caretUp")
+        dmc-icon(type="caretUp")
       .Numberinput__handlerButton(onTap="handleDecreaseButtonPat" ref="touch" disabled="{opts.number <= opts.min}")
-        dmc-icon(type="caretDown" class="caretDown")
+        dmc-icon(type="caretDown")
 
   script.
     import '../dmc-icon/index.tag';
