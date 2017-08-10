@@ -8,6 +8,12 @@ export default function() {
     }
   });
 
+  // @see: https://developer.mozilla.org/ja/docs/Web/API/Element/setAttribute
+  // setAttribute() を使ってある属性、XUL や HTML の特別な値、および HTML の選択領域の変更は、属性がデフォルト値を特定している場合に一貫性の無い動作となります。現在の値にアクセスしたり、変更したりするにはプロパティを使用すべきです。具体例として、 elt .setAttribute('value', val ) の代わりに elt .value を使用します。
+  this.on('updated', () => {
+    this.refs.input.value = this.opts.number;
+  });
+
   this.handleIncreaseButtonPat = () => {
     let number = this.opts.number;
     // numberが空文字/null/undefined/0
@@ -56,12 +62,6 @@ export default function() {
       break;
     }
   };
-
-  // @see: https://developer.mozilla.org/ja/docs/Web/API/Element/setAttribute
-  // setAttribute() を使ってある属性、XUL や HTML の特別な値、および HTML の選択領域の変更は、属性がデフォルト値を特定している場合に一貫性の無い動作となります。現在の値にアクセスしたり、変更したりするにはプロパティを使用すべきです。具体例として、 elt .setAttribute('value', val ) の代わりに elt .value を使用します。
-  this.on('updated', () => {
-    this.refs.input.value = this.opts.number;
-  });
 
   this.handleInputInput = e => {
     e.preventUpdate = true;
