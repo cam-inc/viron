@@ -42,7 +42,11 @@
   transition: flex-grow 0.1s linear;
 }
 
-.Numberinput__handlerButton:hover {
+.Numberinput__handlerButton--disabled {
+  cursor: not-allowed;
+}
+
+.Numberinput__handlerButton:not(.Numberinput__handlerButton--disabled):hover {
   flex-grow: 3;
   color: var(--color-text-anchorLight);
   cursor: pointer;
