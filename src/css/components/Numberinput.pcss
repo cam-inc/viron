@@ -38,15 +38,15 @@
 
 .Numberinput__handlerButton {
   @apply --layout-center-center;
-  height: 50%;
+  flex-grow: 1;
   color: var(--color-basic-gray);
+  transition: flex-grow 0.1s linear;
 }
 
 .Numberinput__handlerButton:hover {
-  height: 70%;
+  flex-grow: 3;
   color: var(--color-text-anchorLight);
   cursor: pointer;
-  transition: height 0.1s linear;
 }
 
 .Numberinput__handlerButton:active {
