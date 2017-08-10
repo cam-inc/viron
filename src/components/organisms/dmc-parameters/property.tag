@@ -8,8 +8,8 @@ dmc-parameter-property.ParameterProperty(class="{ isInfoOpened ? 'ParameterPrope
         dmc-icon(type="up")
     .ParameterProperty__info
       .ParameterProperty__type type: { type }
-      .ParameterProperty__description(if="{ discription }") description: { description }
-      .ParameterProperty__example(if="{ example }") example: { example }
+      .ParameterProperty__description(if="{ !!description }") description: { description }
+      .ParameterProperty__example(if="{ !!example }") example: { example }
   .ParameterProperty__body
     dmc-parameter-schema(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleSchemaChange }")
 
