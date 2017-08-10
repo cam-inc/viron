@@ -24,7 +24,7 @@ export default function() {
     this.opts.onchange(Number(number) - (this.opts.step || 1) );
   };
 
-  this.handleKeyDown = (e) => {
+  this.handleFormKeyDown = (e) => {
     switch (e.code) {
     case 'ArrowUp':
       this.handleIncreaseButtonPat();
