@@ -15,9 +15,9 @@ dmc-parameter-items.ParameterItems(class="{ isInfoOpened ? 'ParameterItems--info
       .ParameterItems__type type: { type }
   .ParameterItems__body
     virtual(if="{ !isRecursive }")
-      dmc-parameter-item(each="{ val, idx in opts.val }" idx="{ idx }" val="{ parent.getItemValue(idx) }" itemsObject="{ parent.itemsObject }" onRemove="{ parent.handleItemRemove }" onChange="{ parent.handleItemChange }")
+      dmc-parameter-item(no-reorder each="{ val, idx in opts.val }" idx="{ idx }" val="{ parent.getItemValue(idx) }" itemsObject="{ parent.itemsObject }" onRemove="{ parent.handleItemRemove }" onChange="{ parent.handleItemChange }")
     virtual(if="{ isRecursive }")
-      dmc-parameter-items(each="{ val, idx in opts.val }" withRemove="{ true }" idx="{ idx }" val="{ parent.getItemValue(idx) }" itemsObject="{ parent.items }" onRemove="{ parent.handleItemRemove }" onChange="{ parent.handleItemChange }")
+      dmc-parameter-items(no-reorder each="{ val, idx in opts.val }" withRemove="{ true }" idx="{ idx }" val="{ parent.getItemValue(idx) }" itemsObject="{ parent.items }" onRemove="{ parent.handleItemRemove }" onChange="{ parent.handleItemChange }")
 
   script.
     import '../../atoms/dmc-icon/index.tag';
