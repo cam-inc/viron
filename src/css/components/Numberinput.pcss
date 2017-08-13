@@ -1,0 +1,62 @@
+.Numberinput {
+  display: block;
+}
+
+.Numberinput__label {
+  padding-left: 8px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  border-left: 2px solid var(--color-bg-primary);
+}
+
+.Numberinput__form {
+  display: flex;
+}
+
+.Numberinput__input {
+  display: block;
+  flex-grow: 1;
+  flex-shrink: 0;
+  width: 0;
+  padding: 14px;
+  font-size: 18px;
+  background-color: var(--color-basic-white);
+  border: 1px solid var(--color-basic-gray);
+  border-radius: 3px 0 0 3px;
+}
+
+.Numberinput__handler {
+  @apply --layout-column-stretch-center;
+  width: 50px;
+  font-weight: 700;
+  user-select: none;
+  border: solid 1px var(--color-basic-gray);
+  border-left: 0;
+  border-radius: 0 3px 3px 0;
+}
+
+.Numberinput__handlerButton {
+  @apply --layout-center-center;
+  flex-grow: 1;
+  color: var(--color-basic-gray);
+  transition: flex-grow 0.1s linear;
+}
+
+.Numberinput__handlerButton--disabled {
+  cursor: not-allowed;
+}
+
+.Numberinput__handlerButton:not(.Numberinput__handlerButton--disabled):hover {
+  flex-grow: 3;
+  color: var(--color-text-anchorLight);
+  cursor: pointer;
+}
+
+.Numberinput__handlerButton:active {
+  background-color: var(--color-basic-lightGray);
+  transition: background-color 0.1s linear;
+}
+
+.Numberinput__handlerButton:first-child {
+  border-bottom: solid 1px var(--color-basic-gray);
+}
