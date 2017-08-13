@@ -22,6 +22,14 @@ export default function() {
   this.required = schemaObject.required;
   this.type = schemaObject.type;
   this.example = schemaObject.example;
+  this.multipleOf = hasOwn(schemaObject, 'multipleOf') && String(schemaObject.multipleOf);
+  this.maximum = hasOwn(schemaObject, 'maximum') && String(schemaObject.maximum);
+  this.exclusiveMaximum = hasOwn(schemaObject, 'exclusiveMaximum') && String(schemaObject.exclusiveMaximum);
+  this.minimum = hasOwn(schemaObject, 'minimum') && String(schemaObject.minimum);
+  this.exclusiveMinimum = hasOwn(schemaObject, 'exclusiveMinimum') && String(schemaObject.exclusiveMinimum);
+  this.maxLength = hasOwn(schemaObject, 'maxLength') && String(schemaObject.maxLength);
+  this.minLength = hasOwn(schemaObject, 'minLength') && String(schemaObject.minLength);
+  this.pattern = hasOwn(schemaObject, 'pattern') && String(schemaObject.pattern);
 
   /**
    * バリデートエラー項目群を返します。
@@ -95,9 +103,9 @@ export default function() {
   this.uiType = inferUITypeBySchemaObject(schemaObject);
 
   // infoの開閉状態。
-  this.isInfoOpened = false;
+  this.isInfoOpened = true;
   // validateの開閉状態。
-  this.isValidateOpened = false;
+  this.isValidateOpened = true;
   // bodyの開閉状態。
   this.isBodyOpened = true;
 

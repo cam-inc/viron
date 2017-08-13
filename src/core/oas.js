@@ -324,6 +324,16 @@ const minProperties = (value, constraints) => {
  */
 const required = (value, constraints) => {
   const result = ObjectAssign({}, resultTemplate);
+  // JsonSchema仕様ではrequiredは常にarrayだが、OASとの兼ね合いで特別にbooleanも許可する。
+  if (isBoolean(constraints.required) && constraints.required) {
+    if (value === undefined) {
+      result.isValid = false;
+      result.message = '必須項目です。';
+      return result;
+    } else {
+      return result;
+    }
+  }
   if (!isArray(constraints.required) || !!constraints.required.length) {
     return result;
   }
@@ -632,13 +642,24 @@ export default {
    * @return {Array}
    */
   validate: (value, schemaObject) => {
+    const results = [];
+
+    // 値が未入力の場合はrequiredチェックだけ行う。
+    if (value === undefined) {
+      // JsonSchema仕様上はvalueはobjectのみ指定可能だが、OASとの兼ね合いで例外的に許可している。
+      results.push(required(value, schemaObject));
+      // isValid値がfalseの結果だけ返す。
+      return reject(results, result => {
+        return result.isValid;
+      });
+    }
+
     // typeチェックだけ最初に済ませておく。
     const result = _type(value, schemaObject);
     if (!result.isValid) {
       return [result];
     }
 
-    const results = [];
     const type = schemaObject.type;
     switch (type) {
     case 'number':

@@ -13,6 +13,15 @@ dmc-parameter-form.ParameterForm(class="{ isInfoOpened ? 'ParameterForm--infoOpe
     .ParameterForm__info
       .ParameterForm__description(if="{ !!description }") description: { description }
       .ParameterForm__type type: { type }
+      .ParameterForm__enum(if="{ !!enum }") enum: { enum }
+      .ParameterForm__multipleOf(if="{ !!multipleOf }") multipleOf: { multipleOf }
+      .ParameterForm__maximum(if="{ !!maximum }") maximum: { maximum }
+      .ParameterForm__exclusiveMaximum(if="{ !!exclusiveMaximum }") exclusiveMaximum: { exclusiveMaximum }
+      .ParameterForm__minimum(if="{ !!minimum }") minimum: { minimum }
+      .ParameterForm__exclusiveMinimum(if="{ !!exclusiveMinimum }") exclusiveMinimum: { exclusiveMinimum }
+      .ParameterForm__maxLength(if="{ !!maxLength }") maxLength: { maxLength }
+      .ParameterForm__minLength(if="{ !!minLength }") minLength: { minLength }
+      .ParameterForm__pattern(if="{ !!pattern }") pattern: { pattern }
       .ParameterForm__example(if="{ !!example }") example: { example }
     .ParameterForm__validates(if="{ !!getValidateErrors().length }")
       virtual(each="{ err in getValidateErrors() }")

@@ -9,6 +9,7 @@ export default function() {
   this.properties = schemaObject.properties;
   this.required = schemaObject.required;
   this.type = schemaObject.type;
+  this.name = schemaObject.name;
 
   // @see: http://json-schema.org/latest/json-schema-core.html#rfc.section.4.2
   // ParameterObject/SchemaObject/ItemsObjectのどれを使用するか。
