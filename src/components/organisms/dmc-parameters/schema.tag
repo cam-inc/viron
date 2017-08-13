@@ -1,9 +1,4 @@
 dmc-parameter-schema.ParameterSchema
-  .ParameterSchema__head
-    .ParameterSchema__caption
-      .ParameterSchema__name { name }
-    .ParameterSchema__info
-      .ParameterSchema__type type: { type }
   .ParameterSchema__body
     virtual(if="{ isFormMode }")
       dmc-parameter-form(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleFormChange }")
