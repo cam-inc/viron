@@ -5,6 +5,7 @@ import ObjectAssign from 'object-assign';
 import oas from '../../../core/oas';
 
 const UI_TEXTINPUT = 'textinput';
+const UI_NUMBERINPUT = 'numberinput';
 const UI_CHECKBOX = 'checkbox';
 const UI_SELECT = 'select';
 const UI_DATEPICKER = 'datepicker';
@@ -78,7 +79,7 @@ export default function() {
       }
     case 'number':
     case 'integer':
-      return UI_TEXTINPUT;
+      return UI_NUMBERINPUT;
     case 'boolean':
       return UI_CHECKBOX;
     case 'file':
@@ -136,6 +137,11 @@ export default function() {
   // textinput値が変更された時の処理。
   this.handleTextinputChange = newText => {
     this.opts.onchange(newText);
+  };
+
+  // numberinput値が変更された時の処理。
+  this.handleNumberinputChange = newNumber => {
+    this.opts.onchange(newNumber);
   };
 
   // checkbox値が変更された時の処理。

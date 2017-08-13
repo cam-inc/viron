@@ -23,6 +23,8 @@ dmc-parameter-form.ParameterForm(class="{ isInfoOpened ? 'ParameterForm--infoOpe
   .ParameterForm__body
     virtual(if="{ uiType === 'textinput' }")
       dmc-textinput(text="{ opts.val }" onChange="{ handleTextinputChange }")
+    virtual(if="{ uiType === 'numberinput' }")
+      dmc-numberinput(number="{ opts.val }" onChange="{ handleNumberinputChange }")
     virtual(if="{ uiType === 'checkbox' }")
       dmc-checkbox(isChecked="{ opts.val }" onChange="{ handleCheckboxChange }")
     virtual(if="{ uiType === 'select' }")
@@ -34,6 +36,7 @@ dmc-parameter-form.ParameterForm(class="{ isInfoOpened ? 'ParameterForm--infoOpe
 
   script.
     import '../../atoms/dmc-checkbox/index.tag';
+    import '../../atoms/dmc-numberinput/index.tag';
     import '../../atoms/dmc-select/index.tag';
     import '../../atoms/dmc-textinput/index.tag';
     import '../../atoms/dmc-uploader/index.tag';
