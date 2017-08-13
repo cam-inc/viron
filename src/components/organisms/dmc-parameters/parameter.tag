@@ -14,7 +14,7 @@ dmc-parameter.Parameter(class="{ isInfoOpened ? 'Parameter--infoOpened' : '' } {
       .Parameter__type(if="{ !!type }") type: { type }
   .Parameter__body
     virtual(if="{ isFormMode }")
-      dmc-parameter-form(val="{ opts.val }" parameterObject="{ parameterObject }" onChange="{ handleFormChange }")
+      dmc-parameter-form(val="{ opts.val }" schemaObject="{ parameterObject }" onChange="{ handleFormChange }")
     virtual(if="{ isSchemaMode }")
       dmc-parameter-schema(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleSchemaChange }")
     virtual(if="{ isItemsMode }")

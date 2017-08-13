@@ -53,6 +53,7 @@
   color: var(--color-text-accent);
 }
 
+.ParameterForm__validateOpenShutButton,
 .ParameterForm__infoOpenShutButton {
   @apply --layout-center-center;
   width: 18px;
@@ -61,6 +62,7 @@
   cursor: pointer;
 }
 
+.ParameterForm__validateOpenShutButton.hover,
 .ParameterForm__infoOpenShutButton.hover {
   opacity: 0.5;
 }
@@ -77,6 +79,36 @@
 }
 
 .ParameterForm__info > div:last-child {
+  margin-bottom: 0;
+}
+
+.ParameterForm__validates {
+  display: none;
+  padding: 8px 0 8px 8px;
+  margin-left: 16px;
+  border-left: 2px solid var(--color-bg-error);
+}
+
+.ParameterForm__validate {
+  @apply --layout-center-center;
+  padding: 8px;
+  background-color: var(--color-bg-errorLight);
+}
+
+.ParameterForm__validateIcon {
+  @apply --layout-center-center;
+  margin-right: 8px;
+}
+
+.ParameterForm__validateMessage {
+  flex-grow: 1;
+}
+
+.ParameterForm__validates > .ParameterForm__validate {
+  margin-bottom: 8px;
+}
+
+.ParameterForm__validates > .ParameterForm__validate:last-child {
   margin-bottom: 0;
 }
 
@@ -99,6 +131,17 @@
 
 .ParameterForm--infoOpened .ParameterForm__infoOpenShutButton .Icon {
   color: var(--color-text-positive);
+}
+
+/* ============================== */
+/* validate開状態 */
+/* ============================== */
+.ParameterForm--validateOpened .ParameterForm__validates {
+  display: block;
+}
+
+.ParameterForm--validateOpened .ParameterForm__validateOpenShutButton .Icon {
+  color: var(--color-text-negative);
 }
 
 /* ============================== */

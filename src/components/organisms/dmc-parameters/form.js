@@ -2,6 +2,7 @@ import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import hasOwn from 'mout/object/hasOwn';
 import ObjectAssign from 'object-assign';
+import oas from '../../../core/oas';
 
 const UI_TEXTINPUT = 'textinput';
 const UI_CHECKBOX = 'checkbox';
@@ -13,14 +14,21 @@ const UI_NULL = 'null';
 // TODO: schemaObject or schemaObjectLikeのみを受け取るようにしたい。
 export default function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
-  const parameterObject = ObjectAssign({}, this.opts.parameterobject);
-  this.enum = parameterObject.enum;
-  this.name = parameterObject.name;
-  this.description = parameterObject.description;
-  this.required = parameterObject.required;
-  this.type = parameterObject.type;
+  const schemaObject = ObjectAssign({}, this.opts.schemaobject);
+  this.enum = schemaObject.enum;
+  this.name = schemaObject.name;
+  this.description = schemaObject.description;
+  this.required = schemaObject.required;
+  this.type = schemaObject.type;
+  this.example = schemaObject.example;
 
-  // TODO: validate
+  /**
+   * バリデートエラー項目群を返します。
+   * @return {Array}
+   */
+  this.getValidateErrors = () => {
+    return oas.validate(this.opts.val, schemaObject);
+  };
 
   /**
    * Selectコンポーネントに使用するoption群を返します。
@@ -46,20 +54,20 @@ export default function() {
   };
 
   /**
-   * ParameterObjectの値から適切なUIコンポーネントを推測します。
-   * @param {Object} parameterObject
+   * SchemaObjectの値から適切なUIコンポーネントを推測します。
+   * @param {Object} schemaObject
    * @return {String}
    */
-  const inferUITypeByParameterObject = parameterObject => {
+  const inferUITypeBySchemaObject = schemaObject => {
     // type値はnull/boolean/number/string/integerのいずれか。
     // typeが`array`や`object`の時にform.tagが使用されることは無い。
     // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
-    if (!!parameterObject.enum) {
+    if (!!schemaObject.enum) {
       return UI_SELECT;
     }
 
-    const type = parameterObject.type;
-    const format = parameterObject.format;
+    const type = schemaObject.type;
+    const format = schemaObject.format;
     switch (type) {
     case 'string':
       switch (format) {
@@ -83,16 +91,24 @@ export default function() {
     }
   };
   // 使用するUIコンポーネント名。
-  this.uiType = inferUITypeByParameterObject(parameterObject);
+  this.uiType = inferUITypeBySchemaObject(schemaObject);
 
   // infoの開閉状態。
   this.isInfoOpened = false;
+  // validateの開閉状態。
+  this.isValidateOpened = false;
   // bodyの開閉状態。
   this.isBodyOpened = true;
 
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {
     this.isInfoOpened = !this.isInfoOpened;
+    this.update();
+  };
+
+  // validateの開閉ボタンがタップされた時の処理。
+  this.handleValidateOpenShutButtonTap = () => {
+    this.isValidateOpened = !this.isValidateOpened;
     this.update();
   };
 
@@ -112,8 +128,8 @@ export default function() {
     // opts.valが何も指定されていない(i.e. undefined)
     // 且つ
     // デフォルト値が設定されていれば自動更新する。
-    if (this.opts.val === undefined && hasOwn(parameterObject, 'default')) {
-      this.opts.onchange(parameterObject.default);
+    if (this.opts.val === undefined && hasOwn(schemaObject, 'default')) {
+      this.opts.onchange(schemaObject.default);
     }
   });
 
