@@ -9,7 +9,7 @@ export default function() {
     renderer.paragraph = (text) => {
       return `<div class="Markdown--p">${text}</div>`;
     },
-    renderer.list = (text, ordered) => {
+    renderer.list = (text) => {
       return `<div class="Markdown--ul">${text}</div>`;
     },
     renderer.listitem = (text) => {
