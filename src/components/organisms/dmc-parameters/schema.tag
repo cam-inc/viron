@@ -39,8 +39,10 @@ dmc-parameter-schema.ParameterSchema
         dmc-parameter-form(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleFormChange }")
       virtual(if="{ isPropertiesMode }")
         dmc-parameter-schema(each="{ property, key in properties }" key="{ key }" val="{ parent.getPropertyValue(property, key) }" schemaObject="{ parent.getNormalizedSchemaObjectForProperty(property, key) }" onChange="{ parent.handlePropertyChange }")
-      virtual(if="{ isItemsMode }")
+      virtual(if="{ isItemsMode && !!opts.val.length }")
         dmc-parameter-schema(no-reorder isRemovable="{ true }" each="{ val, idx in opts.val }" key="{ idx }" val="{ parent.getItemValue(idx) }" schemaObject="{ parent.getNormalizedSchemaObjectForItem(idx) }" onRemove="{ parent.handleItemsRemove }" onChange="{ parent.handleItemsChange }")
+      virtual(if="{ isItemsMode && !opts.val.length }")
+        .ParameterSchema__emptyItemsMessage まだ中身がありません。
 
   script.
     import '../../atoms/dmc-icon/index.tag';
