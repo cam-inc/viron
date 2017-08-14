@@ -1,5 +1,7 @@
 export default function() {
   this.handleKnobPat = () => {
-    this.opts.ontoggle(!this.opts.ischecked);
+    if(!this.opts.isdisabled) {
+      this.opts.ontoggle(!this.opts.ischecked);
+    }
   };
 }
