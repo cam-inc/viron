@@ -1,6 +1,5 @@
 :root {
   --component-markdown-font-size: 1rem;
-  --component-markdown-font-weight: 100;
 }
 
 .Markdown {
@@ -8,64 +7,71 @@
 }
 
 .Markdown__text {
+  display: inline-block;
   font-size: var(--component-markdown-font-size);
   font-weight: normal;
 }
 
-.Markdown__text--h1 {
-  font-size: calc(var(--component-markdown-font-size) * 1.5);
-  /*
-  calcでの計算が出来なかった。
-  TODO：後で調べてできるのであれば変数化する。h2〜h6も同様
-  */
-  font-weight: 900;
-}
-
-.Markdown__text--h2 {
-  font-size: calc(var(--component-markdown-font-size) * 1.4);
-  font-weight: 800;
-}
-
-.Markdown__text--h3 {
-  font-size: calc(var(--component-markdown-font-size) * 1.3);
-  font-weight: 700;
-}
-
-.Markdown__text--h4 {
-  font-size: calc(var(--component-markdown-font-size) * 1.2);
-  font-weight: 600;
-}
-
-.Markdown__text--h5 {
-  font-size: calc(var(--component-markdown-font-size) * 1.1);
-  font-weight: 500;
-}
-
-.Markdown__text--h6 {
-  font-size: calc(var(--component-markdown-font-size) * 1.0);
-  font-weight: 400;
-}
-
-.Markdown__text--p {
-  display: inline-block;
+.Markdown__text--paragraph {
   font-size: calc(var(--component-markdown-font-size));
 }
 
 .Markdown__text--strong {
-  display: inline-block;
   font-size: calc(var(--component-markdown-font-size));
   font-weight: 700;
 }
 
-.Markdown__list--ul {
+.Markdown__text--emphasis {
+  font-style: italic;
 }
+
+.Markdown__text--delete {
+  text-decoration: line-through;
+}
+
+.Markdown__heading {
+  font-weight: 900;
+}
+
+.Markdown__heading--level1 {
+  font-size: calc(var(--component-markdown-font-size) * 1.5);
+}
+
+.Markdown__heading--level2 {
+  font-size: calc(var(--component-markdown-font-size) * 1.4);
+}
+
+.Markdown__heading--level3 {
+  font-size: calc(var(--component-markdown-font-size) * 1.3);
+}
+
+.Markdown__heading--level4 {
+  font-size: calc(var(--component-markdown-font-size) * 1.2);
+}
+
+.Markdown__heading--level5 {
+  font-size: calc(var(--component-markdown-font-size) * 1.1);
+}
+
+.Markdown__heading--level6 {
+  font-size: calc(var(--component-markdown-font-size) * 1.0);
+}
+
+.Markdown__horizontalRule {}
+
+.Markdown__break {}
+
+.Markdown__list--ordered {}
+
+.Markdown__list--unordered {}
 
 .Markdown__listItem {
   position: relative;
+  font-size: calc(var(--component-markdown-font-size));
   padding-left: 10px;
 }
 
-.Markdown__list--ul .Markdown__listItem::before {
+.Markdown__list--unordered .Markdown__listItem::before {
   content: "";
   position: absolute;
   top: 10px;
