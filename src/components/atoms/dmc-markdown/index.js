@@ -3,14 +3,20 @@ import ObjectAssign from 'object-assign';
 export default function() {
 
   this.on('update', () => {
-
     var renderer = new marked.Renderer();
-
     renderer.heading = (text, level) => {
-      var text = text.replace(/[^\w]+/g, '-');
-      return '<div class="wrapper">' + '<h' + level + '>' + text + '</h' + level + '>' + '</div>';
+      return `<div class="Markdown--h${level}">${text}</div>`;
     },
-    this.refs.view.innerHTML = this.opts.data.content ? marked('# Marked in browser\n\nRendered by **marked**.', { renderer: renderer }) : '';
+    renderer.paragraph = (text) => {
+      return `<div class="Markdown--p">${text}</div>`;
+    },
+    renderer.list = (text, ordered) => {
+      return `<div class="Markdown--ul">${text}</div>`;
+    },
+    renderer.listitem = (text) => {
+      return `<div class="Markdown--li">${text}</div>`;
+    },
+    this.refs.view.innerHTML = this.opts.data.content ? marked('# Marked in browser\n\nRendered by **marked**.\n\n - aaaaaa', { renderer: renderer }) : '';
     // this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 }
