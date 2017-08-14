@@ -1,0 +1,65 @@
+:root {
+  --component-markdown-font-size: 1rem;
+  --component-markdown-font-weight: 100;
+}
+
+.Markdown {
+}
+
+.Markdown__text {
+  display: inline-block;
+  font-size: var(--component-markdown-font-size);
+  font-weight: normal;
+}
+
+.Markdown__text--h1 {
+  font-size: calc(var(--component-markdown-font-size) * 1.5);
+  /*
+  calcでの計算が出来なかった。
+  TODO：後で調べてできるのであれば変数化する。h2〜h6も同様
+  */
+  font-weight: 900;
+}
+
+.Markdown__text--h2 {
+  font-size: calc(var(--component-markdown-font-size));
+  font-weight: 800;
+}
+
+.Markdown__text--h3 {
+  font-size: calc(var(--component-markdown-font-size));
+  font-weight: 700;
+}
+
+.Markdown__text--h4 {
+  font-size: calc(var(--component-markdown-font-size));
+  font-weight: 600;
+}
+
+.Markdown__text--h5 {
+  font-size: calc(var(--component-markdown-font-size));
+  font-weight: 500;
+}
+
+.Markdown__text--h6 {
+  font-size: calc(var(--component-markdown-font-size));
+  font-weight: 400;
+}
+
+.Markdown__text--p {
+  font-size: calc(var(--component-markdown-font-size));
+}
+
+.Markdown__text--strong {
+  font-size: calc(var(--component-markdown-font-size));
+  font-weight: 700;
+}
+
+.Markdown__list {
+}
+
+.Markdown__list .Markdown__list--listItem {
+}
+
+.Markdown__list .Markdown__list--listItem::before {
+}
