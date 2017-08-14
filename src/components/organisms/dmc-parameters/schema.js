@@ -154,13 +154,13 @@ export default function() {
   });
 
   // infoの開閉状態。
-  this.isInfoOpened = true;
+  this.isInfoOpened = false;
   // 入力プレビューの開閉状態。
-  this.isPreviewOpened = true;
+  this.isPreviewOpened = false;
   // validateの開閉状態。
-  this.isValidateOpened = true;
+  this.isValidateOpened = false;
   // bodyの開閉状態。
-  this.isBodyOpened = true;
+  this.isBodyOpened = false;
 
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {
@@ -196,7 +196,7 @@ export default function() {
   this.handleAddButtonTap = () => {
     const arr = this.opts.val.concat([]);
     let defaultValue = undefined;
-    switch (schemaObject.type) {
+    switch (schemaObject.items.type) {
     case 'array':
       defaultValue = [];
       break;
