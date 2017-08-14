@@ -1,6 +1,7 @@
-const dmclib = require('node-dmclib');
+const DmcLib = require('node-dmclib');
 
 const config = require('./config');
+const constant = require('./constant');
 const stores = require('./stores');
 
 /**
@@ -18,8 +19,54 @@ class Context {
         return this.initStore(conf.stores);
       })
       .then(() => {
-        const store = this.getStoreMain();
-        return dmclib.adminRole.init(store.models.AdminRoles, this.getDefaultRole());
+        return this.initDmcLib();
+      })
+      .then(() => {
+        return this.initConstant();
+      })
+    ;
+  }
+
+  initConstant() {
+    const dmclib = this.getDmcLib();
+    // サービス側で未定義の定数にdmclibの値をセット
+    for (let k in dmclib.constants) {
+      if (constant[k] === undefined) {
+        constant[k] = dmclib.constants[k];
+      }
+    }
+  }
+
+  initDmcLib() {
+    const store = this.getStoreMain();
+    return Promise.resolve()
+      .then(() => {
+        this.dmclib = new DmcLib({
+          acl: this.getConfigAcl(),
+          audit_log: {
+            audit_logs: store.models.AuditLogs,
+          },
+          admin_user: {
+            admin_users: store.models.AdminUsers,
+            default_role: this.getDefaultRole(),
+          },
+          admin_role: {
+            admin_roles: store.models.AdminRoles,
+            store: store.instance,
+            default_role: this.getDefaultRole(),
+          },
+          auth: {
+            admin_users: store.models.AdminUsers,
+            admin_roles: store.models.AdminRoles,
+            super_role: this.getSuperRole(),
+            auth_jwt: this.getConfigAuthJwt(),
+            google_oauth: this.getConfigGoogleOAuth(),
+          },
+          pager: {
+            limit: constant.DEFAULT_PAGER_LIMIT,
+          },
+        });
+        return this.dmclib;
       })
     ;
   }
@@ -74,6 +121,14 @@ class Context {
    */
   getStoreMain() {
     return this.stores.main;
+  }
+
+  /**
+   * DmcLib 取得
+   * @returns {*}
+   */
+  getDmcLib() {
+    return this.dmclib;
   }
 
   /**

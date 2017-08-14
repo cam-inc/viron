@@ -21,5 +21,5 @@ $ npm run dressup
 # Tools
 
 ```
-$ npm run help
+$ npm run
 ```

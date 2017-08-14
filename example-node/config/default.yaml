@@ -32,7 +32,7 @@ swagger:
     # pipe for all swagger-node controllers
     swagger_controllers:
       - onError: _error_handler
-      - cors
+      # - cors
       - swagger_security
       - _middleware_after_auth
       - _swagger_validate

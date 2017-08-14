@@ -1,9 +1,9 @@
 const compact = require('mout/array/compact');
 const isEmpty = require('mout/lang/isEmpty');
-const dmclib = require('node-dmclib');
 
-const constant = require('../../shared/constant');
-const helperAdminRole = dmclib.adminRole.helper;
+const shared = require('../../shared');
+const context = shared.context;
+const constant = shared.constant;
 
 const defaultOptions = {
   key: 'key',
@@ -18,6 +18,9 @@ const api = (path, method) => {
  * GET: /dmc
  */
 const show = (req, res) => {
+  const dmclib = context.getDmcLib();
+  const helperAdminRole = dmclib.adminRole.helper;
+
   const result = {
     name: 'DMC Example Project for Node.js',
     color: 'white',

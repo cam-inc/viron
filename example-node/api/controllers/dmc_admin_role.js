@@ -1,22 +1,10 @@
-const dmclib = require('node-dmclib');
 const shared = require('../../shared');
+const dmclib = shared.context.getDmcLib();
 
 module.exports = {
-  'admin_role#list': dmclib.adminRole.controller.registerList(
-    shared.context.getStoreMain().models.AdminRoles
-  ),
-  'admin_role#create': dmclib.adminRole.controller.registerCreate(
-    shared.context.getStoreMain().models.AdminRoles,
-    shared.context.getStoreMain().instance
-  ),
-  'admin_role#get': dmclib.adminRole.controller.registerGet(
-    shared.context.getStoreMain().models.AdminRoles
-  ),
-  'admin_role#remove': dmclib.adminRole.controller.registerRemove(
-    shared.context.getStoreMain().models.AdminRoles
-  ),
-  'admin_role#update': dmclib.adminRole.controller.registerUpdate(
-    shared.context.getStoreMain().models.AdminRoles,
-    shared.context.getStoreMain().instance
-  ),
+  'admin_role#list': dmclib.adminRole.controller.list,
+  'admin_role#create': dmclib.adminRole.controller.create,
+  'admin_role#get': dmclib.adminRole.controller.get,
+  'admin_role#remove': dmclib.adminRole.controller.remove,
+  'admin_role#update': dmclib.adminRole.controller.update,
 };
