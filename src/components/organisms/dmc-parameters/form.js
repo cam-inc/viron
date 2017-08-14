@@ -103,11 +103,11 @@ export default function() {
   this.uiType = inferUITypeBySchemaObject(schemaObject);
 
   // infoの開閉状態。
-  this.isInfoOpened = true;
+  this.isInfoOpened = false;
   // validateの開閉状態。
-  this.isValidateOpened = true;
+  this.isValidateOpened = false;
   // bodyの開閉状態。
-  this.isBodyOpened = true;
+  this.isBodyOpened = false;
 
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {
