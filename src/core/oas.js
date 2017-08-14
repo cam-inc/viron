@@ -17,6 +17,29 @@ const resultTemplate = {
 };
 
 /**
+ * 独自validate。
+ * ParameterObjectのrequired(boolean)に対応するため。
+ * @param {Object} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const selfRequired = (value, constraints) => {
+  const result = ObjectAssign({}, resultTemplate);
+  if (!hasOwn(constraints, 'selfRequired')) {
+    return result;
+  }
+  if (isBoolean(constraints.selfRequired) && constraints.selfRequired) {
+    if (value === undefined) {
+      result.isValid = false;
+      result.message = '必須項目です。';
+      return result;
+    }
+  }
+
+  return result;
+};
+
+/**
  * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1
  * @param {Number} value
  * @param {Object} constraints
@@ -323,17 +346,7 @@ const minProperties = (value, constraints) => {
  */
 const required = (value, constraints) => {
   const result = ObjectAssign({}, resultTemplate);
-  // JsonSchema仕様ではrequiredは常にarrayだが、OASとの兼ね合いで特別にbooleanも許可する。
-  if (isBoolean(constraints.required) && constraints.required) {
-    if (value === undefined) {
-      result.isValid = false;
-      result.message = '必須項目です。';
-      return result;
-    } else {
-      return result;
-    }
-  }
-  if (!isArray(constraints.required) || !!constraints.required.length) {
+  if (!isArray(constraints.required) || !constraints.required.length) {
     return result;
   }
   const required = constraints.required;
@@ -472,6 +485,11 @@ const _type = (value, constraints) => {
       break;
     case 'object':
       if (isObject(value)) {
+        isValidType = true;
+      }
+      break;
+    case 'boolean':
+      if (isBoolean(value)) {
         isValidType = true;
       }
       break;
@@ -643,18 +661,12 @@ export default {
   validate: (value, schemaObject) => {
     const results = [];
 
-    // 値が未入力の場合はrequiredチェックだけ行う。
-    if (value === undefined) {
-      // JsonSchema仕様上はvalueはobjectのみ指定可能だが、OASとの兼ね合いで例外的に許可している。
-      results.push(required(value, schemaObject));
-      // isValid値がfalseの結果だけ返す。
-      return reject(results, result => {
-        return result.isValid;
-      });
+    // typeとselfRequiredチェックだけ最初に済ませておく。
+    let result = _type(value, schemaObject);
+    if (!result.isValid) {
+      return [result];
     }
-
-    // typeチェックだけ最初に済ませておく。
-    const result = _type(value, schemaObject);
+    result = selfRequired(value, schemaObject);
     if (!result.isValid) {
       return [result];
     }
@@ -718,8 +730,26 @@ export default {
    * @param {Object} schemaObject
    * @return {Oject}
    */
+  createSchemaObjectFromParameterObject: parameterObject => {
+    const normalizedSchemaObject = ObjectAssign({}, parameterObject);
+    const selfRequired = normalizedSchemaObject.required;
+    delete normalizedSchemaObject.required;
+    normalizedSchemaObject.selfRequired = selfRequired;
+    return normalizedSchemaObject;
+  },
+
+  /**
+   * ParameterObjectとSchemaObjectを元にSchemaObjectを生成します。
+   * @param {Object} parameterObject
+   * @param {Object} schemaObject
+   * @return {Oject}
+   */
   createSchemaObjectFromParameterObjectAndSchemaObject: (parameterObject, schemaObject) => {
-    const normalizedSchemaObject = ObjectAssign({}, parameterObject, schemaObject);
+    let normalizedSchemaObject = ObjectAssign({}, parameterObject);
+    const selfRequired = normalizedSchemaObject.required;
+    delete normalizedSchemaObject.required;
+    normalizedSchemaObject.selfRequired = selfRequired;
+    normalizedSchemaObject = ObjectAssign(normalizedSchemaObject, schemaObject);
     return normalizedSchemaObject;
   },
 

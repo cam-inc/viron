@@ -1,3 +1,4 @@
+import forEach from 'mout/array/forEach';
 import isArray from 'mout/lang/isArray';
 import hasOwn from 'mout/object/hasOwn';
 import ObjectAssign from 'object-assign';
@@ -7,21 +8,19 @@ export default function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const schemaObject = ObjectAssign({}, this.opts.schemaobject);
   this.schemaObject = schemaObject;
-  this.enum = schemaObject.enum;
   this.name = schemaObject.name;
-  this.description = schemaObject.description;
-  this.required = schemaObject.required;
-  this.type = schemaObject.type;
-  this.example = schemaObject.example;
-  this.multipleOf = hasOwn(schemaObject, 'multipleOf') && String(schemaObject.multipleOf);
-  this.maximum = hasOwn(schemaObject, 'maximum') && String(schemaObject.maximum);
-  this.exclusiveMaximum = hasOwn(schemaObject, 'exclusiveMaximum') && String(schemaObject.exclusiveMaximum);
-  this.minimum = hasOwn(schemaObject, 'minimum') && String(schemaObject.minimum);
-  this.exclusiveMinimum = hasOwn(schemaObject, 'exclusiveMinimum') && String(schemaObject.exclusiveMinimum);
-  this.maxLength = hasOwn(schemaObject, 'maxLength') && String(schemaObject.maxLength);
-  this.minLength = hasOwn(schemaObject, 'minLength') && String(schemaObject.minLength);
-  this.pattern = hasOwn(schemaObject, 'pattern') && String(schemaObject.pattern);
-  this.format = hasOwn(schemaObject, 'format') && String(schemaObject.format);
+  this.selfRequired = schemaObject.selfRequired;
+  const keysForInfo = ['enum', 'description', 'required', 'type', 'example', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'format'];
+  this.infos = [];
+  forEach(keysForInfo, key => {
+    if (!hasOwn(schemaObject, key)) {
+      return;
+    }
+    this.infos.push({
+      key,
+      value: String(schemaObject[key])
+    });
+  });
 
   /**
    * バリデートエラー項目群を返します。
@@ -38,7 +37,7 @@ export default function() {
   this.isItemsMode = false;
   this.properties = null;
   this.items = null;
-  switch (this.type) {
+  switch (schemaObject.type) {
   case 'null':
   case 'boolean':
   case 'number':
@@ -155,15 +154,23 @@ export default function() {
   });
 
   // infoの開閉状態。
-  this.isInfoOpened = true;
+  this.isInfoOpened = false;
+  // 入力プレビューの開閉状態。
+  this.isPreviewOpened = false;
   // validateの開閉状態。
-  this.isValidateOpened = true;
+  this.isValidateOpened = false;
   // bodyの開閉状態。
-  this.isBodyOpened = true;
+  this.isBodyOpened = false;
 
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {
     this.isInfoOpened = !this.isInfoOpened;
+    this.update();
+  };
+
+  // previewの開閉ボタンがタップされた時の処理。
+  this.handlePreviewOpenShutButtonTap = () => {
+    this.isPreviewOpened = !this.isPreviewOpened;
     this.update();
   };
 
@@ -188,8 +195,25 @@ export default function() {
   // +ボタンがタップされた時の処理。
   this.handleAddButtonTap = () => {
     const arr = this.opts.val.concat([]);
-    // undefinedを追加することで空の入力フォームを出力できる。
-    arr.push(undefined);
+    let defaultValue = undefined;
+    switch (schemaObject.items.type) {
+    case 'array':
+      defaultValue = [];
+      break;
+    case 'object':
+      defaultValue = {};
+      break;
+    case 'boolean':
+    case 'integer':
+    case 'number':
+    case 'null':
+    case 'string':
+    default:
+      // 意図的に`undefined`をデフォルト値とする。
+      defaultValue = undefined;
+      break;
+    }
+    arr.push(defaultValue);
     this.opts.onchange(arr, this.opts.key);
   };
 

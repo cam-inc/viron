@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const reduce = require('mout/object/reduce');
-const dmclib = require('node-dmclib');
+const dmclibStores = require('node-dmclib/stores');
 
 const models = require('./models');
 const associations = models.associations;
@@ -54,12 +54,12 @@ module.exports = {
   /**
    * Model Define
    */
-  models: Object.assign(models, dmclib.stores.mysql.models),
+  models: Object.assign(models, dmclibStores.mysql.models),
 
   /**
    * Helper functions
    */
-  helper: dmclib.stores.mysql.helper,
+  helper: dmclibStores.mysql.helper,
 
   /**
    * MySQL コネクション作成
@@ -74,7 +74,7 @@ module.exports = {
         return sequelize;
       })
       .then(sequelize => {
-        return dmclib.stores.mysql.init(sequelize); // import dmc library
+        return dmclibStores.mysql.init(sequelize); // import dmc library
       })
       .then(sequelize => {
         return initModels(sequelize);

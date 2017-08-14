@@ -1,28 +1,13 @@
-const dmclib = require('node-dmclib');
 const shared = require('../../shared');
+const dmclib = shared.context.getDmcLib();
 
 /**
  * DMCがデフォルトで提供している認証 (Google OAuth or EMail on JWT)
  * @type {{dmc_auth#signin: (function(*, *, *)), dmc_auth#signout: (function(*, *, *)), dmc_auth#googlesignin: (function(*, *, *)), dmc_auth#googleoauth2callback}}
  */
 module.exports = {
-  'dmc_auth#signin': dmclib.auth.controller.registerSignIn(
-    shared.context.getStoreMain().models.AdminUsers,
-    shared.context.getStoreMain().models.AdminRoles,
-    shared.context.getSuperRole(),
-    shared.context.getConfigAuthJwt()
-  ),
-
-  'dmc_auth#signout': dmclib.auth.controller.registerSignOut(),
-
-  'dmc_auth#googlesignin': dmclib.auth.controller.registerGoogleSignIn(
-    shared.context.getConfigGoogleOAuth()
-  ),
-  'dmc_auth#googleoauth2callback': dmclib.auth.controller.registerGoogleOAuth2Callback(
-    shared.context.getStoreMain().models.AdminUsers,
-    shared.context.getStoreMain().models.AdminRoles,
-    shared.context.getConfigGoogleOAuth(),
-    shared.context.getConfigAuthJwt()
-  )
-
+  'dmc_auth#signin': dmclib.auth.controller.signIn,
+  'dmc_auth#signout': dmclib.auth.controller.signOut,
+  'dmc_auth#googlesignin': dmclib.auth.controller.googleSignIn,
+  'dmc_auth#googleoauth2callback': dmclib.auth.controller.googleOAuth2Callback,
 };

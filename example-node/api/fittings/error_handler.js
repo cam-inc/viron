@@ -1,3 +1,4 @@
-const dmclib = require('node-dmclib');
+const shared = require('../../shared');
+const dmclib = shared.context.getDmcLib();
 
 module.exports = dmclib.errorHandler;

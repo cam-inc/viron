@@ -1,8 +1,5 @@
-const dmclib = require('node-dmclib');
-const pager = dmclib.pager;
-const storeHelper = dmclib.stores.helper;
-
 const shared = require('../../shared');
+const context = shared.context;
 
 /**
  * Controller : List User Blog
@@ -12,7 +9,10 @@ const shared = require('../../shared');
  * @returns {Promise.<TResult>}
  */
 const list = (req, res) => {
-  const store = shared.context.getStoreMain();
+  const dmclib = context.getDmcLib();
+  const pager = dmclib.pager;
+  const storeHelper = dmclib.stores.helper;
+  const store = context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
   const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
   const limit = req.query.limit;
@@ -38,7 +38,9 @@ const list = (req, res) => {
  * @returns {Promise.<TResult>}
  */
 const create = (req, res) => {
-  const store = shared.context.getStoreMain();
+  const dmclib = context.getDmcLib();
+  const storeHelper = dmclib.stores.helper;
+  const store = context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
   return storeHelper.create(store, UserBlogs, req.body)
     .then(data => {
@@ -55,7 +57,9 @@ const create = (req, res) => {
  * @returns {Promise.<TResult>}
  */
 const remove = (req, res) => {
-  const store = shared.context.getStoreMain();
+  const dmclib = context.getDmcLib();
+  const storeHelper = dmclib.stores.helper;
+  const store = context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
   const query = {
     id: req.swagger.params.id.value,
@@ -78,7 +82,9 @@ const remove = (req, res) => {
  * @returns {Promise.<TResult>}
  */
 const show = (req, res) => {
-  const store = shared.context.getStoreMain();
+  const dmclib = context.getDmcLib();
+  const storeHelper = dmclib.stores.helper;
+  const store = context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
   const query = {
     id: req.swagger.params.id.value,
@@ -101,7 +107,9 @@ const show = (req, res) => {
  * @returns {Promise.<TResult>}
  */
 const update = (req, res) => {
-  const store = shared.context.getStoreMain();
+  const dmclib = context.getDmcLib();
+  const storeHelper = dmclib.stores.helper;
+  const store = context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
   const query = {
     id: req.swagger.params.id.value,

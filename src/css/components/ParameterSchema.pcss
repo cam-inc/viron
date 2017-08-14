@@ -65,9 +65,16 @@
   background-color: var(--color-bg-primary);
 }
 
+.ParameterSchema__selfRequired {
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-text-accent);
+}
+
 .ParameterSchema__validateOpenShutButton,
 .ParameterSchema__addButton,
 .ParameterSchema__removeButton,
+.ParameterSchema__previewOpenShutButton,
 .ParameterSchema__infoOpenShutButton {
   @apply --layout-center-center;
   width: 18px;
@@ -79,10 +86,12 @@
 .ParameterSchema__validateOpenShutButton.hover,
 .ParameterSchema__addButton.hover,
 .ParameterSchema__removeButton.hover,
+.ParameterSchema__previewOpenShutButton.hover,
 .ParameterSchema__infoOpenShutButton.hover {
   opacity: 0.5;
 }
 
+.ParameterSchema__previewOpenShutButton--active .Icon,
 .ParameterSchema__infoOpenShutButton--active .Icon {
   color: var(--color-text-positive);
 }
@@ -114,6 +123,12 @@
 
 .ParameterSchema__info > div:last-child {
   margin-bottom: 0;
+}
+
+.ParameterSchema__preview {
+  padding: 8px 0 8px 8px;
+  background-color: #fff;
+  border-left: 2px solid var(--color-basic-skyblue);
 }
 
 .ParameterSchema__validates {

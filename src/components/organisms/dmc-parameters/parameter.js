@@ -17,7 +17,7 @@ export default function() {
   case 'header':
   case 'path':
   case 'formData':
-    this.normalizedSchemaObject = parameterObject;
+    this.normalizedSchemaObject = oas.createSchemaObjectFromParameterObject(parameterObject);
     break;
   default:
     break;
