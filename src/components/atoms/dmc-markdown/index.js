@@ -35,14 +35,6 @@ export default function() {
     renderer.listitem = (text) => {
       return `<div class="Markdown__text--listItem">${text}</div>`;
     },
-    // linkタグ
-    renderer.link = (href, title, text) => {
-      return `<div class="Markdown__text--listItem">${text}</div>`;
-    },
-    // imageタグ
-    renderer.image = (href, title, text) => {
-      return `<div class="Markdown__text--listItem">${text}</div>`;
-    },
     // 引用
     renderer.blockquote = (quote) => {
       return `<div class="Markdown__text--blockquote">${quote}</div>`;
