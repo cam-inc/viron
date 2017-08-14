@@ -1,7 +1,18 @@
 import marked from 'marked';
+import ObjectAssign from 'object-assign';
 export default function() {
 
   this.on('update', () => {
+    // marked.setOptions(ObjectAssign({}, {
+    //   renderer: new marked.Renderer(),
+    //   gfm: true,
+    //   tables: true,
+    //   breaks: false,
+    //   pedantic: false,
+    //   sanitize: false,
+    //   smartLists: true,
+    //   smartypants: false
+    // }, this.opts.data.markedOptions));
     var renderer = new marked.Renderer();
     // hタグ
     renderer.heading = (text, level) => {
@@ -33,15 +44,23 @@ export default function() {
     },
     // liタグ
     renderer.listitem = (text) => {
-      return `<div class="Markdown__text--listItem">${text}</div>`;
+      return `<div class="Markdown__listItem">${text}</div>`;
     },
+    // // linkタグ
+    // renderer.link = (href, title, text) => {
+    //   return `<div class="Markdown__text--listItem"><a href="${href}" title="${title}">${text}</a></div>`;
+    // },
+    // // imageタグ
+    // renderer.image = (href, title, text) => {
+    //   return `<div class="Markdown__text--listItem">${text}</div>`;
+    // },
     // 引用
     renderer.blockquote = (quote) => {
-      return `<div class="Markdown__text--blockquote">${quote}</div>`;
+      return `<div class="Markdown__blockquote">${quote}</div>`;
     },
     // codeタグ
     renderer.codespan = (code) => {
-      return `<div class="Markdown__text--listItem">${code}</div>`;
+      return `<div class="Markdown__code">${code}</div>`;
     },
     // hrタグ
     renderer.hr = () => {
@@ -51,8 +70,21 @@ export default function() {
     renderer.br = () => {
       return '<div class="Markdown--br"></div>';
     },
+    // // tableタグ
+    // renderer.table = (header, body) => {
+    //   return `<div class="Markdown__text--blockquote">${quote}</div>`;
+    // },
+    // // tablerow
+    // renderer.tablerow = (content) => {
+    //   return `<div class="Markdown__text--blockquote">${quote}</div>`;
+    // },
+    // // tablecell
+    // renderer.tablecell = (content) => {
+    //   return `<div class="Markdown__text--blockquote">${quote}</div>`;
+    // },
 
-    this.refs.view.innerHTML = this.opts.data.content ? marked('# Marked in browser\n\nRendered by **marked**.\n\n - aaaaaa', { renderer: renderer }) : '';
+    console.log(marked('# 見出しh1\n\n## 見出しh2\n\n### 見出しh3\n\n#### 見出しh4\n\n##### 見出しh5\n\n###### 見出しh6\n\nparagraph **strong**\n\n- list', { renderer: renderer }));
+    this.refs.view.innerHTML = this.opts.data.content ? marked('# 見出しh1\n\n## 見出しh2\n\n### 見出しh3\n\n#### 見出しh4\n\n##### 見出しh5\n\n###### 見出しh6\n\nparagraph \n\n**strong**\n\n- list\n\n- list', { renderer: renderer }) : '';
     // this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 }
