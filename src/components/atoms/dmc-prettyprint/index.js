@@ -1,7 +1,8 @@
 export default function() {
-  const str = (json => {
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+  const updateText = () => {
+    const json = JSON.stringify(this.opts.data, undefined, 4);
+    let text = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    text = text.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
       let cls = 'number';
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
@@ -16,9 +17,12 @@ export default function() {
       }
       return '<span class="PrettyPrint__' + cls + '">' + match + '</span>';
     });
-  })(JSON.stringify(this.opts.data, undefined, 4));
+    this.refs.canvas.innerHTML = text;
+  };
 
   this.on('mount', () => {
-    this.refs.canvas.innerHTML = str;
+    updateText();
+  }).on('updated', () => {
+    updateText();
   });
 }

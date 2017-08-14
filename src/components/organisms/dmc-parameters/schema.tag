@@ -12,18 +12,22 @@ dmc-parameter-schema.ParameterSchema
         dmc-icon(type="plusCircle")
       .ParameterSchema__removeButton(if="{ opts.isremovable }" ref="touch" onTap="handleRemoveButtonTap")
         dmc-icon(type="minusCircle")
+      .ParameterSchema__previewOpenShutButton(if="{ opts.val !== undefined }" class="{ isPreviewOpened ? 'ParameterSchema__previewOpenShutButton--active' : '' }" ref="touch" onTap="handlePreviewOpenShutButtonTap")
+        dmc-icon(type="filetext")
       .ParameterSchema__infoOpenShutButton(class="{ isInfoOpened ? 'ParameterSchema__infoOpenShutButton--active' : '' }" ref="touch" onTap="handleInfoOpenShutButtonTap")
         dmc-icon(type="infoCirlceO")
   .ParameterSchema__body(if="{ isBodyOpened }")
-    .ParameterSchema__info(if="{ isInfoOpened }")
-      virtual(each="{ info in infos }")
-        div(class="ParameterSchema__{ info.key }") { info.key }: { info.value }
     .ParameterSchema__validates(if="{ isValidateOpened && !!getValidateErrors().length }")
       virtual(each="{ err in getValidateErrors() }")
         .ParameterSchema__validate
           .ParameterSchema__validateIcon
             dmc-icon(type="exclamationCircleO")
           .ParameterSchema__validateMessage { err.message }
+    .ParameterSchema__info(if="{ isInfoOpened }")
+      virtual(each="{ info in infos }")
+        div(class="ParameterSchema__{ info.key }") { info.key }: { info.value }
+    .ParameterSchema__preview(if="{ isPreviewOpened && opts.val !== undefined }")
+      dmc-prettyprint(data="{ opts.val }")
     .ParameterSchema__content
       virtual(if="{ isFormMode }")
         dmc-parameter-form(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleFormChange }")

@@ -155,6 +155,8 @@ export default function() {
 
   // infoの開閉状態。
   this.isInfoOpened = true;
+  // 入力プレビューの開閉状態。
+  this.isPreviewOpened = true;
   // validateの開閉状態。
   this.isValidateOpened = true;
   // bodyの開閉状態。
@@ -163,6 +165,12 @@ export default function() {
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {
     this.isInfoOpened = !this.isInfoOpened;
+    this.update();
+  };
+
+  // previewの開閉ボタンがタップされた時の処理。
+  this.handlePreviewOpenShutButtonTap = () => {
+    this.isPreviewOpened = !this.isPreviewOpened;
     this.update();
   };
 
