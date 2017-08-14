@@ -1,5 +1,6 @@
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
+import isNumber from 'mout/lang/isNumber';
 import hasOwn from 'mout/object/hasOwn';
 import ObjectAssign from 'object-assign';
 
@@ -90,11 +91,17 @@ export default function() {
 
   // textinput値が変更された時の処理。
   this.handleTextinputChange = newText => {
+    if (!schemaObject.allowEmptyValue || !newText) {
+      newText = undefined;
+    }
     this.opts.onchange(newText);
   };
 
   // numberinput値が変更された時の処理。
   this.handleNumberinputChange = newNumber => {
+    if (!isNumber(newNumber)) {
+      newNumber = undefined;
+    }
     this.opts.onchange(newNumber);
   };
 
