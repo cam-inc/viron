@@ -1,19 +1,20 @@
-dmc-parameter-schema.ParameterSchema(class="{ isInfoOpened ? 'ParameterSchema--infoOpened' : '' } { isValidateOpened ? 'ParameterSchema--validateOpened' : '' } { isBodyOpened ? 'ParameterSchema--bodyOpened' : '' }")
+dmc-parameter-schema.ParameterSchema
   .ParameterSchema__head
     .ParameterSchema__caption
-      .ParameterSchema__bodyOpenShutButton(ref="touch" onTap="handleBodyOpenShutButtonTap")
+      .ParameterSchema__bodyOpenShutButton(class="{ isBodyOpened ? 'ParameterSchema__bodyOpenShutButton--active' : '' }" ref="touch" onTap="handleBodyOpenShutButtonTap")
         dmc-icon(type="right")
       .ParameterSchema__name(ref="touch" onTap="handleNameTap") { name }
       .ParameterSchema__line
-      .ParameterSchema__validateOpenShutButton(if="{ !!getValidateErrors().length }" ref="touch" onTap="handleValidateOpenShutButtonTap")
+      .ParameterSchema__validateOpenShutButton(if="{ !!getValidateErrors().length }" class="{ isValidateOpened ? '.ParameterSchema__validateOpenShutButton--active' : '' }" ref="touch" onTap="handleValidateOpenShutButtonTap")
         dmc-icon(type="exclamationCircleO")
       .ParameterSchema__addButton(if="{ isItemsMode }" ref="touch" onTap="handleAddButtonTap")
         dmc-icon(type="plusCircle")
       .ParameterSchema__removeButton(if="{ opts.isremovable }" ref="touch" onTap="handleRemoveButtonTap")
         dmc-icon(type="minusCircle")
-      .ParameterSchema__infoOpenShutButton(ref="touch" onTap="handleInfoOpenShutButtonTap")
+      .ParameterSchema__infoOpenShutButton(class="{ isInfoOpened ? 'ParameterSchema__infoOpenShutButton--active' : '' }" ref="touch" onTap="handleInfoOpenShutButtonTap")
         dmc-icon(type="infoCirlceO")
-    .ParameterSchema__info
+  .ParameterSchema__body(if="{ isBodyOpened }")
+    .ParameterSchema__info(if="{ isInfoOpened }")
       .ParameterSchema__description(if="{ !!description }") description: { description }
       .ParameterSchema__type type: { type }
       .ParameterSchema__enum(if="{ !!enum }") enum: { enum }
@@ -27,19 +28,19 @@ dmc-parameter-schema.ParameterSchema(class="{ isInfoOpened ? 'ParameterSchema--i
       .ParameterSchema__pattern(if="{ !!pattern }") pattern: { pattern }
       .ParameterSchema__format(if="{ !!format }") format: { format }
       .ParameterSchema__example(if="{ !!example }") example: { example }
-    .ParameterSchema__validates(if="{ !!getValidateErrors().length }")
+    .ParameterSchema__validates(if="{ isValidateOpened && !!getValidateErrors().length }")
       virtual(each="{ err in getValidateErrors() }")
         .ParameterSchema__validate
           .ParameterSchema__validateIcon
             dmc-icon(type="exclamationCircleO")
           .ParameterSchema__validateMessage { err.message }
-  .ParameterSchema__body
-    virtual(if="{ isFormMode }")
-      dmc-parameter-form(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleFormChange }")
-    virtual(if="{ isPropertiesMode }")
-      dmc-parameter-schema(each="{ property, key in properties }" key="{ key }" val="{ parent.getPropertyValue(property, key) }" schemaObject="{ parent.getNormalizedSchemaObjectForProperty(property, key) }" onChange="{ parent.handlePropertyChange }")
-    virtual(if="{ isItemsMode }")
-      dmc-parameter-schema(no-reorder isRemovable="{ true }" each="{ val, idx in opts.val }" key="{ idx }" val="{ parent.getItemValue(idx) }" schemaObject="{ parent.getNormalizedSchemaObjectForItem(idx) }" onRemove="{ parent.handleItemsRemove }" onChange="{ parent.handleItemsChange }")
+    .ParameterSchema__content
+      virtual(if="{ isFormMode }")
+        dmc-parameter-form(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleFormChange }")
+      virtual(if="{ isPropertiesMode }")
+        dmc-parameter-schema(each="{ property, key in properties }" key="{ key }" val="{ parent.getPropertyValue(property, key) }" schemaObject="{ parent.getNormalizedSchemaObjectForProperty(property, key) }" onChange="{ parent.handlePropertyChange }")
+      virtual(if="{ isItemsMode }")
+        dmc-parameter-schema(no-reorder isRemovable="{ true }" each="{ val, idx in opts.val }" key="{ idx }" val="{ parent.getItemValue(idx) }" schemaObject="{ parent.getNormalizedSchemaObjectForItem(idx) }" onRemove="{ parent.handleItemsRemove }" onChange="{ parent.handleItemsChange }")
 
   script.
     import '../../atoms/dmc-icon/index.tag';

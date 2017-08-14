@@ -1,6 +1,10 @@
 .ParameterSchema {
   display: block;
-  border-left: 2px solid var(--color-bg-primary);
+  border-left: 2px solid var(--color-bg-tertiaryLight);
+}
+/* TODO: モバイル端末最適化 */
+.ParameterSchema:hover {
+  border-left-color: var(--color-bg-primary);
 }
 
 .ParameterSchema__caption {
@@ -25,6 +29,10 @@
   border-left: 8px solid var(--color-bg-tertiaryLight);
 }
 
+.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton {
+  border-left-color: var(--color-bg-primary);
+}
+
 .ParameterSchema__bodyOpenShutButton.hover {
   opacity: 0.5;
 }
@@ -32,6 +40,10 @@
 .ParameterSchema__bodyOpenShutButton .Icon {
   transition-duration: 100ms;
   transition-property: transform;
+}
+
+.ParameterSchema__bodyOpenShutButton--active .Icon {
+  transform: rotate(90deg);
 }
 
 .ParameterSchema__name {
@@ -47,6 +59,10 @@
   flex-grow: 1;
   height: 1px;
   background-color: var(--color-bg-tertiaryLight);
+}
+
+.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__line {
+  background-color: var(--color-bg-primary);
 }
 
 .ParameterSchema__validateOpenShutButton,
@@ -67,10 +83,28 @@
   opacity: 0.5;
 }
 
+.ParameterSchema__infoOpenShutButton--active .Icon {
+  color: var(--color-text-positive);
+}
+
+.ParameterSchema__validateOpenShutButton--active .Icon {
+  color: var(--color-text-negative);
+}
+
+.ParameterSchema__body {
+  margin: 8px 0 0 16px;
+}
+
+.ParameterSchema__body > div {
+  margin-bottom: 8px;
+}
+
+.ParameterSchema__body > div:last-child {
+  margin-bottom: 0;
+}
+
 .ParameterSchema__info {
-  display: none;
   padding: 8px 0 8px 8px;
-  margin-left: 16px;
   border-left: 2px solid var(--color-bg-info);
 }
 
@@ -83,9 +117,7 @@
 }
 
 .ParameterSchema__validates {
-  display: none;
   padding: 8px 0 8px 8px;
-  margin-left: 16px;
   border-left: 2px solid var(--color-bg-error);
 }
 
@@ -112,44 +144,10 @@
   margin-bottom: 0;
 }
 
-.ParameterSchema__body {
-  display: none;
-  margin: 8px 0 0 16px;
+.ParameterSchema__content > .ParameterSchema {
+  margin-bottom: 8px;
 }
 
-/* ============================== */
-/* info開状態 */
-/* ============================== */
-.ParameterSchema--infoOpened > .ParameterSchema__head > .ParameterSchema__info {
-  display: block;
-}
-
-.ParameterSchema--infoOpened > .ParameterSchema__head > .ParameterSchema__caption > .ParameterSchema__infoOpenShutButton .Icon {
-  color: var(--color-text-positive);
-}
-
-/* ============================== */
-/* validate開状態 */
-/* ============================== */
-.ParameterSchema--validateOpened > .ParameterSchema__head > .ParameterSchema__validates {
-  display: block;
-}
-
-.ParameterSchema--validateOpened > .ParameterSchema__head > .ParameterSchema__caption > .ParameterSchema__validateOpenShutButton .Icon {
-  color: var(--color-text-negative);
-}
-
-/* ============================== */
-/* body開状態 */
-/* ============================== */
-.ParameterSchema--bodyOpened > .ParameterSchema__body {
-  display: block;
-}
-
-.ParameterSchema--bodyOpened > .ParameterSchema__head > .ParameterSchema__caption > .ParameterSchema__bodyOpenShutButton {
-  border-color: var(--color-bg-primary);
-}
-
-.ParameterSchema--bodyOpened > .ParameterSchema__head > .ParameterSchema__caption > .ParameterSchema__bodyOpenShutButton .Icon {
-  transform: rotate(90deg);
+.ParameterSchema__content > .ParameterSchema:last-child {
+  margin-bottom: 0;
 }
