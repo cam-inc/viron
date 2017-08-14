@@ -1,5 +1,4 @@
 import marked from 'marked';
-import ObjectAssign from 'object-assign';
 export default function() {
 
   this.on('update', () => {
