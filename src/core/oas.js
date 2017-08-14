@@ -53,7 +53,7 @@ const multipleOf = (value, constraints) => {
   const multipleOf = constraints.multipleOf;
   if ((value % multipleOf) !== 0) {
     result.isValid = false;
-    result.message = `${value}を${multipleOf}で割り切れる数値にして下さい。`;
+    result.message = `${multipleOf}で割り切れる数値にして下さい。`;
     return result;
   }
   return result;
@@ -77,13 +77,13 @@ const maximum = (value, constraints) => {
   if (exclusiveMaximum) {
     if (value >= maximum) {
       result.isValid = false;
-      result.message = `${value}を${maximum}より小さい数値にして下さい。`;
+      result.message = `${maximum}より小さい数値にして下さい。`;
       return result;
     }
   } else {
     if (value > maximum) {
       result.isValid = false;
-      result.message = `${value}を${maximum}以下の数値にして下さい。`;
+      result.message = `${maximum}以下の数値にして下さい。`;
       return result;
     }
   }
@@ -108,13 +108,13 @@ const minimum = (value, constraints) => {
   if (exclusiveMinimum) {
     if (value <= minimum) {
       result.isValid = false;
-      result.message = `${value}を${minimum}より大きい数値にして下さい。`;
+      result.message = `${minimum}より大きい数値にして下さい。`;
       return result;
     }
   } else {
     if (value < minimum) {
       result.isValid = false;
-      result.message = `${value}を${minimum}以上の数値にして下さい。`;
+      result.message = `${minimum}以上の数値にして下さい。`;
       return result;
     }
   }
@@ -135,7 +135,7 @@ const maxLength = (value, constraints) => {
   const maxLength = constraints.maxLength;
   if (value.length > maxLength) {
     result.isValid = false;
-    result.message = `${value}の文字数を${maxLength}以下にして下さい。`;
+    result.message = `文字数を${maxLength}以下にして下さい。`;
     return result;
   }
   return result;
@@ -154,7 +154,7 @@ const minLength = (value, constraints) => {
   const minLength = constraints.minLength || 0;
   if (value.length < minLength) {
     result.isValid = false;
-    result.message = `${value}の文字数を${minLength}以上にして下さい。`;
+    result.message = `文字数を${minLength}以上にして下さい。`;
     return result;
   }
   return result;
@@ -176,7 +176,7 @@ const pattern = (value, constraints) => {
   const pattern = constraints.pattern;
   if (!value.match(pattern)) {
     result.isValid = false;
-    result.message = `${value}を${pattern}にマッチさせて下さい。`;
+    result.message = `${pattern}にマッチさせて下さい。`;
     return result;
   }
   return result;
@@ -229,7 +229,7 @@ const additionalItemsAndItems = (value, constraints) => {
   }
 
   result.isValid = false;
-  result.message = `${value}を[items: ${items}]、[additionalItems: ${additionalItems}]をパスするように書き換えて下さい。`;
+  result.message = '"items"、"additionalItems"をパスするように書き換えて下さい。';
   return result;
 };
 
@@ -247,7 +247,7 @@ const maxItems = (value, constraints) => {
   const maxItems = constraints.maxItems;
   if (value.length > maxItems) {
     result.isValid = false;
-    result.message = `${value}の要素数を${maxItems}以下にして下さい。`;
+    result.message = `要素数を${maxItems}以下にして下さい。`;
     return result;
   }
 
@@ -267,7 +267,7 @@ const minItems = (value, constraints) => {
   const minItems = constraints.minItems || 0;
   if (value.length < minItems) {
     result.isValid = false;
-    result.message = `${value}の要素数を${minItems}以上にして下さい。`;
+    result.message = `要素数を${minItems}以上にして下さい。`;
     return result;
   }
 
@@ -440,7 +440,7 @@ const _enum = (value, constraints) => {
   });
   if (!isFound) {
     result.isValid = false;
-    result.message = `${_enum}のいずれかの値を設定して下さい。`;
+    result.message = '"enum"のいずれかの値を設定して下さい。';
   }
   return result;
 };
@@ -504,7 +504,7 @@ const _type = (value, constraints) => {
   });
   if (!isValidType) {
     result.isValid = false;
-    result.message = `${value}の型を${types}のいずれかにして下さい。`;
+    result.message = '型を"types"のいずれかにして下さい。';
   }
   return result;
 };
