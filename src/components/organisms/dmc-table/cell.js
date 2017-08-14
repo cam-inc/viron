@@ -8,23 +8,19 @@ export default function() {
   this.value = null;
   this.isComplex = false;
   this.isImage = false;
-  let type;
-  if (!!this.opts.cell) {
-    type = this.opts.cell.getType();
-  }
-  switch (type) {
+  switch (this.opts.data.type) {
   case 'null':
     this.value = 'null';
     break;
   case 'boolean':
-    this.value = this.opts.cell.getValue() ? 'true' : 'false';
+    this.value = this.opts.data.cell ? 'true' : 'false';
     break;
   case 'number':
   case 'integer':
-    this.value = String(this.opts.cell.getValue());
+    this.value = String(this.opts.data.cell);
     break;
   case 'string': {
-    this.value = this.opts.cell.getValue() || '-';
+    this.value = this.opts.data.cell || '-';
     const split = this.value.split('.');
     if (!!split.length && contains(['jpg', 'png', 'gif'], split[split.length - 1])) {
       this.isImage = true;
@@ -43,7 +39,7 @@ export default function() {
 
   this.handleTap = ()  => {
     store.action(actions.MODALS_ADD, 'dmc-prettyprint', {
-      data : this.opts.cell.getRawValue()
+      data : this.opts.data.cell
     });
   };
 }

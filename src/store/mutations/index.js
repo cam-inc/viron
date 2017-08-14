@@ -8,6 +8,7 @@ import layout from './layout';
 import location from './location';
 import menu from './menu';
 import modals from './modals';
+import oas from './oas';
 import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import toasts from './toasts';
@@ -42,6 +43,8 @@ const constants = {
   MENU_DISABLE: 'MENU_DISABLE',
   MODALS_ADD: 'MODALS_ADD',
   MODALS_REMOVE: 'MODALS_REMOVE',
+  OAS_CLIENT: 'OAS_CLIENT',
+  OAS_CLIENT_CLEAR: 'OAS_CLIENT_CLEAR',
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   TOASTS_ADD: 'TOASTS_ADD',
@@ -78,6 +81,8 @@ export default {
   [constants.MENU_DISABLE]: menu.disable,
   [constants.MODALS_ADD]: modals.add,
   [constants.MODALS_REMOVE]: modals.remove,
+  [constants.OAS_CLIENT]: oas.client,
+  [constants.OAS_CLIENT_CLEAR]: oas.clearClient,
   [constants.OAUTH_ENDPOINT_KEY]: oauthEndpointKey.all,
   [constants.PAGE]: page.all,
   [constants.TOASTS_ADD]: toasts.add,

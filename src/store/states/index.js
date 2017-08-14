@@ -8,6 +8,7 @@ import layout from './layout';
 import location from './location';
 import menu from './menu';
 import modals from './modals';
+import oas from './oas';
 import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import signinShowKey from './signinShowKey';
@@ -22,6 +23,7 @@ const constants = {
   },
   CURRENT: 'CURRENT',
   DMC: 'DMC',
+  OAS: 'OAS',
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
   LAYOUT: 'LAYOUT',
@@ -40,6 +42,7 @@ export default {
   components,
   current,
   dmc,
+  oas,
   drawers,
   endpoints,
   layout,

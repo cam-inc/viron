@@ -6,7 +6,7 @@ dmc-table-item.Table__item(class="{ isOpened ? 'Table__item--opened' : '' }")
     .Table__itemOpenShut
       dmc-icon(type="up")
   virtual(if="{ isOpened }")
-    dmc-table-cell(cell="{ opts.item.cell }")
+    dmc-table-cell(data="{ opts.item }")
 
   script.
     import '../../atoms/dmc-icon/index.tag';

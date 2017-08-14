@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/cam-inc/dmc#readme",
   "scripts": {
+    "build:css": "postcss -c postcss.${NODE_ENV}.json",
     "prepush": "npm run test",
     "start": "run-s build:clean build:prepare build:html build:swagger build:img build:font watch",
     "build": "run-s build:clean build:prepare build:html build:swagger build:img build:font build:js build:css",

@@ -1,4 +1,3 @@
-import swagger from '../../../core/swagger';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import '../../atoms/dmc-message/index.tag';
@@ -19,7 +18,6 @@ export default {
     if (!endpoint) {
       return Promise
         .resolve()
-        .then(() => store.action(actions.CURRENT_REMOVE))
         .then(() => {
           replace('/');
         })
@@ -50,17 +48,13 @@ export default {
           .then(() => store.action(actions.CURRENT_UPDATE, endpointKey))
           .then(() => {
             // 無駄な通信を減らすために、`dmc`データを未取得の場合のみfetchする。
-            const dmc = store.getter(getters.DMC);
-            if (!!dmc) {
+            const isDmcExist = store.getter(getters.DMC_EXISTENCE);
+            if (isDmcExist) {
               return Promise.resolve();
             }
             return Promise
               .resolve()
-              .then(() => {
-                return swagger
-                  .setup(endpoint)
-                  .then(info => store.action(actions.ENDPOINTS_UPDATE, endpointKey, info));
-              })
+              .then(() => store.action(actions.OAS_SETUP, endpointKey, endpoint.url, endpoint.token))
               .then(() => store.action(actions.DMC_GET));
           })
           .then(() => {
@@ -85,7 +79,7 @@ export default {
    * @param {Object} route
    * @return {Promise}
    */
-  onEnter: (store, route) => {// eslint-disable-line no-unused-vars
+  onEnter: (store, route) => {
     return store.action(actions.LOCATION_UPDATE, {
       name: 'components',
       route

@@ -9,17 +9,19 @@ export default {
    * @param {Function} replace
    * @return {Promise}
    */
-  onBefore: (store, route, replace) => {// eslint-disable-line no-unused-vars
+  onBefore: store => {
     return Promise
       .resolve()
       .then(() => Promise.all([
         store.action(actions.CURRENT_REMOVE),
-        store.action(actions.PAGE_REMOVE)
+        store.action(actions.PAGE_REMOVE),
+        store.action(actions.OAS_CLEAR)
       ]))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
       }));
   },
+
   /**
    * ページ遷移時の処理。
    * @param {riotx.Store} store

@@ -48,41 +48,14 @@
   color: var(--color-basic-skyblue);
 }
 
-.Component__searchBoxControls {
-  @apply --layout-center-center;
-}
-
-.Component__searchBoxControls .Button:first-child {
-  margin-right: 8px;
-}
-
-.Component__searchBoxInputs {
-  margin-bottom: 24px;
-}
-
-.Component__searchBoxInput {
-  @apply --layout-center-center;
-  margin-bottom: 8px;
-}
-
-.Component__searchBoxInput:last-child {
-  margin-bottom: 0;
-}
-
-.Component__searchBoxInputLabel {
-  margin-right: 8px;
-  font-size: 12px;
-}
-
-.Component__searchBoxInput .Textinput {
-  display: block;
-  flex-grow: 1;
-}
-
 .Component__body {
   @apply --layout-center-center;
   flex-grow: 1;
   padding: 16px;
+}
+
+.Component__body .ComponentTable {
+  width: 100%;
 }
 
 .Component__alert {
@@ -116,5 +89,13 @@
 }
 
 .Component__action .Button {
+  display: block;
+}
+
+.ComponentSearch {
+  display: block;
+}
+
+.ComponentOperation {
   display: block;
 }

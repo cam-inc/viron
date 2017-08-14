@@ -3,7 +3,6 @@ import riot from 'riot';
 import mixin from './core/mixin';
 import './core/polyfill';
 import router from './core/router';
-import swagger from './core/swagger';
 import store from './store';
 import { constants as actions } from './store/actions';
 import { constants as getters } from './store/getters';
@@ -12,16 +11,15 @@ import './components/atoms/dmc-message/index.tag';
 
 // エントリーポイント。
 document.addEventListener('DOMContentLoaded', () => {
-  let _store;
+  let mainStore;
   Promise
     .resolve()
     .then(() => mixin.init())
     .then(() => store.init())
     .then(store => {
-      _store = store;
+      mainStore = store;
       // debug用にglobal公開しておく。
       window.store = store;
-      window.swagger = swagger;
     })
     .then(() => {
       // OAuth認証後のリダイレクトではクエリにtokenが格納されている。
@@ -31,12 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return Promise.resolve();
       }
 
-      const oauthEndpointKey = _store.getter(getters.OAUTH_ENDPOINT_KEY);
+      const oauthEndpointKey = mainStore.getter(getters.OAUTH_ENDPOINT_KEY);
       return Promise
         .all([
-          _store.action(actions.CURRENT_UPDATE, oauthEndpointKey),
-          _store.action(actions.AUTH_UPDATE, oauthEndpointKey, token),
-          _store.action(actions.OAUTH_ENDPOINT_KEY_REMOVE)
+          mainStore.action(actions.CURRENT_UPDATE, oauthEndpointKey),
+          mainStore.action(actions.AUTH_UPDATE, oauthEndpointKey, token),
+          mainStore.action(actions.OAUTH_ENDPOINT_KEY_REMOVE)
         ])
         .then(() => {
           location.href = `${location.origin}${location.pathname}#/${oauthEndpointKey}`;
@@ -45,9 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => {
       riot.mount('dmc');
     })
-    .then(() => _store.action(actions.UA_SETUP))
-    .then(() => router.init(_store))
-    .catch(err => _store.action(actions.MODALS_ADD, 'dmc-message', {
+    .then(() => mainStore.action(actions.UA_SETUP))
+    .then(() => router.init(mainStore))
+    .catch(err => mainStore.action(actions.MODALS_ADD, 'dmc-message', {
       error: err
     }));
 });

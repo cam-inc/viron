@@ -1,0 +1,169 @@
+.ParameterSchema {
+  display: block;
+  border-left: 2px solid var(--color-bg-tertiaryLight);
+}
+/* TODO: モバイル端末最適化 */
+.ParameterSchema:hover {
+  border-left-color: var(--color-bg-primary);
+}
+
+.ParameterSchema__caption {
+  @apply --layout-center-center;
+}
+
+.ParameterSchema__caption > div {
+  margin-right: 8px;
+}
+
+.ParameterSchema__caption > div:last-child {
+  margin-right: 0;
+}
+
+.ParameterSchema__bodyOpenShutButton {
+  @apply --layout-center-center;
+  width: 26px;
+  height: 18px;
+  margin-right: 0;
+  font-size: 14px;
+  cursor: pointer;
+  border-left: 8px solid var(--color-bg-tertiaryLight);
+}
+
+.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton {
+  border-left-color: var(--color-bg-primary);
+}
+
+.ParameterSchema__bodyOpenShutButton.hover .Icon {
+  opacity: 0.5;
+}
+
+.ParameterSchema__bodyOpenShutButton .Icon {
+  transition-duration: 100ms;
+  transition-property: transform;
+}
+
+.ParameterSchema__bodyOpenShutButton--active .Icon {
+  transform: rotate(90deg);
+}
+
+.ParameterSchema__name {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.ParameterSchema__name.hover {
+  opacity: 0.5;
+}
+
+.ParameterSchema__line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--color-bg-tertiaryLight);
+}
+
+.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__line {
+  background-color: var(--color-bg-primary);
+}
+
+.ParameterSchema__selfRequired {
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-text-accent);
+}
+
+.ParameterSchema__validateOpenShutButton,
+.ParameterSchema__addButton,
+.ParameterSchema__removeButton,
+.ParameterSchema__previewOpenShutButton,
+.ParameterSchema__infoOpenShutButton {
+  @apply --layout-center-center;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ParameterSchema__validateOpenShutButton.hover,
+.ParameterSchema__addButton.hover,
+.ParameterSchema__removeButton.hover,
+.ParameterSchema__previewOpenShutButton.hover,
+.ParameterSchema__infoOpenShutButton.hover {
+  opacity: 0.5;
+}
+
+.ParameterSchema__previewOpenShutButton--active .Icon,
+.ParameterSchema__infoOpenShutButton--active .Icon {
+  color: var(--color-text-positive);
+}
+
+.ParameterSchema__validateOpenShutButton--active .Icon {
+  color: var(--color-text-negative);
+}
+
+.ParameterSchema__body {
+  margin: 8px 0 0 16px;
+}
+
+.ParameterSchema__body > div {
+  margin-bottom: 8px;
+}
+
+.ParameterSchema__body > div:last-child {
+  margin-bottom: 0;
+}
+
+.ParameterSchema__info {
+  padding: 8px 0 8px 8px;
+  border-left: 2px solid var(--color-bg-info);
+}
+
+.ParameterSchema__info > div {
+  margin-bottom: 8px;
+}
+
+.ParameterSchema__info > div:last-child {
+  margin-bottom: 0;
+}
+
+.ParameterSchema__preview {
+  padding: 8px 0 8px 8px;
+  background-color: #fff;
+  border-left: 2px solid var(--color-basic-skyblue);
+}
+
+.ParameterSchema__validates {
+  padding: 8px 0 8px 8px;
+  border-left: 2px solid var(--color-bg-error);
+}
+
+.ParameterSchema__validate {
+  @apply --layout-center-center;
+  padding: 8px;
+  color: #fff;
+  background-color: var(--color-bg-errorLight);
+}
+
+.ParameterSchema__validateIcon {
+  @apply --layout-center-center;
+  margin-right: 8px;
+}
+
+.ParameterSchema__validateMessage {
+  flex-grow: 1;
+}
+
+.ParameterSchema__validates > .ParameterSchema__validate {
+  margin-bottom: 8px;
+}
+
+.ParameterSchema__validates > .ParameterSchema__validate:last-child {
+  margin-bottom: 0;
+}
+
+.ParameterSchema__content > .ParameterSchema {
+  margin-bottom: 8px;
+}
+
+.ParameterSchema__content > .ParameterSchema:last-child {
+  margin-bottom: 0;
+}

@@ -1,6 +1,9 @@
 import filter from 'mout/object/filter';
 import values from 'mout/object/values';
 
+const SECTION_DASHBOARD = 'dashboard';
+const SECTION_MANAGE = 'manage';
+
 export default {
   /**
    * 全て返します。
@@ -11,7 +14,16 @@ export default {
     if (!context.state.dmc) {
       return null;
     }
-    return context.state.dmc.getRawValue();
+    return context.state.dmc;
+  },
+
+  /**
+   * DMCデータが存在する否か。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  existence: context => {
+    return !!context.state.dmc;
   },
 
   /**
@@ -20,8 +32,7 @@ export default {
    * @return {Array}
    */
   pages: context => {
-    const rawData = context.state.dmc.getRawValue();
-    return rawData.pages;
+    return context.state.dmc.pages;
   },
 
   /**
@@ -31,9 +42,7 @@ export default {
    * @return {String}
    */
   pageIdOf: (context, idx) => {
-    const rawData = context.state.dmc.getRawValue();
-    const page = rawData.pages[idx];
-    return page.id;
+    return context.state.dmc.pages[idx].id;
   },
 
   /**
@@ -42,8 +51,7 @@ export default {
    * @return {String}
    */
   name: context => {
-    const rawData = context.state.dmc.getRawValue();
-    return rawData.name;
+    return context.state.dmc.name;
   },
 
   /**
@@ -55,10 +63,8 @@ export default {
     if (!context.state.dmc) {
       return [];
     }
-    const rawData = context.state.dmc.getRawValue();
-    const pages = rawData.pages;
-    return values(filter(pages, v => {
-      if (v.section !== 'dashboard') {
+    return values(filter(context.state.dmc.pages, page => {
+      if (page.section !== SECTION_DASHBOARD) {
         return false;
       }
       return true;
@@ -74,10 +80,8 @@ export default {
     if (!context.state.dmc) {
       return [];
     }
-    const rawData = context.state.dmc.getRawValue();
-    const pages = rawData.pages;
-    return values(filter(pages, v => {
-      if (v.section !== 'manage') {
+    return values(filter(context.state.dmc.pages, page => {
+      if (page.section !== SECTION_MANAGE) {
         return false;
       }
       return true;
