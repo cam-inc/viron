@@ -571,21 +571,6 @@ definitions:
     - role_id
     type: object
 
-  UploadFilePayload:
-    example:
-      data: binary-data
-      path: img/x/001.png
-    properties:
-      data:
-        description: base64 encoded binary data
-        example: binary-data
-        type: string
-      path:
-        description: file path
-        example: img/x/001.png
-        type: string
-    type: object
-
   User:
     description: A User
     example:
@@ -2147,71 +2132,6 @@ paths:
       tags:
       - auth_type
 
-  /file:
-    post:
-      description: file upload
-      operationId: file#upload
-      parameters:
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/UploadFilePayload'
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: upload file
-      tags:
-      - file
-
-  /file/{path}:
-    get:
-      description: file download
-      operationId: file#download
-      parameters:
-      - in: path
-        name: path
-        required: true
-        type: string
-      produces:
-      - application/json
-      - text/plain
-      responses:
-        "200":
-          description: OK
-          headers:
-            Content-Disposition:
-              description: content disposition
-              type: string
-            Content-Length:
-              description: content size
-              type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: download file
-      tags:
-      - file
-
   /googleoauth2callback:
     get:
       x-swagger-router-controller: dmc_auth
@@ -2661,6 +2581,9 @@ paths:
       - appendTo: ""
         method: post
         path: /user/upload/csv
+      - appendTo: ""
+        method: get
+        path: /user/download/csv
 
     post:
       x-swagger-router-controller: user
@@ -2697,6 +2620,37 @@ paths:
       - jwt:
         - api:access
       summary: create user
+      tags:
+      - user
+
+  /user/download/csv:
+    get:
+      x-swagger-router-controller: user
+      description: download user data
+      operationId: user#download
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: download user
       tags:
       - user
 

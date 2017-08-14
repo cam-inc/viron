@@ -1,4 +1,5 @@
-const csvParse = require('csv-parse');
+const csv = require('csv');
+const moment = require('moment-timezone');
 
 const shared = require('../../shared');
 const context = shared.context;
@@ -141,7 +142,7 @@ const upload = (req, res) => {
     return res.json({});
   }
 
-  csvParse(file.buffer.toString(), {columns: true}, (err, data) => {
+  csv.parse(file.buffer.toString(), {columns: true}, (err, data) => {
     if (err) {
       console.error(err);
       return res.json({});
@@ -153,6 +154,52 @@ const upload = (req, res) => {
   });
 };
 
+/**
+ * Controller : download Users
+ * HTTP Method : GET
+ * PATH : /user/download/csv
+ *
+ * @returns {Promsie.<TResult>}
+ */
+const download = (req, res) => {
+  const dmclib = context.getDmcLib();
+  const storeHelper = dmclib.stores.helper;
+  const store = context.getStoreMain();
+  const Users = store.models.Users;
+  const attributes = ['id', 'name', 'job', 'birthday', 'blood_type', 'sex'];
+  const options = {
+    attributes,
+    limit: 100000000,
+    offset: 0,
+  };
+  const query = {};
+  return storeHelper.list(store, Users, query, options)
+    .then(data => {
+      return new Promise((resolve, reject) => {
+        csv.stringify(data.list, {
+          columns: attributes,
+          delimiter: ',',
+          escape: '\\',
+          eof: false,
+          header: true,
+          quoted: true,
+          quotedEmpty: true,
+          quotedString: true,
+        }, (err, result) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(result);
+        });
+      });
+    })
+    .then(data => {
+      const name = `user_${moment().tz('Asia/Tokyo').format('YYYYMMDDHHmmss')}.csv`;
+      res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
+      res.send(data);
+    })
+  ;
+};
 
 module.exports = {
   'user#list': list,
@@ -161,4 +208,5 @@ module.exports = {
   'user#show': show,
   'user#update': update,
   'user#upload': upload,
+  'user#download': download,
 };

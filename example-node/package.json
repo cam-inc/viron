@@ -9,7 +9,7 @@
   "main": "app.js",
   "dependencies": {
     "axios": "^0.16.2",
-    "csv-parse": "^1.2.1",
+    "csv": "^1.1.1",
     "express": "^4.12.3",
     "express-jwt": "^5.3.0",
     "googleapis": "^20.1.0",
