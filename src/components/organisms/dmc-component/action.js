@@ -1,20 +1,20 @@
-import swagger from '../../../core/swagger';
 import { constants as actions } from '../../../store/actions';
-import '../../organisms/dmc-operation/index.tag';
+import '../../organisms/dmc-component/operation.tag';
 
 export default function() {
   const store = this.riotx.get();
+  const operationObject = this.opts.action;
 
-  this.label = this.opts.action.summary;
-  if (!this.label) {
-    const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
-    this.label = `${obj.method} ${obj.path}`;
-  }
+  this.label = operationObject.summary || operationObject.operationId;
 
   this.handleButtonPat = () => {
-    store.action(actions.DRAWERS_ADD, 'dmc-operation', {
-      operation: this.opts.action,
-      onSuccess: () => {
+    store.action(actions.DRAWERS_ADD, 'dmc-component-operation', {
+      name: operationObject.summary || operationObject.operationId,
+      description: operationObject.description,
+      operationObject,
+      parameterObjects: operationObject.parameters,
+      initialParameters: {},
+      onComplete: () => {
         this.opts.updater();
       }
     });

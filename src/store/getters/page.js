@@ -5,10 +5,7 @@ export default {
    * @return {Object}
    */
   all: context => {
-    if (!context.state.page) {
-      return {};
-    }
-    return context.state.page.getRawValue();
+    return context.state.page || {};
   },
 
   /**
@@ -17,11 +14,11 @@ export default {
    * @return {String}
    */
   id: context => {
-    if (!context.state.page) {
+    const page = context.state.page;
+    if (!page) {
       return '';
     }
-    const rawData = context.state.page.getRawValue();
-    return rawData.id;
+    return page.id;
   },
 
   /**
@@ -30,11 +27,11 @@ export default {
    * @return {String}
    */
   name: context => {
-    if (!context.state.page) {
+    const page = context.state.page;
+    if (!page) {
       return '';
     }
-    const rawData = context.state.page.getRawValue();
-    return rawData.name;
+    return page.name;
   },
 
   /**
@@ -43,10 +40,10 @@ export default {
    * @return {Array}
    */
   components: context => {
-    if (!context.state.page) {
+    const page = context.state.page;
+    if (!page) {
       return [];
     }
-    const rawData = context.state.page.getRawValue();
-    return rawData.components;
+    return page.components;
   }
 };

@@ -4,7 +4,7 @@ import ComponentsRoute from '../components/pages/dmc-components/route';
 import EndpointsRoute from '../components/pages/dmc-endpoints/route';
 import NotfoundRoute from '../components/pages/dmc-notfound/route';
 
-let _routerInstance;
+let esr;
 
 export default {
   /**
@@ -22,7 +22,6 @@ export default {
             store.action(actions.APPLICATION_NAVIGATION_START),
             store.action(actions.MENU_CLOSE)
           ]))
-          .onBefore(() => store.action(actions.MENU_CLOSE))
           .on('/', route => EndpointsRoute.onEnter(store, route))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
@@ -35,7 +34,7 @@ export default {
       })
       .then(router => {
         router.start();
-        _routerInstance = router;
+        esr = router;
         return router;
       });
   },
@@ -45,6 +44,6 @@ export default {
    * @return {esr}
    */
   getInstance: () => {
-    return _routerInstance;
+    return esr;
   }
 };

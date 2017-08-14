@@ -1,0 +1,155 @@
+.ParameterSchema {
+  display: block;
+  border-left: 2px solid var(--color-bg-primary);
+}
+
+.ParameterSchema__caption {
+  @apply --layout-center-center;
+}
+
+.ParameterSchema__caption > div {
+  margin-right: 8px;
+}
+
+.ParameterSchema__caption > div:last-child {
+  margin-right: 0;
+}
+
+.ParameterSchema__bodyOpenShutButton {
+  @apply --layout-center-center;
+  width: 26px;
+  height: 18px;
+  margin-right: 0;
+  font-size: 14px;
+  cursor: pointer;
+  border-left: 8px solid var(--color-bg-tertiaryLight);
+}
+
+.ParameterSchema__bodyOpenShutButton.hover {
+  opacity: 0.5;
+}
+
+.ParameterSchema__bodyOpenShutButton .Icon {
+  transition-duration: 100ms;
+  transition-property: transform;
+}
+
+.ParameterSchema__name {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.ParameterSchema__name.hover {
+  opacity: 0.5;
+}
+
+.ParameterSchema__line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--color-bg-tertiaryLight);
+}
+
+.ParameterSchema__validateOpenShutButton,
+.ParameterSchema__addButton,
+.ParameterSchema__removeButton,
+.ParameterSchema__infoOpenShutButton {
+  @apply --layout-center-center;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ParameterSchema__validateOpenShutButton.hover,
+.ParameterSchema__addButton.hover,
+.ParameterSchema__removeButton.hover,
+.ParameterSchema__infoOpenShutButton.hover {
+  opacity: 0.5;
+}
+
+.ParameterSchema__info {
+  display: none;
+  padding: 8px 0 8px 8px;
+  margin-left: 16px;
+  border-left: 2px solid var(--color-bg-info);
+}
+
+.ParameterSchema__info > div {
+  margin-bottom: 8px;
+}
+
+.ParameterSchema__info > div:last-child {
+  margin-bottom: 0;
+}
+
+.ParameterSchema__validates {
+  display: none;
+  padding: 8px 0 8px 8px;
+  margin-left: 16px;
+  border-left: 2px solid var(--color-bg-error);
+}
+
+.ParameterSchema__validate {
+  @apply --layout-center-center;
+  padding: 8px;
+  background-color: var(--color-bg-errorLight);
+}
+
+.ParameterSchema__validateIcon {
+  @apply --layout-center-center;
+  margin-right: 8px;
+}
+
+.ParameterSchema__validateMessage {
+  flex-grow: 1;
+}
+
+.ParameterSchema__validates > .ParameterSchema__validate {
+  margin-bottom: 8px;
+}
+
+.ParameterSchema__validates > .ParameterSchema__validate:last-child {
+  margin-bottom: 0;
+}
+
+.ParameterSchema__body {
+  display: none;
+  margin: 8px 0 0 16px;
+}
+
+/* ============================== */
+/* info開状態 */
+/* ============================== */
+.ParameterSchema--infoOpened > .ParameterSchema__head > .ParameterSchema__info {
+  display: block;
+}
+
+.ParameterSchema--infoOpened > .ParameterSchema__head > .ParameterSchema__caption > .ParameterSchema__infoOpenShutButton .Icon {
+  color: var(--color-text-positive);
+}
+
+/* ============================== */
+/* validate開状態 */
+/* ============================== */
+.ParameterSchema--validateOpened > .ParameterSchema__head > .ParameterSchema__validates {
+  display: block;
+}
+
+.ParameterSchema--validateOpened > .ParameterSchema__head > .ParameterSchema__caption > .ParameterSchema__validateOpenShutButton .Icon {
+  color: var(--color-text-negative);
+}
+
+/* ============================== */
+/* body開状態 */
+/* ============================== */
+.ParameterSchema--bodyOpened > .ParameterSchema__body {
+  display: block;
+}
+
+.ParameterSchema--bodyOpened > .ParameterSchema__head > .ParameterSchema__caption > .ParameterSchema__bodyOpenShutButton {
+  border-color: var(--color-bg-primary);
+}
+
+.ParameterSchema--bodyOpened > .ParameterSchema__head > .ParameterSchema__caption > .ParameterSchema__bodyOpenShutButton .Icon {
+  transform: rotate(90deg);
+}

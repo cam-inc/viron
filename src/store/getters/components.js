@@ -22,17 +22,49 @@ export default {
   },
 
   /**
-   * 指定riotIDに対する要素のレスポンス構造を返します。
+   * 指定riotIDに対する要素のAPIレスポンスを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {*}
+   */
+  response: (context, riotId) => {
+    return context.state.components[riotId].response;
+  },
+
+  /**
+   * 指定riotIDに対する要素のschemaObjectを返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Object}
    */
-  schema: (context, riotId) => {
-    return context.state.components[riotId].schema;
+  schemaObject: (context, riotId) => {
+    return context.state.components[riotId].schemaObject;
   },
 
   /**
-   * 自身に関連するactionを返します。
+   * 指定riotIDに対する要素のparamterObject群を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  parameterObjects: (context, riotId) => {
+    return context.state.components[riotId].parameterObjects;
+  },
+
+  /**
+   * action(operationObject)群を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  actions: (context, riotId) => {
+    return map(context.state.components[riotId].actions, action => {
+      return action.operationObject;
+    });
+  },
+
+  /**
+   * 自身に関連するaction(operationObject)群を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Array}
@@ -43,12 +75,12 @@ export default {
       return (!action.appendTo || action.appendTo === 'self');
     });
     return map(selfActions, action => {
-      return action.pathItemObject;
+      return action.operationObject;
     });
   },
 
   /**
-   * テーブル行に関連するactionを返します。
+   * テーブル行に関連するaction(operationObject)群を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Array}
@@ -59,8 +91,28 @@ export default {
       return (action.appendTo === 'row');
     });
     return map(selfActions, action => {
-      return action.pathItemObject;
+      return action.operationObject;
     });
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング機能ON/OFFを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Boolean}
+   */
+  hasPagination: (context, riotId) => {
+    return context.state.components[riotId].hasPagination;
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング情報を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Object}
+   */
+  pagination: (context, riotId) => {
+    return context.state.components[riotId].pagination;
   },
 
   /**
