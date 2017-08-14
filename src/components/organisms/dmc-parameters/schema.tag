@@ -5,6 +5,7 @@ dmc-parameter-schema.ParameterSchema
         dmc-icon(type="right")
       .ParameterSchema__name(ref="touch" onTap="handleNameTap") { name }
       .ParameterSchema__line
+      .ParameterSchema__selfRequired(if="{ selfRequired }") required
       .ParameterSchema__validateOpenShutButton(if="{ !!getValidateErrors().length }" class="{ isValidateOpened ? '.ParameterSchema__validateOpenShutButton--active' : '' }" ref="touch" onTap="handleValidateOpenShutButtonTap")
         dmc-icon(type="exclamationCircleO")
       .ParameterSchema__addButton(if="{ isItemsMode }" ref="touch" onTap="handleAddButtonTap")
@@ -15,19 +16,8 @@ dmc-parameter-schema.ParameterSchema
         dmc-icon(type="infoCirlceO")
   .ParameterSchema__body(if="{ isBodyOpened }")
     .ParameterSchema__info(if="{ isInfoOpened }")
-      .ParameterSchema__description(if="{ !!description }") description: { description }
-      .ParameterSchema__type type: { type }
-      .ParameterSchema__enum(if="{ !!enum }") enum: { enum }
-      .ParameterSchema__multipleOf(if="{ !!multipleOf }") multipleOf: { multipleOf }
-      .ParameterSchema__maximum(if="{ !!maximum }") maximum: { maximum }
-      .ParameterSchema__exclusiveMaximum(if="{ !!exclusiveMaximum }") exclusiveMaximum: { exclusiveMaximum }
-      .ParameterSchema__minimum(if="{ !!minimum }") minimum: { minimum }
-      .ParameterSchema__exclusiveMinimum(if="{ !!exclusiveMinimum }") exclusiveMinimum: { exclusiveMinimum }
-      .ParameterSchema__maxLength(if="{ !!maxLength }") maxLength: { maxLength }
-      .ParameterSchema__minLength(if="{ !!minLength }") minLength: { minLength }
-      .ParameterSchema__pattern(if="{ !!pattern }") pattern: { pattern }
-      .ParameterSchema__format(if="{ !!format }") format: { format }
-      .ParameterSchema__example(if="{ !!example }") example: { example }
+      virtual(each="{ info in infos }")
+        div(class="ParameterSchema__{ info.key }") { info.key }: { info.value }
     .ParameterSchema__validates(if="{ isValidateOpened && !!getValidateErrors().length }")
       virtual(each="{ err in getValidateErrors() }")
         .ParameterSchema__validate
