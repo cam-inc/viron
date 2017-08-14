@@ -155,11 +155,11 @@ export default function() {
   });
 
   // infoの開閉状態。
-  this.isInfoOpened = false;
+  this.isInfoOpened = true;
   // validateの開閉状態。
-  this.isValidateOpened = false;
+  this.isValidateOpened = true;
   // bodyの開閉状態。
-  this.isBodyOpened = false;
+  this.isBodyOpened = true;
 
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {
