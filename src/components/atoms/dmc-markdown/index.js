@@ -45,8 +45,7 @@ export default function() {
     },
     // brタグ
     renderer.br = () => {
-      debugger;
-      return '<br>'
+      return '<br>';
     },
     // 引用
     renderer.blockquote = (quote) => {
