@@ -1,34 +1,4 @@
-dmc-parameter-form.ParameterForm(class="{ isInfoOpened ? 'ParameterForm--infoOpened' : '' } { isValidateOpened ? 'ParameterForm--validateOpened' : '' } { isBodyOpened ? 'ParameterForm--bodyOpened' : '' }")
-  .ParameterForm__head
-    .ParameterForm__caption
-      .ParameterForm__bodyOpenShutButton(ref="touch" onTap="handleBodyOpenShutButtonTap")
-        dmc-icon(type="right")
-      .ParameterForm__name(ref="touch" onTap="handleNameTap") { name }
-      .ParameterForm__line
-      .ParameterForm__required(if="{ required }") required
-      .ParameterForm__validateOpenShutButton(if="{ !!getValidateErrors().length }" ref="touch" onTap="handleValidateOpenShutButtonTap")
-        dmc-icon(type="exclamationCircleO")
-      .ParameterForm__infoOpenShutButton(ref="touch" onTap="handleInfoOpenShutButtonTap")
-        dmc-icon(type="infoCirlceO")
-    .ParameterForm__info
-      .ParameterForm__description(if="{ !!description }") description: { description }
-      .ParameterForm__type type: { type }
-      .ParameterForm__enum(if="{ !!enum }") enum: { enum }
-      .ParameterForm__multipleOf(if="{ !!multipleOf }") multipleOf: { multipleOf }
-      .ParameterForm__maximum(if="{ !!maximum }") maximum: { maximum }
-      .ParameterForm__exclusiveMaximum(if="{ !!exclusiveMaximum }") exclusiveMaximum: { exclusiveMaximum }
-      .ParameterForm__minimum(if="{ !!minimum }") minimum: { minimum }
-      .ParameterForm__exclusiveMinimum(if="{ !!exclusiveMinimum }") exclusiveMinimum: { exclusiveMinimum }
-      .ParameterForm__maxLength(if="{ !!maxLength }") maxLength: { maxLength }
-      .ParameterForm__minLength(if="{ !!minLength }") minLength: { minLength }
-      .ParameterForm__pattern(if="{ !!pattern }") pattern: { pattern }
-      .ParameterForm__example(if="{ !!example }") example: { example }
-    .ParameterForm__validates(if="{ !!getValidateErrors().length }")
-      virtual(each="{ err in getValidateErrors() }")
-        .ParameterForm__validate
-          .ParameterForm__validateIcon
-            dmc-icon(type="exclamationCircleO")
-          .ParameterForm__validateMessage { err.message }
+dmc-parameter-form
   .ParameterForm__body
     virtual(if="{ uiType === 'textinput' }")
       dmc-textinput(text="{ opts.val }" onChange="{ handleTextinputChange }")

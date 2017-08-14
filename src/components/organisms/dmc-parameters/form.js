@@ -2,7 +2,6 @@ import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import hasOwn from 'mout/object/hasOwn';
 import ObjectAssign from 'object-assign';
-import oas from '../../../core/oas';
 
 const UI_TEXTINPUT = 'textinput';
 const UI_NUMBERINPUT = 'numberinput';
@@ -16,28 +15,6 @@ const UI_NULL = 'null';
 export default function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const schemaObject = ObjectAssign({}, this.opts.schemaobject);
-  this.enum = schemaObject.enum;
-  this.name = schemaObject.name;
-  this.description = schemaObject.description;
-  this.required = schemaObject.required;
-  this.type = schemaObject.type;
-  this.example = schemaObject.example;
-  this.multipleOf = hasOwn(schemaObject, 'multipleOf') && String(schemaObject.multipleOf);
-  this.maximum = hasOwn(schemaObject, 'maximum') && String(schemaObject.maximum);
-  this.exclusiveMaximum = hasOwn(schemaObject, 'exclusiveMaximum') && String(schemaObject.exclusiveMaximum);
-  this.minimum = hasOwn(schemaObject, 'minimum') && String(schemaObject.minimum);
-  this.exclusiveMinimum = hasOwn(schemaObject, 'exclusiveMinimum') && String(schemaObject.exclusiveMinimum);
-  this.maxLength = hasOwn(schemaObject, 'maxLength') && String(schemaObject.maxLength);
-  this.minLength = hasOwn(schemaObject, 'minLength') && String(schemaObject.minLength);
-  this.pattern = hasOwn(schemaObject, 'pattern') && String(schemaObject.pattern);
-
-  /**
-   * バリデートエラー項目群を返します。
-   * @return {Array}
-   */
-  this.getValidateErrors = () => {
-    return oas.validate(this.opts.val, schemaObject);
-  };
 
   /**
    * Selectコンポーネントに使用するoption群を返します。
@@ -52,7 +29,7 @@ export default function() {
         isDiabled: true
       });
     }
-    forEach(this.enum, (v, idx) => {
+    forEach(schemaObject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
         label: v,
@@ -101,37 +78,6 @@ export default function() {
   };
   // 使用するUIコンポーネント名。
   this.uiType = inferUITypeBySchemaObject(schemaObject);
-
-  // infoの開閉状態。
-  this.isInfoOpened = false;
-  // validateの開閉状態。
-  this.isValidateOpened = false;
-  // bodyの開閉状態。
-  this.isBodyOpened = false;
-
-  // infoの開閉ボタンがタップされた時の処理。
-  this.handleInfoOpenShutButtonTap = () => {
-    this.isInfoOpened = !this.isInfoOpened;
-    this.update();
-  };
-
-  // validateの開閉ボタンがタップされた時の処理。
-  this.handleValidateOpenShutButtonTap = () => {
-    this.isValidateOpened = !this.isValidateOpened;
-    this.update();
-  };
-
-  // bodyの開閉ボタンがタップされた時の処理。
-  this.handleBodyOpenShutButtonTap = () => {
-    this.isBodyOpened = !this.isBodyOpened;
-    this.update();
-  };
-
-  // nameがタップされた時の処理。
-  this.handleNameTap = () => {
-    this.isBodyOpened = !this.isBodyOpened;
-    this.update();
-  };
 
   this.on('mount', () => {
     // opts.valが何も指定されていない(i.e. undefined)

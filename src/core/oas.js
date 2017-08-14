@@ -1,4 +1,3 @@
-import contains from 'mout/array/contains';
 import forEach from 'mout/array/forEach';
 import reject from 'mout/array/reject';
 import unique from 'mout/array/unique';
@@ -714,20 +713,43 @@ export default {
   },
 
   /**
+   * ParameterObjectとSchemaObjectを元にSchemaObjectを生成します。
+   * @param {Object} parameterObject
+   * @param {Object} schemaObject
+   * @return {Oject}
+   */
+  createSchemaObjectFromParameterObjectAndSchemaObject: (parameterObject, schemaObject) => {
+    const normalizedSchemaObject = ObjectAssign({}, parameterObject, schemaObject);
+    return normalizedSchemaObject;
+  },
+
+  /**
    * PropertyObjectと他情報を元にSchemaObjectを生成します。
    * @param {Object} propertyObject
-   * @param {Object} params
+   * @param {String} key
    * @return {Object}
    */
-  createSchemaObjectFromPropertyObject: (propertyObject, params) => {
+  createSchemaObjectFromPropertyObject: (propertyObject, key) => {
     const normalizedSchemaObject = ObjectAssign({}, propertyObject);
     // nameが未設定であれば、propertyObjectのkeyを使用する。
-    if (!normalizedSchemaObject.name && !!params.key) {
-      normalizedSchemaObject.name = params.key;
+    if (!normalizedSchemaObject.name) {
+      normalizedSchemaObject.name = key;
     }
-    // requiredが未設定であれば、required配列内存在確認を行う。
-    if (!hasOwn(normalizedSchemaObject, 'required') && Array.isArray(params.required) && !!params.required.length) {
-      normalizedSchemaObject.required = contains(params.required, params.key);
+    return normalizedSchemaObject;
+  },
+
+  /**
+   * ItemsObjectと他情報を元にSchemaObjectを生成します。
+   * @param {Object} itemsObject
+   * @param {String} baseName
+   * @param {String} idx
+   * @return {Object}
+   */
+  createSchemaObjectFromItemsObject: (itemsObject, baseName, idx) => {
+    const normalizedSchemaObject = ObjectAssign({}, itemsObject);
+    // nameが未設定であれば、propertyObjectのkeyを使用する。
+    if (!normalizedSchemaObject.name) {
+      normalizedSchemaObject.name = `${baseName}[${idx}]`;
     }
     return normalizedSchemaObject;
   }
