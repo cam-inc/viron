@@ -346,17 +346,7 @@ const minProperties = (value, constraints) => {
  */
 const required = (value, constraints) => {
   const result = ObjectAssign({}, resultTemplate);
-  // JsonSchema仕様ではrequiredは常にarrayだが、OASとの兼ね合いで特別にbooleanも許可する。
-  if (isBoolean(constraints.required) && constraints.required) {
-    if (value === undefined) {
-      result.isValid = false;
-      result.message = '必須項目です。';
-      return result;
-    } else {
-      return result;
-    }
-  }
-  if (!isArray(constraints.required) || !!constraints.required.length) {
+  if (!isArray(constraints.required) || !constraints.required.length) {
     return result;
   }
   const required = constraints.required;
