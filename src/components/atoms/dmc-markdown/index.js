@@ -25,9 +25,10 @@ export default function() {
     },
     // ulタグ
     renderer.list = (body, ordered) => {
-      if(ordered === 'true'){
+      console.log(ordered);
+      if(ordered === true){
         return `<div class="Markdown__list--ordered">${body}</div>`;
-      }else{
+      }else if(ordered === false){
         return `<div class="Markdown__list--unordered">${body}</div>`;
       }
     },
@@ -41,7 +42,7 @@ export default function() {
     },
     // hrタグ
     renderer.hr = () => {
-      return '<hr>';
+      return '<div class="Markdown__horizontalRule"></div>';
     },
     // brタグ
     renderer.br = () => {
@@ -51,27 +52,27 @@ export default function() {
     renderer.blockquote = (quote) => {
       return `<div class="Markdown__blockquote">${quote}</div>`;
     },
-    // // linkタグ
-    // renderer.link = (href, title, text) => {
-    //   return `<div class="Markdown__text--listItem"><a href="${href}" title="${title}">${text}</a></div>`;
-    // },
+    // linkタグ
+    renderer.link = (href, title, text) => {
+      return `<div class="Markdown__link"><a href="${href}" title="${title}">${text}</a></div>`;
+    },
     // // imageタグ
     // renderer.image = (href, title, text) => {
-    //   return `<div class="Markdown__text--listItem">${text}</div>`;
+    //   return `<div class="Markdown__image">${text}</div>`;
     // },
     // // tableタグ
     // renderer.table = (header, body) => {
-    //   return `<div class="Markdown__text--blockquote">${quote}</div>`;
+    //   return `<div class="Markdown__text--blockquote">${body}</div>`;
     // },
     // // tablerow
     // renderer.tablerow = (content) => {
-    //   return `<div class="Markdown__text--blockquote">${quote}</div>`;
+    //   return `<div class="Markdown__text--blockquote">${content}</div>`;
     // },
     // // tablecell
     // renderer.tablecell = (content) => {
-    //   return `<div class="Markdown__text--blockquote">${quote}</div>`;
+    //   return `<div class="Markdown__text--blockquote">${content}</div>`;
     // },
-    this.refs.view.innerHTML = this.opts.data.content ? marked('# 見出しh1  \n## 見出しh2  \n### 見出しh3  \n#### 見出しh4  \n##### 見出しh5\n###### 見出しh6\nparagraph\n**strong**\n```javascript\nif(){}else\n```\n*emphasis*\n~~delete~~\n- list\n- list\n---', { renderer: renderer }) : '';
+    this.refs.view.innerHTML = this.opts.data.content ? marked('# 見出しh1  \n## 見出しh2  \n### 見出しh3  \n#### 見出しh4  \n##### 見出しh5\n###### 見出しh6\nparagraph **strong** ***emphasis***\n```javascript\nif(){}else\n```\n~~delete~~\n1. list\n2. list\n---\n\n> blockquote1\n\n> blockquote2\n\n> blockquote3', { renderer: renderer }) : '';
     // this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 }
