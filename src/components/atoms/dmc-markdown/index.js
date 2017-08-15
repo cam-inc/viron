@@ -3,27 +3,27 @@ export default function() {
 
   this.on('update', () => {
     var renderer = new marked.Renderer();
-    // hタグ
+    // heading
     renderer.heading = (text, level) => {
       return `<div class="Markdown__heading Markdown__heading--level${level}">${text}</div>`;
     },
-    // pタグ
+    // paragraph
     renderer.paragraph = (text) => {
       return `<div class="Markdown__text Markdown__textParagraph">${text}</div>`;
     },
-    // strongタグ
+    // strong
     renderer.strong = (text) => {
       return `<div class="Markdown__text Markdown__text--strong">${text}</div>`;
     },
-    // emタグ
+    // emphasis
     renderer.em = (text) => {
       return `<div class="Markdown__text Markdown__text--emphasis">${text}</div>`;
     },
-    // delタグ
+    // delete
     renderer.del = (text) => {
       return `<div class="Markdown__text Markdown__text--delete">${text}</div>`;
     },
-    // ulタグ
+    // ul/ol
     renderer.list = (body, ordered) => {
       if(ordered === true){
         return `<div class="Markdown__list--ordered">${body}</div>`;
@@ -31,19 +31,19 @@ export default function() {
         return `<div class="Markdown__list--unordered">${body}</div>`;
       }
     },
-    // liタグ
+    // list
     renderer.listitem = (text) => {
       return `<div class="Markdown__listItem">${text}</div>`;
     },
-    // codeタグ
+    // code
     renderer.code = (code, language) => {
       return `<div class="Markdown__code"><pre><code class="language-${language}">${code}</code></pre></div>`;
     },
-    // hrタグ
+    // hr
     renderer.hr = () => {
       return '<div class="Markdown__horizontalRule"></div>';
     },
-    // brタグ
+    // br
     renderer.br = () => {
       return '<br>';
     },
@@ -51,15 +51,15 @@ export default function() {
     renderer.blockquote = (quote) => {
       return `<div class="Markdown__blockquote">${quote}</div>`;
     },
-    // linkタグ
+    // link
     renderer.link = (href, title, text) => {
       return `<a class="Markdown__link" href="${title}">${text}</a>`;
     },
-    // imageタグ
+    // image
     renderer.image = (src, title, text) => {
-      return `<img class="Markdown__image" src="${src}" href="${text}" title="${title}"></img>`;
+      return `<img class="Markdown__image" src="${src}" alt="${text}" title="${title}"></img>`;
     },
-    // tableタグ
+    // table
     renderer.table = (header, body) => {
       return `<table class="Markdown__table"><thead>${header}</thead>${body}</table>`;
     },
@@ -72,7 +72,7 @@ export default function() {
       if(flags.header === true){
         return `<td class="Markdown__tableHeader">${content}</td>`;
       }else if(flags.header === false){
-        return `<td class="Markdown__tableCell" style="text-align: ${flags.align}">${content}</td>`;
+        return `<td class="Markdown__tableCell Markdown__tableCell--${flags.align}">${content}</td>`;
       }
     },
     this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content, { renderer: renderer }) : '';
