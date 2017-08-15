@@ -11,7 +11,7 @@
   font-size: var(--component-markdown-font-size);
 }
 
-.Markdown__text--paragraph {
+.Markdown__textParagraph {
   display: block;
   font-weight: normal;
 }
@@ -37,7 +37,7 @@
 }
 
 .Markdown__image {
-
+  width: 100%;
 }
 
 .Markdown__heading {
@@ -74,11 +74,14 @@
   border-radius: 5px;
 }
 
-.Markdown__break {}
+.Markdown__break {
+}
 
-.Markdown__list--ordered {}
+.Markdown__list--ordered {
+}
 
-.Markdown__list--unordered {}
+.Markdown__list--unordered {
+}
 
 .Markdown__listItem {
   position: relative;
@@ -109,4 +112,20 @@
 .Markdown__blockquote .Markdown__text--paragraph {
   position: relative;
   font-size: calc(var(--component-markdown-font-size) * 0.8);
+}
+
+.Markdown__table {
+  border-collapse:collapse;
+}
+
+.Markdown__tableRow {
+  border: 1px solid;
+}
+
+.Markdown__tableHeader {
+  border: 1px solid;
+}
+
+.Markdown__tableCell {
+  border: 1px solid;
 }
