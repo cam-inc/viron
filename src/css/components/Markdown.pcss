@@ -73,40 +73,22 @@
   border-bottom: 1px solid var(--color-basic-white);
 }
 
-.Markdown__break {
-}
-
-.Markdown__list--ordered {
-  counter-reset: ordered;
-}
-
-.Markdown__list--unordered {
-}
-
 .Markdown__listItem {
-  position: relative;
-  padding-left: 20px;
+  display: list-item;
+  list-style-position: inside;
   font-size: var(--component-markdown-font-size);
 }
 
-.Markdown__list--ordered .Markdown__listItem::before {
-  position: absolute;
-  left: 0;
-  display: inline-block;
-  content: counter(ordered)".";
-  counter-increment: ordered;
+.Markdown__listItem .Markdown__listItem {
+  padding-left: 20px;
 }
 
-.Markdown__list--unordered .Markdown__listItem::before {
-  position: absolute;
-  top: 10px;
-  left: 5px;
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  content: "";
-  background-color: var(--color-basic-darkGray);
-  border-radius: 50%;
+.Markdown__list--ordered .Markdown__listItem {
+  list-style-type: decimal;
+}
+
+.Markdown__list--unordered .Markdown__listItem {
+  list-style-type: disc;
 }
 
 .Markdown__blockquote {
@@ -122,8 +104,8 @@
 }
 
 .Markdown__table {
-  border-collapse: collapse;
   border-spacing: 0;
+  border-collapse: collapse;
 }
 
 .Markdown__tableRow {
