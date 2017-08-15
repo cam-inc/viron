@@ -5,13 +5,57 @@ const shared = require('../../shared');
 const context = shared.context;
 const constant = shared.constant;
 
-const defaultOptions = {
-  key: 'key',
-  value: 'value',
+const genComponent = (name, method, path, style, pagination, options) => {
+  return {
+    name,
+    api: {
+      path,
+      method,
+    },
+    style,
+    pagination: !!pagination,
+    options: options || {
+      key: 'key',
+      value: 'value',
+    },
+  };
 };
 
-const api = (path, method) => {
-  return {path, method};
+const genTableComponent = (name, method, path, query, labels) => {
+  return Object.assign({
+    query,
+    table_labels: labels,
+  }, genComponent(name, method, path, constant.DMC_STYLE_TABLE, true));
+};
+
+const genPage = (section, group, id, name, components) => {
+  return {
+    id,
+    name,
+    section,
+    components,
+    group,
+  };
+};
+
+const genGroup = (section, group) => {
+  const groupNames = Object.keys(group);
+  let list = [];
+  groupNames.forEach(groupName => {
+    const pages = group[groupName];
+    list = list.concat(pages.map(page => {
+      return genPage(section, groupName, page.id, page.name, page.components);
+    }));
+  });
+  return list;
+};
+
+const genSection = (section, groups) => {
+  let list = [];
+  groups.forEach(group => {
+    list = list.concat(genGroup(section, group));
+  });
+  return list;
 };
 
 /**
@@ -26,232 +70,107 @@ const show = (req, res) => {
     color: 'white',
     thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
     tags: ['develop', 'dmc', 'example'],
-    pages: [
+    pages: [].concat(
       // QuickView
-      {
-        id: 'quickview',
-        name: 'クイックビュー',
-        section: constant.DMC_SECTION_DASHBOARD,
-        group: constant.GROUP_EMPTY,
-        components: [
-          {
-            name: 'DAU',
-            api: api('/stats/dau', 'get'),
-            style: constant.DMC_STYLE_NUMBER,
-            options: [defaultOptions],
-            pagination: false,
-          },
-          {
-            name: 'MAU',
-            api: api('/stats/mau', 'get'),
-            style: constant.DMC_STYLE_NUMBER,
-            options: [defaultOptions],
-            pagination: false,
-          },
-          {
-            name: 'Planet(bar)',
-            api: api('/stats/planet/bar', 'get'),
-            style: constant.DMC_STYLE_GRAPH_BAR,
-            options: [defaultOptions],
-            pagination: false,
-          },
-          {
-            name: 'Planet(scatterplot)',
-            api: api('/stats/planet/scatterplot', 'get'),
-            style: constant.DMC_STYLE_GRAPH_SCATTERPLOT,
-            options: [defaultOptions],
-            pagination: false,
-          },
-          {
-            name: 'Planet(line)',
-            api: api('/stats/planet/line', 'get'),
-            style: constant.DMC_STYLE_GRAPH_LINE,
-            options: [defaultOptions],
-            pagination: false,
-          },
-          {
-            name: 'Planet(horizontal-bar)',
-            api: api('/stats/planet/horizontal-bar', 'get'),
-            style: constant.DMC_STYLE_GRAPH_HORIZONTAL_BAR,
-            options: [defaultOptions],
-            pagination: false,
-          },
-          {
-            name: 'Planet(stacked-bar)',
-            api: api('/stats/planet/stacked-bar', 'get'),
-            style: constant.DMC_STYLE_GRAPH_STACKED_BAR,
-            options: [defaultOptions],
-            pagination: false,
-          },
-          {
-            name: 'Planet(horizontal-stacked-bar)',
-            api: api('/stats/planet/horizontal-stacked-bar', 'get'),
-            style: constant.DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR,
-            options: [defaultOptions],
-            pagination: false,
-          },
-          {
-            name: 'Planet(stacked-area)',
-            api: api('/stats/planet/stacked-area', 'get'),
-            style: constant.DMC_STYLE_GRAPH_STACKED_AREA,
-            options: [defaultOptions],
-            pagination: false,
-          },
-        ],
-      },
-      // Manage
-      {
-        id: 'user',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_USER,
-        name: 'ユーザ',
-        components: [
-          {
-            name: 'ユーザ',
-            api: api('/user', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            query: [
-              {
-                key: 'name',
-                type: 'string',
-              },
-            ],
-            options: [defaultOptions],
-            pagination: false,
-            table_labels: ['id', 'name'],
-          },
-        ],
-      },
-      {
-        id: 'userblog',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_USER,
-        name: 'ユーザブログ',
-        components: [
-          {
-            name: 'ユーザブログ',
-            api: api('/userblog', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            options: [defaultOptions],
-            pagination: true,
-            table_labels: ['id', 'user_id'],
-          },
-        ],
-      },
-      {
-        id: 'userblogentry',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_USER,
-        name: 'ユーザブログ記事',
-        components: [
-          {
-            name: 'ユーザブログ',
-            api: api('/userblogentry', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            options: [defaultOptions],
-            pagination: true,
-            table_labels: ['id', 'user_blog_id'],
-          },
-        ],
-      },
-      {
-        id: 'validator',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_TEST,
-        name: 'バリデータ検証',
-        components: [
-          {
-            name: 'バリデータ',
-            api: api('/validator', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            options: [defaultOptions],
-            pagination: true,
-            table_labels: ['validation_type'],
-          },
-        ],
-      },
-      {
-        id: 'nestedarray',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_TEST,
-        name: 'ネスト配列',
-        components: [
-          {
-            name: 'ネスト配列',
-            api: api('/nestedarray', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            options: [defaultOptions],
-            pagination: true,
-            table_labels: ['id'],
-          },
-        ],
-      },
-      {
-        id: 'blogdesign',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_BLOG,
-        name: 'ブログ デザイン',
-        components: [
-          {
-            name: 'ブログ デザイン',
-            api: api('/blogdesign', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            options: [defaultOptions],
-            pagination: true,
-            table_labels: ['id', 'name'],
-          },
-        ],
-      },
-      // Admin
-      {
-        id: 'adminrole',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_ADMIN,
-        name: 'DMC ユーザ権限',
-        components: [
-          {
-            name: 'DMC ユーザ権限',
-            api: api('/adminrole', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            options: [defaultOptions],
-            pagination: false,
-            table_labels: ['role_id'],
-          },
-        ],
-      },
-      {
-        id: 'adminuser',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_ADMIN,
-        name: 'DMC 管理ユーザ',
-        components: [
-          {
-            name: 'DMC 管理ユーザ',
-            api: api('/adminuser', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            options: [defaultOptions],
-            pagination: true,
-            table_labels: ['email', 'role_id'],
-          },
-        ],
-      },
-      {
-        id: 'auditlog',
-        section: constant.DMC_SECTION_MANAGE,
-        group: constant.GROUP_ADMIN,
-        name: 'DMC 監査ログ',
-        components: [
-          {
-            name: 'DMC 監査ログ',
-            api: api('/auditlog', 'get'),
-            style: constant.DMC_STYLE_TABLE,
-            options: [defaultOptions],
-            pagination: true,
-            table_labels: ['createdAt', 'request_uri', 'request_method'],
-          },
-        ],
-      },
-    ],
+      genSection(constant.DMC_SECTION_DASHBOARD, [
+        {
+          [constant.GROUP_EMPTY]: [
+            {
+              id: 'quickview',
+              name: 'クイックビュー',
+              components: [
+                genComponent('DAU', 'get', '/stats/dau', constant.DMC_STYLE_NUMBER),
+                genComponent('MAU', 'get', '/stats/mau', constant.DMC_STYLE_NUMBER),
+                genComponent('Planet(bar)', 'get', '/stats/planet/bar', constant.DMC_STYLE_GRAPH_BAR),
+                genComponent('Planet(scatterplot)', 'get', '/stats/planet/scatterplot', constant.DMC_STYLE_GRAPH_SCATTERPLOT),
+                genComponent('Planet(line)', 'get', '/stats/planet/line', constant.DMC_STYLE_GRAPH_LINE),
+                genComponent('Planet(horizontal-bar)', 'get', '/stats/planet/horizontal-bar', constant.DMC_STYLE_GRAPH_HORIZONTAL_BAR),
+                genComponent('Planet(stacked-bar)', 'get', '/stats/planet/stacked-bar', constant.DMC_STYLE_GRAPH_STACKED_BAR),
+                genComponent('Planet(horizontal-stacked-bar)', 'get', '/stats/planet/horizontal-stacked-bar', constant.DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR),
+                genComponent('Planet(stacked-area)', 'get', '/stats/planet/stacked-area', constant.DMC_STYLE_GRAPH_STACKED_AREA),
+              ],
+            }
+          ],
+        },
+      ]),
+      genSection(constant.DMC_SECTION_MANAGE, [
+        {
+          // Manage
+          [constant.GROUP_USER]: [
+            {
+              id: 'user',
+              name: 'ユーザ',
+              components: [
+                genTableComponent('ユーザ', 'get', '/user', [{key: 'name', type: 'string'}], ['id', 'name']),
+              ],
+            },
+            {
+              id: 'userblog',
+              name: 'ユーザブログ',
+              components: [
+                genTableComponent('ユーザブログ', 'get', '/userblog', null, ['id', 'user_id']),
+              ],
+            },
+            {
+              id: 'userblogentry',
+              name: 'ユーザブログ記事',
+              components: [
+                genTableComponent('ユーザブログ記事', 'get', '/userblogentry', null, ['id', 'user_blog_id']),
+              ],
+            },
+          ],
+          [constant.GROUP_EXAMPLE]: [
+            {
+              id: 'validator',
+              name: 'バリデータ',
+              components: [
+                genTableComponent('バリデータ', 'get', '/validator', null, ['validation_type']),
+              ],
+            },
+            {
+              id: 'nestedarray',
+              name: 'ネスト配列',
+              components: [
+                genTableComponent('ネスト配列', 'get', '/nestedarray', null, ['id']),
+              ],
+            },
+          ],
+          [constant.GROUP_BLOG]: [
+            {
+              id: 'blogdesign',
+              name: 'ブログデザイン',
+              components: [
+                genTableComponent('ブログデザイン', 'get', '/blogdesign', null, ['id', 'name']),
+              ],
+            },
+          ],
+          // Admin
+          [constant.GROUP_ADMIN]: [
+            {
+              id: 'adminrole',
+              name: 'DMC ユーザ権限',
+              components: [
+                genTableComponent('DMC ユーザ権限', 'get', '/adminrole', null, ['role_id']),
+              ],
+            },
+            {
+              id: 'adminuser',
+              name: 'DMC 管理ユーザ',
+              components: [
+                genTableComponent('DMC 管理ユーザ', 'get', '/adminuser', null, ['email', 'role_id']),
+              ],
+            },
+            {
+              id: 'auditlog',
+              name: 'DMC 監査ログ',
+              components: [
+                genTableComponent('DMC 監査ログ', 'get', '/auditlog', null, ['createdAt', 'request_uri', 'request_method']),
+              ],
+            },
+          ],
+        },
+      ])
+    ),
   };
 
   if (!req.swagger.operation.security) {
