@@ -1482,6 +1482,13 @@ definitions:
           </html>
         type: string
         format: wyswyg
+        x-wyswyg-options:
+          key1:
+            key2: value
+            key3:
+              - a
+              - b
+              - c
       hex:
         example: "#95989A"
         type: string
