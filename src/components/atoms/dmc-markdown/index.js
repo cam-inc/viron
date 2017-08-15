@@ -9,7 +9,7 @@ export default function() {
     },
     // pタグ
     renderer.paragraph = (text) => {
-      return `<div class="Markdown__text Markdown__text--paragraph">${text}</div>`;
+      return `<div class="Markdown__text Markdown__textParagraph">${text}</div>`;
     },
     // strongタグ
     renderer.strong = (text) => {
@@ -59,19 +59,23 @@ export default function() {
     renderer.image = (src, title, text) => {
       return `<img class="Markdown__image" src="${src}" href="${text}" title="${title}"></img>`;
     },
-    // // tableタグ
-    // renderer.table = (header, body) => {
-    //   return `<div class="Markdown__text--blockquote">${body}</div>`;
-    // },
-    // // tablerow
-    // renderer.tablerow = (content) => {
-    //   return `<div class="Markdown__text--blockquote">${content}</div>`;
-    // },
-    // // tablecell
-    // renderer.tablecell = (content) => {
-    //   return `<div class="Markdown__text--blockquote">${content}</div>`;
-    // },
-    this.refs.view.innerHTML = this.opts.data.content ? marked('# 見出しh1  \n## 見出しh2  \n### 見出しh3  \n#### 見出しh4  \n##### 見出しh5\n###### 見出しh6\nparagraph **strong** ***emphasis***\n```javascript\nif(){}else\n```\n~~delete~~\n1. list\n2. list\n---\n\n> blockquote1\n\n>> blockquote2\n\n> blockquote3\n\n[Google](https://www.google.co.jp/)\n\n![豆](https://releaf.pfavill.com/Ms_Flont2/img/vesi/ingenmame.png)', { renderer: renderer }) : '';
+    // tableタグ
+    renderer.table = (header, body) => {
+      return `<table class="Markdown__table"><thead>${header}</thead>${body}</table>`;
+    },
+    // tablerow
+    renderer.tablerow = (content) => {
+      return `<tr class="Markdown__tableRow">${content}</tr>`;
+    },
+    // tablecell
+    renderer.tablecell = (content, flags) => {
+      if(flags.header === true){
+        return `<td class="Markdown__tableHeader">${content}</td>`;
+      }else if(flags.header === false){
+        return `<td class="Markdown__tableCell" style="text-align: ${flags.align}">${content}</td>`;
+      }
+    },
+    this.refs.view.innerHTML = this.opts.data.content ? marked('# 見出しh1  \n## 見出しh2  \n### 見出しh3  \n#### 見出しh4  \n##### 見出しh5\n###### 見出しh6\nparagraph **strong** ***emphasis***\n```javascript\nif(){}else\n```\n~~delete~~\n- list\n- list\n---\n\n Header 1|Header 2|Header 3|Header 4 \n :-------|:------:|-------:|-------- \n Cell 1  |Cell 2  |Cell 3  |Cell 4 \n *Cell 5*|Cell 6  |Cell 7  |Cell 8 \n\n> blockquote1\n\n>> blockquote2\n\n> blockquote3\n\n[Google](https://www.google.co.jp/)\n\n![豆](https://releaf.pfavill.com/Ms_Flont2/img/vesi/ingenmame.png)', { renderer: renderer }) : '';
     // this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 }
