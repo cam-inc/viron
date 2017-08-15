@@ -78,6 +78,7 @@
 }
 
 .Markdown__list--ordered {
+  counter-reset: ordered;
 }
 
 .Markdown__list--unordered {
@@ -85,15 +86,23 @@
 
 .Markdown__listItem {
   position: relative;
-  padding-left: 10px;
+  padding-left: 20px;
   font-size: var(--component-markdown-font-size);
+}
+
+.Markdown__list--ordered .Markdown__listItem::before {
+  position: absolute;
+  left: 0;
+  display: inline-block;
+  counter-increment: ordered;
+  content:counter(ordered)".";
 }
 
 .Markdown__list--unordered .Markdown__listItem::before {
   position: absolute;
   top: 10px;
-  left: 0;
-  display: block;
+  left: 5px;
+  display: inline-block;
   width: 5px;
   height: 5px;
   content: "";
@@ -115,7 +124,7 @@
 }
 
 .Markdown__table {
-  border-collapse:collapse;
+  border-collapse: collapse;
 }
 
 .Markdown__tableRow {
@@ -124,6 +133,7 @@
 
 .Markdown__tableHeader {
   border: 1px solid;
+  font-weight: 900;
 }
 
 .Markdown__tableCell {
