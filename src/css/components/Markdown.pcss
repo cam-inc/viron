@@ -70,8 +70,7 @@
 
 .Markdown__horizontalRule {
   border-top: 1px solid var(--color-basic-darkGray);
-  border-bottom: 1px solid #fff;
-  border-radius: 5px;
+  border-bottom: 1px solid var(--color-basic-white);
 }
 
 .Markdown__break {
@@ -94,8 +93,8 @@
   position: absolute;
   left: 0;
   display: inline-block;
+  content: counter(ordered)".";
   counter-increment: ordered;
-  content:counter(ordered)".";
 }
 
 .Markdown__list--unordered .Markdown__listItem::before {
@@ -113,7 +112,6 @@
 .Markdown__blockquote {
   position: relative;
   padding: 0 20px;
-  font-style: italic;
   color: var(--color-basic-darkGray);
   border-left: solid 3px var(--color-basic-gray);
 }
@@ -125,17 +123,46 @@
 
 .Markdown__table {
   border-collapse: collapse;
+  border-spacing: 0;
 }
 
 .Markdown__tableRow {
-  border: 1px solid;
+  border: 1px solid var(--color-basic-darkGray);
+}
+
+.Markdown__tableRow:nth-child(odd) .Markdown__tableCell {
+  background-color: var(--color-basic-lightGray);
+}
+
+.Markdown__tableRow:nth-child(odd) .Markdown__tableCell:hover {
+  background-color: var(--color-basic-white);
 }
 
 .Markdown__tableHeader {
-  border: 1px solid;
   font-weight: 900;
+  border: 1px solid var(--color-basic-darkGray);
+}
+
+.Markdown__tableHeader:hover {
+  background-color: var(--color-basic-lightGray);
 }
 
 .Markdown__tableCell {
-  border: 1px solid;
+  border: 1px solid var(--color-basic-darkGray);
+}
+
+.Markdown__tableCell:hover {
+  background-color: var(--color-basic-lightGray);
+}
+
+.Markdown__tableCell--center {
+  text-align: center;
+}
+
+.Markdown__tableCell--left {
+  text-align: left;
+}
+
+.Markdown__tableCell--right {
+  text-align: right;
 }
