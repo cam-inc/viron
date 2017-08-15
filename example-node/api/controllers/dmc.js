@@ -134,6 +134,14 @@ const show = (req, res) => {
                 genTableComponent('ネスト配列', 'get', '/nestedarray', null, ['id']),
               ],
             },
+            {
+              id: 'format',
+              name: 'フォーマット',
+              components: [
+                genTableComponent('フォーマット', 'get', '/format', null, ['id']),
+              ],
+
+            },
           ],
           [constant.GROUP_BLOG]: [
             {

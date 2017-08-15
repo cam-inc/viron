@@ -1430,6 +1430,121 @@ definitions:
                 age:
                   type: number
 
+  FormatCollection:
+    items:
+      $ref: '#/definitions/Format'
+    type: array
+
+  Format:
+    type: object
+    properties:
+      id:
+        description: id of format
+        example: 1
+        type: number
+      date_time:
+        example: 2006-02-12T07:09:13+09:00
+        type: string
+        format: date-time
+      email:
+        example: user@dmc.com
+        type: string
+        format: email
+      hostname:
+        example: dmc.com
+        type: string
+        format: hostname
+      ipv4:
+        example: 127.0.0.1
+        type: string
+        format: ipv4
+      ipv6:
+        example: FEDC:BA98:7654:3210:FEDC:BA98:7654:3210
+        type: string
+        format: ipv6
+      uri:
+        example: https://dmc.com/swagger.json
+        type: string
+        format: uri
+      multiline:
+        example: |-
+          aaaaaaaaaaaaaa
+          bbbbbbbbbbbbbb
+          cccccccccccccc
+        type: string
+        format: multiline
+      wyswyg:
+        example: |-
+          <html>
+            <body>
+              <div>hoge</div>
+            </body>
+          </html>
+        type: string
+        format: wyswyg
+      hex:
+        example: "#95989A"
+        type: string
+        format: hex
+      rgba:
+        example: 171,205,239,1
+        type: string
+        format: rgba
+        x-format: "%d,%d,%d,%d" # クライアントでカラーパレットを文字列に変換する際のフォーマット
+      cmyk:
+        example: 100,100,100,100
+        type: string
+        format: cmyk
+        x-format: "%d,%d,%d,%d" # クライアントでカラーパレットを文字列に変換する際のフォーマット
+      date_fullyear:
+        example: 1970
+        type: string
+        format: date-fullyear
+      date_month:
+        example: 01
+        type: string
+        format: date-month
+      date_mday:
+        example: 31
+        type: string
+        format: date-mday
+      time_hour:
+        example: 23
+        type: string
+        format: time-hour
+      time_minute:
+        example: 59
+        type: string
+        format: time-minute
+      time_second:
+        example: 59
+        type: string
+        format: time-second
+      time_secfrac:
+        example: .999
+        type: string
+        format: time-secfrac
+      time_numoffset:
+        example: +09:00
+        type: string
+        format: time-numoffset
+      time_offset:
+        example: Z
+        type: string
+        format: time-offset
+      partial_time:
+        example: "23:59:59.999"
+        type: string
+        format: partial-time
+      full_date:
+        example: 1970-12-31
+        type: string
+        format: full-date
+      full_time:
+        example: 23:59:59.999Z
+        type: string
+        format: full-time
+
 #################################################
 # paths
 # - APIの一覧
@@ -3511,6 +3626,136 @@ paths:
       summary: update nested array
       tags:
       - netsted_array
+
+  /format:
+    get:
+      x-swagger-router-controller: format
+      description: get format
+      operationId: format#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      x-ref:
+      - appendTo: row
+        method: put
+        path: /format/{id}
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FormatCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: list format
+      tags:
+      - format
+
+    post:
+      x-swagger-router-controller: format
+      description: create a format
+      operationId: format#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/Format'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Format'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: create format
+      tags:
+      - format
+
+  /format/{id}:
+    put:
+      x-swagger-router-controller: format
+      description: update the format
+      operationId: format#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/Format'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Format'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: update format
+      tags:
+      - format
 
 #################################################
 # securityDefinitions
