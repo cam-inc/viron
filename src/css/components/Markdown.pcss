@@ -9,15 +9,14 @@
 .Markdown__text {
   display: inline-block;
   font-size: var(--component-markdown-font-size);
-  font-weight: normal;
 }
 
 .Markdown__text--paragraph {
-  font-size: calc(var(--component-markdown-font-size));
+  display: block;
+  font-weight: normal;
 }
 
 .Markdown__text--strong {
-  font-size: calc(var(--component-markdown-font-size));
   font-weight: 700;
 }
 
@@ -54,31 +53,49 @@
 }
 
 .Markdown__heading--level6 {
-  font-size: calc(var(--component-markdown-font-size) * 1.0);
+  font-size: calc(var(--component-markdown-font-size) * 1);
 }
 
-.Markdown__horizontalRule {}
+.Markdown__horizontalRule {
+  border-top: 1px solid var(--color-basic-darkGray);
+  border-bottom: 1px solid #fff;
+  border-radius: 5px;
+}
 
 .Markdown__break {}
 
 .Markdown__list--ordered {}
 
-.Markdown__list--unordered {}
+.Markdown__list--unordered {
+}
 
 .Markdown__listItem {
   position: relative;
-  font-size: calc(var(--component-markdown-font-size));
   padding-left: 10px;
+  font-size: var(--component-markdown-font-size);
 }
 
 .Markdown__list--unordered .Markdown__listItem::before {
-  content: "";
   position: absolute;
   top: 10px;
   left: 0;
   display: block;
   width: 5px;
   height: 5px;
-  border-radius: 50%;
+  content: "";
   background-color: var(--color-basic-darkGray);
+  border-radius: 50%;
+}
+
+.Markdown__blockquote {
+  position: relative;
+  padding: 0 20px;
+  font-style: italic;
+  color:var(--color-basic-darkgray);
+  border-left: solid 5px var(--color-basic-gray);
+}
+
+.Markdown__blockquote .Markdown__text--paragraph {
+  position: relative;
+  font-size: calc(var(--component-markdown-font-size) * 0.8);
 }
