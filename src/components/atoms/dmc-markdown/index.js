@@ -25,7 +25,6 @@ export default function() {
     },
     // ulタグ
     renderer.list = (body, ordered) => {
-      console.log(ordered);
       if(ordered === true){
         return `<div class="Markdown__list--ordered">${body}</div>`;
       }else if(ordered === false){
