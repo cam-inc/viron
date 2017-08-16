@@ -44,13 +44,13 @@ export default function() {
     }
   };
 
-  this.handleContainerMouseOver = (e) => {
+  this.handleContainerMouseOver = () => {
     clearTimeout(timerid);
     this.isTooltipShown = true;
     this.isHover = true;
   };
 
-  this.handleContainerMouseOut = (e) => {
+  this.handleContainerMouseOut = () => {
     timerid = setTimeout(() => {
       this.isTooltipShown = false;
       this.isHover = false;
