@@ -3,28 +3,27 @@
 }
 
 .Markdown {
-  position: relative;
+  font-size: var(--component-markdown-font-size);
 }
 
 .Markdown__text {
   display: inline-block;
-  font-size: var(--component-markdown-font-size);
 }
 
-.Markdown__textParagraph {
+.Markdown__paragraph {
   display: block;
   font-weight: normal;
 }
 
-.Markdown__text--strong {
+.Markdown__strong {
   font-weight: 700;
 }
 
-.Markdown__text--emphasis {
+.Markdown__emphasis {
   font-style: italic;
 }
 
-.Markdown__text--delete {
+.Markdown__delete {
   text-decoration: line-through;
 }
 
@@ -74,25 +73,25 @@
   border-bottom: 1px solid var(--color-basic-white);
 }
 
-.Markdown__listItem {
+.Markdown__listitem {
   display: list-item;
-  font-size: var(--component-markdown-font-size);
   list-style-position: inside;
 }
 
-.Markdown__listItem .Markdown__listItem {
-  padding-left: 20px;
+.Markdown__listitem .Markdown__listitem {
+  margin-left: 20px;
 }
 
-.Markdown__orderedList .Markdown__listItem {
+.Markdown__list--ordered .Markdown__listitem {
   list-style-type: decimal;
 }
 
-.Markdown__unorderedList .Markdown__listItem {
+.Markdown__list--unordered .Markdown__listitem {
   list-style-type: disc;
 }
 
 .Markdown__code {
+  font-size: calc(var(--component-markdown-font-size) * 0.8);
   background-color: var(--color-basic-lightGray);
   padding: 10px;
   border-radius: 5px;
@@ -102,18 +101,18 @@
 }
 
 .Markdown__blockquote {
-  position: relative;
   padding: 0 20px;
   color: var(--color-basic-darkGray);
   border-left: solid 3px var(--color-basic-gray);
 }
 
 .Markdown__blockquote .Markdown__text--paragraph {
-  position: relative;
   font-size: calc(var(--component-markdown-font-size) * 0.8);
 }
 
 .Markdown__table {
+  margin: 5px 0;
+  font-size: inherit;
   border-spacing: 0;
   border-collapse: collapse;
 }
