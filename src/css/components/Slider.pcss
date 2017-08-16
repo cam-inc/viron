@@ -38,6 +38,7 @@
   width: 0;
   height: 0;
 }
+
 .Slider__knobInner {
   position: absolute;
   top: -7px;
@@ -63,15 +64,15 @@
   display: block;
 }
 
-.Slider__container:hover .Slider__rail {
+.Slider__rail--active {
   background-color: var(--color-bg-tertiary);
 }
 
-.Slider__container:hover .Slider__track {
+.Slider__track--active {
   background-color: var(--color-bg-success);
 }
 
-.Slider__container:hover .Slider__knobInner {
+.Slider__knobInner--active {
   border-color: var(--color-bg-success);
 }
 
