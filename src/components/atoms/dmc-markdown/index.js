@@ -8,19 +8,19 @@ export default function() {
       return `<div class="Markdown__heading Markdown__heading--level${level}">${text}</div>`;
     },
     // paragraph
-    renderer.paragraph = (text) => {
+    renderer.paragraph = text => {
       return `<div class="Markdown__text Markdown__textParagraph">${text}</div>`;
     },
     // strong
-    renderer.strong = (text) => {
+    renderer.strong = text => {
       return `<div class="Markdown__text Markdown__text--strong">${text}</div>`;
     },
     // emphasis
-    renderer.em = (text) => {
+    renderer.em = text => {
       return `<div class="Markdown__text Markdown__text--emphasis">${text}</div>`;
     },
     // delete
-    renderer.del = (text) => {
+    renderer.del = text => {
       return `<div class="Markdown__text Markdown__text--delete">${text}</div>`;
     },
     // ul/ol
@@ -32,12 +32,18 @@ export default function() {
       }
     },
     // list
-    renderer.listitem = (text) => {
+    renderer.listitem = text => {
       return `<div class="Markdown__listItem">${text}</div>`;
     },
     // code
     renderer.code = (code, language) => {
       return `<div class="Markdown__code"><pre><code class="language-${language}">${code}</code></pre></div>`;
+    },
+    renderer.codespan = code => {
+      return `<div class="Markdown__codespan"><p><code>${code}</code></p></div>`;
+    },
+    renderer.html = html => {
+      return html;
     },
     // hr
     renderer.hr = () => {
@@ -47,8 +53,8 @@ export default function() {
     renderer.br = () => {
       return '<br>';
     },
-    // 引用
-    renderer.blockquote = (quote) => {
+    // blockquote
+    renderer.blockquote = quote => {
       return `<div class="Markdown__blockquote">${quote}</div>`;
     },
     // link
@@ -64,7 +70,7 @@ export default function() {
       return `<table class="Markdown__table"><thead>${header}</thead>${body}</table>`;
     },
     // tablerow
-    renderer.tablerow = (content) => {
+    renderer.tablerow = content => {
       return `<tr class="Markdown__tableRow">${content}</tr>`;
     },
     // tablecell
