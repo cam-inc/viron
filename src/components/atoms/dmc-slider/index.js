@@ -1,9 +1,14 @@
 export default function() {
+  // ホバーのイベントハンドラーの点滅表示を回避するため、
+  // mouseoutされて100ms以内にmouseoverが発火されなかったら
+  // ホバーを無効にするようにしました。
+  // 良くないコードなため、他の案があれば修正求む。
+  let timerid;
   this.isActive = false;
   this.isTooltipShown = false;
+  this.isHover = false;
 
   this.handleContainerTouchEvent = e => {
-    console.log(e.type);
     if(e.type === 'touchstart') {
       this.isTooltipShown = true;
     }
@@ -18,7 +23,6 @@ export default function() {
   };
 
   this.handleContainerMouseEvent = e => {
-    console.log(e.type);
     if(e.type === 'mousedown') {
       this.isActive = true;
       this.isTooltipShown = true;
@@ -41,15 +45,18 @@ export default function() {
   };
 
   this.handleContainerMouseOver = (e) => {
-    console.log(e.type);
-    e.stopPropagation();
+    clearTimeout(timerid);
     this.isTooltipShown = true;
+    this.isHover = true;
   };
 
   this.handleContainerMouseOut = (e) => {
-    console.log(e.type);
-    e.stopPropagation();
-    this.isTooltipShown = false;
+    timerid = setTimeout(() => {
+      this.isTooltipShown = false;
+      this.isHover = false;
+      this.update();
+    }, 100);
+    
   };
 
   this.displayRatio = () => {
