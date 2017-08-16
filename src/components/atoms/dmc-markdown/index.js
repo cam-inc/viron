@@ -6,16 +6,19 @@ const renderer = new marked.Renderer();
 export default function() {
   this.on('update', () => {
 
-    marked.setOptions(ObjectAssign({}, {
-      renderer: new marked.Renderer(),
-      gfm: true,
-      tables: true,
-      breaks: false,
-      pedantic: false,
-      sanitize: false,
-      smartLists: true,
-      smartypants: false
-    }, this.opts.data.markedOptions));
+    marked.setOptions(ObjectAssign(
+      {
+        renderer: new marked.Renderer(),
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: false,
+        smartLists: true,
+        smartypants: false
+      },
+     this.opts.data.markedOptions
+    ));
 
     renderer.heading = (text, level) => {
       return `<div class="Markdown__heading Markdown__heading--level${level}">${text}</div>`;
@@ -49,7 +52,7 @@ export default function() {
       return `<div class="Markdown__listitem">${text}</div>`;
     },
 
-    renderer.code = (code, language) => {
+    renderer.code = code => {
       return `<div class="Markdown__code"><pre><code>${code}</code></pre></div>`;
     },
 
