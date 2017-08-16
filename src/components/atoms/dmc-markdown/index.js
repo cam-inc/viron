@@ -37,10 +37,10 @@ export default function() {
     },
     // code
     renderer.code = (code, language) => {
-      return `<div class="Markdown__code"><pre><code class="language-${language}">${code}</code></pre></div>`;
+      return `<div class="Markdown__code"><pre><code class="Markdown__code--${language}">${code}</code></pre></div>`;
     },
     renderer.codespan = code => {
-      return `<div class="Markdown__codespan"><code>${code}</code></div>`;
+      return `<div class="Markdown__codeSpan"><code>${code}</code></div>`;
     },
     renderer.html = html => {
       return html;
