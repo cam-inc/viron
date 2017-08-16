@@ -1,57 +1,81 @@
-.Slider {
+.Slider__container {
   position: relative;
-  display: inline-block;
-  width: 100px;
-  height: 12px;
-}
-
-.Slider__groove {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
   width: 100%;
-  height: 2px;
-  margin: auto 0;
-  background-color: #ddd;
+  height: 12px;
+  padding: 4px 0;
+  cursor: pointer;
 }
 
-.Slider__bar {
+.Slider__label {
+  padding-left: 8px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  border-left: 2px solid var(--color-bg-tertiaryLight);
+}
+
+.Slider__rail {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  height: 2px;
-  margin: auto 0;
-  background-color: var(--color-basic-skyblue);
+  width: 100%;
+  height: 4px;
+  background-color: var(--color-basic-lightGray);
+  border-radius: 4px;
+  transition: background-color 0.1s linear;
 }
 
-.Slider--disabled .Slider__bar {
-  background-color: var(--color-basic-gray);
+.Slider__track {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background-color: var(--color-bg-successLight);
+  border-radius: 4px;
+  transition: background-color 0.1s linear;
 }
 
 .Slider__knob {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 6px;
   left: 0;
   width: 0;
   height: 0;
-  margin: auto 0;
 }
-
-.Slider__ball {
+.Slider__knobInner {
   position: absolute;
-  top: -6px;
-  left: -6px;
-  width: 12px;
-  height: 12px;
-  cursor: pointer;
-  background-color: var(--color-basic-skyblue);
+  top: -7px;
+  left: -7px;
+  width: 14px;
+  height: 14px;
+  background-color: var(--color-bg-base);
+  border: solid 2px var(--color-bg-successLight);
   border-radius: 50%;
+  transition: border 0.1s linear;
 }
 
-.Slider--disabled .Slider__ball {
-  cursor: not-allowed;
-  background-color: var(--color-basic-gray);
+.Slider__catcher {
+  position: absolute;
+  top: -350%;
+  left: -10%;
+  display: none;
+  width: 120%;
+  height: 800%;
+}
+
+.Slider__catcher--active {
+  display: block;
+}
+
+.Slider__container:hover .Slider__rail {
+  background-color: var(--color-bg-tertiary);
+}
+
+.Slider__container:hover .Slider__track {
+  background-color: var(--color-bg-success);
+}
+
+.Slider__container:hover .Slider__knobInner {
+  border-color: var(--color-bg-success);
+}
+
+.Slider__knob > .Tooltip {
+  position: absolute;
+  top: -10px;
 }
