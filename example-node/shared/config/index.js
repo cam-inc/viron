@@ -26,9 +26,9 @@ class Config {
     return this;
   }
 
-  load() {
+  load(env) {
     return new Promise(resolve => {
-      resolve(require('./local.js')(helper));
+      resolve(require(`./${env}.js`)(helper));
     }).then(conf => {
       return this.init(conf);
     });

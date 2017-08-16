@@ -11,10 +11,11 @@ class Context {
 
   constructor() {
     this.stores = {};
+    this.env = process.env.SERVICE_ENV || 'local';
   }
 
   init() {
-    return config.load()
+    return config.load(this.env)
       .then(conf => {
         return this.initStore(conf.stores);
       })
@@ -171,6 +172,13 @@ class Context {
    */
   getConfigAcl() {
     return config.acl;
+  }
+
+  /**
+   * env 取得
+   */
+  getEnv() {
+    return this.env;
   }
 
 }
