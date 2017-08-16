@@ -26,9 +26,9 @@ export default function() {
     // ul/ol
     renderer.list = (body, ordered) => {
       if(ordered === true){
-        return `<div class="Markdown__list--ordered">${body}</div>`;
+        return `<div class="Markdown__orderedList">${body}</div>`;
       }else if(ordered === false){
-        return `<div class="Markdown__list--unordered">${body}</div>`;
+        return `<div class="Markdown__unorderedList">${body}</div>`;
       }
     },
     // list
@@ -40,7 +40,7 @@ export default function() {
       return `<div class="Markdown__code"><pre><code class="language-${language}">${code}</code></pre></div>`;
     },
     renderer.codespan = code => {
-      return `<div class="Markdown__codespan"><p><code>${code}</code></p></div>`;
+      return `<div class="Markdown__codespan"><code>${code}</code></div>`;
     },
     renderer.html = html => {
       return html;
