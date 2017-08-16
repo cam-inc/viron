@@ -1,86 +1,103 @@
 import marked from 'marked';
-export default function() {
+import ObjectAssign from 'object-assign';
 
+const renderer = new marked.Renderer();
+
+export default function() {
   this.on('update', () => {
-    var renderer = new marked.Renderer();
-    // heading
+
+    marked.setOptions(ObjectAssign({}, {
+      renderer: new marked.Renderer(),
+      gfm: true,
+      tables: true,
+      breaks: false,
+      pedantic: false,
+      sanitize: false,
+      smartLists: true,
+      smartypants: false
+    }, this.opts.data.markedOptions));
+
     renderer.heading = (text, level) => {
       return `<div class="Markdown__heading Markdown__heading--level${level}">${text}</div>`;
     },
-    // paragraph
+
     renderer.paragraph = text => {
-      return `<div class="Markdown__text Markdown__textParagraph">${text}</div>`;
+      return `<div class="Markdown__text Markdown__paragraph">${text}</div>`;
     },
-    // strong
+
     renderer.strong = text => {
-      return `<div class="Markdown__text Markdown__text--strong">${text}</div>`;
+      return `<div class="Markdown__text Markdown__strong">${text}</div>`;
     },
-    // emphasis
+
     renderer.em = text => {
-      return `<div class="Markdown__text Markdown__text--emphasis">${text}</div>`;
+      return `<div class="Markdown__text Markdown__emphasis">${text}</div>`;
     },
-    // delete
+
     renderer.del = text => {
-      return `<div class="Markdown__text Markdown__text--delete">${text}</div>`;
+      return `<div class="Markdown__text Markdown__delete">${text}</div>`;
     },
-    // ul/ol
+
     renderer.list = (body, ordered) => {
-      if(ordered === true){
-        return `<div class="Markdown__orderedList">${body}</div>`;
-      }else if(ordered === false){
-        return `<div class="Markdown__unorderedList">${body}</div>`;
+      if(ordered){
+        return `<div class="Markdown__list--ordered">${body}</div>`;
+      }else{
+        return `<div class="Markdown__list--unordered">${body}</div>`;
       }
     },
-    // list
+
     renderer.listitem = text => {
-      return `<div class="Markdown__listItem">${text}</div>`;
+      return `<div class="Markdown__listitem">${text}</div>`;
     },
-    // code
+
     renderer.code = (code, language) => {
-      return `<div class="Markdown__code"><pre><code class="Markdown__code--${language}">${code}</code></pre></div>`;
+      return `<div class="Markdown__code"><pre><code>${code}</code></pre></div>`;
     },
+
     renderer.codespan = code => {
-      return `<div class="Markdown__codeSpan"><code>${code}</code></div>`;
+      return `<span class="Markdown__codespan"><code>${code}</code></span>`;
     },
+
     renderer.html = html => {
       return html;
     },
-    // hr
+
     renderer.hr = () => {
       return '<div class="Markdown__horizontalRule"></div>';
     },
-    // br
+
     renderer.br = () => {
       return '<br>';
     },
-    // blockquote
+
     renderer.blockquote = quote => {
       return `<div class="Markdown__blockquote">${quote}</div>`;
     },
-    // link
+
     renderer.link = (href, title, text) => {
-      return `<a class="Markdown__link" href="${title}">${text}</a>`;
+      return `<a class="Markdown__link" href="${href}" title="${title}">${text}</a>`;
     },
-    // image
-    renderer.image = (src, title, text) => {
-      return `<img class="Markdown__image" src="${src}" alt="${text}" title="${title}"></img>`;
+
+    renderer.image = (href, title, text) => {
+      return `<img class="Markdown__image" src="${href}" alt="${text}" title="${title}"></img>`;
     },
-    // table
+
     renderer.table = (header, body) => {
-      return `<table class="Markdown__table"><thead>${header}</thead>${body}</table>`;
+      return `<table class="Markdown__table"><thead>${header}</thead><tbody>${body}</tbody></table>`;
     },
-    // tablerow
+
     renderer.tablerow = content => {
       return `<tr class="Markdown__tableRow">${content}</tr>`;
     },
-    // tablecell
+
     renderer.tablecell = (content, flags) => {
-      if(flags.header === true){
-        return `<td class="Markdown__tableHeader">${content}</td>`;
-      }else if(flags.header === false){
+      if(flags.header){
+        return `<th class="Markdown__tableHeader">${content}</th>`;
+      }else{
         return `<td class="Markdown__tableCell Markdown__tableCell--${flags.align}">${content}</td>`;
       }
     },
-    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content, { renderer: renderer }) : '';
+    // this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content, { renderer: renderer }) : '';
+
+    this.refs.view.innerHTML = this.opts.data.content ? marked('# 見出しh1  \n## 見出しh2  \n### 見出しh3  \n#### 見出しh4  \n##### 見出しh5\n###### 見出しh6\nparagraph **strong** ***emphasis*** ~~delete~~\n```javascript\nif(i = 0){\n\tvar i = 0;\n}else{\n}\n\n```\n\n`<test a="` content of attribute `">`\n\n<h1>aaa</h1>\n\n1. list\n\t1. list\n1. list\n\n\n\n- list\n- list \n---\n\n Header 1|Header 2|Header 3|Header 4 \n :-------|:------:|-------:|-------- \n Cell 1  |Cell 2  |Cell 3  |Cell 4 \n *Cell 5*|Cell 6  |Cell 7  |Cell 8 \n\n\n\n Header 1|Header 2|Header 3|Header 4 \n :-------|:------:|-------:|-------- \n Cell 1  |Cell 2  |Cell 3  |Cell 4 \n *Cell 5*|Cell 6  |Cell 7  |Cell 8 \n\n> blockquote1\n\n>> blockquote2\n\n> blockquote3\n\n[Google](https://www.google.co.jp/)\n\n![豆](https://releaf.pfavill.com/Ms_Flont2/img/vesi/ingenmame.png)', { renderer: renderer }) : '';
   });
 }
