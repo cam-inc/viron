@@ -59,7 +59,7 @@ export default function() {
     }
   };
 
-  this.handleContainerMouseMove = e => {
+  this.handleCatcherMouseMove = e => {
     if (this.opts.disabled) {
       return;
     }
@@ -72,7 +72,7 @@ export default function() {
     }
   };
 
-  this.handleContainerMouseUp = e => {
+  this.handleCatcherMouseUp = e => {
     if (this.opts.disabled) {
       return;
     }

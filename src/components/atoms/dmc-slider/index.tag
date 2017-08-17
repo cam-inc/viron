@@ -6,7 +6,7 @@ dmc-slider.Slider(class="{ Slider--active: isActive, Slider--hover: isHover, Sli
     .Slider__knob(style="left: { displayActualValue() }%;")
       .Slider__knobInner
       dmc-tooltip(if="{ isTooltipShown }" label="{ opts.number }")
-    .Slider__catcher(mouseMove="{ handleContainerMouseMove }" mouseUp="{ handleContainerMouseUp }")
+    .Slider__catcher(mouseMove="{ handleCatcherMouseMove }" mouseUp="{ handleCatcherMouseUp }")
 
   script.
     import '../../atoms/dmc-tooltip/index.tag';
