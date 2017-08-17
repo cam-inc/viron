@@ -11,6 +11,10 @@ export default function() {
   // スライダーをホバーしたかどうか
   this.isHover = false;
 
+  this.on('before-unmount', () => {
+    clearTimeout(timerid);
+  });
+
   this.handleContainerTouchStart = e => {
     this.isTooltipShown = true;
     if (this.opts.disabled) {
