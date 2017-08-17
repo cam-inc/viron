@@ -67,7 +67,6 @@ renderer.tablecell = (content, flags) => {
 };
 
 export default function() {
-  this.on('mount', () => {
   marked.setOptions(ObjectAssign(
     {
       renderer: renderer,
@@ -81,6 +80,7 @@ export default function() {
     },
     this.opts.data.markedOptions
   ));
+  this.on('mount', () => {
     this.root.innerHTML = this.opts.data.content ? marked(this.opts.data.content, { renderer: renderer }) : '';
   });
 }
