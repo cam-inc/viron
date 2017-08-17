@@ -26,8 +26,8 @@ const list = (req, res) => {
     offset,
   };
   const query = {};
-  if (req.swagger.params.name.value) {
-    query.where = {name: {$like: `${req.swagger.params.name.value}%`}};
+  if (req.query.name) {
+    query.name = {$like: `${req.query.name}%`};
   }
   return storeHelper.list(store, Users, query, options)
     .then(data => {

@@ -11,10 +11,11 @@ class Context {
 
   constructor() {
     this.stores = {};
+    this.env = process.env.SERVICE_ENV || 'local';
   }
 
   init() {
-    return config.load()
+    return config.load(this.env)
       .then(conf => {
         return this.initStore(conf.stores);
       })
@@ -27,6 +28,9 @@ class Context {
     ;
   }
 
+  /**
+   * サービス側で定義したconstantとdmclibの定義をマージします
+   */
   initConstant() {
     const dmclib = this.getDmcLib();
     // サービス側で未定義の定数にdmclibの値をセット
@@ -37,6 +41,9 @@ class Context {
     }
   }
 
+  /**
+   * node-dmclibの初期化を行う
+   */
   initDmcLib() {
     const store = this.getStoreMain();
     return Promise.resolve()
@@ -71,6 +78,9 @@ class Context {
     ;
   }
 
+  /**
+   * DataStoreの初期化を行う
+   */
   initStore(configStores) {
     const task = (name, configStore) => {
       const type = configStore.type;
@@ -171,6 +181,13 @@ class Context {
    */
   getConfigAcl() {
     return config.acl;
+  }
+
+  /**
+   * env 取得
+   */
+  getEnv() {
+    return this.env;
   }
 
 }

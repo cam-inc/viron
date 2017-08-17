@@ -19,7 +19,7 @@
     "mysql2": "^1.3.6",
     "node-dmclib": "^1.0.1",
     "sequelize": "^4.3.2",
-    "swagger-express-mw": "^0.1.0"
+    "swagger-express-mw": "0.1.0"
   },
   "devDependencies": {
     "eslint": "^4.2.0",
@@ -29,10 +29,13 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "swagger project test",
+    "test": "mocha --reporter spec --ui bdd --timeout 3000 --recursive test",
     "dressup": "docker-compose -f docker-compose.all.yml up --build",
     "dressup-db": "docker-compose -f docker-compose.db.yml up --build",
     "connect-main": "mysql -u user -ppassword -h 127.0.0.1 -P 3306 -Ddmc_local",
     "debug": "supervisor --verbose --debug=0.0.0.0:53000 --watch . --extensions 'node,js,yaml' --ignore node_modules -- ./app.js"
+  },
+  "engines": {
+    "node": ">=7"
   }
 }
