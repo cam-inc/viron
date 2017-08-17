@@ -64,23 +64,23 @@
   height: 800%;
 }
 
-.Slider__catcher--active {
-  display: block;
-}
-
-.Slider__rail--active {
-  background-color: var(--color-bg-tertiary);
-}
-
-.Slider__track--active {
-  background-color: var(--color-bg-success);
-}
-
-.Slider__knobInner--active {
-  border-color: var(--color-bg-success);
-}
-
 .Slider__knob > .Tooltip {
   position: absolute;
   top: -10px;
+}
+
+.Slider--active .Slider__catcher {
+  display: block;
+}
+
+.Slider--hover .Slider__rail {
+  background-color: var(--color-bg-tertiary);
+}
+
+.Slider--hover .Slider__track {
+  background-color: var(--color-bg-success);
+}
+
+.Slider--hover .Slider__knobInner {
+  border-color: var(--color-bg-success);
 }
