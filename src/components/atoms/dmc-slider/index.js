@@ -8,39 +8,60 @@ export default function() {
   this.isTooltipShown = false;
   this.isHover = false;
 
-  this.handleContainerTouchEvent = e => {
-    if(e.type === 'touchstart') {
-      this.isTooltipShown = true;
-    }
-    if(e.type === 'touchend') {
-      this.isTooltipShown = false;
-    }
-    // 数値範囲外に出てないときだけUpdateする
-    const numberRatio = convertActualValue(e);
-    if(numberRatio <= this.opts.max && numberRatio >= this.opts.min) {
-      this.opts.onchange(numberRatio);
+  this.handleContainerTouchStart = e => {
+    this.isTooltipShown = true;
+    const containerRect = this.refs.container.getBoundingClientRect();
+    const actualValue = convertActualValue(e.changedTouches[0].pageX, containerRect);
+    if (validActualValue(actualValue)) {
+      this.opts.onchange(actualValue);
     }
   };
 
-  this.handleContainerMouseEvent = e => {
-    if(e.type === 'mousedown') {
-      this.isActive = true;
-      this.isTooltipShown = true;
+  this.handleContainerTouchMove = e => {
+    const containerRect = this.refs.container.getBoundingClientRect();
+    const actualValue = convertActualValue(e.changedTouches[0].pageX, containerRect);
+    if (validActualValue(actualValue)) {
+      this.opts.onchange(actualValue);
     }
-    if(e.type === 'mousemove') {
-      if (!this.isActive) {
-        return;
-      }
+  };
+
+  this.handleContainerTouchEnd = e => {
+    this.isTooltipShown = false;
+    const containerRect = this.refs.container.getBoundingClientRect();
+    const actualValue = convertActualValue(e.changedTouches[0].pageX, containerRect);
+    if (validActualValue(actualValue)) {
+      this.opts.onchange(actualValue);
     }
-    if(e.type === 'mouseup') {
-      this.isActive = false;
-      this.isTooltipShown = false;
+  };
+
+  this.handleContainerMouseDown = e => {
+    this.isActive = true;
+    this.isTooltipShown = true;
+    const containerRect = this.refs.container.getBoundingClientRect();
+    const actualValue = convertActualValue(e.pageX, containerRect);
+    if (validActualValue(actualValue)) {
+      this.opts.onchange(actualValue);
     }
-    
-    // 数値範囲外に出てないときだけUpdateする
-    const numberRatio = convertActualValue(e);
-    if(numberRatio <= this.opts.max && numberRatio >= this.opts.min) {
-      this.opts.onchange(numberRatio);
+  };
+
+  this.handleContainerMouseMove = e => {
+    if (!this.isActive) {
+      return;
+    }
+    const containerRect = this.refs.container.getBoundingClientRect();
+    const actualValue = convertActualValue(e.pageX, containerRect);
+    if (validActualValue(actualValue)) {
+      this.opts.onchange(actualValue);
+    }
+  };
+
+  this.handleContainerMouseUp = e => {
+    this.isActive = false;
+    this.isTooltipShown = false;
+    const containerRect = this.refs.container.getBoundingClientRect();
+    const actualValue = convertActualValue(e.pageX, containerRect);
+    if (validActualValue(actualValue)) {
+      this.opts.onchange(actualValue);
     }
   };
 
@@ -56,7 +77,6 @@ export default function() {
       this.isHover = false;
       this.update();
     }, 100);
-    
   };
 
   this.displayRatio = () => {
@@ -70,16 +90,13 @@ export default function() {
     return Math.round((this.opts.number - this.opts.min) / (this.opts.max - this.opts.min) * 100);
   };
 
-  const convertActualValue = (e) => {
-    const containerRect = document.querySelector('.Slider__container').getBoundingClientRect();
-    let touchX = 0;
-    if(e.changedTouches) {
-      touchX = e.changedTouches[0].pageX;
-    } else {
-      touchX = e.pageX;
-    }
+  const validActualValue = actualValue => {
+    return (actualValue <= this.opts.max && actualValue >= this.opts.min) ? true : false;
+  };
+
+  const convertActualValue = (touchX, containerRect) => {
     const distance = Math.round(touchX - containerRect.left);
-    const numberRatio = Math.round((distance * (this.opts.max - this.opts.min)) / containerRect.width) - -this.opts.min;
-    return numberRatio;
+    const actualValue = Math.round((distance * (this.opts.max - this.opts.min)) / containerRect.width) - -this.opts.min;
+    return actualValue;
   };
 }
