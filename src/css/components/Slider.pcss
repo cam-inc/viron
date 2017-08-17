@@ -19,6 +19,8 @@
 
 .Slider__rail {
   position: absolute;
+  top: 4px;
+  left: 0;
   width: 100%;
   height: 4px;
   background-color: var(--color-basic-lightGray);
@@ -28,6 +30,8 @@
 
 .Slider__track {
   position: absolute;
+  top: 4px;
+  left: 0;
   width: 100%;
   height: 4px;
   background-color: var(--color-bg-successLight);
@@ -43,6 +47,11 @@
   height: 0;
 }
 
+.Slider__knob > .Tooltip {
+  position: absolute;
+  top: -10px;
+}
+
 .Slider__knobInner {
   position: absolute;
   top: -7px;
@@ -52,22 +61,19 @@
   background-color: var(--color-bg-base);
   border: solid 2px var(--color-bg-successLight);
   border-radius: 50%;
-  transition: border 0.1s linear;
+  transition: border-color 0.1s linear;
 }
 
 .Slider__catcher {
   position: absolute;
-  top: -350%;
-  left: -10%;
+  top: -100px;
+  left: -20px;
   display: none;
-  width: 120%;
-  height: 800%;
+  width: calc(100% + 40px);
+  height: calc(100% + 200px);
 }
 
-.Slider__knob > .Tooltip {
-  position: absolute;
-  top: -10px;
-}
+/*  Modifier  */
 
 .Slider--active .Slider__catcher {
   display: block;
