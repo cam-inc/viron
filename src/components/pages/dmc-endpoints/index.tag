@@ -1,4 +1,5 @@
 dmc-endpoints.Page.EndpointsPage
+  dmc-wyswyg
   .EndpointsPage__list(ref="list")
     .EndpointsPage__addCard(ref="touch" onTap="handleEndpointAddTap")
       dmc-icon(type="plus")
@@ -20,6 +21,7 @@ dmc-endpoints.Page.EndpointsPage
       )
 
   script.
+    import '../../atoms/dmc-wyswyg/index.tag';
     import '../../atoms/dmc-icon/index.tag';
     import './endpoint.tag';
     import script from './index';
