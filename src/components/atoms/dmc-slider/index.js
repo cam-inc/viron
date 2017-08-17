@@ -13,6 +13,9 @@ export default function() {
 
   this.handleContainerTouchStart = e => {
     this.isTooltipShown = true;
+    if (this.opts.disabled) {
+      return;
+    }
     const actualValue = convertToActualValue(e.changedTouches[0].pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
@@ -20,6 +23,9 @@ export default function() {
   };
 
   this.handleContainerTouchMove = e => {
+    if (this.opts.disabled) {
+      return;
+    }
     const actualValue = convertToActualValue(e.changedTouches[0].pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
@@ -28,6 +34,9 @@ export default function() {
 
   this.handleContainerTouchEnd = e => {
     this.isTooltipShown = false;
+    if (this.opts.disabled) {
+      return;
+    }
     const actualValue = convertToActualValue(e.changedTouches[0].pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
@@ -35,6 +44,9 @@ export default function() {
   };
 
   this.handleContainerMouseDown = e => {
+    if (this.opts.disabled) {
+      return;
+    }
     this.isActive = true;
     this.isTooltipShown = true;
     const actualValue = convertToActualValue(e.pageX);
@@ -44,6 +56,9 @@ export default function() {
   };
 
   this.handleContainerMouseMove = e => {
+    if (this.opts.disabled) {
+      return;
+    }
     if (!this.isActive) {
       return;
     }
@@ -54,6 +69,9 @@ export default function() {
   };
 
   this.handleContainerMouseUp = e => {
+    if (this.opts.disabled) {
+      return;
+    }
     this.isActive = false;
     this.isTooltipShown = (this.isHover) ? true : false;
     const actualValue = convertToActualValue(e.pageX);
@@ -65,6 +83,9 @@ export default function() {
   this.handleContainerMouseOver = () => {
     clearTimeout(timerid);
     this.isTooltipShown = true;
+    if (this.opts.disabled) {
+      return;
+    }
     this.isHover = true;
   };
 
