@@ -1,4 +1,4 @@
-dmc-slider
+dmc-slider.Slider
   .Slider__label(if="{ !!opts.label }") { opts.label }
   .Slider__container(ref="container" touchStart="{ handleContainerTouchStart }" touchMove="{ handleContainerTouchMove }" touchEnd="{ handleContainerTouchEnd }" mouseDown="{ handleContainerMouseDown }" mouseOver="{ handleContainerMouseOver }" mouseOut="{ handleContainerMouseOut }")
     .Slider__rail(class="{ Slider__rail--active : isHover }")
