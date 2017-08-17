@@ -17,7 +17,7 @@ export default function() {
 
   this.handleContainerTouchStart = e => {
     this.isTooltipShown = true;
-    if (this.opts.disabled) {
+    if (this.opts.isdisabled) {
       return;
     }
     const actualValue = convertToActualValue(e.changedTouches[0].pageX);
@@ -27,7 +27,7 @@ export default function() {
   };
 
   this.handleContainerTouchMove = e => {
-    if (this.opts.disabled) {
+    if (this.opts.isdisabled) {
       return;
     }
     const actualValue = convertToActualValue(e.changedTouches[0].pageX);
@@ -38,7 +38,7 @@ export default function() {
 
   this.handleContainerTouchEnd = e => {
     this.isTooltipShown = false;
-    if (this.opts.disabled) {
+    if (this.opts.isdisabled) {
       return;
     }
     const actualValue = convertToActualValue(e.changedTouches[0].pageX);
@@ -48,7 +48,7 @@ export default function() {
   };
 
   this.handleContainerMouseDown = e => {
-    if (this.opts.disabled) {
+    if (this.opts.isdisabled) {
       return;
     }
     this.isActive = true;
@@ -60,7 +60,7 @@ export default function() {
   };
 
   this.handleCatcherMouseMove = e => {
-    if (this.opts.disabled) {
+    if (this.opts.isdisabled) {
       return;
     }
     if (!this.isActive) {
@@ -73,7 +73,7 @@ export default function() {
   };
 
   this.handleCatcherMouseUp = e => {
-    if (this.opts.disabled) {
+    if (this.opts.isdisabled) {
       return;
     }
     this.isActive = false;
@@ -87,7 +87,7 @@ export default function() {
   this.handleContainerMouseOver = () => {
     clearTimeout(timerid);
     this.isTooltipShown = true;
-    if (this.opts.disabled) {
+    if (this.opts.isdisabled) {
       return;
     }
     this.isHover = true;

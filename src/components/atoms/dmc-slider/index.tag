@@ -1,4 +1,4 @@
-dmc-slider.Slider(class="{ Slider--active: isActive, Slider--hover: isHover, Slider--disable: opts.disabled || false }")
+dmc-slider.Slider(class="{ Slider--active: isActive, Slider--hover: isHover, Slider--disable: opts.isdisabled || false }")
   .Slider__label(if="{ !!opts.label }") { opts.label }
   .Slider__container(ref="container" touchStart="{ handleContainerTouchStart }" touchMove="{ handleContainerTouchMove }" touchEnd="{ handleContainerTouchEnd }" mouseDown="{ handleContainerMouseDown }" mouseOver="{ handleContainerMouseOver }" mouseOut="{ handleContainerMouseOut }")
     .Slider__rail
