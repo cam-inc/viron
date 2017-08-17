@@ -4,8 +4,11 @@ export default function() {
   // ホバーを無効にするようにしました。
   // 良くないコードなため、他の案があれば修正求む。
   let timerid;
+  // スライダーのキャッチャーをアクティブするかどうか
   this.isActive = false;
+  // ツールチップを表示するかどうか
   this.isTooltipShown = false;
+  // スライダーをホバーしたかどうか
   this.isHover = false;
 
   this.handleContainerTouchStart = e => {
