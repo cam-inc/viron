@@ -96,7 +96,7 @@ export default function() {
 
   const convertActualValue = (touchX, containerRect) => {
     const distance = Math.round(touchX - containerRect.left);
-    const actualValue = Math.round((distance * (this.opts.max - this.opts.min)) / containerRect.width) - -this.opts.min;
+    const actualValue = Math.round((distance * (this.opts.max - this.opts.min)) / containerRect.width) - (-this.opts.min);
     return actualValue;
   };
 }
