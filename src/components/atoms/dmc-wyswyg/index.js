@@ -1,51 +1,84 @@
-import Quill from '../../../core/Quill';
+//import Quill from '../../../core/quill';
 
 export default function() {
   // quillインスタンス。
   let quill = null;
-  const options = {
-    // @see: https://quilljs.com/docs/configuration/#bounds
-    bounds: this.refs.editor,
-    // @see: https://quilljs.com/docs/configuration/#debug
-    debug: true,
-    // @see: https://quilljs.com/docs/configuration/#formats
-    // @see https://quilljs.com/docs/formats/
-    //formats: [],
-    // @see: https://quilljs.com/docs/configuration/#modules
-    modules: {
-      toolbar: [
-        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-        ['blockquote', 'code-block'],
 
-        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-        [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-        [{ 'direction': 'rtl' }],                         // text direction
-
-        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-        [{ 'font': [] }],
-        [{ 'align': [] }],
-
-        ['clean']
-      ]
-    },
-    // @see: https://quilljs.com/docs/configuration/#placeholder
-    placeholder: 'type here...',
-    // @see: https://quilljs.com/docs/configuration/#readonly
-    readonly: false,
-    // @see: https://quilljs.com/docs/configuration/#scrollingcontainer
-    scrollingContainer: null,
-    // @see: https://quilljs.com/docs/configuration/#strict
-    strict: true,
-    // @see: https://quilljs.com/docs/configuration/#theme
-    theme: 'snow'
+  /**
+   * Quillのoptionを返します。
+   * @return {Object}
+   */
+  const getOption = () => {
+    const options = {
+      // @see: https://quilljs.com/docs/configuration/#bounds
+      bounds: this.refs.editor,
+      // @see: https://quilljs.com/docs/configuration/#debug
+      debug: true,
+      // @see: https://quilljs.com/docs/configuration/#formats
+      // @see https://quilljs.com/docs/formats/
+      formats: [
+        // inlineレベルのformat群。
+        'background',// Background Color
+        'bold',
+        'color',
+        'font',
+        'code',// Inline Code
+        'italic',
+        'link',
+        'size',
+        'strike', //Strikethrough
+        'script',// Superscript/Subscript
+        'underline',
+        // blockレベルのformat群。
+        'blockquote',
+        'header',
+        'indent',
+        'list',
+        'align',
+        'direction',// Direction of test
+        'code-block',
+        // embed系format群。
+        'formula',
+        'image',
+        'video'
+      ],
+      // @see: https://quilljs.com/docs/configuration/#modules
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          ['blockquote', 'code-block'],
+          [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+          [{ 'direction': 'rtl' }],                         // text direction
+          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+          [{ 'font': [] }],
+          [{ 'align': [] }],
+          ['clean']
+        ]
+      },
+      // @see: https://quilljs.com/docs/configuration/#placeholder
+      placeholder: 'type here...',
+      // @see: https://quilljs.com/docs/configuration/#readonly
+      readonly: false,
+      // @see: https://quilljs.com/docs/configuration/#scrollingcontainer
+      scrollingContainer: null,
+      // @see: https://quilljs.com/docs/configuration/#strict
+      strict: true,
+      // @see: https://quilljs.com/docs/configuration/#theme
+      theme: 'snow'
+    };
+    return options;
   };
+
+  // Blotを変更します。
+  //Quill.customizeBlot('bold', 'b', 'Service__bold--todo');
+
   this.on('mount', () => {
-    quill = new Quill(this.refs.editor, options);
+    //quill = Quill.create(this.refs.editor, getOption());
     quill.on('text-change', this.handleTextChange);
     quill.on('selection-change', this.handleSelectionChange);
     quill.on('editor-change', this.handleEditorChange);
