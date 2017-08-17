@@ -20,13 +20,13 @@ renderer.del = text => {
 },
 renderer.list = (body, ordered) => {
   if(ordered){
-    return `<div class="Markdown__list--ordered">${body}</div>`;
+    return `<ol class="Markdown__list--ordered">${body}</ol>`;
   }else{
-    return `<div class="Markdown__list--unordered">${body}</div>`;
+    return `<ul class="Markdown__list--unordered">${body}</ul>`;
   }
 },
 renderer.listitem = text => {
-  return `<div class="Markdown__listitem">${text}</div>`;
+  return `<li class="Markdown__listitem">${text}</li>`;
 },
 renderer.code = code => {
   return `<div class="Markdown__code"><pre><code>${code}</code></pre></div>`;
@@ -64,9 +64,10 @@ renderer.tablecell = (content, flags) => {
   }else{
     return `<td class="Markdown__tableCell Markdown__tableCell--${flags.align}">${content}</td>`;
   }
-}
+};
 
 export default function() {
+  this.on('mount', () => {
   marked.setOptions(ObjectAssign(
     {
       renderer: renderer,
@@ -80,7 +81,6 @@ export default function() {
     },
     this.opts.data.markedOptions
   ));
-  this.on('mount', () => {
     this.root.innerHTML = this.opts.data.content ? marked(this.opts.data.content, { renderer: renderer }) : '';
   });
 }
