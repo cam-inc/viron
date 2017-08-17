@@ -101,7 +101,7 @@ export default function() {
     }, 100);
   };
 
-  this.displayRatio = () => {
+  this.displayActualValue = () => {
     // 現在値がmaxとminより越えている場合、値をmaxかminに修正する
     if (this.opts.number < this.opts.min) {
       return this.opts.min;
