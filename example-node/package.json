@@ -23,13 +23,13 @@
   },
   "devDependencies": {
     "eslint": "^4.2.0",
-    "should": "^7.1.0",
+    "mocha": "^3.5.0",
     "supertest": "^3.0.0",
     "supervisor": "^0.12.0"
   },
   "scripts": {
     "start": "node app.js",
-    "test": "mocha --reporter spec --ui bdd --timeout 3000 --recursive test",
+    "test": "PORT=13000 mocha --reporter spec --ui bdd --timeout 3000 --recursive test",
     "dressup": "docker-compose -f docker-compose.all.yml up --build",
     "dressup-db": "docker-compose -f docker-compose.db.yml up --build",
     "connect-main": "mysql -u user -ppassword -h 127.0.0.1 -P 3306 -Ddmc_local",

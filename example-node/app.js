@@ -53,7 +53,7 @@ context.init()
       // add routing
       swaggerExpress.register(app);
 
-      const port = helperSwagger.getPort(swaggerExpress, process.env.PORT);
+      const port = process.env.PORT || helperSwagger.getPort(swaggerExpress, 3000);
       const ssl = context.getConfigSsl();
       if (ssl.use) {
         https.createServer(ssl, app).listen(port);
@@ -67,6 +67,8 @@ context.init()
           console.log(`Added Route. ${method.toUpperCase()}: ${path}`);
         }
       }
+
+      app.emit('setuped'); // for testing
     });
   })
 ;
