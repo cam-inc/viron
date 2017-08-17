@@ -55,7 +55,7 @@ export default function() {
 
   this.handleContainerMouseUp = e => {
     this.isActive = false;
-    this.isTooltipShown = false;
+    this.isTooltipShown = (this.isHover) ? true : false;
     const actualValue = convertToActualValue(e.pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
