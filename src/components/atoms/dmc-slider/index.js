@@ -10,16 +10,14 @@ export default function() {
 
   this.handleContainerTouchStart = e => {
     this.isTooltipShown = true;
-    const containerRect = this.refs.container.getBoundingClientRect();
-    const actualValue = convertToActualValue(e.changedTouches[0].pageX, containerRect);
+    const actualValue = convertToActualValue(e.changedTouches[0].pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
     }
   };
 
   this.handleContainerTouchMove = e => {
-    const containerRect = this.refs.container.getBoundingClientRect();
-    const actualValue = convertToActualValue(e.changedTouches[0].pageX, containerRect);
+    const actualValue = convertToActualValue(e.changedTouches[0].pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
     }
@@ -27,8 +25,7 @@ export default function() {
 
   this.handleContainerTouchEnd = e => {
     this.isTooltipShown = false;
-    const containerRect = this.refs.container.getBoundingClientRect();
-    const actualValue = convertToActualValue(e.changedTouches[0].pageX, containerRect);
+    const actualValue = convertToActualValue(e.changedTouches[0].pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
     }
@@ -37,8 +34,7 @@ export default function() {
   this.handleContainerMouseDown = e => {
     this.isActive = true;
     this.isTooltipShown = true;
-    const containerRect = this.refs.container.getBoundingClientRect();
-    const actualValue = convertToActualValue(e.pageX, containerRect);
+    const actualValue = convertToActualValue(e.pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
     }
@@ -48,8 +44,7 @@ export default function() {
     if (!this.isActive) {
       return;
     }
-    const containerRect = this.refs.container.getBoundingClientRect();
-    const actualValue = convertToActualValue(e.pageX, containerRect);
+    const actualValue = convertToActualValue(e.pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
     }
@@ -58,8 +53,7 @@ export default function() {
   this.handleContainerMouseUp = e => {
     this.isActive = false;
     this.isTooltipShown = false;
-    const containerRect = this.refs.container.getBoundingClientRect();
-    const actualValue = convertToActualValue(e.pageX, containerRect);
+    const actualValue = convertToActualValue(e.pageX);
     if (validActualValue(actualValue)) {
       this.opts.onchange(actualValue);
     }
@@ -94,7 +88,8 @@ export default function() {
     return (actualValue <= this.opts.max && actualValue >= this.opts.min) ? true : false;
   };
 
-  const convertToActualValue = (touchX, containerRect) => {
+  const convertToActualValue = touchX => {
+    const containerRect = this.refs.container.getBoundingClientRect();
     const distance = Math.round(touchX - containerRect.left);
     const actualValue = Math.round((distance * (this.opts.max - this.opts.min)) / containerRect.width) - (-this.opts.min);
     return actualValue;
