@@ -10,6 +10,7 @@ import isString from 'mout/lang/isString';
 import hasOwn from 'mout/object/hasOwn';
 import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
+import moment from 'moment';
 
 const resultTemplate = {
   isValid: true,
@@ -612,10 +613,27 @@ const format = (value, constraints) => {
   }
   const format = constraints.format;
   switch (format) {
-  case 'date-time':
+  case 'date-time': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.1
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // datetimeはRFC3339に則る。
+    // -----以下RFC3339文
+    //  The following profile of ISO 8601 [ISO8601] dates SHOULD be used in new protocols on the Internet.
+    // 次のISO 8601 [ISO8601]日付のプロフィールはインターネット上の新しいプロトコルで使われるべきです
+    // -----
+    // RFC3339はISO 8601に従っているため、momentにあるISO8601フォーマットを使い、これをバリデートする。
+    let isValid = moment(value, moment.ISO_8601).isValid();
+    if (!isValid) {
+      result.isValid = false;
+      result.message = '"date-time"に則ったフォーマットで入力してください。';
+    }
     break;
+  }
   case 'email':
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.2
     // TODO
