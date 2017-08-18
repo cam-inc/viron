@@ -5,18 +5,27 @@ import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
+  // opts文字列指定も許可する。
+  let min, max, step;
+  min = Number(this.opts.min);
+  max = Number(this.opts.max);
+  step = Number(this.opts.step);
+  min = (isNumber(min) ? min : null);
+  max = (isNumber(max) ? max : null);
+  step = (isNumber(step) ? step : null);
+
   /**
    * 現在値を指定step数分インクリメントして返却します。
    * @return {Number}
    */
   const increment = () => {
     const currentValue = this.normalizeValue(this.opts.number);
-    const step = isNumber(this.opts.step) ? this.opts.step : 1;
+    const n = isNumber(step) ? step : 1;
     let newValue;
     if (isNull(currentValue)) {
-      newValue = step;
+      newValue = n;
     } else {
-      newValue = currentValue + step;
+      newValue = currentValue + n;
     }
     return this.normalizeValue(newValue);
   };
@@ -27,12 +36,12 @@ export default function() {
    */
   const decrement = () => {
     const currentValue = this.normalizeValue(this.opts.number);
-    const step = isNumber(this.opts.step) ? this.opts.step : 1;
+    const n = isNumber(step) ? step : 1;
     let newValue;
     if (isNull(currentValue)) {
-      newValue = step * (-1);
+      newValue = n * (-1);
     } else {
-      newValue = currentValue - step;
+      newValue = currentValue - n;
     }
     return this.normalizeValue(newValue);
   };
@@ -75,8 +84,6 @@ export default function() {
     // この時点で`validValue`は必ずNumberとなる。
 
     // 最大値が設定されている 且つ 最大値を超えているケースへの対応。
-    const max = this.opts.max;
-    const min = this.opts.min;
     if (isNumber(max) && value > max) {
       value = max;
     }
@@ -93,7 +100,6 @@ export default function() {
    * @return {Boolean}
    */
   this.isIncrementable = () => {
-    const max = this.opts.max;
     // 最大値が設定されていなければ常にincrement可能とする。
     if (!isNumber(max)) {
       return true;
@@ -111,7 +117,6 @@ export default function() {
    * @return {Boolean}
    */
   this.isDecrementable = () => {
-    const min = this.opts.min;
     // 最小値が設定されていなければ常にincrement可能とする。
     if (!isNumber(min)) {
       return true;
@@ -128,6 +133,9 @@ export default function() {
   // setAttribute() を使ってある属性、XUL や HTML の特別な値、および HTML の選択領域の変更は、属性がデフォルト値を特定している場合に一貫性の無い動作となります。現在の値にアクセスしたり、変更したりするにはプロパティを使用すべきです。具体例として、 elt .setAttribute('value', val ) の代わりに elt .value を使用します。
   this.on('mount', () => {
     this.refs.input.value = this.normalizeValue(this.opts.number);
+    // 初期値の誤りを正すために初回のみonchangeを実行する。
+    // 例えば、min=50 number=10の場合は新number`50`でonchangeが実行される。
+    this.opts.onchange(this.normalizeValue(this.opts.number));
   }).on('updated', () => {
     this.refs.input.value = this.normalizeValue(this.opts.number);
   });
