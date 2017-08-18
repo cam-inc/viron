@@ -3,15 +3,11 @@
 }
 
 .Markdown {
+  display: block;
   font-size: var(--component-markdown-font-size);
 }
 
-.Markdown__text {
-  display: inline-block;
-}
-
 .Markdown__paragraph {
-  display: block;
   font-weight: normal;
 }
 
@@ -77,7 +73,7 @@
   list-style-position: inside;
 }
 
-.Markdown__listitem .Markdown__listitem {
+.Markdown__listitem > .Markdown__list {
   margin-left: 20px;
 }
 
@@ -96,16 +92,12 @@
   border-radius: 5px;
 }
 
-.Markdown__codespan {
-}
-
 .Markdown__blockquote {
   padding: 0 20px;
-  color: var(--color-basic-darkGray);
-  border-left: solid 3px var(--color-basic-gray);
+  border-left: solid 3px var(--color-basic-skyblue);
 }
 
-.Markdown__blockquote .Markdown__text--paragraph {
+.Markdown__blockquote .Markdown__paragraph {
   font-size: calc(var(--component-markdown-font-size) * 0.8);
 }
 
@@ -118,14 +110,6 @@
 
 .Markdown__tableRow {
   border: 1px solid var(--color-basic-darkGray);
-}
-
-.Markdown__tableRow:nth-child(odd) .Markdown__tableCell {
-  background-color: var(--color-basic-lightGray);
-}
-
-.Markdown__tableRow:nth-child(odd) .Markdown__tableCell:hover {
-  background-color: var(--color-basic-white);
 }
 
 .Markdown__tableHeader {
@@ -143,6 +127,14 @@
 
 .Markdown__tableCell:hover {
   background-color: var(--color-basic-lightGray);
+}
+
+.Markdown__tableBody .Markdown__tableRow:nth-child(odd) {
+  background-color: var(--color-basic-lightGray);
+}
+
+.Markdown__tableBody .Markdown__tableRow:nth-child(odd) .Markdown__tableCell:hover {
+  background-color: var(--color-basic-white);
 }
 
 .Markdown__tableCell--center {
