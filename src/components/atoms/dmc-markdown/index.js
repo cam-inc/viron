@@ -7,22 +7,22 @@ renderer.heading = (text, level) => {
   return `<div class="Markdown__heading Markdown__heading--level${level}">${text}</div>`;
 },
 renderer.paragraph = text => {
-  return `<div class="Markdown__text Markdown__paragraph">${text}</div>`;
+  return `<div class="Markdown__paragraph">${text}</div>`;
 },
 renderer.strong = text => {
-  return `<div class="Markdown__text Markdown__strong">${text}</div>`;
+  return `<span class="Markdown__strong">${text}</span>`;
 },
 renderer.em = text => {
-  return `<div class="Markdown__text Markdown__emphasis">${text}</div>`;
+  return `<span class="Markdown__emphasis">${text}</span>`;
 },
 renderer.del = text => {
-  return `<div class="Markdown__text Markdown__delete">${text}</div>`;
+  return `<span class="Markdown__delete">${text}</span>`;
 },
 renderer.list = (body, ordered) => {
   if(ordered){
-    return `<ol class="Markdown__list--ordered">${body}</ol>`;
+    return `<ol class="Markdown__list Markdown__list--ordered">${body}</ol>`;
   }else{
-    return `<ul class="Markdown__list--unordered">${body}</ul>`;
+    return `<ul class="Markdown__list Markdown__list--unordered">${body}</ul>`;
   }
 },
 renderer.listitem = text => {
@@ -47,13 +47,21 @@ renderer.blockquote = quote => {
   return `<div class="Markdown__blockquote">${quote}</div>`;
 },
 renderer.link = (href, title, text) => {
-  return `<a class="Markdown__link" href="${href}" title="${title}">${text}</a>`;
+  if(title){
+    return `<a class="Markdown__link" href="${href}" title="${title}">${text}</a>`;
+  }else{
+    return `<a class="Markdown__link" href="${href}">${text}</a>`;
+  }
 },
 renderer.image = (href, title, text) => {
-  return `<img class="Markdown__image" src="${href}" alt="${text}" title="${title}"></img>`;
+  if(title){
+    return `<img class="Markdown__image" src="${href}" alt="${text}" title="${title}"></img>`;
+  }else{
+    return `<img class="Markdown__image" src="${href}" alt="${text}"></img>`;
+  }
 },
 renderer.table = (header, body) => {
-  return `<table class="Markdown__table"><thead>${header}</thead><tbody>${body}</tbody></table>`;
+  return `<table class="Markdown__table"><thead>${header}</thead><tbody class="Markdown__tableBody">${body}</tbody></table>`;
 },
 renderer.tablerow = content => {
   return `<tr class="Markdown__tableRow">${content}</tr>`;
@@ -81,6 +89,6 @@ export default function() {
     this.opts.data.markedOptions
   ));
   this.on('mount', () => {
-    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content, { renderer: renderer }) : '';
+    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 }
