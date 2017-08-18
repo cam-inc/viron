@@ -6,12 +6,9 @@ export default function() {
   let quill = null;
 
   const blotOptions = this.opts.blotoptions || {
-    bold: {
-      className: 'Wsywyg__bold'
-    },
-    italic: {
-      className: 'Wyswyg__italic'
-    }
+    background: { className: 'Wsywyg__background' },
+    bold: { className: 'Wsywyg__bold' },
+    italic: { className: 'Wyswyg__italic' }
   };
   // Blotを変更します。
   forOwn(blotOptions, (value, key) => {
@@ -22,14 +19,7 @@ export default function() {
     if (!!value.className) {
       params.className = value.className;
     }
-    switch (key) {
-    case 'bold':
-    case 'italic':
-      Quill.customizeBlot(key, params);
-      break;
-    default:
-      break;
-    }
+    Quill.customizeBlot(key, params);
   });
 
   /**
