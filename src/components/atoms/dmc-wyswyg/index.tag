@@ -1,8 +1,9 @@
 dmc-wyswyg.Wyswyg
   .Wyswyg__editor(ref="editor")
-    p Hello World!
+    h4 Hello
+      span(class="Service__bold--todo") World!
     p Some initial
-      strong bold
+      span(class="Service__bold--todo") bold
     p
       br
 

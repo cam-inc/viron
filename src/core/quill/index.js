@@ -1,5 +1,3 @@
-//import BlotBold from './blot/bold';
-
 // TODO: node_moduleから読み込みたい。
 const Quill = window.Quill;
 
@@ -40,7 +38,7 @@ const customizeBlot = (blotName, params) => {
   if (!!params.tagName) {
     TargetBlot.tagName = params.tagName;
   }
-  if (!!params.clasName) {
+  if (!!params.className) {
     TargetBlot.className = params.className;
   }
   Quill.register(TargetBlot, true);

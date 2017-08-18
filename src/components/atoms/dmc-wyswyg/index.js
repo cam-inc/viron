@@ -1,8 +1,36 @@
-//import Quill from '../../../core/quill';
+import forOwn from 'mout/object/forOwn';
+import Quill from '../../../core/quill';
 
 export default function() {
   // quillインスタンス。
   let quill = null;
+
+  const blotOptions = this.opts.blotoptions || {
+    bold: {
+      className: 'Wsywyg__bold'
+    },
+    italic: {
+      className: 'Wyswyg__italic'
+    }
+  };
+  // Blotを変更します。
+  forOwn(blotOptions, (value, key) => {
+    const params = {};
+    if (!!value.tagName) {
+      params.tagName = value.tagName;
+    }
+    if (!!value.className) {
+      params.className = value.className;
+    }
+    switch (key) {
+    case 'bold':
+    case 'italic':
+      Quill.customizeBlot(key, params);
+      break;
+    default:
+      break;
+    }
+  });
 
   /**
    * Quillのoptionを返します。
@@ -45,15 +73,14 @@ export default function() {
       // @see: https://quilljs.com/docs/configuration/#modules
       modules: {
         toolbar: [
-          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
           ['blockquote', 'code-block'],
-          [{ 'header': 1 }, { 'header': 2 }],               // custom button values
           [{ 'list': 'ordered'}, { 'list': 'bullet' }],
           [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
           [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
           [{ 'direction': 'rtl' }],                         // text direction
           [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
           [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
           [{ 'font': [] }],
           [{ 'align': [] }],
@@ -74,11 +101,8 @@ export default function() {
     return options;
   };
 
-  // Blotを変更します。
-  //Quill.customizeBlot('bold', 'b', 'Service__bold--todo');
-
   this.on('mount', () => {
-    //quill = Quill.create(this.refs.editor, getOption());
+    quill = Quill.create(this.refs.editor, getOption());
     quill.on('text-change', this.handleTextChange);
     quill.on('selection-change', this.handleSelectionChange);
     quill.on('editor-change', this.handleEditorChange);
