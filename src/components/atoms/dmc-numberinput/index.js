@@ -1,10 +1,21 @@
 import isNaN from 'mout/lang/isNaN';
 import isNull from 'mout/lang/isNull';
-import isNumber from 'mout/lang/isNumber';
+import _isNumber from 'mout/lang/isNumber';
 import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
+  /**
+   * moutの`isNumber`のラッパー関数。
+   * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
+   * @param {*} num
+   */
+  const isNumber = num => {
+    if (isNaN(num)) {
+      return false;
+    }
+    return _isNumber(num);
+  };
   // opts文字列指定も許可する。
   let min, max, step;
   min = Number(this.opts.min);
