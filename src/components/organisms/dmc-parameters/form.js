@@ -91,7 +91,7 @@ export default function() {
 
   // textinput値が変更された時の処理。
   this.handleTextinputChange = newText => {
-    if (!schemaObject.allowEmptyValue || !newText) {
+    if (!newText) {
       newText = undefined;
     }
     this.opts.onchange(newText);
