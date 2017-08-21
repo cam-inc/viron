@@ -641,7 +641,7 @@ const format = (value, constraints) => {
   }
   case 'email': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.2
-    
+
     // String型のときだけバリデートする
     if (!isString(value)) {
       return result;
@@ -657,10 +657,32 @@ const format = (value, constraints) => {
     }
     break;
   }
-  case 'hostname':
+  case 'hostname': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
-    // TODO
+    
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // RFC 1034に則った書き方かバリデートする
+    const pattern = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[‌​a-z\d])?)*$/i;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"hostname"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
+    // hostnameが255文字を超えていたらエラー
+    if (value.length > 255) {
+      result.isValid = false;
+      result.message = '"hostnameは"255文字以内で入力してください。';
+      return result;
+    }
+
     break;
+  }
   case 'ipv4':
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.4
     // TODO
