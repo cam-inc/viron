@@ -621,16 +621,21 @@ const format = (value, constraints) => {
       return result;
     }
 
-    // datetimeはRFC3339に則る。
-    // -----以下RFC3339文
-    //  The following profile of ISO 8601 [ISO8601] dates SHOULD be used in new protocols on the Internet.
-    // 次のISO 8601 [ISO8601]日付のプロフィールはインターネット上の新しいプロトコルで使われるべきです
-    // -----
-    // RFC3339はISO 8601に従っているため、momentにあるISO8601フォーマットを使い、これをバリデートする。
-    let isValid = moment(value, moment.ISO_8601).isValid();
-    if (!isValid) {
+    // RFC 3339に則った書き方かバリデートする
+    const pattern = /^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+\-])([01]\d|2[0-3]):([0-5]\d))$/;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
       result.isValid = false;
       result.message = '"date-time"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
+    // 存在する日付かチェックする(e.g. うるう年)
+    const isValid = moment(value).isValid();
+    if (!isValid) {
+      result.isValid = false;
+      result.message = '存在する日付を入力してください。';
+      return result;
     }
     break;
   }
