@@ -702,10 +702,55 @@ const format = (value, constraints) => {
     
     break;
   }
-  case 'ipv6':
+  case 'ipv6': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.5
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    if(value.match(/::/)) {
+      let tgtColon = 7;
+      // IPv4互換バージョンを使用している場合、ターゲット番号は：6
+      if(value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
+        tgtColon = 6;
+      }
+
+      // ipv6の形を成形する
+      if(value.match(/^::/)) {
+        value = value.replace('::', '0::');
+      }
+      if(value.match(/::$/)) {
+        value = value.replace('::', '::0');
+      }
+
+      while(value.match(/:/g).length < tgtColon) {
+        value = value.replace('::', ':0::');
+      }
+
+      value = value.replace('::', ':0:');
+    }
+
+    // RFC 2373に則った書き方かバリデートする
+    let pattern = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+    let isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"ipv6"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
+    pattern = /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"ipv6"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
     break;
+  }
   case 'uri':
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.6
     // TODO
