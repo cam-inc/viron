@@ -711,10 +711,10 @@ const format = (value, constraints) => {
     }
 
     if(value.match(/::/)) {
-      let tgtColon = 7;
+      let targetColon = 7;
       // IPv4互換バージョンを使用している場合、ターゲット番号は：6
       if(value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
-        tgtColon = 6;
+        targetColon = 6;
       }
 
       // ipv6の形を成形する
@@ -725,7 +725,7 @@ const format = (value, constraints) => {
         value = value.replace('::', '::0');
       }
 
-      while(value.match(/:/g).length < tgtColon) {
+      while(value.match(/:/g).length < targetColon) {
         value = value.replace('::', ':0::');
       }
 
