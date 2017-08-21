@@ -78,7 +78,7 @@ export default function() {
       // @see: https://quilljs.com/docs/configuration/#modules
       modules: {
         toolbar: [
-          ['code-block'],
+          [{ 'direction': 'rtl' }],
           ['bold', 'italic', 'underline', 'strike'],
           [{ 'color': [] }, { 'background': [] }, { 'size': [false, 'small', 'large', 'huge'] }, { 'font': [] }],
           ['link'],

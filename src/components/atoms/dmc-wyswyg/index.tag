@@ -6,7 +6,7 @@ dmc-wyswyg.Wyswyg
     dmc-wyswyg-tool-list
     dmc-wyswyg-tool-indent
     dmc-wyswyg-tool-align
-    dmc-wyswyg-tool-direction
+    dmc-wyswyg-tool-direction(if="{ !!quill }" quill="{ quill }")
     dmc-wyswyg-tool-blockquote(if="{ !!quill }" quill="{ quill }")
     dmc-wyswyg-tool-codeblock(if="{ !!quill }" quill="{ quill }")
   .Wyswyg__editor(ref="editor")
@@ -14,5 +14,6 @@ dmc-wyswyg.Wyswyg
   script.
     import './tool-blockquote.tag';
     import './tool-codeblock.tag';
+    import './tool-direction.tag';
     import script from './index';
     this.external(script);
