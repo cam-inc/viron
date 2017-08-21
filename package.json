@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/cam-inc/dmc#readme",
   "scripts": {
-    "build:css": "run-s build:css:bundle build:css:minify",
     "prepush": "npm run test",
     "start": "run-s build:clean build:prepare build:html build:swagger build:img build:font watch",
     "build": "run-s build:clean build:prepare build:html build:swagger build:img build:font build:js build:css",
@@ -36,6 +35,7 @@
     "build:js": "run-s build:js:bundle build:js:minify",
     "build:js:bundle": "rollup -c rollup.config.js",
     "build:js:minify": "uglifyjs dist/js/app.js -o dist/js/app.min.js --source-map url=app.min.js.map",
+    "build:css": "run-s build:css:bundle build:css:minify",
     "build:css:bundle": "postcss src/css/app.pcss -o dist/css/app.css",
     "build:css:minify": "csswring dist/css/app.css dist/css/app.min.css",
     "watch": "run-p watch:js watch:css",
