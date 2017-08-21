@@ -639,10 +639,24 @@ const format = (value, constraints) => {
     }
     break;
   }
-  case 'email':
+  case 'email': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.2
-    // TODO
+    
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // RFC 5322に則った書き方かバリデートする
+    const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"email"に則ったフォーマットで入力してください。';
+      return result;
+    }
     break;
+  }
   case 'hostname':
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
     // TODO
