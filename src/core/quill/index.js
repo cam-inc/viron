@@ -35,7 +35,12 @@ const customizeBlotBold = params => {
     BlotBold.className = className;
   }
   if (!!tagName) {
-    BlotBold.tagName = tagName;
+    // TODO: 何故配列ならMaximum optimizeが発生しないのが確認すること。
+    if (tagName.toLowerCase() === 'span') {
+      BlotBold.tagName = [tagName];
+    } else {
+      BlotBold.tagName = tagName;
+    }
   }
   Quill.register(BlotBold);
 };

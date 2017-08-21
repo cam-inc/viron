@@ -1,5 +1,4 @@
 import forOwn from 'mout/object/forOwn';
-import hasOwn from 'mout/object/hasOwn';
 import ObjectAssign from 'object-assign';
 import Quill from '../../../core/quill';
 import { customizeBlot } from '../../../core/quill';
@@ -9,10 +8,8 @@ export default function() {
   this.quill = null;
 
   const blotOptions = this.opts.options || {
-    //bold: { className: 'Wsywyg__bold', tagName: 'b' },
-    bold: { className: 'Wsywyg__bold', tagName: ['span'] },
-    //italic: { className: 'Wyswyg__italic', tagName: 'i' },
-    italic: { className: 'Wyswyg__italic', tagName: ['span'] },
+    bold: { className: 'Wsywyg__bold', tagName: 'span' },
+    italic: { className: 'Wyswyg__italic', tagName: 'i' },
     underline: { className: 'Wyswyg__underline', tagName: 'u' },
     strike: { className: 'Wyswyg__strike', tagName: 's' },
     color: { type: 'class', keyName: 'Wyswyg__color' },
@@ -35,7 +32,7 @@ export default function() {
   };
   // Blotを変更します。
   forOwn(blotOptions, (value, key) => {
-    customizeBlot(key, value);
+    customizeBlot(key, ObjectAssign({}, value));
   });
 
   /**
@@ -128,7 +125,8 @@ export default function() {
    * @param {Quill.Delta} oldContent
    * @param {String} source "user", "api" or "silent"
    */
-  this.handleTextChange = (delta, oldContent, source) => {};
+  this.handleTextChange = (delta, oldContent, source) => {// eslint-disable-line no-unused-vars
+  };
 
   /**
    * 選択範囲が変更された時の処理。
@@ -137,7 +135,8 @@ export default function() {
    * @param {Object} oldRange { index: Number, length: Number }
    * @param {String} source "user", "api" or "silent"
    */
-  this.handleSelectionChange = (range, oldRange, source) => {};
+  this.handleSelectionChange = (range, oldRange, source) => {// eslint-disable-line no-unused-vars
+  };
 
   /**
    * 文章もしくは選択範囲が変更された時の処理。
@@ -145,7 +144,8 @@ export default function() {
    * @param {String} name "text-change" or "selection-change"
    * @param {Array} args
    */
-  this.handleEditorChange = (name, ...args) => {};
+  this.handleEditorChange = (name, ...args) => {// eslint-disable-line no-unused-vars
+  };
 
   /**
    * スクロール最適化された時の処理。
