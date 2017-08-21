@@ -11,6 +11,7 @@ import hasOwn from 'mout/object/hasOwn';
 import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
 import moment from 'moment';
+import rfc3986 from 'rfc-3986';
 
 const resultTemplate = {
   isValid: true,
@@ -733,17 +734,19 @@ const format = (value, constraints) => {
     }
 
     // RFC 2373に則った書き方かバリデートする
-    let pattern = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
-    let isMatch = value.match(pattern);
-    if (isNull(isMatch)) {
-      result.isValid = false;
-      result.message = '"ipv6"に則ったフォーマットで入力してください。';
-      return result;
-    }
+    let patterns = [
+      /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/,
+      /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+    ];
+    let matchResult = false;
+    forEach(patterns, (pattern) => {
+      const isMatch = value.match(pattern);
+      if (!isNull(isMatch)) {
+        matchResult = true;
+      }
+    });
 
-    pattern = /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    isMatch = value.match(pattern);
-    if (isNull(isMatch)) {
+    if (!matchResult) {
       result.isValid = false;
       result.message = '"ipv6"に則ったフォーマットで入力してください。';
       return result;
@@ -760,7 +763,8 @@ const format = (value, constraints) => {
     }
 
     // RFC 3986に則った書き方かバリデートする
-    const pattern = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
+    // const pattern = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
+    const pattern = rfc3986.uri;
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
