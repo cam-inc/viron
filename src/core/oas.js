@@ -665,19 +665,19 @@ const format = (value, constraints) => {
       return result;
     }
 
+    // hostnameが255文字を超えていたらエラー
+    if (value.length > 255) {
+      result.isValid = false;
+      result.message = '"hostnameは"255文字以内で入力してください。';
+      return result;
+    }
+
     // RFC 1034に則った書き方かバリデートする
     const pattern = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[‌​a-z\d])?)*$/i;
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
       result.message = '"hostname"に則ったフォーマットで入力してください。';
-      return result;
-    }
-
-    // hostnameが255文字を超えていたらエラー
-    if (value.length > 255) {
-      result.isValid = false;
-      result.message = '"hostnameは"255文字以内で入力してください。';
       return result;
     }
 
