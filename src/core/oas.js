@@ -669,7 +669,7 @@ const format = (value, constraints) => {
     // hostnameが255文字を超えていたらエラー
     if (value.length > 255) {
       result.isValid = false;
-      result.message = '"hostnameは"255文字以内で入力してください。';
+      result.message = '"hostname"は255文字以内で入力してください。';
       return result;
     }
 
