@@ -7,7 +7,6 @@ swagger: "2.0"
 #################################################
 # host
 # - APIを提供するホスト
-# - DMCではブラウザで先にエンドポイントを登録するためこの値は参照されない
 #################################################
 host: localhost:3000
 
@@ -3782,10 +3781,6 @@ securityDefinitions:
 #################################################
 produces:
   - application/json
-  - application/xml
-  - application/gob
-  - application/x-gob
-  - text/html
   - text/plain
 
 #################################################
@@ -3794,8 +3789,4 @@ produces:
 #################################################
 consumes:
   - application/json
-  - application/xml
-  - application/gob
-  - application/x-gob
-  - text/html
   - text/plain

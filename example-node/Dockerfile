@@ -21,4 +21,4 @@ ADD test /example-node/test
 
 EXPOSE 3000
 USER root
-CMD swagger project start
+CMD npm start

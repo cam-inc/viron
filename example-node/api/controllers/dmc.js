@@ -63,10 +63,12 @@ const genSection = (section, groups) => {
  */
 const show = (req, res) => {
   const dmclib = context.getDmcLib();
+  const env = context.getEnv();
   const helperAdminRole = dmclib.adminRole.helper;
+  const title = req.swagger.swaggerObject.info.title;
 
   const result = {
-    name: 'DMC Example Project for Node.js',
+    name: `${title} - ${env}`,
     color: 'white',
     thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
     tags: ['develop', 'dmc', 'example'],

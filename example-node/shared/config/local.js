@@ -1,28 +1,31 @@
 module.exports = helper => {
   const config = {
+    // dmclibのadmin_roleが使用するユーザー作成時の初期ロール名
     default_role: 'viewer',
+    // dmclibのadmin_roleが使用するスーパーユーザーのロール名
     super_role: 'super',
 
+    // GoogleOAuth認証用
     google_oauth: {
+      // 使い回し厳禁
       client_id: '18099482953-ea1glis8jec14lk71cdrfaak46abd6ni.apps.googleusercontent.com',
       client_secret: 'f3KXzLnwDcLc7X5UWm-o95wX',
       redirect_url: 'https://localhost:3000/googleoauth2callback',
-      scope: [
-        'https://www.googleapis.com/auth/userinfo.email',
-      ],
       //state_url: 'https://cam-inc.github.io/dmc/#/',
       allow_email_domains: [
-        // ここに書いたドメインがGoogle認証で利用可能
+        // ここに書いたドメインが利用可能
         'camobile.com',
       ],
     },
 
+    // dmclibのCORS対応
     acl: {
       //allow_origin: 'https://cam-inc.github.io',
       allow_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
       expose_headers: 'X-Requested-With, Origin, Content-Type, Content-Disposition, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
     },
 
+    // DataStore
     stores: {
       main: {
         type: 'mysql',
@@ -82,15 +85,15 @@ module.exports = helper => {
       },
     },
 
+    // JWT認証
     auth_jwt: {
-      header_key: 'Authorization',
       token_expire: 1 * 24 * 60 * 60 * 1000, // 1日
-      credentials_required: true,
       algorithm: 'RS512',
       claims: {
         iss: 'dmc-example-node',
         aud: 'dmc.local',
       },
+      // 使い回し厳禁
       rsa_private_key: `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAs/PFsXu7tv7cYOSwj3CWkt1HwGtWXr5oqmj5/h+v5doXO6rU
 PqYfogFJ4+QIAxhtQc4EB5bgHFTp6kPta0oFsSGdV8WJQkV2PzducbwDdg85oR2z
@@ -129,6 +132,7 @@ oQIDAQAB
 -----END PUBLIC KEY-----`,
     },
 
+    // 使い回し厳禁
     ssl: {
       use: true,
       key: `-----BEGIN RSA PRIVATE KEY-----
