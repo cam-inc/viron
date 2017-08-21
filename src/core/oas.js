@@ -751,10 +751,25 @@ const format = (value, constraints) => {
 
     break;
   }
-  case 'uri':
+  case 'uri': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.6
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // RFC 3986に則った書き方かバリデートする
+    const pattern = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"uri"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
     break;
+  }
     /*
   case 'todo: custom format here':
     // TODO: 独自フォーマットがあればここに。
