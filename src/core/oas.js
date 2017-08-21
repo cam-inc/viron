@@ -9,8 +9,8 @@ import isObject from 'mout/lang/isObject';
 import isString from 'mout/lang/isString';
 import hasOwn from 'mout/object/hasOwn';
 import keys from 'mout/object/keys';
-import ObjectAssign from 'object-assign';
 import moment from 'moment';
+import ObjectAssign from 'object-assign';
 import rfc3986 from 'rfc-3986';
 
 const resultTemplate = {
