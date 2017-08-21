@@ -763,7 +763,6 @@ const format = (value, constraints) => {
     }
 
     // RFC 3986に則った書き方かバリデートする
-    // const pattern = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
     const pattern = rfc3986.uri;
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
