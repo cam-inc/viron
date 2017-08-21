@@ -683,10 +683,25 @@ const format = (value, constraints) => {
 
     break;
   }
-  case 'ipv4':
+  case 'ipv4': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.4
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // RFC 2673に則った書き方かバリデートする
+    const pattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"ipv4"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    
     break;
+  }
   case 'ipv6':
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.5
     // TODO
