@@ -1,25 +1,41 @@
 import forOwn from 'mout/object/forOwn';
+import hasOwn from 'mout/object/hasOwn';
+import ObjectAssign from 'object-assign';
 import Quill from '../../../core/quill';
+import { customizeBlot } from '../../../core/quill';
 
 export default function() {
   // quillインスタンス。
-  let quill = null;
+  this.quill = null;
 
-  const blotOptions = this.opts.blotoptions || {
-    background: { className: 'Wsywyg__background' },
-    bold: { className: 'Wsywyg__bold' },
-    italic: { className: 'Wyswyg__italic' }
+  const blotOptions = this.opts.options || {
+    //bold: { className: 'Wsywyg__bold', tagName: 'b' },
+    bold: { className: 'Wsywyg__bold', tagName: ['span'] },
+    //italic: { className: 'Wyswyg__italic', tagName: 'i' },
+    italic: { className: 'Wyswyg__italic', tagName: ['span'] },
+    underline: { className: 'Wyswyg__underline', tagName: 'u' },
+    strike: { className: 'Wyswyg__strike', tagName: 's' },
+    color: { type: 'class', keyName: 'Wyswyg__color' },
+    background: { type: 'class', keyName: 'Wyswyg__background' },
+    font: { type: 'class', keyName: 'Wyswyg__font', whitelist: ['serif', 'monospace'] },
+    size: { type: 'class', keyName: 'Wyswyg__size', whitelist: [false, '10px', '12px', '14px', '16px', '18px', '20px'] },
+    link: { className: 'Wyswyg__link', tagName: 'a' },
+    code: { className: 'Wyswyg__code', tagName: 'code' },
+    script: { className: 'Wyswyg__script' },
+    image: { className: 'Wyswyg__image', tagName: 'img' },
+    video: { className: 'Wyswyg__video', tagName: 'video' },
+    header: { className: 'Wyswyg__header' },
+    list: { className: 'Wyswyg__list' },
+    'list-item': { className: 'Wyswyg__listItem' },
+    indent: { keyName: 'Wyswyg__indent' },
+    align: { type: 'class', keyName: 'Wyswyg__align' },
+    direction: { type: 'class', keyName: 'Wyswyg__direction' },
+    blockquote: { className: 'Wyswyg__blockquote', tagName: 'blockquote' },
+    'code-block': { className: 'Wyswyg__codeblock', tagName: 'pre' }
   };
   // Blotを変更します。
   forOwn(blotOptions, (value, key) => {
-    const params = {};
-    if (!!value.tagName) {
-      params.tagName = value.tagName;
-    }
-    if (!!value.className) {
-      params.className = value.className;
-    }
-    Quill.customizeBlot(key, params);
+    customizeBlot(key, value);
   });
 
   /**
@@ -36,44 +52,41 @@ export default function() {
       // @see https://quilljs.com/docs/formats/
       formats: [
         // inlineレベルのformat群。
-        'background',// Background Color
+        // toolbarにて表示する。
         'bold',
-        'color',
-        'font',
-        'code',// Inline Code
         'italic',
-        'link',
-        'size',
-        'strike', //Strikethrough
-        'script',// Superscript/Subscript
         'underline',
+        'strike', //Strikethrough
+        'color',
+        'background',// Background Color
+        'font',
+        'size',
+        'link',
+        'code',// Inline Code
+        'script',// Superscript/Subscript
+        // embed系format群。
+        // 独自toolbar内で表示する。
+        'image',
+        'video',
         // blockレベルのformat群。
-        'blockquote',
+        // 独自toolbar内で表示する。
         'header',
-        'indent',
         'list',
+        'indent',
         'align',
         'direction',// Direction of test
-        'code-block',
-        // embed系format群。
-        'formula',
-        'image',
-        'video'
+        'blockquote',
+        'code-block'
       ],
       // @see: https://quilljs.com/docs/configuration/#modules
       modules: {
         toolbar: [
+          ['blockquote'],
           ['bold', 'italic', 'underline', 'strike'],
-          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-          ['blockquote', 'code-block'],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-          [{ 'direction': 'rtl' }],                         // text direction
-          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-          [{ 'font': [] }],
-          [{ 'align': [] }],
+          [{ 'color': [] }, { 'background': [] }, { 'size': [false, 'small', 'large', 'huge'] }, { 'font': [] }],
+          ['link'],
+          ['code', { 'script': 'sub' }, { 'script': 'super' }],
+          [{ 'indent': '-1'}, { 'indent': '+1' }],
           ['clean']
         ]
       },
@@ -92,16 +105,19 @@ export default function() {
   };
 
   this.on('mount', () => {
-    quill = Quill.create(this.refs.editor, getOption());
-    quill.on('text-change', this.handleTextChange);
-    quill.on('selection-change', this.handleSelectionChange);
-    quill.on('editor-change', this.handleEditorChange);
-  }).on('updated', () => {
-    this.opts.isdisabled ? quill.disable() : quill.enable();
+    this.quill = new Quill(this.refs.editor, getOption());
+    // TODO:
+    window.quill = this.quill;
+    this.quill.on(Quill.events.TEXT_CHANGE, this.handleTextChange);
+    this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
+    this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    this.update();
   }).on('unmount', () => {
-    quill.off('text-change', this.handleTextChange);
-    quill.off('selection-change', this.handleSelectionChange);
-    quill.off('editor-change', this.handleEditorChange);
+    this.quill.off(Quill.events.TEXT_CHANGE, this.handleTextChange);
+    this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
+    this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
     // TODO: dispose
   });
 
@@ -130,4 +146,21 @@ export default function() {
    * @param {Array} args
    */
   this.handleEditorChange = (name, ...args) => {};
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {};
+
+  /**
+   * `divider`ボタンがタップされた時の処理。
+   */
+  /*
+  this.handleDividerPat = () => {
+    const range = quill.getSelection(true);
+    this.quill.insertText(range.index, '\n', Quill.sources.USER);
+    this.quill.insertEmbed(range.index + 1, 'myDivider', true, Quill.sources.USER);
+    this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+  };
+  */
 }

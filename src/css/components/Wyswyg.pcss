@@ -1,8 +1,86 @@
 @import "quill/dist/quill.core.css";
 @import "quill/dist/quill.snow.css";
 
+/* ============================== */
+/* Base */
+/* ============================== */
 .Wyswyg {
   display: block;
-  min-height: 100px;
+}
+
+.Wyswyg__editor {
+  border: 1px solid var(--color-bg-tertiaryLight);
+}
+
+/* ============================== */
+/* 独自toolbar */
+/* ============================== */
+.Wyswyg__toolbar {
+  @apply --layout-center-start;
+  padding: 8px;
   border: 2px solid red;
+}
+
+.Wyswyg__tool {
+}
+
+.Wyswyg__toolbar > .Wyswyg__tool {
+  margin-right: 8px;
+}
+
+.Wyswyg__toolbar > .Wyswyg__tool:last-child {
+  margin-right: 0;
+}
+
+.Wyswyg__tool svg {
+  height: 100%;
+}
+
+/* ============================== */
+/* from quill.snow.css */
+/* ============================== */
+.Wyswyg__toolbar .Wyswyg__tool {
+  cursor: pointer;
+  display: inline-block;
+  height: 24px;
+  padding: 3px 5px;
+  width: 28px;
+  color: #444;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool svg {
+  height: 100%;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool:hover,
+.Wyswyg__toolbar .Wyswyg__tool:focus,
+.Wyswyg__toolbar .Wyswyg__tool--active {
+  color: #06c;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool .ql-fill {
+  fill: #444;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool:hover .ql-fill,
+.Wyswyg__toolbar .Wyswyg__tool:focus .ql-fill,
+.Wyswyg__toolbar .Wyswyg__tool--active .ql-fill {
+  color: #06c;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool .ql-stroke {
+  stroke: #444;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool:hover .ql-stroke,
+.Wyswyg__toolbar .Wyswyg__tool:focus .ql-stroke,
+.Wyswyg__toolbar .Wyswyg__tool--active .ql-stroke {
+  stroke: #06c;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool .ql-even {
+  fill-rule: evenodd;
 }
