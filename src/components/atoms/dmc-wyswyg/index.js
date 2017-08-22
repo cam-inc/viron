@@ -78,12 +78,11 @@ export default function() {
       // @see: https://quilljs.com/docs/configuration/#modules
       modules: {
         toolbar: [
-          [{ 'align': [false, 'right', 'center', 'justify'] }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
           ['bold', 'italic', 'underline', 'strike'],
           [{ 'color': [] }, { 'background': [] }, { 'size': [false, 'small', 'large', 'huge'] }, { 'font': [] }],
           ['link'],
           ['code', { 'script': 'sub' }, { 'script': 'super' }],
-          [{ 'indent': '-1'}, { 'indent': '+1' }],
           ['clean']
         ]
       },
