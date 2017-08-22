@@ -90,13 +90,28 @@ export default function() {
     if (isString(initialInnerHtml)) {
       this.quill.pasteHTML(initialInnerHtml);
     }
+    // load external css file if any specified.
+    const externalCssFilePath = this.opts.blotoptions['external-css-file'];
+    if (!!externalCssFilePath) {
+      const headElm = document.querySelector('head');
+      const linkElm = document.createElement('link');
+      linkElm.rel = 'stylesheet';
+      linkElm.href = externalCssFilePath;
+      linkElm.setAttribute('data-targetid', this._riot_id);
+      // head要素内の先頭に配置。
+      headElm.insertBefore(linkElm, headElm.firstChild);
+    }
     this.update();
   }).on('unmount', () => {
     this.quill.off(Quill.events.TEXT_CHANGE, this.handleTextChange);
     this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
     this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    // TODO: dispose
+    // remove external css file if any.
+    const linkElm = document.querySelector(`link[data-targetid="${this._riot_id}"]`);
+    if (!!linkElm) {
+      linkElm.remove();
+    }
   });
 
   /**
