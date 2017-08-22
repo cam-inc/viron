@@ -5,13 +5,15 @@ import Quill from '../../../core/quill';
 import { customizeBlot } from '../../../core/quill';
 
 export default function() {
-  const initialInnerHtml = this.opts.initialinnerhtml;
+  const blotOptions = this.opts.blotoptions || {};
 
   // quillインスタンス。
   this.quill = null;
+  // quillのbubble用cssを使用するか否か。
+  this.isBubbled = !blotOptions['external-css-file'];
 
   // Blotを変更します。
-  forOwn(this.opts.blotoptions || {}, (value, key) => {
+  forOwn(blotOptions || {}, (value, key) => {
     customizeBlot(key, ObjectAssign({}, value));
   });
 
@@ -87,11 +89,11 @@ export default function() {
     this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
     this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    if (isString(initialInnerHtml)) {
-      this.quill.pasteHTML(initialInnerHtml);
+    if (isString(blotOptions.initialInnerHtml)) {
+      this.quill.pasteHTML(blotOptions.initialInnerHtml);
     }
     // load external css file if any specified.
-    const externalCssFilePath = this.opts.blotoptions['external-css-file'];
+    const externalCssFilePath = blotOptions['external-css-file'];
     if (!!externalCssFilePath) {
       const headElm = document.querySelector('head');
       const linkElm = document.createElement('link');

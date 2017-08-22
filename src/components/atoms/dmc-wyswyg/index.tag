@@ -1,4 +1,4 @@
-dmc-wyswyg.Wyswyg
+dmc-wyswyg.Wyswyg(class="{ 'Wyswyg--bubbled' : isBubbled }")
   .Wyswyg__toolbar
     dmc-wyswyg-tool-image(if="{ !!quill }" quill="{ quill }")
     dmc-wyswyg-tool-video(if="{ !!quill }" quill="{ quill }")
