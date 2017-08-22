@@ -10,12 +10,15 @@ const UI_CHECKBOX = 'checkbox';
 const UI_SELECT = 'select';
 const UI_DATEPICKER = 'datepicker';
 const UI_UPLOADER = 'uploader';
+const UI_WYSWYG = 'wyswyg';
 const UI_NULL = 'null';
 
-// TODO: schemaObject or schemaObjectLikeのみを受け取るようにしたい。
 export default function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const schemaObject = ObjectAssign({}, this.opts.schemaobject);
+
+  // wyswygエディタのオプション群。
+  this.blotOptions = schemaObject['x-wyswyg-options'] || {};
 
   /**
    * Selectコンポーネントに使用するoption群を返します。
@@ -60,6 +63,8 @@ export default function() {
       switch (format) {
       case 'date-time':
         return UI_DATEPICKER;
+      case 'wyswyg':
+        return UI_WYSWYG;
       default:
         return UI_TEXTINPUT;
       }
@@ -122,5 +127,10 @@ export default function() {
   // uploader値が変更された時の処理。
   this.handleUploaderFileChange = newFile => {
     this.opts.onchange(newFile);
+  };
+
+  // wyswyg値が変更された時の処理。
+  this.handleWyswygChange = innerHtml => {
+    this.opts.onchange(innerHtml);
   };
 }

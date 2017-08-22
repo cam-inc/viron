@@ -10,6 +10,8 @@ dmc-parameter-form
       dmc-select(options="{ getSelectOptions() }" onChange="{ handleSelectChange }")
     virtual(if="{ uiType === 'uploader' }")
       dmc-uploader(accept="*" onFileChange="{ handleUploaderFileChange }")
+    virtual(if="{ uiType === 'wyswyg' }")
+      dmc-wyswyg(blotOptions="{ blotOptions }" initialInnerHtml="{ opts.val }" onTextChange="{ handleWyswygChange }")
     virtual(if="{ uiType === 'null' }")
       div TODO: null
 
@@ -19,5 +21,6 @@ dmc-parameter-form
     import '../../atoms/dmc-select/index.tag';
     import '../../atoms/dmc-textinput/index.tag';
     import '../../atoms/dmc-uploader/index.tag';
+    import '../../atoms/dmc-wyswyg/index.tag';
     import script from './form';
     this.external(script);

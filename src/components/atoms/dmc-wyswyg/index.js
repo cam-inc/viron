@@ -1,9 +1,12 @@
+import isString from 'mout/lang/isString';
 import forOwn from 'mout/object/forOwn';
 import ObjectAssign from 'object-assign';
 import Quill from '../../../core/quill';
 import { customizeBlot } from '../../../core/quill';
 
 export default function() {
+  const initialInnerHtml = this.opts.initialinnerhtml;
+
   // quillインスタンス。
   this.quill = null;
 
@@ -84,6 +87,9 @@ export default function() {
     this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
     this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    if (isString(initialInnerHtml)) {
+      this.quill.pasteHTML(initialInnerHtml);
+    }
     this.update();
   }).on('unmount', () => {
     this.quill.off(Quill.events.TEXT_CHANGE, this.handleTextChange);
@@ -101,6 +107,12 @@ export default function() {
    * @param {String} source "user", "api" or "silent"
    */
   this.handleTextChange = (delta, oldContent, source) => {// eslint-disable-line no-unused-vars
+    // querySelectorとinnerHTMLで内容を抜くのはNGだがQuillにAPIが用意されていないので仕方なく。
+    const editorElm = this.quill.container.querySelector('.ql-editor');
+    if (!editorElm) {
+      return;
+    }
+    this.opts.ontextchange && this.opts.ontextchange(editorElm.innerHTML);
   };
 
   /**
