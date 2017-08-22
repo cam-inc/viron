@@ -20,7 +20,7 @@ export default function() {
     code: { className: 'Wyswyg__code', tagName: 'code' },
     script: { className: 'Wyswyg__script' },
     image: { className: 'Wyswyg__image', tagName: 'img' },
-    video: { className: 'Wyswyg__video', tagName: 'video' },
+    video: { className: 'Wyswyg__video' },
     header: { className: 'Wyswyg__header' },
     list: { className: 'Wyswyg__list' },
     'list-item': { className: 'Wyswyg__listItem' },
@@ -78,6 +78,7 @@ export default function() {
       // @see: https://quilljs.com/docs/configuration/#modules
       modules: {
         toolbar: [
+          ['video'],
           [{ 'list': 'ordered'}, { 'list': 'bullet' }],
           ['bold', 'italic', 'underline', 'strike'],
           [{ 'color': [] }, { 'background': [] }, { 'size': [false, 'small', 'large', 'huge'] }, { 'font': [] }],

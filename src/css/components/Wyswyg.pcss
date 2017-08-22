@@ -6,10 +6,15 @@
 /* ============================== */
 .Wyswyg {
   display: block;
+  background-color: #fff;
+  border: 1px solid var(--color-bg-tertiary);
 }
 
 .Wyswyg__editor {
-  border: 1px solid var(--color-bg-tertiaryLight);
+}
+
+.Wyswyg__editor.ql-container.ql-snow {
+  border: none;
 }
 
 /* ============================== */
@@ -17,8 +22,9 @@
 /* ============================== */
 .Wyswyg__toolbar {
   @apply --layout-center-start;
+  flex-wrap: wrap;
   padding: 8px;
-  border: 2px solid red;
+  border-bottom: 1px solid var(--color-bg-tertiary);
 }
 
 .Wyswyg__tool {
@@ -49,6 +55,20 @@
   bottom: 0;
   font-size: 10px;
   font-weight: bold;
+}
+
+/* ============================== */
+/* format image specific */
+/* ============================== */
+.Wyswyg__image .ql-stroke {
+  fill: none;
+}
+
+/* ============================== */
+/* format video specific */
+/* ============================== */
+.Wyswyg__video .ql-stroke {
+  fill: none;
 }
 
 /* ============================== */

@@ -1,7 +1,7 @@
 dmc-wyswyg.Wyswyg
   .Wyswyg__toolbar
-    dmc-wyswyg-tool-image
-    dmc-wyswyg-tool-video
+    dmc-wyswyg-tool-image(if="{ !!quill }" quill="{ quill }")
+    dmc-wyswyg-tool-video(if="{ !!quill }" quill="{ quill }")
     dmc-wyswyg-tool-header(if="{ !!quill }" quill="{ quill }" level="{ 1 }")
     dmc-wyswyg-tool-header(if="{ !!quill }" quill="{ quill }" level="{ 2 }")
     dmc-wyswyg-tool-header(if="{ !!quill }" quill="{ quill }" level="{ 3 }")
@@ -28,9 +28,11 @@ dmc-wyswyg.Wyswyg
     import './tool-codeblock.tag';
     import './tool-direction.tag';
     import './tool-header.tag';
+    import './tool-image.tag';
     import './tool-indent-left.tag';
     import './tool-indent-right.tag';
     import './tool-list-bullet.tag';
     import './tool-list-ordered.tag';
+    import './tool-video.tag';
     import script from './index';
     this.external(script);
