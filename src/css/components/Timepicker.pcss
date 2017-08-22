@@ -1,0 +1,53 @@
+.Timepicker {
+  display: inline-block;
+  position: relative;
+}
+
+.Timepicker__label {
+  padding-left: 8px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  border-left: 2px solid var(--color-bg-primary);
+}
+
+.Timepicker__input {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  background-color: var(--color-basic-white);
+  border: 1px solid var(--color-basic-gray);
+  border-radius: 3px;
+}
+
+.Timepicker__body {
+  display: grid;
+  position: absolute;
+  top: 22px;
+  grid-template-rows: 20px 1fr 20px;
+  grid-template-rows: 50px 1fr;
+}
+
+.Timepicker__input--modifier {
+  grid-row: 1;
+  grid-column: 1 / span 3;
+}
+
+.Timepicker__list{
+  background-color: #fff;
+}
+
+.Timepicker__list--left {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.Timepicker__list--center{
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.Timepicker__list--right{
+  grid-row:2;
+  grid-column: 3;
+}
