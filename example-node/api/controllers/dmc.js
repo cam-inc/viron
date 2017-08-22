@@ -14,18 +14,22 @@ const genComponent = (name, method, path, style, pagination, options) => {
     },
     style,
     pagination: !!pagination,
-    options: options || {
+    options: options || [{
       key: 'key',
       value: 'value',
-    },
+    }],
   };
 };
 
 const genTableComponent = (name, method, path, query, labels) => {
-  return Object.assign({
-    query,
-    table_labels: labels,
-  }, genComponent(name, method, path, constant.DMC_STYLE_TABLE, true));
+  const component = genComponent(name, method, path, constant.DMC_STYLE_TABLE, true);
+  if (query) {
+    component.query = query;
+  }
+  if (labels) {
+    component.table_labels = labels;
+  }
+  return component;
 };
 
 const genPage = (section, group, id, name, components) => {
