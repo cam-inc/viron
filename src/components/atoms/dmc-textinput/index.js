@@ -1,4 +1,8 @@
 export default function() {
+  this.on('updated', () => {
+    this.refs.input.value = this.opts.text;
+  });
+  
   this.handleTap = () => {
     this.refs.form.focus();
   };
