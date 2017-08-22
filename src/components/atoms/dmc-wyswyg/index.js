@@ -7,31 +7,8 @@ export default function() {
   // quillインスタンス。
   this.quill = null;
 
-  const blotOptions = this.opts.options || {
-    bold: { className: 'Wsywyg__bold', tagName: 'span' },
-    italic: { className: 'Wyswyg__italic', tagName: 'i' },
-    underline: { className: 'Wyswyg__underline', tagName: 'u' },
-    strike: { className: 'Wyswyg__strike', tagName: 's' },
-    color: { type: 'class', keyName: 'Wyswyg__color' },
-    background: { type: 'class', keyName: 'Wyswyg__background' },
-    font: { type: 'class', keyName: 'Wyswyg__font', whitelist: ['serif', 'monospace'] },
-    size: { type: 'class', keyName: 'Wyswyg__size', whitelist: [false, '10px', '12px', '14px', '16px', '18px', '20px'] },
-    link: { className: 'Wyswyg__link', tagName: 'a' },
-    code: { className: 'Wyswyg__code', tagName: 'code' },
-    script: { className: 'Wyswyg__script' },
-    image: { className: 'Wyswyg__image', tagName: 'img' },
-    video: { className: 'Wyswyg__video' },
-    header: { className: 'Wyswyg__header' },
-    list: { className: 'Wyswyg__list' },
-    'list-item': { className: 'Wyswyg__listItem' },
-    indent: { keyName: 'Wyswyg__indent' },
-    align: { type: 'class', keyName: 'Wyswyg__align' },
-    direction: { type: 'class', keyName: 'Wyswyg__direction' },
-    blockquote: { className: 'Wyswyg__blockquote', tagName: 'blockquote' },
-    'code-block': { className: 'Wyswyg__codeblock', tagName: 'pre' }
-  };
   // Blotを変更します。
-  forOwn(blotOptions, (value, key) => {
+  forOwn(this.opts.blotoptions || {}, (value, key) => {
     customizeBlot(key, ObjectAssign({}, value));
   });
 
@@ -44,7 +21,7 @@ export default function() {
       // @see: https://quilljs.com/docs/configuration/#bounds
       bounds: this.refs.editor,
       // @see: https://quilljs.com/docs/configuration/#debug
-      debug: true,
+      //debug: true,
       // @see: https://quilljs.com/docs/configuration/#formats
       // @see https://quilljs.com/docs/formats/
       formats: [
@@ -78,8 +55,6 @@ export default function() {
       // @see: https://quilljs.com/docs/configuration/#modules
       modules: {
         toolbar: [
-          ['video'],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
           ['bold', 'italic', 'underline', 'strike'],
           [{ 'color': [] }, { 'background': [] }, { 'size': [false, 'small', 'large', 'huge'] }, { 'font': [] }],
           ['link'],
@@ -96,14 +71,14 @@ export default function() {
       // @see: https://quilljs.com/docs/configuration/#strict
       strict: true,
       // @see: https://quilljs.com/docs/configuration/#theme
-      theme: 'snow'
+      theme: 'bubble'
     };
     return options;
   };
 
   this.on('mount', () => {
     this.quill = new Quill(this.refs.editor, getOption());
-    // TODO:
+    // TODO: 後で消すこと。
     window.quill = this.quill;
     this.quill.on(Quill.events.TEXT_CHANGE, this.handleTextChange);
     this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
