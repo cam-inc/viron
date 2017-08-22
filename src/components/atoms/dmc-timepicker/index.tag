@@ -1,29 +1,14 @@
 dmc-timepicker.Timepicker
   .Timepicker__label(if="{ !!opts.label }") { opts.label }
-  input.Timepicker__input(onClick="{ handleInputTime }")
+  input.Timepicker__input(onClick="{ handleInputTime }" value="")
   .Timepicker__body(if="{ this.isShowTimepicker }")
-    input.Timepicker__input.Timepicker__input--modifier(onClick="{ handleInputTime }")
+    input.Timepicker__input.Timepicker__input--modifier(value="")
     ul.Timepicker__list.Timepicker__list--left
-      li 00
-      li 01
-      li 02
-      li 03
-      li 04
-      li 05
+      li.Timepicker__listItem(each="{ generateHours() }" value="{ hour }") { hour }
     ul.Timepicker__list.timepicker__list--center
-      li 00
-      li 01
-      li 02
-      li 03
-      li 04
-      li 05
+      li.Timepicker__listItem(each="{ generateMinutes() }" value="{ minute }") { minute }
     ul.Timepicker__list.timepicker__list--right
-      li 00
-      li 01
-      li 02
-      li 03
-      li 04
-      li 05
+      li.Timepicker__listItem(each="{ generateSeconds() }" value="{ second }") { second }
 
     script.
       import script from './index';
