@@ -8,7 +8,7 @@ const context = shared.context;
  *
  * @returns {Promise.<TResult>}
  */
-const list = (req, res) => {
+const list = (req, res, next) => {
   const dmclib = context.getDmcLib();
   const pager = dmclib.pager;
   const storeHelper = dmclib.stores.helper;
@@ -27,6 +27,7 @@ const list = (req, res) => {
       pager.setResHeader(res, limit, offset, data.count);
       res.json(data.list);
     })
+    .catch(next)
   ;
 };
 
@@ -37,7 +38,7 @@ const list = (req, res) => {
  *
  * @returns {Promise.<TResult>}
  */
-const create = (req, res) => {
+const create = (req, res, next) => {
   const dmclib = context.getDmcLib();
   const storeHelper = dmclib.stores.helper;
   const store = context.getStoreMain();
@@ -46,6 +47,7 @@ const create = (req, res) => {
     .then(data => {
       res.json(data);
     })
+    .catch(next)
   ;
 };
 
