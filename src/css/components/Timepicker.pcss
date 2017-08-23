@@ -10,44 +10,66 @@
   border-left: 2px solid var(--color-bg-primary);
 }
 
-.Timepicker__input {
+.Partialtime {
+  display: inline-block;
+  position: relative;
+}
+
+.Partialtime__input {
   display: block;
   width: 100%;
   padding: 14px;
   font-size: 18px;
   background-color: var(--color-basic-white);
   border: 1px solid var(--color-basic-gray);
-  border-radius: 3px;
 }
 
-.Timepicker__body {
+.Partialtime__body {
   display: grid;
   position: absolute;
-  top: 22px;
+  background-color: #fff;
+  top: 0px;
   grid-template-rows: 20px 1fr 20px;
-  grid-template-rows: 50px 1fr;
+  grid-template-rows: 50px 100px;
 }
 
-.Timepicker__input--modifier {
+.Partialtime__input--modifier {
   grid-row: 1;
   grid-column: 1 / span 3;
 }
 
-.Timepicker__list{
-  background-color: #fff;
+.Partialtime__list {
+  overflow:scroll;
+  border-right: 1px solid var(--color-basic-gray);
+  border-top: 1px solid var(--color-basic-gray);
 }
 
-.Timepicker__list--left {
+.Partialtime__list--left {
   grid-row: 2;
   grid-column: 1;
+  border-left: 1px solid var(--color-basic-gray);
 }
 
-.Timepicker__list--center{
+.Partialtime__list--center {
   grid-row: 2;
   grid-column: 2;
 }
 
-.Timepicker__list--right{
+.Partialtime__list--right {
   grid-row:2;
   grid-column: 3;
+}
+
+.Partialtime__listItem {
+  font-size: 1rem;
+  padding-left: 5px;
+  cursor: pointer;
+}
+
+.Partialtime__listItem:hover {
+  background-color: var(--color-basic-lightPurple);
+}
+
+.Partialtime__listItem--selected {
+  background-color: var(--color-basic-lightGray);
 }
