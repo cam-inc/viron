@@ -12,7 +12,7 @@ export default function() {
     const MAX_DISPLAY_HOURS = 24;
     const hours = [];
     times(MAX_DISPLAY_HOURS, (i) => {
-      r = ("0" + i).slice(-2);
+      let r = ("0" + i).slice(-2);
       hours[i] = {
         hour: r
       }
@@ -24,7 +24,7 @@ export default function() {
     const MAX_DISPLAY_MINUTES = 60;
     const minutes = [];
     times(MAX_DISPLAY_MINUTES, (i) => {
-      r = ("0" + i).slice(-2);
+      let r = ("0" + i).slice(-2);
       minutes[i] = {
         minute: r
       }
@@ -36,7 +36,7 @@ export default function() {
     const MAX_DISPLAY_SECONDS = 60;
     const seconds = [];
     times(MAX_DISPLAY_SECONDS, (i) => {
-      r = ("0" + i).slice(-2);
+      let r = ("0" + i).slice(-2);
       seconds[i] = {
         second: r
       }
