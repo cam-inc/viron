@@ -12,13 +12,13 @@ export default function() {
   // カラーコード切り替えボタンのときの表示
   this.isColorChangeButtonActive = false;
   // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
-  this.selectableColorCode = (!isUndefined(this.opts.selectablecolorCode)) ? this.opts.selectablecolorCode : {HEX: true, RGBA: true};
+  let selectableColorCode = (!isUndefined(this.opts.selectablecolorcode)) ? this.opts.selectablecolorcode : {HEX: true, RGBA: true};
   // カラーデータを取得する。親から取得できない場合、空を代入する。
-  this.color = (!isUndefined(this.opts.color)) ? this.opts.color : {format: this.selectableColorCode[COLOR_CODE.HEX], value: ''};
+  this.color = (!isUndefined(this.opts.color)) ? this.opts.color : {format: selectableColorCode[COLOR_CODE.HEX], value: ''};
 
   this.on('update', () => {
-    this.selectableColorCode = (!isUndefined(this.opts.selectablecolorCode)) ? this.opts.selectablecolorCode : {HEX: true, RGBA: true};
-    this.color = (!isUndefined(this.opts.color)) ? this.opts.color : {format: this.selectableColorCode[COLOR_CODE.HEX], value: ''};
+    selectableColorCode = (!isUndefined(this.opts.selectablecolorcode)) ? this.opts.selectablecolorcode : {HEX: true, RGBA: true};
+    this.color = (!isUndefined(this.opts.color)) ? this.opts.color : {format: selectableColorCode[COLOR_CODE.HEX], value: ''};
   }).on('updated', () => {
     if (this.color.format === COLOR_CODE.HEX) {
       if (this.opts.isshown) {
@@ -38,20 +38,22 @@ export default function() {
 
     // HEX -> RGBAへ変換する
     if (this.color.format === COLOR_CODE.HEX) {
-      if (this.selectableColorCode[COLOR_CODE.RGBA]) {
+      if (selectableColorCode[COLOR_CODE.RGBA]) {
         color.format = COLOR_CODE.RGBA;
         color.value = convertColor(COLOR_CODE.HEX, this.color.value, COLOR_CODE.RGBA);
       } else {
+        color.format = COLOR_CODE.HEX;
         color.value = this.color.value;
       }
     }
 
     // RGBA -> HEXへ変換する
     if (this.color.format === COLOR_CODE.RGBA) {
-      if (this.selectableColorCode[COLOR_CODE.HEX]) {
+      if (selectableColorCode[COLOR_CODE.HEX]) {
         color.format = COLOR_CODE.HEX;
         color.value = convertColor(COLOR_CODE.RGBA, this.color.value, COLOR_CODE.HEX);
       } else {
+        color.format = COLOR_CODE.RGBA;
         color.value = this.color.value;
       }
     }
@@ -94,6 +96,9 @@ export default function() {
     this.opts.oncolorchange(color);
   };
 
+  /**
+   * Red入力値のイベントリスナーハンドラー
+   */
   this.handleInputRgbaRedInput = value => {
     const rgbaArray = this.opts.color.value.split(',');
     rgbaArray[0] = value;
@@ -106,6 +111,9 @@ export default function() {
     this.opts.oncolorchange(color);
   };
 
+  /**
+   * Green入力値のイベントリスナーハンドラー
+   */
   this.handleInputRgbaGreenInput = value => {
     const rgbaArray = this.opts.color.value.split(',');
     rgbaArray[1] = value;
@@ -118,6 +126,9 @@ export default function() {
     this.opts.oncolorchange(color);
   };
 
+  /**
+   * Blue入力値のイベントリスナーハンドラー
+   */
   this.handleInputRgbaBlueInput = value => {
     const rgbaArray = this.opts.color.value.split(',');
     rgbaArray[2] = value;
@@ -130,6 +141,9 @@ export default function() {
     this.opts.oncolorchange(color);
   };
 
+  /**
+   * Alpha入力値のイベントリスナーハンドラー
+   */
   this.handleInputAlphaInput = value => {
     const rgbaArray = this.opts.color.value.split(',');
     rgbaArray[3] = new BigNumber(value).div(100).toString();
@@ -162,10 +176,19 @@ export default function() {
     return style;
   };
 
+  /**
+   * 表示用のアルファ値を返却します。
+   * @return {String}
+   */
   this.generateAlphaValue = () => {
+    // 少数の値を変換しているため、ライブラリを使用する
     return new BigNumber(this.color.value.split(',')[3]).times(100).round(2).toString();
   };
 
+  /**
+   * HEXの値が正しくなるよう変更をかけます
+   * @param {*} value 
+   */
   const normalizeHexValue = value => {
     if (isNull(value)) {
       return value;
@@ -212,7 +235,7 @@ export default function() {
   };
 
   /**
-   * シャープがついていない場合、シャープを頭につける。
+   * シャープがついていない場合、シャープを頭につけます。
    * @param {String} value 
    * @return {String}
    */
