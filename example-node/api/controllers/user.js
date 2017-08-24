@@ -44,7 +44,7 @@ const list = (req, res) => {
  *
  * @returns {Promise.<TResult>}
  */
-const create = (req, res) => {
+const create = (req, res, next) => {
   const dmclib = context.getDmcLib();
   const storeHelper = dmclib.stores.helper;
   const store = context.getStoreMain();
@@ -53,6 +53,7 @@ const create = (req, res) => {
     .then(data => {
       res.json(data);
     })
+    .catch(next)
   ;
 };
 
@@ -63,7 +64,7 @@ const create = (req, res) => {
  *
  * @returns {Promise.<TResult>}
  */
-const remove = (req, res) => {
+const remove = (req, res, next) => {
   const dmclib = context.getDmcLib();
   const storeHelper = dmclib.stores.helper;
   const store = context.getStoreMain();
@@ -78,6 +79,7 @@ const remove = (req, res) => {
     .then(() => {
       res.status(204).end();
     })
+    .catch(next)
   ;
 };
 
@@ -88,7 +90,7 @@ const remove = (req, res) => {
  *
  * @returns {Promise.<TResult>}
  */
-const show = (req, res) => {
+const show = (req, res, next) => {
   const dmclib = context.getDmcLib();
   const storeHelper = dmclib.stores.helper;
   const store = context.getStoreMain();
@@ -103,6 +105,7 @@ const show = (req, res) => {
     .then(data => {
       res.json(data);
     })
+    .catch(next)
   ;
 };
 
@@ -113,7 +116,7 @@ const show = (req, res) => {
  *
  * @returns {Promise.<TResult>}
  */
-const update = (req, res) => {
+const update = (req, res, next) => {
   const dmclib = context.getDmcLib();
   const storeHelper = dmclib.stores.helper;
   const store = context.getStoreMain();
@@ -125,6 +128,7 @@ const update = (req, res) => {
     .then(data => {
       res.json(data);
     })
+    .catch(next)
   ;
 };
 
@@ -161,7 +165,7 @@ const upload = (req, res) => {
  *
  * @returns {Promsie.<TResult>}
  */
-const download = (req, res) => {
+const download = (req, res, next) => {
   const dmclib = context.getDmcLib();
   const storeHelper = dmclib.stores.helper;
   const store = context.getStoreMain();
@@ -198,6 +202,7 @@ const download = (req, res) => {
       res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
       res.send(data);
     })
+    .catch(next)
   ;
 };
 
