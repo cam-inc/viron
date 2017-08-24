@@ -5,6 +5,7 @@ import hasOwn from 'mout/object/hasOwn';
 import ObjectAssign from 'object-assign';
 
 const UI_TEXTINPUT = 'textinput';
+const UI_TEXTAREA = 'textarea';
 const UI_NUMBERINPUT = 'numberinput';
 const UI_CHECKBOX = 'checkbox';
 const UI_SELECT = 'select';
@@ -63,6 +64,8 @@ export default function() {
       switch (format) {
       case 'date-time':
         return UI_DATEPICKER;
+      case 'multiline':
+        return UI_TEXTAREA;
       case 'wyswyg':
         return UI_WYSWYG;
       default:
@@ -96,6 +99,14 @@ export default function() {
 
   // textinput値が変更された時の処理。
   this.handleTextinputChange = newText => {
+    if (!newText) {
+      newText = undefined;
+    }
+    this.opts.onchange(newText);
+  };
+
+  // textarea値が変更された時の処理。
+  this.handleTextareaChange = newText => {
     if (!newText) {
       newText = undefined;
     }

@@ -2,6 +2,8 @@ dmc-parameter-form
   .ParameterForm__body
     virtual(if="{ uiType === 'textinput' }")
       dmc-textinput(text="{ opts.val }" onChange="{ handleTextinputChange }")
+    virtual(if="{ uiType === 'textarea' }")
+      dmc-textarea(text="{ opts.val }" onChange="{ handleTextareaChange }")
     virtual(if="{ uiType === 'numberinput' }")
       dmc-numberinput(number="{ opts.val }" onChange="{ handleNumberinputChange }")
     virtual(if="{ uiType === 'checkbox' }")
@@ -19,6 +21,7 @@ dmc-parameter-form
     import '../../atoms/dmc-checkbox/index.tag';
     import '../../atoms/dmc-numberinput/index.tag';
     import '../../atoms/dmc-select/index.tag';
+    import '../../atoms/dmc-textarea/index.tag';
     import '../../atoms/dmc-textinput/index.tag';
     import '../../atoms/dmc-uploader/index.tag';
     import '../../atoms/dmc-wyswyg/index.tag';
