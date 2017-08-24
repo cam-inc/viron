@@ -67,12 +67,13 @@ export default function() {
       case 'date-time':
         return UI_DATEPICKER;
       case 'multiline':
-        return UI_HTML;
         return UI_TEXTAREA;
       case 'wyswyg':
         return UI_WYSWYG;
       case 'pug':
         return UI_PUG;
+      case 'html':
+        return UI_HTML;
       default:
         return UI_TEXTINPUT;
       }
