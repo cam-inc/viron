@@ -1,6 +1,7 @@
 dmc-timepicker.Timepicker
-  .Timepicker__label(if="{ !!opts.label }") { opts.label }
-  dmc-timepicker-partial
+    .Timepicker__label(if="{ !!opts.label }") { opts.label }
+    .Timepicker__input(onClick="{ handleInputTime }") { fullTime }
+    dmc-timepicker-partial(if="{ isShowTimepicker }" partialtime="{ partialTime }")
 
     script.
       import '../../atoms/dmc-timepicker/partial.tag';
