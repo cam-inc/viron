@@ -12,16 +12,18 @@ dmc-colorpicker.Colorpicker
           .Colorpicker__opacitySlider
         .Colorpicker__colorcodeOperation
           .Colorpicker__inputContainer
-            virtual(if="{ displayColorcode === 'HEX' }")
-              input.Colorpicker__inputSingle(onInput="{ handleInputSingleInput }" ref="inputSingle" value="{ color.value }")
-            virtual(if="{ displayColorcode !== 'HEX' }")
-              virtual(if="{ displayColorcode !== 'HEX' }" each="{ char in displayColorcode.split('') }")
-                input.Colorpicker__inputMultiple
+            virtual(if="{ color.format === 'HEX' }")
+              input.Colorpicker__inputHex(onInput="{ handleInputHexInput }" ref="inputHex" value="{ color.value }")
+            virtual(if="{ color.format === 'RGBA' }")
+              dmc-numberinput(number="{ color.value.split(',')[0] }" max="255" min="0" onChange="{ handleInputRgbaRedInput }")
+              dmc-numberinput(number="{ color.value.split(',')[1] }" max="255" min="0" onChange="{ handleInputRgbaGreenInput }")
+              dmc-numberinput(number="{ color.value.split(',')[2] }" max="255" min="0" onChange="{ handleInputRgbaBlueInput }")
+              dmc-numberinput(number="{ generateAlphaValue() }" max="100" min="0" onChange="{ handleInputAlphaInput }")
           .Colorpicker__colorcodeContainer
-            virtual(if="{ displayColorcode === 'HEX' }")
-              .Colorpicker__colorcodeSingle {displayColorcode}
-            virtual(if="{ displayColorcode !== 'HEX' }" each="{ char in displayColorcode.split('') }")
-              .Colorpicker__colorcodeMultiple {char}
+            virtual(if="{ color.format === 'HEX' }")
+              .Colorpicker__colorcodeHex {color.format}
+            virtual(if="{ color.format === 'RGBA' }" each="{ char in color.format.split('') }")
+              .Colorpicker__colorcodeRgba {char}
           .Colorpicker__colorChangeContainer
             .Colorpicker__colorChangeButton(class="{ Colorpicker__colorChangeButton--hover: isColorChangeButtonActive }" mouseDown="{ handleColorChangeButtonTap }" ref="touch" touchStart="{ handleColorChangeButtonTouchStart }" touchEnd="{ handleColorChangeButtonTouchEnd }" mouseOver="{ handleColorChangeButtonMouseOver }" mouseOut="{ handleColorChangeButtonMouseOut }")
               dmc-icon(type="caretUp")
@@ -29,5 +31,6 @@ dmc-colorpicker.Colorpicker
       
   script.
     import '../dmc-icon/index.tag';
+    import '../dmc-numberinput/index.tag';
     import script from './index';
     this.external(script);
