@@ -1,9 +1,11 @@
-import beautifier from 'js-beautify';
-
-const htmlBeautifier = beautifier.html;
+import prettifier from 'pretty';
 
 export default function() {
   this.getBeautifiedHtml = () => {
-    return htmlBeautifier(this.opts.data);
+    const data = this.opts.data;
+    if (!data) {
+      return '-';
+    }
+    return prettifier(data);
   };
 }

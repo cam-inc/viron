@@ -1,0 +1,54 @@
+.Html {
+  display: block;
+}
+
+.Html__tabs {
+  @apply --layout-center-start;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--color-bg-tertiary);
+}
+
+.Html__tab {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 2px solid var(--color-bg-tertiary);
+}
+
+.Html__tab:hover,
+.Html__tab.hover,
+.Html__tab--selected {
+  color: var(--color-basic-skyblue);
+  border-color: var(--color-basic-skyblue);
+}
+
+.Html__tabs .Html__tab {
+  margin-right: 8px;
+}
+
+.Html__tabs .Html__tab:last-child {
+  margin-right: 0;
+}
+
+.Html__editor .Textarea {
+  display: block;
+}
+
+.Html__editor .Textarea__input {
+  min-height: 400px;
+}
+
+.Html__message {
+  padding: 8px;
+  margin-bottom: 8px;
+  overflow: scroll;
+  background-color: #fff;
+  border-left: 2px solid #fff;
+}
+
+.Html__message--success {
+  border-left-color: var(--color-basic-skyblue);
+}
+
+.Html__message--failed {
+  border-left-color: var(--color-basic-red);
+}

@@ -6,6 +6,7 @@ import ObjectAssign from 'object-assign';
 
 const UI_TEXTINPUT = 'textinput';
 const UI_TEXTAREA = 'textarea';
+const UI_HTML = 'html';
 const UI_NUMBERINPUT = 'numberinput';
 const UI_CHECKBOX = 'checkbox';
 const UI_SELECT = 'select';
@@ -66,6 +67,7 @@ export default function() {
       case 'date-time':
         return UI_DATEPICKER;
       case 'multiline':
+        return UI_HTML;
         return UI_TEXTAREA;
       case 'wyswyg':
         return UI_WYSWYG;
@@ -150,6 +152,14 @@ export default function() {
 
   // pug値が変更された時の処理。
   this.handlePugChange = newText => {
+    if (!newText) {
+      newText = undefined;
+    }
+    this.opts.onchange(newText);
+  };
+
+  // html値が変更された時の処理。
+  this.handleHtmlChange = newText => {
     if (!newText) {
       newText = undefined;
     }

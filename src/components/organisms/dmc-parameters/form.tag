@@ -16,11 +16,14 @@ dmc-parameter-form
       dmc-wyswyg(blotOptions="{ blotOptions }" initialInnerHtml="{ opts.val }" onTextChange="{ handleWyswygChange }")
     virtual(if="{ uiType === 'pug' }")
       dmc-pug(text="{ opts.val }" onChange="{ handlePugChange }")
+    virtual(if="{ uiType === 'html' }")
+      dmc-html(text="{ opts.val }" onChange="{ handleHtmlChange }")
     virtual(if="{ uiType === 'null' }")
       div TODO: null
 
   script.
     import '../../atoms/dmc-checkbox/index.tag';
+    import '../../atoms/dmc-html/index.tag';
     import '../../atoms/dmc-numberinput/index.tag';
     import '../../atoms/dmc-pug/index.tag';
     import '../../atoms/dmc-select/index.tag';
