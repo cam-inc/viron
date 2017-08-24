@@ -21,13 +21,9 @@ export default function() {
     this.color = (!isUndefined(this.opts.color)) ? this.opts.color : {format: this.selectableColorCode[COLOR_CODE.HEX], value: ''};
   }).on('updated', () => {
     if (this.color.format === COLOR_CODE.HEX) {
-      this.refs.inputHex.value = this.color.value;
-    }
-    if (this.color.format === COLOR_CODE.RGBA) {
-      this.refs.inputRgbaRed = this.color.value.split(',')[0];
-      this.refs.inputRgbaGreen = this.color.value.split(',')[1];
-      this.refs.inputRgbaBlue = this.color.value.split(',')[2];
-      this.refs.inputRgbaAlpha = this.color.value.split(',')[3];
+      if (this.opts.isshown) {
+        this.refs.inputHex.value = this.color.value;
+      }
     }
   });
 
