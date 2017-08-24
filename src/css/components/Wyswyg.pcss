@@ -1,0 +1,125 @@
+@import "quill/dist/quill.core.css";
+@import "WyswygBubble.pcss";
+
+/* ============================== */
+/* Base */
+/* ============================== */
+.Wyswyg {
+  display: block;
+  background-color: #fff;
+  border: 1px solid var(--color-bg-tertiary);
+}
+
+.Wyswyg__editor {
+}
+
+.Wyswyg__editor.ql-container.ql-snow {
+  border: none;
+}
+
+/* ============================== */
+/* 独自toolbar */
+/* ============================== */
+.Wyswyg__toolbar {
+  @apply --layout-center-start;
+  flex-wrap: wrap;
+  padding: 8px;
+  border-bottom: 1px solid var(--color-bg-tertiary);
+}
+
+.Wyswyg__tool {
+}
+
+.Wyswyg__toolbar > .Wyswyg__tool {
+  margin-right: 8px;
+}
+
+.Wyswyg__toolbar > .Wyswyg__tool:last-child {
+  margin-right: 0;
+}
+
+.Wyswyg__tool svg {
+  height: 100%;
+}
+
+/* ============================== */
+/* format header specific */
+/* ============================== */
+.Wyswyg__header .Wyswyg__toolInner {
+  position: relative;
+}
+
+.Wyswyg__headerLevel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* ============================== */
+/* format image specific */
+/* ============================== */
+.Wyswyg__image .ql-stroke {
+  fill: none;
+}
+
+/* ============================== */
+/* format video specific */
+/* ============================== */
+.Wyswyg__video .ql-stroke {
+  fill: none;
+}
+
+/* ============================== */
+/* from quill.snow.css */
+/* ============================== */
+.Wyswyg__toolbar .Wyswyg__tool {
+  display: inline-block;
+  width: 28px;
+  height: 24px;
+  padding: 3px 5px;
+  color: #444;
+  cursor: pointer;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool svg {
+  height: 100%;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool:hover,
+.Wyswyg__toolbar .Wyswyg__tool:focus,
+.Wyswyg__toolbar .Wyswyg__tool--active {
+  color: #06c;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool .ql-fill {
+  fill: #444;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool:hover .ql-fill,
+.Wyswyg__toolbar .Wyswyg__tool:focus .ql-fill,
+.Wyswyg__toolbar .Wyswyg__tool--active .ql-fill {
+  fill: #06c;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool .ql-stroke {
+  stroke: #444;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool:hover .ql-stroke,
+.Wyswyg__toolbar .Wyswyg__tool:focus .ql-stroke,
+.Wyswyg__toolbar .Wyswyg__tool--active .ql-stroke {
+  stroke: #06c;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool .ql-even {
+  fill-rule: evenodd;
+}
+
+.Wyswyg__toolbar .Wyswyg__tool .ql-thin {
+  stroke-width: 1;
+}

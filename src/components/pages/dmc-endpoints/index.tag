@@ -20,6 +20,7 @@ dmc-endpoints.Page.EndpointsPage
       )
 
   script.
+    import '../../atoms/dmc-wyswyg/index.tag';
     import '../../atoms/dmc-icon/index.tag';
     import './endpoint.tag';
     import script from './index';
