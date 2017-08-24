@@ -136,4 +136,28 @@ export default function() {
         error: err
       }));
   };
+
+  this.handleEndpointsFileChange = file => {
+    if (!file) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => new Promise((resolve, reject) => {
+        const fileReader = new window.FileReader();
+        fileReader.onload = e => {
+          const endpoints = JSON.parse(e.target.result);
+          resolve(endpoints);
+        };
+        fileReader.onerror = err => {
+          reject(err);
+        };
+        fileReader.readAsText(file);
+      }))
+      .then(endpoints => store.action(actions.ENDPOINTS_MERGE_ALL, endpoints))
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+
+  };
 }

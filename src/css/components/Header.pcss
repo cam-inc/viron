@@ -14,8 +14,7 @@
   @apply --layout-center-center;
 }
 
-.Header__menuButton,
-.Header__homeButton {
+.Header__button {
   @apply --layout-between-center;
   width: 24px;
   height: 24px;
@@ -24,7 +23,14 @@
   cursor: pointer;
 }
 
-.Header__menuButton.hover,
-.Header__homeButton.hover {
+.Header__button.hover {
   color: var(--color-basic-gray);
+}
+
+.Header__group .Header__button {
+  margin-right: 8px;
+}
+
+.Header__group .Header__button:last-child {
+  margin-right: 0;
 }
