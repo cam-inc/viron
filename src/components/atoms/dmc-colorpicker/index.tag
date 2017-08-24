@@ -8,22 +8,27 @@ dmc-colorpicker.Colorpicker
         .Colorpicker__sliderOperation
           .Colorpicker__circleContainer
             .Colorpicker__circle(style="background-color: { generateColorStyle() }")
-          .Colorpicker__hueSlider
-          .Colorpicker__opacitySlider
+          .Colorpicker__sliderContainer
+            .Colorpicker__hueSlider a
+            .Colorpicker__opacitySlider a
         .Colorpicker__colorcodeOperation
-          .Colorpicker__inputContainer
-            virtual(if="{ color.format === 'HEX' }")
+          virtual(if="{ color.format === 'HEX' }")
+            .Colorpicker__inputContainer
               input.Colorpicker__inputHex(onInput="{ handleInputHexInput }" ref="inputHex" value="{ color.value }")
-            virtual(if="{ color.format === 'RGBA' }")
-              dmc-numberinput(number="{ color.value.split(',')[0] }" max="255" min="0" onChange="{ handleInputRgbaRedInput }")
-              dmc-numberinput(number="{ color.value.split(',')[1] }" max="255" min="0" onChange="{ handleInputRgbaGreenInput }")
-              dmc-numberinput(number="{ color.value.split(',')[2] }" max="255" min="0" onChange="{ handleInputRgbaBlueInput }")
-              dmc-numberinput(number="{ generateAlphaValue() }" max="100" min="0" onChange="{ handleInputAlphaInput }")
-          .Colorpicker__colorcodeContainer
-            virtual(if="{ color.format === 'HEX' }")
               .Colorpicker__colorcodeHex {color.format}
-            virtual(if="{ color.format === 'RGBA' }" each="{ char in color.format.split('') }")
-              .Colorpicker__colorcodeRgba {char}
+          virtual(if="{ color.format === 'RGBA' }")
+            .Colorpicker__inputContainer
+              dmc-numberinput(number="{ color.value.split(',')[0] }" max="255" min="0" onChange="{ handleInputRgbaRedInput }")
+              .Colorpicker__colorcodeRgba r
+            .Colorpicker__inputContainer
+              dmc-numberinput(number="{ color.value.split(',')[1] }" max="255" min="0" onChange="{ handleInputRgbaGreenInput }")
+              .Colorpicker__colorcodeRgba g
+            .Colorpicker__inputContainer
+              dmc-numberinput(number="{ color.value.split(',')[2] }" max="255" min="0" onChange="{ handleInputRgbaBlueInput }")
+              .Colorpicker__colorcodeRgba b
+            .Colorpicker__inputContainer
+              dmc-numberinput(number="{ generateAlphaValue() }" max="100" min="0" onChange="{ handleInputAlphaInput }")
+              .Colorpicker__colorcodeRgba a
           .Colorpicker__colorChangeContainer
             .Colorpicker__colorChangeButton(class="{ Colorpicker__colorChangeButton--hover: isColorChangeButtonActive }" mouseDown="{ handleColorChangeButtonTap }" ref="touch" touchStart="{ handleColorChangeButtonTouchStart }" touchEnd="{ handleColorChangeButtonTouchEnd }" mouseOver="{ handleColorChangeButtonMouseOver }" mouseOut="{ handleColorChangeButtonMouseOut }")
               dmc-icon(type="caretUp")
