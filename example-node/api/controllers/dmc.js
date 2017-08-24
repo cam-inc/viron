@@ -75,7 +75,7 @@ const show = (req, res) => {
     name: `${title} - ${env}`,
     color: 'white',
     thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
-    tags: ['develop', 'dmc', 'example'],
+    tags: [env, 'dmc', 'example'],
     pages: [].concat(
       // QuickView
       genSection(constant.DMC_SECTION_DASHBOARD, [
