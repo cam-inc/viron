@@ -1,5 +1,4 @@
 dmc-endpoints.Page.EndpointsPage
-  dmc-wyswyg
   .EndpointsPage__list(ref="list")
     .EndpointsPage__addCard(ref="touch" onTap="handleEndpointAddTap")
       dmc-icon(type="plus")
