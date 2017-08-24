@@ -12,6 +12,7 @@ const UI_SELECT = 'select';
 const UI_DATEPICKER = 'datepicker';
 const UI_UPLOADER = 'uploader';
 const UI_WYSWYG = 'wyswyg';
+const UI_PUG = 'pug';
 const UI_NULL = 'null';
 
 export default function() {
@@ -68,6 +69,8 @@ export default function() {
         return UI_TEXTAREA;
       case 'wyswyg':
         return UI_WYSWYG;
+      case 'pug':
+        return UI_PUG;
       default:
         return UI_TEXTINPUT;
       }
@@ -143,5 +146,13 @@ export default function() {
   // wyswyg値が変更された時の処理。
   this.handleWyswygChange = innerHtml => {
     this.opts.onchange(innerHtml);
+  };
+
+  // pug値が変更された時の処理。
+  this.handlePugChange = newText => {
+    if (!newText) {
+      newText = undefined;
+    }
+    this.opts.onchange(newText);
   };
 }
