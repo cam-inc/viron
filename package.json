@@ -49,8 +49,12 @@
     "lint:js": "eslint src",
     "lint:css": "stylelint src/css/**/*.pcss",
     "spec": "mocha",
-    "deploy": "gh-pages -d dist",
-    "release": "run-s build deploy",
+    "deploy:prd": "gh-pages -d dist --add",
+    "deploy:stg": "gh-pages -d dist --add --dest stg",
+    "deploy:dev": "gh-pages -d dist --add --dest dev",
+    "release:prd": "run-s build deploy:prd",
+    "release:stg": "run-s build deploy:stg",
+    "release:dev": "run-s build deploy:dev",
     "nuc": "nuc -a"
   },
   "dependencies": {
