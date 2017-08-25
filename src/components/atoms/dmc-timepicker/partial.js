@@ -1,9 +1,6 @@
-import moment from 'moment';
 import times from 'mout/function/times';
 
 export default function() {
-
-  // this.partialTime = moment(this.opts.partialtime, 'HH:mm:ss');
   this.displaySelectedItemHour = '00';
   this.displaySelectedItemMinute = '00';
   this.displaySelectedItemSecond = '00';
@@ -15,10 +12,6 @@ export default function() {
     this.rebindTouchEvents();
   });
 
-  const format = date => {
-    return date.format('HH:mm:ss');
-  };
-
   const digitNum = num => {
     return num = ('0' + num).slice(-2);
   };
@@ -28,12 +21,10 @@ export default function() {
     const hours = [];
 
     times(MAX_DISPLAY_HOURS, i => {
-      // const date = this.partialTime.clone().add(i, 'hours');
       const displayNum = digitNum(i);
       hours[i] = {
         'date': i,
         'displayTime': displayNum,
-        // 'isSelected': format(date)
       };
     });
     return hours;
