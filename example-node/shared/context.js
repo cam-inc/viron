@@ -75,6 +75,9 @@ class Context {
           swagger: {
             host: this.getConfigHost(),
           },
+          body_completion: {
+            exclude_paths: [],
+          },
         });
         return this.dmclib;
       })

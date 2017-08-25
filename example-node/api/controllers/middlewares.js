@@ -8,6 +8,8 @@ const afterAuthMiddlewares = [
   dmclib.auth.google.middleware(),
   // check admin role
   dmclib.adminRole.middleware(),
+  // completion empty body
+  dmclib.bodyCompletion.middleware(),
 ];
 
 /**
