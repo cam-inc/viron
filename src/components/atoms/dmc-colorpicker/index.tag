@@ -14,7 +14,7 @@ dmc-colorpicker.Colorpicker
         .Colorpicker__colorcodeOperation
           virtual(if="{ color.format === 'HEX' }")
             .Colorpicker__inputContainer
-              input.Colorpicker__inputHex(onInput="{ handleInputHexInput }" ref="inputHex" value="{ color.value }")
+              input.Colorpicker__inputHex(onInput="{ handleInputHexInput }" ref="inputHex" value="{ color.value.hex() }")
               .Colorpicker__colorcodeHex {color.format}
           virtual(if="{ color.format === 'RGBA' }")
             .Colorpicker__inputContainer
