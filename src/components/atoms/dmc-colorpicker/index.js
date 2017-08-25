@@ -117,7 +117,8 @@ export default function() {
    */
   this.handleInputRgbaRedInput = value => {
     const rgbaArray = this.opts.color.value.split(',');
-    rgbaArray[0] = value;
+    const colorValue = value || 0;
+    rgbaArray[0] = colorValue;
 
     const color = {
       format: this.color.format,
@@ -132,7 +133,8 @@ export default function() {
    */
   this.handleInputRgbaGreenInput = value => {
     const rgbaArray = this.opts.color.value.split(',');
-    rgbaArray[1] = value;
+    const colorValue = value || 0;
+    rgbaArray[1] = colorValue;
 
     const color = {
       format: this.color.format,
@@ -147,7 +149,8 @@ export default function() {
    */
   this.handleInputRgbaBlueInput = value => {
     const rgbaArray = this.opts.color.value.split(',');
-    rgbaArray[2] = value;
+    const colorValue = value || 0;
+    rgbaArray[2] = colorValue;
 
     const color = {
       format: this.color.format,
@@ -162,7 +165,8 @@ export default function() {
    */
   this.handleInputAlphaInput = value => {
     const rgbaArray = this.opts.color.value.split(',');
-    rgbaArray[3] = new BigNumber(value).div(100).toString();
+    value = new BigNumber(value).div(100).toString() || 0;
+    rgbaArray[3] = value;
 
     const color = {
       format: this.color.format,
@@ -193,12 +197,47 @@ export default function() {
   };
 
   /**
-   * 表示用のアルファ値を返却します。
+   * 表示用のRGB値を返却します。
+   * @return {String}
+   */
+  this.generateRgbaValue = primaryColor => {
+    let paramArray = this.color.value.split(',');
+    let param = null;
+    switch (primaryColor) {
+    case 'red':
+      param = paramArray[0];
+      break;
+    case 'green':
+      param = paramArray[1];
+      break;
+    case 'blue':
+      param = paramArray[2];
+      break;
+    default:
+      break;
+    }
+
+    if (isNull(param)) {
+      return '';
+    }
+    // NaNは0として扱う。
+    // if (isNaN(param)) {
+    //   return 0;
+    // }
+    return param;
+  };
+
+  /**
+   * 表示用のAlpha値を返却します。
    * @return {String}
    */
   this.generateAlphaValue = () => {
+    let param = this.color.value.split(',')[3];
     // 少数の値を変換しているため、ライブラリを使用する
-    return new BigNumber(this.color.value.split(',')[3]).times(100).round(2).toString();
+    if (isNull(param)) {
+      return 1;
+    }
+    return new BigNumber(param).times(100).round(2).toString();
   };
 
   /**

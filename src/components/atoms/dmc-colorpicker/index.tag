@@ -18,13 +18,13 @@ dmc-colorpicker.Colorpicker
               .Colorpicker__colorcodeHex {color.format}
           virtual(if="{ color.format === 'RGBA' }")
             .Colorpicker__inputContainer
-              dmc-numberinput(number="{ color.value.split(',')[0] }" max="255" min="0" onChange="{ handleInputRgbaRedInput }")
+              dmc-numberinput(number="{ generateRgbaValue('red') }" max="255" min="0" onChange="{ handleInputRgbaRedInput }")
               .Colorpicker__colorcodeRgba r
             .Colorpicker__inputContainer
-              dmc-numberinput(number="{ color.value.split(',')[1] }" max="255" min="0" onChange="{ handleInputRgbaGreenInput }")
+              dmc-numberinput(number="{ generateRgbaValue('green') }" max="255" min="0" onChange="{ handleInputRgbaGreenInput }")
               .Colorpicker__colorcodeRgba g
             .Colorpicker__inputContainer
-              dmc-numberinput(number="{ color.value.split(',')[2] }" max="255" min="0" onChange="{ handleInputRgbaBlueInput }")
+              dmc-numberinput(number="{ generateRgbaValue('blue') }" max="255" min="0" onChange="{ handleInputRgbaBlueInput }")
               .Colorpicker__colorcodeRgba b
             .Colorpicker__inputContainer
               dmc-numberinput(number="{ generateAlphaValue() }" max="100" min="0" onChange="{ handleInputAlphaInput }")
