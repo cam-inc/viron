@@ -12,7 +12,7 @@ export default function() {
   // カラーコード切り替えボタンのときの表示
   this.isColorChangeButtonActive = false;
   // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
-  let selectableColorCode = (!isUndefined(this.opts.selectablecolorcode)) ? this.opts.selectablecolorcode : {HEX: true, RGBA: true};
+  const selectableColorCode = this.opts.selectablecolorcode || { HEX: true, RGBA: true };
   // カラーデータを取得する。親から取得できない場合、空を代入する。
   this.color = (!isUndefined(this.opts.color)) ? this.opts.color : {format: selectableColorCode[COLOR_CODE.HEX], value: ''};
   // もし選択可能カラーコードの中の当該カラーデータがtrueになっていなかったら、それを選択可能にする
