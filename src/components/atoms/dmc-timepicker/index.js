@@ -6,6 +6,10 @@ export default function() {
     this.isShowTimepicker = true;
   };
 
+  this.partialTimeHour = '';
+  this.partialTimeMinute = '';
+  this.partialTimeSecond ='';
+
   let defaultPartialTime = '00:00:00';
 
   let defaultOffsetTime = '-00:00';
