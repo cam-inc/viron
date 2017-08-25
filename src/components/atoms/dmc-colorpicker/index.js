@@ -17,7 +17,7 @@ export default function() {
    */
   const isHex = value => {
     const isMatch = value.match(/^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/);
-    return (!isNull(isMatch)) ? true : false;
+    return isMatch;
   };
 
   /**
@@ -27,7 +27,7 @@ export default function() {
    */
   const isRgba = value => {
     const isMatch = value.match(/^(\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-1](?:\.\d+)?))$/);
-    return (!isNull(isMatch)) ? true : false;
+    return isMatch;
   };
 
   // カラーコード切り替えボタンのときの表示
@@ -293,7 +293,7 @@ export default function() {
    */
   const isTypingHex = value => {
     const isMatch = value.match(/^#?[0-9A-Fa-f]{0,6}$/);
-    return (!isNull(isMatch)) ? true : false;
+    return isMatch;
   };  
 
   /**
