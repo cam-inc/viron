@@ -9,32 +9,52 @@ const COLOR_CODE = {
 };
 
 export default function() {
+  /**
+   * 値がHEXか判定します。
+   * シャープはついていてもいなくてもtrueを返します。
+   * @param {String} value 
+   * @return {Boolean}
+   */
+  const isHex = value => {
+    const isMatch = value.match(/^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/);
+    return (!isNull(isMatch)) ? true : false;
+  };
+
+  /**
+   * 値がRGBAか判定します。
+   * @param {String} value 
+   * @return {Boolean}
+   */
+  const isRgba = value => {
+    const isMatch = value.match(/^(\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-1](?:\.\d+)?))$/);
+    return (!isNull(isMatch)) ? true : false;
+  };
+
   // カラーコード切り替えボタンのときの表示
   this.isColorChangeButtonActive = false;
   // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
-  const selectableColorCode = this.opts.selectablecolorcode || { HEX: true, RGBA: true };
+  let selectableColorCode = this.opts.selectablecolorcode || { HEX: true, RGBA: true };
   // カラーデータを取得する。親から取得できない場合、空を代入する。
-  this.color = (!isUndefined(this.opts.color)) ? this.opts.color : {format: selectableColorCode[COLOR_CODE.HEX], value: ''};
+  this.color = this.opts.color || {format: selectableColorCode[COLOR_CODE.HEX], value: ''};
   // もし選択可能カラーコードの中の当該カラーデータがtrueになっていなかったら、それを選択可能にする
   if (!selectableColorCode[this.color.format]) {
     selectableColorCode[this.color.format] = true;
   }
+  // フォーマットが合っていない場合、空文字にする
+  if(this.color.format === COLOR_CODE.HEX) {
+    if (this.color.value !== '' && !isHex(this.color.value)) {
+      this.color.value = '';
+    } 
+  }
+  if(this.color.format === COLOR_CODE.RGBA) {
+    if (this.color.value !== '' && !isRgba(this.color.value)) {
+      this.color.value = '';
+    } 
+  }
 
-  this.on('before-mount', () => {
-    // フォーマットが合っていない場合、空文字にする
-    if(this.color.format === COLOR_CODE.HEX) {
-      if (this.color.value !== '' && !isHex(this.color.value)) {
-        this.color.value = '';
-      } 
-    }
-    if(this.color.format === COLOR_CODE.RGBA) {
-      if (this.color.value !== '' && !isRgba(this.color.value)) {
-        this.color.value = '';
-      } 
-    }
-  }).on('update', () => {
-    selectableColorCode = (!isUndefined(this.opts.selectablecolorcode)) ? this.opts.selectablecolorcode : {HEX: true, RGBA: true};
-    this.color = (!isUndefined(this.opts.color)) ? this.opts.color : {format: selectableColorCode[COLOR_CODE.HEX], value: ''};
+  this.on('update', () => {
+    selectableColorCode = this.opts.selectablecolorcode || {HEX: true, RGBA: true};
+    this.color = this.opts.color || {format: selectableColorCode[COLOR_CODE.HEX], value: ''};
   }).on('updated', () => {
     if (this.color.format === COLOR_CODE.HEX) {
       if (this.opts.isshown) {
@@ -276,18 +296,7 @@ export default function() {
   const isTypingHex = value => {
     const isMatch = value.match(/^#?[0-9A-Fa-f]{0,6}$/);
     return (!isNull(isMatch)) ? true : false;
-  };
-
-  /**
-   * 値がHEXか判定します。
-   * シャープはついていてもいなくてもtrueを返します。
-   * @param {String} value 
-   * @return {Boolean}
-   */
-  const isHex = value => {
-    const isMatch = value.match(/^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/);
-    return (!isNull(isMatch)) ? true : false;
-  };
+  };  
 
   /**
    * シャープがついていない場合、シャープを頭につけます。
@@ -300,16 +309,6 @@ export default function() {
       value = `#${value}`;
     }
     return value;
-  };
-
-  /**
-   * 値がRGBAか判定します。
-   * @param {String} value 
-   * @return {Boolean}
-   */
-  const isRgba = value => {
-    const isMatch = value.match(/^(\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-1](?:\.\d+)?))$/);
-    return (!isNull(isMatch)) ? true : false;
   };
 
   /**
