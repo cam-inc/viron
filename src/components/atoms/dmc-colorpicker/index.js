@@ -49,55 +49,29 @@ export default function() {
     return isValid;
   };
 
-  /**
-   * カラーオブジェクトへ変換します。
-   * 指定していないフォーマットならばnullを返却します
-   * @param {String} colorFormat 
-   * @param {*} colorValue
-   */
-  const convertToColorInstance = (colorFormat, colorValue) => {
-    let color = {};
-    switch (colorFormat) {
-    case COLOR_CODE.HEX:
-      color.format = COLOR_CODE.HEX;
-      color.value = (isHex(colorValue)) ? Color(colorValue) : '';
-      break;
-    case COLOR_CODE.RGBA:
-      color.format = COLOR_CODE.RGBA;
-      color.value = (isRgba(colorValue)) ? Color.rgb(colorValue.r, colorValue.g, colorValue.b).alpha(colorValue.a) : '';
-      break;
-    default:
-      color = null;
-      break;
-    }
-    return color;
-  };
-
   // カラーコード切り替えボタンのときの表示
   this.isColorChangeButtonActive = false;
   // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
   let selectableColorCode = this.opts.selectablecolorcode || { HEX: true, RGBA: true };
-  // カラーデータを取得し、オブジェクト化する
-  this.color = convertToColorInstance(this.opts.color.format, this.opts.color.value);
-  if (isNull(this.color)) {
-    this.color.format = COLOR_CODE.HEX;
-    this.colot.value = '';
-  }
+  // カラーデータを取得する
+  this.color = this.opts.color || {format: COLOR_CODE.HEX, value: ''};
   // 選択可能カラーコードの中の当該カラーデータが有効になっていない場合それを選択可能にする
   if (!selectableColorCode[this.color.format]) {
     selectableColorCode[this.color.format] = true;
   }
+  // 最後に色と認識された値を格納する
+  let lastValidColor = '#000000';
 
   this.on('update', () => {
     selectableColorCode = this.opts.selectablecolorcode || {HEX: true, RGBA: true};
-    this.color = convertToColorInstance(this.opts.color.format, this.opts.color.value);
-  }).on('updated', () => {
-    if (isNull(this.color)) {
-      this.color.format = COLOR_CODE.HEX;
-      this.colot.value = '';
+    this.color = this.opts.color || {format: COLOR_CODE.HEX, value: ''};
+    // 正しい色であれば最新の正しい色として残す
+    if (this.color.format === COLOR_CODE.HEX && isHex(this.color.value)) {
+      lastValidColor = this.color.value;
     }
+  }).on('updated', () => {
     if (this.color.format === COLOR_CODE.HEX && this.opts.isshown) {
-      this.refs.inputHex.value = this.color.value.hex();
+      this.refs.inputHex.value = this.color.value;
     }
   });
 
@@ -108,13 +82,12 @@ export default function() {
     const order = [COLOR_CODE.HEX, COLOR_CODE.RGBA];
     const color = { format: COLOR_CODE.HEX, value: '' };
     let index = order.indexOf(this.color.format);
-
     if (index !== -1) {
       do {
         index = (index !== order.length - 1) ? index + 1 : 0;
       } while (!selectableColorCode[order[index]]);
       color.format = order[index];
-      color.value = convertColor(this.color.value, color.format);
+      color.value = convertColor(this.color.format, this.color.value, color.format);
     }
 
     this.opts.oncolorchange(color);
@@ -160,16 +133,11 @@ export default function() {
    */
   this.handleInputRgbaRedInput = value => {
     const colorValue = value || 0;
-    const rgbaObj = {
-      r: Number(colorValue),
-      g: this.color.value.green(),
-      b: this.color.value.blue(),
-      a: this.color.value.alpha()
-    };
     const color = {
       format: this.color.format,
-      value: rgbaObj
+      value: this.color.value
     };
+    color.value.r = colorValue;
 
     this.opts.oncolorchange(color);
   };
@@ -179,17 +147,11 @@ export default function() {
    */
   this.handleInputRgbaGreenInput = value => {
     const colorValue = value || 0;
-    const rgbaObj = {
-      r: this.color.value.red(),
-      g: colorValue,
-      b: this.color.value.blue(),
-      a: this.color.value.alpha()
-    };
-
     const color = {
       format: this.color.format,
-      value: rgbaObj
+      value: this.color.value
     };
+    color.value.g = colorValue;
 
     this.opts.oncolorchange(color);
   };
@@ -199,17 +161,11 @@ export default function() {
    */
   this.handleInputRgbaBlueInput = value => {
     const colorValue = value || 0;
-    const rgbaObj = {
-      r: this.color.value.red(),
-      g: this.color.value.green(),
-      b: colorValue,
-      a: this.color.value.alpha()
-    };
-
     const color = {
       format: this.color.format,
-      value: rgbaObj
+      value: this.color.value
     };
+    color.value.b = colorValue;
 
     this.opts.oncolorchange(color);
   };
@@ -219,17 +175,11 @@ export default function() {
    */
   this.handleInputAlphaInput = value => {
     const colorValue = value || 0;
-    const rgbaObj = {
-      r: this.color.value.red(),
-      g: this.color.value.green(),
-      b: this.color.value.blue(),
-      a: new BigNumber(colorValue).div(100).toString() || 0
-    };
-
     const color = {
       format: this.color.format,
-      value: rgbaObj
+      value: this.color.value
     };
+    color.value.a = new BigNumber(colorValue).div(100).toString() || 0;
 
     this.opts.oncolorchange(color);
   };
@@ -242,10 +192,29 @@ export default function() {
     let style = '';
     switch (this.color.format) {
     case COLOR_CODE.HEX:
-      style = concatenatePoundKey(this.color.value.hex());
+      style = (isHex(this.color.value)) ? concatenatePoundKey(this.color.value) : lastValidColor;
       break;
     case COLOR_CODE.RGBA:
-      style = `rgba(${this.color.value.red()},${this.color.value.green()},${this.color.value.blue()},${this.color.value.alpha()})`;
+      style = `rgba(${this.color.value.r},${this.color.value.g},${this.color.value.b},${this.color.value.a})`;
+      break;
+    default:
+      break;
+    }
+
+    return style;
+  };
+
+  /**
+   * readonlyのinputの値を表示します。
+   */
+  this.generateDummyValue = () => {
+    let style = '';
+    switch (this.color.format) {
+    case COLOR_CODE.HEX:
+      style = concatenatePoundKey(this.color.value);
+      break;
+    case COLOR_CODE.RGBA:
+      style = `${this.color.value.r},${this.color.value.g},${this.color.value.b},${this.color.value.a}`;
       break;
     default:
       break;
@@ -262,13 +231,13 @@ export default function() {
     let param = null;
     switch (primaryColor) {
     case 'red':
-      param = this.color.value.red();
+      param = this.color.value.r;
       break;
     case 'green':
-      param = this.color.value.green();
+      param = this.color.value.g;
       break;
     case 'blue':
-      param = this.color.value.blue();
+      param = this.color.value.b;
       break;
     default:
       break;
@@ -285,7 +254,7 @@ export default function() {
    * @return {String}
    */
   this.generateAlphaValue = () => {
-    let param = this.color.value.alpha();
+    let param = this.color.value.a;
     // 少数の値を変換しているため、ライブラリを使用する
     if (isNull(param)) {
       return 1;
@@ -346,21 +315,27 @@ export default function() {
 
   /**
    * カラーを変換します
-   * @param {String} colorObj
+   * @param {String} colorCode
+   * @param {String} colorValue
    * @param {String} exportColorcode 
    * @return {String}
    */
-  const convertColor = (colorObj, exportColorcode) => {
-    switch(exportColorcode) {
-    case COLOR_CODE.HEX:
+  const convertColor = (colorCode, colorValue, exportColorcode) => {
+    let colorObj = {};
+    if (colorCode === COLOR_CODE.HEX) {
+      colorObj = (isHex(colorValue)) ? Color(concatenatePoundKey(colorValue)) : Color(concatenatePoundKey(lastValidColor));
+    }
+    if (colorCode === COLOR_CODE.RGBA) {
+      colorObj = Color.rgb(colorValue.r, colorValue.g, colorValue.b).alpha(colorValue.a);
+    }
+
+    if (exportColorcode === COLOR_CODE.HEX) {
       return colorObj.hex();
-    case COLOR_CODE.RGBA: {
+    }
+    if (exportColorcode === COLOR_CODE.RGBA) {
       const color = colorObj.object();
       color.a = colorObj.alpha();
       return color;
-    }
-    default:
-      return null;
     }
   };
 }

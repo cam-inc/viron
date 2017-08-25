@@ -1,7 +1,7 @@
 dmc-colorpicker.Colorpicker
   .Colorpicker__label(if="{ !!opts.label }") { opts.label }
   form.Colorpicker__form(onSubmit="{ handleFormSubmit }")
-    input.Colorpicker__dummyInput(onTap="handleInputTap" ref="touch" placeholder="{ opts.placeholder || '' }" readonly="readonly" value="{ color.value }")
+    input.Colorpicker__dummyInput(onTap="handleInputTap" ref="touch" placeholder="{ opts.placeholder || '' }" readonly="readonly" value="{ generateDummyValue() }")
     .Colorpicker__container(if="{ opts.isshown }")
       .Colorpicker__picker
         canvas.Colorpicker__canvas
@@ -14,7 +14,7 @@ dmc-colorpicker.Colorpicker
         .Colorpicker__colorcodeOperation
           virtual(if="{ color.format === 'HEX' }")
             .Colorpicker__inputContainer
-              input.Colorpicker__inputHex(onInput="{ handleInputHexInput }" ref="inputHex" value="{ color.value.hex() }")
+              input.Colorpicker__inputHex(onInput="{ handleInputHexInput }" ref="inputHex" value="{ opts.color.value }")
               .Colorpicker__colorcodeHex {color.format}
           virtual(if="{ color.format === 'RGBA' }")
             .Colorpicker__inputContainer
