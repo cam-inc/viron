@@ -202,7 +202,7 @@ export default function() {
     let style = '';
     switch (this.color.format) {
     case COLOR_CODE.HEX:
-      style = concatenateSharp(this.color.value);
+      style = concatenatePoundKey(this.color.value);
       break;
     case COLOR_CODE.RGBA:
       style = `rgba(${this.color.value})`;
@@ -273,7 +273,7 @@ export default function() {
     
     // 正しいフォーマットだがシャープをつけていない場合、頭にシャープをつける
     if (isHex(value)) {
-      value = concatenateSharp(value);
+      value = concatenatePoundKey(value);
     }
     
     // HEXでなければ変更前の文字列に戻す
@@ -297,11 +297,11 @@ export default function() {
   };  
 
   /**
-   * シャープがついていない場合、シャープを頭につけます。
+   * 井桁がついていない場合、井桁を頭につけます。
    * @param {String} value 
    * @return {String}
    */
-  const concatenateSharp = value => {
+  const concatenatePoundKey = value => {
     const isIncludeSharp = value.match('^#');
     if (isNull(isIncludeSharp)) {
       value = `#${value}`;
