@@ -56,10 +56,8 @@ export default function() {
     selectableColorCode = this.opts.selectablecolorcode || {HEX: true, RGBA: true};
     this.color = this.opts.color || {format: selectableColorCode[COLOR_CODE.HEX], value: ''};
   }).on('updated', () => {
-    if (this.color.format === COLOR_CODE.HEX) {
-      if (this.opts.isshown) {
-        this.refs.inputHex.value = this.color.value;
-      }
+    if (this.color.format === COLOR_CODE.HEX && this.opts.isshown) {
+      this.refs.inputHex.value = this.color.value;
     }
   });
 
