@@ -34,21 +34,6 @@ export default function() {
     return isMatch;
   };
 
-  /**
-   * 値がRGBAか判定します。
-   * @param {String} value 
-   * @return {Boolean}
-   */
-  const isRgba = value => {
-    let isValid = true;
-    forOwn(value, (val) => {
-      if (val || !isNumber(Number(val))) {
-        return false;
-      }
-    });
-    return isValid;
-  };
-
   // カラーコード切り替えボタンのときの表示
   this.isColorChangeButtonActive = false;
   // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
