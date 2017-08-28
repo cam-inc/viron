@@ -8,16 +8,8 @@ export default function() {
     this.isShowTimepicker = true;
   };
 
-  const formatFullTime = date => {
-    return date.format('HH:mm:ss Z');
-  };
-
   const formatPartial = date => {
     return date.format('HH:mm:ss');
-  };
-
-  const formatOffset = date => {
-    return date.format('Z');
   };
 
   const digitNum = num => {
@@ -27,7 +19,6 @@ export default function() {
   const space = ' ';
   const fulltimesplit = this.opts.date.split(space, 2);
   let partialtime = fulltimesplit[0];
-  let offsettime = fulltimesplit[1];
 
   this.displayTime = partialtime;
   this.defaultTime = moment(this.displayTime, 'HH:mm:ss');
@@ -35,7 +26,6 @@ export default function() {
   this.on('update', () => {
     this.displayTime = partialtime;
     this.defaultTime = moment(this.displayTime, 'HH:mm:ss');
-    console.log(this.defaultTime);
   }).on('updated', () => {
     this.rebindTouchEvents();
   });
@@ -59,7 +49,7 @@ export default function() {
     const MAX_DISPLAY_MINUTES = 60;
     const minutes = [];
     times(MAX_DISPLAY_MINUTES, i => {
-      const date = this.defaultTime.clone().set('minutes', i)
+      const date = this.defaultTime.clone().set('minutes', i);
       const displayNum = digitNum(i);
       minutes[i] = {
         'date': i,
@@ -74,7 +64,7 @@ export default function() {
     const MAX_DISPLAY_SECONDS = 60;
     const seconds = [];
     times(MAX_DISPLAY_SECONDS, i => {
-      const date = this.defaultTime.clone().set('seconds', i)
+      const date = this.defaultTime.clone().set('seconds', i);
       const displayNum = digitNum(i);
       seconds[i] = {
         'date': i,
@@ -86,17 +76,17 @@ export default function() {
   };
 
   this.handleSelectHour = date => {
-    partialtime = date
+    partialtime = date;
     this.update();
   };
 
   this.handleSelectMinute = date => {
-    partialtime = date
+    partialtime = date;
     this.update();
   };
 
   this.handleSelectSecond = date => {
-    partialtime = date
+    partialtime = date;
     this.update();
   };
 
