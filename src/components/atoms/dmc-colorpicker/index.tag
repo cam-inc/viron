@@ -2,7 +2,7 @@ dmc-colorpicker.Colorpicker
   .Colorpicker__label(if="{ !!opts.label }") { opts.label }
   form.Colorpicker__form(onSubmit="{ handleFormSubmit }")
     input.Colorpicker__dummyInput(onTap="handleInputTap" ref="touch" placeholder="{ opts.placeholder || '' }" readonly="readonly" value="{ generateDummyValue() }")
-    .Colorpicker__container(if="{ opts.isshown }")
+    .Colorpicker__container(show="{ opts.isshown }" hide="{ !opts.isshown }")
       .Colorpicker__picker
         canvas.Colorpicker__canvas
         .Colorpicker__sliderOperation
