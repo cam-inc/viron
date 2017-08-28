@@ -20,6 +20,34 @@ export default function() {
     return isMatch;
   };
 
+  /**
+   * HEXの値が正しくなるよう変更をかけます
+   * @param {*} value 
+   */
+  const normalizeHexValue = value => {
+    value = value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+
+    if (isNull(value)) {
+      return value;
+    }
+
+    if (isUndefined(value)) {
+      return null;
+    }
+    
+    // 正しいフォーマットだがシャープをつけていない場合、頭にシャープをつける
+    if (isHex(value)) {
+      value = concatenatePoundKey(value);
+    }
+    
+    // HEXでなければ変更前の文字列に戻す
+    if (!isTypingHex(value)) {
+      value = this.opts.color.value;
+    }
+
+    return value;
+  };
+
   // カラーコード切り替えボタンのときの表示
   this.isColorChangeButtonActive = false;
   // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
@@ -231,34 +259,6 @@ export default function() {
       return 1;
     }
     return new BigNumber(param).times(100).round(2).toString();
-  };
-
-  /**
-   * HEXの値が正しくなるよう変更をかけます
-   * @param {*} value 
-   */
-  const normalizeHexValue = value => {
-    value = value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
-
-    if (isNull(value)) {
-      return value;
-    }
-
-    if (isUndefined(value)) {
-      return null;
-    }
-    
-    // 正しいフォーマットだがシャープをつけていない場合、頭にシャープをつける
-    if (isHex(value)) {
-      value = concatenatePoundKey(value);
-    }
-    
-    // HEXでなければ変更前の文字列に戻す
-    if (!isTypingHex(value)) {
-      value = this.opts.color.value;
-    }
-
-    return value;
   };
 
   /**
