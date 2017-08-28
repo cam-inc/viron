@@ -8,8 +8,16 @@ export default function() {
     this.isShowTimepicker = true;
   };
 
-  const format = date => {
+  const formatFullTime = date => {
+    return date.format('HH:mm:ss Z');
+  };
+
+  const formatPartial = date => {
     return date.format('HH:mm:ss');
+  };
+
+  const formatOffset = date => {
+    return date.format('Z');
   };
 
   const digitNum = num => {
@@ -17,60 +25,31 @@ export default function() {
   };
 
   const space = ' ';
-  const colon = ':';
+  const fulltimesplit = this.opts.date.split(space, 2);
+  let partialtime = fulltimesplit[0];
+  let offsettime = fulltimesplit[1];
 
-  this.defaultPartialTime = this.opts.date;
+  this.displayTime = partialtime;
+  this.defaultTime = moment(this.displayTime, 'HH:mm:ss');
 
-  const fulltimesplit = this.defaultPartialTime.split(space, 2);
-  var partialtime = fulltimesplit[0];
-  var offsettime = fulltimesplit[1];
-
-  const partialtimesplit = partialtime.split(colon, 3);
-  var partialtimehour = partialtimesplit[0];
-  var partialtimeminute = partialtimesplit[1];
-  var partialtimesecond = partialtimesplit[2];
-  var partialtimehournum = Number(partialtimehour);
-  var partialtimeminutenum = Number(partialtimeminute);
-  var partialtimesecondnum = Number(partialtimesecond);
-
-  //
-  //TODO: offsetがZのときの処理を追加する
-  //
-  if(offsettime === 'Z'){
-
-  }else{
-    const offsettimesplit = offsettime.split(colon, 2);
-    var offsettimehour = offsettimesplit[0];
-    var offsettimeminute = offsettimesplit[1];
-    var offsettimehour = Number(offsettimehour);
-    var offsettimeminute = Number(offsettimeminute);
-  }
-
-  //TODO:変数化
-  this.selectedItemHour = partialtimehournum;
-  this.selectedItemMinute = partialtimeminutenum;
-  this.selectedItemSecond = partialtimesecondnum;
-
-  this.partialTime = `${this.selectedItemHour}:${this.selectedItemMinute}:${this.selectedItemSecond}`;
-
-  //TODO:変数化
-  this.displaySelectedItemHour = partialtimehour;
-  this.displaySelectedItemMinute = partialtimeminute;
-  this.displaySelectedItemSecond = partialtimesecond;
-
-  this.displayPartialTime = `${this.displaySelectedItemHour}:${this.displaySelectedItemMinute}:${this.displaySelectedItemSecond}`;
+  this.on('update', () => {
+    this.displayTime = partialtime;
+    this.defaultTime = moment(this.displayTime, 'HH:mm:ss');
+    console.log(this.defaultTime);
+  }).on('updated', () => {
+    this.rebindTouchEvents();
+  });
 
   this.generateHours = () => {
     const MAX_DISPLAY_HOURS = 24;
     const hours = [];
-
     times(MAX_DISPLAY_HOURS, i => {
-      // const date = this.defaultPartialTime.clone().add(i, 'hours');
+      const date = this.defaultTime.clone().set('hours', i);
       const displayNum = digitNum(i);
       hours[i] = {
         'date': i,
         'displayTime': displayNum,
-        // 'isSelected': format(date)
+        'formatDate': formatPartial(date)
       };
     });
     return hours;
@@ -80,10 +59,12 @@ export default function() {
     const MAX_DISPLAY_MINUTES = 60;
     const minutes = [];
     times(MAX_DISPLAY_MINUTES, i => {
+      const date = this.defaultTime.clone().set('minutes', i)
       const displayNum = digitNum(i);
       minutes[i] = {
         'date': i,
-        'displayTime': displayNum
+        'displayTime': displayNum,
+        'formatDate': formatPartial(date)
       };
     });
     return minutes;
@@ -93,40 +74,29 @@ export default function() {
     const MAX_DISPLAY_SECONDS = 60;
     const seconds = [];
     times(MAX_DISPLAY_SECONDS, i => {
+      const date = this.defaultTime.clone().set('seconds', i)
       const displayNum = digitNum(i);
       seconds[i] = {
         'date': i,
-        'displayTime': displayNum
+        'displayTime': displayNum,
+        'formatDate': formatPartial(date)
       };
     });
     return seconds;
   };
 
-  this.on('update', () => {
-    this.partialTime = `${this.selectedItemHour}:${this.selectedItemMinute}:${this.selectedItemSecond}`;
-    this.testTime = `${this.selectedItemHour}:${this.selectedItemMinute}:${this.selectedItemSecond}`;
-    // console.log(this.testTime);
-    this.displayPartialTime = `${this.displaySelectedItemHour}:${this.displaySelectedItemMinute}:${this.displaySelectedItemSecond}`;
-  }).on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
   this.handleSelectHour = date => {
-    this.selectedItemHour = date;
-    console.log(this.selectedItemHour);
-    this.displaySelectedItemHour = digitNum(date);
+    partialtime = date
     this.update();
   };
 
   this.handleSelectMinute = date => {
-    this.selectedItemMinute = date;
-    this.displaySelectedItemMinute = digitNum(date);
+    partialtime = date
     this.update();
   };
 
   this.handleSelectSecond = date => {
-    this.selectedItemSecond = date;
-    this.displaySelectedItemSecond = digitNum(date);
+    partialtime = date
     this.update();
   };
 
