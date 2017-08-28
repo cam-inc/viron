@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import Color from 'color';
 import isNull from 'mout/lang/isNull';
 import isUndefined from 'mout/lang/isUndefined';
+import objectAssign from 'object-assign';
 
 const COLOR_CODE = {
   HEX: 'HEX',
@@ -136,7 +137,7 @@ export default function() {
       format: this.color.format,
       value: this.color.value
     };
-    color.value.r = colorValue;
+    objectAssign(color.value, { r: colorValue });
 
     this.opts.oncolorchange(color);
   };
@@ -150,7 +151,7 @@ export default function() {
       format: this.color.format,
       value: this.color.value
     };
-    color.value.g = colorValue;
+    objectAssign(color.value, { g: colorValue });
 
     this.opts.oncolorchange(color);
   };
@@ -164,7 +165,7 @@ export default function() {
       format: this.color.format,
       value: this.color.value
     };
-    color.value.b = colorValue;
+    objectAssign(color.value, { b: colorValue });
 
     this.opts.oncolorchange(color);
   };
@@ -178,7 +179,7 @@ export default function() {
       format: this.color.format,
       value: this.color.value
     };
-    color.value.a = new BigNumber(colorValue).div(100).toString() || 0;
+    objectAssign(color.value, { a: new BigNumber(colorValue).div(100).toString() || 0 });
 
     this.opts.oncolorchange(color);
   };
