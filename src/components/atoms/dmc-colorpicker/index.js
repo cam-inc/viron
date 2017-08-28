@@ -88,7 +88,7 @@ export default function() {
    * HEX入力値のイベントリスナーハンドラー
    */
   this.handleInputHexInput = e => {
-    let newColor = e.target.value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    let newColor = e.target.value;// eslint-disable-line no-irregular-whitespace
     newColor = normalizeHexValue(newColor);
 
     const color = {
@@ -238,6 +238,8 @@ export default function() {
    * @param {*} value 
    */
   const normalizeHexValue = value => {
+    value = value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+
     if (isNull(value)) {
       return value;
     }
