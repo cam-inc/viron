@@ -3,7 +3,7 @@ import Color from 'color';
 import isNull from 'mout/lang/isNull';
 import _isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
-import forIn from 'mout/object/forIn';
+import forOwn from 'mout/object/forIn';
 
 const COLOR_CODE = {
   HEX: 'HEX',
@@ -41,7 +41,7 @@ export default function() {
    */
   const isRgba = value => {
     let isValid = true;
-    forIn(value, (val) => {
+    forOwn(value, (val) => {
       if (val || !isNumber(Number(val))) {
         return false;
       }
