@@ -9,13 +9,134 @@
   border-left: 2px solid var(--color-bg-primary);
 }
 
-.Colorpicker__input {
+.Colorpicker__form {
+  position: relative;
+}
+
+.Colorpicker__dummyInput {
   display: block;
   width: 100%;
   padding: 14px;
   font-size: 18px;
   cursor: pointer;
+  user-select: none;
   background-color: var(--color-bg-base);
   border: 1px solid var(--color-basic-gray);
   border-radius: 3px;
+}
+
+.Colorpicker__container {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 240px;
+  background-color: var(--color-bg-base);
+  border: 1px solid var(--color-basic-gray);
+  border-radius: 3px;
+}
+
+.Colorpicker__canvas {
+  width: 100%;
+  height: 100px;
+  background-color: #ddd;
+}
+
+.Colorpicker__sliderOperation {
+  @apply --layout-center-stretch;
+  width: 100%;
+  height: 50px;
+}
+
+.Colorpicker__circleContainer {
+  @apply --layout-center-center;
+  width: 60px;
+}
+
+.Colorpicker__circle {
+  width: 30px;
+  height: 30px;
+  background-color: #333;
+  border-radius: 50%;
+}
+
+.Colorpicker__sliderContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-evenly;
+}
+
+.Colorpicker__colorcodeOperation {
+  @apply --layout-center-stretch;
+  width: 100%;
+  height: 50px;
+  padding: 0 10px;
+}
+
+.Colorpicker__inputContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.Colorpicker__inputContainer > .Numberinput {
+  width: 40px;
+}
+
+.Colorpicker__inputContainer .Numberinput__input {
+  width: 28px;
+  padding: 0;
+  font-size: 10px;
+  text-align: center;
+}
+
+.Colorpicker__inputHex {
+  display: block;
+  width: 100%;
+  padding: 2px 0;
+  font-size: 12px;
+  text-align: center;
+  user-select: none;
+  background-color: var(--color-bg-base);
+  border: 1px solid var(--color-basic-gray);
+  border-radius: 3px;
+}
+
+.Colorpicker__colorcodeHex {
+  display: flex;
+  width: 100%;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: default;
+  justify-content: center;
+  align-items: center;
+}
+
+.Colorpicker__colorcodeRgba {
+  display: block;
+  width: 40px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+  cursor: default;
+}
+
+.Colorpicker__colorChangeContainer {
+  @apply --layout-center-center;
+  width: 30px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.1s linear;
+}
+
+.Colorpicker__colorChangeButton {
+  @apply --layout-column-stretch-center;
+  padding: 6px 8px;
+  border-radius: 3px;
+}
+
+.Colorpicker__colorChangeButton--hover {
+  background-color: var(--color-bg-tertiaryLight);
 }
