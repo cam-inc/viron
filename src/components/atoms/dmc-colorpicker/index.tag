@@ -30,7 +30,7 @@ dmc-colorpicker.Colorpicker
               dmc-numberinput(number="{ generateAlphaValue() }" max="100" min="0" onChange="{ handleInputAlphaInput }")
               .Colorpicker__colorcodeRgba a
           .Colorpicker__colorChangeContainer
-            .Colorpicker__colorChangeButton(class="{ Colorpicker__colorChangeButton--hover: isColorChangeButtonActive }" mouseDown="{ handleColorChangeButtonTap }" ref="touch" touchStart="{ handleColorChangeButtonTouchStart }" touchEnd="{ handleColorChangeButtonTouchEnd }" mouseOver="{ handleColorChangeButtonMouseOver }" mouseOut="{ handleColorChangeButtonMouseOut }")
+            .Colorpicker__colorChangeButton(class="{ Colorpicker__colorChangeButton--hover: isColorChangeButtonActive }" onTap="handleColorChangeButtonTap" ref="touch" touchStart="{ handleColorChangeButtonTouchStart }" touchEnd="{ handleColorChangeButtonTouchEnd }" mouseOver="{ handleColorChangeButtonMouseOver }" mouseOut="{ handleColorChangeButtonMouseOut }")
               dmc-icon(type="caretUp")
               dmc-icon(type="caretDown")
       
