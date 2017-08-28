@@ -1,9 +1,7 @@
 import BigNumber from 'bignumber.js';
 import Color from 'color';
 import isNull from 'mout/lang/isNull';
-import _isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
-import forOwn from 'mout/object/forIn';
 
 const COLOR_CODE = {
   HEX: 'HEX',
@@ -11,18 +9,6 @@ const COLOR_CODE = {
 };
 
 export default function() {
-  /**
-   * moutの`isNumber`のラッパー関数。
-   * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
-   * @param {*} num
-   */
-  const isNumber = num => {
-    if (isNaN(num)) {
-      return false;
-    }
-    return _isNumber(num);
-  };
-
   /**
    * 値がHEXか判定します。
    * シャープはついていてもいなくてもtrueを返します。
