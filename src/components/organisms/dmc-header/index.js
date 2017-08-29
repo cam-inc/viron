@@ -27,19 +27,6 @@ export default function() {
       .then(() => store.action(actions.MENU_TOGGLE));
   };
 
-  this.handleUploadButtonTap = () => {
-    // TODO
-  };
-
-  this.handleDownloadButtonTap = () => {
-    const endpoints = ObjectAssign({}, store.getter(getters.ENDPOINTS));
-    // 認証用トークンはexport対象外とする。
-    forOwn(endpoints, endpoint => {
-      delete endpoint.token;
-    });
-    download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
-  };
-
   this.handleHomeButtonTap = () => {
     this.getRouter().navigateTo('/');
   };

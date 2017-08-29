@@ -18,7 +18,6 @@ dmc-endpoints.Page.EndpointsPage
         onQrCode="{ handleEndpointQrCode }"
         onLogout="{ handleEndpointLogout }"
       )
-  dmc-uploader(accept=".json" onFileChange="{ handleEndpointsFileChange }")
 
   script.
     import '../../atoms/dmc-icon/index.tag';
