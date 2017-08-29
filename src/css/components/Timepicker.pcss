@@ -31,24 +31,24 @@
 
 .Partialtime {
   position: absolute;
-  width: 120%;
   display: inline-block;
+  width: 120%;
 }
 
 .Partialtime__body {
   top: 0;
-  height: 100px;
-  background-color: var(--color-basic-white);
-  box-shadow:0px 0px 1px;
-  border-radius: 3px;
   display: flex;
   flex-flow: row wrap;
+  height: 100px;
+  background-color: var(--color-basic-white);
+  border-radius: 3px;
+  box-shadow: 0 0 1px;
   justify-content: space-around;
 }
 
 .Partialtime__list {
-  overflow: scroll;
   flex-grow: 1;
+  overflow: scroll;
 }
 
 .Partialtime__list--left {
@@ -63,8 +63,8 @@
 }
 
 .Partialtime__listItem {
-  font-size: calc(var(--component-timepicker-font-size) * 0.5);
   padding: 1px 5px;
+  font-size: calc(var(--component-timepicker-font-size) * 0.5);
   cursor: pointer;
 }
 
