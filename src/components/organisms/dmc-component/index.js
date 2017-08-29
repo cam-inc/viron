@@ -223,8 +223,6 @@ export default function() {
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'dmc-component-search', {
-        name: 'TODO',
-        description: 'TODO',
         parameterObjects: this.parameterObjects,
         initialParameters: ObjectAssign({}, this.currentRequestParameters),
         onComplete: parameters => {

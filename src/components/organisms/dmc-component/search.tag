@@ -1,7 +1,4 @@
 dmc-component-search.ComponentSearch
-  .ComponentSearch__head
-    .ComponentSearch__name { opts.name }
-    .ComponentSearch__description { opts.description }
   .ComponentSearch__body
     dmc-parameters(parameterObjects="{ opts.parameterObjects }" parameters="{ currentParameters }" onChange="{ handleParametersChange }")
   .ComponentSearch__tail
