@@ -1,5 +1,5 @@
-import QRious from 'qrious'; // @see https://github.com/neocotic/qrious
 import ObjectAssign from 'object-assign';
+import QRious from 'qrious'; // @see https://github.com/neocotic/qrious
 
 export default function() {
   this.on('mount', function() {

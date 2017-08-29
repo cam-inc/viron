@@ -1,7 +1,5 @@
-dmc-qrcode
-  h1 QR Code
-
-  img(ref="qrcode")
+dmc-qrcode.Qrcode
+  img.Qrcode__img(ref="qrcode")
 
   script.
     import script from './index';

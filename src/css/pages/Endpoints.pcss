@@ -144,41 +144,29 @@
   color: var(--color-text-secondary);
 }
 
-.EndpointsPage__itemMenus {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.EndpointsPage__itemMenuFrame {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 12px;
-  background-color: var(--color-basic-white);
-  border-radius: 6px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+.EndpointsPage__itemTail {
+  @apply --layout-center-end;
+  padding: 8px;
+  border-top: 1px solid var(--color-basic-black);
 }
 
 .EndpointsPage__itemMenu {
-  padding: 4px;
-  margin-bottom: 4px;
-  font-size: 12px;
+  color: var(--color-basic-gray);
   cursor: pointer;
-  background-color: transparent;
   transition-duration: 100ms;
-  transition-property: background-color;
+  transition-property: color;
 }
 
 .EndpointsPage__itemMenu.hover {
-  background-color: rgba(200, 200, 200, 0.5);
+  color: var(--color-basic-darkGray);
 }
 
-.EndpointsPage__itemMenus .EndpointsPage__itemMenu:last-child {
-  margin-bottom: 0;
+.EndpointsPage__itemTail .EndpointsPage__itemMenu {
+  margin-right: 8px;
+}
+
+.EndpointsPage__itemTail .EndpointsPage__itemMenu:last-child {
+  margin-right: 0;
 }
 
 /* ============================== */
@@ -320,4 +308,11 @@
 
 .EndpointsPage__signinOauth:last-child {
   margin-right: 0;
+}
+
+/* ============================== */
+/* QR Code */
+/* ============================== */
+.EndpointsPage__qrcode {
+  display: block;
 }

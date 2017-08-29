@@ -1,6 +1,3 @@
-import download from 'downloadjs';
-import forOwn from 'mout/object/forOwn';
-import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
