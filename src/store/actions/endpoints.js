@@ -79,5 +79,19 @@ export default {
       .then(() => {
         context.commit(mutations.ENDPOINTS_REMOVE_ALL);
       });
+  },
+
+  /**
+   * 新エンドポイント群を既存エンドポイント群にmergeします。
+   * @param {riotx.Context} context
+   * @param {Object} endpoints
+   * @return {Promise}
+   */
+  mergeAll: (context, endpoints) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.ENDPOINTS_MERGE_ALL, endpoints);
+      });
   }
 };

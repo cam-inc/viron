@@ -1,5 +1,6 @@
 module.exports = helper => {
   const config = {
+    host: 'localhost:3000',
     // dmclibのadmin_roleが使用するユーザー作成時の初期ロール名
     default_role: 'viewer',
     // dmclibのadmin_roleが使用するスーパーユーザーのロール名

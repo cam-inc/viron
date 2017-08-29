@@ -70,8 +70,10 @@
 
 .Tooltip__text {
   position: relative;
-  padding: 5px;
+  min-width: 30px;
+  padding: 5px 10px;
   color: var(--color-basic-white);
+  text-align: center;
   background-color: var(--color-basic-darkGray);
   border-radius: 5px;
 }
@@ -89,13 +91,13 @@
 }
 
 .Tooltip--topRight .Tooltip__basePoint {
-  right: calc(var(--component-tooltip-triangle-height) * -3);
+  right: calc(var(--component-tooltip-triangle-height) * -2);
   bottom: var(--component-tooltip-triangle-height);
 }
 
 .Tooltip--topLeft .Tooltip__basePoint {
   bottom: var(--component-tooltip-triangle-height);
-  left: calc(var(--component-tooltip-triangle-height) * -3);
+  left: calc(var(--component-tooltip-triangle-height) * -2);
 }
 
 .Tooltip--bottomCenter .Tooltip__basePoint {
@@ -104,12 +106,12 @@
 
 .Tooltip--bottomRight .Tooltip__basePoint {
   top: var(--component-tooltip-triangle-height);
-  right: calc(var(--component-tooltip-triangle-height) * -3);
+  right: calc(var(--component-tooltip-triangle-height) * -2);
 }
 
 .Tooltip--bottomLeft .Tooltip__basePoint {
   top: var(--component-tooltip-triangle-height);
-  left: calc(var(--component-tooltip-triangle-height) * -3);
+  left: calc(var(--component-tooltip-triangle-height) * -2);
 }
 
 .Tooltip--rightTop .Tooltip__basePoint {
@@ -118,7 +120,7 @@
 }
 
 .Tooltip--rightBottom .Tooltip__basePoint {
-  top: calc(var(--component-tooltip-triangle-height) * -3);
+  top: calc(var(--component-tooltip-triangle-height) * -4);
   left: var(--component-tooltip-triangle-height);
 }
 
@@ -128,6 +130,6 @@
 }
 
 .Tooltip--leftBottom .Tooltip__basePoint {
-  top: calc(var(--component-tooltip-triangle-height) * -3);
+  top: calc(var(--component-tooltip-triangle-height) * -4);
   right: var(--component-tooltip-triangle-height);
 }

@@ -67,5 +67,19 @@ export default {
     context.state.endpoints[endpointKey].token = token;
     storage.set('endpoints', context.state.endpoints);
     return [states.ENDPOINTS];
+  },
+
+  /**
+   * 新エンドポイント群をmergeします。
+   * @param {riotx.Context} context
+   * @param {Object} endpoints
+   * @return {Array}
+   */
+  mergeAll: (context, endpoints) => {
+    const currentEndpoints = context.state.endpoints;
+    const newEndpoints = ObjectAssign({}, currentEndpoints, endpoints);
+    context.state.endpoints = newEndpoints;
+    storage.set('endpoints', newEndpoints);
+    return [states.ENDPOINTS];
   }
 };

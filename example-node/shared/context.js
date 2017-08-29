@@ -72,6 +72,12 @@ class Context {
           pager: {
             limit: constant.DEFAULT_PAGER_LIMIT,
           },
+          swagger: {
+            host: this.getConfigHost(),
+          },
+          body_completion: {
+            exclude_paths: [],
+          },
         });
         return this.dmclib;
       })
@@ -181,6 +187,13 @@ class Context {
    */
   getConfigAcl() {
     return config.acl;
+  }
+
+  /**
+   * config host 取得
+   */
+  getConfigHost() {
+    return config.host;
   }
 
   /**
