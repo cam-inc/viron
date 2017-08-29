@@ -8,24 +8,22 @@ export default function() {
     this.isShowTimepicker = true;
   };
 
-  const formatPartial = date => {
-    return date.format('HH:mm:ss');
+  const format = date => {
+    return date.format('HH:mm:ssZ');
   };
 
   const digitNum = num => {
     return num = ('0' + num).slice(-2);
   };
 
-  const space = ' ';
-  const fulltimesplit = this.opts.date.split(space, 2);
-  let partialtime = fulltimesplit[0];
+  let fulltime = this.opts.date;
 
-  this.displayTime = partialtime;
-  this.defaultTime = moment(this.displayTime, 'HH:mm:ss');
+  this.displayDate = moment.utc(fulltime);
+  this.displayFormatDate = format(this.displayDate);
 
   this.on('update', () => {
-    this.displayTime = partialtime;
-    this.defaultTime = moment(this.displayTime, 'HH:mm:ss');
+    this.displayDate = moment.utc(fulltime);
+    this.displayFormatDate = format(this.displayDate);
   }).on('updated', () => {
     this.rebindTouchEvents();
   });
@@ -34,12 +32,12 @@ export default function() {
     const MAX_DISPLAY_HOURS = 24;
     const hours = [];
     times(MAX_DISPLAY_HOURS, i => {
-      const date = this.defaultTime.clone().set('hours', i);
+      const date = this.displayDate.clone().set('hours',i);
       const displayNum = digitNum(i);
       hours[i] = {
-        'date': i,
+        'date': date,
         'displayTime': displayNum,
-        'formatDate': formatPartial(date)
+        'isSelected': format(date) === format(this.displayDate)
       };
     });
     return hours;
@@ -49,12 +47,12 @@ export default function() {
     const MAX_DISPLAY_MINUTES = 60;
     const minutes = [];
     times(MAX_DISPLAY_MINUTES, i => {
-      const date = this.defaultTime.clone().set('minutes', i);
+      const date = this.displayDate.clone().set('minutes',i);
       const displayNum = digitNum(i);
       minutes[i] = {
-        'date': i,
+        'date': date,
         'displayTime': displayNum,
-        'formatDate': formatPartial(date)
+        'isSelected': format(date) === format(this.displayDate)
       };
     });
     return minutes;
@@ -64,29 +62,19 @@ export default function() {
     const MAX_DISPLAY_SECONDS = 60;
     const seconds = [];
     times(MAX_DISPLAY_SECONDS, i => {
-      const date = this.defaultTime.clone().set('seconds', i);
+      const date = this.displayDate.clone().set('seconds',i);
       const displayNum = digitNum(i);
       seconds[i] = {
-        'date': i,
+        'date': date,
         'displayTime': displayNum,
-        'formatDate': formatPartial(date)
+        'isSelected': format(date) === format(this.displayDate)
       };
     });
     return seconds;
   };
 
-  this.handleSelectHour = date => {
-    partialtime = date;
-    this.update();
-  };
-
-  this.handleSelectMinute = date => {
-    partialtime = date;
-    this.update();
-  };
-
-  this.handleSelectSecond = date => {
-    partialtime = date;
+  this.handleSelectItem = date => {
+    fulltime = date;
     this.update();
   };
 
