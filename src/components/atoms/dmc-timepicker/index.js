@@ -9,7 +9,7 @@ export default function() {
   };
 
   const format = date => {
-    return date.format('HH:mm:ssZ');
+    return date.format('HH:mm:ss');
   };
 
   const digitNum = num => {
