@@ -6,7 +6,6 @@ import drawers from './drawers';
 import endpoints from './endpoints';
 import layout from './layout';
 import location from './location';
-import menu from './menu';
 import modals from './modals';
 import oas from './oas';
 import oauthEndpointKey from './oauthEndpointKey';
@@ -28,7 +27,6 @@ const constants = {
   ENDPOINTS: 'ENDPOINTS',
   LAYOUT: 'LAYOUT',
   LOCATION: 'LOCATION',
-  MENU: 'MENU',
   MODALS: 'MODALS',
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
@@ -47,7 +45,6 @@ export default {
   endpoints,
   layout,
   location,
-  menu,
   modals,
   oauthEndpointKey,
   page,

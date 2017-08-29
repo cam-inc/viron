@@ -52,4 +52,8 @@ export default function() {
     this.groupedManage = group(manage);
     this.update();
   });
+
+  this.handleHomeButtonTap = () => {
+    this.getRouter().navigateTo('/');
+  };
 }

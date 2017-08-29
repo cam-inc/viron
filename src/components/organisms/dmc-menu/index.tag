@@ -17,8 +17,12 @@ dmc-menu.Menu
       .Menu__sectionTitle 管理画面
       .Menu__groups
         dmc-menu-group(each="{ group in groupedManage }" group="{ group }")
+  .Menu__tail
+    .Menu__homeButton(ref="touch" onTap="handleHomeButtonTap")
+      dmc-icon(type="home")
 
   script.
+    import '../../atoms/dmc-icon/index.tag';
     import './group.tag';
     import script from './index';
     this.external(script);
