@@ -49,7 +49,6 @@
 }
 
 .Component__body {
-  @apply --layout-center-center;
   flex-grow: 1;
   padding: 16px;
 }
@@ -79,6 +78,7 @@
 }
 
 .Component__tail {
+  @apply --layout-center-center;
   padding: 8px;
   border-top: 1px solid var(--color-basic-black);
 }
@@ -86,6 +86,14 @@
 .Component__action {
   position: relative;
   display: block;
+}
+
+.Component__tail .Component__action {
+  margin-right: 8px;
+}
+
+.Component__tail .Component__action:last-child {
+  margin-right: 0;
 }
 
 .Component__action .Button {
