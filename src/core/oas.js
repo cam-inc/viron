@@ -9,7 +9,9 @@ import isObject from 'mout/lang/isObject';
 import isString from 'mout/lang/isString';
 import hasOwn from 'mout/object/hasOwn';
 import keys from 'mout/object/keys';
+import moment from 'moment';
 import ObjectAssign from 'object-assign';
+import rfc3986 from 'rfc-3986';
 
 const resultTemplate = {
   isValid: true,
@@ -612,30 +614,165 @@ const format = (value, constraints) => {
   }
   const format = constraints.format;
   switch (format) {
-  case 'date-time':
+  case 'date-time': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.1
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // RFC 3339に則った書き方かバリデートする
+    const pattern = /^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+\-])([01]\d|2[0-3]):([0-5]\d))$/;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"date-time"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
+    // 存在する日付かチェックする(e.g. うるう年)
+    const isValid = moment(value).isValid();
+    if (!isValid) {
+      result.isValid = false;
+      result.message = '存在する日付を入力してください。';
+      return result;
+    }
     break;
-  case 'email':
+  }
+  case 'email': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.2
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // RFC 5322に則った書き方かバリデートする
+    const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"email"に則ったフォーマットで入力してください。';
+      return result;
+    }
     break;
-  case 'hostname':
+  }
+  case 'hostname': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
-    // TODO
+    
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // hostnameが255文字を超えていたらエラー
+    if (value.length > 255) {
+      result.isValid = false;
+      result.message = '"hostname"は255文字以内で入力してください。';
+      return result;
+    }
+
+    // RFC 1034に則った書き方かバリデートする
+    const pattern = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[‌​a-z\d])?)*$/i; // eslint-disable-line no-irregular-whitespace
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"hostname"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
     break;
-  case 'ipv4':
+  }
+  case 'ipv4': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.4
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // RFC 2673に則った書き方かバリデートする
+    const pattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"ipv4"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    
     break;
-  case 'ipv6':
+  }
+  case 'ipv6': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.5
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    if(value.match(/::/)) {
+      let targetColon = 7;
+      // IPv4互換バージョンを使用している場合、ターゲット番号は：6
+      if(value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
+        targetColon = 6;
+      }
+
+      // ipv6の形を成形する
+      if(value.match(/^::/)) {
+        value = value.replace('::', '0::');
+      }
+      if(value.match(/::$/)) {
+        value = value.replace('::', '::0');
+      }
+
+      while(value.match(/:/g).length < targetColon) {
+        value = value.replace('::', ':0::');
+      }
+
+      value = value.replace('::', ':0:');
+    }
+
+    // RFC 2373に則った書き方かバリデートする
+    let patterns = [
+      /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/,
+      /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+    ];
+    let matchResult = false;
+    forEach(patterns, (pattern) => {
+      const isMatch = value.match(pattern);
+      if (!isNull(isMatch)) {
+        matchResult = true;
+      }
+    });
+
+    if (!matchResult) {
+      result.isValid = false;
+      result.message = '"ipv6"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
     break;
-  case 'uri':
+  }
+  case 'uri': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.6
-    // TODO
+
+    // String型のときだけバリデートする
+    if (!isString(value)) {
+      return result;
+    }
+
+    // RFC 3986に則った書き方かバリデートする
+    const pattern = rfc3986.uri;
+    const isMatch = value.match(pattern);
+    if (isNull(isMatch)) {
+      result.isValid = false;
+      result.message = '"uri"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
     break;
+  }
     /*
   case 'todo: custom format here':
     // TODO: 独自フォーマットがあればここに。

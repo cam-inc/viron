@@ -10,7 +10,7 @@ export default function() {
   this.schemaObject = schemaObject;
   this.name = schemaObject.name;
   this.selfRequired = schemaObject.selfRequired;
-  const keysForInfo = ['enum', 'description', 'required', 'type', 'example', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'format'];
+  const keysForInfo = ['enum', 'description', 'required', 'type', 'example', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'format', 'x-wyswyg-options'];
   this.infos = [];
   forEach(keysForInfo, key => {
     if (!hasOwn(schemaObject, key)) {
@@ -18,7 +18,7 @@ export default function() {
     }
     this.infos.push({
       key,
-      value: String(schemaObject[key])
+      value: JSON.stringify(schemaObject[key])
     });
   });
 

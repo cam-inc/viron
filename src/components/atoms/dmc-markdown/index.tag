@@ -1,4 +1,4 @@
-dmc-markdown
+dmc-markdown.Markdown
   div(ref='view')
 
   script.

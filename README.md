@@ -3,7 +3,11 @@ Automatically generate a management console based on swagger data.
 
 # Site
 
-> access : [https://cam-inc.github.io/dmc/](https://cam-inc.github.io/dmc/)
+> access : [DMC](https://cam-inc.github.io/dmc/)
+
+> access : [DMC(stg)](https://cam-inc.github.io/dmc/stg/)
+
+> access : [DMC(dev)](https://cam-inc.github.io/dmc/dev/)
 
 # QuickStart
 
@@ -41,6 +45,15 @@ $ ls browser/swagger-client.js
 # Release
 
 ```
-$ npm run release
+# for develop
+$ npm run release:dev
+# for staging
+$ npm run release:stg
+# for production
+$ npm run release:prd
 ```
 > access : [DMC](https://cam-inc.github.io/dmc/)
+
+> access : [DMC(stg)](https://cam-inc.github.io/dmc/stg/)
+
+> access : [DMC(dev)](https://cam-inc.github.io/dmc/dev/)

@@ -1,8 +1,18 @@
 # 実装手順
 
-ここではexample-nodeをベースに自サービスのDMCサーバを実装する手順について記述します。  
+ここではexample-nodeをベースに自サービスのDMCサーバを実装する手順について記述します。
 
 ## 準備
+
+- Node.jsとmysqlのdocker imageを作成
+
+```
+$ cd /your/workspace
+$ git clone git@github.com:cam-inc/Dockerfile.git
+$ cd Dockerfile/
+$ ./build.sh --node
+$ ./build.sh --mysql
+```
 
 - example-nodeを自サービスのリポジトリにコピー
     - 各ディレクトリ/ファイルの詳細は [アーキテクチャ](architecture.md) に記述しています。
@@ -57,7 +67,7 @@ $ npm run dressup
 
 ## CRUD追加
 
-テーブルのCRUDを作成する手順です。  
+テーブルのCRUDを作成する手順です。
 
 - modelを定義
     - `shared/stores/mysql/models` 配下に {{table_name}}.js を作成・実装
@@ -76,7 +86,7 @@ $ npm run dressup
 ## example-nodeを流用しない場合
 
 Node.jsやExpressについてある程度知識があり、クリーンな状態から実装したい場合は  
-[swagger-node](https://github.com/swagger-api/swagger-node) を使用して構築可能です。  
+[swagger-node](https://github.com/swagger-api/swagger-node) を使用して構築可能です。
 
 ```
 $ npm install -g swagger

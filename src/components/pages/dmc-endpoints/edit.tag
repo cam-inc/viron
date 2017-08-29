@@ -2,7 +2,7 @@ dmc-endpoint-edit.EndpointsPage__edit
   .EndpointsPage__editTitle 管理画面を編集する
   .EndpointsPage__editUrl { opts.url }
   .EndpointsPage__editForm
-    dmc-textarea(label="メモ" text="{ memo }" placeholder="メモを入力" onChange="{ handleMemoChange }")
+    dmc-textarea(label="メモ" text="{ memo }" onChange="{ handleMemoChange }")
   .EndpointsPage__editControls
     dmc-button(type="primary" onPat="{ handleEditButtonPat }" label="編集")
     dmc-button(type="secondary" onPat="{ handleCancelButtonPat }" label="キャンセル")

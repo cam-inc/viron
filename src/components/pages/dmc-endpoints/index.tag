@@ -21,6 +21,7 @@ dmc-endpoints.Page.EndpointsPage
 
   script.
     import '../../atoms/dmc-icon/index.tag';
+    import '../../atoms/dmc-uploader/index.tag';
     import './endpoint.tag';
     import script from './index';
     this.external(script);
