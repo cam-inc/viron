@@ -1,3 +1,7 @@
+:root {
+  --component-application-asideColumn-width: 256px;
+}
+
 .Application {
   position: relative;
   display: block;
@@ -13,7 +17,7 @@
 
 .Application__asideColumn {
   flex-shrink: 0;
-  width: 256px;
+  width: var(--component-application-asideColumn-width);
   overflow-y: scroll;
   background-color: var(--color-base-mineShaft);
   box-shadow: 0 0 18px rgba(0, 0, 0, 0.2);

@@ -1,7 +1,7 @@
 dmc-component-operation.ComponentOperation
   .ComponentOperation__head
-    .ComponentOperation__name { opts.name }
-    .ComponentOperation__description { opts.description }
+    .ComponentOperation__title { opts.title }
+    .ComponentOperation__description(if="{ !!opts.description }") { opts.description }
   .ComponentOperation__body
     dmc-parameters(parameterObjects="{ opts.parameterObjects }" parameters="{ currentParameters }" onChange="{ handleParametersChange }")
   .ComponentOperation__tail

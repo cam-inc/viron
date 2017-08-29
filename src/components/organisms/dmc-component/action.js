@@ -9,7 +9,7 @@ export default function() {
 
   this.handleButtonPat = () => {
     store.action(actions.DRAWERS_ADD, 'dmc-component-operation', {
-      name: operationObject.summary || operationObject.operationId,
+      title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,
       operationObject,
       parameterObjects: operationObject.parameters,
