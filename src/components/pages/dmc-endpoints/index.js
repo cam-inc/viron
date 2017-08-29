@@ -4,7 +4,6 @@ import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../atoms/dmc-message/index.tag';
 import './edit.tag';
-import './entry.tag';
 import './qrcode.tag';
 import './signin.tag';
 
@@ -12,6 +11,7 @@ export default function() {
   const store = this.riotx.get();
 
   this.endpoints = store.getter(getters.ENDPOINTS);
+  this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
 
   /**
    * 現在のviewportに最適なcolumn数を計算して返します。
@@ -47,17 +47,9 @@ export default function() {
   });
   this.listen(states.ENDPOINTS, () => {
     this.endpoints = store.getter(getters.ENDPOINTS);
+    this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
     this.update();
   });
-
-  this.handleEndpointAddTap = () => {
-    Promise
-      .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'dmc-endpoint-entry'))
-      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
-        error: err
-      }));
-  };
 
   this.handleEndpointEntry = key => {
     Promise

@@ -9,6 +9,15 @@ dmc.Application
             | Management
             br
             | Console
+          .Application__menuItems
+            .Application__menuItem(ref="touch" onTap="handleEntryMenuItemTap")
+              .Application__menuItemIcon
+                dmc-icon(type="link")
+              .Application__menuItemLabel 新規追加
+            .Application__menuItem(ref="touch" onTap="handleDownloadMenuItemTap")
+              .Application__menuItemIcon
+                dmc-icon(type="download")
+              .Application__menuItemLabel ダウンロード
       virtual(if="{ !isTopPage }")
         dmc-menu
     .Application__mainColumn

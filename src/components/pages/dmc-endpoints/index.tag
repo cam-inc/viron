@@ -1,7 +1,9 @@
 dmc-endpoints.Page.EndpointsPage
+  .EndpointsPage__count(if="{ !!endpointsCount }")
+    .EndpointsPage__countIcon
+      dmc-icon(type="link")
+    .EndpointsPage__countLabel Endpoint ({ endpointsCount })
   .EndpointsPage__list(ref="list")
-    .EndpointsPage__addCard(ref="touch" onTap="handleEndpointAddTap")
-      dmc-icon(type="plus")
     virtual(each="{ endpoint, key in endpoints }")
       dmc-endpoint(
         key="{ key }"

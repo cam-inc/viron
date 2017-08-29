@@ -25,7 +25,37 @@
 }
 
 .Application__title {
+  margin-bottom: 96px;
   font-size: 26px;
+}
+
+.Application__menuItem {
+  @apply --layout-center-center;
+  cursor: pointer;
+}
+
+.Application__menuItem.hover {
+  opacity: 0.5;
+}
+
+.Application__menuItems .Application__menuItem {
+  margin-bottom: 8px;
+}
+
+.Application__menuItems .Application__menuItem:last-child {
+  margin-bottom: 0;
+}
+
+.Application__menuItemIcon {
+  @apply --layout-center-center;
+  width: 24px;
+  height: 24px;
+  margin-right: 32px;
+  font-size: 24px;
+}
+
+.Application__menuItemLabel {
+  flex-grow: 1;
 }
 
 .Application__mainColumn {
@@ -78,4 +108,47 @@
   right: 0;
   bottom: 0;
   left: 0;
+}
+
+/* ============================== */
+/* Entry */
+/* ============================== */
+.Application__entry {
+  display: block;
+}
+
+.Application__entryTitle {
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+.Application__entryMessage {
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-basic-red);
+}
+
+.Application__entryForm .Textinput,
+.Application__entryForm .Textarea {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.Application__entryForm .Textinput {
+  margin-bottom: 12px;
+}
+
+.Application__entryControls {
+  @apply --layout-center-center;
+}
+
+.Application__entryControls .Button {
+  display: block;
+  flex-grow: 1;
+}
+
+.Application__entryControls .Button:first-child {
+  margin-right: 12px;
 }
