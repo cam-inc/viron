@@ -8,15 +8,15 @@ export default function() {
   };
 
   const digitNum = num => {
-    return num = ('0' + num).slice(-2);
+    return ('0' + num).slice(-2);
   };
 
-  this.displayDate = moment.utc(this.opts.date);
-  this.displayFormatDate = format(this.displayDate);
+  this.momentDate = moment.utc(this.opts.date);
+  this.displayFormatDate = format(this.momentDate);
 
   this.on('update', () => {
-    this.displayDate = moment.utc(this.opts.date);
-    this.displayFormatDate = format(this.displayDate);
+    this.momentDate = moment.utc(this.opts.date);
+    this.displayFormatDate = format(this.momentDate);
   }).on('updated', () => {
     this.rebindTouchEvents();
   });
@@ -25,7 +25,7 @@ export default function() {
     const MAX_DISPLAY_HOURS = 24;
     const hours = [];
     times(MAX_DISPLAY_HOURS, i => {
-      const date = this.displayDate.clone().set('hours',i);
+      const date = this.momentDate.clone().set('hours',i);
       const displayNum = digitNum(i);
       hours[i] = {
         'date': date,
@@ -40,7 +40,7 @@ export default function() {
     const MAX_DISPLAY_MINUTES = 60;
     const minutes = [];
     times(MAX_DISPLAY_MINUTES, i => {
-      const date = this.displayDate.clone().set('minutes',i);
+      const date = this.momentDate.clone().set('minutes',i);
       const displayNum = digitNum(i);
       minutes[i] = {
         'date': date,
@@ -55,12 +55,12 @@ export default function() {
     const MAX_DISPLAY_SECONDS = 60;
     const seconds = [];
     times(MAX_DISPLAY_SECONDS, i => {
-      const date = this.displayDate.clone().set('seconds',i);
+      const date = this.momentDate.clone().set('seconds',i);
       const displayNum = digitNum(i);
       seconds[i] = {
         'date': date,
         'displayTime': displayNum,
-        'isSelected': format(date) === format(this.displayDate)
+        'isSelected': format(date) === format(this.momentDate)
       };
     });
     return seconds;
