@@ -82,7 +82,7 @@ export default function () {
   // canvasの初期化
   let canvas, context;
   // 最新の認められた色相値を保存
-  let latestValidHue = 0;
+  // let latestValidHue = 0;
 
   /*****************************************
    * Riotのライフサイクルイベント
@@ -250,14 +250,14 @@ export default function () {
     context.fill();
   };
 
-  const isMonochrome = (format, value) => {
-    let hsv = convertColor(format, value, COLOR_CODE.HSV);
-    if (hsv.s === 0) {
-      hsv.s = latestValidHue;
-    } else {
-      latestValidHue = hsv.s;
-    }
-  };
+  // const isMonochrome = (format, value) => {
+  //   let hsv = convertColor(format, value, COLOR_CODE.HSV);
+  //   if (hsv.s === 0) {
+  //     hsv.s = latestValidHue;
+  //   } else {
+  //     latestValidHue = hsv.s;
+  //   }
+  // };
 
   /**
    * スペクトラムのノブの位置を生成する
