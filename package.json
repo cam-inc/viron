@@ -1,11 +1,11 @@
 {
-  "name": "dmc",
+  "name": "viron",
   "version": "0.0.1",
   "description": "Design-based Management Console.",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cam-inc/dmc.git"
+    "url": "git+https://github.com/cam-inc/viron.git"
   },
   "keywords": [
     "management",
@@ -19,9 +19,9 @@
   "author": "fkei",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cam-inc/dmc/issues"
+    "url": "https://github.com/cam-inc/viron/issues"
   },
-  "homepage": "https://github.com/cam-inc/dmc#readme",
+  "homepage": "https://github.com/cam-inc/viron#readme",
   "scripts": {
     "prepush": "npm run test",
     "start": "run-s build:clean build:prepare build:html build:swagger build:img build:font watch",
@@ -115,6 +115,5 @@
     "stylelint-suitcss": "^1.0.0",
     "uglify-es": "^3.0.15",
     "watch": "^1.0.2"
-  },
-  "private": true
+  }
 }
