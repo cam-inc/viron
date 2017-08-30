@@ -1,7 +1,7 @@
 dmc-timepicker.Timepicker
     .Timepicker__label(if="{ !!opts.label }") { opts.label }
     .Timepicker__input(onTap="handleInputTap" ref="touch") { displayFormatDate }
-    .Partialtime(if="{ opts.isshown }")
+    .Timepicker__partialTime(if="{ opts.isshown }")
       .Partialtime__body
         .Partialtime__list.Partialtime__list--left
           dmc-timepicker-partial(each="{ hour in generateHours() }" date="{ hour.date }" time="{ hour.displayTime }" isSelected="{ hour.isSelected }" onPat="{ parent.handleSelectItem }")
