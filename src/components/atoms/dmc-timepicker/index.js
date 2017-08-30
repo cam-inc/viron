@@ -30,7 +30,7 @@ export default function() {
       hours[i] = {
         'date': date,
         'displayTime': displayNum,
-        'isSelected': format(date) === format(this.displayDate)
+        'isSelected': format(date) === this.displayFormatDate
       };
     });
     return hours;
@@ -45,7 +45,7 @@ export default function() {
       minutes[i] = {
         'date': date,
         'displayTime': displayNum,
-        'isSelected': format(date) === format(this.displayDate)
+        'isSelected': format(date) === this.displayFormatDate
       };
     });
     return minutes;
