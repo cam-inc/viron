@@ -62,7 +62,7 @@ function createCommonjsModule(fn, module) {
 }
 
 var riot_1 = createCommonjsModule(function (module, exports) {
-/* Riot v3.6.0, @license MIT */
+/* Riot v3.6.3, @license MIT */
 (function (global, factory) {
 	factory(exports);
 }(commonjsGlobal, (function (exports) { 'use strict';
@@ -90,14 +90,13 @@ var WIN = typeof window === T_UNDEF ? undefined : window;
 var RE_SPECIAL_TAGS = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/;
 var RE_SPECIAL_TAGS_NO_OPTION = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?)$/;
 var RE_EVENTS_PREFIX = /^on/;
-var RE_RESERVED_NAMES = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|refs|parent|opts|trigger|o(?:n|ff|ne))$/;
 var RE_HTML_ATTRS = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
 var CASE_SENSITIVE_ATTRIBUTES = { 'viewbox': 'viewBox' };
 var RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/;
 var IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
 
 /**
- * Check Check if the passed argument is undefined
+ * Check if the passed argument is a boolean attribute
  * @param   { String } value -
  * @returns { Boolean } -
  */
@@ -171,14 +170,6 @@ function isWritable(obj, key) {
   return isUndefined(obj[key]) || descriptor && descriptor.writable
 }
 
-/**
- * Check if passed argument is a reserved name
- * @param   { String } value -
- * @returns { Boolean } -
- */
-function isReservedName(value) {
-  return RE_RESERVED_NAMES.test(value)
-}
 
 var check = Object.freeze({
 	isBoolAttr: isBoolAttr,
@@ -188,8 +179,7 @@ var check = Object.freeze({
 	isString: isString,
 	isBlank: isBlank,
 	isArray: isArray,
-	isWritable: isWritable,
-	isReservedName: isReservedName
+	isWritable: isWritable
 });
 
 /**
@@ -337,8 +327,7 @@ function safeInsert(root, curr, next) {
  * @param   { Function } fn - callback function to apply on any attribute found
  */
 function walkAttrs(html, fn) {
-  if (!html)
-    { return }
+  if (!html) { return }
   var m;
   while (m = RE_HTML_ATTRS.exec(html))
     { fn(m[1].toLowerCase(), m[2] || m[3] || m[4]); }
@@ -386,6 +375,7 @@ var dom = Object.freeze({
 });
 
 var styleNode;
+// Create cache and shortcut to the correct property
 var cssTextProp;
 var byName = {};
 var remainder = [];
@@ -393,7 +383,7 @@ var needsInject = false;
 
 // skip the following code on the server
 if (WIN) {
-  styleNode = (function () {
+  styleNode = ((function () {
     // create a new style element with the correct type
     var newNode = mkEl('style');
     setAttr(newNode, 'type', 'text/css');
@@ -408,7 +398,7 @@ if (WIN) {
     else { document.getElementsByTagName('head')[0].appendChild(newNode); }
 
     return newNode
-  })();
+  }))();
   cssTextProp = styleNode.styleSheet;
 }
 
@@ -435,7 +425,7 @@ var styleManager = {
     if (!WIN || !needsInject) { return }
     needsInject = false;
     var style = Object.keys(byName)
-      .map(function(k) { return byName[k] })
+      .map(function (k) { return byName[k]; })
       .concat(remainder).join('\n');
     /* istanbul ignore next */
     if (cssTextProp) { cssTextProp.cssText = style; }
@@ -1180,7 +1170,8 @@ function defineProperty(el, key, value, options) {
  *
  */
 function extend(src) {
-  var obj, args = arguments;
+  var obj;
+  var args = arguments;
   for (var i = 1; i < args.length; ++i) {
     if (obj = args[i]) {
       for (var key in obj) {
@@ -1215,8 +1206,8 @@ var settings$1 = extend(Object.create(brackets.settings), {
  * @param   { Object } e - event object
  */
 function handleEvent(dom, handler, e) {
-  var ptag = this.__.parent,
-    item = this.__.item;
+  var ptag = this.__.parent;
+  var item = this.__.item;
 
   if (!item)
     { while (ptag && !item) {
@@ -1254,8 +1245,8 @@ function handleEvent(dom, handler, e) {
  * @param { Tag } tag - tag instance
  */
 function setEventHandler(name, handler, dom, tag) {
-  var eventName,
-    cb = handleEvent.bind(tag, dom, handler);
+  var eventName;
+  var cb = handleEvent.bind(tag, dom, handler);
 
   // avoid to bind twice the same event
   // possible fix for #2332
@@ -1280,45 +1271,60 @@ function setEventHandler(name, handler, dom, tag) {
  * @param { String } tagName - tag implementation we want to use
  */
 function updateDataIs(expr, parent, tagName) {
-  var conf, isVirtual, head, ref;
+  var tag = expr.tag || expr.dom._tag,
+    ref;
 
-  if (expr.tag && expr.tagName === tagName) {
-    expr.tag.update();
+  var ref$1 = tag ? tag.__ : {};
+  var head = ref$1.head;
+  var isVirtual = expr.dom.tagName === 'VIRTUAL';
+
+  if (tag && expr.tagName === tagName) {
+    tag.update();
     return
   }
 
-  isVirtual = expr.dom.tagName === 'VIRTUAL';
   // sync _parent to accommodate changing tagnames
-  if (expr.tag) {
+  if (tag) {
     // need placeholder before unmount
     if(isVirtual) {
-      head = expr.tag.__.head;
       ref = createDOMPlaceholder();
       head.parentNode.insertBefore(ref, head);
     }
 
-    expr.tag.unmount(true);
+    tag.unmount(true);
   }
 
+  // unable to get the tag name
   if (!isString(tagName)) { return }
 
   expr.impl = __TAG_IMPL[tagName];
-  conf = {root: expr.dom, parent: parent, hasImpl: true, tagName: tagName};
-  expr.tag = initChildTag(expr.impl, conf, expr.dom.innerHTML, parent);
-  each(expr.attrs, function (a) { return setAttr(expr.tag.root, a.name, a.value); });
+
+  // unknown implementation
+  if (!expr.impl) { return }
+
+  expr.tag = tag = initChildTag(
+    expr.impl, {
+      root: expr.dom,
+      parent: parent,
+      tagName: tagName
+    },
+    expr.dom.innerHTML,
+    parent
+  );
+
+  each(expr.attrs, function (a) { return setAttr(tag.root, a.name, a.value); });
   expr.tagName = tagName;
-  expr.tag.mount();
-  if (isVirtual)
-    { makeReplaceVirtual(expr.tag, ref || expr.tag.root); } // root exist first time, after use placeholder
+  tag.mount();
+
+  // root exist first time, after use placeholder
+  if (isVirtual) { makeReplaceVirtual(tag, ref || tag.root); }
 
   // parent is the placeholder tag, not the dynamic tag so clean up
   parent.__.onUnmount = function() {
-    var delName = expr.tag.opts.dataIs,
-      tags = expr.tag.parent.tags,
-      _tags = expr.tag.__.parent.tags;
-    arrayishRemove(tags, delName, expr.tag);
-    arrayishRemove(_tags, delName, expr.tag);
-    expr.tag.unmount();
+    var delName = tag.opts.dataIs;
+    arrayishRemove(tag.parent.tags, delName, tag);
+    arrayishRemove(tag.__.parent.tags, delName, tag);
+    tag.unmount();
   };
 }
 
@@ -1358,7 +1364,7 @@ function updateExpression(expr) {
 
   // if it's a tag we could totally skip the rest
   if (expr._riot_id) {
-    if (expr.isMounted) {
+    if (expr.__.wasCreated) {
       expr.update();
     // if it hasn't been mounted yet, do that now.
     } else {
@@ -1578,8 +1584,8 @@ function mkitem(expr, key, val, base) {
  * @param   { Array } tags - array containing all the children tags
  */
 function unmountRedundant(items, tags) {
-  var i = tags.length,
-    j = items.length;
+  var i = tags.length;
+  var j = items.length;
 
   while (i > j) {
     i--;
@@ -1662,23 +1668,22 @@ function append(root, isVirtual) {
  * @returns { Object } expression object for this each loop
  */
 function _each(dom, parent, expr) {
+  var mustReorder = typeof getAttr(dom, LOOP_NO_REORDER_DIRECTIVE) !== T_STRING || remAttr(dom, LOOP_NO_REORDER_DIRECTIVE);
+  var tagName = getTagName(dom);
+  var impl = __TAG_IMPL[tagName];
+  var parentNode = dom.parentNode;
+  var placeholder = createDOMPlaceholder();
+  var child = getTag(dom);
+  var ifExpr = getAttr(dom, CONDITIONAL_DIRECTIVE);
+  var tags = [];
+  var isLoop = true;
+  var isAnonymous = !__TAG_IMPL[tagName];
+  var isVirtual = dom.tagName === 'VIRTUAL';
+  var oldItems = [];
+  var hasKeys;
 
   // remove the each property from the original tag
   remAttr(dom, LOOP_DIRECTIVE);
-
-  var mustReorder = typeof getAttr(dom, LOOP_NO_REORDER_DIRECTIVE) !== T_STRING || remAttr(dom, LOOP_NO_REORDER_DIRECTIVE),
-    tagName = getTagName(dom),
-    impl = __TAG_IMPL[tagName],
-    parentNode = dom.parentNode,
-    placeholder = createDOMPlaceholder(),
-    child = getTag(dom),
-    ifExpr = getAttr(dom, CONDITIONAL_DIRECTIVE),
-    tags = [],
-    oldItems = [],
-    hasKeys,
-    isLoop = true,
-    isAnonymous = !__TAG_IMPL[tagName],
-    isVirtual = dom.tagName === 'VIRTUAL';
 
   // parse the each expression
   expr = tmpl.loopKeys(expr);
@@ -1694,10 +1699,10 @@ function _each(dom, parent, expr) {
     // get the new items collection
     expr.value = tmpl(expr.val, parent);
 
-    var frag = createFrag(),
-      items = expr.value,
-      isObject$$1 = !isArray(items) && !isString(items),
-      root = placeholder.parentNode;
+    var items = expr.value;
+    var frag = createFrag();
+    var isObject$$1 = !isArray(items) && !isString(items);
+    var root = placeholder.parentNode;
 
     // if this DOM was removed the update here is useless
     // this condition fixes also a weird async issue on IE in our unit test
@@ -1707,15 +1712,13 @@ function _each(dom, parent, expr) {
     if (isObject$$1) {
       hasKeys = items || false;
       items = hasKeys ?
-        Object.keys(items).map(function (key) {
-          return mkitem(expr, items[key], key)
-        }) : [];
+        Object.keys(items).map(function (key) { return mkitem(expr, items[key], key); }) : [];
     } else {
       hasKeys = false;
     }
 
     if (ifExpr) {
-      items = items.filter(function(item, i) {
+      items = items.filter(function (item, i) {
         if (expr.key && !isObject$$1)
           { return !!tmpl(ifExpr, mkitem(expr, item, i, parent)) }
 
@@ -1724,17 +1727,16 @@ function _each(dom, parent, expr) {
     }
 
     // loop all the new items
-    each(items, function(item, i) {
+    each(items, function (item, i) {
       // reorder only if the items are objects
-      var
-        doReorder = mustReorder && typeof item === T_OBJECT && !hasKeys,
-        oldPos = oldItems.indexOf(item),
-        isNew = oldPos === -1,
-        pos = !isNew && doReorder ? oldPos : i,
-        // does a tag exist in this position?
-        tag = tags[pos],
-        mustAppend = i >= oldItems.length,
-        mustCreate =  doReorder && isNew || !doReorder && !tag;
+      var doReorder = mustReorder && typeof item === T_OBJECT && !hasKeys;
+      var oldPos = oldItems.indexOf(item);
+      var isNew = oldPos === -1;
+      var pos = !isNew && doReorder ? oldPos : i;
+      // does a tag exist in this position?
+      var tag = tags[pos];
+      var mustAppend = i >= oldItems.length;
+      var mustCreate =  doReorder && isNew || !doReorder && !tag;
 
       item = !hasKeys && expr.key ? mkitem(expr, item, i) : item;
 
@@ -1794,12 +1796,11 @@ function _each(dom, parent, expr) {
     // clone the items array
     oldItems = items.slice();
 
-    // this condition is weird u
     root.insertBefore(frag, placeholder);
   };
 
-  expr.unmount = function() {
-    each(tags, function(t) { t.unmount(); });
+  expr.unmount = function () {
+    each(tags, function (t) { t.unmount(); });
   };
 
   return expr
@@ -1819,7 +1820,12 @@ function parseExpressions(root, expressions, mustIncludeRoot) {
   var tree = {parent: {children: expressions}};
 
   walkNodes(root, function (dom, ctx) {
-    var type = dom.nodeType, parent = ctx.parent, attr, expr, tagImpl;
+    var type = dom.nodeType,
+      parent = ctx.parent,
+      attr,
+      expr,
+      tagImpl;
+
     if (!mustIncludeRoot && dom === root) { return {parent: parent} }
 
     // text node
@@ -1846,7 +1852,12 @@ function parseExpressions(root, expressions, mustIncludeRoot) {
 
     if (expr = getAttr(dom, IS_DIRECTIVE)) {
       if (tmpl.hasExpr(expr)) {
-        parent.children.push({isRtag: true, expr: expr, dom: dom, attrs: [].slice.call(dom.attributes)});
+        parent.children.push({
+          isRtag: true,
+          expr: expr,
+          dom: dom,
+          attrs: [].slice.call(dom.attributes)
+        });
         return false
       }
     }
@@ -1865,20 +1876,30 @@ function parseExpressions(root, expressions, mustIncludeRoot) {
         // can not remove attribute like directives
         // so flag for removal after creation to prevent maximum stack error
         setAttr(dom, 'virtualized', true);
-
-        var tag = new Tag$1({ tmpl: dom.outerHTML },
+        var tag = new Tag$1(
+          {tmpl: dom.outerHTML},
           {root: dom, parent: this$1},
-          dom.innerHTML);
+          dom.innerHTML
+        );
         parent.children.push(tag); // no return, anonymous tag, keep parsing
       } else {
-        var conf = {root: dom, parent: this$1, hasImpl: true};
-        parent.children.push(initChildTag(tagImpl, conf, dom.innerHTML, this$1));
+        parent.children.push(
+          initChildTag(
+            tagImpl,
+            {
+              root: dom,
+              parent: this$1
+            },
+            dom.innerHTML,
+            this$1
+          )
+        );
         return false
       }
     }
 
     // attribute expressions
-    parseAttributes.apply(this$1, [dom, dom.attributes, function(attr, expr) {
+    parseAttributes.apply(this$1, [dom, dom.attributes, function (attr, expr) {
       if (!expr) { return }
       parent.children.push(expr);
     }]);
@@ -1903,7 +1924,9 @@ function parseAttributes(dom, attrs, fn) {
   each(attrs, function (attr) {
     if (!attr) { return false }
 
-    var name = attr.name, bool = isBoolAttr(name), expr;
+    var name = attr.name;
+    var bool = isBoolAttr(name);
+    var expr;
 
     if (contains(REF_DIRECTIVES, name)) {
       expr =  Object.create(RefExpr).init(dom, this$1, name, attr.value);
@@ -1995,9 +2018,9 @@ function replaceYield(tmpl, html) {
  * @returns { HTMLElement } DOM element with _tmpl_ merged through `YIELD` with the _html_.
  */
 function mkdom(tmpl, html, isSvg$$1) {
-  var match   = tmpl && tmpl.match(/^\s*<([-\w]+)/),
-    tagName = match && match[1].toLowerCase(),
-    el = mkEl(isSvg$$1 ? SVG : GENERIC);
+  var match   = tmpl && tmpl.match(/^\s*<([-\w]+)/);
+  var  tagName = match && match[1].toLowerCase();
+  var el = mkEl(isSvg$$1 ? SVG : GENERIC);
 
   // replace all the yield tags with the tag inner html
   tmpl = replaceYield(tmpl, html);
@@ -2053,7 +2076,7 @@ function tag$1(name, tmpl, css, attrs, fn) {
   if (isFunction(attrs)) {
     fn = attrs;
 
-    if (/^[\w\-]+\s?=/.test(css)) {
+    if (/^[\w-]+\s?=/.test(css)) {
       attrs = css;
       css = '';
     } else
@@ -2215,7 +2238,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.6.0';
+var version$1 = 'v3.6.3';
 
 
 var core = Object.freeze({
@@ -2230,7 +2253,7 @@ var core = Object.freeze({
 });
 
 // counter to give a unique id to all the Tag instances
-var __uid = 0;
+var uid = 0;
 
 /**
  * We need to update opts for this tag. That requires updating the expressions
@@ -2247,13 +2270,22 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
   // (and only this case) we don't need to do updateOpts, because the regular parse
   // will update those attrs. Plus, isAnonymous tags don't need opts anyway
   if (isLoop && isAnonymous) { return }
-
   var ctx = !isAnonymous && isLoop ? this : parent || this;
+
   each(instAttrs, function (attr) {
     if (attr.expr) { updateAllExpressions.call(ctx, [attr.expr]); }
     // normalize the attribute names
     opts[toCamel(attr.name).replace(ATTRS_PREFIX, '')] = attr.expr ? attr.expr.value : attr.value;
   });
+}
+
+/**
+ * Toggle the isMounted flag
+ * @this Tag
+ * @param { Boolean } value - ..of the isMounted flag
+ */
+function setIsMounted(value) {
+  defineProperty(this, 'isMounted', value);
 }
 
 
@@ -2273,7 +2305,7 @@ function Tag$1(impl, conf, innerHTML) {
     isLoop = conf.isLoop,
     isAnonymous = !!conf.isAnonymous,
     skipAnonymous = settings$1.skipAnonymousTags && isAnonymous,
-    item = cleanUpData(conf.item),
+    item = conf.item,
     index = conf.index, // available only for the looped nodes
     instAttrs = [], // All attributes on the Tag when it's first parsed
     implAttrs = [], // expressions on this type of Tag
@@ -2291,7 +2323,7 @@ function Tag$1(impl, conf, innerHTML) {
   if (impl.name && root._tag) { root._tag.unmount(true); }
 
   // not yet mounted
-  this.isMounted = false;
+  setIsMounted.call(this, false);
 
   defineProperty(this, '__', {
     isAnonymous: isAnonymous,
@@ -2306,6 +2338,7 @@ function Tag$1(impl, conf, innerHTML) {
     listeners: [],
     // these vars will be needed only for the virtual tags
     virts: [],
+    wasCreated: false,
     tail: null,
     head: null,
     parent: null,
@@ -2314,7 +2347,7 @@ function Tag$1(impl, conf, innerHTML) {
 
   // create a unique id to this tag
   // it could be handy to use it also to improve the virtual dom rendering speed
-  defineProperty(this, '_riot_id', ++__uid); // base 1 allows test !t._riot_id
+  defineProperty(this, '_riot_id', ++uid); // base 1 allows test !t._riot_id
   defineProperty(this, 'root', root);
   extend(this, { opts: opts }, item);
   // protect the "tags" and "refs" property from being overridden
@@ -2338,13 +2371,14 @@ function Tag$1(impl, conf, innerHTML) {
     var nextOpts = {},
       canTrigger = this.isMounted && !skipAnonymous;
 
-    // make sure the data passed will not override
-    // the component core methods
-    data = cleanUpData(data);
     extend(this, data);
     updateOpts.apply(this, [isLoop, parent, isAnonymous, nextOpts, instAttrs]);
 
-    if (canTrigger && this.isMounted && isFunction(this.shouldUpdate) && !this.shouldUpdate(data, nextOpts)) {
+    if (
+      canTrigger &&
+      this.isMounted &&
+      isFunction(this.shouldUpdate) && !this.shouldUpdate(data, nextOpts)
+    ) {
       return this
     }
 
@@ -2466,21 +2500,21 @@ function Tag$1(impl, conf, innerHTML) {
     }
 
     defineProperty(this, 'root', root);
-    defineProperty(this, 'isMounted', true);
 
-    if (skipAnonymous) { return }
-
-    // if it's not a child tag we can trigger its mount event
-    if (!this.parent) {
-      this.trigger('mount');
-    }
-    // otherwise we need to wait that the parent "mount" or "updated" event gets triggered
-    else {
+    // if we need to wait that the parent "mount" or "updated" event gets triggered
+    if (!skipAnonymous && this.parent) {
       var p = getImmediateCustomParentTag(this.parent);
       p.one(!p.isMounted ? 'mount' : 'updated', function () {
+        setIsMounted.call(this$1, true);
         this$1.trigger('mount');
       });
+    } else {
+      // otherwise it's not a child tag we can trigger its mount event
+      setIsMounted.call(this, true);
+      if (!skipAnonymous) { this.trigger('mount'); }
     }
+
+    this.__.wasCreated = true;
 
     return this
 
@@ -2494,10 +2528,10 @@ function Tag$1(impl, conf, innerHTML) {
   defineProperty(this, 'unmount', function tagUnmount(mustKeepRoot) {
     var this$1 = this;
 
-    var el = this.root,
-      p = el.parentNode,
-      ptag,
-      tagIndex = __TAGS_CACHE.indexOf(this);
+    var el = this.root;
+    var p = el.parentNode;
+    var tagIndex = __TAGS_CACHE.indexOf(this);
+    var ptag;
 
     if (!skipAnonymous) { this.trigger('before-unmount'); }
 
@@ -2557,11 +2591,14 @@ function Tag$1(impl, conf, innerHTML) {
     if (this.__.onUnmount) { this.__.onUnmount(); }
 
     if (!skipAnonymous) {
+      // weird fix for a weird edge case #2409
+      if (!this.isMounted) { this.trigger('mount'); }
       this.trigger('unmount');
       this.off('*');
     }
 
     defineProperty(this, 'isMounted', false);
+    this.__.wasCreated = false;
 
     delete this.root._tag;
 
@@ -2591,7 +2628,7 @@ function inheritFrom(target, propsInSyncWithParent) {
 
   each(Object.keys(target), function (k) {
     // some properties must be always in sync with the parent tag
-    var mustSync = !isReservedName(k) && contains(propsInSyncWithParent, k);
+    var mustSync = contains(propsInSyncWithParent, k);
 
     if (isUndefined(this$1[k]) || mustSync) {
       // track the property to keep in sync
@@ -2609,8 +2646,8 @@ function inheritFrom(target, propsInSyncWithParent) {
  * @param   { Number } newPos - index where the new tag will be stored
  */
 function moveChildTag(tagName, newPos) {
-  var parent = this.parent,
-    tags;
+  var parent = this.parent;
+  var tags;
   // no parent no move
   if (!parent) { return }
 
@@ -2630,9 +2667,9 @@ function moveChildTag(tagName, newPos) {
  * @returns { Object } instance of the new child tag just created
  */
 function initChildTag(child, opts, innerHTML, parent) {
-  var tag = new Tag$1(child, opts, innerHTML),
-    tagName = opts.tagName || getTagName(opts.root, true),
-    ptag = getImmediateCustomParentTag(parent);
+  var tag = new Tag$1(child, opts, innerHTML);
+  var tagName = opts.tagName || getTagName(opts.root, true);
+  var ptag = getImmediateCustomParentTag(parent);
   // fix for the parent attribute in the looped elements
   defineProperty(tag, 'parent', ptag);
   // store the real parent tag
@@ -2669,7 +2706,7 @@ function getImmediateCustomParentTag(tag) {
  * @param   { Array } expressions - DOM expressions
  */
 function unmountAll(expressions) {
-  each(expressions, function(expr) {
+  each(expressions, function (expr) {
     if (expr instanceof Tag$1) { expr.unmount(true); }
     else if (expr.tagName) { expr.tag.unmount(true); }
     else if (expr.unmount) { expr.unmount(); }
@@ -2683,27 +2720,10 @@ function unmountAll(expressions) {
  * @returns { String } name to identify this dom node in riot
  */
 function getTagName(dom, skipDataIs) {
-  var child = getTag(dom),
-    namedTag = !skipDataIs && getAttr(dom, IS_DIRECTIVE);
+  var child = getTag(dom);
+  var namedTag = !skipDataIs && getAttr(dom, IS_DIRECTIVE);
   return namedTag && !tmpl.hasExpr(namedTag) ?
-                namedTag :
-              child ? child.name : dom.tagName.toLowerCase()
-}
-
-/**
- * With this function we avoid that the internal Tag methods get overridden
- * @param   { Object } data - options we want to use to extend the tag instance
- * @returns { Object } clean object without containing the riot internal reserved words
- */
-function cleanUpData(data) {
-  if (!(data instanceof Tag$1) && !(data && isFunction(data.trigger)))
-    { return data }
-
-  var o = {};
-  for (var key in data) {
-    if (!RE_RESERVED_NAMES.test(key)) { o[key] = data[key]; }
-  }
-  return o
+    namedTag : child ? child.name : dom.tagName.toLowerCase()
 }
 
 /**
@@ -2770,12 +2790,11 @@ function arrayishRemove(obj, key, value, ensureArray) {
  * @returns { Tag } a new Tag instance
  */
 function mountTo(root, tagName, opts, ctx) {
-  var impl = __TAG_IMPL[tagName],
-    implClass = __TAG_IMPL[tagName].class,
-    tag = ctx || (implClass ? Object.create(implClass.prototype) : {}),
-    // cache the inner HTML to fix #855
-    innerHTML = root._innerHTML = root._innerHTML || root.innerHTML;
-
+  var impl = __TAG_IMPL[tagName];
+  var implClass = __TAG_IMPL[tagName].class;
+  var tag = ctx || (implClass ? Object.create(implClass.prototype) : {});
+  // cache the inner HTML to fix #855
+  var innerHTML = root._innerHTML = root._innerHTML || root.innerHTML;
   var conf = extend({ root: root, opts: opts }, { parent: opts ? opts.parent : null });
 
   if (impl && root) { Tag$1.apply(tag, [impl, conf, innerHTML]); }
@@ -2810,10 +2829,11 @@ function makeReplaceVirtual(tag, ref) {
 function makeVirtual(src, target) {
   var this$1 = this;
 
-  var head = createDOMPlaceholder(),
-    tail = createDOMPlaceholder(),
-    frag = createFrag(),
-    sib, el;
+  var head = createDOMPlaceholder();
+  var tail = createDOMPlaceholder();
+  var frag = createFrag();
+  var sib;
+  var el;
 
   this.root.insertBefore(head, this.root.firstChild);
   this.root.appendChild(tail);
@@ -2843,9 +2863,8 @@ function makeVirtual(src, target) {
 function moveVirtual(src, target) {
   var this$1 = this;
 
-  var el = this.__.head,
-    frag = createFrag(),
-    sib;
+  var el = this.__.head, sib;
+  var frag = createFrag();
 
   while (el) {
     sib = el.nextSibling;
@@ -2888,7 +2907,6 @@ var tags = Object.freeze({
 	getImmediateCustomParentTag: getImmediateCustomParentTag,
 	unmountAll: unmountAll,
 	getTagName: getTagName,
-	cleanUpData: cleanUpData,
 	arrayishAdd: arrayishAdd,
 	arrayishRemove: arrayishRemove,
 	mountTo: mountTo,
@@ -2916,14 +2934,14 @@ var util = {
 };
 
 // export the core props/methods
-var Tag$$1 = Tag$2;
-var tag$$1 = tag$1;
-var tag2$$1 = tag2$1;
-var mount$$1 = mount$1;
-var mixin$$1 = mixin$1;
-var update$$1 = update$1;
-var unregister$$1 = unregister$1;
-var version$$1 = version$1;
+var Tag = Tag$2;
+var tag = tag$1;
+var tag2 = tag2$1;
+var mount = mount$1;
+var mixin = mixin$1;
+var update = update$1;
+var unregister = unregister$1;
+var version = version$1;
 var observable = observable$1;
 
 var riot$1 = extend({}, core, {
@@ -2934,14 +2952,14 @@ var riot$1 = extend({}, core, {
 
 exports.settings = settings;
 exports.util = util;
-exports.Tag = Tag$$1;
-exports.tag = tag$$1;
-exports.tag2 = tag2$$1;
-exports.mount = mount$$1;
-exports.mixin = mixin$$1;
-exports.update = update$$1;
-exports.unregister = unregister$$1;
-exports.version = version$$1;
+exports.Tag = Tag;
+exports.tag = tag;
+exports.tag2 = tag2;
+exports.mount = mount;
+exports.mixin = mixin;
+exports.update = update;
+exports.unregister = unregister;
+exports.version = version;
 exports.observable = observable;
 exports['default'] = riot$1;
 
@@ -6961,7 +6979,7 @@ function shouldUseNative() {
 	}
 }
 
-var index$1$1 = shouldUseNative() ? Object.assign : function (target, source) {
+var objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
 	var from;
 	var to = toObject(target);
 	var symbols;
@@ -7205,6 +7223,15 @@ var drawers = [];
 // ローカルに保存されているエンドポイント一覧。
 var endpoints = store.get('endpoints', {});
 
+var layout = {
+  // componentリストのgridレイアウトのcolumn数。
+  componentsGridColumnCount: (() => {
+    const htmlStyles = window.getComputedStyle(document.querySelector('html'));
+    const columnCount = Number(htmlStyles.getPropertyValue('--page-components-grid-column-count'));
+    return columnCount;
+  })()
+};
+
 var location$1 = {
   // 表示中のページ名。
   name: '',
@@ -7216,15 +7243,15 @@ var location$1 = {
   }
 };
 
-var menu = {
-  // メニューの開閉状態。
-  isOpened: false,
-  // メニューが有効か否か。
-  // 無効状態では画面に表示されない。
-  isEnabled: false
-};
-
 var modals = [];
+
+// OpenAPI Specificationに関する情報。
+var oas = {
+  // SwaggerClientによって生成されたSwaggerClientインスタンス。
+  // resolve済みのOpenAPI Document情報やhttpクライアント等が格納されている。
+  // @see: https://github.com/swagger-api/swagger-js#constructor-and-methods
+  client: null
+};
 
 var oauthEndpointKey = store.get('oauth_endpoint_key', null);
 
@@ -7246,10 +7273,11 @@ const constants$3 = {
   },
   CURRENT: 'CURRENT',
   DMC: 'DMC',
+  OAS: 'OAS',
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
+  LAYOUT: 'LAYOUT',
   LOCATION: 'LOCATION',
-  MENU: 'MENU',
   MODALS: 'MODALS',
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
@@ -7263,10 +7291,11 @@ var states = {
   components,
   current,
   dmc,
+  oas,
   drawers,
   endpoints,
+  layout,
   location: location$1,
-  menu,
   modals,
   oauthEndpointKey,
   page,
@@ -7278,6 +7307,8 @@ var states = {
 var application$1 = {
   /**
    * 起動ステータスを変更します。
+   * @param {riotx.Context} context
+   * @param {Boolean} bool
    * @return {Array}
    */
   launch: (context, bool) => {
@@ -7287,6 +7318,8 @@ var application$1 = {
 
   /**
    * 画面遷移ステータスを変更します。
+   * @param {riotx.Context} context
+   * @param {Boolean} bool
    * @return {Array}
    */
   navigation: (context, bool) => {
@@ -7296,11 +7329,12 @@ var application$1 = {
 
   /**
    * 通信中APIを追加します。
+   * @param {riotx.Context} context
    * @param {Object} info
    * @return {Array}
    */
   addNetworking: (context, info) => {
-    context.state.application.networkings.push(index$1$1({
+    context.state.application.networkings.push(objectAssign({
       id: `networking_${Date.now()}`
     }, info));
     context.state.application.isNetworking = true;
@@ -7309,6 +7343,7 @@ var application$1 = {
 
   /**
    * 通信中APIを削除します。
+   * @param {riotx.Context} context
    * @param {String} networkingId
    * @return {Array}
    */
@@ -7323,362 +7358,6 @@ var application$1 = {
   }
 };
 
-/**
-     * Array.indexOf
-     */
-    function indexOf$1(arr, item, fromIndex) {
-        fromIndex = fromIndex || 0;
-        if (arr == null) {
-            return -1;
-        }
-
-        var len = arr.length,
-            i = fromIndex < 0 ? len + fromIndex : fromIndex;
-        while (i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (arr[i] === item) {
-                return i;
-            }
-
-            i++;
-        }
-
-        return -1;
-    }
-
-    var indexOf_1$1 = indexOf$1;
-
-/**
-     * If array contains values.
-     */
-    function contains$1(arr, val) {
-        return indexOf_1$1(arr, val) !== -1;
-    }
-    var contains_1$1 = contains$1;
-
-/**
-     * Checks if the object is a primitive
-     */
-
-/**
-     * get "nested" object property
-     */
-    function get(obj, prop){
-        var parts = prop.split('.'),
-            last = parts.pop();
-
-        while (prop = parts.shift()) {
-            obj = obj[prop];
-            if (obj == null) { return; }
-        }
-
-        return obj[last];
-    }
-
-    var get_1 = get;
-
-/**
- * Swaggerファイルをロードして解析しデータ/操作を一元管理。
- * Tips: swagger-client(swagger-js) は、ブラウザの外部ファイル読み込み
- */
-class Swagger {
-  constructor() {
-    this.client = null;
-  }
-
-  setup(endpoint) {
-    return new Promise((resolve, reject) => {
-      const request = {
-        url: endpoint.url,
-        //query,
-        //method,
-        //body,
-        headers: {
-          'Authorization': endpoint.token
-        },
-        requestInterceptor: (req) => {
-          console.log('Interceptor(request):', req);
-        },
-        responseInterceptor: (res) => {
-          console.log('Interceptor(response):', res);
-        }
-      };
-
-      SwaggerClient// eslint-disable-line no-undef
-        .http(request)
-        .then(res => {
-          if (res.errors && res.errors.length > 0) {
-            return reject(res.errors);
-          }
-          if (res.status === 401) {
-            const err = new Error();
-            err.name = '401 Authorization Required';
-            err.status = res.spec.status;
-            return reject(err);
-          }
-
-          SwaggerClient({spec: res.body}).then(_client => {// eslint-disable-line no-undef
-            this.client = _client;
-            resolve(_client.spec.info);
-          });
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  }
-
-  apisFlatObject() {
-    if (!this.client) {
-      return {};
-    }
-    const apis = {};
-    forOwn_1$1(this.client.apis, (v) => {
-      forOwn_1$1(v, (v1, k1) => {
-        apis[k1] = v1;
-      });
-    });
-
-    return apis;
-  }
-
-  getApiByOperationID(operationID) {
-    return this.apisFlatObject()[operationID];
-  }
-
-  getOperationObjectByOperationID(operationID) {
-    let operationObject;
-    forOwn_1$1(this.client.spec.paths, pathItemObject => {
-      forOwn_1$1(pathItemObject, v => {
-        if (get_1(v, 'operationId') === operationID) {
-          operationObject = v;
-        }
-      });
-    });
-    return operationObject;
-  }
-
-  getPathItemObjectByPath(path) {
-    return this.client.spec.paths[path];
-  }
-
-  getMethodAndPathByOperationID(operationID) {
-    const ret = {};
-    forOwn_1$1(this.client.spec.paths, (pathItemObject, path) => {
-      forOwn_1$1(pathItemObject, (v, k) => {
-        if (get_1(v, 'operationId') === operationID) {
-          ret.method = k;
-          ret.path = path;
-        }
-      });
-    });
-    return ret;
-  }
-
-  /**
-   * dmc-component-*.tagが扱いやすいデータ構造に変換する。
-   * @param {Object} schema
-   * @param {*} response
-   */
-  mergeSchemaAndResponse(schema, response) {
-    // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
-    // type will be one of "null", "boolean", "object", "array", "number", "string" or "integer".
-    let type = schema.type;
-    // if type is not defined or an array, expect type by response.
-    if (!type || Array.isArray(type)) {
-      if (Array.isArray(response)) {
-        type = 'array';
-      } else {
-        type = typeof response;
-      }
-    }
-    const ret = {
-      // dmc customs.
-      _type: null,
-      _value: null,
-      _rawValue: null,
-      _index: null,
-      _key: null,
-      _keys: null,
-      _length: null,
-      getType: function() {
-        return this._type;
-      },
-      getValue: function(k) {
-        if (k === undefined) {
-          return this._value;
-        }
-        return this._value[k];
-      },
-      getRawValue: function() {
-        return this._rawValue;
-      },
-      getIndex: function() {
-        return this._index;
-      },
-      getKey: function() {
-        return this._key;
-      },
-      getKeys: function() {
-        return this._keys;
-      },
-      getLength: function() {
-        return this._length;
-      }
-    };
-    // @see: http://swagger.io/specification/#schemaObject
-    const schemaObjectKeys = [
-      'example',
-      'format',// @see: http://swagger.io/specification/#dataTypeFormat
-      'title',
-      'description',
-      'default',
-      'multipleOf',
-      'maximum',
-      'exclusiveMaximum',
-      'minimum',
-      'exclusiveMinimum',
-      'maxLength',
-      'minLength',
-      'pattern',
-      'maxItems',
-      'minItems',
-      'uniqueItems',
-      'maxProperties',
-      'minProperties',
-      'required',
-      'enum',
-      //'type',// removed on purpose. type will be customized by dmc.
-      'items',
-      'allOf',
-      'properties',
-      'additionalProperties'
-    ];
-    forEach_1(schemaObjectKeys, v => {
-      ret[`_${v}`] = schema[v];
-      ret[`get${v.charAt(0).toUpperCase()}${v.slice(1)}`] = function() {
-        return this[`_${v}`];
-      };
-    });
-
-    switch (type) {
-    case 'null':
-      ret._type = 'null';
-      ret._value = null;
-      ret._rawValue = null;
-      break;
-    case 'boolean':
-      ret._type = 'boolean';
-      ret._value = response;
-      ret._rawValue = response;
-      break;
-    case 'object':
-      ret._type = 'object';
-      ret._value = {};
-      ret._rawValue = response;
-      ret._keys = [];
-      forOwn_1$1(response, (v, k) => {
-        ret._keys.push(k);
-        let nextSchema;
-        if (!!schema.properties) {
-          nextSchema = schema.properties[k];
-        } else if (schema.additionalProperties) {
-          nextSchema = {};
-        } else {
-          // TODO: swagger定義が間違っているので警告を出す。
-        }
-        ret._value[k] = this.mergeSchemaAndResponse(nextSchema, v);
-        ret._value[k]._key = k;
-      });
-      break;
-    case 'array':
-      ret._type = 'array';
-      ret._value = [];
-      ret._rawValue = response;
-      ret._length = response.length;
-      forEach_1(response, (v, i) => {
-        ret._value[i] = this.mergeSchemaAndResponse(schema.items, v);
-        ret._value[i]._index = i;
-      });
-      break;
-    case 'number':
-      ret._type = 'number';
-      ret._value = response;
-      ret._rawValue = response;
-      break;
-    case 'string':
-      ret._type = 'string';
-      ret._value = response;
-      ret._rawValue = response;
-      break;
-    case 'integer':
-      ret._type = 'integer';
-      ret._value = response;
-      ret._rawValue = response;
-      break;
-    default:
-      // irregular case. e.g.) レスポンス内容がproperties内に定義されていない場合など。
-      ret._value = response;
-      ret._rawValue = response;
-      break;
-    }
-
-    return ret;
-  }
-
-  isComponentStyleNumber(style) {
-    return style === 'number';
-  }
-
-  isComponentStyleTable(style) {
-    return style === 'table';
-  }
-
-  isComponentStyleGraph(style) {
-    return contains_1$1([
-      'graph-bar',
-      'graph-scatterplot',
-      'graph-line',
-      'graph-horizontal-bar',
-      'graph-stacked-bar',
-      'graph-horizontal-stacked-bar',
-      'graph-stacked-area'
-    ], style);
-  }
-
-  isComponentStyleGraphBar(style) {
-    return style === 'graph-bar';
-  }
-
-  isComponentStyleGraphScatterplot(style) {
-    return style === 'graph-scatterplot';
-  }
-
-  isComponentStyleGraphLine(style) {
-    return style === 'graph-line';
-  }
-
-  isComponentStyleGraphHorizontalBar(style) {
-    return style === 'graph-horizontal-bar';
-  }
-
-  isComponentStyleGraphStackedBar(style) {
-    return style === 'graph-stacked-bar';
-  }
-
-  isComponentStyleGraphHorizontalStackedBar(style) {
-    return style === 'graph-horizontal-stacked-bar';
-  }
-
-  isComponentStyleGraphStackedArea(style) {
-    return style === 'graph-stacked-area';
-  }
-
-}
-
-var swagger = new Swagger();
-
 var components$1 = {
   /**
    * 一件更新します。
@@ -7687,47 +7366,10 @@ var components$1 = {
    * @return {Array}
    */
   updateOne: (context, params) => {
-    const schema = params.operationObject.responses[200].schema;
-    const responseObj = params.response.obj;
-    const data = swagger.mergeSchemaAndResponse(schema, responseObj);
-
-    context.state.components[params.component_uid] = context.state.components[params.component_uid] || {};
-    context.state.components[params.component_uid].data = data;
-    context.state.components[params.component_uid].schema = schema;
-    // `component.pagination`からページングをサポートしているか判断する。
-    // サポートしていれば手動でページング情報を付加する。
-    if (params.component.pagination) {
-      context.state.components[params.component_uid].pagination = {
-        // `x-pagination-current-page`等は独自仕様。
-        // DMCを使用するサービスはこの仕様に沿う必要がある。
-        currentPage: Number(params.response.headers['x-pagination-current-page'] || 0),
-        size: Number(params.response.headers['x-pagination-limit'] || 0),
-        maxPage: Number(params.response.headers['x-pagination-total-pages'] || 0)
-      };
-    }
-    // `component.query`(array)からクエリ検索をサポートしているか判断する。
-    // サポートしていれば手動でクエリ情報を付加する。
-    if (params.component.query && !!params.component.query.length) {
-      context.state.components[params.component_uid].search = params.component.query;
-    }
-    // テーブル表示でどのkeyをラベルに用いるか。
-    if (!!params.component.table_labels) {
-      context.state.components[params.component_uid].table_labels = params.component.table_labels;
-    }
-    // 関連API(path)群を付与する。
-    const actions = [];
-    forEach_1(params.pathRefs, ref => {
-      const pathItemObject = swagger.getPathItemObjectByPath(ref.path);
-      if (!pathItemObject || !pathItemObject[ref.method]) {
-        return;
-      }
-      actions.push(index$1$1({
-        pathItemObject: pathItemObject[ref.method]
-      }, ref));
-    });
-    context.state.components[params.component_uid].actions = actions;
-
-    return [constants$3.COMPONENTS_ONE(params.component_uid)];
+    const component_uid = params.component_uid;
+    // 存在しなければ新規作成。
+    context.state.components[component_uid] = params;
+    return [constants$3.COMPONENTS_ONE(component_uid)];
   },
 
   /**
@@ -7772,14 +7414,7 @@ var dmc$1 = {
    * @return {Array}
    */
   all: (context, dmc) => {
-    if (!dmc) {
-      context.state.dmc = null;
-    } else {
-      const schema = dmc.operationObject.responses[200].schema;
-      const response = dmc.response;
-      const data = swagger.mergeSchemaAndResponse(schema, response);
-      context.state.dmc = data;
-    }
+    context.state.dmc = dmc;
     return [constants$3.DMC];
   }
 };
@@ -7865,7 +7500,7 @@ var endpoints$1 = {
     if (!endpoint) {
       context.state.endpoints[endpointKey] = null;
     } else {
-      context.state.endpoints[endpointKey] = index$1$1({}, context.state.endpoints[endpointKey], endpoint);
+      context.state.endpoints[endpointKey] = objectAssign({}, context.state.endpoints[endpointKey], endpoint);
     }
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
@@ -7882,6 +7517,33 @@ var endpoints$1 = {
     context.state.endpoints[endpointKey].token = token;
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
+  },
+
+  /**
+   * 新エンドポイント群をmergeします。
+   * @param {riotx.Context} context
+   * @param {Object} endpoints
+   * @return {Array}
+   */
+  mergeAll: (context, endpoints) => {
+    const currentEndpoints = context.state.endpoints;
+    const newEndpoints = objectAssign({}, currentEndpoints, endpoints);
+    context.state.endpoints = newEndpoints;
+    store.set('endpoints', newEndpoints);
+    return [constants$3.ENDPOINTS];
+  }
+};
+
+var layout$1 = {
+  /**
+   * componentリストのgridレイアウトのcolumn数を更新します。
+   * @param {riotx.Context} context
+   * @param {Number} count
+   * @return {Array}
+   */
+  updateComponentsGridColumnCount: (context, count) => {
+    context.state.layout.componentsGridColumnCount = count;
+    return [constants$3.LAYOUT];
   }
 };
 
@@ -7893,7 +7555,7 @@ var location$2 = {
    * @return {Array}
    */
   all: (context, obj) => {
-    context.state.location = index$1$1({}, context.state.location, obj);
+    context.state.location = objectAssign({}, context.state.location, obj);
     return [constants$3.LOCATION];
   },
 
@@ -7917,58 +7579,6 @@ var location$2 = {
   route: (context, route) => {
     context.state.location.route = route;
     return [constants$3.LOCATION];
-  }
-};
-
-var menu$1 = {
-  /**
-   * 開閉状態をトグルします。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  toggle: context => {
-    context.state.menu.isOpened = !context.state.menu.isOpened;
-    return [constants$3.MENU];
-  },
-
-  /**
-   * 開状態にします。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  open: context => {
-    context.state.menu.isOpened = true;
-    return [constants$3.MENU];
-  },
-
-  /**
-   * 閉状態にします。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  close: context => {
-    context.state.menu.isOpened = false;
-    return [constants$3.MENU];
-  },
-
-  /**
-   * 有効状態にします。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  enable: context => {
-    context.state.menu.isEnabled = true;
-    return [constants$3.MENU];
-  },
-
-  /**
-   * 無効状態にします。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  disable: context => {
-    context.state.menu.isEnabled = false;
-    return [constants$3.MENU];
   }
 };
 
@@ -8002,6 +7612,29 @@ var modals$1 = {
       return (modal.id === modalID);
     });
     return [constants$3.MODALS];
+  }
+};
+
+var oas$1 = {
+  /**
+   * SwaggerClientインスタンスを設定します。
+   * @param {riotx.Context} context
+   * @param {SwaggerClient} client
+   * @return {Array}
+   */
+  client: (context, client) => {
+    context.state.oas.client = client;
+    return [constants$3.OAS];
+  },
+
+  /**
+   * SwaggerClientインスタンスをクリアします。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  clearClient: context => {
+    context.state.oas.client = null;
+    return [constants$3.OAS];
   }
 };
 
@@ -8047,7 +7680,7 @@ var toasts$1 = {
    * @return {Array}
    */
   add: (context, obj) => {
-    const data = index$1$1({
+    const data = objectAssign({
       type: TOAST_TYPE_NORMAL,
       timeout: TOAST_TIMEOUT,
       autoHide: TOAST_AUTO_HIDE
@@ -8104,16 +7737,15 @@ const constants$2 = {
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
   ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
   ENDPOINTS_UPDATE_TOKEN: 'ENDPOINTS_UPDATE_TOKEN',
+  ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
+  LAYOUT_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION: 'LOCATION',
   LOCATION_NAME: 'LOCATION_NAME',
   LOCATION_ROUTE: 'LOCATION_ROUTE',
-  MENU_TOGGLE: 'MENU_TOGGLE',
-  MENU_OPEN: 'MENU_OPEN',
-  MENU_CLOSE: 'MENU_CLOSE',
-  MENU_ENABLE: 'MENU_ENABLE',
-  MENU_DISABLE: 'MENU_DISABLE',
   MODALS_ADD: 'MODALS_ADD',
   MODALS_REMOVE: 'MODALS_REMOVE',
+  OAS_CLIENT: 'OAS_CLIENT',
+  OAS_CLIENT_CLEAR: 'OAS_CLIENT_CLEAR',
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   TOASTS_ADD: 'TOASTS_ADD',
@@ -8138,16 +7770,15 @@ var mutations = {
   [constants$2.ENDPOINTS_REMOVE_ALL]: endpoints$1.removeAll,
   [constants$2.ENDPOINTS_UPDATE]: endpoints$1.update,
   [constants$2.ENDPOINTS_UPDATE_TOKEN]: endpoints$1.updateToken,
+  [constants$2.ENDPOINTS_MERGE_ALL]: endpoints$1.mergeAll,
+  [constants$2.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout$1.updateComponentsGridColumnCount,
   [constants$2.LOCATION]: location$2.all,
   [constants$2.LOCATION_NAME]: location$2.name,
   [constants$2.LOCATION_ROUTE]: location$2.route,
-  [constants$2.MENU_TOGGLE]: menu$1.toggle,
-  [constants$2.MENU_OPEN]: menu$1.open,
-  [constants$2.MENU_CLOSE]: menu$1.close,
-  [constants$2.MENU_ENABLE]: menu$1.enable,
-  [constants$2.MENU_DISABLE]: menu$1.disable,
   [constants$2.MODALS_ADD]: modals$1.add,
   [constants$2.MODALS_REMOVE]: modals$1.remove,
+  [constants$2.OAS_CLIENT]: oas$1.client,
+  [constants$2.OAS_CLIENT_CLEAR]: oas$1.clearClient,
   [constants$2.OAUTH_ENDPOINT_KEY]: oauthEndpointKey$1.all,
   [constants$2.PAGE]: page$1.all,
   [constants$2.TOASTS_ADD]: toasts$1.add,
@@ -8158,6 +7789,7 @@ var mutations = {
 var application = {
   /**
    * 起動状態にします。
+   * @param {riotx.Context} context
    * @return {Promise}
    */
   launch: context => {
@@ -8170,6 +7802,7 @@ var application = {
 
   /**
    * 画面遷移状態にします。
+   * @param {riotx.Context} context
    * @return {Promise}
    */
   startNavigation: context => {
@@ -8182,6 +7815,7 @@ var application = {
 
   /**
    * 画面遷移完了状態にします。
+   * @param {riotx.Context} context
    * @return {Promise}
    */
   endNavigation: context => {
@@ -8258,7 +7892,7 @@ const formDataConverter = body => {
  * @return {Promise}
  */
 const commonFetch = (context, url, options) => {
-  options = index$1$1({
+  options = objectAssign({
     mode: 'cors',
     // redirect方法はレスポンスにそう形にする。
     redirect: 'follow',
@@ -8412,17 +8046,49 @@ var components$2 = {
   },
 
   /**
-   * 指定riotIDに対する要素のレスポンス構造を返します。
+   * 指定riotIDに対する要素のAPIレスポンスを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {*}
+   */
+  response: (context, riotId) => {
+    return context.state.components[riotId].response;
+  },
+
+  /**
+   * 指定riotIDに対する要素のschemaObjectを返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Object}
    */
-  schema: (context, riotId) => {
-    return context.state.components[riotId].schema;
+  schemaObject: (context, riotId) => {
+    return context.state.components[riotId].schemaObject;
   },
 
   /**
-   * 自身に関連するactionを返します。
+   * 指定riotIDに対する要素のparamterObject群を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  parameterObjects: (context, riotId) => {
+    return context.state.components[riotId].parameterObjects;
+  },
+
+  /**
+   * action(operationObject)群を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  actions: (context, riotId) => {
+    return map_1$1(context.state.components[riotId].actions, action => {
+      return action.operationObject;
+    });
+  },
+
+  /**
+   * 自身に関連するaction(operationObject)群を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Array}
@@ -8433,12 +8099,12 @@ var components$2 = {
       return (!action.appendTo || action.appendTo === 'self');
     });
     return map_1$1(selfActions, action => {
-      return action.pathItemObject;
+      return action.operationObject;
     });
   },
 
   /**
-   * テーブル行に関連するactionを返します。
+   * テーブル行に関連するaction(operationObject)群を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Array}
@@ -8449,8 +8115,28 @@ var components$2 = {
       return (action.appendTo === 'row');
     });
     return map_1$1(selfActions, action => {
-      return action.pathItemObject;
+      return action.operationObject;
     });
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング機能ON/OFFを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Boolean}
+   */
+  hasPagination: (context, riotId) => {
+    return context.state.components[riotId].hasPagination;
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング情報を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Object}
+   */
+  pagination: (context, riotId) => {
+    return context.state.components[riotId].pagination;
   },
 
   /**
@@ -8505,6 +8191,9 @@ var current$2 = {
 
     var values_1 = values;
 
+const SECTION_DASHBOARD = 'dashboard';
+const SECTION_MANAGE = 'manage';
+
 var dmc$2 = {
   /**
    * 全て返します。
@@ -8515,7 +8204,16 @@ var dmc$2 = {
     if (!context.state.dmc) {
       return null;
     }
-    return context.state.dmc.getRawValue();
+    return context.state.dmc;
+  },
+
+  /**
+   * DMCデータが存在する否か。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  existence: context => {
+    return !!context.state.dmc;
   },
 
   /**
@@ -8524,8 +8222,7 @@ var dmc$2 = {
    * @return {Array}
    */
   pages: context => {
-    const rawData = context.state.dmc.getRawValue();
-    return rawData.pages;
+    return context.state.dmc.pages;
   },
 
   /**
@@ -8535,9 +8232,7 @@ var dmc$2 = {
    * @return {String}
    */
   pageIdOf: (context, idx) => {
-    const rawData = context.state.dmc.getRawValue();
-    const page = rawData.pages[idx];
-    return page.id;
+    return context.state.dmc.pages[idx].id;
   },
 
   /**
@@ -8546,8 +8241,7 @@ var dmc$2 = {
    * @return {String}
    */
   name: context => {
-    const rawData = context.state.dmc.getRawValue();
-    return rawData.name;
+    return context.state.dmc.name;
   },
 
   /**
@@ -8559,10 +8253,8 @@ var dmc$2 = {
     if (!context.state.dmc) {
       return [];
     }
-    const rawData = context.state.dmc.getRawValue();
-    const pages = rawData.pages;
-    return values_1(filter$3(pages, v => {
-      if (v.section !== 'dashboard') {
+    return values_1(filter$3(context.state.dmc.pages, page => {
+      if (page.section !== SECTION_DASHBOARD) {
         return false;
       }
       return true;
@@ -8578,10 +8270,8 @@ var dmc$2 = {
     if (!context.state.dmc) {
       return [];
     }
-    const rawData = context.state.dmc.getRawValue();
-    const pages = rawData.pages;
-    return values_1(filter$3(pages, v => {
-      if (v.section !== 'manage') {
+    return values_1(filter$3(context.state.dmc.pages, page => {
+      if (page.section !== SECTION_MANAGE) {
         return false;
       }
       return true;
@@ -8634,6 +8324,19 @@ var drawers$2 = {
 
     var find_1$1 = find$1;
 
+/**
+     * Get object size
+     */
+    function size(obj) {
+        var count = 0;
+        forOwn_1$1(obj, function(){
+            count++;
+        });
+        return count;
+    }
+
+    var size_1 = size;
+
 var endpoints$2 = {
   /**
    * 全endpointを返します。
@@ -8642,6 +8345,29 @@ var endpoints$2 = {
    */
   all: context => {
     return context.state.endpoints;
+  },
+
+  /**
+   * endpoint数を返します。
+   * @param {riotx.Context} context
+   * @return {Number}
+   */
+  count: context => {
+    return size_1(context.state.endpoints);
+  },
+
+  /**
+   * 認証トークンを省いた全endpointを返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  allWithoutToken: context => {
+    const endpoints = objectAssign({}, context.state.endpoints);
+    // 認証用トークンはexport対象外とする。
+    forOwn_1$1(endpoints, endpoint => {
+      delete endpoint.token;
+    });
+    return endpoints;
   },
 
   /**
@@ -8667,6 +8393,17 @@ var endpoints$2 = {
     });
   }
 
+};
+
+var layout$2 = {
+  /**
+   * componentリストのgridレイアウトのcolumn数を返します。
+   * @param {riotx.Context} context
+   * @return {Number}
+   */
+  componentsGridColumnCount: context => {
+    return context.state.layout.componentsGridColumnCount;
+  }
 };
 
 var location$3 = {
@@ -8698,16 +8435,7 @@ var location$3 = {
   }
 };
 
-var menu$2 = {
-  /**
-   * 開閉状態を返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  opened: context => {
-    return context.state.menu.isOpened;
-  },
-
+var menu = {
   /**
    * 有効状態を返します。
    * @param {riotx.Context} context
@@ -8729,6 +8457,175 @@ var modals$2 = {
   }
 };
 
+var oas$2 = {
+  /**
+   * SwaggerClientを返します。
+   * @param {riotx.Context} context
+   * @return {SwaggerClient}
+   */
+  client: context => {
+    return context.state.oas.client;
+  },
+
+  /**
+   * resolve済みのOpenAPI Documentを返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  spec: context => {
+    return context.state.oas.client.spec;
+  },
+
+  /**
+   * resolve前のオリジナルのOpenAPI Documentを返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  originalSpec: context => {
+    return context.state.oas.client.originalSpec;
+  },
+
+  /**
+   * resolveされたAPI群を返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  apis: context => {
+    return context.state.oas.client.apis;
+  },
+
+  /**
+   * resolveされたAPI群をflatな構成にして返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  flatApis: context => {
+    // client.apisはタグ分けされているので、まずflatな構成にする。
+    const apis = {};
+    forOwn_1$1(context.state.oas.client.apis, obj => {
+      forOwn_1$1(obj, (api, operationId) => {
+        apis[operationId] = api;
+      });
+    });
+    return apis;
+  },
+
+  /**
+   * 指定したoperationIdにマッチするresolveされたAPIを返します。
+   * @param {riotx.Context} context
+   * @param {String} operationId
+   * @return {Function}
+   */
+  api: (context, operationId) => {
+    const apis = {};
+    forOwn_1$1(context.state.oas.client.apis, obj => {
+      forOwn_1$1(obj, (api, operationId) => {
+        apis[operationId] = api;
+      });
+    });
+    return apis[operationId];
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするresolveされたAPIを返します。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {String} method
+   * @return {Function}
+   */
+  apiByPathAndMethod: (context, path, method) => {
+    const operationObject = context.state.oas.client.spec.paths[path][method];
+    const operationId = operationObject.operationId;
+    const apis = {};
+    forOwn_1$1(context.state.oas.client.apis, obj => {
+      forOwn_1$1(obj, (api, operationId) => {
+        apis[operationId] = api;
+      });
+    });
+    return apis[operationId];
+  },
+
+  /**
+   * 指定したpathにマッチするPathItemObjectを返します。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @return {Object}
+   */
+  pathItemObject: (context, path) => {
+    return context.state.oas.client.spec.paths[path];
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectを返します。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {String} method
+   * @return {Object}
+   */
+  operationObject: (context, path, method) => {
+    return context.state.oas.client.spec.paths[path][method];
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectのoperationIdを返します。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {String} method
+   * @return {String}
+   */
+  operationId: (context, path, method) => {
+    return context.state.oas.client.spec.paths[path][method].operationId;
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectのParameterObject群を返します。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {String} method
+   * @return {Array}
+   */
+  parameterObjects: (context, path, method) => {
+    return context.state.oas.client.spec.paths[path][method].parameters || [];
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObject群を返します。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {String} method
+   * @return {Object}
+   */
+  responseObjects: (context, path, method) => {
+    return context.state.oas.client.spec.paths[path][method].responses;
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectのresponseObjectを返します。
+   * statusCodeを指定しない場合はデフォルトで200に設定されます。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {String} method
+   * @param {Number} statusCode
+   * @return {Object}
+   */
+  responseObject: (context, path, method, statusCode = 200) => {
+    return context.state.oas.client.spec.paths[path][method].responses[statusCode];
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectのresponseObjectのschemaObjectを返します。
+   * statusCodeを指定しない場合はデフォルトで200に設定されます。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {String} method
+   * @param {Number} statusCode
+   * @return {Object}
+   */
+  schemaObject: (context, path, method, statusCode = 200) => {
+    return context.state.oas.client.spec.paths[path][method].responses[statusCode].schema;
+  }
+};
+
 var oauthEndpointKey$2 = {
   /**
    * OAuth認証中のendpointKeyを返します。
@@ -8747,10 +8644,7 @@ var page$2 = {
    * @return {Object}
    */
   all: context => {
-    if (!context.state.page) {
-      return {};
-    }
-    return context.state.page.getRawValue();
+    return context.state.page || {};
   },
 
   /**
@@ -8759,11 +8653,11 @@ var page$2 = {
    * @return {String}
    */
   id: context => {
-    if (!context.state.page) {
+    const page = context.state.page;
+    if (!page) {
       return '';
     }
-    const rawData = context.state.page.getRawValue();
-    return rawData.id;
+    return page.id;
   },
 
   /**
@@ -8772,11 +8666,11 @@ var page$2 = {
    * @return {String}
    */
   name: context => {
-    if (!context.state.page) {
+    const page = context.state.page;
+    if (!page) {
       return '';
     }
-    const rawData = context.state.page.getRawValue();
-    return rawData.name;
+    return page.name;
   },
 
   /**
@@ -8785,11 +8679,11 @@ var page$2 = {
    * @return {Array}
    */
   components: context => {
-    if (!context.state.page) {
+    const page = context.state.page;
+    if (!page) {
       return [];
     }
-    const rawData = context.state.page.getRawValue();
-    return rawData.components;
+    return page.components;
   }
 };
 
@@ -8822,12 +8716,18 @@ const constants$4 = {
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
   COMPONENTS: 'COMPONENTS',
   COMPONENTS_ONE: 'COMPONENTS_ONE',
-  COMPONENTS_ONE_SCHEMA: 'COMPONENTS_ONE_SCHEMA',
-  COMPONENTS_ONE_SELF_ACTIONS: 'COMPONENTS_ONE_SELF_ACTIONS',
-  COMPONENTS_ONE_ROW_ACTIONS: 'COMPONENTS_ONE_ROW_ACTIONS',
+  COMPONENTS_ONE_RESPONSE: 'COMPONENTS_ONE_RESPONSE',
+  COMPONENTS_ONE_SCHEMA_OBJECT: 'COMPONENTS_ONE_SCHEMA_OBJECT',
+  COMPONENTS_ONE_PARAMETER_OBJECTS: 'COMPONENTS_ONE_PARAMETER_OBJECTS',
+  COMPONENTS_ONE_ACTIONS: 'COMPONENTS_ONE_ACTIONS',
+  COMPONENTS_ONE_ACTIONS_SELF: 'COMPONENTS_ONE_ACTIONS_SELF',
+  COMPONENTS_ONE_ACTIONS_ROW: 'COMPONENTS_ONE_ACTIONS_ROW',
+  COMPONENTS_ONE_HAS_PAGINATION: 'COMPONENTS_ONE_HAS_PAGINATION',
+  COMPONENTS_ONE_PAGINATION: 'COMPONENTS_ONE_PAGINATION',
   COMPONENTS_ONE_TABLE_LABELS: 'COMPONENTS_ONE_TABLE_LABELS',
   CURRENT: 'CURRENT',
   DMC: 'DMC',
+  DMC_EXISTENCE: 'DMC_EXISTENCE',
   DMC_PAGES: 'DMC_PAGES',
   DMC_PAGES_ID_OF: 'DMC_PAGES_ID_OF',
   DMC_NAME: 'DMC_NAME',
@@ -8835,14 +8735,29 @@ const constants$4 = {
   DMC_MANAGE: 'DMC_MANAGE',
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
+  ENDPOINTS_COUNT: 'ENDPOINTS_COUNT',
+  ENDPOINTS_WITHOUT_TOKEN: 'ENDPOINTS_WITHOUT_TOKEN',
   ENDPOINTS_ONE: 'ENDPOINTS_ONE',
   ENDPOINTS_ONE_BY_URL: 'ENDPOINTS_ONE_BY_URL',
+  LAYOUT_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION: 'LOCATION',
   LOCATION_NAME: 'LOCATION_NAME',
   LOCATION_ROUTE: 'LOCATION_ROUTE',
-  MENU_OPENED: 'MENU_OPENED',
   MENU_ENABLED: 'MENU_ENABLED',
   MODALS: 'MODALS',
+  OAS_CLIENT: 'OAS_CLIENT',
+  OAS_SPEC: 'OAS_SPEC',
+  OAS_ORIGINAL_SPEC: 'OAS_ORIGINAL_SPEC',
+  OAS_APIS: 'OAS_APIS',
+  OAS_FLAT_APIS: 'OAS_FLAT_APIS',
+  OAS_API: 'OAS_API',
+  OAS_API_BY_PATH_AND_METHOD: 'OAS_API_BY_PATH_AND_METHOD',
+  OAS_PATH_ITEM_OBJECT: 'OAS_PATH_ITEM_OBJECT',
+  OAS_OPERATION_OBJECT: 'OAS_OPERATION_OBJECT',
+  OAS_OPERATION_ID: 'OAS_OPERATION_ID',
+  OAS_PARAMETER_OBJECTS: 'OAS_PARAMETER_OBJECTS',
+  OAS_RESPONSE_OBJECT: 'OAS_RESPONSE_OBJECT',
+  OAS_SCHEMA_OBJECT: 'OAS_SCHEMA_OBJECT',
   OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   PAGE_ID: 'PAGE_ID',
@@ -8859,12 +8774,18 @@ var getters = {
   [constants$4.APPLICATION_ISNETWORKING]: application$3.isNetworking,
   [constants$4.COMPONENTS]: components$2.all,
   [constants$4.COMPONENTS_ONE]: components$2.one,
-  [constants$4.COMPONENTS_ONE_SCHEMA]: components$2.schema,
-  [constants$4.COMPONENTS_ONE_SELF_ACTIONS]: components$2.selfActions,
-  [constants$4.COMPONENTS_ONE_ROW_ACTIONS]: components$2.rowActions,
+  [constants$4.COMPONENTS_ONE_RESPONSE]: components$2.response,
+  [constants$4.COMPONENTS_ONE_SCHEMA_OBJECT]: components$2.schemaObject,
+  [constants$4.COMPONENTS_ONE_PARAMETER_OBJECTS]: components$2.parameterObjects,
+  [constants$4.COMPONENTS_ONE_ACTIONS]: components$2.actions,
+  [constants$4.COMPONENTS_ONE_ACTIONS_SELF]: components$2.selfActions,
+  [constants$4.COMPONENTS_ONE_ACTIONS_ROW]: components$2.rowActions,
+  [constants$4.COMPONENTS_ONE_HAS_PAGINATION]: components$2.hasPagination,
+  [constants$4.COMPONENTS_ONE_PAGINATION]: components$2.pagination,
   [constants$4.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
   [constants$4.CURRENT]: current$2.all,
   [constants$4.DMC]: dmc$2.all,
+  [constants$4.DMC_EXISTENCE]: dmc$2.existence,
   [constants$4.DMC_PAGES]: dmc$2.pages,
   [constants$4.DMC_PAGES_ID_OF]: dmc$2.pageIdOf,
   [constants$4.DMC_NAME]: dmc$2.name,
@@ -8872,14 +8793,29 @@ var getters = {
   [constants$4.DMC_MANAGE]: dmc$2.manage,
   [constants$4.DRAWERS]: drawers$2.all,
   [constants$4.ENDPOINTS]: endpoints$2.all,
+  [constants$4.ENDPOINTS_COUNT]: endpoints$2.count,
+  [constants$4.ENDPOINTS_WITHOUT_TOKEN]: endpoints$2.allWithoutToken,
   [constants$4.ENDPOINTS_ONE]: endpoints$2.one,
   [constants$4.ENDPOINTS_ONE_BY_URL]: endpoints$2.oneByURL,
+  [constants$4.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout$2.componentsGridColumnCount,
   [constants$4.LOCATION]: location$3.all,
   [constants$4.LOCATION_NAME]: location$3.name,
   [constants$4.LOCATION_ROUTE]: location$3.route,
-  [constants$4.MENU_OPENED]: menu$2.opened,
-  [constants$4.MENU_ENABLED]: menu$2.enabled,
+  [constants$4.MENU_ENABLED]: menu.enabled,
   [constants$4.MODALS]: modals$2.all,
+  [constants$4.OAS_CLIENT]: oas$2.client,
+  [constants$4.OAS_SPEC]: oas$2.spec,
+  [constants$4.OAS_ORIGINAL_SPEC]: oas$2.originalSpec,
+  [constants$4.OAS_APIS]: oas$2.apis,
+  [constants$4.OAS_FLAT_APIS]: oas$2.flatApis,
+  [constants$4.OAS_API]: oas$2.api,
+  [constants$4.OAS_API_BY_PATH_AND_METHOD]: oas$2.apiByPathAndMethod,
+  [constants$4.OAS_PATH_ITEM_OBJECT]: oas$2.pathItemObject,
+  [constants$4.OAS_OPERATION_OBJECT]: oas$2.operationObject,
+  [constants$4.OAS_OPERATION_ID]: oas$2.operationId,
+  [constants$4.OAS_PARAMETER_OBJECTS]: oas$2.parameterObjects,
+  [constants$4.OAS_RESPONSE_OBJECT]: oas$2.responseObject,
+  [constants$4.OAS_SCHEMA_OBJECT]: oas$2.schemaObject,
   [constants$4.OAUTH_ENDPOINT_KEY]: oauthEndpointKey$2.all,
   [constants$4.PAGE]: page$2.all,
   [constants$4.PAGE_ID]: page$2.id,
@@ -9272,7 +9208,7 @@ var require$$0 = ( path$1 && path ) || path$1;
  * Module exports.
  */
 
-var index$2 = contentDisposition;
+var contentDisposition_1 = contentDisposition;
 var parse_1$1 = parse$1;
 
 /**
@@ -9706,10 +9642,10 @@ function ContentDisposition (type, parameters) {
   this.parameters = parameters;
 }
 
-index$2.parse = parse_1$1;
+contentDisposition_1.parse = parse_1$1;
 
 var download = createCommonjsModule(function (module, exports) {
-//download.js v4.2, by dandavis; 2008-2016. [MIT] see http://danml.com/download.html for tests/usage
+//download.js v4.2, by dandavis; 2008-2016. [CCBY2] see http://danml.com/download.html for tests/usage
 // v1 landed a FF+Chrome compat way of downloading strings to local un-named files, upgraded to use a hidden frame and optional mime
 // v2 added named files via a[download], msSaveBlob, IE (10+) support, and window.URL support for larger+faster saves than dataURLs
 // v3 added dataURL and Blob Input, bind-toggle arity, and legacy dataURL fallback was improved with force-download mime and base64 support. 3.1 improved safari handling.
@@ -9769,7 +9705,7 @@ var download = createCommonjsModule(function (module, exports) {
 
 
 		//go ahead and download dataURLs right away
-		if(/^data:([\w+-]+\/[\w+.-]+)?[,;]/.test(payload)){
+		if(/^data\:[\w+\-]+\/[\w+\-]+[,;]/.test(payload)){
 		
 			if(payload.length > (1024*1024*1.999) && myBlob !== toString ){
 				payload=dataUrlToBlob(payload);
@@ -9780,13 +9716,8 @@ var download = createCommonjsModule(function (module, exports) {
 					saver(payload) ; // everyone else can save dataURLs un-processed
 			}
 			
-		}else{//not data url, is it a string with special needs?
-			if(/([\x80-\xff])/.test(payload)){			  
-				var i=0, tempUiArr= new Uint8Array(payload.length), mx=tempUiArr.length;
-				for(i;i<mx;++i) { tempUiArr[i]= payload.charCodeAt(i); }
-			 	payload=new myBlob([tempUiArr], {type: mimeType});
-			}		  
-		}
+		}//end if dataURL passed?
+
 		blob = payload instanceof myBlob ?
 			payload :
 			new myBlob([payload], {type: mimeType}) ;
@@ -9825,7 +9756,7 @@ var download = createCommonjsModule(function (module, exports) {
 
 			// handle non-a[download] safari as best we can:
 			if(/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)) {
-				if(/^data:/.test(url))	{ url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime); }
+				url=url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
 				if(!window.open(url)){ // popup blocked, offer direct download:
 					if(confirm("Displaying New Document\n\nUse Save As... to download, then click back to return to this page.")){ location.href=url; }
 				}
@@ -9836,7 +9767,7 @@ var download = createCommonjsModule(function (module, exports) {
 			var f = document.createElement("iframe");
 			document.body.appendChild(f);
 
-			if(!winMode && /^data:/.test(url)){ // force a mime that will download:
+			if(!winMode){ // force a mime that will download:
 				url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
 			}
 			f.src=url;
@@ -9885,59 +9816,77 @@ var components$3 = {
    * @return {Promise}
    */
   get: (context, component_uid, component, query) => {
-    return new Promise((resolve, reject) => {
-      const method = component.api.method;
-      // GETメソッドのみサポート。
-      if (method !== 'get') {
-        return reject('only `get` method is allowed.');
+    const method = component.api.method;
+    // GETメソッドのみサポート。
+    if (method !== 'get') {
+      return Promise.reject('only `get` method is allowed.');
+    }
+    let path = component.api.path;
+    if (path.indexOf('/') !== 0) {
+      path = '/' + path;
+    }
+    const operationObject = context.getter(constants$4.OAS_OPERATION_OBJECT, path, method);
+    // 関連のあるpath情報を取得します。
+    let pathRefs = [];
+    // 同じpath 且つ method名違いのoperationObjectは関連有りとみなす。
+    forEach_1(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
+      if (!context.getter(constants$4.OAS_OPERATION_OBJECT, path, method)) {
+        return;
       }
-
-      let path = component.api.path;
-      if (path.indexOf('/') !== 0) {
-        path = '/' + path;
-      }
-
-      // @see: http://swagger.io/specification/#itemsObject
-      const pathItemObject = swagger.client.spec.paths[path];
-      if (!pathItemObject || !pathItemObject[method]) {
-        return reject(`[fetch] API definition is not found. ${method} ${path}`);
-      }
-      // 関連のあるpath情報を取得します。
-      let pathRefs = [];
-      forEach_1(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
-        if (!pathItemObject || !pathItemObject[method]) {
-          return;
-        }
-        pathRefs.push({
-          path,
-          method,
-          appendTo: 'self'
-        });
+      pathRefs.push({
+        path,
+        method,
+        appendTo: 'self'
       });
-      // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
-      pathRefs = pathRefs.concat(pathItemObject['get']['x-ref'] || []);
-      // @see: http://swagger.io/specification/#operationObject
-      const operationObject = pathItemObject[method];
-      const api = swagger.getApiByOperationID(operationObject.operationId);
+    });
+    // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
+    pathRefs = pathRefs.concat(operationObject['x-ref'] || []);
+    // 関連API(path)群を付与する。
+    const actions = [];
+    forEach_1(pathRefs, ref => {
+      const operationObject = context.getter(constants$4.OAS_OPERATION_OBJECT, ref.path, ref.method);
+      actions.push(objectAssign({
+        operationObject
+      }, ref));
+    });
 
-      api(query, {
-        requestInterceptor: req => {
-          req.headers['Authorization'] = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
-        }
-      }).then(res => {
-        if (!res.ok) {
-          return reject(`[fetch] ${res.url} error.`);
-        }
-        context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
-          response: res,
-          operationObject,
-          pathRefs,
-          component,
-          component_uid: component_uid
-        });
-        return resolve();
-      }).catch(err => {
-        reject(err);
+    const api = context.getter(constants$4.OAS_API_BY_PATH_AND_METHOD, path, method);
+    const currentEndpointKey = context.getter(constants$4.CURRENT);
+    const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
+    const token = currentEndpoint.token;
+    return api(query, {
+      requestInterceptor: req => {
+        req.headers['Authorization'] = token;
+      }
+    }).then(res => {
+      if (!res.ok) {
+        return Promise.reject(`fetch failed: ${res.url}`);
+      }
+      return res;
+    }).then(res => {
+       // `component.pagination`からページングをサポートしているか判断する。
+      // サポートしていれば手動でページング情報を付加する。
+      let hasPagination = false;
+      let pagination;
+      if (component.pagination) {
+        hasPagination = true;
+        pagination = {
+          // `x-pagination-current-page`等は独自仕様。
+          // DMCを使用するサービスはこの仕様に沿う必要がある。
+          currentPage: Number(res.headers['x-pagination-current-page'] || 0),
+          size: Number(res.headers['x-pagination-limit'] || 0),
+          maxPage: Number(res.headers['x-pagination-total-pages'] || 0)
+        };
+      }
+      context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
+        component_uid,
+        response: res.obj,// APIレスポンス内容そのまま。
+        schemaObject: context.getter(constants$4.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
+        parameterObjects: context.getter(constants$4.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
+        actions,// 関連API群。
+        hasPagination,
+        pagination,// ページング関連。
+        table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
       });
     });
   },
@@ -9950,7 +9899,7 @@ var components$3 = {
    * @return {Promise}
    */
   operate: (context, operationObject, params) => {
-    const api = swagger.getApiByOperationID(operationObject.operationId);
+    const api = context.getter(constants$4.OAS_API, operationObject.operationId);
     const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
 
     return api(params, {
@@ -9963,7 +9912,7 @@ var components$3 = {
       if (!contentDispositionHeader) {
         return res;
       }
-      const downloadFileInfo = index$2.parse(contentDispositionHeader);
+      const downloadFileInfo = contentDisposition_1.parse(contentDispositionHeader);
       if (downloadFileInfo.type !== 'attachment') {
         return res;
       }
@@ -10034,45 +9983,37 @@ const DMC_URI = '/dmc';
 
 var dmc$3 = {
   /**
-   * dmc情報を取得します。
+   * dmc情報(各管理画面の基本情報)を取得します。
    * @param {riotx.Context} context
    * @return {Promise}
    */
   get: context => {
-    return new Promise((resolve, reject) => {
-      const operationObject = swagger.client.spec.paths[DMC_URI].get;
+    const operationObject = context.getter(constants$4.OAS_OPERATION_OBJECT, DMC_URI, 'get');
+    const api = context.getter(constants$4.OAS_API, operationObject.operationId);
+    const currentEndpointKey = context.getter(constants$4.CURRENT);
+    const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
+    const token = currentEndpoint.token;
 
-      if (!operationObject || !swagger.client.apis.dmc || !swagger.client.apis.dmc[operationObject.operationId]) {
-        return reject(new Error(`[fetch] ${swagger.client.url}; system entry point not found. (uri: ${DMC_URI})`));
-      }
-
-      const api = swagger.getApiByOperationID(operationObject.operationId);
-
-      const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
-
-      api({}, {
+    return Promise
+      .resolve()
+      .then(() => api({}, {
         requestInterceptor: (req) => {
           req.headers['Authorization'] = token;
         }
-      }).then(res => {
+      }))
+      .then(res => {
         if (!res.ok) {
-          throw new Error(`[fetch] ${res.url} error.`);
+          return Promise.reject(`fetch failed: ${res.url}`);
         }
-        return {
-          response: res.obj,
-          operationObject
-        };
-      }).then(res => {
-        context.commit(constants$2.DMC, res);
-        const key = context.getter(constants$2.CURRENT);
-        const endpoint = context.getter(constants$4.ENDPOINTS_ONE, key);
-        context.commit(constants$2.ENDPOINTS_UPDATE, key, index$1$1({}, endpoint, res.response));
-      }).then(() => {
-        resolve();
-      }).catch(err => {
-        reject(err);
+        return res;
+      })
+      .then(res => {
+        context.commit(constants$2.DMC, res.obj);
+        const endpoint = objectAssign({}, res.obj);
+        // pagesは不要なので削除。
+        delete endpoint.pages;
+        context.commit(constants$2.ENDPOINTS_UPDATE, currentEndpointKey, endpoint);
       });
-    });
   },
 
   /**
@@ -10347,7 +10288,7 @@ var isValid = isShortId;
 
 var clusterWorkerIdBrowser = 0;
 
-var index$4$1 = createCommonjsModule(function (module) {
+var lib = createCommonjsModule(function (module) {
 'use strict';
 
 
@@ -10415,7 +10356,7 @@ module.exports.decode = decode_1;
 module.exports.isValid = isValid;
 });
 
-var index$3$1 = index$4$1;
+var shortid = lib;
 
 var endpoints$3 = {
   /**
@@ -10437,7 +10378,7 @@ var endpoints$3 = {
           throw err;
         }
         //
-        const key = index$3$1.generate();
+        const key = shortid.generate();
         const newEndpoint = {
           url: url,
           memo: memo,
@@ -10494,6 +10435,36 @@ var endpoints$3 = {
       .then(() => {
         context.commit(constants$2.ENDPOINTS_REMOVE_ALL);
       });
+  },
+
+  /**
+   * 新エンドポイント群を既存エンドポイント群にmergeします。
+   * @param {riotx.Context} context
+   * @param {Object} endpoints
+   * @return {Promise}
+   */
+  mergeAll: (context, endpoints) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.ENDPOINTS_MERGE_ALL, endpoints);
+      });
+  }
+};
+
+var layout$3 = {
+  /**
+   * componentリストのgridレイアウトのcolumn数を更新します。
+   * @param {riotx.Context} context
+   * @param {Number} count
+   * @return {Promise}
+   */
+  updateComponentsGridColumnCount: (context, count) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT, count);
+      });
   }
 };
 
@@ -10509,73 +10480,6 @@ var location$4 = {
       .resolve()
       .then(() => {
         context.commit(constants$2.LOCATION, obj);
-      });
-  }
-};
-
-var menu$3 = {
-  /**
-   * 開閉状態をトグルします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  toggle: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.MENU_TOGGLE);
-      });
-  },
-
-  /**
-   * 開状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  open: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.MENU_OPEN);
-      });
-  },
-
-  /**
-   * 閉状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  close: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.MENU_CLOSE);
-      });
-  },
-
-  /**
-   * 有効状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  enable: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.MENU_ENABLE);
-      });
-  },
-
-  /**
-   * 無効状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  disable: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.MENU_DISABLE);
       });
   }
 };
@@ -10612,6 +10516,68 @@ var modals$3 = {
   }
 };
 
+// swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
+const SwaggerClient = window.SwaggerClient;
+
+var oas$3 = {
+  /**
+   * OAS準拠ファイルを取得/resolveし、SwaggerClientインスタンスを生成します。
+   * @see: https://github.com/swagger-api/swagger-js#swagger-specification-resolver
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {String} url
+   * @param {String} token
+   * @return {Promise}
+   */
+  setup: (context, endpointKey, url, token) => {
+    return Promise
+      .resolve()
+      .then(() => SwaggerClient.http({
+        url,
+        headers: {
+          'Authorization': token
+        }
+      }))
+      .then(res => {
+        // 401エラーは想定内。
+        if (res.status === 401) {
+          const err = new Error();
+          err.name = '401 Authorization Required';
+          err.status = res.spec.status;
+          return Promise.reject(err);
+        }
+        return res;
+      })
+      .then(res => SwaggerClient({
+        spec: res.body
+      }))
+      .then(client => {
+        const errors = client.errors;
+        if (!!errors && !!errors.length) {
+          return Promise.reject(errors);
+        }
+        return client;
+      })
+      .then(client => {
+        context.commit(constants$2.OAS_CLIENT, client);
+        context.commit(constants$2.ENDPOINTS_UPDATE, endpointKey, client.spec.info);
+      });
+  },
+
+  /**
+   * OAS情報をクリアします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  clear: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.OAS_CLIENT_CLEAR);
+      });
+  }
+};
+
 var oauthEndpointKey$3 = {
   /**
    * OAuth認証用のエンドポイントkeyを削除します。
@@ -10638,9 +10604,9 @@ var page$3 = {
     return Promise
       .resolve()
       .then(() => {
-        const pages = context.state.dmc.getValue('pages').getValue();
-        const page = find_1$1(pages, v => {
-          return (v.getValue('id').getValue() === pageId);
+        const pages = context.getter(constants$4.DMC_PAGES);
+        const page = find_1$1(pages, page => {
+          return (page.id === pageId);
         });
         context.commit(constants$2.PAGE, page);
       });
@@ -11218,14 +11184,13 @@ const constants$1 = {
   ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
   ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
+  ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
+  LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION_UPDATE: 'LOCATION_UPDATE',
-  MENU_TOGGLE: 'MENU_TOGGLE',
-  MENU_OPEN: 'MENU_OPEN',
-  MENU_CLOSE: 'MENU_CLOSE',
-  MENU_ENABLE: 'MENU_ENABLE',
-  MENU_DISABLE: 'MENU_DISABLE',
   MODALS_ADD: 'MODALS_ADD',
   MODALS_REMOVE: 'MODALS_REMOVE',
+  OAS_SETUP: 'OAS_SETUP',
+  OAS_CLEAR: 'OAS_CLEAR',
   OAUTH_ENDPOINT_KEY_REMOVE: 'OAUTH_ENDPOINT_KEY_REMOVE',
   PAGE_GET: 'PAGE_GET',
   PAGE_REMOVE: 'PAGE_REMOVE',
@@ -11258,14 +11223,13 @@ var actions = {
   [constants$1.ENDPOINTS_UPDATE]: endpoints$3.update,
   [constants$1.ENDPOINTS_REMOVE]: endpoints$3.remove,
   [constants$1.ENDPOINTS_REMOVE_ALL]: endpoints$3.removeAll,
+  [constants$1.ENDPOINTS_MERGE_ALL]: endpoints$3.mergeAll,
+  [constants$1.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT]: layout$3.updateComponentsGridColumnCount,
   [constants$1.LOCATION_UPDATE]: location$4.update,
-  [constants$1.MENU_TOGGLE]: menu$3.toggle,
-  [constants$1.MENU_OPEN]: menu$3.open,
-  [constants$1.MENU_CLOSE]: menu$3.close,
-  [constants$1.MENU_ENABLE]: menu$3.enable,
-  [constants$1.MENU_DISABLE]: menu$3.disable,
   [constants$1.MODALS_ADD]: modals$3.add,
   [constants$1.MODALS_REMOVE]: modals$3.remove,
+  [constants$1.OAS_SETUP]: oas$3.setup,
+  [constants$1.OAS_CLEAR]: oas$3.clear,
   [constants$1.OAUTH_ENDPOINT_KEY_REMOVE]: oauthEndpointKey$3.remove,
   [constants$1.PAGE_GET]: page$3.get,
   [constants$1.PAGE_REMOVE]: page$3.remove,
@@ -11281,9 +11245,10 @@ riot$1.tag2('dmc-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {
 });
 
 var script$1 = function() {
-  const str = (json => {
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+  const updateText = () => {
+    const json = JSON.stringify(this.opts.data, undefined, 4);
+    let text = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    text = text.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
       let cls = 'number';
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
@@ -11298,10 +11263,13 @@ var script$1 = function() {
       }
       return '<span class="PrettyPrint__' + cls + '">' + match + '</span>';
     });
-  })(JSON.stringify(this.opts.data, undefined, 4));
+    this.refs.canvas.innerHTML = text;
+  };
 
   this.on('mount', () => {
-    this.refs.canvas.innerHTML = str;
+    updateText();
+  }).on('updated', () => {
+    updateText();
   });
 };
 
@@ -11359,7 +11327,6 @@ var ComponentsRoute = {
     if (!endpoint) {
       return Promise
         .resolve()
-        .then(() => store.action(constants$1.CURRENT_REMOVE))
         .then(() => {
           replace('/');
         })
@@ -11390,17 +11357,13 @@ var ComponentsRoute = {
           .then(() => store.action(constants$1.CURRENT_UPDATE, endpointKey))
           .then(() => {
             // 無駄な通信を減らすために、`dmc`データを未取得の場合のみfetchする。
-            const dmc = store.getter(constants$4.DMC);
-            if (!!dmc) {
+            const isDmcExist = store.getter(constants$4.DMC_EXISTENCE);
+            if (isDmcExist) {
               return Promise.resolve();
             }
             return Promise
               .resolve()
-              .then(() => {
-                return swagger
-                  .setup(endpoint)
-                  .then(info => store.action(constants$1.ENDPOINTS_UPDATE, endpointKey, info));
-              })
+              .then(() => store.action(constants$1.OAS_SETUP, endpointKey, endpoint.url, endpoint.token))
               .then(() => store.action(constants$1.DMC_GET));
           })
           .then(() => {
@@ -11425,7 +11388,7 @@ var ComponentsRoute = {
    * @param {Object} route
    * @return {Promise}
    */
-  onEnter: (store, route) => {// eslint-disable-line no-unused-vars
+  onEnter: (store, route) => {
     return store.action(constants$1.LOCATION_UPDATE, {
       name: 'components',
       route
@@ -11441,17 +11404,19 @@ var EndpointsRoute = {
    * @param {Function} replace
    * @return {Promise}
    */
-  onBefore: (store, route, replace) => {// eslint-disable-line no-unused-vars
+  onBefore: store => {
     return Promise
       .resolve()
       .then(() => Promise.all([
         store.action(constants$1.CURRENT_REMOVE),
-        store.action(constants$1.PAGE_REMOVE)
+        store.action(constants$1.PAGE_REMOVE),
+        store.action(constants$1.OAS_CLEAR)
       ]))
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
         error: err
       }));
   },
+
   /**
    * ページ遷移時の処理。
    * @param {riotx.Store} store
@@ -11481,7 +11446,7 @@ var NotfoundRoute = {
   }
 };
 
-let _routerInstance;
+let esr;
 
 var router = {
   /**
@@ -11496,23 +11461,20 @@ var router = {
         const router = new Router(Router.HASH);
         router
           .onBefore(() => Promise.all([
-            store.action(constants$1.APPLICATION_NAVIGATION_START),
-            store.action(constants$1.MENU_CLOSE)
+            store.action(constants$1.APPLICATION_NAVIGATION_START)
           ]))
-          .onBefore(() => store.action(constants$1.MENU_CLOSE))
           .on('/', route => EndpointsRoute.onEnter(store, route))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
-          .onAfter(route => Promise.all([
-            store.action(constants$1.APPLICATION_NAVIGATION_END),
-            store.action((route.pathname === '/' ? constants$1.MENU_DISABLE : constants$1.MENU_ENABLE))
+          .onAfter(() => Promise.all([
+            store.action(constants$1.APPLICATION_NAVIGATION_END)
           ]))
           .onAfterOnce(() => store.action(constants$1.APPLICATION_LAUNCH));
         return router;
       })
       .then(router => {
         router.start();
-        _routerInstance = router;
+        esr = router;
         return router;
       });
   },
@@ -11522,7 +11484,7 @@ var router = {
    * @return {esr}
    */
   getInstance: () => {
-    return _routerInstance;
+    return esr;
   }
 };
 
@@ -11550,6 +11512,7 @@ const isSupportTouch = 'ontouchstart' in document;
 const EVENT_TOUCHSTART = isSupportTouch ? 'touchstart' : 'mousedown';
 const EVENT_TOUCHMOVE = isSupportTouch ? 'touchmove' : 'mousemove';
 const EVENT_TOUCHEND = isSupportTouch ? 'touchend' : 'mouseup';
+const TOUCH_ALLOW_RANGE = 10;
 // 無名関数をaddEventListenerのハンドラーに設定した場合でも正しくremoveEventListener出来るようにする。
 const closureEventListener = (() => {
   const events = {};
@@ -11581,6 +11544,7 @@ const closureEventListener = (() => {
 })();
 const bindTouchEvents = tag => {
   forEach_1(getTouchableElements(tag), elm => {
+    let touchX = 0, touchY = 0;
     // bind済みであれば何もしない。
     if (!!elm.getAttribute('touchevents')) {
       return;
@@ -11588,6 +11552,13 @@ const bindTouchEvents = tag => {
 
     const touchStartEventId = closureEventListener.add(elm, EVENT_TOUCHSTART, e => {
       e.stopPropagation();
+      if (isSupportTouch) {
+        touchX = e.touches[0].pageX;
+        touchY = e.touches[0].pageY;
+      } else {
+        touchX = e.pageX;
+        touchY = e.pageY;
+      }
       e.currentTarget.classList.add('hover');
     });
 
@@ -11597,7 +11568,18 @@ const bindTouchEvents = tag => {
       if (!isPressed) {
         return;
       }
-      e.currentTarget.classList.remove('hover');
+      let distanceX = 0, distanceY = 0;
+      if (isSupportTouch) {
+        distanceX = e.touches[0].pageX - touchX;
+        distanceY = e.touches[0].pageY - touchY;
+      } else {
+        distanceX = e.pageX - touchX;
+        distanceY = e.pageY - touchY;
+      }
+      const hypotenuse = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+      if (hypotenuse >= TOUCH_ALLOW_RANGE) {
+        e.currentTarget.classList.remove('hover');
+      }
     });
 
     const touchEndEventId = closureEventListener.add(elm, EVENT_TOUCHEND, e => {
@@ -12408,11 +12390,11 @@ var VERSION$1 = "0.9.4";
 /**
      * Safer Object.hasOwnProperty
      */
-     function hasOwn$3(obj, prop){
+     function hasOwn$4(obj, prop){
          return Object.prototype.hasOwnProperty.call(obj, prop);
      }
 
-     var hasOwn_1$3 = hasOwn$3;
+     var hasOwn_1$2 = hasOwn$4;
 
 var _hasDontEnumBug$2;
 var _dontEnums$2;
@@ -12470,7 +12452,7 @@ var _dontEnums$2;
                 // different than Object prototype value.
                 if (
                     (key !== 'constructor' ||
-                        (!isProto && hasOwn_1$3(obj, key))) &&
+                        (!isProto && hasOwn_1$2(obj, key))) &&
                     obj[key] !== Object.prototype[key]
                 ) {
                     if (exec$2(fn, obj, key, thisObj) === false) {
@@ -12494,7 +12476,7 @@ var _dontEnums$2;
      */
     function forOwn$4(obj, fn, thisObj){
         forIn_1$3(obj, function(val, key){
-            if (hasOwn_1$3(obj, key)) {
+            if (hasOwn_1$2(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
             }
         });
@@ -12578,7 +12560,7 @@ function shouldUseNative$1() {
 	}
 }
 
-var index$1$2 = shouldUseNative$1() ? Object.assign : function (target, source) {
+var index$1$1 = shouldUseNative$1() ? Object.assign : function (target, source) {
 	var arguments$1 = arguments;
 
 	var from;
@@ -12898,13 +12880,13 @@ var Store = function Store(_store) {
    * a object that represents full application state.
    * @type {Object}
    */
-  this.state = index$1$2({}, _store.state);
+  this.state = index$1$1({}, _store.state);
 
   /**
    * functions to mutate application state.
    * @type {Object}
    */
-  this._actions = index$1$2({}, _store.actions);
+  this._actions = index$1$1({}, _store.actions);
 
   /**
    * mutaions.
@@ -12914,13 +12896,13 @@ var Store = function Store(_store) {
    * `obj` will be TODO.
    * @type {Object}
    */
-  this._mutations = index$1$2({}, _store.mutations);
+  this._mutations = index$1$1({}, _store.mutations);
 
   /**
    * functions to get data from states.
    * @type {Object}
    */
-  this._getters = index$1$2({}, _store.getters);
+  this._getters = index$1$1({}, _store.getters);
 
   riot$1.observable(this);
 };
@@ -12936,7 +12918,7 @@ Store.prototype.getter = function getter (name) {
 
   log('[getter]', name, args);
   var context = {
-    state : index$1$2({}, this.state)
+    state : index$1$1({}, this.state)
   };
   return this._getters[name].apply(null, [context ].concat( args));
 };
@@ -12952,7 +12934,7 @@ Store.prototype.commit = function commit (name) {
     var args = [], len = arguments.length - 1;
     while ( len-- > 0 ) { args[ len ] = arguments[ len + 1 ]; }
 
-  var _state = index$1$2({}, this.state);
+  var _state = index$1$1({}, this.state);
   log.apply(void 0, [ '[commit(before)]', name, _state ].concat( args ));
   var context = {
     getter: function (name) {
@@ -12965,7 +12947,7 @@ Store.prototype.commit = function commit (name) {
   };
   var triggers = this._mutations[name].apply(null, [context ].concat( args));
   log.apply(void 0, [ '[commit(after)]', name, _state ].concat( args ));
-  index$1$2(this.state, _state);
+  index$1$1(this.state, _state);
 
   forEach_1$2(triggers, function (v) {
     // this.trigger(v, null, this.state, this);
@@ -12994,7 +12976,7 @@ Store.prototype.action = function action (name) {
 
       return this$1.getter.apply(this$1, [name ].concat( args));
     },
-    state: index$1$2({}, this.state),
+    state: index$1$1({}, this.state),
     commit: function () {
         var args = [], len = arguments.length;
         while ( len-- ) { args[ len ] = arguments[ len ]; }
@@ -13146,7 +13128,7 @@ RiotX.prototype.size = function size () {
   return keys_1(this.stores).length;
 };
 
-var index$6 = new RiotX();
+var index$1$2 = new RiotX();
 
 var store$1 = {
   /**
@@ -13157,13 +13139,13 @@ var store$1 = {
     return Promise
       .resolve()
       .then(() => {
-        const store = new index$6.Store({
+        const store = new index$1$2.Store({
           state: states,
           actions,
           mutations,
           getters
         });
-        index$6.add(store);
+        index$1$2.add(store);
         return store;
       });
   }
@@ -13254,489 +13236,23 @@ riot$1.tag2('dmc-button', '<span>{opts.label}</span>', '', 'class="Button Button
     this.external(script$4);
 });
 
-var script$5 = function() {
-  this.show = () => {
-    // need to set delay after dom mountation.
-    new Promise(resolve => {
-      setTimeout(() => {
-        this.root.classList.add('Tooltip--visible');
-        resolve();
-      }, 0);
-    }).then(() => {
-      this.root.classList.add('Tooltip--active');
-    });
-  };
-
-  this.on('mount', () => {
-    this.show();
-  });
-};
-
-riot$1.tag2('dmc-tooltip', '<div class="Tooltip__wrapper"> <div class="Tooltip__triangle"></div> <div class="Tooltip__contentWrapper"> <div class="Tooltip__content">{opts.message}</div> </div> </div>', '', 'class="Tooltip"', function(opts) {
-    this.external(script$5);
-});
-
-var script$7 = function() {
-  this.handleTap = () => {
-    if (this.opts.isdisabled) {
-      return;
-    }
-    this.opts.onchange && this.opts.onchange(!this.opts.ischecked, this.opts.id);
-  };
-};
-
-riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <dmc-icon type="check"></dmc-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$7);
-});
-
-var script$8 = function() {
-};
-
-riot$1.tag2('dmc-datepicker', '', '', 'class="Datepicker"', function(opts) {
-    this.external(script$8);
-});
-
-var script$9 = function() {
-  this.handleFormSubmit = e => {
-    e.preventUpdate = true;
-    e.preventDefault();
-    const selectedIndex = this.refs.select.selectedIndex;
-    forEach_1(this.opts.options, (option, idx) => {
-      option.isSelected = (idx === selectedIndex);
-    });
-    this.opts.onchange && this.opts.onchange(this.opts.options);
-  };
-
-  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
-  // そのため、`input`イベントを積極的に使用する。
-  this.handleInputInput = e => {
-    e.preventUpdate = true;
-    const selectedIndex = this.refs.select.selectedIndex;
-    forEach_1(this.opts.options, (option, idx) => {
-      option.isSelected = (idx === selectedIndex);
-    });
-    this.opts.onchange && this.opts.onchange(this.opts.options);
-  };
-
-  this.handleInputChange = e => {
-    // `blur`時に`change`イベントが発火する。
-    // 不都合な挙動なのでイベント伝播を止める。
-    e.stopPropagation();
-  };
-};
-
-riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <dmv-icon type="down"></dmv-icon> </div> </form>', '', 'class="Select"', function(opts) {
-    this.external(script$9);
-});
-
-var script$10 = function() {
-  this.handleTap = () => {
-    this.refs.form.focus();
-  };
-
-  this.handleFormSubmit = e => {
-    e.preventDefault();
-    this.opts.onchange && this.opts.onchange(this.opts.text, this.opts.id);
-  };
-
-  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
-  // そのため、`input`イベントを積極的に使用する。
-  this.handleInputInput = e => {
-    e.preventUpdate = true;
-    const newText = e.target.value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
-    this.opts.onchange && this.opts.onchange(newText, this.opts.id);
-  };
-
-  this.handleInputChange = e => {
-    // `blur`時に`change`イベントが発火する。
-    // 不都合な挙動なのでイベント伝播を止める。
-    e.stopPropagation();
-  };
-};
-
-riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" type="{opts.type || \'text\'}" riot-value="{opts.text}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$10);
-});
-
-var script$11 = function() {
-  this.inputId = `Uploader__input${Date.now()}`;
-  this.file = null;
-  this.blobURL = this.opts.initialbloburl || null;
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
-  this.reset = () => {
-    window.URL.revokeObjectURL(this.blobURL);
-    this.refs.form.reset();
-    this.file = null;
-    this.blobURL = this.opts.initialbloburl || null;
-    this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
-    this.update();
-  };
-
-  this.handleFileChange = e => {
-    const files = e.target.files;
-    if (!files.length) {
-      this.reset();
-      return;
-    }
-
-    const file = files[0];
-    this.file = file;
-    this.blobURL = window.URL.createObjectURL(file);
-    this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
-    this.update();
-  };
-
-  this.handleResetButtonTap = () => {
-    this.reset();
-  };
-};
-
-riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL}" riot-style="background-image:url({blobURL});"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div>', '', 'class="Uploader"', function(opts) {
-    this.external(script$11);
-});
-
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex$1(arr, iterator, thisObj){
-        iterator = makeIterator_$1(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (iterator(arr[i], i, arr)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    var findIndex_1$1 = findIndex$1;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$3(arr, iterator, thisObj){
-        var idx = findIndex_1$1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var find_1$2 = find$3;
-
-var script$12 = function() {
-  const type = this.opts.parameterobject.type;
-  // @see: https://swagger.io/specification/#dataTypeFormat
-  const format = this.opts.parameterobject.format;
-  this.uiType = null;
-  this.isOpened = false;
-  if (!!this.opts.parameterobject.enum) {
-    this.uiType = 'select';
-  } else {
-    switch (type) {
-    case 'string':
-      if (format === 'byte') {
-        this.uiType = 'uploader';
-      } else if (format === 'date' || format === 'date-time') {
-        this.uiType = 'datepicker';
-      } else {
-        this.uiType = 'input';
-      }
-      break;
-    case 'number':
-    case 'integer':
-      this.uiType = 'input';
-      break;
-    case 'boolean':
-      this.uiType = 'checkbox';
-      break;
-    case 'array':
-      this.uiType = 'TODO';
-      break;
-    case 'file':
-      this.uiType = 'uploader';
-      break;
-    default:
-      break;
-    }
-  }
-
-  this.getSelectOptions = () => {
-    const options = [];
-    if (this.opts.parametervalue === undefined) {
-      options.push({
-        label: '-- select an option --',
-        isSelected: true,
-        isDiabled: true
-      });
-    }
-    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
-      options.push({
-        id: `select_${idx}`,
-        label: v,
-        isSelected: (v === this.opts.parametervalue)
-      });
-    });
-    return options;
-  };
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
-  this.change = value => {
-    // TODO: format, validate
-    // TODO: byteならbase64化する
-    if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
-      value = Number(value);
-    }
-    this.opts.onchange(this.opts.parameterobject.name, value);
-  };
-
-  this.handleInputChange = value => {
-    this.change(value);
-  };
-
-  this.handleCheckboxChange = isChecked => {
-    this.change(isChecked);
-  };
-
-  this.handleSelectToggle = isOpened => {
-    this.isOpened = isOpened;
-    this.update();
-  };
-
-  this.handleSelectChange = options => {
-    const option = find_1$2(options, option => {
-      return option.isSelected;
-    });
-    const value = (option ? option.label : undefined);
-    this.change(value);
-  };
-
-  this.handleFileChange = file => {
-    this.change(file);
-  };
-};
-
-riot$1.tag2('dmc-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleFileChange}"></dmc-uploader> </virtual> <virtual if="{uiType === \'datepicker\'}"> <dmc-datepicker ondatechange="{handleDateChange}"></dmc-datepicker> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
-    this.external(script$12);
-});
-
-var script$13 = function() {
-  // typeは'null', 'boolean', 'object', 'array', 'number', 'integer', or 'string'.
-  // @see: https://swagger.io/specification/#dataTypeFormat
-  const type = this.opts.parameterobject.type;
-  const format = this.opts.parameterobject.format;
-  this.uiType = null;
-  this.multiSchema = null;
-  this.multiData = null;
-  this.multiPropertyKeys = null;
-  if (!!this.opts.parameterobject.enum) {
-    this.uiType = 'select';
-  } else {
-    switch (type) {
-    case 'string':
-      if (format === 'byte') {
-        this.uiType = 'uploader';
-      } else if (format === 'date' || format === 'date-time') {
-        this.uiType = 'datepicker';
-      } else {
-        this.uiType = 'input';
-      }
-      break;
-    case 'number':
-    case 'integer':
-      this.uiType = 'input';
-      break;
-    case 'boolean':
-      this.uiType = 'checkbox';
-      break;
-    case 'array':
-      this.uiType = 'multi';
-      if (this.opts.parametervalue) {
-        this.multiData = this.opts.parametervalue;
-      }
-      this.multiSchema = this.opts.parameterobject.items;
-      this.multiPropertyKeys = Object.keys(this.opts.parameterobject.items.properties);
-      break;
-    case 'object':
-    case 'null':
-    default:
-      break;
-    }
-  }
-
-  this.getParameterObject = propertyKey => {
-    return index$1$1({}, this.multiSchema.properties[propertyKey], {
-      name: propertyKey,
-      required : contains_1$1(this.multiSchema.required, propertyKey)
-    });
-  };
-
-  this.getValue = (propertyKey, idx) => {
-    if (!this.multiData[idx][propertyKey]) {
-      return;
-    }
-    return this.multiData[idx][propertyKey];
-  };
-
-  this.getSelectOptions = () => {
-    const options = [];
-    if (this.opts.parametervalue === undefined) {
-      options.push({
-        label: '-- select an option --',
-        isSelected: true,
-        isDiabled: true
-      });
-    }
-    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
-      options.push({
-        id: `select_${idx}`,
-        label: v,
-        isSelected: (v === this.opts.parametervalue)
-      });
-    });
-    return options;
-  };
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
-  this.change = value => {
-    // TODO: format, validate
-    // TODO: byteならbase64化する
-    if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
-      value = Number(value);
-    }
-    this.opts.onchange(this.opts.parameterobject.name, value, this.opts.multiidx);
-  };
-
-  this.handleMultiPlusButtonTap = () => {
-    this.multiData = this.multiData || [];
-    this.multiData.push({});
-    this.change(this.multiData);
-  };
-
-  this.handleMultiMinusButtonTap = e => {
-    this.multiData.splice(Number(e.currentTarget.getAttribute('idx')), 1);
-    this.change(this.multiData);
-  };
-
-  this.handleInputChange = value => {
-    this.change(value);
-  };
-
-  this.handleCheckboxChange = isChecked => {
-    this.change(isChecked);
-  };
-
-  this.handleSelectChange = options => {
-    const option = find_1$2(options, option => {
-      return option.isSelected;
-    });
-    const value = (option ? option.label : undefined);
-    this.change(value);
-  };
-
-  this.handleMultiChange = (key, value, idx) => {
-    if (value === undefined || idx === undefined) {
-      // TODO: 原因調査
-      return;
-    }
-    this.multiData[idx][key] = value;
-    this.change(this.multiData);
-  };
-};
-
-riot$1.tag2('dmc-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" ref="touch" ontap="handleMultiPlusButtonTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'datepicker\'}"> <dmc-datepicker ondatechange="{handleDateChange}"></dmc-datepicker> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" ref="touch" idx="{idx}" ontap="handleMultiMinusButtonTap"> <dmc-icon type="minus"></dmc-icon> </div> <dmc-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></dmc-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
-    this.external(script$13);
-});
-
-var script$14 = function() {
-  this.propertyKeys = Object.keys(this.opts.schema.properties);
-
-  this.getParameterObject = propertyKey => {
-    return index$1$1({}, this.opts.schema.properties[propertyKey], {
-      name: propertyKey,
-      required : contains_1$1(this.opts.schema.required, propertyKey)
-    });
-  };
-
-  this.getValue = propertyKey => {
-    if (!this.opts.parametervalues) {
-      return;
-    }
-    return this.opts.parametervalues[propertyKey];
-  };
-
-  this.handleChange = (name, value) => {
-    const values = index$1$1({}, this.opts.parametervalues, {
-      [name]: value
-    });
-    forOwn_1$1(values, (v, k) => {
-      // TODO: deleteするためのもっと良い方法を模索すること。
-      if (typeof v === 'string' && !v.length) {
-        delete values[k];
-      }
-    });
-    this.opts.onchange(this.opts.name, values);
-  };
-};
-
-riot$1.tag2('dmc-operation-schema', '<dmc-operation-schema-form each="{propertyKey in propertyKeys}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey)}" onchange="{parent.handleChange}"></dmc-operation-schema-form>', '', 'class="Operation__schema"', function(opts) {
-    this.external(script$14);
-});
-
-var script$15 = function() {
-  this.isUseBody = false;
-  // "query", "header", "path", "formData" or "body"のどれか。
-  if (this.opts.parameter.in === 'body') {
-    this.isUseBody = true;
-  }
-
-  this.handleChange = (key, value) => {
-    this.opts.onchange(key, value);
-  };
-};
-
-riot$1.tag2('dmc-operation-parameter', '<div class="Operation__parameterHead"> <div> <div class="Operation__parameterName">name: {opts.parameter.name}</div> <div class="Operation__parameterDescription">description: {opts.parameter.description}</div> <div class="Operation__parameterIn">in: {opts.parameter.in}</div> </div> <div class="Operation__parameterRequired" if="{opts.parameter.required}">required</div> </div> <div class="Operation__parameterBody"> <dmc-operation-schema if="{isUseBody}" name="{opts.parameter.name}" schema="{opts.parameter.schema}" parametervalues="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-schema> <dmc-operation-parameter-form if="{!isUseBody}" parameterobject="{this.opts.parameter}" parametervalue="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-parameter-form> </div>', '', 'class="Operation__parameter"', function(opts) {
-    this.external(script$15);
-});
-
-var script$16 = function() {
+var script$6 = function() {
   const store = this.riotx.get();
 
-  this.summary = this.opts.operation.summary;
-  if (!this.summary) {
-    const obj = swagger.getMethodAndPathByOperationID(this.opts.operation.operationId);
-    this.summary = `${obj.method} ${obj.path}`;
-  }
-  this.queries = index$1$1({}, this.opts.initialQueries);
+  this.currentParameters = objectAssign({}, this.opts.initialParameters);
 
-  this.handleParameterChange = (key, value) => {
-    this.queries[key] = value;
-    // TODO: deleteするためのもっと良い方法を模索すること。
-    if (typeof value === 'string' && !value.length) {
-      delete this.queries[key];
-    }
+  this.handleParametersChange = newParameters => {
+    this.currentParameters = newParameters;
     this.update();
   };
 
-  this.handleExecuteButtonPat = () => {
+  this.handleSubmitButtonPat = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.COMPONENTS_OPERATE_ONE, this.opts.operation, this.queries))
+      .then(() => store.action(constants$1.COMPONENTS_OPERATE_ONE, this.opts.operationObject, this.currentParameters))
       .then(() => {
+        this.opts.onComplete();
         this.close();
-        this.opts.onSuccess();
       })
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
         error: err
@@ -13748,41 +13264,32 @@ var script$16 = function() {
   };
 };
 
-riot$1.tag2('dmc-operation', '<div class="Operation__info"> <div> <div class="Operation__summary">{summary}</div> <div class="Operation__description">{opts.operation.description}</div> </div> </div> <div class="Operation__control"> <dmc-button label="{opts.operation.operationId}" onpat="{handleExecuteButtonPat}"></dmc-button> <dmc-button label="cancel" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div> <div class="Operation__parameters"> <dmc-operation-parameter each="{parameter in opts.operation.parameters}" parameter="{parameter}" parametervalue="{parent.queries[parameter.name]}" onchange="{parent.handleParameterChange}"></dmc-operation-parameter> </div>', '', 'class="Operation"', function(opts) {
-    this.external(script$16);
+riot$1.tag2('dmc-component-operation', '<div class="ComponentOperation__head"> <div class="ComponentOperation__title">{opts.title}</div> <div class="ComponentOperation__description" if="{!!opts.description}">{opts.description}</div> </div> <div class="ComponentOperation__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentOperation__tail"> <dmc-button label="submit" onpat="{handleSubmitButtonPat}"></dmc-button> <dmc-button label="cancel" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="ComponentOperation"', function(opts) {
+    this.external(script$6);
 });
 
-var script$6 = function() {
+var script$5 = function() {
   const store = this.riotx.get();
+  const operationObject = this.opts.action;
 
-  this.isTooltipOpened = false;
-  this.label = this.opts.action.summary;
-  if (!this.label) {
-    const obj = swagger.getMethodAndPathByOperationID(this.opts.action.operationId);
-    this.label = `${obj.method} ${obj.path}`;
-  }
-  this.tooltipMessage = this.opts.action.description;
+  this.label = operationObject.summary || operationObject.operationId;
 
   this.handleButtonPat = () => {
-    store.action(constants$1.DRAWERS_ADD, 'dmc-operation', {
-      operation: this.opts.action,
-      onSuccess: () => {
+    store.action(constants$1.DRAWERS_ADD, 'dmc-component-operation', {
+      title: operationObject.summary || operationObject.operationId,
+      description: operationObject.description,
+      operationObject,
+      parameterObjects: operationObject.parameters,
+      initialParameters: {},
+      onComplete: () => {
         this.opts.updater();
       }
     });
   };
-
-  this.handleButtonHoverToggle = isHovered => {
-    if (!this.tooltipMessage) {
-      return;
-    }
-    this.isTooltipOpened = isHovered;
-    this.update();
-  };
 };
 
-riot$1.tag2('dmc-component-action', '<dmc-button label="{label}" onpat="{handleButtonPat}" onhovertoggle="{handleButtonHoverToggle}"></dmc-button> <dmc-tooltip if="{isTooltipOpened}" message="{tooltipMessage}"></dmc-tooltip>', '', 'class="Component__action"', function(opts) {
-    this.external(script$6);
+riot$1.tag2('dmc-component-action', '<dmc-button label="{label}" onpat="{handleButtonPat}"></dmc-button>', '', 'class="Component__action"', function(opts) {
+    this.external(script$5);
 });
 
 var d3 = createCommonjsModule(function (module) {
@@ -41408,98 +40915,91 @@ return /******/ (function(modules) { // webpackBootstrap
 
 var chart$1 = unwrapExports(tauCharts);
 
-var script$17 = function() {
+var script$7 = function() {
   this.on('mount', () => {
-    const rawData = this.opts.data.getRawValue();
-    new chart$1.Chart(index$1$1({
+    new chart$1.Chart(objectAssign({
       type: 'bar'
-    }, rawData)).renderTo(this.refs.canvas);
+    }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('dmc-component-graph-bar', '<div class="ComponentGraphBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphBar"', function(opts) {
-    this.external(script$17);
+    this.external(script$7);
 });
 
-var script$18 = function() {
+var script$8 = function() {
   this.on('mount', () => {
-    const rawData = this.opts.data.getRawValue();
-    new chart$1.Chart(index$1$1({
+    new chart$1.Chart(objectAssign({
       type: 'horizontalBar'
-    }, rawData)).renderTo(this.refs.canvas);
+    }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('dmc-component-graph-horizontal-bar', '<div class="ComponentGraphHorizontalBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalBar"', function(opts) {
-    this.external(script$18);
+    this.external(script$8);
 });
 
-var script$19 = function() {
+var script$9 = function() {
   this.on('mount', () => {
-    const rawData = this.opts.data.getRawValue();
-    new chart$1.Chart(index$1$1({
+    new chart$1.Chart(objectAssign({
       type: 'horizontal-stacked-bar'
-    }, rawData)).renderTo(this.refs.canvas);
+    }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('dmc-component-graph-horizontal-stacked-bar', '<div class="ComponentGraphHorizontalStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalStackedBar"', function(opts) {
-    this.external(script$19);
+    this.external(script$9);
 });
 
-var script$20 = function() {
+var script$10 = function() {
   this.on('mount', () => {
-    const rawData = this.opts.data.getRawValue();
-    new chart$1.Chart(index$1$1({
+    new chart$1.Chart(objectAssign({
       type: 'line',
       guide: {
         interpolate: 'smooth'
       }
-    }, rawData)).renderTo(this.refs.canvas);
+    }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('dmc-component-graph-line', '<div class="ComponentGraphLine__canvas" ref="canvas"></div>', '', 'class="ComponentGraphLine"', function(opts) {
-    this.external(script$20);
+    this.external(script$10);
 });
 
-var script$21 = function() {
+var script$11 = function() {
   this.on('mount', () => {
-    const rawData = this.opts.data.getRawValue();
-    new chart$1.Chart(index$1$1({
+    new chart$1.Chart(objectAssign({
       type: 'scatterplot'
-    }, rawData)).renderTo(this.refs.canvas);
+    }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('dmc-component-graph-scatterplot', '<div class="ComponentGraphScatterplot__canvas" ref="canvas"></div>', '', 'class="ComponentGraphScatterplot"', function(opts) {
-    this.external(script$21);
+    this.external(script$11);
 });
 
-var script$22 = function() {
+var script$12 = function() {
   this.on('mount', () => {
-    const rawData = this.opts.data.getRawValue();
-    new chart$1.Chart(index$1$1({
+    new chart$1.Chart(objectAssign({
       type: 'stacked-area'
-    }, rawData)).renderTo(this.refs.canvas);
+    }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('dmc-component-graph-stacked-area', '<div class="ComponentGraphStackedArea__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedArea"', function(opts) {
-    this.external(script$22);
+    this.external(script$12);
 });
 
-var script$23 = function() {
+var script$13 = function() {
   this.on('mount', () => {
-    const rawData = this.opts.data.getRawValue();
-    new chart$1.Chart(index$1$1({
+    new chart$1.Chart(objectAssign({
       type: 'stacked-bar'
-    }, rawData)).renderTo(this.refs.canvas);
+    }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('dmc-component-graph-stacked-bar', '<div class="ComponentGraphStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedBar"', function(opts) {
-    this.external(script$23);
+    this.external(script$13);
 });
 
 /**
@@ -41543,37 +41043,67 @@ riot$1.tag2('dmc-component-graph-stacked-bar', '<div class="ComponentGraphStacke
 
     var currencyFormat_1 = currencyFormat;
 
-var script$24 = function() {
-  this.value = currencyFormat_1(this.opts.data.getValue('value').getValue(), 0);
+var script$14 = function() {
+  this.value = currencyFormat_1(this.opts.response.value, 0);
 };
 
-riot$1.tag2('dmc-component-number', '<div class="ComponentNumber__value">{value}</div>', '', 'class="ComponentNumber"', function(opts) {
-    this.external(script$24);
+riot$1.tag2('dmc-component-number', '<div>{value}</div>', '', 'class="ComponentNumber"', function(opts) {
+    this.external(script$14);
 });
 
-var script$25 = function() {
+/**
+     * Array.indexOf
+     */
+    function indexOf$1(arr, item, fromIndex) {
+        fromIndex = fromIndex || 0;
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length,
+            i = fromIndex < 0 ? len + fromIndex : fromIndex;
+        while (i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[i] === item) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    var indexOf_1$1 = indexOf$1;
+
+/**
+     * If array contains values.
+     */
+    function contains$1(arr, val) {
+        return indexOf_1$1(arr, val) !== -1;
+    }
+    var contains_1$1 = contains$1;
+
+var script$15 = function() {
   const store = this.riotx.get();
 
   this.value = null;
   this.isComplex = false;
   this.isImage = false;
-  let type;
-  if (!!this.opts.cell) {
-    type = this.opts.cell.getType();
-  }
-  switch (type) {
+  switch (this.opts.data.type) {
   case 'null':
     this.value = 'null';
     break;
   case 'boolean':
-    this.value = this.opts.cell.getValue() ? 'true' : 'false';
+    this.value = this.opts.data.cell ? 'true' : 'false';
     break;
   case 'number':
   case 'integer':
-    this.value = String(this.opts.cell.getValue());
+    this.value = String(this.opts.data.cell);
     break;
   case 'string': {
-    this.value = this.opts.cell.getValue() || '-';
+    this.value = this.opts.data.cell || '-';
     const split = this.value.split('.');
     if (!!split.length && contains_1$1(['jpg', 'png', 'gif'], split[split.length - 1])) {
       this.isImage = true;
@@ -41592,16 +41122,16 @@ var script$25 = function() {
 
   this.handleTap = ()  => {
     store.action(constants$1.MODALS_ADD, 'dmc-prettyprint', {
-      data : this.opts.cell.getRawValue()
+      data : this.opts.data.cell
     });
   };
 };
 
 riot$1.tag2('dmc-table-cell', '<div class="Table__cellValue" if="{!isComplex &amp;&amp; !isImage}">{value}</div> <div class="Table__cellButton" if="{isComplex}" ref="touch" ontap="handleTap">{value}</div> <div class="Table__cellImage" if="{isImage}"> <div riot-style="background-image:url({value});"></div> </div>', '', 'class="Table__cell"', function(opts) {
-    this.external(script$25);
+    this.external(script$15);
 });
 
-var script$26 = function() {
+var script$16 = function() {
   this.isOpened = true;
 
   this.handleHeaderTap = () => {
@@ -41610,20 +41140,64 @@ var script$26 = function() {
   };
 };
 
-riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap="handleHeaderTap"> <div class="Table__itemInfo"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <div class="Table__itemOpenShut"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-cell cell="{opts.item.cell}"></dmc-table-cell> </virtual>', '', 'class="Table__item {isOpened ? \'Table__item--opened\' : \'\'}"', function(opts) {
-    this.external(script$26);
+riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap="handleHeaderTap"> <div class="Table__itemInfo"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <div class="Table__itemOpenShut"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-cell data="{opts.item}"></dmc-table-cell> </virtual>', '', 'class="Table__item {isOpened ? \'Table__item--opened\' : \'\'}"', function(opts) {
+    this.external(script$16);
 });
 
-var script$28 = function() {
+/**
+     * Returns the index of the first item that matches criteria
+     */
+    function findIndex$1(arr, iterator, thisObj){
+        iterator = makeIterator_$1(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (iterator(arr[i], i, arr)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    var findIndex_1$1 = findIndex$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$3(arr, iterator, thisObj){
+        var idx = findIndex_1$1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var find_1$2 = find$3;
+
+var script$18 = function() {
   this.handleActionButtonPat = e => {
-    const id = e.target.getAttribute('id');
-    this.opts.actions[id].onPat(this.opts.actions[id].id, this.opts.actions[id].rowData.getValue(this.opts.idx));
+    const idx = e.target.getAttribute('idx');
+    this.opts.actions[idx].onPat(this.opts.actions[idx].operationId, this.opts.idx);
     this.close();
   };
 };
 
-riot$1.tag2('dmc-table-action', '<div class="Table__actionItem" each="{action, idx in opts.actions}"> <div class="Table__actionInner"> <div class="Table__actionTitle">{action.value}</div> <div class="Table__actionDescription">{action.description}</div> </div> <div class="Table__actionExecuteButton" id="{idx}" ref="touch" ontap="parent.handleActionButtonPat">execute</div> </div>', '', 'class="Table__action"', function(opts) {
-    this.external(script$28);
+riot$1.tag2('dmc-table-action', '<div class="Table__actionItem" each="{action, idx in opts.actions}"> <div class="Table__actionInner"> <div class="Table__actionTitle">{action.value}</div> <div class="Table__actionDescription">{action.description}</div> </div> <div class="Table__actionExecuteButton" idx="{idx}" ref="touch" ontap="parent.handleActionButtonPat">execute</div> </div>', '', 'class="Table__action"', function(opts) {
+    this.external(script$18);
+});
+
+var script$19 = function() {
+  this.handleTap = () => {
+    if (this.opts.isdisabled) {
+      return;
+    }
+    this.opts.onchange && this.opts.onchange(!this.opts.ischecked, this.opts.id);
+  };
+};
+
+riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <dmc-icon type="check"></dmc-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$19);
 });
 
 /**
@@ -41637,7 +41211,7 @@ riot$1.tag2('dmc-table-action', '<div class="Table__actionItem" each="{action, i
 
     var remove_1$1 = remove$1;
 
-var script$29 = function() {
+var script$20 = function() {
   this.items = map_1$1(this.opts.options, option => {
     return {
       label: option,
@@ -41667,10 +41241,10 @@ var script$29 = function() {
 };
 
 riot$1.tag2('dmc-table-filter', '<dmc-checkbox each="{item in items}" label="{item.label}" ischecked="{item.isChecked}" id="{item.id}" onchange="{parent.handleCheckboxChange}"></dmc-checkbox>', '', 'class="Table__filter"', function(opts) {
-    this.external(script$29);
+    this.external(script$20);
 });
 
-var script$27 = function() {
+var script$17 = function() {
   const store = this.riotx.get();
 
   this.isOpened = false;
@@ -41695,14 +41269,16 @@ var script$27 = function() {
   if (!item) {
     item = this.opts.items[0];
   }
-  this.title = `${item.cell.getValue()}`;
-  this.visibleKeys = map_1$1(this.opts.items, item => {
+  this.title = `${item.cell}`;
+
+  // 画面表示するkey群。
+  let visibleKeys = map_1$1(this.opts.items, item => {
     return item.key;
   });
-  // filterを通したリスト。
-  this.getItems = () => {
+  // filterを通したリストを返す。
+  const getItems = () => {
     return filter_1$1(this.opts.items, item => {
-      if (!find_1$2(this.visibleKeys, key => {
+      if (!find_1$2(visibleKeys, key => {
         return (key === item.key);
       })) {
         return false;
@@ -41710,7 +41286,7 @@ var script$27 = function() {
       return true;
     });
   };
-  this.filteredItems = this.getItems();
+  this.filteredItems = getItems();
 
   this.handleHeaderTitleTap = () => {
     this.isOpened = !this.isOpened;
@@ -41729,10 +41305,10 @@ var script$27 = function() {
       options: map_1$1(this.opts.items, item => {
         return item.key;
       }),
-      selectedOptions: this.visibleKeys,
+      selectedOptions: visibleKeys,
       onChange: selectedOptions => {
-        this.visibleKeys = selectedOptions;
-        this.filteredItems = this.getItems();
+        visibleKeys = selectedOptions;
+        this.filteredItems = getItems();
         this.update();
       }
     });
@@ -41745,10 +41321,10 @@ var script$27 = function() {
 };
 
 riot$1.tag2('dmc-table-items', '<div class="Table__itemsHeader"> <div class="Table__itemsTitle" ref="touch" ontap="handleHeaderTitleTap">{title}</div> <div class="Table__itemsButton" if="{!!opts.actions}" ref="touch" ontap="handleActionButtonTap"> <dmc-icon type="edit"></dmc-icon> </div> <div class="Table__itemsButton" ref="touch" ontap="handleFilterButtonTap"> <dmc-icon type="filter"></dmc-icon> </div> <div class="Table__itemsButton Table__itemsOpenShutButton" ref="touch" ontap="handleOpenShutButtonTap"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-item each="{item in filteredItems}" item="{item}"></dmc-table-item> </virtual>', '', 'class="Table__items {isOpened ? \'Table__items--opened\' : \'\'}"', function(opts) {
-    this.external(script$27);
+    this.external(script$17);
 });
 
-var script$30 = function() {
+var script$21 = function() {
   this.getItemList = () => {
     const columns = this.opts.columns;
     const list = [];
@@ -41769,118 +41345,446 @@ var script$30 = function() {
 };
 
 riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}" tablelabels="{parent.opts.tablelabels}"></dmc-table-items>', '', 'class="Table"', function(opts) {
-    this.external(script$30);
+    this.external(script$21);
 });
 
-var script$31 = function() {
-  const store = this.riotx.get();
-
-  this.getColumns = () => {
-    const columns = [];
-    forOwn_1$1(this.opts.schema.items.properties, (v, k) => {
-      columns.push({
-        title: v.description || k,
-        type: v.type,
-        key: k
-      });
+var script$23 = function() {
+  this.handleFormSubmit = e => {
+    e.preventUpdate = true;
+    e.preventDefault();
+    const selectedIndex = this.refs.select.selectedIndex;
+    forEach_1(this.opts.options, (option, idx) => {
+      option.isSelected = (idx === selectedIndex);
     });
-    return columns;
+    this.opts.onchange && this.opts.onchange(this.opts.options);
   };
 
-  this.getRows = () => {
-    const rows = [];
-    forEach_1(this.opts.data.getValue(), cells => {
-      const row = {};
-      forOwn_1$1(cells.getValue(), cell => {
-        row[cell.getKey()] = cell;
-      });
-      rows.push(row);
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    const selectedIndex = this.refs.select.selectedIndex;
+    forEach_1(this.opts.options, (option, idx) => {
+      option.isSelected = (idx === selectedIndex);
     });
-    return rows;
+    this.opts.onchange && this.opts.onchange(this.opts.options);
   };
 
-  this.getActions = () => {
-    const actions = [];
-    forEach_1(this.opts.rowactions, action => {
-      let value = action.summary;
-      if (!value) {
-        const obj = swagger.getMethodAndPathByOperationID(action.operationId);
-        value = `${obj.method} ${obj.path}`;
-      }
-      actions.push({
-        id: action.operationId,
-        value,
-        description: action.description,
-        rowData: this.opts.data,
-        onPat: this.handleActionButtonPat
-      });
-    });
-    return actions;
-  };
-
-  this.createInitialQueries = (operation, rowData) => {
-    const queries = {};
-    const parameters = operation.parameters;
-    forEach_1(parameters, parameter => {
-      const name = parameter.name;
-      if (parameter.in === 'body') {
-        queries[name] = {};
-        forOwn_1$1(parameter.schema.properties, (v, k) => {
-          if (rowData.getValue(k)) {
-            queries[name][k] = rowData.getValue(k).getRawValue();
-          }
-        });
-      } else {
-        if (!rowData.getValue(name)) {
-          return;
-        }
-        queries[name] = rowData.getValue(name).getRawValue();
-      }
-    });
-
-    return queries;
-  };
-
-  this.handleActionButtonPat = (operationID, rowData) => {
-    const operation = find_1$2(this.opts.rowactions, action => {
-      return (action.operationId === operationID);
-    });
-    const initialQueries = this.createInitialQueries(operation, rowData);
-    store.action(constants$1.DRAWERS_ADD, 'dmc-operation', {
-      operation,
-      initialQueries,
-      onSuccess: () => {
-        this.opts.updater();
-      }
-    });
+  this.handleInputChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
   };
 };
 
-riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}" tablelabels="{opts.tablelabels}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
-    this.external(script$31);
+riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </form>', '', 'class="Select"', function(opts) {
+    this.external(script$23);
 });
 
-var script$33 = function() {
-  this.queries = this.opts.queries;
-
-  this.handleInputChange = (value, id) => {
-    const query = find_1$2(this.queries, query => {
-      return (query.key === id);
-    });
-    if (!query) {
-      return;
+/**
+     */
+    function isString(val) {
+        return isKind_1$1(val, 'String');
     }
-    query.value = value;
+    var isString_1 = isString;
+
+var script$24 = function() {
+  /**
+   * undefined等の値を考慮した最適な値を返します。
+   * @param {String|null} value
+   * @return {String|null}
+   */
+  this.normalizeValue = value => {
+    if (!isString_1(value)) {
+      return null;
+    }
+    return value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+  };
+
+  this.on('mount', () => {
+    this.refs.input.value = this.normalizeValue(this.opts.text);
+    this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
+  }).on('updated', () => {
+    this.refs.input.value = this.normalizeValue(this.opts.text);
+  });
+
+  this.handleTap = () => {
+    this.refs.form.focus();
+  };
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    this.opts.onchange && this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    this.opts.onchange && this.opts.onchange(this.normalizeValue(e.target.value), this.opts.id);
+  };
+
+  this.handleInputChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
+  };
+};
+
+riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$24);
+});
+
+var script$25 = function() {
+  this.inputId = `Uploader__input${Date.now()}`;
+  this.file = null;
+  this.blobURL = this.opts.initialbloburl || null;
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.reset = () => {
+    window.URL.revokeObjectURL(this.blobURL);
+    this.refs.form.reset();
+    this.file = null;
+    this.blobURL = this.opts.initialbloburl || null;
+    this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
     this.update();
   };
 
-  this.handleSearchButtonPat = () => {
-    this.close();
-    const ret = {};
-    forEach_1(this.queries, query => {
-      ret[query.key] = query.value;
+  this.handleFileChange = e => {
+    const files = e.target.files;
+    if (!files.length) {
+      this.reset();
+      return;
+    }
+
+    const file = files[0];
+    this.file = file;
+    this.blobURL = window.URL.createObjectURL(file);
+    this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
+    this.update();
+  };
+
+  this.handleResetButtonTap = () => {
+    this.reset();
+  };
+};
+
+riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL}" riot-style="background-image:url({blobURL});"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div>', '', 'class="Uploader"', function(opts) {
+    this.external(script$25);
+});
+
+var script$26 = function() {
+  const type = this.opts.parameterobject.type;
+  // @see: https://swagger.io/specification/#dataTypeFormat
+  const format = this.opts.parameterobject.format;
+  this.uiType = null;
+  this.isOpened = false;
+  if (!!this.opts.parameterobject.enum) {
+    this.uiType = 'select';
+  } else {
+    switch (type) {
+    case 'string':
+      if (format === 'byte') {
+        this.uiType = 'uploader';
+      } else if (format === 'date' || format === 'date-time') {
+        // TODO: datepicker表示
+        //this.uiType = 'datepicker';
+      } else {
+        this.uiType = 'input';
+      }
+      break;
+    case 'number':
+    case 'integer':
+      this.uiType = 'input';
+      break;
+    case 'boolean':
+      this.uiType = 'checkbox';
+      break;
+    case 'array':
+      this.uiType = 'TODO';
+      break;
+    case 'file':
+      this.uiType = 'uploader';
+      break;
+    default:
+      break;
+    }
+  }
+
+  this.getSelectOptions = () => {
+    const options = [];
+    if (this.opts.parametervalue === undefined) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
+    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
+      options.push({
+        id: `select_${idx}`,
+        label: v,
+        isSelected: (v === this.opts.parametervalue)
+      });
     });
-    this.opts.onSearch(ret);
+    return options;
+  };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.change = value => {
+    // TODO: format, validate
+    // TODO: byteならbase64化する
+    if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
+      value = Number(value);
+    }
+    this.opts.onchange(this.opts.parameterobject.name, value);
+  };
+
+  this.handleInputChange = value => {
+    this.change(value);
+  };
+
+  this.handleCheckboxChange = isChecked => {
+    this.change(isChecked);
+  };
+
+  this.handleSelectToggle = isOpened => {
+    this.isOpened = isOpened;
+    this.update();
+  };
+
+  this.handleSelectChange = options => {
+    const option = find_1$2(options, option => {
+      return option.isSelected;
+    });
+    const value = (option ? option.label : undefined);
+    this.change(value);
+  };
+
+  this.handleFileChange = file => {
+    this.change(file);
+  };
+};
+
+riot$1.tag2('dmc-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleFileChange}"></dmc-uploader> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
+    this.external(script$26);
+});
+
+var script$27 = function() {
+  // typeは'null', 'boolean', 'object', 'array', 'number', 'integer', or 'string'.
+  // @see: https://swagger.io/specification/#dataTypeFormat
+  const type = this.opts.parameterobject.type;
+  const format = this.opts.parameterobject.format;
+  this.uiType = null;
+  this.multiSchema = null;
+  this.multiData = null;
+  this.multiPropertyKeys = null;
+  if (!!this.opts.parameterobject.enum) {
+    this.uiType = 'select';
+  } else {
+    switch (type) {
+    case 'string':
+      if (format === 'byte') {
+        this.uiType = 'uploader';
+      } else if (format === 'date' || format === 'date-time') {
+        // TODO: datepicker表示
+        //this.uiType = 'datepicker';
+      } else {
+        this.uiType = 'input';
+      }
+      break;
+    case 'number':
+    case 'integer':
+      this.uiType = 'input';
+      break;
+    case 'boolean':
+      this.uiType = 'checkbox';
+      break;
+    case 'array':
+      this.uiType = 'multi';
+      if (this.opts.parametervalue) {
+        this.multiData = this.opts.parametervalue;
+      }
+      this.multiSchema = this.opts.parameterobject.items;
+      this.multiPropertyKeys = Object.keys(this.opts.parameterobject.items.properties);
+      break;
+    case 'object':
+    case 'null':
+    default:
+      break;
+    }
+  }
+
+  this.getParameterObject = propertyKey => {
+    return objectAssign({}, this.multiSchema.properties[propertyKey], {
+      name: propertyKey,
+      required : contains_1$1(this.multiSchema.required, propertyKey)
+    });
+  };
+
+  this.getValue = (propertyKey, idx) => {
+    if (!this.multiData[idx][propertyKey]) {
+      return;
+    }
+    return this.multiData[idx][propertyKey];
+  };
+
+  this.getSelectOptions = () => {
+    const options = [];
+    if (this.opts.parametervalue === undefined) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
+    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
+      options.push({
+        id: `select_${idx}`,
+        label: v,
+        isSelected: (v === this.opts.parametervalue)
+      });
+    });
+    return options;
+  };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.change = value => {
+    // TODO: format, validate
+    // TODO: byteならbase64化する
+    if (this.opts.parameterobject.type === 'number' || this.opts.parameterobject.type === 'integer') {
+      value = Number(value);
+    }
+    this.opts.onchange(this.opts.parameterobject.name, value, this.opts.multiidx);
+  };
+
+  this.handleMultiPlusButtonTap = () => {
+    this.multiData = this.multiData || [];
+    this.multiData.push({});
+    this.change(this.multiData);
+  };
+
+  this.handleMultiMinusButtonTap = e => {
+    this.multiData.splice(Number(e.currentTarget.getAttribute('idx')), 1);
+    this.change(this.multiData);
+  };
+
+  this.handleInputChange = value => {
+    this.change(value);
+  };
+
+  this.handleCheckboxChange = isChecked => {
+    this.change(isChecked);
+  };
+
+  this.handleSelectChange = options => {
+    const option = find_1$2(options, option => {
+      return option.isSelected;
+    });
+    const value = (option ? option.label : undefined);
+    this.change(value);
+  };
+
+  this.handleMultiChange = (key, value, idx) => {
+    if (value === undefined || idx === undefined) {
+      // TODO: 原因調査
+      return;
+    }
+    this.multiData[idx][key] = value;
+    this.change(this.multiData);
+  };
+};
+
+riot$1.tag2('dmc-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" ref="touch" ontap="handleMultiPlusButtonTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" ref="touch" idx="{idx}" ontap="handleMultiMinusButtonTap"> <dmc-icon type="minus"></dmc-icon> </div> <dmc-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></dmc-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
+    this.external(script$27);
+});
+
+var script$28 = function() {
+  this.propertyKeys = Object.keys(this.opts.schema.properties);
+
+  this.getParameterObject = propertyKey => {
+    return objectAssign({}, this.opts.schema.properties[propertyKey], {
+      name: propertyKey,
+      required : contains_1$1(this.opts.schema.required, propertyKey)
+    });
+  };
+
+  this.getValue = propertyKey => {
+    if (!this.opts.parametervalues) {
+      return;
+    }
+    return this.opts.parametervalues[propertyKey];
+  };
+
+  this.handleChange = (name, value) => {
+    const values = objectAssign({}, this.opts.parametervalues, {
+      [name]: value
+    });
+    forOwn_1$1(values, (v, k) => {
+      // TODO: deleteするためのもっと良い方法を模索すること。
+      if (typeof v === 'string' && !v.length) {
+        delete values[k];
+      }
+    });
+    this.opts.onchange(this.opts.name, values);
+  };
+};
+
+riot$1.tag2('dmc-operation-schema', '<dmc-operation-schema-form each="{propertyKey in propertyKeys}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey)}" onchange="{parent.handleChange}"></dmc-operation-schema-form>', '', 'class="Operation__schema"', function(opts) {
+    this.external(script$28);
+});
+
+var script$29 = function() {
+  this.isUseBody = false;
+  // "query", "header", "path", "formData" or "body"のどれか。
+  if (this.opts.parameter.in === 'body') {
+    this.isUseBody = true;
+  }
+
+  this.handleChange = (key, value) => {
+    this.opts.onchange(key, value);
+  };
+};
+
+riot$1.tag2('dmc-operation-parameter', '<div class="Operation__parameterHead"> <div> <div class="Operation__parameterName">name: {opts.parameter.name}</div> <div class="Operation__parameterDescription">description: {opts.parameter.description}</div> <div class="Operation__parameterIn">in: {opts.parameter.in}</div> </div> <div class="Operation__parameterRequired" if="{opts.parameter.required}">required</div> </div> <div class="Operation__parameterBody"> <dmc-operation-schema if="{isUseBody}" name="{opts.parameter.name}" schema="{opts.parameter.schema}" parametervalues="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-schema> <dmc-operation-parameter-form if="{!isUseBody}" parameterobject="{this.opts.parameter}" parametervalue="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-parameter-form> </div>', '', 'class="Operation__parameter"', function(opts) {
+    this.external(script$29);
+});
+
+var script$30 = function() {
+  const store = this.riotx.get();
+
+  this.summary = this.opts.operationObject.summary || this.opts.operationObject.operationId;
+  this.queries = objectAssign({}, this.opts.initialQueries);
+
+  this.handleParameterChange = (key, value) => {
+    this.queries[key] = value;
+    // TODO: deleteするためのもっと良い方法を模索すること。
+    if (typeof value === 'string' && !value.length) {
+      delete this.queries[key];
+    }
+    this.update();
+  };
+
+  this.handleExecuteButtonPat = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.COMPONENTS_OPERATE_ONE, this.opts.operationObject, this.queries))
+      .then(() => {
+        this.close();
+        this.opts.onSuccess();
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
   };
 
   this.handleCancelButtonPat = () => {
@@ -41888,11 +41792,12619 @@ var script$33 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-searchbox', '<div class="Component__searchBoxInputs"> <div class="Component__searchBoxInput" each="{query in queries}"> <div class="Component__searchBoxInputLabel">{query.key}</div> <dmc-textinput id="{query.key}" text="{query.value}" placeholder="{query.type}" onchange="{parent.handleInputChange}"></dmc-textinput> </div> </div> <div class="Component__searchBoxControls"> <dmc-button label="search" onpat="{handleSearchButtonPat}"></dmc-button> <dmc-button label="cancel" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="Component__searchBox"', function(opts) {
+riot$1.tag2('dmc-operation', '<div class="Operation__info"> <div> <div class="Operation__summary">{summary}</div> <div class="Operation__description">{opts.operationObject.description}</div> </div> </div> <div class="Operation__parameters"> <dmc-operation-parameter each="{parameter in opts.operationObject.parameters}" parameter="{parameter}" parametervalue="{parent.queries[parameter.name]}" onchange="{parent.handleParameterChange}"></dmc-operation-parameter> </div> <div class="Operation__control"> <dmc-button label="{opts.operationObject.operationId}" onpat="{handleExecuteButtonPat}"></dmc-button> <dmc-button label="cancel" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="Operation"', function(opts) {
+    this.external(script$30);
+});
+
+var script$22 = function() {
+  const store = this.riotx.get();
+
+  this.getColumns = () => {
+    const columns = [];
+    forOwn_1$1(this.opts.schemaobject.items.properties, (obj, key) => {
+      columns.push({
+        title: obj.description || key,
+        type: obj.type,
+        key
+      });
+    });
+    return columns;
+  };
+
+  this.getRows = () => {
+    const rows = [];
+    forEach_1(this.opts.response, cells => {
+      const row = {};
+      forOwn_1$1(cells, (cell, key) => {
+        row[key] = cell;
+      });
+      rows.push(row);
+    });
+    return rows;
+  };
+
+  this.getActions = () => {
+    const actions$$1 = [];
+    forEach_1(this.opts.rowactions, operationObject => {
+      actions$$1.push({
+        operationId: operationObject.operationId,
+        value: operationObject.summary || operationObject.operationId,
+        description: operationObject.description,
+        onPat: this.handleActionButtonPat
+      });
+    });
+    return actions$$1;
+  };
+
+  const createInitialQueries = (operationObject, rowData) => {
+    const queries = {};
+    const parameterObjects = operationObject.parameters;
+    forEach_1(parameterObjects, parameterObject => {
+      const name = parameterObject.name;
+      if (parameterObject.in === 'body') {
+        queries[name] = {};
+        forOwn_1$1(parameterObject.schema.properties, (v, k) => {
+          if (rowData[k]) {
+            queries[name][k] = rowData[k];
+          }
+        });
+      } else {
+        if (!rowData[name]) {
+          return;
+        }
+        queries[name] = rowData[name];
+      }
+    });
+
+    return queries;
+  };
+
+  this.handleActionButtonPat = (operationId, rowIdx) => {
+    const operationObject = find_1$2(this.opts.rowactions, operationObject => {
+      return (operationObject.operationId === operationId);
+    });
+    const rowData = this.opts.response[rowIdx];
+    const initialParameters = createInitialQueries(operationObject, rowData);
+    store.action(constants$1.DRAWERS_ADD, 'dmc-component-operation', {
+      name: operationObject.summary || operationObject.operationId,
+      description: operationObject.description,
+      operationObject,
+      parameterObjects: operationObject.parameters,
+      initialParameters,
+      onComplete: () => {
+        this.opts.updater();
+      }
+    });
+  };
+};
+
+riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}" tablelabels="{opts.tablelabels}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
+    this.external(script$22);
+});
+
+/**
+     * Get object keys
+     */
+     var keys$1 = Object.keys || function (obj) {
+            var keys = [];
+            forOwn_1$1(obj, function(val, key){
+                keys.push(key);
+            });
+            return keys;
+        };
+
+    var keys_1$1 = keys$1;
+
+var beautify = createCommonjsModule(function (module, exports) {
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+ JS Beautifier
+---------------
+
+
+  Written by Einar Lielmanis, <einar@jsbeautifier.org>
+      http://jsbeautifier.org/
+
+  Originally converted to javascript by Vital, <vital76@gmail.com>
+  "End braces on own line" added by Chris J. Shull, <chrisjshull@gmail.com>
+  Parsing improvements for brace-less statements by Liam Newman <bitwiseman@gmail.com>
+
+
+  Usage:
+    js_beautify(js_source_text);
+    js_beautify(js_source_text, options);
+
+  The options are:
+    indent_size (default 4)          - indentation size,
+    indent_char (default space)      - character to indent with,
+    preserve_newlines (default true) - whether existing line breaks should be preserved,
+    max_preserve_newlines (default unlimited) - maximum number of line breaks to be preserved in one chunk,
+
+    jslint_happy (default false) - if true, then jslint-stricter mode is enforced.
+
+            jslint_happy        !jslint_happy
+            ---------------------------------
+            function ()         function()
+
+            switch () {         switch() {
+            case 1:               case 1:
+              break;                break;
+            }                   }
+
+    space_after_anon_function (default false) - should the space before an anonymous function's parens be added, "function()" vs "function ()",
+          NOTE: This option is overriden by jslint_happy (i.e. if jslint_happy is true, space_after_anon_function is true by design)
+
+    brace_style (default "collapse") - "collapse" | "expand" | "end-expand" | "none" | any of the former + ",preserve-inline"
+            put braces on the same line as control statements (default), or put braces on own line (Allman / ANSI style), or just put end braces on own line, or attempt to keep them where they are.
+            preserve-inline will try to preserve inline blocks of curly braces
+
+    space_before_conditional (default true) - should the space before conditional statement be added, "if(true)" vs "if (true)",
+
+    unescape_strings (default false) - should printable characters in strings encoded in \xNN notation be unescaped, "example" vs "\x65\x78\x61\x6d\x70\x6c\x65"
+
+    wrap_line_length (default unlimited) - lines should wrap at next opportunity after this number of characters.
+          NOTE: This is not a hard limit. Lines will continue until a point where a newline would
+                be preserved if it were present.
+
+    end_with_newline (default false)  - end output with a newline
+
+
+    e.g
+
+    js_beautify(js_source_text, {
+      'indent_size': 1,
+      'indent_char': '\t'
+    });
+
+*/
+
+// Object.values polyfill found here:
+// http://tokenposts.blogspot.com.au/2012/04/javascript-objectkeys-browser.html
+if (!Object.values) {
+    Object.values = function(o) {
+        if (o !== Object(o)) {
+            throw new TypeError('Object.values called on a non-object');
+        }
+        var k = [],
+            p;
+        for (p in o) {
+            if (Object.prototype.hasOwnProperty.call(o, p)) {
+                k.push(o[p]);
+            }
+        }
+        return k;
+    };
+}
+
+(function() {
+
+    function mergeOpts(allOptions, targetType) {
+        var finalOpts = {};
+        var name;
+
+        for (name in allOptions) {
+            if (name !== targetType) {
+                finalOpts[name] = allOptions[name];
+            }
+        }
+
+        //merge in the per type settings for the targetType
+        if (targetType in allOptions) {
+            for (name in allOptions[targetType]) {
+                finalOpts[name] = allOptions[targetType][name];
+            }
+        }
+        return finalOpts;
+    }
+
+    function js_beautify(js_source_text, options) {
+
+        var acorn = {};
+        (function(exports) {
+            /* jshint curly: false */
+            // This section of code is taken from acorn.
+            //
+            // Acorn was written by Marijn Haverbeke and released under an MIT
+            // license. The Unicode regexps (for identifiers and whitespace) were
+            // taken from [Esprima](http://esprima.org) by Ariya Hidayat.
+            //
+            // Git repositories for Acorn are available at
+            //
+            //     http://marijnhaverbeke.nl/git/acorn
+            //     https://github.com/marijnh/acorn.git
+
+            // ## Character categories
+
+            // Big ugly regular expressions that match characters in the
+            // whitespace, identifier, and identifier-start categories. These
+            // are only applied when a character is found to actually have a
+            // code point above 128.
+
+            var nonASCIIwhitespace = /[\u1680\u180e\u2000-\u200a\u202f\u205f\u3000\ufeff]/; // jshint ignore:line
+            var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
+            var nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f";
+            var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
+            var nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonASCIIidentifierChars + "]");
+
+            // Whether a single character denotes a newline.
+
+            exports.newline = /[\n\r\u2028\u2029]/;
+
+            // Matches a whole line break (where CRLF is considered a single
+            // line break). Used to count lines.
+
+            // in javascript, these two differ
+            // in python they are the same, different methods are called on them
+            exports.lineBreak = new RegExp('\r\n|' + exports.newline.source);
+            exports.allLineBreaks = new RegExp(exports.lineBreak.source, 'g');
+
+
+            // Test whether a given character code starts an identifier.
+
+            exports.isIdentifierStart = function(code) {
+                // permit $ (36) and @ (64). @ is used in ES7 decorators.
+                if (code < 65) { return code === 36 || code === 64; }
+                // 65 through 91 are uppercase letters.
+                if (code < 91) { return true; }
+                // permit _ (95).
+                if (code < 97) { return code === 95; }
+                // 97 through 123 are lowercase letters.
+                if (code < 123) { return true; }
+                return code >= 0xaa && nonASCIIidentifierStart.test(String.fromCharCode(code));
+            };
+
+            // Test whether a given character is part of an identifier.
+
+            exports.isIdentifierChar = function(code) {
+                if (code < 48) { return code === 36; }
+                if (code < 58) { return true; }
+                if (code < 65) { return false; }
+                if (code < 91) { return true; }
+                if (code < 97) { return code === 95; }
+                if (code < 123) { return true; }
+                return code >= 0xaa && nonASCIIidentifier.test(String.fromCharCode(code));
+            };
+        })(acorn);
+        /* jshint curly: true */
+
+        function in_array(what, arr) {
+            for (var i = 0; i < arr.length; i += 1) {
+                if (arr[i] === what) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function trim(s) {
+            return s.replace(/^\s+|\s+$/g, '');
+        }
+
+        function ltrim(s) {
+            return s.replace(/^\s+/g, '');
+        }
+
+        // function rtrim(s) {
+        //     return s.replace(/\s+$/g, '');
+        // }
+
+        function sanitizeOperatorPosition(opPosition) {
+            opPosition = opPosition || OPERATOR_POSITION.before_newline;
+
+            var validPositionValues = Object.values(OPERATOR_POSITION);
+
+            if (!in_array(opPosition, validPositionValues)) {
+                throw new Error("Invalid Option Value: The option 'operator_position' must be one of the following values\n" +
+                    validPositionValues +
+                    "\nYou passed in: '" + opPosition + "'");
+            }
+
+            return opPosition;
+        }
+
+        var OPERATOR_POSITION = {
+            before_newline: 'before-newline',
+            after_newline: 'after-newline',
+            preserve_newline: 'preserve-newline',
+        };
+
+        var OPERATOR_POSITION_BEFORE_OR_PRESERVE = [OPERATOR_POSITION.before_newline, OPERATOR_POSITION.preserve_newline];
+
+        var MODE = {
+            BlockStatement: 'BlockStatement', // 'BLOCK'
+            Statement: 'Statement', // 'STATEMENT'
+            ObjectLiteral: 'ObjectLiteral', // 'OBJECT',
+            ArrayLiteral: 'ArrayLiteral', //'[EXPRESSION]',
+            ForInitializer: 'ForInitializer', //'(FOR-EXPRESSION)',
+            Conditional: 'Conditional', //'(COND-EXPRESSION)',
+            Expression: 'Expression' //'(EXPRESSION)'
+        };
+
+        function Beautifier(js_source_text, options) {
+            "use strict";
+            var output;
+            var tokens = [],
+                token_pos;
+            var Tokenizer;
+            var current_token;
+            var last_type, last_last_text, indent_string;
+            var flags, previous_flags, flag_store;
+            var prefix;
+
+            var handlers, opt;
+            var baseIndentString = '';
+
+            handlers = {
+                'TK_START_EXPR': handle_start_expr,
+                'TK_END_EXPR': handle_end_expr,
+                'TK_START_BLOCK': handle_start_block,
+                'TK_END_BLOCK': handle_end_block,
+                'TK_WORD': handle_word,
+                'TK_RESERVED': handle_word,
+                'TK_SEMICOLON': handle_semicolon,
+                'TK_STRING': handle_string,
+                'TK_EQUALS': handle_equals,
+                'TK_OPERATOR': handle_operator,
+                'TK_COMMA': handle_comma,
+                'TK_BLOCK_COMMENT': handle_block_comment,
+                'TK_COMMENT': handle_comment,
+                'TK_DOT': handle_dot,
+                'TK_UNKNOWN': handle_unknown,
+                'TK_EOF': handle_eof
+            };
+
+            function create_flags(flags_base, mode) {
+                var next_indent_level = 0;
+                if (flags_base) {
+                    next_indent_level = flags_base.indentation_level;
+                    if (!output.just_added_newline() &&
+                        flags_base.line_indent_level > next_indent_level) {
+                        next_indent_level = flags_base.line_indent_level;
+                    }
+                }
+
+                var next_flags = {
+                    mode: mode,
+                    parent: flags_base,
+                    last_text: flags_base ? flags_base.last_text : '', // last token text
+                    last_word: flags_base ? flags_base.last_word : '', // last 'TK_WORD' passed
+                    declaration_statement: false,
+                    declaration_assignment: false,
+                    multiline_frame: false,
+                    inline_frame: false,
+                    if_block: false,
+                    else_block: false,
+                    do_block: false,
+                    do_while: false,
+                    import_block: false,
+                    in_case_statement: false, // switch(..){ INSIDE HERE }
+                    in_case: false, // we're on the exact line with "case 0:"
+                    case_body: false, // the indented case-action block
+                    indentation_level: next_indent_level,
+                    line_indent_level: flags_base ? flags_base.line_indent_level : next_indent_level,
+                    start_line_index: output.get_line_number(),
+                    ternary_depth: 0
+                };
+                return next_flags;
+            }
+
+            // Some interpreters have unexpected results with foo = baz || bar;
+            options = options ? options : {};
+
+            // Allow the setting of language/file-type specific options
+            // with inheritance of overall settings
+            options = mergeOpts(options, 'js');
+
+            opt = {};
+
+            // compatibility, re
+            if (options.brace_style === "expand-strict") { //graceful handling of deprecated option
+                options.brace_style = "expand";
+            } else if (options.brace_style === "collapse-preserve-inline") { //graceful handling of deprecated option
+                options.brace_style = "collapse,preserve-inline";
+            } else if (options.braces_on_own_line !== undefined) { //graceful handling of deprecated option
+                options.brace_style = options.braces_on_own_line ? "expand" : "collapse";
+            } else if (!options.brace_style) //Nothing exists to set it
+            {
+                options.brace_style = "collapse";
+            }
+
+
+            var brace_style_split = options.brace_style.split(/[^a-zA-Z0-9_\-]+/);
+            opt.brace_style = brace_style_split[0];
+            opt.brace_preserve_inline = brace_style_split[1] ? brace_style_split[1] : false;
+
+            opt.indent_size = options.indent_size ? parseInt(options.indent_size, 10) : 4;
+            opt.indent_char = options.indent_char ? options.indent_char : ' ';
+            opt.eol = options.eol ? options.eol : 'auto';
+            opt.preserve_newlines = (options.preserve_newlines === undefined) ? true : options.preserve_newlines;
+            opt.break_chained_methods = (options.break_chained_methods === undefined) ? false : options.break_chained_methods;
+            opt.max_preserve_newlines = (options.max_preserve_newlines === undefined) ? 0 : parseInt(options.max_preserve_newlines, 10);
+            opt.space_in_paren = (options.space_in_paren === undefined) ? false : options.space_in_paren;
+            opt.space_in_empty_paren = (options.space_in_empty_paren === undefined) ? false : options.space_in_empty_paren;
+            opt.jslint_happy = (options.jslint_happy === undefined) ? false : options.jslint_happy;
+            opt.space_after_anon_function = (options.space_after_anon_function === undefined) ? false : options.space_after_anon_function;
+            opt.keep_array_indentation = (options.keep_array_indentation === undefined) ? false : options.keep_array_indentation;
+            opt.space_before_conditional = (options.space_before_conditional === undefined) ? true : options.space_before_conditional;
+            opt.unescape_strings = (options.unescape_strings === undefined) ? false : options.unescape_strings;
+            opt.wrap_line_length = (options.wrap_line_length === undefined) ? 0 : parseInt(options.wrap_line_length, 10);
+            opt.e4x = (options.e4x === undefined) ? false : options.e4x;
+            opt.end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
+            opt.comma_first = (options.comma_first === undefined) ? false : options.comma_first;
+            opt.operator_position = sanitizeOperatorPosition(options.operator_position);
+
+            // For testing of beautify ignore:start directive
+            opt.test_output_raw = (options.test_output_raw === undefined) ? false : options.test_output_raw;
+
+            // force opt.space_after_anon_function to true if opt.jslint_happy
+            if (opt.jslint_happy) {
+                opt.space_after_anon_function = true;
+            }
+
+            if (options.indent_with_tabs) {
+                opt.indent_char = '\t';
+                opt.indent_size = 1;
+            }
+
+            if (opt.eol === 'auto') {
+                opt.eol = '\n';
+                if (js_source_text && acorn.lineBreak.test(js_source_text || '')) {
+                    opt.eol = js_source_text.match(acorn.lineBreak)[0];
+                }
+            }
+
+            opt.eol = opt.eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
+
+            //----------------------------------
+            indent_string = '';
+            while (opt.indent_size > 0) {
+                indent_string += opt.indent_char;
+                opt.indent_size -= 1;
+            }
+
+            var preindent_index = 0;
+            if (js_source_text && js_source_text.length) {
+                while ((js_source_text.charAt(preindent_index) === ' ' ||
+                        js_source_text.charAt(preindent_index) === '\t')) {
+                    baseIndentString += js_source_text.charAt(preindent_index);
+                    preindent_index += 1;
+                }
+                js_source_text = js_source_text.substring(preindent_index);
+            }
+
+            last_type = 'TK_START_BLOCK'; // last token type
+            last_last_text = ''; // pre-last token text
+            output = new Output(indent_string, baseIndentString);
+
+            // If testing the ignore directive, start with output disable set to true
+            output.raw = opt.test_output_raw;
+
+
+            // Stack of parsing/formatting states, including MODE.
+            // We tokenize, parse, and output in an almost purely a forward-only stream of token input
+            // and formatted output.  This makes the beautifier less accurate than full parsers
+            // but also far more tolerant of syntax errors.
+            //
+            // For example, the default mode is MODE.BlockStatement. If we see a '{' we push a new frame of type
+            // MODE.BlockStatement on the the stack, even though it could be object literal.  If we later
+            // encounter a ":", we'll switch to to MODE.ObjectLiteral.  If we then see a ";",
+            // most full parsers would die, but the beautifier gracefully falls back to
+            // MODE.BlockStatement and continues on.
+            flag_store = [];
+            set_mode(MODE.BlockStatement);
+
+            this.beautify = function() {
+
+                /*jshint onevar:true */
+                var sweet_code;
+                Tokenizer = new tokenizer(js_source_text, opt, indent_string);
+                tokens = Tokenizer.tokenize();
+                token_pos = 0;
+
+                current_token = get_token();
+                while (current_token) {
+                    handlers[current_token.type]();
+
+                    last_last_text = flags.last_text;
+                    last_type = current_token.type;
+                    flags.last_text = current_token.text;
+
+                    token_pos += 1;
+                    current_token = get_token();
+                }
+
+                sweet_code = output.get_code();
+                if (opt.end_with_newline) {
+                    sweet_code += '\n';
+                }
+
+                if (opt.eol !== '\n') {
+                    sweet_code = sweet_code.replace(/[\n]/g, opt.eol);
+                }
+
+                return sweet_code;
+            };
+
+            function handle_whitespace_and_comments(local_token, preserve_statement_flags) {
+                var newlines = local_token.newlines;
+                var keep_whitespace = opt.keep_array_indentation && is_array(flags.mode);
+                var temp_token = current_token;
+
+                for (var h = 0; h < local_token.comments_before.length; h++) {
+                    // The cleanest handling of inline comments is to treat them as though they aren't there.
+                    // Just continue formatting and the behavior should be logical.
+                    // Also ignore unknown tokens.  Again, this should result in better behavior.
+                    current_token = local_token.comments_before[h];
+                    handle_whitespace_and_comments(current_token, preserve_statement_flags);
+                    handlers[current_token.type](preserve_statement_flags);
+                }
+                current_token = temp_token;
+
+                if (keep_whitespace) {
+                    for (var i = 0; i < newlines; i += 1) {
+                        print_newline(i > 0, preserve_statement_flags);
+                    }
+                } else {
+                    if (opt.max_preserve_newlines && newlines > opt.max_preserve_newlines) {
+                        newlines = opt.max_preserve_newlines;
+                    }
+
+                    if (opt.preserve_newlines) {
+                        if (local_token.newlines > 1) {
+                            print_newline(false, preserve_statement_flags);
+                            for (var j = 1; j < newlines; j += 1) {
+                                print_newline(true, preserve_statement_flags);
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            // we could use just string.split, but
+            // IE doesn't like returning empty strings
+            function split_linebreaks(s) {
+                //return s.split(/\x0d\x0a|\x0a/);
+
+                s = s.replace(acorn.allLineBreaks, '\n');
+                var out = [],
+                    idx = s.indexOf("\n");
+                while (idx !== -1) {
+                    out.push(s.substring(0, idx));
+                    s = s.substring(idx + 1);
+                    idx = s.indexOf("\n");
+                }
+                if (s.length) {
+                    out.push(s);
+                }
+                return out;
+            }
+
+            var newline_restricted_tokens = ['break', 'continue', 'return', 'throw'];
+
+            function allow_wrap_or_preserved_newline(force_linewrap) {
+                force_linewrap = (force_linewrap === undefined) ? false : force_linewrap;
+
+                // Never wrap the first token on a line
+                if (output.just_added_newline()) {
+                    return;
+                }
+
+                var shouldPreserveOrForce = (opt.preserve_newlines && current_token.wanted_newline) || force_linewrap;
+                var operatorLogicApplies = in_array(flags.last_text, Tokenizer.positionable_operators) || in_array(current_token.text, Tokenizer.positionable_operators);
+
+                if (operatorLogicApplies) {
+                    var shouldPrintOperatorNewline = (
+                            in_array(flags.last_text, Tokenizer.positionable_operators) &&
+                            in_array(opt.operator_position, OPERATOR_POSITION_BEFORE_OR_PRESERVE)
+                        ) ||
+                        in_array(current_token.text, Tokenizer.positionable_operators);
+                    shouldPreserveOrForce = shouldPreserveOrForce && shouldPrintOperatorNewline;
+                }
+
+                if (shouldPreserveOrForce) {
+                    print_newline(false, true);
+                } else if (opt.wrap_line_length) {
+                    if (last_type === 'TK_RESERVED' && in_array(flags.last_text, newline_restricted_tokens)) {
+                        // These tokens should never have a newline inserted
+                        // between them and the following expression.
+                        return;
+                    }
+                    var proposed_line_length = output.current_line.get_character_count() + current_token.text.length +
+                        (output.space_before_token ? 1 : 0);
+                    if (proposed_line_length >= opt.wrap_line_length) {
+                        print_newline(false, true);
+                    }
+                }
+            }
+
+            function print_newline(force_newline, preserve_statement_flags) {
+                if (!preserve_statement_flags) {
+                    if (flags.last_text !== ';' && flags.last_text !== ',' && flags.last_text !== '=' && last_type !== 'TK_OPERATOR') {
+                        var next_token = get_token(1);
+                        while (flags.mode === MODE.Statement &&
+                            !(flags.if_block && next_token && next_token.type === 'TK_RESERVED' && next_token.text === 'else') &&
+                            !flags.do_block) {
+                            restore_mode();
+                        }
+                    }
+                }
+
+                if (output.add_new_line(force_newline)) {
+                    flags.multiline_frame = true;
+                }
+            }
+
+            function print_token_line_indentation() {
+                if (output.just_added_newline()) {
+                    if (opt.keep_array_indentation && is_array(flags.mode) && current_token.wanted_newline) {
+                        output.current_line.push(current_token.whitespace_before);
+                        output.space_before_token = false;
+                    } else if (output.set_indent(flags.indentation_level)) {
+                        flags.line_indent_level = flags.indentation_level;
+                    }
+                }
+            }
+
+            function print_token(printable_token) {
+                if (output.raw) {
+                    output.add_raw_token(current_token);
+                    return;
+                }
+
+                if (opt.comma_first && last_type === 'TK_COMMA' &&
+                    output.just_added_newline()) {
+                    if (output.previous_line.last() === ',') {
+                        var popped = output.previous_line.pop();
+                        // if the comma was already at the start of the line,
+                        // pull back onto that line and reprint the indentation
+                        if (output.previous_line.is_empty()) {
+                            output.previous_line.push(popped);
+                            output.trim(true);
+                            output.current_line.pop();
+                            output.trim();
+                        }
+
+                        // add the comma in front of the next token
+                        print_token_line_indentation();
+                        output.add_token(',');
+                        output.space_before_token = true;
+                    }
+                }
+
+                printable_token = printable_token || current_token.text;
+                print_token_line_indentation();
+                output.add_token(printable_token);
+            }
+
+            function indent() {
+                flags.indentation_level += 1;
+            }
+
+            function deindent() {
+                if (flags.indentation_level > 0 &&
+                    ((!flags.parent) || flags.indentation_level > flags.parent.indentation_level)) {
+                    flags.indentation_level -= 1;
+
+                }
+            }
+
+            function set_mode(mode) {
+                if (flags) {
+                    flag_store.push(flags);
+                    previous_flags = flags;
+                } else {
+                    previous_flags = create_flags(null, mode);
+                }
+
+                flags = create_flags(previous_flags, mode);
+            }
+
+            function is_array(mode) {
+                return mode === MODE.ArrayLiteral;
+            }
+
+            function is_expression(mode) {
+                return in_array(mode, [MODE.Expression, MODE.ForInitializer, MODE.Conditional]);
+            }
+
+            function restore_mode() {
+                if (flag_store.length > 0) {
+                    previous_flags = flags;
+                    flags = flag_store.pop();
+                    if (previous_flags.mode === MODE.Statement) {
+                        output.remove_redundant_indentation(previous_flags);
+                    }
+                }
+            }
+
+            function start_of_object_property() {
+                return flags.parent.mode === MODE.ObjectLiteral && flags.mode === MODE.Statement && (
+                    (flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set'])));
+            }
+
+            function start_of_statement() {
+                if (
+                    (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') ||
+                    (last_type === 'TK_RESERVED' && flags.last_text === 'do') ||
+                    (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['return', 'throw']) && !current_token.wanted_newline) ||
+                    (last_type === 'TK_RESERVED' && flags.last_text === 'else' &&
+                        !(current_token.type === 'TK_RESERVED' && current_token.text === 'if' && !current_token.comments_before.length)) ||
+                    (last_type === 'TK_END_EXPR' && (previous_flags.mode === MODE.ForInitializer || previous_flags.mode === MODE.Conditional)) ||
+                    (last_type === 'TK_WORD' && flags.mode === MODE.BlockStatement &&
+                        !flags.in_case &&
+                        !(current_token.text === '--' || current_token.text === '++') &&
+                        last_last_text !== 'function' &&
+                        current_token.type !== 'TK_WORD' && current_token.type !== 'TK_RESERVED') ||
+                    (flags.mode === MODE.ObjectLiteral && (
+                        (flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set']))))
+                ) {
+
+                    set_mode(MODE.Statement);
+                    indent();
+
+                    handle_whitespace_and_comments(current_token, true);
+
+                    // Issue #276:
+                    // If starting a new statement with [if, for, while, do], push to a new line.
+                    // if (a) if (b) if(c) d(); else e(); else f();
+                    if (!start_of_object_property()) {
+                        allow_wrap_or_preserved_newline(
+                            current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['do', 'for', 'if', 'while']));
+                    }
+
+                    return true;
+                }
+                return false;
+            }
+
+            function all_lines_start_with(lines, c) {
+                for (var i = 0; i < lines.length; i++) {
+                    var line = trim(lines[i]);
+                    if (line.charAt(0) !== c) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function each_line_matches_indent(lines, indent) {
+                var i = 0,
+                    len = lines.length,
+                    line;
+                for (; i < len; i++) {
+                    line = lines[i];
+                    // allow empty lines to pass through
+                    if (line && line.indexOf(indent) !== 0) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function is_special_word(word) {
+                return in_array(word, ['case', 'return', 'do', 'if', 'throw', 'else']);
+            }
+
+            function get_token(offset) {
+                var index = token_pos + (offset || 0);
+                return (index < 0 || index >= tokens.length) ? null : tokens[index];
+            }
+
+            function handle_start_expr() {
+                // The conditional starts the statement if appropriate.
+                if (!start_of_statement()) {
+                    handle_whitespace_and_comments(current_token);
+                }
+
+                var next_mode = MODE.Expression;
+                if (current_token.text === '[') {
+
+                    if (last_type === 'TK_WORD' || flags.last_text === ')') {
+                        // this is array index specifier, break immediately
+                        // a[x], fn()[x]
+                        if (last_type === 'TK_RESERVED' && in_array(flags.last_text, Tokenizer.line_starters)) {
+                            output.space_before_token = true;
+                        }
+                        set_mode(next_mode);
+                        print_token();
+                        indent();
+                        if (opt.space_in_paren) {
+                            output.space_before_token = true;
+                        }
+                        return;
+                    }
+
+                    next_mode = MODE.ArrayLiteral;
+                    if (is_array(flags.mode)) {
+                        if (flags.last_text === '[' ||
+                            (flags.last_text === ',' && (last_last_text === ']' || last_last_text === '}'))) {
+                            // ], [ goes to new line
+                            // }, [ goes to new line
+                            if (!opt.keep_array_indentation) {
+                                print_newline();
+                            }
+                        }
+                    }
+
+                } else {
+                    if (last_type === 'TK_RESERVED' && flags.last_text === 'for') {
+                        next_mode = MODE.ForInitializer;
+                    } else if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['if', 'while'])) {
+                        next_mode = MODE.Conditional;
+                    } else {
+                        // next_mode = MODE.Expression;
+                    }
+                }
+
+                if (flags.last_text === ';' || last_type === 'TK_START_BLOCK') {
+                    print_newline();
+                } else if (last_type === 'TK_END_EXPR' || last_type === 'TK_START_EXPR' || last_type === 'TK_END_BLOCK' || flags.last_text === '.') {
+                    // TODO: Consider whether forcing this is required.  Review failing tests when removed.
+                    allow_wrap_or_preserved_newline(current_token.wanted_newline);
+                    // do nothing on (( and )( and ][ and ]( and .(
+                } else if (!(last_type === 'TK_RESERVED' && current_token.text === '(') && last_type !== 'TK_WORD' && last_type !== 'TK_OPERATOR') {
+                    output.space_before_token = true;
+                } else if ((last_type === 'TK_RESERVED' && (flags.last_word === 'function' || flags.last_word === 'typeof')) ||
+                    (flags.last_text === '*' &&
+                        (in_array(last_last_text, ['function', 'yield']) ||
+                            (flags.mode === MODE.ObjectLiteral && in_array(last_last_text, ['{', ',']))))) {
+                    // function() vs function ()
+                    // yield*() vs yield* ()
+                    // function*() vs function* ()
+                    if (opt.space_after_anon_function) {
+                        output.space_before_token = true;
+                    }
+                } else if (last_type === 'TK_RESERVED' && (in_array(flags.last_text, Tokenizer.line_starters) || flags.last_text === 'catch')) {
+                    if (opt.space_before_conditional) {
+                        output.space_before_token = true;
+                    }
+                }
+
+                // Should be a space between await and an IIFE
+                if (current_token.text === '(' && last_type === 'TK_RESERVED' && flags.last_word === 'await') {
+                    output.space_before_token = true;
+                }
+
+                // Support of this kind of newline preservation.
+                // a = (b &&
+                //     (c || d));
+                if (current_token.text === '(') {
+                    if (last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+                        if (!start_of_object_property()) {
+                            allow_wrap_or_preserved_newline();
+                        }
+                    }
+                }
+
+                // Support preserving wrapped arrow function expressions
+                // a.b('c',
+                //     () => d.e
+                // )
+                if (current_token.text === '(' && last_type !== 'TK_WORD' && last_type !== 'TK_RESERVED') {
+                    allow_wrap_or_preserved_newline();
+                }
+
+                set_mode(next_mode);
+                print_token();
+                if (opt.space_in_paren) {
+                    output.space_before_token = true;
+                }
+
+                // In all cases, if we newline while inside an expression it should be indented.
+                indent();
+            }
+
+            function handle_end_expr() {
+                // statements inside expressions are not valid syntax, but...
+                // statements must all be closed when their container closes
+                while (flags.mode === MODE.Statement) {
+                    restore_mode();
+                }
+
+                handle_whitespace_and_comments(current_token);
+
+                if (flags.multiline_frame) {
+                    allow_wrap_or_preserved_newline(current_token.text === ']' && is_array(flags.mode) && !opt.keep_array_indentation);
+                }
+
+                if (opt.space_in_paren) {
+                    if (last_type === 'TK_START_EXPR' && !opt.space_in_empty_paren) {
+                        // () [] no inner space in empty parens like these, ever, ref #320
+                        output.trim();
+                        output.space_before_token = false;
+                    } else {
+                        output.space_before_token = true;
+                    }
+                }
+                if (current_token.text === ']' && opt.keep_array_indentation) {
+                    print_token();
+                    restore_mode();
+                } else {
+                    restore_mode();
+                    print_token();
+                }
+                output.remove_redundant_indentation(previous_flags);
+
+                // do {} while () // no statement required after
+                if (flags.do_while && previous_flags.mode === MODE.Conditional) {
+                    previous_flags.mode = MODE.Expression;
+                    flags.do_block = false;
+                    flags.do_while = false;
+
+                }
+            }
+
+            function handle_start_block() {
+                handle_whitespace_and_comments(current_token);
+
+                // Check if this is should be treated as a ObjectLiteral
+                var next_token = get_token(1);
+                var second_token = get_token(2);
+                if (second_token && (
+                        (in_array(second_token.text, [':', ',']) && in_array(next_token.type, ['TK_STRING', 'TK_WORD', 'TK_RESERVED'])) ||
+                        (in_array(next_token.text, ['get', 'set', '...']) && in_array(second_token.type, ['TK_WORD', 'TK_RESERVED']))
+                    )) {
+                    // We don't support TypeScript,but we didn't break it for a very long time.
+                    // We'll try to keep not breaking it.
+                    if (!in_array(last_last_text, ['class', 'interface'])) {
+                        set_mode(MODE.ObjectLiteral);
+                    } else {
+                        set_mode(MODE.BlockStatement);
+                    }
+                } else if (last_type === 'TK_OPERATOR' && flags.last_text === '=>') {
+                    // arrow function: (param1, paramN) => { statements }
+                    set_mode(MODE.BlockStatement);
+                } else if (in_array(last_type, ['TK_EQUALS', 'TK_START_EXPR', 'TK_COMMA', 'TK_OPERATOR']) ||
+                    (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['return', 'throw', 'import', 'default']))
+                ) {
+                    // Detecting shorthand function syntax is difficult by scanning forward,
+                    //     so check the surrounding context.
+                    // If the block is being returned, imported, export default, passed as arg,
+                    //     assigned with = or assigned in a nested object, treat as an ObjectLiteral.
+                    set_mode(MODE.ObjectLiteral);
+                } else {
+                    set_mode(MODE.BlockStatement);
+                }
+
+                var empty_braces = !next_token.comments_before.length && next_token.text === '}';
+                var empty_anonymous_function = empty_braces && flags.last_word === 'function' &&
+                    last_type === 'TK_END_EXPR';
+
+                if (opt.brace_preserve_inline) // check for inline, set inline_frame if so
+                {
+                    // search forward for a newline wanted inside this block
+                    var index = 0;
+                    var check_token = null;
+                    flags.inline_frame = true;
+                    do {
+                        index += 1;
+                        check_token = get_token(index);
+                        if (check_token.wanted_newline) {
+                            flags.inline_frame = false;
+                            break;
+                        }
+                    } while (check_token.type !== 'TK_EOF' &&
+                        !(check_token.type === 'TK_END_BLOCK' && check_token.opened === current_token));
+                }
+
+                if ((opt.brace_style === "expand" ||
+                        (opt.brace_style === "none" && current_token.wanted_newline)) &&
+                    !flags.inline_frame) {
+                    if (last_type !== 'TK_OPERATOR' &&
+                        (empty_anonymous_function ||
+                            last_type === 'TK_EQUALS' ||
+                            (last_type === 'TK_RESERVED' && is_special_word(flags.last_text) && flags.last_text !== 'else'))) {
+                        output.space_before_token = true;
+                    } else {
+                        print_newline(false, true);
+                    }
+                } else { // collapse || inline_frame
+                    if (is_array(previous_flags.mode) && (last_type === 'TK_START_EXPR' || last_type === 'TK_COMMA')) {
+                        if (last_type === 'TK_COMMA' || opt.space_in_paren) {
+                            output.space_before_token = true;
+                        }
+
+                        if (last_type === 'TK_COMMA' || (last_type === 'TK_START_EXPR' && flags.inline_frame)) {
+                            allow_wrap_or_preserved_newline();
+                            previous_flags.multiline_frame = previous_flags.multiline_frame || flags.multiline_frame;
+                            flags.multiline_frame = false;
+                        }
+                    }
+                    if (last_type !== 'TK_OPERATOR' && last_type !== 'TK_START_EXPR') {
+                        if (last_type === 'TK_START_BLOCK' && !flags.inline_frame) {
+                            print_newline();
+                        } else {
+                            output.space_before_token = true;
+                        }
+                    }
+                }
+                print_token();
+                indent();
+            }
+
+            function handle_end_block() {
+                // statements must all be closed when their container closes
+                handle_whitespace_and_comments(current_token);
+
+                while (flags.mode === MODE.Statement) {
+                    restore_mode();
+                }
+
+                var empty_braces = last_type === 'TK_START_BLOCK';
+
+                if (flags.inline_frame && !empty_braces) { // try inline_frame (only set if opt.braces-preserve-inline) first
+                    output.space_before_token = true;
+                } else if (opt.brace_style === "expand") {
+                    if (!empty_braces) {
+                        print_newline();
+                    }
+                } else {
+                    // skip {}
+                    if (!empty_braces) {
+                        if (is_array(flags.mode) && opt.keep_array_indentation) {
+                            // we REALLY need a newline here, but newliner would skip that
+                            opt.keep_array_indentation = false;
+                            print_newline();
+                            opt.keep_array_indentation = true;
+
+                        } else {
+                            print_newline();
+                        }
+                    }
+                }
+                restore_mode();
+                print_token();
+            }
+
+            function handle_word() {
+                if (current_token.type === 'TK_RESERVED') {
+                    if (in_array(current_token.text, ['set', 'get']) && flags.mode !== MODE.ObjectLiteral) {
+                        current_token.type = 'TK_WORD';
+                    } else if (in_array(current_token.text, ['as', 'from']) && !flags.import_block) {
+                        current_token.type = 'TK_WORD';
+                    } else if (flags.mode === MODE.ObjectLiteral) {
+                        var next_token = get_token(1);
+                        if (next_token.text === ':') {
+                            current_token.type = 'TK_WORD';
+                        }
+                    }
+                }
+
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                    if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') {
+                        flags.declaration_statement = true;
+                    }
+                } else if (current_token.wanted_newline && !is_expression(flags.mode) &&
+                    (last_type !== 'TK_OPERATOR' || (flags.last_text === '--' || flags.last_text === '++')) &&
+                    last_type !== 'TK_EQUALS' &&
+                    (opt.preserve_newlines || !(last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const', 'set', 'get'])))) {
+                    handle_whitespace_and_comments(current_token);
+                    print_newline();
+                } else {
+                    handle_whitespace_and_comments(current_token);
+                }
+
+                if (flags.do_block && !flags.do_while) {
+                    if (current_token.type === 'TK_RESERVED' && current_token.text === 'while') {
+                        // do {} ## while ()
+                        output.space_before_token = true;
+                        print_token();
+                        output.space_before_token = true;
+                        flags.do_while = true;
+                        return;
+                    } else {
+                        // do {} should always have while as the next word.
+                        // if we don't see the expected while, recover
+                        print_newline();
+                        flags.do_block = false;
+                    }
+                }
+
+                // if may be followed by else, or not
+                // Bare/inline ifs are tricky
+                // Need to unwind the modes correctly: if (a) if (b) c(); else d(); else e();
+                if (flags.if_block) {
+                    if (!flags.else_block && (current_token.type === 'TK_RESERVED' && current_token.text === 'else')) {
+                        flags.else_block = true;
+                    } else {
+                        while (flags.mode === MODE.Statement) {
+                            restore_mode();
+                        }
+                        flags.if_block = false;
+                        flags.else_block = false;
+                    }
+                }
+
+                if (current_token.type === 'TK_RESERVED' && (current_token.text === 'case' || (current_token.text === 'default' && flags.in_case_statement))) {
+                    print_newline();
+                    if (flags.case_body || opt.jslint_happy) {
+                        // switch cases following one another
+                        deindent();
+                        flags.case_body = false;
+                    }
+                    print_token();
+                    flags.in_case = true;
+                    flags.in_case_statement = true;
+                    return;
+                }
+
+                if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+                    if (!start_of_object_property()) {
+                        allow_wrap_or_preserved_newline();
+                    }
+                }
+
+                if (current_token.type === 'TK_RESERVED' && current_token.text === 'function') {
+                    if (in_array(flags.last_text, ['}', ';']) ||
+                        (output.just_added_newline() && !(in_array(flags.last_text, ['(', '[', '{', ':', '=', ',']) || last_type === 'TK_OPERATOR'))) {
+                        // make sure there is a nice clean space of at least one blank line
+                        // before a new function definition
+                        if (!output.just_added_blankline() && !current_token.comments_before.length) {
+                            print_newline();
+                            print_newline(true);
+                        }
+                    }
+                    if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD') {
+                        if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set', 'new', 'return', 'export', 'async'])) {
+                            output.space_before_token = true;
+                        } else if (last_type === 'TK_RESERVED' && flags.last_text === 'default' && last_last_text === 'export') {
+                            output.space_before_token = true;
+                        } else {
+                            print_newline();
+                        }
+                    } else if (last_type === 'TK_OPERATOR' || flags.last_text === '=') {
+                        // foo = function
+                        output.space_before_token = true;
+                    } else if (!flags.multiline_frame && (is_expression(flags.mode) || is_array(flags.mode))) {
+                        // (function
+                    } else {
+                        print_newline();
+                    }
+
+                    print_token();
+                    flags.last_word = current_token.text;
+                    return;
+                }
+
+                prefix = 'NONE';
+
+                if (last_type === 'TK_END_BLOCK') {
+
+                    if (previous_flags.inline_frame) {
+                        prefix = 'SPACE';
+                    } else if (!(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally', 'from']))) {
+                        prefix = 'NEWLINE';
+                    } else {
+                        if (opt.brace_style === "expand" ||
+                            opt.brace_style === "end-expand" ||
+                            (opt.brace_style === "none" && current_token.wanted_newline)) {
+                            prefix = 'NEWLINE';
+                        } else {
+                            prefix = 'SPACE';
+                            output.space_before_token = true;
+                        }
+                    }
+                } else if (last_type === 'TK_SEMICOLON' && flags.mode === MODE.BlockStatement) {
+                    // TODO: Should this be for STATEMENT as well?
+                    prefix = 'NEWLINE';
+                } else if (last_type === 'TK_SEMICOLON' && is_expression(flags.mode)) {
+                    prefix = 'SPACE';
+                } else if (last_type === 'TK_STRING') {
+                    prefix = 'NEWLINE';
+                } else if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' ||
+                    (flags.last_text === '*' &&
+                        (in_array(last_last_text, ['function', 'yield']) ||
+                            (flags.mode === MODE.ObjectLiteral && in_array(last_last_text, ['{', ',']))))) {
+                    prefix = 'SPACE';
+                } else if (last_type === 'TK_START_BLOCK') {
+                    if (flags.inline_frame) {
+                        prefix = 'SPACE';
+                    } else {
+                        prefix = 'NEWLINE';
+                    }
+                } else if (last_type === 'TK_END_EXPR') {
+                    output.space_before_token = true;
+                    prefix = 'NEWLINE';
+                }
+
+                if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, Tokenizer.line_starters) && flags.last_text !== ')') {
+                    if (flags.inline_frame || flags.last_text === 'else' || flags.last_text === 'export') {
+                        prefix = 'SPACE';
+                    } else {
+                        prefix = 'NEWLINE';
+                    }
+
+                }
+
+                if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally'])) {
+                    if ((!(last_type === 'TK_END_BLOCK' && previous_flags.mode === MODE.BlockStatement) ||
+                            opt.brace_style === "expand" ||
+                            opt.brace_style === "end-expand" ||
+                            (opt.brace_style === "none" && current_token.wanted_newline)) &&
+                        !flags.inline_frame) {
+                        print_newline();
+                    } else {
+                        output.trim(true);
+                        var line = output.current_line;
+                        // If we trimmed and there's something other than a close block before us
+                        // put a newline back in.  Handles '} // comment' scenario.
+                        if (line.last() !== '}') {
+                            print_newline();
+                        }
+                        output.space_before_token = true;
+                    }
+                } else if (prefix === 'NEWLINE') {
+                    if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+                        // no newline between 'return nnn'
+                        output.space_before_token = true;
+                    } else if (last_type !== 'TK_END_EXPR') {
+                        if ((last_type !== 'TK_START_EXPR' || !(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['var', 'let', 'const']))) && flags.last_text !== ':') {
+                            // no need to force newline on 'var': for (var x = 0...)
+                            if (current_token.type === 'TK_RESERVED' && current_token.text === 'if' && flags.last_text === 'else') {
+                                // no newline for } else if {
+                                output.space_before_token = true;
+                            } else {
+                                print_newline();
+                            }
+                        }
+                    } else if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, Tokenizer.line_starters) && flags.last_text !== ')') {
+                        print_newline();
+                    }
+                } else if (flags.multiline_frame && is_array(flags.mode) && flags.last_text === ',' && last_last_text === '}') {
+                    print_newline(); // }, in lists get a newline treatment
+                } else if (prefix === 'SPACE') {
+                    output.space_before_token = true;
+                }
+                print_token();
+                flags.last_word = current_token.text;
+
+                if (current_token.type === 'TK_RESERVED') {
+                    if (current_token.text === 'do') {
+                        flags.do_block = true;
+                    } else if (current_token.text === 'if') {
+                        flags.if_block = true;
+                    } else if (current_token.text === 'import') {
+                        flags.import_block = true;
+                    } else if (flags.import_block && current_token.type === 'TK_RESERVED' && current_token.text === 'from') {
+                        flags.import_block = false;
+                    }
+                }
+            }
+
+            function handle_semicolon() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                    // Semicolon can be the start (and end) of a statement
+                    output.space_before_token = false;
+                } else {
+                    handle_whitespace_and_comments(current_token);
+                }
+
+                var next_token = get_token(1);
+                while (flags.mode === MODE.Statement &&
+                    !(flags.if_block && next_token && next_token.type === 'TK_RESERVED' && next_token.text === 'else') &&
+                    !flags.do_block) {
+                    restore_mode();
+                }
+
+                // hacky but effective for the moment
+                if (flags.import_block) {
+                    flags.import_block = false;
+                }
+                print_token();
+            }
+
+            function handle_string() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                    // One difference - strings want at least a space before
+                    output.space_before_token = true;
+                } else {
+                    handle_whitespace_and_comments(current_token);
+                    if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' || flags.inline_frame) {
+                        output.space_before_token = true;
+                    } else if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+                        if (!start_of_object_property()) {
+                            allow_wrap_or_preserved_newline();
+                        }
+                    } else {
+                        print_newline();
+                    }
+                }
+                print_token();
+            }
+
+            function handle_equals() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                } else {
+                    handle_whitespace_and_comments(current_token);
+                }
+
+                if (flags.declaration_statement) {
+                    // just got an '=' in a var-line, different formatting/line-breaking, etc will now be done
+                    flags.declaration_assignment = true;
+                }
+                output.space_before_token = true;
+                print_token();
+                output.space_before_token = true;
+            }
+
+            function handle_comma() {
+                handle_whitespace_and_comments(current_token, true);
+
+                print_token();
+                output.space_before_token = true;
+                if (flags.declaration_statement) {
+                    if (is_expression(flags.parent.mode)) {
+                        // do not break on comma, for(var a = 1, b = 2)
+                        flags.declaration_assignment = false;
+                    }
+
+                    if (flags.declaration_assignment) {
+                        flags.declaration_assignment = false;
+                        print_newline(false, true);
+                    } else if (opt.comma_first) {
+                        // for comma-first, we want to allow a newline before the comma
+                        // to turn into a newline after the comma, which we will fixup later
+                        allow_wrap_or_preserved_newline();
+                    }
+                } else if (flags.mode === MODE.ObjectLiteral ||
+                    (flags.mode === MODE.Statement && flags.parent.mode === MODE.ObjectLiteral)) {
+                    if (flags.mode === MODE.Statement) {
+                        restore_mode();
+                    }
+
+                    if (!flags.inline_frame) {
+                        print_newline();
+                    }
+                } else if (opt.comma_first) {
+                    // EXPR or DO_BLOCK
+                    // for comma-first, we want to allow a newline before the comma
+                    // to turn into a newline after the comma, which we will fixup later
+                    allow_wrap_or_preserved_newline();
+                }
+            }
+
+            function handle_operator() {
+                var isGeneratorAsterisk = current_token.text === '*' &&
+                    ((last_type === 'TK_RESERVED' && in_array(flags.last_text, ['function', 'yield'])) ||
+                        (in_array(last_type, ['TK_START_BLOCK', 'TK_COMMA', 'TK_END_BLOCK', 'TK_SEMICOLON']))
+                    );
+                var isUnary = in_array(current_token.text, ['-', '+']) && (
+                    in_array(last_type, ['TK_START_BLOCK', 'TK_START_EXPR', 'TK_EQUALS', 'TK_OPERATOR']) ||
+                    in_array(flags.last_text, Tokenizer.line_starters) ||
+                    flags.last_text === ','
+                );
+
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                } else {
+                    var preserve_statement_flags = !isGeneratorAsterisk;
+                    handle_whitespace_and_comments(current_token, preserve_statement_flags);
+                }
+
+                if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+                    // "return" had a special handling in TK_WORD. Now we need to return the favor
+                    output.space_before_token = true;
+                    print_token();
+                    return;
+                }
+
+                // hack for actionscript's import .*;
+                if (current_token.text === '*' && last_type === 'TK_DOT') {
+                    print_token();
+                    return;
+                }
+
+                if (current_token.text === '::') {
+                    // no spaces around exotic namespacing syntax operator
+                    print_token();
+                    return;
+                }
+
+                // Allow line wrapping between operators when operator_position is
+                //   set to before or preserve
+                if (last_type === 'TK_OPERATOR' && in_array(opt.operator_position, OPERATOR_POSITION_BEFORE_OR_PRESERVE)) {
+                    allow_wrap_or_preserved_newline();
+                }
+
+                if (current_token.text === ':' && flags.in_case) {
+                    flags.case_body = true;
+                    indent();
+                    print_token();
+                    print_newline();
+                    flags.in_case = false;
+                    return;
+                }
+
+                var space_before = true;
+                var space_after = true;
+                var in_ternary = false;
+                if (current_token.text === ':') {
+                    if (flags.ternary_depth === 0) {
+                        // Colon is invalid javascript outside of ternary and object, but do our best to guess what was meant.
+                        space_before = false;
+                    } else {
+                        flags.ternary_depth -= 1;
+                        in_ternary = true;
+                    }
+                } else if (current_token.text === '?') {
+                    flags.ternary_depth += 1;
+                }
+
+                // let's handle the operator_position option prior to any conflicting logic
+                if (!isUnary && !isGeneratorAsterisk && opt.preserve_newlines && in_array(current_token.text, Tokenizer.positionable_operators)) {
+                    var isColon = current_token.text === ':';
+                    var isTernaryColon = (isColon && in_ternary);
+                    var isOtherColon = (isColon && !in_ternary);
+
+                    switch (opt.operator_position) {
+                        case OPERATOR_POSITION.before_newline:
+                            // if the current token is : and it's not a ternary statement then we set space_before to false
+                            output.space_before_token = !isOtherColon;
+
+                            print_token();
+
+                            if (!isColon || isTernaryColon) {
+                                allow_wrap_or_preserved_newline();
+                            }
+
+                            output.space_before_token = true;
+                            return;
+
+                        case OPERATOR_POSITION.after_newline:
+                            // if the current token is anything but colon, or (via deduction) it's a colon and in a ternary statement,
+                            //   then print a newline.
+
+                            output.space_before_token = true;
+
+                            if (!isColon || isTernaryColon) {
+                                if (get_token(1).wanted_newline) {
+                                    print_newline(false, true);
+                                } else {
+                                    allow_wrap_or_preserved_newline();
+                                }
+                            } else {
+                                output.space_before_token = false;
+                            }
+
+                            print_token();
+
+                            output.space_before_token = true;
+                            return;
+
+                        case OPERATOR_POSITION.preserve_newline:
+                            if (!isOtherColon) {
+                                allow_wrap_or_preserved_newline();
+                            }
+
+                            // if we just added a newline, or the current token is : and it's not a ternary statement,
+                            //   then we set space_before to false
+                            space_before = !(output.just_added_newline() || isOtherColon);
+
+                            output.space_before_token = space_before;
+                            print_token();
+                            output.space_before_token = true;
+                            return;
+                    }
+                }
+
+                if (isGeneratorAsterisk) {
+                    allow_wrap_or_preserved_newline();
+                    space_before = false;
+                    var next_token = get_token(1);
+                    space_after = next_token && in_array(next_token.type, ['TK_WORD', 'TK_RESERVED']);
+                } else if (current_token.text === '...') {
+                    allow_wrap_or_preserved_newline();
+                    space_before = last_type === 'TK_START_BLOCK';
+                    space_after = false;
+                } else if (in_array(current_token.text, ['--', '++', '!', '~']) || isUnary) {
+                    // unary operators (and binary +/- pretending to be unary) special cases
+
+                    space_before = false;
+                    space_after = false;
+
+                    // http://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
+                    // if there is a newline between -- or ++ and anything else we should preserve it.
+                    if (current_token.wanted_newline && (current_token.text === '--' || current_token.text === '++')) {
+                        print_newline(false, true);
+                    }
+
+                    if (flags.last_text === ';' && is_expression(flags.mode)) {
+                        // for (;; ++i)
+                        //        ^^^
+                        space_before = true;
+                    }
+
+                    if (last_type === 'TK_RESERVED') {
+                        space_before = true;
+                    } else if (last_type === 'TK_END_EXPR') {
+                        space_before = !(flags.last_text === ']' && (current_token.text === '--' || current_token.text === '++'));
+                    } else if (last_type === 'TK_OPERATOR') {
+                        // a++ + ++b;
+                        // a - -b
+                        space_before = in_array(current_token.text, ['--', '-', '++', '+']) && in_array(flags.last_text, ['--', '-', '++', '+']);
+                        // + and - are not unary when preceeded by -- or ++ operator
+                        // a-- + b
+                        // a * +b
+                        // a - -b
+                        if (in_array(current_token.text, ['+', '-']) && in_array(flags.last_text, ['--', '++'])) {
+                            space_after = true;
+                        }
+                    }
+
+
+                    if (((flags.mode === MODE.BlockStatement && !flags.inline_frame) || flags.mode === MODE.Statement) &&
+                        (flags.last_text === '{' || flags.last_text === ';')) {
+                        // { foo; --i }
+                        // foo(); --bar;
+                        print_newline();
+                    }
+                }
+
+                output.space_before_token = output.space_before_token || space_before;
+                print_token();
+                output.space_before_token = space_after;
+            }
+
+            function handle_block_comment(preserve_statement_flags) {
+                if (output.raw) {
+                    output.add_raw_token(current_token);
+                    if (current_token.directives && current_token.directives.preserve === 'end') {
+                        // If we're testing the raw output behavior, do not allow a directive to turn it off.
+                        output.raw = opt.test_output_raw;
+                    }
+                    return;
+                }
+
+                if (current_token.directives) {
+                    print_newline(false, preserve_statement_flags);
+                    print_token();
+                    if (current_token.directives.preserve === 'start') {
+                        output.raw = true;
+                    }
+                    print_newline(false, true);
+                    return;
+                }
+
+                // inline block
+                if (!acorn.newline.test(current_token.text) && !current_token.wanted_newline) {
+                    output.space_before_token = true;
+                    print_token();
+                    output.space_before_token = true;
+                    return;
+                }
+
+                var lines = split_linebreaks(current_token.text);
+                var j; // iterator for this case
+                var javadoc = false;
+                var starless = false;
+                var lastIndent = current_token.whitespace_before;
+                var lastIndentLength = lastIndent.length;
+
+                // block comment starts with a new line
+                print_newline(false, preserve_statement_flags);
+                if (lines.length > 1) {
+                    javadoc = all_lines_start_with(lines.slice(1), '*');
+                    starless = each_line_matches_indent(lines.slice(1), lastIndent);
+                }
+
+                // first line always indented
+                print_token(lines[0]);
+                for (j = 1; j < lines.length; j++) {
+                    print_newline(false, true);
+                    if (javadoc) {
+                        // javadoc: reformat and re-indent
+                        print_token(' ' + ltrim(lines[j]));
+                    } else if (starless && lines[j].length > lastIndentLength) {
+                        // starless: re-indent non-empty content, avoiding trim
+                        print_token(lines[j].substring(lastIndentLength));
+                    } else {
+                        // normal comments output raw
+                        output.add_token(lines[j]);
+                    }
+                }
+
+                // for comments of more than one line, make sure there's a new line after
+                print_newline(false, preserve_statement_flags);
+            }
+
+            function handle_comment(preserve_statement_flags) {
+                if (current_token.wanted_newline) {
+                    print_newline(false, preserve_statement_flags);
+                } else {
+                    output.trim(true);
+                }
+
+                output.space_before_token = true;
+                print_token();
+                print_newline(false, preserve_statement_flags);
+            }
+
+            function handle_dot() {
+                if (start_of_statement()) {
+                    // The conditional starts the statement if appropriate.
+                } else {
+                    handle_whitespace_and_comments(current_token, true);
+                }
+
+                if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+                    output.space_before_token = true;
+                } else {
+                    // allow preserved newlines before dots in general
+                    // force newlines on dots after close paren when break_chained - for bar().baz()
+                    allow_wrap_or_preserved_newline(flags.last_text === ')' && opt.break_chained_methods);
+                }
+
+                print_token();
+            }
+
+            function handle_unknown(preserve_statement_flags) {
+                print_token();
+
+                if (current_token.text[current_token.text.length - 1] === '\n') {
+                    print_newline(false, preserve_statement_flags);
+                }
+            }
+
+            function handle_eof() {
+                // Unwind any open statements
+                while (flags.mode === MODE.Statement) {
+                    restore_mode();
+                }
+                handle_whitespace_and_comments(current_token);
+            }
+        }
+
+
+        function OutputLine(parent) {
+            var _character_count = 0;
+            // use indent_count as a marker for lines that have preserved indentation
+            var _indent_count = -1;
+
+            var _items = [];
+            var _empty = true;
+
+            this.set_indent = function(level) {
+                _character_count = parent.baseIndentLength + level * parent.indent_length;
+                _indent_count = level;
+            };
+
+            this.get_character_count = function() {
+                return _character_count;
+            };
+
+            this.is_empty = function() {
+                return _empty;
+            };
+
+            this.last = function() {
+                if (!this._empty) {
+                    return _items[_items.length - 1];
+                } else {
+                    return null;
+                }
+            };
+
+            this.push = function(input) {
+                _items.push(input);
+                _character_count += input.length;
+                _empty = false;
+            };
+
+            this.pop = function() {
+                var item = null;
+                if (!_empty) {
+                    item = _items.pop();
+                    _character_count -= item.length;
+                    _empty = _items.length === 0;
+                }
+                return item;
+            };
+
+            this.remove_indent = function() {
+                if (_indent_count > 0) {
+                    _indent_count -= 1;
+                    _character_count -= parent.indent_length;
+                }
+            };
+
+            this.trim = function() {
+                while (this.last() === ' ') {
+                    _items.pop();
+                    _character_count -= 1;
+                }
+                _empty = _items.length === 0;
+            };
+
+            this.toString = function() {
+                var result = '';
+                if (!this._empty) {
+                    if (_indent_count >= 0) {
+                        result = parent.indent_cache[_indent_count];
+                    }
+                    result += _items.join('');
+                }
+                return result;
+            };
+        }
+
+        function Output(indent_string, baseIndentString) {
+            baseIndentString = baseIndentString || '';
+            this.indent_cache = [baseIndentString];
+            this.baseIndentLength = baseIndentString.length;
+            this.indent_length = indent_string.length;
+            this.raw = false;
+
+            var lines = [];
+            this.baseIndentString = baseIndentString;
+            this.indent_string = indent_string;
+            this.previous_line = null;
+            this.current_line = null;
+            this.space_before_token = false;
+
+            this.add_outputline = function() {
+                this.previous_line = this.current_line;
+                this.current_line = new OutputLine(this);
+                lines.push(this.current_line);
+            };
+
+            // initialize
+            this.add_outputline();
+
+
+            this.get_line_number = function() {
+                return lines.length;
+            };
+
+            // Using object instead of string to allow for later expansion of info about each line
+            this.add_new_line = function(force_newline) {
+                if (this.get_line_number() === 1 && this.just_added_newline()) {
+                    return false; // no newline on start of file
+                }
+
+                if (force_newline || !this.just_added_newline()) {
+                    if (!this.raw) {
+                        this.add_outputline();
+                    }
+                    return true;
+                }
+
+                return false;
+            };
+
+            this.get_code = function() {
+                var sweet_code = lines.join('\n').replace(/[\r\n\t ]+$/, '');
+                return sweet_code;
+            };
+
+            this.set_indent = function(level) {
+                // Never indent your first output indent at the start of the file
+                if (lines.length > 1) {
+                    while (level >= this.indent_cache.length) {
+                        this.indent_cache.push(this.indent_cache[this.indent_cache.length - 1] + this.indent_string);
+                    }
+
+                    this.current_line.set_indent(level);
+                    return true;
+                }
+                this.current_line.set_indent(0);
+                return false;
+            };
+
+            this.add_raw_token = function(token) {
+                for (var x = 0; x < token.newlines; x++) {
+                    this.add_outputline();
+                }
+                this.current_line.push(token.whitespace_before);
+                this.current_line.push(token.text);
+                this.space_before_token = false;
+            };
+
+            this.add_token = function(printable_token) {
+                this.add_space_before_token();
+                this.current_line.push(printable_token);
+            };
+
+            this.add_space_before_token = function() {
+                if (this.space_before_token && !this.just_added_newline()) {
+                    this.current_line.push(' ');
+                }
+                this.space_before_token = false;
+            };
+
+            this.remove_redundant_indentation = function(frame) {
+                // This implementation is effective but has some issues:
+                //     - can cause line wrap to happen too soon due to indent removal
+                //           after wrap points are calculated
+                // These issues are minor compared to ugly indentation.
+
+                if (frame.multiline_frame ||
+                    frame.mode === MODE.ForInitializer ||
+                    frame.mode === MODE.Conditional) {
+                    return;
+                }
+
+                // remove one indent from each line inside this section
+                var index = frame.start_line_index;
+
+                var output_length = lines.length;
+                while (index < output_length) {
+                    lines[index].remove_indent();
+                    index++;
+                }
+            };
+
+            this.trim = function(eat_newlines) {
+                eat_newlines = (eat_newlines === undefined) ? false : eat_newlines;
+
+                this.current_line.trim(indent_string, baseIndentString);
+
+                while (eat_newlines && lines.length > 1 &&
+                    this.current_line.is_empty()) {
+                    lines.pop();
+                    this.current_line = lines[lines.length - 1];
+                    this.current_line.trim();
+                }
+
+                this.previous_line = lines.length > 1 ? lines[lines.length - 2] : null;
+            };
+
+            this.just_added_newline = function() {
+                return this.current_line.is_empty();
+            };
+
+            this.just_added_blankline = function() {
+                if (this.just_added_newline()) {
+                    if (lines.length === 1) {
+                        return true; // start of the file and newline = blank
+                    }
+
+                    var line = lines[lines.length - 2];
+                    return line.is_empty();
+                }
+                return false;
+            };
+        }
+
+        var InputScanner = function(input) {
+            var _input = input;
+            var _input_length = _input.length;
+            var _position = 0;
+
+            this.back = function() {
+                _position -= 1;
+            };
+
+            this.hasNext = function() {
+                return _position < _input_length;
+            };
+
+            this.next = function() {
+                var val = null;
+                if (this.hasNext()) {
+                    val = _input.charAt(_position);
+                    _position += 1;
+                }
+                return val;
+            };
+
+            this.peek = function(index) {
+                var val = null;
+                index = index || 0;
+                index += _position;
+                if (index >= 0 && index < _input_length) {
+                    val = _input.charAt(index);
+                }
+                return val;
+            };
+
+            this.peekCharCode = function(index) {
+                var val = 0;
+                index = index || 0;
+                index += _position;
+                if (index >= 0 && index < _input_length) {
+                    val = _input.charCodeAt(index);
+                }
+                return val;
+            };
+
+            this.test = function(pattern, index) {
+                index = index || 0;
+                pattern.lastIndex = _position + index;
+                return pattern.test(_input);
+            };
+
+            this.testChar = function(pattern, index) {
+                var val = this.peek(index);
+                return val !== null && pattern.test(val);
+            };
+
+            this.match = function(pattern) {
+                pattern.lastIndex = _position;
+                var pattern_match = pattern.exec(_input);
+                if (pattern_match && pattern_match.index === _position) {
+                    _position += pattern_match[0].length;
+                } else {
+                    pattern_match = null;
+                }
+                return pattern_match;
+            };
+        };
+
+        var Token = function(type, text, newlines, whitespace_before, parent) {
+            this.type = type;
+            this.text = text;
+
+            // comments_before are
+            // comments that have a new line before them
+            // and may or may not have a newline after
+            // this is a set of comments before
+            this.comments_before = /* inline comment*/ [];
+
+
+            this.comments_after = []; // no new line before and newline after
+            this.newlines = newlines || 0;
+            this.wanted_newline = newlines > 0;
+            this.whitespace_before = whitespace_before || '';
+            this.parent = parent || null;
+            this.opened = null;
+            this.directives = null;
+        };
+
+        function tokenizer(input_string, opts) {
+
+            var whitespace = "\n\r\t ".split('');
+            var digit = /[0-9]/;
+            var digit_bin = /[01]/;
+            var digit_oct = /[01234567]/;
+            var digit_hex = /[0123456789abcdefABCDEF]/;
+
+            this.positionable_operators = '!= !== % & && * ** + - / : < << <= == === > >= >> >>> ? ^ | ||'.split(' ');
+            var punct = this.positionable_operators.concat(
+                // non-positionable operators - these do not follow operator position settings
+                '! %= &= *= **= ++ += , -- -= /= :: <<= = => >>= >>>= ^= |= ~ ...'.split(' '));
+
+            // words which should always start on new line.
+            this.line_starters = 'continue,try,throw,return,var,let,const,if,switch,case,default,for,while,break,function,import,export'.split(',');
+            var reserved_words = this.line_starters.concat(['do', 'in', 'of', 'else', 'get', 'set', 'new', 'catch', 'finally', 'typeof', 'yield', 'async', 'await', 'from', 'as']);
+
+            //  /* ... */ comment ends with nearest */ or end of file
+            var block_comment_pattern = /([\s\S]*?)((?:\*\/)|$)/g;
+
+            // comment ends just before nearest linefeed or end of file
+            var comment_pattern = /([^\n\r\u2028\u2029]*)/g;
+
+            var directives_block_pattern = /\/\* beautify( \w+[:]\w+)+ \*\//g;
+            var directive_pattern = / (\w+)[:](\w+)/g;
+            var directives_end_ignore_pattern = /([\s\S]*?)((?:\/\*\sbeautify\signore:end\s\*\/)|$)/g;
+
+            var template_pattern = /((<\?php|<\?=)[\s\S]*?\?>)|(<%[\s\S]*?%>)/g;
+
+            var n_newlines, whitespace_before_token, in_html_comment, tokens;
+            var input;
+
+            this.tokenize = function() {
+                input = new InputScanner(input_string);
+                in_html_comment = false;
+                tokens = [];
+
+                var next, last;
+                var token_values;
+                var open = null;
+                var open_stack = [];
+                var comments = [];
+
+                while (!(last && last.type === 'TK_EOF')) {
+                    token_values = tokenize_next();
+                    next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
+                    while (next.type === 'TK_COMMENT' || next.type === 'TK_BLOCK_COMMENT' || next.type === 'TK_UNKNOWN') {
+                        if (next.type === 'TK_BLOCK_COMMENT') {
+                            next.directives = token_values[2];
+                        }
+                        comments.push(next);
+                        token_values = tokenize_next();
+                        next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
+                    }
+
+                    if (comments.length) {
+                        next.comments_before = comments;
+                        comments = [];
+                    }
+
+                    if (next.type === 'TK_START_BLOCK' || next.type === 'TK_START_EXPR') {
+                        next.parent = last;
+                        open_stack.push(open);
+                        open = next;
+                    } else if ((next.type === 'TK_END_BLOCK' || next.type === 'TK_END_EXPR') &&
+                        (open && (
+                            (next.text === ']' && open.text === '[') ||
+                            (next.text === ')' && open.text === '(') ||
+                            (next.text === '}' && open.text === '{')))) {
+                        next.parent = open.parent;
+                        next.opened = open;
+
+                        open = open_stack.pop();
+                    }
+
+                    tokens.push(next);
+                    last = next;
+                }
+
+                return tokens;
+            };
+
+            function get_directives(text) {
+                if (!text.match(directives_block_pattern)) {
+                    return null;
+                }
+
+                var directives = {};
+                directive_pattern.lastIndex = 0;
+                var directive_match = directive_pattern.exec(text);
+
+                while (directive_match) {
+                    directives[directive_match[1]] = directive_match[2];
+                    directive_match = directive_pattern.exec(text);
+                }
+
+                return directives;
+            }
+
+            function tokenize_next() {
+                var resulting_string;
+                var whitespace_on_this_line = [];
+
+                n_newlines = 0;
+                whitespace_before_token = '';
+
+                var c = input.next();
+
+                if (c === null) {
+                    return ['', 'TK_EOF'];
+                }
+
+                var last_token;
+                if (tokens.length) {
+                    last_token = tokens[tokens.length - 1];
+                } else {
+                    // For the sake of tokenizing we can pretend that there was on open brace to start
+                    last_token = new Token('TK_START_BLOCK', '{');
+                }
+
+                while (in_array(c, whitespace)) {
+
+                    if (acorn.newline.test(c)) {
+                        if (!(c === '\n' && input.peek(-2) === '\r')) {
+                            n_newlines += 1;
+                            whitespace_on_this_line = [];
+                        }
+                    } else {
+                        whitespace_on_this_line.push(c);
+                    }
+
+                    c = input.next();
+
+                    if (c === null) {
+                        return ['', 'TK_EOF'];
+                    }
+                }
+
+                if (whitespace_on_this_line.length) {
+                    whitespace_before_token = whitespace_on_this_line.join('');
+                }
+
+                if (digit.test(c) || (c === '.' && input.testChar(digit))) {
+                    var allow_decimal = true;
+                    var allow_e = true;
+                    var local_digit = digit;
+
+                    if (c === '0' && input.testChar(/[XxOoBb]/)) {
+                        // switch to hex/oct/bin number, no decimal or e, just hex/oct/bin digits
+                        allow_decimal = false;
+                        allow_e = false;
+                        if (input.testChar(/[Bb]/)) {
+                            local_digit = digit_bin;
+                        } else if (input.testChar(/[Oo]/)) {
+                            local_digit = digit_oct;
+                        } else {
+                            local_digit = digit_hex;
+                        }
+                        c += input.next();
+                    } else if (c === '.') {
+                        // Already have a decimal for this literal, don't allow another
+                        allow_decimal = false;
+                    } else {
+                        // we know this first loop will run.  It keeps the logic simpler.
+                        c = '';
+                        input.back();
+                    }
+
+                    // Add the digits
+                    while (input.testChar(local_digit)) {
+                        c += input.next();
+
+                        if (allow_decimal && input.peek() === '.') {
+                            c += input.next();
+                            allow_decimal = false;
+                        }
+
+                        // a = 1.e-7 is valid, so we test for . then e in one loop
+                        if (allow_e && input.testChar(/[Ee]/)) {
+                            c += input.next();
+
+                            if (input.testChar(/[+-]/)) {
+                                c += input.next();
+                            }
+
+                            allow_e = false;
+                            allow_decimal = false;
+                        }
+                    }
+
+                    return [c, 'TK_WORD'];
+                }
+
+                if (acorn.isIdentifierStart(input.peekCharCode(-1))) {
+                    if (input.hasNext()) {
+                        while (acorn.isIdentifierChar(input.peekCharCode())) {
+                            c += input.next();
+                            if (!input.hasNext()) {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!(last_token.type === 'TK_DOT' ||
+                            (last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['set', 'get']))) &&
+                        in_array(c, reserved_words)) {
+                        if (c === 'in' || c === 'of') { // hack for 'in' and 'of' operators
+                            return [c, 'TK_OPERATOR'];
+                        }
+                        return [c, 'TK_RESERVED'];
+                    }
+
+                    return [c, 'TK_WORD'];
+                }
+
+                if (c === '(' || c === '[') {
+                    return [c, 'TK_START_EXPR'];
+                }
+
+                if (c === ')' || c === ']') {
+                    return [c, 'TK_END_EXPR'];
+                }
+
+                if (c === '{') {
+                    return [c, 'TK_START_BLOCK'];
+                }
+
+                if (c === '}') {
+                    return [c, 'TK_END_BLOCK'];
+                }
+
+                if (c === ';') {
+                    return [c, 'TK_SEMICOLON'];
+                }
+
+                if (c === '/') {
+                    var comment = '';
+                    var comment_match;
+                    // peek for comment /* ... */
+                    if (input.peek() === '*') {
+                        input.next();
+                        comment_match = input.match(block_comment_pattern);
+                        comment = '/*' + comment_match[0];
+                        var directives = get_directives(comment);
+                        if (directives && directives.ignore === 'start') {
+                            comment_match = input.match(directives_end_ignore_pattern);
+                            comment += comment_match[0];
+                        }
+                        comment = comment.replace(acorn.allLineBreaks, '\n');
+                        return [comment, 'TK_BLOCK_COMMENT', directives];
+                    }
+                    // peek for comment // ...
+                    if (input.peek() === '/') {
+                        input.next();
+                        comment_match = input.match(comment_pattern);
+                        comment = '//' + comment_match[0];
+                        return [comment, 'TK_COMMENT'];
+                    }
+
+                }
+
+                var startXmlRegExp = /<()([-a-zA-Z:0-9_.]+|{[\s\S]+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{[\s\S]+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{[\s\S]+?}))*\s*(\/?)\s*>/g;
+
+                if (c === '`' || c === "'" || c === '"' || // string
+                    (
+                        (c === '/') || // regexp
+                        (opts.e4x && c === "<" && input.test(startXmlRegExp, -1)) // xml
+                    ) && ( // regex and xml can only appear in specific locations during parsing
+                        (last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['return', 'case', 'throw', 'else', 'do', 'typeof', 'yield'])) ||
+                        (last_token.type === 'TK_END_EXPR' && last_token.text === ')' &&
+                            last_token.parent && last_token.parent.type === 'TK_RESERVED' && in_array(last_token.parent.text, ['if', 'while', 'for'])) ||
+                        (in_array(last_token.type, ['TK_COMMENT', 'TK_START_EXPR', 'TK_START_BLOCK',
+                            'TK_END_BLOCK', 'TK_OPERATOR', 'TK_EQUALS', 'TK_EOF', 'TK_SEMICOLON', 'TK_COMMA'
+                        ]))
+                    )) {
+
+                    var sep = c,
+                        esc = false,
+                        has_char_escapes = false;
+
+                    resulting_string = c;
+
+                    if (sep === '/') {
+                        //
+                        // handle regexp
+                        //
+                        var in_char_class = false;
+                        while (input.hasNext() &&
+                            ((esc || in_char_class || input.peek() !== sep) &&
+                                !input.testChar(acorn.newline))) {
+                            resulting_string += input.peek();
+                            if (!esc) {
+                                esc = input.peek() === '\\';
+                                if (input.peek() === '[') {
+                                    in_char_class = true;
+                                } else if (input.peek() === ']') {
+                                    in_char_class = false;
+                                }
+                            } else {
+                                esc = false;
+                            }
+                            input.next();
+                        }
+                    } else if (opts.e4x && sep === '<') {
+                        //
+                        // handle e4x xml literals
+                        //
+
+                        var xmlRegExp = /[\s\S]*?<(\/?)([-a-zA-Z:0-9_.]+|{[\s\S]+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{[\s\S]+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{[\s\S]+?}))*\s*(\/?)\s*>/g;
+                        input.back();
+                        var xmlStr = '';
+                        var match = input.match(startXmlRegExp);
+                        if (match) {
+                            // Trim root tag to attempt to
+                            var rootTag = match[2].replace(/^{\s+/, '{').replace(/\s+}$/, '}');
+                            var isCurlyRoot = rootTag.indexOf('{') === 0;
+                            var depth = 0;
+                            while (match) {
+                                var isEndTag = !!match[1];
+                                var tagName = match[2];
+                                var isSingletonTag = (!!match[match.length - 1]) || (tagName.slice(0, 8) === "![CDATA[");
+                                if (!isSingletonTag &&
+                                    (tagName === rootTag || (isCurlyRoot && tagName.replace(/^{\s+/, '{').replace(/\s+}$/, '}')))) {
+                                    if (isEndTag) {
+                                        --depth;
+                                    } else {
+                                        ++depth;
+                                    }
+                                }
+                                xmlStr += match[0];
+                                if (depth <= 0) {
+                                    break;
+                                }
+                                match = input.match(xmlRegExp);
+                            }
+                            // if we didn't close correctly, keep unformatted.
+                            if (!match) {
+                                xmlStr += input.match(/[\s\S]*/g)[0];
+                            }
+                            xmlStr = xmlStr.replace(acorn.allLineBreaks, '\n');
+                            return [xmlStr, "TK_STRING"];
+                        }
+                    } else {
+                        //
+                        // handle string
+                        //
+                        var parse_string = function(delimiter, allow_unescaped_newlines, start_sub) {
+                            // Template strings can travers lines without escape characters.
+                            // Other strings cannot
+                            var current_char;
+                            while (input.hasNext()) {
+                                current_char = input.peek();
+                                if (!(esc || (current_char !== delimiter &&
+                                        (allow_unescaped_newlines || !acorn.newline.test(current_char))))) {
+                                    break;
+                                }
+
+                                // Handle \r\n linebreaks after escapes or in template strings
+                                if ((esc || allow_unescaped_newlines) && acorn.newline.test(current_char)) {
+                                    if (current_char === '\r' && input.peek(1) === '\n') {
+                                        input.next();
+                                        current_char = input.peek();
+                                    }
+                                    resulting_string += '\n';
+                                } else {
+                                    resulting_string += current_char;
+                                }
+
+                                if (esc) {
+                                    if (current_char === 'x' || current_char === 'u') {
+                                        has_char_escapes = true;
+                                    }
+                                    esc = false;
+                                } else {
+                                    esc = current_char === '\\';
+                                }
+
+                                input.next();
+
+                                if (start_sub && resulting_string.indexOf(start_sub, resulting_string.length - start_sub.length) !== -1) {
+                                    if (delimiter === '`') {
+                                        parse_string('}', allow_unescaped_newlines, '`');
+                                    } else {
+                                        parse_string('`', allow_unescaped_newlines, '${');
+                                    }
+
+                                    if (input.hasNext()) {
+                                        resulting_string += input.next();
+                                    }
+                                }
+                            }
+                        };
+
+                        if (sep === '`') {
+                            parse_string('`', true, '${');
+                        } else {
+                            parse_string(sep);
+                        }
+                    }
+
+                    if (has_char_escapes && opts.unescape_strings) {
+                        resulting_string = unescape_string(resulting_string);
+                    }
+
+                    if (input.peek() === sep) {
+                        resulting_string += sep;
+                        input.next();
+
+                        if (sep === '/') {
+                            // regexps may have modifiers /regexp/MOD , so fetch those, too
+                            // Only [gim] are valid, but if the user puts in garbage, do what we can to take it.
+                            while (input.hasNext() && acorn.isIdentifierStart(input.peekCharCode())) {
+                                resulting_string += input.next();
+                            }
+                        }
+                    }
+                    return [resulting_string, 'TK_STRING'];
+                }
+
+                if (c === '#') {
+
+                    if (tokens.length === 0 && input.peek() === '!') {
+                        // shebang
+                        resulting_string = c;
+                        while (input.hasNext() && c !== '\n') {
+                            c = input.next();
+                            resulting_string += c;
+                        }
+                        return [trim(resulting_string) + '\n', 'TK_UNKNOWN'];
+                    }
+
+
+
+                    // Spidermonkey-specific sharp variables for circular references
+                    // https://developer.mozilla.org/En/Sharp_variables_in_JavaScript
+                    // http://mxr.mozilla.org/mozilla-central/source/js/src/jsscan.cpp around line 1935
+                    var sharp = '#';
+                    if (input.hasNext() && input.testChar(digit)) {
+                        do {
+                            c = input.next();
+                            sharp += c;
+                        } while (input.hasNext() && c !== '#' && c !== '=');
+                        if (c === '#') {
+                            //
+                        } else if (input.peek() === '[' && input.peek(1) === ']') {
+                            sharp += '[]';
+                            input.next();
+                            input.next();
+                        } else if (input.peek() === '{' && input.peek(1) === '}') {
+                            sharp += '{}';
+                            input.next();
+                            input.next();
+                        }
+                        return [sharp, 'TK_WORD'];
+                    }
+                }
+
+                if (c === '<' && (input.peek() === '?' || input.peek() === '%')) {
+                    input.back();
+                    var template_match = input.match(template_pattern);
+                    if (template_match) {
+                        c = template_match[0];
+                        c = c.replace(acorn.allLineBreaks, '\n');
+                        return [c, 'TK_STRING'];
+                    }
+                }
+
+                if (c === '<' && input.match(/\!--/g)) {
+                    c = '<!--';
+                    while (input.hasNext() && !input.testChar(acorn.newline)) {
+                        c += input.next();
+                    }
+                    in_html_comment = true;
+                    return [c, 'TK_COMMENT'];
+                }
+
+                if (c === '-' && in_html_comment && input.match(/->/g)) {
+                    in_html_comment = false;
+                    return ['-->', 'TK_COMMENT'];
+                }
+
+                if (c === '.') {
+                    if (input.peek() === '.' && input.peek(1) === '.') {
+                        c += input.next() + input.next();
+                        return [c, 'TK_OPERATOR'];
+                    }
+                    return [c, 'TK_DOT'];
+                }
+
+                if (in_array(c, punct)) {
+                    while (input.hasNext() && in_array(c + input.peek(), punct)) {
+                        c += input.next();
+                        if (!input.hasNext()) {
+                            break;
+                        }
+                    }
+
+                    if (c === ',') {
+                        return [c, 'TK_COMMA'];
+                    } else if (c === '=') {
+                        return [c, 'TK_EQUALS'];
+                    } else {
+                        return [c, 'TK_OPERATOR'];
+                    }
+                }
+
+                return [c, 'TK_UNKNOWN'];
+            }
+
+
+            function unescape_string(s) {
+                // You think that a regex would work for this
+                // return s.replace(/\\x([0-9a-f]{2})/gi, function(match, val) {
+                //         return String.fromCharCode(parseInt(val, 16));
+                //     })
+                // However, dealing with '\xff', '\\xff', '\\\xff' makes this more fun.
+                var out = '',
+                    escaped = 0;
+
+                var input_scan = new InputScanner(s);
+                var matched = null;
+
+                while (input_scan.hasNext()) {
+                    // Keep any whitespace, non-slash characters
+                    // also keep slash pairs.
+                    matched = input_scan.match(/([\s]|[^\\]|\\\\)+/g);
+
+                    if (matched) {
+                        out += matched[0];
+                    }
+
+                    if (input_scan.peek() === '\\') {
+                        input_scan.next();
+                        if (input_scan.peek() === 'x') {
+                            matched = input_scan.match(/x([0-9A-Fa-f]{2})/g);
+                        } else if (input_scan.peek() === 'u') {
+                            matched = input_scan.match(/u([0-9A-Fa-f]{4})/g);
+                        } else {
+                            out += '\\';
+                            if (input_scan.hasNext()) {
+                                out += input_scan.next();
+                            }
+                            continue;
+                        }
+
+                        // If there's some error decoding, return the original string
+                        if (!matched) {
+                            return s;
+                        }
+
+                        escaped = parseInt(matched[1], 16);
+
+                        if (escaped > 0x7e && escaped <= 0xff && matched[0].indexOf('x') === 0) {
+                            // we bail out on \x7f..\xff,
+                            // leaving whole string escaped,
+                            // as it's probably completely binary
+                            return s;
+                        } else if (escaped >= 0x00 && escaped < 0x20) {
+                            // leave 0x00...0x1f escaped
+                            out += '\\' + matched[0];
+                            continue;
+                        } else if (escaped === 0x22 || escaped === 0x27 || escaped === 0x5c) {
+                            // single-quote, apostrophe, backslash - escape these
+                            out += '\\' + String.fromCharCode(escaped);
+                        } else {
+                            out += String.fromCharCode(escaped);
+                        }
+                    }
+                }
+
+                return out;
+            }
+        }
+
+        var beautifier = new Beautifier(js_source_text, options);
+        return beautifier.beautify();
+
+    }
+
+    if (typeof undefined === "function" && undefined.amd) {
+        // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
+        undefined([], function() {
+            return { js_beautify: js_beautify };
+        });
+    } else {
+        // Add support for CommonJS. Just put this file somewhere on your require.paths
+        // and you will be able to `var js_beautify = require("beautify").js_beautify`.
+        exports.js_beautify = js_beautify;
+    }
+
+}());
+});
+
+var beautifyCss = createCommonjsModule(function (module, exports) {
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+
+ CSS Beautifier
+---------------
+
+    Written by Harutyun Amirjanyan, (amirjanyan@gmail.com)
+
+    Based on code initially developed by: Einar Lielmanis, <einar@jsbeautifier.org>
+        http://jsbeautifier.org/
+
+    Usage:
+        css_beautify(source_text);
+        css_beautify(source_text, options);
+
+    The options are (default in brackets):
+        indent_size (4)                         — indentation size,
+        indent_char (space)                     — character to indent with,
+        preserve_newlines (default false)       - whether existing line breaks should be preserved,
+        selector_separator_newline (true)       - separate selectors with newline or
+                                                  not (e.g. "a,\nbr" or "a, br")
+        end_with_newline (false)                - end with a newline
+        newline_between_rules (true)            - add a new line after every css rule
+        space_around_selector_separator (false) - ensure space around selector separators:
+                                                  '>', '+', '~' (e.g. "a>b" -> "a > b")
+    e.g
+
+    css_beautify(css_source_text, {
+      'indent_size': 1,
+      'indent_char': '\t',
+      'selector_separator': ' ',
+      'end_with_newline': false,
+      'newline_between_rules': true,
+      'space_around_selector_separator': true
+    });
+*/
+
+// http://www.w3.org/TR/CSS21/syndata.html#tokenization
+// http://www.w3.org/TR/css3-syntax/
+
+(function() {
+
+    function mergeOpts(allOptions, targetType) {
+        var finalOpts = {};
+        var name;
+
+        for (name in allOptions) {
+            if (name !== targetType) {
+                finalOpts[name] = allOptions[name];
+            }
+        }
+
+
+        //merge in the per type settings for the targetType
+        if (targetType in allOptions) {
+            for (name in allOptions[targetType]) {
+                finalOpts[name] = allOptions[targetType][name];
+            }
+        }
+        return finalOpts;
+    }
+
+    var lineBreak = /\r\n|[\n\r\u2028\u2029]/;
+    var allLineBreaks = new RegExp(lineBreak.source, 'g');
+
+    function css_beautify(source_text, options) {
+        options = options || {};
+
+        // Allow the setting of language/file-type specific options
+        // with inheritance of overall settings
+        options = mergeOpts(options, 'css');
+
+        source_text = source_text || '';
+
+        var newlinesFromLastWSEat = 0;
+        var indentSize = options.indent_size ? parseInt(options.indent_size, 10) : 4;
+        var indentCharacter = options.indent_char || ' ';
+        var preserve_newlines = (options.preserve_newlines === undefined) ? false : options.preserve_newlines;
+        var selectorSeparatorNewline = (options.selector_separator_newline === undefined) ? true : options.selector_separator_newline;
+        var end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
+        var newline_between_rules = (options.newline_between_rules === undefined) ? true : options.newline_between_rules;
+        var space_around_combinator = (options.space_around_combinator === undefined) ? false : options.space_around_combinator;
+        space_around_combinator = space_around_combinator || ((options.space_around_selector_separator === undefined) ? false : options.space_around_selector_separator);
+        var eol = options.eol ? options.eol : 'auto';
+
+        if (options.indent_with_tabs) {
+            indentCharacter = '\t';
+            indentSize = 1;
+        }
+
+        if (eol === 'auto') {
+            eol = '\n';
+            if (source_text && lineBreak.test(source_text || '')) {
+                eol = source_text.match(lineBreak)[0];
+            }
+        }
+
+        eol = eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
+
+        // HACK: newline parsing inconsistent. This brute force normalizes the input.
+        source_text = source_text.replace(allLineBreaks, '\n');
+
+        // tokenizer
+        var whiteRe = /^\s+$/;
+
+        var pos = -1,
+            ch;
+        var parenLevel = 0;
+
+        function next() {
+            ch = source_text.charAt(++pos);
+            return ch || '';
+        }
+
+        function peek(skipWhitespace) {
+            var result = '';
+            var prev_pos = pos;
+            if (skipWhitespace) {
+                eatWhitespace();
+            }
+            result = source_text.charAt(pos + 1) || '';
+            pos = prev_pos - 1;
+            next();
+            return result;
+        }
+
+        function eatString(endChars) {
+            var start = pos;
+            while (next()) {
+                if (ch === "\\") {
+                    next();
+                } else if (endChars.indexOf(ch) !== -1) {
+                    break;
+                } else if (ch === "\n") {
+                    break;
+                }
+            }
+            return source_text.substring(start, pos + 1);
+        }
+
+        function peekString(endChar) {
+            var prev_pos = pos;
+            var str = eatString(endChar);
+            pos = prev_pos - 1;
+            next();
+            return str;
+        }
+
+        function eatWhitespace(preserve_newlines_local) {
+            var result = 0;
+            while (whiteRe.test(peek())) {
+                next();
+                if (ch === '\n' && preserve_newlines_local && preserve_newlines) {
+                    print.newLine(true);
+                    result++;
+                }
+            }
+            newlinesFromLastWSEat = result;
+            return result;
+        }
+
+        function skipWhitespace() {
+            var result = '';
+            if (ch && whiteRe.test(ch)) {
+                result = ch;
+            }
+            while (whiteRe.test(next())) {
+                result += ch;
+            }
+            return result;
+        }
+
+        function eatComment(singleLine) {
+            var start = pos;
+            singleLine = peek() === "/";
+            next();
+            while (next()) {
+                if (!singleLine && ch === "*" && peek() === "/") {
+                    next();
+                    break;
+                } else if (singleLine && ch === "\n") {
+                    return source_text.substring(start, pos);
+                }
+            }
+
+            return source_text.substring(start, pos) + ch;
+        }
+
+
+        function lookBack(str) {
+            return source_text.substring(pos - str.length, pos).toLowerCase() ===
+                str;
+        }
+
+        // Nested pseudo-class if we are insideRule
+        // and the next special character found opens
+        // a new block
+        function foundNestedPseudoClass() {
+            var openParen = 0;
+            for (var i = pos + 1; i < source_text.length; i++) {
+                var ch = source_text.charAt(i);
+                if (ch === "{") {
+                    return true;
+                } else if (ch === '(') {
+                    // pseudoclasses can contain ()
+                    openParen += 1;
+                } else if (ch === ')') {
+                    if (openParen === 0) {
+                        return false;
+                    }
+                    openParen -= 1;
+                } else if (ch === ";" || ch === "}") {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // printer
+        var basebaseIndentString = source_text.match(/^[\t ]*/)[0];
+        var singleIndent = new Array(indentSize + 1).join(indentCharacter);
+        var indentLevel = 0;
+        var nestedLevel = 0;
+
+        function indent() {
+            indentLevel++;
+            basebaseIndentString += singleIndent;
+        }
+
+        function outdent() {
+            indentLevel--;
+            basebaseIndentString = basebaseIndentString.slice(0, -indentSize);
+        }
+
+        var print = {};
+        print["{"] = function(ch) {
+            print.singleSpace();
+            output.push(ch);
+            if (!eatWhitespace(true)) {
+                print.newLine();
+            }
+        };
+        print["}"] = function(newline) {
+            if (newline) {
+                print.newLine();
+            }
+            output.push('}');
+            if (!eatWhitespace(true)) {
+                print.newLine();
+            }
+        };
+
+        print._lastCharWhitespace = function() {
+            return whiteRe.test(output[output.length - 1]);
+        };
+
+        print.newLine = function(keepWhitespace) {
+            if (output.length) {
+                if (!keepWhitespace && output[output.length - 1] !== '\n') {
+                    print.trim();
+                } else if (output[output.length - 1] === basebaseIndentString) {
+                    output.pop();
+                }
+                output.push('\n');
+
+                if (basebaseIndentString) {
+                    output.push(basebaseIndentString);
+                }
+            }
+        };
+        print.singleSpace = function() {
+            if (output.length && !print._lastCharWhitespace()) {
+                output.push(' ');
+            }
+        };
+
+        print.preserveSingleSpace = function() {
+            if (isAfterSpace) {
+                print.singleSpace();
+            }
+        };
+
+        print.trim = function() {
+            while (print._lastCharWhitespace()) {
+                output.pop();
+            }
+        };
+
+
+        var output = [];
+        /*_____________________--------------------_____________________*/
+
+        var insideRule = false;
+        var insidePropertyValue = false;
+        var enteringConditionalGroup = false;
+        var top_ch = '';
+        var last_top_ch = '';
+
+        while (true) {
+            var whitespace = skipWhitespace();
+            var isAfterSpace = whitespace !== '';
+            var isAfterNewline = whitespace.indexOf('\n') !== -1;
+            last_top_ch = top_ch;
+            top_ch = ch;
+
+            if (!ch) {
+                break;
+            } else if (ch === '/' && peek() === '*') { /* css comment */
+                var header = indentLevel === 0;
+
+                if (isAfterNewline || header) {
+                    print.newLine();
+                }
+
+                output.push(eatComment());
+                print.newLine();
+                if (header) {
+                    print.newLine(true);
+                }
+            } else if (ch === '/' && peek() === '/') { // single line comment
+                if (!isAfterNewline && last_top_ch !== '{') {
+                    print.trim();
+                }
+                print.singleSpace();
+                output.push(eatComment());
+                print.newLine();
+            } else if (ch === '@') {
+                print.preserveSingleSpace();
+
+                // deal with less propery mixins @{...}
+                if (peek() === '{') {
+                    output.push(eatString('}'));
+                } else {
+                    output.push(ch);
+
+                    // strip trailing space, if present, for hash property checks
+                    var variableOrRule = peekString(": ,;{}()[]/='\"");
+
+                    if (variableOrRule.match(/[ :]$/)) {
+                        // we have a variable or pseudo-class, add it and insert one space before continuing
+                        next();
+                        variableOrRule = eatString(": ").replace(/\s$/, '');
+                        output.push(variableOrRule);
+                        print.singleSpace();
+                    }
+
+                    variableOrRule = variableOrRule.replace(/\s$/, '');
+
+                    // might be a nesting at-rule
+                    if (variableOrRule in css_beautify.NESTED_AT_RULE) {
+                        nestedLevel += 1;
+                        if (variableOrRule in css_beautify.CONDITIONAL_GROUP_RULE) {
+                            enteringConditionalGroup = true;
+                        }
+                    }
+                }
+            } else if (ch === '#' && peek() === '{') {
+                print.preserveSingleSpace();
+                output.push(eatString('}'));
+            } else if (ch === '{') {
+                if (peek(true) === '}') {
+                    eatWhitespace();
+                    next();
+                    print.singleSpace();
+                    output.push("{");
+                    print['}'](false);
+                    if (newlinesFromLastWSEat < 2 && newline_between_rules && indentLevel === 0) {
+                        print.newLine(true);
+                    }
+                } else {
+                    indent();
+                    print["{"](ch);
+                    // when entering conditional groups, only rulesets are allowed
+                    if (enteringConditionalGroup) {
+                        enteringConditionalGroup = false;
+                        insideRule = (indentLevel > nestedLevel);
+                    } else {
+                        // otherwise, declarations are also allowed
+                        insideRule = (indentLevel >= nestedLevel);
+                    }
+                }
+            } else if (ch === '}') {
+                outdent();
+                print["}"](true);
+                insideRule = false;
+                insidePropertyValue = false;
+                if (nestedLevel) {
+                    nestedLevel--;
+                }
+                if (newlinesFromLastWSEat < 2 && newline_between_rules && indentLevel === 0) {
+                    print.newLine(true);
+                }
+            } else if (ch === ":") {
+                eatWhitespace();
+                if ((insideRule || enteringConditionalGroup) &&
+                    !(lookBack("&") || foundNestedPseudoClass()) &&
+                    !lookBack("(")) {
+                    // 'property: value' delimiter
+                    // which could be in a conditional group query
+                    output.push(':');
+                    if (!insidePropertyValue) {
+                        insidePropertyValue = true;
+                        print.singleSpace();
+                    }
+                } else {
+                    // sass/less parent reference don't use a space
+                    // sass nested pseudo-class don't use a space
+
+                    // preserve space before pseudoclasses/pseudoelements, as it means "in any child"
+                    if (lookBack(" ") && output[output.length - 1] !== " ") {
+                        output.push(" ");
+                    }
+                    if (peek() === ":") {
+                        // pseudo-element
+                        next();
+                        output.push("::");
+                    } else {
+                        // pseudo-class
+                        output.push(':');
+                    }
+                }
+            } else if (ch === '"' || ch === '\'') {
+                print.preserveSingleSpace();
+                output.push(eatString(ch));
+            } else if (ch === ';') {
+                insidePropertyValue = false;
+                output.push(ch);
+                if (!eatWhitespace(true)) {
+                    print.newLine();
+                }
+            } else if (ch === '(') { // may be a url
+                if (lookBack("url")) {
+                    output.push(ch);
+                    eatWhitespace();
+                    if (next()) {
+                        if (ch !== ')' && ch !== '"' && ch !== '\'') {
+                            output.push(eatString(')'));
+                        } else {
+                            pos--;
+                        }
+                    }
+                } else {
+                    parenLevel++;
+                    print.preserveSingleSpace();
+                    output.push(ch);
+                    eatWhitespace();
+                }
+            } else if (ch === ')') {
+                output.push(ch);
+                parenLevel--;
+            } else if (ch === ',') {
+                output.push(ch);
+                if (!eatWhitespace(true) && selectorSeparatorNewline && !insidePropertyValue && parenLevel < 1) {
+                    print.newLine();
+                } else {
+                    print.singleSpace();
+                }
+            } else if ((ch === '>' || ch === '+' || ch === '~') &&
+                !insidePropertyValue && parenLevel < 1) {
+                //handle combinator spacing
+                if (space_around_combinator) {
+                    print.singleSpace();
+                    output.push(ch);
+                    print.singleSpace();
+                } else {
+                    output.push(ch);
+                    eatWhitespace();
+                    // squash extra whitespace
+                    if (ch && whiteRe.test(ch)) {
+                        ch = '';
+                    }
+                }
+            } else if (ch === ']') {
+                output.push(ch);
+            } else if (ch === '[') {
+                print.preserveSingleSpace();
+                output.push(ch);
+            } else if (ch === '=') { // no whitespace before or after
+                eatWhitespace();
+                output.push('=');
+                if (whiteRe.test(ch)) {
+                    ch = '';
+                }
+            } else {
+                print.preserveSingleSpace();
+                output.push(ch);
+            }
+        }
+
+
+        var sweetCode = '';
+        if (basebaseIndentString) {
+            sweetCode += basebaseIndentString;
+        }
+
+        sweetCode += output.join('').replace(/[\r\n\t ]+$/, '');
+
+        // establish end_with_newline
+        if (end_with_newline) {
+            sweetCode += '\n';
+        }
+
+        if (eol !== '\n') {
+            sweetCode = sweetCode.replace(/[\n]/g, eol);
+        }
+
+        return sweetCode;
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/At-rule
+    css_beautify.NESTED_AT_RULE = {
+        "@page": true,
+        "@font-face": true,
+        "@keyframes": true,
+        // also in CONDITIONAL_GROUP_RULE below
+        "@media": true,
+        "@supports": true,
+        "@document": true
+    };
+    css_beautify.CONDITIONAL_GROUP_RULE = {
+        "@media": true,
+        "@supports": true,
+        "@document": true
+    };
+
+    /*global define */
+    if (typeof undefined === "function" && undefined.amd) {
+        // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
+        undefined([], function() {
+            return {
+                css_beautify: css_beautify
+            };
+        });
+    } else {
+        // Add support for CommonJS. Just put this file somewhere on your require.paths
+        // and you will be able to `var html_beautify = require("beautify").html_beautify`.
+        exports.css_beautify = css_beautify;
+    }
+
+}());
+});
+
+var beautifyHtml = createCommonjsModule(function (module, exports) {
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+
+ Style HTML
+---------------
+
+  Written by Nochum Sossonko, (nsossonko@hotmail.com)
+
+  Based on code initially developed by: Einar Lielmanis, <einar@jsbeautifier.org>
+    http://jsbeautifier.org/
+
+  Usage:
+    style_html(html_source);
+
+    style_html(html_source, options);
+
+  The options are:
+    indent_inner_html (default false)  — indent <head> and <body> sections,
+    indent_size (default 4)          — indentation size,
+    indent_char (default space)      — character to indent with,
+    wrap_line_length (default 250)            -  maximum amount of characters per line (0 = disable)
+    brace_style (default "collapse") - "collapse" | "expand" | "end-expand" | "none"
+            put braces on the same line as control statements (default), or put braces on own line (Allman / ANSI style), or just put end braces on own line, or attempt to keep them where they are.
+    unformatted (defaults to inline tags) - list of tags, that shouldn't be reformatted
+    content_unformatted (defaults to pre tag) - list of tags, that its content shouldn't be reformatted
+    indent_scripts (default normal)  - "keep"|"separate"|"normal"
+    preserve_newlines (default true) - whether existing line breaks before elements should be preserved
+                                        Only works before elements, not inside tags or for text.
+    max_preserve_newlines (default unlimited) - maximum number of line breaks to be preserved in one chunk
+    indent_handlebars (default false) - format and indent {{#foo}} and {{/foo}}
+    end_with_newline (false)          - end with a newline
+    extra_liners (default [head,body,/html]) -List of tags that should have an extra newline before them.
+
+    e.g.
+
+    style_html(html_source, {
+      'indent_inner_html': false,
+      'indent_size': 2,
+      'indent_char': ' ',
+      'wrap_line_length': 78,
+      'brace_style': 'expand',
+      'preserve_newlines': true,
+      'max_preserve_newlines': 5,
+      'indent_handlebars': false,
+      'extra_liners': ['/html']
+    });
+*/
+
+(function() {
+
+    // function trim(s) {
+    //     return s.replace(/^\s+|\s+$/g, '');
+    // }
+
+    function ltrim(s) {
+        return s.replace(/^\s+/g, '');
+    }
+
+    function rtrim(s) {
+        return s.replace(/\s+$/g, '');
+    }
+
+    function mergeOpts(allOptions, targetType) {
+        var finalOpts = {};
+        var name;
+
+        for (name in allOptions) {
+            if (name !== targetType) {
+                finalOpts[name] = allOptions[name];
+            }
+        }
+
+        //merge in the per type settings for the targetType
+        if (targetType in allOptions) {
+            for (name in allOptions[targetType]) {
+                finalOpts[name] = allOptions[targetType][name];
+            }
+        }
+        return finalOpts;
+    }
+
+    var lineBreak = /\r\n|[\n\r\u2028\u2029]/;
+    var allLineBreaks = new RegExp(lineBreak.source, 'g');
+
+    function style_html(html_source, options, js_beautify, css_beautify) {
+        //Wrapper function to invoke all the necessary constructors and deal with the output.
+
+        var multi_parser,
+            indent_inner_html,
+            indent_body_inner_html,
+            indent_head_inner_html,
+            indent_size,
+            indent_character,
+            wrap_line_length,
+            brace_style,
+            unformatted,
+            content_unformatted,
+            preserve_newlines,
+            max_preserve_newlines,
+            indent_handlebars,
+            wrap_attributes,
+            wrap_attributes_indent_size,
+            is_wrap_attributes_force,
+            is_wrap_attributes_force_expand_multiline,
+            is_wrap_attributes_force_aligned,
+            end_with_newline,
+            extra_liners,
+            eol;
+
+        options = options || {};
+
+        // Allow the setting of language/file-type specific options
+        // with inheritance of overall settings
+        options = mergeOpts(options, 'html');
+
+        // backwards compatibility to 1.3.4
+        if ((options.wrap_line_length === undefined || parseInt(options.wrap_line_length, 10) === 0) &&
+            (options.max_char !== undefined && parseInt(options.max_char, 10) !== 0)) {
+            options.wrap_line_length = options.max_char;
+        }
+
+        indent_inner_html = (options.indent_inner_html === undefined) ? false : options.indent_inner_html;
+        indent_body_inner_html = (options.indent_body_inner_html === undefined) ? true : options.indent_body_inner_html;
+        indent_head_inner_html = (options.indent_head_inner_html === undefined) ? true : options.indent_head_inner_html;
+        indent_size = (options.indent_size === undefined) ? 4 : parseInt(options.indent_size, 10);
+        indent_character = (options.indent_char === undefined) ? ' ' : options.indent_char;
+        brace_style = (options.brace_style === undefined) ? 'collapse' : options.brace_style;
+        wrap_line_length = parseInt(options.wrap_line_length, 10) === 0 ? 32786 : parseInt(options.wrap_line_length || 250, 10);
+        unformatted = options.unformatted || [
+            // https://www.w3.org/TR/html5/dom.html#phrasing-content
+            'a', 'abbr', 'area', 'audio', 'b', 'bdi', 'bdo', 'br', 'button', 'canvas', 'cite',
+            'code', 'data', 'datalist', 'del', 'dfn', 'em', 'embed', 'i', 'iframe', 'img',
+            'input', 'ins', 'kbd', 'keygen', 'label', 'map', 'mark', 'math', 'meter', 'noscript',
+            'object', 'output', 'progress', 'q', 'ruby', 's', 'samp', /* 'script', */ 'select', 'small',
+            'span', 'strong', 'sub', 'sup', 'svg', 'template', 'textarea', 'time', 'u', 'var',
+            'video', 'wbr', 'text',
+            // prexisting - not sure of full effect of removing, leaving in
+            'acronym', 'address', 'big', 'dt', 'ins', 'strike', 'tt',
+        ];
+        content_unformatted = options.content_unformatted || [
+            'pre',
+        ];
+        preserve_newlines = (options.preserve_newlines === undefined) ? true : options.preserve_newlines;
+        max_preserve_newlines = preserve_newlines ?
+            (isNaN(parseInt(options.max_preserve_newlines, 10)) ? 32786 : parseInt(options.max_preserve_newlines, 10)) :
+            0;
+        indent_handlebars = (options.indent_handlebars === undefined) ? false : options.indent_handlebars;
+        wrap_attributes = (options.wrap_attributes === undefined) ? 'auto' : options.wrap_attributes;
+        wrap_attributes_indent_size = (isNaN(parseInt(options.wrap_attributes_indent_size, 10))) ? indent_size : parseInt(options.wrap_attributes_indent_size, 10);
+        is_wrap_attributes_force = wrap_attributes.substr(0, 'force'.length) === 'force';
+        is_wrap_attributes_force_expand_multiline = (wrap_attributes === 'force-expand-multiline');
+        is_wrap_attributes_force_aligned = (wrap_attributes === 'force-aligned');
+        end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
+        extra_liners = (typeof options.extra_liners === 'object') && options.extra_liners ?
+            options.extra_liners.concat() : (typeof options.extra_liners === 'string') ?
+            options.extra_liners.split(',') : 'head,body,/html'.split(',');
+        eol = options.eol ? options.eol : 'auto';
+
+        if (options.indent_with_tabs) {
+            indent_character = '\t';
+            indent_size = 1;
+        }
+
+        if (eol === 'auto') {
+            eol = '\n';
+            if (html_source && lineBreak.test(html_source || '')) {
+                eol = html_source.match(lineBreak)[0];
+            }
+        }
+
+        eol = eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
+
+        // HACK: newline parsing inconsistent. This brute force normalizes the input.
+        html_source = html_source.replace(allLineBreaks, '\n');
+
+        function Parser() {
+
+            this.pos = 0; //Parser position
+            this.token = '';
+            this.current_mode = 'CONTENT'; //reflects the current Parser mode: TAG/CONTENT
+            this.tags = { //An object to hold tags, their position, and their parent-tags, initiated with default values
+                parent: 'parent1',
+                parentcount: 1,
+                parent1: ''
+            };
+            this.tag_type = '';
+            this.token_text = this.last_token = this.last_text = this.token_type = '';
+            this.newlines = 0;
+            this.indent_content = indent_inner_html;
+            this.indent_body_inner_html = indent_body_inner_html;
+            this.indent_head_inner_html = indent_head_inner_html;
+
+            this.Utils = { //Uilities made available to the various functions
+                whitespace: "\n\r\t ".split(''),
+
+                single_token: options.void_elements || [
+                    // HTLM void elements - aka self-closing tags - aka singletons
+                    // https://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+                    'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen',
+                    'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr',
+                    // NOTE: Optional tags - are not understood.
+                    // https://www.w3.org/TR/html5/syntax.html#optional-tags
+                    // The rules for optional tags are too complex for a simple list
+                    // Also, the content of these tags should still be indented in many cases.
+                    // 'li' is a good exmple.
+
+                    // Doctype and xml elements
+                    '!doctype', '?xml',
+                    // ?php tag
+                    '?php',
+                    // other tags that were in this list, keeping just in case
+                    'basefont', 'isindex'
+                ],
+                extra_liners: extra_liners, //for tags that need a line of whitespace before them
+                in_array: function(what, arr) {
+                    for (var i = 0; i < arr.length; i++) {
+                        if (what === arr[i]) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
+
+            // Return true if the given text is composed entirely of whitespace.
+            this.is_whitespace = function(text) {
+                for (var n = 0; n < text.length; n++) {
+                    if (!this.Utils.in_array(text.charAt(n), this.Utils.whitespace)) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+
+            this.traverse_whitespace = function() {
+                var input_char = '';
+
+                input_char = this.input.charAt(this.pos);
+                if (this.Utils.in_array(input_char, this.Utils.whitespace)) {
+                    this.newlines = 0;
+                    while (this.Utils.in_array(input_char, this.Utils.whitespace)) {
+                        if (preserve_newlines && input_char === '\n' && this.newlines <= max_preserve_newlines) {
+                            this.newlines += 1;
+                        }
+
+                        this.pos++;
+                        input_char = this.input.charAt(this.pos);
+                    }
+                    return true;
+                }
+                return false;
+            };
+
+            // Append a space to the given content (string array) or, if we are
+            // at the wrap_line_length, append a newline/indentation.
+            // return true if a newline was added, false if a space was added
+            this.space_or_wrap = function(content) {
+                if (this.line_char_count >= this.wrap_line_length) { //insert a line when the wrap_line_length is reached
+                    this.print_newline(false, content);
+                    this.print_indentation(content);
+                    return true;
+                } else {
+                    this.line_char_count++;
+                    content.push(' ');
+                    return false;
+                }
+            };
+
+            this.get_content = function() { //function to capture regular content between tags
+                var input_char = '',
+                    content = [],
+                    handlebarsStarted = 0;
+
+                while (this.input.charAt(this.pos) !== '<' || handlebarsStarted === 2) {
+                    if (this.pos >= this.input.length) {
+                        return content.length ? content.join('') : ['', 'TK_EOF'];
+                    }
+
+                    if (handlebarsStarted < 2 && this.traverse_whitespace()) {
+                        this.space_or_wrap(content);
+                        continue;
+                    }
+
+                    input_char = this.input.charAt(this.pos);
+
+                    if (indent_handlebars) {
+                        if (input_char === '{') {
+                            handlebarsStarted += 1;
+                        } else if (handlebarsStarted < 2) {
+                            handlebarsStarted = 0;
+                        }
+
+                        if (input_char === '}' && handlebarsStarted > 0) {
+                            if (handlebarsStarted-- === 0) {
+                                break;
+                            }
+                        }
+                        // Handlebars parsing is complicated.
+                        // {{#foo}} and {{/foo}} are formatted tags.
+                        // {{something}} should get treated as content, except:
+                        // {{else}} specifically behaves like {{#if}} and {{/if}}
+                        var peek3 = this.input.substr(this.pos, 3);
+                        if (peek3 === '{{#' || peek3 === '{{/') {
+                            // These are tags and not content.
+                            break;
+                        } else if (peek3 === '{{!') {
+                            return [this.get_tag(), 'TK_TAG_HANDLEBARS_COMMENT'];
+                        } else if (this.input.substr(this.pos, 2) === '{{') {
+                            if (this.get_tag(true) === '{{else}}') {
+                                break;
+                            }
+                        }
+                    }
+
+                    this.pos++;
+                    this.line_char_count++;
+                    content.push(input_char); //letter at-a-time (or string) inserted to an array
+                }
+                return content.length ? content.join('') : '';
+            };
+
+            this.get_contents_to = function(name) { //get the full content of a script or style to pass to js_beautify
+                if (this.pos === this.input.length) {
+                    return ['', 'TK_EOF'];
+                }
+                var content = '';
+                var reg_match = new RegExp('</' + name + '\\s*>', 'igm');
+                reg_match.lastIndex = this.pos;
+                var reg_array = reg_match.exec(this.input);
+                var end_script = reg_array ? reg_array.index : this.input.length; //absolute end of script
+                if (this.pos < end_script) { //get everything in between the script tags
+                    content = this.input.substring(this.pos, end_script);
+                    this.pos = end_script;
+                }
+                return content;
+            };
+
+            this.record_tag = function(tag) { //function to record a tag and its parent in this.tags Object
+                if (this.tags[tag + 'count']) { //check for the existence of this tag type
+                    this.tags[tag + 'count']++;
+                    this.tags[tag + this.tags[tag + 'count']] = this.indent_level; //and record the present indent level
+                } else { //otherwise initialize this tag type
+                    this.tags[tag + 'count'] = 1;
+                    this.tags[tag + this.tags[tag + 'count']] = this.indent_level; //and record the present indent level
+                }
+                this.tags[tag + this.tags[tag + 'count'] + 'parent'] = this.tags.parent; //set the parent (i.e. in the case of a div this.tags.div1parent)
+                this.tags.parent = tag + this.tags[tag + 'count']; //and make this the current parent (i.e. in the case of a div 'div1')
+            };
+
+            this.retrieve_tag = function(tag) { //function to retrieve the opening tag to the corresponding closer
+                if (this.tags[tag + 'count']) { //if the openener is not in the Object we ignore it
+                    var temp_parent = this.tags.parent; //check to see if it's a closable tag.
+                    while (temp_parent) { //till we reach '' (the initial value);
+                        if (tag + this.tags[tag + 'count'] === temp_parent) { //if this is it use it
+                            break;
+                        }
+                        temp_parent = this.tags[temp_parent + 'parent']; //otherwise keep on climbing up the DOM Tree
+                    }
+                    if (temp_parent) { //if we caught something
+                        this.indent_level = this.tags[tag + this.tags[tag + 'count']]; //set the indent_level accordingly
+                        this.tags.parent = this.tags[temp_parent + 'parent']; //and set the current parent
+                    }
+                    delete this.tags[tag + this.tags[tag + 'count'] + 'parent']; //delete the closed tags parent reference...
+                    delete this.tags[tag + this.tags[tag + 'count']]; //...and the tag itself
+                    if (this.tags[tag + 'count'] === 1) {
+                        delete this.tags[tag + 'count'];
+                    } else {
+                        this.tags[tag + 'count']--;
+                    }
+                }
+            };
+
+            this.indent_to_tag = function(tag) {
+                // Match the indentation level to the last use of this tag, but don't remove it.
+                if (!this.tags[tag + 'count']) {
+                    return;
+                }
+                var temp_parent = this.tags.parent;
+                while (temp_parent) {
+                    if (tag + this.tags[tag + 'count'] === temp_parent) {
+                        break;
+                    }
+                    temp_parent = this.tags[temp_parent + 'parent'];
+                }
+                if (temp_parent) {
+                    this.indent_level = this.tags[tag + this.tags[tag + 'count']];
+                }
+            };
+
+            this.get_tag = function(peek) { //function to get a full tag and parse its type
+                var input_char = '',
+                    content = [],
+                    comment = '',
+                    space = false,
+                    first_attr = true,
+                    has_wrapped_attrs = false,
+                    tag_start, tag_end,
+                    tag_start_char,
+                    orig_pos = this.pos,
+                    orig_line_char_count = this.line_char_count,
+                    is_tag_closed = false,
+                    tail;
+
+                peek = peek !== undefined ? peek : false;
+
+                do {
+                    if (this.pos >= this.input.length) {
+                        if (peek) {
+                            this.pos = orig_pos;
+                            this.line_char_count = orig_line_char_count;
+                        }
+                        return content.length ? content.join('') : ['', 'TK_EOF'];
+                    }
+
+                    input_char = this.input.charAt(this.pos);
+                    this.pos++;
+
+                    if (this.Utils.in_array(input_char, this.Utils.whitespace)) { //don't want to insert unnecessary space
+                        space = true;
+                        continue;
+                    }
+
+                    if (input_char === "'" || input_char === '"') {
+                        input_char += this.get_unformatted(input_char);
+                        space = true;
+                    }
+
+                    if (input_char === '=') { //no space before =
+                        space = false;
+                    }
+                    tail = this.input.substr(this.pos - 1);
+                    if (is_wrap_attributes_force_expand_multiline && has_wrapped_attrs && !is_tag_closed && (input_char === '>' || input_char === '/')) {
+                        if (tail.match(/^\/?\s*>/)) {
+                            space = false;
+                            is_tag_closed = true;
+                            this.print_newline(false, content);
+                            this.print_indentation(content);
+                        }
+                    }
+                    if (content.length && content[content.length - 1] !== '=' && input_char !== '>' && space) {
+                        //no space after = or before >
+                        var wrapped = this.space_or_wrap(content);
+                        var indentAttrs = wrapped && input_char !== '/' && !is_wrap_attributes_force;
+                        space = false;
+
+                        if (is_wrap_attributes_force && input_char !== '/') {
+                            var force_first_attr_wrap = false;
+                            if (is_wrap_attributes_force_expand_multiline && first_attr) {
+                                var is_only_attribute = tail.match(/^\S*(="([^"]|\\")*")?\s*\/?\s*>/) !== null;
+                                force_first_attr_wrap = !is_only_attribute;
+                            }
+                            if (!first_attr || force_first_attr_wrap) {
+                                this.print_newline(false, content);
+                                this.print_indentation(content);
+                                indentAttrs = true;
+                            }
+                        }
+                        if (indentAttrs) {
+                            has_wrapped_attrs = true;
+
+                            //indent attributes an auto, forced, or forced-align line-wrap
+                            var alignment_size = wrap_attributes_indent_size;
+                            if (is_wrap_attributes_force_aligned) {
+                                alignment_size = content.indexOf(' ') + 1;
+                            }
+
+                            for (var count = 0; count < alignment_size; count++) {
+                                // only ever further indent with spaces since we're trying to align characters
+                                content.push(' ');
+                            }
+                        }
+                        if (first_attr) {
+                            for (var i = 0; i < content.length; i++) {
+                                if (content[i] === ' ') {
+                                    first_attr = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (indent_handlebars && tag_start_char === '<') {
+                        // When inside an angle-bracket tag, put spaces around
+                        // handlebars not inside of strings.
+                        if ((input_char + this.input.charAt(this.pos)) === '{{') {
+                            input_char += this.get_unformatted('}}');
+                            if (content.length && content[content.length - 1] !== ' ' && content[content.length - 1] !== '<') {
+                                input_char = ' ' + input_char;
+                            }
+                            space = true;
+                        }
+                    }
+
+                    if (input_char === '<' && !tag_start_char) {
+                        tag_start = this.pos - 1;
+                        tag_start_char = '<';
+                    }
+
+                    if (indent_handlebars && !tag_start_char) {
+                        if (content.length >= 2 && content[content.length - 1] === '{' && content[content.length - 2] === '{') {
+                            if (input_char === '#' || input_char === '/' || input_char === '!') {
+                                tag_start = this.pos - 3;
+                            } else {
+                                tag_start = this.pos - 2;
+                            }
+                            tag_start_char = '{';
+                        }
+                    }
+
+                    this.line_char_count++;
+                    content.push(input_char); //inserts character at-a-time (or string)
+
+                    if (content[1] && (content[1] === '!' || content[1] === '?' || content[1] === '%')) { //if we're in a comment, do something special
+                        // We treat all comments as literals, even more than preformatted tags
+                        // we just look for the appropriate close tag
+                        content = [this.get_comment(tag_start)];
+                        break;
+                    }
+
+                    if (indent_handlebars && content[1] && content[1] === '{' && content[2] && content[2] === '!') { //if we're in a comment, do something special
+                        // We treat all comments as literals, even more than preformatted tags
+                        // we just look for the appropriate close tag
+                        content = [this.get_comment(tag_start)];
+                        break;
+                    }
+
+                    if (indent_handlebars && tag_start_char === '{' && content.length > 2 && content[content.length - 2] === '}' && content[content.length - 1] === '}') {
+                        break;
+                    }
+                } while (input_char !== '>');
+
+                var tag_complete = content.join('');
+                var tag_index;
+                var tag_offset;
+
+                // must check for space first otherwise the tag could have the first attribute included, and
+                // then not un-indent correctly
+                if (tag_complete.indexOf(' ') !== -1) { //if there's whitespace, thats where the tag name ends
+                    tag_index = tag_complete.indexOf(' ');
+                } else if (tag_complete.indexOf('\n') !== -1) { //if there's a line break, thats where the tag name ends
+                    tag_index = tag_complete.indexOf('\n');
+                } else if (tag_complete.charAt(0) === '{') {
+                    tag_index = tag_complete.indexOf('}');
+                } else { //otherwise go with the tag ending
+                    tag_index = tag_complete.indexOf('>');
+                }
+                if (tag_complete.charAt(0) === '<' || !indent_handlebars) {
+                    tag_offset = 1;
+                } else {
+                    tag_offset = tag_complete.charAt(2) === '#' ? 3 : 2;
+                }
+                var tag_check = tag_complete.substring(tag_offset, tag_index).toLowerCase();
+                if (tag_complete.charAt(tag_complete.length - 2) === '/' ||
+                    this.Utils.in_array(tag_check, this.Utils.single_token)) { //if this tag name is a single tag type (either in the list or has a closing /)
+                    if (!peek) {
+                        this.tag_type = 'SINGLE';
+                    }
+                } else if (indent_handlebars && tag_complete.charAt(0) === '{' && tag_check === 'else') {
+                    if (!peek) {
+                        this.indent_to_tag('if');
+                        this.tag_type = 'HANDLEBARS_ELSE';
+                        this.indent_content = true;
+                        this.traverse_whitespace();
+                    }
+                } else if (this.is_unformatted(tag_check, unformatted) ||
+                    this.is_unformatted(tag_check, content_unformatted)) {
+                    // do not reformat the "unformatted" or "content_unformatted" tags
+                    comment = this.get_unformatted('</' + tag_check + '>', tag_complete); //...delegate to get_unformatted function
+                    content.push(comment);
+                    tag_end = this.pos - 1;
+                    this.tag_type = 'SINGLE';
+                } else if (tag_check === 'script' &&
+                    (tag_complete.search('type') === -1 ||
+                        (tag_complete.search('type') > -1 &&
+                            tag_complete.search(/\b(text|application|dojo)\/(x-)?(javascript|ecmascript|jscript|livescript|(ld\+)?json|method|aspect)/) > -1))) {
+                    if (!peek) {
+                        this.record_tag(tag_check);
+                        this.tag_type = 'SCRIPT';
+                    }
+                } else if (tag_check === 'style' &&
+                    (tag_complete.search('type') === -1 ||
+                        (tag_complete.search('type') > -1 && tag_complete.search('text/css') > -1))) {
+                    if (!peek) {
+                        this.record_tag(tag_check);
+                        this.tag_type = 'STYLE';
+                    }
+                } else if (tag_check.charAt(0) === '!') { //peek for <! comment
+                    // for comments content is already correct.
+                    if (!peek) {
+                        this.tag_type = 'SINGLE';
+                        this.traverse_whitespace();
+                    }
+                } else if (!peek) {
+                    if (tag_check.charAt(0) === '/') { //this tag is a double tag so check for tag-ending
+                        this.retrieve_tag(tag_check.substring(1)); //remove it and all ancestors
+                        this.tag_type = 'END';
+                    } else { //otherwise it's a start-tag
+                        this.record_tag(tag_check); //push it on the tag stack
+                        if (tag_check.toLowerCase() !== 'html') {
+                            this.indent_content = true;
+                        }
+                        this.tag_type = 'START';
+                    }
+
+                    // Allow preserving of newlines after a start or end tag
+                    if (this.traverse_whitespace()) {
+                        this.space_or_wrap(content);
+                    }
+
+                    if (this.Utils.in_array(tag_check, this.Utils.extra_liners)) { //check if this double needs an extra line
+                        this.print_newline(false, this.output);
+                        if (this.output.length && this.output[this.output.length - 2] !== '\n') {
+                            this.print_newline(true, this.output);
+                        }
+                    }
+                }
+
+                if (peek) {
+                    this.pos = orig_pos;
+                    this.line_char_count = orig_line_char_count;
+                }
+
+                return content.join(''); //returns fully formatted tag
+            };
+
+            this.get_comment = function(start_pos) { //function to return comment content in its entirety
+                // this is will have very poor perf, but will work for now.
+                var comment = '',
+                    delimiter = '>',
+                    matched = false;
+
+                this.pos = start_pos;
+                var input_char = this.input.charAt(this.pos);
+                this.pos++;
+
+                while (this.pos <= this.input.length) {
+                    comment += input_char;
+
+                    // only need to check for the delimiter if the last chars match
+                    if (comment.charAt(comment.length - 1) === delimiter.charAt(delimiter.length - 1) &&
+                        comment.indexOf(delimiter) !== -1) {
+                        break;
+                    }
+
+                    // only need to search for custom delimiter for the first few characters
+                    if (!matched && comment.length < 10) {
+                        if (comment.indexOf('<![if') === 0) { //peek for <![if conditional comment
+                            delimiter = '<![endif]>';
+                            matched = true;
+                        } else if (comment.indexOf('<![cdata[') === 0) { //if it's a <[cdata[ comment...
+                            delimiter = ']]>';
+                            matched = true;
+                        } else if (comment.indexOf('<![') === 0) { // some other ![ comment? ...
+                            delimiter = ']>';
+                            matched = true;
+                        } else if (comment.indexOf('<!--') === 0) { // <!-- comment ...
+                            delimiter = '-->';
+                            matched = true;
+                        } else if (comment.indexOf('{{!--') === 0) { // {{!-- handlebars comment
+                            delimiter = '--}}';
+                            matched = true;
+                        } else if (comment.indexOf('{{!') === 0) { // {{! handlebars comment
+                            if (comment.length === 5 && comment.indexOf('{{!--') === -1) {
+                                delimiter = '}}';
+                                matched = true;
+                            }
+                        } else if (comment.indexOf('<?') === 0) { // {{! handlebars comment
+                            delimiter = '?>';
+                            matched = true;
+                        } else if (comment.indexOf('<%') === 0) { // {{! handlebars comment
+                            delimiter = '%>';
+                            matched = true;
+                        }
+                    }
+
+                    input_char = this.input.charAt(this.pos);
+                    this.pos++;
+                }
+
+                return comment;
+            };
+
+            function tokenMatcher(delimiter) {
+                var token = '';
+
+                var add = function(str) {
+                    var newToken = token + str.toLowerCase();
+                    token = newToken.length <= delimiter.length ? newToken : newToken.substr(newToken.length - delimiter.length, delimiter.length);
+                };
+
+                var doesNotMatch = function() {
+                    return token.indexOf(delimiter) === -1;
+                };
+
+                return {
+                    add: add,
+                    doesNotMatch: doesNotMatch
+                };
+            }
+
+            this.get_unformatted = function(delimiter, orig_tag) { //function to return unformatted content in its entirety
+                if (orig_tag && orig_tag.toLowerCase().indexOf(delimiter) !== -1) {
+                    return '';
+                }
+                var input_char = '';
+                var content = '';
+                var space = true;
+
+                var delimiterMatcher = tokenMatcher(delimiter);
+
+                do {
+
+                    if (this.pos >= this.input.length) {
+                        return content;
+                    }
+
+                    input_char = this.input.charAt(this.pos);
+                    this.pos++;
+
+                    if (this.Utils.in_array(input_char, this.Utils.whitespace)) {
+                        if (!space) {
+                            this.line_char_count--;
+                            continue;
+                        }
+                        if (input_char === '\n' || input_char === '\r') {
+                            content += '\n';
+                            /*  Don't change tab indention for unformatted blocks.  If using code for html editing, this will greatly affect <pre> tags if they are specified in the 'unformatted array'
+                for (var i=0; i<this.indent_level; i++) {
+                  content += this.indent_string;
+                }
+                space = false; //...and make sure other indentation is erased
+                */
+                            this.line_char_count = 0;
+                            continue;
+                        }
+                    }
+                    content += input_char;
+                    delimiterMatcher.add(input_char);
+                    this.line_char_count++;
+                    space = true;
+
+                    if (indent_handlebars && input_char === '{' && content.length && content.charAt(content.length - 2) === '{') {
+                        // Handlebars expressions in strings should also be unformatted.
+                        content += this.get_unformatted('}}');
+                        // Don't consider when stopping for delimiters.
+                    }
+                } while (delimiterMatcher.doesNotMatch());
+
+                return content;
+            };
+
+            this.get_token = function() { //initial handler for token-retrieval
+                var token;
+
+                if (this.last_token === 'TK_TAG_SCRIPT' || this.last_token === 'TK_TAG_STYLE') { //check if we need to format javascript
+                    var type = this.last_token.substr(7);
+                    token = this.get_contents_to(type);
+                    if (typeof token !== 'string') {
+                        return token;
+                    }
+                    return [token, 'TK_' + type];
+                }
+                if (this.current_mode === 'CONTENT') {
+                    token = this.get_content();
+                    if (typeof token !== 'string') {
+                        return token;
+                    } else {
+                        return [token, 'TK_CONTENT'];
+                    }
+                }
+
+                if (this.current_mode === 'TAG') {
+                    token = this.get_tag();
+                    if (typeof token !== 'string') {
+                        return token;
+                    } else {
+                        var tag_name_type = 'TK_TAG_' + this.tag_type;
+                        return [token, tag_name_type];
+                    }
+                }
+            };
+
+            this.get_full_indent = function(level) {
+                level = this.indent_level + level || 0;
+                if (level < 1) {
+                    return '';
+                }
+
+                return Array(level + 1).join(this.indent_string);
+            };
+
+            this.is_unformatted = function(tag_check, unformatted) {
+                //is this an HTML5 block-level link?
+                if (!this.Utils.in_array(tag_check, unformatted)) {
+                    return false;
+                }
+
+                if (tag_check.toLowerCase() !== 'a' || !this.Utils.in_array('a', unformatted)) {
+                    return true;
+                }
+
+                //at this point we have an  tag; is its first child something we want to remain
+                //unformatted?
+                var next_tag = this.get_tag(true /* peek. */ );
+
+                // test next_tag to see if it is just html tag (no external content)
+                var tag = (next_tag || "").match(/^\s*<\s*\/?([a-z]*)\s*[^>]*>\s*$/);
+
+                // if next_tag comes back but is not an isolated tag, then
+                // let's treat the 'a' tag as having content
+                // and respect the unformatted option
+                if (!tag || this.Utils.in_array(tag[1], unformatted)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            this.printer = function(js_source, indent_character, indent_size, wrap_line_length, brace_style) { //handles input/output and some other printing functions
+
+                this.input = js_source || ''; //gets the input for the Parser
+
+                // HACK: newline parsing inconsistent. This brute force normalizes the input.
+                this.input = this.input.replace(/\r\n|[\r\u2028\u2029]/g, '\n');
+
+                this.output = [];
+                this.indent_character = indent_character;
+                this.indent_string = '';
+                this.indent_size = indent_size;
+                this.brace_style = brace_style;
+                this.indent_level = 0;
+                this.wrap_line_length = wrap_line_length;
+                this.line_char_count = 0; //count to see if wrap_line_length was exceeded
+
+                for (var i = 0; i < this.indent_size; i++) {
+                    this.indent_string += this.indent_character;
+                }
+
+                this.print_newline = function(force, arr) {
+                    this.line_char_count = 0;
+                    if (!arr || !arr.length) {
+                        return;
+                    }
+                    if (force || (arr[arr.length - 1] !== '\n')) { //we might want the extra line
+                        if ((arr[arr.length - 1] !== '\n')) {
+                            arr[arr.length - 1] = rtrim(arr[arr.length - 1]);
+                        }
+                        arr.push('\n');
+                    }
+                };
+
+                this.print_indentation = function(arr) {
+                    for (var i = 0; i < this.indent_level; i++) {
+                        arr.push(this.indent_string);
+                        this.line_char_count += this.indent_string.length;
+                    }
+                };
+
+                this.print_token = function(text) {
+                    // Avoid printing initial whitespace.
+                    if (this.is_whitespace(text) && !this.output.length) {
+                        return;
+                    }
+                    if (text || text !== '') {
+                        if (this.output.length && this.output[this.output.length - 1] === '\n') {
+                            this.print_indentation(this.output);
+                            text = ltrim(text);
+                        }
+                    }
+                    this.print_token_raw(text);
+                };
+
+                this.print_token_raw = function(text) {
+                    // If we are going to print newlines, truncate trailing
+                    // whitespace, as the newlines will represent the space.
+                    if (this.newlines > 0) {
+                        text = rtrim(text);
+                    }
+
+                    if (text && text !== '') {
+                        if (text.length > 1 && text.charAt(text.length - 1) === '\n') {
+                            // unformatted tags can grab newlines as their last character
+                            this.output.push(text.slice(0, -1));
+                            this.print_newline(false, this.output);
+                        } else {
+                            this.output.push(text);
+                        }
+                    }
+
+                    for (var n = 0; n < this.newlines; n++) {
+                        this.print_newline(n > 0, this.output);
+                    }
+                    this.newlines = 0;
+                };
+
+                this.indent = function() {
+                    this.indent_level++;
+                };
+
+                this.unindent = function() {
+                    if (this.indent_level > 0) {
+                        this.indent_level--;
+                    }
+                };
+            };
+            return this;
+        }
+
+        /*_____________________--------------------_____________________*/
+
+        multi_parser = new Parser(); //wrapping functions Parser
+        multi_parser.printer(html_source, indent_character, indent_size, wrap_line_length, brace_style); //initialize starting values
+
+        while (true) {
+            var t = multi_parser.get_token();
+            multi_parser.token_text = t[0];
+            multi_parser.token_type = t[1];
+
+            if (multi_parser.token_type === 'TK_EOF') {
+                break;
+            }
+
+            switch (multi_parser.token_type) {
+                case 'TK_TAG_START':
+                    multi_parser.print_newline(false, multi_parser.output);
+                    multi_parser.print_token(multi_parser.token_text);
+                    if (multi_parser.indent_content) {
+                        if ((multi_parser.indent_body_inner_html || !multi_parser.token_text.match(/<body(?:.*)>/)) &&
+                            (multi_parser.indent_head_inner_html || !multi_parser.token_text.match(/<head(?:.*)>/))) {
+
+                            multi_parser.indent();
+                        }
+
+                        multi_parser.indent_content = false;
+                    }
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_STYLE':
+                case 'TK_TAG_SCRIPT':
+                    multi_parser.print_newline(false, multi_parser.output);
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_END':
+                    //Print new line only if the tag has no content and has child
+                    if (multi_parser.last_token === 'TK_CONTENT' && multi_parser.last_text === '') {
+                        var tag_name = (multi_parser.token_text.match(/\w+/) || [])[0];
+                        var tag_extracted_from_last_output = null;
+                        if (multi_parser.output.length) {
+                            tag_extracted_from_last_output = multi_parser.output[multi_parser.output.length - 1].match(/(?:<|{{#)\s*(\w+)/);
+                        }
+                        if (tag_extracted_from_last_output === null ||
+                            (tag_extracted_from_last_output[1] !== tag_name && !multi_parser.Utils.in_array(tag_extracted_from_last_output[1], unformatted))) {
+                            multi_parser.print_newline(false, multi_parser.output);
+                        }
+                    }
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_SINGLE':
+                    // Don't add a newline before elements that should remain unformatted.
+                    var tag_check = multi_parser.token_text.match(/^\s*<([a-z-]+)/i);
+                    if (!tag_check || !multi_parser.Utils.in_array(tag_check[1], unformatted)) {
+                        multi_parser.print_newline(false, multi_parser.output);
+                    }
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_HANDLEBARS_ELSE':
+                    // Don't add a newline if opening {{#if}} tag is on the current line
+                    var foundIfOnCurrentLine = false;
+                    for (var lastCheckedOutput = multi_parser.output.length - 1; lastCheckedOutput >= 0; lastCheckedOutput--) {
+                        if (multi_parser.output[lastCheckedOutput] === '\n') {
+                            break;
+                        } else {
+                            if (multi_parser.output[lastCheckedOutput].match(/{{#if/)) {
+                                foundIfOnCurrentLine = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!foundIfOnCurrentLine) {
+                        multi_parser.print_newline(false, multi_parser.output);
+                    }
+                    multi_parser.print_token(multi_parser.token_text);
+                    if (multi_parser.indent_content) {
+                        multi_parser.indent();
+                        multi_parser.indent_content = false;
+                    }
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_HANDLEBARS_COMMENT':
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'TAG';
+                    break;
+                case 'TK_CONTENT':
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'TAG';
+                    break;
+                case 'TK_STYLE':
+                case 'TK_SCRIPT':
+                    if (multi_parser.token_text !== '') {
+                        multi_parser.print_newline(false, multi_parser.output);
+                        var text = multi_parser.token_text,
+                            _beautifier,
+                            script_indent_level = 1;
+                        if (multi_parser.token_type === 'TK_SCRIPT') {
+                            _beautifier = typeof js_beautify === 'function' && js_beautify;
+                        } else if (multi_parser.token_type === 'TK_STYLE') {
+                            _beautifier = typeof css_beautify === 'function' && css_beautify;
+                        }
+
+                        if (options.indent_scripts === "keep") {
+                            script_indent_level = 0;
+                        } else if (options.indent_scripts === "separate") {
+                            script_indent_level = -multi_parser.indent_level;
+                        }
+
+                        var indentation = multi_parser.get_full_indent(script_indent_level);
+                        if (_beautifier) {
+
+                            // call the Beautifier if avaliable
+                            var Child_options = function() {
+                                this.eol = '\n';
+                            };
+                            Child_options.prototype = options;
+                            var child_options = new Child_options();
+                            text = _beautifier(text.replace(/^\s*/, indentation), child_options);
+                        } else {
+                            // simply indent the string otherwise
+                            var white = text.match(/^\s*/)[0];
+                            var _level = white.match(/[^\n\r]*$/)[0].split(multi_parser.indent_string).length - 1;
+                            var reindent = multi_parser.get_full_indent(script_indent_level - _level);
+                            text = text.replace(/^\s*/, indentation)
+                                .replace(/\r\n|\r|\n/g, '\n' + reindent)
+                                .replace(/\s+$/, '');
+                        }
+                        if (text) {
+                            multi_parser.print_token_raw(text);
+                            multi_parser.print_newline(true, multi_parser.output);
+                        }
+                    }
+                    multi_parser.current_mode = 'TAG';
+                    break;
+                default:
+                    // We should not be getting here but we don't want to drop input on the floor
+                    // Just output the text and move on
+                    if (multi_parser.token_text !== '') {
+                        multi_parser.print_token(multi_parser.token_text);
+                    }
+                    break;
+            }
+            multi_parser.last_token = multi_parser.token_type;
+            multi_parser.last_text = multi_parser.token_text;
+        }
+        var sweet_code = multi_parser.output.join('').replace(/[\r\n\t ]+$/, '');
+
+        // establish end_with_newline
+        if (end_with_newline) {
+            sweet_code += '\n';
+        }
+
+        if (eol !== '\n') {
+            sweet_code = sweet_code.replace(/[\n]/g, eol);
+        }
+
+        return sweet_code;
+    }
+
+    if (typeof undefined === "function" && undefined.amd) {
+        // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
+        undefined(["require", "./beautify", "./beautify-css"], function(requireamd) {
+            var js_beautify = requireamd("./beautify");
+            var css_beautify = requireamd("./beautify-css");
+
+            return {
+                html_beautify: function(html_source, options) {
+                    return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
+                }
+            };
+        });
+    } else {
+        // Add support for CommonJS. Just put this file somewhere on your require.paths
+        // and you will be able to `var html_beautify = require("beautify").html_beautify`.
+        var js_beautify = beautify;
+        var css_beautify = beautifyCss;
+
+        exports.html_beautify = function(html_source, options) {
+            return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
+        };
+    }
+
+}());
+});
+
+var js = createCommonjsModule(function (module) {
+/*
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
+
+/**
+The following batches are equivalent:
+
+var beautify_js = require('js-beautify');
+var beautify_js = require('js-beautify').js;
+var beautify_js = require('js-beautify').js_beautify;
+
+var beautify_css = require('js-beautify').css;
+var beautify_css = require('js-beautify').css_beautify;
+
+var beautify_html = require('js-beautify').html;
+var beautify_html = require('js-beautify').html_beautify;
+
+All methods returned accept two arguments, the source string and an options object.
+**/
+
+function get_beautify(js_beautify, css_beautify, html_beautify) {
+    // the default is js
+    var beautify$$1 = function(src, config) {
+        return js_beautify.js_beautify(src, config);
+    };
+
+    // short aliases
+    beautify$$1.js = js_beautify.js_beautify;
+    beautify$$1.css = css_beautify.css_beautify;
+    beautify$$1.html = html_beautify.html_beautify;
+
+    // legacy aliases
+    beautify$$1.js_beautify = js_beautify.js_beautify;
+    beautify$$1.css_beautify = css_beautify.css_beautify;
+    beautify$$1.html_beautify = html_beautify.html_beautify;
+
+    return beautify$$1;
+}
+
+if (typeof undefined === "function" && undefined.amd) {
+    // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
+    undefined([
+        "./lib/beautify",
+        "./lib/beautify-css",
+        "./lib/beautify-html"
+    ], function(js_beautify, css_beautify, html_beautify) {
+        return get_beautify(js_beautify, css_beautify, html_beautify);
+    });
+} else {
+    (function(mod) {
+        var js_beautify = beautify;
+        var css_beautify = beautifyCss;
+        var html_beautify = beautifyHtml;
+
+        mod.exports = get_beautify(js_beautify, css_beautify, html_beautify);
+
+    })(module);
+}
+});
+
+/*!
+ * is-whitespace <https://github.com/jonschlinkert/is-whitespace>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+var cache;
+
+var isWhitespace = function isWhitespace(str) {
+  return (typeof str === 'string') && regex().test(str);
+};
+
+function regex() {
+  // ensure that runtime compilation only happens once
+  return cache || (cache = new RegExp('^[\\s\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF"]+$'));
+}
+
+/*!
+ * is-extendable <https://github.com/jonschlinkert/is-extendable>
+ *
+ * Copyright (c) 2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+var isExtendable = function isExtendable(val) {
+  return typeof val !== 'undefined' && val !== null
+    && (typeof val === 'object' || typeof val === 'function');
+};
+
+var extendShallow = function extend(o/*, objects*/) {
+  if (!isExtendable(o)) { o = {}; }
+
+  var len = arguments.length;
+  for (var i = 1; i < len; i++) {
+    var obj = arguments[i];
+
+    if (isExtendable(obj)) {
+      assign(o, obj);
+    }
+  }
+  return o;
+};
+
+function assign(a, b) {
+  for (var key in b) {
+    if (hasOwn$5(b, key)) {
+      a[key] = b[key];
+    }
+  }
+}
+
+/**
+ * Returns true if the given `key` is an own property of `obj`.
+ */
+
+function hasOwn$5(obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+/*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+
+// The _isBuffer check is for Safari 5-7 support, because it's missing
+// Object.prototype.constructor. Remove this eventually
+var isBuffer_1 = function (obj) {
+  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+};
+
+function isBuffer (obj) {
+  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
+
+// For Node v0.10 support. Remove this eventually.
+function isSlowBuffer (obj) {
+  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
+}
+
+var toString = Object.prototype.toString;
+
+/**
+ * Get the native `typeof` a value.
+ *
+ * @param  {*} `val`
+ * @return {*} Native javascript type
+ */
+
+var kindOf$3 = function kindOf(val) {
+  // primitivies
+  if (typeof val === 'undefined') {
+    return 'undefined';
+  }
+  if (val === null) {
+    return 'null';
+  }
+  if (val === true || val === false || val instanceof Boolean) {
+    return 'boolean';
+  }
+  if (typeof val === 'string' || val instanceof String) {
+    return 'string';
+  }
+  if (typeof val === 'number' || val instanceof Number) {
+    return 'number';
+  }
+
+  // functions
+  if (typeof val === 'function' || val instanceof Function) {
+    return 'function';
+  }
+
+  // array
+  if (typeof Array.isArray !== 'undefined' && Array.isArray(val)) {
+    return 'array';
+  }
+
+  // check for instances of RegExp and Date before calling `toString`
+  if (val instanceof RegExp) {
+    return 'regexp';
+  }
+  if (val instanceof Date) {
+    return 'date';
+  }
+
+  // other objects
+  var type = toString.call(val);
+
+  if (type === '[object RegExp]') {
+    return 'regexp';
+  }
+  if (type === '[object Date]') {
+    return 'date';
+  }
+  if (type === '[object Arguments]') {
+    return 'arguments';
+  }
+  if (type === '[object Error]') {
+    return 'error';
+  }
+
+  // buffer
+  if (isBuffer_1(val)) {
+    return 'buffer';
+  }
+
+  // es6: Map, WeakMap, Set, WeakSet
+  if (type === '[object Set]') {
+    return 'set';
+  }
+  if (type === '[object WeakSet]') {
+    return 'weakset';
+  }
+  if (type === '[object Map]') {
+    return 'map';
+  }
+  if (type === '[object WeakMap]') {
+    return 'weakmap';
+  }
+  if (type === '[object Symbol]') {
+    return 'symbol';
+  }
+
+  // typed arrays
+  if (type === '[object Int8Array]') {
+    return 'int8array';
+  }
+  if (type === '[object Uint8Array]') {
+    return 'uint8array';
+  }
+  if (type === '[object Uint8ClampedArray]') {
+    return 'uint8clampedarray';
+  }
+  if (type === '[object Int16Array]') {
+    return 'int16array';
+  }
+  if (type === '[object Uint16Array]') {
+    return 'uint16array';
+  }
+  if (type === '[object Int32Array]') {
+    return 'int32array';
+  }
+  if (type === '[object Uint32Array]') {
+    return 'uint32array';
+  }
+  if (type === '[object Float32Array]') {
+    return 'float32array';
+  }
+  if (type === '[object Float64Array]') {
+    return 'float64array';
+  }
+
+  // must be a plain object
+  return 'object';
+};
+
+var condenseNewlines = function(str, options) {
+  var opts = extendShallow({}, options);
+  var sep = opts.sep || '\n\n';
+  var min = opts.min;
+  var re;
+
+  if (typeof min === 'number' && min !== 2) {
+    re = new RegExp('(\\r\\n|\\n|\\u2424) {' + min + ',}');
+  }
+  if (typeof re === 'undefined') {
+    re = opts.regex || /(\r\n|\n|\u2424){2,}/g;
+  }
+
+  // if a line is 100% whitespace it will be trimmed, so that
+  // later we can condense newlines correctly
+  if (opts.keepWhitespace !== true) {
+    str = str.split('\n').map(function(line) {
+      return isWhitespace(line) ? line.trim() : line;
+    }).join('\n');
+  }
+
+  str = trailingNewline(str, opts);
+  return str.replace(re, sep);
+};
+
+function trailingNewline(str, options) {
+  var val = options.trailingNewline;
+  if (val === false) {
+    return str;
+  }
+
+  switch (kindOf$3(val)) {
+    case 'string':
+      str = str.replace(/\s+$/, options.trailingNewline);
+      break;
+    case 'function':
+      str = options.trailingNewline(str);
+      break;
+    case 'undefined':
+    case 'boolean':
+    default: {
+      str = str.replace(/\s+$/, '\n');
+      break;
+    }
+  }
+  return str;
+}
+
+var defaults = {
+  unformatted: ['code', 'pre', 'em', 'strong', 'span'],
+  indent_inner_html: true,
+  indent_char: ' ',
+  indent_size: 2,
+  sep: '\n'
+};
+
+var pretty = function pretty(str, options) {
+  var opts = extendShallow({}, defaults, options);
+  str = js.html(str, opts);
+
+  if (opts.ocd === true) {
+    if (opts.newlines) { opts.sep = opts.newlines; }
+    return ocd(str, opts);
+  }
+
+  return str;
+};
+
+function ocd(str, options) {
+  // Normalize and condense all newlines
+  return condenseNewlines(str, options)
+    // Remove empty whitespace the top of a file.
+    .replace(/^\s+/g, '')
+    // Remove extra whitespace from eof
+    .replace(/\s+$/g, '\n')
+
+    // Add a space above each comment
+    .replace(/(\s*<!--)/g, '\n$1')
+    // Bring closing comments up to the same line as closing tag.
+    .replace(/>(\s*)(?=<!--\s*\/)/g, '> ');
+}
+
+var script$32 = function() {
+  this.getBeautifiedHtml = () => {
+    const data = this.opts.data;
+    if (!data) {
+      return '-';
+    }
+    return pretty(data);
+  };
+};
+
+riot$1.tag2('dmc-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="Prettyhtml"', function(opts) {
+    this.external(script$32);
+});
+
+var script$33 = function() {
+  /**
+   * undefined等の値を考慮した最適な値を返します。
+   * @param {String|null} value
+   * @return {String|null}
+   */
+  this.normalizeValue = value => {
+    if (!isString_1(value)) {
+      return null;
+    }
+    return value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+  };
+
+  this.on('mount', () => {
+    this.refs.textarea.value = this.normalizeValue(this.opts.text);
+    this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
+  }).on('updated', () => {
+    this.refs.textarea.value = this.normalizeValue(this.opts.text);
+  });
+
+  this.handleTap = () => {
+    this.refs.form.focus();
+  };
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    this.opts.onchange && this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleTextareaInput = e => {
+    e.preventUpdate = true;
+    this.opts.onchange && this.opts.onchange(this.normalizeValue(e.target.value), this.opts.id);
+  };
+
+  this.handleTextareaChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
+  };
+};
+
+riot$1.tag2('dmc-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea" ref="touch" ontap="handleTap"', function(opts) {
     this.external(script$33);
 });
 
-var script$32 = function() {
+var script$34 = function() {
+  // 各タブの選択状態。
+  this.isTabEditorSelected = true;
+  this.isTabPreviewSelected = false;
+
+  /**
+   * htmlをコンパイルします。
+   * @return {Object}
+   */
+  this.compileHtml = () => {
+    const text = this.opts.text;
+    const result = {
+      status: ''
+    };
+    if (!text) {
+      result.status = 'ready';
+      return result;
+    }
+    try {
+      result.status = 'success';
+      result.message = 'コンパイル成功';
+      result.html = text;
+    } catch (err) {
+      result.status = 'failed';
+      result.message = err.message;
+    }
+    return result;
+  };
+
+  /**
+   * editorタブがタップされた時の処理。
+   */
+  this.handleTabEditorTap = () => {
+    this.isTabEditorSelected = true;
+    this.isTabPreviewSelected = false;
+    this.update();
+  };
+
+  /**
+   * previewタブがタップされた時の処理。
+   */
+  this.handleTabPreviewTap = () => {
+    this.isTabEditorSelected = false;
+    this.isTabPreviewSelected = true;
+    this.update();
+  };
+
+  /**
+   * editor値が変更された時の処理。
+   * @param {String} newText
+   */
+  this.handleEditorChange = newText => {
+    this.opts.onchange && this.opts.onchange(newText);
+  };
+};
+
+riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Html__tab {\'Html__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Html__body"> <div class="Html__message Html__message--{compileHtml().status}" if="{compileHtml().status === \'failed\'}">{compileHtml().message}</div> <div class="Html__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Html__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compileHtml().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Html"', function(opts) {
+    this.external(script$34);
+});
+
+/**
+     */
+    function isNumber(val) {
+        return isKind_1$1(val, 'Number');
+    }
+    var isNumber_1 = isNumber;
+
+/**
+     * ES6 Number.isNaN
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN
+     */
+    function isNaN$3(val){
+        // jshint eqeqeq:false
+        return typeof val === 'number' && val != val;
+    }
+
+    var _isNaN$1 = isNaN$3;
+
+/**
+     * Check if value is NaN for realz
+     */
+    function isNaN$1(val){
+        // based on the fact that NaN !== NaN
+        // need to check if it's a number to avoid conflicts with host objects
+        // also need to coerce ToNumber to avoid edge case `new Number(NaN)`
+        return !isNumber_1(val) || _isNaN$1(Number(val));
+    }
+
+    var _isNaN = isNaN$1;
+
+/**
+     */
+    function isNull(val){
+        return val === null;
+    }
+    var isNull_1 = isNull;
+
+var UNDEF$3;
+
+    /**
+     */
+    function isUndef(val){
+        return val === UNDEF$3;
+    }
+    var isUndefined = isUndef;
+
+var script$35 = function() {
+  /**
+   * moutの`isNumber`のラッパー関数。
+   * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
+   * @param {*} num
+   */
+  const isNumber = num => {
+    if (_isNaN(num)) {
+      return false;
+    }
+    return isNumber_1(num);
+  };
+  // opts文字列指定も許可する。
+  let min, max, step;
+  min = Number(this.opts.min);
+  max = Number(this.opts.max);
+  step = Number(this.opts.step);
+  min = (isNumber(min) ? min : null);
+  max = (isNumber(max) ? max : null);
+  step = (isNumber(step) ? step : null);
+
+  /**
+   * 現在値を指定step数分インクリメントして返却します。
+   * @return {Number}
+   */
+  const increment = () => {
+    const currentValue = this.normalizeValue(this.opts.number);
+    const n = isNumber(step) ? step : 1;
+    let newValue;
+    if (isNull_1(currentValue)) {
+      newValue = n;
+    } else {
+      newValue = currentValue + n;
+    }
+    return this.normalizeValue(newValue);
+  };
+
+  /**
+   * 現在値を指定step数分デクリメントして返却します。
+   * @return {Number}
+   */
+  const decrement = () => {
+    const currentValue = this.normalizeValue(this.opts.number);
+    const n = isNumber(step) ? step : 1;
+    let newValue;
+    if (isNull_1(currentValue)) {
+      newValue = n * (-1);
+    } else {
+      newValue = currentValue - n;
+    }
+    return this.normalizeValue(newValue);
+  };
+
+  /**
+   * nullやundefined等を考慮した上で最適な値を返します。
+   * @param {Number|String|null|undefined} value
+   * @return {Number|null}
+   */
+  this.normalizeValue = value => {
+    // nullの場合はそのまま扱う。
+    if (isNull_1(value)) {
+      return value;
+    }
+
+    // undefined時はnullとして扱う。
+    if (isUndefined(value)) {
+      return null;
+    }
+
+    // 文字列を受け取った場合は形式によって返却値が変わる。
+    if (isString_1(value)) {
+      // 数字と`-`のみも文字列に変換する。
+      value = value.replace(/[^-^0-9]/g, '');
+      // 空文字列の場合はnullとして扱う。
+      if (!value.length) {
+        return null;
+      }
+      // 数値に変換する。
+      // `-12` -> 12
+      // `0012` -> 12
+      // `1-2` ->  NaN
+      value = Number(value);
+      // NaNはnullとして扱う。
+      if (_isNaN(value)) {
+        return null;
+      }
+    }
+
+    // この時点で`validValue`は必ずNumberとなる。
+
+    // 最大値が設定されている 且つ 最大値を超えているケースへの対応。
+    if (isNumber(max) && value > max) {
+      value = max;
+    }
+    // 最小値が設定されている 且つ 最小値より小さいケースへの対応。
+    if (isNumber(min) && value < min) {
+      value = min;
+    }
+
+    return value;
+  };
+
+  /**
+   * インクリメント可能かチェックします。
+   * @return {Boolean}
+   */
+  this.isIncrementable = () => {
+    // 最大値が設定されていなければ常にincrement可能とする。
+    if (!isNumber(max)) {
+      return true;
+    }
+    const incrementedValue = increment();
+    if (incrementedValue > max) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  /**
+   * デクリメント可能かチェックします。
+   * @return {Boolean}
+   */
+  this.isDecrementable = () => {
+    // 最小値が設定されていなければ常にincrement可能とする。
+    if (!isNumber(min)) {
+      return true;
+    }
+    const decrementedValue = decrement();
+    if (decrementedValue < min) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  // @see: https://developer.mozilla.org/ja/docs/Web/API/Element/setAttribute
+  // setAttribute() を使ってある属性、XUL や HTML の特別な値、および HTML の選択領域の変更は、属性がデフォルト値を特定している場合に一貫性の無い動作となります。現在の値にアクセスしたり、変更したりするにはプロパティを使用すべきです。具体例として、 elt .setAttribute('value', val ) の代わりに elt .value を使用します。
+  this.on('mount', () => {
+    this.refs.input.value = this.normalizeValue(this.opts.number);
+    // 初期値の誤りを正すために初回のみonchangeを実行する。
+    // 例えば、min=50 number=10の場合は新number`50`でonchangeが実行される。
+    this.opts.onchange(this.normalizeValue(this.opts.number));
+  }).on('updated', () => {
+    this.refs.input.value = this.normalizeValue(this.opts.number);
+  });
+
+  /**
+   * form要素でkeyイベントが発生した際の処理。
+   * @param {Object} e
+   */
+  this.handleFormKeyDown = e => {
+    e.preventUpdate = true;
+    switch (e.code) {
+    case 'ArrowUp':
+      this.opts.onchange(increment());
+      break;
+    case 'ArrowDown':
+      this.opts.onchange(decrement());
+      break;
+    default:
+      break;
+    }
+  };
+
+  /**
+   * input値に変更があった際の処理。
+   * @param {Object} e
+   */
+  this.handleInputChange = e => {
+    e.preventUpdate = true;
+    // input要素のchangeイベントは不安定に発火するのでイベント伝播を止める役割にとどめます。
+    e.stopPropagation();
+  };
+
+  /**
+   * input値に変更があった際の処理。
+   * @param {Object} e
+   */
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    this.opts.onchange(this.normalizeValue(e.target.value));
+  };
+
+  /**
+   * increaseボタンがタップされた時の処理。
+   */
+  this.handleIncreaseButtonPat = () => {
+    // ボタンが押されたとき、inputにフォーカスすることで、矢印ボタンでも加減できるようにする
+    this.refs.input.focus();
+    this.opts.onchange(increment());
+  };
+
+  /**
+   * decreaseボタンがタップされた時の処理。
+   */
+  this.handleDecreaseButtonPat = () => {
+    // ボタンが押されたとき、inputにフォーカスすることで、矢印ボタンでも加減できるようにする
+    this.refs.input.focus();
+    this.opts.onchange(decrement());
+  };
+
+};
+
+riot$1.tag2('dmc-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" onsubmit="{handleFormSubmit}" onkeydown="{handleFormKeyDown}"> <input class="Numberinput__input" ref="input" riot-value="{normalizeValue(opts.number)}" placeholder="{opts.placeholder || \'\'}" oninput="{handleInputInput}" onchange="{handleInputChange}"> <div class="Numberinput__handler"> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : !isIncrementable()}" ontap="handleIncreaseButtonPat" ref="touch"> <dmc-icon type="caretUp"></dmc-icon> </div> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : !isDecrementable()}" ontap="handleDecreaseButtonPat" ref="touch"> <dmc-icon type="caretDown"></dmc-icon> </div> </div> </form>', '', 'class="Numberinput"', function(opts) {
+    this.external(script$35);
+});
+
+// NOTE: ブラウザ上でpugを動かすためには`https://pugjs.org/js/pug.js`を使用する必要がある。
+const pug = window.require && window.require('pug');
+
+var script$36 = function() {
+  // 各タブの選択状態。
+  this.isTabEditorSelected = true;
+  this.isTabPreviewSelected = false;
+
+  /**
+   * pugをコンパイルします。
+   * @return {Object}
+   */
+  this.compilePug = () => {
+    const text = this.opts.text;
+    const result = {
+      status: ''
+    };
+    if (!text) {
+      result.status = 'ready';
+      return result;
+    }
+    try {
+      result.status = 'success';
+      result.message = 'コンパイル成功';
+      result.html = pug.render(text);
+    } catch (err) {
+      result.status = 'failed';
+      result.message = err.message;
+    }
+    return result;
+  };
+
+  /**
+   * editorタブがタップされた時の処理。
+   */
+  this.handleTabEditorTap = () => {
+    this.isTabEditorSelected = true;
+    this.isTabPreviewSelected = false;
+    this.update();
+  };
+
+  /**
+   * previewタブがタップされた時の処理。
+   */
+  this.handleTabPreviewTap = () => {
+    this.isTabEditorSelected = false;
+    this.isTabPreviewSelected = true;
+    this.update();
+  };
+
+  /**
+   * editor値が変更された時の処理。
+   * @param {String} newText
+   */
+  this.handleEditorChange = newText => {
+    this.opts.onchange && this.opts.onchange(newText);
+  };
+};
+
+riot$1.tag2('dmc-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Pug__tab {\'Pug__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Pug__body"> <div class="Pug__message Pug__message--{compilePug().status}" if="{compilePug().status === \'failed\'}">{compilePug().message}</div> <div class="Pug__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Pug__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compilePug().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Pug"', function(opts) {
+    this.external(script$36);
+});
+
+// TODO: node_moduleから読み込みたい。
+const Quill$2 = window.Quill;
+const QuillBlotBold = Quill$2.import('formats/bold');
+
+class BlotBold extends QuillBlotBold {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$3 = window.Quill;
+const QuillBlotItalic = Quill$3.import('formats/italic');
+
+class BlotItalic extends QuillBlotItalic { }
+
+// TODO: node_moduleから読み込みたい。
+const Quill$4 = window.Quill;
+const QuillBlotUnderline = Quill$4.import('formats/underline');
+
+class BlotUnderline extends QuillBlotUnderline { }
+
+// TODO: node_moduleから読み込みたい。
+const Quill$5 = window.Quill;
+const QuillBlotStrike = Quill$5.import('formats/strike');
+
+class BlotStrike extends QuillBlotStrike { }
+
+// TODO: node_moduleから読み込みたい。
+const Quill$6 = window.Quill;
+const QuillBlotLink = Quill$6.import('formats/link');
+
+class BlotLink extends QuillBlotLink {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$7 = window.Quill;
+const QuillBlotCode = Quill$7.import('formats/code');
+
+class BlotCode extends QuillBlotCode {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$8 = window.Quill;
+const QuillBlotScript = Quill$8.import('formats/script');
+
+class BlotScript extends QuillBlotScript {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$9 = window.Quill;
+const QuillBlockEmbed = Quill$9.import('blots/block/embed');
+
+class BlotImage extends QuillBlockEmbed {
+  static create(value) {
+    const node = super.create();
+    node.setAttribute('src', value);
+    return node;
+  }
+
+  static value(node) {
+    return node.getAttribute('src');
+  }
+}
+BlotImage.blotName = 'image';
+BlotImage.tagName = 'img';
+
+Quill$9.register(BlotImage);
+
+const Quill$10 = window.Quill;
+const QuillBlotVideo = Quill$10.import('formats/video');
+
+class BlotVideo extends QuillBlotVideo {}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$11 = window.Quill;
+const QuillBlotHeader = Quill$11.import('formats/header');
+
+class BlotHeader extends QuillBlotHeader {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$12 = window.Quill;
+const QuillBlotList = Quill$12.import('formats/list');
+
+class BlotList extends QuillBlotList {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$13 = window.Quill;
+const QuillBlotListItem = Quill$13.import('formats/list/item');
+
+class BlotListItem extends QuillBlotListItem {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$14 = window.Quill;
+const QuillBlotBlockquote = Quill$14.import('formats/blockquote');
+
+class BlotBlockquote extends QuillBlotBlockquote {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$15 = window.Quill;
+const QuillBlotCodeBlock = Quill$15.import('formats/code-block');
+
+class BlotCodeBlock extends QuillBlotCodeBlock {
+}
+
+// TODO: node_moduleから読み込みたい。
+const Quill$16 = window.Quill;
+const QuillAttributorClassColor = Quill$16.import('attributors/class/color');
+const QuillAttributorStyleColor = Quill$16.import('attributors/style/color');
+
+// デフォルトでstyle属性を使用する。
+Quill$16.register(QuillAttributorStyleColor, true);
+
+// TODO: node_moduleから読み込みたい。
+const Quill$17 = window.Quill;
+const QuillAttributorClassBackground = Quill$17.import('attributors/class/background');
+const QuillAttributorStyleBackground = Quill$17.import('attributors/style/background');
+
+// デフォルトでstyle属性を使用する。
+Quill$17.register(QuillAttributorStyleBackground, true);
+
+// TODO: node_moduleから読み込みたい。
+const Quill$18 = window.Quill;
+const QuillAttributorClassFont = Quill$18.import('attributors/class/font');
+const QuillAttributorStyleFont = Quill$18.import('attributors/style/font');
+
+// デフォルトでstyle属性を使用する。
+Quill$18.register(QuillAttributorStyleFont, true);
+
+// TODO: node_moduleから読み込みたい。
+const Quill$19 = window.Quill;
+const QuillAttributorClassSize = Quill$19.import('attributors/class/size');
+const QuillAttributorStyleSize = Quill$19.import('attributors/style/size');
+
+// デフォルトでstyle属性を使用する。
+Quill$19.register(QuillAttributorStyleSize, true);
+
+// TODO: node_moduleから読み込みたい。
+const Quill$20 = window.Quill;
+const QuillAttributorClassIndent = Quill$20.import('formats/indent');
+// 何故か`attributes`配下に存在しない。。
+//const QuillAttributorClassIndent = Quill.import('attributors/class/indent');
+
+const AttributorClassIndent = QuillAttributorClassIndent;
+
+// TODO: node_moduleから読み込みたい。
+const Quill$21 = window.Quill;
+const QuillAttributorClassAlign = Quill$21.import('attributors/class/align');
+const QuillAttributorStyleAlign = Quill$21.import('attributors/style/align');
+
+// デフォルトでstyle属性を使用する。
+Quill$21.register(QuillAttributorStyleAlign, true);
+
+// TODO: node_moduleから読み込みたい。
+const Quill$22 = window.Quill;
+const QuillAttributorClassDirection = Quill$22.import('attributors/class/direction');
+const QuillAttributorStyleDirection = Quill$22.import('attributors/style/direction');
+
+// デフォルトでstyle属性を使用する。
+Quill$22.register(QuillAttributorStyleDirection, true);
+
+// TODO: node_moduleから読み込みたい。
+const Quill = window.Quill;
+
+// Blot群。
+// Attributor群。
+/**
+ * BlotBoldを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotBold = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotBold.className = className;
+  }
+  if (!!tagName) {
+    // TODO: 何故配列ならMaximum optimizeが発生しないのが確認すること。
+    if (tagName.toLowerCase() === 'span') {
+      BlotBold.tagName = [tagName];
+    } else {
+      BlotBold.tagName = tagName;
+    }
+  }
+  Quill.register(BlotBold);
+};
+
+/**
+ * BlotItalicを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotItalic = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotItalic.className = className;
+  }
+  if (!!tagName) {
+    BlotItalic.tagName = tagName;
+  }
+  Quill.register(BlotItalic);
+};
+
+/**
+ * BlotUnderlineを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotUnderline = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotUnderline.className = className;
+  }
+  if (!!tagName) {
+    BlotUnderline.tagName = tagName;
+  }
+  Quill.register(BlotUnderline);
+};
+
+/**
+ * BlotStrikeを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotStrike = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotStrike.className = className;
+  }
+  if (!!tagName) {
+    BlotStrike.tagName = tagName;
+  }
+  Quill.register(BlotStrike);
+};
+
+/**
+ * BlotLinkを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotLink = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotLink.className = className;
+  }
+  if (!!tagName) {
+    BlotLink.tagName = tagName;
+  }
+  Quill.register(BlotLink);
+};
+
+/**
+ * BlotCodeを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotCode = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotCode.className = className;
+  }
+  if (!!tagName) {
+    BlotCode.tagName = tagName;
+  }
+  Quill.register(BlotCode);
+};
+
+/**
+ * BlotScriptを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotScript = params => {
+  const { className } = params;
+  if (!!className) {
+    BlotScript.className = className;
+  }
+  Quill.register(BlotScript);
+};
+
+/**
+ * BlotImageを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotImage = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotImage.className = className;
+  }
+  if (!!tagName) {
+    BlotImage.tagName = tagName;
+  }
+  Quill.register(BlotImage);
+};
+
+/**
+ * BlotVideoを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotVideo = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotVideo.className = className;
+  }
+  if (!!tagName) {
+    BlotVideo.tagName = tagName;
+  }
+  Quill.register(BlotVideo);
+};
+
+/**
+ * BlotHeaderを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotHeader = params => {
+  const { className } = params;
+  if (!!className) {
+    BlotHeader.className = className;
+  }
+  Quill.register(BlotHeader);
+};
+
+/**
+ * BlotListを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotList = params => {
+  const { className } = params;
+  if (!!className) {
+    BlotList.className = className;
+  }
+  Quill.register(BlotList);
+};
+
+/**
+ * BlotListItemを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotListItem = params => {
+  const { className } = params;
+  if (!!className) {
+    BlotListItem.className = className;
+  }
+  Quill.register(BlotListItem);
+};
+
+/**
+ * BlotBlockquoteを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotBlockquote = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotBlockquote.className = className;
+  }
+  if (!!tagName) {
+    BlotBlockquote.tagName = tagName;
+  }
+  Quill.register(BlotBlockquote);
+};
+
+/**
+ * BlotCodeBlockを書き換えます。
+ * @param {Object} params
+ */
+const customizeBlotCodeBlock = params => {
+  const { className, tagName } = params;
+  if (!!className) {
+    BlotCodeBlock.className = className;
+  }
+  if (!!tagName) {
+    BlotCodeBlock.tagName = tagName;
+  }
+  Quill.register(BlotCodeBlock);
+};
+
+/**
+ * AttributorColorを書き換えます。
+ * @param {Object} params
+ */
+const customizeAttributorColor = params => {
+  const { type = 'style', keyName } = params;
+  if (type === 'style') {
+    Quill.register(QuillAttributorStyleColor, true);
+  } else {
+    if (!!keyName) {
+      QuillAttributorClassColor.keyName = keyName;
+    }
+    Quill.register(QuillAttributorClassColor, true);
+  }
+};
+
+/**
+ * AttributorBackgroundを書き換えます。
+ * @param {Object} params
+ */
+const customizeAttributorBackground = params => {
+  const { type = 'style', keyName } = params;
+  if (type === 'style') {
+    Quill.register(QuillAttributorStyleBackground, true);
+  } else {
+    if (!!keyName) {
+      QuillAttributorClassBackground.keyName = keyName;
+    }
+    Quill.register(QuillAttributorClassBackground, true);
+  }
+};
+
+/**
+ * AttributorFontを書き換えます。
+ * @param {Object} params
+ */
+const customizeAttributorFont = params => {
+  const { type = 'style', keyName, whitelist = [] } = params;
+  QuillAttributorClassFont.whitelist = whitelist;
+  if (type === 'style') {
+    Quill.register(QuillAttributorStyleFont, true);
+  } else {
+    if (!!keyName) {
+      QuillAttributorClassFont.keyName = keyName;
+    }
+    Quill.register(QuillAttributorClassFont, true);
+  }
+};
+
+/**
+ * AttributorSizeを書き換えます。
+ * @param {Object} params
+ */
+const customizeAttributorSize = params => {
+  const { type = 'style', keyName, whitelist = [] } = params;
+  QuillAttributorClassSize.whitelist = whitelist;
+  if (type === 'style') {
+    Quill.register(QuillAttributorStyleSize, true);
+  } else {
+    if (!!keyName) {
+      QuillAttributorClassSize.keyName = keyName;
+    }
+    Quill.register(QuillAttributorClassSize, true);
+  }
+};
+
+/**
+ * AttributorIndentを書き換えます。
+ * @param {Object} params
+ */
+const customizeAttributorIndent = params => {
+  const { keyName } = params;
+  if (!!keyName) {
+    AttributorClassIndent.keyName = keyName;
+  }
+  Quill.register(AttributorClassIndent, true);
+};
+
+/**
+ * AttributorAlignを書き換えます。
+ * @param {Object} params
+ */
+const customizeAttributorAlign = params => {
+  const { type = 'style', keyName } = params;
+  if (type === 'style') {
+    Quill.register(QuillAttributorStyleAlign, true);
+  } else {
+    if (!!keyName) {
+      QuillAttributorClassAlign.keyName = keyName;
+    }
+    Quill.register(QuillAttributorClassAlign, true);
+  }
+};
+
+/**
+ * AttributorDirectionを書き換えます。
+ * @param {Object} params
+ */
+const customizeAttributorDirection = params => {
+  const { type = 'style', keyName } = params;
+  if (type === 'style') {
+    Quill.register(QuillAttributorStyleDirection, true);
+  } else {
+    if (!!keyName) {
+      QuillAttributorClassDirection.keyName = keyName;
+    }
+    Quill.register(QuillAttributorClassDirection, true);
+  }
+};
+
+/**
+ * 指定Blotを書き換えます。
+ * @param {String} blotName
+ * @param {Object} params
+ */
+const customizeBlot = (blotName, params) => {
+  switch (blotName) {
+  case 'bold':
+    customizeBlotBold(params);
+    break;
+  case 'italic':
+    customizeBlotItalic(params);
+    break;
+  case 'underline':
+    customizeBlotUnderline(params);
+    break;
+  case 'strike':
+    customizeBlotStrike(params);
+    break;
+  case 'link':
+    customizeBlotLink(params);
+    break;
+  case 'code':
+    customizeBlotCode(params);
+    break;
+  case 'script':
+    customizeBlotScript(params);
+    break;
+  case 'image':
+    customizeBlotImage(params);
+    break;
+  case 'video':
+    customizeBlotVideo(params);
+    break;
+  case 'header':
+    customizeBlotHeader(params);
+    break;
+  case 'list':
+    customizeBlotList(params);
+    break;
+  case 'list-item':
+    customizeBlotListItem(params);
+    break;
+  case 'blockquote':
+    customizeBlotBlockquote(params);
+    break;
+  case 'code-block':
+    customizeBlotCodeBlock(params);
+    break;
+  case 'color':
+    customizeAttributorColor(params);
+    break;
+  case 'background':
+    customizeAttributorBackground(params);
+    break;
+  case 'font':
+    customizeAttributorFont(params);
+    break;
+  case 'size':
+    customizeAttributorSize(params);
+    break;
+  case 'indent':
+    customizeAttributorIndent(params);
+    break;
+  case 'align':
+    customizeAttributorAlign(params);
+    break;
+  case 'direction':
+    customizeAttributorDirection(params);
+    break;
+  default:
+    break;
+  }
+};
+
+var script$37 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'center');
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    this.opts.quill.format('align', 'center', Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-align-center', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="15" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="14" x2="4" y1="14" y2="14"></line> <line class="ql-stroke" x1="12" x2="6" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignCenter {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$37);
+});
+
+var script$38 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'left');
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    this.opts.quill.format('align', false, Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-align-left', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="3" x2="13" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="9" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignLeft {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$38);
+});
+
+var script$39 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'right');
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    this.opts.quill.format('align', 'right', Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-align-right', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="15" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="15" x2="5" y1="14" y2="14"></line> <line class="ql-stroke" x1="15" x2="9" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignRight {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$39);
+});
+
+var script$40 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = hasOwn_1$1(formats, 'blockquote');
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    this.opts.quill.format('blockquote', !this.isActive, Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-blockquote', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-fill ql-stroke" height="3" width="3" x="4" y="5"></rect> <rect class="ql-fill ql-stroke" height="3" width="3" x="11" y="5"></rect> <path class="ql-even ql-fill ql-stroke" d="M7,8c0,4.031-3,5-3,5"></path> <path class="ql-even ql-fill ql-stroke" d="M14,8c0,4.031-3,5-3,5"></path> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__blockquote {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$40);
+});
+
+var script$41 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = hasOwn_1$1(formats, 'code-block');
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    this.opts.quill.format('code-block', !this.isActive, Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-codeblock', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <polyline class="ql-even ql-stroke" points="5 7 3 9 5 11"></polyline> <polyline class="ql-even ql-stroke" points="13 7 15 9 13 11"></polyline> <line class="ql-stroke" x1="10" x2="8" y1="5" y2="13"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__codeblock {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$41);
+});
+
+var script$42 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = hasOwn_1$1(formats, 'direction');
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    const value = (this.isActive ? false : 'rtl');
+    this.opts.quill.format('direction', value, Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-direction', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg if="{!isActive}" viewbox="0 0 18 18"> <polygon class="ql-stroke ql-fill" points="3 11 5 9 3 7 3 11"></polygon> <line class="ql-stroke ql-fill" x1="15" x2="11" y1="4" y2="4"></line> <path class="ql-fill" d="M11,3a3,3,0,0,0,0,6h1V3H11Z"></path> <rect class="ql-fill" height="11" width="1" x="11" y="4"></rect> <rect class="ql-fill" height="11" width="1" x="13" y="4"></rect> </svg> <svg if="{isActive}" viewbox="0 0 18 18"> <polygon class="ql-stroke ql-fill" points="15 12 13 10 15 8 15 12"></polygon> <line class="ql-stroke ql-fill" x1="9" x2="5" y1="4" y2="4"></line> <path class="ql-fill" d="M5,3A3,3,0,0,0,5,9H6V3H5Z"></path> <rect class="ql-fill" height="11" width="1" x="5" y="4"></rect> <rect class="ql-fill" height="11" width="1" x="7" y="4"></rect> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__direction {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$42);
+});
+
+var script$43 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = hasOwn_1$1(formats, 'header') && formats['header'] === this.opts.level;
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    const value = (this.isActive ? false : this.opts.level);
+    this.opts.quill.format('header', value, Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-header', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="3" y1="4" y2="14"></line> <line class="ql-stroke" x1="11" x2="11" y1="4" y2="14"></line> <line class="ql-stroke" x1="11" x2="3" y1="9" y2="9"></line> </svg> <div class="Wyswyg__headerLevel">{opts.level}</div> </div>', '', 'class="Wyswyg__tool Wyswyg__header {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$43);
+});
+
+var script$44 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = hasOwn_1$1(formats, 'image');
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    // TODO: url入力フォームを表示
+    this.opts.quill.format('image', 'https://dummyimage.com/600x400/000/fff', Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-image', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-stroke" height="10" width="12" x="3" y="4"></rect> <circle class="ql-fill" cx="6" cy="7" r="1"></circle> <polyline class="ql-even ql-fill" points="5 12 5 11 7 9 8 10 11 7 13 9 13 12 5 12"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__image {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$44);
+});
+
+var script$45 = function() {
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    this.opts.quill.format('indent', '-1', Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-indent-left', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="9" x2="15" y1="9" y2="9"></line> <polyline class="ql-stroke" points="5 7 5 11 3 9 5 7"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__indentLeft"', function(opts) {
+    this.external(script$45);
+});
+
+var script$46 = function() {
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    this.opts.quill.format('indent', '+1', Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-indent-right', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="9" x2="15" y1="9" y2="9"></line> <polyline class="ql-fill ql-stroke" points="3 7 3 11 5 9 3 7"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__indentRight"', function(opts) {
+    this.external(script$46);
+});
+
+var script$47 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = hasOwn_1$1(formats, 'list') && formats['list'] === 'bullet';
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    const value = (this.isActive ? false : 'bullet');
+    this.opts.quill.format('list', value, Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-list-bullet', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="6" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="6" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="6" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="3" y1="4" y2="4"></line> <line class="ql-stroke" x1="3" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="3" x2="3" y1="14" y2="14"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__listBullet {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$47);
+});
+
+var script$48 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = hasOwn_1$1(formats, 'list') && formats['list'] === 'ordered';
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    const value = (this.isActive ? false : 'ordered');
+    this.opts.quill.format('list', value, Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-list-ordered', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="7" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="7" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="7" x2="15" y1="14" y2="14"></line> <line class="ql-stroke ql-thin" x1="2.5" x2="4.5" y1="5.5" y2="5.5"></line> <path class="ql-fill" d="M3.5,6A0.5,0.5,0,0,1,3,5.5V3.085l-0.276.138A0.5,0.5,0,0,1,2.053,3c-0.124-.247-0.023-0.324.224-0.447l1-.5A0.5,0.5,0,0,1,4,2.5v3A0.5,0.5,0,0,1,3.5,6Z"></path> <path class="ql-stroke ql-thin" d="M4.5,10.5h-2c0-.234,1.85-1.076,1.85-2.234A0.959,0.959,0,0,0,2.5,8.156"></path> <path class="ql-stroke ql-thin" d="M2.5,14.846a0.959,0.959,0,0,0,1.85-.109A0.7,0.7,0,0,0,3.75,14a0.688,0.688,0,0,0,.6-0.736,0.959,0.959,0,0,0-1.85-.109"></path> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__listOrdered {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$48);
+});
+
+var script$49 = function() {
+  // formatが適用中か否か。
+  this.isActive = false;
+
+  /**
+   * formatボタン等のactive状態を更新します。
+   * @param {Quill.Range} range
+   */
+  const updateActiveStatus = range => {
+    const formats = (!range ? {} : this.opts.quill.getFormat(range));
+    this.isActive = hasOwn_1$1(formats, 'video');
+    this.update();
+  };
+
+  this.on('mount', () => {
+    this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  }).on('unmount', () => {
+    this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.opts.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+  });
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {
+    const range = args[0];
+    if (name == Quill.events.SELECTION_CHANGE) {
+      updateActiveStatus(range);
+    }
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {
+    const [range, ] = this.opts.quill.selection.getRange();
+    updateActiveStatus(range);
+  };
+
+  /**
+   * タップ領域がタップされた時の処理。
+   */
+  this.handleInnerTap = () => {
+    this.opts.quill.focus();
+    // TODO: url入力フォームを表示
+    this.opts.quill.format('video', 'https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0', Quill.sources.USER);
+  };
+};
+
+riot$1.tag2('dmc-wyswyg-tool-video', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-stroke" height="12" width="12" x="3" y="3"></rect> <rect class="ql-fill" height="12" width="1" x="5" y="3"></rect> <rect class="ql-fill" height="12" width="1" x="12" y="3"></rect> <rect class="ql-fill" height="2" width="8" x="5" y="8"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="5"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="7"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="10"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="12"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="5"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="7"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="10"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="12"></rect> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__video {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
+    this.external(script$49);
+});
+
+var script$50 = function() {
+  const blotOptions = this.opts.blotoptions || {};
+
+  // quillインスタンス。
+  this.quill = null;
+  // quillのbubble用cssを使用するか否か。
+  this.isBubbled = !blotOptions['external-css-file'];
+
+  // Blotを変更します。
+  forOwn_1$1(blotOptions || {}, (value, key) => {
+    customizeBlot(key, objectAssign({}, value));
+  });
+
+  /**
+   * Quillのoptionを返します。
+   * @return {Object}
+   */
+  const getOption = () => {
+    const options = {
+      // @see: https://quilljs.com/docs/configuration/#bounds
+      bounds: this.refs.editor,
+      // @see: https://quilljs.com/docs/configuration/#debug
+      //debug: true,
+      // @see: https://quilljs.com/docs/configuration/#formats
+      // @see https://quilljs.com/docs/formats/
+      formats: [
+        // inlineレベルのformat群。
+        // toolbarにて表示する。
+        'bold',
+        'italic',
+        'underline',
+        'strike', //Strikethrough
+        'color',
+        'background',// Background Color
+        'font',
+        'size',
+        'link',
+        'code',// Inline Code
+        'script',// Superscript/Subscript
+        // embed系format群。
+        // 独自toolbar内で表示する。
+        'image',
+        'video',
+        // blockレベルのformat群。
+        // 独自toolbar内で表示する。
+        'header',
+        'list',
+        'indent',
+        'align',
+        'direction',// Direction of test
+        'blockquote',
+        'code-block'
+      ],
+      // @see: https://quilljs.com/docs/configuration/#modules
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }, { 'background': [] }, { 'size': [false, 'small', 'large', 'huge'] }, { 'font': [] }],
+          ['link'],
+          ['code', { 'script': 'sub' }, { 'script': 'super' }],
+          ['clean']
+        ]
+      },
+      // @see: https://quilljs.com/docs/configuration/#placeholder
+      placeholder: 'type here...',
+      // @see: https://quilljs.com/docs/configuration/#readonly
+      readonly: false,
+      // @see: https://quilljs.com/docs/configuration/#scrollingcontainer
+      scrollingContainer: null,
+      // @see: https://quilljs.com/docs/configuration/#strict
+      strict: true,
+      // @see: https://quilljs.com/docs/configuration/#theme
+      theme: 'bubble'
+    };
+    return options;
+  };
+
+  this.on('mount', () => {
+    this.quill = new Quill(this.refs.editor, getOption());
+    // TODO: 後で消すこと。
+    window.quill = this.quill;
+    this.quill.on(Quill.events.TEXT_CHANGE, this.handleTextChange);
+    this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
+    this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    if (isString_1(blotOptions.initialInnerHtml)) {
+      this.quill.pasteHTML(blotOptions.initialInnerHtml);
+    }
+    // load external css file if any specified.
+    const externalCssFilePath = blotOptions['external-css-file'];
+    if (!!externalCssFilePath) {
+      const headElm = document.querySelector('head');
+      const linkElm = document.createElement('link');
+      linkElm.rel = 'stylesheet';
+      linkElm.href = externalCssFilePath;
+      linkElm.setAttribute('data-targetid', this._riot_id);
+      // head要素内の先頭に配置。
+      headElm.insertBefore(linkElm, headElm.firstChild);
+    }
+    this.update();
+  }).on('unmount', () => {
+    this.quill.off(Quill.events.TEXT_CHANGE, this.handleTextChange);
+    this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
+    this.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
+    this.quill.off(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
+    // remove external css file if any.
+    const linkElm = document.querySelector(`link[data-targetid="${this._riot_id}"]`);
+    if (!!linkElm) {
+      linkElm.remove();
+    }
+  });
+
+  /**
+   * 文章が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#text-change
+   * @param {Quill.Delta} delta
+   * @param {Quill.Delta} oldContent
+   * @param {String} source "user", "api" or "silent"
+   */
+  this.handleTextChange = (delta, oldContent, source) => {// eslint-disable-line no-unused-vars
+    // querySelectorとinnerHTMLで内容を抜くのはNGだがQuillにAPIが用意されていないので仕方なく。
+    const editorElm = this.quill.container.querySelector('.ql-editor');
+    if (!editorElm) {
+      return;
+    }
+    this.opts.ontextchange && this.opts.ontextchange(editorElm.innerHTML);
+  };
+
+  /**
+   * 選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#selection-change
+   * @param {Object} range { index: Number, length: Number }
+   * @param {Object} oldRange { index: Number, length: Number }
+   * @param {String} source "user", "api" or "silent"
+   */
+  this.handleSelectionChange = (range, oldRange, source) => {// eslint-disable-line no-unused-vars
+  };
+
+  /**
+   * 文章もしくは選択範囲が変更された時の処理。
+   * @see: https://quilljs.com/docs/api/#editor-change
+   * @param {String} name "text-change" or "selection-change"
+   * @param {Array} args
+   */
+  this.handleEditorChange = (name, ...args) => {// eslint-disable-line no-unused-vars
+  };
+
+  /**
+   * スクロール最適化された時の処理。
+   */
+  this.handleScrollOptimize = () => {};
+
+  /**
+   * `divider`ボタンがタップされた時の処理。
+   */
+  /*
+  this.handleDividerPat = () => {
+    const range = quill.getSelection(true);
+    this.quill.insertText(range.index, '\n', Quill.sources.USER);
+    this.quill.insertEmbed(range.index + 1, 'myDivider', true, Quill.sources.USER);
+    this.quill.setSelection(range.index + 2, Quill.sources.SILENT);
+  };
+  */
+};
+
+riot$1.tag2('dmc-wyswyg', '<div class="Wyswyg__toolbar"> <dmc-wyswyg-tool-image if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-image> <dmc-wyswyg-tool-video if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-video> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{1}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{2}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{3}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{4}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{5}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{6}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-list-ordered if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-ordered> <dmc-wyswyg-tool-list-bullet if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-bullet> <dmc-wyswyg-tool-indent-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-left> <dmc-wyswyg-tool-indent-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-right> <dmc-wyswyg-tool-align-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-left> <dmc-wyswyg-tool-align-center if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-center> <dmc-wyswyg-tool-align-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-right> <dmc-wyswyg-tool-direction if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-direction> <dmc-wyswyg-tool-blockquote if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-blockquote> <dmc-wyswyg-tool-codeblock if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-codeblock> </div> <div class="Wyswyg__editor" ref="editor"></div>', '', 'class="Wyswyg {\'Wyswyg--bubbled\' : isBubbled}"', function(opts) {
+    this.external(script$50);
+});
+
+const UI_TEXTINPUT = 'textinput';
+const UI_TEXTAREA = 'textarea';
+const UI_HTML = 'html';
+const UI_NUMBERINPUT = 'numberinput';
+const UI_CHECKBOX = 'checkbox';
+const UI_SELECT = 'select';
+const UI_UPLOADER = 'uploader';
+const UI_WYSWYG = 'wyswyg';
+const UI_PUG = 'pug';
+const UI_NULL = 'null';
+
+var script$51 = function() {
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
+  const schemaObject = objectAssign({}, this.opts.schemaobject);
+
+  // wyswygエディタのオプション群。
+  this.blotOptions = schemaObject['x-wyswyg-options'] || {};
+
+  /**
+   * Selectコンポーネントに使用するoption群を返します。
+   * @return {Array}
+   */
+  this.getSelectOptions = () => {
+    const options = [];
+    if (this.opts.val === undefined) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
+    forEach_1(schemaObject.enum, (v, idx) => {
+      options.push({
+        id: `select_${idx}`,
+        label: v,
+        isSelected: (v === this.opts.val)
+      });
+    });
+    return options;
+  };
+
+  /**
+   * SchemaObjectの値から適切なUIコンポーネントを推測します。
+   * @param {Object} schemaObject
+   * @return {String}
+   */
+  const inferUITypeBySchemaObject = schemaObject => {
+    // type値はnull/boolean/number/string/integerのいずれか。
+    // typeが`array`や`object`の時にform.tagが使用されることは無い。
+    // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+    if (!!schemaObject.enum) {
+      return UI_SELECT;
+    }
+
+    const type = schemaObject.type;
+    const format = schemaObject.format;
+    switch (type) {
+    case 'string':
+      switch (format) {
+      case 'date-time':
+        //return UI_DATEPICKER;
+        return UI_TEXTINPUT;
+      case 'multiline':
+        return UI_TEXTAREA;
+      case 'wyswyg':
+        return UI_WYSWYG;
+      case 'pug':
+        return UI_PUG;
+      case 'html':
+        return UI_HTML;
+      default:
+        return UI_TEXTINPUT;
+      }
+    case 'number':
+    case 'integer':
+      return UI_NUMBERINPUT;
+    case 'boolean':
+      return UI_CHECKBOX;
+    case 'file':
+      return UI_UPLOADER;
+    case 'null':
+      return UI_NULL;
+    default:
+      // OpenAPI Documentが正しければ処理がここに来ることはない。
+      break;
+    }
+  };
+  // 使用するUIコンポーネント名。
+  this.uiType = inferUITypeBySchemaObject(schemaObject);
+
+  this.on('mount', () => {
+    // opts.valが何も指定されていない(i.e. undefined)
+    // 且つ
+    // デフォルト値が設定されていれば自動更新する。
+    if (this.opts.val === undefined && hasOwn_1$1(schemaObject, 'default')) {
+      this.opts.onchange(schemaObject.default);
+    }
+  });
+
+  // textinput値が変更された時の処理。
+  this.handleTextinputChange = newText => {
+    if (!newText) {
+      newText = undefined;
+    }
+    this.opts.onchange(newText);
+  };
+
+  // textarea値が変更された時の処理。
+  this.handleTextareaChange = newText => {
+    if (!newText) {
+      newText = undefined;
+    }
+    this.opts.onchange(newText);
+  };
+
+  // numberinput値が変更された時の処理。
+  this.handleNumberinputChange = newNumber => {
+    if (!isNumber_1(newNumber)) {
+      newNumber = undefined;
+    }
+    this.opts.onchange(newNumber);
+  };
+
+  // checkbox値が変更された時の処理。
+  this.handleCheckboxChange = newIsChecked => {
+    this.opts.onchange(newIsChecked);
+  };
+
+  // select値が変更された時の処理。
+  this.handleSelectChange = options => {
+    const option = find_1$2(options, option => {
+      return option.isSelected;
+    });
+    const value = (option ? option.label : undefined);
+    this.opts.onchange(value);
+  };
+
+  // uploader値が変更された時の処理。
+  this.handleUploaderFileChange = newFile => {
+    this.opts.onchange(newFile);
+  };
+
+  // wyswyg値が変更された時の処理。
+  this.handleWyswygChange = innerHtml => {
+    this.opts.onchange(innerHtml);
+  };
+
+  // pug値が変更された時の処理。
+  this.handlePugChange = newText => {
+    if (!newText) {
+      newText = undefined;
+    }
+    this.opts.onchange(newText);
+  };
+
+  // html値が変更された時の処理。
+  this.handleHtmlChange = newText => {
+    if (!newText) {
+      newText = undefined;
+    }
+    this.opts.onchange(newText);
+  };
+};
+
+riot$1.tag2('dmc-parameter-form', '<div class="ParameterForm__body"> <virtual if="{uiType === \'textinput\'}"> <dmc-textinput text="{opts.val}" onchange="{handleTextinputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <dmc-textarea text="{opts.val}" onchange="{handleTextareaChange}"></dmc-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <dmc-numberinput number="{opts.val}" onchange="{handleNumberinputChange}"></dmc-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.val}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleUploaderFileChange}"></dmc-uploader> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <dmc-wyswyg blotoptions="{blotOptions}" initialinnerhtml="{opts.val}" ontextchange="{handleWyswygChange}"></dmc-wyswyg> </virtual> <virtual if="{uiType === \'pug\'}"> <dmc-pug text="{opts.val}" onchange="{handlePugChange}"></dmc-pug> </virtual> <virtual if="{uiType === \'html\'}"> <dmc-html text="{opts.val}" onchange="{handleHtmlChange}"></dmc-html> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO: null</div> </virtual> </div>', '', '', function(opts) {
+    this.external(script$51);
+});
+
+/**
+     * @return {array} Array of unique items
+     */
+    function unique$1(arr, compare){
+        compare = compare || isEqual$1;
+        return filter_1$1(arr, function(item, i, arr){
+            var n = arr.length;
+            while (++i < n) {
+                if ( compare(item, arr[i]) ) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    function isEqual$1(a, b){
+        return a === b;
+    }
+
+    var unique_1$1 = unique$1;
+
+/**
+     */
+    function isBoolean(val) {
+        return isKind_1$1(val, 'Boolean');
+    }
+    var isBoolean_1 = isBoolean;
+
+var hookCallback;
+
+function hooks () {
+    return hookCallback.apply(null, arguments);
+}
+
+// This is done to register the method called with moment()
+// without creating circular dependencies.
+function setHookCallback (callback) {
+    hookCallback = callback;
+}
+
+function isArray$4(input) {
+    return input instanceof Array || Object.prototype.toString.call(input) === '[object Array]';
+}
+
+function isObject$3(input) {
+    // IE8 will treat undefined and null as object if it wasn't for
+    // input != null
+    return input != null && Object.prototype.toString.call(input) === '[object Object]';
+}
+
+function isObjectEmpty(obj) {
+    var k;
+    for (k in obj) {
+        // even if its not own property I'd still call it non-empty
+        return false;
+    }
+    return true;
+}
+
+function isUndefined$2(input) {
+    return input === void 0;
+}
+
+function isNumber$3(input) {
+    return typeof input === 'number' || Object.prototype.toString.call(input) === '[object Number]';
+}
+
+function isDate(input) {
+    return input instanceof Date || Object.prototype.toString.call(input) === '[object Date]';
+}
+
+function map$3(arr, fn) {
+    var res = [], i;
+    for (i = 0; i < arr.length; ++i) {
+        res.push(fn(arr[i], i));
+    }
+    return res;
+}
+
+function hasOwnProp(a, b) {
+    return Object.prototype.hasOwnProperty.call(a, b);
+}
+
+function extend$1(a, b) {
+    for (var i in b) {
+        if (hasOwnProp(b, i)) {
+            a[i] = b[i];
+        }
+    }
+
+    if (hasOwnProp(b, 'toString')) {
+        a.toString = b.toString;
+    }
+
+    if (hasOwnProp(b, 'valueOf')) {
+        a.valueOf = b.valueOf;
+    }
+
+    return a;
+}
+
+function createUTC (input, format, locale, strict) {
+    return createLocalOrUTC(input, format, locale, strict, true).utc();
+}
+
+function defaultParsingFlags() {
+    // We need to deep clone this object.
+    return {
+        empty           : false,
+        unusedTokens    : [],
+        unusedInput     : [],
+        overflow        : -2,
+        charsLeftOver   : 0,
+        nullInput       : false,
+        invalidMonth    : null,
+        invalidFormat   : false,
+        userInvalidated : false,
+        iso             : false,
+        parsedDateParts : [],
+        meridiem        : null,
+        rfc2822         : false,
+        weekdayMismatch : false
+    };
+}
+
+function getParsingFlags(m) {
+    if (m._pf == null) {
+        m._pf = defaultParsingFlags();
+    }
+    return m._pf;
+}
+
+var some$3;
+if (Array.prototype.some) {
+    some$3 = Array.prototype.some;
+} else {
+    some$3 = function (fun) {
+        var t = Object(this);
+        var len = t.length >>> 0;
+
+        for (var i = 0; i < len; i++) {
+            if (i in t && fun.call(this, t[i], i, t)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+}
+
+function isValid$3(m) {
+    if (m._isValid == null) {
+        var flags = getParsingFlags(m);
+        var parsedParts = some$3.call(flags.parsedDateParts, function (i) {
+            return i != null;
+        });
+        var isNowValid = !isNaN(m._d.getTime()) &&
+            flags.overflow < 0 &&
+            !flags.empty &&
+            !flags.invalidMonth &&
+            !flags.invalidWeekday &&
+            !flags.nullInput &&
+            !flags.invalidFormat &&
+            !flags.userInvalidated &&
+            (!flags.meridiem || (flags.meridiem && parsedParts));
+
+        if (m._strict) {
+            isNowValid = isNowValid &&
+                flags.charsLeftOver === 0 &&
+                flags.unusedTokens.length === 0 &&
+                flags.bigHour === undefined;
+        }
+
+        if (Object.isFrozen == null || !Object.isFrozen(m)) {
+            m._isValid = isNowValid;
+        }
+        else {
+            return isNowValid;
+        }
+    }
+    return m._isValid;
+}
+
+function createInvalid (flags) {
+    var m = createUTC(NaN);
+    if (flags != null) {
+        extend$1(getParsingFlags(m), flags);
+    }
+    else {
+        getParsingFlags(m).userInvalidated = true;
+    }
+
+    return m;
+}
+
+// Plugins that add properties should also add the key here (null value),
+// so we can properly clone ourselves.
+var momentProperties = hooks.momentProperties = [];
+
+function copyConfig(to, from) {
+    var i, prop, val;
+
+    if (!isUndefined$2(from._isAMomentObject)) {
+        to._isAMomentObject = from._isAMomentObject;
+    }
+    if (!isUndefined$2(from._i)) {
+        to._i = from._i;
+    }
+    if (!isUndefined$2(from._f)) {
+        to._f = from._f;
+    }
+    if (!isUndefined$2(from._l)) {
+        to._l = from._l;
+    }
+    if (!isUndefined$2(from._strict)) {
+        to._strict = from._strict;
+    }
+    if (!isUndefined$2(from._tzm)) {
+        to._tzm = from._tzm;
+    }
+    if (!isUndefined$2(from._isUTC)) {
+        to._isUTC = from._isUTC;
+    }
+    if (!isUndefined$2(from._offset)) {
+        to._offset = from._offset;
+    }
+    if (!isUndefined$2(from._pf)) {
+        to._pf = getParsingFlags(from);
+    }
+    if (!isUndefined$2(from._locale)) {
+        to._locale = from._locale;
+    }
+
+    if (momentProperties.length > 0) {
+        for (i = 0; i < momentProperties.length; i++) {
+            prop = momentProperties[i];
+            val = from[prop];
+            if (!isUndefined$2(val)) {
+                to[prop] = val;
+            }
+        }
+    }
+
+    return to;
+}
+
+var updateInProgress = false;
+
+// Moment prototype object
+function Moment(config) {
+    copyConfig(this, config);
+    this._d = new Date(config._d != null ? config._d.getTime() : NaN);
+    if (!this.isValid()) {
+        this._d = new Date(NaN);
+    }
+    // Prevent infinite loop in case updateOffset creates new moment
+    // objects.
+    if (updateInProgress === false) {
+        updateInProgress = true;
+        hooks.updateOffset(this);
+        updateInProgress = false;
+    }
+}
+
+function isMoment (obj) {
+    return obj instanceof Moment || (obj != null && obj._isAMomentObject != null);
+}
+
+function absFloor (number) {
+    if (number < 0) {
+        // -0 -> 0
+        return Math.ceil(number) || 0;
+    } else {
+        return Math.floor(number);
+    }
+}
+
+function toInt(argumentForCoercion) {
+    var coercedNumber = +argumentForCoercion,
+        value = 0;
+
+    if (coercedNumber !== 0 && isFinite(coercedNumber)) {
+        value = absFloor(coercedNumber);
+    }
+
+    return value;
+}
+
+// compare two arrays, return the number of differences
+function compareArrays(array1, array2, dontConvert) {
+    var len = Math.min(array1.length, array2.length),
+        lengthDiff = Math.abs(array1.length - array2.length),
+        diffs = 0,
+        i;
+    for (i = 0; i < len; i++) {
+        if ((dontConvert && array1[i] !== array2[i]) ||
+            (!dontConvert && toInt(array1[i]) !== toInt(array2[i]))) {
+            diffs++;
+        }
+    }
+    return diffs + lengthDiff;
+}
+
+function warn(msg) {
+    if (hooks.suppressDeprecationWarnings === false &&
+            (typeof console !==  'undefined') && console.warn) {
+        console.warn('Deprecation warning: ' + msg);
+    }
+}
+
+function deprecate(msg, fn) {
+    var firstTime = true;
+
+    return extend$1(function () {
+        if (hooks.deprecationHandler != null) {
+            hooks.deprecationHandler(null, msg);
+        }
+        if (firstTime) {
+            var args = [];
+            var arg;
+            for (var i = 0; i < arguments.length; i++) {
+                arg = '';
+                if (typeof arguments[i] === 'object') {
+                    arg += '\n[' + i + '] ';
+                    for (var key in arguments[0]) {
+                        arg += key + ': ' + arguments[0][key] + ', ';
+                    }
+                    arg = arg.slice(0, -2); // Remove trailing comma and space
+                } else {
+                    arg = arguments[i];
+                }
+                args.push(arg);
+            }
+            warn(msg + '\nArguments: ' + Array.prototype.slice.call(args).join('') + '\n' + (new Error()).stack);
+            firstTime = false;
+        }
+        return fn.apply(this, arguments);
+    }, fn);
+}
+
+var deprecations = {};
+
+function deprecateSimple(name, msg) {
+    if (hooks.deprecationHandler != null) {
+        hooks.deprecationHandler(name, msg);
+    }
+    if (!deprecations[name]) {
+        warn(msg);
+        deprecations[name] = true;
+    }
+}
+
+hooks.suppressDeprecationWarnings = false;
+hooks.deprecationHandler = null;
+
+function isFunction$1(input) {
+    return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
+}
+
+function set (config) {
+    var prop, i;
+    for (i in config) {
+        prop = config[i];
+        if (isFunction$1(prop)) {
+            this[i] = prop;
+        } else {
+            this['_' + i] = prop;
+        }
+    }
+    this._config = config;
+    // Lenient ordinal parsing accepts just a number in addition to
+    // number + (possibly) stuff coming from _dayOfMonthOrdinalParse.
+    // TODO: Remove "ordinalParse" fallback in next major release.
+    this._dayOfMonthOrdinalParseLenient = new RegExp(
+        (this._dayOfMonthOrdinalParse.source || this._ordinalParse.source) +
+            '|' + (/\d{1,2}/).source);
+}
+
+function mergeConfigs(parentConfig, childConfig) {
+    var res = extend$1({}, parentConfig), prop;
+    for (prop in childConfig) {
+        if (hasOwnProp(childConfig, prop)) {
+            if (isObject$3(parentConfig[prop]) && isObject$3(childConfig[prop])) {
+                res[prop] = {};
+                extend$1(res[prop], parentConfig[prop]);
+                extend$1(res[prop], childConfig[prop]);
+            } else if (childConfig[prop] != null) {
+                res[prop] = childConfig[prop];
+            } else {
+                delete res[prop];
+            }
+        }
+    }
+    for (prop in parentConfig) {
+        if (hasOwnProp(parentConfig, prop) &&
+                !hasOwnProp(childConfig, prop) &&
+                isObject$3(parentConfig[prop])) {
+            // make sure changes to properties don't modify parent config
+            res[prop] = extend$1({}, res[prop]);
+        }
+    }
+    return res;
+}
+
+function Locale(config) {
+    if (config != null) {
+        this.set(config);
+    }
+}
+
+var keys$3;
+
+if (Object.keys) {
+    keys$3 = Object.keys;
+} else {
+    keys$3 = function (obj) {
+        var i, res = [];
+        for (i in obj) {
+            if (hasOwnProp(obj, i)) {
+                res.push(i);
+            }
+        }
+        return res;
+    };
+}
+
+var defaultCalendar = {
+    sameDay : '[Today at] LT',
+    nextDay : '[Tomorrow at] LT',
+    nextWeek : 'dddd [at] LT',
+    lastDay : '[Yesterday at] LT',
+    lastWeek : '[Last] dddd [at] LT',
+    sameElse : 'L'
+};
+
+function calendar (key, mom, now) {
+    var output = this._calendar[key] || this._calendar['sameElse'];
+    return isFunction$1(output) ? output.call(mom, now) : output;
+}
+
+var defaultLongDateFormat = {
+    LTS  : 'h:mm:ss A',
+    LT   : 'h:mm A',
+    L    : 'MM/DD/YYYY',
+    LL   : 'MMMM D, YYYY',
+    LLL  : 'MMMM D, YYYY h:mm A',
+    LLLL : 'dddd, MMMM D, YYYY h:mm A'
+};
+
+function longDateFormat (key) {
+    var format = this._longDateFormat[key],
+        formatUpper = this._longDateFormat[key.toUpperCase()];
+
+    if (format || !formatUpper) {
+        return format;
+    }
+
+    this._longDateFormat[key] = formatUpper.replace(/MMMM|MM|DD|dddd/g, function (val) {
+        return val.slice(1);
+    });
+
+    return this._longDateFormat[key];
+}
+
+var defaultInvalidDate = 'Invalid date';
+
+function invalidDate () {
+    return this._invalidDate;
+}
+
+var defaultOrdinal = '%d';
+var defaultDayOfMonthOrdinalParse = /\d{1,2}/;
+
+function ordinal (number) {
+    return this._ordinal.replace('%d', number);
+}
+
+var defaultRelativeTime = {
+    future : 'in %s',
+    past   : '%s ago',
+    s  : 'a few seconds',
+    ss : '%d seconds',
+    m  : 'a minute',
+    mm : '%d minutes',
+    h  : 'an hour',
+    hh : '%d hours',
+    d  : 'a day',
+    dd : '%d days',
+    M  : 'a month',
+    MM : '%d months',
+    y  : 'a year',
+    yy : '%d years'
+};
+
+function relativeTime (number, withoutSuffix, string, isFuture) {
+    var output = this._relativeTime[string];
+    return (isFunction$1(output)) ?
+        output(number, withoutSuffix, string, isFuture) :
+        output.replace(/%d/i, number);
+}
+
+function pastFuture (diff, output) {
+    var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
+    return isFunction$1(format) ? format(output) : format.replace(/%s/i, output);
+}
+
+var aliases = {};
+
+function addUnitAlias (unit, shorthand) {
+    var lowerCase = unit.toLowerCase();
+    aliases[lowerCase] = aliases[lowerCase + 's'] = aliases[shorthand] = unit;
+}
+
+function normalizeUnits(units) {
+    return typeof units === 'string' ? aliases[units] || aliases[units.toLowerCase()] : undefined;
+}
+
+function normalizeObjectUnits(inputObject) {
+    var normalizedInput = {},
+        normalizedProp,
+        prop;
+
+    for (prop in inputObject) {
+        if (hasOwnProp(inputObject, prop)) {
+            normalizedProp = normalizeUnits(prop);
+            if (normalizedProp) {
+                normalizedInput[normalizedProp] = inputObject[prop];
+            }
+        }
+    }
+
+    return normalizedInput;
+}
+
+var priorities = {};
+
+function addUnitPriority(unit, priority) {
+    priorities[unit] = priority;
+}
+
+function getPrioritizedUnits(unitsObj) {
+    var units = [];
+    for (var u in unitsObj) {
+        units.push({unit: u, priority: priorities[u]});
+    }
+    units.sort(function (a, b) {
+        return a.priority - b.priority;
+    });
+    return units;
+}
+
+function makeGetSet (unit, keepTime) {
+    return function (value) {
+        if (value != null) {
+            set$1(this, unit, value);
+            hooks.updateOffset(this, keepTime);
+            return this;
+        } else {
+            return get(this, unit);
+        }
+    };
+}
+
+function get (mom, unit) {
+    return mom.isValid() ?
+        mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]() : NaN;
+}
+
+function set$1 (mom, unit, value) {
+    if (mom.isValid()) {
+        mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
+    }
+}
+
+// MOMENTS
+
+function stringGet (units) {
+    units = normalizeUnits(units);
+    if (isFunction$1(this[units])) {
+        return this[units]();
+    }
+    return this;
+}
+
+
+function stringSet (units, value) {
+    if (typeof units === 'object') {
+        units = normalizeObjectUnits(units);
+        var prioritized = getPrioritizedUnits(units);
+        for (var i = 0; i < prioritized.length; i++) {
+            this[prioritized[i].unit](units[prioritized[i].unit]);
+        }
+    } else {
+        units = normalizeUnits(units);
+        if (isFunction$1(this[units])) {
+            return this[units](value);
+        }
+    }
+    return this;
+}
+
+function zeroFill(number, targetLength, forceSign) {
+    var absNumber = '' + Math.abs(number),
+        zerosToFill = targetLength - absNumber.length,
+        sign = number >= 0;
+    return (sign ? (forceSign ? '+' : '') : '-') +
+        Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
+}
+
+var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
+
+var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
+
+var formatFunctions = {};
+
+var formatTokenFunctions = {};
+
+// token:    'M'
+// padded:   ['MM', 2]
+// ordinal:  'Mo'
+// callback: function () { this.month() + 1 }
+function addFormatToken (token, padded, ordinal, callback) {
+    var func = callback;
+    if (typeof callback === 'string') {
+        func = function () {
+            return this[callback]();
+        };
+    }
+    if (token) {
+        formatTokenFunctions[token] = func;
+    }
+    if (padded) {
+        formatTokenFunctions[padded[0]] = function () {
+            return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
+        };
+    }
+    if (ordinal) {
+        formatTokenFunctions[ordinal] = function () {
+            return this.localeData().ordinal(func.apply(this, arguments), token);
+        };
+    }
+}
+
+function removeFormattingTokens(input) {
+    if (input.match(/\[[\s\S]/)) {
+        return input.replace(/^\[|\]$/g, '');
+    }
+    return input.replace(/\\/g, '');
+}
+
+function makeFormatFunction(format) {
+    var array = format.match(formattingTokens), i, length;
+
+    for (i = 0, length = array.length; i < length; i++) {
+        if (formatTokenFunctions[array[i]]) {
+            array[i] = formatTokenFunctions[array[i]];
+        } else {
+            array[i] = removeFormattingTokens(array[i]);
+        }
+    }
+
+    return function (mom) {
+        var output = '', i;
+        for (i = 0; i < length; i++) {
+            output += isFunction$1(array[i]) ? array[i].call(mom, format) : array[i];
+        }
+        return output;
+    };
+}
+
+// format date using native date object
+function formatMoment(m, format) {
+    if (!m.isValid()) {
+        return m.localeData().invalidDate();
+    }
+
+    format = expandFormat(format, m.localeData());
+    formatFunctions[format] = formatFunctions[format] || makeFormatFunction(format);
+
+    return formatFunctions[format](m);
+}
+
+function expandFormat(format, locale) {
+    var i = 5;
+
+    function replaceLongDateFormatTokens(input) {
+        return locale.longDateFormat(input) || input;
+    }
+
+    localFormattingTokens.lastIndex = 0;
+    while (i >= 0 && localFormattingTokens.test(format)) {
+        format = format.replace(localFormattingTokens, replaceLongDateFormatTokens);
+        localFormattingTokens.lastIndex = 0;
+        i -= 1;
+    }
+
+    return format;
+}
+
+var match1         = /\d/;            //       0 - 9
+var match2         = /\d\d/;          //      00 - 99
+var match3         = /\d{3}/;         //     000 - 999
+var match4         = /\d{4}/;         //    0000 - 9999
+var match6         = /[+-]?\d{6}/;    // -999999 - 999999
+var match1to2      = /\d\d?/;         //       0 - 99
+var match3to4      = /\d\d\d\d?/;     //     999 - 9999
+var match5to6      = /\d\d\d\d\d\d?/; //   99999 - 999999
+var match1to3      = /\d{1,3}/;       //       0 - 999
+var match1to4      = /\d{1,4}/;       //       0 - 9999
+var match1to6      = /[+-]?\d{1,6}/;  // -999999 - 999999
+
+var matchUnsigned  = /\d+/;           //       0 - inf
+var matchSigned    = /[+-]?\d+/;      //    -inf - inf
+
+var matchOffset    = /Z|[+-]\d\d:?\d\d/gi; // +00:00 -00:00 +0000 -0000 or Z
+var matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi; // +00 -00 +00:00 -00:00 +0000 -0000 or Z
+
+var matchTimestamp = /[+-]?\d+(\.\d{1,3})?/; // 123456789 123456789.123
+
+// any word (or two) characters or numbers including two/three word month in arabic.
+// includes scottish gaelic two word and hyphenated months
+var matchWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i;
+
+
+var regexes = {};
+
+function addRegexToken (token, regex, strictRegex) {
+    regexes[token] = isFunction$1(regex) ? regex : function (isStrict, localeData) {
+        return (isStrict && strictRegex) ? strictRegex : regex;
+    };
+}
+
+function getParseRegexForToken (token, config) {
+    if (!hasOwnProp(regexes, token)) {
+        return new RegExp(unescapeFormat(token));
+    }
+
+    return regexes[token](config._strict, config._locale);
+}
+
+// Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+function unescapeFormat(s) {
+    return regexEscape(s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
+        return p1 || p2 || p3 || p4;
+    }));
+}
+
+function regexEscape(s) {
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+var tokens = {};
+
+function addParseToken (token, callback) {
+    var i, func = callback;
+    if (typeof token === 'string') {
+        token = [token];
+    }
+    if (isNumber$3(callback)) {
+        func = function (input, array) {
+            array[callback] = toInt(input);
+        };
+    }
+    for (i = 0; i < token.length; i++) {
+        tokens[token[i]] = func;
+    }
+}
+
+function addWeekParseToken (token, callback) {
+    addParseToken(token, function (input, array, config, token) {
+        config._w = config._w || {};
+        callback(input, config._w, config, token);
+    });
+}
+
+function addTimeToArrayFromToken(token, input, config) {
+    if (input != null && hasOwnProp(tokens, token)) {
+        tokens[token](input, config._a, config, token);
+    }
+}
+
+var YEAR = 0;
+var MONTH = 1;
+var DATE = 2;
+var HOUR = 3;
+var MINUTE = 4;
+var SECOND = 5;
+var MILLISECOND = 6;
+var WEEK = 7;
+var WEEKDAY = 8;
+
+var indexOf$3;
+
+if (Array.prototype.indexOf) {
+    indexOf$3 = Array.prototype.indexOf;
+} else {
+    indexOf$3 = function (o) {
+        // I know
+        var i;
+        for (i = 0; i < this.length; ++i) {
+            if (this[i] === o) {
+                return i;
+            }
+        }
+        return -1;
+    };
+}
+
+function daysInMonth(year, month) {
+    return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+}
+
+// FORMATTING
+
+addFormatToken('M', ['MM', 2], 'Mo', function () {
+    return this.month() + 1;
+});
+
+addFormatToken('MMM', 0, 0, function (format) {
+    return this.localeData().monthsShort(this, format);
+});
+
+addFormatToken('MMMM', 0, 0, function (format) {
+    return this.localeData().months(this, format);
+});
+
+// ALIASES
+
+addUnitAlias('month', 'M');
+
+// PRIORITY
+
+addUnitPriority('month', 8);
+
+// PARSING
+
+addRegexToken('M',    match1to2);
+addRegexToken('MM',   match1to2, match2);
+addRegexToken('MMM',  function (isStrict, locale) {
+    return locale.monthsShortRegex(isStrict);
+});
+addRegexToken('MMMM', function (isStrict, locale) {
+    return locale.monthsRegex(isStrict);
+});
+
+addParseToken(['M', 'MM'], function (input, array) {
+    array[MONTH] = toInt(input) - 1;
+});
+
+addParseToken(['MMM', 'MMMM'], function (input, array, config, token) {
+    var month = config._locale.monthsParse(input, token, config._strict);
+    // if we didn't find a month name, mark the date as invalid.
+    if (month != null) {
+        array[MONTH] = month;
+    } else {
+        getParsingFlags(config).invalidMonth = input;
+    }
+});
+
+// LOCALES
+
+var MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/;
+var defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_');
+function localeMonths (m, format) {
+    if (!m) {
+        return isArray$4(this._months) ? this._months :
+            this._months['standalone'];
+    }
+    return isArray$4(this._months) ? this._months[m.month()] :
+        this._months[(this._months.isFormat || MONTHS_IN_FORMAT).test(format) ? 'format' : 'standalone'][m.month()];
+}
+
+var defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_');
+function localeMonthsShort (m, format) {
+    if (!m) {
+        return isArray$4(this._monthsShort) ? this._monthsShort :
+            this._monthsShort['standalone'];
+    }
+    return isArray$4(this._monthsShort) ? this._monthsShort[m.month()] :
+        this._monthsShort[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
+}
+
+function handleStrictParse(monthName, format, strict) {
+    var i, ii, mom, llc = monthName.toLocaleLowerCase();
+    if (!this._monthsParse) {
+        // this is not used
+        this._monthsParse = [];
+        this._longMonthsParse = [];
+        this._shortMonthsParse = [];
+        for (i = 0; i < 12; ++i) {
+            mom = createUTC([2000, i]);
+            this._shortMonthsParse[i] = this.monthsShort(mom, '').toLocaleLowerCase();
+            this._longMonthsParse[i] = this.months(mom, '').toLocaleLowerCase();
+        }
+    }
+
+    if (strict) {
+        if (format === 'MMM') {
+            ii = indexOf$3.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$3.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    } else {
+        if (format === 'MMM') {
+            ii = indexOf$3.call(this._shortMonthsParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$3.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$3.call(this._longMonthsParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$3.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    }
+}
+
+function localeMonthsParse (monthName, format, strict) {
+    var i, mom, regex;
+
+    if (this._monthsParseExact) {
+        return handleStrictParse.call(this, monthName, format, strict);
+    }
+
+    if (!this._monthsParse) {
+        this._monthsParse = [];
+        this._longMonthsParse = [];
+        this._shortMonthsParse = [];
+    }
+
+    // TODO: add sorting
+    // Sorting makes sure if one month (or abbr) is a prefix of another
+    // see sorting in computeMonthsParse
+    for (i = 0; i < 12; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, i]);
+        if (strict && !this._longMonthsParse[i]) {
+            this._longMonthsParse[i] = new RegExp('^' + this.months(mom, '').replace('.', '') + '$', 'i');
+            this._shortMonthsParse[i] = new RegExp('^' + this.monthsShort(mom, '').replace('.', '') + '$', 'i');
+        }
+        if (!strict && !this._monthsParse[i]) {
+            regex = '^' + this.months(mom, '') + '|^' + this.monthsShort(mom, '');
+            this._monthsParse[i] = new RegExp(regex.replace('.', ''), 'i');
+        }
+        // test the regex
+        if (strict && format === 'MMMM' && this._longMonthsParse[i].test(monthName)) {
+            return i;
+        } else if (strict && format === 'MMM' && this._shortMonthsParse[i].test(monthName)) {
+            return i;
+        } else if (!strict && this._monthsParse[i].test(monthName)) {
+            return i;
+        }
+    }
+}
+
+// MOMENTS
+
+function setMonth (mom, value) {
+    var dayOfMonth;
+
+    if (!mom.isValid()) {
+        // No op
+        return mom;
+    }
+
+    if (typeof value === 'string') {
+        if (/^\d+$/.test(value)) {
+            value = toInt(value);
+        } else {
+            value = mom.localeData().monthsParse(value);
+            // TODO: Another silent failure?
+            if (!isNumber$3(value)) {
+                return mom;
+            }
+        }
+    }
+
+    dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
+    mom._d['set' + (mom._isUTC ? 'UTC' : '') + 'Month'](value, dayOfMonth);
+    return mom;
+}
+
+function getSetMonth (value) {
+    if (value != null) {
+        setMonth(this, value);
+        hooks.updateOffset(this, true);
+        return this;
+    } else {
+        return get(this, 'Month');
+    }
+}
+
+function getDaysInMonth () {
+    return daysInMonth(this.year(), this.month());
+}
+
+var defaultMonthsShortRegex = matchWord;
+function monthsShortRegex (isStrict) {
+    if (this._monthsParseExact) {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            computeMonthsParse.call(this);
+        }
+        if (isStrict) {
+            return this._monthsShortStrictRegex;
+        } else {
+            return this._monthsShortRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_monthsShortRegex')) {
+            this._monthsShortRegex = defaultMonthsShortRegex;
+        }
+        return this._monthsShortStrictRegex && isStrict ?
+            this._monthsShortStrictRegex : this._monthsShortRegex;
+    }
+}
+
+var defaultMonthsRegex = matchWord;
+function monthsRegex (isStrict) {
+    if (this._monthsParseExact) {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            computeMonthsParse.call(this);
+        }
+        if (isStrict) {
+            return this._monthsStrictRegex;
+        } else {
+            return this._monthsRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            this._monthsRegex = defaultMonthsRegex;
+        }
+        return this._monthsStrictRegex && isStrict ?
+            this._monthsStrictRegex : this._monthsRegex;
+    }
+}
+
+function computeMonthsParse () {
+    function cmpLenRev(a, b) {
+        return b.length - a.length;
+    }
+
+    var shortPieces = [], longPieces = [], mixedPieces = [],
+        i, mom;
+    for (i = 0; i < 12; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, i]);
+        shortPieces.push(this.monthsShort(mom, ''));
+        longPieces.push(this.months(mom, ''));
+        mixedPieces.push(this.months(mom, ''));
+        mixedPieces.push(this.monthsShort(mom, ''));
+    }
+    // Sorting makes sure if one month (or abbr) is a prefix of another it
+    // will match the longer piece.
+    shortPieces.sort(cmpLenRev);
+    longPieces.sort(cmpLenRev);
+    mixedPieces.sort(cmpLenRev);
+    for (i = 0; i < 12; i++) {
+        shortPieces[i] = regexEscape(shortPieces[i]);
+        longPieces[i] = regexEscape(longPieces[i]);
+    }
+    for (i = 0; i < 24; i++) {
+        mixedPieces[i] = regexEscape(mixedPieces[i]);
+    }
+
+    this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+    this._monthsShortRegex = this._monthsRegex;
+    this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+    this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+}
+
+// FORMATTING
+
+addFormatToken('Y', 0, 0, function () {
+    var y = this.year();
+    return y <= 9999 ? '' + y : '+' + y;
+});
+
+addFormatToken(0, ['YY', 2], 0, function () {
+    return this.year() % 100;
+});
+
+addFormatToken(0, ['YYYY',   4],       0, 'year');
+addFormatToken(0, ['YYYYY',  5],       0, 'year');
+addFormatToken(0, ['YYYYYY', 6, true], 0, 'year');
+
+// ALIASES
+
+addUnitAlias('year', 'y');
+
+// PRIORITIES
+
+addUnitPriority('year', 1);
+
+// PARSING
+
+addRegexToken('Y',      matchSigned);
+addRegexToken('YY',     match1to2, match2);
+addRegexToken('YYYY',   match1to4, match4);
+addRegexToken('YYYYY',  match1to6, match6);
+addRegexToken('YYYYYY', match1to6, match6);
+
+addParseToken(['YYYYY', 'YYYYYY'], YEAR);
+addParseToken('YYYY', function (input, array) {
+    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+});
+addParseToken('YY', function (input, array) {
+    array[YEAR] = hooks.parseTwoDigitYear(input);
+});
+addParseToken('Y', function (input, array) {
+    array[YEAR] = parseInt(input, 10);
+});
+
+// HELPERS
+
+function daysInYear(year) {
+    return isLeapYear(year) ? 366 : 365;
+}
+
+function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+// HOOKS
+
+hooks.parseTwoDigitYear = function (input) {
+    return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
+};
+
+// MOMENTS
+
+var getSetYear = makeGetSet('FullYear', true);
+
+function getIsLeapYear () {
+    return isLeapYear(this.year());
+}
+
+function createDate (y, m, d, h, M, s, ms) {
+    // can't just apply() to create a date:
+    // https://stackoverflow.com/q/181348
+    var date = new Date(y, m, d, h, M, s, ms);
+
+    // the date constructor remaps years 0-99 to 1900-1999
+    if (y < 100 && y >= 0 && isFinite(date.getFullYear())) {
+        date.setFullYear(y);
+    }
+    return date;
+}
+
+function createUTCDate (y) {
+    var date = new Date(Date.UTC.apply(null, arguments));
+
+    // the Date.UTC function remaps years 0-99 to 1900-1999
+    if (y < 100 && y >= 0 && isFinite(date.getUTCFullYear())) {
+        date.setUTCFullYear(y);
+    }
+    return date;
+}
+
+// start-of-first-week - start-of-year
+function firstWeekOffset(year, dow, doy) {
+    var // first-week day -- which january is always in the first week (4 for iso, 1 for other)
+        fwd = 7 + dow - doy,
+        // first-week day local weekday -- which local weekday is fwd
+        fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
+
+    return -fwdlw + fwd - 1;
+}
+
+// https://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year.2C_week_number_and_weekday
+function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
+    var localWeekday = (7 + weekday - dow) % 7,
+        weekOffset = firstWeekOffset(year, dow, doy),
+        dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset,
+        resYear, resDayOfYear;
+
+    if (dayOfYear <= 0) {
+        resYear = year - 1;
+        resDayOfYear = daysInYear(resYear) + dayOfYear;
+    } else if (dayOfYear > daysInYear(year)) {
+        resYear = year + 1;
+        resDayOfYear = dayOfYear - daysInYear(year);
+    } else {
+        resYear = year;
+        resDayOfYear = dayOfYear;
+    }
+
+    return {
+        year: resYear,
+        dayOfYear: resDayOfYear
+    };
+}
+
+function weekOfYear(mom, dow, doy) {
+    var weekOffset = firstWeekOffset(mom.year(), dow, doy),
+        week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1,
+        resWeek, resYear;
+
+    if (week < 1) {
+        resYear = mom.year() - 1;
+        resWeek = week + weeksInYear(resYear, dow, doy);
+    } else if (week > weeksInYear(mom.year(), dow, doy)) {
+        resWeek = week - weeksInYear(mom.year(), dow, doy);
+        resYear = mom.year() + 1;
+    } else {
+        resYear = mom.year();
+        resWeek = week;
+    }
+
+    return {
+        week: resWeek,
+        year: resYear
+    };
+}
+
+function weeksInYear(year, dow, doy) {
+    var weekOffset = firstWeekOffset(year, dow, doy),
+        weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
+    return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
+}
+
+// FORMATTING
+
+addFormatToken('w', ['ww', 2], 'wo', 'week');
+addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
+
+// ALIASES
+
+addUnitAlias('week', 'w');
+addUnitAlias('isoWeek', 'W');
+
+// PRIORITIES
+
+addUnitPriority('week', 5);
+addUnitPriority('isoWeek', 5);
+
+// PARSING
+
+addRegexToken('w',  match1to2);
+addRegexToken('ww', match1to2, match2);
+addRegexToken('W',  match1to2);
+addRegexToken('WW', match1to2, match2);
+
+addWeekParseToken(['w', 'ww', 'W', 'WW'], function (input, week, config, token) {
+    week[token.substr(0, 1)] = toInt(input);
+});
+
+// HELPERS
+
+// LOCALES
+
+function localeWeek (mom) {
+    return weekOfYear(mom, this._week.dow, this._week.doy).week;
+}
+
+var defaultLocaleWeek = {
+    dow : 0, // Sunday is the first day of the week.
+    doy : 6  // The week that contains Jan 1st is the first week of the year.
+};
+
+function localeFirstDayOfWeek () {
+    return this._week.dow;
+}
+
+function localeFirstDayOfYear () {
+    return this._week.doy;
+}
+
+// MOMENTS
+
+function getSetWeek (input) {
+    var week = this.localeData().week(this);
+    return input == null ? week : this.add((input - week) * 7, 'd');
+}
+
+function getSetISOWeek (input) {
+    var week = weekOfYear(this, 1, 4).week;
+    return input == null ? week : this.add((input - week) * 7, 'd');
+}
+
+// FORMATTING
+
+addFormatToken('d', 0, 'do', 'day');
+
+addFormatToken('dd', 0, 0, function (format) {
+    return this.localeData().weekdaysMin(this, format);
+});
+
+addFormatToken('ddd', 0, 0, function (format) {
+    return this.localeData().weekdaysShort(this, format);
+});
+
+addFormatToken('dddd', 0, 0, function (format) {
+    return this.localeData().weekdays(this, format);
+});
+
+addFormatToken('e', 0, 0, 'weekday');
+addFormatToken('E', 0, 0, 'isoWeekday');
+
+// ALIASES
+
+addUnitAlias('day', 'd');
+addUnitAlias('weekday', 'e');
+addUnitAlias('isoWeekday', 'E');
+
+// PRIORITY
+addUnitPriority('day', 11);
+addUnitPriority('weekday', 11);
+addUnitPriority('isoWeekday', 11);
+
+// PARSING
+
+addRegexToken('d',    match1to2);
+addRegexToken('e',    match1to2);
+addRegexToken('E',    match1to2);
+addRegexToken('dd',   function (isStrict, locale) {
+    return locale.weekdaysMinRegex(isStrict);
+});
+addRegexToken('ddd',   function (isStrict, locale) {
+    return locale.weekdaysShortRegex(isStrict);
+});
+addRegexToken('dddd',   function (isStrict, locale) {
+    return locale.weekdaysRegex(isStrict);
+});
+
+addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
+    var weekday = config._locale.weekdaysParse(input, token, config._strict);
+    // if we didn't get a weekday name, mark the date as invalid
+    if (weekday != null) {
+        week.d = weekday;
+    } else {
+        getParsingFlags(config).invalidWeekday = input;
+    }
+});
+
+addWeekParseToken(['d', 'e', 'E'], function (input, week, config, token) {
+    week[token] = toInt(input);
+});
+
+// HELPERS
+
+function parseWeekday(input, locale) {
+    if (typeof input !== 'string') {
+        return input;
+    }
+
+    if (!isNaN(input)) {
+        return parseInt(input, 10);
+    }
+
+    input = locale.weekdaysParse(input);
+    if (typeof input === 'number') {
+        return input;
+    }
+
+    return null;
+}
+
+function parseIsoWeekday(input, locale) {
+    if (typeof input === 'string') {
+        return locale.weekdaysParse(input) % 7 || 7;
+    }
+    return isNaN(input) ? null : input;
+}
+
+// LOCALES
+
+var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_');
+function localeWeekdays (m, format) {
+    if (!m) {
+        return isArray$4(this._weekdays) ? this._weekdays :
+            this._weekdays['standalone'];
+    }
+    return isArray$4(this._weekdays) ? this._weekdays[m.day()] :
+        this._weekdays[this._weekdays.isFormat.test(format) ? 'format' : 'standalone'][m.day()];
+}
+
+var defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
+function localeWeekdaysShort (m) {
+    return (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
+}
+
+var defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_');
+function localeWeekdaysMin (m) {
+    return (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
+}
+
+function handleStrictParse$1(weekdayName, format, strict) {
+    var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+        this._shortWeekdaysParse = [];
+        this._minWeekdaysParse = [];
+
+        for (i = 0; i < 7; ++i) {
+            mom = createUTC([2000, 1]).day(i);
+            this._minWeekdaysParse[i] = this.weekdaysMin(mom, '').toLocaleLowerCase();
+            this._shortWeekdaysParse[i] = this.weekdaysShort(mom, '').toLocaleLowerCase();
+            this._weekdaysParse[i] = this.weekdays(mom, '').toLocaleLowerCase();
+        }
+    }
+
+    if (strict) {
+        if (format === 'dddd') {
+            ii = indexOf$3.call(this._weekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else if (format === 'ddd') {
+            ii = indexOf$3.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$3.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    } else {
+        if (format === 'dddd') {
+            ii = indexOf$3.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$3.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$3.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else if (format === 'ddd') {
+            ii = indexOf$3.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$3.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$3.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$3.call(this._minWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$3.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$3.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    }
+}
+
+function localeWeekdaysParse (weekdayName, format, strict) {
+    var i, mom, regex;
+
+    if (this._weekdaysParseExact) {
+        return handleStrictParse$1.call(this, weekdayName, format, strict);
+    }
+
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+        this._minWeekdaysParse = [];
+        this._shortWeekdaysParse = [];
+        this._fullWeekdaysParse = [];
+    }
+
+    for (i = 0; i < 7; i++) {
+        // make the regex if we don't have it already
+
+        mom = createUTC([2000, 1]).day(i);
+        if (strict && !this._fullWeekdaysParse[i]) {
+            this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
+            this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
+            this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+        }
+        if (!this._weekdaysParse[i]) {
+            regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
+            this._weekdaysParse[i] = new RegExp(regex.replace('.', ''), 'i');
+        }
+        // test the regex
+        if (strict && format === 'dddd' && this._fullWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (strict && format === 'ddd' && this._shortWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (strict && format === 'dd' && this._minWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
+            return i;
+        }
+    }
+}
+
+// MOMENTS
+
+function getSetDayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
+    if (input != null) {
+        input = parseWeekday(input, this.localeData());
+        return this.add(input - day, 'd');
+    } else {
+        return day;
+    }
+}
+
+function getSetLocaleDayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
+    return input == null ? weekday : this.add(input - weekday, 'd');
+}
+
+function getSetISODayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+
+    // behaves the same as moment#day except
+    // as a getter, returns 7 instead of 0 (1-7 range instead of 0-6)
+    // as a setter, sunday should belong to the previous week.
+
+    if (input != null) {
+        var weekday = parseIsoWeekday(input, this.localeData());
+        return this.day(this.day() % 7 ? weekday : weekday - 7);
+    } else {
+        return this.day() || 7;
+    }
+}
+
+var defaultWeekdaysRegex = matchWord;
+function weekdaysRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysStrictRegex;
+        } else {
+            return this._weekdaysRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            this._weekdaysRegex = defaultWeekdaysRegex;
+        }
+        return this._weekdaysStrictRegex && isStrict ?
+            this._weekdaysStrictRegex : this._weekdaysRegex;
+    }
+}
+
+var defaultWeekdaysShortRegex = matchWord;
+function weekdaysShortRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysShortStrictRegex;
+        } else {
+            return this._weekdaysShortRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysShortRegex')) {
+            this._weekdaysShortRegex = defaultWeekdaysShortRegex;
+        }
+        return this._weekdaysShortStrictRegex && isStrict ?
+            this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
+    }
+}
+
+var defaultWeekdaysMinRegex = matchWord;
+function weekdaysMinRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysMinStrictRegex;
+        } else {
+            return this._weekdaysMinRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysMinRegex')) {
+            this._weekdaysMinRegex = defaultWeekdaysMinRegex;
+        }
+        return this._weekdaysMinStrictRegex && isStrict ?
+            this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
+    }
+}
+
+
+function computeWeekdaysParse () {
+    function cmpLenRev(a, b) {
+        return b.length - a.length;
+    }
+
+    var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [],
+        i, mom, minp, shortp, longp;
+    for (i = 0; i < 7; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, 1]).day(i);
+        minp = this.weekdaysMin(mom, '');
+        shortp = this.weekdaysShort(mom, '');
+        longp = this.weekdays(mom, '');
+        minPieces.push(minp);
+        shortPieces.push(shortp);
+        longPieces.push(longp);
+        mixedPieces.push(minp);
+        mixedPieces.push(shortp);
+        mixedPieces.push(longp);
+    }
+    // Sorting makes sure if one weekday (or abbr) is a prefix of another it
+    // will match the longer piece.
+    minPieces.sort(cmpLenRev);
+    shortPieces.sort(cmpLenRev);
+    longPieces.sort(cmpLenRev);
+    mixedPieces.sort(cmpLenRev);
+    for (i = 0; i < 7; i++) {
+        shortPieces[i] = regexEscape(shortPieces[i]);
+        longPieces[i] = regexEscape(longPieces[i]);
+        mixedPieces[i] = regexEscape(mixedPieces[i]);
+    }
+
+    this._weekdaysRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+    this._weekdaysShortRegex = this._weekdaysRegex;
+    this._weekdaysMinRegex = this._weekdaysRegex;
+
+    this._weekdaysStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+    this._weekdaysShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+    this._weekdaysMinStrictRegex = new RegExp('^(' + minPieces.join('|') + ')', 'i');
+}
+
+// FORMATTING
+
+function hFormat() {
+    return this.hours() % 12 || 12;
+}
+
+function kFormat() {
+    return this.hours() || 24;
+}
+
+addFormatToken('H', ['HH', 2], 0, 'hour');
+addFormatToken('h', ['hh', 2], 0, hFormat);
+addFormatToken('k', ['kk', 2], 0, kFormat);
+
+addFormatToken('hmm', 0, 0, function () {
+    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2);
+});
+
+addFormatToken('hmmss', 0, 0, function () {
+    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2) +
+        zeroFill(this.seconds(), 2);
+});
+
+addFormatToken('Hmm', 0, 0, function () {
+    return '' + this.hours() + zeroFill(this.minutes(), 2);
+});
+
+addFormatToken('Hmmss', 0, 0, function () {
+    return '' + this.hours() + zeroFill(this.minutes(), 2) +
+        zeroFill(this.seconds(), 2);
+});
+
+function meridiem (token, lowercase) {
+    addFormatToken(token, 0, 0, function () {
+        return this.localeData().meridiem(this.hours(), this.minutes(), lowercase);
+    });
+}
+
+meridiem('a', true);
+meridiem('A', false);
+
+// ALIASES
+
+addUnitAlias('hour', 'h');
+
+// PRIORITY
+addUnitPriority('hour', 13);
+
+// PARSING
+
+function matchMeridiem (isStrict, locale) {
+    return locale._meridiemParse;
+}
+
+addRegexToken('a',  matchMeridiem);
+addRegexToken('A',  matchMeridiem);
+addRegexToken('H',  match1to2);
+addRegexToken('h',  match1to2);
+addRegexToken('k',  match1to2);
+addRegexToken('HH', match1to2, match2);
+addRegexToken('hh', match1to2, match2);
+addRegexToken('kk', match1to2, match2);
+
+addRegexToken('hmm', match3to4);
+addRegexToken('hmmss', match5to6);
+addRegexToken('Hmm', match3to4);
+addRegexToken('Hmmss', match5to6);
+
+addParseToken(['H', 'HH'], HOUR);
+addParseToken(['k', 'kk'], function (input, array, config) {
+    var kInput = toInt(input);
+    array[HOUR] = kInput === 24 ? 0 : kInput;
+});
+addParseToken(['a', 'A'], function (input, array, config) {
+    config._isPm = config._locale.isPM(input);
+    config._meridiem = input;
+});
+addParseToken(['h', 'hh'], function (input, array, config) {
+    array[HOUR] = toInt(input);
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('hmm', function (input, array, config) {
+    var pos = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos));
+    array[MINUTE] = toInt(input.substr(pos));
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('hmmss', function (input, array, config) {
+    var pos1 = input.length - 4;
+    var pos2 = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos1));
+    array[MINUTE] = toInt(input.substr(pos1, 2));
+    array[SECOND] = toInt(input.substr(pos2));
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('Hmm', function (input, array, config) {
+    var pos = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos));
+    array[MINUTE] = toInt(input.substr(pos));
+});
+addParseToken('Hmmss', function (input, array, config) {
+    var pos1 = input.length - 4;
+    var pos2 = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos1));
+    array[MINUTE] = toInt(input.substr(pos1, 2));
+    array[SECOND] = toInt(input.substr(pos2));
+});
+
+// LOCALES
+
+function localeIsPM (input) {
+    // IE8 Quirks Mode & IE7 Standards Mode do not allow accessing strings like arrays
+    // Using charAt should be more compatible.
+    return ((input + '').toLowerCase().charAt(0) === 'p');
+}
+
+var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i;
+function localeMeridiem (hours, minutes, isLower) {
+    if (hours > 11) {
+        return isLower ? 'pm' : 'PM';
+    } else {
+        return isLower ? 'am' : 'AM';
+    }
+}
+
+
+// MOMENTS
+
+// Setting the hour should keep the time, because the user explicitly
+// specified which hour he wants. So trying to maintain the same hour (in
+// a new timezone) makes sense. Adding/subtracting hours does not follow
+// this rule.
+var getSetHour = makeGetSet('Hours', true);
+
+// months
+// week
+// weekdays
+// meridiem
+var baseConfig = {
+    calendar: defaultCalendar,
+    longDateFormat: defaultLongDateFormat,
+    invalidDate: defaultInvalidDate,
+    ordinal: defaultOrdinal,
+    dayOfMonthOrdinalParse: defaultDayOfMonthOrdinalParse,
+    relativeTime: defaultRelativeTime,
+
+    months: defaultLocaleMonths,
+    monthsShort: defaultLocaleMonthsShort,
+
+    week: defaultLocaleWeek,
+
+    weekdays: defaultLocaleWeekdays,
+    weekdaysMin: defaultLocaleWeekdaysMin,
+    weekdaysShort: defaultLocaleWeekdaysShort,
+
+    meridiemParse: defaultLocaleMeridiemParse
+};
+
+// internal storage for locale config files
+var locales = {};
+var localeFamilies = {};
+var globalLocale;
+
+function normalizeLocale(key) {
+    return key ? key.toLowerCase().replace('_', '-') : key;
+}
+
+// pick the locale from the array
+// try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
+// substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
+function chooseLocale(names) {
+    var i = 0, j, next, locale, split;
+
+    while (i < names.length) {
+        split = normalizeLocale(names[i]).split('-');
+        j = split.length;
+        next = normalizeLocale(names[i + 1]);
+        next = next ? next.split('-') : null;
+        while (j > 0) {
+            locale = loadLocale(split.slice(0, j).join('-'));
+            if (locale) {
+                return locale;
+            }
+            if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
+                //the next array item is better than a shallower substring of this one
+                break;
+            }
+            j--;
+        }
+        i++;
+    }
+    return null;
+}
+
+function loadLocale(name) {
+    var oldLocale = null;
+    // TODO: Find a better way to register and load all the locales in Node
+    if (!locales[name] && (typeof module !== 'undefined') &&
+            module && module.exports) {
+        try {
+            oldLocale = globalLocale._abbr;
+            require('./locale/' + name);
+            // because defineLocale currently also sets the global locale, we
+            // want to undo that for lazy loaded locales
+            getSetGlobalLocale(oldLocale);
+        } catch (e) { }
+    }
+    return locales[name];
+}
+
+// This function will load locale and then set the global locale.  If
+// no arguments are passed in, it will simply return the current global
+// locale key.
+function getSetGlobalLocale (key, values) {
+    var data;
+    if (key) {
+        if (isUndefined$2(values)) {
+            data = getLocale(key);
+        }
+        else {
+            data = defineLocale(key, values);
+        }
+
+        if (data) {
+            // moment.duration._locale = moment._locale = data;
+            globalLocale = data;
+        }
+    }
+
+    return globalLocale._abbr;
+}
+
+function defineLocale (name, config) {
+    if (config !== null) {
+        var parentConfig = baseConfig;
+        config.abbr = name;
+        if (locales[name] != null) {
+            deprecateSimple('defineLocaleOverride',
+                    'use moment.updateLocale(localeName, config) to change ' +
+                    'an existing locale. moment.defineLocale(localeName, ' +
+                    'config) should only be used for creating a new locale ' +
+                    'See http://momentjs.com/guides/#/warnings/define-locale/ for more info.');
+            parentConfig = locales[name]._config;
+        } else if (config.parentLocale != null) {
+            if (locales[config.parentLocale] != null) {
+                parentConfig = locales[config.parentLocale]._config;
+            } else {
+                if (!localeFamilies[config.parentLocale]) {
+                    localeFamilies[config.parentLocale] = [];
+                }
+                localeFamilies[config.parentLocale].push({
+                    name: name,
+                    config: config
+                });
+                return null;
+            }
+        }
+        locales[name] = new Locale(mergeConfigs(parentConfig, config));
+
+        if (localeFamilies[name]) {
+            localeFamilies[name].forEach(function (x) {
+                defineLocale(x.name, x.config);
+            });
+        }
+
+        // backwards compat for now: also set the locale
+        // make sure we set the locale AFTER all child locales have been
+        // created, so we won't end up with the child locale set.
+        getSetGlobalLocale(name);
+
+
+        return locales[name];
+    } else {
+        // useful for testing
+        delete locales[name];
+        return null;
+    }
+}
+
+function updateLocale(name, config) {
+    if (config != null) {
+        var locale, parentConfig = baseConfig;
+        // MERGE
+        if (locales[name] != null) {
+            parentConfig = locales[name]._config;
+        }
+        config = mergeConfigs(parentConfig, config);
+        locale = new Locale(config);
+        locale.parentLocale = locales[name];
+        locales[name] = locale;
+
+        // backwards compat for now: also set the locale
+        getSetGlobalLocale(name);
+    } else {
+        // pass null for config to unupdate, useful for tests
+        if (locales[name] != null) {
+            if (locales[name].parentLocale != null) {
+                locales[name] = locales[name].parentLocale;
+            } else if (locales[name] != null) {
+                delete locales[name];
+            }
+        }
+    }
+    return locales[name];
+}
+
+// returns locale data
+function getLocale (key) {
+    var locale;
+
+    if (key && key._locale && key._locale._abbr) {
+        key = key._locale._abbr;
+    }
+
+    if (!key) {
+        return globalLocale;
+    }
+
+    if (!isArray$4(key)) {
+        //short-circuit everything else
+        locale = loadLocale(key);
+        if (locale) {
+            return locale;
+        }
+        key = [key];
+    }
+
+    return chooseLocale(key);
+}
+
+function listLocales() {
+    return keys$3(locales);
+}
+
+function checkOverflow (m) {
+    var overflow;
+    var a = m._a;
+
+    if (a && getParsingFlags(m).overflow === -2) {
+        overflow =
+            a[MONTH]       < 0 || a[MONTH]       > 11  ? MONTH :
+            a[DATE]        < 1 || a[DATE]        > daysInMonth(a[YEAR], a[MONTH]) ? DATE :
+            a[HOUR]        < 0 || a[HOUR]        > 24 || (a[HOUR] === 24 && (a[MINUTE] !== 0 || a[SECOND] !== 0 || a[MILLISECOND] !== 0)) ? HOUR :
+            a[MINUTE]      < 0 || a[MINUTE]      > 59  ? MINUTE :
+            a[SECOND]      < 0 || a[SECOND]      > 59  ? SECOND :
+            a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND :
+            -1;
+
+        if (getParsingFlags(m)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
+            overflow = DATE;
+        }
+        if (getParsingFlags(m)._overflowWeeks && overflow === -1) {
+            overflow = WEEK;
+        }
+        if (getParsingFlags(m)._overflowWeekday && overflow === -1) {
+            overflow = WEEKDAY;
+        }
+
+        getParsingFlags(m).overflow = overflow;
+    }
+
+    return m;
+}
+
+// iso 8601 regex
+// 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
+var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+
+var tzRegex = /Z|[+-]\d\d(?::?\d\d)?/;
+
+var isoDates = [
+    ['YYYYYY-MM-DD', /[+-]\d{6}-\d\d-\d\d/],
+    ['YYYY-MM-DD', /\d{4}-\d\d-\d\d/],
+    ['GGGG-[W]WW-E', /\d{4}-W\d\d-\d/],
+    ['GGGG-[W]WW', /\d{4}-W\d\d/, false],
+    ['YYYY-DDD', /\d{4}-\d{3}/],
+    ['YYYY-MM', /\d{4}-\d\d/, false],
+    ['YYYYYYMMDD', /[+-]\d{10}/],
+    ['YYYYMMDD', /\d{8}/],
+    // YYYYMM is NOT allowed by the standard
+    ['GGGG[W]WWE', /\d{4}W\d{3}/],
+    ['GGGG[W]WW', /\d{4}W\d{2}/, false],
+    ['YYYYDDD', /\d{7}/]
+];
+
+// iso time formats and regexes
+var isoTimes = [
+    ['HH:mm:ss.SSSS', /\d\d:\d\d:\d\d\.\d+/],
+    ['HH:mm:ss,SSSS', /\d\d:\d\d:\d\d,\d+/],
+    ['HH:mm:ss', /\d\d:\d\d:\d\d/],
+    ['HH:mm', /\d\d:\d\d/],
+    ['HHmmss.SSSS', /\d\d\d\d\d\d\.\d+/],
+    ['HHmmss,SSSS', /\d\d\d\d\d\d,\d+/],
+    ['HHmmss', /\d\d\d\d\d\d/],
+    ['HHmm', /\d\d\d\d/],
+    ['HH', /\d\d/]
+];
+
+var aspNetJsonRegex = /^\/?Date\((\-?\d+)/i;
+
+// date from iso format
+function configFromISO(config) {
+    var i, l,
+        string = config._i,
+        match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string),
+        allowTime, dateFormat, timeFormat, tzFormat;
+
+    if (match) {
+        getParsingFlags(config).iso = true;
+
+        for (i = 0, l = isoDates.length; i < l; i++) {
+            if (isoDates[i][1].exec(match[1])) {
+                dateFormat = isoDates[i][0];
+                allowTime = isoDates[i][2] !== false;
+                break;
+            }
+        }
+        if (dateFormat == null) {
+            config._isValid = false;
+            return;
+        }
+        if (match[3]) {
+            for (i = 0, l = isoTimes.length; i < l; i++) {
+                if (isoTimes[i][1].exec(match[3])) {
+                    // match[2] should be 'T' or space
+                    timeFormat = (match[2] || ' ') + isoTimes[i][0];
+                    break;
+                }
+            }
+            if (timeFormat == null) {
+                config._isValid = false;
+                return;
+            }
+        }
+        if (!allowTime && timeFormat != null) {
+            config._isValid = false;
+            return;
+        }
+        if (match[4]) {
+            if (tzRegex.exec(match[4])) {
+                tzFormat = 'Z';
+            } else {
+                config._isValid = false;
+                return;
+            }
+        }
+        config._f = dateFormat + (timeFormat || '') + (tzFormat || '');
+        configFromStringAndFormat(config);
+    } else {
+        config._isValid = false;
+    }
+}
+
+// RFC 2822 regex: For details see https://tools.ietf.org/html/rfc2822#section-3.3
+var basicRfcRegex = /^((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d?\d\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(?:\d\d)?\d\d\s)(\d\d:\d\d)(\:\d\d)?(\s(?:UT|GMT|[ECMP][SD]T|[A-IK-Za-ik-z]|[+-]\d{4}))$/;
+
+// date and time from ref 2822 format
+function configFromRFC2822(config) {
+    var string, match, dayFormat,
+        dateFormat, timeFormat, tzFormat;
+    var timezones = {
+        ' GMT': ' +0000',
+        ' EDT': ' -0400',
+        ' EST': ' -0500',
+        ' CDT': ' -0500',
+        ' CST': ' -0600',
+        ' MDT': ' -0600',
+        ' MST': ' -0700',
+        ' PDT': ' -0700',
+        ' PST': ' -0800'
+    };
+    var military = 'YXWVUTSRQPONZABCDEFGHIKLM';
+    var timezone, timezoneIndex;
+
+    string = config._i
+        .replace(/\([^\)]*\)|[\n\t]/g, ' ') // Remove comments and folding whitespace
+        .replace(/(\s\s+)/g, ' ') // Replace multiple-spaces with a single space
+        .replace(/^\s|\s$/g, ''); // Remove leading and trailing spaces
+    match = basicRfcRegex.exec(string);
+
+    if (match) {
+        dayFormat = match[1] ? 'ddd' + ((match[1].length === 5) ? ', ' : ' ') : '';
+        dateFormat = 'D MMM ' + ((match[2].length > 10) ? 'YYYY ' : 'YY ');
+        timeFormat = 'HH:mm' + (match[4] ? ':ss' : '');
+
+        // TODO: Replace the vanilla JS Date object with an indepentent day-of-week check.
+        if (match[1]) { // day of week given
+            var momentDate = new Date(match[2]);
+            var momentDay = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][momentDate.getDay()];
+
+            if (match[1].substr(0,3) !== momentDay) {
+                getParsingFlags(config).weekdayMismatch = true;
+                config._isValid = false;
+                return;
+            }
+        }
+
+        switch (match[5].length) {
+            case 2: // military
+                if (timezoneIndex === 0) {
+                    timezone = ' +0000';
+                } else {
+                    timezoneIndex = military.indexOf(match[5][1].toUpperCase()) - 12;
+                    timezone = ((timezoneIndex < 0) ? ' -' : ' +') +
+                        (('' + timezoneIndex).replace(/^-?/, '0')).match(/..$/)[0] + '00';
+                }
+                break;
+            case 4: // Zone
+                timezone = timezones[match[5]];
+                break;
+            default: // UT or +/-9999
+                timezone = timezones[' GMT'];
+        }
+        match[5] = timezone;
+        config._i = match.splice(1).join('');
+        tzFormat = ' ZZ';
+        config._f = dayFormat + dateFormat + timeFormat + tzFormat;
+        configFromStringAndFormat(config);
+        getParsingFlags(config).rfc2822 = true;
+    } else {
+        config._isValid = false;
+    }
+}
+
+// date from iso format or fallback
+function configFromString(config) {
+    var matched = aspNetJsonRegex.exec(config._i);
+
+    if (matched !== null) {
+        config._d = new Date(+matched[1]);
+        return;
+    }
+
+    configFromISO(config);
+    if (config._isValid === false) {
+        delete config._isValid;
+    } else {
+        return;
+    }
+
+    configFromRFC2822(config);
+    if (config._isValid === false) {
+        delete config._isValid;
+    } else {
+        return;
+    }
+
+    // Final attempt, use Input Fallback
+    hooks.createFromInputFallback(config);
+}
+
+hooks.createFromInputFallback = deprecate(
+    'value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), ' +
+    'which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are ' +
+    'discouraged and will be removed in an upcoming major release. Please refer to ' +
+    'http://momentjs.com/guides/#/warnings/js-date/ for more info.',
+    function (config) {
+        config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
+    }
+);
+
+// Pick the first defined of two or three arguments.
+function defaults$1(a, b, c) {
+    if (a != null) {
+        return a;
+    }
+    if (b != null) {
+        return b;
+    }
+    return c;
+}
+
+function currentDateArray(config) {
+    // hooks is actually the exported moment object
+    var nowValue = new Date(hooks.now());
+    if (config._useUTC) {
+        return [nowValue.getUTCFullYear(), nowValue.getUTCMonth(), nowValue.getUTCDate()];
+    }
+    return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
+}
+
+// convert an array to a date.
+// the array should mirror the parameters below
+// note: all values past the year are optional and will default to the lowest possible value.
+// [year, month, day , hour, minute, second, millisecond]
+function configFromArray (config) {
+    var i, date, input = [], currentDate, yearToUse;
+
+    if (config._d) {
+        return;
+    }
+
+    currentDate = currentDateArray(config);
+
+    //compute day of the year from weeks and weekdays
+    if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
+        dayOfYearFromWeekInfo(config);
+    }
+
+    //if the day of the year is set, figure out what it is
+    if (config._dayOfYear != null) {
+        yearToUse = defaults$1(config._a[YEAR], currentDate[YEAR]);
+
+        if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
+            getParsingFlags(config)._overflowDayOfYear = true;
+        }
+
+        date = createUTCDate(yearToUse, 0, config._dayOfYear);
+        config._a[MONTH] = date.getUTCMonth();
+        config._a[DATE] = date.getUTCDate();
+    }
+
+    // Default to current date.
+    // * if no year, month, day of month are given, default to today
+    // * if day of month is given, default month and year
+    // * if month is given, default only year
+    // * if year is given, don't default anything
+    for (i = 0; i < 3 && config._a[i] == null; ++i) {
+        config._a[i] = input[i] = currentDate[i];
+    }
+
+    // Zero out whatever was not defaulted, including time
+    for (; i < 7; i++) {
+        config._a[i] = input[i] = (config._a[i] == null) ? (i === 2 ? 1 : 0) : config._a[i];
+    }
+
+    // Check for 24:00:00.000
+    if (config._a[HOUR] === 24 &&
+            config._a[MINUTE] === 0 &&
+            config._a[SECOND] === 0 &&
+            config._a[MILLISECOND] === 0) {
+        config._nextDay = true;
+        config._a[HOUR] = 0;
+    }
+
+    config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
+    // Apply timezone offset from input. The actual utcOffset can be changed
+    // with parseZone.
+    if (config._tzm != null) {
+        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+    }
+
+    if (config._nextDay) {
+        config._a[HOUR] = 24;
+    }
+}
+
+function dayOfYearFromWeekInfo(config) {
+    var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
+
+    w = config._w;
+    if (w.GG != null || w.W != null || w.E != null) {
+        dow = 1;
+        doy = 4;
+
+        // TODO: We need to take the current isoWeekYear, but that depends on
+        // how we interpret now (local, utc, fixed offset). So create
+        // a now version of current config (take local/utc/offset flags, and
+        // create now).
+        weekYear = defaults$1(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
+        week = defaults$1(w.W, 1);
+        weekday = defaults$1(w.E, 1);
+        if (weekday < 1 || weekday > 7) {
+            weekdayOverflow = true;
+        }
+    } else {
+        dow = config._locale._week.dow;
+        doy = config._locale._week.doy;
+
+        var curWeek = weekOfYear(createLocal(), dow, doy);
+
+        weekYear = defaults$1(w.gg, config._a[YEAR], curWeek.year);
+
+        // Default to current week.
+        week = defaults$1(w.w, curWeek.week);
+
+        if (w.d != null) {
+            // weekday -- low day numbers are considered next week
+            weekday = w.d;
+            if (weekday < 0 || weekday > 6) {
+                weekdayOverflow = true;
+            }
+        } else if (w.e != null) {
+            // local weekday -- counting starts from begining of week
+            weekday = w.e + dow;
+            if (w.e < 0 || w.e > 6) {
+                weekdayOverflow = true;
+            }
+        } else {
+            // default to begining of week
+            weekday = dow;
+        }
+    }
+    if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+        getParsingFlags(config)._overflowWeeks = true;
+    } else if (weekdayOverflow != null) {
+        getParsingFlags(config)._overflowWeekday = true;
+    } else {
+        temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+        config._a[YEAR] = temp.year;
+        config._dayOfYear = temp.dayOfYear;
+    }
+}
+
+// constant that refers to the ISO standard
+hooks.ISO_8601 = function () {};
+
+// constant that refers to the RFC 2822 form
+hooks.RFC_2822 = function () {};
+
+// date from string and format string
+function configFromStringAndFormat(config) {
+    // TODO: Move this to another part of the creation flow to prevent circular deps
+    if (config._f === hooks.ISO_8601) {
+        configFromISO(config);
+        return;
+    }
+    if (config._f === hooks.RFC_2822) {
+        configFromRFC2822(config);
+        return;
+    }
+    config._a = [];
+    getParsingFlags(config).empty = true;
+
+    // This array is used to make a Date, either with `new Date` or `Date.UTC`
+    var string = '' + config._i,
+        i, parsedInput, tokens, token, skipped,
+        stringLength = string.length,
+        totalParsedInputLength = 0;
+
+    tokens = expandFormat(config._f, config._locale).match(formattingTokens) || [];
+
+    for (i = 0; i < tokens.length; i++) {
+        token = tokens[i];
+        parsedInput = (string.match(getParseRegexForToken(token, config)) || [])[0];
+        // console.log('token', token, 'parsedInput', parsedInput,
+        //         'regex', getParseRegexForToken(token, config));
+        if (parsedInput) {
+            skipped = string.substr(0, string.indexOf(parsedInput));
+            if (skipped.length > 0) {
+                getParsingFlags(config).unusedInput.push(skipped);
+            }
+            string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
+            totalParsedInputLength += parsedInput.length;
+        }
+        // don't parse if it's not a known token
+        if (formatTokenFunctions[token]) {
+            if (parsedInput) {
+                getParsingFlags(config).empty = false;
+            }
+            else {
+                getParsingFlags(config).unusedTokens.push(token);
+            }
+            addTimeToArrayFromToken(token, parsedInput, config);
+        }
+        else if (config._strict && !parsedInput) {
+            getParsingFlags(config).unusedTokens.push(token);
+        }
+    }
+
+    // add remaining unparsed input length to the string
+    getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
+    if (string.length > 0) {
+        getParsingFlags(config).unusedInput.push(string);
+    }
+
+    // clear _12h flag if hour is <= 12
+    if (config._a[HOUR] <= 12 &&
+        getParsingFlags(config).bigHour === true &&
+        config._a[HOUR] > 0) {
+        getParsingFlags(config).bigHour = undefined;
+    }
+
+    getParsingFlags(config).parsedDateParts = config._a.slice(0);
+    getParsingFlags(config).meridiem = config._meridiem;
+    // handle meridiem
+    config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
+
+    configFromArray(config);
+    checkOverflow(config);
+}
+
+
+function meridiemFixWrap (locale, hour, meridiem) {
+    var isPm;
+
+    if (meridiem == null) {
+        // nothing to do
+        return hour;
+    }
+    if (locale.meridiemHour != null) {
+        return locale.meridiemHour(hour, meridiem);
+    } else if (locale.isPM != null) {
+        // Fallback
+        isPm = locale.isPM(meridiem);
+        if (isPm && hour < 12) {
+            hour += 12;
+        }
+        if (!isPm && hour === 12) {
+            hour = 0;
+        }
+        return hour;
+    } else {
+        // this is not supposed to happen
+        return hour;
+    }
+}
+
+// date from string and array of format strings
+function configFromStringAndArray(config) {
+    var tempConfig,
+        bestMoment,
+
+        scoreToBeat,
+        i,
+        currentScore;
+
+    if (config._f.length === 0) {
+        getParsingFlags(config).invalidFormat = true;
+        config._d = new Date(NaN);
+        return;
+    }
+
+    for (i = 0; i < config._f.length; i++) {
+        currentScore = 0;
+        tempConfig = copyConfig({}, config);
+        if (config._useUTC != null) {
+            tempConfig._useUTC = config._useUTC;
+        }
+        tempConfig._f = config._f[i];
+        configFromStringAndFormat(tempConfig);
+
+        if (!isValid$3(tempConfig)) {
+            continue;
+        }
+
+        // if there is any input that was not parsed add a penalty for that format
+        currentScore += getParsingFlags(tempConfig).charsLeftOver;
+
+        //or tokens
+        currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
+
+        getParsingFlags(tempConfig).score = currentScore;
+
+        if (scoreToBeat == null || currentScore < scoreToBeat) {
+            scoreToBeat = currentScore;
+            bestMoment = tempConfig;
+        }
+    }
+
+    extend$1(config, bestMoment || tempConfig);
+}
+
+function configFromObject(config) {
+    if (config._d) {
+        return;
+    }
+
+    var i = normalizeObjectUnits(config._i);
+    config._a = map$3([i.year, i.month, i.day || i.date, i.hour, i.minute, i.second, i.millisecond], function (obj) {
+        return obj && parseInt(obj, 10);
+    });
+
+    configFromArray(config);
+}
+
+function createFromConfig (config) {
+    var res = new Moment(checkOverflow(prepareConfig(config)));
+    if (res._nextDay) {
+        // Adding is smart enough around DST
+        res.add(1, 'd');
+        res._nextDay = undefined;
+    }
+
+    return res;
+}
+
+function prepareConfig (config) {
+    var input = config._i,
+        format = config._f;
+
+    config._locale = config._locale || getLocale(config._l);
+
+    if (input === null || (format === undefined && input === '')) {
+        return createInvalid({nullInput: true});
+    }
+
+    if (typeof input === 'string') {
+        config._i = input = config._locale.preparse(input);
+    }
+
+    if (isMoment(input)) {
+        return new Moment(checkOverflow(input));
+    } else if (isDate(input)) {
+        config._d = input;
+    } else if (isArray$4(format)) {
+        configFromStringAndArray(config);
+    } else if (format) {
+        configFromStringAndFormat(config);
+    }  else {
+        configFromInput(config);
+    }
+
+    if (!isValid$3(config)) {
+        config._d = null;
+    }
+
+    return config;
+}
+
+function configFromInput(config) {
+    var input = config._i;
+    if (isUndefined$2(input)) {
+        config._d = new Date(hooks.now());
+    } else if (isDate(input)) {
+        config._d = new Date(input.valueOf());
+    } else if (typeof input === 'string') {
+        configFromString(config);
+    } else if (isArray$4(input)) {
+        config._a = map$3(input.slice(0), function (obj) {
+            return parseInt(obj, 10);
+        });
+        configFromArray(config);
+    } else if (isObject$3(input)) {
+        configFromObject(config);
+    } else if (isNumber$3(input)) {
+        // from milliseconds
+        config._d = new Date(input);
+    } else {
+        hooks.createFromInputFallback(config);
+    }
+}
+
+function createLocalOrUTC (input, format, locale, strict, isUTC) {
+    var c = {};
+
+    if (locale === true || locale === false) {
+        strict = locale;
+        locale = undefined;
+    }
+
+    if ((isObject$3(input) && isObjectEmpty(input)) ||
+            (isArray$4(input) && input.length === 0)) {
+        input = undefined;
+    }
+    // object construction must be done this way.
+    // https://github.com/moment/moment/issues/1423
+    c._isAMomentObject = true;
+    c._useUTC = c._isUTC = isUTC;
+    c._l = locale;
+    c._i = input;
+    c._f = format;
+    c._strict = strict;
+
+    return createFromConfig(c);
+}
+
+function createLocal (input, format, locale, strict) {
+    return createLocalOrUTC(input, format, locale, strict, false);
+}
+
+var prototypeMin = deprecate(
+    'moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/',
+    function () {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+            return other < this ? this : other;
+        } else {
+            return createInvalid();
+        }
+    }
+);
+
+var prototypeMax = deprecate(
+    'moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/',
+    function () {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+            return other > this ? this : other;
+        } else {
+            return createInvalid();
+        }
+    }
+);
+
+// Pick a moment m from moments so that m[fn](other) is true for all
+// other. This relies on the function fn to be transitive.
+//
+// moments should either be an array of moment objects or an array, whose
+// first element is an array of moment objects.
+function pickBy(fn, moments) {
+    var res, i;
+    if (moments.length === 1 && isArray$4(moments[0])) {
+        moments = moments[0];
+    }
+    if (!moments.length) {
+        return createLocal();
+    }
+    res = moments[0];
+    for (i = 1; i < moments.length; ++i) {
+        if (!moments[i].isValid() || moments[i][fn](res)) {
+            res = moments[i];
+        }
+    }
+    return res;
+}
+
+// TODO: Use [].sort instead?
+function min$1 () {
+    var args = [].slice.call(arguments, 0);
+
+    return pickBy('isBefore', args);
+}
+
+function max$1 () {
+    var args = [].slice.call(arguments, 0);
+
+    return pickBy('isAfter', args);
+}
+
+var now = function () {
+    return Date.now ? Date.now() : +(new Date());
+};
+
+var ordering = ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute', 'second', 'millisecond'];
+
+function isDurationValid(m) {
+    for (var key in m) {
+        if (!(ordering.indexOf(key) !== -1 && (m[key] == null || !isNaN(m[key])))) {
+            return false;
+        }
+    }
+
+    var unitHasDecimal = false;
+    for (var i = 0; i < ordering.length; ++i) {
+        if (m[ordering[i]]) {
+            if (unitHasDecimal) {
+                return false; // only allow non-integers for smallest unit
+            }
+            if (parseFloat(m[ordering[i]]) !== toInt(m[ordering[i]])) {
+                unitHasDecimal = true;
+            }
+        }
+    }
+
+    return true;
+}
+
+function isValid$4() {
+    return this._isValid;
+}
+
+function createInvalid$1() {
+    return createDuration(NaN);
+}
+
+function Duration (duration) {
+    var normalizedInput = normalizeObjectUnits(duration),
+        years = normalizedInput.year || 0,
+        quarters = normalizedInput.quarter || 0,
+        months = normalizedInput.month || 0,
+        weeks = normalizedInput.week || 0,
+        days = normalizedInput.day || 0,
+        hours = normalizedInput.hour || 0,
+        minutes = normalizedInput.minute || 0,
+        seconds = normalizedInput.second || 0,
+        milliseconds = normalizedInput.millisecond || 0;
+
+    this._isValid = isDurationValid(normalizedInput);
+
+    // representation for dateAddRemove
+    this._milliseconds = +milliseconds +
+        seconds * 1e3 + // 1000
+        minutes * 6e4 + // 1000 * 60
+        hours * 1000 * 60 * 60; //using 1000 * 60 * 60 instead of 36e5 to avoid floating point rounding errors https://github.com/moment/moment/issues/2978
+    // Because of dateAddRemove treats 24 hours as different from a
+    // day when working around DST, we need to store them separately
+    this._days = +days +
+        weeks * 7;
+    // It is impossible translate months into days without knowing
+    // which months you are are talking about, so we have to store
+    // it separately.
+    this._months = +months +
+        quarters * 3 +
+        years * 12;
+
+    this._data = {};
+
+    this._locale = getLocale();
+
+    this._bubble();
+}
+
+function isDuration (obj) {
+    return obj instanceof Duration;
+}
+
+function absRound (number) {
+    if (number < 0) {
+        return Math.round(-1 * number) * -1;
+    } else {
+        return Math.round(number);
+    }
+}
+
+// FORMATTING
+
+function offset (token, separator) {
+    addFormatToken(token, 0, 0, function () {
+        var offset = this.utcOffset();
+        var sign = '+';
+        if (offset < 0) {
+            offset = -offset;
+            sign = '-';
+        }
+        return sign + zeroFill(~~(offset / 60), 2) + separator + zeroFill(~~(offset) % 60, 2);
+    });
+}
+
+offset('Z', ':');
+offset('ZZ', '');
+
+// PARSING
+
+addRegexToken('Z',  matchShortOffset);
+addRegexToken('ZZ', matchShortOffset);
+addParseToken(['Z', 'ZZ'], function (input, array, config) {
+    config._useUTC = true;
+    config._tzm = offsetFromString(matchShortOffset, input);
+});
+
+// HELPERS
+
+// timezone chunker
+// '+10:00' > ['10',  '00']
+// '-1530'  > ['-15', '30']
+var chunkOffset = /([\+\-]|\d\d)/gi;
+
+function offsetFromString(matcher, string) {
+    var matches = (string || '').match(matcher);
+
+    if (matches === null) {
+        return null;
+    }
+
+    var chunk   = matches[matches.length - 1] || [];
+    var parts   = (chunk + '').match(chunkOffset) || ['-', 0, 0];
+    var minutes = +(parts[1] * 60) + toInt(parts[2]);
+
+    return minutes === 0 ?
+      0 :
+      parts[0] === '+' ? minutes : -minutes;
+}
+
+// Return a moment from input, that is local/utc/zone equivalent to model.
+function cloneWithOffset(input, model) {
+    var res, diff;
+    if (model._isUTC) {
+        res = model.clone();
+        diff = (isMoment(input) || isDate(input) ? input.valueOf() : createLocal(input).valueOf()) - res.valueOf();
+        // Use low-level api, because this fn is low-level api.
+        res._d.setTime(res._d.valueOf() + diff);
+        hooks.updateOffset(res, false);
+        return res;
+    } else {
+        return createLocal(input).local();
+    }
+}
+
+function getDateOffset (m) {
+    // On Firefox.24 Date#getTimezoneOffset returns a floating point.
+    // https://github.com/moment/moment/pull/1871
+    return -Math.round(m._d.getTimezoneOffset() / 15) * 15;
+}
+
+// HOOKS
+
+// This function will be called whenever a moment is mutated.
+// It is intended to keep the offset in sync with the timezone.
+hooks.updateOffset = function () {};
+
+// MOMENTS
+
+// keepLocalTime = true means only change the timezone, without
+// affecting the local hour. So 5:31:26 +0300 --[utcOffset(2, true)]-->
+// 5:31:26 +0200 It is possible that 5:31:26 doesn't exist with offset
+// +0200, so we adjust the time as needed, to be valid.
+//
+// Keeping the time actually adds/subtracts (one hour)
+// from the actual represented time. That is why we call updateOffset
+// a second time. In case it wants us to change the offset again
+// _changeInProgress == true case, then we have to adjust, because
+// there is no such time in the given timezone.
+function getSetOffset (input, keepLocalTime, keepMinutes) {
+    var offset = this._offset || 0,
+        localAdjust;
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    if (input != null) {
+        if (typeof input === 'string') {
+            input = offsetFromString(matchShortOffset, input);
+            if (input === null) {
+                return this;
+            }
+        } else if (Math.abs(input) < 16 && !keepMinutes) {
+            input = input * 60;
+        }
+        if (!this._isUTC && keepLocalTime) {
+            localAdjust = getDateOffset(this);
+        }
+        this._offset = input;
+        this._isUTC = true;
+        if (localAdjust != null) {
+            this.add(localAdjust, 'm');
+        }
+        if (offset !== input) {
+            if (!keepLocalTime || this._changeInProgress) {
+                addSubtract(this, createDuration(input - offset, 'm'), 1, false);
+            } else if (!this._changeInProgress) {
+                this._changeInProgress = true;
+                hooks.updateOffset(this, true);
+                this._changeInProgress = null;
+            }
+        }
+        return this;
+    } else {
+        return this._isUTC ? offset : getDateOffset(this);
+    }
+}
+
+function getSetZone (input, keepLocalTime) {
+    if (input != null) {
+        if (typeof input !== 'string') {
+            input = -input;
+        }
+
+        this.utcOffset(input, keepLocalTime);
+
+        return this;
+    } else {
+        return -this.utcOffset();
+    }
+}
+
+function setOffsetToUTC (keepLocalTime) {
+    return this.utcOffset(0, keepLocalTime);
+}
+
+function setOffsetToLocal (keepLocalTime) {
+    if (this._isUTC) {
+        this.utcOffset(0, keepLocalTime);
+        this._isUTC = false;
+
+        if (keepLocalTime) {
+            this.subtract(getDateOffset(this), 'm');
+        }
+    }
+    return this;
+}
+
+function setOffsetToParsedOffset () {
+    if (this._tzm != null) {
+        this.utcOffset(this._tzm, false, true);
+    } else if (typeof this._i === 'string') {
+        var tZone = offsetFromString(matchOffset, this._i);
+        if (tZone != null) {
+            this.utcOffset(tZone);
+        }
+        else {
+            this.utcOffset(0, true);
+        }
+    }
+    return this;
+}
+
+function hasAlignedHourOffset (input) {
+    if (!this.isValid()) {
+        return false;
+    }
+    input = input ? createLocal(input).utcOffset() : 0;
+
+    return (this.utcOffset() - input) % 60 === 0;
+}
+
+function isDaylightSavingTime () {
+    return (
+        this.utcOffset() > this.clone().month(0).utcOffset() ||
+        this.utcOffset() > this.clone().month(5).utcOffset()
+    );
+}
+
+function isDaylightSavingTimeShifted () {
+    if (!isUndefined$2(this._isDSTShifted)) {
+        return this._isDSTShifted;
+    }
+
+    var c = {};
+
+    copyConfig(c, this);
+    c = prepareConfig(c);
+
+    if (c._a) {
+        var other = c._isUTC ? createUTC(c._a) : createLocal(c._a);
+        this._isDSTShifted = this.isValid() &&
+            compareArrays(c._a, other.toArray()) > 0;
+    } else {
+        this._isDSTShifted = false;
+    }
+
+    return this._isDSTShifted;
+}
+
+function isLocal () {
+    return this.isValid() ? !this._isUTC : false;
+}
+
+function isUtcOffset () {
+    return this.isValid() ? this._isUTC : false;
+}
+
+function isUtc () {
+    return this.isValid() ? this._isUTC && this._offset === 0 : false;
+}
+
+// ASP.NET json date format regex
+var aspNetRegex = /^(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
+
+// from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
+// somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
+// and further modified to allow for strings containing both week and day
+var isoRegex = /^(-)?P(?:(-?[0-9,.]*)Y)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)W)?(?:(-?[0-9,.]*)D)?(?:T(?:(-?[0-9,.]*)H)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)S)?)?$/;
+
+function createDuration (input, key) {
+    var duration = input,
+        // matching against regexp is expensive, do it on demand
+        match = null,
+        sign,
+        ret,
+        diffRes;
+
+    if (isDuration(input)) {
+        duration = {
+            ms : input._milliseconds,
+            d  : input._days,
+            M  : input._months
+        };
+    } else if (isNumber$3(input)) {
+        duration = {};
+        if (key) {
+            duration[key] = input;
+        } else {
+            duration.milliseconds = input;
+        }
+    } else if (!!(match = aspNetRegex.exec(input))) {
+        sign = (match[1] === '-') ? -1 : 1;
+        duration = {
+            y  : 0,
+            d  : toInt(match[DATE])                         * sign,
+            h  : toInt(match[HOUR])                         * sign,
+            m  : toInt(match[MINUTE])                       * sign,
+            s  : toInt(match[SECOND])                       * sign,
+            ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
+        };
+    } else if (!!(match = isoRegex.exec(input))) {
+        sign = (match[1] === '-') ? -1 : 1;
+        duration = {
+            y : parseIso(match[2], sign),
+            M : parseIso(match[3], sign),
+            w : parseIso(match[4], sign),
+            d : parseIso(match[5], sign),
+            h : parseIso(match[6], sign),
+            m : parseIso(match[7], sign),
+            s : parseIso(match[8], sign)
+        };
+    } else if (duration == null) {// checks for null or undefined
+        duration = {};
+    } else if (typeof duration === 'object' && ('from' in duration || 'to' in duration)) {
+        diffRes = momentsDifference(createLocal(duration.from), createLocal(duration.to));
+
+        duration = {};
+        duration.ms = diffRes.milliseconds;
+        duration.M = diffRes.months;
+    }
+
+    ret = new Duration(duration);
+
+    if (isDuration(input) && hasOwnProp(input, '_locale')) {
+        ret._locale = input._locale;
+    }
+
+    return ret;
+}
+
+createDuration.fn = Duration.prototype;
+createDuration.invalid = createInvalid$1;
+
+function parseIso (inp, sign) {
+    // We'd normally use ~~inp for this, but unfortunately it also
+    // converts floats to ints.
+    // inp may be undefined, so careful calling replace on it.
+    var res = inp && parseFloat(inp.replace(',', '.'));
+    // apply sign while we're at it
+    return (isNaN(res) ? 0 : res) * sign;
+}
+
+function positiveMomentsDifference(base, other) {
+    var res = {milliseconds: 0, months: 0};
+
+    res.months = other.month() - base.month() +
+        (other.year() - base.year()) * 12;
+    if (base.clone().add(res.months, 'M').isAfter(other)) {
+        --res.months;
+    }
+
+    res.milliseconds = +other - +(base.clone().add(res.months, 'M'));
+
+    return res;
+}
+
+function momentsDifference(base, other) {
+    var res;
+    if (!(base.isValid() && other.isValid())) {
+        return {milliseconds: 0, months: 0};
+    }
+
+    other = cloneWithOffset(other, base);
+    if (base.isBefore(other)) {
+        res = positiveMomentsDifference(base, other);
+    } else {
+        res = positiveMomentsDifference(other, base);
+        res.milliseconds = -res.milliseconds;
+        res.months = -res.months;
+    }
+
+    return res;
+}
+
+// TODO: remove 'name' arg after deprecation is removed
+function createAdder(direction, name) {
+    return function (val, period) {
+        var dur, tmp;
+        //invert the arguments, but complain about it
+        if (period !== null && !isNaN(+period)) {
+            deprecateSimple(name, 'moment().' + name  + '(period, number) is deprecated. Please use moment().' + name + '(number, period). ' +
+            'See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.');
+            tmp = val; val = period; period = tmp;
+        }
+
+        val = typeof val === 'string' ? +val : val;
+        dur = createDuration(val, period);
+        addSubtract(this, dur, direction);
+        return this;
+    };
+}
+
+function addSubtract (mom, duration, isAdding, updateOffset) {
+    var milliseconds = duration._milliseconds,
+        days = absRound(duration._days),
+        months = absRound(duration._months);
+
+    if (!mom.isValid()) {
+        // No op
+        return;
+    }
+
+    updateOffset = updateOffset == null ? true : updateOffset;
+
+    if (milliseconds) {
+        mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
+    }
+    if (days) {
+        set$1(mom, 'Date', get(mom, 'Date') + days * isAdding);
+    }
+    if (months) {
+        setMonth(mom, get(mom, 'Month') + months * isAdding);
+    }
+    if (updateOffset) {
+        hooks.updateOffset(mom, days || months);
+    }
+}
+
+var add      = createAdder(1, 'add');
+var subtract = createAdder(-1, 'subtract');
+
+function getCalendarFormat(myMoment, now) {
+    var diff = myMoment.diff(now, 'days', true);
+    return diff < -6 ? 'sameElse' :
+            diff < -1 ? 'lastWeek' :
+            diff < 0 ? 'lastDay' :
+            diff < 1 ? 'sameDay' :
+            diff < 2 ? 'nextDay' :
+            diff < 7 ? 'nextWeek' : 'sameElse';
+}
+
+function calendar$1 (time, formats) {
+    // We want to compare the start of today, vs this.
+    // Getting start-of-today depends on whether we're local/utc/offset or not.
+    var now = time || createLocal(),
+        sod = cloneWithOffset(now, this).startOf('day'),
+        format = hooks.calendarFormat(this, sod) || 'sameElse';
+
+    var output = formats && (isFunction$1(formats[format]) ? formats[format].call(this, now) : formats[format]);
+
+    return this.format(output || this.localeData().calendar(format, this, createLocal(now)));
+}
+
+function clone () {
+    return new Moment(this);
+}
+
+function isAfter (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input);
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(!isUndefined$2(units) ? units : 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() > localInput.valueOf();
+    } else {
+        return localInput.valueOf() < this.clone().startOf(units).valueOf();
+    }
+}
+
+function isBefore (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input);
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(!isUndefined$2(units) ? units : 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() < localInput.valueOf();
+    } else {
+        return this.clone().endOf(units).valueOf() < localInput.valueOf();
+    }
+}
+
+function isBetween (from, to, units, inclusivity) {
+    inclusivity = inclusivity || '()';
+    return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
+        (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
+}
+
+function isSame (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input),
+        inputMs;
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(units || 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() === localInput.valueOf();
+    } else {
+        inputMs = localInput.valueOf();
+        return this.clone().startOf(units).valueOf() <= inputMs && inputMs <= this.clone().endOf(units).valueOf();
+    }
+}
+
+function isSameOrAfter (input, units) {
+    return this.isSame(input, units) || this.isAfter(input,units);
+}
+
+function isSameOrBefore (input, units) {
+    return this.isSame(input, units) || this.isBefore(input,units);
+}
+
+function diff (input, units, asFloat) {
+    var that,
+        zoneDelta,
+        delta, output;
+
+    if (!this.isValid()) {
+        return NaN;
+    }
+
+    that = cloneWithOffset(input, this);
+
+    if (!that.isValid()) {
+        return NaN;
+    }
+
+    zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
+
+    units = normalizeUnits(units);
+
+    if (units === 'year' || units === 'month' || units === 'quarter') {
+        output = monthDiff(this, that);
+        if (units === 'quarter') {
+            output = output / 3;
+        } else if (units === 'year') {
+            output = output / 12;
+        }
+    } else {
+        delta = this - that;
+        output = units === 'second' ? delta / 1e3 : // 1000
+            units === 'minute' ? delta / 6e4 : // 1000 * 60
+            units === 'hour' ? delta / 36e5 : // 1000 * 60 * 60
+            units === 'day' ? (delta - zoneDelta) / 864e5 : // 1000 * 60 * 60 * 24, negate dst
+            units === 'week' ? (delta - zoneDelta) / 6048e5 : // 1000 * 60 * 60 * 24 * 7, negate dst
+            delta;
+    }
+    return asFloat ? output : absFloor(output);
+}
+
+function monthDiff (a, b) {
+    // difference in months
+    var wholeMonthDiff = ((b.year() - a.year()) * 12) + (b.month() - a.month()),
+        // b is in (anchor - 1 month, anchor + 1 month)
+        anchor = a.clone().add(wholeMonthDiff, 'months'),
+        anchor2, adjust;
+
+    if (b - anchor < 0) {
+        anchor2 = a.clone().add(wholeMonthDiff - 1, 'months');
+        // linear across the month
+        adjust = (b - anchor) / (anchor - anchor2);
+    } else {
+        anchor2 = a.clone().add(wholeMonthDiff + 1, 'months');
+        // linear across the month
+        adjust = (b - anchor) / (anchor2 - anchor);
+    }
+
+    //check for negative zero, return zero if negative zero
+    return -(wholeMonthDiff + adjust) || 0;
+}
+
+hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
+
+function toString$1 () {
+    return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+}
+
+function toISOString() {
+    if (!this.isValid()) {
+        return null;
+    }
+    var m = this.clone().utc();
+    if (m.year() < 0 || m.year() > 9999) {
+        return formatMoment(m, 'YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+    }
+    if (isFunction$1(Date.prototype.toISOString)) {
+        // native implementation is ~50x faster, use it when we can
+        return this.toDate().toISOString();
+    }
+    return formatMoment(m, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+}
+
+/**
+ * Return a human readable representation of a moment that can
+ * also be evaluated to get a new moment which is the same
+ *
+ * @link https://nodejs.org/dist/latest/docs/api/util.html#util_custom_inspect_function_on_objects
+ */
+function inspect () {
+    if (!this.isValid()) {
+        return 'moment.invalid(/* ' + this._i + ' */)';
+    }
+    var func = 'moment';
+    var zone = '';
+    if (!this.isLocal()) {
+        func = this.utcOffset() === 0 ? 'moment.utc' : 'moment.parseZone';
+        zone = 'Z';
+    }
+    var prefix = '[' + func + '("]';
+    var year = (0 <= this.year() && this.year() <= 9999) ? 'YYYY' : 'YYYYYY';
+    var datetime = '-MM-DD[T]HH:mm:ss.SSS';
+    var suffix = zone + '[")]';
+
+    return this.format(prefix + year + datetime + suffix);
+}
+
+function format$2 (inputString) {
+    if (!inputString) {
+        inputString = this.isUtc() ? hooks.defaultFormatUtc : hooks.defaultFormat;
+    }
+    var output = formatMoment(this, inputString);
+    return this.localeData().postformat(output);
+}
+
+function from (time, withoutSuffix) {
+    if (this.isValid() &&
+            ((isMoment(time) && time.isValid()) ||
+             createLocal(time).isValid())) {
+        return createDuration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
+    } else {
+        return this.localeData().invalidDate();
+    }
+}
+
+function fromNow (withoutSuffix) {
+    return this.from(createLocal(), withoutSuffix);
+}
+
+function to (time, withoutSuffix) {
+    if (this.isValid() &&
+            ((isMoment(time) && time.isValid()) ||
+             createLocal(time).isValid())) {
+        return createDuration({from: this, to: time}).locale(this.locale()).humanize(!withoutSuffix);
+    } else {
+        return this.localeData().invalidDate();
+    }
+}
+
+function toNow (withoutSuffix) {
+    return this.to(createLocal(), withoutSuffix);
+}
+
+// If passed a locale key, it will set the locale for this
+// instance.  Otherwise, it will return the locale configuration
+// variables for this instance.
+function locale (key) {
+    var newLocaleData;
+
+    if (key === undefined) {
+        return this._locale._abbr;
+    } else {
+        newLocaleData = getLocale(key);
+        if (newLocaleData != null) {
+            this._locale = newLocaleData;
+        }
+        return this;
+    }
+}
+
+var lang = deprecate(
+    'moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.',
+    function (key) {
+        if (key === undefined) {
+            return this.localeData();
+        } else {
+            return this.locale(key);
+        }
+    }
+);
+
+function localeData () {
+    return this._locale;
+}
+
+function startOf (units) {
+    units = normalizeUnits(units);
+    // the following switch intentionally omits break keywords
+    // to utilize falling through the cases.
+    switch (units) {
+        case 'year':
+            this.month(0);
+            /* falls through */
+        case 'quarter':
+        case 'month':
+            this.date(1);
+            /* falls through */
+        case 'week':
+        case 'isoWeek':
+        case 'day':
+        case 'date':
+            this.hours(0);
+            /* falls through */
+        case 'hour':
+            this.minutes(0);
+            /* falls through */
+        case 'minute':
+            this.seconds(0);
+            /* falls through */
+        case 'second':
+            this.milliseconds(0);
+    }
+
+    // weeks are a special case
+    if (units === 'week') {
+        this.weekday(0);
+    }
+    if (units === 'isoWeek') {
+        this.isoWeekday(1);
+    }
+
+    // quarters are also special
+    if (units === 'quarter') {
+        this.month(Math.floor(this.month() / 3) * 3);
+    }
+
+    return this;
+}
+
+function endOf (units) {
+    units = normalizeUnits(units);
+    if (units === undefined || units === 'millisecond') {
+        return this;
+    }
+
+    // 'date' is an alias for 'day', so it should be considered as such.
+    if (units === 'date') {
+        units = 'day';
+    }
+
+    return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
+}
+
+function valueOf () {
+    return this._d.valueOf() - ((this._offset || 0) * 60000);
+}
+
+function unix () {
+    return Math.floor(this.valueOf() / 1000);
+}
+
+function toDate () {
+    return new Date(this.valueOf());
+}
+
+function toArray () {
+    var m = this;
+    return [m.year(), m.month(), m.date(), m.hour(), m.minute(), m.second(), m.millisecond()];
+}
+
+function toObject$2 () {
+    var m = this;
+    return {
+        years: m.year(),
+        months: m.month(),
+        date: m.date(),
+        hours: m.hours(),
+        minutes: m.minutes(),
+        seconds: m.seconds(),
+        milliseconds: m.milliseconds()
+    };
+}
+
+function toJSON () {
+    // new Date(NaN).toJSON() === null
+    return this.isValid() ? this.toISOString() : null;
+}
+
+function isValid$5 () {
+    return isValid$3(this);
+}
+
+function parsingFlags () {
+    return extend$1({}, getParsingFlags(this));
+}
+
+function invalidAt () {
+    return getParsingFlags(this).overflow;
+}
+
+function creationData() {
+    return {
+        input: this._i,
+        format: this._f,
+        locale: this._locale,
+        isUTC: this._isUTC,
+        strict: this._strict
+    };
+}
+
+// FORMATTING
+
+addFormatToken(0, ['gg', 2], 0, function () {
+    return this.weekYear() % 100;
+});
+
+addFormatToken(0, ['GG', 2], 0, function () {
+    return this.isoWeekYear() % 100;
+});
+
+function addWeekYearFormatToken (token, getter) {
+    addFormatToken(0, [token, token.length], 0, getter);
+}
+
+addWeekYearFormatToken('gggg',     'weekYear');
+addWeekYearFormatToken('ggggg',    'weekYear');
+addWeekYearFormatToken('GGGG',  'isoWeekYear');
+addWeekYearFormatToken('GGGGG', 'isoWeekYear');
+
+// ALIASES
+
+addUnitAlias('weekYear', 'gg');
+addUnitAlias('isoWeekYear', 'GG');
+
+// PRIORITY
+
+addUnitPriority('weekYear', 1);
+addUnitPriority('isoWeekYear', 1);
+
+
+// PARSING
+
+addRegexToken('G',      matchSigned);
+addRegexToken('g',      matchSigned);
+addRegexToken('GG',     match1to2, match2);
+addRegexToken('gg',     match1to2, match2);
+addRegexToken('GGGG',   match1to4, match4);
+addRegexToken('gggg',   match1to4, match4);
+addRegexToken('GGGGG',  match1to6, match6);
+addRegexToken('ggggg',  match1to6, match6);
+
+addWeekParseToken(['gggg', 'ggggg', 'GGGG', 'GGGGG'], function (input, week, config, token) {
+    week[token.substr(0, 2)] = toInt(input);
+});
+
+addWeekParseToken(['gg', 'GG'], function (input, week, config, token) {
+    week[token] = hooks.parseTwoDigitYear(input);
+});
+
+// MOMENTS
+
+function getSetWeekYear (input) {
+    return getSetWeekYearHelper.call(this,
+            input,
+            this.week(),
+            this.weekday(),
+            this.localeData()._week.dow,
+            this.localeData()._week.doy);
+}
+
+function getSetISOWeekYear (input) {
+    return getSetWeekYearHelper.call(this,
+            input, this.isoWeek(), this.isoWeekday(), 1, 4);
+}
+
+function getISOWeeksInYear () {
+    return weeksInYear(this.year(), 1, 4);
+}
+
+function getWeeksInYear () {
+    var weekInfo = this.localeData()._week;
+    return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
+}
+
+function getSetWeekYearHelper(input, week, weekday, dow, doy) {
+    var weeksTarget;
+    if (input == null) {
+        return weekOfYear(this, dow, doy).year;
+    } else {
+        weeksTarget = weeksInYear(input, dow, doy);
+        if (week > weeksTarget) {
+            week = weeksTarget;
+        }
+        return setWeekAll.call(this, input, week, weekday, dow, doy);
+    }
+}
+
+function setWeekAll(weekYear, week, weekday, dow, doy) {
+    var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy),
+        date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
+
+    this.year(date.getUTCFullYear());
+    this.month(date.getUTCMonth());
+    this.date(date.getUTCDate());
+    return this;
+}
+
+// FORMATTING
+
+addFormatToken('Q', 0, 'Qo', 'quarter');
+
+// ALIASES
+
+addUnitAlias('quarter', 'Q');
+
+// PRIORITY
+
+addUnitPriority('quarter', 7);
+
+// PARSING
+
+addRegexToken('Q', match1);
+addParseToken('Q', function (input, array) {
+    array[MONTH] = (toInt(input) - 1) * 3;
+});
+
+// MOMENTS
+
+function getSetQuarter (input) {
+    return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
+}
+
+// FORMATTING
+
+addFormatToken('D', ['DD', 2], 'Do', 'date');
+
+// ALIASES
+
+addUnitAlias('date', 'D');
+
+// PRIOROITY
+addUnitPriority('date', 9);
+
+// PARSING
+
+addRegexToken('D',  match1to2);
+addRegexToken('DD', match1to2, match2);
+addRegexToken('Do', function (isStrict, locale) {
+    // TODO: Remove "ordinalParse" fallback in next major release.
+    return isStrict ?
+      (locale._dayOfMonthOrdinalParse || locale._ordinalParse) :
+      locale._dayOfMonthOrdinalParseLenient;
+});
+
+addParseToken(['D', 'DD'], DATE);
+addParseToken('Do', function (input, array) {
+    array[DATE] = toInt(input.match(match1to2)[0], 10);
+});
+
+// MOMENTS
+
+var getSetDayOfMonth = makeGetSet('Date', true);
+
+// FORMATTING
+
+addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
+
+// ALIASES
+
+addUnitAlias('dayOfYear', 'DDD');
+
+// PRIORITY
+addUnitPriority('dayOfYear', 4);
+
+// PARSING
+
+addRegexToken('DDD',  match1to3);
+addRegexToken('DDDD', match3);
+addParseToken(['DDD', 'DDDD'], function (input, array, config) {
+    config._dayOfYear = toInt(input);
+});
+
+// HELPERS
+
+// MOMENTS
+
+function getSetDayOfYear (input) {
+    var dayOfYear = Math.round((this.clone().startOf('day') - this.clone().startOf('year')) / 864e5) + 1;
+    return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
+}
+
+// FORMATTING
+
+addFormatToken('m', ['mm', 2], 0, 'minute');
+
+// ALIASES
+
+addUnitAlias('minute', 'm');
+
+// PRIORITY
+
+addUnitPriority('minute', 14);
+
+// PARSING
+
+addRegexToken('m',  match1to2);
+addRegexToken('mm', match1to2, match2);
+addParseToken(['m', 'mm'], MINUTE);
+
+// MOMENTS
+
+var getSetMinute = makeGetSet('Minutes', false);
+
+// FORMATTING
+
+addFormatToken('s', ['ss', 2], 0, 'second');
+
+// ALIASES
+
+addUnitAlias('second', 's');
+
+// PRIORITY
+
+addUnitPriority('second', 15);
+
+// PARSING
+
+addRegexToken('s',  match1to2);
+addRegexToken('ss', match1to2, match2);
+addParseToken(['s', 'ss'], SECOND);
+
+// MOMENTS
+
+var getSetSecond = makeGetSet('Seconds', false);
+
+// FORMATTING
+
+addFormatToken('S', 0, 0, function () {
+    return ~~(this.millisecond() / 100);
+});
+
+addFormatToken(0, ['SS', 2], 0, function () {
+    return ~~(this.millisecond() / 10);
+});
+
+addFormatToken(0, ['SSS', 3], 0, 'millisecond');
+addFormatToken(0, ['SSSS', 4], 0, function () {
+    return this.millisecond() * 10;
+});
+addFormatToken(0, ['SSSSS', 5], 0, function () {
+    return this.millisecond() * 100;
+});
+addFormatToken(0, ['SSSSSS', 6], 0, function () {
+    return this.millisecond() * 1000;
+});
+addFormatToken(0, ['SSSSSSS', 7], 0, function () {
+    return this.millisecond() * 10000;
+});
+addFormatToken(0, ['SSSSSSSS', 8], 0, function () {
+    return this.millisecond() * 100000;
+});
+addFormatToken(0, ['SSSSSSSSS', 9], 0, function () {
+    return this.millisecond() * 1000000;
+});
+
+
+// ALIASES
+
+addUnitAlias('millisecond', 'ms');
+
+// PRIORITY
+
+addUnitPriority('millisecond', 16);
+
+// PARSING
+
+addRegexToken('S',    match1to3, match1);
+addRegexToken('SS',   match1to3, match2);
+addRegexToken('SSS',  match1to3, match3);
+
+var token;
+for (token = 'SSSS'; token.length <= 9; token += 'S') {
+    addRegexToken(token, matchUnsigned);
+}
+
+function parseMs(input, array) {
+    array[MILLISECOND] = toInt(('0.' + input) * 1000);
+}
+
+for (token = 'S'; token.length <= 9; token += 'S') {
+    addParseToken(token, parseMs);
+}
+// MOMENTS
+
+var getSetMillisecond = makeGetSet('Milliseconds', false);
+
+// FORMATTING
+
+addFormatToken('z',  0, 0, 'zoneAbbr');
+addFormatToken('zz', 0, 0, 'zoneName');
+
+// MOMENTS
+
+function getZoneAbbr () {
+    return this._isUTC ? 'UTC' : '';
+}
+
+function getZoneName () {
+    return this._isUTC ? 'Coordinated Universal Time' : '';
+}
+
+var proto = Moment.prototype;
+
+proto.add               = add;
+proto.calendar          = calendar$1;
+proto.clone             = clone;
+proto.diff              = diff;
+proto.endOf             = endOf;
+proto.format            = format$2;
+proto.from              = from;
+proto.fromNow           = fromNow;
+proto.to                = to;
+proto.toNow             = toNow;
+proto.get               = stringGet;
+proto.invalidAt         = invalidAt;
+proto.isAfter           = isAfter;
+proto.isBefore          = isBefore;
+proto.isBetween         = isBetween;
+proto.isSame            = isSame;
+proto.isSameOrAfter     = isSameOrAfter;
+proto.isSameOrBefore    = isSameOrBefore;
+proto.isValid           = isValid$5;
+proto.lang              = lang;
+proto.locale            = locale;
+proto.localeData        = localeData;
+proto.max               = prototypeMax;
+proto.min               = prototypeMin;
+proto.parsingFlags      = parsingFlags;
+proto.set               = stringSet;
+proto.startOf           = startOf;
+proto.subtract          = subtract;
+proto.toArray           = toArray;
+proto.toObject          = toObject$2;
+proto.toDate            = toDate;
+proto.toISOString       = toISOString;
+proto.inspect           = inspect;
+proto.toJSON            = toJSON;
+proto.toString          = toString$1;
+proto.unix              = unix;
+proto.valueOf           = valueOf;
+proto.creationData      = creationData;
+
+// Year
+proto.year       = getSetYear;
+proto.isLeapYear = getIsLeapYear;
+
+// Week Year
+proto.weekYear    = getSetWeekYear;
+proto.isoWeekYear = getSetISOWeekYear;
+
+// Quarter
+proto.quarter = proto.quarters = getSetQuarter;
+
+// Month
+proto.month       = getSetMonth;
+proto.daysInMonth = getDaysInMonth;
+
+// Week
+proto.week           = proto.weeks        = getSetWeek;
+proto.isoWeek        = proto.isoWeeks     = getSetISOWeek;
+proto.weeksInYear    = getWeeksInYear;
+proto.isoWeeksInYear = getISOWeeksInYear;
+
+// Day
+proto.date       = getSetDayOfMonth;
+proto.day        = proto.days             = getSetDayOfWeek;
+proto.weekday    = getSetLocaleDayOfWeek;
+proto.isoWeekday = getSetISODayOfWeek;
+proto.dayOfYear  = getSetDayOfYear;
+
+// Hour
+proto.hour = proto.hours = getSetHour;
+
+// Minute
+proto.minute = proto.minutes = getSetMinute;
+
+// Second
+proto.second = proto.seconds = getSetSecond;
+
+// Millisecond
+proto.millisecond = proto.milliseconds = getSetMillisecond;
+
+// Offset
+proto.utcOffset            = getSetOffset;
+proto.utc                  = setOffsetToUTC;
+proto.local                = setOffsetToLocal;
+proto.parseZone            = setOffsetToParsedOffset;
+proto.hasAlignedHourOffset = hasAlignedHourOffset;
+proto.isDST                = isDaylightSavingTime;
+proto.isLocal              = isLocal;
+proto.isUtcOffset          = isUtcOffset;
+proto.isUtc                = isUtc;
+proto.isUTC                = isUtc;
+
+// Timezone
+proto.zoneAbbr = getZoneAbbr;
+proto.zoneName = getZoneName;
+
+// Deprecations
+proto.dates  = deprecate('dates accessor is deprecated. Use date instead.', getSetDayOfMonth);
+proto.months = deprecate('months accessor is deprecated. Use month instead', getSetMonth);
+proto.years  = deprecate('years accessor is deprecated. Use year instead', getSetYear);
+proto.zone   = deprecate('moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/', getSetZone);
+proto.isDSTShifted = deprecate('isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information', isDaylightSavingTimeShifted);
+
+function createUnix (input) {
+    return createLocal(input * 1000);
+}
+
+function createInZone () {
+    return createLocal.apply(null, arguments).parseZone();
+}
+
+function preParsePostFormat (string) {
+    return string;
+}
+
+var proto$1 = Locale.prototype;
+
+proto$1.calendar        = calendar;
+proto$1.longDateFormat  = longDateFormat;
+proto$1.invalidDate     = invalidDate;
+proto$1.ordinal         = ordinal;
+proto$1.preparse        = preParsePostFormat;
+proto$1.postformat      = preParsePostFormat;
+proto$1.relativeTime    = relativeTime;
+proto$1.pastFuture      = pastFuture;
+proto$1.set             = set;
+
+// Month
+proto$1.months            =        localeMonths;
+proto$1.monthsShort       =        localeMonthsShort;
+proto$1.monthsParse       =        localeMonthsParse;
+proto$1.monthsRegex       = monthsRegex;
+proto$1.monthsShortRegex  = monthsShortRegex;
+
+// Week
+proto$1.week = localeWeek;
+proto$1.firstDayOfYear = localeFirstDayOfYear;
+proto$1.firstDayOfWeek = localeFirstDayOfWeek;
+
+// Day of Week
+proto$1.weekdays       =        localeWeekdays;
+proto$1.weekdaysMin    =        localeWeekdaysMin;
+proto$1.weekdaysShort  =        localeWeekdaysShort;
+proto$1.weekdaysParse  =        localeWeekdaysParse;
+
+proto$1.weekdaysRegex       =        weekdaysRegex;
+proto$1.weekdaysShortRegex  =        weekdaysShortRegex;
+proto$1.weekdaysMinRegex    =        weekdaysMinRegex;
+
+// Hours
+proto$1.isPM = localeIsPM;
+proto$1.meridiem = localeMeridiem;
+
+function get$1 (format, index, field, setter) {
+    var locale = getLocale();
+    var utc = createUTC().set(setter, index);
+    return locale[field](utc, format);
+}
+
+function listMonthsImpl (format, index, field) {
+    if (isNumber$3(format)) {
+        index = format;
+        format = undefined;
+    }
+
+    format = format || '';
+
+    if (index != null) {
+        return get$1(format, index, field, 'month');
+    }
+
+    var i;
+    var out = [];
+    for (i = 0; i < 12; i++) {
+        out[i] = get$1(format, i, field, 'month');
+    }
+    return out;
+}
+
+// ()
+// (5)
+// (fmt, 5)
+// (fmt)
+// (true)
+// (true, 5)
+// (true, fmt, 5)
+// (true, fmt)
+function listWeekdaysImpl (localeSorted, format, index, field) {
+    if (typeof localeSorted === 'boolean') {
+        if (isNumber$3(format)) {
+            index = format;
+            format = undefined;
+        }
+
+        format = format || '';
+    } else {
+        format = localeSorted;
+        index = format;
+        localeSorted = false;
+
+        if (isNumber$3(format)) {
+            index = format;
+            format = undefined;
+        }
+
+        format = format || '';
+    }
+
+    var locale = getLocale(),
+        shift = localeSorted ? locale._week.dow : 0;
+
+    if (index != null) {
+        return get$1(format, (index + shift) % 7, field, 'day');
+    }
+
+    var i;
+    var out = [];
+    for (i = 0; i < 7; i++) {
+        out[i] = get$1(format, (i + shift) % 7, field, 'day');
+    }
+    return out;
+}
+
+function listMonths (format, index) {
+    return listMonthsImpl(format, index, 'months');
+}
+
+function listMonthsShort (format, index) {
+    return listMonthsImpl(format, index, 'monthsShort');
+}
+
+function listWeekdays (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdays');
+}
+
+function listWeekdaysShort (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysShort');
+}
+
+function listWeekdaysMin (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysMin');
+}
+
+getSetGlobalLocale('en', {
+    dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
+    ordinal : function (number) {
+        var b = number % 10,
+            output = (toInt(number % 100 / 10) === 1) ? 'th' :
+            (b === 1) ? 'st' :
+            (b === 2) ? 'nd' :
+            (b === 3) ? 'rd' : 'th';
+        return number + output;
+    }
+});
+
+// Side effect imports
+hooks.lang = deprecate('moment.lang is deprecated. Use moment.locale instead.', getSetGlobalLocale);
+hooks.langData = deprecate('moment.langData is deprecated. Use moment.localeData instead.', getLocale);
+
+var mathAbs = Math.abs;
+
+function abs () {
+    var data           = this._data;
+
+    this._milliseconds = mathAbs(this._milliseconds);
+    this._days         = mathAbs(this._days);
+    this._months       = mathAbs(this._months);
+
+    data.milliseconds  = mathAbs(data.milliseconds);
+    data.seconds       = mathAbs(data.seconds);
+    data.minutes       = mathAbs(data.minutes);
+    data.hours         = mathAbs(data.hours);
+    data.months        = mathAbs(data.months);
+    data.years         = mathAbs(data.years);
+
+    return this;
+}
+
+function addSubtract$1 (duration, input, value, direction) {
+    var other = createDuration(input, value);
+
+    duration._milliseconds += direction * other._milliseconds;
+    duration._days         += direction * other._days;
+    duration._months       += direction * other._months;
+
+    return duration._bubble();
+}
+
+// supports only 2.0-style add(1, 's') or add(duration)
+function add$1 (input, value) {
+    return addSubtract$1(this, input, value, 1);
+}
+
+// supports only 2.0-style subtract(1, 's') or subtract(duration)
+function subtract$1 (input, value) {
+    return addSubtract$1(this, input, value, -1);
+}
+
+function absCeil (number) {
+    if (number < 0) {
+        return Math.floor(number);
+    } else {
+        return Math.ceil(number);
+    }
+}
+
+function bubble () {
+    var milliseconds = this._milliseconds;
+    var days         = this._days;
+    var months       = this._months;
+    var data         = this._data;
+    var seconds, minutes, hours, years, monthsFromDays;
+
+    // if we have a mix of positive and negative values, bubble down first
+    // check: https://github.com/moment/moment/issues/2166
+    if (!((milliseconds >= 0 && days >= 0 && months >= 0) ||
+            (milliseconds <= 0 && days <= 0 && months <= 0))) {
+        milliseconds += absCeil(monthsToDays(months) + days) * 864e5;
+        days = 0;
+        months = 0;
+    }
+
+    // The following code bubbles up values, see the tests for
+    // examples of what that means.
+    data.milliseconds = milliseconds % 1000;
+
+    seconds           = absFloor(milliseconds / 1000);
+    data.seconds      = seconds % 60;
+
+    minutes           = absFloor(seconds / 60);
+    data.minutes      = minutes % 60;
+
+    hours             = absFloor(minutes / 60);
+    data.hours        = hours % 24;
+
+    days += absFloor(hours / 24);
+
+    // convert days to months
+    monthsFromDays = absFloor(daysToMonths(days));
+    months += monthsFromDays;
+    days -= absCeil(monthsToDays(monthsFromDays));
+
+    // 12 months -> 1 year
+    years = absFloor(months / 12);
+    months %= 12;
+
+    data.days   = days;
+    data.months = months;
+    data.years  = years;
+
+    return this;
+}
+
+function daysToMonths (days) {
+    // 400 years have 146097 days (taking into account leap year rules)
+    // 400 years have 12 months === 4800
+    return days * 4800 / 146097;
+}
+
+function monthsToDays (months) {
+    // the reverse of daysToMonths
+    return months * 146097 / 4800;
+}
+
+function as (units) {
+    if (!this.isValid()) {
+        return NaN;
+    }
+    var days;
+    var months;
+    var milliseconds = this._milliseconds;
+
+    units = normalizeUnits(units);
+
+    if (units === 'month' || units === 'year') {
+        days   = this._days   + milliseconds / 864e5;
+        months = this._months + daysToMonths(days);
+        return units === 'month' ? months : months / 12;
+    } else {
+        // handle milliseconds separately because of floating point math errors (issue #1867)
+        days = this._days + Math.round(monthsToDays(this._months));
+        switch (units) {
+            case 'week'   : return days / 7     + milliseconds / 6048e5;
+            case 'day'    : return days         + milliseconds / 864e5;
+            case 'hour'   : return days * 24    + milliseconds / 36e5;
+            case 'minute' : return days * 1440  + milliseconds / 6e4;
+            case 'second' : return days * 86400 + milliseconds / 1000;
+            // Math.floor prevents floating point math errors here
+            case 'millisecond': return Math.floor(days * 864e5) + milliseconds;
+            default: throw new Error('Unknown unit ' + units);
+        }
+    }
+}
+
+// TODO: Use this.as('ms')?
+function valueOf$1 () {
+    if (!this.isValid()) {
+        return NaN;
+    }
+    return (
+        this._milliseconds +
+        this._days * 864e5 +
+        (this._months % 12) * 2592e6 +
+        toInt(this._months / 12) * 31536e6
+    );
+}
+
+function makeAs (alias) {
+    return function () {
+        return this.as(alias);
+    };
+}
+
+var asMilliseconds = makeAs('ms');
+var asSeconds      = makeAs('s');
+var asMinutes      = makeAs('m');
+var asHours        = makeAs('h');
+var asDays         = makeAs('d');
+var asWeeks        = makeAs('w');
+var asMonths       = makeAs('M');
+var asYears        = makeAs('y');
+
+function get$2 (units) {
+    units = normalizeUnits(units);
+    return this.isValid() ? this[units + 's']() : NaN;
+}
+
+function makeGetter(name) {
+    return function () {
+        return this.isValid() ? this._data[name] : NaN;
+    };
+}
+
+var milliseconds = makeGetter('milliseconds');
+var seconds      = makeGetter('seconds');
+var minutes      = makeGetter('minutes');
+var hours        = makeGetter('hours');
+var days         = makeGetter('days');
+var months       = makeGetter('months');
+var years        = makeGetter('years');
+
+function weeks () {
+    return absFloor(this.days() / 7);
+}
+
+var round = Math.round;
+var thresholds = {
+    ss: 44,         // a few seconds to seconds
+    s : 45,         // seconds to minute
+    m : 45,         // minutes to hour
+    h : 22,         // hours to day
+    d : 26,         // days to month
+    M : 11          // months to year
+};
+
+// helper function for moment.fn.from, moment.fn.fromNow, and moment.duration.fn.humanize
+function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale) {
+    return locale.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
+}
+
+function relativeTime$1 (posNegDuration, withoutSuffix, locale) {
+    var duration = createDuration(posNegDuration).abs();
+    var seconds  = round(duration.as('s'));
+    var minutes  = round(duration.as('m'));
+    var hours    = round(duration.as('h'));
+    var days     = round(duration.as('d'));
+    var months   = round(duration.as('M'));
+    var years    = round(duration.as('y'));
+
+    var a = seconds <= thresholds.ss && ['s', seconds]  ||
+            seconds < thresholds.s   && ['ss', seconds] ||
+            minutes <= 1             && ['m']           ||
+            minutes < thresholds.m   && ['mm', minutes] ||
+            hours   <= 1             && ['h']           ||
+            hours   < thresholds.h   && ['hh', hours]   ||
+            days    <= 1             && ['d']           ||
+            days    < thresholds.d   && ['dd', days]    ||
+            months  <= 1             && ['M']           ||
+            months  < thresholds.M   && ['MM', months]  ||
+            years   <= 1             && ['y']           || ['yy', years];
+
+    a[2] = withoutSuffix;
+    a[3] = +posNegDuration > 0;
+    a[4] = locale;
+    return substituteTimeAgo.apply(null, a);
+}
+
+// This function allows you to set the rounding function for relative time strings
+function getSetRelativeTimeRounding (roundingFunction) {
+    if (roundingFunction === undefined) {
+        return round;
+    }
+    if (typeof(roundingFunction) === 'function') {
+        round = roundingFunction;
+        return true;
+    }
+    return false;
+}
+
+// This function allows you to set a threshold for relative time strings
+function getSetRelativeTimeThreshold (threshold, limit) {
+    if (thresholds[threshold] === undefined) {
+        return false;
+    }
+    if (limit === undefined) {
+        return thresholds[threshold];
+    }
+    thresholds[threshold] = limit;
+    if (threshold === 's') {
+        thresholds.ss = limit - 1;
+    }
+    return true;
+}
+
+function humanize (withSuffix) {
+    if (!this.isValid()) {
+        return this.localeData().invalidDate();
+    }
+
+    var locale = this.localeData();
+    var output = relativeTime$1(this, !withSuffix, locale);
+
+    if (withSuffix) {
+        output = locale.pastFuture(+this, output);
+    }
+
+    return locale.postformat(output);
+}
+
+var abs$1 = Math.abs;
+
+function toISOString$1() {
+    // for ISO strings we do not use the normal bubbling rules:
+    //  * milliseconds bubble up until they become hours
+    //  * days do not bubble at all
+    //  * months bubble up until they become years
+    // This is because there is no context-free conversion between hours and days
+    // (think of clock changes)
+    // and also not between days and months (28-31 days per month)
+    if (!this.isValid()) {
+        return this.localeData().invalidDate();
+    }
+
+    var seconds = abs$1(this._milliseconds) / 1000;
+    var days         = abs$1(this._days);
+    var months       = abs$1(this._months);
+    var minutes, hours, years;
+
+    // 3600 seconds -> 60 minutes -> 1 hour
+    minutes           = absFloor(seconds / 60);
+    hours             = absFloor(minutes / 60);
+    seconds %= 60;
+    minutes %= 60;
+
+    // 12 months -> 1 year
+    years  = absFloor(months / 12);
+    months %= 12;
+
+
+    // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
+    var Y = years;
+    var M = months;
+    var D = days;
+    var h = hours;
+    var m = minutes;
+    var s = seconds;
+    var total = this.asSeconds();
+
+    if (!total) {
+        // this is the same as C#'s (Noda) and python (isodate)...
+        // but not other JS (goog.date)
+        return 'P0D';
+    }
+
+    return (total < 0 ? '-' : '') +
+        'P' +
+        (Y ? Y + 'Y' : '') +
+        (M ? M + 'M' : '') +
+        (D ? D + 'D' : '') +
+        ((h || m || s) ? 'T' : '') +
+        (h ? h + 'H' : '') +
+        (m ? m + 'M' : '') +
+        (s ? s + 'S' : '');
+}
+
+var proto$2 = Duration.prototype;
+
+proto$2.isValid        = isValid$4;
+proto$2.abs            = abs;
+proto$2.add            = add$1;
+proto$2.subtract       = subtract$1;
+proto$2.as             = as;
+proto$2.asMilliseconds = asMilliseconds;
+proto$2.asSeconds      = asSeconds;
+proto$2.asMinutes      = asMinutes;
+proto$2.asHours        = asHours;
+proto$2.asDays         = asDays;
+proto$2.asWeeks        = asWeeks;
+proto$2.asMonths       = asMonths;
+proto$2.asYears        = asYears;
+proto$2.valueOf        = valueOf$1;
+proto$2._bubble        = bubble;
+proto$2.get            = get$2;
+proto$2.milliseconds   = milliseconds;
+proto$2.seconds        = seconds;
+proto$2.minutes        = minutes;
+proto$2.hours          = hours;
+proto$2.days           = days;
+proto$2.weeks          = weeks;
+proto$2.months         = months;
+proto$2.years          = years;
+proto$2.humanize       = humanize;
+proto$2.toISOString    = toISOString$1;
+proto$2.toString       = toISOString$1;
+proto$2.toJSON         = toISOString$1;
+proto$2.locale         = locale;
+proto$2.localeData     = localeData;
+
+// Deprecations
+proto$2.toIsoString = deprecate('toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)', toISOString$1);
+proto$2.lang = lang;
+
+// Side effect imports
+
+// FORMATTING
+
+addFormatToken('X', 0, 0, 'unix');
+addFormatToken('x', 0, 0, 'valueOf');
+
+// PARSING
+
+addRegexToken('x', matchSigned);
+addRegexToken('X', matchTimestamp);
+addParseToken('X', function (input, array, config) {
+    config._d = new Date(parseFloat(input, 10) * 1000);
+});
+addParseToken('x', function (input, array, config) {
+    config._d = new Date(toInt(input));
+});
+
+// Side effect imports
+
+//! moment.js
+//! version : 2.18.1
+//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
+//! license : MIT
+//! momentjs.com
+
+hooks.version = '2.18.1';
+
+setHookCallback(createLocal);
+
+hooks.fn                    = proto;
+hooks.min                   = min$1;
+hooks.max                   = max$1;
+hooks.now                   = now;
+hooks.utc                   = createUTC;
+hooks.unix                  = createUnix;
+hooks.months                = listMonths;
+hooks.isDate                = isDate;
+hooks.locale                = getSetGlobalLocale;
+hooks.invalid               = createInvalid;
+hooks.duration              = createDuration;
+hooks.isMoment              = isMoment;
+hooks.weekdays              = listWeekdays;
+hooks.parseZone             = createInZone;
+hooks.localeData            = getLocale;
+hooks.isDuration            = isDuration;
+hooks.monthsShort           = listMonthsShort;
+hooks.weekdaysMin           = listWeekdaysMin;
+hooks.defineLocale          = defineLocale;
+hooks.updateLocale          = updateLocale;
+hooks.locales               = listLocales;
+hooks.weekdaysShort         = listWeekdaysShort;
+hooks.normalizeUnits        = normalizeUnits;
+hooks.relativeTimeRounding = getSetRelativeTimeRounding;
+hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
+hooks.calendarFormat        = getCalendarFormat;
+hooks.prototype             = proto;
+
+// Load modules
+
+// Delcare internals
+
+var internals = {
+    rfc3986: {}
+};
+
+internals.generate = function () {
+
+    /**
+     * elements separated by forward slash ("/") are alternatives.
+     */
+    var or = '|';
+
+    /**
+     * DIGIT = %x30-39 ; 0-9
+     */
+    var digit = '0-9';
+    var digitOnly = '[' + digit + ']';
+
+    /**
+     * ALPHA = %x41-5A / %x61-7A   ; A-Z / a-z
+     */
+    var alpha = 'a-zA-Z';
+    var alphaOnly = '[' + alpha + ']';
+
+    /**
+     * cidr       = DIGIT                ; 0-9
+     *            / %x31-32 DIGIT         ; 10-29
+     *            / "3" %x30-32           ; 30-32
+     */
+    internals.rfc3986.cidr = digitOnly + or + '[1-2]' + digitOnly + or + '3' + '[0-2]';
+
+    /**
+     * HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+     */
+    var hexDigit = digit + 'A-Fa-f';
+    var hexDigitOnly = '[' + hexDigit + ']';
+
+    /**
+     * unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+     */
+    var unreserved = alpha + digit + '-\\._~';
+
+    /**
+     * sub-delims = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+     */
+    var subDelims = '!\\$&\'\\(\\)\\*\\+,;=';
+
+    /**
+     * pct-encoded = "%" HEXDIG HEXDIG
+     */
+    var pctEncoded = '%' + hexDigit;
+
+    /**
+     * pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
+     */
+    var pchar = unreserved + pctEncoded + subDelims + ':@';
+    var pcharOnly = '[' + pchar + ']';
+
+    /**
+     * Rule to support zero-padded addresses.
+     */
+    var zeroPad = '0?';
+
+    /**
+     * dec-octet   = DIGIT                 ; 0-9
+     *            / %x31-39 DIGIT         ; 10-99
+     *            / "1" 2DIGIT            ; 100-199
+     *            / "2" %x30-34 DIGIT     ; 200-249
+     *            / "25" %x30-35          ; 250-255
+     */
+    var decOctect = '(?:' + zeroPad + zeroPad + digitOnly + or + zeroPad + '[1-9]' + digitOnly + or + '1' + digitOnly + digitOnly + or + '2' + '[0-4]' + digitOnly + or + '25' + '[0-5])';
+
+    /**
+     * IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
+     */
+    internals.rfc3986.IPv4address = '(?:' + decOctect + '\\.){3}' + decOctect;
+
+    /**
+     * h16 = 1*4HEXDIG ; 16 bits of address represented in hexadecimal
+     * ls32 = ( h16 ":" h16 ) / IPv4address ; least-significant 32 bits of address
+     * IPv6address =                            6( h16 ":" ) ls32
+     *             /                       "::" 5( h16 ":" ) ls32
+     *             / [               h16 ] "::" 4( h16 ":" ) ls32
+     *             / [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+     *             / [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+     *             / [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+     *             / [ *4( h16 ":" ) h16 ] "::"              ls32
+     *             / [ *5( h16 ":" ) h16 ] "::"              h16
+     *             / [ *6( h16 ":" ) h16 ] "::"
+     */
+    var h16 = hexDigitOnly + '{1,4}';
+    var ls32 = '(?:' + h16 + ':' + h16 + '|' + internals.rfc3986.IPv4address + ')';
+    var IPv6SixHex = '(?:' + h16 + ':){6}' + ls32;
+    var IPv6FiveHex = '::(?:' + h16 + ':){5}' + ls32;
+    var IPv6FourHex = '(?:' + h16 + ')?::(?:' + h16 + ':){4}' + ls32;
+    var IPv6ThreeHex = '(?:(?:' + h16 + ':){0,1}' + h16 + ')?::(?:' + h16 + ':){3}' + ls32;
+    var IPv6TwoHex = '(?:(?:' + h16 + ':){0,2}' + h16 + ')?::(?:' + h16 + ':){2}' + ls32;
+    var IPv6OneHex = '(?:(?:' + h16 + ':){0,3}' + h16 + ')?::' + h16 + ':' + ls32;
+    var IPv6NoneHex = '(?:(?:' + h16 + ':){0,4}' + h16 + ')?::' + ls32;
+    var IPv6NoneHex2 = '(?:(?:' + h16 + ':){0,5}' + h16 + ')?::' + h16;
+    var IPv6NoneHex3 = '(?:(?:' + h16 + ':){0,6}' + h16 + ')?::';
+    internals.rfc3986.IPv6address = '(?:' + IPv6SixHex + or + IPv6FiveHex + or + IPv6FourHex + or + IPv6ThreeHex + or + IPv6TwoHex + or + IPv6OneHex + or + IPv6NoneHex + or + IPv6NoneHex2 + or + IPv6NoneHex3 + ')';
+
+    /**
+     * IPvFuture = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+     */
+    internals.rfc3986.IPvFuture = 'v' + hexDigitOnly + '+\\.[' + unreserved + subDelims + ':]+';
+
+    /**
+     * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+     */
+    internals.rfc3986.scheme = alphaOnly + '[' + alpha + digit + '+-\\.]*';
+
+    /**
+     * userinfo = *( unreserved / pct-encoded / sub-delims / ":" )
+     */
+    var userinfo = '[' + unreserved + pctEncoded + subDelims + ':]*';
+
+    /**
+     * IP-literal = "[" ( IPv6address / IPvFuture  ) "]"
+     */
+    internals.rfc3986.IPLiteral = '\\[(?:' + internals.rfc3986.IPv6address + or + internals.rfc3986.IPvFuture + ')\\]';
+
+    /**
+     * reg-name = *( unreserved / pct-encoded / sub-delims )
+     */
+    var regName = '[' + unreserved + pctEncoded + subDelims + ']{0,255}';
+
+    /**
+     * host = IP-literal / IPv4address / reg-name
+     */
+    var host = '(?:' + internals.rfc3986.IPLiteral + or + internals.rfc3986.IPv4address + or + regName + ')';
+
+    /**
+     * port = *DIGIT
+     */
+    var port = digitOnly + '*';
+
+    /**
+     * authority   = [ userinfo "@" ] host [ ":" port ]
+     */
+    var authority = '(?:' + userinfo + '@)?' + host + '(?::' + port + ')?';
+
+    /**
+     * segment       = *pchar
+     * segment-nz    = 1*pchar
+     * path          = path-abempty    ; begins with "/" or is empty
+     *               / path-absolute   ; begins with "/" but not "//"
+     *               / path-noscheme   ; begins with a non-colon segment
+     *               / path-rootless   ; begins with a segment
+     *               / path-empty      ; zero characters
+     * path-abempty  = *( "/" segment )
+     * path-absolute = "/" [ segment-nz *( "/" segment ) ]
+     * path-rootless = segment-nz *( "/" segment )
+     */
+    var segment = pcharOnly + '*';
+    var segmentNz = pcharOnly + '+';
+    var pathAbEmpty = '(?:\\/' + segment + ')*';
+    var pathAbsolute = '\\/(?:' + segmentNz + pathAbEmpty + ')?';
+    var pathRootless = segmentNz + pathAbEmpty;
+
+    /**
+     * hier-part = "//" authority path
+     */
+    internals.rfc3986.hierPart = '(?:' + '(?:\\/\\/' + authority + pathAbEmpty + ')' + or + pathAbsolute + or + pathRootless + ')';
+
+    /**
+     * query = *( pchar / "/" / "?" )
+     */
+    internals.rfc3986.query = '[' + pchar + '\\/\\?]*(?=#|$)'; //Finish matching either at the fragment part or end of the line.
+
+    /**
+     * fragment = *( pchar / "/" / "?" )
+     */
+    internals.rfc3986.fragment = '[' + pchar + '\\/\\?]*';
+
+    /**
+     * URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+     *
+     * OR
+     *
+     * relative-ref = relative-part [ "?" query ] [ "#" fragment ]
+     */
+    internals.rfc3986.uri = '^(?:' + internals.rfc3986.scheme + ':' + internals.rfc3986.hierPart + ')(?:\\?' + internals.rfc3986.query + ')?' + '(?:#' + internals.rfc3986.fragment + ')?$';
+};
+
+internals.generate();
+
+var rfc3986 = internals.rfc3986;
+
+const resultTemplate = {
+  isValid: true,
+  message: ''
+};
+
+/**
+ * 独自validate。
+ * ParameterObjectのrequired(boolean)に対応するため。
+ * @param {Object} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const selfRequired = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'selfRequired')) {
+    return result;
+  }
+  if (isBoolean_1(constraints.selfRequired) && constraints.selfRequired) {
+    if (value === undefined) {
+      result.isValid = false;
+      result.message = '必須項目です。';
+      return result;
+    }
+  }
+
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1
+ * @param {Number} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const multipleOf = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'multipleOf')) {
+    return result;
+  }
+  const multipleOf = constraints.multipleOf;
+  if ((value % multipleOf) !== 0) {
+    result.isValid = false;
+    result.message = `${multipleOf}で割り切れる数値にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.2
+ * @param {Number} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const maximum = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'maximum')) {
+    return result;
+  }
+  const maximum = constraints.maximum;
+  // 未定義時はfalse扱い。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.2.3
+  const exclusiveMaximum = !!constraints.exclusiveMaximum;
+  if (exclusiveMaximum) {
+    if (value >= maximum) {
+      result.isValid = false;
+      result.message = `${maximum}より小さい数値にして下さい。`;
+      return result;
+    }
+  } else {
+    if (value > maximum) {
+      result.isValid = false;
+      result.message = `${maximum}以下の数値にして下さい。`;
+      return result;
+    }
+  }
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.3
+ * @param {Number} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const minimum = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'minimum')) {
+    return result;
+  }
+  const minimum = constraints.minimum;
+  // 未定義時はfalse扱い。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.3.3
+  const exclusiveMinimum = !!constraints.exclusiveMinimum;
+  if (exclusiveMinimum) {
+    if (value <= minimum) {
+      result.isValid = false;
+      result.message = `${minimum}より大きい数値にして下さい。`;
+      return result;
+    }
+  } else {
+    if (value < minimum) {
+      result.isValid = false;
+      result.message = `${minimum}以上の数値にして下さい。`;
+      return result;
+    }
+  }
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.1
+ * @param {String} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const maxLength = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'maxLength')) {
+    return result;
+  }
+  const maxLength = constraints.maxLength;
+  if (value.length > maxLength) {
+    result.isValid = false;
+    result.message = `文字数を${maxLength}以下にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.2
+ * @param {String} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const minLength = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // デフォルト値は`0`。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.2.3
+  const minLength = constraints.minLength || 0;
+  if (value.length < minLength) {
+    result.isValid = false;
+    result.message = `文字数を${minLength}以上にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.3
+ * @param {String} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const pattern = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'pattern')) {
+    return result;
+  }
+  // ECMA 262 regular expression dialect.
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.3.1
+  const pattern = constraints.pattern;
+  if (!value.match(pattern)) {
+    result.isValid = false;
+    result.message = `${pattern}にマッチさせて下さい。`;
+    return result;
+  }
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1
+ * @param {Array} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const additionalItemsAndItems = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // itemsはSchemaObject or array of SchemaObject.
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
+  // additionalItemsはboolean or SchemaObject.
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
+  // 未定義の場合は空のSchemaObjectになる。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.4
+  let items;
+  let additionalItems;
+  if (!hasOwn_1$1(constraints, 'items')) {
+    items = {};
+  } else {
+    items = constraints.items;
+  }
+  if (!hasOwn_1$1(constraints, 'additionalItems')) {
+    additionalItems = {};
+  } else {
+    additionalItems = constraints.additionalItems;
+  }
+
+  // itemsが未定義もしくはオブジェクトならばvalidate結果は常にOK。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.2
+  if (isObject_1(items)) {
+    return result;
+  }
+  // additionalItemsがBooleanのtrueもしくはobjectならばvalidate結果は常にOK。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
+  if ((isBoolean_1(additionalItems) && additionalItems) || isObject_1(additionalItems)) {
+    return result;
+  }
+  // additionalItemsがBooleanのfalseでありitemsがarrayの場合、
+  // value配列の長さがitemsの長さ以下ならばvalidate結果はOK。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
+  if ((isBoolean_1(additionalItems) && !additionalItems) && isArray_1$1(items)) {
+    if (value.length <= items.length) {
+      return result;
+    }
+  }
+
+  result.isValid = false;
+  result.message = '"items"、"additionalItems"をパスするように書き換えて下さい。';
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.2
+ * @param {Array} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const maxItems = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'maxItems')) {
+    return result;
+  }
+  const maxItems = constraints.maxItems;
+  if (value.length > maxItems) {
+    result.isValid = false;
+    result.message = `要素数を${maxItems}以下にして下さい。`;
+    return result;
+  }
+
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.3
+ * @param {Array} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const minItems = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // デフォルト値は`0`。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.3.3
+  const minItems = constraints.minItems || 0;
+  if (value.length < minItems) {
+    result.isValid = false;
+    result.message = `要素数を${minItems}以上にして下さい。`;
+    return result;
+  }
+
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.4
+ * @param {Array} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const uniqueItems = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // デフォルト値はfalse。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.4.3
+  const uniqueItems = constraints.uniqueItems || false;
+  if (!uniqueItems) {
+    return result;
+  }
+  if (value.length !== unique_1$1(value).length) {
+    result.isValid = false;
+    result.message = '内容が重複しない要素で構成して下さい。';
+    return result;
+  }
+
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.1
+ * @param {Object} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const maxProperties = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'maxProperties')) {
+    return result;
+  }
+  const maxProperties = constraints.maxProperties;
+  if (keys_1$1(value).length > maxProperties) {
+    result.isValid = false;
+    result.message = `要素数を${maxProperties}以下にして下さい。`;
+    return result;
+  }
+
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.2
+ * @param {Object} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const minProperties = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // デフォルト値は`0`。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.2.3
+  const minProperties = constraints.minProperties || 0;
+  if (keys_1$1(value).length < minProperties) {
+    result.isValid = false;
+    result.message = `要素数を${minProperties}以上にして下さい。`;
+    return result;
+  }
+
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.3
+ * @param {Object} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const required = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.required) || !constraints.required.length) {
+    return result;
+  }
+  const required = constraints.required;
+  forEach_1(required, key => {
+    if (!hasOwn_1$1(value, key)) {
+      result.isValid = false;
+      result.message = `要素に${key}を含めて下さい。`;
+    }
+  });
+
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4
+ * @param {Object} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const additionalPropertiesAndPropertiesAndPatternPropertie = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // `properties`と`patternProperties`のデフォルト値は空オブジェクト。
+  // `additionalProperties`のデフォルト値は空SchemaObject。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.3
+  let properties;// eslint-disable-line no-unused-vars
+  let patternProperties;// eslint-disable-line no-unused-vars
+  let additionalProperties;// eslint-disable-line no-unused-vars
+  if (!hasOwn_1$1(constraints, 'properties')) {
+    properties = {};
+  } else {
+    properties = constraints.properties;
+  }
+  if (!hasOwn_1$1(constraints, 'patternProperties')) {
+    patternProperties = {};
+  } else {
+    patternProperties = constraints.patternProperties;
+  }
+  if (!hasOwn_1$1(constraints, 'additionalProperties')) {
+    additionalProperties = {};
+  } else {
+    additionalProperties = constraints.additionalProperties;
+  }
+
+  // additionalPropertiesはBooleanもしくはSchemaObject。
+  // propertiesはオブジェクト。中身の値(key-valueのvalue)はSchemaObject。
+  // patternPropertiesはオブジェクト。keyはECMA 262 regular expression dialectに沿う文字列でvalueはSchemaObject。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.1
+
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.2
+  if ((isBoolean_1(additionalProperties) && additionalProperties) || isObject_1(additionalProperties)) {
+    return result;
+  }
+
+  if (isBoolean_1(additionalProperties) && !additionalProperties) {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.4
+    // TODO:
+  }
+
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.5
+ * @param {Object} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const dependencies = (value, constraints) => {// eslint-disable-line no-unused-vars
+  const result = objectAssign({}, resultTemplate);
+  // TODO:
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.1
+ * @param {*} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const _enum = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'enum')) {
+    return result;
+  }
+  const _enum = constraints.enum;
+  let isFound = false;
+  forEach_1(_enum, item => {
+    if (value === item) {
+      isFound = true;
+    }
+  });
+  if (!isFound) {
+    result.isValid = false;
+    result.message = '"enum"のいずれかの値を設定して下さい。';
+  }
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2
+ * @param {*} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const _type = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'type')) {
+    return result;
+  }
+  let types;
+  // type値はstringもしくはstring型のarray。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2.1
+  if (isString_1(constraints.type)) {
+    types = [constraints.type];
+  } else {
+    types = constraints.type;
+  }
+  let isValidType = false;
+  forEach_1(types, type => {
+    switch (type) {
+    case 'integer':
+    case 'number':
+      if (isNumber_1(value)) {
+        isValidType = true;
+      }
+      break;
+    case 'string':
+      if (isString_1(value)) {
+        isValidType = true;
+      }
+      break;
+    case 'array':
+      if (isArray_1$1(value)) {
+        isValidType = true;
+      }
+      break;
+    case 'object':
+      if (isObject_1(value)) {
+        isValidType = true;
+      }
+      break;
+    case 'boolean':
+      if (isBoolean_1(value)) {
+        isValidType = true;
+      }
+      break;
+    case 'null':
+      if (isNull_1(value)) {
+        isValidType = true;
+      }
+      break;
+    default:
+      break;
+    }
+  });
+  if (!isValidType) {
+    result.isValid = false;
+    result.message = '型を"types"のいずれかにして下さい。';
+  }
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.3
+ * @param {*} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const allOf = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.allOf)) {
+    return result;
+  }
+  // SchemaObjectのarray。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.3.1
+  const allOf = constraints.allOf;// eslint-disable-line no-unused-vars
+  // TODO:
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.4
+ * @param {*} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const anyOf = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.anyOf)) {
+    return result;
+  }
+  // SchemaObjectのarray。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.4.1
+  const anyOf = constraints.anyOf;// eslint-disable-line no-unused-vars
+  // TODO:
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.5
+ * @param {*} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const oneOf = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.oneOf)) {
+    return result;
+  }
+  // SchemaObjectのarray。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.5.1
+  const oneOf = constraints.oneOf;// eslint-disable-line no-unused-vars
+  // TODO:
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.6
+ * @param {*} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const not = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.not)) {
+    return result;
+  }
+  // SchemaObjectのarray。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.6.1
+  const not = constraints.not;// eslint-disable-line no-unused-vars
+  // TODO:
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.7
+ * @param {*} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const definitions = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.definitions)) {
+    return result;
+  }
+  // SchemaObjectのarray。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.7.1
+  const definitions = constraints.definitions;// eslint-disable-line no-unused-vars
+  // TODO:
+  return result;
+};
+
+/**
+ * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.2
+ * @param {*} value
+ * @param {Object} constraints
+ * @return {Object}
+ */
+const format$1 = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!isString_1(constraints.format)) {
+    return result;
+  }
+  const format = constraints.format;
+  switch (format) {
+  case 'date-time': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.1
+
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+
+    // RFC 3339に則った書き方かバリデートする
+    const pattern = /^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+\-])([01]\d|2[0-3]):([0-5]\d))$/;
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"date-time"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
+    // 存在する日付かチェックする(e.g. うるう年)
+    const isValid = hooks(value).isValid();
+    if (!isValid) {
+      result.isValid = false;
+      result.message = '存在する日付を入力してください。';
+      return result;
+    }
+    break;
+  }
+  case 'email': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.2
+
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+
+    // RFC 5322に則った書き方かバリデートする
+    const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"email"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    break;
+  }
+  case 'hostname': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
+    
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+
+    // hostnameが255文字を超えていたらエラー
+    if (value.length > 255) {
+      result.isValid = false;
+      result.message = '"hostname"は255文字以内で入力してください。';
+      return result;
+    }
+
+    // RFC 1034に則った書き方かバリデートする
+    const pattern = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[‌​a-z\d])?)*$/i; // eslint-disable-line no-irregular-whitespace
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"hostname"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
+    break;
+  }
+  case 'ipv4': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.4
+
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+
+    // RFC 2673に則った書き方かバリデートする
+    const pattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"ipv4"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    
+    break;
+  }
+  case 'ipv6': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.5
+
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+
+    if(value.match(/::/)) {
+      let targetColon = 7;
+      // IPv4互換バージョンを使用している場合、ターゲット番号は：6
+      if(value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
+        targetColon = 6;
+      }
+
+      // ipv6の形を成形する
+      if(value.match(/^::/)) {
+        value = value.replace('::', '0::');
+      }
+      if(value.match(/::$/)) {
+        value = value.replace('::', '::0');
+      }
+
+      while(value.match(/:/g).length < targetColon) {
+        value = value.replace('::', ':0::');
+      }
+
+      value = value.replace('::', ':0:');
+    }
+
+    // RFC 2373に則った書き方かバリデートする
+    let patterns = [
+      /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/,
+      /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+    ];
+    let matchResult = false;
+    forEach_1(patterns, (pattern) => {
+      const isMatch = value.match(pattern);
+      if (!isNull_1(isMatch)) {
+        matchResult = true;
+      }
+    });
+
+    if (!matchResult) {
+      result.isValid = false;
+      result.message = '"ipv6"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
+    break;
+  }
+  case 'uri': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.6
+
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+
+    // RFC 3986に則った書き方かバリデートする
+    const pattern = rfc3986.uri;
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"uri"に則ったフォーマットで入力してください。';
+      return result;
+    }
+
+    break;
+  }
+    /*
+  case 'todo: custom format here':
+    // TODO: 独自フォーマットがあればここに。
+    break;
+    */
+  default:
+    break;
+  }
+  // TODO:
+  return result;
+};
+
+var oas$4 = {
+  /**
+   * OASに沿って値を検証します。
+   * @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.2
+   * NOTE: OAS2.0はJSON Schema SpecのDraft4を使用している。誤って最新Draftを参照しないように注意すること。
+   * TODO: i18n対応すること。
+   * @param {*} value
+   * @param {Object} schemaObject
+   * @return {Array}
+   */
+  validate: (value, schemaObject) => {
+    const results = [];
+
+    // typeとselfRequiredチェックだけ最初に済ませておく。
+    let result = _type(value, schemaObject);
+    if (!result.isValid) {
+      return [result];
+    }
+    result = selfRequired(value, schemaObject);
+    if (!result.isValid) {
+      return [result];
+    }
+
+    const type = schemaObject.type;
+    switch (type) {
+    case 'number':
+    case 'integer':
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1
+      results.push(multipleOf(value, schemaObject));
+      results.push(maximum(value, schemaObject));
+      results.push(minimum(value, schemaObject));
+      break;
+    case 'string':
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2
+      results.push(maxLength(value, schemaObject));
+      results.push(minLength(value, schemaObject));
+      results.push(pattern(value, schemaObject));
+      break;
+    case 'array':
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3
+      results.push(additionalItemsAndItems(value, schemaObject));
+      results.push(maxItems(value, schemaObject));
+      results.push(minItems(value, schemaObject));
+      results.push(uniqueItems(value, schemaObject));
+      break;
+    case 'object':
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4
+      results.push(maxProperties(value, schemaObject));
+      results.push(minProperties(value, schemaObject));
+      results.push(required(value, schemaObject));
+      results.push(additionalPropertiesAndPropertiesAndPatternPropertie(value, schemaObject));
+      results.push(dependencies(value, schemaObject));
+      break;
+    default:
+      break;
+    }
+
+    // どのtypeも対象となるvalidate。
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5
+    results.push(_enum(value, schemaObject));
+    results.push(allOf(value, schemaObject));
+    results.push(anyOf(value, schemaObject));
+    results.push(oneOf(value, schemaObject));
+    results.push(not(value, schemaObject));
+    results.push(definitions(value, schemaObject));
+
+    // format関連。
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7
+    results.push(format$1(value, schemaObject));
+
+    // isValid値がfalseの結果だけ返す。
+    return reject_1$1(results, result => {
+      return result.isValid;
+    });
+  },
+
+  /**
+   * ParameterObjectとSchemaObjectを元にSchemaObjectを生成します。
+   * @param {Object} parameterObject
+   * @param {Object} schemaObject
+   * @return {Oject}
+   */
+  createSchemaObjectFromParameterObject: parameterObject => {
+    const normalizedSchemaObject = objectAssign({}, parameterObject);
+    const selfRequired = normalizedSchemaObject.required;
+    delete normalizedSchemaObject.required;
+    normalizedSchemaObject.selfRequired = selfRequired;
+    return normalizedSchemaObject;
+  },
+
+  /**
+   * ParameterObjectとSchemaObjectを元にSchemaObjectを生成します。
+   * @param {Object} parameterObject
+   * @param {Object} schemaObject
+   * @return {Oject}
+   */
+  createSchemaObjectFromParameterObjectAndSchemaObject: (parameterObject, schemaObject) => {
+    let normalizedSchemaObject = objectAssign({}, parameterObject);
+    const selfRequired = normalizedSchemaObject.required;
+    delete normalizedSchemaObject.required;
+    normalizedSchemaObject.selfRequired = selfRequired;
+    normalizedSchemaObject = objectAssign(normalizedSchemaObject, schemaObject);
+    return normalizedSchemaObject;
+  },
+
+  /**
+   * PropertyObjectと他情報を元にSchemaObjectを生成します。
+   * @param {Object} propertyObject
+   * @param {String} key
+   * @return {Object}
+   */
+  createSchemaObjectFromPropertyObject: (propertyObject, key) => {
+    const normalizedSchemaObject = objectAssign({}, propertyObject);
+    // nameが未設定であれば、propertyObjectのkeyを使用する。
+    if (!normalizedSchemaObject.name) {
+      normalizedSchemaObject.name = key;
+    }
+    return normalizedSchemaObject;
+  },
+
+  /**
+   * ItemsObjectと他情報を元にSchemaObjectを生成します。
+   * @param {Object} itemsObject
+   * @param {String} baseName
+   * @param {String} idx
+   * @return {Object}
+   */
+  createSchemaObjectFromItemsObject: (itemsObject, baseName, idx) => {
+    const normalizedSchemaObject = objectAssign({}, itemsObject);
+    // nameが未設定であれば、propertyObjectのkeyを使用する。
+    if (!normalizedSchemaObject.name) {
+      normalizedSchemaObject.name = `${baseName}[${idx}]`;
+    }
+    return normalizedSchemaObject;
+  }
+};
+
+var script$52 = function() {
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
+  const schemaObject = objectAssign({}, this.opts.schemaobject);
+  this.schemaObject = schemaObject;
+  this.name = schemaObject.name;
+  this.selfRequired = schemaObject.selfRequired;
+  const keysForInfo = ['enum', 'description', 'required', 'type', 'example', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'format', 'x-wyswyg-options'];
+  this.infos = [];
+  forEach_1(keysForInfo, key => {
+    if (!hasOwn_1$1(schemaObject, key)) {
+      return;
+    }
+    this.infos.push({
+      key,
+      value: JSON.stringify(schemaObject[key])
+    });
+  });
+
+  /**
+   * バリデートエラー項目群を返します。
+   * @return {Array}
+   */
+  this.getValidateErrors = () => {
+    return oas$4.validate(this.opts.val, schemaObject);
+  };
+
+  // @see: http://json-schema.org/latest/json-schema-core.html#rfc.section.4.2
+  // ParameterObject/SchemaObject/ItemsObjectのどれを使用するか。
+  this.isFormMode = false;
+  this.isPropertiesMode = false;
+  this.isItemsMode = false;
+  this.properties = null;
+  this.items = null;
+  switch (schemaObject.type) {
+  case 'null':
+  case 'boolean':
+  case 'number':
+  case 'integer':
+  case 'string':
+  case 'file':
+    this.isFormMode = true;
+    break;
+  case 'object':
+    this.isPropertiesMode = true;
+    this.properties = schemaObject.properties;
+    break;
+  case 'array':
+    this.isItemsMode = true;
+    this.items = schemaObject.items;
+    break;
+  default:
+    // JSON Schema仕様拡張時にここに到達するがサポートしない。
+    break;
+  }
+
+  /**
+   * propertyを参照してデフォルト値を返します。
+   * @param {Object} property
+   * @return {*}
+   */
+  const getDefaultPropertyValue = property => {
+    // 上書き予防。
+    property = objectAssign({}, property);
+    let defaultValue;
+    let type;
+    if (isArray_1$1(property.type)) {
+      type = property.type[0];
+    } else {
+      type = property.type;
+    }
+    switch (type) {
+    case 'array':
+      defaultValue = [];
+      break;
+    case 'object':
+      defaultValue = {};
+      break;
+    case 'boolean':
+    case 'integer':
+    case 'number':
+    case 'null':
+    case 'string':
+    default:
+      // 意図的に`undefined`をデフォルト値とする。
+      defaultValue = undefined;
+      break;
+    }
+    return defaultValue;
+  };
+
+  /**
+   * 指定propertyに対応するユーザ入力値を返却します。
+   * @param {Object} property
+   * @param {String} key
+   * @return {*}
+   */
+  this.getPropertyValue = (property, key) => {
+    let value = this.opts.val[key];
+    // nullも値として有効なので`undefined`だけを対象とする。
+    if (value === undefined) {
+      value = getDefaultPropertyValue(property);
+    }
+    return value;
+  };
+
+  /**
+   * 指定idxに対応するユーザ入力値を返却します。
+   * @param {Number} idx
+   * @return {*}
+   */
+  this.getItemValue = idx => {
+    let value = this.opts.val[idx];
+    // nullも値として有効なので`undefined`だけを対象とする。
+    if (value === undefined) {
+      if (this.type === 'array') {
+        value = [];
+      } else {
+        // 明示的に`undefined`を設定。
+        value = undefined;
+      }
+    }
+    return value;
+  };
+
+  /**
+   * PropertyObjectをSchemaObjectに変換して返却します。
+   * @param {Object} propertyObject
+   * @param {String} key
+   * @return {Object}
+   */
+  this.getNormalizedSchemaObjectForProperty = (propertyObject, key) => {
+    const normalizedSchemaObject = oas$4.createSchemaObjectFromPropertyObject(propertyObject, key);
+    return normalizedSchemaObject;
+  };
+
+  /**
+   * ItemsObjectをSchemaObjectに変換して返却します。
+   * @param {Number} idx
+   * @return {Object}
+   */
+  this.getNormalizedSchemaObjectForItem = idx => {
+    const normalizedSchemaObject = oas$4.createSchemaObjectFromItemsObject(this.schemaObject.items, this.schemaObject.name, idx);
+    return normalizedSchemaObject;
+  };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  // infoの開閉状態。
+  this.isInfoOpened = false;
+  // 入力プレビューの開閉状態。
+  this.isPreviewOpened = false;
+  // validateの開閉状態。
+  this.isValidateOpened = false;
+  // bodyの開閉状態。
+  this.isBodyOpened = true;
+
+  // infoの開閉ボタンがタップされた時の処理。
+  this.handleInfoOpenShutButtonTap = () => {
+    this.isInfoOpened = !this.isInfoOpened;
+    this.update();
+  };
+
+  // previewの開閉ボタンがタップされた時の処理。
+  this.handlePreviewOpenShutButtonTap = () => {
+    this.isPreviewOpened = !this.isPreviewOpened;
+    this.update();
+  };
+
+  // validateの開閉ボタンがタップされた時の処理。
+  this.handleValidateOpenShutButtonTap = () => {
+    this.isValidateOpened = !this.isValidateOpened;
+    this.update();
+  };
+
+  // bodyの開閉ボタンがタップされた時の処理。
+  this.handleBodyOpenShutButtonTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
+  };
+
+  // nameがタップされた時の処理。
+  this.handleNameTap = () => {
+    this.isBodyOpened = !this.isBodyOpened;
+    this.update();
+  };
+
+  // +ボタンがタップされた時の処理。
+  this.handleAddButtonTap = () => {
+    const arr = this.opts.val.concat([]);
+    let defaultValue = undefined;
+    switch (schemaObject.items.type) {
+    case 'array':
+      defaultValue = [];
+      break;
+    case 'object':
+      defaultValue = {};
+      break;
+    case 'boolean':
+    case 'integer':
+    case 'number':
+    case 'null':
+    case 'string':
+    default:
+      // 意図的に`undefined`をデフォルト値とする。
+      defaultValue = undefined;
+      break;
+    }
+    arr.push(defaultValue);
+    this.opts.onchange(arr, this.opts.key);
+  };
+
+  // -ボタンがタップされた時の処理。
+  this.handleRemoveButtonTap = () => {
+    this.opts.onremove(this.opts.idx);
+  };
+
+  // itemsから削除依頼を受け取った時の処理。
+  this.handleItemsRemove = idx => {
+    const arr = this.opts.val.concat([]);
+    // undefinedを追加することで空の入力フォームを出力できる。
+    arr.splice(idx, 1);
+    this.opts.onchange(arr, this.opts.key);
+  };
+
+  // formが変更された時の処理。
+  this.handleFormChange = newValue => {
+    this.opts.onchange(newValue, this.opts.key);
+  };
+
+  // propertiesが変更された時の処理。
+  this.handlePropertyChange = (newValue, key) => {
+    const obj = objectAssign(this.opts.val);
+    obj[key] = newValue;
+    this.opts.onchange(obj, this.opts.key);
+  };
+
+  // itemsが変更された時の処理。
+  this.handleItemsChange = (newValue, idx) => {
+    const arr = this.opts.val.concat([]);
+    arr[idx] = newValue;
+    this.opts.onchange(arr, this.opts.key);
+  };
+};
+
+riot$1.tag2('dmc-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <dmc-icon type="right"></dmc-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}</div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <dmc-icon type="plusCircle"></dmc-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <dmc-icon type="minusCircle"></dmc-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <dmc-icon type="filetext"></dmc-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <dmc-icon type="infoCirlceO"></dmc-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <dmc-prettyprint data="{opts.val}"></dmc-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <dmc-parameter-form val="{opts.val}" schemaobject="{schemaObject}" onchange="{handleFormChange}"></dmc-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <dmc-parameter-schema each="{property, key in properties}" key="{key}" val="{parent.getPropertyValue(property, key)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, key)}" onchange="{parent.handlePropertyChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <dmc-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" key="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema"', function(opts) {
+    this.external(script$52);
+});
+
+var script$53 = function() {
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
+  const parameterObject = objectAssign({}, this.opts.parameterobject);
+  this.parameterObject = parameterObject;
+  // SchemaObject化したObject。
+  this.normalizedSchemaObject = null;
+  // ParameterObject/SchemaObject/ItemsObjectのどれを使用するか。
+  switch (parameterObject.in) {
+  case 'body':
+    // `in`値が`body`の時だけschemaObjectが存在。
+    this.normalizedSchemaObject = oas$4.createSchemaObjectFromParameterObjectAndSchemaObject(parameterObject, parameterObject.schema);
+    break;
+  case 'query':
+  case 'header':
+  case 'path':
+  case 'formData':
+    this.normalizedSchemaObject = oas$4.createSchemaObjectFromParameterObject(parameterObject);
+    break;
+  default:
+    break;
+  }
+
+  // schema入力値が変更された時の処理。
+  this.handleSchemaChange = newValue => {
+    this.opts.onchange(this.parameterObject, newValue);
+  };
+};
+
+riot$1.tag2('dmc-parameter', '<div class="Parameter__body"> <dmc-parameter-schema val="{opts.val}" schemaobject="{normalizedSchemaObject}" onchange="{handleSchemaChange}"></dmc-parameter-schema> </div>', '', 'class="Parameter"', function(opts) {
+    this.external(script$53);
+});
+
+var script$54 = function() {
+  /**
+   * ParameterObjectを参照してデフォルト値を返します。
+   * @param {Object} parameterObject
+   * @return {*}
+   */
+  const getDefaultValue = parameterObject => {
+    // 上書き予防。
+    parameterObject = objectAssign({}, parameterObject);
+    let defaultValue;
+    const _in = parameterObject.in;
+    if (_in === 'body') {
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2
+      let type;
+      if (Array.isArray(parameterObject.schema.type)) {
+        type = parameterObject.schema.type[0];
+      } else {
+        type = parameterObject.schema.type;
+      }
+      // @see: https://tools.ietf.org/html/draft-zyp-json-schema-04#section-3.5
+      switch (type) {
+      case 'array':
+        defaultValue = [];
+        break;
+      case 'object':
+        defaultValue = {};
+        break;
+      case 'boolean':
+      case 'integer':
+      case 'number':
+      case 'null':
+      case 'string':
+      default:
+        // 意図的に`undefined`をデフォルト値とする。
+        defaultValue = undefined;
+        break;
+      }
+    } else {
+      // デフォルト値が指定されていなければ、type値から適切なデフォルト値を決定する。
+      switch (parameterObject.type) {
+      case 'array':
+        defaultValue = [];
+        break;
+      case 'string':
+      case 'number':
+      case 'integer':
+      case 'boolean':
+      case 'file':
+      default:
+        // 意図的に`undefined`をデフォルト値とする。
+        defaultValue = undefined;
+        break;
+      }
+    }
+    return defaultValue;
+  };
+
+  /**
+   * 指定parameterObjectに対応するユーザ入力値を返却します。
+   * @param {Object} parameterObject
+   * @return {*}
+   */
+  this.getParameterValue = parameterObject => {
+    let value = this.opts.parameters[parameterObject.name];
+    // nullも値として有効なので`undefined`だけを対象とする。
+    if (value === undefined) {
+      value = getDefaultValue(parameterObject);
+    }
+    return value;
+  };
+
+  /**
+   * parameter入力値が変更された時の処理。
+   * @param {Object} parameterObject
+   * @param {*} newValue
+   */
+  this.handleChange = (parameterObject, newValue) => {
+    const newParameter = {};
+    newParameter[parameterObject.name] = newValue;
+    const newParameters = objectAssign({}, this.opts.parameters, newParameter);
+    this.opts.onchange(newParameters);
+  };
+};
+
+riot$1.tag2('dmc-parameters', '<virtual each="{parameterObject in opts.parameterobjects}"> <dmc-parameter parameterobject="{parameterObject}" val="{parent.getParameterValue(parameterObject)}" onchange="{parent.handleChange}"></dmc-parameter> </virtual>', '', 'class="Parameters"', function(opts) {
+    this.external(script$54);
+});
+
+var script$55 = function() {
+  this.currentParameters = objectAssign({}, this.opts.initialParameters);
+
+  this.handleParametersChange = newParameters => {
+    this.currentParameters = newParameters;
+    this.update();
+  };
+
+  this.handleSubmitButtonPat = () => {
+    this.opts.onComplete(this.currentParameters);
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-component-search', '<div class="ComponentSearch__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentSearch__tail"> <dmc-button label="submit" onpat="{handleSubmitButtonPat}"></dmc-button> </div>', '', 'class="ComponentSearch"', function(opts) {
+    this.external(script$55);
+});
+
+const STYLE_NUMBER = 'number';
+const STYLE_TABLE = 'table';
+const STYLE_GRAPH_BAR = 'graph-bar';
+const STYLE_GRAPH_SCATTERPLOT = 'graph-scatterplot';
+const STYLE_GRAPH_LINE = 'graph-line';
+const STYLE_GRAPH_HORIZONTAL_BAR = 'graph-horizontal-bar';
+const STYLE_GRAPH_STACKED_BAR = 'graph-stacked-bar';
+const STYLE_GRAPH_HORIZONTAL_STACKED_BAR = 'graph-horizontal-stacked-bar';
+const STYLE_GRAPH_STACKED_AREA = 'graph-stacked-area';
+
+var script$31 = function() {
   const store = this.riotx.get();
 
   // データ取得中か否か。
@@ -41903,60 +54415,70 @@ var script$32 = function() {
   this.alertApi = '';
   this.alertText = '';
   // レスポンスデータ。
-  this.data = null;
+  this.response = null;
   // レスポンスの構造。
-  this.schema = null;
-  // ページング情報。
-  this.pagination = null;
-  // 現在のページング情報。
-  this.currentPaging = {};
-  // 検索情報。
-  this.search = null;
-  // 現在の検索条件。
-  this.currentSearch = {};
-  this.isCurrentSearchEmpty = () => {
-    let isEmpty = true;
-    forOwn_1$1(this.currentSearch, val => {
-      if (!!val) {
-        isEmpty = false;
-      }
-    });
-    return isEmpty;
-  };
+  this.schemaObject = null;
+  // リクエストパラメータ定義。
+  this.parameterObjects = [];
   // 自身に関するアクション群。
-  this.selfActions = null;
+  this.selfActions = [];
   // テーブル行に関するアクション群。
-  this.rowActions = null;
+  this.rowActions = [];
   // テーブルのrow表示ラベル。
-  this.tableLabels = null;
+  this.tableLabels = [];
+  // ページング機能ONかどうか。
+  this.hasPagination = false;
+  // ページング情報。
+  this.pagination = {};
+  // 現在のリクエストパラメータ値。
+  this.currentRequestParameters = {};
+  this.isCurrentRequestParametersEmpty = () => {
+    return !keys_1$1(this.currentRequestParameters).length;
+  };
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
-  if (swagger.isComponentStyleNumber(this.opts.component.style)) {
+  switch (this.opts.component.style) {
+  case STYLE_NUMBER:
     this.childComponentName = 'dmc-component-number';
-  } else if (swagger.isComponentStyleTable(this.opts.component.style)) {
+    break;
+  case STYLE_TABLE:
     this.childComponentName = 'dmc-component-table';
-  } else if (swagger.isComponentStyleGraphBar(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_BAR:
     this.childComponentName = 'dmc-component-graph-bar';
-  } else if (swagger.isComponentStyleGraphScatterplot(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_SCATTERPLOT:
     this.childComponentName = 'dmc-component-graph-scatterplot';
-  } else if (swagger.isComponentStyleGraphLine(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_LINE:
     this.childComponentName = 'dmc-component-graph-line';
-  } else if (swagger.isComponentStyleGraphHorizontalBar(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_HORIZONTAL_BAR:
     this.childComponentName = 'dmc-component-graph-horizontal-bar';
-  } else if (swagger.isComponentStyleGraphStackedBar(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_STACKED_BAR:
     this.childComponentName = 'dmc-component-graph-stacked-bar';
-  } else if (swagger.isComponentStyleGraphHorizontalStackedBar(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_HORIZONTAL_STACKED_BAR:
     this.childComponentName = 'dmc-component-graph-horizontal-stacked-bar';
-  } else if (swagger.isComponentStyleGraphStackedArea(this.opts.component.style)) {
+    break;
+  case STYLE_GRAPH_STACKED_AREA:
     this.childComponentName = 'dmc-component-graph-stacked-area';
+    break;
+  default:
+    this.isValidData = false;
+    this.alertApi = `${this.opts.component.api.method}: ${this.opts.component.api.path}`;
+    this.alertText = `component type of ${this.opts.component.style} is not supported.`;
+    break;
   }
 
   // コンポーネントを更新するための関数。
   // 子コンポーネントに渡されます。
-  this.updater = (query = {}) => {
+  this.updater = (requestParameters = {}) => {
     this.isPending = true;
     this.update();
-    query = index$1$1({}, this.currentPaging, this.currentSearch, query);
+
+    this.currentRequestParameters = objectAssign(this.currentRequestParameters, requestParameters);
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
@@ -41965,19 +54487,23 @@ var script$32 = function() {
           resolve();
         }, 1000);
       }))
-      .then(() => store.action(constants$1.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, query))
+      .then(() => store.action(constants$1.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentRequestParameters))
       .catch(err => store.action(constants$1.MODALS_ADD, {
         error: err
       }));
   };
 
-  this.validateResponse = data => {
-    const type = data.getType();
+  /**
+   * レスポンス内容が正しい形式か確認します。
+   * @param {*} response
+   */
+  this.validateResponse = response => {
+    const style = this.opts.component.style;
     const method = this.opts.component.api.method;
     const path = this.opts.component.api.path;
 
-    if (swagger.isComponentStyleNumber(this.opts.component.style)) {
-      if (type !== 'object' || data.getValue('value') === undefined) {
+    if (style === STYLE_NUMBER) {
+      if (typeof response !== 'object' || response.value === 'undefined') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
@@ -41985,20 +54511,20 @@ var script$32 = function() {
       }
     }
 
-    if (swagger.isComponentStyleTable(this.opts.component.style)) {
-      if (type !== 'array') {
+    if (style === STYLE_TABLE) {
+      if (!Array.isArray(response)) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
         return;
       }
-      if (!data.getLength()) {
+      if (!response.length) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'Length is 0.';
         return;
       }
-      if (data.getValue(0).getType() !== 'object') {
+      if (typeof response[0] !== 'object') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
@@ -42006,20 +54532,28 @@ var script$32 = function() {
       }
     }
 
-    if (swagger.isComponentStyleGraph(this.opts.component.style)) {
-      if (type !== 'object') {
+    if (contains_1$1([
+      STYLE_GRAPH_BAR,
+      STYLE_GRAPH_SCATTERPLOT,
+      STYLE_GRAPH_LINE,
+      STYLE_GRAPH_HORIZONTAL_BAR,
+      STYLE_GRAPH_STACKED_BAR,
+      STYLE_GRAPH_HORIZONTAL_STACKED_BAR,
+      STYLE_GRAPH_STACKED_AREA
+    ], style)) {
+      if (typeof response !== 'object') {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
         return;
       }
-      if (!data.getValue('data') || !data.getValue('x') || !data.getValue('y') || data.getValue('data').getType() !== 'array') {
+      if (!response.data || !response.x || !response.y || !Array.isArray(response.data)) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'unexpected response.';
         return;
       }
-      if (!data.getValue('data').getLength()) {
+      if (!response.data.length) {
         this.isValidData = false;
         this.alertApi = `${method}: ${path}`;
         this.alertText = 'Length is 0.';
@@ -42032,26 +54566,25 @@ var script$32 = function() {
   };
 
   this.on('mount', () => {
+    // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
     this.updater();
   }).on('updated', () => {
     this.rebindTouchEvents();
+  }).on('unmount', () => {
+    store.action(constants$1.COMPONENTS_REMOVE_ONE, this._riot_id);
   });
 
   this.listen(constants$3.COMPONENTS_ONE(this._riot_id), () => {
     this.isPending = false;
-    const component = store.getter(constants$4.COMPONENTS_ONE, this._riot_id);
-    this.data = component.data;
-    if (component.pagination && component.pagination.maxPage > 1) {
-      this.pagination = component.pagination;
-    } else {
-      this.pagination = null;
-    }
-    this.search = component.search;
-    this.schema = store.getter(constants$4.COMPONENTS_ONE_SCHEMA, this._riot_id);
-    this.selfActions = store.getter(constants$4.COMPONENTS_ONE_SELF_ACTIONS, this._riot_id);
-    this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ROW_ACTIONS, this._riot_id);
+    this.response = store.getter(constants$4.COMPONENTS_ONE_RESPONSE, this._riot_id);
+    this.schemaObject = store.getter(constants$4.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
+    this.parameterObjects = store.getter(constants$4.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
+    this.selfActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
+    this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
+    this.hasPagination = store.getter(constants$4.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
+    this.pagination = store.getter(constants$4.COMPONENTS_ONE_PAGINATION, this._riot_id);
     this.tableLabels = store.getter(constants$4.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
-    this.validateResponse(this.data);
+    this.validateResponse(this.response);
     this.update();
   });
 
@@ -42074,23 +54607,13 @@ var script$32 = function() {
       return;
     }
 
-    const queries = [];
-    forEach_1(this.search, query => {
-      queries.push({
-        key: query.key,
-        type: query.type,
-        value: this.currentSearch[query.key] || ''
-      });
-    });
     Promise
       .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-component-searchbox', {
-        queries,
-        onSearch: queries => {
-          // キーワード変更後は1ページ目に戻す。
-          this.currentPaging = {};
-          this.currentSearch = queries;
-          this.updater(queries);
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-component-search', {
+        parameterObjects: this.parameterObjects,
+        initialParameters: objectAssign({}, this.currentRequestParameters),
+        onComplete: parameters => {
+          this.updater(parameters);
         }
       }))
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
@@ -42099,6 +54622,7 @@ var script$32 = function() {
   };
 
   this.handlePaginationChange = page => {
+    // TODO: swagger上に定義されていないけどOK？？
     const paging = this.currentPaging = {
       limit: this.pagination.size,
       offset: (page - 1) * this.pagination.size
@@ -42107,16 +54631,97 @@ var script$32 = function() {
   };
 };
 
-riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search {!isCurrentSearchEmpty() ? \'Component__search--active\' : \'\'}" if="{!!search}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" data="{data}" schema="{schema}" tablelabels="{tableLabels}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; !!pagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
-    this.external(script$32);
+riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search {!isCurrentRequestParametersEmpty() ? \'Component__search--active\' : \'\'}" if="{!!parameterObjects.length}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <dmc-pagination if="{!isPending &amp;&amp; hasPpagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" response="{response}" schemaobject="{schemaObject}" tablelabels="{tableLabels}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
+    this.external(script$31);
 });
 
-var script$34 = function() {
+/**
+     * Get current time in miliseconds
+     */
+    function now$1(){
+        // yes, we defer the work to another function to allow mocking it
+        // during the tests
+        return now$1.get();
+    }
+
+    now$1.get = (typeof Date.now === 'function')? Date.now : function(){
+        return +(new Date());
+    };
+
+    var now_1 = now$1;
+
+/**
+     */
+    function throttle(fn, delay){
+        var context, timeout, result, args,
+            diff, prevCall = 0;
+        function delayed(){
+            prevCall = now_1();
+            timeout = null;
+            result = fn.apply(context, args);
+        }
+        function throttled(){
+            context = this;
+            args = arguments;
+            diff = delay - (now_1() - prevCall);
+            if (diff <= 0) {
+                clearTimeout(timeout);
+                delayed();
+            } else if (! timeout) {
+                timeout = setTimeout(delayed, diff);
+            }
+            return result;
+        }
+        throttled.cancel = function(){
+            clearTimeout(timeout);
+        };
+        return throttled;
+    }
+
+    var throttle_1 = throttle;
+
+var script$56 = function() {
   const store = this.riotx.get();
 
   this.name = store.getter(constants$4.PAGE_NAME);
   this.components = store.getter(constants$4.PAGE_COMPONENTS);
 
+  /**
+   * 現在のviewportに最適なcolumn数を計算して返します。
+   * @return {Number}
+   */
+  const getGridColumnCountForCurrentViewport = () => {
+    const containerWidth = this.refs.list.getBoundingClientRect().width;
+    const baseColumnWith = 400;
+    const newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
+    return newColumnCount;
+  };
+
+  /**
+   * column数を更新します。
+   */
+  const updateGridColumnCount = () => {
+    const columnCount = getGridColumnCountForCurrentViewport();
+    store.action(constants$1.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT, columnCount);
+  };
+
+  // resizeイベントハンドラーの発火回数を減らす。
+  const handleResize = throttle_1(updateGridColumnCount, 1000);
+  this.on('mount', () => {
+    // 初回にcolumn数を設定する。
+    updateGridColumnCount();
+    window.addEventListener('resize', handleResize);
+  }).on('unmount', () => {
+    window.removeEventListener('resize', handleResize);
+  });
+
+  this.listen(constants$3.LAYOUT, () => {
+    const columnCount = store.getter(constants$4.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT);
+    document.documentElement.style.setProperty('--page-components-grid-column-count', columnCount);
+    // tauchartはresize時に自動で再レンダリングするが、column数変更時にはresizeイベントが発火しないため再レンダリングが実行されない。
+    // column数変更時も再レンダリングさせるために手動でresizeイベントハンドラを実行する。
+    chart$1.Chart.resizeOnWindowEvent();
+  });
   this.listen(constants$3.PAGE, () => {
     this.name = store.getter(constants$4.PAGE_NAME);
     this.components = store.getter(constants$4.PAGE_COMPONENTS);
@@ -42124,18 +54729,1402 @@ var script$34 = function() {
   });
 };
 
-riot$1.tag2('dmc-components', '<div class="ComponentsPage__title">{name}</div> <div class="ComponentsPage__list"> <dmc-component each="{component, idx in components}" component="{component}"></dmc-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
-    this.external(script$34);
+riot$1.tag2('dmc-components', '<div class="ComponentsPage__title">{name}</div> <div class="ComponentsPage__listWrapper"> <div class="ComponentsPage__list" ref="list"> <dmc-component each="{component, idx in components}" component="{component}"></dmc-component> </div> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+    this.external(script$56);
 });
 
-var script$35 = function() {};
+var script$57 = function() {};
 
 riot$1.tag2('dmc-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
-    this.external(script$35);
+    this.external(script$57);
 });
 
-var script$36 = function() {
-  this.isMenuOpened = false;
+var marked = createCommonjsModule(function (module, exports) {
+/**
+ * marked - a markdown parser
+ * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
+ * https://github.com/chjj/marked
+ */
+
+(function() {
+
+/**
+ * Block-Level Grammar
+ */
+
+var block = {
+  newline: /^\n+/,
+  code: /^( {4}[^\n]+\n*)+/,
+  fences: noop,
+  hr: /^( *[-*_]){3,} *(?:\n+|$)/,
+  heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
+  nptable: noop,
+  lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
+  blockquote: /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,
+  list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
+  html: /^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,
+  def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
+  table: noop,
+  paragraph: /^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,
+  text: /^[^\n]+/
+};
+
+block.bullet = /(?:[*+-]|\d+\.)/;
+block.item = /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;
+block.item = replace(block.item, 'gm')
+  (/bull/g, block.bullet)
+  ();
+
+block.list = replace(block.list)
+  (/bull/g, block.bullet)
+  ('hr', '\\n+(?=\\1?(?:[-*_] *){3,}(?:\\n+|$))')
+  ('def', '\\n+(?=' + block.def.source + ')')
+  ();
+
+block.blockquote = replace(block.blockquote)
+  ('def', block.def)
+  ();
+
+block._tag = '(?!(?:'
+  + 'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code'
+  + '|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo'
+  + '|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b';
+
+block.html = replace(block.html)
+  ('comment', /<!--[\s\S]*?-->/)
+  ('closed', /<(tag)[\s\S]+?<\/\1>/)
+  ('closing', /<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)
+  (/tag/g, block._tag)
+  ();
+
+block.paragraph = replace(block.paragraph)
+  ('hr', block.hr)
+  ('heading', block.heading)
+  ('lheading', block.lheading)
+  ('blockquote', block.blockquote)
+  ('tag', '<' + block._tag)
+  ('def', block.def)
+  ();
+
+/**
+ * Normal Block Grammar
+ */
+
+block.normal = merge({}, block);
+
+/**
+ * GFM Block Grammar
+ */
+
+block.gfm = merge({}, block.normal, {
+  fences: /^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\s*\1 *(?:\n+|$)/,
+  paragraph: /^/,
+  heading: /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/
+});
+
+block.gfm.paragraph = replace(block.paragraph)
+  ('(?!', '(?!'
+    + block.gfm.fences.source.replace('\\1', '\\2') + '|'
+    + block.list.source.replace('\\1', '\\3') + '|')
+  ();
+
+/**
+ * GFM + Tables Block Grammar
+ */
+
+block.tables = merge({}, block.gfm, {
+  nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
+  table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
+});
+
+/**
+ * Block Lexer
+ */
+
+function Lexer(options) {
+  this.tokens = [];
+  this.tokens.links = {};
+  this.options = options || marked.defaults;
+  this.rules = block.normal;
+
+  if (this.options.gfm) {
+    if (this.options.tables) {
+      this.rules = block.tables;
+    } else {
+      this.rules = block.gfm;
+    }
+  }
+}
+
+/**
+ * Expose Block Rules
+ */
+
+Lexer.rules = block;
+
+/**
+ * Static Lex Method
+ */
+
+Lexer.lex = function(src, options) {
+  var lexer = new Lexer(options);
+  return lexer.lex(src);
+};
+
+/**
+ * Preprocessing
+ */
+
+Lexer.prototype.lex = function(src) {
+  src = src
+    .replace(/\r\n|\r/g, '\n')
+    .replace(/\t/g, '    ')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u2424/g, '\n');
+
+  return this.token(src, true);
+};
+
+/**
+ * Lexing
+ */
+
+Lexer.prototype.token = function(src, top, bq) {
+  var src = src.replace(/^ +$/gm, '')
+    , next
+    , loose
+    , cap
+    , bull
+    , b
+    , item
+    , space
+    , i
+    , l;
+
+  while (src) {
+    // newline
+    if (cap = this.rules.newline.exec(src)) {
+      src = src.substring(cap[0].length);
+      if (cap[0].length > 1) {
+        this.tokens.push({
+          type: 'space'
+        });
+      }
+    }
+
+    // code
+    if (cap = this.rules.code.exec(src)) {
+      src = src.substring(cap[0].length);
+      cap = cap[0].replace(/^ {4}/gm, '');
+      this.tokens.push({
+        type: 'code',
+        text: !this.options.pedantic
+          ? cap.replace(/\n+$/, '')
+          : cap
+      });
+      continue;
+    }
+
+    // fences (gfm)
+    if (cap = this.rules.fences.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'code',
+        lang: cap[2],
+        text: cap[3] || ''
+      });
+      continue;
+    }
+
+    // heading
+    if (cap = this.rules.heading.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'heading',
+        depth: cap[1].length,
+        text: cap[2]
+      });
+      continue;
+    }
+
+    // table no leading pipe (gfm)
+    if (top && (cap = this.rules.nptable.exec(src))) {
+      src = src.substring(cap[0].length);
+
+      item = {
+        type: 'table',
+        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
+        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
+        cells: cap[3].replace(/\n$/, '').split('\n')
+      };
+
+      for (i = 0; i < item.align.length; i++) {
+        if (/^ *-+: *$/.test(item.align[i])) {
+          item.align[i] = 'right';
+        } else if (/^ *:-+: *$/.test(item.align[i])) {
+          item.align[i] = 'center';
+        } else if (/^ *:-+ *$/.test(item.align[i])) {
+          item.align[i] = 'left';
+        } else {
+          item.align[i] = null;
+        }
+      }
+
+      for (i = 0; i < item.cells.length; i++) {
+        item.cells[i] = item.cells[i].split(/ *\| */);
+      }
+
+      this.tokens.push(item);
+
+      continue;
+    }
+
+    // lheading
+    if (cap = this.rules.lheading.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'heading',
+        depth: cap[2] === '=' ? 1 : 2,
+        text: cap[1]
+      });
+      continue;
+    }
+
+    // hr
+    if (cap = this.rules.hr.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'hr'
+      });
+      continue;
+    }
+
+    // blockquote
+    if (cap = this.rules.blockquote.exec(src)) {
+      src = src.substring(cap[0].length);
+
+      this.tokens.push({
+        type: 'blockquote_start'
+      });
+
+      cap = cap[0].replace(/^ *> ?/gm, '');
+
+      // Pass `top` to keep the current
+      // "toplevel" state. This is exactly
+      // how markdown.pl works.
+      this.token(cap, top, true);
+
+      this.tokens.push({
+        type: 'blockquote_end'
+      });
+
+      continue;
+    }
+
+    // list
+    if (cap = this.rules.list.exec(src)) {
+      src = src.substring(cap[0].length);
+      bull = cap[2];
+
+      this.tokens.push({
+        type: 'list_start',
+        ordered: bull.length > 1
+      });
+
+      // Get each top-level item.
+      cap = cap[0].match(this.rules.item);
+
+      next = false;
+      l = cap.length;
+      i = 0;
+
+      for (; i < l; i++) {
+        item = cap[i];
+
+        // Remove the list item's bullet
+        // so it is seen as the next token.
+        space = item.length;
+        item = item.replace(/^ *([*+-]|\d+\.) +/, '');
+
+        // Outdent whatever the
+        // list item contains. Hacky.
+        if (~item.indexOf('\n ')) {
+          space -= item.length;
+          item = !this.options.pedantic
+            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
+            : item.replace(/^ {1,4}/gm, '');
+        }
+
+        // Determine whether the next list item belongs here.
+        // Backpedal if it does not belong in this list.
+        if (this.options.smartLists && i !== l - 1) {
+          b = block.bullet.exec(cap[i + 1])[0];
+          if (bull !== b && !(bull.length > 1 && b.length > 1)) {
+            src = cap.slice(i + 1).join('\n') + src;
+            i = l - 1;
+          }
+        }
+
+        // Determine whether item is loose or not.
+        // Use: /(^|\n)(?! )[^\n]+\n\n(?!\s*$)/
+        // for discount behavior.
+        loose = next || /\n\n(?!\s*$)/.test(item);
+        if (i !== l - 1) {
+          next = item.charAt(item.length - 1) === '\n';
+          if (!loose) { loose = next; }
+        }
+
+        this.tokens.push({
+          type: loose
+            ? 'loose_item_start'
+            : 'list_item_start'
+        });
+
+        // Recurse.
+        this.token(item, false, bq);
+
+        this.tokens.push({
+          type: 'list_item_end'
+        });
+      }
+
+      this.tokens.push({
+        type: 'list_end'
+      });
+
+      continue;
+    }
+
+    // html
+    if (cap = this.rules.html.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: this.options.sanitize
+          ? 'paragraph'
+          : 'html',
+        pre: !this.options.sanitizer
+          && (cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style'),
+        text: cap[0]
+      });
+      continue;
+    }
+
+    // def
+    if ((!bq && top) && (cap = this.rules.def.exec(src))) {
+      src = src.substring(cap[0].length);
+      this.tokens.links[cap[1].toLowerCase()] = {
+        href: cap[2],
+        title: cap[3]
+      };
+      continue;
+    }
+
+    // table (gfm)
+    if (top && (cap = this.rules.table.exec(src))) {
+      src = src.substring(cap[0].length);
+
+      item = {
+        type: 'table',
+        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
+        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
+        cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n')
+      };
+
+      for (i = 0; i < item.align.length; i++) {
+        if (/^ *-+: *$/.test(item.align[i])) {
+          item.align[i] = 'right';
+        } else if (/^ *:-+: *$/.test(item.align[i])) {
+          item.align[i] = 'center';
+        } else if (/^ *:-+ *$/.test(item.align[i])) {
+          item.align[i] = 'left';
+        } else {
+          item.align[i] = null;
+        }
+      }
+
+      for (i = 0; i < item.cells.length; i++) {
+        item.cells[i] = item.cells[i]
+          .replace(/^ *\| *| *\| *$/g, '')
+          .split(/ *\| */);
+      }
+
+      this.tokens.push(item);
+
+      continue;
+    }
+
+    // top-level paragraph
+    if (top && (cap = this.rules.paragraph.exec(src))) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'paragraph',
+        text: cap[1].charAt(cap[1].length - 1) === '\n'
+          ? cap[1].slice(0, -1)
+          : cap[1]
+      });
+      continue;
+    }
+
+    // text
+    if (cap = this.rules.text.exec(src)) {
+      // Top-level should never reach here.
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'text',
+        text: cap[0]
+      });
+      continue;
+    }
+
+    if (src) {
+      throw new
+        Error('Infinite loop on byte: ' + src.charCodeAt(0));
+    }
+  }
+
+  return this.tokens;
+};
+
+/**
+ * Inline-Level Grammar
+ */
+
+var inline = {
+  escape: /^\\([\\`*{}\[\]()#+\-.!_>])/,
+  autolink: /^<([^ >]+(@|:\/)[^ >]+)>/,
+  url: noop,
+  tag: /^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,
+  link: /^!?\[(inside)\]\(href\)/,
+  reflink: /^!?\[(inside)\]\s*\[([^\]]*)\]/,
+  nolink: /^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,
+  strong: /^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,
+  em: /^\b_((?:[^_]|__)+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+  code: /^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,
+  br: /^ {2,}\n(?!\s*$)/,
+  del: noop,
+  text: /^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
+};
+
+inline._inside = /(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/;
+inline._href = /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
+
+inline.link = replace(inline.link)
+  ('inside', inline._inside)
+  ('href', inline._href)
+  ();
+
+inline.reflink = replace(inline.reflink)
+  ('inside', inline._inside)
+  ();
+
+/**
+ * Normal Inline Grammar
+ */
+
+inline.normal = merge({}, inline);
+
+/**
+ * Pedantic Inline Grammar
+ */
+
+inline.pedantic = merge({}, inline.normal, {
+  strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
+  em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/
+});
+
+/**
+ * GFM Inline Grammar
+ */
+
+inline.gfm = merge({}, inline.normal, {
+  escape: replace(inline.escape)('])', '~|])')(),
+  url: /^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,
+  del: /^~~(?=\S)([\s\S]*?\S)~~/,
+  text: replace(inline.text)
+    (']|', '~]|')
+    ('|', '|https?://|')
+    ()
+});
+
+/**
+ * GFM + Line Breaks Inline Grammar
+ */
+
+inline.breaks = merge({}, inline.gfm, {
+  br: replace(inline.br)('{2,}', '*')(),
+  text: replace(inline.gfm.text)('{2,}', '*')()
+});
+
+/**
+ * Inline Lexer & Compiler
+ */
+
+function InlineLexer(links, options) {
+  this.options = options || marked.defaults;
+  this.links = links;
+  this.rules = inline.normal;
+  this.renderer = this.options.renderer || new Renderer;
+  this.renderer.options = this.options;
+
+  if (!this.links) {
+    throw new
+      Error('Tokens array requires a `links` property.');
+  }
+
+  if (this.options.gfm) {
+    if (this.options.breaks) {
+      this.rules = inline.breaks;
+    } else {
+      this.rules = inline.gfm;
+    }
+  } else if (this.options.pedantic) {
+    this.rules = inline.pedantic;
+  }
+}
+
+/**
+ * Expose Inline Rules
+ */
+
+InlineLexer.rules = inline;
+
+/**
+ * Static Lexing/Compiling Method
+ */
+
+InlineLexer.output = function(src, links, options) {
+  var inline = new InlineLexer(links, options);
+  return inline.output(src);
+};
+
+/**
+ * Lexing/Compiling
+ */
+
+InlineLexer.prototype.output = function(src) {
+  var out = ''
+    , link
+    , text
+    , href
+    , cap;
+
+  while (src) {
+    // escape
+    if (cap = this.rules.escape.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += cap[1];
+      continue;
+    }
+
+    // autolink
+    if (cap = this.rules.autolink.exec(src)) {
+      src = src.substring(cap[0].length);
+      if (cap[2] === '@') {
+        text = cap[1].charAt(6) === ':'
+          ? this.mangle(cap[1].substring(7))
+          : this.mangle(cap[1]);
+        href = this.mangle('mailto:') + text;
+      } else {
+        text = escape(cap[1]);
+        href = text;
+      }
+      out += this.renderer.link(href, null, text);
+      continue;
+    }
+
+    // url (gfm)
+    if (!this.inLink && (cap = this.rules.url.exec(src))) {
+      src = src.substring(cap[0].length);
+      text = escape(cap[1]);
+      href = text;
+      out += this.renderer.link(href, null, text);
+      continue;
+    }
+
+    // tag
+    if (cap = this.rules.tag.exec(src)) {
+      if (!this.inLink && /^<a /i.test(cap[0])) {
+        this.inLink = true;
+      } else if (this.inLink && /^<\/a>/i.test(cap[0])) {
+        this.inLink = false;
+      }
+      src = src.substring(cap[0].length);
+      out += this.options.sanitize
+        ? this.options.sanitizer
+          ? this.options.sanitizer(cap[0])
+          : escape(cap[0])
+        : cap[0];
+      continue;
+    }
+
+    // link
+    if (cap = this.rules.link.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.inLink = true;
+      out += this.outputLink(cap, {
+        href: cap[2],
+        title: cap[3]
+      });
+      this.inLink = false;
+      continue;
+    }
+
+    // reflink, nolink
+    if ((cap = this.rules.reflink.exec(src))
+        || (cap = this.rules.nolink.exec(src))) {
+      src = src.substring(cap[0].length);
+      link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
+      link = this.links[link.toLowerCase()];
+      if (!link || !link.href) {
+        out += cap[0].charAt(0);
+        src = cap[0].substring(1) + src;
+        continue;
+      }
+      this.inLink = true;
+      out += this.outputLink(cap, link);
+      this.inLink = false;
+      continue;
+    }
+
+    // strong
+    if (cap = this.rules.strong.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.strong(this.output(cap[2] || cap[1]));
+      continue;
+    }
+
+    // em
+    if (cap = this.rules.em.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.em(this.output(cap[2] || cap[1]));
+      continue;
+    }
+
+    // code
+    if (cap = this.rules.code.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.codespan(escape(cap[2], true));
+      continue;
+    }
+
+    // br
+    if (cap = this.rules.br.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.br();
+      continue;
+    }
+
+    // del (gfm)
+    if (cap = this.rules.del.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.del(this.output(cap[1]));
+      continue;
+    }
+
+    // text
+    if (cap = this.rules.text.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.text(escape(this.smartypants(cap[0])));
+      continue;
+    }
+
+    if (src) {
+      throw new
+        Error('Infinite loop on byte: ' + src.charCodeAt(0));
+    }
+  }
+
+  return out;
+};
+
+/**
+ * Compile Link
+ */
+
+InlineLexer.prototype.outputLink = function(cap, link) {
+  var href = escape(link.href)
+    , title = link.title ? escape(link.title) : null;
+
+  return cap[0].charAt(0) !== '!'
+    ? this.renderer.link(href, title, this.output(cap[1]))
+    : this.renderer.image(href, title, escape(cap[1]));
+};
+
+/**
+ * Smartypants Transformations
+ */
+
+InlineLexer.prototype.smartypants = function(text) {
+  if (!this.options.smartypants) { return text; }
+  return text
+    // em-dashes
+    .replace(/---/g, '\u2014')
+    // en-dashes
+    .replace(/--/g, '\u2013')
+    // opening singles
+    .replace(/(^|[-\u2014/(\[{"\s])'/g, '$1\u2018')
+    // closing singles & apostrophes
+    .replace(/'/g, '\u2019')
+    // opening doubles
+    .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, '$1\u201c')
+    // closing doubles
+    .replace(/"/g, '\u201d')
+    // ellipses
+    .replace(/\.{3}/g, '\u2026');
+};
+
+/**
+ * Mangle Links
+ */
+
+InlineLexer.prototype.mangle = function(text) {
+  if (!this.options.mangle) { return text; }
+  var out = ''
+    , l = text.length
+    , i = 0
+    , ch;
+
+  for (; i < l; i++) {
+    ch = text.charCodeAt(i);
+    if (Math.random() > 0.5) {
+      ch = 'x' + ch.toString(16);
+    }
+    out += '&#' + ch + ';';
+  }
+
+  return out;
+};
+
+/**
+ * Renderer
+ */
+
+function Renderer(options) {
+  this.options = options || {};
+}
+
+Renderer.prototype.code = function(code, lang, escaped) {
+  if (this.options.highlight) {
+    var out = this.options.highlight(code, lang);
+    if (out != null && out !== code) {
+      escaped = true;
+      code = out;
+    }
+  }
+
+  if (!lang) {
+    return '<pre><code>'
+      + (escaped ? code : escape(code, true))
+      + '\n</code></pre>';
+  }
+
+  return '<pre><code class="'
+    + this.options.langPrefix
+    + escape(lang, true)
+    + '">'
+    + (escaped ? code : escape(code, true))
+    + '\n</code></pre>\n';
+};
+
+Renderer.prototype.blockquote = function(quote) {
+  return '<blockquote>\n' + quote + '</blockquote>\n';
+};
+
+Renderer.prototype.html = function(html) {
+  return html;
+};
+
+Renderer.prototype.heading = function(text, level, raw) {
+  return '<h'
+    + level
+    + ' id="'
+    + this.options.headerPrefix
+    + raw.toLowerCase().replace(/[^\w]+/g, '-')
+    + '">'
+    + text
+    + '</h'
+    + level
+    + '>\n';
+};
+
+Renderer.prototype.hr = function() {
+  return this.options.xhtml ? '<hr/>\n' : '<hr>\n';
+};
+
+Renderer.prototype.list = function(body, ordered) {
+  var type = ordered ? 'ol' : 'ul';
+  return '<' + type + '>\n' + body + '</' + type + '>\n';
+};
+
+Renderer.prototype.listitem = function(text) {
+  return '<li>' + text + '</li>\n';
+};
+
+Renderer.prototype.paragraph = function(text) {
+  return '<p>' + text + '</p>\n';
+};
+
+Renderer.prototype.table = function(header, body) {
+  return '<table>\n'
+    + '<thead>\n'
+    + header
+    + '</thead>\n'
+    + '<tbody>\n'
+    + body
+    + '</tbody>\n'
+    + '</table>\n';
+};
+
+Renderer.prototype.tablerow = function(content) {
+  return '<tr>\n' + content + '</tr>\n';
+};
+
+Renderer.prototype.tablecell = function(content, flags) {
+  var type = flags.header ? 'th' : 'td';
+  var tag = flags.align
+    ? '<' + type + ' style="text-align:' + flags.align + '">'
+    : '<' + type + '>';
+  return tag + content + '</' + type + '>\n';
+};
+
+// span level renderer
+Renderer.prototype.strong = function(text) {
+  return '<strong>' + text + '</strong>';
+};
+
+Renderer.prototype.em = function(text) {
+  return '<em>' + text + '</em>';
+};
+
+Renderer.prototype.codespan = function(text) {
+  return '<code>' + text + '</code>';
+};
+
+Renderer.prototype.br = function() {
+  return this.options.xhtml ? '<br/>' : '<br>';
+};
+
+Renderer.prototype.del = function(text) {
+  return '<del>' + text + '</del>';
+};
+
+Renderer.prototype.link = function(href, title, text) {
+  if (this.options.sanitize) {
+    try {
+      var prot = decodeURIComponent(unescape(href))
+        .replace(/[^\w:]/g, '')
+        .toLowerCase();
+    } catch (e) {
+      return '';
+    }
+    if (prot.indexOf('javascript:') === 0 || prot.indexOf('vbscript:') === 0) {
+      return '';
+    }
+  }
+  var out = '<a href="' + href + '"';
+  if (title) {
+    out += ' title="' + title + '"';
+  }
+  out += '>' + text + '</a>';
+  return out;
+};
+
+Renderer.prototype.image = function(href, title, text) {
+  var out = '<img src="' + href + '" alt="' + text + '"';
+  if (title) {
+    out += ' title="' + title + '"';
+  }
+  out += this.options.xhtml ? '/>' : '>';
+  return out;
+};
+
+Renderer.prototype.text = function(text) {
+  return text;
+};
+
+/**
+ * Parsing & Compiling
+ */
+
+function Parser(options) {
+  this.tokens = [];
+  this.token = null;
+  this.options = options || marked.defaults;
+  this.options.renderer = this.options.renderer || new Renderer;
+  this.renderer = this.options.renderer;
+  this.renderer.options = this.options;
+}
+
+/**
+ * Static Parse Method
+ */
+
+Parser.parse = function(src, options, renderer) {
+  var parser = new Parser(options, renderer);
+  return parser.parse(src);
+};
+
+/**
+ * Parse Loop
+ */
+
+Parser.prototype.parse = function(src) {
+  this.inline = new InlineLexer(src.links, this.options, this.renderer);
+  this.tokens = src.reverse();
+
+  var out = '';
+  while (this.next()) {
+    out += this.tok();
+  }
+
+  return out;
+};
+
+/**
+ * Next Token
+ */
+
+Parser.prototype.next = function() {
+  return this.token = this.tokens.pop();
+};
+
+/**
+ * Preview Next Token
+ */
+
+Parser.prototype.peek = function() {
+  return this.tokens[this.tokens.length - 1] || 0;
+};
+
+/**
+ * Parse Text Tokens
+ */
+
+Parser.prototype.parseText = function() {
+  var body = this.token.text;
+
+  while (this.peek().type === 'text') {
+    body += '\n' + this.next().text;
+  }
+
+  return this.inline.output(body);
+};
+
+/**
+ * Parse Current Token
+ */
+
+Parser.prototype.tok = function() {
+  switch (this.token.type) {
+    case 'space': {
+      return '';
+    }
+    case 'hr': {
+      return this.renderer.hr();
+    }
+    case 'heading': {
+      return this.renderer.heading(
+        this.inline.output(this.token.text),
+        this.token.depth,
+        this.token.text);
+    }
+    case 'code': {
+      return this.renderer.code(this.token.text,
+        this.token.lang,
+        this.token.escaped);
+    }
+    case 'table': {
+      var header = ''
+        , body = ''
+        , i
+        , row
+        , cell
+        , flags
+        , j;
+
+      // header
+      cell = '';
+      for (i = 0; i < this.token.header.length; i++) {
+        flags = { header: true, align: this.token.align[i] };
+        cell += this.renderer.tablecell(
+          this.inline.output(this.token.header[i]),
+          { header: true, align: this.token.align[i] }
+        );
+      }
+      header += this.renderer.tablerow(cell);
+
+      for (i = 0; i < this.token.cells.length; i++) {
+        row = this.token.cells[i];
+
+        cell = '';
+        for (j = 0; j < row.length; j++) {
+          cell += this.renderer.tablecell(
+            this.inline.output(row[j]),
+            { header: false, align: this.token.align[j] }
+          );
+        }
+
+        body += this.renderer.tablerow(cell);
+      }
+      return this.renderer.table(header, body);
+    }
+    case 'blockquote_start': {
+      var body = '';
+
+      while (this.next().type !== 'blockquote_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.blockquote(body);
+    }
+    case 'list_start': {
+      var body = ''
+        , ordered = this.token.ordered;
+
+      while (this.next().type !== 'list_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.list(body, ordered);
+    }
+    case 'list_item_start': {
+      var body = '';
+
+      while (this.next().type !== 'list_item_end') {
+        body += this.token.type === 'text'
+          ? this.parseText()
+          : this.tok();
+      }
+
+      return this.renderer.listitem(body);
+    }
+    case 'loose_item_start': {
+      var body = '';
+
+      while (this.next().type !== 'list_item_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.listitem(body);
+    }
+    case 'html': {
+      var html = !this.token.pre && !this.options.pedantic
+        ? this.inline.output(this.token.text)
+        : this.token.text;
+      return this.renderer.html(html);
+    }
+    case 'paragraph': {
+      return this.renderer.paragraph(this.inline.output(this.token.text));
+    }
+    case 'text': {
+      return this.renderer.paragraph(this.parseText());
+    }
+  }
+};
+
+/**
+ * Helpers
+ */
+
+function escape(html, encode) {
+  return html
+    .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function unescape(html) {
+	// explicitly match decimal, hex, and named HTML entities 
+  return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function(_, n) {
+    n = n.toLowerCase();
+    if (n === 'colon') { return ':'; }
+    if (n.charAt(0) === '#') {
+      return n.charAt(1) === 'x'
+        ? String.fromCharCode(parseInt(n.substring(2), 16))
+        : String.fromCharCode(+n.substring(1));
+    }
+    return '';
+  });
+}
+
+function replace(regex, opt) {
+  regex = regex.source;
+  opt = opt || '';
+  return function self(name, val) {
+    if (!name) { return new RegExp(regex, opt); }
+    val = val.source || val;
+    val = val.replace(/(^|[^\[])\^/g, '$1');
+    regex = regex.replace(name, val);
+    return self;
+  };
+}
+
+function noop() {}
+noop.exec = noop;
+
+function merge(obj) {
+  var i = 1
+    , target
+    , key;
+
+  for (; i < arguments.length; i++) {
+    target = arguments[i];
+    for (key in target) {
+      if (Object.prototype.hasOwnProperty.call(target, key)) {
+        obj[key] = target[key];
+      }
+    }
+  }
+
+  return obj;
+}
+
+
+/**
+ * Marked
+ */
+
+function marked(src, opt, callback) {
+  if (callback || typeof opt === 'function') {
+    if (!callback) {
+      callback = opt;
+      opt = null;
+    }
+
+    opt = merge({}, marked.defaults, opt || {});
+
+    var highlight = opt.highlight
+      , tokens
+      , pending
+      , i = 0;
+
+    try {
+      tokens = Lexer.lex(src, opt);
+    } catch (e) {
+      return callback(e);
+    }
+
+    pending = tokens.length;
+
+    var done = function(err) {
+      if (err) {
+        opt.highlight = highlight;
+        return callback(err);
+      }
+
+      var out;
+
+      try {
+        out = Parser.parse(tokens, opt);
+      } catch (e) {
+        err = e;
+      }
+
+      opt.highlight = highlight;
+
+      return err
+        ? callback(err)
+        : callback(null, out);
+    };
+
+    if (!highlight || highlight.length < 3) {
+      return done();
+    }
+
+    delete opt.highlight;
+
+    if (!pending) { return done(); }
+
+    for (; i < tokens.length; i++) {
+      (function(token) {
+        if (token.type !== 'code') {
+          return --pending || done();
+        }
+        return highlight(token.text, token.lang, function(err, code) {
+          if (err) { return done(err); }
+          if (code == null || code === token.text) {
+            return --pending || done();
+          }
+          token.text = code;
+          token.escaped = true;
+          --pending || done();
+        });
+      })(tokens[i]);
+    }
+
+    return;
+  }
+  try {
+    if (opt) { opt = merge({}, marked.defaults, opt); }
+    return Parser.parse(Lexer.lex(src, opt), opt);
+  } catch (e) {
+    e.message += '\nPlease report this to https://github.com/chjj/marked.';
+    if ((opt || marked.defaults).silent) {
+      return '<p>An error occured:</p><pre>'
+        + escape(e.message + '', true)
+        + '</pre>';
+    }
+    throw e;
+  }
+}
+
+/**
+ * Options
+ */
+
+marked.options =
+marked.setOptions = function(opt) {
+  merge(marked.defaults, opt);
+  return marked;
+};
+
+marked.defaults = {
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  sanitizer: null,
+  mangle: true,
+  smartLists: false,
+  silent: false,
+  highlight: null,
+  langPrefix: 'lang-',
+  smartypants: false,
+  headerPrefix: '',
+  renderer: new Renderer,
+  xhtml: false
+};
+
+/**
+ * Expose
+ */
+
+marked.Parser = Parser;
+marked.parser = Parser.parse;
+
+marked.Renderer = Renderer;
+
+marked.Lexer = Lexer;
+marked.lexer = Lexer.lex;
+
+marked.InlineLexer = InlineLexer;
+marked.inlineLexer = InlineLexer.output;
+
+marked.parse = marked;
+
+{
+  module.exports = marked;
+}
+
+}).call(function() {
+  return this || (typeof window !== 'undefined' ? window : commonjsGlobal);
+}());
+});
+
+const renderer = new marked.Renderer();
+
+renderer.heading = (text, level) => {
+  return `<div class="Markdown__heading Markdown__heading--level${level}">${text}</div>`;
+},
+renderer.paragraph = text => {
+  return `<div class="Markdown__paragraph">${text}</div>`;
+},
+renderer.strong = text => {
+  return `<span class="Markdown__strong">${text}</span>`;
+},
+renderer.em = text => {
+  return `<span class="Markdown__emphasis">${text}</span>`;
+},
+renderer.del = text => {
+  return `<span class="Markdown__delete">${text}</span>`;
+},
+renderer.list = (body, ordered) => {
+  if(ordered){
+    return `<ol class="Markdown__list Markdown__list--ordered">${body}</ol>`;
+  }else{
+    return `<ul class="Markdown__list Markdown__list--unordered">${body}</ul>`;
+  }
+},
+renderer.listitem = text => {
+  return `<li class="Markdown__listitem">${text}</li>`;
+},
+renderer.code = code => {
+  return `<div class="Markdown__code"><pre><code>${code}</code></pre></div>`;
+},
+renderer.codespan = code => {
+  return `<span class="Markdown__codespan"><code>${code}</code></span>`;
+},
+renderer.html = html => {
+  return html;
+},
+renderer.hr = () => {
+  return '<div class="Markdown__horizontalRule"></div>';
+},
+renderer.br = () => {
+  return '<br>';
+},
+renderer.blockquote = quote => {
+  return `<div class="Markdown__blockquote">${quote}</div>`;
+},
+renderer.link = (href, title, text) => {
+  if(title){
+    return `<a class="Markdown__link" href="${href}" title="${title}">${text}</a>`;
+  }else{
+    return `<a class="Markdown__link" href="${href}">${text}</a>`;
+  }
+},
+renderer.image = (href, title, text) => {
+  if(title){
+    return `<img class="Markdown__image" src="${href}" alt="${text}" title="${title}"></img>`;
+  }else{
+    return `<img class="Markdown__image" src="${href}" alt="${text}"></img>`;
+  }
+},
+renderer.table = (header, body) => {
+  return `<table class="Markdown__table"><thead>${header}</thead><tbody class="Markdown__tableBody">${body}</tbody></table>`;
+},
+renderer.tablerow = content => {
+  return `<tr class="Markdown__tableRow">${content}</tr>`;
+},
+renderer.tablecell = (content, flags) => {
+  if(flags.header){
+    return `<th class="Markdown__tableHeader">${content}</th>`;
+  }else{
+    return `<td class="Markdown__tableCell Markdown__tableCell--${flags.align}">${content}</td>`;
+  }
+};
+
+var script$58 = function() {
+  marked.setOptions(objectAssign(
+    {
+      renderer: renderer,
+      gfm: true,
+      tables: true,
+      breaks: false,
+      pedantic: false,
+      sanitize: false,
+      smartLists: true,
+      smartypants: false
+    },
+    this.opts.data.markedOptions
+  ));
+  this.on('mount', () => {
+    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
+  });
+};
+
+riot$1.tag2('dmc-markdown', '<div ref="view"></div>', '', 'class="Markdown"', function(opts) {
+    this.external(script$58);
+});
+
+var script$59 = function() {
+  this.descriptionsMarkdown = {
+    content: this.opts.description,
+    markedOptions: {}
+  };
 
   this.on('updated', () => {
     this.rebindTouchEvents();
@@ -42145,22 +56134,7 @@ var script$36 = function() {
     this.opts.onentry(this.opts.key);
   };
 
-  this.handleMenusTap = e => {
-    if (!e.target.classList.contains('EndpointsPage__itemMenus')) {
-      return;
-    }
-    this.isMenuOpened = false;
-    this.update();
-  };
-
-  this.handleMenuButtonTap = () => {
-    this.isMenuOpened = true;
-    this.update();
-  };
-
   this.handleEditButtonPat = () => {
-    this.isMenuOpened = false;
-    this.update();
     this.opts.onedit(this.opts.key, this.opts.url, this.opts.memo);
   };
 
@@ -42169,40 +56143,19 @@ var script$36 = function() {
   };
 
   this.handleLogoutButtonPat = () => {
-    this.isMenuOpened = false;
-    this.update();
     this.opts.onlogout(this.opts.key);
   };
-};
 
-riot$1.tag2('dmc-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemMenuButton" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="ellipsis"></dmc-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemName">{opts.name}</div> <div class="EndpointsPage__itemUrl">{opts.url}</div> <div class="EndpointsPage__itemTags" if="{!!opts.tags.length}"> <dmc-tag each="{label in opts.tags}" label="{label}"></dmc-tag> </div> <div class="EndpointsPage__itemDescription">{opts.description}</div> <div class="EndpointsPage__itemMemo">{opts.memo}</div> </div> <div class="EndpointsPage__itemMenus" if="{isMenuOpened}" ref="touch" ontap="handleMenusTap"> <div class="EndpointsPage__itemMenuFrame"> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleEditButtonPat">編集</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleRemoveButtonPat">削除</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleLogoutButtonPat">ログアウト</div> </div> </div>', '', 'class="EndpointsPage__item" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$36);
-});
-
-var script$38 = function() {
-  this.handleTap = () => {
-    this.refs.form.focus();
-  };
-
-  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
-  // そのため、`input`イベントを積極的に使用する。
-  this.handleTextareaInput = e => {
-    const newText = e.target.value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
-    this.opts.onchange && this.opts.onchange(newText);
-  };
-
-  this.handleTextareaChange = e => {
-    // `blur`時に`change`イベントが発火する。
-    // 不都合な挙動なのでイベント伝播を止める。
-    e.stopPropagation();
+  this.handleQrCodeButtonPat = () => {
+    this.opts.onqrcode(this.opts.key, this.opts.url, this.opts.memo);
   };
 };
 
-riot$1.tag2('dmc-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form"> <textarea class="Textarea__input" riot-value="{opts.text}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$38);
+riot$1.tag2('dmc-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemName">{opts.name}</div> <div class="EndpointsPage__itemMenuButton" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="ellipsis"></dmc-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemDescription"> <dmc-markdown data="{descriptionsMarkdown}"></dmc-markdown> </div> <div class="EndpointsPage__itemMemo">{opts.memo}</div> <div class="EndpointsPage__itemTags" if="{!!opts.tags.length}"> <dmc-tag each="{label in opts.tags}" label="{label}"></dmc-tag> </div> <div class="EndpointsPage__itemUrl"> <div class="EndpointsPage__itemUrlIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__itemUrlLabel">{opts.url}</div> </div> </div> <div class="EndpointsPage__itemTail"> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleEditButtonPat">編集</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleRemoveButtonPat">削除</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleQrCodeButtonPat">QR Code</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleLogoutButtonPat">ログアウト</div> </div>', '', 'class="EndpointsPage__item" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$59);
 });
 
-var script$39 = function() {
+var script$61 = function() {
   const store = this.riotx.get();
 
   this.memo = this.opts.memo || '';
@@ -42235,69 +56188,2408 @@ var script$39 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoint-edit', '<div class="EndpointsPage__editTitle">管理画面を編集する</div> <div class="EndpointsPage__editUrl">{opts.url}</div> <div class="EndpointsPage__editForm"> <dmc-textarea label="メモ" text="{memo}" placeholder="メモを入力" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__editControls"> <dmc-button type="primary" onpat="{handleEditButtonPat}" label="編集"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
-    this.external(script$39);
+riot$1.tag2('dmc-endpoint-edit', '<div class="EndpointsPage__editTitle">管理画面を編集する</div> <div class="EndpointsPage__editUrl">{opts.url}</div> <div class="EndpointsPage__editForm"> <dmc-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__editControls"> <dmc-button type="primary" onpat="{handleEditButtonPat}" label="編集"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
+    this.external(script$61);
 });
 
-var script$40 = function() {
-  const store = this.riotx.get();
+var qrious = createCommonjsModule(function (module, exports) {
+/*
+ * QRious v4.0.2
+ * Copyright (C) 2017 Alasdair Mercer
+ * Copyright (C) 2010 Tom Zerucha
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+(function (global, factory) {
+  module.exports = factory();
+}(commonjsGlobal, (function () { 'use strict';
 
-  this.isExist = false;
-  this.endpointURL = '';
-  this.memo = '';
+  /*
+   * Copyright (C) 2017 Alasdair Mercer, !ninja
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a copy
+   * of this software and associated documentation files (the "Software"), to deal
+   * in the Software without restriction, including without limitation the rights
+   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   * copies of the Software, and to permit persons to whom the Software is
+   * furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be included in all
+   * copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   * SOFTWARE.
+   */
 
-  this.handleEndpointURLChange = newEndpointURL => {
-    this.endpointURL = newEndpointURL;
-    this.isExist = !!store.getter(constants$4.ENDPOINTS_ONE_BY_URL, newEndpointURL);
-    this.update();
-  };
+  /**
+   * A bare-bones constructor for surrogate prototype swapping.
+   *
+   * @private
+   * @constructor
+   */
+  var Constructor = /* istanbul ignore next */ function() {};
+  /**
+   * A reference to <code>Object.prototype.hasOwnProperty</code>.
+   *
+   * @private
+   * @type {Function}
+   */
+  var hasOwnProperty = Object.prototype.hasOwnProperty;
+  /**
+   * A reference to <code>Array.prototype.slice</code>.
+   *
+   * @private
+   * @type {Function}
+   */
+  var slice = Array.prototype.slice;
 
-  this.handleMemoChange = newMemo => {
-    this.memo = newMemo;
-    this.update();
-  };
+  /**
+   * Creates an object which inherits the given <code>prototype</code>.
+   *
+   * Optionally, the created object can be extended further with the specified <code>properties</code>.
+   *
+   * @param {Object} prototype - the prototype to be inherited by the created object
+   * @param {Object} [properties] - the optional properties to be extended by the created object
+   * @return {Object} The newly created object.
+   * @private
+   */
+  function createObject(prototype, properties) {
+    var result;
+    /* istanbul ignore next */
+    if (typeof Object.create === 'function') {
+      result = Object.create(prototype);
+    } else {
+      Constructor.prototype = prototype;
+      result = new Constructor();
+      Constructor.prototype = null;
+    }
 
-  this.handleRegisterButtonPat = () => {
-    Promise
-      .resolve()
-      .then(() => store.action(constants$1.ENDPOINTS_ADD, this.endpointURL, this.memo))
-      .then(() => store.action(constants$1.TOASTS_ADD, {
-        message: 'エンドポイントを追加しました。'
-      }))
-      .then(() => {
-        this.close();
-      })
-      .catch(err => {
-        let autoHide = true;
-        let linkText;
-        let link;
-        // サーバが自己証明書を使用している場合にページ遷移を促す。
-        if (this.endpointURL.startsWith('https://')) {
-          autoHide = false;
-          linkText = 'Self-Signed Certificate?';
-          link = this.endpointURL;
+    if (properties) {
+      extendObject(true, result, properties);
+    }
+
+    return result;
+  }
+
+  /**
+   * Extends the constructor to which this method is associated with the <code>prototype</code> and/or
+   * <code>statics</code> provided.
+   *
+   * If <code>name</code> is provided, it will be used as the class name and can be accessed via a special
+   * <code>class_</code> property on the child constructor, otherwise the class name of the super constructor will be used
+   * instead. The class name may also be used string representation for instances of the child constructor (via
+   * <code>toString</code>), but this is not applicable to the <i>lite</i> version of Nevis.
+   *
+   * If <code>constructor</code> is provided, it will be used as the constructor for the child, otherwise a simple
+   * constructor which only calls the super constructor will be used instead.
+   *
+   * The super constructor can be accessed via a special <code>super_</code> property on the child constructor.
+   *
+   * @param {string} [name=this.class_] - the class name to be used for the child constructor
+   * @param {Function} [constructor] - the constructor for the child
+   * @param {Object} [prototype] - the prototype properties to be defined for the child
+   * @param {Object} [statics] - the static properties to be defined for the child
+   * @return {Function} The child <code>constructor</code> provided or the one created if none was given.
+   * @public
+   */
+  function extend(name, constructor, prototype, statics) {
+    var superConstructor = this;
+
+    if (typeof name !== 'string') {
+      statics = prototype;
+      prototype = constructor;
+      constructor = name;
+      name = null;
+    }
+
+    if (typeof constructor !== 'function') {
+      statics = prototype;
+      prototype = constructor;
+      constructor = function() {
+        return superConstructor.apply(this, arguments);
+      };
+    }
+
+    extendObject(false, constructor, superConstructor, statics);
+
+    constructor.prototype = createObject(superConstructor.prototype, prototype);
+    constructor.prototype.constructor = constructor;
+
+    constructor.class_ = name || superConstructor.class_;
+    constructor.super_ = superConstructor;
+
+    return constructor;
+  }
+
+  /**
+   * Extends the specified <code>target</code> object with the properties in each of the <code>sources</code> provided.
+   *
+   * if any source is <code>null</code> it will be ignored.
+   *
+   * @param {boolean} own - <code>true</code> to only copy <b>own</b> properties from <code>sources</code> onto
+   * <code>target</code>; otherwise <code>false</code>
+   * @param {Object} target - the target object which should be extended
+   * @param {...Object} [sources] - the source objects whose properties are to be copied onto <code>target</code>
+   * @return {void}
+   * @private
+   */
+  function extendObject(own, target, sources) {
+    sources = slice.call(arguments, 2);
+
+    var property;
+    var source;
+
+    for (var i = 0, length = sources.length; i < length; i++) {
+      source = sources[i];
+
+      for (property in source) {
+        if (!own || hasOwnProperty.call(source, property)) {
+          target[property] = source[property];
         }
-        store.action(constants$1.TOASTS_ADD, {
-          message: err.message,
-          autoHide,
-          linkText,
-          link
-        });
-      });
-  };
+      }
+    }
+  }
 
-  this.handleCancelButtonPat = () => {
-    this.close();
+  var extend_1 = extend;
+
+  /**
+   * The base class from which all others should extend.
+   *
+   * @public
+   * @constructor
+   */
+  function Nevis() {}
+  Nevis.class_ = 'Nevis';
+  Nevis.super_ = Object;
+
+  /**
+   * Extends the constructor to which this method is associated with the <code>prototype</code> and/or
+   * <code>statics</code> provided.
+   *
+   * If <code>name</code> is provided, it will be used as the class name and can be accessed via a special
+   * <code>class_</code> property on the child constructor, otherwise the class name of the super constructor will be used
+   * instead. The class name may also be used string representation for instances of the child constructor (via
+   * <code>toString</code>), but this is not applicable to the <i>lite</i> version of Nevis.
+   *
+   * If <code>constructor</code> is provided, it will be used as the constructor for the child, otherwise a simple
+   * constructor which only calls the super constructor will be used instead.
+   *
+   * The super constructor can be accessed via a special <code>super_</code> property on the child constructor.
+   *
+   * @param {string} [name=this.class_] - the class name to be used for the child constructor
+   * @param {Function} [constructor] - the constructor for the child
+   * @param {Object} [prototype] - the prototype properties to be defined for the child
+   * @param {Object} [statics] - the static properties to be defined for the child
+   * @return {Function} The child <code>constructor</code> provided or the one created if none was given.
+   * @public
+   * @static
+   * @memberof Nevis
+   */
+  Nevis.extend = extend_1;
+
+  var nevis = Nevis;
+
+  var lite = nevis;
+
+  /**
+   * Responsible for rendering a QR code {@link Frame} on a specific type of element.
+   *
+   * A renderer may be dependant on the rendering of another element, so the ordering of their execution is important.
+   *
+   * The rendering of a element can be deferred by disabling the renderer initially, however, any attempt get the element
+   * from the renderer will result in it being immediately enabled and the element being rendered.
+   *
+   * @param {QRious} qrious - the {@link QRious} instance to be used
+   * @param {*} element - the element onto which the QR code is to be rendered
+   * @param {boolean} [enabled] - <code>true</code> this {@link Renderer} is enabled; otherwise <code>false</code>.
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var Renderer = lite.extend(function(qrious, element, enabled) {
+    /**
+     * The {@link QRious} instance.
+     *
+     * @protected
+     * @type {QRious}
+     * @memberof Renderer#
+     */
+    this.qrious = qrious;
+
+    /**
+     * The element onto which this {@link Renderer} is rendering the QR code.
+     *
+     * @protected
+     * @type {*}
+     * @memberof Renderer#
+     */
+    this.element = element;
+    this.element.qrious = qrious;
+
+    /**
+     * Whether this {@link Renderer} is enabled.
+     *
+     * @protected
+     * @type {boolean}
+     * @memberof Renderer#
+     */
+    this.enabled = Boolean(enabled);
+  }, {
+
+    /**
+     * Draws the specified QR code <code>frame</code> on the underlying element.
+     *
+     * Implementations of {@link Renderer} <b>must</b> override this method with their own specific logic.
+     *
+     * @param {Frame} frame - the {@link Frame} to be drawn
+     * @return {void}
+     * @protected
+     * @abstract
+     * @memberof Renderer#
+     */
+    draw: function(frame) {},
+
+    /**
+     * Returns the element onto which this {@link Renderer} is rendering the QR code.
+     *
+     * If this method is called while this {@link Renderer} is disabled, it will be immediately enabled and rendered
+     * before the element is returned.
+     *
+     * @return {*} The element.
+     * @public
+     * @memberof Renderer#
+     */
+    getElement: function() {
+      if (!this.enabled) {
+        this.enabled = true;
+        this.render();
+      }
+
+      return this.element;
+    },
+
+    /**
+     * Calculates the size (in pixel units) to represent an individual module within the QR code based on the
+     * <code>frame</code> provided.
+     *
+     * Any configured padding will be excluded from the returned size.
+     *
+     * The returned value will be at least one, even in cases where the size of the QR code does not fit its contents.
+     * This is done so that the inevitable clipping is handled more gracefully since this way at least something is
+     * displayed instead of just a blank space filled by the background color.
+     *
+     * @param {Frame} frame - the {@link Frame} from which the module size is to be derived
+     * @return {number} The pixel size for each module in the QR code which will be no less than one.
+     * @protected
+     * @memberof Renderer#
+     */
+    getModuleSize: function(frame) {
+      var qrious = this.qrious;
+      var padding = qrious.padding || 0;
+      var pixels = Math.floor((qrious.size - (padding * 2)) / frame.width);
+
+      return Math.max(1, pixels);
+    },
+
+    /**
+     * Calculates the offset/padding (in pixel units) to be inserted before the QR code based on the <code>frame</code>
+     * provided.
+     *
+     * The returned value will be zero if there is no available offset or if the size of the QR code does not fit its
+     * contents. It will never be a negative value. This is done so that the inevitable clipping appears more naturally
+     * and it is not clipped from all directions.
+     *
+     * @param {Frame} frame - the {@link Frame} from which the offset is to be derived
+     * @return {number} The pixel offset for the QR code which will be no less than zero.
+     * @protected
+     * @memberof Renderer#
+     */
+    getOffset: function(frame) {
+      var qrious = this.qrious;
+      var padding = qrious.padding;
+
+      if (padding != null) {
+        return padding;
+      }
+
+      var moduleSize = this.getModuleSize(frame);
+      var offset = Math.floor((qrious.size - (moduleSize * frame.width)) / 2);
+
+      return Math.max(0, offset);
+    },
+
+    /**
+     * Renders a QR code on the underlying element based on the <code>frame</code> provided.
+     *
+     * @param {Frame} frame - the {@link Frame} to be rendered
+     * @return {void}
+     * @public
+     * @memberof Renderer#
+     */
+    render: function(frame) {
+      if (this.enabled) {
+        this.resize();
+        this.reset();
+        this.draw(frame);
+      }
+    },
+
+    /**
+     * Resets the underlying element, effectively clearing any previously rendered QR code.
+     *
+     * Implementations of {@link Renderer} <b>must</b> override this method with their own specific logic.
+     *
+     * @return {void}
+     * @protected
+     * @abstract
+     * @memberof Renderer#
+     */
+    reset: function() {},
+
+    /**
+     * Ensures that the size of the underlying element matches that defined on the associated {@link QRious} instance.
+     *
+     * Implementations of {@link Renderer} <b>must</b> override this method with their own specific logic.
+     *
+     * @return {void}
+     * @protected
+     * @abstract
+     * @memberof Renderer#
+     */
+    resize: function() {}
+
+  });
+
+  var Renderer_1 = Renderer;
+
+  /**
+   * An implementation of {@link Renderer} for working with <code>canvas</code> elements.
+   *
+   * @public
+   * @class
+   * @extends Renderer
+   */
+  var CanvasRenderer = Renderer_1.extend({
+
+    /**
+     * @override
+     */
+    draw: function(frame) {
+      var i, j;
+      var qrious = this.qrious;
+      var moduleSize = this.getModuleSize(frame);
+      var offset = this.getOffset(frame);
+      var context = this.element.getContext('2d');
+
+      context.fillStyle = qrious.foreground;
+      context.globalAlpha = qrious.foregroundAlpha;
+
+      for (i = 0; i < frame.width; i++) {
+        for (j = 0; j < frame.width; j++) {
+          if (frame.buffer[(j * frame.width) + i]) {
+            context.fillRect((moduleSize * i) + offset, (moduleSize * j) + offset, moduleSize, moduleSize);
+          }
+        }
+      }
+    },
+
+    /**
+     * @override
+     */
+    reset: function() {
+      var qrious = this.qrious;
+      var context = this.element.getContext('2d');
+      var size = qrious.size;
+
+      context.lineWidth = 1;
+      context.clearRect(0, 0, size, size);
+      context.fillStyle = qrious.background;
+      context.globalAlpha = qrious.backgroundAlpha;
+      context.fillRect(0, 0, size, size);
+    },
+
+    /**
+     * @override
+     */
+    resize: function() {
+      var element = this.element;
+
+      element.width = element.height = this.qrious.size;
+    }
+
+  });
+
+  var CanvasRenderer_1 = CanvasRenderer;
+
+  /* eslint no-multi-spaces: "off" */
+
+
+
+  /**
+   * Contains alignment pattern information.
+   *
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var Alignment = lite.extend(null, {
+
+    /**
+     * The alignment pattern block.
+     *
+     * @public
+     * @static
+     * @type {number[]}
+     * @memberof Alignment
+     */
+    BLOCK: [
+      0,  11, 15, 19, 23, 27, 31,
+      16, 18, 20, 22, 24, 26, 28, 20, 22, 24, 24, 26, 28, 28, 22, 24, 24,
+      26, 26, 28, 28, 24, 24, 26, 26, 26, 28, 28, 24, 26, 26, 26, 28, 28
+    ]
+
+  });
+
+  var Alignment_1 = Alignment;
+
+  /* eslint no-multi-spaces: "off" */
+
+
+
+  /**
+   * Contains error correction information.
+   *
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var ErrorCorrection = lite.extend(null, {
+
+    /**
+     * The error correction blocks.
+     *
+     * There are four elements per version. The first two indicate the number of blocks, then the data width, and finally
+     * the ECC width.
+     *
+     * @public
+     * @static
+     * @type {number[]}
+     * @memberof ErrorCorrection
+     */
+    BLOCKS: [
+      1,  0,  19,  7,     1,  0,  16,  10,    1,  0,  13,  13,    1,  0,  9,   17,
+      1,  0,  34,  10,    1,  0,  28,  16,    1,  0,  22,  22,    1,  0,  16,  28,
+      1,  0,  55,  15,    1,  0,  44,  26,    2,  0,  17,  18,    2,  0,  13,  22,
+      1,  0,  80,  20,    2,  0,  32,  18,    2,  0,  24,  26,    4,  0,  9,   16,
+      1,  0,  108, 26,    2,  0,  43,  24,    2,  2,  15,  18,    2,  2,  11,  22,
+      2,  0,  68,  18,    4,  0,  27,  16,    4,  0,  19,  24,    4,  0,  15,  28,
+      2,  0,  78,  20,    4,  0,  31,  18,    2,  4,  14,  18,    4,  1,  13,  26,
+      2,  0,  97,  24,    2,  2,  38,  22,    4,  2,  18,  22,    4,  2,  14,  26,
+      2,  0,  116, 30,    3,  2,  36,  22,    4,  4,  16,  20,    4,  4,  12,  24,
+      2,  2,  68,  18,    4,  1,  43,  26,    6,  2,  19,  24,    6,  2,  15,  28,
+      4,  0,  81,  20,    1,  4,  50,  30,    4,  4,  22,  28,    3,  8,  12,  24,
+      2,  2,  92,  24,    6,  2,  36,  22,    4,  6,  20,  26,    7,  4,  14,  28,
+      4,  0,  107, 26,    8,  1,  37,  22,    8,  4,  20,  24,    12, 4,  11,  22,
+      3,  1,  115, 30,    4,  5,  40,  24,    11, 5,  16,  20,    11, 5,  12,  24,
+      5,  1,  87,  22,    5,  5,  41,  24,    5,  7,  24,  30,    11, 7,  12,  24,
+      5,  1,  98,  24,    7,  3,  45,  28,    15, 2,  19,  24,    3,  13, 15,  30,
+      1,  5,  107, 28,    10, 1,  46,  28,    1,  15, 22,  28,    2,  17, 14,  28,
+      5,  1,  120, 30,    9,  4,  43,  26,    17, 1,  22,  28,    2,  19, 14,  28,
+      3,  4,  113, 28,    3,  11, 44,  26,    17, 4,  21,  26,    9,  16, 13,  26,
+      3,  5,  107, 28,    3,  13, 41,  26,    15, 5,  24,  30,    15, 10, 15,  28,
+      4,  4,  116, 28,    17, 0,  42,  26,    17, 6,  22,  28,    19, 6,  16,  30,
+      2,  7,  111, 28,    17, 0,  46,  28,    7,  16, 24,  30,    34, 0,  13,  24,
+      4,  5,  121, 30,    4,  14, 47,  28,    11, 14, 24,  30,    16, 14, 15,  30,
+      6,  4,  117, 30,    6,  14, 45,  28,    11, 16, 24,  30,    30, 2,  16,  30,
+      8,  4,  106, 26,    8,  13, 47,  28,    7,  22, 24,  30,    22, 13, 15,  30,
+      10, 2,  114, 28,    19, 4,  46,  28,    28, 6,  22,  28,    33, 4,  16,  30,
+      8,  4,  122, 30,    22, 3,  45,  28,    8,  26, 23,  30,    12, 28, 15,  30,
+      3,  10, 117, 30,    3,  23, 45,  28,    4,  31, 24,  30,    11, 31, 15,  30,
+      7,  7,  116, 30,    21, 7,  45,  28,    1,  37, 23,  30,    19, 26, 15,  30,
+      5,  10, 115, 30,    19, 10, 47,  28,    15, 25, 24,  30,    23, 25, 15,  30,
+      13, 3,  115, 30,    2,  29, 46,  28,    42, 1,  24,  30,    23, 28, 15,  30,
+      17, 0,  115, 30,    10, 23, 46,  28,    10, 35, 24,  30,    19, 35, 15,  30,
+      17, 1,  115, 30,    14, 21, 46,  28,    29, 19, 24,  30,    11, 46, 15,  30,
+      13, 6,  115, 30,    14, 23, 46,  28,    44, 7,  24,  30,    59, 1,  16,  30,
+      12, 7,  121, 30,    12, 26, 47,  28,    39, 14, 24,  30,    22, 41, 15,  30,
+      6,  14, 121, 30,    6,  34, 47,  28,    46, 10, 24,  30,    2,  64, 15,  30,
+      17, 4,  122, 30,    29, 14, 46,  28,    49, 10, 24,  30,    24, 46, 15,  30,
+      4,  18, 122, 30,    13, 32, 46,  28,    48, 14, 24,  30,    42, 32, 15,  30,
+      20, 4,  117, 30,    40, 7,  47,  28,    43, 22, 24,  30,    10, 67, 15,  30,
+      19, 6,  118, 30,    18, 31, 47,  28,    34, 34, 24,  30,    20, 61, 15,  30
+    ],
+
+    /**
+     * The final format bits with mask (level << 3 | mask).
+     *
+     * @public
+     * @static
+     * @type {number[]}
+     * @memberof ErrorCorrection
+     */
+    FINAL_FORMAT: [
+      // L
+      0x77c4, 0x72f3, 0x7daa, 0x789d, 0x662f, 0x6318, 0x6c41, 0x6976,
+      // M
+      0x5412, 0x5125, 0x5e7c, 0x5b4b, 0x45f9, 0x40ce, 0x4f97, 0x4aa0,
+      // Q
+      0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed,
+      // H
+      0x1689, 0x13be, 0x1ce7, 0x19d0, 0x0762, 0x0255, 0x0d0c, 0x083b
+    ],
+
+    /**
+     * A map of human-readable ECC levels.
+     *
+     * @public
+     * @static
+     * @type {Object.<string, number>}
+     * @memberof ErrorCorrection
+     */
+    LEVELS: {
+      L: 1,
+      M: 2,
+      Q: 3,
+      H: 4
+    }
+
+  });
+
+  var ErrorCorrection_1 = ErrorCorrection;
+
+  /**
+   * Contains Galois field information.
+   *
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var Galois = lite.extend(null, {
+
+    /**
+     * The Galois field exponent table.
+     *
+     * @public
+     * @static
+     * @type {number[]}
+     * @memberof Galois
+     */
+    EXPONENT: [
+      0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1d, 0x3a, 0x74, 0xe8, 0xcd, 0x87, 0x13, 0x26,
+      0x4c, 0x98, 0x2d, 0x5a, 0xb4, 0x75, 0xea, 0xc9, 0x8f, 0x03, 0x06, 0x0c, 0x18, 0x30, 0x60, 0xc0,
+      0x9d, 0x27, 0x4e, 0x9c, 0x25, 0x4a, 0x94, 0x35, 0x6a, 0xd4, 0xb5, 0x77, 0xee, 0xc1, 0x9f, 0x23,
+      0x46, 0x8c, 0x05, 0x0a, 0x14, 0x28, 0x50, 0xa0, 0x5d, 0xba, 0x69, 0xd2, 0xb9, 0x6f, 0xde, 0xa1,
+      0x5f, 0xbe, 0x61, 0xc2, 0x99, 0x2f, 0x5e, 0xbc, 0x65, 0xca, 0x89, 0x0f, 0x1e, 0x3c, 0x78, 0xf0,
+      0xfd, 0xe7, 0xd3, 0xbb, 0x6b, 0xd6, 0xb1, 0x7f, 0xfe, 0xe1, 0xdf, 0xa3, 0x5b, 0xb6, 0x71, 0xe2,
+      0xd9, 0xaf, 0x43, 0x86, 0x11, 0x22, 0x44, 0x88, 0x0d, 0x1a, 0x34, 0x68, 0xd0, 0xbd, 0x67, 0xce,
+      0x81, 0x1f, 0x3e, 0x7c, 0xf8, 0xed, 0xc7, 0x93, 0x3b, 0x76, 0xec, 0xc5, 0x97, 0x33, 0x66, 0xcc,
+      0x85, 0x17, 0x2e, 0x5c, 0xb8, 0x6d, 0xda, 0xa9, 0x4f, 0x9e, 0x21, 0x42, 0x84, 0x15, 0x2a, 0x54,
+      0xa8, 0x4d, 0x9a, 0x29, 0x52, 0xa4, 0x55, 0xaa, 0x49, 0x92, 0x39, 0x72, 0xe4, 0xd5, 0xb7, 0x73,
+      0xe6, 0xd1, 0xbf, 0x63, 0xc6, 0x91, 0x3f, 0x7e, 0xfc, 0xe5, 0xd7, 0xb3, 0x7b, 0xf6, 0xf1, 0xff,
+      0xe3, 0xdb, 0xab, 0x4b, 0x96, 0x31, 0x62, 0xc4, 0x95, 0x37, 0x6e, 0xdc, 0xa5, 0x57, 0xae, 0x41,
+      0x82, 0x19, 0x32, 0x64, 0xc8, 0x8d, 0x07, 0x0e, 0x1c, 0x38, 0x70, 0xe0, 0xdd, 0xa7, 0x53, 0xa6,
+      0x51, 0xa2, 0x59, 0xb2, 0x79, 0xf2, 0xf9, 0xef, 0xc3, 0x9b, 0x2b, 0x56, 0xac, 0x45, 0x8a, 0x09,
+      0x12, 0x24, 0x48, 0x90, 0x3d, 0x7a, 0xf4, 0xf5, 0xf7, 0xf3, 0xfb, 0xeb, 0xcb, 0x8b, 0x0b, 0x16,
+      0x2c, 0x58, 0xb0, 0x7d, 0xfa, 0xe9, 0xcf, 0x83, 0x1b, 0x36, 0x6c, 0xd8, 0xad, 0x47, 0x8e, 0x00
+    ],
+
+    /**
+     * The Galois field log table.
+     *
+     * @public
+     * @static
+     * @type {number[]}
+     * @memberof Galois
+     */
+    LOG: [
+      0xff, 0x00, 0x01, 0x19, 0x02, 0x32, 0x1a, 0xc6, 0x03, 0xdf, 0x33, 0xee, 0x1b, 0x68, 0xc7, 0x4b,
+      0x04, 0x64, 0xe0, 0x0e, 0x34, 0x8d, 0xef, 0x81, 0x1c, 0xc1, 0x69, 0xf8, 0xc8, 0x08, 0x4c, 0x71,
+      0x05, 0x8a, 0x65, 0x2f, 0xe1, 0x24, 0x0f, 0x21, 0x35, 0x93, 0x8e, 0xda, 0xf0, 0x12, 0x82, 0x45,
+      0x1d, 0xb5, 0xc2, 0x7d, 0x6a, 0x27, 0xf9, 0xb9, 0xc9, 0x9a, 0x09, 0x78, 0x4d, 0xe4, 0x72, 0xa6,
+      0x06, 0xbf, 0x8b, 0x62, 0x66, 0xdd, 0x30, 0xfd, 0xe2, 0x98, 0x25, 0xb3, 0x10, 0x91, 0x22, 0x88,
+      0x36, 0xd0, 0x94, 0xce, 0x8f, 0x96, 0xdb, 0xbd, 0xf1, 0xd2, 0x13, 0x5c, 0x83, 0x38, 0x46, 0x40,
+      0x1e, 0x42, 0xb6, 0xa3, 0xc3, 0x48, 0x7e, 0x6e, 0x6b, 0x3a, 0x28, 0x54, 0xfa, 0x85, 0xba, 0x3d,
+      0xca, 0x5e, 0x9b, 0x9f, 0x0a, 0x15, 0x79, 0x2b, 0x4e, 0xd4, 0xe5, 0xac, 0x73, 0xf3, 0xa7, 0x57,
+      0x07, 0x70, 0xc0, 0xf7, 0x8c, 0x80, 0x63, 0x0d, 0x67, 0x4a, 0xde, 0xed, 0x31, 0xc5, 0xfe, 0x18,
+      0xe3, 0xa5, 0x99, 0x77, 0x26, 0xb8, 0xb4, 0x7c, 0x11, 0x44, 0x92, 0xd9, 0x23, 0x20, 0x89, 0x2e,
+      0x37, 0x3f, 0xd1, 0x5b, 0x95, 0xbc, 0xcf, 0xcd, 0x90, 0x87, 0x97, 0xb2, 0xdc, 0xfc, 0xbe, 0x61,
+      0xf2, 0x56, 0xd3, 0xab, 0x14, 0x2a, 0x5d, 0x9e, 0x84, 0x3c, 0x39, 0x53, 0x47, 0x6d, 0x41, 0xa2,
+      0x1f, 0x2d, 0x43, 0xd8, 0xb7, 0x7b, 0xa4, 0x76, 0xc4, 0x17, 0x49, 0xec, 0x7f, 0x0c, 0x6f, 0xf6,
+      0x6c, 0xa1, 0x3b, 0x52, 0x29, 0x9d, 0x55, 0xaa, 0xfb, 0x60, 0x86, 0xb1, 0xbb, 0xcc, 0x3e, 0x5a,
+      0xcb, 0x59, 0x5f, 0xb0, 0x9c, 0xa9, 0xa0, 0x51, 0x0b, 0xf5, 0x16, 0xeb, 0x7a, 0x75, 0x2c, 0xd7,
+      0x4f, 0xae, 0xd5, 0xe9, 0xe6, 0xe7, 0xad, 0xe8, 0x74, 0xd6, 0xf4, 0xea, 0xa8, 0x50, 0x58, 0xaf
+    ]
+
+  });
+
+  var Galois_1 = Galois;
+
+  /**
+   * Contains version pattern information.
+   *
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var Version = lite.extend(null, {
+
+    /**
+     * The version pattern block.
+     *
+     * @public
+     * @static
+     * @type {number[]}
+     * @memberof Version
+     */
+    BLOCK: [
+      0xc94, 0x5bc, 0xa99, 0x4d3, 0xbf6, 0x762, 0x847, 0x60d, 0x928, 0xb78, 0x45d, 0xa17, 0x532,
+      0x9a6, 0x683, 0x8c9, 0x7ec, 0xec4, 0x1e1, 0xfab, 0x08e, 0xc1a, 0x33f, 0xd75, 0x250, 0x9d5,
+      0x6f0, 0x8ba, 0x79f, 0xb0b, 0x42e, 0xa64, 0x541, 0xc69
+    ]
+
+  });
+
+  var Version_1 = Version;
+
+  /**
+   * Generates information for a QR code frame based on a specific value to be encoded.
+   *
+   * @param {Frame~Options} options - the options to be used
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var Frame = lite.extend(function(options) {
+    var dataBlock, eccBlock, index, neccBlock1, neccBlock2;
+    var valueLength = options.value.length;
+
+    this._badness = [];
+    this._level = ErrorCorrection_1.LEVELS[options.level];
+    this._polynomial = [];
+    this._value = options.value;
+    this._version = 0;
+    this._stringBuffer = [];
+
+    while (this._version < 40) {
+      this._version++;
+
+      index = ((this._level - 1) * 4) + ((this._version - 1) * 16);
+
+      neccBlock1 = ErrorCorrection_1.BLOCKS[index++];
+      neccBlock2 = ErrorCorrection_1.BLOCKS[index++];
+      dataBlock = ErrorCorrection_1.BLOCKS[index++];
+      eccBlock = ErrorCorrection_1.BLOCKS[index];
+
+      index = (dataBlock * (neccBlock1 + neccBlock2)) + neccBlock2 - 3 + (this._version <= 9);
+
+      if (valueLength <= index) {
+        break;
+      }
+    }
+
+    this._dataBlock = dataBlock;
+    this._eccBlock = eccBlock;
+    this._neccBlock1 = neccBlock1;
+    this._neccBlock2 = neccBlock2;
+
+    /**
+     * The data width is based on version.
+     *
+     * @public
+     * @type {number}
+     * @memberof Frame#
+     */
+    // FIXME: Ensure that it fits instead of being truncated.
+    var width = this.width = 17 + (4 * this._version);
+
+    /**
+     * The image buffer.
+     *
+     * @public
+     * @type {number[]}
+     * @memberof Frame#
+     */
+    this.buffer = Frame._createArray(width * width);
+
+    this._ecc = Frame._createArray(dataBlock + ((dataBlock + eccBlock) * (neccBlock1 + neccBlock2)) + neccBlock2);
+    this._mask = Frame._createArray(((width * (width + 1)) + 1) / 2);
+
+    this._insertFinders();
+    this._insertAlignments();
+
+    // Insert single foreground cell.
+    this.buffer[8 + (width * (width - 8))] = 1;
+
+    this._insertTimingGap();
+    this._reverseMask();
+    this._insertTimingRowAndColumn();
+    this._insertVersion();
+    this._syncMask();
+    this._convertBitStream(valueLength);
+    this._calculatePolynomial();
+    this._appendEccToData();
+    this._interleaveBlocks();
+    this._pack();
+    this._finish();
+  }, {
+
+    _addAlignment: function(x, y) {
+      var i;
+      var buffer = this.buffer;
+      var width = this.width;
+
+      buffer[x + (width * y)] = 1;
+
+      for (i = -2; i < 2; i++) {
+        buffer[x + i + (width * (y - 2))] = 1;
+        buffer[x - 2 + (width * (y + i + 1))] = 1;
+        buffer[x + 2 + (width * (y + i))] = 1;
+        buffer[x + i + 1 + (width * (y + 2))] = 1;
+      }
+
+      for (i = 0; i < 2; i++) {
+        this._setMask(x - 1, y + i);
+        this._setMask(x + 1, y - i);
+        this._setMask(x - i, y - 1);
+        this._setMask(x + i, y + 1);
+      }
+    },
+
+    _appendData: function(data, dataLength, ecc, eccLength) {
+      var bit, i, j;
+      var polynomial = this._polynomial;
+      var stringBuffer = this._stringBuffer;
+
+      for (i = 0; i < eccLength; i++) {
+        stringBuffer[ecc + i] = 0;
+      }
+
+      for (i = 0; i < dataLength; i++) {
+        bit = Galois_1.LOG[stringBuffer[data + i] ^ stringBuffer[ecc]];
+
+        if (bit !== 255) {
+          for (j = 1; j < eccLength; j++) {
+            stringBuffer[ecc + j - 1] = stringBuffer[ecc + j] ^
+              Galois_1.EXPONENT[Frame._modN(bit + polynomial[eccLength - j])];
+          }
+        } else {
+          for (j = ecc; j < ecc + eccLength; j++) {
+            stringBuffer[j] = stringBuffer[j + 1];
+          }
+        }
+
+        stringBuffer[ecc + eccLength - 1] = bit === 255 ? 0 : Galois_1.EXPONENT[Frame._modN(bit + polynomial[0])];
+      }
+    },
+
+    _appendEccToData: function() {
+      var i;
+      var data = 0;
+      var dataBlock = this._dataBlock;
+      var ecc = this._calculateMaxLength();
+      var eccBlock = this._eccBlock;
+
+      for (i = 0; i < this._neccBlock1; i++) {
+        this._appendData(data, dataBlock, ecc, eccBlock);
+
+        data += dataBlock;
+        ecc += eccBlock;
+      }
+
+      for (i = 0; i < this._neccBlock2; i++) {
+        this._appendData(data, dataBlock + 1, ecc, eccBlock);
+
+        data += dataBlock + 1;
+        ecc += eccBlock;
+      }
+    },
+
+    _applyMask: function(mask) {
+      var r3x, r3y, x, y;
+      var buffer = this.buffer;
+      var width = this.width;
+
+      switch (mask) {
+      case 0:
+        for (y = 0; y < width; y++) {
+          for (x = 0; x < width; x++) {
+            if (!((x + y) & 1) && !this._isMasked(x, y)) {
+              buffer[x + (y * width)] ^= 1;
+            }
+          }
+        }
+
+        break;
+      case 1:
+        for (y = 0; y < width; y++) {
+          for (x = 0; x < width; x++) {
+            if (!(y & 1) && !this._isMasked(x, y)) {
+              buffer[x + (y * width)] ^= 1;
+            }
+          }
+        }
+
+        break;
+      case 2:
+        for (y = 0; y < width; y++) {
+          for (r3x = 0, x = 0; x < width; x++, r3x++) {
+            if (r3x === 3) {
+              r3x = 0;
+            }
+
+            if (!r3x && !this._isMasked(x, y)) {
+              buffer[x + (y * width)] ^= 1;
+            }
+          }
+        }
+
+        break;
+      case 3:
+        for (r3y = 0, y = 0; y < width; y++, r3y++) {
+          if (r3y === 3) {
+            r3y = 0;
+          }
+
+          for (r3x = r3y, x = 0; x < width; x++, r3x++) {
+            if (r3x === 3) {
+              r3x = 0;
+            }
+
+            if (!r3x && !this._isMasked(x, y)) {
+              buffer[x + (y * width)] ^= 1;
+            }
+          }
+        }
+
+        break;
+      case 4:
+        for (y = 0; y < width; y++) {
+          for (r3x = 0, r3y = (y >> 1) & 1, x = 0; x < width; x++, r3x++) {
+            if (r3x === 3) {
+              r3x = 0;
+              r3y = !r3y;
+            }
+
+            if (!r3y && !this._isMasked(x, y)) {
+              buffer[x + (y * width)] ^= 1;
+            }
+          }
+        }
+
+        break;
+      case 5:
+        for (r3y = 0, y = 0; y < width; y++, r3y++) {
+          if (r3y === 3) {
+            r3y = 0;
+          }
+
+          for (r3x = 0, x = 0; x < width; x++, r3x++) {
+            if (r3x === 3) {
+              r3x = 0;
+            }
+
+            if (!((x & y & 1) + !(!r3x | !r3y)) && !this._isMasked(x, y)) {
+              buffer[x + (y * width)] ^= 1;
+            }
+          }
+        }
+
+        break;
+      case 6:
+        for (r3y = 0, y = 0; y < width; y++, r3y++) {
+          if (r3y === 3) {
+            r3y = 0;
+          }
+
+          for (r3x = 0, x = 0; x < width; x++, r3x++) {
+            if (r3x === 3) {
+              r3x = 0;
+            }
+
+            if (!((x & y & 1) + (r3x && r3x === r3y) & 1) && !this._isMasked(x, y)) {
+              buffer[x + (y * width)] ^= 1;
+            }
+          }
+        }
+
+        break;
+      case 7:
+        for (r3y = 0, y = 0; y < width; y++, r3y++) {
+          if (r3y === 3) {
+            r3y = 0;
+          }
+
+          for (r3x = 0, x = 0; x < width; x++, r3x++) {
+            if (r3x === 3) {
+              r3x = 0;
+            }
+
+            if (!((r3x && r3x === r3y) + (x + y & 1) & 1) && !this._isMasked(x, y)) {
+              buffer[x + (y * width)] ^= 1;
+            }
+          }
+        }
+
+        break;
+      }
+    },
+
+    _calculateMaxLength: function() {
+      return (this._dataBlock * (this._neccBlock1 + this._neccBlock2)) + this._neccBlock2;
+    },
+
+    _calculatePolynomial: function() {
+      var i, j;
+      var eccBlock = this._eccBlock;
+      var polynomial = this._polynomial;
+
+      polynomial[0] = 1;
+
+      for (i = 0; i < eccBlock; i++) {
+        polynomial[i + 1] = 1;
+
+        for (j = i; j > 0; j--) {
+          polynomial[j] = polynomial[j] ? polynomial[j - 1] ^
+            Galois_1.EXPONENT[Frame._modN(Galois_1.LOG[polynomial[j]] + i)] : polynomial[j - 1];
+        }
+
+        polynomial[0] = Galois_1.EXPONENT[Frame._modN(Galois_1.LOG[polynomial[0]] + i)];
+      }
+
+      // Use logs for generator polynomial to save calculation step.
+      for (i = 0; i <= eccBlock; i++) {
+        polynomial[i] = Galois_1.LOG[polynomial[i]];
+      }
+    },
+
+    _checkBadness: function() {
+      var b, b1, h, x, y;
+      var bad = 0;
+      var badness = this._badness;
+      var buffer = this.buffer;
+      var width = this.width;
+
+      // Blocks of same colour.
+      for (y = 0; y < width - 1; y++) {
+        for (x = 0; x < width - 1; x++) {
+          // All foreground colour.
+          if ((buffer[x + (width * y)] &&
+            buffer[x + 1 + (width * y)] &&
+            buffer[x + (width * (y + 1))] &&
+            buffer[x + 1 + (width * (y + 1))]) ||
+            // All background colour.
+            !(buffer[x + (width * y)] ||
+            buffer[x + 1 + (width * y)] ||
+            buffer[x + (width * (y + 1))] ||
+            buffer[x + 1 + (width * (y + 1))])) {
+            bad += Frame.N2;
+          }
+        }
+      }
+
+      var bw = 0;
+
+      // X runs.
+      for (y = 0; y < width; y++) {
+        h = 0;
+
+        badness[0] = 0;
+
+        for (b = 0, x = 0; x < width; x++) {
+          b1 = buffer[x + (width * y)];
+
+          if (b === b1) {
+            badness[h]++;
+          } else {
+            badness[++h] = 1;
+          }
+
+          b = b1;
+          bw += b ? 1 : -1;
+        }
+
+        bad += this._getBadness(h);
+      }
+
+      if (bw < 0) {
+        bw = -bw;
+      }
+
+      var count = 0;
+      var big = bw;
+      big += big << 2;
+      big <<= 1;
+
+      while (big > width * width) {
+        big -= width * width;
+        count++;
+      }
+
+      bad += count * Frame.N4;
+
+      // Y runs.
+      for (x = 0; x < width; x++) {
+        h = 0;
+
+        badness[0] = 0;
+
+        for (b = 0, y = 0; y < width; y++) {
+          b1 = buffer[x + (width * y)];
+
+          if (b === b1) {
+            badness[h]++;
+          } else {
+            badness[++h] = 1;
+          }
+
+          b = b1;
+        }
+
+        bad += this._getBadness(h);
+      }
+
+      return bad;
+    },
+
+    _convertBitStream: function(length) {
+      var bit, i;
+      var ecc = this._ecc;
+      var version = this._version;
+
+      // Convert string to bit stream. 8-bit data to QR-coded 8-bit data (numeric, alphanumeric, or kanji not supported).
+      for (i = 0; i < length; i++) {
+        ecc[i] = this._value.charCodeAt(i);
+      }
+
+      var stringBuffer = this._stringBuffer = ecc.slice();
+      var maxLength = this._calculateMaxLength();
+
+      if (length >= maxLength - 2) {
+        length = maxLength - 2;
+
+        if (version > 9) {
+          length--;
+        }
+      }
+
+      // Shift and re-pack to insert length prefix.
+      var index = length;
+
+      if (version > 9) {
+        stringBuffer[index + 2] = 0;
+        stringBuffer[index + 3] = 0;
+
+        while (index--) {
+          bit = stringBuffer[index];
+
+          stringBuffer[index + 3] |= 255 & (bit << 4);
+          stringBuffer[index + 2] = bit >> 4;
+        }
+
+        stringBuffer[2] |= 255 & (length << 4);
+        stringBuffer[1] = length >> 4;
+        stringBuffer[0] = 0x40 | (length >> 12);
+      } else {
+        stringBuffer[index + 1] = 0;
+        stringBuffer[index + 2] = 0;
+
+        while (index--) {
+          bit = stringBuffer[index];
+
+          stringBuffer[index + 2] |= 255 & (bit << 4);
+          stringBuffer[index + 1] = bit >> 4;
+        }
+
+        stringBuffer[1] |= 255 & (length << 4);
+        stringBuffer[0] = 0x40 | (length >> 4);
+      }
+
+      // Fill to end with pad pattern.
+      index = length + 3 - (version < 10);
+
+      while (index < maxLength) {
+        stringBuffer[index++] = 0xec;
+        stringBuffer[index++] = 0x11;
+      }
+    },
+
+    _getBadness: function(length) {
+      var i;
+      var badRuns = 0;
+      var badness = this._badness;
+
+      for (i = 0; i <= length; i++) {
+        if (badness[i] >= 5) {
+          badRuns += Frame.N1 + badness[i] - 5;
+        }
+      }
+
+      // FBFFFBF as in finder.
+      for (i = 3; i < length - 1; i += 2) {
+        if (badness[i - 2] === badness[i + 2] &&
+          badness[i + 2] === badness[i - 1] &&
+          badness[i - 1] === badness[i + 1] &&
+          badness[i - 1] * 3 === badness[i] &&
+          // Background around the foreground pattern? Not part of the specs.
+          (badness[i - 3] === 0 || i + 3 > length ||
+          badness[i - 3] * 3 >= badness[i] * 4 ||
+          badness[i + 3] * 3 >= badness[i] * 4)) {
+          badRuns += Frame.N3;
+        }
+      }
+
+      return badRuns;
+    },
+
+    _finish: function() {
+      // Save pre-mask copy of frame.
+      this._stringBuffer = this.buffer.slice();
+
+      var currentMask, i;
+      var bit = 0;
+      var mask = 30000;
+
+      /*
+       * Using for instead of while since in original Arduino code if an early mask was "good enough" it wouldn't try for
+       * a better one since they get more complex and take longer.
+       */
+      for (i = 0; i < 8; i++) {
+        // Returns foreground-background imbalance.
+        this._applyMask(i);
+
+        currentMask = this._checkBadness();
+
+        // Is current mask better than previous best?
+        if (currentMask < mask) {
+          mask = currentMask;
+          bit = i;
+        }
+
+        // Don't increment "i" to a void redoing mask.
+        if (bit === 7) {
+          break;
+        }
+
+        // Reset for next pass.
+        this.buffer = this._stringBuffer.slice();
+      }
+
+      // Redo best mask as none were "good enough" (i.e. last wasn't bit).
+      if (bit !== i) {
+        this._applyMask(bit);
+      }
+
+      // Add in final mask/ECC level bytes.
+      mask = ErrorCorrection_1.FINAL_FORMAT[bit + (this._level - 1 << 3)];
+
+      var buffer = this.buffer;
+      var width = this.width;
+
+      // Low byte.
+      for (i = 0; i < 8; i++, mask >>= 1) {
+        if (mask & 1) {
+          buffer[width - 1 - i + (width * 8)] = 1;
+
+          if (i < 6) {
+            buffer[8 + (width * i)] = 1;
+          } else {
+            buffer[8 + (width * (i + 1))] = 1;
+          }
+        }
+      }
+
+      // High byte.
+      for (i = 0; i < 7; i++, mask >>= 1) {
+        if (mask & 1) {
+          buffer[8 + (width * (width - 7 + i))] = 1;
+
+          if (i) {
+            buffer[6 - i + (width * 8)] = 1;
+          } else {
+            buffer[7 + (width * 8)] = 1;
+          }
+        }
+      }
+    },
+
+    _interleaveBlocks: function() {
+      var i, j;
+      var dataBlock = this._dataBlock;
+      var ecc = this._ecc;
+      var eccBlock = this._eccBlock;
+      var k = 0;
+      var maxLength = this._calculateMaxLength();
+      var neccBlock1 = this._neccBlock1;
+      var neccBlock2 = this._neccBlock2;
+      var stringBuffer = this._stringBuffer;
+
+      for (i = 0; i < dataBlock; i++) {
+        for (j = 0; j < neccBlock1; j++) {
+          ecc[k++] = stringBuffer[i + (j * dataBlock)];
+        }
+
+        for (j = 0; j < neccBlock2; j++) {
+          ecc[k++] = stringBuffer[(neccBlock1 * dataBlock) + i + (j * (dataBlock + 1))];
+        }
+      }
+
+      for (j = 0; j < neccBlock2; j++) {
+        ecc[k++] = stringBuffer[(neccBlock1 * dataBlock) + i + (j * (dataBlock + 1))];
+      }
+
+      for (i = 0; i < eccBlock; i++) {
+        for (j = 0; j < neccBlock1 + neccBlock2; j++) {
+          ecc[k++] = stringBuffer[maxLength + i + (j * eccBlock)];
+        }
+      }
+
+      this._stringBuffer = ecc;
+    },
+
+    _insertAlignments: function() {
+      var i, x, y;
+      var version = this._version;
+      var width = this.width;
+
+      if (version > 1) {
+        i = Alignment_1.BLOCK[version];
+        y = width - 7;
+
+        for (;;) {
+          x = width - 7;
+
+          while (x > i - 3) {
+            this._addAlignment(x, y);
+
+            if (x < i) {
+              break;
+            }
+
+            x -= i;
+          }
+
+          if (y <= i + 9) {
+            break;
+          }
+
+          y -= i;
+
+          this._addAlignment(6, y);
+          this._addAlignment(y, 6);
+        }
+      }
+    },
+
+    _insertFinders: function() {
+      var i, j, x, y;
+      var buffer = this.buffer;
+      var width = this.width;
+
+      for (i = 0; i < 3; i++) {
+        j = 0;
+        y = 0;
+
+        if (i === 1) {
+          j = width - 7;
+        }
+        if (i === 2) {
+          y = width - 7;
+        }
+
+        buffer[y + 3 + (width * (j + 3))] = 1;
+
+        for (x = 0; x < 6; x++) {
+          buffer[y + x + (width * j)] = 1;
+          buffer[y + (width * (j + x + 1))] = 1;
+          buffer[y + 6 + (width * (j + x))] = 1;
+          buffer[y + x + 1 + (width * (j + 6))] = 1;
+        }
+
+        for (x = 1; x < 5; x++) {
+          this._setMask(y + x, j + 1);
+          this._setMask(y + 1, j + x + 1);
+          this._setMask(y + 5, j + x);
+          this._setMask(y + x + 1, j + 5);
+        }
+
+        for (x = 2; x < 4; x++) {
+          buffer[y + x + (width * (j + 2))] = 1;
+          buffer[y + 2 + (width * (j + x + 1))] = 1;
+          buffer[y + 4 + (width * (j + x))] = 1;
+          buffer[y + x + 1 + (width * (j + 4))] = 1;
+        }
+      }
+    },
+
+    _insertTimingGap: function() {
+      var x, y;
+      var width = this.width;
+
+      for (y = 0; y < 7; y++) {
+        this._setMask(7, y);
+        this._setMask(width - 8, y);
+        this._setMask(7, y + width - 7);
+      }
+
+      for (x = 0; x < 8; x++) {
+        this._setMask(x, 7);
+        this._setMask(x + width - 8, 7);
+        this._setMask(x, width - 8);
+      }
+    },
+
+    _insertTimingRowAndColumn: function() {
+      var x;
+      var buffer = this.buffer;
+      var width = this.width;
+
+      for (x = 0; x < width - 14; x++) {
+        if (x & 1) {
+          this._setMask(8 + x, 6);
+          this._setMask(6, 8 + x);
+        } else {
+          buffer[8 + x + (width * 6)] = 1;
+          buffer[6 + (width * (8 + x))] = 1;
+        }
+      }
+    },
+
+    _insertVersion: function() {
+      var i, j, x, y;
+      var buffer = this.buffer;
+      var version = this._version;
+      var width = this.width;
+
+      if (version > 6) {
+        i = Version_1.BLOCK[version - 7];
+        j = 17;
+
+        for (x = 0; x < 6; x++) {
+          for (y = 0; y < 3; y++, j--) {
+            if (1 & (j > 11 ? version >> j - 12 : i >> j)) {
+              buffer[5 - x + (width * (2 - y + width - 11))] = 1;
+              buffer[2 - y + width - 11 + (width * (5 - x))] = 1;
+            } else {
+              this._setMask(5 - x, 2 - y + width - 11);
+              this._setMask(2 - y + width - 11, 5 - x);
+            }
+          }
+        }
+      }
+    },
+
+    _isMasked: function(x, y) {
+      var bit = Frame._getMaskBit(x, y);
+
+      return this._mask[bit] === 1;
+    },
+
+    _pack: function() {
+      var bit, i, j;
+      var k = 1;
+      var v = 1;
+      var width = this.width;
+      var x = width - 1;
+      var y = width - 1;
+
+      // Interleaved data and ECC codes.
+      var length = ((this._dataBlock + this._eccBlock) * (this._neccBlock1 + this._neccBlock2)) + this._neccBlock2;
+
+      for (i = 0; i < length; i++) {
+        bit = this._stringBuffer[i];
+
+        for (j = 0; j < 8; j++, bit <<= 1) {
+          if (0x80 & bit) {
+            this.buffer[x + (width * y)] = 1;
+          }
+
+          // Find next fill position.
+          do {
+            if (v) {
+              x--;
+            } else {
+              x++;
+
+              if (k) {
+                if (y !== 0) {
+                  y--;
+                } else {
+                  x -= 2;
+                  k = !k;
+
+                  if (x === 6) {
+                    x--;
+                    y = 9;
+                  }
+                }
+              } else if (y !== width - 1) {
+                y++;
+              } else {
+                x -= 2;
+                k = !k;
+
+                if (x === 6) {
+                  x--;
+                  y -= 8;
+                }
+              }
+            }
+
+            v = !v;
+          } while (this._isMasked(x, y));
+        }
+      }
+    },
+
+    _reverseMask: function() {
+      var x, y;
+      var width = this.width;
+
+      for (x = 0; x < 9; x++) {
+        this._setMask(x, 8);
+      }
+
+      for (x = 0; x < 8; x++) {
+        this._setMask(x + width - 8, 8);
+        this._setMask(8, x);
+      }
+
+      for (y = 0; y < 7; y++) {
+        this._setMask(8, y + width - 7);
+      }
+    },
+
+    _setMask: function(x, y) {
+      var bit = Frame._getMaskBit(x, y);
+
+      this._mask[bit] = 1;
+    },
+
+    _syncMask: function() {
+      var x, y;
+      var width = this.width;
+
+      for (y = 0; y < width; y++) {
+        for (x = 0; x <= y; x++) {
+          if (this.buffer[x + (width * y)]) {
+            this._setMask(x, y);
+          }
+        }
+      }
+    }
+
+  }, {
+
+    _createArray: function(length) {
+      var i;
+      var array = [];
+
+      for (i = 0; i < length; i++) {
+        array[i] = 0;
+      }
+
+      return array;
+    },
+
+    _getMaskBit: function(x, y) {
+      var bit;
+
+      if (x > y) {
+        bit = x;
+        x = y;
+        y = bit;
+      }
+
+      bit = y;
+      bit += y * y;
+      bit >>= 1;
+      bit += x;
+
+      return bit;
+    },
+
+    _modN: function(x) {
+      while (x >= 255) {
+        x -= 255;
+        x = (x >> 8) + (x & 255);
+      }
+
+      return x;
+    },
+
+    // *Badness* coefficients.
+    N1: 3,
+    N2: 3,
+    N3: 40,
+    N4: 10
+
+  });
+
+  var Frame_1 = Frame;
+
+  /**
+   * The options used by {@link Frame}.
+   *
+   * @typedef {Object} Frame~Options
+   * @property {string} level - The ECC level to be used.
+   * @property {string} value - The value to be encoded.
+   */
+
+  /**
+   * An implementation of {@link Renderer} for working with <code>img</code> elements.
+   *
+   * This depends on {@link CanvasRenderer} being executed first as this implementation simply applies the data URL from
+   * the rendered <code>canvas</code> element as the <code>src</code> for the <code>img</code> element being rendered.
+   *
+   * @public
+   * @class
+   * @extends Renderer
+   */
+  var ImageRenderer = Renderer_1.extend({
+
+    /**
+     * @override
+     */
+    draw: function() {
+      this.element.src = this.qrious.toDataURL();
+    },
+
+    /**
+     * @override
+     */
+    reset: function() {
+      this.element.src = '';
+    },
+
+    /**
+     * @override
+     */
+    resize: function() {
+      var element = this.element;
+
+      element.width = element.height = this.qrious.size;
+    }
+
+  });
+
+  var ImageRenderer_1 = ImageRenderer;
+
+  /**
+   * Defines an available option while also configuring how values are applied to the target object.
+   *
+   * Optionally, a default value can be specified as well a value transformer for greater control over how the option
+   * value is applied.
+   *
+   * If no value transformer is specified, then any specified option will be applied directly. All values are maintained
+   * on the target object itself as a field using the option name prefixed with a single underscore.
+   *
+   * When an option is specified as modifiable, the {@link OptionManager} will be required to include a setter for the
+   * property that is defined on the target object that uses the option name.
+   *
+   * @param {string} name - the name to be used
+   * @param {boolean} [modifiable] - <code>true</code> if the property defined on target objects should include a setter;
+   * otherwise <code>false</code>
+   * @param {*} [defaultValue] - the default value to be used
+   * @param {Option~ValueTransformer} [valueTransformer] - the value transformer to be used
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var Option = lite.extend(function(name, modifiable, defaultValue, valueTransformer) {
+    /**
+     * The name for this {@link Option}.
+     *
+     * @public
+     * @type {string}
+     * @memberof Option#
+     */
+    this.name = name;
+
+    /**
+     * Whether a setter should be included on the property defined on target objects for this {@link Option}.
+     *
+     * @public
+     * @type {boolean}
+     * @memberof Option#
+     */
+    this.modifiable = Boolean(modifiable);
+
+    /**
+     * The default value for this {@link Option}.
+     *
+     * @public
+     * @type {*}
+     * @memberof Option#
+     */
+    this.defaultValue = defaultValue;
+
+    this._valueTransformer = valueTransformer;
+  }, {
+
+    /**
+     * Transforms the specified <code>value</code> so that it can be applied for this {@link Option}.
+     *
+     * If a value transformer has been specified for this {@link Option}, it will be called upon to transform
+     * <code>value</code>. Otherwise, <code>value</code> will be returned directly.
+     *
+     * @param {*} value - the value to be transformed
+     * @return {*} The transformed value or <code>value</code> if no value transformer is specified.
+     * @public
+     * @memberof Option#
+     */
+    transform: function(value) {
+      var transformer = this._valueTransformer;
+      if (typeof transformer === 'function') {
+        return transformer(value, this);
+      }
+
+      return value;
+    }
+
+  });
+
+  var Option_1 = Option;
+
+  /**
+   * Returns a transformed value for the specified <code>value</code> to be applied for the <code>option</code> provided.
+   *
+   * @callback Option~ValueTransformer
+   * @param {*} value - the value to be transformed
+   * @param {Option} option - the {@link Option} for which <code>value</code> is being transformed
+   * @return {*} The transform value.
+   */
+
+  /**
+   * Contains utility methods that are useful throughout the library.
+   *
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var Utilities = lite.extend(null, {
+
+    /**
+     * Returns the absolute value of a given number.
+     *
+     * This method is simply a convenient shorthand for <code>Math.abs</code> while ensuring that nulls are returned as
+     * <code>null</code> instead of zero.
+     *
+     * @param {number} value - the number whose absolute value is to be returned
+     * @return {number} The absolute value of <code>value</code> or <code>null</code> if <code>value</code> is
+     * <code>null</code>.
+     * @public
+     * @static
+     * @memberof Utilities
+     */
+    abs: function(value) {
+      return value != null ? Math.abs(value) : null;
+    },
+
+    /**
+     * Returns whether the specified <code>object</code> has a property with the specified <code>name</code> as an own
+     * (not inherited) property.
+     *
+     * @param {Object} object - the object on which the property is to be checked
+     * @param {string} name - the name of the property to be checked
+     * @return {boolean} <code>true</code> if <code>object</code> has an own property with <code>name</code>.
+     * @public
+     * @static
+     * @memberof Utilities
+     */
+    hasOwn: function(object, name) {
+      return Object.prototype.hasOwnProperty.call(object, name);
+    },
+
+    /**
+     * A non-operation method that does absolutely nothing.
+     *
+     * @return {void}
+     * @public
+     * @static
+     * @memberof Utilities
+     */
+    noop: function() {},
+
+    /**
+     * Transforms the specified <code>string</code> to upper case while remaining null-safe.
+     *
+     * @param {string} string - the string to be transformed to upper case
+     * @return {string} <code>string</code> transformed to upper case if <code>string</code> is not <code>null</code>.
+     * @public
+     * @static
+     * @memberof Utilities
+     */
+    toUpperCase: function(string) {
+      return string != null ? string.toUpperCase() : null;
+    }
+
+  });
+
+  var Utilities_1 = Utilities;
+
+  /**
+   * Manages multiple {@link Option} instances that are intended to be used by multiple implementations.
+   *
+   * Although the option definitions are shared between targets, the values are maintained on the targets themselves.
+   *
+   * @param {Option[]} options - the options to be used
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var OptionManager = lite.extend(function(options) {
+    /**
+     * The available options for this {@link OptionManager}.
+     *
+     * @public
+     * @type {Object.<string, Option>}
+     * @memberof OptionManager#
+     */
+    this.options = {};
+
+    options.forEach(function(option) {
+      this.options[option.name] = option;
+    }, this);
+  }, {
+
+    /**
+     * Returns whether an option with the specified <code>name</code> is available.
+     *
+     * @param {string} name - the name of the {@link Option} whose existence is to be checked
+     * @return {boolean} <code>true</code> if an {@link Option} exists with <code>name</code>; otherwise
+     * <code>false</code>.
+     * @public
+     * @memberof OptionManager#
+     */
+    exists: function(name) {
+      return this.options[name] != null;
+    },
+
+    /**
+     * Returns the value of the option with the specified <code>name</code> on the <code>target</code> object provided.
+     *
+     * @param {string} name - the name of the {@link Option} whose value on <code>target</code> is to be returned
+     * @param {Object} target - the object from which the value of the named {@link Option} is to be returned
+     * @return {*} The value of the {@link Option} with <code>name</code> on <code>target</code>.
+     * @public
+     * @memberof OptionManager#
+     */
+    get: function(name, target) {
+      return OptionManager._get(this.options[name], target);
+    },
+
+    /**
+     * Returns a copy of all of the available options on the <code>target</code> object provided.
+     *
+     * @param {Object} target - the object from which the option name/value pairs are to be returned
+     * @return {Object.<string, *>} A hash containing the name/value pairs of all options on <code>target</code>.
+     * @public
+     * @memberof OptionManager#
+     */
+    getAll: function(target) {
+      var name;
+      var options = this.options;
+      var result = {};
+
+      for (name in options) {
+        if (Utilities_1.hasOwn(options, name)) {
+          result[name] = OptionManager._get(options[name], target);
+        }
+      }
+
+      return result;
+    },
+
+    /**
+     * Initializes the available options for the <code>target</code> object provided and then applies the initial values
+     * within the speciifed <code>options</code>.
+     *
+     * This method will throw an error if any of the names within <code>options</code> does not match an available option.
+     *
+     * This involves setting the default values and defining properties for all of the available options on
+     * <code>target</code> before finally calling {@link OptionMananger#setAll} with <code>options</code> and
+     * <code>target</code>. Any options that are configured to be modifiable will have a setter included in their defined
+     * property that will allow its corresponding value to be modified.
+     *
+     * If a change handler is specified, it will be called whenever the value changes on <code>target</code> for a
+     * modifiable option, but only when done so via the defined property's setter.
+     *
+     * @param {Object.<string, *>} options - the name/value pairs of the initial options to be set
+     * @param {Object} target - the object on which the options are to be initialized
+     * @param {Function} [changeHandler] - the function to be called whenever the value of an modifiable option changes on
+     * <code>target</code>
+     * @return {void}
+     * @throws {Error} If <code>options</code> contains an invalid option name.
+     * @public
+     * @memberof OptionManager#
+     */
+    init: function(options, target, changeHandler) {
+      if (typeof changeHandler !== 'function') {
+        changeHandler = Utilities_1.noop;
+      }
+
+      var name, option;
+
+      for (name in this.options) {
+        if (Utilities_1.hasOwn(this.options, name)) {
+          option = this.options[name];
+
+          OptionManager._set(option, option.defaultValue, target);
+          OptionManager._createAccessor(option, target, changeHandler);
+        }
+      }
+
+      this._setAll(options, target, true);
+    },
+
+    /**
+     * Sets the value of the option with the specified <code>name</code> on the <code>target</code> object provided to
+     * <code>value</code>.
+     *
+     * This method will throw an error if <code>name</code> does not match an available option or matches an option that
+     * cannot be modified.
+     *
+     * If <code>value</code> is <code>null</code> and the {@link Option} has a default value configured, then that default
+     * value will be used instead. If the {@link Option} also has a value transformer configured, it will be used to
+     * transform whichever value was determined to be used.
+     *
+     * This method returns whether the value of the underlying field on <code>target</code> was changed as a result.
+     *
+     * @param {string} name - the name of the {@link Option} whose value is to be set
+     * @param {*} value - the value to be set for the named {@link Option} on <code>target</code>
+     * @param {Object} target - the object on which <code>value</code> is to be set for the named {@link Option}
+     * @return {boolean} <code>true</code> if the underlying field on <code>target</code> was changed; otherwise
+     * <code>false</code>.
+     * @throws {Error} If <code>name</code> is invalid or is for an option that cannot be modified.
+     * @public
+     * @memberof OptionManager#
+     */
+    set: function(name, value, target) {
+      return this._set(name, value, target);
+    },
+
+    /**
+     * Sets all of the specified <code>options</code> on the <code>target</code> object provided to their corresponding
+     * values.
+     *
+     * This method will throw an error if any of the names within <code>options</code> does not match an available option
+     * or matches an option that cannot be modified.
+     *
+     * If any value within <code>options</code> is <code>null</code> and the corresponding {@link Option} has a default
+     * value configured, then that default value will be used instead. If an {@link Option} also has a value transformer
+     * configured, it will be used to transform whichever value was determined to be used.
+     *
+     * This method returns whether the value for any of the underlying fields on <code>target</code> were changed as a
+     * result.
+     *
+     * @param {Object.<string, *>} options - the name/value pairs of options to be set
+     * @param {Object} target - the object on which the options are to be set
+     * @return {boolean} <code>true</code> if any of the underlying fields on <code>target</code> were changed; otherwise
+     * <code>false</code>.
+     * @throws {Error} If <code>options</code> contains an invalid option name or an option that cannot be modiifed.
+     * @public
+     * @memberof OptionManager#
+     */
+    setAll: function(options, target) {
+      return this._setAll(options, target);
+    },
+
+    _set: function(name, value, target, allowUnmodifiable) {
+      var option = this.options[name];
+      if (!option) {
+        throw new Error('Invalid option: ' + name);
+      }
+      if (!option.modifiable && !allowUnmodifiable) {
+        throw new Error('Option cannot be modified: ' + name);
+      }
+
+      return OptionManager._set(option, value, target);
+    },
+
+    _setAll: function(options, target, allowUnmodifiable) {
+      if (!options) {
+        return false;
+      }
+
+      var name;
+      var changed = false;
+
+      for (name in options) {
+        if (Utilities_1.hasOwn(options, name) && this._set(name, options[name], target, allowUnmodifiable)) {
+          changed = true;
+        }
+      }
+
+      return changed;
+    }
+
+  }, {
+
+    _createAccessor: function(option, target, changeHandler) {
+      var descriptor = {
+        get: function() {
+          return OptionManager._get(option, target);
+        }
+      };
+
+      if (option.modifiable) {
+        descriptor.set = function(value) {
+          if (OptionManager._set(option, value, target)) {
+            changeHandler(value, option);
+          }
+        };
+      }
+
+      Object.defineProperty(target, option.name, descriptor);
+    },
+
+    _get: function(option, target) {
+      return target['_' + option.name];
+    },
+
+    _set: function(option, value, target) {
+      var fieldName = '_' + option.name;
+      var oldValue = target[fieldName];
+      var newValue = option.transform(value != null ? value : option.defaultValue);
+
+      target[fieldName] = newValue;
+
+      return newValue !== oldValue;
+    }
+
+  });
+
+  var OptionManager_1 = OptionManager;
+
+  /**
+   * Called whenever the value of a modifiable {@link Option} is changed on a target object via the defined property's
+   * setter.
+   *
+   * @callback OptionManager~ChangeHandler
+   * @param {*} value - the new value for <code>option</code> on the target object
+   * @param {Option} option - the modifable {@link Option} whose value has changed on the target object.
+   * @return {void}
+   */
+
+  /**
+   * A basic manager for {@link Service} implementations that are mapped to simple names.
+   *
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var ServiceManager = lite.extend(function() {
+    this._services = {};
+  }, {
+
+    /**
+     * Returns the {@link Service} being managed with the specified <code>name</code>.
+     *
+     * @param {string} name - the name of the {@link Service} to be returned
+     * @return {Service} The {@link Service} is being managed with <code>name</code>.
+     * @throws {Error} If no {@link Service} is being managed with <code>name</code>.
+     * @public
+     * @memberof ServiceManager#
+     */
+    getService: function(name) {
+      var service = this._services[name];
+      if (!service) {
+        throw new Error('Service is not being managed with name: ' + name);
+      }
+
+      return service;
+    },
+
+    /**
+     * Sets the {@link Service} implementation to be managed for the specified <code>name</code> to the
+     * <code>service</code> provided.
+     *
+     * @param {string} name - the name of the {@link Service} to be managed with <code>name</code>
+     * @param {Service} service - the {@link Service} implementation to be managed
+     * @return {void}
+     * @throws {Error} If a {@link Service} is already being managed with the same <code>name</code>.
+     * @public
+     * @memberof ServiceManager#
+     */
+    setService: function(name, service) {
+      if (this._services[name]) {
+        throw new Error('Service is already managed with name: ' + name);
+      }
+
+      if (service) {
+        this._services[name] = service;
+      }
+    }
+
+  });
+
+  var ServiceManager_1 = ServiceManager;
+
+  var optionManager = new OptionManager_1([
+    new Option_1('background', true, 'white'),
+    new Option_1('backgroundAlpha', true, 1, Utilities_1.abs),
+    new Option_1('element'),
+    new Option_1('foreground', true, 'black'),
+    new Option_1('foregroundAlpha', true, 1, Utilities_1.abs),
+    new Option_1('level', true, 'L', Utilities_1.toUpperCase),
+    new Option_1('mime', true, 'image/png'),
+    new Option_1('padding', true, null, Utilities_1.abs),
+    new Option_1('size', true, 100, Utilities_1.abs),
+    new Option_1('value', true, '')
+  ]);
+  var serviceManager = new ServiceManager_1();
+
+  /**
+   * Enables configuration of a QR code generator which uses HTML5 <code>canvas</code> for rendering.
+   *
+   * @param {QRious~Options} [options] - the options to be used
+   * @throws {Error} If any <code>options</code> are invalid.
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var QRious = lite.extend(function(options) {
+    optionManager.init(options, this, this.update.bind(this));
+
+    var element = optionManager.get('element', this);
+    var elementService = serviceManager.getService('element');
+    var canvas = element && elementService.isCanvas(element) ? element : elementService.createCanvas();
+    var image = element && elementService.isImage(element) ? element : elementService.createImage();
+
+    this._canvasRenderer = new CanvasRenderer_1(this, canvas, true);
+    this._imageRenderer = new ImageRenderer_1(this, image, image === element);
+
+    this.update();
+  }, {
+
+    /**
+     * Returns all of the options configured for this {@link QRious}.
+     *
+     * Any changes made to the returned object will not be reflected in the options themselves or their corresponding
+     * underlying fields.
+     *
+     * @return {Object.<string, *>} A copy of the applied options.
+     * @public
+     * @memberof QRious#
+     */
+    get: function() {
+      return optionManager.getAll(this);
+    },
+
+    /**
+     * Sets all of the specified <code>options</code> and automatically updates this {@link QRious} if any of the
+     * underlying fields are changed as a result.
+     *
+     * This is the preferred method for updating multiple options at one time to avoid unnecessary updates between
+     * changes.
+     *
+     * @param {QRious~Options} options - the options to be set
+     * @return {void}
+     * @throws {Error} If any <code>options</code> are invalid or cannot be modified.
+     * @public
+     * @memberof QRious#
+     */
+    set: function(options) {
+      if (optionManager.setAll(options, this)) {
+        this.update();
+      }
+    },
+
+    /**
+     * Returns the image data URI for the generated QR code using the <code>mime</code> provided.
+     *
+     * @param {string} [mime] - the MIME type for the image
+     * @return {string} The image data URI for the QR code.
+     * @public
+     * @memberof QRious#
+     */
+    toDataURL: function(mime) {
+      return this.canvas.toDataURL(mime || this.mime);
+    },
+
+    /**
+     * Updates this {@link QRious} by generating a new {@link Frame} and re-rendering the QR code.
+     *
+     * @return {void}
+     * @protected
+     * @memberof QRious#
+     */
+    update: function() {
+      var frame = new Frame_1({
+        level: this.level,
+        value: this.value
+      });
+
+      this._canvasRenderer.render(frame);
+      this._imageRenderer.render(frame);
+    }
+
+  }, {
+
+    /**
+     * Configures the <code>service</code> provided to be used by all {@link QRious} instances.
+     *
+     * @param {Service} service - the {@link Service} to be configured
+     * @return {void}
+     * @throws {Error} If a {@link Service} has already been configured with the same name.
+     * @public
+     * @static
+     * @memberof QRious
+     */
+    use: function(service) {
+      serviceManager.setService(service.getName(), service);
+    }
+
+  });
+
+  Object.defineProperties(QRious.prototype, {
+
+    canvas: {
+      /**
+       * Returns the <code>canvas</code> element being used to render the QR code for this {@link QRious}.
+       *
+       * @return {*} The <code>canvas</code> element.
+       * @public
+       * @memberof QRious#
+       * @alias canvas
+       */
+      get: function() {
+        return this._canvasRenderer.getElement();
+      }
+    },
+
+    image: {
+      /**
+       * Returns the <code>img</code> element being used to render the QR code for this {@link QRious}.
+       *
+       * @return {*} The <code>img</code> element.
+       * @public
+       * @memberof QRious#
+       * @alias image
+       */
+      get: function() {
+        return this._imageRenderer.getElement();
+      }
+    }
+
+  });
+
+  var QRious_1$2 = QRious;
+
+  /**
+   * The options used by {@link QRious}.
+   *
+   * @typedef {Object} QRious~Options
+   * @property {string} [background="white"] - The background color to be applied to the QR code.
+   * @property {number} [backgroundAlpha=1] - The background alpha to be applied to the QR code.
+   * @property {*} [element] - The element to be used to render the QR code which may either be an <code>canvas</code> or
+   * <code>img</code>. The element(s) will be created if needed.
+   * @property {string} [foreground="black"] - The foreground color to be applied to the QR code.
+   * @property {number} [foregroundAlpha=1] - The foreground alpha to be applied to the QR code.
+   * @property {string} [level="L"] - The error correction level to be applied to the QR code.
+   * @property {string} [mime="image/png"] - The MIME type to be used to render the image for the QR code.
+   * @property {number} [padding] - The padding for the QR code in pixels.
+   * @property {number} [size=100] - The size of the QR code in pixels.
+   * @property {string} [value=""] - The value to be encoded within the QR code.
+   */
+
+  var index = QRious_1$2;
+
+  /**
+   * Defines a service contract that must be met by all implementations.
+   *
+   * @public
+   * @class
+   * @extends Nevis
+   */
+  var Service = lite.extend({
+
+    /**
+     * Returns the name of this {@link Service}.
+     *
+     * @return {string} The service name.
+     * @public
+     * @abstract
+     * @memberof Service#
+     */
+    getName: function() {}
+
+  });
+
+  var Service_1 = Service;
+
+  /**
+   * A service for working with elements.
+   *
+   * @public
+   * @class
+   * @extends Service
+   */
+  var ElementService = Service_1.extend({
+
+    /**
+     * Creates an instance of a canvas element.
+     *
+     * Implementations of {@link ElementService} <b>must</b> override this method with their own specific logic.
+     *
+     * @return {*} The newly created canvas element.
+     * @public
+     * @abstract
+     * @memberof ElementService#
+     */
+    createCanvas: function() {},
+
+    /**
+     * Creates an instance of a image element.
+     *
+     * Implementations of {@link ElementService} <b>must</b> override this method with their own specific logic.
+     *
+     * @return {*} The newly created image element.
+     * @public
+     * @abstract
+     * @memberof ElementService#
+     */
+    createImage: function() {},
+
+    /**
+     * @override
+     */
+    getName: function() {
+      return 'element';
+    },
+
+    /**
+     * Returns whether the specified <code>element</code> is a canvas.
+     *
+     * Implementations of {@link ElementService} <b>must</b> override this method with their own specific logic.
+     *
+     * @param {*} element - the element to be checked
+     * @return {boolean} <code>true</code> if <code>element</code> is a canvas; otherwise <code>false</code>.
+     * @public
+     * @abstract
+     * @memberof ElementService#
+     */
+    isCanvas: function(element) {},
+
+    /**
+     * Returns whether the specified <code>element</code> is an image.
+     *
+     * Implementations of {@link ElementService} <b>must</b> override this method with their own specific logic.
+     *
+     * @param {*} element - the element to be checked
+     * @return {boolean} <code>true</code> if <code>element</code> is an image; otherwise <code>false</code>.
+     * @public
+     * @abstract
+     * @memberof ElementService#
+     */
+    isImage: function(element) {}
+
+  });
+
+  var ElementService_1 = ElementService;
+
+  /**
+   * An implementation of {@link ElementService} intended for use within a browser environment.
+   *
+   * @public
+   * @class
+   * @extends ElementService
+   */
+  var BrowserElementService = ElementService_1.extend({
+
+    /**
+     * @override
+     */
+    createCanvas: function() {
+      return document.createElement('canvas');
+    },
+
+    /**
+     * @override
+     */
+    createImage: function() {
+      return document.createElement('img');
+    },
+
+    /**
+     * @override
+     */
+    isCanvas: function(element) {
+      return element instanceof HTMLCanvasElement;
+    },
+
+    /**
+     * @override
+     */
+    isImage: function(element) {
+      return element instanceof HTMLImageElement;
+    }
+
+  });
+
+  var BrowserElementService_1 = BrowserElementService;
+
+  index.use(new BrowserElementService_1());
+
+  var QRious_1 = index;
+
+  return QRious_1;
+
+})));
+
+
+});
+
+var script$62 = function() {
+  this.on('mount', function() {
+    const qrcode = new qrious(objectAssign({}, this.opts.data));
+    this.refs.qrcode.src = qrcode.toDataURL();
+  });
+
+};
+
+riot$1.tag2('dmc-qrcode', '<img class="Qrcode__img" ref="qrcode">', '', 'class="Qrcode"', function(opts) {
+    this.external(script$62);
+});
+
+var script$63 = function() {
+  this.qrcodeStyle = {
+    // background: 'green',
+    // backgroundAlpha: 0.8,
+    // element: <Canvas>,
+    // foreground: 'blue',
+    // foregroundAlpha: 0.8,
+    level: 'M',
+    mime: 'image/png',
+    // padding: 5,
+    size: 200,
+    value: `${document.location.origin}/?endpoint=${this.opts.url}`
   };
 };
 
-riot$1.tag2('dmc-endpoint-entry', '<div class="EndpointsPage__entryTitle">新しい管理画面を作成する</div> <div class="EndpointsPage__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="EndpointsPage__entryForm"> <dmc-textinput label="エンドポイント" text="{endpointURL}" placeholder="https://localhost:3000/swagger.json" onchange="{handleEndpointURLChange}"></dmc-textinput> <dmc-textarea label="メモ" text="{memo}" placeholder="メモを入力" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__entryControls"> <dmc-button type="primary" isdisabled="{isExist}" onpat="{handleRegisterButtonPat}" label="新規作成"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__entry"', function(opts) {
-    this.external(script$40);
+riot$1.tag2('dmc-endpoint-qrcode', '<dmc-qrcode data="{qrcodeStyle}"></dmc-qrcode>', '', 'class="EndpointsPage__qrcode"', function(opts) {
+    this.external(script$63);
 });
 
-var script$41 = function() {
-  this.email = 'fkei@example.com';
-  this.password = '1234567890';
+var script$64 = function() {
+  this.email = '';
+  this.password = '';
 
   this.handleEmailChange = newEmail => {
     this.email = newEmail;
@@ -42314,21 +58606,21 @@ var script$41 = function() {
   };
 };
 
-riot$1.tag2('dmc-signinemail', '<dmc-textinput label="メールアドレス" text="{email}" placeholder="e-mail" onchange="{handleEmailChange}" type="email"></dmc-textinput> <dmc-textinput label="パスワード" text="{password}" type="password" placeholder="password" onchange="{handlePasswordChange}"></dmc-textinput> <dmc-button onpat="{handleSigninPat}" label="サインイン"></dmc-button>', '', 'class="EndpointsPage__signinEmail"', function(opts) {
-    this.external(script$41);
+riot$1.tag2('dmc-signinemail', '<dmc-textinput label="メールアドレス" text="{email}" onchange="{handleEmailChange}" type="email"></dmc-textinput> <dmc-textinput label="パスワード" text="{password}" type="password" onchange="{handlePasswordChange}"></dmc-textinput> <dmc-button onpat="{handleSigninPat}" label="サインイン"></dmc-button>', '', 'class="EndpointsPage__signinEmail"', function(opts) {
+    this.external(script$64);
 });
 
-var script$42 = function() {
+var script$65 = function() {
   this.handleButtonPat = () => {
     this.opts.onpat(this.opts.authtype);
   };
 };
 
 riot$1.tag2('dmc-signinoauth', '<dmc-button onpat="{handleButtonPat}" label="{opts.authtype.provider}"></dmc-button>', '', 'class="EndpointsPage__signinOauth"', function(opts) {
-    this.external(script$42);
+    this.external(script$65);
 });
 
-var script$43 = function() {
+var script$66 = function() {
   const store = this.riotx.get();
 
   this.oauths = values_1(filter$3(this.opts.authtypes, v => {
@@ -42362,27 +58654,20 @@ var script$43 = function() {
 };
 
 riot$1.tag2('dmc-endpoint-signin', '<div class="EndpointsPage__signinTitle">サインイン</div> <div class="EndpointsPage__signinEmails" if="{!!emails.length}"> <div class="EndpointsPage__signinEmailsTitle">メールアドレス認証</div> <virtual each="{authtype in emails}"> <dmc-signinemail authtype="{authtype}" onsigninpat="{parent.handleEmailSigninPat}"></dmc-signinemail> </virtual> </div> <div class="EndpointsPage__signinOauths" if="{!!oauths.length}"> <div class="EndpointsPage__signinOauthsTitle">OAuth認証</div> <virtual each="{authtype in oauths}"> <dmc-signinoauth authtype="{authtype}" onpat="{parent.handleOAuthPat}"></dmc-signinoauth> </virtual> </div>', '', 'class="EndpointsPage__signin"', function(opts) {
-    this.external(script$43);
+    this.external(script$66);
 });
 
-var script$37 = function() {
+var script$60 = function() {
   const store = this.riotx.get();
 
   this.endpoints = store.getter(constants$4.ENDPOINTS);
+  this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
 
   this.listen(constants$3.ENDPOINTS, () => {
     this.endpoints = store.getter(constants$4.ENDPOINTS);
+    this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
     this.update();
   });
-
-  this.handleEndpointAddTap = () => {
-    Promise
-      .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-endpoint-entry'))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
-        error: err
-      }));
-  };
 
   this.handleEndpointEntry = key => {
     Promise
@@ -42437,6 +58722,19 @@ var script$37 = function() {
       }));
   };
 
+  this.handleEndpointQrCode = (key, url, memo) => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-endpoint-qrcode', {
+        endpointKey: key,
+        url,
+        memo
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
   this.handleEndpointLogout = key => {
     Promise
       .resolve()
@@ -42450,23 +58748,23 @@ var script$37 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__list"> <div class="EndpointsPage__addCard" ref="touch" ontap="handleEndpointAddTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" name="{endpoint.name}" thumbnail="{endpoint.thumbnail}" token="{endpoint.token}" url="{endpoint.url}" description="{endpoint.description}" memo="{endpoint.memo}" tags="{endpoint.tags}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
-    this.external(script$37);
+riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__count" if="{!!endpointsCount}"> <div class="EndpointsPage__countIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__countLabel">Endpoint ({endpointsCount})</div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" name="{endpoint.name}" thumbnail="{endpoint.thumbnail}" token="{endpoint.token}" url="{endpoint.url}" description="{endpoint.description}" memo="{endpoint.memo}" tags="{endpoint.tags}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
+    this.external(script$60);
 });
 
-var script$44 = function() {};
+var script$67 = function() {};
 
 riot$1.tag2('dmc-notfound', '<div>NOT FOUND...</div>', '', 'class="Page NotfoundPage"', function(opts) {
-    this.external(script$44);
+    this.external(script$67);
 });
 
-var script$45 = function() {};
+var script$68 = function() {};
 
 riot$1.tag2('dmc-blocker', '', '', 'class="Blocker"', function(opts) {
-    this.external(script$45);
+    this.external(script$68);
 });
 
-var script$46 = function() {
+var script$69 = function() {
   const store = this.riotx.get();
 
   // `tag` = drawer内に展開されるriot tagインスタンス。
@@ -42487,7 +58785,7 @@ var script$46 = function() {
   };
 
   this.on('mount', () => {
-    tag = riot$1.mount(this.refs.content, this.opts.tagname, index$1$1({
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
       isDrawer: true,
       drawerCloser: this.fadeOut
     }, this.opts.tagopts))[0];
@@ -42511,10 +58809,6 @@ var script$46 = function() {
     this.fadeOut();
   };
 
-  this.handleCloseButtonTap = () => {
-    this.fadeOut();
-  };
-
   this.handleKeyDown = e => {
     switch (e.keyCode) {
     case 27:// Esc
@@ -42526,11 +58820,11 @@ var script$46 = function() {
   };
 };
 
-riot$1.tag2('dmc-drawer', '<div class="Drawer__closeButton" ref="touch" ontap="handleCloseButtonTap"> <dmc-icon type="close"></dmc-icon> </div> <div class="Drawer__frame"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$46);
+riot$1.tag2('dmc-drawer', '<div class="Drawer__frame"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$69);
 });
 
-var script$47 = function() {
+var script$70 = function() {
   const store = this.riotx.get();
 
   this.drawers = store.getter(constants$4.DRAWERS);
@@ -42542,41 +58836,10 @@ var script$47 = function() {
 };
 
 riot$1.tag2('dmc-drawers', '<virtual each="{drawers}"> <dmc-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}"></dmc-drawer> </virtual>', '', 'class="Drawers"', function(opts) {
-    this.external(script$47);
+    this.external(script$70);
 });
 
-var script$48 = function() {
-  const store = this.riotx.get();
-
-  this.isMenuEnabled = store.getter(constants$4.MENU_ENABLED);
-  this.isMenuOpened = store.getter(constants$4.MENU_OPENED);
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
-  this.listen(constants$3.MENU, () => {
-    this.isMenuEnabled = store.getter(constants$4.MENU_ENABLED);
-    this.isMenuOpened = store.getter(constants$4.MENU_OPENED);
-    this.update();
-  });
-
-  this.handleMenuButtonTap = () => {
-    Promise
-      .resolve()
-      .then(() => store.action(constants$1.MENU_TOGGLE));
-  };
-
-  this.handleHomeButtonTap = () => {
-    this.getRouter().navigateTo('/');
-  };
-};
-
-riot$1.tag2('dmc-header', '<div class="Header__groups"> <div class="Header_group"> <div class="Header__menuButton" if="{isMenuEnabled}" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="{isMenuOpened ? \'menuUnfold\' : \'menuFold\'}"></dmc-icon> </div> </div> <div class="Header__group"> <div class="Header__homeButton" ref="touch" ontap="handleHomeButtonTap"> <dmc-icon type="home"></dmc-icon> </div> </div> </div>', '', 'class="Header"', function(opts) {
-    this.external(script$48);
-});
-
-var script$49 = function() {
+var script$71 = function() {
   const store = this.riotx.get();
 
   this.isOpened = false;
@@ -42629,10 +58892,10 @@ var script$49 = function() {
 };
 
 riot$1.tag2('dmc-menu-group', '<div class="Menu__groupToggle {opts.group.isIndependent &amp;&amp; opts.group.list[0].isSelected ? \'Menu__groupToggle--selected\' : \'\'}" ref="touch" ontap="handleToggleTap"> <dmc-icon class="Menu__groupIconHead" type="codeSquareO"></dmc-icon> <div class="Menu__groupName">{opts.group.isIndependent ? opts.group.list[0].name : opts.group.name}</div> <dmc-icon class="Menu__groupIconTail {isOpened ? \'Menu__groupIconTail--opened\' : \'\'}" if="{!opts.group.isIndependent}" type="up"></dmc-icon> </div> <div class="Menu__groupList {isOpened ? \'Menu__groupList--opened\' : \'\'}" if="{!opts.group.isIndependent}"> <div class="Menu__groupListItem {item.isSelected ? \'Menu__groupListItem--selected\' : \'\'}" each="{item, idx in opts.group.list}" data-idx="{idx}" ref="touch" ontap="handleGroupItemTap">{item.name}</div> </div>', '', 'class="Menu__group"', function(opts) {
-    this.external(script$49);
+    this.external(script$71);
 });
 
-var script$50 = function() {
+var script$72 = function() {
   const store = this.riotx.get();
 
   const group = items => {
@@ -42681,13 +58944,17 @@ var script$50 = function() {
     this.groupedManage = group(manage);
     this.update();
   });
+
+  this.handleHomeButtonTap = () => {
+    this.getRouter().navigateTo('/');
+  };
 };
 
-riot$1.tag2('dmc-menu', '<div class="Menu__head"> <div class="media Menu__endpoint"> <div class="media__image Menu__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Menu__endpointBody"> <div class="Menu__endpointBodyHead"> <div class="Menu__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Menu__endpointHost" if="{!!endpoint}">{endpoint.url}</div> </div> <div class="Menu__endpointBodyTail"> <div class="Menu__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> </div> <div class="Menu__body"> <div class="Menu__section"> <div class="Menu__sectionTitle">ダッシュボード</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedDashboard}" group="{group}"></dmc-menu-group> </div> </div> <div class="Menu__section"> <div class="Menu__sectionTitle">管理画面</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedManage}" group="{group}"></dmc-menu-group> </div> </div> </div>', '', 'class="Menu"', function(opts) {
-    this.external(script$50);
+riot$1.tag2('dmc-menu', '<div class="Menu__head"> <div class="media Menu__endpoint"> <div class="media__image Menu__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Menu__endpointBody"> <div class="Menu__endpointBodyHead"> <div class="Menu__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Menu__endpointHost" if="{!!endpoint}">{endpoint.url}</div> </div> <div class="Menu__endpointBodyTail"> <div class="Menu__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> </div> <div class="Menu__body"> <div class="Menu__section"> <div class="Menu__sectionTitle">ダッシュボード</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedDashboard}" group="{group}"></dmc-menu-group> </div> </div> <div class="Menu__section"> <div class="Menu__sectionTitle">管理画面</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedManage}" group="{group}"></dmc-menu-group> </div> </div> </div> <div class="Menu__tail"> <div class="Menu__homeButton" ref="touch" ontap="handleHomeButtonTap"> <dmc-icon type="home"></dmc-icon> </div> </div>', '', 'class="Menu"', function(opts) {
+    this.external(script$72);
 });
 
-var script$51 = function() {
+var script$73 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -42707,7 +58974,7 @@ var script$51 = function() {
   };
 
   this.on('mount', () => {
-    tag = riot$1.mount(this.refs.content, this.opts.tagname, index$1$1({
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
       isModal: true,
       modalCloser: this.fadeOut
     }, this.opts.tagopts))[0];
@@ -42751,10 +59018,10 @@ var script$51 = function() {
 };
 
 riot$1.tag2('dmc-modal', '<div class="Modal__frame" ref="touch" ontap="handleFrameTap"> <div class="Modal__closeButton" ref="touch" ontap="handleCloseButtonTap"> <dmc-icon type="close"></dmc-icon> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal Modal--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$51);
+    this.external(script$73);
 });
 
-var script$52 = function() {
+var script$74 = function() {
   const store = this.riotx.get();
 
   this.modals = store.getter(constants$4.MODALS);
@@ -42766,24 +59033,24 @@ var script$52 = function() {
 };
 
 riot$1.tag2('dmc-modals', '<virtual each="{modals}"> <dmc-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{modalOpts.theme}"></dmc-modal> </virtual>', '', 'class="Modals"', function(opts) {
-    this.external(script$52);
+    this.external(script$74);
 });
 
-var script$53 = function() {
+var script$75 = function() {
 };
 
 riot$1.tag2('dmc-progress', '<div class="Progress__spinner"> <dmc-icon type="loading"></dmc-icon> </div>', '', 'class="Progress"', function(opts) {
-    this.external(script$53);
+    this.external(script$75);
 });
 
-var script$54 = function() {
+var script$76 = function() {
 };
 
 riot$1.tag2('dmc-splash', '<div class="Splash__logo"></div>', '', 'class="Splash"', function(opts) {
-    this.external(script$54);
+    this.external(script$76);
 });
 
-var script$55 = function() {
+var script$77 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -42823,16 +59090,16 @@ var script$55 = function() {
     this.hide();
   };
 
-  this.handleLinkClick = () => {
+  this.handleLinkTap = () => {
     window.open(this.opts.link);
   };
 };
 
 riot$1.tag2('dmc-toast', '<div class="Toast__icon"> <dmc-icon if="{opts.type === \'normal\'}" type="close"></dmc-icon> <dmc-icon if="{opts.type === \'error\'}" type="exclamation"></dmc-icon> </div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" ref="touch" ontap="handleLinkTap">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$55);
+    this.external(script$77);
 });
 
-var script$56 = function() {
+var script$78 = function() {
   const store = this.riotx.get();
 
   this.toasts = store.getter(constants$4.TOASTS);
@@ -42844,22 +59111,81 @@ var script$56 = function() {
 };
 
 riot$1.tag2('dmc-toasts', '<virtual each="{toasts}"> <dmc-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></dmc-toast> </virtual>', '', 'class="Toasts"', function(opts) {
-    this.external(script$56);
+    this.external(script$78);
 });
 
-var script$57 = function() {
+var script$80 = function() {
+  const store = this.riotx.get();
+
+  this.isExist = false;
+  this.endpointURL = '';
+  this.memo = '';
+
+  this.handleEndpointURLChange = newEndpointURL => {
+    this.endpointURL = newEndpointURL;
+    this.isExist = !!store.getter(constants$4.ENDPOINTS_ONE_BY_URL, newEndpointURL);
+    this.update();
+  };
+
+  this.handleMemoChange = newMemo => {
+    this.memo = newMemo;
+    this.update();
+  };
+
+  this.handleRegisterButtonPat = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.ENDPOINTS_ADD, this.endpointURL, this.memo))
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'エンドポイントを追加しました。'
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => {
+        let autoHide = true;
+        let linkText;
+        let link;
+        // サーバが自己証明書を使用している場合にページ遷移を促す。
+        if (this.endpointURL.startsWith('https://')) {
+          autoHide = false;
+          linkText = 'Self-Signed Certificate?';
+          link = this.endpointURL;
+        }
+        store.action(constants$1.TOASTS_ADD, {
+          message: err.message,
+          autoHide,
+          linkText,
+          link
+        });
+      });
+  };
+
+  this.handleCancelButtonPat = () => {
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <dmc-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></dmc-textinput> <dmc-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="Application__entryControls"> <dmc-button type="primary" isdisabled="{isExist}" onpat="{handleRegisterButtonPat}" label="新規作成"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="Application__entry"', function(opts) {
+    this.external(script$80);
+});
+
+var script$79 = function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
   this.isNavigating = store.getter(constants$4.APPLICATION_ISNAVIGATING);
   this.isNetworking = store.getter(constants$4.APPLICATION_ISNETWORKING);
-  const isEnabled = store.getter(constants$4.MENU_ENABLED);
-  const isOpened = store.getter(constants$4.MENU_OPENED);
-  this.isMenuOpened = isEnabled && isOpened;
   // 表示すべきページの名前。
   this.pageName = store.getter(constants$4.LOCATION_NAME);
+  // TOPページか否か。
+  this.isTopPage = (this.pageName === 'endpoints');
   // 表示すべきページのルーティング情報。
   this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
 
   this.listen(constants$3.APPLICATION, () => {
     this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
@@ -42869,33 +59195,41 @@ var script$57 = function() {
   });
   this.listen(constants$3.LOCATION, () => {
     this.pageName = store.getter(constants$4.LOCATION_NAME);
+    this.isTopPage = (this.pageName === 'endpoints');
     this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
     this.update();
   });
-  this.listen(constants$3.MENU, () => {
-    const isEnabled = store.getter(constants$4.MENU_ENABLED);
-    const isOpened = store.getter(constants$4.MENU_OPENED);
-    this.isMenuOpened = isEnabled && isOpened;
-    this.update();
-  });
+
+  this.handleEntryMenuItemTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-entry'))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleDownloadMenuItemTap = () => {
+    const endpoints = store.getter(constants$4.ENDPOINTS_WITHOUT_TOKEN);
+    download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
+  };
 };
 
-riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> <div class="Application__asideColumn {Application__asideColumn--opened : isMenuOpened}"> <dmc-menu></dmc-menu> </div> <div class="Application__head"> <dmc-header></dmc-header> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
-    this.external(script$57);
+riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemLabel">新規追加</div> </div> <div class="Application__menuItem" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemLabel">ダウンロード</div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
+    this.external(script$79);
 });
 
 // エントリーポイント。
 document.addEventListener('DOMContentLoaded', () => {
-  let _store;
+  let mainStore;
   Promise
     .resolve()
     .then(() => mixin.init())
     .then(() => store$1.init())
     .then(store => {
-      _store = store;
+      mainStore = store;
       // debug用にglobal公開しておく。
       window.store = store;
-      window.swagger = swagger;
     })
     .then(() => {
       // OAuth認証後のリダイレクトではクエリにtokenが格納されている。
@@ -42905,12 +59239,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return Promise.resolve();
       }
 
-      const oauthEndpointKey = _store.getter(constants$4.OAUTH_ENDPOINT_KEY);
+      const oauthEndpointKey = mainStore.getter(constants$4.OAUTH_ENDPOINT_KEY);
       return Promise
         .all([
-          _store.action(constants$1.CURRENT_UPDATE, oauthEndpointKey),
-          _store.action(constants$1.AUTH_UPDATE, oauthEndpointKey, token),
-          _store.action(constants$1.OAUTH_ENDPOINT_KEY_REMOVE)
+          mainStore.action(constants$1.CURRENT_UPDATE, oauthEndpointKey),
+          mainStore.action(constants$1.AUTH_UPDATE, oauthEndpointKey, token),
+          mainStore.action(constants$1.OAUTH_ENDPOINT_KEY_REMOVE)
         ])
         .then(() => {
           location.href = `${location.origin}${location.pathname}#/${oauthEndpointKey}`;
@@ -42919,9 +59253,9 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => {
       riot$1.mount('dmc');
     })
-    .then(() => _store.action(constants$1.UA_SETUP))
-    .then(() => router.init(_store))
-    .catch(err => _store.action(constants$1.MODALS_ADD, 'dmc-message', {
+    .then(() => mainStore.action(constants$1.UA_SETUP))
+    .then(() => router.init(mainStore))
+    .catch(err => mainStore.action(constants$1.MODALS_ADD, 'dmc-message', {
       error: err
     }));
 });
