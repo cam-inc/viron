@@ -3,11 +3,6 @@ import times from 'mout/function/times';
 
 export default function() {
 
-  this.isShowTimepicker = false;
-  this.handleInputTime = () => {
-    this.isShowTimepicker = true;
-  };
-
   const format = date => {
     return date.format('HH:mm:ss');
   };
@@ -15,14 +10,12 @@ export default function() {
   const digitNum = num => {
     return num = ('0' + num).slice(-2);
   };
-
-  let fulltime = this.opts.date;
-
-  this.displayDate = moment.utc(fulltime);
+  
+  this.displayDate = moment.utc(this.opts.date);
   this.displayFormatDate = format(this.displayDate);
 
   this.on('update', () => {
-    this.displayDate = moment.utc(fulltime);
+    this.displayDate = moment.utc(this.opts.date);
     this.displayFormatDate = format(this.displayDate);
   }).on('updated', () => {
     this.rebindTouchEvents();
@@ -74,8 +67,10 @@ export default function() {
   };
 
   this.handleSelectItem = date => {
-    fulltime = date;
-    this.update();
+    this.opts.onchange(date);
   };
 
+  this.handleInputTap = () => {
+    this.opts.ontoggle(!this.opts.isshown);
+  };
 }
