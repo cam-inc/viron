@@ -10,7 +10,7 @@ export default function() {
   const digitNum = num => {
     return num = ('0' + num).slice(-2);
   };
-  
+
   this.displayDate = moment.utc(this.opts.date);
   this.displayFormatDate = format(this.displayDate);
 
@@ -67,7 +67,8 @@ export default function() {
   };
 
   this.handleSelectItem = date => {
-    this.opts.onchange(date);
+    let formatDate = date.toISOString();
+    this.opts.onchange(formatDate);
   };
 
   this.handleInputTap = () => {
