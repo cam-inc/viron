@@ -98,7 +98,7 @@ export default function() {
         // 通信が速すぎると見た目がチカチカするので、意図的に通信を遅らせる。
         setTimeout(() => {
           resolve();
-        }, 1000);
+        }, 300);
       }))
       .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentRequestParameters))
       .catch(err => store.action(actions.MODALS_ADD, {
