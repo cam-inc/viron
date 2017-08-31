@@ -82,7 +82,7 @@ export default function () {
   // canvasの初期化
   let canvas, context;
   // 最新の認められた色相値を保存
-  // let latestValidHue = 0;
+  let latestValidHue = 0;
 
   /*****************************************
    * Riotのライフサイクルイベント
@@ -159,6 +159,12 @@ export default function () {
     const hue = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
     const saturation = new BigNumber(distanceX).div(containerRect.width).round(2).times(100).toString();
     const brightness = new BigNumber(1).minus(new BigNumber(distanceY).div(containerRect.height).round(2)).times(100).toString();
+
+    // モノクロであれば最新の色相に変更
+    if (isMonochrome(this.color.format, this.color.value)) {
+      hue.h = latestValidHue; 
+    }
+
     const color = {
       h: hue.h,
       s: saturation,
@@ -173,15 +179,8 @@ export default function () {
    * @param {integer} touchY 
    */
   const getColorObject = (touchX, touchY) => {
-    let colorValue = getSpectrumColor(touchX, touchY);
-
-    if (this.color.format === COLOR_CODE.HEX) {
-      colorValue = convertColor(COLOR_CODE.HSV, colorValue, COLOR_CODE.HEX);
-    }
-
-    if (this.color.format === COLOR_CODE.RGBA) {
-      colorValue = convertColor(COLOR_CODE.HSV, colorValue, COLOR_CODE.RGBA);
-    }
+    let hsv = getSpectrumColor(touchX, touchY);
+    let colorValue = convertColor(COLOR_CODE.HSV, hsv, this.color.format);
 
     const color = {
       format: this.color.format,
@@ -222,22 +221,18 @@ export default function () {
   const updateSpectrum = () => {
     // 色相の取得
     const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
-    objectAssign(hsv, {
-      s: 100,
-      v: 100
-    });
+    if (isMonochrome(this.color.format, this.color.value)) {
+      hsv.h = latestValidHue;
+    } else {
+      latestValidHue = hsv.h;
+    }
+    hsv.s = 100;
+    hsv.v = 100;
     const hueHex = convertColor(COLOR_CODE.HSV, hsv, COLOR_CODE.HEX);
     // 横向きのグラデーション
     let linearGrad = context.createLinearGradient(0, 0, canvas.width, 0);
     linearGrad.addColorStop(0, 'rgb(255, 255, 255)');
     linearGrad.addColorStop(1, hueHex || '#FF0000');
-    // linearGrad.addColorStop(0.00, 'hsl(0,100%,50%)');
-    // linearGrad.addColorStop(0.17, 'hsl(298.8, 100%, 50%)');
-    // linearGrad.addColorStop(0.33, 'hsl(241.2, 100%, 50%)');
-    // linearGrad.addColorStop(0.50, 'hsl(180, 100%, 50%)');
-    // linearGrad.addColorStop(0.67, 'hsl(118.8, 100%, 50%)');
-    // linearGrad.addColorStop(0.83, 'hsl(61.2,100%,50%)');
-    // linearGrad.addColorStop(1.00, 'hsl(360,100%,50%)');
     context.fillStyle = linearGrad;
     context.rect(0, 0, canvas.width, canvas.height);
     context.fill();
@@ -250,14 +245,19 @@ export default function () {
     context.fill();
   };
 
-  // const isMonochrome = (format, value) => {
-  //   let hsv = convertColor(format, value, COLOR_CODE.HSV);
-  //   if (hsv.s === 0) {
-  //     hsv.s = latestValidHue;
-  //   } else {
-  //     latestValidHue = hsv.s;
-  //   }
-  // };
+  /**
+   * 対象の色がモノクロか検査します
+   * @param {String} format 
+   * @param {Integer||String} value 
+   */
+  const isMonochrome = (format, value) => {
+    let hsv = convertColor(format, value, COLOR_CODE.HSV);
+    if (hsv.s === 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   /**
    * スペクトラムのノブの位置を生成する
@@ -344,6 +344,9 @@ export default function () {
    */
   this.getHueValue = () => {
     const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
+    if (isMonochrome(this.color.format, this.color.value)) {
+      hsv.h = latestValidHue;
+    }
     return Math.round(hsv.h);
   };
 
@@ -417,6 +420,9 @@ export default function () {
   this.handleCanvasMouseDown = e => {
     this.isCatcherActive = true;
     const color = getColorObject(e.pageX, e.pageY);
+    if (!isMonochrome(color.format, color.value)) {
+      latestValidHue = convertColor(color.format, color.value, COLOR_CODE.HSV).h;
+    }
     this.opts.oncolorchange(color);
   };
 
@@ -430,6 +436,9 @@ export default function () {
       return;
     }
     const color = getColorObject(e.pageX, e.pageY);
+    if (!isMonochrome(color.format, color.value)) {
+      latestValidHue = convertColor(color.format, color.value, COLOR_CODE.HSV).h;
+    }
     this.opts.oncolorchange(color);
   };
 
@@ -441,6 +450,9 @@ export default function () {
   this.handleCatcherMouseUp = e => {
     this.isCatcherActive = false;
     const color = getColorObject(e.pageX, e.pageY);
+    if (!isMonochrome(color.format, color.value)) {
+      latestValidHue = convertColor(color.format, color.value, COLOR_CODE.HSV).h;
+    }
     this.opts.oncolorchange(color);
   };
 
@@ -450,6 +462,7 @@ export default function () {
    */
   this.handleHueSliderChange = (hue) => {
     const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
+    latestValidHue = hue;
     hsv.h = hue;
     const colorValue = convertColor(COLOR_CODE.HSV, hsv, this.color.format);
     const color = {
