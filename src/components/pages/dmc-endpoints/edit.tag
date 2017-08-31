@@ -4,7 +4,7 @@ dmc-endpoint-edit.EndpointsPage__edit
   .EndpointsPage__editForm
     dmc-textarea(label="メモ" text="{ memo }" onChange="{ handleMemoChange }")
   .EndpointsPage__editControls
-    dmc-button(type="primary" onPat="{ handleEditButtonPat }" label="編集")
+    dmc-button(type="primary" onPat="{ handleEditButtonPat }" label="保存")
     dmc-button(type="secondary" onPat="{ handleCancelButtonPat }" label="キャンセル")
 
   script.
