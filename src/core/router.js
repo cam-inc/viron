@@ -3,6 +3,7 @@ import { constants as actions } from '../store/actions';
 import ComponentsRoute from '../components/pages/dmc-components/route';
 import EndpointsRoute from '../components/pages/dmc-endpoints/route';
 import NotfoundRoute from '../components/pages/dmc-notfound/route';
+import OauthredirectRoute from '../components/pages/dmc-oauthredirect/route';
 
 let esr;
 
@@ -22,6 +23,7 @@ export default {
             store.action(actions.APPLICATION_NAVIGATION_START)
           ]))
           .on('/', route => EndpointsRoute.onEnter(store, route))
+          .on('/oauthredirect/:endpointKey', () => Promise.resolve(), (route, replace) => OauthredirectRoute.onBefore(store, route, replace))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(() => Promise.all([

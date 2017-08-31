@@ -9,7 +9,6 @@ import layout from './layout';
 import location from './location';
 import modals from './modals';
 import oas from './oas';
-import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import toasts from './toasts';
 import ua from './ua';
@@ -84,7 +83,6 @@ export default {
   [constants.MODALS_REMOVE]: modals.remove,
   [constants.OAS_SETUP]: oas.setup,
   [constants.OAS_CLEAR]: oas.clear,
-  [constants.OAUTH_ENDPOINT_KEY_REMOVE]: oauthEndpointKey.remove,
   [constants.PAGE_GET]: page.get,
   [constants.PAGE_REMOVE]: page.remove,
   [constants.TOASTS_ADD]: toasts.add,

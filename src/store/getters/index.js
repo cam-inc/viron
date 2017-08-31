@@ -9,7 +9,6 @@ import location from './location';
 import menu from './menu';
 import modals from './modals';
 import oas from './oas';
-import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import toasts from './toasts';
 import ua from './ua';
@@ -63,7 +62,6 @@ const constants = {
   OAS_PARAMETER_OBJECTS: 'OAS_PARAMETER_OBJECTS',
   OAS_RESPONSE_OBJECT: 'OAS_RESPONSE_OBJECT',
   OAS_SCHEMA_OBJECT: 'OAS_SCHEMA_OBJECT',
-  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   PAGE_ID: 'PAGE_ID',
   PAGE_NAME: 'PAGE_NAME',
@@ -121,7 +119,6 @@ export default {
   [constants.OAS_PARAMETER_OBJECTS]: oas.parameterObjects,
   [constants.OAS_RESPONSE_OBJECT]: oas.responseObject,
   [constants.OAS_SCHEMA_OBJECT]: oas.schemaObject,
-  [constants.OAUTH_ENDPOINT_KEY]: oauthEndpointKey.all,
   [constants.PAGE]: page.all,
   [constants.PAGE_ID]: page.id,
   [constants.PAGE_NAME]: page.name,

@@ -8,7 +8,6 @@ import layout from './layout';
 import location from './location';
 import modals from './modals';
 import oas from './oas';
-import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import signinShowKey from './signinShowKey';
 import toasts from './toasts';
@@ -28,7 +27,6 @@ const constants = {
   LAYOUT: 'LAYOUT',
   LOCATION: 'LOCATION',
   MODALS: 'MODALS',
-  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   SIGNIN_SHOW_KEY: 'SIGNIN_SHOW_KEY',
   TOASTS: 'TOASTS',
@@ -46,7 +44,6 @@ export default {
   layout,
   location,
   modals,
-  oauthEndpointKey,
   page,
   signinShowKey,
   toasts,
