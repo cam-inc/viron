@@ -63,6 +63,11 @@ export default {
       }
       return res;
     }).then(res => {
+      // tokenを更新する。
+      const token = res.headers.get('Authorization');
+      if (!!token) {
+        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+      }
        // `component.pagination`からページングをサポートしているか判断する。
       // サポートしていれば手動でページング情報を付加する。
       let hasPagination = false;
@@ -100,12 +105,18 @@ export default {
   operate: (context, operationObject, params) => {
     const api = context.getter(getters.OAS_API, operationObject.operationId);
     const token = context.getter(getters.ENDPOINTS_ONE, context.getter(getters.CURRENT)).token;
+    const currentEndpointKey = context.getter(getters.CURRENT);
 
     return api(params, {
       requestInterceptor: req => {
         req.headers['Authorization'] = token;
       }
     }).then(res => {
+      // tokenを更新する。
+      const token = res.headers.get('Authorization');
+      if (!!token) {
+        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+      }
       // ダウンロード指定されていればダウンロードする。
       const contentDispositionHeader = res.headers['content-disposition'];
       if (!contentDispositionHeader) {

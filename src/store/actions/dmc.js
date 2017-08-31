@@ -32,6 +32,11 @@ export default {
         return res;
       })
       .then(res => {
+        // tokenを更新する。
+        const token = res.headers.get('Authorization');
+        if (!!token) {
+          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
         context.commit(mutations.DMC, res.obj);
         const endpoint = ObjectAssign({}, res.obj);
         // pagesは不要なので削除。

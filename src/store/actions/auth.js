@@ -47,13 +47,18 @@ export default {
           'Authorization': endpoint.token
         }
       }))
-      .then(() => {
+      .then(response => {
+        const token = response.headers.get('Authorization');
+        if (!!token) {
+          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        }
         return true;
       })
       .catch(err => {
         if (err.status !== 401) {
           throw err;
         }
+        // TODO: token更新
         context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
         return false;
       });
@@ -74,7 +79,13 @@ export default {
     return Promise
       .resolve()
       .then(() => fetch(context, fetchUrl))
-      .then(response => response.json());
+      .then(response => {
+        const token = response.headers.get('Authorization');
+        if (!!token) {
+          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        }
+        response.json();
+      });
   },
 
   /**
