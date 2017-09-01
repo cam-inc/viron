@@ -1,6 +1,6 @@
 const shared = require('../../shared');
-const dmclib = shared.context.getDmcLib();
+const vironlib = shared.context.getVironLib();
 
 module.exports = {
-  'swagger#show': dmclib.swagger.controller.show,
+  'swagger#show': vironlib.swagger.controller.show,
 };

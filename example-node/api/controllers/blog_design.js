@@ -9,9 +9,9 @@ const context = shared.context;
  * @returns {Promise.<TResult>}
  */
 const list = (req, res, next) => {
-  const dmclib = context.getDmcLib();
-  const pager = dmclib.pager;
-  const storeHelper = dmclib.stores.helper;
+  const vironlib = context.getVironLib();
+  const pager = vironlib.pager;
+  const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
   const limit = Number(req.query.limit);
@@ -38,8 +38,8 @@ const list = (req, res, next) => {
  * @returns {Promise.<TResult>}
  */
 const create = (req, res, next) => {
-  const dmclib = context.getDmcLib();
-  const storeHelper = dmclib.stores.helper;
+  const vironlib = context.getVironLib();
+  const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
   return storeHelper.create(store, BlogDesigns, req.body)
@@ -58,8 +58,8 @@ const create = (req, res, next) => {
  * @returns {Promise.<TResult>}
  */
 const remove = (req, res, next) => {
-  const dmclib = context.getDmcLib();
-  const storeHelper = dmclib.stores.helper;
+  const vironlib = context.getVironLib();
+  const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
   const query = {
@@ -84,8 +84,8 @@ const remove = (req, res, next) => {
  * @returns {Promise.<TResult>}
  */
 const show = (req, res, next) => {
-  const dmclib = context.getDmcLib();
-  const storeHelper = dmclib.stores.helper;
+  const vironlib = context.getVironLib();
+  const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
   const query = {
@@ -110,8 +110,8 @@ const show = (req, res, next) => {
  * @returns {Promise.<TResult>}
  */
 const update = (req, res, next) => {
-  const dmclib = context.getDmcLib();
-  const storeHelper = dmclib.stores.helper;
+  const vironlib = context.getVironLib();
+  const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const BlogDesigns = store.models.BlogDesigns;
   const query = {

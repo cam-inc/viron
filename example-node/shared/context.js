@@ -1,4 +1,4 @@
-const DmcLib = require('node-dmclib');
+const VironLib = require('node-vironlib');
 
 const config = require('./config');
 const constant = require('./constant');
@@ -20,7 +20,7 @@ class Context {
         return this.initStore(conf.stores);
       })
       .then(() => {
-        return this.initDmcLib();
+        return this.initVironLib();
       })
       .then(() => {
         return this.initConstant();
@@ -29,26 +29,26 @@ class Context {
   }
 
   /**
-   * サービス側で定義したconstantとdmclibの定義をマージします
+   * サービス側で定義したconstantとvironlibの定義をマージします
    */
   initConstant() {
-    const dmclib = this.getDmcLib();
-    // サービス側で未定義の定数にdmclibの値をセット
-    for (let k in dmclib.constants) {
+    const vironlib = this.getVironLib();
+    // サービス側で未定義の定数にvironlibの値をセット
+    for (let k in vironlib.constants) {
       if (constant[k] === undefined) {
-        constant[k] = dmclib.constants[k];
+        constant[k] = vironlib.constants[k];
       }
     }
   }
 
   /**
-   * node-dmclibの初期化を行う
+   * node-vironlibの初期化を行う
    */
-  initDmcLib() {
+  initVironLib() {
     const store = this.getStoreMain();
     return Promise.resolve()
       .then(() => {
-        this.dmclib = new DmcLib({
+        this.vironlib = new VironLib({
           acl: this.getConfigAcl(),
           audit_log: {
             audit_logs: store.models.AuditLogs,
@@ -79,7 +79,7 @@ class Context {
             exclude_paths: [],
           },
         });
-        return this.dmclib;
+        return this.vironlib;
       })
     ;
   }
@@ -140,11 +140,11 @@ class Context {
   }
 
   /**
-   * DmcLib 取得
+   * vironlib 取得
    * @returns {*}
    */
-  getDmcLib() {
-    return this.dmclib;
+  getVironLib() {
+    return this.vironlib;
   }
 
   /**

@@ -1,9 +1,9 @@
 module.exports = helper => {
   const config = {
     host: 'localhost:3000',
-    // dmclibのadmin_roleが使用するユーザー作成時の初期ロール名
+    // vironlibのadmin_roleが使用するユーザー作成時の初期ロール名
     default_role: 'viewer',
-    // dmclibのadmin_roleが使用するスーパーユーザーのロール名
+    // vironlibのadmin_roleが使用するスーパーユーザーのロール名
     super_role: 'super',
 
     // GoogleOAuth認証用
@@ -19,7 +19,7 @@ module.exports = helper => {
       ],
     },
 
-    // dmclibのCORS対応
+    // vironlibのCORS対応
     acl: {
       //allow_origin: 'https://cam-inc.github.io',
       allow_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',

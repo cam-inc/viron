@@ -945,7 +945,7 @@ definitions:
       path:
         description: path
         enum:
-        - AutoGenerate # @see node-dmclib/swagger.js
+        - AutoGenerate # @see node-vironlib/swagger.js
         example: GET:/user
         type: string
     required:
