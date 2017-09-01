@@ -39,11 +39,14 @@
   display: none;
 }
 
+.Pagination__button--moderate:hover .Pagination__ellipsisIcon,
 .Pagination__button--moderate.hover .Pagination__ellipsisIcon {
   display: none;
 }
 
+.Pagination__button--moderate:hover .Pagination__recedeIcon,
 .Pagination__button--moderate.hover .Pagination__recedeIcon,
+.Pagination__button--moderate:hover .Pagination__proceedIcon,
 .Pagination__button--moderate.hover .Pagination__proceedIcon {
   display: block;
   color: var(--color-basic-skyblue);
@@ -55,6 +58,7 @@
   border-color: var(--color-basic-lightGray);
 }
 
+.Pagination__button:hover:not(.Pagination__button--disabled):not(.Pagination__button--selected):not(.Pagination__button--moderate),
 .Pagination__button.hover:not(.Pagination__button--disabled):not(.Pagination__button--selected):not(.Pagination__button--moderate) {
   color: var(--color-basic-skyblue);
   border-color: var(--color-basic-skyblue);

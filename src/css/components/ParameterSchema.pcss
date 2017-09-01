@@ -3,7 +3,8 @@
   border-left: 2px solid var(--color-bg-tertiaryLight);
 }
 /* TODO: モバイル端末最適化 */
-.ParameterSchema:hover {
+.ParameterSchema:hover,
+.ParameterSchema.hover {
   border-left-color: var(--color-bg-primary);
 }
 
@@ -29,10 +30,12 @@
   border-left: 8px solid var(--color-bg-tertiaryLight);
 }
 
-.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton {
+.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton,
+.ParameterSchema.hover > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton {
   border-left-color: var(--color-bg-primary);
 }
 
+.ParameterSchema__bodyOpenShutButton:hover .Icon,
 .ParameterSchema__bodyOpenShutButton.hover .Icon {
   opacity: 0.5;
 }
@@ -51,6 +54,7 @@
   cursor: pointer;
 }
 
+.ParameterSchema__name:hover,
 .ParameterSchema__name.hover {
   opacity: 0.5;
 }
@@ -61,7 +65,8 @@
   background-color: var(--color-bg-tertiaryLight);
 }
 
-.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__line {
+.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__line,
+.ParameterSchema.hover > .ParameterSchema__head .ParameterSchema__line {
   background-color: var(--color-bg-primary);
 }
 
@@ -84,9 +89,14 @@
 }
 
 .ParameterSchema__validateOpenShutButton.hover,
+.ParameterSchema__validateOpenShutButton:hover,
 .ParameterSchema__addButton.hover,
+.ParameterSchema__addButton:hover,
 .ParameterSchema__removeButton.hover,
+.ParameterSchema__removeButton:hover,
 .ParameterSchema__previewOpenShutButton.hover,
+.ParameterSchema__previewOpenShutButton:hover,
+.ParameterSchema__infoOpenShutButton:hover,
 .ParameterSchema__infoOpenShutButton.hover {
   opacity: 0.5;
 }
