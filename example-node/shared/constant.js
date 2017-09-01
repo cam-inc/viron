@@ -5,10 +5,10 @@ module.exports = {
 
   GROUP_EMPTY: '', // グループなし
   GROUP_KPI: 'kpi', // KPI
-  GROUP_USER: 'user', // ユーザ
-  GROUP_BLOG: 'blog', // ブログ
-  GROUP_ADMIN: 'admin', // 管理権限
-  GROUP_EXAMPLE: 'example', // サンプル
+  GROUP_USER: 'ユーザ', // ユーザ
+  GROUP_BLOG: 'ブログ', // ブログ
+  GROUP_ADMIN: '管理', // 管理権限
+  GROUP_EXAMPLE: 'サンプル', // サンプル
 
   USER_MALE: 'male',
   USER_FEMALE: 'female',
