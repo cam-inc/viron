@@ -3,11 +3,9 @@ dmc-menu.Menu
     .media.Menu__endpoint
       .media__image.Menu__endpointImage(if="{ !!endpoint }" style="background-image:url({ endpoint.thumbnail })")
       .media__body.Menu__endpointBody
-        .Menu__endpointBodyHead
-          .Menu__endpointTitle(if="{ !!endpoint }") { endpoint.name }
-          .Menu__endpointHost(if="{ !!endpoint }") { endpoint.url }
-        .Menu__endpointBodyTail
-          .Menu__endpointDescription(if="{ !!endpoint }") { endpoint.description }
+        .Menu__endpointTitle(if="{ !!endpoint }") { endpoint.name }
+        .Menu__endpointHost(if="{ !!endpoint }") { endpoint.url }
+        .Menu__endpointDescription(if="{ !!endpoint }") { endpoint.description }
   .Menu__body
     .Menu__section
       .Menu__sectionTitle ダッシュボード
@@ -18,6 +16,8 @@ dmc-menu.Menu
       .Menu__groups
         dmc-menu-group(each="{ group in groupedManage }" group="{ group }")
   .Menu__tail
+    .Menu__leftIcon
+      dmc-icon(type="left")
     .Menu__homeButton(ref="touch" onTap="handleHomeButtonTap")
       dmc-icon(type="home")
 

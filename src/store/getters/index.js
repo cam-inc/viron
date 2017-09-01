@@ -66,6 +66,7 @@ const constants = {
   PAGE_ID: 'PAGE_ID',
   PAGE_NAME: 'PAGE_NAME',
   PAGE_COMPONENTS: 'PAGE_COMPONENTS',
+  PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
   UA: 'UA'
 };
@@ -123,6 +124,7 @@ export default {
   [constants.PAGE_ID]: page.id,
   [constants.PAGE_NAME]: page.name,
   [constants.PAGE_COMPONENTS]: page.components,
+  [constants.PAGE_COMPONENTS_COUNT]: page.componentsCount,
   [constants.TOASTS]: toasts.all,
   [constants.UA]: ua.all
 };

@@ -9,6 +9,7 @@ export default function() {
 
   this.name = store.getter(getters.PAGE_NAME);
   this.components = store.getter(getters.PAGE_COMPONENTS);
+  this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
 
   /**
    * 現在のviewportに最適なcolumn数を計算して返します。
@@ -49,6 +50,7 @@ export default function() {
   this.listen(states.PAGE, () => {
     this.name = store.getter(getters.PAGE_NAME);
     this.components = store.getter(getters.PAGE_COMPONENTS);
+    this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
     this.update();
   });
 }

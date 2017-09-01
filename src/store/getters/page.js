@@ -45,5 +45,18 @@ export default {
       return [];
     }
     return page.components;
+  },
+
+  /**
+   * コンポーネント数を返します。
+   * @param {riotx.Context} context
+   * @return {Number}
+   */
+  componentsCount: context => {
+    const page = context.state.page;
+    if (!page) {
+      return 0;
+    }
+    return (page.components || []).length;
   }
 };

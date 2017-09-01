@@ -2,9 +2,19 @@
 /* 紛らわしいので注意すること */
 .Component {
   @apply --layout-column-stretch-center;
-  background-color: var(--color-basic-white);
-  border-radius: 6px;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin: 0 8px 8px 0;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: var(--color-base-white);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  transition-duration: 100ms;
+  transition-property: box-shadow;
+}
+
+.Component:hover,
+.Component.hover {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
 }
 
 .Component__spinner {
