@@ -74,8 +74,6 @@ export default function () {
   if (!selectableColorCode[this.color.format]) {
     selectableColorCode[this.color.format] = true;
   }
-  // 最新の認められた色相値を保存
-  let latestValidHue = 0;
   // 最後に色と認識された値を格納する
   let lastValidColor = '#000000';
   // canvasの初期化
@@ -137,15 +135,6 @@ export default function () {
     return value;
   };
 
-  /**
-   * 対象の色がモノクロか検査します
-   * @param {String} format 
-   * @param {Integer||String} value 
-   */
-  const isMonochrome = (format, value) => {
-    let hsv = convertColor(format, value, COLOR_CODE.HSV);
-    return hsv.s === 0;
-  };
   /**
    * カラーを変換します
    * @param {String} colorCode
@@ -403,9 +392,6 @@ export default function () {
       format: this.color.format,
       value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
     };
-    if (!isMonochrome(color.format, color.value)) {
-      latestValidHue = hsv.h;
-    }
     this.opts.oncolorchange(color, hsv);
   };
 
@@ -424,9 +410,6 @@ export default function () {
       format: this.color.format,
       value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
     };
-    if (!isMonochrome(color.format, color.value)) {
-      latestValidHue = hsv.h;
-    }
     this.opts.oncolorchange(color, hsv);
   };
 
@@ -443,9 +426,6 @@ export default function () {
       format: this.color.format,
       value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
     };
-    if (!isMonochrome(color.format, color.value)) {
-      latestValidHue = hsv.h;
-    }
     this.opts.oncolorchange(color, hsv);
   };
 
