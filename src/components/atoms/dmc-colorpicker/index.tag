@@ -1,20 +1,20 @@
 dmc-colorpicker.Colorpicker(class="{ Colorpicker--active: isCatcherActive }")
   .Colorpicker__label(if="{ !!opts.label }") { opts.label }
   form.Colorpicker__form(onSubmit="{ handleFormSubmit }")
-    input.Colorpicker__dummyInput(onTap="handleInputTap" ref="touch" placeholder="{ opts.placeholder || '' }" readonly="readonly" value="{ generateDummyValue() }")
+    input.Colorpicker__dummyInput(onTap="handleInputTap" ref="touch" placeholder="{ opts.placeholder || '' }" readonly="readonly" value="{ getDummyValue() }")
     .Colorpicker__container(show="{ opts.isshown }" hide="{ !opts.isshown }")
       .Colorpicker__picker
         .Colorpicker__canvasContainer(ref="canvasContainer" mouseDown="{ handleCanvasMouseDown }")
           canvas.Colorpicker__canvas(ref="canvas")
-          .Colorpicker__canvasKnob(style="left: { updateSpectrumKnob('saturation') }%; top: { updateSpectrumKnob('brightness') }%;")
-            .Colorpicker__canvasKnobInner(style="background-color: { generateColorStyle() }")
+          .Colorpicker__canvasKnob(style="left: { getSpectrumPosition('saturation') }%; top: { getSpectrumPosition('brightness') }%")
+            .Colorpicker__canvasKnobInner(style="background-color: { getColorStyle() }")
           .Colorpicker__catcher(mouseMove="{ handleCatcherMouseMove }" mouseUp="{ handleCatcherMouseUp }")
         .Colorpicker__sliderOperation
           .Colorpicker__circleContainer
-            .Colorpicker__circle(style="background-color: { generateColorStyle() }")
+            .Colorpicker__circle(style="background-color: { getColorStyle() }")
           .Colorpicker__sliderContainer
             .Colorpicker__hueSlider
-              dmc-slider(number="{ getHueValue() }" min="0" max="359" onChange="{ handleHueSliderChange }")
+              dmc-slider(number="{ getHsv().h }" min="0" max="359" onChange="{ handleHueSliderChange }")
             .Colorpicker__alphaSlider
               dmc-slider(number="{ getAlphaValue() }" min="0" max="100" onChange="{ handleAlphaSliderChange }")
         .Colorpicker__colorcodeOperation
@@ -24,16 +24,16 @@ dmc-colorpicker.Colorpicker(class="{ Colorpicker--active: isCatcherActive }")
               .Colorpicker__colorcodeHex {color.format}
           virtual(if="{ color.format === 'RGBA' }")
             .Colorpicker__inputContainer
-              dmc-numberinput(number="{ generateRgbaValue('red') }" max="255" min="0" onChange="{ handleInputRgbaRedInput }")
+              dmc-numberinput(number="{ getRgbaValue('red') }" max="255" min="0" onChange="{ handleInputRgbaRedInput }")
               .Colorpicker__colorcodeRgba r
             .Colorpicker__inputContainer
-              dmc-numberinput(number="{ generateRgbaValue('green') }" max="255" min="0" onChange="{ handleInputRgbaGreenInput }")
+              dmc-numberinput(number="{ getRgbaValue('green') }" max="255" min="0" onChange="{ handleInputRgbaGreenInput }")
               .Colorpicker__colorcodeRgba g
             .Colorpicker__inputContainer
-              dmc-numberinput(number="{ generateRgbaValue('blue') }" max="255" min="0" onChange="{ handleInputRgbaBlueInput }")
+              dmc-numberinput(number="{ getRgbaValue('blue') }" max="255" min="0" onChange="{ handleInputRgbaBlueInput }")
               .Colorpicker__colorcodeRgba b
             .Colorpicker__inputContainer
-              dmc-numberinput(number="{ generateAlphaValue() }" max="100" min="0" onChange="{ handleInputAlphaInput }")
+              dmc-numberinput(number="{ getAlphaValue() }" max="100" min="0" onChange="{ handleInputAlphaInput }")
               .Colorpicker__colorcodeRgba a
           .Colorpicker__colorChangeContainer
             .Colorpicker__colorChangeButton(class="{ Colorpicker__colorChangeButton--hover: isColorChangeButtonActive }" onTap="handleColorChangeButtonTap" ref="touch" touchStart="{ handleColorChangeButtonTouchStart }" touchEnd="{ handleColorChangeButtonTouchEnd }" mouseOver="{ handleColorChangeButtonMouseOver }" mouseOut="{ handleColorChangeButtonMouseOut }")

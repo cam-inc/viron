@@ -11,7 +11,6 @@ const COLOR_CODE = {
 };
 
 export default function () {
-
   /*****************************************
    * 巻き上げによるエラー回避のためメソッドを上部に表記
    *****************************************/
@@ -61,8 +60,6 @@ export default function () {
 
   // カラーコード切り替えボタンのときの表示
   this.isColorChangeButtonActive = false;
-  // キャッチャーアクティブ状態
-  this.isCatcherActive = false;
   // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
   let selectableColorCode = this.opts.selectablecolorcode || {
     HEX: true,
@@ -77,12 +74,12 @@ export default function () {
   if (!selectableColorCode[this.color.format]) {
     selectableColorCode[this.color.format] = true;
   }
+  // 最新の認められた色相値を保存
+  let latestValidHue = 0;
   // 最後に色と認識された値を格納する
   let lastValidColor = '#000000';
   // canvasの初期化
   let canvas, context;
-  // 最新の認められた色相値を保存
-  let latestValidHue = 0;
 
   /*****************************************
    * Riotのライフサイクルイベント
@@ -90,8 +87,6 @@ export default function () {
 
   this.on('mount', () => {
     // canvasの初期化
-    canvas = this.refs.canvas;
-    context = canvas.getContext('2d');
     updateSpectrum();
   }).on('update', () => {
     selectableColorCode = this.opts.selectablecolorcode || {
@@ -116,79 +111,6 @@ export default function () {
   /*****************************************
    * メソッド群
    *****************************************/
-
-  /**
-   * カラーを変換します
-   * @param {String} colorCode
-   * @param {String} colorValue
-   * @param {String} exportColorcode 
-   * @return {Object}
-   */
-  const convertColor = (colorCode, colorValue, exportColorcode) => {
-    let colorObj = {};
-
-    if (colorCode === COLOR_CODE.HEX) {
-      colorObj = (isHex(colorValue)) ? tinycolor(colorValue) : tinycolor(lastValidColor);
-    } else {
-      colorObj = tinycolor(colorValue);
-    }
-
-    if (exportColorcode === COLOR_CODE.HEX) {
-      return colorObj.toHexString();
-    }
-    if (exportColorcode === COLOR_CODE.RGBA) {
-      return colorObj.toRgb();
-    }
-    if (exportColorcode === COLOR_CODE.HSV) {
-      return colorObj.toHsv();
-    }
-  };
-
-  /**
-   * タップした相対座標からHSVを算出します
-   * @param {Integer} touchX 
-   * @param {Integer} touchY 
-   * @return {Object}
-   */
-  const getSpectrumColor = (touchX, touchY) => {
-    // X: 彩度(Saturation) Y: 明度(Brightness)
-    const containerRect = this.refs.canvasContainer.getBoundingClientRect();
-    const distanceX = new BigNumber(touchX).minus(containerRect.left).toString();
-    const distanceY = new BigNumber(touchY).minus(containerRect.top).toString();
-    // HSVの取得
-    const hue = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
-    const saturation = new BigNumber(distanceX).div(containerRect.width).round(2).times(100).toString();
-    const brightness = new BigNumber(1).minus(new BigNumber(distanceY).div(containerRect.height).round(2)).times(100).toString();
-
-    // モノクロであれば最新の色相に変更
-    if (isMonochrome(this.color.format, this.color.value)) {
-      hue.h = latestValidHue; 
-    }
-
-    const color = {
-      h: hue.h,
-      s: saturation,
-      v: brightness
-    };
-    return color;
-  };
-
-  /**
-   * 座標からカラーオブジェクトを返します
-   * @param {integer} touchX 
-   * @param {integer} touchY 
-   */
-  const getColorObject = (touchX, touchY) => {
-    let hsv = getSpectrumColor(touchX, touchY);
-    let colorValue = convertColor(COLOR_CODE.HSV, hsv, this.color.format);
-
-    const color = {
-      format: this.color.format,
-      value: colorValue
-    };
-
-    return color;
-  };
 
   /**
    * 値がHEXか判定します。
@@ -216,23 +138,60 @@ export default function () {
   };
 
   /**
+   * 対象の色がモノクロか検査します
+   * @param {String} format 
+   * @param {Integer||String} value 
+   */
+  const isMonochrome = (format, value) => {
+    let hsv = convertColor(format, value, COLOR_CODE.HSV);
+    return hsv.s === 0;
+  };
+  /**
+   * カラーを変換します
+   * @param {String} colorCode
+   * @param {String} colorValue
+   * @param {String} exportColorcode 
+   * @return {String}
+   */
+  const convertColor = (colorCode, colorValue, exportColorcode) => {
+    let colorObj = {};
+
+    if (colorCode === COLOR_CODE.HEX) {
+      colorObj = (isHex(colorValue)) ? tinycolor(colorValue) : tinycolor(lastValidColor);
+    } else if(colorCode === COLOR_CODE.HSV) {
+      colorObj = tinycolor(`hsv(${colorValue.h}, ${colorValue.s}%, ${colorValue.v}%)`);
+    } else {
+      colorObj = tinycolor(colorValue);
+    }
+
+    if (exportColorcode === COLOR_CODE.HEX) {
+      return colorObj.toHexString();
+    }
+    if (exportColorcode === COLOR_CODE.RGBA) {
+      return colorObj.toRgb();
+    }
+    if (exportColorcode === COLOR_CODE.HSV) {
+      return colorObj.toHsv();
+    }
+  };
+
+  /**
    * スペクトラムのViewを更新する
    */
   const updateSpectrum = () => {
+    canvas = this.refs.canvas;
+    context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
     // 色相の取得
-    const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
-    if (isMonochrome(this.color.format, this.color.value)) {
-      hsv.h = latestValidHue;
-    } else {
-      latestValidHue = hsv.h;
-    }
+    let hsv = this.getHsv();
     hsv.s = 100;
     hsv.v = 100;
     const hueHex = convertColor(COLOR_CODE.HSV, hsv, COLOR_CODE.HEX);
     // 横向きのグラデーション
     let linearGrad = context.createLinearGradient(0, 0, canvas.width, 0);
     linearGrad.addColorStop(0, 'rgb(255, 255, 255)');
-    linearGrad.addColorStop(1, hueHex || '#FF0000');
+    linearGrad.addColorStop(1, hueHex);
     context.fillStyle = linearGrad;
     context.rect(0, 0, canvas.width, canvas.height);
     context.fill();
@@ -246,40 +205,91 @@ export default function () {
   };
 
   /**
-   * 対象の色がモノクロか検査します
-   * @param {String} format 
-   * @param {Integer||String} value 
+   * 座標からカラーオブジェクトを返します
+   * @param {integer} touchX 
+   * @param {integer} touchY 
    */
-  const isMonochrome = (format, value) => {
-    let hsv = convertColor(format, value, COLOR_CODE.HSV);
-    if (hsv.s === 0) {
-      return true;
-    } else {
-      return false;
+  const getColorObject = (touchX, touchY) => {
+    // X: 彩度(Saturation) Y: 明度(Brightness)
+    const containerRect = this.refs.canvasContainer.getBoundingClientRect();
+    let x = Math.round(touchX - containerRect.left);
+    let y = Math.round(touchY - containerRect.top);
+
+    if (x > containerRect.width) {
+      x = containerRect.width;
     }
+    if (x < 0) {
+      x = 0;
+    }
+    if (y > containerRect.height) {
+      y = containerRect.height;
+    }
+    if (y < 0) {
+      y = .1;
+    }
+
+    const hue = this.getHsv().h;
+    let saturation = Math.round(x / containerRect.width * 100);
+    let brightness = 100 - Math.round(y / containerRect.height * 100);
+
+    const color = {
+      h: hue,
+      s: saturation,
+      v: brightness
+    };
+
+    return color;
+  };
+
+  /**
+   * HSVに変換し四捨五入したものを返します。
+   */
+  this.getHsv = () => {
+    let hsv;
+    if (this.opts.hsv) {
+      hsv = objectAssign({}, this.opts.hsv);
+    } else {
+      hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
+      objectAssign(hsv, {
+        h: Math.round(hsv.h),
+        s: (Math.round(hsv.s * 100) / 100) * 100,
+        v: (Math.round(hsv.v * 100) / 100) * 100
+      });
+    }
+
+    return hsv;
   };
 
   /**
    * スペクトラムのノブの位置を生成する
-   * @param {String} hsvKind 'saturation' or 'brightness'
+   * @param {String} saturation or brightness
    */
-  this.updateSpectrumKnob = hsvKind => {
-    const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
-    objectAssign(hsv, {
-      s: Math.round(hsv.s * 100) / 100,
-      v: Math.round(hsv.v * 100) / 100
-    });
-    if (hsvKind === 'saturation') {
-      return new BigNumber(hsv.s).times(100).round().toString();
+  this.getSpectrumPosition = param => {
+    let hsv = this.getHsv();
+    if (param === 'saturation') {
+      let saturation = hsv.s;
+      if (saturation > 100) {
+        saturation = 100;
+      }
+      if (saturation < 0) {
+        saturation = 0;
+      }
+      return saturation;
     }
-    
-    if (hsvKind === 'brightness') {
-      return new BigNumber(100).minus(new BigNumber(hsv.v).times(100)).round().toString();
+    if (param === 'brightness') {
+      let brightness = 100 - hsv.v;
+      if (brightness > 100) {
+        brightness = 100;
+      }
+      if (brightness < 0) {
+        brightness = 0;
+      }
+      return brightness;
     }
   };
 
   /**
-   * 表示カラーコードを切り替えます。
+   * 表示カラーコードを切り替える
    */
   this.handleColorChangeButtonTap = () => {
     const order = [COLOR_CODE.HEX, COLOR_CODE.RGBA];
@@ -300,10 +310,22 @@ export default function () {
   };
 
   /**
+   * 現在の色のアルファ値を取得します。
+   * @return {Integer}
+   */
+  this.getAlphaValue = () => {
+    if (this.color.format === COLOR_CODE.RGBA) {
+      return new BigNumber(this.color.value.a).times(100).toNumber();
+    } else {
+      return 100;
+    }
+  };
+
+  /**
    * 表示用のカラースタイルを返却します。
    * @return {String}
    */
-  this.generateColorStyle = () => {
+  this.getColorStyle = () => {
     let style = '';
     switch (this.color.format) {
     case COLOR_CODE.HEX:
@@ -320,9 +342,9 @@ export default function () {
   };
 
   /**
-   * dummyのinputの値を表示します。
+   * readonlyのinputの値を表示します。
    */
-  this.generateDummyValue = () => {
+  this.getDummyValue = () => {
     let style = '';
     switch (this.color.format) {
     case COLOR_CODE.HEX:
@@ -339,34 +361,10 @@ export default function () {
   };
 
   /**
-   * 現在の色の色相を取得します。
-   * @return {Integer}
-   */
-  this.getHueValue = () => {
-    const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
-    if (isMonochrome(this.color.format, this.color.value)) {
-      hsv.h = latestValidHue;
-    }
-    return Math.round(hsv.h);
-  };
-
-  /**
-   * 現在の色のアルファ値を取得します。
-   * @return {Integer}
-   */
-  this.getAlphaValue = () => {
-    if (this.color.format === COLOR_CODE.RGBA) {
-      return new BigNumber(this.color.value.a).times(100).toString();
-    } else {
-      return 100;
-    }
-  };
-
-  /**
    * 表示用のRGB値を返却します。
    * @return {String}
    */
-  this.generateRgbaValue = primaryColor => {
+  this.getRgbaValue = primaryColor => {
     let param = null;
     switch (primaryColor) {
     case 'red':
@@ -388,29 +386,9 @@ export default function () {
     return param;
   };
 
-  /**
-   * 表示用のAlpha値を返却します。
-   * @return {String}
-   */
-  this.generateAlphaValue = () => {
-    let param = this.color.value.a;
-    // 少数の値を純正の関数で計算すると正しい結果がでないため、ライブラリを使用する
-    if (isNull(param)) {
-      return 1;
-    }
-    return new BigNumber(param).times(100).round(2).toString();
-  };
-
   /*****************************************
    * UIハンドラ
    *****************************************/
-
-  /**
-   * dummyinputのイベントリスナーハンドラー
-   */
-  this.handleInputTap = () => {
-    this.opts.ontoggle(!this.opts.isshown);
-  };
 
   /**
    * スペクトラムのイベントリスナーハンドラー
@@ -419,11 +397,16 @@ export default function () {
    */
   this.handleCanvasMouseDown = e => {
     this.isCatcherActive = true;
-    const color = getColorObject(e.pageX, e.pageY);
+
+    const hsv = getColorObject(e.pageX, e.pageY);
+    const color = {
+      format: this.color.format,
+      value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
+    };
     if (!isMonochrome(color.format, color.value)) {
-      latestValidHue = convertColor(color.format, color.value, COLOR_CODE.HSV).h;
+      latestValidHue = hsv.h;
     }
-    this.opts.oncolorchange(color);
+    this.opts.oncolorchange(color, hsv);
   };
 
   /**
@@ -435,11 +418,16 @@ export default function () {
     if (!this.isCatcherActive) {
       return;
     }
-    const color = getColorObject(e.pageX, e.pageY);
+
+    const hsv = getColorObject(e.pageX, e.pageY);
+    const color = {
+      format: this.color.format,
+      value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
+    };
     if (!isMonochrome(color.format, color.value)) {
-      latestValidHue = convertColor(color.format, color.value, COLOR_CODE.HSV).h;
+      latestValidHue = hsv.h;
     }
-    this.opts.oncolorchange(color);
+    this.opts.oncolorchange(color, hsv);
   };
 
   /**
@@ -449,11 +437,16 @@ export default function () {
    */
   this.handleCatcherMouseUp = e => {
     this.isCatcherActive = false;
-    const color = getColorObject(e.pageX, e.pageY);
+
+    const hsv = getColorObject(e.pageX, e.pageY);
+    const color = {
+      format: this.color.format,
+      value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
+    };
     if (!isMonochrome(color.format, color.value)) {
-      latestValidHue = convertColor(color.format, color.value, COLOR_CODE.HSV).h;
+      latestValidHue = hsv.h;
     }
-    this.opts.oncolorchange(color);
+    this.opts.oncolorchange(color, hsv);
   };
 
   /**
@@ -462,14 +455,16 @@ export default function () {
    */
   this.handleHueSliderChange = (hue) => {
     const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
-    latestValidHue = hue;
     hsv.h = hue;
+    hsv.s = Math.round(hsv.s * 100);
+    hsv.v = Math.round(hsv.v * 100);
     const colorValue = convertColor(COLOR_CODE.HSV, hsv, this.color.format);
+
     const color = {
       format: this.color.format,
       value: colorValue
     };
-    this.opts.oncolorchange(color);
+    this.opts.oncolorchange(color, hsv);
   };
 
   /**
@@ -482,8 +477,8 @@ export default function () {
       color.format = COLOR_CODE.RGBA;
       color.value = convertColor(this.color.format, this.color.value, COLOR_CODE.RGBA);
     }
-    color.value.a = new BigNumber(alpha).div(100).toString();
-    this.opts.oncolorchange(color);
+    color.value.a = alpha / 100;
+    this.opts.oncolorchange(color, this.opts.hsv);
   };
 
   /**
@@ -563,6 +558,13 @@ export default function () {
     });
 
     this.opts.oncolorchange(color);
+  };
+
+  /**
+   * dummyinputのイベントリスナーハンドラー
+   */
+  this.handleInputTap = () => {
+    this.opts.ontoggle(!this.opts.isshown);
   };
 
   /**
