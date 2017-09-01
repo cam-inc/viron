@@ -21,6 +21,7 @@ export default function() {
         this.close();
       })
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        message: `APIパラメータやOASが正しいか確認して下さい。[${this.opts.operationObject.summary || ''}]`,
         error: err
       }));
   };

@@ -26,6 +26,8 @@ export default {
         replace('/');
       })
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: `エンドポイント(${url})を追加出来ませんでした。`,
         error: err
       }));
   }

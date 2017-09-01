@@ -101,9 +101,14 @@ export default function() {
         }, 300);
       }))
       .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentRequestParameters))
-      .catch(err => store.action(actions.MODALS_ADD, {
-        error: err
-      }));
+      .catch(err => {
+        const api = this.opts.component.api;
+        return store.action(actions.MODALS_ADD, {
+          title: '通信失敗',
+          message: `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。該当するAPIがOAS上に正しく定義されているかご確認下さい。`,
+          error: err
+        });
+      });
   };
 
   /**

@@ -35,7 +35,6 @@ export default {
           return Promise
             .resolve()
             .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
-              type: 'error',
               title: '認証切れ',
               message: '認証が切れました。再度ログインして下さい。'
             }))

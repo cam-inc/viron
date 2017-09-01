@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => mainStore.action(actions.UA_SETUP))
     .then(() => router.init(mainStore))
     .catch(err => mainStore.action(actions.MODALS_ADD, 'dmc-message', {
+      message: 'Viron起動に失敗しました。Viron担当者にお問い合わせ下さい。',
       error: err
     }));
 });
