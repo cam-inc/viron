@@ -71,13 +71,12 @@ export default function() {
       }));
   };
 
-  this.handleEndpointQrCode = (key, url, memo) => {
+  this.handleEndpointQrCode = key => {
+    const endpoint = store.getter(getters.ENDPOINTS_ONE, key);
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'dmc-endpoint-qrcode', {
-        endpointKey: key,
-        url,
-        memo
+        endpoint
       }))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err

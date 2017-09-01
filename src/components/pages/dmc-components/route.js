@@ -36,8 +36,8 @@ export default {
             .resolve()
             .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
               type: 'error',
-              title: 'Unauthorized',
-              message: 'You are not authorized. Check if your token is expired. '
+              title: '認証切れ',
+              message: '認証が切れました。再度ログインして下さい。'
             }))
             .then(() => {
               replace('/');

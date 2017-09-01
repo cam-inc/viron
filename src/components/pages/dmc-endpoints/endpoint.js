@@ -25,6 +25,6 @@ export default function() {
   };
 
   this.handleQrCodeButtonPat = () => {
-    this.opts.onqrcode(this.opts.key, this.opts.url, this.opts.memo);
+    this.opts.onqrcode(this.opts.key);
   };
 }

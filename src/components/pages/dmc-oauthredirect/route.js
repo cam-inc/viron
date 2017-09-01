@@ -1,4 +1,5 @@
 import { constants as actions } from '../../../store/actions';
+import '../../atoms/dmc-message/index.tag';
 
 export default {
   /**
@@ -22,7 +23,8 @@ export default {
       to = '/';
       tasks.push(store.action(actions.AUTH_REMOVE, endpointKey));
       tasks.push(store.action(actions.MODALS_ADD, 'dmc-message', {
-        message: 'TODO: oauth失敗'
+        title: '認証失敗',
+        message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
       }));
     }
 

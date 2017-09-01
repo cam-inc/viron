@@ -1,6 +1,7 @@
 import Esr from 'esr';
 import { constants as actions } from '../store/actions';
 import ComponentsRoute from '../components/pages/dmc-components/route';
+import EndpointimportRoute from '../components/pages/dmc-endpointimport/route';
 import EndpointsRoute from '../components/pages/dmc-endpoints/route';
 import NotfoundRoute from '../components/pages/dmc-notfound/route';
 import OauthredirectRoute from '../components/pages/dmc-oauthredirect/route';
@@ -24,6 +25,7 @@ export default {
           ]))
           .on('/', route => EndpointsRoute.onEnter(store, route))
           .on('/oauthredirect/:endpointKey', () => Promise.resolve(), (route, replace) => OauthredirectRoute.onBefore(store, route, replace))
+          .on('/endpointimport', () => Promise.resolve(), (route, replace) => EndpointimportRoute.onBefore(store, route, replace))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(() => Promise.all([

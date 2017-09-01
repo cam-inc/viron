@@ -1,5 +1,5 @@
 dmc-qrcode.Qrcode
-  img.Qrcode__img(ref="qrcode")
+  canvas.Qrcode__canvas(ref="canvas")
 
   script.
     import script from './index';
