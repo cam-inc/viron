@@ -33,42 +33,43 @@ context.init()
       if (err) {
         throw err;
       }
-
       // swagger.jsonを動的に書き換える
-      helperSwagger.autoGenerate(swaggerExpress);
+      helperSwagger.autoGenerate(swaggerExpress, context.getStoreMain().models)
+        .then(() => {
+          // add middlewares here.
+          // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
 
-      // add middlewares here.
-      // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
+          // add acl response headers
+          app.use(dmclib.acl.middleware());
 
-      // add acl response headers
-      app.use(dmclib.acl.middleware());
+          app.use((req, res, next) => {
+            if (req.method === 'OPTIONS') {
+              return res.status(200).end();
+            }
+            next();
+          });
 
-      app.use((req, res, next) => {
-        if (req.method === 'OPTIONS') {
-          return res.status(200).end();
-        }
-        next();
-      });
+          // add routing
+          swaggerExpress.register(app);
 
-      // add routing
-      swaggerExpress.register(app);
-
-      const port = process.env.PORT || helperSwagger.getPort(swaggerExpress, 3000);
-      const ssl = context.getConfigSsl();
-      if (ssl.use) {
-        https.createServer(ssl, app).listen(port);
-      } else {
-        http.createServer(app).listen(port);
-      }
+          const port = process.env.PORT || helperSwagger.getPort(swaggerExpress, 3000);
+          const ssl = context.getConfigSsl();
+          if (ssl.use) {
+            https.createServer(ssl, app).listen(port);
+          } else {
+            http.createServer(app).listen(port);
+          }
 
 
-      for (let path in swaggerExpress.runner.swagger.paths) {
-        for (let method in swaggerExpress.runner.swagger.paths[path]) {
-          console.log(`Added Route. ${method.toUpperCase()}: ${path}`);
-        }
-      }
+          for (let path in swaggerExpress.runner.swagger.paths) {
+            for (let method in swaggerExpress.runner.swagger.paths[path]) {
+              console.log(`Added Route. ${method.toUpperCase()}: ${path}`);
+            }
+          }
 
-      app.emit('setuped'); // for testing
+          app.emit('setuped'); // for testing
+        })
+      ;
     });
   })
 ;

@@ -566,6 +566,8 @@ definitions:
         description: admin role id
         example: viewer
         type: string
+        enum:
+        - AutoGenerate
     required:
     - role_id
     type: object
