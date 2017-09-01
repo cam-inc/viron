@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import isNull from 'mout/lang/isNull';
+import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 import objectAssign from 'object-assign';
 import tinycolor from 'tinycolor2';
@@ -22,6 +23,9 @@ export default function () {
    * @return {Boolean}
    */
   const isHex = value => {
+    if (!isString(value)) {
+      return false;
+    }
     const isMatch = value.match(/^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/);
     return isMatch;
   };
@@ -51,87 +55,6 @@ export default function () {
       value = this.opts.color.value;
     }
 
-    return value;
-  };
-
-  /*****************************************
-   * 値の初期化
-   *****************************************/
-
-  // カラーコード切り替えボタンのときの表示
-  this.isColorChangeButtonActive = false;
-  // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
-  let selectableColorCode = this.opts.selectablecolorcode || {
-    HEX: true,
-    RGBA: true
-  };
-  // カラーデータを取得する
-  this.color = this.opts.color || {
-    format: COLOR_CODE.HEX,
-    value: ''
-  };
-  // 選択可能カラーコードの中の当該カラーデータが有効になっていない場合それを選択可能にする
-  if (!selectableColorCode[this.color.format]) {
-    selectableColorCode[this.color.format] = true;
-  }
-  // 最後に色と認識された値を格納する
-  let lastValidColor = '#000000';
-  // canvasの初期化
-  let canvas, context;
-
-  /*****************************************
-   * Riotのライフサイクルイベント
-   *****************************************/
-
-  this.on('mount', () => {
-    // canvasの初期化
-    updateSpectrum();
-  }).on('update', () => {
-    selectableColorCode = this.opts.selectablecolorcode || {
-      HEX: true,
-      RGBA: true
-    };
-    this.color = this.opts.color || {
-      format: COLOR_CODE.HEX,
-      value: ''
-    };
-    // 正しい色であれば最新の正しい色として残す
-    if (this.color.format === COLOR_CODE.HEX && isHex(this.color.value)) {
-      lastValidColor = this.color.value;
-    }
-    updateSpectrum();
-  }).on('updated', () => {
-    if (this.color.format === COLOR_CODE.HEX && this.opts.isshown) {
-      this.refs.inputHex.value = this.color.value;
-    }
-  });
-
-  /*****************************************
-   * メソッド群
-   *****************************************/
-
-  /**
-   * 値がHEXか判定します。
-   * 入力用なため、16進数を3,6文字に限定するのではなく
-   * 1~6文字以内で許容します。
-   * @param {String} value 
-   * @return {Boolean}
-   */
-  const isTypingHex = value => {
-    const isMatch = value.match(/^#?[0-9A-Fa-f]{0,6}$/);
-    return isMatch;
-  };
-
-  /**
-   * 井桁がついていない場合、井桁を頭につけます。
-   * @param {String} value 
-   * @return {String}
-   */
-  const concatenatePoundKey = value => {
-    const isIncludeSharp = value.match('^#');
-    if (isNull(isIncludeSharp)) {
-      value = `#${value}`;
-    }
     return value;
   };
 
@@ -168,10 +91,17 @@ export default function () {
    * スペクトラムのViewを更新する
    */
   const updateSpectrum = () => {
-    canvas = this.refs.canvas;
-    context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    const canvas = this.refs.canvas;
+    if (!canvas) {
+      return;
+    }
 
+    if (!this.opts.isshown) {
+      return;
+    }
+
+    context = context || this.refs.canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     // 色相の取得
     let hsv = this.getHsv();
     hsv.s = 100;
@@ -191,6 +121,96 @@ export default function () {
     context.fillStyle = linearGrad2;
     context.rect(0, 0, canvas.width, canvas.height);
     context.fill();
+  };
+
+  /*****************************************
+   * 値の初期化
+   *****************************************/
+
+  // カラーコード切り替えボタンのときの表示
+  this.isColorChangeButtonActive = false;
+  // 選択可能カラーコードが選択されていない場合、全種類のカラーコードを選択可能とする
+  let selectableColorCode = this.opts.selectablecolorcode || {
+    HEX: true,
+    RGBA: true
+  };
+
+  // カラーデータを取得する
+  this.color = (this.opts.color) ? objectAssign({}, this.opts.color) : {format: COLOR_CODE.HEX, value: ''};
+
+  // HEXのとき、Undefinedであれば黒を入れる
+  if (isUndefined(this.opts.color.value) && this.color.format === COLOR_CODE.HEX) {
+    this.color.value = '#000000';
+  }
+
+  // 選択可能カラーコードの中の当該カラーデータが有効になっていない場合それを選択可能にする
+  if (!selectableColorCode[this.color.format]) {
+    selectableColorCode[this.color.format] = true;
+  }
+  // 最後に色と認識された値を格納する
+  let lastValidColor = '#000000';
+  // canvasの初期化
+  let context;
+
+  /*****************************************
+   * Riotのライフサイクルイベント
+   *****************************************/
+
+  this.on('mount', () => {
+    updateSpectrum();
+  }).on('update', () => {
+    selectableColorCode = this.opts.selectablecolorcode || {
+      HEX: true,
+      RGBA: true
+    };
+    this.color = (this.opts.color) ? objectAssign({}, this.opts.color) : {format: COLOR_CODE.HEX,value: ''};
+    if (isUndefined(this.opts.color.value) && this.color.format === COLOR_CODE.HEX) {
+      this.color.value = '#000000';
+    }
+    // 正しい色であれば最新の正しい色として残す
+    if (this.color.format === COLOR_CODE.HEX && isHex(this.color.value)) {
+      lastValidColor = this.color.value;
+    }
+  }).on('updated', () => {
+    this.rebindTouchEvents();
+    if (this.opts.isshown) {
+      context = context || this.refs.canvas.getContext('2d');
+    } else {
+      context = null;
+    }
+    updateSpectrum();
+    if (this.color.format === COLOR_CODE.HEX && this.opts.isshown) {
+      this.refs.inputHex.value = this.color.value;
+    }
+  });
+
+  /*****************************************
+   * メソッド群
+   *****************************************/
+
+  /**
+   * 値がHEXか判定します。
+   * 入力用なため、16進数を3,6文字に限定するのではなく
+   * 1~6文字以内で許容します。
+   * @param {String} value 
+   * @return {Boolean}
+   */
+  const isTypingHex = value => {
+    const isMatch = value.match(/^#?[0-9A-Fa-f]{0,6}$/);
+    return isMatch;
+  };
+
+  /**
+   * 井桁がついていない場合、井桁を頭につけます。
+   * @param {String} value 
+   * @return {String}
+   */
+  const concatenatePoundKey = value => {
+    const isIncludeSharp = value.match('^#');
+    if (isNull(isIncludeSharp)) {
+      value = `#${value}`;
+    }
+    return value;
   };
 
   /**
@@ -278,6 +298,95 @@ export default function () {
   };
 
   /**
+   * 現在の色のアルファ値を取得します。
+   * @return {Integer}
+   */
+  this.getAlphaValue = () => {
+    if (this.color.format === COLOR_CODE.RGBA) {
+      if (isUndefined(this.color.value)) {
+        return 100;
+      }
+      return new BigNumber(this.color.value.a).times(100).toNumber();
+    } else {
+      return 100;
+    }
+  };
+
+  /**
+   * 表示用のカラースタイルを返却します。
+   * @return {String}
+   */
+  this.getColorStyle = () => {
+    let style = '';
+    if (this.color.format === COLOR_CODE.HEX) {
+      style = (isHex(this.color.value)) ? concatenatePoundKey(this.color.value) : lastValidColor;
+    }
+    if (this.color.format === COLOR_CODE.RGBA) {
+      if (isUndefined(this.color.value)) {
+        style = 'rgba(0,0,0,1)';
+      } else {
+        style = `rgba(${this.color.value.r},${this.color.value.g},${this.color.value.b},${this.color.value.a})`;
+      }
+    }
+
+    return style;
+  };
+
+  /**
+   * readonlyのinputの値を表示します。
+   */
+  this.getDummyValue = () => {
+    let style = '';
+    if (isUndefined(this.opts.color.value)) {
+      return 'undefined';
+    }
+    if (this.color.format === COLOR_CODE.HEX) {
+      style = concatenatePoundKey(this.color.value);
+    }
+    if (this.color.format === COLOR_CODE.RGBA) {
+      style = `${this.color.value.r},${this.color.value.g},${this.color.value.b},${this.color.value.a}`;
+    }
+
+    return style;
+  };
+
+  this.getHexValue = () => {
+    if (isUndefined(this.opts.color.value)) {
+      return '#000000';
+    }
+    return this.color.value;
+  };
+
+  /**
+   * 表示用のRGB値を返却します。
+   * @return {Integer}
+   */
+  this.getRgbaValue = primaryColor => {
+    let param = null;
+    if (isUndefined(this.color.value)) {
+      return 0;
+    }
+    if (primaryColor === 'red') {
+      param = this.color.value.r;
+    }
+    if (primaryColor === 'green') {
+      param = this.color.value.g;
+    }
+    if (primaryColor === 'blue') {
+      param = this.color.value.b;
+    }
+
+    if (isNull(param)) {
+      return '';
+    }
+    return param;
+  };
+
+  /*****************************************
+   * UIハンドラ
+   *****************************************/
+
+  /**
    * 表示カラーコードを切り替える
    */
   this.handleColorChangeButtonTap = () => {
@@ -297,87 +406,6 @@ export default function () {
 
     this.opts.oncolorchange(color);
   };
-
-  /**
-   * 現在の色のアルファ値を取得します。
-   * @return {Integer}
-   */
-  this.getAlphaValue = () => {
-    if (this.color.format === COLOR_CODE.RGBA) {
-      return new BigNumber(this.color.value.a).times(100).toNumber();
-    } else {
-      return 100;
-    }
-  };
-
-  /**
-   * 表示用のカラースタイルを返却します。
-   * @return {String}
-   */
-  this.getColorStyle = () => {
-    let style = '';
-    switch (this.color.format) {
-    case COLOR_CODE.HEX:
-      style = (isHex(this.color.value)) ? concatenatePoundKey(this.color.value) : lastValidColor;
-      break;
-    case COLOR_CODE.RGBA:
-      style = `rgba(${this.color.value.r},${this.color.value.g},${this.color.value.b},${this.color.value.a})`;
-      break;
-    default:
-      break;
-    }
-
-    return style;
-  };
-
-  /**
-   * readonlyのinputの値を表示します。
-   */
-  this.getDummyValue = () => {
-    let style = '';
-    switch (this.color.format) {
-    case COLOR_CODE.HEX:
-      style = concatenatePoundKey(this.color.value);
-      break;
-    case COLOR_CODE.RGBA:
-      style = `${this.color.value.r},${this.color.value.g},${this.color.value.b},${this.color.value.a}`;
-      break;
-    default:
-      break;
-    }
-
-    return style;
-  };
-
-  /**
-   * 表示用のRGB値を返却します。
-   * @return {String}
-   */
-  this.getRgbaValue = primaryColor => {
-    let param = null;
-    switch (primaryColor) {
-    case 'red':
-      param = this.color.value.r;
-      break;
-    case 'green':
-      param = this.color.value.g;
-      break;
-    case 'blue':
-      param = this.color.value.b;
-      break;
-    default:
-      break;
-    }
-
-    if (isNull(param)) {
-      return '';
-    }
-    return param;
-  };
-
-  /*****************************************
-   * UIハンドラ
-   *****************************************/
 
   /**
    * スペクトラムのイベントリスナーハンドラー
@@ -430,6 +458,56 @@ export default function () {
   };
 
   /**
+   * スペクトラムのイベントリスナーハンドラー
+   * タッチしたとき色を取得する
+   * @param {eventObject} e
+   */
+  this.handleCanvasTouchStart = e => {
+    this.isCatcherActive = true;
+    
+    const hsv = getColorObject(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+    const color = {
+      format: this.color.format,
+      value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
+    };
+    this.opts.oncolorchange(color, hsv);
+  };
+
+  /**
+   * スペクトラムのイベントリスナーハンドラー
+   * キャッチャーの中でタッチムーブしたとき色を取得する
+   * @param {eventObject} e
+   */
+  this.handleCatcherTouchMove = e => {
+    if (!this.isCatcherActive) {
+      return;
+    }
+
+    const hsv = getColorObject(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+    const color = {
+      format: this.color.format,
+      value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
+    };
+    this.opts.oncolorchange(color, hsv);
+  };
+
+  /**
+   * スペクトラムのイベントリスナーハンドラー
+   * キャッチャーの中でタッチエンドしたとき色を取得する
+   * @param {eventObject} e
+   */
+  this.handleCatcherTouchEnd = e => {
+    this.isCatcherActive = false;
+
+    const hsv = getColorObject(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+    const color = {
+      format: this.color.format,
+      value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
+    };
+    this.opts.oncolorchange(color, hsv);
+  };
+
+  /**
    * 色相スライダーのイベントリスナーハンドラー
    * スライダーを移動したとき色相値を取得する
    */
@@ -465,7 +543,7 @@ export default function () {
    * HEX入力値のイベントリスナーハンドラー
    */
   this.handleInputHexInput = e => {
-    let newColor = e.target.value; // eslint-disable-line no-irregular-whitespace
+    let newColor = e.target.value;
     newColor = normalizeHexValue(newColor);
 
     const color = {
@@ -483,7 +561,7 @@ export default function () {
     const colorValue = value || 0;
     const color = {
       format: this.color.format,
-      value: this.color.value
+      value: this.color.value || {r: 0, g: 0, b: 0, a: 1}
     };
     objectAssign(color.value, {
       r: colorValue
@@ -499,7 +577,7 @@ export default function () {
     const colorValue = value || 0;
     const color = {
       format: this.color.format,
-      value: this.color.value
+      value: this.color.value || {r: 0, g: 0, b: 0, a: 1}
     };
     objectAssign(color.value, {
       g: colorValue
@@ -515,7 +593,7 @@ export default function () {
     const colorValue = value || 0;
     const color = {
       format: this.color.format,
-      value: this.color.value
+      value: this.color.value || {r: 0, g: 0, b: 0, a: 1}
     };
     objectAssign(color.value, {
       b: colorValue
@@ -531,7 +609,7 @@ export default function () {
     const colorValue = value || 0;
     const color = {
       format: this.color.format,
-      value: this.color.value
+      value: this.color.value || {r: 0, g: 0, b: 0, a: 1}
     };
     objectAssign(color.value, {
       a: new BigNumber(colorValue).div(100).toString() || 0
@@ -545,37 +623,5 @@ export default function () {
    */
   this.handleInputTap = () => {
     this.opts.ontoggle(!this.opts.isshown);
-  };
-
-  /**
-   * 色切り替えボタンのイベントリスナーハンドラー
-   * タップしたとき背景色を変更する
-   */
-  this.handleColorChangeButtonTouchStart = () => {
-    this.isColorChangeButtonActive = true;
-  };
-
-  /**
-   * 色切り替えボタンのイベントリスナーハンドラー
-   * タップした指を離したとき背景色を戻す
-   */
-  this.handleColorChangeButtonTouchEnd = () => {
-    this.isColorChangeButtonActive = false;
-  };
-
-  /**
-   * 色切り替えボタンのイベントリスナーハンドラー
-   * マウスオーバーしたとき背景色を変更する
-   */
-  this.handleColorChangeButtonMouseOver = () => {
-    this.isColorChangeButtonActive = true;
-  };
-
-  /**
-   * 色切り替えボタンのイベントリスナーハンドラー
-   * マウスアウトしたとき背景色を変更する
-   */
-  this.handleColorChangeButtonMouseOut = () => {
-    this.isColorChangeButtonActive = false;
   };
 }
