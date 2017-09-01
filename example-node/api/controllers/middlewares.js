@@ -1,15 +1,15 @@
 const shared = require('../../shared');
-const dmclib = shared.context.getDmcLib();
+const vironlib = shared.context.getVironLib();
 
 const afterAuthMiddlewares = [
   // audit log
-  dmclib.auditLog.middleware(),
+  vironlib.auditLog.middleware(),
   // check google oauth token
-  dmclib.auth.google.middleware(),
+  vironlib.auth.google.middleware(),
   // check admin role
-  dmclib.adminRole.middleware(),
+  vironlib.adminRole.middleware(),
   // completion empty body
-  dmclib.bodyCompletion.middleware(),
+  vironlib.bodyCompletion.middleware(),
 ];
 
 /**

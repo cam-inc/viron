@@ -11,8 +11,8 @@ module.exports = app; // for testing
 
 context.init()
   .then(() => {
-    const dmclib = context.getDmcLib();
-    const helperSwagger = dmclib.swagger.helper;
+    const vironlib = context.getVironLib();
+    const helperSwagger = vironlib.swagger.helper;
     const config = {
       appRoot: __dirname, // required config
       swaggerSecurityHandlers: {
@@ -24,7 +24,7 @@ context.init()
          * @param {function} next
          */
         jwt: (req, def, scopes, next) => {
-          dmclib.auth.jwt.middleware()(req, req.res, next);
+          vironlib.auth.jwt.middleware()(req, req.res, next);
         },
       },
     };
@@ -40,7 +40,7 @@ context.init()
           // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
 
           // add acl response headers
-          app.use(dmclib.acl.middleware());
+          app.use(vironlib.acl.middleware());
 
           app.use((req, res, next) => {
             if (req.method === 'OPTIONS') {

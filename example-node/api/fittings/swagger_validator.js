@@ -1,4 +1,4 @@
 const shared = require('../../shared');
-const dmclib = shared.context.getDmcLib();
+const vironlib = shared.context.getVironLib();
 
-module.exports = dmclib.swaggerValidator;
+module.exports = vironlib.swaggerValidator;

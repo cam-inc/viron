@@ -66,9 +66,9 @@ const genSection = (section, groups) => {
  * GET: /dmc
  */
 const show = (req, res) => {
-  const dmclib = context.getDmcLib();
+  const vironlib = context.getVironLib();
   const env = context.getEnv();
-  const helperAdminRole = dmclib.adminRole.helper;
+  const helperAdminRole = vironlib.adminRole.helper;
   const title = req.swagger.swaggerObject.info.title;
 
   const result = {
