@@ -1,6 +1,6 @@
 export default function() {
   this.descriptionsMarkdown = {
-    content: this.opts.description,
+    content: this.opts.endpoint.description,
     markedOptions: {}
   };
 
@@ -13,7 +13,7 @@ export default function() {
   };
 
   this.handleEditButtonPat = () => {
-    this.opts.onedit(this.opts.key, this.opts.url, this.opts.memo);
+    this.opts.onedit(this.opts.key, this.opts.endpoint.url, this.opts.endpoint.memo);
   };
 
   this.handleRemoveButtonPat = () => {

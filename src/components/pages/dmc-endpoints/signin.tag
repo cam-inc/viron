@@ -1,5 +1,7 @@
 dmc-endpoint-signin.EndpointsPage__signin
-  .EndpointsPage__signinTitle サインイン
+  .EndpointsPage__signinHead
+    .EndpointsPage__signinThumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
+    .EndpointsPage__signinName { opts.endpoint.name }
   .EndpointsPage__signinEmails(if="{ !!emails.length }")
     .EndpointsPage__signinEmailsTitle メールアドレス認証
     virtual(each="{ authtype in emails }")

@@ -23,7 +23,7 @@ export default {
           .onBefore(() => Promise.all([
             store.action(actions.APPLICATION_NAVIGATION_START)
           ]))
-          .on('/', route => EndpointsRoute.onEnter(store, route))
+          .on('/', route => EndpointsRoute.onEnter(store, route), (route, replace) => EndpointsRoute.onBefore(store, route, replace))
           .on('/oauthredirect/:endpointKey', () => Promise.resolve(), (route, replace) => OauthredirectRoute.onBefore(store, route, replace))
           .on('/endpointimport', () => Promise.resolve(), (route, replace) => EndpointimportRoute.onBefore(store, route, replace))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))

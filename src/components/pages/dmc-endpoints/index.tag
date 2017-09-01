@@ -7,13 +7,7 @@ dmc-endpoints.Page.EndpointsPage
     virtual(each="{ endpoint, key in endpoints }")
       dmc-endpoint(
         key="{ key }"
-        name="{ endpoint.name }"
-        thumbnail="{ endpoint.thumbnail }"
-        token="{ endpoint.token }"
-        url="{ endpoint.url }"
-        description="{ endpoint.description }"
-        memo="{ endpoint.memo }"
-        tags="{ endpoint.tags }"
+        endpoint="{ endpoint }"
         onEntry="{ handleEndpointEntry }"
         onEdit="{ handleEndpointEdit }"
         onRemove="{ handleEndpointRemove }"
