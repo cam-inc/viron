@@ -420,6 +420,7 @@ export default function () {
       format: this.color.format,
       value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
     };
+    color.value.a = this.color.value.a;
     this.opts.oncolorchange(color, hsv);
   };
 
@@ -438,6 +439,7 @@ export default function () {
       format: this.color.format,
       value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
     };
+    color.value.a = this.color.value.a;
     this.opts.oncolorchange(color, hsv);
   };
 
@@ -454,6 +456,7 @@ export default function () {
       format: this.color.format,
       value: convertColor(COLOR_CODE.HSV, hsv, this.color.format)
     };
+    color.value.a = this.color.value.a;
     this.opts.oncolorchange(color, hsv);
   };
 
@@ -530,7 +533,7 @@ export default function () {
    * スライダーを移動したとき透明度を取得する
    */
   this.handleAlphaSliderChange = (alpha) => {
-    const color = this.color;
+    const color = objectAssign({},this.color);
     if (this.color.format !== COLOR_CODE.RGBA) {
       color.format = COLOR_CODE.RGBA;
       color.value = convertColor(this.color.format, this.color.value, COLOR_CODE.RGBA);
