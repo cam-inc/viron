@@ -5,8 +5,8 @@ dmc-component-operation.ComponentOperation
   .ComponentOperation__body
     dmc-parameters(parameterObjects="{ opts.parameterObjects }" parameters="{ currentParameters }" onChange="{ handleParametersChange }")
   .ComponentOperation__tail
-    dmc-button(label="submit" onPat="{ handleSubmitButtonPat }")
-    dmc-button(label="cancel" onPat="{ handleCancelButtonPat }")
+    dmc-button(label="送信" onPat="{ handleSubmitButtonPat }")
+    dmc-button(label="閉じる" onPat="{ handleCancelButtonPat }")
 
   script.
     import script from './operation';
