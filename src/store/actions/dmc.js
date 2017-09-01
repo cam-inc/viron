@@ -33,7 +33,7 @@ export default {
       })
       .then(res => {
         // tokenを更新する。
-        const token = res.headers.get('Authorization');
+        const token = res.headers['Authorization'];
         if (!!token) {
           context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
         }

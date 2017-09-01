@@ -58,7 +58,6 @@ export default {
         if (err.status !== 401) {
           throw err;
         }
-        // TODO: token更新
         context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
         return false;
       });
@@ -79,13 +78,7 @@ export default {
     return Promise
       .resolve()
       .then(() => fetch(context, fetchUrl))
-      .then(response => {
-        const token = response.headers.get('Authorization');
-        if (!!token) {
-          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
-        }
-        response.json();
-      });
+      .then(response => response.json());
   },
 
   /**
