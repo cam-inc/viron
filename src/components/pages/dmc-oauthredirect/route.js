@@ -18,7 +18,7 @@ export default {
     const tasks = [];
     if (isAuthorized) {
       to = `/${endpointKey}`;
-      tasks.push(store.action(actions.AUTH_UPDATE, endpointKey, token));
+      tasks.push(store.action(actions.AUTH_UPDATE, endpointKey, decodeURIComponent(token)));
     } else {
       to = '/';
       tasks.push(store.action(actions.AUTH_REMOVE, endpointKey));
