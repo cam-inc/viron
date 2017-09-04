@@ -1,4 +1,5 @@
 import contains from 'mout/array/contains';
+import reject from 'mout/array/reject';
 import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
@@ -50,6 +51,22 @@ export default function() {
   this.isCurrentRequestParametersEmpty = () => {
     return !keys(this.currentRequestParameters).length;
   };
+  // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
+  this.getParameterObjectsForSearch = () => {
+    return reject(this.parameterObjects || [], parameterObject => {
+      if (parameterObject.in !== 'query') {
+        return false;
+      }
+      if (parameterObject.name === 'limit') {
+        return true;
+      }
+      if (parameterObject.name === 'offset') {
+        return true;
+      }
+      return false;
+    });
+  };
+
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   switch (this.opts.component.style) {
@@ -224,6 +241,14 @@ export default function() {
 
   this.handleSearchButtonTap = () => {
     if (this.isPending) {
+      return;
+    }
+
+    // ページングに使用するparamerは取り除く。
+    const escapedParameterObjects = this.getParameterObjectsForSearch();
+
+    // 検索用のparameterObjectが存在しない場合は何もしない。
+    if (!escapedParameterObjects.length) {
       return;
     }
 

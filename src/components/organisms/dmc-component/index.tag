@@ -3,7 +3,7 @@ dmc-component.Component
     .Component__name { opts.component.name }
     .Component__refresh(ref="touch" onTap="handleRefreshButtonTap")
       dmc-icon(type="reload")
-    .Component__search(if="{ !!parameterObjects.length }" class="{ !isCurrentRequestParametersEmpty() ? 'Component__search--active' : ''}" ref="touch" onTap="handleSearchButtonTap")
+    .Component__search(if="{ !!getParameterObjectsForSearch().length }" class="{ !isCurrentRequestParametersEmpty() ? 'Component__search--active' : ''}" ref="touch" onTap="handleSearchButtonTap")
       dmc-icon(type="search")
   .Component__body(ref="body")
     .Component__spinner(if="{ isPending }")
