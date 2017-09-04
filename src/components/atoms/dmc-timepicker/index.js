@@ -92,16 +92,16 @@ export default function() {
   };
 
   const scrollSelected = (scroll, datetype) => {
-    if(this.refs.hourscroll && datetype === 'hour'){
-      this.refs.hourscroll.scrollTop = scroll * 20;
+    if(this.refs.hourlist && datetype === 'hour'){
+      this.refs.hourlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;;
     }
 
-    if(this.refs.minutescroll && datetype === 'minute'){
-      this.refs.minutescroll.scrollTop = scroll * 20;
+    if(this.refs.minutelist && datetype === 'minute'){
+      this.refs.minutelist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;;
     }
 
-    if(this.refs.secondscroll && datetype === 'second'){
-      this.refs.secondscroll.scrollTop = scroll * 20;
+    if(this.refs.secondlist && datetype === 'second'){
+      this.refs.secondlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;;
     }
   };
   this.handleInputTap = () => {
