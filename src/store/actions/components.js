@@ -1,7 +1,5 @@
 import contentDisposition from 'content-disposition';
 import download from 'downloadjs';
-import forEach from 'mout/array/forEach';
-import ObjectAssign from 'object-assign';
 import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
@@ -24,30 +22,7 @@ export default {
     if (path.indexOf('/') !== 0) {
       path = '/' + path;
     }
-    const operationObject = context.getter(getters.OAS_OPERATION_OBJECT, path, method);
-    // 関連のあるpath情報を取得します。
-    let pathRefs = [];
-    // 同じpath 且つ method名違いのoperationObjectは関連有りとみなす。
-    forEach(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
-      if (!context.getter(getters.OAS_OPERATION_OBJECT, path, method)) {
-        return;
-      }
-      pathRefs.push({
-        path,
-        method,
-        appendTo: 'self'
-      });
-    });
-    // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
-    pathRefs = pathRefs.concat(operationObject['x-ref'] || []);
-    // 関連API(path)群を付与する。
-    const actions = [];
-    forEach(pathRefs, ref => {
-      const operationObject = context.getter(getters.OAS_OPERATION_OBJECT, ref.path, ref.method);
-      actions.push(ObjectAssign({
-        operationObject
-      }, ref));
-    });
+    const actions = context.getter(getters.OAS_OPERATION_OBJECTS_AS_ACTION, component);
 
     const api = context.getter(getters.OAS_API_BY_PATH_AND_METHOD, path, method);
     const currentEndpointKey = context.getter(getters.CURRENT);
