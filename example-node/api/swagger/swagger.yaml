@@ -1963,6 +1963,21 @@ paths:
         name: offset
         required: false
         type: integer
+      - description: http request method
+        in: query
+        name: request_method
+        required: false
+        type: string
+      - description: user id
+        in: query
+        name: user_id
+        required: false
+        type: string
+      - description: request uri
+        in: query
+        name: request_uri
+        required: false
+        type: string
       produces:
       - application/json
       responses:
