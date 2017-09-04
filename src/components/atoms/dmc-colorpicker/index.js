@@ -268,7 +268,7 @@ export default function () {
    * @param {String} saturation or brightness
    */
   this.getSpectrumPosition = param => {
-    let hsv = this.getHsv();
+    const hsv = this.getHsv();
     if (param === 'saturation') {
       let saturation = hsv.s;
       if (saturation > 100) {
