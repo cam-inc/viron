@@ -48,14 +48,20 @@ export default {
       let hasPagination = false;
       let pagination;
       if (component.pagination) {
-        hasPagination = true;
+        const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
+        const size = Number(res.headers['x-pagination-limit'] || 0);
+        const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
         pagination = {
           // `x-pagination-current-page`等は独自仕様。
           // DMCを使用するサービスはこの仕様に沿う必要がある。
-          currentPage: Number(res.headers['x-pagination-current-page'] || 0),
-          size: Number(res.headers['x-pagination-limit'] || 0),
-          maxPage: Number(res.headers['x-pagination-total-pages'] || 0)
+          currentPage,
+          size,
+          maxPage
         };
+        // 2ページ以上存在する場合のみページングをONにする。
+        if (maxPage >= 2) {
+          hasPagination = true;
+        }
       }
       context.commit(mutations.COMPONENTS_UPDATE_ONE, {
         component_uid,

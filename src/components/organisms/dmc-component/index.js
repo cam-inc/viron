@@ -43,6 +43,8 @@ export default function() {
   this.hasPagination = false;
   // ページング情報。
   this.pagination = {};
+  // ページングのサイズ値。
+  this.paginationSize = 3;
   // 現在のリクエストパラメータ値。
   this.currentRequestParameters = {};
   this.isCurrentRequestParametersEmpty = () => {

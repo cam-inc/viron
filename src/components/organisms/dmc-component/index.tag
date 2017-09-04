@@ -8,12 +8,12 @@ dmc-component.Component
   .Component__body(ref="body")
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
-    dmc-pagination(if="{ !isPending && hasPpagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ 3 }" onChange="{ handlePaginationChange }")
+    dmc-pagination.Component__pagination.Component__pagination--head(if="{ !isPending &&  hasPagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ paginationSize }" onChange="{ handlePaginationChange }")
     div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" response="{ response }" schemaObject="{ schemaObject }" tableLabels="{ tableLabels }" rowActions="{ rowActions }" updater="{ updater }")
+    dmc-pagination.Component__pagination.Component__pagination--tail(if="{ !isPending && hasPagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ paginationSize }" onChange="{ handlePaginationChange }")
     .Component__alert(if="{ !isPending && !isValidData }")
       .Component__alertApi { alertApi }
       .Component__alertText { alertText }
-    dmc-pagination(if="{ !isPending && hasPagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ 3 }" onChange="{ handlePaginationChange }")
   .Component__tail(if="{ !!selfActions }")
     dmc-component-action(each="{ action in selfActions }" action="{ action }" updater="{ parent.updater }")
 

@@ -1,4 +1,4 @@
-dmc-pagination.Pagination
+dmc-pagination.Pagination(class="{ opts.class }")
   .Pagination__control
     div(class="Pagination__button { opts.currentpage === 1 ? 'Pagination__button--disabled' : '' }" ref="touch" onTap="handlePrevButtonTap")
       dmc-icon(type="left")
@@ -13,7 +13,6 @@ dmc-pagination.Pagination
     div(if="{ getBasePages()[getBasePages().length - 1].num !== opts.maxpage }" class="Pagination__button" data-page="{ opts.maxpage }" ref="touch" onTap="handlePageButtonTap") { opts.maxpage }
     div(class="Pagination__button { opts.currentpage === opts.maxpage ? 'Pagination__button--disabled' : '' }" ref="touch" onTap="handleNextButtonTap")
       dmc-icon(type="right")
-  .Pagination__info { opts.currentpage } / { opts.maxpage }
 
   script.
     import '../../atoms/dmc-icon/index.tag';
