@@ -101,6 +101,30 @@ export default {
   },
 
   /**
+   * 指定したoperationIdにマッチするPathItemObjectのmethod名を返します。
+   * @param {riotx.Context} context
+   * @param {String} operationId
+   * @return {String}
+   */
+  pathItemObjectMethodNameByOperationId: (context, operationId) => {
+    let ret;
+    forOwn(context.state.oas.client.spec.paths, pathItemObject => {
+      if (!!ret) {
+        return;
+      }
+      forOwn(pathItemObject, (operationObject, method) => {
+        if (!!ret) {
+          return;
+        }
+        if (operationObject.operationId === operationId) {
+          ret = method;
+        }
+      });
+    });
+    return ret;
+  },
+
+  /**
    * 指定したpathとmethodにマッチするOperationObjectを返します。
    * @param {riotx.Context} context
    * @param {String} path
