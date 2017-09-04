@@ -100,7 +100,7 @@ export default function () {
       return;
     }
 
-    context = context || this.refs.canvas.getContext('2d');
+    let context = this.refs.canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     // 色相の取得
     let hsv = this.getHsv();
@@ -149,8 +149,6 @@ export default function () {
   }
   // 最後に色と認識された値を格納する
   let lastValidColor = '#000000';
-  // canvasの初期化
-  let context;
 
   /*****************************************
    * Riotのライフサイクルイベント
@@ -174,11 +172,6 @@ export default function () {
   }).on('updated', () => {
     // タッチイベントの更新
     this.rebindTouchEvents();
-    if (this.opts.isshown) {
-      context = context || this.refs.canvas.getContext('2d');
-    } else {
-      context = null;
-    }
     updateSpectrum();
     if (this.color.format === COLOR_CODE.HEX && this.opts.isshown) {
       this.refs.inputHex.value = this.color.value;
