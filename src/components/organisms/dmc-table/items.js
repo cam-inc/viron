@@ -3,7 +3,6 @@ import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import map from 'mout/array/map';
 import { constants as actions } from '../../../store/actions';
-import './action.tag';
 import './filter.tag';
 
 export default function() {
@@ -55,14 +54,11 @@ export default function() {
     this.update();
   };
 
-  this.handleActionButtonTap = () => {
-    store.action(actions.MODALS_ADD, 'dmc-table-action', {
-      actions: this.opts.actions,
-      idx: this.opts.idx
-    });
+  this.handleItemsActionButtonPat = action => {
+    action.onPat(action.operationId, this.opts.idx);
   };
 
-  this.handleFilterButtonTap = () => {
+  this.handleFilterButtonPat = () => {
     store.action(actions.MODALS_ADD, 'dmc-table-filter', {
       options: map(this.opts.items, item => {
         return item.key;
@@ -76,7 +72,7 @@ export default function() {
     });
   };
 
-  this.handleOpenShutButtonTap = () => {
+  this.handleOpenShutButtonPat = () => {
     this.isOpened = !this.isOpened;
     this.update();
   };

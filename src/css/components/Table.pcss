@@ -38,6 +38,7 @@
 
 .Table__itemsButton {
   @apply --layout-center-center;
+  position: relative;
   flex-shrink: 0;
   width: 18px;
   height: 18px;
@@ -48,9 +49,17 @@
   border-radius: 2px;
 }
 
-.Table__itemsButton:hover,
-.Table__itemsButton.hover {
+.Table__itemsButton:hover .Icon,
+.Table__itemsButton.hover .Icon {
   opacity: 0.5;
+}
+
+.Table__itemsButton .Tooltip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  margin: 0 auto;
 }
 
 .Table__itemsOpenShutButton .Icon {
@@ -60,6 +69,14 @@
 
 .Table__items--opened .Table__itemsOpenShutButton .Icon {
   transform: rotate(180deg);
+}
+
+.Table__itemsButtonCatcher {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 /* ============================== */
@@ -170,46 +187,4 @@
 
 .Table__filter .Checkbox:last-child {
   margin-bottom: 0;
-}
-
-/* ============================== */
-/* action */
-/* ============================== */
-.Table__action {
-  display: block;
-}
-
-.Table__actionItem {
-  @apply --layout-center-center;
-  padding: 8px;
-  margin-bottom: 8px;
-  background-color: #fff;
-  border-left: 2px solid var(--color-bg-tertiary);
-}
-
-.Table__actionItem:last-child {
-  margin-bottom: 0;
-}
-
-.Table__actionInner {
-  flex-grow: 1;
-  margin-right: 8px;
-}
-
-.Table__actionTitle {
-  margin-bottom: 4px;
-  font-weight: bold;
-}
-
-.Table__actionExecuteButton {
-  padding: 8px;
-  color: #fff;
-  cursor: pointer;
-  background-color: var(--color-basic-skyblue);
-  border-radius: 4px;
-}
-
-.Table__actionExecuteButton:hover,
-.Table__actionExecuteButton.hover {
-  background-color: var(--color-basic-lightPurple);
 }
