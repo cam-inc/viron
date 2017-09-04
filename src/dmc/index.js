@@ -137,10 +137,8 @@ export default function() {
 
       if (hasAllKeys) {
         store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
-        console.log('resolve');
         resolve();
       } else {
-        console.log('reject');
         reject();
       }
     });
