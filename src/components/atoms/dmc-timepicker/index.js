@@ -18,7 +18,7 @@ export default function() {
     this.momentDate = moment.utc(this.opts.date);
     this.displayFormatDate = format(this.momentDate);
   } else {
-    this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0);
+    this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
     this.displayFormatDate = '';
   }
 
@@ -27,7 +27,7 @@ export default function() {
       this.momentDate = moment.utc(this.opts.date);
       this.displayFormatDate = format(this.momentDate);
     } else {
-      this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0);
+      this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
       this.displayFormatDate = format(this.momentDate);
     }
   }).on('updated', () => {
