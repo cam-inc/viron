@@ -1,5 +1,6 @@
 import moment from 'moment';
 import times from 'mout/function/times';
+import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
 
@@ -13,12 +14,22 @@ export default function() {
 
   const colon = ':';
 
-  this.momentDate = moment.utc(this.opts.date);
-  this.displayFormatDate = format(this.momentDate);
-
-  this.on('update', () => {
+  if (!isUndefined(this.opts.date)) {
     this.momentDate = moment.utc(this.opts.date);
     this.displayFormatDate = format(this.momentDate);
+  } else {
+    this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0);
+    this.displayFormatDate = '';
+  }
+
+  this.on('update', () => {
+    if (!isUndefined(this.opts.date)) {
+      this.momentDate = moment.utc(this.opts.date);
+      this.displayFormatDate = format(this.momentDate);
+    } else {
+      this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0);
+      this.displayFormatDate = '';
+    }
   }).on('updated', () => {
     this.rebindTouchEvents();
     let splitsFormatDate = this.displayFormatDate.split(colon, 3);
@@ -81,11 +92,11 @@ export default function() {
   };
 
   const scrollSelected = (scroll, datetype) => {
-    if(datetype === 'hour'){
+    if(this.refs.hourscroll && datetype === 'hour'){
       this.refs.hourscroll.scrollTop = scroll * 20;
-    }else if(datetype === 'minute'){
+    }else if(this.refs.minutescroll && datetype === 'minute'){
       this.refs.minutescroll.scrollTop = scroll * 20;
-    }else if(datetype === 'second'){
+    }else if(this.refs.secondscroll && datetype === 'second'){
       this.refs.secondscroll.scrollTop = scroll * 20;
     }
   };
