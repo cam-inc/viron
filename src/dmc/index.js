@@ -86,43 +86,42 @@ export default function() {
    * @param {String} text 
    */
   const parseFile = file => {
-    Promise
-      .resolve()
-      .then(() => {
-        // JSONにパースする。
-        const endpoints = JSON.parse(file);
-
-        // エンドポイントを配列にする。
-        const endpointsArray = [];
-        forOwn(endpoints, val => {
-          endpointsArray.push(val);
-        });
-
-        // 成功したときの表示オブジェクト。
-        const success = {
-          title: 'エンドポイント追加',
-          message: 'エンドポイントが一覧に追加されました。'
-        };
-
-        // 失敗したときの表示オブジェクト。
-        const failure = {
-          title: 'エンドポイント追加 失敗',
-          message: 'エンドポイントを追加出来ませんでした。',
-          error: {}
-        };
-
-        // 並行処理を行う。
-        Promise.all(endpointsArray.map( endpoint => {
-          return addEndpoint(endpoint);
-        }))
+    try {
+      // JSONにパースする。
+      const endpoints = JSON.parse(file);
+      
+      // エンドポイントを配列にする。
+      const endpointsArray = [];
+      forOwn(endpoints, val => {
+        endpointsArray.push(val);
+      });
+      
+      // 成功したときの表示オブジェクト。
+      const success = {
+        title: 'エンドポイント追加',
+        message: 'エンドポイントが一覧に追加されました。'
+      };
+      
+      // 失敗したときの表示オブジェクト。
+      const failure = {
+        title: 'エンドポイント追加 失敗',
+        message: 'エンドポイントを追加出来ませんでした。',
+        error: {}
+      };
+      
+      // 並行処理を行う。
+      Promise.all(endpointsArray.map( endpoint => {
+        return addEndpoint(endpoint);
+      }))
         .then(() => store.action(actions.MODALS_ADD, 'dmc-message', success))
         .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', failure));
-      })
-      .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+    } catch (error) {
+      store.action(actions.MODALS_ADD, 'dmc-message', {
         title: 'エンドポイント追加 失敗',
         message: 'エンドポイントを追加出来ませんでした',
         error: {}
-      }));
+      });
+    }
   };
 
   const addEndpoint = endpoint => {
