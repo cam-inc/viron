@@ -40,6 +40,8 @@ export default function() {
   this.rowActions = [];
   // テーブルのrow表示ラベル。
   this.tableLabels = [];
+  // テーブル使用時のprimaryキー。
+  this.primaryKey = null;
   // ページング機能ONかどうか。
   this.hasPagination = false;
   // ページング情報。
@@ -220,6 +222,7 @@ export default function() {
     this.rowActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
     this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
     this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION, this._riot_id);
+    this.primaryKey = store.getter(getters.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
     this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
     this.validateResponse(this.response);
     this.update();

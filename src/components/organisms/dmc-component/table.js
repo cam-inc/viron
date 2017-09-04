@@ -80,6 +80,7 @@ export default function() {
       title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,
       method,
+      primaryKey: this.opts.primarykey,
       operationObject,
       parameterObjects: operationObject.parameters,
       initialParameters,

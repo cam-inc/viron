@@ -24,6 +24,23 @@ export default function() {
   this.blotOptions = schemaObject['x-wyswyg-options'] || {};
 
   /**
+   * 入力可否をチェックします。
+   * @return {Boolean}
+   */
+  this.checkIsDisabled = () => {
+    const additionalInfo = this.opts.additionalinfo;
+    // primaryキーがpathに含まれており、且つ入力対象keyが同一の場合。
+    // get, post, put, deleteいかなるメソッドでも入力不可能にする。
+    if (schemaObject.in === 'path' && schemaObject.name === additionalInfo.primaryKey) {
+      return true;
+    }
+    // 特に問題なければ入力可能。
+    return false;
+  };
+  // 入力可能 or not。
+  this.isDisabled = this.checkIsDisabled();
+
+  /**
    * Selectコンポーネントに使用するoption群を返します。
    * @return {Array}
    */

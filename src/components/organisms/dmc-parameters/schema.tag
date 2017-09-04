@@ -1,4 +1,4 @@
-dmc-parameter-schema.ParameterSchema
+dmc-parameter-schema.ParameterSchema(class="{ 'ParameterSchema--disabled' : isDisabled }")
   .ParameterSchema__head
     .ParameterSchema__caption
       .ParameterSchema__bodyOpenShutButton(class="{ isBodyOpened ? 'ParameterSchema__bodyOpenShutButton--active' : '' }" ref="touch" onTap="handleBodyOpenShutButtonTap")
@@ -30,11 +30,11 @@ dmc-parameter-schema.ParameterSchema
       dmc-prettyprint(data="{ opts.val }")
     .ParameterSchema__content
       virtual(if="{ isFormMode }")
-        dmc-parameter-form(val="{ opts.val }" schemaObject="{ schemaObject }" onChange="{ handleFormChange }")
+        dmc-parameter-form(val="{ opts.val }" schemaObject="{ schemaObject }" additionalInfo="{ opts.additionalinfo }" onChange="{ handleFormChange }")
       virtual(if="{ isPropertiesMode }")
-        dmc-parameter-schema(each="{ property, key in properties }" key="{ key }" val="{ parent.getPropertyValue(property, key) }" schemaObject="{ parent.getNormalizedSchemaObjectForProperty(property, key) }" onChange="{ parent.handlePropertyChange }")
+        dmc-parameter-schema(each="{ property, key in properties }" key="{ key }" val="{ parent.getPropertyValue(property, key) }" schemaObject="{ parent.getNormalizedSchemaObjectForProperty(property, key) }" additionalInfo="{ parent.opts.additionalinfo }" onChange="{ parent.handlePropertyChange }")
       virtual(if="{ isItemsMode && !!opts.val.length }")
-        dmc-parameter-schema(no-reorder isRemovable="{ true }" each="{ val, idx in opts.val }" key="{ idx }" val="{ parent.getItemValue(idx) }" schemaObject="{ parent.getNormalizedSchemaObjectForItem(idx) }" onRemove="{ parent.handleItemsRemove }" onChange="{ parent.handleItemsChange }")
+        dmc-parameter-schema(no-reorder isRemovable="{ true }" each="{ val, idx in opts.val }" key="{ idx }" val="{ parent.getItemValue(idx) }" schemaObject="{ parent.getNormalizedSchemaObjectForItem(idx) }" additionalInfo="{ parent.opts.additionalinfo }" onRemove="{ parent.handleItemsRemove }" onChange="{ parent.handleItemsChange }")
       virtual(if="{ isItemsMode && !opts.val.length }")
         .ParameterSchema__emptyItemsMessage まだ中身がありません。
 

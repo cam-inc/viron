@@ -123,5 +123,15 @@ export default {
    */
   tableLabels: (context, riotId) => {
     return context.state.components[riotId].table_labels || [];
+  },
+
+  /**
+   * テーブル行に使用するprimaryキーを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {String|null}
+   */
+  primaryKey: (context, riotId) => {
+    return context.state.components[riotId].primaryKey || null;
   }
 };

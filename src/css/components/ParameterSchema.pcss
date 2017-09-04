@@ -3,8 +3,8 @@
   border-left: 2px solid var(--color-bg-tertiaryLight);
 }
 /* TODO: モバイル端末最適化 */
-.ParameterSchema:hover,
-.ParameterSchema.hover {
+.ParameterSchema:hover:not(.ParameterSchema--disabled),
+.ParameterSchema.hover:not(.ParameterSchema--disabled) {
   border-left-color: var(--color-bg-primary);
 }
 
@@ -30,8 +30,8 @@
   border-left: 8px solid var(--color-bg-tertiaryLight);
 }
 
-.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton,
-.ParameterSchema.hover > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton {
+.ParameterSchema:hover:not(.ParameterSchema--disabled) > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton,
+.ParameterSchema.hover:not(.ParameterSchema--disabled) > .ParameterSchema__head .ParameterSchema__bodyOpenShutButton {
   border-left-color: var(--color-bg-primary);
 }
 
@@ -52,6 +52,7 @@
 .ParameterSchema__name {
   font-weight: bold;
   cursor: pointer;
+  user-select: none;
 }
 
 .ParameterSchema__name:hover,
@@ -65,8 +66,8 @@
   background-color: var(--color-bg-tertiaryLight);
 }
 
-.ParameterSchema:hover > .ParameterSchema__head .ParameterSchema__line,
-.ParameterSchema.hover > .ParameterSchema__head .ParameterSchema__line {
+.ParameterSchema:hover:not(.ParameterSchema--disabled) > .ParameterSchema__head .ParameterSchema__line,
+.ParameterSchema:hover:not(.ParameterSchema--disabled) > .ParameterSchema__head .ParameterSchema__line {
   background-color: var(--color-bg-primary);
 }
 
@@ -88,12 +89,18 @@
   cursor: pointer;
 }
 
+.ParameterSchema--disabled > .ParameterSchema__head .ParameterSchema__addButton,
+.ParameterSchema--disabled > .ParameterSchema__head .ParameterSchema__removeButton {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .ParameterSchema__validateOpenShutButton.hover,
 .ParameterSchema__validateOpenShutButton:hover,
-.ParameterSchema__addButton.hover,
-.ParameterSchema__addButton:hover,
-.ParameterSchema__removeButton.hover,
-.ParameterSchema__removeButton:hover,
+.ParameterSchema:not(.ParameterSchema--disabled) > .ParameterSchema__head .ParameterSchema__addButton.hover,
+.ParameterSchema:not(.ParameterSchema--disabled) > .ParameterSchema__head .ParameterSchema__addButton:hover,
+.ParameterSchema:not(.ParameterSchema--disabled) > .ParameterSchema__head .ParameterSchema__removeButton.hover,
+.ParameterSchema:not(.ParameterSchema--disabled) > .ParameterSchema__head .ParameterSchema__removeButton:hover,
 .ParameterSchema__previewOpenShutButton.hover,
 .ParameterSchema__previewOpenShutButton:hover,
 .ParameterSchema__infoOpenShutButton:hover,
