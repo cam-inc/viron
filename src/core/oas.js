@@ -7,6 +7,7 @@ import isNull from 'mout/lang/isNull';
 import isNumber from 'mout/lang/isNumber';
 import isObject from 'mout/lang/isObject';
 import isString from 'mout/lang/isString';
+import isUndefined from 'mout/lang/isUndefined';
 import hasOwn from 'mout/object/hasOwn';
 import keys from 'mout/object/keys';
 import moment from 'moment';
@@ -660,7 +661,7 @@ const format = (value, constraints) => {
   }
   case 'hostname': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
-    
+
     // String型のときだけバリデートする
     if (!isString(value)) {
       return result;
@@ -700,7 +701,7 @@ const format = (value, constraints) => {
       result.message = '"ipv4"に則ったフォーマットで入力してください。';
       return result;
     }
-    
+
     break;
   }
   case 'ipv6': {
@@ -797,9 +798,15 @@ export default {
    */
   validate: (value, schemaObject) => {
     const results = [];
+    let result;
+
+    // 空(i.e. undefined)の場合なvalidateしない。
+    if (isUndefined(value)) {
+      return [];
+    }
 
     // typeとselfRequiredチェックだけ最初に済ませておく。
-    let result = _type(value, schemaObject);
+    result = _type(value, schemaObject);
     if (!result.isValid) {
       return [result];
     }
