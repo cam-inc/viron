@@ -18,7 +18,11 @@ export default function() {
   const getGridColumnCountForCurrentViewport = () => {
     const containerWidth = this.refs.list.getBoundingClientRect().width;
     const baseColumnWith = 400;
-    const newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
+    let newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
+    // component数が少ない時はギリギリまで横幅を使う。
+    if (this.componentsCount < newColumnCount) {
+      newColumnCount = this.componentsCount;
+    }
     return newColumnCount;
   };
 
@@ -52,5 +56,6 @@ export default function() {
     this.components = store.getter(getters.PAGE_COMPONENTS);
     this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
     this.update();
+    updateGridColumnCount();
   });
 }
