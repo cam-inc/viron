@@ -26,7 +26,6 @@ export default function() {
   // レスポンスデータが有効か否か。
   this.isValidData = false;
   // レスポンスデータが不正の時に表示するエラー文言。
-  this.alertApi = '';
   this.alertText = '';
   // レスポンスデータ。
   this.response = null;
@@ -101,8 +100,7 @@ export default function() {
     break;
   default:
     this.isValidData = false;
-    this.alertApi = `${this.opts.component.api.method}: ${this.opts.component.api.path}`;
-    this.alertText = `component type of ${this.opts.component.style} is not supported.`;
+    this.alertText = `"${this.opts.component.style}"はサポートされていないstyleです。サポートされているstyleを使用して下さい。`;
     break;
   }
 
@@ -138,14 +136,11 @@ export default function() {
    */
   this.validateResponse = response => {
     const style = this.opts.component.style;
-    const method = this.opts.component.api.method;
-    const path = this.opts.component.api.path;
 
     if (style === STYLE_NUMBER) {
       if (typeof response !== 'object' || response.value === 'undefined') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
     }
@@ -153,20 +148,17 @@ export default function() {
     if (style === STYLE_TABLE) {
       if (!Array.isArray(response)) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.length) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'Length is 0.';
+        this.alertText = 'テーブルが空です。';
         return;
       }
       if (typeof response[0] !== 'object') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
     }
@@ -182,20 +174,17 @@ export default function() {
     ], style)) {
       if (typeof response !== 'object') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.data || !response.x || !response.y || !Array.isArray(response.data)) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.data.length) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'Length is 0.';
+        this.alertText = 'グラフデータが空です。';
         return;
       }
     }
