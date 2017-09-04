@@ -88,14 +88,9 @@ export default function() {
   const parseFile = file => {
     Promise
       .resolve()
-      .then((resolve, reject) => {
+      .then(() => {
         // JSONにパースする。
         const endpoints = JSON.parse(file);
-
-        // 空であるか。
-        if (!Object.keys({}).length) {
-          reject();
-        }
 
         // エンドポイントを配列にする。
         const endpointsArray = [];
