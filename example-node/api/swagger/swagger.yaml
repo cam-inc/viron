@@ -1601,13 +1601,6 @@ paths:
       summary: list admin_role
       tags:
       - admin_role
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /adminrole/{role_id}
-      - appendTo: row
-        method: delete
-        path: /adminrole/{role_id}
 
     post:
       x-swagger-router-controller: dmc_admin_role
@@ -1797,13 +1790,6 @@ paths:
       summary: list admin_user
       tags:
       - admin_user
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /adminuser/{id}
-      - appendTo: row
-        method: delete
-        path: /adminuser/{id}
 
     post:
       x-swagger-router-controller: dmc_admin_user
@@ -2044,13 +2030,6 @@ paths:
       summary: list blog_design
       tags:
       - blog_design
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /blogdesign/{id}
-      - appendTo: row
-        method: delete
-        path: /blogdesign/{id}
 
     post:
       x-swagger-router-controller: blog_design
@@ -2694,19 +2673,6 @@ paths:
       summary: list user
       tags:
       - user
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /user/{id}
-      - appendTo: row
-        method: delete
-        path: /user/{id}
-      - appendTo: ""
-        method: post
-        path: /user/upload/csv
-      - appendTo: ""
-        method: get
-        path: /user/download/csv
 
     post:
       x-swagger-router-controller: user
@@ -2967,13 +2933,6 @@ paths:
       summary: list user_blog
       tags:
       - user_blog
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /userblog/{id}
-      - appendTo: row
-        method: delete
-        path: /userblog/{id}
 
     post:
       x-swagger-router-controller: user_blog
@@ -3211,13 +3170,6 @@ paths:
       summary: list user_blog_entry
       tags:
       - user_blog_entry
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /userblogentry/{id}
-      - appendTo: row
-        method: delete
-        path: /userblogentry/{id}
 
     post:
       x-swagger-router-controller: user_blog_entry
@@ -3391,10 +3343,6 @@ paths:
         name: offset
         required: false
         type: integer
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /validator/{id}
       produces:
       - application/json
       responses:
@@ -3521,10 +3469,6 @@ paths:
         name: offset
         required: false
         type: integer
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /nestedarray/{id}
       produces:
       - application/json
       responses:
@@ -3651,10 +3595,6 @@ paths:
         name: offset
         required: false
         type: integer
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /format/{id}
       produces:
       - application/json
       responses:
