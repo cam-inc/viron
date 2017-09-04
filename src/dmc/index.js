@@ -88,9 +88,14 @@ export default function() {
   const parseFile = file => {
     Promise
       .resolve()
-      .then(() => {
+      .then((resolve, reject) => {
         // JSONにパースする。
         const endpoints = JSON.parse(file);
+
+        // 空であるか。
+        if (!Object.keys({}).length) {
+          reject();
+        }
 
         // エンドポイントを配列にする。
         const endpointsArray = [];
@@ -118,16 +123,17 @@ export default function() {
         .then(() => store.action(actions.MODALS_ADD, 'dmc-message', success))
         .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', failure));
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+      .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', {
         title: 'エンドポイント追加 失敗',
-        message: 'エンドポイントを追加出来ませんでした。',
-        error: err
+        message: 'エンドポイントを追加出来ませんでした',
+        error: {}
       }));
   };
 
   const addEndpoint = endpoint => {
     return new Promise((resolve, reject) => {
       let hasAllKeys = true;
+
       const keys = ['url', 'memo', 'title', 'name', 'description', 'version', 'color', 'thumbnail', 'tags'];
       forEach(keys, key => {
         if (!hasOwn(endpoint, key)) {
