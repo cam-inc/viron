@@ -11,6 +11,8 @@ export default function() {
     return ('0' + num).slice(-2);
   };
 
+  const colon = ':';
+
   this.momentDate = moment.utc(this.opts.date);
   this.displayFormatDate = format(this.momentDate);
 
@@ -19,6 +21,10 @@ export default function() {
     this.displayFormatDate = format(this.momentDate);
   }).on('updated', () => {
     this.rebindTouchEvents();
+    let splitsFormatDate = this.displayFormatDate.split(colon, 3);
+    scrollSelected(Number(splitsFormatDate[0]),'hour');
+    scrollSelected(Number(splitsFormatDate[1]),'minute');
+    scrollSelected(Number(splitsFormatDate[2]),'second');
   });
 
   this.generateHours = () => {
@@ -30,7 +36,8 @@ export default function() {
       hours[i] = {
         'date': date,
         'displayTime': displayNum,
-        'isSelected': format(date) === this.displayFormatDate
+        'isSelected': format(date) === this.displayFormatDate,
+        'scroll': i
       };
     });
     return hours;
@@ -45,7 +52,8 @@ export default function() {
       minutes[i] = {
         'date': date,
         'displayTime': displayNum,
-        'isSelected': format(date) === this.displayFormatDate
+        'isSelected': format(date) === this.displayFormatDate,
+        'scroll': i
       };
     });
     return minutes;
@@ -60,7 +68,8 @@ export default function() {
       seconds[i] = {
         'date': date,
         'displayTime': displayNum,
-        'isSelected': format(date) === format(this.momentDate)
+        'isSelected': format(date) === this.displayFormatDate,
+        'scroll': i
       };
     });
     return seconds;
@@ -71,6 +80,20 @@ export default function() {
     this.opts.onchange(formatDate);
   };
 
+  const scrollSelected = (scroll, datetype) => {
+    switch (datetype) {
+      case 'hour':
+        this.refs.hourscroll.scrollTop = scroll * 20;
+        break;
+      case 'minute':
+        this.refs.minutescroll.scrollTop = scroll * 20;
+        break;
+      case 'second':
+        this.refs.secondscroll.scrollTop = scroll * 20;
+        break;
+      default:
+    }
+  };
   this.handleInputTap = () => {
     this.opts.ontoggle(!this.opts.isshown);
   };
