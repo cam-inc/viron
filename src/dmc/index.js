@@ -1,6 +1,8 @@
 import download from 'downloadjs';
 import isUndefined from 'mout/lang/isUndefined';
 import forOwn from 'mout/Object/forOwn';
+import hasOwn from 'mout/Object/hasOwn';
+import forEach from 'mout/array/forEach';
 import { constants as actions } from '../store/actions';
 import { constants as getters } from '../store/getters';
 import { constants as states } from '../store/states';
@@ -111,7 +113,7 @@ export default function() {
 
         // 並行処理を行う。
         Promise.all(endpointsArray.map( endpoint => {
-          addEndpoint(endpoint);
+          return addEndpoint(endpoint);
         }))
         .then(() => store.action(actions.MODALS_ADD, 'dmc-message', success))
         .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', failure));
@@ -124,9 +126,23 @@ export default function() {
   };
 
   const addEndpoint = endpoint => {
-    return new Promise(resolve => {
-      store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
-      resolve();
+    return new Promise((resolve, reject) => {
+      let hasAllKeys = true;
+      const keys = ['url', 'memo', 'title', 'name', 'description', 'version', 'color', 'thumbnail', 'tags'];
+      forEach(keys, key => {
+        if (!hasOwn(endpoint, key)) {
+          hasAllKeys = false;
+        }
+      });
+
+      if (hasAllKeys) {
+        store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
+        console.log('resolve');
+        resolve();
+      } else {
+        console.log('reject');
+        reject();
+      }
     });
   };
 }
