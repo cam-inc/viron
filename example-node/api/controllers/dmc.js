@@ -21,13 +21,19 @@ const genComponent = (name, method, path, style, pagination, options) => {
   };
 };
 
-const genTableComponent = (name, method, path, query, labels) => {
+const genTableComponent = (name, method, path, primary, query, labels, actions) => {
   const component = genComponent(name, method, path, constant.DMC_STYLE_TABLE, true);
+  if (primary) {
+    component.primary = primary;
+  }
   if (query) {
     component.query = query;
   }
   if (labels) {
     component.table_labels = labels;
+  }
+  if (actions) {
+    component.actions = actions;
   }
   return component;
 };
@@ -107,21 +113,26 @@ const show = (req, res) => {
               id: 'user',
               name: 'ユーザ',
               components: [
-                genTableComponent('ユーザ', 'get', '/user', [{key: 'name', type: 'string'}], ['id', 'name']),
+                genTableComponent('ユーザ', 'get', '/user', 'id', [
+                  {key: 'name', type: 'string'}
+                ], ['id', 'name'], [
+                  '/user/upload/csv',
+                  '/user/download/csv',
+                ]),
               ],
             },
             {
               id: 'userblog',
               name: 'ユーザブログ',
               components: [
-                genTableComponent('ユーザブログ', 'get', '/userblog', null, ['id', 'user_id']),
+                genTableComponent('ユーザブログ', 'get', '/userblog', 'id', null, ['id', 'user_id']),
               ],
             },
             {
               id: 'userblogentry',
               name: 'ユーザブログ記事',
               components: [
-                genTableComponent('ユーザブログ記事', 'get', '/userblogentry', null, ['id', 'user_blog_id']),
+                genTableComponent('ユーザブログ記事', 'get', '/userblogentry', 'id', null, ['id', 'user_blog_id']),
               ],
             },
           ],
@@ -130,21 +141,21 @@ const show = (req, res) => {
               id: 'validator',
               name: 'バリデータ',
               components: [
-                genTableComponent('バリデータ', 'get', '/validator', null, ['validation_type']),
+                genTableComponent('バリデータ', 'get', '/validator', 'id', null, ['validation_type']),
               ],
             },
             {
               id: 'nestedarray',
               name: 'ネスト配列',
               components: [
-                genTableComponent('ネスト配列', 'get', '/nestedarray', null, ['id']),
+                genTableComponent('ネスト配列', 'get', '/nestedarray', 'id', null, ['id']),
               ],
             },
             {
               id: 'format',
               name: 'フォーマット',
               components: [
-                genTableComponent('フォーマット', 'get', '/format', null, ['id']),
+                genTableComponent('フォーマット', 'get', '/format', 'id', null, ['id']),
               ],
 
             },
@@ -154,7 +165,7 @@ const show = (req, res) => {
               id: 'blogdesign',
               name: 'ブログデザイン',
               components: [
-                genTableComponent('ブログデザイン', 'get', '/blogdesign', null, ['id', 'name']),
+                genTableComponent('ブログデザイン', 'get', '/blogdesign', 'id', null, ['id', 'name']),
               ],
             },
           ],
@@ -164,21 +175,21 @@ const show = (req, res) => {
               id: 'adminrole',
               name: 'DMC ユーザ権限',
               components: [
-                genTableComponent('DMC ユーザ権限', 'get', '/adminrole', null, ['role_id']),
+                genTableComponent('DMC ユーザ権限', 'get', '/adminrole', 'role_id', null, ['role_id']),
               ],
             },
             {
               id: 'adminuser',
               name: 'DMC 管理ユーザ',
               components: [
-                genTableComponent('DMC 管理ユーザ', 'get', '/adminuser', null, ['email', 'role_id']),
+                genTableComponent('DMC 管理ユーザ', 'get', '/adminuser', 'id', null, ['email', 'role_id']),
               ],
             },
             {
               id: 'auditlog',
               name: 'DMC 監査ログ',
               components: [
-                genTableComponent('DMC 監査ログ', 'get', '/auditlog', null, ['createdAt', 'request_uri', 'request_method']),
+                genTableComponent('DMC 監査ログ', 'get', '/auditlog', null, null, ['createdAt', 'request_uri', 'request_method']),
               ],
             },
           ],
