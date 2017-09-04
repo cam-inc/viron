@@ -94,9 +94,13 @@ export default function() {
   const scrollSelected = (scroll, datetype) => {
     if(this.refs.hourscroll && datetype === 'hour'){
       this.refs.hourscroll.scrollTop = scroll * 20;
-    }else if(this.refs.minutescroll && datetype === 'minute'){
+    }
+
+    if(this.refs.minutescroll && datetype === 'minute'){
       this.refs.minutescroll.scrollTop = scroll * 20;
-    }else if(this.refs.secondscroll && datetype === 'second'){
+    }
+
+    if(this.refs.secondscroll && datetype === 'second'){
       this.refs.secondscroll.scrollTop = scroll * 20;
     }
   };
