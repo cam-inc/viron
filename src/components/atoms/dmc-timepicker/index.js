@@ -28,7 +28,7 @@ export default function() {
       this.displayFormatDate = format(this.momentDate);
     } else {
       this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0);
-      this.displayFormatDate = '';
+      this.displayFormatDate = format(this.momentDate);
     }
   }).on('updated', () => {
     this.rebindTouchEvents();
@@ -93,18 +93,16 @@ export default function() {
 
   const scrollSelected = (scroll, datetype) => {
 
-    let clientHeight = document.querySelector('.Partialtime__listItem').clientHeight;
-
     if(this.refs.hourlist && datetype === 'hour'){
-      this.refs.hourlist.scrollTop = scroll * clientHeight;
+      this.refs.hourlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
     }
 
     if(this.refs.minutelist && datetype === 'minute'){
-      this.refs.minutelist.scrollTop = scroll * clientHeight;
+      this.refs.minutelist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
     }
 
     if(this.refs.secondlist && datetype === 'second'){
-      this.refs.secondlist.scrollTop = scroll * clientHeight;
+      this.refs.secondlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
     }
   };
   this.handleInputTap = () => {
