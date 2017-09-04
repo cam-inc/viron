@@ -228,7 +228,7 @@ export default function () {
       y = containerRect.height;
     }
     if (y < 0) {
-      y = .1;
+      y = 0;
     }
 
     const hue = this.getHsv().h;
