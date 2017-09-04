@@ -31,8 +31,8 @@ export default function () {
   };
 
   /**
-   * HEXの値が正しくなるよう変更をかけます
-   * @param {*} value 
+   * HEXの値が正しくなるよう変更をかけます。
+   * @param {String} 
    */
   const normalizeHexValue = value => {
     value = value.replace(/　/g, ' '); // eslint-disable-line no-irregular-whitespace
@@ -59,7 +59,7 @@ export default function () {
   };
 
   /**
-   * カラーを変換します
+   * カラーを変換します。
    * @param {String} colorCode
    * @param {String} colorValue
    * @param {String} exportColorcode 
@@ -88,7 +88,7 @@ export default function () {
   };
 
   /**
-   * スペクトラムのViewを更新する
+   * スペクトラムのViewを更新します。
    */
   const updateSpectrum = () => {
     const canvas = this.refs.canvas;
@@ -172,6 +172,7 @@ export default function () {
       lastValidColor = this.color.value;
     }
   }).on('updated', () => {
+    // タッチイベントの更新
     this.rebindTouchEvents();
     if (this.opts.isshown) {
       context = context || this.refs.canvas.getContext('2d');
@@ -333,7 +334,8 @@ export default function () {
   };
 
   /**
-   * readonlyのinputの値を表示します。
+   * readonlyのinputの値を返却します。
+   * @return {String}
    */
   this.getDummyValue = () => {
     let style = '';
@@ -350,6 +352,10 @@ export default function () {
     return style;
   };
 
+  /**
+   * 表示用のHEX値を返却します。
+   * @return {String}
+   */
   this.getHexValue = () => {
     if (isUndefined(this.opts.color.value)) {
       return '#000000';
@@ -387,7 +393,7 @@ export default function () {
    *****************************************/
 
   /**
-   * 表示カラーコードを切り替える
+   * 表示カラーコードを切り替えます。
    */
   this.handleColorChangeButtonTap = () => {
     const order = [COLOR_CODE.HEX, COLOR_CODE.RGBA];
@@ -409,7 +415,7 @@ export default function () {
 
   /**
    * スペクトラムのイベントリスナーハンドラー
-   * マウスダウンしたとき色を取得する
+   * マウスダウンしたとき色を取得します。
    * @param {eventObject} e
    */
   this.handleCanvasMouseDown = e => {
@@ -426,7 +432,7 @@ export default function () {
 
   /**
    * スペクトラムのイベントリスナーハンドラー
-   * キャッチャーの中でマウスムーブしたとき色を取得する
+   * キャッチャーの中でマウスムーブしたとき色を取得します。
    * @param {eventObject} e
    */
   this.handleCatcherMouseMove = e => {
@@ -445,7 +451,7 @@ export default function () {
 
   /**
    * スペクトラムのイベントリスナーハンドラー
-   * キャッチャーの中でマウスアップしたとき色を取得する
+   * キャッチャーの中でマウスアップしたとき色を取得します。
    * @param {eventObject} e
    */
   this.handleCatcherMouseUp = e => {
@@ -462,7 +468,7 @@ export default function () {
 
   /**
    * スペクトラムのイベントリスナーハンドラー
-   * タッチしたとき色を取得する
+   * タッチしたとき色を取得します。
    * @param {eventObject} e
    */
   this.handleCanvasTouchStart = e => {
@@ -478,7 +484,7 @@ export default function () {
 
   /**
    * スペクトラムのイベントリスナーハンドラー
-   * キャッチャーの中でタッチムーブしたとき色を取得する
+   * キャッチャーの中でタッチムーブしたとき色を取得します。
    * @param {eventObject} e
    */
   this.handleCatcherTouchMove = e => {
@@ -496,7 +502,7 @@ export default function () {
 
   /**
    * スペクトラムのイベントリスナーハンドラー
-   * キャッチャーの中でタッチエンドしたとき色を取得する
+   * キャッチャーの中でタッチエンドしたとき色を取得します。
    * @param {eventObject} e
    */
   this.handleCatcherTouchEnd = e => {
@@ -512,7 +518,7 @@ export default function () {
 
   /**
    * 色相スライダーのイベントリスナーハンドラー
-   * スライダーを移動したとき色相値を取得する
+   * スライダーを移動したとき色相値を取得します。
    */
   this.handleHueSliderChange = (hue) => {
     const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
@@ -530,7 +536,7 @@ export default function () {
 
   /**
    * 透明度スライダーのイベントリスナーハンドラー
-   * スライダーを移動したとき透明度を取得する
+   * スライダーを移動したとき透明度を取得します。
    */
   this.handleAlphaSliderChange = (alpha) => {
     const color = objectAssign({},this.color);
