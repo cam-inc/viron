@@ -92,16 +92,19 @@ export default function() {
   };
 
   const scrollSelected = (scroll, datetype) => {
+
+    let clientHeight = document.querySelector('.Partialtime__listItem').clientHeight;
+
     if(this.refs.hourlist && datetype === 'hour'){
-      this.refs.hourlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;;
+      this.refs.hourlist.scrollTop = scroll * clientHeight;
     }
 
     if(this.refs.minutelist && datetype === 'minute'){
-      this.refs.minutelist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;;
+      this.refs.minutelist.scrollTop = scroll * clientHeight;
     }
 
     if(this.refs.secondlist && datetype === 'second'){
-      this.refs.secondlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;;
+      this.refs.secondlist.scrollTop = scroll * clientHeight;
     }
   };
   this.handleInputTap = () => {
