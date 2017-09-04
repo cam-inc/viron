@@ -100,11 +100,8 @@
 }
 
 .Colorpicker__sliderContainer {
-  display: flex;
+  @apply --layout-column-stretch-spaceEvenly;
   flex: 1;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: space-evenly;
 }
 
 .Colorpicker__hueSlider > .Slider .Slider__rail {
@@ -158,13 +155,11 @@
 }
 
 .Colorpicker__colorcodeHex {
-  display: flex;
+  @apply --layout-center-center:
   width: 100%;
   font-weight: 600;
   color: var(--color-text-secondary);
   cursor: default;
-  justify-content: center;
-  align-items: center;
 }
 
 .Colorpicker__colorcodeRgba {
