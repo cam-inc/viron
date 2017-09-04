@@ -54,14 +54,14 @@ export default function() {
     scrollSelected(Number(splitsFormatDate[2]),'second');
   });
 
-  //　itemListの表示
+  // itemListの表示
   // 引数に応じて表示する内容を変える。
   this.generateTimes = time => {
 
     let maxDisplayTime;
     // timeがhourの時MAX_DISPLAY_TIMEに24を設定
     if(time === 'hour'){
-     maxDisplayTime = 24;
+      maxDisplayTime = 24;
     }
     // timeがhourの時MAX_DISPLAY_TIMEに60を設定
     if(time === 'minute'){
