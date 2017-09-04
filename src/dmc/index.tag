@@ -18,6 +18,12 @@ dmc.Application
               .Application__menuItemIcon
                 dmc-icon(type="download")
               .Application__menuItemLabel ダウンロード
+            .Application__menuItem
+              label.Application__menuItemLabel(for="file")
+                .Application__menuItemIcon
+                  dmc-icon(type="upload")
+                .Application__menuItemLabel アップロード
+              input.Application__menuItemInput(type="file" accept='application/json' id="file" ref="upload" onChange="{ handleFileChange }")
       virtual(if="{ !isTopPage }")
         dmc-menu
     .Application__mainColumn
