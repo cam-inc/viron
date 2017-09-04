@@ -81,17 +81,12 @@ export default function() {
   };
 
   const scrollSelected = (scroll, datetype) => {
-    switch (datetype) {
-      case 'hour':
-        this.refs.hourscroll.scrollTop = scroll * 20;
-        break;
-      case 'minute':
-        this.refs.minutescroll.scrollTop = scroll * 20;
-        break;
-      case 'second':
-        this.refs.secondscroll.scrollTop = scroll * 20;
-        break;
-      default:
+    if(datetype === 'hour'){
+      this.refs.hourscroll.scrollTop = scroll * 20;
+    }else if(datetype === 'minute'){
+      this.refs.minutescroll.scrollTop = scroll * 20;
+    }else if(datetype === 'second'){
+      this.refs.secondscroll.scrollTop = scroll * 20;
     }
   };
   this.handleInputTap = () => {
