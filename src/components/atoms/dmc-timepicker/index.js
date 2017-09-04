@@ -4,15 +4,31 @@ import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
 
+  // データをPartialTime(HH:mm:ss)のフォーマットにする関数
   const format = date => {
     return date.format('HH:mm:ss');
   };
 
+  // 数字を二桁にする関数
   const digitNum = num => {
     return ('0' + num).slice(-2);
   };
 
-  const colon = ':';
+  // スクロールイベントに使う関数
+  const scrollSelected = (scroll, datetype) => {
+
+    if(this.refs.hourlist && datetype === 'hour'){
+      this.refs.hourlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
+    }
+
+    if(this.refs.minutelist && datetype === 'minute'){
+      this.refs.minutelist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
+    }
+
+    if(this.refs.secondlist && datetype === 'second'){
+      this.refs.secondlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
+    }
+  };
 
   if (!isUndefined(this.opts.date)) {
     this.momentDate = moment.utc(this.opts.date);
@@ -32,78 +48,47 @@ export default function() {
     }
   }).on('updated', () => {
     this.rebindTouchEvents();
-    let splitsFormatDate = this.displayFormatDate.split(colon, 3);
+    const splitsFormatDate = this.displayFormatDate.split(':', 3);
     scrollSelected(Number(splitsFormatDate[0]),'hour');
     scrollSelected(Number(splitsFormatDate[1]),'minute');
     scrollSelected(Number(splitsFormatDate[2]),'second');
   });
 
-  this.generateHours = () => {
-    const MAX_DISPLAY_HOURS = 24;
-    const hours = [];
-    times(MAX_DISPLAY_HOURS, i => {
-      const date = this.momentDate.clone().set('hours',i);
+  //　itemListの表示
+  // 引数に応じて表示する内容を変える。
+  this.generateTimes = time => {
+
+    let maxDisplayTime;
+    // timeがhourの時MAX_DISPLAY_TIMEに24を設定
+    if(time === 'hour'){
+     maxDisplayTime = 24;
+    }
+    // timeがhourの時MAX_DISPLAY_TIMEに60を設定
+    if(time === 'minute'){
+      maxDisplayTime = 60;
+    }
+    // timeがhourの時MAX_DISPLAY_TIMEに60を設定
+    if(time === 'second'){
+      maxDisplayTime = 60;
+    }
+    // 配列timeを用意
+    const timeValue = [];
+    times(maxDisplayTime, i => {
+      const date = this.momentDate.clone().set(time,i);
       const displayNum = digitNum(i);
-      hours[i] = {
-        'date': date,
+      timeValue[i] = {
+        date,
         'displayTime': displayNum,
         'isSelected': format(date) === this.displayFormatDate,
         'scroll': i
       };
     });
-    return hours;
+    return timeValue;
   };
 
-  this.generateMinutes = () => {
-    const MAX_DISPLAY_MINUTES = 60;
-    const minutes = [];
-    times(MAX_DISPLAY_MINUTES, i => {
-      const date = this.momentDate.clone().set('minutes',i);
-      const displayNum = digitNum(i);
-      minutes[i] = {
-        'date': date,
-        'displayTime': displayNum,
-        'isSelected': format(date) === this.displayFormatDate,
-        'scroll': i
-      };
-    });
-    return minutes;
-  };
-
-  this.generateSeconds = () => {
-    const MAX_DISPLAY_SECONDS = 60;
-    const seconds = [];
-    times(MAX_DISPLAY_SECONDS, i => {
-      const date = this.momentDate.clone().set('seconds',i);
-      const displayNum = digitNum(i);
-      seconds[i] = {
-        'date': date,
-        'displayTime': displayNum,
-        'isSelected': format(date) === this.displayFormatDate,
-        'scroll': i
-      };
-    });
-    return seconds;
-  };
-
-  this.handleSelectItem = date => {
+  this.handleSelectItemTap = date => {
     let formatDate = date.toISOString();
     this.opts.onchange(formatDate);
-  };
-
-  const scrollSelected = (scroll, datetype) => {
-
-    if(this.refs.hourlist && datetype === 'hour'){
-      this.refs.hourlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
-    }
-
-    if(this.refs.minutelist && datetype === 'minute'){
-      this.refs.minutelist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
-    }
-
-    if(this.refs.secondlist && datetype === 'second'){
-      this.refs.secondlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
-    }
   };
   this.handleInputTap = () => {
     this.opts.ontoggle(!this.opts.isshown);
