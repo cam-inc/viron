@@ -59,6 +59,7 @@ class Context {
           },
           admin_role: {
             admin_roles: store.models.AdminRoles,
+            admin_users: store.models.AdminUsers,
             store: store.instance,
             default_role: this.getDefaultRole(),
           },
