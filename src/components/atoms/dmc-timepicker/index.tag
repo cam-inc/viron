@@ -4,11 +4,11 @@ dmc-timepicker.Timepicker
     .Timepicker__partialTime(if="{ opts.isshown }")
       .Partialtime__body
         .Partialtime__list.Partialtime__list--left(ref="hourlist")
-          dmc-timepicker-partial(datetype="hour" each="{ generateTimes('hour') }" date="{ date }" time="{ displayTime }" isSelected="{ isSelected }" scroll="{ scroll }" onPat="{ parent.handleSelectItemTap }")
+          dmc-timepicker-partial(each="{ generateTimes('hour') }" date="{ date }" time="{ displayNum }" isSelected="{ isSelected }" scroll="{ scroll }" onPat="{ parent.handleSelectItemTap }")
         .Partialtime__list.Partialtime__list--center(ref="minutelist")
-          dmc-timepicker-partial(datetype="minute" each="{ generateTimes('minute') }" date="{ date }" time="{ displayTime }" isSelected="{ isSelected }" scroll="{ scroll }" onPat="{ parent.handleSelectItemTap }")
+          dmc-timepicker-partial(each="{ generateTimes('minute') }" date="{ date }" time="{ displayNum }" isSelected="{ isSelected }" scroll="{ scroll }" onPat="{ parent.handleSelectItemTap }")
         .Partialtime__list.Partialtime__list--right(ref="secondlist")
-          dmc-timepicker-partial(datetype="second" each="{ generateTimes('second') }" date="{ date }" time="{ displayTime }" isSelected="{ isSelected }" scroll="{ scroll }" onPat="{ parent.handleSelectItemTap }")
+          dmc-timepicker-partial(each="{ generateTimes('second') }" date="{ date }" time="{ displayNum }" isSelected="{ isSelected }" scroll="{ scroll }" onPat="{ parent.handleSelectItemTap }")
 
     script.
       import '../../atoms/dmc-timepicker/partial.tag';
