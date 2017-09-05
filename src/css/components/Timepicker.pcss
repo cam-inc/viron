@@ -32,7 +32,7 @@
 .Timepicker__partialTime {
   position: absolute;
   display: inline-block;
-  width: 120%;
+  width: 100%;
 }
 
 .Partialtime__body {
@@ -51,18 +51,13 @@
   overflow: scroll;
 }
 
-.Partialtime__list--left {
-}
-
 .Partialtime__list--center {
   border-right: 0.5px solid var(--color-basic-lightGray);
   border-left: 0.5px solid var(--color-basic-lightGray);
 }
 
-.Partialtime__list--right {
-}
-
 .Partialtime__listItem {
+  height: 20px;
   padding: 1px 5px;
   font-size: calc(var(--component-timepicker-font-size) * 0.5);
   cursor: pointer;
