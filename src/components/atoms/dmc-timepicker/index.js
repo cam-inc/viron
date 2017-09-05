@@ -4,92 +4,97 @@ import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
 
-  // データをPartialTime(HH:mm:ss)のフォーマットにする関数
-  const format = date => {
+  /**
+   *  moment.utc()のオブジェクトから指定した型にフォーマットする為に使用
+   * @param {Object} date
+   */
+  const partialFormat = date => {
     return date.format('HH:mm:ss');
   };
 
-  // 数字を二桁にする関数
+  /**
+   *  1桁数字を2桁数字(文字列)として返す。0→01
+   * @param {Number} num
+   * @return {String}
+   */
   const digitNum = num => {
     return ('0' + num).slice(-2);
   };
 
-  // スクロールイベントに使う関数
+  /**
+   * 選択された対象をセレクトリストの一番上に表示
+   * @param {Number} scroll
+   * @param {String} datetype
+   */
   const scrollSelected = (scroll, datetype) => {
-
-    if(this.refs.hourlist && datetype === 'hour'){
-      this.refs.hourlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
-    }
-
-    if(this.refs.minutelist && datetype === 'minute'){
-      this.refs.minutelist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
-    }
-
-    if(this.refs.secondlist && datetype === 'second'){
-      this.refs.secondlist.scrollTop = scroll * document.querySelector('.Partialtime__listItem').clientHeight;
-    }
+    // 対象の高さを取得し、変数へ代入
+    // document.querySelectorを使うと簡単にwindow内のどのDOMにもアクセスできてしまう。
+    let targetHeight = document.querySelector('.Partialtime__listItem').clientHeight;
+    // datetypeの値と照らし合わせ、スクロールトップへ設定
+    if(datetype === 'hour') this.refs.hourlist.scrollTop = scroll * targetHeight;
+    if(datetype === 'minute') this.refs.minutelist.scrollTop = scroll * targetHeight;
+    if(datetype === 'second') this.refs.secondlist.scrollTop = scroll * targetHeight;
   };
 
+  // momentオブジェクトを入れる変数を宣言
+  let momentObj = {};
+  // 値がなければ時：分：秒に0を設定し、画面表示されないように空文字を代入
   if (!isUndefined(this.opts.date)) {
-    this.momentDate = moment.utc(this.opts.date);
-    this.displayFormatDate = format(this.momentDate);
+    momentObj = moment.utc(this.opts.date);
+    this.displayFormatDate = partialFormat(momentObj);
   } else {
-    this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
+    momentObj = moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
     this.displayFormatDate = '';
   }
 
   this.on('update', () => {
-    if (!isUndefined(this.opts.date)) {
-      this.momentDate = moment.utc(this.opts.date);
-      this.displayFormatDate = format(this.momentDate);
-    } else {
-      this.momentDate = moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
-      this.displayFormatDate = format(this.momentDate);
-    }
+    // 値がなければ時：分：秒に0を設定する。画面表示をさせるためpartialFormat(this.momentObj)を代入。
+    console.log(this.opts.date);
+    momentObj = (!isUndefined(this.opts.date)) ? moment.utc(this.opts.date) : moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
+    this.displayFormatDate = partialFormat(momentObj);
   }).on('updated', () => {
     this.rebindTouchEvents();
     const splitsFormatDate = this.displayFormatDate.split(':', 3);
-    scrollSelected(Number(splitsFormatDate[0]),'hour');
-    scrollSelected(Number(splitsFormatDate[1]),'minute');
-    scrollSelected(Number(splitsFormatDate[2]),'second');
+    if(this.refs.hourlist) scrollSelected(Number(splitsFormatDate[0]),'hour');
+    if(this.refs.minutelist) scrollSelected(Number(splitsFormatDate[1]),'minute');
+    if(this.refs.secondlist) scrollSelected(Number(splitsFormatDate[2]),'second');
   });
 
-  // itemListの表示
-  // 引数に応じて表示する内容を変える。
-  this.generateTimes = time => {
-
+  /**
+   * プルダウンリストの表示
+   * 引数の値に応じて表示する内容を変更
+   * @param {String} datetype
+   */
+  this.generateTimes = datetype => {
     let maxDisplayTime;
-    // timeがhourの時MAX_DISPLAY_TIMEに24を設定
-    if(time === 'hour'){
-      maxDisplayTime = 24;
-    }
-    // timeがhourの時MAX_DISPLAY_TIMEに60を設定
-    if(time === 'minute'){
-      maxDisplayTime = 60;
-    }
-    // timeがhourの時MAX_DISPLAY_TIMEに60を設定
-    if(time === 'second'){
-      maxDisplayTime = 60;
-    }
-    // 配列timeを用意
-    const timeValue = [];
+    // datetypeの値と比較して,対象の繰り返し表示の回数を設定
+    if(datetype === 'hour') maxDisplayTime = 24;
+    if(datetype === 'minute') maxDisplayTime = 60;
+    if(datetype === 'second') maxDisplayTime = 60;
+    // 配列arrayTimeを用意
+    const arrayTime = [];
+    // mout/function/timeを使用し、上記で設定した回数下記の文を繰り返す
     times(maxDisplayTime, i => {
-      const date = this.momentDate.clone().set(time,i);
+      const date = momentObj.clone().set(datetype,i);
       const displayNum = digitNum(i);
-      timeValue[i] = {
+      arrayTime[i] = {
         date,
-        'displayTime': displayNum,
-        'isSelected': format(date) === this.displayFormatDate,
+        displayNum,
+        'isSelected': partialFormat(date) === this.displayFormatDate,
         'scroll': i
       };
     });
-    return timeValue;
+    return arrayTime;
   };
-
+  /**
+   * プルダウンリストのリストをタップした際のイベント
+   * @param {Object} date
+   */
   this.handleSelectItemTap = date => {
-    let formatDate = date.toISOString();
-    this.opts.onchange(formatDate);
+    let isoFormatDate = date.toISOString();
+    this.opts.onchange(isoFormatDate);
   };
+  // テキストボックスをタップした際のイベント
   this.handleInputTap = () => {
     this.opts.ontoggle(!this.opts.isshown);
   };
