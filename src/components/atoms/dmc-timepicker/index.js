@@ -49,7 +49,6 @@ export default function() {
 
   this.on('update', () => {
     // 値がなければ時：分：秒に0を設定する。画面表示をさせるためpartialFormat(this.momentObj)を代入。
-    console.log(this.opts.date);
     momentObj = (!isUndefined(this.opts.date)) ? moment.utc(this.opts.date) : moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
     this.displayFormatDate = partialFormat(momentObj);
   }).on('updated', () => {
