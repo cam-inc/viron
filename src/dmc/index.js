@@ -130,14 +130,16 @@ export default function() {
             message: 'エンドポイントが一覧に追加されました。'
           }));
         })
-        .catch(() => {
+        .catch(err => {
           store.action(actions.MODALS_ADD, 'dmc-message', {
             title: 'エンドポイント追加 失敗',
             message: 'エンドポイントを追加出来ませんでした。',
-            error: {}
+            error: err
           });
-          inputFile.value = '';
         });
+
+      // inputしたjsonをリセットする。
+      inputFile.value = '';
     };
   };
 
@@ -163,9 +165,6 @@ export default function() {
    * @return {Promise}
    */
   const addEndpoint = endpoint => {
-    return new Promise(resolve => {
-      store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
-      resolve();
-    });
+    return store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
   };
 }
