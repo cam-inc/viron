@@ -2,7 +2,7 @@ import moment from 'moment';
 import times from 'mout/function/times';
 import isUndefined from 'mout/lang/isUndefined';
 
-//　セレクトリストのセルの高さ
+// セレクトリストのセルの高さ
 const CELL_HEIGHT = 25;
 
 export default function() {
