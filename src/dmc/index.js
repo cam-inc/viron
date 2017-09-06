@@ -123,7 +123,7 @@ export default function() {
 
           // エンドポイントをStoreへ追加する。
           return Promise.all(endpointsArray.map( endpoint => {
-            return addEndpoint(endpoint);
+            return store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
           }))
           .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
             title: 'エンドポイント追加',
@@ -133,7 +133,6 @@ export default function() {
         .catch(err => {
           store.action(actions.MODALS_ADD, 'dmc-message', {
             title: 'エンドポイント追加 失敗',
-            message: 'エンドポイントを追加出来ませんでした。',
             error: err
           });
         });
