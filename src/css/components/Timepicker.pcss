@@ -36,13 +36,13 @@
 }
 
 .Timepicker__partialTimeBody {
+  @apply --layout-between-stretch;
   top: 0;
+  flex-wrap: wrap;
   height: 100px;
   background-color: var(--color-basic-white);
   border-radius: 3px;
   box-shadow: 0 0 1px;
-  @apply --layout-between-stretch;
-  flex-wrap: wrap;
 }
 
 .Timepicker__partialTimeList {
@@ -51,8 +51,8 @@
 }
 
 /*プルダウンメニューのタップ領域を増やす為、スクロールバーを除去*/
-.Timepicker__partialTimeList::-webkit-scrollbar{
-    display:none;
+.Timepicker__partialTimeList::-webkit-scrollbar {
+  display: none;
 }
 
 .Timepicker__partialTimeList--center {
