@@ -28,7 +28,9 @@
 .Table__itemsTitle {
   @apply --text-truncate;
   flex-grow: 1;
+  font-weight: bold;
   cursor: pointer;
+  user-select: none;
 }
 
 .Table__itemsTitle:hover,
@@ -88,60 +90,40 @@
 /* item */
 /* ============================== */
 
+.Table__itemsContent {
+  @apply --layout-stretch-start;
+  overflow-x: scroll;
+}
+
 .Table__item {
   display: block;
+  flex-shrink: 0;
   padding: 8px;
-  margin-bottom: 8px;
+  margin-right: 4px;
   background-color: #fff;
   border-right: 2px solid var(--color-bg-tertiary);
   border-left: 2px solid var(--color-bg-tertiary);
 }
 
-.Table__items .Table__item:last-child {
-  margin-bottom: 0;
+.Table__itemsContent .Table__item:last-child {
+  margin-right: 0;
 }
 
 .Table__itemHeader {
   @apply --layout-center-center;
-  cursor: pointer;
-}
-
-.Table__itemHeader:hover,
-.Table__itemHeader.hover {
-  opacity: 0.5;
-}
-
-.Table__itemInfo {
-  flex-grow: 1;
+  margin-bottom: 4px;
 }
 
 .Table__itemTitle {
+  flex-grow: 1;
+  flex-shrink: 0;
+  margin-right: 4px;
   font-weight: bold;
 }
 
 .Table__itemType {
+  flex-shrink: 0;
   color: var(--color-bg-secondary);
-}
-
-.Table__item--opened .Table__itemHeader {
-  margin-bottom: 4px;
-}
-
-.Table__itemOpenShut {
-  @apply --layout-center-center;
-  width: 12px;
-  height: 12px;
-  margin-left: 4px;
-  font-size: 12px;
-}
-
-.Table__itemOpenShut .Icon {
-  transition-duration: 100ms;
-  transition-property: transform;
-}
-
-.Table__item--opened .Table__itemOpenShut .Icon {
-  transform: rotate(180deg);
 }
 
 .Table__cell {

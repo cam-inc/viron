@@ -2,8 +2,7 @@ import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 
 export default function() {
-
-  this.isOpened = false;
+  this.isOpened = true;
   this.title = '';
   // keyが指定されていればそれを使う。
   let item;
