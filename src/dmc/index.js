@@ -55,7 +55,6 @@ export default function() {
 
   this.handleFileChange = e =>{
     const file = e.target.files[0];
-    const reader = new FileReader();
 
     // ファイルを取得出来たか。
     if (isUndefined(file)) {
@@ -73,6 +72,7 @@ export default function() {
     }
 
     // ファイルをテキストとして読み込む。
+    const reader = new FileReader();
     reader.readAsText(file);
 
     // 読み込みが成功し、完了した。
