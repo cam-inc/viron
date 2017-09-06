@@ -1,54 +1,4 @@
 (function () {
-var UNDEF;
-
-    /**
-     * Parses string and convert it into a native value.
-     */
-    function typecast(val) {
-        var r;
-        if ( val === null || val === 'null' ) {
-            r = null;
-        } else if ( val === 'true' ) {
-            r = true;
-        } else if ( val === 'false' ) {
-            r = false;
-        } else if ( val === UNDEF || val === 'undefined' ) {
-            r = UNDEF;
-        } else if ( val === '' || isNaN(val) ) {
-            //isNaN('') returns false
-            r = val;
-        } else {
-            //parseFloat(null || '') returns NaN
-            r = parseFloat(val);
-        }
-        return r;
-    }
-
-    var typecast_1 = typecast;
-
-/**
-     * Gets full query as string with all special chars decoded.
-     */
-    function getQuery(url) {
-        // url = url.replace(/#.*\?/, '?'); //removes hash (to avoid getting hash query)
-        var queryString = /\?[a-zA-Z0-9\=\&\%\$\-\_\.\+\!\*\'\(\)\,]+/.exec(url); //valid chars according to: http://www.ietf.org/rfc/rfc1738.txt
-        return (queryString)? decodeURIComponent(queryString[0].replace(/\+/g,' ')) : '';
-    }
-
-    var getQuery_1 = getQuery;
-
-/**
-     * Get query parameter value.
-     */
-    function getParam(url, param, shouldTypecast){
-        var regexp = new RegExp('(\\?|&)'+ param + '=([^&]*)'), //matches `?param=value` or `&param=value`, value = $2
-            result = regexp.exec( getQuery_1(url) ),
-            val = (result && result[2])? result[2] : null;
-        return shouldTypecast === false? val : typecast_1(val);
-    }
-
-    var getParam_1 = getParam;
-
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -3129,7 +3079,7 @@ var _dontEnums;
 
 var _rKind = /^\[object (.*)\]$/;
 var _toString = Object.prototype.toString;
-var UNDEF$1;
+var UNDEF;
 
     /**
      * Gets the "kind" of value. (e.g. "String", "Number", etc)
@@ -3137,7 +3087,7 @@ var UNDEF$1;
     function kindOf(val) {
         if (val === null) {
             return 'Null';
-        } else if (val === UNDEF$1) {
+        } else if (val === UNDEF) {
             return 'Undefined';
         } else {
             return _rKind.exec( _toString.call(val) )[1];
@@ -6781,7 +6731,7 @@ var _dontEnums$1;
 
 var _rKind$1 = /^\[object (.*)\]$/;
 var _toString$1 = Object.prototype.toString;
-var UNDEF$2;
+var UNDEF$1;
 
     /**
      * Gets the "kind" of value. (e.g. "String", "Number", etc)
@@ -6789,7 +6739,7 @@ var UNDEF$2;
     function kindOf$1(val) {
         if (val === null) {
             return 'Null';
-        } else if (val === UNDEF$2) {
+        } else if (val === UNDEF$1) {
             return 'Undefined';
         } else {
             return _rKind$1.exec( _toString$1.call(val) )[1];
@@ -7253,8 +7203,6 @@ var oas = {
   client: null
 };
 
-var oauthEndpointKey = store.get('oauth_endpoint_key', null);
-
 // 選択中の`page`情報。
 // `page` = 左メニュー(dmc)の一要素。
 var page = null;
@@ -7279,7 +7227,6 @@ const constants$3 = {
   LAYOUT: 'LAYOUT',
   LOCATION: 'LOCATION',
   MODALS: 'MODALS',
-  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   SIGNIN_SHOW_KEY: 'SIGNIN_SHOW_KEY',
   TOASTS: 'TOASTS',
@@ -7297,7 +7244,6 @@ var states = {
   layout,
   location: location$1,
   modals,
-  oauthEndpointKey,
   page,
   signinShowKey,
   toasts,
@@ -7514,7 +7460,9 @@ var endpoints$1 = {
    * @return {Array}
    */
   updateToken: (context, endpointKey, token) => {
-    context.state.endpoints[endpointKey].token = token;
+    if (!!context.state.endpoints[endpointKey]) {
+      context.state.endpoints[endpointKey].token = token;
+    }
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
   },
@@ -7638,19 +7586,6 @@ var oas$1 = {
   }
 };
 
-var oauthEndpointKey$1 = {
-  /**
-   * OAuth認証中のエンドポイントkeyを変更します。
-   * @param {riotx.Context} context
-   * @param {String|null} endpointKey
-   * @return {Array}
-   */
-  all: (context, endpointKey) => {
-    context.state.oauthEndpointKey = store.set('oauth_endpoint_key', endpointKey);
-    return [constants$3.OAUTHENDPOINTKEY];
-  }
-};
-
 var page$1 = {
   /**
    * ページ情報を書き換えます。
@@ -7746,7 +7681,6 @@ const constants$2 = {
   MODALS_REMOVE: 'MODALS_REMOVE',
   OAS_CLIENT: 'OAS_CLIENT',
   OAS_CLIENT_CLEAR: 'OAS_CLIENT_CLEAR',
-  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   TOASTS_ADD: 'TOASTS_ADD',
   TOASTS_REMOVE: 'TOASTS_REMOVE',
@@ -7779,7 +7713,6 @@ var mutations = {
   [constants$2.MODALS_REMOVE]: modals$1.remove,
   [constants$2.OAS_CLIENT]: oas$1.client,
   [constants$2.OAS_CLIENT_CLEAR]: oas$1.clearClient,
-  [constants$2.OAUTH_ENDPOINT_KEY]: oauthEndpointKey$1.all,
   [constants$2.PAGE]: page$1.all,
   [constants$2.TOASTS_ADD]: toasts$1.add,
   [constants$2.TOASTS_REMOVE]: toasts$1.remove,
@@ -8147,6 +8080,16 @@ var components$2 = {
    */
   tableLabels: (context, riotId) => {
     return context.state.components[riotId].table_labels || [];
+  },
+
+  /**
+   * テーブル行に使用するprimaryキーを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {String|null}
+   */
+  primaryKey: (context, riotId) => {
+    return context.state.components[riotId].primaryKey || null;
   }
 };
 
@@ -8556,6 +8499,30 @@ var oas$2 = {
   },
 
   /**
+   * 指定したoperationIdにマッチするPathItemObjectのmethod名を返します。
+   * @param {riotx.Context} context
+   * @param {String} operationId
+   * @return {String}
+   */
+  pathItemObjectMethodNameByOperationId: (context, operationId) => {
+    let ret;
+    forOwn_1$1(context.state.oas.client.spec.paths, pathItemObject => {
+      if (!!ret) {
+        return;
+      }
+      forOwn_1$1(pathItemObject, (operationObject, method) => {
+        if (!!ret) {
+          return;
+        }
+        if (operationObject.operationId === operationId) {
+          ret = method;
+        }
+      });
+    });
+    return ret;
+  },
+
+  /**
    * 指定したpathとmethodにマッチするOperationObjectを返します。
    * @param {riotx.Context} context
    * @param {String} path
@@ -8564,6 +8531,82 @@ var oas$2 = {
    */
   operationObject: (context, path, method) => {
     return context.state.oas.client.spec.paths[path][method];
+  },
+
+  /**
+   * 指定したcomponentに関連するOperationObject(action)群を返します。
+   * @param {riotx.Context} context
+   * @param {Object} component
+   * @return {Array}
+   */
+  operationObjectsAsAction: (context, component) => {
+    const methods = ['get','put', 'post', 'delete'];
+    const basePath = component.api.path;
+    const primaryKey = component.primary;
+    const actions = component.actions || [];
+
+    // 関連API情報。後のOperationObject群抽出に使用します。
+    const pathRefs = [];
+    // 同じpath & method違いのoperationObjectは関連有りとみなす。
+    forEach_1(methods, method => {
+      // `get`はcomponent自身なのでスルーする。
+      if (method === 'get') {
+        return;
+      }
+      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath][method];
+      if (!isOperationObjectDefined) {
+        return;
+      }
+      pathRefs.push({
+        path: basePath,
+        method,
+        appendTo: 'self'
+      });
+    });
+    // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
+    // テーブルの各rowに紐づくOperationObjectとみなす。
+    if (!!primaryKey) {
+      const listBasePath = `${basePath}/{${primaryKey}}`;
+      forEach_1(methods, method => {
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath][method];
+        if (!isOperationObjectDefined) {
+          return;
+        }
+        pathRefs.push({
+          path: listBasePath,
+          method,
+          appendTo: 'row'
+        });
+      });
+    }
+    // actionsに指定されたpath群のOperationObjectも関連有りとみなします。
+    // path内にprimaryKeyと同一名の変数があれば、それはテーブルrowに紐づくOperationObjectとみなします。
+    // primaryKeyと同一名の変数が無ければ、componentと紐づくOperationObjectとみなします。
+    forEach_1(actions, actionBasePath => {
+      const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
+      forEach_1(methods, method => {
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath][method];
+        if (!isOperationObjectDefined) {
+          return;
+        }
+        pathRefs.push({
+          path: actionBasePath,
+          method,
+          appendTo
+        });
+      });
+    });
+
+    // OperationObject群を抽出します。
+    const operationObjects = [];
+    forEach_1(pathRefs, ref => {
+      const operationObject = context.state.oas.client.spec.paths[ref.path][ref.method];
+      operationObjects.push(objectAssign({
+        operationObject
+      }, ref));
+    });
+
+    return operationObjects;
   },
 
   /**
@@ -8626,17 +8669,6 @@ var oas$2 = {
   }
 };
 
-var oauthEndpointKey$2 = {
-  /**
-   * OAuth認証中のendpointKeyを返します。
-   * @param {riotx.Context} context
-   * @return {String}
-   */
-  all: context => {
-    return context.state.oauthEndpointKey;
-  }
-};
-
 var page$2 = {
   /**
    * 全情報を返します。
@@ -8684,6 +8716,19 @@ var page$2 = {
       return [];
     }
     return page.components;
+  },
+
+  /**
+   * コンポーネント数を返します。
+   * @param {riotx.Context} context
+   * @return {Number}
+   */
+  componentsCount: context => {
+    const page = context.state.page;
+    if (!page) {
+      return 0;
+    }
+    return (page.components || []).length;
   }
 };
 
@@ -8725,6 +8770,7 @@ const constants$4 = {
   COMPONENTS_ONE_HAS_PAGINATION: 'COMPONENTS_ONE_HAS_PAGINATION',
   COMPONENTS_ONE_PAGINATION: 'COMPONENTS_ONE_PAGINATION',
   COMPONENTS_ONE_TABLE_LABELS: 'COMPONENTS_ONE_TABLE_LABELS',
+  COMPONENTS_ONE_PRIMARY_KEY: 'COMPONENTS_ONE_PRIMARY_KEY',
   CURRENT: 'CURRENT',
   DMC: 'DMC',
   DMC_EXISTENCE: 'DMC_EXISTENCE',
@@ -8753,16 +8799,18 @@ const constants$4 = {
   OAS_API: 'OAS_API',
   OAS_API_BY_PATH_AND_METHOD: 'OAS_API_BY_PATH_AND_METHOD',
   OAS_PATH_ITEM_OBJECT: 'OAS_PATH_ITEM_OBJECT',
+  OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID: 'OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID',
   OAS_OPERATION_OBJECT: 'OAS_OPERATION_OBJECT',
+  OAS_OPERATION_OBJECTS_AS_ACTION: 'OAS_OPERATION_OBJECTS_AS_ACTION',
   OAS_OPERATION_ID: 'OAS_OPERATION_ID',
   OAS_PARAMETER_OBJECTS: 'OAS_PARAMETER_OBJECTS',
   OAS_RESPONSE_OBJECT: 'OAS_RESPONSE_OBJECT',
   OAS_SCHEMA_OBJECT: 'OAS_SCHEMA_OBJECT',
-  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   PAGE_ID: 'PAGE_ID',
   PAGE_NAME: 'PAGE_NAME',
   PAGE_COMPONENTS: 'PAGE_COMPONENTS',
+  PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
   UA: 'UA'
 };
@@ -8783,6 +8831,7 @@ var getters = {
   [constants$4.COMPONENTS_ONE_HAS_PAGINATION]: components$2.hasPagination,
   [constants$4.COMPONENTS_ONE_PAGINATION]: components$2.pagination,
   [constants$4.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
+  [constants$4.COMPONENTS_ONE_PRIMARY_KEY]: components$2.primaryKey,
   [constants$4.CURRENT]: current$2.all,
   [constants$4.DMC]: dmc$2.all,
   [constants$4.DMC_EXISTENCE]: dmc$2.existence,
@@ -8811,16 +8860,18 @@ var getters = {
   [constants$4.OAS_API]: oas$2.api,
   [constants$4.OAS_API_BY_PATH_AND_METHOD]: oas$2.apiByPathAndMethod,
   [constants$4.OAS_PATH_ITEM_OBJECT]: oas$2.pathItemObject,
+  [constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID]: oas$2.pathItemObjectMethodNameByOperationId,
   [constants$4.OAS_OPERATION_OBJECT]: oas$2.operationObject,
+  [constants$4.OAS_OPERATION_OBJECTS_AS_ACTION]: oas$2.operationObjectsAsAction,
   [constants$4.OAS_OPERATION_ID]: oas$2.operationId,
   [constants$4.OAS_PARAMETER_OBJECTS]: oas$2.parameterObjects,
   [constants$4.OAS_RESPONSE_OBJECT]: oas$2.responseObject,
   [constants$4.OAS_SCHEMA_OBJECT]: oas$2.schemaObject,
-  [constants$4.OAUTH_ENDPOINT_KEY]: oauthEndpointKey$2.all,
   [constants$4.PAGE]: page$2.all,
   [constants$4.PAGE_ID]: page$2.id,
   [constants$4.PAGE_NAME]: page$2.name,
   [constants$4.PAGE_COMPONENTS]: page$2.components,
+  [constants$4.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
   [constants$4.TOASTS]: toasts$2.all,
   [constants$4.UA]: ua$2.all
 };
@@ -8870,7 +8921,11 @@ var auth = {
           'Authorization': endpoint.token
         }
       }))
-      .then(() => {
+      .then(response => {
+        const token = response.headers.get('Authorization');
+        if (!!token) {
+          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        }
         return true;
       })
       .catch(err => {
@@ -8911,13 +8966,12 @@ var auth = {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants$2.OAUTH_ENDPOINT_KEY, endpointKey);
-      })
-      .then(() => {
         const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
         const anchorElm = document.createElement('a');
         anchorElm.href = endpoint.url;
-        const fetchUrl = `${anchorElm.origin}${authtype.url}?redirect_url=${encodeURIComponent(location.href)}`;
+        const origin = anchorElm.origin;
+        const redirect_url = encodeURIComponent(`${location.href}oauthredirect/${endpointKey}`);
+        const fetchUrl = `${origin}${authtype.url}?redirect_url=${redirect_url}`;
         location.href = fetchUrl;
       });
   },
@@ -9825,30 +9879,7 @@ var components$3 = {
     if (path.indexOf('/') !== 0) {
       path = '/' + path;
     }
-    const operationObject = context.getter(constants$4.OAS_OPERATION_OBJECT, path, method);
-    // 関連のあるpath情報を取得します。
-    let pathRefs = [];
-    // 同じpath 且つ method名違いのoperationObjectは関連有りとみなす。
-    forEach_1(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
-      if (!context.getter(constants$4.OAS_OPERATION_OBJECT, path, method)) {
-        return;
-      }
-      pathRefs.push({
-        path,
-        method,
-        appendTo: 'self'
-      });
-    });
-    // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
-    pathRefs = pathRefs.concat(operationObject['x-ref'] || []);
-    // 関連API(path)群を付与する。
-    const actions = [];
-    forEach_1(pathRefs, ref => {
-      const operationObject = context.getter(constants$4.OAS_OPERATION_OBJECT, ref.path, ref.method);
-      actions.push(objectAssign({
-        operationObject
-      }, ref));
-    });
+    const actions = context.getter(constants$4.OAS_OPERATION_OBJECTS_AS_ACTION, component);
 
     const api = context.getter(constants$4.OAS_API_BY_PATH_AND_METHOD, path, method);
     const currentEndpointKey = context.getter(constants$4.CURRENT);
@@ -9864,19 +9895,30 @@ var components$3 = {
       }
       return res;
     }).then(res => {
+      // tokenを更新する。
+      const token = res.headers['Authorization'];
+      if (!!token) {
+        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+      }
        // `component.pagination`からページングをサポートしているか判断する。
       // サポートしていれば手動でページング情報を付加する。
       let hasPagination = false;
       let pagination;
       if (component.pagination) {
-        hasPagination = true;
+        const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
+        const size = Number(res.headers['x-pagination-limit'] || 0);
+        const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
         pagination = {
           // `x-pagination-current-page`等は独自仕様。
           // DMCを使用するサービスはこの仕様に沿う必要がある。
-          currentPage: Number(res.headers['x-pagination-current-page'] || 0),
-          size: Number(res.headers['x-pagination-limit'] || 0),
-          maxPage: Number(res.headers['x-pagination-total-pages'] || 0)
+          currentPage,
+          size,
+          maxPage
         };
+        // 2ページ以上存在する場合のみページングをONにする。
+        if (maxPage >= 2) {
+          hasPagination = true;
+        }
       }
       context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
         component_uid,
@@ -9886,6 +9928,7 @@ var components$3 = {
         actions,// 関連API群。
         hasPagination,
         pagination,// ページング関連。
+        primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
         table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
       });
     });
@@ -9901,12 +9944,18 @@ var components$3 = {
   operate: (context, operationObject, params) => {
     const api = context.getter(constants$4.OAS_API, operationObject.operationId);
     const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
+    const currentEndpointKey = context.getter(constants$4.CURRENT);
 
     return api(params, {
       requestInterceptor: req => {
         req.headers['Authorization'] = token;
       }
     }).then(res => {
+      // tokenを更新する。
+      const token = res.headers['Authorization'];
+      if (!!token) {
+        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+      }
       // ダウンロード指定されていればダウンロードする。
       const contentDispositionHeader = res.headers['content-disposition'];
       if (!contentDispositionHeader) {
@@ -10008,6 +10057,11 @@ var dmc$3 = {
         return res;
       })
       .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
         context.commit(constants$2.DMC, res.obj);
         const endpoint = objectAssign({}, res.obj);
         // pagesは不要なので削除。
@@ -10449,6 +10503,22 @@ var endpoints$3 = {
       .then(() => {
         context.commit(constants$2.ENDPOINTS_MERGE_ALL, endpoints);
       });
+  },
+
+  /**
+   * 一件の新エンドポイントを既存エンドポイント群にmergeします。
+   * endpointKeyも新規生成します。
+   * @param {riotx.Context} context
+   * @param {Object} endpoint
+   * @return {Promise}
+   */
+  mergeOneWithKey: (context, endpoint) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const key = shortid.generate();
+        context.commit(constants$2.ENDPOINTS_ADD, key, endpoint);
+      });
   }
 };
 
@@ -10574,21 +10644,6 @@ var oas$3 = {
       .resolve()
       .then(() => {
         context.commit(constants$2.OAS_CLIENT_CLEAR);
-      });
-  }
-};
-
-var oauthEndpointKey$3 = {
-  /**
-   * OAuth認証用のエンドポイントkeyを削除します。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  remove: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.OAUTH_ENDPOINT_KEY, null);
       });
   }
 };
@@ -11185,6 +11240,7 @@ const constants$1 = {
   ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
   ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
+  ENDPOINTS_MERGE_ONE_WITH_KEY: 'ENDPOINTS_MERGE_ONE_WITH_KEY',
   LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION_UPDATE: 'LOCATION_UPDATE',
   MODALS_ADD: 'MODALS_ADD',
@@ -11224,13 +11280,13 @@ var actions = {
   [constants$1.ENDPOINTS_REMOVE]: endpoints$3.remove,
   [constants$1.ENDPOINTS_REMOVE_ALL]: endpoints$3.removeAll,
   [constants$1.ENDPOINTS_MERGE_ALL]: endpoints$3.mergeAll,
+  [constants$1.ENDPOINTS_MERGE_ONE_WITH_KEY]: endpoints$3.mergeOneWithKey,
   [constants$1.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT]: layout$3.updateComponentsGridColumnCount,
   [constants$1.LOCATION_UPDATE]: location$4.update,
   [constants$1.MODALS_ADD]: modals$3.add,
   [constants$1.MODALS_REMOVE]: modals$3.remove,
   [constants$1.OAS_SETUP]: oas$3.setup,
   [constants$1.OAS_CLEAR]: oas$3.clear,
-  [constants$1.OAUTH_ENDPOINT_KEY_REMOVE]: oauthEndpointKey$3.remove,
   [constants$1.PAGE_GET]: page$3.get,
   [constants$1.PAGE_REMOVE]: page$3.remove,
   [constants$1.TOASTS_ADD]: toasts$3.add,
@@ -11303,11 +11359,40 @@ var script$2 = function() {
   if (!!this.opts.error) {
     this.type = 'error';
     this.icon = 'close';
-    this.title = this.opts.error.name || 'Error';
+    this.title = this.title || this.opts.error.name || this.opts.error.statusText || 'Error';
+    this.message = this.message || this.opts.error.message;
   }
+
+  // prettyprintで表示させる内容。
+  this.detail = null;
+
+  this.on('mount', () => {
+    // エラーがPromiseであれば解析する。
+    const error = this.opts.error;
+    if (!error) {
+      return;
+    }
+    if (error instanceof Error) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => error.json())
+      .then(json => {
+        const error = json.error;
+        this.detail = error;
+        !this.opts.title && !!error.name && (this.title = error.name);
+        !this.opts.message && !!error.data && !!error.data.message && (this.message = error.data.message);
+        this.update();
+      })
+      .catch(() => {
+        // do nothing on purpose.
+        return Promise.resolve();
+      });
+  });
 };
 
-riot$1.tag2('dmc-message', '<div class="Message__head"> <div class="Message__icon"> <dmc-icon type="{icon}"></dmc-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message &amp;&amp; !opts.error}">{message}</div> <dmc-prettyprint class="Message__error" if="{!!opts.error}" data="{opts.error}"></dmc-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
+riot$1.tag2('dmc-message', '<div class="Message__head"> <div class="Message__icon"> <dmc-icon type="{icon}"></dmc-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message}">{message}</div> <dmc-prettyprint class="Message__error" if="{!!detail}" data="{detail}"></dmc-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
     this.external(script$2);
 });
 
@@ -11344,9 +11429,8 @@ var ComponentsRoute = {
           return Promise
             .resolve()
             .then(() => store.action(constants$1.MODALS_ADD, 'dmc-message', {
-              type: 'error',
-              title: 'Unauthorized',
-              message: 'You are not authorized. Check if your token is expired. '
+              title: '認証切れ',
+              message: '認証が切れました。再度ログインして下さい。'
             }))
             .then(() => {
               replace('/');
@@ -11396,6 +11480,38 @@ var ComponentsRoute = {
   }
 };
 
+var EndpointimportRoute = {
+  /**
+   * ページ遷移前の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @param {Function} replace
+   * @return {Promise}
+   */
+  onBefore: (store, route, replace) => {
+    let url;
+    return Promise
+      .resolve()
+      .then(() => {
+        const endpoint = JSON.parse(decodeURIComponent(route.queries.endpoint));
+        url = endpoint.url;
+        return store.action(constants$1.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
+      })
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加',
+        message: `エンドポイント(${url})が一覧に追加されました。`
+      }))
+      .then(() => {
+        replace('/');
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: `エンドポイント(${url})を追加出来ませんでした。`,
+        error: err
+      }));
+  }
+};
+
 var EndpointsRoute = {
   /**
    * ページ遷移前の処理。
@@ -11410,7 +11526,8 @@ var EndpointsRoute = {
       .then(() => Promise.all([
         store.action(constants$1.CURRENT_REMOVE),
         store.action(constants$1.PAGE_REMOVE),
-        store.action(constants$1.OAS_CLEAR)
+        store.action(constants$1.OAS_CLEAR),
+        store.action(constants$1.DMC_REMOVE)
       ]))
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
         error: err
@@ -11446,6 +11563,44 @@ var NotfoundRoute = {
   }
 };
 
+var OauthredirectRoute = {
+  /**
+   * ページ遷移前の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @param {Function} replace
+   * @return {Promise}
+   */
+  onBefore: (store, route, replace) => {
+    const endpointKey = route.params.endpointKey;
+    const token = route.queries.token;
+    // tokenが存在したらOAuth認証成功とする。
+    const isAuthorized = !!token;
+    let to;
+    const tasks = [];
+    if (isAuthorized) {
+      to = `/${endpointKey}`;
+      tasks.push(store.action(constants$1.AUTH_UPDATE, endpointKey, decodeURIComponent(token)));
+    } else {
+      to = '/';
+      tasks.push(store.action(constants$1.AUTH_REMOVE, endpointKey));
+      tasks.push(store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: '認証失敗',
+        message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
+      }));
+    }
+
+    return Promise
+      .all(tasks)
+      .then(() => {
+        replace(to);
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  }
+};
+
 let esr;
 
 var router = {
@@ -11463,7 +11618,9 @@ var router = {
           .onBefore(() => Promise.all([
             store.action(constants$1.APPLICATION_NAVIGATION_START)
           ]))
-          .on('/', route => EndpointsRoute.onEnter(store, route))
+          .on('/', route => EndpointsRoute.onEnter(store, route), (route, replace) => EndpointsRoute.onBefore(store, route, replace))
+          .on('/oauthredirect/:endpointKey', () => Promise.resolve(), (route, replace) => OauthredirectRoute.onBefore(store, route, replace))
+          .on('/endpointimport', () => Promise.resolve(), (route, replace) => EndpointimportRoute.onBefore(store, route, replace))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(() => Promise.all([
@@ -13219,7 +13376,7 @@ var script$3 = function() {
   };
 };
 
-riot$1.tag2('dmc-pagination', '<div class="Pagination__control"> <div class="Pagination__button {opts.currentpage === 1 ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handlePrevButtonTap"> <dmc-icon type="left"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[0].num !== 1}" data-page="1" ref="touch" ontap="handlePageButtonTap">1</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[0].num &gt;= 3}" ref="touch" ontap="handleRecedeButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__recedeIcon" type="doubleLeft"></dmc-icon> </div> <div class="Pagination__button {page.isSelected ? \'Pagination__button--selected\' : \'\'}" each="{page in getBasePages()}" data-page="{page.num}" ref="touch" ontap="parent.handlePageButtonTap">{page.num}</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[getBasePages().length - 1].num &lt;= opts.maxpage - 2}" ref="touch" ontap="handleProceedButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__proceedIcon" type="doubleRight"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[getBasePages().length - 1].num !== opts.maxpage}" data-page="{opts.maxpage}" ref="touch" ontap="handlePageButtonTap">{opts.maxpage}</div> <div class="Pagination__button {opts.currentpage === opts.maxpage ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handleNextButtonTap"> <dmc-icon type="right"></dmc-icon> </div> </div> <div class="Pagination__info">{opts.currentpage} / {opts.maxpage}</div>', '', 'class="Pagination"', function(opts) {
+riot$1.tag2('dmc-pagination', '<div class="Pagination__control"> <div class="Pagination__button {opts.currentpage === 1 ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handlePrevButtonTap"> <dmc-icon type="left"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[0].num !== 1}" data-page="1" ref="touch" ontap="handlePageButtonTap">1</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[0].num &gt;= 3}" ref="touch" ontap="handleRecedeButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__recedeIcon" type="doubleLeft"></dmc-icon> </div> <div class="Pagination__button {page.isSelected ? \'Pagination__button--selected\' : \'\'}" each="{page in getBasePages()}" data-page="{page.num}" ref="touch" ontap="parent.handlePageButtonTap">{page.num}</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[getBasePages().length - 1].num &lt;= opts.maxpage - 2}" ref="touch" ontap="handleProceedButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__proceedIcon" type="doubleRight"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[getBasePages().length - 1].num !== opts.maxpage}" data-page="{opts.maxpage}" ref="touch" ontap="handlePageButtonTap">{opts.maxpage}</div> <div class="Pagination__button {opts.currentpage === opts.maxpage ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handleNextButtonTap"> <dmc-icon type="right"></dmc-icon> </div> </div>', '', 'class="Pagination {opts.class}"', function(opts) {
     this.external(script$3);
 });
 
@@ -13232,14 +13389,45 @@ var script$4 = function() {
   };
 };
 
-riot$1.tag2('dmc-button', '<span>{opts.label}</span>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
+riot$1.tag2('dmc-button', '<div class="Button__content"> <div class="Button__icon" if="{!!opts.icon}"> <dmc-icon type="{opts.icon}"></dmc-icon> </div> <div class="Button__label">{opts.label}</div> </div>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
     this.external(script$4);
 });
 
 var script$6 = function() {
   const store = this.riotx.get();
 
+  // submitボタンに使用するラベル。method名によって内容を変える。
+  this.submitButtonLabel = null;
+  // cancelボタンに使用するタイプ。method名によって内容を変える。
+  this.submitButtonType = 'primary';
+  switch (this.opts.method) {
+  case 'get':
+    this.submitButtonLabel = '取得する';
+    break;
+  case 'post':
+    this.submitButtonLabel = '新規追加する';
+    break;
+  case 'put':
+    this.submitButtonLabel = '変更する';
+    this.submitButtonType = 'emphasis';
+    break;
+  case 'delete':
+    this.submitButtonLabel = '削除する';
+    this.submitButtonType = 'emphasis';
+    break;
+  default:
+    this.submitButtonLabel = '送信する';
+    break;
+  }
+
+  // 現在の入力値群。
   this.currentParameters = objectAssign({}, this.opts.initialParameters);
+
+  // 補完的な情報群。primaryキー等。
+  this.additionalInfo = {
+    method: this.opts.method,
+    primaryKey: this.opts.primaryKey
+  };
 
   this.handleParametersChange = newParameters => {
     this.currentParameters = newParameters;
@@ -13255,6 +13443,7 @@ var script$6 = function() {
         this.close();
       })
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        message: `APIパラメータやOASが正しいか確認して下さい。[${this.opts.operationObject.summary || ''}]`,
         error: err
       }));
   };
@@ -13264,7 +13453,7 @@ var script$6 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-operation', '<div class="ComponentOperation__head"> <div class="ComponentOperation__title">{opts.title}</div> <div class="ComponentOperation__description" if="{!!opts.description}">{opts.description}</div> </div> <div class="ComponentOperation__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentOperation__tail"> <dmc-button label="submit" onpat="{handleSubmitButtonPat}"></dmc-button> <dmc-button label="cancel" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="ComponentOperation"', function(opts) {
+riot$1.tag2('dmc-component-operation', '<div class="ComponentOperation__head"> <div class="ComponentOperation__title">{opts.title}</div> <div class="ComponentOperation__description" if="{!!opts.description}">{opts.description}</div> </div> <div class="ComponentOperation__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" additionalinfo="{additionalInfo}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentOperation__tail"> <dmc-button label="{submitButtonLabel}" type="{submitButtonType}" onpat="{handleSubmitButtonPat}"></dmc-button> <dmc-button label="閉じる" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="ComponentOperation"', function(opts) {
     this.external(script$6);
 });
 
@@ -13273,11 +13462,30 @@ var script$5 = function() {
   const operationObject = this.opts.action;
 
   this.label = operationObject.summary || operationObject.operationId;
+  const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
+  this.icon = null;
+  switch (method) {
+  case 'get':
+    this.icon = 'download';
+    break;
+  case 'post':
+    this.icon = 'plusSquareO';
+    break;
+  case 'put':
+    this.icon = 'edit';
+    break;
+  case 'delete':
+    this.icon = 'closeSquareO';
+    break;
+  default:
+    break;
+  }
 
   this.handleButtonPat = () => {
     store.action(constants$1.DRAWERS_ADD, 'dmc-component-operation', {
       title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,
+      method,
       operationObject,
       parameterObjects: operationObject.parameters,
       initialParameters: {},
@@ -13288,7 +13496,7 @@ var script$5 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-action', '<dmc-button label="{label}" onpat="{handleButtonPat}"></dmc-button>', '', 'class="Component__action"', function(opts) {
+riot$1.tag2('dmc-component-action', '<dmc-button label="{label}" icon="{icon}" onpat="{handleButtonPat}"></dmc-button>', '', 'class="Component__action"', function(opts) {
     this.external(script$5);
 });
 
@@ -41051,6 +41259,75 @@ riot$1.tag2('dmc-component-number', '<div>{value}</div>', '', 'class="ComponentN
     this.external(script$14);
 });
 
+var script$15 = function() {};
+
+riot$1.tag2('dmc-tooltip', '<div class="Tooltip__basePoint"> <div class="Tooltip__text">{opts.label}</div> </div>', '', 'class="Tooltip Tooltip--{opts.placement || \'topCenter\'}"', function(opts) {
+    this.external(script$15);
+});
+
+var script$16 = function() {
+  const store = this.riotx.get();
+
+  // icon種類。
+  this.icon = this.opts.icon;
+  // actionの場合はmethodから判定する。
+  if (this.opts.isaction) {
+    const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, this.opts.action.operationId);
+    switch (method) {
+    case 'get':
+      this.icon = 'download';
+      break;
+    case 'post':
+      this.icon = 'plusSquareO';
+      break;
+    case 'put':
+      this.icon = 'edit';
+      break;
+    case 'delete':
+      this.icon = 'closeSquareO';
+      break;
+    default:
+      break;
+    }
+  }
+
+  // tooltip表示中か否か。
+  this.isTooltipVisible = false;
+  // tooltip内に表示するテキスト。
+  this.tooltipLabel = null;
+  if (this.opts.isaction) {
+    this.tooltipLabel = this.opts.action.value;
+  }
+
+  this.handleTap = () => {
+    if (this.opts.isaction) {
+      this.opts.onpat(this.opts.action);
+    } else {
+      this.opts.onpat();
+    }
+  };
+
+  this.handleMouseOver = () => {
+    if (!this.opts.isaction) {
+      return;
+    }
+    this.isTooltipVisible = true;
+    this.update();
+  };
+
+  this.handleMouseOut = () => {
+    if (!this.opts.isaction) {
+      return;
+    }
+    this.isTooltipVisible = false;
+    this.update();
+  };
+};
+
+riot$1.tag2('dmc-table-items-button', '<dmc-icon type="{icon}"></dmc-icon> <dmc-tooltip if="{isTooltipVisible}" label="{tooltipLabel}"></dmc-tooltip> <div class="Table__itemsButtonCatcher"></div>', '', 'class="Table__itemsButton {opts.class}" ref="touch" ontap="handleTap" onmouseover="{handleMouseOver}" onmouseout="{handleMouseOut}"', function(opts) {
+    this.external(script$16);
+});
+
 /**
      * Array.indexOf
      */
@@ -41085,7 +41362,7 @@ riot$1.tag2('dmc-component-number', '<div>{value}</div>', '', 'class="ComponentN
     }
     var contains_1$1 = contains$1;
 
-var script$15 = function() {
+var script$17 = function() {
   const store = this.riotx.get();
 
   this.value = null;
@@ -41112,7 +41389,6 @@ var script$15 = function() {
   }
   case 'object':
   case 'array':
-    this.value = '[詳細を見る]';
     this.isComplex = true;
     break;
   default:
@@ -41120,28 +41396,185 @@ var script$15 = function() {
     break;
   }
 
-  this.handleTap = ()  => {
+  this.handleDetailPat = ()  => {
     store.action(constants$1.MODALS_ADD, 'dmc-prettyprint', {
       data : this.opts.data.cell
     });
   };
 };
 
-riot$1.tag2('dmc-table-cell', '<div class="Table__cellValue" if="{!isComplex &amp;&amp; !isImage}">{value}</div> <div class="Table__cellButton" if="{isComplex}" ref="touch" ontap="handleTap">{value}</div> <div class="Table__cellImage" if="{isImage}"> <div riot-style="background-image:url({value});"></div> </div>', '', 'class="Table__cell"', function(opts) {
-    this.external(script$15);
+riot$1.tag2('dmc-table-cell', '<div class="Table__cellValue" if="{!isComplex &amp;&amp; !isImage}">{value}</div> <dmc-button if="{isComplex}" type="secondaryGhost" icon="link" label="詳細" onpat="{handleDetailPat}"></dmc-button> <div class="Table__cellImage" if="{isImage}"> <div riot-style="background-image:url({value});"></div> </div>', '', 'class="Table__cell"', function(opts) {
+    this.external(script$17);
 });
 
-var script$16 = function() {
+var script$18 = function() {
+  const store = this.riotx.get();
+
+  this.handleTap = () => {
+    // クリップボードにコピーできないタイプであればスルーする。
+    const type = this.opts.item.type;
+    const value = this.opts.item.cell;
+    if (type === 'object' || type === 'array') {
+      return;
+    }
+    if (type === 'string') {
+      const split = value.split('.');
+      if (!!split.length && contains_1$1(['jpg', 'png', 'gif'], split[split.length - 1])) {
+        return;
+      }
+    }
+
+    Promise
+      .resolve()
+      .then(() => {
+        const tmpElm = document.createElement('textarea');
+        tmpElm.value = value;
+        tmpElm.selectionStart = 0;
+        tmpElm.selectionEnd = tmpElm.value.length;
+        const tmpStyle = tmpElm.style;
+        tmpStyle.position = 'fixed';
+        tmpStyle.left = '-100%';
+        document.body.appendChild(tmpElm);
+        tmpElm.focus();
+        const result = document.execCommand('copy');
+        tmpElm.blur();
+        document.body.removeChild(tmpElm);
+        if (!result) {
+          throw new Error();
+        }
+      })
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'クリップボードにコピーしました。'
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'コピー失敗',
+        message: 'ご使用中の環境ではクリップボードへコピー出来ません。',
+        error: err
+      }));
+
+  };
+};
+
+riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <dmc-table-cell data="{opts.item}"></dmc-table-cell>', '', 'class="Table__item" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$18);
+});
+
+/**
+     * Merge sort (http://en.wikipedia.org/wiki/Merge_sort)
+     */
+    function mergeSort$1(arr, compareFn) {
+        if (arr == null) {
+            return [];
+        } else if (arr.length < 2) {
+            return arr;
+        }
+
+        if (compareFn == null) {
+            compareFn = defaultCompare$1;
+        }
+
+        var mid, left, right;
+
+        mid   = ~~(arr.length / 2);
+        left  = mergeSort$1( arr.slice(0, mid), compareFn );
+        right = mergeSort$1( arr.slice(mid, arr.length), compareFn );
+
+        return merge$1(left, right, compareFn);
+    }
+
+    function defaultCompare$1(a, b) {
+        return a < b ? -1 : (a > b? 1 : 0);
+    }
+
+    function merge$1(left, right, compareFn) {
+        var result = [];
+
+        while (left.length && right.length) {
+            if (compareFn(left[0], right[0]) <= 0) {
+                // if 0 it should preserve same order (stable)
+                result.push(left.shift());
+            } else {
+                result.push(right.shift());
+            }
+        }
+
+        if (left.length) {
+            result.push.apply(result, left);
+        }
+
+        if (right.length) {
+            result.push.apply(result, right);
+        }
+
+        return result;
+    }
+
+    var sort$1 = mergeSort$1;
+
+/*
+     * Sort array by the result of the callback
+     */
+    function sortBy$1(arr, callback, context){
+        callback = makeIterator_$1(callback, context);
+
+        return sort$1(arr, function(a, b) {
+            a = callback(a);
+            b = callback(b);
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        });
+    }
+
+    var sortBy_1$1 = sortBy$1;
+
+var script$19 = function() {
+  // sort済みのitems。
+  this.sortedItems = sortBy_1$1(this.opts.items, item => {
+    return (this.opts.tablelabels || []).indexOf(item.key) * (-1);
+  });
+  this.title = this.sortedItems[0].cell;
   this.isOpened = true;
 
-  this.handleHeaderTap = () => {
+  this.handleHeaderTitleTap = () => {
+    this.isOpened = !this.isOpened;
+    this.update();
+  };
+
+  this.handleItemsActionButtonPat = action => {
+    action.onPat(action.operationId, this.opts.idx);
+  };
+
+  this.handleOpenShutButtonPat = () => {
     this.isOpened = !this.isOpened;
     this.update();
   };
 };
 
-riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap="handleHeaderTap"> <div class="Table__itemInfo"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <div class="Table__itemOpenShut"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-cell data="{opts.item}"></dmc-table-cell> </virtual>', '', 'class="Table__item {isOpened ? \'Table__item--opened\' : \'\'}"', function(opts) {
-    this.external(script$16);
+riot$1.tag2('dmc-table-items', '<div class="Table__itemsHeader"> <div class="Table__itemsTitle" ref="touch" ontap="handleHeaderTitleTap">{title}</div> <virtual each="{action in opts.actions}"> <dmc-table-items-button action="{action}" isaction="{true}" onpat="{parent.handleItemsActionButtonPat}"></dmc-table-items-button> </virtual> <dmc-table-items-button class="Table__itemsOpenShutButton" icon="up" onpat="{handleOpenShutButtonPat}"></dmc-table-items-button> </div> <virtual if="{isOpened}"> <div class="Table__itemsContent"> <dmc-table-item each="{item in sortedItems}" item="{item}"></dmc-table-item> </div> </virtual>', '', 'class="Table__items {isOpened ? \'Table__items--opened\' : \'\'}"', function(opts) {
+    this.external(script$19);
+});
+
+var script$20 = function() {
+  this.getItemList = () => {
+    const columns = this.opts.columns;
+    const list = [];
+    forEach_1(this.opts.rows, row => {
+      const items = [];
+      forEach_1(columns, column => {
+        items.push({
+          key: column.key,
+          title: column.title,
+          type: column.type,
+          cell: row[column.key]
+        });
+      });
+      list.push(items);
+    });
+    return list;
+  };
+};
+
+riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}" tablelabels="{parent.opts.tablelabels}"></dmc-table-items>', '', 'class="Table"', function(opts) {
+    this.external(script$20);
 });
 
 /**
@@ -41175,19 +41608,7 @@ riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap=
 
     var find_1$2 = find$3;
 
-var script$18 = function() {
-  this.handleActionButtonPat = e => {
-    const idx = e.target.getAttribute('idx');
-    this.opts.actions[idx].onPat(this.opts.actions[idx].operationId, this.opts.idx);
-    this.close();
-  };
-};
-
-riot$1.tag2('dmc-table-action', '<div class="Table__actionItem" each="{action, idx in opts.actions}"> <div class="Table__actionInner"> <div class="Table__actionTitle">{action.value}</div> <div class="Table__actionDescription">{action.description}</div> </div> <div class="Table__actionExecuteButton" idx="{idx}" ref="touch" ontap="parent.handleActionButtonPat">execute</div> </div>', '', 'class="Table__action"', function(opts) {
-    this.external(script$18);
-});
-
-var script$19 = function() {
+var script$22 = function() {
   this.handleTap = () => {
     if (this.opts.isdisabled) {
       return;
@@ -41197,155 +41618,7 @@ var script$19 = function() {
 };
 
 riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <dmc-icon type="check"></dmc-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$19);
-});
-
-/**
-     * Remove a single item from the array.
-     * (it won't remove duplicates, just a single item)
-     */
-    function remove$1(arr, item){
-        var idx = indexOf_1$1(arr, item);
-        if (idx !== -1) { arr.splice(idx, 1); }
-    }
-
-    var remove_1$1 = remove$1;
-
-var script$20 = function() {
-  this.items = map_1$1(this.opts.options, option => {
-    return {
-      label: option,
-      id: option,
-      isChecked: find_1$2(this.opts.selectedOptions, selectedOption => {
-        return (selectedOption === option);
-      })
-    };
-  });
-  this.selectedItems = [].concat(this.opts.selectedOptions);
-
-  this.handleCheckboxChange = (isChecked, id) => {
-    if (isChecked) {
-      this.selectedItems.push(id);
-    } else {
-      remove_1$1(this.selectedItems, id);
-    }
-    forEach_1(this.items, item => {
-      if (item.id !== id) {
-        return;
-      }
-      item.isChecked = isChecked;
-    });
-    this.update();
-    this.opts.onChange(this.selectedItems);
-  };
-};
-
-riot$1.tag2('dmc-table-filter', '<dmc-checkbox each="{item in items}" label="{item.label}" ischecked="{item.isChecked}" id="{item.id}" onchange="{parent.handleCheckboxChange}"></dmc-checkbox>', '', 'class="Table__filter"', function(opts) {
-    this.external(script$20);
-});
-
-var script$17 = function() {
-  const store = this.riotx.get();
-
-  this.isOpened = false;
-  this.title = '';
-  // keyを指定されていればそれを使う。
-  let item;
-  forEach_1(this.opts.tablelabels, key => {
-    if (!!item) {
-      return;
-    }
-    item = find_1$2(this.opts.items, item => {
-      return (item.key === key);
-    });
-  });
-  // `id`を優先する。
-  if (!item) {
-    item = find_1$2(this.opts.items, item => {
-      return (item.key === 'id');
-    });
-  }
-  // 適当に選ぶ。
-  if (!item) {
-    item = this.opts.items[0];
-  }
-  this.title = `${item.cell}`;
-
-  // 画面表示するkey群。
-  let visibleKeys = map_1$1(this.opts.items, item => {
-    return item.key;
-  });
-  // filterを通したリストを返す。
-  const getItems = () => {
-    return filter_1$1(this.opts.items, item => {
-      if (!find_1$2(visibleKeys, key => {
-        return (key === item.key);
-      })) {
-        return false;
-      }
-      return true;
-    });
-  };
-  this.filteredItems = getItems();
-
-  this.handleHeaderTitleTap = () => {
-    this.isOpened = !this.isOpened;
-    this.update();
-  };
-
-  this.handleActionButtonTap = () => {
-    store.action(constants$1.MODALS_ADD, 'dmc-table-action', {
-      actions: this.opts.actions,
-      idx: this.opts.idx
-    });
-  };
-
-  this.handleFilterButtonTap = () => {
-    store.action(constants$1.MODALS_ADD, 'dmc-table-filter', {
-      options: map_1$1(this.opts.items, item => {
-        return item.key;
-      }),
-      selectedOptions: visibleKeys,
-      onChange: selectedOptions => {
-        visibleKeys = selectedOptions;
-        this.filteredItems = getItems();
-        this.update();
-      }
-    });
-  };
-
-  this.handleOpenShutButtonTap = () => {
-    this.isOpened = !this.isOpened;
-    this.update();
-  };
-};
-
-riot$1.tag2('dmc-table-items', '<div class="Table__itemsHeader"> <div class="Table__itemsTitle" ref="touch" ontap="handleHeaderTitleTap">{title}</div> <div class="Table__itemsButton" if="{!!opts.actions}" ref="touch" ontap="handleActionButtonTap"> <dmc-icon type="edit"></dmc-icon> </div> <div class="Table__itemsButton" ref="touch" ontap="handleFilterButtonTap"> <dmc-icon type="filter"></dmc-icon> </div> <div class="Table__itemsButton Table__itemsOpenShutButton" ref="touch" ontap="handleOpenShutButtonTap"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-item each="{item in filteredItems}" item="{item}"></dmc-table-item> </virtual>', '', 'class="Table__items {isOpened ? \'Table__items--opened\' : \'\'}"', function(opts) {
-    this.external(script$17);
-});
-
-var script$21 = function() {
-  this.getItemList = () => {
-    const columns = this.opts.columns;
-    const list = [];
-    forEach_1(this.opts.rows, row => {
-      const items = [];
-      forEach_1(columns, column => {
-        items.push({
-          key: column.key,
-          title: column.title,
-          type: column.type,
-          cell: row[column.key]
-        });
-      });
-      list.push(items);
-    });
-    return list;
-  };
-};
-
-riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}" tablelabels="{parent.opts.tablelabels}"></dmc-table-items>', '', 'class="Table"', function(opts) {
-    this.external(script$21);
+    this.external(script$22);
 });
 
 var script$23 = function() {
@@ -41377,7 +41650,7 @@ var script$23 = function() {
   };
 };
 
-riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </form>', '', 'class="Select"', function(opts) {
+riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" disabled="{!!opts.isdisabled}" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </form>', '', 'class="Select {\'Select--disabled\' : opts.isdisabled}"', function(opts) {
     this.external(script$23);
 });
 
@@ -41398,14 +41671,17 @@ var script$24 = function() {
     if (!isString_1(value)) {
       return null;
     }
-    return value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    return value;
   };
 
   this.on('mount', () => {
     this.refs.input.value = this.normalizeValue(this.opts.text);
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
-    this.refs.input.value = this.normalizeValue(this.opts.text);
+    const text = this.opts.text;
+    if (!isString_1(text)) {
+      this.refs.input.value = this.normalizeValue(text);
+    }
   });
 
   this.handleTap = () => {
@@ -41431,7 +41707,7 @@ var script$24 = function() {
   };
 };
 
-riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput" ref="touch" ontap="handleTap"', function(opts) {
+riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--disabled\' : opts.isdisabled}" ref="touch" ontap="handleTap"', function(opts) {
     this.external(script$24);
 });
 
@@ -41472,7 +41748,7 @@ var script$25 = function() {
   };
 };
 
-riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL}" riot-style="background-image:url({blobURL});"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div>', '', 'class="Uploader"', function(opts) {
+riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{!!opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL}" riot-style="background-image:url({blobURL});"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div>', '', 'class="Uploader {\'Uploader--disabled\' : opts.isdisabled}"', function(opts) {
     this.external(script$25);
 });
 
@@ -41783,6 +42059,7 @@ var script$30 = function() {
         this.opts.onSuccess();
       })
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        message: `APIパラメータやOASが正しいか確認して下さい。[${this.opts.operationObject.summary || ''}]`,
         error: err
       }));
   };
@@ -41796,7 +42073,7 @@ riot$1.tag2('dmc-operation', '<div class="Operation__info"> <div> <div class="Op
     this.external(script$30);
 });
 
-var script$22 = function() {
+var script$21 = function() {
   const store = this.riotx.get();
 
   this.getColumns = () => {
@@ -41863,11 +42140,14 @@ var script$22 = function() {
     const operationObject = find_1$2(this.opts.rowactions, operationObject => {
       return (operationObject.operationId === operationId);
     });
+    const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
     const rowData = this.opts.response[rowIdx];
     const initialParameters = createInitialQueries(operationObject, rowData);
     store.action(constants$1.DRAWERS_ADD, 'dmc-component-operation', {
-      name: operationObject.summary || operationObject.operationId,
+      title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,
+      method,
+      primaryKey: this.opts.primarykey,
       operationObject,
       parameterObjects: operationObject.parameters,
       initialParameters,
@@ -41879,8 +42159,17 @@ var script$22 = function() {
 };
 
 riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}" tablelabels="{opts.tablelabels}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
-    this.external(script$22);
+    this.external(script$21);
 });
+
+var UNDEF$2;
+
+    /**
+     */
+    function isUndef(val){
+        return val === UNDEF$2;
+    }
+    var isUndefined = isUndef;
 
 /**
      * Get object keys
@@ -41894,6 +42183,18 @@ riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{g
         };
 
     var keys_1$1 = keys$1;
+
+/**
+     * Object reject
+     */
+    function reject$3(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        return filter$3(obj, function(value, index, obj) {
+            return !callback(value, index, obj);
+        }, thisObj);
+    }
+
+    var reject_1$2 = reject$3;
 
 var beautify = createCommonjsModule(function (module, exports) {
 /*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
@@ -46450,14 +46751,17 @@ var script$33 = function() {
     if (!isString_1(value)) {
       return null;
     }
-    return value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    return value;
   };
 
   this.on('mount', () => {
     this.refs.textarea.value = this.normalizeValue(this.opts.text);
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
-    this.refs.textarea.value = this.normalizeValue(this.opts.text);
+    const text = this.opts.text;
+    if (!isString_1(text)) {
+      this.refs.textarea.value = this.normalizeValue(text);
+    }
   });
 
   this.handleTap = () => {
@@ -46483,7 +46787,7 @@ var script$33 = function() {
   };
 };
 
-riot$1.tag2('dmc-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea" ref="touch" ontap="handleTap"', function(opts) {
+riot$1.tag2('dmc-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\' : opts.isdisabled}" ref="touch" ontap="handleTap"', function(opts) {
     this.external(script$33);
 });
 
@@ -46543,7 +46847,7 @@ var script$34 = function() {
   };
 };
 
-riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Html__tab {\'Html__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Html__body"> <div class="Html__message Html__message--{compileHtml().status}" if="{compileHtml().status === \'failed\'}">{compileHtml().message}</div> <div class="Html__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Html__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compileHtml().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Html"', function(opts) {
+riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Html__tab {\'Html__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Html__body"> <div class="Html__message Html__message--{compileHtml().status}" if="{compileHtml().status === \'failed\'}">{compileHtml().message}</div> <div class="Html__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Html__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compileHtml().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Html"', function(opts) {
     this.external(script$34);
 });
 
@@ -46583,15 +46887,6 @@ riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html_
         return val === null;
     }
     var isNull_1 = isNull;
-
-var UNDEF$3;
-
-    /**
-     */
-    function isUndef(val){
-        return val === UNDEF$3;
-    }
-    var isUndefined = isUndef;
 
 var script$35 = function() {
   /**
@@ -46797,7 +47092,7 @@ var script$35 = function() {
 
 };
 
-riot$1.tag2('dmc-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" onsubmit="{handleFormSubmit}" onkeydown="{handleFormKeyDown}"> <input class="Numberinput__input" ref="input" riot-value="{normalizeValue(opts.number)}" placeholder="{opts.placeholder || \'\'}" oninput="{handleInputInput}" onchange="{handleInputChange}"> <div class="Numberinput__handler"> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : !isIncrementable()}" ontap="handleIncreaseButtonPat" ref="touch"> <dmc-icon type="caretUp"></dmc-icon> </div> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : !isDecrementable()}" ontap="handleDecreaseButtonPat" ref="touch"> <dmc-icon type="caretDown"></dmc-icon> </div> </div> </form>', '', 'class="Numberinput"', function(opts) {
+riot$1.tag2('dmc-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" onsubmit="{handleFormSubmit}" onkeydown="{handleFormKeyDown}"> <input class="Numberinput__input" ref="input" riot-value="{normalizeValue(opts.number)}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> <div class="Numberinput__handler"> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : (opts.isdisabled || !isIncrementable())}" ontap="handleIncreaseButtonPat" ref="touch"> <dmc-icon type="caretUp"></dmc-icon> </div> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : (opts.isdisabled || !isDecrementable())}" ontap="handleDecreaseButtonPat" ref="touch"> <dmc-icon type="caretDown"></dmc-icon> </div> </div> </form>', '', 'class="Numberinput {\'Numberinput--disabled\' : opts.isdisabled}"', function(opts) {
     this.external(script$35);
 });
 
@@ -46860,7 +47155,7 @@ var script$36 = function() {
   };
 };
 
-riot$1.tag2('dmc-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Pug__tab {\'Pug__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Pug__body"> <div class="Pug__message Pug__message--{compilePug().status}" if="{compilePug().status === \'failed\'}">{compilePug().message}</div> <div class="Pug__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Pug__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compilePug().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Pug"', function(opts) {
+riot$1.tag2('dmc-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Pug__tab {\'Pug__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Pug__body"> <div class="Pug__message Pug__message--{compilePug().status}" if="{compilePug().status === \'failed\'}">{compilePug().message}</div> <div class="Pug__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Pug__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compilePug().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Pug"', function(opts) {
     this.external(script$36);
 });
 
@@ -48157,7 +48452,7 @@ var script$50 = function() {
       // @see: https://quilljs.com/docs/configuration/#placeholder
       placeholder: 'type here...',
       // @see: https://quilljs.com/docs/configuration/#readonly
-      readonly: false,
+      readonly: this.opts.isdisabled,
       // @see: https://quilljs.com/docs/configuration/#scrollingcontainer
       scrollingContainer: null,
       // @see: https://quilljs.com/docs/configuration/#strict
@@ -48191,6 +48486,7 @@ var script$50 = function() {
       headElm.insertBefore(linkElm, headElm.firstChild);
     }
     this.update();
+    this.quill.enable(!this.opts.isdisabled);
   }).on('unmount', () => {
     this.quill.off(Quill.events.TEXT_CHANGE, this.handleTextChange);
     this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
@@ -48256,7 +48552,7 @@ var script$50 = function() {
   */
 };
 
-riot$1.tag2('dmc-wyswyg', '<div class="Wyswyg__toolbar"> <dmc-wyswyg-tool-image if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-image> <dmc-wyswyg-tool-video if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-video> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{1}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{2}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{3}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{4}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{5}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{6}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-list-ordered if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-ordered> <dmc-wyswyg-tool-list-bullet if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-bullet> <dmc-wyswyg-tool-indent-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-left> <dmc-wyswyg-tool-indent-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-right> <dmc-wyswyg-tool-align-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-left> <dmc-wyswyg-tool-align-center if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-center> <dmc-wyswyg-tool-align-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-right> <dmc-wyswyg-tool-direction if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-direction> <dmc-wyswyg-tool-blockquote if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-blockquote> <dmc-wyswyg-tool-codeblock if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-codeblock> </div> <div class="Wyswyg__editor" ref="editor"></div>', '', 'class="Wyswyg {\'Wyswyg--bubbled\' : isBubbled}"', function(opts) {
+riot$1.tag2('dmc-wyswyg', '<div class="Wyswyg__toolbar"> <dmc-wyswyg-tool-image if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-image> <dmc-wyswyg-tool-video if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-video> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{1}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{2}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{3}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{4}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{5}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{6}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-list-ordered if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-ordered> <dmc-wyswyg-tool-list-bullet if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-bullet> <dmc-wyswyg-tool-indent-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-left> <dmc-wyswyg-tool-indent-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-right> <dmc-wyswyg-tool-align-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-left> <dmc-wyswyg-tool-align-center if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-center> <dmc-wyswyg-tool-align-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-right> <dmc-wyswyg-tool-direction if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-direction> <dmc-wyswyg-tool-blockquote if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-blockquote> <dmc-wyswyg-tool-codeblock if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-codeblock> </div> <div class="Wyswyg__editor" ref="editor"></div>', '', 'class="Wyswyg {\'Wyswyg--bubbled\' : isBubbled, \'Wyswyg--disabled\' : opts.isdisabled}"', function(opts) {
     this.external(script$50);
 });
 
@@ -48277,6 +48573,23 @@ var script$51 = function() {
 
   // wyswygエディタのオプション群。
   this.blotOptions = schemaObject['x-wyswyg-options'] || {};
+
+  /**
+   * 入力可否をチェックします。
+   * @return {Boolean}
+   */
+  this.checkIsDisabled = () => {
+    const additionalInfo = this.opts.additionalinfo;
+    // primaryキーがpathに含まれており、且つ入力対象keyが同一の場合。
+    // get, post, put, deleteいかなるメソッドでも入力不可能にする。
+    if (schemaObject.in === 'path' && schemaObject.name === additionalInfo.primaryKey) {
+      return true;
+    }
+    // 特に問題なければ入力可能。
+    return false;
+  };
+  // 入力可能 or not。
+  this.isDisabled = this.checkIsDisabled();
 
   /**
    * Selectコンポーネントに使用するoption群を返します。
@@ -48424,7 +48737,7 @@ var script$51 = function() {
   };
 };
 
-riot$1.tag2('dmc-parameter-form', '<div class="ParameterForm__body"> <virtual if="{uiType === \'textinput\'}"> <dmc-textinput text="{opts.val}" onchange="{handleTextinputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <dmc-textarea text="{opts.val}" onchange="{handleTextareaChange}"></dmc-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <dmc-numberinput number="{opts.val}" onchange="{handleNumberinputChange}"></dmc-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.val}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleUploaderFileChange}"></dmc-uploader> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <dmc-wyswyg blotoptions="{blotOptions}" initialinnerhtml="{opts.val}" ontextchange="{handleWyswygChange}"></dmc-wyswyg> </virtual> <virtual if="{uiType === \'pug\'}"> <dmc-pug text="{opts.val}" onchange="{handlePugChange}"></dmc-pug> </virtual> <virtual if="{uiType === \'html\'}"> <dmc-html text="{opts.val}" onchange="{handleHtmlChange}"></dmc-html> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO: null</div> </virtual> </div>', '', '', function(opts) {
+riot$1.tag2('dmc-parameter-form', '<div class="ParameterForm__body"> <virtual if="{uiType === \'textinput\'}"> <dmc-textinput text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextinputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <dmc-textarea text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextareaChange}"></dmc-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <dmc-numberinput number="{opts.val}" isdisabled="{isDisabled}" onchange="{handleNumberinputChange}"></dmc-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.val}" isdisabled="{isDisabled}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" isdisabled="{isDisabled}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" isdisabled="{isDisabled}" onfilechange="{handleUploaderFileChange}"></dmc-uploader> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <dmc-wyswyg blotoptions="{blotOptions}" initialinnerhtml="{opts.val}" isdisabled="{isDisabled}" ontextchange="{handleWyswygChange}"></dmc-wyswyg> </virtual> <virtual if="{uiType === \'pug\'}"> <dmc-pug text="{opts.val}" isdisabled="{isDisabled}" onchange="{handlePugChange}"></dmc-pug> </virtual> <virtual if="{uiType === \'html\'}"> <dmc-html text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleHtmlChange}"></dmc-html> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO: null</div> </virtual> </div>', '', '', function(opts) {
     this.external(script$51);
 });
 
@@ -53744,7 +54057,7 @@ const format$1 = (value, constraints) => {
   }
   case 'hostname': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
-    
+
     // String型のときだけバリデートする
     if (!isString_1(value)) {
       return result;
@@ -53784,7 +54097,7 @@ const format$1 = (value, constraints) => {
       result.message = '"ipv4"に則ったフォーマットで入力してください。';
       return result;
     }
-    
+
     break;
   }
   case 'ipv6': {
@@ -53881,9 +54194,15 @@ var oas$4 = {
    */
   validate: (value, schemaObject) => {
     const results = [];
+    let result;
+
+    // 空(i.e. undefined)の場合なvalidateしない。
+    if (isUndefined(value)) {
+      return [];
+    }
 
     // typeとselfRequiredチェックだけ最初に済ませておく。
-    let result = _type(value, schemaObject);
+    result = _type(value, schemaObject);
     if (!result.isValid) {
       return [result];
     }
@@ -54025,6 +54344,23 @@ var script$52 = function() {
   });
 
   /**
+   * 入力可否をチェックします。
+   * @return {Boolean}
+   */
+  this.checkIsDisabled = () => {
+    const additionalInfo = this.opts.additionalinfo;
+    // primaryキーがpathに含まれており、且つ入力対象keyが同一の場合。
+    // get, post, put, deleteいかなるメソッドでも入力不可能にする。
+    if (schemaObject.in === 'path' && schemaObject.name === additionalInfo.primaryKey) {
+      return true;
+    }
+    // 特に問題なければ入力可能。
+    return false;
+  };
+  // 入力可能 or not。
+  this.isDisabled = this.checkIsDisabled();
+
+  /**
    * バリデートエラー項目群を返します。
    * @return {Array}
    */
@@ -54160,7 +54496,7 @@ var script$52 = function() {
   // 入力プレビューの開閉状態。
   this.isPreviewOpened = false;
   // validateの開閉状態。
-  this.isValidateOpened = false;
+  this.isValidateOpened = true;
   // bodyの開閉状態。
   this.isBodyOpened = true;
 
@@ -54196,6 +54532,9 @@ var script$52 = function() {
 
   // +ボタンがタップされた時の処理。
   this.handleAddButtonTap = () => {
+    if (this.isDisabled) {
+      return;
+    }
     const arr = this.opts.val.concat([]);
     let defaultValue = undefined;
     switch (schemaObject.items.type) {
@@ -54221,6 +54560,9 @@ var script$52 = function() {
 
   // -ボタンがタップされた時の処理。
   this.handleRemoveButtonTap = () => {
+    if (this.isDisabled) {
+      return;
+    }
     this.opts.onremove(this.opts.idx);
   };
 
@@ -54252,7 +54594,7 @@ var script$52 = function() {
   };
 };
 
-riot$1.tag2('dmc-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <dmc-icon type="right"></dmc-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}</div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <dmc-icon type="plusCircle"></dmc-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <dmc-icon type="minusCircle"></dmc-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <dmc-icon type="filetext"></dmc-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <dmc-icon type="infoCirlceO"></dmc-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <dmc-prettyprint data="{opts.val}"></dmc-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <dmc-parameter-form val="{opts.val}" schemaobject="{schemaObject}" onchange="{handleFormChange}"></dmc-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <dmc-parameter-schema each="{property, key in properties}" key="{key}" val="{parent.getPropertyValue(property, key)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, key)}" onchange="{parent.handlePropertyChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <dmc-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" key="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema"', function(opts) {
+riot$1.tag2('dmc-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <dmc-icon type="right"></dmc-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}</div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <dmc-icon type="plusCircle"></dmc-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <dmc-icon type="minusCircle"></dmc-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <dmc-icon type="filetext"></dmc-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <dmc-icon type="infoCirlceO"></dmc-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <dmc-prettyprint data="{opts.val}"></dmc-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <dmc-parameter-form val="{opts.val}" schemaobject="{schemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleFormChange}"></dmc-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <dmc-parameter-schema each="{property, key in properties}" key="{key}" val="{parent.getPropertyValue(property, key)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, key)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handlePropertyChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <dmc-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" key="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" additionalinfo="{parent.opts.additionalinfo}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema {\'ParameterSchema--disabled\' : isDisabled}"', function(opts) {
     this.external(script$52);
 });
 
@@ -54284,7 +54626,7 @@ var script$53 = function() {
   };
 };
 
-riot$1.tag2('dmc-parameter', '<div class="Parameter__body"> <dmc-parameter-schema val="{opts.val}" schemaobject="{normalizedSchemaObject}" onchange="{handleSchemaChange}"></dmc-parameter-schema> </div>', '', 'class="Parameter"', function(opts) {
+riot$1.tag2('dmc-parameter', '<div class="Parameter__body"> <dmc-parameter-schema val="{opts.val}" schemaobject="{normalizedSchemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleSchemaChange}"></dmc-parameter-schema> </div>', '', 'class="Parameter"', function(opts) {
     this.external(script$53);
 });
 
@@ -54372,7 +54714,7 @@ var script$54 = function() {
   };
 };
 
-riot$1.tag2('dmc-parameters', '<virtual each="{parameterObject in opts.parameterobjects}"> <dmc-parameter parameterobject="{parameterObject}" val="{parent.getParameterValue(parameterObject)}" onchange="{parent.handleChange}"></dmc-parameter> </virtual>', '', 'class="Parameters"', function(opts) {
+riot$1.tag2('dmc-parameters', '<virtual each="{parameterObject in opts.parameterobjects}"> <dmc-parameter parameterobject="{parameterObject}" val="{parent.getParameterValue(parameterObject)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handleChange}"></dmc-parameter> </virtual>', '', 'class="Parameters"', function(opts) {
     this.external(script$54);
 });
 
@@ -54390,7 +54732,7 @@ var script$55 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-search', '<div class="ComponentSearch__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentSearch__tail"> <dmc-button label="submit" onpat="{handleSubmitButtonPat}"></dmc-button> </div>', '', 'class="ComponentSearch"', function(opts) {
+riot$1.tag2('dmc-component-search', '<div class="ComponentSearch__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentSearch__tail"> <dmc-button label="検索する" onpat="{handleSubmitButtonPat}"></dmc-button> </div>', '', 'class="ComponentSearch"', function(opts) {
     this.external(script$55);
 });
 
@@ -54412,7 +54754,6 @@ var script$31 = function() {
   // レスポンスデータが有効か否か。
   this.isValidData = false;
   // レスポンスデータが不正の時に表示するエラー文言。
-  this.alertApi = '';
   this.alertText = '';
   // レスポンスデータ。
   this.response = null;
@@ -54426,15 +54767,35 @@ var script$31 = function() {
   this.rowActions = [];
   // テーブルのrow表示ラベル。
   this.tableLabels = [];
+  // テーブル使用時のprimaryキー。
+  this.primaryKey = null;
   // ページング機能ONかどうか。
   this.hasPagination = false;
   // ページング情報。
   this.pagination = {};
-  // 現在のリクエストパラメータ値。
-  this.currentRequestParameters = {};
-  this.isCurrentRequestParametersEmpty = () => {
-    return !keys_1$1(this.currentRequestParameters).length;
+  // ページングのサイズ値。
+  this.paginationSize = 3;
+  // 現在の検索用リクエストパラメータ値。
+  this.currentSearchRequestParameters = {};
+  this.isCurrentSearchRequestParametersEmpty = () => {
+    return !keys_1$1(this.currentSearchRequestParameters).length;
   };
+  // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
+  this.getParameterObjectsForSearch = () => {
+    return reject_1$1(this.parameterObjects || [], parameterObject => {
+      if (parameterObject.in !== 'query') {
+        return false;
+      }
+      if (parameterObject.name === 'limit') {
+        return true;
+      }
+      if (parameterObject.name === 'offset') {
+        return true;
+      }
+      return false;
+    });
+  };
+
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   switch (this.opts.component.style) {
@@ -54467,8 +54828,7 @@ var script$31 = function() {
     break;
   default:
     this.isValidData = false;
-    this.alertApi = `${this.opts.component.api.method}: ${this.opts.component.api.path}`;
-    this.alertText = `component type of ${this.opts.component.style} is not supported.`;
+    this.alertText = `"${this.opts.component.style}"はサポートされていないstyleです。サポートされているstyleを使用して下さい。`;
     break;
   }
 
@@ -54478,19 +54838,26 @@ var script$31 = function() {
     this.isPending = true;
     this.update();
 
-    this.currentRequestParameters = objectAssign(this.currentRequestParameters, requestParameters);
+    this.currentSearchRequestParameters = reject_1$2(objectAssign(this.currentSearchRequestParameters, requestParameters), val => {
+      return isUndefined(val);
+    });
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
         // 通信が速すぎると見た目がチカチカするので、意図的に通信を遅らせる。
         setTimeout(() => {
           resolve();
-        }, 1000);
+        }, 300);
       }))
-      .then(() => store.action(constants$1.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentRequestParameters))
-      .catch(err => store.action(constants$1.MODALS_ADD, {
-        error: err
-      }));
+      .then(() => store.action(constants$1.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentSearchRequestParameters))
+      .catch(err => {
+        const api = this.opts.component.api;
+        return store.action(constants$1.MODALS_ADD, {
+          title: '通信失敗',
+          message: `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。該当するAPIがOAS上に正しく定義されているかご確認下さい。`,
+          error: err
+        });
+      });
   };
 
   /**
@@ -54499,14 +54866,11 @@ var script$31 = function() {
    */
   this.validateResponse = response => {
     const style = this.opts.component.style;
-    const method = this.opts.component.api.method;
-    const path = this.opts.component.api.path;
 
     if (style === STYLE_NUMBER) {
       if (typeof response !== 'object' || response.value === 'undefined') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
     }
@@ -54514,20 +54878,17 @@ var script$31 = function() {
     if (style === STYLE_TABLE) {
       if (!Array.isArray(response)) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.length) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'Length is 0.';
+        this.alertText = 'テーブルが空です。';
         return;
       }
       if (typeof response[0] !== 'object') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
     }
@@ -54543,20 +54904,17 @@ var script$31 = function() {
     ], style)) {
       if (typeof response !== 'object') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.data || !response.x || !response.y || !Array.isArray(response.data)) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.data.length) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'Length is 0.';
+        this.alertText = 'グラフデータが空です。';
         return;
       }
     }
@@ -54583,6 +54941,7 @@ var script$31 = function() {
     this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
     this.hasPagination = store.getter(constants$4.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
     this.pagination = store.getter(constants$4.COMPONENTS_ONE_PAGINATION, this._riot_id);
+    this.primaryKey = store.getter(constants$4.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
     this.tableLabels = store.getter(constants$4.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
     this.validateResponse(this.response);
     this.update();
@@ -54607,11 +54966,19 @@ var script$31 = function() {
       return;
     }
 
+    // ページングに使用するparamerは取り除く。
+    const escapedParameterObjects = this.getParameterObjectsForSearch();
+
+    // 検索用のparameterObjectが存在しない場合は何もしない。
+    if (!escapedParameterObjects.length) {
+      return;
+    }
+
     Promise
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'dmc-component-search', {
-        parameterObjects: this.parameterObjects,
-        initialParameters: objectAssign({}, this.currentRequestParameters),
+        parameterObjects: escapedParameterObjects,
+        initialParameters: objectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
           this.updater(parameters);
         }
@@ -54622,7 +54989,6 @@ var script$31 = function() {
   };
 
   this.handlePaginationChange = page => {
-    // TODO: swagger上に定義されていないけどOK？？
     const paging = this.currentPaging = {
       limit: this.pagination.size,
       offset: (page - 1) * this.pagination.size
@@ -54631,7 +54997,7 @@ var script$31 = function() {
   };
 };
 
-riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search {!isCurrentRequestParametersEmpty() ? \'Component__search--active\' : \'\'}" if="{!!parameterObjects.length}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <dmc-pagination if="{!isPending &amp;&amp; hasPpagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" response="{response}" schemaobject="{schemaObject}" tablelabels="{tableLabels}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
+riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__headBasic"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search {!isCurrentSearchRequestParametersEmpty() ? \'Component__search--active\' : \'\'}" if="{!!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__headSearch" if="{!isCurrentSearchRequestParametersEmpty()}"> <div class="Component__searchQuery" each="{val, key in currentSearchRequestParameters}">{key} : {val}</div> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <dmc-pagination class="Component__pagination Component__pagination--head" if="{!isPending &amp;&amp;  hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{paginationSize}" onchange="{handlePaginationChange}"></dmc-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" response="{response}" schemaobject="{schemaObject}" primarykey="{primaryKey}" tablelabels="{tableLabels}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination class="Component__pagination Component__pagination--tail" if="{!isPending &amp;&amp; hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{paginationSize}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
     this.external(script$31);
 });
 
@@ -54685,6 +55051,7 @@ var script$56 = function() {
 
   this.name = store.getter(constants$4.PAGE_NAME);
   this.components = store.getter(constants$4.PAGE_COMPONENTS);
+  this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
 
   /**
    * 現在のviewportに最適なcolumn数を計算して返します。
@@ -54693,7 +55060,11 @@ var script$56 = function() {
   const getGridColumnCountForCurrentViewport = () => {
     const containerWidth = this.refs.list.getBoundingClientRect().width;
     const baseColumnWith = 400;
-    const newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
+    let newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
+    // component数が少ない時はギリギリまで横幅を使う。
+    if (this.componentsCount < newColumnCount) {
+      newColumnCount = this.componentsCount;
+    }
     return newColumnCount;
   };
 
@@ -54725,11 +55096,13 @@ var script$56 = function() {
   this.listen(constants$3.PAGE, () => {
     this.name = store.getter(constants$4.PAGE_NAME);
     this.components = store.getter(constants$4.PAGE_COMPONENTS);
+    this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
     this.update();
+    updateGridColumnCount();
   });
 };
 
-riot$1.tag2('dmc-components', '<div class="ComponentsPage__title">{name}</div> <div class="ComponentsPage__listWrapper"> <div class="ComponentsPage__list" ref="list"> <dmc-component each="{component, idx in components}" component="{component}"></dmc-component> </div> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+riot$1.tag2('dmc-components', '<div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <dmc-icon type="home"></dmc-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <dmc-icon type="right"></dmc-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__list" ref="list"> <dmc-component each="{component, idx in components}" component="{component}"></dmc-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
     this.external(script$56);
 });
 
@@ -56122,7 +56495,7 @@ riot$1.tag2('dmc-markdown', '<div ref="view"></div>', '', 'class="Markdown"', fu
 
 var script$59 = function() {
   this.descriptionsMarkdown = {
-    content: this.opts.description,
+    content: this.opts.endpoint.description,
     markedOptions: {}
   };
 
@@ -56135,7 +56508,7 @@ var script$59 = function() {
   };
 
   this.handleEditButtonPat = () => {
-    this.opts.onedit(this.opts.key, this.opts.url, this.opts.memo);
+    this.opts.onedit(this.opts.key, this.opts.endpoint.url, this.opts.endpoint.memo);
   };
 
   this.handleRemoveButtonPat = () => {
@@ -56147,11 +56520,11 @@ var script$59 = function() {
   };
 
   this.handleQrCodeButtonPat = () => {
-    this.opts.onqrcode(this.opts.key, this.opts.url, this.opts.memo);
+    this.opts.onqrcode(this.opts.key);
   };
 };
 
-riot$1.tag2('dmc-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemName">{opts.name}</div> <div class="EndpointsPage__itemMenuButton" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="ellipsis"></dmc-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemDescription"> <dmc-markdown data="{descriptionsMarkdown}"></dmc-markdown> </div> <div class="EndpointsPage__itemMemo">{opts.memo}</div> <div class="EndpointsPage__itemTags" if="{!!opts.tags.length}"> <dmc-tag each="{label in opts.tags}" label="{label}"></dmc-tag> </div> <div class="EndpointsPage__itemUrl"> <div class="EndpointsPage__itemUrlIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__itemUrlLabel">{opts.url}</div> </div> </div> <div class="EndpointsPage__itemTail"> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleEditButtonPat">編集</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleRemoveButtonPat">削除</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleQrCodeButtonPat">QR Code</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleLogoutButtonPat">ログアウト</div> </div>', '', 'class="EndpointsPage__item" ref="touch" ontap="handleTap"', function(opts) {
+riot$1.tag2('dmc-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.endpoint.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemName">{opts.endpoint.name}</div> <div class="EndpointsPage__itemMenuButton" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="ellipsis"></dmc-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemDescription"> <dmc-markdown data="{descriptionsMarkdown}"></dmc-markdown> </div> <div class="EndpointsPage__itemMemo">{opts.endpoint.memo}</div> <div class="EndpointsPage__itemTags" if="{!!opts.endpoint.tags.length}"> <dmc-tag each="{label in opts.endpoint.tags}" label="{label}"></dmc-tag> </div> <div class="EndpointsPage__itemUrl"> <div class="EndpointsPage__itemUrlIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__itemUrlLabel">{opts.endpoint.url}</div> </div> </div> <div class="EndpointsPage__itemTail"> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleEditButtonPat">編集</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleRemoveButtonPat">削除</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleQrCodeButtonPat">QR Code</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleLogoutButtonPat">ログアウト</div> </div>', '', 'class="EndpointsPage__item" ref="touch" ontap="handleTap"', function(opts) {
     this.external(script$59);
 });
 
@@ -56188,7 +56561,7 @@ var script$61 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoint-edit', '<div class="EndpointsPage__editTitle">管理画面を編集する</div> <div class="EndpointsPage__editUrl">{opts.url}</div> <div class="EndpointsPage__editForm"> <dmc-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__editControls"> <dmc-button type="primary" onpat="{handleEditButtonPat}" label="編集"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
+riot$1.tag2('dmc-endpoint-edit', '<div class="EndpointsPage__editTitle">管理画面を編集する</div> <div class="EndpointsPage__editUrl">{opts.url}</div> <div class="EndpointsPage__editForm"> <dmc-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__editControls"> <dmc-button type="primary" onpat="{handleEditButtonPat}" label="保存"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
     this.external(script$61);
 });
 
@@ -58557,33 +58930,39 @@ var qrious = createCommonjsModule(function (module, exports) {
 });
 
 var script$62 = function() {
-  this.on('mount', function() {
-    const qrcode = new qrious(objectAssign({}, this.opts.data));
-    this.refs.qrcode.src = qrcode.toDataURL();
+  this.on('mount', () => {
+    new qrious(objectAssign({}, this.opts.data, {
+      element: this.refs.canvas
+    }));
   });
-
 };
 
-riot$1.tag2('dmc-qrcode', '<img class="Qrcode__img" ref="qrcode">', '', 'class="Qrcode"', function(opts) {
+riot$1.tag2('dmc-qrcode', '<canvas class="Qrcode__canvas" ref="canvas"></canvas>', '', 'class="Qrcode"', function(opts) {
     this.external(script$62);
 });
 
 var script$63 = function() {
-  this.qrcodeStyle = {
+  const optimizedEndpoint = objectAssign({}, this.opts.endpoint);
+  // token情報は不要。
+  delete optimizedEndpoint.token;
+  const encodedEndpoint = encodeURIComponent(JSON.stringify(optimizedEndpoint));
+  const value = `${location.origin}/#/endpointimport?endpoint=${encodedEndpoint}`;
+
+  this.data = {
     // background: 'green',
     // backgroundAlpha: 0.8,
     // element: <Canvas>,
     // foreground: 'blue',
     // foregroundAlpha: 0.8,
-    level: 'M',
+    level: 'L',
     mime: 'image/png',
     // padding: 5,
     size: 200,
-    value: `${document.location.origin}/?endpoint=${this.opts.url}`
+    value
   };
 };
 
-riot$1.tag2('dmc-endpoint-qrcode', '<dmc-qrcode data="{qrcodeStyle}"></dmc-qrcode>', '', 'class="EndpointsPage__qrcode"', function(opts) {
+riot$1.tag2('dmc-endpoint-qrcode', '<div class="EndpointsPage__qrcodeMessage">モバイル端末にエンドポイントを追加できます。<br>お好きなQRコードリーダーで読み込んで下さい。</div> <div class="EndpointsPage__qrcodeContent"> <dmc-qrcode data="{data}"></dmc-qrcode> </div>', '', 'class="EndpointsPage__qrcode"', function(opts) {
     this.external(script$63);
 });
 
@@ -58639,6 +59018,8 @@ var script$66 = function() {
         this.opts.onSignin();
       })
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'ログイン失敗',
+        message: 'ログイン出来ませんでした。正しいメールアドレスとパスワードを使用しているか確認して下さい。使用したメールアドレスが予め管理者として登録されているか確認して下さい。',
         error: err
       }));
   };
@@ -58653,7 +59034,7 @@ var script$66 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoint-signin', '<div class="EndpointsPage__signinTitle">サインイン</div> <div class="EndpointsPage__signinEmails" if="{!!emails.length}"> <div class="EndpointsPage__signinEmailsTitle">メールアドレス認証</div> <virtual each="{authtype in emails}"> <dmc-signinemail authtype="{authtype}" onsigninpat="{parent.handleEmailSigninPat}"></dmc-signinemail> </virtual> </div> <div class="EndpointsPage__signinOauths" if="{!!oauths.length}"> <div class="EndpointsPage__signinOauthsTitle">OAuth認証</div> <virtual each="{authtype in oauths}"> <dmc-signinoauth authtype="{authtype}" onpat="{parent.handleOAuthPat}"></dmc-signinoauth> </virtual> </div>', '', 'class="EndpointsPage__signin"', function(opts) {
+riot$1.tag2('dmc-endpoint-signin', '<div class="EndpointsPage__signinHead"> <div class="EndpointsPage__signinThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__signinName">{opts.endpoint.name}</div> </div> <div class="EndpointsPage__signinEmails" if="{!!emails.length}"> <div class="EndpointsPage__signinEmailsTitle">メールアドレス認証</div> <virtual each="{authtype in emails}"> <dmc-signinemail authtype="{authtype}" onsigninpat="{parent.handleEmailSigninPat}"></dmc-signinemail> </virtual> </div> <div class="EndpointsPage__signinOauths" if="{!!oauths.length}"> <div class="EndpointsPage__signinOauthsTitle">OAuth認証</div> <virtual each="{authtype in oauths}"> <dmc-signinoauth authtype="{authtype}" onpat="{parent.handleOAuthPat}"></dmc-signinoauth> </virtual> </div>', '', 'class="EndpointsPage__signin"', function(opts) {
     this.external(script$66);
 });
 
@@ -58722,13 +59103,12 @@ var script$60 = function() {
       }));
   };
 
-  this.handleEndpointQrCode = (key, url, memo) => {
+  this.handleEndpointQrCode = key => {
+    const endpoint = store.getter(constants$4.ENDPOINTS_ONE, key);
     Promise
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'dmc-endpoint-qrcode', {
-        endpointKey: key,
-        url,
-        memo
+        endpoint
       }))
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
         error: err
@@ -58748,7 +59128,7 @@ var script$60 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__count" if="{!!endpointsCount}"> <div class="EndpointsPage__countIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__countLabel">Endpoint ({endpointsCount})</div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" name="{endpoint.name}" thumbnail="{endpoint.thumbnail}" token="{endpoint.token}" url="{endpoint.url}" description="{endpoint.description}" memo="{endpoint.memo}" tags="{endpoint.tags}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
+riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__count" if="{!!endpointsCount}"> <div class="EndpointsPage__countIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__countLabel">Endpoint ({endpointsCount})</div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" endpoint="{endpoint}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
     this.external(script$60);
 });
 
@@ -58891,7 +59271,7 @@ var script$71 = function() {
   };
 };
 
-riot$1.tag2('dmc-menu-group', '<div class="Menu__groupToggle {opts.group.isIndependent &amp;&amp; opts.group.list[0].isSelected ? \'Menu__groupToggle--selected\' : \'\'}" ref="touch" ontap="handleToggleTap"> <dmc-icon class="Menu__groupIconHead" type="codeSquareO"></dmc-icon> <div class="Menu__groupName">{opts.group.isIndependent ? opts.group.list[0].name : opts.group.name}</div> <dmc-icon class="Menu__groupIconTail {isOpened ? \'Menu__groupIconTail--opened\' : \'\'}" if="{!opts.group.isIndependent}" type="up"></dmc-icon> </div> <div class="Menu__groupList {isOpened ? \'Menu__groupList--opened\' : \'\'}" if="{!opts.group.isIndependent}"> <div class="Menu__groupListItem {item.isSelected ? \'Menu__groupListItem--selected\' : \'\'}" each="{item, idx in opts.group.list}" data-idx="{idx}" ref="touch" ontap="handleGroupItemTap">{item.name}</div> </div>', '', 'class="Menu__group"', function(opts) {
+riot$1.tag2('dmc-menu-group', '<div class="Menu__groupToggle {opts.group.isIndependent &amp;&amp; opts.group.list[0].isSelected ? \'Menu__groupToggle--selected\' : \'\'}" ref="touch" ontap="handleToggleTap"> <dmc-icon class="Menu__groupIconHead" type="play"></dmc-icon> <div class="Menu__groupName">{opts.group.isIndependent ? opts.group.list[0].name : opts.group.name}</div> <dmc-icon class="Menu__groupIconTail {isOpened ? \'Menu__groupIconTail--opened\' : \'\'}" if="{!opts.group.isIndependent}" type="up"></dmc-icon> </div> <div class="Menu__groupList {isOpened ? \'Menu__groupList--opened\' : \'\'}" if="{!opts.group.isIndependent}"> <div class="Menu__groupListItem {item.isSelected ? \'Menu__groupListItem--selected\' : \'\'}" each="{item, idx in opts.group.list}" data-idx="{idx}" ref="touch" ontap="handleGroupItemTap">{item.name}</div> </div>', '', 'class="Menu__group"', function(opts) {
     this.external(script$71);
 });
 
@@ -58950,7 +59330,7 @@ var script$72 = function() {
   };
 };
 
-riot$1.tag2('dmc-menu', '<div class="Menu__head"> <div class="media Menu__endpoint"> <div class="media__image Menu__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Menu__endpointBody"> <div class="Menu__endpointBodyHead"> <div class="Menu__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Menu__endpointHost" if="{!!endpoint}">{endpoint.url}</div> </div> <div class="Menu__endpointBodyTail"> <div class="Menu__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> </div> <div class="Menu__body"> <div class="Menu__section"> <div class="Menu__sectionTitle">ダッシュボード</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedDashboard}" group="{group}"></dmc-menu-group> </div> </div> <div class="Menu__section"> <div class="Menu__sectionTitle">管理画面</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedManage}" group="{group}"></dmc-menu-group> </div> </div> </div> <div class="Menu__tail"> <div class="Menu__homeButton" ref="touch" ontap="handleHomeButtonTap"> <dmc-icon type="home"></dmc-icon> </div> </div>', '', 'class="Menu"', function(opts) {
+riot$1.tag2('dmc-menu', '<div class="Menu__head"> <div class="media Menu__endpoint"> <div class="media__image Menu__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Menu__endpointBody"> <div class="Menu__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Menu__endpointHost" if="{!!endpoint}">{endpoint.url}</div> <div class="Menu__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> <div class="Menu__body"> <div class="Menu__section"> <div class="Menu__sectionTitle">ダッシュボード</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedDashboard}" group="{group}"></dmc-menu-group> </div> </div> <div class="Menu__section"> <div class="Menu__sectionTitle">管理画面</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedManage}" group="{group}"></dmc-menu-group> </div> </div> </div> <div class="Menu__tail"> <div class="Menu__leftIcon"> <dmc-icon type="left"></dmc-icon> </div> <div class="Menu__homeButton" ref="touch" ontap="handleHomeButtonTap"> <dmc-icon type="home"></dmc-icon> </div> </div>', '', 'class="Menu"', function(opts) {
     this.external(script$72);
 });
 
@@ -59232,30 +59612,12 @@ document.addEventListener('DOMContentLoaded', () => {
       window.store = store;
     })
     .then(() => {
-      // OAuth認証後のリダイレクトではクエリにtokenが格納されている。
-      // tokenがあればOAuth認証とみなす。
-      const token = getParam_1(location.href, 'token');
-      if (!token) {
-        return Promise.resolve();
-      }
-
-      const oauthEndpointKey = mainStore.getter(constants$4.OAUTH_ENDPOINT_KEY);
-      return Promise
-        .all([
-          mainStore.action(constants$1.CURRENT_UPDATE, oauthEndpointKey),
-          mainStore.action(constants$1.AUTH_UPDATE, oauthEndpointKey, token),
-          mainStore.action(constants$1.OAUTH_ENDPOINT_KEY_REMOVE)
-        ])
-        .then(() => {
-          location.href = `${location.origin}${location.pathname}#/${oauthEndpointKey}`;
-        });
-    })
-    .then(() => {
       riot$1.mount('dmc');
     })
     .then(() => mainStore.action(constants$1.UA_SETUP))
     .then(() => router.init(mainStore))
     .catch(err => mainStore.action(constants$1.MODALS_ADD, 'dmc-message', {
+      message: 'Viron起動に失敗しました。Viron担当者にお問い合わせ下さい。',
       error: err
     }));
 });
