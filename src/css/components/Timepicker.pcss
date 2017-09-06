@@ -8,6 +8,7 @@
 }
 
 .Timepicker__label {
+  display: block;
   padding-left: 8px;
   margin-bottom: 4px;
   font-size: 12px;
@@ -19,7 +20,6 @@
   width: 100%;
   padding: 10px;
   font-size: var(--component-timepicker-font-size);
-  cursor: text;
   background-color: var(--color-basic-white);
   border: 1px solid var(--color-basic-gray);
   border-radius: 5px;
@@ -31,43 +31,47 @@
 
 .Timepicker__partialTime {
   position: absolute;
-  display: inline-block;
   width: 100%;
+  min-width: 125px;
 }
 
-.Partialtime__body {
+.Timepicker__partialTimeBody {
   top: 0;
-  display: flex;
-  flex-flow: row wrap;
   height: 100px;
   background-color: var(--color-basic-white);
   border-radius: 3px;
   box-shadow: 0 0 1px;
-  justify-content: space-around;
+  @apply --layout-between-stretch;
+  flex-wrap: wrap;
 }
 
-.Partialtime__list {
+.Timepicker__partialTimeList {
   flex-grow: 1;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
-.Partialtime__list--center {
+/*プルダウンメニューのタップ領域を増やす為、スクロールバーを除去*/
+.Timepicker__partialTimeList::-webkit-scrollbar{
+    display:none;
+}
+
+.Timepicker__partialTimeList--center {
   border-right: 0.5px solid var(--color-basic-lightGray);
   border-left: 0.5px solid var(--color-basic-lightGray);
 }
 
-.Partialtime__listItem {
-  height: 20px;
-  padding: 1px 5px;
+.Timepicker__partialTimeListItem {
+  height: 25px;
+  padding: 5px 5px;
   font-size: calc(var(--component-timepicker-font-size) * 0.5);
   cursor: pointer;
 }
 
-.Partialtime__listItem:hover {
+.Timepicker__partialTimeListItem:hover {
   background-color: var(--color-basic-lightGray);
 }
 
-.Partialtime__listItem--selected {
+.Timepicker__partialTimeListItem--selected {
   font-weight: 700;
   background-color: var(--color-basic-lightGray);
 }
