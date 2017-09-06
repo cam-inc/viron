@@ -1,4 +1,4 @@
-dmc-table-item.Table__item(class="{ isOpened ? 'Table__item--opened' : '' }")
+dmc-table-item.Table__item(ref="touch" onTap="handleTap")
   .Table__itemHeader
     .Table__itemTitle { opts.item.title }
     .Table__itemType { opts.item.type }

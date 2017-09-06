@@ -100,9 +100,15 @@
   flex-shrink: 0;
   padding: 8px;
   margin-right: 4px;
+  cursor: pointer;
   background-color: #fff;
   border-right: 2px solid var(--color-bg-tertiary);
   border-left: 2px solid var(--color-bg-tertiary);
+}
+
+.Table__item:hover,
+.Table__item.hover {
+  border-color: var(--color-base-dodgerBlue);
 }
 
 .Table__itemsContent .Table__item:last-child {
