@@ -65,7 +65,7 @@ export default function() {
       store.action(actions.MODALS_ADD, 'dmc-message', {
         title: 'エンドポイント追加 失敗',
         message: 'JSONファイルを指定してください。',
-        error: {}
+        type: 'error'
       });
       inputFile.value = '';
       return;
@@ -76,14 +76,13 @@ export default function() {
     reader.readAsText(file);
 
     // 読み込みが失敗した。
-    reader.onerror = () => {
+    reader.onerror = err => {
       store.action(actions.MODALS_ADD, 'dmc-message', {
         title: 'エンドポイント追加 失敗',
         message: 'ファイルの読み込みに失敗しました。',
-        error: {}
+        error: err
       });
       inputFile.value = '';
-      return;
     };
 
     // 読み込みが成功し、完了した。
