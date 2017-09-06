@@ -1,9 +1,22 @@
 import moment from 'moment';
 import times from 'mout/function/times';
+import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
-  this.selectedDate = moment(this.opts.date || null);
-  this.displayDate = moment(this.opts.displaydate || {});
+
+  const format = (date) => {
+    return date.format('YYYY-MM-DD');
+  };
+
+  if (!isUndefined(this.opts.date)) {
+    this.selectedDate = moment.utc(this.opts.date || null);
+    this.displayFormatDate = format(this.selectedDate);
+    this.displayDate = moment.utc(this.opts.displaydate || {});
+  } else {
+    this.selectedDate = moment.utc(this.opts.date).set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
+    this.displayFormatDate = '';
+    this.displayDate = moment.utc(this.opts.displaydate || {});
+  }
   this.settingDateName = {
     'month': {
       'ja': [
@@ -24,15 +37,18 @@ export default function() {
   };
 
   this.on('update', () => {
-    this.selectedDate = moment(this.opts.date || null);
-    this.displayDate = moment(this.opts.displaydate || {});
+    if (!isUndefined(this.opts.date)) {
+      this.selectedDate = moment.utc(this.opts.date || null);
+      this.displayFormatDate = format(this.selectedDate);
+      this.displayDate = moment.utc(this.opts.displaydate || {});
+    } else {
+      this.selectedDate = moment.utc(this.opts.date).set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
+      this.displayFormatDate = format(this.selectedDate);
+      this.displayDate = moment.utc(this.opts.displaydate || {});
+    }
   }).on('updated', () => {
     this.rebindTouchEvents();
   });
-
-  const format = (date) => {
-    return date.format('YYYY-MM-DD');
-  };
 
   this.generateCalendar = () => {
     const MAX_DISPLAY_DAYS = 42;
@@ -54,17 +70,17 @@ export default function() {
   };
 
   this.handleNextButtonPat = () => {
-    const newDateText =  format(this.displayDate.add(1, 'month'));
+    const newDateText =  this.displayDate.add(1, 'month').toISOString();
     this.opts.ondisplaychange(newDateText);
   };
 
   this.handlePrevButtonPat = () => {
-    const newDateText = format(this.displayDate.subtract(1, 'month'));
+    const newDateText = this.displayDate.subtract(1, 'month').toISOString();
     this.opts.ondisplaychange(newDateText);
   };
 
   this.handleCellPat = (newDate) => {
-    this.opts.onchange(format(newDate));
+    this.opts.onchange(newDate.toISOString());
   };
 
   this.handleInputTap = () => {
