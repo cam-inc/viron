@@ -62,6 +62,16 @@ export default function() {
       return;
     }
 
+    // ファイルがjsonであるか
+    if (file.type !== 'application/json') {
+      store.action(actions.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'JSONファイルを指定してください。',
+        error: {}
+      });
+      return;
+    }
+
     // ファイルをテキストとして読み込む。
     reader.readAsText(file);
 
@@ -108,7 +118,7 @@ export default function() {
         })
         .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', {
           title: 'エンドポイント追加 失敗',
-          message: 'エンドポイントを追加出来ませんでした',
+          message: 'エンドポイントを追加出来ませんでした。',
           error: {}
         }));
     };
