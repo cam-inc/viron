@@ -19,7 +19,7 @@ dmc.Application
                 dmc-icon(type="download")
               .Application__menuItemLabel ダウンロード
             .Application__menuItem
-              label.Application__menuItemLabel(for="file")
+              label.Application__menuItemLabelInput(for="file")
                 .Application__menuItemIcon
                   dmc-icon(type="upload")
                 .Application__menuItemLabel アップロード
