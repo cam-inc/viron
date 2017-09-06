@@ -2,6 +2,8 @@ import download from 'downloadjs';
 import { constants as actions } from '../store/actions';
 import { constants as getters } from '../store/getters';
 import { constants as states } from '../store/states';
+import '../components/atoms/dmc-message/index.tag';
+import './confirm.tag';
 import './entry.tag';
 
 export default function() {
@@ -37,7 +39,7 @@ export default function() {
   this.handleEntryMenuItemTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'dmc-entry'))
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-application-entry'))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
       }));
@@ -46,5 +48,18 @@ export default function() {
   this.handleDownloadMenuItemTap = () => {
     const endpoints = store.getter(getters.ENDPOINTS_WITHOUT_TOKEN);
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
+  };
+
+  this.handleClearMenuItemTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-application-confirm', {
+        onConfirm: () => {
+          store.action(actions.ENDPOINTS_REMOVE_ALL);
+        }
+      }))
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
   };
 }
