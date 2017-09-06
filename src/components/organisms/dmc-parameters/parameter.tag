@@ -1,6 +1,6 @@
 dmc-parameter.Parameter
   .Parameter__body
-    dmc-parameter-schema(val="{ opts.val }" schemaObject="{ normalizedSchemaObject }" onChange="{ handleSchemaChange }")
+    dmc-parameter-schema(val="{ opts.val }" schemaObject="{ normalizedSchemaObject }" additionalInfo="{ opts.additionalinfo }" onChange="{ handleSchemaChange }")
 
   script.
     import './schema.tag';

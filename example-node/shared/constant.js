@@ -5,10 +5,10 @@ module.exports = {
 
   GROUP_EMPTY: '', // グループなし
   GROUP_KPI: 'kpi', // KPI
-  GROUP_USER: 'user', // ユーザ
-  GROUP_BLOG: 'blog', // ブログ
-  GROUP_ADMIN: 'admin', // 管理権限
-  GROUP_EXAMPLE: 'example', // サンプル
+  GROUP_USER: 'ユーザ', // ユーザ
+  GROUP_BLOG: 'ブログ', // ブログ
+  GROUP_ADMIN: '管理', // 管理権限
+  GROUP_EXAMPLE: 'サンプル', // サンプル
 
   USER_MALE: 'male',
   USER_FEMALE: 'female',
@@ -25,16 +25,16 @@ module.exports = {
   DEFAULT_PAGER_LIMIT: 100,
 
   // @see shared/context.js#initConstant
-  //DMC_STYLE_LIST: dmclib.constants.DMC_STYLE_LIST,
-  //DMC_STYLE_TABLE: dmclib.constants.DMC_STYLE_TABLE,
-  //DMC_STYLE_NUMBER: dmclib.constants.DMC_STYLE_NUMBER,
-  //DMC_STYLE_GRAPH_SCATTERPLOT: dmclib.constants.DMC_STYLE_GRAPH_SCATTERPLOT,
-  //DMC_STYLE_GRAPH_LINE: dmclib.constants.DMC_STYLE_GRAPH_LINE,
-  //DMC_STYLE_GRAPH_BAR: dmclib.constants.DMC_STYLE_GRAPH_BAR,
-  //DMC_STYLE_GRAPH_HORIZONTAL_BAR: dmclib.constants.DMC_STYLE_GRAPH_HORIZONTAL_BAR,
-  //DMC_STYLE_GRAPH_STACKED_BAR: dmclib.constants.DMC_STYLE_GRAPH_STACKED_BAR,
-  //DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR: dmclib.constants.DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR,
-  //DMC_STYLE_GRAPH_STACKED_AREA: dmclib.constants.DMC_STYLE_GRAPH_STACKED_AREA,
-  //DMC_SECTION_DASHBOARD: dmclib.constants.DMC_SECTION_DASHBOARD,
-  //DMC_SECTION_MANAGE: dmclib.constants.DMC_SECTION_MANAGE,
+  //DMC_STYLE_LIST: vironlib.constants.DMC_STYLE_LIST,
+  //DMC_STYLE_TABLE: vironlib.constants.DMC_STYLE_TABLE,
+  //DMC_STYLE_NUMBER: vironlib.constants.DMC_STYLE_NUMBER,
+  //DMC_STYLE_GRAPH_SCATTERPLOT: vironlib.constants.DMC_STYLE_GRAPH_SCATTERPLOT,
+  //DMC_STYLE_GRAPH_LINE: vironlib.constants.DMC_STYLE_GRAPH_LINE,
+  //DMC_STYLE_GRAPH_BAR: vironlib.constants.DMC_STYLE_GRAPH_BAR,
+  //DMC_STYLE_GRAPH_HORIZONTAL_BAR: vironlib.constants.DMC_STYLE_GRAPH_HORIZONTAL_BAR,
+  //DMC_STYLE_GRAPH_STACKED_BAR: vironlib.constants.DMC_STYLE_GRAPH_STACKED_BAR,
+  //DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR: vironlib.constants.DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR,
+  //DMC_STYLE_GRAPH_STACKED_AREA: vironlib.constants.DMC_STYLE_GRAPH_STACKED_AREA,
+  //DMC_SECTION_DASHBOARD: vironlib.constants.DMC_SECTION_DASHBOARD,
+  //DMC_SECTION_MANAGE: vironlib.constants.DMC_SECTION_MANAGE,
 };

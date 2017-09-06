@@ -28,15 +28,19 @@
 .Table__itemsTitle {
   @apply --text-truncate;
   flex-grow: 1;
+  font-weight: bold;
   cursor: pointer;
+  user-select: none;
 }
 
+.Table__itemsTitle:hover,
 .Table__itemsTitle.hover {
   opacity: 0.5;
 }
 
 .Table__itemsButton {
   @apply --layout-center-center;
+  position: relative;
   flex-shrink: 0;
   width: 18px;
   height: 18px;
@@ -47,8 +51,22 @@
   border-radius: 2px;
 }
 
-.Table__itemsButton.hover {
+.Table__itemsButton:hover .Icon,
+.Table__itemsButton.hover .Icon {
   opacity: 0.5;
+}
+
+.Table__itemsButton .Tooltip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  margin: 0 auto;
+}
+
+/* TODO: テキストが縦に伸びるbug有り。下記は暫定対応。後で修正したい。 */
+.Table__itemsButton .Tooltip__text {
+  width: 150px;
 }
 
 .Table__itemsOpenShutButton .Icon {
@@ -60,78 +78,65 @@
   transform: rotate(180deg);
 }
 
+.Table__itemsButtonCatcher {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 /* ============================== */
 /* item */
 /* ============================== */
 
+.Table__itemsContent {
+  @apply --layout-stretch-start;
+  overflow-x: scroll;
+}
+
 .Table__item {
   display: block;
+  flex-shrink: 0;
   padding: 8px;
-  margin-bottom: 8px;
+  margin-right: 4px;
+  cursor: pointer;
   background-color: #fff;
   border-right: 2px solid var(--color-bg-tertiary);
   border-left: 2px solid var(--color-bg-tertiary);
 }
 
-.Table__items .Table__item:last-child {
-  margin-bottom: 0;
+.Table__item:hover,
+.Table__item.hover {
+  border-color: var(--color-base-dodgerBlue);
+}
+
+.Table__itemsContent .Table__item:last-child {
+  margin-right: 0;
 }
 
 .Table__itemHeader {
   @apply --layout-center-center;
-  cursor: pointer;
-}
-
-.Table__itemHeader.hover {
-  opacity: 0.5;
-}
-
-.Table__itemInfo {
-  flex-grow: 1;
+  margin-bottom: 4px;
 }
 
 .Table__itemTitle {
+  flex-grow: 1;
+  flex-shrink: 0;
+  margin-right: 4px;
   font-weight: bold;
 }
 
 .Table__itemType {
+  flex-shrink: 0;
   color: var(--color-bg-secondary);
-}
-
-.Table__item--opened .Table__itemHeader {
-  margin-bottom: 4px;
-}
-
-.Table__itemOpenShut {
-  @apply --layout-center-center;
-  width: 12px;
-  height: 12px;
-  margin-left: 4px;
-  font-size: 12px;
-}
-
-.Table__itemOpenShut .Icon {
-  transition-duration: 100ms;
-  transition-property: transform;
-}
-
-.Table__item--opened .Table__itemOpenShut .Icon {
-  transform: rotate(180deg);
 }
 
 .Table__cell {
   display: block;
 }
 
-.Table__cellButton {
-  display: inline-block;
-  padding: 4px 8px;
-  color: #fff;
-  cursor: pointer;
-  background-color: var(--color-bg-secondary);
-  border-radius: 2px;
-}
-
+.Table__cellButton:hover,
 .Table__cellButton.hover {
   opacity: 0.5;
 }
@@ -166,45 +171,4 @@
 
 .Table__filter .Checkbox:last-child {
   margin-bottom: 0;
-}
-
-/* ============================== */
-/* action */
-/* ============================== */
-.Table__action {
-  display: block;
-}
-
-.Table__actionItem {
-  @apply --layout-center-center;
-  padding: 8px;
-  margin-bottom: 8px;
-  background-color: #fff;
-  border-left: 2px solid var(--color-bg-tertiary);
-}
-
-.Table__actionItem:last-child {
-  margin-bottom: 0;
-}
-
-.Table__actionInner {
-  flex-grow: 1;
-  margin-right: 8px;
-}
-
-.Table__actionTitle {
-  margin-bottom: 4px;
-  font-weight: bold;
-}
-
-.Table__actionExecuteButton {
-  padding: 8px;
-  color: #fff;
-  cursor: pointer;
-  background-color: var(--color-basic-skyblue);
-  border-radius: 4px;
-}
-
-.Table__actionExecuteButton.hover {
-  background-color: var(--color-basic-lightPurple);
 }

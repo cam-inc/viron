@@ -64,7 +64,9 @@ export default {
    * @return {Array}
    */
   updateToken: (context, endpointKey, token) => {
-    context.state.endpoints[endpointKey].token = token;
+    if (!!context.state.endpoints[endpointKey]) {
+      context.state.endpoints[endpointKey].token = token;
+    }
     storage.set('endpoints', context.state.endpoints);
     return [states.ENDPOINTS];
   },

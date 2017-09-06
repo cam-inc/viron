@@ -47,10 +47,6 @@ export default function() {
     this.fadeOut();
   };
 
-  this.handleCloseButtonTap = () => {
-    this.fadeOut();
-  };
-
   this.handleKeyDown = e => {
     switch (e.keyCode) {
     case 27:// Esc

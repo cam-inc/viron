@@ -1,6 +1,6 @@
 dmc-parameters.Parameters
   virtual(each="{ parameterObject in opts.parameterobjects }")
-    dmc-parameter(parameterObject="{ parameterObject }" val="{ parent.getParameterValue(parameterObject) }" onChange="{ parent.handleChange }")
+    dmc-parameter(parameterObject="{ parameterObject }" val="{ parent.getParameterValue(parameterObject) }" additionalInfo="{ parent.opts.additionalinfo }" onChange="{ parent.handleChange }")
 
   script.
     import './parameter.tag';

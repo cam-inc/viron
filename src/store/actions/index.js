@@ -7,10 +7,8 @@ import drawers from './drawers';
 import endpoints from './endpoints';
 import layout from './layout';
 import location from './location';
-import menu from './menu';
 import modals from './modals';
 import oas from './oas';
-import oauthEndpointKey from './oauthEndpointKey';
 import page from './page';
 import toasts from './toasts';
 import ua from './ua';
@@ -40,14 +38,9 @@ const constants = {
   ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
   ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
-  LAYOUT_UPDATE_ENDPOINTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_ENDPOINTS_GRID_COLUMN_COUNT',
+  ENDPOINTS_MERGE_ONE_WITH_KEY: 'ENDPOINTS_MERGE_ONE_WITH_KEY',
   LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION_UPDATE: 'LOCATION_UPDATE',
-  MENU_TOGGLE: 'MENU_TOGGLE',
-  MENU_OPEN: 'MENU_OPEN',
-  MENU_CLOSE: 'MENU_CLOSE',
-  MENU_ENABLE: 'MENU_ENABLE',
-  MENU_DISABLE: 'MENU_DISABLE',
   MODALS_ADD: 'MODALS_ADD',
   MODALS_REMOVE: 'MODALS_REMOVE',
   OAS_SETUP: 'OAS_SETUP',
@@ -85,19 +78,13 @@ export default {
   [constants.ENDPOINTS_REMOVE]: endpoints.remove,
   [constants.ENDPOINTS_REMOVE_ALL]: endpoints.removeAll,
   [constants.ENDPOINTS_MERGE_ALL]: endpoints.mergeAll,
-  [constants.LAYOUT_UPDATE_ENDPOINTS_GRID_COLUMN_COUNT]: layout.updateEndpointsGridColumnCount,
+  [constants.ENDPOINTS_MERGE_ONE_WITH_KEY]: endpoints.mergeOneWithKey,
   [constants.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT]: layout.updateComponentsGridColumnCount,
   [constants.LOCATION_UPDATE]: location.update,
-  [constants.MENU_TOGGLE]: menu.toggle,
-  [constants.MENU_OPEN]: menu.open,
-  [constants.MENU_CLOSE]: menu.close,
-  [constants.MENU_ENABLE]: menu.enable,
-  [constants.MENU_DISABLE]: menu.disable,
   [constants.MODALS_ADD]: modals.add,
   [constants.MODALS_REMOVE]: modals.remove,
   [constants.OAS_SETUP]: oas.setup,
   [constants.OAS_CLEAR]: oas.clear,
-  [constants.OAUTH_ENDPOINT_KEY_REMOVE]: oauthEndpointKey.remove,
   [constants.PAGE_GET]: page.get,
   [constants.PAGE_REMOVE]: page.remove,
   [constants.TOASTS_ADD]: toasts.add,

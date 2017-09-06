@@ -1,8 +1,7 @@
 .Menu {
   @apply --layout-column-stretch-center;
-  width: var(--component-application-asideColumn-width);
   height: 100%;
-  background-color: var(--color-basic-white);
+  color: var(--color-base-white);
 }
 
 .Menu__head {
@@ -12,7 +11,7 @@
 
 .Menu__endpoint {
   padding-bottom: 24px;
-  border-bottom: 1px solid var(--color-basic-black);
+  border-bottom: 1px solid var(--color-base-concrete);
 }
 
 .Menu__endpointImage {
@@ -23,37 +22,28 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  border-radius: 4px;
+  border-radius: 50%;
   box-shadow: 0 3px 2px rgba(0, 0, 0, 0.16);
 }
 
 .Menu__endpointBody {
-  @apply --layout-column-stretch-center;
-  height: 54px;
-}
-
-.Menu__endpointBodyHead {
-  flex-grow: 1;
+  color: var(--color-base-concrete);
 }
 
 .Menu__endpointTitle {
   @apply --text-truncate;
-  margin-bottom: 4px;
-  font-size: 12px;
   font-weight: bold;
-  color: var(--color-basic-black);
 }
 
 .Menu__endpointHost {
   @apply --text-truncate;
-  font-size: 12px;
-  color: var(--color-basic-black);
+  margin-bottom: 8px;
+  font-size: 10px;
 }
 
 .Menu__endpointDescription {
   @apply --text-truncate;
-  font-size: 15px;
-  color: var(--color-basic-black);
+  font-size: 10px;
 }
 
 .Menu__body {
@@ -64,8 +54,7 @@
 
 .Menu__sectionTitle {
   padding: 14px 16px;
-  font-size: 11px;
-  color: var(--color-basic-black);
+  font-size: 10px;
 }
 
 .Menu__group {
@@ -76,18 +65,16 @@
   @apply --layout-center-center;
   padding: 14px 16px;
   margin-right: 8px;
-  font-size: 15px;
-  color: var(--color-basic-black);
   cursor: pointer;
   border-radius: 0 8px 8px 0;
   transition-duration: 100ms;
   transition-property: color, background-color;
 }
 
+.Menu__groupToggle:hover,
 .Menu__groupToggle.hover,
 .Menu__groupToggle--selected {
-  color: var(--color-basic-white);
-  background-color: var(--color-basic-black);
+  background-color: var(--color-base-black);
 }
 
 .Menu__groupIconHead {
@@ -111,40 +98,60 @@
 .Menu__groupList {
   position: relative;
   display: none;
-  padding: 12px 0;
-  margin-top: 12px;
-  background-color: var(--color-basic-lightGray);
 }
 
 .Menu__groupList--opened {
   display: block;
 }
 
-.Menu__groupList::before {
-  position: absolute;
-  top: -4px;
-  left: 30px;
-  display: block;
-  width: 10px;
-  height: 10px;
-  content: "";
-  background-color: var(--color-basic-lightGray);
-  transform: rotate(45deg);
-}
-
 .Menu__groupListItem {
   position: relative;
   padding: 14px 16px 14px 48px;
   margin-right: 8px;
-  font-size: 14px;
   cursor: pointer;
-  background-color: var(--color-basic-lightGray);
   border-radius: 0 8px 8px 0;
   transition-duration: 100ms;
   transition-property: background-color;
 }
 
 .Menu__groupListItem--selected,
+.Menu__groupListItem:hover,
 .Menu__groupListItem.hover {
-  background-color: var(--color-basic-gray);
+  background-color: var(--color-base-black);
+}
+
+.Menu__groupList .Menu__groupListItem {
+  margin-bottom: 4px;
+}
+
+.Menu__groupList .Menu__groupListItem:last-child {
+  margin-bottom: 0;
+}
+
+.Menu__tail {
+  @apply --layout-center-start;
+  padding: 24px 16px;
+}
+
+.Menu__leftIcon {
+  @apply --layout-center-center;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  font-size: 12px;
+  color: var(--color-base-concrete);
+}
+
+.Menu__homeButton {
+  @apply --layout-center-center;
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
+  color: var(--color-base-concrete);
+  cursor: pointer;
+}
+
+.Menu__homeButton:hover,
+.Menu__homeButton.hover {
+  opacity: 0.5;
 }

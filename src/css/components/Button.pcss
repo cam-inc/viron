@@ -1,14 +1,26 @@
 .Button {
   display: inline-block;
-  padding: 16px;
-  font-size: 15px;
+  padding: 8px;
   text-align: center;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 2px;
 }
 
 .Button--disabled {
   cursor: not-allowed;
+}
+
+.Button__content {
+  @apply --layout-center-center;
+}
+
+.Button__icon {
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.Button__icon {
+  flex-grow: 1;
 }
 
 /* ============================== */
@@ -20,6 +32,7 @@
 }
 
 .Button--primary.Button--disabled,
+.Button--primary:hover,
 .Button--primary.hover {
   background-color: var(--color-basic-lightPurple);
 }
@@ -30,6 +43,7 @@
 }
 
 .Button--secondary.Button--disabled,
+.Button--secondary:hover,
 .Button--secondary.hover {
   background-color: var(--color-basic-lightGray);
 }
@@ -40,16 +54,18 @@
 }
 
 .Button--emphasis.Button--disabled,
+.Button--emphasis:hover,
 .Button--emphasis.hover {
   background-color: var(--color-basic-lightGray);
 }
 
 .Button--primaryGhost {
   color: var(--color-basic-skyblue);
-  border: 3px solid var(--color-basic-skyblue);
+  border: 1px solid var(--color-basic-skyblue);
 }
 
 .Button--primaryGhost.Button--disabled,
+.Button--primaryGhost:hover,
 .Button--primaryGhost.hover {
   color: var(--color-basic-lightPurple);
   border-color: var(--color-basic-lightPurple);
@@ -57,10 +73,11 @@
 
 .Button--secondaryGhost {
   color: var(--color-basic-gray);
-  border: 3px solid var(--color-basic-gray);
+  border: 1px solid var(--color-basic-gray);
 }
 
 .Button--secondaryGhost.Button--disabled,
+.Button--secondaryGhost:hover,
 .Button--secondaryGhost.hover {
   color: var(--color-basic-lightGray);
   border-color: var(--color-basic-lightGray);
@@ -68,10 +85,11 @@
 
 .Button--emphasisGhost {
   color: var(--color-basic-red);
-  border: 3px solid var(--color-basic-red);
+  border: 1px solid var(--color-basic-red);
 }
 
 .Button--emphasisGhost.Button--disabled,
+.Button--emphasisGhost:hover,
 .Button--emphasisGhost.hover {
   color: var(--color-basic-lightGray);
   border-color: var(--color-basic-lightGray);

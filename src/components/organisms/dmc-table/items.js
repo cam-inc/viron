@@ -1,82 +1,23 @@
-import filter from 'mout/array/filter';
-import find from 'mout/array/find';
-import forEach from 'mout/array/forEach';
-import map from 'mout/array/map';
-import { constants as actions } from '../../../store/actions';
-import './action.tag';
-import './filter.tag';
+import sortBy from 'mout/array/sortBy';
 
 export default function() {
-  const store = this.riotx.get();
-
-  this.isOpened = false;
-  this.title = '';
-  // keyを指定されていればそれを使う。
-  let item;
-  forEach(this.opts.tablelabels, key => {
-    if (!!item) {
-      return;
-    }
-    item = find(this.opts.items, item => {
-      return (item.key === key);
-    });
+  // sort済みのitems。
+  this.sortedItems = sortBy(this.opts.items, item => {
+    return (this.opts.tablelabels || []).indexOf(item.key) * (-1);
   });
-  // `id`を優先する。
-  if (!item) {
-    item = find(this.opts.items, item => {
-      return (item.key === 'id');
-    });
-  }
-  // 適当に選ぶ。
-  if (!item) {
-    item = this.opts.items[0];
-  }
-  this.title = `${item.cell}`;
-
-  // 画面表示するkey群。
-  let visibleKeys = map(this.opts.items, item => {
-    return item.key;
-  });
-  // filterを通したリストを返す。
-  const getItems = () => {
-    return filter(this.opts.items, item => {
-      if (!find(visibleKeys, key => {
-        return (key === item.key);
-      })) {
-        return false;
-      }
-      return true;
-    });
-  };
-  this.filteredItems = getItems();
+  this.title = this.sortedItems[0].cell;
+  this.isOpened = true;
 
   this.handleHeaderTitleTap = () => {
     this.isOpened = !this.isOpened;
     this.update();
   };
 
-  this.handleActionButtonTap = () => {
-    store.action(actions.MODALS_ADD, 'dmc-table-action', {
-      actions: this.opts.actions,
-      idx: this.opts.idx
-    });
+  this.handleItemsActionButtonPat = action => {
+    action.onPat(action.operationId, this.opts.idx);
   };
 
-  this.handleFilterButtonTap = () => {
-    store.action(actions.MODALS_ADD, 'dmc-table-filter', {
-      options: map(this.opts.items, item => {
-        return item.key;
-      }),
-      selectedOptions: visibleKeys,
-      onChange: selectedOptions => {
-        visibleKeys = selectedOptions;
-        this.filteredItems = getItems();
-        this.update();
-      }
-    });
-  };
-
-  this.handleOpenShutButtonTap = () => {
+  this.handleOpenShutButtonPat = () => {
     this.isOpened = !this.isOpened;
     this.update();
   };

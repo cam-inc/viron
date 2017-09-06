@@ -56,6 +56,13 @@
     justify-content: space-between;
   }
 
+  /* 左揃え & 上下いっぱいまで広がる*/
+  --layout-stretch-start: {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
   /* 縦方向*/
   /* 天地中央 & 左右いっぱいまで広がる */
   --layout-column-stretch-center: {
@@ -63,5 +70,14 @@
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
+  }
+
+  /* 各アイテムの周囲に均等なスペース & 左右いっぱいまで広がる */
+  /* @see https://developer.mozilla.org/ja/docs/Web/CSS/justify-content */
+  --layout-column-stretch-spaceEvenly: {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-evenly;
   }
 }

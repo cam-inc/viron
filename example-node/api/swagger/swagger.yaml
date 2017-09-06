@@ -566,6 +566,8 @@ definitions:
         description: admin role id
         example: viewer
         type: string
+        enum:
+        - AutoGenerate
     required:
     - role_id
     type: object
@@ -943,7 +945,7 @@ definitions:
       path:
         description: path
         enum:
-        - AutoGenerate # @see node-dmclib/swagger.js
+        - AutoGenerate # @see node-vironlib/swagger.js
         example: GET:/user
         type: string
     required:
@@ -1573,7 +1575,7 @@ paths:
   /adminrole:
     get:
       x-swagger-router-controller: dmc_admin_role
-      description: get admin roles
+      description: ユーザ権限の一覧
       operationId: admin_role#list
       parameters: []
       produces:
@@ -1596,20 +1598,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list admin_role
+      summary: ユーザ権限一覧
       tags:
       - admin_role
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /adminrole/{role_id}
-      - appendTo: row
-        method: delete
-        path: /adminrole/{role_id}
 
     post:
       x-swagger-router-controller: dmc_admin_role
-      description: create a admin role
+      description: ユーザ権限の作成
       operationId: admin_role#create
       parameters:
       - in: body
@@ -1641,14 +1636,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create admin_role
+      summary: ユーザ権限作成
       tags:
       - admin_role
 
   /adminrole/{role_id}:
     delete:
       x-swagger-router-controller: dmc_admin_role
-      description: delete the user
+      description: ユーザ権限の削除
       operationId: admin_role#remove
       parameters:
       - description: role id
@@ -1678,13 +1673,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: delete admin_role
+      summary: ユーザ権限削除
       tags:
       - admin_role
 
     get:
       x-swagger-router-controller: dmc_admin_role
-      description: get the admin role
+      description: ユーザ権限の取得
       operationId: admin_role#show
       parameters:
       - description: role id
@@ -1716,13 +1711,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: show admin_role
+      summary: ユーザ権限取得
       tags:
       - admin_role
 
     put:
       x-swagger-router-controller: dmc_admin_role
-      description: update the admin user
+      description: ユーザ権限の更新
       operationId: admin_role#update
       parameters:
       - description: role id
@@ -1759,14 +1754,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update admin_role
+      summary: ユーザ権限更新
       tags:
       - admin_role
 
   /adminuser:
     get:
       x-swagger-router-controller: dmc_admin_user
-      description: get admin users
+      description: 管理ユーザの一覧
       operationId: admin_user#list
       produces:
       - application/json
@@ -1792,20 +1787,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list admin_user
+      summary: 管理ユーザ一覧
       tags:
       - admin_user
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /adminuser/{id}
-      - appendTo: row
-        method: delete
-        path: /adminuser/{id}
 
     post:
       x-swagger-router-controller: dmc_admin_user
-      description: create a admin user
+      description: 管理ユーザの作成
       operationId: admin_user#create
       parameters:
       - in: body
@@ -1837,14 +1825,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create admin_user
+      summary: 管理ユーザ作成
       tags:
       - admin_user
 
   /adminuser/{id}:
     delete:
       x-swagger-router-controller: dmc_admin_user
-      description: delete the user
+      description: 管理ユーザの削除
       operationId: admin_user#remove
       parameters:
       - description: id
@@ -1874,13 +1862,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: delete admin_user
+      summary: 管理ユーザ削除
       tags:
       - admin_user
 
     get:
       x-swagger-router-controller: dmc_admin_user
-      description: get the admin user
+      description: 管理ユーザ情報の取得
       operationId: admin_user#show
       parameters:
       - description: id
@@ -1912,13 +1900,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: show admin_user
+      summary: 管理ユーザ取得
       tags:
       - admin_user
 
     put:
       x-swagger-router-controller: dmc_admin_user
-      description: update the admin user
+      description: 管理ユーザ情報の更新
       operationId: admin_user#update
       parameters:
       - description: id
@@ -1955,14 +1943,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update admin_user
+      summary: 管理ユーザ更新
       tags:
       - admin_user
 
   /auditlog:
     get:
       x-swagger-router-controller: dmc_audit_log
-      description: get admin roles
+      description: 監査ログの一覧
       operationId: audit_log#list
       parameters:
       - description: number of items per page
@@ -1975,6 +1963,21 @@ paths:
         name: offset
         required: false
         type: integer
+      - description: http request method
+        in: query
+        name: request_method
+        required: false
+        type: string
+      - description: user id
+        in: query
+        name: user_id
+        required: false
+        type: string
+      - description: request uri
+        in: query
+        name: request_uri
+        required: false
+        type: string
       produces:
       - application/json
       responses:
@@ -1995,14 +1998,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list audit_log
+      summary: 監査ログ一覧
       tags:
       - audit_log
 
   /blogdesign:
     get:
       x-swagger-router-controller: blog_design
-      description: get blog designs
+      description: ブログデザインの一覧
       operationId: blog_design#list
       parameters:
       - description: number of items per page
@@ -2039,20 +2042,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list blog_design
+      summary: ブログデザイン一覧
       tags:
       - blog_design
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /blogdesign/{id}
-      - appendTo: row
-        method: delete
-        path: /blogdesign/{id}
 
     post:
       x-swagger-router-controller: blog_design
-      description: create a blog design
+      description: ブログデザインの作成
       operationId: blog_design#create
       parameters:
       - in: body
@@ -2084,14 +2080,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create blog_design
+      summary: ブログデザイン作成
       tags:
       - blog_design
 
   /blogdesign/{id}:
     delete:
       x-swagger-router-controller: blog_design
-      description: delete the blog design
+      description: ブログデザインの削除
       operationId: blog_design#remove
       parameters:
       - description: id
@@ -2121,13 +2117,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: delete blog_design
+      summary: ブログデザイン削除
       tags:
       - blog_design
 
     get:
       x-swagger-router-controller: blog_design
-      description: get the blog design
+      description: ブログデザイン情報の取得
       operationId: blog_design#show
       parameters:
       - description: id
@@ -2159,13 +2155,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: show blog_design
+      summary: ブログデザイン取得
       tags:
       - blog_design
 
     put:
       x-swagger-router-controller: blog_design
-      description: update the blog design
+      description: ブログデザイン情報の更新
       operationId: blog_design#update
       parameters:
       - description: id
@@ -2202,7 +2198,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update blog_design
+      summary: ブログデザイン更新
       tags:
       - blog_design
 
@@ -2241,7 +2237,7 @@ paths:
       description: get auth types
       operationId: auth_type#list
       produces:
-      - application/vnd.auth_type+json; type=collection
+      - application/json
       responses:
         "200":
           description: OK
@@ -2338,7 +2334,7 @@ paths:
   /signin:
     post:
       x-swagger-router-controller: dmc_auth
-      description: signin with JWT
+      description: サインイン
       operationId: dmc_auth#signin
       parameters:
       - in: body
@@ -2369,21 +2365,21 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - https
-      summary: signin auth
+      summary: サインイン
       tags:
       - auth
 
   /signout:
     post:
       x-swagger-router-controller: dmc_auth
-      description: signout
+      description: サインアウト
       operationId: dmc_auth#signout
       responses:
         "204":
           description: No Content
       schemes:
       - https
-      summary: signout auth
+      summary: サインアウト
       tags:
       - auth
 
@@ -2624,7 +2620,7 @@ paths:
   /swagger.json:
     get:
       x-swagger-router-controller: swagger
-      description: get swagger.json
+      description: swagger.jsonの取得
       operationId: swagger#show
       produces:
       - application/json
@@ -2650,14 +2646,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: show swagger
+      summary: swagger.json取得
       tags:
       - swagger
 
   /user:
     get:
       x-swagger-router-controller: user
-      description: get users
+      description: ユーザの一覧
       operationId: user#list
       parameters:
       - description: 名前
@@ -2689,26 +2685,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list user
+      summary: ユーザ一覧
       tags:
       - user
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /user/{id}
-      - appendTo: row
-        method: delete
-        path: /user/{id}
-      - appendTo: ""
-        method: post
-        path: /user/upload/csv
-      - appendTo: ""
-        method: get
-        path: /user/download/csv
 
     post:
       x-swagger-router-controller: user
-      description: create a user
+      description: ユーザの作成
       operationId: user#create
       parameters:
       - in: body
@@ -2740,14 +2723,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create user
+      summary: ユーザ作成
       tags:
       - user
 
   /user/download/csv:
     get:
       x-swagger-router-controller: user
-      description: download user data
+      description: ユーザ一覧をcsvファイルでダウンロード
       operationId: user#download
       produces:
       - text/plain
@@ -2771,14 +2754,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: download user
+      summary: ユーザ一覧ダウンロード
       tags:
       - user
 
   /user/upload/csv:
     post:
       x-swagger-router-controller: user
-      description: upload user data
+      description: ユーザをcsvファイルでアップロード
       operationId: user#upload
       parameters:
       - in: formData
@@ -2800,14 +2783,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: upload users
+      summary: ユーザアップロード
       tags:
       - user
 
   /user/{id}:
     delete:
       x-swagger-router-controller: user
-      description: delete the user
+      description: ユーザの削除
       operationId: user#remove
       parameters:
       - description: id
@@ -2837,13 +2820,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: delete user
+      summary: ユーザ削除
       tags:
       - user
 
     get:
       x-swagger-router-controller: user
-      description: get the user
+      description: ユーザ情報の取得
       operationId: user#show
       parameters:
       - description: id
@@ -2875,13 +2858,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: show user
+      summary: ユーザ取得
       tags:
       - user
 
     put:
       x-swagger-router-controller: user
-      description: update the user
+      description: ユーザ情報の更新
       operationId: user#update
       parameters:
       - description: id
@@ -2918,14 +2901,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update user
+      summary: ユーザ更新
       tags:
       - user
 
   /userblog:
     get:
       x-swagger-router-controller: user_blog
-      description: get user blogs
+      description: ユーザブログの一覧
       operationId: user_blog#list
       parameters:
       - description: number of items per page
@@ -2962,20 +2945,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list user_blog
+      summary: ユーザブログ一覧
       tags:
       - user_blog
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /userblog/{id}
-      - appendTo: row
-        method: delete
-        path: /userblog/{id}
 
     post:
       x-swagger-router-controller: user_blog
-      description: create a user blog
+      description: ユーザブログの作成
       operationId: user_blog#create
       parameters:
       - in: body
@@ -3007,14 +2983,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create user_blog
+      summary: ユーザブログ作成
       tags:
       - user_blog
 
   /userblog/{id}:
     delete:
       x-swagger-router-controller: user_blog
-      description: delete the user blog
+      description: ユーザブログの削除
       operationId: user_blog#remove
       parameters:
       - description: id
@@ -3044,13 +3020,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: delete user_blog
+      summary: ユーザブログ削除
       tags:
       - user_blog
 
     get:
       x-swagger-router-controller: user_blog
-      description: get the user blog
+      description: ユーザブログ情報の取得
       operationId: user_blog#show
       parameters:
       - description: id
@@ -3082,13 +3058,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: show user_blog
+      summary: ユーザブログ取得
       tags:
       - user_blog
 
     put:
       x-swagger-router-controller: user_blog
-      description: update the user blog
+      description: ユーザブログ情報の更新
       operationId: user_blog#update
       parameters:
       - description: id
@@ -3125,7 +3101,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update user_blog
+      summary: ユーザブログ更新
       tags:
       - user_blog
 
@@ -3169,7 +3145,7 @@ paths:
   /userblogentry:
     get:
       x-swagger-router-controller: user_blog_entry
-      description: get user blog entries
+      description: ユーザブログ記事の一覧
       operationId: user_blog_entry#list
       parameters:
       - description: number of items per page
@@ -3206,20 +3182,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list user_blog_entry
+      summary: ユーザブログ記事一覧
       tags:
       - user_blog_entry
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /userblogentry/{id}
-      - appendTo: row
-        method: delete
-        path: /userblogentry/{id}
 
     post:
       x-swagger-router-controller: user_blog_entry
-      description: create a user blog entry
+      description: ユーザブログ記事の作成
       operationId: user_blog_entry#create
       parameters:
       - in: body
@@ -3251,14 +3220,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create user_blog_entry
+      summary: ユーザブログ記事作成
       tags:
       - user_blog_entry
 
   /userblogentry/{id}:
     delete:
       x-swagger-router-controller: user_blog_entry
-      description: delete the user blog entry
+      description: ユーザブログ記事の削除
       operationId: user_blog_entry#remove
       parameters:
       - description: id
@@ -3288,13 +3257,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: delete user_blog_entry
+      summary: ユーザブログ記事削除
       tags:
       - user_blog_entry
 
     get:
       x-swagger-router-controller: user_blog_entry
-      description: get the user blog entry
+      description: ユーザブログ記事情報の取得
       operationId: user_blog_entry#show
       parameters:
       - description: id
@@ -3326,13 +3295,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: show user_blog_entry
+      summary: ユーザブログ記事取得
       tags:
       - user_blog_entry
 
     put:
       x-swagger-router-controller: user_blog_entry
-      description: update the user blog entry
+      description: ユーザブログ記事情報の更新
       operationId: user_blog_entry#update
       parameters:
       - description: id
@@ -3369,14 +3338,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update user_blog_entry
+      summary: ユーザブログ記事更新
       tags:
       - user_blog_entry
 
   /validator:
     get:
       x-swagger-router-controller: validator
-      description: get validators
+      description: バリデータの一覧
       operationId: validator#list
       parameters:
       - description: number of items per page
@@ -3389,10 +3358,6 @@ paths:
         name: offset
         required: false
         type: integer
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /validator/{id}
       produces:
       - application/json
       responses:
@@ -3417,13 +3382,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list validator
+      summary: バリデータ
       tags:
       - validator
 
     post:
       x-swagger-router-controller: validator
-      description: create a validator
+      description: バリデータの作成
       operationId: validator#create
       parameters:
       - in: body
@@ -3455,14 +3420,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create validator
+      summary: バリデータ作成
       tags:
       - validator
 
   /validator/{id}:
     put:
       x-swagger-router-controller: validator
-      description: update the validator
+      description: バリデータ情報の更新
       operationId: validator#update
       parameters:
       - description: id
@@ -3499,14 +3464,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update validator
+      summary: バリデータ更新
       tags:
       - validator
 
   /nestedarray:
     get:
       x-swagger-router-controller: nested_array
-      description: get nested_arrays
+      description: ネスト配列の一覧
       operationId: nested_array#list
       parameters:
       - description: number of items per page
@@ -3519,10 +3484,6 @@ paths:
         name: offset
         required: false
         type: integer
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /nestedarray/{id}
       produces:
       - application/json
       responses:
@@ -3547,13 +3508,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list nested array
+      summary: ネスト配列一覧
       tags:
       - nested_array
 
     post:
       x-swagger-router-controller: nested_array
-      description: create a nested_array
+      description: ネスト配列の作成
       operationId: nested_array#create
       parameters:
       - in: body
@@ -3585,14 +3546,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create nested aray
+      summary: ネスト配列作成
       tags:
       - nested_array
 
   /nestedarray/{id}:
     put:
       x-swagger-router-controller: nested_array
-      description: update the nested array
+      description: ネスト配列情報の更新
       operationId: nested_array#update
       parameters:
       - description: id
@@ -3629,14 +3590,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update nested array
+      summary: ネスト配列更新
       tags:
       - netsted_array
 
   /format:
     get:
       x-swagger-router-controller: format
-      description: get format
+      description: フォーマットの一覧
       operationId: format#list
       parameters:
       - description: number of items per page
@@ -3649,10 +3610,6 @@ paths:
         name: offset
         required: false
         type: integer
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /format/{id}
       produces:
       - application/json
       responses:
@@ -3677,13 +3634,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: list format
+      summary: フォーマット一覧
       tags:
       - format
 
     post:
       x-swagger-router-controller: format
-      description: create a format
+      description: フォーマットの作成
       operationId: format#create
       parameters:
       - in: body
@@ -3715,14 +3672,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: create format
+      summary: フォーマット作成
       tags:
       - format
 
   /format/{id}:
     put:
       x-swagger-router-controller: format
-      description: update the format
+      description: フォーマット情報の更新
       operationId: format#update
       parameters:
       - description: id
@@ -3759,7 +3716,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: update format
+      summary: フォーマット更新
       tags:
       - format
 

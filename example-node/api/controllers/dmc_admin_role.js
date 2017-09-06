@@ -1,10 +1,10 @@
 const shared = require('../../shared');
-const dmclib = shared.context.getDmcLib();
+const vironlib = shared.context.getVironLib();
 
 module.exports = {
-  'admin_role#list': dmclib.adminRole.controller.list,
-  'admin_role#create': dmclib.adminRole.controller.create,
-  'admin_role#get': dmclib.adminRole.controller.get,
-  'admin_role#remove': dmclib.adminRole.controller.remove,
-  'admin_role#update': dmclib.adminRole.controller.update,
+  'admin_role#list': vironlib.adminRole.controller.list,
+  'admin_role#create': vironlib.adminRole.controller.create,
+  'admin_role#get': vironlib.adminRole.controller.get,
+  'admin_role#remove': vironlib.adminRole.controller.remove,
+  'admin_role#update': vironlib.adminRole.controller.update,
 };

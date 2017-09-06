@@ -15,7 +15,8 @@ export default {
       .then(() => Promise.all([
         store.action(actions.CURRENT_REMOVE),
         store.action(actions.PAGE_REMOVE),
-        store.action(actions.OAS_CLEAR)
+        store.action(actions.OAS_CLEAR),
+        store.action(actions.DMC_REMOVE)
       ]))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err

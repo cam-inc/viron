@@ -22,6 +22,8 @@ export default function() {
         this.opts.onSignin();
       })
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        title: 'ログイン失敗',
+        message: 'ログイン出来ませんでした。正しいメールアドレスとパスワードを使用しているか確認して下さい。使用したメールアドレスが予め管理者として登録されているか確認して下さい。',
         error: err
       }));
   };

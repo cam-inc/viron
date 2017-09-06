@@ -1,12 +1,28 @@
 dmc.Application
   .Application__contents
+    .Application__asideColumn
+      virtual(if="{ isTopPage }")
+        .Application__menu
+          .Application__title
+            | Design based
+            br
+            | Management
+            br
+            | Console
+          .Application__menuItems
+            .Application__menuItem(ref="touch" onTap="handleEntryMenuItemTap")
+              .Application__menuItemIcon
+                dmc-icon(type="link")
+              .Application__menuItemLabel 新規追加
+            .Application__menuItem(ref="touch" onTap="handleDownloadMenuItemTap")
+              .Application__menuItemIcon
+                dmc-icon(type="download")
+              .Application__menuItemLabel ダウンロード
+      virtual(if="{ !isTopPage }")
+        dmc-menu
     .Application__mainColumn
       .Application__page
         div(data-is="dmc-{ pageName }" route="{ pageRoute }")
-    .Application__asideColumn(class="{ Application__asideColumn--opened : isMenuOpened }")
-      dmc-menu
-    .Application__head
-      dmc-header
   dmc-drawers
   dmc-modals
   dmc-toasts
@@ -20,7 +36,6 @@ dmc.Application
     import '../components/pages/dmc-notfound/index.tag';
     import '../components/organisms/dmc-blocker/index.tag';
     import '../components/organisms/dmc-drawers/index.tag';
-    import '../components/organisms/dmc-header/index.tag';
     import '../components/organisms/dmc-menu/index.tag';
     import '../components/organisms/dmc-modals/index.tag';
     import '../components/organisms/dmc-progress/index.tag';

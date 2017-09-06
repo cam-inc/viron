@@ -93,5 +93,21 @@ export default {
       .then(() => {
         context.commit(mutations.ENDPOINTS_MERGE_ALL, endpoints);
       });
+  },
+
+  /**
+   * 一件の新エンドポイントを既存エンドポイント群にmergeします。
+   * endpointKeyも新規生成します。
+   * @param {riotx.Context} context
+   * @param {Object} endpoint
+   * @return {Promise}
+   */
+  mergeOneWithKey: (context, endpoint) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const key = shortid.generate();
+        context.commit(mutations.ENDPOINTS_ADD, key, endpoint);
+      });
   }
 };

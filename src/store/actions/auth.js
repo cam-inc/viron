@@ -47,7 +47,11 @@ export default {
           'Authorization': endpoint.token
         }
       }))
-      .then(() => {
+      .then(response => {
+        const token = response.headers.get('Authorization');
+        if (!!token) {
+          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        }
         return true;
       })
       .catch(err => {
@@ -88,13 +92,12 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.OAUTH_ENDPOINT_KEY, endpointKey);
-      })
-      .then(() => {
         const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
         const anchorElm = document.createElement('a');
         anchorElm.href = endpoint.url;
-        const fetchUrl = `${anchorElm.origin}${authtype.url}?redirect_url=${encodeURIComponent(location.href)}`;
+        const origin = anchorElm.origin;
+        const redirect_url = encodeURIComponent(`${location.href}oauthredirect/${endpointKey}`);
+        const fetchUrl = `${origin}${authtype.url}?redirect_url=${redirect_url}`;
         location.href = fetchUrl;
       });
   },

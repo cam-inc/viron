@@ -2,15 +2,23 @@
 /* 紛らわしいので注意すること */
 .Component {
   @apply --layout-column-stretch-center;
-  background-color: var(--color-basic-white);
-  border-radius: 6px;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin: 0 8px 8px 0;
+  overflow: hidden;
+  background-color: var(--color-base-white);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  transition-duration: 100ms;
+  transition-property: box-shadow;
+}
+
+.Component:hover,
+.Component.hover {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
 }
 
 .Component__spinner {
   @apply --layout-center-center;
   height: 100%;
-  min-height: 100px;
   font-size: 18px;
 }
 
@@ -19,9 +27,12 @@
 }
 
 .Component__head {
-  @apply --layout-center-center;
-  padding: 8px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--color-basic-black);
+}
+
+.Component__headBasic {
+  @apply --layout-center-center;
 }
 
 .Component__name {
@@ -40,16 +51,25 @@
 }
 
 .Component__refresh.hover,
+.Component__refresh:hover,
+.Component__search:hover,
 .Component__search.hover {
   color: var(--color-basic-gray);
 }
 
 .Component__search--active {
-  color: var(--color-basic-skyblue);
+  color: var(--color-base-dodgerBlue);
+}
+
+.Component__headSearch {
+  margin: 4px 4px 0 0;
+  overflow: scroll;
+  font-size: 10px;
+  text-align: right;
+  background-color: #fff;
 }
 
 .Component__body {
-  @apply --layout-center-center;
   flex-grow: 1;
   padding: 16px;
 }
@@ -62,30 +82,38 @@
   padding: 12px 0;
 }
 
-.Component__alertApi {
-  margin-bottom: 8px;
-  font-size: 10px;
-  color: var(--color-basic-red);
-}
-
 .Component__alertText {
   font-size: 12px;
   font-weight: bold;
   color: var(--color-basic-red);
 }
 
-.Component__body .Pagination {
-  margin-top: 16px;
+.Component__pagination {
+  margin-bottom: 8px;
+}
+
+.Component__pagination--tail {
+  margin-top: 8px;
+  margin-bottom: 0;
 }
 
 .Component__tail {
-  padding: 8px;
+  @apply --layout-center-center;
+  padding-top: 24px;
   border-top: 1px solid var(--color-basic-black);
 }
 
 .Component__action {
   position: relative;
   display: block;
+}
+
+.Component__tail .Component__action {
+  margin-right: 8px;
+}
+
+.Component__tail .Component__action:last-child {
+  margin-right: 0;
 }
 
 .Component__action .Button {
@@ -96,6 +124,56 @@
   display: block;
 }
 
+.ComponentSearch__body {
+  min-width: 300px;
+  margin-bottom: 32px;
+}
+
+.ComponentSearch__tail {
+  @apply --layout-center-center;
+}
+
+.ComponentSearch__tail .Button {
+  width: 120px;
+}
+
 .ComponentOperation {
-  display: block;
+  @apply --layout-column-stretch-center;
+  height: 100%;
+}
+
+.ComponentOperation__head {
+  flex-shrink: 0;
+  padding: 24px;
+  border-bottom: 2px solid var(--color-base-mineShaft);
+}
+
+.ComponentOperation__title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.ComponentOperation__description {
+  margin-top: 12px;
+}
+
+.ComponentOperation__body {
+  flex-grow: 1;
+  overflow-y: scroll;
+}
+
+.ComponentOperation__tail {
+  @apply --layout-center-center;
+  flex-shrink: 0;
+  padding: 24px;
+  border-top: 2px solid var(--color-base-mineShaft);
+}
+
+.ComponentOperation__tail .Button {
+  min-width: 120px;
+  margin-right: 12px;
+}
+
+.ComponentOperation__tail .Button:last-child {
+  margin-right: 0;
 }

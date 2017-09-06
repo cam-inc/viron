@@ -103,23 +103,23 @@ export default function() {
 
   this.displayActualValue = () => {
     // 現在値がmaxとminより越えている場合、値をmaxかminに修正する
-    if (this.opts.number < this.opts.min) {
-      return this.opts.min;
+    if (Number(this.opts.number) < Number(this.opts.min)) {
+      return Number(this.opts.min);
     }
-    if (this.opts.number > this.opts.max) {
-      return this.opts.max;
+    if (Number(this.opts.number) > Number(this.opts.max)) {
+      return Number(this.opts.max);
     }
-    return Math.round((this.opts.number - this.opts.min) / (this.opts.max - this.opts.min) * 100);
+    return Math.round((Number(this.opts.number) - Number(this.opts.min)) / (Number(this.opts.max) - Number(this.opts.min)) * 100);
   };
 
   const validActualValue = actualValue => {
-    return (actualValue <= this.opts.max && actualValue >= this.opts.min) ? true : false;
+    return (actualValue <= Number(this.opts.max) && actualValue >= Number(this.opts.min)) ? true : false;
   };
 
   const convertToActualValue = touchX => {
     const containerRect = this.refs.container.getBoundingClientRect();
     const distance = Math.round(touchX - containerRect.left);
-    const actualValue = Math.round((distance * (this.opts.max - this.opts.min)) / containerRect.width) - (-this.opts.min);
+    const actualValue = Math.round((distance * (Number(this.opts.max) - Number(this.opts.min))) / containerRect.width) - (-Number(this.opts.min));
     return actualValue;
   };
 }

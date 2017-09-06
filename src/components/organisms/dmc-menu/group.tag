@@ -1,6 +1,6 @@
 dmc-menu-group.Menu__group
   .Menu__groupToggle(class="{ opts.group.isIndependent && opts.group.list[0].isSelected ? 'Menu__groupToggle--selected' : '' }" ref="touch" onTap="handleToggleTap")
-    dmc-icon(type="codeSquareO" class="Menu__groupIconHead")
+    dmc-icon(type="play" class="Menu__groupIconHead")
     .Menu__groupName { opts.group.isIndependent ? opts.group.list[0].name : opts.group.name }
     dmc-icon(if="{ !opts.group.isIndependent }" type="up" class="Menu__groupIconTail { isOpened ? 'Menu__groupIconTail--opened' : '' }")
   div(if="{ !opts.group.isIndependent }" class="Menu__groupList { isOpened ? 'Menu__groupList--opened' : '' }")

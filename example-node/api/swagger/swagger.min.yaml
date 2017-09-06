@@ -435,7 +435,7 @@ definitions:
       path:
         description: path
         enum:
-        - AutoGenerate # @see node-dmclib/swagger.js
+        - AutoGenerate # @see node-vironlib/swagger.js
         example: GET:/user
         type: string
     required:
@@ -742,13 +742,6 @@ paths:
       summary: list admin_role
       tags:
       - admin_role
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /adminrole/{role_id}
-      - appendTo: row
-        method: delete
-        path: /adminrole/{role_id}
 
     post:
       x-swagger-router-controller: dmc_admin_role
@@ -938,13 +931,6 @@ paths:
       summary: list admin_user
       tags:
       - admin_user
-      x-ref:
-      - appendTo: row
-        method: put
-        path: /adminuser/{id}
-      - appendTo: row
-        method: delete
-        path: /adminuser/{id}
 
     post:
       x-swagger-router-controller: dmc_admin_user

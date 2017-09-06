@@ -1,4 +1,6 @@
+import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
+import ObjectAssign from 'object-assign';
 
 export default {
   /**
@@ -99,6 +101,30 @@ export default {
   },
 
   /**
+   * 指定したoperationIdにマッチするPathItemObjectのmethod名を返します。
+   * @param {riotx.Context} context
+   * @param {String} operationId
+   * @return {String}
+   */
+  pathItemObjectMethodNameByOperationId: (context, operationId) => {
+    let ret;
+    forOwn(context.state.oas.client.spec.paths, pathItemObject => {
+      if (!!ret) {
+        return;
+      }
+      forOwn(pathItemObject, (operationObject, method) => {
+        if (!!ret) {
+          return;
+        }
+        if (operationObject.operationId === operationId) {
+          ret = method;
+        }
+      });
+    });
+    return ret;
+  },
+
+  /**
    * 指定したpathとmethodにマッチするOperationObjectを返します。
    * @param {riotx.Context} context
    * @param {String} path
@@ -107,6 +133,82 @@ export default {
    */
   operationObject: (context, path, method) => {
     return context.state.oas.client.spec.paths[path][method];
+  },
+
+  /**
+   * 指定したcomponentに関連するOperationObject(action)群を返します。
+   * @param {riotx.Context} context
+   * @param {Object} component
+   * @return {Array}
+   */
+  operationObjectsAsAction: (context, component) => {
+    const methods = ['get','put', 'post', 'delete'];
+    const basePath = component.api.path;
+    const primaryKey = component.primary;
+    const actions = component.actions || [];
+
+    // 関連API情報。後のOperationObject群抽出に使用します。
+    const pathRefs = [];
+    // 同じpath & method違いのoperationObjectは関連有りとみなす。
+    forEach(methods, method => {
+      // `get`はcomponent自身なのでスルーする。
+      if (method === 'get') {
+        return;
+      }
+      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath][method];
+      if (!isOperationObjectDefined) {
+        return;
+      }
+      pathRefs.push({
+        path: basePath,
+        method,
+        appendTo: 'self'
+      });
+    });
+    // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
+    // テーブルの各rowに紐づくOperationObjectとみなす。
+    if (!!primaryKey) {
+      const listBasePath = `${basePath}/{${primaryKey}}`;
+      forEach(methods, method => {
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath][method];
+        if (!isOperationObjectDefined) {
+          return;
+        }
+        pathRefs.push({
+          path: listBasePath,
+          method,
+          appendTo: 'row'
+        });
+      });
+    }
+    // actionsに指定されたpath群のOperationObjectも関連有りとみなします。
+    // path内にprimaryKeyと同一名の変数があれば、それはテーブルrowに紐づくOperationObjectとみなします。
+    // primaryKeyと同一名の変数が無ければ、componentと紐づくOperationObjectとみなします。
+    forEach(actions, actionBasePath => {
+      const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
+      forEach(methods, method => {
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath][method];
+        if (!isOperationObjectDefined) {
+          return;
+        }
+        pathRefs.push({
+          path: actionBasePath,
+          method,
+          appendTo
+        });
+      });
+    });
+
+    // OperationObject群を抽出します。
+    const operationObjects = [];
+    forEach(pathRefs, ref => {
+      const operationObject = context.state.oas.client.spec.paths[ref.path][ref.method];
+      operationObjects.push(ObjectAssign({
+        operationObject
+      }, ref));
+    });
+
+    return operationObjects;
   },
 
   /**

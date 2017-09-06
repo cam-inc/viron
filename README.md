@@ -1,13 +1,17 @@
-# dmc
+# viron
 Automatically generate a management console based on swagger data.
+
+# Document
+
+> access : [Viron Documentation](https://cam-inc.github.io/viron-doc/)
 
 # Site
 
-> access : [DMC](https://cam-inc.github.io/dmc/)
+> access : [Viron](https://cam-inc.github.io/viron/)
 
-> access : [DMC(stg)](https://cam-inc.github.io/dmc/stg/)
+> access : [Viron(stg)](https://cam-inc.github.io/viron/stg/)
 
-> access : [DMC(dev)](https://cam-inc.github.io/dmc/dev/)
+> access : [Viron(dev)](https://cam-inc.github.io/viron/dev/)
 
 # QuickStart
 
@@ -52,8 +56,8 @@ $ npm run release:stg
 # for production
 $ npm run release:prd
 ```
-> access : [DMC](https://cam-inc.github.io/dmc/)
+> access : [Viron](https://cam-inc.github.io/viron/)
 
-> access : [DMC(stg)](https://cam-inc.github.io/dmc/stg/)
+> access : [Viron(stg)](https://cam-inc.github.io/viron/stg/)
 
-> access : [DMC(dev)](https://cam-inc.github.io/dmc/dev/)
+> access : [Viron(dev)](https://cam-inc.github.io/viron/dev/)

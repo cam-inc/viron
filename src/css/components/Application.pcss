@@ -1,6 +1,5 @@
 :root {
-  --component-application-asideColumn-width: 320px;
-  --component-application-head-height: 64px;
+  --component-application-asideColumn-width: 256px;
 }
 
 .Application {
@@ -8,73 +7,65 @@
   display: block;
   width: 100%;
   height: 100%;
-  background-color: var(--color-basic-lightGray);
 }
 
 .Application__contents {
+  @apply --layout-center-stretch;
   width: 100%;
   height: 100%;
-  overflow: hidden;
 }
 
 .Application__asideColumn {
-  position: absolute;
-  top: var(--component-application-head-height);
-  left: 0;
-  width: 0;
-  height: calc(100% - var(--component-application-head-height));
-  overflow-x: hidden;
-  overflow-y: scroll;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-  transition-duration: 150ms;
-  transition-property: width;
-}
-
-.Application__asideColumn .Menu {
-  opacity: 0;
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-  transition-duration: 150ms;
-  transition-property: opacity;
-}
-
-.Application__asideColumn--opened {
+  flex-shrink: 0;
   width: var(--component-application-asideColumn-width);
+  overflow-y: scroll;
+  background-color: var(--color-base-mineShaft);
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.2);
 }
 
-.Application__asideColumn--opened .Menu {
-  opacity: 1;
+.Application__menu {
+  padding: 84px 36px;
+  color: var(--color-base-white);
+}
+
+.Application__title {
+  margin-bottom: 96px;
+  font-size: 26px;
+}
+
+.Application__menuItem {
+  @apply --layout-center-center;
+  cursor: pointer;
+}
+
+.Application__menuItem:hover,
+.Application__menuItem.hover {
+  opacity: 0.5;
+}
+
+.Application__menuItems .Application__menuItem {
+  margin-bottom: 8px;
+}
+
+.Application__menuItems .Application__menuItem:last-child {
+  margin-bottom: 0;
+}
+
+.Application__menuItemIcon {
+  @apply --layout-center-center;
+  width: 24px;
+  height: 24px;
+  margin-right: 32px;
+  font-size: 24px;
+}
+
+.Application__menuItemLabel {
+  flex-grow: 1;
 }
 
 .Application__mainColumn {
-  height: calc(100% - var(--component-application-head-height));
-  margin-top: var(--component-application-head-height);
-  overflow-y: scroll;
-}
-
-.Application__head {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: var(--component-application-head-height);
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
-}
-
-.Application__head .Header {
-  height: 100%;
-}
-
-.Application__head .Toasts {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.Application__page {
   flex-grow: 1;
+  padding: 24px;
   overflow-y: scroll;
 }
 
@@ -104,7 +95,7 @@
 
 .Application .Progress {
   position: absolute;
-  top: calc(var(--component-application-head-height) + 10px);
+  top: 10px;
   right: 10px;
 }
 
@@ -122,4 +113,47 @@
   right: 0;
   bottom: 0;
   left: 0;
+}
+
+/* ============================== */
+/* Entry */
+/* ============================== */
+.Application__entry {
+  display: block;
+}
+
+.Application__entryTitle {
+  margin-bottom: 24px;
+  font-size: 24px;
+}
+
+.Application__entryMessage {
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--color-basic-red);
+}
+
+.Application__entryForm .Textinput,
+.Application__entryForm .Textarea {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.Application__entryForm .Textinput {
+  margin-bottom: 12px;
+}
+
+.Application__entryControls {
+  @apply --layout-center-center;
+}
+
+.Application__entryControls .Button {
+  display: block;
+  flex-grow: 1;
+}
+
+.Application__entryControls .Button:first-child {
+  margin-right: 12px;
 }

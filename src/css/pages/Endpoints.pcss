@@ -1,35 +1,25 @@
-:root {
-  /* jsによって値が操作される*/
-  --page-endpoints-grid-column-count: 1;
-}
-
 .EndpointsPage {
   display: block;
-  padding: 32px;
+}
+
+.EndpointsPage__count {
+  @apply --layout-center-start;
+  margin-bottom: 12px;
+  color: var(--color-base-mineShaft);
+  opacity: 0.6;
+}
+
+.EndpointsPage__countIcon {
+  @apply --layout-center-center;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  font-size: 12px;
 }
 
 .EndpointsPage__list {
-  display: grid;
-  grid-row-gap: 10px;
-  grid-column-gap: 10px;
-  grid-template-columns: repeat(var(--page-endpoints-grid-column-count), 1fr);
-}
-
-.EndpointsPage__addCard {
-  @apply --layout-center-center;
-  min-height: 100px;
-  font-size: 20px;
-  color: var(--color-basic-white);
-  cursor: pointer;
-  background-color: var(--color-basic-black);
-  border-radius: 6px;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
-  transition-duration: 100ms;
-  transition-property: background-color;
-}
-
-.EndpointsPage__addCard.hover {
-  background-color: #323232;
+  @apply --layout-center-start;
+  flex-wrap: wrap;
 }
 
 /* ============================== */
@@ -38,30 +28,31 @@
 .EndpointsPage__item {
   position: relative;
   display: block;
-  min-height: 140px;
+  width: 375px;
+  padding: 24px;
+  margin: 0 8px 8px 0;
   overflow: hidden;
   cursor: pointer;
-  background-color: var(--color-basic-white);
-  border-radius: 6px;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-base-white);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   transition-duration: 100ms;
-  transition-property: background-color;
+  transition-property: box-shadow;
 }
 
+.EndpointsPage__item:hover,
 .EndpointsPage__item.hover {
-  background-color: #fff;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
 }
 
 .EndpointsPage__itemHead {
-  @apply --layout-between-center;
-  padding: 8px;
-  border-bottom: 1px solid var(--color-basic-black);
+  @apply --layout-center-center;
+  margin-bottom: 24px;
 }
 
 .EndpointsPage__itemAvatar {
   position: relative;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
 }
 
 .EndpointsPage__itemThumbnail {
@@ -73,81 +64,91 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  border-radius: 4px;
-  box-shadow: 0 3px 2px rgba(0, 0, 0, 0.16);
+  border-radius: 50%;
 }
 
 .EndpointsPage__itemToken {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-basic-white);
-  border: 2px solid var(--color-basic-gray);
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 5px;
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-base-dodgerBlue);
   border-radius: 50%;
 }
 
 .EndpointsPage__itemToken--active {
-  background-color: var(--color-basic-skyblue);
-  border-color: var(--color-basic-skyblue);
+  background-color: var(--color-base-dodgerBlue);
+}
+
+.EndpointsPage__itemName {
+  @apply --text-truncate;
+  flex-grow: 1;
+  margin: 0 12px;
+  font-weight: bold;
 }
 
 .EndpointsPage__itemMenuButton {
   @apply --layout-center-center;
-  width: 32px;
-  height: 32px;
-  font-size: 32px;
-  color: var(--color-basic-black);
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: var(--color-base-mercury);
   cursor: pointer;
 }
 
+.EndpointsPage__itemMenuButton:hover,
 .EndpointsPage__itemMenuButton.hover {
-  color: var(--color-basic-gray);
+  color: var(--color-base-mineShaft);
 }
 
 .EndpointsPage__itemBody {
-  padding: 16px;
-}
-
-.EndpointsPage__itemName {
-  @apply --text-break;
-  margin-bottom: 4px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.EndpointsPage__itemUrl {
-  @apply --text-truncate;
-  margin-bottom: 4px;
-}
-
-.EndpointsPage__itemTags {
-  margin-bottom: 4px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.EndpointsPage__itemTags .Tag {
-  margin-right: 4px;
 }
 
 .EndpointsPage__itemDescription {
   @apply --text-break;
-  margin-top: 4px;
-  font-size: 12px;
+  margin-bottom: 16px;
 }
 
 .EndpointsPage__itemMemo {
   @apply --text-break;
-  font-size: 10px;
-  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+
+.EndpointsPage__itemTags {
+  margin-bottom: 16px;
+}
+
+.EndpointsPage__itemTags .Tag {
+  margin-right: 8px;
+}
+
+.EndpointsPage__itemTags .Tag:last-child {
+  margin-right: 0;
+}
+
+.EndpointsPage__itemUrl {
+  @apply --layout-center-center;
+  margin-bottom: 16px;
+}
+
+.EndpointsPage__itemUrlIcon {
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+.EndpointsPage__itemUrlLabel {
+  @apply --text-truncate;
+  flex-grow: 1;
+  opacity: 0.6;
 }
 
 .EndpointsPage__itemTail {
   @apply --layout-center-end;
   padding: 8px;
-  border-top: 1px solid var(--color-basic-black);
 }
 
 .EndpointsPage__itemMenu {
@@ -157,6 +158,7 @@
   transition-property: color;
 }
 
+.EndpointsPage__itemMenu:hover,
 .EndpointsPage__itemMenu.hover {
   color: var(--color-basic-darkGray);
 }
@@ -167,49 +169,6 @@
 
 .EndpointsPage__itemTail .EndpointsPage__itemMenu:last-child {
   margin-right: 0;
-}
-
-/* ============================== */
-/* Entry */
-/* ============================== */
-.EndpointsPage__entry {
-  display: block;
-}
-
-.EndpointsPage__entryTitle {
-  margin-bottom: 24px;
-  font-size: 24px;
-}
-
-.EndpointsPage__entryMessage {
-  margin-bottom: 24px;
-  font-size: 14px;
-  font-style: italic;
-  font-weight: bold;
-  color: var(--color-basic-red);
-}
-
-.EndpointsPage__entryForm .Textinput,
-.EndpointsPage__entryForm .Textarea {
-  display: block;
-  margin-bottom: 24px;
-}
-
-.EndpointsPage__entryForm .Textinput {
-  margin-bottom: 12px;
-}
-
-.EndpointsPage__entryControls {
-  @apply --layout-center-center;
-}
-
-.EndpointsPage__entryControls .Button {
-  display: block;
-  flex-grow: 1;
-}
-
-.EndpointsPage__entryControls .Button:first-child {
-  margin-right: 12px;
 }
 
 /* ============================== */
@@ -257,9 +216,26 @@
   display: block;
 }
 
-.EndpointsPage__signinTitle {
+.EndpointsPage__signinHead {
+  @apply --layout-center-center;
   margin-bottom: 24px;
-  font-size: 24px;
+}
+
+.EndpointsPage__signinThumbnail {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+}
+
+.EndpointsPage__signinName {
+  @apply --text-truncate;
+  flex-grow: 1;
+  font-weight: bold;
 }
 
 .EndpointsPage__signinEmails {
@@ -268,7 +244,6 @@
 
 .EndpointsPage__signinEmailsTitle {
   margin-bottom: 8px;
-  font-size: 16px;
   font-weight: bold;
 }
 
@@ -297,7 +272,6 @@
 
 .EndpointsPage__signinOauthsTitle {
   margin-bottom: 8px;
-  font-size: 16px;
   font-weight: bold;
 }
 
@@ -315,4 +289,8 @@
 /* ============================== */
 .EndpointsPage__qrcode {
   display: block;
+}
+
+.EndpointsPage__qrcodeMessage {
+  margin-bottom: 8px;
 }

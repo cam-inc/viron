@@ -1,11 +1,8 @@
 dmc-component-search.ComponentSearch
-  .ComponentSearch__head
-    .ComponentSearch__name { opts.name }
-    .ComponentSearch__description { opts.description }
   .ComponentSearch__body
     dmc-parameters(parameterObjects="{ opts.parameterObjects }" parameters="{ currentParameters }" onChange="{ handleParametersChange }")
   .ComponentSearch__tail
-    dmc-button(label="submit" onPat="{ handleSubmitButtonPat }")
+    dmc-button(label="検索する" onPat="{ handleSubmitButtonPat }")
 
   script.
     import '../../organisms/dmc-parameters/index.tag';

@@ -1,7 +1,5 @@
 import contentDisposition from 'content-disposition';
 import download from 'downloadjs';
-import forEach from 'mout/array/forEach';
-import ObjectAssign from 'object-assign';
 import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
@@ -24,30 +22,7 @@ export default {
     if (path.indexOf('/') !== 0) {
       path = '/' + path;
     }
-    const operationObject = context.getter(getters.OAS_OPERATION_OBJECT, path, method);
-    // 関連のあるpath情報を取得します。
-    let pathRefs = [];
-    // 同じpath 且つ method名違いのoperationObjectは関連有りとみなす。
-    forEach(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
-      if (!context.getter(getters.OAS_OPERATION_OBJECT, path, method)) {
-        return;
-      }
-      pathRefs.push({
-        path,
-        method,
-        appendTo: 'self'
-      });
-    });
-    // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
-    pathRefs = pathRefs.concat(operationObject['x-ref'] || []);
-    // 関連API(path)群を付与する。
-    const actions = [];
-    forEach(pathRefs, ref => {
-      const operationObject = context.getter(getters.OAS_OPERATION_OBJECT, ref.path, ref.method);
-      actions.push(ObjectAssign({
-        operationObject
-      }, ref));
-    });
+    const actions = context.getter(getters.OAS_OPERATION_OBJECTS_AS_ACTION, component);
 
     const api = context.getter(getters.OAS_API_BY_PATH_AND_METHOD, path, method);
     const currentEndpointKey = context.getter(getters.CURRENT);
@@ -63,19 +38,30 @@ export default {
       }
       return res;
     }).then(res => {
+      // tokenを更新する。
+      const token = res.headers['Authorization'];
+      if (!!token) {
+        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+      }
        // `component.pagination`からページングをサポートしているか判断する。
       // サポートしていれば手動でページング情報を付加する。
       let hasPagination = false;
       let pagination;
       if (component.pagination) {
-        hasPagination = true;
+        const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
+        const size = Number(res.headers['x-pagination-limit'] || 0);
+        const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
         pagination = {
           // `x-pagination-current-page`等は独自仕様。
           // DMCを使用するサービスはこの仕様に沿う必要がある。
-          currentPage: Number(res.headers['x-pagination-current-page'] || 0),
-          size: Number(res.headers['x-pagination-limit'] || 0),
-          maxPage: Number(res.headers['x-pagination-total-pages'] || 0)
+          currentPage,
+          size,
+          maxPage
         };
+        // 2ページ以上存在する場合のみページングをONにする。
+        if (maxPage >= 2) {
+          hasPagination = true;
+        }
       }
       context.commit(mutations.COMPONENTS_UPDATE_ONE, {
         component_uid,
@@ -85,6 +71,7 @@ export default {
         actions,// 関連API群。
         hasPagination,
         pagination,// ページング関連。
+        primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
         table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
       });
     });
@@ -100,12 +87,18 @@ export default {
   operate: (context, operationObject, params) => {
     const api = context.getter(getters.OAS_API, operationObject.operationId);
     const token = context.getter(getters.ENDPOINTS_ONE, context.getter(getters.CURRENT)).token;
+    const currentEndpointKey = context.getter(getters.CURRENT);
 
     return api(params, {
       requestInterceptor: req => {
         req.headers['Authorization'] = token;
       }
     }).then(res => {
+      // tokenを更新する。
+      const token = res.headers['Authorization'];
+      if (!!token) {
+        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+      }
       // ダウンロード指定されていればダウンロードする。
       const contentDispositionHeader = res.headers['content-disposition'];
       if (!contentDispositionHeader) {

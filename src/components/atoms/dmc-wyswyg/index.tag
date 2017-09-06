@@ -1,4 +1,4 @@
-dmc-wyswyg.Wyswyg(class="{ 'Wyswyg--bubbled' : isBubbled }")
+dmc-wyswyg.Wyswyg(class="{ 'Wyswyg--bubbled' : isBubbled, 'Wyswyg--disabled' : opts.isdisabled }")
   .Wyswyg__toolbar
     dmc-wyswyg-tool-image(if="{ !!quill }" quill="{ quill }")
     dmc-wyswyg-tool-video(if="{ !!quill }" quill="{ quill }")
