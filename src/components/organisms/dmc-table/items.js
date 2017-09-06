@@ -27,6 +27,10 @@ export default function() {
     });
   };
 
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
   this.handleHeaderTitleTap = () => {
     this.isOpened = !this.isOpened;
     this.update();
