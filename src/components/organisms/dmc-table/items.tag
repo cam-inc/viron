@@ -6,7 +6,7 @@ dmc-table-items.Table__items(class="{ isOpened ? 'Table__items--opened' : '' }")
     dmc-table-items-button.Table__itemsOpenShutButton(icon="up" onPat="{ handleOpenShutButtonPat }")
   virtual(if="{ isOpened }")
     .Table__itemsContent
-      dmc-table-item(each="{ item in opts.items }" item="{ item }")
+      dmc-table-item(each="{ item in sortedItems }" item="{ item }")
 
   script.
     import '../../atoms/dmc-icon/index.tag';

@@ -1,30 +1,12 @@
-import find from 'mout/array/find';
-import forEach from 'mout/array/forEach';
+import sortBy from 'mout/array/sortBy';
 
 export default function() {
-  this.isOpened = true;
-  this.title = '';
-  // keyが指定されていればそれを使う。
-  let item;
-  forEach(this.opts.tablelabels, key => {
-    if (!!item) {
-      return;
-    }
-    item = find(this.opts.items, item => {
-      return (item.key === key);
-    });
+  // sort済みのitems。
+  this.sortedItems = sortBy(this.opts.items, item => {
+    return (this.opts.tablelabels || []).indexOf(item.key) * (-1);
   });
-  // `id`を優先する。
-  if (!item) {
-    item = find(this.opts.items, item => {
-      return (item.key === 'id');
-    });
-  }
-  // 適当に選ぶ。
-  if (!item) {
-    item = this.opts.items[0];
-  }
-  this.title = `${item.cell}`;
+  this.title = this.sortedItems[0].cell;
+  this.isOpened = true;
 
   this.handleHeaderTitleTap = () => {
     this.isOpened = !this.isOpened;
