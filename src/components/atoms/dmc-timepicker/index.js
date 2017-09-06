@@ -2,6 +2,9 @@ import moment from 'moment';
 import times from 'mout/function/times';
 import isUndefined from 'mout/lang/isUndefined';
 
+//　セレクトリストのセルの高さ
+const CELL_HEIGHT = 25;
+
 export default function() {
 
   /**
@@ -27,13 +30,16 @@ export default function() {
    * @param {String} datetype
    */
   const scrollSelected = (scroll, datetype) => {
-    // 対象の高さを取得し、変数へ代入
-    // document.querySelectorを使うと簡単にwindow内のどのDOMにもアクセスできてしまう。
-    let targetHeight = document.querySelector('.Partialtime__listItem').clientHeight;
     // datetypeの値と照らし合わせ、スクロールトップへ設定
-    if(datetype === 'hour') this.refs.hourlist.scrollTop = scroll * targetHeight;
-    if(datetype === 'minute') this.refs.minutelist.scrollTop = scroll * targetHeight;
-    if(datetype === 'second') this.refs.secondlist.scrollTop = scroll * targetHeight;
+    if(datetype === 'hour'){
+      this.refs.hourlist.scrollTop = scroll * CELL_HEIGHT;
+    }
+    if(datetype === 'minute'){
+      this.refs.minutelist.scrollTop = scroll * CELL_HEIGHT;
+    }
+    if(datetype === 'second'){
+      this.refs.secondlist.scrollTop = scroll * CELL_HEIGHT;
+    }
   };
 
   // momentオブジェクトを入れる変数を宣言
@@ -54,9 +60,11 @@ export default function() {
   }).on('updated', () => {
     this.rebindTouchEvents();
     const splitsFormatDate = this.displayFormatDate.split(':', 3);
-    if(this.refs.hourlist) scrollSelected(Number(splitsFormatDate[0]),'hour');
-    if(this.refs.minutelist) scrollSelected(Number(splitsFormatDate[1]),'minute');
-    if(this.refs.secondlist) scrollSelected(Number(splitsFormatDate[2]),'second');
+    if(this.opts.isshown){
+      scrollSelected(Number(splitsFormatDate[0]),'hour');
+      scrollSelected(Number(splitsFormatDate[1]),'minute');
+      scrollSelected(Number(splitsFormatDate[2]),'second');
+    }
   });
 
   /**
@@ -67,9 +75,15 @@ export default function() {
   this.generateTimes = datetype => {
     let maxDisplayTime;
     // datetypeの値と比較して,対象の繰り返し表示の回数を設定
-    if(datetype === 'hour') maxDisplayTime = 24;
-    if(datetype === 'minute') maxDisplayTime = 60;
-    if(datetype === 'second') maxDisplayTime = 60;
+    if(datetype === 'hour'){
+      maxDisplayTime = 24;
+    }
+    if(datetype === 'minute'){
+      maxDisplayTime = 60;
+    }
+    if(datetype === 'second'){
+      maxDisplayTime = 60;
+    }
     // 配列arrayTimeを用意
     const arrayTime = [];
     // mout/function/timeを使用し、上記で設定した回数下記の文を繰り返す
