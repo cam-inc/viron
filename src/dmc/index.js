@@ -78,6 +78,17 @@ export default function() {
     const reader = new FileReader();
     reader.readAsText(file);
 
+    // 読み込みが失敗した。
+    reader.onerror = () => {
+      store.action(actions.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'ファイルの読み込みに失敗しました。',
+        error: {}
+      });
+      inputFile.value = '';
+      return;
+    };
+
     // 読み込みが成功し、完了した。
     reader.onload = event => {
       const text = event.target.result;
