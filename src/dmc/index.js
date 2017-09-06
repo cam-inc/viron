@@ -94,33 +94,18 @@ export default function() {
       const text = event.target.result;
 
       // エンドポイント追加処理開始
-      new Promise((resolve, reject) => {
-        // ファイルを解析し、エンドポイントの値が正常か確認する。
-
-        // テキストをパース
-        const endpoints = JSON.parse(text);
-          
-        // 値が正常か確認する。
-        forOwn(endpoints, val => {
-          if (!isValidEndpoint(val)) {
-            // 一度でも正しくないファイルがあれば処理を中止する。
-            reject('error');
-          }
-        });
-        
-        // 正常であれば次の処理へ移行する
-        resolve(endpoints);
-      })
+      Promise
+        .resolve()
         .then(() => {
           // エンドポイントをストアへ追加する。
           const endpoints = JSON.parse(text);
-
+        
           // エンドポインツを配列にする。
           let endpointsArray = [];
           forOwn(endpoints, val => {
             endpointsArray.push(val);
           });
-
+        
           // エンドポイントをStoreへ追加する。
           return Promise.all(endpointsArray.map( endpoint => {
             return store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
@@ -128,12 +113,12 @@ export default function() {
           .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
             title: 'エンドポイント追加',
             message: 'エンドポイントが一覧に追加されました。'
-          }));
-        })
-        .catch(err => {
-          store.action(actions.MODALS_ADD, 'dmc-message', {
-            title: 'エンドポイント追加 失敗',
-            error: err
+          }))
+          .catch(err => {
+            store.action(actions.MODALS_ADD, 'dmc-message', {
+              title: 'エンドポイント追加 失敗',
+              error: err
+            });
           });
         });
 
