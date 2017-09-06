@@ -19,11 +19,11 @@ dmc.Application
                 dmc-icon(type="download")
               .Application__menuItemLabel ダウンロード
             .Application__menuItem
-              label.Application__menuItemLabelInput(for="file")
+              label.Application__menuItemLabelInput(for="Application{_riot_id}")
                 .Application__menuItemIcon
                   dmc-icon(type="upload")
                 .Application__menuItemLabel アップロード
-              input.Application__menuItemInput(type="file" accept='application/json' id="file" ref="upload" onChange="{ handleFileChange }")
+              input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" ref="upload" onChange="{ handleFileChange }")
       virtual(if="{ !isTopPage }")
         dmc-menu
     .Application__mainColumn
