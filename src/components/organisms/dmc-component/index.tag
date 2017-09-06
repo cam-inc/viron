@@ -13,9 +13,9 @@ dmc-component.Component
       dmc-icon(type="loading")
     dmc-pagination.Component__pagination.Component__pagination--head(if="{ !isPending &&  hasPagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ paginationSize }" onChange="{ handlePaginationChange }")
     div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" response="{ response }" schemaObject="{ schemaObject }" primaryKey="{ primaryKey }" tableLabels="{ tableLabels }" rowActions="{ rowActions }" updater="{ updater }")
-    dmc-pagination.Component__pagination.Component__pagination--tail(if="{ !isPending && hasPagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ paginationSize }" onChange="{ handlePaginationChange }")
     .Component__alert(if="{ !isPending && !isValidData }")
       .Component__alertText { alertText }
+    dmc-pagination.Component__pagination.Component__pagination--tail(if="{ !isPending && hasPagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ paginationSize }" onChange="{ handlePaginationChange }")
   .Component__tail(if="{ !!selfActions }")
     dmc-component-action(each="{ action in selfActions }" action="{ action }" updater="{ parent.updater }")
 

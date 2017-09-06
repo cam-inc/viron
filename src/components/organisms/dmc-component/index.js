@@ -251,7 +251,7 @@ export default function() {
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'dmc-component-search', {
-        parameterObjects: this.parameterObjects,
+        parameterObjects: escapedParameterObjects,
         initialParameters: ObjectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
           this.updater(parameters);
@@ -263,7 +263,6 @@ export default function() {
   };
 
   this.handlePaginationChange = page => {
-    // TODO: swagger上に定義されていないけどOK？？
     const paging = this.currentPaging = {
       limit: this.pagination.size,
       offset: (page - 1) * this.pagination.size
