@@ -79,7 +79,7 @@ export default function() {
     reader.readAsText(file);
 
     // 読み込みが成功し、完了した。
-    reader.onload = () => {
+    reader.onload = event => {
       const text = event.target.result;
 
       // エンドポイント追加処理開始
