@@ -62,85 +62,83 @@ export default function() {
       return;
     }
 
-    // ファイルがJSONでないか。
-    if (file.type !== 'application/json') {
-      store.action(actions.MODALS_ADD, 'dmc-message', {
-        title: 'エンドポイント追加 失敗',
-        message: 'ファイルはjsonを選択してください。',
-        error: {}
-      });
-      return;
-    }
-
     // ファイルをテキストとして読み込む。
     reader.readAsText(file);
 
-    // 読み込みが成功して完了した。
+    // 読み込みが成功し、完了した。
     reader.onload = () => {
-      parseFile(event.target.result);
+      const text = event.target.result;
+
+      // エンドポイント追加処理開始
+      new Promise((resolve, reject) => {
+        // ファイルを解析し、エンドポイントの値が正常か確認する。
+
+        // テキストをパース
+        const endpoints = JSON.parse(text);
+          
+        // 値が正常か確認する。
+        forOwn(endpoints, val => {
+          if (!isValidEndpoint(val)) {
+            // 一度でも正しくないファイルがあれば処理を中止する。
+            reject('error');
+          }
+        });
+        
+        // 正常であれば次の処理へ移行する
+        resolve(endpoints);
+      })
+        .then(() => {
+          // エンドポイントをストアへ追加する。
+          const endpoints = JSON.parse(text);
+
+          // エンドポインツを配列にする。
+          let endpointsArray = [];
+          forOwn(endpoints, val => {
+            endpointsArray.push(val);
+          });
+
+          // エンドポイントをStoreへ追加する。
+          return Promise.all(endpointsArray.map( endpoint => {
+            return addEndpoint(endpoint);
+          }))
+          .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+            title: 'エンドポイント追加',
+            message: 'エンドポイントが一覧に追加されました。'
+          }));
+        })
+        .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加 失敗',
+          message: 'エンドポイントを追加出来ませんでした',
+          error: {}
+        }));
     };
   };
 
   /**
-   * ファイルをパースし、エンドポイントへ追加します。
-   * @param {String} text 
+   * 対象のエンドポイントに正しく値が入っているか判定します。
+   * @param {Object} endpoint 
+   * @returns {Boolean}
    */
-  const parseFile = file => {
-    try {
-      // JSONにパースする。
-      const endpoints = JSON.parse(file);
-      
-      // エンドポイントを配列にする。
-      const endpointsArray = [];
-      forOwn(endpoints, val => {
-        endpointsArray.push(val);
-      });
-      
-      // 成功したときの表示オブジェクト。
-      const success = {
-        title: 'エンドポイント追加',
-        message: 'エンドポイントが一覧に追加されました。'
-      };
-      
-      // 失敗したときの表示オブジェクト。
-      const failure = {
-        title: 'エンドポイント追加 失敗',
-        message: 'エンドポイントを追加出来ませんでした。',
-        error: {}
-      };
-      
-      // 並行処理を行う。
-      Promise.all(endpointsArray.map( endpoint => {
-        return addEndpoint(endpoint);
-      }))
-        .then(() => store.action(actions.MODALS_ADD, 'dmc-message', success))
-        .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', failure));
-    } catch (error) {
-      store.action(actions.MODALS_ADD, 'dmc-message', {
-        title: 'エンドポイント追加 失敗',
-        message: 'エンドポイントを追加出来ませんでした',
-        error: {}
-      });
-    }
+  const isValidEndpoint = (endpoint) => {
+    const keys = ['url', 'memo', 'title', 'name', 'description', 'version', 'color', 'thumbnail', 'tags'];
+    let hasOwnAll = true;
+    forEach(keys, key => {
+      if (!hasOwn(endpoint, key)) {
+        hasOwnAll = false;
+      }
+    });
+    return hasOwnAll;
   };
 
+  /**
+   * エンドポイントをエンドポイント一覧へ追加します。
+   * @param {Object} endpoint
+   * @return {Promise}
+   */
   const addEndpoint = endpoint => {
-    return new Promise((resolve, reject) => {
-      let hasAllKeys = true;
-
-      const keys = ['url', 'memo', 'title', 'name', 'description', 'version', 'color', 'thumbnail', 'tags'];
-      forEach(keys, key => {
-        if (!hasOwn(endpoint, key)) {
-          hasAllKeys = false;
-        }
-      });
-
-      if (hasAllKeys) {
-        store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
-        resolve();
-      } else {
-        reject();
-      }
+    return new Promise(resolve => {
+      store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
+      resolve();
     });
   };
 }
