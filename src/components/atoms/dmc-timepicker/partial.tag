@@ -1,5 +1,5 @@
 dmc-timepicker-partial
-  .Partialtime__listItem(onTap="handleTap" ref="touch" class="{(opts.isselected) ? 'Partialtime__listItem--selected' : ''}") { opts.time }
+  .Timepicker__partialTimeListItem(onTap="handleTap" ref="touch" class="{(opts.isselected) ? 'Timepicker__partialTimeListItem--selected' : ''}") { opts.time }
 
     script.
       import script from './partial';
