@@ -97,31 +97,19 @@ export default function() {
       Promise
         .resolve()
         .then(() => {
-          // エンドポイントをストアへ追加する。
           const endpoints = JSON.parse(text);
-        
-          // エンドポインツを配列にする。
-          let endpointsArray = [];
-          forOwn(endpoints, val => {
-            endpointsArray.push(val);
-          });
-        
-          // エンドポイントをStoreへ追加する。
-          return Promise.all(endpointsArray.map( endpoint => {
-            return store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
-          }))
-          .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
-            title: 'エンドポイント追加',
-            message: 'エンドポイントが一覧に追加されました。'
-          }))
-          .catch(err => {
-            store.action(actions.MODALS_ADD, 'dmc-message', {
-              title: 'エンドポイント追加 失敗',
-              error: err
-            });
+          return store.action(actions.ENDPOINTS_MERGE_ALL, endpoints);
+        })
+        .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加',
+          message: 'エンドポイントが一覧に追加されました。'
+        }))
+        .catch(err => {
+          store.action(actions.MODALS_ADD, 'dmc-message', {
+            title: 'エンドポイント追加 失敗',
+            error: err
           });
         });
-
       // inputしたjsonをリセットする。
       inputFile.value = '';
     };
