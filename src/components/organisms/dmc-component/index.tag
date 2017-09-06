@@ -4,6 +4,8 @@ dmc-component.Component
       .Component__name { opts.component.name }
       .Component__refresh(ref="touch" onTap="handleRefreshButtonTap")
         dmc-icon(type="reload")
+      .Component__filter(if="{ opts.component.style === 'table' }" class="{ !!selectedTableColumns.length ? 'Component__filter--active' : '' }" ref="touch" onTap="handleFilterButtonTap")
+        dmc-icon(type="filter")
       .Component__search(if="{ !!getParameterObjectsForSearch().length }" class="{ !isCurrentSearchRequestParametersEmpty() ? 'Component__search--active' : ''}" ref="touch" onTap="handleSearchButtonTap")
         dmc-icon(type="search")
     .Component__headSearch(if="{ !isCurrentSearchRequestParametersEmpty() }")
@@ -12,7 +14,7 @@ dmc-component.Component
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")
     dmc-pagination.Component__pagination.Component__pagination--head(if="{ !isPending &&  hasPagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ paginationSize }" onChange="{ handlePaginationChange }")
-    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" response="{ response }" schemaObject="{ schemaObject }" primaryKey="{ primaryKey }" tableLabels="{ tableLabels }" rowActions="{ rowActions }" updater="{ updater }")
+    div(data-is="{ childComponentName }" if="{ !isPending && isValidData }" response="{ response }" schemaObject="{ schemaObject }" primaryKey="{ primaryKey }" tableLabels="{ tableLabels }" selectedTableColumns="{ selectedTableColumns }" rowActions="{ rowActions }" updater="{ updater }")
     .Component__alert(if="{ !isPending && !isValidData }")
       .Component__alertText { alertText }
     dmc-pagination.Component__pagination.Component__pagination--tail(if="{ !isPending && hasPagination }" currentPage="{ pagination.currentPage }" maxPage="{ pagination.maxPage }" size="{ paginationSize }" onChange="{ handlePaginationChange }")
