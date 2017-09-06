@@ -54,10 +54,12 @@ export default function() {
   };
 
   this.handleFileChange = e =>{
-    const file = e.target.files[0];
+    const inputFile = e.target;
+    const file = inputFile.files[0];
 
     // ファイルを取得出来たか。
     if (isUndefined(file)) {
+      inputFile.value = '';
       return;
     }
 
@@ -68,6 +70,7 @@ export default function() {
         message: 'JSONファイルを指定してください。',
         error: {}
       });
+      inputFile.value = '';
       return;
     }
 
@@ -116,11 +119,14 @@ export default function() {
             message: 'エンドポイントが一覧に追加されました。'
           }));
         })
-        .catch(() => store.action(actions.MODALS_ADD, 'dmc-message', {
-          title: 'エンドポイント追加 失敗',
-          message: 'エンドポイントを追加出来ませんでした。',
-          error: {}
-        }));
+        .catch(() => {
+          store.action(actions.MODALS_ADD, 'dmc-message', {
+            title: 'エンドポイント追加 失敗',
+            message: 'エンドポイントを追加出来ませんでした。',
+            error: {}
+          });
+          inputFile.value = '';
+        });
     };
   };
 
