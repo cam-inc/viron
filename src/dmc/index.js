@@ -126,29 +126,4 @@ export default function() {
       inputFile.value = '';
     };
   };
-
-  /**
-   * 対象のエンドポイントに正しく値が入っているか判定します。
-   * @param {Object} endpoint 
-   * @returns {Boolean}
-   */
-  const isValidEndpoint = (endpoint) => {
-    const keys = ['url', 'memo', 'title', 'name', 'description', 'version', 'color', 'thumbnail', 'tags'];
-    let hasOwnAll = true;
-    forEach(keys, key => {
-      if (!hasOwn(endpoint, key)) {
-        hasOwnAll = false;
-      }
-    });
-    return hasOwnAll;
-  };
-
-  /**
-   * エンドポイントをエンドポイント一覧へ追加します。
-   * @param {Object} endpoint
-   * @return {Promise}
-   */
-  const addEndpoint = endpoint => {
-    return store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
-  };
 }
