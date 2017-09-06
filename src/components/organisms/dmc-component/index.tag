@@ -1,10 +1,13 @@
 dmc-component.Component
   .Component__head
-    .Component__name { opts.component.name }
-    .Component__refresh(ref="touch" onTap="handleRefreshButtonTap")
-      dmc-icon(type="reload")
-    .Component__search(if="{ !!getParameterObjectsForSearch().length }" class="{ !isCurrentSearchRequestParametersEmpty() ? 'Component__search--active' : ''}" ref="touch" onTap="handleSearchButtonTap")
-      dmc-icon(type="search")
+    .Component__headBasic
+      .Component__name { opts.component.name }
+      .Component__refresh(ref="touch" onTap="handleRefreshButtonTap")
+        dmc-icon(type="reload")
+      .Component__search(if="{ !!getParameterObjectsForSearch().length }" class="{ !isCurrentSearchRequestParametersEmpty() ? 'Component__search--active' : ''}" ref="touch" onTap="handleSearchButtonTap")
+        dmc-icon(type="search")
+    .Component__headSearch(if="{ !isCurrentSearchRequestParametersEmpty() }")
+      .Component__searchQuery(each="{ val, key in currentSearchRequestParameters }") { key } : { val }
   .Component__body(ref="body")
     .Component__spinner(if="{ isPending }")
       dmc-icon(type="loading")

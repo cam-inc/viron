@@ -27,9 +27,12 @@
 }
 
 .Component__head {
-  @apply --layout-center-center;
-  padding: 8px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--color-basic-black);
+}
+
+.Component__headBasic {
+  @apply --layout-center-center;
 }
 
 .Component__name {
@@ -55,7 +58,15 @@
 }
 
 .Component__search--active {
-  color: var(--color-basic-skyblue);
+  color: var(--color-base-dodgerBlue);
+}
+
+.Component__headSearch {
+  margin: 4px 4px 0 0;
+  overflow: scroll;
+  font-size: 10px;
+  text-align: right;
+  background-color: #fff;
 }
 
 .Component__body {
