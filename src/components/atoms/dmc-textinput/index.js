@@ -10,14 +10,17 @@ export default function() {
     if (!isString(value)) {
       return null;
     }
-    return value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    return value;
   };
 
   this.on('mount', () => {
     this.refs.input.value = this.normalizeValue(this.opts.text);
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
-    this.refs.input.value = this.normalizeValue(this.opts.text);
+    const text = this.opts.text;
+    if (!isString(text)) {
+      this.refs.input.value = this.normalizeValue(text);
+    }
   });
 
   this.handleTap = () => {
