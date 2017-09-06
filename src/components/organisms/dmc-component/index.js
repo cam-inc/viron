@@ -1,6 +1,8 @@
 import contains from 'mout/array/contains';
 import reject from 'mout/array/reject';
+import isUndefined from 'mout/lang/isUndefined';
 import keys from 'mout/object/keys';
+import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
@@ -47,10 +49,10 @@ export default function() {
   this.pagination = {};
   // ページングのサイズ値。
   this.paginationSize = 3;
-  // 現在のリクエストパラメータ値。
-  this.currentRequestParameters = {};
-  this.isCurrentRequestParametersEmpty = () => {
-    return !keys(this.currentRequestParameters).length;
+  // 現在の検索用リクエストパラメータ値。
+  this.currentSearchRequestParameters = {};
+  this.isCurrentSearchRequestParametersEmpty = () => {
+    return !keys(this.currentSearchRequestParameters).length;
   };
   // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
   this.getParameterObjectsForSearch = () => {
@@ -110,7 +112,9 @@ export default function() {
     this.isPending = true;
     this.update();
 
-    this.currentRequestParameters = ObjectAssign(this.currentRequestParameters, requestParameters);
+    this.currentSearchRequestParameters = objectReject(ObjectAssign(this.currentSearchRequestParameters, requestParameters), val => {
+      return isUndefined(val);
+    });
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
@@ -119,7 +123,7 @@ export default function() {
           resolve();
         }, 300);
       }))
-      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentRequestParameters))
+      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentSearchRequestParameters))
       .catch(err => {
         const api = this.opts.component.api;
         return store.action(actions.MODALS_ADD, {
@@ -248,7 +252,7 @@ export default function() {
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'dmc-component-search', {
         parameterObjects: this.parameterObjects,
-        initialParameters: ObjectAssign({}, this.currentRequestParameters),
+        initialParameters: ObjectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
           this.updater(parameters);
         }
