@@ -175,7 +175,7 @@ export default function() {
   // 入力プレビューの開閉状態。
   this.isPreviewOpened = false;
   // validateの開閉状態。
-  this.isValidateOpened = false;
+  this.isValidateOpened = true;
   // bodyの開閉状態。
   this.isBodyOpened = true;
 
