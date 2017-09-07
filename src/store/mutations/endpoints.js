@@ -79,23 +79,23 @@ export default {
    * @return {Array}
    */
   mergeAll: (context, endpoints) => {
-    const modifyEndpoint = ObjectAssign({}, context.state.endpoints);
+    const modifiedEndpoint = ObjectAssign({}, context.state.endpoints);
     for (const newKey of Object.keys(endpoints)) {
       let canAppend = true;
-      for (const modifyKey of Object.keys(modifyEndpoint)) {
-        if (modifyEndpoint[modifyKey].url === endpoints[newKey].url)   {
-          modifyEndpoint[modifyKey] = endpoints[newKey];
+      for (const modifyKey of Object.keys(modifiedEndpoint)) {
+        if (modifiedEndpoint[modifyKey].url === endpoints[newKey].url)   {
+          modifiedEndpoint[modifyKey] = endpoints[newKey];
           canAppend = false;
         }
       }
       if (canAppend) {
         const key = shortid.generate();
-        modifyEndpoint[key] = endpoints[newKey];
+        modifiedEndpoint[key] = endpoints[newKey];
       }
     }
     // const newEndpoints = ObjectAssign({}, currentEndpoints, endpoints);
-    context.state.endpoints = modifyEndpoint;
-    storage.set('endpoints', modifyEndpoint);
+    context.state.endpoints = modifiedEndpoint;
+    storage.set('endpoints', modifiedEndpoint);
     return [states.ENDPOINTS];
   }
 };
