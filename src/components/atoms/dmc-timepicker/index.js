@@ -41,22 +41,31 @@ export default function() {
       this.refs.secondlist.scrollTop = scroll * CELL_HEIGHT;
     }
   };
-
   // momentオブジェクトを入れる変数を宣言
   let momentObj = {};
-  // 値がなければ時：分：秒に0を設定し、画面表示されないように空文字を代入
-  if (!isUndefined(this.opts.date)) {
-    momentObj = moment.utc(this.opts.date);
-    this.displayFormatDate = partialFormat(momentObj);
-  } else {
-    momentObj = moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
-    this.displayFormatDate = '';
-  }
+  /**
+   * 引数の値がUndefinedであればをそのままmomentオブジェクトへ追加。
+   * 引数の値がUndefinedでなければHH:mm:ss.sssへ0を設定。
+   * 画面表示をさせるためpartialFormat(this.momentObj)を代入。
+   * @param {String} date
+   */
+  const updateDisplayDate = date => {
+    if (!isUndefined(date)) {
+      momentObj = moment.utc(date);
+      this.displayFormatDate = partialFormat(momentObj);
+    } else {
+      momentObj = moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
+      this.displayFormatDate = '';
+    }
+  };
+
+  updateDisplayDate(this.opts.date);
 
   this.on('update', () => {
-    // 値がなければ時：分：秒に0を設定する。画面表示をさせるためpartialFormat(this.momentObj)を代入。
-    momentObj = (!isUndefined(this.opts.date)) ? moment.utc(this.opts.date) : moment.utc().set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
-    this.displayFormatDate = partialFormat(momentObj);
+    updateDisplayDate(this.opts.date);
+    if(!this.opts.date){
+      this.displayFormatDate = partialFormat(momentObj);
+    }
   }).on('updated', () => {
     this.rebindTouchEvents();
     const splitsFormatDate = this.displayFormatDate.split(':', 3);
