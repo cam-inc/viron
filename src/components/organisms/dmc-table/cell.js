@@ -29,6 +29,7 @@ export default function() {
   }
   case 'object':
   case 'array':
+    this.value = this.opts.data.cell;
     this.isComplex = true;
     break;
   default:

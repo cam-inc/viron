@@ -53,5 +53,16 @@ export default {
       context.state.application.isNetworking = false;
     }
     return [states.APPLICATION];
+  },
+
+  /**
+   * ドラッグステータスを変更します。
+   * @param {riotx.Context} context
+   * @param {Boolean} bool
+   * @return {Array}
+   */
+  drag: (context, bool) => {
+    context.state.application.isDragging = bool;
+    return [states.APPLICATION];
   }
 };

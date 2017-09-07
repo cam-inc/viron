@@ -1,5 +1,7 @@
 import filter from 'mout/array/filter';
 import map from 'mout/array/map';
+import isArray from 'mout/lang/isArray';
+import keys from 'mout/object/keys';
 
 export default {
   /**
@@ -123,6 +125,20 @@ export default {
    */
   tableLabels: (context, riotId) => {
     return context.state.components[riotId].table_labels || [];
+  },
+
+  /**
+   * テーブル列のキー群を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  tableColumns: (context, riotId) => {
+    const response = context.state.components[riotId].response;
+    if (!isArray(response) || !response.length) {
+      return [];
+    }
+    return keys(response[0]);
   },
 
   /**

@@ -38,5 +38,31 @@ export default {
       .then(() => {
         context.commit(mutations.APPLICATION_NAVIGATION, false);
       });
+  },
+
+  /**
+   * ドラッグ状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  startDrag: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.APPLICATION_DRAG, true);
+      });
+  },
+
+  /**
+   * ドラッグ完了状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  endDrag: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.APPLICATION_DRAG, false);
+      });
   }
 };

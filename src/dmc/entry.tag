@@ -1,4 +1,4 @@
-dmc-entry.Application__entry
+dmc-application-entry.Application__entry
   .Application__entryTitle 新しい管理画面を作成する
   .Application__entryMessage(if="{ isExist }") そのエンドポイントは既に登録済みです。
   .Application__entryForm

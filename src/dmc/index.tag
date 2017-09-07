@@ -18,6 +18,14 @@ dmc.Application
               .Application__menuItemIcon
                 dmc-icon(type="download")
               .Application__menuItemLabel ダウンロード
+            .Application__menuItem(if="{ endpointsCount > 2 }" ref="touch" onTap="handleOrderMenuItemTap")
+              .Application__menuItemIcon
+                dmc-icon(type="bars")
+              .Application__menuItemLabel 並び替え
+            .Application__menuItem(ref="touch" onTap="handleClearMenuItemTap")
+              .Application__menuItemIcon
+                dmc-icon(type="close")
+              .Application__menuItemLabel クリア
       virtual(if="{ !isTopPage }")
         dmc-menu
     .Application__mainColumn

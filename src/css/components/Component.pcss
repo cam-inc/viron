@@ -43,7 +43,8 @@
 }
 
 .Component__refresh,
-.Component__search {
+.Component__search,
+.Component__filter {
   @apply --layout-center-center;
   margin-left: 4px;
   font-size: 12px;
@@ -53,11 +54,14 @@
 .Component__refresh.hover,
 .Component__refresh:hover,
 .Component__search:hover,
-.Component__search.hover {
+.Component__search.hover,
+.Component__filter:hover,
+.Component__filter.hover {
   color: var(--color-basic-gray);
 }
 
-.Component__search--active {
+.Component__search--active,
+.Component__filter--active {
   color: var(--color-base-dodgerBlue);
 }
 
@@ -135,6 +139,43 @@
 
 .ComponentSearch__tail .Button {
   width: 120px;
+}
+
+.ComponentFilter {
+  display: block;
+}
+
+.ComponentFilter__head {
+  margin-bottom: 24px;
+}
+
+.ComponentFilter__title {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.ComponentFilter__description {
+  font-size: 10px;
+}
+
+.ComponentFilter__items {
+  @apply --layout-start-start;
+  flex-wrap: wrap;
+  max-width: 300px;
+  margin-bottom: 24px;
+}
+
+.ComponentFilter__item {
+  display: inline-block;
+  margin: 0 8px 8px 0;
+}
+
+.ComponentFilter__items .ComponentFilter__item:last-child {
+  margin-right: 0;
+}
+
+.ComponentFilter__tail {
+  @apply --layout-center-center;
 }
 
 .ComponentOperation {

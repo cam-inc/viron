@@ -4,9 +4,9 @@ dmc-endpoints.Page.EndpointsPage
       dmc-icon(type="link")
     .EndpointsPage__countLabel Endpoint ({ endpointsCount })
   .EndpointsPage__list(ref="list")
-    virtual(each="{ endpoint, key in endpoints }")
+    virtual(each="{ endpoint in endpoints }")
       dmc-endpoint(
-        key="{ key }"
+        key="{ endpoint.key }"
         endpoint="{ endpoint }"
         onEntry="{ handleEndpointEntry }"
         onEdit="{ handleEndpointEdit }"

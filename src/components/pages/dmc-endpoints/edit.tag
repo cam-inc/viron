@@ -1,6 +1,8 @@
 dmc-endpoint-edit.EndpointsPage__edit
-  .EndpointsPage__editTitle 管理画面を編集する
-  .EndpointsPage__editUrl { opts.url }
+  .EndpointsPage__editTitle エンドポイント編集
+  .EndpointsPage__editHead
+    .EndpointsPage__editThumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
+    .EndpointsPage__editName { opts.endpoint.name || '-' }
   .EndpointsPage__editForm
     dmc-textarea(label="メモ" text="{ memo }" onChange="{ handleMemoChange }")
   .EndpointsPage__editControls

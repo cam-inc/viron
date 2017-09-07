@@ -8,6 +8,7 @@ import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../atoms/dmc-message/index.tag';
+import './filter.tag';
 import './search.tag';
 
 const STYLE_NUMBER = 'number';
@@ -41,6 +42,10 @@ export default function() {
   this.rowActions = [];
   // テーブルのrow表示ラベル。
   this.tableLabels = [];
+  // テーブルの全column群。
+  this.tableColumns = [];
+  // filterで選択されたcolumn群。
+  this.selectedTableColumns = [];
   // テーブル使用時のprimaryキー。
   this.primaryKey = null;
   // ページング機能ONかどうか。
@@ -217,6 +222,7 @@ export default function() {
     this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION, this._riot_id);
     this.primaryKey = store.getter(getters.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
     this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
+    this.tableColumns = store.getter(getters.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
     this.validateResponse(this.response);
     this.update();
   });
@@ -233,6 +239,25 @@ export default function() {
       .then(() => {
         this.refs.body.style.height = '';
       });
+  };
+
+  this.handleFilterButtonTap = () => {
+    if (this.isPending) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-component-filter', {
+        tableColumns: this.tableColumns,
+        selectedTableColumns: this.selectedTableColumns,
+        onComplete: newSelectedTableColumns => {
+          this.selectedTableColumns = newSelectedTableColumns;
+          this.update();
+        }
+      }))
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
   };
 
   this.handleSearchButtonTap = () => {

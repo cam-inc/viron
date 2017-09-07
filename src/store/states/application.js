@@ -6,5 +6,7 @@ export default {
   // 通信中のAPI群。
   networkings: [],
   // 通信中か否か(i.e. 一つでも通信中のAPIが存在するか?)
-  isNetworking: false
+  isNetworking: false,
+  // ドラッグ中か否か。
+  isDragging: false
 };
