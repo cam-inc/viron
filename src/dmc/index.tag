@@ -22,7 +22,7 @@ dmc.Application
               .Application__menuItemIcon
                 dmc-icon(type="upload")
               .Application__menuItemLabel アップロード
-              input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" ref="upload" onChange="{ handleFileChange }")
+              input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" onChange="{ handleFileChange }")
       virtual(if="{ !isTopPage }")
         dmc-menu
     .Application__mainColumn
