@@ -1,14 +1,9 @@
-:root {
-  --component-timepicker-font-size: 1rem;
-}
-
 .Timepicker {
   position: relative;
   display: inline-block;
 }
 
 .Timepicker__label {
-  display: block;
   padding-left: 8px;
   margin-bottom: 4px;
   font-size: 12px;
@@ -19,7 +14,7 @@
   display: block;
   width: 100%;
   padding: 10px;
-  font-size: var(--component-timepicker-font-size);
+  font-size: 1rem;
   background-color: var(--color-basic-white);
   border: 1px solid var(--color-basic-gray);
   border-radius: 5px;
@@ -37,8 +32,6 @@
 
 .Timepicker__partialTimeBody {
   @apply --layout-between-stretch;
-  top: 0;
-  flex-wrap: wrap;
   height: 100px;
   background-color: var(--color-basic-white);
   border-radius: 3px;
@@ -55,15 +48,16 @@
   display: none;
 }
 
-.Timepicker__partialTimeList--center {
+.Timepicker__partialTimeList:nth-child(2n) {
   border-right: 0.5px solid var(--color-basic-lightGray);
   border-left: 0.5px solid var(--color-basic-lightGray);
 }
 
 .Timepicker__partialTimeListItem {
+  display:block;
   height: 25px;
-  padding: 5px 5px;
-  font-size: calc(var(--component-timepicker-font-size) * 0.5);
+  padding: 5px;
+  font-size: 0.5rem;
   cursor: pointer;
 }
 
@@ -72,6 +66,6 @@
 }
 
 .Timepicker__partialTimeListItem--selected {
-  font-weight: 700;
+  font-weight: bold;
   background-color: var(--color-basic-lightGray);
 }
