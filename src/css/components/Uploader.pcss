@@ -33,6 +33,10 @@
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
+.Uploader--dragWatching .Uploader__label {
+  border-color: var(--color-base-dodgerBlue);
+}
+
 .Uploader--disabled .Uploader__label {
   cursor: not-allowed;
 }
@@ -57,6 +61,14 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
+}
+
+.Uploader__dragHandler {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 .Uploader__reset {

@@ -4,10 +4,8 @@ export default function() {
   this.fileName = null;
   this.isTypeOfImage = false;
   this.blobURL = this.opts.initialbloburl || null;
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
+  this.isDragWatching = false;
+  this.isDroppable = false;
 
   this.reset = () => {
     window.URL.revokeObjectURL(this.blobURL);
@@ -20,12 +18,27 @@ export default function() {
     this.update();
   };
 
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
   this.handleChange = e => {
     e.stopPropagation();
   };
 
-  this.handleFileChange = e => {
-    const files = e.target.files;
+  /**
+   * fileが変更された時の処理。
+   * DnD経由でも実行されます。
+   * @param {Object} e
+   * @param {Boolean} fromDnD Dnd経由か否か。
+   */
+  this.handleFileChange = (e, fromDnD) => {
+    let files;
+    if (fromDnD) {
+      files = e.dataTransfer.files;
+    } else {
+      files = e.target.files;
+    }
     if (!files.length) {
       this.reset();
       return;
@@ -38,6 +51,28 @@ export default function() {
     this.blobURL = window.URL.createObjectURL(file);
     this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
     this.update();
+  };
+
+  this.handleHandlerDragEnter = e => {
+    e.preventDefault();
+    this.isDragWatching = true;
+    this.update();
+  };
+
+  this.handleHandlerDragOver = e => {
+    e.preventDefault();
+  };
+
+  this.handleHandlerDragLeave = () => {
+    this.isDragWatching = false;
+    this.update();
+  };
+
+  this.handleHandlerDrop = e => {
+    e.preventDefault();
+    this.isDragWatching = false;
+    this.update();
+    this.handleFileChange(e, true);
   };
 
   this.handleResetButtonTap = () => {
