@@ -5,6 +5,7 @@ import { constants as states } from '../store/states';
 import '../components/atoms/dmc-message/index.tag';
 import './confirm.tag';
 import './entry.tag';
+import './order.tag';
 
 export default function() {
   const store = this.riotx.get();
@@ -18,6 +19,8 @@ export default function() {
   this.isTopPage = (this.pageName === 'endpoints');
   // 表示すべきページのルーティング情報。
   this.pageRoute = store.getter(getters.LOCATION_ROUTE);
+  // エンドポイント数。
+  this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
 
   this.on('updated', () => {
     this.rebindTouchEvents();
@@ -35,6 +38,10 @@ export default function() {
     this.pageRoute = store.getter(getters.LOCATION_ROUTE);
     this.update();
   });
+  this.listen(states.ENDPOINTS, () => {
+    this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+    this.update();
+  });
 
   this.handleEntryMenuItemTap = () => {
     Promise
@@ -48,6 +55,10 @@ export default function() {
   this.handleDownloadMenuItemTap = () => {
     const endpoints = store.getter(getters.ENDPOINTS_WITHOUT_TOKEN);
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
+  };
+
+  this.handleOrderMenuItemTap = () => {
+    store.action(actions.MODALS_ADD, 'dmc-application-order');
   };
 
   this.handleClearMenuItemTap = () => {

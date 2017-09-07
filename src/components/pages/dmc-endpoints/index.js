@@ -9,11 +9,11 @@ import './signin.tag';
 export default function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(getters.ENDPOINTS);
+  this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER);
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
 
   this.listen(states.ENDPOINTS, () => {
-    this.endpoints = store.getter(getters.ENDPOINTS);
+    this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER);
     this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
     this.update();
   });

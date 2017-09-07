@@ -109,5 +109,34 @@ export default {
         const key = shortid.generate();
         context.commit(mutations.ENDPOINTS_ADD, key, endpoint);
       });
+  },
+
+  /**
+   * エンドポイントのorder値を整理します。
+   * order値が存在しない等への対応を行います。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  tidyUpOrder: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.ENDPOINTS_TIDY_UP_ORDER);
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントのorder値を変更します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Number} newOrder
+   * @return {Promise}
+   */
+  changeOrder: (context, endpointKey, newOrder) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder);
+      });
   }
 };
