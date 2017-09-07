@@ -41,6 +41,7 @@
 .Timepicker__partialTimeList {
   flex-grow: 1;
   overflow-y: scroll;
+  border-right: 0.5px solid var(--color-basic-lightGray);
 }
 
 /*プルダウンメニューのタップ領域を増やす為、スクロールバーを除去*/
@@ -48,9 +49,8 @@
   display: none;
 }
 
-.Timepicker__partialTimeList:nth-child(2n) {
-  border-right: 0.5px solid var(--color-basic-lightGray);
-  border-left: 0.5px solid var(--color-basic-lightGray);
+.Timepicker__partialTimeList:last-child {
+  border-right: 0px; 
 }
 
 .Timepicker__partialTimeListItem {
