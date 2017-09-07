@@ -5,7 +5,38 @@ import '../../atoms/dmc-message/index.tag';
 export default function() {
   const store = this.riotx.get();
 
+  // submitボタンに使用するラベル。method名によって内容を変える。
+  this.submitButtonLabel = null;
+  // cancelボタンに使用するタイプ。method名によって内容を変える。
+  this.submitButtonType = 'primary';
+  switch (this.opts.method) {
+  case 'get':
+    this.submitButtonLabel = '取得する';
+    break;
+  case 'post':
+    this.submitButtonLabel = '新規追加する';
+    break;
+  case 'put':
+    this.submitButtonLabel = '変更する';
+    this.submitButtonType = 'emphasis';
+    break;
+  case 'delete':
+    this.submitButtonLabel = '削除する';
+    this.submitButtonType = 'emphasis';
+    break;
+  default:
+    this.submitButtonLabel = '送信する';
+    break;
+  }
+
+  // 現在の入力値群。
   this.currentParameters = ObjectAssign({}, this.opts.initialParameters);
+
+  // 補完的な情報群。primaryキー等。
+  this.additionalInfo = {
+    method: this.opts.method,
+    primaryKey: this.opts.primaryKey
+  };
 
   this.handleParametersChange = newParameters => {
     this.currentParameters = newParameters;

@@ -11,6 +11,10 @@
   height: 100%;
 }
 
+.Uploader--disabled .Uploader__form {
+  opacity: 0.5;
+}
+
 .Uploader__input {
   display: none;
 }
@@ -29,8 +33,12 @@
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
-.Uploader__label:hover,
-.Uploader__label.hover {
+.Uploader--disabled .Uploader__label {
+  cursor: not-allowed;
+}
+
+.Uploader:not(.Uploader--disabled) .Uploader__label:hover,
+.Uploader:not(.Uploader--disabled) .Uploader__label.hover {
   opacity: 0.8;
 }
 
@@ -65,7 +73,11 @@
   border-radius: 50%;
 }
 
-.Uploader__reset:hover,
-.Uploader__reset.hover {
+.Uploader--disabled .Uploader__reset {
+  cursor: not-allowed;
+}
+
+.Uploader:not(.Uploader--disabled) .Uploader__reset:hover,
+.Uploader:not(.Uploader--disabled) .Uploader__reset.hover {
   background-color: #000;
 }

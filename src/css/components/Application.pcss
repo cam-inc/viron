@@ -161,3 +161,138 @@
 .Application__entryControls .Button:first-child {
   margin-right: 12px;
 }
+
+/* ============================== */
+/* Confirm */
+/* ============================== */
+.Application__confirm {
+  display: block;
+}
+
+.Application__confirmHead {
+  margin-bottom: 24px;
+}
+
+.Application__confirmTitle {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.Application__confirmDescription {
+  font-size: 10px;
+}
+
+.Application__confirmTail {
+  @apply --layout-center-center;
+}
+
+.Application__confirmTail .Button {
+  margin-right: 8px;
+}
+
+.Application__confirmTail .Button:last-child {
+  margin-right: 0;
+}
+
+/* ============================== */
+/* Order */
+/* ============================== */
+.Application__order {
+  display: block;
+}
+
+.Application__orderTitle {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.Application__orderDescription {
+  margin-bottom: 8px;
+}
+
+.Application__orderDroparea {
+  position: relative;
+  display: block;
+  padding: 12px;
+  background-color: transparent;
+}
+
+.Application__orderDropareaContent {
+  @apply --layout-center-center;
+  height: 20px;
+  transition-duration: 100ms;
+  transition-property: height, background-color;
+}
+
+.Application__orderDroparea--watching .Application__orderDropareaContent {
+  background-color: var(--color-base-concrete);
+}
+
+.Application__orderDroparea--droppable .Application__orderDropareaContent {
+  height: 100px;
+  background-color: var(--color-base-puertoRico);
+}
+
+.Application__orderDropareaHandler {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.Application__orderItem {
+  display: block;
+  padding: 24px;
+  cursor: move;
+  background-color: var(--color-base-white);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  transition-duration: 100ms;
+  transition-property: box-shadow;
+}
+
+.Application__orderItem:hover,
+.Application__orderItem.hover {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+.Application__orderItemHead {
+  @apply --layout-center-center;
+  margin-bottom: 24px;
+}
+
+.Application__orderItemThumbnail {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  border-radius: 50%;
+}
+
+.Application__orderItemName {
+  @apply --text-truncate;
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.Application__orderItemUrl {
+  @apply --layout-center-center;
+}
+
+.Application__orderItemUrlIcon {
+  @apply --layout-center-center;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+.Application__orderItemUrlLabel {
+  @apply --text-truncate;
+  flex-grow: 1;
+  opacity: 0.6;
+}

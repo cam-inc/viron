@@ -1,3 +1,7 @@
+import forEach from 'mout/array/forEach';
+import sortBy from 'mout/array/sortBy';
+import isNumber from 'mout/lang/isNumber';
+import forOwn from 'mout/object/forOwn';
 import ObjectAssign from 'object-assign';
 import shortid from 'shortid';
 import storage from 'store';
@@ -96,6 +100,64 @@ export default {
     // const newEndpoints = ObjectAssign({}, currentEndpoints, endpoints);
     context.state.endpoints = modifyEndpoint;
     storage.set('endpoints', modifyEndpoint);
+    return [states.ENDPOINTS];
+  },
+
+  /**
+   * エンドポイント群のorder値を整理します。
+   * order値が存在しない場合は後方に配置されます。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  tidyUpOrder: context => {
+    const newEndpoints = ObjectAssign(context.state.endpoints);
+    // どのorder値よりも大きいであろう適当な値。
+    const bigNumber = 9999;
+    let ordered = [];
+    forOwn(newEndpoints, (endpoint, key) => {
+      ordered.push({
+        key,
+        order: (isNumber(endpoint.order) ? endpoint.order : bigNumber)
+      });
+    });
+    ordered = sortBy(ordered, obj => {
+      return obj.order;
+    });
+    forEach(ordered, (obj, order) => {
+      newEndpoints[obj.key].order = order;
+    });
+    context.state.endpoints = newEndpoints;
+    storage.set('endpoints', newEndpoints);
+    return [states.ENDPOINTS];
+  },
+
+  /**
+   * 指定されたエンドポイントのorder値を変更します。
+   * 他エンドポイントのorder値もインクリメントされます。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Number} newOrder
+   * @return {Array}
+   */
+  changeOrder: (context, endpointKey, newOrder) => {
+    const newEndpoints = ObjectAssign(context.state.endpoints);
+    // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
+    newEndpoints[endpointKey].order = newOrder - 0.5;
+    let ordered = [];
+    forOwn(newEndpoints, (endpoint, key) => {
+      ordered.push({
+        key,
+        order: endpoint.order
+      });
+    });
+    ordered = sortBy(ordered, obj => {
+      return obj.order;
+    });
+    forEach(ordered, (obj, order) => {
+      newEndpoints[obj.key].order = order;
+    });
+    context.state.endpoints = newEndpoints;
+    storage.set('endpoints', newEndpoints);
     return [states.ENDPOINTS];
   }
 };

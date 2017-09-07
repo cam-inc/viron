@@ -19,7 +19,6 @@
 .Component__spinner {
   @apply --layout-center-center;
   height: 100%;
-  min-height: 100px;
   font-size: 18px;
 }
 
@@ -28,9 +27,12 @@
 }
 
 .Component__head {
-  @apply --layout-center-center;
-  padding: 8px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--color-basic-black);
+}
+
+.Component__headBasic {
+  @apply --layout-center-center;
 }
 
 .Component__name {
@@ -41,7 +43,8 @@
 }
 
 .Component__refresh,
-.Component__search {
+.Component__search,
+.Component__filter {
   @apply --layout-center-center;
   margin-left: 4px;
   font-size: 12px;
@@ -51,12 +54,23 @@
 .Component__refresh.hover,
 .Component__refresh:hover,
 .Component__search:hover,
-.Component__search.hover {
+.Component__search.hover,
+.Component__filter:hover,
+.Component__filter.hover {
   color: var(--color-basic-gray);
 }
 
-.Component__search--active {
-  color: var(--color-basic-skyblue);
+.Component__search--active,
+.Component__filter--active {
+  color: var(--color-base-dodgerBlue);
+}
+
+.Component__headSearch {
+  margin: 4px 4px 0 0;
+  overflow: scroll;
+  font-size: 10px;
+  text-align: right;
+  background-color: #fff;
 }
 
 .Component__body {
@@ -70,12 +84,6 @@
 
 .Component__alert {
   padding: 12px 0;
-}
-
-.Component__alertApi {
-  margin-bottom: 8px;
-  font-size: 10px;
-  color: var(--color-basic-red);
 }
 
 .Component__alertText {
@@ -95,7 +103,7 @@
 
 .Component__tail {
   @apply --layout-center-center;
-  padding: 8px;
+  padding-top: 24px;
   border-top: 1px solid var(--color-basic-black);
 }
 
@@ -131,6 +139,43 @@
 
 .ComponentSearch__tail .Button {
   width: 120px;
+}
+
+.ComponentFilter {
+  display: block;
+}
+
+.ComponentFilter__head {
+  margin-bottom: 24px;
+}
+
+.ComponentFilter__title {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.ComponentFilter__description {
+  font-size: 10px;
+}
+
+.ComponentFilter__items {
+  @apply --layout-start-start;
+  flex-wrap: wrap;
+  max-width: 300px;
+  margin-bottom: 24px;
+}
+
+.ComponentFilter__item {
+  display: inline-block;
+  margin: 0 8px 8px 0;
+}
+
+.ComponentFilter__items .ComponentFilter__item:last-child {
+  margin-right: 0;
+}
+
+.ComponentFilter__tail {
+  @apply --layout-center-center;
 }
 
 .ComponentOperation {

@@ -1,3 +1,4 @@
+import sortBy from 'mout/array/sortBy';
 import find from 'mout/object/find';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
@@ -11,6 +12,24 @@ export default {
    */
   all: context => {
     return context.state.endpoints;
+  },
+
+  /**
+   * 全endpointをorder昇順の配列として返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  allByOrder: context => {
+    const endpoints = ObjectAssign(context.state.endpoints);
+    let endpointsByOrder = [];
+    forOwn(endpoints, (endpoint, key) => {
+      endpoint.key = key;
+      endpointsByOrder.push(endpoint);
+    });
+    endpointsByOrder = sortBy(endpointsByOrder, endpoint => {
+      return endpoint.order;
+    });
+    return endpointsByOrder;
   },
 
   /**

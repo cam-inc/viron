@@ -23,6 +23,14 @@ dmc.Application
                 dmc-icon(type="upload")
               .Application__menuItemLabel アップロード
               input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" ref="upload" onChange="{ handleFileChange }")
+            .Application__menuItem(if="{ endpointsCount > 2 }" ref="touch" onTap="handleOrderMenuItemTap")
+              .Application__menuItemIcon
+                dmc-icon(type="bars")
+              .Application__menuItemLabel 並び替え
+            .Application__menuItem(ref="touch" onTap="handleClearMenuItemTap")
+              .Application__menuItemIcon
+                dmc-icon(type="close")
+              .Application__menuItemLabel クリア
       virtual(if="{ !isTopPage }")
         dmc-menu
     .Application__mainColumn

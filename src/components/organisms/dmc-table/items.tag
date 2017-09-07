@@ -1,17 +1,23 @@
 dmc-table-items.Table__items(class="{ isOpened ? 'Table__items--opened' : '' }")
   .Table__itemsHeader
     .Table__itemsTitle(ref="touch" onTap="handleHeaderTitleTap") { title }
-    .Table__itemsButton(if="{ !!opts.actions }" ref="touch" onTap="handleActionButtonTap")
-      dmc-icon(type="edit")
-    .Table__itemsButton(ref="touch" onTap="handleFilterButtonTap")
-      dmc-icon(type="filter")
-    .Table__itemsButton.Table__itemsOpenShutButton(ref="touch" onTap="handleOpenShutButtonTap")
-      dmc-icon(type="up")
+    virtual(each="{ action in opts.actions}")
+      dmc-table-items-button(action="{ action }" isAction="{ true }" onPat="{ parent.handleItemsActionButtonPat }")
+    dmc-table-items-button.Table__itemsOpenShutButton(icon="up" onPat="{ handleOpenShutButtonPat }")
   virtual(if="{ isOpened }")
-    dmc-table-item(each="{ item in filteredItems }" item="{ item }")
+    .Table__itemsContent
+      .Table__itemsList
+        dmc-table-item(each="{ item in getFilteredItems() }" item="{ item }")
+      .Table__itemsControl
+        .Table__itemsDetailButton(ref="touch" onTap="handleDetailButtonTap" onMouseOver="{ handleDetailButtonMouseOver }" onMouseOut="{ handleDetailButtonMouseOut }")
+          dmc-icon(type="scan")
+          dmc-tooltip(if="{ isTooltipVisible }" placement="topRight" label="全て表示")
+          .Table__itemsDetailButtonCatcher
 
   script.
     import '../../atoms/dmc-icon/index.tag';
+    import '../../atoms/dmc-tooltip/index.tag';
+    import './button.tag';
     import './item.tag';
     import script from './items';
     this.external(script);

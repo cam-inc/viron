@@ -29,7 +29,7 @@ export default function() {
   }
   case 'object':
   case 'array':
-    this.value = '[詳細を見る]';
+    this.value = this.opts.data.cell;
     this.isComplex = true;
     break;
   default:
@@ -37,7 +37,7 @@ export default function() {
     break;
   }
 
-  this.handleTap = ()  => {
+  this.handleDetailPat = ()  => {
     store.action(actions.MODALS_ADD, 'dmc-prettyprint', {
       data : this.opts.data.cell
     });

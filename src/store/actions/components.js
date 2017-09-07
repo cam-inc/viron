@@ -71,6 +71,7 @@ export default {
         actions,// 関連API群。
         hasPagination,
         pagination,// ページング関連。
+        primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
         table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
       });
     });

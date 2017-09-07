@@ -70,7 +70,7 @@ export default function() {
       // @see: https://quilljs.com/docs/configuration/#placeholder
       placeholder: 'type here...',
       // @see: https://quilljs.com/docs/configuration/#readonly
-      readonly: false,
+      readonly: this.opts.isdisabled,
       // @see: https://quilljs.com/docs/configuration/#scrollingcontainer
       scrollingContainer: null,
       // @see: https://quilljs.com/docs/configuration/#strict
@@ -104,6 +104,7 @@ export default function() {
       headElm.insertBefore(linkElm, headElm.firstChild);
     }
     this.update();
+    this.quill.enable(!this.opts.isdisabled);
   }).on('unmount', () => {
     this.quill.off(Quill.events.TEXT_CHANGE, this.handleTextChange);
     this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
