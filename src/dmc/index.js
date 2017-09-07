@@ -56,7 +56,7 @@ export default function() {
 
     // ファイルを取得出来たか。
     if (isUndefined(file)) {
-      inputFile.value = '';
+      inputFile.value = null;
       return;
     }
 
@@ -67,7 +67,7 @@ export default function() {
         message: 'JSONファイルを指定してください。',
         type: 'error'
       });
-      inputFile.value = '';
+      inputFile.value = null;
       return;
     }
 
@@ -82,7 +82,7 @@ export default function() {
         message: 'ファイルの読み込みに失敗しました。',
         error: err
       });
-      inputFile.value = '';
+      inputFile.value = null;
     };
 
     // 読み込みが成功し、完了した。
@@ -107,7 +107,7 @@ export default function() {
           });
         });
       // inputしたjsonをリセットする。
-      inputFile.value = '';
+      inputFile.value = null;
     };
   };
 }
