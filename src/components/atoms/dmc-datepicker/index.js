@@ -8,15 +8,25 @@ export default function() {
     return date.format('YYYY-MM-DD');
   };
 
-  if (!isUndefined(this.opts.date)) {
-    this.selectedDate = moment.utc(this.opts.date || null);
-    this.displayFormatDate = format(this.selectedDate);
-    this.displayDate = moment.utc(this.opts.displaydate || {});
-  } else {
-    this.selectedDate = moment.utc(this.opts.date).set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
-    this.displayFormatDate = '';
-    this.displayDate = moment.utc(this.opts.displaydate || {});
+  /**
+   *  moment.utc()のオブジェクトから指定した型にフォーマットする為に使用
+   * @param {String} date
+   * @param {String} displaydate
+   */
+  const updateDate = (date,displaydate) => {
+    if (!isUndefined(date)) {
+      this.selectedDate = moment.utc(date || null);
+      this.displayFormatDate = format(this.selectedDate);
+      this.displayDate = moment.utc(displaydate || {});
+      console.log(this.displayDate);
+    } else {
+      this.selectedDate = moment.utc(date).set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
+      this.displayFormatDate = '';
+      this.displayDate = moment.utc(displaydate || {}).set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
+    }
   }
+
+  updateDate(this.opts.date,this.opts.displaydate);
   this.settingDateName = {
     'month': {
       'ja': [
@@ -37,14 +47,9 @@ export default function() {
   };
 
   this.on('update', () => {
-    if (!isUndefined(this.opts.date)) {
-      this.selectedDate = moment.utc(this.opts.date || null);
+    toMomentDate(this.opts.date,this.opts.displaydate);
+    if(!this.displayFormatDate){
       this.displayFormatDate = format(this.selectedDate);
-      this.displayDate = moment.utc(this.opts.displaydate || {});
-    } else {
-      this.selectedDate = moment.utc(this.opts.date).set('hour', 0).set('minute', 0).set('second', 0).set('milliseconds', 0);
-      this.displayFormatDate = format(this.selectedDate);
-      this.displayDate = moment.utc(this.opts.displaydate || {});
     }
   }).on('updated', () => {
     this.rebindTouchEvents();
