@@ -1,7 +1,7 @@
 dmc-application-order-item.Application__orderItem(draggable="{ true }" onDragStart="{ handleDragStart }" onDrag="{ handleDrag }" onDragEnd="{ handleDragEnd }")
   .Application__orderItemHead
     .Application__orderItemThumbnail(style="background-image:url({ opts.endpoint.thumbnail })")
-    .Application__orderItemName ({ opts.endpoint.order }) { opts.endpoint.name || '-'}
+    .Application__orderItemName { opts.endpoint.name || '-'}
   .Application__orderItemBody
     .Application__orderItemUrl
       .Application__orderItemUrlIcon
