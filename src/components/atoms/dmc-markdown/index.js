@@ -90,5 +90,7 @@ export default function() {
   ));
   this.on('mount', () => {
     this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
+  }).on('update', () => {
+    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 }
