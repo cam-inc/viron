@@ -180,12 +180,29 @@
 
 .EndpointsPage__editTitle {
   margin-bottom: 24px;
-  font-size: 24px;
+  font-size: 16px;
 }
 
-.EndpointsPage__editUrl {
-  margin-bottom: 8px;
-  font-size: 12px;
+.EndpointsPage__editHead {
+  @apply --layout-center-center;
+  margin-bottom: 24px;
+}
+
+.EndpointsPage__editThumbnail {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+}
+
+.EndpointsPage__editName {
+  @apply --text-truncate;
+  flex-grow: 1;
+  font-weight: bold;
 }
 
 .EndpointsPage__editForm {

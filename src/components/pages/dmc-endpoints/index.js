@@ -46,13 +46,12 @@ export default function() {
       }));
   };
 
-  this.handleEndpointEdit = (key, url, memo) => {
+  this.handleEndpointEdit = key => {
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'dmc-endpoint-edit', {
         endpointKey: key,
-        url,
-        memo
+        endpoint: store.getter(getters.ENDPOINTS_ONE, key)
       }))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
