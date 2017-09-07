@@ -1,4 +1,5 @@
 import ObjectAssign from 'object-assign';
+import shortid from 'shortid';
 import storage from 'store';
 import { constants as states } from '../states';
 
@@ -78,10 +79,23 @@ export default {
    * @return {Array}
    */
   mergeAll: (context, endpoints) => {
-    const currentEndpoints = context.state.endpoints;
-    const newEndpoints = ObjectAssign({}, currentEndpoints, endpoints);
-    context.state.endpoints = newEndpoints;
-    storage.set('endpoints', newEndpoints);
+    const modifyEndpoint = ObjectAssign({}, context.state.endpoints);
+    for (const newKey of Object.keys(endpoints)) {
+      let canAppend = true;
+      for (const modifyKey of Object.keys(modifyEndpoint)) {
+        if (modifyEndpoint[modifyKey].url === endpoints[newKey].url)   {
+          modifyEndpoint[modifyKey] = endpoints[newKey];
+          canAppend = false;
+        }
+      }
+      if (canAppend) {
+        const key = shortid.generate();
+        modifyEndpoint[key] = endpoints[newKey];
+      }
+    }
+    // const newEndpoints = ObjectAssign({}, currentEndpoints, endpoints);
+    context.state.endpoints = modifyEndpoint;
+    storage.set('endpoints', modifyEndpoint);
     return [states.ENDPOINTS];
   }
 };
