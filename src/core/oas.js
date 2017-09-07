@@ -496,6 +496,12 @@ const _type = (value, constraints) => {
         isValidType = true;
       }
       break;
+    case 'file':
+      // より最適なtypeチェックがあればそれを採用したい。
+      if (!!value && isString(value.name)) {
+        isValidType = true;
+      }
+      break;
     case 'null':
       if (isNull(value)) {
         isValidType = true;

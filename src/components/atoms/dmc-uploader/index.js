@@ -16,6 +16,10 @@ export default function() {
     this.update();
   };
 
+  this.handleChange = e => {
+    e.stopPropagation();
+  };
+
   this.handleFileChange = e => {
     const files = e.target.files;
     if (!files.length) {

@@ -1,4 +1,4 @@
-dmc-uploader.Uploader(class="{ 'Uploader--disabled' : opts.isdisabled }")
+dmc-uploader.Uploader(class="{ 'Uploader--disabled' : opts.isdisabled }" onChange="{ handleChange }")
   form.Uploader__form(ref="form")
     input.Uploader__input(type="file" id="{ inputId }" accept="{ opts.accept || 'image/*' }" disabled="{ !!opts.isdisabled }" onChange="{ handleFileChange }")
     label.Uploader__label(for="{ inputId }")
