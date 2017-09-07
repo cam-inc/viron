@@ -100,12 +100,10 @@ export default function() {
           title: 'エンドポイント追加',
           message: 'エンドポイントが一覧に追加されました。'
         }))
-        .catch(err => {
-          store.action(actions.MODALS_ADD, 'dmc-message', {
+        .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
             title: 'エンドポイント追加 失敗',
             error: err
-          });
-        });
+          }));
       // inputしたjsonをリセットする。
       inputFile.value = null;
     };
