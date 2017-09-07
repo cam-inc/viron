@@ -4,9 +4,10 @@ dmc-uploader.Uploader(class="{ 'Uploader--disabled' : opts.isdisabled }" onChang
     label.Uploader__label(for="{ inputId }")
       .Uploader__empty(if="{ !file || !blobURL }")
         dmc-icon(type="file")
-      .Uploader__cover(if="{ !!file && !!blobURL }" style="background-image:url({ blobURL });")
+      .Uploader__cover(if="{ !!file && !!blobURL && isTypeOfImage }" style="background-image:url({ blobURL });")
   .Uploader__reset(if="{ !!file }" ref="touch" onTap="handleResetButtonTap")
     dmc-icon(type="close")
+  .Uploader__fileName(if="{ !!fileName }") { fileName }
   script.
     import '../../atoms/dmc-icon/index.tag';
     import script from './index';
