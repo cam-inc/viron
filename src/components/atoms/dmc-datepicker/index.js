@@ -9,7 +9,7 @@ export default function() {
   };
 
   /**
-   *  moment.utc()のオブジェクトから指定した型にフォーマットする為に使用
+   *  引数をmomentオブジェクトへ変換し、表示させる
    * @param {String} date
    * @param {String} displaydate
    */
@@ -47,7 +47,7 @@ export default function() {
   };
 
   this.on('update', () => {
-    toMomentDate(this.opts.date,this.opts.displaydate);
+    updateDate(this.opts.date,this.opts.displaydate);
     if(!this.displayFormatDate){
       this.displayFormatDate = format(this.selectedDate);
     }
