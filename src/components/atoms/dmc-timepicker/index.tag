@@ -1,6 +1,6 @@
 dmc-timepicker.Timepicker
   .Timepicker__label(if="{ !!opts.label }") { opts.label }
-  input.Timepicker__input(onTap="handleInputTap" ref="touch" placeholder="{ opts.placeholder}" value="{ displayFormatDate }" readonly="readonly")
+  input.Timepicker__input(onTap="handleInputTap" ref="touch" placeholder="{ opts.placeholder || '' }" value="{ displayFormatDate }" readonly="readonly")
   .Timepicker__partialTime(if="{ opts.isshown }")
     .Timepicker__partialTimeBody
       .Timepicker__partialTimeList(ref="hourlist")
