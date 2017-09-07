@@ -55,7 +55,7 @@ export default function() {
     const file = inputFile.files[0];
 
     // ファイルを取得出来たか。
-    if (isUndefined(file)) {
+    if (!file) {
       inputFile.value = null;
       return;
     }
