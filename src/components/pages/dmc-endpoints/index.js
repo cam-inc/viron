@@ -9,11 +9,11 @@ import './signin.tag';
 export default function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(getters.ENDPOINTS);
+  this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER);
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
 
   this.listen(states.ENDPOINTS, () => {
-    this.endpoints = store.getter(getters.ENDPOINTS);
+    this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER);
     this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
     this.update();
   });
@@ -46,13 +46,12 @@ export default function() {
       }));
   };
 
-  this.handleEndpointEdit = (key, url, memo) => {
+  this.handleEndpointEdit = key => {
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'dmc-endpoint-edit', {
         endpointKey: key,
-        url,
-        memo
+        endpoint: store.getter(getters.ENDPOINTS_ONE, key)
       }))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err

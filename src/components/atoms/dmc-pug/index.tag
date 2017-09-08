@@ -5,7 +5,7 @@ dmc-pug.Pug
   .Pug__body
     .Pug__message(if="{ compilePug().status === 'failed' }" class="Pug__message--{ compilePug().status }") { compilePug().message }
     .Pug__editor(if="{ isTabEditorSelected }")
-      dmc-textarea(text="{ opts.text }" onChange="{ handleEditorChange }")
+      dmc-textarea(text="{ opts.text }" isDisabled="{ opts.isdisabled }" onChange="{ handleEditorChange }")
     .Pug__preview(if="{ isTabPreviewSelected }")
       dmc-prettyhtml(data="{ compilePug().html }")
 

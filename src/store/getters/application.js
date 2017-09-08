@@ -33,5 +33,14 @@ export default {
    */
   isNetworking: context => {
     return context.state.application.isNetworking;
+  },
+
+  /**
+   * ドラッグ中か否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isDragging: context => {
+    return context.state.application.isDragging;
   }
 };

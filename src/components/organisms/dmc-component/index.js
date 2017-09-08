@@ -1,10 +1,14 @@
 import contains from 'mout/array/contains';
+import reject from 'mout/array/reject';
+import isUndefined from 'mout/lang/isUndefined';
 import keys from 'mout/object/keys';
+import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
 import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../atoms/dmc-message/index.tag';
+import './filter.tag';
 import './search.tag';
 
 const STYLE_NUMBER = 'number';
@@ -25,7 +29,6 @@ export default function() {
   // レスポンスデータが有効か否か。
   this.isValidData = false;
   // レスポンスデータが不正の時に表示するエラー文言。
-  this.alertApi = '';
   this.alertText = '';
   // レスポンスデータ。
   this.response = null;
@@ -39,17 +42,39 @@ export default function() {
   this.rowActions = [];
   // テーブルのrow表示ラベル。
   this.tableLabels = [];
+  // テーブルの全column群。
+  this.tableColumns = [];
+  // filterで選択されたcolumn群。
+  this.selectedTableColumns = [];
+  // テーブル使用時のprimaryキー。
+  this.primaryKey = null;
   // ページング機能ONかどうか。
   this.hasPagination = false;
   // ページング情報。
   this.pagination = {};
   // ページングのサイズ値。
   this.paginationSize = 3;
-  // 現在のリクエストパラメータ値。
-  this.currentRequestParameters = {};
-  this.isCurrentRequestParametersEmpty = () => {
-    return !keys(this.currentRequestParameters).length;
+  // 現在の検索用リクエストパラメータ値。
+  this.currentSearchRequestParameters = {};
+  this.isCurrentSearchRequestParametersEmpty = () => {
+    return !keys(this.currentSearchRequestParameters).length;
   };
+  // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
+  this.getParameterObjectsForSearch = () => {
+    return reject(this.parameterObjects || [], parameterObject => {
+      if (parameterObject.in !== 'query') {
+        return false;
+      }
+      if (parameterObject.name === 'limit') {
+        return true;
+      }
+      if (parameterObject.name === 'offset') {
+        return true;
+      }
+      return false;
+    });
+  };
+
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   switch (this.opts.component.style) {
@@ -82,8 +107,7 @@ export default function() {
     break;
   default:
     this.isValidData = false;
-    this.alertApi = `${this.opts.component.api.method}: ${this.opts.component.api.path}`;
-    this.alertText = `component type of ${this.opts.component.style} is not supported.`;
+    this.alertText = `"${this.opts.component.style}"はサポートされていないstyleです。サポートされているstyleを使用して下さい。`;
     break;
   }
 
@@ -93,7 +117,9 @@ export default function() {
     this.isPending = true;
     this.update();
 
-    this.currentRequestParameters = ObjectAssign(this.currentRequestParameters, requestParameters);
+    this.currentSearchRequestParameters = objectReject(ObjectAssign(this.currentSearchRequestParameters, requestParameters), val => {
+      return isUndefined(val);
+    });
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
@@ -102,7 +128,7 @@ export default function() {
           resolve();
         }, 300);
       }))
-      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentRequestParameters))
+      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentSearchRequestParameters))
       .catch(err => {
         const api = this.opts.component.api;
         return store.action(actions.MODALS_ADD, {
@@ -119,14 +145,11 @@ export default function() {
    */
   this.validateResponse = response => {
     const style = this.opts.component.style;
-    const method = this.opts.component.api.method;
-    const path = this.opts.component.api.path;
 
     if (style === STYLE_NUMBER) {
       if (typeof response !== 'object' || response.value === 'undefined') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
     }
@@ -134,20 +157,17 @@ export default function() {
     if (style === STYLE_TABLE) {
       if (!Array.isArray(response)) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.length) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'Length is 0.';
+        this.alertText = 'テーブルが空です。';
         return;
       }
       if (typeof response[0] !== 'object') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
     }
@@ -163,20 +183,17 @@ export default function() {
     ], style)) {
       if (typeof response !== 'object') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.data || !response.x || !response.y || !Array.isArray(response.data)) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.data.length) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'Length is 0.';
+        this.alertText = 'グラフデータが空です。';
         return;
       }
     }
@@ -203,7 +220,9 @@ export default function() {
     this.rowActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
     this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
     this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION, this._riot_id);
+    this.primaryKey = store.getter(getters.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
     this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
+    this.tableColumns = store.getter(getters.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
     this.validateResponse(this.response);
     this.update();
   });
@@ -222,16 +241,43 @@ export default function() {
       });
   };
 
+  this.handleFilterButtonTap = () => {
+    if (this.isPending) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => store.action(actions.MODALS_ADD, 'dmc-component-filter', {
+        tableColumns: this.tableColumns,
+        selectedTableColumns: this.selectedTableColumns,
+        onComplete: newSelectedTableColumns => {
+          this.selectedTableColumns = newSelectedTableColumns;
+          this.update();
+        }
+      }))
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
   this.handleSearchButtonTap = () => {
     if (this.isPending) {
+      return;
+    }
+
+    // ページングに使用するparamerは取り除く。
+    const escapedParameterObjects = this.getParameterObjectsForSearch();
+
+    // 検索用のparameterObjectが存在しない場合は何もしない。
+    if (!escapedParameterObjects.length) {
       return;
     }
 
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'dmc-component-search', {
-        parameterObjects: this.parameterObjects,
-        initialParameters: ObjectAssign({}, this.currentRequestParameters),
+        parameterObjects: escapedParameterObjects,
+        initialParameters: ObjectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
           this.updater(parameters);
         }
@@ -242,7 +288,6 @@ export default function() {
   };
 
   this.handlePaginationChange = page => {
-    // TODO: swagger上に定義されていないけどOK？？
     const paging = this.currentPaging = {
       limit: this.pagination.size,
       offset: (page - 1) * this.pagination.size

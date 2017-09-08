@@ -3,7 +3,7 @@ import { constants as actions } from '../../../store/actions';
 export default function() {
   const store = this.riotx.get();
 
-  this.memo = this.opts.memo || '';
+  this.memo = this.opts.endpoint.memo || '';
 
   this.handleMemoChange = newMemo => {
     this.memo = newMemo;

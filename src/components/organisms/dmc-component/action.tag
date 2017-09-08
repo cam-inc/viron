@@ -1,5 +1,5 @@
 dmc-component-action.Component__action
-  dmc-button(label="{ label }" onPat="{ handleButtonPat }")
+  dmc-button(label="{ label }" icon="{ icon }" onPat="{ handleButtonPat }")
 
   script.
     import '../../atoms/dmc-button/index.tag';

@@ -5,7 +5,7 @@ dmc-html.Html
   .Html__body
     .Html__message(if="{ compileHtml().status === 'failed' }" class="Html__message--{ compileHtml().status }") { compileHtml().message }
     .Html__editor(if="{ isTabEditorSelected }")
-      dmc-textarea(text="{ opts.text }" onChange="{ handleEditorChange }")
+      dmc-textarea(text="{ opts.text }" isDisabled="{ opts.isdisabled }" onChange="{ handleEditorChange }")
     .Html__preview(if="{ isTabPreviewSelected }")
       dmc-prettyhtml(data="{ compileHtml().html }")
 

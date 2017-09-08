@@ -18,7 +18,7 @@ export default function() {
   };
 
   this.handleEditButtonPat = () => {
-    this.opts.onedit(this.opts.key, this.opts.endpoint.url, this.opts.endpoint.memo);
+    this.opts.onedit(this.opts.key);
   };
 
   this.handleRemoveButtonPat = () => {

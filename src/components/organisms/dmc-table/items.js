@@ -1,83 +1,63 @@
+import contains from 'mout/array/contains';
 import filter from 'mout/array/filter';
-import find from 'mout/array/find';
-import forEach from 'mout/array/forEach';
-import map from 'mout/array/map';
+import sortBy from 'mout/array/sortBy';
+import isArray from 'mout/lang/isArray';
 import { constants as actions } from '../../../store/actions';
-import './action.tag';
-import './filter.tag';
+import './flatitems.tag';
 
 export default function() {
   const store = this.riotx.get();
 
-  this.isOpened = false;
-  this.title = '';
-  // keyを指定されていればそれを使う。
-  let item;
-  forEach(this.opts.tablelabels, key => {
-    if (!!item) {
-      return;
-    }
-    item = find(this.opts.items, item => {
-      return (item.key === key);
-    });
+  // sort済みのitems。
+  this.sortedItems = sortBy(this.opts.items, item => {
+    return (this.opts.tablelabels || []).indexOf(item.key) * (-1);
   });
-  // `id`を優先する。
-  if (!item) {
-    item = find(this.opts.items, item => {
-      return (item.key === 'id');
-    });
-  }
-  // 適当に選ぶ。
-  if (!item) {
-    item = this.opts.items[0];
-  }
-  this.title = `${item.cell}`;
+  this.title = this.sortedItems[0].cell;
+  this.isOpened = true;
+  this.isTooltipVisible = false;
 
-  // 画面表示するkey群。
-  let visibleKeys = map(this.opts.items, item => {
-    return item.key;
-  });
-  // filterを通したリストを返す。
-  const getItems = () => {
-    return filter(this.opts.items, item => {
-      if (!find(visibleKeys, key => {
-        return (key === item.key);
-      })) {
-        return false;
-      }
-      return true;
+  this.getFilteredItems = () => {
+    const items =  this.sortedItems;
+    const columns = this.opts.selectedtablecolumns;
+    if (!isArray(columns) || !columns.length) {
+      return items;
+    }
+    return filter(items, item => {
+      return contains(columns, item.key);
     });
   };
-  this.filteredItems = getItems();
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
 
   this.handleHeaderTitleTap = () => {
     this.isOpened = !this.isOpened;
     this.update();
   };
 
-  this.handleActionButtonTap = () => {
-    store.action(actions.MODALS_ADD, 'dmc-table-action', {
-      actions: this.opts.actions,
-      idx: this.opts.idx
-    });
+  this.handleItemsActionButtonPat = action => {
+    action.onPat(action.operationId, this.opts.idx);
   };
 
-  this.handleFilterButtonTap = () => {
-    store.action(actions.MODALS_ADD, 'dmc-table-filter', {
-      options: map(this.opts.items, item => {
-        return item.key;
-      }),
-      selectedOptions: visibleKeys,
-      onChange: selectedOptions => {
-        visibleKeys = selectedOptions;
-        this.filteredItems = getItems();
-        this.update();
-      }
-    });
-  };
-
-  this.handleOpenShutButtonTap = () => {
+  this.handleOpenShutButtonPat = () => {
     this.isOpened = !this.isOpened;
+    this.update();
+  };
+
+  this.handleDetailButtonTap = () => {
+    store.action(actions.DRAWERS_ADD, 'dmc-table-flatitems', {
+      items: this.sortedItems
+    });
+  };
+
+  this.handleDetailButtonMouseOver = () => {
+    this.isTooltipVisible = true;
+    this.update();
+  };
+
+  this.handleDetailButtonMouseOut = () => {
+    this.isTooltipVisible = false;
     this.update();
   };
 }
