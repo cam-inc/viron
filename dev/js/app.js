@@ -6966,7 +6966,9 @@ var application$2 = {
   // 通信中か否か(i.e. 一つでも通信中のAPIが存在するか?)
   isNetworking: false,
   // ドラッグ中か否か。
-  isDragging: false
+  isDragging: false,
+  // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
+  endpointFilterText: ''
 };
 
 // 選択された`page`に関する`component`群。
@@ -7314,6 +7316,17 @@ var application$1 = {
   drag: (context, bool) => {
     context.state.application.isDragging = bool;
     return [constants$3.APPLICATION];
+  },
+
+  /**
+   * エンドポイント用のフィルターテキストを更新します。
+   * @param {riotx.Context} context
+   * @param {String} newFilterText
+   * @return {Array}
+   */
+  endpointFilterText: (context, newFilterText) => {
+    context.state.application.endpointFilterText = newFilterText;
+    return [constants$3.APPLICATION];
   }
 };
 
@@ -7485,6 +7498,31 @@ var drawers$1 = {
     }
     var isNumber_1 = isNumber;
 
+/**
+ * 受け取ったエンドポイント群をきれいに並び替えます。
+ * order値が存在しない場合は後方に配置されます。
+ * @param {Object} endpoints
+ * @return {Oject}
+ */
+const putEndpointsInOrder = endpoints => {
+  // どのorder値よりも大きいであろう適当な値。
+  const bigNumber = 9999;
+  let ordered = [];
+  forOwn_1$1(endpoints, (endpoint, key) => {
+    ordered.push({
+      key,
+      order: (isNumber_1(endpoint.order) ? endpoint.order : bigNumber)
+    });
+  });
+  ordered = sortBy_1$1(ordered, obj => {
+    return obj.order;
+  });
+  forEach_1(ordered, (obj, order) => {
+    endpoints[obj.key].order = order;
+  });
+  return endpoints;
+};
+
 var endpoints$1 = {
   /**
    * 1件のエンドポイントを追加します。
@@ -7494,7 +7532,15 @@ var endpoints$1 = {
    * @return {Array}
    */
   add: (context, endpointKey, endpoint) => {
-    context.state.endpoints[endpointKey] = endpoint;
+    // order値が指定されていなければ自動的に設定する。
+    if (!isNumber_1(endpoint.order)) {
+      // リストの先頭に配置するために意図的にマイナス値を付与。
+      endpoint.order = -1;
+    }
+    let newEndpoints = objectAssign({}, context.state.endpoints);
+    newEndpoints[endpointKey] = endpoint;
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    context.state.endpoints = newEndpoints;
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
   },
@@ -7506,7 +7552,10 @@ var endpoints$1 = {
    * @return {Array}
    */
   remove: (context, endpointKey) => {
-    delete context.state.endpoints[endpointKey];
+    let newEndpoints = objectAssign({}, context.state.endpoints);
+    delete newEndpoints[endpointKey];
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    context.state.endpoints = newEndpoints;
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
   },
@@ -7562,7 +7611,8 @@ var endpoints$1 = {
    */
   mergeAll: (context, endpoints) => {
     const currentEndpoints = context.state.endpoints;
-    const newEndpoints = objectAssign({}, currentEndpoints, endpoints);
+    let newEndpoints = objectAssign({}, currentEndpoints, endpoints);
+    newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
     store.set('endpoints', newEndpoints);
     return [constants$3.ENDPOINTS];
@@ -7575,22 +7625,7 @@ var endpoints$1 = {
    * @return {Array}
    */
   tidyUpOrder: context => {
-    const newEndpoints = objectAssign(context.state.endpoints);
-    // どのorder値よりも大きいであろう適当な値。
-    const bigNumber = 9999;
-    let ordered = [];
-    forOwn_1$1(newEndpoints, (endpoint, key) => {
-      ordered.push({
-        key,
-        order: (isNumber_1(endpoint.order) ? endpoint.order : bigNumber)
-      });
-    });
-    ordered = sortBy_1$1(ordered, obj => {
-      return obj.order;
-    });
-    forEach_1(ordered, (obj, order) => {
-      newEndpoints[obj.key].order = order;
-    });
+    const newEndpoints = putEndpointsInOrder(objectAssign(context.state.endpoints));
     context.state.endpoints = newEndpoints;
     store.set('endpoints', newEndpoints);
     return [constants$3.ENDPOINTS];
@@ -7605,22 +7640,10 @@ var endpoints$1 = {
    * @return {Array}
    */
   changeOrder: (context, endpointKey, newOrder) => {
-    const newEndpoints = objectAssign(context.state.endpoints);
+    let newEndpoints = objectAssign(context.state.endpoints);
     // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
     newEndpoints[endpointKey].order = newOrder - 0.5;
-    let ordered = [];
-    forOwn_1$1(newEndpoints, (endpoint, key) => {
-      ordered.push({
-        key,
-        order: endpoint.order
-      });
-    });
-    ordered = sortBy_1$1(ordered, obj => {
-      return obj.order;
-    });
-    forEach_1(ordered, (obj, order) => {
-      newEndpoints[obj.key].order = order;
-    });
+    newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
     store.set('endpoints', newEndpoints);
     return [constants$3.ENDPOINTS];
@@ -7806,6 +7829,7 @@ const constants$2 = {
   APPLICATION_NETWORKINGS_ADD: 'APPLICATION_NETWORKINGS_ADD',
   APPLICATION_NETWORKINGS_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
   APPLICATION_DRAG: 'APPLICATION_DRAG',
+  APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS_UPDATE_ONE: 'COMPONENTS_UPDATE_ONE',
   COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
   COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
@@ -7841,6 +7865,7 @@ var mutations = {
   [constants$2.APPLICATION_NETWORKINGS_ADD]: application$1.addNetworking,
   [constants$2.APPLICATION_NETWORKINGS_REMOVE]: application$1.removeNetworking,
   [constants$2.APPLICATION_DRAG]: application$1.drag,
+  [constants$2.APPLICATION_ENDPOINT_FILTER_TEXT]: application$1.endpointFilterText,
   [constants$2.COMPONENTS_UPDATE_ONE]: components$1.updateOne,
   [constants$2.COMPONENTS_REMOVE_ONE]: components$1.removeOne,
   [constants$2.COMPONENTS_REMOVE_ALL]: components$1.removeAll,
@@ -7934,6 +7959,33 @@ var application = {
       .then(() => {
         context.commit(constants$2.APPLICATION_DRAG, false);
       });
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストを更新します。
+   * @param {riotx.Context} context
+   * @param {String} newFilterText
+   * @return {Promise}
+   */
+  updateEndpointFilterText: (context, newFilterText) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_ENDPOINT_FILTER_TEXT, newFilterText);
+      });
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストをリセットします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  resetEndpointFilterText: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_ENDPOINT_FILTER_TEXT, '');
+      });
   }
 };
 
@@ -8009,7 +8061,8 @@ const commonFetch = (context, url, options) => {
     headers: {
       // 何も指定しない場合はこれをデフォルトにする。
       'Content-Type': 'application/json'
-    }
+    },
+    cache: 'no-store'
   }, options);
 
   // `Content-Type`に応じてbody内容を書き換えます。
@@ -8098,6 +8151,15 @@ var application$3 = {
    */
   isDragging: context => {
     return context.state.application.isDragging;
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストを返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  endpointFilterText: context => {
+    return context.state.application.endpointFilterText;
   }
 };
 
@@ -8493,6 +8555,89 @@ var drawers$2 = {
 
     var size_1 = size;
 
+/**
+     * Typecast a value to a String, using an empty string value for null or
+     * undefined.
+     */
+    function toString(val){
+        return val == null ? '' : val.toString();
+    }
+
+    var toString_1 = toString;
+
+/**
+     * Searches for a given substring
+     */
+    function contains$1(str, substring, fromIndex){
+        str = toString_1(str);
+        substring = toString_1(substring);
+        return str.indexOf(substring, fromIndex) !== -1;
+    }
+
+    var contains_1$1 = contains$1;
+
+/**
+ * 受け取ったエンドポイント群をorder昇順の配列として返します。
+ * @param {Object} endpoints
+ * @return {Array}
+ */
+const sortByOrder = endpoints => {
+  let endpointsByOrder = [];
+  forOwn_1$1(endpoints, (endpoint, key) => {
+    endpoint.key = key;
+    endpointsByOrder.push(endpoint);
+  });
+  endpointsByOrder = sortBy_1$1(endpointsByOrder, endpoint => {
+    return endpoint.order;
+  });
+  return endpointsByOrder;
+};
+
+/**
+ * 受け取ったエンドポイント群をfilterして返します。
+ * @param {Array} endpoints
+ * @param {String} filterText
+ * @return {Array}
+ */
+const filterBy = (endpoints, filterText) => {
+  filterText = filterText || '';
+  filterText = filterText.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+  filterText = filterText.replace(/,/g, ' ');
+  const targetTexts = filter_1$1((filterText || '').split(' '), targetText => {
+    return !!targetText;
+  });
+  if (!targetTexts.length) {
+    return endpoints;
+  }
+
+  return filter_1$1(endpoints, endpoint => {
+    let isMatched = false;
+    forEach_1(targetTexts, targetText => {
+      if (contains_1$1(endpoint.url, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.title, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.name, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.description, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.memo, targetText)) {
+        isMatched = true;
+      }
+      forEach_1(endpoint.tags || [], tag => {
+        if (contains_1$1(tag, targetText)) {
+          isMatched = true;
+        }
+      });
+    });
+    return isMatched;
+  });
+};
+
 var endpoints$2 = {
   /**
    * 全endpointを返します。
@@ -8509,16 +8654,21 @@ var endpoints$2 = {
    * @return {Array}
    */
   allByOrder: context => {
-    const endpoints = objectAssign(context.state.endpoints);
-    let endpointsByOrder = [];
-    forOwn_1$1(endpoints, (endpoint, key) => {
-      endpoint.key = key;
-      endpointsByOrder.push(endpoint);
-    });
-    endpointsByOrder = sortBy_1$1(endpointsByOrder, endpoint => {
-      return endpoint.order;
-    });
-    return endpointsByOrder;
+    let endpoints = objectAssign(context.state.endpoints);
+    endpoints = sortByOrder(endpoints);
+    return endpoints;
+  },
+
+  /**
+   * 全endpointをorder昇順のfilter済み配列として返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  allByOrderFiltered: context => {
+    let endpoints = objectAssign(context.state.endpoints);
+    endpoints = sortByOrder(endpoints);
+    endpoints = filterBy(endpoints, context.state.application.endpointFilterText);
+    return endpoints;
   },
 
   /**
@@ -8991,6 +9141,7 @@ const constants$4 = {
   APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
   APPLICATION_ISDRAGGING: 'APPLICATION_ISDRAGGING',
+  APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS: 'COMPONENTS',
   COMPONENTS_ONE: 'COMPONENTS_ONE',
   COMPONENTS_ONE_RESPONSE: 'COMPONENTS_ONE_RESPONSE',
@@ -9015,6 +9166,7 @@ const constants$4 = {
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
   ENDPOINTS_BY_ORDER: 'ENDPOINTS_BY_ORDER',
+  ENDPOINTS_BY_ORDER_FILTERED: 'ENDPOINTS_BY_ORDER_FILTERED',
   ENDPOINTS_COUNT: 'ENDPOINTS_COUNT',
   ENDPOINTS_WITHOUT_TOKEN: 'ENDPOINTS_WITHOUT_TOKEN',
   ENDPOINTS_ONE: 'ENDPOINTS_ONE',
@@ -9055,6 +9207,7 @@ var getters = {
   [constants$4.APPLICATION_ISNAVIGATING]: application$3.isNavigating,
   [constants$4.APPLICATION_ISNETWORKING]: application$3.isNetworking,
   [constants$4.APPLICATION_ISDRAGGING]: application$3.isDragging,
+  [constants$4.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
   [constants$4.COMPONENTS]: components$2.all,
   [constants$4.COMPONENTS_ONE]: components$2.one,
   [constants$4.COMPONENTS_ONE_RESPONSE]: components$2.response,
@@ -9079,6 +9232,7 @@ var getters = {
   [constants$4.DRAWERS]: drawers$2.all,
   [constants$4.ENDPOINTS]: endpoints$2.all,
   [constants$4.ENDPOINTS_BY_ORDER]: endpoints$2.allByOrder,
+  [constants$4.ENDPOINTS_BY_ORDER_FILTERED]: endpoints$2.allByOrderFiltered,
   [constants$4.ENDPOINTS_COUNT]: endpoints$2.count,
   [constants$4.ENDPOINTS_WITHOUT_TOKEN]: endpoints$2.allWithoutToken,
   [constants$4.ENDPOINTS_ONE]: endpoints$2.one,
@@ -11487,6 +11641,8 @@ const constants$1 = {
   APPLICATION_NAVIGATION_END: 'APPLICATION_NAVIGATION_END',
   APPLICATION_DRAG_START: 'APPLICATION_DRAG_START',
   APPLICATION_DRAG_END: 'APPLICATION_DRAG_END',
+  APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT: 'APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT',
+  APPLICATION_RESET_ENDPOINT_FILTER_TEXT: 'APPLICATION_RESET_ENDPOINT_FILTER_TEXT',
   AUTH_UPDATE: 'AUTH_UPADTE',
   AUTH_REMOVE: 'AUTH_REMOVE',
   AUTH_VALIDATE: 'AUTH_VALIDATE',
@@ -11531,6 +11687,8 @@ var actions = {
   [constants$1.APPLICATION_NAVIGATION_END]: application.endNavigation,
   [constants$1.APPLICATION_DRAG_START]: application.startDrag,
   [constants$1.APPLICATION_DRAG_END]: application.endDrag,
+  [constants$1.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT]: application.updateEndpointFilterText,
+  [constants$1.APPLICATION_RESET_ENDPOINT_FILTER_TEXT]: application.resetEndpointFilterText,
   [constants$1.AUTH_UPDATE]: auth.update,
   [constants$1.AUTH_REMOVE]: auth.remove,
   [constants$1.AUTH_VALIDATE]: auth.validate,
@@ -41631,10 +41789,10 @@ riot$1.tag2('dmc-table-items-button', '<dmc-icon type="{icon}"></dmc-icon> <dmc-
 /**
      * If array contains values.
      */
-    function contains$1(arr, val) {
+    function contains$3(arr, val) {
         return indexOf_1$1(arr, val) !== -1;
     }
-    var contains_1$1 = contains$1;
+    var contains_1$2 = contains$3;
 
 var script$17 = function() {
   const store = this.riotx.get();
@@ -41656,7 +41814,7 @@ var script$17 = function() {
   case 'string': {
     this.value = this.opts.data.cell || '-';
     const split = this.value.split('.');
-    if (!!split.length && contains_1$1(['jpg', 'png', 'gif'], split[split.length - 1])) {
+    if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
       this.isImage = true;
     }
     break;
@@ -41694,7 +41852,7 @@ var script$18 = function() {
     }
     if (type === 'string') {
       const split = value.split('.');
-      if (!!split.length && contains_1$1(['jpg', 'png', 'gif'], split[split.length - 1])) {
+      if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
         return;
       }
     }
@@ -41762,7 +41920,7 @@ var script$19 = function() {
       return items;
     }
     return filter_1$1(items, item => {
-      return contains_1$1(columns, item.key);
+      return contains_1$2(columns, item.key);
     });
   };
 
@@ -41959,34 +42117,51 @@ var script$25 = function() {
   };
 };
 
-riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--disabled\' : opts.isdisabled}" ref="touch" ontap="handleTap"', function(opts) {
+riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--ghost\' : (opts.theme === \'ghost\'), \'Textinput--disabled\' : opts.isdisabled}" ref="touch" ontap="handleTap"', function(opts) {
     this.external(script$25);
 });
 
 var script$26 = function() {
   this.inputId = `Uploader__input${Date.now()}`;
   this.file = null;
+  this.fileName = null;
+  this.isTypeOfImage = false;
   this.blobURL = this.opts.initialbloburl || null;
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
+  this.isDragWatching = false;
+  this.isDroppable = false;
 
   this.reset = () => {
     window.URL.revokeObjectURL(this.blobURL);
     this.refs.form.reset();
     this.file = null;
+    this.fileName = null;
+    this.isTypeOfImage = false;
     this.blobURL = this.opts.initialbloburl || null;
     this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
     this.update();
   };
 
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
   this.handleChange = e => {
     e.stopPropagation();
   };
 
-  this.handleFileChange = e => {
-    const files = e.target.files;
+  /**
+   * fileが変更された時の処理。
+   * DnD経由でも実行されます。
+   * @param {Object} e
+   * @param {Boolean} fromDnD Dnd経由か否か。
+   */
+  this.handleFileChange = (e, fromDnD) => {
+    let files;
+    if (fromDnD) {
+      files = e.dataTransfer.files;
+    } else {
+      files = e.target.files;
+    }
     if (!files.length) {
       this.reset();
       return;
@@ -41994,9 +42169,33 @@ var script$26 = function() {
 
     const file = files[0];
     this.file = file;
+    this.fileName = file.name;
+    this.isTypeOfImage = (file.type.indexOf('image/') === 0);
     this.blobURL = window.URL.createObjectURL(file);
     this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
     this.update();
+  };
+
+  this.handleHandlerDragEnter = e => {
+    e.preventDefault();
+    this.isDragWatching = true;
+    this.update();
+  };
+
+  this.handleHandlerDragOver = e => {
+    e.preventDefault();
+  };
+
+  this.handleHandlerDragLeave = () => {
+    this.isDragWatching = false;
+    this.update();
+  };
+
+  this.handleHandlerDrop = e => {
+    e.preventDefault();
+    this.isDragWatching = false;
+    this.update();
+    this.handleFileChange(e, true);
   };
 
   this.handleResetButtonTap = () => {
@@ -42004,7 +42203,7 @@ var script$26 = function() {
   };
 };
 
-riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{!!opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL}" riot-style="background-image:url({blobURL});"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div>', '', 'class="Uploader {\'Uploader--disabled\' : opts.isdisabled}" onchange="{handleChange}"', function(opts) {
+riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{!!opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfImage}" riot-style="background-image:url({blobURL});"></div> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--disabled\' : opts.isdisabled, \'Uploader--dragWatching\' : isDragWatching}" onchange="{handleChange}"', function(opts) {
     this.external(script$26);
 });
 
@@ -42156,7 +42355,7 @@ var script$28 = function() {
   this.getParameterObject = propertyKey => {
     return objectAssign({}, this.multiSchema.properties[propertyKey], {
       name: propertyKey,
-      required : contains_1$1(this.multiSchema.required, propertyKey)
+      required : contains_1$2(this.multiSchema.required, propertyKey)
     });
   };
 
@@ -42246,7 +42445,7 @@ var script$29 = function() {
   this.getParameterObject = propertyKey => {
     return objectAssign({}, this.opts.schema.properties[propertyKey], {
       name: propertyKey,
-      required : contains_1$1(this.opts.schema.required, propertyKey)
+      required : contains_1$2(this.opts.schema.required, propertyKey)
     });
   };
 
@@ -42456,7 +42655,7 @@ var script$34 = function() {
   forEach_1(this.opts.tableColumns, tableColumn => {
     const item = {
       label: tableColumn,
-      isSelected: contains_1$1(selectedTableColumns, tableColumn)
+      isSelected: contains_1$2(selectedTableColumns, tableColumn)
     };
     this.items.push(item);
   });
@@ -46819,7 +47018,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-var toString = Object.prototype.toString;
+var toString$2 = Object.prototype.toString;
 
 /**
  * Get the native `typeof` a value.
@@ -46865,7 +47064,7 @@ var kindOf$3 = function kindOf(val) {
   }
 
   // other objects
-  var type = toString.call(val);
+  var type = toString$2.call(val);
 
   if (type === '[object RegExp]') {
     return 'regexp';
@@ -52292,7 +52491,7 @@ function monthDiff (a, b) {
 hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
 hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
 
-function toString$1 () {
+function toString$3 () {
     return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
 }
 
@@ -52855,7 +53054,7 @@ proto.toDate            = toDate;
 proto.toISOString       = toISOString;
 proto.inspect           = inspect;
 proto.toJSON            = toJSON;
-proto.toString          = toString$1;
+proto.toString          = toString$3;
 proto.unix              = unix;
 proto.valueOf           = valueOf;
 proto.creationData      = creationData;
@@ -55186,7 +55385,7 @@ var script$32 = function() {
       }
     }
 
-    if (contains_1$1([
+    if (contains_1$2([
       STYLE_GRAPH_BAR,
       STYLE_GRAPH_SCATTERPLOT,
       STYLE_GRAPH_LINE,
@@ -59354,12 +59553,19 @@ riot$1.tag2('dmc-endpoint-signin', '<div class="EndpointsPage__signinHead"> <div
 var script$63 = function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER);
+  this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
   this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+  this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.listen(constants$3.ENDPOINTS, () => {
-    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER);
+    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
     this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+    this.update();
+  });
+
+  this.listen(constants$3.APPLICATION, () => {
+    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
+    this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
 
@@ -59440,7 +59646,7 @@ var script$63 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__count" if="{!!endpointsCount}"> <div class="EndpointsPage__countIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__countLabel">Endpoint ({endpointsCount})</div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint in endpoints}"> <dmc-endpoint key="{endpoint.key}" endpoint="{endpoint}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
+riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__caption" if="{!!endpointsCount}"> <div class="EndpointsPage__captionIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__captionLabel">Endpoint ({endpointsCount})<span class="EndpointsPage__captionFilter" if="{!!endpointFilterText}">filtered by "{endpointFilterText}"</span></div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint in endpoints}"> <dmc-endpoint key="{endpoint.key}" endpoint="{endpoint}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
     this.external(script$63);
 });
 
@@ -59991,6 +60197,8 @@ var script$82 = function() {
   this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
   // エンドポイント数。
   this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+  // エンドポイントフィルター用のテキスト。
+  this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.on('updated', () => {
     this.rebindTouchEvents();
@@ -60000,6 +60208,7 @@ var script$82 = function() {
     this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
     this.isNavigating = store.getter(constants$4.APPLICATION_ISNAVIGATING);
     this.isNetworking = store.getter(constants$4.APPLICATION_ISNETWORKING);
+    this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
   this.listen(constants$3.LOCATION, () => {
@@ -60043,9 +60252,18 @@ var script$82 = function() {
         error: err
       }));
   };
+
+  this.handleFilterChange = newText => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT, newText))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
 };
 
-riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemLabel">新規追加</div> </div> <div class="Application__menuItem" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemLabel">ダウンロード</div> </div> <div class="Application__menuItem" if="{endpointsCount &gt; 2}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="bars"></dmc-icon> </div> <div class="Application__menuItemLabel">並び替え</div> </div> <div class="Application__menuItem" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="close"></dmc-icon> </div> <div class="Application__menuItemLabel">クリア</div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
+riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 2}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="bars"></dmc-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="close"></dmc-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <dmc-icon type="search"></dmc-icon> </div> <div class="Application__menuItemBody"> <dmc-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></dmc-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
     this.external(script$82);
 });
 
