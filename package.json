@@ -84,7 +84,7 @@
   },
   "devDependencies": {
     "csswring": "^6.0.0",
-    "eslint": "^3.19.0",
+    "eslint": "^4.6.1",
     "gh-pages": "^1.0.0",
     "husky": "^0.13.4",
     "imagemin-cli": "^3.0.0",
