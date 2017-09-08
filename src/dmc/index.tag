@@ -17,12 +17,13 @@ dmc.Application
             .Application__menuItem.Application__menuItem--interactive(ref="touch" onTap="handleDownloadMenuItemTap")
               .Application__menuItemIcon
                 dmc-icon(type="download")
-              .Application__menuItemLabel ダウンロード
-            label.Application__menuItem(for="Application{_riot_id}")
+              .Application__menuItemBody ダウンロード
+            label.Application__menuItem.Application__menuItem--interactive(for="Application{_riot_id}")
               .Application__menuItemIcon
                 dmc-icon(type="upload")
-              .Application__menuItemLabel アップロード
-              input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" onChange="{ handleFileChange }")
+              .Application__menuItemBody
+                | アップロード
+                input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" onChange="{ handleFileChange }")
             .Application__menuItem.Application__menuItem--interactive(if="{ endpointsCount > 2 }" ref="touch" onTap="handleOrderMenuItemTap")
               .Application__menuItemIcon
                 dmc-icon(type="bars")
