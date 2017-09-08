@@ -9,6 +9,31 @@ import shortid from 'shortid';
 import storage from 'store';
 import { constants as states } from '../states';
 
+/**
+ * 受け取ったエンドポイント群をきれいに並び替えます。
+ * order値が存在しない場合は後方に配置されます。
+ * @param {Object} endpoints
+ * @return {Oject}
+ */
+const putEndpointsInOrder = endpoints => {
+  // どのorder値よりも大きいであろう適当な値。
+  const bigNumber = 9999;
+  let ordered = [];
+  forOwn(endpoints, (endpoint, key) => {
+    ordered.push({
+      key,
+      order: (isNumber(endpoint.order) ? endpoint.order : bigNumber)
+    });
+  });
+  ordered = sortBy(ordered, obj => {
+    return obj.order;
+  });
+  forEach(ordered, (obj, order) => {
+    endpoints[obj.key].order = order;
+  });
+  return endpoints;
+};
+
 export default {
   /**
    * 1件のエンドポイントを追加します。
@@ -18,7 +43,15 @@ export default {
    * @return {Array}
    */
   add: (context, endpointKey, endpoint) => {
-    context.state.endpoints[endpointKey] = endpoint;
+    // order値が指定されていなければ自動的に設定する。
+    if (!isNumber(endpoint.order)) {
+      // リストの先頭に配置するために意図的にマイナス値を付与。
+      endpoint.order = -1;
+    }
+    let newEndpoints = ObjectAssign({}, context.state.endpoints);
+    newEndpoints[endpointKey] = endpoint;
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    context.state.endpoints = newEndpoints;
     storage.set('endpoints', context.state.endpoints);
     return [states.ENDPOINTS];
   },
@@ -30,7 +63,10 @@ export default {
    * @return {Array}
    */
   remove: (context, endpointKey) => {
-    delete context.state.endpoints[endpointKey];
+    let newEndpoints = ObjectAssign({}, context.state.endpoints);
+    delete newEndpoints[endpointKey];
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    context.state.endpoints = newEndpoints;
     storage.set('endpoints', context.state.endpoints);
     return [states.ENDPOINTS];
   },
@@ -116,22 +152,7 @@ export default {
    * @return {Array}
    */
   tidyUpOrder: context => {
-    const newEndpoints = ObjectAssign(context.state.endpoints);
-    // どのorder値よりも大きいであろう適当な値。
-    const bigNumber = 9999;
-    let ordered = [];
-    forOwn(newEndpoints, (endpoint, key) => {
-      ordered.push({
-        key,
-        order: (isNumber(endpoint.order) ? endpoint.order : bigNumber)
-      });
-    });
-    ordered = sortBy(ordered, obj => {
-      return obj.order;
-    });
-    forEach(ordered, (obj, order) => {
-      newEndpoints[obj.key].order = order;
-    });
+    const newEndpoints = putEndpointsInOrder(ObjectAssign(context.state.endpoints));
     context.state.endpoints = newEndpoints;
     storage.set('endpoints', newEndpoints);
     return [states.ENDPOINTS];
@@ -146,22 +167,10 @@ export default {
    * @return {Array}
    */
   changeOrder: (context, endpointKey, newOrder) => {
-    const newEndpoints = ObjectAssign(context.state.endpoints);
+    let newEndpoints = ObjectAssign(context.state.endpoints);
     // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
     newEndpoints[endpointKey].order = newOrder - 0.5;
-    let ordered = [];
-    forOwn(newEndpoints, (endpoint, key) => {
-      ordered.push({
-        key,
-        order: endpoint.order
-      });
-    });
-    ordered = sortBy(ordered, obj => {
-      return obj.order;
-    });
-    forEach(ordered, (obj, order) => {
-      newEndpoints[obj.key].order = order;
-    });
+    newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
     storage.set('endpoints', newEndpoints);
     return [states.ENDPOINTS];

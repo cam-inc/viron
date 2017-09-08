@@ -1,8 +1,9 @@
 .Drawer {
+  overflow: hidden;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
   transition-duration: 300ms;
-  transition-property: background-color;
+  transition-property: background-color;/* need for FF */
 }
 
 .Drawer--visible {

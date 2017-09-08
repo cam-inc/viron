@@ -64,5 +64,16 @@ export default {
   drag: (context, bool) => {
     context.state.application.isDragging = bool;
     return [states.APPLICATION];
+  },
+
+  /**
+   * エンドポイント用のフィルターテキストを更新します。
+   * @param {riotx.Context} context
+   * @param {String} newFilterText
+   * @return {Array}
+   */
+  endpointFilterText: (context, newFilterText) => {
+    context.state.application.endpointFilterText = newFilterText;
+    return [states.APPLICATION];
   }
 };
