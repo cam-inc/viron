@@ -67,7 +67,8 @@ const commonFetch = (context, url, options) => {
     headers: {
       // 何も指定しない場合はこれをデフォルトにする。
       'Content-Type': 'application/json'
-    }
+    },
+    cache: 'no-store'
   }, options);
 
   // `Content-Type`に応じてbody内容を書き換えます。
