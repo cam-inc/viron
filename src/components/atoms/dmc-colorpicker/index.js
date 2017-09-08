@@ -70,7 +70,7 @@ export default function () {
 
     if (colorCode === COLOR_CODE.HEX) {
       colorObj = (isHex(colorValue)) ? tinycolor(colorValue) : tinycolor(lastValidColor);
-    } else if(colorCode === COLOR_CODE.HSV) {
+    } else if (colorCode === COLOR_CODE.HSV) {
       colorObj = tinycolor(`hsv(${colorValue.h}, ${colorValue.s}%, ${colorValue.v}%)`);
     } else {
       colorObj = tinycolor(colorValue);
