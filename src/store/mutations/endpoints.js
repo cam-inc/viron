@@ -13,7 +13,7 @@ import { constants as states } from '../states';
  * 受け取ったエンドポイント群をきれいに並び替えます。
  * order値が存在しない場合は後方に配置されます。
  * @param {Object} endpoints
- * @return {Oject}
+ * @return {Object}
  */
 const putEndpointsInOrder = endpoints => {
   // どのorder値よりも大きいであろう適当な値。
@@ -140,6 +140,7 @@ export default {
       }
     });
 
+    modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
     context.state.endpoints = modifiedEndpoints;
     storage.set('endpoints', modifiedEndpoints);
     return [states.ENDPOINTS];
