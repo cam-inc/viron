@@ -1,3 +1,6 @@
+import forOwn from 'mout/object/forOwn';
+import find from 'mout/object/find';
+import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
 import shortid from 'shortid';
 import storage from 'store';
@@ -80,20 +83,25 @@ export default {
    */
   mergeAll: (context, endpoints) => {
     const modifiedEndpoint = ObjectAssign({}, context.state.endpoints);
-    for (const newKey of Object.keys(endpoints)) {
-      let canAppend = true;
-      for (const modifyKey of Object.keys(modifiedEndpoint)) {
-        if (modifiedEndpoint[modifyKey].url === endpoints[newKey].url)   {
-          modifiedEndpoint[modifyKey] = endpoints[newKey];
-          canAppend = false;
-        }
-      }
-      if (canAppend) {
+    let newEndpoints = {};
+
+    forOwn(endpoints, (endpoint) => {
+      let duplicatedEndpoint = find(modifiedEndpoint, val => {
+        return endpoint.url === val.url;
+      });
+
+      if (!duplicatedEndpoint) {
         const key = shortid.generate();
-        modifiedEndpoint[key] = endpoints[newKey];
+        modifiedEndpoint[key] = endpoint;
+      } else {
+        const searchKeys = keys(modifiedEndpoint);
+        const resultKey = searchKeys.filter((key) => {
+          return modifiedEndpoint[key] === duplicatedEndpoint;
+        });
+        modifiedEndpoint[resultKey] = endpoint;
       }
-    }
-    // const newEndpoints = ObjectAssign({}, currentEndpoints, endpoints);
+    });
+
     context.state.endpoints = modifiedEndpoint;
     storage.set('endpoints', modifiedEndpoint);
     return [states.ENDPOINTS];
