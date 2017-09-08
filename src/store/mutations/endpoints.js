@@ -1,13 +1,9 @@
-<<<<<<< HEAD
-import forOwn from 'mout/object/forOwn';
-import find from 'mout/object/find';
-import keys from 'mout/object/keys';
-=======
 import forEach from 'mout/array/forEach';
 import sortBy from 'mout/array/sortBy';
 import isNumber from 'mout/lang/isNumber';
 import forOwn from 'mout/object/forOwn';
->>>>>>> 3b1db76b95f960f0f0f8bf27167464e0493c22a0
+import find from 'mout/object/find';
+import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
 import shortid from 'shortid';
 import storage from 'store';
