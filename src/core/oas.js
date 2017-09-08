@@ -718,22 +718,22 @@ const format = (value, constraints) => {
       return result;
     }
 
-    if(value.match(/::/)) {
+    if (value.match(/::/)) {
       let targetColon = 7;
       // IPv4互換バージョンを使用している場合、ターゲット番号は：6
-      if(value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
+      if (value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
         targetColon = 6;
       }
 
       // ipv6の形を成形する
-      if(value.match(/^::/)) {
+      if (value.match(/^::/)) {
         value = value.replace('::', '0::');
       }
-      if(value.match(/::$/)) {
+      if (value.match(/::$/)) {
         value = value.replace('::', '::0');
       }
 
-      while(value.match(/:/g).length < targetColon) {
+      while (value.match(/:/g).length < targetColon) {
         value = value.replace('::', ':0::');
       }
 
@@ -780,11 +780,11 @@ const format = (value, constraints) => {
 
     break;
   }
-    /*
+  /*
   case 'todo: custom format here':
     // TODO: 独自フォーマットがあればここに。
     break;
-    */
+  */
   default:
     break;
   }
