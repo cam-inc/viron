@@ -60,6 +60,65 @@ export default function() {
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
 
+  this.handleFileChange = e =>{
+    const inputFile = e.target;
+    const file = inputFile.files[0];
+
+    // ファイルを取得出来たか。
+    if (!file) {
+      inputFile.value = null;
+      return;
+    }
+
+    // ファイルがjsonであるか
+    if (file.type !== 'application/json') {
+      store.action(actions.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'JSONファイルを指定してください。',
+        type: 'error'
+      });
+      inputFile.value = null;
+      return;
+    }
+
+    // ファイルをテキストとして読み込む。
+    const reader = new FileReader();
+    reader.readAsText(file);
+
+    // 読み込みが失敗した。
+    reader.onerror = err => {
+      store.action(actions.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'ファイルの読み込みに失敗しました。',
+        error: err
+      });
+      inputFile.value = null;
+    };
+
+    // 読み込みが成功し、完了した。
+    reader.onload = event => {
+      const text = event.target.result;
+
+      // エンドポイント追加処理開始
+      Promise
+        .resolve()
+        .then(() => {
+          const endpoints = JSON.parse(text);
+          return store.action(actions.ENDPOINTS_MERGE_ALL, endpoints);
+        })
+        .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加',
+          message: 'エンドポイントが一覧に追加されました。'
+        }))
+        .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加 失敗',
+          error: err
+        }));
+      // inputしたjsonをリセットする。
+      inputFile.value = null;
+    };
+  };
+
   this.handleOrderMenuItemTap = () => {
     store.action(actions.MODALS_ADD, 'dmc-application-order');
   };

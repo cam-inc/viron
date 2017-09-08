@@ -4,7 +4,12 @@ export default function() {
     markedOptions: {}
   };
 
-  this.on('updated', () => {
+  this.on('update', () => {
+    this.descriptionsMarkdown = {
+      content: this.opts.endpoint.description,
+      markedOptions: {}
+    };
+  }).on('updated', () => {
     this.rebindTouchEvents();
   });
 

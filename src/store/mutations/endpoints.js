@@ -2,7 +2,9 @@ import forEach from 'mout/array/forEach';
 import sortBy from 'mout/array/sortBy';
 import isNumber from 'mout/lang/isNumber';
 import forOwn from 'mout/object/forOwn';
+import find from 'mout/object/find';
 import ObjectAssign from 'object-assign';
+import shortid from 'shortid';
 import storage from 'store';
 import { constants as states } from '../states';
 
@@ -10,7 +12,7 @@ import { constants as states } from '../states';
  * 受け取ったエンドポイント群をきれいに並び替えます。
  * order値が存在しない場合は後方に配置されます。
  * @param {Object} endpoints
- * @return {Oject}
+ * @return {Object}
  */
 const putEndpointsInOrder = endpoints => {
   // どのorder値よりも大きいであろう適当な値。
@@ -118,11 +120,24 @@ export default {
    * @return {Array}
    */
   mergeAll: (context, endpoints) => {
-    const currentEndpoints = context.state.endpoints;
-    let newEndpoints = ObjectAssign({}, currentEndpoints, endpoints);
-    newEndpoints = putEndpointsInOrder(newEndpoints);
-    context.state.endpoints = newEndpoints;
-    storage.set('endpoints', newEndpoints);
+    let modifiedEndpoints = ObjectAssign({}, context.state.endpoints);
+
+    forOwn(endpoints, (endpoint) => {
+      let duplicatedEndpoint = find(modifiedEndpoints, val => {
+        return endpoint.url === val.url;
+      });
+
+      if (!duplicatedEndpoint) {
+        const key = shortid.generate();
+        modifiedEndpoints[key] = endpoint;
+      } else {
+        ObjectAssign(duplicatedEndpoint, endpoint);
+      }
+    });
+
+    modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
+    context.state.endpoints = modifiedEndpoints;
+    storage.set('endpoints', modifiedEndpoints);
     return [states.ENDPOINTS];
   },
 
