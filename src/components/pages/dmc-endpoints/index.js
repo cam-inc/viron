@@ -9,12 +9,19 @@ import './signin.tag';
 export default function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER);
+  this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER_FILTERED);
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+  this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.listen(states.ENDPOINTS, () => {
-    this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER);
+    this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER_FILTERED);
     this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+    this.update();
+  });
+
+  this.listen(states.APPLICATION, () => {
+    this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER_FILTERED);
+    this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
 

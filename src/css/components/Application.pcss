@@ -35,11 +35,14 @@
 
 .Application__menuItem {
   @apply --layout-center-center;
+}
+
+.Application__menuItem--interactive {
   cursor: pointer;
 }
 
-.Application__menuItem:hover,
-.Application__menuItem.hover {
+.Application__menuItem--interactive:hover,
+.Application__menuItem--interactive.hover {
   opacity: 0.5;
 }
 
@@ -59,12 +62,20 @@
   font-size: 24px;
 }
 
-.Application__menuItemLabel {
+.Application__menuItem--secondary .Application__menuItemIcon {
+  opacity: 0.5;
+}
+
+.Application__menuItemBody {
   flex-grow: 1;
 }
 
 .Application__menuItemInput {
   display: none;
+}
+
+.Application__menuItemBody .Textinput {
+  display: block;
 }
 
 .Application__mainColumn {
