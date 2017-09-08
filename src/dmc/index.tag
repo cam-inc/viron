@@ -10,22 +10,27 @@ dmc.Application
             br
             | Console
           .Application__menuItems
-            .Application__menuItem(ref="touch" onTap="handleEntryMenuItemTap")
+            .Application__menuItem.Application__menuItem--interactive(ref="touch" onTap="handleEntryMenuItemTap")
               .Application__menuItemIcon
                 dmc-icon(type="link")
-              .Application__menuItemLabel 新規追加
-            .Application__menuItem(ref="touch" onTap="handleDownloadMenuItemTap")
+              .Application__menuItemBody 新規追加
+            .Application__menuItem.Application__menuItem--interactive(ref="touch" onTap="handleDownloadMenuItemTap")
               .Application__menuItemIcon
                 dmc-icon(type="download")
-              .Application__menuItemLabel ダウンロード
-            .Application__menuItem(if="{ endpointsCount > 2 }" ref="touch" onTap="handleOrderMenuItemTap")
+              .Application__menuItemBody ダウンロード
+            .Application__menuItem.Application__menuItem--interactive(if="{ endpointsCount > 2 }" ref="touch" onTap="handleOrderMenuItemTap")
               .Application__menuItemIcon
                 dmc-icon(type="bars")
-              .Application__menuItemLabel 並び替え
-            .Application__menuItem(ref="touch" onTap="handleClearMenuItemTap")
+              .Application__menuItemBody 並び替え
+            .Application__menuItem.Application__menuItem--interactive(ref="touch" onTap="handleClearMenuItemTap")
               .Application__menuItemIcon
                 dmc-icon(type="close")
-              .Application__menuItemLabel クリア
+              .Application__menuItemBody クリア
+            .Application__menuItem.Application__menuItem--secondary
+              .Application__menuItemIcon
+                dmc-icon(type="search")
+              .Application__menuItemBody
+                dmc-textinput(text="{ endpointFilterText }" theme="ghost" placeholder="filter..." onChange="{ handleFilterChange }")
       virtual(if="{ !isTopPage }")
         dmc-menu
     .Application__mainColumn
@@ -49,5 +54,6 @@ dmc.Application
     import '../components/organisms/dmc-progress/index.tag';
     import '../components/organisms/dmc-splash/index.tag';
     import '../components/organisms/dmc-toasts/index.tag';
+    import '../components/atoms/dmc-textinput/index.tag';
     import script from './index';
     this.external(script);

@@ -21,6 +21,8 @@ export default function() {
   this.pageRoute = store.getter(getters.LOCATION_ROUTE);
   // エンドポイント数。
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+  // エンドポイントフィルター用のテキスト。
+  this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.on('updated', () => {
     this.rebindTouchEvents();
@@ -30,6 +32,7 @@ export default function() {
     this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
     this.isNavigating = store.getter(getters.APPLICATION_ISNAVIGATING);
     this.isNetworking = store.getter(getters.APPLICATION_ISNETWORKING);
+    this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
   this.listen(states.LOCATION, () => {
@@ -69,6 +72,15 @@ export default function() {
           store.action(actions.ENDPOINTS_REMOVE_ALL);
         }
       }))
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleFilterChange = newText => {
+    Promise
+      .resolve()
+      .then(() => store.action(actions.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT, newText))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
       }));

@@ -1,8 +1,9 @@
 dmc-endpoints.Page.EndpointsPage
-  .EndpointsPage__count(if="{ !!endpointsCount }")
-    .EndpointsPage__countIcon
+  .EndpointsPage__caption(if="{ !!endpointsCount }")
+    .EndpointsPage__captionIcon
       dmc-icon(type="link")
-    .EndpointsPage__countLabel Endpoint ({ endpointsCount })
+    .EndpointsPage__captionLabel Endpoint ({ endpointsCount })
+      span.EndpointsPage__captionFilter(if="{ !!endpointFilterText }") filtered by "{ endpointFilterText }"
   .EndpointsPage__list(ref="list")
     virtual(each="{ endpoint in endpoints }")
       dmc-endpoint(

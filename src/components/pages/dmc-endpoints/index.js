@@ -11,10 +11,16 @@ export default function() {
 
   this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER);
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+  this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.listen(states.ENDPOINTS, () => {
     this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER);
     this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+    this.update();
+  });
+
+  this.listen(states.APPLICATION, () => {
+    this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
 
