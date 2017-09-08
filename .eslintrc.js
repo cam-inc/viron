@@ -44,6 +44,8 @@ module.exports = {
     "no-debugger": "error",
     // "extends": "eslint:recommended"
     "no-extra-boolean-cast": "off",
+    // "extends": "eslint:recommended"
+    "no-useless-escape": "off",
     // ブロックの前にスペースが入っていたらエラーを表示させる
     "space-before-blocks": [
       "error",
