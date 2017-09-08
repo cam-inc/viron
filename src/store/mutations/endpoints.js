@@ -40,6 +40,11 @@ export default {
    * @return {Array}
    */
   add: (context, endpointKey, endpoint) => {
+    // order値が指定されていなければ自動的に設定する。
+    if (!isNumber(endpoint.order)) {
+      // リストの先頭に配置するために意図的にマイナス値を付与。
+      endpoint.order = -1;
+    }
     let newEndpoints = ObjectAssign({}, context.state.endpoints);
     newEndpoints[endpointKey] = endpoint;
     newEndpoints = putEndpointsInOrder(newEndpoints);
