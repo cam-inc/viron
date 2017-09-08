@@ -3,7 +3,6 @@ import sortBy from 'mout/array/sortBy';
 import isNumber from 'mout/lang/isNumber';
 import forOwn from 'mout/object/forOwn';
 import find from 'mout/object/find';
-import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
 import shortid from 'shortid';
 import storage from 'store';
