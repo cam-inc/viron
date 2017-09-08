@@ -88,6 +88,7 @@ export default function() {
     },
     this.opts.data.markedOptions
   ));
+
   this.on('mount', () => {
     this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
