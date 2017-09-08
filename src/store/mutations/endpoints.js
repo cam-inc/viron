@@ -86,7 +86,6 @@ export default {
    */
   mergeAll: (context, endpoints) => {
     const modifiedEndpoint = ObjectAssign({}, context.state.endpoints);
-    let newEndpoints = {};
 
     forOwn(endpoints, (endpoint) => {
       let duplicatedEndpoint = find(modifiedEndpoint, val => {
