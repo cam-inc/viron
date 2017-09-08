@@ -121,7 +121,7 @@ export default {
    * @return {Array}
    */
   mergeAll: (context, endpoints) => {
-    const modifiedEndpoints = ObjectAssign({}, context.state.endpoints);
+    let modifiedEndpoints = ObjectAssign({}, context.state.endpoints);
 
     forOwn(endpoints, (endpoint) => {
       let duplicatedEndpoint = find(modifiedEndpoints, val => {
@@ -132,11 +132,7 @@ export default {
         const key = shortid.generate();
         modifiedEndpoints[key] = endpoint;
       } else {
-        const searchKeys = keys(modifiedEndpoints);
-        const resultKey = searchKeys.filter((key) => {
-          return modifiedEndpoints[key] === duplicatedEndpoint;
-        });
-        modifiedEndpoints[resultKey] = endpoint;
+        ObjectAssign(duplicatedEndpoint, endpoint);
       }
     });
 
