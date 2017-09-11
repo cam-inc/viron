@@ -60,7 +60,7 @@ export default function() {
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
 
-  this.handleFileChange = e =>{
+  this.handleFileChange = e => {
     const inputFile = e.target;
     const file = inputFile.files[0];
 
