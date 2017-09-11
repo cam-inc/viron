@@ -54,7 +54,7 @@ module.exports = {
      * ECMAScript 6
      */
     // 関数本体の周囲に中{}を使用する
-    "arrow-body-style": ["error", "always"],
+    // "arrow-body-style": ["error", "always"],
     // arrow関数の引数が一つの場合()をつけない。
     "arrow-parens": ["error", "as-needed"],
     // aorrow関数の => の前後にスペースを入れる。
