@@ -9451,6 +9451,15 @@ var ua$2 = {
    */
   all: context => {
     return context.state.ua;
+  },
+
+  /**
+   * Safariか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isSafari: context => {
+    return !!context.state.ua.safari;
   }
 };
 
@@ -9517,7 +9526,8 @@ const constants$4 = {
   PAGE_COMPONENTS: 'PAGE_COMPONENTS',
   PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
-  UA: 'UA'
+  UA: 'UA',
+  UA_IS_SAFARI: 'UA_IS_SAFARI'
 };
 
 var getters = {
@@ -9583,7 +9593,8 @@ var getters = {
   [constants$4.PAGE_COMPONENTS]: page$2.components,
   [constants$4.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
   [constants$4.TOASTS]: toasts$2.all,
-  [constants$4.UA]: ua$2.all
+  [constants$4.UA]: ua$2.all,
+  [constants$4.UA_IS_SAFARI]: ua$2.isSafari
 };
 
 var auth = {
@@ -11875,11 +11886,15 @@ var ComponentsRoute = {
       .then(isSignined => {
         // 認証切れ or 非ログ時はTOPに戻す。
         if (!isSignined) {
+          let message = '認証が切れました。再度ログインして下さい。';
+          if (store.getter(constants$4.UA_IS_SAFARI)) {
+            message = `${message} Safariをお使いの場合は[https://foo.com/swagger.json]のようにリダイレクト先のエンドポイントURLを指定して下さい。`;
+          }
           return Promise
             .resolve()
             .then(() => store.action(constants$1.MODALS_ADD, 'dmc-message', {
               title: '認証切れ',
-              message: '認証が切れました。再度ログインして下さい。'
+              message
             }))
             .then(() => {
               replace('/');
@@ -47662,139 +47677,63 @@ riot$1.tag2('dmc-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab
 const Quill$2 = window.Quill;
 const QuillBlotBold = Quill$2.import('formats/bold');
 
-var BlotBold = (function (QuillBlotBold) {
-	function BlotBold () {
-		QuillBlotBold.apply(this, arguments);
-	}if ( QuillBlotBold ) BlotBold.__proto__ = QuillBlotBold;
-	BlotBold.prototype = Object.create( QuillBlotBold && QuillBlotBold.prototype );
-	BlotBold.prototype.constructor = BlotBold;
-
-	
-
-	return BlotBold;
-}(QuillBlotBold));
+class BlotBold extends QuillBlotBold {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$3 = window.Quill;
 const QuillBlotItalic = Quill$3.import('formats/italic');
 
-var BlotItalic = (function (QuillBlotItalic) {
-	function BlotItalic () {
-		QuillBlotItalic.apply(this, arguments);
-	}if ( QuillBlotItalic ) BlotItalic.__proto__ = QuillBlotItalic;
-	BlotItalic.prototype = Object.create( QuillBlotItalic && QuillBlotItalic.prototype );
-	BlotItalic.prototype.constructor = BlotItalic;
-
-	
-
-	return BlotItalic;
-}(QuillBlotItalic));
+class BlotItalic extends QuillBlotItalic { }
 
 // TODO: node_moduleから読み込みたい。
 const Quill$4 = window.Quill;
 const QuillBlotUnderline = Quill$4.import('formats/underline');
 
-var BlotUnderline = (function (QuillBlotUnderline) {
-	function BlotUnderline () {
-		QuillBlotUnderline.apply(this, arguments);
-	}if ( QuillBlotUnderline ) BlotUnderline.__proto__ = QuillBlotUnderline;
-	BlotUnderline.prototype = Object.create( QuillBlotUnderline && QuillBlotUnderline.prototype );
-	BlotUnderline.prototype.constructor = BlotUnderline;
-
-	
-
-	return BlotUnderline;
-}(QuillBlotUnderline));
+class BlotUnderline extends QuillBlotUnderline { }
 
 // TODO: node_moduleから読み込みたい。
 const Quill$5 = window.Quill;
 const QuillBlotStrike = Quill$5.import('formats/strike');
 
-var BlotStrike = (function (QuillBlotStrike) {
-	function BlotStrike () {
-		QuillBlotStrike.apply(this, arguments);
-	}if ( QuillBlotStrike ) BlotStrike.__proto__ = QuillBlotStrike;
-	BlotStrike.prototype = Object.create( QuillBlotStrike && QuillBlotStrike.prototype );
-	BlotStrike.prototype.constructor = BlotStrike;
-
-	
-
-	return BlotStrike;
-}(QuillBlotStrike));
+class BlotStrike extends QuillBlotStrike { }
 
 // TODO: node_moduleから読み込みたい。
 const Quill$6 = window.Quill;
 const QuillBlotLink = Quill$6.import('formats/link');
 
-var BlotLink = (function (QuillBlotLink) {
-	function BlotLink () {
-		QuillBlotLink.apply(this, arguments);
-	}if ( QuillBlotLink ) BlotLink.__proto__ = QuillBlotLink;
-	BlotLink.prototype = Object.create( QuillBlotLink && QuillBlotLink.prototype );
-	BlotLink.prototype.constructor = BlotLink;
-
-	
-
-	return BlotLink;
-}(QuillBlotLink));
+class BlotLink extends QuillBlotLink {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$7 = window.Quill;
 const QuillBlotCode = Quill$7.import('formats/code');
 
-var BlotCode = (function (QuillBlotCode) {
-	function BlotCode () {
-		QuillBlotCode.apply(this, arguments);
-	}if ( QuillBlotCode ) BlotCode.__proto__ = QuillBlotCode;
-	BlotCode.prototype = Object.create( QuillBlotCode && QuillBlotCode.prototype );
-	BlotCode.prototype.constructor = BlotCode;
-
-	
-
-	return BlotCode;
-}(QuillBlotCode));
+class BlotCode extends QuillBlotCode {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$8 = window.Quill;
 const QuillBlotScript = Quill$8.import('formats/script');
 
-var BlotScript = (function (QuillBlotScript) {
-	function BlotScript () {
-		QuillBlotScript.apply(this, arguments);
-	}if ( QuillBlotScript ) BlotScript.__proto__ = QuillBlotScript;
-	BlotScript.prototype = Object.create( QuillBlotScript && QuillBlotScript.prototype );
-	BlotScript.prototype.constructor = BlotScript;
-
-	
-
-	return BlotScript;
-}(QuillBlotScript));
+class BlotScript extends QuillBlotScript {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$9 = window.Quill;
 const QuillBlockEmbed = Quill$9.import('blots/block/embed');
 
-var BlotImage = (function (QuillBlockEmbed) {
-  function BlotImage () {
-    QuillBlockEmbed.apply(this, arguments);
-  }
-
-  if ( QuillBlockEmbed ) BlotImage.__proto__ = QuillBlockEmbed;
-  BlotImage.prototype = Object.create( QuillBlockEmbed && QuillBlockEmbed.prototype );
-  BlotImage.prototype.constructor = BlotImage;
-
-  BlotImage.create = function create (value) {
-    const node = QuillBlockEmbed.create.call(this);
+class BlotImage extends QuillBlockEmbed {
+  static create(value) {
+    const node = super.create();
     node.setAttribute('src', value);
     return node;
-  };
+  }
 
-  BlotImage.value = function value (node) {
+  static value(node) {
     return node.getAttribute('src');
-  };
-
-  return BlotImage;
-}(QuillBlockEmbed));
+  }
+}
 BlotImage.blotName = 'image';
 BlotImage.tagName = 'img';
 
@@ -47803,97 +47742,42 @@ Quill$9.register(BlotImage);
 const Quill$10 = window.Quill;
 const QuillBlotVideo = Quill$10.import('formats/video');
 
-var BlotVideo = (function (QuillBlotVideo) {
-	function BlotVideo () {
-		QuillBlotVideo.apply(this, arguments);
-	}if ( QuillBlotVideo ) BlotVideo.__proto__ = QuillBlotVideo;
-	BlotVideo.prototype = Object.create( QuillBlotVideo && QuillBlotVideo.prototype );
-	BlotVideo.prototype.constructor = BlotVideo;
-
-	
-
-	return BlotVideo;
-}(QuillBlotVideo));
+class BlotVideo extends QuillBlotVideo {}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$11 = window.Quill;
 const QuillBlotHeader = Quill$11.import('formats/header');
 
-var BlotHeader = (function (QuillBlotHeader) {
-	function BlotHeader () {
-		QuillBlotHeader.apply(this, arguments);
-	}if ( QuillBlotHeader ) BlotHeader.__proto__ = QuillBlotHeader;
-	BlotHeader.prototype = Object.create( QuillBlotHeader && QuillBlotHeader.prototype );
-	BlotHeader.prototype.constructor = BlotHeader;
-
-	
-
-	return BlotHeader;
-}(QuillBlotHeader));
+class BlotHeader extends QuillBlotHeader {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$12 = window.Quill;
 const QuillBlotList = Quill$12.import('formats/list');
 
-var BlotList = (function (QuillBlotList) {
-	function BlotList () {
-		QuillBlotList.apply(this, arguments);
-	}if ( QuillBlotList ) BlotList.__proto__ = QuillBlotList;
-	BlotList.prototype = Object.create( QuillBlotList && QuillBlotList.prototype );
-	BlotList.prototype.constructor = BlotList;
-
-	
-
-	return BlotList;
-}(QuillBlotList));
+class BlotList extends QuillBlotList {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$13 = window.Quill;
 const QuillBlotListItem = Quill$13.import('formats/list/item');
 
-var BlotListItem = (function (QuillBlotListItem) {
-	function BlotListItem () {
-		QuillBlotListItem.apply(this, arguments);
-	}if ( QuillBlotListItem ) BlotListItem.__proto__ = QuillBlotListItem;
-	BlotListItem.prototype = Object.create( QuillBlotListItem && QuillBlotListItem.prototype );
-	BlotListItem.prototype.constructor = BlotListItem;
-
-	
-
-	return BlotListItem;
-}(QuillBlotListItem));
+class BlotListItem extends QuillBlotListItem {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$14 = window.Quill;
 const QuillBlotBlockquote = Quill$14.import('formats/blockquote');
 
-var BlotBlockquote = (function (QuillBlotBlockquote) {
-	function BlotBlockquote () {
-		QuillBlotBlockquote.apply(this, arguments);
-	}if ( QuillBlotBlockquote ) BlotBlockquote.__proto__ = QuillBlotBlockquote;
-	BlotBlockquote.prototype = Object.create( QuillBlotBlockquote && QuillBlotBlockquote.prototype );
-	BlotBlockquote.prototype.constructor = BlotBlockquote;
-
-	
-
-	return BlotBlockquote;
-}(QuillBlotBlockquote));
+class BlotBlockquote extends QuillBlotBlockquote {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$15 = window.Quill;
 const QuillBlotCodeBlock = Quill$15.import('formats/code-block');
 
-var BlotCodeBlock = (function (QuillBlotCodeBlock) {
-	function BlotCodeBlock () {
-		QuillBlotCodeBlock.apply(this, arguments);
-	}if ( QuillBlotCodeBlock ) BlotCodeBlock.__proto__ = QuillBlotCodeBlock;
-	BlotCodeBlock.prototype = Object.create( QuillBlotCodeBlock && QuillBlotCodeBlock.prototype );
-	BlotCodeBlock.prototype.constructor = BlotCodeBlock;
-
-	
-
-	return BlotCodeBlock;
-}(QuillBlotCodeBlock));
+class BlotCodeBlock extends QuillBlotCodeBlock {
+}
 
 // TODO: node_moduleから読み込みたい。
 const Quill$16 = window.Quill;
@@ -59651,9 +59535,10 @@ riot$1.tag2('dmc-qrcode', '<canvas class="Qrcode__canvas" ref="canvas"></canvas>
 });
 
 var script$66 = function() {
-  const optimizedEndpoint = objectAssign({}, this.opts.endpoint);
-  // token情報は不要。
-  delete optimizedEndpoint.token;
+  const optimizedEndpoint = objectAssign({}, {
+    url: this.opts.endpoint.url,
+    memo: this.opts.endpoint.memo
+  });
   const encodedEndpoint = encodeURIComponent(JSON.stringify(optimizedEndpoint));
   const value = `${location.origin}/#/endpointimport?endpoint=${encodedEndpoint}`;
 
