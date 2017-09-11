@@ -76,7 +76,7 @@ module.exports = {
     // letで割り当てられいるが再定義されていないかのエラーを表示させる。https://eslint.org/docs/rules/prefer-const
     // "prefer-const": "error",
     // テンプレートリテラルを使用するように設定
-    "prefer-template": "error",
+    // "prefer-template": "error",
     // importをアルファベット順にソート https://eslint.org/docs/rules/sort-imports
     // "sort-imports": "error"
     // テンプレート文字列内${}内にスペースを入れないように設定。
