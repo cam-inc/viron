@@ -11,12 +11,6 @@ const list = (req, res) => {
       url: '/signin',
       method: 'POST',
     },
-    {
-      type: 'oauth',
-      provider: 'google',
-      url: '/googlesignin',
-      method: 'POST',
-    },
     // signoutは必須
     {
       type: 'signout',
@@ -25,6 +19,16 @@ const list = (req, res) => {
       method: 'POST',
     },
   ];
+
+  // ClientID,ClientSecretが設定されている場合のみGoogle認証を有効にする
+  if (process.env.GOOGLE_OAUTH_CLIENT_ID && process.env.GOOGLE_OAUTH_CLIENT_SECRET) {
+    result.push({
+      type: 'oauth',
+      provider: 'google',
+      url: '/googlesignin',
+      method: 'POST',
+    });
+  }
 
   res.json(result);
 };

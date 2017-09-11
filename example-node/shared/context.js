@@ -66,6 +66,7 @@ class Context {
           auth: {
             admin_users: store.models.AdminUsers,
             admin_roles: store.models.AdminRoles,
+            default_role: this.getDefaultRole(),
             super_role: this.getSuperRole(),
             auth_jwt: this.getConfigAuthJwt(),
             google_oauth: this.getConfigGoogleOAuth(),

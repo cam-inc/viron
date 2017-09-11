@@ -22,6 +22,7 @@ services:
       - $PWD/config:/example-node/config
       - $PWD/app.js:/example-node/app.js
       - $PWD/test:/example-node/test
+      - $PWD/.env:/example-node/.env
     command: npm run debug
     #command: tail -f /var/log/bootstrap.log
 

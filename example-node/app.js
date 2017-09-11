@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const http = require('http');
 const https = require('https');
 
@@ -38,6 +40,9 @@ context.init()
         .then(() => {
           // add middlewares here.
           // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
+
+          // ignore if-none-match header
+          app.disable('etag');
 
           // add acl response headers
           app.use(vironlib.acl.middleware());

@@ -1,6 +1,6 @@
 module.exports = helper => {
   const config = {
-    host: 'localhost:3000',
+    host: 'dmc.camplat.net:443',
     // vironlibのadmin_roleが使用するユーザー作成時の初期ロール名
     default_role: 'viewer',
     // vironlibのadmin_roleが使用するスーパーユーザーのロール名
@@ -10,7 +10,7 @@ module.exports = helper => {
     google_oauth: {
       client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
       client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      redirect_url: 'https://localhost:3000/googleoauth2callback',
+      redirect_url: 'https://dmc.camplat.net/googleoauth2callback',
       //state_url: 'https://cam-inc.github.io/dmc/#/',
       allow_email_domains: [
         // ここに書いたドメインが利用可能
@@ -30,7 +30,7 @@ module.exports = helper => {
       main: {
         type: 'mysql',
         config: {
-          database: 'dmc_local', // The name of the database
+          database: 'dmc_stg', // The name of the database
           dialect: 'mysql', // The dialect of the database you are connecting to. One of mysql, postgres, sqlite and mssql. 'mysql'|'sqlite'|'postgres'|'mssql'
           // dialectModulePath: null, // {String} If specified, load the dialect library from this path. For example, if you want to use pg.js instead of pg when connecting to a pg database, you should specify 'pg.js' here
           // dialectOptions: null, // {Object} An object of additional options, which are passed directly to the connection library
@@ -47,7 +47,7 @@ module.exports = helper => {
           // native: false, // A flag that defines if native library shall be used or not. Currently only has an effect for
           replication: { // Use read / write replication. To enable replication, pass an object, with two properties, read and write. Write should be an object (a single server for handling writes), and read an array of object (several servers to handle reads). Each read/write server can have the following properties: `host`, `port`, `username`, `password`, `database`
             write: {
-              host: 'local-dmc-mysql.in.dmc.biz', // The host of the relational database.
+              host: 'localhost', // The host of the relational database.
               port: 3306, // The port of the relational database.
               username: process.env.MYSQL_USER_NAME, // The username which is used to authenticate against the database.
               password: process.env.MYSQL_USER_PASSWORD, // The password which is used to authenticate against the database.
@@ -60,7 +60,7 @@ module.exports = helper => {
               },
             },
             read: [{
-              host: 'local-dmc-mysql.in.dmc.biz', // The host of the relational database.
+              host: 'localhost', // The host of the relational database.
               port: 3306, // The port of the relational database.
               username: process.env.MYSQL_USER_NAME, // The username which is used to authenticate against the database.
               password: process.env.MYSQL_USER_PASSWORD, // The password which is used to authenticate against the database.
@@ -91,15 +91,14 @@ module.exports = helper => {
       algorithm: 'RS512',
       claims: {
         iss: 'dmc-example-node',
-        aud: 'dmc.local',
+        aud: 'dmc.stg',
       },
-      // 使い回し厳禁
       rsa_private_key: process.env.AUTH_JWT_PRIVATE_KEY,
       rsa_public_key: process.env.AUTH_JWT_PUBLIC_KEY,
     },
 
     ssl: {
-      use: true,
+      use: false,
       key: process.env.SSL_PRIVATE_KEY,
       cert: process.env.SSL_CERTIFICATE,
     },
