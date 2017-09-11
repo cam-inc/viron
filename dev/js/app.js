@@ -7400,7 +7400,10 @@ var drawers$1 = {
    * @param {Object} drawerOpts
    * @return {Array}
    */
-  add: (context, tagName, tagOpts = {}, drawerOpts = {}) => {
+  add: (context, tagName, tagOpts, drawerOpts) => {
+    if ( tagOpts === void 0 ) tagOpts = {};
+    if ( drawerOpts === void 0 ) drawerOpts = {};
+
     context.state.drawers.push({
       id: `drawer_${Date.now()}`,
       tagName,
@@ -7499,10 +7502,340 @@ var drawers$1 = {
     var isNumber_1 = isNumber;
 
 /**
+     * Object some
+     */
+    function some$1(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var result = false;
+        forOwn_1$1(obj, function(val, key) {
+            if (callback(val, key, obj)) {
+                result = true;
+                return false; // break
+            }
+        });
+        return result;
+    }
+
+    var some_1$1 = some$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$1(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var result;
+        some_1$1(obj, function(value, key, obj) {
+            if (callback(value, key, obj)) {
+                result = value;
+                return true; //break
+            }
+        });
+        return result;
+    }
+
+    var find_1$1 = find$1;
+
+// Found this seed-based random generator somewhere
+// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
+
+var seed = 1;
+
+/**
+ * return a random number based on a seed
+ * @param seed
+ * @returns {number}
+ */
+function getNextValue() {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed/(233280.0);
+}
+
+function setSeed$1(_seed_) {
+    seed = _seed_;
+}
+
+var randomFromSeed = {
+    nextValue: getNextValue,
+    seed: setSeed$1
+};
+
+var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
+var alphabet;
+var previousSeed;
+
+var shuffled;
+
+function reset() {
+    shuffled = false;
+}
+
+function setCharacters(_alphabet_) {
+    if (!_alphabet_) {
+        if (alphabet !== ORIGINAL) {
+            alphabet = ORIGINAL;
+            reset();
+        }
+        return;
+    }
+
+    if (_alphabet_ === alphabet) {
+        return;
+    }
+
+    if (_alphabet_.length !== ORIGINAL.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
+    }
+
+    var unique = _alphabet_.split('').filter(function(item, ind, arr){
+       return ind !== arr.lastIndexOf(item);
+    });
+
+    if (unique.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
+    }
+
+    alphabet = _alphabet_;
+    reset();
+}
+
+function characters(_alphabet_) {
+    setCharacters(_alphabet_);
+    return alphabet;
+}
+
+function setSeed(seed) {
+    randomFromSeed.seed(seed);
+    if (previousSeed !== seed) {
+        reset();
+        previousSeed = seed;
+    }
+}
+
+function shuffle$1() {
+    if (!alphabet) {
+        setCharacters(ORIGINAL);
+    }
+
+    var sourceArray = alphabet.split('');
+    var targetArray = [];
+    var r = randomFromSeed.nextValue();
+    var characterIndex;
+
+    while (sourceArray.length > 0) {
+        r = randomFromSeed.nextValue();
+        characterIndex = Math.floor(r * sourceArray.length);
+        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
+    }
+    return targetArray.join('');
+}
+
+function getShuffled() {
+    if (shuffled) {
+        return shuffled;
+    }
+    shuffled = shuffle$1();
+    return shuffled;
+}
+
+/**
+ * lookup shuffled letter
+ * @param index
+ * @returns {string}
+ */
+function lookup(index) {
+    var alphabetShuffled = getShuffled();
+    return alphabetShuffled[index];
+}
+
+var alphabet_1 = {
+    characters: characters,
+    seed: setSeed,
+    lookup: lookup,
+    shuffled: getShuffled
+};
+
+var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
+
+function randomByte() {
+    if (!crypto || !crypto.getRandomValues) {
+        return Math.floor(Math.random() * 256) & 0x30;
+    }
+    var dest = new Uint8Array(1);
+    crypto.getRandomValues(dest);
+    return dest[0] & 0x30;
+}
+
+var randomByteBrowser = randomByte;
+
+function encode(lookup, number) {
+    var loopCounter = 0;
+    var done;
+
+    var str = '';
+
+    while (!done) {
+        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByteBrowser() );
+        done = number < (Math.pow(16, loopCounter + 1 ) );
+        loopCounter++;
+    }
+    return str;
+}
+
+var encode_1 = encode;
+
+/**
+ * Decode the id to get the version and worker
+ * Mainly for debugging and testing.
+ * @param id - the shortid-generated id.
+ */
+function decode(id) {
+    var characters = alphabet_1.shuffled();
+    return {
+        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
+        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
+    };
+}
+
+var decode_1 = decode;
+
+// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
+// This number should be updated every year or so to keep the generated id short.
+// To regenerate `new Date() - 0` and bump the version. Always bump the version!
+var REDUCE_TIME = 1459707606518;
+
+// don't change unless we change the algos or REDUCE_TIME
+// must be an integer and less than 16
+var version = 6;
+
+// Counter is used when shortid is called multiple times in one second.
+var counter;
+
+// Remember the last time shortid was called in case counter is needed.
+var previousSeconds;
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function build(clusterWorkerId) {
+
+    var str = '';
+
+    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
+
+    if (seconds === previousSeconds) {
+        counter++;
+    } else {
+        counter = 0;
+        previousSeconds = seconds;
+    }
+
+    str = str + encode_1(alphabet_1.lookup, version);
+    str = str + encode_1(alphabet_1.lookup, clusterWorkerId);
+    if (counter > 0) {
+        str = str + encode_1(alphabet_1.lookup, counter);
+    }
+    str = str + encode_1(alphabet_1.lookup, seconds);
+
+    return str;
+}
+
+var build_1 = build;
+
+function isShortId(id) {
+    if (!id || typeof id !== 'string' || id.length < 6 ) {
+        return false;
+    }
+
+    var characters = alphabet_1.characters();
+    var len = id.length;
+    for(var i = 0; i < len;i++) {
+        if (characters.indexOf(id[i]) === -1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+var isValid = isShortId;
+
+var clusterWorkerIdBrowser = 0;
+
+var lib = createCommonjsModule(function (module) {
+'use strict';
+
+
+
+
+
+
+
+// if you are using cluster or multiple servers use this to make each instance
+// has a unique value for worker
+// Note: I don't know if this is automatically set when using third
+// party cluster solutions such as pm2.
+var clusterWorkerId = clusterWorkerIdBrowser || 0;
+
+/**
+ * Set the seed.
+ * Highly recommended if you don't want people to try to figure out your id schema.
+ * exposed as shortid.seed(int)
+ * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
+ */
+function seed(seedValue) {
+    alphabet_1.seed(seedValue);
+    return module.exports;
+}
+
+/**
+ * Set the cluster worker or machine id
+ * exposed as shortid.worker(int)
+ * @param workerId worker must be positive integer.  Number less than 16 is recommended.
+ * returns shortid module so it can be chained.
+ */
+function worker(workerId) {
+    clusterWorkerId = workerId;
+    return module.exports;
+}
+
+/**
+ *
+ * sets new characters to use in the alphabet
+ * returns the shuffled alphabet
+ */
+function characters(newCharacters) {
+    if (newCharacters !== undefined) {
+        alphabet_1.characters(newCharacters);
+    }
+
+    return alphabet_1.shuffled();
+}
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function generate() {
+  return build_1(clusterWorkerId);
+}
+
+// Export all other functions as properties of the generate function
+module.exports = generate;
+module.exports.generate = generate;
+module.exports.seed = seed;
+module.exports.worker = worker;
+module.exports.characters = characters;
+module.exports.decode = decode_1;
+module.exports.isValid = isValid;
+});
+
+var shortid = lib;
+
+/**
  * 受け取ったエンドポイント群をきれいに並び替えます。
  * order値が存在しない場合は後方に配置されます。
  * @param {Object} endpoints
- * @return {Oject}
+ * @return {Object}
  */
 const putEndpointsInOrder = endpoints => {
   // どのorder値よりも大きいであろう適当な値。
@@ -7610,11 +7943,24 @@ var endpoints$1 = {
    * @return {Array}
    */
   mergeAll: (context, endpoints) => {
-    const currentEndpoints = context.state.endpoints;
-    let newEndpoints = objectAssign({}, currentEndpoints, endpoints);
-    newEndpoints = putEndpointsInOrder(newEndpoints);
-    context.state.endpoints = newEndpoints;
-    store.set('endpoints', newEndpoints);
+    let modifiedEndpoints = objectAssign({}, context.state.endpoints);
+
+    forOwn_1$1(endpoints, (endpoint) => {
+      let duplicatedEndpoint = find_1$1(modifiedEndpoints, val => {
+        return endpoint.url === val.url;
+      });
+
+      if (!duplicatedEndpoint) {
+        const key = shortid.generate();
+        modifiedEndpoints[key] = endpoint;
+      } else {
+        objectAssign(duplicatedEndpoint, endpoint);
+      }
+    });
+
+    modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
+    context.state.endpoints = modifiedEndpoints;
+    store.set('endpoints', modifiedEndpoints);
     return [constants$3.ENDPOINTS];
   },
 
@@ -7707,7 +8053,10 @@ var modals$1 = {
    * @param {Object} modalOpts
    * @return {Array}
    */
-  add: (context, tagName, tagOpts = {}, modalOpts = {}) => {
+  add: (context, tagName, tagOpts, modalOpts) => {
+    if ( tagOpts === void 0 ) tagOpts = {};
+    if ( modalOpts === void 0 ) modalOpts = {};
+
     context.state.modals.push({
       id: `modal_${Date.now()}`,
       tagName,
@@ -8509,40 +8858,6 @@ var drawers$2 = {
 };
 
 /**
-     * Object some
-     */
-    function some$1(obj, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var result = false;
-        forOwn_1$1(obj, function(val, key) {
-            if (callback(val, key, obj)) {
-                result = true;
-                return false; // break
-            }
-        });
-        return result;
-    }
-
-    var some_1$1 = some$1;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$1(obj, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var result;
-        some_1$1(obj, function(value, key, obj) {
-            if (callback(value, key, obj)) {
-                result = value;
-                return true; //break
-            }
-        });
-        return result;
-    }
-
-    var find_1$1 = find$1;
-
-/**
      * Get object size
      */
     function size(obj) {
@@ -9032,7 +9347,9 @@ var oas$2 = {
    * @param {Number} statusCode
    * @return {Object}
    */
-  responseObject: (context, path, method, statusCode = 200) => {
+  responseObject: (context, path, method, statusCode) => {
+    if ( statusCode === void 0 ) statusCode = 200;
+
     return context.state.oas.client.spec.paths[path][method].responses[statusCode];
   },
 
@@ -9045,7 +9362,9 @@ var oas$2 = {
    * @param {Number} statusCode
    * @return {Object}
    */
-  schemaObject: (context, path, method, statusCode = 200) => {
+  schemaObject: (context, path, method, statusCode) => {
+    if ( statusCode === void 0 ) statusCode = 200;
+
     return context.state.oas.client.spec.paths[path][method].responses[statusCode].schema;
   }
 };
@@ -9647,7 +9966,7 @@ var path$1 = Object.freeze({
 	default: path
 });
 
-var require$$0 = ( path$1 && path ) || path$1;
+var require$$0$2 = ( path$1 && path ) || path$1;
 
 /**
  * Module exports.
@@ -9660,7 +9979,7 @@ var parse_1$1 = parse$1;
  * Module dependencies.
  */
 
-var basename = require$$0.basename;
+var basename = require$$0$2.basename;
 
 /**
  * RegExp to match non attr-char, *after* encodeURIComponent (i.e. not including "%")
@@ -10506,302 +10825,6 @@ var drawers$3 = {
       });
   }
 };
-
-// Found this seed-based random generator somewhere
-// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
-
-var seed = 1;
-
-/**
- * return a random number based on a seed
- * @param seed
- * @returns {number}
- */
-function getNextValue() {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed/(233280.0);
-}
-
-function setSeed$1(_seed_) {
-    seed = _seed_;
-}
-
-var randomFromSeed = {
-    nextValue: getNextValue,
-    seed: setSeed$1
-};
-
-var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
-var alphabet;
-var previousSeed;
-
-var shuffled;
-
-function reset() {
-    shuffled = false;
-}
-
-function setCharacters(_alphabet_) {
-    if (!_alphabet_) {
-        if (alphabet !== ORIGINAL) {
-            alphabet = ORIGINAL;
-            reset();
-        }
-        return;
-    }
-
-    if (_alphabet_ === alphabet) {
-        return;
-    }
-
-    if (_alphabet_.length !== ORIGINAL.length) {
-        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
-    }
-
-    var unique = _alphabet_.split('').filter(function(item, ind, arr){
-       return ind !== arr.lastIndexOf(item);
-    });
-
-    if (unique.length) {
-        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
-    }
-
-    alphabet = _alphabet_;
-    reset();
-}
-
-function characters(_alphabet_) {
-    setCharacters(_alphabet_);
-    return alphabet;
-}
-
-function setSeed(seed) {
-    randomFromSeed.seed(seed);
-    if (previousSeed !== seed) {
-        reset();
-        previousSeed = seed;
-    }
-}
-
-function shuffle$1() {
-    if (!alphabet) {
-        setCharacters(ORIGINAL);
-    }
-
-    var sourceArray = alphabet.split('');
-    var targetArray = [];
-    var r = randomFromSeed.nextValue();
-    var characterIndex;
-
-    while (sourceArray.length > 0) {
-        r = randomFromSeed.nextValue();
-        characterIndex = Math.floor(r * sourceArray.length);
-        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
-    }
-    return targetArray.join('');
-}
-
-function getShuffled() {
-    if (shuffled) {
-        return shuffled;
-    }
-    shuffled = shuffle$1();
-    return shuffled;
-}
-
-/**
- * lookup shuffled letter
- * @param index
- * @returns {string}
- */
-function lookup(index) {
-    var alphabetShuffled = getShuffled();
-    return alphabetShuffled[index];
-}
-
-var alphabet_1 = {
-    characters: characters,
-    seed: setSeed,
-    lookup: lookup,
-    shuffled: getShuffled
-};
-
-var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
-
-function randomByte() {
-    if (!crypto || !crypto.getRandomValues) {
-        return Math.floor(Math.random() * 256) & 0x30;
-    }
-    var dest = new Uint8Array(1);
-    crypto.getRandomValues(dest);
-    return dest[0] & 0x30;
-}
-
-var randomByteBrowser = randomByte;
-
-function encode(lookup, number) {
-    var loopCounter = 0;
-    var done;
-
-    var str = '';
-
-    while (!done) {
-        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByteBrowser() );
-        done = number < (Math.pow(16, loopCounter + 1 ) );
-        loopCounter++;
-    }
-    return str;
-}
-
-var encode_1 = encode;
-
-/**
- * Decode the id to get the version and worker
- * Mainly for debugging and testing.
- * @param id - the shortid-generated id.
- */
-function decode(id) {
-    var characters = alphabet_1.shuffled();
-    return {
-        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
-        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
-    };
-}
-
-var decode_1 = decode;
-
-// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
-// This number should be updated every year or so to keep the generated id short.
-// To regenerate `new Date() - 0` and bump the version. Always bump the version!
-var REDUCE_TIME = 1459707606518;
-
-// don't change unless we change the algos or REDUCE_TIME
-// must be an integer and less than 16
-var version = 6;
-
-// Counter is used when shortid is called multiple times in one second.
-var counter;
-
-// Remember the last time shortid was called in case counter is needed.
-var previousSeconds;
-
-/**
- * Generate unique id
- * Returns string id
- */
-function build(clusterWorkerId) {
-
-    var str = '';
-
-    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
-
-    if (seconds === previousSeconds) {
-        counter++;
-    } else {
-        counter = 0;
-        previousSeconds = seconds;
-    }
-
-    str = str + encode_1(alphabet_1.lookup, version);
-    str = str + encode_1(alphabet_1.lookup, clusterWorkerId);
-    if (counter > 0) {
-        str = str + encode_1(alphabet_1.lookup, counter);
-    }
-    str = str + encode_1(alphabet_1.lookup, seconds);
-
-    return str;
-}
-
-var build_1 = build;
-
-function isShortId(id) {
-    if (!id || typeof id !== 'string' || id.length < 6 ) {
-        return false;
-    }
-
-    var characters = alphabet_1.characters();
-    var len = id.length;
-    for(var i = 0; i < len;i++) {
-        if (characters.indexOf(id[i]) === -1) {
-            return false;
-        }
-    }
-    return true;
-}
-
-var isValid = isShortId;
-
-var clusterWorkerIdBrowser = 0;
-
-var lib = createCommonjsModule(function (module) {
-'use strict';
-
-
-
-
-
-
-
-// if you are using cluster or multiple servers use this to make each instance
-// has a unique value for worker
-// Note: I don't know if this is automatically set when using third
-// party cluster solutions such as pm2.
-var clusterWorkerId = clusterWorkerIdBrowser || 0;
-
-/**
- * Set the seed.
- * Highly recommended if you don't want people to try to figure out your id schema.
- * exposed as shortid.seed(int)
- * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
- */
-function seed(seedValue) {
-    alphabet_1.seed(seedValue);
-    return module.exports;
-}
-
-/**
- * Set the cluster worker or machine id
- * exposed as shortid.worker(int)
- * @param workerId worker must be positive integer.  Number less than 16 is recommended.
- * returns shortid module so it can be chained.
- */
-function worker(workerId) {
-    clusterWorkerId = workerId;
-    return module.exports;
-}
-
-/**
- *
- * sets new characters to use in the alphabet
- * returns the shuffled alphabet
- */
-function characters(newCharacters) {
-    if (newCharacters !== undefined) {
-        alphabet_1.characters(newCharacters);
-    }
-
-    return alphabet_1.shuffled();
-}
-
-/**
- * Generate unique id
- * Returns string id
- */
-function generate() {
-  return build_1(clusterWorkerId);
-}
-
-// Export all other functions as properties of the generate function
-module.exports = generate;
-module.exports.generate = generate;
-module.exports.seed = seed;
-module.exports.worker = worker;
-module.exports.characters = characters;
-module.exports.decode = decode_1;
-module.exports.isValid = isValid;
-});
-
-var shortid = lib;
 
 var endpoints$3 = {
   /**
@@ -47813,7 +47836,8 @@ const Quill = window.Quill;
  * @param {Object} params
  */
 const customizeBlotBold = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotBold.className = className;
   }
@@ -47833,7 +47857,8 @@ const customizeBlotBold = params => {
  * @param {Object} params
  */
 const customizeBlotItalic = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotItalic.className = className;
   }
@@ -47848,7 +47873,8 @@ const customizeBlotItalic = params => {
  * @param {Object} params
  */
 const customizeBlotUnderline = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotUnderline.className = className;
   }
@@ -47863,7 +47889,8 @@ const customizeBlotUnderline = params => {
  * @param {Object} params
  */
 const customizeBlotStrike = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotStrike.className = className;
   }
@@ -47878,7 +47905,8 @@ const customizeBlotStrike = params => {
  * @param {Object} params
  */
 const customizeBlotLink = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotLink.className = className;
   }
@@ -47893,7 +47921,8 @@ const customizeBlotLink = params => {
  * @param {Object} params
  */
 const customizeBlotCode = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotCode.className = className;
   }
@@ -47908,7 +47937,7 @@ const customizeBlotCode = params => {
  * @param {Object} params
  */
 const customizeBlotScript = params => {
-  const { className } = params;
+  var className = params.className;
   if (!!className) {
     BlotScript.className = className;
   }
@@ -47920,7 +47949,8 @@ const customizeBlotScript = params => {
  * @param {Object} params
  */
 const customizeBlotImage = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotImage.className = className;
   }
@@ -47935,7 +47965,8 @@ const customizeBlotImage = params => {
  * @param {Object} params
  */
 const customizeBlotVideo = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotVideo.className = className;
   }
@@ -47950,7 +47981,7 @@ const customizeBlotVideo = params => {
  * @param {Object} params
  */
 const customizeBlotHeader = params => {
-  const { className } = params;
+  var className = params.className;
   if (!!className) {
     BlotHeader.className = className;
   }
@@ -47962,7 +47993,7 @@ const customizeBlotHeader = params => {
  * @param {Object} params
  */
 const customizeBlotList = params => {
-  const { className } = params;
+  var className = params.className;
   if (!!className) {
     BlotList.className = className;
   }
@@ -47974,7 +48005,7 @@ const customizeBlotList = params => {
  * @param {Object} params
  */
 const customizeBlotListItem = params => {
-  const { className } = params;
+  var className = params.className;
   if (!!className) {
     BlotListItem.className = className;
   }
@@ -47986,7 +48017,8 @@ const customizeBlotListItem = params => {
  * @param {Object} params
  */
 const customizeBlotBlockquote = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotBlockquote.className = className;
   }
@@ -48001,7 +48033,8 @@ const customizeBlotBlockquote = params => {
  * @param {Object} params
  */
 const customizeBlotCodeBlock = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotCodeBlock.className = className;
   }
@@ -48016,7 +48049,8 @@ const customizeBlotCodeBlock = params => {
  * @param {Object} params
  */
 const customizeAttributorColor = params => {
-  const { type = 'style', keyName } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleColor, true);
   } else {
@@ -48032,7 +48066,8 @@ const customizeAttributorColor = params => {
  * @param {Object} params
  */
 const customizeAttributorBackground = params => {
-  const { type = 'style', keyName } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleBackground, true);
   } else {
@@ -48048,7 +48083,9 @@ const customizeAttributorBackground = params => {
  * @param {Object} params
  */
 const customizeAttributorFont = params => {
-  const { type = 'style', keyName, whitelist = [] } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
+  var whitelist = params.whitelist; if ( whitelist === void 0 ) whitelist = [];
   QuillAttributorClassFont.whitelist = whitelist;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleFont, true);
@@ -48065,7 +48102,9 @@ const customizeAttributorFont = params => {
  * @param {Object} params
  */
 const customizeAttributorSize = params => {
-  const { type = 'style', keyName, whitelist = [] } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
+  var whitelist = params.whitelist; if ( whitelist === void 0 ) whitelist = [];
   QuillAttributorClassSize.whitelist = whitelist;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleSize, true);
@@ -48082,7 +48121,7 @@ const customizeAttributorSize = params => {
  * @param {Object} params
  */
 const customizeAttributorIndent = params => {
-  const { keyName } = params;
+  var keyName = params.keyName;
   if (!!keyName) {
     AttributorClassIndent.keyName = keyName;
   }
@@ -48094,7 +48133,8 @@ const customizeAttributorIndent = params => {
  * @param {Object} params
  */
 const customizeAttributorAlign = params => {
-  const { type = 'style', keyName } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleAlign, true);
   } else {
@@ -48110,7 +48150,8 @@ const customizeAttributorAlign = params => {
  * @param {Object} params
  */
 const customizeAttributorDirection = params => {
-  const { type = 'style', keyName } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleDirection, true);
   } else {
@@ -48213,7 +48254,8 @@ var script$40 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48237,7 +48279,8 @@ var script$40 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48271,7 +48314,8 @@ var script$41 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48295,7 +48339,8 @@ var script$41 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48329,7 +48374,8 @@ var script$42 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48353,7 +48399,8 @@ var script$42 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48387,7 +48434,8 @@ var script$43 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48411,7 +48459,8 @@ var script$43 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48445,7 +48494,8 @@ var script$44 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48469,7 +48519,8 @@ var script$44 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48503,7 +48554,8 @@ var script$45 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48527,7 +48579,8 @@ var script$45 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48562,7 +48615,8 @@ var script$46 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48586,7 +48640,8 @@ var script$46 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48621,7 +48676,8 @@ var script$47 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48645,7 +48701,8 @@ var script$47 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48708,7 +48765,8 @@ var script$50 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48732,7 +48790,8 @@ var script$50 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48767,7 +48826,8 @@ var script$51 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48791,7 +48851,8 @@ var script$51 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48826,7 +48887,8 @@ var script$52 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48850,7 +48912,8 @@ var script$52 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -55326,7 +55389,9 @@ var script$32 = function() {
 
   // コンポーネントを更新するための関数。
   // 子コンポーネントに渡されます。
-  this.updater = (requestParameters = {}) => {
+  this.updater = (requestParameters) => {
+    if ( requestParameters === void 0 ) requestParameters = {};
+
     this.isPending = true;
     this.update();
 
@@ -56998,6 +57063,8 @@ var script$61 = function() {
   ));
   this.on('mount', () => {
     this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
+  }).on('updated', () => {
+    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 };
 
@@ -57011,7 +57078,12 @@ var script$62 = function() {
     markedOptions: {}
   };
 
-  this.on('updated', () => {
+  this.on('update', () => {
+    this.descriptionsMarkdown = {
+      content: this.opts.endpoint.description,
+      markedOptions: {}
+    };
+  }).on('updated', () => {
     this.rebindTouchEvents();
   });
 
@@ -60236,6 +60308,65 @@ var script$82 = function() {
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
 
+  this.handleFileChange = e =>{
+    const inputFile = e.target;
+    const file = inputFile.files[0];
+
+    // ファイルを取得出来たか。
+    if (!file) {
+      inputFile.value = null;
+      return;
+    }
+
+    // ファイルがjsonであるか
+    if (file.type !== 'application/json') {
+      store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'JSONファイルを指定してください。',
+        type: 'error'
+      });
+      inputFile.value = null;
+      return;
+    }
+
+    // ファイルをテキストとして読み込む。
+    const reader = new FileReader();
+    reader.readAsText(file);
+
+    // 読み込みが失敗した。
+    reader.onerror = err => {
+      store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'ファイルの読み込みに失敗しました。',
+        error: err
+      });
+      inputFile.value = null;
+    };
+
+    // 読み込みが成功し、完了した。
+    reader.onload = event => {
+      const text = event.target.result;
+
+      // エンドポイント追加処理開始
+      Promise
+        .resolve()
+        .then(() => {
+          const endpoints = JSON.parse(text);
+          return store.action(constants$1.ENDPOINTS_MERGE_ALL, endpoints);
+        })
+        .then(() => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加',
+          message: 'エンドポイントが一覧に追加されました。'
+        }))
+        .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加 失敗',
+          error: err
+        }));
+      // inputしたjsonをリセットする。
+      inputFile.value = null;
+    };
+  };
+
   this.handleOrderMenuItemTap = () => {
     store.action(constants$1.MODALS_ADD, 'dmc-application-order');
   };
@@ -60263,7 +60394,7 @@ var script$82 = function() {
   };
 };
 
-riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 2}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="bars"></dmc-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="close"></dmc-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <dmc-icon type="search"></dmc-icon> </div> <div class="Application__menuItemBody"> <dmc-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></dmc-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
+riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <label class="Application__menuItem Application__menuItem--interactive" for="Application{_riot_id}"> <div class="Application__menuItemIcon"> <dmc-icon type="upload"></dmc-icon> </div> <div class="Application__menuItemBody">アップロード <input class="Application__menuItemInput" type="file" accept="application/json" id="Application{_riot_id}" onchange="{handleFileChange}"> </div> </label> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 2}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="bars"></dmc-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="close"></dmc-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <dmc-icon type="search"></dmc-icon> </div> <div class="Application__menuItemBody"> <dmc-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></dmc-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
     this.external(script$82);
 });
 
