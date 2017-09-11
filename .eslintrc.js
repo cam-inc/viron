@@ -1,5 +1,4 @@
 module.exports = {
-  // 有効にしたい環境を設定
   // 詳細：https://eslint.org/docs/user-guide/configuring#specifying-environments
   "env": {
     // ブラウザのグローバル変数
@@ -7,12 +6,8 @@ module.exports = {
     // モジュールを除くすべてのECMAScript 6機能を有効にする（自動的にecmaVersion parserオプションが6に設定される）
     "es6": true
   },
-  // 有効なルールのセットを基本設定から拡張
-  // recommnendedを追加すると公式(https://eslint.org/docs/rules/)のチェックマークが付いたルールが有効化される
   "extends": "eslint:recommended",
-  // パーサーを指定する事で解析エラーを判別するのに役立つ
   "parserOptions": {
-    // sourceType = sourceCodeがECMAScriptモジュールの場合は "script"（デフォルト）または "module"に設定します。
     "sourceType": "module"
   },
   /** 
@@ -28,6 +23,10 @@ module.exports = {
     /** 
      * Possible Errors
      */
+    // for文の無限ループを許可しない
+    "for-direction": "error",
+    // 不要なカッコを消す。ただし、ネストされた式は例外。例):x = a || (b && c);
+    "no-extra-parens": ["error", "all", { "nestedBinaryExpressions": false }],
     // 必要のないbooleancastの使用でエラーを出さない
     "no-extra-boolean-cast": "off",
     // 関数周りに不要なカッコをつけない
@@ -35,6 +34,16 @@ module.exports = {
     /** 
      * Best Practices
      */
+    // alert, prompt, confirmの使用を許可しない。
+    "no-alert": "error",
+    // eval関数の使用を禁止する
+    "no-eval": "error",
+    // 浮動小数点数を許可しない 例)var num = .5;
+    "no-floating-decimal": "error",
+    // インデントに使用されない行内の複数のスペースを許可しない。
+    "no-multi-spaces": "error",
+    // 自己比較を許可しない 例）x===x
+    "no-self-compare": "error",
     // 不要なエスケープの使用を許可する。正規表現で使用するため。
     "no-useless-escape": "off",
     /** 
@@ -53,8 +62,6 @@ module.exports = {
     /** 
      * ECMAScript 6
      */
-    // 関数本体の周囲に中{}を使用する
-    // "arrow-body-style": ["error", "always"],
     // arrow関数の引数が一つの場合()をつけない。
     "arrow-parens": ["error", "as-needed"],
     // aorrow関数の => の前後にスペースを入れる。
@@ -63,8 +70,6 @@ module.exports = {
     "generator-star-spacing": ["error", {"before": false, "after": true}],
     // 比較を混乱させる矢印機能を禁止する NO：var x = a => 1 ? 2 : 3;　OK：var x = a => { return 1 ? 2 : 3; };
     "no-confusing-arrow": "error",
-    // 同じ場所からのmoduleインポートは一行にまとめる。
-    // "eslint no-duplicate-imports": "error",
     // 計算されたプロパティキーの不必要な使用を許可しない。
     "no-useless-computed-key": "error",
     // 空のコンストラクタを許可しない。
@@ -73,13 +78,7 @@ module.exports = {
     "no-useless-rename": "error",
     // varでの宣言を不可 let or const
     "no-var": "error",
-    // letで割り当てられいるが再定義されていないかのエラーを表示させる。https://eslint.org/docs/rules/prefer-const
-    // "prefer-const": "error",
-    // テンプレートリテラルを使用するように設定
-    // "prefer-template": "error",
-    // importをアルファベット順にソート https://eslint.org/docs/rules/sort-imports
-    // "sort-imports": "error"
     // テンプレート文字列内${}内にスペースを入れないように設定。
-    "template-curly-spacing": "error"
+    "template-curly-spacing": "error",
   }
 };
