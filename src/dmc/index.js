@@ -71,6 +71,8 @@ export default function() {
     }
 
     // ファイルがjsonであるか
+    // Edge v.13環境で`file/type`値が空文字になるため、一時的にtypeチェックをコメントアウトしておく。
+    /*
     if (file.type !== 'application/json') {
       store.action(actions.MODALS_ADD, 'dmc-message', {
         title: 'エンドポイント追加 失敗',
@@ -80,6 +82,7 @@ export default function() {
       inputFile.value = null;
       return;
     }
+    */
 
     // ファイルをテキストとして読み込む。
     const reader = new FileReader();
