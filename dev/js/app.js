@@ -9460,6 +9460,15 @@ var ua$2 = {
    */
   isSafari: context => {
     return !!context.state.ua.safari;
+  },
+
+  /**
+   * Edgeか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isEdge: context => {
+    return !!context.state.ua.edge;
   }
 };
 
@@ -9527,7 +9536,8 @@ const constants$4 = {
   PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
   UA: 'UA',
-  UA_IS_SAFARI: 'UA_IS_SAFARI'
+  UA_IS_SAFARI: 'UA_IS_SAFARI',
+  UA_IS_EDGE: 'UA_IS_EDGE'
 };
 
 var getters = {
@@ -9594,7 +9604,8 @@ var getters = {
   [constants$4.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
   [constants$4.TOASTS]: toasts$2.all,
   [constants$4.UA]: ua$2.all,
-  [constants$4.UA_IS_SAFARI]: ua$2.isSafari
+  [constants$4.UA_IS_SAFARI]: ua$2.isSafari,
+  [constants$4.UA_IS_EDGE]: ua$2.isEdge
 };
 
 var auth = {
@@ -60201,7 +60212,7 @@ var script$85 = function() {
     this.isDroppable = false;
     this.update();
 
-    const endpointKey = e.dataTransfer.getData('endpointKey');
+    const endpointKey = e.dataTransfer.getData('text/plain');
     const newOrder = this.opts.order;
     Promise
       .resolve()
@@ -60221,7 +60232,8 @@ var script$86 = function() {
 
   // ドラッグ開始時の処理。
   this.handleDragStart = e => {
-    e.dataTransfer.setData('endpointKey', this.opts.endpoint.key);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.opts.endpoint.key);
 
     Promise
       .resolve()
@@ -60329,10 +60341,9 @@ var script$82 = function() {
     }
 
     // ファイルがjsonであるか
-    // Edge v.13環境で`file/type`値が空文字になるため、一時的にtypeチェックをコメントアウトしておく。
-    /*
-    if (file.type !== 'application/json') {
-      store.action(actions.MODALS_ADD, 'dmc-message', {
+    // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
+    if (!store.getter(constants$4.UA_IS_EDGE) && file.type !== 'application/json') {
+      store.action(constants$1.MODALS_ADD, 'dmc-message', {
         title: 'エンドポイント追加 失敗',
         message: 'JSONファイルを指定してください。',
         type: 'error'
@@ -60340,7 +60351,6 @@ var script$82 = function() {
       inputFile.value = null;
       return;
     }
-    */
 
     // ファイルをテキストとして読み込む。
     const reader = new FileReader();
