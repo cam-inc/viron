@@ -32,11 +32,15 @@ export default {
       .then(isSignined => {
         // 認証切れ or 非ログ時はTOPに戻す。
         if (!isSignined) {
+          let message = '認証が切れました。再度ログインして下さい。';
+          if (store.getter(getters.UA_IS_SAFARI)) {
+            message = `${message} Safariをお使いの場合は[https://foo.com/swagger.json]のようにリダイレクト先のエンドポイントURLを指定して下さい。`;
+          }
           return Promise
             .resolve()
             .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
               title: '認証切れ',
-              message: '認証が切れました。再度ログインして下さい。'
+              message
             }))
             .then(() => {
               replace('/');
