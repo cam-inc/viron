@@ -21,9 +21,13 @@ module.exports = {
   * 詳細：https://eslint.org/docs/user-guide/configuring#configuring-rules
   * ルール一覧。公式(https://eslint.org/docs/rules/)
   * 配列の最初の項目は、常にルールの重大度（数値または文字列）です。
+  * ルールID
+  * "off" or 0 ルールを無効化する
+  * "warn" or 1 ルールを警告としてオンにします（終了コードには影響しない）
+  * "error" or 2 ルールをエラーとしてオンにします
   */
   "rules": {
-    // 半角スペース2つでインデント。それ以外はエラー。
+    // インデントは半角スペース2つ
     "indent": [
       "error",
       2
@@ -38,21 +42,19 @@ module.exports = {
       "error",
       "always"
     ],
-    // "extends": "eslint:recommended"
-    "no-console": "error",
     // --fixed "extends": "eslint:recommended"
-    "no-debugger": "error",
-    // "extends": "eslint:recommended"
+    // 必要のないbooleancastの使用でエラーを出さない
     "no-extra-boolean-cast": "off",
     // "extends": "eslint:recommended"
+    // 不要なエスケープの使用を許可する。正規表現で使用するため。
     "no-useless-escape": "off",
-    // ブロックの前にスペースが入っていたらエラーを表示させる
+    // ブロック{}の前にスペースが入っていたらエラーを表示させる
     "space-before-blocks": [
       "error",
       "always"
     ],
     // --fixed キーワードの前後に一貫した間隔を適用する
-    // キーワードとはfunctionやifなどのJavaScriptの構文要素
+    // キーワードとは`function`や`if`などのJavaScriptの構文要素
     // https://eslint.org/docs/rules/keyword-spacing
     "keyword-spacing": [
       "error",
