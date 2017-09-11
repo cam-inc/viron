@@ -8439,7 +8439,14 @@ const commonFetch = (context, url, options) => {
       url,
       options
     }))
-    .then(() => fetch(url, options))
+    .then(() => Promise.race([
+      fetch(url, options),
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject('時間がかかり過ぎたため通信を中断しました。');
+        }, 1000 * 5);
+      })
+    ]))
     .then(response => {
       context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
       return response;
