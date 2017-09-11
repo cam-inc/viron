@@ -57,7 +57,7 @@ export default {
     buble({
       target: {
         chrome: 52,
-        edge: 12
+        edge: 13
       }
     })
   ]
