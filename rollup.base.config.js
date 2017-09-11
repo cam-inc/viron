@@ -56,8 +56,8 @@ export default {
     }),
     buble({
       target: {
-        //chrome: 49, firefox: 45, safari: 9, edge: 12, ie: 11
-        chrome: 52
+        chrome: 52,
+        edge: 12
       }
     })
   ]
