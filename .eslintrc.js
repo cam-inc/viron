@@ -64,7 +64,7 @@ module.exports = {
     // 比較を混乱させる矢印機能を禁止する NO：var x = a => 1 ? 2 : 3;　OK：var x = a => { return 1 ? 2 : 3; };
     "no-confusing-arrow": "error",
     // 同じ場所からのmoduleインポートは一行にまとめる。
-    "eslint no-duplicate-imports": "error",
+    // "eslint no-duplicate-imports": "error",
     // 計算されたプロパティキーの不必要な使用を許可しない。
     "no-useless-computed-key": "error",
     // 空のコンストラクタを許可しない。
