@@ -64,5 +64,32 @@ export default {
       .then(() => {
         context.commit(mutations.APPLICATION_DRAG, false);
       });
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストを更新します。
+   * @param {riotx.Context} context
+   * @param {String} newFilterText
+   * @return {Promise}
+   */
+  updateEndpointFilterText: (context, newFilterText) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.APPLICATION_ENDPOINT_FILTER_TEXT, newFilterText);
+      });
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストをリセットします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  resetEndpointFilterText: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.APPLICATION_ENDPOINT_FILTER_TEXT, '');
+      });
   }
 };
