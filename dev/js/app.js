@@ -8443,7 +8443,7 @@ const commonFetch = (context, url, options) => {
       fetch(url, options),
       new Promise((resolve, reject) => {
         setTimeout(() => {
-          reject('時間がかかり過ぎたため通信を中断しました。');
+          reject(new Error('時間がかかり過ぎたため通信を中断しました。'));
         }, 1000 * 5);
       })
     ]))
