@@ -77,7 +77,8 @@ const constants = {
   PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
   UA: 'UA',
-  UA_IS_SAFARI: 'UA_IS_SAFARI'
+  UA_IS_SAFARI: 'UA_IS_SAFARI',
+  UA_IS_EDGE: 'UA_IS_EDGE'
 };
 
 export default {
@@ -144,7 +145,8 @@ export default {
   [constants.PAGE_COMPONENTS_COUNT]: page.componentsCount,
   [constants.TOASTS]: toasts.all,
   [constants.UA]: ua.all,
-  [constants.UA_IS_SAFARI]: ua.isSafari
+  [constants.UA_IS_SAFARI]: ua.isSafari,
+  [constants.UA_IS_EDGE]: ua.isEdge
 };
 
 export {

@@ -15,5 +15,14 @@ export default {
    */
   isSafari: context => {
     return !!context.state.ua.safari;
+  },
+
+  /**
+   * Edgeか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isEdge: context => {
+    return !!context.state.ua.edge;
   }
 };
