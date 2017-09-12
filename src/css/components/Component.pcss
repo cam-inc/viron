@@ -79,6 +79,13 @@
   padding: 16px;
 }
 
+/* Safari v10以下ではflex_itemに対してheight:100%が効かないバグ有り。*/
+/* Safari v11ではbugが解消されている。 */
+/* Safari v11が正式リリースされるまでの一時対応として以下のスタイルを適用する。 */
+.Component__body .graphical-report__layout {
+  display: block;
+}
+
 .Component__body .ComponentTable {
   width: 100%;
 }
