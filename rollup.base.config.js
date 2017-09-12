@@ -11,7 +11,7 @@ const mout = require('mout');
 let namedExports = {};
 mout.object.forOwn(mout, (v,k) => {
 
-  if(!mout.lang.isObject(v)) {
+  if (!mout.lang.isObject(v)) {
     return;
   }
 
@@ -29,13 +29,15 @@ mout.object.forOwn(mout, (v,k) => {
 
 // @see https://github.com/rollup/rollup/wiki/JavaScript-API
 export default {
-  entry: 'src/app.js',
-  dest: 'dist/js/app.js',
-  sourceMap: false,
-  exports: 'none',
-  format: 'iife',
-  useStrict: false,
-  context: 'window',
+  input: 'src/app.js',
+  output: {
+    file: 'dist/js/app.js',
+    sourcemap: false,
+    exports: 'none',
+    format: 'iife',
+    strict: false,
+    context: 'window',
+  },
   plugins: [
     builtins(),
     json(),
@@ -60,5 +62,8 @@ export default {
         edge: 13
       }
     })
-  ]
+  ],
+  moduleContext: {
+    'node_modules/whatwg-fetch/fetch.js': 'this'
+  },
 };
