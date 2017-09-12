@@ -7945,7 +7945,7 @@ var endpoints$1 = {
   mergeAll: (context, endpoints) => {
     let modifiedEndpoints = objectAssign({}, context.state.endpoints);
 
-    forOwn_1$1(endpoints, (endpoint) => {
+    forOwn_1$1(endpoints, endpoint => {
       let duplicatedEndpoint = find_1$1(modifiedEndpoints, val => {
         return endpoint.url === val.url;
       });
@@ -10633,7 +10633,7 @@ var components$3 = {
       if (!!token) {
         context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
       }
-       // `component.pagination`からページングをサポートしているか判断する。
+      // `component.pagination`からページングをサポートしているか判断する。
       // サポートしていれば手動でページング情報を付加する。
       let hasPagination = false;
       let pagination;
@@ -10779,7 +10779,7 @@ var dmc$3 = {
     return Promise
       .resolve()
       .then(() => api({}, {
-        requestInterceptor: (req) => {
+        requestInterceptor: req => {
           req.headers['Authorization'] = token;
         }
       }))
@@ -41879,7 +41879,7 @@ var script$17 = function() {
     break;
   }
 
-  this.handleDetailPat = ()  => {
+  this.handleDetailPat = () => {
     store.action(constants$1.MODALS_ADD, 'dmc-prettyprint', {
       data : this.opts.data.cell
     });
@@ -41964,7 +41964,7 @@ var script$19 = function() {
   this.isTooltipVisible = false;
 
   this.getFilteredItems = () => {
-    const items =  this.sortedItems;
+    const items = this.sortedItems;
     const columns = this.opts.selectedtablecolumns;
     if (!isArray_1$1(columns) || !columns.length) {
       return items;
@@ -54686,22 +54686,22 @@ const format$1 = (value, constraints) => {
       return result;
     }
 
-    if(value.match(/::/)) {
+    if (value.match(/::/)) {
       let targetColon = 7;
       // IPv4互換バージョンを使用している場合、ターゲット番号は：6
-      if(value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
+      if (value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
         targetColon = 6;
       }
 
       // ipv6の形を成形する
-      if(value.match(/^::/)) {
+      if (value.match(/^::/)) {
         value = value.replace('::', '0::');
       }
-      if(value.match(/::$/)) {
+      if (value.match(/::$/)) {
         value = value.replace('::', '::0');
       }
 
-      while(value.match(/:/g).length < targetColon) {
+      while (value.match(/:/g).length < targetColon) {
         value = value.replace('::', ':0::');
       }
 
@@ -54714,7 +54714,7 @@ const format$1 = (value, constraints) => {
       /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
     ];
     let matchResult = false;
-    forEach_1(patterns, (pattern) => {
+    forEach_1(patterns, pattern => {
       const isMatch = value.match(pattern);
       if (!isNull_1(isMatch)) {
         matchResult = true;
@@ -54748,11 +54748,11 @@ const format$1 = (value, constraints) => {
 
     break;
   }
-    /*
+  /*
   case 'todo: custom format here':
     // TODO: 独自フォーマットがあればここに。
     break;
-    */
+  */
   default:
     break;
   }
@@ -57019,9 +57019,9 @@ renderer.del = text => {
   return `<span class="Markdown__delete">${text}</span>`;
 },
 renderer.list = (body, ordered) => {
-  if(ordered){
+  if (ordered) {
     return `<ol class="Markdown__list Markdown__list--ordered">${body}</ol>`;
-  }else{
+  } else {
     return `<ul class="Markdown__list Markdown__list--unordered">${body}</ul>`;
   }
 },
@@ -57047,16 +57047,16 @@ renderer.blockquote = quote => {
   return `<div class="Markdown__blockquote">${quote}</div>`;
 },
 renderer.link = (href, title, text) => {
-  if(title){
+  if (title) {
     return `<a class="Markdown__link" href="${href}" title="${title}">${text}</a>`;
-  }else{
+  } else {
     return `<a class="Markdown__link" href="${href}">${text}</a>`;
   }
 },
 renderer.image = (href, title, text) => {
-  if(title){
+  if (title) {
     return `<img class="Markdown__image" src="${href}" alt="${text}" title="${title}"></img>`;
-  }else{
+  } else {
     return `<img class="Markdown__image" src="${href}" alt="${text}"></img>`;
   }
 },
@@ -57067,9 +57067,9 @@ renderer.tablerow = content => {
   return `<tr class="Markdown__tableRow">${content}</tr>`;
 },
 renderer.tablecell = (content, flags) => {
-  if(flags.header){
+  if (flags.header) {
     return `<th class="Markdown__tableHeader">${content}</th>`;
-  }else{
+  } else {
     return `<td class="Markdown__tableCell Markdown__tableCell--${flags.align}">${content}</td>`;
   }
 };
@@ -57088,6 +57088,7 @@ var script$61 = function() {
     },
     this.opts.data.markedOptions
   ));
+
   this.on('mount', () => {
     this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   }).on('updated', () => {
@@ -60337,7 +60338,7 @@ var script$82 = function() {
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
 
-  this.handleFileChange = e =>{
+  this.handleFileChange = e => {
     const inputFile = e.target;
     const file = inputFile.files[0];
 
