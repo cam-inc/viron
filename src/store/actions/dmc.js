@@ -21,7 +21,7 @@ export default {
     return Promise
       .resolve()
       .then(() => api({}, {
-        requestInterceptor: (req) => {
+        requestInterceptor: req => {
           req.headers['Authorization'] = token;
         }
       }))

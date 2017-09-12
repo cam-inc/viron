@@ -30,7 +30,7 @@ export default function() {
     this.rebindTouchEvents();
   });
 
-  const format = (date) => {
+  const format = date => {
     return date.format('YYYY-MM-DD');
   };
 
@@ -40,7 +40,7 @@ export default function() {
     const currentDirstDate = this.displayDate.clone().date(1);
     const displayFirstDate = currentDirstDate.clone().subtract(currentDirstDate.day(), 'days');
 
-    times(MAX_DISPLAY_DAYS, (i) => {
+    times(MAX_DISPLAY_DAYS, i => {
       const date = displayFirstDate.clone().add(i, 'days');
       calendar[i] = {
         'date': date,
@@ -54,7 +54,7 @@ export default function() {
   };
 
   this.handleNextButtonPat = () => {
-    const newDateText =  format(this.displayDate.add(1, 'month'));
+    const newDateText = format(this.displayDate.add(1, 'month'));
     this.opts.ondisplaychange(newDateText);
   };
 
@@ -63,7 +63,7 @@ export default function() {
     this.opts.ondisplaychange(newDateText);
   };
 
-  this.handleCellPat = (newDate) => {
+  this.handleCellPat = newDate => {
     this.opts.onchange(format(newDate));
   };
 

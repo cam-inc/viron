@@ -70,7 +70,7 @@ export default function () {
 
     if (colorCode === COLOR_CODE.HEX) {
       colorObj = (isHex(colorValue)) ? tinycolor(colorValue) : tinycolor(lastValidColor);
-    } else if(colorCode === COLOR_CODE.HSV) {
+    } else if (colorCode === COLOR_CODE.HSV) {
       colorObj = tinycolor(`hsv(${colorValue.h}, ${colorValue.s}%, ${colorValue.v}%)`);
     } else {
       colorObj = tinycolor(colorValue);
@@ -513,7 +513,7 @@ export default function () {
    * 色相スライダーのイベントリスナーハンドラー
    * スライダーを移動したとき色相値を取得します。
    */
-  this.handleHueSliderChange = (hue) => {
+  this.handleHueSliderChange = hue => {
     const hsv = convertColor(this.color.format, this.color.value, COLOR_CODE.HSV);
     hsv.h = hue;
     hsv.s = Math.round(hsv.s * 100);
@@ -531,7 +531,7 @@ export default function () {
    * 透明度スライダーのイベントリスナーハンドラー
    * スライダーを移動したとき透明度を取得します。
    */
-  this.handleAlphaSliderChange = (alpha) => {
+  this.handleAlphaSliderChange = alpha => {
     const color = objectAssign({},this.color);
     if (this.color.format !== COLOR_CODE.RGBA) {
       color.format = COLOR_CODE.RGBA;

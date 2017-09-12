@@ -43,7 +43,7 @@ export default {
       if (!!token) {
         context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
       }
-       // `component.pagination`からページングをサポートしているか判断する。
+      // `component.pagination`からページングをサポートしているか判断する。
       // サポートしていれば手動でページング情報を付加する。
       let hasPagination = false;
       let pagination;

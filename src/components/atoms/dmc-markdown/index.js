@@ -19,9 +19,9 @@ renderer.del = text => {
   return `<span class="Markdown__delete">${text}</span>`;
 },
 renderer.list = (body, ordered) => {
-  if(ordered){
+  if (ordered) {
     return `<ol class="Markdown__list Markdown__list--ordered">${body}</ol>`;
-  }else{
+  } else {
     return `<ul class="Markdown__list Markdown__list--unordered">${body}</ul>`;
   }
 },
@@ -47,16 +47,16 @@ renderer.blockquote = quote => {
   return `<div class="Markdown__blockquote">${quote}</div>`;
 },
 renderer.link = (href, title, text) => {
-  if(title){
+  if (title) {
     return `<a class="Markdown__link" href="${href}" title="${title}">${text}</a>`;
-  }else{
+  } else {
     return `<a class="Markdown__link" href="${href}">${text}</a>`;
   }
 },
 renderer.image = (href, title, text) => {
-  if(title){
+  if (title) {
     return `<img class="Markdown__image" src="${href}" alt="${text}" title="${title}"></img>`;
-  }else{
+  } else {
     return `<img class="Markdown__image" src="${href}" alt="${text}"></img>`;
   }
 },
@@ -67,9 +67,9 @@ renderer.tablerow = content => {
   return `<tr class="Markdown__tableRow">${content}</tr>`;
 },
 renderer.tablecell = (content, flags) => {
-  if(flags.header){
+  if (flags.header) {
     return `<th class="Markdown__tableHeader">${content}</th>`;
-  }else{
+  } else {
     return `<td class="Markdown__tableCell Markdown__tableCell--${flags.align}">${content}</td>`;
   }
 };
@@ -88,6 +88,7 @@ export default function() {
     },
     this.opts.data.markedOptions
   ));
+
   this.on('mount', () => {
     this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   }).on('updated', () => {
