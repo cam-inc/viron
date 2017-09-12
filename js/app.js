@@ -1,54 +1,4 @@
 (function () {
-var UNDEF;
-
-    /**
-     * Parses string and convert it into a native value.
-     */
-    function typecast(val) {
-        var r;
-        if ( val === null || val === 'null' ) {
-            r = null;
-        } else if ( val === 'true' ) {
-            r = true;
-        } else if ( val === 'false' ) {
-            r = false;
-        } else if ( val === UNDEF || val === 'undefined' ) {
-            r = UNDEF;
-        } else if ( val === '' || isNaN(val) ) {
-            //isNaN('') returns false
-            r = val;
-        } else {
-            //parseFloat(null || '') returns NaN
-            r = parseFloat(val);
-        }
-        return r;
-    }
-
-    var typecast_1 = typecast;
-
-/**
-     * Gets full query as string with all special chars decoded.
-     */
-    function getQuery(url) {
-        // url = url.replace(/#.*\?/, '?'); //removes hash (to avoid getting hash query)
-        var queryString = /\?[a-zA-Z0-9\=\&\%\$\-\_\.\+\!\*\'\(\)\,]+/.exec(url); //valid chars according to: http://www.ietf.org/rfc/rfc1738.txt
-        return (queryString)? decodeURIComponent(queryString[0].replace(/\+/g,' ')) : '';
-    }
-
-    var getQuery_1 = getQuery;
-
-/**
-     * Get query parameter value.
-     */
-    function getParam(url, param, shouldTypecast){
-        var regexp = new RegExp('(\\?|&)'+ param + '=([^&]*)'), //matches `?param=value` or `&param=value`, value = $2
-            result = regexp.exec( getQuery_1(url) ),
-            val = (result && result[2])? result[2] : null;
-        return shouldTypecast === false? val : typecast_1(val);
-    }
-
-    var getParam_1 = getParam;
-
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 
@@ -3129,7 +3079,7 @@ var _dontEnums;
 
 var _rKind = /^\[object (.*)\]$/;
 var _toString = Object.prototype.toString;
-var UNDEF$1;
+var UNDEF;
 
     /**
      * Gets the "kind" of value. (e.g. "String", "Number", etc)
@@ -3137,7 +3087,7 @@ var UNDEF$1;
     function kindOf(val) {
         if (val === null) {
             return 'Null';
-        } else if (val === UNDEF$1) {
+        } else if (val === UNDEF) {
             return 'Undefined';
         } else {
             return _rKind.exec( _toString.call(val) )[1];
@@ -6781,7 +6731,7 @@ var _dontEnums$1;
 
 var _rKind$1 = /^\[object (.*)\]$/;
 var _toString$1 = Object.prototype.toString;
-var UNDEF$2;
+var UNDEF$1;
 
     /**
      * Gets the "kind" of value. (e.g. "String", "Number", etc)
@@ -6789,7 +6739,7 @@ var UNDEF$2;
     function kindOf$1(val) {
         if (val === null) {
             return 'Null';
-        } else if (val === UNDEF$2) {
+        } else if (val === UNDEF$1) {
             return 'Undefined';
         } else {
             return _rKind$1.exec( _toString$1.call(val) )[1];
@@ -7014,7 +6964,11 @@ var application$2 = {
   // 通信中のAPI群。
   networkings: [],
   // 通信中か否か(i.e. 一つでも通信中のAPIが存在するか?)
-  isNetworking: false
+  isNetworking: false,
+  // ドラッグ中か否か。
+  isDragging: false,
+  // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
+  endpointFilterText: ''
 };
 
 // 選択された`page`に関する`component`群。
@@ -7253,8 +7207,6 @@ var oas = {
   client: null
 };
 
-var oauthEndpointKey = store.get('oauth_endpoint_key', null);
-
 // 選択中の`page`情報。
 // `page` = 左メニュー(dmc)の一要素。
 var page = null;
@@ -7279,7 +7231,6 @@ const constants$3 = {
   LAYOUT: 'LAYOUT',
   LOCATION: 'LOCATION',
   MODALS: 'MODALS',
-  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   SIGNIN_SHOW_KEY: 'SIGNIN_SHOW_KEY',
   TOASTS: 'TOASTS',
@@ -7297,7 +7248,6 @@ var states = {
   layout,
   location: location$1,
   modals,
-  oauthEndpointKey,
   page,
   signinShowKey,
   toasts,
@@ -7354,6 +7304,28 @@ var application$1 = {
     if (!context.state.application.networkings.length) {
       context.state.application.isNetworking = false;
     }
+    return [constants$3.APPLICATION];
+  },
+
+  /**
+   * ドラッグステータスを変更します。
+   * @param {riotx.Context} context
+   * @param {Boolean} bool
+   * @return {Array}
+   */
+  drag: (context, bool) => {
+    context.state.application.isDragging = bool;
+    return [constants$3.APPLICATION];
+  },
+
+  /**
+   * エンドポイント用のフィルターテキストを更新します。
+   * @param {riotx.Context} context
+   * @param {String} newFilterText
+   * @return {Array}
+   */
+  endpointFilterText: (context, newFilterText) => {
+    context.state.application.endpointFilterText = newFilterText;
     return [constants$3.APPLICATION];
   }
 };
@@ -7428,7 +7400,10 @@ var drawers$1 = {
    * @param {Object} drawerOpts
    * @return {Array}
    */
-  add: (context, tagName, tagOpts = {}, drawerOpts = {}) => {
+  add: (context, tagName, tagOpts, drawerOpts) => {
+    if ( tagOpts === void 0 ) tagOpts = {};
+    if ( drawerOpts === void 0 ) drawerOpts = {};
+
     context.state.drawers.push({
       id: `drawer_${Date.now()}`,
       tagName,
@@ -7452,6 +7427,435 @@ var drawers$1 = {
   }
 };
 
+/**
+     * Merge sort (http://en.wikipedia.org/wiki/Merge_sort)
+     */
+    function mergeSort$1(arr, compareFn) {
+        if (arr == null) {
+            return [];
+        } else if (arr.length < 2) {
+            return arr;
+        }
+
+        if (compareFn == null) {
+            compareFn = defaultCompare$1;
+        }
+
+        var mid, left, right;
+
+        mid   = ~~(arr.length / 2);
+        left  = mergeSort$1( arr.slice(0, mid), compareFn );
+        right = mergeSort$1( arr.slice(mid, arr.length), compareFn );
+
+        return merge$1(left, right, compareFn);
+    }
+
+    function defaultCompare$1(a, b) {
+        return a < b ? -1 : (a > b? 1 : 0);
+    }
+
+    function merge$1(left, right, compareFn) {
+        var result = [];
+
+        while (left.length && right.length) {
+            if (compareFn(left[0], right[0]) <= 0) {
+                // if 0 it should preserve same order (stable)
+                result.push(left.shift());
+            } else {
+                result.push(right.shift());
+            }
+        }
+
+        if (left.length) {
+            result.push.apply(result, left);
+        }
+
+        if (right.length) {
+            result.push.apply(result, right);
+        }
+
+        return result;
+    }
+
+    var sort$1 = mergeSort$1;
+
+/*
+     * Sort array by the result of the callback
+     */
+    function sortBy$1(arr, callback, context){
+        callback = makeIterator_$1(callback, context);
+
+        return sort$1(arr, function(a, b) {
+            a = callback(a);
+            b = callback(b);
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        });
+    }
+
+    var sortBy_1$1 = sortBy$1;
+
+/**
+     */
+    function isNumber(val) {
+        return isKind_1$1(val, 'Number');
+    }
+    var isNumber_1 = isNumber;
+
+/**
+     * Object some
+     */
+    function some$1(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var result = false;
+        forOwn_1$1(obj, function(val, key) {
+            if (callback(val, key, obj)) {
+                result = true;
+                return false; // break
+            }
+        });
+        return result;
+    }
+
+    var some_1$1 = some$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$1(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var result;
+        some_1$1(obj, function(value, key, obj) {
+            if (callback(value, key, obj)) {
+                result = value;
+                return true; //break
+            }
+        });
+        return result;
+    }
+
+    var find_1$1 = find$1;
+
+// Found this seed-based random generator somewhere
+// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
+
+var seed = 1;
+
+/**
+ * return a random number based on a seed
+ * @param seed
+ * @returns {number}
+ */
+function getNextValue() {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed/(233280.0);
+}
+
+function setSeed$1(_seed_) {
+    seed = _seed_;
+}
+
+var randomFromSeed = {
+    nextValue: getNextValue,
+    seed: setSeed$1
+};
+
+var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
+var alphabet;
+var previousSeed;
+
+var shuffled;
+
+function reset() {
+    shuffled = false;
+}
+
+function setCharacters(_alphabet_) {
+    if (!_alphabet_) {
+        if (alphabet !== ORIGINAL) {
+            alphabet = ORIGINAL;
+            reset();
+        }
+        return;
+    }
+
+    if (_alphabet_ === alphabet) {
+        return;
+    }
+
+    if (_alphabet_.length !== ORIGINAL.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
+    }
+
+    var unique = _alphabet_.split('').filter(function(item, ind, arr){
+       return ind !== arr.lastIndexOf(item);
+    });
+
+    if (unique.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
+    }
+
+    alphabet = _alphabet_;
+    reset();
+}
+
+function characters(_alphabet_) {
+    setCharacters(_alphabet_);
+    return alphabet;
+}
+
+function setSeed(seed) {
+    randomFromSeed.seed(seed);
+    if (previousSeed !== seed) {
+        reset();
+        previousSeed = seed;
+    }
+}
+
+function shuffle$1() {
+    if (!alphabet) {
+        setCharacters(ORIGINAL);
+    }
+
+    var sourceArray = alphabet.split('');
+    var targetArray = [];
+    var r = randomFromSeed.nextValue();
+    var characterIndex;
+
+    while (sourceArray.length > 0) {
+        r = randomFromSeed.nextValue();
+        characterIndex = Math.floor(r * sourceArray.length);
+        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
+    }
+    return targetArray.join('');
+}
+
+function getShuffled() {
+    if (shuffled) {
+        return shuffled;
+    }
+    shuffled = shuffle$1();
+    return shuffled;
+}
+
+/**
+ * lookup shuffled letter
+ * @param index
+ * @returns {string}
+ */
+function lookup(index) {
+    var alphabetShuffled = getShuffled();
+    return alphabetShuffled[index];
+}
+
+var alphabet_1 = {
+    characters: characters,
+    seed: setSeed,
+    lookup: lookup,
+    shuffled: getShuffled
+};
+
+var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
+
+function randomByte() {
+    if (!crypto || !crypto.getRandomValues) {
+        return Math.floor(Math.random() * 256) & 0x30;
+    }
+    var dest = new Uint8Array(1);
+    crypto.getRandomValues(dest);
+    return dest[0] & 0x30;
+}
+
+var randomByteBrowser = randomByte;
+
+function encode(lookup, number) {
+    var loopCounter = 0;
+    var done;
+
+    var str = '';
+
+    while (!done) {
+        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByteBrowser() );
+        done = number < (Math.pow(16, loopCounter + 1 ) );
+        loopCounter++;
+    }
+    return str;
+}
+
+var encode_1 = encode;
+
+/**
+ * Decode the id to get the version and worker
+ * Mainly for debugging and testing.
+ * @param id - the shortid-generated id.
+ */
+function decode(id) {
+    var characters = alphabet_1.shuffled();
+    return {
+        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
+        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
+    };
+}
+
+var decode_1 = decode;
+
+// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
+// This number should be updated every year or so to keep the generated id short.
+// To regenerate `new Date() - 0` and bump the version. Always bump the version!
+var REDUCE_TIME = 1459707606518;
+
+// don't change unless we change the algos or REDUCE_TIME
+// must be an integer and less than 16
+var version = 6;
+
+// Counter is used when shortid is called multiple times in one second.
+var counter;
+
+// Remember the last time shortid was called in case counter is needed.
+var previousSeconds;
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function build(clusterWorkerId) {
+
+    var str = '';
+
+    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
+
+    if (seconds === previousSeconds) {
+        counter++;
+    } else {
+        counter = 0;
+        previousSeconds = seconds;
+    }
+
+    str = str + encode_1(alphabet_1.lookup, version);
+    str = str + encode_1(alphabet_1.lookup, clusterWorkerId);
+    if (counter > 0) {
+        str = str + encode_1(alphabet_1.lookup, counter);
+    }
+    str = str + encode_1(alphabet_1.lookup, seconds);
+
+    return str;
+}
+
+var build_1 = build;
+
+function isShortId(id) {
+    if (!id || typeof id !== 'string' || id.length < 6 ) {
+        return false;
+    }
+
+    var characters = alphabet_1.characters();
+    var len = id.length;
+    for(var i = 0; i < len;i++) {
+        if (characters.indexOf(id[i]) === -1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+var isValid = isShortId;
+
+var clusterWorkerIdBrowser = 0;
+
+var lib = createCommonjsModule(function (module) {
+'use strict';
+
+
+
+
+
+
+
+// if you are using cluster or multiple servers use this to make each instance
+// has a unique value for worker
+// Note: I don't know if this is automatically set when using third
+// party cluster solutions such as pm2.
+var clusterWorkerId = clusterWorkerIdBrowser || 0;
+
+/**
+ * Set the seed.
+ * Highly recommended if you don't want people to try to figure out your id schema.
+ * exposed as shortid.seed(int)
+ * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
+ */
+function seed(seedValue) {
+    alphabet_1.seed(seedValue);
+    return module.exports;
+}
+
+/**
+ * Set the cluster worker or machine id
+ * exposed as shortid.worker(int)
+ * @param workerId worker must be positive integer.  Number less than 16 is recommended.
+ * returns shortid module so it can be chained.
+ */
+function worker(workerId) {
+    clusterWorkerId = workerId;
+    return module.exports;
+}
+
+/**
+ *
+ * sets new characters to use in the alphabet
+ * returns the shuffled alphabet
+ */
+function characters(newCharacters) {
+    if (newCharacters !== undefined) {
+        alphabet_1.characters(newCharacters);
+    }
+
+    return alphabet_1.shuffled();
+}
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function generate() {
+  return build_1(clusterWorkerId);
+}
+
+// Export all other functions as properties of the generate function
+module.exports = generate;
+module.exports.generate = generate;
+module.exports.seed = seed;
+module.exports.worker = worker;
+module.exports.characters = characters;
+module.exports.decode = decode_1;
+module.exports.isValid = isValid;
+});
+
+var shortid = lib;
+
+/**
+ * 受け取ったエンドポイント群をきれいに並び替えます。
+ * order値が存在しない場合は後方に配置されます。
+ * @param {Object} endpoints
+ * @return {Object}
+ */
+const putEndpointsInOrder = endpoints => {
+  // どのorder値よりも大きいであろう適当な値。
+  const bigNumber = 9999;
+  let ordered = [];
+  forOwn_1$1(endpoints, (endpoint, key) => {
+    ordered.push({
+      key,
+      order: (isNumber_1(endpoint.order) ? endpoint.order : bigNumber)
+    });
+  });
+  ordered = sortBy_1$1(ordered, obj => {
+    return obj.order;
+  });
+  forEach_1(ordered, (obj, order) => {
+    endpoints[obj.key].order = order;
+  });
+  return endpoints;
+};
+
 var endpoints$1 = {
   /**
    * 1件のエンドポイントを追加します。
@@ -7461,7 +7865,15 @@ var endpoints$1 = {
    * @return {Array}
    */
   add: (context, endpointKey, endpoint) => {
-    context.state.endpoints[endpointKey] = endpoint;
+    // order値が指定されていなければ自動的に設定する。
+    if (!isNumber_1(endpoint.order)) {
+      // リストの先頭に配置するために意図的にマイナス値を付与。
+      endpoint.order = -1;
+    }
+    let newEndpoints = objectAssign({}, context.state.endpoints);
+    newEndpoints[endpointKey] = endpoint;
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    context.state.endpoints = newEndpoints;
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
   },
@@ -7473,7 +7885,10 @@ var endpoints$1 = {
    * @return {Array}
    */
   remove: (context, endpointKey) => {
-    delete context.state.endpoints[endpointKey];
+    let newEndpoints = objectAssign({}, context.state.endpoints);
+    delete newEndpoints[endpointKey];
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    context.state.endpoints = newEndpoints;
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
   },
@@ -7514,7 +7929,9 @@ var endpoints$1 = {
    * @return {Array}
    */
   updateToken: (context, endpointKey, token) => {
-    context.state.endpoints[endpointKey].token = token;
+    if (!!context.state.endpoints[endpointKey]) {
+      context.state.endpoints[endpointKey].token = token;
+    }
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
   },
@@ -7526,8 +7943,53 @@ var endpoints$1 = {
    * @return {Array}
    */
   mergeAll: (context, endpoints) => {
-    const currentEndpoints = context.state.endpoints;
-    const newEndpoints = objectAssign({}, currentEndpoints, endpoints);
+    let modifiedEndpoints = objectAssign({}, context.state.endpoints);
+
+    forOwn_1$1(endpoints, endpoint => {
+      let duplicatedEndpoint = find_1$1(modifiedEndpoints, val => {
+        return endpoint.url === val.url;
+      });
+
+      if (!duplicatedEndpoint) {
+        const key = shortid.generate();
+        modifiedEndpoints[key] = endpoint;
+      } else {
+        objectAssign(duplicatedEndpoint, endpoint);
+      }
+    });
+
+    modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
+    context.state.endpoints = modifiedEndpoints;
+    store.set('endpoints', modifiedEndpoints);
+    return [constants$3.ENDPOINTS];
+  },
+
+  /**
+   * エンドポイント群のorder値を整理します。
+   * order値が存在しない場合は後方に配置されます。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  tidyUpOrder: context => {
+    const newEndpoints = putEndpointsInOrder(objectAssign(context.state.endpoints));
+    context.state.endpoints = newEndpoints;
+    store.set('endpoints', newEndpoints);
+    return [constants$3.ENDPOINTS];
+  },
+
+  /**
+   * 指定されたエンドポイントのorder値を変更します。
+   * 他エンドポイントのorder値もインクリメントされます。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Number} newOrder
+   * @return {Array}
+   */
+  changeOrder: (context, endpointKey, newOrder) => {
+    let newEndpoints = objectAssign(context.state.endpoints);
+    // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
+    newEndpoints[endpointKey].order = newOrder - 0.5;
+    newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
     store.set('endpoints', newEndpoints);
     return [constants$3.ENDPOINTS];
@@ -7591,7 +8053,10 @@ var modals$1 = {
    * @param {Object} modalOpts
    * @return {Array}
    */
-  add: (context, tagName, tagOpts = {}, modalOpts = {}) => {
+  add: (context, tagName, tagOpts, modalOpts) => {
+    if ( tagOpts === void 0 ) tagOpts = {};
+    if ( modalOpts === void 0 ) modalOpts = {};
+
     context.state.modals.push({
       id: `modal_${Date.now()}`,
       tagName,
@@ -7635,19 +8100,6 @@ var oas$1 = {
   clearClient: context => {
     context.state.oas.client = null;
     return [constants$3.OAS];
-  }
-};
-
-var oauthEndpointKey$1 = {
-  /**
-   * OAuth認証中のエンドポイントkeyを変更します。
-   * @param {riotx.Context} context
-   * @param {String|null} endpointKey
-   * @return {Array}
-   */
-  all: (context, endpointKey) => {
-    context.state.oauthEndpointKey = store.set('oauth_endpoint_key', endpointKey);
-    return [constants$3.OAUTHENDPOINTKEY];
   }
 };
 
@@ -7725,6 +8177,8 @@ const constants$2 = {
   APPLICATION_NAVIGATION: 'APPLICATION_NAVIGATION',
   APPLICATION_NETWORKINGS_ADD: 'APPLICATION_NETWORKINGS_ADD',
   APPLICATION_NETWORKINGS_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
+  APPLICATION_DRAG: 'APPLICATION_DRAG',
+  APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS_UPDATE_ONE: 'COMPONENTS_UPDATE_ONE',
   COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
   COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
@@ -7738,6 +8192,8 @@ const constants$2 = {
   ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
   ENDPOINTS_UPDATE_TOKEN: 'ENDPOINTS_UPDATE_TOKEN',
   ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
+  ENDPOINTS_TIDY_UP_ORDER: 'ENDPOINTS_TIDY_UP_ORDER',
+  ENDPOINTS_CHANGE_ORDER: 'ENDPOINTS_CHANGE_ORDER',
   LAYOUT_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION: 'LOCATION',
   LOCATION_NAME: 'LOCATION_NAME',
@@ -7746,7 +8202,6 @@ const constants$2 = {
   MODALS_REMOVE: 'MODALS_REMOVE',
   OAS_CLIENT: 'OAS_CLIENT',
   OAS_CLIENT_CLEAR: 'OAS_CLIENT_CLEAR',
-  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   TOASTS_ADD: 'TOASTS_ADD',
   TOASTS_REMOVE: 'TOASTS_REMOVE',
@@ -7758,6 +8213,8 @@ var mutations = {
   [constants$2.APPLICATION_NAVIGATION]: application$1.navigation,
   [constants$2.APPLICATION_NETWORKINGS_ADD]: application$1.addNetworking,
   [constants$2.APPLICATION_NETWORKINGS_REMOVE]: application$1.removeNetworking,
+  [constants$2.APPLICATION_DRAG]: application$1.drag,
+  [constants$2.APPLICATION_ENDPOINT_FILTER_TEXT]: application$1.endpointFilterText,
   [constants$2.COMPONENTS_UPDATE_ONE]: components$1.updateOne,
   [constants$2.COMPONENTS_REMOVE_ONE]: components$1.removeOne,
   [constants$2.COMPONENTS_REMOVE_ALL]: components$1.removeAll,
@@ -7771,6 +8228,8 @@ var mutations = {
   [constants$2.ENDPOINTS_UPDATE]: endpoints$1.update,
   [constants$2.ENDPOINTS_UPDATE_TOKEN]: endpoints$1.updateToken,
   [constants$2.ENDPOINTS_MERGE_ALL]: endpoints$1.mergeAll,
+  [constants$2.ENDPOINTS_TIDY_UP_ORDER]: endpoints$1.tidyUpOrder,
+  [constants$2.ENDPOINTS_CHANGE_ORDER]: endpoints$1.changeOrder,
   [constants$2.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout$1.updateComponentsGridColumnCount,
   [constants$2.LOCATION]: location$2.all,
   [constants$2.LOCATION_NAME]: location$2.name,
@@ -7779,7 +8238,6 @@ var mutations = {
   [constants$2.MODALS_REMOVE]: modals$1.remove,
   [constants$2.OAS_CLIENT]: oas$1.client,
   [constants$2.OAS_CLIENT_CLEAR]: oas$1.clearClient,
-  [constants$2.OAUTH_ENDPOINT_KEY]: oauthEndpointKey$1.all,
   [constants$2.PAGE]: page$1.all,
   [constants$2.TOASTS_ADD]: toasts$1.add,
   [constants$2.TOASTS_REMOVE]: toasts$1.remove,
@@ -7823,6 +8281,59 @@ var application = {
       .resolve()
       .then(() => {
         context.commit(constants$2.APPLICATION_NAVIGATION, false);
+      });
+  },
+
+  /**
+   * ドラッグ状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  startDrag: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_DRAG, true);
+      });
+  },
+
+  /**
+   * ドラッグ完了状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  endDrag: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_DRAG, false);
+      });
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストを更新します。
+   * @param {riotx.Context} context
+   * @param {String} newFilterText
+   * @return {Promise}
+   */
+  updateEndpointFilterText: (context, newFilterText) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_ENDPOINT_FILTER_TEXT, newFilterText);
+      });
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストをリセットします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  resetEndpointFilterText: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_ENDPOINT_FILTER_TEXT, '');
       });
   }
 };
@@ -7899,7 +8410,8 @@ const commonFetch = (context, url, options) => {
     headers: {
       // 何も指定しない場合はこれをデフォルトにする。
       'Content-Type': 'application/json'
-    }
+    },
+    cache: 'no-store'
   }, options);
 
   // `Content-Type`に応じてbody内容を書き換えます。
@@ -7927,7 +8439,14 @@ const commonFetch = (context, url, options) => {
       url,
       options
     }))
-    .then(() => fetch(url, options))
+    .then(() => Promise.race([
+      fetch(url, options),
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error('時間がかかり過ぎたため通信を中断しました。'));
+        }, 1000 * 5);
+      })
+    ]))
     .then(response => {
       context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
       return response;
@@ -7979,6 +8498,24 @@ var application$3 = {
    */
   isNetworking: context => {
     return context.state.application.isNetworking;
+  },
+
+  /**
+   * ドラッグ中か否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isDragging: context => {
+    return context.state.application.isDragging;
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストを返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  endpointFilterText: context => {
+    return context.state.application.endpointFilterText;
   }
 };
 
@@ -8024,6 +8561,19 @@ var application$3 = {
     }
 
      var map_1$1 = map$1;
+
+/**
+     * Get object keys
+     */
+     var keys = Object.keys || function (obj) {
+            var keys = [];
+            forOwn_1$1(obj, function(val, key){
+                keys.push(key);
+            });
+            return keys;
+        };
+
+    var keys_1 = keys;
 
 var components$2 = {
   /**
@@ -8147,6 +8697,30 @@ var components$2 = {
    */
   tableLabels: (context, riotId) => {
     return context.state.components[riotId].table_labels || [];
+  },
+
+  /**
+   * テーブル列のキー群を返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Array}
+   */
+  tableColumns: (context, riotId) => {
+    const response = context.state.components[riotId].response;
+    if (!isArray_1$1(response) || !response.length) {
+      return [];
+    }
+    return keys_1(response[0]);
+  },
+
+  /**
+   * テーブル行に使用するprimaryキーを返します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {String|null}
+   */
+  primaryKey: (context, riotId) => {
+    return context.state.components[riotId].primaryKey || null;
   }
 };
 
@@ -8291,40 +8865,6 @@ var drawers$2 = {
 };
 
 /**
-     * Object some
-     */
-    function some$1(obj, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var result = false;
-        forOwn_1$1(obj, function(val, key) {
-            if (callback(val, key, obj)) {
-                result = true;
-                return false; // break
-            }
-        });
-        return result;
-    }
-
-    var some_1$1 = some$1;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$1(obj, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var result;
-        some_1$1(obj, function(value, key, obj) {
-            if (callback(value, key, obj)) {
-                result = value;
-                return true; //break
-            }
-        });
-        return result;
-    }
-
-    var find_1$1 = find$1;
-
-/**
      * Get object size
      */
     function size(obj) {
@@ -8337,6 +8877,89 @@ var drawers$2 = {
 
     var size_1 = size;
 
+/**
+     * Typecast a value to a String, using an empty string value for null or
+     * undefined.
+     */
+    function toString(val){
+        return val == null ? '' : val.toString();
+    }
+
+    var toString_1 = toString;
+
+/**
+     * Searches for a given substring
+     */
+    function contains$1(str, substring, fromIndex){
+        str = toString_1(str);
+        substring = toString_1(substring);
+        return str.indexOf(substring, fromIndex) !== -1;
+    }
+
+    var contains_1$1 = contains$1;
+
+/**
+ * 受け取ったエンドポイント群をorder昇順の配列として返します。
+ * @param {Object} endpoints
+ * @return {Array}
+ */
+const sortByOrder = endpoints => {
+  let endpointsByOrder = [];
+  forOwn_1$1(endpoints, (endpoint, key) => {
+    endpoint.key = key;
+    endpointsByOrder.push(endpoint);
+  });
+  endpointsByOrder = sortBy_1$1(endpointsByOrder, endpoint => {
+    return endpoint.order;
+  });
+  return endpointsByOrder;
+};
+
+/**
+ * 受け取ったエンドポイント群をfilterして返します。
+ * @param {Array} endpoints
+ * @param {String} filterText
+ * @return {Array}
+ */
+const filterBy = (endpoints, filterText) => {
+  filterText = filterText || '';
+  filterText = filterText.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+  filterText = filterText.replace(/,/g, ' ');
+  const targetTexts = filter_1$1((filterText || '').split(' '), targetText => {
+    return !!targetText;
+  });
+  if (!targetTexts.length) {
+    return endpoints;
+  }
+
+  return filter_1$1(endpoints, endpoint => {
+    let isMatched = false;
+    forEach_1(targetTexts, targetText => {
+      if (contains_1$1(endpoint.url, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.title, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.name, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.description, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.memo, targetText)) {
+        isMatched = true;
+      }
+      forEach_1(endpoint.tags || [], tag => {
+        if (contains_1$1(tag, targetText)) {
+          isMatched = true;
+        }
+      });
+    });
+    return isMatched;
+  });
+};
+
 var endpoints$2 = {
   /**
    * 全endpointを返します。
@@ -8345,6 +8968,29 @@ var endpoints$2 = {
    */
   all: context => {
     return context.state.endpoints;
+  },
+
+  /**
+   * 全endpointをorder昇順の配列として返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  allByOrder: context => {
+    let endpoints = objectAssign(context.state.endpoints);
+    endpoints = sortByOrder(endpoints);
+    return endpoints;
+  },
+
+  /**
+   * 全endpointをorder昇順のfilter済み配列として返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  allByOrderFiltered: context => {
+    let endpoints = objectAssign(context.state.endpoints);
+    endpoints = sortByOrder(endpoints);
+    endpoints = filterBy(endpoints, context.state.application.endpointFilterText);
+    return endpoints;
   },
 
   /**
@@ -8556,6 +9202,30 @@ var oas$2 = {
   },
 
   /**
+   * 指定したoperationIdにマッチするPathItemObjectのmethod名を返します。
+   * @param {riotx.Context} context
+   * @param {String} operationId
+   * @return {String}
+   */
+  pathItemObjectMethodNameByOperationId: (context, operationId) => {
+    let ret;
+    forOwn_1$1(context.state.oas.client.spec.paths, pathItemObject => {
+      if (!!ret) {
+        return;
+      }
+      forOwn_1$1(pathItemObject, (operationObject, method) => {
+        if (!!ret) {
+          return;
+        }
+        if (operationObject.operationId === operationId) {
+          ret = method;
+        }
+      });
+    });
+    return ret;
+  },
+
+  /**
    * 指定したpathとmethodにマッチするOperationObjectを返します。
    * @param {riotx.Context} context
    * @param {String} path
@@ -8564,6 +9234,82 @@ var oas$2 = {
    */
   operationObject: (context, path, method) => {
     return context.state.oas.client.spec.paths[path][method];
+  },
+
+  /**
+   * 指定したcomponentに関連するOperationObject(action)群を返します。
+   * @param {riotx.Context} context
+   * @param {Object} component
+   * @return {Array}
+   */
+  operationObjectsAsAction: (context, component) => {
+    const methods = ['get','put', 'post', 'delete'];
+    const basePath = component.api.path;
+    const primaryKey = component.primary;
+    const actions = component.actions || [];
+
+    // 関連API情報。後のOperationObject群抽出に使用します。
+    const pathRefs = [];
+    // 同じpath & method違いのoperationObjectは関連有りとみなす。
+    forEach_1(methods, method => {
+      // `get`はcomponent自身なのでスルーする。
+      if (method === 'get') {
+        return;
+      }
+      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath][method];
+      if (!isOperationObjectDefined) {
+        return;
+      }
+      pathRefs.push({
+        path: basePath,
+        method,
+        appendTo: 'self'
+      });
+    });
+    // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
+    // テーブルの各rowに紐づくOperationObjectとみなす。
+    if (!!primaryKey) {
+      const listBasePath = `${basePath}/{${primaryKey}}`;
+      forEach_1(methods, method => {
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath][method];
+        if (!isOperationObjectDefined) {
+          return;
+        }
+        pathRefs.push({
+          path: listBasePath,
+          method,
+          appendTo: 'row'
+        });
+      });
+    }
+    // actionsに指定されたpath群のOperationObjectも関連有りとみなします。
+    // path内にprimaryKeyと同一名の変数があれば、それはテーブルrowに紐づくOperationObjectとみなします。
+    // primaryKeyと同一名の変数が無ければ、componentと紐づくOperationObjectとみなします。
+    forEach_1(actions, actionBasePath => {
+      const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
+      forEach_1(methods, method => {
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath][method];
+        if (!isOperationObjectDefined) {
+          return;
+        }
+        pathRefs.push({
+          path: actionBasePath,
+          method,
+          appendTo
+        });
+      });
+    });
+
+    // OperationObject群を抽出します。
+    const operationObjects = [];
+    forEach_1(pathRefs, ref => {
+      const operationObject = context.state.oas.client.spec.paths[ref.path][ref.method];
+      operationObjects.push(objectAssign({
+        operationObject
+      }, ref));
+    });
+
+    return operationObjects;
   },
 
   /**
@@ -8608,7 +9354,9 @@ var oas$2 = {
    * @param {Number} statusCode
    * @return {Object}
    */
-  responseObject: (context, path, method, statusCode = 200) => {
+  responseObject: (context, path, method, statusCode) => {
+    if ( statusCode === void 0 ) statusCode = 200;
+
     return context.state.oas.client.spec.paths[path][method].responses[statusCode];
   },
 
@@ -8621,19 +9369,10 @@ var oas$2 = {
    * @param {Number} statusCode
    * @return {Object}
    */
-  schemaObject: (context, path, method, statusCode = 200) => {
-    return context.state.oas.client.spec.paths[path][method].responses[statusCode].schema;
-  }
-};
+  schemaObject: (context, path, method, statusCode) => {
+    if ( statusCode === void 0 ) statusCode = 200;
 
-var oauthEndpointKey$2 = {
-  /**
-   * OAuth認証中のendpointKeyを返します。
-   * @param {riotx.Context} context
-   * @return {String}
-   */
-  all: context => {
-    return context.state.oauthEndpointKey;
+    return context.state.oas.client.spec.paths[path][method].responses[statusCode].schema;
   }
 };
 
@@ -8684,6 +9423,19 @@ var page$2 = {
       return [];
     }
     return page.components;
+  },
+
+  /**
+   * コンポーネント数を返します。
+   * @param {riotx.Context} context
+   * @return {Number}
+   */
+  componentsCount: context => {
+    const page = context.state.page;
+    if (!page) {
+      return 0;
+    }
+    return (page.components || []).length;
   }
 };
 
@@ -8706,6 +9458,24 @@ var ua$2 = {
    */
   all: context => {
     return context.state.ua;
+  },
+
+  /**
+   * Safariか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isSafari: context => {
+    return !!context.state.ua.safari;
+  },
+
+  /**
+   * Edgeか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isEdge: context => {
+    return !!context.state.ua.edge;
   }
 };
 
@@ -8714,6 +9484,8 @@ const constants$4 = {
   APPLICATION_ISLAUNCHED: 'APPLICATION_ISLAUNCHED',
   APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
+  APPLICATION_ISDRAGGING: 'APPLICATION_ISDRAGGING',
+  APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS: 'COMPONENTS',
   COMPONENTS_ONE: 'COMPONENTS_ONE',
   COMPONENTS_ONE_RESPONSE: 'COMPONENTS_ONE_RESPONSE',
@@ -8725,6 +9497,8 @@ const constants$4 = {
   COMPONENTS_ONE_HAS_PAGINATION: 'COMPONENTS_ONE_HAS_PAGINATION',
   COMPONENTS_ONE_PAGINATION: 'COMPONENTS_ONE_PAGINATION',
   COMPONENTS_ONE_TABLE_LABELS: 'COMPONENTS_ONE_TABLE_LABELS',
+  COMPONENTS_ONE_TABLE_COLUMNS: 'COMPONENTS_ONE_TABLE_COLUMNS',
+  COMPONENTS_ONE_PRIMARY_KEY: 'COMPONENTS_ONE_PRIMARY_KEY',
   CURRENT: 'CURRENT',
   DMC: 'DMC',
   DMC_EXISTENCE: 'DMC_EXISTENCE',
@@ -8735,6 +9509,8 @@ const constants$4 = {
   DMC_MANAGE: 'DMC_MANAGE',
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
+  ENDPOINTS_BY_ORDER: 'ENDPOINTS_BY_ORDER',
+  ENDPOINTS_BY_ORDER_FILTERED: 'ENDPOINTS_BY_ORDER_FILTERED',
   ENDPOINTS_COUNT: 'ENDPOINTS_COUNT',
   ENDPOINTS_WITHOUT_TOKEN: 'ENDPOINTS_WITHOUT_TOKEN',
   ENDPOINTS_ONE: 'ENDPOINTS_ONE',
@@ -8753,18 +9529,22 @@ const constants$4 = {
   OAS_API: 'OAS_API',
   OAS_API_BY_PATH_AND_METHOD: 'OAS_API_BY_PATH_AND_METHOD',
   OAS_PATH_ITEM_OBJECT: 'OAS_PATH_ITEM_OBJECT',
+  OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID: 'OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID',
   OAS_OPERATION_OBJECT: 'OAS_OPERATION_OBJECT',
+  OAS_OPERATION_OBJECTS_AS_ACTION: 'OAS_OPERATION_OBJECTS_AS_ACTION',
   OAS_OPERATION_ID: 'OAS_OPERATION_ID',
   OAS_PARAMETER_OBJECTS: 'OAS_PARAMETER_OBJECTS',
   OAS_RESPONSE_OBJECT: 'OAS_RESPONSE_OBJECT',
   OAS_SCHEMA_OBJECT: 'OAS_SCHEMA_OBJECT',
-  OAUTH_ENDPOINT_KEY: 'OAUTH_ENDPOINT_KEY',
   PAGE: 'PAGE',
   PAGE_ID: 'PAGE_ID',
   PAGE_NAME: 'PAGE_NAME',
   PAGE_COMPONENTS: 'PAGE_COMPONENTS',
+  PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
-  UA: 'UA'
+  UA: 'UA',
+  UA_IS_SAFARI: 'UA_IS_SAFARI',
+  UA_IS_EDGE: 'UA_IS_EDGE'
 };
 
 var getters = {
@@ -8772,6 +9552,8 @@ var getters = {
   [constants$4.APPLICATION_ISLAUNCHED]: application$3.isLaunched,
   [constants$4.APPLICATION_ISNAVIGATING]: application$3.isNavigating,
   [constants$4.APPLICATION_ISNETWORKING]: application$3.isNetworking,
+  [constants$4.APPLICATION_ISDRAGGING]: application$3.isDragging,
+  [constants$4.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
   [constants$4.COMPONENTS]: components$2.all,
   [constants$4.COMPONENTS_ONE]: components$2.one,
   [constants$4.COMPONENTS_ONE_RESPONSE]: components$2.response,
@@ -8783,6 +9565,8 @@ var getters = {
   [constants$4.COMPONENTS_ONE_HAS_PAGINATION]: components$2.hasPagination,
   [constants$4.COMPONENTS_ONE_PAGINATION]: components$2.pagination,
   [constants$4.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
+  [constants$4.COMPONENTS_ONE_TABLE_COLUMNS]: components$2.tableColumns,
+  [constants$4.COMPONENTS_ONE_PRIMARY_KEY]: components$2.primaryKey,
   [constants$4.CURRENT]: current$2.all,
   [constants$4.DMC]: dmc$2.all,
   [constants$4.DMC_EXISTENCE]: dmc$2.existence,
@@ -8793,6 +9577,8 @@ var getters = {
   [constants$4.DMC_MANAGE]: dmc$2.manage,
   [constants$4.DRAWERS]: drawers$2.all,
   [constants$4.ENDPOINTS]: endpoints$2.all,
+  [constants$4.ENDPOINTS_BY_ORDER]: endpoints$2.allByOrder,
+  [constants$4.ENDPOINTS_BY_ORDER_FILTERED]: endpoints$2.allByOrderFiltered,
   [constants$4.ENDPOINTS_COUNT]: endpoints$2.count,
   [constants$4.ENDPOINTS_WITHOUT_TOKEN]: endpoints$2.allWithoutToken,
   [constants$4.ENDPOINTS_ONE]: endpoints$2.one,
@@ -8811,18 +9597,22 @@ var getters = {
   [constants$4.OAS_API]: oas$2.api,
   [constants$4.OAS_API_BY_PATH_AND_METHOD]: oas$2.apiByPathAndMethod,
   [constants$4.OAS_PATH_ITEM_OBJECT]: oas$2.pathItemObject,
+  [constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID]: oas$2.pathItemObjectMethodNameByOperationId,
   [constants$4.OAS_OPERATION_OBJECT]: oas$2.operationObject,
+  [constants$4.OAS_OPERATION_OBJECTS_AS_ACTION]: oas$2.operationObjectsAsAction,
   [constants$4.OAS_OPERATION_ID]: oas$2.operationId,
   [constants$4.OAS_PARAMETER_OBJECTS]: oas$2.parameterObjects,
   [constants$4.OAS_RESPONSE_OBJECT]: oas$2.responseObject,
   [constants$4.OAS_SCHEMA_OBJECT]: oas$2.schemaObject,
-  [constants$4.OAUTH_ENDPOINT_KEY]: oauthEndpointKey$2.all,
   [constants$4.PAGE]: page$2.all,
   [constants$4.PAGE_ID]: page$2.id,
   [constants$4.PAGE_NAME]: page$2.name,
   [constants$4.PAGE_COMPONENTS]: page$2.components,
+  [constants$4.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
   [constants$4.TOASTS]: toasts$2.all,
-  [constants$4.UA]: ua$2.all
+  [constants$4.UA]: ua$2.all,
+  [constants$4.UA_IS_SAFARI]: ua$2.isSafari,
+  [constants$4.UA_IS_EDGE]: ua$2.isEdge
 };
 
 var auth = {
@@ -8870,7 +9660,11 @@ var auth = {
           'Authorization': endpoint.token
         }
       }))
-      .then(() => {
+      .then(response => {
+        const token = response.headers.get('Authorization');
+        if (!!token) {
+          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        }
         return true;
       })
       .catch(err => {
@@ -8890,9 +9684,7 @@ var auth = {
    */
   getTypes: (context, endpointKey) => {
     const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
-    const anchorElm = document.createElement('a');
-    anchorElm.href = endpoint.url;
-    const fetchUrl = `${anchorElm.origin}/dmc_authtype`;
+    const fetchUrl = `${new URL(endpoint.url).origin}/dmc_authtype`;
 
     return Promise
       .resolve()
@@ -8911,13 +9703,10 @@ var auth = {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(constants$2.OAUTH_ENDPOINT_KEY, endpointKey);
-      })
-      .then(() => {
         const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
-        const anchorElm = document.createElement('a');
-        anchorElm.href = endpoint.url;
-        const fetchUrl = `${anchorElm.origin}${authtype.url}?redirect_url=${encodeURIComponent(location.href)}`;
+        const origin = new URL(endpoint.url).origin;
+        const redirect_url = encodeURIComponent(`${location.href}oauthredirect/${endpointKey}`);
+        const fetchUrl = `${origin}${authtype.url}?redirect_url=${redirect_url}`;
         location.href = fetchUrl;
       });
   },
@@ -8933,9 +9722,7 @@ var auth = {
    */
   signinEmail: (context, endpointKey, authtype, email, password) => {
     const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
-    const anchorElm = document.createElement('a');
-    anchorElm.href = endpoint.url;
-    const fetchUrl = `${anchorElm.origin}${authtype.url}`;
+    const fetchUrl = `${new URL(endpoint.url).origin}${authtype.url}`;
 
     return Promise
       .resolve()
@@ -9202,7 +9989,7 @@ var path$1 = Object.freeze({
 	default: path
 });
 
-var require$$0 = ( path$1 && path ) || path$1;
+var require$$0$2 = ( path$1 && path ) || path$1;
 
 /**
  * Module exports.
@@ -9215,7 +10002,7 @@ var parse_1$1 = parse$1;
  * Module dependencies.
  */
 
-var basename = require$$0.basename;
+var basename = require$$0$2.basename;
 
 /**
  * RegExp to match non attr-char, *after* encodeURIComponent (i.e. not including "%")
@@ -9825,30 +10612,7 @@ var components$3 = {
     if (path.indexOf('/') !== 0) {
       path = '/' + path;
     }
-    const operationObject = context.getter(constants$4.OAS_OPERATION_OBJECT, path, method);
-    // 関連のあるpath情報を取得します。
-    let pathRefs = [];
-    // 同じpath 且つ method名違いのoperationObjectは関連有りとみなす。
-    forEach_1(['put', 'post', 'delete', 'options', 'head', 'patch'], method => {
-      if (!context.getter(constants$4.OAS_OPERATION_OBJECT, path, method)) {
-        return;
-      }
-      pathRefs.push({
-        path,
-        method,
-        appendTo: 'self'
-      });
-    });
-    // `x-ref`を独自仕様として仕様する。このkeyが付いたものを関連APIとする。
-    pathRefs = pathRefs.concat(operationObject['x-ref'] || []);
-    // 関連API(path)群を付与する。
-    const actions = [];
-    forEach_1(pathRefs, ref => {
-      const operationObject = context.getter(constants$4.OAS_OPERATION_OBJECT, ref.path, ref.method);
-      actions.push(objectAssign({
-        operationObject
-      }, ref));
-    });
+    const actions = context.getter(constants$4.OAS_OPERATION_OBJECTS_AS_ACTION, component);
 
     const api = context.getter(constants$4.OAS_API_BY_PATH_AND_METHOD, path, method);
     const currentEndpointKey = context.getter(constants$4.CURRENT);
@@ -9864,19 +10628,30 @@ var components$3 = {
       }
       return res;
     }).then(res => {
-       // `component.pagination`からページングをサポートしているか判断する。
+      // tokenを更新する。
+      const token = res.headers['Authorization'];
+      if (!!token) {
+        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+      }
+      // `component.pagination`からページングをサポートしているか判断する。
       // サポートしていれば手動でページング情報を付加する。
       let hasPagination = false;
       let pagination;
       if (component.pagination) {
-        hasPagination = true;
+        const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
+        const size = Number(res.headers['x-pagination-limit'] || 0);
+        const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
         pagination = {
           // `x-pagination-current-page`等は独自仕様。
           // DMCを使用するサービスはこの仕様に沿う必要がある。
-          currentPage: Number(res.headers['x-pagination-current-page'] || 0),
-          size: Number(res.headers['x-pagination-limit'] || 0),
-          maxPage: Number(res.headers['x-pagination-total-pages'] || 0)
+          currentPage,
+          size,
+          maxPage
         };
+        // 2ページ以上存在する場合のみページングをONにする。
+        if (maxPage >= 2) {
+          hasPagination = true;
+        }
       }
       context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
         component_uid,
@@ -9886,6 +10661,7 @@ var components$3 = {
         actions,// 関連API群。
         hasPagination,
         pagination,// ページング関連。
+        primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
         table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
       });
     });
@@ -9901,12 +10677,18 @@ var components$3 = {
   operate: (context, operationObject, params) => {
     const api = context.getter(constants$4.OAS_API, operationObject.operationId);
     const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
+    const currentEndpointKey = context.getter(constants$4.CURRENT);
 
     return api(params, {
       requestInterceptor: req => {
         req.headers['Authorization'] = token;
       }
     }).then(res => {
+      // tokenを更新する。
+      const token = res.headers['Authorization'];
+      if (!!token) {
+        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+      }
       // ダウンロード指定されていればダウンロードする。
       const contentDispositionHeader = res.headers['content-disposition'];
       if (!contentDispositionHeader) {
@@ -9997,7 +10779,7 @@ var dmc$3 = {
     return Promise
       .resolve()
       .then(() => api({}, {
-        requestInterceptor: (req) => {
+        requestInterceptor: req => {
           req.headers['Authorization'] = token;
         }
       }))
@@ -10008,6 +10790,11 @@ var dmc$3 = {
         return res;
       })
       .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
         context.commit(constants$2.DMC, res.obj);
         const endpoint = objectAssign({}, res.obj);
         // pagesは不要なので削除。
@@ -10061,302 +10848,6 @@ var drawers$3 = {
       });
   }
 };
-
-// Found this seed-based random generator somewhere
-// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
-
-var seed = 1;
-
-/**
- * return a random number based on a seed
- * @param seed
- * @returns {number}
- */
-function getNextValue() {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed/(233280.0);
-}
-
-function setSeed$1(_seed_) {
-    seed = _seed_;
-}
-
-var randomFromSeed = {
-    nextValue: getNextValue,
-    seed: setSeed$1
-};
-
-var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
-var alphabet;
-var previousSeed;
-
-var shuffled;
-
-function reset() {
-    shuffled = false;
-}
-
-function setCharacters(_alphabet_) {
-    if (!_alphabet_) {
-        if (alphabet !== ORIGINAL) {
-            alphabet = ORIGINAL;
-            reset();
-        }
-        return;
-    }
-
-    if (_alphabet_ === alphabet) {
-        return;
-    }
-
-    if (_alphabet_.length !== ORIGINAL.length) {
-        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
-    }
-
-    var unique = _alphabet_.split('').filter(function(item, ind, arr){
-       return ind !== arr.lastIndexOf(item);
-    });
-
-    if (unique.length) {
-        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
-    }
-
-    alphabet = _alphabet_;
-    reset();
-}
-
-function characters(_alphabet_) {
-    setCharacters(_alphabet_);
-    return alphabet;
-}
-
-function setSeed(seed) {
-    randomFromSeed.seed(seed);
-    if (previousSeed !== seed) {
-        reset();
-        previousSeed = seed;
-    }
-}
-
-function shuffle$1() {
-    if (!alphabet) {
-        setCharacters(ORIGINAL);
-    }
-
-    var sourceArray = alphabet.split('');
-    var targetArray = [];
-    var r = randomFromSeed.nextValue();
-    var characterIndex;
-
-    while (sourceArray.length > 0) {
-        r = randomFromSeed.nextValue();
-        characterIndex = Math.floor(r * sourceArray.length);
-        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
-    }
-    return targetArray.join('');
-}
-
-function getShuffled() {
-    if (shuffled) {
-        return shuffled;
-    }
-    shuffled = shuffle$1();
-    return shuffled;
-}
-
-/**
- * lookup shuffled letter
- * @param index
- * @returns {string}
- */
-function lookup(index) {
-    var alphabetShuffled = getShuffled();
-    return alphabetShuffled[index];
-}
-
-var alphabet_1 = {
-    characters: characters,
-    seed: setSeed,
-    lookup: lookup,
-    shuffled: getShuffled
-};
-
-var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
-
-function randomByte() {
-    if (!crypto || !crypto.getRandomValues) {
-        return Math.floor(Math.random() * 256) & 0x30;
-    }
-    var dest = new Uint8Array(1);
-    crypto.getRandomValues(dest);
-    return dest[0] & 0x30;
-}
-
-var randomByteBrowser = randomByte;
-
-function encode(lookup, number) {
-    var loopCounter = 0;
-    var done;
-
-    var str = '';
-
-    while (!done) {
-        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByteBrowser() );
-        done = number < (Math.pow(16, loopCounter + 1 ) );
-        loopCounter++;
-    }
-    return str;
-}
-
-var encode_1 = encode;
-
-/**
- * Decode the id to get the version and worker
- * Mainly for debugging and testing.
- * @param id - the shortid-generated id.
- */
-function decode(id) {
-    var characters = alphabet_1.shuffled();
-    return {
-        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
-        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
-    };
-}
-
-var decode_1 = decode;
-
-// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
-// This number should be updated every year or so to keep the generated id short.
-// To regenerate `new Date() - 0` and bump the version. Always bump the version!
-var REDUCE_TIME = 1459707606518;
-
-// don't change unless we change the algos or REDUCE_TIME
-// must be an integer and less than 16
-var version = 6;
-
-// Counter is used when shortid is called multiple times in one second.
-var counter;
-
-// Remember the last time shortid was called in case counter is needed.
-var previousSeconds;
-
-/**
- * Generate unique id
- * Returns string id
- */
-function build(clusterWorkerId) {
-
-    var str = '';
-
-    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
-
-    if (seconds === previousSeconds) {
-        counter++;
-    } else {
-        counter = 0;
-        previousSeconds = seconds;
-    }
-
-    str = str + encode_1(alphabet_1.lookup, version);
-    str = str + encode_1(alphabet_1.lookup, clusterWorkerId);
-    if (counter > 0) {
-        str = str + encode_1(alphabet_1.lookup, counter);
-    }
-    str = str + encode_1(alphabet_1.lookup, seconds);
-
-    return str;
-}
-
-var build_1 = build;
-
-function isShortId(id) {
-    if (!id || typeof id !== 'string' || id.length < 6 ) {
-        return false;
-    }
-
-    var characters = alphabet_1.characters();
-    var len = id.length;
-    for(var i = 0; i < len;i++) {
-        if (characters.indexOf(id[i]) === -1) {
-            return false;
-        }
-    }
-    return true;
-}
-
-var isValid = isShortId;
-
-var clusterWorkerIdBrowser = 0;
-
-var lib = createCommonjsModule(function (module) {
-'use strict';
-
-
-
-
-
-
-
-// if you are using cluster or multiple servers use this to make each instance
-// has a unique value for worker
-// Note: I don't know if this is automatically set when using third
-// party cluster solutions such as pm2.
-var clusterWorkerId = clusterWorkerIdBrowser || 0;
-
-/**
- * Set the seed.
- * Highly recommended if you don't want people to try to figure out your id schema.
- * exposed as shortid.seed(int)
- * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
- */
-function seed(seedValue) {
-    alphabet_1.seed(seedValue);
-    return module.exports;
-}
-
-/**
- * Set the cluster worker or machine id
- * exposed as shortid.worker(int)
- * @param workerId worker must be positive integer.  Number less than 16 is recommended.
- * returns shortid module so it can be chained.
- */
-function worker(workerId) {
-    clusterWorkerId = workerId;
-    return module.exports;
-}
-
-/**
- *
- * sets new characters to use in the alphabet
- * returns the shuffled alphabet
- */
-function characters(newCharacters) {
-    if (newCharacters !== undefined) {
-        alphabet_1.characters(newCharacters);
-    }
-
-    return alphabet_1.shuffled();
-}
-
-/**
- * Generate unique id
- * Returns string id
- */
-function generate() {
-  return build_1(clusterWorkerId);
-}
-
-// Export all other functions as properties of the generate function
-module.exports = generate;
-module.exports.generate = generate;
-module.exports.seed = seed;
-module.exports.worker = worker;
-module.exports.characters = characters;
-module.exports.decode = decode_1;
-module.exports.isValid = isValid;
-});
-
-var shortid = lib;
 
 var endpoints$3 = {
   /**
@@ -10448,6 +10939,51 @@ var endpoints$3 = {
       .resolve()
       .then(() => {
         context.commit(constants$2.ENDPOINTS_MERGE_ALL, endpoints);
+      });
+  },
+
+  /**
+   * 一件の新エンドポイントを既存エンドポイント群にmergeします。
+   * endpointKeyも新規生成します。
+   * @param {riotx.Context} context
+   * @param {Object} endpoint
+   * @return {Promise}
+   */
+  mergeOneWithKey: (context, endpoint) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const key = shortid.generate();
+        context.commit(constants$2.ENDPOINTS_ADD, key, endpoint);
+      });
+  },
+
+  /**
+   * エンドポイントのorder値を整理します。
+   * order値が存在しない等への対応を行います。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  tidyUpOrder: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.ENDPOINTS_TIDY_UP_ORDER);
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントのorder値を変更します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Number} newOrder
+   * @return {Promise}
+   */
+  changeOrder: (context, endpointKey, newOrder) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder);
       });
   }
 };
@@ -10574,21 +11110,6 @@ var oas$3 = {
       .resolve()
       .then(() => {
         context.commit(constants$2.OAS_CLIENT_CLEAR);
-      });
-  }
-};
-
-var oauthEndpointKey$3 = {
-  /**
-   * OAuth認証用のエンドポイントkeyを削除します。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  remove: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.OAUTH_ENDPOINT_KEY, null);
       });
   }
 };
@@ -11164,6 +11685,10 @@ const constants$1 = {
   APPLICATION_LAUNCH: 'APPLICATION_LAUNCH',
   APPLICATION_NAVIGATION_START: 'APPLICATION_NAVIGATION_START',
   APPLICATION_NAVIGATION_END: 'APPLICATION_NAVIGATION_END',
+  APPLICATION_DRAG_START: 'APPLICATION_DRAG_START',
+  APPLICATION_DRAG_END: 'APPLICATION_DRAG_END',
+  APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT: 'APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT',
+  APPLICATION_RESET_ENDPOINT_FILTER_TEXT: 'APPLICATION_RESET_ENDPOINT_FILTER_TEXT',
   AUTH_UPDATE: 'AUTH_UPADTE',
   AUTH_REMOVE: 'AUTH_REMOVE',
   AUTH_VALIDATE: 'AUTH_VALIDATE',
@@ -11185,6 +11710,9 @@ const constants$1 = {
   ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
   ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
   ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
+  ENDPOINTS_MERGE_ONE_WITH_KEY: 'ENDPOINTS_MERGE_ONE_WITH_KEY',
+  ENDPOINTS_TIDY_UP_ORDER: 'ENDPOINTS_TIDY_UP_ORDER',
+  ENDPOINTS_CHANGE_ORDER: 'ENDPOINTS_CHANGE_ORDER',
   LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION_UPDATE: 'LOCATION_UPDATE',
   MODALS_ADD: 'MODALS_ADD',
@@ -11203,6 +11731,10 @@ var actions = {
   [constants$1.APPLICATION_LAUNCH]: application.launch,
   [constants$1.APPLICATION_NAVIGATION_START]: application.startNavigation,
   [constants$1.APPLICATION_NAVIGATION_END]: application.endNavigation,
+  [constants$1.APPLICATION_DRAG_START]: application.startDrag,
+  [constants$1.APPLICATION_DRAG_END]: application.endDrag,
+  [constants$1.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT]: application.updateEndpointFilterText,
+  [constants$1.APPLICATION_RESET_ENDPOINT_FILTER_TEXT]: application.resetEndpointFilterText,
   [constants$1.AUTH_UPDATE]: auth.update,
   [constants$1.AUTH_REMOVE]: auth.remove,
   [constants$1.AUTH_VALIDATE]: auth.validate,
@@ -11224,13 +11756,15 @@ var actions = {
   [constants$1.ENDPOINTS_REMOVE]: endpoints$3.remove,
   [constants$1.ENDPOINTS_REMOVE_ALL]: endpoints$3.removeAll,
   [constants$1.ENDPOINTS_MERGE_ALL]: endpoints$3.mergeAll,
+  [constants$1.ENDPOINTS_MERGE_ONE_WITH_KEY]: endpoints$3.mergeOneWithKey,
+  [constants$1.ENDPOINTS_TIDY_UP_ORDER]: endpoints$3.tidyUpOrder,
+  [constants$1.ENDPOINTS_CHANGE_ORDER]: endpoints$3.changeOrder,
   [constants$1.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT]: layout$3.updateComponentsGridColumnCount,
   [constants$1.LOCATION_UPDATE]: location$4.update,
   [constants$1.MODALS_ADD]: modals$3.add,
   [constants$1.MODALS_REMOVE]: modals$3.remove,
   [constants$1.OAS_SETUP]: oas$3.setup,
   [constants$1.OAS_CLEAR]: oas$3.clear,
-  [constants$1.OAUTH_ENDPOINT_KEY_REMOVE]: oauthEndpointKey$3.remove,
   [constants$1.PAGE_GET]: page$3.get,
   [constants$1.PAGE_REMOVE]: page$3.remove,
   [constants$1.TOASTS_ADD]: toasts$3.add,
@@ -11303,11 +11837,40 @@ var script$2 = function() {
   if (!!this.opts.error) {
     this.type = 'error';
     this.icon = 'close';
-    this.title = this.opts.error.name || 'Error';
+    this.title = this.title || this.opts.error.name || this.opts.error.statusText || 'Error';
+    this.message = this.message || this.opts.error.message;
   }
+
+  // prettyprintで表示させる内容。
+  this.detail = null;
+
+  this.on('mount', () => {
+    // エラーがPromiseであれば解析する。
+    const error = this.opts.error;
+    if (!error) {
+      return;
+    }
+    if (error instanceof Error) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => error.json())
+      .then(json => {
+        const error = json.error;
+        this.detail = error;
+        !this.opts.title && !!error.name && (this.title = error.name);
+        !this.opts.message && !!error.data && !!error.data.message && (this.message = error.data.message);
+        this.update();
+      })
+      .catch(() => {
+        // do nothing on purpose.
+        return Promise.resolve();
+      });
+  });
 };
 
-riot$1.tag2('dmc-message', '<div class="Message__head"> <div class="Message__icon"> <dmc-icon type="{icon}"></dmc-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message &amp;&amp; !opts.error}">{message}</div> <dmc-prettyprint class="Message__error" if="{!!opts.error}" data="{opts.error}"></dmc-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
+riot$1.tag2('dmc-message', '<div class="Message__head"> <div class="Message__icon"> <dmc-icon type="{icon}"></dmc-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message}">{message}</div> <dmc-prettyprint class="Message__error" if="{!!detail}" data="{detail}"></dmc-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
     this.external(script$2);
 });
 
@@ -11341,12 +11904,15 @@ var ComponentsRoute = {
       .then(isSignined => {
         // 認証切れ or 非ログ時はTOPに戻す。
         if (!isSignined) {
+          let message = '認証が切れました。再度ログインして下さい。';
+          if (store.getter(constants$4.UA_IS_SAFARI)) {
+            message = `${message} Safariをお使いの場合は[https://foo.com/swagger.json]のようにリダイレクト先のエンドポイントURLを指定して下さい。`;
+          }
           return Promise
             .resolve()
             .then(() => store.action(constants$1.MODALS_ADD, 'dmc-message', {
-              type: 'error',
-              title: 'Unauthorized',
-              message: 'You are not authorized. Check if your token is expired. '
+              title: '認証切れ',
+              message
             }))
             .then(() => {
               replace('/');
@@ -11396,6 +11962,38 @@ var ComponentsRoute = {
   }
 };
 
+var EndpointimportRoute = {
+  /**
+   * ページ遷移前の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @param {Function} replace
+   * @return {Promise}
+   */
+  onBefore: (store, route, replace) => {
+    let url;
+    return Promise
+      .resolve()
+      .then(() => {
+        const endpoint = JSON.parse(decodeURIComponent(route.queries.endpoint));
+        url = endpoint.url;
+        return store.action(constants$1.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
+      })
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加',
+        message: `エンドポイント(${url})が一覧に追加されました。`
+      }))
+      .then(() => {
+        replace('/');
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: `エンドポイント(${url})を追加出来ませんでした。`,
+        error: err
+      }));
+  }
+};
+
 var EndpointsRoute = {
   /**
    * ページ遷移前の処理。
@@ -11410,7 +12008,8 @@ var EndpointsRoute = {
       .then(() => Promise.all([
         store.action(constants$1.CURRENT_REMOVE),
         store.action(constants$1.PAGE_REMOVE),
-        store.action(constants$1.OAS_CLEAR)
+        store.action(constants$1.OAS_CLEAR),
+        store.action(constants$1.DMC_REMOVE)
       ]))
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
         error: err
@@ -11446,6 +12045,44 @@ var NotfoundRoute = {
   }
 };
 
+var OauthredirectRoute = {
+  /**
+   * ページ遷移前の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @param {Function} replace
+   * @return {Promise}
+   */
+  onBefore: (store, route, replace) => {
+    const endpointKey = route.params.endpointKey;
+    const token = route.queries.token;
+    // tokenが存在したらOAuth認証成功とする。
+    const isAuthorized = !!token;
+    let to;
+    const tasks = [];
+    if (isAuthorized) {
+      to = `/${endpointKey}`;
+      tasks.push(store.action(constants$1.AUTH_UPDATE, endpointKey, decodeURIComponent(token)));
+    } else {
+      to = '/';
+      tasks.push(store.action(constants$1.AUTH_REMOVE, endpointKey));
+      tasks.push(store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: '認証失敗',
+        message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
+      }));
+    }
+
+    return Promise
+      .all(tasks)
+      .then(() => {
+        replace(to);
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  }
+};
+
 let esr;
 
 var router = {
@@ -11463,7 +12100,9 @@ var router = {
           .onBefore(() => Promise.all([
             store.action(constants$1.APPLICATION_NAVIGATION_START)
           ]))
-          .on('/', route => EndpointsRoute.onEnter(store, route))
+          .on('/', route => EndpointsRoute.onEnter(store, route), (route, replace) => EndpointsRoute.onBefore(store, route, replace))
+          .on('/oauthredirect/:endpointKey', () => Promise.resolve(), (route, replace) => OauthredirectRoute.onBefore(store, route, replace))
+          .on('/endpointimport', () => Promise.resolve(), (route, replace) => EndpointimportRoute.onBefore(store, route, replace))
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(() => Promise.all([
@@ -12487,7 +13126,7 @@ var _dontEnums$2;
 /**
      * Get object keys
      */
-     var keys = Object.keys || function (obj) {
+     var keys$2 = Object.keys || function (obj) {
             var keys = [];
             forOwn_1$2(obj, function(val, key){
                 keys.push(key);
@@ -12495,7 +13134,7 @@ var _dontEnums$2;
             return keys;
         };
 
-    var keys_1 = keys;
+    var keys_1$1 = keys$2;
 
 /*
 object-assign
@@ -13125,7 +13764,7 @@ RiotX.prototype.reset = function reset () {
  * @returns {int} size
  */
 RiotX.prototype.size = function size () {
-  return keys_1(this.stores).length;
+  return keys_1$1(this.stores).length;
 };
 
 var index$1$2 = new RiotX();
@@ -13219,7 +13858,7 @@ var script$3 = function() {
   };
 };
 
-riot$1.tag2('dmc-pagination', '<div class="Pagination__control"> <div class="Pagination__button {opts.currentpage === 1 ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handlePrevButtonTap"> <dmc-icon type="left"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[0].num !== 1}" data-page="1" ref="touch" ontap="handlePageButtonTap">1</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[0].num &gt;= 3}" ref="touch" ontap="handleRecedeButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__recedeIcon" type="doubleLeft"></dmc-icon> </div> <div class="Pagination__button {page.isSelected ? \'Pagination__button--selected\' : \'\'}" each="{page in getBasePages()}" data-page="{page.num}" ref="touch" ontap="parent.handlePageButtonTap">{page.num}</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[getBasePages().length - 1].num &lt;= opts.maxpage - 2}" ref="touch" ontap="handleProceedButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__proceedIcon" type="doubleRight"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[getBasePages().length - 1].num !== opts.maxpage}" data-page="{opts.maxpage}" ref="touch" ontap="handlePageButtonTap">{opts.maxpage}</div> <div class="Pagination__button {opts.currentpage === opts.maxpage ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handleNextButtonTap"> <dmc-icon type="right"></dmc-icon> </div> </div> <div class="Pagination__info">{opts.currentpage} / {opts.maxpage}</div>', '', 'class="Pagination"', function(opts) {
+riot$1.tag2('dmc-pagination', '<div class="Pagination__control"> <div class="Pagination__button {opts.currentpage === 1 ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handlePrevButtonTap"> <dmc-icon type="left"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[0].num !== 1}" data-page="1" ref="touch" ontap="handlePageButtonTap">1</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[0].num &gt;= 3}" ref="touch" ontap="handleRecedeButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__recedeIcon" type="doubleLeft"></dmc-icon> </div> <div class="Pagination__button {page.isSelected ? \'Pagination__button--selected\' : \'\'}" each="{page in getBasePages()}" data-page="{page.num}" ref="touch" ontap="parent.handlePageButtonTap">{page.num}</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[getBasePages().length - 1].num &lt;= opts.maxpage - 2}" ref="touch" ontap="handleProceedButtonTap"> <dmc-icon class="Pagination__ellipsisIcon" type="ellipsis"></dmc-icon> <dmc-icon class="Pagination__proceedIcon" type="doubleRight"></dmc-icon> </div> <div class="Pagination__button" if="{getBasePages()[getBasePages().length - 1].num !== opts.maxpage}" data-page="{opts.maxpage}" ref="touch" ontap="handlePageButtonTap">{opts.maxpage}</div> <div class="Pagination__button {opts.currentpage === opts.maxpage ? \'Pagination__button--disabled\' : \'\'}" ref="touch" ontap="handleNextButtonTap"> <dmc-icon type="right"></dmc-icon> </div> </div>', '', 'class="Pagination {opts.class}"', function(opts) {
     this.external(script$3);
 });
 
@@ -13232,14 +13871,45 @@ var script$4 = function() {
   };
 };
 
-riot$1.tag2('dmc-button', '<span>{opts.label}</span>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
+riot$1.tag2('dmc-button', '<div class="Button__content"> <div class="Button__icon" if="{!!opts.icon}"> <dmc-icon type="{opts.icon}"></dmc-icon> </div> <div class="Button__label">{opts.label}</div> </div>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
     this.external(script$4);
 });
 
 var script$6 = function() {
   const store = this.riotx.get();
 
+  // submitボタンに使用するラベル。method名によって内容を変える。
+  this.submitButtonLabel = null;
+  // cancelボタンに使用するタイプ。method名によって内容を変える。
+  this.submitButtonType = 'primary';
+  switch (this.opts.method) {
+  case 'get':
+    this.submitButtonLabel = '取得する';
+    break;
+  case 'post':
+    this.submitButtonLabel = '新規追加する';
+    break;
+  case 'put':
+    this.submitButtonLabel = '変更する';
+    this.submitButtonType = 'emphasis';
+    break;
+  case 'delete':
+    this.submitButtonLabel = '削除する';
+    this.submitButtonType = 'emphasis';
+    break;
+  default:
+    this.submitButtonLabel = '送信する';
+    break;
+  }
+
+  // 現在の入力値群。
   this.currentParameters = objectAssign({}, this.opts.initialParameters);
+
+  // 補完的な情報群。primaryキー等。
+  this.additionalInfo = {
+    method: this.opts.method,
+    primaryKey: this.opts.primaryKey
+  };
 
   this.handleParametersChange = newParameters => {
     this.currentParameters = newParameters;
@@ -13255,6 +13925,7 @@ var script$6 = function() {
         this.close();
       })
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        message: `APIパラメータやOASが正しいか確認して下さい。[${this.opts.operationObject.summary || ''}]`,
         error: err
       }));
   };
@@ -13264,7 +13935,7 @@ var script$6 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-operation', '<div class="ComponentOperation__head"> <div class="ComponentOperation__title">{opts.title}</div> <div class="ComponentOperation__description" if="{!!opts.description}">{opts.description}</div> </div> <div class="ComponentOperation__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentOperation__tail"> <dmc-button label="submit" onpat="{handleSubmitButtonPat}"></dmc-button> <dmc-button label="cancel" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="ComponentOperation"', function(opts) {
+riot$1.tag2('dmc-component-operation', '<div class="ComponentOperation__head"> <div class="ComponentOperation__title">{opts.title}</div> <div class="ComponentOperation__description" if="{!!opts.description}">{opts.description}</div> </div> <div class="ComponentOperation__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" additionalinfo="{additionalInfo}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentOperation__tail"> <dmc-button label="{submitButtonLabel}" type="{submitButtonType}" onpat="{handleSubmitButtonPat}"></dmc-button> <dmc-button label="閉じる" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="ComponentOperation"', function(opts) {
     this.external(script$6);
 });
 
@@ -13273,11 +13944,30 @@ var script$5 = function() {
   const operationObject = this.opts.action;
 
   this.label = operationObject.summary || operationObject.operationId;
+  const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
+  this.icon = null;
+  switch (method) {
+  case 'get':
+    this.icon = 'download';
+    break;
+  case 'post':
+    this.icon = 'plusSquareO';
+    break;
+  case 'put':
+    this.icon = 'edit';
+    break;
+  case 'delete':
+    this.icon = 'closeSquareO';
+    break;
+  default:
+    break;
+  }
 
   this.handleButtonPat = () => {
     store.action(constants$1.DRAWERS_ADD, 'dmc-component-operation', {
       title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,
+      method,
       operationObject,
       parameterObjects: operationObject.parameters,
       initialParameters: {},
@@ -13288,7 +13978,7 @@ var script$5 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-action', '<dmc-button label="{label}" onpat="{handleButtonPat}"></dmc-button>', '', 'class="Component__action"', function(opts) {
+riot$1.tag2('dmc-component-action', '<dmc-button label="{label}" icon="{icon}" onpat="{handleButtonPat}"></dmc-button>', '', 'class="Component__action"', function(opts) {
     this.external(script$5);
 });
 
@@ -41051,6 +41741,75 @@ riot$1.tag2('dmc-component-number', '<div>{value}</div>', '', 'class="ComponentN
     this.external(script$14);
 });
 
+var script$15 = function() {};
+
+riot$1.tag2('dmc-tooltip', '<div class="Tooltip__basePoint"> <div class="Tooltip__text">{opts.label}</div> </div>', '', 'class="Tooltip Tooltip--{opts.placement || \'topCenter\'}"', function(opts) {
+    this.external(script$15);
+});
+
+var script$16 = function() {
+  const store = this.riotx.get();
+
+  // icon種類。
+  this.icon = this.opts.icon;
+  // actionの場合はmethodから判定する。
+  if (this.opts.isaction) {
+    const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, this.opts.action.operationId);
+    switch (method) {
+    case 'get':
+      this.icon = 'download';
+      break;
+    case 'post':
+      this.icon = 'plusSquareO';
+      break;
+    case 'put':
+      this.icon = 'edit';
+      break;
+    case 'delete':
+      this.icon = 'closeSquareO';
+      break;
+    default:
+      break;
+    }
+  }
+
+  // tooltip表示中か否か。
+  this.isTooltipVisible = false;
+  // tooltip内に表示するテキスト。
+  this.tooltipLabel = null;
+  if (this.opts.isaction) {
+    this.tooltipLabel = this.opts.action.value;
+  }
+
+  this.handleTap = () => {
+    if (this.opts.isaction) {
+      this.opts.onpat(this.opts.action);
+    } else {
+      this.opts.onpat();
+    }
+  };
+
+  this.handleMouseOver = () => {
+    if (!this.opts.isaction) {
+      return;
+    }
+    this.isTooltipVisible = true;
+    this.update();
+  };
+
+  this.handleMouseOut = () => {
+    if (!this.opts.isaction) {
+      return;
+    }
+    this.isTooltipVisible = false;
+    this.update();
+  };
+};
+
+riot$1.tag2('dmc-table-items-button', '<dmc-icon type="{icon}"></dmc-icon> <dmc-tooltip if="{isTooltipVisible}" label="{tooltipLabel}"></dmc-tooltip> <div class="Table__itemsButtonCatcher"></div>', '', 'class="Table__itemsButton {opts.class}" ref="touch" ontap="handleTap" onmouseover="{handleMouseOver}" onmouseout="{handleMouseOut}"', function(opts) {
+    this.external(script$16);
+});
+
 /**
      * Array.indexOf
      */
@@ -41080,12 +41839,12 @@ riot$1.tag2('dmc-component-number', '<div>{value}</div>', '', 'class="ComponentN
 /**
      * If array contains values.
      */
-    function contains$1(arr, val) {
+    function contains$3(arr, val) {
         return indexOf_1$1(arr, val) !== -1;
     }
-    var contains_1$1 = contains$1;
+    var contains_1$2 = contains$3;
 
-var script$15 = function() {
+var script$17 = function() {
   const store = this.riotx.get();
 
   this.value = null;
@@ -41105,14 +41864,14 @@ var script$15 = function() {
   case 'string': {
     this.value = this.opts.data.cell || '-';
     const split = this.value.split('.');
-    if (!!split.length && contains_1$1(['jpg', 'png', 'gif'], split[split.length - 1])) {
+    if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
       this.isImage = true;
     }
     break;
   }
   case 'object':
   case 'array':
-    this.value = '[詳細を見る]';
+    this.value = this.opts.data.cell;
     this.isComplex = true;
     break;
   default:
@@ -41120,28 +41879,162 @@ var script$15 = function() {
     break;
   }
 
-  this.handleTap = ()  => {
+  this.handleDetailPat = () => {
     store.action(constants$1.MODALS_ADD, 'dmc-prettyprint', {
       data : this.opts.data.cell
     });
   };
 };
 
-riot$1.tag2('dmc-table-cell', '<div class="Table__cellValue" if="{!isComplex &amp;&amp; !isImage}">{value}</div> <div class="Table__cellButton" if="{isComplex}" ref="touch" ontap="handleTap">{value}</div> <div class="Table__cellImage" if="{isImage}"> <div riot-style="background-image:url({value});"></div> </div>', '', 'class="Table__cell"', function(opts) {
-    this.external(script$15);
+riot$1.tag2('dmc-table-cell', '<div class="Table__cellValue" if="{!isComplex &amp;&amp; !isImage}">{value}</div> <dmc-button if="{isComplex &amp;&amp; !opts.isdetailmode}" type="secondaryGhost" icon="link" label="詳細" onpat="{handleDetailPat}"></dmc-button> <div class="Table__cellComplex" if="{isComplex &amp;&amp; opts.isdetailmode}"> <dmc-prettyprint data="{value}"></dmc-prettyprint> </div> <div class="Table__cellImage" if="{isImage}"> <div riot-style="background-image:url({value});"></div> </div>', '', 'class="Table__cell"', function(opts) {
+    this.external(script$17);
 });
 
-var script$16 = function() {
-  this.isOpened = true;
+var script$18 = function() {
+  const store = this.riotx.get();
 
-  this.handleHeaderTap = () => {
+  this.handleTap = () => {
+    // クリップボードにコピーできないタイプであればスルーする。
+    const type = this.opts.item.type;
+    const value = this.opts.item.cell;
+    if (type === 'object' || type === 'array') {
+      return;
+    }
+    if (type === 'string') {
+      const split = value.split('.');
+      if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
+        return;
+      }
+    }
+
+    Promise
+      .resolve()
+      .then(() => {
+        const tmpElm = document.createElement('textarea');
+        tmpElm.value = value;
+        tmpElm.selectionStart = 0;
+        tmpElm.selectionEnd = tmpElm.value.length;
+        const tmpStyle = tmpElm.style;
+        tmpStyle.position = 'fixed';
+        tmpStyle.left = '-100%';
+        document.body.appendChild(tmpElm);
+        tmpElm.focus();
+        const result = document.execCommand('copy');
+        tmpElm.blur();
+        document.body.removeChild(tmpElm);
+        if (!result) {
+          throw new Error();
+        }
+      })
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'クリップボードにコピーしました。'
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'コピー失敗',
+        message: 'ご使用中の環境ではクリップボードへコピー出来ません。',
+        error: err
+      }));
+
+  };
+};
+
+riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <dmc-table-cell data="{opts.item}" isdetailmode="{opts.isdetailmode}"></dmc-table-cell>', '', 'class="Table__item {opts.isdetailmode ? \'Table__item--detail\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$18);
+});
+
+var script$20 = function() {
+  this.handleCloseButtonPat = () => {
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-table-flatitems', '<div class="Table__flatitemsHead"> <div class="Table__flatitemsTitle">詳細</div> <div class="Table__flatitemsDescription">テーブル列の全項目を表示しています。</div> </div> <div class="Table__flatitemsBody"> <div class="Table__flatitemsList"> <dmc-table-item each="{item in opts.items}" isdetailmode="{true}" item="{item}"></dmc-table-item> </div> </div> <div class="Table__flatitemsTail"> <dmc-button label="閉じる" type="secondary" onpat="{handleCloseButtonPat}"></dmc-button> </div>', '', 'class="Table__flatitems"', function(opts) {
+    this.external(script$20);
+});
+
+var script$19 = function() {
+  const store = this.riotx.get();
+
+  // sort済みのitems。
+  this.sortedItems = sortBy_1$1(this.opts.items, item => {
+    return (this.opts.tablelabels || []).indexOf(item.key) * (-1);
+  });
+  this.title = this.sortedItems[0].cell;
+  this.isOpened = true;
+  this.isTooltipVisible = false;
+
+  this.getFilteredItems = () => {
+    const items = this.sortedItems;
+    const columns = this.opts.selectedtablecolumns;
+    if (!isArray_1$1(columns) || !columns.length) {
+      return items;
+    }
+    return filter_1$1(items, item => {
+      return contains_1$2(columns, item.key);
+    });
+  };
+
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.handleHeaderTitleTap = () => {
     this.isOpened = !this.isOpened;
+    this.update();
+  };
+
+  this.handleItemsActionButtonPat = action => {
+    action.onPat(action.operationId, this.opts.idx);
+  };
+
+  this.handleOpenShutButtonPat = () => {
+    this.isOpened = !this.isOpened;
+    this.update();
+  };
+
+  this.handleDetailButtonTap = () => {
+    store.action(constants$1.DRAWERS_ADD, 'dmc-table-flatitems', {
+      items: this.sortedItems
+    });
+  };
+
+  this.handleDetailButtonMouseOver = () => {
+    this.isTooltipVisible = true;
+    this.update();
+  };
+
+  this.handleDetailButtonMouseOut = () => {
+    this.isTooltipVisible = false;
     this.update();
   };
 };
 
-riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap="handleHeaderTap"> <div class="Table__itemInfo"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <div class="Table__itemOpenShut"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-cell data="{opts.item}"></dmc-table-cell> </virtual>', '', 'class="Table__item {isOpened ? \'Table__item--opened\' : \'\'}"', function(opts) {
-    this.external(script$16);
+riot$1.tag2('dmc-table-items', '<div class="Table__itemsHeader"> <div class="Table__itemsTitle" ref="touch" ontap="handleHeaderTitleTap">{title}</div> <virtual each="{action in opts.actions}"> <dmc-table-items-button action="{action}" isaction="{true}" onpat="{parent.handleItemsActionButtonPat}"></dmc-table-items-button> </virtual> <dmc-table-items-button class="Table__itemsOpenShutButton" icon="up" onpat="{handleOpenShutButtonPat}"></dmc-table-items-button> </div> <virtual if="{isOpened}"> <div class="Table__itemsContent"> <div class="Table__itemsList"> <dmc-table-item each="{item in getFilteredItems()}" item="{item}"></dmc-table-item> </div> <div class="Table__itemsControl"> <div class="Table__itemsDetailButton" ref="touch" ontap="handleDetailButtonTap" onmouseover="{handleDetailButtonMouseOver}" onmouseout="{handleDetailButtonMouseOut}"> <dmc-icon type="scan"></dmc-icon> <dmc-tooltip if="{isTooltipVisible}" placement="topRight" label="全て表示"></dmc-tooltip> <div class="Table__itemsDetailButtonCatcher"></div> </div> </div> </div> </virtual>', '', 'class="Table__items {isOpened ? \'Table__items--opened\' : \'\'}"', function(opts) {
+    this.external(script$19);
+});
+
+var script$21 = function() {
+  this.getItemList = () => {
+    const columns = this.opts.columns;
+    const list = [];
+    forEach_1(this.opts.rows, row => {
+      const items = [];
+      forEach_1(columns, column => {
+        items.push({
+          key: column.key,
+          title: column.title,
+          type: column.type,
+          cell: row[column.key]
+        });
+      });
+      list.push(items);
+    });
+    return list;
+  };
+};
+
+riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}" tablelabels="{parent.opts.tablelabels}" selectedtablecolumns="{parent.opts.selectedtablecolumns}"></dmc-table-items>', '', 'class="Table"', function(opts) {
+    this.external(script$21);
 });
 
 /**
@@ -41175,19 +42068,7 @@ riot$1.tag2('dmc-table-item', '<div class="Table__itemHeader" ref="touch" ontap=
 
     var find_1$2 = find$3;
 
-var script$18 = function() {
-  this.handleActionButtonPat = e => {
-    const idx = e.target.getAttribute('idx');
-    this.opts.actions[idx].onPat(this.opts.actions[idx].operationId, this.opts.idx);
-    this.close();
-  };
-};
-
-riot$1.tag2('dmc-table-action', '<div class="Table__actionItem" each="{action, idx in opts.actions}"> <div class="Table__actionInner"> <div class="Table__actionTitle">{action.value}</div> <div class="Table__actionDescription">{action.description}</div> </div> <div class="Table__actionExecuteButton" idx="{idx}" ref="touch" ontap="parent.handleActionButtonPat">execute</div> </div>', '', 'class="Table__action"', function(opts) {
-    this.external(script$18);
-});
-
-var script$19 = function() {
+var script$23 = function() {
   this.handleTap = () => {
     if (this.opts.isdisabled) {
       return;
@@ -41197,158 +42078,10 @@ var script$19 = function() {
 };
 
 riot$1.tag2('dmc-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <dmc-icon type="check"></dmc-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$19);
+    this.external(script$23);
 });
 
-/**
-     * Remove a single item from the array.
-     * (it won't remove duplicates, just a single item)
-     */
-    function remove$1(arr, item){
-        var idx = indexOf_1$1(arr, item);
-        if (idx !== -1) { arr.splice(idx, 1); }
-    }
-
-    var remove_1$1 = remove$1;
-
-var script$20 = function() {
-  this.items = map_1$1(this.opts.options, option => {
-    return {
-      label: option,
-      id: option,
-      isChecked: find_1$2(this.opts.selectedOptions, selectedOption => {
-        return (selectedOption === option);
-      })
-    };
-  });
-  this.selectedItems = [].concat(this.opts.selectedOptions);
-
-  this.handleCheckboxChange = (isChecked, id) => {
-    if (isChecked) {
-      this.selectedItems.push(id);
-    } else {
-      remove_1$1(this.selectedItems, id);
-    }
-    forEach_1(this.items, item => {
-      if (item.id !== id) {
-        return;
-      }
-      item.isChecked = isChecked;
-    });
-    this.update();
-    this.opts.onChange(this.selectedItems);
-  };
-};
-
-riot$1.tag2('dmc-table-filter', '<dmc-checkbox each="{item in items}" label="{item.label}" ischecked="{item.isChecked}" id="{item.id}" onchange="{parent.handleCheckboxChange}"></dmc-checkbox>', '', 'class="Table__filter"', function(opts) {
-    this.external(script$20);
-});
-
-var script$17 = function() {
-  const store = this.riotx.get();
-
-  this.isOpened = false;
-  this.title = '';
-  // keyを指定されていればそれを使う。
-  let item;
-  forEach_1(this.opts.tablelabels, key => {
-    if (!!item) {
-      return;
-    }
-    item = find_1$2(this.opts.items, item => {
-      return (item.key === key);
-    });
-  });
-  // `id`を優先する。
-  if (!item) {
-    item = find_1$2(this.opts.items, item => {
-      return (item.key === 'id');
-    });
-  }
-  // 適当に選ぶ。
-  if (!item) {
-    item = this.opts.items[0];
-  }
-  this.title = `${item.cell}`;
-
-  // 画面表示するkey群。
-  let visibleKeys = map_1$1(this.opts.items, item => {
-    return item.key;
-  });
-  // filterを通したリストを返す。
-  const getItems = () => {
-    return filter_1$1(this.opts.items, item => {
-      if (!find_1$2(visibleKeys, key => {
-        return (key === item.key);
-      })) {
-        return false;
-      }
-      return true;
-    });
-  };
-  this.filteredItems = getItems();
-
-  this.handleHeaderTitleTap = () => {
-    this.isOpened = !this.isOpened;
-    this.update();
-  };
-
-  this.handleActionButtonTap = () => {
-    store.action(constants$1.MODALS_ADD, 'dmc-table-action', {
-      actions: this.opts.actions,
-      idx: this.opts.idx
-    });
-  };
-
-  this.handleFilterButtonTap = () => {
-    store.action(constants$1.MODALS_ADD, 'dmc-table-filter', {
-      options: map_1$1(this.opts.items, item => {
-        return item.key;
-      }),
-      selectedOptions: visibleKeys,
-      onChange: selectedOptions => {
-        visibleKeys = selectedOptions;
-        this.filteredItems = getItems();
-        this.update();
-      }
-    });
-  };
-
-  this.handleOpenShutButtonTap = () => {
-    this.isOpened = !this.isOpened;
-    this.update();
-  };
-};
-
-riot$1.tag2('dmc-table-items', '<div class="Table__itemsHeader"> <div class="Table__itemsTitle" ref="touch" ontap="handleHeaderTitleTap">{title}</div> <div class="Table__itemsButton" if="{!!opts.actions}" ref="touch" ontap="handleActionButtonTap"> <dmc-icon type="edit"></dmc-icon> </div> <div class="Table__itemsButton" ref="touch" ontap="handleFilterButtonTap"> <dmc-icon type="filter"></dmc-icon> </div> <div class="Table__itemsButton Table__itemsOpenShutButton" ref="touch" ontap="handleOpenShutButtonTap"> <dmc-icon type="up"></dmc-icon> </div> </div> <virtual if="{isOpened}"> <dmc-table-item each="{item in filteredItems}" item="{item}"></dmc-table-item> </virtual>', '', 'class="Table__items {isOpened ? \'Table__items--opened\' : \'\'}"', function(opts) {
-    this.external(script$17);
-});
-
-var script$21 = function() {
-  this.getItemList = () => {
-    const columns = this.opts.columns;
-    const list = [];
-    forEach_1(this.opts.rows, row => {
-      const items = [];
-      forEach_1(columns, column => {
-        items.push({
-          key: column.key,
-          title: column.title,
-          type: column.type,
-          cell: row[column.key]
-        });
-      });
-      list.push(items);
-    });
-    return list;
-  };
-};
-
-riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}" tablelabels="{parent.opts.tablelabels}"></dmc-table-items>', '', 'class="Table"', function(opts) {
-    this.external(script$21);
-});
-
-var script$23 = function() {
+var script$24 = function() {
   this.handleFormSubmit = e => {
     e.preventUpdate = true;
     e.preventDefault();
@@ -41377,8 +42110,8 @@ var script$23 = function() {
   };
 };
 
-riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </form>', '', 'class="Select"', function(opts) {
-    this.external(script$23);
+riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" disabled="{!!opts.isdisabled}" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <dmc-icon type="down"></dmc-icon> </div> </form>', '', 'class="Select {\'Select--disabled\' : opts.isdisabled}"', function(opts) {
+    this.external(script$24);
 });
 
 /**
@@ -41388,7 +42121,7 @@ riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.
     }
     var isString_1 = isString;
 
-var script$24 = function() {
+var script$25 = function() {
   /**
    * undefined等の値を考慮した最適な値を返します。
    * @param {String|null} value
@@ -41398,14 +42131,17 @@ var script$24 = function() {
     if (!isString_1(value)) {
       return null;
     }
-    return value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    return value;
   };
 
   this.on('mount', () => {
     this.refs.input.value = this.normalizeValue(this.opts.text);
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
-    this.refs.input.value = this.normalizeValue(this.opts.text);
+    const text = this.opts.text;
+    if (!isString_1(text)) {
+      this.refs.input.value = this.normalizeValue(text);
+    }
   });
 
   this.handleTap = () => {
@@ -41431,30 +42167,51 @@ var script$24 = function() {
   };
 };
 
-riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$24);
+riot$1.tag2('dmc-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--ghost\' : (opts.theme === \'ghost\'), \'Textinput--disabled\' : opts.isdisabled}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$25);
 });
 
-var script$25 = function() {
+var script$26 = function() {
   this.inputId = `Uploader__input${Date.now()}`;
   this.file = null;
+  this.fileName = null;
+  this.isTypeOfImage = false;
   this.blobURL = this.opts.initialbloburl || null;
-
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
+  this.isDragWatching = false;
+  this.isDroppable = false;
 
   this.reset = () => {
     window.URL.revokeObjectURL(this.blobURL);
     this.refs.form.reset();
     this.file = null;
+    this.fileName = null;
+    this.isTypeOfImage = false;
     this.blobURL = this.opts.initialbloburl || null;
     this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
     this.update();
   };
 
-  this.handleFileChange = e => {
-    const files = e.target.files;
+  this.on('updated', () => {
+    this.rebindTouchEvents();
+  });
+
+  this.handleChange = e => {
+    e.stopPropagation();
+  };
+
+  /**
+   * fileが変更された時の処理。
+   * DnD経由でも実行されます。
+   * @param {Object} e
+   * @param {Boolean} fromDnD Dnd経由か否か。
+   */
+  this.handleFileChange = (e, fromDnD) => {
+    let files;
+    if (fromDnD) {
+      files = e.dataTransfer.files;
+    } else {
+      files = e.target.files;
+    }
     if (!files.length) {
       this.reset();
       return;
@@ -41462,9 +42219,33 @@ var script$25 = function() {
 
     const file = files[0];
     this.file = file;
+    this.fileName = file.name;
+    this.isTypeOfImage = (file.type.indexOf('image/') === 0);
     this.blobURL = window.URL.createObjectURL(file);
     this.opts.onfilechange && this.opts.onfilechange(this.file, this.blobURL);
     this.update();
+  };
+
+  this.handleHandlerDragEnter = e => {
+    e.preventDefault();
+    this.isDragWatching = true;
+    this.update();
+  };
+
+  this.handleHandlerDragOver = e => {
+    e.preventDefault();
+  };
+
+  this.handleHandlerDragLeave = () => {
+    this.isDragWatching = false;
+    this.update();
+  };
+
+  this.handleHandlerDrop = e => {
+    e.preventDefault();
+    this.isDragWatching = false;
+    this.update();
+    this.handleFileChange(e, true);
   };
 
   this.handleResetButtonTap = () => {
@@ -41472,11 +42253,11 @@ var script$25 = function() {
   };
 };
 
-riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL}" riot-style="background-image:url({blobURL});"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div>', '', 'class="Uploader"', function(opts) {
-    this.external(script$25);
+riot$1.tag2('dmc-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{!!opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <dmc-icon type="file"></dmc-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfImage}" riot-style="background-image:url({blobURL});"></div> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <dmc-icon type="close"></dmc-icon> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--disabled\' : opts.isdisabled, \'Uploader--dragWatching\' : isDragWatching}" onchange="{handleChange}"', function(opts) {
+    this.external(script$26);
 });
 
-var script$26 = function() {
+var script$27 = function() {
   const type = this.opts.parameterobject.type;
   // @see: https://swagger.io/specification/#dataTypeFormat
   const format = this.opts.parameterobject.format;
@@ -41573,10 +42354,10 @@ var script$26 = function() {
 };
 
 riot$1.tag2('dmc-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select isopened="{isOpened}" options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleFileChange}"></dmc-uploader> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
-    this.external(script$26);
+    this.external(script$27);
 });
 
-var script$27 = function() {
+var script$28 = function() {
   // typeは'null', 'boolean', 'object', 'array', 'number', 'integer', or 'string'.
   // @see: https://swagger.io/specification/#dataTypeFormat
   const type = this.opts.parameterobject.type;
@@ -41624,7 +42405,7 @@ var script$27 = function() {
   this.getParameterObject = propertyKey => {
     return objectAssign({}, this.multiSchema.properties[propertyKey], {
       name: propertyKey,
-      required : contains_1$1(this.multiSchema.required, propertyKey)
+      required : contains_1$2(this.multiSchema.required, propertyKey)
     });
   };
 
@@ -41705,16 +42486,16 @@ var script$27 = function() {
 };
 
 riot$1.tag2('dmc-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" ref="touch" ontap="handleMultiPlusButtonTap"> <dmc-icon type="plus"></dmc-icon> </div> <virtual if="{uiType === \'input\'}"> <dmc-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" ref="touch" idx="{idx}" ontap="handleMultiMinusButtonTap"> <dmc-icon type="minus"></dmc-icon> </div> <dmc-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></dmc-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
-    this.external(script$27);
+    this.external(script$28);
 });
 
-var script$28 = function() {
+var script$29 = function() {
   this.propertyKeys = Object.keys(this.opts.schema.properties);
 
   this.getParameterObject = propertyKey => {
     return objectAssign({}, this.opts.schema.properties[propertyKey], {
       name: propertyKey,
-      required : contains_1$1(this.opts.schema.required, propertyKey)
+      required : contains_1$2(this.opts.schema.required, propertyKey)
     });
   };
 
@@ -41740,10 +42521,10 @@ var script$28 = function() {
 };
 
 riot$1.tag2('dmc-operation-schema', '<dmc-operation-schema-form each="{propertyKey in propertyKeys}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey)}" onchange="{parent.handleChange}"></dmc-operation-schema-form>', '', 'class="Operation__schema"', function(opts) {
-    this.external(script$28);
+    this.external(script$29);
 });
 
-var script$29 = function() {
+var script$30 = function() {
   this.isUseBody = false;
   // "query", "header", "path", "formData" or "body"のどれか。
   if (this.opts.parameter.in === 'body') {
@@ -41756,10 +42537,10 @@ var script$29 = function() {
 };
 
 riot$1.tag2('dmc-operation-parameter', '<div class="Operation__parameterHead"> <div> <div class="Operation__parameterName">name: {opts.parameter.name}</div> <div class="Operation__parameterDescription">description: {opts.parameter.description}</div> <div class="Operation__parameterIn">in: {opts.parameter.in}</div> </div> <div class="Operation__parameterRequired" if="{opts.parameter.required}">required</div> </div> <div class="Operation__parameterBody"> <dmc-operation-schema if="{isUseBody}" name="{opts.parameter.name}" schema="{opts.parameter.schema}" parametervalues="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-schema> <dmc-operation-parameter-form if="{!isUseBody}" parameterobject="{this.opts.parameter}" parametervalue="{opts.parametervalue}" onchange="{handleChange}"></dmc-operation-parameter-form> </div>', '', 'class="Operation__parameter"', function(opts) {
-    this.external(script$29);
+    this.external(script$30);
 });
 
-var script$30 = function() {
+var script$31 = function() {
   const store = this.riotx.get();
 
   this.summary = this.opts.operationObject.summary || this.opts.operationObject.operationId;
@@ -41783,6 +42564,7 @@ var script$30 = function() {
         this.opts.onSuccess();
       })
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        message: `APIパラメータやOASが正しいか確認して下さい。[${this.opts.operationObject.summary || ''}]`,
         error: err
       }));
   };
@@ -41793,7 +42575,7 @@ var script$30 = function() {
 };
 
 riot$1.tag2('dmc-operation', '<div class="Operation__info"> <div> <div class="Operation__summary">{summary}</div> <div class="Operation__description">{opts.operationObject.description}</div> </div> </div> <div class="Operation__parameters"> <dmc-operation-parameter each="{parameter in opts.operationObject.parameters}" parameter="{parameter}" parametervalue="{parent.queries[parameter.name]}" onchange="{parent.handleParameterChange}"></dmc-operation-parameter> </div> <div class="Operation__control"> <dmc-button label="{opts.operationObject.operationId}" onpat="{handleExecuteButtonPat}"></dmc-button> <dmc-button label="cancel" type="secondary" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="Operation"', function(opts) {
-    this.external(script$30);
+    this.external(script$31);
 });
 
 var script$22 = function() {
@@ -41863,11 +42645,14 @@ var script$22 = function() {
     const operationObject = find_1$2(this.opts.rowactions, operationObject => {
       return (operationObject.operationId === operationId);
     });
+    const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
     const rowData = this.opts.response[rowIdx];
     const initialParameters = createInitialQueries(operationObject, rowData);
     store.action(constants$1.DRAWERS_ADD, 'dmc-component-operation', {
-      name: operationObject.summary || operationObject.operationId,
+      title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,
+      method,
+      primaryKey: this.opts.primarykey,
       operationObject,
       parameterObjects: operationObject.parameters,
       initialParameters,
@@ -41878,22 +42663,77 @@ var script$22 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}" tablelabels="{opts.tablelabels}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
+riot$1.tag2('dmc-component-table', '<dmc-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}" tablelabels="{opts.tablelabels}" selectedtablecolumns="{opts.selectedtablecolumns}"></dmc-table>', '', 'class="ComponentTable"', function(opts) {
     this.external(script$22);
 });
 
-/**
-     * Get object keys
-     */
-     var keys$1 = Object.keys || function (obj) {
-            var keys = [];
-            forOwn_1$1(obj, function(val, key){
-                keys.push(key);
-            });
-            return keys;
-        };
+var UNDEF$2;
 
-    var keys_1$1 = keys$1;
+    /**
+     */
+    function isUndef(val){
+        return val === UNDEF$2;
+    }
+    var isUndefined = isUndef;
+
+/**
+     * Object reject
+     */
+    function reject$3(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        return filter$3(obj, function(value, index, obj) {
+            return !callback(value, index, obj);
+        }, thisObj);
+    }
+
+    var reject_1$2 = reject$3;
+
+var script$33 = function() {
+  this.handleCheckboxChange = newIsChecked => {
+    this.opts.ontoggle(this.opts.item, newIsChecked);
+  };
+};
+
+riot$1.tag2('dmc-component-filter-item', '<dmc-checkbox ischecked="{opts.item.isSelected}" label="{opts.item.label}" onchange="{handleCheckboxChange}"></dmc-checkbox>', '', 'class="ComponentFilter__item"', function(opts) {
+    this.external(script$33);
+});
+
+var script$34 = function() {
+  const selectedTableColumns = (this.opts.selectedTableColumns || []).concat([]);
+
+  this.items = [];
+  forEach_1(this.opts.tableColumns, tableColumn => {
+    const item = {
+      label: tableColumn,
+      isSelected: contains_1$2(selectedTableColumns, tableColumn)
+    };
+    this.items.push(item);
+  });
+
+  this.handleItemToggle = (item, newIsSelected) => {
+    const targetItem = find_1$2(this.items, i => {
+      return (i.label === item.label);
+    });
+    if (!!targetItem) {
+      targetItem.isSelected = newIsSelected;
+      this.update();
+    }
+  };
+
+  this.handleApplyButtonPat = () => {
+    const newSelectedTableColumns = map_1$1(reject_1$1(this.items, item => {
+      return !item.isSelected;
+    }), item => {
+      return item.label;
+    });
+    this.opts.onComplete(newSelectedTableColumns);
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-component-filter', '<div class="ComponentFilter__head"> <div class="ComponentFilter__title">表示項目フィルター</div> <div class="ComponentFilter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> </div> <div class="ComponentFilter__items"> <dmc-component-filter-item each="{item in items}" item="{item}" ontoggle="{parent.handleItemToggle}"></dmc-component-filter-item> </div> <div class="ComponentFilter__tail"> <dmc-button label="適用する" onpat="{handleApplyButtonPat}"></dmc-button> </div>', '', 'class="ComponentFilter"', function(opts) {
+    this.external(script$34);
+});
 
 var beautify = createCommonjsModule(function (module, exports) {
 /*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
@@ -46228,7 +47068,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-var toString = Object.prototype.toString;
+var toString$2 = Object.prototype.toString;
 
 /**
  * Get the native `typeof` a value.
@@ -46274,7 +47114,7 @@ var kindOf$3 = function kindOf(val) {
   }
 
   // other objects
-  var type = toString.call(val);
+  var type = toString$2.call(val);
 
   if (type === '[object RegExp]') {
     return 'regexp';
@@ -46426,7 +47266,7 @@ function ocd(str, options) {
     .replace(/>(\s*)(?=<!--\s*\/)/g, '> ');
 }
 
-var script$32 = function() {
+var script$35 = function() {
   this.getBeautifiedHtml = () => {
     const data = this.opts.data;
     if (!data) {
@@ -46437,10 +47277,10 @@ var script$32 = function() {
 };
 
 riot$1.tag2('dmc-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="Prettyhtml"', function(opts) {
-    this.external(script$32);
+    this.external(script$35);
 });
 
-var script$33 = function() {
+var script$36 = function() {
   /**
    * undefined等の値を考慮した最適な値を返します。
    * @param {String|null} value
@@ -46450,14 +47290,17 @@ var script$33 = function() {
     if (!isString_1(value)) {
       return null;
     }
-    return value.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    return value;
   };
 
   this.on('mount', () => {
     this.refs.textarea.value = this.normalizeValue(this.opts.text);
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
-    this.refs.textarea.value = this.normalizeValue(this.opts.text);
+    const text = this.opts.text;
+    if (!isString_1(text)) {
+      this.refs.textarea.value = this.normalizeValue(text);
+    }
   });
 
   this.handleTap = () => {
@@ -46483,11 +47326,11 @@ var script$33 = function() {
   };
 };
 
-riot$1.tag2('dmc-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$33);
+riot$1.tag2('dmc-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\' : opts.isdisabled}" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$36);
 });
 
-var script$34 = function() {
+var script$37 = function() {
   // 各タブの選択状態。
   this.isTabEditorSelected = true;
   this.isTabPreviewSelected = false;
@@ -46543,16 +47386,9 @@ var script$34 = function() {
   };
 };
 
-riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Html__tab {\'Html__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Html__body"> <div class="Html__message Html__message--{compileHtml().status}" if="{compileHtml().status === \'failed\'}">{compileHtml().message}</div> <div class="Html__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Html__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compileHtml().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Html"', function(opts) {
-    this.external(script$34);
+riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Html__tab {\'Html__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Html__body"> <div class="Html__message Html__message--{compileHtml().status}" if="{compileHtml().status === \'failed\'}">{compileHtml().message}</div> <div class="Html__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Html__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compileHtml().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Html"', function(opts) {
+    this.external(script$37);
 });
-
-/**
-     */
-    function isNumber(val) {
-        return isKind_1$1(val, 'Number');
-    }
-    var isNumber_1 = isNumber;
 
 /**
      * ES6 Number.isNaN
@@ -46584,16 +47420,7 @@ riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html_
     }
     var isNull_1 = isNull;
 
-var UNDEF$3;
-
-    /**
-     */
-    function isUndef(val){
-        return val === UNDEF$3;
-    }
-    var isUndefined = isUndef;
-
-var script$35 = function() {
+var script$38 = function() {
   /**
    * moutの`isNumber`のラッパー関数。
    * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
@@ -46797,14 +47624,14 @@ var script$35 = function() {
 
 };
 
-riot$1.tag2('dmc-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" onsubmit="{handleFormSubmit}" onkeydown="{handleFormKeyDown}"> <input class="Numberinput__input" ref="input" riot-value="{normalizeValue(opts.number)}" placeholder="{opts.placeholder || \'\'}" oninput="{handleInputInput}" onchange="{handleInputChange}"> <div class="Numberinput__handler"> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : !isIncrementable()}" ontap="handleIncreaseButtonPat" ref="touch"> <dmc-icon type="caretUp"></dmc-icon> </div> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : !isDecrementable()}" ontap="handleDecreaseButtonPat" ref="touch"> <dmc-icon type="caretDown"></dmc-icon> </div> </div> </form>', '', 'class="Numberinput"', function(opts) {
-    this.external(script$35);
+riot$1.tag2('dmc-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" onsubmit="{handleFormSubmit}" onkeydown="{handleFormKeyDown}"> <input class="Numberinput__input" ref="input" riot-value="{normalizeValue(opts.number)}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> <div class="Numberinput__handler"> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : (opts.isdisabled || !isIncrementable())}" ontap="handleIncreaseButtonPat" ref="touch"> <dmc-icon type="caretUp"></dmc-icon> </div> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : (opts.isdisabled || !isDecrementable())}" ontap="handleDecreaseButtonPat" ref="touch"> <dmc-icon type="caretDown"></dmc-icon> </div> </div> </form>', '', 'class="Numberinput {\'Numberinput--disabled\' : opts.isdisabled}"', function(opts) {
+    this.external(script$38);
 });
 
 // NOTE: ブラウザ上でpugを動かすためには`https://pugjs.org/js/pug.js`を使用する必要がある。
 const pug = window.require && window.require('pug');
 
-var script$36 = function() {
+var script$39 = function() {
   // 各タブの選択状態。
   this.isTabEditorSelected = true;
   this.isTabPreviewSelected = false;
@@ -46860,8 +47687,8 @@ var script$36 = function() {
   };
 };
 
-riot$1.tag2('dmc-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Pug__tab {\'Pug__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Pug__body"> <div class="Pug__message Pug__message--{compilePug().status}" if="{compilePug().status === \'failed\'}">{compilePug().message}</div> <div class="Pug__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Pug__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compilePug().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Pug"', function(opts) {
-    this.external(script$36);
+riot$1.tag2('dmc-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Pug__tab {\'Pug__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Pug__body"> <div class="Pug__message Pug__message--{compilePug().status}" if="{compilePug().status === \'failed\'}">{compilePug().message}</div> <div class="Pug__editor" if="{isTabEditorSelected}"> <dmc-textarea text="{opts.text}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}"></dmc-textarea> </div> <div class="Pug__preview" if="{isTabPreviewSelected}"> <dmc-prettyhtml data="{compilePug().html}"></dmc-prettyhtml> </div> </div>', '', 'class="Pug"', function(opts) {
+    this.external(script$39);
 });
 
 // TODO: node_moduleから読み込みたい。
@@ -47036,7 +47863,8 @@ const Quill = window.Quill;
  * @param {Object} params
  */
 const customizeBlotBold = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotBold.className = className;
   }
@@ -47056,7 +47884,8 @@ const customizeBlotBold = params => {
  * @param {Object} params
  */
 const customizeBlotItalic = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotItalic.className = className;
   }
@@ -47071,7 +47900,8 @@ const customizeBlotItalic = params => {
  * @param {Object} params
  */
 const customizeBlotUnderline = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotUnderline.className = className;
   }
@@ -47086,7 +47916,8 @@ const customizeBlotUnderline = params => {
  * @param {Object} params
  */
 const customizeBlotStrike = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotStrike.className = className;
   }
@@ -47101,7 +47932,8 @@ const customizeBlotStrike = params => {
  * @param {Object} params
  */
 const customizeBlotLink = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotLink.className = className;
   }
@@ -47116,7 +47948,8 @@ const customizeBlotLink = params => {
  * @param {Object} params
  */
 const customizeBlotCode = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotCode.className = className;
   }
@@ -47131,7 +47964,7 @@ const customizeBlotCode = params => {
  * @param {Object} params
  */
 const customizeBlotScript = params => {
-  const { className } = params;
+  var className = params.className;
   if (!!className) {
     BlotScript.className = className;
   }
@@ -47143,7 +47976,8 @@ const customizeBlotScript = params => {
  * @param {Object} params
  */
 const customizeBlotImage = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotImage.className = className;
   }
@@ -47158,7 +47992,8 @@ const customizeBlotImage = params => {
  * @param {Object} params
  */
 const customizeBlotVideo = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotVideo.className = className;
   }
@@ -47173,7 +48008,7 @@ const customizeBlotVideo = params => {
  * @param {Object} params
  */
 const customizeBlotHeader = params => {
-  const { className } = params;
+  var className = params.className;
   if (!!className) {
     BlotHeader.className = className;
   }
@@ -47185,7 +48020,7 @@ const customizeBlotHeader = params => {
  * @param {Object} params
  */
 const customizeBlotList = params => {
-  const { className } = params;
+  var className = params.className;
   if (!!className) {
     BlotList.className = className;
   }
@@ -47197,7 +48032,7 @@ const customizeBlotList = params => {
  * @param {Object} params
  */
 const customizeBlotListItem = params => {
-  const { className } = params;
+  var className = params.className;
   if (!!className) {
     BlotListItem.className = className;
   }
@@ -47209,7 +48044,8 @@ const customizeBlotListItem = params => {
  * @param {Object} params
  */
 const customizeBlotBlockquote = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotBlockquote.className = className;
   }
@@ -47224,7 +48060,8 @@ const customizeBlotBlockquote = params => {
  * @param {Object} params
  */
 const customizeBlotCodeBlock = params => {
-  const { className, tagName } = params;
+  var className = params.className;
+  var tagName = params.tagName;
   if (!!className) {
     BlotCodeBlock.className = className;
   }
@@ -47239,7 +48076,8 @@ const customizeBlotCodeBlock = params => {
  * @param {Object} params
  */
 const customizeAttributorColor = params => {
-  const { type = 'style', keyName } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleColor, true);
   } else {
@@ -47255,7 +48093,8 @@ const customizeAttributorColor = params => {
  * @param {Object} params
  */
 const customizeAttributorBackground = params => {
-  const { type = 'style', keyName } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleBackground, true);
   } else {
@@ -47271,7 +48110,9 @@ const customizeAttributorBackground = params => {
  * @param {Object} params
  */
 const customizeAttributorFont = params => {
-  const { type = 'style', keyName, whitelist = [] } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
+  var whitelist = params.whitelist; if ( whitelist === void 0 ) whitelist = [];
   QuillAttributorClassFont.whitelist = whitelist;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleFont, true);
@@ -47288,7 +48129,9 @@ const customizeAttributorFont = params => {
  * @param {Object} params
  */
 const customizeAttributorSize = params => {
-  const { type = 'style', keyName, whitelist = [] } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
+  var whitelist = params.whitelist; if ( whitelist === void 0 ) whitelist = [];
   QuillAttributorClassSize.whitelist = whitelist;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleSize, true);
@@ -47305,7 +48148,7 @@ const customizeAttributorSize = params => {
  * @param {Object} params
  */
 const customizeAttributorIndent = params => {
-  const { keyName } = params;
+  var keyName = params.keyName;
   if (!!keyName) {
     AttributorClassIndent.keyName = keyName;
   }
@@ -47317,7 +48160,8 @@ const customizeAttributorIndent = params => {
  * @param {Object} params
  */
 const customizeAttributorAlign = params => {
-  const { type = 'style', keyName } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleAlign, true);
   } else {
@@ -47333,7 +48177,8 @@ const customizeAttributorAlign = params => {
  * @param {Object} params
  */
 const customizeAttributorDirection = params => {
-  const { type = 'style', keyName } = params;
+  var type = params.type; if ( type === void 0 ) type = 'style';
+  var keyName = params.keyName;
   if (type === 'style') {
     Quill.register(QuillAttributorStyleDirection, true);
   } else {
@@ -47419,7 +48264,7 @@ const customizeBlot = (blotName, params) => {
   }
 };
 
-var script$37 = function() {
+var script$40 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47436,7 +48281,8 @@ var script$37 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47460,7 +48306,8 @@ var script$37 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47474,10 +48321,10 @@ var script$37 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-align-center', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="15" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="14" x2="4" y1="14" y2="14"></line> <line class="ql-stroke" x1="12" x2="6" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignCenter {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$37);
+    this.external(script$40);
 });
 
-var script$38 = function() {
+var script$41 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47494,7 +48341,8 @@ var script$38 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47518,7 +48366,8 @@ var script$38 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47532,10 +48381,10 @@ var script$38 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-align-left', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="3" x2="13" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="9" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignLeft {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$38);
+    this.external(script$41);
 });
 
-var script$39 = function() {
+var script$42 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47552,7 +48401,8 @@ var script$39 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47576,7 +48426,8 @@ var script$39 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47590,10 +48441,10 @@ var script$39 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-align-right', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="15" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="15" x2="5" y1="14" y2="14"></line> <line class="ql-stroke" x1="15" x2="9" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignRight {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$39);
+    this.external(script$42);
 });
 
-var script$40 = function() {
+var script$43 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47610,7 +48461,8 @@ var script$40 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47634,7 +48486,8 @@ var script$40 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47648,10 +48501,10 @@ var script$40 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-blockquote', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-fill ql-stroke" height="3" width="3" x="4" y="5"></rect> <rect class="ql-fill ql-stroke" height="3" width="3" x="11" y="5"></rect> <path class="ql-even ql-fill ql-stroke" d="M7,8c0,4.031-3,5-3,5"></path> <path class="ql-even ql-fill ql-stroke" d="M14,8c0,4.031-3,5-3,5"></path> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__blockquote {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$40);
+    this.external(script$43);
 });
 
-var script$41 = function() {
+var script$44 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47668,7 +48521,8 @@ var script$41 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47692,7 +48546,8 @@ var script$41 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47706,10 +48561,10 @@ var script$41 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-codeblock', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <polyline class="ql-even ql-stroke" points="5 7 3 9 5 11"></polyline> <polyline class="ql-even ql-stroke" points="13 7 15 9 13 11"></polyline> <line class="ql-stroke" x1="10" x2="8" y1="5" y2="13"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__codeblock {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$41);
+    this.external(script$44);
 });
 
-var script$42 = function() {
+var script$45 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47726,7 +48581,8 @@ var script$42 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47750,7 +48606,8 @@ var script$42 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47765,10 +48622,10 @@ var script$42 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-direction', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg if="{!isActive}" viewbox="0 0 18 18"> <polygon class="ql-stroke ql-fill" points="3 11 5 9 3 7 3 11"></polygon> <line class="ql-stroke ql-fill" x1="15" x2="11" y1="4" y2="4"></line> <path class="ql-fill" d="M11,3a3,3,0,0,0,0,6h1V3H11Z"></path> <rect class="ql-fill" height="11" width="1" x="11" y="4"></rect> <rect class="ql-fill" height="11" width="1" x="13" y="4"></rect> </svg> <svg if="{isActive}" viewbox="0 0 18 18"> <polygon class="ql-stroke ql-fill" points="15 12 13 10 15 8 15 12"></polygon> <line class="ql-stroke ql-fill" x1="9" x2="5" y1="4" y2="4"></line> <path class="ql-fill" d="M5,3A3,3,0,0,0,5,9H6V3H5Z"></path> <rect class="ql-fill" height="11" width="1" x="5" y="4"></rect> <rect class="ql-fill" height="11" width="1" x="7" y="4"></rect> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__direction {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$42);
+    this.external(script$45);
 });
 
-var script$43 = function() {
+var script$46 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47785,7 +48642,8 @@ var script$43 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47809,7 +48667,8 @@ var script$43 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47824,10 +48683,10 @@ var script$43 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-header', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="3" y1="4" y2="14"></line> <line class="ql-stroke" x1="11" x2="11" y1="4" y2="14"></line> <line class="ql-stroke" x1="11" x2="3" y1="9" y2="9"></line> </svg> <div class="Wyswyg__headerLevel">{opts.level}</div> </div>', '', 'class="Wyswyg__tool Wyswyg__header {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$43);
+    this.external(script$46);
 });
 
-var script$44 = function() {
+var script$47 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47844,7 +48703,8 @@ var script$44 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47868,7 +48728,8 @@ var script$44 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47883,10 +48744,10 @@ var script$44 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-image', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-stroke" height="10" width="12" x="3" y="4"></rect> <circle class="ql-fill" cx="6" cy="7" r="1"></circle> <polyline class="ql-even ql-fill" points="5 12 5 11 7 9 8 10 11 7 13 9 13 12 5 12"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__image {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$44);
+    this.external(script$47);
 });
 
-var script$45 = function() {
+var script$48 = function() {
   /**
    * タップ領域がタップされた時の処理。
    */
@@ -47897,10 +48758,10 @@ var script$45 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-indent-left', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="9" x2="15" y1="9" y2="9"></line> <polyline class="ql-stroke" points="5 7 5 11 3 9 5 7"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__indentLeft"', function(opts) {
-    this.external(script$45);
+    this.external(script$48);
 });
 
-var script$46 = function() {
+var script$49 = function() {
   /**
    * タップ領域がタップされた時の処理。
    */
@@ -47911,10 +48772,10 @@ var script$46 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-indent-right', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="9" x2="15" y1="9" y2="9"></line> <polyline class="ql-fill ql-stroke" points="3 7 3 11 5 9 3 7"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__indentRight"', function(opts) {
-    this.external(script$46);
+    this.external(script$49);
 });
 
-var script$47 = function() {
+var script$50 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47931,7 +48792,8 @@ var script$47 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -47955,7 +48817,8 @@ var script$47 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -47970,10 +48833,10 @@ var script$47 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-list-bullet', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="6" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="6" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="6" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="3" y1="4" y2="4"></line> <line class="ql-stroke" x1="3" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="3" x2="3" y1="14" y2="14"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__listBullet {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$47);
+    this.external(script$50);
 });
 
-var script$48 = function() {
+var script$51 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -47990,7 +48853,8 @@ var script$48 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48014,7 +48878,8 @@ var script$48 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48029,10 +48894,10 @@ var script$48 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-list-ordered', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="7" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="7" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="7" x2="15" y1="14" y2="14"></line> <line class="ql-stroke ql-thin" x1="2.5" x2="4.5" y1="5.5" y2="5.5"></line> <path class="ql-fill" d="M3.5,6A0.5,0.5,0,0,1,3,5.5V3.085l-0.276.138A0.5,0.5,0,0,1,2.053,3c-0.124-.247-0.023-0.324.224-0.447l1-.5A0.5,0.5,0,0,1,4,2.5v3A0.5,0.5,0,0,1,3.5,6Z"></path> <path class="ql-stroke ql-thin" d="M4.5,10.5h-2c0-.234,1.85-1.076,1.85-2.234A0.959,0.959,0,0,0,2.5,8.156"></path> <path class="ql-stroke ql-thin" d="M2.5,14.846a0.959,0.959,0,0,0,1.85-.109A0.7,0.7,0,0,0,3.75,14a0.688,0.688,0,0,0,.6-0.736,0.959,0.959,0,0,0-1.85-.109"></path> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__listOrdered {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$48);
+    this.external(script$51);
 });
 
-var script$49 = function() {
+var script$52 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -48049,7 +48914,8 @@ var script$49 = function() {
   this.on('mount', () => {
     this.opts.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.opts.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   }).on('unmount', () => {
     this.opts.quill.off(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
@@ -48073,7 +48939,8 @@ var script$49 = function() {
    * スクロール最適化された時の処理。
    */
   this.handleScrollOptimize = () => {
-    const [range, ] = this.opts.quill.selection.getRange();
+    var ref = this.opts.quill.selection.getRange();
+    var range = ref[0];
     updateActiveStatus(range);
   };
 
@@ -48088,10 +48955,10 @@ var script$49 = function() {
 };
 
 riot$1.tag2('dmc-wyswyg-tool-video', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-stroke" height="12" width="12" x="3" y="3"></rect> <rect class="ql-fill" height="12" width="1" x="5" y="3"></rect> <rect class="ql-fill" height="12" width="1" x="12" y="3"></rect> <rect class="ql-fill" height="2" width="8" x="5" y="8"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="5"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="7"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="10"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="12"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="5"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="7"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="10"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="12"></rect> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__video {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$49);
+    this.external(script$52);
 });
 
-var script$50 = function() {
+var script$53 = function() {
   const blotOptions = this.opts.blotoptions || {};
 
   // quillインスタンス。
@@ -48157,7 +49024,7 @@ var script$50 = function() {
       // @see: https://quilljs.com/docs/configuration/#placeholder
       placeholder: 'type here...',
       // @see: https://quilljs.com/docs/configuration/#readonly
-      readonly: false,
+      readonly: this.opts.isdisabled,
       // @see: https://quilljs.com/docs/configuration/#scrollingcontainer
       scrollingContainer: null,
       // @see: https://quilljs.com/docs/configuration/#strict
@@ -48191,6 +49058,7 @@ var script$50 = function() {
       headElm.insertBefore(linkElm, headElm.firstChild);
     }
     this.update();
+    this.quill.enable(!this.opts.isdisabled);
   }).on('unmount', () => {
     this.quill.off(Quill.events.TEXT_CHANGE, this.handleTextChange);
     this.quill.off(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
@@ -48256,8 +49124,8 @@ var script$50 = function() {
   */
 };
 
-riot$1.tag2('dmc-wyswyg', '<div class="Wyswyg__toolbar"> <dmc-wyswyg-tool-image if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-image> <dmc-wyswyg-tool-video if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-video> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{1}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{2}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{3}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{4}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{5}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{6}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-list-ordered if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-ordered> <dmc-wyswyg-tool-list-bullet if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-bullet> <dmc-wyswyg-tool-indent-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-left> <dmc-wyswyg-tool-indent-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-right> <dmc-wyswyg-tool-align-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-left> <dmc-wyswyg-tool-align-center if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-center> <dmc-wyswyg-tool-align-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-right> <dmc-wyswyg-tool-direction if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-direction> <dmc-wyswyg-tool-blockquote if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-blockquote> <dmc-wyswyg-tool-codeblock if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-codeblock> </div> <div class="Wyswyg__editor" ref="editor"></div>', '', 'class="Wyswyg {\'Wyswyg--bubbled\' : isBubbled}"', function(opts) {
-    this.external(script$50);
+riot$1.tag2('dmc-wyswyg', '<div class="Wyswyg__toolbar"> <dmc-wyswyg-tool-image if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-image> <dmc-wyswyg-tool-video if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-video> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{1}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{2}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{3}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{4}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{5}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{6}"></dmc-wyswyg-tool-header> <dmc-wyswyg-tool-list-ordered if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-ordered> <dmc-wyswyg-tool-list-bullet if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-list-bullet> <dmc-wyswyg-tool-indent-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-left> <dmc-wyswyg-tool-indent-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-indent-right> <dmc-wyswyg-tool-align-left if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-left> <dmc-wyswyg-tool-align-center if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-center> <dmc-wyswyg-tool-align-right if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-align-right> <dmc-wyswyg-tool-direction if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-direction> <dmc-wyswyg-tool-blockquote if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-blockquote> <dmc-wyswyg-tool-codeblock if="{!!quill}" quill="{quill}"></dmc-wyswyg-tool-codeblock> </div> <div class="Wyswyg__editor" ref="editor"></div>', '', 'class="Wyswyg {\'Wyswyg--bubbled\' : isBubbled, \'Wyswyg--disabled\' : opts.isdisabled}"', function(opts) {
+    this.external(script$53);
 });
 
 const UI_TEXTINPUT = 'textinput';
@@ -48271,12 +49139,29 @@ const UI_WYSWYG = 'wyswyg';
 const UI_PUG = 'pug';
 const UI_NULL = 'null';
 
-var script$51 = function() {
+var script$54 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const schemaObject = objectAssign({}, this.opts.schemaobject);
 
   // wyswygエディタのオプション群。
   this.blotOptions = schemaObject['x-wyswyg-options'] || {};
+
+  /**
+   * 入力可否をチェックします。
+   * @return {Boolean}
+   */
+  this.checkIsDisabled = () => {
+    const additionalInfo = this.opts.additionalinfo;
+    // primaryキーがpathに含まれており、且つ入力対象keyが同一の場合。
+    // get, post, put, deleteいかなるメソッドでも入力不可能にする。
+    if (schemaObject.in === 'path' && schemaObject.name === additionalInfo.primaryKey) {
+      return true;
+    }
+    // 特に問題なければ入力可能。
+    return false;
+  };
+  // 入力可能 or not。
+  this.isDisabled = this.checkIsDisabled();
 
   /**
    * Selectコンポーネントに使用するoption群を返します。
@@ -48424,8 +49309,8 @@ var script$51 = function() {
   };
 };
 
-riot$1.tag2('dmc-parameter-form', '<div class="ParameterForm__body"> <virtual if="{uiType === \'textinput\'}"> <dmc-textinput text="{opts.val}" onchange="{handleTextinputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <dmc-textarea text="{opts.val}" onchange="{handleTextareaChange}"></dmc-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <dmc-numberinput number="{opts.val}" onchange="{handleNumberinputChange}"></dmc-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.val}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" onfilechange="{handleUploaderFileChange}"></dmc-uploader> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <dmc-wyswyg blotoptions="{blotOptions}" initialinnerhtml="{opts.val}" ontextchange="{handleWyswygChange}"></dmc-wyswyg> </virtual> <virtual if="{uiType === \'pug\'}"> <dmc-pug text="{opts.val}" onchange="{handlePugChange}"></dmc-pug> </virtual> <virtual if="{uiType === \'html\'}"> <dmc-html text="{opts.val}" onchange="{handleHtmlChange}"></dmc-html> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO: null</div> </virtual> </div>', '', '', function(opts) {
-    this.external(script$51);
+riot$1.tag2('dmc-parameter-form', '<div class="ParameterForm__body"> <virtual if="{uiType === \'textinput\'}"> <dmc-textinput text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextinputChange}"></dmc-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <dmc-textarea text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextareaChange}"></dmc-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <dmc-numberinput number="{opts.val}" isdisabled="{isDisabled}" onchange="{handleNumberinputChange}"></dmc-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <dmc-checkbox ischecked="{opts.val}" isdisabled="{isDisabled}" onchange="{handleCheckboxChange}"></dmc-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <dmc-select options="{getSelectOptions()}" isdisabled="{isDisabled}" onchange="{handleSelectChange}"></dmc-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <dmc-uploader accept="*" isdisabled="{isDisabled}" onfilechange="{handleUploaderFileChange}"></dmc-uploader> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <dmc-wyswyg blotoptions="{blotOptions}" initialinnerhtml="{opts.val}" isdisabled="{isDisabled}" ontextchange="{handleWyswygChange}"></dmc-wyswyg> </virtual> <virtual if="{uiType === \'pug\'}"> <dmc-pug text="{opts.val}" isdisabled="{isDisabled}" onchange="{handlePugChange}"></dmc-pug> </virtual> <virtual if="{uiType === \'html\'}"> <dmc-html text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleHtmlChange}"></dmc-html> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO: null</div> </virtual> </div>', '', '', function(opts) {
+    this.external(script$54);
 });
 
 /**
@@ -51696,7 +52581,7 @@ function monthDiff (a, b) {
 hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
 hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
 
-function toString$1 () {
+function toString$3 () {
     return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
 }
 
@@ -52259,7 +53144,7 @@ proto.toDate            = toDate;
 proto.toISOString       = toISOString;
 proto.inspect           = inspect;
 proto.toJSON            = toJSON;
-proto.toString          = toString$1;
+proto.toString          = toString$3;
 proto.unix              = unix;
 proto.valueOf           = valueOf;
 proto.creationData      = creationData;
@@ -53395,7 +54280,7 @@ const maxProperties = (value, constraints) => {
     return result;
   }
   const maxProperties = constraints.maxProperties;
-  if (keys_1$1(value).length > maxProperties) {
+  if (keys_1(value).length > maxProperties) {
     result.isValid = false;
     result.message = `要素数を${maxProperties}以下にして下さい。`;
     return result;
@@ -53415,7 +54300,7 @@ const minProperties = (value, constraints) => {
   // デフォルト値は`0`。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.2.3
   const minProperties = constraints.minProperties || 0;
-  if (keys_1$1(value).length < minProperties) {
+  if (keys_1(value).length < minProperties) {
     result.isValid = false;
     result.message = `要素数を${minProperties}以上にして下さい。`;
     return result;
@@ -53576,6 +54461,12 @@ const _type = (value, constraints) => {
       break;
     case 'boolean':
       if (isBoolean_1(value)) {
+        isValidType = true;
+      }
+      break;
+    case 'file':
+      // より最適なtypeチェックがあればそれを採用したい。
+      if (!!value && isString_1(value.name)) {
         isValidType = true;
       }
       break;
@@ -53744,7 +54635,7 @@ const format$1 = (value, constraints) => {
   }
   case 'hostname': {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
-    
+
     // String型のときだけバリデートする
     if (!isString_1(value)) {
       return result;
@@ -53784,7 +54675,7 @@ const format$1 = (value, constraints) => {
       result.message = '"ipv4"に則ったフォーマットで入力してください。';
       return result;
     }
-    
+
     break;
   }
   case 'ipv6': {
@@ -53795,22 +54686,22 @@ const format$1 = (value, constraints) => {
       return result;
     }
 
-    if(value.match(/::/)) {
+    if (value.match(/::/)) {
       let targetColon = 7;
       // IPv4互換バージョンを使用している場合、ターゲット番号は：6
-      if(value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
+      if (value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
         targetColon = 6;
       }
 
       // ipv6の形を成形する
-      if(value.match(/^::/)) {
+      if (value.match(/^::/)) {
         value = value.replace('::', '0::');
       }
-      if(value.match(/::$/)) {
+      if (value.match(/::$/)) {
         value = value.replace('::', '::0');
       }
 
-      while(value.match(/:/g).length < targetColon) {
+      while (value.match(/:/g).length < targetColon) {
         value = value.replace('::', ':0::');
       }
 
@@ -53823,7 +54714,7 @@ const format$1 = (value, constraints) => {
       /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
     ];
     let matchResult = false;
-    forEach_1(patterns, (pattern) => {
+    forEach_1(patterns, pattern => {
       const isMatch = value.match(pattern);
       if (!isNull_1(isMatch)) {
         matchResult = true;
@@ -53857,11 +54748,11 @@ const format$1 = (value, constraints) => {
 
     break;
   }
-    /*
+  /*
   case 'todo: custom format here':
     // TODO: 独自フォーマットがあればここに。
     break;
-    */
+  */
   default:
     break;
   }
@@ -53881,9 +54772,15 @@ var oas$4 = {
    */
   validate: (value, schemaObject) => {
     const results = [];
+    let result;
+
+    // 空(i.e. undefined)の場合なvalidateしない。
+    if (isUndefined(value)) {
+      return [];
+    }
 
     // typeとselfRequiredチェックだけ最初に済ませておく。
-    let result = _type(value, schemaObject);
+    result = _type(value, schemaObject);
     if (!result.isValid) {
       return [result];
     }
@@ -54006,7 +54903,7 @@ var oas$4 = {
   }
 };
 
-var script$52 = function() {
+var script$55 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const schemaObject = objectAssign({}, this.opts.schemaobject);
   this.schemaObject = schemaObject;
@@ -54023,6 +54920,23 @@ var script$52 = function() {
       value: JSON.stringify(schemaObject[key])
     });
   });
+
+  /**
+   * 入力可否をチェックします。
+   * @return {Boolean}
+   */
+  this.checkIsDisabled = () => {
+    const additionalInfo = this.opts.additionalinfo;
+    // primaryキーがpathに含まれており、且つ入力対象keyが同一の場合。
+    // get, post, put, deleteいかなるメソッドでも入力不可能にする。
+    if (schemaObject.in === 'path' && schemaObject.name === additionalInfo.primaryKey) {
+      return true;
+    }
+    // 特に問題なければ入力可能。
+    return false;
+  };
+  // 入力可能 or not。
+  this.isDisabled = this.checkIsDisabled();
 
   /**
    * バリデートエラー項目群を返します。
@@ -54160,7 +55074,7 @@ var script$52 = function() {
   // 入力プレビューの開閉状態。
   this.isPreviewOpened = false;
   // validateの開閉状態。
-  this.isValidateOpened = false;
+  this.isValidateOpened = true;
   // bodyの開閉状態。
   this.isBodyOpened = true;
 
@@ -54196,6 +55110,9 @@ var script$52 = function() {
 
   // +ボタンがタップされた時の処理。
   this.handleAddButtonTap = () => {
+    if (this.isDisabled) {
+      return;
+    }
     const arr = this.opts.val.concat([]);
     let defaultValue = undefined;
     switch (schemaObject.items.type) {
@@ -54221,6 +55138,9 @@ var script$52 = function() {
 
   // -ボタンがタップされた時の処理。
   this.handleRemoveButtonTap = () => {
+    if (this.isDisabled) {
+      return;
+    }
     this.opts.onremove(this.opts.idx);
   };
 
@@ -54252,11 +55172,11 @@ var script$52 = function() {
   };
 };
 
-riot$1.tag2('dmc-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <dmc-icon type="right"></dmc-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}</div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <dmc-icon type="plusCircle"></dmc-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <dmc-icon type="minusCircle"></dmc-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <dmc-icon type="filetext"></dmc-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <dmc-icon type="infoCirlceO"></dmc-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <dmc-prettyprint data="{opts.val}"></dmc-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <dmc-parameter-form val="{opts.val}" schemaobject="{schemaObject}" onchange="{handleFormChange}"></dmc-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <dmc-parameter-schema each="{property, key in properties}" key="{key}" val="{parent.getPropertyValue(property, key)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, key)}" onchange="{parent.handlePropertyChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <dmc-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" key="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema"', function(opts) {
-    this.external(script$52);
+riot$1.tag2('dmc-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <dmc-icon type="right"></dmc-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}</div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <dmc-icon type="plusCircle"></dmc-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <dmc-icon type="minusCircle"></dmc-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <dmc-icon type="filetext"></dmc-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <dmc-icon type="infoCirlceO"></dmc-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <dmc-icon type="exclamationCircleO"></dmc-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <dmc-prettyprint data="{opts.val}"></dmc-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <dmc-parameter-form val="{opts.val}" schemaobject="{schemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleFormChange}"></dmc-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <dmc-parameter-schema each="{property, key in properties}" key="{key}" val="{parent.getPropertyValue(property, key)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, key)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handlePropertyChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <dmc-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" key="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" additionalinfo="{parent.opts.additionalinfo}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></dmc-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema {\'ParameterSchema--disabled\' : isDisabled}"', function(opts) {
+    this.external(script$55);
 });
 
-var script$53 = function() {
+var script$56 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const parameterObject = objectAssign({}, this.opts.parameterobject);
   this.parameterObject = parameterObject;
@@ -54284,11 +55204,11 @@ var script$53 = function() {
   };
 };
 
-riot$1.tag2('dmc-parameter', '<div class="Parameter__body"> <dmc-parameter-schema val="{opts.val}" schemaobject="{normalizedSchemaObject}" onchange="{handleSchemaChange}"></dmc-parameter-schema> </div>', '', 'class="Parameter"', function(opts) {
-    this.external(script$53);
+riot$1.tag2('dmc-parameter', '<div class="Parameter__body"> <dmc-parameter-schema val="{opts.val}" schemaobject="{normalizedSchemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleSchemaChange}"></dmc-parameter-schema> </div>', '', 'class="Parameter"', function(opts) {
+    this.external(script$56);
 });
 
-var script$54 = function() {
+var script$57 = function() {
   /**
    * ParameterObjectを参照してデフォルト値を返します。
    * @param {Object} parameterObject
@@ -54372,11 +55292,11 @@ var script$54 = function() {
   };
 };
 
-riot$1.tag2('dmc-parameters', '<virtual each="{parameterObject in opts.parameterobjects}"> <dmc-parameter parameterobject="{parameterObject}" val="{parent.getParameterValue(parameterObject)}" onchange="{parent.handleChange}"></dmc-parameter> </virtual>', '', 'class="Parameters"', function(opts) {
-    this.external(script$54);
+riot$1.tag2('dmc-parameters', '<virtual each="{parameterObject in opts.parameterobjects}"> <dmc-parameter parameterobject="{parameterObject}" val="{parent.getParameterValue(parameterObject)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handleChange}"></dmc-parameter> </virtual>', '', 'class="Parameters"', function(opts) {
+    this.external(script$57);
 });
 
-var script$55 = function() {
+var script$58 = function() {
   this.currentParameters = objectAssign({}, this.opts.initialParameters);
 
   this.handleParametersChange = newParameters => {
@@ -54390,8 +55310,8 @@ var script$55 = function() {
   };
 };
 
-riot$1.tag2('dmc-component-search', '<div class="ComponentSearch__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentSearch__tail"> <dmc-button label="submit" onpat="{handleSubmitButtonPat}"></dmc-button> </div>', '', 'class="ComponentSearch"', function(opts) {
-    this.external(script$55);
+riot$1.tag2('dmc-component-search', '<div class="ComponentSearch__body"> <dmc-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></dmc-parameters> </div> <div class="ComponentSearch__tail"> <dmc-button label="検索する" onpat="{handleSubmitButtonPat}"></dmc-button> </div>', '', 'class="ComponentSearch"', function(opts) {
+    this.external(script$58);
 });
 
 const STYLE_NUMBER = 'number';
@@ -54404,7 +55324,7 @@ const STYLE_GRAPH_STACKED_BAR = 'graph-stacked-bar';
 const STYLE_GRAPH_HORIZONTAL_STACKED_BAR = 'graph-horizontal-stacked-bar';
 const STYLE_GRAPH_STACKED_AREA = 'graph-stacked-area';
 
-var script$31 = function() {
+var script$32 = function() {
   const store = this.riotx.get();
 
   // データ取得中か否か。
@@ -54412,7 +55332,6 @@ var script$31 = function() {
   // レスポンスデータが有効か否か。
   this.isValidData = false;
   // レスポンスデータが不正の時に表示するエラー文言。
-  this.alertApi = '';
   this.alertText = '';
   // レスポンスデータ。
   this.response = null;
@@ -54426,15 +55345,39 @@ var script$31 = function() {
   this.rowActions = [];
   // テーブルのrow表示ラベル。
   this.tableLabels = [];
+  // テーブルの全column群。
+  this.tableColumns = [];
+  // filterで選択されたcolumn群。
+  this.selectedTableColumns = [];
+  // テーブル使用時のprimaryキー。
+  this.primaryKey = null;
   // ページング機能ONかどうか。
   this.hasPagination = false;
   // ページング情報。
   this.pagination = {};
-  // 現在のリクエストパラメータ値。
-  this.currentRequestParameters = {};
-  this.isCurrentRequestParametersEmpty = () => {
-    return !keys_1$1(this.currentRequestParameters).length;
+  // ページングのサイズ値。
+  this.paginationSize = 3;
+  // 現在の検索用リクエストパラメータ値。
+  this.currentSearchRequestParameters = {};
+  this.isCurrentSearchRequestParametersEmpty = () => {
+    return !keys_1(this.currentSearchRequestParameters).length;
   };
+  // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
+  this.getParameterObjectsForSearch = () => {
+    return reject_1$1(this.parameterObjects || [], parameterObject => {
+      if (parameterObject.in !== 'query') {
+        return false;
+      }
+      if (parameterObject.name === 'limit') {
+        return true;
+      }
+      if (parameterObject.name === 'offset') {
+        return true;
+      }
+      return false;
+    });
+  };
+
   // コンポーネントにrenderするRiotタグ名。
   this.childComponentName = null;
   switch (this.opts.component.style) {
@@ -54467,30 +55410,38 @@ var script$31 = function() {
     break;
   default:
     this.isValidData = false;
-    this.alertApi = `${this.opts.component.api.method}: ${this.opts.component.api.path}`;
-    this.alertText = `component type of ${this.opts.component.style} is not supported.`;
+    this.alertText = `"${this.opts.component.style}"はサポートされていないstyleです。サポートされているstyleを使用して下さい。`;
     break;
   }
 
   // コンポーネントを更新するための関数。
   // 子コンポーネントに渡されます。
-  this.updater = (requestParameters = {}) => {
+  this.updater = (requestParameters) => {
+    if ( requestParameters === void 0 ) requestParameters = {};
+
     this.isPending = true;
     this.update();
 
-    this.currentRequestParameters = objectAssign(this.currentRequestParameters, requestParameters);
+    this.currentSearchRequestParameters = reject_1$2(objectAssign(this.currentSearchRequestParameters, requestParameters), val => {
+      return isUndefined(val);
+    });
     return Promise
       .resolve()
       .then(() => new Promise(resolve => {
         // 通信が速すぎると見た目がチカチカするので、意図的に通信を遅らせる。
         setTimeout(() => {
           resolve();
-        }, 1000);
+        }, 300);
       }))
-      .then(() => store.action(constants$1.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentRequestParameters))
-      .catch(err => store.action(constants$1.MODALS_ADD, {
-        error: err
-      }));
+      .then(() => store.action(constants$1.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentSearchRequestParameters))
+      .catch(err => {
+        const api = this.opts.component.api;
+        return store.action(constants$1.MODALS_ADD, {
+          title: '通信失敗',
+          message: `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。該当するAPIがOAS上に正しく定義されているかご確認下さい。`,
+          error: err
+        });
+      });
   };
 
   /**
@@ -54499,14 +55450,11 @@ var script$31 = function() {
    */
   this.validateResponse = response => {
     const style = this.opts.component.style;
-    const method = this.opts.component.api.method;
-    const path = this.opts.component.api.path;
 
     if (style === STYLE_NUMBER) {
       if (typeof response !== 'object' || response.value === 'undefined') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
     }
@@ -54514,25 +55462,22 @@ var script$31 = function() {
     if (style === STYLE_TABLE) {
       if (!Array.isArray(response)) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.length) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'Length is 0.';
+        this.alertText = 'テーブルが空です。';
         return;
       }
       if (typeof response[0] !== 'object') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
     }
 
-    if (contains_1$1([
+    if (contains_1$2([
       STYLE_GRAPH_BAR,
       STYLE_GRAPH_SCATTERPLOT,
       STYLE_GRAPH_LINE,
@@ -54543,20 +55488,17 @@ var script$31 = function() {
     ], style)) {
       if (typeof response !== 'object') {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.data || !response.x || !response.y || !Array.isArray(response.data)) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'unexpected response.';
+        this.alertText = 'レスポンス形式が不正です。正しいレスポンス形式に修正して下さい。';
         return;
       }
       if (!response.data.length) {
         this.isValidData = false;
-        this.alertApi = `${method}: ${path}`;
-        this.alertText = 'Length is 0.';
+        this.alertText = 'グラフデータが空です。';
         return;
       }
     }
@@ -54583,7 +55525,9 @@ var script$31 = function() {
     this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
     this.hasPagination = store.getter(constants$4.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
     this.pagination = store.getter(constants$4.COMPONENTS_ONE_PAGINATION, this._riot_id);
+    this.primaryKey = store.getter(constants$4.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
     this.tableLabels = store.getter(constants$4.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
+    this.tableColumns = store.getter(constants$4.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
     this.validateResponse(this.response);
     this.update();
   });
@@ -54602,16 +55546,43 @@ var script$31 = function() {
       });
   };
 
+  this.handleFilterButtonTap = () => {
+    if (this.isPending) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-component-filter', {
+        tableColumns: this.tableColumns,
+        selectedTableColumns: this.selectedTableColumns,
+        onComplete: newSelectedTableColumns => {
+          this.selectedTableColumns = newSelectedTableColumns;
+          this.update();
+        }
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
   this.handleSearchButtonTap = () => {
     if (this.isPending) {
+      return;
+    }
+
+    // ページングに使用するparamerは取り除く。
+    const escapedParameterObjects = this.getParameterObjectsForSearch();
+
+    // 検索用のparameterObjectが存在しない場合は何もしない。
+    if (!escapedParameterObjects.length) {
       return;
     }
 
     Promise
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'dmc-component-search', {
-        parameterObjects: this.parameterObjects,
-        initialParameters: objectAssign({}, this.currentRequestParameters),
+        parameterObjects: escapedParameterObjects,
+        initialParameters: objectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
           this.updater(parameters);
         }
@@ -54622,7 +55593,6 @@ var script$31 = function() {
   };
 
   this.handlePaginationChange = page => {
-    // TODO: swagger上に定義されていないけどOK？？
     const paging = this.currentPaging = {
       limit: this.pagination.size,
       offset: (page - 1) * this.pagination.size
@@ -54631,8 +55601,8 @@ var script$31 = function() {
   };
 };
 
-riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__search {!isCurrentRequestParametersEmpty() ? \'Component__search--active\' : \'\'}" if="{!!parameterObjects.length}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <dmc-pagination if="{!isPending &amp;&amp; hasPpagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" response="{response}" schemaobject="{schemaObject}" tablelabels="{tableLabels}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertApi">{alertApi}</div> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination if="{!isPending &amp;&amp; hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{3}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
-    this.external(script$31);
+riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Component__headBasic"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <dmc-icon type="reload"></dmc-icon> </div> <div class="Component__filter {!!selectedTableColumns.length ? \'Component__filter--active\' : \'\'}" if="{opts.component.style === \'table\'}" ref="touch" ontap="handleFilterButtonTap"> <dmc-icon type="filter"></dmc-icon> </div> <div class="Component__search {!isCurrentSearchRequestParametersEmpty() ? \'Component__search--active\' : \'\'}" if="{!!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap"> <dmc-icon type="search"></dmc-icon> </div> </div> <div class="Component__headSearch" if="{!isCurrentSearchRequestParametersEmpty()}"> <div class="Component__searchQuery" each="{val, key in currentSearchRequestParameters}">{key} : {val}</div> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <dmc-icon type="loading"></dmc-icon> </div> <dmc-pagination class="Component__pagination Component__pagination--head" if="{!isPending &amp;&amp;  hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{paginationSize}" onchange="{handlePaginationChange}"></dmc-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" response="{response}" schemaobject="{schemaObject}" primarykey="{primaryKey}" tablelabels="{tableLabels}" selectedtablecolumns="{selectedTableColumns}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertText">{alertText}</div> </div> <dmc-pagination class="Component__pagination Component__pagination--tail" if="{!isPending &amp;&amp; hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{paginationSize}" onchange="{handlePaginationChange}"></dmc-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <dmc-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></dmc-component-action> </div>', '', 'class="Component"', function(opts) {
+    this.external(script$32);
 });
 
 /**
@@ -54680,11 +55650,12 @@ riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Componen
 
     var throttle_1 = throttle;
 
-var script$56 = function() {
+var script$59 = function() {
   const store = this.riotx.get();
 
   this.name = store.getter(constants$4.PAGE_NAME);
   this.components = store.getter(constants$4.PAGE_COMPONENTS);
+  this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
 
   /**
    * 現在のviewportに最適なcolumn数を計算して返します。
@@ -54693,7 +55664,11 @@ var script$56 = function() {
   const getGridColumnCountForCurrentViewport = () => {
     const containerWidth = this.refs.list.getBoundingClientRect().width;
     const baseColumnWith = 400;
-    const newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
+    let newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
+    // component数が少ない時はギリギリまで横幅を使う。
+    if (this.componentsCount < newColumnCount) {
+      newColumnCount = this.componentsCount;
+    }
     return newColumnCount;
   };
 
@@ -54725,18 +55700,20 @@ var script$56 = function() {
   this.listen(constants$3.PAGE, () => {
     this.name = store.getter(constants$4.PAGE_NAME);
     this.components = store.getter(constants$4.PAGE_COMPONENTS);
+    this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
     this.update();
+    updateGridColumnCount();
   });
 };
 
-riot$1.tag2('dmc-components', '<div class="ComponentsPage__title">{name}</div> <div class="ComponentsPage__listWrapper"> <div class="ComponentsPage__list" ref="list"> <dmc-component each="{component, idx in components}" component="{component}"></dmc-component> </div> </div>', '', 'class="Page ComponentsPage"', function(opts) {
-    this.external(script$56);
+riot$1.tag2('dmc-components', '<div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <dmc-icon type="home"></dmc-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <dmc-icon type="right"></dmc-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__list" ref="list"> <dmc-component each="{component, idx in components}" component="{component}"></dmc-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+    this.external(script$59);
 });
 
-var script$57 = function() {};
+var script$60 = function() {};
 
 riot$1.tag2('dmc-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
-    this.external(script$57);
+    this.external(script$60);
 });
 
 var marked = createCommonjsModule(function (module, exports) {
@@ -56042,9 +57019,9 @@ renderer.del = text => {
   return `<span class="Markdown__delete">${text}</span>`;
 },
 renderer.list = (body, ordered) => {
-  if(ordered){
+  if (ordered) {
     return `<ol class="Markdown__list Markdown__list--ordered">${body}</ol>`;
-  }else{
+  } else {
     return `<ul class="Markdown__list Markdown__list--unordered">${body}</ul>`;
   }
 },
@@ -56070,16 +57047,16 @@ renderer.blockquote = quote => {
   return `<div class="Markdown__blockquote">${quote}</div>`;
 },
 renderer.link = (href, title, text) => {
-  if(title){
+  if (title) {
     return `<a class="Markdown__link" href="${href}" title="${title}">${text}</a>`;
-  }else{
+  } else {
     return `<a class="Markdown__link" href="${href}">${text}</a>`;
   }
 },
 renderer.image = (href, title, text) => {
-  if(title){
+  if (title) {
     return `<img class="Markdown__image" src="${href}" alt="${text}" title="${title}"></img>`;
-  }else{
+  } else {
     return `<img class="Markdown__image" src="${href}" alt="${text}"></img>`;
   }
 },
@@ -56090,14 +57067,14 @@ renderer.tablerow = content => {
   return `<tr class="Markdown__tableRow">${content}</tr>`;
 },
 renderer.tablecell = (content, flags) => {
-  if(flags.header){
+  if (flags.header) {
     return `<th class="Markdown__tableHeader">${content}</th>`;
-  }else{
+  } else {
     return `<td class="Markdown__tableCell Markdown__tableCell--${flags.align}">${content}</td>`;
   }
 };
 
-var script$58 = function() {
+var script$61 = function() {
   marked.setOptions(objectAssign(
     {
       renderer: renderer,
@@ -56111,22 +57088,30 @@ var script$58 = function() {
     },
     this.opts.data.markedOptions
   ));
+
   this.on('mount', () => {
+    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
+  }).on('updated', () => {
     this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
   });
 };
 
 riot$1.tag2('dmc-markdown', '<div ref="view"></div>', '', 'class="Markdown"', function(opts) {
-    this.external(script$58);
+    this.external(script$61);
 });
 
-var script$59 = function() {
+var script$62 = function() {
   this.descriptionsMarkdown = {
-    content: this.opts.description,
+    content: this.opts.endpoint.description,
     markedOptions: {}
   };
 
-  this.on('updated', () => {
+  this.on('update', () => {
+    this.descriptionsMarkdown = {
+      content: this.opts.endpoint.description,
+      markedOptions: {}
+    };
+  }).on('updated', () => {
     this.rebindTouchEvents();
   });
 
@@ -56135,7 +57120,7 @@ var script$59 = function() {
   };
 
   this.handleEditButtonPat = () => {
-    this.opts.onedit(this.opts.key, this.opts.url, this.opts.memo);
+    this.opts.onedit(this.opts.key);
   };
 
   this.handleRemoveButtonPat = () => {
@@ -56147,18 +57132,18 @@ var script$59 = function() {
   };
 
   this.handleQrCodeButtonPat = () => {
-    this.opts.onqrcode(this.opts.key, this.opts.url, this.opts.memo);
+    this.opts.onqrcode(this.opts.key);
   };
 };
 
-riot$1.tag2('dmc-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemName">{opts.name}</div> <div class="EndpointsPage__itemMenuButton" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="ellipsis"></dmc-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemDescription"> <dmc-markdown data="{descriptionsMarkdown}"></dmc-markdown> </div> <div class="EndpointsPage__itemMemo">{opts.memo}</div> <div class="EndpointsPage__itemTags" if="{!!opts.tags.length}"> <dmc-tag each="{label in opts.tags}" label="{label}"></dmc-tag> </div> <div class="EndpointsPage__itemUrl"> <div class="EndpointsPage__itemUrlIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__itemUrlLabel">{opts.url}</div> </div> </div> <div class="EndpointsPage__itemTail"> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleEditButtonPat">編集</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleRemoveButtonPat">削除</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleQrCodeButtonPat">QR Code</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleLogoutButtonPat">ログアウト</div> </div>', '', 'class="EndpointsPage__item" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$59);
+riot$1.tag2('dmc-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.endpoint.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemName">{opts.endpoint.name}</div> <div class="EndpointsPage__itemMenuButton" ref="touch" ontap="handleMenuButtonTap"> <dmc-icon type="ellipsis"></dmc-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemDescription"> <dmc-markdown data="{descriptionsMarkdown}"></dmc-markdown> </div> <div class="EndpointsPage__itemMemo">{opts.endpoint.memo}</div> <div class="EndpointsPage__itemTags" if="{!!opts.endpoint.tags.length}"> <dmc-tag each="{label in opts.endpoint.tags}" label="{label}"></dmc-tag> </div> <div class="EndpointsPage__itemUrl"> <div class="EndpointsPage__itemUrlIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__itemUrlLabel">{opts.endpoint.url}</div> </div> </div> <div class="EndpointsPage__itemTail"> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleEditButtonPat">編集</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleRemoveButtonPat">削除</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleQrCodeButtonPat">QR Code</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleLogoutButtonPat">ログアウト</div> </div>', '', 'class="EndpointsPage__item" ref="touch" ontap="handleTap"', function(opts) {
+    this.external(script$62);
 });
 
-var script$61 = function() {
+var script$64 = function() {
   const store = this.riotx.get();
 
-  this.memo = this.opts.memo || '';
+  this.memo = this.opts.endpoint.memo || '';
 
   this.handleMemoChange = newMemo => {
     this.memo = newMemo;
@@ -56188,8 +57173,8 @@ var script$61 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoint-edit', '<div class="EndpointsPage__editTitle">管理画面を編集する</div> <div class="EndpointsPage__editUrl">{opts.url}</div> <div class="EndpointsPage__editForm"> <dmc-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__editControls"> <dmc-button type="primary" onpat="{handleEditButtonPat}" label="編集"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
-    this.external(script$61);
+riot$1.tag2('dmc-endpoint-edit', '<div class="EndpointsPage__editTitle">エンドポイント編集</div> <div class="EndpointsPage__editHead"> <div class="EndpointsPage__editThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__editName">{opts.endpoint.name || \'-\'}</div> </div> <div class="EndpointsPage__editForm"> <dmc-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="EndpointsPage__editControls"> <dmc-button type="primary" onpat="{handleEditButtonPat}" label="保存"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
+    this.external(script$64);
 });
 
 var qrious = createCommonjsModule(function (module, exports) {
@@ -58556,38 +59541,45 @@ var qrious = createCommonjsModule(function (module, exports) {
 
 });
 
-var script$62 = function() {
-  this.on('mount', function() {
-    const qrcode = new qrious(objectAssign({}, this.opts.data));
-    this.refs.qrcode.src = qrcode.toDataURL();
+var script$65 = function() {
+  this.on('mount', () => {
+    new qrious(objectAssign({}, this.opts.data, {
+      element: this.refs.canvas
+    }));
   });
-
 };
 
-riot$1.tag2('dmc-qrcode', '<img class="Qrcode__img" ref="qrcode">', '', 'class="Qrcode"', function(opts) {
-    this.external(script$62);
+riot$1.tag2('dmc-qrcode', '<canvas class="Qrcode__canvas" ref="canvas"></canvas>', '', 'class="Qrcode"', function(opts) {
+    this.external(script$65);
 });
 
-var script$63 = function() {
-  this.qrcodeStyle = {
+var script$66 = function() {
+  const optimizedEndpoint = objectAssign({}, {
+    url: this.opts.endpoint.url,
+    memo: this.opts.endpoint.memo
+  });
+  const encodedEndpoint = encodeURIComponent(JSON.stringify(optimizedEndpoint));
+  const value = `${location.origin}/#/endpointimport?endpoint=${encodedEndpoint}`;
+
+  this.data = {
     // background: 'green',
     // backgroundAlpha: 0.8,
     // element: <Canvas>,
     // foreground: 'blue',
     // foregroundAlpha: 0.8,
-    level: 'M',
+    level: 'L',
     mime: 'image/png',
     // padding: 5,
     size: 200,
-    value: `${document.location.origin}/?endpoint=${this.opts.url}`
+    value
   };
 };
 
-riot$1.tag2('dmc-endpoint-qrcode', '<dmc-qrcode data="{qrcodeStyle}"></dmc-qrcode>', '', 'class="EndpointsPage__qrcode"', function(opts) {
-    this.external(script$63);
+riot$1.tag2('dmc-endpoint-qrcode', '<div class="EndpointsPage__qrcodeMessage">モバイル端末にエンドポイントを追加できます。<br>お好きなQRコードリーダーで読み込んで下さい。</div> <div class="EndpointsPage__qrcodeContent"> <dmc-qrcode data="{data}"></dmc-qrcode> </div>', '', 'class="EndpointsPage__qrcode"', function(opts) {
+    this.external(script$66);
 });
 
-var script$64 = function() {
+var script$67 = function() {
   this.email = '';
   this.password = '';
 
@@ -58607,20 +59599,20 @@ var script$64 = function() {
 };
 
 riot$1.tag2('dmc-signinemail', '<dmc-textinput label="メールアドレス" text="{email}" onchange="{handleEmailChange}" type="email"></dmc-textinput> <dmc-textinput label="パスワード" text="{password}" type="password" onchange="{handlePasswordChange}"></dmc-textinput> <dmc-button onpat="{handleSigninPat}" label="サインイン"></dmc-button>', '', 'class="EndpointsPage__signinEmail"', function(opts) {
-    this.external(script$64);
+    this.external(script$67);
 });
 
-var script$65 = function() {
+var script$68 = function() {
   this.handleButtonPat = () => {
     this.opts.onpat(this.opts.authtype);
   };
 };
 
 riot$1.tag2('dmc-signinoauth', '<dmc-button onpat="{handleButtonPat}" label="{opts.authtype.provider}"></dmc-button>', '', 'class="EndpointsPage__signinOauth"', function(opts) {
-    this.external(script$65);
+    this.external(script$68);
 });
 
-var script$66 = function() {
+var script$69 = function() {
   const store = this.riotx.get();
 
   this.oauths = values_1(filter$3(this.opts.authtypes, v => {
@@ -58639,6 +59631,8 @@ var script$66 = function() {
         this.opts.onSignin();
       })
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'ログイン失敗',
+        message: 'ログイン出来ませんでした。正しいメールアドレスとパスワードを使用しているか確認して下さい。使用したメールアドレスが予め管理者として登録されているか確認して下さい。',
         error: err
       }));
   };
@@ -58653,19 +59647,26 @@ var script$66 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoint-signin', '<div class="EndpointsPage__signinTitle">サインイン</div> <div class="EndpointsPage__signinEmails" if="{!!emails.length}"> <div class="EndpointsPage__signinEmailsTitle">メールアドレス認証</div> <virtual each="{authtype in emails}"> <dmc-signinemail authtype="{authtype}" onsigninpat="{parent.handleEmailSigninPat}"></dmc-signinemail> </virtual> </div> <div class="EndpointsPage__signinOauths" if="{!!oauths.length}"> <div class="EndpointsPage__signinOauthsTitle">OAuth認証</div> <virtual each="{authtype in oauths}"> <dmc-signinoauth authtype="{authtype}" onpat="{parent.handleOAuthPat}"></dmc-signinoauth> </virtual> </div>', '', 'class="EndpointsPage__signin"', function(opts) {
-    this.external(script$66);
+riot$1.tag2('dmc-endpoint-signin', '<div class="EndpointsPage__signinHead"> <div class="EndpointsPage__signinThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__signinName">{opts.endpoint.name}</div> </div> <div class="EndpointsPage__signinEmails" if="{!!emails.length}"> <div class="EndpointsPage__signinEmailsTitle">メールアドレス認証</div> <virtual each="{authtype in emails}"> <dmc-signinemail authtype="{authtype}" onsigninpat="{parent.handleEmailSigninPat}"></dmc-signinemail> </virtual> </div> <div class="EndpointsPage__signinOauths" if="{!!oauths.length}"> <div class="EndpointsPage__signinOauthsTitle">OAuth認証</div> <virtual each="{authtype in oauths}"> <dmc-signinoauth authtype="{authtype}" onpat="{parent.handleOAuthPat}"></dmc-signinoauth> </virtual> </div>', '', 'class="EndpointsPage__signin"', function(opts) {
+    this.external(script$69);
 });
 
-var script$60 = function() {
+var script$63 = function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(constants$4.ENDPOINTS);
+  this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
   this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+  this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.listen(constants$3.ENDPOINTS, () => {
-    this.endpoints = store.getter(constants$4.ENDPOINTS);
+    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
     this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+    this.update();
+  });
+
+  this.listen(constants$3.APPLICATION, () => {
+    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
+    this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
 
@@ -58697,13 +59698,12 @@ var script$60 = function() {
       }));
   };
 
-  this.handleEndpointEdit = (key, url, memo) => {
+  this.handleEndpointEdit = key => {
     Promise
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'dmc-endpoint-edit', {
         endpointKey: key,
-        url,
-        memo
+        endpoint: store.getter(constants$4.ENDPOINTS_ONE, key)
       }))
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
         error: err
@@ -58722,13 +59722,12 @@ var script$60 = function() {
       }));
   };
 
-  this.handleEndpointQrCode = (key, url, memo) => {
+  this.handleEndpointQrCode = key => {
+    const endpoint = store.getter(constants$4.ENDPOINTS_ONE, key);
     Promise
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'dmc-endpoint-qrcode', {
-        endpointKey: key,
-        url,
-        memo
+        endpoint
       }))
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
         error: err
@@ -58748,23 +59747,23 @@ var script$60 = function() {
   };
 };
 
-riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__count" if="{!!endpointsCount}"> <div class="EndpointsPage__countIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__countLabel">Endpoint ({endpointsCount})</div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint, key in endpoints}"> <dmc-endpoint key="{key}" name="{endpoint.name}" thumbnail="{endpoint.thumbnail}" token="{endpoint.token}" url="{endpoint.url}" description="{endpoint.description}" memo="{endpoint.memo}" tags="{endpoint.tags}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
-    this.external(script$60);
+riot$1.tag2('dmc-endpoints', '<div class="EndpointsPage__caption" if="{!!endpointsCount}"> <div class="EndpointsPage__captionIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="EndpointsPage__captionLabel">Endpoint ({endpointsCount})<span class="EndpointsPage__captionFilter" if="{!!endpointFilterText}">filtered by "{endpointFilterText}"</span></div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint in endpoints}"> <dmc-endpoint key="{endpoint.key}" endpoint="{endpoint}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></dmc-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
+    this.external(script$63);
 });
 
-var script$67 = function() {};
+var script$70 = function() {};
 
 riot$1.tag2('dmc-notfound', '<div>NOT FOUND...</div>', '', 'class="Page NotfoundPage"', function(opts) {
-    this.external(script$67);
+    this.external(script$70);
 });
 
-var script$68 = function() {};
+var script$71 = function() {};
 
 riot$1.tag2('dmc-blocker', '', '', 'class="Blocker"', function(opts) {
-    this.external(script$68);
+    this.external(script$71);
 });
 
-var script$69 = function() {
+var script$72 = function() {
   const store = this.riotx.get();
 
   // `tag` = drawer内に展開されるriot tagインスタンス。
@@ -58821,10 +59820,10 @@ var script$69 = function() {
 };
 
 riot$1.tag2('dmc-drawer', '<div class="Drawer__frame"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$69);
+    this.external(script$72);
 });
 
-var script$70 = function() {
+var script$73 = function() {
   const store = this.riotx.get();
 
   this.drawers = store.getter(constants$4.DRAWERS);
@@ -58836,10 +59835,10 @@ var script$70 = function() {
 };
 
 riot$1.tag2('dmc-drawers', '<virtual each="{drawers}"> <dmc-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}"></dmc-drawer> </virtual>', '', 'class="Drawers"', function(opts) {
-    this.external(script$70);
+    this.external(script$73);
 });
 
-var script$71 = function() {
+var script$74 = function() {
   const store = this.riotx.get();
 
   this.isOpened = false;
@@ -58891,11 +59890,11 @@ var script$71 = function() {
   };
 };
 
-riot$1.tag2('dmc-menu-group', '<div class="Menu__groupToggle {opts.group.isIndependent &amp;&amp; opts.group.list[0].isSelected ? \'Menu__groupToggle--selected\' : \'\'}" ref="touch" ontap="handleToggleTap"> <dmc-icon class="Menu__groupIconHead" type="codeSquareO"></dmc-icon> <div class="Menu__groupName">{opts.group.isIndependent ? opts.group.list[0].name : opts.group.name}</div> <dmc-icon class="Menu__groupIconTail {isOpened ? \'Menu__groupIconTail--opened\' : \'\'}" if="{!opts.group.isIndependent}" type="up"></dmc-icon> </div> <div class="Menu__groupList {isOpened ? \'Menu__groupList--opened\' : \'\'}" if="{!opts.group.isIndependent}"> <div class="Menu__groupListItem {item.isSelected ? \'Menu__groupListItem--selected\' : \'\'}" each="{item, idx in opts.group.list}" data-idx="{idx}" ref="touch" ontap="handleGroupItemTap">{item.name}</div> </div>', '', 'class="Menu__group"', function(opts) {
-    this.external(script$71);
+riot$1.tag2('dmc-menu-group', '<div class="Menu__groupToggle {opts.group.isIndependent &amp;&amp; opts.group.list[0].isSelected ? \'Menu__groupToggle--selected\' : \'\'}" ref="touch" ontap="handleToggleTap"> <dmc-icon class="Menu__groupIconHead" type="play"></dmc-icon> <div class="Menu__groupName">{opts.group.isIndependent ? opts.group.list[0].name : opts.group.name}</div> <dmc-icon class="Menu__groupIconTail {isOpened ? \'Menu__groupIconTail--opened\' : \'\'}" if="{!opts.group.isIndependent}" type="up"></dmc-icon> </div> <div class="Menu__groupList {isOpened ? \'Menu__groupList--opened\' : \'\'}" if="{!opts.group.isIndependent}"> <div class="Menu__groupListItem {item.isSelected ? \'Menu__groupListItem--selected\' : \'\'}" each="{item, idx in opts.group.list}" data-idx="{idx}" ref="touch" ontap="handleGroupItemTap">{item.name}</div> </div>', '', 'class="Menu__group"', function(opts) {
+    this.external(script$74);
 });
 
-var script$72 = function() {
+var script$75 = function() {
   const store = this.riotx.get();
 
   const group = items => {
@@ -58950,11 +59949,11 @@ var script$72 = function() {
   };
 };
 
-riot$1.tag2('dmc-menu', '<div class="Menu__head"> <div class="media Menu__endpoint"> <div class="media__image Menu__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Menu__endpointBody"> <div class="Menu__endpointBodyHead"> <div class="Menu__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Menu__endpointHost" if="{!!endpoint}">{endpoint.url}</div> </div> <div class="Menu__endpointBodyTail"> <div class="Menu__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> </div> <div class="Menu__body"> <div class="Menu__section"> <div class="Menu__sectionTitle">ダッシュボード</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedDashboard}" group="{group}"></dmc-menu-group> </div> </div> <div class="Menu__section"> <div class="Menu__sectionTitle">管理画面</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedManage}" group="{group}"></dmc-menu-group> </div> </div> </div> <div class="Menu__tail"> <div class="Menu__homeButton" ref="touch" ontap="handleHomeButtonTap"> <dmc-icon type="home"></dmc-icon> </div> </div>', '', 'class="Menu"', function(opts) {
-    this.external(script$72);
+riot$1.tag2('dmc-menu', '<div class="Menu__head"> <div class="media Menu__endpoint"> <div class="media__image Menu__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Menu__endpointBody"> <div class="Menu__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Menu__endpointHost" if="{!!endpoint}">{endpoint.url}</div> <div class="Menu__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> <div class="Menu__body"> <div class="Menu__section"> <div class="Menu__sectionTitle">ダッシュボード</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedDashboard}" group="{group}"></dmc-menu-group> </div> </div> <div class="Menu__section"> <div class="Menu__sectionTitle">管理画面</div> <div class="Menu__groups"> <dmc-menu-group each="{group in groupedManage}" group="{group}"></dmc-menu-group> </div> </div> </div> <div class="Menu__tail"> <div class="Menu__leftIcon"> <dmc-icon type="left"></dmc-icon> </div> <div class="Menu__homeButton" ref="touch" ontap="handleHomeButtonTap"> <dmc-icon type="home"></dmc-icon> </div> </div>', '', 'class="Menu"', function(opts) {
+    this.external(script$75);
 });
 
-var script$73 = function() {
+var script$76 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -59018,10 +60017,10 @@ var script$73 = function() {
 };
 
 riot$1.tag2('dmc-modal', '<div class="Modal__frame" ref="touch" ontap="handleFrameTap"> <div class="Modal__closeButton" ref="touch" ontap="handleCloseButtonTap"> <dmc-icon type="close"></dmc-icon> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal Modal--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$73);
+    this.external(script$76);
 });
 
-var script$74 = function() {
+var script$77 = function() {
   const store = this.riotx.get();
 
   this.modals = store.getter(constants$4.MODALS);
@@ -59033,24 +60032,24 @@ var script$74 = function() {
 };
 
 riot$1.tag2('dmc-modals', '<virtual each="{modals}"> <dmc-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{modalOpts.theme}"></dmc-modal> </virtual>', '', 'class="Modals"', function(opts) {
-    this.external(script$74);
+    this.external(script$77);
 });
 
-var script$75 = function() {
+var script$78 = function() {
 };
 
 riot$1.tag2('dmc-progress', '<div class="Progress__spinner"> <dmc-icon type="loading"></dmc-icon> </div>', '', 'class="Progress"', function(opts) {
-    this.external(script$75);
+    this.external(script$78);
 });
 
-var script$76 = function() {
+var script$79 = function() {
 };
 
 riot$1.tag2('dmc-splash', '<div class="Splash__logo"></div>', '', 'class="Splash"', function(opts) {
-    this.external(script$76);
+    this.external(script$79);
 });
 
-var script$77 = function() {
+var script$80 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -59096,10 +60095,10 @@ var script$77 = function() {
 };
 
 riot$1.tag2('dmc-toast', '<div class="Toast__icon"> <dmc-icon if="{opts.type === \'normal\'}" type="close"></dmc-icon> <dmc-icon if="{opts.type === \'error\'}" type="exclamation"></dmc-icon> </div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" ref="touch" ontap="handleLinkTap">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$77);
+    this.external(script$80);
 });
 
-var script$78 = function() {
+var script$81 = function() {
   const store = this.riotx.get();
 
   this.toasts = store.getter(constants$4.TOASTS);
@@ -59111,10 +60110,25 @@ var script$78 = function() {
 };
 
 riot$1.tag2('dmc-toasts', '<virtual each="{toasts}"> <dmc-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></dmc-toast> </virtual>', '', 'class="Toasts"', function(opts) {
-    this.external(script$78);
+    this.external(script$81);
 });
 
-var script$80 = function() {
+var script$83 = function() {
+  this.handleDeleteButtonPat = () => {
+    this.opts.onConfirm();
+    this.close();
+  };
+
+  this.handleCancelButtonPat = () => {
+    this.close();
+  };
+};
+
+riot$1.tag2('dmc-application-confirm', '<div class="Application__confirmHead"> <div class="Application__confirmTitle">エンドポイント削除</div> <div class="Application__confirmDescription">全てのエンドポイントが削除されます。個別に削除したい場合は各エンドポイントカード内の削除ボタンから行って下さい。</div> </div> <div class="Application__confirmTail"> <dmc-button label="全て削除する" type="emphasis" onpat="{handleDeleteButtonPat}"></dmc-button> <dmc-button label="キャンセル" onpat="{handleCancelButtonPat}"></dmc-button> </div>', '', 'class="Application__confirm"', function(opts) {
+    this.external(script$83);
+});
+
+var script$84 = function() {
   const store = this.riotx.get();
 
   this.isExist = false;
@@ -59166,11 +60180,112 @@ var script$80 = function() {
   };
 };
 
-riot$1.tag2('dmc-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <dmc-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></dmc-textinput> <dmc-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="Application__entryControls"> <dmc-button type="primary" isdisabled="{isExist}" onpat="{handleRegisterButtonPat}" label="新規作成"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="Application__entry"', function(opts) {
-    this.external(script$80);
+riot$1.tag2('dmc-application-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <dmc-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></dmc-textinput> <dmc-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></dmc-textarea> </div> <div class="Application__entryControls"> <dmc-button type="primary" isdisabled="{isExist}" onpat="{handleRegisterButtonPat}" label="新規作成"></dmc-button> <dmc-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></dmc-button> </div>', '', 'class="Application__entry"', function(opts) {
+    this.external(script$84);
 });
 
-var script$79 = function() {
+var script$85 = function() {
+  const store = this.riotx.get();
+
+  // ドロップ待受中か否か。
+  this.isWatching = store.getter(constants$4.APPLICATION_ISDRAGGING);
+  // ドロップ可能な状態か否か。
+  this.isDroppable = false;
+
+  this.listen(constants$3.APPLICATION, () => {
+    this.isWatching = store.getter(constants$4.APPLICATION_ISDRAGGING);
+    this.update();
+  });
+
+  // ドラッグしている要素がドロップ領域に入った時の処理。
+  this.handleDragEnter = e => {
+    e.preventDefault();
+    this.isDroppable = true;
+    this.update();
+  };
+
+  // ドラッグしている要素がドロップ領域にある間の処理。
+  this.handleDragOver = e => {
+    e.preventDefault();
+  };
+
+  // ドラッグしている要素がドロップ領域から出た時の処理。
+  this.handleDragLeave = () => {
+    this.isDroppable = false;
+    this.update();
+  };
+
+  // ドラッグしている要素がドロップ領域にドロップされた時の処理。
+  this.handleDrop = e => {
+    this.isDroppable = false;
+    this.update();
+
+    const endpointKey = e.dataTransfer.getData('text/plain');
+    const newOrder = this.opts.order;
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+};
+
+riot$1.tag2('dmc-application-order-droparea', '<div class="Application__orderDropareaContent"></div> <div class="Application__orderDropareaHandler" ondragenter="{handleDragEnter}" ondragover="{handleDragOver}" ondragleave="{handleDragLeave}" ondrop="{handleDrop}"></div>', '', 'class="Application__orderDroparea {\'Application__orderDroparea--watching\' : isWatching, \'Application__orderDroparea--droppable\' : isDroppable}"', function(opts) {
+    this.external(script$85);
+});
+
+var script$86 = function() {
+  const store = this.riotx.get();
+
+  // ドラッグ開始時の処理。
+  this.handleDragStart = e => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.opts.endpoint.key);
+
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.APPLICATION_DRAG_START))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  // ドラッグしている間の処理。
+  this.handleDrag = () => {
+  };
+
+  // ドラッグ終了時の処理。
+  this.handleDragEnd = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.APPLICATION_DRAG_END))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+};
+
+riot$1.tag2('dmc-application-order-item', '<div class="Application__orderItemHead"> <div class="Application__orderItemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="Application__orderItemName">{opts.endpoint.name || \'-\'}</div> </div> <div class="Application__orderItemBody"> <div class="Application__orderItemUrl"> <div class="Application__orderItemUrlIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__orderItemUrlLabel">{opts.endpoint.url}</div> </div> </div>', '', 'class="Application__orderItem" draggable="{true}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}"', function(opts) {
+    this.external(script$86);
+});
+
+var script$87 = function() {
+  const store = this.riotx.get();
+
+  this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER);
+
+  this.listen(constants$3.ENDPOINTS, () => {
+    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER);
+    this.update();
+  });
+};
+
+riot$1.tag2('dmc-application-order', '<div class="Application__orderTitle">並び順を変更</div> <div class="Application__orderDescription">ドラッグ&ドロップでエンドポイントの並び順を変更できます。</div> <div class="Application__orderPlayground"> <dmc-application-order-droparea order="{0}"></dmc-application-order-droparea> <virtual each="{endpoint, idx in endpoints}"> <dmc-application-order-item endpoint="{endpoint}"></dmc-application-order-item> <dmc-application-order-droparea order="{idx + 1}"></dmc-application-order-droparea> </virtual> </div>', '', 'class="Application__order"', function(opts) {
+    this.external(script$87);
+});
+
+var script$82 = function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
@@ -59182,6 +60297,10 @@ var script$79 = function() {
   this.isTopPage = (this.pageName === 'endpoints');
   // 表示すべきページのルーティング情報。
   this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
+  // エンドポイント数。
+  this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+  // エンドポイントフィルター用のテキスト。
+  this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.on('updated', () => {
     this.rebindTouchEvents();
@@ -59191,6 +60310,7 @@ var script$79 = function() {
     this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
     this.isNavigating = store.getter(constants$4.APPLICATION_ISNAVIGATING);
     this.isNetworking = store.getter(constants$4.APPLICATION_ISNETWORKING);
+    this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
   this.listen(constants$3.LOCATION, () => {
@@ -59199,11 +60319,15 @@ var script$79 = function() {
     this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
     this.update();
   });
+  this.listen(constants$3.ENDPOINTS, () => {
+    this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+    this.update();
+  });
 
   this.handleEntryMenuItemTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-entry'))
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-application-entry'))
       .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
         error: err
       }));
@@ -59213,10 +60337,96 @@ var script$79 = function() {
     const endpoints = store.getter(constants$4.ENDPOINTS_WITHOUT_TOKEN);
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
+
+  this.handleFileChange = e => {
+    const inputFile = e.target;
+    const file = inputFile.files[0];
+
+    // ファイルを取得出来たか。
+    if (!file) {
+      inputFile.value = null;
+      return;
+    }
+
+    // ファイルがjsonであるか
+    // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
+    if (!store.getter(constants$4.UA_IS_EDGE) && file.type !== 'application/json') {
+      store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'JSONファイルを指定してください。',
+        type: 'error'
+      });
+      inputFile.value = null;
+      return;
+    }
+
+    // ファイルをテキストとして読み込む。
+    const reader = new FileReader();
+    reader.readAsText(file);
+
+    // 読み込みが失敗した。
+    reader.onerror = err => {
+      store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'ファイルの読み込みに失敗しました。',
+        error: err
+      });
+      inputFile.value = null;
+    };
+
+    // 読み込みが成功し、完了した。
+    reader.onload = event => {
+      const text = event.target.result;
+
+      // エンドポイント追加処理開始
+      Promise
+        .resolve()
+        .then(() => {
+          const endpoints = JSON.parse(text);
+          return store.action(constants$1.ENDPOINTS_MERGE_ALL, endpoints);
+        })
+        .then(() => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加',
+          message: 'エンドポイントが一覧に追加されました。'
+        }))
+        .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加 失敗',
+          error: err
+        }));
+      // inputしたjsonをリセットする。
+      inputFile.value = null;
+    };
+  };
+
+  this.handleOrderMenuItemTap = () => {
+    store.action(constants$1.MODALS_ADD, 'dmc-application-order');
+  };
+
+  this.handleClearMenuItemTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'dmc-application-confirm', {
+        onConfirm: () => {
+          store.action(constants$1.ENDPOINTS_REMOVE_ALL);
+        }
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleFilterChange = newText => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT, newText))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
 };
 
-riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemLabel">新規追加</div> </div> <div class="Application__menuItem" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemLabel">ダウンロード</div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
-    this.external(script$79);
+riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <label class="Application__menuItem Application__menuItem--interactive" for="Application{_riot_id}"> <div class="Application__menuItemIcon"> <dmc-icon type="upload"></dmc-icon> </div> <div class="Application__menuItemBody">アップロード <input class="Application__menuItemInput" type="file" accept="application/json" id="Application{_riot_id}" onchange="{handleFileChange}"> </div> </label> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 2}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="bars"></dmc-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="close"></dmc-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <dmc-icon type="search"></dmc-icon> </div> <div class="Application__menuItemBody"> <dmc-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></dmc-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
+    this.external(script$82);
 });
 
 // エントリーポイント。
@@ -59232,30 +60442,15 @@ document.addEventListener('DOMContentLoaded', () => {
       window.store = store;
     })
     .then(() => {
-      // OAuth認証後のリダイレクトではクエリにtokenが格納されている。
-      // tokenがあればOAuth認証とみなす。
-      const token = getParam_1(location.href, 'token');
-      if (!token) {
-        return Promise.resolve();
-      }
-
-      const oauthEndpointKey = mainStore.getter(constants$4.OAUTH_ENDPOINT_KEY);
-      return Promise
-        .all([
-          mainStore.action(constants$1.CURRENT_UPDATE, oauthEndpointKey),
-          mainStore.action(constants$1.AUTH_UPDATE, oauthEndpointKey, token),
-          mainStore.action(constants$1.OAUTH_ENDPOINT_KEY_REMOVE)
-        ])
-        .then(() => {
-          location.href = `${location.origin}${location.pathname}#/${oauthEndpointKey}`;
-        });
-    })
-    .then(() => {
       riot$1.mount('dmc');
     })
-    .then(() => mainStore.action(constants$1.UA_SETUP))
+    .then(() => Promise.all([
+      mainStore.action(constants$1.ENDPOINTS_TIDY_UP_ORDER),
+      mainStore.action(constants$1.UA_SETUP)
+    ]))
     .then(() => router.init(mainStore))
     .catch(err => mainStore.action(constants$1.MODALS_ADD, 'dmc-message', {
+      message: 'Viron起動に失敗しました。Viron担当者にお問い合わせ下さい。',
       error: err
     }));
 });
