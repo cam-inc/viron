@@ -39,7 +39,7 @@
     "build:css:bundle": "postcss src/css/app.pcss -o dist/css/app.css",
     "build:css:minify": "csswring dist/css/app.css dist/css/app.min.css",
     "watch": "run-p watch:js watch:css",
-    "watch:js": "rollup -c rollup.local.config.js --watch",
+    "watch:js": "rollup -c --watch rollup.local.config.js",
     "watch:css": "watch 'npm run build:css' src/css",
     "test": "run-s format lint spec",
     "format": "run-p format:js format:css",
