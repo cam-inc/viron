@@ -27,7 +27,7 @@ export default {
       }))
       .then(res => {
         if (!res.ok) {
-          return Promise.reject(`fetch failed: ${res.url}`);
+          return Promise.reject(res);
         }
         return res;
       })

@@ -130,12 +130,25 @@ export default function() {
       }))
       .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentSearchRequestParameters))
       .catch(err => {
-        const api = this.opts.component.api;
-        return store.action(actions.MODALS_ADD, {
-          title: '通信失敗',
-          message: `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。該当するAPIがOAS上に正しく定義されているかご確認下さい。`,
-          error: err
-        });
+        // 401 = 認証エラー
+        // 通常エラーと認証エラーで処理を振り分ける。
+        if (err.status !== 401) {
+          const api = this.opts.component.api;
+          return store.action(actions.MODALS_ADD, {
+            title: '通信失敗',
+            message: `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。該当するAPIがOAS上に正しく定義されているかご確認下さい。`,
+            error: err
+          });
+        }
+        return Promise
+          .resolve()
+          .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+            title: '認証切れ',
+            message: '認証が切れました。再度ログインして下さい。'
+          }))
+          .then(() => {
+            this.getRouter().navigateTo('/');
+          });
       });
   };
 

@@ -25,10 +25,25 @@ export default function() {
         this.close();
         this.opts.onSuccess();
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
-        message: `APIパラメータやOASが正しいか確認して下さい。[${this.opts.operationObject.summary || ''}]`,
-        error: err
-      }));
+      .catch(err => {
+        // 401 = 認証エラー
+        // 通常エラーと認証エラーで処理を振り分ける。
+        if (err.status !== 401) {
+          return store.action(actions.MODALS_ADD, 'dmc-message', {
+            message: `APIパラメータやOASが正しいか確認して下さい。[${this.opts.operationObject.summary || ''}]`,
+            error: err
+          });
+        }
+        return Promise
+          .resolve()
+          .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+            title: '認証切れ',
+            message: '認証が切れました。再度ログインして下さい。'
+          }))
+          .then(() => {
+            this.getRouter().navigateTo('/');
+          });
+      });
   };
 
   this.handleCancelButtonPat = () => {

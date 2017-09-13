@@ -34,7 +34,7 @@ export default {
       }
     }).then(res => {
       if (!res.ok) {
-        return Promise.reject(`fetch failed: ${res.url}`);
+        return Promise.reject(res);
       }
       return res;
     }).then(res => {
@@ -93,6 +93,11 @@ export default {
       requestInterceptor: req => {
         req.headers['Authorization'] = token;
       }
+    }).then(res => {
+      if (!res.ok) {
+        return Promise.reject(res);
+      }
+      return res;
     }).then(res => {
       // tokenを更新する。
       const token = res.headers['Authorization'];
