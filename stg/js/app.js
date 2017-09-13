@@ -2938,7 +2938,7 @@ var riot$1 = unwrapExports(riot_1);
         }
     }
 
-    var forEach_1 = forEach;
+    var forEach_1$1 = forEach;
 
 /* esr version 0.9.2 */
 /**
@@ -2987,7 +2987,7 @@ var riot$1 = unwrapExports(riot_1);
          return Object.prototype.hasOwnProperty.call(obj, prop);
      }
 
-     var hasOwn_1 = hasOwn;
+     var hasOwn_1$1 = hasOwn;
 
 var _hasDontEnumBug;
 var _dontEnums;
@@ -3045,7 +3045,7 @@ var _dontEnums;
                 // different than Object prototype value.
                 if (
                     (key !== 'constructor' ||
-                        (!isProto && hasOwn_1(obj, key))) &&
+                        (!isProto && hasOwn_1$1(obj, key))) &&
                     obj[key] !== Object.prototype[key]
                 ) {
                     if (exec(fn, obj, key, thisObj) === false) {
@@ -3069,13 +3069,13 @@ var _dontEnums;
      */
     function forOwn(obj, fn, thisObj){
         forIn_1(obj, function(val, key){
-            if (hasOwn_1(obj, key)) {
+            if (hasOwn_1$1(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
             }
         });
     }
 
-    var forOwn_1 = forOwn;
+    var forOwn_1$1 = forOwn;
 
 var _rKind = /^\[object (.*)\]$/;
 var _toString = Object.prototype.toString;
@@ -3108,7 +3108,7 @@ var UNDEF;
     var isArray = Array.isArray || function (val) {
         return isKind_1(val, 'Array');
     };
-    var isArray_1 = isArray;
+    var isArray_1$1 = isArray;
 
 function containsMatch(array, pattern) {
         var i = -1, length = array.length;
@@ -3134,7 +3134,7 @@ function containsMatch(array, pattern) {
 
     function matchObject(target, pattern) {
         var result = true;
-        forOwn_1(pattern, function(val, key) {
+        forOwn_1$1(pattern, function(val, key) {
             if (!deepMatches(target[key], val)) {
                 // Return false to break out of forOwn early
                 return (result = false);
@@ -3150,7 +3150,7 @@ function containsMatch(array, pattern) {
     function deepMatches(target, pattern){
         if (target && typeof target === 'object' &&
             pattern && typeof pattern === 'object') {
-            if (isArray_1(target) && isArray_1(pattern)) {
+            if (isArray_1$1(target) && isArray_1$1(pattern)) {
                 return matchArray(target, pattern);
             } else {
                 return matchObject(target, pattern);
@@ -3281,13 +3281,13 @@ function containsMatch(array, pattern) {
         return results;
     }
 
-    var filter_1 = filter;
+    var filter_1$1 = filter;
 
 /**
      * Remove all null/undefined items from array.
      */
     function compact(arr) {
-        return filter_1(arr, function(val){
+        return filter_1$1(arr, function(val){
             return (val != null);
         });
     }
@@ -3300,14 +3300,14 @@ function containsMatch(array, pattern) {
     function contains(arr, val) {
         return indexOf_1(arr, val) !== -1;
     }
-    var contains_1 = contains;
+    var contains_1$1 = contains;
 
 /**
      * @return {array} Array of unique items
      */
     function unique(arr, compare){
         compare = compare || isEqual;
-        return filter_1(arr, function(item, i, arr){
+        return filter_1$1(arr, function(item, i, arr){
             var n = arr.length;
             while (++i < n) {
                 if ( compare(item, arr[i]) ) {
@@ -3322,7 +3322,7 @@ function containsMatch(array, pattern) {
         return a === b;
     }
 
-    var unique_1 = unique;
+    var unique_1$1 = unique;
 
 /**
      * Array some
@@ -3386,9 +3386,9 @@ function containsMatch(array, pattern) {
      */
     function difference(arr) {
         var arrs = slice_1(arguments, 1),
-            result = filter_1(unique_1(arr), function(needle){
+            result = filter_1$1(unique_1$1(arr), function(needle){
                 return !some_1(arrs, function(haystack){
-                    return contains_1(haystack, needle);
+                    return contains_1$1(haystack, needle);
                 });
             });
         return result;
@@ -3447,7 +3447,7 @@ function containsMatch(array, pattern) {
     function equals(a, b, callback){
         callback = callback || is_1;
 
-        if (!isArray_1(a) || !isArray_1(b)) {
+        if (!isArray_1$1(a) || !isArray_1$1(b)) {
             return callback(a, b);
         }
 
@@ -3495,7 +3495,7 @@ function containsMatch(array, pattern) {
         return idx >= 0? arr[idx] : void(0);
     }
 
-    var find_1 = find;
+    var find_1$1 = find;
 
 /**
      * Returns the index of the last item that matches criteria
@@ -3543,7 +3543,7 @@ function containsMatch(array, pattern) {
             len = arr.length;
         while (++i < len) {
             value = arr[i];
-            if (isArray_1(value)) {
+            if (isArray_1$1(value)) {
                 flattenTo(value, result, level - 1);
             } else {
                 result.push(value);
@@ -3586,7 +3586,7 @@ function containsMatch(array, pattern) {
         }
     }
 
-    var forEach_1$1 = forEach$2;
+    var forEach_1$2 = forEach$2;
 
 /**
      * Bucket the array values.
@@ -3600,7 +3600,7 @@ function containsMatch(array, pattern) {
         }
 
         var buckets = {};
-        forEach_1$1(arr, function(element) {
+        forEach_1$2(arr, function(element) {
             var bucket = categorize(element);
             if (!(bucket in buckets)) {
                 buckets[bucket] = [];
@@ -3658,9 +3658,9 @@ function containsMatch(array, pattern) {
      */
     function intersection(arr) {
         var arrs = slice_1(arguments, 1),
-            result = filter_1(unique_1(arr), function(needle){
+            result = filter_1$1(unique_1$1(arr), function(needle){
                 return every_1(arrs, function(haystack){
-                    return contains_1(haystack, needle);
+                    return contains_1$1(haystack, needle);
                 });
             });
         return result;
@@ -3699,7 +3699,7 @@ function isValidString(val) {
      */
     function join(items, separator) {
         separator = separator || '';
-        return filter_1(items, isValidString).join(separator);
+        return filter_1$1(items, isValidString).join(separator);
     }
 
     var join_1 = join;
@@ -3761,7 +3761,7 @@ function isValidString(val) {
         return results;
     }
 
-     var map_1 = map;
+     var map_1$1 = map;
 
 /**
      * Return maximum value inside array
@@ -3909,25 +3909,10 @@ function isValidString(val) {
      * Extract a list of property values.
      */
     function pluck(arr, propName){
-        return map_1(arr, propName);
+        return map_1$1(arr, propName);
     }
 
     var pluck_1 = pluck;
-
-/**
-    * Count number of full steps.
-    */
-    function countSteps(val, step, overflow){
-        val = Math.floor(val / step);
-
-        if (overflow) {
-            return val % overflow;
-        }
-
-        return val;
-    }
-
-    var countSteps_1 = countSteps;
 
 /**
      * Returns an Array of numbers inside range.
@@ -4037,7 +4022,7 @@ function isValidString(val) {
         return results;
     }
 
-    var reject_1 = reject;
+    var reject_1$1 = reject;
 
 /**
      * Remove a single item from the array.
@@ -4165,7 +4150,7 @@ function isValidString(val) {
         });
     }
 
-    var sortBy_1 = sortBy;
+    var sortBy_1$1 = sortBy;
 
 /**
      * Split array into a fixed number of segments.
@@ -4266,7 +4251,7 @@ function isValidString(val) {
             append_1(results, arguments$1[i]);
         }
 
-        return unique_1(results);
+        return unique_1$1(results);
     }
 
     var union_1 = union;
@@ -4276,14 +4261,14 @@ function isValidString(val) {
      * - like ptyhon's `symmetric_difference`
      */
     function xor(arr1, arr2) {
-        arr1 = unique_1(arr1);
-        arr2 = unique_1(arr2);
+        arr1 = unique_1$1(arr1);
+        arr2 = unique_1$1(arr2);
 
-        var a1 = filter_1(arr1, function(item){
-                return !contains_1(arr2, item);
+        var a1 = filter_1$1(arr1, function(item){
+                return !contains_1$1(arr2, item);
             }),
-            a2 = filter_1(arr2, function(item){
-                return !contains_1(arr1, item);
+            a2 = filter_1$1(arr2, function(item){
+                return !contains_1$1(arr1, item);
             });
 
         return a1.concat(a2);
@@ -4302,12 +4287,12 @@ function getLength(arr) {
     function zip(arr){
         var arguments$1 = arguments;
 
-        var len = arr ? max_1(map_1(arguments, getLength)) : 0,
+        var len = arr ? max_1(map_1$1(arguments, getLength)) : 0,
             results = [],
             i = -1;
         while (++i < len) {
             // jshint loopfunc: true
-            results.push(map_1(arguments$1, function(item) {
+            results.push(map_1$1(arguments$1, function(item) {
                 return item == null ? undefined : item[i];
             }));
         }
@@ -4324,17 +4309,17 @@ var array = {
     'collect' : collect_1,
     'combine' : combine_1,
     'compact' : compact_1,
-    'contains' : contains_1,
+    'contains' : contains_1$1,
     'difference' : difference_1,
     'equals' : equals_1,
     'every' : every_1,
-    'filter' : filter_1,
-    'find' : find_1,
+    'filter' : filter_1$1,
+    'find' : find_1$1,
     'findIndex' : findIndex_1,
     'findLast' : findLast_1,
     'findLastIndex' : findLastIndex_1,
     'flatten' : flatten_1,
-    'forEach' : forEach_1$1,
+    'forEach' : forEach_1$2,
     'groupBy' : groupBy_1,
     'indexOf' : indexOf_1,
     'indicesOf' : indicesOf_1,
@@ -4344,7 +4329,7 @@ var array = {
     'join' : join_1,
     'last' : last_1,
     'lastIndexOf' : lastIndexOf_1,
-    'map' : map_1,
+    'map' : map_1$1,
     'max' : max_1,
     'min' : min_1,
     'pick' : pick_1,
@@ -4352,7 +4337,7 @@ var array = {
     'range' : range_1,
     'reduce' : reduce_1,
     'reduceRight' : reduceRight_1,
-    'reject' : reject_1,
+    'reject' : reject_1$1,
     'remove' : remove_1,
     'removeAll' : removeAll_1,
     'reverse' : reverse_1,
@@ -4360,12 +4345,12 @@ var array = {
     'slice' : slice_1,
     'some' : some_1,
     'sort' : sort,
-    'sortBy' : sortBy_1,
+    'sortBy' : sortBy_1$1,
     'split' : split_1,
     'take' : take_1,
     'toLookup' : toLookup_1,
     'union' : union_1,
-    'unique' : unique_1,
+    'unique' : unique_1$1,
     'xor' : xor_1,
     'zip' : zip_1
 };
@@ -6276,7 +6261,7 @@ var constants = {
   HASH: 'HASH'
 };
 
-var Router = function Router(type) {
+var Router$1 = function Router(type) {
   if ( type === void 0 ) { type = constants.BROWSER; }
 
   /**
@@ -6342,7 +6327,7 @@ var Router = function Router(type) {
  * start listening for changes to the current location.
  * @param {Boolean} autoExec to decide whether routing is executed with the current url.
  */
-Router.prototype.start = function start (autoExec) {
+Router$1.prototype.start = function start (autoExec) {
     var this$1 = this;
     if ( autoExec === void 0 ) { autoExec = true; }
 
@@ -6358,7 +6343,7 @@ Router.prototype.start = function start (autoExec) {
 /**
  * stop listening.
  */
-Router.prototype.stop = function stop () {
+Router$1.prototype.stop = function stop () {
   if (!this._unlistener) {
     return;
   }
@@ -6374,7 +6359,7 @@ Router.prototype.stop = function stop () {
  * @param {Function} onAfter a function that will be executed after the route changes.
  * @return {Router}
  */
-Router.prototype.on = function on (pattern, onEnter, onBefore, onAfter) {
+Router$1.prototype.on = function on (pattern, onEnter, onBefore, onAfter) {
   var keys = [];
   var regexp = index(pattern, keys);
   this._routes.push({
@@ -6394,7 +6379,7 @@ Router.prototype.on = function on (pattern, onEnter, onBefore, onAfter) {
  * @param {Function} func
  * @return {Router}
  */
-Router.prototype.onBefore = function onBefore (func) {
+Router$1.prototype.onBefore = function onBefore (func) {
   this._onBefore = func;
   return this;
 };
@@ -6405,7 +6390,7 @@ Router.prototype.onBefore = function onBefore (func) {
  * @param {Function} func
  * @return {Router}
  */
-Router.prototype.onBeforeOnce = function onBeforeOnce (func) {
+Router$1.prototype.onBeforeOnce = function onBeforeOnce (func) {
   this._onBeforeOnce = func;
   return this;
 };
@@ -6416,7 +6401,7 @@ Router.prototype.onBeforeOnce = function onBeforeOnce (func) {
  * @param {Function} func
  * @return {Router}
  */
-Router.prototype.onAfter = function onAfter (func) {
+Router$1.prototype.onAfter = function onAfter (func) {
   this._onAfter = func;
   return this;
 };
@@ -6427,7 +6412,7 @@ Router.prototype.onAfter = function onAfter (func) {
  * @param {Function} func
  * @return {Router}
  */
-Router.prototype.onAfterOnce = function onAfterOnce (func) {
+Router$1.prototype.onAfterOnce = function onAfterOnce (func) {
   this._onAfterOnce = func;
   return this;
 };
@@ -6436,7 +6421,7 @@ Router.prototype.onAfterOnce = function onAfterOnce (func) {
  * navigate to target location.
  * @param {String|Object} path e.g.) '/foo' or { pathname, search, hash }
  */
-Router.prototype.navigateTo = function navigateTo (path) {
+Router$1.prototype.navigateTo = function navigateTo (path) {
     var this$1 = this;
 
   return promise
@@ -6455,7 +6440,7 @@ Router.prototype.navigateTo = function navigateTo (path) {
  * replace current location.
  * @param {String|Object} path e.g.) '/foo' or { pathname, search, hash }
  */
-Router.prototype.replace = function replace (path) {
+Router$1.prototype.replace = function replace (path) {
     var this$1 = this;
 
   return promise
@@ -6474,7 +6459,7 @@ Router.prototype.replace = function replace (path) {
  * returns current location.
  * @return {String}
  */
-Router.prototype.getCurrentLocation = function getCurrentLocation () {
+Router$1.prototype.getCurrentLocation = function getCurrentLocation () {
   return this._history.location;
 };
 
@@ -6482,7 +6467,7 @@ Router.prototype.getCurrentLocation = function getCurrentLocation () {
  * returns current action.
  * @return {String}
  */
-Router.prototype.getCurrentAction = function getCurrentAction () {
+Router$1.prototype.getCurrentAction = function getCurrentAction () {
   return this._history.action;
 };
 
@@ -6490,7 +6475,7 @@ Router.prototype.getCurrentAction = function getCurrentAction () {
  * hash version of `location.href`.
  * @param {String} pathname
  */
-Router.prototype.createHref = function createHref (pathname) {
+Router$1.prototype.createHref = function createHref (pathname) {
   return this._history.createHref({
     pathname: pathname
   });
@@ -6502,7 +6487,7 @@ Router.prototype.createHref = function createHref (pathname) {
  * @param {Object} location i.e.) history.location
  * @param {String} action i.e.) history.action
  */
-Router.prototype._change = function _change (location/*, action */) {
+Router$1.prototype._change = function _change (location/*, action */) {
     var this$1 = this;
 
   var route = array_1(this._routes, function (route) {
@@ -6582,7 +6567,7 @@ Router.prototype._change = function _change (location/*, action */) {
  * @param {Object} route
  * @return {Object}
  */
-Router.prototype._parseLocation = function _parseLocation (location, route) {
+Router$1.prototype._parseLocation = function _parseLocation (location, route) {
   var params = {};
   var list = route.regexp.exec(location.pathname).slice(1);
   array_2(route.keys, function (v, i) {
@@ -6608,9 +6593,9 @@ Router.prototype._parseLocation = function _parseLocation (location, route) {
   };
 };
 
-Router.BROWSER = constants.BROWSER;
-Router.MEMORY = constants.MEMORY;
-Router.HASH = constants.HASH;
+Router$1.BROWSER = constants.BROWSER;
+Router$1.MEMORY = constants.MEMORY;
+Router$1.HASH = constants.HASH;
 
 /**
      * Returns the first argument provided to it.
@@ -6639,7 +6624,7 @@ Router.HASH = constants.HASH;
          return Object.prototype.hasOwnProperty.call(obj, prop);
      }
 
-     var hasOwn_1$1 = hasOwn$1;
+     var hasOwn_1$2 = hasOwn$1;
 
 var _hasDontEnumBug$1;
 var _dontEnums$1;
@@ -6697,7 +6682,7 @@ var _dontEnums$1;
                 // different than Object prototype value.
                 if (
                     (key !== 'constructor' ||
-                        (!isProto && hasOwn_1$1(obj, key))) &&
+                        (!isProto && hasOwn_1$2(obj, key))) &&
                     obj[key] !== Object.prototype[key]
                 ) {
                     if (exec$1(fn, obj, key, thisObj) === false) {
@@ -6721,13 +6706,13 @@ var _dontEnums$1;
      */
     function forOwn$1(obj, fn, thisObj){
         forIn_1$1(obj, function(val, key){
-            if (hasOwn_1$1(obj, key)) {
+            if (hasOwn_1$2(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
             }
         });
     }
 
-    var forOwn_1$1 = forOwn$1;
+    var forOwn_1$2 = forOwn$1;
 
 var _rKind$1 = /^\[object (.*)\]$/;
 var _toString$1 = Object.prototype.toString;
@@ -6760,7 +6745,7 @@ var UNDEF$1;
     var isArray$1 = Array.isArray || function (val) {
         return isKind_1$1(val, 'Array');
     };
-    var isArray_1$1 = isArray$1;
+    var isArray_1$2 = isArray$1;
 
 function containsMatch$1(array, pattern) {
         var i = -1, length = array.length;
@@ -6786,7 +6771,7 @@ function containsMatch$1(array, pattern) {
 
     function matchObject$1(target, pattern) {
         var result = true;
-        forOwn_1$1(pattern, function(val, key) {
+        forOwn_1$2(pattern, function(val, key) {
             if (!deepMatches$1(target[key], val)) {
                 // Return false to break out of forOwn early
                 return (result = false);
@@ -6802,7 +6787,7 @@ function containsMatch$1(array, pattern) {
     function deepMatches$1(target, pattern){
         if (target && typeof target === 'object' &&
             pattern && typeof pattern === 'object') {
-            if (isArray_1$1(target) && isArray_1$1(pattern)) {
+            if (isArray_1$2(target) && isArray_1$2(pattern)) {
                 return matchArray$1(target, pattern);
             } else {
                 return matchObject$1(target, pattern);
@@ -6864,7 +6849,7 @@ function containsMatch$1(array, pattern) {
         return results;
     }
 
-    var reject_1$1 = reject$1;
+    var reject_1$2 = reject$1;
 
 /*
 object-assign
@@ -6872,6 +6857,7 @@ object-assign
 @license MIT
 */
 
+'use strict';
 /* eslint-disable no-unused-vars */
 var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -6929,7 +6915,7 @@ function shouldUseNative() {
 	}
 }
 
-var objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
+var objectAssign$1 = shouldUseNative() ? Object.assign : function (target, source) {
 	var from;
 	var to = toObject(target);
 	var symbols;
@@ -7284,7 +7270,7 @@ var application$1 = {
    * @return {Array}
    */
   addNetworking: (context, info) => {
-    context.state.application.networkings.push(objectAssign({
+    context.state.application.networkings.push(objectAssign$1({
       id: `networking_${Date.now()}`
     }, info));
     context.state.application.isNetworking = true;
@@ -7298,7 +7284,7 @@ var application$1 = {
    * @return {Array}
    */
   removeNetworking: (context, networkingId) => {
-    context.state.application.networkings = reject_1$1(context.state.application.networkings, networking => {
+    context.state.application.networkings = reject_1$2(context.state.application.networkings, networking => {
       return (networking.id === networkingId);
     });
     if (!context.state.application.networkings.length) {
@@ -7420,7 +7406,7 @@ var drawers$1 = {
    * @return {Array}
    */
   remove: (context, drawerID) => {
-    context.state.drawers = reject_1$1(context.state.drawers, drawer => {
+    context.state.drawers = reject_1$2(context.state.drawers, drawer => {
       return (drawer.id === drawerID);
     });
     return [constants$3.DRAWERS];
@@ -7492,14 +7478,14 @@ var drawers$1 = {
         });
     }
 
-    var sortBy_1$1 = sortBy$1;
+    var sortBy_1$2 = sortBy$1;
 
 /**
      */
     function isNumber(val) {
         return isKind_1$1(val, 'Number');
     }
-    var isNumber_1 = isNumber;
+    var isNumber_1$1 = isNumber;
 
 /**
      * Object some
@@ -7507,7 +7493,7 @@ var drawers$1 = {
     function some$1(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var result = false;
-        forOwn_1$1(obj, function(val, key) {
+        forOwn_1$2(obj, function(val, key) {
             if (callback(val, key, obj)) {
                 result = true;
                 return false; // break
@@ -7533,7 +7519,9 @@ var drawers$1 = {
         return result;
     }
 
-    var find_1$1 = find$1;
+    var find_1$2 = find$1;
+
+'use strict';
 
 // Found this seed-based random generator somewhere
 // Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
@@ -7558,6 +7546,10 @@ var randomFromSeed = {
     nextValue: getNextValue,
     seed: setSeed$1
 };
+
+'use strict';
+
+
 
 var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
 var alphabet;
@@ -7654,6 +7646,8 @@ var alphabet_1 = {
     shuffled: getShuffled
 };
 
+'use strict';
+
 var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
 
 function randomByte() {
@@ -7666,6 +7660,10 @@ function randomByte() {
 }
 
 var randomByteBrowser = randomByte;
+
+'use strict';
+
+
 
 function encode(lookup, number) {
     var loopCounter = 0;
@@ -7683,6 +7681,9 @@ function encode(lookup, number) {
 
 var encode_1 = encode;
 
+'use strict';
+
+
 /**
  * Decode the id to get the version and worker
  * Mainly for debugging and testing.
@@ -7697,6 +7698,11 @@ function decode(id) {
 }
 
 var decode_1 = decode;
+
+'use strict';
+
+
+
 
 // Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
 // This number should be updated every year or so to keep the generated id short.
@@ -7742,6 +7748,9 @@ function build(clusterWorkerId) {
 
 var build_1 = build;
 
+'use strict';
+
+
 function isShortId(id) {
     if (!id || typeof id !== 'string' || id.length < 6 ) {
         return false;
@@ -7758,6 +7767,8 @@ function isShortId(id) {
 }
 
 var isValid = isShortId;
+
+'use strict';
 
 var clusterWorkerIdBrowser = 0;
 
@@ -7829,6 +7840,7 @@ module.exports.decode = decode_1;
 module.exports.isValid = isValid;
 });
 
+'use strict';
 var shortid = lib;
 
 /**
@@ -7841,16 +7853,16 @@ const putEndpointsInOrder = endpoints => {
   // どのorder値よりも大きいであろう適当な値。
   const bigNumber = 9999;
   let ordered = [];
-  forOwn_1$1(endpoints, (endpoint, key) => {
+  forOwn_1$2(endpoints, (endpoint, key) => {
     ordered.push({
       key,
-      order: (isNumber_1(endpoint.order) ? endpoint.order : bigNumber)
+      order: (isNumber_1$1(endpoint.order) ? endpoint.order : bigNumber)
     });
   });
-  ordered = sortBy_1$1(ordered, obj => {
+  ordered = sortBy_1$2(ordered, obj => {
     return obj.order;
   });
-  forEach_1(ordered, (obj, order) => {
+  forEach_1$1(ordered, (obj, order) => {
     endpoints[obj.key].order = order;
   });
   return endpoints;
@@ -7866,11 +7878,11 @@ var endpoints$1 = {
    */
   add: (context, endpointKey, endpoint) => {
     // order値が指定されていなければ自動的に設定する。
-    if (!isNumber_1(endpoint.order)) {
+    if (!isNumber_1$1(endpoint.order)) {
       // リストの先頭に配置するために意図的にマイナス値を付与。
       endpoint.order = -1;
     }
-    let newEndpoints = objectAssign({}, context.state.endpoints);
+    let newEndpoints = objectAssign$1({}, context.state.endpoints);
     newEndpoints[endpointKey] = endpoint;
     newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
@@ -7885,7 +7897,7 @@ var endpoints$1 = {
    * @return {Array}
    */
   remove: (context, endpointKey) => {
-    let newEndpoints = objectAssign({}, context.state.endpoints);
+    let newEndpoints = objectAssign$1({}, context.state.endpoints);
     delete newEndpoints[endpointKey];
     newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
@@ -7915,7 +7927,7 @@ var endpoints$1 = {
     if (!endpoint) {
       context.state.endpoints[endpointKey] = null;
     } else {
-      context.state.endpoints[endpointKey] = objectAssign({}, context.state.endpoints[endpointKey], endpoint);
+      context.state.endpoints[endpointKey] = objectAssign$1({}, context.state.endpoints[endpointKey], endpoint);
     }
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
@@ -7943,10 +7955,10 @@ var endpoints$1 = {
    * @return {Array}
    */
   mergeAll: (context, endpoints) => {
-    let modifiedEndpoints = objectAssign({}, context.state.endpoints);
+    let modifiedEndpoints = objectAssign$1({}, context.state.endpoints);
 
-    forOwn_1$1(endpoints, endpoint => {
-      let duplicatedEndpoint = find_1$1(modifiedEndpoints, val => {
+    forOwn_1$2(endpoints, endpoint => {
+      let duplicatedEndpoint = find_1$2(modifiedEndpoints, val => {
         return endpoint.url === val.url;
       });
 
@@ -7954,7 +7966,7 @@ var endpoints$1 = {
         const key = shortid.generate();
         modifiedEndpoints[key] = endpoint;
       } else {
-        objectAssign(duplicatedEndpoint, endpoint);
+        objectAssign$1(duplicatedEndpoint, endpoint);
       }
     });
 
@@ -7971,7 +7983,7 @@ var endpoints$1 = {
    * @return {Array}
    */
   tidyUpOrder: context => {
-    const newEndpoints = putEndpointsInOrder(objectAssign(context.state.endpoints));
+    const newEndpoints = putEndpointsInOrder(objectAssign$1(context.state.endpoints));
     context.state.endpoints = newEndpoints;
     store.set('endpoints', newEndpoints);
     return [constants$3.ENDPOINTS];
@@ -7986,7 +7998,7 @@ var endpoints$1 = {
    * @return {Array}
    */
   changeOrder: (context, endpointKey, newOrder) => {
-    let newEndpoints = objectAssign(context.state.endpoints);
+    let newEndpoints = objectAssign$1(context.state.endpoints);
     // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
     newEndpoints[endpointKey].order = newOrder - 0.5;
     newEndpoints = putEndpointsInOrder(newEndpoints);
@@ -8017,7 +8029,7 @@ var location$2 = {
    * @return {Array}
    */
   all: (context, obj) => {
-    context.state.location = objectAssign({}, context.state.location, obj);
+    context.state.location = objectAssign$1({}, context.state.location, obj);
     return [constants$3.LOCATION];
   },
 
@@ -8073,7 +8085,7 @@ var modals$1 = {
    * @return {Array}
    */
   remove: (context, modalID) => {
-    context.state.modals = reject_1$1(context.state.modals, modal => {
+    context.state.modals = reject_1$2(context.state.modals, modal => {
       return (modal.id === modalID);
     });
     return [constants$3.MODALS];
@@ -8132,7 +8144,7 @@ var toasts$1 = {
    * @return {Array}
    */
   add: (context, obj) => {
-    const data = objectAssign({
+    const data = objectAssign$1({
       type: TOAST_TYPE_NORMAL,
       timeout: TOAST_TIMEOUT,
       autoHide: TOAST_AUTO_HIDE
@@ -8151,7 +8163,7 @@ var toasts$1 = {
    * @return {Array}
    */
   remove: (context, toastId) => {
-    context.state.toasts = reject_1$1(context.state.toasts, toast => {
+    context.state.toasts = reject_1$2(context.state.toasts, toast => {
       return toast.id === toastId;
     });
 
@@ -8343,7 +8355,7 @@ var application = {
     function isObject(val) {
         return isKind_1$1(val, 'Object');
     }
-    var isObject_1 = isObject;
+    var isObject_1$1 = isObject;
 
 /**
  * body値をContent-Type `application/json`に最適化します。
@@ -8385,7 +8397,7 @@ const formDataConverter = body => {
   keys.forEach(key => {
     const value = body[key];
 
-    if (isObject_1(value) || Array.isArray(value)) {
+    if (isObject_1$1(value) || Array.isArray(value)) {
       formData.append(key, JSON.stringify(value));
     } else if (value != null) {
       formData.append(key, value);
@@ -8403,7 +8415,7 @@ const formDataConverter = body => {
  * @return {Promise}
  */
 const commonFetch = (context, url, options) => {
-  options = objectAssign({
+  options = objectAssign$1({
     mode: 'cors',
     // redirect方法はレスポンスにそう形にする。
     redirect: 'follow',
@@ -8540,7 +8552,7 @@ var application$3 = {
         return results;
     }
 
-    var filter_1$1 = filter$1;
+    var filter_1$2 = filter$1;
 
 /**
      * Array map
@@ -8560,20 +8572,20 @@ var application$3 = {
         return results;
     }
 
-     var map_1$1 = map$1;
+     var map_1$2 = map$1;
 
 /**
      * Get object keys
      */
      var keys = Object.keys || function (obj) {
             var keys = [];
-            forOwn_1$1(obj, function(val, key){
+            forOwn_1$2(obj, function(val, key){
                 keys.push(key);
             });
             return keys;
         };
 
-    var keys_1 = keys;
+    var keys_1$1 = keys;
 
 var components$2 = {
   /**
@@ -8632,7 +8644,7 @@ var components$2 = {
    * @return {Array}
    */
   actions: (context, riotId) => {
-    return map_1$1(context.state.components[riotId].actions, action => {
+    return map_1$2(context.state.components[riotId].actions, action => {
       return action.operationObject;
     });
   },
@@ -8645,10 +8657,10 @@ var components$2 = {
    */
   selfActions: (context, riotId) => {
     const actions = context.state.components[riotId].actions;
-    const selfActions = filter_1$1(actions, action => {
+    const selfActions = filter_1$2(actions, action => {
       return (!action.appendTo || action.appendTo === 'self');
     });
-    return map_1$1(selfActions, action => {
+    return map_1$2(selfActions, action => {
       return action.operationObject;
     });
   },
@@ -8661,10 +8673,10 @@ var components$2 = {
    */
   rowActions: (context, riotId) => {
     const actions = context.state.components[riotId].actions;
-    const selfActions = filter_1$1(actions, action => {
+    const selfActions = filter_1$2(actions, action => {
       return (action.appendTo === 'row');
     });
-    return map_1$1(selfActions, action => {
+    return map_1$2(selfActions, action => {
       return action.operationObject;
     });
   },
@@ -8707,10 +8719,10 @@ var components$2 = {
    */
   tableColumns: (context, riotId) => {
     const response = context.state.components[riotId].response;
-    if (!isArray_1$1(response) || !response.length) {
+    if (!isArray_1$2(response) || !response.length) {
       return [];
     }
-    return keys_1(response[0]);
+    return keys_1$1(response[0]);
   },
 
   /**
@@ -8739,10 +8751,10 @@ var current$2 = {
      * Creates a new object with all the properties where the callback returns
      * true.
      */
-    function filterValues(obj, callback, thisObj) {
+    function filterValues$1(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var output = {};
-        forOwn_1$1(obj, function(value, key, obj) {
+        forOwn_1$2(obj, function(value, key, obj) {
             if (callback(value, key, obj)) {
                 output[key] = value;
             }
@@ -8750,14 +8762,14 @@ var current$2 = {
 
         return output;
     }
-    var filter$3 = filterValues;
+    var filter$3 = filterValues$1;
 
 /**
      * Get object values
      */
     function values(obj) {
         var vals = [];
-        forOwn_1$1(obj, function(val, key){
+        forOwn_1$2(obj, function(val, key){
             vals.push(val);
         });
         return vals;
@@ -8869,7 +8881,7 @@ var drawers$2 = {
      */
     function size(obj) {
         var count = 0;
-        forOwn_1$1(obj, function(){
+        forOwn_1$2(obj, function(){
             count++;
         });
         return count;
@@ -8896,7 +8908,7 @@ var drawers$2 = {
         return str.indexOf(substring, fromIndex) !== -1;
     }
 
-    var contains_1$1 = contains$1;
+    var contains_1$2 = contains$1;
 
 /**
  * 受け取ったエンドポイント群をorder昇順の配列として返します。
@@ -8905,11 +8917,11 @@ var drawers$2 = {
  */
 const sortByOrder = endpoints => {
   let endpointsByOrder = [];
-  forOwn_1$1(endpoints, (endpoint, key) => {
+  forOwn_1$2(endpoints, (endpoint, key) => {
     endpoint.key = key;
     endpointsByOrder.push(endpoint);
   });
-  endpointsByOrder = sortBy_1$1(endpointsByOrder, endpoint => {
+  endpointsByOrder = sortBy_1$2(endpointsByOrder, endpoint => {
     return endpoint.order;
   });
   return endpointsByOrder;
@@ -8925,33 +8937,33 @@ const filterBy = (endpoints, filterText) => {
   filterText = filterText || '';
   filterText = filterText.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
   filterText = filterText.replace(/,/g, ' ');
-  const targetTexts = filter_1$1((filterText || '').split(' '), targetText => {
+  const targetTexts = filter_1$2((filterText || '').split(' '), targetText => {
     return !!targetText;
   });
   if (!targetTexts.length) {
     return endpoints;
   }
 
-  return filter_1$1(endpoints, endpoint => {
+  return filter_1$2(endpoints, endpoint => {
     let isMatched = false;
-    forEach_1(targetTexts, targetText => {
-      if (contains_1$1(endpoint.url, targetText)) {
+    forEach_1$1(targetTexts, targetText => {
+      if (contains_1$2(endpoint.url, targetText)) {
         isMatched = true;
       }
-      if (contains_1$1(endpoint.title, targetText)) {
+      if (contains_1$2(endpoint.title, targetText)) {
         isMatched = true;
       }
-      if (contains_1$1(endpoint.name, targetText)) {
+      if (contains_1$2(endpoint.name, targetText)) {
         isMatched = true;
       }
-      if (contains_1$1(endpoint.description, targetText)) {
+      if (contains_1$2(endpoint.description, targetText)) {
         isMatched = true;
       }
-      if (contains_1$1(endpoint.memo, targetText)) {
+      if (contains_1$2(endpoint.memo, targetText)) {
         isMatched = true;
       }
-      forEach_1(endpoint.tags || [], tag => {
-        if (contains_1$1(tag, targetText)) {
+      forEach_1$1(endpoint.tags || [], tag => {
+        if (contains_1$2(tag, targetText)) {
           isMatched = true;
         }
       });
@@ -8976,7 +8988,7 @@ var endpoints$2 = {
    * @return {Array}
    */
   allByOrder: context => {
-    let endpoints = objectAssign(context.state.endpoints);
+    let endpoints = objectAssign$1(context.state.endpoints);
     endpoints = sortByOrder(endpoints);
     return endpoints;
   },
@@ -8987,7 +8999,7 @@ var endpoints$2 = {
    * @return {Array}
    */
   allByOrderFiltered: context => {
-    let endpoints = objectAssign(context.state.endpoints);
+    let endpoints = objectAssign$1(context.state.endpoints);
     endpoints = sortByOrder(endpoints);
     endpoints = filterBy(endpoints, context.state.application.endpointFilterText);
     return endpoints;
@@ -9008,9 +9020,9 @@ var endpoints$2 = {
    * @return {Object}
    */
   allWithoutToken: context => {
-    const endpoints = objectAssign({}, context.state.endpoints);
+    const endpoints = objectAssign$1({}, context.state.endpoints);
     // 認証用トークンはexport対象外とする。
-    forOwn_1$1(endpoints, endpoint => {
+    forOwn_1$2(endpoints, endpoint => {
       delete endpoint.token;
     });
     return endpoints;
@@ -9034,7 +9046,7 @@ var endpoints$2 = {
    */
   oneByURL: (context, url) => {
     const endpoints = context.state.endpoints;
-    return find_1$1(endpoints, endpoint => {
+    return find_1$2(endpoints, endpoint => {
       return endpoint.url === url;
     });
   }
@@ -9148,8 +9160,8 @@ var oas$2 = {
   flatApis: context => {
     // client.apisはタグ分けされているので、まずflatな構成にする。
     const apis = {};
-    forOwn_1$1(context.state.oas.client.apis, obj => {
-      forOwn_1$1(obj, (api, operationId) => {
+    forOwn_1$2(context.state.oas.client.apis, obj => {
+      forOwn_1$2(obj, (api, operationId) => {
         apis[operationId] = api;
       });
     });
@@ -9164,8 +9176,8 @@ var oas$2 = {
    */
   api: (context, operationId) => {
     const apis = {};
-    forOwn_1$1(context.state.oas.client.apis, obj => {
-      forOwn_1$1(obj, (api, operationId) => {
+    forOwn_1$2(context.state.oas.client.apis, obj => {
+      forOwn_1$2(obj, (api, operationId) => {
         apis[operationId] = api;
       });
     });
@@ -9183,8 +9195,8 @@ var oas$2 = {
     const operationObject = context.state.oas.client.spec.paths[path][method];
     const operationId = operationObject.operationId;
     const apis = {};
-    forOwn_1$1(context.state.oas.client.apis, obj => {
-      forOwn_1$1(obj, (api, operationId) => {
+    forOwn_1$2(context.state.oas.client.apis, obj => {
+      forOwn_1$2(obj, (api, operationId) => {
         apis[operationId] = api;
       });
     });
@@ -9209,11 +9221,11 @@ var oas$2 = {
    */
   pathItemObjectMethodNameByOperationId: (context, operationId) => {
     let ret;
-    forOwn_1$1(context.state.oas.client.spec.paths, pathItemObject => {
+    forOwn_1$2(context.state.oas.client.spec.paths, pathItemObject => {
       if (!!ret) {
         return;
       }
-      forOwn_1$1(pathItemObject, (operationObject, method) => {
+      forOwn_1$2(pathItemObject, (operationObject, method) => {
         if (!!ret) {
           return;
         }
@@ -9251,7 +9263,7 @@ var oas$2 = {
     // 関連API情報。後のOperationObject群抽出に使用します。
     const pathRefs = [];
     // 同じpath & method違いのoperationObjectは関連有りとみなす。
-    forEach_1(methods, method => {
+    forEach_1$1(methods, method => {
       // `get`はcomponent自身なのでスルーする。
       if (method === 'get') {
         return;
@@ -9270,7 +9282,7 @@ var oas$2 = {
     // テーブルの各rowに紐づくOperationObjectとみなす。
     if (!!primaryKey) {
       const listBasePath = `${basePath}/{${primaryKey}}`;
-      forEach_1(methods, method => {
+      forEach_1$1(methods, method => {
         const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath][method];
         if (!isOperationObjectDefined) {
           return;
@@ -9285,9 +9297,9 @@ var oas$2 = {
     // actionsに指定されたpath群のOperationObjectも関連有りとみなします。
     // path内にprimaryKeyと同一名の変数があれば、それはテーブルrowに紐づくOperationObjectとみなします。
     // primaryKeyと同一名の変数が無ければ、componentと紐づくOperationObjectとみなします。
-    forEach_1(actions, actionBasePath => {
+    forEach_1$1(actions, actionBasePath => {
       const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
-      forEach_1(methods, method => {
+      forEach_1$1(methods, method => {
         const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath][method];
         if (!isOperationObjectDefined) {
           return;
@@ -9302,9 +9314,9 @@ var oas$2 = {
 
     // OperationObject群を抽出します。
     const operationObjects = [];
-    forEach_1(pathRefs, ref => {
+    forEach_1$1(pathRefs, ref => {
       const operationObject = context.state.oas.client.spec.paths[ref.path][ref.method];
-      operationObjects.push(objectAssign({
+      operationObjects.push(objectAssign$1({
         operationObject
       }, ref));
     });
@@ -9990,6 +10002,14 @@ var path$1 = Object.freeze({
 });
 
 var require$$0$2 = ( path$1 && path ) || path$1;
+
+/*!
+ * content-disposition
+ * Copyright(c) 2014 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+'use strict';
 
 /**
  * Module exports.
@@ -10796,7 +10816,7 @@ var dmc$3 = {
           context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
         }
         context.commit(constants$2.DMC, res.obj);
-        const endpoint = objectAssign({}, res.obj);
+        const endpoint = objectAssign$1({}, res.obj);
         // pagesは不要なので削除。
         delete endpoint.pages;
         context.commit(constants$2.ENDPOINTS_UPDATE, currentEndpointKey, endpoint);
@@ -11020,6 +11040,11 @@ var location$4 = {
   }
 };
 
+// モーダルを多重起動しないよう判定する変数
+let canCreateModal = true;
+// タイマーID管理用変数
+let timer;
+
 var modals$3 = {
   /**
    * モーダルを追加します。
@@ -11030,6 +11055,20 @@ var modals$3 = {
    * @return {Promise}
    */
   add: (context, tagName, tagOpts, modalOpts) => {
+    if (!canCreateModal) {
+      console.warn('多重に起動しないよう、一定時間のモーダル作成を規制する。'); // eslint-disable-line no-console
+      return;
+    }
+
+    // モーダル作成を一時的に不可にする。
+    canCreateModal = false;
+    clearTimeout(timer);
+
+    // 一定時間後にモーダル作成可とする。
+    timer = setTimeout(() => {
+      canCreateModal = true;
+    }, 300);
+
     return Promise
       .resolve()
       .then(() => {
@@ -11126,7 +11165,7 @@ var page$3 = {
       .resolve()
       .then(() => {
         const pages = context.getter(constants$4.DMC_PAGES);
-        const page = find_1$1(pages, page => {
+        const page = find_1$2(pages, page => {
           return (page.id === pageId);
         });
         context.commit(constants$2.PAGE, page);
@@ -11178,7 +11217,7 @@ var toasts$3 = {
 
 };
 
-var sua = createCommonjsModule(function (module) {
+var sua$1 = createCommonjsModule(function (module) {
 /* Zepto v1.0-1-ga3cab6c - polyfill zepto detect event ajax form fx - zeptojs.com/license */
 /**
  * @name sua.js
@@ -11675,7 +11714,7 @@ var ua$3 = {
     return Promise
       .resolve()
       .then(() => {
-        const ua = new sua(navigator.userAgent);
+        const ua = new sua$1(navigator.userAgent);
         context.commit(constants$2.UA, ua);
       });
   }
@@ -12095,7 +12134,7 @@ var router = {
     return Promise
       .resolve()
       .then(() => {
-        const router = new Router(Router.HASH);
+        const router = new Router$1(Router$1.HASH);
         router
           .onBefore(() => Promise.all([
             store.action(constants$1.APPLICATION_NAVIGATION_START)
@@ -12182,7 +12221,7 @@ const closureEventListener = (() => {
   };
 })();
 const bindTouchEvents = tag => {
-  forEach_1(getTouchableElements(tag), elm => {
+  forEach_1$1(getTouchableElements(tag), elm => {
     let touchX = 0, touchY = 0;
     // bind済みであれば何もしない。
     if (!!elm.getAttribute('touchevents')) {
@@ -12242,13 +12281,13 @@ const bindTouchEvents = tag => {
   });
 };
 const unbindTouchEvents = tag => {
-  forEach_1(getTouchableElements(tag), elm => {
+  forEach_1$1(getTouchableElements(tag), elm => {
     const touchEvents = elm.getAttribute('touchevents');
     if (!touchEvents) {
       return;
     }
     const touchEventIds = touchEvents.split('/');
-    forEach_1(touchEventIds, touchEventId => {
+    forEach_1$1(touchEventIds, touchEventId => {
       closureEventListener.remove(touchEventId);
     });
   });
@@ -13024,7 +13063,7 @@ var VERSION$1 = "0.9.4";
         }
     }
 
-    var forEach_1$2 = forEach$3;
+    var forEach_1$3 = forEach$3;
 
 /**
      * Safer Object.hasOwnProperty
@@ -13033,7 +13072,7 @@ var VERSION$1 = "0.9.4";
          return Object.prototype.hasOwnProperty.call(obj, prop);
      }
 
-     var hasOwn_1$2 = hasOwn$4;
+     var hasOwn_1$3 = hasOwn$4;
 
 var _hasDontEnumBug$2;
 var _dontEnums$2;
@@ -13091,7 +13130,7 @@ var _dontEnums$2;
                 // different than Object prototype value.
                 if (
                     (key !== 'constructor' ||
-                        (!isProto && hasOwn_1$2(obj, key))) &&
+                        (!isProto && hasOwn_1$3(obj, key))) &&
                     obj[key] !== Object.prototype[key]
                 ) {
                     if (exec$2(fn, obj, key, thisObj) === false) {
@@ -13115,26 +13154,26 @@ var _dontEnums$2;
      */
     function forOwn$4(obj, fn, thisObj){
         forIn_1$3(obj, function(val, key){
-            if (hasOwn_1$2(obj, key)) {
+            if (hasOwn_1$3(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
             }
         });
     }
 
-    var forOwn_1$2 = forOwn$4;
+    var forOwn_1$3 = forOwn$4;
 
 /**
      * Get object keys
      */
      var keys$2 = Object.keys || function (obj) {
             var keys = [];
-            forOwn_1$2(obj, function(val, key){
+            forOwn_1$3(obj, function(val, key){
                 keys.push(key);
             });
             return keys;
         };
 
-    var keys_1$1 = keys$2;
+    var keys_1$2 = keys$2;
 
 /*
 object-assign
@@ -13588,7 +13627,7 @@ Store.prototype.commit = function commit (name) {
   log.apply(void 0, [ '[commit(after)]', name, _state ].concat( args ));
   index$1$1(this.state, _state);
 
-  forEach_1$2(triggers, function (v) {
+  forEach_1$3(triggers, function (v) {
     // this.trigger(v, null, this.state, this);
     this$1.trigger(v, this$1.state, this$1);
   });
@@ -13682,7 +13721,7 @@ var RiotX = function RiotX() {
       // the context of `this` will be equal to riot tag instant.
       this.on('unmount', function () {
         this$1.off('*');
-        forEach_1$2(this$1._riotx_change_handlers, function (obj) {
+        forEach_1$3(this$1._riotx_change_handlers, function (obj) {
           obj.store.off(obj.evtName, obj.handler);
         });
         delete this$1.riotx;
@@ -13764,7 +13803,7 @@ RiotX.prototype.reset = function reset () {
  * @returns {int} size
  */
 RiotX.prototype.size = function size () {
-  return keys_1$1(this.stores).length;
+  return keys_1$2(this.stores).length;
 };
 
 var index$1$2 = new RiotX();
@@ -13903,7 +13942,7 @@ var script$6 = function() {
   }
 
   // 現在の入力値群。
-  this.currentParameters = objectAssign({}, this.opts.initialParameters);
+  this.currentParameters = objectAssign$1({}, this.opts.initialParameters);
 
   // 補完的な情報群。primaryキー等。
   this.additionalInfo = {
@@ -19497,7 +19536,6 @@ var d3 = createCommonjsModule(function (module) {
       d3_geom_voronoi(sites(data)).cells.forEach(function(cell, i) {
         var site = cell.site, edges = cell.edges.sort(d3_geom_voronoiHalfEdgeOrder), j = -1, m = edges.length, e0, s0, e1 = edges[m - 1].edge, s1 = e1.l === site ? e1.r : e1.l;
         while (++j < m) {
-          e0 = e1;
           s0 = s1;
           e1 = edges[j].edge;
           s1 = e1.l === site ? e1.r : e1.l;
@@ -24085,13 +24123,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var xFontSize = typeof fontSize === 'string' ? fontSize : fontSize + 'px';
 	        var w = 0;
-	        var h = 0;
 	        var l = text.length - 1;
 	        for (var i = 0; i <= l; i++) {
 	            var char = text.charAt(i);
 	            var s = utilsDom.getCharSize(char, { fontSize: xFontSize, fontFamily: fontFamily, fontWeight: fontWeight });
 	            w += s.width;
-	            h = Math.max(h, s.height);
+	            
 	        }
 
 	        return { width: w, height: parseInt(xFontSize) };
@@ -30431,9 +30468,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		    // Trigger layout and kick in the transition
 		    if (this.options.inClass) {
-		        if (this.options.effectClass) {
-		            void this.element.clientHeight;
-		        }
 		        this.classes.add(this.options.inClass);
 		    }
 
@@ -35213,9 +35247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    labeler = {};
 
 	    var max_move = 5.0,
-	        max_angle = 0.5,
-	        acc = 0,
-	        rej = 0;
+	        max_angle = 0.5;
 
 	    // weights
 	    var w_len = 0.2,
@@ -35348,12 +35380,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var delta_energy = new_energy - old_energy;
 
 	        if (Math.random() < Math.exp(-delta_energy / currT)) {
-	            acc += 1;
+	            
 	        } else {
 	            // move back to old coordinates
 	            lab[i].x = x_old;
 	            lab[i].y = y_old;
-	            rej += 1;
+	            
 	        }
 	    };
 
@@ -35419,12 +35451,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var delta_energy = new_energy - old_energy;
 
 	        if (Math.random() < Math.exp(-delta_energy / currT)) {
-	            acc += 1;
+	            
 	        } else {
 	            // move back to old coordinates
 	            lab[i].x = x_old;
 	            lab[i].y = y_old;
-	            rej += 1;
+	            
 	        }
 	    };
 
@@ -41607,7 +41639,7 @@ var chart$1 = unwrapExports(tauCharts);
 
 var script$7 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign({
+    new chart$1.Chart(objectAssign$1({
       type: 'bar'
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
@@ -41619,7 +41651,7 @@ riot$1.tag2('dmc-component-graph-bar', '<div class="ComponentGraphBar__canvas" r
 
 var script$8 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign({
+    new chart$1.Chart(objectAssign$1({
       type: 'horizontalBar'
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
@@ -41631,7 +41663,7 @@ riot$1.tag2('dmc-component-graph-horizontal-bar', '<div class="ComponentGraphHor
 
 var script$9 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign({
+    new chart$1.Chart(objectAssign$1({
       type: 'horizontal-stacked-bar'
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
@@ -41643,7 +41675,7 @@ riot$1.tag2('dmc-component-graph-horizontal-stacked-bar', '<div class="Component
 
 var script$10 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign({
+    new chart$1.Chart(objectAssign$1({
       type: 'line',
       guide: {
         interpolate: 'smooth'
@@ -41658,7 +41690,7 @@ riot$1.tag2('dmc-component-graph-line', '<div class="ComponentGraphLine__canvas"
 
 var script$11 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign({
+    new chart$1.Chart(objectAssign$1({
       type: 'scatterplot'
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
@@ -41670,7 +41702,7 @@ riot$1.tag2('dmc-component-graph-scatterplot', '<div class="ComponentGraphScatte
 
 var script$12 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign({
+    new chart$1.Chart(objectAssign$1({
       type: 'stacked-area'
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
@@ -41682,7 +41714,7 @@ riot$1.tag2('dmc-component-graph-stacked-area', '<div class="ComponentGraphStack
 
 var script$13 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign({
+    new chart$1.Chart(objectAssign$1({
       type: 'stacked-bar'
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
@@ -41703,7 +41735,7 @@ riot$1.tag2('dmc-component-graph-stacked-bar', '<div class="ComponentGraphStacke
         if (!val) { return 0; }
         if (typeof val === 'string') { return parseFloat(val); }
         // arrays are edge cases. `Number([4]) === 4`
-        if (isArray_1$1(val)) { return NaN; }
+        if (isArray_1$2(val)) { return NaN; }
         return Number(val);
     }
 
@@ -41731,10 +41763,10 @@ riot$1.tag2('dmc-component-graph-stacked-bar', '<div class="ComponentGraphStacke
         }
     }
 
-    var currencyFormat_1 = currencyFormat;
+    var currencyFormat_1$1 = currencyFormat;
 
 var script$14 = function() {
-  this.value = currencyFormat_1(this.opts.response.value, 0);
+  this.value = currencyFormat_1$1(this.opts.response.value, 0);
 };
 
 riot$1.tag2('dmc-component-number', '<div>{value}</div>', '', 'class="ComponentNumber"', function(opts) {
@@ -41842,7 +41874,7 @@ riot$1.tag2('dmc-table-items-button', '<dmc-icon type="{icon}"></dmc-icon> <dmc-
     function contains$3(arr, val) {
         return indexOf_1$1(arr, val) !== -1;
     }
-    var contains_1$2 = contains$3;
+    var contains_1$3 = contains$3;
 
 var script$17 = function() {
   const store = this.riotx.get();
@@ -41864,7 +41896,7 @@ var script$17 = function() {
   case 'string': {
     this.value = this.opts.data.cell || '-';
     const split = this.value.split('.');
-    if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
+    if (!!split.length && contains_1$3(['jpg', 'png', 'gif'], split[split.length - 1])) {
       this.isImage = true;
     }
     break;
@@ -41902,7 +41934,7 @@ var script$18 = function() {
     }
     if (type === 'string') {
       const split = value.split('.');
-      if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
+      if (!!split.length && contains_1$3(['jpg', 'png', 'gif'], split[split.length - 1])) {
         return;
       }
     }
@@ -41956,8 +41988,15 @@ var script$19 = function() {
   const store = this.riotx.get();
 
   // sort済みのitems。
-  this.sortedItems = sortBy_1$1(this.opts.items, item => {
-    return (this.opts.tablelabels || []).indexOf(item.key) * (-1);
+  // どのorder値よりも大きいであろう適当な値。
+  const bigNumber = 9999;
+  this.sortedItems = sortBy_1$2(this.opts.items, item => {
+    const labels = this.opts.tablelabels || [];
+    if (contains_1$3(labels, item.key)) {
+      return labels.indexOf(item.key);
+    } else {
+      return bigNumber;
+    }
   });
   this.title = this.sortedItems[0].cell;
   this.isOpened = true;
@@ -41966,11 +42005,11 @@ var script$19 = function() {
   this.getFilteredItems = () => {
     const items = this.sortedItems;
     const columns = this.opts.selectedtablecolumns;
-    if (!isArray_1$1(columns) || !columns.length) {
+    if (!isArray_1$2(columns) || !columns.length) {
       return items;
     }
-    return filter_1$1(items, item => {
-      return contains_1$2(columns, item.key);
+    return filter_1$2(items, item => {
+      return contains_1$3(columns, item.key);
     });
   };
 
@@ -42017,9 +42056,9 @@ var script$21 = function() {
   this.getItemList = () => {
     const columns = this.opts.columns;
     const list = [];
-    forEach_1(this.opts.rows, row => {
+    forEach_1$1(this.opts.rows, row => {
       const items = [];
-      forEach_1(columns, column => {
+      forEach_1$1(columns, column => {
         items.push({
           key: column.key,
           title: column.title,
@@ -42066,7 +42105,7 @@ riot$1.tag2('dmc-table', '<dmc-table-items each="{items, idx in getItemList()}" 
         return idx >= 0? arr[idx] : void(0);
     }
 
-    var find_1$2 = find$3;
+    var find_1$3 = find$3;
 
 var script$23 = function() {
   this.handleTap = () => {
@@ -42086,7 +42125,7 @@ var script$24 = function() {
     e.preventUpdate = true;
     e.preventDefault();
     const selectedIndex = this.refs.select.selectedIndex;
-    forEach_1(this.opts.options, (option, idx) => {
+    forEach_1$1(this.opts.options, (option, idx) => {
       option.isSelected = (idx === selectedIndex);
     });
     this.opts.onchange && this.opts.onchange(this.opts.options);
@@ -42097,7 +42136,7 @@ var script$24 = function() {
   this.handleInputInput = e => {
     e.preventUpdate = true;
     const selectedIndex = this.refs.select.selectedIndex;
-    forEach_1(this.opts.options, (option, idx) => {
+    forEach_1$1(this.opts.options, (option, idx) => {
       option.isSelected = (idx === selectedIndex);
     });
     this.opts.onchange && this.opts.onchange(this.opts.options);
@@ -42119,7 +42158,7 @@ riot$1.tag2('dmc-select', '<div class="Select__label" if="{!!opts.label || opts.
     function isString(val) {
         return isKind_1$1(val, 'String');
     }
-    var isString_1 = isString;
+    var isString_1$1 = isString;
 
 var script$25 = function() {
   /**
@@ -42128,7 +42167,7 @@ var script$25 = function() {
    * @return {String|null}
    */
   this.normalizeValue = value => {
-    if (!isString_1(value)) {
+    if (!isString_1$1(value)) {
       return null;
     }
     return value;
@@ -42139,7 +42178,7 @@ var script$25 = function() {
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
     const text = this.opts.text;
-    if (!isString_1(text)) {
+    if (!isString_1$1(text)) {
       this.refs.input.value = this.normalizeValue(text);
     }
   });
@@ -42304,7 +42343,7 @@ var script$27 = function() {
         isDiabled: true
       });
     }
-    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
+    forEach_1$1(this.opts.parameterobject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
         label: v,
@@ -42341,7 +42380,7 @@ var script$27 = function() {
   };
 
   this.handleSelectChange = options => {
-    const option = find_1$2(options, option => {
+    const option = find_1$3(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -42403,9 +42442,9 @@ var script$28 = function() {
   }
 
   this.getParameterObject = propertyKey => {
-    return objectAssign({}, this.multiSchema.properties[propertyKey], {
+    return objectAssign$1({}, this.multiSchema.properties[propertyKey], {
       name: propertyKey,
-      required : contains_1$2(this.multiSchema.required, propertyKey)
+      required : contains_1$3(this.multiSchema.required, propertyKey)
     });
   };
 
@@ -42425,7 +42464,7 @@ var script$28 = function() {
         isDiabled: true
       });
     }
-    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
+    forEach_1$1(this.opts.parameterobject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
         label: v,
@@ -42468,7 +42507,7 @@ var script$28 = function() {
   };
 
   this.handleSelectChange = options => {
-    const option = find_1$2(options, option => {
+    const option = find_1$3(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -42493,9 +42532,9 @@ var script$29 = function() {
   this.propertyKeys = Object.keys(this.opts.schema.properties);
 
   this.getParameterObject = propertyKey => {
-    return objectAssign({}, this.opts.schema.properties[propertyKey], {
+    return objectAssign$1({}, this.opts.schema.properties[propertyKey], {
       name: propertyKey,
-      required : contains_1$2(this.opts.schema.required, propertyKey)
+      required : contains_1$3(this.opts.schema.required, propertyKey)
     });
   };
 
@@ -42507,10 +42546,10 @@ var script$29 = function() {
   };
 
   this.handleChange = (name, value) => {
-    const values = objectAssign({}, this.opts.parametervalues, {
+    const values = objectAssign$1({}, this.opts.parametervalues, {
       [name]: value
     });
-    forOwn_1$1(values, (v, k) => {
+    forOwn_1$2(values, (v, k) => {
       // TODO: deleteするためのもっと良い方法を模索すること。
       if (typeof v === 'string' && !v.length) {
         delete values[k];
@@ -42544,7 +42583,7 @@ var script$31 = function() {
   const store = this.riotx.get();
 
   this.summary = this.opts.operationObject.summary || this.opts.operationObject.operationId;
-  this.queries = objectAssign({}, this.opts.initialQueries);
+  this.queries = objectAssign$1({}, this.opts.initialQueries);
 
   this.handleParameterChange = (key, value) => {
     this.queries[key] = value;
@@ -42583,7 +42622,7 @@ var script$22 = function() {
 
   this.getColumns = () => {
     const columns = [];
-    forOwn_1$1(this.opts.schemaobject.items.properties, (obj, key) => {
+    forOwn_1$2(this.opts.schemaobject.items.properties, (obj, key) => {
       columns.push({
         title: obj.description || key,
         type: obj.type,
@@ -42595,9 +42634,9 @@ var script$22 = function() {
 
   this.getRows = () => {
     const rows = [];
-    forEach_1(this.opts.response, cells => {
+    forEach_1$1(this.opts.response, cells => {
       const row = {};
-      forOwn_1$1(cells, (cell, key) => {
+      forOwn_1$2(cells, (cell, key) => {
         row[key] = cell;
       });
       rows.push(row);
@@ -42607,7 +42646,7 @@ var script$22 = function() {
 
   this.getActions = () => {
     const actions$$1 = [];
-    forEach_1(this.opts.rowactions, operationObject => {
+    forEach_1$1(this.opts.rowactions, operationObject => {
       actions$$1.push({
         operationId: operationObject.operationId,
         value: operationObject.summary || operationObject.operationId,
@@ -42621,11 +42660,11 @@ var script$22 = function() {
   const createInitialQueries = (operationObject, rowData) => {
     const queries = {};
     const parameterObjects = operationObject.parameters;
-    forEach_1(parameterObjects, parameterObject => {
+    forEach_1$1(parameterObjects, parameterObject => {
       const name = parameterObject.name;
       if (parameterObject.in === 'body') {
         queries[name] = {};
-        forOwn_1$1(parameterObject.schema.properties, (v, k) => {
+        forOwn_1$2(parameterObject.schema.properties, (v, k) => {
           if (rowData[k]) {
             queries[name][k] = rowData[k];
           }
@@ -42642,7 +42681,7 @@ var script$22 = function() {
   };
 
   this.handleActionButtonPat = (operationId, rowIdx) => {
-    const operationObject = find_1$2(this.opts.rowactions, operationObject => {
+    const operationObject = find_1$3(this.opts.rowactions, operationObject => {
       return (operationObject.operationId === operationId);
     });
     const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
@@ -42671,10 +42710,10 @@ var UNDEF$2;
 
     /**
      */
-    function isUndef(val){
+    function isUndef$1(val){
         return val === UNDEF$2;
     }
-    var isUndefined = isUndef;
+    var isUndefined = isUndef$1;
 
 /**
      * Object reject
@@ -42686,7 +42725,7 @@ var UNDEF$2;
         }, thisObj);
     }
 
-    var reject_1$2 = reject$3;
+    var reject_1$3 = reject$3;
 
 var script$33 = function() {
   this.handleCheckboxChange = newIsChecked => {
@@ -42702,16 +42741,16 @@ var script$34 = function() {
   const selectedTableColumns = (this.opts.selectedTableColumns || []).concat([]);
 
   this.items = [];
-  forEach_1(this.opts.tableColumns, tableColumn => {
+  forEach_1$1(this.opts.tableColumns, tableColumn => {
     const item = {
       label: tableColumn,
-      isSelected: contains_1$2(selectedTableColumns, tableColumn)
+      isSelected: contains_1$3(selectedTableColumns, tableColumn)
     };
     this.items.push(item);
   });
 
   this.handleItemToggle = (item, newIsSelected) => {
-    const targetItem = find_1$2(this.items, i => {
+    const targetItem = find_1$3(this.items, i => {
       return (i.label === item.label);
     });
     if (!!targetItem) {
@@ -42721,7 +42760,7 @@ var script$34 = function() {
   };
 
   this.handleApplyButtonPat = () => {
-    const newSelectedTableColumns = map_1$1(reject_1$1(this.items, item => {
+    const newSelectedTableColumns = map_1$2(reject_1$2(this.items, item => {
       return !item.isSelected;
     }), item => {
       return item.label;
@@ -42885,7 +42924,6 @@ if (!Object.values) {
             // are only applied when a character is found to actually have a
             // code point above 128.
 
-            var nonASCIIwhitespace = /[\u1680\u180e\u2000-\u200a\u202f\u205f\u3000\ufeff]/; // jshint ignore:line
             var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
             var nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f";
             var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
@@ -46376,7 +46414,6 @@ var beautifyHtml = createCommonjsModule(function (module, exports) {
                     // do not reformat the "unformatted" or "content_unformatted" tags
                     comment = this.get_unformatted('</' + tag_check + '>', tag_complete); //...delegate to get_unformatted function
                     content.push(comment);
-                    tag_end = this.pos - 1;
                     this.tag_type = 'SINGLE';
                 } else if (tag_check === 'script' &&
                     (tag_complete.search('type') === -1 ||
@@ -46993,6 +47030,8 @@ if (typeof undefined === "function" && undefined.amd) {
  * Licensed under the MIT License.
  */
 
+'use strict';
+
 var cache;
 
 var isWhitespace = function isWhitespace(str) {
@@ -47011,10 +47050,16 @@ function regex() {
  * Licensed under the MIT License.
  */
 
+'use strict';
+
 var isExtendable = function isExtendable(val) {
   return typeof val !== 'undefined' && val !== null
     && (typeof val === 'object' || typeof val === 'function');
 };
+
+'use strict';
+
+
 
 var extendShallow = function extend(o/*, objects*/) {
   if (!isExtendable(o)) { o = {}; }
@@ -47184,6 +47229,19 @@ var kindOf$3 = function kindOf(val) {
   return 'object';
 };
 
+/*!
+ * condense-newlines <https://github.com/jonschlinkert/condense-newlines>
+ *
+ * Copyright (c) 2014 Jon Schlinkert, contributors.
+ * Licensed under the MIT License
+ */
+
+'use strict';
+
+
+
+
+
 var condenseNewlines = function(str, options) {
   var opts = extendShallow({}, options);
   var sep = opts.sep || '\n\n';
@@ -47231,6 +47289,18 @@ function trailingNewline(str, options) {
   }
   return str;
 }
+
+/*!
+ * pretty <https://github.com/jonschlinkert/pretty>
+ *
+ * Copyright (c) 2013-2015, 2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+'use strict';
+
+
+
 
 var defaults = {
   unformatted: ['code', 'pre', 'em', 'strong', 'span'],
@@ -47287,7 +47357,7 @@ var script$36 = function() {
    * @return {String|null}
    */
   this.normalizeValue = value => {
-    if (!isString_1(value)) {
+    if (!isString_1$1(value)) {
       return null;
     }
     return value;
@@ -47298,7 +47368,7 @@ var script$36 = function() {
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
     const text = this.opts.text;
-    if (!isString_1(text)) {
+    if (!isString_1$1(text)) {
       this.refs.textarea.value = this.normalizeValue(text);
     }
   });
@@ -47399,7 +47469,7 @@ riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html_
         return typeof val === 'number' && val != val;
     }
 
-    var _isNaN$1 = isNaN$3;
+    var _isNaN$2 = isNaN$3;
 
 /**
      * Check if value is NaN for realz
@@ -47408,17 +47478,17 @@ riot$1.tag2('dmc-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html_
         // based on the fact that NaN !== NaN
         // need to check if it's a number to avoid conflicts with host objects
         // also need to coerce ToNumber to avoid edge case `new Number(NaN)`
-        return !isNumber_1(val) || _isNaN$1(Number(val));
+        return !isNumber_1$1(val) || _isNaN$2(Number(val));
     }
 
-    var _isNaN = isNaN$1;
+    var _isNaN$1 = isNaN$1;
 
 /**
      */
     function isNull(val){
         return val === null;
     }
-    var isNull_1 = isNull;
+    var isNull_1$1 = isNull;
 
 var script$38 = function() {
   /**
@@ -47427,10 +47497,10 @@ var script$38 = function() {
    * @param {*} num
    */
   const isNumber = num => {
-    if (_isNaN(num)) {
+    if (_isNaN$1(num)) {
       return false;
     }
-    return isNumber_1(num);
+    return isNumber_1$1(num);
   };
   // opts文字列指定も許可する。
   let min, max, step;
@@ -47449,7 +47519,7 @@ var script$38 = function() {
     const currentValue = this.normalizeValue(this.opts.number);
     const n = isNumber(step) ? step : 1;
     let newValue;
-    if (isNull_1(currentValue)) {
+    if (isNull_1$1(currentValue)) {
       newValue = n;
     } else {
       newValue = currentValue + n;
@@ -47465,7 +47535,7 @@ var script$38 = function() {
     const currentValue = this.normalizeValue(this.opts.number);
     const n = isNumber(step) ? step : 1;
     let newValue;
-    if (isNull_1(currentValue)) {
+    if (isNull_1$1(currentValue)) {
       newValue = n * (-1);
     } else {
       newValue = currentValue - n;
@@ -47480,7 +47550,7 @@ var script$38 = function() {
    */
   this.normalizeValue = value => {
     // nullの場合はそのまま扱う。
-    if (isNull_1(value)) {
+    if (isNull_1$1(value)) {
       return value;
     }
 
@@ -47490,7 +47560,7 @@ var script$38 = function() {
     }
 
     // 文字列を受け取った場合は形式によって返却値が変わる。
-    if (isString_1(value)) {
+    if (isString_1$1(value)) {
       // 数字と`-`のみも文字列に変換する。
       value = value.replace(/[^-^0-9]/g, '');
       // 空文字列の場合はnullとして扱う。
@@ -47503,7 +47573,7 @@ var script$38 = function() {
       // `1-2` ->  NaN
       value = Number(value);
       // NaNはnullとして扱う。
-      if (_isNaN(value)) {
+      if (_isNaN$1(value)) {
         return null;
       }
     }
@@ -48274,7 +48344,7 @@ var script$40 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'center');
+    this.isActive = (hasOwn_1$2(formats, 'align') && formats['align'] === 'center');
     this.update();
   };
 
@@ -48334,7 +48404,7 @@ var script$41 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'left');
+    this.isActive = (hasOwn_1$2(formats, 'align') && formats['align'] === 'left');
     this.update();
   };
 
@@ -48394,7 +48464,7 @@ var script$42 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'right');
+    this.isActive = (hasOwn_1$2(formats, 'align') && formats['align'] === 'right');
     this.update();
   };
 
@@ -48454,7 +48524,7 @@ var script$43 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$1(formats, 'blockquote');
+    this.isActive = hasOwn_1$2(formats, 'blockquote');
     this.update();
   };
 
@@ -48514,7 +48584,7 @@ var script$44 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$1(formats, 'code-block');
+    this.isActive = hasOwn_1$2(formats, 'code-block');
     this.update();
   };
 
@@ -48574,7 +48644,7 @@ var script$45 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$1(formats, 'direction');
+    this.isActive = hasOwn_1$2(formats, 'direction');
     this.update();
   };
 
@@ -48635,7 +48705,7 @@ var script$46 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$1(formats, 'header') && formats['header'] === this.opts.level;
+    this.isActive = hasOwn_1$2(formats, 'header') && formats['header'] === this.opts.level;
     this.update();
   };
 
@@ -48696,7 +48766,7 @@ var script$47 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$1(formats, 'image');
+    this.isActive = hasOwn_1$2(formats, 'image');
     this.update();
   };
 
@@ -48785,7 +48855,7 @@ var script$50 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$1(formats, 'list') && formats['list'] === 'bullet';
+    this.isActive = hasOwn_1$2(formats, 'list') && formats['list'] === 'bullet';
     this.update();
   };
 
@@ -48846,7 +48916,7 @@ var script$51 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$1(formats, 'list') && formats['list'] === 'ordered';
+    this.isActive = hasOwn_1$2(formats, 'list') && formats['list'] === 'ordered';
     this.update();
   };
 
@@ -48907,7 +48977,7 @@ var script$52 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$1(formats, 'video');
+    this.isActive = hasOwn_1$2(formats, 'video');
     this.update();
   };
 
@@ -48967,8 +49037,8 @@ var script$53 = function() {
   this.isBubbled = !blotOptions['external-css-file'];
 
   // Blotを変更します。
-  forOwn_1$1(blotOptions || {}, (value, key) => {
-    customizeBlot(key, objectAssign({}, value));
+  forOwn_1$2(blotOptions || {}, (value, key) => {
+    customizeBlot(key, objectAssign$1({}, value));
   });
 
   /**
@@ -49043,7 +49113,7 @@ var script$53 = function() {
     this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
     this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    if (isString_1(blotOptions.initialInnerHtml)) {
+    if (isString_1$1(blotOptions.initialInnerHtml)) {
       this.quill.pasteHTML(blotOptions.initialInnerHtml);
     }
     // load external css file if any specified.
@@ -49141,7 +49211,7 @@ const UI_NULL = 'null';
 
 var script$54 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
-  const schemaObject = objectAssign({}, this.opts.schemaobject);
+  const schemaObject = objectAssign$1({}, this.opts.schemaobject);
 
   // wyswygエディタのオプション群。
   this.blotOptions = schemaObject['x-wyswyg-options'] || {};
@@ -49176,7 +49246,7 @@ var script$54 = function() {
         isDiabled: true
       });
     }
-    forEach_1(schemaObject.enum, (v, idx) => {
+    forEach_1$1(schemaObject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
         label: v,
@@ -49239,7 +49309,7 @@ var script$54 = function() {
     // opts.valが何も指定されていない(i.e. undefined)
     // 且つ
     // デフォルト値が設定されていれば自動更新する。
-    if (this.opts.val === undefined && hasOwn_1$1(schemaObject, 'default')) {
+    if (this.opts.val === undefined && hasOwn_1$2(schemaObject, 'default')) {
       this.opts.onchange(schemaObject.default);
     }
   });
@@ -49262,7 +49332,7 @@ var script$54 = function() {
 
   // numberinput値が変更された時の処理。
   this.handleNumberinputChange = newNumber => {
-    if (!isNumber_1(newNumber)) {
+    if (!isNumber_1$1(newNumber)) {
       newNumber = undefined;
     }
     this.opts.onchange(newNumber);
@@ -49275,7 +49345,7 @@ var script$54 = function() {
 
   // select値が変更された時の処理。
   this.handleSelectChange = options => {
-    const option = find_1$2(options, option => {
+    const option = find_1$3(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -49318,7 +49388,7 @@ riot$1.tag2('dmc-parameter-form', '<div class="ParameterForm__body"> <virtual if
      */
     function unique$1(arr, compare){
         compare = compare || isEqual$1;
-        return filter_1$1(arr, function(item, i, arr){
+        return filter_1$2(arr, function(item, i, arr){
             var n = arr.length;
             while (++i < n) {
                 if ( compare(item, arr[i]) ) {
@@ -49333,14 +49403,14 @@ riot$1.tag2('dmc-parameter-form', '<div class="ParameterForm__body"> <virtual if
         return a === b;
     }
 
-    var unique_1$1 = unique$1;
+    var unique_1$2 = unique$1;
 
 /**
      */
     function isBoolean(val) {
         return isKind_1$1(val, 'Boolean');
     }
-    var isBoolean_1 = isBoolean;
+    var isBoolean_1$1 = isBoolean;
 
 var hookCallback;
 
@@ -53789,6 +53859,8 @@ hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
 hooks.calendarFormat        = getCalendarFormat;
 hooks.prototype             = proto;
 
+'use strict';
+
 // Load modules
 
 // Delcare internals
@@ -53995,11 +54067,11 @@ const resultTemplate = {
  * @return {Object}
  */
 const selfRequired = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'selfRequired')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'selfRequired')) {
     return result;
   }
-  if (isBoolean_1(constraints.selfRequired) && constraints.selfRequired) {
+  if (isBoolean_1$1(constraints.selfRequired) && constraints.selfRequired) {
     if (value === undefined) {
       result.isValid = false;
       result.message = '必須項目です。';
@@ -54017,8 +54089,8 @@ const selfRequired = (value, constraints) => {
  * @return {Object}
  */
 const multipleOf = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'multipleOf')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'multipleOf')) {
     return result;
   }
   const multipleOf = constraints.multipleOf;
@@ -54037,8 +54109,8 @@ const multipleOf = (value, constraints) => {
  * @return {Object}
  */
 const maximum = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'maximum')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'maximum')) {
     return result;
   }
   const maximum = constraints.maximum;
@@ -54068,8 +54140,8 @@ const maximum = (value, constraints) => {
  * @return {Object}
  */
 const minimum = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'minimum')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'minimum')) {
     return result;
   }
   const minimum = constraints.minimum;
@@ -54099,8 +54171,8 @@ const minimum = (value, constraints) => {
  * @return {Object}
  */
 const maxLength = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'maxLength')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'maxLength')) {
     return result;
   }
   const maxLength = constraints.maxLength;
@@ -54119,7 +54191,7 @@ const maxLength = (value, constraints) => {
  * @return {Object}
  */
 const minLength = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
+  const result = objectAssign$1({}, resultTemplate);
   // デフォルト値は`0`。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.2.3
   const minLength = constraints.minLength || 0;
@@ -54138,8 +54210,8 @@ const minLength = (value, constraints) => {
  * @return {Object}
  */
 const pattern = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'pattern')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'pattern')) {
     return result;
   }
   // ECMA 262 regular expression dialect.
@@ -54160,7 +54232,7 @@ const pattern = (value, constraints) => {
  * @return {Object}
  */
 const additionalItemsAndItems = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
+  const result = objectAssign$1({}, resultTemplate);
   // itemsはSchemaObject or array of SchemaObject.
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
   // additionalItemsはboolean or SchemaObject.
@@ -54169,12 +54241,12 @@ const additionalItemsAndItems = (value, constraints) => {
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.4
   let items;
   let additionalItems;
-  if (!hasOwn_1$1(constraints, 'items')) {
+  if (!hasOwn_1$2(constraints, 'items')) {
     items = {};
   } else {
     items = constraints.items;
   }
-  if (!hasOwn_1$1(constraints, 'additionalItems')) {
+  if (!hasOwn_1$2(constraints, 'additionalItems')) {
     additionalItems = {};
   } else {
     additionalItems = constraints.additionalItems;
@@ -54182,18 +54254,18 @@ const additionalItemsAndItems = (value, constraints) => {
 
   // itemsが未定義もしくはオブジェクトならばvalidate結果は常にOK。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.2
-  if (isObject_1(items)) {
+  if (isObject_1$1(items)) {
     return result;
   }
   // additionalItemsがBooleanのtrueもしくはobjectならばvalidate結果は常にOK。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
-  if ((isBoolean_1(additionalItems) && additionalItems) || isObject_1(additionalItems)) {
+  if ((isBoolean_1$1(additionalItems) && additionalItems) || isObject_1$1(additionalItems)) {
     return result;
   }
   // additionalItemsがBooleanのfalseでありitemsがarrayの場合、
   // value配列の長さがitemsの長さ以下ならばvalidate結果はOK。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
-  if ((isBoolean_1(additionalItems) && !additionalItems) && isArray_1$1(items)) {
+  if ((isBoolean_1$1(additionalItems) && !additionalItems) && isArray_1$2(items)) {
     if (value.length <= items.length) {
       return result;
     }
@@ -54211,8 +54283,8 @@ const additionalItemsAndItems = (value, constraints) => {
  * @return {Object}
  */
 const maxItems = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'maxItems')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'maxItems')) {
     return result;
   }
   const maxItems = constraints.maxItems;
@@ -54232,7 +54304,7 @@ const maxItems = (value, constraints) => {
  * @return {Object}
  */
 const minItems = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
+  const result = objectAssign$1({}, resultTemplate);
   // デフォルト値は`0`。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.3.3
   const minItems = constraints.minItems || 0;
@@ -54252,14 +54324,14 @@ const minItems = (value, constraints) => {
  * @return {Object}
  */
 const uniqueItems = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
+  const result = objectAssign$1({}, resultTemplate);
   // デフォルト値はfalse。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.4.3
   const uniqueItems = constraints.uniqueItems || false;
   if (!uniqueItems) {
     return result;
   }
-  if (value.length !== unique_1$1(value).length) {
+  if (value.length !== unique_1$2(value).length) {
     result.isValid = false;
     result.message = '内容が重複しない要素で構成して下さい。';
     return result;
@@ -54275,12 +54347,12 @@ const uniqueItems = (value, constraints) => {
  * @return {Object}
  */
 const maxProperties = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'maxProperties')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'maxProperties')) {
     return result;
   }
   const maxProperties = constraints.maxProperties;
-  if (keys_1(value).length > maxProperties) {
+  if (keys_1$1(value).length > maxProperties) {
     result.isValid = false;
     result.message = `要素数を${maxProperties}以下にして下さい。`;
     return result;
@@ -54296,11 +54368,11 @@ const maxProperties = (value, constraints) => {
  * @return {Object}
  */
 const minProperties = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
+  const result = objectAssign$1({}, resultTemplate);
   // デフォルト値は`0`。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.2.3
   const minProperties = constraints.minProperties || 0;
-  if (keys_1(value).length < minProperties) {
+  if (keys_1$1(value).length < minProperties) {
     result.isValid = false;
     result.message = `要素数を${minProperties}以上にして下さい。`;
     return result;
@@ -54316,13 +54388,13 @@ const minProperties = (value, constraints) => {
  * @return {Object}
  */
 const required = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!isArray_1$1(constraints.required) || !constraints.required.length) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!isArray_1$2(constraints.required) || !constraints.required.length) {
     return result;
   }
   const required = constraints.required;
-  forEach_1(required, key => {
-    if (!hasOwn_1$1(value, key)) {
+  forEach_1$1(required, key => {
+    if (!hasOwn_1$2(value, key)) {
       result.isValid = false;
       result.message = `要素に${key}を含めて下さい。`;
     }
@@ -54338,24 +54410,22 @@ const required = (value, constraints) => {
  * @return {Object}
  */
 const additionalPropertiesAndPropertiesAndPatternPropertie = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
+  const result = objectAssign$1({}, resultTemplate);
   // `properties`と`patternProperties`のデフォルト値は空オブジェクト。
   // `additionalProperties`のデフォルト値は空SchemaObject。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.3
-  let properties;// eslint-disable-line no-unused-vars
-  let patternProperties;// eslint-disable-line no-unused-vars
   let additionalProperties;// eslint-disable-line no-unused-vars
-  if (!hasOwn_1$1(constraints, 'properties')) {
-    properties = {};
+  if (!hasOwn_1$2(constraints, 'properties')) {
+    
   } else {
-    properties = constraints.properties;
+    
   }
-  if (!hasOwn_1$1(constraints, 'patternProperties')) {
-    patternProperties = {};
+  if (!hasOwn_1$2(constraints, 'patternProperties')) {
+    
   } else {
-    patternProperties = constraints.patternProperties;
+    
   }
-  if (!hasOwn_1$1(constraints, 'additionalProperties')) {
+  if (!hasOwn_1$2(constraints, 'additionalProperties')) {
     additionalProperties = {};
   } else {
     additionalProperties = constraints.additionalProperties;
@@ -54367,11 +54437,11 @@ const additionalPropertiesAndPropertiesAndPatternPropertie = (value, constraints
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.1
 
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.2
-  if ((isBoolean_1(additionalProperties) && additionalProperties) || isObject_1(additionalProperties)) {
+  if ((isBoolean_1$1(additionalProperties) && additionalProperties) || isObject_1$1(additionalProperties)) {
     return result;
   }
 
-  if (isBoolean_1(additionalProperties) && !additionalProperties) {
+  if (isBoolean_1$1(additionalProperties) && !additionalProperties) {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.4
     // TODO:
   }
@@ -54386,7 +54456,7 @@ const additionalPropertiesAndPropertiesAndPatternPropertie = (value, constraints
  * @return {Object}
  */
 const dependencies = (value, constraints) => {// eslint-disable-line no-unused-vars
-  const result = objectAssign({}, resultTemplate);
+  const result = objectAssign$1({}, resultTemplate);
   // TODO:
   return result;
 };
@@ -54398,13 +54468,13 @@ const dependencies = (value, constraints) => {// eslint-disable-line no-unused-v
  * @return {Object}
  */
 const _enum = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'enum')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'enum')) {
     return result;
   }
   const _enum = constraints.enum;
   let isFound = false;
-  forEach_1(_enum, item => {
+  forEach_1$1(_enum, item => {
     if (value === item) {
       isFound = true;
     }
@@ -54423,55 +54493,55 @@ const _enum = (value, constraints) => {
  * @return {Object}
  */
 const _type = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!hasOwn_1$1(constraints, 'type')) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'type')) {
     return result;
   }
   let types;
   // type値はstringもしくはstring型のarray。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2.1
-  if (isString_1(constraints.type)) {
+  if (isString_1$1(constraints.type)) {
     types = [constraints.type];
   } else {
     types = constraints.type;
   }
   let isValidType = false;
-  forEach_1(types, type => {
+  forEach_1$1(types, type => {
     switch (type) {
     case 'integer':
     case 'number':
-      if (isNumber_1(value)) {
+      if (isNumber_1$1(value)) {
         isValidType = true;
       }
       break;
     case 'string':
-      if (isString_1(value)) {
+      if (isString_1$1(value)) {
         isValidType = true;
       }
       break;
     case 'array':
-      if (isArray_1$1(value)) {
+      if (isArray_1$2(value)) {
         isValidType = true;
       }
       break;
     case 'object':
-      if (isObject_1(value)) {
+      if (isObject_1$1(value)) {
         isValidType = true;
       }
       break;
     case 'boolean':
-      if (isBoolean_1(value)) {
+      if (isBoolean_1$1(value)) {
         isValidType = true;
       }
       break;
     case 'file':
       // より最適なtypeチェックがあればそれを採用したい。
-      if (!!value && isString_1(value.name)) {
+      if (!!value && isString_1$1(value.name)) {
         isValidType = true;
       }
       break;
     case 'null':
-      if (isNull_1(value)) {
+      if (isNull_1$1(value)) {
         isValidType = true;
       }
       break;
@@ -54493,14 +54563,12 @@ const _type = (value, constraints) => {
  * @return {Object}
  */
 const allOf = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!isArray_1$1(constraints.allOf)) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!isArray_1$2(constraints.allOf)) {
     return result;
   }
   // SchemaObjectのarray。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.3.1
-  const allOf = constraints.allOf;// eslint-disable-line no-unused-vars
-  // TODO:
   return result;
 };
 
@@ -54511,14 +54579,12 @@ const allOf = (value, constraints) => {
  * @return {Object}
  */
 const anyOf = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!isArray_1$1(constraints.anyOf)) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!isArray_1$2(constraints.anyOf)) {
     return result;
   }
   // SchemaObjectのarray。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.4.1
-  const anyOf = constraints.anyOf;// eslint-disable-line no-unused-vars
-  // TODO:
   return result;
 };
 
@@ -54529,14 +54595,12 @@ const anyOf = (value, constraints) => {
  * @return {Object}
  */
 const oneOf = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!isArray_1$1(constraints.oneOf)) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!isArray_1$2(constraints.oneOf)) {
     return result;
   }
   // SchemaObjectのarray。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.5.1
-  const oneOf = constraints.oneOf;// eslint-disable-line no-unused-vars
-  // TODO:
   return result;
 };
 
@@ -54547,14 +54611,12 @@ const oneOf = (value, constraints) => {
  * @return {Object}
  */
 const not = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!isArray_1$1(constraints.not)) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!isArray_1$2(constraints.not)) {
     return result;
   }
   // SchemaObjectのarray。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.6.1
-  const not = constraints.not;// eslint-disable-line no-unused-vars
-  // TODO:
   return result;
 };
 
@@ -54565,14 +54627,12 @@ const not = (value, constraints) => {
  * @return {Object}
  */
 const definitions = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!isArray_1$1(constraints.definitions)) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!isArray_1$2(constraints.definitions)) {
     return result;
   }
   // SchemaObjectのarray。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.7.1
-  const definitions = constraints.definitions;// eslint-disable-line no-unused-vars
-  // TODO:
   return result;
 };
 
@@ -54583,8 +54643,8 @@ const definitions = (value, constraints) => {
  * @return {Object}
  */
 const format$1 = (value, constraints) => {
-  const result = objectAssign({}, resultTemplate);
-  if (!isString_1(constraints.format)) {
+  const result = objectAssign$1({}, resultTemplate);
+  if (!isString_1$1(constraints.format)) {
     return result;
   }
   const format = constraints.format;
@@ -54593,14 +54653,14 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.1
 
     // String型のときだけバリデートする
-    if (!isString_1(value)) {
+    if (!isString_1$1(value)) {
       return result;
     }
 
     // RFC 3339に則った書き方かバリデートする
     const pattern = /^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+\-])([01]\d|2[0-3]):([0-5]\d))$/;
     const isMatch = value.match(pattern);
-    if (isNull_1(isMatch)) {
+    if (isNull_1$1(isMatch)) {
       result.isValid = false;
       result.message = '"date-time"に則ったフォーマットで入力してください。';
       return result;
@@ -54619,14 +54679,14 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.2
 
     // String型のときだけバリデートする
-    if (!isString_1(value)) {
+    if (!isString_1$1(value)) {
       return result;
     }
 
     // RFC 5322に則った書き方かバリデートする
     const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const isMatch = value.match(pattern);
-    if (isNull_1(isMatch)) {
+    if (isNull_1$1(isMatch)) {
       result.isValid = false;
       result.message = '"email"に則ったフォーマットで入力してください。';
       return result;
@@ -54637,7 +54697,7 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
 
     // String型のときだけバリデートする
-    if (!isString_1(value)) {
+    if (!isString_1$1(value)) {
       return result;
     }
 
@@ -54651,7 +54711,7 @@ const format$1 = (value, constraints) => {
     // RFC 1034に則った書き方かバリデートする
     const pattern = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[‌​a-z\d])?)*$/i; // eslint-disable-line no-irregular-whitespace
     const isMatch = value.match(pattern);
-    if (isNull_1(isMatch)) {
+    if (isNull_1$1(isMatch)) {
       result.isValid = false;
       result.message = '"hostname"に則ったフォーマットで入力してください。';
       return result;
@@ -54663,14 +54723,14 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.4
 
     // String型のときだけバリデートする
-    if (!isString_1(value)) {
+    if (!isString_1$1(value)) {
       return result;
     }
 
     // RFC 2673に則った書き方かバリデートする
     const pattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     const isMatch = value.match(pattern);
-    if (isNull_1(isMatch)) {
+    if (isNull_1$1(isMatch)) {
       result.isValid = false;
       result.message = '"ipv4"に則ったフォーマットで入力してください。';
       return result;
@@ -54682,7 +54742,7 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.5
 
     // String型のときだけバリデートする
-    if (!isString_1(value)) {
+    if (!isString_1$1(value)) {
       return result;
     }
 
@@ -54714,9 +54774,9 @@ const format$1 = (value, constraints) => {
       /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
     ];
     let matchResult = false;
-    forEach_1(patterns, pattern => {
+    forEach_1$1(patterns, pattern => {
       const isMatch = value.match(pattern);
-      if (!isNull_1(isMatch)) {
+      if (!isNull_1$1(isMatch)) {
         matchResult = true;
       }
     });
@@ -54733,14 +54793,14 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.6
 
     // String型のときだけバリデートする
-    if (!isString_1(value)) {
+    if (!isString_1$1(value)) {
       return result;
     }
 
     // RFC 3986に則った書き方かバリデートする
     const pattern = rfc3986.uri;
     const isMatch = value.match(pattern);
-    if (isNull_1(isMatch)) {
+    if (isNull_1$1(isMatch)) {
       result.isValid = false;
       result.message = '"uri"に則ったフォーマットで入力してください。';
       return result;
@@ -54837,7 +54897,7 @@ var oas$4 = {
     results.push(format$1(value, schemaObject));
 
     // isValid値がfalseの結果だけ返す。
-    return reject_1$1(results, result => {
+    return reject_1$2(results, result => {
       return result.isValid;
     });
   },
@@ -54849,7 +54909,7 @@ var oas$4 = {
    * @return {Oject}
    */
   createSchemaObjectFromParameterObject: parameterObject => {
-    const normalizedSchemaObject = objectAssign({}, parameterObject);
+    const normalizedSchemaObject = objectAssign$1({}, parameterObject);
     const selfRequired = normalizedSchemaObject.required;
     delete normalizedSchemaObject.required;
     normalizedSchemaObject.selfRequired = selfRequired;
@@ -54863,11 +54923,11 @@ var oas$4 = {
    * @return {Oject}
    */
   createSchemaObjectFromParameterObjectAndSchemaObject: (parameterObject, schemaObject) => {
-    let normalizedSchemaObject = objectAssign({}, parameterObject);
+    let normalizedSchemaObject = objectAssign$1({}, parameterObject);
     const selfRequired = normalizedSchemaObject.required;
     delete normalizedSchemaObject.required;
     normalizedSchemaObject.selfRequired = selfRequired;
-    normalizedSchemaObject = objectAssign(normalizedSchemaObject, schemaObject);
+    normalizedSchemaObject = objectAssign$1(normalizedSchemaObject, schemaObject);
     return normalizedSchemaObject;
   },
 
@@ -54878,7 +54938,7 @@ var oas$4 = {
    * @return {Object}
    */
   createSchemaObjectFromPropertyObject: (propertyObject, key) => {
-    const normalizedSchemaObject = objectAssign({}, propertyObject);
+    const normalizedSchemaObject = objectAssign$1({}, propertyObject);
     // nameが未設定であれば、propertyObjectのkeyを使用する。
     if (!normalizedSchemaObject.name) {
       normalizedSchemaObject.name = key;
@@ -54894,7 +54954,7 @@ var oas$4 = {
    * @return {Object}
    */
   createSchemaObjectFromItemsObject: (itemsObject, baseName, idx) => {
-    const normalizedSchemaObject = objectAssign({}, itemsObject);
+    const normalizedSchemaObject = objectAssign$1({}, itemsObject);
     // nameが未設定であれば、propertyObjectのkeyを使用する。
     if (!normalizedSchemaObject.name) {
       normalizedSchemaObject.name = `${baseName}[${idx}]`;
@@ -54905,14 +54965,14 @@ var oas$4 = {
 
 var script$55 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
-  const schemaObject = objectAssign({}, this.opts.schemaobject);
+  const schemaObject = objectAssign$1({}, this.opts.schemaobject);
   this.schemaObject = schemaObject;
   this.name = schemaObject.name;
   this.selfRequired = schemaObject.selfRequired;
   const keysForInfo = ['enum', 'description', 'required', 'type', 'example', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'format', 'x-wyswyg-options'];
   this.infos = [];
-  forEach_1(keysForInfo, key => {
-    if (!hasOwn_1$1(schemaObject, key)) {
+  forEach_1$1(keysForInfo, key => {
+    if (!hasOwn_1$2(schemaObject, key)) {
       return;
     }
     this.infos.push({
@@ -54982,10 +55042,10 @@ var script$55 = function() {
    */
   const getDefaultPropertyValue = property => {
     // 上書き予防。
-    property = objectAssign({}, property);
+    property = objectAssign$1({}, property);
     let defaultValue;
     let type;
-    if (isArray_1$1(property.type)) {
+    if (isArray_1$2(property.type)) {
       type = property.type[0];
     } else {
       type = property.type;
@@ -55159,7 +55219,7 @@ var script$55 = function() {
 
   // propertiesが変更された時の処理。
   this.handlePropertyChange = (newValue, key) => {
-    const obj = objectAssign(this.opts.val);
+    const obj = objectAssign$1(this.opts.val);
     obj[key] = newValue;
     this.opts.onchange(obj, this.opts.key);
   };
@@ -55178,7 +55238,7 @@ riot$1.tag2('dmc-parameter-schema', '<div class="ParameterSchema__head"> <div cl
 
 var script$56 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
-  const parameterObject = objectAssign({}, this.opts.parameterobject);
+  const parameterObject = objectAssign$1({}, this.opts.parameterobject);
   this.parameterObject = parameterObject;
   // SchemaObject化したObject。
   this.normalizedSchemaObject = null;
@@ -55216,7 +55276,7 @@ var script$57 = function() {
    */
   const getDefaultValue = parameterObject => {
     // 上書き予防。
-    parameterObject = objectAssign({}, parameterObject);
+    parameterObject = objectAssign$1({}, parameterObject);
     let defaultValue;
     const _in = parameterObject.in;
     if (_in === 'body') {
@@ -55287,7 +55347,7 @@ var script$57 = function() {
   this.handleChange = (parameterObject, newValue) => {
     const newParameter = {};
     newParameter[parameterObject.name] = newValue;
-    const newParameters = objectAssign({}, this.opts.parameters, newParameter);
+    const newParameters = objectAssign$1({}, this.opts.parameters, newParameter);
     this.opts.onchange(newParameters);
   };
 };
@@ -55297,7 +55357,7 @@ riot$1.tag2('dmc-parameters', '<virtual each="{parameterObject in opts.parameter
 });
 
 var script$58 = function() {
-  this.currentParameters = objectAssign({}, this.opts.initialParameters);
+  this.currentParameters = objectAssign$1({}, this.opts.initialParameters);
 
   this.handleParametersChange = newParameters => {
     this.currentParameters = newParameters;
@@ -55360,11 +55420,11 @@ var script$32 = function() {
   // 現在の検索用リクエストパラメータ値。
   this.currentSearchRequestParameters = {};
   this.isCurrentSearchRequestParametersEmpty = () => {
-    return !keys_1(this.currentSearchRequestParameters).length;
+    return !keys_1$1(this.currentSearchRequestParameters).length;
   };
   // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
   this.getParameterObjectsForSearch = () => {
-    return reject_1$1(this.parameterObjects || [], parameterObject => {
+    return reject_1$2(this.parameterObjects || [], parameterObject => {
       if (parameterObject.in !== 'query') {
         return false;
       }
@@ -55422,7 +55482,7 @@ var script$32 = function() {
     this.isPending = true;
     this.update();
 
-    this.currentSearchRequestParameters = reject_1$2(objectAssign(this.currentSearchRequestParameters, requestParameters), val => {
+    this.currentSearchRequestParameters = reject_1$3(objectAssign$1(this.currentSearchRequestParameters, requestParameters), val => {
       return isUndefined(val);
     });
     return Promise
@@ -55477,7 +55537,7 @@ var script$32 = function() {
       }
     }
 
-    if (contains_1$2([
+    if (contains_1$3([
       STYLE_GRAPH_BAR,
       STYLE_GRAPH_SCATTERPLOT,
       STYLE_GRAPH_LINE,
@@ -55582,7 +55642,7 @@ var script$32 = function() {
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'dmc-component-search', {
         parameterObjects: escapedParameterObjects,
-        initialParameters: objectAssign({}, this.currentSearchRequestParameters),
+        initialParameters: objectAssign$1({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
           this.updater(parameters);
         }
@@ -55648,7 +55708,7 @@ riot$1.tag2('dmc-component', '<div class="Component__head"> <div class="Componen
         return throttled;
     }
 
-    var throttle_1 = throttle;
+    var throttle_1$1 = throttle;
 
 var script$59 = function() {
   const store = this.riotx.get();
@@ -55681,7 +55741,7 @@ var script$59 = function() {
   };
 
   // resizeイベントハンドラーの発火回数を減らす。
-  const handleResize = throttle_1(updateGridColumnCount, 1000);
+  const handleResize = throttle_1$1(updateGridColumnCount, 1000);
   this.on('mount', () => {
     // 初回にcolumn数を設定する。
     updateGridColumnCount();
@@ -56722,7 +56782,6 @@ Parser.prototype.tok = function() {
       // header
       cell = '';
       for (i = 0; i < this.token.header.length; i++) {
-        flags = { header: true, align: this.token.align[i] };
         cell += this.renderer.tablecell(
           this.inline.output(this.token.header[i]),
           { header: true, align: this.token.align[i] }
@@ -57075,7 +57134,7 @@ renderer.tablecell = (content, flags) => {
 };
 
 var script$61 = function() {
-  marked.setOptions(objectAssign(
+  marked.setOptions(objectAssign$1(
     {
       renderer: renderer,
       gfm: true,
@@ -57177,7 +57236,7 @@ riot$1.tag2('dmc-endpoint-edit', '<div class="EndpointsPage__editTitle">エン�
     this.external(script$64);
 });
 
-var qrious = createCommonjsModule(function (module, exports) {
+var qrious$1 = createCommonjsModule(function (module, exports) {
 /*
  * QRious v4.0.2
  * Copyright (C) 2017 Alasdair Mercer
@@ -59543,7 +59602,7 @@ var qrious = createCommonjsModule(function (module, exports) {
 
 var script$65 = function() {
   this.on('mount', () => {
-    new qrious(objectAssign({}, this.opts.data, {
+    new qrious$1(objectAssign$1({}, this.opts.data, {
       element: this.refs.canvas
     }));
   });
@@ -59554,7 +59613,7 @@ riot$1.tag2('dmc-qrcode', '<canvas class="Qrcode__canvas" ref="canvas"></canvas>
 });
 
 var script$66 = function() {
-  const optimizedEndpoint = objectAssign({}, {
+  const optimizedEndpoint = objectAssign$1({}, {
     url: this.opts.endpoint.url,
     memo: this.opts.endpoint.memo
   });
@@ -59784,7 +59843,7 @@ var script$72 = function() {
   };
 
   this.on('mount', () => {
-    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign$1({
       isDrawer: true,
       drawerCloser: this.fadeOut
     }, this.opts.tagopts))[0];
@@ -59843,12 +59902,12 @@ var script$74 = function() {
 
   this.isOpened = false;
   const pageId = store.getter(constants$4.PAGE_ID);
-  if (!!find_1$2(this.opts.group.list, item => {
+  if (!!find_1$3(this.opts.group.list, item => {
     return (item.id === pageId);
   })) {
     this.isOpened = true;
   }
-  map_1$1(this.opts.group.list, item => {
+  map_1$2(this.opts.group.list, item => {
     if (item.id === pageId) {
       item.isSelected = true;
     } else {
@@ -59859,12 +59918,12 @@ var script$74 = function() {
 
   this.listen(constants$3.PAGE, () => {
     const pageId = store.getter(constants$4.PAGE_ID);
-    if (!!find_1$2(this.opts.group.list, item => {
+    if (!!find_1$3(this.opts.group.list, item => {
       return (item.id === pageId);
     })) {
       this.isOpened = true;
     }
-    map_1$1(this.opts.group.list, item => {
+    map_1$2(this.opts.group.list, item => {
       if (item.id === pageId) {
         item.isSelected = true;
       } else {
@@ -59900,7 +59959,7 @@ var script$75 = function() {
   const group = items => {
     const groups = {};
     let counter = 0;
-    forEach_1(items, (item, idx) => {
+    forEach_1$1(items, (item, idx) => {
       const assignment = item.group || `independent_${idx}`;
       if (!groups[assignment]) {
         groups[assignment] = {
@@ -59915,7 +59974,7 @@ var script$75 = function() {
     });
 
     const ret = [];
-    forOwn_1$1(groups, val => {
+    forOwn_1$2(groups, val => {
       const index = val.index;
       delete val.index;
       ret[index] = val;
@@ -59973,7 +60032,7 @@ var script$76 = function() {
   };
 
   this.on('mount', () => {
-    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign$1({
       isModal: true,
       modalCloser: this.fadeOut
     }, this.opts.tagopts))[0];
@@ -60425,7 +60484,7 @@ var script$82 = function() {
   };
 };
 
-riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <label class="Application__menuItem Application__menuItem--interactive" for="Application{_riot_id}"> <div class="Application__menuItemIcon"> <dmc-icon type="upload"></dmc-icon> </div> <div class="Application__menuItemBody">アップロード <input class="Application__menuItemInput" type="file" accept="application/json" id="Application{_riot_id}" onchange="{handleFileChange}"> </div> </label> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 2}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="bars"></dmc-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="close"></dmc-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <dmc-icon type="search"></dmc-icon> </div> <div class="Application__menuItemBody"> <dmc-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></dmc-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
+riot$1.tag2('dmc', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="link"></dmc-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="download"></dmc-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <label class="Application__menuItem Application__menuItem--interactive" for="Application{_riot_id}"> <div class="Application__menuItemIcon"> <dmc-icon type="upload"></dmc-icon> </div> <div class="Application__menuItemBody">アップロード <input class="Application__menuItemInput" type="file" accept="application/json" id="Application{_riot_id}" onchange="{handleFileChange}"> </div> </label> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 1}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="bars"></dmc-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <dmc-icon type="close"></dmc-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <dmc-icon type="search"></dmc-icon> </div> <div class="Application__menuItemBody"> <dmc-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></dmc-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <dmc-menu></dmc-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="dmc-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <dmc-drawers></dmc-drawers> <dmc-modals></dmc-modals> <dmc-toasts></dmc-toasts> <dmc-progress if="{isNetworking}"></dmc-progress> <dmc-blocker if="{isNavigating}"></dmc-blocker> <dmc-splash if="{!isLaunched}"></dmc-splash>', '', 'class="Application"', function(opts) {
     this.external(script$82);
 });
 
