@@ -31,13 +31,13 @@ export default function() {
    */
   const scrollSelected = (scroll, datetype) => {
     // datetypeの値と照らし合わせ、スクロールトップへ設定
-    if(datetype === 'hour'){
+    if (datetype === 'hour') {
       this.refs.hourlist.scrollTop = scroll * CELL_HEIGHT;
     }
-    if(datetype === 'minute'){
+    if (datetype === 'minute') {
       this.refs.minutelist.scrollTop = scroll * CELL_HEIGHT;
     }
-    if(datetype === 'second'){
+    if (datetype === 'second') {
       this.refs.secondlist.scrollTop = scroll * CELL_HEIGHT;
     }
   };
@@ -66,7 +66,7 @@ export default function() {
   }).on('updated', () => {
     this.rebindTouchEvents();
     const splitsFormatDate = this.displayFormatDate.split(':', 3);
-    if(this.opts.isshown){
+    if (this.opts.isshown) {
       scrollSelected(Number(splitsFormatDate[0]),'hour');
       scrollSelected(Number(splitsFormatDate[1]),'minute');
       scrollSelected(Number(splitsFormatDate[2]),'second');
@@ -81,13 +81,13 @@ export default function() {
   this.generateTimes = datetype => {
     let maxDisplayTime;
     // datetypeの値と比較して,対象の繰り返し表示の回数を設定
-    if(datetype === 'hour'){
+    if (datetype === 'hour') {
       maxDisplayTime = 24;
     }
-    if(datetype === 'minute'){
+    if (datetype === 'minute') {
       maxDisplayTime = 60;
     }
-    if(datetype === 'second'){
+    if (datetype === 'second') {
       maxDisplayTime = 60;
     }
     // 配列arrayTimeを用意
