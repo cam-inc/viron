@@ -2,6 +2,7 @@ import { constants as mutations } from '../mutations';
 
 // モーダルを多重起動しないよう判定する変数
 let canCreateModal = true;
+let timer;
 
 export default {
   /**
@@ -20,9 +21,10 @@ export default {
     // モーダル作成を一時的に不可にする。
     console.warn('多重に起動しないよう、一定時間のモーダル作成を規制する。'); // eslint-disable-line no-console
     canCreateModal = false;
+    clearTimeout(timer);
 
     // 一定時間後に作成可とする。
-    setTimeout(() => {
+    timer = setTimeout(() => {
       canCreateModal = true;
     }, 300);
 
