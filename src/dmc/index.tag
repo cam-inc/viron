@@ -24,7 +24,7 @@ dmc.Application
               .Application__menuItemBody
                 | アップロード
                 input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" onChange="{ handleFileChange }")
-            .Application__menuItem.Application__menuItem--interactive(if="{ endpointsCount > 2 }" ref="touch" onTap="handleOrderMenuItemTap")
+            .Application__menuItem.Application__menuItem--interactive(if="{ endpointsCount > 1 }" ref="touch" onTap="handleOrderMenuItemTap")
               .Application__menuItemIcon
                 dmc-icon(type="bars")
               .Application__menuItemBody 並び替え

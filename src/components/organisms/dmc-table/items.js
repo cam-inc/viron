@@ -9,8 +9,15 @@ export default function() {
   const store = this.riotx.get();
 
   // sort済みのitems。
+  // どのorder値よりも大きいであろう適当な値。
+  const bigNumber = 9999;
   this.sortedItems = sortBy(this.opts.items, item => {
-    return (this.opts.tablelabels || []).indexOf(item.key) * (-1);
+    const labels = this.opts.tablelabels || [];
+    if (contains(labels, item.key)) {
+      return labels.indexOf(item.key);
+    } else {
+      return bigNumber;
+    }
   });
   this.title = this.sortedItems[0].cell;
   this.isOpened = true;
