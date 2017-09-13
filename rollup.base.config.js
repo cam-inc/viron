@@ -36,8 +36,8 @@ export default {
     exports: 'none',
     format: 'iife',
     strict: false,
-    context: 'window',
   },
+  context: 'window',
   plugins: [
     builtins(),
     json(),
@@ -62,8 +62,5 @@ export default {
         edge: 13
       }
     })
-  ],
-  moduleContext: {
-    'node_modules/whatwg-fetch/fetch.js': 'this'
-  },
+  ]
 };
