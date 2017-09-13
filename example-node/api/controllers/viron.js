@@ -77,7 +77,7 @@ const show = (req, res) => {
     name: `${title} - ${env}`,
     color: 'white',
     thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
-    tags: [env, 'dmc', 'example'],
+    tags: [env, 'viron', 'example'],
     pages: [].concat(
       // QuickView
       genSection(constant.DMC_SECTION_DASHBOARD, {
@@ -165,23 +165,23 @@ const show = (req, res) => {
         [constant.GROUP_ADMIN]: [
           {
             id: 'adminrole',
-            name: 'DMC ユーザ権限',
+            name: 'Viron ユーザ権限',
             components: [
-              genTableComponent('DMC ユーザ権限', 'get', '/adminrole', 'role_id', null, ['role_id']),
+              genTableComponent('Viron ユーザ権限', 'get', '/adminrole', 'role_id', null, ['role_id']),
             ],
           },
           {
             id: 'adminuser',
-            name: 'DMC 管理ユーザ',
+            name: 'Viron 管理ユーザ',
             components: [
-              genTableComponent('DMC 管理ユーザ', 'get', '/adminuser', 'id', null, ['email', 'role_id']),
+              genTableComponent('Viron 管理ユーザ', 'get', '/adminuser', 'id', null, ['email', 'role_id']),
             ],
           },
           {
             id: 'auditlog',
-            name: 'DMC 監査ログ',
+            name: 'Viron 監査ログ',
             components: [
-              genTableComponent('DMC 監査ログ', 'get', '/auditlog', null, null, ['createdAt', 'request_uri', 'request_method']),
+              genTableComponent('Viron 監査ログ', 'get', '/auditlog', null, null, ['createdAt', 'request_uri', 'request_method']),
             ],
           },
         ],
@@ -219,5 +219,5 @@ const show = (req, res) => {
 };
 
 module.exports = {
-  'dmc#show': show,
+  'viron#show': show,
 };

@@ -4,7 +4,7 @@
 const list = (req, res) => {
   const result = [
     // サポートしている認証を定義
-    // - emailとgoogleOAuthはDMCがデフォルトで提供
+    // - emailとgoogleOAuthはVironがデフォルトで提供
     {
       type: 'email',
       provider: 'example-node',

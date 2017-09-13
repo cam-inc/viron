@@ -15,7 +15,7 @@ host: localhost:3000
 # - API全般のメタ情報を記載
 #################################################
 info:
-  title: DMC example for Node.js
+  title: Viron example for Node.js
   description: Design-based Management Console.
   version: 0.0.1
 
@@ -71,13 +71,13 @@ definitions:
   AdminUser:
     description: A Admin User
     example:
-      email: test@dmc.com
+      email: test@viron.com
       id: 1
       role_id: operator
     properties:
       email:
         description: login id
-        example: test@dmc.com
+        example: test@viron.com
         type: string
       id:
         description: unique id
@@ -96,7 +96,7 @@ definitions:
   AdminUserCollection:
     description: AdminUserCollection is the media type for an array of AdminUser
     example:
-    - email: test@dmc.com
+    - email: test@viron.com
       id: 1
       role_id: operator
     items:
@@ -112,7 +112,7 @@ definitions:
       request_uri: '/user'
       source_ip: 200.200.200.200
       status_code: 200
-      user_id: test@dmc.com
+      user_id: test@viron.com
     properties:
       createdAt:
         description: created time
@@ -154,7 +154,7 @@ definitions:
       request_uri: '/user'
       source_ip: 200.200.200.200
       status_code: 200
-      user_id: test@dmc.com
+      user_id: test@viron.com
     items:
       $ref: '#/definitions/AuditLog'
     type: array
@@ -290,11 +290,11 @@ definitions:
     - password
     type: object
 
-  Dmc:
-    description: A DMC settings data
+  Viron:
+    description: A Viron settings data
     example:
       color: white
-      name: DMC Example Project for Node.js
+      name: Viron Example Project for Node.js
       pages:
       - components:
         - api:
@@ -316,7 +316,7 @@ definitions:
         name: クイックビュー
         section: dashboard
       tags:
-      - dmc
+      - viron
       - example
       thumbnail: Iure nisi.
     properties:
@@ -330,7 +330,7 @@ definitions:
         type: string
       name:
         description: Name pattern
-        example: DMC Example Project for Node.js
+        example: Viron Example Project for Node.js
         type: string
       pages:
         description: A Pages format
@@ -360,14 +360,14 @@ definitions:
       tags:
         description: tags
         example:
-        - dmc
+        - viron
         items:
-          example: dmc
+          example: viron
           type: string
         type: array
       thumbnail:
         description: thumbnail of endpoint
-        example: https://dmc.com/thumbnail.png
+        example: https://viron.com/thumbnail.png
         type: string
     required:
     - name
@@ -379,11 +379,11 @@ definitions:
 
   SigninAuthPayload:
     example:
-      email: user1@dmc.com
+      email: user1@viron.com
       password: XXXXXXXXXXXX
     properties:
       email:
-        example: user1@dmc.com
+        example: user1@viron.com
         type: string
       password:
         example: XXXXXXXXXXXX
@@ -715,7 +715,7 @@ paths:
 
   /adminrole:
     get:
-      x-swagger-router-controller: dmc_admin_role
+      x-swagger-router-controller: viron_admin_role
       description: get admin roles
       operationId: admin_role#list
       parameters: []
@@ -744,7 +744,7 @@ paths:
       - admin_role
 
     post:
-      x-swagger-router-controller: dmc_admin_role
+      x-swagger-router-controller: viron_admin_role
       description: create a admin role
       operationId: admin_role#create
       parameters:
@@ -783,7 +783,7 @@ paths:
 
   /adminrole/{role_id}:
     delete:
-      x-swagger-router-controller: dmc_admin_role
+      x-swagger-router-controller: viron_admin_role
       description: delete the user
       operationId: admin_role#remove
       parameters:
@@ -819,7 +819,7 @@ paths:
       - admin_role
 
     get:
-      x-swagger-router-controller: dmc_admin_role
+      x-swagger-router-controller: viron_admin_role
       description: get the admin role
       operationId: admin_role#show
       parameters:
@@ -857,7 +857,7 @@ paths:
       - admin_role
 
     put:
-      x-swagger-router-controller: dmc_admin_role
+      x-swagger-router-controller: viron_admin_role
       description: update the admin user
       operationId: admin_role#update
       parameters:
@@ -901,7 +901,7 @@ paths:
 
   /adminuser:
     get:
-      x-swagger-router-controller: dmc_admin_user
+      x-swagger-router-controller: viron_admin_user
       description: get admin users
       operationId: admin_user#list
       produces:
@@ -933,7 +933,7 @@ paths:
       - admin_user
 
     post:
-      x-swagger-router-controller: dmc_admin_user
+      x-swagger-router-controller: viron_admin_user
       description: create a admin user
       operationId: admin_user#create
       parameters:
@@ -972,7 +972,7 @@ paths:
 
   /adminuser/{id}:
     delete:
-      x-swagger-router-controller: dmc_admin_user
+      x-swagger-router-controller: viron_admin_user
       description: delete the user
       operationId: admin_user#remove
       parameters:
@@ -1008,7 +1008,7 @@ paths:
       - admin_user
 
     get:
-      x-swagger-router-controller: dmc_admin_user
+      x-swagger-router-controller: viron_admin_user
       description: get the admin user
       operationId: admin_user#show
       parameters:
@@ -1046,7 +1046,7 @@ paths:
       - admin_user
 
     put:
-      x-swagger-router-controller: dmc_admin_user
+      x-swagger-router-controller: viron_admin_user
       description: update the admin user
       operationId: admin_user#update
       parameters:
@@ -1090,7 +1090,7 @@ paths:
 
   /auditlog:
     get:
-      x-swagger-router-controller: dmc_audit_log
+      x-swagger-router-controller: viron_audit_log
       description: get admin roles
       operationId: audit_log#list
       parameters:
@@ -1130,16 +1130,16 @@ paths:
 
   /dmc:
     get:
-      x-swagger-router-controller: dmc
-      description: dmc settings
-      operationId: dmc#show
+      x-swagger-router-controller: viron
+      description: viron settings
+      operationId: viron#show
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Dmc'
+            $ref: '#/definitions/Viron'
         "400":
           description: Bad Request
           schema:
@@ -1153,13 +1153,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: show dmc
+      summary: show viron
       tags:
-      - dmc
+      - viron
 
   /dmc_authtype:
     get:
-      x-swagger-router-controller: dmc_authtype
+      x-swagger-router-controller: viron_authtype
       description: get auth types
       operationId: auth_type#list
       produces:
@@ -1177,9 +1177,9 @@ paths:
 
   /googleoauth2callback:
     get:
-      x-swagger-router-controller: dmc_auth
+      x-swagger-router-controller: viron_auth
       description: callback function from google oauth2
-      operationId: dmc_auth#googleoauth2callback
+      operationId: viron_auth#googleoauth2callback
       parameters:
       - description: authorization code
         in: query
@@ -1214,9 +1214,9 @@ paths:
 
   /googlesignin:
     get:
-      x-swagger-router-controller: dmc_auth
+      x-swagger-router-controller: viron_auth
       description: signin with google
-      operationId: dmc_auth#googlesignin
+      operationId: viron_auth#googlesignin
       parameters:
       - description: redirect url
         in: query
@@ -1259,9 +1259,9 @@ paths:
 
   /signin:
     post:
-      x-swagger-router-controller: dmc_auth
+      x-swagger-router-controller: viron_auth
       description: signin with JWT
-      operationId: dmc_auth#signin
+      operationId: viron_auth#signin
       parameters:
       - in: body
         name: payload
@@ -1297,9 +1297,9 @@ paths:
 
   /signout:
     post:
-      x-swagger-router-controller: dmc_auth
+      x-swagger-router-controller: viron_auth
       description: signout
-      operationId: dmc_auth#signout
+      operationId: viron_auth#signout
       responses:
         "204":
           description: No Content
