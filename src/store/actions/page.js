@@ -13,7 +13,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        const pages = context.getter(getters.DMC_PAGES);
+        const pages = context.getter(getters.VIRON_PAGES);
         const page = find(pages, page => {
           return (page.id === pageId);
         });

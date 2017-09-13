@@ -1,7 +1,7 @@
 import application from './application';
 import components from './components';
 import current from './current';
-import dmc from './dmc';
+import viron from './viron';
 import drawers from './drawers';
 import endpoints from './endpoints';
 import layout from './layout';
@@ -20,7 +20,7 @@ const constants = {
     return `component_${riotId}`;
   },
   CURRENT: 'CURRENT',
-  DMC: 'DMC',
+  VIRON: 'VIRON',
   OAS: 'OAS',
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
@@ -37,7 +37,7 @@ export default {
   application,
   components,
   current,
-  dmc,
+  viron,
   oas,
   drawers,
   endpoints,

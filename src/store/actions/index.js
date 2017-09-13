@@ -2,7 +2,7 @@ import application from './application';
 import auth from './auth';
 import components from './components';
 import current from './current';
-import dmc from './dmc';
+import viron from './viron';
 import drawers from './drawers';
 import endpoints from './endpoints';
 import layout from './layout';
@@ -33,8 +33,8 @@ const constants = {
   COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
   CURRENT_UPDATE: 'CURRENT_UPDATE',
   CURRENT_REMOVE: 'CURRENT_REMOVE',
-  DMC_GET: 'DMC_GET',
-  DMC_REMOVE: 'DMC_REMOVE',
+  VIRON_GET: 'VIRON_GET',
+  VIRON_REMOVE: 'VIRON_REMOVE',
   DRAWERS_ADD: 'DRAWERS_ADD',
   DRAWERS_REMOVE: 'DRAWERS_REMOVE',
   ENDPOINTS_ADD: 'ENDPOINTS_ADD',
@@ -79,8 +79,8 @@ export default {
   [constants.COMPONENTS_REMOVE_ALL]: components.removeAll,
   [constants.CURRENT_UPDATE]: current.update,
   [constants.CURRENT_REMOVE]: current.remove,
-  [constants.DMC_GET]: dmc.get,
-  [constants.DMC_REMOVE]: dmc.remove,
+  [constants.VIRON_GET]: viron.get,
+  [constants.VIRON_REMOVE]: viron.remove,
   [constants.DRAWERS_ADD]: drawers.add,
   [constants.DRAWERS_REMOVE]: drawers.remove,
   [constants.ENDPOINTS_ADD]: endpoints.add,

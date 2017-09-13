@@ -4,8 +4,8 @@ import './core/polyfill';
 import router from './core/router';
 import store from './store';
 import { constants as actions } from './store/actions';
-import './dmc/index.tag';
-import './components/atoms/dmc-message/index.tag';
+import './viron/index.tag';
+import './components/atoms/viron-message/index.tag';
 
 // エントリーポイント。
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
       window.store = store;
     })
     .then(() => {
-      riot.mount('dmc');
+      riot.mount('viron');
     })
     .then(() => Promise.all([
       mainStore.action(actions.ENDPOINTS_TIDY_UP_ORDER),
       mainStore.action(actions.UA_SETUP)
     ]))
     .then(() => router.init(mainStore))
-    .catch(err => mainStore.action(actions.MODALS_ADD, 'dmc-message', {
+    .catch(err => mainStore.action(actions.MODALS_ADD, 'viron-message', {
       message: 'Viron起動に失敗しました。Viron担当者にお問い合わせ下さい。',
       error: err
     }));
