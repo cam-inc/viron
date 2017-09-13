@@ -42,7 +42,7 @@ export default function() {
     }
   };
   // momentオブジェクトを入れる変数を宣言
-  let momentObj = {};
+  let momentObj;
   /**
    * 引数の値がUndefinedであればをそのままmomentオブジェクトへ追加。
    * 引数の値がUndefinedでなければHH:mm:ss.sssへ0を設定。
@@ -63,9 +63,6 @@ export default function() {
 
   this.on('update', () => {
     updateDisplayDate(this.opts.date);
-    if(!this.opts.date){
-      this.displayFormatDate = partialFormat(momentObj);
-    }
   }).on('updated', () => {
     this.rebindTouchEvents();
     const splitsFormatDate = this.displayFormatDate.split(':', 3);
