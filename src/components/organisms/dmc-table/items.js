@@ -17,7 +17,7 @@ export default function() {
   this.isTooltipVisible = false;
 
   this.getFilteredItems = () => {
-    const items =  this.sortedItems;
+    const items = this.sortedItems;
     const columns = this.opts.selectedtablecolumns;
     if (!isArray(columns) || !columns.length) {
       return items;

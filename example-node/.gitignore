@@ -29,6 +29,7 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+.env
 
 # Runtime configuration for swagger app
 config/runtime.yaml

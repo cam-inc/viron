@@ -10,6 +10,8 @@
 ## 起動 on Docker
 
 ```
+$ cp -ip .env.template .env
+$ # 必要に応じて.envを編集してください
 $ npm run dressup
 ```
 

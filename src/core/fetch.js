@@ -67,7 +67,8 @@ const commonFetch = (context, url, options) => {
     headers: {
       // 何も指定しない場合はこれをデフォルトにする。
       'Content-Type': 'application/json'
-    }
+    },
+    cache: 'no-store'
   }, options);
 
   // `Content-Type`に応じてbody内容を書き換えます。
@@ -95,7 +96,14 @@ const commonFetch = (context, url, options) => {
       url,
       options
     }))
-    .then(() => fetch(url, options))
+    .then(() => Promise.race([
+      fetch(url, options),
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error('時間がかかり過ぎたため通信を中断しました。'));
+        }, 1000 * 5);
+      })
+    ]))
     .then(response => {
       context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
       return response;

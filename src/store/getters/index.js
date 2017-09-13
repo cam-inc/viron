@@ -19,6 +19,7 @@ const constants = {
   APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
   APPLICATION_ISDRAGGING: 'APPLICATION_ISDRAGGING',
+  APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS: 'COMPONENTS',
   COMPONENTS_ONE: 'COMPONENTS_ONE',
   COMPONENTS_ONE_RESPONSE: 'COMPONENTS_ONE_RESPONSE',
@@ -43,6 +44,7 @@ const constants = {
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
   ENDPOINTS_BY_ORDER: 'ENDPOINTS_BY_ORDER',
+  ENDPOINTS_BY_ORDER_FILTERED: 'ENDPOINTS_BY_ORDER_FILTERED',
   ENDPOINTS_COUNT: 'ENDPOINTS_COUNT',
   ENDPOINTS_WITHOUT_TOKEN: 'ENDPOINTS_WITHOUT_TOKEN',
   ENDPOINTS_ONE: 'ENDPOINTS_ONE',
@@ -74,7 +76,9 @@ const constants = {
   PAGE_COMPONENTS: 'PAGE_COMPONENTS',
   PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
-  UA: 'UA'
+  UA: 'UA',
+  UA_IS_SAFARI: 'UA_IS_SAFARI',
+  UA_IS_EDGE: 'UA_IS_EDGE'
 };
 
 export default {
@@ -83,6 +87,7 @@ export default {
   [constants.APPLICATION_ISNAVIGATING]: application.isNavigating,
   [constants.APPLICATION_ISNETWORKING]: application.isNetworking,
   [constants.APPLICATION_ISDRAGGING]: application.isDragging,
+  [constants.APPLICATION_ENDPOINT_FILTER_TEXT]: application.endpointFilterText,
   [constants.COMPONENTS]: components.all,
   [constants.COMPONENTS_ONE]: components.one,
   [constants.COMPONENTS_ONE_RESPONSE]: components.response,
@@ -107,6 +112,7 @@ export default {
   [constants.DRAWERS]: drawers.all,
   [constants.ENDPOINTS]: endpoints.all,
   [constants.ENDPOINTS_BY_ORDER]: endpoints.allByOrder,
+  [constants.ENDPOINTS_BY_ORDER_FILTERED]: endpoints.allByOrderFiltered,
   [constants.ENDPOINTS_COUNT]: endpoints.count,
   [constants.ENDPOINTS_WITHOUT_TOKEN]: endpoints.allWithoutToken,
   [constants.ENDPOINTS_ONE]: endpoints.one,
@@ -138,7 +144,9 @@ export default {
   [constants.PAGE_COMPONENTS]: page.components,
   [constants.PAGE_COMPONENTS_COUNT]: page.componentsCount,
   [constants.TOASTS]: toasts.all,
-  [constants.UA]: ua.all
+  [constants.UA]: ua.all,
+  [constants.UA_IS_SAFARI]: ua.isSafari,
+  [constants.UA_IS_EDGE]: ua.isEdge
 };
 
 export {

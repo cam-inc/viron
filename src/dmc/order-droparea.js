@@ -39,7 +39,7 @@ export default function() {
     this.isDroppable = false;
     this.update();
 
-    const endpointKey = e.dataTransfer.getData('endpointKey');
+    const endpointKey = e.dataTransfer.getData('text/plain');
     const newOrder = this.opts.order;
     Promise
       .resolve()

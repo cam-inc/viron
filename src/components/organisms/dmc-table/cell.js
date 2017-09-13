@@ -37,7 +37,7 @@ export default function() {
     break;
   }
 
-  this.handleDetailPat = ()  => {
+  this.handleDetailPat = () => {
     store.action(actions.MODALS_ADD, 'dmc-prettyprint', {
       data : this.opts.data.cell
     });

@@ -6,7 +6,8 @@ export default function() {
 
   // ドラッグ開始時の処理。
   this.handleDragStart = e => {
-    e.dataTransfer.setData('endpointKey', this.opts.endpoint.key);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.opts.endpoint.key);
 
     Promise
       .resolve()

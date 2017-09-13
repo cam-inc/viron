@@ -71,9 +71,7 @@ export default {
    */
   getTypes: (context, endpointKey) => {
     const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
-    const anchorElm = document.createElement('a');
-    anchorElm.href = endpoint.url;
-    const fetchUrl = `${anchorElm.origin}/dmc_authtype`;
+    const fetchUrl = `${new URL(endpoint.url).origin}/dmc_authtype`;
 
     return Promise
       .resolve()
@@ -93,9 +91,7 @@ export default {
       .resolve()
       .then(() => {
         const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
-        const anchorElm = document.createElement('a');
-        anchorElm.href = endpoint.url;
-        const origin = anchorElm.origin;
+        const origin = new URL(endpoint.url).origin;
         const redirect_url = encodeURIComponent(`${location.href}oauthredirect/${endpointKey}`);
         const fetchUrl = `${origin}${authtype.url}?redirect_url=${redirect_url}`;
         location.href = fetchUrl;
@@ -113,9 +109,7 @@ export default {
    */
   signinEmail: (context, endpointKey, authtype, email, password) => {
     const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
-    const anchorElm = document.createElement('a');
-    anchorElm.href = endpoint.url;
-    const fetchUrl = `${anchorElm.origin}${authtype.url}`;
+    const fetchUrl = `${new URL(endpoint.url).origin}${authtype.url}`;
 
     return Promise
       .resolve()

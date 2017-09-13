@@ -1,9 +1,10 @@
 import ObjectAssign from 'object-assign';
 
 export default function() {
-  const optimizedEndpoint = ObjectAssign({}, this.opts.endpoint);
-  // token情報は不要。
-  delete optimizedEndpoint.token;
+  const optimizedEndpoint = ObjectAssign({}, {
+    url: this.opts.endpoint.url,
+    memo: this.opts.endpoint.memo
+  });
   const encodedEndpoint = encodeURIComponent(JSON.stringify(optimizedEndpoint));
   const value = `${location.origin}/#/endpointimport?endpoint=${encodedEndpoint}`;
 

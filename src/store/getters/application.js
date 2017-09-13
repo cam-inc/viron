@@ -42,5 +42,14 @@ export default {
    */
   isDragging: context => {
     return context.state.application.isDragging;
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストを返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  endpointFilterText: context => {
+    return context.state.application.endpointFilterText;
   }
 };

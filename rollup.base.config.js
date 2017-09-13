@@ -11,7 +11,7 @@ const mout = require('mout');
 let namedExports = {};
 mout.object.forOwn(mout, (v,k) => {
 
-  if(!mout.lang.isObject(v)) {
+  if (!mout.lang.isObject(v)) {
     return;
   }
 
@@ -29,12 +29,14 @@ mout.object.forOwn(mout, (v,k) => {
 
 // @see https://github.com/rollup/rollup/wiki/JavaScript-API
 export default {
-  entry: 'src/app.js',
-  dest: 'dist/js/app.js',
-  sourceMap: false,
-  exports: 'none',
-  format: 'iife',
-  useStrict: false,
+  input: 'src/app.js',
+  output: {
+    file: 'dist/js/app.js',
+    sourcemap: false,
+    exports: 'none',
+    format: 'iife',
+    strict: false,
+  },
   context: 'window',
   plugins: [
     builtins(),
@@ -56,8 +58,8 @@ export default {
     }),
     buble({
       target: {
-        //chrome: 49, firefox: 45, safari: 9, edge: 12, ie: 11
-        chrome: 52
+        chrome: 52,
+        edge: 13
       }
     })
   ]

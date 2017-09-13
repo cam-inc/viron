@@ -6,5 +6,23 @@ export default {
    */
   all: context => {
     return context.state.ua;
+  },
+
+  /**
+   * Safariか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isSafari: context => {
+    return !!context.state.ua.safari;
+  },
+
+  /**
+   * Edgeか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isEdge: context => {
+    return !!context.state.ua.edge;
   }
 };

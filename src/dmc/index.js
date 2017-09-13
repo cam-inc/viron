@@ -21,6 +21,8 @@ export default function() {
   this.pageRoute = store.getter(getters.LOCATION_ROUTE);
   // エンドポイント数。
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+  // エンドポイントフィルター用のテキスト。
+  this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.on('updated', () => {
     this.rebindTouchEvents();
@@ -30,6 +32,7 @@ export default function() {
     this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
     this.isNavigating = store.getter(getters.APPLICATION_ISNAVIGATING);
     this.isNetworking = store.getter(getters.APPLICATION_ISNETWORKING);
+    this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
   this.listen(states.LOCATION, () => {
@@ -57,6 +60,66 @@ export default function() {
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
 
+  this.handleFileChange = e => {
+    const inputFile = e.target;
+    const file = inputFile.files[0];
+
+    // ファイルを取得出来たか。
+    if (!file) {
+      inputFile.value = null;
+      return;
+    }
+
+    // ファイルがjsonであるか
+    // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
+    if (!store.getter(getters.UA_IS_EDGE) && file.type !== 'application/json') {
+      store.action(actions.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'JSONファイルを指定してください。',
+        type: 'error'
+      });
+      inputFile.value = null;
+      return;
+    }
+
+    // ファイルをテキストとして読み込む。
+    const reader = new FileReader();
+    reader.readAsText(file);
+
+    // 読み込みが失敗した。
+    reader.onerror = err => {
+      store.action(actions.MODALS_ADD, 'dmc-message', {
+        title: 'エンドポイント追加 失敗',
+        message: 'ファイルの読み込みに失敗しました。',
+        error: err
+      });
+      inputFile.value = null;
+    };
+
+    // 読み込みが成功し、完了した。
+    reader.onload = event => {
+      const text = event.target.result;
+
+      // エンドポイント追加処理開始
+      Promise
+        .resolve()
+        .then(() => {
+          const endpoints = JSON.parse(text);
+          return store.action(actions.ENDPOINTS_MERGE_ALL, endpoints);
+        })
+        .then(() => store.action(actions.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加',
+          message: 'エンドポイントが一覧に追加されました。'
+        }))
+        .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+          title: 'エンドポイント追加 失敗',
+          error: err
+        }));
+      // inputしたjsonをリセットする。
+      inputFile.value = null;
+    };
+  };
+
   this.handleOrderMenuItemTap = () => {
     store.action(actions.MODALS_ADD, 'dmc-application-order');
   };
@@ -69,6 +132,15 @@ export default function() {
           store.action(actions.ENDPOINTS_REMOVE_ALL);
         }
       }))
+      .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
+        error: err
+      }));
+  };
+
+  this.handleFilterChange = newText => {
+    Promise
+      .resolve()
+      .then(() => store.action(actions.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT, newText))
       .catch(err => store.action(actions.MODALS_ADD, 'dmc-message', {
         error: err
       }));
