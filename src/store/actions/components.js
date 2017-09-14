@@ -28,53 +28,67 @@ export default {
     const currentEndpointKey = context.getter(getters.CURRENT);
     const currentEndpoint = context.getter(getters.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
-    return api(query, {
-      requestInterceptor: req => {
-        req.headers['Authorization'] = token;
-      }
-    }).then(res => {
-      if (!res.ok) {
-        return Promise.reject(res);
-      }
-      return res;
-    }).then(res => {
-      // tokenを更新する。
-      const token = res.headers['Authorization'];
-      if (!!token) {
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-      }
-      // `component.pagination`からページングをサポートしているか判断する。
-      // サポートしていれば手動でページング情報を付加する。
-      let hasPagination = false;
-      let pagination;
-      if (component.pagination) {
-        const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
-        const size = Number(res.headers['x-pagination-limit'] || 0);
-        const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
-        pagination = {
-          // `x-pagination-current-page`等は独自仕様。
-          // VIRONを使用するサービスはこの仕様に沿う必要がある。
-          currentPage,
-          size,
-          maxPage
-        };
-        // 2ページ以上存在する場合のみページングをONにする。
-        if (maxPage >= 2) {
-          hasPagination = true;
+    const networkingId = `networking_${Date.now()}`;
+
+    return Promise
+      .resolve()
+      .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
+      .then(() => api(query, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
         }
-      }
-      context.commit(mutations.COMPONENTS_UPDATE_ONE, {
-        component_uid,
-        response: res.obj,// APIレスポンス内容そのまま。
-        schemaObject: context.getter(getters.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
-        parameterObjects: context.getter(getters.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
-        actions,// 関連API群。
-        hasPagination,
-        pagination,// ページング関連。
-        primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
-        table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
+        // `component.pagination`からページングをサポートしているか判断する。
+        // サポートしていれば手動でページング情報を付加する。
+        let hasPagination = false;
+        let pagination;
+        if (component.pagination) {
+          const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
+          const size = Number(res.headers['x-pagination-limit'] || 0);
+          const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
+          pagination = {
+            // `x-pagination-current-page`等は独自仕様。
+            // VIRONを使用するサービスはこの仕様に沿う必要がある。
+            currentPage,
+            size,
+            maxPage
+          };
+          // 2ページ以上存在する場合のみページングをONにする。
+          if (maxPage >= 2) {
+            hasPagination = true;
+          }
+        }
+        context.commit(mutations.COMPONENTS_UPDATE_ONE, {
+          component_uid,
+          response: res.obj,// APIレスポンス内容そのまま。
+          schemaObject: context.getter(getters.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
+          parameterObjects: context.getter(getters.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
+          actions,// 関連API群。
+          hasPagination,
+          pagination,// ページング関連。
+          primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
+          table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
+        });
+        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      })
+      .catch(err => {
+        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
       });
-    });
   },
 
   /**
@@ -88,34 +102,47 @@ export default {
     const api = context.getter(getters.OAS_API, operationObject.operationId);
     const token = context.getter(getters.ENDPOINTS_ONE, context.getter(getters.CURRENT)).token;
     const currentEndpointKey = context.getter(getters.CURRENT);
+    const networkingId = `networking_${Date.now()}`;
 
-    return api(params, {
-      requestInterceptor: req => {
-        req.headers['Authorization'] = token;
-      }
-    }).then(res => {
-      if (!res.ok) {
-        return Promise.reject(res);
-      }
-      return res;
-    }).then(res => {
-      // tokenを更新する。
-      const token = res.headers['Authorization'];
-      if (!!token) {
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-      }
-      // ダウンロード指定されていればダウンロードする。
-      const contentDispositionHeader = res.headers['content-disposition'];
-      if (!contentDispositionHeader) {
+    return Promise
+      .resolve()
+      .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
+      .then(() => api(params, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
         return res;
-      }
-      const downloadFileInfo = contentDisposition.parse(contentDispositionHeader);
-      if (downloadFileInfo.type !== 'attachment') {
+      })
+      .then(res => {
+        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
+        // ダウンロード指定されていればダウンロードする。
+        const contentDispositionHeader = res.headers['content-disposition'];
+        if (!contentDispositionHeader) {
+          return res;
+        }
+        const downloadFileInfo = contentDisposition.parse(contentDispositionHeader);
+        if (downloadFileInfo.type !== 'attachment') {
+          return res;
+        }
+        download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
         return res;
-      }
-      download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
-      return res;
-    });
+      })
+      .catch(err => {
+        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
+      });
   },
 
   /**

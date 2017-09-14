@@ -17,9 +17,13 @@ export default {
     const currentEndpointKey = context.getter(getters.CURRENT);
     const currentEndpoint = context.getter(getters.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
+    const networkingId = `networking_${Date.now()}`;
 
     return Promise
       .resolve()
+      .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
       .then(() => api({}, {
         requestInterceptor: req => {
           req.headers['Authorization'] = token;
@@ -42,6 +46,11 @@ export default {
         // pagesは不要なので削除。
         delete endpoint.pages;
         context.commit(mutations.ENDPOINTS_UPDATE, currentEndpointKey, endpoint);
+        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      })
+      .catch(err => {
+        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
       });
   },
 
