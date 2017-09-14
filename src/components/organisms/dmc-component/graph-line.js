@@ -9,8 +9,7 @@ export default function() {
         interpolate: 'smooth'
       },
       plugins: [
-        chart.api.plugins.get('tooltip')(),
-        chart.api.plugins.get('legend')()
+        chart.api.plugins.get('tooltip')()
       ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
