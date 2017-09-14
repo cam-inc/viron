@@ -7,7 +7,10 @@ export default function() {
       type: 'line',
       guide: {
         interpolate: 'smooth'
-      }
+      },
+      plugins: [
+        chart.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 }

@@ -4,7 +4,10 @@ import chart from '../../../core/chart';
 export default function() {
   this.on('mount', () => {
     new chart.Chart(ObjectAssign({
-      type: 'scatterplot'
+      type: 'scatterplot',
+      plugins: [
+        chart.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 }
