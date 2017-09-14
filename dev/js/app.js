@@ -60139,18 +60139,25 @@ riot$1.tag2('viron-modals', '<virtual each="{modals}"> <viron-modal id="{id}" ta
 var script$78 = function() {
 };
 
-riot$1.tag2('viron-progress', '<div class="Progress__spinner"> <viron-icon type="loading"></viron-icon> </div>', '', 'class="Progress"', function(opts) {
+riot$1.tag2('viron-progress-circular', '<div class="ProgressCircular__spinner"> <viron-icon type="loading"></viron-icon> </div>', '', 'class="ProgressCircular"', function(opts) {
     this.external(script$78);
 });
 
 var script$79 = function() {
 };
 
-riot$1.tag2('viron-splash', '<div class="Splash__logo"></div>', '', 'class="Splash"', function(opts) {
+riot$1.tag2('viron-progress-linear', '<div class="ProgressLinear__bar"> <div class="ProgressLinear__particle"></div> <div class="ProgressLinear__particle"></div> </div>', '', 'class="ProgressLinear {\'ProgressLinear--active\' : opts.isactive}"', function(opts) {
     this.external(script$79);
 });
 
 var script$80 = function() {
+};
+
+riot$1.tag2('viron-splash', '<div class="Splash__logo"></div>', '', 'class="Splash"', function(opts) {
+    this.external(script$80);
+});
+
+var script$81 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -60196,10 +60203,10 @@ var script$80 = function() {
 };
 
 riot$1.tag2('viron-toast', '<div class="Toast__icon"> <viron-icon if="{opts.type === \'normal\'}" type="close"></viron-icon> <viron-icon if="{opts.type === \'error\'}" type="exclamation"></viron-icon> </div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" ref="touch" ontap="handleLinkTap">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$80);
+    this.external(script$81);
 });
 
-var script$81 = function() {
+var script$82 = function() {
   const store = this.riotx.get();
 
   this.toasts = store.getter(constants$4.TOASTS);
@@ -60211,10 +60218,10 @@ var script$81 = function() {
 };
 
 riot$1.tag2('viron-toasts', '<virtual each="{toasts}"> <viron-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></viron-toast> </virtual>', '', 'class="Toasts"', function(opts) {
-    this.external(script$81);
+    this.external(script$82);
 });
 
-var script$83 = function() {
+var script$84 = function() {
   this.handleDeleteButtonPat = () => {
     this.opts.onConfirm();
     this.close();
@@ -60226,10 +60233,10 @@ var script$83 = function() {
 };
 
 riot$1.tag2('viron-application-confirm', '<div class="Application__confirmHead"> <div class="Application__confirmTitle">エンドポイント削除</div> <div class="Application__confirmDescription">全てのエンドポイントが削除されます。個別に削除したい場合は各エンドポイントカード内の削除ボタンから行って下さい。</div> </div> <div class="Application__confirmTail"> <viron-button label="全て削除する" type="emphasis" onpat="{handleDeleteButtonPat}"></viron-button> <viron-button label="キャンセル" onpat="{handleCancelButtonPat}"></viron-button> </div>', '', 'class="Application__confirm"', function(opts) {
-    this.external(script$83);
+    this.external(script$84);
 });
 
-var script$84 = function() {
+var script$85 = function() {
   const store = this.riotx.get();
 
   this.isExist = false;
@@ -60282,10 +60289,10 @@ var script$84 = function() {
 };
 
 riot$1.tag2('viron-application-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <viron-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application__entryControls"> <viron-button type="primary" isdisabled="{isExist}" onpat="{handleRegisterButtonPat}" label="新規作成"></viron-button> <viron-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></viron-button> </div>', '', 'class="Application__entry"', function(opts) {
-    this.external(script$84);
+    this.external(script$85);
 });
 
-var script$85 = function() {
+var script$86 = function() {
   const store = this.riotx.get();
 
   // ドロップ待受中か否か。
@@ -60333,10 +60340,10 @@ var script$85 = function() {
 };
 
 riot$1.tag2('viron-application-order-droparea', '<div class="Application__orderDropareaContent"></div> <div class="Application__orderDropareaHandler" ondragenter="{handleDragEnter}" ondragover="{handleDragOver}" ondragleave="{handleDragLeave}" ondrop="{handleDrop}"></div>', '', 'class="Application__orderDroparea {\'Application__orderDroparea--watching\' : isWatching, \'Application__orderDroparea--droppable\' : isDroppable}"', function(opts) {
-    this.external(script$85);
+    this.external(script$86);
 });
 
-var script$86 = function() {
+var script$87 = function() {
   const store = this.riotx.get();
 
   // ドラッグ開始時の処理。
@@ -60368,10 +60375,10 @@ var script$86 = function() {
 };
 
 riot$1.tag2('viron-application-order-item', '<div class="Application__orderItemHead"> <div class="Application__orderItemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="Application__orderItemName">{opts.endpoint.name || \'-\'}</div> </div> <div class="Application__orderItemBody"> <div class="Application__orderItemUrl"> <div class="Application__orderItemUrlIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__orderItemUrlLabel">{opts.endpoint.url}</div> </div> </div>', '', 'class="Application__orderItem" draggable="{true}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}"', function(opts) {
-    this.external(script$86);
+    this.external(script$87);
 });
 
-var script$87 = function() {
+var script$88 = function() {
   const store = this.riotx.get();
 
   this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER);
@@ -60383,10 +60390,10 @@ var script$87 = function() {
 };
 
 riot$1.tag2('viron-application-order', '<div class="Application__orderTitle">並び順を変更</div> <div class="Application__orderDescription">ドラッグ&ドロップでエンドポイントの並び順を変更できます。</div> <div class="Application__orderPlayground"> <viron-application-order-droparea order="{0}"></viron-application-order-droparea> <virtual each="{endpoint, idx in endpoints}"> <viron-application-order-item endpoint="{endpoint}"></viron-application-order-item> <viron-application-order-droparea order="{idx + 1}"></viron-application-order-droparea> </virtual> </div>', '', 'class="Application__order"', function(opts) {
-    this.external(script$87);
+    this.external(script$88);
 });
 
-var script$82 = function() {
+var script$83 = function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
@@ -60526,8 +60533,8 @@ var script$82 = function() {
   };
 };
 
-riot$1.tag2('viron', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="download"></viron-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <label class="Application__menuItem Application__menuItem--interactive" for="Application{_riot_id}"> <div class="Application__menuItemIcon"> <viron-icon type="upload"></viron-icon> </div> <div class="Application__menuItemBody">アップロード <input class="Application__menuItemInput" type="file" accept="application/json" id="Application{_riot_id}" onchange="{handleFileChange}"> </div> </label> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 1}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="bars"></viron-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="close"></viron-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <viron-icon type="search"></viron-icon> </div> <div class="Application__menuItemBody"> <viron-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></viron-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <viron-menu></viron-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="viron-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <viron-drawers></viron-drawers> <viron-modals></viron-modals> <viron-toasts></viron-toasts> <viron-progress if="{isNetworking}"></viron-progress> <viron-blocker if="{isNavigating}"></viron-blocker> <viron-splash if="{!isLaunched}"></viron-splash>', '', 'class="Application"', function(opts) {
-    this.external(script$82);
+riot$1.tag2('viron', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="download"></viron-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <label class="Application__menuItem Application__menuItem--interactive" for="Application{_riot_id}"> <div class="Application__menuItemIcon"> <viron-icon type="upload"></viron-icon> </div> <div class="Application__menuItemBody">アップロード <input class="Application__menuItemInput" type="file" accept="application/json" id="Application{_riot_id}" onchange="{handleFileChange}"> </div> </label> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 1}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="bars"></viron-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="close"></viron-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <viron-icon type="search"></viron-icon> </div> <div class="Application__menuItemBody"> <viron-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></viron-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <viron-menu></viron-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="viron-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <viron-drawers></viron-drawers> <viron-modals></viron-modals> <viron-toasts></viron-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-blocker if="{isNavigating}"></viron-blocker> <viron-splash if="{!isLaunched}"></viron-splash>', '', 'class="Application"', function(opts) {
+    this.external(script$83);
 });
 
 // エントリーポイント。
