@@ -3,7 +3,7 @@ import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
 // APIは必須でサポートしなければならない URI
-const VIRON_URI = '/dmc';
+const VIRON_URI = '/viron';
 
 export default {
   /**
