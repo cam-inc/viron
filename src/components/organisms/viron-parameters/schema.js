@@ -234,7 +234,7 @@ export default function() {
       break;
     }
     arr.push(defaultValue);
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 
   // -ボタンがタップされた時の処理。
@@ -250,25 +250,25 @@ export default function() {
     const arr = this.opts.val.concat([]);
     // undefinedを追加することで空の入力フォームを出力できる。
     arr.splice(idx, 1);
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 
   // formが変更された時の処理。
   this.handleFormChange = newValue => {
-    this.opts.onchange(newValue, this.opts.key);
+    this.opts.onchange(newValue, this.opts.propkey);
   };
 
   // propertiesが変更された時の処理。
   this.handlePropertyChange = (newValue, key) => {
     const obj = ObjectAssign(this.opts.val);
     obj[key] = newValue;
-    this.opts.onchange(obj, this.opts.key);
+    this.opts.onchange(obj, this.opts.propkey);
   };
 
   // itemsが変更された時の処理。
   this.handleItemsChange = (newValue, idx) => {
     const arr = this.opts.val.concat([]);
     arr[idx] = newValue;
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 }

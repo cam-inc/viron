@@ -32,9 +32,9 @@ viron-parameter-schema.ParameterSchema(class="{ 'ParameterSchema--disabled' : is
       virtual(if="{ isFormMode }")
         viron-parameter-form(val="{ opts.val }" schemaObject="{ schemaObject }" additionalInfo="{ opts.additionalinfo }" onChange="{ handleFormChange }")
       virtual(if="{ isPropertiesMode }")
-        viron-parameter-schema(each="{ property, key in properties }" key="{ key }" val="{ parent.getPropertyValue(property, key) }" schemaObject="{ parent.getNormalizedSchemaObjectForProperty(property, key) }" additionalInfo="{ parent.opts.additionalinfo }" onChange="{ parent.handlePropertyChange }")
+        viron-parameter-schema(each="{ property, propKey in properties }" propKey="{ propKey }" val="{ parent.getPropertyValue(property, propKey) }" schemaObject="{ parent.getNormalizedSchemaObjectForProperty(property, propKey) }" additionalInfo="{ parent.opts.additionalinfo }" onChange="{ parent.handlePropertyChange }")
       virtual(if="{ isItemsMode && !!opts.val.length }")
-        viron-parameter-schema(no-reorder isRemovable="{ true }" each="{ val, idx in opts.val }" key="{ idx }" val="{ parent.getItemValue(idx) }" schemaObject="{ parent.getNormalizedSchemaObjectForItem(idx) }" additionalInfo="{ parent.opts.additionalinfo }" onRemove="{ parent.handleItemsRemove }" onChange="{ parent.handleItemsChange }")
+        viron-parameter-schema(no-reorder isRemovable="{ true }" each="{ val, idx in opts.val }" propKey="{ idx }" val="{ parent.getItemValue(idx) }" schemaObject="{ parent.getNormalizedSchemaObjectForItem(idx) }" additionalInfo="{ parent.opts.additionalinfo }" onRemove="{ parent.handleItemsRemove }" onChange="{ parent.handleItemsChange }")
       virtual(if="{ isItemsMode && !opts.val.length }")
         .ParameterSchema__emptyItemsMessage まだ中身がありません。
 
