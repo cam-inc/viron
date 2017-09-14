@@ -4,7 +4,11 @@ import chart from '../../../core/chart';
 export default function() {
   this.on('mount', () => {
     new chart.Chart(ObjectAssign({
-      type: 'horizontal-stacked-bar'
+      type: 'horizontal-stacked-bar',
+      plugins: [
+        chart.api.plugins.get('tooltip')(),
+        chart.api.plugins.get('legend')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 }
