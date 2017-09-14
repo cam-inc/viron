@@ -65,7 +65,6 @@ context.init()
             http.createServer(app).listen(port);
           }
 
-
           for (let path in swaggerExpress.runner.swagger.paths) {
             for (let method in swaggerExpress.runner.swagger.paths[path]) {
               console.log(`Added Route. ${method.toUpperCase()}: ${path}`);

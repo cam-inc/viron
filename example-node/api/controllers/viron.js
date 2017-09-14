@@ -23,7 +23,7 @@ const genComponent = (name, method, path, style, pagination, options) => {
 };
 
 const genTableComponent = (name, method, path, primary, query, labels, actions) => {
-  const component = genComponent(name, method, path, constant.DMC_STYLE_TABLE, true);
+  const component = genComponent(name, method, path, constant.VIRON_STYLE_TABLE, true);
   if (primary) {
     component.primary = primary;
   }
@@ -65,7 +65,7 @@ const genSection = (section, groups) => {
 };
 
 /**
- * GET: /dmc
+ * GET: /viron
  */
 const show = (req, res) => {
   const vironlib = context.getVironLib();
@@ -80,26 +80,26 @@ const show = (req, res) => {
     tags: [env, 'viron', 'example'],
     pages: [].concat(
       // QuickView
-      genSection(constant.DMC_SECTION_DASHBOARD, {
+      genSection(constant.VIRON_SECTION_DASHBOARD, {
         [constant.GROUP_EMPTY]: [
           {
             id: 'quickview',
             name: 'クイックビュー',
             components: [
-              genComponent('DAU', 'get', '/stats/dau', constant.DMC_STYLE_NUMBER),
-              genComponent('MAU', 'get', '/stats/mau', constant.DMC_STYLE_NUMBER),
-              genComponent('Planet(bar)', 'get', '/stats/planet/bar', constant.DMC_STYLE_GRAPH_BAR),
-              genComponent('Planet(scatterplot)', 'get', '/stats/planet/scatterplot', constant.DMC_STYLE_GRAPH_SCATTERPLOT),
-              genComponent('Planet(line)', 'get', '/stats/planet/line', constant.DMC_STYLE_GRAPH_LINE),
-              genComponent('Planet(horizontal-bar)', 'get', '/stats/planet/horizontal-bar', constant.DMC_STYLE_GRAPH_HORIZONTAL_BAR),
-              genComponent('Planet(stacked-bar)', 'get', '/stats/planet/stacked-bar', constant.DMC_STYLE_GRAPH_STACKED_BAR),
-              genComponent('Planet(horizontal-stacked-bar)', 'get', '/stats/planet/horizontal-stacked-bar', constant.DMC_STYLE_GRAPH_HORIZONTAL_STACKED_BAR),
-              genComponent('Planet(stacked-area)', 'get', '/stats/planet/stacked-area', constant.DMC_STYLE_GRAPH_STACKED_AREA),
+              genComponent('DAU', 'get', '/stats/dau', constant.VIRON_STYLE_NUMBER),
+              genComponent('MAU', 'get', '/stats/mau', constant.VIRON_STYLE_NUMBER),
+              genComponent('Planet(bar)', 'get', '/stats/planet/bar', constant.VIRON_STYLE_GRAPH_BAR),
+              genComponent('Planet(scatterplot)', 'get', '/stats/planet/scatterplot', constant.VIRON_STYLE_GRAPH_SCATTERPLOT),
+              genComponent('Planet(line)', 'get', '/stats/planet/line', constant.VIRON_STYLE_GRAPH_LINE),
+              genComponent('Planet(horizontal-bar)', 'get', '/stats/planet/horizontal-bar', constant.VIRON_STYLE_GRAPH_HORIZONTAL_BAR),
+              genComponent('Planet(stacked-bar)', 'get', '/stats/planet/stacked-bar', constant.VIRON_STYLE_GRAPH_STACKED_BAR),
+              genComponent('Planet(horizontal-stacked-bar)', 'get', '/stats/planet/horizontal-stacked-bar', constant.VIRON_STYLE_GRAPH_HORIZONTAL_STACKED_BAR),
+              genComponent('Planet(stacked-area)', 'get', '/stats/planet/stacked-area', constant.VIRON_STYLE_GRAPH_STACKED_AREA),
             ],
           }
         ],
       }),
-      genSection(constant.DMC_SECTION_MANAGE, {
+      genSection(constant.VIRON_SECTION_MANAGE, {
         // Manage
         [constant.GROUP_USER]: [
           {
@@ -190,7 +190,7 @@ const show = (req, res) => {
   };
 
   if (!req.swagger.operation.security) {
-    // /dmc自体が非認証の場合はそのまま返す
+    // /viron自体が非認証の場合はそのまま返す
     return res.json(result);
   }
 

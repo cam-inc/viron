@@ -1128,7 +1128,7 @@ paths:
       tags:
       - audit_log
 
-  /dmc:
+  /viron:
     get:
       x-swagger-router-controller: viron
       description: viron settings
@@ -1157,7 +1157,7 @@ paths:
       tags:
       - viron
 
-  /dmc_authtype:
+  /viron_authtype:
     get:
       x-swagger-router-controller: viron_authtype
       description: get auth types

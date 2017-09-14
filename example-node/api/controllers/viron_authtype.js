@@ -1,5 +1,5 @@
 /**
- * GET: /dmc_authtype
+ * GET: /viron_authtype
  */
 const list = (req, res) => {
   const result = [
