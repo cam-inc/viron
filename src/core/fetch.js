@@ -101,7 +101,7 @@ const commonFetch = (context, url, options) => {
       new Promise((resolve, reject) => {
         setTimeout(() => {
           reject(new Error('時間がかかり過ぎたため通信を中断しました。'));
-        }, 1000 * 5);
+        }, 1000 * 10);
       })
     ]))
     .then(response => {

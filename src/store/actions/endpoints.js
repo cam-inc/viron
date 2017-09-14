@@ -32,7 +32,7 @@ export default {
           description: '',
           version: '',
           color: '',
-          thumbnail: './img/dmc_default.png',
+          thumbnail: './img/viron_default.png',
           tags: []
         };
         context.commit(mutations.ENDPOINTS_ADD, key, newEndpoint);

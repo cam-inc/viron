@@ -1,7 +1,7 @@
 import application from './application';
 import components from './components';
 import current from './current';
-import dmc from './dmc';
+import viron from './viron';
 import drawers from './drawers';
 import endpoints from './endpoints';
 import layout from './layout';
@@ -23,7 +23,7 @@ const constants = {
   COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
   COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
   CURRENT: 'CURRENT',
-  DMC: 'DMC',
+  VIRON: 'VIRON',
   DRAWERS_ADD: 'DRAWERS_ADD',
   DRAWERS_REMOVE: 'DRAWERS_REMOVE',
   ENDPOINTS_ADD: 'ENDPOINTS_ADD',
@@ -59,7 +59,7 @@ export default {
   [constants.COMPONENTS_REMOVE_ONE]: components.removeOne,
   [constants.COMPONENTS_REMOVE_ALL]: components.removeAll,
   [constants.CURRENT]: current.all,
-  [constants.DMC]: dmc.all,
+  [constants.VIRON]: viron.all,
   [constants.DRAWERS_ADD]: drawers.add,
   [constants.DRAWERS_REMOVE]: drawers.remove,
   [constants.ENDPOINTS_ADD]: endpoints.add,

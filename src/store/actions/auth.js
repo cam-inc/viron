@@ -71,7 +71,7 @@ export default {
    */
   getTypes: (context, endpointKey) => {
     const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
-    const fetchUrl = `${new URL(endpoint.url).origin}/dmc_authtype`;
+    const fetchUrl = `${new URL(endpoint.url).origin}/viron_authtype`;
 
     return Promise
       .resolve()

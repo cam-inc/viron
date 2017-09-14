@@ -74,7 +74,7 @@ module.exports = {
         return sequelize;
       })
       .then(sequelize => {
-        return vironlibStores.mysql.init(sequelize); // import dmc library
+        return vironlibStores.mysql.init(sequelize); // import viron library
       })
       .then(sequelize => {
         return initModels(sequelize);

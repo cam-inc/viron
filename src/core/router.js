@@ -1,10 +1,10 @@
 import Esr from 'esr';
 import { constants as actions } from '../store/actions';
-import ComponentsRoute from '../components/pages/dmc-components/route';
-import EndpointimportRoute from '../components/pages/dmc-endpointimport/route';
-import EndpointsRoute from '../components/pages/dmc-endpoints/route';
-import NotfoundRoute from '../components/pages/dmc-notfound/route';
-import OauthredirectRoute from '../components/pages/dmc-oauthredirect/route';
+import ComponentsRoute from '../components/pages/viron-components/route';
+import EndpointimportRoute from '../components/pages/viron-endpointimport/route';
+import EndpointsRoute from '../components/pages/viron-endpoints/route';
+import NotfoundRoute from '../components/pages/viron-notfound/route';
+import OauthredirectRoute from '../components/pages/viron-oauthredirect/route';
 
 let esr;
 

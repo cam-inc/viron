@@ -34,7 +34,7 @@ export default {
       }
     }).then(res => {
       if (!res.ok) {
-        return Promise.reject(`fetch failed: ${res.url}`);
+        return Promise.reject(res);
       }
       return res;
     }).then(res => {
@@ -53,7 +53,7 @@ export default {
         const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
         pagination = {
           // `x-pagination-current-page`等は独自仕様。
-          // DMCを使用するサービスはこの仕様に沿う必要がある。
+          // VIRONを使用するサービスはこの仕様に沿う必要がある。
           currentPage,
           size,
           maxPage
@@ -93,6 +93,11 @@ export default {
       requestInterceptor: req => {
         req.headers['Authorization'] = token;
       }
+    }).then(res => {
+      if (!res.ok) {
+        return Promise.reject(res);
+      }
+      return res;
     }).then(res => {
       // tokenを更新する。
       const token = res.headers['Authorization'];

@@ -1,7 +1,7 @@
 import application from './application';
 import components from './components';
 import current from './current';
-import dmc from './dmc';
+import viron from './viron';
 import drawers from './drawers';
 import endpoints from './endpoints';
 import layout from './layout';
@@ -34,13 +34,13 @@ const constants = {
   COMPONENTS_ONE_TABLE_COLUMNS: 'COMPONENTS_ONE_TABLE_COLUMNS',
   COMPONENTS_ONE_PRIMARY_KEY: 'COMPONENTS_ONE_PRIMARY_KEY',
   CURRENT: 'CURRENT',
-  DMC: 'DMC',
-  DMC_EXISTENCE: 'DMC_EXISTENCE',
-  DMC_PAGES: 'DMC_PAGES',
-  DMC_PAGES_ID_OF: 'DMC_PAGES_ID_OF',
-  DMC_NAME: 'DMC_NAME',
-  DMC_DASHBOARD: 'DMC_DASHBOARD',
-  DMC_MANAGE: 'DMC_MANAGE',
+  VIRON: 'VIRON',
+  VIRON_EXISTENCE: 'VIRON_EXISTENCE',
+  VIRON_PAGES: 'VIRON_PAGES',
+  VIRON_PAGES_ID_OF: 'VIRON_PAGES_ID_OF',
+  VIRON_NAME: 'VIRON_NAME',
+  VIRON_DASHBOARD: 'VIRON_DASHBOARD',
+  VIRON_MANAGE: 'VIRON_MANAGE',
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
   ENDPOINTS_BY_ORDER: 'ENDPOINTS_BY_ORDER',
@@ -102,13 +102,13 @@ export default {
   [constants.COMPONENTS_ONE_TABLE_COLUMNS]: components.tableColumns,
   [constants.COMPONENTS_ONE_PRIMARY_KEY]: components.primaryKey,
   [constants.CURRENT]: current.all,
-  [constants.DMC]: dmc.all,
-  [constants.DMC_EXISTENCE]: dmc.existence,
-  [constants.DMC_PAGES]: dmc.pages,
-  [constants.DMC_PAGES_ID_OF]: dmc.pageIdOf,
-  [constants.DMC_NAME]: dmc.name,
-  [constants.DMC_DASHBOARD]: dmc.dashboard,
-  [constants.DMC_MANAGE]: dmc.manage,
+  [constants.VIRON]: viron.all,
+  [constants.VIRON_EXISTENCE]: viron.existence,
+  [constants.VIRON_PAGES]: viron.pages,
+  [constants.VIRON_PAGES_ID_OF]: viron.pageIdOf,
+  [constants.VIRON_NAME]: viron.name,
+  [constants.VIRON_DASHBOARD]: viron.dashboard,
+  [constants.VIRON_MANAGE]: viron.manage,
   [constants.DRAWERS]: drawers.all,
   [constants.ENDPOINTS]: endpoints.all,
   [constants.ENDPOINTS_BY_ORDER]: endpoints.allByOrder,

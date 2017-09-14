@@ -1,6 +1,6 @@
 module.exports = helper => {
   const config = {
-    host: 'dmc.camplat.net:443',
+    host: 'viron.camplat.net:443',
     // vironlibのadmin_roleが使用するユーザー作成時の初期ロール名
     default_role: 'viewer',
     // vironlibのadmin_roleが使用するスーパーユーザーのロール名
@@ -10,8 +10,8 @@ module.exports = helper => {
     google_oauth: {
       client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
       client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      redirect_url: 'https://dmc.camplat.net/googleoauth2callback',
-      //state_url: 'https://cam-inc.github.io/dmc/#/',
+      redirect_url: 'https://viron.camplat.net/googleoauth2callback',
+      //state_url: 'https://cam-inc.github.io/viron/#/',
       allow_email_domains: [
         // ここに書いたドメインが利用可能
         'camobile.com',
@@ -30,7 +30,7 @@ module.exports = helper => {
       main: {
         type: 'mysql',
         config: {
-          database: 'dmc_stg', // The name of the database
+          database: 'viron_stg', // The name of the database
           dialect: 'mysql', // The dialect of the database you are connecting to. One of mysql, postgres, sqlite and mssql. 'mysql'|'sqlite'|'postgres'|'mssql'
           // dialectModulePath: null, // {String} If specified, load the dialect library from this path. For example, if you want to use pg.js instead of pg when connecting to a pg database, you should specify 'pg.js' here
           // dialectOptions: null, // {Object} An object of additional options, which are passed directly to the connection library
@@ -90,8 +90,8 @@ module.exports = helper => {
       token_expire: 1 * 24 * 60 * 60 * 1000, // 1日
       algorithm: 'RS512',
       claims: {
-        iss: 'dmc-example-node',
-        aud: 'dmc.stg',
+        iss: 'viron-example-node',
+        aud: 'viron.stg',
       },
       rsa_private_key: process.env.AUTH_JWT_PRIVATE_KEY,
       rsa_public_key: process.env.AUTH_JWT_PUBLIC_KEY,
