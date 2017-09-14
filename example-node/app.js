@@ -31,49 +31,62 @@ context.init()
       },
     };
 
-    SwaggerExpress.create(config, (err, swaggerExpress) => {
-      if (err) {
-        throw err;
-      }
+    return new Promise((resolve, reject) => {
+      SwaggerExpress.create(config, (err, swaggerExpress) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(swaggerExpress);
+      });
+    })
+      .then(swaggerExpress => {
       // swagger.jsonを動的に書き換える
-      helperSwagger.autoGenerate(swaggerExpress, context.getStoreMain().models)
-        .then(() => {
-          // add middlewares here.
-          // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
+        return helperSwagger.autoGenerate(swaggerExpress, context.getStoreMain().models)
+          .then(() => {
+            return swaggerExpress;
+          })
+        ;
+      })
+      .then(swaggerExpress => {
+        // add middlewares here.
+        // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
 
-          // ignore if-none-match header
-          app.disable('etag');
+        // ignore if-none-match header
+        app.disable('etag');
 
-          // add acl response headers
-          app.use(vironlib.acl.middleware());
+        // add acl response headers
+        app.use(vironlib.acl.middleware());
 
-          app.use((req, res, next) => {
-            if (req.method === 'OPTIONS') {
-              return res.status(200).end();
-            }
-            next();
-          });
-
-          // add routing
-          swaggerExpress.register(app);
-
-          const port = process.env.PORT || helperSwagger.getPort(swaggerExpress, 3000);
-          const ssl = context.getConfigSsl();
-          if (ssl.use) {
-            https.createServer(ssl, app).listen(port);
-          } else {
-            http.createServer(app).listen(port);
+        app.use((req, res, next) => {
+          if (req.method === 'OPTIONS') {
+            return res.status(200).end();
           }
+          next();
+        });
 
-          for (let path in swaggerExpress.runner.swagger.paths) {
-            for (let method in swaggerExpress.runner.swagger.paths[path]) {
-              console.log(`Added Route. ${method.toUpperCase()}: ${path}`);
-            }
+        // add routing
+        swaggerExpress.register(app);
+
+        const port = process.env.PORT || helperSwagger.getPort(swaggerExpress, 3000);
+        const ssl = context.getConfigSsl();
+        if (ssl.use) {
+          https.createServer(ssl, app).listen(port);
+        } else {
+          http.createServer(app).listen(port);
+        }
+
+        for (let path in swaggerExpress.runner.swagger.paths) {
+          for (let method in swaggerExpress.runner.swagger.paths[path]) {
+            console.log(`Added Route. ${method.toUpperCase()}: ${path}`);
           }
+        }
 
-          app.emit('setuped'); // for testing
-        })
-      ;
-    });
+        app.emit('setuped'); // for testing
+      })
+    ;
+  })
+  .catch(e => {
+    console.error(e);
+    process.exit(1);
   })
 ;
