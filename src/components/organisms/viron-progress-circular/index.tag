@@ -1,5 +1,5 @@
-viron-progress.Progress
-  .Progress__spinner
+viron-progress-circular.ProgressCircular
+  .ProgressCircular__spinner
     viron-icon(type="loading")
 
   script.
