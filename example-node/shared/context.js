@@ -77,6 +77,7 @@ class Context {
           swagger: {
             host: this.getConfigHost(),
             admin_roles: store.models.AdminRoles,
+            super_role: this.getSuperRole(),
           },
           body_completion: {
             exclude_paths: [],
