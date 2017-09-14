@@ -218,8 +218,10 @@
 
 .Table__itemHeader {
   @apply --layout-center-center;
-  margin-bottom: 4px;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
   font-size: 10px;
+  border-bottom: 1px solid var(--color-base-concrete);
 }
 
 .Table__itemTitle {
@@ -239,6 +241,11 @@
 
 .Table__cell {
   display: block;
+  padding: 8px;
+}
+
+.Table__cellValue {
+  font-size: 14px;
 }
 
 .Table__cellButton:hover,
