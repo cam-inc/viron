@@ -8695,12 +8695,26 @@ var components$2 = {
    */
   parameterObjectsEntirely: context => {
     let entireParameterObjects = [];
+    const weights = {};
     forOwn_1$2(context.state.components, component => {
       entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
     });
-    return unique_1$2(entireParameterObjects, (a, b) => {
+    entireParameterObjects = map_1$2(entireParameterObjects, entireParameterObject => {
+      const name = entireParameterObject.name;
+      weights[name] || (weights[name] = 0);
+      weights[name] = weights[name] + 1;
+      return objectAssign$1({}, entireParameterObject);
+    });
+    entireParameterObjects = unique_1$2(entireParameterObjects, (a, b) => {
       return (a.name === b.name);
     });
+    forEach_1$1(entireParameterObjects, entireParameterObject => {
+      entireParameterObject.weight = weights[entireParameterObject.name];
+    });
+    entireParameterObjects = sortBy_1$2(entireParameterObjects, entireParameterObject => {
+      return weights[entireParameterObject.name] * (-1);
+    });
+    return entireParameterObjects;
   },
 
   /**
@@ -26627,6 +26641,10 @@ var script$30 = function() {
   this.isValidateOpened = true;
   // bodyの開閉状態。
   this.isBodyOpened = true;
+  // weightは独自仕様。並び順の重み付け。
+  if (this.schemaObject.weight === 1) {
+    this.isBodyOpened = false;
+  }
 
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {
