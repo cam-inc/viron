@@ -179,6 +179,10 @@ export default function() {
   this.isValidateOpened = true;
   // bodyの開閉状態。
   this.isBodyOpened = true;
+  // weightは独自仕様。並び順の重み付け。
+  if (this.schemaObject.weight === 1) {
+    this.isBodyOpened = false;
+  }
 
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {

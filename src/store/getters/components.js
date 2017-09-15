@@ -1,9 +1,12 @@
 import filter from 'mout/array/filter';
+import forEach from 'mout/array/forEach';
 import map from 'mout/array/map';
+import sortBy from 'mout/array/sortBy';
 import unique from 'mout/array/unique';
 import isArray from 'mout/lang/isArray';
 import forOwn from 'mout/object/forOwn';
 import keys from 'mout/object/keys';
+import ObjectAssign from 'object-assign';
 
 export default {
   /**
@@ -62,12 +65,26 @@ export default {
    */
   parameterObjectsEntirely: context => {
     let entireParameterObjects = [];
+    const weights = {};
     forOwn(context.state.components, component => {
       entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
     });
-    return unique(entireParameterObjects, (a, b) => {
+    entireParameterObjects = map(entireParameterObjects, entireParameterObject => {
+      const name = entireParameterObject.name;
+      weights[name] || (weights[name] = 0);
+      weights[name] = weights[name] + 1;
+      return ObjectAssign({}, entireParameterObject);
+    });
+    entireParameterObjects = unique(entireParameterObjects, (a, b) => {
       return (a.name === b.name);
     });
+    forEach(entireParameterObjects, entireParameterObject => {
+      entireParameterObject.weight = weights[entireParameterObject.name];
+    });
+    entireParameterObjects = sortBy(entireParameterObjects, entireParameterObject => {
+      return weights[entireParameterObject.name] * (-1);
+    });
+    return entireParameterObjects;
   },
 
   /**
