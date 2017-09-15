@@ -2970,11 +2970,7 @@ var riot$1 = unwrapExports(riot_1);
     var forEach_1$1 = forEach;
 
 /* esr version 0.9.2 */
-/**
-     * Appends an array to the end of another.
-     * The first array will be modified.
-     */
-    function append(arr1, arr2) {
+function append(arr1, arr2) {
         if (arr2 == null) {
             return arr1;
         }
@@ -3944,8 +3940,8 @@ function isValidString(val) {
     var pluck_1 = pluck;
 
 /**
-     * Returns an Array of numbers inside range.
-     */
+    * Count number of full steps.
+    */
     function range(start, stop, step) {
         if (stop == null) {
             stop = start;
@@ -6728,12 +6724,7 @@ var _dontEnums$1;
 
     var forIn_1$1 = forIn$1;
 
-/**
-     * Similar to Array/forEach but works over object properties and fixes Don't
-     * Enum bug on IE.
-     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
-     */
-    function forOwn$1(obj, fn, thisObj){
+function forOwn$1(obj, fn, thisObj){
         forIn_1$1(obj, function(val, key){
             if (hasOwn_1$2(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
@@ -6761,17 +6752,12 @@ var UNDEF$1;
     }
     var kindOf_1$1 = kindOf$1;
 
-/**
-     * Check if value is from a specific "kind".
-     */
-    function isKind$1(val, kind){
+function isKind$1(val, kind){
         return kindOf_1$1(val) === kind;
     }
     var isKind_1$1 = isKind$1;
 
-/**
-     */
-    var isArray$1 = Array.isArray || function (val) {
+var isArray$1 = Array.isArray || function (val) {
         return isKind_1$1(val, 'Array');
     };
     var isArray_1$2 = isArray$1;
@@ -6828,12 +6814,7 @@ function containsMatch$1(array, pattern) {
 
     var deepMatches_1$1 = deepMatches$1;
 
-/**
-     * Converts argument into a valid iterator.
-     * Used internally on most array/object/collection methods that receives a
-     * callback/iterator providing a shortcut syntax.
-     */
-    function makeIterator$1(src, thisObj){
+function makeIterator$1(src, thisObj){
         if (src == null) {
             return identity_1$1;
         }
@@ -6857,10 +6838,7 @@ function containsMatch$1(array, pattern) {
 
     var makeIterator_$1 = makeIterator$1;
 
-/**
-     * Array reject
-     */
-    function reject$1(arr, callback, thisObj) {
+function reject$1(arr, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var results = [];
         if (arr == null) {
@@ -7181,7 +7159,6 @@ var store = createCommonjsModule(function (module, exports) {
 }));
 });
 
-// 選択されているエンドポイント。
 var current = store.get('current', null);
 
 // `/viron`のデータ。
@@ -7189,7 +7166,6 @@ var viron = null;
 
 var drawers = [];
 
-// ローカルに保存されているエンドポイント一覧。
 var endpoints = store.get('endpoints', {});
 
 var layout = {
@@ -7356,7 +7332,7 @@ var components$1 = {
     const component_uid = params.component_uid;
     // 存在しなければ新規作成。
     context.state.components[component_uid] = params;
-    return [constants$3.COMPONENTS_ONE(component_uid)];
+    return [constants$3.COMPONENTS, constants$3.COMPONENTS_ONE(component_uid)];
   },
 
   /**
@@ -7367,7 +7343,7 @@ var components$1 = {
    */
   removeOne: (context, component_uid) => {
     delete context.state.components[component_uid];
-    return [constants$3.COMPONENTS_ONE(component_uid)];
+    return [constants$3.COMPONENTS, constants$3.COMPONENTS_ONE(component_uid)];
   },
 
   /**
@@ -7377,7 +7353,7 @@ var components$1 = {
    */
   removeAll: context => {
     context.state.components = {};
-    return [constants$3.COMPONENTS];
+    return [constants$3.COMPONENTS, constants$3.COMPONENTS];
   }
 };
 
@@ -7494,10 +7470,7 @@ var drawers$1 = {
 
     var sort$1 = mergeSort$1;
 
-/*
-     * Sort array by the result of the callback
-     */
-    function sortBy$1(arr, callback, context){
+function sortBy$1(arr, callback, context){
         callback = makeIterator_$1(callback, context);
 
         return sort$1(arr, function(a, b) {
@@ -7509,17 +7482,12 @@ var drawers$1 = {
 
     var sortBy_1$2 = sortBy$1;
 
-/**
-     */
-    function isNumber(val) {
+function isNumber(val) {
         return isKind_1$1(val, 'Number');
     }
     var isNumber_1$1 = isNumber;
 
-/**
-     * Object some
-     */
-    function some$1(obj, callback, thisObj) {
+function some$1(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var result = false;
         forOwn_1$2(obj, function(val, key) {
@@ -7533,10 +7501,7 @@ var drawers$1 = {
 
     var some_1$1 = some$1;
 
-/**
-     * Returns first item that matches criteria
-     */
-    function find$1(obj, callback, thisObj) {
+function find$1(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var result;
         some_1$1(obj, function(value, key, obj) {
@@ -7872,12 +7837,6 @@ module.exports.isValid = isValid;
 'use strict';
 var shortid = lib;
 
-/**
- * 受け取ったエンドポイント群をきれいに並び替えます。
- * order値が存在しない場合は後方に配置されます。
- * @param {Object} endpoints
- * @return {Object}
- */
 const putEndpointsInOrder = endpoints => {
   // どのorder値よりも大きいであろう適当な値。
   const bigNumber = 9999;
@@ -8379,18 +8338,11 @@ var application = {
   }
 };
 
-/**
-     */
-    function isObject(val) {
+function isObject(val) {
         return isKind_1$1(val, 'Object');
     }
     var isObject_1$1 = isObject;
 
-/**
- * body値をContent-Type `application/json`に最適化します。
- * @param {*} body
- * @return {*}
- */
 const jsonConverter = body => {
   return JSON.stringify(body);
 };
@@ -8560,10 +8512,7 @@ var application$3 = {
   }
 };
 
-/**
-     * Array filter
-     */
-    function filter$1(arr, callback, thisObj) {
+function filter$1(arr, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var results = [];
         if (arr == null) {
@@ -8583,10 +8532,7 @@ var application$3 = {
 
     var filter_1$2 = filter$1;
 
-/**
-     * Array map
-     */
-    function map$1(arr, callback, thisObj) {
+function map$1(arr, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var results = [];
         if (arr == null){
@@ -8603,10 +8549,26 @@ var application$3 = {
 
      var map_1$2 = map$1;
 
-/**
-     * Get object keys
-     */
-     var keys = Object.keys || function (obj) {
+function unique$1(arr, compare){
+        compare = compare || isEqual$1;
+        return filter_1$2(arr, function(item, i, arr){
+            var n = arr.length;
+            while (++i < n) {
+                if ( compare(item, arr[i]) ) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    function isEqual$1(a, b){
+        return a === b;
+    }
+
+    var unique_1$2 = unique$1;
+
+var keys = Object.keys || function (obj) {
             var keys = [];
             forOwn_1$2(obj, function(val, key){
                 keys.push(key);
@@ -8664,6 +8626,21 @@ var components$2 = {
    */
   parameterObjects: (context, riotId) => {
     return context.state.components[riotId].parameterObjects;
+  },
+
+  /**
+   * 全てののparamterObject群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  parameterObjectsEntirely: context => {
+    let entireParameterObjects = [];
+    forOwn_1$2(context.state.components, component => {
+      entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
+    });
+    return unique_1$2(entireParameterObjects, (a, b) => {
+      return (a.name === b.name);
+    });
   },
 
   /**
@@ -8776,11 +8753,7 @@ var current$2 = {
   }
 };
 
-/**
-     * Creates a new object with all the properties where the callback returns
-     * true.
-     */
-    function filterValues$1(obj, callback, thisObj) {
+function filterValues$1(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var output = {};
         forOwn_1$2(obj, function(value, key, obj) {
@@ -8791,12 +8764,9 @@ var current$2 = {
 
         return output;
     }
-    var filter$3 = filterValues$1;
+    var filter$4 = filterValues$1;
 
-/**
-     * Get object values
-     */
-    function values(obj) {
+function values(obj) {
         var vals = [];
         forOwn_1$2(obj, function(val, key){
             vals.push(val);
@@ -8868,7 +8838,7 @@ var viron$2 = {
     if (!context.state.viron) {
       return [];
     }
-    return values_1(filter$3(context.state.viron.pages, page => {
+    return values_1(filter$4(context.state.viron.pages, page => {
       if (page.section !== SECTION_DASHBOARD) {
         return false;
       }
@@ -8885,7 +8855,7 @@ var viron$2 = {
     if (!context.state.viron) {
       return [];
     }
-    return values_1(filter$3(context.state.viron.pages, page => {
+    return values_1(filter$4(context.state.viron.pages, page => {
       if (page.section !== SECTION_MANAGE) {
         return false;
       }
@@ -8905,10 +8875,7 @@ var drawers$2 = {
   }
 };
 
-/**
-     * Get object size
-     */
-    function size(obj) {
+function size(obj) {
         var count = 0;
         forOwn_1$2(obj, function(){
             count++;
@@ -8928,10 +8895,7 @@ var drawers$2 = {
 
     var toString_1 = toString;
 
-/**
-     * Searches for a given substring
-     */
-    function contains$1(str, substring, fromIndex){
+function contains$1(str, substring, fromIndex){
         str = toString_1(str);
         substring = toString_1(substring);
         return str.indexOf(substring, fromIndex) !== -1;
@@ -8939,11 +8903,6 @@ var drawers$2 = {
 
     var contains_1$2 = contains$1;
 
-/**
- * 受け取ったエンドポイント群をorder昇順の配列として返します。
- * @param {Object} endpoints
- * @return {Array}
- */
 const sortByOrder = endpoints => {
   let endpointsByOrder = [];
   forOwn_1$2(endpoints, (endpoint, key) => {
@@ -9558,6 +9517,7 @@ const constants$4 = {
   APPLICATION_ISDRAGGING: 'APPLICATION_ISDRAGGING',
   APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS: 'COMPONENTS',
+  COMPONENTS_PARAMETER_OBJECTS: 'COMPONENTS_PARAMETER_OBJECTS',
   COMPONENTS_ONE: 'COMPONENTS_ONE',
   COMPONENTS_ONE_RESPONSE: 'COMPONENTS_ONE_RESPONSE',
   COMPONENTS_ONE_SCHEMA_OBJECT: 'COMPONENTS_ONE_SCHEMA_OBJECT',
@@ -9628,6 +9588,7 @@ var getters = {
   [constants$4.APPLICATION_ISDRAGGING]: application$3.isDragging,
   [constants$4.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
   [constants$4.COMPONENTS]: components$2.all,
+  [constants$4.COMPONENTS_PARAMETER_OBJECTS]: components$2.parameterObjectsEntirely,
   [constants$4.COMPONENTS_ONE]: components$2.one,
   [constants$4.COMPONENTS_ONE_RESPONSE]: components$2.response,
   [constants$4.COMPONENTS_ONE_SCHEMA_OBJECT]: components$2.schemaObject,
@@ -9898,7 +9859,7 @@ function resolve() {
   // handle relative paths to be safe (might happen when process.cwd() fails)
 
   // Normalize the path
-  resolvedPath = normalizeArray(filter$5(resolvedPath.split('/'), function(p) {
+  resolvedPath = normalizeArray(filter$6(resolvedPath.split('/'), function(p) {
     return !!p;
   }), !resolvedAbsolute).join('/');
 
@@ -9912,7 +9873,7 @@ function normalize(path) {
       trailingSlash = substr(path, -1) === '/';
 
   // Normalize the path
-  path = normalizeArray(filter$5(path.split('/'), function(p) {
+  path = normalizeArray(filter$6(path.split('/'), function(p) {
     return !!p;
   }), !isPathAbsolute).join('/');
 
@@ -9934,7 +9895,7 @@ function isAbsolute$1(path) {
 // posix version
 function join$1() {
   var paths = Array.prototype.slice.call(arguments, 0);
-  return normalize(filter$5(paths, function(p, index) {
+  return normalize(filter$6(paths, function(p, index) {
     if (typeof p !== 'string') {
       throw new TypeError('Arguments to path.join must be strings');
     }
@@ -10032,7 +9993,7 @@ var path = {
   normalize: normalize,
   resolve: resolve
 };
-function filter$5 (xs, f) {
+function filter$6 (xs, f) {
     if (xs.filter) { return xs.filter(f); }
     var res = [];
     for (var i = 0; i < xs.length; i++) {
@@ -10065,12 +10026,6 @@ var path$1 = Object.freeze({
 });
 
 var require$$0$2 = ( path$1 && path ) || path$1;
-
-/*!
- * content-disposition
- * Copyright(c) 2014 Douglas Christopher Wilson
- * MIT Licensed
- */
 
 'use strict';
 
@@ -10875,7 +10830,6 @@ var current$3 = {
   }
 };
 
-// APIは必須でサポートしなければならない URI
 const VIRON_URI = '/viron';
 
 var viron$3 = {
@@ -11144,7 +11098,6 @@ var location$4 = {
   }
 };
 
-// モーダルを多重起動しないよう判定する変数
 let canCreateModal = true;
 // タイマーID管理用変数
 let timer;
@@ -11195,7 +11148,6 @@ var modals$3 = {
   }
 };
 
-// swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
 const SwaggerClient = window.SwaggerClient;
 
 var oas$3 = {
@@ -12269,11 +12221,6 @@ var router = {
   }
 };
 
-/**
- * touch系イベントが定義されたdom要素群を返却します。
- * @param {Riot} tag
- * @return {Array}
- */
 const getTouchableElements = tag => {
   const refs = tag.refs;
   let elms = [];
@@ -13148,10 +13095,7 @@ window.Promise = promise$1;
 /* riotx version 0.9.4 */
 var VERSION$1 = "0.9.4";
 
-/**
-     * Array forEach
-     */
-    function forEach$3(arr, callback, thisObj) {
+function forEach$3(arr, callback, thisObj) {
         if (arr == null) {
             return;
         }
@@ -18485,13 +18429,6 @@ var kindOf$3 = function kindOf(val) {
   return 'object';
 };
 
-/*!
- * condense-newlines <https://github.com/jonschlinkert/condense-newlines>
- *
- * Copyright (c) 2014 Jon Schlinkert, contributors.
- * Licensed under the MIT License
- */
-
 'use strict';
 
 
@@ -18546,13 +18483,6 @@ function trailingNewline(str, options) {
   return str;
 }
 
-/*!
- * pretty <https://github.com/jonschlinkert/pretty>
- *
- * Copyright (c) 2013-2015, 2017, Jon Schlinkert.
- * Released under the MIT License.
- */
-
 'use strict';
 
 
@@ -18606,9 +18536,7 @@ riot$1.tag2('viron-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="
     this.external(script$7);
 });
 
-/**
-     */
-    function isString(val) {
+function isString(val) {
         return isKind_1$1(val, 'String');
     }
     var isString_1$1 = isString;
@@ -18734,10 +18662,7 @@ riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Htm
 
     var _isNaN$2 = isNaN$3;
 
-/**
-     * Check if value is NaN for realz
-     */
-    function isNaN$1(val){
+function isNaN$1(val){
         // based on the fact that NaN !== NaN
         // need to check if it's a number to avoid conflicts with host objects
         // also need to coerce ToNumber to avoid edge case `new Number(NaN)`
@@ -19368,11 +19293,6 @@ Quill$22.register(QuillAttributorStyleDirection, true);
 const Quill = window.Quill;
 
 // Blot群。
-// Attributor群。
-/**
- * BlotBoldを書き換えます。
- * @param {Object} params
- */
 const customizeBlotBold = params => {
   var className = params.className;
   var tagName = params.tagName;
@@ -20639,10 +20559,7 @@ riot$1.tag2('viron-wyswyg', '<div class="Wyswyg__toolbar"> <viron-wyswyg-tool-im
     this.external(script$28);
 });
 
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex$1(arr, iterator, thisObj){
+function findIndex$1(arr, iterator, thisObj){
         iterator = makeIterator_$1(iterator, thisObj);
         if (arr == null) {
             return -1;
@@ -20660,10 +20577,7 @@ riot$1.tag2('viron-wyswyg', '<div class="Wyswyg__toolbar"> <viron-wyswyg-tool-im
 
     var findIndex_1$1 = findIndex$1;
 
-/**
-     * Returns first item that matches criteria
-     */
-    function find$3(arr, iterator, thisObj){
+function find$3(arr, iterator, thisObj){
         var idx = findIndex_1$1(arr, iterator, thisObj);
         return idx >= 0? arr[idx] : void(0);
     }
@@ -20855,31 +20769,7 @@ riot$1.tag2('viron-parameter-form', '<div class="ParameterForm__body"> <virtual 
     this.external(script$29);
 });
 
-/**
-     * @return {array} Array of unique items
-     */
-    function unique$1(arr, compare){
-        compare = compare || isEqual$1;
-        return filter_1$2(arr, function(item, i, arr){
-            var n = arr.length;
-            while (++i < n) {
-                if ( compare(item, arr[i]) ) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
-
-    function isEqual$1(a, b){
-        return a === b;
-    }
-
-    var unique_1$2 = unique$1;
-
-/**
-     */
-    function isBoolean(val) {
+function isBoolean(val) {
         return isKind_1$1(val, 'Boolean');
     }
     var isBoolean_1$1 = isBoolean;
@@ -21051,8 +20941,6 @@ function createInvalid (flags) {
     return m;
 }
 
-// Plugins that add properties should also add the key here (null value),
-// so we can properly clone ourselves.
 var momentProperties = hooks.momentProperties = [];
 
 function copyConfig(to, from) {
@@ -21144,7 +21032,6 @@ function toInt(argumentForCoercion) {
     return value;
 }
 
-// compare two arrays, return the number of differences
 function compareArrays(array1, array2, dontConvert) {
     var len = Math.min(array1.length, array2.length),
         lengthDiff = Math.abs(array1.length - array2.length),
@@ -21932,8 +21819,6 @@ function computeMonthsParse () {
     this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
 }
 
-// FORMATTING
-
 addFormatToken('Y', 0, 0, function () {
     var y = this.year();
     return y <= 9999 ? '' + y : '+' + y;
@@ -22020,7 +21905,6 @@ function createUTCDate (y) {
     return date;
 }
 
-// start-of-first-week - start-of-year
 function firstWeekOffset(year, dow, doy) {
     var // first-week day -- which january is always in the first week (4 for iso, 1 for other)
         fwd = 7 + dow - doy,
@@ -22082,8 +21966,6 @@ function weeksInYear(year, dow, doy) {
     return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
 }
 
-// FORMATTING
-
 addFormatToken('w', ['ww', 2], 'wo', 'week');
 addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
 
@@ -22140,8 +22022,6 @@ function getSetISOWeek (input) {
     var week = weekOfYear(this, 1, 4).week;
     return input == null ? week : this.add((input - week) * 7, 'd');
 }
-
-// FORMATTING
 
 addFormatToken('d', 0, 'do', 'day');
 
@@ -22494,8 +22374,6 @@ function computeWeekdaysParse () {
     this._weekdaysMinStrictRegex = new RegExp('^(' + minPieces.join('|') + ')', 'i');
 }
 
-// FORMATTING
-
 function hFormat() {
     return this.hours() % 12 || 12;
 }
@@ -22628,10 +22506,6 @@ function localeMeridiem (hours, minutes, isLower) {
 // this rule.
 var getSetHour = makeGetSet('Hours', true);
 
-// months
-// week
-// weekdays
-// meridiem
 var baseConfig = {
     calendar: defaultCalendar,
     longDateFormat: defaultLongDateFormat,
@@ -22652,7 +22526,6 @@ var baseConfig = {
     meridiemParse: defaultLocaleMeridiemParse
 };
 
-// internal storage for locale config files
 var locales = {};
 var localeFamilies = {};
 var globalLocale;
@@ -22858,8 +22731,6 @@ function checkOverflow (m) {
     return m;
 }
 
-// iso 8601 regex
-// 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
 var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
 var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
 
@@ -23199,7 +23070,6 @@ function dayOfYearFromWeekInfo(config) {
     }
 }
 
-// constant that refers to the ISO standard
 hooks.ISO_8601 = function () {};
 
 // constant that refers to the RFC 2822 form
@@ -23303,7 +23173,6 @@ function meridiemFixWrap (locale, hour, meridiem) {
     }
 }
 
-// date from string and array of format strings
 function configFromStringAndArray(config) {
     var tempConfig,
         bestMoment,
@@ -23600,8 +23469,6 @@ function absRound (number) {
     }
 }
 
-// FORMATTING
-
 function offset (token, separator) {
     addFormatToken(token, 0, 0, function () {
         var offset = this.utcOffset();
@@ -23820,7 +23687,6 @@ function isUtc () {
     return this.isValid() ? this._isUTC && this._offset === 0 : false;
 }
 
-// ASP.NET json date format regex
 var aspNetRegex = /^(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
 
 // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
@@ -23933,7 +23799,6 @@ function momentsDifference(base, other) {
     return res;
 }
 
-// TODO: remove 'name' arg after deprecation is removed
 function createAdder(direction, name) {
     return function (val, period) {
         var dur, tmp;
@@ -24202,9 +24067,6 @@ function toNow (withoutSuffix) {
     return this.to(createLocal(), withoutSuffix);
 }
 
-// If passed a locale key, it will set the locale for this
-// instance.  Otherwise, it will return the locale configuration
-// variables for this instance.
 function locale (key) {
     var newLocaleData;
 
@@ -24349,8 +24211,6 @@ function creationData() {
     };
 }
 
-// FORMATTING
-
 addFormatToken(0, ['gg', 2], 0, function () {
     return this.weekYear() % 100;
 });
@@ -24446,8 +24306,6 @@ function setWeekAll(weekYear, week, weekday, dow, doy) {
     return this;
 }
 
-// FORMATTING
-
 addFormatToken('Q', 0, 'Qo', 'quarter');
 
 // ALIASES
@@ -24470,8 +24328,6 @@ addParseToken('Q', function (input, array) {
 function getSetQuarter (input) {
     return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
 }
-
-// FORMATTING
 
 addFormatToken('D', ['DD', 2], 'Do', 'date');
 
@@ -24502,8 +24358,6 @@ addParseToken('Do', function (input, array) {
 
 var getSetDayOfMonth = makeGetSet('Date', true);
 
-// FORMATTING
-
 addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
 
 // ALIASES
@@ -24530,8 +24384,6 @@ function getSetDayOfYear (input) {
     return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
 }
 
-// FORMATTING
-
 addFormatToken('m', ['mm', 2], 0, 'minute');
 
 // ALIASES
@@ -24552,8 +24404,6 @@ addParseToken(['m', 'mm'], MINUTE);
 
 var getSetMinute = makeGetSet('Minutes', false);
 
-// FORMATTING
-
 addFormatToken('s', ['ss', 2], 0, 'second');
 
 // ALIASES
@@ -24573,8 +24423,6 @@ addParseToken(['s', 'ss'], SECOND);
 // MOMENTS
 
 var getSetSecond = makeGetSet('Seconds', false);
-
-// FORMATTING
 
 addFormatToken('S', 0, 0, function () {
     return ~~(this.millisecond() / 100);
@@ -24634,8 +24482,6 @@ for (token = 'S'; token.length <= 9; token += 'S') {
 // MOMENTS
 
 var getSetMillisecond = makeGetSet('Milliseconds', false);
-
-// FORMATTING
 
 addFormatToken('z',  0, 0, 'zoneAbbr');
 addFormatToken('zz', 0, 0, 'zoneName');
@@ -25274,8 +25120,6 @@ proto$2.toIsoString = deprecate('toIsoString() is deprecated. Please use toISOSt
 proto$2.lang = lang;
 
 // Side effect imports
-
-// FORMATTING
 
 addFormatToken('X', 0, 0, 'unix');
 addFormatToken('x', 0, 0, 'valueOf');
@@ -55176,10 +55020,7 @@ riot$1.tag2('viron-component-graph-stacked-bar', '<div class="ComponentGraphStac
     this.external(script$40);
 });
 
-/**
-     * covert value into number if numeric
-     */
-    function toNumber(val){
+function toNumber(val){
         // numberic values should come first because of -0
         if (typeof val === 'number') { return val; }
         // we want all falsy values (besides -0) to return zero to avoid
@@ -55193,10 +55034,7 @@ riot$1.tag2('viron-component-graph-stacked-bar', '<div class="ComponentGraphStac
 
     var toNumber_1 = toNumber;
 
-/**
-     * Converts number into currency format
-     */
-    function currencyFormat(val, nDecimalDigits, decimalSeparator, thousandsSeparator) {
+function currencyFormat(val, nDecimalDigits, decimalSeparator, thousandsSeparator) {
         val = toNumber_1(val);
         nDecimalDigits = nDecimalDigits == null? 2 : nDecimalDigits;
         decimalSeparator = decimalSeparator == null? '.' : decimalSeparator;
@@ -55320,10 +55158,7 @@ riot$1.tag2('viron-table-items-button', '<viron-icon type="{icon}"></viron-icon>
 
     var indexOf_1$1 = indexOf$2;
 
-/**
-     * If array contains values.
-     */
-    function contains$3(arr, val) {
+function contains$3(arr, val) {
         return indexOf_1$1(arr, val) !== -1;
     }
     var contains_1$3 = contains$3;
@@ -55953,12 +55788,9 @@ riot$1.tag2('viron-component-table', '<viron-table columns="{getColumns()}" rows
     this.external(script$49);
 });
 
-/**
-     * Object reject
-     */
-    function reject$3(obj, callback, thisObj) {
+function reject$3(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
-        return filter$3(obj, function(value, index, obj) {
+        return filter$4(obj, function(value, index, obj) {
             return !callback(value, index, obj);
         }, thisObj);
     }
@@ -56074,7 +55906,7 @@ var script$55 = function() {
   // ページングのサイズ値。
   this.paginationSize = 3;
   // 現在の検索用リクエストパラメータ値。
-  this.currentSearchRequestParameters = {};
+  this.currentSearchRequestParameters = objectAssign$1({}, this.opts.entirecurrentsearchrequestparameters || {});
   this.isCurrentSearchRequestParametersEmpty = () => {
     return !keys_1$1(this.currentSearchRequestParameters).length;
   };
@@ -56239,6 +56071,8 @@ var script$55 = function() {
   this.on('mount', () => {
     // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
     this.updater();
+  }).on('update', () => {
+    this.currentSearchRequestParameters = objectAssign$1(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
   }).on('updated', () => {
     this.rebindTouchEvents();
   }).on('unmount', () => {
@@ -56313,6 +56147,7 @@ var script$55 = function() {
         parameterObjects: escapedParameterObjects,
         initialParameters: objectAssign$1({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
+          //this.opts.entirecurrentsearchrequestparametersresetter();
           this.updater(parameters);
         }
       }))
@@ -56349,9 +56184,7 @@ riot$1.tag2('viron-component', '<div class="Component__head"> <div class="Compon
 
     var now_1 = now$1;
 
-/**
-     */
-    function throttle(fn, delay){
+function throttle(fn, delay){
         var context, timeout, result, args,
             diff, prevCall = 0;
         function delayed(){
@@ -56386,6 +56219,45 @@ var script$59 = function() {
   this.tableComponents = store.getter(constants$4.PAGE_COMPONENTS_TABLE);
   this.notTableComponents = store.getter(constants$4.PAGE_COMPONENTS_NOT_TABLE);
   this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
+  // リクエストパラメータ定義。
+  this.parameterObjects = [];
+  // 現在の検索用リクエストパラメータ値。
+  this.currentSearchRequestParameters = {};
+  this.isCurrentSearchRequestParametersEmpty = () => {
+    return !keys_1$1(this.currentSearchRequestParameters).length;
+  };
+  // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
+  this.getParameterObjectsForSearch = () => {
+    const ret = reject_1$2(this.parameterObjects || [], parameterObject => {
+      if (parameterObject.in !== 'query') {
+        return false;
+      }
+      if (parameterObject.name === 'limit') {
+        return true;
+      }
+      if (parameterObject.name === 'offset') {
+        return true;
+      }
+      return false;
+    });
+    return ret;
+  };
+  // componentで定義されている値のみ抽出します。
+  this.getCurrentSearchRequestParametersForComponent = component => {
+    const parameterObjects = store.getter(constants$4.OAS_PARAMETER_OBJECTS, component.api.path, component.api.method);
+    const names = [];
+    forEach_1$1(parameterObjects, parameterObject => {
+      names.push(parameterObject.name);
+    });
+    return reject_1$3(this.currentSearchRequestParameters, (v, k) => {
+      return !contains_1$3(names, k);
+    });
+  };
+  // 現在の検索用パラメータ値をリセットします。
+  this.currentSearchRequestParametersResetter = () => {
+    this.currentSearchRequestParameters = {};
+    this.update();
+  };
 
   /**
    * 現在のviewportに最適なcolumn数を計算して返します。
@@ -56421,6 +56293,8 @@ var script$59 = function() {
     // 初回にcolumn数を設定する。
     updateGridColumnCount();
     window.addEventListener('resize', handleResize);
+  }).on('updated', () => {
+    this.rebindTouchEvents();
   }).on('unmount', () => {
     window.removeEventListener('resize', handleResize);
   });
@@ -56440,9 +56314,50 @@ var script$59 = function() {
     this.update();
     updateGridColumnCount();
   });
+
+  this.listen(constants$3.COMPONENTS, () => {
+    this.parameterObjects = store.getter(constants$4.COMPONENTS_PARAMETER_OBJECTS);
+    this.update();
+  });
+
+  this.handleSearchButtonTap = () => {
+    // TODO
+    if (this.isPending) {
+      return;
+    }
+
+    // ページングに使用するparamerは取り除く。
+    const escapedParameterObjects = this.getParameterObjectsForSearch();
+
+    // 検索用のparameterObjectが存在しない場合は何もしない。
+    if (!escapedParameterObjects.length) {
+      return;
+    }
+
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'viron-component-search', {
+        parameterObjects: escapedParameterObjects,
+        initialParameters: objectAssign$1({}, this.currentSearchRequestParameters),
+        onComplete: parameters => {
+          this.currentSearchRequestParameters = reject_1$3(objectAssign$1(this.currentSearchRequestParameters, parameters), val => {
+            return isUndefined(val);
+          });
+          this.update();
+          // 親コンポーネントから子コンポーネントを操作するのはNGだけど、ここだけ....
+          // 改修するなら、search状態をstore管理する必要があるので。
+          forEach_1$1(this.tags['viron-component'] || [], componentTag => {
+            componentTag.updater();
+          });
+        }
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+        error: err
+      }));
+  };
 };
 
-riot$1.tag2('viron-components', '<div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+riot$1.tag2('viron-components', '<div class="ComponentsPage__head"> <div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__control"> <div class="ComponentsPage__search {isCurrentSearchRequestParametersEmpty() ? \'\' : \'ComponentsPage__search--active\'}" if="{!!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap"> <viron-icon type="search"></viron-icon> </div> </div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
     this.external(script$59);
 });
 
@@ -60273,7 +60188,7 @@ var qrious$1 = createCommonjsModule(function (module, exports) {
 
 })));
 
-
+//# sourceMappingURL=qrious.js.map
 });
 
 var script$65 = function() {
@@ -60350,10 +60265,10 @@ riot$1.tag2('viron-signinoauth', '<viron-button onpat="{handleButtonPat}" label=
 var script$69 = function() {
   const store = this.riotx.get();
 
-  this.oauths = values_1(filter$3(this.opts.authtypes, v => {
+  this.oauths = values_1(filter$4(this.opts.authtypes, v => {
     return v.type === 'oauth';
   }));
-  this.emails = values_1(filter$3(this.opts.authtypes, v => {
+  this.emails = values_1(filter$4(this.opts.authtypes, v => {
     return v.type === 'email';
   }));
 
@@ -61171,7 +61086,6 @@ riot$1.tag2('viron', '<div class="Application__contents"> <div class="Applicatio
     this.external(script$83);
 });
 
-// エントリーポイント。
 document.addEventListener('DOMContentLoaded', () => {
   let mainStore;
   Promise
