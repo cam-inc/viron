@@ -38,6 +38,7 @@
 
 .ComponentsPage__search {
   @apply --layout-center-center;
+  position: relative;
   font-size: 12px;
   cursor: pointer;
 }
@@ -49,6 +50,29 @@
 
 .ComponentsPage__search--active {
   color: var(--color-base-dodgerBlue);
+}
+
+.ComponentsPage__search .Tooltip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0 auto;
+}
+
+.ComponentsPage__search::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  content: "";
+}
+
+/* TODO: テキストが縦に伸びるbug有り。下記は暫定対応。後で修正したい。 */
+.ComponentsPage__search .Tooltip__text {
+  width: 150px;
 }
 
 .ComponentsPage__listForTable .Component {

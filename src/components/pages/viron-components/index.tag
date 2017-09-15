@@ -7,8 +7,9 @@ viron-components.Page.ComponentsPage
         viron-icon(type="right")
       .ComponentsPage__breadcrumbLabel { name } ({ componentsCount })
     .ComponentsPage__control
-      .ComponentsPage__search(if="{ !!getParameterObjectsForSearch().length }" class="{ isCurrentSearchRequestParametersEmpty() ? '' : 'ComponentsPage__search--active' }" ref="touch" onTap="handleSearchButtonTap")
+      .ComponentsPage__search(if="{ !!getParameterObjectsForSearch().length }" class="{ isCurrentSearchRequestParametersEmpty() ? '' : 'ComponentsPage__search--active' }" ref="touch" onTap="handleSearchButtonTap" onMouseOver="{ handleSearchButtonMouseOver }" onMouseOut="{ handleSearchButtonMouseOut }")
         viron-icon(type="search")
+        viron-tooltip(if="{ isSearchTooltipVisible }" placement="bottomRight" label="全体検索")
   .ComponentsPage__listForTable(if="{ !!tableComponents.length }")
     viron-component(each="{ component, idx in tableComponents }" component="{ component }" entireCurrentSearchRequestParameters="{ parent.getCurrentSearchRequestParametersForComponent(component) }" entireCurrentSearchRequestParametersResetter="{ parent.currentSearchRequestParametersResetter }")
   .ComponentsPage__list(ref="list" if="{ !!notTableComponents.length }")
@@ -17,5 +18,6 @@ viron-components.Page.ComponentsPage
   script.
     import '../../organisms/viron-component/index.tag';
     import '../../atoms/viron-icon/index.tag';
+    import '../../atoms/viron-tooltip/index.tag';
     import script from './index';
     this.external(script);

@@ -22,6 +22,8 @@ export default function() {
   this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
   // リクエストパラメータ定義。
   this.parameterObjects = [];
+  // tooltip表示中か否か。
+  this.isSearchTooltipVisible = false;
   // 現在の検索用リクエストパラメータ値。
   this.currentSearchRequestParameters = {};
   this.isCurrentSearchRequestParametersEmpty = () => {
@@ -120,6 +122,16 @@ export default function() {
     this.parameterObjects = store.getter(getters.COMPONENTS_PARAMETER_OBJECTS);
     this.update();
   });
+
+  this.handleSearchButtonMouseOver = () => {
+    this.isSearchTooltipVisible = true;
+    this.update();
+  };
+
+  this.handleSearchButtonMouseOut = () => {
+    this.isSearchTooltipVisible = false;
+    this.update();
+  };
 
   this.handleSearchButtonTap = () => {
     // TODO
