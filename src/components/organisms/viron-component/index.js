@@ -55,7 +55,7 @@ export default function() {
   // ページングのサイズ値。
   this.paginationSize = 3;
   // 現在の検索用リクエストパラメータ値。
-  this.currentSearchRequestParameters = {};
+  this.currentSearchRequestParameters = ObjectAssign({}, this.opts.entirecurrentsearchrequestparameters || {});
   this.isCurrentSearchRequestParametersEmpty = () => {
     return !keys(this.currentSearchRequestParameters).length;
   };
@@ -218,6 +218,8 @@ export default function() {
   this.on('mount', () => {
     // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
     this.updater();
+  }).on('update', () => {
+    this.currentSearchRequestParameters = ObjectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
   }).on('updated', () => {
     this.rebindTouchEvents();
   }).on('unmount', () => {
@@ -292,6 +294,7 @@ export default function() {
         parameterObjects: escapedParameterObjects,
         initialParameters: ObjectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
+          this.opts.entirecurrentsearchrequestparametersresetter();
           this.updater(parameters);
         }
       }))

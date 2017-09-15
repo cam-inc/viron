@@ -9,9 +9,16 @@
   display: block;
 }
 
+.ComponentsPage__head {
+  @apply --layout-center-center;
+  margin-bottom: 8px;
+}
+
 .ComponentsPage__breadcrumb {
+  @apply --text-truncate;
+
   @apply --layout-center-start;
-  margin-bottom: 12px;
+  flex-grow: 1;
   color: var(--color-base-mineShaft);
   opacity: 0.6;
 }
@@ -22,6 +29,26 @@
   height: 12px;
   margin-right: 4px;
   font-size: 12px;
+}
+
+.ComponentsPage__control {
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.ComponentsPage__search {
+  @apply --layout-center-center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ComponentsPage__search:hover,
+.ComponentsPage__search.hover {
+  color: var(--color-basic-gray);
+}
+
+.ComponentsPage__search--active {
+  color: var(--color-base-dodgerBlue);
 }
 
 .ComponentsPage__listForTable .Component {

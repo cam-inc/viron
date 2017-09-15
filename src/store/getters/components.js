@@ -1,6 +1,8 @@
 import filter from 'mout/array/filter';
 import map from 'mout/array/map';
+import unique from 'mout/array/unique';
 import isArray from 'mout/lang/isArray';
+import forOwn from 'mout/object/forOwn';
 import keys from 'mout/object/keys';
 
 export default {
@@ -51,6 +53,21 @@ export default {
    */
   parameterObjects: (context, riotId) => {
     return context.state.components[riotId].parameterObjects;
+  },
+
+  /**
+   * 全てののparamterObject群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  parameterObjectsEntirely: context => {
+    let entireParameterObjects = [];
+    forOwn(context.state.components, component => {
+      entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
+    });
+    return unique(entireParameterObjects, (a, b) => {
+      return (a.name === b.name);
+    });
   },
 
   /**
