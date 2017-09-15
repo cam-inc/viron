@@ -125,20 +125,13 @@ export default function() {
 
   this.handleSearchButtonMouseOver = () => {
     this.isSearchTooltipVisible = true;
-    this.update();
   };
 
   this.handleSearchButtonMouseOut = () => {
     this.isSearchTooltipVisible = false;
-    this.update();
   };
 
   this.handleSearchButtonTap = () => {
-    // TODO
-    if (this.isPending) {
-      return;
-    }
-
     // ページングに使用するparamerは取り除く。
     const escapedParameterObjects = this.getParameterObjectsForSearch();
 
