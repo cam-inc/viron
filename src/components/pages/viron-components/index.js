@@ -8,7 +8,8 @@ export default function() {
   const store = this.riotx.get();
 
   this.name = store.getter(getters.PAGE_NAME);
-  this.components = store.getter(getters.PAGE_COMPONENTS);
+  this.tableComponents = store.getter(getters.PAGE_COMPONENTS_TABLE);
+  this.notTableComponents = store.getter(getters.PAGE_COMPONENTS_NOT_TABLE);
   this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
 
   /**
@@ -16,6 +17,11 @@ export default function() {
    * @return {Number}
    */
   const getGridColumnCountForCurrentViewport = () => {
+    // table表示以外のコンポーネント数が0の場合はrefs.listが存在しない。適当な固定値を返却する。
+    if (!this.refs.list) {
+      return 1;
+    }
+
     const containerWidth = this.refs.list.getBoundingClientRect().width;
     const baseColumnWith = 400;
     let newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
@@ -53,7 +59,8 @@ export default function() {
   });
   this.listen(states.PAGE, () => {
     this.name = store.getter(getters.PAGE_NAME);
-    this.components = store.getter(getters.PAGE_COMPONENTS);
+    this.tableComponents = store.getter(getters.PAGE_COMPONENTS_TABLE);
+    this.notTableComponents = store.getter(getters.PAGE_COMPONENTS_NOT_TABLE);
     this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
     this.update();
     updateGridColumnCount();

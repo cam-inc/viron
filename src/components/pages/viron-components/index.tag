@@ -5,8 +5,10 @@ viron-components.Page.ComponentsPage
     .ComponentsPage__breadcrumbIcon
       viron-icon(type="right")
     .ComponentsPage__breadcrumbLabel { name } ({ componentsCount })
-  .ComponentsPage__list(ref="list")
-    viron-component(each="{ component, idx in components }" component="{ component }")
+  .ComponentsPage__listForTable(if="{ !!tableComponents.length }")
+    viron-component(each="{ component, idx in tableComponents }" component="{ component }")
+  .ComponentsPage__list(ref="list" if="{ !!notTableComponents.length }")
+    viron-component(each="{ component, idx in notTableComponents }" component="{ component }")
 
   script.
     import '../../organisms/viron-component/index.tag';
