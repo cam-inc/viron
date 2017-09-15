@@ -1,3 +1,6 @@
+import filter from 'mout/array/filter';
+import reject from 'mout/array/reject';
+
 export default {
   /**
    * 全情報を返します。
@@ -45,6 +48,36 @@ export default {
       return [];
     }
     return page.components;
+  },
+
+  /**
+   * table表示のコンポーネント群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  componentsTable: context => {
+    const page = context.state.page;
+    if (!page) {
+      return [];
+    }
+    return filter(page.components, component => {
+      return (component.style === 'table');
+    });
+  },
+
+  /**
+   * table表示以外のコンポーネント群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  componentsNotTable: context => {
+    const page = context.state.page;
+    if (!page) {
+      return [];
+    }
+    return reject(page.components, component => {
+      return (component.style === 'table');
+    });
   },
 
   /**

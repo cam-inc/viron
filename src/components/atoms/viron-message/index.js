@@ -42,7 +42,12 @@ export default function() {
     }
     Promise
       .resolve()
-      .then(() => error.json())
+      .then(() => {
+        if (!!error.json) {
+          return error.json();
+        }
+        return error.text().then(text => JSON.parse(text));
+      })
       .then(json => {
         const error = json.error;
         this.detail = error;

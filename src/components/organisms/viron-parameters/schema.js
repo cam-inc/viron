@@ -9,6 +9,7 @@ export default function() {
   const schemaObject = ObjectAssign({}, this.opts.schemaobject);
   this.schemaObject = schemaObject;
   this.name = schemaObject.name;
+  this.description = schemaObject.description;
   this.selfRequired = schemaObject.selfRequired;
   const keysForInfo = ['enum', 'description', 'required', 'type', 'example', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'format', 'x-wyswyg-options'];
   this.infos = [];
