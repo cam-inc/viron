@@ -123,6 +123,7 @@ export default function() {
     this.update();
   });
 
+  // TOOD: 動作が重いので一旦OFFる。
   this.handleSearchButtonMouseOver = () => {
     this.isSearchTooltipVisible = true;
   };
