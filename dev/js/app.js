@@ -9467,6 +9467,36 @@ var page$2 = {
   },
 
   /**
+   * table表示のコンポーネント群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  componentsTable: context => {
+    const page = context.state.page;
+    if (!page) {
+      return [];
+    }
+    return filter_1$2(page.components, component => {
+      return (component.style === 'table');
+    });
+  },
+
+  /**
+   * table表示以外のコンポーネント群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  componentsNotTable: context => {
+    const page = context.state.page;
+    if (!page) {
+      return [];
+    }
+    return reject_1$2(page.components, component => {
+      return (component.style === 'table');
+    });
+  },
+
+  /**
    * コンポーネント数を返します。
    * @param {riotx.Context} context
    * @return {Number}
@@ -9581,6 +9611,8 @@ const constants$4 = {
   PAGE_ID: 'PAGE_ID',
   PAGE_NAME: 'PAGE_NAME',
   PAGE_COMPONENTS: 'PAGE_COMPONENTS',
+  PAGE_COMPONENTS_TABLE: 'PAGE_COMPONENTS_TABLE',
+  PAGE_COMPONENTS_NOT_TABLE: 'PAGE_COMPONENTS_NOT_TABLE',
   PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
   UA: 'UA',
@@ -9649,6 +9681,8 @@ var getters = {
   [constants$4.PAGE_ID]: page$2.id,
   [constants$4.PAGE_NAME]: page$2.name,
   [constants$4.PAGE_COMPONENTS]: page$2.components,
+  [constants$4.PAGE_COMPONENTS_TABLE]: page$2.componentsTable,
+  [constants$4.PAGE_COMPONENTS_NOT_TABLE]: page$2.componentsNotTable,
   [constants$4.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
   [constants$4.TOASTS]: toasts$2.all,
   [constants$4.UA]: ua$2.all,
@@ -56349,7 +56383,8 @@ var script$59 = function() {
   const store = this.riotx.get();
 
   this.name = store.getter(constants$4.PAGE_NAME);
-  this.components = store.getter(constants$4.PAGE_COMPONENTS);
+  this.tableComponents = store.getter(constants$4.PAGE_COMPONENTS_TABLE);
+  this.notTableComponents = store.getter(constants$4.PAGE_COMPONENTS_NOT_TABLE);
   this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
 
   /**
@@ -56357,6 +56392,11 @@ var script$59 = function() {
    * @return {Number}
    */
   const getGridColumnCountForCurrentViewport = () => {
+    // table表示以外のコンポーネント数が0の場合はrefs.listが存在しない。適当な固定値を返却する。
+    if (!this.refs.list) {
+      return 1;
+    }
+
     const containerWidth = this.refs.list.getBoundingClientRect().width;
     const baseColumnWith = 400;
     let newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
@@ -56394,14 +56434,15 @@ var script$59 = function() {
   });
   this.listen(constants$3.PAGE, () => {
     this.name = store.getter(constants$4.PAGE_NAME);
-    this.components = store.getter(constants$4.PAGE_COMPONENTS);
+    this.tableComponents = store.getter(constants$4.PAGE_COMPONENTS_TABLE);
+    this.notTableComponents = store.getter(constants$4.PAGE_COMPONENTS_NOT_TABLE);
     this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
     this.update();
     updateGridColumnCount();
   });
 };
 
-riot$1.tag2('viron-components', '<div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__list" ref="list"> <viron-component each="{component, idx in components}" component="{component}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+riot$1.tag2('viron-components', '<div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
     this.external(script$59);
 });
 
