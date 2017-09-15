@@ -12,13 +12,14 @@ function createCommonjsModule(fn, module) {
 }
 
 var riot_1 = createCommonjsModule(function (module, exports) {
-/* Riot v3.6.3, @license MIT */
+/* Riot v3.7.0, @license MIT */
 (function (global, factory) {
 	factory(exports);
 }(commonjsGlobal, (function (exports) { 'use strict';
 
 var __TAGS_CACHE = [];
 var __TAG_IMPL = {};
+var YIELD_TAG = 'yield';
 var GLOBAL_MIXIN = '__global_mixin';
 var ATTRS_PREFIX = 'riot-';
 var REF_DIRECTIVES = ['ref', 'data-ref'];
@@ -28,6 +29,7 @@ var LOOP_DIRECTIVE = 'each';
 var LOOP_NO_REORDER_DIRECTIVE = 'no-reorder';
 var SHOW_DIRECTIVE = 'show';
 var HIDE_DIRECTIVE = 'hide';
+var KEY_DIRECTIVE = 'key';
 var RIOT_EVENTS_KEY = '__riot-events__';
 var T_STRING = 'string';
 var T_OBJECT = 'object';
@@ -1398,9 +1400,7 @@ function updateExpression(expr) {
 
     if (attrName === 'value' && dom.value !== value) {
       dom.value = value;
-    }
-
-    if (hasValue && value !== false) {
+    } else if (hasValue && value !== false) {
       setAttr(dom, attrName, value);
     }
 
@@ -1611,6 +1611,22 @@ function append(root, isVirtual) {
 }
 
 /**
+ * Return the value we want to use to lookup the postion of our items in the collection
+ * @param   { String }  keyAttr         - lookup string or expression
+ * @param   { * }       originalItem    - original item from the collection
+ * @param   { Object }  keyedItem       - object created by riot via { item, i in collection }
+ * @param   { Boolean } hasKeyAttrExpr  - flag to check whether the key is an expression
+ * @returns { * } value that we will use to figure out the item position via collection.indexOf
+ */
+function getItemId(keyAttr, originalItem, keyedItem, hasKeyAttrExpr) {
+  if (keyAttr) {
+    return hasKeyAttrExpr ?  tmpl(keyAttr, keyedItem) :  originalItem[keyAttr]
+  }
+
+  return originalItem
+}
+
+/**
  * Manage tags having the 'each'
  * @param   { HTMLElement } dom - DOM node we need to loop
  * @param   { Tag } parent - parent tag instance where the dom node is contained
@@ -1619,6 +1635,8 @@ function append(root, isVirtual) {
  */
 function _each(dom, parent, expr) {
   var mustReorder = typeof getAttr(dom, LOOP_NO_REORDER_DIRECTIVE) !== T_STRING || remAttr(dom, LOOP_NO_REORDER_DIRECTIVE);
+  var keyAttr = getAttr(dom, KEY_DIRECTIVE);
+  var hasKeyAttrExpr = keyAttr ? tmpl.hasExpr(keyAttr) : false;
   var tagName = getTagName(dom);
   var impl = __TAG_IMPL[tagName];
   var parentNode = dom.parentNode;
@@ -1634,6 +1652,7 @@ function _each(dom, parent, expr) {
 
   // remove the each property from the original tag
   remAttr(dom, LOOP_DIRECTIVE);
+  remAttr(dom, KEY_DIRECTIVE);
 
   // parse the each expression
   expr = tmpl.loopKeys(expr);
@@ -1653,6 +1672,7 @@ function _each(dom, parent, expr) {
     var frag = createFrag();
     var isObject$$1 = !isArray(items) && !isString(items);
     var root = placeholder.parentNode;
+    var tmpItems = [];
 
     // if this DOM was removed the update here is useless
     // this condition fixes also a weird async issue on IE in our unit test
@@ -1677,18 +1697,18 @@ function _each(dom, parent, expr) {
     }
 
     // loop all the new items
-    each(items, function (item, i) {
+    each(items, function (_item, i) {
+      var item = !hasKeys && expr.key ? mkitem(expr, _item, i) : _item;
+      var itemId = getItemId(keyAttr, _item, item, hasKeyAttrExpr);
       // reorder only if the items are objects
-      var doReorder = mustReorder && typeof item === T_OBJECT && !hasKeys;
-      var oldPos = oldItems.indexOf(item);
+      var doReorder = mustReorder && typeof _item === T_OBJECT && !hasKeys;
+      var oldPos = oldItems.indexOf(itemId);
       var isNew = oldPos === -1;
       var pos = !isNew && doReorder ? oldPos : i;
       // does a tag exist in this position?
       var tag = tags[pos];
       var mustAppend = i >= oldItems.length;
       var mustCreate =  doReorder && isNew || !doReorder && !tag;
-
-      item = !hasKeys && expr.key ? mkitem(expr, item, i) : item;
 
       // new tag
       if (mustCreate) {
@@ -1715,7 +1735,7 @@ function _each(dom, parent, expr) {
         if (child) { arrayishAdd(parent.tags, tagName, tag, true); }
       } else if (pos !== i && doReorder) {
         // move
-        if (contains(items, oldItems[pos])) {
+        if (keyAttr || contains(items, oldItems[pos])) {
           move.apply(tag, [root, tags[i], isVirtual]);
           // move the old tag instance
           tags.splice(i, 0, tags.splice(pos, 1)[0]);
@@ -1737,6 +1757,8 @@ function _each(dom, parent, expr) {
       tag.__.index = i;
       tag.__.parent = parent;
 
+      tmpItems[i] = itemId;
+
       if (!mustCreate) { tag.update(item); }
     });
 
@@ -1744,7 +1766,7 @@ function _each(dom, parent, expr) {
     unmountRedundant(items, tags);
 
     // clone the items array
-    oldItems = items.slice();
+    oldItems = tmpItems.slice();
 
     root.insertBefore(frag, placeholder);
   };
@@ -1878,7 +1900,7 @@ function parseAttributes(dom, attrs, fn) {
     var bool = isBoolAttr(name);
     var expr;
 
-    if (contains(REF_DIRECTIVES, name)) {
+    if (contains(REF_DIRECTIVES, name) && dom.tagName.toLowerCase() !== YIELD_TAG) {
       expr =  Object.create(RefExpr).init(dom, this$1, name, attr.value);
     } else if (tmpl.hasExpr(attr.value)) {
       expr = {dom: dom, expr: attr.value, attr: name, bool: bool};
@@ -2188,7 +2210,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.6.3';
+var version$1 = 'v3.7.0';
 
 
 var core = Object.freeze({
@@ -2230,12 +2252,24 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
 }
 
 /**
- * Toggle the isMounted flag
+ * Manage the mount state of a tag triggering also the observable events
  * @this Tag
  * @param { Boolean } value - ..of the isMounted flag
  */
-function setIsMounted(value) {
+function setMountState(value) {
+  var ref = this.__;
+  var isAnonymous = ref.isAnonymous;
+
   defineProperty(this, 'isMounted', value);
+
+  if (!isAnonymous) {
+    if (value) { this.trigger('mount'); }
+    else {
+      this.trigger('unmount');
+      this.off('*');
+      this.__.wasCreated = false;
+    }
+  }
 }
 
 
@@ -2273,7 +2307,7 @@ function Tag$1(impl, conf, innerHTML) {
   if (impl.name && root._tag) { root._tag.unmount(true); }
 
   // not yet mounted
-  setIsMounted.call(this, false);
+  defineProperty(this, 'isMounted', false);
 
   defineProperty(this, '__', {
     isAnonymous: isAnonymous,
@@ -2393,7 +2427,7 @@ function Tag$1(impl, conf, innerHTML) {
 
       // init method will be called automatically
       if (instance.init)
-        { instance.init.bind(this$1)(); }
+        { instance.init.bind(this$1)(opts); }
     });
     return this
   }.bind(this));
@@ -2455,13 +2489,11 @@ function Tag$1(impl, conf, innerHTML) {
     if (!skipAnonymous && this.parent) {
       var p = getImmediateCustomParentTag(this.parent);
       p.one(!p.isMounted ? 'mount' : 'updated', function () {
-        setIsMounted.call(this$1, true);
-        this$1.trigger('mount');
+        setMountState.call(this$1, true);
       });
     } else {
       // otherwise it's not a child tag we can trigger its mount event
-      setIsMounted.call(this, true);
-      if (!skipAnonymous) { this.trigger('mount'); }
+      setMountState.call(this, true);
     }
 
     this.__.wasCreated = true;
@@ -2540,15 +2572,12 @@ function Tag$1(impl, conf, innerHTML) {
     // custom internal unmount function to avoid relying on the observable
     if (this.__.onUnmount) { this.__.onUnmount(); }
 
-    if (!skipAnonymous) {
-      // weird fix for a weird edge case #2409
-      if (!this.isMounted) { this.trigger('mount'); }
-      this.trigger('unmount');
-      this.off('*');
-    }
+    // weird fix for a weird edge case #2409 and #2436
+    // some users might use your software not as you've expected
+    // so I need to add these dirty hacks to mitigate unexpected issues
+    if (!this.isMounted) { setMountState.call(this, true); }
 
-    defineProperty(this, 'isMounted', false);
-    this.__.wasCreated = false;
+    setMountState.call(this, false);
 
     delete this.root._tag;
 
@@ -10638,53 +10667,67 @@ var components$3 = {
     const currentEndpointKey = context.getter(constants$4.CURRENT);
     const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
-    return api(query, {
-      requestInterceptor: req => {
-        req.headers['Authorization'] = token;
-      }
-    }).then(res => {
-      if (!res.ok) {
-        return Promise.reject(res);
-      }
-      return res;
-    }).then(res => {
-      // tokenを更新する。
-      const token = res.headers['Authorization'];
-      if (!!token) {
-        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-      }
-      // `component.pagination`からページングをサポートしているか判断する。
-      // サポートしていれば手動でページング情報を付加する。
-      let hasPagination = false;
-      let pagination;
-      if (component.pagination) {
-        const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
-        const size = Number(res.headers['x-pagination-limit'] || 0);
-        const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
-        pagination = {
-          // `x-pagination-current-page`等は独自仕様。
-          // VIRONを使用するサービスはこの仕様に沿う必要がある。
-          currentPage,
-          size,
-          maxPage
-        };
-        // 2ページ以上存在する場合のみページングをONにする。
-        if (maxPage >= 2) {
-          hasPagination = true;
+    const networkingId = `networking_${Date.now()}`;
+
+    return Promise
+      .resolve()
+      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
+      .then(() => api(query, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
         }
-      }
-      context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
-        component_uid,
-        response: res.obj,// APIレスポンス内容そのまま。
-        schemaObject: context.getter(constants$4.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
-        parameterObjects: context.getter(constants$4.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
-        actions,// 関連API群。
-        hasPagination,
-        pagination,// ページング関連。
-        primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
-        table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
+        // `component.pagination`からページングをサポートしているか判断する。
+        // サポートしていれば手動でページング情報を付加する。
+        let hasPagination = false;
+        let pagination;
+        if (component.pagination) {
+          const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
+          const size = Number(res.headers['x-pagination-limit'] || 0);
+          const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
+          pagination = {
+            // `x-pagination-current-page`等は独自仕様。
+            // VIRONを使用するサービスはこの仕様に沿う必要がある。
+            currentPage,
+            size,
+            maxPage
+          };
+          // 2ページ以上存在する場合のみページングをONにする。
+          if (maxPage >= 2) {
+            hasPagination = true;
+          }
+        }
+        context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
+          component_uid,
+          response: res.obj,// APIレスポンス内容そのまま。
+          schemaObject: context.getter(constants$4.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
+          parameterObjects: context.getter(constants$4.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
+          actions,// 関連API群。
+          hasPagination,
+          pagination,// ページング関連。
+          primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
+          table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
+        });
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      })
+      .catch(err => {
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
       });
-    });
   },
 
   /**
@@ -10698,34 +10741,47 @@ var components$3 = {
     const api = context.getter(constants$4.OAS_API, operationObject.operationId);
     const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
     const currentEndpointKey = context.getter(constants$4.CURRENT);
+    const networkingId = `networking_${Date.now()}`;
 
-    return api(params, {
-      requestInterceptor: req => {
-        req.headers['Authorization'] = token;
-      }
-    }).then(res => {
-      if (!res.ok) {
-        return Promise.reject(res);
-      }
-      return res;
-    }).then(res => {
-      // tokenを更新する。
-      const token = res.headers['Authorization'];
-      if (!!token) {
-        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-      }
-      // ダウンロード指定されていればダウンロードする。
-      const contentDispositionHeader = res.headers['content-disposition'];
-      if (!contentDispositionHeader) {
+    return Promise
+      .resolve()
+      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
+      .then(() => api(params, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
         return res;
-      }
-      const downloadFileInfo = contentDisposition_1.parse(contentDispositionHeader);
-      if (downloadFileInfo.type !== 'attachment') {
+      })
+      .then(res => {
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
+        // ダウンロード指定されていればダウンロードする。
+        const contentDispositionHeader = res.headers['content-disposition'];
+        if (!contentDispositionHeader) {
+          return res;
+        }
+        const downloadFileInfo = contentDisposition_1.parse(contentDispositionHeader);
+        if (downloadFileInfo.type !== 'attachment') {
+          return res;
+        }
+        download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
         return res;
-      }
-      download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
-      return res;
-    });
+      })
+      .catch(err => {
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
+      });
   },
 
   /**
@@ -10800,9 +10856,13 @@ var viron$3 = {
     const currentEndpointKey = context.getter(constants$4.CURRENT);
     const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
+    const networkingId = `networking_${Date.now()}`;
 
     return Promise
       .resolve()
+      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
       .then(() => api({}, {
         requestInterceptor: req => {
           req.headers['Authorization'] = token;
@@ -10825,6 +10885,11 @@ var viron$3 = {
         // pagesは不要なので削除。
         delete endpoint.pages;
         context.commit(constants$2.ENDPOINTS_UPDATE, currentEndpointKey, endpoint);
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      })
+      .catch(err => {
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
       });
   },
 
@@ -11899,7 +11964,12 @@ var script$2 = function() {
     }
     Promise
       .resolve()
-      .then(() => error.json())
+      .then(() => {
+        if (!!error.json) {
+          return error.json();
+        }
+        return error.text().then(text => JSON.parse(text));
+      })
       .then(json => {
         const error = json.error;
         this.detail = error;
@@ -26336,6 +26406,7 @@ var script$30 = function() {
   const schemaObject = objectAssign$1({}, this.opts.schemaobject);
   this.schemaObject = schemaObject;
   this.name = schemaObject.name;
+  this.description = schemaObject.description;
   this.selfRequired = schemaObject.selfRequired;
   const keysForInfo = ['enum', 'description', 'required', 'type', 'example', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'format', 'x-wyswyg-options'];
   this.infos = [];
@@ -26561,7 +26632,7 @@ var script$30 = function() {
       break;
     }
     arr.push(defaultValue);
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 
   // -ボタンがタップされた時の処理。
@@ -26577,30 +26648,30 @@ var script$30 = function() {
     const arr = this.opts.val.concat([]);
     // undefinedを追加することで空の入力フォームを出力できる。
     arr.splice(idx, 1);
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 
   // formが変更された時の処理。
   this.handleFormChange = newValue => {
-    this.opts.onchange(newValue, this.opts.key);
+    this.opts.onchange(newValue, this.opts.propkey);
   };
 
   // propertiesが変更された時の処理。
   this.handlePropertyChange = (newValue, key) => {
     const obj = objectAssign$1(this.opts.val);
     obj[key] = newValue;
-    this.opts.onchange(obj, this.opts.key);
+    this.opts.onchange(obj, this.opts.propkey);
   };
 
   // itemsが変更された時の処理。
   this.handleItemsChange = (newValue, idx) => {
     const arr = this.opts.val.concat([]);
     arr[idx] = newValue;
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 };
 
-riot$1.tag2('viron-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <viron-icon type="right"></viron-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}</div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <viron-icon type="plusCircle"></viron-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <viron-icon type="minusCircle"></viron-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <viron-icon type="filetext"></viron-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <viron-icon type="infoCirlceO"></viron-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <viron-prettyprint data="{opts.val}"></viron-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <viron-parameter-form val="{opts.val}" schemaobject="{schemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleFormChange}"></viron-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameter-schema each="{property, key in properties}" key="{key}" val="{parent.getPropertyValue(property, key)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, key)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handlePropertyChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <viron-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" key="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" additionalinfo="{parent.opts.additionalinfo}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema {\'ParameterSchema--disabled\' : isDisabled}"', function(opts) {
+riot$1.tag2('viron-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <viron-icon type="right"></viron-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}<span if="{description}">({description})</span></div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <viron-icon type="plusCircle"></viron-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <viron-icon type="minusCircle"></viron-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <viron-icon type="filetext"></viron-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <viron-icon type="infoCirlceO"></viron-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <viron-prettyprint data="{opts.val}"></viron-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <viron-parameter-form val="{opts.val}" schemaobject="{schemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleFormChange}"></viron-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameter-schema each="{property, propKey in properties}" propkey="{propKey}" val="{parent.getPropertyValue(property, propKey)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, propKey)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handlePropertyChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <viron-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" propkey="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" additionalinfo="{parent.opts.additionalinfo}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema {\'ParameterSchema--disabled\' : isDisabled}"', function(opts) {
     this.external(script$30);
 });
 
@@ -54462,10 +54533,514 @@ return /******/ (function(modules) { // webpackBootstrap
 
 var chart$1 = unwrapExports(tauCharts);
 
+var tauCharts_tooltip = createCommonjsModule(function (module) {
+(function (factory) {
+    if (typeof undefined === 'function' && undefined.amd) {
+        undefined(['taucharts'], function (tauPlugins) {
+            return factory(tauPlugins);
+        });
+    } else if ('object' === 'object' && module.exports) {
+        var tauPlugins = tauCharts;
+        module.exports = factory(tauPlugins);
+    } else {
+        factory(this.tauCharts);
+    }
+})(function (tauCharts$$1) {
+
+    var d3 = tauCharts$$1.api.d3;
+    var utils = tauCharts$$1.api.utils;
+    var pluginsSDK = tauCharts$$1.api.pluginsSDK;
+    var TARGET_SVG_CLASS = 'graphical-report__tooltip-target';
+
+    var escapeHtml = function (x) {
+        return String(x)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
+    function Tooltip(xSettings) {
+
+        var settings = utils.defaults(
+            xSettings || {},
+            {
+                // add default settings here
+                align: 'bottom-right',
+                escapeHtml: true,
+                fields: null,
+                formatters: {},
+                dockToData: false,
+                aggregationGroupFields: [],
+                onRevealAggregation: function (filters, row) {
+                    console.log(
+                        'Setup [onRevealAggregation] callback and filter original data by the following criteria: ',
+                        JSON.stringify(filters, null, 2));
+                },
+                spacing: 24
+            });
+
+        var plugin = {
+
+            init: function (chart) {
+
+                this._chart = chart;
+                this._metaInfo = {};
+                this._skipInfo = {};
+
+                // NOTE: for compatibility with old Tooltip implementation.
+                Object.assign(this, utils.omit(settings, 'fields', 'getFields'));
+
+                this._tooltip = this._chart.addBalloon(
+                    {
+                        spacing: settings.spacing,
+                        auto: true,
+                        effectClass: 'fade'
+                    });
+
+                var revealAggregationBtn = ((settings.aggregationGroupFields.length > 0) ?
+                        (this.templateRevealAggregation) :
+                        ('')
+                );
+
+                var template = utils.template(this.template);
+                var tooltipNode = this.getTooltipNode();
+
+                this._tooltip
+                    .content(template({
+                        revealTemplate: revealAggregationBtn,
+                        excludeTemplate: this.templateExclude
+                    }));
+
+                tooltipNode
+                    .addEventListener('click', function (e) {
+
+                        var target = e.target;
+
+                        while (target !== e.currentTarget && target !== null) {
+                            if (target.classList.contains('i-role-exclude')) {
+                                this._exclude();
+                                this.setState({
+                                    highlight: null,
+                                    isStuck: false
+                                });
+                            }
+
+                            if (target.classList.contains('i-role-reveal')) {
+                                this._reveal();
+                                this.setState({
+                                    highlight: null,
+                                    isStuck: false
+                                });
+                            }
+
+                            target = target.parentNode;
+                        }
+
+                    }.bind(this), false);
+
+                this._scrollHandler = function () {
+                    this.setState({
+                        highlight: null,
+                        isStuck: false
+                    });
+                }.bind(this);
+                window.addEventListener('scroll', this._scrollHandler, true);
+
+                this._outerClickHandler = function (e) {
+                    var tooltipRect = this.getTooltipNode().getBoundingClientRect();
+                    if ((e.clientX < tooltipRect.left) ||
+                        (e.clientX > tooltipRect.right) ||
+                        (e.clientY < tooltipRect.top) ||
+                        (e.clientY > tooltipRect.bottom)
+                    ) {
+                        this.setState({
+                            highlight: null,
+                            isStuck: false
+                        });
+                    }
+                }.bind(this);
+
+                // Handle initial state
+                this.setState(this.state);
+
+                this.afterInit(tooltipNode);
+            },
+
+            getTooltipNode: function () {
+                return this._tooltip.getElement();
+            },
+
+            state: {
+                highlight: null,
+                isStuck: false
+            },
+
+            setState: function (newState) {
+                var prev = this.state;
+                var state = this.state = Object.assign({}, prev, newState);
+                prev.highlight = prev.highlight || {data: null, cursor: null, unit: null};
+                state.highlight = state.highlight || {data: null, cursor: null, unit: null};
+
+                // If stuck, treat that data has not changed
+                if (state.isStuck && prev.highlight.data) {
+                    state.highlight = prev.highlight;
+                }
+
+                // Show/hide tooltip
+                if (state.highlight.data !== prev.highlight.data) {
+                    if (state.highlight.data) {
+                        this.hideTooltip();
+                        this.showTooltip(
+                            state.highlight.data,
+                            state.highlight.cursor
+                        );
+                        this._setTargetSvgClass(true);
+                        requestAnimationFrame(function () {
+                            this._setTargetSvgClass(true);
+                        }.bind(this));
+                    } else if (!state.isStuck && prev.highlight.data && !state.highlight.data) {
+                        this._removeFocus();
+                        this.hideTooltip();
+                        this._setTargetSvgClass(false);
+                    }
+                }
+
+                // Update tooltip position
+                if (state.highlight.data && (
+                    !prev.highlight.cursor ||
+                    state.highlight.cursor.x !== prev.highlight.cursor.x ||
+                    state.highlight.cursor.y !== prev.highlight.cursor.y
+                )) {
+                    this._tooltip.position(state.highlight.cursor.x, state.highlight.cursor.y);
+                }
+
+                // Stick/unstick tooltip
+                var tooltipNode = this.getTooltipNode();
+                if (state.isStuck !== prev.isStuck) {
+                    if (state.isStuck) {
+                        window.addEventListener('click', this._outerClickHandler, true);
+                        tooltipNode.classList.add('stuck');
+                        this._setTargetEventsEnabled(false);
+                        this._accentFocus(state.highlight.data);
+                        this._tooltip.updateSize();
+                    } else {
+                        window.removeEventListener('click', this._outerClickHandler, true);
+                        tooltipNode.classList.remove('stuck');
+                        // NOTE: Prevent showing tooltip immediately
+                        // after pointer events appear.
+                        requestAnimationFrame(function () {
+                            this._setTargetEventsEnabled(true);
+                        }.bind(this));
+                    }
+                }
+            },
+
+            showTooltip: function (data, cursor) {
+
+                var content = this.getTooltipNode().querySelectorAll('.i-role-content')[0];
+                if (content) {
+                    var fields = (
+                        settings.fields
+                        ||
+                        ((typeof settings.getFields === 'function') && settings.getFields(this._chart))
+                        ||
+                        Object.keys(data)
+                    );
+                    content.innerHTML = this.render(data, fields);
+                }
+
+                this._tooltip
+                    .position(cursor.x, cursor.y)
+                    .place(settings.align)
+                    .show()
+                    .updateSize();
+            },
+
+            hideTooltip: function (e) {
+                window.removeEventListener('click', this._outerClickHandler, true);
+                this._tooltip.hide();
+            },
+
+            destroy: function () {
+                window.removeEventListener('scroll', this._scrollHandler, true);
+                this._setTargetSvgClass(false);
+                this.setState({
+                    highlight: null,
+                    isStuck: false
+                });
+                this._tooltip.destroy();
+            },
+
+            _subscribeToHover: function () {
+
+                var elementsToMatch = [
+                    'ELEMENT.LINE',
+                    'ELEMENT.AREA',
+                    'ELEMENT.PATH',
+                    'ELEMENT.INTERVAL',
+                    'ELEMENT.INTERVAL.STACKED',
+                    'ELEMENT.POINT'
+                ];
+
+                this._chart
+                    .select(function (node) {
+                        return (elementsToMatch.indexOf(node.config.type) >= 0);
+                    })
+                    .forEach(function (node) {
+
+                        node.on('data-hover', function (sender, e) {
+                            var bodyRect = document.body.getBoundingClientRect();
+                            this.setState({
+                                highlight: (e.data ? {
+                                    data: e.data,
+                                    cursor: {
+                                        x: (e.event.clientX - bodyRect.left),
+                                        y: (e.event.clientY - bodyRect.top)
+                                    },
+                                    unit: sender
+                                } : null)
+                            });
+                        }.bind(this));
+
+                        node.on('data-click', function (sender, e) {
+                            var bodyRect = document.body.getBoundingClientRect();
+                            this.setState(e.data ? {
+                                highlight: {
+                                    data: e.data,
+                                    cursor: {
+                                        x: (e.event.clientX - bodyRect.left),
+                                        y: (e.event.clientY - bodyRect.top)
+                                    },
+                                    unit: sender
+                                },
+                                isStuck: true
+                            } : {
+                                    highlight: null,
+                                    isStuck: null
+                                });
+                        }.bind(this));
+                    }, this);
+            },
+
+            afterInit: function (tooltipNode) {
+                // for override
+            },
+
+            render: function (data, fields) {
+                var self = this;
+                return fields
+                    .filter(function (k) {
+                        var tokens = k.split('.');
+                        var matchX = ((tokens.length === 2) && self._skipInfo[tokens[0]]);
+                        return !matchX;
+                    })
+                    .map(function (k) {
+                        var key = k;
+                        var val = data[k];
+                        return self.renderItem(self._getLabel(key), self._getFormat(key)(val), key, val);
+                    })
+                    .join('');
+            },
+
+            renderItem: function (label, formattedValue, fieldKey, fieldVal) {
+                return this.itemTemplate({
+                    label: settings.escapeHtml ? escapeHtml(label) : label,
+                    value: settings.escapeHtml ? escapeHtml(formattedValue) : formattedValue
+                });
+            },
+
+            _getFormat: function (k) {
+                var meta = this._metaInfo[k] || {format: function (x) {
+                    return String(x);
+                }};
+                return meta.format;
+            },
+
+            _getLabel: function (k) {
+                var meta = this._metaInfo[k] || {label: k};
+                return meta.label;
+            },
+
+            _accentFocus: function (data) {
+                var filter = function (d) {
+                    return (d === data);
+                };
+                this._chart
+                    .select(function () {
+                        return true;
+                    }).forEach(function (unit) {
+                        unit.fire('highlight', filter);
+                    });
+            },
+
+            _removeFocus: function () {
+                var filter = function () {
+                    return null;
+                };
+                this._chart
+                    .select(function () {
+                        return true;
+                    }).forEach(function (unit) {
+                        unit.fire('highlight', filter);
+                        unit.fire('highlight-data-points', filter);
+                    });
+            },
+
+            _reveal: function () {
+                var aggregatedRow = this.state.highlight.data;
+                var groupFields = (settings.aggregationGroupFields || []);
+                var descFilters = groupFields.reduce(function (memo, k) {
+                    if (aggregatedRow.hasOwnProperty(k)) {
+                        memo[k] = aggregatedRow[k];
+                    }
+                    return memo;
+                }, {});
+
+                settings.onRevealAggregation(descFilters, aggregatedRow);
+            },
+
+            _exclude: function () {
+                this._chart
+                    .addFilter({
+                        tag: 'exclude',
+                        predicate: (function (element) {
+                            return function (row) {
+                                return JSON.stringify(row) !== JSON.stringify(element);
+                            };
+                        }(this.state.highlight.data))
+                    });
+                this._chart.refresh();
+            },
+
+            onRender: function () {
+
+                var info = this._getFormatters();
+                this._metaInfo = info.meta;
+                this._skipInfo = info.skip;
+
+                this._subscribeToHover();
+
+                this.setState({
+                    highlight: null,
+                    isStuck: false
+                });
+            },
+
+            _setTargetSvgClass: function (isSet) {
+                d3.select(this._chart.getSVG()).classed(TARGET_SVG_CLASS, isSet);
+            },
+
+            _setTargetEventsEnabled: function (isSet) {
+                if (isSet) {
+                    this._chart.enablePointerEvents();
+                } else {
+                    this._chart.disablePointerEvents();
+                }
+            },
+
+            templateRevealAggregation: [
+                '<div class="i-role-reveal graphical-report__tooltip__vertical">',
+                '   <div class="graphical-report__tooltip__vertical__wrap">',
+                '       Reveal',
+                '   </div>',
+                '</div>'
+            ].join(''),
+
+            templateExclude: [
+                '<div class="i-role-exclude graphical-report__tooltip__exclude">',
+                '   <div class="graphical-report__tooltip__exclude__wrap">',
+                '       <span class="tau-icon-close-gray"></span>',
+                '       Exclude',
+                '   </div>',
+                '</div>'
+            ].join(''),
+
+            template: [
+                '<div class="i-role-content graphical-report__tooltip__content"></div>',
+                '<%= revealTemplate %>',
+                '<%= excludeTemplate %>'
+            ].join(''),
+
+            itemTemplate: utils.template([
+                '<div class="graphical-report__tooltip__list__item">',
+                '<div class="graphical-report__tooltip__list__elem"><%=label%></div>',
+                '<div class="graphical-report__tooltip__list__elem"><%=value%></div>',
+                '</div>'
+            ].join('')),
+
+            _getFormatters: function () {
+
+                var info = pluginsSDK.extractFieldsFormatInfo(this._chart.getSpec());
+                var skip = {};
+                Object.keys(info).forEach(function (k) {
+
+                    if (info[k].isComplexField) {
+                        skip[k] = true;
+                    }
+
+                    if (info[k].parentField) {
+                        delete info[k];
+                    }
+                });
+
+                var toLabelValuePair = function (x) {
+
+                    var res = {};
+
+                    if (typeof x === 'function' || typeof x === 'string') {
+                        res = {format: x};
+                    } else if (utils.isObject(x)) {
+                        res = utils.pick(x, 'label', 'format', 'nullAlias');
+                    }
+
+                    return res;
+                };
+
+                Object.keys(settings.formatters).forEach(function (k) {
+
+                    var fmt = toLabelValuePair(settings.formatters[k]);
+
+                    info[k] = Object.assign(
+                        ({label: k, nullAlias: ('No ' + k)}),
+                        (info[k] || {}),
+                        (utils.pick(fmt, 'label', 'nullAlias')));
+
+                    if (fmt.hasOwnProperty('format')) {
+                        info[k].format = (typeof fmt.format === 'function') ?
+                            (fmt.format) :
+                            (tauCharts$$1.api.tickFormat.get(fmt.format, info[k].nullAlias));
+                    } else {
+                        info[k].format = (info[k].hasOwnProperty('format')) ?
+                            (info[k].format) :
+                            (tauCharts$$1.api.tickFormat.get(null, info[k].nullAlias));
+                    }
+                });
+
+                return {
+                    meta: info,
+                    skip: skip
+                };
+            }
+        };
+
+        return plugin;
+    }
+
+    tauCharts$$1.api.plugins.add('tooltip', Tooltip);
+
+    return Tooltip;
+});
+});
+
 var script$34 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign$1({
-      type: 'bar'
+      type: 'bar',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
@@ -54477,7 +55052,10 @@ riot$1.tag2('viron-component-graph-bar', '<div class="ComponentGraphBar__canvas"
 var script$35 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign$1({
-      type: 'horizontalBar'
+      type: 'horizontalBar',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
@@ -54489,7 +55067,10 @@ riot$1.tag2('viron-component-graph-horizontal-bar', '<div class="ComponentGraphH
 var script$36 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign$1({
-      type: 'horizontal-stacked-bar'
+      type: 'horizontal-stacked-bar',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
@@ -54504,7 +55085,10 @@ var script$37 = function() {
       type: 'line',
       guide: {
         interpolate: 'smooth'
-      }
+      },
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
@@ -54516,7 +55100,10 @@ riot$1.tag2('viron-component-graph-line', '<div class="ComponentGraphLine__canva
 var script$38 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign$1({
-      type: 'scatterplot'
+      type: 'scatterplot',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
@@ -54528,7 +55115,10 @@ riot$1.tag2('viron-component-graph-scatterplot', '<div class="ComponentGraphScat
 var script$39 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign$1({
-      type: 'stacked-area'
+      type: 'stacked-area',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
@@ -54540,7 +55130,10 @@ riot$1.tag2('viron-component-graph-stacked-area', '<div class="ComponentGraphSta
 var script$40 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign$1({
-      type: 'stacked-bar'
+      type: 'stacked-bar',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
