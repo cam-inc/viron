@@ -1553,6 +1553,39 @@ definitions:
         type: string
         format: full-time
 
+  MultiQueryCollection:
+    items:
+      $ref: '#/definitions/MultiQuery'
+    type: array
+
+  MultiQuery:
+    type: object
+    properties:
+      id:
+        description: id of multiquery
+        example: m1
+        type: string
+      name:
+        description: name of multiquery
+        example: m-name
+        type: string
+      age:
+        description: age of multiquery
+        example: 22
+        type: integer
+      address:
+        description: address of multiquery
+        example: 'shibuya-ku dogenzaka'
+        type: string
+      job:
+        description: job of multiquery
+        example: 学生
+        type: string
+      detail:
+        description: detail of multiquery
+        example: 詳細詳細詳細詳細
+        type: string
+
 #################################################
 # paths
 # - APIの一覧
@@ -3719,6 +3752,286 @@ paths:
       summary: フォーマット更新
       tags:
       - format
+
+  /multiquery/a:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索A
+      operationId: multiquery#a
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: name of multiquery
+        in: query
+        name: name
+        required: false
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - multiquery
+
+  /multiquery/b:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索B
+      operationId: multiquery#b
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: name of multiquery
+        in: query
+        name: name
+        required: false
+        type: string
+      - description: age of multiquery
+        in: query
+        name: age
+        required: false
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - multiquery
+
+  /multiquery/c:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索C
+      operationId: multiquery#c
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: age of multiquery
+        in: query
+        name: age
+        required: false
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - multiquery
+
+  /multiquery/d:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索D
+      operationId: multiquery#d
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: address of multiquery
+        in: query
+        name: address
+        required: false
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - multiquery
+
+  /multiquery/e:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索E
+      operationId: multiquery#e
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: job of multiquery
+        in: query
+        name: job
+        required: false
+        type: string
+      - description: name of multiquery
+        in: query
+        name: name
+        required: false
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - multiquery
 
 #################################################
 # securityDefinitions

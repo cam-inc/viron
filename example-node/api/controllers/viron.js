@@ -151,6 +151,34 @@ const show = (req, res) => {
               genTableComponent('フォーマット', 'get', '/format', 'id', null, ['id']),
             ],
           },
+          {
+            id: 'multiquery',
+            name: '横断検索',
+            components: [
+              genTableComponent('A', 'get', '/multiquery/a', null, [
+                {key: 'id', type: 'string'},
+                {key: 'name', type: 'string'},
+              ], ['id', 'name']),
+              genTableComponent('B', 'get', '/multiquery/b', null, [
+                {key: 'id', type: 'string'},
+                {key: 'name', type: 'string'},
+                {key: 'age', type: 'integer'},
+              ], ['id', 'name', 'age']),
+              genTableComponent('C', 'get', '/multiquery/c', null, [
+                {key: 'id', type: 'string'},
+                {key: 'age', type: 'integer'},
+              ], ['id', 'age']),
+              genTableComponent('D', 'get', '/multiquery/d', null, [
+                {key: 'id', type: 'string'},
+                {key: 'address', type: 'string'},
+              ], ['id', 'address']),
+              genTableComponent('E', 'get', '/multiquery/e', null, [
+                {key: 'id', type: 'string'},
+                {key: 'job', type: 'string'},
+                {key: 'name', type: 'string'},
+              ], ['id', 'job', 'name']),
+            ],
+          },
         ],
         [constant.GROUP_BLOG]: [
           {
