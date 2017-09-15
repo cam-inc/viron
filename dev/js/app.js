@@ -56509,22 +56509,16 @@ var script$59 = function() {
     this.update();
   });
 
+  // TOOD: 動作が重いので一旦OFFる。
   this.handleSearchButtonMouseOver = () => {
     this.isSearchTooltipVisible = true;
-    this.update();
   };
 
   this.handleSearchButtonMouseOut = () => {
     this.isSearchTooltipVisible = false;
-    this.update();
   };
 
   this.handleSearchButtonTap = () => {
-    // TODO
-    if (this.isPending) {
-      return;
-    }
-
     // ページングに使用するparamerは取り除く。
     const escapedParameterObjects = this.getParameterObjectsForSearch();
 
@@ -56556,7 +56550,7 @@ var script$59 = function() {
   };
 };
 
-riot$1.tag2('viron-components', '<div class="ComponentsPage__head"> <div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__control"> <div class="ComponentsPage__search {isCurrentSearchRequestParametersEmpty() ? \'\' : \'ComponentsPage__search--active\'}" if="{!!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap" onmouseover="{handleSearchButtonMouseOver}" onmouseout="{handleSearchButtonMouseOut}"> <viron-icon type="search"></viron-icon> <viron-tooltip if="{isSearchTooltipVisible}" placement="bottomRight" label="全体検索"></viron-tooltip> </div> </div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+riot$1.tag2('viron-components', '<div class="ComponentsPage__head"> <div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__control"> <div class="ComponentsPage__search {isCurrentSearchRequestParametersEmpty() ? \'\' : \'ComponentsPage__search--active\'}" if="{!!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap"> <viron-icon type="search"></viron-icon> <viron-tooltip if="{isSearchTooltipVisible}" placement="bottomRight" label="全体検索"></viron-tooltip> </div> </div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
     this.external(script$59);
 });
 
