@@ -4,6 +4,7 @@ viron-parameter-schema.ParameterSchema(class="{ 'ParameterSchema--disabled' : is
       .ParameterSchema__bodyOpenShutButton(class="{ isBodyOpened ? 'ParameterSchema__bodyOpenShutButton--active' : '' }" ref="touch" onTap="handleBodyOpenShutButtonTap")
         viron-icon(type="right")
       .ParameterSchema__name(ref="touch" onTap="handleNameTap") { name }
+        span(if="{ description }") ({ description })
       .ParameterSchema__line
       .ParameterSchema__selfRequired(if="{ selfRequired }") required
       .ParameterSchema__validateOpenShutButton(if="{ !!getValidateErrors().length }" class="{ isValidateOpened ? '.ParameterSchema__validateOpenShutButton--active' : '' }" ref="touch" onTap="handleValidateOpenShutButtonTap")
