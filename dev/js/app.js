@@ -12,14 +12,13 @@ function createCommonjsModule(fn, module) {
 }
 
 var riot_1 = createCommonjsModule(function (module, exports) {
-/* Riot v3.7.0, @license MIT */
+/* Riot v3.6.3, @license MIT */
 (function (global, factory) {
 	factory(exports);
 }(commonjsGlobal, (function (exports) { 'use strict';
 
 var __TAGS_CACHE = [];
 var __TAG_IMPL = {};
-var YIELD_TAG = 'yield';
 var GLOBAL_MIXIN = '__global_mixin';
 var ATTRS_PREFIX = 'riot-';
 var REF_DIRECTIVES = ['ref', 'data-ref'];
@@ -29,7 +28,6 @@ var LOOP_DIRECTIVE = 'each';
 var LOOP_NO_REORDER_DIRECTIVE = 'no-reorder';
 var SHOW_DIRECTIVE = 'show';
 var HIDE_DIRECTIVE = 'hide';
-var KEY_DIRECTIVE = 'key';
 var RIOT_EVENTS_KEY = '__riot-events__';
 var T_STRING = 'string';
 var T_OBJECT = 'object';
@@ -1400,7 +1398,9 @@ function updateExpression(expr) {
 
     if (attrName === 'value' && dom.value !== value) {
       dom.value = value;
-    } else if (hasValue && value !== false) {
+    }
+
+    if (hasValue && value !== false) {
       setAttr(dom, attrName, value);
     }
 
@@ -1611,22 +1611,6 @@ function append(root, isVirtual) {
 }
 
 /**
- * Return the value we want to use to lookup the postion of our items in the collection
- * @param   { String }  keyAttr         - lookup string or expression
- * @param   { * }       originalItem    - original item from the collection
- * @param   { Object }  keyedItem       - object created by riot via { item, i in collection }
- * @param   { Boolean } hasKeyAttrExpr  - flag to check whether the key is an expression
- * @returns { * } value that we will use to figure out the item position via collection.indexOf
- */
-function getItemId(keyAttr, originalItem, keyedItem, hasKeyAttrExpr) {
-  if (keyAttr) {
-    return hasKeyAttrExpr ?  tmpl(keyAttr, keyedItem) :  originalItem[keyAttr]
-  }
-
-  return originalItem
-}
-
-/**
  * Manage tags having the 'each'
  * @param   { HTMLElement } dom - DOM node we need to loop
  * @param   { Tag } parent - parent tag instance where the dom node is contained
@@ -1635,8 +1619,6 @@ function getItemId(keyAttr, originalItem, keyedItem, hasKeyAttrExpr) {
  */
 function _each(dom, parent, expr) {
   var mustReorder = typeof getAttr(dom, LOOP_NO_REORDER_DIRECTIVE) !== T_STRING || remAttr(dom, LOOP_NO_REORDER_DIRECTIVE);
-  var keyAttr = getAttr(dom, KEY_DIRECTIVE);
-  var hasKeyAttrExpr = keyAttr ? tmpl.hasExpr(keyAttr) : false;
   var tagName = getTagName(dom);
   var impl = __TAG_IMPL[tagName];
   var parentNode = dom.parentNode;
@@ -1652,7 +1634,6 @@ function _each(dom, parent, expr) {
 
   // remove the each property from the original tag
   remAttr(dom, LOOP_DIRECTIVE);
-  remAttr(dom, KEY_DIRECTIVE);
 
   // parse the each expression
   expr = tmpl.loopKeys(expr);
@@ -1672,7 +1653,6 @@ function _each(dom, parent, expr) {
     var frag = createFrag();
     var isObject$$1 = !isArray(items) && !isString(items);
     var root = placeholder.parentNode;
-    var tmpItems = [];
 
     // if this DOM was removed the update here is useless
     // this condition fixes also a weird async issue on IE in our unit test
@@ -1697,18 +1677,18 @@ function _each(dom, parent, expr) {
     }
 
     // loop all the new items
-    each(items, function (_item, i) {
-      var item = !hasKeys && expr.key ? mkitem(expr, _item, i) : _item;
-      var itemId = getItemId(keyAttr, _item, item, hasKeyAttrExpr);
+    each(items, function (item, i) {
       // reorder only if the items are objects
-      var doReorder = mustReorder && typeof _item === T_OBJECT && !hasKeys;
-      var oldPos = oldItems.indexOf(itemId);
+      var doReorder = mustReorder && typeof item === T_OBJECT && !hasKeys;
+      var oldPos = oldItems.indexOf(item);
       var isNew = oldPos === -1;
       var pos = !isNew && doReorder ? oldPos : i;
       // does a tag exist in this position?
       var tag = tags[pos];
       var mustAppend = i >= oldItems.length;
       var mustCreate =  doReorder && isNew || !doReorder && !tag;
+
+      item = !hasKeys && expr.key ? mkitem(expr, item, i) : item;
 
       // new tag
       if (mustCreate) {
@@ -1735,7 +1715,7 @@ function _each(dom, parent, expr) {
         if (child) { arrayishAdd(parent.tags, tagName, tag, true); }
       } else if (pos !== i && doReorder) {
         // move
-        if (keyAttr || contains(items, oldItems[pos])) {
+        if (contains(items, oldItems[pos])) {
           move.apply(tag, [root, tags[i], isVirtual]);
           // move the old tag instance
           tags.splice(i, 0, tags.splice(pos, 1)[0]);
@@ -1757,8 +1737,6 @@ function _each(dom, parent, expr) {
       tag.__.index = i;
       tag.__.parent = parent;
 
-      tmpItems[i] = itemId;
-
       if (!mustCreate) { tag.update(item); }
     });
 
@@ -1766,7 +1744,7 @@ function _each(dom, parent, expr) {
     unmountRedundant(items, tags);
 
     // clone the items array
-    oldItems = tmpItems.slice();
+    oldItems = items.slice();
 
     root.insertBefore(frag, placeholder);
   };
@@ -1900,7 +1878,7 @@ function parseAttributes(dom, attrs, fn) {
     var bool = isBoolAttr(name);
     var expr;
 
-    if (contains(REF_DIRECTIVES, name) && dom.tagName.toLowerCase() !== YIELD_TAG) {
+    if (contains(REF_DIRECTIVES, name)) {
       expr =  Object.create(RefExpr).init(dom, this$1, name, attr.value);
     } else if (tmpl.hasExpr(attr.value)) {
       expr = {dom: dom, expr: attr.value, attr: name, bool: bool};
@@ -2210,7 +2188,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.7.0';
+var version$1 = 'v3.6.3';
 
 
 var core = Object.freeze({
@@ -2252,24 +2230,12 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
 }
 
 /**
- * Manage the mount state of a tag triggering also the observable events
+ * Toggle the isMounted flag
  * @this Tag
  * @param { Boolean } value - ..of the isMounted flag
  */
-function setMountState(value) {
-  var ref = this.__;
-  var isAnonymous = ref.isAnonymous;
-
+function setIsMounted(value) {
   defineProperty(this, 'isMounted', value);
-
-  if (!isAnonymous) {
-    if (value) { this.trigger('mount'); }
-    else {
-      this.trigger('unmount');
-      this.off('*');
-      this.__.wasCreated = false;
-    }
-  }
 }
 
 
@@ -2307,7 +2273,7 @@ function Tag$1(impl, conf, innerHTML) {
   if (impl.name && root._tag) { root._tag.unmount(true); }
 
   // not yet mounted
-  defineProperty(this, 'isMounted', false);
+  setIsMounted.call(this, false);
 
   defineProperty(this, '__', {
     isAnonymous: isAnonymous,
@@ -2427,7 +2393,7 @@ function Tag$1(impl, conf, innerHTML) {
 
       // init method will be called automatically
       if (instance.init)
-        { instance.init.bind(this$1)(opts); }
+        { instance.init.bind(this$1)(); }
     });
     return this
   }.bind(this));
@@ -2489,11 +2455,13 @@ function Tag$1(impl, conf, innerHTML) {
     if (!skipAnonymous && this.parent) {
       var p = getImmediateCustomParentTag(this.parent);
       p.one(!p.isMounted ? 'mount' : 'updated', function () {
-        setMountState.call(this$1, true);
+        setIsMounted.call(this$1, true);
+        this$1.trigger('mount');
       });
     } else {
       // otherwise it's not a child tag we can trigger its mount event
-      setMountState.call(this, true);
+      setIsMounted.call(this, true);
+      if (!skipAnonymous) { this.trigger('mount'); }
     }
 
     this.__.wasCreated = true;
@@ -2572,12 +2540,15 @@ function Tag$1(impl, conf, innerHTML) {
     // custom internal unmount function to avoid relying on the observable
     if (this.__.onUnmount) { this.__.onUnmount(); }
 
-    // weird fix for a weird edge case #2409 and #2436
-    // some users might use your software not as you've expected
-    // so I need to add these dirty hacks to mitigate unexpected issues
-    if (!this.isMounted) { setMountState.call(this, true); }
+    if (!skipAnonymous) {
+      // weird fix for a weird edge case #2409
+      if (!this.isMounted) { this.trigger('mount'); }
+      this.trigger('unmount');
+      this.off('*');
+    }
 
-    setMountState.call(this, false);
+    defineProperty(this, 'isMounted', false);
+    this.__.wasCreated = false;
 
     delete this.root._tag;
 
@@ -56527,11 +56498,12 @@ var script$59 = function() {
     this.update();
   });
 
-  // TOOD: 動作が重いので一旦OFFる。
+  // TOOD: 動作が重いので一旦OFFっている。原因が判明したら修正すること。
   this.handleSearchButtonMouseOver = () => {
     this.isSearchTooltipVisible = true;
   };
 
+  // TOOD: 動作が重いので一旦OFFっている。原因が判明したら修正すること。
   this.handleSearchButtonMouseOut = () => {
     this.isSearchTooltipVisible = false;
   };
@@ -56568,7 +56540,7 @@ var script$59 = function() {
   };
 };
 
-riot$1.tag2('viron-components', '<div class="ComponentsPage__head"> <div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__control"> <div class="ComponentsPage__search {isCurrentSearchRequestParametersEmpty() ? \'\' : \'ComponentsPage__search--active\'}" if="{!!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap"> <viron-icon type="search"></viron-icon> <viron-tooltip if="{isSearchTooltipVisible}" placement="bottomRight" label="全体検索"></viron-tooltip> </div> </div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+riot$1.tag2('viron-components', '<div class="ComponentsPage__head"> <div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__control"> <div class="ComponentsPage__search {isCurrentSearchRequestParametersEmpty() ? \'\' : \'ComponentsPage__search--active\'}" if="{componentsCount &gt; 1 &amp;&amp; !!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap"> <viron-icon type="search"></viron-icon> <viron-tooltip if="{isSearchTooltipVisible}" placement="bottomRight" label="全体検索"></viron-tooltip> </div> </div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
     this.external(script$59);
 });
 
