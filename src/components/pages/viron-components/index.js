@@ -123,11 +123,12 @@ export default function() {
     this.update();
   });
 
-  // TOOD: 動作が重いので一旦OFFる。
+  // TOOD: 動作が重いので一旦OFFっている。原因が判明したら修正すること。
   this.handleSearchButtonMouseOver = () => {
     this.isSearchTooltipVisible = true;
   };
 
+  // TOOD: 動作が重いので一旦OFFっている。原因が判明したら修正すること。
   this.handleSearchButtonMouseOut = () => {
     this.isSearchTooltipVisible = false;
   };
