@@ -1,4 +1,5 @@
 import contains from 'mout/array/contains';
+import clipboard from 'clipboard-js';
 import { constants as actions } from '../../../store/actions';
 import '../../atoms/viron-message/index.tag';
 
@@ -8,35 +9,27 @@ export default function() {
   this.handleTap = () => {
     // クリップボードにコピーできないタイプであればスルーする。
     const type = this.opts.item.type;
-    const value = this.opts.item.cell;
+    let value = this.opts.item.cell;
     if (type === 'object' || type === 'array') {
       return;
     }
+
+    // 画像ファイルであればスルーする。
     if (type === 'string') {
       const split = value.split('.');
-      if (!!split.length && contains(['jpg', 'png', 'gif'], split[split.length - 1])) {
+      const extension = ['jpg', 'jpeg', 'bmp', 'png', 'gif'];
+      if (!!split.length && contains(extension, split[split.length - 1])) {
         return;
       }
     }
 
+    // Stringに変換する
+    value = String(value);
+
     Promise
       .resolve()
       .then(() => {
-        const tmpElm = document.createElement('textarea');
-        tmpElm.value = value;
-        tmpElm.selectionStart = 0;
-        tmpElm.selectionEnd = tmpElm.value.length;
-        const tmpStyle = tmpElm.style;
-        tmpStyle.position = 'fixed';
-        tmpStyle.left = '-100%';
-        document.body.appendChild(tmpElm);
-        tmpElm.focus();
-        const result = document.execCommand('copy');
-        tmpElm.blur();
-        document.body.removeChild(tmpElm);
-        if (!result) {
-          throw new Error();
-        }
+        return clipboard.copy(value);
       })
       .then(() => store.action(actions.TOASTS_ADD, {
         message: 'クリップボードにコピーしました。'
