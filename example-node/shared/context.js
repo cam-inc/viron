@@ -71,6 +71,9 @@ class Context {
             auth_jwt: this.getConfigAuthJwt(),
             google_oauth: this.getConfigGoogleOAuth(),
           },
+          autocomplete: {
+            store: store.instance,
+          },
           pager: {
             limit: constant.DEFAULT_PAGER_LIMIT,
           },
