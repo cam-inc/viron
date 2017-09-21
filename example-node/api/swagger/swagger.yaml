@@ -834,11 +834,11 @@ definitions:
         format: int64
         type: integer
         x-autocomplete:
-          field: id
+          field: title
           path: /viron_autocomplete
           query:
-            table: user_blogs
-            disp: title
+            model: user_blogs
+            value: id
     title: UserBlogEntryPayload
     required:
     - user_blog_id
@@ -879,11 +879,11 @@ definitions:
         format: int64
         type: integer
         x-autocomplete:
-          field: id
+          field: name
           path: /viron_autocomplete
           query:
-            table: users
-            disp: name
+            model: users
+            value: id
     required:
     - user_id
     type: object
