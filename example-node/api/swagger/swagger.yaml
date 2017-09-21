@@ -833,6 +833,12 @@ definitions:
         example: 11
         format: int64
         type: integer
+        x-autocomplete:
+          field: id
+          path: /viron_autocomplete
+          query:
+            table: user_blogs
+            disp: title
     title: UserBlogEntryPayload
     required:
     - user_blog_id
@@ -872,6 +878,12 @@ definitions:
         example: 1
         format: int64
         type: integer
+        x-autocomplete:
+          field: id
+          path: /viron_autocomplete
+          query:
+            table: users
+            disp: name
     required:
     - user_id
     type: object
@@ -4012,6 +4024,46 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - multiquery
+
+  /viron_autocomplete:
+    get:
+      x-swagger-router-controller: viron_autocomplete
+      description: オートコンプリート
+      operationId: viron_autocomplete#list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
+            type: array
         "400":
           description: Bad Request
           schema:
