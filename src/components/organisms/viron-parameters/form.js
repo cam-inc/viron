@@ -1,5 +1,6 @@
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
+import isNaN from 'mout/lang/isNaN';
 import isNumber from 'mout/lang/isNumber';
 import hasOwn from 'mout/object/hasOwn';
 import ObjectAssign from 'object-assign';
@@ -15,6 +16,7 @@ const UI_UPLOADER = 'uploader';
 const UI_WYSWYG = 'wyswyg';
 const UI_PUG = 'pug';
 const UI_NULL = 'null';
+const UI_AUTOCOMPLETE = 'autocomplete';
 
 export default function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
@@ -22,6 +24,9 @@ export default function() {
 
   // wyswygエディタのオプション群。
   this.blotOptions = schemaObject['x-wyswyg-options'] || {};
+
+  // autocomplete設定。
+  this.autocompleteConfig = schemaObject['x-autocomplete'];
 
   /**
    * 入力可否をチェックします。
@@ -74,6 +79,11 @@ export default function() {
     // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
     if (!!schemaObject.enum) {
       return UI_SELECT;
+    }
+
+    // autocomplete有効時。
+    if (!!schemaObject['x-autocomplete']) {
+      return UI_AUTOCOMPLETE;
     }
 
     const type = schemaObject.type;
@@ -181,6 +191,29 @@ export default function() {
   this.handleHtmlChange = newText => {
     if (!newText) {
       newText = undefined;
+    }
+    this.opts.onchange(newText);
+  };
+
+  // autocomplete値が変更された時の処理。
+  this.handleAutocompleteChange = newText => {
+    switch (schemaObject.type) {
+    case 'string':
+      if (!newText) {
+        newText = undefined;
+      }
+      break;
+    case 'number':
+    case 'integer':
+      if (!newText) {
+        newText = undefined;
+      } else {
+        newText = Number(newText);
+        if (isNaN(newText)) {
+          newText = undefined;
+        }
+      }
+      break;
     }
     this.opts.onchange(newText);
   };
