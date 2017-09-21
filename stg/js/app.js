@@ -12,13 +12,14 @@ function createCommonjsModule(fn, module) {
 }
 
 var riot_1 = createCommonjsModule(function (module, exports) {
-/* Riot v3.6.3, @license MIT */
+/* Riot v3.7.0, @license MIT */
 (function (global, factory) {
 	factory(exports);
 }(commonjsGlobal, (function (exports) { 'use strict';
 
 var __TAGS_CACHE = [];
 var __TAG_IMPL = {};
+var YIELD_TAG = 'yield';
 var GLOBAL_MIXIN = '__global_mixin';
 var ATTRS_PREFIX = 'riot-';
 var REF_DIRECTIVES = ['ref', 'data-ref'];
@@ -28,6 +29,7 @@ var LOOP_DIRECTIVE = 'each';
 var LOOP_NO_REORDER_DIRECTIVE = 'no-reorder';
 var SHOW_DIRECTIVE = 'show';
 var HIDE_DIRECTIVE = 'hide';
+var KEY_DIRECTIVE = 'key';
 var RIOT_EVENTS_KEY = '__riot-events__';
 var T_STRING = 'string';
 var T_OBJECT = 'object';
@@ -1398,9 +1400,7 @@ function updateExpression(expr) {
 
     if (attrName === 'value' && dom.value !== value) {
       dom.value = value;
-    }
-
-    if (hasValue && value !== false) {
+    } else if (hasValue && value !== false) {
       setAttr(dom, attrName, value);
     }
 
@@ -1611,6 +1611,22 @@ function append(root, isVirtual) {
 }
 
 /**
+ * Return the value we want to use to lookup the postion of our items in the collection
+ * @param   { String }  keyAttr         - lookup string or expression
+ * @param   { * }       originalItem    - original item from the collection
+ * @param   { Object }  keyedItem       - object created by riot via { item, i in collection }
+ * @param   { Boolean } hasKeyAttrExpr  - flag to check whether the key is an expression
+ * @returns { * } value that we will use to figure out the item position via collection.indexOf
+ */
+function getItemId(keyAttr, originalItem, keyedItem, hasKeyAttrExpr) {
+  if (keyAttr) {
+    return hasKeyAttrExpr ?  tmpl(keyAttr, keyedItem) :  originalItem[keyAttr]
+  }
+
+  return originalItem
+}
+
+/**
  * Manage tags having the 'each'
  * @param   { HTMLElement } dom - DOM node we need to loop
  * @param   { Tag } parent - parent tag instance where the dom node is contained
@@ -1619,6 +1635,8 @@ function append(root, isVirtual) {
  */
 function _each(dom, parent, expr) {
   var mustReorder = typeof getAttr(dom, LOOP_NO_REORDER_DIRECTIVE) !== T_STRING || remAttr(dom, LOOP_NO_REORDER_DIRECTIVE);
+  var keyAttr = getAttr(dom, KEY_DIRECTIVE);
+  var hasKeyAttrExpr = keyAttr ? tmpl.hasExpr(keyAttr) : false;
   var tagName = getTagName(dom);
   var impl = __TAG_IMPL[tagName];
   var parentNode = dom.parentNode;
@@ -1634,6 +1652,7 @@ function _each(dom, parent, expr) {
 
   // remove the each property from the original tag
   remAttr(dom, LOOP_DIRECTIVE);
+  remAttr(dom, KEY_DIRECTIVE);
 
   // parse the each expression
   expr = tmpl.loopKeys(expr);
@@ -1653,6 +1672,7 @@ function _each(dom, parent, expr) {
     var frag = createFrag();
     var isObject$$1 = !isArray(items) && !isString(items);
     var root = placeholder.parentNode;
+    var tmpItems = [];
 
     // if this DOM was removed the update here is useless
     // this condition fixes also a weird async issue on IE in our unit test
@@ -1677,18 +1697,18 @@ function _each(dom, parent, expr) {
     }
 
     // loop all the new items
-    each(items, function (item, i) {
+    each(items, function (_item, i) {
+      var item = !hasKeys && expr.key ? mkitem(expr, _item, i) : _item;
+      var itemId = getItemId(keyAttr, _item, item, hasKeyAttrExpr);
       // reorder only if the items are objects
-      var doReorder = mustReorder && typeof item === T_OBJECT && !hasKeys;
-      var oldPos = oldItems.indexOf(item);
+      var doReorder = mustReorder && typeof _item === T_OBJECT && !hasKeys;
+      var oldPos = oldItems.indexOf(itemId);
       var isNew = oldPos === -1;
       var pos = !isNew && doReorder ? oldPos : i;
       // does a tag exist in this position?
       var tag = tags[pos];
       var mustAppend = i >= oldItems.length;
       var mustCreate =  doReorder && isNew || !doReorder && !tag;
-
-      item = !hasKeys && expr.key ? mkitem(expr, item, i) : item;
 
       // new tag
       if (mustCreate) {
@@ -1715,7 +1735,7 @@ function _each(dom, parent, expr) {
         if (child) { arrayishAdd(parent.tags, tagName, tag, true); }
       } else if (pos !== i && doReorder) {
         // move
-        if (contains(items, oldItems[pos])) {
+        if (keyAttr || contains(items, oldItems[pos])) {
           move.apply(tag, [root, tags[i], isVirtual]);
           // move the old tag instance
           tags.splice(i, 0, tags.splice(pos, 1)[0]);
@@ -1737,6 +1757,8 @@ function _each(dom, parent, expr) {
       tag.__.index = i;
       tag.__.parent = parent;
 
+      tmpItems[i] = itemId;
+
       if (!mustCreate) { tag.update(item); }
     });
 
@@ -1744,7 +1766,7 @@ function _each(dom, parent, expr) {
     unmountRedundant(items, tags);
 
     // clone the items array
-    oldItems = items.slice();
+    oldItems = tmpItems.slice();
 
     root.insertBefore(frag, placeholder);
   };
@@ -1878,7 +1900,7 @@ function parseAttributes(dom, attrs, fn) {
     var bool = isBoolAttr(name);
     var expr;
 
-    if (contains(REF_DIRECTIVES, name)) {
+    if (contains(REF_DIRECTIVES, name) && dom.tagName.toLowerCase() !== YIELD_TAG) {
       expr =  Object.create(RefExpr).init(dom, this$1, name, attr.value);
     } else if (tmpl.hasExpr(attr.value)) {
       expr = {dom: dom, expr: attr.value, attr: name, bool: bool};
@@ -2188,7 +2210,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.6.3';
+var version$1 = 'v3.7.0';
 
 
 var core = Object.freeze({
@@ -2230,12 +2252,24 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
 }
 
 /**
- * Toggle the isMounted flag
+ * Manage the mount state of a tag triggering also the observable events
  * @this Tag
  * @param { Boolean } value - ..of the isMounted flag
  */
-function setIsMounted(value) {
+function setMountState(value) {
+  var ref = this.__;
+  var isAnonymous = ref.isAnonymous;
+
   defineProperty(this, 'isMounted', value);
+
+  if (!isAnonymous) {
+    if (value) { this.trigger('mount'); }
+    else {
+      this.trigger('unmount');
+      this.off('*');
+      this.__.wasCreated = false;
+    }
+  }
 }
 
 
@@ -2273,7 +2307,7 @@ function Tag$1(impl, conf, innerHTML) {
   if (impl.name && root._tag) { root._tag.unmount(true); }
 
   // not yet mounted
-  setIsMounted.call(this, false);
+  defineProperty(this, 'isMounted', false);
 
   defineProperty(this, '__', {
     isAnonymous: isAnonymous,
@@ -2393,7 +2427,7 @@ function Tag$1(impl, conf, innerHTML) {
 
       // init method will be called automatically
       if (instance.init)
-        { instance.init.bind(this$1)(); }
+        { instance.init.bind(this$1)(opts); }
     });
     return this
   }.bind(this));
@@ -2455,13 +2489,11 @@ function Tag$1(impl, conf, innerHTML) {
     if (!skipAnonymous && this.parent) {
       var p = getImmediateCustomParentTag(this.parent);
       p.one(!p.isMounted ? 'mount' : 'updated', function () {
-        setIsMounted.call(this$1, true);
-        this$1.trigger('mount');
+        setMountState.call(this$1, true);
       });
     } else {
       // otherwise it's not a child tag we can trigger its mount event
-      setIsMounted.call(this, true);
-      if (!skipAnonymous) { this.trigger('mount'); }
+      setMountState.call(this, true);
     }
 
     this.__.wasCreated = true;
@@ -2540,15 +2572,12 @@ function Tag$1(impl, conf, innerHTML) {
     // custom internal unmount function to avoid relying on the observable
     if (this.__.onUnmount) { this.__.onUnmount(); }
 
-    if (!skipAnonymous) {
-      // weird fix for a weird edge case #2409
-      if (!this.isMounted) { this.trigger('mount'); }
-      this.trigger('unmount');
-      this.off('*');
-    }
+    // weird fix for a weird edge case #2409 and #2436
+    // some users might use your software not as you've expected
+    // so I need to add these dirty hacks to mitigate unexpected issues
+    if (!this.isMounted) { setMountState.call(this, true); }
 
-    defineProperty(this, 'isMounted', false);
-    this.__.wasCreated = false;
+    setMountState.call(this, false);
 
     delete this.root._tag;
 
@@ -2938,7 +2967,7 @@ var riot$1 = unwrapExports(riot_1);
         }
     }
 
-    var forEach_1$1 = forEach;
+    var forEach_1 = forEach;
 
 /* esr version 0.9.2 */
 /**
@@ -2987,7 +3016,7 @@ var riot$1 = unwrapExports(riot_1);
          return Object.prototype.hasOwnProperty.call(obj, prop);
      }
 
-     var hasOwn_1$1 = hasOwn;
+     var hasOwn_1 = hasOwn;
 
 var _hasDontEnumBug;
 var _dontEnums;
@@ -3045,7 +3074,7 @@ var _dontEnums;
                 // different than Object prototype value.
                 if (
                     (key !== 'constructor' ||
-                        (!isProto && hasOwn_1$1(obj, key))) &&
+                        (!isProto && hasOwn_1(obj, key))) &&
                     obj[key] !== Object.prototype[key]
                 ) {
                     if (exec(fn, obj, key, thisObj) === false) {
@@ -3069,13 +3098,13 @@ var _dontEnums;
      */
     function forOwn(obj, fn, thisObj){
         forIn_1(obj, function(val, key){
-            if (hasOwn_1$1(obj, key)) {
+            if (hasOwn_1(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
             }
         });
     }
 
-    var forOwn_1$1 = forOwn;
+    var forOwn_1 = forOwn;
 
 var _rKind = /^\[object (.*)\]$/;
 var _toString = Object.prototype.toString;
@@ -3108,7 +3137,7 @@ var UNDEF;
     var isArray = Array.isArray || function (val) {
         return isKind_1(val, 'Array');
     };
-    var isArray_1$1 = isArray;
+    var isArray_1 = isArray;
 
 function containsMatch(array, pattern) {
         var i = -1, length = array.length;
@@ -3134,7 +3163,7 @@ function containsMatch(array, pattern) {
 
     function matchObject(target, pattern) {
         var result = true;
-        forOwn_1$1(pattern, function(val, key) {
+        forOwn_1(pattern, function(val, key) {
             if (!deepMatches(target[key], val)) {
                 // Return false to break out of forOwn early
                 return (result = false);
@@ -3150,7 +3179,7 @@ function containsMatch(array, pattern) {
     function deepMatches(target, pattern){
         if (target && typeof target === 'object' &&
             pattern && typeof pattern === 'object') {
-            if (isArray_1$1(target) && isArray_1$1(pattern)) {
+            if (isArray_1(target) && isArray_1(pattern)) {
                 return matchArray(target, pattern);
             } else {
                 return matchObject(target, pattern);
@@ -3281,13 +3310,13 @@ function containsMatch(array, pattern) {
         return results;
     }
 
-    var filter_1$1 = filter;
+    var filter_1 = filter;
 
 /**
      * Remove all null/undefined items from array.
      */
     function compact(arr) {
-        return filter_1$1(arr, function(val){
+        return filter_1(arr, function(val){
             return (val != null);
         });
     }
@@ -3300,14 +3329,14 @@ function containsMatch(array, pattern) {
     function contains(arr, val) {
         return indexOf_1(arr, val) !== -1;
     }
-    var contains_1$1 = contains;
+    var contains_1 = contains;
 
 /**
      * @return {array} Array of unique items
      */
     function unique(arr, compare){
         compare = compare || isEqual;
-        return filter_1$1(arr, function(item, i, arr){
+        return filter_1(arr, function(item, i, arr){
             var n = arr.length;
             while (++i < n) {
                 if ( compare(item, arr[i]) ) {
@@ -3322,7 +3351,7 @@ function containsMatch(array, pattern) {
         return a === b;
     }
 
-    var unique_1$1 = unique;
+    var unique_1 = unique;
 
 /**
      * Array some
@@ -3386,9 +3415,9 @@ function containsMatch(array, pattern) {
      */
     function difference(arr) {
         var arrs = slice_1(arguments, 1),
-            result = filter_1$1(unique_1$1(arr), function(needle){
+            result = filter_1(unique_1(arr), function(needle){
                 return !some_1(arrs, function(haystack){
-                    return contains_1$1(haystack, needle);
+                    return contains_1(haystack, needle);
                 });
             });
         return result;
@@ -3447,7 +3476,7 @@ function containsMatch(array, pattern) {
     function equals(a, b, callback){
         callback = callback || is_1;
 
-        if (!isArray_1$1(a) || !isArray_1$1(b)) {
+        if (!isArray_1(a) || !isArray_1(b)) {
             return callback(a, b);
         }
 
@@ -3495,7 +3524,7 @@ function containsMatch(array, pattern) {
         return idx >= 0? arr[idx] : void(0);
     }
 
-    var find_1$1 = find;
+    var find_1 = find;
 
 /**
      * Returns the index of the last item that matches criteria
@@ -3543,7 +3572,7 @@ function containsMatch(array, pattern) {
             len = arr.length;
         while (++i < len) {
             value = arr[i];
-            if (isArray_1$1(value)) {
+            if (isArray_1(value)) {
                 flattenTo(value, result, level - 1);
             } else {
                 result.push(value);
@@ -3586,7 +3615,7 @@ function containsMatch(array, pattern) {
         }
     }
 
-    var forEach_1$2 = forEach$2;
+    var forEach_1$1 = forEach$2;
 
 /**
      * Bucket the array values.
@@ -3600,7 +3629,7 @@ function containsMatch(array, pattern) {
         }
 
         var buckets = {};
-        forEach_1$2(arr, function(element) {
+        forEach_1$1(arr, function(element) {
             var bucket = categorize(element);
             if (!(bucket in buckets)) {
                 buckets[bucket] = [];
@@ -3658,9 +3687,9 @@ function containsMatch(array, pattern) {
      */
     function intersection(arr) {
         var arrs = slice_1(arguments, 1),
-            result = filter_1$1(unique_1$1(arr), function(needle){
+            result = filter_1(unique_1(arr), function(needle){
                 return every_1(arrs, function(haystack){
-                    return contains_1$1(haystack, needle);
+                    return contains_1(haystack, needle);
                 });
             });
         return result;
@@ -3699,7 +3728,7 @@ function isValidString(val) {
      */
     function join(items, separator) {
         separator = separator || '';
-        return filter_1$1(items, isValidString).join(separator);
+        return filter_1(items, isValidString).join(separator);
     }
 
     var join_1 = join;
@@ -3761,7 +3790,7 @@ function isValidString(val) {
         return results;
     }
 
-     var map_1$1 = map;
+     var map_1 = map;
 
 /**
      * Return maximum value inside array
@@ -3909,7 +3938,7 @@ function isValidString(val) {
      * Extract a list of property values.
      */
     function pluck(arr, propName){
-        return map_1$1(arr, propName);
+        return map_1(arr, propName);
     }
 
     var pluck_1 = pluck;
@@ -4022,7 +4051,7 @@ function isValidString(val) {
         return results;
     }
 
-    var reject_1$1 = reject;
+    var reject_1 = reject;
 
 /**
      * Remove a single item from the array.
@@ -4150,7 +4179,7 @@ function isValidString(val) {
         });
     }
 
-    var sortBy_1$1 = sortBy;
+    var sortBy_1 = sortBy;
 
 /**
      * Split array into a fixed number of segments.
@@ -4251,7 +4280,7 @@ function isValidString(val) {
             append_1(results, arguments$1[i]);
         }
 
-        return unique_1$1(results);
+        return unique_1(results);
     }
 
     var union_1 = union;
@@ -4261,14 +4290,14 @@ function isValidString(val) {
      * - like ptyhon's `symmetric_difference`
      */
     function xor(arr1, arr2) {
-        arr1 = unique_1$1(arr1);
-        arr2 = unique_1$1(arr2);
+        arr1 = unique_1(arr1);
+        arr2 = unique_1(arr2);
 
-        var a1 = filter_1$1(arr1, function(item){
-                return !contains_1$1(arr2, item);
+        var a1 = filter_1(arr1, function(item){
+                return !contains_1(arr2, item);
             }),
-            a2 = filter_1$1(arr2, function(item){
-                return !contains_1$1(arr1, item);
+            a2 = filter_1(arr2, function(item){
+                return !contains_1(arr1, item);
             });
 
         return a1.concat(a2);
@@ -4287,12 +4316,12 @@ function getLength(arr) {
     function zip(arr){
         var arguments$1 = arguments;
 
-        var len = arr ? max_1(map_1$1(arguments, getLength)) : 0,
+        var len = arr ? max_1(map_1(arguments, getLength)) : 0,
             results = [],
             i = -1;
         while (++i < len) {
             // jshint loopfunc: true
-            results.push(map_1$1(arguments$1, function(item) {
+            results.push(map_1(arguments$1, function(item) {
                 return item == null ? undefined : item[i];
             }));
         }
@@ -4309,17 +4338,17 @@ var array = {
     'collect' : collect_1,
     'combine' : combine_1,
     'compact' : compact_1,
-    'contains' : contains_1$1,
+    'contains' : contains_1,
     'difference' : difference_1,
     'equals' : equals_1,
     'every' : every_1,
-    'filter' : filter_1$1,
-    'find' : find_1$1,
+    'filter' : filter_1,
+    'find' : find_1,
     'findIndex' : findIndex_1,
     'findLast' : findLast_1,
     'findLastIndex' : findLastIndex_1,
     'flatten' : flatten_1,
-    'forEach' : forEach_1$2,
+    'forEach' : forEach_1$1,
     'groupBy' : groupBy_1,
     'indexOf' : indexOf_1,
     'indicesOf' : indicesOf_1,
@@ -4329,7 +4358,7 @@ var array = {
     'join' : join_1,
     'last' : last_1,
     'lastIndexOf' : lastIndexOf_1,
-    'map' : map_1$1,
+    'map' : map_1,
     'max' : max_1,
     'min' : min_1,
     'pick' : pick_1,
@@ -4337,7 +4366,7 @@ var array = {
     'range' : range_1,
     'reduce' : reduce_1,
     'reduceRight' : reduceRight_1,
-    'reject' : reject_1$1,
+    'reject' : reject_1,
     'remove' : remove_1,
     'removeAll' : removeAll_1,
     'reverse' : reverse_1,
@@ -4345,12 +4374,12 @@ var array = {
     'slice' : slice_1,
     'some' : some_1,
     'sort' : sort,
-    'sortBy' : sortBy_1$1,
+    'sortBy' : sortBy_1,
     'split' : split_1,
     'take' : take_1,
     'toLookup' : toLookup_1,
     'union' : union_1,
-    'unique' : unique_1$1,
+    'unique' : unique_1,
     'xor' : xor_1,
     'zip' : zip_1
 };
@@ -6261,7 +6290,7 @@ var constants = {
   HASH: 'HASH'
 };
 
-var Router$1 = function Router(type) {
+var Router = function Router(type) {
   if ( type === void 0 ) { type = constants.BROWSER; }
 
   /**
@@ -6327,7 +6356,7 @@ var Router$1 = function Router(type) {
  * start listening for changes to the current location.
  * @param {Boolean} autoExec to decide whether routing is executed with the current url.
  */
-Router$1.prototype.start = function start (autoExec) {
+Router.prototype.start = function start (autoExec) {
     var this$1 = this;
     if ( autoExec === void 0 ) { autoExec = true; }
 
@@ -6343,7 +6372,7 @@ Router$1.prototype.start = function start (autoExec) {
 /**
  * stop listening.
  */
-Router$1.prototype.stop = function stop () {
+Router.prototype.stop = function stop () {
   if (!this._unlistener) {
     return;
   }
@@ -6359,7 +6388,7 @@ Router$1.prototype.stop = function stop () {
  * @param {Function} onAfter a function that will be executed after the route changes.
  * @return {Router}
  */
-Router$1.prototype.on = function on (pattern, onEnter, onBefore, onAfter) {
+Router.prototype.on = function on (pattern, onEnter, onBefore, onAfter) {
   var keys = [];
   var regexp = index(pattern, keys);
   this._routes.push({
@@ -6379,7 +6408,7 @@ Router$1.prototype.on = function on (pattern, onEnter, onBefore, onAfter) {
  * @param {Function} func
  * @return {Router}
  */
-Router$1.prototype.onBefore = function onBefore (func) {
+Router.prototype.onBefore = function onBefore (func) {
   this._onBefore = func;
   return this;
 };
@@ -6390,7 +6419,7 @@ Router$1.prototype.onBefore = function onBefore (func) {
  * @param {Function} func
  * @return {Router}
  */
-Router$1.prototype.onBeforeOnce = function onBeforeOnce (func) {
+Router.prototype.onBeforeOnce = function onBeforeOnce (func) {
   this._onBeforeOnce = func;
   return this;
 };
@@ -6401,7 +6430,7 @@ Router$1.prototype.onBeforeOnce = function onBeforeOnce (func) {
  * @param {Function} func
  * @return {Router}
  */
-Router$1.prototype.onAfter = function onAfter (func) {
+Router.prototype.onAfter = function onAfter (func) {
   this._onAfter = func;
   return this;
 };
@@ -6412,7 +6441,7 @@ Router$1.prototype.onAfter = function onAfter (func) {
  * @param {Function} func
  * @return {Router}
  */
-Router$1.prototype.onAfterOnce = function onAfterOnce (func) {
+Router.prototype.onAfterOnce = function onAfterOnce (func) {
   this._onAfterOnce = func;
   return this;
 };
@@ -6421,7 +6450,7 @@ Router$1.prototype.onAfterOnce = function onAfterOnce (func) {
  * navigate to target location.
  * @param {String|Object} path e.g.) '/foo' or { pathname, search, hash }
  */
-Router$1.prototype.navigateTo = function navigateTo (path) {
+Router.prototype.navigateTo = function navigateTo (path) {
     var this$1 = this;
 
   return promise
@@ -6440,7 +6469,7 @@ Router$1.prototype.navigateTo = function navigateTo (path) {
  * replace current location.
  * @param {String|Object} path e.g.) '/foo' or { pathname, search, hash }
  */
-Router$1.prototype.replace = function replace (path) {
+Router.prototype.replace = function replace (path) {
     var this$1 = this;
 
   return promise
@@ -6459,7 +6488,7 @@ Router$1.prototype.replace = function replace (path) {
  * returns current location.
  * @return {String}
  */
-Router$1.prototype.getCurrentLocation = function getCurrentLocation () {
+Router.prototype.getCurrentLocation = function getCurrentLocation () {
   return this._history.location;
 };
 
@@ -6467,7 +6496,7 @@ Router$1.prototype.getCurrentLocation = function getCurrentLocation () {
  * returns current action.
  * @return {String}
  */
-Router$1.prototype.getCurrentAction = function getCurrentAction () {
+Router.prototype.getCurrentAction = function getCurrentAction () {
   return this._history.action;
 };
 
@@ -6475,7 +6504,7 @@ Router$1.prototype.getCurrentAction = function getCurrentAction () {
  * hash version of `location.href`.
  * @param {String} pathname
  */
-Router$1.prototype.createHref = function createHref (pathname) {
+Router.prototype.createHref = function createHref (pathname) {
   return this._history.createHref({
     pathname: pathname
   });
@@ -6487,7 +6516,7 @@ Router$1.prototype.createHref = function createHref (pathname) {
  * @param {Object} location i.e.) history.location
  * @param {String} action i.e.) history.action
  */
-Router$1.prototype._change = function _change (location/*, action */) {
+Router.prototype._change = function _change (location/*, action */) {
     var this$1 = this;
 
   var route = array_1(this._routes, function (route) {
@@ -6567,7 +6596,7 @@ Router$1.prototype._change = function _change (location/*, action */) {
  * @param {Object} route
  * @return {Object}
  */
-Router$1.prototype._parseLocation = function _parseLocation (location, route) {
+Router.prototype._parseLocation = function _parseLocation (location, route) {
   var params = {};
   var list = route.regexp.exec(location.pathname).slice(1);
   array_2(route.keys, function (v, i) {
@@ -6593,9 +6622,9 @@ Router$1.prototype._parseLocation = function _parseLocation (location, route) {
   };
 };
 
-Router$1.BROWSER = constants.BROWSER;
-Router$1.MEMORY = constants.MEMORY;
-Router$1.HASH = constants.HASH;
+Router.BROWSER = constants.BROWSER;
+Router.MEMORY = constants.MEMORY;
+Router.HASH = constants.HASH;
 
 /**
      * Returns the first argument provided to it.
@@ -6624,7 +6653,7 @@ Router$1.HASH = constants.HASH;
          return Object.prototype.hasOwnProperty.call(obj, prop);
      }
 
-     var hasOwn_1$2 = hasOwn$1;
+     var hasOwn_1$1 = hasOwn$1;
 
 var _hasDontEnumBug$1;
 var _dontEnums$1;
@@ -6682,7 +6711,7 @@ var _dontEnums$1;
                 // different than Object prototype value.
                 if (
                     (key !== 'constructor' ||
-                        (!isProto && hasOwn_1$2(obj, key))) &&
+                        (!isProto && hasOwn_1$1(obj, key))) &&
                     obj[key] !== Object.prototype[key]
                 ) {
                     if (exec$1(fn, obj, key, thisObj) === false) {
@@ -6706,13 +6735,13 @@ var _dontEnums$1;
      */
     function forOwn$1(obj, fn, thisObj){
         forIn_1$1(obj, function(val, key){
-            if (hasOwn_1$2(obj, key)) {
+            if (hasOwn_1$1(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
             }
         });
     }
 
-    var forOwn_1$2 = forOwn$1;
+    var forOwn_1$1 = forOwn$1;
 
 var _rKind$1 = /^\[object (.*)\]$/;
 var _toString$1 = Object.prototype.toString;
@@ -6745,7 +6774,7 @@ var UNDEF$1;
     var isArray$1 = Array.isArray || function (val) {
         return isKind_1$1(val, 'Array');
     };
-    var isArray_1$2 = isArray$1;
+    var isArray_1$1 = isArray$1;
 
 function containsMatch$1(array, pattern) {
         var i = -1, length = array.length;
@@ -6771,7 +6800,7 @@ function containsMatch$1(array, pattern) {
 
     function matchObject$1(target, pattern) {
         var result = true;
-        forOwn_1$2(pattern, function(val, key) {
+        forOwn_1$1(pattern, function(val, key) {
             if (!deepMatches$1(target[key], val)) {
                 // Return false to break out of forOwn early
                 return (result = false);
@@ -6787,7 +6816,7 @@ function containsMatch$1(array, pattern) {
     function deepMatches$1(target, pattern){
         if (target && typeof target === 'object' &&
             pattern && typeof pattern === 'object') {
-            if (isArray_1$2(target) && isArray_1$2(pattern)) {
+            if (isArray_1$1(target) && isArray_1$1(pattern)) {
                 return matchArray$1(target, pattern);
             } else {
                 return matchObject$1(target, pattern);
@@ -6849,7 +6878,7 @@ function containsMatch$1(array, pattern) {
         return results;
     }
 
-    var reject_1$2 = reject$1;
+    var reject_1$1 = reject$1;
 
 /*
 object-assign
@@ -6915,7 +6944,7 @@ function shouldUseNative() {
 	}
 }
 
-var objectAssign$1 = shouldUseNative() ? Object.assign : function (target, source) {
+var objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
 	var from;
 	var to = toObject(target);
 	var symbols;
@@ -7270,7 +7299,7 @@ var application$1 = {
    * @return {Array}
    */
   addNetworking: (context, info) => {
-    context.state.application.networkings.push(objectAssign$1({
+    context.state.application.networkings.push(objectAssign({
       id: `networking_${Date.now()}`
     }, info));
     context.state.application.isNetworking = true;
@@ -7284,7 +7313,7 @@ var application$1 = {
    * @return {Array}
    */
   removeNetworking: (context, networkingId) => {
-    context.state.application.networkings = reject_1$2(context.state.application.networkings, networking => {
+    context.state.application.networkings = reject_1$1(context.state.application.networkings, networking => {
       return (networking.id === networkingId);
     });
     if (!context.state.application.networkings.length) {
@@ -7327,7 +7356,7 @@ var components$1 = {
     const component_uid = params.component_uid;
     // 存在しなければ新規作成。
     context.state.components[component_uid] = params;
-    return [constants$3.COMPONENTS_ONE(component_uid)];
+    return [constants$3.COMPONENTS, constants$3.COMPONENTS_ONE(component_uid)];
   },
 
   /**
@@ -7338,7 +7367,7 @@ var components$1 = {
    */
   removeOne: (context, component_uid) => {
     delete context.state.components[component_uid];
-    return [constants$3.COMPONENTS_ONE(component_uid)];
+    return [constants$3.COMPONENTS, constants$3.COMPONENTS_ONE(component_uid)];
   },
 
   /**
@@ -7348,7 +7377,7 @@ var components$1 = {
    */
   removeAll: context => {
     context.state.components = {};
-    return [constants$3.COMPONENTS];
+    return [constants$3.COMPONENTS, constants$3.COMPONENTS];
   }
 };
 
@@ -7406,7 +7435,7 @@ var drawers$1 = {
    * @return {Array}
    */
   remove: (context, drawerID) => {
-    context.state.drawers = reject_1$2(context.state.drawers, drawer => {
+    context.state.drawers = reject_1$1(context.state.drawers, drawer => {
       return (drawer.id === drawerID);
     });
     return [constants$3.DRAWERS];
@@ -7478,14 +7507,14 @@ var drawers$1 = {
         });
     }
 
-    var sortBy_1$2 = sortBy$1;
+    var sortBy_1$1 = sortBy$1;
 
 /**
      */
     function isNumber(val) {
         return isKind_1$1(val, 'Number');
     }
-    var isNumber_1$1 = isNumber;
+    var isNumber_1 = isNumber;
 
 /**
      * Object some
@@ -7493,7 +7522,7 @@ var drawers$1 = {
     function some$1(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var result = false;
-        forOwn_1$2(obj, function(val, key) {
+        forOwn_1$1(obj, function(val, key) {
             if (callback(val, key, obj)) {
                 result = true;
                 return false; // break
@@ -7519,7 +7548,7 @@ var drawers$1 = {
         return result;
     }
 
-    var find_1$2 = find$1;
+    var find_1$1 = find$1;
 
 'use strict';
 
@@ -7853,16 +7882,16 @@ const putEndpointsInOrder = endpoints => {
   // どのorder値よりも大きいであろう適当な値。
   const bigNumber = 9999;
   let ordered = [];
-  forOwn_1$2(endpoints, (endpoint, key) => {
+  forOwn_1$1(endpoints, (endpoint, key) => {
     ordered.push({
       key,
-      order: (isNumber_1$1(endpoint.order) ? endpoint.order : bigNumber)
+      order: (isNumber_1(endpoint.order) ? endpoint.order : bigNumber)
     });
   });
-  ordered = sortBy_1$2(ordered, obj => {
+  ordered = sortBy_1$1(ordered, obj => {
     return obj.order;
   });
-  forEach_1$1(ordered, (obj, order) => {
+  forEach_1(ordered, (obj, order) => {
     endpoints[obj.key].order = order;
   });
   return endpoints;
@@ -7878,11 +7907,11 @@ var endpoints$1 = {
    */
   add: (context, endpointKey, endpoint) => {
     // order値が指定されていなければ自動的に設定する。
-    if (!isNumber_1$1(endpoint.order)) {
+    if (!isNumber_1(endpoint.order)) {
       // リストの先頭に配置するために意図的にマイナス値を付与。
       endpoint.order = -1;
     }
-    let newEndpoints = objectAssign$1({}, context.state.endpoints);
+    let newEndpoints = objectAssign({}, context.state.endpoints);
     newEndpoints[endpointKey] = endpoint;
     newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
@@ -7897,7 +7926,7 @@ var endpoints$1 = {
    * @return {Array}
    */
   remove: (context, endpointKey) => {
-    let newEndpoints = objectAssign$1({}, context.state.endpoints);
+    let newEndpoints = objectAssign({}, context.state.endpoints);
     delete newEndpoints[endpointKey];
     newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
@@ -7927,7 +7956,7 @@ var endpoints$1 = {
     if (!endpoint) {
       context.state.endpoints[endpointKey] = null;
     } else {
-      context.state.endpoints[endpointKey] = objectAssign$1({}, context.state.endpoints[endpointKey], endpoint);
+      context.state.endpoints[endpointKey] = objectAssign({}, context.state.endpoints[endpointKey], endpoint);
     }
     store.set('endpoints', context.state.endpoints);
     return [constants$3.ENDPOINTS];
@@ -7955,10 +7984,10 @@ var endpoints$1 = {
    * @return {Array}
    */
   mergeAll: (context, endpoints) => {
-    let modifiedEndpoints = objectAssign$1({}, context.state.endpoints);
+    let modifiedEndpoints = objectAssign({}, context.state.endpoints);
 
-    forOwn_1$2(endpoints, endpoint => {
-      let duplicatedEndpoint = find_1$2(modifiedEndpoints, val => {
+    forOwn_1$1(endpoints, endpoint => {
+      let duplicatedEndpoint = find_1$1(modifiedEndpoints, val => {
         return endpoint.url === val.url;
       });
 
@@ -7966,7 +7995,7 @@ var endpoints$1 = {
         const key = shortid.generate();
         modifiedEndpoints[key] = endpoint;
       } else {
-        objectAssign$1(duplicatedEndpoint, endpoint);
+        objectAssign(duplicatedEndpoint, endpoint);
       }
     });
 
@@ -7983,7 +8012,7 @@ var endpoints$1 = {
    * @return {Array}
    */
   tidyUpOrder: context => {
-    const newEndpoints = putEndpointsInOrder(objectAssign$1(context.state.endpoints));
+    const newEndpoints = putEndpointsInOrder(objectAssign(context.state.endpoints));
     context.state.endpoints = newEndpoints;
     store.set('endpoints', newEndpoints);
     return [constants$3.ENDPOINTS];
@@ -7998,7 +8027,7 @@ var endpoints$1 = {
    * @return {Array}
    */
   changeOrder: (context, endpointKey, newOrder) => {
-    let newEndpoints = objectAssign$1(context.state.endpoints);
+    let newEndpoints = objectAssign(context.state.endpoints);
     // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
     newEndpoints[endpointKey].order = newOrder - 0.5;
     newEndpoints = putEndpointsInOrder(newEndpoints);
@@ -8029,7 +8058,7 @@ var location$2 = {
    * @return {Array}
    */
   all: (context, obj) => {
-    context.state.location = objectAssign$1({}, context.state.location, obj);
+    context.state.location = objectAssign({}, context.state.location, obj);
     return [constants$3.LOCATION];
   },
 
@@ -8085,7 +8114,7 @@ var modals$1 = {
    * @return {Array}
    */
   remove: (context, modalID) => {
-    context.state.modals = reject_1$2(context.state.modals, modal => {
+    context.state.modals = reject_1$1(context.state.modals, modal => {
       return (modal.id === modalID);
     });
     return [constants$3.MODALS];
@@ -8144,7 +8173,7 @@ var toasts$1 = {
    * @return {Array}
    */
   add: (context, obj) => {
-    const data = objectAssign$1({
+    const data = objectAssign({
       type: TOAST_TYPE_NORMAL,
       timeout: TOAST_TIMEOUT,
       autoHide: TOAST_AUTO_HIDE
@@ -8163,7 +8192,7 @@ var toasts$1 = {
    * @return {Array}
    */
   remove: (context, toastId) => {
-    context.state.toasts = reject_1$2(context.state.toasts, toast => {
+    context.state.toasts = reject_1$1(context.state.toasts, toast => {
       return toast.id === toastId;
     });
 
@@ -8355,7 +8384,7 @@ var application = {
     function isObject(val) {
         return isKind_1$1(val, 'Object');
     }
-    var isObject_1$1 = isObject;
+    var isObject_1 = isObject;
 
 /**
  * body値をContent-Type `application/json`に最適化します。
@@ -8397,7 +8426,7 @@ const formDataConverter = body => {
   keys.forEach(key => {
     const value = body[key];
 
-    if (isObject_1$1(value) || Array.isArray(value)) {
+    if (isObject_1(value) || Array.isArray(value)) {
       formData.append(key, JSON.stringify(value));
     } else if (value != null) {
       formData.append(key, value);
@@ -8415,7 +8444,7 @@ const formDataConverter = body => {
  * @return {Promise}
  */
 const commonFetch = (context, url, options) => {
-  options = objectAssign$1({
+  options = objectAssign({
     mode: 'cors',
     // redirect方法はレスポンスにそう形にする。
     redirect: 'follow',
@@ -8552,7 +8581,7 @@ var application$3 = {
         return results;
     }
 
-    var filter_1$2 = filter$1;
+    var filter_1$1 = filter$1;
 
 /**
      * Array map
@@ -8572,20 +8601,42 @@ var application$3 = {
         return results;
     }
 
-     var map_1$2 = map$1;
+     var map_1$1 = map$1;
+
+/**
+     * @return {array} Array of unique items
+     */
+    function unique$1(arr, compare){
+        compare = compare || isEqual$1;
+        return filter_1$1(arr, function(item, i, arr){
+            var n = arr.length;
+            while (++i < n) {
+                if ( compare(item, arr[i]) ) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    function isEqual$1(a, b){
+        return a === b;
+    }
+
+    var unique_1$1 = unique$1;
 
 /**
      * Get object keys
      */
      var keys = Object.keys || function (obj) {
             var keys = [];
-            forOwn_1$2(obj, function(val, key){
+            forOwn_1$1(obj, function(val, key){
                 keys.push(key);
             });
             return keys;
         };
 
-    var keys_1$1 = keys;
+    var keys_1 = keys;
 
 var components$2 = {
   /**
@@ -8638,13 +8689,42 @@ var components$2 = {
   },
 
   /**
+   * 全てののparamterObject群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  parameterObjectsEntirely: context => {
+    let entireParameterObjects = [];
+    const weights = {};
+    forOwn_1$1(context.state.components, component => {
+      entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
+    });
+    entireParameterObjects = map_1$1(entireParameterObjects, entireParameterObject => {
+      const name = entireParameterObject.name;
+      weights[name] || (weights[name] = 0);
+      weights[name] = weights[name] + 1;
+      return objectAssign({}, entireParameterObject);
+    });
+    entireParameterObjects = unique_1$1(entireParameterObjects, (a, b) => {
+      return (a.name === b.name);
+    });
+    forEach_1(entireParameterObjects, entireParameterObject => {
+      entireParameterObject.weight = weights[entireParameterObject.name];
+    });
+    entireParameterObjects = sortBy_1$1(entireParameterObjects, entireParameterObject => {
+      return weights[entireParameterObject.name] * (-1);
+    });
+    return entireParameterObjects;
+  },
+
+  /**
    * action(operationObject)群を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
    * @return {Array}
    */
   actions: (context, riotId) => {
-    return map_1$2(context.state.components[riotId].actions, action => {
+    return map_1$1(context.state.components[riotId].actions, action => {
       return action.operationObject;
     });
   },
@@ -8657,10 +8737,10 @@ var components$2 = {
    */
   selfActions: (context, riotId) => {
     const actions = context.state.components[riotId].actions;
-    const selfActions = filter_1$2(actions, action => {
+    const selfActions = filter_1$1(actions, action => {
       return (!action.appendTo || action.appendTo === 'self');
     });
-    return map_1$2(selfActions, action => {
+    return map_1$1(selfActions, action => {
       return action.operationObject;
     });
   },
@@ -8673,10 +8753,10 @@ var components$2 = {
    */
   rowActions: (context, riotId) => {
     const actions = context.state.components[riotId].actions;
-    const selfActions = filter_1$2(actions, action => {
+    const selfActions = filter_1$1(actions, action => {
       return (action.appendTo === 'row');
     });
-    return map_1$2(selfActions, action => {
+    return map_1$1(selfActions, action => {
       return action.operationObject;
     });
   },
@@ -8719,10 +8799,10 @@ var components$2 = {
    */
   tableColumns: (context, riotId) => {
     const response = context.state.components[riotId].response;
-    if (!isArray_1$2(response) || !response.length) {
+    if (!isArray_1$1(response) || !response.length) {
       return [];
     }
-    return keys_1$1(response[0]);
+    return keys_1(response[0]);
   },
 
   /**
@@ -8751,10 +8831,10 @@ var current$2 = {
      * Creates a new object with all the properties where the callback returns
      * true.
      */
-    function filterValues$1(obj, callback, thisObj) {
+    function filterValues(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var output = {};
-        forOwn_1$2(obj, function(value, key, obj) {
+        forOwn_1$1(obj, function(value, key, obj) {
             if (callback(value, key, obj)) {
                 output[key] = value;
             }
@@ -8762,14 +8842,14 @@ var current$2 = {
 
         return output;
     }
-    var filter$3 = filterValues$1;
+    var filter$4 = filterValues;
 
 /**
      * Get object values
      */
     function values(obj) {
         var vals = [];
-        forOwn_1$2(obj, function(val, key){
+        forOwn_1$1(obj, function(val, key){
             vals.push(val);
         });
         return vals;
@@ -8839,7 +8919,7 @@ var viron$2 = {
     if (!context.state.viron) {
       return [];
     }
-    return values_1(filter$3(context.state.viron.pages, page => {
+    return values_1(filter$4(context.state.viron.pages, page => {
       if (page.section !== SECTION_DASHBOARD) {
         return false;
       }
@@ -8856,7 +8936,7 @@ var viron$2 = {
     if (!context.state.viron) {
       return [];
     }
-    return values_1(filter$3(context.state.viron.pages, page => {
+    return values_1(filter$4(context.state.viron.pages, page => {
       if (page.section !== SECTION_MANAGE) {
         return false;
       }
@@ -8881,7 +8961,7 @@ var drawers$2 = {
      */
     function size(obj) {
         var count = 0;
-        forOwn_1$2(obj, function(){
+        forOwn_1$1(obj, function(){
             count++;
         });
         return count;
@@ -8908,7 +8988,7 @@ var drawers$2 = {
         return str.indexOf(substring, fromIndex) !== -1;
     }
 
-    var contains_1$2 = contains$1;
+    var contains_1$1 = contains$1;
 
 /**
  * 受け取ったエンドポイント群をorder昇順の配列として返します。
@@ -8917,11 +8997,11 @@ var drawers$2 = {
  */
 const sortByOrder = endpoints => {
   let endpointsByOrder = [];
-  forOwn_1$2(endpoints, (endpoint, key) => {
+  forOwn_1$1(endpoints, (endpoint, key) => {
     endpoint.key = key;
     endpointsByOrder.push(endpoint);
   });
-  endpointsByOrder = sortBy_1$2(endpointsByOrder, endpoint => {
+  endpointsByOrder = sortBy_1$1(endpointsByOrder, endpoint => {
     return endpoint.order;
   });
   return endpointsByOrder;
@@ -8937,33 +9017,33 @@ const filterBy = (endpoints, filterText) => {
   filterText = filterText || '';
   filterText = filterText.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
   filterText = filterText.replace(/,/g, ' ');
-  const targetTexts = filter_1$2((filterText || '').split(' '), targetText => {
+  const targetTexts = filter_1$1((filterText || '').split(' '), targetText => {
     return !!targetText;
   });
   if (!targetTexts.length) {
     return endpoints;
   }
 
-  return filter_1$2(endpoints, endpoint => {
+  return filter_1$1(endpoints, endpoint => {
     let isMatched = false;
-    forEach_1$1(targetTexts, targetText => {
-      if (contains_1$2(endpoint.url, targetText)) {
+    forEach_1(targetTexts, targetText => {
+      if (contains_1$1(endpoint.url, targetText)) {
         isMatched = true;
       }
-      if (contains_1$2(endpoint.title, targetText)) {
+      if (contains_1$1(endpoint.title, targetText)) {
         isMatched = true;
       }
-      if (contains_1$2(endpoint.name, targetText)) {
+      if (contains_1$1(endpoint.name, targetText)) {
         isMatched = true;
       }
-      if (contains_1$2(endpoint.description, targetText)) {
+      if (contains_1$1(endpoint.description, targetText)) {
         isMatched = true;
       }
-      if (contains_1$2(endpoint.memo, targetText)) {
+      if (contains_1$1(endpoint.memo, targetText)) {
         isMatched = true;
       }
-      forEach_1$1(endpoint.tags || [], tag => {
-        if (contains_1$2(tag, targetText)) {
+      forEach_1(endpoint.tags || [], tag => {
+        if (contains_1$1(tag, targetText)) {
           isMatched = true;
         }
       });
@@ -8988,7 +9068,7 @@ var endpoints$2 = {
    * @return {Array}
    */
   allByOrder: context => {
-    let endpoints = objectAssign$1(context.state.endpoints);
+    let endpoints = objectAssign(context.state.endpoints);
     endpoints = sortByOrder(endpoints);
     return endpoints;
   },
@@ -8999,7 +9079,7 @@ var endpoints$2 = {
    * @return {Array}
    */
   allByOrderFiltered: context => {
-    let endpoints = objectAssign$1(context.state.endpoints);
+    let endpoints = objectAssign(context.state.endpoints);
     endpoints = sortByOrder(endpoints);
     endpoints = filterBy(endpoints, context.state.application.endpointFilterText);
     return endpoints;
@@ -9020,9 +9100,9 @@ var endpoints$2 = {
    * @return {Object}
    */
   allWithoutToken: context => {
-    const endpoints = objectAssign$1({}, context.state.endpoints);
+    const endpoints = objectAssign({}, context.state.endpoints);
     // 認証用トークンはexport対象外とする。
-    forOwn_1$2(endpoints, endpoint => {
+    forOwn_1$1(endpoints, endpoint => {
       delete endpoint.token;
     });
     return endpoints;
@@ -9046,7 +9126,7 @@ var endpoints$2 = {
    */
   oneByURL: (context, url) => {
     const endpoints = context.state.endpoints;
-    return find_1$2(endpoints, endpoint => {
+    return find_1$1(endpoints, endpoint => {
       return endpoint.url === url;
     });
   }
@@ -9160,8 +9240,8 @@ var oas$2 = {
   flatApis: context => {
     // client.apisはタグ分けされているので、まずflatな構成にする。
     const apis = {};
-    forOwn_1$2(context.state.oas.client.apis, obj => {
-      forOwn_1$2(obj, (api, operationId) => {
+    forOwn_1$1(context.state.oas.client.apis, obj => {
+      forOwn_1$1(obj, (api, operationId) => {
         apis[operationId] = api;
       });
     });
@@ -9176,8 +9256,8 @@ var oas$2 = {
    */
   api: (context, operationId) => {
     const apis = {};
-    forOwn_1$2(context.state.oas.client.apis, obj => {
-      forOwn_1$2(obj, (api, operationId) => {
+    forOwn_1$1(context.state.oas.client.apis, obj => {
+      forOwn_1$1(obj, (api, operationId) => {
         apis[operationId] = api;
       });
     });
@@ -9195,8 +9275,8 @@ var oas$2 = {
     const operationObject = context.state.oas.client.spec.paths[path][method];
     const operationId = operationObject.operationId;
     const apis = {};
-    forOwn_1$2(context.state.oas.client.apis, obj => {
-      forOwn_1$2(obj, (api, operationId) => {
+    forOwn_1$1(context.state.oas.client.apis, obj => {
+      forOwn_1$1(obj, (api, operationId) => {
         apis[operationId] = api;
       });
     });
@@ -9221,11 +9301,11 @@ var oas$2 = {
    */
   pathItemObjectMethodNameByOperationId: (context, operationId) => {
     let ret;
-    forOwn_1$2(context.state.oas.client.spec.paths, pathItemObject => {
+    forOwn_1$1(context.state.oas.client.spec.paths, pathItemObject => {
       if (!!ret) {
         return;
       }
-      forOwn_1$2(pathItemObject, (operationObject, method) => {
+      forOwn_1$1(pathItemObject, (operationObject, method) => {
         if (!!ret) {
           return;
         }
@@ -9263,12 +9343,12 @@ var oas$2 = {
     // 関連API情報。後のOperationObject群抽出に使用します。
     const pathRefs = [];
     // 同じpath & method違いのoperationObjectは関連有りとみなす。
-    forEach_1$1(methods, method => {
+    forEach_1(methods, method => {
       // `get`はcomponent自身なのでスルーする。
       if (method === 'get') {
         return;
       }
-      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath][method];
+      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath] && !!context.state.oas.client.spec.paths[basePath][method];
       if (!isOperationObjectDefined) {
         return;
       }
@@ -9282,8 +9362,8 @@ var oas$2 = {
     // テーブルの各rowに紐づくOperationObjectとみなす。
     if (!!primaryKey) {
       const listBasePath = `${basePath}/{${primaryKey}}`;
-      forEach_1$1(methods, method => {
-        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath][method];
+      forEach_1(methods, method => {
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath] && !!context.state.oas.client.spec.paths[listBasePath][method];
         if (!isOperationObjectDefined) {
           return;
         }
@@ -9297,10 +9377,10 @@ var oas$2 = {
     // actionsに指定されたpath群のOperationObjectも関連有りとみなします。
     // path内にprimaryKeyと同一名の変数があれば、それはテーブルrowに紐づくOperationObjectとみなします。
     // primaryKeyと同一名の変数が無ければ、componentと紐づくOperationObjectとみなします。
-    forEach_1$1(actions, actionBasePath => {
+    forEach_1(actions, actionBasePath => {
       const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
-      forEach_1$1(methods, method => {
-        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath][method];
+      forEach_1(methods, method => {
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath] && !!context.state.oas.client.spec.paths[actionBasePath][method];
         if (!isOperationObjectDefined) {
           return;
         }
@@ -9314,9 +9394,9 @@ var oas$2 = {
 
     // OperationObject群を抽出します。
     const operationObjects = [];
-    forEach_1$1(pathRefs, ref => {
+    forEach_1(pathRefs, ref => {
       const operationObject = context.state.oas.client.spec.paths[ref.path][ref.method];
-      operationObjects.push(objectAssign$1({
+      operationObjects.push(objectAssign({
         operationObject
       }, ref));
     });
@@ -9438,6 +9518,36 @@ var page$2 = {
   },
 
   /**
+   * table表示のコンポーネント群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  componentsTable: context => {
+    const page = context.state.page;
+    if (!page) {
+      return [];
+    }
+    return filter_1$1(page.components, component => {
+      return (component.style === 'table');
+    });
+  },
+
+  /**
+   * table表示以外のコンポーネント群を返します。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  componentsNotTable: context => {
+    const page = context.state.page;
+    if (!page) {
+      return [];
+    }
+    return reject_1$1(page.components, component => {
+      return (component.style === 'table');
+    });
+  },
+
+  /**
    * コンポーネント数を返します。
    * @param {riotx.Context} context
    * @return {Number}
@@ -9499,6 +9609,7 @@ const constants$4 = {
   APPLICATION_ISDRAGGING: 'APPLICATION_ISDRAGGING',
   APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS: 'COMPONENTS',
+  COMPONENTS_PARAMETER_OBJECTS: 'COMPONENTS_PARAMETER_OBJECTS',
   COMPONENTS_ONE: 'COMPONENTS_ONE',
   COMPONENTS_ONE_RESPONSE: 'COMPONENTS_ONE_RESPONSE',
   COMPONENTS_ONE_SCHEMA_OBJECT: 'COMPONENTS_ONE_SCHEMA_OBJECT',
@@ -9552,6 +9663,8 @@ const constants$4 = {
   PAGE_ID: 'PAGE_ID',
   PAGE_NAME: 'PAGE_NAME',
   PAGE_COMPONENTS: 'PAGE_COMPONENTS',
+  PAGE_COMPONENTS_TABLE: 'PAGE_COMPONENTS_TABLE',
+  PAGE_COMPONENTS_NOT_TABLE: 'PAGE_COMPONENTS_NOT_TABLE',
   PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
   TOASTS: 'TOASTS',
   UA: 'UA',
@@ -9567,6 +9680,7 @@ var getters = {
   [constants$4.APPLICATION_ISDRAGGING]: application$3.isDragging,
   [constants$4.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
   [constants$4.COMPONENTS]: components$2.all,
+  [constants$4.COMPONENTS_PARAMETER_OBJECTS]: components$2.parameterObjectsEntirely,
   [constants$4.COMPONENTS_ONE]: components$2.one,
   [constants$4.COMPONENTS_ONE_RESPONSE]: components$2.response,
   [constants$4.COMPONENTS_ONE_SCHEMA_OBJECT]: components$2.schemaObject,
@@ -9620,6 +9734,8 @@ var getters = {
   [constants$4.PAGE_ID]: page$2.id,
   [constants$4.PAGE_NAME]: page$2.name,
   [constants$4.PAGE_COMPONENTS]: page$2.components,
+  [constants$4.PAGE_COMPONENTS_TABLE]: page$2.componentsTable,
+  [constants$4.PAGE_COMPONENTS_NOT_TABLE]: page$2.componentsNotTable,
   [constants$4.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
   [constants$4.TOASTS]: toasts$2.all,
   [constants$4.UA]: ua$2.all,
@@ -9835,7 +9951,7 @@ function resolve() {
   // handle relative paths to be safe (might happen when process.cwd() fails)
 
   // Normalize the path
-  resolvedPath = normalizeArray(filter$5(resolvedPath.split('/'), function(p) {
+  resolvedPath = normalizeArray(filter$6(resolvedPath.split('/'), function(p) {
     return !!p;
   }), !resolvedAbsolute).join('/');
 
@@ -9849,7 +9965,7 @@ function normalize(path) {
       trailingSlash = substr(path, -1) === '/';
 
   // Normalize the path
-  path = normalizeArray(filter$5(path.split('/'), function(p) {
+  path = normalizeArray(filter$6(path.split('/'), function(p) {
     return !!p;
   }), !isPathAbsolute).join('/');
 
@@ -9871,7 +9987,7 @@ function isAbsolute$1(path) {
 // posix version
 function join$1() {
   var paths = Array.prototype.slice.call(arguments, 0);
-  return normalize(filter$5(paths, function(p, index) {
+  return normalize(filter$6(paths, function(p, index) {
     if (typeof p !== 'string') {
       throw new TypeError('Arguments to path.join must be strings');
     }
@@ -9969,7 +10085,7 @@ var path = {
   normalize: normalize,
   resolve: resolve
 };
-function filter$5 (xs, f) {
+function filter$6 (xs, f) {
     if (xs.filter) { return xs.filter(f); }
     var res = [];
     for (var i = 0; i < xs.length; i++) {
@@ -10638,53 +10754,67 @@ var components$3 = {
     const currentEndpointKey = context.getter(constants$4.CURRENT);
     const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
-    return api(query, {
-      requestInterceptor: req => {
-        req.headers['Authorization'] = token;
-      }
-    }).then(res => {
-      if (!res.ok) {
-        return Promise.reject(res);
-      }
-      return res;
-    }).then(res => {
-      // tokenを更新する。
-      const token = res.headers['Authorization'];
-      if (!!token) {
-        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-      }
-      // `component.pagination`からページングをサポートしているか判断する。
-      // サポートしていれば手動でページング情報を付加する。
-      let hasPagination = false;
-      let pagination;
-      if (component.pagination) {
-        const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
-        const size = Number(res.headers['x-pagination-limit'] || 0);
-        const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
-        pagination = {
-          // `x-pagination-current-page`等は独自仕様。
-          // VIRONを使用するサービスはこの仕様に沿う必要がある。
-          currentPage,
-          size,
-          maxPage
-        };
-        // 2ページ以上存在する場合のみページングをONにする。
-        if (maxPage >= 2) {
-          hasPagination = true;
+    const networkingId = `networking_${Date.now()}`;
+
+    return Promise
+      .resolve()
+      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
+      .then(() => api(query, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
         }
-      }
-      context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
-        component_uid,
-        response: res.obj,// APIレスポンス内容そのまま。
-        schemaObject: context.getter(constants$4.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
-        parameterObjects: context.getter(constants$4.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
-        actions,// 関連API群。
-        hasPagination,
-        pagination,// ページング関連。
-        primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
-        table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
+        // `component.pagination`からページングをサポートしているか判断する。
+        // サポートしていれば手動でページング情報を付加する。
+        let hasPagination = false;
+        let pagination;
+        if (component.pagination) {
+          const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
+          const size = Number(res.headers['x-pagination-limit'] || 0);
+          const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
+          pagination = {
+            // `x-pagination-current-page`等は独自仕様。
+            // VIRONを使用するサービスはこの仕様に沿う必要がある。
+            currentPage,
+            size,
+            maxPage
+          };
+          // 2ページ以上存在する場合のみページングをONにする。
+          if (maxPage >= 2) {
+            hasPagination = true;
+          }
+        }
+        context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
+          component_uid,
+          response: res.obj,// APIレスポンス内容そのまま。
+          schemaObject: context.getter(constants$4.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
+          parameterObjects: context.getter(constants$4.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
+          actions,// 関連API群。
+          hasPagination,
+          pagination,// ページング関連。
+          primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
+          table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
+        });
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      })
+      .catch(err => {
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
       });
-    });
   },
 
   /**
@@ -10698,34 +10828,47 @@ var components$3 = {
     const api = context.getter(constants$4.OAS_API, operationObject.operationId);
     const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
     const currentEndpointKey = context.getter(constants$4.CURRENT);
+    const networkingId = `networking_${Date.now()}`;
 
-    return api(params, {
-      requestInterceptor: req => {
-        req.headers['Authorization'] = token;
-      }
-    }).then(res => {
-      if (!res.ok) {
-        return Promise.reject(res);
-      }
-      return res;
-    }).then(res => {
-      // tokenを更新する。
-      const token = res.headers['Authorization'];
-      if (!!token) {
-        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-      }
-      // ダウンロード指定されていればダウンロードする。
-      const contentDispositionHeader = res.headers['content-disposition'];
-      if (!contentDispositionHeader) {
+    return Promise
+      .resolve()
+      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
+      .then(() => api(params, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
         return res;
-      }
-      const downloadFileInfo = contentDisposition_1.parse(contentDispositionHeader);
-      if (downloadFileInfo.type !== 'attachment') {
+      })
+      .then(res => {
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+        }
+        // ダウンロード指定されていればダウンロードする。
+        const contentDispositionHeader = res.headers['content-disposition'];
+        if (!contentDispositionHeader) {
+          return res;
+        }
+        const downloadFileInfo = contentDisposition_1.parse(contentDispositionHeader);
+        if (downloadFileInfo.type !== 'attachment') {
+          return res;
+        }
+        download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
         return res;
-      }
-      download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
-      return res;
-    });
+      })
+      .catch(err => {
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
+      });
   },
 
   /**
@@ -10800,9 +10943,13 @@ var viron$3 = {
     const currentEndpointKey = context.getter(constants$4.CURRENT);
     const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
+    const networkingId = `networking_${Date.now()}`;
 
     return Promise
       .resolve()
+      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
+        id: networkingId
+      }))
       .then(() => api({}, {
         requestInterceptor: req => {
           req.headers['Authorization'] = token;
@@ -10821,10 +10968,15 @@ var viron$3 = {
           context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
         }
         context.commit(constants$2.VIRON, res.obj);
-        const endpoint = objectAssign$1({}, res.obj);
+        const endpoint = objectAssign({}, res.obj);
         // pagesは不要なので削除。
         delete endpoint.pages;
         context.commit(constants$2.ENDPOINTS_UPDATE, currentEndpointKey, endpoint);
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      })
+      .catch(err => {
+        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        throw err;
       });
   },
 
@@ -11096,6 +11248,29 @@ var modals$3 = {
   }
 };
 
+/**
+     * Encode object into a query string.
+     */
+    function encode$2(obj){
+        var query = [],
+            arrValues, reg;
+        forOwn_1$1(obj, function (val, key) {
+            if (isArray_1$1(val)) {
+                arrValues = key + '=';
+                reg = new RegExp('&'+key+'+=$');
+                forEach_1(val, function (aValue) {
+                    arrValues += encodeURIComponent(aValue) + '&' + key + '=';
+                });
+                query.push(arrValues.replace(reg, ''));
+            } else {
+               query.push(key + '=' + encodeURIComponent(val));
+            }
+        });
+        return (query.length) ? '?' + query.join('&') : '';
+    }
+
+    var encode_1$2 = encode$2;
+
 // swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
 const SwaggerClient = window.SwaggerClient;
 
@@ -11155,6 +11330,28 @@ var oas$3 = {
       .then(() => {
         context.commit(constants$2.OAS_CLIENT_CLEAR);
       });
+  },
+
+  /**
+   * Autocompleteリストを取得します。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {Object} query
+   * @return {Promise}
+   */
+  getAutocomplete: (context, path, query) => {
+    const currentEndpointKey = context.getter(constants$4.CURRENT);
+    const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
+    const token = currentEndpoint.token;
+    const url = `${new URL(currentEndpoint.url).origin}${path}${encode_1$2(query)}`;
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, url, {
+        headers: {
+          'Authorization': token
+        }
+      }))
+      .then(res => res.json());
   }
 };
 
@@ -11170,7 +11367,7 @@ var page$3 = {
       .resolve()
       .then(() => {
         const pages = context.getter(constants$4.VIRON_PAGES);
-        const page = find_1$2(pages, page => {
+        const page = find_1$1(pages, page => {
           return (page.id === pageId);
         });
         context.commit(constants$2.PAGE, page);
@@ -11222,7 +11419,7 @@ var toasts$3 = {
 
 };
 
-var sua$1 = createCommonjsModule(function (module) {
+var sua = createCommonjsModule(function (module) {
 /* Zepto v1.0-1-ga3cab6c - polyfill zepto detect event ajax form fx - zeptojs.com/license */
 /**
  * @name sua.js
@@ -11719,7 +11916,7 @@ var ua$3 = {
     return Promise
       .resolve()
       .then(() => {
-        const ua = new sua$1(navigator.userAgent);
+        const ua = new sua(navigator.userAgent);
         context.commit(constants$2.UA, ua);
       });
   }
@@ -11763,6 +11960,7 @@ const constants$1 = {
   MODALS_REMOVE: 'MODALS_REMOVE',
   OAS_SETUP: 'OAS_SETUP',
   OAS_CLEAR: 'OAS_CLEAR',
+  OAS_GET_AUTOCOMPLETE: 'OAS_GET_AUTOCOMPLETE',
   OAUTH_ENDPOINT_KEY_REMOVE: 'OAUTH_ENDPOINT_KEY_REMOVE',
   PAGE_GET: 'PAGE_GET',
   PAGE_REMOVE: 'PAGE_REMOVE',
@@ -11809,6 +12007,7 @@ var actions = {
   [constants$1.MODALS_REMOVE]: modals$3.remove,
   [constants$1.OAS_SETUP]: oas$3.setup,
   [constants$1.OAS_CLEAR]: oas$3.clear,
+  [constants$1.OAS_GET_AUTOCOMPLETE]: oas$3.getAutocomplete,
   [constants$1.PAGE_GET]: page$3.get,
   [constants$1.PAGE_REMOVE]: page$3.remove,
   [constants$1.TOASTS_ADD]: toasts$3.add,
@@ -11899,7 +12098,12 @@ var script$2 = function() {
     }
     Promise
       .resolve()
-      .then(() => error.json())
+      .then(() => {
+        if (!!error.json) {
+          return error.json();
+        }
+        return error.text().then(text => JSON.parse(text));
+      })
       .then(json => {
         const error = json.error;
         this.detail = error;
@@ -12133,7 +12337,7 @@ var router = {
     return Promise
       .resolve()
       .then(() => {
-        const router = new Router$1(Router$1.HASH);
+        const router = new Router(Router.HASH);
         router
           .onBefore(() => Promise.all([
             store.action(constants$1.APPLICATION_NAVIGATION_START)
@@ -12220,7 +12424,7 @@ const closureEventListener = (() => {
   };
 })();
 const bindTouchEvents = tag => {
-  forEach_1$1(getTouchableElements(tag), elm => {
+  forEach_1(getTouchableElements(tag), elm => {
     let touchX = 0, touchY = 0;
     // bind済みであれば何もしない。
     if (!!elm.getAttribute('touchevents')) {
@@ -12280,13 +12484,13 @@ const bindTouchEvents = tag => {
   });
 };
 const unbindTouchEvents = tag => {
-  forEach_1$1(getTouchableElements(tag), elm => {
+  forEach_1(getTouchableElements(tag), elm => {
     const touchEvents = elm.getAttribute('touchevents');
     if (!touchEvents) {
       return;
     }
     const touchEventIds = touchEvents.split('/');
-    forEach_1$1(touchEventIds, touchEventId => {
+    forEach_1(touchEventIds, touchEventId => {
       closureEventListener.remove(touchEventId);
     });
   });
@@ -13047,7 +13251,7 @@ var VERSION$1 = "0.9.4";
 /**
      * Array forEach
      */
-    function forEach$3(arr, callback, thisObj) {
+    function forEach$4(arr, callback, thisObj) {
         if (arr == null) {
             return;
         }
@@ -13062,7 +13266,7 @@ var VERSION$1 = "0.9.4";
         }
     }
 
-    var forEach_1$3 = forEach$3;
+    var forEach_1$2 = forEach$4;
 
 /**
      * Safer Object.hasOwnProperty
@@ -13071,7 +13275,7 @@ var VERSION$1 = "0.9.4";
          return Object.prototype.hasOwnProperty.call(obj, prop);
      }
 
-     var hasOwn_1$3 = hasOwn$4;
+     var hasOwn_1$2 = hasOwn$4;
 
 var _hasDontEnumBug$2;
 var _dontEnums$2;
@@ -13129,7 +13333,7 @@ var _dontEnums$2;
                 // different than Object prototype value.
                 if (
                     (key !== 'constructor' ||
-                        (!isProto && hasOwn_1$3(obj, key))) &&
+                        (!isProto && hasOwn_1$2(obj, key))) &&
                     obj[key] !== Object.prototype[key]
                 ) {
                     if (exec$2(fn, obj, key, thisObj) === false) {
@@ -13153,26 +13357,26 @@ var _dontEnums$2;
      */
     function forOwn$4(obj, fn, thisObj){
         forIn_1$3(obj, function(val, key){
-            if (hasOwn_1$3(obj, key)) {
+            if (hasOwn_1$2(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
             }
         });
     }
 
-    var forOwn_1$3 = forOwn$4;
+    var forOwn_1$2 = forOwn$4;
 
 /**
      * Get object keys
      */
      var keys$2 = Object.keys || function (obj) {
             var keys = [];
-            forOwn_1$3(obj, function(val, key){
+            forOwn_1$2(obj, function(val, key){
                 keys.push(key);
             });
             return keys;
         };
 
-    var keys_1$2 = keys$2;
+    var keys_1$1 = keys$2;
 
 /*
 object-assign
@@ -13626,7 +13830,7 @@ Store.prototype.commit = function commit (name) {
   log.apply(void 0, [ '[commit(after)]', name, _state ].concat( args ));
   index$1$1(this.state, _state);
 
-  forEach_1$3(triggers, function (v) {
+  forEach_1$2(triggers, function (v) {
     // this.trigger(v, null, this.state, this);
     this$1.trigger(v, this$1.state, this$1);
   });
@@ -13720,7 +13924,7 @@ var RiotX = function RiotX() {
       // the context of `this` will be equal to riot tag instant.
       this.on('unmount', function () {
         this$1.off('*');
-        forEach_1$3(this$1._riotx_change_handlers, function (obj) {
+        forEach_1$2(this$1._riotx_change_handlers, function (obj) {
           obj.store.off(obj.evtName, obj.handler);
         });
         delete this$1.riotx;
@@ -13802,7 +14006,7 @@ RiotX.prototype.reset = function reset () {
  * @returns {int} size
  */
 RiotX.prototype.size = function size () {
-  return keys_1$2(this.stores).length;
+  return keys_1$1(this.stores).length;
 };
 
 var index$1$2 = new RiotX();
@@ -13913,7 +14117,95 @@ riot$1.tag2('viron-button', '<div class="Button__content"> <div class="Button__i
     this.external(script$4);
 });
 
+/**
+     */
+    function isNull(val){
+        return val === null;
+    }
+    var isNull_1 = isNull;
+
+var UNDEF$2;
+
+    /**
+     */
+    function isUndef(val){
+        return val === UNDEF$2;
+    }
+    var isUndefined = isUndef;
+
 var script$6 = function() {
+  const store = this.riotx.get();
+
+  this.options = [];
+
+  const config = this.opts.config;
+  const path = config.path;
+  const field = config.field;
+  const query = config.query || {};
+  const fetchAutocompleteOptions = val => {
+    if (isNull_1(val) || isUndefined(val)) {
+      return;
+    }
+
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.OAS_GET_AUTOCOMPLETE, path, objectAssign({}, query, {
+        [field]: val
+      })))
+      .then(options => {
+        this.options = options;
+        this.update();
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+        error: err
+      }));
+  };
+
+  /**
+   * undefined等の値を考慮した最適な値を返します。
+   * @param {String|null} value
+   * @return {String|null}
+   */
+  this.normalizeValue = value => {
+    if (isNumber_1(value)) {
+      return String(value);
+    }
+    if (isUndefined(value)) {
+      return null;
+    }
+    return value;
+  };
+
+  this.on('mount', () => {
+    this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
+    fetchAutocompleteOptions(this.normalizeValue(this.refs.input.value));
+  });
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    this.opts.onchange && this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    fetchAutocompleteOptions(this.normalizeValue(e.target.value));
+    this.opts.onchange && this.opts.onchange(this.normalizeValue(e.target.value), this.opts.id);
+  };
+
+  this.handleInputChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
+  };
+};
+
+riot$1.tag2('viron-autocomplete', '<div class="Autocomplete__label" if="{!!opts.label}">{opts.label}</div> <form onsubmit="{handleFormSubmit}"> <input class="Autocomplete__input" type="text" ref="input" list="{_riot_id}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form> <datalist id="{_riot_id}"> <option each="{opt in options}" riot-value="{opt.value}">{opt.name}</option> </datalist>', '', 'class="Autocomplete {\'Textinput--disabled\' : opts.isdisabled}"', function(opts) {
+    this.external(script$6);
+});
+
+var script$7 = function() {
   this.handleTap = () => {
     if (this.opts.isdisabled) {
       return;
@@ -13923,7 +14215,7 @@ var script$6 = function() {
 };
 
 riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon type="check"></viron-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$6);
+    this.external(script$7);
 });
 
 var beautify = createCommonjsModule(function (module, exports) {
@@ -18488,7 +18780,7 @@ function ocd(str, options) {
     .replace(/>(\s*)(?=<!--\s*\/)/g, '> ');
 }
 
-var script$7 = function() {
+var script$8 = function() {
   this.getBeautifiedHtml = () => {
     const data = this.opts.data;
     if (!data) {
@@ -18499,7 +18791,7 @@ var script$7 = function() {
 };
 
 riot$1.tag2('viron-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="Prettyhtml"', function(opts) {
-    this.external(script$7);
+    this.external(script$8);
 });
 
 /**
@@ -18507,16 +18799,16 @@ riot$1.tag2('viron-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="
     function isString(val) {
         return isKind_1$1(val, 'String');
     }
-    var isString_1$1 = isString;
+    var isString_1 = isString;
 
-var script$8 = function() {
+var script$9 = function() {
   /**
    * undefined等の値を考慮した最適な値を返します。
    * @param {String|null} value
    * @return {String|null}
    */
   this.normalizeValue = value => {
-    if (!isString_1$1(value)) {
+    if (!isString_1(value)) {
       return null;
     }
     return value;
@@ -18527,7 +18819,7 @@ var script$8 = function() {
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
     const text = this.opts.text;
-    if (!isString_1$1(text)) {
+    if (!isString_1(text)) {
       this.refs.textarea.value = this.normalizeValue(text);
     }
   });
@@ -18556,10 +18848,10 @@ var script$8 = function() {
 };
 
 riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\' : opts.isdisabled}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$8);
+    this.external(script$9);
 });
 
-var script$9 = function() {
+var script$10 = function() {
   // 各タブの選択状態。
   this.isTabEditorSelected = true;
   this.isTabPreviewSelected = false;
@@ -18616,7 +18908,7 @@ var script$9 = function() {
 };
 
 riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Html__tab {\'Html__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Html__body"> <div class="Html__message Html__message--{compileHtml().status}" if="{compileHtml().status === \'failed\'}">{compileHtml().message}</div> <div class="Html__editor" if="{isTabEditorSelected}"> <viron-textarea text="{opts.text}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}"></viron-textarea> </div> <div class="Html__preview" if="{isTabPreviewSelected}"> <viron-prettyhtml data="{compileHtml().html}"></viron-prettyhtml> </div> </div>', '', 'class="Html"', function(opts) {
-    this.external(script$9);
+    this.external(script$10);
 });
 
 /**
@@ -18628,7 +18920,7 @@ riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Htm
         return typeof val === 'number' && val != val;
     }
 
-    var _isNaN$2 = isNaN$3;
+    var _isNaN$1 = isNaN$3;
 
 /**
      * Check if value is NaN for realz
@@ -18637,38 +18929,22 @@ riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Htm
         // based on the fact that NaN !== NaN
         // need to check if it's a number to avoid conflicts with host objects
         // also need to coerce ToNumber to avoid edge case `new Number(NaN)`
-        return !isNumber_1$1(val) || _isNaN$2(Number(val));
+        return !isNumber_1(val) || _isNaN$1(Number(val));
     }
 
-    var _isNaN$1 = isNaN$1;
+    var _isNaN = isNaN$1;
 
-/**
-     */
-    function isNull(val){
-        return val === null;
-    }
-    var isNull_1$1 = isNull;
-
-var UNDEF$2;
-
-    /**
-     */
-    function isUndef$1(val){
-        return val === UNDEF$2;
-    }
-    var isUndefined = isUndef$1;
-
-var script$10 = function() {
+var script$11 = function() {
   /**
    * moutの`isNumber`のラッパー関数。
    * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
    * @param {*} num
    */
   const isNumber = num => {
-    if (_isNaN$1(num)) {
+    if (_isNaN(num)) {
       return false;
     }
-    return isNumber_1$1(num);
+    return isNumber_1(num);
   };
   // opts文字列指定も許可する。
   let min, max, step;
@@ -18687,7 +18963,7 @@ var script$10 = function() {
     const currentValue = this.normalizeValue(this.opts.number);
     const n = isNumber(step) ? step : 1;
     let newValue;
-    if (isNull_1$1(currentValue)) {
+    if (isNull_1(currentValue)) {
       newValue = n;
     } else {
       newValue = currentValue + n;
@@ -18703,7 +18979,7 @@ var script$10 = function() {
     const currentValue = this.normalizeValue(this.opts.number);
     const n = isNumber(step) ? step : 1;
     let newValue;
-    if (isNull_1$1(currentValue)) {
+    if (isNull_1(currentValue)) {
       newValue = n * (-1);
     } else {
       newValue = currentValue - n;
@@ -18718,7 +18994,7 @@ var script$10 = function() {
    */
   this.normalizeValue = value => {
     // nullの場合はそのまま扱う。
-    if (isNull_1$1(value)) {
+    if (isNull_1(value)) {
       return value;
     }
 
@@ -18728,7 +19004,7 @@ var script$10 = function() {
     }
 
     // 文字列を受け取った場合は形式によって返却値が変わる。
-    if (isString_1$1(value)) {
+    if (isString_1(value)) {
       // 数字と`-`のみも文字列に変換する。
       value = value.replace(/[^-^0-9]/g, '');
       // 空文字列の場合はnullとして扱う。
@@ -18741,7 +19017,7 @@ var script$10 = function() {
       // `1-2` ->  NaN
       value = Number(value);
       // NaNはnullとして扱う。
-      if (_isNaN$1(value)) {
+      if (_isNaN(value)) {
         return null;
       }
     }
@@ -18863,13 +19139,13 @@ var script$10 = function() {
 };
 
 riot$1.tag2('viron-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" onsubmit="{handleFormSubmit}" onkeydown="{handleFormKeyDown}"> <input class="Numberinput__input" ref="input" riot-value="{normalizeValue(opts.number)}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> <div class="Numberinput__handler"> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : (opts.isdisabled || !isIncrementable())}" ontap="handleIncreaseButtonPat" ref="touch"> <viron-icon type="caretUp"></viron-icon> </div> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : (opts.isdisabled || !isDecrementable())}" ontap="handleDecreaseButtonPat" ref="touch"> <viron-icon type="caretDown"></viron-icon> </div> </div> </form>', '', 'class="Numberinput {\'Numberinput--disabled\' : opts.isdisabled}"', function(opts) {
-    this.external(script$10);
+    this.external(script$11);
 });
 
 // NOTE: ブラウザ上でpugを動かすためには`https://pugjs.org/js/pug.js`を使用する必要がある。
 const pug = window.require && window.require('pug');
 
-var script$11 = function() {
+var script$12 = function() {
   // 各タブの選択状態。
   this.isTabEditorSelected = true;
   this.isTabPreviewSelected = false;
@@ -18926,15 +19202,15 @@ var script$11 = function() {
 };
 
 riot$1.tag2('viron-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\' : isTabEditorSelected}" ref="touch" ontap="handleTabEditorTap">editor</div> <div class="Pug__tab {\'Pug__tab--selected\' : isTabPreviewSelected}" ref="touch" ontap="handleTabPreviewTap">preview</div> </div> <div class="Pug__body"> <div class="Pug__message Pug__message--{compilePug().status}" if="{compilePug().status === \'failed\'}">{compilePug().message}</div> <div class="Pug__editor" if="{isTabEditorSelected}"> <viron-textarea text="{opts.text}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}"></viron-textarea> </div> <div class="Pug__preview" if="{isTabPreviewSelected}"> <viron-prettyhtml data="{compilePug().html}"></viron-prettyhtml> </div> </div>', '', 'class="Pug"', function(opts) {
-    this.external(script$11);
+    this.external(script$12);
 });
 
-var script$12 = function() {
+var script$13 = function() {
   this.handleFormSubmit = e => {
     e.preventUpdate = true;
     e.preventDefault();
     const selectedIndex = this.refs.select.selectedIndex;
-    forEach_1$1(this.opts.options, (option, idx) => {
+    forEach_1(this.opts.options, (option, idx) => {
       option.isSelected = (idx === selectedIndex);
     });
     this.opts.onchange && this.opts.onchange(this.opts.options);
@@ -18945,7 +19221,7 @@ var script$12 = function() {
   this.handleInputInput = e => {
     e.preventUpdate = true;
     const selectedIndex = this.refs.select.selectedIndex;
-    forEach_1$1(this.opts.options, (option, idx) => {
+    forEach_1(this.opts.options, (option, idx) => {
       option.isSelected = (idx === selectedIndex);
     });
     this.opts.onchange && this.opts.onchange(this.opts.options);
@@ -18959,17 +19235,17 @@ var script$12 = function() {
 };
 
 riot$1.tag2('viron-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" disabled="{!!opts.isdisabled}" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <viron-icon type="down"></viron-icon> </div> </form>', '', 'class="Select {\'Select--disabled\' : opts.isdisabled}"', function(opts) {
-    this.external(script$12);
+    this.external(script$13);
 });
 
-var script$13 = function() {
+var script$14 = function() {
   /**
    * undefined等の値を考慮した最適な値を返します。
    * @param {String|null} value
    * @return {String|null}
    */
   this.normalizeValue = value => {
-    if (!isString_1$1(value)) {
+    if (!isString_1(value)) {
       return null;
     }
     return value;
@@ -18980,7 +19256,7 @@ var script$13 = function() {
     this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
   }).on('updated', () => {
     const text = this.opts.text;
-    if (!isString_1$1(text)) {
+    if (!isString_1(text)) {
       this.refs.input.value = this.normalizeValue(text);
     }
   });
@@ -19009,10 +19285,10 @@ var script$13 = function() {
 };
 
 riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--ghost\' : (opts.theme === \'ghost\'), \'Textinput--disabled\' : opts.isdisabled}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$13);
+    this.external(script$14);
 });
 
-var script$14 = function() {
+var script$15 = function() {
   this.inputId = `Uploader__input${Date.now()}`;
   this.file = null;
   this.fileName = null;
@@ -19095,7 +19371,7 @@ var script$14 = function() {
 };
 
 riot$1.tag2('viron-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{!!opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <viron-icon type="file"></viron-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfImage}" riot-style="background-image:url({blobURL});"></div> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" ref="touch" ontap="handleResetButtonTap"> <viron-icon type="close"></viron-icon> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--disabled\' : opts.isdisabled, \'Uploader--dragWatching\' : isDragWatching}" onchange="{handleChange}"', function(opts) {
-    this.external(script$14);
+    this.external(script$15);
 });
 
 // TODO: node_moduleから読み込みたい。
@@ -19671,7 +19947,7 @@ const customizeBlot = (blotName, params) => {
   }
 };
 
-var script$15 = function() {
+var script$16 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -19681,7 +19957,7 @@ var script$15 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = (hasOwn_1$2(formats, 'align') && formats['align'] === 'center');
+    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'center');
     this.update();
   };
 
@@ -19728,10 +20004,10 @@ var script$15 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-align-center', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="15" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="14" x2="4" y1="14" y2="14"></line> <line class="ql-stroke" x1="12" x2="6" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignCenter {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$15);
+    this.external(script$16);
 });
 
-var script$16 = function() {
+var script$17 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -19741,7 +20017,7 @@ var script$16 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = (hasOwn_1$2(formats, 'align') && formats['align'] === 'left');
+    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'left');
     this.update();
   };
 
@@ -19788,10 +20064,10 @@ var script$16 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-align-left', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="3" x2="13" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="9" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignLeft {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$16);
+    this.external(script$17);
 });
 
-var script$17 = function() {
+var script$18 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -19801,7 +20077,7 @@ var script$17 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = (hasOwn_1$2(formats, 'align') && formats['align'] === 'right');
+    this.isActive = (hasOwn_1$1(formats, 'align') && formats['align'] === 'right');
     this.update();
   };
 
@@ -19848,10 +20124,10 @@ var script$17 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-align-right', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="15" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="15" x2="5" y1="14" y2="14"></line> <line class="ql-stroke" x1="15" x2="9" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignRight {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$17);
+    this.external(script$18);
 });
 
-var script$18 = function() {
+var script$19 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -19861,7 +20137,7 @@ var script$18 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$2(formats, 'blockquote');
+    this.isActive = hasOwn_1$1(formats, 'blockquote');
     this.update();
   };
 
@@ -19908,10 +20184,10 @@ var script$18 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-blockquote', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-fill ql-stroke" height="3" width="3" x="4" y="5"></rect> <rect class="ql-fill ql-stroke" height="3" width="3" x="11" y="5"></rect> <path class="ql-even ql-fill ql-stroke" d="M7,8c0,4.031-3,5-3,5"></path> <path class="ql-even ql-fill ql-stroke" d="M14,8c0,4.031-3,5-3,5"></path> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__blockquote {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$18);
+    this.external(script$19);
 });
 
-var script$19 = function() {
+var script$20 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -19921,7 +20197,7 @@ var script$19 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$2(formats, 'code-block');
+    this.isActive = hasOwn_1$1(formats, 'code-block');
     this.update();
   };
 
@@ -19968,10 +20244,10 @@ var script$19 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-codeblock', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <polyline class="ql-even ql-stroke" points="5 7 3 9 5 11"></polyline> <polyline class="ql-even ql-stroke" points="13 7 15 9 13 11"></polyline> <line class="ql-stroke" x1="10" x2="8" y1="5" y2="13"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__codeblock {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$19);
+    this.external(script$20);
 });
 
-var script$20 = function() {
+var script$21 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -19981,7 +20257,7 @@ var script$20 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$2(formats, 'direction');
+    this.isActive = hasOwn_1$1(formats, 'direction');
     this.update();
   };
 
@@ -20029,10 +20305,10 @@ var script$20 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-direction', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg if="{!isActive}" viewbox="0 0 18 18"> <polygon class="ql-stroke ql-fill" points="3 11 5 9 3 7 3 11"></polygon> <line class="ql-stroke ql-fill" x1="15" x2="11" y1="4" y2="4"></line> <path class="ql-fill" d="M11,3a3,3,0,0,0,0,6h1V3H11Z"></path> <rect class="ql-fill" height="11" width="1" x="11" y="4"></rect> <rect class="ql-fill" height="11" width="1" x="13" y="4"></rect> </svg> <svg if="{isActive}" viewbox="0 0 18 18"> <polygon class="ql-stroke ql-fill" points="15 12 13 10 15 8 15 12"></polygon> <line class="ql-stroke ql-fill" x1="9" x2="5" y1="4" y2="4"></line> <path class="ql-fill" d="M5,3A3,3,0,0,0,5,9H6V3H5Z"></path> <rect class="ql-fill" height="11" width="1" x="5" y="4"></rect> <rect class="ql-fill" height="11" width="1" x="7" y="4"></rect> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__direction {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$20);
+    this.external(script$21);
 });
 
-var script$21 = function() {
+var script$22 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20042,7 +20318,7 @@ var script$21 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$2(formats, 'header') && formats['header'] === this.opts.level;
+    this.isActive = hasOwn_1$1(formats, 'header') && formats['header'] === this.opts.level;
     this.update();
   };
 
@@ -20090,10 +20366,10 @@ var script$21 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-header', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="3" y1="4" y2="14"></line> <line class="ql-stroke" x1="11" x2="11" y1="4" y2="14"></line> <line class="ql-stroke" x1="11" x2="3" y1="9" y2="9"></line> </svg> <div class="Wyswyg__headerLevel">{opts.level}</div> </div>', '', 'class="Wyswyg__tool Wyswyg__header {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$21);
+    this.external(script$22);
 });
 
-var script$22 = function() {
+var script$23 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20103,7 +20379,7 @@ var script$22 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$2(formats, 'image');
+    this.isActive = hasOwn_1$1(formats, 'image');
     this.update();
   };
 
@@ -20151,10 +20427,10 @@ var script$22 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-image', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-stroke" height="10" width="12" x="3" y="4"></rect> <circle class="ql-fill" cx="6" cy="7" r="1"></circle> <polyline class="ql-even ql-fill" points="5 12 5 11 7 9 8 10 11 7 13 9 13 12 5 12"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__image {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$22);
+    this.external(script$23);
 });
 
-var script$23 = function() {
+var script$24 = function() {
   /**
    * タップ領域がタップされた時の処理。
    */
@@ -20165,10 +20441,10 @@ var script$23 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-indent-left', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="9" x2="15" y1="9" y2="9"></line> <polyline class="ql-stroke" points="5 7 5 11 3 9 5 7"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__indentLeft"', function(opts) {
-    this.external(script$23);
+    this.external(script$24);
 });
 
-var script$24 = function() {
+var script$25 = function() {
   /**
    * タップ領域がタップされた時の処理。
    */
@@ -20179,10 +20455,10 @@ var script$24 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-indent-right', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="9" x2="15" y1="9" y2="9"></line> <polyline class="ql-fill ql-stroke" points="3 7 3 11 5 9 3 7"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__indentRight"', function(opts) {
-    this.external(script$24);
+    this.external(script$25);
 });
 
-var script$25 = function() {
+var script$26 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20192,7 +20468,7 @@ var script$25 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$2(formats, 'list') && formats['list'] === 'bullet';
+    this.isActive = hasOwn_1$1(formats, 'list') && formats['list'] === 'bullet';
     this.update();
   };
 
@@ -20240,10 +20516,10 @@ var script$25 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-list-bullet', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="6" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="6" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="6" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="3" y1="4" y2="4"></line> <line class="ql-stroke" x1="3" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="3" x2="3" y1="14" y2="14"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__listBullet {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$25);
+    this.external(script$26);
 });
 
-var script$26 = function() {
+var script$27 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20253,7 +20529,7 @@ var script$26 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$2(formats, 'list') && formats['list'] === 'ordered';
+    this.isActive = hasOwn_1$1(formats, 'list') && formats['list'] === 'ordered';
     this.update();
   };
 
@@ -20301,10 +20577,10 @@ var script$26 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-list-ordered', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="7" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="7" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="7" x2="15" y1="14" y2="14"></line> <line class="ql-stroke ql-thin" x1="2.5" x2="4.5" y1="5.5" y2="5.5"></line> <path class="ql-fill" d="M3.5,6A0.5,0.5,0,0,1,3,5.5V3.085l-0.276.138A0.5,0.5,0,0,1,2.053,3c-0.124-.247-0.023-0.324.224-0.447l1-.5A0.5,0.5,0,0,1,4,2.5v3A0.5,0.5,0,0,1,3.5,6Z"></path> <path class="ql-stroke ql-thin" d="M4.5,10.5h-2c0-.234,1.85-1.076,1.85-2.234A0.959,0.959,0,0,0,2.5,8.156"></path> <path class="ql-stroke ql-thin" d="M2.5,14.846a0.959,0.959,0,0,0,1.85-.109A0.7,0.7,0,0,0,3.75,14a0.688,0.688,0,0,0,.6-0.736,0.959,0.959,0,0,0-1.85-.109"></path> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__listOrdered {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$26);
+    this.external(script$27);
 });
 
-var script$27 = function() {
+var script$28 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20314,7 +20590,7 @@ var script$27 = function() {
    */
   const updateActiveStatus = range => {
     const formats = (!range ? {} : this.opts.quill.getFormat(range));
-    this.isActive = hasOwn_1$2(formats, 'video');
+    this.isActive = hasOwn_1$1(formats, 'video');
     this.update();
   };
 
@@ -20362,10 +20638,10 @@ var script$27 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-video', '<div class="Wyswyg__toolInner" ref="touch" ontap="handleInnerTap"> <svg viewbox="0 0 18 18"> <rect class="ql-stroke" height="12" width="12" x="3" y="3"></rect> <rect class="ql-fill" height="12" width="1" x="5" y="3"></rect> <rect class="ql-fill" height="12" width="1" x="12" y="3"></rect> <rect class="ql-fill" height="2" width="8" x="5" y="8"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="5"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="7"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="10"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="12"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="5"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="7"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="10"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="12"></rect> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__video {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$27);
+    this.external(script$28);
 });
 
-var script$28 = function() {
+var script$29 = function() {
   const blotOptions = this.opts.blotoptions || {};
 
   // quillインスタンス。
@@ -20374,8 +20650,8 @@ var script$28 = function() {
   this.isBubbled = !blotOptions['external-css-file'];
 
   // Blotを変更します。
-  forOwn_1$2(blotOptions || {}, (value, key) => {
-    customizeBlot(key, objectAssign$1({}, value));
+  forOwn_1$1(blotOptions || {}, (value, key) => {
+    customizeBlot(key, objectAssign({}, value));
   });
 
   /**
@@ -20450,7 +20726,7 @@ var script$28 = function() {
     this.quill.on(Quill.events.SELECTION_CHANGE, this.handleSelectionChange);
     this.quill.on(Quill.events.EDITOR_CHANGE, this.handleEditorChange);
     this.quill.on(Quill.events.SCROLL_OPTIMIZE, this.handleScrollOptimize);
-    if (isString_1$1(blotOptions.initialInnerHtml)) {
+    if (isString_1(blotOptions.initialInnerHtml)) {
       this.quill.pasteHTML(blotOptions.initialInnerHtml);
     }
     // load external css file if any specified.
@@ -20532,7 +20808,7 @@ var script$28 = function() {
 };
 
 riot$1.tag2('viron-wyswyg', '<div class="Wyswyg__toolbar"> <viron-wyswyg-tool-image if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-image> <viron-wyswyg-tool-video if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-video> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{1}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{2}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{3}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{4}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{5}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{6}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-list-ordered if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-list-ordered> <viron-wyswyg-tool-list-bullet if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-list-bullet> <viron-wyswyg-tool-indent-left if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-indent-left> <viron-wyswyg-tool-indent-right if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-indent-right> <viron-wyswyg-tool-align-left if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-align-left> <viron-wyswyg-tool-align-center if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-align-center> <viron-wyswyg-tool-align-right if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-align-right> <viron-wyswyg-tool-direction if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-direction> <viron-wyswyg-tool-blockquote if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-blockquote> <viron-wyswyg-tool-codeblock if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-codeblock> </div> <div class="Wyswyg__editor" ref="editor"></div>', '', 'class="Wyswyg {\'Wyswyg--bubbled\' : isBubbled, \'Wyswyg--disabled\' : opts.isdisabled}"', function(opts) {
-    this.external(script$28);
+    this.external(script$29);
 });
 
 /**
@@ -20564,7 +20840,7 @@ riot$1.tag2('viron-wyswyg', '<div class="Wyswyg__toolbar"> <viron-wyswyg-tool-im
         return idx >= 0? arr[idx] : void(0);
     }
 
-    var find_1$3 = find$3;
+    var find_1$2 = find$3;
 
 const UI_TEXTINPUT = 'textinput';
 const UI_TEXTAREA = 'textarea';
@@ -20576,13 +20852,17 @@ const UI_UPLOADER = 'uploader';
 const UI_WYSWYG = 'wyswyg';
 const UI_PUG = 'pug';
 const UI_NULL = 'null';
+const UI_AUTOCOMPLETE = 'autocomplete';
 
-var script$29 = function() {
+var script$30 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
-  const schemaObject = objectAssign$1({}, this.opts.schemaobject);
+  const schemaObject = objectAssign({}, this.opts.schemaobject);
 
   // wyswygエディタのオプション群。
   this.blotOptions = schemaObject['x-wyswyg-options'] || {};
+
+  // autocomplete設定。
+  this.autocompleteConfig = schemaObject['x-autocomplete'];
 
   /**
    * 入力可否をチェックします。
@@ -20614,7 +20894,7 @@ var script$29 = function() {
         isDiabled: true
       });
     }
-    forEach_1$1(schemaObject.enum, (v, idx) => {
+    forEach_1(schemaObject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
         label: v,
@@ -20635,6 +20915,11 @@ var script$29 = function() {
     // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
     if (!!schemaObject.enum) {
       return UI_SELECT;
+    }
+
+    // autocomplete有効時。
+    if (!!schemaObject['x-autocomplete']) {
+      return UI_AUTOCOMPLETE;
     }
 
     const type = schemaObject.type;
@@ -20677,7 +20962,7 @@ var script$29 = function() {
     // opts.valが何も指定されていない(i.e. undefined)
     // 且つ
     // デフォルト値が設定されていれば自動更新する。
-    if (this.opts.val === undefined && hasOwn_1$2(schemaObject, 'default')) {
+    if (this.opts.val === undefined && hasOwn_1$1(schemaObject, 'default')) {
       this.opts.onchange(schemaObject.default);
     }
   });
@@ -20700,7 +20985,7 @@ var script$29 = function() {
 
   // numberinput値が変更された時の処理。
   this.handleNumberinputChange = newNumber => {
-    if (!isNumber_1$1(newNumber)) {
+    if (!isNumber_1(newNumber)) {
       newNumber = undefined;
     }
     this.opts.onchange(newNumber);
@@ -20713,7 +20998,7 @@ var script$29 = function() {
 
   // select値が変更された時の処理。
   this.handleSelectChange = options => {
-    const option = find_1$3(options, option => {
+    const option = find_1$2(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -20745,40 +21030,41 @@ var script$29 = function() {
     }
     this.opts.onchange(newText);
   };
+
+  // autocomplete値が変更された時の処理。
+  this.handleAutocompleteChange = newText => {
+    switch (schemaObject.type) {
+    case 'string':
+      if (!newText) {
+        newText = undefined;
+      }
+      break;
+    case 'number':
+    case 'integer':
+      if (!newText) {
+        newText = undefined;
+      } else {
+        newText = Number(newText);
+        if (_isNaN(newText)) {
+          newText = undefined;
+        }
+      }
+      break;
+    }
+    this.opts.onchange(newText);
+  };
 };
 
-riot$1.tag2('viron-parameter-form', '<div class="ParameterForm__body"> <virtual if="{uiType === \'textinput\'}"> <viron-textinput text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextinputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextareaChange}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput number="{opts.val}" isdisabled="{isDisabled}" onchange="{handleNumberinputChange}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" isdisabled="{isDisabled}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" isdisabled="{isDisabled}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="*" isdisabled="{isDisabled}" onfilechange="{handleUploaderFileChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg blotoptions="{blotOptions}" initialinnerhtml="{opts.val}" isdisabled="{isDisabled}" ontextchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug text="{opts.val}" isdisabled="{isDisabled}" onchange="{handlePugChange}"></viron-pug> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleHtmlChange}"></viron-html> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO: null</div> </virtual> </div>', '', '', function(opts) {
-    this.external(script$29);
+riot$1.tag2('viron-parameter-form', '<div class="ParameterForm__body"> <virtual if="{uiType === \'textinput\'}"> <viron-textinput text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextinputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextareaChange}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput number="{opts.val}" isdisabled="{isDisabled}" onchange="{handleNumberinputChange}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" isdisabled="{isDisabled}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" isdisabled="{isDisabled}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="*" isdisabled="{isDisabled}" onfilechange="{handleUploaderFileChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg blotoptions="{blotOptions}" initialinnerhtml="{opts.val}" isdisabled="{isDisabled}" ontextchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug text="{opts.val}" isdisabled="{isDisabled}" onchange="{handlePugChange}"></viron-pug> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleHtmlChange}"></viron-html> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" config="{autocompleteConfig}" onchange="{handleAutocompleteChange}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'null\'}"> <div>null</div> </virtual> </div>', '', '', function(opts) {
+    this.external(script$30);
 });
-
-/**
-     * @return {array} Array of unique items
-     */
-    function unique$1(arr, compare){
-        compare = compare || isEqual$1;
-        return filter_1$2(arr, function(item, i, arr){
-            var n = arr.length;
-            while (++i < n) {
-                if ( compare(item, arr[i]) ) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
-
-    function isEqual$1(a, b){
-        return a === b;
-    }
-
-    var unique_1$2 = unique$1;
 
 /**
      */
     function isBoolean(val) {
         return isKind_1$1(val, 'Boolean');
     }
-    var isBoolean_1$1 = isBoolean;
+    var isBoolean_1 = isBoolean;
 
 var hookCallback;
 
@@ -25435,11 +25721,11 @@ const resultTemplate = {
  * @return {Object}
  */
 const selfRequired = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'selfRequired')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'selfRequired')) {
     return result;
   }
-  if (isBoolean_1$1(constraints.selfRequired) && constraints.selfRequired) {
+  if (isBoolean_1(constraints.selfRequired) && constraints.selfRequired) {
     if (value === undefined) {
       result.isValid = false;
       result.message = '必須項目です。';
@@ -25457,8 +25743,8 @@ const selfRequired = (value, constraints) => {
  * @return {Object}
  */
 const multipleOf = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'multipleOf')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'multipleOf')) {
     return result;
   }
   const multipleOf = constraints.multipleOf;
@@ -25477,8 +25763,8 @@ const multipleOf = (value, constraints) => {
  * @return {Object}
  */
 const maximum = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'maximum')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'maximum')) {
     return result;
   }
   const maximum = constraints.maximum;
@@ -25508,8 +25794,8 @@ const maximum = (value, constraints) => {
  * @return {Object}
  */
 const minimum = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'minimum')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'minimum')) {
     return result;
   }
   const minimum = constraints.minimum;
@@ -25539,8 +25825,8 @@ const minimum = (value, constraints) => {
  * @return {Object}
  */
 const maxLength = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'maxLength')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'maxLength')) {
     return result;
   }
   const maxLength = constraints.maxLength;
@@ -25559,7 +25845,7 @@ const maxLength = (value, constraints) => {
  * @return {Object}
  */
 const minLength = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
+  const result = objectAssign({}, resultTemplate);
   // デフォルト値は`0`。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.2.3
   const minLength = constraints.minLength || 0;
@@ -25578,8 +25864,8 @@ const minLength = (value, constraints) => {
  * @return {Object}
  */
 const pattern = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'pattern')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'pattern')) {
     return result;
   }
   // ECMA 262 regular expression dialect.
@@ -25600,7 +25886,7 @@ const pattern = (value, constraints) => {
  * @return {Object}
  */
 const additionalItemsAndItems = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
+  const result = objectAssign({}, resultTemplate);
   // itemsはSchemaObject or array of SchemaObject.
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
   // additionalItemsはboolean or SchemaObject.
@@ -25609,12 +25895,12 @@ const additionalItemsAndItems = (value, constraints) => {
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.4
   let items;
   let additionalItems;
-  if (!hasOwn_1$2(constraints, 'items')) {
+  if (!hasOwn_1$1(constraints, 'items')) {
     items = {};
   } else {
     items = constraints.items;
   }
-  if (!hasOwn_1$2(constraints, 'additionalItems')) {
+  if (!hasOwn_1$1(constraints, 'additionalItems')) {
     additionalItems = {};
   } else {
     additionalItems = constraints.additionalItems;
@@ -25622,18 +25908,18 @@ const additionalItemsAndItems = (value, constraints) => {
 
   // itemsが未定義もしくはオブジェクトならばvalidate結果は常にOK。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.2
-  if (isObject_1$1(items)) {
+  if (isObject_1(items)) {
     return result;
   }
   // additionalItemsがBooleanのtrueもしくはobjectならばvalidate結果は常にOK。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
-  if ((isBoolean_1$1(additionalItems) && additionalItems) || isObject_1$1(additionalItems)) {
+  if ((isBoolean_1(additionalItems) && additionalItems) || isObject_1(additionalItems)) {
     return result;
   }
   // additionalItemsがBooleanのfalseでありitemsがarrayの場合、
   // value配列の長さがitemsの長さ以下ならばvalidate結果はOK。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.1
-  if ((isBoolean_1$1(additionalItems) && !additionalItems) && isArray_1$2(items)) {
+  if ((isBoolean_1(additionalItems) && !additionalItems) && isArray_1$1(items)) {
     if (value.length <= items.length) {
       return result;
     }
@@ -25651,8 +25937,8 @@ const additionalItemsAndItems = (value, constraints) => {
  * @return {Object}
  */
 const maxItems = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'maxItems')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'maxItems')) {
     return result;
   }
   const maxItems = constraints.maxItems;
@@ -25672,7 +25958,7 @@ const maxItems = (value, constraints) => {
  * @return {Object}
  */
 const minItems = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
+  const result = objectAssign({}, resultTemplate);
   // デフォルト値は`0`。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.3.3
   const minItems = constraints.minItems || 0;
@@ -25692,14 +25978,14 @@ const minItems = (value, constraints) => {
  * @return {Object}
  */
 const uniqueItems = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
+  const result = objectAssign({}, resultTemplate);
   // デフォルト値はfalse。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.4.3
   const uniqueItems = constraints.uniqueItems || false;
   if (!uniqueItems) {
     return result;
   }
-  if (value.length !== unique_1$2(value).length) {
+  if (value.length !== unique_1$1(value).length) {
     result.isValid = false;
     result.message = '内容が重複しない要素で構成して下さい。';
     return result;
@@ -25715,12 +26001,12 @@ const uniqueItems = (value, constraints) => {
  * @return {Object}
  */
 const maxProperties = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'maxProperties')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'maxProperties')) {
     return result;
   }
   const maxProperties = constraints.maxProperties;
-  if (keys_1$1(value).length > maxProperties) {
+  if (keys_1(value).length > maxProperties) {
     result.isValid = false;
     result.message = `要素数を${maxProperties}以下にして下さい。`;
     return result;
@@ -25736,11 +26022,11 @@ const maxProperties = (value, constraints) => {
  * @return {Object}
  */
 const minProperties = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
+  const result = objectAssign({}, resultTemplate);
   // デフォルト値は`0`。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.2.3
   const minProperties = constraints.minProperties || 0;
-  if (keys_1$1(value).length < minProperties) {
+  if (keys_1(value).length < minProperties) {
     result.isValid = false;
     result.message = `要素数を${minProperties}以上にして下さい。`;
     return result;
@@ -25756,13 +26042,13 @@ const minProperties = (value, constraints) => {
  * @return {Object}
  */
 const required = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!isArray_1$2(constraints.required) || !constraints.required.length) {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.required) || !constraints.required.length) {
     return result;
   }
   const required = constraints.required;
-  forEach_1$1(required, key => {
-    if (!hasOwn_1$2(value, key)) {
+  forEach_1(required, key => {
+    if (!hasOwn_1$1(value, key)) {
       result.isValid = false;
       result.message = `要素に${key}を含めて下さい。`;
     }
@@ -25778,22 +26064,22 @@ const required = (value, constraints) => {
  * @return {Object}
  */
 const additionalPropertiesAndPropertiesAndPatternPropertie = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
+  const result = objectAssign({}, resultTemplate);
   // `properties`と`patternProperties`のデフォルト値は空オブジェクト。
   // `additionalProperties`のデフォルト値は空SchemaObject。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.3
   let additionalProperties;// eslint-disable-line no-unused-vars
-  if (!hasOwn_1$2(constraints, 'properties')) {
+  if (!hasOwn_1$1(constraints, 'properties')) {
     
   } else {
     
   }
-  if (!hasOwn_1$2(constraints, 'patternProperties')) {
+  if (!hasOwn_1$1(constraints, 'patternProperties')) {
     
   } else {
     
   }
-  if (!hasOwn_1$2(constraints, 'additionalProperties')) {
+  if (!hasOwn_1$1(constraints, 'additionalProperties')) {
     additionalProperties = {};
   } else {
     additionalProperties = constraints.additionalProperties;
@@ -25805,11 +26091,11 @@ const additionalPropertiesAndPropertiesAndPatternPropertie = (value, constraints
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.1
 
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.2
-  if ((isBoolean_1$1(additionalProperties) && additionalProperties) || isObject_1$1(additionalProperties)) {
+  if ((isBoolean_1(additionalProperties) && additionalProperties) || isObject_1(additionalProperties)) {
     return result;
   }
 
-  if (isBoolean_1$1(additionalProperties) && !additionalProperties) {
+  if (isBoolean_1(additionalProperties) && !additionalProperties) {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.4
     // TODO:
   }
@@ -25824,7 +26110,7 @@ const additionalPropertiesAndPropertiesAndPatternPropertie = (value, constraints
  * @return {Object}
  */
 const dependencies = (value, constraints) => {// eslint-disable-line no-unused-vars
-  const result = objectAssign$1({}, resultTemplate);
+  const result = objectAssign({}, resultTemplate);
   // TODO:
   return result;
 };
@@ -25836,13 +26122,13 @@ const dependencies = (value, constraints) => {// eslint-disable-line no-unused-v
  * @return {Object}
  */
 const _enum = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'enum')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'enum')) {
     return result;
   }
   const _enum = constraints.enum;
   let isFound = false;
-  forEach_1$1(_enum, item => {
+  forEach_1(_enum, item => {
     if (value === item) {
       isFound = true;
     }
@@ -25861,55 +26147,55 @@ const _enum = (value, constraints) => {
  * @return {Object}
  */
 const _type = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!hasOwn_1$2(constraints, 'type')) {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$1(constraints, 'type')) {
     return result;
   }
   let types;
   // type値はstringもしくはstring型のarray。
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2.1
-  if (isString_1$1(constraints.type)) {
+  if (isString_1(constraints.type)) {
     types = [constraints.type];
   } else {
     types = constraints.type;
   }
   let isValidType = false;
-  forEach_1$1(types, type => {
+  forEach_1(types, type => {
     switch (type) {
     case 'integer':
     case 'number':
-      if (isNumber_1$1(value)) {
+      if (isNumber_1(value)) {
         isValidType = true;
       }
       break;
     case 'string':
-      if (isString_1$1(value)) {
+      if (isString_1(value)) {
         isValidType = true;
       }
       break;
     case 'array':
-      if (isArray_1$2(value)) {
+      if (isArray_1$1(value)) {
         isValidType = true;
       }
       break;
     case 'object':
-      if (isObject_1$1(value)) {
+      if (isObject_1(value)) {
         isValidType = true;
       }
       break;
     case 'boolean':
-      if (isBoolean_1$1(value)) {
+      if (isBoolean_1(value)) {
         isValidType = true;
       }
       break;
     case 'file':
       // より最適なtypeチェックがあればそれを採用したい。
-      if (!!value && isString_1$1(value.name)) {
+      if (!!value && isString_1(value.name)) {
         isValidType = true;
       }
       break;
     case 'null':
-      if (isNull_1$1(value)) {
+      if (isNull_1(value)) {
         isValidType = true;
       }
       break;
@@ -25931,8 +26217,8 @@ const _type = (value, constraints) => {
  * @return {Object}
  */
 const allOf = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!isArray_1$2(constraints.allOf)) {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.allOf)) {
     return result;
   }
   // SchemaObjectのarray。
@@ -25947,8 +26233,8 @@ const allOf = (value, constraints) => {
  * @return {Object}
  */
 const anyOf = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!isArray_1$2(constraints.anyOf)) {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.anyOf)) {
     return result;
   }
   // SchemaObjectのarray。
@@ -25963,8 +26249,8 @@ const anyOf = (value, constraints) => {
  * @return {Object}
  */
 const oneOf = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!isArray_1$2(constraints.oneOf)) {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.oneOf)) {
     return result;
   }
   // SchemaObjectのarray。
@@ -25979,8 +26265,8 @@ const oneOf = (value, constraints) => {
  * @return {Object}
  */
 const not = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!isArray_1$2(constraints.not)) {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.not)) {
     return result;
   }
   // SchemaObjectのarray。
@@ -25995,8 +26281,8 @@ const not = (value, constraints) => {
  * @return {Object}
  */
 const definitions = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!isArray_1$2(constraints.definitions)) {
+  const result = objectAssign({}, resultTemplate);
+  if (!isArray_1$1(constraints.definitions)) {
     return result;
   }
   // SchemaObjectのarray。
@@ -26011,8 +26297,8 @@ const definitions = (value, constraints) => {
  * @return {Object}
  */
 const format$1 = (value, constraints) => {
-  const result = objectAssign$1({}, resultTemplate);
-  if (!isString_1$1(constraints.format)) {
+  const result = objectAssign({}, resultTemplate);
+  if (!isString_1(constraints.format)) {
     return result;
   }
   const format = constraints.format;
@@ -26021,14 +26307,14 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.1
 
     // String型のときだけバリデートする
-    if (!isString_1$1(value)) {
+    if (!isString_1(value)) {
       return result;
     }
 
     // RFC 3339に則った書き方かバリデートする
     const pattern = /^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+\-])([01]\d|2[0-3]):([0-5]\d))$/;
     const isMatch = value.match(pattern);
-    if (isNull_1$1(isMatch)) {
+    if (isNull_1(isMatch)) {
       result.isValid = false;
       result.message = '"date-time"に則ったフォーマットで入力してください。';
       return result;
@@ -26047,14 +26333,14 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.2
 
     // String型のときだけバリデートする
-    if (!isString_1$1(value)) {
+    if (!isString_1(value)) {
       return result;
     }
 
     // RFC 5322に則った書き方かバリデートする
     const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const isMatch = value.match(pattern);
-    if (isNull_1$1(isMatch)) {
+    if (isNull_1(isMatch)) {
       result.isValid = false;
       result.message = '"email"に則ったフォーマットで入力してください。';
       return result;
@@ -26065,7 +26351,7 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
 
     // String型のときだけバリデートする
-    if (!isString_1$1(value)) {
+    if (!isString_1(value)) {
       return result;
     }
 
@@ -26079,7 +26365,7 @@ const format$1 = (value, constraints) => {
     // RFC 1034に則った書き方かバリデートする
     const pattern = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[‌​a-z\d])?)*$/i; // eslint-disable-line no-irregular-whitespace
     const isMatch = value.match(pattern);
-    if (isNull_1$1(isMatch)) {
+    if (isNull_1(isMatch)) {
       result.isValid = false;
       result.message = '"hostname"に則ったフォーマットで入力してください。';
       return result;
@@ -26091,14 +26377,14 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.4
 
     // String型のときだけバリデートする
-    if (!isString_1$1(value)) {
+    if (!isString_1(value)) {
       return result;
     }
 
     // RFC 2673に則った書き方かバリデートする
     const pattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     const isMatch = value.match(pattern);
-    if (isNull_1$1(isMatch)) {
+    if (isNull_1(isMatch)) {
       result.isValid = false;
       result.message = '"ipv4"に則ったフォーマットで入力してください。';
       return result;
@@ -26110,7 +26396,7 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.5
 
     // String型のときだけバリデートする
-    if (!isString_1$1(value)) {
+    if (!isString_1(value)) {
       return result;
     }
 
@@ -26142,9 +26428,9 @@ const format$1 = (value, constraints) => {
       /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
     ];
     let matchResult = false;
-    forEach_1$1(patterns, pattern => {
+    forEach_1(patterns, pattern => {
       const isMatch = value.match(pattern);
-      if (!isNull_1$1(isMatch)) {
+      if (!isNull_1(isMatch)) {
         matchResult = true;
       }
     });
@@ -26161,14 +26447,14 @@ const format$1 = (value, constraints) => {
     // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.6
 
     // String型のときだけバリデートする
-    if (!isString_1$1(value)) {
+    if (!isString_1(value)) {
       return result;
     }
 
     // RFC 3986に則った書き方かバリデートする
     const pattern = rfc3986.uri;
     const isMatch = value.match(pattern);
-    if (isNull_1$1(isMatch)) {
+    if (isNull_1(isMatch)) {
       result.isValid = false;
       result.message = '"uri"に則ったフォーマットで入力してください。';
       return result;
@@ -26265,7 +26551,7 @@ var oas$4 = {
     results.push(format$1(value, schemaObject));
 
     // isValid値がfalseの結果だけ返す。
-    return reject_1$2(results, result => {
+    return reject_1$1(results, result => {
       return result.isValid;
     });
   },
@@ -26277,7 +26563,7 @@ var oas$4 = {
    * @return {Oject}
    */
   createSchemaObjectFromParameterObject: parameterObject => {
-    const normalizedSchemaObject = objectAssign$1({}, parameterObject);
+    const normalizedSchemaObject = objectAssign({}, parameterObject);
     const selfRequired = normalizedSchemaObject.required;
     delete normalizedSchemaObject.required;
     normalizedSchemaObject.selfRequired = selfRequired;
@@ -26291,11 +26577,11 @@ var oas$4 = {
    * @return {Oject}
    */
   createSchemaObjectFromParameterObjectAndSchemaObject: (parameterObject, schemaObject) => {
-    let normalizedSchemaObject = objectAssign$1({}, parameterObject);
+    let normalizedSchemaObject = objectAssign({}, parameterObject);
     const selfRequired = normalizedSchemaObject.required;
     delete normalizedSchemaObject.required;
     normalizedSchemaObject.selfRequired = selfRequired;
-    normalizedSchemaObject = objectAssign$1(normalizedSchemaObject, schemaObject);
+    normalizedSchemaObject = objectAssign(normalizedSchemaObject, schemaObject);
     return normalizedSchemaObject;
   },
 
@@ -26306,7 +26592,7 @@ var oas$4 = {
    * @return {Object}
    */
   createSchemaObjectFromPropertyObject: (propertyObject, key) => {
-    const normalizedSchemaObject = objectAssign$1({}, propertyObject);
+    const normalizedSchemaObject = objectAssign({}, propertyObject);
     // nameが未設定であれば、propertyObjectのkeyを使用する。
     if (!normalizedSchemaObject.name) {
       normalizedSchemaObject.name = key;
@@ -26322,7 +26608,7 @@ var oas$4 = {
    * @return {Object}
    */
   createSchemaObjectFromItemsObject: (itemsObject, baseName, idx) => {
-    const normalizedSchemaObject = objectAssign$1({}, itemsObject);
+    const normalizedSchemaObject = objectAssign({}, itemsObject);
     // nameが未設定であれば、propertyObjectのkeyを使用する。
     if (!normalizedSchemaObject.name) {
       normalizedSchemaObject.name = `${baseName}[${idx}]`;
@@ -26331,16 +26617,17 @@ var oas$4 = {
   }
 };
 
-var script$30 = function() {
+var script$31 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
-  const schemaObject = objectAssign$1({}, this.opts.schemaobject);
+  const schemaObject = objectAssign({}, this.opts.schemaobject);
   this.schemaObject = schemaObject;
   this.name = schemaObject.name;
+  this.description = schemaObject.description;
   this.selfRequired = schemaObject.selfRequired;
   const keysForInfo = ['enum', 'description', 'required', 'type', 'example', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'format', 'x-wyswyg-options'];
   this.infos = [];
-  forEach_1$1(keysForInfo, key => {
-    if (!hasOwn_1$2(schemaObject, key)) {
+  forEach_1(keysForInfo, key => {
+    if (!hasOwn_1$1(schemaObject, key)) {
       return;
     }
     this.infos.push({
@@ -26410,10 +26697,10 @@ var script$30 = function() {
    */
   const getDefaultPropertyValue = property => {
     // 上書き予防。
-    property = objectAssign$1({}, property);
+    property = objectAssign({}, property);
     let defaultValue;
     let type;
-    if (isArray_1$2(property.type)) {
+    if (isArray_1$1(property.type)) {
       type = property.type[0];
     } else {
       type = property.type;
@@ -26505,6 +26792,10 @@ var script$30 = function() {
   this.isValidateOpened = true;
   // bodyの開閉状態。
   this.isBodyOpened = true;
+  // weightは独自仕様。並び順の重み付け。
+  if (this.schemaObject.weight === 1) {
+    this.isBodyOpened = false;
+  }
 
   // infoの開閉ボタンがタップされた時の処理。
   this.handleInfoOpenShutButtonTap = () => {
@@ -26561,7 +26852,7 @@ var script$30 = function() {
       break;
     }
     arr.push(defaultValue);
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 
   // -ボタンがタップされた時の処理。
@@ -26577,36 +26868,36 @@ var script$30 = function() {
     const arr = this.opts.val.concat([]);
     // undefinedを追加することで空の入力フォームを出力できる。
     arr.splice(idx, 1);
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 
   // formが変更された時の処理。
   this.handleFormChange = newValue => {
-    this.opts.onchange(newValue, this.opts.key);
+    this.opts.onchange(newValue, this.opts.propkey);
   };
 
   // propertiesが変更された時の処理。
   this.handlePropertyChange = (newValue, key) => {
-    const obj = objectAssign$1(this.opts.val);
+    const obj = objectAssign(this.opts.val);
     obj[key] = newValue;
-    this.opts.onchange(obj, this.opts.key);
+    this.opts.onchange(obj, this.opts.propkey);
   };
 
   // itemsが変更された時の処理。
   this.handleItemsChange = (newValue, idx) => {
     const arr = this.opts.val.concat([]);
     arr[idx] = newValue;
-    this.opts.onchange(arr, this.opts.key);
+    this.opts.onchange(arr, this.opts.propkey);
   };
 };
 
-riot$1.tag2('viron-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <viron-icon type="right"></viron-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}</div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <viron-icon type="plusCircle"></viron-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <viron-icon type="minusCircle"></viron-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <viron-icon type="filetext"></viron-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <viron-icon type="infoCirlceO"></viron-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <viron-prettyprint data="{opts.val}"></viron-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <viron-parameter-form val="{opts.val}" schemaobject="{schemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleFormChange}"></viron-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameter-schema each="{property, key in properties}" key="{key}" val="{parent.getPropertyValue(property, key)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, key)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handlePropertyChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <viron-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" key="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" additionalinfo="{parent.opts.additionalinfo}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema {\'ParameterSchema--disabled\' : isDisabled}"', function(opts) {
-    this.external(script$30);
+riot$1.tag2('viron-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleBodyOpenShutButtonTap"> <viron-icon type="right"></viron-icon> </div> <div class="ParameterSchema__name" ref="touch" ontap="handleNameTap">{name}<span if="{description}">({description})</span></div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" ref="touch" ontap="handleValidateOpenShutButtonTap"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" ref="touch" ontap="handleAddButtonTap"> <viron-icon type="plusCircle"></viron-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" ref="touch" ontap="handleRemoveButtonTap"> <viron-icon type="minusCircle"></viron-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" ref="touch" ontap="handlePreviewOpenShutButtonTap"> <viron-icon type="filetext"></viron-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" ref="touch" ontap="handleInfoOpenShutButtonTap"> <viron-icon type="infoCirlceO"></viron-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <viron-prettyprint data="{opts.val}"></viron-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <viron-parameter-form val="{opts.val}" schemaobject="{schemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleFormChange}"></viron-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameter-schema each="{property, propKey in properties}" propkey="{propKey}" val="{parent.getPropertyValue(property, propKey)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, propKey)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handlePropertyChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <viron-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" propkey="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" additionalinfo="{parent.opts.additionalinfo}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema {\'ParameterSchema--disabled\' : isDisabled}"', function(opts) {
+    this.external(script$31);
 });
 
-var script$31 = function() {
+var script$32 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
-  const parameterObject = objectAssign$1({}, this.opts.parameterobject);
+  const parameterObject = objectAssign({}, this.opts.parameterobject);
   this.parameterObject = parameterObject;
   // SchemaObject化したObject。
   this.normalizedSchemaObject = null;
@@ -26633,10 +26924,10 @@ var script$31 = function() {
 };
 
 riot$1.tag2('viron-parameter', '<div class="Parameter__body"> <viron-parameter-schema val="{opts.val}" schemaobject="{normalizedSchemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleSchemaChange}"></viron-parameter-schema> </div>', '', 'class="Parameter"', function(opts) {
-    this.external(script$31);
+    this.external(script$32);
 });
 
-var script$32 = function() {
+var script$33 = function() {
   /**
    * ParameterObjectを参照してデフォルト値を返します。
    * @param {Object} parameterObject
@@ -26644,7 +26935,7 @@ var script$32 = function() {
    */
   const getDefaultValue = parameterObject => {
     // 上書き予防。
-    parameterObject = objectAssign$1({}, parameterObject);
+    parameterObject = objectAssign({}, parameterObject);
     let defaultValue;
     const _in = parameterObject.in;
     if (_in === 'body') {
@@ -26715,16 +27006,16 @@ var script$32 = function() {
   this.handleChange = (parameterObject, newValue) => {
     const newParameter = {};
     newParameter[parameterObject.name] = newValue;
-    const newParameters = objectAssign$1({}, this.opts.parameters, newParameter);
+    const newParameters = objectAssign({}, this.opts.parameters, newParameter);
     this.opts.onchange(newParameters);
   };
 };
 
 riot$1.tag2('viron-parameters', '<virtual each="{parameterObject in opts.parameterobjects}"> <viron-parameter parameterobject="{parameterObject}" val="{parent.getParameterValue(parameterObject)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handleChange}"></viron-parameter> </virtual>', '', 'class="Parameters"', function(opts) {
-    this.external(script$32);
+    this.external(script$33);
 });
 
-var script$33 = function() {
+var script$34 = function() {
   const store = this.riotx.get();
 
   // submitボタンに使用するラベル。method名によって内容を変える。
@@ -26752,7 +27043,7 @@ var script$33 = function() {
   }
 
   // 現在の入力値群。
-  this.currentParameters = objectAssign$1({}, this.opts.initialParameters);
+  this.currentParameters = objectAssign({}, this.opts.initialParameters);
 
   // 補完的な情報群。primaryキー等。
   this.additionalInfo = {
@@ -26800,7 +27091,7 @@ var script$33 = function() {
 };
 
 riot$1.tag2('viron-component-operation', '<div class="ComponentOperation__head"> <div class="ComponentOperation__title">{opts.title}</div> <div class="ComponentOperation__description" if="{!!opts.description}">{opts.description}</div> </div> <div class="ComponentOperation__body"> <viron-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" additionalinfo="{additionalInfo}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentOperation__tail"> <viron-button label="{submitButtonLabel}" type="{submitButtonType}" onpat="{handleSubmitButtonPat}"></viron-button> <viron-button label="閉じる" type="secondary" onpat="{handleCancelButtonPat}"></viron-button> </div>', '', 'class="ComponentOperation"', function(opts) {
-    this.external(script$33);
+    this.external(script$34);
 });
 
 var script$5 = function() {
@@ -54462,91 +54753,613 @@ return /******/ (function(modules) { // webpackBootstrap
 
 var chart$1 = unwrapExports(tauCharts);
 
-var script$34 = function() {
+var tauCharts_tooltip = createCommonjsModule(function (module) {
+(function (factory) {
+    if (typeof undefined === 'function' && undefined.amd) {
+        undefined(['taucharts'], function (tauPlugins) {
+            return factory(tauPlugins);
+        });
+    } else if ('object' === 'object' && module.exports) {
+        var tauPlugins = tauCharts;
+        module.exports = factory(tauPlugins);
+    } else {
+        factory(this.tauCharts);
+    }
+})(function (tauCharts$$1) {
+
+    var d3 = tauCharts$$1.api.d3;
+    var utils = tauCharts$$1.api.utils;
+    var pluginsSDK = tauCharts$$1.api.pluginsSDK;
+    var TARGET_SVG_CLASS = 'graphical-report__tooltip-target';
+
+    var escapeHtml = function (x) {
+        return String(x)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
+    function Tooltip(xSettings) {
+
+        var settings = utils.defaults(
+            xSettings || {},
+            {
+                // add default settings here
+                align: 'bottom-right',
+                escapeHtml: true,
+                fields: null,
+                formatters: {},
+                dockToData: false,
+                aggregationGroupFields: [],
+                onRevealAggregation: function (filters, row) {
+                    console.log(
+                        'Setup [onRevealAggregation] callback and filter original data by the following criteria: ',
+                        JSON.stringify(filters, null, 2));
+                },
+                spacing: 24
+            });
+
+        var plugin = {
+
+            init: function (chart) {
+
+                this._chart = chart;
+                this._metaInfo = {};
+                this._skipInfo = {};
+
+                // NOTE: for compatibility with old Tooltip implementation.
+                Object.assign(this, utils.omit(settings, 'fields', 'getFields'));
+
+                this._tooltip = this._chart.addBalloon(
+                    {
+                        spacing: settings.spacing,
+                        auto: true,
+                        effectClass: 'fade'
+                    });
+
+                var revealAggregationBtn = ((settings.aggregationGroupFields.length > 0) ?
+                        (this.templateRevealAggregation) :
+                        ('')
+                );
+
+                var template = utils.template(this.template);
+                var tooltipNode = this.getTooltipNode();
+
+                this._tooltip
+                    .content(template({
+                        revealTemplate: revealAggregationBtn,
+                        excludeTemplate: this.templateExclude
+                    }));
+
+                tooltipNode
+                    .addEventListener('click', function (e) {
+
+                        var target = e.target;
+
+                        while (target !== e.currentTarget && target !== null) {
+                            if (target.classList.contains('i-role-exclude')) {
+                                this._exclude();
+                                this.setState({
+                                    highlight: null,
+                                    isStuck: false
+                                });
+                            }
+
+                            if (target.classList.contains('i-role-reveal')) {
+                                this._reveal();
+                                this.setState({
+                                    highlight: null,
+                                    isStuck: false
+                                });
+                            }
+
+                            target = target.parentNode;
+                        }
+
+                    }.bind(this), false);
+
+                this._scrollHandler = function () {
+                    this.setState({
+                        highlight: null,
+                        isStuck: false
+                    });
+                }.bind(this);
+                window.addEventListener('scroll', this._scrollHandler, true);
+
+                this._outerClickHandler = function (e) {
+                    var tooltipRect = this.getTooltipNode().getBoundingClientRect();
+                    if ((e.clientX < tooltipRect.left) ||
+                        (e.clientX > tooltipRect.right) ||
+                        (e.clientY < tooltipRect.top) ||
+                        (e.clientY > tooltipRect.bottom)
+                    ) {
+                        this.setState({
+                            highlight: null,
+                            isStuck: false
+                        });
+                    }
+                }.bind(this);
+
+                // Handle initial state
+                this.setState(this.state);
+
+                this.afterInit(tooltipNode);
+            },
+
+            getTooltipNode: function () {
+                return this._tooltip.getElement();
+            },
+
+            state: {
+                highlight: null,
+                isStuck: false
+            },
+
+            setState: function (newState) {
+                var prev = this.state;
+                var state = this.state = Object.assign({}, prev, newState);
+                prev.highlight = prev.highlight || {data: null, cursor: null, unit: null};
+                state.highlight = state.highlight || {data: null, cursor: null, unit: null};
+
+                // If stuck, treat that data has not changed
+                if (state.isStuck && prev.highlight.data) {
+                    state.highlight = prev.highlight;
+                }
+
+                // Show/hide tooltip
+                if (state.highlight.data !== prev.highlight.data) {
+                    if (state.highlight.data) {
+                        this.hideTooltip();
+                        this.showTooltip(
+                            state.highlight.data,
+                            state.highlight.cursor
+                        );
+                        this._setTargetSvgClass(true);
+                        requestAnimationFrame(function () {
+                            this._setTargetSvgClass(true);
+                        }.bind(this));
+                    } else if (!state.isStuck && prev.highlight.data && !state.highlight.data) {
+                        this._removeFocus();
+                        this.hideTooltip();
+                        this._setTargetSvgClass(false);
+                    }
+                }
+
+                // Update tooltip position
+                if (state.highlight.data && (
+                    !prev.highlight.cursor ||
+                    state.highlight.cursor.x !== prev.highlight.cursor.x ||
+                    state.highlight.cursor.y !== prev.highlight.cursor.y
+                )) {
+                    this._tooltip.position(state.highlight.cursor.x, state.highlight.cursor.y);
+                }
+
+                // Stick/unstick tooltip
+                var tooltipNode = this.getTooltipNode();
+                if (state.isStuck !== prev.isStuck) {
+                    if (state.isStuck) {
+                        window.addEventListener('click', this._outerClickHandler, true);
+                        tooltipNode.classList.add('stuck');
+                        this._setTargetEventsEnabled(false);
+                        this._accentFocus(state.highlight.data);
+                        this._tooltip.updateSize();
+                    } else {
+                        window.removeEventListener('click', this._outerClickHandler, true);
+                        tooltipNode.classList.remove('stuck');
+                        // NOTE: Prevent showing tooltip immediately
+                        // after pointer events appear.
+                        requestAnimationFrame(function () {
+                            this._setTargetEventsEnabled(true);
+                        }.bind(this));
+                    }
+                }
+            },
+
+            showTooltip: function (data, cursor) {
+
+                var content = this.getTooltipNode().querySelectorAll('.i-role-content')[0];
+                if (content) {
+                    var fields = (
+                        settings.fields
+                        ||
+                        ((typeof settings.getFields === 'function') && settings.getFields(this._chart))
+                        ||
+                        Object.keys(data)
+                    );
+                    content.innerHTML = this.render(data, fields);
+                }
+
+                this._tooltip
+                    .position(cursor.x, cursor.y)
+                    .place(settings.align)
+                    .show()
+                    .updateSize();
+            },
+
+            hideTooltip: function (e) {
+                window.removeEventListener('click', this._outerClickHandler, true);
+                this._tooltip.hide();
+            },
+
+            destroy: function () {
+                window.removeEventListener('scroll', this._scrollHandler, true);
+                this._setTargetSvgClass(false);
+                this.setState({
+                    highlight: null,
+                    isStuck: false
+                });
+                this._tooltip.destroy();
+            },
+
+            _subscribeToHover: function () {
+
+                var elementsToMatch = [
+                    'ELEMENT.LINE',
+                    'ELEMENT.AREA',
+                    'ELEMENT.PATH',
+                    'ELEMENT.INTERVAL',
+                    'ELEMENT.INTERVAL.STACKED',
+                    'ELEMENT.POINT'
+                ];
+
+                this._chart
+                    .select(function (node) {
+                        return (elementsToMatch.indexOf(node.config.type) >= 0);
+                    })
+                    .forEach(function (node) {
+
+                        node.on('data-hover', function (sender, e) {
+                            var bodyRect = document.body.getBoundingClientRect();
+                            this.setState({
+                                highlight: (e.data ? {
+                                    data: e.data,
+                                    cursor: {
+                                        x: (e.event.clientX - bodyRect.left),
+                                        y: (e.event.clientY - bodyRect.top)
+                                    },
+                                    unit: sender
+                                } : null)
+                            });
+                        }.bind(this));
+
+                        node.on('data-click', function (sender, e) {
+                            var bodyRect = document.body.getBoundingClientRect();
+                            this.setState(e.data ? {
+                                highlight: {
+                                    data: e.data,
+                                    cursor: {
+                                        x: (e.event.clientX - bodyRect.left),
+                                        y: (e.event.clientY - bodyRect.top)
+                                    },
+                                    unit: sender
+                                },
+                                isStuck: true
+                            } : {
+                                    highlight: null,
+                                    isStuck: null
+                                });
+                        }.bind(this));
+                    }, this);
+            },
+
+            afterInit: function (tooltipNode) {
+                // for override
+            },
+
+            render: function (data, fields) {
+                var self = this;
+                return fields
+                    .filter(function (k) {
+                        var tokens = k.split('.');
+                        var matchX = ((tokens.length === 2) && self._skipInfo[tokens[0]]);
+                        return !matchX;
+                    })
+                    .map(function (k) {
+                        var key = k;
+                        var val = data[k];
+                        return self.renderItem(self._getLabel(key), self._getFormat(key)(val), key, val);
+                    })
+                    .join('');
+            },
+
+            renderItem: function (label, formattedValue, fieldKey, fieldVal) {
+                return this.itemTemplate({
+                    label: settings.escapeHtml ? escapeHtml(label) : label,
+                    value: settings.escapeHtml ? escapeHtml(formattedValue) : formattedValue
+                });
+            },
+
+            _getFormat: function (k) {
+                var meta = this._metaInfo[k] || {format: function (x) {
+                    return String(x);
+                }};
+                return meta.format;
+            },
+
+            _getLabel: function (k) {
+                var meta = this._metaInfo[k] || {label: k};
+                return meta.label;
+            },
+
+            _accentFocus: function (data) {
+                var filter = function (d) {
+                    return (d === data);
+                };
+                this._chart
+                    .select(function () {
+                        return true;
+                    }).forEach(function (unit) {
+                        unit.fire('highlight', filter);
+                    });
+            },
+
+            _removeFocus: function () {
+                var filter = function () {
+                    return null;
+                };
+                this._chart
+                    .select(function () {
+                        return true;
+                    }).forEach(function (unit) {
+                        unit.fire('highlight', filter);
+                        unit.fire('highlight-data-points', filter);
+                    });
+            },
+
+            _reveal: function () {
+                var aggregatedRow = this.state.highlight.data;
+                var groupFields = (settings.aggregationGroupFields || []);
+                var descFilters = groupFields.reduce(function (memo, k) {
+                    if (aggregatedRow.hasOwnProperty(k)) {
+                        memo[k] = aggregatedRow[k];
+                    }
+                    return memo;
+                }, {});
+
+                settings.onRevealAggregation(descFilters, aggregatedRow);
+            },
+
+            _exclude: function () {
+                this._chart
+                    .addFilter({
+                        tag: 'exclude',
+                        predicate: (function (element) {
+                            return function (row) {
+                                return JSON.stringify(row) !== JSON.stringify(element);
+                            };
+                        }(this.state.highlight.data))
+                    });
+                this._chart.refresh();
+            },
+
+            onRender: function () {
+
+                var info = this._getFormatters();
+                this._metaInfo = info.meta;
+                this._skipInfo = info.skip;
+
+                this._subscribeToHover();
+
+                this.setState({
+                    highlight: null,
+                    isStuck: false
+                });
+            },
+
+            _setTargetSvgClass: function (isSet) {
+                d3.select(this._chart.getSVG()).classed(TARGET_SVG_CLASS, isSet);
+            },
+
+            _setTargetEventsEnabled: function (isSet) {
+                if (isSet) {
+                    this._chart.enablePointerEvents();
+                } else {
+                    this._chart.disablePointerEvents();
+                }
+            },
+
+            templateRevealAggregation: [
+                '<div class="i-role-reveal graphical-report__tooltip__vertical">',
+                '   <div class="graphical-report__tooltip__vertical__wrap">',
+                '       Reveal',
+                '   </div>',
+                '</div>'
+            ].join(''),
+
+            templateExclude: [
+                '<div class="i-role-exclude graphical-report__tooltip__exclude">',
+                '   <div class="graphical-report__tooltip__exclude__wrap">',
+                '       <span class="tau-icon-close-gray"></span>',
+                '       Exclude',
+                '   </div>',
+                '</div>'
+            ].join(''),
+
+            template: [
+                '<div class="i-role-content graphical-report__tooltip__content"></div>',
+                '<%= revealTemplate %>',
+                '<%= excludeTemplate %>'
+            ].join(''),
+
+            itemTemplate: utils.template([
+                '<div class="graphical-report__tooltip__list__item">',
+                '<div class="graphical-report__tooltip__list__elem"><%=label%></div>',
+                '<div class="graphical-report__tooltip__list__elem"><%=value%></div>',
+                '</div>'
+            ].join('')),
+
+            _getFormatters: function () {
+
+                var info = pluginsSDK.extractFieldsFormatInfo(this._chart.getSpec());
+                var skip = {};
+                Object.keys(info).forEach(function (k) {
+
+                    if (info[k].isComplexField) {
+                        skip[k] = true;
+                    }
+
+                    if (info[k].parentField) {
+                        delete info[k];
+                    }
+                });
+
+                var toLabelValuePair = function (x) {
+
+                    var res = {};
+
+                    if (typeof x === 'function' || typeof x === 'string') {
+                        res = {format: x};
+                    } else if (utils.isObject(x)) {
+                        res = utils.pick(x, 'label', 'format', 'nullAlias');
+                    }
+
+                    return res;
+                };
+
+                Object.keys(settings.formatters).forEach(function (k) {
+
+                    var fmt = toLabelValuePair(settings.formatters[k]);
+
+                    info[k] = Object.assign(
+                        ({label: k, nullAlias: ('No ' + k)}),
+                        (info[k] || {}),
+                        (utils.pick(fmt, 'label', 'nullAlias')));
+
+                    if (fmt.hasOwnProperty('format')) {
+                        info[k].format = (typeof fmt.format === 'function') ?
+                            (fmt.format) :
+                            (tauCharts$$1.api.tickFormat.get(fmt.format, info[k].nullAlias));
+                    } else {
+                        info[k].format = (info[k].hasOwnProperty('format')) ?
+                            (info[k].format) :
+                            (tauCharts$$1.api.tickFormat.get(null, info[k].nullAlias));
+                    }
+                });
+
+                return {
+                    meta: info,
+                    skip: skip
+                };
+            }
+        };
+
+        return plugin;
+    }
+
+    tauCharts$$1.api.plugins.add('tooltip', Tooltip);
+
+    return Tooltip;
+});
+});
+
+var script$35 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign$1({
-      type: 'bar'
+    new chart$1.Chart(objectAssign({
+      type: 'bar',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('viron-component-graph-bar', '<div class="ComponentGraphBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphBar"', function(opts) {
-    this.external(script$34);
-});
-
-var script$35 = function() {
-  this.on('mount', () => {
-    new chart$1.Chart(objectAssign$1({
-      type: 'horizontalBar'
-    }, this.opts.response)).renderTo(this.refs.canvas);
-  });
-};
-
-riot$1.tag2('viron-component-graph-horizontal-bar', '<div class="ComponentGraphHorizontalBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalBar"', function(opts) {
     this.external(script$35);
 });
 
 var script$36 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign$1({
-      type: 'horizontal-stacked-bar'
+    new chart$1.Chart(objectAssign({
+      type: 'horizontalBar',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
-riot$1.tag2('viron-component-graph-horizontal-stacked-bar', '<div class="ComponentGraphHorizontalStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalStackedBar"', function(opts) {
+riot$1.tag2('viron-component-graph-horizontal-bar', '<div class="ComponentGraphHorizontalBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalBar"', function(opts) {
     this.external(script$36);
 });
 
 var script$37 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign$1({
-      type: 'line',
-      guide: {
-        interpolate: 'smooth'
-      }
+    new chart$1.Chart(objectAssign({
+      type: 'horizontal-stacked-bar',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
-riot$1.tag2('viron-component-graph-line', '<div class="ComponentGraphLine__canvas" ref="canvas"></div>', '', 'class="ComponentGraphLine"', function(opts) {
+riot$1.tag2('viron-component-graph-horizontal-stacked-bar', '<div class="ComponentGraphHorizontalStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalStackedBar"', function(opts) {
     this.external(script$37);
 });
 
 var script$38 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign$1({
-      type: 'scatterplot'
+    new chart$1.Chart(objectAssign({
+      type: 'line',
+      guide: {
+        interpolate: 'smooth'
+      },
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
-riot$1.tag2('viron-component-graph-scatterplot', '<div class="ComponentGraphScatterplot__canvas" ref="canvas"></div>', '', 'class="ComponentGraphScatterplot"', function(opts) {
+riot$1.tag2('viron-component-graph-line', '<div class="ComponentGraphLine__canvas" ref="canvas"></div>', '', 'class="ComponentGraphLine"', function(opts) {
     this.external(script$38);
 });
 
 var script$39 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign$1({
-      type: 'stacked-area'
+    new chart$1.Chart(objectAssign({
+      type: 'scatterplot',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
-riot$1.tag2('viron-component-graph-stacked-area', '<div class="ComponentGraphStackedArea__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedArea"', function(opts) {
+riot$1.tag2('viron-component-graph-scatterplot', '<div class="ComponentGraphScatterplot__canvas" ref="canvas"></div>', '', 'class="ComponentGraphScatterplot"', function(opts) {
     this.external(script$39);
 });
 
 var script$40 = function() {
   this.on('mount', () => {
-    new chart$1.Chart(objectAssign$1({
-      type: 'stacked-bar'
+    new chart$1.Chart(objectAssign({
+      type: 'stacked-area',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
+    }, this.opts.response)).renderTo(this.refs.canvas);
+  });
+};
+
+riot$1.tag2('viron-component-graph-stacked-area', '<div class="ComponentGraphStackedArea__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedArea"', function(opts) {
+    this.external(script$40);
+});
+
+var script$41 = function() {
+  this.on('mount', () => {
+    new chart$1.Chart(objectAssign({
+      type: 'stacked-bar',
+      plugins: [
+        chart$1.api.plugins.get('tooltip')()
+      ]
     }, this.opts.response)).renderTo(this.refs.canvas);
   });
 };
 
 riot$1.tag2('viron-component-graph-stacked-bar', '<div class="ComponentGraphStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedBar"', function(opts) {
-    this.external(script$40);
+    this.external(script$41);
 });
 
 /**
@@ -54560,7 +55373,7 @@ riot$1.tag2('viron-component-graph-stacked-bar', '<div class="ComponentGraphStac
         if (!val) { return 0; }
         if (typeof val === 'string') { return parseFloat(val); }
         // arrays are edge cases. `Number([4]) === 4`
-        if (isArray_1$2(val)) { return NaN; }
+        if (isArray_1$1(val)) { return NaN; }
         return Number(val);
     }
 
@@ -54588,23 +55401,23 @@ riot$1.tag2('viron-component-graph-stacked-bar', '<div class="ComponentGraphStac
         }
     }
 
-    var currencyFormat_1$1 = currencyFormat;
+    var currencyFormat_1 = currencyFormat;
 
-var script$41 = function() {
-  this.value = currencyFormat_1$1(this.opts.response.value, 0);
+var script$42 = function() {
+  this.value = currencyFormat_1(this.opts.response.value, 0);
 };
 
 riot$1.tag2('viron-component-number', '<div>{value}</div>', '', 'class="ComponentNumber"', function(opts) {
-    this.external(script$41);
-});
-
-var script$42 = function() {};
-
-riot$1.tag2('viron-tooltip', '<div class="Tooltip__basePoint"> <div class="Tooltip__text">{opts.label}</div> </div>', '', 'class="Tooltip Tooltip--{opts.placement || \'topCenter\'}"', function(opts) {
     this.external(script$42);
 });
 
-var script$43 = function() {
+var script$43 = function() {};
+
+riot$1.tag2('viron-tooltip', '<div class="Tooltip__basePoint"> <div class="Tooltip__text">{opts.label}</div> </div>', '', 'class="Tooltip Tooltip--{opts.placement || \'topCenter\'}"', function(opts) {
+    this.external(script$43);
+});
+
+var script$44 = function() {
   const store = this.riotx.get();
 
   // icon種類。
@@ -54664,7 +55477,7 @@ var script$43 = function() {
 };
 
 riot$1.tag2('viron-table-items-button', '<viron-icon type="{icon}"></viron-icon> <viron-tooltip if="{isTooltipVisible}" label="{tooltipLabel}"></viron-tooltip> <div class="Table__itemsButtonCatcher"></div>', '', 'class="Table__itemsButton {opts.class}" ref="touch" ontap="handleTap" onmouseover="{handleMouseOver}" onmouseout="{handleMouseOut}"', function(opts) {
-    this.external(script$43);
+    this.external(script$44);
 });
 
 /**
@@ -54699,9 +55512,9 @@ riot$1.tag2('viron-table-items-button', '<viron-icon type="{icon}"></viron-icon>
     function contains$3(arr, val) {
         return indexOf_1$1(arr, val) !== -1;
     }
-    var contains_1$3 = contains$3;
+    var contains_1$2 = contains$3;
 
-var script$44 = function() {
+var script$45 = function() {
   const store = this.riotx.get();
 
   this.value = null;
@@ -54721,7 +55534,7 @@ var script$44 = function() {
   case 'string': {
     this.value = this.opts.data.cell || '-';
     const split = this.value.split('.');
-    if (!!split.length && contains_1$3(['jpg', 'png', 'gif'], split[split.length - 1])) {
+    if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
       this.isImage = true;
     }
     break;
@@ -54744,10 +55557,10 @@ var script$44 = function() {
 };
 
 riot$1.tag2('viron-table-cell', '<div class="Table__cellValue" if="{!isComplex &amp;&amp; !isImage}">{value}</div> <viron-button if="{isComplex &amp;&amp; !opts.isdetailmode}" type="secondaryGhost" icon="link" label="詳細" onpat="{handleDetailPat}"></viron-button> <div class="Table__cellComplex" if="{isComplex &amp;&amp; opts.isdetailmode}"> <viron-prettyprint data="{value}"></viron-prettyprint> </div> <div class="Table__cellImage" if="{isImage}"> <div riot-style="background-image:url({value});"></div> </div>', '', 'class="Table__cell"', function(opts) {
-    this.external(script$44);
+    this.external(script$45);
 });
 
-var script$45 = function() {
+var script$46 = function() {
   const store = this.riotx.get();
 
   this.handleTap = () => {
@@ -54759,7 +55572,7 @@ var script$45 = function() {
     }
     if (type === 'string') {
       const split = value.split('.');
-      if (!!split.length && contains_1$3(['jpg', 'png', 'gif'], split[split.length - 1])) {
+      if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
         return;
       }
     }
@@ -54796,28 +55609,28 @@ var script$45 = function() {
 };
 
 riot$1.tag2('viron-table-item', '<div class="Table__itemHeader"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <viron-table-cell data="{opts.item}" isdetailmode="{opts.isdetailmode}"></viron-table-cell>', '', 'class="Table__item {opts.isdetailmode ? \'Table__item--detail\' : \'\'}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$45);
+    this.external(script$46);
 });
 
-var script$47 = function() {
+var script$48 = function() {
   this.handleCloseButtonPat = () => {
     this.close();
   };
 };
 
 riot$1.tag2('viron-table-flatitems', '<div class="Table__flatitemsHead"> <div class="Table__flatitemsTitle">詳細</div> <div class="Table__flatitemsDescription">テーブル列の全項目を表示しています。</div> </div> <div class="Table__flatitemsBody"> <div class="Table__flatitemsList"> <viron-table-item each="{item in opts.items}" isdetailmode="{true}" item="{item}"></viron-table-item> </div> </div> <div class="Table__flatitemsTail"> <viron-button label="閉じる" type="secondary" onpat="{handleCloseButtonPat}"></viron-button> </div>', '', 'class="Table__flatitems"', function(opts) {
-    this.external(script$47);
+    this.external(script$48);
 });
 
-var script$46 = function() {
+var script$47 = function() {
   const store = this.riotx.get();
 
   // sort済みのitems。
   // どのorder値よりも大きいであろう適当な値。
   const bigNumber = 9999;
-  this.sortedItems = sortBy_1$2(this.opts.items, item => {
+  this.sortedItems = sortBy_1$1(this.opts.items, item => {
     const labels = this.opts.tablelabels || [];
-    if (contains_1$3(labels, item.key)) {
+    if (contains_1$2(labels, item.key)) {
       return labels.indexOf(item.key);
     } else {
       return bigNumber;
@@ -54830,11 +55643,11 @@ var script$46 = function() {
   this.getFilteredItems = () => {
     const items = this.sortedItems;
     const columns = this.opts.selectedtablecolumns;
-    if (!isArray_1$2(columns) || !columns.length) {
+    if (!isArray_1$1(columns) || !columns.length) {
       return items;
     }
-    return filter_1$2(items, item => {
-      return contains_1$3(columns, item.key);
+    return filter_1$1(items, item => {
+      return contains_1$2(columns, item.key);
     });
   };
 
@@ -54874,16 +55687,16 @@ var script$46 = function() {
 };
 
 riot$1.tag2('viron-table-items', '<div class="Table__itemsHeader"> <div class="Table__itemsTitle" ref="touch" ontap="handleHeaderTitleTap">{title}</div> <virtual each="{action in opts.actions}"> <viron-table-items-button action="{action}" isaction="{true}" onpat="{parent.handleItemsActionButtonPat}"></viron-table-items-button> </virtual> <viron-table-items-button class="Table__itemsOpenShutButton" icon="up" onpat="{handleOpenShutButtonPat}"></viron-table-items-button> </div> <virtual if="{isOpened}"> <div class="Table__itemsContent"> <div class="Table__itemsList"> <viron-table-item each="{item in getFilteredItems()}" item="{item}"></viron-table-item> </div> <div class="Table__itemsControl"> <div class="Table__itemsDetailButton" ref="touch" ontap="handleDetailButtonTap" onmouseover="{handleDetailButtonMouseOver}" onmouseout="{handleDetailButtonMouseOut}"> <viron-icon type="scan"></viron-icon> <viron-tooltip if="{isTooltipVisible}" placement="topRight" label="全て表示"></viron-tooltip> <div class="Table__itemsDetailButtonCatcher"></div> </div> </div> </div> </virtual>', '', 'class="Table__items {isOpened ? \'Table__items--opened\' : \'\'}"', function(opts) {
-    this.external(script$46);
+    this.external(script$47);
 });
 
-var script$48 = function() {
+var script$49 = function() {
   this.getItemList = () => {
     const columns = this.opts.columns;
     const list = [];
-    forEach_1$1(this.opts.rows, row => {
+    forEach_1(this.opts.rows, row => {
       const items = [];
-      forEach_1$1(columns, column => {
+      forEach_1(columns, column => {
         items.push({
           key: column.key,
           title: column.title,
@@ -54898,10 +55711,10 @@ var script$48 = function() {
 };
 
 riot$1.tag2('viron-table', '<viron-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}" tablelabels="{parent.opts.tablelabels}" selectedtablecolumns="{parent.opts.selectedtablecolumns}"></viron-table-items>', '', 'class="Table"', function(opts) {
-    this.external(script$48);
+    this.external(script$49);
 });
 
-var script$50 = function() {
+var script$51 = function() {
   const type = this.opts.parameterobject.type;
   // @see: https://swagger.io/specification/#dataTypeFormat
   const format = this.opts.parameterobject.format;
@@ -54948,7 +55761,7 @@ var script$50 = function() {
         isDiabled: true
       });
     }
-    forEach_1$1(this.opts.parameterobject.enum, (v, idx) => {
+    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
         label: v,
@@ -54985,7 +55798,7 @@ var script$50 = function() {
   };
 
   this.handleSelectChange = options => {
-    const option = find_1$3(options, option => {
+    const option = find_1$2(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -54998,10 +55811,10 @@ var script$50 = function() {
 };
 
 riot$1.tag2('viron-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <viron-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select isopened="{isOpened}" options="{getSelectOptions()}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="*" onfilechange="{handleFileChange}"></viron-uploader> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
-    this.external(script$50);
+    this.external(script$51);
 });
 
-var script$51 = function() {
+var script$52 = function() {
   // typeは'null', 'boolean', 'object', 'array', 'number', 'integer', or 'string'.
   // @see: https://swagger.io/specification/#dataTypeFormat
   const type = this.opts.parameterobject.type;
@@ -55047,9 +55860,9 @@ var script$51 = function() {
   }
 
   this.getParameterObject = propertyKey => {
-    return objectAssign$1({}, this.multiSchema.properties[propertyKey], {
+    return objectAssign({}, this.multiSchema.properties[propertyKey], {
       name: propertyKey,
-      required : contains_1$3(this.multiSchema.required, propertyKey)
+      required : contains_1$2(this.multiSchema.required, propertyKey)
     });
   };
 
@@ -55069,7 +55882,7 @@ var script$51 = function() {
         isDiabled: true
       });
     }
-    forEach_1$1(this.opts.parameterobject.enum, (v, idx) => {
+    forEach_1(this.opts.parameterobject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
         label: v,
@@ -55112,7 +55925,7 @@ var script$51 = function() {
   };
 
   this.handleSelectChange = options => {
-    const option = find_1$3(options, option => {
+    const option = find_1$2(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -55130,16 +55943,16 @@ var script$51 = function() {
 };
 
 riot$1.tag2('viron-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" ref="touch" ontap="handleMultiPlusButtonTap"> <viron-icon type="plus"></viron-icon> </div> <virtual if="{uiType === \'input\'}"> <viron-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></viron-select> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" ref="touch" idx="{idx}" ontap="handleMultiMinusButtonTap"> <viron-icon type="minus"></viron-icon> </div> <viron-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></viron-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
-    this.external(script$51);
+    this.external(script$52);
 });
 
-var script$52 = function() {
+var script$53 = function() {
   this.propertyKeys = Object.keys(this.opts.schema.properties);
 
   this.getParameterObject = propertyKey => {
-    return objectAssign$1({}, this.opts.schema.properties[propertyKey], {
+    return objectAssign({}, this.opts.schema.properties[propertyKey], {
       name: propertyKey,
-      required : contains_1$3(this.opts.schema.required, propertyKey)
+      required : contains_1$2(this.opts.schema.required, propertyKey)
     });
   };
 
@@ -55151,10 +55964,10 @@ var script$52 = function() {
   };
 
   this.handleChange = (name, value) => {
-    const values = objectAssign$1({}, this.opts.parametervalues, {
+    const values = objectAssign({}, this.opts.parametervalues, {
       [name]: value
     });
-    forOwn_1$2(values, (v, k) => {
+    forOwn_1$1(values, (v, k) => {
       // TODO: deleteするためのもっと良い方法を模索すること。
       if (typeof v === 'string' && !v.length) {
         delete values[k];
@@ -55165,10 +55978,10 @@ var script$52 = function() {
 };
 
 riot$1.tag2('viron-operation-schema', '<viron-operation-schema-form each="{propertyKey in propertyKeys}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey)}" onchange="{parent.handleChange}"></viron-operation-schema-form>', '', 'class="Operation__schema"', function(opts) {
-    this.external(script$52);
+    this.external(script$53);
 });
 
-var script$53 = function() {
+var script$54 = function() {
   this.isUseBody = false;
   // "query", "header", "path", "formData" or "body"のどれか。
   if (this.opts.parameter.in === 'body') {
@@ -55181,14 +55994,14 @@ var script$53 = function() {
 };
 
 riot$1.tag2('viron-operation-parameter', '<div class="Operation__parameterHead"> <div> <div class="Operation__parameterName">name: {opts.parameter.name}</div> <div class="Operation__parameterDescription">description: {opts.parameter.description}</div> <div class="Operation__parameterIn">in: {opts.parameter.in}</div> </div> <div class="Operation__parameterRequired" if="{opts.parameter.required}">required</div> </div> <div class="Operation__parameterBody"> <viron-operation-schema if="{isUseBody}" name="{opts.parameter.name}" schema="{opts.parameter.schema}" parametervalues="{opts.parametervalue}" onchange="{handleChange}"></viron-operation-schema> <viron-operation-parameter-form if="{!isUseBody}" parameterobject="{this.opts.parameter}" parametervalue="{opts.parametervalue}" onchange="{handleChange}"></viron-operation-parameter-form> </div>', '', 'class="Operation__parameter"', function(opts) {
-    this.external(script$53);
+    this.external(script$54);
 });
 
-var script$54 = function() {
+var script$55 = function() {
   const store = this.riotx.get();
 
   this.summary = this.opts.operationObject.summary || this.opts.operationObject.operationId;
-  this.queries = objectAssign$1({}, this.opts.initialQueries);
+  this.queries = objectAssign({}, this.opts.initialQueries);
 
   this.handleParameterChange = (key, value) => {
     this.queries[key] = value;
@@ -55234,15 +56047,15 @@ var script$54 = function() {
 };
 
 riot$1.tag2('viron-operation', '<div class="Operation__info"> <div> <div class="Operation__summary">{summary}</div> <div class="Operation__description">{opts.operationObject.description}</div> </div> </div> <div class="Operation__parameters"> <viron-operation-parameter each="{parameter in opts.operationObject.parameters}" parameter="{parameter}" parametervalue="{parent.queries[parameter.name]}" onchange="{parent.handleParameterChange}"></viron-operation-parameter> </div> <div class="Operation__control"> <viron-button label="{opts.operationObject.operationId}" onpat="{handleExecuteButtonPat}"></viron-button> <viron-button label="cancel" type="secondary" onpat="{handleCancelButtonPat}"></viron-button> </div>', '', 'class="Operation"', function(opts) {
-    this.external(script$54);
+    this.external(script$55);
 });
 
-var script$49 = function() {
+var script$50 = function() {
   const store = this.riotx.get();
 
   this.getColumns = () => {
     const columns = [];
-    forOwn_1$2(this.opts.schemaobject.items.properties, (obj, key) => {
+    forOwn_1$1(this.opts.schemaobject.items.properties, (obj, key) => {
       columns.push({
         title: obj.description || key,
         type: obj.type,
@@ -55254,9 +56067,9 @@ var script$49 = function() {
 
   this.getRows = () => {
     const rows = [];
-    forEach_1$1(this.opts.response, cells => {
+    forEach_1(this.opts.response, cells => {
       const row = {};
-      forOwn_1$2(cells, (cell, key) => {
+      forOwn_1$1(cells, (cell, key) => {
         row[key] = cell;
       });
       rows.push(row);
@@ -55266,7 +56079,7 @@ var script$49 = function() {
 
   this.getActions = () => {
     const actions$$1 = [];
-    forEach_1$1(this.opts.rowactions, operationObject => {
+    forEach_1(this.opts.rowactions, operationObject => {
       actions$$1.push({
         operationId: operationObject.operationId,
         value: operationObject.summary || operationObject.operationId,
@@ -55280,11 +56093,11 @@ var script$49 = function() {
   const createInitialQueries = (operationObject, rowData) => {
     const queries = {};
     const parameterObjects = operationObject.parameters;
-    forEach_1$1(parameterObjects, parameterObject => {
+    forEach_1(parameterObjects, parameterObject => {
       const name = parameterObject.name;
       if (parameterObject.in === 'body') {
         queries[name] = {};
-        forOwn_1$2(parameterObject.schema.properties, (v, k) => {
+        forOwn_1$1(parameterObject.schema.properties, (v, k) => {
           if (rowData[k]) {
             queries[name][k] = rowData[k];
           }
@@ -55301,7 +56114,7 @@ var script$49 = function() {
   };
 
   this.handleActionButtonPat = (operationId, rowIdx) => {
-    const operationObject = find_1$3(this.opts.rowactions, operationObject => {
+    const operationObject = find_1$2(this.opts.rowactions, operationObject => {
       return (operationObject.operationId === operationId);
     });
     const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
@@ -55323,7 +56136,7 @@ var script$49 = function() {
 };
 
 riot$1.tag2('viron-component-table', '<viron-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}" tablelabels="{opts.tablelabels}" selectedtablecolumns="{opts.selectedtablecolumns}"></viron-table>', '', 'class="ComponentTable"', function(opts) {
-    this.external(script$49);
+    this.external(script$50);
 });
 
 /**
@@ -55331,37 +56144,37 @@ riot$1.tag2('viron-component-table', '<viron-table columns="{getColumns()}" rows
      */
     function reject$3(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
-        return filter$3(obj, function(value, index, obj) {
+        return filter$4(obj, function(value, index, obj) {
             return !callback(value, index, obj);
         }, thisObj);
     }
 
-    var reject_1$3 = reject$3;
+    var reject_1$2 = reject$3;
 
-var script$56 = function() {
+var script$57 = function() {
   this.handleCheckboxChange = newIsChecked => {
     this.opts.ontoggle(this.opts.item, newIsChecked);
   };
 };
 
 riot$1.tag2('viron-component-filter-item', '<viron-checkbox ischecked="{opts.item.isSelected}" label="{opts.item.label}" onchange="{handleCheckboxChange}"></viron-checkbox>', '', 'class="ComponentFilter__item"', function(opts) {
-    this.external(script$56);
+    this.external(script$57);
 });
 
-var script$57 = function() {
+var script$58 = function() {
   const selectedTableColumns = (this.opts.selectedTableColumns || []).concat([]);
 
   this.items = [];
-  forEach_1$1(this.opts.tableColumns, tableColumn => {
+  forEach_1(this.opts.tableColumns, tableColumn => {
     const item = {
       label: tableColumn,
-      isSelected: contains_1$3(selectedTableColumns, tableColumn)
+      isSelected: contains_1$2(selectedTableColumns, tableColumn)
     };
     this.items.push(item);
   });
 
   this.handleItemToggle = (item, newIsSelected) => {
-    const targetItem = find_1$3(this.items, i => {
+    const targetItem = find_1$2(this.items, i => {
       return (i.label === item.label);
     });
     if (!!targetItem) {
@@ -55371,7 +56184,7 @@ var script$57 = function() {
   };
 
   this.handleApplyButtonPat = () => {
-    const newSelectedTableColumns = map_1$2(reject_1$2(this.items, item => {
+    const newSelectedTableColumns = map_1$1(reject_1$1(this.items, item => {
       return !item.isSelected;
     }), item => {
       return item.label;
@@ -55382,11 +56195,11 @@ var script$57 = function() {
 };
 
 riot$1.tag2('viron-component-filter', '<div class="ComponentFilter__head"> <div class="ComponentFilter__title">表示項目フィルター</div> <div class="ComponentFilter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> </div> <div class="ComponentFilter__items"> <viron-component-filter-item each="{item in items}" item="{item}" ontoggle="{parent.handleItemToggle}"></viron-component-filter-item> </div> <div class="ComponentFilter__tail"> <viron-button label="適用する" onpat="{handleApplyButtonPat}"></viron-button> </div>', '', 'class="ComponentFilter"', function(opts) {
-    this.external(script$57);
+    this.external(script$58);
 });
 
-var script$58 = function() {
-  this.currentParameters = objectAssign$1({}, this.opts.initialParameters);
+var script$59 = function() {
+  this.currentParameters = objectAssign({}, this.opts.initialParameters);
 
   this.handleParametersChange = newParameters => {
     this.currentParameters = newParameters;
@@ -55400,7 +56213,7 @@ var script$58 = function() {
 };
 
 riot$1.tag2('viron-component-search', '<div class="ComponentSearch__body"> <viron-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentSearch__tail"> <viron-button label="検索する" onpat="{handleSubmitButtonPat}"></viron-button> </div>', '', 'class="ComponentSearch"', function(opts) {
-    this.external(script$58);
+    this.external(script$59);
 });
 
 const STYLE_NUMBER = 'number';
@@ -55413,7 +56226,7 @@ const STYLE_GRAPH_STACKED_BAR = 'graph-stacked-bar';
 const STYLE_GRAPH_HORIZONTAL_STACKED_BAR = 'graph-horizontal-stacked-bar';
 const STYLE_GRAPH_STACKED_AREA = 'graph-stacked-area';
 
-var script$55 = function() {
+var script$56 = function() {
   const store = this.riotx.get();
 
   // データ取得中か否か。
@@ -55447,13 +56260,13 @@ var script$55 = function() {
   // ページングのサイズ値。
   this.paginationSize = 3;
   // 現在の検索用リクエストパラメータ値。
-  this.currentSearchRequestParameters = {};
+  this.currentSearchRequestParameters = objectAssign({}, this.opts.entirecurrentsearchrequestparameters || {});
   this.isCurrentSearchRequestParametersEmpty = () => {
-    return !keys_1$1(this.currentSearchRequestParameters).length;
+    return !keys_1(this.currentSearchRequestParameters).length;
   };
   // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
   this.getParameterObjectsForSearch = () => {
-    return reject_1$2(this.parameterObjects || [], parameterObject => {
+    return reject_1$1(this.parameterObjects || [], parameterObject => {
       if (parameterObject.in !== 'query') {
         return false;
       }
@@ -55511,7 +56324,7 @@ var script$55 = function() {
     this.isPending = true;
     this.update();
 
-    this.currentSearchRequestParameters = reject_1$3(objectAssign$1(this.currentSearchRequestParameters, requestParameters), val => {
+    this.currentSearchRequestParameters = reject_1$2(objectAssign(this.currentSearchRequestParameters, requestParameters), val => {
       return isUndefined(val);
     });
     return Promise
@@ -55579,7 +56392,7 @@ var script$55 = function() {
       }
     }
 
-    if (contains_1$3([
+    if (contains_1$2([
       STYLE_GRAPH_BAR,
       STYLE_GRAPH_SCATTERPLOT,
       STYLE_GRAPH_LINE,
@@ -55612,6 +56425,8 @@ var script$55 = function() {
   this.on('mount', () => {
     // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
     this.updater();
+  }).on('update', () => {
+    this.currentSearchRequestParameters = objectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
   }).on('updated', () => {
     this.rebindTouchEvents();
   }).on('unmount', () => {
@@ -55684,8 +56499,9 @@ var script$55 = function() {
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'viron-component-search', {
         parameterObjects: escapedParameterObjects,
-        initialParameters: objectAssign$1({}, this.currentSearchRequestParameters),
+        initialParameters: objectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
+          this.opts.entirecurrentsearchrequestparametersresetter();
           this.updater(parameters);
         }
       }))
@@ -55704,7 +56520,7 @@ var script$55 = function() {
 };
 
 riot$1.tag2('viron-component', '<div class="Component__head"> <div class="Component__headBasic"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" ref="touch" ontap="handleRefreshButtonTap"> <viron-icon type="reload"></viron-icon> </div> <div class="Component__filter {!!selectedTableColumns.length ? \'Component__filter--active\' : \'\'}" if="{opts.component.style === \'table\'}" ref="touch" ontap="handleFilterButtonTap"> <viron-icon type="filter"></viron-icon> </div> <div class="Component__search {!isCurrentSearchRequestParametersEmpty() ? \'Component__search--active\' : \'\'}" if="{!!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap"> <viron-icon type="search"></viron-icon> </div> </div> <div class="Component__headSearch" if="{!isCurrentSearchRequestParametersEmpty()}"> <div class="Component__searchQuery" each="{val, key in currentSearchRequestParameters}">{key} : {val}</div> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <viron-icon type="loading"></viron-icon> </div> <viron-pagination class="Component__pagination Component__pagination--head" if="{!isPending &amp;&amp;  hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{paginationSize}" onchange="{handlePaginationChange}"></viron-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" response="{response}" schemaobject="{schemaObject}" primarykey="{primaryKey}" tablelabels="{tableLabels}" selectedtablecolumns="{selectedTableColumns}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertText">{alertText}</div> </div> <viron-pagination class="Component__pagination Component__pagination--tail" if="{!isPending &amp;&amp; hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{paginationSize}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <viron-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></viron-component-action> </div>', '', 'class="Component"', function(opts) {
-    this.external(script$55);
+    this.external(script$56);
 });
 
 /**
@@ -55750,20 +56566,67 @@ riot$1.tag2('viron-component', '<div class="Component__head"> <div class="Compon
         return throttled;
     }
 
-    var throttle_1$1 = throttle;
+    var throttle_1 = throttle;
 
-var script$59 = function() {
+var script$60 = function() {
   const store = this.riotx.get();
 
   this.name = store.getter(constants$4.PAGE_NAME);
-  this.components = store.getter(constants$4.PAGE_COMPONENTS);
+  this.tableComponents = store.getter(constants$4.PAGE_COMPONENTS_TABLE);
+  this.notTableComponents = store.getter(constants$4.PAGE_COMPONENTS_NOT_TABLE);
   this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
+  // リクエストパラメータ定義。
+  this.parameterObjects = [];
+  // tooltip表示中か否か。
+  this.isSearchTooltipVisible = false;
+  // 現在の検索用リクエストパラメータ値。
+  this.currentSearchRequestParameters = {};
+  this.isCurrentSearchRequestParametersEmpty = () => {
+    return !keys_1(this.currentSearchRequestParameters).length;
+  };
+  // 検索用のParameterObject群を返します。(i.e. ページング用のParameterObjectを取り除く)
+  this.getParameterObjectsForSearch = () => {
+    const ret = reject_1$1(this.parameterObjects || [], parameterObject => {
+      if (parameterObject.in !== 'query') {
+        return false;
+      }
+      if (parameterObject.name === 'limit') {
+        return true;
+      }
+      if (parameterObject.name === 'offset') {
+        return true;
+      }
+      return false;
+    });
+    return ret;
+  };
+  // componentで定義されている値のみ抽出します。
+  this.getCurrentSearchRequestParametersForComponent = component => {
+    const parameterObjects = store.getter(constants$4.OAS_PARAMETER_OBJECTS, component.api.path, component.api.method);
+    const names = [];
+    forEach_1(parameterObjects, parameterObject => {
+      names.push(parameterObject.name);
+    });
+    return reject_1$2(this.currentSearchRequestParameters, (v, k) => {
+      return !contains_1$2(names, k);
+    });
+  };
+  // 現在の検索用パラメータ値をリセットします。
+  this.currentSearchRequestParametersResetter = () => {
+    this.currentSearchRequestParameters = {};
+    this.update();
+  };
 
   /**
    * 現在のviewportに最適なcolumn数を計算して返します。
    * @return {Number}
    */
   const getGridColumnCountForCurrentViewport = () => {
+    // table表示以外のコンポーネント数が0の場合はrefs.listが存在しない。適当な固定値を返却する。
+    if (!this.refs.list) {
+      return 1;
+    }
+
     const containerWidth = this.refs.list.getBoundingClientRect().width;
     const baseColumnWith = 400;
     let newColumnCount = Math.floor(containerWidth / baseColumnWith) || 1;
@@ -55783,11 +56646,13 @@ var script$59 = function() {
   };
 
   // resizeイベントハンドラーの発火回数を減らす。
-  const handleResize = throttle_1$1(updateGridColumnCount, 1000);
+  const handleResize = throttle_1(updateGridColumnCount, 1000);
   this.on('mount', () => {
     // 初回にcolumn数を設定する。
     updateGridColumnCount();
     window.addEventListener('resize', handleResize);
+  }).on('updated', () => {
+    this.rebindTouchEvents();
   }).on('unmount', () => {
     window.removeEventListener('resize', handleResize);
   });
@@ -55801,21 +56666,68 @@ var script$59 = function() {
   });
   this.listen(constants$3.PAGE, () => {
     this.name = store.getter(constants$4.PAGE_NAME);
-    this.components = store.getter(constants$4.PAGE_COMPONENTS);
+    this.tableComponents = store.getter(constants$4.PAGE_COMPONENTS_TABLE);
+    this.notTableComponents = store.getter(constants$4.PAGE_COMPONENTS_NOT_TABLE);
     this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
     this.update();
     updateGridColumnCount();
   });
+
+  this.listen(constants$3.COMPONENTS, () => {
+    this.parameterObjects = store.getter(constants$4.COMPONENTS_PARAMETER_OBJECTS);
+    this.update();
+  });
+
+  // TOOD: 動作が重いので一旦OFFっている。原因が判明したら修正すること。
+  this.handleSearchButtonMouseOver = () => {
+    this.isSearchTooltipVisible = true;
+  };
+
+  // TOOD: 動作が重いので一旦OFFっている。原因が判明したら修正すること。
+  this.handleSearchButtonMouseOut = () => {
+    this.isSearchTooltipVisible = false;
+  };
+
+  this.handleSearchButtonTap = () => {
+    // ページングに使用するparamerは取り除く。
+    const escapedParameterObjects = this.getParameterObjectsForSearch();
+
+    // 検索用のparameterObjectが存在しない場合は何もしない。
+    if (!escapedParameterObjects.length) {
+      return;
+    }
+
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'viron-component-search', {
+        parameterObjects: escapedParameterObjects,
+        initialParameters: objectAssign({}, this.currentSearchRequestParameters),
+        onComplete: parameters => {
+          this.currentSearchRequestParameters = reject_1$2(objectAssign(this.currentSearchRequestParameters, parameters), val => {
+            return isUndefined(val);
+          });
+          this.update();
+          // 親コンポーネントから子コンポーネントを操作するのはNGだけど、ここだけ....
+          // 改修するなら、search状態をstore管理する必要があるので。
+          forEach_1(this.tags['viron-component'] || [], componentTag => {
+            componentTag.updater();
+          });
+        }
+      }))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+        error: err
+      }));
+  };
 };
 
-riot$1.tag2('viron-components', '<div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__list" ref="list"> <viron-component each="{component, idx in components}" component="{component}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
-    this.external(script$59);
+riot$1.tag2('viron-components', '<div class="ComponentsPage__head"> <div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__control"> <div class="ComponentsPage__search {isCurrentSearchRequestParametersEmpty() ? \'\' : \'ComponentsPage__search--active\'}" if="{componentsCount &gt; 1 &amp;&amp; !!getParameterObjectsForSearch().length}" ref="touch" ontap="handleSearchButtonTap"> <viron-icon type="search"></viron-icon> <viron-tooltip if="{isSearchTooltipVisible}" placement="bottomRight" label="全体検索"></viron-tooltip> </div> </div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
+    this.external(script$60);
 });
 
-var script$60 = function() {};
+var script$61 = function() {};
 
 riot$1.tag2('viron-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
-    this.external(script$60);
+    this.external(script$61);
 });
 
 var marked = createCommonjsModule(function (module, exports) {
@@ -57175,8 +58087,8 @@ renderer.tablecell = (content, flags) => {
   }
 };
 
-var script$61 = function() {
-  marked.setOptions(objectAssign$1(
+var script$62 = function() {
+  marked.setOptions(objectAssign(
     {
       renderer: renderer,
       gfm: true,
@@ -57198,10 +58110,10 @@ var script$61 = function() {
 };
 
 riot$1.tag2('viron-markdown', '<div ref="view"></div>', '', 'class="Markdown"', function(opts) {
-    this.external(script$61);
+    this.external(script$62);
 });
 
-var script$62 = function() {
+var script$63 = function() {
   this.descriptionsMarkdown = {
     content: this.opts.endpoint.description,
     markedOptions: {}
@@ -57238,10 +58150,10 @@ var script$62 = function() {
 };
 
 riot$1.tag2('viron-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.endpoint.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemName">{opts.endpoint.name}</div> <div class="EndpointsPage__itemMenuButton" ref="touch" ontap="handleMenuButtonTap"> <viron-icon type="ellipsis"></viron-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemDescription"> <viron-markdown data="{descriptionsMarkdown}"></viron-markdown> </div> <div class="EndpointsPage__itemMemo">{opts.endpoint.memo}</div> <div class="EndpointsPage__itemTags" if="{!!opts.endpoint.tags.length}"> <viron-tag each="{label in opts.endpoint.tags}" label="{label}"></viron-tag> </div> <div class="EndpointsPage__itemUrl"> <div class="EndpointsPage__itemUrlIcon"> <viron-icon type="link"></viron-icon> </div> <div class="EndpointsPage__itemUrlLabel">{opts.endpoint.url}</div> </div> </div> <div class="EndpointsPage__itemTail"> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleEditButtonPat">編集</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleRemoveButtonPat">削除</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleQrCodeButtonPat">QR Code</div> <div class="EndpointsPage__itemMenu" ref="touch" ontap="handleLogoutButtonPat">ログアウト</div> </div>', '', 'class="EndpointsPage__item" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$62);
+    this.external(script$63);
 });
 
-var script$64 = function() {
+var script$65 = function() {
   const store = this.riotx.get();
 
   this.memo = this.opts.endpoint.memo || '';
@@ -57275,10 +58187,10 @@ var script$64 = function() {
 };
 
 riot$1.tag2('viron-endpoint-edit', '<div class="EndpointsPage__editTitle">エンドポイント編集</div> <div class="EndpointsPage__editHead"> <div class="EndpointsPage__editThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__editName">{opts.endpoint.name || \'-\'}</div> </div> <div class="EndpointsPage__editForm"> <viron-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="EndpointsPage__editControls"> <viron-button type="primary" onpat="{handleEditButtonPat}" label="保存"></viron-button> <viron-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></viron-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
-    this.external(script$64);
+    this.external(script$65);
 });
 
-var qrious$1 = createCommonjsModule(function (module, exports) {
+var qrious = createCommonjsModule(function (module, exports) {
 /*
  * QRious v4.0.2
  * Copyright (C) 2017 Alasdair Mercer
@@ -59642,20 +60554,20 @@ var qrious$1 = createCommonjsModule(function (module, exports) {
 
 });
 
-var script$65 = function() {
+var script$66 = function() {
   this.on('mount', () => {
-    new qrious$1(objectAssign$1({}, this.opts.data, {
+    new qrious(objectAssign({}, this.opts.data, {
       element: this.refs.canvas
     }));
   });
 };
 
 riot$1.tag2('viron-qrcode', '<canvas class="Qrcode__canvas" ref="canvas"></canvas>', '', 'class="Qrcode"', function(opts) {
-    this.external(script$65);
+    this.external(script$66);
 });
 
-var script$66 = function() {
-  const optimizedEndpoint = objectAssign$1({}, {
+var script$67 = function() {
+  const optimizedEndpoint = objectAssign({}, {
     url: this.opts.endpoint.url,
     memo: this.opts.endpoint.memo
   });
@@ -59677,10 +60589,10 @@ var script$66 = function() {
 };
 
 riot$1.tag2('viron-endpoint-qrcode', '<div class="EndpointsPage__qrcodeMessage">モバイル端末にエンドポイントを追加できます。<br>お好きなQRコードリーダーで読み込んで下さい。</div> <div class="EndpointsPage__qrcodeContent"> <viron-qrcode data="{data}"></viron-qrcode> </div>', '', 'class="EndpointsPage__qrcode"', function(opts) {
-    this.external(script$66);
+    this.external(script$67);
 });
 
-var script$67 = function() {
+var script$68 = function() {
   this.email = '';
   this.password = '';
 
@@ -59700,26 +60612,26 @@ var script$67 = function() {
 };
 
 riot$1.tag2('viron-signinemail', '<viron-textinput label="メールアドレス" text="{email}" onchange="{handleEmailChange}" type="email"></viron-textinput> <viron-textinput label="パスワード" text="{password}" type="password" onchange="{handlePasswordChange}"></viron-textinput> <viron-button onpat="{handleSigninPat}" label="サインイン"></viron-button>', '', 'class="EndpointsPage__signinEmail"', function(opts) {
-    this.external(script$67);
+    this.external(script$68);
 });
 
-var script$68 = function() {
+var script$69 = function() {
   this.handleButtonPat = () => {
     this.opts.onpat(this.opts.authtype);
   };
 };
 
 riot$1.tag2('viron-signinoauth', '<viron-button onpat="{handleButtonPat}" label="{opts.authtype.provider}"></viron-button>', '', 'class="EndpointsPage__signinOauth"', function(opts) {
-    this.external(script$68);
+    this.external(script$69);
 });
 
-var script$69 = function() {
+var script$70 = function() {
   const store = this.riotx.get();
 
-  this.oauths = values_1(filter$3(this.opts.authtypes, v => {
+  this.oauths = values_1(filter$4(this.opts.authtypes, v => {
     return v.type === 'oauth';
   }));
-  this.emails = values_1(filter$3(this.opts.authtypes, v => {
+  this.emails = values_1(filter$4(this.opts.authtypes, v => {
     return v.type === 'email';
   }));
 
@@ -59749,10 +60661,10 @@ var script$69 = function() {
 };
 
 riot$1.tag2('viron-endpoint-signin', '<div class="EndpointsPage__signinHead"> <div class="EndpointsPage__signinThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__signinName">{opts.endpoint.name}</div> </div> <div class="EndpointsPage__signinEmails" if="{!!emails.length}"> <div class="EndpointsPage__signinEmailsTitle">メールアドレス認証</div> <virtual each="{authtype in emails}"> <viron-signinemail authtype="{authtype}" onsigninpat="{parent.handleEmailSigninPat}"></viron-signinemail> </virtual> </div> <div class="EndpointsPage__signinOauths" if="{!!oauths.length}"> <div class="EndpointsPage__signinOauthsTitle">OAuth認証</div> <virtual each="{authtype in oauths}"> <viron-signinoauth authtype="{authtype}" onpat="{parent.handleOAuthPat}"></viron-signinoauth> </virtual> </div>', '', 'class="EndpointsPage__signin"', function(opts) {
-    this.external(script$69);
+    this.external(script$70);
 });
 
-var script$63 = function() {
+var script$64 = function() {
   const store = this.riotx.get();
 
   this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
@@ -59849,22 +60761,22 @@ var script$63 = function() {
 };
 
 riot$1.tag2('viron-endpoints', '<div class="EndpointsPage__caption" if="{!!endpointsCount}"> <div class="EndpointsPage__captionIcon"> <viron-icon type="link"></viron-icon> </div> <div class="EndpointsPage__captionLabel">Endpoint ({endpointsCount})<span class="EndpointsPage__captionFilter" if="{!!endpointFilterText}">filtered by "{endpointFilterText}"</span></div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint in endpoints}"> <viron-endpoint key="{endpoint.key}" endpoint="{endpoint}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></viron-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
-    this.external(script$63);
-});
-
-var script$70 = function() {};
-
-riot$1.tag2('viron-notfound', '<div>NOT FOUND...</div>', '', 'class="Page NotfoundPage"', function(opts) {
-    this.external(script$70);
+    this.external(script$64);
 });
 
 var script$71 = function() {};
 
-riot$1.tag2('viron-blocker', '', '', 'class="Blocker"', function(opts) {
+riot$1.tag2('viron-notfound', '<div>NOT FOUND...</div>', '', 'class="Page NotfoundPage"', function(opts) {
     this.external(script$71);
 });
 
-var script$72 = function() {
+var script$72 = function() {};
+
+riot$1.tag2('viron-blocker', '', '', 'class="Blocker"', function(opts) {
+    this.external(script$72);
+});
+
+var script$73 = function() {
   const store = this.riotx.get();
 
   // `tag` = drawer内に展開されるriot tagインスタンス。
@@ -59885,7 +60797,7 @@ var script$72 = function() {
   };
 
   this.on('mount', () => {
-    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign$1({
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
       isDrawer: true,
       drawerCloser: this.fadeOut
     }, this.opts.tagopts))[0];
@@ -59921,10 +60833,10 @@ var script$72 = function() {
 };
 
 riot$1.tag2('viron-drawer', '<div class="Drawer__frame"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$72);
+    this.external(script$73);
 });
 
-var script$73 = function() {
+var script$74 = function() {
   const store = this.riotx.get();
 
   this.drawers = store.getter(constants$4.DRAWERS);
@@ -59936,20 +60848,20 @@ var script$73 = function() {
 };
 
 riot$1.tag2('viron-drawers', '<virtual each="{drawers}"> <viron-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}"></viron-drawer> </virtual>', '', 'class="Drawers"', function(opts) {
-    this.external(script$73);
+    this.external(script$74);
 });
 
-var script$74 = function() {
+var script$75 = function() {
   const store = this.riotx.get();
 
   this.isOpened = false;
   const pageId = store.getter(constants$4.PAGE_ID);
-  if (!!find_1$3(this.opts.group.list, item => {
+  if (!!find_1$2(this.opts.group.list, item => {
     return (item.id === pageId);
   })) {
     this.isOpened = true;
   }
-  map_1$2(this.opts.group.list, item => {
+  map_1$1(this.opts.group.list, item => {
     if (item.id === pageId) {
       item.isSelected = true;
     } else {
@@ -59960,12 +60872,12 @@ var script$74 = function() {
 
   this.listen(constants$3.PAGE, () => {
     const pageId = store.getter(constants$4.PAGE_ID);
-    if (!!find_1$3(this.opts.group.list, item => {
+    if (!!find_1$2(this.opts.group.list, item => {
       return (item.id === pageId);
     })) {
       this.isOpened = true;
     }
-    map_1$2(this.opts.group.list, item => {
+    map_1$1(this.opts.group.list, item => {
       if (item.id === pageId) {
         item.isSelected = true;
       } else {
@@ -59992,16 +60904,16 @@ var script$74 = function() {
 };
 
 riot$1.tag2('viron-menu-group', '<div class="Menu__groupToggle {opts.group.isIndependent &amp;&amp; opts.group.list[0].isSelected ? \'Menu__groupToggle--selected\' : \'\'}" ref="touch" ontap="handleToggleTap"> <viron-icon class="Menu__groupIconHead" type="play"></viron-icon> <div class="Menu__groupName">{opts.group.isIndependent ? opts.group.list[0].name : opts.group.name}</div> <viron-icon class="Menu__groupIconTail {isOpened ? \'Menu__groupIconTail--opened\' : \'\'}" if="{!opts.group.isIndependent}" type="up"></viron-icon> </div> <div class="Menu__groupList {isOpened ? \'Menu__groupList--opened\' : \'\'}" if="{!opts.group.isIndependent}"> <div class="Menu__groupListItem {item.isSelected ? \'Menu__groupListItem--selected\' : \'\'}" each="{item, idx in opts.group.list}" data-idx="{idx}" ref="touch" ontap="handleGroupItemTap">{item.name}</div> </div>', '', 'class="Menu__group"', function(opts) {
-    this.external(script$74);
+    this.external(script$75);
 });
 
-var script$75 = function() {
+var script$76 = function() {
   const store = this.riotx.get();
 
   const group = items => {
     const groups = {};
     let counter = 0;
-    forEach_1$1(items, (item, idx) => {
+    forEach_1(items, (item, idx) => {
       const assignment = item.group || `independent_${idx}`;
       if (!groups[assignment]) {
         groups[assignment] = {
@@ -60016,7 +60928,7 @@ var script$75 = function() {
     });
 
     const ret = [];
-    forOwn_1$2(groups, val => {
+    forOwn_1$1(groups, val => {
       const index = val.index;
       delete val.index;
       ret[index] = val;
@@ -60051,10 +60963,10 @@ var script$75 = function() {
 };
 
 riot$1.tag2('viron-menu', '<div class="Menu__head"> <div class="media Menu__endpoint"> <div class="media__image Menu__endpointImage" if="{!!endpoint}" riot-style="background-image:url({endpoint.thumbnail});"></div> <div class="media__body Menu__endpointBody"> <div class="Menu__endpointTitle" if="{!!endpoint}">{endpoint.name}</div> <div class="Menu__endpointHost" if="{!!endpoint}">{endpoint.url}</div> <div class="Menu__endpointDescription" if="{!!endpoint}">{endpoint.description}</div> </div> </div> </div> <div class="Menu__body"> <div class="Menu__section"> <div class="Menu__sectionTitle">ダッシュボード</div> <div class="Menu__groups"> <viron-menu-group each="{group in groupedDashboard}" group="{group}"></viron-menu-group> </div> </div> <div class="Menu__section"> <div class="Menu__sectionTitle">管理画面</div> <div class="Menu__groups"> <viron-menu-group each="{group in groupedManage}" group="{group}"></viron-menu-group> </div> </div> </div> <div class="Menu__tail"> <div class="Menu__leftIcon"> <viron-icon type="left"></viron-icon> </div> <div class="Menu__homeButton" ref="touch" ontap="handleHomeButtonTap"> <viron-icon type="home"></viron-icon> </div> </div>', '', 'class="Menu"', function(opts) {
-    this.external(script$75);
+    this.external(script$76);
 });
 
-var script$76 = function() {
+var script$77 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -60074,7 +60986,7 @@ var script$76 = function() {
   };
 
   this.on('mount', () => {
-    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign$1({
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
       isModal: true,
       modalCloser: this.fadeOut
     }, this.opts.tagopts))[0];
@@ -60118,10 +61030,10 @@ var script$76 = function() {
 };
 
 riot$1.tag2('viron-modal', '<div class="Modal__frame" ref="touch" ontap="handleFrameTap"> <div class="Modal__closeButton" ref="touch" ontap="handleCloseButtonTap"> <viron-icon type="close"></viron-icon> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal Modal--{opts.theme}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$76);
+    this.external(script$77);
 });
 
-var script$77 = function() {
+var script$78 = function() {
   const store = this.riotx.get();
 
   this.modals = store.getter(constants$4.MODALS);
@@ -60133,24 +61045,31 @@ var script$77 = function() {
 };
 
 riot$1.tag2('viron-modals', '<virtual each="{modals}"> <viron-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{modalOpts.theme}"></viron-modal> </virtual>', '', 'class="Modals"', function(opts) {
-    this.external(script$77);
-});
-
-var script$78 = function() {
-};
-
-riot$1.tag2('viron-progress', '<div class="Progress__spinner"> <viron-icon type="loading"></viron-icon> </div>', '', 'class="Progress"', function(opts) {
     this.external(script$78);
 });
 
 var script$79 = function() {
 };
 
-riot$1.tag2('viron-splash', '<div class="Splash__logo"></div>', '', 'class="Splash"', function(opts) {
+riot$1.tag2('viron-progress-circular', '<div class="ProgressCircular__spinner"> <viron-icon type="loading"></viron-icon> </div>', '', 'class="ProgressCircular"', function(opts) {
     this.external(script$79);
 });
 
 var script$80 = function() {
+};
+
+riot$1.tag2('viron-progress-linear', '<div class="ProgressLinear__bar"> <div class="ProgressLinear__particle"></div> <div class="ProgressLinear__particle"></div> </div>', '', 'class="ProgressLinear {\'ProgressLinear--active\' : opts.isactive}"', function(opts) {
+    this.external(script$80);
+});
+
+var script$81 = function() {
+};
+
+riot$1.tag2('viron-splash', '<div class="Splash__logo"></div>', '', 'class="Splash"', function(opts) {
+    this.external(script$81);
+});
+
+var script$82 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -60196,10 +61115,10 @@ var script$80 = function() {
 };
 
 riot$1.tag2('viron-toast', '<div class="Toast__icon"> <viron-icon if="{opts.type === \'normal\'}" type="close"></viron-icon> <viron-icon if="{opts.type === \'error\'}" type="exclamation"></viron-icon> </div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" ref="touch" ontap="handleLinkTap">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" ref="touch" ontap="handleTap"', function(opts) {
-    this.external(script$80);
+    this.external(script$82);
 });
 
-var script$81 = function() {
+var script$83 = function() {
   const store = this.riotx.get();
 
   this.toasts = store.getter(constants$4.TOASTS);
@@ -60211,10 +61130,10 @@ var script$81 = function() {
 };
 
 riot$1.tag2('viron-toasts', '<virtual each="{toasts}"> <viron-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></viron-toast> </virtual>', '', 'class="Toasts"', function(opts) {
-    this.external(script$81);
+    this.external(script$83);
 });
 
-var script$83 = function() {
+var script$85 = function() {
   this.handleDeleteButtonPat = () => {
     this.opts.onConfirm();
     this.close();
@@ -60226,10 +61145,10 @@ var script$83 = function() {
 };
 
 riot$1.tag2('viron-application-confirm', '<div class="Application__confirmHead"> <div class="Application__confirmTitle">エンドポイント削除</div> <div class="Application__confirmDescription">全てのエンドポイントが削除されます。個別に削除したい場合は各エンドポイントカード内の削除ボタンから行って下さい。</div> </div> <div class="Application__confirmTail"> <viron-button label="全て削除する" type="emphasis" onpat="{handleDeleteButtonPat}"></viron-button> <viron-button label="キャンセル" onpat="{handleCancelButtonPat}"></viron-button> </div>', '', 'class="Application__confirm"', function(opts) {
-    this.external(script$83);
+    this.external(script$85);
 });
 
-var script$84 = function() {
+var script$86 = function() {
   const store = this.riotx.get();
 
   this.isExist = false;
@@ -60282,10 +61201,10 @@ var script$84 = function() {
 };
 
 riot$1.tag2('viron-application-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <viron-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application__entryControls"> <viron-button type="primary" isdisabled="{isExist}" onpat="{handleRegisterButtonPat}" label="新規作成"></viron-button> <viron-button type="secondary" onpat="{handleCancelButtonPat}" label="キャンセル"></viron-button> </div>', '', 'class="Application__entry"', function(opts) {
-    this.external(script$84);
+    this.external(script$86);
 });
 
-var script$85 = function() {
+var script$87 = function() {
   const store = this.riotx.get();
 
   // ドロップ待受中か否か。
@@ -60333,10 +61252,10 @@ var script$85 = function() {
 };
 
 riot$1.tag2('viron-application-order-droparea', '<div class="Application__orderDropareaContent"></div> <div class="Application__orderDropareaHandler" ondragenter="{handleDragEnter}" ondragover="{handleDragOver}" ondragleave="{handleDragLeave}" ondrop="{handleDrop}"></div>', '', 'class="Application__orderDroparea {\'Application__orderDroparea--watching\' : isWatching, \'Application__orderDroparea--droppable\' : isDroppable}"', function(opts) {
-    this.external(script$85);
+    this.external(script$87);
 });
 
-var script$86 = function() {
+var script$88 = function() {
   const store = this.riotx.get();
 
   // ドラッグ開始時の処理。
@@ -60368,10 +61287,10 @@ var script$86 = function() {
 };
 
 riot$1.tag2('viron-application-order-item', '<div class="Application__orderItemHead"> <div class="Application__orderItemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="Application__orderItemName">{opts.endpoint.name || \'-\'}</div> </div> <div class="Application__orderItemBody"> <div class="Application__orderItemUrl"> <div class="Application__orderItemUrlIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__orderItemUrlLabel">{opts.endpoint.url}</div> </div> </div>', '', 'class="Application__orderItem" draggable="{true}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}"', function(opts) {
-    this.external(script$86);
+    this.external(script$88);
 });
 
-var script$87 = function() {
+var script$89 = function() {
   const store = this.riotx.get();
 
   this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER);
@@ -60383,10 +61302,10 @@ var script$87 = function() {
 };
 
 riot$1.tag2('viron-application-order', '<div class="Application__orderTitle">並び順を変更</div> <div class="Application__orderDescription">ドラッグ&ドロップでエンドポイントの並び順を変更できます。</div> <div class="Application__orderPlayground"> <viron-application-order-droparea order="{0}"></viron-application-order-droparea> <virtual each="{endpoint, idx in endpoints}"> <viron-application-order-item endpoint="{endpoint}"></viron-application-order-item> <viron-application-order-droparea order="{idx + 1}"></viron-application-order-droparea> </virtual> </div>', '', 'class="Application__order"', function(opts) {
-    this.external(script$87);
+    this.external(script$89);
 });
 
-var script$82 = function() {
+var script$84 = function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
@@ -60526,8 +61445,8 @@ var script$82 = function() {
   };
 };
 
-riot$1.tag2('viron', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="download"></viron-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <label class="Application__menuItem Application__menuItem--interactive" for="Application{_riot_id}"> <div class="Application__menuItemIcon"> <viron-icon type="upload"></viron-icon> </div> <div class="Application__menuItemBody">アップロード <input class="Application__menuItemInput" type="file" accept="application/json" id="Application{_riot_id}" onchange="{handleFileChange}"> </div> </label> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 1}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="bars"></viron-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="close"></viron-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <viron-icon type="search"></viron-icon> </div> <div class="Application__menuItemBody"> <viron-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></viron-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <viron-menu></viron-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="viron-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <viron-drawers></viron-drawers> <viron-modals></viron-modals> <viron-toasts></viron-toasts> <viron-progress if="{isNetworking}"></viron-progress> <viron-blocker if="{isNavigating}"></viron-blocker> <viron-splash if="{!isLaunched}"></viron-splash>', '', 'class="Application"', function(opts) {
-    this.external(script$82);
+riot$1.tag2('viron', '<div class="Application__contents"> <div class="Application__asideColumn"> <virtual if="{isTopPage}"> <div class="Application__menu"> <div class="Application__title">Design based<br>Management<br>Console</div> <div class="Application__menuItems"> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleEntryMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__menuItemBody">新規追加</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleDownloadMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="download"></viron-icon> </div> <div class="Application__menuItemBody">ダウンロード</div> </div> <label class="Application__menuItem Application__menuItem--interactive" for="Application{_riot_id}"> <div class="Application__menuItemIcon"> <viron-icon type="upload"></viron-icon> </div> <div class="Application__menuItemBody">アップロード <input class="Application__menuItemInput" type="file" accept="application/json" id="Application{_riot_id}" onchange="{handleFileChange}"> </div> </label> <div class="Application__menuItem Application__menuItem--interactive" if="{endpointsCount &gt; 1}" ref="touch" ontap="handleOrderMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="bars"></viron-icon> </div> <div class="Application__menuItemBody">並び替え</div> </div> <div class="Application__menuItem Application__menuItem--interactive" ref="touch" ontap="handleClearMenuItemTap"> <div class="Application__menuItemIcon"> <viron-icon type="close"></viron-icon> </div> <div class="Application__menuItemBody">クリア</div> </div> <div class="Application__menuItem Application__menuItem--secondary"> <div class="Application__menuItemIcon"> <viron-icon type="search"></viron-icon> </div> <div class="Application__menuItemBody"> <viron-textinput text="{endpointFilterText}" theme="ghost" placeholder="filter..." onchange="{handleFilterChange}"></viron-textinput> </div> </div> </div> </div> </virtual> <virtual if="{!isTopPage}"> <viron-menu></viron-menu> </virtual> </div> <div class="Application__mainColumn"> <div class="Application__page"> <div data-is="viron-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <viron-drawers></viron-drawers> <viron-modals></viron-modals> <viron-toasts></viron-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-blocker if="{isNavigating}"></viron-blocker> <viron-splash if="{!isLaunched}"></viron-splash>', '', 'class="Application"', function(opts) {
+    this.external(script$84);
 });
 
 // エントリーポイント。
