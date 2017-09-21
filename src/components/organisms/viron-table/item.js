@@ -7,6 +7,15 @@ export default function() {
   const store = this.riotx.get();
 
   this.handleTap = () => {
+    // ブラウザによってコピー機能を無効化する
+    let userAgent = window.navigator.userAgent.toLowerCase();
+    if (userAgent.indexOf('edge') != -1) {
+      return;
+    } else if (userAgent.indexOf('firefox') != -1) {
+      return;
+    }
+
+
     // クリップボードにコピーできないタイプであればスルーする。
     const type = this.opts.item.type;
     let value = this.opts.item.cell;
