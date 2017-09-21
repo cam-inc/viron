@@ -1,6 +1,7 @@
 const compact = require('mout/array/compact');
 const isEmpty = require('mout/lang/isEmpty');
 const forOwn = require('mout/object/forOwn');
+const some = require('mout/array/some');
 
 const shared = require('../../shared');
 const context = shared.context;
@@ -212,6 +213,13 @@ const show = (req, res) => {
               genTableComponent('Viron 監査ログ', 'get', '/auditlog', null, null, ['createdAt', 'request_uri', 'request_method']),
             ],
           },
+          {
+            id: 'account',
+            name: 'アカウント設定',
+            components: [
+              genTableComponent('アカウント設定', 'get', '/account', 'id', null, ['email', 'role_id']),
+            ],
+          },
         ],
       })
     ),
@@ -233,6 +241,13 @@ const show = (req, res) => {
       if (!helperAdminRole.canAccess(path, method, roles)) {
         // 権限がないcomponentを削除
         page.components[j] = null;
+      } else if (component.actions) {
+        // actionsはGET,POST,PUT,DELETEすべてに権限がないものは削除
+        page.components[j].actions = component.actions.filter(action => {
+          return some(Object.keys(req.swagger.swaggerObject.paths[action]), method => {
+            return helperAdminRole.canAccess(action, method, roles);
+          });
+        });
       }
     }
     page.components = compact(page.components);
