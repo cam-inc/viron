@@ -18,10 +18,13 @@ viron-parameter-form
       viron-pug(text="{ opts.val }" isDisabled="{ isDisabled }" onChange="{ handlePugChange }")
     virtual(if="{ uiType === 'html' }")
       viron-html(text="{ opts.val }" isDisabled="{ isDisabled }" onChange="{ handleHtmlChange }")
+    virtual(if="{ uiType === 'autocomplete' }")
+      viron-autocomplete(val="{ opts.val }" config="{ autocompleteConfig }" onChange="{ handleAutocompleteChange }")
     virtual(if="{ uiType === 'null' }")
-      div TODO: null
+      div null
 
   script.
+    import '../../atoms/viron-autocomplete/index.tag';
     import '../../atoms/viron-checkbox/index.tag';
     import '../../atoms/viron-html/index.tag';
     import '../../atoms/viron-numberinput/index.tag';

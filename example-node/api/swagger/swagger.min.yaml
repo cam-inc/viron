@@ -276,6 +276,7 @@ definitions:
     example:
       email: user@sample.com
       password: XXXXXXXXXXXXXXXX
+      role_id: viewer
     properties:
       email:
         description: login user mail address
@@ -285,6 +286,12 @@ definitions:
         description: password for email auth
         example: XXXXXXXXXXXXXXXX
         type: string
+      role_id:
+        description: admin role id
+        example: viewer
+        type: string
+        enum:
+        - AutoGenerate
     required:
     - email
     - password
@@ -421,6 +428,18 @@ definitions:
         type: string
     required:
     - role_id
+    type: object
+
+  UpdateAccountPayload:
+    example:
+      password: XXXXXXXXXXXXXXXX
+    properties:
+      password:
+        description: password for email auth
+        example: XXXXXXXXXXXXXXXX
+        type: string
+    required:
+    - password
     type: object
 
   adminrolepath:
@@ -1341,6 +1360,121 @@ paths:
       summary: show swagger
       tags:
       - swagger
+
+  /account:
+    get:
+      x-swagger-router-controller: viron_account
+      description: アカウント情報取得
+      operationId: account#list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUserCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: アカウント設定
+      tags:
+      - me
+
+  /account/{id}:
+    get:
+      x-swagger-router-controller: viron_account
+      description: アカウント情報取得
+      operationId: account#show
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: 管理ユーザ取得
+      tags:
+      - me
+
+    put:
+      x-swagger-router-controller: viron_account
+      description: アカウント情報の更新
+      operationId: account#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAccountPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: アカウント情報の更新
+      tags:
+      - me
 
 #################################################
 # securityDefinitions

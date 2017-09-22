@@ -155,7 +155,7 @@ export default {
       if (method === 'get') {
         return;
       }
-      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath][method];
+      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath] && !!context.state.oas.client.spec.paths[basePath][method];
       if (!isOperationObjectDefined) {
         return;
       }
@@ -170,7 +170,7 @@ export default {
     if (!!primaryKey) {
       const listBasePath = `${basePath}/{${primaryKey}}`;
       forEach(methods, method => {
-        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath][method];
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath] && !!context.state.oas.client.spec.paths[listBasePath][method];
         if (!isOperationObjectDefined) {
           return;
         }
@@ -187,7 +187,7 @@ export default {
     forEach(actions, actionBasePath => {
       const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
       forEach(methods, method => {
-        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath][method];
+        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath] && !!context.state.oas.client.spec.paths[actionBasePath][method];
         if (!isOperationObjectDefined) {
           return;
         }

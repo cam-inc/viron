@@ -49,6 +49,9 @@ class Context {
     return Promise.resolve()
       .then(() => {
         this.vironlib = new VironLib({
+          account: {
+            admin_users: store.models.AdminUsers,
+          },
           acl: this.getConfigAcl(),
           audit_log: {
             audit_logs: store.models.AuditLogs,

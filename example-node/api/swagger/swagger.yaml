@@ -319,6 +319,7 @@ definitions:
     example:
       email: user@sample.com
       password: XXXXXXXXXXXXXXXX
+      role_id: viewer
     properties:
       email:
         description: login user mail address
@@ -328,6 +329,12 @@ definitions:
         description: password for email auth
         example: XXXXXXXXXXXXXXXX
         type: string
+      role_id:
+        description: admin role id
+        example: viewer
+        type: string
+        enum:
+        - AutoGenerate
     required:
     - email
     - password
@@ -570,6 +577,18 @@ definitions:
         - AutoGenerate
     required:
     - role_id
+    type: object
+
+  UpdateAccountPayload:
+    example:
+      password: XXXXXXXXXXXXXXXX
+    properties:
+      password:
+        description: password for email auth
+        example: XXXXXXXXXXXXXXXX
+        type: string
+    required:
+    - password
     type: object
 
   User:
@@ -834,11 +853,11 @@ definitions:
         format: int64
         type: integer
         x-autocomplete:
-          field: id
+          field: title
           path: /viron_autocomplete
           query:
-            table: user_blogs
-            disp: title
+            model: user_blogs
+            value: id
     title: UserBlogEntryPayload
     required:
     - user_blog_id
@@ -879,11 +898,11 @@ definitions:
         format: int64
         type: integer
         x-autocomplete:
-          field: id
+          field: name
           path: /viron_autocomplete
           query:
-            table: users
-            disp: name
+            model: users
+            value: id
     required:
     - user_id
     type: object
@@ -3150,43 +3169,6 @@ paths:
       tags:
       - user_blog
 
-  /userblog/autocomplete/{field}:
-    get:
-      description: autocomplete user data
-      operationId: user_blog#autocomplete
-      parameters:
-      - description: field name in userblog model
-        in: path
-        name: field
-        required: true
-        type: string
-      - description: search query string
-        in: query
-        name: search
-        required: false
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: autocomplete user_blog
-      tags:
-      - user_blog
-
   /userblogentry:
     get:
       x-swagger-router-controller: user_blog_entry
@@ -4084,6 +4066,121 @@ paths:
       summary: 横断検索
       tags:
       - multiquery
+
+  /account:
+    get:
+      x-swagger-router-controller: viron_account
+      description: アカウント情報取得
+      operationId: account#list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUserCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: アカウント設定
+      tags:
+      - account
+
+  /account/{id}:
+    get:
+      x-swagger-router-controller: viron_account
+      description: アカウント情報取得
+      operationId: account#show
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: 管理ユーザ取得
+      tags:
+      - account
+
+    put:
+      x-swagger-router-controller: viron_account
+      description: アカウント情報の更新
+      operationId: account#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAccountPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: アカウント情報の更新
+      tags:
+      - account
 
 #################################################
 # securityDefinitions
