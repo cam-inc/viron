@@ -24,5 +24,14 @@ export default {
    */
   isEdge: context => {
     return !!context.state.ua.edge;
+  },
+
+  /**
+   * Edgeか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isFirefox: context => {
+    return !!context.state.ua.firefox;
   }
 };

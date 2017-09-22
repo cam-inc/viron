@@ -1,20 +1,20 @@
 import contains from 'mout/array/contains';
 import clipboard from 'clipboard-js';
 import { constants as actions } from '../../../store/actions';
+import { constants as getters } from '../../../store/getters';
 import '../../atoms/viron-message/index.tag';
 
 export default function() {
   const store = this.riotx.get();
 
   this.handleTap = () => {
-    // ブラウザによってコピー機能を無効化する
-    let userAgent = window.navigator.userAgent.toLowerCase();
-    if (userAgent.indexOf('edge') != -1) {
-      return;
-    } else if (userAgent.indexOf('firefox') != -1) {
+    // ブラウザによってコピー機能を無効化する。
+    if (store.getter(getters.UA_IS_EDGE)) {
       return;
     }
-
+    if (store.getter(getters.UA_IS_FIREFOX)) {
+      return;
+    }
 
     // クリップボードにコピーできないタイプであればスルーする。
     const type = this.opts.item.type;

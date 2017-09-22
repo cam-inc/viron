@@ -81,7 +81,8 @@ const constants = {
   TOASTS: 'TOASTS',
   UA: 'UA',
   UA_IS_SAFARI: 'UA_IS_SAFARI',
-  UA_IS_EDGE: 'UA_IS_EDGE'
+  UA_IS_EDGE: 'UA_IS_EDGE',
+  UA_IS_FIREFOX: 'UA_IS_FIREFOX'
 };
 
 export default {
@@ -152,7 +153,8 @@ export default {
   [constants.TOASTS]: toasts.all,
   [constants.UA]: ua.all,
   [constants.UA_IS_SAFARI]: ua.isSafari,
-  [constants.UA_IS_EDGE]: ua.isEdge
+  [constants.UA_IS_EDGE]: ua.isEdge,
+  [constants.UA_IS_FIREFOX]: ua.isFirefox
 };
 
 export {
