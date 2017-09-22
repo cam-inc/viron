@@ -23,6 +23,9 @@ export default function() {
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
   // エンドポイントフィルター用のテキスト。
   this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
+  // Firefox, Edgeのpaddingバグを回避するため、当該ブラウザのとき、特殊クラスを指定する
+  // @see https://bugzilla.mozilla.org/show_bug.cgi?id=748518
+  this.isSpecialBrowser = store.getter(getters.UA_IS_FIREFOX) || store.getter(getters.UA_IS_EDGE);
 
   this.on('updated', () => {
     this.rebindTouchEvents();
@@ -43,6 +46,10 @@ export default function() {
   });
   this.listen(states.ENDPOINTS, () => {
     this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+    this.update();
+  });
+  this.listen(states.UA, () => {
+    this.isSpecialBrowser = store.getter(getters.UA_IS_FIREFOX) || store.getter(getters.UA_IS_EDGE);
     this.update();
   });
 
