@@ -85,12 +85,7 @@
 }
 
 /* FirefoxとEdgeの場合はpadding-bottomが効かないため、after要素で補う */
-.Application--firefox .Application__mainColumn::after {
-  display: block;
-  height: 24px;
-  content: "";
-}
-
+.Application--firefox .Application__mainColumn::after,
 .Application--edge .Application__mainColumn::after {
   display: block;
   height: 24px;
