@@ -1,6 +1,7 @@
 const VERSION = '1.0.17';
 const CACHE_NAME = 'viron';
-const urlsToCache = ['/css/app.min.css'];
+// 環境別に対応させるために相対パスで指定。
+const urlsToCache = ['./css/app.min.css'];
 
 // インストール時の処理。
 self.addEventListener('install', event => {
