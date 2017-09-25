@@ -84,6 +84,7 @@
   overflow-y: scroll;
 }
 
+/* FirefoxとEdgeの場合はpadding-bottomが効かないため、after要素で補う */
 .Application--specialBrowser .Application__mainColumn::after {
   display: block;
   height: 24px;
