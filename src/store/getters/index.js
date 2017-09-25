@@ -82,7 +82,8 @@ const constants = {
   UA: 'UA',
   UA_IS_SAFARI: 'UA_IS_SAFARI',
   UA_IS_EDGE: 'UA_IS_EDGE',
-  UA_IS_FIREFOX: 'UA_IS_FIREFOX'
+  UA_IS_FIREFOX: 'UA_IS_FIREFOX',
+  UA_USING_BROWSER: 'UA_USING_BROWSER'
 };
 
 export default {
@@ -154,7 +155,8 @@ export default {
   [constants.UA]: ua.all,
   [constants.UA_IS_SAFARI]: ua.isSafari,
   [constants.UA_IS_EDGE]: ua.isEdge,
-  [constants.UA_IS_FIREFOX]: ua.isFirefox
+  [constants.UA_IS_FIREFOX]: ua.isFirefox,
+  [constants.UA_USING_BROWSER]: ua.usingBrowser
 };
 
 export {

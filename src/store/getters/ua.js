@@ -9,6 +9,15 @@ export default {
   },
 
   /**
+   * Chromeか否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isChrome: context => {
+    return !!context.state.ua.chrome;
+  },
+
+  /**
    * Safariか否かを返します。
    * @param {riotx.Context} context
    * @return {Boolean}
@@ -27,11 +36,34 @@ export default {
   },
 
   /**
-   * Edgeか否かを返します。
+   * Firefoxか否かを返します。
    * @param {riotx.Context} context
    * @return {Boolean}
    */
   isFirefox: context => {
     return !!context.state.ua.firefox;
+  },
+
+  /**
+   * 使用しているブラウザを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  usingBrowser: context => {
+    const ua = context.state.ua;
+    if (!!ua.chrome) {
+      return 'chrome';
+    }
+    if (!!ua.safari) {
+      return 'safari';
+    }
+    if (!!ua.edge) {
+      return 'edge';
+    }
+    if (!!ua.firefox) {
+      return 'firefox';
+    }
+
+    return null;
   }
 };
