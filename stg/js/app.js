@@ -61449,11 +61449,31 @@ riot$1.tag2('viron', '<div class="Application__contents"> <div class="Applicatio
     this.external(script$84);
 });
 
+/**
+ * ServiceWorkerの登録を行います。
+ * @return {Promise}
+ */
+const serviceWorkerRegistry = () => {
+  // @see: https://caniuse.com/#feat=serviceworkers
+  if (!window.navigator.serviceWorker) {
+    return Promise.resolve();
+  }
+  return window.navigator.serviceWorker
+    .register('/sw.js')
+    .then(registration => {
+      console.log(`ServiceWorker registration succeeded with scope: ${registration.scope}`);
+    })
+    .catch(err => {
+      console.error('ServiceWorker registration failed with error.', err);
+    });
+};
+
 // エントリーポイント。
 document.addEventListener('DOMContentLoaded', () => {
   let mainStore;
   Promise
     .resolve()
+    .then(() => serviceWorkerRegistry())
     .then(() => mixin.init())
     .then(() => store$1.init())
     .then(store => {
