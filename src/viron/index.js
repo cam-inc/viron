@@ -23,6 +23,8 @@ export default function() {
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
   // エンドポイントフィルター用のテキスト。
   this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
+  // バグを対処するため、各ブラウザごとのクラス設定用のブラウザ名を取得する。
+  this.usingBrowser = store.getter(getters.UA_USING_BROWSER);
 
   this.on('updated', () => {
     this.rebindTouchEvents();
@@ -43,6 +45,10 @@ export default function() {
   });
   this.listen(states.ENDPOINTS, () => {
     this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+    this.update();
+  });
+  this.listen(states.UA, () => {
+    this.usingBrowser = store.getter(getters.UA_USING_BROWSER);
     this.update();
   });
 
