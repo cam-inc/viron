@@ -22,13 +22,10 @@
 }
 
 .EndpointsPage__list {
-  /*@apply --layout-start-start;
-  flex-wrap: wrap;*/
   display: grid;
-  padding: 2.5vmin;
-  grid-template-columns: repeat(auto-fill, minmax(calc(8rem + 5vw + 5vh), 1fr));
+  grid-template-columns: repeat(auto-fill, 375px);
   grid-auto-flow: dense;
-  grid-gap: 2.5vmin;
+  grid-gap: 15px;
 }
 
 /* ============================== */
@@ -38,74 +35,35 @@
 .EndpointsPage__item {
   position: relative;
   display: block;
-  /*width: 375px;*/
   width: 100%;
   height: 100%;
   padding: 24px;
   margin: 0 8px 8px 0;
   overflow: hidden;
   cursor: pointer;
-  /*デバック用コード*/
-  counter-increment: numImg;
   background-color: var(--color-base-white);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   transition-duration: 100ms;
   transition-property: box-shadow;
 }
-/*デバック用コード*/
-.EndpointsPage__item::after {
-  position: absolute;
-  top: 0%;
-  left: 0;
-  width: 4rem;
-  height: 4rem;
-  font-size: 2rem;
-  line-height: 4rem;
-  color: #c6d9d3;
-  text-align: center;
-  content: counter(numImg);
-  background: rgba(0, 0, 0, 0.5);
-}
 
-@media only screen and (min-width: 800px) {
+@media only screen and (min-width: 1024px) {
 
-  /* BEM Modifierにspanを指定するのか？ */
-
-  .EndpointsPage__item:first-child {
-    grid-row-start: span 1;
-    grid-column-start: span 1;
-  }
-
-  .EndpointsPage__item:nth-child(2) {
-    grid-row-start: span 1;
-    grid-column-start: span 2;
-  }
-
-  .EndpointsPage__item:nth-child(3) {
-    grid-row-start: span 2;
-    grid-column-start: span 1;
-  }
-
-  .EndpointsPage__item:nth-child(4) {
+  .EndpointsPage__item--large {
     grid-row-start: span 2;
     grid-column-start: span 2;
   }
 
-  .EndpointsPage__item:nth-child(5) {
-    grid-row-start: span 1;
-    grid-column-start: span 3;
-  }
-
-  .EndpointsPage__item:nth-child(6) {
+  .EndpointsPage__item--portrait {
     grid-row-start: span 2;
-    grid-column-start: span 3;
+    grid-column-start: span 1;
   }
 
-  .EndpointsPage__item:nth-child(7) {
+  .EndpointsPage__item--landscape {
+    grid-row-start: span 1;
+    grid-column-start: span 2;
   }
 
-  .EndpointsPage__item:nth-child(8) {
-  }
 }
 
 .EndpointsPage__item:hover,
