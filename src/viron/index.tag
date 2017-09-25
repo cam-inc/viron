@@ -1,4 +1,4 @@
-viron.Application(class="{ Application--specialBrowser: isSpecialBrowser }")
+viron.Application(class="{ Application--exceptionalBrowser: isExceptionalBrowser }")
   .Application__contents
     .Application__asideColumn
       virtual(if="{ isTopPage }")
