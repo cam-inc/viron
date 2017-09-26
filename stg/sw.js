@@ -1,6 +1,6 @@
 // `0.0.1`はrollupにて書き換えられる。
 const VERSION = '0.0.1';
-const BASE_DIR = '/stg/';
+const BASE_DIR = '/viron/stg/';
 const CACHE_NAME = `viron-${VERSION}`;
 const CACHE_WHITELIST = [CACHE_NAME];
 // 環境別に対応させるために相対パスで指定。
