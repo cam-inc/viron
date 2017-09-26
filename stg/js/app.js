@@ -6983,7 +6983,9 @@ var application$2 = {
   // ドラッグ中か否か。
   isDragging: false,
   // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
-  endpointFilterText: ''
+  endpointFilterText: '',
+  // オンラインか否か。
+  isOnline: true
 };
 
 // 選択された`page`に関する`component`群。
@@ -7341,6 +7343,17 @@ var application$1 = {
    */
   endpointFilterText: (context, newFilterText) => {
     context.state.application.endpointFilterText = newFilterText;
+    return [constants$3.APPLICATION];
+  },
+
+  /**
+   * オンライン状態を切り替えます.
+   * @param {riotx.Context} context
+   * @param {Boolean} isOn
+   * @return {Array}
+   */
+  online: (context, isOn) => {
+    context.state.application.isOnline = isOn;
     return [constants$3.APPLICATION];
   }
 };
@@ -8220,6 +8233,7 @@ const constants$2 = {
   APPLICATION_NETWORKINGS_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
   APPLICATION_DRAG: 'APPLICATION_DRAG',
   APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
+  APPLICATION_ONLINE: 'APPLICATION_ONLINE',
   COMPONENTS_UPDATE_ONE: 'COMPONENTS_UPDATE_ONE',
   COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
   COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
@@ -8256,6 +8270,7 @@ var mutations = {
   [constants$2.APPLICATION_NETWORKINGS_REMOVE]: application$1.removeNetworking,
   [constants$2.APPLICATION_DRAG]: application$1.drag,
   [constants$2.APPLICATION_ENDPOINT_FILTER_TEXT]: application$1.endpointFilterText,
+  [constants$2.APPLICATION_ONLINE]: application$1.online,
   [constants$2.COMPONENTS_UPDATE_ONE]: components$1.updateOne,
   [constants$2.COMPONENTS_REMOVE_ONE]: components$1.removeOne,
   [constants$2.COMPONENTS_REMOVE_ALL]: components$1.removeAll,
@@ -8375,6 +8390,32 @@ var application = {
       .resolve()
       .then(() => {
         context.commit(constants$2.APPLICATION_ENDPOINT_FILTER_TEXT, '');
+      });
+  },
+
+  /**
+   * オンライン状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  turnOnline: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_ONLINE, true);
+      });
+  },
+
+  /**
+   * オフライン状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  turnOffline: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_ONLINE, false);
       });
   }
 };
@@ -8557,6 +8598,15 @@ var application$3 = {
    */
   endpointFilterText: context => {
     return context.state.application.endpointFilterText;
+  },
+
+  /**
+   * オンライン状態か否かを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isOnline: context => {
+    return context.state.application.isOnline;
   }
 };
 
@@ -9608,6 +9658,7 @@ const constants$4 = {
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
   APPLICATION_ISDRAGGING: 'APPLICATION_ISDRAGGING',
   APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
+  APPLICATION_ISONLINE: 'APPLICATION_ISONLINE',
   COMPONENTS: 'COMPONENTS',
   COMPONENTS_PARAMETER_OBJECTS: 'COMPONENTS_PARAMETER_OBJECTS',
   COMPONENTS_ONE: 'COMPONENTS_ONE',
@@ -9679,6 +9730,7 @@ var getters = {
   [constants$4.APPLICATION_ISNETWORKING]: application$3.isNetworking,
   [constants$4.APPLICATION_ISDRAGGING]: application$3.isDragging,
   [constants$4.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
+  [constants$4.APPLICATION_ISONLINE]: application$3.isOnline,
   [constants$4.COMPONENTS]: components$2.all,
   [constants$4.COMPONENTS_PARAMETER_OBJECTS]: components$2.parameterObjectsEntirely,
   [constants$4.COMPONENTS_ONE]: components$2.one,
@@ -11930,6 +11982,8 @@ const constants$1 = {
   APPLICATION_DRAG_END: 'APPLICATION_DRAG_END',
   APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT: 'APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT',
   APPLICATION_RESET_ENDPOINT_FILTER_TEXT: 'APPLICATION_RESET_ENDPOINT_FILTER_TEXT',
+  APPLICATION_TURN_ONLINE: 'APPLICATION_TURN_ONLINE',
+  APPLICATION_TURN_OFFLINE: 'APPLICATION_TURN_OFFLINE',
   AUTH_UPDATE: 'AUTH_UPADTE',
   AUTH_REMOVE: 'AUTH_REMOVE',
   AUTH_VALIDATE: 'AUTH_VALIDATE',
@@ -11977,6 +12031,8 @@ var actions = {
   [constants$1.APPLICATION_DRAG_END]: application.endDrag,
   [constants$1.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT]: application.updateEndpointFilterText,
   [constants$1.APPLICATION_RESET_ENDPOINT_FILTER_TEXT]: application.resetEndpointFilterText,
+  [constants$1.APPLICATION_TURN_ONLINE]: application.turnOnline,
+  [constants$1.APPLICATION_TURN_OFFLINE]: application.turnOffline,
   [constants$1.AUTH_UPDATE]: auth.update,
   [constants$1.AUTH_REMOVE]: auth.remove,
   [constants$1.AUTH_VALIDATE]: auth.validate,
@@ -61322,8 +61378,14 @@ var script$84 = function() {
   // エンドポイントフィルター用のテキスト。
   this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
 
-  this.on('updated', () => {
+  this.on('mount', () => {
+    window.addEventListener('online', this.handleOnline);
+    window.addEventListener('offline', this.handleOffline);
+  }).on('updated', () => {
     this.rebindTouchEvents();
+  }).on('unmount', () => {
+    window.removeEventListener('online', this.handleOnline);
+    window.removeEventListener('offline', this.handleOffline);
   });
 
   this.listen(constants$3.APPLICATION, () => {
@@ -61343,6 +61405,14 @@ var script$84 = function() {
     this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
     this.update();
   });
+
+  this.handleOnline = () => {
+    store.action(constants$1.APPLICATION_TURN_ONLINE);
+  };
+
+  this.handleOffline = () => {
+    store.action(constants$1.APPLICATION_TURN_OFFLINE);
+  };
 
   this.handleEntryMenuItemTap = () => {
     Promise
@@ -61458,13 +61528,19 @@ const serviceWorkerRegistry = () => {
   if (!window.navigator.serviceWorker) {
     return Promise.resolve();
   }
-  return window.navigator.serviceWorker
-    .register('./sw.js')
-    .then(registration => {
-      console.log(`ServiceWorker registration succeeded with scope: ${registration.scope}`);
+  const pathToSWFile = `${window.VIRON.baseDir}sw.js`;
+  return Promise
+    .resolve()
+    .then(() => {
+      return window.navigator.serviceWorker
+        .register(pathToSWFile)
+        .then(registration => {
+          console.log(`ServiceWorker registration succeeded with scope: ${registration.scope}`);// eslint-disable-line no-console
+        });
     })
+    .then(() => window.navigator.serviceWorker.ready)
     .catch(err => {
-      console.error('ServiceWorker registration failed with error.', err);
+      console.error('ServiceWorker registration failed with error.', err);// eslint-disable-line no-console
     });
 };
 
