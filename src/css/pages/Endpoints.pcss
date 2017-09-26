@@ -23,9 +23,11 @@
 
 .EndpointsPage__list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 375px);
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-rows: repeat(auto-fit, minmax(350px, 1fr));
   grid-auto-flow: dense;
-  grid-gap: 15px;
+  grid-gap: 10px;
+  justify-content: center;
 }
 
 /* ============================== */
@@ -35,10 +37,8 @@
 .EndpointsPage__item {
   position: relative;
   display: block;
-  width: 100%;
-  height: 100%;
+  min-width: 350px;
   padding: 24px;
-  margin: 0 8px 8px 0;
   overflow: hidden;
   cursor: pointer;
   background-color: var(--color-base-white);
@@ -47,8 +47,7 @@
   transition-property: box-shadow;
 }
 
-@media only screen and (min-width: 1024px) {
-
+@media only screen and (min-width: 1025px) {
   .EndpointsPage__item--large {
     grid-row-start: span 3;
     grid-column-start: span 3;
@@ -89,7 +88,6 @@
     grid-column-start: span 2;
   }
 }
-
 .EndpointsPage__item:hover,
 .EndpointsPage__item.hover {
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
