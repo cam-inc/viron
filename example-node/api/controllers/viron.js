@@ -7,8 +7,8 @@ const shared = require('../../shared');
 const context = shared.context;
 const constant = shared.constant;
 
-const genComponent = (name, method, path, style, pagination, options) => {
-  return {
+const genComponent = (name, method, path, style, autoRefreshSec, pagination, options) => {
+  const cmp = {
     name,
     api: {
       path,
@@ -21,10 +21,16 @@ const genComponent = (name, method, path, style, pagination, options) => {
       value: 'value',
     }],
   };
+
+  if (autoRefreshSec) {
+    cmp.auto_refresh_sec = autoRefreshSec;
+  }
+
+  return cmp;
 };
 
 const genTableComponent = (name, method, path, primary, query, labels, actions) => {
-  const component = genComponent(name, method, path, constant.VIRON_STYLE_TABLE, true);
+  const component = genComponent(name, method, path, constant.VIRON_STYLE_TABLE, null, true);
   if (primary) {
     component.primary = primary;
   }
@@ -87,15 +93,15 @@ const show = (req, res) => {
             id: 'quickview',
             name: 'クイックビュー',
             components: [
-              genComponent('DAU', 'get', '/stats/dau', constant.VIRON_STYLE_NUMBER),
-              genComponent('MAU', 'get', '/stats/mau', constant.VIRON_STYLE_NUMBER),
-              genComponent('Planet(bar)', 'get', '/stats/planet/bar', constant.VIRON_STYLE_GRAPH_BAR),
-              genComponent('Planet(scatterplot)', 'get', '/stats/planet/scatterplot', constant.VIRON_STYLE_GRAPH_SCATTERPLOT),
-              genComponent('Planet(line)', 'get', '/stats/planet/line', constant.VIRON_STYLE_GRAPH_LINE),
-              genComponent('Planet(horizontal-bar)', 'get', '/stats/planet/horizontal-bar', constant.VIRON_STYLE_GRAPH_HORIZONTAL_BAR),
-              genComponent('Planet(stacked-bar)', 'get', '/stats/planet/stacked-bar', constant.VIRON_STYLE_GRAPH_STACKED_BAR),
-              genComponent('Planet(horizontal-stacked-bar)', 'get', '/stats/planet/horizontal-stacked-bar', constant.VIRON_STYLE_GRAPH_HORIZONTAL_STACKED_BAR),
-              genComponent('Planet(stacked-area)', 'get', '/stats/planet/stacked-area', constant.VIRON_STYLE_GRAPH_STACKED_AREA),
+              genComponent('DAU', 'get', '/stats/dau', constant.VIRON_STYLE_NUMBER, 5),
+              genComponent('MAU', 'get', '/stats/mau', constant.VIRON_STYLE_NUMBER, 30),
+              genComponent('Planet(bar)', 'get', '/stats/planet/bar', constant.VIRON_STYLE_GRAPH_BAR, 60),
+              genComponent('Planet(scatterplot)', 'get', '/stats/planet/scatterplot', constant.VIRON_STYLE_GRAPH_SCATTERPLOT, 300),
+              genComponent('Planet(line)', 'get', '/stats/planet/line', constant.VIRON_STYLE_GRAPH_LINE, 300),
+              genComponent('Planet(horizontal-bar)', 'get', '/stats/planet/horizontal-bar', constant.VIRON_STYLE_GRAPH_HORIZONTAL_BAR, 300),
+              genComponent('Planet(stacked-bar)', 'get', '/stats/planet/stacked-bar', constant.VIRON_STYLE_GRAPH_STACKED_BAR, 300),
+              genComponent('Planet(horizontal-stacked-bar)', 'get', '/stats/planet/horizontal-stacked-bar', constant.VIRON_STYLE_GRAPH_HORIZONTAL_STACKED_BAR, 300),
+              genComponent('Planet(stacked-area)', 'get', '/stats/planet/stacked-area', constant.VIRON_STYLE_GRAPH_STACKED_AREA, 300),
             ],
           }
         ],
