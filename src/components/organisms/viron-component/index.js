@@ -54,6 +54,8 @@ export default function() {
   this.pagination = {};
   // ページングのサイズ値。
   this.paginationSize = 3;
+  // 自動更新間隔。
+  this.autoRefreshSec = 0;
   // 現在の検索用リクエストパラメータ値。
   this.currentSearchRequestParameters = ObjectAssign({}, this.opts.entirecurrentsearchrequestparameters || {});
   this.isCurrentSearchRequestParametersEmpty = () => {
@@ -215,34 +217,8 @@ export default function() {
     this.alertText = '';
   };
 
-  this.on('mount', () => {
-    // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
-    this.updater();
-  }).on('update', () => {
-    this.currentSearchRequestParameters = ObjectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
-  }).on('updated', () => {
-    this.rebindTouchEvents();
-  }).on('unmount', () => {
-    store.action(actions.COMPONENTS_REMOVE_ONE, this._riot_id);
-  });
-
-  this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
-    this.isPending = false;
-    this.response = store.getter(getters.COMPONENTS_ONE_RESPONSE, this._riot_id);
-    this.schemaObject = store.getter(getters.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
-    this.parameterObjects = store.getter(getters.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
-    this.selfActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
-    this.rowActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
-    this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
-    this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION, this._riot_id);
-    this.primaryKey = store.getter(getters.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
-    this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
-    this.tableColumns = store.getter(getters.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
-    this.validateResponse(this.response);
-    this.update();
-  });
-
-  this.handleRefreshButtonTap = () => {
+  // 更新ボタンや定期更新で使用される。
+  const refresh = () => {
     Promise
       .resolve()
       .then(() => {
@@ -254,6 +230,58 @@ export default function() {
       .then(() => {
         this.refs.body.style.height = '';
       });
+  };
+
+  // 自動更新機能関連。
+  let autoRefreshIntervalId = null;
+  const activateAutoRefresh = () => {
+    if (!this.autoRefreshSec) {
+      return;
+    }
+    if (autoRefreshIntervalId) {
+      return;
+    }
+    autoRefreshIntervalId = window.setInterval(() => {
+      refresh();
+    }, this.autoRefreshSec * 1000);
+  };
+  const inactivateAutoRefresh = () => {
+    window.clearInterval(autoRefreshIntervalId);
+    autoRefreshIntervalId = null;
+  };
+
+  this.on('mount', () => {
+    // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
+    this.updater();
+  }).on('update', () => {
+    this.currentSearchRequestParameters = ObjectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
+  }).on('updated', () => {
+    this.rebindTouchEvents();
+  }).on('unmount', () => {
+    inactivateAutoRefresh();
+    store.action(actions.COMPONENTS_REMOVE_ONE, this._riot_id);
+  });
+
+  this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
+    this.isPending = false;
+    this.response = store.getter(getters.COMPONENTS_ONE_RESPONSE, this._riot_id);
+    this.schemaObject = store.getter(getters.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
+    this.parameterObjects = store.getter(getters.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
+    this.selfActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
+    this.rowActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
+    this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
+    this.autoRefreshSec = store.getter(getters.COMPONENTS_ONE_AUTO_REFRESH_SEC, this._riot_id);
+    this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION, this._riot_id);
+    this.primaryKey = store.getter(getters.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
+    this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
+    this.tableColumns = store.getter(getters.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
+    this.validateResponse(this.response);
+    activateAutoRefresh();
+    this.update();
+  });
+
+  this.handleRefreshButtonTap = () => {
+    this.refresh();
   };
 
   this.handleFilterButtonTap = () => {

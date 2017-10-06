@@ -142,6 +142,16 @@ export default {
   },
 
   /**
+   * 指定riotIDに対する要素の自動更新secを取得します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Number}
+   */
+  autoRefreshSec: (context, riotId) => {
+    return context.state.components[riotId].autoRefreshSec;
+  },
+
+  /**
    * 指定riotIDに対する要素のページング情報を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
