@@ -8772,6 +8772,16 @@ var components$2 = {
   },
 
   /**
+   * 指定riotIDに対する要素の自動更新secを取得します。
+   * @param {riotx.Context} context
+   * @param {String} riotId
+   * @return {Number}
+   */
+  autoRefreshSec: (context, riotId) => {
+    return context.state.components[riotId].autoRefreshSec;
+  },
+
+  /**
    * 指定riotIDに対する要素のページング情報を返します。
    * @param {riotx.Context} context
    * @param {String} riotId
@@ -9659,6 +9669,7 @@ const constants$4 = {
   COMPONENTS_ONE_ACTIONS_SELF: 'COMPONENTS_ONE_ACTIONS_SELF',
   COMPONENTS_ONE_ACTIONS_ROW: 'COMPONENTS_ONE_ACTIONS_ROW',
   COMPONENTS_ONE_HAS_PAGINATION: 'COMPONENTS_ONE_HAS_PAGINATION',
+  COMPONENTS_ONE_AUTO_REFRESH_SEC: 'COMPONENTS_ONE_AUTO_REFRESH_SEC',
   COMPONENTS_ONE_PAGINATION: 'COMPONENTS_ONE_PAGINATION',
   COMPONENTS_ONE_TABLE_LABELS: 'COMPONENTS_ONE_TABLE_LABELS',
   COMPONENTS_ONE_TABLE_COLUMNS: 'COMPONENTS_ONE_TABLE_COLUMNS',
@@ -9732,6 +9743,7 @@ var getters = {
   [constants$4.COMPONENTS_ONE_ACTIONS_SELF]: components$2.selfActions,
   [constants$4.COMPONENTS_ONE_ACTIONS_ROW]: components$2.rowActions,
   [constants$4.COMPONENTS_ONE_HAS_PAGINATION]: components$2.hasPagination,
+  [constants$4.COMPONENTS_ONE_AUTO_REFRESH_SEC]: components$2.autoRefreshSec,
   [constants$4.COMPONENTS_ONE_PAGINATION]: components$2.pagination,
   [constants$4.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
   [constants$4.COMPONENTS_ONE_TABLE_COLUMNS]: components$2.tableColumns,
@@ -10851,6 +10863,7 @@ var components$3 = {
           actions,// 関連API群。
           hasPagination,
           pagination,// ページング関連。
+          autoRefreshSec: (component.auto_refresh_sec || 0),
           primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
           table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
         });
@@ -56482,6 +56495,8 @@ var script$56 = function() {
   this.pagination = {};
   // ページングのサイズ値。
   this.paginationSize = 3;
+  // 自動更新間隔。
+  this.autoRefreshSec = 0;
   // 現在の検索用リクエストパラメータ値。
   this.currentSearchRequestParameters = objectAssign({}, this.opts.entirecurrentsearchrequestparameters || {});
   this.isCurrentSearchRequestParametersEmpty = () => {
@@ -56645,34 +56660,8 @@ var script$56 = function() {
     this.alertText = '';
   };
 
-  this.on('mount', () => {
-    // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
-    this.updater();
-  }).on('update', () => {
-    this.currentSearchRequestParameters = objectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
-  }).on('updated', () => {
-    this.rebindTouchEvents();
-  }).on('unmount', () => {
-    store.action(constants$1.COMPONENTS_REMOVE_ONE, this._riot_id);
-  });
-
-  this.listen(constants$3.COMPONENTS_ONE(this._riot_id), () => {
-    this.isPending = false;
-    this.response = store.getter(constants$4.COMPONENTS_ONE_RESPONSE, this._riot_id);
-    this.schemaObject = store.getter(constants$4.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
-    this.parameterObjects = store.getter(constants$4.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
-    this.selfActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
-    this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
-    this.hasPagination = store.getter(constants$4.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
-    this.pagination = store.getter(constants$4.COMPONENTS_ONE_PAGINATION, this._riot_id);
-    this.primaryKey = store.getter(constants$4.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
-    this.tableLabels = store.getter(constants$4.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
-    this.tableColumns = store.getter(constants$4.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
-    this.validateResponse(this.response);
-    this.update();
-  });
-
-  this.handleRefreshButtonTap = () => {
+  // 更新ボタンや定期更新で使用される。
+  const refresh = () => {
     Promise
       .resolve()
       .then(() => {
@@ -56684,6 +56673,58 @@ var script$56 = function() {
       .then(() => {
         this.refs.body.style.height = '';
       });
+  };
+
+  // 自動更新機能関連。
+  let autoRefreshIntervalId = null;
+  const activateAutoRefresh = () => {
+    if (!this.autoRefreshSec) {
+      return;
+    }
+    if (autoRefreshIntervalId) {
+      return;
+    }
+    autoRefreshIntervalId = window.setInterval(() => {
+      refresh();
+    }, this.autoRefreshSec * 1000);
+  };
+  const inactivateAutoRefresh = () => {
+    window.clearInterval(autoRefreshIntervalId);
+    autoRefreshIntervalId = null;
+  };
+
+  this.on('mount', () => {
+    // TODO: GETリクエストに必須パラメータが存在するケースへの対応。
+    this.updater();
+  }).on('update', () => {
+    this.currentSearchRequestParameters = objectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
+  }).on('updated', () => {
+    this.rebindTouchEvents();
+  }).on('unmount', () => {
+    inactivateAutoRefresh();
+    store.action(constants$1.COMPONENTS_REMOVE_ONE, this._riot_id);
+  });
+
+  this.listen(constants$3.COMPONENTS_ONE(this._riot_id), () => {
+    this.isPending = false;
+    this.response = store.getter(constants$4.COMPONENTS_ONE_RESPONSE, this._riot_id);
+    this.schemaObject = store.getter(constants$4.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
+    this.parameterObjects = store.getter(constants$4.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
+    this.selfActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
+    this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
+    this.hasPagination = store.getter(constants$4.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
+    this.autoRefreshSec = store.getter(constants$4.COMPONENTS_ONE_AUTO_REFRESH_SEC, this._riot_id);
+    this.pagination = store.getter(constants$4.COMPONENTS_ONE_PAGINATION, this._riot_id);
+    this.primaryKey = store.getter(constants$4.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
+    this.tableLabels = store.getter(constants$4.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
+    this.tableColumns = store.getter(constants$4.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
+    this.validateResponse(this.response);
+    activateAutoRefresh();
+    this.update();
+  });
+
+  this.handleRefreshButtonTap = () => {
+    refresh();
   };
 
   this.handleFilterButtonTap = () => {
