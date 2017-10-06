@@ -281,7 +281,7 @@ export default function() {
   });
 
   this.handleRefreshButtonTap = () => {
-    this.refresh();
+    refresh();
   };
 
   this.handleFilterButtonTap = () => {
