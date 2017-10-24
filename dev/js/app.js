@@ -55587,10 +55587,14 @@ var script$45 = function() {
     break;
   case 'number':
   case 'integer':
-    this.value = String(this.opts.data.cell);
+    if (isNull_1(this.opts.data.cell)) {
+      this.value = '';
+    } else {
+      this.value = String(this.opts.data.cell);
+    }
     break;
   case 'string': {
-    this.value = this.opts.data.cell || '-';
+    this.value = this.opts.data.cell || '';
     const split = this.value.split('.');
     if (!!split.length && contains_1$2(['jpg', 'png', 'gif'], split[split.length - 1])) {
       this.isImage = true;
