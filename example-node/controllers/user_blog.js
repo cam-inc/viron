@@ -1,10 +1,10 @@
-const shared = require('../../shared');
+const shared = require('../shared');
 const context = shared.context;
 
 /**
- * Controller : List Blog Design
+ * Controller : List User Blog
  * HTTP Method : GET
- * PATH : /blogdesign
+ * PATH : /userblog
  *
  * @returns {Promise.<TResult>}
  */
@@ -13,15 +13,16 @@ const list = (req, res, next) => {
   const pager = vironlib.pager;
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
-  const BlogDesigns = store.models.BlogDesigns;
-  const limit = Number(req.query.limit);
-  const offset = Number(req.query.offset);
+  const UserBlogs = store.models.UserBlogs;
+  const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
+  const limit = req.query.limit;
+  const offset = req.query.offset;
   const options = {
-    attributes: Object.keys(req.swagger.operation.responses['200'].schema.items.properties),
+    attributes,
     limit,
     offset,
   };
-  return storeHelper.list(store, BlogDesigns, {}, options)
+  return storeHelper.list(store, UserBlogs, {}, options)
     .then(data => {
       pager.setResHeader(res, limit, offset, data.count);
       res.json(data.list);
@@ -31,9 +32,9 @@ const list = (req, res, next) => {
 };
 
 /**
- * Controller : Create  Blog Design
+ * Controller : Create  User Blog
  * HTTP Method : POST
- * PATH : /blogdesign
+ * PATH : /userblog
  *
  * @returns {Promise.<TResult>}
  */
@@ -41,8 +42,8 @@ const create = (req, res, next) => {
   const vironlib = context.getVironLib();
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
-  const BlogDesigns = store.models.BlogDesigns;
-  return storeHelper.create(store, BlogDesigns, req.body)
+  const UserBlogs = store.models.UserBlogs;
+  return storeHelper.create(store, UserBlogs, req.body)
     .then(data => {
       res.json(data);
     })
@@ -51,9 +52,9 @@ const create = (req, res, next) => {
 };
 
 /**
- * Controller : Delete  Blog Design
+ * Controller : Delete  User Blog
  * HTTP Method : DELETE
- * PATH : /blogdesign/:id
+ * PATH : /userblog/:id
  *
  * @returns {Promise.<TResult>}
  */
@@ -61,14 +62,14 @@ const remove = (req, res, next) => {
   const vironlib = context.getVironLib();
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
-  const BlogDesigns = store.models.BlogDesigns;
+  const UserBlogs = store.models.UserBlogs;
   const query = {
     id: req.swagger.params.id.value,
   };
   const options = {
     force: true, // physical delete
   };
-  return storeHelper.remove(store, BlogDesigns, query, options)
+  return storeHelper.remove(store, UserBlogs, query, options)
     .then(() => {
       res.status(204).end();
     })
@@ -77,9 +78,9 @@ const remove = (req, res, next) => {
 };
 
 /**
- * Controller : Show  Blog Design
+ * Controller : Show  User Blog
  * HTTP Method : GET
- * PATH : /blogdesign/:id
+ * PATH : /userblog/:id
  *
  * @returns {Promise.<TResult>}
  */
@@ -87,14 +88,14 @@ const show = (req, res, next) => {
   const vironlib = context.getVironLib();
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
-  const BlogDesigns = store.models.BlogDesigns;
+  const UserBlogs = store.models.UserBlogs;
   const query = {
     id: req.swagger.params.id.value,
   };
   const options = {
     attributes: Object.keys(req.swagger.operation.responses['200'].schema.properties),
   };
-  return storeHelper.findOne(store, BlogDesigns, query, options)
+  return storeHelper.findOne(store, UserBlogs, query, options)
     .then(data => {
       res.json(data);
     })
@@ -103,9 +104,9 @@ const show = (req, res, next) => {
 };
 
 /**
- * Controller : update  Blog Design
+ * Controller : update  User Blog
  * HTTP Method : PUT
- * PATH : /blogdesign/:id
+ * PATH : /userblog/:id
  *
  * @returns {Promise.<TResult>}
  */
@@ -113,11 +114,11 @@ const update = (req, res, next) => {
   const vironlib = context.getVironLib();
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
-  const BlogDesigns = store.models.BlogDesigns;
+  const UserBlogs = store.models.UserBlogs;
   const query = {
     id: req.swagger.params.id.value,
   };
-  return storeHelper.update(store, BlogDesigns, query, req.body)
+  return storeHelper.update(store, UserBlogs, query, req.body)
     .then(data => {
       res.json(data);
     })
@@ -126,9 +127,9 @@ const update = (req, res, next) => {
 };
 
 module.exports = {
-  'blog_design#list': list,
-  'blog_design#create': create,
-  'blog_design#remove': remove,
-  'blog_design#show': show,
-  'blog_design#update': update,
+  'user_blog#list': list,
+  'user_blog#create': create,
+  'user_blog#remove': remove,
+  'user_blog#show': show,
+  'user_blog#update': update,
 };

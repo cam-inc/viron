@@ -1,7 +1,7 @@
 const csv = require('csv');
 const moment = require('moment-timezone');
 
-const shared = require('../../shared');
+const shared = require('../shared');
 const context = shared.context;
 
 /**
