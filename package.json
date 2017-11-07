@@ -50,7 +50,7 @@
     "lint:css": "stylelint src/css/**/*.pcss",
     "spec": "mocha",
     "deploy": "node task/deploy.js",
-    "release:prd": "run-s build deploy",
+    "release": "run-s build deploy",
     "nuc": "nuc -a"
   },
   "dependencies": {
