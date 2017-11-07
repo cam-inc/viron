@@ -35,7 +35,7 @@ export default {
     sourcemap: false,
     exports: 'none',
     format: 'iife',
-    strict: false,
+    strict: false
   },
   context: 'window',
   plugins: [
