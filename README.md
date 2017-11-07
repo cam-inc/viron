@@ -13,6 +13,8 @@ Automatically generate a management console based on swagger data.
 
 > access : [Viron(dev)](https://cam-inc.github.io/viron/dev/)
 
+> access : [Viron(v0)](https://cam-inc.github.io/viron/v0/)
+
 # QuickStart
 
 ```
@@ -49,12 +51,9 @@ $ ls browser/swagger-client.js
 # Release
 
 ```
-# for develop
-$ npm run release:dev
-# for staging
-$ npm run release:stg
-# for production
-$ npm run release:prd
+$ npm version [major|minor|patch]
+$ git push origin develop
+$ npm run release
 ```
 > access : [Viron](https://cam-inc.github.io/viron/)
 
