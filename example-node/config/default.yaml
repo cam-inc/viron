@@ -3,7 +3,7 @@
 # values in the swagger hash are system configuration for swagger-node
 swagger:
 
-  fittingsDirs: [ api/fittings ]
+  fittingsDirs: [ fittings ]
   defaultPipe: null
   swaggerControllerPipe: swagger_controllers  # defines the standard processing pipe for controllers
 
@@ -14,17 +14,15 @@ swagger:
     _router:
       name: swagger_router
       mockMode: false
-      mockControllersDirs: [ api/mocks ]
-      controllersDirs: [ api/controllers ]
+      mockControllersDirs: [ mocks ]
+      controllersDirs: [ controllers ]
 
     _swagger_validate:
       name: swagger_validator
       validateResponse: false
 
     _middleware_after_auth:
-      type: connect-middleware
-      module: middlewares
-      function: afterAuth
+      name: middlewares
 
     _error_handler:
       name: error_handler
@@ -33,6 +31,7 @@ swagger:
     swagger_controllers:
       - onError: _error_handler
       # - cors
+      - swagger_params_parser
       - swagger_security
       - _middleware_after_auth
       - _swagger_validate

@@ -1,4 +1,4 @@
-const shared = require('../../shared');
+const shared = require('../shared');
 const vironlib = shared.context.getVironLib();
 
 module.exports = {

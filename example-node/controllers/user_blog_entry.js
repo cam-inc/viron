@@ -1,4 +1,4 @@
-const shared = require('../../shared');
+const shared = require('../shared');
 const context = shared.context;
 
 /**

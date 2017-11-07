@@ -16,7 +16,9 @@ context.init()
     const vironlib = context.getVironLib();
     const helperSwagger = vironlib.swagger.helper;
     const config = {
-      appRoot: __dirname, // required config
+      appRoot: __dirname,
+      configDir: `${__dirname}/config`,
+      swaggerFile: `${__dirname}/swagger/swagger.yaml`,
       swaggerSecurityHandlers: {
         /**
          * JWT middleware

@@ -8,15 +8,16 @@ WORKDIR $HOME
 
 # Setup project
 ADD package.json /example-node/package.json
-ADD .npmrc /example-node/.npmrc
 #RUN npm install --production --no-progress && npm cache clean
 RUN npm install --no-progress && npm cache clean
 
 # Copy source files
 ADD shared /example-node/shared
-ADD api /example-node/api
 ADD config /example-node/config
 ADD app.js /example-node/app.js
+ADD controllers /example-node/controllers
+ADD fittings /example-node/fittings
+ADD swagger /example-node/swagger
 ADD test /example-node/test
 
 EXPOSE 3000

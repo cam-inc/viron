@@ -18,9 +18,11 @@ services:
     volumes:
       - $PWD/package.json:/example-node/package.json
       - $PWD/shared:/example-node/shared
-      - $PWD/api:/example-node/api
       - $PWD/config:/example-node/config
       - $PWD/app.js:/example-node/app.js
+      - $PWD/controllers:/example-node/controllers
+      - $PWD/fittings:/example-node/fittings
+      - $PWD/swagger:/example-node/swagger
       - $PWD/test:/example-node/test
       - $PWD/.env:/example-node/.env
     command: npm run debug

@@ -3,7 +3,7 @@ const isEmpty = require('mout/lang/isEmpty');
 const forOwn = require('mout/object/forOwn');
 const some = require('mout/array/some');
 
-const shared = require('../../shared');
+const shared = require('../shared');
 const context = shared.context;
 const constant = shared.constant;
 
