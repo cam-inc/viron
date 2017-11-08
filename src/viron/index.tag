@@ -15,7 +15,7 @@ viron.Application(class="Application--{ usingBrowser }")
   viron-progress-linear(isActive="{ isNavigating || isNetworking }")
   viron-progress-circular(if="{ isNetworking }")
   viron-application-blocker(if="{ isNavigating }")
-  viron-splash(if="{ !isLaunched }")
+  viron-application-splash(if="{ !isLaunched }")
 
   script.
     import '../components/pages/viron-components/index.tag';
@@ -24,12 +24,12 @@ viron.Application(class="Application--{ usingBrowser }")
     import '../components/organisms/viron-drawers/index.tag';
     import '../components/organisms/viron-progress-circular/index.tag';
     import '../components/organisms/viron-progress-linear/index.tag';
-    import '../components/organisms/viron-splash/index.tag';
     import '../components/organisms/viron-toasts/index.tag';
     import './blocker.tag';
     import './header.tag';
     import './menu.tag';
     import './modals.tag';
     import './poster.tag';
+    import './splash.tag';
     import script from './index';
     this.external(script);
