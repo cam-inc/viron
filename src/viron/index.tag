@@ -1,45 +1,11 @@
 viron.Application(class="Application--{ usingBrowser }")
-  .Application__contents
-    .Application__asideColumn
-      virtual(if="{ isTopPage }")
-        .Application__menu
-          .Application__title
-            | Design based
-            br
-            | Management
-            br
-            | Console
-          .Application__menuItems
-            .Application__menuItem.Application__menuItem--interactive(onClick="{ handleEntryMenuItemClick }")
-              .Application__menuItemIcon
-                viron-icon(type="link")
-              .Application__menuItemBody 新規追加
-            .Application__menuItem.Application__menuItem--interactive(onClick="{ handleDownloadMenuItemClick }")
-              .Application__menuItemIcon
-                viron-icon(type="download")
-              .Application__menuItemBody ダウンロード
-            label.Application__menuItem.Application__menuItem--interactive(for="Application{_riot_id}")
-              .Application__menuItemIcon
-                viron-icon(type="upload")
-              .Application__menuItemBody
-                | アップロード
-                input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" onChange="{ handleFileChange }")
-            .Application__menuItem.Application__menuItem--interactive(if="{ endpointsCount > 1 }" onClick="{ handleOrderMenuItemClick }")
-              .Application__menuItemIcon
-                viron-icon(type="bars")
-              .Application__menuItemBody 並び替え
-            .Application__menuItem.Application__menuItem--interactive(onClick="{ handleClearMenuItemClick }")
-              .Application__menuItemIcon
-                viron-icon(type="close")
-              .Application__menuItemBody クリア
-            .Application__menuItem.Application__menuItem--secondary
-              .Application__menuItemIcon
-                viron-icon(type="search")
-              .Application__menuItemBody
-                viron-textinput(text="{ endpointFilterText }" theme="ghost" placeholder="filter..." onChange="{ handleFilterChange }")
-      virtual(if="{ !isTopPage }")
-        viron-menu
-    .Application__mainColumn
+  .Application__container
+    .Application__aside
+      viron-application-poster(if="{ isTopPage }")
+      viron-application-menu(if="{ !isTopPage }")
+    .Application__header
+      viron-application-header
+    .Application__main
       .Application__page
         div(data-is="viron-{ pageName }" route="{ pageRoute }")
   viron-drawers
@@ -56,12 +22,14 @@ viron.Application(class="Application--{ usingBrowser }")
     import '../components/pages/viron-notfound/index.tag';
     import '../components/organisms/viron-blocker/index.tag';
     import '../components/organisms/viron-drawers/index.tag';
-    import '../components/organisms/viron-menu/index.tag';
     import '../components/organisms/viron-modals/index.tag';
     import '../components/organisms/viron-progress-circular/index.tag';
     import '../components/organisms/viron-progress-linear/index.tag';
     import '../components/organisms/viron-splash/index.tag';
     import '../components/organisms/viron-toasts/index.tag';
     import '../components/atoms/viron-textinput/index.tag';
+    import './header.tag';
+    import './menu.tag';
+    import './poster.tag';
     import script from './index';
     this.external(script);

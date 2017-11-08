@@ -1,0 +1,39 @@
+.Application_Poster {
+  position: relative;
+  display: block;
+
+  &__bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: url("https://source.unsplash.com/random");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  &__content {
+    position: relative;
+    padding: 24px;
+    font-size: 1.6rem;
+    color: var(--color-base-red);
+
+    & .IconLogo {
+      display: block;
+      width: 24px;
+      height: 24px;
+      margin-bottom: 24px;
+    }
+  }
+}

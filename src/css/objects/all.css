@@ -1,3 +1,4 @@
 /* ITCSS: Objects */
 /* Cosmetic-free design patterns. */
-@import "media.css";
+@import "icon";
+@import "media";

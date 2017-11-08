@@ -1,0 +1,38 @@
+.Application {
+  position: relative;
+  display: block;
+  height: 100%;
+
+  &__container {
+    display: grid;
+    height: 100%;
+    grid-template-areas: "aside header" "aside main";
+    grid-template-rows: 64px 1fr;
+    grid-template-columns: 192px 1fr;
+  }
+
+  &__aside {
+
+    @apply --layout-stretch-center;
+    grid-area: aside;
+
+    & .Application_Menu,
+    & .Application_Poster {
+      flex-grow: 1;
+    }
+  }
+
+  &__header {
+
+    @apply --layout-stretch-center;
+    grid-area: header;
+
+    & .Application_Header {
+      flex-grow: 1;
+    }
+  }
+
+  &__main {
+    grid-area: main;
+  }
+}

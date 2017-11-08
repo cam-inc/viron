@@ -1,4 +1,4 @@
 /* ITCSS: Tools */
 /* Default mixins and functions. */
-@import "layout.pcss";
-@import "text.pcss";
+@import "layout.css";
+@import "text.css";

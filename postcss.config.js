@@ -17,7 +17,7 @@ module.exports = {
         'last 2 ChromeAndroid versions'
       ]
     },
-    'postcss-nesting': {},
+    'postcss-nested': {},
     'postcss-overflow-wrap': {},
     'postcss-currentcolor': {},
     'postcss-sorting': {}
