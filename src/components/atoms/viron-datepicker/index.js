@@ -53,17 +53,17 @@ export default function() {
     return calendar;
   };
 
-  this.handleNextButtonPat = () => {
+  this.handleNextButtonPpat = () => {
     const newDateText = format(this.displayDate.add(1, 'month'));
     this.opts.ondisplaychange(newDateText);
   };
 
-  this.handlePrevButtonPat = () => {
+  this.handlePrevButtonPpat = () => {
     const newDateText = format(this.displayDate.subtract(1, 'month'));
     this.opts.ondisplaychange(newDateText);
   };
 
-  this.handleCellPat = newDate => {
+  this.handleCellPpat = newDate => {
     this.opts.onchange(format(newDate));
   };
 

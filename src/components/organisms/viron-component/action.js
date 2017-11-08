@@ -26,7 +26,7 @@ export default function() {
     break;
   }
 
-  this.handleButtonPat = () => {
+  this.handleButtonPpat = () => {
     store.action(actions.DRAWERS_ADD, 'viron-component-operation', {
       title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,

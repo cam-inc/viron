@@ -1,7 +1,7 @@
 viron-signinemail.EndpointsPage__signinEmail
   viron-textinput(label="メールアドレス" text="{ email }" type="email" onChange="{ handleEmailChange }")
   viron-textinput(label="パスワード" text="{ password }" type="password" onChange="{ handlePasswordChange }")
-  viron-button(onPat="{ handleSigninPat }" label="サインイン")
+  viron-button(onPpat="{ handleSigninPpat }" label="サインイン")
 
   script.
     import '../../atoms/viron-button/index.tag';

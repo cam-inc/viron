@@ -19,7 +19,7 @@ export default function() {
     this.update();
   };
 
-  this.handleRegisterButtonPat = () => {
+  this.handleRegisterButtonPpat = () => {
     Promise
       .resolve()
       .then(() => store.action(actions.ENDPOINTS_ADD, this.endpointURL, this.memo))
@@ -48,7 +48,7 @@ export default function() {
       });
   };
 
-  this.handleCancelButtonPat = () => {
+  this.handleCancelButtonPpat = () => {
     this.close();
   };
 }

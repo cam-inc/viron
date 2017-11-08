@@ -36,9 +36,9 @@ export default function() {
 
   this.handleTap = () => {
     if (this.opts.isaction) {
-      this.opts.onpat(this.opts.action);
+      this.opts.onppat(this.opts.action);
     } else {
-      this.opts.onpat();
+      this.opts.onppat();
     }
   };
 

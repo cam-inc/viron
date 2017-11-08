@@ -5,11 +5,11 @@ viron-endpoint-signin.EndpointsPage__signin
   .EndpointsPage__signinEmails(if="{ !!emails.length }")
     .EndpointsPage__signinEmailsTitle メールアドレス認証
     virtual(each="{ authtype in emails }")
-      viron-signinemail(authtype="{ authtype }" onSigninPat="{ parent.handleEmailSigninPat }")
+      viron-signinemail(authtype="{ authtype }" onSigninPpat="{ parent.handleEmailSigninPpat }")
   .EndpointsPage__signinOauths(if="{ !!oauths.length }")
     .EndpointsPage__signinOauthsTitle OAuth認証
     virtual(each="{ authtype in oauths }")
-      viron-signinoauth(authtype="{ authtype }" onPat="{ parent.handleOAuthPat }")
+      viron-signinoauth(authtype="{ authtype }" onPpat="{ parent.handleOAuthPpat }")
 
   script.
     import './signinemail.tag';

@@ -4,15 +4,15 @@ viron-datepicker.Datepicker
     input.Datepicker__input(onTap="handleInputTap" ref="touch" value="{ opts.date }" placeholder="{ opts.placeholder || '' }" readonly="readonly" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
     .Datepicker__calendar(if="{ opts.isshown }")
       .Datepicker__head
-        .Datepicker__transition(onTap="handlePrevButtonPat" ref="touch") &lt;
+        .Datepicker__transition(onTap="handlePrevButtonPpat" ref="touch") &lt;
         .Datepicker__month { displayDate.year() }
           span { settingDateName.month[opts.language || 'ja'][displayDate.month()] }
-        .Datepicker__transition(onTap="handleNextButtonPat" ref="touch") &gt;
+        .Datepicker__transition(onTap="handleNextButtonPpat" ref="touch") &gt;
       .Datepicker__days
         .Datepicker__day(each="{ day, index in settingDateName.days[opts.language || 'ja'] }" class="{ (index === 0) ? 'Datepicker__day--sunday' : '' } { (index === 6) ? 'Datepicker__day--saturday' : '' }") { day }
       .Datepicker__container
         virtual(each="{ cell in generateCalendar() }")
-          viron-datepicker-cell(date="{ cell.date }" isCurrentMonth="{ cell.isCurrentMonth }" isToday="{ cell.isToday }" isSelected="{ cell.isSelected }" onPat="{ handleCellPat }")
+          viron-datepicker-cell(date="{ cell.date }" isCurrentMonth="{ cell.isCurrentMonth }" isToday="{ cell.isToday }" isSelected="{ cell.isSelected }" onPpat="{ handleCellPpat }")
   script.
     import '../../atoms/viron-datepicker/cell.tag';
     import script from './index';

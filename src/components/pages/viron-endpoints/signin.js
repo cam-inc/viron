@@ -13,7 +13,7 @@ export default function() {
     return v.type === 'email';
   }));
 
-  this.handleEmailSigninPat = (email, password, authtype) => {
+  this.handleEmailSigninPpat = (email, password, authtype) => {
     Promise
       .resolve()
       .then(() => store.action(actions.AUTH_SIGNIN_EMAIL, this.opts.key, authtype, email, password))
@@ -28,7 +28,7 @@ export default function() {
       }));
   };
 
-  this.handleOAuthPat = authtype => {
+  this.handleOAuthPpat = authtype => {
     Promise
       .resolve()
       .then(() => store.action(actions.AUTH_SIGNIN_OAUTH, this.opts.key, authtype))

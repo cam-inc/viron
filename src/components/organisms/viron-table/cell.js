@@ -42,7 +42,7 @@ export default function() {
     break;
   }
 
-  this.handleDetailPat = () => {
+  this.handleDetailPpat = () => {
     store.action(actions.MODALS_ADD, 'viron-prettyprint', {
       data : this.opts.data.cell
     });

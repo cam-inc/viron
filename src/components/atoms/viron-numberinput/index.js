@@ -191,7 +191,7 @@ export default function() {
   /**
    * increaseボタンがタップされた時の処理。
    */
-  this.handleIncreaseButtonPat = () => {
+  this.handleIncreaseButtonPpat = () => {
     // ボタンが押されたとき、inputにフォーカスすることで、矢印ボタンでも加減できるようにする
     this.refs.input.focus();
     this.opts.onchange(increment());
@@ -200,7 +200,7 @@ export default function() {
   /**
    * decreaseボタンがタップされた時の処理。
    */
-  this.handleDecreaseButtonPat = () => {
+  this.handleDecreaseButtonPpat = () => {
     // ボタンが押されたとき、inputにフォーカスすることで、矢印ボタンでも加減できるようにする
     this.refs.input.focus();
     this.opts.onchange(decrement());

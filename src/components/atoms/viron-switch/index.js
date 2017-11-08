@@ -1,5 +1,5 @@
 export default function() {
-  this.handleGroovePat = () => {
+  this.handleGroovePpat = () => {
     if (!this.opts.isdisabled) {
       this.opts.ontoggle(!this.opts.ischecked);
     }

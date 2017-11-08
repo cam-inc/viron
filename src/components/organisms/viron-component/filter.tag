@@ -5,7 +5,7 @@ viron-component-filter.ComponentFilter
   .ComponentFilter__items
     viron-component-filter-item(each="{ item in items }" item="{ item }" onToggle="{ parent.handleItemToggle }")
   .ComponentFilter__tail
-    viron-button(label="適用する" onPat="{ handleApplyButtonPat }")
+    viron-button(label="適用する" onPpat="{ handleApplyButtonPpat }")
 
   script.
     import './filter-item.tag';

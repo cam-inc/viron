@@ -12,7 +12,7 @@ export default function() {
     this.update();
   };
 
-  this.handleSigninPat = () => {
-    this.opts.onsigninpat(this.email, this.password, this.opts.authtype);
+  this.handleSigninPpat = () => {
+    this.opts.onsigninppat(this.email, this.password, this.opts.authtype);
   };
 }

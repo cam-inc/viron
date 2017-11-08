@@ -26,7 +26,7 @@ export default function() {
     }
   };
 
-  this.handleApplyButtonPat = () => {
+  this.handleApplyButtonPpat = () => {
     const newSelectedTableColumns = map(reject(this.items, item => {
       return !item.isSelected;
     }), item => {

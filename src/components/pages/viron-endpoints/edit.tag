@@ -6,8 +6,8 @@ viron-endpoint-edit.EndpointsPage__edit
   .EndpointsPage__editForm
     viron-textarea(label="メモ" text="{ memo }" onChange="{ handleMemoChange }")
   .EndpointsPage__editControls
-    viron-button(type="primary" onPat="{ handleEditButtonPat }" label="保存")
-    viron-button(type="secondary" onPat="{ handleCancelButtonPat }" label="キャンセル")
+    viron-button(type="primary" onPpat="{ handleEditButtonPpat }" label="保存")
+    viron-button(type="secondary" onPpat="{ handleCancelButtonPpat }" label="キャンセル")
 
   script.
     import '../../atoms/viron-button/index.tag';

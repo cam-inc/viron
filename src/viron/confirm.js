@@ -1,10 +1,10 @@
 export default function() {
-  this.handleDeleteButtonPat = () => {
+  this.handleDeleteButtonPpat = () => {
     this.opts.onConfirm();
     this.close();
   };
 
-  this.handleCancelButtonPat = () => {
+  this.handleCancelButtonPpat = () => {
     this.close();
   };
 }
