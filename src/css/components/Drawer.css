@@ -1,0 +1,31 @@
+.Drawer {
+  display: block;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;
+
+  &__frame {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: calc(100% - 88px);
+    height: 100%;
+    overflow-y: scroll;
+    background-color: var(--color-base-white);
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transform: translateX(100px);
+  }
+
+  &--visible {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    & .Drawer__frame {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }/* need for FF */
+}

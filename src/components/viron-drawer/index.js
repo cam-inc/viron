@@ -8,13 +8,13 @@ export default function() {
   // `tag` = drawer内に展開されるriot tagインスタンス。
   let tag;
 
-  this.fadeIn = () => {
+  const fadeIn = () => {
     setTimeout(() => {
       this.root.classList.add('Drawer--visible');
     }, 100);
   };
 
-  this.fadeOut = () => {
+  const fadeOut = () => {
     this.root.classList.remove('Drawer--visible');
 
     setTimeout(() => {
@@ -27,24 +27,19 @@ export default function() {
       isDrawer: true,
       drawerCloser: this.fadeOut
     }, this.opts.tagopts))[0];
-    this.fadeIn();
+    fadeIn();
     window.addEventListener('keydown', this.handleKeyDown);
-  });
-
-  this.on('before-unmount', () => {
+  }).on('before-unmount', () => {
     tag.unmount(true);
-  });
-
-  this.on('unmount', () => {
+  }).on('unmount', () => {
     window.removeEventListener('keydown', this.handleKeyDown);
   });
 
-  this.handleClick = e => {
+  this.handleTap = e => {
     if (!e.target.classList.contains('Drawer')) {
       return;
     }
-
-    this.fadeOut();
+    fadeOut();
   };
 
   this.handleKeyDown = e => {
