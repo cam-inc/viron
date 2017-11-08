@@ -26,10 +26,13 @@ body {
   @apply --text-break;
   height: 100%;
   overflow-y: hidden;
+  /* 1rem = 10px */
+  font-size: 62.5%;
 }
 
 body {
   position: relative;
+  /* 320px = iPhoneSEの横幅。これを最小値とする。 */
   min-width: 320px;
   font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
   font-size: 12px;
