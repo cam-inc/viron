@@ -36,9 +36,9 @@ export default function() {
 
   this.handleClick = () => {
     if (this.opts.isaction) {
-      this.opts.onppat(this.opts.action);
+      this.opts.onclick(this.opts.action);
     } else {
-      this.opts.onppat();
+      this.opts.onclick();
     }
   };
 

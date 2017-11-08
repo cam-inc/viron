@@ -39,11 +39,11 @@ export default function() {
     this.update();
   };
 
-  this.handleItemsActionButtonPpat = action => {
-    action.onPpat(action.operationId, this.opts.idx);
+  this.handleItemsActionButtonClick = action => {
+    action.onClick(action.operationId, this.opts.idx);
   };
 
-  this.handleOpenShutButtonPpat = () => {
+  this.handleOpenShutButtonClick = () => {
     this.isOpened = !this.isOpened;
     this.update();
   };

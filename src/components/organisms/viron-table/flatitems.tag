@@ -6,7 +6,7 @@ viron-table-flatitems.Table__flatitems
     .Table__flatitemsList
       viron-table-item(each="{ item in opts.items }" isDetailMode="{ true }" item="{ item }")
   .Table__flatitemsTail
-    viron-button(label="閉じる" type="secondary" onPpat="{ handleCloseButtonPpat }")
+    viron-button(label="閉じる" type="secondary" onClick="{ handleCloseButtonClick }")
 
   script.
     import '../../atoms/viron-button/index.tag';

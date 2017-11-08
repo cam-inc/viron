@@ -17,7 +17,7 @@ export default function() {
     this.update();
   };
 
-  this.handleExecuteButtonPpat = () => {
+  this.handleExecuteButtonClick = () => {
     Promise
       .resolve()
       .then(() => store.action(actions.COMPONENTS_OPERATE_ONE, this.opts.operationObject, this.queries))
@@ -46,7 +46,7 @@ export default function() {
       });
   };
 
-  this.handleCancelButtonPpat = () => {
+  this.handleCancelButtonClick = () => {
     this.close();
   };
 }

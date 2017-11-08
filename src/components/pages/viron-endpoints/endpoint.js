@@ -15,19 +15,19 @@ export default function() {
     this.opts.onentry(this.opts.key);
   };
 
-  this.handleEditButtonPpat = () => {
+  this.handleEditButtonClick = () => {
     this.opts.onedit(this.opts.key);
   };
 
-  this.handleRemoveButtonPpat = () => {
+  this.handleRemoveButtonClick = () => {
     this.opts.onremove(this.opts.key);
   };
 
-  this.handleLogoutButtonPpat = () => {
+  this.handleLogoutButtonClick = () => {
     this.opts.onlogout(this.opts.key);
   };
 
-  this.handleQrCodeButtonPpat = () => {
+  this.handleQrCodeButtonClick = () => {
     this.opts.onqrcode(this.opts.key);
   };
 }

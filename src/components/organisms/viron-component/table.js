@@ -40,7 +40,7 @@ export default function() {
         operationId: operationObject.operationId,
         value: operationObject.summary || operationObject.operationId,
         description: operationObject.description,
-        onPpat: this.handleActionButtonPpat
+        onClick: this.handleActionButtonClick
       });
     });
     return actions;
@@ -69,7 +69,7 @@ export default function() {
     return queries;
   };
 
-  this.handleActionButtonPpat = (operationId, rowIdx) => {
+  this.handleActionButtonClick = (operationId, rowIdx) => {
     const operationObject = find(this.opts.rowactions, operationObject => {
       return (operationObject.operationId === operationId);
     });

@@ -1,5 +1,5 @@
 export default function() {
-  this.handleButtonPpat = () => {
-    this.opts.onppat(this.opts.authtype);
+  this.handleButtonClick = () => {
+    this.opts.onclick(this.opts.authtype);
   };
 }

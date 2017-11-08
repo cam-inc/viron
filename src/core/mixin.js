@@ -1,4 +1,3 @@
-import forEach from 'mout/array/forEach';
 import riot from 'riot';
 import router from './router';
 

@@ -10,7 +10,7 @@ export default function() {
     this.update();
   };
 
-  this.handleEditButtonPpat = () => {
+  this.handleEditButtonClick = () => {
     Promise
       .resolve()
       .then(() => store.action(actions.ENDPOINTS_UPDATE, this.opts.endpointKey, {
@@ -28,7 +28,7 @@ export default function() {
       }));
   };
 
-  this.handleCancelButtonPpat = () => {
+  this.handleCancelButtonClick = () => {
     this.close();
   };
 }

@@ -2,7 +2,7 @@ viron-component-search.ComponentSearch
   .ComponentSearch__body
     viron-parameters(parameterObjects="{ opts.parameterObjects }" parameters="{ currentParameters }" onChange="{ handleParametersChange }")
   .ComponentSearch__tail
-    viron-button(label="検索する" onPpat="{ handleSubmitButtonPpat }")
+    viron-button(label="検索する" onClick="{ handleSubmitButtonClick }")
 
   script.
     import '../../organisms/viron-parameters/index.tag';

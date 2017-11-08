@@ -2,8 +2,8 @@ viron-table-items.Table__items(class="{ isOpened ? 'Table__items--opened' : '' }
   .Table__itemsHeader
     .Table__itemsTitle(onClick="{ handleHeaderTitleClick }") { title }
     virtual(each="{ action in opts.actions}")
-      viron-table-items-button(action="{ action }" isAction="{ true }" onPpat="{ parent.handleItemsActionButtonPpat }")
-    viron-table-items-button.Table__itemsOpenShutButton(icon="up" onPpat="{ handleOpenShutButtonPpat }")
+      viron-table-items-button(action="{ action }" isAction="{ true }" onClick="{ parent.handleItemsActionButtonClick }")
+    viron-table-items-button.Table__itemsOpenShutButton(icon="up" onClick="{ handleOpenShutButtonClick }")
   virtual(if="{ isOpened }")
     .Table__itemsContent
       .Table__itemsList

@@ -43,7 +43,7 @@ export default function() {
     this.update();
   };
 
-  this.handleSubmitButtonPpat = () => {
+  this.handleSubmitButtonClick = () => {
     Promise
       .resolve()
       .then(() => store.action(actions.COMPONENTS_OPERATE_ONE, this.opts.operationObject, this.currentParameters))
@@ -72,7 +72,7 @@ export default function() {
       });
   };
 
-  this.handleCancelButtonPpat = () => {
+  this.handleCancelButtonClick = () => {
     this.close();
   };
 }

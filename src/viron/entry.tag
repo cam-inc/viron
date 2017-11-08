@@ -5,8 +5,8 @@ viron-application-entry.Application__entry
     viron-textinput(label="エンドポイント" text="{ endpointURL }" onChange="{ handleEndpointURLChange }")
     viron-textarea(label="メモ" text="{ memo }" onChange="{ handleMemoChange }")
   .Application__entryControls
-    viron-button(type="primary" isDisabled="{ isExist }" onPpat="{ handleRegisterButtonPpat }" label="新規作成")
-    viron-button(type="secondary" onPpat="{ handleCancelButtonPpat }" label="キャンセル")
+    viron-button(type="primary" isDisabled="{ isExist }" onClick="{ handleRegisterButtonClick }" label="新規作成")
+    viron-button(type="secondary" onClick="{ handleCancelButtonClick }" label="キャンセル")
 
   script.
     import '../components/atoms/viron-button/index.tag';

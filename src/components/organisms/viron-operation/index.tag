@@ -6,8 +6,8 @@ viron-operation.Operation
   .Operation__parameters
     viron-operation-parameter(each="{ parameter in opts.operationObject.parameters }" parameter="{ parameter }" parameterValue="{ parent.queries[parameter.name] }" onChange="{ parent.handleParameterChange }")
   .Operation__control
-    viron-button(label="{ opts.operationObject.operationId }" onPpat="{ handleExecuteButtonPpat }")
-    viron-button(label="cancel" type="secondary" onPpat="{ handleCancelButtonPpat }")
+    viron-button(label="{ opts.operationObject.operationId }" onClick="{ handleExecuteButtonClick }")
+    viron-button(label="cancel" type="secondary" onClick="{ handleCancelButtonClick }")
 
   script.
     import '../../atoms/viron-button/index.tag';

@@ -161,7 +161,7 @@ export default function() {
    * `divider`ボタンがタップされた時の処理。
    */
   /*
-  this.handleDividerPpat = () => {
+  this.handleDividerClick = () => {
     const range = quill.getSelection(true);
     this.quill.insertText(range.index, '\n', Quill.sources.USER);
     this.quill.insertEmbed(range.index + 1, 'myDivider', true, Quill.sources.USER);

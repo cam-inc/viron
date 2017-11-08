@@ -1,5 +1,5 @@
 viron-component-action.Component__action
-  viron-button(label="{ label }" icon="{ icon }" onPpat="{ handleButtonPpat }")
+  viron-button(label="{ label }" icon="{ icon }" onClick="{ handleButtonClick }")
 
   script.
     import '../../atoms/viron-button/index.tag';

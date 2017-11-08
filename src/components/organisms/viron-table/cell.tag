@@ -1,6 +1,6 @@
 viron-table-cell.Table__cell
   .Table__cellValue(if="{ !isComplex && !isImage }") { value }
-  viron-button(if="{ isComplex && !opts.isdetailmode }" type="secondaryGhost" icon="link" label="詳細" onPpat="{ handleDetailPpat }")
+  viron-button(if="{ isComplex && !opts.isdetailmode }" type="secondaryGhost" icon="link" label="詳細" onClick="{ handleDetailClick }")
   .Table__cellComplex(if="{ isComplex && opts.isdetailmode }")
     viron-prettyprint(data="{ value }")
   .Table__cellImage(if="{ isImage }")

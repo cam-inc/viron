@@ -8,7 +8,7 @@ export default function() {
     this.update();
   };
 
-  this.handleSubmitButtonPpat = () => {
+  this.handleSubmitButtonClick = () => {
     this.opts.onComplete(this.currentParameters);
     this.close();
   };

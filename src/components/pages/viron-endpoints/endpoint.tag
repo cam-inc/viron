@@ -17,10 +17,10 @@ viron-endpoint.EndpointsPage__item(onClick="{ handleClick }")
         viron-icon(type="link")
       .EndpointsPage__itemUrlLabel { opts.endpoint.url }
   .EndpointsPage__itemTail
-    .EndpointsPage__itemMenu(onClick="{ handleEditButtonPpat }") 編集
-    .EndpointsPage__itemMenu(onClick="{ handleRemoveButtonPpat }") 削除
-    .EndpointsPage__itemMenu(onClick="{ handleQrCodeButtonPpat }") QR Code
-    .EndpointsPage__itemMenu(onClick="{ handleLogoutButtonPpat }") ログアウト
+    .EndpointsPage__itemMenu(onClick="{ handleEditButtonClick }") 編集
+    .EndpointsPage__itemMenu(onClick="{ handleRemoveButtonClick }") 削除
+    .EndpointsPage__itemMenu(onClick="{ handleQrCodeButtonClick }") QR Code
+    .EndpointsPage__itemMenu(onClick="{ handleLogoutButtonClick }") ログアウト
 
 
   script.

@@ -51,17 +51,17 @@ export default function() {
     return calendar;
   };
 
-  this.handleNextButtonPpat = () => {
+  this.handleNextButtonClick = () => {
     const newDateText = format(this.displayDate.add(1, 'month'));
     this.opts.ondisplaychange(newDateText);
   };
 
-  this.handlePrevButtonPpat = () => {
+  this.handlePrevButtonClick = () => {
     const newDateText = format(this.displayDate.subtract(1, 'month'));
     this.opts.ondisplaychange(newDateText);
   };
 
-  this.handleCellPpat = newDate => {
+  this.handleCellClick = newDate => {
     this.opts.onchange(format(newDate));
   };
 

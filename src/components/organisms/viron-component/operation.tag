@@ -5,8 +5,8 @@ viron-component-operation.ComponentOperation
   .ComponentOperation__body
     viron-parameters(parameterObjects="{ opts.parameterObjects }" parameters="{ currentParameters }" additionalInfo="{ additionalInfo }" onChange="{ handleParametersChange }")
   .ComponentOperation__tail
-    viron-button(label="{ submitButtonLabel }" type="{ submitButtonType }" onPpat="{ handleSubmitButtonPpat }")
-    viron-button(label="閉じる" type="secondary" onPpat="{ handleCancelButtonPpat }")
+    viron-button(label="{ submitButtonLabel }" type="{ submitButtonType }" onClick="{ handleSubmitButtonClick }")
+    viron-button(label="閉じる" type="secondary" onClick="{ handleCancelButtonClick }")
 
   script.
     import '../../organisms/viron-parameters/index.tag';

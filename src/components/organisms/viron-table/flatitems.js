@@ -1,5 +1,5 @@
 export default function() {
-  this.handleCloseButtonPpat = () => {
+  this.handleCloseButtonClick = () => {
     this.close();
   };
 }

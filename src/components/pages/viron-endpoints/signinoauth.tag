@@ -1,5 +1,5 @@
 viron-signinoauth.EndpointsPage__signinOauth
-  viron-button(onPpat="{ handleButtonPpat }" label="{ opts.authtype.provider }")
+  viron-button(onClick="{ handleButtonClick }" label="{ opts.authtype.provider }")
 
   script.
     import '../../atoms/viron-button/index.tag';
