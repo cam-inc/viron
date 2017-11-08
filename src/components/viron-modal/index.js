@@ -1,21 +1,20 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
-import { constants as actions } from '../../../store/actions';
+import { constants as actions } from '../../store/actions';
 
 export default function() {
   const store = this.riotx.get();
 
   let tag;
 
-  this.fadeIn = () => {
+  const fadeIn = () => {
     setTimeout(() => {
       this.root.classList.add('Modal--visible');
     }, 100);
   };
 
-  this.fadeOut = () => {
+  const fadeOut = () => {
     this.root.classList.remove('Modal--visible');
-
     setTimeout(() => {
       store.action(actions.MODALS_REMOVE, this.opts.id);
     }, 1000);
@@ -26,38 +25,31 @@ export default function() {
       isModal: true,
       modalCloser: this.fadeOut
     }, this.opts.tagopts))[0];
-    this.fadeIn();
+    fadeIn();
     window.addEventListener('keydown', this.handleKeyDown);
-  });
-
-  this.on('before-unmount', () => {
+  }).on('before-unmount', () => {
     tag.unmount(true);
-  });
-
-  this.on('unmount', () => {
+  }).on('unmount', () => {
     window.removeEventListener('keydown', this.handleKeyDown);
   });
 
-  this.handleClick = () => {
-    this.fadeOut();
+  this.handleTap = () => {
+    fadeOut();
   };
 
-  this.handleFrameClick = e => {
-    // frameの内側のイベントを外側に伝播させない。
-    if (!e.target.classList.contains('Modal__frame')) {
-      return;
-    }
-    this.fadeOut();
+  this.handleFrameTap = e => {
+    // 内部イベントを外部に伝播させない。
+    e.stopPropagation();
   };
 
-  this.handleCloseButtonClick = () => {
-    this.fadeOut();
+  this.handleCloseButtonTap = () => {
+    fadeOut();
   };
 
   this.handleKeyDown = e => {
     switch (e.keyCode) {
     case 27: // Esc
-      this.fadeOut();
+      fadeOut();
       break;
     default:
       break;

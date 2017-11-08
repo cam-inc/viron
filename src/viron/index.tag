@@ -6,30 +6,30 @@ viron.Application(class="Application--{ usingBrowser }")
     .Application__header
       viron-application-header
     .Application__main
+      .Application__pageInfo TODO
       .Application__page
         div(data-is="viron-{ pageName }" route="{ pageRoute }")
   viron-drawers
-  viron-modals
+  viron-application-modals
   viron-toasts
   viron-progress-linear(isActive="{ isNavigating || isNetworking }")
   viron-progress-circular(if="{ isNetworking }")
-  viron-blocker(if="{ isNavigating }")
+  viron-application-blocker(if="{ isNavigating }")
   viron-splash(if="{ !isLaunched }")
 
   script.
     import '../components/pages/viron-components/index.tag';
     import '../components/pages/viron-endpoints/index.tag';
     import '../components/pages/viron-notfound/index.tag';
-    import '../components/organisms/viron-blocker/index.tag';
     import '../components/organisms/viron-drawers/index.tag';
-    import '../components/organisms/viron-modals/index.tag';
     import '../components/organisms/viron-progress-circular/index.tag';
     import '../components/organisms/viron-progress-linear/index.tag';
     import '../components/organisms/viron-splash/index.tag';
     import '../components/organisms/viron-toasts/index.tag';
-    import '../components/atoms/viron-textinput/index.tag';
+    import './blocker.tag';
     import './header.tag';
     import './menu.tag';
+    import './modals.tag';
     import './poster.tag';
     import script from './index';
     this.external(script);

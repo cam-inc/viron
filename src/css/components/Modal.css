@@ -1,0 +1,40 @@
+.Modal {
+  @apply --layout-center-center;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;
+
+  &__frame {
+    position: relative;
+    min-width: 300px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow-y: scroll;
+    background-color: var(--color-base-white);
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transform: scale(0.8);
+  }
+
+  &__closeButton {
+    @apply --layout-center-center;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+  }
+
+  &--visible {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+
+    & .Modal__frame {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

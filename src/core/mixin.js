@@ -17,6 +17,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
+        riot.settings.autoUpdate = false;
         riot.mixin({
           // riotx.riotxChange(store, evtName, func)のショートカット。
           listen: function(...args) {
