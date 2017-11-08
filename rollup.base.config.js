@@ -39,9 +39,9 @@ export default {
     builtins(),
     replace({
       patterns: [{
-        test: /onPat="{.+}"/g,
+        test: /onTap="{.+}"/g,
         replace: str => {
-          const handlerName = str.replace('onPat="{', '').replace('}"', '').replace(/ /g, '');
+          const handlerName = str.replace('onTap="{', '').replace('}"', '').replace(/ /g, '');
           return `onClick="{ getClickHandler('${handlerName}') }" onTouchStart="{ getTouchStartHandler() }" onTouchMove="{ getTouchMoveHandler() }" onTouchEnd="{ getTouchEndHandler('${handlerName}') }"`;
         }
       }]
