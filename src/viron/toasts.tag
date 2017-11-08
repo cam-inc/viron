@@ -1,4 +1,4 @@
-viron-toasts.Toasts
+viron-application-toasts.Application_Toasts
   virtual(each="{ toasts }")
     viron-toast(id="{ id }"
       type="{ type }"
@@ -9,6 +9,6 @@ viron-toasts.Toasts
       linkText="{ linkText }")
 
   script.
-    import './partial.tag';
-    import script from './index';
+    import '../components/viron-toast/index.tag';
+    import script from './toasts';
     this.external(script);

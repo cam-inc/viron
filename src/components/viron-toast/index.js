@@ -1,20 +1,19 @@
-import { constants as actions } from '../../../store/actions';
+import { constants as actions } from '../../store/actions';
 
 export default function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
 
-  this.show = () => {
+  const show = () => {
     // need to set delay after dom mountation.
     setTimeout(() => {
       this.root.classList.add('Toast--visible');
     }, 100);
   };
 
-  this.hide = () => {
+  const hide = () => {
     this.root.classList.remove('Toast--visible');
-
     // call action after the hide animation completes.
     setTimeout(() => {
       store.action(actions.TOASTS_REMOVE, this.opts.id);
@@ -22,25 +21,22 @@ export default function() {
   };
 
   this.on('mount', () => {
-    this.show();
-
+    show();
     if (this.opts.autohide) {
       autoHideTimerID = setTimeout(() => {
-        this.hide();
+        hide();
       }, this.opts.timeout);
     }
-  });
-
-  this.on('unmount', () => {
+  }).on('unmount', () => {
     clearTimeout(autoHideTimerID);
   });
 
-  this.handleClick = () => {
+  this.handleTap = () => {
     clearTimeout(autoHideTimerID);
-    this.hide();
+    hide();
   };
 
-  this.handleLinkClick = () => {
+  this.handleLinkTap = () => {
     window.open(this.opts.link);
   };
 }

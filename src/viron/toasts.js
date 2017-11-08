@@ -1,5 +1,5 @@
-import { constants as getters } from '../../../store/getters';
-import { constants as states } from '../../../store/states';
+import { constants as getters } from '../store/getters';
+import { constants as states } from '../store/states';
 
 export default function() {
   const store = this.riotx.get();
