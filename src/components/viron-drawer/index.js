@@ -1,6 +1,6 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
-import { constants as actions } from '../../../store/actions';
+import { constants as actions } from '../../store/actions';
 
 export default function() {
   const store = this.riotx.get();
