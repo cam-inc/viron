@@ -2,11 +2,11 @@ viron-component.Component
   .Component__head
     .Component__headBasic
       .Component__name { opts.component.name }
-      .Component__refresh(ref="touch" onTap="handleRefreshButtonTap")
+      .Component__refresh(onClick="{ handleRefreshButtonClick }")
         viron-icon(type="reload")
-      .Component__filter(if="{ opts.component.style === 'table' }" class="{ !!selectedTableColumns.length ? 'Component__filter--active' : '' }" ref="touch" onTap="handleFilterButtonTap")
+      .Component__filter(if="{ opts.component.style === 'table' }" class="{ !!selectedTableColumns.length ? 'Component__filter--active' : '' }" onClick="{ handleFilterButtonClick }")
         viron-icon(type="filter")
-      .Component__search(if="{ !!getParameterObjectsForSearch().length }" class="{ !isCurrentSearchRequestParametersEmpty() ? 'Component__search--active' : ''}" ref="touch" onTap="handleSearchButtonTap")
+      .Component__search(if="{ !!getParameterObjectsForSearch().length }" class="{ !isCurrentSearchRequestParametersEmpty() ? 'Component__search--active' : ''}" onClick="{ handleSearchButtonClick }")
         viron-icon(type="search")
     .Component__headSearch(if="{ !isCurrentSearchRequestParametersEmpty() }")
       .Component__searchQuery(each="{ val, key in currentSearchRequestParameters }") { key } : { val }

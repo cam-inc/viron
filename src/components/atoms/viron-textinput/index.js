@@ -23,7 +23,7 @@ export default function() {
     }
   });
 
-  this.handleTap = () => {
+  this.handleClick = () => {
     this.refs.form.focus();
   };
 

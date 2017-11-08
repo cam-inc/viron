@@ -26,8 +26,6 @@ export default function() {
   this.on('update', () => {
     this.selectedDate = moment(this.opts.date || null);
     this.displayDate = moment(this.opts.displaydate || {});
-  }).on('updated', () => {
-    this.rebindTouchEvents();
   });
 
   const format = date => {
@@ -67,7 +65,7 @@ export default function() {
     this.opts.onchange(format(newDate));
   };
 
-  this.handleInputTap = () => {
+  this.handleInputClick = () => {
     this.opts.ontoggle(!this.opts.isshown);
   };
 }

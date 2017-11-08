@@ -38,11 +38,11 @@ export default function() {
     window.removeEventListener('keydown', this.handleKeyDown);
   });
 
-  this.handleTap = () => {
+  this.handleClick = () => {
     this.fadeOut();
   };
 
-  this.handleFrameTap = e => {
+  this.handleFrameClick = e => {
     // frameの内側のイベントを外側に伝播させない。
     if (!e.target.classList.contains('Modal__frame')) {
       return;
@@ -50,7 +50,7 @@ export default function() {
     this.fadeOut();
   };
 
-  this.handleCloseButtonTap = () => {
+  this.handleCloseButtonClick = () => {
     this.fadeOut();
   };
 

@@ -1,13 +1,13 @@
 viron-datepicker.Datepicker
   .Datepicker__label(if="{ !!opts.label }") { opts.label }
   form.Datepicker__form(onSubmit="{ handleFormSubmit }")
-    input.Datepicker__input(onTap="handleInputTap" ref="touch" value="{ opts.date }" placeholder="{ opts.placeholder || '' }" readonly="readonly" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
+    input.Datepicker__input(onClick="{ handleInputClick }" value="{ opts.date }" placeholder="{ opts.placeholder || '' }" readonly="readonly" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
     .Datepicker__calendar(if="{ opts.isshown }")
       .Datepicker__head
-        .Datepicker__transition(onTap="handlePrevButtonPpat" ref="touch") &lt;
+        .Datepicker__transition(onClick="{ handlePrevButtonPpat }") &lt;
         .Datepicker__month { displayDate.year() }
           span { settingDateName.month[opts.language || 'ja'][displayDate.month()] }
-        .Datepicker__transition(onTap="handleNextButtonPpat" ref="touch") &gt;
+        .Datepicker__transition(onClick="{ handleNextButtonPpat }") &gt;
       .Datepicker__days
         .Datepicker__day(each="{ day, index in settingDateName.days[opts.language || 'ja'] }" class="{ (index === 0) ? 'Datepicker__day--sunday' : '' } { (index === 6) ? 'Datepicker__day--saturday' : '' }") { day }
       .Datepicker__container

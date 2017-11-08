@@ -19,7 +19,7 @@ export default function () {
   /**
    * 値がHEXか判定します。
    * シャープはついていてもいなくてもtrueを返します。
-   * @param {String} value 
+   * @param {String} value
    * @return {Boolean}
    */
   const isHex = value => {
@@ -32,7 +32,7 @@ export default function () {
 
   /**
    * HEXの値が正しくなるよう変更をかけます。
-   * @param {String} 
+   * @param {String}
    */
   const normalizeHexValue = value => {
     value = value.replace(/　/g, ' '); // eslint-disable-line no-irregular-whitespace
@@ -62,7 +62,7 @@ export default function () {
    * カラーを変換します。
    * @param {String} colorCode
    * @param {String} colorValue
-   * @param {String} exportColorcode 
+   * @param {String} exportColorcode
    * @return {String}
    */
   const convertColor = (colorCode, colorValue, exportColorcode) => {
@@ -170,8 +170,6 @@ export default function () {
       lastValidColor = this.color.value;
     }
   }).on('updated', () => {
-    // タッチイベントの更新
-    this.rebindTouchEvents();
     updateSpectrum();
     if (this.color.format === COLOR_CODE.HEX && this.opts.isshown) {
       this.refs.inputHex.value = this.color.value;
@@ -186,7 +184,7 @@ export default function () {
    * 値がHEXか判定します。
    * 入力用なため、16進数を3,6文字に限定するのではなく
    * 1~6文字以内で許容します。
-   * @param {String} value 
+   * @param {String} value
    * @return {Boolean}
    */
   const isTypingHex = value => {
@@ -196,7 +194,7 @@ export default function () {
 
   /**
    * 井桁がついていない場合、井桁を頭につけます。
-   * @param {String} value 
+   * @param {String} value
    * @return {String}
    */
   const concatenatePoundKey = value => {
@@ -209,8 +207,8 @@ export default function () {
 
   /**
    * 座標からカラーオブジェクトを返します
-   * @param {integer} touchX 
-   * @param {integer} touchY 
+   * @param {integer} touchX
+   * @param {integer} touchY
    */
   const getColorObject = (touchX, touchY) => {
     // X: 彩度(Saturation) Y: 明度(Brightness)
@@ -388,7 +386,7 @@ export default function () {
   /**
    * 表示カラーコードを切り替えます。
    */
-  this.handleColorChangeButtonTap = () => {
+  this.handleColorChangeButtonClick = () => {
     const order = [COLOR_CODE.HEX, COLOR_CODE.RGBA];
     const color = {
       format: COLOR_CODE.HEX,
@@ -466,7 +464,7 @@ export default function () {
    */
   this.handleCanvasTouchStart = e => {
     this.isCatcherActive = true;
-    
+
     const hsv = getColorObject(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
     const color = {
       format: this.color.format,
@@ -623,7 +621,7 @@ export default function () {
   /**
    * dummyinputのイベントリスナーハンドラー
    */
-  this.handleInputTap = () => {
+  this.handleInputClick = () => {
     this.opts.ontoggle(!this.opts.isshown);
   };
 }

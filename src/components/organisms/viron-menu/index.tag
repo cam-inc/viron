@@ -18,7 +18,7 @@ viron-menu.Menu
   .Menu__tail
     .Menu__leftIcon
       viron-icon(type="left")
-    .Menu__homeButton(ref="touch" onTap="handleHomeButtonTap")
+    .Menu__homeButton(onClick="{ handleHomeButtonClick }")
       viron-icon(type="home")
 
   script.

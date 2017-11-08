@@ -49,7 +49,7 @@ export default function() {
   /**
    * タップ領域がタップされた時の処理。
    */
-  this.handleInnerTap = () => {
+  this.handleInnerClick = () => {
     this.opts.quill.focus();
     // TODO: url入力フォームを表示
     this.opts.quill.format('video', 'https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0', Quill.sources.USER);

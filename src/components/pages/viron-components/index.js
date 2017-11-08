@@ -96,8 +96,6 @@ export default function() {
     // 初回にcolumn数を設定する。
     updateGridColumnCount();
     window.addEventListener('resize', handleResize);
-  }).on('updated', () => {
-    this.rebindTouchEvents();
   }).on('unmount', () => {
     window.removeEventListener('resize', handleResize);
   });
@@ -133,7 +131,7 @@ export default function() {
     this.isSearchTooltipVisible = false;
   };
 
-  this.handleSearchButtonTap = () => {
+  this.handleSearchButtonClick = () => {
     // ページングに使用するparamerは取り除く。
     const escapedParameterObjects = this.getParameterObjectsForSearch();
 

@@ -1,4 +1,4 @@
-viron-drawer(class="Drawer Drawer--{ opts.theme }" ref="touch" onTap="handleTap")
+viron-drawer(class="Drawer Drawer--{ opts.theme }" onClick="{ handleClick }")
   .Drawer__frame
     .Drawer__content(ref="content")
 

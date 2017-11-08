@@ -1,4 +1,4 @@
-viron-table-item.Table__item(class="{ opts.isdetailmode ? 'Table__item--detail' : '' }" ref="touch" onTap="handleTap")
+viron-table-item.Table__item(class="{ opts.isdetailmode ? 'Table__item--detail' : '' }" onClick="{ handleClick }")
   .Table__itemHeader
     .Table__itemTitle { opts.item.title }
     .Table__itemType { opts.item.type }

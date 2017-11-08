@@ -35,12 +35,12 @@ export default function() {
     clearTimeout(autoHideTimerID);
   });
 
-  this.handleTap = () => {
+  this.handleClick = () => {
     clearTimeout(autoHideTimerID);
     this.hide();
   };
 
-  this.handleLinkTap = () => {
+  this.handleLinkClick = () => {
     window.open(this.opts.link);
   };
 }

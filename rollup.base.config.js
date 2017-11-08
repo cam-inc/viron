@@ -1,25 +1,22 @@
-import builtins from 'rollup-plugin-node-builtins';
-import json from 'rollup-plugin-json';
-import riot from 'rollup-plugin-riot';
-import nodeResolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import mout from 'mout';
 import buble from 'rollup-plugin-buble';
-import replace from 'rollup-plugin-replace';
+import commonjs from 'rollup-plugin-commonjs';
+import json from 'rollup-plugin-json';
+import builtins from 'rollup-plugin-node-builtins';
+import nodeResolve from 'rollup-plugin-node-resolve';
+import progress from 'rollup-plugin-progress';
+import replace from 'rollup-plugin-re';
+import riot from 'rollup-plugin-riot';
 
-const mout = require('mout');
-
-let namedExports = {};
-mout.object.forOwn(mout, (v,k) => {
-
+const namedExports = {};
+mout.object.forOwn(mout, (v, k) => {
   if (!mout.lang.isObject(v)) {
     return;
   }
-
-  let key = 'node_modules/mout/' + k + '.js';
+  const key = `node_modules/mout/${k}.js`;
   if (!namedExports[key]) {
     namedExports[key] = [];
   }
-
   mout.object.forOwn(v, (v1, k1) => {
     if (mout.lang.isFunction(v1)) {
       namedExports[key].push(k1);
@@ -40,10 +37,16 @@ export default {
   context: 'window',
   plugins: [
     builtins(),
-    json(),
     replace({
-      'process.env.NODE_ENV': '"local"' // local/development/staging/production
+      patterns: [{
+        test: /onPat="{.+}"/g,
+        replace: str => {
+          const handlerName = str.replace('onPat="{', '').replace('}"', '').replace(/ /g, '');
+          return `onClick="{ getClickHandler('${handlerName}') }" onTouchStart="{ getTouchStartHandler() }" onTouchMove="{ getTouchMoveHandler() }" onTouchEnd="{ getTouchEndHandler('${handlerName}') }"`;
+        }
+      }]
     }),
+    json(),
     riot({
       template: 'pug'
     }),
@@ -61,6 +64,7 @@ export default {
         chrome: 52,
         edge: 13
       }
-    })
+    }),
+    progress({ clearLine: false })
   ]
 };

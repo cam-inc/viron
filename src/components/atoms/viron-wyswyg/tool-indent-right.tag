@@ -1,5 +1,5 @@
 viron-wyswyg-tool-indent-right.Wyswyg__tool.Wyswyg__indentRight
-  .Wyswyg__toolInner(ref="touch" onTap="handleInnerTap")
+  .Wyswyg__toolInner(onClick="handleInnerClick")
     svg(viewbox="0 0 18 18")
       line(class="ql-stroke" x1="3" x2="15" y1="14" y2="14")
       line(class="ql-stroke" x1="3" x2="15" y1="4" y2="4")

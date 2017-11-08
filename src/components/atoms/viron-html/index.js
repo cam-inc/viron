@@ -30,7 +30,7 @@ export default function() {
   /**
    * editorタブがタップされた時の処理。
    */
-  this.handleTabEditorTap = () => {
+  this.handleTabEditorClick = () => {
     this.isTabEditorSelected = true;
     this.isTabPreviewSelected = false;
     this.update();
@@ -39,7 +39,7 @@ export default function() {
   /**
    * previewタブがタップされた時の処理。
    */
-  this.handleTabPreviewTap = () => {
+  this.handleTabPreviewClick = () => {
     this.isTabEditorSelected = false;
     this.isTabPreviewSelected = true;
     this.update();

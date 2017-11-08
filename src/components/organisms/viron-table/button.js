@@ -34,7 +34,7 @@ export default function() {
     this.tooltipLabel = this.opts.action.value;
   }
 
-  this.handleTap = () => {
+  this.handleClick = () => {
     if (this.opts.isaction) {
       this.opts.onppat(this.opts.action);
     } else {

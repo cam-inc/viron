@@ -7,7 +7,7 @@ viron-components.Page.ComponentsPage
         viron-icon(type="right")
       .ComponentsPage__breadcrumbLabel { name } ({ componentsCount })
     .ComponentsPage__control
-      .ComponentsPage__search(if="{ componentsCount > 1 && !!getParameterObjectsForSearch().length }" class="{ isCurrentSearchRequestParametersEmpty() ? '' : 'ComponentsPage__search--active' }" ref="touch" onTap="handleSearchButtonTap")
+      .ComponentsPage__search(if="{ componentsCount > 1 && !!getParameterObjectsForSearch().length }" class="{ isCurrentSearchRequestParametersEmpty() ? '' : 'ComponentsPage__search--active' }" onClick="{ handleSearchButtonClick }")
         viron-icon(type="search")
         viron-tooltip(if="{ isSearchTooltipVisible }" placement="bottomRight" label="全体検索")
   .ComponentsPage__listForTable(if="{ !!tableComponents.length }")

@@ -1,7 +1,7 @@
 viron-html.Html
   .Html__tabs
-    .Html__tab(class="{ 'Html__tab--selected' : isTabEditorSelected }" ref="touch" onTap="handleTabEditorTap") editor
-    .Html__tab(class="{ 'Html__tab--selected' : isTabPreviewSelected }" ref="touch" onTap="handleTabPreviewTap") preview
+    .Html__tab(class="{ 'Html__tab--selected' : isTabEditorSelected }" onClick="{ handleTabEditorClick }") editor
+    .Html__tab(class="{ 'Html__tab--selected' : isTabPreviewSelected }" onClick="{ handleTabPreviewClick }") preview
   .Html__body
     .Html__message(if="{ compileHtml().status === 'failed' }" class="Html__message--{ compileHtml().status }") { compileHtml().message }
     .Html__editor(if="{ isTabEditorSelected }")

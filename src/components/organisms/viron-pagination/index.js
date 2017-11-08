@@ -24,11 +24,7 @@ export default function() {
     return ret;
   };
 
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
-  this.handlePrevButtonTap = () => {
+  this.handlePrevButtonClick = () => {
     let newPage = this.opts.currentpage - 1;
     if (newPage < 1) {
       newPage = 1;
@@ -36,7 +32,7 @@ export default function() {
     this.opts.onchange(newPage);
   };
 
-  this.handleRecedeButtonTap = () => {
+  this.handleRecedeButtonClick = () => {
     let newPage = this.opts.currentpage - this.opts.size;
     if (newPage < 1) {
       newPage = 1;
@@ -44,12 +40,12 @@ export default function() {
     this.opts.onchange(newPage);
   };
 
-  this.handlePageButtonTap = e => {
+  this.handlePageButtonClick = e => {
     const newPage = Number(e.currentTarget.getAttribute('data-page'));
     this.opts.onchange(newPage);
   };
 
-  this.handleProceedButtonTap = () => {
+  this.handleProceedButtonClick = () => {
     let newPage = this.opts.currentpage + this.opts.size;
     if (newPage > this.opts.maxpage) {
       newPage = this.opts.maxpage;
@@ -57,7 +53,7 @@ export default function() {
     this.opts.onchange(newPage);
   };
 
-  this.handleNextButtonTap = () => {
+  this.handleNextButtonClick = () => {
     let newPage = this.opts.currentpage + 1;
     if (newPage > this.opts.maxpage) {
       newPage = this.opts.maxpage;

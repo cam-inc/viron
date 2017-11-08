@@ -1,6 +1,6 @@
-viron-modal(class="Modal Modal--{ opts.theme  }" ref="touch" onTap="handleTap")
-  .Modal__frame(ref="touch" onTap="handleFrameTap")
-    .Modal__closeButton(ref="touch" onTap="handleCloseButtonTap")
+viron-modal(class="Modal Modal--{ opts.theme  }" onClick="{ handleClick }")
+  .Modal__frame(onClick="{ handleFrameClick }")
+    .Modal__closeButton(onClick="{ handleCloseButtonClick }")
       viron-icon(type="close")
     .Modal__content(ref="content")
 

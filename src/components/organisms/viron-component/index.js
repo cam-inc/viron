@@ -255,8 +255,6 @@ export default function() {
     this.updater();
   }).on('update', () => {
     this.currentSearchRequestParameters = ObjectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
-  }).on('updated', () => {
-    this.rebindTouchEvents();
   }).on('unmount', () => {
     inactivateAutoRefresh();
     store.action(actions.COMPONENTS_REMOVE_ONE, this._riot_id);
@@ -280,11 +278,11 @@ export default function() {
     this.update();
   });
 
-  this.handleRefreshButtonTap = () => {
+  this.handleRefreshButtonClick = () => {
     refresh();
   };
 
-  this.handleFilterButtonTap = () => {
+  this.handleFilterButtonClick = () => {
     if (this.isPending) {
       return;
     }
@@ -303,7 +301,7 @@ export default function() {
       }));
   };
 
-  this.handleSearchButtonTap = () => {
+  this.handleSearchButtonClick = () => {
     if (this.isPending) {
       return;
     }

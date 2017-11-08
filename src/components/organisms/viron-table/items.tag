@@ -1,6 +1,6 @@
 viron-table-items.Table__items(class="{ isOpened ? 'Table__items--opened' : '' }")
   .Table__itemsHeader
-    .Table__itemsTitle(ref="touch" onTap="handleHeaderTitleTap") { title }
+    .Table__itemsTitle(onClick="{ handleHeaderTitleClick }") { title }
     virtual(each="{ action in opts.actions}")
       viron-table-items-button(action="{ action }" isAction="{ true }" onPpat="{ parent.handleItemsActionButtonPpat }")
     viron-table-items-button.Table__itemsOpenShutButton(icon="up" onPpat="{ handleOpenShutButtonPpat }")
@@ -9,7 +9,7 @@ viron-table-items.Table__items(class="{ isOpened ? 'Table__items--opened' : '' }
       .Table__itemsList
         viron-table-item(each="{ item in getFilteredItems() }" item="{ item }")
       .Table__itemsControl
-        .Table__itemsDetailButton(ref="touch" onTap="handleDetailButtonTap" onMouseOver="{ handleDetailButtonMouseOver }" onMouseOut="{ handleDetailButtonMouseOut }")
+        .Table__itemsDetailButton(onClick="{ handleDetailButtonClick }" onMouseOver="{ handleDetailButtonMouseOver }" onMouseOut="{ handleDetailButtonMouseOut }")
           viron-icon(type="scan")
           viron-tooltip(if="{ isTooltipVisible }" placement="topRight" label="全て表示")
           .Table__itemsDetailButtonCatcher

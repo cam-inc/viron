@@ -58,10 +58,6 @@ export default function() {
     return options;
   };
 
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
   this.change = value => {
     // TODO: format, validate
     // TODO: byteならbase64化する

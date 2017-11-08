@@ -1,7 +1,7 @@
 viron-colorpicker.Colorpicker(class="{ Colorpicker--active: isCatcherActive }")
   .Colorpicker__label(if="{ !!opts.label }") { opts.label }
   form.Colorpicker__form(onSubmit="{ handleFormSubmit }")
-    input.Colorpicker__dummyInput(onTap="handleInputTap" ref="touch" placeholder="{ opts.placeholder || '' }" readonly="readonly" value="{ getDummyValue() }")
+    input.Colorpicker__dummyInput(onClick="{ handleInputClick }" placeholder="{ opts.placeholder || '' }" readonly="readonly" value="{ getDummyValue() }")
     .Colorpicker__container(if="{ opts.isshown }")
       .Colorpicker__canvasContainer(ref="canvasContainer" mouseDown="{ handleCanvasMouseDown }" touchStart="{ handleCanvasTouchStart }")
         canvas.Colorpicker__canvas(ref="canvas")
@@ -35,7 +35,7 @@ viron-colorpicker.Colorpicker(class="{ Colorpicker--active: isCatcherActive }")
             viron-numberinput(number="{ getAlphaValue() }" max="100" min="0" onChange="{ handleInputAlphaInput }")
             .Colorpicker__colorcodeRgba a
         .Colorpicker__colorChangeContainer
-          .Colorpicker__colorChangeButton(onTap="handleColorChangeButtonTap" ref="touch")
+          .Colorpicker__colorChangeButton(onClick="{ handleColorChangeButtonClick }")
             viron-icon(type="caretUp")
             viron-icon(type="caretDown")
 

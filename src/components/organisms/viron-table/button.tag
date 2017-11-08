@@ -1,4 +1,4 @@
-viron-table-items-button.Table__itemsButton(class="{ opts.class }" ref="touch" onTap="handleTap" onMouseOver="{ handleMouseOver }" onMouseOut="{ handleMouseOut }")
+viron-table-items-button.Table__itemsButton(class="{ opts.class }" onClick="{ handleClick }" onMouseOver="{ handleMouseOver }" onMouseOut="{ handleMouseOut }")
   viron-icon(type="{ icon }")
   viron-tooltip(if="{ isTooltipVisible }" label="{ tooltipLabel }")
   .Table__itemsButtonCatcher

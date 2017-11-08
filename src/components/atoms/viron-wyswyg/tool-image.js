@@ -49,7 +49,7 @@ export default function() {
   /**
    * タップ領域がタップされた時の処理。
    */
-  this.handleInnerTap = () => {
+  this.handleInnerClick = () => {
     this.opts.quill.focus();
     // TODO: url入力フォームを表示
     this.opts.quill.format('image', 'https://dummyimage.com/600x400/000/fff', Quill.sources.USER);

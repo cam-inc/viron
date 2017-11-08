@@ -81,10 +81,6 @@ export default function() {
     return options;
   };
 
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
   this.change = value => {
     // TODO: format, validate
     // TODO: byteならbase64化する
@@ -94,13 +90,13 @@ export default function() {
     this.opts.onchange(this.opts.parameterobject.name, value, this.opts.multiidx);
   };
 
-  this.handleMultiPlusButtonTap = () => {
+  this.handleMultiPlusButtonClick = () => {
     this.multiData = this.multiData || [];
     this.multiData.push({});
     this.change(this.multiData);
   };
 
-  this.handleMultiMinusButtonTap = e => {
+  this.handleMultiMinusButtonClick = e => {
     this.multiData.splice(Number(e.currentTarget.getAttribute('idx')), 1);
     this.change(this.multiData);
   };

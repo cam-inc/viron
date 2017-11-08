@@ -1,5 +1,5 @@
 viron-wyswyg-tool-direction.Wyswyg__tool.Wyswyg__direction(class="{ isActive ? 'Wyswyg__tool--active' : '' }")
-  .Wyswyg__toolInner(ref="touch" onTap="handleInnerTap")
+  .Wyswyg__toolInner(onClick="{ handleInnerClick }")
     svg(if="{ !isActive }" viewbox="0 0 18 18")
       polygon(class="ql-stroke ql-fill" points="3 11 5 9 3 7 3 11")
       line(class="ql-stroke ql-fill" x1="15" x2="11" y1="4" y2="4")

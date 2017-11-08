@@ -40,7 +40,7 @@ export default function() {
     this.update();
   });
 
-  this.handleToggleTap = () => {
+  this.handleToggleClick = () => {
     if (this.opts.group.isIndependent) {
       this.getRouter().navigateTo(`/${store.getter(getters.CURRENT)}/${this.opts.group.list[0].id}`);
     } else {
@@ -49,7 +49,7 @@ export default function() {
     }
   };
 
-  this.handleGroupItemTap = e => {
+  this.handleGroupItemClick = e => {
     const pageName = this.opts.group.list[Number(e.currentTarget.getAttribute('data-idx'))].id;
     this.getRouter().navigateTo(`/${store.getter(getters.CURRENT)}/${pageName}`);
   };

@@ -9,11 +9,9 @@ export default function() {
       content: this.opts.endpoint.description,
       markedOptions: {}
     };
-  }).on('updated', () => {
-    this.rebindTouchEvents();
   });
 
-  this.handleTap = () => {
+  this.handleClick = () => {
     this.opts.onentry(this.opts.key);
   };
 

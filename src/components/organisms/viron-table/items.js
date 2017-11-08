@@ -34,11 +34,7 @@ export default function() {
     });
   };
 
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
-  this.handleHeaderTitleTap = () => {
+  this.handleHeaderTitleClick = () => {
     this.isOpened = !this.isOpened;
     this.update();
   };
@@ -52,7 +48,7 @@ export default function() {
     this.update();
   };
 
-  this.handleDetailButtonTap = () => {
+  this.handleDetailButtonClick = () => {
     store.action(actions.DRAWERS_ADD, 'viron-table-flatitems', {
       items: this.sortedItems
     });

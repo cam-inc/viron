@@ -1,4 +1,4 @@
-viron-button(class="Button Button--{ opts.type || 'primary' } { opts.class } { opts.isdisabled ? 'Button--disabled' : ''}" ref="touch" onTap="handleTap")
+viron-button(class="Button Button--{ opts.type || 'primary' } { opts.class } { opts.isdisabled ? 'Button--disabled' : ''}" onClick="{ handleClick }")
   .Button__content
     .Button__icon(if="{ !!opts.icon }")
       viron-icon(type="{ opts.icon }")

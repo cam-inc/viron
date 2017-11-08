@@ -7,7 +7,7 @@ import '../../atoms/viron-message/index.tag';
 export default function() {
   const store = this.riotx.get();
 
-  this.handleTap = () => {
+  this.handleClick = () => {
     // ブラウザによってコピー機能を無効化する。
     if (store.getter(getters.UA_IS_EDGE)) {
       return;

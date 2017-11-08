@@ -10,11 +10,11 @@ viron.Application(class="Application--{ usingBrowser }")
             br
             | Console
           .Application__menuItems
-            .Application__menuItem.Application__menuItem--interactive(ref="touch" onTap="handleEntryMenuItemTap")
+            .Application__menuItem.Application__menuItem--interactive(onClick="{ handleEntryMenuItemClick }")
               .Application__menuItemIcon
                 viron-icon(type="link")
               .Application__menuItemBody 新規追加
-            .Application__menuItem.Application__menuItem--interactive(ref="touch" onTap="handleDownloadMenuItemTap")
+            .Application__menuItem.Application__menuItem--interactive(onClick="{ handleDownloadMenuItemClick }")
               .Application__menuItemIcon
                 viron-icon(type="download")
               .Application__menuItemBody ダウンロード
@@ -24,11 +24,11 @@ viron.Application(class="Application--{ usingBrowser }")
               .Application__menuItemBody
                 | アップロード
                 input.Application__menuItemInput(type="file" accept='application/json' id="Application{_riot_id}" onChange="{ handleFileChange }")
-            .Application__menuItem.Application__menuItem--interactive(if="{ endpointsCount > 1 }" ref="touch" onTap="handleOrderMenuItemTap")
+            .Application__menuItem.Application__menuItem--interactive(if="{ endpointsCount > 1 }" onClick="{ handleOrderMenuItemClick }")
               .Application__menuItemIcon
                 viron-icon(type="bars")
               .Application__menuItemBody 並び替え
-            .Application__menuItem.Application__menuItem--interactive(ref="touch" onTap="handleClearMenuItemTap")
+            .Application__menuItem.Application__menuItem--interactive(onClick="{ handleClearMenuItemClick }")
               .Application__menuItemIcon
                 viron-icon(type="close")
               .Application__menuItemBody クリア

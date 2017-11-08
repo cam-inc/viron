@@ -1,21 +1,21 @@
 viron-parameter-schema.ParameterSchema(class="{ 'ParameterSchema--disabled' : isDisabled }")
   .ParameterSchema__head
     .ParameterSchema__caption
-      .ParameterSchema__bodyOpenShutButton(class="{ isBodyOpened ? 'ParameterSchema__bodyOpenShutButton--active' : '' }" ref="touch" onTap="handleBodyOpenShutButtonTap")
+      .ParameterSchema__bodyOpenShutButton(class="{ isBodyOpened ? 'ParameterSchema__bodyOpenShutButton--active' : '' }" onClick="{ handleBodyOpenShutButtonClick }")
         viron-icon(type="right")
-      .ParameterSchema__name(ref="touch" onTap="handleNameTap") { name }
+      .ParameterSchema__name(onClick="{ handleNameClick }") { name }
         span(if="{ description }") ({ description })
       .ParameterSchema__line
       .ParameterSchema__selfRequired(if="{ selfRequired }") required
-      .ParameterSchema__validateOpenShutButton(if="{ !!getValidateErrors().length }" class="{ isValidateOpened ? '.ParameterSchema__validateOpenShutButton--active' : '' }" ref="touch" onTap="handleValidateOpenShutButtonTap")
+      .ParameterSchema__validateOpenShutButton(if="{ !!getValidateErrors().length }" class="{ isValidateOpened ? '.ParameterSchema__validateOpenShutButton--active' : '' }" onClick="{ handleValidateOpenShutButtonClick }")
         viron-icon(type="exclamationCircleO")
-      .ParameterSchema__addButton(if="{ isItemsMode }" ref="touch" onTap="handleAddButtonTap")
+      .ParameterSchema__addButton(if="{ isItemsMode }" onClick="{ handleAddButtonClick }")
         viron-icon(type="plusCircle")
-      .ParameterSchema__removeButton(if="{ opts.isremovable }" ref="touch" onTap="handleRemoveButtonTap")
+      .ParameterSchema__removeButton(if="{ opts.isremovable }" onClick="{ handleRemoveButtonClick }")
         viron-icon(type="minusCircle")
-      .ParameterSchema__previewOpenShutButton(if="{ opts.val !== undefined }" class="{ isPreviewOpened ? 'ParameterSchema__previewOpenShutButton--active' : '' }" ref="touch" onTap="handlePreviewOpenShutButtonTap")
+      .ParameterSchema__previewOpenShutButton(if="{ opts.val !== undefined }" class="{ isPreviewOpened ? 'ParameterSchema__previewOpenShutButton--active' : '' }" onClick="{ handlePreviewOpenShutButtonClick }")
         viron-icon(type="filetext")
-      .ParameterSchema__infoOpenShutButton(class="{ isInfoOpened ? 'ParameterSchema__infoOpenShutButton--active' : '' }" ref="touch" onTap="handleInfoOpenShutButtonTap")
+      .ParameterSchema__infoOpenShutButton(class="{ isInfoOpened ? 'ParameterSchema__infoOpenShutButton--active' : '' }" onClick="{ handleInfoOpenShutButtonClick }")
         viron-icon(type="infoCirlceO")
   .ParameterSchema__body(if="{ isBodyOpened }")
     .ParameterSchema__validates(if="{ isValidateOpened && !!getValidateErrors().length }")

@@ -26,10 +26,6 @@ export default function() {
   // バグを対処するため、各ブラウザごとのクラス設定用のブラウザ名を取得する。
   this.usingBrowser = store.getter(getters.UA_USING_BROWSER);
 
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
   this.listen(states.APPLICATION, () => {
     this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
     this.isNavigating = store.getter(getters.APPLICATION_ISNAVIGATING);
@@ -52,7 +48,7 @@ export default function() {
     this.update();
   });
 
-  this.handleEntryMenuItemTap = () => {
+  this.handleEntryMenuItemClick = () => {
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'viron-application-entry'))
@@ -61,7 +57,7 @@ export default function() {
       }));
   };
 
-  this.handleDownloadMenuItemTap = () => {
+  this.handleDownloadMenuItemClick = () => {
     const endpoints = store.getter(getters.ENDPOINTS_WITHOUT_TOKEN);
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
@@ -126,11 +122,11 @@ export default function() {
     };
   };
 
-  this.handleOrderMenuItemTap = () => {
+  this.handleOrderMenuItemClick = () => {
     store.action(actions.MODALS_ADD, 'viron-application-order');
   };
 
-  this.handleClearMenuItemTap = () => {
+  this.handleClearMenuItemClick = () => {
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'viron-application-confirm', {

@@ -53,7 +53,7 @@ export default function() {
     this.update();
   });
 
-  this.handleHomeButtonTap = () => {
+  this.handleHomeButtonClick = () => {
     this.getRouter().navigateTo('/');
   };
 }

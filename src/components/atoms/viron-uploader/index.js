@@ -18,10 +18,6 @@ export default function() {
     this.update();
   };
 
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
   this.handleChange = e => {
     e.stopPropagation();
   };
@@ -75,7 +71,7 @@ export default function() {
     this.handleFileChange(e, true);
   };
 
-  this.handleResetButtonTap = () => {
+  this.handleResetButtonClick = () => {
     this.reset();
   };
 }

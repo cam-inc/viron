@@ -1,5 +1,5 @@
 viron-wyswyg-tool-video.Wyswyg__tool.Wyswyg__video(class="{ isActive ? 'Wyswyg__tool--active' : '' }")
-  .Wyswyg__toolInner(ref="touch" onTap="handleInnerTap")
+  .Wyswyg__toolInner(onClick="{ handleInnerClick }")
     svg(viewbox="0 0 18 18")
       rect(class="ql-stroke" height="12" width="12" x="3" y="3")
       rect(class="ql-fill" height="12" width="1" x="5" y="3")

@@ -167,10 +167,6 @@ export default function() {
     return normalizedSchemaObject;
   };
 
-  this.on('updated', () => {
-    this.rebindTouchEvents();
-  });
-
   // infoの開閉状態。
   this.isInfoOpened = false;
   // 入力プレビューの開閉状態。
@@ -185,37 +181,37 @@ export default function() {
   }
 
   // infoの開閉ボタンがタップされた時の処理。
-  this.handleInfoOpenShutButtonTap = () => {
+  this.handleInfoOpenShutButtonClick = () => {
     this.isInfoOpened = !this.isInfoOpened;
     this.update();
   };
 
   // previewの開閉ボタンがタップされた時の処理。
-  this.handlePreviewOpenShutButtonTap = () => {
+  this.handlePreviewOpenShutButtonClick = () => {
     this.isPreviewOpened = !this.isPreviewOpened;
     this.update();
   };
 
   // validateの開閉ボタンがタップされた時の処理。
-  this.handleValidateOpenShutButtonTap = () => {
+  this.handleValidateOpenShutButtonClick = () => {
     this.isValidateOpened = !this.isValidateOpened;
     this.update();
   };
 
   // bodyの開閉ボタンがタップされた時の処理。
-  this.handleBodyOpenShutButtonTap = () => {
+  this.handleBodyOpenShutButtonClick = () => {
     this.isBodyOpened = !this.isBodyOpened;
     this.update();
   };
 
   // nameがタップされた時の処理。
-  this.handleNameTap = () => {
+  this.handleNameClick = () => {
     this.isBodyOpened = !this.isBodyOpened;
     this.update();
   };
 
   // +ボタンがタップされた時の処理。
-  this.handleAddButtonTap = () => {
+  this.handleAddButtonClick = () => {
     if (this.isDisabled) {
       return;
     }
@@ -243,7 +239,7 @@ export default function() {
   };
 
   // -ボタンがタップされた時の処理。
-  this.handleRemoveButtonTap = () => {
+  this.handleRemoveButtonClick = () => {
     if (this.isDisabled) {
       return;
     }

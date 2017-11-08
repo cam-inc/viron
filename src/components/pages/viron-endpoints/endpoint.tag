@@ -1,10 +1,10 @@
-viron-endpoint.EndpointsPage__item(ref="touch" onTap="handleTap")
+viron-endpoint.EndpointsPage__item(onClick="{ handleClick }")
   .EndpointsPage__itemHead
     .EndpointsPage__itemAvatar
       .EndpointsPage__itemThumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
       div(class="EndpointsPage__itemToken { !!opts.endpoint.token ? 'EndpointsPage__itemToken--active' : '' }")
     .EndpointsPage__itemName { opts.endpoint.name }
-    .EndpointsPage__itemMenuButton(ref="touch" onTap="handleMenuButtonTap")
+    .EndpointsPage__itemMenuButton(onClick="{ handleMenuButtonClick }")
       viron-icon(type="ellipsis")
   .EndpointsPage__itemBody
     .EndpointsPage__itemDescription
@@ -17,10 +17,10 @@ viron-endpoint.EndpointsPage__item(ref="touch" onTap="handleTap")
         viron-icon(type="link")
       .EndpointsPage__itemUrlLabel { opts.endpoint.url }
   .EndpointsPage__itemTail
-    .EndpointsPage__itemMenu(ref="touch" onTap="handleEditButtonPpat") 編集
-    .EndpointsPage__itemMenu(ref="touch" onTap="handleRemoveButtonPpat") 削除
-    .EndpointsPage__itemMenu(ref="touch" onTap="handleQrCodeButtonPpat") QR Code
-    .EndpointsPage__itemMenu(ref="touch" onTap="handleLogoutButtonPpat") ログアウト
+    .EndpointsPage__itemMenu(onClick="{ handleEditButtonPpat }") 編集
+    .EndpointsPage__itemMenu(onClick="{ handleRemoveButtonPpat }") 削除
+    .EndpointsPage__itemMenu(onClick="{ handleQrCodeButtonPpat }") QR Code
+    .EndpointsPage__itemMenu(onClick="{ handleLogoutButtonPpat }") ログアウト
 
 
   script.

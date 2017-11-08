@@ -49,7 +49,7 @@ export default function() {
   /**
    * タップ領域がタップされた時の処理。
    */
-  this.handleInnerTap = () => {
+  this.handleInnerClick = () => {
     this.opts.quill.focus();
     const value = (this.isActive ? false : this.opts.level);
     this.opts.quill.format('header', value, Quill.sources.USER);

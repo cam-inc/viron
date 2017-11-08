@@ -1,5 +1,5 @@
 export default function() {
-  this.handleTap = () => {
+  this.handleClick = () => {
     this.opts.onppat(this.opts.date);
   };
 }
