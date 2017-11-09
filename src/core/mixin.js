@@ -37,6 +37,9 @@ export default {
             if (this.opts.isDrawer) {
               this.opts.drawerCloser();
             }
+            if (this.opts.isPopover) {
+              this.opts.popoverCloser();
+            }
           },
           getRouter: () => {
             return router.getInstance();

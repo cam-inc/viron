@@ -5,14 +5,16 @@
   border-bottom: 1px solid #e8e8e7;
 
   &__aside {
+    @apply --layout-center-center;
+
     & .Icon {
       width: 16px;
       height: 16px;
       cursor: pointer;
     }
+  }
 
-    & .IconSquare {
-      margin-right: 48px;
-    }
+  &__squareIcon {
+    margin-right: 48px;
   }
 }
