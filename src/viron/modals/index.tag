@@ -3,6 +3,6 @@ viron-application-modals.Application_Modals
     viron-modal(id="{ id }" tagName="{ tagName }" tagOpts="{ tagOpts }" theme="{ modalOpts.theme }")
 
   script.
-    import '../components/viron-modal/index.tag';
-    import script from './modals';
+    import '../../components/viron-modal/index.tag';
+    import script from './index';
     this.external(script);

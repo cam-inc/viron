@@ -6,6 +6,6 @@ viron-application-poster.Application_Poster
     div ホーム
 
   script.
-    import '../components/icons/viron-icon-logo/index.tag';
-    import script from './poster';
+    import '../../components/icons/viron-icon-logo/index.tag';
+    import script from './index';
     this.external(script);

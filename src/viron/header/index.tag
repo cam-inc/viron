@@ -7,8 +7,8 @@ viron-application-header.Application_Header
     viron-icon-dots
 
   script.
-    import '../components/icons/viron-icon-dots/index.tag';
-    import '../components/icons/viron-icon-search/index.tag';
-    import '../components/icons/viron-icon-square/index.tag';
-    import script from './header';
+    import '../../components/icons/viron-icon-dots/index.tag';
+    import '../../components/icons/viron-icon-search/index.tag';
+    import '../../components/icons/viron-icon-square/index.tag';
+    import script from './index';
     this.external(script);

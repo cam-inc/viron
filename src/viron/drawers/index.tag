@@ -3,6 +3,6 @@ viron-application-drawers.Application_Drawers
     viron-drawer(id="{ id }" tagname="{ tagName }" tagopts="{ tagOpts }" theme="{ drawerOpts.theme }")
 
   script.
-    import '../components/viron-drawer/index.tag';
-    import script from './drawers';
+    import '../../components/viron-drawer/index.tag';
+    import script from './index';
     this.external(script);

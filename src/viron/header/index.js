@@ -1,5 +1,5 @@
-import { constants as actions } from '../store/actions';
-import './autocomplete.tag';
+import { constants as actions } from '../../store/actions';
+import '../autocomplete/index.tag';
 
 export default function() {
   const store = this.riotx.get();

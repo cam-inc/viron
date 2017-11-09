@@ -9,6 +9,6 @@ viron-application-toasts.Application_Toasts
       linkText="{ linkText }")
 
   script.
-    import '../components/viron-toast/index.tag';
-    import script from './toasts';
+    import '../../components/viron-toast/index.tag';
+    import script from './index';
     this.external(script);
