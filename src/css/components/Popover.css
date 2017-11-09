@@ -1,0 +1,205 @@
+:root {
+  --component-popover-arrow-size: 10px;
+}
+
+.Popover {
+  position: relative;
+  display: block;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition-duration: 300ms;
+  transition-property: transform, opacity;
+  transform: scale(0.8);
+
+  &__frameOuter {
+    position: absolute;
+  }
+
+  &__frameInner {
+    position: relative;
+    overflow-y: scroll;
+    background-color: var(--color-base-white);
+    border-radius: 2px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &__arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+  }
+
+  &--visible {
+    opacity: 1;
+    transform: scale(1);
+
+    & .Popover__frameInner {
+      pointer-events: auto;
+    }
+  }
+
+  /* arrow配置: Top */
+  &--T {
+    & .Popover__frameOuter {
+      top: var(--component-popover-arrow-size);
+      left: 0;
+    }
+
+    & .Popover__frameInner {
+      margin-left: -50%;
+    }
+  }
+
+  /* arrow配置: TopLeft */
+  &--TL {
+    & .Popover__frameOuter {
+      top: var(--component-popover-arrow-size);
+      left: calc(-1 * var(--component-popover-arrow-size));
+    }
+  }
+
+  /* arrow配置: TopRight */
+  &--TR {
+    & .Popover__frameOuter {
+      top: var(--component-popover-arrow-size);
+      right: calc(-1 * var(--component-popover-arrow-size));
+    }
+  }
+
+  &--T,
+  &--TL,
+  &--TR {
+    & .Popover__arrow {
+      left: calc(-1 * var(--component-popover-arrow-size) / 2);
+      border-color: transparent transparent var(--color-base-white) transparent;
+      border-width: 0 calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2);
+    }
+  }
+
+  /* arrow配置: Right */
+  &--R {
+    & .Popover__frameOuter {
+      top: 0;
+      right: var(--component-popover-arrow-size);
+    }
+
+    & .Popover__frameInner {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+    }
+  }
+
+  /* arrow配置: RightTop */
+  &--RT {
+    & .Popover__frameOuter {
+      top: calc(-1 * var(--component-popover-arrow-size));
+      right: var(--component-popover-arrow-size);
+    }
+  }
+
+  /* arrow配置: RightBottom */
+  &--RB {
+    & .Popover__frameOuter {
+      right: var(--component-popover-arrow-size);
+      bottom: calc(-1 * var(--component-popover-arrow-size));
+    }
+  }
+
+  &--R,
+  &--RT,
+  &--RB {
+    & .Popover__arrow {
+      top: calc(-1 * var(--component-popover-arrow-size) / 2);
+      left: calc(-1 * var(--component-popover-arrow-size));
+      border-color: transparent transparent transparent var(--color-base-white);
+      border-width: calc(var(--component-popover-arrow-size) / 2) 0 calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size);
+    }
+  }
+
+  /* arrow配置: Bottom */
+  &--B {
+    & .Popover__frameOuter {
+      bottom: var(--component-popover-arrow-size);
+      left: 0;
+    }
+
+    & .Popover__frameInner {
+      margin-left: -50%;
+    }
+  }
+
+  /* arrow配置: BottomLeft */
+  &--BL {
+    & .Popover__frameOuter {
+      bottom: var(--component-popover-arrow-size);
+      left: calc(-1 * var(--component-popover-arrow-size));
+    }
+  }
+
+  /* arrow配置: BottomRight */
+  &--BR {
+    & .Popover__frameOuter {
+      right: calc(-1 * var(--component-popover-arrow-size));
+      bottom: var(--component-popover-arrow-size);
+    }
+  }
+
+  &--B,
+  &--BL,
+  &--BR {
+    & .Popover__arrow {
+      top: calc(-1 * var(--component-popover-arrow-size));
+      left: calc(-1 * var(--component-popover-arrow-size) / 2);
+      border-color: var(--color-base-white) transparent transparent transparent;
+      border-width: var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0 calc(var(--component-popover-arrow-size) / 2);
+    }
+  }
+
+  /* arrow配置: Left */
+  &--L {
+    & .Popover__frameOuter {
+      top: 0;
+      left: var(--component-popover-arrow-size);
+    }
+
+    & .Popover__frameInner {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+    }
+  }
+
+  /* arrow配置: LeftTop */
+  &--LT {
+    & .Popover__frameOuter {
+      top: calc(-1 * var(--component-popover-arrow-size));
+      left: var(--component-popover-arrow-size);
+    }
+  }
+
+  /* arrow配置: LeftBottom */
+  &--LB {
+    & .Popover__frameOuter {
+      bottom: calc(-1 * var(--component-popover-arrow-size));
+      left: var(--component-popover-arrow-size);
+    }
+  }
+
+  &--L,
+  &--LT,
+  &--LB {
+    & .Popover__arrow {
+      top: calc(-1 * var(--component-popover-arrow-size) / 2);
+      right: calc(-1 * var(--component-popover-arrow-size));
+      border-color: transparent var(--color-base-white) transparent transparent;
+      border-width: calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0;
+    }
+  }
+}

@@ -9,6 +9,7 @@ import location from './location';
 import modals from './modals';
 import oas from './oas';
 import page from './page';
+import popovers from './popovers';
 import signinShowKey from './signinShowKey';
 import toasts from './toasts';
 import ua from './ua';
@@ -28,6 +29,7 @@ const constants = {
   LOCATION: 'LOCATION',
   MODALS: 'MODALS',
   PAGE: 'PAGE',
+  POPOVERS: 'POPOVERS',
   SIGNIN_SHOW_KEY: 'SIGNIN_SHOW_KEY',
   TOASTS: 'TOASTS',
   UA: 'UA'
@@ -45,6 +47,7 @@ export default {
   location,
   modals,
   page,
+  popovers,
   signinShowKey,
   toasts,
   ua

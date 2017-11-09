@@ -23,7 +23,7 @@ export default function() {
   this.on('mount', () => {
     tag = riot.mount(this.refs.content, this.opts.tagname, ObjectAssign({
       isModal: true,
-      modalCloser: this.fadeOut
+      modalCloser: fadeOut
     }, this.opts.tagopts))[0];
     fadeIn();
     window.addEventListener('keydown', this.handleKeyDown);

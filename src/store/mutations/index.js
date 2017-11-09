@@ -9,6 +9,7 @@ import location from './location';
 import modals from './modals';
 import oas from './oas';
 import page from './page';
+import popovers from './popovers';
 import toasts from './toasts';
 import ua from './ua';
 
@@ -43,6 +44,8 @@ const constants = {
   OAS_CLIENT: 'OAS_CLIENT',
   OAS_CLIENT_CLEAR: 'OAS_CLIENT_CLEAR',
   PAGE: 'PAGE',
+  POPOVERS_ADD: 'POPOVERS_ADD',
+  POPOVERS_REMOVE: 'POPOVERS_REMOVE',
   TOASTS_ADD: 'TOASTS_ADD',
   TOASTS_REMOVE: 'TOASTS_REMOVE',
   UA: 'UA'
@@ -79,6 +82,8 @@ export default {
   [constants.OAS_CLIENT]: oas.client,
   [constants.OAS_CLIENT_CLEAR]: oas.clearClient,
   [constants.PAGE]: page.all,
+  [constants.POPOVERS_ADD]: popovers.add,
+  [constants.POPOVERS_REMOVE]: popovers.remove,
   [constants.TOASTS_ADD]: toasts.add,
   [constants.TOASTS_REMOVE]: toasts.remove,
   [constants.UA]: ua.all

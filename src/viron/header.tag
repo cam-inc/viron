@@ -1,6 +1,7 @@
 viron-application-header.Application_Header
   .Application_Header__aside
-    viron-icon-search
+    .Application_Header__searchIcon(ref="searchIcon" onTap="{ handleSearchIconTap }")
+      viron-icon-search
   .Application_Header__aside
     viron-icon-square
     viron-icon-dots

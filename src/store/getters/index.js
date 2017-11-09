@@ -10,6 +10,7 @@ import menu from './menu';
 import modals from './modals';
 import oas from './oas';
 import page from './page';
+import popovers from './popovers';
 import toasts from './toasts';
 import ua from './ua';
 
@@ -79,6 +80,7 @@ const constants = {
   PAGE_COMPONENTS_TABLE: 'PAGE_COMPONENTS_TABLE',
   PAGE_COMPONENTS_NOT_TABLE: 'PAGE_COMPONENTS_NOT_TABLE',
   PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
+  POPOVERS: 'POPOVERS',
   TOASTS: 'TOASTS',
   UA: 'UA',
   UA_IS_SAFARI: 'UA_IS_SAFARI',
@@ -153,6 +155,7 @@ export default {
   [constants.PAGE_COMPONENTS_TABLE]: page.componentsTable,
   [constants.PAGE_COMPONENTS_NOT_TABLE]: page.componentsNotTable,
   [constants.PAGE_COMPONENTS_COUNT]: page.componentsCount,
+  [constants.POPOVERS]: popovers.all,
   [constants.TOASTS]: toasts.all,
   [constants.UA]: ua.all,
   [constants.UA_IS_SAFARI]: ua.isSafari,

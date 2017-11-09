@@ -11,6 +11,7 @@ viron.Application(class="Application--{ usingBrowser }")
         div(data-is="viron-{ pageName }" route="{ pageRoute }")
   viron-application-drawers
   viron-application-modals
+  viron-application-popovers
   viron-application-toasts
   viron-progress-linear(isActive="{ isNavigating || isNetworking }")
   viron-progress-circular(if="{ isNetworking }")
@@ -28,6 +29,7 @@ viron.Application(class="Application--{ usingBrowser }")
     import './header.tag';
     import './menu.tag';
     import './modals.tag';
+    import './popovers.tag';
     import './poster.tag';
     import './splash.tag';
     import './toasts.tag';
