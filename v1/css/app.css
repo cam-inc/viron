@@ -1,0 +1,1104 @@
+/* ITCSS: Settings */
+/* Global variables, config switches. */
+/* 色情報 */
+:root {
+  /* 基本色 */
+  --color-base-black: #484848;
+  --color-base-gray: #d1d1d1;
+  --color-base-white: #fff;
+  --color-base-red: #f57177;
+  --color-base-blue: #627edf;
+}
+/* ITCSS: Tools */
+/* Default mixins and functions. */
+/* flexboxによるレイアウト*/
+/* syntax: --layout-[vertial]-[horizontal] */
+/* syntax(column): --layout-column-[vertial]-[horizontal] */
+:root {
+  /* 上揃え & 左揃え */
+
+  /* 上揃え & 左右中央 */
+
+  /* 上揃え & 左右スペースを空けて目一杯に広げる */
+
+  /* 上揃え & 右揃え */
+
+  /* 天地中央 & 左揃え */
+
+  /* 天地中央 & 左右中央 */
+
+  /* 天地中央 & 左右スペースを空けて目一杯に広げる */
+
+  /* 天地中央 & 右揃え */
+
+  /* 天地いっぱいまで広げる & 左揃え */
+
+  /* 天地いっぱいまで広げる & 左右中央 */
+
+  /* 天地いっぱいまで広げる & 左右スペースを空けて目一杯に広げる */
+
+  /* 天地いっぱいまで広げる & 右揃え */
+
+  /* 下揃え & 左揃え */
+
+  /* 下揃え & 左右中央 */
+
+  /* 下揃え & 左右スペースを空けて目一杯に広げる */
+
+  /* 下揃え & 右揃え */
+}
+/* テキスト */
+:root {
+  /* はみ出した部分を三点リーダー化 */
+  /* `max-width`等と一緒に使用すること */
+
+  /* overflow時にtext-breakさせる */
+}
+/* ITCSS: Generic */
+/* Ground-zero styles(Normalize.css, resets, box-sizing). */
+/*! normalize.css v7.0.0 | MIT License | github.com/necolas/normalize.css */
+/* Document
+   ========================================================================== */
+/**
+ * 1. Correct the line height in all browsers.
+ * 2. Prevent adjustments of font size after orientation changes in
+ *    IE on Windows Phone and in iOS.
+ */
+html {
+  line-height: 1.15; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+/* Sections
+   ========================================================================== */
+/**
+ * Remove the margin in all browsers (opinionated).
+ */
+body {
+  margin: 0;
+}
+/**
+ * Add the correct display in IE 9-.
+ */
+article,
+aside,
+footer,
+header,
+nav,
+section {
+  display: block;
+}
+/**
+ * Correct the font size and margin on `h1` elements within `section` and
+ * `article` contexts in Chrome, Firefox, and Safari.
+ */
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+/* Grouping content
+   ========================================================================== */
+/**
+ * Add the correct display in IE 9-.
+ * 1. Add the correct display in IE.
+ */
+figcaption,
+figure,
+main { /* 1 */
+  display: block;
+}
+/**
+ * Add the correct margin in IE 8.
+ */
+figure {
+  margin: 1em 40px;
+}
+/**
+ * 1. Add the correct box sizing in Firefox.
+ * 2. Show the overflow in Edge and IE.
+ */
+hr {
+  box-sizing: content-box; /* 1 */
+  height: 0; /* 1 */
+  overflow: visible; /* 2 */
+}
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+pre {
+  font-family: monospace, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+/* Text-level semantics
+   ========================================================================== */
+/**
+ * 1. Remove the gray background on active links in IE 10.
+ * 2. Remove gaps in links underline in iOS 8+ and Safari 8+.
+ */
+a {
+  background-color: transparent; /* 1 */
+  -webkit-text-decoration-skip: objects; /* 2 */
+}
+/**
+ * 1. Remove the bottom border in Chrome 57- and Firefox 39-.
+ * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
+ */
+abbr[title] {
+  border-bottom: none; /* 1 */
+  text-decoration: underline; /* 2 */
+  text-decoration: underline dotted; /* 2 */
+}
+/**
+ * Prevent the duplicate application of `bolder` by the next rule in Safari 6.
+ */
+b,
+strong {
+  font-weight: inherit;
+}
+/**
+ * Add the correct font weight in Chrome, Edge, and Safari.
+ */
+b,
+strong {
+  font-weight: bolder;
+}
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+code,
+kbd,
+samp {
+  font-family: monospace, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+/**
+ * Add the correct font style in Android 4.3-.
+ */
+dfn {
+  font-style: italic;
+}
+/**
+ * Add the correct background and color in IE 9-.
+ */
+mark {
+  background-color: #ff0;
+  color: #000;
+}
+/**
+ * Add the correct font size in all browsers.
+ */
+small {
+  font-size: 80%;
+}
+/**
+ * Prevent `sub` and `sup` elements from affecting the line height in
+ * all browsers.
+ */
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sub {
+  bottom: -0.25em;
+}
+sup {
+  top: -0.5em;
+}
+/* Embedded content
+   ========================================================================== */
+/**
+ * Add the correct display in IE 9-.
+ */
+audio,
+video {
+  display: inline-block;
+}
+/**
+ * Add the correct display in iOS 4-7.
+ */
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+/**
+ * Remove the border on images inside links in IE 10-.
+ */
+img {
+  border-style: none;
+}
+/**
+ * Hide the overflow in IE.
+ */
+svg:not(:root) {
+  overflow: hidden;
+}
+/* Forms
+   ========================================================================== */
+/**
+ * 1. Change the font styles in all browsers (opinionated).
+ * 2. Remove the margin in Firefox and Safari.
+ */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: sans-serif; /* 1 */
+  font-size: 100%; /* 1 */
+  line-height: 1.15; /* 1 */
+  margin: 0; /* 2 */
+}
+/**
+ * Show the overflow in IE.
+ * 1. Show the overflow in Edge.
+ */
+button,
+input { /* 1 */
+  overflow: visible;
+}
+/**
+ * Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 1. Remove the inheritance of text transform in Firefox.
+ */
+button,
+select { /* 1 */
+  text-transform: none;
+}
+/**
+ * 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`
+ *    controls in Android 4.
+ * 2. Correct the inability to style clickable types in iOS and Safari.
+ */
+button,
+html [type="button"], /* 1 */
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+}
+/**
+ * Remove the inner border and padding in Firefox.
+ */
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+/**
+ * Restore the focus styles unset by the previous rule.
+ */
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+/**
+ * Correct the padding in Firefox.
+ */
+fieldset {
+  padding: 0.35em 0.75em 0.625em;
+}
+/**
+ * 1. Correct the text wrapping in Edge and IE.
+ * 2. Correct the color inheritance from `fieldset` elements in IE.
+ * 3. Remove the padding so developers are not caught out when they zero out
+ *    `fieldset` elements in all browsers.
+ */
+legend {
+  box-sizing: border-box; /* 1 */
+  color: inherit; /* 2 */
+  display: table; /* 1 */
+  max-width: 100%; /* 1 */
+  padding: 0; /* 3 */
+  white-space: normal; /* 1 */
+}
+/**
+ * 1. Add the correct display in IE 9-.
+ * 2. Add the correct vertical alignment in Chrome, Firefox, and Opera.
+ */
+progress {
+  display: inline-block; /* 1 */
+  vertical-align: baseline; /* 2 */
+}
+/**
+ * Remove the default vertical scrollbar in IE.
+ */
+textarea {
+  overflow: auto;
+}
+/**
+ * 1. Add the correct box sizing in IE 10-.
+ * 2. Remove the padding in IE 10-.
+ */
+[type="checkbox"],
+[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+/**
+ * Correct the cursor style of increment and decrement buttons in Chrome.
+ */
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+/**
+ * 1. Correct the odd appearance in Chrome and Safari.
+ * 2. Correct the outline style in Safari.
+ */
+[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  outline-offset: -2px; /* 2 */
+}
+/**
+ * Remove the inner padding and cancel buttons in Chrome and Safari on macOS.
+ */
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+/**
+ * 1. Correct the inability to style clickable types in iOS and Safari.
+ * 2. Change font properties to `inherit` in Safari.
+ */
+::-webkit-file-upload-button {
+  -webkit-appearance: button; /* 1 */
+  font: inherit; /* 2 */
+}
+/* Interactive
+   ========================================================================== */
+/*
+ * Add the correct display in IE 9-.
+ * 1. Add the correct display in Edge, IE, and Firefox.
+ */
+details, /* 1 */
+menu {
+  display: block;
+}
+/*
+ * Add the correct display in all browsers.
+ */
+summary {
+  display: list-item;
+}
+/* Scripting
+   ========================================================================== */
+/**
+ * Add the correct display in IE 9-.
+ */
+canvas {
+  display: inline-block;
+}
+/**
+ * Add the correct display in IE.
+ */
+template {
+  display: none;
+}
+/* Hidden
+   ========================================================================== */
+/**
+ * Add the correct display in IE 10-.
+ */
+[hidden] {
+  display: none;
+}
+/**
+ * A thin layer on top of normalize.css that provides a starting point more
+ * suitable for web applications.
+ */
+/**
+ * 1. Prevent padding and border from affecting element width
+ * https://goo.gl/pYtbK7
+ * 2. Change the default font family in all browsers (opinionated)
+ */
+html {
+  box-sizing: border-box; /* 1 */
+  font-family: sans-serif; /* 2 */
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+/**
+ * Removes the default spacing and border for appropriate elements.
+ */
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+figure,
+p,
+pre {
+  margin: 0;
+}
+button {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+/**
+ * Work around a Firefox/IE bug where the transparent `button` background
+ * results in a loss of the default `button` focus styles.
+ */
+button:focus {
+  outline: 1px dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+}
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+iframe {
+  border: 0;
+}
+ol,
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/**
+ * Suppress the focus outline on elements that cannot be accessed via keyboard.
+ * This prevents an unwanted focus outline from appearing around elements that
+ * might still respond to pointer events.
+ */
+[tabindex="-1"]:focus {
+  outline: none !important;
+}
+html {
+  box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+a {
+  text-decoration: none;
+  outline: none;
+}
+form {
+  margin: 0;
+}
+input,
+button,
+textarea,
+select {
+  padding: 0;
+  margin: 0;
+  line-height: normal;
+  background: none;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+/* Chromeのautofill機能で背景色がyellowに設定される問題への対応 */
+@keyframes autofill {
+  to {
+    background: transparent;
+  }
+}
+input:-webkit-autofill {
+  animation-name: autofill;
+  animation-fill-mode: both;
+}
+/* ITCSS: Base */
+/* Unclassed HTML elements(type selectors). */
+@font-face {
+  font-family: "NotoSansCJKjp-Jxck";
+  font-style: normal;
+  font-weight: light;
+  src: url("../font/NotoSansCJKjp-Jxck-Regular.woff2") format("woff2"), url("../font/NotoSansCJKjp-Jxck-Regular.woff") format("woff"), url("../font/NotoSansCJKjp-Jxck-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "NotoSansCJKjp-Jxck";
+  font-style: normal;
+  font-weight: normal;
+  src: url("../font/NotoSansCJKjp-Jxck-Medium.woff2") format("woff2"), url("../font/NotoSansCJKjp-Jxck-Medium.woff") format("woff"), url("../font/NotoSansCJKjp-Jxck-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "NotoSansCJKjp-Jxck";
+  font-style: normal;
+  font-weight: bold;
+  src: url("../font/NotoSansCJKjp-Jxck-Bold.woff2") format("woff2"), url("../font/NotoSansCJKjp-Jxck-Bold.woff") format("woff"), url("../font/NotoSansCJKjp-Jxck-Bold.ttf") format("truetype");
+}
+html,
+body {
+  word-break: break-all;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  height: 100%;
+  overflow-y: hidden;
+  /* 1rem = 10px */
+  font-size: 62.5%;
+}
+body {
+  position: relative;
+  /* 320px = iPhoneSEの横幅。これを最小値とする。 */
+  min-width: 320px;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #484848;
+  color: var(--color-base-black);
+  background-color: #f0f0ef;
+}
+input,
+button,
+textarea,
+select {
+  font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
+}
+/* ITCSS: Objects */
+/* Cosmetic-free design patterns. */
+.icon {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  fill: currentcolor;
+}
+/* @see: http://www.stubbornella.org/content/2010/06/25/the-media-object-saves-hundreds-of-lines-of-code/ */
+.media {
+  display: flex;
+  align-items: flex-start;
+}
+.media__image {
+  margin-right: 0;
+}
+.media__body {
+  flex-grow: 1;
+  width: 0;
+  min-width: 0;
+}
+/* ITCSS: Components */
+/* Designed components, chunks of UI. */
+.Application {
+  position: relative;
+  display: block;
+  height: 100%;
+}
+.Application__container {
+    display: -ms-grid;
+    display: grid;
+    height: 100%;
+    grid-template-areas: "aside header" "aside main";
+    -ms-grid-rows: 64px 1fr;
+        grid-template-rows: 64px 1fr;
+    -ms-grid-columns: 192px 1fr;
+        grid-template-columns: 192px 1fr;
+  }
+.Application__aside {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+    grid-area: aside;
+  }
+.Application__aside .Application_Menu,
+    .Application__aside .Application_Poster {
+      flex-grow: 1;
+    }
+.Application__header {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+    grid-area: header;
+  }
+.Application__header .Application_Header {
+      flex-grow: 1;
+    }
+.Application__main {
+    padding: 24px;
+    overflow-y: scroll;
+    grid-area: main;
+  }
+.Application__pageInfo {
+    margin-bottom: 24px;
+    font-size: 2.8rem;
+    font-weight: bold;
+  }
+.Application_Blocker {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.Application_Drawers {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  pointer-events: none;
+}
+.Application_Drawers .Drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+.Application_Header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background-color: #f6f6f6;
+  border-bottom: 1px solid #e8e8e7;
+}
+.Application_Header__aside {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
+.Application_Header__aside .Icon {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+.Application_Header__squareIcon {
+    margin-right: 48px;
+  }
+.Application_Header_Autocomplete {
+  display: block;
+}
+.Application_Header_Menu {
+  display: block;
+}
+.Application_Header_Menu__list {
+    padding: 0 18px;
+  }
+.Application_Header_Menu__item {
+    padding: 18px 0;
+    font-size: 1.4rem;
+    cursor: pointer;
+    border-bottom: 1px solid #d1d1d1;
+    border-bottom: 1px solid var(--color-base-gray);
+  }
+.Application_Header_Menu__item:last-child {
+      border-bottom: none;
+    }
+.Application_Header_Menu__item:hover,
+    .Application_Header_Menu__item.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+.Application_Menu {
+  display: block;
+}
+.Application_Modals {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  pointer-events: none;
+}
+.Application_Modals .Modal {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+.Application_Popovers {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  pointer-events: none;
+}
+.Application_Popovers .Popover {
+    position: absolute;
+  }
+.Application_Poster {
+  position: relative;
+  display: block;
+}
+.Application_Poster__bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: url("https://source.unsplash.com/random");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+  }
+.Application_Poster__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+.Application_Poster__content {
+    position: relative;
+    padding: 24px;
+    font-size: 1.6rem;
+    color: #f57177;
+    color: var(--color-base-red);
+  }
+.Application_Poster__content .IconLogo {
+      display: block;
+      width: 24px;
+      height: 24px;
+      margin-bottom: 24px;
+    }
+.Application_Splash {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: blue;
+}
+.Application_Toasts {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  pointer-events: none;
+}
+.Application_Toasts .Toast {
+    position: absolute;
+    top: -58px;
+    left: 0;
+    width: 100%;
+    height: 58px;
+    pointer-events: auto;
+    transition-duration: 300ms;
+    transition-property: top, opacity;
+  }
+.Application_Toasts .Toast--visible {
+      top: 0;
+    }
+.Drawer {
+  display: block;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;/* need for FF */
+}
+.Drawer__frame {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: calc(100% - 88px);
+    height: 100%;
+    overflow-y: scroll;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transform: translateX(100px);
+  }
+.Drawer--visible {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+.Drawer--visible .Drawer__frame {
+      opacity: 1;
+      transform: translateX(0);
+    }
+.Modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: block;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;
+}
+.Modal__frame {
+    position: relative;
+    min-width: 300px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow-y: scroll;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transform: scale(0.8);
+  }
+.Modal__closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+  }
+.Modal--visible {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+.Modal--visible .Modal__frame {
+      opacity: 1;
+      transform: scale(1);
+    }
+:root {
+  --component-popover-arrow-size: 10px;
+}
+.Popover {
+  position: relative;
+  display: block;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition-duration: 300ms;
+  transition-property: transform, opacity;
+  transform: scale(0.8);
+}
+.Popover__frameOuter {
+    position: absolute;
+  }
+.Popover__frameInner {
+    position: relative;
+    overflow-y: scroll;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    border-radius: 2px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  }
+.Popover__arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+  }
+.Popover--visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+.Popover--visible .Popover__frameInner {
+      pointer-events: auto;
+    }
+/* arrow配置: Top */
+.Popover--T .Popover__frameOuter {
+      top: 10px;
+      top: var(--component-popover-arrow-size);
+      left: 0;
+    }
+.Popover--T .Popover__frameInner {
+      margin-left: -50%;
+    }
+/* arrow配置: TopLeft */
+.Popover--TL .Popover__frameOuter {
+      top: 10px;
+      top: var(--component-popover-arrow-size);
+      left: calc(-1 * 10px);
+      left: calc(-1 * var(--component-popover-arrow-size));
+    }
+/* arrow配置: TopRight */
+.Popover--TR .Popover__frameOuter {
+      top: 10px;
+      top: var(--component-popover-arrow-size);
+      right: calc(-1 * 10px);
+      right: calc(-1 * var(--component-popover-arrow-size));
+    }
+.Popover--T .Popover__arrow, .Popover--TL .Popover__arrow, .Popover--TR .Popover__arrow {
+      left: calc(-1 * 10px / 2);
+      left: calc(-1 * var(--component-popover-arrow-size) / 2);
+      border-color: transparent transparent #fff transparent;
+      border-color: transparent transparent var(--color-base-white) transparent;
+      border-width: 0 calc(10px / 2) 10px calc(10px / 2);
+      border-width: 0 calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2);
+    }
+/* arrow配置: Right */
+.Popover--R .Popover__frameOuter {
+      top: 0;
+      right: 10px;
+      right: var(--component-popover-arrow-size);
+    }
+.Popover--R .Popover__frameInner {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+    }
+/* arrow配置: RightTop */
+.Popover--RT .Popover__frameOuter {
+      top: calc(-1 * 10px);
+      top: calc(-1 * var(--component-popover-arrow-size));
+      right: 10px;
+      right: var(--component-popover-arrow-size);
+    }
+/* arrow配置: RightBottom */
+.Popover--RB .Popover__frameOuter {
+      right: 10px;
+      right: var(--component-popover-arrow-size);
+      bottom: calc(-1 * 10px);
+      bottom: calc(-1 * var(--component-popover-arrow-size));
+    }
+.Popover--R .Popover__arrow, .Popover--RT .Popover__arrow, .Popover--RB .Popover__arrow {
+      top: calc(-1 * 10px / 2);
+      top: calc(-1 * var(--component-popover-arrow-size) / 2);
+      left: calc(-1 * 10px);
+      left: calc(-1 * var(--component-popover-arrow-size));
+      border-color: transparent transparent transparent #fff;
+      border-color: transparent transparent transparent var(--color-base-white);
+      border-width: calc(10px / 2) 0 calc(10px / 2) 10px;
+      border-width: calc(var(--component-popover-arrow-size) / 2) 0 calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size);
+    }
+/* arrow配置: Bottom */
+.Popover--B .Popover__frameOuter {
+      bottom: 10px;
+      bottom: var(--component-popover-arrow-size);
+      left: 0;
+    }
+.Popover--B .Popover__frameInner {
+      margin-left: -50%;
+    }
+/* arrow配置: BottomLeft */
+.Popover--BL .Popover__frameOuter {
+      bottom: 10px;
+      bottom: var(--component-popover-arrow-size);
+      left: calc(-1 * 10px);
+      left: calc(-1 * var(--component-popover-arrow-size));
+    }
+/* arrow配置: BottomRight */
+.Popover--BR .Popover__frameOuter {
+      right: calc(-1 * 10px);
+      right: calc(-1 * var(--component-popover-arrow-size));
+      bottom: 10px;
+      bottom: var(--component-popover-arrow-size);
+    }
+.Popover--B .Popover__arrow, .Popover--BL .Popover__arrow, .Popover--BR .Popover__arrow {
+      top: calc(-1 * 10px);
+      top: calc(-1 * var(--component-popover-arrow-size));
+      left: calc(-1 * 10px / 2);
+      left: calc(-1 * var(--component-popover-arrow-size) / 2);
+      border-color: #fff transparent transparent transparent;
+      border-color: var(--color-base-white) transparent transparent transparent;
+      border-width: 10px calc(10px / 2) 0 calc(10px / 2);
+      border-width: var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0 calc(var(--component-popover-arrow-size) / 2);
+    }
+/* arrow配置: Left */
+.Popover--L .Popover__frameOuter {
+      top: 0;
+      left: 10px;
+      left: var(--component-popover-arrow-size);
+    }
+.Popover--L .Popover__frameInner {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+    }
+/* arrow配置: LeftTop */
+.Popover--LT .Popover__frameOuter {
+      top: calc(-1 * 10px);
+      top: calc(-1 * var(--component-popover-arrow-size));
+      left: 10px;
+      left: var(--component-popover-arrow-size);
+    }
+/* arrow配置: LeftBottom */
+.Popover--LB .Popover__frameOuter {
+      bottom: calc(-1 * 10px);
+      bottom: calc(-1 * var(--component-popover-arrow-size));
+      left: 10px;
+      left: var(--component-popover-arrow-size);
+    }
+.Popover--L .Popover__arrow, .Popover--LT .Popover__arrow, .Popover--LB .Popover__arrow {
+      top: calc(-1 * 10px / 2);
+      top: calc(-1 * var(--component-popover-arrow-size) / 2);
+      right: calc(-1 * 10px);
+      right: calc(-1 * var(--component-popover-arrow-size));
+      border-color: transparent #fff transparent transparent;
+      border-color: transparent var(--color-base-white) transparent transparent;
+      border-width: calc(10px / 2) 10px calc(10px / 2) 0;
+      border-width: calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0;
+    }
+.Toast {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: block;
+  padding: 12px;
+  cursor: pointer;
+  background-color: #fff;
+  background-color: var(--color-base-white);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition-duration: 300ms;
+  transition-property: opacity;
+}
+.Toast__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    font-size: 14px;
+    color: #fff;
+    color: var(--color-base-white);
+    border-radius: 50%;
+  }
+.Toast__message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    flex-grow: 1;
+    font-size: 1.2rem;
+  }
+.Toast__link {
+    flex-shrink: 0;
+    margin-left: 12px;
+    font-size: 1.2rem;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+.Toast--visible {
+    opacity: 1;
+  }
+.Toast--normal .Toast__icon {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+    }
+.Toast--normal .Toast__icon {
+      background-color: #f57177;
+      background-color: var(--color-base-red);
+    }
+/* ITCSS: Components(Page) */
+/* Designed components, chunks of UI. */
+/* ITCSS: Trumps */
+/* Helpers and overrides. */
