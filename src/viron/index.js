@@ -17,7 +17,7 @@ export default function() {
   // 表示すべきページの名前。
   this.pageName = store.getter(getters.LOCATION_NAME);
   // TOPページか否か。
-  this.isTopPage = (this.pageName === 'endpoints');
+  this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
   // 表示すべきページのルーティング情報。
   this.pageRoute = store.getter(getters.LOCATION_ROUTE);
   // エンドポイント数。
@@ -40,7 +40,7 @@ export default function() {
   });
   this.listen(states.LOCATION, () => {
     this.pageName = store.getter(getters.LOCATION_NAME);
-    this.isTopPage = (this.pageName === 'endpoints');
+    this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
     this.pageRoute = store.getter(getters.LOCATION_ROUTE);
     this.update();
   });

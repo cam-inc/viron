@@ -9,6 +9,15 @@ export default {
   },
 
   /**
+   * トップページか判定します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  isTop: context => {
+    return (context.state.location.name === 'endpoints');
+  },
+
+  /**
    * ページ名を返します。
    * @param {riotx.Context} context
    * @return {String}
