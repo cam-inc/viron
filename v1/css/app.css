@@ -4,9 +4,11 @@
 :root {
   /* 基本色 */
   --color-base-black: #484848;
+  --color-base-black-secondary: #a3a3a3;
   --color-base-gray: #d1d1d1;
   --color-base-white: #fff;
   --color-base-red: #f57177;
+  --color-base-red-secondary: #fab7ba;
   --color-base-blue: #627edf;
 }
 /* ITCSS: Tools */
@@ -805,6 +807,43 @@ select {
 .Application_Toasts .Toast--visible {
       top: 0;
     }
+.Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  cursor: pointer;
+  border-radius: 24px;
+}
+.Button__label {
+    font-size: 1.6rem;
+  }
+.Button--primary {
+    background-color: #f57177;
+    background-color: var(--color-base-red);
+  }
+.Button--primary:hover,
+    .Button--primary.hold {
+      background-color: #fab7ba;
+      background-color: var(--color-base-red-secondary);
+    }
+.Button--primary .Button__label {
+      color: #fff;
+      color: var(--color-base-white);
+    }
+.Button--ghost {
+    border: 2px solid #484848;
+    border: 2px solid var(--color-base-black);
+  }
+.Button--ghost:hover,
+    .Button--ghost.hold {
+      border-color: #a3a3a3;
+      border-color: var(--color-base-black-secondary);
+    }
+.Button--ghost:hover .Button__label, .Button--ghost.hold .Button__label {
+        color: #a3a3a3;
+        color: var(--color-base-black-secondary);
+      }
 .Drawer {
   display: block;
   pointer-events: none;
