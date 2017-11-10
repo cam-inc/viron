@@ -1,4 +1,8 @@
+import { constants as actions } from '../../../store/actions';
+import './entry/index.tag';
+
 export default function() {
+  const store = this.riotx.get();
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
     { label: 'ヘルプ', id: 'navigate_to_doc' },
@@ -26,6 +30,13 @@ export default function() {
   }
 
   /**
+   * エンドポイント追加用のモーダルを表示します。
+   */
+  this.showModalToAddEndpoint = () => {
+    store.action(actions.MODALS_ADD, 'viron-application-header-menu-entry');
+  };
+
+  /**
    * メニュー項目がクリック/タップされた時の処理。
    * @param {Object} e
    */
@@ -45,7 +56,7 @@ export default function() {
       this.close();
       break;
     case 'add_endpoint':
-      // TODO:
+      this.showModalToAddEndpoint();
       this.close();
       break;
     case 'export_endpoints':

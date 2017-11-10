@@ -1,6 +1,8 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
 import { constants as actions } from '../../store/actions';
+import { constants as getters } from '../../store/getters';
+import { constants as states } from '../../store/states';
 
 export default function() {
   const store = this.riotx.get();
@@ -9,16 +11,24 @@ export default function() {
 
   const fadeIn = () => {
     setTimeout(() => {
-      this.root.classList.add('Modal--visible');
+      this.isVisible = true;
+      this.update();
     }, 100);
   };
 
   const fadeOut = () => {
-    this.root.classList.remove('Modal--visible');
+    this.isVisible = false;
+    this.update();
     setTimeout(() => {
       store.action(actions.MODALS_REMOVE, this.opts.id);
     }, 1000);
   };
+
+  this.layoutType = store.getter(getters.LAYOUT_TYPE);
+  this.listen(states.LAYOUT, () => {
+    this.layoutType = store.getter(getters.LAYOUT_TYPE);
+    this.update();
+  });
 
   this.on('mount', () => {
     tag = riot.mount(this.refs.content, this.opts.tagname, ObjectAssign({
