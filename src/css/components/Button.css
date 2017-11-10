@@ -1,0 +1,36 @@
+.Button {
+  @apply --layout-center-center;
+  height: 48px;
+  cursor: pointer;
+  border-radius: 24px;
+
+  &__label {
+    font-size: 1.6rem;
+  }
+
+  &--primary {
+    background-color: var(--color-base-red);
+
+    &:hover,
+    &.hold {
+      background-color: var(--color-base-red-secondary);
+    }
+
+    & .Button__label {
+      color: var(--color-base-white);
+    }
+  }
+
+  &--ghost {
+    border: 2px solid var(--color-base-black);
+
+    &:hover,
+    &.hold {
+      border-color: var(--color-base-black-secondary);
+
+      & .Button__label {
+        color: var(--color-base-black-secondary);
+      }
+    }
+  }
+}
