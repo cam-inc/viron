@@ -7180,7 +7180,28 @@ var drawers = [];
 // ローカルに保存されているエンドポイント一覧。
 var endpoints = store.get('endpoints', {});
 
+var constants$4 = {
+  // mobileとdesktopレイアウトの切り替え閾値。
+  layoutThreshold: 640,
+  // レイアウトタイプ。mobile or desktop用。
+  layoutTypeDesktop: 'desktop',
+  layoutTypeMobile: 'mobile'
+};
+
 var layout = {
+  // レイアウトタイプ。mobile or desktop。
+  type: (() => {
+    const width = window.innerWidth;
+    if (width > constants$4.layoutThreshold) {
+      return constants$4.layoutTypeDesktop;
+    }
+    return constants$4.layoutTypeMobile;
+  })(),
+  // 表示サイズ。
+  size: {
+    width: window.innerWidth,
+    height: window.innerHeight
+  },
   // componentリストのgridレイアウトのcolumn数。
   componentsGridColumnCount: (() => {
     const htmlStyles = window.getComputedStyle(document.querySelector('html'));
@@ -8051,6 +8072,23 @@ var endpoints$1 = {
 
 var layout$1 = {
   /**
+   * 表示サイズを更新します。
+   * @param {riotx.Context} context
+   * @param {Number} width
+   * @param {Number} height
+   */
+  updateSize: (context, width, height) => {
+    context.state.layout.size.width = width;
+    context.state.layout.size.height = height;
+    if (width > constants$4.layoutThreshold) {
+      context.state.layout.type = constants$4.layoutTypeDesktop;
+    } else {
+      context.state.layout.type = constants$4.layoutTypeMobile;
+    }
+    return [constants$3.LAYOUT];
+  },
+
+  /**
    * componentリストのgridレイアウトのcolumn数を更新します。
    * @param {riotx.Context} context
    * @param {Number} count
@@ -8288,6 +8326,7 @@ const constants$2 = {
   ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
   ENDPOINTS_TIDY_UP_ORDER: 'ENDPOINTS_TIDY_UP_ORDER',
   ENDPOINTS_CHANGE_ORDER: 'ENDPOINTS_CHANGE_ORDER',
+  LAYOUT_SIZE: 'LAYOUT_SIZE',
   LAYOUT_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION: 'LOCATION',
   LOCATION_NAME: 'LOCATION_NAME',
@@ -8326,6 +8365,7 @@ var mutations = {
   [constants$2.ENDPOINTS_MERGE_ALL]: endpoints$1.mergeAll,
   [constants$2.ENDPOINTS_TIDY_UP_ORDER]: endpoints$1.tidyUpOrder,
   [constants$2.ENDPOINTS_CHANGE_ORDER]: endpoints$1.changeOrder,
+  [constants$2.LAYOUT_SIZE]: layout$1.updateSize,
   [constants$2.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout$1.updateComponentsGridColumnCount,
   [constants$2.LOCATION]: location$2.all,
   [constants$2.LOCATION_NAME]: location$2.name,
@@ -9202,6 +9242,42 @@ var endpoints$2 = {
 
 var layout$2 = {
   /**
+   * レイアウトタイプを返します。
+   * @param {riotx.Context} context
+   * @return {String}
+   */
+  type: context => {
+    return context.state.layout.type;
+  },
+
+  /**
+   * レイアウトタイプがdesktopならtrueを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isDesktop: context => {
+    return (context.state.layout.type === constants$4.layoutTypeDesktop);
+  },
+
+  /**
+   * レイアウトタイプがmobileならtrueを返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isMobile: context => {
+    return (context.state.layout.type === constants$4.layoutTypeMobile);
+  },
+
+  /**
+   * 表示サイズを返します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  size: context => {
+    return context.state.layout.size;
+  },
+
+  /**
    * componentリストのgridレイアウトのcolumn数を返します。
    * @param {riotx.Context} context
    * @return {Number}
@@ -9219,6 +9295,15 @@ var location$3 = {
    */
   all: context => {
     return context.state.location;
+  },
+
+  /**
+   * トップページか判定します。
+   * @param {riotx.Context} context
+   * @return {Object}
+   */
+  isTop: context => {
+    return (context.state.location.name === 'endpoints');
   },
 
   /**
@@ -9720,7 +9805,7 @@ var ua$2 = {
   }
 };
 
-const constants$4 = {
+const constants$5 = {
   APPLICATION: 'APPLICATION',
   APPLICATION_ISLAUNCHED: 'APPLICATION_ISLAUNCHED',
   APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
@@ -9758,8 +9843,13 @@ const constants$4 = {
   ENDPOINTS_WITHOUT_TOKEN: 'ENDPOINTS_WITHOUT_TOKEN',
   ENDPOINTS_ONE: 'ENDPOINTS_ONE',
   ENDPOINTS_ONE_BY_URL: 'ENDPOINTS_ONE_BY_URL',
+  LAYOUT_TYPE: 'LAYOUT_TYPE',
+  LAYOUT_IS_DESKTOP: 'LAYOUT_IS_DESKTOP',
+  LAYOUT_IS_MOBILE: 'LAYOUT_IS_MOBILE',
+  LAYOUT_SIZE: 'LAYOUT_SIZE',
   LAYOUT_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION: 'LOCATION',
+  LOCATION_IS_TOP: 'LOCATION_IS_TOP',
   LOCATION_NAME: 'LOCATION_NAME',
   LOCATION_ROUTE: 'LOCATION_ROUTE',
   MENU_ENABLED: 'MENU_ENABLED',
@@ -9796,78 +9886,83 @@ const constants$4 = {
 };
 
 var getters = {
-  [constants$4.APPLICATION]: application$3.all,
-  [constants$4.APPLICATION_ISLAUNCHED]: application$3.isLaunched,
-  [constants$4.APPLICATION_ISNAVIGATING]: application$3.isNavigating,
-  [constants$4.APPLICATION_ISNETWORKING]: application$3.isNetworking,
-  [constants$4.APPLICATION_ISDRAGGING]: application$3.isDragging,
-  [constants$4.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
-  [constants$4.COMPONENTS]: components$2.all,
-  [constants$4.COMPONENTS_PARAMETER_OBJECTS]: components$2.parameterObjectsEntirely,
-  [constants$4.COMPONENTS_ONE]: components$2.one,
-  [constants$4.COMPONENTS_ONE_RESPONSE]: components$2.response,
-  [constants$4.COMPONENTS_ONE_SCHEMA_OBJECT]: components$2.schemaObject,
-  [constants$4.COMPONENTS_ONE_PARAMETER_OBJECTS]: components$2.parameterObjects,
-  [constants$4.COMPONENTS_ONE_ACTIONS]: components$2.actions,
-  [constants$4.COMPONENTS_ONE_ACTIONS_SELF]: components$2.selfActions,
-  [constants$4.COMPONENTS_ONE_ACTIONS_ROW]: components$2.rowActions,
-  [constants$4.COMPONENTS_ONE_HAS_PAGINATION]: components$2.hasPagination,
-  [constants$4.COMPONENTS_ONE_AUTO_REFRESH_SEC]: components$2.autoRefreshSec,
-  [constants$4.COMPONENTS_ONE_PAGINATION]: components$2.pagination,
-  [constants$4.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
-  [constants$4.COMPONENTS_ONE_TABLE_COLUMNS]: components$2.tableColumns,
-  [constants$4.COMPONENTS_ONE_PRIMARY_KEY]: components$2.primaryKey,
-  [constants$4.CURRENT]: current$2.all,
-  [constants$4.VIRON]: viron$2.all,
-  [constants$4.VIRON_EXISTENCE]: viron$2.existence,
-  [constants$4.VIRON_PAGES]: viron$2.pages,
-  [constants$4.VIRON_PAGES_ID_OF]: viron$2.pageIdOf,
-  [constants$4.VIRON_NAME]: viron$2.name,
-  [constants$4.VIRON_DASHBOARD]: viron$2.dashboard,
-  [constants$4.VIRON_MANAGE]: viron$2.manage,
-  [constants$4.DRAWERS]: drawers$2.all,
-  [constants$4.ENDPOINTS]: endpoints$2.all,
-  [constants$4.ENDPOINTS_BY_ORDER]: endpoints$2.allByOrder,
-  [constants$4.ENDPOINTS_BY_ORDER_FILTERED]: endpoints$2.allByOrderFiltered,
-  [constants$4.ENDPOINTS_COUNT]: endpoints$2.count,
-  [constants$4.ENDPOINTS_WITHOUT_TOKEN]: endpoints$2.allWithoutToken,
-  [constants$4.ENDPOINTS_ONE]: endpoints$2.one,
-  [constants$4.ENDPOINTS_ONE_BY_URL]: endpoints$2.oneByURL,
-  [constants$4.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout$2.componentsGridColumnCount,
-  [constants$4.LOCATION]: location$3.all,
-  [constants$4.LOCATION_NAME]: location$3.name,
-  [constants$4.LOCATION_ROUTE]: location$3.route,
-  [constants$4.MENU_ENABLED]: menu.enabled,
-  [constants$4.MODALS]: modals$2.all,
-  [constants$4.OAS_CLIENT]: oas$2.client,
-  [constants$4.OAS_SPEC]: oas$2.spec,
-  [constants$4.OAS_ORIGINAL_SPEC]: oas$2.originalSpec,
-  [constants$4.OAS_APIS]: oas$2.apis,
-  [constants$4.OAS_FLAT_APIS]: oas$2.flatApis,
-  [constants$4.OAS_API]: oas$2.api,
-  [constants$4.OAS_API_BY_PATH_AND_METHOD]: oas$2.apiByPathAndMethod,
-  [constants$4.OAS_PATH_ITEM_OBJECT]: oas$2.pathItemObject,
-  [constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID]: oas$2.pathItemObjectMethodNameByOperationId,
-  [constants$4.OAS_OPERATION_OBJECT]: oas$2.operationObject,
-  [constants$4.OAS_OPERATION_OBJECTS_AS_ACTION]: oas$2.operationObjectsAsAction,
-  [constants$4.OAS_OPERATION_ID]: oas$2.operationId,
-  [constants$4.OAS_PARAMETER_OBJECTS]: oas$2.parameterObjects,
-  [constants$4.OAS_RESPONSE_OBJECT]: oas$2.responseObject,
-  [constants$4.OAS_SCHEMA_OBJECT]: oas$2.schemaObject,
-  [constants$4.PAGE]: page$2.all,
-  [constants$4.PAGE_ID]: page$2.id,
-  [constants$4.PAGE_NAME]: page$2.name,
-  [constants$4.PAGE_COMPONENTS]: page$2.components,
-  [constants$4.PAGE_COMPONENTS_TABLE]: page$2.componentsTable,
-  [constants$4.PAGE_COMPONENTS_NOT_TABLE]: page$2.componentsNotTable,
-  [constants$4.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
-  [constants$4.POPOVERS]: popovers$2.all,
-  [constants$4.TOASTS]: toasts$2.all,
-  [constants$4.UA]: ua$2.all,
-  [constants$4.UA_IS_SAFARI]: ua$2.isSafari,
-  [constants$4.UA_IS_EDGE]: ua$2.isEdge,
-  [constants$4.UA_IS_FIREFOX]: ua$2.isFirefox,
-  [constants$4.UA_USING_BROWSER]: ua$2.usingBrowser
+  [constants$5.APPLICATION]: application$3.all,
+  [constants$5.APPLICATION_ISLAUNCHED]: application$3.isLaunched,
+  [constants$5.APPLICATION_ISNAVIGATING]: application$3.isNavigating,
+  [constants$5.APPLICATION_ISNETWORKING]: application$3.isNetworking,
+  [constants$5.APPLICATION_ISDRAGGING]: application$3.isDragging,
+  [constants$5.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
+  [constants$5.COMPONENTS]: components$2.all,
+  [constants$5.COMPONENTS_PARAMETER_OBJECTS]: components$2.parameterObjectsEntirely,
+  [constants$5.COMPONENTS_ONE]: components$2.one,
+  [constants$5.COMPONENTS_ONE_RESPONSE]: components$2.response,
+  [constants$5.COMPONENTS_ONE_SCHEMA_OBJECT]: components$2.schemaObject,
+  [constants$5.COMPONENTS_ONE_PARAMETER_OBJECTS]: components$2.parameterObjects,
+  [constants$5.COMPONENTS_ONE_ACTIONS]: components$2.actions,
+  [constants$5.COMPONENTS_ONE_ACTIONS_SELF]: components$2.selfActions,
+  [constants$5.COMPONENTS_ONE_ACTIONS_ROW]: components$2.rowActions,
+  [constants$5.COMPONENTS_ONE_HAS_PAGINATION]: components$2.hasPagination,
+  [constants$5.COMPONENTS_ONE_AUTO_REFRESH_SEC]: components$2.autoRefreshSec,
+  [constants$5.COMPONENTS_ONE_PAGINATION]: components$2.pagination,
+  [constants$5.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
+  [constants$5.COMPONENTS_ONE_TABLE_COLUMNS]: components$2.tableColumns,
+  [constants$5.COMPONENTS_ONE_PRIMARY_KEY]: components$2.primaryKey,
+  [constants$5.CURRENT]: current$2.all,
+  [constants$5.VIRON]: viron$2.all,
+  [constants$5.VIRON_EXISTENCE]: viron$2.existence,
+  [constants$5.VIRON_PAGES]: viron$2.pages,
+  [constants$5.VIRON_PAGES_ID_OF]: viron$2.pageIdOf,
+  [constants$5.VIRON_NAME]: viron$2.name,
+  [constants$5.VIRON_DASHBOARD]: viron$2.dashboard,
+  [constants$5.VIRON_MANAGE]: viron$2.manage,
+  [constants$5.DRAWERS]: drawers$2.all,
+  [constants$5.ENDPOINTS]: endpoints$2.all,
+  [constants$5.ENDPOINTS_BY_ORDER]: endpoints$2.allByOrder,
+  [constants$5.ENDPOINTS_BY_ORDER_FILTERED]: endpoints$2.allByOrderFiltered,
+  [constants$5.ENDPOINTS_COUNT]: endpoints$2.count,
+  [constants$5.ENDPOINTS_WITHOUT_TOKEN]: endpoints$2.allWithoutToken,
+  [constants$5.ENDPOINTS_ONE]: endpoints$2.one,
+  [constants$5.ENDPOINTS_ONE_BY_URL]: endpoints$2.oneByURL,
+  [constants$5.LAYOUT_TYPE]: layout$2.type,
+  [constants$5.LAYOUT_IS_DESKTOP]: layout$2.isDesktop,
+  [constants$5.LAYOUT_IS_MOBILE]: layout$2.isMobile,
+  [constants$5.LAYOUT_SIZE]: layout$2.size,
+  [constants$5.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout$2.componentsGridColumnCount,
+  [constants$5.LOCATION]: location$3.all,
+  [constants$5.LOCATION_IS_TOP]: location$3.isTop,
+  [constants$5.LOCATION_NAME]: location$3.name,
+  [constants$5.LOCATION_ROUTE]: location$3.route,
+  [constants$5.MENU_ENABLED]: menu.enabled,
+  [constants$5.MODALS]: modals$2.all,
+  [constants$5.OAS_CLIENT]: oas$2.client,
+  [constants$5.OAS_SPEC]: oas$2.spec,
+  [constants$5.OAS_ORIGINAL_SPEC]: oas$2.originalSpec,
+  [constants$5.OAS_APIS]: oas$2.apis,
+  [constants$5.OAS_FLAT_APIS]: oas$2.flatApis,
+  [constants$5.OAS_API]: oas$2.api,
+  [constants$5.OAS_API_BY_PATH_AND_METHOD]: oas$2.apiByPathAndMethod,
+  [constants$5.OAS_PATH_ITEM_OBJECT]: oas$2.pathItemObject,
+  [constants$5.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID]: oas$2.pathItemObjectMethodNameByOperationId,
+  [constants$5.OAS_OPERATION_OBJECT]: oas$2.operationObject,
+  [constants$5.OAS_OPERATION_OBJECTS_AS_ACTION]: oas$2.operationObjectsAsAction,
+  [constants$5.OAS_OPERATION_ID]: oas$2.operationId,
+  [constants$5.OAS_PARAMETER_OBJECTS]: oas$2.parameterObjects,
+  [constants$5.OAS_RESPONSE_OBJECT]: oas$2.responseObject,
+  [constants$5.OAS_SCHEMA_OBJECT]: oas$2.schemaObject,
+  [constants$5.PAGE]: page$2.all,
+  [constants$5.PAGE_ID]: page$2.id,
+  [constants$5.PAGE_NAME]: page$2.name,
+  [constants$5.PAGE_COMPONENTS]: page$2.components,
+  [constants$5.PAGE_COMPONENTS_TABLE]: page$2.componentsTable,
+  [constants$5.PAGE_COMPONENTS_NOT_TABLE]: page$2.componentsNotTable,
+  [constants$5.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
+  [constants$5.POPOVERS]: popovers$2.all,
+  [constants$5.TOASTS]: toasts$2.all,
+  [constants$5.UA]: ua$2.all,
+  [constants$5.UA_IS_SAFARI]: ua$2.isSafari,
+  [constants$5.UA_IS_EDGE]: ua$2.isEdge,
+  [constants$5.UA_IS_FIREFOX]: ua$2.isFirefox,
+  [constants$5.UA_USING_BROWSER]: ua$2.usingBrowser
 };
 
 var auth = {
@@ -9907,7 +10002,7 @@ var auth = {
    * @return {Promise}
    */
   validate: (context, endpointKey) => {
-    const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+    const endpoint = context.getter(constants$5.ENDPOINTS_ONE, endpointKey);
     return Promise
       .resolve()
       .then(() => commonFetch(context, endpoint.url, {
@@ -9938,7 +10033,7 @@ var auth = {
    * @return {Promise}
    */
   getTypes: (context, endpointKey) => {
-    const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+    const endpoint = context.getter(constants$5.ENDPOINTS_ONE, endpointKey);
     const fetchUrl = `${new URL(endpoint.url).origin}/viron_authtype`;
 
     return Promise
@@ -9958,7 +10053,7 @@ var auth = {
     return Promise
       .resolve()
       .then(() => {
-        const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+        const endpoint = context.getter(constants$5.ENDPOINTS_ONE, endpointKey);
         const origin = new URL(endpoint.url).origin;
         const redirect_url = encodeURIComponent(`${location.href}oauthredirect/${endpointKey}`);
         const fetchUrl = `${origin}${authtype.url}?redirect_url=${redirect_url}`;
@@ -9976,7 +10071,7 @@ var auth = {
    * @return {Promise}
    */
   signinEmail: (context, endpointKey, authtype, email, password) => {
-    const endpoint = context.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+    const endpoint = context.getter(constants$5.ENDPOINTS_ONE, endpointKey);
     const fetchUrl = `${new URL(endpoint.url).origin}${authtype.url}`;
 
     return Promise
@@ -10875,11 +10970,11 @@ var components$3 = {
     if (path.indexOf('/') !== 0) {
       path = '/' + path;
     }
-    const actions = context.getter(constants$4.OAS_OPERATION_OBJECTS_AS_ACTION, component);
+    const actions = context.getter(constants$5.OAS_OPERATION_OBJECTS_AS_ACTION, component);
 
-    const api = context.getter(constants$4.OAS_API_BY_PATH_AND_METHOD, path, method);
-    const currentEndpointKey = context.getter(constants$4.CURRENT);
-    const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
+    const api = context.getter(constants$5.OAS_API_BY_PATH_AND_METHOD, path, method);
+    const currentEndpointKey = context.getter(constants$5.CURRENT);
+    const currentEndpoint = context.getter(constants$5.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
     const networkingId = `networking_${Date.now()}`;
 
@@ -10928,8 +11023,8 @@ var components$3 = {
         context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
           component_uid,
           response: res.obj,// APIレスポンス内容そのまま。
-          schemaObject: context.getter(constants$4.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
-          parameterObjects: context.getter(constants$4.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
+          schemaObject: context.getter(constants$5.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
+          parameterObjects: context.getter(constants$5.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
           actions,// 関連API群。
           hasPagination,
           pagination,// ページング関連。
@@ -10953,9 +11048,9 @@ var components$3 = {
    * @return {Promise}
    */
   operate: (context, operationObject, params) => {
-    const api = context.getter(constants$4.OAS_API, operationObject.operationId);
-    const token = context.getter(constants$4.ENDPOINTS_ONE, context.getter(constants$4.CURRENT)).token;
-    const currentEndpointKey = context.getter(constants$4.CURRENT);
+    const api = context.getter(constants$5.OAS_API, operationObject.operationId);
+    const token = context.getter(constants$5.ENDPOINTS_ONE, context.getter(constants$5.CURRENT)).token;
+    const currentEndpointKey = context.getter(constants$5.CURRENT);
     const networkingId = `networking_${Date.now()}`;
 
     return Promise
@@ -11066,10 +11161,10 @@ var viron$3 = {
    * @return {Promise}
    */
   get: context => {
-    const operationObject = context.getter(constants$4.OAS_OPERATION_OBJECT, VIRON_URI, 'get');
-    const api = context.getter(constants$4.OAS_API, operationObject.operationId);
-    const currentEndpointKey = context.getter(constants$4.CURRENT);
-    const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
+    const operationObject = context.getter(constants$5.OAS_OPERATION_OBJECT, VIRON_URI, 'get');
+    const api = context.getter(constants$5.OAS_API, operationObject.operationId);
+    const currentEndpointKey = context.getter(constants$5.CURRENT);
+    const currentEndpoint = context.getter(constants$5.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
     const networkingId = `networking_${Date.now()}`;
 
@@ -11295,6 +11390,21 @@ var endpoints$3 = {
 
 var layout$3 = {
   /**
+   * アプリケーションの表示サイズを更新します。
+   * @param {riotx.Context} context
+   * @param {Number} width
+   * @param {Number} height
+   * @return {Promise}
+   */
+  updateSize: (context, width, height) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.LAYOUT_SIZE, width, height);
+      });
+  },
+
+  /**
    * componentリストのgridレイアウトのcolumn数を更新します。
    * @param {riotx.Context} context
    * @param {Number} count
@@ -11468,8 +11578,8 @@ var oas$3 = {
    * @return {Promise}
    */
   getAutocomplete: (context, path, query) => {
-    const currentEndpointKey = context.getter(constants$4.CURRENT);
-    const currentEndpoint = context.getter(constants$4.ENDPOINTS_ONE, currentEndpointKey);
+    const currentEndpointKey = context.getter(constants$5.CURRENT);
+    const currentEndpoint = context.getter(constants$5.ENDPOINTS_ONE, currentEndpointKey);
     const token = currentEndpoint.token;
     const url = `${new URL(currentEndpoint.url).origin}${path}${encode_1$2(query)}`;
     return Promise
@@ -11494,7 +11604,7 @@ var page$3 = {
     return Promise
       .resolve()
       .then(() => {
-        const pages = context.getter(constants$4.VIRON_PAGES);
+        const pages = context.getter(constants$5.VIRON_PAGES);
         const page = find_1$1(pages, page => {
           return (page.id === pageId);
         });
@@ -12114,6 +12224,7 @@ const constants$1 = {
   ENDPOINTS_MERGE_ONE_WITH_KEY: 'ENDPOINTS_MERGE_ONE_WITH_KEY',
   ENDPOINTS_TIDY_UP_ORDER: 'ENDPOINTS_TIDY_UP_ORDER',
   ENDPOINTS_CHANGE_ORDER: 'ENDPOINTS_CHANGE_ORDER',
+  LAYOUT_UPDATE_SIZE: 'LAYOUT_UPDATE_SIZE',
   LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT',
   LOCATION_UPDATE: 'LOCATION_UPDATE',
   MODALS_ADD: 'MODALS_ADD',
@@ -12163,6 +12274,7 @@ var actions = {
   [constants$1.ENDPOINTS_MERGE_ONE_WITH_KEY]: endpoints$3.mergeOneWithKey,
   [constants$1.ENDPOINTS_TIDY_UP_ORDER]: endpoints$3.tidyUpOrder,
   [constants$1.ENDPOINTS_CHANGE_ORDER]: endpoints$3.changeOrder,
+  [constants$1.LAYOUT_UPDATE_SIZE]: layout$3.updateSize,
   [constants$1.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT]: layout$3.updateComponentsGridColumnCount,
   [constants$1.LOCATION_UPDATE]: location$4.update,
   [constants$1.MODALS_ADD]: modals$3.add,
@@ -12297,7 +12409,7 @@ var ComponentsRoute = {
    */
   onBefore: (store, route, replace) => {
     const endpointKey = route.params.endpointKey;
-    const endpoint = store.getter(constants$4.ENDPOINTS_ONE, endpointKey);
+    const endpoint = store.getter(constants$5.ENDPOINTS_ONE, endpointKey);
 
     // endpointが存在しなければTOPに戻す。
     if (!endpoint) {
@@ -12316,7 +12428,7 @@ var ComponentsRoute = {
       .then(() => store.action(constants$1.CURRENT_UPDATE, endpointKey))
       .then(() => {
         // 無駄な通信を減らすために、`viron`データを未取得の場合のみfetchする。
-        const isVironExist = store.getter(constants$4.VIRON_EXISTENCE);
+        const isVironExist = store.getter(constants$5.VIRON_EXISTENCE);
         if (isVironExist) {
           return Promise.resolve();
         }
@@ -12329,7 +12441,7 @@ var ComponentsRoute = {
         // pageが指定されていない場合は`viron`のpageリストの先頭項目を自動選択する。
         if (!route.params.page) {
           return Promise.resolve().then(() => {
-            const pageName = store.getter(constants$4.VIRON_PAGES_ID_OF, 0);
+            const pageName = store.getter(constants$5.VIRON_PAGES_ID_OF, 0);
             replace(`/${endpointKey}/${pageName}`);
           });
         }
@@ -27249,7 +27361,7 @@ var script$5 = function() {
   const operationObject = this.opts.action;
 
   this.label = operationObject.summary || operationObject.operationId;
-  const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
+  const method = store.getter(constants$5.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
   this.icon = null;
   switch (method) {
   case 'get':
@@ -55574,7 +55686,7 @@ var script$44 = function() {
   this.icon = this.opts.icon;
   // actionの場合はmethodから判定する。
   if (this.opts.isaction) {
-    const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, this.opts.action.operationId);
+    const method = store.getter(constants$5.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, this.opts.action.operationId);
     switch (method) {
     case 'get':
       this.icon = 'download';
@@ -55897,10 +56009,10 @@ var script$46 = function() {
 
   this.handleClick = () => {
     // ブラウザによってコピー機能を無効化する。
-    if (store.getter(constants$4.UA_IS_EDGE)) {
+    if (store.getter(constants$5.UA_IS_EDGE)) {
       return;
     }
-    if (store.getter(constants$4.UA_IS_FIREFOX)) {
+    if (store.getter(constants$5.UA_IS_FIREFOX)) {
       return;
     }
 
@@ -56437,7 +56549,7 @@ var script$50 = function() {
     const operationObject = find_1$2(this.opts.rowactions, operationObject => {
       return (operationObject.operationId === operationId);
     });
-    const method = store.getter(constants$4.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
+    const method = store.getter(constants$5.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
     const rowData = this.opts.response[rowIdx];
     const initialParameters = createInitialQueries(operationObject, rowData);
     store.action(constants$1.DRAWERS_ADD, 'viron-component-operation', {
@@ -56789,17 +56901,17 @@ var script$56 = function() {
 
   this.listen(constants$3.COMPONENTS_ONE(this._riot_id), () => {
     this.isPending = false;
-    this.response = store.getter(constants$4.COMPONENTS_ONE_RESPONSE, this._riot_id);
-    this.schemaObject = store.getter(constants$4.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
-    this.parameterObjects = store.getter(constants$4.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
-    this.selfActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
-    this.rowActions = store.getter(constants$4.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
-    this.hasPagination = store.getter(constants$4.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
-    this.autoRefreshSec = store.getter(constants$4.COMPONENTS_ONE_AUTO_REFRESH_SEC, this._riot_id);
-    this.pagination = store.getter(constants$4.COMPONENTS_ONE_PAGINATION, this._riot_id);
-    this.primaryKey = store.getter(constants$4.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
-    this.tableLabels = store.getter(constants$4.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
-    this.tableColumns = store.getter(constants$4.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
+    this.response = store.getter(constants$5.COMPONENTS_ONE_RESPONSE, this._riot_id);
+    this.schemaObject = store.getter(constants$5.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
+    this.parameterObjects = store.getter(constants$5.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
+    this.selfActions = store.getter(constants$5.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
+    this.rowActions = store.getter(constants$5.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
+    this.hasPagination = store.getter(constants$5.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
+    this.autoRefreshSec = store.getter(constants$5.COMPONENTS_ONE_AUTO_REFRESH_SEC, this._riot_id);
+    this.pagination = store.getter(constants$5.COMPONENTS_ONE_PAGINATION, this._riot_id);
+    this.primaryKey = store.getter(constants$5.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
+    this.tableLabels = store.getter(constants$5.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
+    this.tableColumns = store.getter(constants$5.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
     this.validateResponse(this.response);
     activateAutoRefresh();
     this.update();
@@ -56917,10 +57029,10 @@ riot$1.tag2('viron-component', '<div class="Component__head"> <div class="Compon
 var script$60 = function() {
   const store = this.riotx.get();
 
-  this.name = store.getter(constants$4.PAGE_NAME);
-  this.tableComponents = store.getter(constants$4.PAGE_COMPONENTS_TABLE);
-  this.notTableComponents = store.getter(constants$4.PAGE_COMPONENTS_NOT_TABLE);
-  this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
+  this.name = store.getter(constants$5.PAGE_NAME);
+  this.tableComponents = store.getter(constants$5.PAGE_COMPONENTS_TABLE);
+  this.notTableComponents = store.getter(constants$5.PAGE_COMPONENTS_NOT_TABLE);
+  this.componentsCount = store.getter(constants$5.PAGE_COMPONENTS_COUNT);
   // リクエストパラメータ定義。
   this.parameterObjects = [];
   // tooltip表示中か否か。
@@ -56948,7 +57060,7 @@ var script$60 = function() {
   };
   // componentで定義されている値のみ抽出します。
   this.getCurrentSearchRequestParametersForComponent = component => {
-    const parameterObjects = store.getter(constants$4.OAS_PARAMETER_OBJECTS, component.api.path, component.api.method);
+    const parameterObjects = store.getter(constants$5.OAS_PARAMETER_OBJECTS, component.api.path, component.api.method);
     const names = [];
     forEach_1$1(parameterObjects, parameterObject => {
       names.push(parameterObject.name);
@@ -57002,23 +57114,23 @@ var script$60 = function() {
   });
 
   this.listen(constants$3.LAYOUT, () => {
-    const columnCount = store.getter(constants$4.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT);
+    const columnCount = store.getter(constants$5.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT);
     document.documentElement.style.setProperty('--page-components-grid-column-count', columnCount);
     // tauchartはresize時に自動で再レンダリングするが、column数変更時にはresizeイベントが発火しないため再レンダリングが実行されない。
     // column数変更時も再レンダリングさせるために手動でresizeイベントハンドラを実行する。
     chart$1.Chart.resizeOnWindowEvent();
   });
   this.listen(constants$3.PAGE, () => {
-    this.name = store.getter(constants$4.PAGE_NAME);
-    this.tableComponents = store.getter(constants$4.PAGE_COMPONENTS_TABLE);
-    this.notTableComponents = store.getter(constants$4.PAGE_COMPONENTS_NOT_TABLE);
-    this.componentsCount = store.getter(constants$4.PAGE_COMPONENTS_COUNT);
+    this.name = store.getter(constants$5.PAGE_NAME);
+    this.tableComponents = store.getter(constants$5.PAGE_COMPONENTS_TABLE);
+    this.notTableComponents = store.getter(constants$5.PAGE_COMPONENTS_NOT_TABLE);
+    this.componentsCount = store.getter(constants$5.PAGE_COMPONENTS_COUNT);
     this.update();
     updateGridColumnCount();
   });
 
   this.listen(constants$3.COMPONENTS, () => {
-    this.parameterObjects = store.getter(constants$4.COMPONENTS_PARAMETER_OBJECTS);
+    this.parameterObjects = store.getter(constants$5.COMPONENTS_PARAMETER_OBJECTS);
     this.update();
   });
 
@@ -61009,19 +61121,19 @@ riot$1.tag2('viron-endpoint-signin', '<div class="EndpointsPage__signinHead"> <d
 var script$64 = function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
-  this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
-  this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
+  this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
+  this.endpointsCount = store.getter(constants$5.ENDPOINTS_COUNT);
+  this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
 
   this.listen(constants$3.ENDPOINTS, () => {
-    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
-    this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+    this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
+    this.endpointsCount = store.getter(constants$5.ENDPOINTS_COUNT);
     this.update();
   });
 
   this.listen(constants$3.APPLICATION, () => {
-    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER_FILTERED);
-    this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
+    this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
+    this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
 
@@ -61041,7 +61153,7 @@ var script$64 = function() {
           .then(() => store.action(constants$1.AUTH_GET_TYPES, key))
           .then(authtypes => store.action(constants$1.MODALS_ADD, 'viron-endpoint-signin', {
             key,
-            endpoint: store.getter(constants$4.ENDPOINTS_ONE, key),
+            endpoint: store.getter(constants$5.ENDPOINTS_ONE, key),
             authtypes,
             onSignin: () => {
               this.getRouter().navigateTo(`/${key}`);
@@ -61058,7 +61170,7 @@ var script$64 = function() {
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'viron-endpoint-edit', {
         endpointKey: key,
-        endpoint: store.getter(constants$4.ENDPOINTS_ONE, key)
+        endpoint: store.getter(constants$5.ENDPOINTS_ONE, key)
       }))
       .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
         error: err
@@ -61078,7 +61190,7 @@ var script$64 = function() {
   };
 
   this.handleEndpointQrCode = key => {
-    const endpoint = store.getter(constants$4.ENDPOINTS_ONE, key);
+    const endpoint = store.getter(constants$5.ENDPOINTS_ONE, key);
     Promise
       .resolve()
       .then(() => store.action(constants$1.MODALS_ADD, 'viron-endpoint-qrcode', {
@@ -61187,10 +61299,10 @@ riot$1.tag2('viron-drawer', '<div class="Drawer__frame"> <div class="Drawer__con
 var script$75 = function() {
   const store = this.riotx.get();
 
-  this.drawers = store.getter(constants$4.DRAWERS);
+  this.drawers = store.getter(constants$5.DRAWERS);
 
   this.listen(constants$3.DRAWERS, () => {
-    this.drawers = store.getter(constants$4.DRAWERS);
+    this.drawers = store.getter(constants$5.DRAWERS);
     this.update();
   });
 };
@@ -61210,11 +61322,18 @@ riot$1.tag2('viron-icon-square', '<svg viewbox="-1062 13983 15 14"> <g transform
 
 var script$77 = function() {};
 
-riot$1.tag2('viron-application-autocomplete', '<div>autocomplete!!!</div>', '', 'class="Application_Header_Autocomplete"', function(opts) {
+riot$1.tag2('viron-application-header-autocomplete', '<div>autocomplete!!!</div>', '', 'class="Application_Header_Autocomplete"', function(opts) {
     this.external(script$77);
 });
 
+var script$79 = function() {};
+
+riot$1.tag2('viron-application-header-menu-entry', '<div>entry!!!!!!!!!!</div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
+    this.external(script$79);
+});
+
 var script$78 = function() {
+  const store = this.riotx.get();
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
     { label: 'ヘルプ', id: 'navigate_to_doc' },
@@ -61242,6 +61361,13 @@ var script$78 = function() {
   }
 
   /**
+   * エンドポイント追加用のモーダルを表示します。
+   */
+  this.showModalToAddEndpoint = () => {
+    store.action(constants$1.MODALS_ADD, 'viron-application-header-menu-entry');
+  };
+
+  /**
    * メニュー項目がクリック/タップされた時の処理。
    * @param {Object} e
    */
@@ -61261,7 +61387,7 @@ var script$78 = function() {
       this.close();
       break;
     case 'add_endpoint':
-      // TODO:
+      this.showModalToAddEndpoint();
       this.close();
       break;
     case 'export_endpoints':
@@ -61331,29 +61457,40 @@ riot$1.tag2('viron-application-header', '<div class="Application_Header__aside">
     this.external(script$76);
 });
 
-var script$79 = function() {};
+var script$80 = function() {};
 
 riot$1.tag2('viron-application-menu', '', '', 'class="Application_Menu"', function(opts) {
-    this.external(script$79);
+    this.external(script$80);
 });
 
-var script$80 = function() {
+riot$1.tag2('viron-icon-close', '<svg viewbox="-1062 13983 15 14"> <g transform="translate(-1342 13957.235)"> <g transform="translate(280 25.765)"> <rect width="15" height="14" rx="1"></rect> <rect x="1.5" y="1.5" width="12" height="11" rx="0.5"></rect> </g> </g> </svg>', '', 'class="icon Icon IconClose"', function(opts) {
+});
+
+var script$81 = function() {
   const store = this.riotx.get();
 
   let tag;
 
   const fadeIn = () => {
     setTimeout(() => {
-      this.root.classList.add('Modal--visible');
+      this.isVisible = true;
+      this.update();
     }, 100);
   };
 
   const fadeOut = () => {
-    this.root.classList.remove('Modal--visible');
+    this.isVisible = false;
+    this.update();
     setTimeout(() => {
       store.action(constants$1.MODALS_REMOVE, this.opts.id);
     }, 1000);
   };
+
+  this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
+  this.listen(constants$3.LAYOUT, () => {
+    this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
+    this.update();
+  });
 
   this.on('mount', () => {
     tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
@@ -61392,25 +61529,25 @@ var script$80 = function() {
   };
 };
 
-riot$1.tag2('viron-modal', '<div class="Modal__frame" onclick="{getClickHandler(\'handleFrameTapk\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTapk\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}">TODO</div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal Modal--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$80);
+riot$1.tag2('viron-modal', '<div class="Modal__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {isVisible ? \'Modal--visible\' : \'\'} Modal--{opts.theme} Modal--{layoutType}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$81);
 });
 
-var script$81 = function() {
+var script$82 = function() {
   const store = this.riotx.get();
 
-  this.modals = store.getter(constants$4.MODALS);
+  this.modals = store.getter(constants$5.MODALS);
   this.listen(constants$3.MODALS, () => {
-    this.modals = store.getter(constants$4.MODALS);
+    this.modals = store.getter(constants$5.MODALS);
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-modals', '<virtual each="{modals}"> <viron-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{modalOpts.theme}"></viron-modal> </virtual>', '', 'class="Application_Modals"', function(opts) {
-    this.external(script$81);
+    this.external(script$82);
 });
 
-var script$82 = function() {
+var script$83 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -61502,36 +61639,36 @@ var script$82 = function() {
 };
 
 riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
-    this.external(script$82);
+    this.external(script$83);
 });
 
-var script$83 = function() {
+var script$84 = function() {
   const store = this.riotx.get();
 
-  this.popovers = store.getter(constants$4.POPOVERS);
+  this.popovers = store.getter(constants$5.POPOVERS);
   this.listen(constants$3.POPOVERS, () => {
-    this.popovers = store.getter(constants$4.POPOVERS);
+    this.popovers = store.getter(constants$5.POPOVERS);
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <viron-popover id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover> </virtual>', '', 'class="Application_Popovers"', function(opts) {
-    this.external(script$83);
+    this.external(script$84);
 });
 
 riot$1.tag2('viron-icon-logo', '<svg viewbox="-1062 13983 15 14"> <g transform="translate(-1342 13957.235)"> <g transform="translate(280 25.765)"> <rect width="15" height="14" rx="1"></rect> <rect x="1.5" y="1.5" width="12" height="11" rx="0.5"></rect> </g> </g> </svg>', '', 'class="icon Icon IconLogo"', function(opts) {
 });
 
-var script$84 = function() {};
+var script$85 = function() {};
 
 riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
-    this.external(script$84);
+    this.external(script$85);
 });
 
 riot$1.tag2('viron-application-splash', '<div>TODO</div>', '', 'class="Application_Splash"', function(opts) {
 });
 
-var script$85 = function() {
+var script$86 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -61573,25 +61710,25 @@ var script$85 = function() {
 };
 
 riot$1.tag2('viron-toast', '<div class="Toast__icon">TODO</div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" onclick="{getClickHandler(\'handleLinkTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLinkTap\')}">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$85);
+    this.external(script$86);
 });
 
-var script$86 = function() {
+var script$87 = function() {
   const store = this.riotx.get();
 
-  this.toasts = store.getter(constants$4.TOASTS);
+  this.toasts = store.getter(constants$5.TOASTS);
 
   this.listen(constants$3.TOASTS, () => {
-    this.toasts = store.getter(constants$4.TOASTS);
+    this.toasts = store.getter(constants$5.TOASTS);
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-toasts', '<virtual each="{toasts}"> <viron-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></viron-toast> </virtual>', '', 'class="Application_Toasts"', function(opts) {
-    this.external(script$86);
+    this.external(script$87);
 });
 
-var script$88 = function() {
+var script$89 = function() {
   this.handleDeleteButtonClick = () => {
     this.opts.onConfirm();
     this.close();
@@ -61603,10 +61740,10 @@ var script$88 = function() {
 };
 
 riot$1.tag2('viron-application-confirm', '<div class="Application__confirmHead"> <div class="Application__confirmTitle">エンドポイント削除</div> <div class="Application__confirmDescription">全てのエンドポイントが削除されます。個別に削除したい場合は各エンドポイントカード内の削除ボタンから行って下さい。</div> </div> <div class="Application__confirmTail"> <viron-button label="全て削除する" type="emphasis" onclick="{handleDeleteButtonClick}"></viron-button> <viron-button label="キャンセル" onclick="{handleCancelButtonClick}"></viron-button> </div>', '', 'class="Application__confirm"', function(opts) {
-    this.external(script$88);
+    this.external(script$89);
 });
 
-var script$89 = function() {
+var script$90 = function() {
   const store = this.riotx.get();
 
   this.isExist = false;
@@ -61615,7 +61752,7 @@ var script$89 = function() {
 
   this.handleEndpointURLChange = newEndpointURL => {
     this.endpointURL = newEndpointURL;
-    this.isExist = !!store.getter(constants$4.ENDPOINTS_ONE_BY_URL, newEndpointURL);
+    this.isExist = !!store.getter(constants$5.ENDPOINTS_ONE_BY_URL, newEndpointURL);
     this.update();
   };
 
@@ -61659,19 +61796,19 @@ var script$89 = function() {
 };
 
 riot$1.tag2('viron-application-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <viron-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application__entryControls"> <viron-button type="primary" isdisabled="{isExist}" onclick="{handleRegisterButtonClick}" label="新規作成"></viron-button> <viron-button type="secondary" onclick="{handleCancelButtonClick}" label="キャンセル"></viron-button> </div>', '', 'class="Application__entry"', function(opts) {
-    this.external(script$89);
+    this.external(script$90);
 });
 
-var script$90 = function() {
+var script$91 = function() {
   const store = this.riotx.get();
 
   // ドロップ待受中か否か。
-  this.isWatching = store.getter(constants$4.APPLICATION_ISDRAGGING);
+  this.isWatching = store.getter(constants$5.APPLICATION_ISDRAGGING);
   // ドロップ可能な状態か否か。
   this.isDroppable = false;
 
   this.listen(constants$3.APPLICATION, () => {
-    this.isWatching = store.getter(constants$4.APPLICATION_ISDRAGGING);
+    this.isWatching = store.getter(constants$5.APPLICATION_ISDRAGGING);
     this.update();
   });
 
@@ -61710,10 +61847,10 @@ var script$90 = function() {
 };
 
 riot$1.tag2('viron-application-order-droparea', '<div class="Application__orderDropareaContent"></div> <div class="Application__orderDropareaHandler" ondragenter="{handleDragEnter}" ondragover="{handleDragOver}" ondragleave="{handleDragLeave}" ondrop="{handleDrop}"></div>', '', 'class="Application__orderDroparea {\'Application__orderDroparea--watching\' : isWatching, \'Application__orderDroparea--droppable\' : isDroppable}"', function(opts) {
-    this.external(script$90);
+    this.external(script$91);
 });
 
-var script$91 = function() {
+var script$92 = function() {
   const store = this.riotx.get();
 
   // ドラッグ開始時の処理。
@@ -61745,63 +61882,86 @@ var script$91 = function() {
 };
 
 riot$1.tag2('viron-application-order-item', '<div class="Application__orderItemHead"> <div class="Application__orderItemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="Application__orderItemName">{opts.endpoint.name || \'-\'}</div> </div> <div class="Application__orderItemBody"> <div class="Application__orderItemUrl"> <div class="Application__orderItemUrlIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__orderItemUrlLabel">{opts.endpoint.url}</div> </div> </div>', '', 'class="Application__orderItem" draggable="{true}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}"', function(opts) {
-    this.external(script$91);
+    this.external(script$92);
 });
 
-var script$92 = function() {
+var script$93 = function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER);
+  this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER);
 
   this.listen(constants$3.ENDPOINTS, () => {
-    this.endpoints = store.getter(constants$4.ENDPOINTS_BY_ORDER);
+    this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER);
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-order', '<div class="Application__orderTitle">並び順を変更</div> <div class="Application__orderDescription">ドラッグ&ドロップでエンドポイントの並び順を変更できます。</div> <div class="Application__orderPlayground"> <viron-application-order-droparea order="{0}"></viron-application-order-droparea> <virtual each="{endpoint, idx in endpoints}"> <viron-application-order-item endpoint="{endpoint}"></viron-application-order-item> <viron-application-order-droparea order="{idx + 1}"></viron-application-order-droparea> </virtual> </div>', '', 'class="Application__order"', function(opts) {
-    this.external(script$92);
+    this.external(script$93);
 });
 
-var script$87 = function() {
+var script$88 = function() {
   const store = this.riotx.get();
 
-  this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
-  this.isNavigating = store.getter(constants$4.APPLICATION_ISNAVIGATING);
-  this.isNetworking = store.getter(constants$4.APPLICATION_ISNETWORKING);
+  this.isLaunched = store.getter(constants$5.APPLICATION_ISLAUNCHED);
+  this.isNavigating = store.getter(constants$5.APPLICATION_ISNAVIGATING);
+  this.isNetworking = store.getter(constants$5.APPLICATION_ISNETWORKING);
   // 表示すべきページの名前。
-  this.pageName = store.getter(constants$4.LOCATION_NAME);
+  this.pageName = store.getter(constants$5.LOCATION_NAME);
   // TOPページか否か。
-  this.isTopPage = (this.pageName === 'endpoints');
+  this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
   // 表示すべきページのルーティング情報。
-  this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
+  this.pageRoute = store.getter(constants$5.LOCATION_ROUTE);
   // エンドポイント数。
-  this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+  this.endpointsCount = store.getter(constants$5.ENDPOINTS_COUNT);
   // エンドポイントフィルター用のテキスト。
-  this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
-  // バグを対処するため、各ブラウザごとのクラス設定用のブラウザ名を取得する。
-  this.usingBrowser = store.getter(constants$4.UA_USING_BROWSER);
+  this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
+  // バグに対処するため、ブラウザ毎クラス設定目的でブラウザ名を取得する。
+  this.usingBrowser = store.getter(constants$5.UA_USING_BROWSER);
+  // レスポンシブデザイン用。
+  this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
+  this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
+  this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
 
   this.listen(constants$3.APPLICATION, () => {
-    this.isLaunched = store.getter(constants$4.APPLICATION_ISLAUNCHED);
-    this.isNavigating = store.getter(constants$4.APPLICATION_ISNAVIGATING);
-    this.isNetworking = store.getter(constants$4.APPLICATION_ISNETWORKING);
-    this.endpointFilterText = store.getter(constants$4.APPLICATION_ENDPOINT_FILTER_TEXT);
+    this.isLaunched = store.getter(constants$5.APPLICATION_ISLAUNCHED);
+    this.isNavigating = store.getter(constants$5.APPLICATION_ISNAVIGATING);
+    this.isNetworking = store.getter(constants$5.APPLICATION_ISNETWORKING);
+    this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
     this.update();
   });
   this.listen(constants$3.LOCATION, () => {
-    this.pageName = store.getter(constants$4.LOCATION_NAME);
-    this.isTopPage = (this.pageName === 'endpoints');
-    this.pageRoute = store.getter(constants$4.LOCATION_ROUTE);
+    this.pageName = store.getter(constants$5.LOCATION_NAME);
+    this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
+    this.pageRoute = store.getter(constants$5.LOCATION_ROUTE);
     this.update();
   });
   this.listen(constants$3.ENDPOINTS, () => {
-    this.endpointsCount = store.getter(constants$4.ENDPOINTS_COUNT);
+    this.endpointsCount = store.getter(constants$5.ENDPOINTS_COUNT);
     this.update();
   });
   this.listen(constants$3.UA, () => {
-    this.usingBrowser = store.getter(constants$4.UA_USING_BROWSER);
+    this.usingBrowser = store.getter(constants$5.UA_USING_BROWSER);
     this.update();
+  });
+  this.listen(constants$3.LAYOUT, () => {
+    this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
+    this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
+    this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
+    this.update();
+  });
+
+  // resize時にvironアプリケーションの表示サイズを更新します。
+  // resizeイベントハンドラーの発火回数を減らす。
+  const handleResize = throttle_1(() => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    store.action(constants$1.LAYOUT_UPDATE_SIZE, width, height);
+  }, 1000);
+  this.on('mount', () => {
+    window.addEventListener('resize', handleResize);
+  }).on('unmount', () => {
+    window.removeEventListener('resize', handleResize);
   });
 
   this.handleEntryMenuItemClick = () => {
@@ -61814,7 +61974,7 @@ var script$87 = function() {
   };
 
   this.handleDownloadMenuItemClick = () => {
-    const endpoints = store.getter(constants$4.ENDPOINTS_WITHOUT_TOKEN);
+    const endpoints = store.getter(constants$5.ENDPOINTS_WITHOUT_TOKEN);
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
 
@@ -61830,7 +61990,7 @@ var script$87 = function() {
 
     // ファイルがjsonであるか
     // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
-    if (!store.getter(constants$4.UA_IS_EDGE) && file.type !== 'application/json') {
+    if (!store.getter(constants$5.UA_IS_EDGE) && file.type !== 'application/json') {
       store.action(constants$1.MODALS_ADD, 'viron-message', {
         title: 'エンドポイント追加 失敗',
         message: 'JSONファイルを指定してください。',
@@ -61905,8 +62065,8 @@ var script$87 = function() {
   };
 };
 
-riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__pageInfo">TODO</div> <div class="Application__page"> <div data-is="viron-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser}"', function(opts) {
-    this.external(script$87);
+riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__pageInfo">TODO</div> <div class="Application__page"> <div data-is="viron-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType}"', function(opts) {
+    this.external(script$88);
 });
 
 // エントリーポイント。
