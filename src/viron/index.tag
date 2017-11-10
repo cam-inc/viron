@@ -1,6 +1,6 @@
-viron.Application(class="Application--{ usingBrowser }")
+viron.Application(class="Application--{ usingBrowser } Application--{ layoutType }")
   .Application__container
-    .Application__aside
+    .Application__aside(if="{ isDesktop }")
       viron-application-poster(if="{ isTopPage }")
       viron-application-menu(if="{ !isTopPage }")
     .Application__header

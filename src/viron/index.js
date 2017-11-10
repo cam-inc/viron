@@ -1,4 +1,5 @@
 import download from 'downloadjs';
+import throttle from 'mout/function/throttle';
 import { constants as actions } from '../store/actions';
 import { constants as getters } from '../store/getters';
 import { constants as states } from '../store/states';
@@ -23,8 +24,12 @@ export default function() {
   this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
   // エンドポイントフィルター用のテキスト。
   this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
-  // バグを対処するため、各ブラウザごとのクラス設定用のブラウザ名を取得する。
+  // バグに対処するため、ブラウザ毎クラス設定目的でブラウザ名を取得する。
   this.usingBrowser = store.getter(getters.UA_USING_BROWSER);
+  // レスポンシブデザイン用。
+  this.layoutType = store.getter(getters.LAYOUT_TYPE);
+  this.isDesktop = store.getter(getters.LAYOUT_IS_DESKTOP);
+  this.isMobile = store.getter(getters.LAYOUT_IS_MOBILE);
 
   this.listen(states.APPLICATION, () => {
     this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
@@ -46,6 +51,25 @@ export default function() {
   this.listen(states.UA, () => {
     this.usingBrowser = store.getter(getters.UA_USING_BROWSER);
     this.update();
+  });
+  this.listen(states.LAYOUT, () => {
+    this.layoutType = store.getter(getters.LAYOUT_TYPE);
+    this.isDesktop = store.getter(getters.LAYOUT_IS_DESKTOP);
+    this.isMobile = store.getter(getters.LAYOUT_IS_MOBILE);
+    this.update();
+  });
+
+  // resize時にvironアプリケーションの表示サイズを更新します。
+  // resizeイベントハンドラーの発火回数を減らす。
+  const handleResize = throttle(() => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    store.action(actions.LAYOUT_UPDATE_SIZE, width, height);
+  }, 1000);
+  this.on('mount', () => {
+    window.addEventListener('resize', handleResize);
+  }).on('unmount', () => {
+    window.removeEventListener('resize', handleResize);
   });
 
   this.handleEntryMenuItemClick = () => {
