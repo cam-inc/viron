@@ -1,8 +1,8 @@
 import Esr from 'esr';
 import { constants as actions } from '../store/actions';
+import EndpointsRoute from '../pages/viron-endpoints/route';
 import ComponentsRoute from '../components/pages/viron-components/route';
 import EndpointimportRoute from '../components/pages/viron-endpointimport/route';
-import EndpointsRoute from '../components/pages/viron-endpoints/route';
 import NotfoundRoute from '../components/pages/viron-notfound/route';
 import OauthredirectRoute from '../components/pages/viron-oauthredirect/route';
 
