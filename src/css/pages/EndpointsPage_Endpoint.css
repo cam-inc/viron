@@ -1,0 +1,13 @@
+.EndpointsPage_Endpoint {
+  display: block;
+
+  &__menu {
+    display: inline-block;
+    cursor: pointer;
+
+    & .Icon {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}

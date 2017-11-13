@@ -1,0 +1,28 @@
+.Prettyprint {
+  display: block;
+
+  &__canvas {
+    @apply --text-break;
+    white-space: pre-wrap;
+  }
+
+  &__string {
+    color: green;
+  }
+
+  &__number {
+    color: darkorange;
+  }
+
+  &__boolean {
+    color: blue;
+  }
+
+  &__null {
+    color: magenta;
+  }
+
+  &__key {
+    color: red;
+  }
+}

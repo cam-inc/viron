@@ -1,0 +1,6 @@
+.Tag {
+  display: inline-block;
+  padding: 2px 4px;
+  color: var(--color-base-white);
+  background-color: var(--color-base-gray);
+}

@@ -1,2 +1,4 @@
 /* ITCSS: Components(Page) */
 /* Designed components, chunks of UI. */
+@import "EndpointsPage";
+@import "EndpointsPage_Endpoint";
