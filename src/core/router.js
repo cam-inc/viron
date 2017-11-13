@@ -1,10 +1,10 @@
 import Esr from 'esr';
 import { constants as actions } from '../store/actions';
 import EndpointsRoute from '../pages/viron-endpoints/route';
+import OauthredirectRoute from '../pages/viron-oauthredirect/route';
 import ComponentsRoute from '../components/pages/viron-components/route';
 import EndpointimportRoute from '../components/pages/viron-endpointimport/route';
 import NotfoundRoute from '../components/pages/viron-notfound/route';
-import OauthredirectRoute from '../components/pages/viron-oauthredirect/route';
 
 let esr;
 
