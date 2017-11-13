@@ -1,0 +1,63 @@
+.EndpointsPage_Endpoint_Signin {
+  @apply --layout-stretch-center;
+
+  &__main {
+    flex-grow: 1;
+    padding: 64px;
+
+    & .HorizontalRule {
+      margin: 24px 0;
+    }
+  }
+
+  &__thumbnail {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+  }
+
+  &__name {
+    margin-bottom: 24px;
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  &__url {
+    margin-bottom: 24px;
+    color: var(--color-base-gray);
+  }
+
+  &__emails .EndpointsPage_Endpoint_Signin_Email {
+    margin-bottom: 24px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__aside {
+    position: relative;
+    flex-shrink: 0;
+    width: 198px;
+    padding: 28px 32px;
+    background-image: url("https://source.unsplash.com/random");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+  }
+
+  &__oauthMessage {
+    margin-bottom: 36px;
+    font-size: 1.6rem;
+    color: var(--color-base-white);
+  }
+
+  &__oauths .EndpointsPage_Endpoint_Signin_Oauth {
+    margin-bottom: 24px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

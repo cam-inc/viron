@@ -1,0 +1,14 @@
+.HorizontalRule {
+  @apply --layout-center-center;
+
+  &__line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--color-base-gray);
+  }
+
+  &__label {
+    margin: 0 8px;
+    font-size: 1.4rem;
+  }
+}

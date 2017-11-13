@@ -1,4 +1,4 @@
-viron-endpoints-page-endpoint.card.EndpointsPage_Endpoint
+viron-endpoints-page-endpoint.card.EndpointsPage_Endpoint(onTap="{ handleTap }")
   .EndpointsPage_Endpoint__menu(ref="menu" onTap="{ handleMenuTap }")
     viron-icon-dots
   .EndpointsPage_Endpoint__thumbnail(style="background-image:url({ opts.endpoint.thumbnail });")

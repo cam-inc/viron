@@ -1,5 +1,6 @@
 .EndpointsPage_Endpoint {
   display: block;
+  cursor: pointer;
 
   &__menu {
     display: inline-block;

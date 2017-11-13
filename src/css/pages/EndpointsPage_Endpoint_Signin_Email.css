@@ -1,0 +1,7 @@
+.EndpointsPage_Endpoint_Signin_Email {
+  display: block;
+
+  & .Textinput {
+    margin-bottom: 12px;
+  }
+}

@@ -3,4 +3,8 @@
 @import "EndpointsPage";
 @import "EndpointsPage_Endpoint";
 @import "EndpointsPage_Endpoint_Menu";
+@import "EndpointsPage_Endpoint_Menu_Edit";
 @import "EndpointsPage_Endpoint_Menu_QRCode";
+@import "EndpointsPage_Endpoint_Signin";
+@import "EndpointsPage_Endpoint_Signin_Email";
+@import "EndpointsPage_Endpoint_Signin_Oauth";
