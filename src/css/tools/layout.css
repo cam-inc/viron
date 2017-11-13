@@ -113,4 +113,13 @@
     align-items: flex-end;
     justify-content: flex-end;
   }
+
+  /* 縦方向*/
+  /* 天地中央 & 左右いっぱいまで広がる */
+  --layout-column-center-stretch: {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+  }
 }

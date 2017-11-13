@@ -1,3 +1,5 @@
+import find from 'mout/array/find';
+import forEach from 'mout/array/forEach';
 import filter from 'mout/object/filter';
 import values from 'mout/object/values';
 
@@ -86,5 +88,60 @@ export default {
       }
       return true;
     }));
+  },
+
+  /**
+   * メニュー内容を返します。
+   * @param {riot.Context} context
+   * @return {Array}
+   */
+  menu: context => {
+    const menu = [];
+    if (!context.state.viron || !context.state.viron.sections) {
+      return menu;
+    }
+    const sections = context.state.viron.sections;
+    forEach(sections, section => {
+      menu.push({
+        name: section.label || section.id,
+        id: section.id,
+        groups: []
+      });
+    });
+    const pages = context.state.viron.pages;
+    forEach(pages, page => {
+      const targetSection = find(menu, section => {
+        return (section.id === page.section);
+      });
+      const groupName = page.group;
+      const isIndependent = !groupName;
+      if (isIndependent) {
+        targetSection.groups.push({
+          pages: [{
+            name: page.name,
+            id: page.id
+          }],
+          isIndependent
+        });
+      } else {
+        if (!find(targetSection.groups, group => {
+          return (group.name === groupName);
+        })) {
+          targetSection.groups.push({
+            name: groupName,
+            pages: [],
+            isIndependent
+          });
+        }
+        const targetGroup = find(targetSection.groups, group => {
+          return (group.name === groupName);
+        });
+        targetGroup.pages.push({
+          name: page.name,
+          id: page.id
+        });
+      }
+    });
+    return menu;
   }
 };

@@ -1,3 +1,49 @@
 .Application_Menu {
-  display: block;
+  @apply --layout-column-center-stretch;
+  background-color: var(--color-base-white);
+
+  &__head {
+    @apply --layout-center-start;
+    flex-shrink: 0;
+    height: 64px;
+    padding: 0 16px;
+  }
+
+  &__icon {
+    margin-right: 16px;
+
+    & .Icon {
+      width: 8px;
+      height: 8px;
+    }
+  }
+
+  &__logo {
+    cursor: pointer;
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-blue);
+    }
+
+    & .Icon {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &__body {
+    flex-grow: 1;
+    overflow-y: scroll;
+  }
+
+  &__sectionName {
+    padding: 8px;
+    font-weight: bold;
+    background-color: var(--color-base-blue-tertiary);
+  }
+
+  &__groups .Application_Menu_Group {
+    border-bottom: 1px solid var(--color-base-gray);
+  }
 }
