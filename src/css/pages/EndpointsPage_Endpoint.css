@@ -10,4 +10,13 @@
       height: 12px;
     }
   }
+
+  &__thumbnail {
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    border-radius: 50%;
+  }
 }
