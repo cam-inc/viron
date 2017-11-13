@@ -10,6 +10,8 @@
   --color-base-red: #f57177;
   --color-base-red-secondary: #fab7ba;
   --color-base-blue: #627edf;
+  --color-base-blue-secondary: #c0cbf2;
+  --color-base-blue-tertiary: #e9eefb;
 }
 /* ITCSS: Tools */
 /* Default mixins and functions. */
@@ -48,6 +50,9 @@
   /* 下揃え & 左右スペースを空けて目一杯に広げる */
 
   /* 下揃え & 右揃え */
+
+  /* 縦方向*/
+  /* 天地中央 & 左右いっぱいまで広がる */
 }
 /* テキスト */
 :root {
@@ -572,6 +577,13 @@ select {
 }
 /* ITCSS: Objects */
 /* Cosmetic-free design patterns. */
+.card {
+  background-color: #fff;
+  background-color: var(--color-base-white);
+  border: 1px solid #d1d1d1;
+  border: 1px solid var(--color-base-gray);
+  border-radius: 6px;
+}
 .icon {
   display: inline-block;
   width: 1rem;
@@ -711,8 +723,94 @@ select {
       color: var(--color-base-blue);
     }
 .Application_Menu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  background-color: #fff;
+  background-color: var(--color-base-white);
+}
+.Application_Menu__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+    flex-shrink: 0;
+    height: 64px;
+    padding: 0 16px;
+  }
+.Application_Menu__icon {
+    margin-right: 16px;
+  }
+.Application_Menu__icon .Icon {
+      width: 8px;
+      height: 8px;
+    }
+.Application_Menu__logo {
+    cursor: pointer;
+  }
+.Application_Menu__logo:hover,
+    .Application_Menu__logo.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+.Application_Menu__logo .Icon {
+      width: 24px;
+      height: 24px;
+    }
+.Application_Menu__body {
+    flex-grow: 1;
+    overflow-y: scroll;
+  }
+.Application_Menu__sectionName {
+    padding: 8px;
+    font-weight: bold;
+    background-color: #e9eefb;
+    background-color: var(--color-base-blue-tertiary);
+  }
+.Application_Menu__groups .Application_Menu_Group {
+    border-bottom: 1px solid #d1d1d1;
+    border-bottom: 1px solid var(--color-base-gray);
+  }
+.Application_Menu_Group {
   display: block;
 }
+.Application_Menu_Group__head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    height: 64px;
+    padding: 0 16px 0 32px;
+    cursor: pointer;
+  }
+.Application_Menu_Group__head:hover,
+    .Application_Menu_Group__head.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+.Application_Menu_Group__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    flex-grow: 1;
+    font-size: 1.6rem;
+  }
+.Application_Menu_Group__icon {
+    flex-shrink: 0;
+  }
+.Application_Menu_Group__icon .Icon {
+      width: 8px;
+      height: 8px;
+    }
+.Application_Menu_Group__page {
+    padding: 16px 16px 16px 32px;
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+.Application_Menu_Group__page:hover,
+    .Application_Menu_Group__page.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
 .Application_Modals {
   position: absolute;
   top: 0;
@@ -873,6 +971,24 @@ select {
       opacity: 1;
       transform: translateX(0);
     }
+.Error {
+  display: block;
+}
+.HorizontalRule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.HorizontalRule__line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: #d1d1d1;
+    background-color: var(--color-base-gray);
+  }
+.HorizontalRule__label {
+    margin: 0 8px;
+    font-size: 1.4rem;
+  }
 .Modal {
   display: flex;
   align-items: center;
@@ -1107,11 +1223,99 @@ select {
       border-width: calc(10px / 2) 10px calc(10px / 2) 0;
       border-width: calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0;
     }
+.Prettyprint {
+  display: block;
+}
+.Prettyprint__canvas {
+  word-break: break-all;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+    white-space: pre-wrap;
+  }
+.Prettyprint__string {
+    color: green;
+  }
+.Prettyprint__number {
+    color: darkorange;
+  }
+.Prettyprint__boolean {
+    color: blue;
+  }
+.Prettyprint__null {
+    color: magenta;
+  }
+.Prettyprint__key {
+    color: red;
+  }
+.Qrcode {
+  display: block;
+}
+.Qrcode $__canvas {
+    display: block;
+    margin: 0 auto;
+  }
+.Tag {
+  display: inline-block;
+  padding: 2px 4px;
+  color: #fff;
+  color: var(--color-base-white);
+  background-color: #d1d1d1;
+  background-color: var(--color-base-gray);
+}
+.Textarea {
+  display: block;
+}
+.Textarea__label {
+    margin-bottom: 4px;
+    font-size: 1.2rem;
+  }
+.Textarea__input {
+    display: block;
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1.6rem;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    border: 1px solid #d1d1d1;
+    border: 1px solid var(--color-base-gray);
+    border-radius: 2px;
+  }
+.Textarea__input:hover,
+    .Textarea__inputhold {
+      background-color: #e9eefb;
+      background-color: var(--color-base-blue-tertiary);
+      border-color: #c0cbf2;
+      border-color: var(--color-base-blue-secondary);
+    }
+.Textinput {
+  display: block;
+}
+.Textinput__label {
+    margin-bottom: 4px;
+    font-size: 1.2rem;
+  }
+.Textinput__input {
+    display: block;
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1.6rem;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    border: 1px solid #d1d1d1;
+    border: 1px solid var(--color-base-gray);
+    border-radius: 2px;
+  }
+.Textinput__input:hover,
+    .Textinput__inputhold {
+      background-color: #e9eefb;
+      background-color: var(--color-base-blue-tertiary);
+      border-color: #c0cbf2;
+      border-color: var(--color-base-blue-secondary);
+    }
 .Toast {
   display: flex;
   align-items: center;
   justify-content: center;
-  display: block;
   padding: 12px;
   cursor: pointer;
   background-color: #fff;
@@ -1161,5 +1365,102 @@ select {
     }
 /* ITCSS: Components(Page) */
 /* Designed components, chunks of UI. */
+.EndpointsPage {
+  display: block;
+}
+.EndpointsPage_Endpoint {
+  display: block;
+  cursor: pointer;
+}
+.EndpointsPage_Endpoint__menu {
+    display: inline-block;
+    cursor: pointer;
+  }
+.EndpointsPage_Endpoint__menu .Icon {
+      width: 12px;
+      height: 12px;
+    }
+.EndpointsPage_Endpoint__thumbnail {
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    border-radius: 50%;
+  }
+.EndpointsPage_Endpoint_Menu {
+  display: block;
+}
+.EndpointsPage_Endpoint_Menu_Edit {
+  display: block;
+}
+.EndpointsPage_Endpoint_Menu_QRCode {
+  display: block;
+}
+.EndpointsPage_Endpoint_Signin {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+.EndpointsPage_Endpoint_Signin__main {
+    flex-grow: 1;
+    padding: 64px;
+  }
+.EndpointsPage_Endpoint_Signin__main .HorizontalRule {
+      margin: 24px 0;
+    }
+.EndpointsPage_Endpoint_Signin__thumbnail {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+  }
+.EndpointsPage_Endpoint_Signin__name {
+    margin-bottom: 24px;
+    font-size: 1.4rem;
+    text-align: center;
+  }
+.EndpointsPage_Endpoint_Signin__url {
+    margin-bottom: 24px;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+  }
+.EndpointsPage_Endpoint_Signin__emails .EndpointsPage_Endpoint_Signin_Email {
+    margin-bottom: 24px;
+  }
+.EndpointsPage_Endpoint_Signin__emails .EndpointsPage_Endpoint_Signin_Email:last-child {
+      margin-bottom: 0;
+    }
+.EndpointsPage_Endpoint_Signin__aside {
+    position: relative;
+    flex-shrink: 0;
+    width: 198px;
+    padding: 28px 32px;
+    background-image: url("https://source.unsplash.com/random");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+  }
+.EndpointsPage_Endpoint_Signin__oauthMessage {
+    margin-bottom: 36px;
+    font-size: 1.6rem;
+    color: #fff;
+    color: var(--color-base-white);
+  }
+.EndpointsPage_Endpoint_Signin__oauths .EndpointsPage_Endpoint_Signin_Oauth {
+    margin-bottom: 24px;
+  }
+.EndpointsPage_Endpoint_Signin__oauths .EndpointsPage_Endpoint_Signin_Oauth:last-child {
+      margin-bottom: 0;
+    }
+.EndpointsPage_Endpoint_Signin_Email {
+  display: block;
+}
+.EndpointsPage_Endpoint_Signin_Email .Textinput {
+    margin-bottom: 12px;
+  }
+.EndpointsPage_Endpoint_Signin_Oauth {
+  display: block;
+}
 /* ITCSS: Trumps */
 /* Helpers and overrides. */

@@ -7185,7 +7185,11 @@ var constants$4 = {
   layoutThreshold: 640,
   // レイアウトタイプ。mobile or desktop用。
   layoutTypeDesktop: 'desktop',
-  layoutTypeMobile: 'mobile'
+  layoutTypeMobile: 'mobile',
+
+  // 認証方法。
+  authtypeEmail: 'email',
+  authtypeOauth: 'oauth'
 };
 
 var layout = {
@@ -7407,6 +7411,83 @@ var current$1 = {
   }
 };
 
+/**
+     * Array.indexOf
+     */
+    function indexOf$1(arr, item, fromIndex) {
+        fromIndex = fromIndex || 0;
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length,
+            i = fromIndex < 0 ? len + fromIndex : fromIndex;
+        while (i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[i] === item) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    var indexOf_1$1 = indexOf$1;
+
+/**
+     * Combines an array with all the items of another.
+     * Does not allow duplicates and is case and type sensitive.
+     */
+    function combine$1(arr1, arr2) {
+        if (arr2 == null) {
+            return arr1;
+        }
+
+        var i = -1, len = arr2.length;
+        while (++i < len) {
+            if (indexOf_1$1(arr1, arr2[i]) === -1) {
+                arr1.push(arr2[i]);
+            }
+        }
+
+        return arr1;
+    }
+    var combine_1$1 = combine$1;
+
+/**
+     * Returns the index of the first item that matches criteria
+     */
+    function findIndex$1(arr, iterator, thisObj){
+        iterator = makeIterator_$1(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (iterator(arr[i], i, arr)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    var findIndex_1$1 = findIndex$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$1(arr, iterator, thisObj){
+        var idx = findIndex_1$1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var find_1$1 = find$1;
+
 var viron$1 = {
   /**
    * @param {riotx.Context} context
@@ -7414,6 +7495,20 @@ var viron$1 = {
    * @return {Array}
    */
   all: (context, viron) => {
+    // メニューのカテゴライズ。下位互換のため、dashboardとmanageは必須項目とする。
+    if (!!viron) {
+      viron.sections = viron.sections || [];
+      if (!find_1$1(viron.sections, section => {
+        return (section.id === 'manage');
+      })) {
+        viron.sections = combine_1$1([{ id: 'manage', label: '管理画面' }], viron.sections);
+      }
+      if (!find_1$1(viron.sections, section => {
+        return (section.id === 'dashboard');
+      })) {
+        viron.sections = combine_1$1([{ id: 'dashboard', label: 'ダッシュボード' }], viron.sections);
+      }
+    }
     context.state.viron = viron;
     return [constants$3.VIRON];
   }
@@ -7569,7 +7664,7 @@ var drawers$1 = {
 /**
      * Returns first item that matches criteria
      */
-    function find$1(obj, callback, thisObj) {
+    function find$3(obj, callback, thisObj) {
         callback = makeIterator_$1(callback, thisObj);
         var result;
         some_1$1(obj, function(value, key, obj) {
@@ -7581,7 +7676,7 @@ var drawers$1 = {
         return result;
     }
 
-    var find_1$1 = find$1;
+    var find_1$2 = find$3;
 
 'use strict';
 
@@ -8020,7 +8115,7 @@ var endpoints$1 = {
     let modifiedEndpoints = objectAssign({}, context.state.endpoints);
 
     forOwn_1$1(endpoints, endpoint => {
-      let duplicatedEndpoint = find_1$1(modifiedEndpoints, val => {
+      let duplicatedEndpoint = find_1$2(modifiedEndpoints, val => {
         return endpoint.url === val.url;
       });
 
@@ -9049,6 +9144,61 @@ var viron$2 = {
       }
       return true;
     }));
+  },
+
+  /**
+   * メニュー内容を返します。
+   * @param {riot.Context} context
+   * @return {Array}
+   */
+  menu: context => {
+    const menu = [];
+    if (!context.state.viron || !context.state.viron.sections) {
+      return menu;
+    }
+    const sections = context.state.viron.sections;
+    forEach_1$1(sections, section => {
+      menu.push({
+        name: section.label || section.id,
+        id: section.id,
+        groups: []
+      });
+    });
+    const pages = context.state.viron.pages;
+    forEach_1$1(pages, page => {
+      const targetSection = find_1$1(menu, section => {
+        return (section.id === page.section);
+      });
+      const groupName = page.group;
+      const isIndependent = !groupName;
+      if (isIndependent) {
+        targetSection.groups.push({
+          pages: [{
+            name: page.name,
+            id: page.id
+          }],
+          isIndependent
+        });
+      } else {
+        if (!find_1$1(targetSection.groups, group => {
+          return (group.name === groupName);
+        })) {
+          targetSection.groups.push({
+            name: groupName,
+            pages: [],
+            isIndependent
+          });
+        }
+        const targetGroup = find_1$1(targetSection.groups, group => {
+          return (group.name === groupName);
+        });
+        targetGroup.pages.push({
+          name: page.name,
+          id: page.id
+        });
+      }
+    });
+    return menu;
   }
 };
 
@@ -9233,7 +9383,7 @@ var endpoints$2 = {
    */
   oneByURL: (context, url) => {
     const endpoints = context.state.endpoints;
-    return find_1$1(endpoints, endpoint => {
+    return find_1$2(endpoints, endpoint => {
       return endpoint.url === url;
     });
   }
@@ -9835,6 +9985,7 @@ const constants$5 = {
   VIRON_NAME: 'VIRON_NAME',
   VIRON_DASHBOARD: 'VIRON_DASHBOARD',
   VIRON_MANAGE: 'VIRON_MANAGE',
+  VIRON_MENU: 'VIRON_MENU',
   DRAWERS: 'DRAWERS',
   ENDPOINTS: 'ENDPOINTS',
   ENDPOINTS_BY_ORDER: 'ENDPOINTS_BY_ORDER',
@@ -9915,6 +10066,7 @@ var getters = {
   [constants$5.VIRON_NAME]: viron$2.name,
   [constants$5.VIRON_DASHBOARD]: viron$2.dashboard,
   [constants$5.VIRON_MANAGE]: viron$2.manage,
+  [constants$5.VIRON_MENU]: viron$2.menu,
   [constants$5.DRAWERS]: drawers$2.all,
   [constants$5.ENDPOINTS]: endpoints$2.all,
   [constants$5.ENDPOINTS_BY_ORDER]: endpoints$2.allByOrder,
@@ -11605,7 +11757,7 @@ var page$3 = {
       .resolve()
       .then(() => {
         const pages = context.getter(constants$5.VIRON_PAGES);
-        const page = find_1$1(pages, page => {
+        const page = find_1$2(pages, page => {
           return (page.id === pageId);
         });
         context.commit(constants$2.PAGE, page);
@@ -12292,13 +12444,169 @@ var actions = {
 };
 
 var script = function() {
+  const updateText = () => {
+    const json = JSON.stringify(this.opts.data, undefined, 4);
+    let text = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    text = text.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+      let cls = 'number';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'key';
+        } else {
+          cls = 'string';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'boolean';
+      } else if (/null/.test(match)) {
+        cls = 'null';
+      }
+      return '<span class="Prettyprint__' + cls + '">' + match + '</span>';
+    });
+    this.refs.canvas.innerHTML = text;
+  };
+
+  this.on('mount', () => {
+    updateText();
+  }).on('updated', () => {
+    updateText();
+  });
 };
 
-riot$1.tag2('viron-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {opts.class}"', function(opts) {
+riot$1.tag2('viron-prettyprint', '<pre class="Prettyprint__canvas" ref="canvas"></pre>', '', 'class="Prettyprint"', function(opts) {
     this.external(script);
 });
 
 var script$1 = function() {
+  // タイトル。
+  this.title = this.opts.title;
+  // メッセージ。
+  this.message = this.opts.message;
+  // errorが渡された場合は最適化処理を行う。
+  if (!!this.opts.error) {
+    this.title = this.title || this.opts.error.name || this.opts.error.statusText || 'Error';
+    this.message = this.message || this.opts.error.message;
+  }
+
+  // prettyprintで表示させる内容。
+  this.detail = null;
+
+  this.on('mount', () => {
+    // エラーがPromiseであれば解析する。
+    const error = this.opts.error;
+    if (!error) {
+      return;
+    }
+    if (error instanceof Error) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        if (!!error.json) {
+          return error.json();
+        }
+        return error.text().then(text => JSON.parse(text));
+      })
+      .then(json => {
+        const error = json.error;
+        this.detail = error;
+        !this.opts.title && !!error.name && (this.title = error.name);
+        !this.opts.message && !!error.data && !!error.data.message && (this.message = error.data.message);
+        this.update();
+      })
+      .catch(() => {
+        // do nothing on purpose.
+        return Promise.resolve();
+      });
+  });
+};
+
+riot$1.tag2('viron-error', '<div class="Error__title">{title}</div> <div class="Error__message" if="{!!message}">{message}</div> <viron-prettyprint if="{!!detail}" data="{detail}"></viron-prettyprint>', '', 'class="Error"', function(opts) {
+    this.external(script$1);
+});
+
+var EndpointsRoute = {
+  /**
+   * ページ遷移前の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @param {Function} replace
+   * @return {Promise}
+   */
+  onBefore: store => {
+    return Promise
+      .resolve()
+      .then(() => Promise.all([
+        store.action(constants$1.CURRENT_REMOVE),
+        store.action(constants$1.PAGE_REMOVE),
+        store.action(constants$1.OAS_CLEAR),
+        store.action(constants$1.VIRON_REMOVE)
+      ]))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+        error: err
+      }));
+  },
+
+  /**
+   * ページ遷移時の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @return {Promise}
+   */
+  onEnter: (store, route) => {
+    return store.action(constants$1.LOCATION_UPDATE, {
+      name: 'endpoints',
+      route
+    });
+  }
+};
+
+var OauthredirectRoute = {
+  /**
+   * ページ遷移前の処理。
+   * @param {riotx.Store} store
+   * @param {Object} route
+   * @param {Function} replace
+   * @return {Promise}
+   */
+  onBefore: (store, route, replace) => {
+    const endpointKey = route.params.endpointKey;
+    const token = route.queries.token;
+    // tokenが存在したらOAuth認証成功とする。
+    const isAuthorized = !!token;
+    let to;
+    const tasks = [];
+    if (isAuthorized) {
+      to = `/${endpointKey}`;
+      tasks.push(store.action(constants$1.AUTH_UPDATE, endpointKey, decodeURIComponent(token)));
+    } else {
+      to = '/';
+      tasks.push(store.action(constants$1.AUTH_REMOVE, endpointKey));
+      tasks.push(store.action(constants$1.MODALS_ADD, 'viron-error', {
+        title: '認証失敗',
+        message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
+      }));
+    }
+
+    return Promise
+      .all(tasks)
+      .then(() => {
+        replace(to);
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+        error: err
+      }));
+  }
+};
+
+var script$2 = function() {
+};
+
+riot$1.tag2('viron-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {opts.class}"', function(opts) {
+    this.external(script$2);
+});
+
+var script$3 = function() {
   const updateText = () => {
     const json = JSON.stringify(this.opts.data, undefined, 4);
     let text = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -12328,10 +12636,10 @@ var script$1 = function() {
 };
 
 riot$1.tag2('viron-prettyprint', '<pre class="PrettyPrint__pre" ref="canvas"></pre>', '', 'class="PrettyPrint {opts.class}"', function(opts) {
-    this.external(script$1);
+    this.external(script$3);
 });
 
-var script$2 = function() {
+var script$4 = function() {
   // タイプ。
   this.type = this.opts.type || 'info';
   // iconの種類。
@@ -12396,7 +12704,7 @@ var script$2 = function() {
 };
 
 riot$1.tag2('viron-message', '<div class="Message__head"> <div class="Message__icon"> <viron-icon type="{icon}"></viron-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message}">{message}</div> <viron-prettyprint class="Message__error" if="{!!detail}" data="{detail}"></viron-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
-    this.external(script$2);
+    this.external(script$4);
 });
 
 var ComponentsRoute = {
@@ -12513,42 +12821,6 @@ var EndpointimportRoute = {
   }
 };
 
-var EndpointsRoute = {
-  /**
-   * ページ遷移前の処理。
-   * @param {riotx.Store} store
-   * @param {Object} route
-   * @param {Function} replace
-   * @return {Promise}
-   */
-  onBefore: store => {
-    return Promise
-      .resolve()
-      .then(() => Promise.all([
-        store.action(constants$1.CURRENT_REMOVE),
-        store.action(constants$1.PAGE_REMOVE),
-        store.action(constants$1.OAS_CLEAR),
-        store.action(constants$1.VIRON_REMOVE)
-      ]))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
-        error: err
-      }));
-  },
-
-  /**
-   * ページ遷移時の処理。
-   * @param {riotx.Store} store
-   * @param {Object} route
-   * @return {Promise}
-   */
-  onEnter: (store, route) => {
-    return store.action(constants$1.LOCATION_UPDATE, {
-      name: 'endpoints',
-      route
-    });
-  }
-};
-
 var NotfoundRoute = {
   /**
    * ページ遷移時の処理。
@@ -12561,44 +12833,6 @@ var NotfoundRoute = {
       name: 'notfound',
       route
     });
-  }
-};
-
-var OauthredirectRoute = {
-  /**
-   * ページ遷移前の処理。
-   * @param {riotx.Store} store
-   * @param {Object} route
-   * @param {Function} replace
-   * @return {Promise}
-   */
-  onBefore: (store, route, replace) => {
-    const endpointKey = route.params.endpointKey;
-    const token = route.queries.token;
-    // tokenが存在したらOAuth認証成功とする。
-    const isAuthorized = !!token;
-    let to;
-    const tasks = [];
-    if (isAuthorized) {
-      to = `/${endpointKey}`;
-      tasks.push(store.action(constants$1.AUTH_UPDATE, endpointKey, decodeURIComponent(token)));
-    } else {
-      to = '/';
-      tasks.push(store.action(constants$1.AUTH_REMOVE, endpointKey));
-      tasks.push(store.action(constants$1.MODALS_ADD, 'viron-message', {
-        title: '認証失敗',
-        message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
-      }));
-    }
-
-    return Promise
-      .all(tasks)
-      .then(() => {
-        replace(to);
-      })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
-        error: err
-      }));
   }
 };
 
@@ -14249,7 +14483,7 @@ var store$1 = {
   }
 };
 
-var script$3 = function() {
+var script$5 = function() {
   this.getBasePages = () => {
     const size = this.opts.size;
     const currentPage = this.opts.currentpage;
@@ -14314,10 +14548,10 @@ var script$3 = function() {
 };
 
 riot$1.tag2('viron-pagination', '<div class="Pagination__control"> <div class="Pagination__button {opts.currentpage === 1 ? \'Pagination__button--disabled\' : \'\'}" onclick="{handlePrevButtonClick}"> <viron-icon type="left"></viron-icon> </div> <div class="Pagination__button" if="{getBasePages()[0].num !== 1}" data-page="1" onclick="{handlePageButtonClick}">1</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[0].num &gt;= 3}" onclick="{handleRecedeButtonClick}"> <viron-icon class="Pagination__ellipsisIcon" type="ellipsis"></viron-icon> <viron-icon class="Pagination__recedeIcon" type="doubleLeft"></viron-icon> </div> <div class="Pagination__button {page.isSelected ? \'Pagination__button--selected\' : \'\'}" each="{page in getBasePages()}" data-page="{page.num}" onclick="{parent.handlePageButtonClick}">{page.num}</div> <div class="Pagination__button Pagination__button--moderate" if="{getBasePages()[getBasePages().length - 1].num &lt;= opts.maxpage - 2}" onclick="{handleProceedButtonClick}"> <viron-icon class="Pagination__ellipsisIcon" type="ellipsis"></viron-icon> <viron-icon class="Pagination__proceedIcon" type="doubleRight"></viron-icon> </div> <div class="Pagination__button" if="{getBasePages()[getBasePages().length - 1].num !== opts.maxpage}" data-page="{opts.maxpage}" onclick="{handlePageButtonClick}">{opts.maxpage}</div> <div class="Pagination__button {opts.currentpage === opts.maxpage ? \'Pagination__button--disabled\' : \'\'}" onclick="{handleNextButtonClick}"> <viron-icon type="right"></viron-icon> </div> </div>', '', 'class="Pagination {opts.class}"', function(opts) {
-    this.external(script$3);
+    this.external(script$5);
 });
 
-var script$4 = function() {
+var script$6 = function() {
   this.handleClick = () => {
     if (this.opts.isdisabled) {
       return;
@@ -14327,7 +14561,7 @@ var script$4 = function() {
 };
 
 riot$1.tag2('viron-button_', '<div class="Button__content"> <div class="Button__icon" if="{!!opts.icon}"> <viron-icon type="{opts.icon}"></viron-icon> </div> <div class="Button__label">{opts.label}</div> </div>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" onclick="{handleClick}"', function(opts) {
-    this.external(script$4);
+    this.external(script$6);
 });
 
 /**
@@ -14346,7 +14580,7 @@ var UNDEF$1;
     }
     var isUndefined = isUndef;
 
-var script$6 = function() {
+var script$8 = function() {
   const store = this.riotx.get();
 
   this.options = [];
@@ -14415,10 +14649,10 @@ var script$6 = function() {
 };
 
 riot$1.tag2('viron-autocomplete', '<div class="Autocomplete__label" if="{!!opts.label}">{opts.label}</div> <form onsubmit="{handleFormSubmit}"> <input class="Autocomplete__input" type="text" ref="input" list="{_riot_id}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form> <datalist id="{_riot_id}"> <option each="{opt in options}" riot-value="{opt.value}">{opt.name}</option> </datalist>', '', 'class="Autocomplete {\'Textinput--disabled\' : opts.isdisabled}"', function(opts) {
-    this.external(script$6);
+    this.external(script$8);
 });
 
-var script$7 = function() {
+var script$9 = function() {
   this.handleClick = () => {
     if (this.opts.isdisabled) {
       return;
@@ -14428,7 +14662,7 @@ var script$7 = function() {
 };
 
 riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon type="check"></viron-icon> </div> <virtual if="{!!opts.label}"> <div class="Checkbox__label">{opts.label}</div> </virtual> </div>', '', 'class="Checkbox {opts.ischecked ? \'Checkbox--checked\' : \'\'} {opts.isdisabled ? \'Checkbox--disabled\' : \'\'}" onclick="{handleClick}"', function(opts) {
-    this.external(script$7);
+    this.external(script$9);
 });
 
 var beautify = createCommonjsModule(function (module, exports) {
@@ -18993,7 +19227,7 @@ function ocd(str, options) {
     .replace(/>(\s*)(?=<!--\s*\/)/g, '> ');
 }
 
-var script$8 = function() {
+var script$10 = function() {
   this.getBeautifiedHtml = () => {
     const data = this.opts.data;
     if (!data) {
@@ -19004,7 +19238,7 @@ var script$8 = function() {
 };
 
 riot$1.tag2('viron-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="Prettyhtml"', function(opts) {
-    this.external(script$8);
+    this.external(script$10);
 });
 
 /**
@@ -19014,7 +19248,7 @@ riot$1.tag2('viron-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="
     }
     var isString_1 = isString;
 
-var script$9 = function() {
+var script$11 = function() {
   /**
    * undefined等の値を考慮した最適な値を返します。
    * @param {String|null} value
@@ -19061,10 +19295,10 @@ var script$9 = function() {
 };
 
 riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\' : opts.isdisabled}" onclick="{handleClick}"', function(opts) {
-    this.external(script$9);
+    this.external(script$11);
 });
 
-var script$10 = function() {
+var script$12 = function() {
   // 各タブの選択状態。
   this.isTabEditorSelected = true;
   this.isTabPreviewSelected = false;
@@ -19121,7 +19355,7 @@ var script$10 = function() {
 };
 
 riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\' : isTabEditorSelected}" onclick="{handleTabEditorClick}">editor</div> <div class="Html__tab {\'Html__tab--selected\' : isTabPreviewSelected}" onclick="{handleTabPreviewClick}">preview</div> </div> <div class="Html__body"> <div class="Html__message Html__message--{compileHtml().status}" if="{compileHtml().status === \'failed\'}">{compileHtml().message}</div> <div class="Html__editor" if="{isTabEditorSelected}"> <viron-textarea text="{opts.text}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}"></viron-textarea> </div> <div class="Html__preview" if="{isTabPreviewSelected}"> <viron-prettyhtml data="{compileHtml().html}"></viron-prettyhtml> </div> </div>', '', 'class="Html"', function(opts) {
-    this.external(script$10);
+    this.external(script$12);
 });
 
 /**
@@ -19147,7 +19381,7 @@ riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Htm
 
     var _isNaN = isNaN$1;
 
-var script$11 = function() {
+var script$13 = function() {
   /**
    * moutの`isNumber`のラッパー関数。
    * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
@@ -19352,13 +19586,13 @@ var script$11 = function() {
 };
 
 riot$1.tag2('viron-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" onsubmit="{handleFormSubmit}" onkeydown="{handleFormKeyDown}"> <input class="Numberinput__input" ref="input" riot-value="{normalizeValue(opts.number)}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> <div class="Numberinput__handler"> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : (opts.isdisabled || !isIncrementable())}" onclick="{handleIncreaseButtonClick}"> <viron-icon type="caretUp"></viron-icon> </div> <div class="Numberinput__handlerButton {\'Numberinput__handlerButton--disabled\' : (opts.isdisabled || !isDecrementable())}" onclick="{handleDecreaseButtonClick}"> <viron-icon type="caretDown"></viron-icon> </div> </div> </form>', '', 'class="Numberinput {\'Numberinput--disabled\' : opts.isdisabled}"', function(opts) {
-    this.external(script$11);
+    this.external(script$13);
 });
 
 // NOTE: ブラウザ上でpugを動かすためには`https://pugjs.org/js/pug.js`を使用する必要がある。
 const pug = window.require && window.require('pug');
 
-var script$12 = function() {
+var script$14 = function() {
   // 各タブの選択状態。
   this.isTabEditorSelected = true;
   this.isTabPreviewSelected = false;
@@ -19415,10 +19649,10 @@ var script$12 = function() {
 };
 
 riot$1.tag2('viron-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\' : isTabEditorSelected}" onclick="{handleTabEditorClick}">editor</div> <div class="Pug__tab {\'Pug__tab--selected\' : isTabPreviewSelected}" onclick="{handleTabPreviewClick}">preview</div> </div> <div class="Pug__body"> <div class="Pug__message Pug__message--{compilePug().status}" if="{compilePug().status === \'failed\'}">{compilePug().message}</div> <div class="Pug__editor" if="{isTabEditorSelected}"> <viron-textarea text="{opts.text}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}"></viron-textarea> </div> <div class="Pug__preview" if="{isTabPreviewSelected}"> <viron-prettyhtml data="{compilePug().html}"></viron-prettyhtml> </div> </div>', '', 'class="Pug"', function(opts) {
-    this.external(script$12);
+    this.external(script$14);
 });
 
-var script$13 = function() {
+var script$15 = function() {
   this.handleFormSubmit = e => {
     e.preventUpdate = true;
     e.preventDefault();
@@ -19448,10 +19682,10 @@ var script$13 = function() {
 };
 
 riot$1.tag2('viron-select', '<div class="Select__label" if="{!!opts.label || opts.isrequired}">{opts.label}{(opts.isrequired !== undefined) ? \' *\' : \'\'}</div> <form class="Select__content" onsubmit="{handleFormSubmit}"> <select class="Select__input" disabled="{!!opts.isdisabled}" ref="select" oninput="{handleInputInput}" onchange="{handleInputChange}"> <option each="{option in opts.options}" selected="{option.isSelected}" disabled="{option.isDisabled}">{option.label}</option> </select> <div class="Select__icon"> <viron-icon type="down"></viron-icon> </div> </form>', '', 'class="Select {\'Select--disabled\' : opts.isdisabled}"', function(opts) {
-    this.external(script$13);
+    this.external(script$15);
 });
 
-var script$14 = function() {
+var script$16 = function() {
   /**
    * undefined等の値を考慮した最適な値を返します。
    * @param {String|null} value
@@ -19497,11 +19731,11 @@ var script$14 = function() {
   };
 };
 
-riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--ghost\' : (opts.theme === \'ghost\'), \'Textinput--disabled\' : opts.isdisabled}" onclick="{handleClick}"', function(opts) {
-    this.external(script$14);
+riot$1.tag2('viron-textinputtt', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--ghost\' : (opts.theme === \'ghost\'), \'Textinput--disabled\' : opts.isdisabled}" onclick="{handleClick}"', function(opts) {
+    this.external(script$16);
 });
 
-var script$15 = function() {
+var script$17 = function() {
   this.inputId = `Uploader__input${Date.now()}`;
   this.file = null;
   this.fileName = null;
@@ -19580,7 +19814,7 @@ var script$15 = function() {
 };
 
 riot$1.tag2('viron-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{!!opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <viron-icon type="file"></viron-icon> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfImage}" riot-style="background-image:url({blobURL});"></div> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" onclick="{handleResetButtonClick}"> <viron-icon type="close"></viron-icon> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--disabled\' : opts.isdisabled, \'Uploader--dragWatching\' : isDragWatching}" onchange="{handleChange}"', function(opts) {
-    this.external(script$15);
+    this.external(script$17);
 });
 
 // TODO: node_moduleから読み込みたい。
@@ -20156,7 +20390,7 @@ const customizeBlot = (blotName, params) => {
   }
 };
 
-var script$16 = function() {
+var script$18 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20213,10 +20447,10 @@ var script$16 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-align-center', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="15" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="14" x2="4" y1="14" y2="14"></line> <line class="ql-stroke" x1="12" x2="6" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignCenter {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$16);
+    this.external(script$18);
 });
 
-var script$17 = function() {
+var script$19 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20273,10 +20507,10 @@ var script$17 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-align-left', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="3" x2="13" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="9" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignLeft {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$17);
+    this.external(script$19);
 });
 
-var script$18 = function() {
+var script$20 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20333,10 +20567,10 @@ var script$18 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-align-right', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="15" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="15" x2="5" y1="14" y2="14"></line> <line class="ql-stroke" x1="15" x2="9" y1="4" y2="4"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__alignRight {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$18);
+    this.external(script$20);
 });
 
-var script$19 = function() {
+var script$21 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20393,10 +20627,10 @@ var script$19 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-blockquote', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <rect class="ql-fill ql-stroke" height="3" width="3" x="4" y="5"></rect> <rect class="ql-fill ql-stroke" height="3" width="3" x="11" y="5"></rect> <path class="ql-even ql-fill ql-stroke" d="M7,8c0,4.031-3,5-3,5"></path> <path class="ql-even ql-fill ql-stroke" d="M14,8c0,4.031-3,5-3,5"></path> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__blockquote {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$19);
+    this.external(script$21);
 });
 
-var script$20 = function() {
+var script$22 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20453,10 +20687,10 @@ var script$20 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-codeblock', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <polyline class="ql-even ql-stroke" points="5 7 3 9 5 11"></polyline> <polyline class="ql-even ql-stroke" points="13 7 15 9 13 11"></polyline> <line class="ql-stroke" x1="10" x2="8" y1="5" y2="13"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__codeblock {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$20);
+    this.external(script$22);
 });
 
-var script$21 = function() {
+var script$23 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20514,10 +20748,10 @@ var script$21 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-direction', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg if="{!isActive}" viewbox="0 0 18 18"> <polygon class="ql-stroke ql-fill" points="3 11 5 9 3 7 3 11"></polygon> <line class="ql-stroke ql-fill" x1="15" x2="11" y1="4" y2="4"></line> <path class="ql-fill" d="M11,3a3,3,0,0,0,0,6h1V3H11Z"></path> <rect class="ql-fill" height="11" width="1" x="11" y="4"></rect> <rect class="ql-fill" height="11" width="1" x="13" y="4"></rect> </svg> <svg if="{isActive}" viewbox="0 0 18 18"> <polygon class="ql-stroke ql-fill" points="15 12 13 10 15 8 15 12"></polygon> <line class="ql-stroke ql-fill" x1="9" x2="5" y1="4" y2="4"></line> <path class="ql-fill" d="M5,3A3,3,0,0,0,5,9H6V3H5Z"></path> <rect class="ql-fill" height="11" width="1" x="5" y="4"></rect> <rect class="ql-fill" height="11" width="1" x="7" y="4"></rect> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__direction {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$21);
+    this.external(script$23);
 });
 
-var script$22 = function() {
+var script$24 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20575,10 +20809,10 @@ var script$22 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-header', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="3" y1="4" y2="14"></line> <line class="ql-stroke" x1="11" x2="11" y1="4" y2="14"></line> <line class="ql-stroke" x1="11" x2="3" y1="9" y2="9"></line> </svg> <div class="Wyswyg__headerLevel">{opts.level}</div> </div>', '', 'class="Wyswyg__tool Wyswyg__header {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$22);
+    this.external(script$24);
 });
 
-var script$23 = function() {
+var script$25 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20636,10 +20870,10 @@ var script$23 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-image', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <rect class="ql-stroke" height="10" width="12" x="3" y="4"></rect> <circle class="ql-fill" cx="6" cy="7" r="1"></circle> <polyline class="ql-even ql-fill" points="5 12 5 11 7 9 8 10 11 7 13 9 13 12 5 12"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__image {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$23);
+    this.external(script$25);
 });
 
-var script$24 = function() {
+var script$26 = function() {
   /**
    * タップ領域がタップされた時の処理。
    */
@@ -20650,10 +20884,10 @@ var script$24 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-indent-left', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="9" x2="15" y1="9" y2="9"></line> <polyline class="ql-stroke" points="5 7 5 11 3 9 5 7"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__indentLeft"', function(opts) {
-    this.external(script$24);
+    this.external(script$26);
 });
 
-var script$25 = function() {
+var script$27 = function() {
   /**
    * タップ領域がタップされた時の処理。
    */
@@ -20664,10 +20898,10 @@ var script$25 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-indent-right', '<div class="Wyswyg__toolInner" onclick="handleInnerClick"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="3" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="9" x2="15" y1="9" y2="9"></line> <polyline class="ql-fill ql-stroke" points="3 7 3 11 5 9 3 7"></polyline> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__indentRight"', function(opts) {
-    this.external(script$25);
+    this.external(script$27);
 });
 
-var script$26 = function() {
+var script$28 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20725,10 +20959,10 @@ var script$26 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-list-bullet', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="6" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="6" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="6" x2="15" y1="14" y2="14"></line> <line class="ql-stroke" x1="3" x2="3" y1="4" y2="4"></line> <line class="ql-stroke" x1="3" x2="3" y1="9" y2="9"></line> <line class="ql-stroke" x1="3" x2="3" y1="14" y2="14"></line> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__listBullet {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$26);
+    this.external(script$28);
 });
 
-var script$27 = function() {
+var script$29 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20786,10 +21020,10 @@ var script$27 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-list-ordered', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <line class="ql-stroke" x1="7" x2="15" y1="4" y2="4"></line> <line class="ql-stroke" x1="7" x2="15" y1="9" y2="9"></line> <line class="ql-stroke" x1="7" x2="15" y1="14" y2="14"></line> <line class="ql-stroke ql-thin" x1="2.5" x2="4.5" y1="5.5" y2="5.5"></line> <path class="ql-fill" d="M3.5,6A0.5,0.5,0,0,1,3,5.5V3.085l-0.276.138A0.5,0.5,0,0,1,2.053,3c-0.124-.247-0.023-0.324.224-0.447l1-.5A0.5,0.5,0,0,1,4,2.5v3A0.5,0.5,0,0,1,3.5,6Z"></path> <path class="ql-stroke ql-thin" d="M4.5,10.5h-2c0-.234,1.85-1.076,1.85-2.234A0.959,0.959,0,0,0,2.5,8.156"></path> <path class="ql-stroke ql-thin" d="M2.5,14.846a0.959,0.959,0,0,0,1.85-.109A0.7,0.7,0,0,0,3.75,14a0.688,0.688,0,0,0,.6-0.736,0.959,0.959,0,0,0-1.85-.109"></path> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__listOrdered {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$27);
+    this.external(script$29);
 });
 
-var script$28 = function() {
+var script$30 = function() {
   // formatが適用中か否か。
   this.isActive = false;
 
@@ -20847,10 +21081,10 @@ var script$28 = function() {
 };
 
 riot$1.tag2('viron-wyswyg-tool-video', '<div class="Wyswyg__toolInner" onclick="{handleInnerClick}"> <svg viewbox="0 0 18 18"> <rect class="ql-stroke" height="12" width="12" x="3" y="3"></rect> <rect class="ql-fill" height="12" width="1" x="5" y="3"></rect> <rect class="ql-fill" height="12" width="1" x="12" y="3"></rect> <rect class="ql-fill" height="2" width="8" x="5" y="8"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="5"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="7"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="10"></rect> <rect class="ql-fill" height="1" width="3" x="3" y="12"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="5"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="7"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="10"></rect> <rect class="ql-fill" height="1" width="3" x="12" y="12"></rect> </svg> </div>', '', 'class="Wyswyg__tool Wyswyg__video {isActive ? \'Wyswyg__tool--active\' : \'\'}"', function(opts) {
-    this.external(script$28);
+    this.external(script$30);
 });
 
-var script$29 = function() {
+var script$31 = function() {
   const blotOptions = this.opts.blotoptions || {};
 
   // quillインスタンス。
@@ -21017,39 +21251,8 @@ var script$29 = function() {
 };
 
 riot$1.tag2('viron-wyswyg', '<div class="Wyswyg__toolbar"> <viron-wyswyg-tool-image if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-image> <viron-wyswyg-tool-video if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-video> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{1}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{2}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{3}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{4}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{5}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-header if="{!!quill}" quill="{quill}" level="{6}"></viron-wyswyg-tool-header> <viron-wyswyg-tool-list-ordered if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-list-ordered> <viron-wyswyg-tool-list-bullet if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-list-bullet> <viron-wyswyg-tool-indent-left if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-indent-left> <viron-wyswyg-tool-indent-right if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-indent-right> <viron-wyswyg-tool-align-left if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-align-left> <viron-wyswyg-tool-align-center if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-align-center> <viron-wyswyg-tool-align-right if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-align-right> <viron-wyswyg-tool-direction if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-direction> <viron-wyswyg-tool-blockquote if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-blockquote> <viron-wyswyg-tool-codeblock if="{!!quill}" quill="{quill}"></viron-wyswyg-tool-codeblock> </div> <div class="Wyswyg__editor" ref="editor"></div>', '', 'class="Wyswyg {\'Wyswyg--bubbled\' : isBubbled, \'Wyswyg--disabled\' : opts.isdisabled}"', function(opts) {
-    this.external(script$29);
+    this.external(script$31);
 });
-
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex$1(arr, iterator, thisObj){
-        iterator = makeIterator_$1(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (iterator(arr[i], i, arr)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    var findIndex_1$1 = findIndex$1;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$3(arr, iterator, thisObj){
-        var idx = findIndex_1$1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var find_1$2 = find$3;
 
 const UI_TEXTINPUT = 'textinput';
 const UI_TEXTAREA = 'textarea';
@@ -21063,7 +21266,7 @@ const UI_PUG = 'pug';
 const UI_NULL = 'null';
 const UI_AUTOCOMPLETE = 'autocomplete';
 
-var script$30 = function() {
+var script$32 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const schemaObject = objectAssign({}, this.opts.schemaobject);
 
@@ -21207,7 +21410,7 @@ var script$30 = function() {
 
   // select値が変更された時の処理。
   this.handleSelectChange = options => {
-    const option = find_1$2(options, option => {
+    const option = find_1$1(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -21265,7 +21468,7 @@ var script$30 = function() {
 };
 
 riot$1.tag2('viron-parameter-form', '<div class="ParameterForm__body"> <virtual if="{uiType === \'textinput\'}"> <viron-textinput text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextinputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleTextareaChange}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput number="{opts.val}" isdisabled="{isDisabled}" onchange="{handleNumberinputChange}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" isdisabled="{isDisabled}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" isdisabled="{isDisabled}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="*" isdisabled="{isDisabled}" onfilechange="{handleUploaderFileChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg blotoptions="{blotOptions}" initialinnerhtml="{opts.val}" isdisabled="{isDisabled}" ontextchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug text="{opts.val}" isdisabled="{isDisabled}" onchange="{handlePugChange}"></viron-pug> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html text="{opts.val}" isdisabled="{isDisabled}" onchange="{handleHtmlChange}"></viron-html> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" config="{autocompleteConfig}" onchange="{handleAutocompleteChange}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'null\'}"> <div>null</div> </virtual> </div>', '', '', function(opts) {
-    this.external(script$30);
+    this.external(script$32);
 });
 
 /**
@@ -22119,12 +22322,12 @@ function mod(n, x) {
     return ((n % x) + x) % x;
 }
 
-var indexOf$1;
+var indexOf$3;
 
 if (Array.prototype.indexOf) {
-    indexOf$1 = Array.prototype.indexOf;
+    indexOf$3 = Array.prototype.indexOf;
 } else {
-    indexOf$1 = function (o) {
+    indexOf$3 = function (o) {
         // I know
         var i;
         for (i = 0; i < this.length; ++i) {
@@ -22231,26 +22434,26 @@ function handleStrictParse(monthName, format, strict) {
 
     if (strict) {
         if (format === 'MMM') {
-            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            ii = indexOf$3.call(this._shortMonthsParse, llc);
             return ii !== -1 ? ii : null;
         } else {
-            ii = indexOf$1.call(this._longMonthsParse, llc);
+            ii = indexOf$3.call(this._longMonthsParse, llc);
             return ii !== -1 ? ii : null;
         }
     } else {
         if (format === 'MMM') {
-            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            ii = indexOf$3.call(this._shortMonthsParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf$1.call(this._longMonthsParse, llc);
+            ii = indexOf$3.call(this._longMonthsParse, llc);
             return ii !== -1 ? ii : null;
         } else {
-            ii = indexOf$1.call(this._longMonthsParse, llc);
+            ii = indexOf$3.call(this._longMonthsParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf$1.call(this._shortMonthsParse, llc);
+            ii = indexOf$3.call(this._shortMonthsParse, llc);
             return ii !== -1 ? ii : null;
         }
     }
@@ -22676,48 +22879,48 @@ function handleStrictParse$1(weekdayName, format, strict) {
 
     if (strict) {
         if (format === 'dddd') {
-            ii = indexOf$1.call(this._weekdaysParse, llc);
+            ii = indexOf$3.call(this._weekdaysParse, llc);
             return ii !== -1 ? ii : null;
         } else if (format === 'ddd') {
-            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            ii = indexOf$3.call(this._shortWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         } else {
-            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            ii = indexOf$3.call(this._minWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         }
     } else {
         if (format === 'dddd') {
-            ii = indexOf$1.call(this._weekdaysParse, llc);
+            ii = indexOf$3.call(this._weekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            ii = indexOf$3.call(this._shortWeekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            ii = indexOf$3.call(this._minWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         } else if (format === 'ddd') {
-            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            ii = indexOf$3.call(this._shortWeekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf$1.call(this._weekdaysParse, llc);
+            ii = indexOf$3.call(this._weekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            ii = indexOf$3.call(this._minWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         } else {
-            ii = indexOf$1.call(this._minWeekdaysParse, llc);
+            ii = indexOf$3.call(this._minWeekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf$1.call(this._weekdaysParse, llc);
+            ii = indexOf$3.call(this._weekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
+            ii = indexOf$3.call(this._shortWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         }
     }
@@ -23962,7 +24165,7 @@ var ordering = ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute', 'se
 
 function isDurationValid(m) {
     for (var key in m) {
-        if (!(indexOf$1.call(ordering, key) !== -1 && (m[key] == null || !isNaN(m[key])))) {
+        if (!(indexOf$3.call(ordering, key) !== -1 && (m[key] == null || !isNaN(m[key])))) {
             return false;
         }
     }
@@ -26883,7 +27086,7 @@ var oas$4 = {
   }
 };
 
-var script$31 = function() {
+var script$33 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const schemaObject = objectAssign({}, this.opts.schemaobject);
   this.schemaObject = schemaObject;
@@ -27154,10 +27357,10 @@ var script$31 = function() {
 };
 
 riot$1.tag2('viron-parameter-schema', '<div class="ParameterSchema__head"> <div class="ParameterSchema__caption"> <div class="ParameterSchema__bodyOpenShutButton {isBodyOpened ? \'ParameterSchema__bodyOpenShutButton--active\' : \'\'}" onclick="{handleBodyOpenShutButtonClick}"> <viron-icon type="right"></viron-icon> </div> <div class="ParameterSchema__name" onclick="{handleNameClick}">{name}<span if="{description}">({description})</span></div> <div class="ParameterSchema__line"></div> <div class="ParameterSchema__selfRequired" if="{selfRequired}">required</div> <div class="ParameterSchema__validateOpenShutButton {isValidateOpened ? \'.ParameterSchema__validateOpenShutButton--active\' : \'\'}" if="{!!getValidateErrors().length}" onclick="{handleValidateOpenShutButtonClick}"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__addButton" if="{isItemsMode}" onclick="{handleAddButtonClick}"> <viron-icon type="plusCircle"></viron-icon> </div> <div class="ParameterSchema__removeButton" if="{opts.isremovable}" onclick="{handleRemoveButtonClick}"> <viron-icon type="minusCircle"></viron-icon> </div> <div class="ParameterSchema__previewOpenShutButton {isPreviewOpened ? \'ParameterSchema__previewOpenShutButton--active\' : \'\'}" if="{opts.val !== undefined}" onclick="{handlePreviewOpenShutButtonClick}"> <viron-icon type="filetext"></viron-icon> </div> <div class="ParameterSchema__infoOpenShutButton {isInfoOpened ? \'ParameterSchema__infoOpenShutButton--active\' : \'\'}" onclick="{handleInfoOpenShutButtonClick}"> <viron-icon type="infoCirlceO"></viron-icon> </div> </div> </div> <div class="ParameterSchema__body" if="{isBodyOpened}"> <div class="ParameterSchema__validates" if="{isValidateOpened &amp;&amp; !!getValidateErrors().length}"> <virtual each="{err in getValidateErrors()}"> <div class="ParameterSchema__validate"> <div class="ParameterSchema__validateIcon"> <viron-icon type="exclamationCircleO"></viron-icon> </div> <div class="ParameterSchema__validateMessage">{err.message}</div> </div> </virtual> </div> <div class="ParameterSchema__info" if="{isInfoOpened}"> <virtual each="{info in infos}"> <div class="ParameterSchema__{info.key}">{info.key}: {info.value}</div> </virtual> </div> <div class="ParameterSchema__preview" if="{isPreviewOpened &amp;&amp; opts.val !== undefined}"> <viron-prettyprint data="{opts.val}"></viron-prettyprint> </div> <div class="ParameterSchema__content"> <virtual if="{isFormMode}"> <viron-parameter-form val="{opts.val}" schemaobject="{schemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleFormChange}"></viron-parameter-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameter-schema each="{property, propKey in properties}" propkey="{propKey}" val="{parent.getPropertyValue(property, propKey)}" schemaobject="{parent.getNormalizedSchemaObjectForProperty(property, propKey)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handlePropertyChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !!opts.val.length}"> <viron-parameter-schema no-reorder isremovable="{true}" each="{val, idx in opts.val}" propkey="{idx}" val="{parent.getItemValue(idx)}" schemaobject="{parent.getNormalizedSchemaObjectForItem(idx)}" additionalinfo="{parent.opts.additionalinfo}" onremove="{parent.handleItemsRemove}" onchange="{parent.handleItemsChange}"></viron-parameter-schema> </virtual> <virtual if="{isItemsMode &amp;&amp; !opts.val.length}"> <div class="ParameterSchema__emptyItemsMessage">まだ中身がありません。</div> </virtual> </div> </div>', '', 'class="ParameterSchema {\'ParameterSchema--disabled\' : isDisabled}"', function(opts) {
-    this.external(script$31);
+    this.external(script$33);
 });
 
-var script$32 = function() {
+var script$34 = function() {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-7
   const parameterObject = objectAssign({}, this.opts.parameterobject);
   this.parameterObject = parameterObject;
@@ -27186,10 +27389,10 @@ var script$32 = function() {
 };
 
 riot$1.tag2('viron-parameter', '<div class="Parameter__body"> <viron-parameter-schema val="{opts.val}" schemaobject="{normalizedSchemaObject}" additionalinfo="{opts.additionalinfo}" onchange="{handleSchemaChange}"></viron-parameter-schema> </div>', '', 'class="Parameter"', function(opts) {
-    this.external(script$32);
+    this.external(script$34);
 });
 
-var script$33 = function() {
+var script$35 = function() {
   /**
    * ParameterObjectを参照してデフォルト値を返します。
    * @param {Object} parameterObject
@@ -27274,10 +27477,10 @@ var script$33 = function() {
 };
 
 riot$1.tag2('viron-parameters', '<virtual each="{parameterObject in opts.parameterobjects}"> <viron-parameter parameterobject="{parameterObject}" val="{parent.getParameterValue(parameterObject)}" additionalinfo="{parent.opts.additionalinfo}" onchange="{parent.handleChange}"></viron-parameter> </virtual>', '', 'class="Parameters"', function(opts) {
-    this.external(script$33);
+    this.external(script$35);
 });
 
-var script$34 = function() {
+var script$36 = function() {
   const store = this.riotx.get();
 
   // submitボタンに使用するラベル。method名によって内容を変える。
@@ -27353,10 +27556,10 @@ var script$34 = function() {
 };
 
 riot$1.tag2('viron-component-operation', '<div class="ComponentOperation__head"> <div class="ComponentOperation__title">{opts.title}</div> <div class="ComponentOperation__description" if="{!!opts.description}">{opts.description}</div> </div> <div class="ComponentOperation__body"> <viron-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" additionalinfo="{additionalInfo}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentOperation__tail"> <viron-button label="{submitButtonLabel}" type="{submitButtonType}" onclick="{handleSubmitButtonClick}"></viron-button> <viron-button label="閉じる" type="secondary" onclick="{handleCancelButtonClick}"></viron-button> </div>', '', 'class="ComponentOperation"', function(opts) {
-    this.external(script$34);
+    this.external(script$36);
 });
 
-var script$5 = function() {
+var script$7 = function() {
   const store = this.riotx.get();
   const operationObject = this.opts.action;
 
@@ -27396,7 +27599,7 @@ var script$5 = function() {
 };
 
 riot$1.tag2('viron-component-action', '<viron-button label="{label}" icon="{icon}" onclick="{handleButtonClick}"></viron-button>', '', 'class="Component__action"', function(opts) {
-    this.external(script$5);
+    this.external(script$7);
 });
 
 var d3 = createCommonjsModule(function (module) {
@@ -55516,7 +55719,7 @@ var tauCharts_tooltip = createCommonjsModule(function (module) {
 });
 });
 
-var script$35 = function() {
+var script$37 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign({
       type: 'bar',
@@ -55528,10 +55731,10 @@ var script$35 = function() {
 };
 
 riot$1.tag2('viron-component-graph-bar', '<div class="ComponentGraphBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphBar"', function(opts) {
-    this.external(script$35);
+    this.external(script$37);
 });
 
-var script$36 = function() {
+var script$38 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign({
       type: 'horizontalBar',
@@ -55543,10 +55746,10 @@ var script$36 = function() {
 };
 
 riot$1.tag2('viron-component-graph-horizontal-bar', '<div class="ComponentGraphHorizontalBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalBar"', function(opts) {
-    this.external(script$36);
+    this.external(script$38);
 });
 
-var script$37 = function() {
+var script$39 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign({
       type: 'horizontal-stacked-bar',
@@ -55558,10 +55761,10 @@ var script$37 = function() {
 };
 
 riot$1.tag2('viron-component-graph-horizontal-stacked-bar', '<div class="ComponentGraphHorizontalStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphHorizontalStackedBar"', function(opts) {
-    this.external(script$37);
+    this.external(script$39);
 });
 
-var script$38 = function() {
+var script$40 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign({
       type: 'line',
@@ -55576,10 +55779,10 @@ var script$38 = function() {
 };
 
 riot$1.tag2('viron-component-graph-line', '<div class="ComponentGraphLine__canvas" ref="canvas"></div>', '', 'class="ComponentGraphLine"', function(opts) {
-    this.external(script$38);
+    this.external(script$40);
 });
 
-var script$39 = function() {
+var script$41 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign({
       type: 'scatterplot',
@@ -55591,10 +55794,10 @@ var script$39 = function() {
 };
 
 riot$1.tag2('viron-component-graph-scatterplot', '<div class="ComponentGraphScatterplot__canvas" ref="canvas"></div>', '', 'class="ComponentGraphScatterplot"', function(opts) {
-    this.external(script$39);
+    this.external(script$41);
 });
 
-var script$40 = function() {
+var script$42 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign({
       type: 'stacked-area',
@@ -55606,10 +55809,10 @@ var script$40 = function() {
 };
 
 riot$1.tag2('viron-component-graph-stacked-area', '<div class="ComponentGraphStackedArea__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedArea"', function(opts) {
-    this.external(script$40);
+    this.external(script$42);
 });
 
-var script$41 = function() {
+var script$43 = function() {
   this.on('mount', () => {
     new chart$1.Chart(objectAssign({
       type: 'stacked-bar',
@@ -55621,7 +55824,7 @@ var script$41 = function() {
 };
 
 riot$1.tag2('viron-component-graph-stacked-bar', '<div class="ComponentGraphStackedBar__canvas" ref="canvas"></div>', '', 'class="ComponentGraphStackedBar"', function(opts) {
-    this.external(script$41);
+    this.external(script$43);
 });
 
 /**
@@ -55665,21 +55868,21 @@ riot$1.tag2('viron-component-graph-stacked-bar', '<div class="ComponentGraphStac
 
     var currencyFormat_1 = currencyFormat;
 
-var script$42 = function() {
+var script$44 = function() {
   this.value = currencyFormat_1(this.opts.response.value, 0);
 };
 
 riot$1.tag2('viron-component-number', '<div>{value}</div>', '', 'class="ComponentNumber"', function(opts) {
-    this.external(script$42);
+    this.external(script$44);
 });
 
-var script$43 = function() {};
+var script$45 = function() {};
 
 riot$1.tag2('viron-tooltip', '<div class="Tooltip__basePoint"> <div class="Tooltip__text">{opts.label}</div> </div>', '', 'class="Tooltip Tooltip--{opts.placement || \'topCenter\'}"', function(opts) {
-    this.external(script$43);
+    this.external(script$45);
 });
 
-var script$44 = function() {
+var script$46 = function() {
   const store = this.riotx.get();
 
   // icon種類。
@@ -55739,34 +55942,8 @@ var script$44 = function() {
 };
 
 riot$1.tag2('viron-table-items-button', '<viron-icon type="{icon}"></viron-icon> <viron-tooltip if="{isTooltipVisible}" label="{tooltipLabel}"></viron-tooltip> <div class="Table__itemsButtonCatcher"></div>', '', 'class="Table__itemsButton {opts.class}" onclick="{handleClick}" onmouseover="{handleMouseOver}" onmouseout="{handleMouseOut}"', function(opts) {
-    this.external(script$44);
+    this.external(script$46);
 });
-
-/**
-     * Array.indexOf
-     */
-    function indexOf$2(arr, item, fromIndex) {
-        fromIndex = fromIndex || 0;
-        if (arr == null) {
-            return -1;
-        }
-
-        var len = arr.length,
-            i = fromIndex < 0 ? len + fromIndex : fromIndex;
-        while (i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (arr[i] === item) {
-                return i;
-            }
-
-            i++;
-        }
-
-        return -1;
-    }
-
-    var indexOf_1$1 = indexOf$2;
 
 /**
      * If array contains values.
@@ -55776,7 +55953,7 @@ riot$1.tag2('viron-table-items-button', '<viron-icon type="{icon}"></viron-icon>
     }
     var contains_1$2 = contains$3;
 
-var script$45 = function() {
+var script$47 = function() {
   const store = this.riotx.get();
 
   this.value = null;
@@ -55823,7 +56000,7 @@ var script$45 = function() {
 };
 
 riot$1.tag2('viron-table-cell', '<div class="Table__cellValue" if="{!isComplex &amp;&amp; !isImage}">{value}</div> <viron-button if="{isComplex &amp;&amp; !opts.isdetailmode}" type="secondaryGhost" icon="link" label="詳細" onclick="{handleDetailClick}"></viron-button> <div class="Table__cellComplex" if="{isComplex &amp;&amp; opts.isdetailmode}"> <viron-prettyprint data="{value}"></viron-prettyprint> </div> <div class="Table__cellImage" if="{isImage}"> <div riot-style="background-image:url({value});"></div> </div>', '', 'class="Table__cell"', function(opts) {
-    this.external(script$45);
+    this.external(script$47);
 });
 
 var clipboard = createCommonjsModule(function (module) {
@@ -56004,7 +56181,7 @@ var clipboard = createCommonjsModule(function (module) {
 }));
 });
 
-var script$46 = function() {
+var script$48 = function() {
   const store = this.riotx.get();
 
   this.handleClick = () => {
@@ -56053,20 +56230,20 @@ var script$46 = function() {
 };
 
 riot$1.tag2('viron-table-item', '<div class="Table__itemHeader"> <div class="Table__itemTitle">{opts.item.title}</div> <div class="Table__itemType">{opts.item.type}</div> </div> <viron-table-cell data="{opts.item}" isdetailmode="{opts.isdetailmode}"></viron-table-cell>', '', 'class="Table__item {opts.isdetailmode ? \'Table__item--detail\' : \'\'}" onclick="{handleClick}"', function(opts) {
-    this.external(script$46);
+    this.external(script$48);
 });
 
-var script$48 = function() {
+var script$50 = function() {
   this.handleCloseButtonClick = () => {
     this.close();
   };
 };
 
 riot$1.tag2('viron-table-flatitems', '<div class="Table__flatitemsHead"> <div class="Table__flatitemsTitle">詳細</div> <div class="Table__flatitemsDescription">テーブル列の全項目を表示しています。</div> </div> <div class="Table__flatitemsBody"> <div class="Table__flatitemsList"> <viron-table-item each="{item in opts.items}" isdetailmode="{true}" item="{item}"></viron-table-item> </div> </div> <div class="Table__flatitemsTail"> <viron-button label="閉じる" type="secondary" onclick="{handleCloseButtonClick}"></viron-button> </div>', '', 'class="Table__flatitems"', function(opts) {
-    this.external(script$48);
+    this.external(script$50);
 });
 
-var script$47 = function() {
+var script$49 = function() {
   const store = this.riotx.get();
 
   // sort済みのitems。
@@ -56127,10 +56304,10 @@ var script$47 = function() {
 };
 
 riot$1.tag2('viron-table-items', '<div class="Table__itemsHeader"> <div class="Table__itemsTitle" onclick="{handleHeaderTitleClick}">{title}</div> <virtual each="{action in opts.actions}"> <viron-table-items-button action="{action}" isaction="{true}" onclick="{parent.handleItemsActionButtonClick}"></viron-table-items-button> </virtual> <viron-table-items-button class="Table__itemsOpenShutButton" icon="up" onclick="{handleOpenShutButtonClick}"></viron-table-items-button> </div> <virtual if="{isOpened}"> <div class="Table__itemsContent"> <div class="Table__itemsList"> <viron-table-item each="{item in getFilteredItems()}" item="{item}"></viron-table-item> </div> <div class="Table__itemsControl"> <div class="Table__itemsDetailButton" onclick="{handleDetailButtonClick}" onmouseover="{handleDetailButtonMouseOver}" onmouseout="{handleDetailButtonMouseOut}"> <viron-icon type="scan"></viron-icon> <viron-tooltip if="{isTooltipVisible}" placement="topRight" label="全て表示"></viron-tooltip> <div class="Table__itemsDetailButtonCatcher"></div> </div> </div> </div> </virtual>', '', 'class="Table__items {isOpened ? \'Table__items--opened\' : \'\'}"', function(opts) {
-    this.external(script$47);
+    this.external(script$49);
 });
 
-var script$49 = function() {
+var script$51 = function() {
   this.getItemList = () => {
     const columns = this.opts.columns;
     const list = [];
@@ -56151,10 +56328,10 @@ var script$49 = function() {
 };
 
 riot$1.tag2('viron-table', '<viron-table-items each="{items, idx in getItemList()}" items="{items}" actions="{parent.opts.actions}" idx="{idx}" tablelabels="{parent.opts.tablelabels}" selectedtablecolumns="{parent.opts.selectedtablecolumns}"></viron-table-items>', '', 'class="Table"', function(opts) {
-    this.external(script$49);
+    this.external(script$51);
 });
 
-var script$51 = function() {
+var script$53 = function() {
   const type = this.opts.parameterobject.type;
   // @see: https://swagger.io/specification/#dataTypeFormat
   const format = this.opts.parameterobject.format;
@@ -56234,7 +56411,7 @@ var script$51 = function() {
   };
 
   this.handleSelectChange = options => {
-    const option = find_1$2(options, option => {
+    const option = find_1$1(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -56247,10 +56424,10 @@ var script$51 = function() {
 };
 
 riot$1.tag2('viron-operation-parameter-form', '<virtual if="{uiType === \'input\'}"> <viron-textinput text="{opts.parametervalue}" onchange="{handleInputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select isopened="{isOpened}" options="{getSelectOptions()}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="*" onfilechange="{handleFileChange}"></viron-uploader> </virtual>', '', 'class="Operation__parameterForm"', function(opts) {
-    this.external(script$51);
+    this.external(script$53);
 });
 
-var script$52 = function() {
+var script$54 = function() {
   // typeは'null', 'boolean', 'object', 'array', 'number', 'integer', or 'string'.
   // @see: https://swagger.io/specification/#dataTypeFormat
   const type = this.opts.parameterobject.type;
@@ -56357,7 +56534,7 @@ var script$52 = function() {
   };
 
   this.handleSelectChange = options => {
-    const option = find_1$2(options, option => {
+    const option = find_1$1(options, option => {
       return option.isSelected;
     });
     const value = (option ? option.label : undefined);
@@ -56375,10 +56552,10 @@ var script$52 = function() {
 };
 
 riot$1.tag2('viron-operation-schema-form', '<div class="Operation__schemaFormDescription">{opts.parameterobject.description || \'-\'}</div> <div class="Operation__schemaFormRequired" if="{opts.parameterobject.required}">required</div> <div class="Operation__schemaFormName">name: {opts.parameterobject.name}</div> <div class="Operation__schemaFormType">type: {opts.parameterobject.type}</div> <div class="Operation__schemaFormFormat">format: {opts.parameterobject.format || \'-\'}</div> <div class="Operation__schemaFormMultiPlusButton" if="{uiType === \'multi\'}" onclick="{handleMultiPlusButtonClick}"> <viron-icon type="plus"></viron-icon> </div> <virtual if="{uiType === \'input\'}"> <viron-textinput text="{opts.parametervalue}" placeholder="{opts.parameterobject.example}" onchange="{handleInputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.parametervalue}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" onchange="{handleSelectChange}"></viron-select> </virtual> <div class="Operation__schemaFormChildren" if="{uiType === \'multi\'}" each="{p, idx in multiData}"> <div class="Operation__schemaFormMultiMinusButton" idx="{idx}" onclick="{handleMultiMinusButtonClick}"> <viron-icon type="minus"></viron-icon> </div> <viron-operation-schema-form each="{propertyKey in parent.multiPropertyKeys}" multiidx="{parent.idx}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey, parent.idx)}" onchange="{parent.handleMultiChange}"></viron-operation-schema-form> </div>', '', 'class="Operation__schemaForm"', function(opts) {
-    this.external(script$52);
+    this.external(script$54);
 });
 
-var script$53 = function() {
+var script$55 = function() {
   this.propertyKeys = Object.keys(this.opts.schema.properties);
 
   this.getParameterObject = propertyKey => {
@@ -56410,10 +56587,10 @@ var script$53 = function() {
 };
 
 riot$1.tag2('viron-operation-schema', '<viron-operation-schema-form each="{propertyKey in propertyKeys}" parameterobject="{parent.getParameterObject(propertyKey)}" parametervalue="{parent.getValue(propertyKey)}" onchange="{parent.handleChange}"></viron-operation-schema-form>', '', 'class="Operation__schema"', function(opts) {
-    this.external(script$53);
+    this.external(script$55);
 });
 
-var script$54 = function() {
+var script$56 = function() {
   this.isUseBody = false;
   // "query", "header", "path", "formData" or "body"のどれか。
   if (this.opts.parameter.in === 'body') {
@@ -56426,10 +56603,10 @@ var script$54 = function() {
 };
 
 riot$1.tag2('viron-operation-parameter', '<div class="Operation__parameterHead"> <div> <div class="Operation__parameterName">name: {opts.parameter.name}</div> <div class="Operation__parameterDescription">description: {opts.parameter.description}</div> <div class="Operation__parameterIn">in: {opts.parameter.in}</div> </div> <div class="Operation__parameterRequired" if="{opts.parameter.required}">required</div> </div> <div class="Operation__parameterBody"> <viron-operation-schema if="{isUseBody}" name="{opts.parameter.name}" schema="{opts.parameter.schema}" parametervalues="{opts.parametervalue}" onchange="{handleChange}"></viron-operation-schema> <viron-operation-parameter-form if="{!isUseBody}" parameterobject="{this.opts.parameter}" parametervalue="{opts.parametervalue}" onchange="{handleChange}"></viron-operation-parameter-form> </div>', '', 'class="Operation__parameter"', function(opts) {
-    this.external(script$54);
+    this.external(script$56);
 });
 
-var script$55 = function() {
+var script$57 = function() {
   const store = this.riotx.get();
 
   this.summary = this.opts.operationObject.summary || this.opts.operationObject.operationId;
@@ -56479,10 +56656,10 @@ var script$55 = function() {
 };
 
 riot$1.tag2('viron-operation', '<div class="Operation__info"> <div> <div class="Operation__summary">{summary}</div> <div class="Operation__description">{opts.operationObject.description}</div> </div> </div> <div class="Operation__parameters"> <viron-operation-parameter each="{parameter in opts.operationObject.parameters}" parameter="{parameter}" parametervalue="{parent.queries[parameter.name]}" onchange="{parent.handleParameterChange}"></viron-operation-parameter> </div> <div class="Operation__control"> <viron-button label="{opts.operationObject.operationId}" onclick="{handleExecuteButtonClick}"></viron-button> <viron-button label="cancel" type="secondary" onclick="{handleCancelButtonClick}"></viron-button> </div>', '', 'class="Operation"', function(opts) {
-    this.external(script$55);
+    this.external(script$57);
 });
 
-var script$50 = function() {
+var script$52 = function() {
   const store = this.riotx.get();
 
   this.getColumns = () => {
@@ -56546,7 +56723,7 @@ var script$50 = function() {
   };
 
   this.handleActionButtonClick = (operationId, rowIdx) => {
-    const operationObject = find_1$2(this.opts.rowactions, operationObject => {
+    const operationObject = find_1$1(this.opts.rowactions, operationObject => {
       return (operationObject.operationId === operationId);
     });
     const method = store.getter(constants$5.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
@@ -56568,7 +56745,7 @@ var script$50 = function() {
 };
 
 riot$1.tag2('viron-component-table', '<viron-table columns="{getColumns()}" rows="{getRows()}" actions="{getActions()}" tablelabels="{opts.tablelabels}" selectedtablecolumns="{opts.selectedtablecolumns}"></viron-table>', '', 'class="ComponentTable"', function(opts) {
-    this.external(script$50);
+    this.external(script$52);
 });
 
 /**
@@ -56583,17 +56760,17 @@ riot$1.tag2('viron-component-table', '<viron-table columns="{getColumns()}" rows
 
     var reject_1$2 = reject$3;
 
-var script$57 = function() {
+var script$59 = function() {
   this.handleCheckboxChange = newIsChecked => {
     this.opts.ontoggle(this.opts.item, newIsChecked);
   };
 };
 
 riot$1.tag2('viron-component-filter-item', '<viron-checkbox ischecked="{opts.item.isSelected}" label="{opts.item.label}" onchange="{handleCheckboxChange}"></viron-checkbox>', '', 'class="ComponentFilter__item"', function(opts) {
-    this.external(script$57);
+    this.external(script$59);
 });
 
-var script$58 = function() {
+var script$60 = function() {
   const selectedTableColumns = (this.opts.selectedTableColumns || []).concat([]);
 
   this.items = [];
@@ -56606,7 +56783,7 @@ var script$58 = function() {
   });
 
   this.handleItemToggle = (item, newIsSelected) => {
-    const targetItem = find_1$2(this.items, i => {
+    const targetItem = find_1$1(this.items, i => {
       return (i.label === item.label);
     });
     if (!!targetItem) {
@@ -56627,10 +56804,10 @@ var script$58 = function() {
 };
 
 riot$1.tag2('viron-component-filter', '<div class="ComponentFilter__head"> <div class="ComponentFilter__title">表示項目フィルター</div> <div class="ComponentFilter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> </div> <div class="ComponentFilter__items"> <viron-component-filter-item each="{item in items}" item="{item}" ontoggle="{parent.handleItemToggle}"></viron-component-filter-item> </div> <div class="ComponentFilter__tail"> <viron-button label="適用する" onclick="{handleApplyButtonClick}"></viron-button> </div>', '', 'class="ComponentFilter"', function(opts) {
-    this.external(script$58);
+    this.external(script$60);
 });
 
-var script$59 = function() {
+var script$61 = function() {
   this.currentParameters = objectAssign({}, this.opts.initialParameters);
 
   this.handleParametersChange = newParameters => {
@@ -56645,7 +56822,7 @@ var script$59 = function() {
 };
 
 riot$1.tag2('viron-component-search', '<div class="ComponentSearch__body"> <viron-parameters parameterobjects="{opts.parameterObjects}" parameters="{currentParameters}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentSearch__tail"> <viron-button label="検索する" onclick="{handleSubmitButtonClick}"></viron-button> </div>', '', 'class="ComponentSearch"', function(opts) {
-    this.external(script$59);
+    this.external(script$61);
 });
 
 const STYLE_NUMBER = 'number';
@@ -56658,7 +56835,7 @@ const STYLE_GRAPH_STACKED_BAR = 'graph-stacked-bar';
 const STYLE_GRAPH_HORIZONTAL_STACKED_BAR = 'graph-horizontal-stacked-bar';
 const STYLE_GRAPH_STACKED_AREA = 'graph-stacked-area';
 
-var script$56 = function() {
+var script$58 = function() {
   const store = this.riotx.get();
 
   // データ取得中か否か。
@@ -56978,7 +57155,7 @@ var script$56 = function() {
 };
 
 riot$1.tag2('viron-component', '<div class="Component__head"> <div class="Component__headBasic"> <div class="Component__name">{opts.component.name}</div> <div class="Component__refresh" onclick="{handleRefreshButtonClick}"> <viron-icon type="reload"></viron-icon> </div> <div class="Component__filter {!!selectedTableColumns.length ? \'Component__filter--active\' : \'\'}" if="{opts.component.style === \'table\'}" onclick="{handleFilterButtonClick}"> <viron-icon type="filter"></viron-icon> </div> <div class="Component__search {!isCurrentSearchRequestParametersEmpty() ? \'Component__search--active\' : \'\'}" if="{!!getParameterObjectsForSearch().length}" onclick="{handleSearchButtonClick}"> <viron-icon type="search"></viron-icon> </div> </div> <div class="Component__headSearch" if="{!isCurrentSearchRequestParametersEmpty()}"> <div class="Component__searchQuery" each="{val, key in currentSearchRequestParameters}">{key} : {val}</div> </div> </div> <div class="Component__body" ref="body"> <div class="Component__spinner" if="{isPending}"> <viron-icon type="loading"></viron-icon> </div> <viron-pagination class="Component__pagination Component__pagination--head" if="{!isPending &amp;&amp;  hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{paginationSize}" onchange="{handlePaginationChange}"></viron-pagination> <div data-is="{childComponentName}" if="{!isPending &amp;&amp; isValidData}" response="{response}" schemaobject="{schemaObject}" primarykey="{primaryKey}" tablelabels="{tableLabels}" selectedtablecolumns="{selectedTableColumns}" rowactions="{rowActions}" updater="{updater}"></div> <div class="Component__alert" if="{!isPending &amp;&amp; !isValidData}"> <div class="Component__alertText">{alertText}</div> </div> <viron-pagination class="Component__pagination Component__pagination--tail" if="{!isPending &amp;&amp; hasPagination}" currentpage="{pagination.currentPage}" maxpage="{pagination.maxPage}" size="{paginationSize}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="Component__tail" if="{!!selfActions}"> <viron-component-action each="{action in selfActions}" action="{action}" updater="{parent.updater}"></viron-component-action> </div>', '', 'class="Component"', function(opts) {
-    this.external(script$56);
+    this.external(script$58);
 });
 
 /**
@@ -57026,7 +57203,7 @@ riot$1.tag2('viron-component', '<div class="Component__head"> <div class="Compon
 
     var throttle_1 = throttle;
 
-var script$60 = function() {
+var script$62 = function() {
   const store = this.riotx.get();
 
   this.name = store.getter(constants$5.PAGE_NAME);
@@ -57177,1471 +57354,130 @@ var script$60 = function() {
 };
 
 riot$1.tag2('viron-components', '<div class="ComponentsPage__head"> <div class="ComponentsPage__breadcrumb"> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="home"></viron-icon> </div> <div class="ComponentsPage__breadcrumbIcon"> <viron-icon type="right"></viron-icon> </div> <div class="ComponentsPage__breadcrumbLabel">{name} ({componentsCount})</div> </div> <div class="ComponentsPage__control"> <div class="ComponentsPage__search {isCurrentSearchRequestParametersEmpty() ? \'\' : \'ComponentsPage__search--active\'}" if="{componentsCount &gt; 1 &amp;&amp; !!getParameterObjectsForSearch().length}" onclick="{handleSearchButtonClick}"> <viron-icon type="search"></viron-icon> <viron-tooltip if="{isSearchTooltipVisible}" placement="bottomRight" label="全体検索"></viron-tooltip> </div> </div> </div> <div class="ComponentsPage__listForTable" if="{!!tableComponents.length}"> <viron-component each="{component, idx in tableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div> <div class="ComponentsPage__list" ref="list" if="{!!notTableComponents.length}"> <viron-component each="{component, idx in notTableComponents}" component="{component}" entirecurrentsearchrequestparameters="{parent.getCurrentSearchRequestParametersForComponent(component)}" entirecurrentsearchrequestparametersresetter="{parent.currentSearchRequestParametersResetter}"></viron-component> </div>', '', 'class="Page ComponentsPage"', function(opts) {
-    this.external(script$60);
-});
-
-var script$61 = function() {};
-
-riot$1.tag2('viron-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
-    this.external(script$61);
-});
-
-var marked = createCommonjsModule(function (module, exports) {
-/**
- * marked - a markdown parser
- * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
- * https://github.com/chjj/marked
- */
-
-(function() {
-
-/**
- * Block-Level Grammar
- */
-
-var block = {
-  newline: /^\n+/,
-  code: /^( {4}[^\n]+\n*)+/,
-  fences: noop,
-  hr: /^( *[-*_]){3,} *(?:\n+|$)/,
-  heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
-  nptable: noop,
-  lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
-  blockquote: /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,
-  list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
-  html: /^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,
-  def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
-  table: noop,
-  paragraph: /^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,
-  text: /^[^\n]+/
-};
-
-block.bullet = /(?:[*+-]|\d+\.)/;
-block.item = /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;
-block.item = replace(block.item, 'gm')
-  (/bull/g, block.bullet)
-  ();
-
-block.list = replace(block.list)
-  (/bull/g, block.bullet)
-  ('hr', '\\n+(?=\\1?(?:[-*_] *){3,}(?:\\n+|$))')
-  ('def', '\\n+(?=' + block.def.source + ')')
-  ();
-
-block.blockquote = replace(block.blockquote)
-  ('def', block.def)
-  ();
-
-block._tag = '(?!(?:'
-  + 'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code'
-  + '|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo'
-  + '|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b';
-
-block.html = replace(block.html)
-  ('comment', /<!--[\s\S]*?-->/)
-  ('closed', /<(tag)[\s\S]+?<\/\1>/)
-  ('closing', /<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)
-  (/tag/g, block._tag)
-  ();
-
-block.paragraph = replace(block.paragraph)
-  ('hr', block.hr)
-  ('heading', block.heading)
-  ('lheading', block.lheading)
-  ('blockquote', block.blockquote)
-  ('tag', '<' + block._tag)
-  ('def', block.def)
-  ();
-
-/**
- * Normal Block Grammar
- */
-
-block.normal = merge({}, block);
-
-/**
- * GFM Block Grammar
- */
-
-block.gfm = merge({}, block.normal, {
-  fences: /^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\s*\1 *(?:\n+|$)/,
-  paragraph: /^/,
-  heading: /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/
-});
-
-block.gfm.paragraph = replace(block.paragraph)
-  ('(?!', '(?!'
-    + block.gfm.fences.source.replace('\\1', '\\2') + '|'
-    + block.list.source.replace('\\1', '\\3') + '|')
-  ();
-
-/**
- * GFM + Tables Block Grammar
- */
-
-block.tables = merge({}, block.gfm, {
-  nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
-  table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
-});
-
-/**
- * Block Lexer
- */
-
-function Lexer(options) {
-  this.tokens = [];
-  this.tokens.links = {};
-  this.options = options || marked.defaults;
-  this.rules = block.normal;
-
-  if (this.options.gfm) {
-    if (this.options.tables) {
-      this.rules = block.tables;
-    } else {
-      this.rules = block.gfm;
-    }
-  }
-}
-
-/**
- * Expose Block Rules
- */
-
-Lexer.rules = block;
-
-/**
- * Static Lex Method
- */
-
-Lexer.lex = function(src, options) {
-  var lexer = new Lexer(options);
-  return lexer.lex(src);
-};
-
-/**
- * Preprocessing
- */
-
-Lexer.prototype.lex = function(src) {
-  src = src
-    .replace(/\r\n|\r/g, '\n')
-    .replace(/\t/g, '    ')
-    .replace(/\u00a0/g, ' ')
-    .replace(/\u2424/g, '\n');
-
-  return this.token(src, true);
-};
-
-/**
- * Lexing
- */
-
-Lexer.prototype.token = function(src, top, bq) {
-  var src = src.replace(/^ +$/gm, '')
-    , next
-    , loose
-    , cap
-    , bull
-    , b
-    , item
-    , space
-    , i
-    , l;
-
-  while (src) {
-    // newline
-    if (cap = this.rules.newline.exec(src)) {
-      src = src.substring(cap[0].length);
-      if (cap[0].length > 1) {
-        this.tokens.push({
-          type: 'space'
-        });
-      }
-    }
-
-    // code
-    if (cap = this.rules.code.exec(src)) {
-      src = src.substring(cap[0].length);
-      cap = cap[0].replace(/^ {4}/gm, '');
-      this.tokens.push({
-        type: 'code',
-        text: !this.options.pedantic
-          ? cap.replace(/\n+$/, '')
-          : cap
-      });
-      continue;
-    }
-
-    // fences (gfm)
-    if (cap = this.rules.fences.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'code',
-        lang: cap[2],
-        text: cap[3] || ''
-      });
-      continue;
-    }
-
-    // heading
-    if (cap = this.rules.heading.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'heading',
-        depth: cap[1].length,
-        text: cap[2]
-      });
-      continue;
-    }
-
-    // table no leading pipe (gfm)
-    if (top && (cap = this.rules.nptable.exec(src))) {
-      src = src.substring(cap[0].length);
-
-      item = {
-        type: 'table',
-        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
-        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-        cells: cap[3].replace(/\n$/, '').split('\n')
-      };
-
-      for (i = 0; i < item.align.length; i++) {
-        if (/^ *-+: *$/.test(item.align[i])) {
-          item.align[i] = 'right';
-        } else if (/^ *:-+: *$/.test(item.align[i])) {
-          item.align[i] = 'center';
-        } else if (/^ *:-+ *$/.test(item.align[i])) {
-          item.align[i] = 'left';
-        } else {
-          item.align[i] = null;
-        }
-      }
-
-      for (i = 0; i < item.cells.length; i++) {
-        item.cells[i] = item.cells[i].split(/ *\| */);
-      }
-
-      this.tokens.push(item);
-
-      continue;
-    }
-
-    // lheading
-    if (cap = this.rules.lheading.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'heading',
-        depth: cap[2] === '=' ? 1 : 2,
-        text: cap[1]
-      });
-      continue;
-    }
-
-    // hr
-    if (cap = this.rules.hr.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'hr'
-      });
-      continue;
-    }
-
-    // blockquote
-    if (cap = this.rules.blockquote.exec(src)) {
-      src = src.substring(cap[0].length);
-
-      this.tokens.push({
-        type: 'blockquote_start'
-      });
-
-      cap = cap[0].replace(/^ *> ?/gm, '');
-
-      // Pass `top` to keep the current
-      // "toplevel" state. This is exactly
-      // how markdown.pl works.
-      this.token(cap, top, true);
-
-      this.tokens.push({
-        type: 'blockquote_end'
-      });
-
-      continue;
-    }
-
-    // list
-    if (cap = this.rules.list.exec(src)) {
-      src = src.substring(cap[0].length);
-      bull = cap[2];
-
-      this.tokens.push({
-        type: 'list_start',
-        ordered: bull.length > 1
-      });
-
-      // Get each top-level item.
-      cap = cap[0].match(this.rules.item);
-
-      next = false;
-      l = cap.length;
-      i = 0;
-
-      for (; i < l; i++) {
-        item = cap[i];
-
-        // Remove the list item's bullet
-        // so it is seen as the next token.
-        space = item.length;
-        item = item.replace(/^ *([*+-]|\d+\.) +/, '');
-
-        // Outdent whatever the
-        // list item contains. Hacky.
-        if (~item.indexOf('\n ')) {
-          space -= item.length;
-          item = !this.options.pedantic
-            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
-            : item.replace(/^ {1,4}/gm, '');
-        }
-
-        // Determine whether the next list item belongs here.
-        // Backpedal if it does not belong in this list.
-        if (this.options.smartLists && i !== l - 1) {
-          b = block.bullet.exec(cap[i + 1])[0];
-          if (bull !== b && !(bull.length > 1 && b.length > 1)) {
-            src = cap.slice(i + 1).join('\n') + src;
-            i = l - 1;
-          }
-        }
-
-        // Determine whether item is loose or not.
-        // Use: /(^|\n)(?! )[^\n]+\n\n(?!\s*$)/
-        // for discount behavior.
-        loose = next || /\n\n(?!\s*$)/.test(item);
-        if (i !== l - 1) {
-          next = item.charAt(item.length - 1) === '\n';
-          if (!loose) { loose = next; }
-        }
-
-        this.tokens.push({
-          type: loose
-            ? 'loose_item_start'
-            : 'list_item_start'
-        });
-
-        // Recurse.
-        this.token(item, false, bq);
-
-        this.tokens.push({
-          type: 'list_item_end'
-        });
-      }
-
-      this.tokens.push({
-        type: 'list_end'
-      });
-
-      continue;
-    }
-
-    // html
-    if (cap = this.rules.html.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: this.options.sanitize
-          ? 'paragraph'
-          : 'html',
-        pre: !this.options.sanitizer
-          && (cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style'),
-        text: cap[0]
-      });
-      continue;
-    }
-
-    // def
-    if ((!bq && top) && (cap = this.rules.def.exec(src))) {
-      src = src.substring(cap[0].length);
-      this.tokens.links[cap[1].toLowerCase()] = {
-        href: cap[2],
-        title: cap[3]
-      };
-      continue;
-    }
-
-    // table (gfm)
-    if (top && (cap = this.rules.table.exec(src))) {
-      src = src.substring(cap[0].length);
-
-      item = {
-        type: 'table',
-        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
-        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-        cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n')
-      };
-
-      for (i = 0; i < item.align.length; i++) {
-        if (/^ *-+: *$/.test(item.align[i])) {
-          item.align[i] = 'right';
-        } else if (/^ *:-+: *$/.test(item.align[i])) {
-          item.align[i] = 'center';
-        } else if (/^ *:-+ *$/.test(item.align[i])) {
-          item.align[i] = 'left';
-        } else {
-          item.align[i] = null;
-        }
-      }
-
-      for (i = 0; i < item.cells.length; i++) {
-        item.cells[i] = item.cells[i]
-          .replace(/^ *\| *| *\| *$/g, '')
-          .split(/ *\| */);
-      }
-
-      this.tokens.push(item);
-
-      continue;
-    }
-
-    // top-level paragraph
-    if (top && (cap = this.rules.paragraph.exec(src))) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'paragraph',
-        text: cap[1].charAt(cap[1].length - 1) === '\n'
-          ? cap[1].slice(0, -1)
-          : cap[1]
-      });
-      continue;
-    }
-
-    // text
-    if (cap = this.rules.text.exec(src)) {
-      // Top-level should never reach here.
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'text',
-        text: cap[0]
-      });
-      continue;
-    }
-
-    if (src) {
-      throw new
-        Error('Infinite loop on byte: ' + src.charCodeAt(0));
-    }
-  }
-
-  return this.tokens;
-};
-
-/**
- * Inline-Level Grammar
- */
-
-var inline = {
-  escape: /^\\([\\`*{}\[\]()#+\-.!_>])/,
-  autolink: /^<([^ >]+(@|:\/)[^ >]+)>/,
-  url: noop,
-  tag: /^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,
-  link: /^!?\[(inside)\]\(href\)/,
-  reflink: /^!?\[(inside)\]\s*\[([^\]]*)\]/,
-  nolink: /^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,
-  strong: /^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,
-  em: /^\b_((?:[^_]|__)+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
-  code: /^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,
-  br: /^ {2,}\n(?!\s*$)/,
-  del: noop,
-  text: /^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
-};
-
-inline._inside = /(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/;
-inline._href = /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
-
-inline.link = replace(inline.link)
-  ('inside', inline._inside)
-  ('href', inline._href)
-  ();
-
-inline.reflink = replace(inline.reflink)
-  ('inside', inline._inside)
-  ();
-
-/**
- * Normal Inline Grammar
- */
-
-inline.normal = merge({}, inline);
-
-/**
- * Pedantic Inline Grammar
- */
-
-inline.pedantic = merge({}, inline.normal, {
-  strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
-  em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/
-});
-
-/**
- * GFM Inline Grammar
- */
-
-inline.gfm = merge({}, inline.normal, {
-  escape: replace(inline.escape)('])', '~|])')(),
-  url: /^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,
-  del: /^~~(?=\S)([\s\S]*?\S)~~/,
-  text: replace(inline.text)
-    (']|', '~]|')
-    ('|', '|https?://|')
-    ()
-});
-
-/**
- * GFM + Line Breaks Inline Grammar
- */
-
-inline.breaks = merge({}, inline.gfm, {
-  br: replace(inline.br)('{2,}', '*')(),
-  text: replace(inline.gfm.text)('{2,}', '*')()
-});
-
-/**
- * Inline Lexer & Compiler
- */
-
-function InlineLexer(links, options) {
-  this.options = options || marked.defaults;
-  this.links = links;
-  this.rules = inline.normal;
-  this.renderer = this.options.renderer || new Renderer;
-  this.renderer.options = this.options;
-
-  if (!this.links) {
-    throw new
-      Error('Tokens array requires a `links` property.');
-  }
-
-  if (this.options.gfm) {
-    if (this.options.breaks) {
-      this.rules = inline.breaks;
-    } else {
-      this.rules = inline.gfm;
-    }
-  } else if (this.options.pedantic) {
-    this.rules = inline.pedantic;
-  }
-}
-
-/**
- * Expose Inline Rules
- */
-
-InlineLexer.rules = inline;
-
-/**
- * Static Lexing/Compiling Method
- */
-
-InlineLexer.output = function(src, links, options) {
-  var inline = new InlineLexer(links, options);
-  return inline.output(src);
-};
-
-/**
- * Lexing/Compiling
- */
-
-InlineLexer.prototype.output = function(src) {
-  var out = ''
-    , link
-    , text
-    , href
-    , cap;
-
-  while (src) {
-    // escape
-    if (cap = this.rules.escape.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += cap[1];
-      continue;
-    }
-
-    // autolink
-    if (cap = this.rules.autolink.exec(src)) {
-      src = src.substring(cap[0].length);
-      if (cap[2] === '@') {
-        text = cap[1].charAt(6) === ':'
-          ? this.mangle(cap[1].substring(7))
-          : this.mangle(cap[1]);
-        href = this.mangle('mailto:') + text;
-      } else {
-        text = escape(cap[1]);
-        href = text;
-      }
-      out += this.renderer.link(href, null, text);
-      continue;
-    }
-
-    // url (gfm)
-    if (!this.inLink && (cap = this.rules.url.exec(src))) {
-      src = src.substring(cap[0].length);
-      text = escape(cap[1]);
-      href = text;
-      out += this.renderer.link(href, null, text);
-      continue;
-    }
-
-    // tag
-    if (cap = this.rules.tag.exec(src)) {
-      if (!this.inLink && /^<a /i.test(cap[0])) {
-        this.inLink = true;
-      } else if (this.inLink && /^<\/a>/i.test(cap[0])) {
-        this.inLink = false;
-      }
-      src = src.substring(cap[0].length);
-      out += this.options.sanitize
-        ? this.options.sanitizer
-          ? this.options.sanitizer(cap[0])
-          : escape(cap[0])
-        : cap[0];
-      continue;
-    }
-
-    // link
-    if (cap = this.rules.link.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.inLink = true;
-      out += this.outputLink(cap, {
-        href: cap[2],
-        title: cap[3]
-      });
-      this.inLink = false;
-      continue;
-    }
-
-    // reflink, nolink
-    if ((cap = this.rules.reflink.exec(src))
-        || (cap = this.rules.nolink.exec(src))) {
-      src = src.substring(cap[0].length);
-      link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
-      link = this.links[link.toLowerCase()];
-      if (!link || !link.href) {
-        out += cap[0].charAt(0);
-        src = cap[0].substring(1) + src;
-        continue;
-      }
-      this.inLink = true;
-      out += this.outputLink(cap, link);
-      this.inLink = false;
-      continue;
-    }
-
-    // strong
-    if (cap = this.rules.strong.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.strong(this.output(cap[2] || cap[1]));
-      continue;
-    }
-
-    // em
-    if (cap = this.rules.em.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.em(this.output(cap[2] || cap[1]));
-      continue;
-    }
-
-    // code
-    if (cap = this.rules.code.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.codespan(escape(cap[2], true));
-      continue;
-    }
-
-    // br
-    if (cap = this.rules.br.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.br();
-      continue;
-    }
-
-    // del (gfm)
-    if (cap = this.rules.del.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.del(this.output(cap[1]));
-      continue;
-    }
-
-    // text
-    if (cap = this.rules.text.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.text(escape(this.smartypants(cap[0])));
-      continue;
-    }
-
-    if (src) {
-      throw new
-        Error('Infinite loop on byte: ' + src.charCodeAt(0));
-    }
-  }
-
-  return out;
-};
-
-/**
- * Compile Link
- */
-
-InlineLexer.prototype.outputLink = function(cap, link) {
-  var href = escape(link.href)
-    , title = link.title ? escape(link.title) : null;
-
-  return cap[0].charAt(0) !== '!'
-    ? this.renderer.link(href, title, this.output(cap[1]))
-    : this.renderer.image(href, title, escape(cap[1]));
-};
-
-/**
- * Smartypants Transformations
- */
-
-InlineLexer.prototype.smartypants = function(text) {
-  if (!this.options.smartypants) { return text; }
-  return text
-    // em-dashes
-    .replace(/---/g, '\u2014')
-    // en-dashes
-    .replace(/--/g, '\u2013')
-    // opening singles
-    .replace(/(^|[-\u2014/(\[{"\s])'/g, '$1\u2018')
-    // closing singles & apostrophes
-    .replace(/'/g, '\u2019')
-    // opening doubles
-    .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, '$1\u201c')
-    // closing doubles
-    .replace(/"/g, '\u201d')
-    // ellipses
-    .replace(/\.{3}/g, '\u2026');
-};
-
-/**
- * Mangle Links
- */
-
-InlineLexer.prototype.mangle = function(text) {
-  if (!this.options.mangle) { return text; }
-  var out = ''
-    , l = text.length
-    , i = 0
-    , ch;
-
-  for (; i < l; i++) {
-    ch = text.charCodeAt(i);
-    if (Math.random() > 0.5) {
-      ch = 'x' + ch.toString(16);
-    }
-    out += '&#' + ch + ';';
-  }
-
-  return out;
-};
-
-/**
- * Renderer
- */
-
-function Renderer(options) {
-  this.options = options || {};
-}
-
-Renderer.prototype.code = function(code, lang, escaped) {
-  if (this.options.highlight) {
-    var out = this.options.highlight(code, lang);
-    if (out != null && out !== code) {
-      escaped = true;
-      code = out;
-    }
-  }
-
-  if (!lang) {
-    return '<pre><code>'
-      + (escaped ? code : escape(code, true))
-      + '\n</code></pre>';
-  }
-
-  return '<pre><code class="'
-    + this.options.langPrefix
-    + escape(lang, true)
-    + '">'
-    + (escaped ? code : escape(code, true))
-    + '\n</code></pre>\n';
-};
-
-Renderer.prototype.blockquote = function(quote) {
-  return '<blockquote>\n' + quote + '</blockquote>\n';
-};
-
-Renderer.prototype.html = function(html) {
-  return html;
-};
-
-Renderer.prototype.heading = function(text, level, raw) {
-  return '<h'
-    + level
-    + ' id="'
-    + this.options.headerPrefix
-    + raw.toLowerCase().replace(/[^\w]+/g, '-')
-    + '">'
-    + text
-    + '</h'
-    + level
-    + '>\n';
-};
-
-Renderer.prototype.hr = function() {
-  return this.options.xhtml ? '<hr/>\n' : '<hr>\n';
-};
-
-Renderer.prototype.list = function(body, ordered) {
-  var type = ordered ? 'ol' : 'ul';
-  return '<' + type + '>\n' + body + '</' + type + '>\n';
-};
-
-Renderer.prototype.listitem = function(text) {
-  return '<li>' + text + '</li>\n';
-};
-
-Renderer.prototype.paragraph = function(text) {
-  return '<p>' + text + '</p>\n';
-};
-
-Renderer.prototype.table = function(header, body) {
-  return '<table>\n'
-    + '<thead>\n'
-    + header
-    + '</thead>\n'
-    + '<tbody>\n'
-    + body
-    + '</tbody>\n'
-    + '</table>\n';
-};
-
-Renderer.prototype.tablerow = function(content) {
-  return '<tr>\n' + content + '</tr>\n';
-};
-
-Renderer.prototype.tablecell = function(content, flags) {
-  var type = flags.header ? 'th' : 'td';
-  var tag = flags.align
-    ? '<' + type + ' style="text-align:' + flags.align + '">'
-    : '<' + type + '>';
-  return tag + content + '</' + type + '>\n';
-};
-
-// span level renderer
-Renderer.prototype.strong = function(text) {
-  return '<strong>' + text + '</strong>';
-};
-
-Renderer.prototype.em = function(text) {
-  return '<em>' + text + '</em>';
-};
-
-Renderer.prototype.codespan = function(text) {
-  return '<code>' + text + '</code>';
-};
-
-Renderer.prototype.br = function() {
-  return this.options.xhtml ? '<br/>' : '<br>';
-};
-
-Renderer.prototype.del = function(text) {
-  return '<del>' + text + '</del>';
-};
-
-Renderer.prototype.link = function(href, title, text) {
-  if (this.options.sanitize) {
-    try {
-      var prot = decodeURIComponent(unescape(href))
-        .replace(/[^\w:]/g, '')
-        .toLowerCase();
-    } catch (e) {
-      return '';
-    }
-    if (prot.indexOf('javascript:') === 0 || prot.indexOf('vbscript:') === 0) {
-      return '';
-    }
-  }
-  var out = '<a href="' + href + '"';
-  if (title) {
-    out += ' title="' + title + '"';
-  }
-  out += '>' + text + '</a>';
-  return out;
-};
-
-Renderer.prototype.image = function(href, title, text) {
-  var out = '<img src="' + href + '" alt="' + text + '"';
-  if (title) {
-    out += ' title="' + title + '"';
-  }
-  out += this.options.xhtml ? '/>' : '>';
-  return out;
-};
-
-Renderer.prototype.text = function(text) {
-  return text;
-};
-
-/**
- * Parsing & Compiling
- */
-
-function Parser(options) {
-  this.tokens = [];
-  this.token = null;
-  this.options = options || marked.defaults;
-  this.options.renderer = this.options.renderer || new Renderer;
-  this.renderer = this.options.renderer;
-  this.renderer.options = this.options;
-}
-
-/**
- * Static Parse Method
- */
-
-Parser.parse = function(src, options, renderer) {
-  var parser = new Parser(options, renderer);
-  return parser.parse(src);
-};
-
-/**
- * Parse Loop
- */
-
-Parser.prototype.parse = function(src) {
-  this.inline = new InlineLexer(src.links, this.options, this.renderer);
-  this.tokens = src.reverse();
-
-  var out = '';
-  while (this.next()) {
-    out += this.tok();
-  }
-
-  return out;
-};
-
-/**
- * Next Token
- */
-
-Parser.prototype.next = function() {
-  return this.token = this.tokens.pop();
-};
-
-/**
- * Preview Next Token
- */
-
-Parser.prototype.peek = function() {
-  return this.tokens[this.tokens.length - 1] || 0;
-};
-
-/**
- * Parse Text Tokens
- */
-
-Parser.prototype.parseText = function() {
-  var body = this.token.text;
-
-  while (this.peek().type === 'text') {
-    body += '\n' + this.next().text;
-  }
-
-  return this.inline.output(body);
-};
-
-/**
- * Parse Current Token
- */
-
-Parser.prototype.tok = function() {
-  switch (this.token.type) {
-    case 'space': {
-      return '';
-    }
-    case 'hr': {
-      return this.renderer.hr();
-    }
-    case 'heading': {
-      return this.renderer.heading(
-        this.inline.output(this.token.text),
-        this.token.depth,
-        this.token.text);
-    }
-    case 'code': {
-      return this.renderer.code(this.token.text,
-        this.token.lang,
-        this.token.escaped);
-    }
-    case 'table': {
-      var header = ''
-        , body = ''
-        , i
-        , row
-        , cell
-        , flags
-        , j;
-
-      // header
-      cell = '';
-      for (i = 0; i < this.token.header.length; i++) {
-        cell += this.renderer.tablecell(
-          this.inline.output(this.token.header[i]),
-          { header: true, align: this.token.align[i] }
-        );
-      }
-      header += this.renderer.tablerow(cell);
-
-      for (i = 0; i < this.token.cells.length; i++) {
-        row = this.token.cells[i];
-
-        cell = '';
-        for (j = 0; j < row.length; j++) {
-          cell += this.renderer.tablecell(
-            this.inline.output(row[j]),
-            { header: false, align: this.token.align[j] }
-          );
-        }
-
-        body += this.renderer.tablerow(cell);
-      }
-      return this.renderer.table(header, body);
-    }
-    case 'blockquote_start': {
-      var body = '';
-
-      while (this.next().type !== 'blockquote_end') {
-        body += this.tok();
-      }
-
-      return this.renderer.blockquote(body);
-    }
-    case 'list_start': {
-      var body = ''
-        , ordered = this.token.ordered;
-
-      while (this.next().type !== 'list_end') {
-        body += this.tok();
-      }
-
-      return this.renderer.list(body, ordered);
-    }
-    case 'list_item_start': {
-      var body = '';
-
-      while (this.next().type !== 'list_item_end') {
-        body += this.token.type === 'text'
-          ? this.parseText()
-          : this.tok();
-      }
-
-      return this.renderer.listitem(body);
-    }
-    case 'loose_item_start': {
-      var body = '';
-
-      while (this.next().type !== 'list_item_end') {
-        body += this.tok();
-      }
-
-      return this.renderer.listitem(body);
-    }
-    case 'html': {
-      var html = !this.token.pre && !this.options.pedantic
-        ? this.inline.output(this.token.text)
-        : this.token.text;
-      return this.renderer.html(html);
-    }
-    case 'paragraph': {
-      return this.renderer.paragraph(this.inline.output(this.token.text));
-    }
-    case 'text': {
-      return this.renderer.paragraph(this.parseText());
-    }
-  }
-};
-
-/**
- * Helpers
- */
-
-function escape(html, encode) {
-  return html
-    .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function unescape(html) {
-	// explicitly match decimal, hex, and named HTML entities 
-  return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function(_, n) {
-    n = n.toLowerCase();
-    if (n === 'colon') { return ':'; }
-    if (n.charAt(0) === '#') {
-      return n.charAt(1) === 'x'
-        ? String.fromCharCode(parseInt(n.substring(2), 16))
-        : String.fromCharCode(+n.substring(1));
-    }
-    return '';
-  });
-}
-
-function replace(regex, opt) {
-  regex = regex.source;
-  opt = opt || '';
-  return function self(name, val) {
-    if (!name) { return new RegExp(regex, opt); }
-    val = val.source || val;
-    val = val.replace(/(^|[^\[])\^/g, '$1');
-    regex = regex.replace(name, val);
-    return self;
-  };
-}
-
-function noop() {}
-noop.exec = noop;
-
-function merge(obj) {
-  var i = 1
-    , target
-    , key;
-
-  for (; i < arguments.length; i++) {
-    target = arguments[i];
-    for (key in target) {
-      if (Object.prototype.hasOwnProperty.call(target, key)) {
-        obj[key] = target[key];
-      }
-    }
-  }
-
-  return obj;
-}
-
-
-/**
- * Marked
- */
-
-function marked(src, opt, callback) {
-  if (callback || typeof opt === 'function') {
-    if (!callback) {
-      callback = opt;
-      opt = null;
-    }
-
-    opt = merge({}, marked.defaults, opt || {});
-
-    var highlight = opt.highlight
-      , tokens
-      , pending
-      , i = 0;
-
-    try {
-      tokens = Lexer.lex(src, opt);
-    } catch (e) {
-      return callback(e);
-    }
-
-    pending = tokens.length;
-
-    var done = function(err) {
-      if (err) {
-        opt.highlight = highlight;
-        return callback(err);
-      }
-
-      var out;
-
-      try {
-        out = Parser.parse(tokens, opt);
-      } catch (e) {
-        err = e;
-      }
-
-      opt.highlight = highlight;
-
-      return err
-        ? callback(err)
-        : callback(null, out);
-    };
-
-    if (!highlight || highlight.length < 3) {
-      return done();
-    }
-
-    delete opt.highlight;
-
-    if (!pending) { return done(); }
-
-    for (; i < tokens.length; i++) {
-      (function(token) {
-        if (token.type !== 'code') {
-          return --pending || done();
-        }
-        return highlight(token.text, token.lang, function(err, code) {
-          if (err) { return done(err); }
-          if (code == null || code === token.text) {
-            return --pending || done();
-          }
-          token.text = code;
-          token.escaped = true;
-          --pending || done();
-        });
-      })(tokens[i]);
-    }
-
-    return;
-  }
-  try {
-    if (opt) { opt = merge({}, marked.defaults, opt); }
-    return Parser.parse(Lexer.lex(src, opt), opt);
-  } catch (e) {
-    e.message += '\nPlease report this to https://github.com/chjj/marked.';
-    if ((opt || marked.defaults).silent) {
-      return '<p>An error occured:</p><pre>'
-        + escape(e.message + '', true)
-        + '</pre>';
-    }
-    throw e;
-  }
-}
-
-/**
- * Options
- */
-
-marked.options =
-marked.setOptions = function(opt) {
-  merge(marked.defaults, opt);
-  return marked;
-};
-
-marked.defaults = {
-  gfm: true,
-  tables: true,
-  breaks: false,
-  pedantic: false,
-  sanitize: false,
-  sanitizer: null,
-  mangle: true,
-  smartLists: false,
-  silent: false,
-  highlight: null,
-  langPrefix: 'lang-',
-  smartypants: false,
-  headerPrefix: '',
-  renderer: new Renderer,
-  xhtml: false
-};
-
-/**
- * Expose
- */
-
-marked.Parser = Parser;
-marked.parser = Parser.parse;
-
-marked.Renderer = Renderer;
-
-marked.Lexer = Lexer;
-marked.lexer = Lexer.lex;
-
-marked.InlineLexer = InlineLexer;
-marked.inlineLexer = InlineLexer.output;
-
-marked.parse = marked;
-
-{
-  module.exports = marked;
-}
-
-}).call(function() {
-  return this || (typeof window !== 'undefined' ? window : commonjsGlobal);
-}());
-});
-
-const renderer = new marked.Renderer();
-
-renderer.heading = (text, level) => {
-  return `<div class="Markdown__heading Markdown__heading--level${level}">${text}</div>`;
-},
-renderer.paragraph = text => {
-  return `<div class="Markdown__paragraph">${text}</div>`;
-},
-renderer.strong = text => {
-  return `<span class="Markdown__strong">${text}</span>`;
-},
-renderer.em = text => {
-  return `<span class="Markdown__emphasis">${text}</span>`;
-},
-renderer.del = text => {
-  return `<span class="Markdown__delete">${text}</span>`;
-},
-renderer.list = (body, ordered) => {
-  if (ordered) {
-    return `<ol class="Markdown__list Markdown__list--ordered">${body}</ol>`;
-  } else {
-    return `<ul class="Markdown__list Markdown__list--unordered">${body}</ul>`;
-  }
-},
-renderer.listitem = text => {
-  return `<li class="Markdown__listitem">${text}</li>`;
-},
-renderer.code = code => {
-  return `<div class="Markdown__code"><pre><code>${code}</code></pre></div>`;
-},
-renderer.codespan = code => {
-  return `<span class="Markdown__codespan"><code>${code}</code></span>`;
-},
-renderer.html = html => {
-  return html;
-},
-renderer.hr = () => {
-  return '<div class="Markdown__horizontalRule"></div>';
-},
-renderer.br = () => {
-  return '<br>';
-},
-renderer.blockquote = quote => {
-  return `<div class="Markdown__blockquote">${quote}</div>`;
-},
-renderer.link = (href, title, text) => {
-  if (title) {
-    return `<a class="Markdown__link" href="${href}" title="${title}">${text}</a>`;
-  } else {
-    return `<a class="Markdown__link" href="${href}">${text}</a>`;
-  }
-},
-renderer.image = (href, title, text) => {
-  if (title) {
-    return `<img class="Markdown__image" src="${href}" alt="${text}" title="${title}"></img>`;
-  } else {
-    return `<img class="Markdown__image" src="${href}" alt="${text}"></img>`;
-  }
-},
-renderer.table = (header, body) => {
-  return `<table class="Markdown__table"><thead>${header}</thead><tbody class="Markdown__tableBody">${body}</tbody></table>`;
-},
-renderer.tablerow = content => {
-  return `<tr class="Markdown__tableRow">${content}</tr>`;
-},
-renderer.tablecell = (content, flags) => {
-  if (flags.header) {
-    return `<th class="Markdown__tableHeader">${content}</th>`;
-  } else {
-    return `<td class="Markdown__tableCell Markdown__tableCell--${flags.align}">${content}</td>`;
-  }
-};
-
-var script$62 = function() {
-  marked.setOptions(objectAssign(
-    {
-      renderer: renderer,
-      gfm: true,
-      tables: true,
-      breaks: false,
-      pedantic: false,
-      sanitize: false,
-      smartLists: true,
-      smartypants: false
-    },
-    this.opts.data.markedOptions
-  ));
-
-  this.on('mount', () => {
-    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
-  }).on('updated', () => {
-    this.refs.view.innerHTML = this.opts.data.content ? marked(this.opts.data.content) : '';
-  });
-};
-
-riot$1.tag2('viron-markdown', '<div ref="view"></div>', '', 'class="Markdown"', function(opts) {
     this.external(script$62);
 });
 
-var script$63 = function() {
-  this.descriptionsMarkdown = {
-    content: this.opts.endpoint.description,
-    markedOptions: {}
-  };
+var script$63 = function() {};
 
-  this.on('update', () => {
-    this.descriptionsMarkdown = {
-      content: this.opts.endpoint.description,
-      markedOptions: {}
-    };
-  });
-
-  this.handleClick = () => {
-    this.opts.onentry(this.opts.key);
-  };
-
-  this.handleEditButtonClick = () => {
-    this.opts.onedit(this.opts.key);
-  };
-
-  this.handleRemoveButtonClick = () => {
-    this.opts.onremove(this.opts.key);
-  };
-
-  this.handleLogoutButtonClick = () => {
-    this.opts.onlogout(this.opts.key);
-  };
-
-  this.handleQrCodeButtonClick = () => {
-    this.opts.onqrcode(this.opts.key);
-  };
-};
-
-riot$1.tag2('viron-endpoint', '<div class="EndpointsPage__itemHead"> <div class="EndpointsPage__itemAvatar"> <div class="EndpointsPage__itemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__itemToken {!!opts.endpoint.token ? \'EndpointsPage__itemToken--active\' : \'\'}"></div> </div> <div class="EndpointsPage__itemName">{opts.endpoint.name}</div> <div class="EndpointsPage__itemMenuButton" onclick="{handleMenuButtonClick}"> <viron-icon type="ellipsis"></viron-icon> </div> </div> <div class="EndpointsPage__itemBody"> <div class="EndpointsPage__itemDescription"> <viron-markdown data="{descriptionsMarkdown}"></viron-markdown> </div> <div class="EndpointsPage__itemMemo">{opts.endpoint.memo}</div> <div class="EndpointsPage__itemTags" if="{!!opts.endpoint.tags.length}"> <viron-tag each="{label in opts.endpoint.tags}" label="{label}"></viron-tag> </div> <div class="EndpointsPage__itemUrl"> <div class="EndpointsPage__itemUrlIcon"> <viron-icon type="link"></viron-icon> </div> <div class="EndpointsPage__itemUrlLabel">{opts.endpoint.url}</div> </div> </div> <div class="EndpointsPage__itemTail"> <div class="EndpointsPage__itemMenu" onclick="{handleEditButtonClick}">編集</div> <div class="EndpointsPage__itemMenu" onclick="{handleRemoveButtonClick}">削除</div> <div class="EndpointsPage__itemMenu" onclick="{handleQrCodeButtonClick}">QR Code</div> <div class="EndpointsPage__itemMenu" onclick="{handleLogoutButtonClick}">ログアウト</div> </div>', '', 'class="EndpointsPage__item" onclick="{handleClick}"', function(opts) {
+riot$1.tag2('viron-notfound', '<div>NOT FOUND...</div>', '', 'class="Page NotfoundPage"', function(opts) {
     this.external(script$63);
 });
 
+var script$64 = function() {
+};
+
+riot$1.tag2('viron-progress-circular', '<div class="ProgressCircular__spinner"> <viron-icon type="loading"></viron-icon> </div>', '', 'class="ProgressCircular"', function(opts) {
+    this.external(script$64);
+});
+
 var script$65 = function() {
+};
+
+riot$1.tag2('viron-progress-linear', '<div class="ProgressLinear__bar"> <div class="ProgressLinear__particle"></div> <div class="ProgressLinear__particle"></div> </div>', '', 'class="ProgressLinear {\'ProgressLinear--active\' : opts.isactive}"', function(opts) {
+    this.external(script$65);
+});
+
+var script$66 = function() {};
+
+riot$1.tag2('viron-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
+    this.external(script$66);
+});
+
+riot$1.tag2('viron-icon-dots', '<svg viewbox="-1062 13983 15 14"> <g transform="translate(-1342 13957.235)"> <g transform="translate(280 25.765)"> <rect width="15" height="14" rx="1"></rect> <rect x="1.5" y="1.5" width="12" height="11" rx="0.5"></rect> </g> </g> </svg>', '', 'class="icon Icon IconDots"', function(opts) {
+});
+
+var script$69 = function() {
+  /**
+   * 文字列もしくはnullに変換します。
+   * @param {String|null|undefined} value
+   * @return {String|null}
+   */
+  this.normalizeValue = value => {
+    if (!isString_1(value)) {
+      return null;
+    }
+    return value;
+  };
+
+  this.handleTap = () => {
+    this.refs.input.focus();
+  };
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    if (!this.opts.onchange) {
+      return;
+    }
+    const newVal = this.normalizeValue(this.opts.val);
+    this.opts.onchange(newVal, this.opts.id);
+  };
+
+  // `blur`時にも`change`イベントが発火する。
+  // 不都合な挙動なのでイベント伝播を止める。
+  this.handleTextareaChange = e => {
+    e.stopPropagation();
+  };
+
+  this.handleTextareaInput = e => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    const newVal = this.normalizeValue(e.target.value);
+    this.opts.onchange(newVal, this.opts.id);
+  };
+};
+
+riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__form" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="input" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\': opts.isdisabled}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$69);
+});
+
+var script$70 = function() {
+  this.handleTap = () => {
+    if (!this.opts.onselect) {
+      return;
+    }
+    this.opts.onselect();
+  };
+};
+
+riot$1.tag2('viron-button', '<div class="Button__label">{opts.label}</div>', '', 'class="Button Button--{opts.theme || \'primary\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$70);
+});
+
+var script$71 = function() {
   const store = this.riotx.get();
 
-  this.memo = this.opts.endpoint.memo || '';
+  this.memo = this.opts.endpoint.memo;
 
   this.handleMemoChange = newMemo => {
     this.memo = newMemo;
     this.update();
   };
 
-  this.handleEditButtonClick = () => {
+  this.handleSaveButtonSelect = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.ENDPOINTS_UPDATE, this.opts.endpointKey, {
+      .then(() => store.action(constants$1.ENDPOINTS_UPDATE, this.opts.endpoint.key, {
         memo: this.memo
       }))
       .then(() => store.action(constants$1.TOASTS_ADD, {
-        message: 'エンドポイントを編集しました。'
+        message: '保存完了。'
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(constants$1.TOASTS_ADD, {
-        type: 'error',
-        message: err.message
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+        error: err
       }));
   };
 
-  this.handleCancelButtonClick = () => {
+  this.handleCancelButtonSelect = () => {
     this.close();
   };
 };
 
-riot$1.tag2('viron-endpoint-edit', '<div class="EndpointsPage__editTitle">エンドポイント編集</div> <div class="EndpointsPage__editHead"> <div class="EndpointsPage__editThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__editName">{opts.endpoint.name || \'-\'}</div> </div> <div class="EndpointsPage__editForm"> <viron-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="EndpointsPage__editControls"> <viron-button type="primary" onclick="{handleEditButtonClick}" label="保存"></viron-button> <viron-button type="secondary" onclick="{handleCancelButtonClick}" label="キャンセル"></viron-button> </div>', '', 'class="EndpointsPage__edit"', function(opts) {
-    this.external(script$65);
+riot$1.tag2('viron-endpoints-page-endpoint-menu-edit', '<div class="EndpointsPage_Endpoint_Menu_Edit__title">エンドポイント編集</div> <div class="EndpointsPage_Endpoint_Menu_Edit__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint_Menu_Edit__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint_Menu_Edit__inputs"> <viron-textarea label="メモ" val="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="EndpointsPage_Endpoint_Menu_Edit__control"> <viron-button label="保存" onselect="{handleSaveButtonSelect}"></viron-button> <viron-button theme="ghost" label="キャンセル" onselect="{handleCancelButtonSelect}"></viron-button> </div>', '', 'class="EndpointsPage_Endpoint_Menu_Edit"', function(opts) {
+    this.external(script$71);
 });
 
 var qrious = createCommonjsModule(function (module, exports) {
@@ -61008,7 +59844,7 @@ var qrious = createCommonjsModule(function (module, exports) {
 
 });
 
-var script$66 = function() {
+var script$72 = function() {
   this.on('mount', () => {
     new qrious(objectAssign({}, this.opts.data, {
       element: this.refs.canvas
@@ -61016,11 +59852,11 @@ var script$66 = function() {
   });
 };
 
-riot$1.tag2('viron-qrcode', '<canvas class="Qrcode__canvas" ref="canvas"></canvas>', '', 'class="Qrcode"', function(opts) {
-    this.external(script$66);
+riot$1.tag2('viron-qrcode', '<canvas class="Qrcode_canvas" ref="canvas"></canvas>', '', 'class="Qrcode"', function(opts) {
+    this.external(script$72);
 });
 
-var script$67 = function() {
+var script$73 = function() {
   const optimizedEndpoint = objectAssign({}, {
     url: this.opts.endpoint.url,
     memo: this.opts.endpoint.memo
@@ -61042,16 +59878,135 @@ var script$67 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoint-qrcode', '<div class="EndpointsPage__qrcodeMessage">モバイル端末にエンドポイントを追加できます。<br>お好きなQRコードリーダーで読み込んで下さい。</div> <div class="EndpointsPage__qrcodeContent"> <viron-qrcode data="{data}"></viron-qrcode> </div>', '', 'class="EndpointsPage__qrcode"', function(opts) {
-    this.external(script$67);
+riot$1.tag2('viron-endpoints-page-endpoint-menu-qrcode', '<div class="EndpointsPage_Endpoint_Menu_QRCode__message">モバイル端末にエンドポイントを追加できます。<br>お好きなQRコードリーダーで読み込んで下さい。</div> <div class="EndpointsPage_Endpoint_Menu_QRCode__canvas"> <viron-qrcode data="{data}"></viron-qrcode> </div>', '', 'class="EndpointsPage_Endpoint_Menu_QRCode"', function(opts) {
+    this.external(script$73);
 });
 
 var script$68 = function() {
-  this.email = '';
+  const store = this.riotx.get();
+
+  this.handleEditButtonTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'viron-endpoints-page-endpoint-menu-edit', {
+        endpoint: this.opts.endpoint
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+        error: err
+      }));
+  };
+
+  this.handleDeleteButtonTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.ENDPOINTS_REMOVE, this.opts.endpoint.key))
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'エンドポイントを削除しました。'
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+        error: err
+      }));
+  };
+
+  this.handleQRCodeButtonTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.MODALS_ADD, 'viron-endpoints-page-endpoint-menu-qrcode', {
+        endpoint: this.opts.endpoint
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+        error: err
+      }));
+  };
+
+  this.handleSignoutButtonTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.AUTH_REMOVE, this.opts.endpoint.key))
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'ログアウトしました。'
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+        error: err
+      }));
+  };
+};
+
+riot$1.tag2('viron-endpoints-page-endpoint-menu', '<div onclick="{getClickHandler(\'handleEditButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditButtonTap\')}">編集</div> <div onclick="{getClickHandler(\'handleDeleteButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDeleteButtonTap\')}">削除</div> <div onclick="{getClickHandler(\'handleQRCodeButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleQRCodeButtonTap\')}">QR Code</div> <div onclick="{getClickHandler(\'handleSignoutButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSignoutButtonTap\')}">サインアウト</div>', '', 'class="EndpointsPage_Endpoint_Menu"', function(opts) {
+    this.external(script$68);
+});
+
+var script$74 = function() {};
+
+riot$1.tag2('viron-horizontal-rule', '<div class="HorizontalRule__line"></div> <virtual if="{!!opts.label}"> <div class="HorizontalRule__label">{opts.label}</div> <div class="HorizontalRule__line"></div> </virtual>', '', 'class="HorizontalRule"', function(opts) {
+    this.external(script$74);
+});
+
+var script$75 = function() {
+  /**
+   * 文字列もしくはnullに変換します。
+   * @param {String|null|undefined} value
+   * @return {String|null}
+   */
+  this.normalizeValue = value => {
+    if (!isString_1(value)) {
+      return null;
+    }
+    return value;
+  };
+
+  this.handleTap = () => {
+    this.refs.input.focus();
+  };
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    if (!this.opts.onchange) {
+      return;
+    }
+    const newVal = this.normalizeValue(this.opts.val);
+    this.opts.onchange(newVal, this.opts.id);
+  };
+
+  // `blur`時にも`change`イベントが発火する。
+  // 不都合な挙動なのでイベント伝播を止める。
+  this.handleInputChange = e => {
+    e.stopPropagation();
+  };
+
+  this.handleInputInput = e => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    const newVal = this.normalizeValue(e.target.value);
+    this.opts.onchange(newVal, this.opts.id);
+  };
+};
+
+riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$75);
+});
+
+var script$76 = function() {
+  const store = this.riotx.get();
+
+  this.mailAddress = '';
   this.password = '';
 
-  this.handleEmailChange = newEmail => {
-    this.email = newEmail;
+  this.handleMailAddressChange = newMailAddress => {
+    this.mailAddress = newMailAddress;
     this.update();
   };
 
@@ -61060,188 +60015,134 @@ var script$68 = function() {
     this.update();
   };
 
-  this.handleSigninClick = () => {
-    this.opts.onsigninclick(this.email, this.password, this.opts.authtype);
-  };
-};
-
-riot$1.tag2('viron-signinemail', '<viron-textinput label="メールアドレス" text="{email}" onchange="{handleEmailChange}" type="email"></viron-textinput> <viron-textinput label="パスワード" text="{password}" type="password" onchange="{handlePasswordChange}"></viron-textinput> <viron-button onclick="{handleSigninClick}" label="サインイン"></viron-button>', '', 'class="EndpointsPage__signinEmail"', function(opts) {
-    this.external(script$68);
-});
-
-var script$69 = function() {
-  this.handleButtonClick = () => {
-    this.opts.onclick(this.opts.authtype);
-  };
-};
-
-riot$1.tag2('viron-signinoauth', '<viron-button onclick="{handleButtonClick}" label="{opts.authtype.provider}"></viron-button>', '', 'class="EndpointsPage__signinOauth"', function(opts) {
-    this.external(script$69);
-});
-
-var script$70 = function() {
-  const store = this.riotx.get();
-
-  this.oauths = values_1(filter$4(this.opts.authtypes, v => {
-    return v.type === 'oauth';
-  }));
-  this.emails = values_1(filter$4(this.opts.authtypes, v => {
-    return v.type === 'email';
-  }));
-
-  this.handleEmailSigninClick = (email, password, authtype) => {
+  this.handleSigninButtonSelect = () => {
+    this.opts.closer();
     Promise
       .resolve()
-      .then(() => store.action(constants$1.AUTH_SIGNIN_EMAIL, this.opts.key, authtype, email, password))
+      .then(() => store.action(constants$1.AUTH_SIGNIN_EMAIL, this.opts.endpointkey, this.opts.authtype, this.mailAddress, this.password))
       .then(() => {
-        this.close();
-        this.opts.onSignin();
+        this.getRouter().navigateTo(`/${this.opts.endpointkey}`);
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
         title: 'ログイン失敗',
         message: 'ログイン出来ませんでした。正しいメールアドレスとパスワードを使用しているか確認して下さい。使用したメールアドレスが予め管理者として登録されているか確認して下さい。',
         error: err
       }));
   };
+};
 
-  this.handleOAuthClick = authtype => {
+riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<viron-textinput placeholder="mail address" val="{mailAddress}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="password" type="password" val="{password}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button label="ログイン" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
+    this.external(script$76);
+});
+
+var script$77 = function() {
+  const store = this.riotx.get();
+
+  this.handleButtonSelect = () => {
+    this.opts.closer();
     Promise
       .resolve()
-      .then(() => store.action(constants$1.AUTH_SIGNIN_OAUTH, this.opts.key, authtype))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .then(() => store.action(constants$1.AUTH_SIGNIN_OAUTH, this.opts.endpointkey, this.opts.authtype))
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
         error: err
       }));
   };
 };
 
-riot$1.tag2('viron-endpoint-signin', '<div class="EndpointsPage__signinHead"> <div class="EndpointsPage__signinThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage__signinName">{opts.endpoint.name}</div> </div> <div class="EndpointsPage__signinEmails" if="{!!emails.length}"> <div class="EndpointsPage__signinEmailsTitle">メールアドレス認証</div> <virtual each="{authtype in emails}"> <viron-signinemail authtype="{authtype}" onsigninclick="{parent.handleEmailSigninClick}"></viron-signinemail> </virtual> </div> <div class="EndpointsPage__signinOauths" if="{!!oauths.length}"> <div class="EndpointsPage__signinOauthsTitle">OAuth認証</div> <virtual each="{authtype in oauths}"> <viron-signinoauth authtype="{authtype}" onclick="{parent.handleOAuthClick}"></viron-signinoauth> </virtual> </div>', '', 'class="EndpointsPage__signin"', function(opts) {
-    this.external(script$70);
+riot$1.tag2('viron-endpoints-page-endpoint-signin-oauth', '<viron-button label="{opts.authtype.provider}" onselect="{handleButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Oauth"', function(opts) {
+    this.external(script$77);
 });
 
-var script$64 = function() {
+var script$78 = function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
-  this.endpointsCount = store.getter(constants$5.ENDPOINTS_COUNT);
-  this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
+  this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
+  this.emails = filter_1$1(this.opts.authtypes, authtype => {
+    return (authtype.type === constants$4.authtypeEmail);
+  });
+  this.oauths = filter_1$1(this.opts.authtypes, authtype => {
+    return (authtype.type === constants$4.authtypeOauth);
+  });
 
-  this.listen(constants$3.ENDPOINTS, () => {
-    this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
-    this.endpointsCount = store.getter(constants$5.ENDPOINTS_COUNT);
+  this.listen(constants$3.LAYOUT, () => {
+    this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
     this.update();
   });
 
-  this.listen(constants$3.APPLICATION, () => {
-    this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
-    this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
-    this.update();
-  });
+  // 子コンポーネントに渡す。モーダルを閉じるため。
+  this.closer = () => {
+    this.close();
+  };
+};
 
-  this.handleEndpointEntry = key => {
+riot$1.tag2('viron-endpoints-page-endpoint-signin', '<div class="EndpointsPage_Endpoint_Signin__main"> <div class="EndpointsPage_Endpoint_Signin__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint_Signin__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint_Signin__url">url: {opts.endpoint.url}</div> <div class="EndpointsPage_Endpoint_Signin__emails" if="{!!emails.length}"> <viron-endpoints-page-endpoint-signin-email each="{authtype in emails}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-email> </div> <virtual if="{!isDesktop &amp;&amp; !!oauths.length}"> <viron-horizontal-rule label="または"></viron-horizontal-rule> <div class="EndpointsPage_Endpoint_Signin__oauths"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </virtual> </div> <div class="EndpointsPage_Endpoint_Signin__aside" if="{isDesktop &amp;&amp; !!oauths.length}"> <div class="EndpointsPage_Endpoint_Signin__oauthMessage">または、こちらを<br>利用してログイン</div> <div class="EndpointsPage_Endpoint_Signin__oauths"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </div>', '', 'class="EndpointsPage_Endpoint_Signin"', function(opts) {
+    this.external(script$78);
+});
+
+var script$67 = function() {
+  const store = this.riotx.get();
+
+  this.handleTap = () => {
+    // サインイン済みならばendpointページに遷移させる。
+    // サインインしていなければ認証モーダルを表示する。
+    const endpointKey = this.opts.endpoint.key;
     Promise
       .resolve()
-      .then(() => store.action(constants$1.AUTH_VALIDATE, key))
+      .then(() => store.action(constants$1.AUTH_VALIDATE, endpointKey))
       .then(isValid => {
-        // tokenが有効ならばendpointページに遷移させる。
-        // 無効ならサインイン用のモーダルを表示させる。
         if (isValid) {
-          this.getRouter().navigateTo(`/${key}`);
+          this.getRouter().navigateTo(`/${endpointKey}`);
           return Promise.resolve();
         }
         return Promise
           .resolve()
-          .then(() => store.action(constants$1.AUTH_GET_TYPES, key))
-          .then(authtypes => store.action(constants$1.MODALS_ADD, 'viron-endpoint-signin', {
-            key,
-            endpoint: store.getter(constants$5.ENDPOINTS_ONE, key),
-            authtypes,
-            onSignin: () => {
-              this.getRouter().navigateTo(`/${key}`);
-            }
-          }));
+          .then(() => store.action(constants$1.AUTH_GET_TYPES, endpointKey))
+          .then(authtypes => store.action(constants$1.MODALS_ADD, 'viron-endpoints-page-endpoint-signin', {
+            endpoint: this.opts.endpoint,
+            authtypes
+          }, { isSpread: true }));
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
         error: err
       }));
   };
 
-  this.handleEndpointEdit = key => {
-    Promise
-      .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'viron-endpoint-edit', {
-        endpointKey: key,
-        endpoint: store.getter(constants$5.ENDPOINTS_ONE, key)
-      }))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
-        error: err
-      }));
-  };
-
-  this.handleEndpointRemove = key => {
-    Promise
-      .resolve()
-      .then(() => store.action(constants$1.ENDPOINTS_REMOVE, key))
-      .then(() => store.action(constants$1.TOASTS_ADD, {
-        message: 'エンドポイントを削除しました。'
-      }))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
-        error: err
-      }));
-  };
-
-  this.handleEndpointQrCode = key => {
-    const endpoint = store.getter(constants$5.ENDPOINTS_ONE, key);
-    Promise
-      .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'viron-endpoint-qrcode', {
-        endpoint
-      }))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
-        error: err
-      }));
-  };
-
-  this.handleEndpointLogout = key => {
-    Promise
-      .resolve()
-      .then(() => store.action(constants$1.AUTH_REMOVE, key))
-      .then(() => store.action(constants$1.TOASTS_ADD, {
-        message: 'エンドポイントからログアウトしました。'
-      }))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
-        error: err
-      }));
+  this.handleMenuTap = e => {
+    e.stopPropagation();
+    const rect = this.refs.menu.getBoundingClientRect();
+    store.action(constants$1.POPOVERS_ADD, 'viron-endpoints-page-endpoint-menu', {
+      endpoint: this.opts.endpoint
+    }, {
+      x: rect.left + (rect.width / 2),
+      y: rect.bottom,
+      direction: 'TL'
+    });
   };
 };
 
-riot$1.tag2('viron-endpoints', '<div class="EndpointsPage__caption" if="{!!endpointsCount}"> <div class="EndpointsPage__captionIcon"> <viron-icon type="link"></viron-icon> </div> <div class="EndpointsPage__captionLabel">Endpoint ({endpointsCount})<span class="EndpointsPage__captionFilter" if="{!!endpointFilterText}">filtered by "{endpointFilterText}"</span></div> </div> <div class="EndpointsPage__list" ref="list"> <virtual each="{endpoint in endpoints}"> <viron-endpoint key="{endpoint.key}" endpoint="{endpoint}" onentry="{handleEndpointEntry}" onedit="{handleEndpointEdit}" onremove="{handleEndpointRemove}" onqrcode="{handleEndpointQrCode}" onlogout="{handleEndpointLogout}"></viron-endpoint> </virtual> </div>', '', 'class="Page EndpointsPage"', function(opts) {
-    this.external(script$64);
+riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"> <viron-icon-dots></viron-icon-dots> </div> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint__description">description: {opts.endpoint.description}</div> <div class="EndpointsPage_Endpoint__memo">memo: {opts.endpoint.memo}</div> <div class="EndpointsPage_Endpoint__url">url: {opts.endpoint.url}</div> <div class="EndpointsPage_Endpoint__version">version: {opts.endpoint.version}</div> <div class="EndpointsPage_Endpoint__token">token: {opts.endpoint.token}</div> <div class="EndpointsPage_Endpoint__theme">theme: {opts.endpoint.color}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div>', '', 'class="card EndpointsPage_Endpoint" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$67);
 });
 
-var script$71 = function() {};
+var script$79 = function() {
+  const store = this.riotx.get();
 
-riot$1.tag2('viron-notfound', '<div>NOT FOUND...</div>', '', 'class="Page NotfoundPage"', function(opts) {
-    this.external(script$71);
-});
+  this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
 
-var script$72 = function() {
+  this.listen(constants$3.ENDPOINTS, () => {
+    this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
+    this.update();
+  });
 };
 
-riot$1.tag2('viron-progress-circular', '<div class="ProgressCircular__spinner"> <viron-icon type="loading"></viron-icon> </div>', '', 'class="ProgressCircular"', function(opts) {
-    this.external(script$72);
-});
-
-var script$73 = function() {
-};
-
-riot$1.tag2('viron-progress-linear', '<div class="ProgressLinear__bar"> <div class="ProgressLinear__particle"></div> <div class="ProgressLinear__particle"></div> </div>', '', 'class="ProgressLinear {\'ProgressLinear--active\' : opts.isactive}"', function(opts) {
-    this.external(script$73);
+riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__list"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage"', function(opts) {
+    this.external(script$79);
 });
 
 riot$1.tag2('viron-application-blocker', '', '', 'class="Application_Blocker"', function(opts) {
 });
 
-var script$74 = function() {
+var script$80 = function() {
   const store = this.riotx.get();
 
   // `tag` = drawer内に展開されるriot tagインスタンス。
@@ -61293,10 +60194,10 @@ var script$74 = function() {
 };
 
 riot$1.tag2('viron-drawer', '<div class="Drawer__frame"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$74);
+    this.external(script$80);
 });
 
-var script$75 = function() {
+var script$81 = function() {
   const store = this.riotx.get();
 
   this.drawers = store.getter(constants$5.DRAWERS);
@@ -61308,10 +60209,7 @@ var script$75 = function() {
 };
 
 riot$1.tag2('viron-application-drawers', '<virtual each="{drawers}"> <viron-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}"></viron-drawer> </virtual>', '', 'class="Application_Drawers"', function(opts) {
-    this.external(script$75);
-});
-
-riot$1.tag2('viron-icon-dots', '<svg viewbox="-1062 13983 15 14"> <g transform="translate(-1342 13957.235)"> <g transform="translate(280 25.765)"> <rect width="15" height="14" rx="1"></rect> <rect x="1.5" y="1.5" width="12" height="11" rx="0.5"></rect> </g> </g> </svg>', '', 'class="icon Icon IconDots"', function(opts) {
+    this.external(script$81);
 });
 
 riot$1.tag2('viron-icon-search', '<svg viewbox="-2605 13982 16 16"> <path d="M11.256,9.4h-.372a6.163,6.163,0,0,0,1.023-3.349A5.9,5.9,0,0,0,5.953,0a5.953,5.953,0,0,0,0,11.907h0A6.163,6.163,0,0,0,9.3,10.884v.372L14.047,16,16,14.047ZM9.4,5.953A3.335,3.335,0,0,1,6.047,9.3h0a3.349,3.349,0,0,1,0-6.7A3.4,3.4,0,0,1,9.4,5.953Z" transform="translate(-2605 13982)"></path> </svg>', '', 'class="icon Icon IconSearch"', function(opts) {
@@ -61320,28 +60218,56 @@ riot$1.tag2('viron-icon-search', '<svg viewbox="-2605 13982 16 16"> <path d="M11
 riot$1.tag2('viron-icon-square', '<svg viewbox="-1062 13983 15 14"> <g transform="translate(-1342 13957.235)"> <g transform="translate(280 25.765)"> <rect width="15" height="14" rx="1"></rect> <rect x="1.5" y="1.5" width="12" height="11" rx="0.5"></rect> </g> </g> </svg>', '', 'class="icon Icon IconSquare"', function(opts) {
 });
 
-var script$77 = function() {};
+var script$83 = function() {};
 
 riot$1.tag2('viron-application-header-autocomplete', '<div>autocomplete!!!</div>', '', 'class="Application_Header_Autocomplete"', function(opts) {
-    this.external(script$77);
+    this.external(script$83);
 });
 
-var script$79 = function() {
-  this.handleTap = () => {
-    if (!this.opts.onselect) {
-      return;
-    }
-    this.opts.onselect();
+var script$85 = function() {
+  const store = this.riotx.get();
+
+  this.endpointURL = '';
+  this.memo = '';
+
+  this.handleEndpointURLChange = newEndpointURL => {
+    this.endpointURL = newEndpointURL;
+    this.update();
   };
-};
 
-riot$1.tag2('viron-button', '<div class="Button__label">{opts.label}</div>', '', 'class="Button Button--{opts.theme || \'primary\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$79);
-});
+  this.handleMemoChange = newMemo => {
+    this.memo = newMemo;
+    this.update();
+  };
 
-var script$80 = function() {
+
   this.handleAddButtonSelect = () => {
-    this.close();
+    Promise
+      .resolve()
+      .then(() => store.action(constants$1.ENDPOINTS_ADD, this.endpointURL, this.memo))
+      .then(() => store.action(constants$1.TOASTS_ADD, {
+        message: 'エンドポイントを追加しました。'
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => {
+        let autoHide = true;
+        let linkText;
+        let link;
+        // サーバが自己証明書を使用している場合にページ遷移を促す。
+        if (this.endpointURL.startsWith('https://')) {
+          autoHide = false;
+          linkText = 'Self-Signed Certificate?';
+          link = this.endpointURL;
+        }
+        store.action(constants$1.TOASTS_ADD, {
+          message: err.message,
+          autoHide,
+          linkText,
+          link
+        });
+      });
   };
 
   this.handleCancelButtonSelect = () => {
@@ -61349,11 +60275,11 @@ var script$80 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header-menu-entry', '<div>新しい管理画面を追加する</div> <div>forms...</div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="追加" onselect="{handleAddButtonSelect}"></viron-button> <viron-button theme="ghost" label="キャンセル" onselect="{handleCancelButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
-    this.external(script$80);
+riot$1.tag2('viron-application-header-menu-entry', '<div>新しい管理画面を追加する</div> <div class="Application_Header_Menu_Entry__inputs"> <viron-textinput label="エンドポイント" val="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" val="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="追加" onselect="{handleAddButtonSelect}"></viron-button> <viron-button theme="ghost" label="キャンセル" onselect="{handleCancelButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
+    this.external(script$85);
 });
 
-var script$78 = function() {
+var script$84 = function() {
   const store = this.riotx.get();
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
@@ -61397,6 +60323,11 @@ var script$78 = function() {
     switch (actionId) {
     case 'show_credit':
       // TODO:
+      // TODO: debug用なので後で消すこと。
+      store.action(constants$1.TOASTS_ADD, {
+        message: 'testes',
+        autoHide: false
+      });
       this.close();
       break;
     case 'navigate_to_doc':
@@ -61431,10 +60362,10 @@ var script$78 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu', '<div class="Application_Header_Menu__list"> <div class="Application_Header_Menu__item" each="{action in actions}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}">{action.label}</div> </div>', '', 'class="Application_Header_Menu"', function(opts) {
-    this.external(script$78);
+    this.external(script$84);
 });
 
-var script$76 = function() {
+var script$82 = function() {
   const store = this.riotx.get();
 
   this.handleSearchIconTap = () => {
@@ -61475,19 +60406,59 @@ var script$76 = function() {
 };
 
 riot$1.tag2('viron-application-header', '<div class="Application_Header__aside"> <div class="Application_Header__searchIcon" ref="searchIcon" onclick="{getClickHandler(\'handleSearchIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchIconTap\')}"> <viron-icon-search></viron-icon-search> </div> </div> <div class="Application_Header__aside"> <div class="Application_Header__squareIcon" ref="squareIcon" onclick="{getClickHandler(\'handleSquareIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSquareIconTap\')}"> <viron-icon-square></viron-icon-square> </div> <div class="Application_Header__dotsIcon" ref="dotsIcon" onclick="{getClickHandler(\'handleDotsIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDotsIconTap\')}"> <viron-icon-dots></viron-icon-dots> </div> </div>', '', 'class="Application_Header"', function(opts) {
-    this.external(script$76);
+    this.external(script$82);
 });
 
-var script$81 = function() {};
+riot$1.tag2('viron-icon-logo', '<svg viewbox="-1062 13983 15 14"> <g transform="translate(-1342 13957.235)"> <g transform="translate(280 25.765)"> <rect width="15" height="14" rx="1"></rect> <rect x="1.5" y="1.5" width="12" height="11" rx="0.5"></rect> </g> </g> </svg>', '', 'class="icon Icon IconLogo"', function(opts) {
+});
 
-riot$1.tag2('viron-application-menu', '', '', 'class="Application_Menu"', function(opts) {
-    this.external(script$81);
+var script$86 = function() {
+  const store = this.riotx.get();
+
+  this.isOpened = false;
+
+  this.handleHeadTap = () => {
+    this.isOpened = !this.isOpened;
+    this.update();
+  };
+
+  this.handleIndependentHeadTap = () => {
+    const id = this.opts.group.pages[0].id;
+    this.getRouter().navigateTo(`/${store.getter(constants$5.CURRENT)}/${id}`);
+  };
+
+  this.handlePageTap = e => {
+    const id = e.item.page.id;
+    this.getRouter().navigateTo(`/${store.getter(constants$5.CURRENT)}/${id}`);
+  };
+};
+
+riot$1.tag2('viron-application-menu-group', '<virtual if="{!opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.name}</div> <div class="Application_Menu_Group__icon"> <viron-icon-square></viron-icon-square> </div> </div> <div class="Application_Menu_Group__pages" if="{isOpened}"> <div class="Application_Menu_Group__page" each="{page in opts.group.pages}" onclick="{getClickHandler(\'handlePageTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePageTap\')}">{page.name}</div> </div> </virtual> <virtual if="{opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleIndependentHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleIndependentHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.pages[0].name}</div> </div> </virtual>', '', 'class="Application_Menu_Group"', function(opts) {
+    this.external(script$86);
+});
+
+var script$87 = function() {
+  const store = this.riotx.get();
+
+  this.menu = store.getter(constants$5.VIRON_MENU);
+  this.listen(constants$3.VIRON, () => {
+    this.menu = store.getter(constants$5.VIRON_MENU);
+    this.update();
+  });
+
+  this.handleLogoTap = () => {
+    this.getRouter().navigateTo('/');
+  };
+};
+
+riot$1.tag2('viron-application-menu', '<div class="Application_Menu__head"> <div class="Application_Menu__icon"> <viron-icon-square></viron-icon-square> </div> <div class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"> <viron-icon-logo></viron-icon-logo> </div> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}"></viron-application-menu-group> </div> </div> </div>', '', 'class="Application_Menu"', function(opts) {
+    this.external(script$87);
 });
 
 riot$1.tag2('viron-icon-close', '<svg viewbox="-1062 13983 15 14"> <g transform="translate(-1342 13957.235)"> <g transform="translate(280 25.765)"> <rect width="15" height="14" rx="1"></rect> <rect x="1.5" y="1.5" width="12" height="11" rx="0.5"></rect> </g> </g> </svg>', '', 'class="icon Icon IconClose"', function(opts) {
 });
 
-var script$82 = function() {
+var script$88 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -61550,11 +60521,11 @@ var script$82 = function() {
   };
 };
 
-riot$1.tag2('viron-modal', '<div class="Modal__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {isVisible ? \'Modal--visible\' : \'\'} Modal--{opts.theme} Modal--{layoutType}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$82);
+riot$1.tag2('viron-modal', '<div class="Modal__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {isVisible ? \'Modal--visible\' : \'\'} Modal--{opts.modalopts.theme} Modal--{layoutType} {opts.modalopts.isSpread ? \'Modal--spread\': \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$88);
 });
 
-var script$83 = function() {
+var script$89 = function() {
   const store = this.riotx.get();
 
   this.modals = store.getter(constants$5.MODALS);
@@ -61564,11 +60535,14 @@ var script$83 = function() {
   });
 };
 
-riot$1.tag2('viron-application-modals', '<virtual each="{modals}"> <viron-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{modalOpts.theme}"></viron-modal> </virtual>', '', 'class="Application_Modals"', function(opts) {
-    this.external(script$83);
+riot$1.tag2('viron-application-modals', '<virtual each="{modals}"> <viron-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" modalopts="{modalOpts}"></viron-modal> </virtual>', '', 'class="Application_Modals"', function(opts) {
+    this.external(script$89);
 });
 
-var script$84 = function() {
+// Mouse系かTouch系か。
+const isTouchEventSupported$1 = 'ontouchstart' in document;
+
+var script$90 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -61595,14 +60569,14 @@ var script$84 = function() {
     window.addEventListener('resize', this.handleWindowResize);
     window.addEventListener('scroll', this.handleWindowScroll);
     window.addEventListener('click', this.handleWindowClick);
-    window.addEventListener('touchstart', this.handleWindowTouchStart);
+    window.addEventListener('touchend', this.handleWindowTouchEnd);
   }).on('before-unmount', () => {
     tag.unmount(true);
   }).on('unmount', () => {
     window.removeEventListener('resize', this.handleWindowResize);
     window.removeEventListener('scroll', this.handleWindowScroll);
     window.removeEventListener('click', this.handleWindowClick);
-    window.removeEventListener('touchstart', this.handleWindowTouchStart);
+    window.removeEventListener('touchend', this.handleWindowTouchend);
   });
 
   /**
@@ -61651,19 +60625,23 @@ var script$84 = function() {
   };
 
   this.handleWindowClick = () => {
+    // mouse環境は扱わない。
+    if (isTouchEventSupported$1) {
+      return;
+    }
     fadeOut();
   };
 
-  this.handleWindowTouchStart = () => {
+  this.handleWindowTouchEnd = () => {
     fadeOut();
   };
 };
 
 riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
-    this.external(script$84);
+    this.external(script$90);
 });
 
-var script$85 = function() {
+var script$91 = function() {
   const store = this.riotx.get();
 
   this.popovers = store.getter(constants$5.POPOVERS);
@@ -61674,22 +60652,19 @@ var script$85 = function() {
 };
 
 riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <viron-popover id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover> </virtual>', '', 'class="Application_Popovers"', function(opts) {
-    this.external(script$85);
+    this.external(script$91);
 });
 
-riot$1.tag2('viron-icon-logo', '<svg viewbox="-1062 13983 15 14"> <g transform="translate(-1342 13957.235)"> <g transform="translate(280 25.765)"> <rect width="15" height="14" rx="1"></rect> <rect x="1.5" y="1.5" width="12" height="11" rx="0.5"></rect> </g> </g> </svg>', '', 'class="icon Icon IconLogo"', function(opts) {
-});
-
-var script$86 = function() {};
+var script$92 = function() {};
 
 riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
-    this.external(script$86);
+    this.external(script$92);
 });
 
 riot$1.tag2('viron-application-splash', '<div>TODO</div>', '', 'class="Application_Splash"', function(opts) {
 });
 
-var script$87 = function() {
+var script$93 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -61731,10 +60706,10 @@ var script$87 = function() {
 };
 
 riot$1.tag2('viron-toast', '<div class="Toast__icon">TODO</div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" onclick="{getClickHandler(\'handleLinkTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLinkTap\')}">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$87);
+    this.external(script$93);
 });
 
-var script$88 = function() {
+var script$94 = function() {
   const store = this.riotx.get();
 
   this.toasts = store.getter(constants$5.TOASTS);
@@ -61746,10 +60721,10 @@ var script$88 = function() {
 };
 
 riot$1.tag2('viron-application-toasts', '<virtual each="{toasts}"> <viron-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></viron-toast> </virtual>', '', 'class="Application_Toasts"', function(opts) {
-    this.external(script$88);
+    this.external(script$94);
 });
 
-var script$90 = function() {
+var script$96 = function() {
   this.handleDeleteButtonClick = () => {
     this.opts.onConfirm();
     this.close();
@@ -61761,10 +60736,10 @@ var script$90 = function() {
 };
 
 riot$1.tag2('viron-application-confirm', '<div class="Application__confirmHead"> <div class="Application__confirmTitle">エンドポイント削除</div> <div class="Application__confirmDescription">全てのエンドポイントが削除されます。個別に削除したい場合は各エンドポイントカード内の削除ボタンから行って下さい。</div> </div> <div class="Application__confirmTail"> <viron-button label="全て削除する" type="emphasis" onclick="{handleDeleteButtonClick}"></viron-button> <viron-button label="キャンセル" onclick="{handleCancelButtonClick}"></viron-button> </div>', '', 'class="Application__confirm"', function(opts) {
-    this.external(script$90);
+    this.external(script$96);
 });
 
-var script$91 = function() {
+var script$97 = function() {
   const store = this.riotx.get();
 
   this.isExist = false;
@@ -61817,10 +60792,10 @@ var script$91 = function() {
 };
 
 riot$1.tag2('viron-application-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <viron-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application__entryControls"> <viron-button type="primary" isdisabled="{isExist}" onclick="{handleRegisterButtonClick}" label="新規作成"></viron-button> <viron-button type="secondary" onclick="{handleCancelButtonClick}" label="キャンセル"></viron-button> </div>', '', 'class="Application__entry"', function(opts) {
-    this.external(script$91);
+    this.external(script$97);
 });
 
-var script$92 = function() {
+var script$98 = function() {
   const store = this.riotx.get();
 
   // ドロップ待受中か否か。
@@ -61868,10 +60843,10 @@ var script$92 = function() {
 };
 
 riot$1.tag2('viron-application-order-droparea', '<div class="Application__orderDropareaContent"></div> <div class="Application__orderDropareaHandler" ondragenter="{handleDragEnter}" ondragover="{handleDragOver}" ondragleave="{handleDragLeave}" ondrop="{handleDrop}"></div>', '', 'class="Application__orderDroparea {\'Application__orderDroparea--watching\' : isWatching, \'Application__orderDroparea--droppable\' : isDroppable}"', function(opts) {
-    this.external(script$92);
+    this.external(script$98);
 });
 
-var script$93 = function() {
+var script$99 = function() {
   const store = this.riotx.get();
 
   // ドラッグ開始時の処理。
@@ -61903,10 +60878,10 @@ var script$93 = function() {
 };
 
 riot$1.tag2('viron-application-order-item', '<div class="Application__orderItemHead"> <div class="Application__orderItemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="Application__orderItemName">{opts.endpoint.name || \'-\'}</div> </div> <div class="Application__orderItemBody"> <div class="Application__orderItemUrl"> <div class="Application__orderItemUrlIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__orderItemUrlLabel">{opts.endpoint.url}</div> </div> </div>', '', 'class="Application__orderItem" draggable="{true}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}"', function(opts) {
-    this.external(script$93);
+    this.external(script$99);
 });
 
-var script$94 = function() {
+var script$100 = function() {
   const store = this.riotx.get();
 
   this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER);
@@ -61918,10 +60893,10 @@ var script$94 = function() {
 };
 
 riot$1.tag2('viron-application-order', '<div class="Application__orderTitle">並び順を変更</div> <div class="Application__orderDescription">ドラッグ&ドロップでエンドポイントの並び順を変更できます。</div> <div class="Application__orderPlayground"> <viron-application-order-droparea order="{0}"></viron-application-order-droparea> <virtual each="{endpoint, idx in endpoints}"> <viron-application-order-item endpoint="{endpoint}"></viron-application-order-item> <viron-application-order-droparea order="{idx + 1}"></viron-application-order-droparea> </virtual> </div>', '', 'class="Application__order"', function(opts) {
-    this.external(script$94);
+    this.external(script$100);
 });
 
-var script$89 = function() {
+var script$95 = function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter(constants$5.APPLICATION_ISLAUNCHED);
@@ -62086,8 +61061,8 @@ var script$89 = function() {
   };
 };
 
-riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__pageInfo">TODO</div> <div class="Application__page"> <div data-is="viron-{pageName}" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType}"', function(opts) {
-    this.external(script$89);
+riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__pageInfo">TODO</div> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType}"', function(opts) {
+    this.external(script$95);
 });
 
 // エントリーポイント。
