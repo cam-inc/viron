@@ -2,6 +2,9 @@ import ObjectAssign from 'object-assign';
 import riot from 'riot';
 import { constants as actions } from '../../store/actions';
 
+// Mouse系かTouch系か。
+const isTouchEventSupported = 'ontouchstart' in document;
+
 export default function() {
   const store = this.riotx.get();
 
@@ -29,14 +32,14 @@ export default function() {
     window.addEventListener('resize', this.handleWindowResize);
     window.addEventListener('scroll', this.handleWindowScroll);
     window.addEventListener('click', this.handleWindowClick);
-    window.addEventListener('touchstart', this.handleWindowTouchStart);
+    window.addEventListener('touchend', this.handleWindowTouchEnd);
   }).on('before-unmount', () => {
     tag.unmount(true);
   }).on('unmount', () => {
     window.removeEventListener('resize', this.handleWindowResize);
     window.removeEventListener('scroll', this.handleWindowScroll);
     window.removeEventListener('click', this.handleWindowClick);
-    window.removeEventListener('touchstart', this.handleWindowTouchStart);
+    window.removeEventListener('touchend', this.handleWindowTouchend);
   });
 
   /**
@@ -85,10 +88,14 @@ export default function() {
   };
 
   this.handleWindowClick = () => {
+    // mouse環境は扱わない。
+    if (isTouchEventSupported) {
+      return;
+    }
     fadeOut();
   };
 
-  this.handleWindowTouchStart = () => {
+  this.handleWindowTouchEnd = () => {
     fadeOut();
   };
 }
