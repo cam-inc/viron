@@ -4,6 +4,7 @@ viron-endpoints-page-endpoint.card.EndpointsPage_Endpoint
   .EndpointsPage_Endpoint__thumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
   .EndpointsPage_Endpoint__name name: { opts.endpoint.name }
   .EndpointsPage_Endpoint__description description: { opts.endpoint.description }
+  .EndpointsPage_Endpoint__memo memo: { opts.endpoint.memo }
   .EndpointsPage_Endpoint__url url: { opts.endpoint.url }
   .EndpointsPage_Endpoint__version version: { opts.endpoint.version }
   .EndpointsPage_Endpoint__token token: { opts.endpoint.token }

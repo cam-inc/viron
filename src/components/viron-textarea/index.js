@@ -28,7 +28,7 @@ export default function() {
 
   // `blur`時にも`change`イベントが発火する。
   // 不都合な挙動なのでイベント伝播を止める。
-  this.handleTextaresChange = e => {
+  this.handleTextareaChange = e => {
     e.stopPropagation();
   };
 

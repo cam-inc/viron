@@ -1,11 +1,24 @@
 import { constants as actions } from '../../../../store/actions';
 import '../../../../components/viron-error/index.tag';
+import './edit/index.tag';
 import './qrcode/index.tag';
 
 export default function() {
   const store = this.riotx.get();
 
-  this.handleEditButtonTap = () => {};
+  this.handleEditButtonTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action(actions.MODALS_ADD, 'viron-endpoints-page-endpoint-menu-edit', {
+        endpoint: this.opts.endpoint
+      }))
+      .then(() => {
+        this.close();
+      })
+      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+        error: err
+      }));
+  };
 
   this.handleDeleteButtonTap = () => {
     Promise
