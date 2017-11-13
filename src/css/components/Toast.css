@@ -1,6 +1,5 @@
 .Toast {
   @apply --layout-center-center;
-  display: block;
   padding: 12px;
   cursor: pointer;
   background-color: var(--color-base-white);

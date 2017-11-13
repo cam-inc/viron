@@ -45,6 +45,11 @@ export default function() {
     switch (actionId) {
     case 'show_credit':
       // TODO:
+      // TODO: debug用なので後で消すこと。
+      store.action(actions.TOASTS_ADD, {
+        message: 'testes',
+        autoHide: false
+      });
       this.close();
       break;
     case 'navigate_to_doc':
