@@ -19,11 +19,11 @@ viron.Application(class="Application--{ usingBrowser } Application--{ layoutType
   viron-application-splash(if="{ !isLaunched }")
 
   script.
-    import '../components/pages/viron-components/index.tag';
-    import '../components/pages/viron-notfound/index.tag';
+    import '../pages/viron-components/index.tag';
+    import '../pages/viron-endpoints/index.tag';
+    import '../pages/viron-notfound/index.tag';
     import '../components/organisms/viron-progress-circular/index.tag';
     import '../components/organisms/viron-progress-linear/index.tag';
-    import '../pages/viron-endpoints/index.tag';
     import './blocker/index.tag';
     import './drawers/index.tag';
     import './header/index.tag';
