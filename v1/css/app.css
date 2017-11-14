@@ -154,8 +154,7 @@ a {
 abbr[title] {
   border-bottom: none; /* 1 */
   text-decoration: underline; /* 2 */
-  -webkit-text-decoration: underline dotted;
-          text-decoration: underline dotted; /* 2 */
+  text-decoration: underline dotted; /* 2 */
 }
 /**
  * Prevent the duplicate application of `bolder` by the next rule in Safari 6.
@@ -549,6 +548,12 @@ input:-webkit-autofill {
   font-weight: bold;
   src: url("../font/NotoSansCJKjp-Jxck-Bold.woff2") format("woff2"), url("../font/NotoSansCJKjp-Jxck-Bold.woff") format("woff"), url("../font/NotoSansCJKjp-Jxck-Bold.ttf") format("truetype");
 }
+*,
+*::before,
+*::after {
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
+}
 html,
 body {
   word-break: break-all;
@@ -610,17 +615,32 @@ select {
 }
 /* ITCSS: Components */
 /* Designed components, chunks of UI. */
+:root {
+  --component-application-menu-width: 192px;
+  --component-application-header-height: 64px;
+}
 .Application {
   position: relative;
   display: block;
   height: 100%;
 }
 .Application__container {
+    display: -ms-grid;
     display: grid;
     height: 100%;
+    transition-duration: 300ms;
+    transition-property: grid-template-columns;
+    transition-property: grid-template-columns, -ms-grid-columns;
     grid-template-areas: "aside header" "aside main";
-    grid-template-rows: 64px 1fr;
-    grid-template-columns: 192px 1fr;
+    /* minmaxを使わないと正しく高さが計算されないbug有り。(safari) */
+    -ms-grid-rows: 64px minmax(0, 1fr);
+        grid-template-rows: 64px minmax(0, 1fr);
+    -ms-grid-rows: var(--component-application-header-height) minmax(0, 1fr);
+        grid-template-rows: var(--component-application-header-height) minmax(0, 1fr);
+    -ms-grid-columns: 192px minmax(0, 1fr);
+        grid-template-columns: 192px minmax(0, 1fr);
+    -ms-grid-columns: var(--component-application-menu-width) minmax(0, 1fr);
+        grid-template-columns: var(--component-application-menu-width) minmax(0, 1fr);
   }
 .Application__aside {
   display: flex;
@@ -628,9 +648,18 @@ select {
   justify-content: center;
     grid-area: aside;
   }
-.Application__aside .Application_Menu,
-    .Application__aside .Application_Poster {
-      flex-grow: 1;
+.Application__asideAdjuster {
+    flex-grow: 1;
+    overflow: hidden;
+  }
+.Application__asideContent {
+    width: 192px;
+    width: var(--component-application-menu-width);
+    height: 100%;
+  }
+.Application__asideContent .Application_Menu,
+    .Application__asideContent .Application_Poster {
+      height: 100%;
     }
 .Application__header {
   display: flex;
@@ -651,9 +680,14 @@ select {
     font-size: 2.8rem;
     font-weight: bold;
   }
+.Application--desktop.Application--asideClosed .Application__container {
+      -ms-grid-columns: 0 minmax(0, 1fr);
+          grid-template-columns: 0 minmax(0, 1fr);
+    }
 .Application--mobile .Application__container {
       grid-template-areas: "header" "main";
-      grid-template-columns: 1fr;
+      -ms-grid-columns: minmax(0, 1fr);
+          grid-template-columns: minmax(0, 1fr);
     }
 .Application_Blocker {
   position: absolute;
@@ -686,18 +720,42 @@ select {
   background-color: #f6f6f6;
   border-bottom: 1px solid #e8e8e7;
 }
-.Application_Header__aside {
+.Application_Header__item {
   display: flex;
   align-items: center;
   justify-content: center;
   }
-.Application_Header__aside .Icon {
+.Application_Header__item > .Icon {
       width: 16px;
       height: 16px;
       cursor: pointer;
     }
-.Application_Header__squareIcon {
+.Application_Header__thumbnail {
+    width: 32px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    border-radius: 50%;
+  }
+.Application_Header__info,
+  .Application_Header__squareIcon {
     margin-right: 48px;
+  }
+.Application_Header__info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
+.Application_Header__name {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+.Application_Header__arrow {
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
   }
 .Application_Header_Autocomplete {
   display: block;

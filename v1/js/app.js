@@ -2967,6 +2967,2305 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var riot$1 = unwrapExports(riot_1);
 
+var _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var consoleLogger = {
+  type: 'logger',
+
+  log: function log(args) {
+    this.output('log', args);
+  },
+  warn: function warn(args) {
+    this.output('warn', args);
+  },
+  error: function error(args) {
+    this.output('error', args);
+  },
+  output: function output(type, args) {
+    var _console;
+
+    /* eslint no-console: 0 */
+    if (console && console[type]) { (_console = console)[type].apply(_console, _toConsumableArray(args)); }
+  }
+};
+
+var Logger = function () {
+  function Logger(concreteLogger) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck$1(this, Logger);
+
+    this.init(concreteLogger, options);
+  }
+
+  Logger.prototype.init = function init(concreteLogger) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    this.prefix = options.prefix || 'i18next:';
+    this.logger = concreteLogger || consoleLogger;
+    this.options = options;
+    this.debug = options.debug;
+  };
+
+  Logger.prototype.setDebug = function setDebug(bool) {
+    this.debug = bool;
+  };
+
+  Logger.prototype.log = function log() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return this.forward(args, 'log', '', true);
+  };
+
+  Logger.prototype.warn = function warn() {
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    return this.forward(args, 'warn', '', true);
+  };
+
+  Logger.prototype.error = function error() {
+    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      args[_key3] = arguments[_key3];
+    }
+
+    return this.forward(args, 'error', '');
+  };
+
+  Logger.prototype.deprecate = function deprecate() {
+    for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+      args[_key4] = arguments[_key4];
+    }
+
+    return this.forward(args, 'warn', 'WARNING DEPRECATED: ', true);
+  };
+
+  Logger.prototype.forward = function forward(args, lvl, prefix, debugOnly) {
+    if (debugOnly && !this.debug) { return null; }
+    if (typeof args[0] === 'string') { args[0] = '' + prefix + this.prefix + ' ' + args[0]; }
+    return this.logger[lvl](args);
+  };
+
+  Logger.prototype.create = function create(moduleName) {
+    return new Logger(this.logger, _extends$1({ prefix: this.prefix + ':' + moduleName + ':' }, this.options));
+  };
+
+  return Logger;
+}();
+
+var baseLogger = new Logger();
+
+function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EventEmitter = function () {
+  function EventEmitter() {
+    _classCallCheck$2(this, EventEmitter);
+
+    this.observers = {};
+  }
+
+  EventEmitter.prototype.on = function on(events, listener) {
+    var _this = this;
+
+    events.split(' ').forEach(function (event) {
+      _this.observers[event] = _this.observers[event] || [];
+      _this.observers[event].push(listener);
+    });
+  };
+
+  EventEmitter.prototype.off = function off(event, listener) {
+    var _this2 = this;
+
+    if (!this.observers[event]) {
+      return;
+    }
+
+    this.observers[event].forEach(function () {
+      if (!listener) {
+        delete _this2.observers[event];
+      } else {
+        var index = _this2.observers[event].indexOf(listener);
+        if (index > -1) {
+          _this2.observers[event].splice(index, 1);
+        }
+      }
+    });
+  };
+
+  EventEmitter.prototype.emit = function emit(event) {
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    if (this.observers[event]) {
+      var cloned = [].concat(this.observers[event]);
+      cloned.forEach(function (observer) {
+        observer.apply(undefined, args);
+      });
+    }
+
+    if (this.observers['*']) {
+      var _cloned = [].concat(this.observers['*']);
+      _cloned.forEach(function (observer) {
+        var _ref;
+
+        observer.apply(observer, (_ref = [event]).concat.apply(_ref, args));
+      });
+    }
+  };
+
+  return EventEmitter;
+}();
+
+function makeString(object) {
+  if (object == null) { return ''; }
+  /* eslint prefer-template: 0 */
+  return '' + object;
+}
+
+function copy(a, s, t) {
+  a.forEach(function (m) {
+    if (s[m]) { t[m] = s[m]; }
+  });
+}
+
+function getLastOfPath(object, path, Empty) {
+  function cleanKey(key) {
+    return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
+  }
+
+  function canNotTraverseDeeper() {
+    return !object || typeof object === 'string';
+  }
+
+  var stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
+  while (stack.length > 1) {
+    if (canNotTraverseDeeper()) { return {}; }
+
+    var key = cleanKey(stack.shift());
+    if (!object[key] && Empty) { object[key] = new Empty(); }
+    object = object[key];
+  }
+
+  if (canNotTraverseDeeper()) { return {}; }
+  return {
+    obj: object,
+    k: cleanKey(stack.shift())
+  };
+}
+
+function setPath(object, path, newValue) {
+  var _getLastOfPath = getLastOfPath(object, path, Object),
+      obj = _getLastOfPath.obj,
+      k = _getLastOfPath.k;
+
+  obj[k] = newValue;
+}
+
+function pushPath(object, path, newValue, concat) {
+  var _getLastOfPath2 = getLastOfPath(object, path, Object),
+      obj = _getLastOfPath2.obj,
+      k = _getLastOfPath2.k;
+
+  obj[k] = obj[k] || [];
+  if (concat) { obj[k] = obj[k].concat(newValue); }
+  if (!concat) { obj[k].push(newValue); }
+}
+
+function getPath(object, path) {
+  var _getLastOfPath3 = getLastOfPath(object, path),
+      obj = _getLastOfPath3.obj,
+      k = _getLastOfPath3.k;
+
+  if (!obj) { return undefined; }
+  return obj[k];
+}
+
+function deepExtend(target, source, overwrite) {
+  /* eslint no-restricted-syntax: 0 */
+  for (var prop in source) {
+    if (prop in target) {
+      // If we reached a leaf string in target or source then replace with source or skip depending on the 'overwrite' switch
+      if (typeof target[prop] === 'string' || target[prop] instanceof String || typeof source[prop] === 'string' || source[prop] instanceof String) {
+        if (overwrite) { target[prop] = source[prop]; }
+      } else {
+        deepExtend(target[prop], source[prop], overwrite);
+      }
+    } else {
+      target[prop] = source[prop];
+    }
+  }
+  return target;
+}
+
+function regexEscape(str) {
+  /* eslint no-useless-escape: 0 */
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+}
+
+/* eslint-disable */
+var _entityMap = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': '&quot;',
+  "'": '&#39;',
+  "/": '&#x2F;'
+};
+/* eslint-enable */
+
+function escape(data) {
+  if (typeof data === 'string') {
+    return data.replace(/[&<>"'\/]/g, function (s) {
+      return _entityMap[s];
+    });
+  }
+
+  return data;
+}
+
+var _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _defaults$1(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn$1(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits$1(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults$1(subClass, superClass); } }
+
+var ResourceStore = function (_EventEmitter) {
+  _inherits$1(ResourceStore, _EventEmitter);
+
+  function ResourceStore(data) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { ns: ['translation'], defaultNS: 'translation' };
+
+    _classCallCheck$3(this, ResourceStore);
+
+    var _this = _possibleConstructorReturn$1(this, _EventEmitter.call(this));
+
+    _this.data = data || {};
+    _this.options = options;
+    return _this;
+  }
+
+  ResourceStore.prototype.addNamespaces = function addNamespaces(ns) {
+    if (this.options.ns.indexOf(ns) < 0) {
+      this.options.ns.push(ns);
+    }
+  };
+
+  ResourceStore.prototype.removeNamespaces = function removeNamespaces(ns) {
+    var index = this.options.ns.indexOf(ns);
+    if (index > -1) {
+      this.options.ns.splice(index, 1);
+    }
+  };
+
+  ResourceStore.prototype.getResource = function getResource(lng, ns, key) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    var keySeparator = options.keySeparator || this.options.keySeparator;
+    if (keySeparator === undefined) { keySeparator = '.'; }
+
+    var path = [lng, ns];
+    if (key && typeof key !== 'string') { path = path.concat(key); }
+    if (key && typeof key === 'string') { path = path.concat(keySeparator ? key.split(keySeparator) : key); }
+
+    if (lng.indexOf('.') > -1) {
+      path = lng.split('.');
+    }
+
+    return getPath(this.data, path);
+  };
+
+  ResourceStore.prototype.addResource = function addResource(lng, ns, key, value) {
+    var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : { silent: false };
+
+    var keySeparator = this.options.keySeparator;
+    if (keySeparator === undefined) { keySeparator = '.'; }
+
+    var path = [lng, ns];
+    if (key) { path = path.concat(keySeparator ? key.split(keySeparator) : key); }
+
+    if (lng.indexOf('.') > -1) {
+      path = lng.split('.');
+      value = ns;
+      ns = path[1];
+    }
+
+    this.addNamespaces(ns);
+
+    setPath(this.data, path, value);
+
+    if (!options.silent) { this.emit('added', lng, ns, key, value); }
+  };
+
+  ResourceStore.prototype.addResources = function addResources(lng, ns, resources) {
+    /* eslint no-restricted-syntax: 0 */
+    for (var m in resources) {
+      if (typeof resources[m] === 'string') { this.addResource(lng, ns, m, resources[m], { silent: true }); }
+    }
+    this.emit('added', lng, ns, resources);
+  };
+
+  ResourceStore.prototype.addResourceBundle = function addResourceBundle(lng, ns, resources, deep, overwrite) {
+    var path = [lng, ns];
+    if (lng.indexOf('.') > -1) {
+      path = lng.split('.');
+      deep = resources;
+      resources = ns;
+      ns = path[1];
+    }
+
+    this.addNamespaces(ns);
+
+    var pack = getPath(this.data, path) || {};
+
+    if (deep) {
+      deepExtend(pack, resources, overwrite);
+    } else {
+      pack = _extends$2({}, pack, resources);
+    }
+
+    setPath(this.data, path, pack);
+
+    this.emit('added', lng, ns, resources);
+  };
+
+  ResourceStore.prototype.removeResourceBundle = function removeResourceBundle(lng, ns) {
+    if (this.hasResourceBundle(lng, ns)) {
+      delete this.data[lng][ns];
+    }
+    this.removeNamespaces(ns);
+
+    this.emit('removed', lng, ns);
+  };
+
+  ResourceStore.prototype.hasResourceBundle = function hasResourceBundle(lng, ns) {
+    return this.getResource(lng, ns) !== undefined;
+  };
+
+  ResourceStore.prototype.getResourceBundle = function getResourceBundle(lng, ns) {
+    if (!ns) { ns = this.options.defaultNS; }
+
+    // COMPATIBILITY: remove extend in v2.1.0
+    if (this.options.compatibilityAPI === 'v1') { return _extends$2({}, this.getResource(lng, ns)); }
+
+    return this.getResource(lng, ns);
+  };
+
+  ResourceStore.prototype.toJSON = function toJSON() {
+    return this.data;
+  };
+
+  return ResourceStore;
+}(EventEmitter);
+
+var postProcessor = {
+
+  processors: {},
+
+  addPostProcessor: function addPostProcessor(module) {
+    this.processors[module.name] = module;
+  },
+  handle: function handle(processors, value, key, options, translator) {
+    var _this = this;
+
+    processors.forEach(function (processor) {
+      if (_this.processors[processor]) { value = _this.processors[processor].process(value, key, options, translator); }
+    });
+
+    return value;
+  }
+};
+
+var _extends$3 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _defaults$2(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn$2(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits$2(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults$2(subClass, superClass); } }
+
+var Translator = function (_EventEmitter) {
+  _inherits$2(Translator, _EventEmitter);
+
+  function Translator(services) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck$4(this, Translator);
+
+    var _this = _possibleConstructorReturn$2(this, _EventEmitter.call(this));
+
+    copy(['resourceStore', 'languageUtils', 'pluralResolver', 'interpolator', 'backendConnector'], services, _this);
+
+    _this.options = options;
+    _this.logger = baseLogger.create('translator');
+    return _this;
+  }
+
+  Translator.prototype.changeLanguage = function changeLanguage(lng) {
+    if (lng) { this.language = lng; }
+  };
+
+  Translator.prototype.exists = function exists(key) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { interpolation: {} };
+
+    var resolved = this.resolve(key, options);
+    return resolved && resolved.res !== undefined;
+  };
+
+  Translator.prototype.extractFromKey = function extractFromKey(key, options) {
+    var nsSeparator = options.nsSeparator || this.options.nsSeparator;
+    if (nsSeparator === undefined) { nsSeparator = ':'; }
+    var keySeparator = options.keySeparator || this.options.keySeparator || '.';
+
+    var namespaces = options.ns || this.options.defaultNS;
+    if (nsSeparator && key.indexOf(nsSeparator) > -1) {
+      var parts = key.split(nsSeparator);
+      if (nsSeparator !== keySeparator || nsSeparator === keySeparator && this.options.ns.indexOf(parts[0]) > -1) { namespaces = parts.shift(); }
+      key = parts.join(keySeparator);
+    }
+    if (typeof namespaces === 'string') { namespaces = [namespaces]; }
+
+    return {
+      key: key,
+      namespaces: namespaces
+    };
+  };
+
+  Translator.prototype.translate = function translate(keys) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if ((typeof options === 'undefined' ? 'undefined' : _typeof$1(options)) !== 'object') {
+      /* eslint prefer-rest-params: 0 */
+      options = this.options.overloadTranslationOptionHandler(arguments);
+    }
+
+    // non valid keys handling
+    if (keys === undefined || keys === null || keys === '') { return ''; }
+    if (typeof keys === 'number') { keys = String(keys); }
+    if (typeof keys === 'string') { keys = [keys]; }
+
+    // separators
+    var keySeparator = options.keySeparator || this.options.keySeparator || '.';
+
+    // get namespace(s)
+
+    var _extractFromKey = this.extractFromKey(keys[keys.length - 1], options),
+        key = _extractFromKey.key,
+        namespaces = _extractFromKey.namespaces;
+
+    var namespace = namespaces[namespaces.length - 1];
+
+    // return key on CIMode
+    var lng = options.lng || this.language;
+    var appendNamespaceToCIMode = options.appendNamespaceToCIMode || this.options.appendNamespaceToCIMode;
+    if (lng && lng.toLowerCase() === 'cimode') {
+      if (appendNamespaceToCIMode) {
+        var nsSeparator = options.nsSeparator || this.options.nsSeparator;
+        return namespace + nsSeparator + key;
+      }
+
+      return key;
+    }
+
+    // resolve from store
+    var resolved = this.resolve(keys, options);
+    var res = resolved && resolved.res;
+    var usedKey = resolved && resolved.usedKey || key;
+
+    var resType = Object.prototype.toString.apply(res);
+    var noObject = ['[object Number]', '[object Function]', '[object RegExp]'];
+    var joinArrays = options.joinArrays !== undefined ? options.joinArrays : this.options.joinArrays;
+
+    // object
+    if (res && typeof res !== 'string' && noObject.indexOf(resType) < 0 && !(joinArrays && resType === '[object Array]')) {
+      if (!options.returnObjects && !this.options.returnObjects) {
+        this.logger.warn('accessing an object - but returnObjects options is not enabled!');
+        return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(usedKey, res, options) : 'key \'' + key + ' (' + this.language + ')\' returned an object instead of string.';
+      }
+
+      // if we got a separator we loop over children - else we just return object as is
+      // as having it set to false means no hierarchy so no lookup for nested values
+      if (options.keySeparator || this.options.keySeparator) {
+        var copy$$1 = resType === '[object Array]' ? [] : {}; // apply child translation on a copy
+
+        /* eslint no-restricted-syntax: 0 */
+        for (var m in res) {
+          if (Object.prototype.hasOwnProperty.call(res, m)) {
+            copy$$1[m] = this.translate('' + usedKey + keySeparator + m, _extends$3({}, options, { joinArrays: false, ns: namespaces }));
+          }
+        }
+        res = copy$$1;
+      }
+    } else if (joinArrays && resType === '[object Array]') {
+      // array special treatment
+      res = res.join(joinArrays);
+      if (res) { res = this.extendTranslation(res, keys, options); }
+    } else {
+      // string, empty or null
+      var usedDefault = false;
+      var _usedKey = false;
+
+      // fallback value
+      if (!this.isValidLookup(res) && options.defaultValue !== undefined) {
+        usedDefault = true;
+        res = options.defaultValue;
+      }
+      if (!this.isValidLookup(res)) {
+        _usedKey = true;
+        res = key;
+      }
+
+      // save missing
+      if (_usedKey || usedDefault) {
+        this.logger.log('missingKey', lng, namespace, key, res);
+
+        var lngs = [];
+        var fallbackLngs = this.languageUtils.getFallbackCodes(this.options.fallbackLng, options.lng || this.language);
+        if (this.options.saveMissingTo === 'fallback' && fallbackLngs && fallbackLngs[0]) {
+          for (var i = 0; i < fallbackLngs.length; i++) {
+            lngs.push(fallbackLngs[i]);
+          }
+        } else if (this.options.saveMissingTo === 'all') {
+          lngs = this.languageUtils.toResolveHierarchy(options.lng || this.language);
+        } else {
+          lngs.push(options.lng || this.language);
+        }
+
+        if (this.options.saveMissing) {
+          if (this.options.missingKeyHandler) {
+            this.options.missingKeyHandler(lngs, namespace, key, res);
+          } else if (this.backendConnector && this.backendConnector.saveMissing) {
+            this.backendConnector.saveMissing(lngs, namespace, key, res);
+          }
+        }
+
+        this.emit('missingKey', lngs, namespace, key, res);
+      }
+
+      // extend
+      res = this.extendTranslation(res, keys, options);
+
+      // append namespace if still key
+      if (_usedKey && res === key && this.options.appendNamespaceToMissingKey) { res = namespace + ':' + key; }
+
+      // parseMissingKeyHandler
+      if (_usedKey && this.options.parseMissingKeyHandler) { res = this.options.parseMissingKeyHandler(res); }
+    }
+
+    // return
+    return res;
+  };
+
+  Translator.prototype.extendTranslation = function extendTranslation(res, key, options) {
+    var _this2 = this;
+
+    if (options.interpolation) { this.interpolator.init(_extends$3({}, options, { interpolation: _extends$3({}, this.options.interpolation, options.interpolation) })); }
+
+    // interpolate
+    var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
+    if (this.options.interpolation.defaultVariables) { data = _extends$3({}, this.options.interpolation.defaultVariables, data); }
+    res = this.interpolator.interpolate(res, data, options.lng || this.language);
+
+    // nesting
+    if (options.nest !== false) { res = this.interpolator.nest(res, function () {
+      return _this2.translate.apply(_this2, arguments);
+    }, options); }
+
+    if (options.interpolation) { this.interpolator.reset(); }
+
+    // post process
+    var postProcess = options.postProcess || this.options.postProcess;
+    var postProcessorNames = typeof postProcess === 'string' ? [postProcess] : postProcess;
+
+    if (res !== undefined && postProcessorNames && postProcessorNames.length && options.applyPostProcessor !== false) {
+      res = postProcessor.handle(postProcessorNames, res, key, options, this);
+    }
+
+    return res;
+  };
+
+  Translator.prototype.resolve = function resolve(keys) {
+    var _this3 = this;
+
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    var found = void 0;
+    var usedKey = void 0;
+
+    if (typeof keys === 'string') { keys = [keys]; }
+
+    // forEach possible key
+    keys.forEach(function (k) {
+      if (_this3.isValidLookup(found)) { return; }
+      var extracted = _this3.extractFromKey(k, options);
+      var key = extracted.key;
+      usedKey = key;
+      var namespaces = extracted.namespaces;
+      if (_this3.options.fallbackNS) { namespaces = namespaces.concat(_this3.options.fallbackNS); }
+
+      var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+      var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
+
+      var codes = options.lngs ? options.lngs : _this3.languageUtils.toResolveHierarchy(options.lng || _this3.language);
+
+      namespaces.forEach(function (ns) {
+        if (_this3.isValidLookup(found)) { return; }
+
+        codes.forEach(function (code) {
+          if (_this3.isValidLookup(found)) { return; }
+
+          var finalKey = key;
+          var finalKeys = [finalKey];
+
+          var pluralSuffix = void 0;
+          if (needsPluralHandling) { pluralSuffix = _this3.pluralResolver.getSuffix(code, options.count); }
+
+          // fallback for plural if context not found
+          if (needsPluralHandling && needsContextHandling) { finalKeys.push(finalKey + pluralSuffix); }
+
+          // get key for context if needed
+          if (needsContextHandling) { finalKeys.push(finalKey += '' + _this3.options.contextSeparator + options.context); }
+
+          // get key for plural if needed
+          if (needsPluralHandling) { finalKeys.push(finalKey += pluralSuffix); }
+
+          // iterate over finalKeys starting with most specific pluralkey (-> contextkey only) -> singularkey only
+          var possibleKey = void 0;
+          /* eslint no-cond-assign: 0 */
+          while (possibleKey = finalKeys.pop()) {
+            if (!_this3.isValidLookup(found)) {
+              found = _this3.getResource(code, ns, possibleKey, options);
+            }
+          }
+        });
+      });
+    });
+
+    return { res: found, usedKey: usedKey };
+  };
+
+  Translator.prototype.isValidLookup = function isValidLookup(res) {
+    return res !== undefined && !(!this.options.returnNull && res === null) && !(!this.options.returnEmptyString && res === '');
+  };
+
+  Translator.prototype.getResource = function getResource(code, ns, key) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    return this.resourceStore.getResource(code, ns, key, options);
+  };
+
+  return Translator;
+}(EventEmitter);
+
+function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+var LanguageUtil = function () {
+  function LanguageUtil(options) {
+    _classCallCheck$5(this, LanguageUtil);
+
+    this.options = options;
+
+    this.whitelist = this.options.whitelist || false;
+    this.logger = baseLogger.create('languageUtils');
+  }
+
+  LanguageUtil.prototype.getScriptPartFromCode = function getScriptPartFromCode(code) {
+    if (!code || code.indexOf('-') < 0) { return null; }
+
+    var p = code.split('-');
+    if (p.length === 2) { return null; }
+    p.pop();
+    return this.formatLanguageCode(p.join('-'));
+  };
+
+  LanguageUtil.prototype.getLanguagePartFromCode = function getLanguagePartFromCode(code) {
+    if (!code || code.indexOf('-') < 0) { return code; }
+
+    var p = code.split('-');
+    return this.formatLanguageCode(p[0]);
+  };
+
+  LanguageUtil.prototype.formatLanguageCode = function formatLanguageCode(code) {
+    // http://www.iana.org/assignments/language-tags/language-tags.xhtml
+    if (typeof code === 'string' && code.indexOf('-') > -1) {
+      var specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
+      var p = code.split('-');
+
+      if (this.options.lowerCaseLng) {
+        p = p.map(function (part) {
+          return part.toLowerCase();
+        });
+      } else if (p.length === 2) {
+        p[0] = p[0].toLowerCase();
+        p[1] = p[1].toUpperCase();
+
+        if (specialCases.indexOf(p[1].toLowerCase()) > -1) { p[1] = capitalize(p[1].toLowerCase()); }
+      } else if (p.length === 3) {
+        p[0] = p[0].toLowerCase();
+
+        // if lenght 2 guess it's a country
+        if (p[1].length === 2) { p[1] = p[1].toUpperCase(); }
+        if (p[0] !== 'sgn' && p[2].length === 2) { p[2] = p[2].toUpperCase(); }
+
+        if (specialCases.indexOf(p[1].toLowerCase()) > -1) { p[1] = capitalize(p[1].toLowerCase()); }
+        if (specialCases.indexOf(p[2].toLowerCase()) > -1) { p[2] = capitalize(p[2].toLowerCase()); }
+      }
+
+      return p.join('-');
+    }
+
+    return this.options.cleanCode || this.options.lowerCaseLng ? code.toLowerCase() : code;
+  };
+
+  LanguageUtil.prototype.isWhitelisted = function isWhitelisted(code) {
+    if (this.options.load === 'languageOnly' || this.options.nonExplicitWhitelist) {
+      code = this.getLanguagePartFromCode(code);
+    }
+    return !this.whitelist || !this.whitelist.length || this.whitelist.indexOf(code) > -1;
+  };
+
+  LanguageUtil.prototype.getFallbackCodes = function getFallbackCodes(fallbacks, code) {
+    if (!fallbacks) { return []; }
+    if (typeof fallbacks === 'string') { fallbacks = [fallbacks]; }
+    if (Object.prototype.toString.apply(fallbacks) === '[object Array]') { return fallbacks; }
+
+    if (!code) { return fallbacks.default || []; }
+
+    // asume we have an object defining fallbacks
+    var found = fallbacks[code];
+    if (!found) { found = fallbacks[this.getScriptPartFromCode(code)]; }
+    if (!found) { found = fallbacks[this.formatLanguageCode(code)]; }
+    if (!found) { found = fallbacks.default; }
+
+    return found || [];
+  };
+
+  LanguageUtil.prototype.toResolveHierarchy = function toResolveHierarchy(code, fallbackCode) {
+    var _this = this;
+
+    var fallbackCodes = this.getFallbackCodes(fallbackCode || this.options.fallbackLng || [], code);
+
+    var codes = [];
+    var addCode = function addCode(c) {
+      if (!c) { return; }
+      if (_this.isWhitelisted(c)) {
+        codes.push(c);
+      } else {
+        _this.logger.warn('rejecting non-whitelisted language code: ' + c);
+      }
+    };
+
+    if (typeof code === 'string' && code.indexOf('-') > -1) {
+      if (this.options.load !== 'languageOnly') { addCode(this.formatLanguageCode(code)); }
+      if (this.options.load !== 'languageOnly' && this.options.load !== 'currentOnly') { addCode(this.getScriptPartFromCode(code)); }
+      if (this.options.load !== 'currentOnly') { addCode(this.getLanguagePartFromCode(code)); }
+    } else if (typeof code === 'string') {
+      addCode(this.formatLanguageCode(code));
+    }
+
+    fallbackCodes.forEach(function (fc) {
+      if (codes.indexOf(fc) < 0) { addCode(_this.formatLanguageCode(fc)); }
+    });
+
+    return codes;
+  };
+
+  return LanguageUtil;
+}();
+
+function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// definition http://translate.sourceforge.net/wiki/l10n/pluralforms
+/* eslint-disable */
+var sets = [{ lngs: ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'gun', 'ln', 'mfe', 'mg', 'mi', 'oc', 'pt', 'pt-BR', 'tg', 'ti', 'tr', 'uz', 'wa'], nr: [1, 2], fc: 1 }, { lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'he', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'], nr: [1, 2], fc: 2 }, { lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'], nr: [1], fc: 3 }, { lngs: ['be', 'bs', 'dz', 'hr', 'ru', 'sr', 'uk'], nr: [1, 2, 5], fc: 4 }, { lngs: ['ar'], nr: [0, 1, 2, 3, 11, 100], fc: 5 }, { lngs: ['cs', 'sk'], nr: [1, 2, 5], fc: 6 }, { lngs: ['csb', 'pl'], nr: [1, 2, 5], fc: 7 }, { lngs: ['cy'], nr: [1, 2, 3, 8], fc: 8 }, { lngs: ['fr'], nr: [1, 2], fc: 9 }, { lngs: ['ga'], nr: [1, 2, 3, 7, 11], fc: 10 }, { lngs: ['gd'], nr: [1, 2, 3, 20], fc: 11 }, { lngs: ['is'], nr: [1, 2], fc: 12 }, { lngs: ['jv'], nr: [0, 1], fc: 13 }, { lngs: ['kw'], nr: [1, 2, 3, 4], fc: 14 }, { lngs: ['lt'], nr: [1, 2, 10], fc: 15 }, { lngs: ['lv'], nr: [1, 2, 0], fc: 16 }, { lngs: ['mk'], nr: [1, 2], fc: 17 }, { lngs: ['mnk'], nr: [0, 1, 2], fc: 18 }, { lngs: ['mt'], nr: [1, 2, 11, 20], fc: 19 }, { lngs: ['or'], nr: [2, 1], fc: 2 }, { lngs: ['ro'], nr: [1, 2, 20], fc: 20 }, { lngs: ['sl'], nr: [5, 1, 2, 3], fc: 21 }];
+
+var _rulesPluralsTypes = {
+  1: function _(n) {
+    return Number(n > 1);
+  },
+  2: function _(n) {
+    return Number(n != 1);
+  },
+  3: function _(n) {
+    return 0;
+  },
+  4: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  5: function _(n) {
+    return Number(n === 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 ? 4 : 5);
+  },
+  6: function _(n) {
+    return Number(n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2);
+  },
+  7: function _(n) {
+    return Number(n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  8: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n != 8 && n != 11 ? 2 : 3);
+  },
+  9: function _(n) {
+    return Number(n >= 2);
+  },
+  10: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4);
+  },
+  11: function _(n) {
+    return Number(n == 1 || n == 11 ? 0 : n == 2 || n == 12 ? 1 : n > 2 && n < 20 ? 2 : 3);
+  },
+  12: function _(n) {
+    return Number(n % 10 != 1 || n % 100 == 11);
+  },
+  13: function _(n) {
+    return Number(n !== 0);
+  },
+  14: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n == 3 ? 2 : 3);
+  },
+  15: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  16: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n !== 0 ? 1 : 2);
+  },
+  17: function _(n) {
+    return Number(n == 1 || n % 10 == 1 ? 0 : 1);
+  },
+  18: function _(n) {
+    return Number(n == 0 ? 0 : n == 1 ? 1 : 2);
+  },
+  19: function _(n) {
+    return Number(n == 1 ? 0 : n === 0 || n % 100 > 1 && n % 100 < 11 ? 1 : n % 100 > 10 && n % 100 < 20 ? 2 : 3);
+  },
+  20: function _(n) {
+    return Number(n == 1 ? 0 : n === 0 || n % 100 > 0 && n % 100 < 20 ? 1 : 2);
+  },
+  21: function _(n) {
+    return Number(n % 100 == 1 ? 1 : n % 100 == 2 ? 2 : n % 100 == 3 || n % 100 == 4 ? 3 : 0);
+  }
+};
+/* eslint-enable */
+
+function createRules() {
+  var rules = {};
+  sets.forEach(function (set) {
+    set.lngs.forEach(function (l) {
+      rules[l] = {
+        numbers: set.nr,
+        plurals: _rulesPluralsTypes[set.fc]
+      };
+    });
+  });
+  return rules;
+}
+
+var PluralResolver = function () {
+  function PluralResolver(languageUtils) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck$6(this, PluralResolver);
+
+    this.languageUtils = languageUtils;
+    this.options = options;
+
+    this.logger = baseLogger.create('pluralResolver');
+
+    this.rules = createRules();
+  }
+
+  PluralResolver.prototype.addRule = function addRule(lng, obj) {
+    this.rules[lng] = obj;
+  };
+
+  PluralResolver.prototype.getRule = function getRule(code) {
+    return this.rules[code] || this.rules[this.languageUtils.getLanguagePartFromCode(code)];
+  };
+
+  PluralResolver.prototype.needsPlural = function needsPlural(code) {
+    var rule = this.getRule(code);
+
+    return rule && rule.numbers.length > 1;
+  };
+
+  PluralResolver.prototype.getSuffix = function getSuffix(code, count) {
+    var _this = this;
+
+    var rule = this.getRule(code);
+
+    if (rule) {
+      //if (rule.numbers.length === 1) return ''; // only singular
+
+      var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
+      var suffix = rule.numbers[idx];
+
+      // special treatment for lngs only having singular and plural
+      if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+        if (suffix === 2) {
+          suffix = 'plural';
+        } else if (suffix === 1) {
+          suffix = '';
+        }
+      }
+
+      var returnSuffix = function returnSuffix() {
+        return _this.options.prepend && suffix.toString() ? _this.options.prepend + suffix.toString() : suffix.toString();
+      };
+
+      // COMPATIBILITY JSON
+      // v1
+      if (this.options.compatibilityJSON === 'v1') {
+        if (suffix === 1) { return ''; }
+        if (typeof suffix === 'number') { return '_plural_' + suffix.toString(); }
+        return returnSuffix();
+      } else if ( /* v2 */this.options.compatibilityJSON === 'v2' || rule.numbers.length === 2 && rule.numbers[0] === 1) {
+        return returnSuffix();
+      } else if ( /* v3 - gettext index */rule.numbers.length === 2 && rule.numbers[0] === 1) {
+        return returnSuffix();
+      }
+      return this.options.prepend && idx.toString() ? this.options.prepend + idx.toString() : idx.toString();
+    }
+
+    this.logger.warn('no plural rule found for: ' + code);
+    return '';
+  };
+
+  return PluralResolver;
+}();
+
+var _extends$4 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Interpolator = function () {
+  function Interpolator() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck$7(this, Interpolator);
+
+    this.logger = baseLogger.create('interpolator');
+
+    this.init(options, true);
+  }
+
+  /* eslint no-param-reassign: 0 */
+
+
+  Interpolator.prototype.init = function init() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var reset = arguments[1];
+
+    if (reset) {
+      this.options = options;
+      this.format = options.interpolation && options.interpolation.format || function (value) {
+        return value;
+      };
+      this.escape = options.interpolation && options.interpolation.escape || escape;
+    }
+    if (!options.interpolation) { options.interpolation = { escapeValue: true }; }
+
+    var iOpts = options.interpolation;
+
+    this.escapeValue = iOpts.escapeValue !== undefined ? iOpts.escapeValue : true;
+
+    this.prefix = iOpts.prefix ? regexEscape(iOpts.prefix) : iOpts.prefixEscaped || '{{';
+    this.suffix = iOpts.suffix ? regexEscape(iOpts.suffix) : iOpts.suffixEscaped || '}}';
+
+    this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ',';
+
+    this.unescapePrefix = iOpts.unescapeSuffix ? '' : iOpts.unescapePrefix || '-';
+    this.unescapeSuffix = this.unescapePrefix ? '' : iOpts.unescapeSuffix || '';
+
+    this.nestingPrefix = iOpts.nestingPrefix ? regexEscape(iOpts.nestingPrefix) : iOpts.nestingPrefixEscaped || regexEscape('$t(');
+    this.nestingSuffix = iOpts.nestingSuffix ? regexEscape(iOpts.nestingSuffix) : iOpts.nestingSuffixEscaped || regexEscape(')');
+
+    this.maxReplaces = iOpts.maxReplaces ? iOpts.maxReplaces : 1000;
+
+    // the regexp
+    this.resetRegExp();
+  };
+
+  Interpolator.prototype.reset = function reset() {
+    if (this.options) { this.init(this.options); }
+  };
+
+  Interpolator.prototype.resetRegExp = function resetRegExp() {
+    // the regexp
+    var regexpStr = this.prefix + '(.+?)' + this.suffix;
+    this.regexp = new RegExp(regexpStr, 'g');
+
+    var regexpUnescapeStr = '' + this.prefix + this.unescapePrefix + '(.+?)' + this.unescapeSuffix + this.suffix;
+    this.regexpUnescape = new RegExp(regexpUnescapeStr, 'g');
+
+    var nestingRegexpStr = this.nestingPrefix + '(.+?)' + this.nestingSuffix;
+    this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
+  };
+
+  Interpolator.prototype.interpolate = function interpolate(str, data, lng) {
+    var _this = this;
+
+    var match = void 0;
+    var value = void 0;
+    var replaces = void 0;
+
+    function regexSafe(val) {
+      return val.replace(/\$/g, '$$$$');
+    }
+
+    var handleFormat = function handleFormat(key) {
+      if (key.indexOf(_this.formatSeparator) < 0) { return getPath(data, key); }
+
+      var p = key.split(_this.formatSeparator);
+      var k = p.shift().trim();
+      var f = p.join(_this.formatSeparator).trim();
+
+      return _this.format(getPath(data, k), f, lng);
+    };
+
+    this.resetRegExp();
+
+    replaces = 0;
+    // unescape if has unescapePrefix/Suffix
+    /* eslint no-cond-assign: 0 */
+    while (match = this.regexpUnescape.exec(str)) {
+      value = handleFormat(match[1].trim());
+      str = str.replace(match[0], value);
+      this.regexpUnescape.lastIndex = 0;
+      replaces++;
+      if (replaces >= this.maxReplaces) {
+        break;
+      }
+    }
+
+    replaces = 0;
+    // regular escape on demand
+    while (match = this.regexp.exec(str)) {
+      value = handleFormat(match[1].trim());
+      if (typeof value !== 'string') { value = makeString(value); }
+      if (!value) {
+        this.logger.warn('missed to pass in variable ' + match[1] + ' for interpolating ' + str);
+        value = '';
+      }
+      value = this.escapeValue ? regexSafe(this.escape(value)) : regexSafe(value);
+      str = str.replace(match[0], value);
+      this.regexp.lastIndex = 0;
+      replaces++;
+      if (replaces >= this.maxReplaces) {
+        break;
+      }
+    }
+    return str;
+  };
+
+  Interpolator.prototype.nest = function nest(str, fc) {
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+    var match = void 0;
+    var value = void 0;
+
+    var clonedOptions = _extends$4({}, options);
+    clonedOptions.applyPostProcessor = false; // avoid post processing on nested lookup
+
+    // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
+    function handleHasOptions(key) {
+      if (key.indexOf(',') < 0) { return key; }
+
+      var p = key.split(',');
+      key = p.shift();
+      var optionsString = p.join(',');
+      optionsString = this.interpolate(optionsString, clonedOptions);
+      optionsString = optionsString.replace(/'/g, '"');
+
+      try {
+        clonedOptions = JSON.parse(optionsString);
+      } catch (e) {
+        this.logger.error('failed parsing options string in nesting for key ' + key, e);
+      }
+
+      return key;
+    }
+
+    // regular escape on demand
+    while (match = this.nestingRegexp.exec(str)) {
+      value = fc(handleHasOptions.call(this, match[1].trim()), clonedOptions);
+
+      // is only the nesting key (key1 = '$(key2)') return the value without stringify
+      if (value && match[0] === str && typeof value !== 'string') { return value; }
+
+      // no string to include or empty
+      if (typeof value !== 'string') { value = makeString(value); }
+      if (!value) {
+        this.logger.warn('missed to resolve ' + match[1] + ' for nesting ' + str);
+        value = '';
+      }
+      // Nested keys should not be escaped by default #854
+      // value = this.escapeValue ? regexSafe(utils.escape(value)) : regexSafe(value);
+      str = str.replace(match[0], value);
+      this.regexp.lastIndex = 0;
+    }
+    return str;
+  };
+
+  return Interpolator;
+}();
+
+var _extends$5 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) { break; } } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) { _i["return"](); } } finally { if (_d) { throw _e; } } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+function _defaults$3(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn$3(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits$3(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults$3(subClass, superClass); } }
+
+function remove(arr, what) {
+  var found = arr.indexOf(what);
+
+  while (found !== -1) {
+    arr.splice(found, 1);
+    found = arr.indexOf(what);
+  }
+}
+
+var Connector = function (_EventEmitter) {
+  _inherits$3(Connector, _EventEmitter);
+
+  function Connector(backend, store, services) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    _classCallCheck$8(this, Connector);
+
+    var _this = _possibleConstructorReturn$3(this, _EventEmitter.call(this));
+
+    _this.backend = backend;
+    _this.store = store;
+    _this.languageUtils = services.languageUtils;
+    _this.options = options;
+    _this.logger = baseLogger.create('backendConnector');
+
+    _this.state = {};
+    _this.queue = [];
+
+    if (_this.backend && _this.backend.init) {
+      _this.backend.init(services, options.backend, options);
+    }
+    return _this;
+  }
+
+  Connector.prototype.queueLoad = function queueLoad(languages, namespaces, callback) {
+    var _this2 = this;
+
+    // find what needs to be loaded
+    var toLoad = [];
+    var pending = [];
+    var toLoadLanguages = [];
+    var toLoadNamespaces = [];
+
+    languages.forEach(function (lng) {
+      var hasAllNamespaces = true;
+
+      namespaces.forEach(function (ns) {
+        var name = lng + '|' + ns;
+
+        if (_this2.store.hasResourceBundle(lng, ns)) {
+          _this2.state[name] = 2; // loaded
+        } else if (_this2.state[name] < 0) {
+          // nothing to do for err
+        } else if (_this2.state[name] === 1) {
+          if (pending.indexOf(name) < 0) { pending.push(name); }
+        } else {
+          _this2.state[name] = 1; // pending
+
+          hasAllNamespaces = false;
+
+          if (pending.indexOf(name) < 0) { pending.push(name); }
+          if (toLoad.indexOf(name) < 0) { toLoad.push(name); }
+          if (toLoadNamespaces.indexOf(ns) < 0) { toLoadNamespaces.push(ns); }
+        }
+      });
+
+      if (!hasAllNamespaces) { toLoadLanguages.push(lng); }
+    });
+
+    if (toLoad.length || pending.length) {
+      this.queue.push({
+        pending: pending,
+        loaded: {},
+        errors: [],
+        callback: callback
+      });
+    }
+
+    return {
+      toLoad: toLoad,
+      pending: pending,
+      toLoadLanguages: toLoadLanguages,
+      toLoadNamespaces: toLoadNamespaces
+    };
+  };
+
+  Connector.prototype.loaded = function loaded(name, err, data) {
+    var _this3 = this;
+
+    var _name$split = name.split('|'),
+        _name$split2 = _slicedToArray(_name$split, 2),
+        lng = _name$split2[0],
+        ns = _name$split2[1];
+
+    if (err) { this.emit('failedLoading', lng, ns, err); }
+
+    if (data) {
+      this.store.addResourceBundle(lng, ns, data);
+    }
+
+    // set loaded
+    this.state[name] = err ? -1 : 2;
+
+    // callback if ready
+    this.queue.forEach(function (q) {
+      pushPath(q.loaded, [lng], ns);
+      remove(q.pending, name);
+
+      if (err) { q.errors.push(err); }
+
+      if (q.pending.length === 0 && !q.done) {
+        _this3.emit('loaded', q.loaded);
+        /* eslint no-param-reassign: 0 */
+        q.done = true;
+        if (q.errors.length) {
+          q.callback(q.errors);
+        } else {
+          q.callback();
+        }
+      }
+    });
+
+    // remove done load requests
+    this.queue = this.queue.filter(function (q) {
+      return !q.done;
+    });
+  };
+
+  Connector.prototype.read = function read(lng, ns, fcName) {
+    var tried = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+    var _this4 = this;
+
+    var wait = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 250;
+    var callback = arguments[5];
+
+    if (!lng.length) { return callback(null, {}); } // noting to load
+
+    return this.backend[fcName](lng, ns, function (err, data) {
+      if (err && data /* = retryFlag */ && tried < 5) {
+        setTimeout(function () {
+          _this4.read.call(_this4, lng, ns, fcName, tried + 1, wait * 2, callback);
+        }, wait);
+        return;
+      }
+      callback(err, data);
+    });
+  };
+
+  /* eslint consistent-return: 0 */
+
+
+  Connector.prototype.load = function load(languages, namespaces, callback) {
+    var _this5 = this;
+
+    if (!this.backend) {
+      this.logger.warn('No backend was added via i18next.use. Will not load resources.');
+      return callback && callback();
+    }
+    var options = _extends$5({}, this.backend.options, this.options.backend);
+
+    if (typeof languages === 'string') { languages = this.languageUtils.toResolveHierarchy(languages); }
+    if (typeof namespaces === 'string') { namespaces = [namespaces]; }
+
+    var toLoad = this.queueLoad(languages, namespaces, callback);
+    if (!toLoad.toLoad.length) {
+      if (!toLoad.pending.length) { callback(); } // nothing to load and no pendings...callback now
+      return null; // pendings will trigger callback
+    }
+
+    // load with multi-load
+    if (options.allowMultiLoading && this.backend.readMulti) {
+      this.read(toLoad.toLoadLanguages, toLoad.toLoadNamespaces, 'readMulti', null, null, function (err, data) {
+        if (err) { _this5.logger.warn('loading namespaces ' + toLoad.toLoadNamespaces.join(', ') + ' for languages ' + toLoad.toLoadLanguages.join(', ') + ' via multiloading failed', err); }
+        if (!err && data) { _this5.logger.log('successfully loaded namespaces ' + toLoad.toLoadNamespaces.join(', ') + ' for languages ' + toLoad.toLoadLanguages.join(', ') + ' via multiloading', data); }
+
+        toLoad.toLoad.forEach(function (name) {
+          var _name$split3 = name.split('|'),
+              _name$split4 = _slicedToArray(_name$split3, 2),
+              l = _name$split4[0],
+              n = _name$split4[1];
+
+          var bundle = getPath(data, [l, n]);
+          if (bundle) {
+            _this5.loaded(name, err, bundle);
+          } else {
+            var error = 'loading namespace ' + n + ' for language ' + l + ' via multiloading failed';
+            _this5.loaded(name, error);
+            _this5.logger.error(error);
+          }
+        });
+      });
+    } else {
+      toLoad.toLoad.forEach(function (name) {
+        _this5.loadOne(name);
+      });
+    }
+  };
+
+  Connector.prototype.reload = function reload(languages, namespaces) {
+    var _this6 = this;
+
+    if (!this.backend) {
+      this.logger.warn('No backend was added via i18next.use. Will not load resources.');
+    }
+    var options = _extends$5({}, this.backend.options, this.options.backend);
+
+    if (typeof languages === 'string') { languages = this.languageUtils.toResolveHierarchy(languages); }
+    if (typeof namespaces === 'string') { namespaces = [namespaces]; }
+
+    // load with multi-load
+    if (options.allowMultiLoading && this.backend.readMulti) {
+      this.read(languages, namespaces, 'readMulti', null, null, function (err, data) {
+        if (err) { _this6.logger.warn('reloading namespaces ' + namespaces.join(', ') + ' for languages ' + languages.join(', ') + ' via multiloading failed', err); }
+        if (!err && data) { _this6.logger.log('successfully reloaded namespaces ' + namespaces.join(', ') + ' for languages ' + languages.join(', ') + ' via multiloading', data); }
+
+        languages.forEach(function (l) {
+          namespaces.forEach(function (n) {
+            var bundle = getPath(data, [l, n]);
+            if (bundle) {
+              _this6.loaded(l + '|' + n, err, bundle);
+            } else {
+              var error = 'reloading namespace ' + n + ' for language ' + l + ' via multiloading failed';
+              _this6.loaded(l + '|' + n, error);
+              _this6.logger.error(error);
+            }
+          });
+        });
+      });
+    } else {
+      languages.forEach(function (l) {
+        namespaces.forEach(function (n) {
+          _this6.loadOne(l + '|' + n, 're');
+        });
+      });
+    }
+  };
+
+  Connector.prototype.loadOne = function loadOne(name) {
+    var _this7 = this;
+
+    var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+    var _name$split5 = name.split('|'),
+        _name$split6 = _slicedToArray(_name$split5, 2),
+        lng = _name$split6[0],
+        ns = _name$split6[1];
+
+    this.read(lng, ns, 'read', null, null, function (err, data) {
+      if (err) { _this7.logger.warn(prefix + 'loading namespace ' + ns + ' for language ' + lng + ' failed', err); }
+      if (!err && data) { _this7.logger.log(prefix + 'loaded namespace ' + ns + ' for language ' + lng, data); }
+
+      _this7.loaded(name, err, data);
+    });
+  };
+
+  Connector.prototype.saveMissing = function saveMissing(languages, namespace, key, fallbackValue) {
+    if (this.backend && this.backend.create) { this.backend.create(languages, namespace, key, fallbackValue); }
+
+    // write to store to avoid resending
+    if (!languages || !languages[0]) { return; }
+    this.store.addResource(languages[0], namespace, key, fallbackValue);
+  };
+
+  return Connector;
+}(EventEmitter);
+
+var _extends$6 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _defaults$4(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn$4(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits$4(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults$4(subClass, superClass); } }
+
+var Connector$1 = function (_EventEmitter) {
+  _inherits$4(Connector, _EventEmitter);
+
+  function Connector(cache, store, services) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    _classCallCheck$9(this, Connector);
+
+    var _this = _possibleConstructorReturn$4(this, _EventEmitter.call(this));
+
+    _this.cache = cache;
+    _this.store = store;
+    _this.services = services;
+    _this.options = options;
+    _this.logger = baseLogger.create('cacheConnector');
+
+    if (_this.cache && _this.cache.init) { _this.cache.init(services, options.cache, options); }
+    return _this;
+  }
+
+  /* eslint consistent-return: 0 */
+
+
+  Connector.prototype.load = function load(languages, namespaces, callback) {
+    var _this2 = this;
+
+    if (!this.cache) { return callback && callback(); }
+    var options = _extends$6({}, this.cache.options, this.options.cache);
+
+    var loadLngs = typeof languages === 'string' ? this.services.languageUtils.toResolveHierarchy(languages) : languages;
+
+    if (options.enabled) {
+      this.cache.load(loadLngs, function (err, data) {
+        if (err) { _this2.logger.error('loading languages ' + loadLngs.join(', ') + ' from cache failed', err); }
+        if (data) {
+          /* eslint no-restricted-syntax: 0 */
+          for (var l in data) {
+            if (Object.prototype.hasOwnProperty.call(data, l)) {
+              for (var n in data[l]) {
+                if (Object.prototype.hasOwnProperty.call(data[l], n)) {
+                  if (n !== 'i18nStamp') {
+                    var bundle = data[l][n];
+                    if (bundle) { _this2.store.addResourceBundle(l, n, bundle); }
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (callback) { callback(); }
+      });
+    } else if (callback) {
+      callback();
+    }
+  };
+
+  Connector.prototype.save = function save() {
+    if (this.cache && this.options.cache && this.options.cache.enabled) { this.cache.save(this.store.data); }
+  };
+
+  return Connector;
+}(EventEmitter);
+
+function get() {
+  return {
+    debug: false,
+    initImmediate: true,
+
+    ns: ['translation'],
+    defaultNS: ['translation'],
+    fallbackLng: ['dev'],
+    fallbackNS: false, // string or array of namespaces
+
+    whitelist: false, // array with whitelisted languages
+    nonExplicitWhitelist: false,
+    load: 'all', // | currentOnly | languageOnly
+    preload: false, // array with preload languages
+
+    simplifyPluralSuffix: true,
+    keySeparator: '.',
+    nsSeparator: ':',
+    pluralSeparator: '_',
+    contextSeparator: '_',
+
+    saveMissing: false, // enable to send missing values
+    saveMissingTo: 'fallback', // 'current' || 'all'
+    missingKeyHandler: false, // function(lng, ns, key, fallbackValue) -> override if prefer on handling
+
+    postProcess: false, // string or array of postProcessor names
+    returnNull: true, // allows null value as valid translation
+    returnEmptyString: true, // allows empty string value as valid translation
+    returnObjects: false,
+    joinArrays: false, // or string to join array
+    returnedObjectHandler: function returnedObjectHandler() {}, // function(key, value, options) triggered if key returns object but returnObjects is set to false
+    parseMissingKeyHandler: false, // function(key) parsed a key that was not found in t() before returning
+    appendNamespaceToMissingKey: false,
+    appendNamespaceToCIMode: false,
+    overloadTranslationOptionHandler: function handle(args) {
+      return { defaultValue: args[1] };
+    },
+
+    interpolation: {
+      escapeValue: true,
+      format: function format(value, _format, lng) {
+        return value;
+      },
+      prefix: '{{',
+      suffix: '}}',
+      formatSeparator: ',',
+      // prefixEscaped: '{{',
+      // suffixEscaped: '}}',
+      // unescapeSuffix: '',
+      unescapePrefix: '-',
+
+      nestingPrefix: '$t(',
+      nestingSuffix: ')',
+      // nestingPrefixEscaped: '$t(',
+      // nestingSuffixEscaped: ')',
+      // defaultVariables: undefined // object that can have values to interpolate on - extends passed in interpolation data
+      maxReplaces: 1000 // max replaces to prevent endless loop
+    }
+  };
+}
+
+/* eslint no-param-reassign: 0 */
+function transformOptions(options) {
+  // create namespace object if namespace is passed in as string
+  if (typeof options.ns === 'string') { options.ns = [options.ns]; }
+  if (typeof options.fallbackLng === 'string') { options.fallbackLng = [options.fallbackLng]; }
+  if (typeof options.fallbackNS === 'string') { options.fallbackNS = [options.fallbackNS]; }
+
+  // extend whitelist with cimode
+  if (options.whitelist && options.whitelist.indexOf('cimode') < 0) { options.whitelist.push('cimode'); }
+
+  return options;
+}
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); } }
+
+function noop() {}
+
+var I18n = function (_EventEmitter) {
+  _inherits(I18n, _EventEmitter);
+
+  function I18n() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments[1];
+
+    _classCallCheck(this, I18n);
+
+    var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
+
+    _this.options = transformOptions(options);
+    _this.services = {};
+    _this.logger = baseLogger;
+    _this.modules = { external: [] };
+
+    if (callback && !_this.isInitialized && !options.isClone) {
+      var _ret;
+
+      // https://github.com/i18next/i18next/issues/879
+      if (!_this.options.initImmediate) { return _ret = _this.init(options, callback), _possibleConstructorReturn(_this, _ret); }
+      setTimeout(function () {
+        _this.init(options, callback);
+      }, 0);
+    }
+    return _this;
+  }
+
+  I18n.prototype.init = function init() {
+    var _this2 = this;
+
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments[1];
+
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    this.options = _extends({}, get(), this.options, transformOptions(options));
+
+    this.format = this.options.interpolation.format;
+    if (!callback) { callback = noop; }
+
+    function createClassOnDemand(ClassOrObject) {
+      if (!ClassOrObject) { return null; }
+      if (typeof ClassOrObject === 'function') { return new ClassOrObject(); }
+      return ClassOrObject;
+    }
+
+    // init services
+    if (!this.options.isClone) {
+      if (this.modules.logger) {
+        baseLogger.init(createClassOnDemand(this.modules.logger), this.options);
+      } else {
+        baseLogger.init(null, this.options);
+      }
+
+      var lu = new LanguageUtil(this.options);
+      this.store = new ResourceStore(this.options.resources, this.options);
+
+      var s = this.services;
+      s.logger = baseLogger;
+      s.resourceStore = this.store;
+      s.resourceStore.on('added removed', function (lng, ns) {
+        s.cacheConnector.save();
+      });
+      s.languageUtils = lu;
+      s.pluralResolver = new PluralResolver(lu, { prepend: this.options.pluralSeparator, compatibilityJSON: this.options.compatibilityJSON, simplifyPluralSuffix: this.options.simplifyPluralSuffix });
+      s.interpolator = new Interpolator(this.options);
+
+      s.backendConnector = new Connector(createClassOnDemand(this.modules.backend), s.resourceStore, s, this.options);
+      // pipe events from backendConnector
+      s.backendConnector.on('*', function (event) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        _this2.emit.apply(_this2, [event].concat(args));
+      });
+
+      s.backendConnector.on('loaded', function (loaded) {
+        s.cacheConnector.save();
+      });
+
+      s.cacheConnector = new Connector$1(createClassOnDemand(this.modules.cache), s.resourceStore, s, this.options);
+      // pipe events from backendConnector
+      s.cacheConnector.on('*', function (event) {
+        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+          args[_key2 - 1] = arguments[_key2];
+        }
+
+        _this2.emit.apply(_this2, [event].concat(args));
+      });
+
+      if (this.modules.languageDetector) {
+        s.languageDetector = createClassOnDemand(this.modules.languageDetector);
+        s.languageDetector.init(s, this.options.detection, this.options);
+      }
+
+      this.translator = new Translator(this.services, this.options);
+      // pipe events from translator
+      this.translator.on('*', function (event) {
+        for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+          args[_key3 - 1] = arguments[_key3];
+        }
+
+        _this2.emit.apply(_this2, [event].concat(args));
+      });
+
+      this.modules.external.forEach(function (m) {
+        if (m.init) { m.init(_this2); }
+      });
+    }
+
+    // append api
+    var storeApi = ['getResource', 'addResource', 'addResources', 'addResourceBundle', 'removeResourceBundle', 'hasResourceBundle', 'getResourceBundle'];
+    storeApi.forEach(function (fcName) {
+      _this2[fcName] = function () {
+        var _store;
+
+        return (_store = _this2.store)[fcName].apply(_store, arguments);
+      };
+    });
+
+    var load = function load() {
+      _this2.changeLanguage(_this2.options.lng, function (err, t) {
+        _this2.isInitialized = true;
+        _this2.logger.log('initialized', _this2.options);
+        _this2.emit('initialized', _this2.options);
+
+        callback(err, t);
+      });
+    };
+
+    if (this.options.resources || !this.options.initImmediate) {
+      load();
+    } else {
+      setTimeout(load, 0);
+    }
+
+    return this;
+  };
+
+  /* eslint consistent-return: 0 */
+
+
+  I18n.prototype.loadResources = function loadResources() {
+    var _this3 = this;
+
+    var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
+
+    if (!this.options.resources) {
+      if (this.language && this.language.toLowerCase() === 'cimode') { return callback(); } // avoid loading resources for cimode
+
+      var toLoad = [];
+
+      var append = function append(lng) {
+        if (!lng) { return; }
+        var lngs = _this3.services.languageUtils.toResolveHierarchy(lng);
+        lngs.forEach(function (l) {
+          if (toLoad.indexOf(l) < 0) { toLoad.push(l); }
+        });
+      };
+
+      if (!this.language) {
+        // at least load fallbacks in this case
+        var fallbacks = this.services.languageUtils.getFallbackCodes(this.options.fallbackLng);
+        fallbacks.forEach(function (l) {
+          return append(l);
+        });
+      } else {
+        append(this.language);
+      }
+
+      if (this.options.preload) {
+        this.options.preload.forEach(function (l) {
+          return append(l);
+        });
+      }
+
+      this.services.cacheConnector.load(toLoad, this.options.ns, function () {
+        _this3.services.backendConnector.load(toLoad, _this3.options.ns, callback);
+      });
+    } else {
+      callback(null);
+    }
+  };
+
+  I18n.prototype.reloadResources = function reloadResources(lngs, ns) {
+    if (!lngs) { lngs = this.languages; }
+    if (!ns) { ns = this.options.ns; }
+    this.services.backendConnector.reload(lngs, ns);
+  };
+
+  I18n.prototype.use = function use(module) {
+    if (module.type === 'backend') {
+      this.modules.backend = module;
+    }
+
+    if (module.type === 'cache') {
+      this.modules.cache = module;
+    }
+
+    if (module.type === 'logger' || module.log && module.warn && module.error) {
+      this.modules.logger = module;
+    }
+
+    if (module.type === 'languageDetector') {
+      this.modules.languageDetector = module;
+    }
+
+    if (module.type === 'postProcessor') {
+      postProcessor.addPostProcessor(module);
+    }
+
+    if (module.type === '3rdParty') {
+      this.modules.external.push(module);
+    }
+
+    return this;
+  };
+
+  I18n.prototype.changeLanguage = function changeLanguage(lng, callback) {
+    var _this4 = this;
+
+    var done = function done(err, l) {
+      _this4.translator.changeLanguage(l);
+
+      if (l) {
+        _this4.emit('languageChanged', l);
+        _this4.logger.log('languageChanged', l);
+      }
+
+      if (callback) { callback(err, function () {
+        return _this4.t.apply(_this4, arguments);
+      }); }
+    };
+
+    var setLng = function setLng(l) {
+      if (l) {
+        _this4.language = l;
+        _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l);
+
+        if (_this4.services.languageDetector) { _this4.services.languageDetector.cacheUserLanguage(l); }
+      }
+
+      _this4.loadResources(function (err) {
+        done(err, l);
+      });
+    };
+
+    if (!lng && this.services.languageDetector && !this.services.languageDetector.async) {
+      setLng(this.services.languageDetector.detect());
+    } else if (!lng && this.services.languageDetector && this.services.languageDetector.async) {
+      this.services.languageDetector.detect(setLng);
+    } else {
+      setLng(lng);
+    }
+  };
+
+  I18n.prototype.getFixedT = function getFixedT(lng, ns) {
+    var _this5 = this;
+
+    var fixedT = function fixedT(key, opts) {
+      for (var _len4 = arguments.length, rest = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
+        rest[_key4 - 2] = arguments[_key4];
+      }
+
+      var options = _extends({}, opts);
+      if ((typeof opts === 'undefined' ? 'undefined' : _typeof(opts)) !== 'object') {
+        options = _this5.options.overloadTranslationOptionHandler([key, opts].concat(rest));
+      }
+
+      options.lng = options.lng || fixedT.lng;
+      options.lngs = options.lngs || fixedT.lngs;
+      options.ns = options.ns || fixedT.ns;
+      return _this5.t(key, options);
+    };
+    if (typeof lng === 'string') {
+      fixedT.lng = lng;
+    } else {
+      fixedT.lngs = lng;
+    }
+    fixedT.ns = ns;
+    return fixedT;
+  };
+
+  I18n.prototype.t = function t() {
+    var _translator;
+
+    return this.translator && (_translator = this.translator).translate.apply(_translator, arguments);
+  };
+
+  I18n.prototype.exists = function exists() {
+    var _translator2;
+
+    return this.translator && (_translator2 = this.translator).exists.apply(_translator2, arguments);
+  };
+
+  I18n.prototype.setDefaultNamespace = function setDefaultNamespace(ns) {
+    this.options.defaultNS = ns;
+  };
+
+  I18n.prototype.loadNamespaces = function loadNamespaces(ns, callback) {
+    var _this6 = this;
+
+    if (!this.options.ns) { return callback && callback(); }
+    if (typeof ns === 'string') { ns = [ns]; }
+
+    ns.forEach(function (n) {
+      if (_this6.options.ns.indexOf(n) < 0) { _this6.options.ns.push(n); }
+    });
+
+    this.loadResources(callback);
+  };
+
+  I18n.prototype.loadLanguages = function loadLanguages(lngs, callback) {
+    if (typeof lngs === 'string') { lngs = [lngs]; }
+    var preloaded = this.options.preload || [];
+
+    var newLngs = lngs.filter(function (lng) {
+      return preloaded.indexOf(lng) < 0;
+    });
+    // Exit early if all given languages are already preloaded
+    if (!newLngs.length) { return callback(); }
+
+    this.options.preload = preloaded.concat(newLngs);
+    this.loadResources(callback);
+  };
+
+  I18n.prototype.dir = function dir(lng) {
+    if (!lng) { lng = this.languages && this.languages.length > 0 ? this.languages[0] : this.language; }
+    if (!lng) { return 'rtl'; }
+
+    var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
+
+    return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
+  };
+
+  /* eslint class-methods-use-this: 0 */
+
+
+  I18n.prototype.createInstance = function createInstance() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments[1];
+
+    return new I18n(options, callback);
+  };
+
+  I18n.prototype.cloneInstance = function cloneInstance() {
+    var _this7 = this;
+
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
+
+    var mergedOptions = _extends({}, this.options, options, { isClone: true });
+    var clone = new I18n(mergedOptions);
+    var membersToCopy = ['store', 'services', 'language'];
+    membersToCopy.forEach(function (m) {
+      clone[m] = _this7[m];
+    });
+    clone.translator = new Translator(clone.services, clone.options);
+    clone.translator.on('*', function (event) {
+      for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+        args[_key5 - 1] = arguments[_key5];
+      }
+
+      clone.emit.apply(clone, [event].concat(args));
+    });
+    clone.init(mergedOptions, callback);
+    clone.translator.options = clone.options; // sync options
+
+    return clone;
+  };
+
+  return I18n;
+}(EventEmitter);
+
+var i18next$1 = new I18n();
+
+var changeLanguage = i18next$1.changeLanguage.bind(i18next$1);
+var cloneInstance = i18next$1.cloneInstance.bind(i18next$1);
+var createInstance = i18next$1.createInstance.bind(i18next$1);
+var dir = i18next$1.dir.bind(i18next$1);
+var exists = i18next$1.exists.bind(i18next$1);
+var getFixedT = i18next$1.getFixedT.bind(i18next$1);
+var init = i18next$1.init.bind(i18next$1);
+var loadLanguages = i18next$1.loadLanguages.bind(i18next$1);
+var loadNamespaces = i18next$1.loadNamespaces.bind(i18next$1);
+var loadResources = i18next$1.loadResources.bind(i18next$1);
+var off = i18next$1.off.bind(i18next$1);
+var on = i18next$1.on.bind(i18next$1);
+var setDefaultNamespace = i18next$1.setDefaultNamespace.bind(i18next$1);
+var t = i18next$1.t.bind(i18next$1);
+var use = i18next$1.use.bind(i18next$1);
+
+var arr = [];
+var each = arr.forEach;
+var slice = arr.slice;
+
+function defaults(obj) {
+  each.call(slice.call(arguments, 1), function (source) {
+    if (source) {
+      for (var prop in source) {
+        if (obj[prop] === undefined) { obj[prop] = source[prop]; }
+      }
+    }
+  });
+  return obj;
+}
+
+var cookie = {
+  create: function create(name, value, minutes, domain) {
+    var expires = void 0;
+    if (minutes) {
+      var date = new Date();
+      date.setTime(date.getTime() + minutes * 60 * 1000);
+      expires = '; expires=' + date.toGMTString();
+    } else { expires = ''; }
+    domain = domain ? 'domain=' + domain + ';' : '';
+    document.cookie = name + '=' + value + expires + ';' + domain + 'path=/';
+  },
+
+  read: function read(name) {
+    var nameEQ = name + '=';
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1, c.length);
+      }if (c.indexOf(nameEQ) === 0) { return c.substring(nameEQ.length, c.length); }
+    }
+    return null;
+  },
+
+  remove: function remove(name) {
+    this.create(name, '', -1);
+  }
+};
+
+var cookie$1 = {
+  name: 'cookie',
+
+  lookup: function lookup(options) {
+    var found = void 0;
+
+    if (options.lookupCookie && typeof document !== 'undefined') {
+      var c = cookie.read(options.lookupCookie);
+      if (c) { found = c; }
+    }
+
+    return found;
+  },
+  cacheUserLanguage: function cacheUserLanguage(lng, options) {
+    if (options.lookupCookie && typeof document !== 'undefined') {
+      cookie.create(options.lookupCookie, lng, options.cookieMinutes, options.cookieDomain);
+    }
+  }
+};
+
+var querystring = {
+  name: 'querystring',
+
+  lookup: function lookup(options) {
+    var found = void 0;
+
+    if (typeof window !== 'undefined') {
+      var query = window.location.search.substring(1);
+      var params = query.split('&');
+      for (var i = 0; i < params.length; i++) {
+        var pos = params[i].indexOf('=');
+        if (pos > 0) {
+          var key = params[i].substring(0, pos);
+          if (key === options.lookupQuerystring) {
+            found = params[i].substring(pos + 1);
+          }
+        }
+      }
+    }
+
+    return found;
+  }
+};
+
+var hasLocalStorageSupport = void 0;
+try {
+  hasLocalStorageSupport = window !== 'undefined' && window.localStorage !== null;
+  var testKey = 'i18next.translate.boo';
+  window.localStorage.setItem(testKey, 'foo');
+  window.localStorage.removeItem(testKey);
+} catch (e) {
+  hasLocalStorageSupport = false;
+}
+
+var localStorage = {
+  name: 'localStorage',
+
+  lookup: function lookup(options) {
+    var found = void 0;
+
+    if (options.lookupLocalStorage && hasLocalStorageSupport) {
+      var lng = window.localStorage.getItem(options.lookupLocalStorage);
+      if (lng) { found = lng; }
+    }
+
+    return found;
+  },
+  cacheUserLanguage: function cacheUserLanguage(lng, options) {
+    if (options.lookupLocalStorage && hasLocalStorageSupport) {
+      window.localStorage.setItem(options.lookupLocalStorage, lng);
+    }
+  }
+};
+
+var navigator$1 = {
+  name: 'navigator',
+
+  lookup: function lookup(options) {
+    var found = [];
+
+    if (typeof navigator !== 'undefined') {
+      if (navigator.languages) {
+        // chrome only; not an array, so can't use .push.apply instead of iterating
+        for (var i = 0; i < navigator.languages.length; i++) {
+          found.push(navigator.languages[i]);
+        }
+      }
+      if (navigator.userLanguage) {
+        found.push(navigator.userLanguage);
+      }
+      if (navigator.language) {
+        found.push(navigator.language);
+      }
+    }
+
+    return found.length > 0 ? found : undefined;
+  }
+};
+
+var htmlTag = {
+  name: 'htmlTag',
+
+  lookup: function lookup(options) {
+    var found = void 0;
+    var htmlTag = options.htmlTag || (typeof document !== 'undefined' ? document.documentElement : null);
+
+    if (htmlTag && typeof htmlTag.getAttribute === 'function') {
+      found = htmlTag.getAttribute('lang');
+    }
+
+    return found;
+  }
+};
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) { descriptor.writable = true; } Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) { defineProperties(Constructor.prototype, protoProps); } if (staticProps) { defineProperties(Constructor, staticProps); } return Constructor; }; }();
+
+function _classCallCheck$10(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function getDefaults() {
+  return {
+    order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag'],
+    lookupQuerystring: 'lng',
+    lookupCookie: 'i18next',
+    lookupLocalStorage: 'i18nextLng',
+
+    // cache user language
+    caches: ['localStorage'],
+    excludeCacheFor: ['cimode']
+    //cookieMinutes: 10,
+    //cookieDomain: 'myDomain'
+  };
+}
+
+var Browser = function () {
+  function Browser(services) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck$10(this, Browser);
+
+    this.type = 'languageDetector';
+    this.detectors = {};
+
+    this.init(services, options);
+  }
+
+  _createClass(Browser, [{
+    key: 'init',
+    value: function init(services) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var i18nOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      this.services = services;
+      this.options = defaults(options, this.options || {}, getDefaults());
+      this.i18nOptions = i18nOptions;
+
+      this.addDetector(cookie$1);
+      this.addDetector(querystring);
+      this.addDetector(localStorage);
+      this.addDetector(navigator$1);
+      this.addDetector(htmlTag);
+    }
+  }, {
+    key: 'addDetector',
+    value: function addDetector(detector) {
+      this.detectors[detector.name] = detector;
+    }
+  }, {
+    key: 'detect',
+    value: function detect(detectionOrder) {
+      var _this = this;
+
+      if (!detectionOrder) { detectionOrder = this.options.order; }
+
+      var detected = [];
+      detectionOrder.forEach(function (detectorName) {
+        if (_this.detectors[detectorName]) {
+          var lookup = _this.detectors[detectorName].lookup(_this.options);
+          if (lookup && typeof lookup === 'string') { lookup = [lookup]; }
+          if (lookup) { detected = detected.concat(lookup); }
+        }
+      });
+
+      var found = void 0;
+      detected.forEach(function (lng) {
+        if (found) { return; }
+        var cleanedLng = _this.services.languageUtils.formatLanguageCode(lng);
+        if (_this.services.languageUtils.isWhitelisted(cleanedLng)) { found = cleanedLng; }
+      });
+
+      return found || this.i18nOptions.fallbackLng[0];
+    }
+  }, {
+    key: 'cacheUserLanguage',
+    value: function cacheUserLanguage(lng, caches) {
+      var _this2 = this;
+
+      if (!caches) { caches = this.options.caches; }
+      if (!caches) { return; }
+      if (this.options.excludeCacheFor && this.options.excludeCacheFor.indexOf(lng) > -1) { return; }
+      caches.forEach(function (cacheName) {
+        if (_this2.detectors[cacheName]) { _this2.detectors[cacheName].cacheUserLanguage(lng, _this2.options); }
+      });
+    }
+  }]);
+
+  return Browser;
+}();
+
+Browser.type = 'languageDetector';
+
+var ja = {
+  word: {
+    manage: '管理画面',
+    dashboard: 'ダッシュボード'
+  }
+};
+
+var en = {};
+
+// i18n対応
+// @see: https://www.i18next.com
+// API経由で定義ファイルを取得する場合は、
+// https://github.com/i18next/i18next-xhr-backend
+// 等を使うこと。
+
+
+
+var i18n = {
+  init: () => {
+    return new Promise((resolve, reject) => {
+      i18next$1
+        .use(Browser)
+        .init({
+          // @see: https://www.i18next.com/configuration-options.html
+          fallbackLng: 'ja',
+          resources: {
+            ja: { translation: ja },
+            en: { translation: en }
+          }
+        }, err => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve();
+        });
+    });
+  },
+
+  /**
+   * @return {i18next}
+   */
+  get: () => {
+    return i18next$1;
+  }
+};
+
+const i18n$1 = i18next$1;
+
 /* esr version 0.9.2 */
 /**
      * Appends an array to the end of another.
@@ -3379,7 +5678,7 @@ function containsMatch(array, pattern) {
 /**
      * Create slice of source array or array-like object
      */
-    function slice(arr, start, end){
+    function slice$1(arr, start, end){
         var len = arr.length;
 
         if (start == null) {
@@ -3406,7 +5705,7 @@ function containsMatch(array, pattern) {
         return result;
     }
 
-    var slice_1 = slice;
+    var slice_1 = slice$1;
 
 /**
      * Return a new Array with elements that aren't present in the other Arrays.
@@ -4055,12 +6354,12 @@ function isValidString(val) {
      * Remove a single item from the array.
      * (it won't remove duplicates, just a single item)
      */
-    function remove(arr, item){
+    function remove$1(arr, item){
         var idx = indexOf_1(arr, item);
         if (idx !== -1) { arr.splice(idx, 1); }
     }
 
-    var remove_1 = remove;
+    var remove_1 = remove$1;
 
 /**
      * Remove all instances of an item from array.
@@ -5351,7 +7650,7 @@ var createPath = function createPath(location) {
   return path;
 };
 
-var _extends$1 = Object.assign || function (target) {
+var _extends$1$1 = Object.assign || function (target) {
 var arguments$1 = arguments;
  for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -5363,7 +7662,7 @@ var createLocation = function createLocation(path, state, key, currentLocation) 
     location.state = state;
   } else {
     // One-arg form: push(location)
-    location = _extends$1({}, path);
+    location = _extends$1$1({}, path);
 
     if (location.pathname === undefined) { location.pathname = ''; }
 
@@ -5544,9 +7843,9 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
   return event.state === undefined && navigator.userAgent.indexOf('CriOS') === -1;
 };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof$2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _extends = Object.assign || function (target) {
+var _extends$7 = Object.assign || function (target) {
 var arguments$1 = arguments;
  for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -5612,7 +7911,7 @@ var createBrowserHistory = function createBrowserHistory() {
   var transitionManager = createTransitionManager();
 
   var setState = function setState(nextState) {
-    _extends(history, nextState);
+    _extends$7(history, nextState);
 
     history.length = globalHistory.length;
 
@@ -5682,7 +7981,7 @@ var createBrowserHistory = function createBrowserHistory() {
   };
 
   var push = function push(path, state) {
-    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$2(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
 
     var action = 'PUSH';
     var location = createLocation(path, state, createKey(), history.location);
@@ -5718,7 +8017,7 @@ var createBrowserHistory = function createBrowserHistory() {
   };
 
   var replace = function replace(path, state) {
-    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$2(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
 
     var action = 'REPLACE';
     var location = createLocation(path, state, createKey(), history.location);
@@ -5828,7 +8127,7 @@ var createBrowserHistory = function createBrowserHistory() {
   return history;
 };
 
-var _extends$2 = Object.assign || function (target) {
+var _extends$2$1 = Object.assign || function (target) {
 var arguments$1 = arguments;
  for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -5904,7 +8203,7 @@ var createHashHistory = function createHashHistory() {
   var transitionManager = createTransitionManager();
 
   var setState = function setState(nextState) {
-    _extends$2(history, nextState);
+    _extends$2$1(history, nextState);
 
     history.length = globalHistory.length;
 
@@ -6129,9 +8428,9 @@ var createHashHistory = function createHashHistory() {
   return history;
 };
 
-var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof$1$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _extends$3 = Object.assign || function (target) {
+var _extends$3$1 = Object.assign || function (target) {
 var arguments$1 = arguments;
  for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -6156,7 +8455,7 @@ var createMemoryHistory = function createMemoryHistory() {
   var transitionManager = createTransitionManager();
 
   var setState = function setState(nextState) {
-    _extends$3(history, nextState);
+    _extends$3$1(history, nextState);
 
     history.length = history.entries.length;
 
@@ -6177,7 +8476,7 @@ var createMemoryHistory = function createMemoryHistory() {
   var createHref = createPath;
 
   var push = function push(path, state) {
-    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
 
     var action = 'PUSH';
     var location = createLocation(path, state, createKey(), history.location);
@@ -6205,7 +8504,7 @@ var createMemoryHistory = function createMemoryHistory() {
   };
 
   var replace = function replace(path, state) {
-    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
 
     var action = 'REPLACE';
     var location = createLocation(path, state, createKey(), history.location);
@@ -6970,6 +9269,8 @@ var application$2 = {
   isNetworking: false,
   // ドラッグ中か否か。
   isDragging: false,
+  // 左カラムメニューの開閉状態
+  isMenuOpened: true,
   // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
   endpointFilterText: ''
 };
@@ -7351,6 +9652,16 @@ var application$1 = {
   },
 
   /**
+   * メニューの開閉状態を切り替えます。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  menuToggle: context => {
+    context.state.application.isMenuOpened = !context.state.application.isMenuOpened;
+    return [constants$3.APPLICATION];
+  },
+
+  /**
    * エンドポイント用のフィルターテキストを更新します。
    * @param {riotx.Context} context
    * @param {String} newFilterText
@@ -7501,12 +9812,12 @@ var viron$1 = {
       if (!find_1$1(viron.sections, section => {
         return (section.id === 'manage');
       })) {
-        viron.sections = combine_1$1([{ id: 'manage', label: '管理画面' }], viron.sections);
+        viron.sections = combine_1$1([{ id: 'manage', label: i18n$1.t('word.manage') }], viron.sections);
       }
       if (!find_1$1(viron.sections, section => {
         return (section.id === 'dashboard');
       })) {
-        viron.sections = combine_1$1([{ id: 'dashboard', label: 'ダッシュボード' }], viron.sections);
+        viron.sections = combine_1$1([{ id: 'dashboard', label: i18n$1.t('word.dashboard') }], viron.sections);
       }
     }
     context.state.viron = viron;
@@ -8405,6 +10716,7 @@ const constants$2 = {
   APPLICATION_NETWORKINGS_ADD: 'APPLICATION_NETWORKINGS_ADD',
   APPLICATION_NETWORKINGS_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
   APPLICATION_DRAG: 'APPLICATION_DRAG',
+  APPLICATION_MENU_TOGGLE: 'APPLICATION_MENU_TOGGLE',
   APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS_UPDATE_ONE: 'COMPONENTS_UPDATE_ONE',
   COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
@@ -8444,6 +10756,7 @@ var mutations = {
   [constants$2.APPLICATION_NETWORKINGS_ADD]: application$1.addNetworking,
   [constants$2.APPLICATION_NETWORKINGS_REMOVE]: application$1.removeNetworking,
   [constants$2.APPLICATION_DRAG]: application$1.drag,
+  [constants$2.APPLICATION_MENU_TOGGLE]: application$1.menuToggle,
   [constants$2.APPLICATION_ENDPOINT_FILTER_TEXT]: application$1.endpointFilterText,
   [constants$2.COMPONENTS_UPDATE_ONE]: components$1.updateOne,
   [constants$2.COMPONENTS_REMOVE_ONE]: components$1.removeOne,
@@ -8540,6 +10853,19 @@ var application = {
       .resolve()
       .then(() => {
         context.commit(constants$2.APPLICATION_DRAG, false);
+      });
+  },
+
+  /**
+   * メニューの開閉状態をトグルします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  toggleMenu: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(constants$2.APPLICATION_MENU_TOGGLE);
       });
   },
 
@@ -8740,6 +11066,15 @@ var application$3 = {
    */
   isDragging: context => {
     return context.state.application.isDragging;
+  },
+
+  /**
+   * メニューの開閉状態を返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isMenuOpened: context => {
+    return context.state.application.isMenuOpened;
   },
 
   /**
@@ -9106,10 +11441,25 @@ var viron$2 = {
   /**
    * 名前を返します。
    * @param {riotx.Context} context
-   * @return {String}
+   * @return {String|null}
    */
   name: context => {
+    if (!context.state.viron) {
+      return null;
+    }
     return context.state.viron.name;
+  },
+
+  /**
+   * サムネイルを返します。
+   * @param {riotx.Context} context
+   * @return {String|null}
+   */
+  thumbnail: context => {
+    if (!context.state.viron) {
+      return null;
+    }
+    return context.state.viron.thumbnail;
   },
 
   /**
@@ -9961,6 +12311,7 @@ const constants$5 = {
   APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
   APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
   APPLICATION_ISDRAGGING: 'APPLICATION_ISDRAGGING',
+  APPLICATION_ISMENUOPENED: 'APPLICATION_ISMENUOPENED',
   APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
   COMPONENTS: 'COMPONENTS',
   COMPONENTS_PARAMETER_OBJECTS: 'COMPONENTS_PARAMETER_OBJECTS',
@@ -9983,6 +12334,7 @@ const constants$5 = {
   VIRON_PAGES: 'VIRON_PAGES',
   VIRON_PAGES_ID_OF: 'VIRON_PAGES_ID_OF',
   VIRON_NAME: 'VIRON_NAME',
+  VIRON_THUMBNAIL: 'VIRON_THUMBNAIL',
   VIRON_DASHBOARD: 'VIRON_DASHBOARD',
   VIRON_MANAGE: 'VIRON_MANAGE',
   VIRON_MENU: 'VIRON_MENU',
@@ -10042,6 +12394,7 @@ var getters = {
   [constants$5.APPLICATION_ISNAVIGATING]: application$3.isNavigating,
   [constants$5.APPLICATION_ISNETWORKING]: application$3.isNetworking,
   [constants$5.APPLICATION_ISDRAGGING]: application$3.isDragging,
+  [constants$5.APPLICATION_ISMENUOPENED]: application$3.isMenuOpened,
   [constants$5.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
   [constants$5.COMPONENTS]: components$2.all,
   [constants$5.COMPONENTS_PARAMETER_OBJECTS]: components$2.parameterObjectsEntirely,
@@ -10064,6 +12417,7 @@ var getters = {
   [constants$5.VIRON_PAGES]: viron$2.pages,
   [constants$5.VIRON_PAGES_ID_OF]: viron$2.pageIdOf,
   [constants$5.VIRON_NAME]: viron$2.name,
+  [constants$5.VIRON_THUMBNAIL]: viron$2.thumbnail,
   [constants$5.VIRON_DASHBOARD]: viron$2.dashboard,
   [constants$5.VIRON_MANAGE]: viron$2.manage,
   [constants$5.VIRON_MENU]: viron$2.menu,
@@ -12114,6 +14468,7 @@ const constants$1 = {
   APPLICATION_NAVIGATION_END: 'APPLICATION_NAVIGATION_END',
   APPLICATION_DRAG_START: 'APPLICATION_DRAG_START',
   APPLICATION_DRAG_END: 'APPLICATION_DRAG_END',
+  APPLICATION_MENU_TOGGLE: 'APPLICATION_MENU_TOGGLE',
   APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT: 'APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT',
   APPLICATION_RESET_ENDPOINT_FILTER_TEXT: 'APPLICATION_RESET_ENDPOINT_FILTER_TEXT',
   AUTH_UPDATE: 'AUTH_UPADTE',
@@ -12164,6 +14519,7 @@ var actions = {
   [constants$1.APPLICATION_NAVIGATION_END]: application.endNavigation,
   [constants$1.APPLICATION_DRAG_START]: application.startDrag,
   [constants$1.APPLICATION_DRAG_END]: application.endDrag,
+  [constants$1.APPLICATION_MENU_TOGGLE]: application.toggleMenu,
   [constants$1.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT]: application.updateEndpointFilterText,
   [constants$1.APPLICATION_RESET_ENDPOINT_FILTER_TEXT]: application.resetEndpointFilterText,
   [constants$1.AUTH_UPDATE]: auth.update,
@@ -12554,6 +14910,10 @@ var mixin = {
       .then(() => {
         riot$1.settings.autoUpdate = false;
         riot$1.mixin({
+          init: function() {
+            // 各riotタグインスタンスから簡単にi18n機能を使用可能にする。
+            this.i18n = i18n.get();
+          },
           // riotx.riotxChange(store, evtName, func)のショートカット。
           listen: function(...args) {
             const store = this.riotx.get();
@@ -17014,19 +19374,87 @@ riot$1.tag2('viron-application-drawers', '<virtual each="{drawers}"> <viron-draw
     this.external(script$22);
 });
 
+riot$1.tag2('viron-icon-arrow-right', '<svg viewbox="-3551.038 14059.998 10.039 16.002"> <path d="M1763.979-16723.969l-7.394-7.4a.291.291,0,0,1-.022-.025l-.381-.383a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.286,0l1.836,1.84a.191.191,0,0,1,0,.277l-5.819,5.822,5.819,5.818a.2.2,0,0,1,0,.287l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1763.979-16723.969Z" transform="translate(-1784.878 -2663.914) rotate(180)"></path> </svg>', '', 'class="icon Icon IconArrowRight {opts.class}"', function(opts) {
+});
+
+riot$1.tag2('viron-icon-menu', '<svg viewbox="-3635 13999.001 24 9.4"> <g transform="translate(-3357.6 14031.401) rotate(180)"> <rect width="16" height="3" rx="0.4" transform="translate(261.4 29.4)"></rect> <rect width="16" height="3" rx="0.4" transform="translate(253.4 23)"></rect> </g> </svg>', '', 'class="icon Icon IconMenu {opts.class}"', function(opts) {
+});
+
+riot$1.tag2('viron-icon-menu-invert', '<svg viewbox="-3595 13999.001 24 9.4"> <g transform="translate(-3317.6 14031.401) rotate(180)"> <rect width="16" height="3" rx="0.4" transform="translate(253.4 29.4)"></rect> <rect class="cls-1" width="16" height="3" rx="0.4" transform="translate(261.4 23)"></rect> </g> </svg>', '', 'class="icon Icon IconMenuInvert {opts.class}"', function(opts) {
+});
+
 riot$1.tag2('viron-icon-search', '<svg viewbox="-3434 14059.999 15.999 16.003"> <path d="M3710.818-13811.056l-3.051-3.05a6.957,6.957,0,0,1-3.768,1.1,7.008,7.008,0,0,1-7-7,7.008,7.008,0,0,1,7-7,7.008,7.008,0,0,1,7,7,6.957,6.957,0,0,1-1.107,3.773l3.051,3.049a.205.205,0,0,1,0,.284l-1.839,1.839a.206.206,0,0,1-.142.058A.206.206,0,0,1,3710.818-13811.056ZM3700-13820a4,4,0,0,0,4,4,4,4,0,0,0,4-4,4,4,0,0,0-4-4A4,4,0,0,0,3700-13820Z" transform="translate(-7131 27887)"></path> </svg>', '', 'class="icon Icon IconSearch {opts.class}"', function(opts) {
 });
 
 riot$1.tag2('viron-icon-square', '<svg viewbox="-3674 14061 15.998 13.998"> <path d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)"></path> </svg>', '', 'class="icon Icon IconSquare {opts.class}"', function(opts) {
 });
 
-var script$24 = function() {};
+riot$1.tag2('viron-icon-arrow-left', '<svg viewbox="-3581 14060.002 10.04 16.002"> <path d="M1793.942-16723.971l-7.4-7.4-.018-.023-.385-.385a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.816a.2.2,0,0,1,0,.287l-1.84,1.84a.2.2,0,0,1-.141.057A.2.2,0,0,1,1793.942-16723.971Z" transform="translate(-5367.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconArrowLeft {opts.class}"', function(opts) {
+});
 
-riot$1.tag2('viron-application-header-autocomplete', '<div>autocomplete!!!</div>', '', 'class="Application_Header_Autocomplete"', function(opts) {
+riot$1.tag2('viron-icon-logo', '<svg viewbox="-3675 13992 24 24"> <path d="M13.333,0H0V24H24V0Zm0,2.667h8V5.333h-8Zm-10.667,0h8v8h-8ZM21.333,21.333H2.667v-8H21.333Zm0-10.667h-8V8h8Z" transform="translate(-3675 13992)"></path> </svg>', '', 'class="icon Icon IconLogo {opts.class}"', function(opts) {
+});
+
+riot$1.tag2('viron-icon-arrow-up', '<svg viewbox="-3494.002 14063 16.002 10.037"> <path d="M1706.943-16726.971l-5.963-5.963-1.433-1.434a.122.122,0,0,1-.019-.021l-.384-.385a.2.2,0,0,1,0-.283l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.842a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.818a.2.2,0,0,1,0,.281l-1.84,1.842a.2.2,0,0,1-.141.059A.2.2,0,0,1,1706.943-16726.971Z" transform="translate(-20220.914 12363.916) rotate(90)"></path> </svg>', '', 'class="icon Icon IconArrowUp {opts.class}"', function(opts) {
+});
+
+var script$24 = function() {
+  const store = this.riotx.get();
+
+  this.isOpened = false;
+
+  this.handleHeadTap = () => {
+    this.isOpened = !this.isOpened;
+    this.update();
+  };
+
+  this.handleIndependentHeadTap = () => {
+    this.opts.closer();
+    const id = this.opts.group.pages[0].id;
+    this.getRouter().navigateTo(`/${store.getter(constants$5.CURRENT)}/${id}`);
+  };
+
+  this.handlePageTap = e => {
+    this.opts.closer();
+    const id = e.item.page.id;
+    this.getRouter().navigateTo(`/${store.getter(constants$5.CURRENT)}/${id}`);
+  };
+};
+
+riot$1.tag2('viron-application-menu-group', '<virtual if="{!opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.name}</div> <viron-icon-arrow-up class="Application_Menu_Group__arrow"></viron-icon-arrow-up> </div> <div class="Application_Menu_Group__pages" if="{isOpened}"> <div class="Application_Menu_Group__page" each="{page in opts.group.pages}" onclick="{getClickHandler(\'handlePageTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePageTap\')}">{page.name}</div> </div> </virtual> <virtual if="{opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleIndependentHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleIndependentHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.pages[0].name}</div> </div> </virtual>', '', 'class="Application_Menu_Group {\'Application_Menu_Group--open\': isOpened}"', function(opts) {
     this.external(script$24);
 });
 
-var script$26 = function() {
+var script$25 = function() {
+  const store = this.riotx.get();
+
+  this.closer = () => {
+    this.close();
+  };
+
+  this.menu = store.getter(constants$5.VIRON_MENU);
+  this.listen(constants$3.VIRON, () => {
+    this.menu = store.getter(constants$5.VIRON_MENU);
+    this.update();
+  });
+
+  this.handleLogoTap = () => {
+    this.close();
+    this.getRouter().navigateTo('/');
+  };
+};
+
+riot$1.tag2('viron-application-menu', '<div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div>', '', 'class="Application_Menu"', function(opts) {
+    this.external(script$25);
+});
+
+var script$26 = function() {};
+
+riot$1.tag2('viron-application-header-autocomplete', '<div>autocomplete!!!</div>', '', 'class="Application_Header_Autocomplete"', function(opts) {
+    this.external(script$26);
+});
+
+var script$28 = function() {
   const store = this.riotx.get();
 
   this.endpointURL = '';
@@ -17078,10 +19506,10 @@ var script$26 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu-entry', '<div>新しい管理画面を追加する</div> <div class="Application_Header_Menu_Entry__inputs"> <viron-textinput label="エンドポイント" val="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" val="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="追加" onselect="{handleAddButtonSelect}"></viron-button> <viron-button theme="ghost" label="キャンセル" onselect="{handleCancelButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
-    this.external(script$26);
+    this.external(script$28);
 });
 
-var script$25 = function() {
+var script$27 = function() {
   const store = this.riotx.get();
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
@@ -17164,11 +19592,40 @@ var script$25 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu', '<div class="Application_Header_Menu__list"> <div class="Application_Header_Menu__item" each="{action in actions}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}">{action.label}</div> </div>', '', 'class="Application_Header_Menu"', function(opts) {
-    this.external(script$25);
+    this.external(script$27);
 });
 
 var script$23 = function() {
   const store = this.riotx.get();
+
+  // TOPページか否か。
+  this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
+  // メニューの開閉状態。
+  this.isMenuOpened = store.getter(constants$5.APPLICATION_ISMENUOPENED);
+  // モバイルレイアウトか否か。
+  this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
+  // エンドポイント名。
+  this.name = store.getter(constants$5.VIRON_NAME);
+  // エンドポイントのサムネイル。
+  this.thumbnail = store.getter(constants$5.VIRON_THUMBNAIL);
+
+  this.listen(constants$3.LOCATION, () => {
+    this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
+    this.update();
+  });
+  this.listen(constants$3.APPLICATION, () => {
+    this.isMenuOpened = store.getter(constants$5.APPLICATION_ISMENUOPENED);
+    this.update();
+  });
+  this.listen(constants$3.LAYOUT, () => {
+    this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
+    this.update();
+  });
+  this.listen(constants$3.VIRON, () => {
+    this.name = store.getter(constants$5.VIRON_NAME);
+    this.thumbnail = store.getter(constants$5.VIRON_THUMBNAIL);
+    this.update();
+  });
 
   this.handleSearchIconTap = () => {
     // 検索用オートコンプリートをpopoverで開きます。
@@ -17177,6 +19634,16 @@ var script$23 = function() {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
       direction: 'TL'
+    });
+  };
+
+  this.handleMenuToggleButtonTap = () => {
+    if (!this.isMobile) {
+      store.action(constants$1.APPLICATION_MENU_TOGGLE);
+      return;
+    }
+    store.action(constants$1.MODALS_ADD, 'viron-application-menu', null, {
+      isSpread: true
     });
   };
 
@@ -17207,60 +19674,8 @@ var script$23 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header', '<div class="Application_Header__aside"> <viron-icon-search class="Application_Header__searchIcon" ref="searchIcon" onclick="{getClickHandler(\'handleSearchIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchIconTap\')}"></viron-icon-search> </div> <div class="Application_Header__aside"> <viron-icon-square class="Application_Header__squareIcon" ref="squareIcon" onclick="{getClickHandler(\'handleSquareIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSquareIconTap\')}"></viron-icon-square> <viron-icon-dots class="Application_Header__dotsIcon" ref="dotsIcon" onclick="{getClickHandler(\'handleDotsIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDotsIconTap\')}"></viron-icon-dots> </div>', '', 'class="Application_Header"', function(opts) {
+riot$1.tag2('viron-application-header', '<div class="Application_Header__item"> <virtual if="{isTopPage}"> <viron-icon-search class="Application_Header__searchIcon" ref="searchIcon" onclick="{getClickHandler(\'handleSearchIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchIconTap\')}"></viron-icon-search> </virtual> <virtual if="{!isTopPage}"> <virtual if="{isMenuOpened}"> <viron-icon-menu onclick="{getClickHandler(\'handleMenuToggleButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuToggleButtonTap\')}"></viron-icon-menu> </virtual> <virtual if="{!isMenuOpened}"> <viron-icon-menu-invert onclick="{getClickHandler(\'handleMenuToggleButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuToggleButtonTap\')}"></viron-icon-menu-invert> </virtual> </virtual> </div> <div class="Application_Header__item" if="{isMobile}"> <div class="Application_Header__thumbnail" riot-style="background-image:url({thumbnail});"></div> </div> <div class="Application_Header__item"> <virtual if="{isTopPage}"> <viron-icon-square class="Application_Header__squareIcon" ref="squareIcon" onclick="{getClickHandler(\'handleSquareIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSquareIconTap\')}"></viron-icon-square> </virtual> <virtual if="{!isTopPage}"> <virtual if="{!isMobile}"> <div class="Application_Header__info"> <div class="Application_Header__name">{name}</div> <viron-icon-arrow-right class="Application_Header__arrow"></viron-icon-arrow-right> <div class="Application_Header__thumbnail" riot-style="background-image:url({thumbnail});"></div> </div> </virtual> </virtual> <viron-icon-dots class="Application_Header__dotsIcon" ref="dotsIcon" onclick="{getClickHandler(\'handleDotsIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDotsIconTap\')}"></viron-icon-dots> </div>', '', 'class="Application_Header"', function(opts) {
     this.external(script$23);
-});
-
-riot$1.tag2('viron-icon-arrow-left', '<svg viewbox="-3581 14060.002 10.04 16.002"> <path d="M1793.942-16723.971l-7.4-7.4-.018-.023-.385-.385a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.816a.2.2,0,0,1,0,.287l-1.84,1.84a.2.2,0,0,1-.141.057A.2.2,0,0,1,1793.942-16723.971Z" transform="translate(-5367.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconArrowLeft {opts.class}"', function(opts) {
-});
-
-riot$1.tag2('viron-icon-logo', '<svg viewbox="-3675 13992 24 24"> <path d="M13.333,0H0V24H24V0Zm0,2.667h8V5.333h-8Zm-10.667,0h8v8h-8ZM21.333,21.333H2.667v-8H21.333Zm0-10.667h-8V8h8Z" transform="translate(-3675 13992)"></path> </svg>', '', 'class="icon Icon IconLogo {opts.class}"', function(opts) {
-});
-
-riot$1.tag2('viron-icon-arrow-up', '<svg viewbox="-3494.002 14063 16.002 10.037"> <path d="M1706.943-16726.971l-5.963-5.963-1.433-1.434a.122.122,0,0,1-.019-.021l-.384-.385a.2.2,0,0,1,0-.283l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.842a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.818a.2.2,0,0,1,0,.281l-1.84,1.842a.2.2,0,0,1-.141.059A.2.2,0,0,1,1706.943-16726.971Z" transform="translate(-20220.914 12363.916) rotate(90)"></path> </svg>', '', 'class="icon Icon IconArrowUp {opts.class}"', function(opts) {
-});
-
-var script$27 = function() {
-  const store = this.riotx.get();
-
-  this.isOpened = false;
-
-  this.handleHeadTap = () => {
-    this.isOpened = !this.isOpened;
-    this.update();
-  };
-
-  this.handleIndependentHeadTap = () => {
-    const id = this.opts.group.pages[0].id;
-    this.getRouter().navigateTo(`/${store.getter(constants$5.CURRENT)}/${id}`);
-  };
-
-  this.handlePageTap = e => {
-    const id = e.item.page.id;
-    this.getRouter().navigateTo(`/${store.getter(constants$5.CURRENT)}/${id}`);
-  };
-};
-
-riot$1.tag2('viron-application-menu-group', '<virtual if="{!opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.name}</div> <viron-icon-arrow-up class="Application_Menu_Group__arrow"></viron-icon-arrow-up> </div> <div class="Application_Menu_Group__pages" if="{isOpened}"> <div class="Application_Menu_Group__page" each="{page in opts.group.pages}" onclick="{getClickHandler(\'handlePageTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePageTap\')}">{page.name}</div> </div> </virtual> <virtual if="{opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleIndependentHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleIndependentHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.pages[0].name}</div> </div> </virtual>', '', 'class="Application_Menu_Group {\'Application_Menu_Group--open\': isOpened}"', function(opts) {
-    this.external(script$27);
-});
-
-var script$28 = function() {
-  const store = this.riotx.get();
-
-  this.menu = store.getter(constants$5.VIRON_MENU);
-  this.listen(constants$3.VIRON, () => {
-    this.menu = store.getter(constants$5.VIRON_MENU);
-    this.update();
-  });
-
-  this.handleLogoTap = () => {
-    this.getRouter().navigateTo('/');
-  };
-};
-
-riot$1.tag2('viron-application-menu', '<div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}"></viron-application-menu-group> </div> </div> </div>', '', 'class="Application_Menu"', function(opts) {
-    this.external(script$28);
 });
 
 riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
@@ -17985,18 +20400,22 @@ var script$36 = function() {
   this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
   this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
   this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
+  // 左カラムの開閉状態。トップページでは常にopenとなる。
+  this.isAsideClosed = (!store.getter(constants$5.LOCATION_IS_TOP) && !store.getter(constants$5.APPLICATION_ISMENUOPENED));
 
   this.listen(constants$3.APPLICATION, () => {
     this.isLaunched = store.getter(constants$5.APPLICATION_ISLAUNCHED);
     this.isNavigating = store.getter(constants$5.APPLICATION_ISNAVIGATING);
     this.isNetworking = store.getter(constants$5.APPLICATION_ISNETWORKING);
     this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
+    this.isAsideClosed = (!store.getter(constants$5.LOCATION_IS_TOP) && !store.getter(constants$5.APPLICATION_ISMENUOPENED));
     this.update();
   });
   this.listen(constants$3.LOCATION, () => {
     this.pageName = store.getter(constants$5.LOCATION_NAME);
     this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
     this.pageRoute = store.getter(constants$5.LOCATION_ROUTE);
+    this.isAsideClosed = (!store.getter(constants$5.LOCATION_IS_TOP) && !store.getter(constants$5.APPLICATION_ISMENUOPENED));
     this.update();
   });
   this.listen(constants$3.ENDPOINTS, () => {
@@ -18128,7 +20547,7 @@ var script$36 = function() {
   };
 };
 
-riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__pageInfo">TODO</div> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType}"', function(opts) {
+riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__pageInfo">TODO</div> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
     this.external(script$36);
 });
 
@@ -18137,6 +20556,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let mainStore;
   Promise
     .resolve()
+    .then(() => i18n.init())
     .then(() => mixin.init())
     .then(() => store$1.init())
     .then(store => {
