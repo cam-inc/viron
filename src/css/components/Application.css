@@ -14,7 +14,8 @@
     transition-duration: 300ms;
     transition-property: grid-template-columns;
     grid-template-areas: "aside header" "aside main";
-    grid-template-rows: var(--component-application-header-height) 1fr;
+    /* minmaxを使わないと正しく高さが計算されないbug有り。(safari) */
+    grid-template-rows: var(--component-application-header-height) minmax(0, 1fr);
     grid-template-columns: var(--component-application-menu-width) 1fr;
   }
 

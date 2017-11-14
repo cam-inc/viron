@@ -21,6 +21,13 @@
   src: url("../font/NotoSansCJKjp-Jxck-Bold.woff2") format("woff2"), url("../font/NotoSansCJKjp-Jxck-Bold.woff") format("woff"), url("../font/NotoSansCJKjp-Jxck-Bold.ttf") format("truetype");
 }
 
+*,
+*::before,
+*::after {
+  overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch;
+}
+
 html,
 body {
   @apply --text-break;
