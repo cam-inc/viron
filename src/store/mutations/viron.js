@@ -1,5 +1,6 @@
 import combine from 'mout/array/combine';
 import find from 'mout/array/find';
+import { i18n } from '../../core/i18n';
 import { constants as states } from '../states';
 
 export default {
@@ -15,12 +16,12 @@ export default {
       if (!find(viron.sections, section => {
         return (section.id === 'manage');
       })) {
-        viron.sections = combine([{ id: 'manage', label: '管理画面' }], viron.sections);
+        viron.sections = combine([{ id: 'manage', label: i18n.t('word.manage') }], viron.sections);
       }
       if (!find(viron.sections, section => {
         return (section.id === 'dashboard');
       })) {
-        viron.sections = combine([{ id: 'dashboard', label: 'ダッシュボード' }], viron.sections);
+        viron.sections = combine([{ id: 'dashboard', label: i18n.t('word.dashboard') }], viron.sections);
       }
     }
     context.state.viron = viron;

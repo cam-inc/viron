@@ -1,4 +1,5 @@
 import riot from 'riot';
+import i18n from './i18n';
 import router from './router';
 
 // Mouse系かTouch系か。
@@ -19,6 +20,10 @@ export default {
       .then(() => {
         riot.settings.autoUpdate = false;
         riot.mixin({
+          init: function() {
+            // 各riotタグインスタンスから簡単にi18n機能を使用可能にする。
+            this.i18n = i18n.get();
+          },
           // riotx.riotxChange(store, evtName, func)のショートカット。
           listen: function(...args) {
             const store = this.riotx.get();

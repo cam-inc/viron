@@ -1,4 +1,5 @@
 import riot from 'riot';
+import i18n from './core/i18n';
 import mixin from './core/mixin';
 import './core/polyfill';
 import router from './core/router';
@@ -12,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let mainStore;
   Promise
     .resolve()
+    .then(() => i18n.init())
     .then(() => mixin.init())
     .then(() => store.init())
     .then(store => {
