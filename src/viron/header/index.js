@@ -1,6 +1,7 @@
 import { constants as actions } from '../../store/actions';
 import { constants as getters } from '../../store/getters';
 import { constants as states } from '../../store/states';
+import '../menu/index.tag';
 import './autocomplete/index.tag';
 import './menu/index.tag';
 
@@ -47,7 +48,13 @@ export default function() {
   };
 
   this.handleMenuToggleButtonTap = () => {
-    store.action(actions.APPLICATION_MENU_TOGGLE);
+    if (!this.isMobile) {
+      store.action(actions.APPLICATION_MENU_TOGGLE);
+      return;
+    }
+    store.action(actions.MODALS_ADD, 'viron-application-menu', null, {
+      isSpread: true
+    });
   };
 
   this.handleSquareIconTap = () => {

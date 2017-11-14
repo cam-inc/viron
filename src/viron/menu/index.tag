@@ -6,7 +6,7 @@ viron-application-menu.Application_Menu
     .Application_Menu__section(each="{ section in menu }")
       .Application_Menu__sectionName { section.name }
       .Application_Menu__groups
-        viron-application-menu-group(each="{ group in section.groups }" group="{ group }")
+        viron-application-menu-group(each="{ group in section.groups }" group="{ group }" closer="{ parent.closer }")
 
   script.
     import '../../components/icons/viron-icon-arrow-left/index.tag';

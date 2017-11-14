@@ -11,11 +11,13 @@ export default function() {
   };
 
   this.handleIndependentHeadTap = () => {
+    this.opts.closer();
     const id = this.opts.group.pages[0].id;
     this.getRouter().navigateTo(`/${store.getter(getters.CURRENT)}/${id}`);
   };
 
   this.handlePageTap = e => {
+    this.opts.closer();
     const id = e.item.page.id;
     this.getRouter().navigateTo(`/${store.getter(getters.CURRENT)}/${id}`);
   };
