@@ -9,26 +9,20 @@
     padding: 0 16px;
   }
 
-  &__icon {
+  &__arrow {
+    width: 8px;
+    height: 8px;
     margin-right: 16px;
-
-    & .Icon {
-      width: 8px;
-      height: 8px;
-    }
   }
 
   &__logo {
+    width: 24px;
+    height: 24px;
     cursor: pointer;
 
     &:hover,
     &.hold {
       color: var(--color-base-blue);
-    }
-
-    & .Icon {
-      width: 24px;
-      height: 24px;
     }
   }
 

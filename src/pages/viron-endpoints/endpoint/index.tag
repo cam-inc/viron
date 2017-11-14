@@ -1,6 +1,5 @@
 viron-endpoints-page-endpoint.card.EndpointsPage_Endpoint(onTap="{ handleTap }")
-  .EndpointsPage_Endpoint__menu(ref="menu" onTap="{ handleMenuTap }")
-    viron-icon-dots
+  viron-icon-dots.EndpointsPage_Endpoint__menu(ref="menu" onTap="{ handleMenuTap }")
   .EndpointsPage_Endpoint__thumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
   .EndpointsPage_Endpoint__name name: { opts.endpoint.name }
   .EndpointsPage_Endpoint__description description: { opts.endpoint.description }

@@ -7,7 +7,7 @@ export default function() {
 
   this.handleSearchIconTap = () => {
     // 検索用オートコンプリートをpopoverで開きます。
-    const rect = this.refs.searchIcon.getBoundingClientRect();
+    const rect = this.refs.searchIcon.root.getBoundingClientRect();
     store.action(actions.POPOVERS_ADD, 'viron-application-header-autocomplete', null, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
@@ -17,7 +17,7 @@ export default function() {
 
   this.handleSquareIconTap = () => {
     // menu(エンドポイント関連のやつ)をpopoverで開きます。
-    const rect = this.refs.squareIcon.getBoundingClientRect();
+    const rect = this.refs.squareIcon.root.getBoundingClientRect();
     store.action(actions.POPOVERS_ADD, 'viron-application-header-menu', {
       type: 'endpoint'
     }, {
@@ -30,7 +30,7 @@ export default function() {
 
   this.handleDotsIconTap = () => {
     // menu(一般的なやつ)をpopoverで開きます。
-    const rect = this.refs.dotsIcon.getBoundingClientRect();
+    const rect = this.refs.dotsIcon.root.getBoundingClientRect();
     store.action(actions.POPOVERS_ADD, 'viron-application-header-menu', {
       type: 'general'
     }, {

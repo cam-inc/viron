@@ -1,6 +1,6 @@
-viron-icon-dots.icon.Icon.IconDots
-  svg(viewBox="-1062 13983 15 14")
-    g(transform="translate(-1342 13957.235)")
-      g(transform="translate(280 25.765)")
-        rect(width="15" height="14" rx="1")
-        rect(x="1.5" y="1.5" width="12" height="11" rx="0.5")
+viron-icon-dots.icon.Icon.IconDots(class="{ opts.class }")
+  svg(viewBox="-3614 14066 16 4")
+    g(transform="translate(-3894 14025)")
+      circle(cx="2" cy="2" r="2" transform="translate(280 41)")
+      circle(cx="2" cy="2" r="2" transform="translate(286 41)")
+      circle(cx="2" cy="2" r="2" transform="translate(292 41)")

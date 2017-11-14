@@ -1,7 +1,6 @@
 viron-modal(class="Modal { isVisible ? 'Modal--visible' : '' } Modal--{ opts.modalopts.theme } Modal--{ layoutType } { opts.modalopts.isSpread ? 'Modal--spread': '' }" onTap="{ handleTap }")
   .Modal__frame(onTap="{ handleFrameTap }")
-    .Modal__closeButton(onTap="{ handleCloseButtonTap }")
-      viron-icon-close
+    viron-icon-close.Modal__closeButton(onTap="{ handleCloseButtonTap }")
     .Modal__content(ref="content")
 
   script.

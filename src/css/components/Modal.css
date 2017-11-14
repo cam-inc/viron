@@ -21,12 +21,9 @@
     position: absolute;
     top: 12px;
     left: 12px;
+    width: 12px;
+    height: 12px;
     cursor: pointer;
-
-    & .IconClose {
-      width: 12px;
-      height: 12px;
-    }
   }
 
   &--visible {

@@ -3,13 +3,9 @@
   cursor: pointer;
 
   &__menu {
-    display: inline-block;
+    width: 12px;
+    height: 12px;
     cursor: pointer;
-
-    & .Icon {
-      width: 12px;
-      height: 12px;
-    }
   }
 
   &__thumbnail {

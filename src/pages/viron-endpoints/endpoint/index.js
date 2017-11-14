@@ -33,7 +33,7 @@ export default function() {
 
   this.handleMenuTap = e => {
     e.stopPropagation();
-    const rect = this.refs.menu.getBoundingClientRect();
+    const rect = this.refs.menu.root.getBoundingClientRect();
     store.action(actions.POPOVERS_ADD, 'viron-endpoints-page-endpoint-menu', {
       endpoint: this.opts.endpoint
     }, {

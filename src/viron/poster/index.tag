@@ -2,7 +2,7 @@ viron-application-poster.Application_Poster
   .Application_Poster__bg
   .Application_Poster__overlay
   .Application_Poster__content
-    viron-icon-logo
+    viron-icon-logo.Application_Poster__logo
     div ホーム
 
   script.
