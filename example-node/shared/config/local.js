@@ -1,6 +1,6 @@
 module.exports = helper => {
   const config = {
-    host: 'localhost:3000',
+    host: `${process.env.VIRON_HOSTNAME}:3000`,
     // vironlibのadmin_roleが使用するユーザー作成時の初期ロール名
     default_role: 'viewer',
     // vironlibのadmin_roleが使用するスーパーユーザーのロール名
@@ -10,7 +10,7 @@ module.exports = helper => {
     google_oauth: {
       client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
       client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      redirect_url: 'https://localhost:3000/googleoauth2callback',
+      redirect_url: `https://${process.env.VIRON_HOSTNAME}:3000/googleoauth2callback`,
       //state_url: 'https://cam-inc.github.io/viron/#/',
       allow_email_domains: [
         // ここに書いたドメインが利用可能
