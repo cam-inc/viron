@@ -16,7 +16,7 @@
     grid-template-areas: "aside header" "aside main";
     /* minmaxを使わないと正しく高さが計算されないbug有り。(safari) */
     grid-template-rows: var(--component-application-header-height) minmax(0, 1fr);
-    grid-template-columns: var(--component-application-menu-width) 1fr;
+    grid-template-columns: var(--component-application-menu-width) minmax(0, 1fr);
   }
 
   &__aside {
@@ -62,14 +62,14 @@
 
   &--desktop&--asideClosed {
     .Application__container {
-      grid-template-columns: 0 1fr;
+      grid-template-columns: 0 minmax(0, 1fr);
     }
   }
 
   &--mobile {
     & .Application__container {
       grid-template-areas: "header" "main";
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 }
