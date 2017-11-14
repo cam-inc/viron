@@ -1,6 +1,3 @@
 viron-icon-square.icon.Icon.IconSquare
-  svg(viewBox="-1062 13983 15 14")
-    g(transform="translate(-1342 13957.235)")
-      g(transform="translate(280 25.765)")
-        rect(width="15" height="14" rx="1")
-        rect(x="1.5" y="1.5" width="12" height="11" rx="0.5")
+  svg(viewBox="-3674 14061 15.998 13.998")
+    path(d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)")
