@@ -30,18 +30,22 @@ export default function() {
   this.layoutType = store.getter(getters.LAYOUT_TYPE);
   this.isDesktop = store.getter(getters.LAYOUT_IS_DESKTOP);
   this.isMobile = store.getter(getters.LAYOUT_IS_MOBILE);
+  // 左カラムの開閉状態。トップページでは常にopenとなる。
+  this.isAsideClosed = (!store.getter(getters.LOCATION_IS_TOP) && !store.getter(getters.APPLICATION_ISMENUOPENED));
 
   this.listen(states.APPLICATION, () => {
     this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
     this.isNavigating = store.getter(getters.APPLICATION_ISNAVIGATING);
     this.isNetworking = store.getter(getters.APPLICATION_ISNETWORKING);
     this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
+    this.isAsideClosed = (!store.getter(getters.LOCATION_IS_TOP) && !store.getter(getters.APPLICATION_ISMENUOPENED));
     this.update();
   });
   this.listen(states.LOCATION, () => {
     this.pageName = store.getter(getters.LOCATION_NAME);
     this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
     this.pageRoute = store.getter(getters.LOCATION_ROUTE);
+    this.isAsideClosed = (!store.getter(getters.LOCATION_IS_TOP) && !store.getter(getters.APPLICATION_ISMENUOPENED));
     this.update();
   });
   this.listen(states.ENDPOINTS, () => {

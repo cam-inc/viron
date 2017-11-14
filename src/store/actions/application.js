@@ -67,6 +67,19 @@ export default {
   },
 
   /**
+   * メニューの開閉状態をトグルします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  toggleMenu: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit(mutations.APPLICATION_MENU_TOGGLE);
+      });
+  },
+
+  /**
    * エンドポイントフィルター用のテキストを更新します。
    * @param {riotx.Context} context
    * @param {String} newFilterText

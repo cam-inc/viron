@@ -1,8 +1,10 @@
-viron.Application(class="Application--{ usingBrowser } Application--{ layoutType }")
+viron.Application(class="Application--{ usingBrowser } Application--{ layoutType } { isAsideClosed ? 'Application--asideClosed' : '' }")
   .Application__container
     .Application__aside(if="{ isDesktop }")
-      viron-application-poster(if="{ isTopPage }")
-      viron-application-menu(if="{ !isTopPage }")
+      .Application__asideAdjuster
+        .Application__asideContent
+          viron-application-poster(if="{ isTopPage }")
+          viron-application-menu(if="{ !isTopPage }")
     .Application__header
       viron-application-header
     .Application__main

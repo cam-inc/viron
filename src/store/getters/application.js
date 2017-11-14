@@ -45,6 +45,15 @@ export default {
   },
 
   /**
+   * メニューの開閉状態を返します。
+   * @param {riotx.Context} context
+   * @return {Boolean}
+   */
+  isMenuOpened: context => {
+    return context.state.application.isMenuOpened;
+  },
+
+  /**
    * エンドポイントフィルター用のテキストを返します。
    * @param {riotx.Context} context
    * @return {String}

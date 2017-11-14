@@ -67,6 +67,16 @@ export default {
   },
 
   /**
+   * メニューの開閉状態を切り替えます。
+   * @param {riotx.Context} context
+   * @return {Array}
+   */
+  menuToggle: context => {
+    context.state.application.isMenuOpened = !context.state.application.isMenuOpened;
+    return [states.APPLICATION];
+  },
+
+  /**
    * エンドポイント用のフィルターテキストを更新します。
    * @param {riotx.Context} context
    * @param {String} newFilterText

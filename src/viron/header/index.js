@@ -1,9 +1,26 @@
 import { constants as actions } from '../../store/actions';
+import { constants as getters } from '../../store/getters';
+import { constants as states } from '../../store/states';
 import './autocomplete/index.tag';
 import './menu/index.tag';
 
 export default function() {
   const store = this.riotx.get();
+
+  // TOPページか否か。
+  this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
+  // メニューの開閉状態。
+  this.isMenuOpened = store.getter(getters.APPLICATION_ISMENUOPENED);
+
+  this.listen(states.LOCATION, () => {
+    this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
+    this.update();
+  });
+
+  this.listen(states.APPLICATION, () => {
+    this.isMenuOpened = store.getter(getters.APPLICATION_ISMENUOPENED);
+    this.update();
+  });
 
   this.handleSearchIconTap = () => {
     // 検索用オートコンプリートをpopoverで開きます。
@@ -13,6 +30,10 @@ export default function() {
       y: rect.bottom,
       direction: 'TL'
     });
+  };
+
+  this.handleMenuToggleButtonTap = () => {
+    store.action(actions.APPLICATION_MENU_TOGGLE);
   };
 
   this.handleSquareIconTap = () => {

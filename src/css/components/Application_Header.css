@@ -4,7 +4,7 @@
   background-color: #f6f6f6;
   border-bottom: 1px solid #e8e8e7;
 
-  &__aside {
+  &__item {
     @apply --layout-center-center;
 
     & .Icon {

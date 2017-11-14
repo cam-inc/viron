@@ -9,6 +9,8 @@ export default {
   isNetworking: false,
   // ドラッグ中か否か。
   isDragging: false,
+  // 左カラムメニューの開閉状態
+  isMenuOpened: true,
   // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
   endpointFilterText: ''
 };
