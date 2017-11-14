@@ -50,10 +50,25 @@ export default {
   /**
    * 名前を返します。
    * @param {riotx.Context} context
-   * @return {String}
+   * @return {String|null}
    */
   name: context => {
+    if (!context.state.viron) {
+      return null;
+    }
     return context.state.viron.name;
+  },
+
+  /**
+   * サムネイルを返します。
+   * @param {riotx.Context} context
+   * @return {String|null}
+   */
+  thumbnail: context => {
+    if (!context.state.viron) {
+      return null;
+    }
+    return context.state.viron.thumbnail;
   },
 
   /**

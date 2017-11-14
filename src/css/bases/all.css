@@ -24,8 +24,8 @@
 *,
 *::before,
 *::after {
-  overflow-scrolling: touch;
   -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
 }
 
 html,

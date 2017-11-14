@@ -7,14 +7,40 @@
   &__item {
     @apply --layout-center-center;
 
-    & .Icon {
+    & > .Icon {
       width: 16px;
       height: 16px;
       cursor: pointer;
     }
   }
 
+  &__thumbnail {
+    width: 32px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    border-radius: 50%;
+  }
+
+  &__info,
   &__squareIcon {
     margin-right: 48px;
+  }
+
+  &__info {
+    @apply --layout-center-center;
+  }
+
+  &__name {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  &__arrow {
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
   }
 }

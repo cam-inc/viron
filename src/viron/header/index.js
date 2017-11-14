@@ -11,14 +11,28 @@ export default function() {
   this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
   // メニューの開閉状態。
   this.isMenuOpened = store.getter(getters.APPLICATION_ISMENUOPENED);
+  // モバイルレイアウトか否か。
+  this.isMobile = store.getter(getters.LAYOUT_IS_MOBILE);
+  // エンドポイント名。
+  this.name = store.getter(getters.VIRON_NAME);
+  // エンドポイントのサムネイル。
+  this.thumbnail = store.getter(getters.VIRON_THUMBNAIL);
 
   this.listen(states.LOCATION, () => {
     this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
     this.update();
   });
-
   this.listen(states.APPLICATION, () => {
     this.isMenuOpened = store.getter(getters.APPLICATION_ISMENUOPENED);
+    this.update();
+  });
+  this.listen(states.LAYOUT, () => {
+    this.isMobile = store.getter(getters.LAYOUT_IS_MOBILE);
+    this.update();
+  });
+  this.listen(states.VIRON, () => {
+    this.name = store.getter(getters.VIRON_NAME);
+    this.thumbnail = store.getter(getters.VIRON_THUMBNAIL);
     this.update();
   });
 
