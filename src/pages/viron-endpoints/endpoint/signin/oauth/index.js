@@ -1,4 +1,3 @@
-import { constants as actions } from '../../../../../store/actions';
 import '../../../../../components/viron-error/index.tag';
 
 export default function() {
@@ -8,8 +7,8 @@ export default function() {
     this.opts.closer();
     Promise
       .resolve()
-      .then(() => store.action(actions.AUTH_SIGNIN_OAUTH, this.opts.endpointkey, this.opts.authtype))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .then(() => store.action('auth.signinOAuth', this.opts.endpointkey, this.opts.authtype))
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };

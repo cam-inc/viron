@@ -1,11 +1,12 @@
 import encode from 'mout/queryString/encode';
 import { fetch } from '../../core/fetch';
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
 // swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
 const SwaggerClient = window.SwaggerClient;
 
-export default {
+export default exporter('oas', {
   /**
    * OAS準拠ファイルを取得/resolveし、SwaggerClientインスタンスを生成します。
    * @see: https://github.com/swagger-api/swagger-js#swagger-specification-resolver
@@ -84,4 +85,4 @@ export default {
       }))
       .then(res => res.json());
   }
-};
+});

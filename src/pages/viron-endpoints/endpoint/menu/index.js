@@ -1,4 +1,3 @@
-import { constants as actions } from '../../../../store/actions';
 import '../../../../components/viron-error/index.tag';
 import './edit/index.tag';
 import './qrcode/index.tag';
@@ -9,13 +8,13 @@ export default function() {
   this.handleEditButtonTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-endpoints-page-endpoint-menu-edit', {
+      .then(() => store.action('modals.add', 'viron-endpoints-page-endpoint-menu-edit', {
         endpoint: this.opts.endpoint
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -23,14 +22,14 @@ export default function() {
   this.handleDeleteButtonTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.ENDPOINTS_REMOVE, this.opts.endpoint.key))
-      .then(() => store.action(actions.TOASTS_ADD, {
+      .then(() => store.action('endpoints.remove', this.opts.endpoint.key))
+      .then(() => store.action('toasts.add', {
         message: 'エンドポイントを削除しました。'
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -38,13 +37,13 @@ export default function() {
   this.handleQRCodeButtonTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-endpoints-page-endpoint-menu-qrcode', {
+      .then(() => store.action('modals.add', 'viron-endpoints-page-endpoint-menu-qrcode', {
         endpoint: this.opts.endpoint
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -52,14 +51,14 @@ export default function() {
   this.handleSignoutButtonTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.AUTH_REMOVE, this.opts.endpoint.key))
-      .then(() => store.action(actions.TOASTS_ADD, {
+      .then(() => store.action('auth.remove', this.opts.endpoint.key))
+      .then(() => store.action('toasts.add', {
         message: 'ログアウトしました。'
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };

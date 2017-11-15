@@ -1,10 +1,11 @@
 import ObjectAssign from 'object-assign';
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
 // APIは必須でサポートしなければならない URI
 const VIRON_URI = '/viron';
 
-export default {
+export default exporter('viron', {
   /**
    * viron情報(各管理画面の基本情報)を取得します。
    * @param {riotx.Context} context
@@ -65,4 +66,4 @@ export default {
         context.commit(mutations.VIRON, null);
       });
   }
-};
+});

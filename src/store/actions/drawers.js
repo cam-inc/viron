@@ -1,6 +1,7 @@
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('drawers', {
   /**
    * ドローワーを追加します。
    * @param {riotx.Context} context
@@ -30,4 +31,4 @@ export default {
         context.commit(mutations.DRAWERS_REMOVE, drawerId);
       });
   }
-};
+});

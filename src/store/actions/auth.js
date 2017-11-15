@@ -1,7 +1,8 @@
 import { fetch } from '../../core/fetch';
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('auth', {
   /**
    * 指定されたエンドポイントのtokenを更新します。
    * @param {riotx.Context} context
@@ -124,4 +125,4 @@ export default {
         context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
       });
   }
-};
+});

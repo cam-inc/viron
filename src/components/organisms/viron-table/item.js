@@ -1,6 +1,5 @@
 import contains from 'mout/array/contains';
 import clipboard from 'clipboard-js';
-import { constants as actions } from '../../../store/actions';
 import '../../atoms/viron-message/index.tag';
 
 export default function() {
@@ -39,10 +38,10 @@ export default function() {
       .then(() => {
         return clipboard.copy(value);
       })
-      .then(() => store.action(actions.TOASTS_ADD, {
+      .then(() => store.action('toasts.add', {
         message: 'クリップボードにコピーしました。'
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         title: 'コピー失敗',
         message: 'ご使用中の環境ではクリップボードへコピー出来ません。',
         error: err

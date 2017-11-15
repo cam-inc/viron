@@ -1,5 +1,4 @@
 import Esr from 'esr';
-import { constants as actions } from '../store/actions';
 import ComponentsRoute from '../pages/viron-components/route';
 import EndpointsRoute from '../pages/viron-endpoints/route';
 import EndpointimportRoute from '../pages/viron-endpointimport/route';
@@ -21,7 +20,7 @@ export default {
         const router = new Esr(Esr.HASH);
         router
           .onBefore(() => Promise.all([
-            store.action(actions.APPLICATION_NAVIGATION_START)
+            store.action('application.startNavigation')
           ]))
           .on('/', route => EndpointsRoute.onEnter(store, route), (route, replace) => EndpointsRoute.onBefore(store, route, replace))
           .on('/oauthredirect/:endpointKey', () => Promise.resolve(), (route, replace) => OauthredirectRoute.onBefore(store, route, replace))
@@ -29,9 +28,9 @@ export default {
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(() => Promise.all([
-            store.action(actions.APPLICATION_NAVIGATION_END)
+            store.action('application.endNavigation')
           ]))
-          .onAfterOnce(() => store.action(actions.APPLICATION_LAUNCH));
+          .onAfterOnce(() => store.action('application.launch'));
         return router;
       })
       .then(router => {

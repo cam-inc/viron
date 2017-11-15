@@ -1,6 +1,7 @@
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('popovers', {
   /**
    * 吹き出しを追加します。
    * @param {riotx.Context} context
@@ -30,4 +31,4 @@ export default {
         context.commit(mutations.POPOVERS_REMOVE, popoverId);
       });
   }
-};
+});

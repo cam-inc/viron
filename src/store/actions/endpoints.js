@@ -1,8 +1,9 @@
 import shortid from 'shortid';
 import { fetch } from '../../core/fetch';
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('endpoints', {
   /**
    * 1件のエンドポイントを追加します。
    * @param {riotx.Context} context
@@ -139,4 +140,4 @@ export default {
         context.commit(mutations.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder);
       });
   }
-};
+});

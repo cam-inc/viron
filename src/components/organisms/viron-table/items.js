@@ -2,7 +2,6 @@ import contains from 'mout/array/contains';
 import filter from 'mout/array/filter';
 import sortBy from 'mout/array/sortBy';
 import isArray from 'mout/lang/isArray';
-import { constants as actions } from '../../../store/actions';
 import './flatitems.tag';
 
 export default function() {
@@ -49,7 +48,7 @@ export default function() {
   };
 
   this.handleDetailButtonClick = () => {
-    store.action(actions.DRAWERS_ADD, 'viron-table-flatitems', {
+    store.action('drawers.add', 'viron-table-flatitems', {
       items: this.sortedItems
     });
   };

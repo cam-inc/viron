@@ -1,6 +1,7 @@
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('location', {
   /**
    * 更新します。
    * @param {riotx.Context} context
@@ -14,4 +15,4 @@ export default {
         context.commit(mutations.LOCATION, obj);
       });
   }
-};
+});

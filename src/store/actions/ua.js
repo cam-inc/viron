@@ -1,7 +1,8 @@
 import SUA from 'sua.js';
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('ua', {
   /**
    * 初期設定を行います。
    * @param {riotx.Context} context
@@ -15,4 +16,4 @@ export default {
         context.commit(mutations.UA, ua);
       });
   }
-};
+});

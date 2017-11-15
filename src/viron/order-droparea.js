@@ -1,4 +1,3 @@
-import { constants as actions } from '../store/actions';
 import '../components/atoms/viron-message/index.tag';
 
 export default function() {
@@ -41,8 +40,8 @@ export default function() {
     const newOrder = this.opts.order;
     Promise
       .resolve()
-      .then(() => store.action(actions.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('endpoints.changeOrder', endpointKey, newOrder))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

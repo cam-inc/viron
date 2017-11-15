@@ -1,6 +1,5 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
-import { constants as actions } from '../../store/actions';
 export default function() {
   const store = this.riotx.get();
 
@@ -17,7 +16,7 @@ export default function() {
     this.isVisible = false;
     this.update();
     setTimeout(() => {
-      store.action(actions.MODALS_REMOVE, this.opts.id);
+      store.action('modals.remove', this.opts.id);
     }, 1000);
   };
 

@@ -1,7 +1,6 @@
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
-import { constants as actions } from '../../../store/actions';
 import '../../organisms/viron-operation/index.tag';
 import './operation.tag';
 
@@ -75,7 +74,7 @@ export default function() {
     const method = store.getter('oas.pathItemObjectMethodNameByOperationId', operationObject.operationId);
     const rowData = this.opts.response[rowIdx];
     const initialParameters = createInitialQueries(operationObject, rowData);
-    store.action(actions.DRAWERS_ADD, 'viron-component-operation', {
+    store.action('drawers.add', 'viron-component-operation', {
       title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,
       method,

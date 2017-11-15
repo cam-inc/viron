@@ -1,6 +1,5 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
-import { constants as actions } from '../../store/actions';
 
 // Mouse系かTouch系か。
 const isTouchEventSupported = 'ontouchstart' in document;
@@ -19,7 +18,7 @@ export default function() {
   const fadeOut = () => {
     this.root.classList.remove('Popover--visible');
     setTimeout(() => {
-      store.action(actions.POPOVERS_REMOVE, this.opts.id);
+      store.action('popovers.remove', this.opts.id);
     }, 1000);
   };
 

@@ -7,7 +7,6 @@ import keys from 'mout/object/keys';
 import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
 import chart from '../../../core/chart';
-import { constants as actions } from '../../../store/actions';
 import '../../organisms/viron-component/search.tag';
 import '../../atoms/viron-message/index.tag';
 
@@ -85,7 +84,7 @@ export default function() {
    */
   const updateGridColumnCount = () => {
     const columnCount = getGridColumnCountForCurrentViewport();
-    store.action(actions.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT, columnCount);
+    store.action('layout.updateComponentsGridColumnCount', columnCount);
   };
 
   // resizeイベントハンドラーの発火回数を減らす。
@@ -140,7 +139,7 @@ export default function() {
 
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-component-search', {
+      .then(() => store.action('modals.add', 'viron-component-search', {
         parameterObjects: escapedParameterObjects,
         initialParameters: ObjectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
@@ -155,7 +154,7 @@ export default function() {
           });
         }
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

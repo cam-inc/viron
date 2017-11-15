@@ -1,4 +1,3 @@
-import { constants as actions } from '../../store/actions';
 import '../menu/index.tag';
 import './autocomplete/index.tag';
 import './menu/index.tag';
@@ -38,7 +37,7 @@ export default function() {
   this.handleSearchIconTap = () => {
     // 検索用オートコンプリートをpopoverで開きます。
     const rect = this.refs.searchIcon.root.getBoundingClientRect();
-    store.action(actions.POPOVERS_ADD, 'viron-application-header-autocomplete', null, {
+    store.action('popovers.add', 'viron-application-header-autocomplete', null, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
       direction: 'TL'
@@ -47,10 +46,10 @@ export default function() {
 
   this.handleMenuToggleButtonTap = () => {
     if (!this.isMobile) {
-      store.action(actions.APPLICATION_MENU_TOGGLE);
+      store.action('application.toggleMenu');
       return;
     }
-    store.action(actions.MODALS_ADD, 'viron-application-menu', null, {
+    store.action('modals.add', 'viron-application-menu', null, {
       isSpread: true
     });
   };
@@ -58,7 +57,7 @@ export default function() {
   this.handleSquareIconTap = () => {
     // menu(エンドポイント関連のやつ)をpopoverで開きます。
     const rect = this.refs.squareIcon.root.getBoundingClientRect();
-    store.action(actions.POPOVERS_ADD, 'viron-application-header-menu', {
+    store.action('popovers.add', 'viron-application-header-menu', {
       type: 'endpoint'
     }, {
       x: rect.left + (rect.width / 2),
@@ -71,7 +70,7 @@ export default function() {
   this.handleDotsIconTap = () => {
     // menu(一般的なやつ)をpopoverで開きます。
     const rect = this.refs.dotsIcon.root.getBoundingClientRect();
-    store.action(actions.POPOVERS_ADD, 'viron-application-header-menu', {
+    store.action('popovers.add', 'viron-application-header-menu', {
       type: 'general'
     }, {
       x: rect.left + (rect.width / 2),

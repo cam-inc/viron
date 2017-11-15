@@ -1,11 +1,12 @@
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
 // モーダルを多重起動しないよう判定する変数
 let canCreateModal = true;
 // タイマーID管理用変数
 let timer;
 
-export default {
+export default exporter('modals', {
   /**
    * モーダルを追加します。
    * @param {riotx.Context} context
@@ -49,4 +50,4 @@ export default {
         context.commit(mutations.MODALS_REMOVE, modalId);
       });
   }
-};
+});

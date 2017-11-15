@@ -1,6 +1,5 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
-import { constants as actions } from '../../store/actions';
 
 export default function() {
   const store = this.riotx.get();
@@ -18,7 +17,7 @@ export default function() {
     this.root.classList.remove('Drawer--visible');
 
     setTimeout(() => {
-      store.action(actions.DRAWERS_REMOVE, this.opts.id);
+      store.action('drawers.remove', this.opts.id);
     }, 1000);
   };
 

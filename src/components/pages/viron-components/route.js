@@ -1,4 +1,3 @@
-import { constants as actions } from '../../../store/actions';
 import '../../atoms/viron-message/index.tag';
 
 export default {
@@ -20,14 +19,14 @@ export default {
         .then(() => {
           replace('/');
         })
-        .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+        .catch(err => store.action('modals.add', 'viron-message', {
           error: err
         }));
     }
 
     return Promise
       .resolve()
-      .then(() => store.action(actions.CURRENT_UPDATE, endpointKey))
+      .then(() => store.action('current.update', endpointKey))
       .then(() => {
         // 無駄な通信を減らすために、`viron`データを未取得の場合のみfetchする。
         const isVironExist = store.getter('viron.existence');
@@ -36,8 +35,8 @@ export default {
         }
         return Promise
           .resolve()
-          .then(() => store.action(actions.OAS_SETUP, endpointKey, endpoint.url, endpoint.token))
-          .then(() => store.action(actions.VIRON_GET));
+          .then(() => store.action('oas.setup', endpointKey, endpoint.url, endpoint.token))
+          .then(() => store.action('viron.get'));
       })
       .then(() => {
         // pageが指定されていない場合は`viron`のpageリストの先頭項目を自動選択する。
@@ -47,19 +46,19 @@ export default {
             replace(`/${endpointKey}/${pageName}`);
           });
         }
-        return store.action(actions.PAGE_GET, route.params.page);
+        return store.action('page.get', route.params.page);
       })
       .catch(err => {
         // 401 = 認証エラー
         // 通常エラーと認証エラーで処理を振り分ける。
         if (err.status !== 401) {
-          return store.action(actions.MODALS_ADD, 'viron-message', {
+          return store.action('modals.add', 'viron-message', {
             error: err
           });
         }
         return Promise
           .resolve()
-          .then(() => store.action(actions.MODALS_ADD, 'viron-message', {
+          .then(() => store.action('modals.add', 'viron-message', {
             title: '認証切れ',
             message: '認証が切れました。再度ログインして下さい。'
           }))
@@ -76,7 +75,7 @@ export default {
    * @return {Promise}
    */
   onEnter: (store, route) => {
-    return store.action(actions.LOCATION_UPDATE, {
+    return store.action('location.update', {
       name: 'components',
       route
     });

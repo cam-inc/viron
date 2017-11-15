@@ -4,7 +4,6 @@ import isUndefined from 'mout/lang/isUndefined';
 import keys from 'mout/object/keys';
 import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
-import { constants as actions } from '../../../store/actions';
 import { getComponentStateName } from '../../../store/states';
 import '../../atoms/viron-message/index.tag';
 import './filter.tag';
@@ -129,13 +128,13 @@ export default function() {
           resolve();
         }, 300);
       }))
-      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentSearchRequestParameters))
+      .then(() => store.action('components.get', this._riot_id, this.opts.component, this.currentSearchRequestParameters))
       .catch(err => {
         // 401 = 認証エラー
         // 通常エラーと認証エラーで処理を振り分ける。
         if (err.status !== 401) {
           const api = this.opts.component.api;
-          return store.action(actions.MODALS_ADD, {
+          return store.action('modals.add', {
             title: '通信失敗',
             message: `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。該当するAPIがOAS上に正しく定義されているかご確認下さい。`,
             error: err
@@ -143,7 +142,7 @@ export default function() {
         }
         return Promise
           .resolve()
-          .then(() => store.action(actions.MODALS_ADD, 'viron-message', {
+          .then(() => store.action('modals.add', 'viron-message', {
             title: '認証切れ',
             message: '認証が切れました。再度ログインして下さい。'
           }))
@@ -256,7 +255,7 @@ export default function() {
     this.currentSearchRequestParameters = ObjectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
   }).on('unmount', () => {
     inactivateAutoRefresh();
-    store.action(actions.COMPONENTS_REMOVE_ONE, this._riot_id);
+    store.action('components.remove', this._riot_id);
   });
 
   this.listen(getComponentStateName(this._riot_id), () => {
@@ -287,7 +286,7 @@ export default function() {
     }
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-component-filter', {
+      .then(() => store.action('modals.add', 'viron-component-filter', {
         tableColumns: this.tableColumns,
         selectedTableColumns: this.selectedTableColumns,
         onComplete: newSelectedTableColumns => {
@@ -295,7 +294,7 @@ export default function() {
           this.update();
         }
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
@@ -315,7 +314,7 @@ export default function() {
 
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-component-search', {
+      .then(() => store.action('modals.add', 'viron-component-search', {
         parameterObjects: escapedParameterObjects,
         initialParameters: ObjectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
@@ -323,7 +322,7 @@ export default function() {
           this.updater(parameters);
         }
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

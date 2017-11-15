@@ -1,4 +1,3 @@
-import { constants as actions } from '../../../store/actions';
 import './entry/index.tag';
 
 export default function() {
@@ -33,7 +32,7 @@ export default function() {
    * エンドポイント追加用のモーダルを表示します。
    */
   this.showModalToAddEndpoint = () => {
-    store.action(actions.MODALS_ADD, 'viron-application-header-menu-entry');
+    store.action('modals.add', 'viron-application-header-menu-entry');
   };
 
   /**
@@ -45,11 +44,6 @@ export default function() {
     switch (actionId) {
     case 'show_credit':
       // TODO:
-      // TODO: debug用なので後で消すこと。
-      store.action(actions.TOASTS_ADD, {
-        message: 'testes',
-        autoHide: false
-      });
       this.close();
       break;
     case 'navigate_to_doc':

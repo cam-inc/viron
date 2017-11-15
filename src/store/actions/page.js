@@ -1,7 +1,8 @@
 import find from 'mout/object/find';
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('page', {
   /**
    * ページ情報を取得します。
    * @param {riotx.Context} context
@@ -32,4 +33,4 @@ export default {
         context.commit(mutations.PAGE, null);
       });
   }
-};
+});

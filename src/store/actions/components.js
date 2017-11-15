@@ -1,8 +1,9 @@
 import contentDisposition from 'content-disposition';
 import download from 'downloadjs';
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('components', {
   /**
    * 一つのコンポーネント情報を取得します。
    * @param {riotx.Context} context
@@ -171,4 +172,4 @@ export default {
         context.commit(mutations.COMPONENTS_REMOVE_ALL);
       });
   }
-};
+});

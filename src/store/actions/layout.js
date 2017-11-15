@@ -1,6 +1,7 @@
 import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('layout', {
   /**
    * アプリケーションの表示サイズを更新します。
    * @param {riotx.Context} context
@@ -29,4 +30,4 @@ export default {
         context.commit(mutations.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT, count);
       });
   }
-};
+});

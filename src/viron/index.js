@@ -1,6 +1,5 @@
 import download from 'downloadjs';
 import throttle from 'mout/function/throttle';
-import { constants as actions } from '../store/actions';
 import '../components/atoms/viron-message/index.tag';
 import './confirm.tag';
 import './entry.tag';
@@ -66,7 +65,7 @@ export default function() {
   const handleResize = throttle(() => {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    store.action(actions.LAYOUT_UPDATE_SIZE, width, height);
+    store.action('layout.updateSize', width, height);
   }, 1000);
   this.on('mount', () => {
     window.addEventListener('resize', handleResize);
@@ -77,8 +76,8 @@ export default function() {
   this.handleEntryMenuItemClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-application-entry'))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('modals.add', 'viron-application-entry'))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
@@ -101,7 +100,7 @@ export default function() {
     // ファイルがjsonであるか
     // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
     if (!store.getter('ua.isEdge') && file.type !== 'application/json') {
-      store.action(actions.MODALS_ADD, 'viron-message', {
+      store.action('modals.add', 'viron-message', {
         title: 'エンドポイント追加 失敗',
         message: 'JSONファイルを指定してください。',
         type: 'error'
@@ -116,7 +115,7 @@ export default function() {
 
     // 読み込みが失敗した。
     reader.onerror = err => {
-      store.action(actions.MODALS_ADD, 'viron-message', {
+      store.action('modals.add', 'viron-message', {
         title: 'エンドポイント追加 失敗',
         message: 'ファイルの読み込みに失敗しました。',
         error: err
@@ -133,13 +132,13 @@ export default function() {
         .resolve()
         .then(() => {
           const endpoints = JSON.parse(text);
-          return store.action(actions.ENDPOINTS_MERGE_ALL, endpoints);
+          return store.action('endpoints.mergeAll', endpoints);
         })
-        .then(() => store.action(actions.MODALS_ADD, 'viron-message', {
+        .then(() => store.action('modals.add', 'viron-message', {
           title: 'エンドポイント追加',
           message: 'エンドポイントが一覧に追加されました。'
         }))
-        .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+        .catch(err => store.action('modals.add', 'viron-message', {
           title: 'エンドポイント追加 失敗',
           error: err
         }));
@@ -149,18 +148,18 @@ export default function() {
   };
 
   this.handleOrderMenuItemClick = () => {
-    store.action(actions.MODALS_ADD, 'viron-application-order');
+    store.action('modals.add', 'viron-application-order');
   };
 
   this.handleClearMenuItemClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-application-confirm', {
+      .then(() => store.action('modals.add', 'viron-application-confirm', {
         onConfirm: () => {
-          store.action(actions.ENDPOINTS_REMOVE_ALL);
+          store.action('endpoints.removeAll');
         }
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
@@ -168,8 +167,8 @@ export default function() {
   this.handleFilterChange = newText => {
     Promise
       .resolve()
-      .then(() => store.action(actions.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT, newText))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('application.updateEndpointFilterText', newText))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

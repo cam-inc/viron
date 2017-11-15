@@ -1,4 +1,3 @@
-import { constants as actions } from '../../../store/actions';
 import '../../organisms/viron-component/operation.tag';
 
 export default function() {
@@ -26,7 +25,7 @@ export default function() {
   }
 
   this.handleButtonClick = () => {
-    store.action(actions.DRAWERS_ADD, 'viron-component-operation', {
+    store.action('drawers.add', 'viron-component-operation', {
       title: operationObject.summary || operationObject.operationId,
       description: operationObject.description,
       method,

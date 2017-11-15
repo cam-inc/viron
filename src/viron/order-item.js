@@ -1,4 +1,3 @@
-import { constants as actions } from '../store/actions';
 import '../components/atoms/viron-message/index.tag';
 
 export default function() {
@@ -11,8 +10,8 @@ export default function() {
 
     Promise
       .resolve()
-      .then(() => store.action(actions.APPLICATION_DRAG_START))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('application.startDrag'))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
@@ -25,8 +24,8 @@ export default function() {
   this.handleDragEnd = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.APPLICATION_DRAG_END))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('application.endDrag'))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
