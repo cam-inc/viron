@@ -1,5 +1,4 @@
 import storage from 'store';
-import { constants as states } from '../states';
 
 export default {
   /**
@@ -9,7 +8,7 @@ export default {
    * @return {Array}
    */
   all: (context, endpointKey) => {
-    context.state.current = storage.set(states.CURRENT, endpointKey);
-    return [states.CURRENT];
+    context.state.current = storage.set('current', endpointKey);
+    return ['current'];
   }
 };

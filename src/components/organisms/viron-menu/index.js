@@ -1,7 +1,5 @@
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
-import { constants as states } from '../../../store/states';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -39,12 +37,12 @@ export default function() {
   this.groupedDashboard = group(dashboard);
   this.groupedManage = group(manage);
 
-  this.listen(states.ENDPOINTS, () => {
+  this.listen('endpoints', () => {
     const current = store.getter('current.all');
     this.endpoint = store.getter('endpoints.one', current);
     this.update();
   });
-  this.listen(states.VIRON, () => {
+  this.listen('viron', () => {
     const dashboard = store.getter('viron.dashbboard');
     const manage = store.getter('viron.manage');
     this.groupedDashboard = group(dashboard);

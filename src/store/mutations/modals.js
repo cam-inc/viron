@@ -1,5 +1,4 @@
 import reject from 'mout/array/reject';
-import { constants as states } from '../states';
 
 export default {
   /**
@@ -17,7 +16,7 @@ export default {
       tagOpts,
       modalOpts
     });
-    return [states.MODALS];
+    return ['modals'];
   },
 
   /**
@@ -30,6 +29,6 @@ export default {
     context.state.modals = reject(context.state.modals, modal => {
       return (modal.id === modalID);
     });
-    return [states.MODALS];
+    return ['modals'];
   }
 };

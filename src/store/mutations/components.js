@@ -1,4 +1,4 @@
-import { constants as states } from '../states';
+import { getComponentStateName } from '../states';
 
 export default {
   /**
@@ -11,7 +11,7 @@ export default {
     const component_uid = params.component_uid;
     // 存在しなければ新規作成。
     context.state.components[component_uid] = params;
-    return [states.COMPONENTS, states.COMPONENTS_ONE(component_uid)];
+    return ['components', getComponentStateName(component_uid)];
   },
 
   /**
@@ -22,7 +22,7 @@ export default {
    */
   removeOne: (context, component_uid) => {
     delete context.state.components[component_uid];
-    return [states.COMPONENTS, states.COMPONENTS_ONE(component_uid)];
+    return ['components', getComponentStateName(component_uid)];
   },
 
   /**
@@ -32,6 +32,6 @@ export default {
    */
   removeAll: context => {
     context.state.components = {};
-    return [states.COMPONENTS, states.COMPONENTS];
+    return ['components'];
   }
 };

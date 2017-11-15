@@ -1,6 +1,5 @@
 import reject from 'mout/array/reject';
 import ObjectAssign from 'object-assign';
-import { constants as states } from '../states';
 
 const generateId = () => {
   return `toast_${Date.now()}`;
@@ -27,7 +26,7 @@ export default {
     });
 
     context.state.toasts.push(data);
-    return [states.TOASTS];
+    return ['toasts'];
   },
 
   /**
@@ -41,6 +40,6 @@ export default {
       return toast.id === toastId;
     });
 
-    return [states.TOASTS];
+    return ['toasts'];
   }
 };

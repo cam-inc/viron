@@ -1,5 +1,4 @@
 import { constants as actions } from '../../../store/actions';
-import { constants as states } from '../../../store/states';
 import '../../atoms/viron-message/index.tag';
 import './edit.tag';
 import './qrcode.tag';
@@ -12,13 +11,13 @@ export default function() {
   this.endpointsCount = store.getter('endpoints.count');
   this.endpointFilterText = store.getter('application.endpointFilterText');
 
-  this.listen(states.ENDPOINTS, () => {
+  this.listen('endpoints', () => {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
     this.endpointsCount = store.getter('endpoints.count');
     this.update();
   });
 
-  this.listen(states.APPLICATION, () => {
+  this.listen('application', () => {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
     this.endpointFilterText = store.getter('application.endpointFilterText');
     this.update();

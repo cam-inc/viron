@@ -1,4 +1,6 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('application', {
   // 起動状態。
   isLaunched: false,
   // 画面遷移中か否か。
@@ -13,4 +15,4 @@ export default {
   isMenuOpened: true,
   // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
   endpointFilterText: ''
-};
+});

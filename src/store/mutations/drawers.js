@@ -1,5 +1,4 @@
 import reject from 'mout/array/reject';
-import { constants as states } from '../states';
 
 export default {
   /**
@@ -17,7 +16,7 @@ export default {
       tagOpts,
       drawerOpts
     });
-    return [states.DRAWERS];
+    return ['drawers'];
   },
 
   /**
@@ -30,6 +29,6 @@ export default {
     context.state.drawers = reject(context.state.drawers, drawer => {
       return (drawer.id === drawerID);
     });
-    return [states.DRAWERS];
+    return ['drawers'];
   }
 };

@@ -1,7 +1,5 @@
 import find from 'mout/array/find';
 import map from 'mout/array/map';
-import { constants as states } from '../../../store/states';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -21,7 +19,7 @@ export default function() {
     return item;
   });
 
-  this.listen(states.PAGE, () => {
+  this.listen('page', () => {
     const pageId = store.getter('page.id');
     if (!!find(this.opts.group.list, item => {
       return (item.id === pageId);

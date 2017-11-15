@@ -1,5 +1,3 @@
-import { constants as states } from '../../store/states';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -8,7 +6,7 @@ export default function() {
   };
 
   this.menu = store.getter('viron.menu');
-  this.listen(states.VIRON, () => {
+  this.listen('viron', () => {
     this.menu = store.getter('viron.menu');
     this.update();
   });

@@ -6,7 +6,6 @@ import find from 'mout/object/find';
 import ObjectAssign from 'object-assign';
 import shortid from 'shortid';
 import storage from 'store';
-import { constants as states } from '../states';
 
 /**
  * 受け取ったエンドポイント群をきれいに並び替えます。
@@ -52,7 +51,7 @@ export default {
     newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
     storage.set('endpoints', context.state.endpoints);
-    return [states.ENDPOINTS];
+    return ['endpoints'];
   },
 
   /**
@@ -67,7 +66,7 @@ export default {
     newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
     storage.set('endpoints', context.state.endpoints);
-    return [states.ENDPOINTS];
+    return ['endpoints'];
   },
 
   /**
@@ -78,7 +77,7 @@ export default {
   removeAll: context => {
     context.state.endpoints = {};
     storage.set('endpoints', context.state.endpoints);
-    return [states.ENDPOINTS];
+    return ['endpoints'];
   },
 
   /**
@@ -95,7 +94,7 @@ export default {
       context.state.endpoints[endpointKey] = ObjectAssign({}, context.state.endpoints[endpointKey], endpoint);
     }
     storage.set('endpoints', context.state.endpoints);
-    return [states.ENDPOINTS];
+    return ['endpoints'];
   },
 
   /**
@@ -110,7 +109,7 @@ export default {
       context.state.endpoints[endpointKey].token = token;
     }
     storage.set('endpoints', context.state.endpoints);
-    return [states.ENDPOINTS];
+    return ['endpoints'];
   },
 
   /**
@@ -138,7 +137,7 @@ export default {
     modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
     context.state.endpoints = modifiedEndpoints;
     storage.set('endpoints', modifiedEndpoints);
-    return [states.ENDPOINTS];
+    return ['endpoints'];
   },
 
   /**
@@ -151,7 +150,7 @@ export default {
     const newEndpoints = putEndpointsInOrder(ObjectAssign(context.state.endpoints));
     context.state.endpoints = newEndpoints;
     storage.set('endpoints', newEndpoints);
-    return [states.ENDPOINTS];
+    return ['endpoints'];
   },
 
   /**
@@ -169,6 +168,6 @@ export default {
     newEndpoints = putEndpointsInOrder(newEndpoints);
     context.state.endpoints = newEndpoints;
     storage.set('endpoints', newEndpoints);
-    return [states.ENDPOINTS];
+    return ['endpoints'];
   }
 };

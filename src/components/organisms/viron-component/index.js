@@ -5,7 +5,7 @@ import keys from 'mout/object/keys';
 import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
-import { constants as states } from '../../../store/states';
+import { getComponentStateName } from '../../../store/states';
 import '../../atoms/viron-message/index.tag';
 import './filter.tag';
 import './search.tag';
@@ -259,7 +259,7 @@ export default function() {
     store.action(actions.COMPONENTS_REMOVE_ONE, this._riot_id);
   });
 
-  this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
+  this.listen(getComponentStateName(this._riot_id), () => {
     this.isPending = false;
     this.response = store.getter('components.response', this._riot_id);
     this.schemaObject = store.getter('components.schemaObject', this._riot_id);

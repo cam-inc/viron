@@ -1,5 +1,4 @@
 import { constants as actions } from '../../store/actions';
-import { constants as states } from '../../store/states';
 import '../menu/index.tag';
 import './autocomplete/index.tag';
 import './menu/index.tag';
@@ -18,19 +17,19 @@ export default function() {
   // エンドポイントのサムネイル。
   this.thumbnail = store.getter('viron.thumbnail');
 
-  this.listen(states.LOCATION, () => {
+  this.listen('location', () => {
     this.isTopPage = store.getter('location.isTop');
     this.update();
   });
-  this.listen(states.APPLICATION, () => {
+  this.listen('application', () => {
     this.isMenuOpened = store.getter('application.isMenuOpened');
     this.update();
   });
-  this.listen(states.LAYOUT, () => {
+  this.listen('layout', () => {
     this.isMobile = store.getter('layout.isMobile');
     this.update();
   });
-  this.listen(states.VIRON, () => {
+  this.listen('viron', () => {
     this.name = store.getter('viron.name');
     this.thumbnail = store.getter('viron.thumbnail');
     this.update();

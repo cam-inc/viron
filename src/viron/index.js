@@ -1,7 +1,6 @@
 import download from 'downloadjs';
 import throttle from 'mout/function/throttle';
 import { constants as actions } from '../store/actions';
-import { constants as states } from '../store/states';
 import '../components/atoms/viron-message/index.tag';
 import './confirm.tag';
 import './entry.tag';
@@ -32,7 +31,7 @@ export default function() {
   // 左カラムの開閉状態。トップページでは常にopenとなる。
   this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
 
-  this.listen(states.APPLICATION, () => {
+  this.listen('application', () => {
     this.isLaunched = store.getter('application.isLaunched');
     this.isNavigating = store.getter('application.isNavigating');
     this.isNetworking = store.getter('application.isNetworking');
@@ -40,22 +39,22 @@ export default function() {
     this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
     this.update();
   });
-  this.listen(states.LOCATION, () => {
+  this.listen('location', () => {
     this.pageName = store.getter('location.name');
     this.isTopPage = store.getter('location.isTop');
     this.pageRoute = store.getter('location.route');
     this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
     this.update();
   });
-  this.listen(states.ENDPOINTS, () => {
+  this.listen('endpoints', () => {
     this.endpointsCount = store.getter('endpoints.count');
     this.update();
   });
-  this.listen(states.UA, () => {
+  this.listen('ua', () => {
     this.usingBrowser = store.getter('ua.usingBrowser');
     this.update();
   });
-  this.listen(states.LAYOUT, () => {
+  this.listen('layout', () => {
     this.layoutType = store.getter('layout.type');
     this.isDesktop = store.getter('layout.isDesktop');
     this.isMobile = store.getter('layout.isMobile');

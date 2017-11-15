@@ -1,5 +1,4 @@
 import { constants as actions } from '../store/actions';
-import { constants as states } from '../store/states';
 import '../components/atoms/viron-message/index.tag';
 
 export default function() {
@@ -10,7 +9,7 @@ export default function() {
   // ドロップ可能な状態か否か。
   this.isDroppable = false;
 
-  this.listen(states.APPLICATION, () => {
+  this.listen('application', () => {
     this.isWatching = store.getter('application.isDragging');
     this.update();
   });

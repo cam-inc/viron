@@ -1,7 +1,6 @@
 import combine from 'mout/array/combine';
 import find from 'mout/array/find';
 import { i18n } from '../../core/i18n';
-import { constants as states } from '../states';
 
 export default {
   /**
@@ -25,6 +24,6 @@ export default {
       }
     }
     context.state.viron = viron;
-    return [states.VIRON];
+    return ['viron'];
   }
 };

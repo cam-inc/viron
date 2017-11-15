@@ -1,6 +1,5 @@
 import reject from 'mout/array/reject';
 import ObjectAssign from 'object-assign';
-import { constants as states } from '../states';
 
 export default {
   /**
@@ -11,7 +10,7 @@ export default {
    */
   launch: (context, bool) => {
     context.state.application.isLaunched = bool;
-    return [states.APPLICATION];
+    return ['application'];
   },
 
   /**
@@ -22,7 +21,7 @@ export default {
    */
   navigation: (context, bool) => {
     context.state.application.isNavigating = bool;
-    return [states.APPLICATION];
+    return ['application'];
   },
 
   /**
@@ -36,7 +35,7 @@ export default {
       id: `networking_${Date.now()}`
     }, info));
     context.state.application.isNetworking = true;
-    return [states.APPLICATION];
+    return ['application'];
   },
 
   /**
@@ -52,7 +51,7 @@ export default {
     if (!context.state.application.networkings.length) {
       context.state.application.isNetworking = false;
     }
-    return [states.APPLICATION];
+    return ['application'];
   },
 
   /**
@@ -63,7 +62,7 @@ export default {
    */
   drag: (context, bool) => {
     context.state.application.isDragging = bool;
-    return [states.APPLICATION];
+    return ['application'];
   },
 
   /**
@@ -73,7 +72,7 @@ export default {
    */
   menuToggle: context => {
     context.state.application.isMenuOpened = !context.state.application.isMenuOpened;
-    return [states.APPLICATION];
+    return ['application'];
   },
 
   /**
@@ -84,6 +83,6 @@ export default {
    */
   endpointFilterText: (context, newFilterText) => {
     context.state.application.endpointFilterText = newFilterText;
-    return [states.APPLICATION];
+    return ['application'];
   }
 };

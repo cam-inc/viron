@@ -8,7 +8,6 @@ import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
 import chart from '../../../core/chart';
 import { constants as actions } from '../../../store/actions';
-import { constants as states } from '../../../store/states';
 import '../../organisms/viron-component/search.tag';
 import '../../atoms/viron-message/index.tag';
 
@@ -99,14 +98,14 @@ export default function() {
     window.removeEventListener('resize', handleResize);
   });
 
-  this.listen(states.LAYOUT, () => {
+  this.listen('layout', () => {
     const columnCount = store.getter('layout.componentsGridColumnCount');
     document.documentElement.style.setProperty('--page-components-grid-column-count', columnCount);
     // tauchartはresize時に自動で再レンダリングするが、column数変更時にはresizeイベントが発火しないため再レンダリングが実行されない。
     // column数変更時も再レンダリングさせるために手動でresizeイベントハンドラを実行する。
     chart.Chart.resizeOnWindowEvent();
   });
-  this.listen(states.PAGE, () => {
+  this.listen('page', () => {
     this.name = store.getter('page.name');
     this.tableComponents = store.getter('page.componentsTable');
     this.notTableComponents = store.getter('page.componentsNotTable');
@@ -115,7 +114,7 @@ export default function() {
     updateGridColumnCount();
   });
 
-  this.listen(states.COMPONENTS, () => {
+  this.listen('components', () => {
     this.parameterObjects = store.getter('components.parameterObjectsEntirely');
     this.update();
   });

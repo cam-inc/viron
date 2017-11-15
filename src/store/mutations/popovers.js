@@ -1,6 +1,5 @@
 import reject from 'mout/array/reject';
 import ObjectAssign from 'object-assign';
-import { constants as states } from '../states';
 
 export default {
   /**
@@ -23,7 +22,7 @@ export default {
         y: 0
       }, popoverOpts)
     });
-    return [states.POPOVERS];
+    return ['popovers'];
   },
 
   /**
@@ -36,6 +35,6 @@ export default {
     context.state.popovers = reject(context.state.popovers, popover => {
       return (popover.id === popoverID);
     });
-    return [states.POPOVERS];
+    return ['popovers'];
   }
 };

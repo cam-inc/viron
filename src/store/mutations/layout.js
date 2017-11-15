@@ -1,5 +1,4 @@
 import constants from '../../core/constants';
-import { constants as states } from '../states';
 
 export default {
   /**
@@ -16,7 +15,7 @@ export default {
     } else {
       context.state.layout.type = constants.layoutTypeMobile;
     }
-    return [states.LAYOUT];
+    return ['layout'];
   },
 
   /**
@@ -27,6 +26,6 @@ export default {
    */
   updateComponentsGridColumnCount: (context, count) => {
     context.state.layout.componentsGridColumnCount = count;
-    return [states.LAYOUT];
+    return ['layout'];
   }
 };

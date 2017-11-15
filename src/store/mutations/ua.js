@@ -1,5 +1,3 @@
-import { constants as states } from '../states';
-
 export default {
   /**
    * UA情報を書き換えます。
@@ -9,6 +7,6 @@ export default {
    */
   all: (context, ua) => {
     context.state.ua = ua;
-    return [states.UA];
+    return ['ua'];
   }
 };

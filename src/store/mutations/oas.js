@@ -1,5 +1,3 @@
-import { constants as states } from '../states';
-
 export default {
   /**
    * SwaggerClientインスタンスを設定します。
@@ -9,7 +7,7 @@ export default {
    */
   client: (context, client) => {
     context.state.oas.client = client;
-    return [states.OAS];
+    return ['oas'];
   },
 
   /**
@@ -19,6 +17,6 @@ export default {
    */
   clearClient: context => {
     context.state.oas.client = null;
-    return [states.OAS];
+    return ['oas'];
   }
 };

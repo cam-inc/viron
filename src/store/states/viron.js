@@ -1,2 +1,4 @@
+import exporter from './exporter';
+
 // `/viron`のデータ。
-export default null;
+export default exporter('viron', null);

@@ -1,6 +1,5 @@
 import filter from 'mout/array/filter';
 import constants from '../../../../core/constants';
-import { constants as states } from '../../../../store/states';
 
 export default function() {
   const store = this.riotx.get();
@@ -13,7 +12,7 @@ export default function() {
     return (authtype.type === constants.authtypeOauth);
   });
 
-  this.listen(states.LAYOUT, () => {
+  this.listen('layout', () => {
     this.isDesktop = store.getter('layout.isDesktop');
     this.update();
   });

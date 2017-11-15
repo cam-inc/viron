@@ -1,5 +1,4 @@
 import ObjectAssign from 'object-assign';
-import { constants as states } from '../states';
 
 export default {
   /**
@@ -10,7 +9,7 @@ export default {
    */
   all: (context, obj) => {
     context.state.location = ObjectAssign({}, context.state.location, obj);
-    return [states.LOCATION];
+    return ['location'];
   },
 
   /**
@@ -21,7 +20,7 @@ export default {
    */
   name: (context, name) => {
     context.state.location.name = name;
-    return [states.LOCATION];
+    return ['location'];
   },
 
   /**
@@ -32,6 +31,6 @@ export default {
    */
   route: (context, route) => {
     context.state.location.route = route;
-    return [states.LOCATION];
+    return ['location'];
   }
 };
