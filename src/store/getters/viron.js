@@ -2,85 +2,86 @@ import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import filter from 'mout/object/filter';
 import values from 'mout/object/values';
+import exporter from './exporter';
 
 const SECTION_DASHBOARD = 'dashboard';
 const SECTION_MANAGE = 'manage';
 
-export default {
+export default exporter('viron', {
   /**
    * 全て返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  all: context => {
-    if (!context.state.viron) {
+  all: state => {
+    if (!state.viron) {
       return null;
     }
-    return context.state.viron;
+    return state.viron;
   },
 
   /**
    * VIRONデータが存在する否か。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  existence: context => {
-    return !!context.state.viron;
+  existence: state => {
+    return !!state.viron;
   },
 
   /**
    * page群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  pages: context => {
-    return context.state.viron.pages;
+  pages: state => {
+    return state.viron.pages;
   },
 
   /**
    * 指定idx値のpageのidを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {Number} idx
    * @return {String}
    */
-  pageIdOf: (context, idx) => {
-    return context.state.viron.pages[idx].id;
+  pageIdOf: (state, idx) => {
+    return state.viron.pages[idx].id;
   },
 
   /**
    * 名前を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {String|null}
    */
-  name: context => {
-    if (!context.state.viron) {
+  name: state => {
+    if (!state.viron) {
       return null;
     }
-    return context.state.viron.name;
+    return state.viron.name;
   },
 
   /**
    * サムネイルを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {String|null}
    */
-  thumbnail: context => {
-    if (!context.state.viron) {
+  thumbnail: state => {
+    if (!state.viron) {
       return null;
     }
-    return context.state.viron.thumbnail;
+    return state.viron.thumbnail;
   },
 
   /**
    * ダッシュボードメニュー群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  dashboard: context => {
-    if (!context.state.viron) {
+  dashboard: state => {
+    if (!state.viron) {
       return [];
     }
-    return values(filter(context.state.viron.pages, page => {
+    return values(filter(state.viron.pages, page => {
       if (page.section !== SECTION_DASHBOARD) {
         return false;
       }
@@ -90,14 +91,14 @@ export default {
 
   /**
    * 管理画面メニュー群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  manage: context => {
-    if (!context.state.viron) {
+  manage: state => {
+    if (!state.viron) {
       return [];
     }
-    return values(filter(context.state.viron.pages, page => {
+    return values(filter(state.viron.pages, page => {
       if (page.section !== SECTION_MANAGE) {
         return false;
       }
@@ -107,15 +108,15 @@ export default {
 
   /**
    * メニュー内容を返します。
-   * @param {riot.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  menu: context => {
+  menu: state => {
     const menu = [];
-    if (!context.state.viron || !context.state.viron.sections) {
+    if (!state.viron || !state.viron.sections) {
       return menu;
     }
-    const sections = context.state.viron.sections;
+    const sections = state.viron.sections;
     forEach(sections, section => {
       menu.push({
         name: section.label || section.id,
@@ -123,7 +124,7 @@ export default {
         groups: []
       });
     });
-    const pages = context.state.viron.pages;
+    const pages = state.viron.pages;
     forEach(pages, page => {
       const targetSection = find(menu, section => {
         return (section.id === page.section);
@@ -159,4 +160,4 @@ export default {
     });
     return menu;
   }
-};
+});

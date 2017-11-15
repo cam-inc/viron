@@ -1,5 +1,4 @@
 import { constants as actions } from '../../../store/actions';
-import { constants as getters } from '../../../store/getters';
 import '../../organisms/viron-component/operation.tag';
 
 export default function() {
@@ -7,7 +6,7 @@ export default function() {
   const operationObject = this.opts.action;
 
   this.label = operationObject.summary || operationObject.operationId;
-  const method = store.getter(getters.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, operationObject.operationId);
+  const method = store.getter('oas.pathItemObjectMethodNameByOperationId', operationObject.operationId);
   this.icon = null;
   switch (method) {
   case 'get':

@@ -6,6 +6,7 @@ import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
 import contains from 'mout/string/contains';
 import ObjectAssign from 'object-assign';
+import exporter from './exporter';
 
 /**
  * 受け取ったエンドポイント群をorder昇順の配列として返します。
@@ -69,55 +70,55 @@ const filterBy = (endpoints, filterText) => {
   });
 };
 
-export default {
+export default exporter('endpoints', {
   /**
    * 全endpointを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  all: context => {
-    return context.state.endpoints;
+  all: state => {
+    return state.endpoints;
   },
 
   /**
    * 全endpointをorder昇順の配列として返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  allByOrder: context => {
-    let endpoints = ObjectAssign(context.state.endpoints);
+  allByOrder: state => {
+    let endpoints = ObjectAssign(state.endpoints);
     endpoints = sortByOrder(endpoints);
     return endpoints;
   },
 
   /**
    * 全endpointをorder昇順のfilter済み配列として返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  allByOrderFiltered: context => {
-    let endpoints = ObjectAssign(context.state.endpoints);
+  allByOrderFiltered: state => {
+    let endpoints = ObjectAssign(state.endpoints);
     endpoints = sortByOrder(endpoints);
-    endpoints = filterBy(endpoints, context.state.application.endpointFilterText);
+    endpoints = filterBy(endpoints, state.application.endpointFilterText);
     return endpoints;
   },
 
   /**
    * endpoint数を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Number}
    */
-  count: context => {
-    return size(context.state.endpoints);
+  count: state => {
+    return size(state.endpoints);
   },
 
   /**
    * 認証トークンを省いた全endpointを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  allWithoutToken: context => {
-    const endpoints = ObjectAssign({}, context.state.endpoints);
+  allWithoutToken: state => {
+    const endpoints = ObjectAssign({}, state.endpoints);
     // 認証用トークンはexport対象外とする。
     forOwn(endpoints, endpoint => {
       delete endpoint.token;
@@ -127,25 +128,25 @@ export default {
 
   /**
    * 指定keyにマッチするendpointを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} key
    * @return {Object}
    */
-  one: (context, key) => {
-    return context.state.endpoints[key];
+  one: (state, key) => {
+    return state.endpoints[key];
   },
 
   /**
    * 指定urlにマッチするendpointを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} url
    * @return {Object}
    */
-  oneByURL: (context, url) => {
-    const endpoints = context.state.endpoints;
+  oneByURL: (state, url) => {
+    const endpoints = state.endpoints;
     return find(endpoints, endpoint => {
       return endpoint.url === url;
     });
   }
 
-};
+});

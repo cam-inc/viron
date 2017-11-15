@@ -1,48 +1,49 @@
 import constants from '../../core/constants';
+import exporter from './exporter';
 
-export default {
+export default exporter('layout', {
   /**
    * レイアウトタイプを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {String}
    */
-  type: context => {
-    return context.state.layout.type;
+  type: state => {
+    return state.layout.type;
   },
 
   /**
    * レイアウトタイプがdesktopならtrueを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isDesktop: context => {
-    return (context.state.layout.type === constants.layoutTypeDesktop);
+  isDesktop: state => {
+    return (state.layout.type === constants.layoutTypeDesktop);
   },
 
   /**
    * レイアウトタイプがmobileならtrueを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isMobile: context => {
-    return (context.state.layout.type === constants.layoutTypeMobile);
+  isMobile: state => {
+    return (state.layout.type === constants.layoutTypeMobile);
   },
 
   /**
    * 表示サイズを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  size: context => {
-    return context.state.layout.size;
+  size: state => {
+    return state.layout.size;
   },
 
   /**
    * componentリストのgridレイアウトのcolumn数を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Number}
    */
-  componentsGridColumnCount: context => {
-    return context.state.layout.componentsGridColumnCount;
+  componentsGridColumnCount: state => {
+    return state.layout.componentsGridColumnCount;
   }
-};
+});

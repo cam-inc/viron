@@ -1,6 +1,5 @@
 import contentDisposition from 'content-disposition';
 import download from 'downloadjs';
-import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
 export default {
@@ -22,11 +21,11 @@ export default {
     if (path.indexOf('/') !== 0) {
       path = '/' + path;
     }
-    const actions = context.getter(getters.OAS_OPERATION_OBJECTS_AS_ACTION, component);
+    const actions = context.getter('oas.operationObjectsAsAction', component);
 
-    const api = context.getter(getters.OAS_API_BY_PATH_AND_METHOD, path, method);
-    const currentEndpointKey = context.getter(getters.CURRENT);
-    const currentEndpoint = context.getter(getters.ENDPOINTS_ONE, currentEndpointKey);
+    const api = context.getter('oas.apiByPathAndMethod', path, method);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
     const token = currentEndpoint.token;
     const networkingId = `networking_${Date.now()}`;
 
@@ -75,8 +74,8 @@ export default {
         context.commit(mutations.COMPONENTS_UPDATE_ONE, {
           component_uid,
           response: res.obj,// APIレスポンス内容そのまま。
-          schemaObject: context.getter(getters.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
-          parameterObjects: context.getter(getters.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
+          schemaObject: context.getter('oas.schemaObject', path, method),// OASのschema。
+          parameterObjects: context.getter('oas.parameterObjects', path, method),// OASのparameterObject群。
           actions,// 関連API群。
           hasPagination,
           pagination,// ページング関連。
@@ -100,9 +99,9 @@ export default {
    * @return {Promise}
    */
   operate: (context, operationObject, params) => {
-    const api = context.getter(getters.OAS_API, operationObject.operationId);
-    const token = context.getter(getters.ENDPOINTS_ONE, context.getter(getters.CURRENT)).token;
-    const currentEndpointKey = context.getter(getters.CURRENT);
+    const api = context.getter('oas.api', operationObject.operationId);
+    const token = context.getter('endpoints.one', context.getter('current.all')).token;
+    const currentEndpointKey = context.getter('current.all');
     const networkingId = `networking_${Date.now()}`;
 
     return Promise

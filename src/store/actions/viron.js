@@ -1,5 +1,4 @@
 import ObjectAssign from 'object-assign';
-import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
 // APIは必須でサポートしなければならない URI
@@ -12,10 +11,10 @@ export default {
    * @return {Promise}
    */
   get: context => {
-    const operationObject = context.getter(getters.OAS_OPERATION_OBJECT, VIRON_URI, 'get');
-    const api = context.getter(getters.OAS_API, operationObject.operationId);
-    const currentEndpointKey = context.getter(getters.CURRENT);
-    const currentEndpoint = context.getter(getters.ENDPOINTS_ONE, currentEndpointKey);
+    const operationObject = context.getter('oas.operationObject', VIRON_URI, 'get');
+    const api = context.getter('oas.api', operationObject.operationId);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
     const token = currentEndpoint.token;
     const networkingId = `networking_${Date.now()}`;
 

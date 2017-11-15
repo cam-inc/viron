@@ -1,6 +1,5 @@
 import encode from 'mout/queryString/encode';
 import { fetch } from '../../core/fetch';
-import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
 // swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
@@ -72,8 +71,8 @@ export default {
    * @return {Promise}
    */
   getAutocomplete: (context, path, query) => {
-    const currentEndpointKey = context.getter(getters.CURRENT);
-    const currentEndpoint = context.getter(getters.ENDPOINTS_ONE, currentEndpointKey);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
     const token = currentEndpoint.token;
     const url = `${new URL(currentEndpoint.url).origin}${path}${encode(query)}`;
     return Promise

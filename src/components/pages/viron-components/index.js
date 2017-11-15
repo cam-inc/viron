@@ -8,7 +8,6 @@ import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
 import chart from '../../../core/chart';
 import { constants as actions } from '../../../store/actions';
-import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../organisms/viron-component/search.tag';
 import '../../atoms/viron-message/index.tag';
@@ -16,10 +15,10 @@ import '../../atoms/viron-message/index.tag';
 export default function() {
   const store = this.riotx.get();
 
-  this.name = store.getter(getters.PAGE_NAME);
-  this.tableComponents = store.getter(getters.PAGE_COMPONENTS_TABLE);
-  this.notTableComponents = store.getter(getters.PAGE_COMPONENTS_NOT_TABLE);
-  this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
+  this.name = store.getter('page.name');
+  this.tableComponents = store.getter('page.componentsTable');
+  this.notTableComponents = store.getter('page.componentsNotTable');
+  this.componentsCount = store.getter('page.componentsCount');
   // リクエストパラメータ定義。
   this.parameterObjects = [];
   // tooltip表示中か否か。
@@ -47,7 +46,7 @@ export default function() {
   };
   // componentで定義されている値のみ抽出します。
   this.getCurrentSearchRequestParametersForComponent = component => {
-    const parameterObjects = store.getter(getters.OAS_PARAMETER_OBJECTS, component.api.path, component.api.method);
+    const parameterObjects = store.getter('oas.parameterObjects', component.api.path, component.api.method);
     const names = [];
     forEach(parameterObjects, parameterObject => {
       names.push(parameterObject.name);
@@ -101,23 +100,23 @@ export default function() {
   });
 
   this.listen(states.LAYOUT, () => {
-    const columnCount = store.getter(getters.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT);
+    const columnCount = store.getter('layout.componentsGridColumnCount');
     document.documentElement.style.setProperty('--page-components-grid-column-count', columnCount);
     // tauchartはresize時に自動で再レンダリングするが、column数変更時にはresizeイベントが発火しないため再レンダリングが実行されない。
     // column数変更時も再レンダリングさせるために手動でresizeイベントハンドラを実行する。
     chart.Chart.resizeOnWindowEvent();
   });
   this.listen(states.PAGE, () => {
-    this.name = store.getter(getters.PAGE_NAME);
-    this.tableComponents = store.getter(getters.PAGE_COMPONENTS_TABLE);
-    this.notTableComponents = store.getter(getters.PAGE_COMPONENTS_NOT_TABLE);
-    this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
+    this.name = store.getter('page.name');
+    this.tableComponents = store.getter('page.componentsTable');
+    this.notTableComponents = store.getter('page.componentsNotTable');
+    this.componentsCount = store.getter('page.componentsCount');
     this.update();
     updateGridColumnCount();
   });
 
   this.listen(states.COMPONENTS, () => {
-    this.parameterObjects = store.getter(getters.COMPONENTS_PARAMETER_OBJECTS);
+    this.parameterObjects = store.getter('components.parameterObjectsEntirely');
     this.update();
   });
 

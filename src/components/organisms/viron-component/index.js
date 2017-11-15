@@ -5,7 +5,6 @@ import keys from 'mout/object/keys';
 import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
 import { constants as actions } from '../../../store/actions';
-import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../atoms/viron-message/index.tag';
 import './filter.tag';
@@ -262,17 +261,17 @@ export default function() {
 
   this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
     this.isPending = false;
-    this.response = store.getter(getters.COMPONENTS_ONE_RESPONSE, this._riot_id);
-    this.schemaObject = store.getter(getters.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
-    this.parameterObjects = store.getter(getters.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
-    this.selfActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
-    this.rowActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
-    this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
-    this.autoRefreshSec = store.getter(getters.COMPONENTS_ONE_AUTO_REFRESH_SEC, this._riot_id);
-    this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION, this._riot_id);
-    this.primaryKey = store.getter(getters.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
-    this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
-    this.tableColumns = store.getter(getters.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
+    this.response = store.getter('components.response', this._riot_id);
+    this.schemaObject = store.getter('components.schemaObject', this._riot_id);
+    this.parameterObjects = store.getter('components.parameterObjects', this._riot_id);
+    this.selfActions = store.getter('components.selfActions', this._riot_id);
+    this.rowActions = store.getter('components.rowActions', this._riot_id);
+    this.hasPagination = store.getter('components.hasPagination', this._riot_id);
+    this.autoRefreshSec = store.getter('components.autoRefreshSec', this._riot_id);
+    this.pagination = store.getter('components.pagination', this._riot_id);
+    this.primaryKey = store.getter('components.primaryKey', this._riot_id);
+    this.tableLabels = store.getter('components.tableLabels', this._riot_id);
+    this.tableColumns = store.getter('components.tableColumns', this._riot_id);
     this.validateResponse(this.response);
     activateAutoRefresh();
     this.update();

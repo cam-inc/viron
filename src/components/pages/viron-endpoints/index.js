@@ -1,5 +1,4 @@
 import { constants as actions } from '../../../store/actions';
-import { constants as getters } from '../../../store/getters';
 import { constants as states } from '../../../store/states';
 import '../../atoms/viron-message/index.tag';
 import './edit.tag';
@@ -9,19 +8,19 @@ import './signin.tag';
 export default function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER_FILTERED);
-  this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
-  this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
+  this.endpoints = store.getter('endpoints.allByOrderFiltered');
+  this.endpointsCount = store.getter('endpoints.count');
+  this.endpointFilterText = store.getter('application.endpointFilterText');
 
   this.listen(states.ENDPOINTS, () => {
-    this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER_FILTERED);
-    this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+    this.endpoints = store.getter('endpoints.allByOrderFiltered');
+    this.endpointsCount = store.getter('endpoints.count');
     this.update();
   });
 
   this.listen(states.APPLICATION, () => {
-    this.endpoints = store.getter(getters.ENDPOINTS_BY_ORDER_FILTERED);
-    this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
+    this.endpoints = store.getter('endpoints.allByOrderFiltered');
+    this.endpointFilterText = store.getter('application.endpointFilterText');
     this.update();
   });
 
@@ -41,7 +40,7 @@ export default function() {
           .then(() => store.action(actions.AUTH_GET_TYPES, key))
           .then(authtypes => store.action(actions.MODALS_ADD, 'viron-endpoint-signin', {
             key,
-            endpoint: store.getter(getters.ENDPOINTS_ONE, key),
+            endpoint: store.getter('endpoints.one', key),
             authtypes,
             onSignin: () => {
               this.getRouter().navigateTo(`/${key}`);
@@ -58,7 +57,7 @@ export default function() {
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'viron-endpoint-edit', {
         endpointKey: key,
-        endpoint: store.getter(getters.ENDPOINTS_ONE, key)
+        endpoint: store.getter('endpoints.one', key)
       }))
       .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
         error: err
@@ -78,7 +77,7 @@ export default function() {
   };
 
   this.handleEndpointQrCode = key => {
-    const endpoint = store.getter(getters.ENDPOINTS_ONE, key);
+    const endpoint = store.getter('endpoints.one', key);
     Promise
       .resolve()
       .then(() => store.action(actions.MODALS_ADD, 'viron-endpoint-qrcode', {

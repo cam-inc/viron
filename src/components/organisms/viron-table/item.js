@@ -1,7 +1,6 @@
 import contains from 'mout/array/contains';
 import clipboard from 'clipboard-js';
 import { constants as actions } from '../../../store/actions';
-import { constants as getters } from '../../../store/getters';
 import '../../atoms/viron-message/index.tag';
 
 export default function() {
@@ -9,10 +8,10 @@ export default function() {
 
   this.handleClick = () => {
     // ブラウザによってコピー機能を無効化する。
-    if (store.getter(getters.UA_IS_EDGE)) {
+    if (store.getter('ua.isEdge')) {
       return;
     }
-    if (store.getter(getters.UA_IS_FIREFOX)) {
+    if (store.getter('ua.isFirefox')) {
       return;
     }
 

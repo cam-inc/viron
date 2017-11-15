@@ -1,7 +1,6 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
 import { constants as actions } from '../../store/actions';
-import { constants as getters } from '../../store/getters';
 import { constants as states } from '../../store/states';
 
 export default function() {
@@ -24,9 +23,9 @@ export default function() {
     }, 1000);
   };
 
-  this.layoutType = store.getter(getters.LAYOUT_TYPE);
+  this.layoutType = store.getter('layout.type');
   this.listen(states.LAYOUT, () => {
-    this.layoutType = store.getter(getters.LAYOUT_TYPE);
+    this.layoutType = store.getter('layout.type');
     this.update();
   });
 

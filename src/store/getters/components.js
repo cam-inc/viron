@@ -7,66 +7,67 @@ import isArray from 'mout/lang/isArray';
 import forOwn from 'mout/object/forOwn';
 import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
+import exporter from './exporter';
 
-export default {
+export default exporter('components', {
   /**
    * 全情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  all: context => {
-    return context.state.components;
+  all: state => {
+    return state.state.components;
   },
 
   /**
    * 指定riotIDに対する要素を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Object}
    */
-  one: (context, riotId) => {
-    return context.state.components[riotId];
+  one: (state, riotId) => {
+    return state.components[riotId];
   },
 
   /**
    * 指定riotIDに対する要素のAPIレスポンスを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {*}
    */
-  response: (context, riotId) => {
-    return context.state.components[riotId].response;
+  response: (state, riotId) => {
+    return state.components[riotId].response;
   },
 
   /**
    * 指定riotIDに対する要素のschemaObjectを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Object}
    */
-  schemaObject: (context, riotId) => {
-    return context.state.components[riotId].schemaObject;
+  schemaObject: (state, riotId) => {
+    return state.components[riotId].schemaObject;
   },
 
   /**
    * 指定riotIDに対する要素のparamterObject群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Array}
    */
-  parameterObjects: (context, riotId) => {
-    return context.state.components[riotId].parameterObjects;
+  parameterObjects: (state, riotId) => {
+    return state.components[riotId].parameterObjects;
   },
 
   /**
    * 全てののparamterObject群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  parameterObjectsEntirely: context => {
+  parameterObjectsEntirely: state => {
     let entireParameterObjects = [];
     const weights = {};
-    forOwn(context.state.components, component => {
+    forOwn(state.components, component => {
       entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
     });
     entireParameterObjects = map(entireParameterObjects, entireParameterObject => {
@@ -89,24 +90,24 @@ export default {
 
   /**
    * action(operationObject)群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Array}
    */
-  actions: (context, riotId) => {
-    return map(context.state.components[riotId].actions, action => {
+  actions: (state, riotId) => {
+    return map(state.components[riotId].actions, action => {
       return action.operationObject;
     });
   },
 
   /**
    * 自身に関連するaction(operationObject)群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Array}
    */
-  selfActions: (context, riotId) => {
-    const actions = context.state.components[riotId].actions;
+  selfActions: (state, riotId) => {
+    const actions = state.components[riotId].actions;
     const selfActions = filter(actions, action => {
       return (!action.appendTo || action.appendTo === 'self');
     });
@@ -117,12 +118,12 @@ export default {
 
   /**
    * テーブル行に関連するaction(operationObject)群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Array}
    */
-  rowActions: (context, riotId) => {
-    const actions = context.state.components[riotId].actions;
+  rowActions: (state, riotId) => {
+    const actions = state.components[riotId].actions;
     const selfActions = filter(actions, action => {
       return (action.appendTo === 'row');
     });
@@ -133,52 +134,52 @@ export default {
 
   /**
    * 指定riotIDに対する要素のページング機能ON/OFFを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Boolean}
    */
-  hasPagination: (context, riotId) => {
-    return context.state.components[riotId].hasPagination;
+  hasPagination: (state, riotId) => {
+    return state.components[riotId].hasPagination;
   },
 
   /**
    * 指定riotIDに対する要素の自動更新secを取得します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Number}
    */
-  autoRefreshSec: (context, riotId) => {
-    return context.state.components[riotId].autoRefreshSec;
+  autoRefreshSec: (state, riotId) => {
+    return state.components[riotId].autoRefreshSec;
   },
 
   /**
    * 指定riotIDに対する要素のページング情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Object}
    */
-  pagination: (context, riotId) => {
-    return context.state.components[riotId].pagination;
+  pagination: (state, riotId) => {
+    return state.components[riotId].pagination;
   },
 
   /**
    * テーブル行のラベルに使用するkey群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Array}
    */
-  tableLabels: (context, riotId) => {
-    return context.state.components[riotId].table_labels || [];
+  tableLabels: (state, riotId) => {
+    return state.components[riotId].table_labels || [];
   },
 
   /**
    * テーブル列のキー群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {Array}
    */
-  tableColumns: (context, riotId) => {
-    const response = context.state.components[riotId].response;
+  tableColumns: (state, riotId) => {
+    const response = state.components[riotId].response;
     if (!isArray(response) || !response.length) {
       return [];
     }
@@ -187,11 +188,11 @@ export default {
 
   /**
    * テーブル行に使用するprimaryキーを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} riotId
    * @return {String|null}
    */
-  primaryKey: (context, riotId) => {
-    return context.state.components[riotId].primaryKey || null;
+  primaryKey: (state, riotId) => {
+    return state.components[riotId].primaryKey || null;
   }
-};
+});

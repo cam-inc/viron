@@ -1,4 +1,3 @@
-import { constants as getters } from '../../../store/getters';
 
 export default function() {
   const store = this.riotx.get();
@@ -7,7 +6,7 @@ export default function() {
   this.icon = this.opts.icon;
   // actionの場合はmethodから判定する。
   if (this.opts.isaction) {
-    const method = store.getter(getters.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID, this.opts.action.operationId);
+    const method = store.getter('oas.pathItemObjectMethodNameByOperationId', this.opts.action.operationId);
     switch (method) {
     case 'get':
       this.icon = 'download';

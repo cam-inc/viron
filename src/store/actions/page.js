@@ -1,5 +1,4 @@
 import find from 'mout/object/find';
-import { constants as getters } from '../getters';
 import { constants as mutations } from '../mutations';
 
 export default {
@@ -13,7 +12,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        const pages = context.getter(getters.VIRON_PAGES);
+        const pages = context.getter('viron.pages');
         const page = find(pages, page => {
           return (page.id === pageId);
         });

@@ -1,5 +1,4 @@
 import { constants as actions } from '../../store/actions';
-import { constants as getters } from '../../store/getters';
 import '../../components/viron-error/index.tag';
 
 export default {
@@ -12,7 +11,7 @@ export default {
    */
   onBefore: (store, route, replace) => {
     const endpointKey = route.params.endpointKey;
-    const endpoint = store.getter(getters.ENDPOINTS_ONE, endpointKey);
+    const endpoint = store.getter('endpoints.one', endpointKey);
 
     // endpointが存在しなければTOPに戻す。
     if (!endpoint) {
@@ -31,7 +30,7 @@ export default {
       .then(() => store.action(actions.CURRENT_UPDATE, endpointKey))
       .then(() => {
         // 無駄な通信を減らすために、`viron`データを未取得の場合のみfetchする。
-        const isVironExist = store.getter(getters.VIRON_EXISTENCE);
+        const isVironExist = store.getter('viron.existence');
         if (isVironExist) {
           return Promise.resolve();
         }
@@ -44,7 +43,7 @@ export default {
         // pageが指定されていない場合は`viron`のpageリストの先頭項目を自動選択する。
         if (!route.params.page) {
           return Promise.resolve().then(() => {
-            const pageName = store.getter(getters.VIRON_PAGES_ID_OF, 0);
+            const pageName = store.getter('viron.pageIdOf', 0);
             replace(`/${endpointKey}/${pageName}`);
           });
         }

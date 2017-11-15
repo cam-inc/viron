@@ -1,37 +1,39 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('location', {
   /**
    * 全情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  all: context => {
-    return context.state.location;
+  all: state => {
+    return state.location;
   },
 
   /**
    * トップページか判定します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  isTop: context => {
-    return (context.state.location.name === 'endpoints');
+  isTop: state => {
+    return (state.location.name === 'endpoints');
   },
 
   /**
    * ページ名を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {String}
    */
-  name: context => {
-    return context.state.location.name;
+  name: state => {
+    return state.location.name;
   },
 
   /**
    * ルーティング情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  route: context => {
-    return context.state.location.route;
+  route: state => {
+    return state.location.route;
   }
-};
+});

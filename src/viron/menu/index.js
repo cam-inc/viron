@@ -1,4 +1,3 @@
-import { constants as getters } from '../../store/getters';
 import { constants as states } from '../../store/states';
 
 export default function() {
@@ -8,9 +7,9 @@ export default function() {
     this.close();
   };
 
-  this.menu = store.getter(getters.VIRON_MENU);
+  this.menu = store.getter('viron.menu');
   this.listen(states.VIRON, () => {
-    this.menu = store.getter(getters.VIRON_MENU);
+    this.menu = store.getter('viron.menu');
     this.update();
   });
 

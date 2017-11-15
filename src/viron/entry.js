@@ -1,6 +1,4 @@
 import { constants as actions } from '../store/actions';
-import { constants as getters } from '../store/getters';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -10,7 +8,7 @@ export default function() {
 
   this.handleEndpointURLChange = newEndpointURL => {
     this.endpointURL = newEndpointURL;
-    this.isExist = !!store.getter(getters.ENDPOINTS_ONE_BY_URL, newEndpointURL);
+    this.isExist = !!store.getter('endpoints.oneByURL', newEndpointURL);
     this.update();
   };
 

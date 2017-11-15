@@ -1,10 +1,12 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('toasts', {
   /**
    * 全てのトースト情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  all: context => {
-    return context.state.toasts;
+  all: state => {
+    return state.toasts;
   }
-};
+});

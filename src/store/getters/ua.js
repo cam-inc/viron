@@ -1,56 +1,58 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('ua', {
   /**
    * 全情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  all: context => {
-    return context.state.ua;
+  all: state => {
+    return state.ua;
   },
 
   /**
    * Chromeか否かを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isChrome: context => {
-    return !!context.state.ua.chrome;
+  isChrome: state => {
+    return !!state.ua.chrome;
   },
 
   /**
    * Safariか否かを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isSafari: context => {
-    return !!context.state.ua.safari;
+  isSafari: state => {
+    return !!state.ua.safari;
   },
 
   /**
    * Edgeか否かを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isEdge: context => {
-    return !!context.state.ua.edge;
+  isEdge: state => {
+    return !!state.ua.edge;
   },
 
   /**
    * Firefoxか否かを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isFirefox: context => {
-    return !!context.state.ua.firefox;
+  isFirefox: state => {
+    return !!state.ua.firefox;
   },
 
   /**
    * 使用しているブラウザを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  usingBrowser: context => {
-    const ua = context.state.ua;
+  usingBrowser: state => {
+    const ua = state.ua;
     if (!!ua.chrome) {
       return 'chrome';
     }
@@ -66,4 +68,4 @@ export default {
 
     return null;
   }
-};
+});

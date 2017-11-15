@@ -1,53 +1,54 @@
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
 import ObjectAssign from 'object-assign';
+import exporter from './exporter';
 
-export default {
+export default exporter('oas', {
   /**
    * SwaggerClientを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {SwaggerClient}
    */
-  client: context => {
-    return context.state.oas.client;
+  client: state => {
+    return state.oas.client;
   },
 
   /**
    * resolve済みのOpenAPI Documentを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  spec: context => {
-    return context.state.oas.client.spec;
+  spec: state => {
+    return state.oas.client.spec;
   },
 
   /**
    * resolve前のオリジナルのOpenAPI Documentを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  originalSpec: context => {
-    return context.state.oas.client.originalSpec;
+  originalSpec: state => {
+    return state.oas.client.originalSpec;
   },
 
   /**
    * resolveされたAPI群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  apis: context => {
-    return context.state.oas.client.apis;
+  apis: state => {
+    return state.oas.client.apis;
   },
 
   /**
    * resolveされたAPI群をflatな構成にして返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  flatApis: context => {
+  flatApis: state => {
     // client.apisはタグ分けされているので、まずflatな構成にする。
     const apis = {};
-    forOwn(context.state.oas.client.apis, obj => {
+    forOwn(state.oas.client.apis, obj => {
       forOwn(obj, (api, operationId) => {
         apis[operationId] = api;
       });
@@ -57,13 +58,13 @@ export default {
 
   /**
    * 指定したoperationIdにマッチするresolveされたAPIを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} operationId
    * @return {Function}
    */
-  api: (context, operationId) => {
+  api: (state, operationId) => {
     const apis = {};
-    forOwn(context.state.oas.client.apis, obj => {
+    forOwn(state.oas.client.apis, obj => {
       forOwn(obj, (api, operationId) => {
         apis[operationId] = api;
       });
@@ -73,16 +74,16 @@ export default {
 
   /**
    * 指定したpathとmethodにマッチするresolveされたAPIを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} path
    * @param {String} method
    * @return {Function}
    */
-  apiByPathAndMethod: (context, path, method) => {
-    const operationObject = context.state.oas.client.spec.paths[path][method];
+  apiByPathAndMethod: (state, path, method) => {
+    const operationObject = state.oas.client.spec.paths[path][method];
     const operationId = operationObject.operationId;
     const apis = {};
-    forOwn(context.state.oas.client.apis, obj => {
+    forOwn(state.oas.client.apis, obj => {
       forOwn(obj, (api, operationId) => {
         apis[operationId] = api;
       });
@@ -92,23 +93,23 @@ export default {
 
   /**
    * 指定したpathにマッチするPathItemObjectを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} path
    * @return {Object}
    */
-  pathItemObject: (context, path) => {
-    return context.state.oas.client.spec.paths[path];
+  pathItemObject: (state, path) => {
+    return state.oas.client.spec.paths[path];
   },
 
   /**
    * 指定したoperationIdにマッチするPathItemObjectのmethod名を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} operationId
    * @return {String}
    */
-  pathItemObjectMethodNameByOperationId: (context, operationId) => {
+  pathItemObjectMethodNameByOperationId: (state, operationId) => {
     let ret;
-    forOwn(context.state.oas.client.spec.paths, pathItemObject => {
+    forOwn(state.oas.client.spec.paths, pathItemObject => {
       if (!!ret) {
         return;
       }
@@ -126,22 +127,22 @@ export default {
 
   /**
    * 指定したpathとmethodにマッチするOperationObjectを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} path
    * @param {String} method
    * @return {Object}
    */
-  operationObject: (context, path, method) => {
-    return context.state.oas.client.spec.paths[path][method];
+  operationObject: (state, path, method) => {
+    return state.oas.client.spec.paths[path][method];
   },
 
   /**
    * 指定したcomponentに関連するOperationObject(action)群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {Object} component
    * @return {Array}
    */
-  operationObjectsAsAction: (context, component) => {
+  operationObjectsAsAction: (state, component) => {
     const methods = ['get','put', 'post', 'delete'];
     const basePath = component.api.path;
     const primaryKey = component.primary;
@@ -155,7 +156,7 @@ export default {
       if (method === 'get') {
         return;
       }
-      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath] && !!context.state.oas.client.spec.paths[basePath][method];
+      const isOperationObjectDefined = !!state.oas.client.spec.paths[basePath] && !!state.oas.client.spec.paths[basePath][method];
       if (!isOperationObjectDefined) {
         return;
       }
@@ -170,7 +171,7 @@ export default {
     if (!!primaryKey) {
       const listBasePath = `${basePath}/{${primaryKey}}`;
       forEach(methods, method => {
-        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath] && !!context.state.oas.client.spec.paths[listBasePath][method];
+        const isOperationObjectDefined = !!state.oas.client.spec.paths[listBasePath] && !!state.oas.client.spec.paths[listBasePath][method];
         if (!isOperationObjectDefined) {
           return;
         }
@@ -187,7 +188,7 @@ export default {
     forEach(actions, actionBasePath => {
       const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
       forEach(methods, method => {
-        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath] && !!context.state.oas.client.spec.paths[actionBasePath][method];
+        const isOperationObjectDefined = !!state.oas.client.spec.paths[actionBasePath] && !!state.oas.client.spec.paths[actionBasePath][method];
         if (!isOperationObjectDefined) {
           return;
         }
@@ -202,7 +203,7 @@ export default {
     // OperationObject群を抽出します。
     const operationObjects = [];
     forEach(pathRefs, ref => {
-      const operationObject = context.state.oas.client.spec.paths[ref.path][ref.method];
+      const operationObject = state.oas.client.spec.paths[ref.path][ref.method];
       operationObjects.push(ObjectAssign({
         operationObject
       }, ref));
@@ -213,60 +214,60 @@ export default {
 
   /**
    * 指定したpathとmethodにマッチするOperationObjectのoperationIdを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} path
    * @param {String} method
    * @return {String}
    */
-  operationId: (context, path, method) => {
-    return context.state.oas.client.spec.paths[path][method].operationId;
+  operationId: (state, path, method) => {
+    return state.oas.client.spec.paths[path][method].operationId;
   },
 
   /**
    * 指定したpathとmethodにマッチするOperationObjectのParameterObject群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} path
    * @param {String} method
    * @return {Array}
    */
-  parameterObjects: (context, path, method) => {
-    return context.state.oas.client.spec.paths[path][method].parameters || [];
+  parameterObjects: (state, path, method) => {
+    return state.oas.client.spec.paths[path][method].parameters || [];
   },
 
   /**
    * 指定したpathとmethodにマッチするOperationObject群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} path
    * @param {String} method
    * @return {Object}
    */
-  responseObjects: (context, path, method) => {
-    return context.state.oas.client.spec.paths[path][method].responses;
+  responseObjects: (state, path, method) => {
+    return state.oas.client.spec.paths[path][method].responses;
   },
 
   /**
    * 指定したpathとmethodにマッチするOperationObjectのresponseObjectを返します。
    * statusCodeを指定しない場合はデフォルトで200に設定されます。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} path
    * @param {String} method
    * @param {Number} statusCode
    * @return {Object}
    */
-  responseObject: (context, path, method, statusCode = 200) => {
-    return context.state.oas.client.spec.paths[path][method].responses[statusCode];
+  responseObject: (state, path, method, statusCode = 200) => {
+    return state.oas.client.spec.paths[path][method].responses[statusCode];
   },
 
   /**
    * 指定したpathとmethodにマッチするOperationObjectのresponseObjectのschemaObjectを返します。
    * statusCodeを指定しない場合はデフォルトで200に設定されます。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} path
    * @param {String} method
    * @param {Number} statusCode
    * @return {Object}
    */
-  schemaObject: (context, path, method, statusCode = 200) => {
-    return context.state.oas.client.spec.paths[path][method].responses[statusCode].schema;
+  schemaObject: (state, path, method, statusCode = 200) => {
+    return state.oas.client.spec.paths[path][method].responses[statusCode].schema;
   }
-};
+});

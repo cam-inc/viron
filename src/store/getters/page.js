@@ -1,23 +1,24 @@
 import filter from 'mout/array/filter';
 import reject from 'mout/array/reject';
+import exporter from './exporter';
 
-export default {
+export default exporter('page', {
   /**
    * 全情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  all: context => {
-    return context.state.page || {};
+  all: state => {
+    return state.page || {};
   },
 
   /**
    * ページIDを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {String}
    */
-  id: context => {
-    const page = context.state.page;
+  id: state => {
+    const page = state.page;
     if (!page) {
       return '';
     }
@@ -26,11 +27,11 @@ export default {
 
   /**
    * ページ名を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {String}
    */
-  name: context => {
-    const page = context.state.page;
+  name: state => {
+    const page = state.page;
     if (!page) {
       return '';
     }
@@ -39,11 +40,11 @@ export default {
 
   /**
    * コンポーネント群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  components: context => {
-    const page = context.state.page;
+  components: state => {
+    const page = state.page;
     if (!page) {
       return [];
     }
@@ -52,11 +53,11 @@ export default {
 
   /**
    * table表示のコンポーネント群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  componentsTable: context => {
-    const page = context.state.page;
+  componentsTable: state => {
+    const page = state.page;
     if (!page) {
       return [];
     }
@@ -67,11 +68,11 @@ export default {
 
   /**
    * table表示以外のコンポーネント群を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  componentsNotTable: context => {
-    const page = context.state.page;
+  componentsNotTable: state => {
+    const page = state.page;
     if (!page) {
       return [];
     }
@@ -82,14 +83,14 @@ export default {
 
   /**
    * コンポーネント数を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Number}
    */
-  componentsCount: context => {
-    const page = context.state.page;
+  componentsCount: state => {
+    const page = state.page;
     if (!page) {
       return 0;
     }
     return (page.components || []).length;
   }
-};
+});
