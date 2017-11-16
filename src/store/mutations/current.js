@@ -9,7 +9,9 @@ export default exporter('current', {
    * @return {Array}
    */
   all: (state, endpointKey) => {
-    state.current = storage.set('current', endpointKey);
+    const version = state.application.version;
+    state.current[version] = endpointKey;
+    storage.set('current', state.current);
     return ['current'];
   }
 });

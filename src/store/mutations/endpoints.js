@@ -47,10 +47,11 @@ export default exporter('endpoints', {
       // リストの先頭に配置するために意図的にマイナス値を付与。
       endpoint.order = -1;
     }
-    let newEndpoints = ObjectAssign({}, state.endpoints);
+    const version = state.application.version;
+    let newEndpoints = ObjectAssign({}, state.endpoints[version]);
     newEndpoints[endpointKey] = endpoint;
     newEndpoints = putEndpointsInOrder(newEndpoints);
-    state.endpoints = newEndpoints;
+    state.endpoints[version] = newEndpoints;
     storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
@@ -62,10 +63,11 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   remove: (state, endpointKey) => {
-    let newEndpoints = ObjectAssign({}, state.endpoints);
+    const version = state.application.version;
+    let newEndpoints = ObjectAssign({}, state.endpoints[version]);
     delete newEndpoints[endpointKey];
     newEndpoints = putEndpointsInOrder(newEndpoints);
-    state.endpoints = newEndpoints;
+    state.endpoints[version] = newEndpoints;
     storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
@@ -76,7 +78,8 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   removeAll: state => {
-    state.endpoints = {};
+    const version = state.application.version;
+    state.endpoints[version] = {};
     storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
@@ -89,10 +92,12 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   update: (state, endpointKey, endpoint) => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version];
     if (!endpoint) {
-      state.endpoints[endpointKey] = null;
+      endpoints[endpointKey] = null;
     } else {
-      state.endpoints[endpointKey] = ObjectAssign({}, state.endpoints[endpointKey], endpoint);
+      endpoints[endpointKey] = ObjectAssign({}, endpoints[endpointKey], endpoint);
     }
     storage.set('endpoints', state.endpoints);
     return ['endpoints'];
@@ -106,8 +111,10 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   updateToken: (state, endpointKey, token) => {
-    if (!!state.endpoints[endpointKey]) {
-      state.endpoints[endpointKey].token = token;
+    const version = state.application.version;
+    const endpoints = state.endpoints[version];
+    if (!!endpoints[endpointKey]) {
+      endpoints[endpointKey].token = token;
     }
     storage.set('endpoints', state.endpoints);
     return ['endpoints'];
@@ -120,7 +127,8 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   mergeAll: (state, endpoints) => {
-    let modifiedEndpoints = ObjectAssign({}, state.endpoints);
+    const version = state.application.version;
+    let modifiedEndpoints = ObjectAssign({}, state.endpoints[version]);
 
     forOwn(endpoints, endpoint => {
       let duplicatedEndpoint = find(modifiedEndpoints, val => {
@@ -136,8 +144,8 @@ export default exporter('endpoints', {
     });
 
     modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
-    state.endpoints = modifiedEndpoints;
-    storage.set('endpoints', modifiedEndpoints);
+    state.endpoints[version] = modifiedEndpoints;
+    storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
 
@@ -148,9 +156,10 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   tidyUpOrder: state => {
-    const newEndpoints = putEndpointsInOrder(ObjectAssign(state.endpoints));
-    state.endpoints = newEndpoints;
-    storage.set('endpoints', newEndpoints);
+    const version = state.application.version;
+    const newEndpoints = putEndpointsInOrder(ObjectAssign({}, state.endpoints[version]));
+    state.endpoints[version] = newEndpoints;
+    storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
 
@@ -163,12 +172,13 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   changeOrder: (state, endpointKey, newOrder) => {
-    let newEndpoints = ObjectAssign(state.endpoints);
+    const version = state.application.version;
+    let newEndpoints = ObjectAssign({}, state.endpoints[version]);
     // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
     newEndpoints[endpointKey].order = newOrder - 0.5;
     newEndpoints = putEndpointsInOrder(newEndpoints);
-    state.endpoints = newEndpoints;
-    storage.set('endpoints', newEndpoints);
+    state.endpoints[version] = newEndpoints;
+    storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   }
 });

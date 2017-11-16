@@ -11,6 +11,15 @@ export default exporter('application', {
   },
 
   /**
+   * バージョンを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  version: state => {
+    return state.application.version;
+  },
+
+  /**
    * 起動状態を返します。
    * @param {Object} state
    * @return {Boolean}

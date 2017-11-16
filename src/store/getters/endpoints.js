@@ -77,7 +77,8 @@ export default exporter('endpoints', {
    * @return {Object}
    */
   all: state => {
-    return state.endpoints;
+    const version = state.application.version;
+    return state.endpoints[version] || {};
   },
 
   /**
@@ -86,7 +87,8 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   allByOrder: state => {
-    let endpoints = ObjectAssign(state.endpoints);
+    const version = state.application.version;
+    let endpoints = ObjectAssign({}, state.endpoints[version]);
     endpoints = sortByOrder(endpoints);
     return endpoints;
   },
@@ -97,7 +99,8 @@ export default exporter('endpoints', {
    * @return {Array}
    */
   allByOrderFiltered: state => {
-    let endpoints = ObjectAssign(state.endpoints);
+    const version = state.application.version;
+    let endpoints = ObjectAssign({}, state.endpoints[version]);
     endpoints = sortByOrder(endpoints);
     endpoints = filterBy(endpoints, state.application.endpointFilterText);
     return endpoints;
@@ -109,7 +112,9 @@ export default exporter('endpoints', {
    * @return {Number}
    */
   count: state => {
-    return size(state.endpoints);
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
+    return size(endpoints);
   },
 
   /**
@@ -118,7 +123,8 @@ export default exporter('endpoints', {
    * @return {Object}
    */
   allWithoutToken: state => {
-    const endpoints = ObjectAssign({}, state.endpoints);
+    const version = state.application.version;
+    const endpoints = ObjectAssign({}, state.endpoints[version]);
     // 認証用トークンはexport対象外とする。
     forOwn(endpoints, endpoint => {
       delete endpoint.token;
@@ -133,7 +139,9 @@ export default exporter('endpoints', {
    * @return {Object}
    */
   one: (state, key) => {
-    return state.endpoints[key];
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
+    return endpoints[key];
   },
 
   /**
@@ -143,7 +151,8 @@ export default exporter('endpoints', {
    * @return {Object}
    */
   oneByURL: (state, url) => {
-    const endpoints = state.endpoints;
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
     return find(endpoints, endpoint => {
       return endpoint.url === url;
     });

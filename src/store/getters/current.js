@@ -7,6 +7,7 @@ export default exporter('current', {
    * @return {String|null}
    */
   all: state => {
-    return state.current;
+    const version = state.application.version;
+    return state.current[version];
   }
 });
