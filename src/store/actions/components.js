@@ -1,6 +1,5 @@
 import contentDisposition from 'content-disposition';
 import download from 'downloadjs';
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('components', {
@@ -32,7 +31,7 @@ export default exporter('components', {
 
     return Promise
       .resolve()
-      .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+      .then(() => context.commit('application.addNetworking', {
         id: networkingId
       }))
       .then(() => api(query, {
@@ -50,7 +49,7 @@ export default exporter('components', {
         // tokenを更新する。
         const token = res.headers['Authorization'];
         if (!!token) {
-          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
         // `component.pagination`からページングをサポートしているか判断する。
         // サポートしていれば手動でページング情報を付加する。
@@ -72,7 +71,7 @@ export default exporter('components', {
             hasPagination = true;
           }
         }
-        context.commit(mutations.COMPONENTS_UPDATE_ONE, {
+        context.commit('components.updateOne', {
           component_uid,
           response: res.obj,// APIレスポンス内容そのまま。
           schemaObject: context.getter('oas.schemaObject', path, method),// OASのschema。
@@ -84,10 +83,10 @@ export default exporter('components', {
           primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
           table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
         });
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
       })
       .catch(err => {
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
         throw err;
       });
   },
@@ -107,7 +106,7 @@ export default exporter('components', {
 
     return Promise
       .resolve()
-      .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+      .then(() => context.commit('application.addNetworking', {
         id: networkingId
       }))
       .then(() => api(params, {
@@ -122,11 +121,11 @@ export default exporter('components', {
         return res;
       })
       .then(res => {
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
         // tokenを更新する。
         const token = res.headers['Authorization'];
         if (!!token) {
-          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
         // ダウンロード指定されていればダウンロードする。
         const contentDispositionHeader = res.headers['content-disposition'];
@@ -141,7 +140,7 @@ export default exporter('components', {
         return res;
       })
       .catch(err => {
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
         throw err;
       });
   },
@@ -156,7 +155,7 @@ export default exporter('components', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.COMPONENTS_REMOVE_ONE, component_uid);
+        context.commit('components.removeOne', component_uid);
       });
   },
 
@@ -169,7 +168,7 @@ export default exporter('components', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.COMPONENTS_REMOVE_ALL);
+        context.commit('components.removeAll');
       });
   }
 });

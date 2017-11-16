@@ -6,6 +6,7 @@ import find from 'mout/object/find';
 import ObjectAssign from 'object-assign';
 import shortid from 'shortid';
 import storage from 'store';
+import exporter from './exporter';
 
 /**
  * 受け取ったエンドポイント群をきれいに並び替えます。
@@ -32,94 +33,94 @@ const putEndpointsInOrder = endpoints => {
   return endpoints;
 };
 
-export default {
+export default exporter('endpoints', {
   /**
    * 1件のエンドポイントを追加します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} endpointKey
    * @param {Object} endpoint
    * @return {Array}
    */
-  add: (context, endpointKey, endpoint) => {
+  add: (state, endpointKey, endpoint) => {
     // order値が指定されていなければ自動的に設定する。
     if (!isNumber(endpoint.order)) {
       // リストの先頭に配置するために意図的にマイナス値を付与。
       endpoint.order = -1;
     }
-    let newEndpoints = ObjectAssign({}, context.state.endpoints);
+    let newEndpoints = ObjectAssign({}, state.endpoints);
     newEndpoints[endpointKey] = endpoint;
     newEndpoints = putEndpointsInOrder(newEndpoints);
-    context.state.endpoints = newEndpoints;
-    storage.set('endpoints', context.state.endpoints);
+    state.endpoints = newEndpoints;
+    storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
 
   /**
    * 指定されたエンドポイントを削除します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} endpointKey
    * @return {Array}
    */
-  remove: (context, endpointKey) => {
-    let newEndpoints = ObjectAssign({}, context.state.endpoints);
+  remove: (state, endpointKey) => {
+    let newEndpoints = ObjectAssign({}, state.endpoints);
     delete newEndpoints[endpointKey];
     newEndpoints = putEndpointsInOrder(newEndpoints);
-    context.state.endpoints = newEndpoints;
-    storage.set('endpoints', context.state.endpoints);
+    state.endpoints = newEndpoints;
+    storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
 
   /**
    * 全てのエンドポイントを削除します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  removeAll: context => {
-    context.state.endpoints = {};
-    storage.set('endpoints', context.state.endpoints);
+  removeAll: state => {
+    state.endpoints = {};
+    storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
 
   /**
    * 指定されたエンドポイントを更新します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} endpointKey
    * @param {Object} endpoint
    * @return {Array}
    */
-  update: (context, endpointKey, endpoint) => {
+  update: (state, endpointKey, endpoint) => {
     if (!endpoint) {
-      context.state.endpoints[endpointKey] = null;
+      state.endpoints[endpointKey] = null;
     } else {
-      context.state.endpoints[endpointKey] = ObjectAssign({}, context.state.endpoints[endpointKey], endpoint);
+      state.endpoints[endpointKey] = ObjectAssign({}, state.endpoints[endpointKey], endpoint);
     }
-    storage.set('endpoints', context.state.endpoints);
+    storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
 
   /**
    * 指定されたエンドポイントのtokenを更新します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} endpointKey
    * @param {String|null} token
    * @return {Array}
    */
-  updateToken: (context, endpointKey, token) => {
-    if (!!context.state.endpoints[endpointKey]) {
-      context.state.endpoints[endpointKey].token = token;
+  updateToken: (state, endpointKey, token) => {
+    if (!!state.endpoints[endpointKey]) {
+      state.endpoints[endpointKey].token = token;
     }
-    storage.set('endpoints', context.state.endpoints);
+    storage.set('endpoints', state.endpoints);
     return ['endpoints'];
   },
 
   /**
    * 新エンドポイント群をmergeします。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {Object} endpoints
    * @return {Array}
    */
-  mergeAll: (context, endpoints) => {
-    let modifiedEndpoints = ObjectAssign({}, context.state.endpoints);
+  mergeAll: (state, endpoints) => {
+    let modifiedEndpoints = ObjectAssign({}, state.endpoints);
 
     forOwn(endpoints, endpoint => {
       let duplicatedEndpoint = find(modifiedEndpoints, val => {
@@ -135,7 +136,7 @@ export default {
     });
 
     modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
-    context.state.endpoints = modifiedEndpoints;
+    state.endpoints = modifiedEndpoints;
     storage.set('endpoints', modifiedEndpoints);
     return ['endpoints'];
   },
@@ -143,12 +144,12 @@ export default {
   /**
    * エンドポイント群のorder値を整理します。
    * order値が存在しない場合は後方に配置されます。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  tidyUpOrder: context => {
-    const newEndpoints = putEndpointsInOrder(ObjectAssign(context.state.endpoints));
-    context.state.endpoints = newEndpoints;
+  tidyUpOrder: state => {
+    const newEndpoints = putEndpointsInOrder(ObjectAssign(state.endpoints));
+    state.endpoints = newEndpoints;
     storage.set('endpoints', newEndpoints);
     return ['endpoints'];
   },
@@ -156,18 +157,18 @@ export default {
   /**
    * 指定されたエンドポイントのorder値を変更します。
    * 他エンドポイントのorder値もインクリメントされます。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} endpointKey
    * @param {Number} newOrder
    * @return {Array}
    */
-  changeOrder: (context, endpointKey, newOrder) => {
-    let newEndpoints = ObjectAssign(context.state.endpoints);
+  changeOrder: (state, endpointKey, newOrder) => {
+    let newEndpoints = ObjectAssign(state.endpoints);
     // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
     newEndpoints[endpointKey].order = newOrder - 0.5;
     newEndpoints = putEndpointsInOrder(newEndpoints);
-    context.state.endpoints = newEndpoints;
+    state.endpoints = newEndpoints;
     storage.set('endpoints', newEndpoints);
     return ['endpoints'];
   }
-};
+});

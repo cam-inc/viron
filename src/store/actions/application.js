@@ -1,4 +1,3 @@
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('application', {
@@ -11,7 +10,7 @@ export default exporter('application', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_LAUNCH, true);
+        context.commit('application.launch', true);
       });
   },
 
@@ -24,7 +23,7 @@ export default exporter('application', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_NAVIGATION, true);
+        context.commit('application.navigation', true);
       });
   },
 
@@ -37,7 +36,7 @@ export default exporter('application', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_NAVIGATION, false);
+        context.commit('application.navigation', false);
       });
   },
 
@@ -50,7 +49,7 @@ export default exporter('application', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_DRAG, true);
+        context.commit('application.drag', true);
       });
   },
 
@@ -63,7 +62,7 @@ export default exporter('application', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_DRAG, false);
+        context.commit('application.drag', false);
       });
   },
 
@@ -76,7 +75,7 @@ export default exporter('application', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_MENU_TOGGLE);
+        context.commit('application.menuToggle');
       });
   },
 
@@ -90,7 +89,7 @@ export default exporter('application', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_ENDPOINT_FILTER_TEXT, newFilterText);
+        context.commit('application.endpointFilterText', newFilterText);
       });
   },
 
@@ -103,7 +102,7 @@ export default exporter('application', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_ENDPOINT_FILTER_TEXT, '');
+        context.commit('application.endpointFilterText', '');
       });
   }
 });

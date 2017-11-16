@@ -1,4 +1,3 @@
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('drawers', {
@@ -14,7 +13,7 @@ export default exporter('drawers', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.DRAWERS_ADD, tagName, tagOpts, drawerOpts);
+        context.commit('drawers.add', tagName, tagOpts, drawerOpts);
       });
   },
 
@@ -28,7 +27,7 @@ export default exporter('drawers', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.DRAWERS_REMOVE, drawerId);
+        context.commit('drawers.remove', drawerId);
       });
   }
 });

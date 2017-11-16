@@ -1,37 +1,38 @@
 import { getComponentStateName } from '../states';
+import exporter from './exporter';
 
-export default {
+export default exporter('components', {
   /**
    * 一件更新します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {Object} params
    * @return {Array}
    */
-  updateOne: (context, params) => {
+  updateOne: (state, params) => {
     const component_uid = params.component_uid;
     // 存在しなければ新規作成。
-    context.state.components[component_uid] = params;
+    state.components[component_uid] = params;
     return ['components', getComponentStateName(component_uid)];
   },
 
   /**
    * 一件削除します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} component_uid
    * @return {Array}
    */
-  removeOne: (context, component_uid) => {
-    delete context.state.components[component_uid];
+  removeOne: (state, component_uid) => {
+    delete state.components[component_uid];
     return ['components', getComponentStateName(component_uid)];
   },
 
   /**
    * 全件削除します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  removeAll: context => {
-    context.state.components = {};
+  removeAll: state => {
+    state.components = {};
     return ['components'];
   }
-};
+});

@@ -1,4 +1,3 @@
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('popovers', {
@@ -14,7 +13,7 @@ export default exporter('popovers', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.POPOVERS_ADD, tagName, tagOpts, popoverOpts);
+        context.commit('popovers.add', tagName, tagOpts, popoverOpts);
       });
   },
 
@@ -28,7 +27,7 @@ export default exporter('popovers', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.POPOVERS_REMOVE, popoverId);
+        context.commit('popovers.remove', popoverId);
       });
   }
 });

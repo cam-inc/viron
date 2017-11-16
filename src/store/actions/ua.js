@@ -1,5 +1,4 @@
 import SUA from 'sua.js';
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('ua', {
@@ -13,7 +12,7 @@ export default exporter('ua', {
       .resolve()
       .then(() => {
         const ua = new SUA(navigator.userAgent);
-        context.commit(mutations.UA, ua);
+        context.commit('ua.all', ua);
       });
   }
 });

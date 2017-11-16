@@ -1,22 +1,24 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('oas', {
   /**
    * SwaggerClientインスタンスを設定します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {SwaggerClient} client
    * @return {Array}
    */
-  client: (context, client) => {
-    context.state.oas.client = client;
+  client: (state, client) => {
+    state.oas.client = client;
     return ['oas'];
   },
 
   /**
    * SwaggerClientインスタンスをクリアします。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  clearClient: context => {
-    context.state.oas.client = null;
+  clearClient: state => {
+    state.oas.client = null;
     return ['oas'];
   }
-};
+});

@@ -1,6 +1,5 @@
 import encode from 'mout/queryString/encode';
 import { fetch } from '../../core/fetch';
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 // swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
@@ -46,8 +45,8 @@ export default exporter('oas', {
         return client;
       })
       .then(client => {
-        context.commit(mutations.OAS_CLIENT, client);
-        context.commit(mutations.ENDPOINTS_UPDATE, endpointKey, client.spec.info);
+        context.commit('oas.client', client);
+        context.commit('endpoints.update', endpointKey, client.spec.info);
       });
   },
 
@@ -60,7 +59,7 @@ export default exporter('oas', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.OAS_CLIENT_CLEAR);
+        context.commit('oas.clearClient');
       });
   },
 

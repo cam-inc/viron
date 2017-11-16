@@ -1,4 +1,3 @@
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('location', {
@@ -12,7 +11,7 @@ export default exporter('location', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.LOCATION, obj);
+        context.commit('location.all', obj);
       });
   }
 });

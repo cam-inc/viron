@@ -1,5 +1,4 @@
 import { fetch } from '../../core/fetch';
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('auth', {
@@ -14,7 +13,7 @@ export default exporter('auth', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        context.commit('endpoints.updateToken', endpointKey, token);
       });
   },
 
@@ -28,7 +27,7 @@ export default exporter('auth', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
+        context.commit('endpoints.updateToken', endpointKey, null);
       });
   },
 
@@ -50,7 +49,7 @@ export default exporter('auth', {
       .then(response => {
         const token = response.headers.get('Authorization');
         if (!!token) {
-          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+          context.commit('endpoints.updateToken', endpointKey, token);
         }
         return true;
       })
@@ -58,7 +57,7 @@ export default exporter('auth', {
         if (err.status !== 401) {
           throw err;
         }
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
+        context.commit('endpoints.updateToken', endpointKey, null);
         return false;
       });
   },
@@ -122,7 +121,7 @@ export default exporter('auth', {
       }))
       .then(response => {
         const token = response.headers.get('Authorization');
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        context.commit('endpoints.updateToken', endpointKey, token);
       });
   }
 });

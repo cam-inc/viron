@@ -1,4 +1,3 @@
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('layout', {
@@ -13,7 +12,7 @@ export default exporter('layout', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.LAYOUT_SIZE, width, height);
+        context.commit('layout.updateSize', width, height);
       });
   },
 
@@ -27,7 +26,7 @@ export default exporter('layout', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT, count);
+        context.commit('layout.updateComponentsGridColumnCount', count);
       });
   }
 });

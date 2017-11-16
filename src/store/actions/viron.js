@@ -1,5 +1,4 @@
 import ObjectAssign from 'object-assign';
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 // APIは必須でサポートしなければならない URI
@@ -21,7 +20,7 @@ export default exporter('viron', {
 
     return Promise
       .resolve()
-      .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+      .then(() => context.commit('application.addNetworking', {
         id: networkingId
       }))
       .then(() => api({}, {
@@ -39,17 +38,17 @@ export default exporter('viron', {
         // tokenを更新する。
         const token = res.headers['Authorization'];
         if (!!token) {
-          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
-        context.commit(mutations.VIRON, res.obj);
+        context.commit('viron.all', res.obj);
         const endpoint = ObjectAssign({}, res.obj);
         // pagesは不要なので削除。
         delete endpoint.pages;
-        context.commit(mutations.ENDPOINTS_UPDATE, currentEndpointKey, endpoint);
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('endpoints.update', currentEndpointKey, endpoint);
+        context.commit('application.removeNetworking', networkingId);
       })
       .catch(err => {
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
         throw err;
       });
   },
@@ -63,7 +62,7 @@ export default exporter('viron', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.VIRON, null);
+        context.commit('viron.all', null);
       });
   }
 });

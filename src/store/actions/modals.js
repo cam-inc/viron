@@ -1,4 +1,3 @@
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 // モーダルを多重起動しないよう判定する変数
@@ -18,7 +17,7 @@ export default exporter('modals', {
   add: (context, tagName, tagOpts, modalOpts) => {
     if (!canCreateModal) {
       console.warn('多重に起動しないよう、一定時間のモーダル作成を規制する。'); // eslint-disable-line no-console
-      return;
+      return Promise.resolve();
     }
 
     // モーダル作成を一時的に不可にする。
@@ -33,7 +32,7 @@ export default exporter('modals', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.MODALS_ADD, tagName, tagOpts, modalOpts);
+        context.commit('modals.add', tagName, tagOpts, modalOpts);
       });
   },
 
@@ -47,7 +46,7 @@ export default exporter('modals', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.MODALS_REMOVE, modalId);
+        context.commit('modals.remove', modalId);
       });
   }
 });

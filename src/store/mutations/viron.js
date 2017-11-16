@@ -1,14 +1,15 @@
 import combine from 'mout/array/combine';
 import find from 'mout/array/find';
 import { i18n } from '../../core/i18n';
+import exporter from './exporter';
 
-export default {
+export default exporter('viron', {
   /**
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {Object|null} viron
    * @return {Array}
    */
-  all: (context, viron) => {
+  all: (state, viron) => {
     // メニューのカテゴライズ。下位互換のため、dashboardとmanageは必須項目とする。
     if (!!viron) {
       viron.sections = viron.sections || [];
@@ -23,7 +24,7 @@ export default {
         viron.sections = combine([{ id: 'dashboard', label: i18n.t('word.dashboard') }], viron.sections);
       }
     }
-    context.state.viron = viron;
+    state.viron = viron;
     return ['viron'];
   }
-};
+});

@@ -1,16 +1,17 @@
 import reject from 'mout/array/reject';
+import exporter from './exporter';
 
-export default {
+export default exporter('drawers', {
   /**
    * ドローワーを追加します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} tagName
    * @param {Object} tagOpts
    * @param {Object} drawerOpts
    * @return {Array}
    */
-  add: (context, tagName, tagOpts = {}, drawerOpts = {}) => {
-    context.state.drawers.push({
+  add: (state, tagName, tagOpts = {}, drawerOpts = {}) => {
+    state.drawers.push({
       id: `drawer_${Date.now()}`,
       tagName,
       tagOpts,
@@ -21,14 +22,14 @@ export default {
 
   /**
    * ドローワーを削除します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} drawerID
    * @return {Array}
    */
-  remove: (context, drawerID) => {
-    context.state.drawers = reject(context.state.drawers, drawer => {
+  remove: (state, drawerID) => {
+    state.drawers = reject(state.drawers, drawer => {
       return (drawer.id === drawerID);
     });
     return ['drawers'];
   }
-};
+});

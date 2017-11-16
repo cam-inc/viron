@@ -1,4 +1,3 @@
-import { constants as mutations } from '../mutations';
 import exporter from './exporter';
 
 export default exporter('current', {
@@ -12,7 +11,7 @@ export default exporter('current', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.CURRENT, endpointKey);
+        context.commit('current.all', endpointKey);
       });
   },
 
@@ -25,7 +24,7 @@ export default exporter('current', {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.CURRENT, null);
+        context.commit('current.all', null);
       });
   }
 });
