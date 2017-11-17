@@ -1,8 +1,8 @@
 viron-components-page-number.ComponentsPage_Card_Number
   .ComponentsPage_Card_Number__head
     .ComponentsPage_Card_Number__title { opts.def.name }
-      div(onTap="{ handleRefreshButtonTap }")
     .ComponentsPage_Card_Number__control
+      div(onTap="{ handleRefreshButtonTap }")
   .ComponentsPage_Card_Number__body(if="{ !isLoading }")
     // エラー時
     virtual(if="{ !!error }")
