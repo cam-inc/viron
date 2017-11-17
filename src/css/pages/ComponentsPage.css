@@ -1,3 +1,11 @@
 .ComponentsPage {
   display: block;
+
+  &__inlines {
+    margin-top: 24px;
+  }
+
+  &__tables {
+    margin-top: 24px;
+  }
 }

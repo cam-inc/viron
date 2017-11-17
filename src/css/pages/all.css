@@ -1,6 +1,17 @@
 /* ITCSS: Components(Page) */
 /* Designed components, chunks of UI. */
 @import "ComponentsPage";
+@import "ComponentsPage_Card";
+@import "ComponentsPage_Card_GraphBar";
+@import "ComponentsPage_Card_GraphHorizontalBar";
+@import "ComponentsPage_Card_GraphHorizontalStackedBar";
+@import "ComponentsPage_Card_GraphLine";
+@import "ComponentsPage_Card_GraphScatterplot";
+@import "ComponentsPage_Card_GraphStackedArea";
+@import "ComponentsPage_Card_GraphStackedBar";
+@import "ComponentsPage_Card_Number";
+@import "ComponentsPage_Card_Table";
+@import "ComponentsPage_Inlines";
 @import "EndpointsPage";
 @import "EndpointsPage_Endpoint";
 @import "EndpointsPage_Endpoint_Menu";

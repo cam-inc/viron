@@ -1,3 +1,4 @@
+import contains from 'mout/array/contains';
 import filter from 'mout/array/filter';
 import reject from 'mout/array/reject';
 import exporter from './exporter';
@@ -49,6 +50,21 @@ export default exporter('page', {
       return [];
     }
     return page.components;
+  },
+
+  /**
+   * number等小型表示可能なコンポーネント群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  componentsInline: state => {
+    const page = state.page;
+    if (!page) {
+      return [];
+    }
+    return filter(page.components, component => {
+      return contains(['number'], component.style);
+    });
   },
 
   /**

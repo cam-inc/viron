@@ -1,4 +1,3 @@
-import { getComponentStateName } from '../states';
 import exporter from './exporter';
 
 export default exporter('components', {
@@ -12,7 +11,7 @@ export default exporter('components', {
     const component_uid = params.component_uid;
     // 存在しなければ新規作成。
     state.components[component_uid] = params;
-    return ['components', getComponentStateName(component_uid)];
+    return ['components', component_uid];
   },
 
   /**
@@ -23,7 +22,7 @@ export default exporter('components', {
    */
   removeOne: (state, component_uid) => {
     delete state.components[component_uid];
-    return ['components', getComponentStateName(component_uid)];
+    return ['components', component_uid];
   },
 
   /**
