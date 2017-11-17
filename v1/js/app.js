@@ -8923,5646 +8923,6 @@ Router.BROWSER = constants.BROWSER;
 Router.MEMORY = constants.MEMORY;
 Router.HASH = constants.HASH;
 
-/**
-     * Returns the first argument provided to it.
-     */
-    function identity$1(val){
-        return val;
-    }
-
-    var identity_1$1 = identity$1;
-
-/**
-     * Returns a function that gets a property of the passed object
-     */
-    function prop$1(name){
-        return function(obj){
-            return obj[name];
-        };
-    }
-
-    var prop_1$1 = prop$1;
-
-/**
-     * Safer Object.hasOwnProperty
-     */
-     function hasOwn$1(obj, prop){
-         return Object.prototype.hasOwnProperty.call(obj, prop);
-     }
-
-     var hasOwn_1$1 = hasOwn$1;
-
-var _hasDontEnumBug$1;
-var _dontEnums$1;
-
-    function checkDontEnum$1(){
-        _dontEnums$1 = [
-                'toString',
-                'toLocaleString',
-                'valueOf',
-                'hasOwnProperty',
-                'isPrototypeOf',
-                'propertyIsEnumerable',
-                'constructor'
-            ];
-
-        _hasDontEnumBug$1 = true;
-
-        for (var key in {'toString': null}) {
-            _hasDontEnumBug$1 = false;
-        }
-    }
-
-    /**
-     * Similar to Array/forEach but works over object properties and fixes Don't
-     * Enum bug on IE.
-     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
-     */
-    function forIn$1(obj, fn, thisObj){
-        var key, i = 0;
-        // no need to check if argument is a real object that way we can use
-        // it for arrays, functions, date, etc.
-
-        //post-pone check till needed
-        if (_hasDontEnumBug$1 == null) { checkDontEnum$1(); }
-
-        for (key in obj) {
-            if (exec$1(fn, obj, key, thisObj) === false) {
-                break;
-            }
-        }
-
-
-        if (_hasDontEnumBug$1) {
-            var ctor = obj.constructor,
-                isProto = !!ctor && obj === ctor.prototype;
-
-            while (key = _dontEnums$1[i++]) {
-                // For constructor, if it is a prototype object the constructor
-                // is always non-enumerable unless defined otherwise (and
-                // enumerated above).  For non-prototype objects, it will have
-                // to be defined on this object, since it cannot be defined on
-                // any prototype objects.
-                //
-                // For other [[DontEnum]] properties, check if the value is
-                // different than Object prototype value.
-                if (
-                    (key !== 'constructor' ||
-                        (!isProto && hasOwn_1$1(obj, key))) &&
-                    obj[key] !== Object.prototype[key]
-                ) {
-                    if (exec$1(fn, obj, key, thisObj) === false) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    function exec$1(fn, obj, key, thisObj){
-        return fn.call(thisObj, obj[key], key, obj);
-    }
-
-    var forIn_1$1 = forIn$1;
-
-/**
-     * Similar to Array/forEach but works over object properties and fixes Don't
-     * Enum bug on IE.
-     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
-     */
-    function forOwn$1(obj, fn, thisObj){
-        forIn_1$1(obj, function(val, key){
-            if (hasOwn_1$1(obj, key)) {
-                return fn.call(thisObj, obj[key], key, obj);
-            }
-        });
-    }
-
-    var forOwn_1$1 = forOwn$1;
-
-/**
-     * Gets the "kind" of value. (e.g. "String", "Number", etc)
-     */
-    function kindOf$1(val) {
-        return Object.prototype.toString.call(val).slice(8, -1);
-    }
-    var kindOf_1$1 = kindOf$1;
-
-/**
-     * Check if value is from a specific "kind".
-     */
-    function isKind$1(val, kind){
-        return kindOf_1$1(val) === kind;
-    }
-    var isKind_1$1 = isKind$1;
-
-/**
-     */
-    var isArray$1 = Array.isArray || function (val) {
-        return isKind_1$1(val, 'Array');
-    };
-    var isArray_1$1 = isArray$1;
-
-function containsMatch$1(array, pattern) {
-        var i = -1, length = array.length;
-        while (++i < length) {
-            if (deepMatches$1(array[i], pattern)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    function matchArray$1(target, pattern) {
-        var i = -1, patternLength = pattern.length;
-        while (++i < patternLength) {
-            if (!containsMatch$1(target, pattern[i])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    function matchObject$1(target, pattern) {
-        var result = true;
-        forOwn_1$1(pattern, function(val, key) {
-            if (!deepMatches$1(target[key], val)) {
-                // Return false to break out of forOwn early
-                return (result = false);
-            }
-        });
-
-        return result;
-    }
-
-    /**
-     * Recursively check if the objects match.
-     */
-    function deepMatches$1(target, pattern){
-        if (target && typeof target === 'object' &&
-            pattern && typeof pattern === 'object') {
-            if (isArray_1$1(target) && isArray_1$1(pattern)) {
-                return matchArray$1(target, pattern);
-            } else {
-                return matchObject$1(target, pattern);
-            }
-        } else {
-            return target === pattern;
-        }
-    }
-
-    var deepMatches_1$1 = deepMatches$1;
-
-/**
-     * Converts argument into a valid iterator.
-     * Used internally on most array/object/collection methods that receives a
-     * callback/iterator providing a shortcut syntax.
-     */
-    function makeIterator$1(src, thisObj){
-        if (src == null) {
-            return identity_1$1;
-        }
-        switch(typeof src) {
-            case 'function':
-                // function is the first to improve perf (most common case)
-                // also avoid using `Function#call` if not needed, which boosts
-                // perf a lot in some cases
-                return (typeof thisObj !== 'undefined')? function(val, i, arr){
-                    return src.call(thisObj, val, i, arr);
-                } : src;
-            case 'object':
-                return function(val){
-                    return deepMatches_1$1(val, src);
-                };
-            case 'string':
-            case 'number':
-                return prop_1$1(src);
-        }
-    }
-
-    var makeIterator_$1 = makeIterator$1;
-
-/**
-     * Array reject
-     */
-    function reject$1(arr, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            if (!callback(value, i, arr)) {
-                results.push(value);
-            }
-        }
-
-        return results;
-    }
-
-    var reject_1$1 = reject$1;
-
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/
-
-'use strict';
-/* eslint-disable no-unused-vars */
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-function toObject(val) {
-	if (val === null || val === undefined) {
-		throw new TypeError('Object.assign cannot be called with null or undefined');
-	}
-
-	return Object(val);
-}
-
-function shouldUseNative() {
-	try {
-		if (!Object.assign) {
-			return false;
-		}
-
-		// Detect buggy property enumeration order in older V8 versions.
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
-		test1[5] = 'de';
-		if (Object.getOwnPropertyNames(test1)[0] === '5') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test2 = {};
-		for (var i = 0; i < 10; i++) {
-			test2['_' + String.fromCharCode(i)] = i;
-		}
-		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
-			return test2[n];
-		});
-		if (order2.join('') !== '0123456789') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test3 = {};
-		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
-			test3[letter] = letter;
-		});
-		if (Object.keys(Object.assign({}, test3)).join('') !==
-				'abcdefghijklmnopqrst') {
-			return false;
-		}
-
-		return true;
-	} catch (err) {
-		// We don't expect any of the above to throw, but better to be safe.
-		return false;
-	}
-}
-
-var objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
-	var from;
-	var to = toObject(target);
-	var symbols;
-
-	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
-
-		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (getOwnPropertySymbols) {
-			symbols = getOwnPropertySymbols(from);
-			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
-		}
-	}
-
-	return to;
-};
-
-var application$2 = {
-  // 起動状態。
-  isLaunched: false,
-  // 画面遷移中か否か。
-  isNavigating: false,
-  // 通信中のAPI群。
-  networkings: [],
-  // 通信中か否か(i.e. 一つでも通信中のAPIが存在するか?)
-  isNetworking: false,
-  // ドラッグ中か否か。
-  isDragging: false,
-  // 左カラムメニューの開閉状態
-  isMenuOpened: true,
-  // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
-  endpointFilterText: ''
-};
-
-// 選択された`page`に関する`component`群。
-// `component` = 画面中央に表示される各要素。
-var components = {};
-
-var store = createCommonjsModule(function (module, exports) {
-"use strict"
-// Module export pattern from
-// https://github.com/umdjs/umd/blob/master/returnExports.js
-;(function (root, factory) {
-    if (typeof undefined === 'function' && undefined.amd) {
-        // AMD. Register as an anonymous module.
-        undefined([], factory);
-    } else {
-        // Node. Does not work with strict CommonJS, but
-        // only CommonJS-like environments that support module.exports,
-        // like Node.
-        module.exports = factory();
-    }
-}(commonjsGlobal, function () {
-	
-	// Store.js
-	var store = {},
-		win = (typeof window != 'undefined' ? window : commonjsGlobal),
-		doc = win.document,
-		localStorageName = 'localStorage',
-		scriptTag = 'script',
-		storage;
-
-	store.disabled = false;
-	store.version = '1.3.20';
-	store.set = function(key, value) {};
-	store.get = function(key, defaultVal) {};
-	store.has = function(key) { return store.get(key) !== undefined };
-	store.remove = function(key) {};
-	store.clear = function() {};
-	store.transact = function(key, defaultVal, transactionFn) {
-		if (transactionFn == null) {
-			transactionFn = defaultVal;
-			defaultVal = null;
-		}
-		if (defaultVal == null) {
-			defaultVal = {};
-		}
-		var val = store.get(key, defaultVal);
-		transactionFn(val);
-		store.set(key, val);
-	};
-	store.getAll = function() {};
-	store.forEach = function() {};
-
-	store.serialize = function(value) {
-		return JSON.stringify(value)
-	};
-	store.deserialize = function(value) {
-		if (typeof value != 'string') { return undefined }
-		try { return JSON.parse(value) }
-		catch(e) { return value || undefined }
-	};
-
-	// Functions to encapsulate questionable FireFox 3.6.13 behavior
-	// when about.config::dom.storage.enabled === false
-	// See https://github.com/marcuswestin/store.js/issues#issue/13
-	function isLocalStorageNameSupported() {
-		try { return (localStorageName in win && win[localStorageName]) }
-		catch(err) { return false }
-	}
-
-	if (isLocalStorageNameSupported()) {
-		storage = win[localStorageName];
-		store.set = function(key, val) {
-			if (val === undefined) { return store.remove(key) }
-			storage.setItem(key, store.serialize(val));
-			return val
-		};
-		store.get = function(key, defaultVal) {
-			var val = store.deserialize(storage.getItem(key));
-			return (val === undefined ? defaultVal : val)
-		};
-		store.remove = function(key) { storage.removeItem(key); };
-		store.clear = function() { storage.clear(); };
-		store.getAll = function() {
-			var ret = {};
-			store.forEach(function(key, val) {
-				ret[key] = val;
-			});
-			return ret
-		};
-		store.forEach = function(callback) {
-			for (var i=0; i<storage.length; i++) {
-				var key = storage.key(i);
-				callback(key, store.get(key));
-			}
-		};
-	} else if (doc && doc.documentElement.addBehavior) {
-		var storageOwner,
-			storageContainer;
-		// Since #userData storage applies only to specific paths, we need to
-		// somehow link our data to a specific path.  We choose /favicon.ico
-		// as a pretty safe option, since all browsers already make a request to
-		// this URL anyway and being a 404 will not hurt us here.  We wrap an
-		// iframe pointing to the favicon in an ActiveXObject(htmlfile) object
-		// (see: http://msdn.microsoft.com/en-us/library/aa752574(v=VS.85).aspx)
-		// since the iframe access rules appear to allow direct access and
-		// manipulation of the document element, even for a 404 page.  This
-		// document can be used instead of the current document (which would
-		// have been limited to the current path) to perform #userData storage.
-		try {
-			storageContainer = new ActiveXObject('htmlfile');
-			storageContainer.open();
-			storageContainer.write('<'+scriptTag+'>document.w=window</'+scriptTag+'><iframe src="/favicon.ico"></iframe>');
-			storageContainer.close();
-			storageOwner = storageContainer.w.frames[0].document;
-			storage = storageOwner.createElement('div');
-		} catch(e) {
-			// somehow ActiveXObject instantiation failed (perhaps some special
-			// security settings or otherwse), fall back to per-path storage
-			storage = doc.createElement('div');
-			storageOwner = doc.body;
-		}
-		var withIEStorage = function(storeFunction) {
-			return function() {
-				var args = Array.prototype.slice.call(arguments, 0);
-				args.unshift(storage);
-				// See http://msdn.microsoft.com/en-us/library/ms531081(v=VS.85).aspx
-				// and http://msdn.microsoft.com/en-us/library/ms531424(v=VS.85).aspx
-				storageOwner.appendChild(storage);
-				storage.addBehavior('#default#userData');
-				storage.load(localStorageName);
-				var result = storeFunction.apply(store, args);
-				storageOwner.removeChild(storage);
-				return result
-			}
-		};
-
-		// In IE7, keys cannot start with a digit or contain certain chars.
-		// See https://github.com/marcuswestin/store.js/issues/40
-		// See https://github.com/marcuswestin/store.js/issues/83
-		var forbiddenCharsRegex = new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]", "g");
-		var ieKeyFix = function(key) {
-			return key.replace(/^d/, '___$&').replace(forbiddenCharsRegex, '___')
-		};
-		store.set = withIEStorage(function(storage, key, val) {
-			key = ieKeyFix(key);
-			if (val === undefined) { return store.remove(key) }
-			storage.setAttribute(key, store.serialize(val));
-			storage.save(localStorageName);
-			return val
-		});
-		store.get = withIEStorage(function(storage, key, defaultVal) {
-			key = ieKeyFix(key);
-			var val = store.deserialize(storage.getAttribute(key));
-			return (val === undefined ? defaultVal : val)
-		});
-		store.remove = withIEStorage(function(storage, key) {
-			key = ieKeyFix(key);
-			storage.removeAttribute(key);
-			storage.save(localStorageName);
-		});
-		store.clear = withIEStorage(function(storage) {
-			var attributes = storage.XMLDocument.documentElement.attributes;
-			storage.load(localStorageName);
-			for (var i=attributes.length-1; i>=0; i--) {
-				storage.removeAttribute(attributes[i].name);
-			}
-			storage.save(localStorageName);
-		});
-		store.getAll = function(storage) {
-			var ret = {};
-			store.forEach(function(key, val) {
-				ret[key] = val;
-			});
-			return ret
-		};
-		store.forEach = withIEStorage(function(storage, callback) {
-			var attributes = storage.XMLDocument.documentElement.attributes;
-			for (var i=0, attr; attr=attributes[i]; ++i) {
-				callback(attr.name, store.deserialize(storage.getAttribute(attr.name)));
-			}
-		});
-	}
-
-	try {
-		var testKey = '__storejs__';
-		store.set(testKey, testKey);
-		if (store.get(testKey) != testKey) { store.disabled = true; }
-		store.remove(testKey);
-	} catch(e) {
-		store.disabled = true;
-	}
-	store.enabled = !store.disabled;
-	
-	return store
-}));
-});
-
-// 選択されているエンドポイント。
-var current = store.get('current', null);
-
-// `/viron`のデータ。
-var viron = null;
-
-var drawers = [];
-
-// ローカルに保存されているエンドポイント一覧。
-var endpoints = store.get('endpoints', {});
-
-var constants$4 = {
-  // mobileとdesktopレイアウトの切り替え閾値。
-  layoutThreshold: 640,
-  // レイアウトタイプ。mobile or desktop用。
-  layoutTypeDesktop: 'desktop',
-  layoutTypeMobile: 'mobile',
-
-  // 認証方法。
-  authtypeEmail: 'email',
-  authtypeOauth: 'oauth'
-};
-
-var layout = {
-  // レイアウトタイプ。mobile or desktop。
-  type: (() => {
-    const width = window.innerWidth;
-    if (width > constants$4.layoutThreshold) {
-      return constants$4.layoutTypeDesktop;
-    }
-    return constants$4.layoutTypeMobile;
-  })(),
-  // 表示サイズ。
-  size: {
-    width: window.innerWidth,
-    height: window.innerHeight
-  },
-  // componentリストのgridレイアウトのcolumn数。
-  componentsGridColumnCount: (() => {
-    const htmlStyles = window.getComputedStyle(document.querySelector('html'));
-    const columnCount = Number(htmlStyles.getPropertyValue('--page-components-grid-column-count'));
-    return columnCount;
-  })()
-};
-
-var location$1 = {
-  // 表示中のページ名。
-  name: '',
-  // ルーティング情報。
-  route: {
-    params: {},
-    queries: {},
-    hash: ''
-  }
-};
-
-var modals = [];
-
-// OpenAPI Specificationに関する情報。
-var oas = {
-  // SwaggerClientによって生成されたSwaggerClientインスタンス。
-  // resolve済みのOpenAPI Document情報やhttpクライアント等が格納されている。
-  // @see: https://github.com/swagger-api/swagger-js#constructor-and-methods
-  client: null
-};
-
-// 選択中の`page`情報。
-// `page` = 左メニュー(viron)の一要素。
-var page = null;
-
-var popovers = [];
-
-var signinShowKey = null;
-
-var toasts = [];
-
-var ua = {};
-
-const constants$3 = {
-  APPLICATION: 'APPLICATION',
-  COMPONENTS: 'COMPONENTS',
-  COMPONENTS_ONE: riotId => {
-    return `component_${riotId}`;
-  },
-  CURRENT: 'CURRENT',
-  VIRON: 'VIRON',
-  OAS: 'OAS',
-  DRAWERS: 'DRAWERS',
-  ENDPOINTS: 'ENDPOINTS',
-  LAYOUT: 'LAYOUT',
-  LOCATION: 'LOCATION',
-  MODALS: 'MODALS',
-  PAGE: 'PAGE',
-  POPOVERS: 'POPOVERS',
-  SIGNIN_SHOW_KEY: 'SIGNIN_SHOW_KEY',
-  TOASTS: 'TOASTS',
-  UA: 'UA'
-};
-
-var states = {
-  application: application$2,
-  components,
-  current,
-  viron,
-  oas,
-  drawers,
-  endpoints,
-  layout,
-  location: location$1,
-  modals,
-  page,
-  popovers,
-  signinShowKey,
-  toasts,
-  ua
-};
-
-var application$1 = {
-  /**
-   * 起動ステータスを変更します。
-   * @param {riotx.Context} context
-   * @param {Boolean} bool
-   * @return {Array}
-   */
-  launch: (context, bool) => {
-    context.state.application.isLaunched = bool;
-    return [constants$3.APPLICATION];
-  },
-
-  /**
-   * 画面遷移ステータスを変更します。
-   * @param {riotx.Context} context
-   * @param {Boolean} bool
-   * @return {Array}
-   */
-  navigation: (context, bool) => {
-    context.state.application.isNavigating = bool;
-    return [constants$3.APPLICATION];
-  },
-
-  /**
-   * 通信中APIを追加します。
-   * @param {riotx.Context} context
-   * @param {Object} info
-   * @return {Array}
-   */
-  addNetworking: (context, info) => {
-    context.state.application.networkings.push(objectAssign({
-      id: `networking_${Date.now()}`
-    }, info));
-    context.state.application.isNetworking = true;
-    return [constants$3.APPLICATION];
-  },
-
-  /**
-   * 通信中APIを削除します。
-   * @param {riotx.Context} context
-   * @param {String} networkingId
-   * @return {Array}
-   */
-  removeNetworking: (context, networkingId) => {
-    context.state.application.networkings = reject_1$1(context.state.application.networkings, networking => {
-      return (networking.id === networkingId);
-    });
-    if (!context.state.application.networkings.length) {
-      context.state.application.isNetworking = false;
-    }
-    return [constants$3.APPLICATION];
-  },
-
-  /**
-   * ドラッグステータスを変更します。
-   * @param {riotx.Context} context
-   * @param {Boolean} bool
-   * @return {Array}
-   */
-  drag: (context, bool) => {
-    context.state.application.isDragging = bool;
-    return [constants$3.APPLICATION];
-  },
-
-  /**
-   * メニューの開閉状態を切り替えます。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  menuToggle: context => {
-    context.state.application.isMenuOpened = !context.state.application.isMenuOpened;
-    return [constants$3.APPLICATION];
-  },
-
-  /**
-   * エンドポイント用のフィルターテキストを更新します。
-   * @param {riotx.Context} context
-   * @param {String} newFilterText
-   * @return {Array}
-   */
-  endpointFilterText: (context, newFilterText) => {
-    context.state.application.endpointFilterText = newFilterText;
-    return [constants$3.APPLICATION];
-  }
-};
-
-var components$1 = {
-  /**
-   * 一件更新します。
-   * @param {riotx.Context} context
-   * @param {Object} params
-   * @return {Array}
-   */
-  updateOne: (context, params) => {
-    const component_uid = params.component_uid;
-    // 存在しなければ新規作成。
-    context.state.components[component_uid] = params;
-    return [constants$3.COMPONENTS, constants$3.COMPONENTS_ONE(component_uid)];
-  },
-
-  /**
-   * 一件削除します。
-   * @param {riotx.Context} context
-   * @param {String} component_uid
-   * @return {Array}
-   */
-  removeOne: (context, component_uid) => {
-    delete context.state.components[component_uid];
-    return [constants$3.COMPONENTS, constants$3.COMPONENTS_ONE(component_uid)];
-  },
-
-  /**
-   * 全件削除します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  removeAll: context => {
-    context.state.components = {};
-    return [constants$3.COMPONENTS, constants$3.COMPONENTS];
-  }
-};
-
-var current$1 = {
-  /**
-   * 値書き換え。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @return {Array}
-   */
-  all: (context, endpointKey) => {
-    context.state.current = store.set(constants$3.CURRENT, endpointKey);
-    return [constants$3.CURRENT];
-  }
-};
-
-/**
-     * Array.indexOf
-     */
-    function indexOf$1(arr, item, fromIndex) {
-        fromIndex = fromIndex || 0;
-        if (arr == null) {
-            return -1;
-        }
-
-        var len = arr.length,
-            i = fromIndex < 0 ? len + fromIndex : fromIndex;
-        while (i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (arr[i] === item) {
-                return i;
-            }
-
-            i++;
-        }
-
-        return -1;
-    }
-
-    var indexOf_1$1 = indexOf$1;
-
-/**
-     * Combines an array with all the items of another.
-     * Does not allow duplicates and is case and type sensitive.
-     */
-    function combine$1(arr1, arr2) {
-        if (arr2 == null) {
-            return arr1;
-        }
-
-        var i = -1, len = arr2.length;
-        while (++i < len) {
-            if (indexOf_1$1(arr1, arr2[i]) === -1) {
-                arr1.push(arr2[i]);
-            }
-        }
-
-        return arr1;
-    }
-    var combine_1$1 = combine$1;
-
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex$1(arr, iterator, thisObj){
-        iterator = makeIterator_$1(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (iterator(arr[i], i, arr)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    var findIndex_1$1 = findIndex$1;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$1(arr, iterator, thisObj){
-        var idx = findIndex_1$1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var find_1$1 = find$1;
-
-var viron$1 = {
-  /**
-   * @param {riotx.Context} context
-   * @param {Object|null} viron
-   * @return {Array}
-   */
-  all: (context, viron) => {
-    // メニューのカテゴライズ。下位互換のため、dashboardとmanageは必須項目とする。
-    if (!!viron) {
-      viron.sections = viron.sections || [];
-      if (!find_1$1(viron.sections, section => {
-        return (section.id === 'manage');
-      })) {
-        viron.sections = combine_1$1([{ id: 'manage', label: i18n$1.t('word.manage') }], viron.sections);
-      }
-      if (!find_1$1(viron.sections, section => {
-        return (section.id === 'dashboard');
-      })) {
-        viron.sections = combine_1$1([{ id: 'dashboard', label: i18n$1.t('word.dashboard') }], viron.sections);
-      }
-    }
-    context.state.viron = viron;
-    return [constants$3.VIRON];
-  }
-};
-
-var drawers$1 = {
-  /**
-   * ドローワーを追加します。
-   * @param {riotx.Context} context
-   * @param {String} tagName
-   * @param {Object} tagOpts
-   * @param {Object} drawerOpts
-   * @return {Array}
-   */
-  add: (context, tagName, tagOpts, drawerOpts) => {
-    if ( tagOpts === void 0 ) tagOpts = {};
-    if ( drawerOpts === void 0 ) drawerOpts = {};
-
-    context.state.drawers.push({
-      id: `drawer_${Date.now()}`,
-      tagName,
-      tagOpts,
-      drawerOpts
-    });
-    return [constants$3.DRAWERS];
-  },
-
-  /**
-   * ドローワーを削除します。
-   * @param {riotx.Context} context
-   * @param {String} drawerID
-   * @return {Array}
-   */
-  remove: (context, drawerID) => {
-    context.state.drawers = reject_1$1(context.state.drawers, drawer => {
-      return (drawer.id === drawerID);
-    });
-    return [constants$3.DRAWERS];
-  }
-};
-
-/**
-     * Array forEach
-     */
-    function forEach$1(arr, callback, thisObj) {
-        if (arr == null) {
-            return;
-        }
-        var i = -1,
-            len = arr.length;
-        while (++i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if ( callback.call(thisObj, arr[i], i, arr) === false ) {
-                break;
-            }
-        }
-    }
-
-    var forEach_1$1 = forEach$1;
-
-/**
-     * Merge sort (http://en.wikipedia.org/wiki/Merge_sort)
-     */
-    function mergeSort$1(arr, compareFn) {
-        if (arr == null) {
-            return [];
-        } else if (arr.length < 2) {
-            return arr;
-        }
-
-        if (compareFn == null) {
-            compareFn = defaultCompare$1;
-        }
-
-        var mid, left, right;
-
-        mid   = ~~(arr.length / 2);
-        left  = mergeSort$1( arr.slice(0, mid), compareFn );
-        right = mergeSort$1( arr.slice(mid, arr.length), compareFn );
-
-        return merge$1(left, right, compareFn);
-    }
-
-    function defaultCompare$1(a, b) {
-        return a < b ? -1 : (a > b? 1 : 0);
-    }
-
-    function merge$1(left, right, compareFn) {
-        var result = [];
-
-        while (left.length && right.length) {
-            if (compareFn(left[0], right[0]) <= 0) {
-                // if 0 it should preserve same order (stable)
-                result.push(left.shift());
-            } else {
-                result.push(right.shift());
-            }
-        }
-
-        if (left.length) {
-            result.push.apply(result, left);
-        }
-
-        if (right.length) {
-            result.push.apply(result, right);
-        }
-
-        return result;
-    }
-
-    var sort$1 = mergeSort$1;
-
-/*
-     * Sort array by the result of the callback
-     */
-    function sortBy$1(arr, callback, context){
-        callback = makeIterator_$1(callback, context);
-
-        return sort$1(arr, function(a, b) {
-            a = callback(a);
-            b = callback(b);
-            return (a < b) ? -1 : ((a > b) ? 1 : 0);
-        });
-    }
-
-    var sortBy_1$1 = sortBy$1;
-
-/**
-     */
-    function isNumber(val) {
-        return isKind_1$1(val, 'Number');
-    }
-    var isNumber_1 = isNumber;
-
-/**
-     * Object some
-     */
-    function some$1(obj, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var result = false;
-        forOwn_1$1(obj, function(val, key) {
-            if (callback(val, key, obj)) {
-                result = true;
-                return false; // break
-            }
-        });
-        return result;
-    }
-
-    var some_1$1 = some$1;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$3(obj, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var result;
-        some_1$1(obj, function(value, key, obj) {
-            if (callback(value, key, obj)) {
-                result = value;
-                return true; //break
-            }
-        });
-        return result;
-    }
-
-    var find_1$2 = find$3;
-
-'use strict';
-
-// Found this seed-based random generator somewhere
-// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
-
-var seed = 1;
-
-/**
- * return a random number based on a seed
- * @param seed
- * @returns {number}
- */
-function getNextValue() {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed/(233280.0);
-}
-
-function setSeed$1(_seed_) {
-    seed = _seed_;
-}
-
-var randomFromSeed = {
-    nextValue: getNextValue,
-    seed: setSeed$1
-};
-
-'use strict';
-
-
-
-var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
-var alphabet;
-var previousSeed;
-
-var shuffled;
-
-function reset() {
-    shuffled = false;
-}
-
-function setCharacters(_alphabet_) {
-    if (!_alphabet_) {
-        if (alphabet !== ORIGINAL) {
-            alphabet = ORIGINAL;
-            reset();
-        }
-        return;
-    }
-
-    if (_alphabet_ === alphabet) {
-        return;
-    }
-
-    if (_alphabet_.length !== ORIGINAL.length) {
-        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
-    }
-
-    var unique = _alphabet_.split('').filter(function(item, ind, arr){
-       return ind !== arr.lastIndexOf(item);
-    });
-
-    if (unique.length) {
-        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
-    }
-
-    alphabet = _alphabet_;
-    reset();
-}
-
-function characters(_alphabet_) {
-    setCharacters(_alphabet_);
-    return alphabet;
-}
-
-function setSeed(seed) {
-    randomFromSeed.seed(seed);
-    if (previousSeed !== seed) {
-        reset();
-        previousSeed = seed;
-    }
-}
-
-function shuffle$1() {
-    if (!alphabet) {
-        setCharacters(ORIGINAL);
-    }
-
-    var sourceArray = alphabet.split('');
-    var targetArray = [];
-    var r = randomFromSeed.nextValue();
-    var characterIndex;
-
-    while (sourceArray.length > 0) {
-        r = randomFromSeed.nextValue();
-        characterIndex = Math.floor(r * sourceArray.length);
-        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
-    }
-    return targetArray.join('');
-}
-
-function getShuffled() {
-    if (shuffled) {
-        return shuffled;
-    }
-    shuffled = shuffle$1();
-    return shuffled;
-}
-
-/**
- * lookup shuffled letter
- * @param index
- * @returns {string}
- */
-function lookup(index) {
-    var alphabetShuffled = getShuffled();
-    return alphabetShuffled[index];
-}
-
-var alphabet_1 = {
-    characters: characters,
-    seed: setSeed,
-    lookup: lookup,
-    shuffled: getShuffled
-};
-
-'use strict';
-
-var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
-
-function randomByte() {
-    if (!crypto || !crypto.getRandomValues) {
-        return Math.floor(Math.random() * 256) & 0x30;
-    }
-    var dest = new Uint8Array(1);
-    crypto.getRandomValues(dest);
-    return dest[0] & 0x30;
-}
-
-var randomByteBrowser = randomByte;
-
-'use strict';
-
-
-
-function encode(lookup, number) {
-    var loopCounter = 0;
-    var done;
-
-    var str = '';
-
-    while (!done) {
-        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByteBrowser() );
-        done = number < (Math.pow(16, loopCounter + 1 ) );
-        loopCounter++;
-    }
-    return str;
-}
-
-var encode_1 = encode;
-
-'use strict';
-
-
-/**
- * Decode the id to get the version and worker
- * Mainly for debugging and testing.
- * @param id - the shortid-generated id.
- */
-function decode(id) {
-    var characters = alphabet_1.shuffled();
-    return {
-        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
-        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
-    };
-}
-
-var decode_1 = decode;
-
-'use strict';
-
-
-
-
-// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
-// This number should be updated every year or so to keep the generated id short.
-// To regenerate `new Date() - 0` and bump the version. Always bump the version!
-var REDUCE_TIME = 1459707606518;
-
-// don't change unless we change the algos or REDUCE_TIME
-// must be an integer and less than 16
-var version = 6;
-
-// Counter is used when shortid is called multiple times in one second.
-var counter;
-
-// Remember the last time shortid was called in case counter is needed.
-var previousSeconds;
-
-/**
- * Generate unique id
- * Returns string id
- */
-function build(clusterWorkerId) {
-
-    var str = '';
-
-    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
-
-    if (seconds === previousSeconds) {
-        counter++;
-    } else {
-        counter = 0;
-        previousSeconds = seconds;
-    }
-
-    str = str + encode_1(alphabet_1.lookup, version);
-    str = str + encode_1(alphabet_1.lookup, clusterWorkerId);
-    if (counter > 0) {
-        str = str + encode_1(alphabet_1.lookup, counter);
-    }
-    str = str + encode_1(alphabet_1.lookup, seconds);
-
-    return str;
-}
-
-var build_1 = build;
-
-'use strict';
-
-
-function isShortId(id) {
-    if (!id || typeof id !== 'string' || id.length < 6 ) {
-        return false;
-    }
-
-    var characters = alphabet_1.characters();
-    var len = id.length;
-    for(var i = 0; i < len;i++) {
-        if (characters.indexOf(id[i]) === -1) {
-            return false;
-        }
-    }
-    return true;
-}
-
-var isValid = isShortId;
-
-'use strict';
-
-var clusterWorkerIdBrowser = 0;
-
-var lib = createCommonjsModule(function (module) {
-'use strict';
-
-
-
-
-
-
-
-// if you are using cluster or multiple servers use this to make each instance
-// has a unique value for worker
-// Note: I don't know if this is automatically set when using third
-// party cluster solutions such as pm2.
-var clusterWorkerId = clusterWorkerIdBrowser || 0;
-
-/**
- * Set the seed.
- * Highly recommended if you don't want people to try to figure out your id schema.
- * exposed as shortid.seed(int)
- * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
- */
-function seed(seedValue) {
-    alphabet_1.seed(seedValue);
-    return module.exports;
-}
-
-/**
- * Set the cluster worker or machine id
- * exposed as shortid.worker(int)
- * @param workerId worker must be positive integer.  Number less than 16 is recommended.
- * returns shortid module so it can be chained.
- */
-function worker(workerId) {
-    clusterWorkerId = workerId;
-    return module.exports;
-}
-
-/**
- *
- * sets new characters to use in the alphabet
- * returns the shuffled alphabet
- */
-function characters(newCharacters) {
-    if (newCharacters !== undefined) {
-        alphabet_1.characters(newCharacters);
-    }
-
-    return alphabet_1.shuffled();
-}
-
-/**
- * Generate unique id
- * Returns string id
- */
-function generate() {
-  return build_1(clusterWorkerId);
-}
-
-// Export all other functions as properties of the generate function
-module.exports = generate;
-module.exports.generate = generate;
-module.exports.seed = seed;
-module.exports.worker = worker;
-module.exports.characters = characters;
-module.exports.decode = decode_1;
-module.exports.isValid = isValid;
-});
-
-'use strict';
-var shortid = lib;
-
-/**
- * 受け取ったエンドポイント群をきれいに並び替えます。
- * order値が存在しない場合は後方に配置されます。
- * @param {Object} endpoints
- * @return {Object}
- */
-const putEndpointsInOrder = endpoints => {
-  // どのorder値よりも大きいであろう適当な値。
-  const bigNumber = 9999;
-  let ordered = [];
-  forOwn_1$1(endpoints, (endpoint, key) => {
-    ordered.push({
-      key,
-      order: (isNumber_1(endpoint.order) ? endpoint.order : bigNumber)
-    });
-  });
-  ordered = sortBy_1$1(ordered, obj => {
-    return obj.order;
-  });
-  forEach_1$1(ordered, (obj, order) => {
-    endpoints[obj.key].order = order;
-  });
-  return endpoints;
-};
-
-var endpoints$1 = {
-  /**
-   * 1件のエンドポイントを追加します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {Object} endpoint
-   * @return {Array}
-   */
-  add: (context, endpointKey, endpoint) => {
-    // order値が指定されていなければ自動的に設定する。
-    if (!isNumber_1(endpoint.order)) {
-      // リストの先頭に配置するために意図的にマイナス値を付与。
-      endpoint.order = -1;
-    }
-    let newEndpoints = objectAssign({}, context.state.endpoints);
-    newEndpoints[endpointKey] = endpoint;
-    newEndpoints = putEndpointsInOrder(newEndpoints);
-    context.state.endpoints = newEndpoints;
-    store.set('endpoints', context.state.endpoints);
-    return [constants$3.ENDPOINTS];
-  },
-
-  /**
-   * 指定されたエンドポイントを削除します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @return {Array}
-   */
-  remove: (context, endpointKey) => {
-    let newEndpoints = objectAssign({}, context.state.endpoints);
-    delete newEndpoints[endpointKey];
-    newEndpoints = putEndpointsInOrder(newEndpoints);
-    context.state.endpoints = newEndpoints;
-    store.set('endpoints', context.state.endpoints);
-    return [constants$3.ENDPOINTS];
-  },
-
-  /**
-   * 全てのエンドポイントを削除します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  removeAll: context => {
-    context.state.endpoints = {};
-    store.set('endpoints', context.state.endpoints);
-    return [constants$3.ENDPOINTS];
-  },
-
-  /**
-   * 指定されたエンドポイントを更新します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {Object} endpoint
-   * @return {Array}
-   */
-  update: (context, endpointKey, endpoint) => {
-    if (!endpoint) {
-      context.state.endpoints[endpointKey] = null;
-    } else {
-      context.state.endpoints[endpointKey] = objectAssign({}, context.state.endpoints[endpointKey], endpoint);
-    }
-    store.set('endpoints', context.state.endpoints);
-    return [constants$3.ENDPOINTS];
-  },
-
-  /**
-   * 指定されたエンドポイントのtokenを更新します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {String|null} token
-   * @return {Array}
-   */
-  updateToken: (context, endpointKey, token) => {
-    if (!!context.state.endpoints[endpointKey]) {
-      context.state.endpoints[endpointKey].token = token;
-    }
-    store.set('endpoints', context.state.endpoints);
-    return [constants$3.ENDPOINTS];
-  },
-
-  /**
-   * 新エンドポイント群をmergeします。
-   * @param {riotx.Context} context
-   * @param {Object} endpoints
-   * @return {Array}
-   */
-  mergeAll: (context, endpoints) => {
-    let modifiedEndpoints = objectAssign({}, context.state.endpoints);
-
-    forOwn_1$1(endpoints, endpoint => {
-      let duplicatedEndpoint = find_1$2(modifiedEndpoints, val => {
-        return endpoint.url === val.url;
-      });
-
-      if (!duplicatedEndpoint) {
-        const key = shortid.generate();
-        modifiedEndpoints[key] = endpoint;
-      } else {
-        objectAssign(duplicatedEndpoint, endpoint);
-      }
-    });
-
-    modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
-    context.state.endpoints = modifiedEndpoints;
-    store.set('endpoints', modifiedEndpoints);
-    return [constants$3.ENDPOINTS];
-  },
-
-  /**
-   * エンドポイント群のorder値を整理します。
-   * order値が存在しない場合は後方に配置されます。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  tidyUpOrder: context => {
-    const newEndpoints = putEndpointsInOrder(objectAssign(context.state.endpoints));
-    context.state.endpoints = newEndpoints;
-    store.set('endpoints', newEndpoints);
-    return [constants$3.ENDPOINTS];
-  },
-
-  /**
-   * 指定されたエンドポイントのorder値を変更します。
-   * 他エンドポイントのorder値もインクリメントされます。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {Number} newOrder
-   * @return {Array}
-   */
-  changeOrder: (context, endpointKey, newOrder) => {
-    let newEndpoints = objectAssign(context.state.endpoints);
-    // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
-    newEndpoints[endpointKey].order = newOrder - 0.5;
-    newEndpoints = putEndpointsInOrder(newEndpoints);
-    context.state.endpoints = newEndpoints;
-    store.set('endpoints', newEndpoints);
-    return [constants$3.ENDPOINTS];
-  }
-};
-
-var layout$1 = {
-  /**
-   * 表示サイズを更新します。
-   * @param {riotx.Context} context
-   * @param {Number} width
-   * @param {Number} height
-   */
-  updateSize: (context, width, height) => {
-    context.state.layout.size.width = width;
-    context.state.layout.size.height = height;
-    if (width > constants$4.layoutThreshold) {
-      context.state.layout.type = constants$4.layoutTypeDesktop;
-    } else {
-      context.state.layout.type = constants$4.layoutTypeMobile;
-    }
-    return [constants$3.LAYOUT];
-  },
-
-  /**
-   * componentリストのgridレイアウトのcolumn数を更新します。
-   * @param {riotx.Context} context
-   * @param {Number} count
-   * @return {Array}
-   */
-  updateComponentsGridColumnCount: (context, count) => {
-    context.state.layout.componentsGridColumnCount = count;
-    return [constants$3.LAYOUT];
-  }
-};
-
-var location$2 = {
-  /**
-   * ページ情報を更新します。
-   * @param {riotx.Context} context
-   * @param {Object} obj
-   * @return {Array}
-   */
-  all: (context, obj) => {
-    context.state.location = objectAssign({}, context.state.location, obj);
-    return [constants$3.LOCATION];
-  },
-
-  /**
-   * ページ名を更新します。
-   * @param {riotx.Context} context
-   * @param {String} name
-   * @return {Array}
-   */
-  name: (context, name) => {
-    context.state.location.name = name;
-    return [constants$3.LOCATION];
-  },
-
-  /**
-   * ルーティング情報を更新します。
-   * @param {riotx.Context} context
-   * @param {Object} route
-   * @return {Array}
-   */
-  route: (context, route) => {
-    context.state.location.route = route;
-    return [constants$3.LOCATION];
-  }
-};
-
-var modals$1 = {
-  /**
-   * モーダルを追加します。
-   * @param {riotx.Context} context
-   * @param {String} tagName
-   * @param {Object} tagOpts
-   * @param {Object} modalOpts
-   * @return {Array}
-   */
-  add: (context, tagName, tagOpts, modalOpts) => {
-    if ( tagOpts === void 0 ) tagOpts = {};
-    if ( modalOpts === void 0 ) modalOpts = {};
-
-    context.state.modals.push({
-      id: `modal_${Date.now()}`,
-      tagName,
-      tagOpts,
-      modalOpts
-    });
-    return [constants$3.MODALS];
-  },
-
-  /**
-   * モーダルを削除します。
-   * @param {riotx.Context} context
-   * @param {String} modalID
-   * @return {Array}
-   */
-  remove: (context, modalID) => {
-    context.state.modals = reject_1$1(context.state.modals, modal => {
-      return (modal.id === modalID);
-    });
-    return [constants$3.MODALS];
-  }
-};
-
-var oas$1 = {
-  /**
-   * SwaggerClientインスタンスを設定します。
-   * @param {riotx.Context} context
-   * @param {SwaggerClient} client
-   * @return {Array}
-   */
-  client: (context, client) => {
-    context.state.oas.client = client;
-    return [constants$3.OAS];
-  },
-
-  /**
-   * SwaggerClientインスタンスをクリアします。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  clearClient: context => {
-    context.state.oas.client = null;
-    return [constants$3.OAS];
-  }
-};
-
-var page$1 = {
-  /**
-   * ページ情報を書き換えます。
-   * @param {riotx.Context} context
-   * @param {Object|null} page
-   * @return {Array}
-   */
-  all: (context, page) => {
-    context.state.page = page;
-    return [constants$3.PAGE];
-  }
-};
-
-var popovers$1 = {
-  /**
-   * 吹き出しを追加します。
-   * @param {riotx.Context} context
-   * @param {String} tagName
-   * @param {Object} tagOpts
-   * @param {Object} popoverOpts
-   * @return {Array}
-   */
-  add: (context, tagName, tagOpts, popoverOpts) => {
-    if ( tagOpts === void 0 ) tagOpts = {};
-    if ( popoverOpts === void 0 ) popoverOpts = {};
-
-    context.state.popovers.push({
-      id: `popover_${Date.now()}`,
-      tagName,
-      tagOpts,
-      popoverOpts: objectAssign({
-        direction: 'T',
-        width: 100,
-        x: 0,
-        y: 0
-      }, popoverOpts)
-    });
-    return [constants$3.POPOVERS];
-  },
-
-  /**
-   * 吹き出しを削除します。
-   * @param {riotx.Context} context
-   * @param {String} popoverID
-   * @return {Array}
-   */
-  remove: (context, popoverID) => {
-    context.state.popovers = reject_1$1(context.state.popovers, popover => {
-      return (popover.id === popoverID);
-    });
-    return [constants$3.POPOVERS];
-  }
-};
-
-const generateId = () => {
-  return `toast_${Date.now()}`;
-};
-
-const TOAST_TYPE_NORMAL = 'normal';
-const TOAST_TIMEOUT = 3 * 1000;
-const TOAST_AUTO_HIDE = true;
-
-var toasts$1 = {
-  /**
-   * トーストを追加します。
-   * @param {riotx.Context} context
-   * @param {Object} obj
-   * @return {Array}
-   */
-  add: (context, obj) => {
-    const data = objectAssign({
-      type: TOAST_TYPE_NORMAL,
-      timeout: TOAST_TIMEOUT,
-      autoHide: TOAST_AUTO_HIDE
-    }, obj, {
-      id: generateId()
-    });
-
-    context.state.toasts.push(data);
-    return [constants$3.TOASTS];
-  },
-
-  /**
-   * トーストを削除します。
-   * @param {riotx.Context} context
-   * @param {String} toastId
-   * @return {Array}
-   */
-  remove: (context, toastId) => {
-    context.state.toasts = reject_1$1(context.state.toasts, toast => {
-      return toast.id === toastId;
-    });
-
-    return [constants$3.TOASTS];
-  }
-};
-
-var ua$1 = {
-  /**
-   * UA情報を書き換えます。
-   * @param {riotx.Context} context
-   * @param {Object} ua
-   * @return {Array}
-   */
-  all: (context, ua) => {
-    context.state.ua = ua;
-    return [constants$3.UA];
-  }
-};
-
-const constants$2 = {
-  APPLICATION_LAUNCH: 'APPLICATION_LAUNCH',
-  APPLICATION_NAVIGATION: 'APPLICATION_NAVIGATION',
-  APPLICATION_NETWORKINGS_ADD: 'APPLICATION_NETWORKINGS_ADD',
-  APPLICATION_NETWORKINGS_REMOVE: 'APPLICATION_NETWORKINGS_REMOVE',
-  APPLICATION_DRAG: 'APPLICATION_DRAG',
-  APPLICATION_MENU_TOGGLE: 'APPLICATION_MENU_TOGGLE',
-  APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
-  COMPONENTS_UPDATE_ONE: 'COMPONENTS_UPDATE_ONE',
-  COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
-  COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
-  CURRENT: 'CURRENT',
-  VIRON: 'VIRON',
-  DRAWERS_ADD: 'DRAWERS_ADD',
-  DRAWERS_REMOVE: 'DRAWERS_REMOVE',
-  ENDPOINTS_ADD: 'ENDPOINTS_ADD',
-  ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
-  ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
-  ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
-  ENDPOINTS_UPDATE_TOKEN: 'ENDPOINTS_UPDATE_TOKEN',
-  ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
-  ENDPOINTS_TIDY_UP_ORDER: 'ENDPOINTS_TIDY_UP_ORDER',
-  ENDPOINTS_CHANGE_ORDER: 'ENDPOINTS_CHANGE_ORDER',
-  LAYOUT_SIZE: 'LAYOUT_SIZE',
-  LAYOUT_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_COMPONENTS_GRID_COLUMN_COUNT',
-  LOCATION: 'LOCATION',
-  LOCATION_NAME: 'LOCATION_NAME',
-  LOCATION_ROUTE: 'LOCATION_ROUTE',
-  MODALS_ADD: 'MODALS_ADD',
-  MODALS_REMOVE: 'MODALS_REMOVE',
-  OAS_CLIENT: 'OAS_CLIENT',
-  OAS_CLIENT_CLEAR: 'OAS_CLIENT_CLEAR',
-  PAGE: 'PAGE',
-  POPOVERS_ADD: 'POPOVERS_ADD',
-  POPOVERS_REMOVE: 'POPOVERS_REMOVE',
-  TOASTS_ADD: 'TOASTS_ADD',
-  TOASTS_REMOVE: 'TOASTS_REMOVE',
-  UA: 'UA'
-};
-
-var mutations = {
-  [constants$2.APPLICATION_LAUNCH]: application$1.launch,
-  [constants$2.APPLICATION_NAVIGATION]: application$1.navigation,
-  [constants$2.APPLICATION_NETWORKINGS_ADD]: application$1.addNetworking,
-  [constants$2.APPLICATION_NETWORKINGS_REMOVE]: application$1.removeNetworking,
-  [constants$2.APPLICATION_DRAG]: application$1.drag,
-  [constants$2.APPLICATION_MENU_TOGGLE]: application$1.menuToggle,
-  [constants$2.APPLICATION_ENDPOINT_FILTER_TEXT]: application$1.endpointFilterText,
-  [constants$2.COMPONENTS_UPDATE_ONE]: components$1.updateOne,
-  [constants$2.COMPONENTS_REMOVE_ONE]: components$1.removeOne,
-  [constants$2.COMPONENTS_REMOVE_ALL]: components$1.removeAll,
-  [constants$2.CURRENT]: current$1.all,
-  [constants$2.VIRON]: viron$1.all,
-  [constants$2.DRAWERS_ADD]: drawers$1.add,
-  [constants$2.DRAWERS_REMOVE]: drawers$1.remove,
-  [constants$2.ENDPOINTS_ADD]: endpoints$1.add,
-  [constants$2.ENDPOINTS_REMOVE]: endpoints$1.remove,
-  [constants$2.ENDPOINTS_REMOVE_ALL]: endpoints$1.removeAll,
-  [constants$2.ENDPOINTS_UPDATE]: endpoints$1.update,
-  [constants$2.ENDPOINTS_UPDATE_TOKEN]: endpoints$1.updateToken,
-  [constants$2.ENDPOINTS_MERGE_ALL]: endpoints$1.mergeAll,
-  [constants$2.ENDPOINTS_TIDY_UP_ORDER]: endpoints$1.tidyUpOrder,
-  [constants$2.ENDPOINTS_CHANGE_ORDER]: endpoints$1.changeOrder,
-  [constants$2.LAYOUT_SIZE]: layout$1.updateSize,
-  [constants$2.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout$1.updateComponentsGridColumnCount,
-  [constants$2.LOCATION]: location$2.all,
-  [constants$2.LOCATION_NAME]: location$2.name,
-  [constants$2.LOCATION_ROUTE]: location$2.route,
-  [constants$2.MODALS_ADD]: modals$1.add,
-  [constants$2.MODALS_REMOVE]: modals$1.remove,
-  [constants$2.OAS_CLIENT]: oas$1.client,
-  [constants$2.OAS_CLIENT_CLEAR]: oas$1.clearClient,
-  [constants$2.PAGE]: page$1.all,
-  [constants$2.POPOVERS_ADD]: popovers$1.add,
-  [constants$2.POPOVERS_REMOVE]: popovers$1.remove,
-  [constants$2.TOASTS_ADD]: toasts$1.add,
-  [constants$2.TOASTS_REMOVE]: toasts$1.remove,
-  [constants$2.UA]: ua$1.all
-};
-
-var application = {
-  /**
-   * 起動状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  launch: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.APPLICATION_LAUNCH, true);
-      });
-  },
-
-  /**
-   * 画面遷移状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  startNavigation: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.APPLICATION_NAVIGATION, true);
-      });
-  },
-
-  /**
-   * 画面遷移完了状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  endNavigation: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.APPLICATION_NAVIGATION, false);
-      });
-  },
-
-  /**
-   * ドラッグ状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  startDrag: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.APPLICATION_DRAG, true);
-      });
-  },
-
-  /**
-   * ドラッグ完了状態にします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  endDrag: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.APPLICATION_DRAG, false);
-      });
-  },
-
-  /**
-   * メニューの開閉状態をトグルします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  toggleMenu: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.APPLICATION_MENU_TOGGLE);
-      });
-  },
-
-  /**
-   * エンドポイントフィルター用のテキストを更新します。
-   * @param {riotx.Context} context
-   * @param {String} newFilterText
-   * @return {Promise}
-   */
-  updateEndpointFilterText: (context, newFilterText) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.APPLICATION_ENDPOINT_FILTER_TEXT, newFilterText);
-      });
-  },
-
-  /**
-   * エンドポイントフィルター用のテキストをリセットします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  resetEndpointFilterText: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.APPLICATION_ENDPOINT_FILTER_TEXT, '');
-      });
-  }
-};
-
-/**
-     */
-    function isObject(val) {
-        return isKind_1$1(val, 'Object');
-    }
-    var isObject_1 = isObject;
-
-/**
- * body値をContent-Type `application/json`に最適化します。
- * @param {*} body
- * @return {*}
- */
-const jsonConverter = body => {
-  return JSON.stringify(body);
-};
-
-/**
- * body値をContent-Type `application/x-www-form-urlencoded`に最適化します。
- * @param {*} body
- * @return {*}
- */
-const urlEncodedStandardQueryStringConverter = body => {
-  const strings = [];
-  const keys = Object.keys(body);
-
-  keys.forEach(key => {
-    const value = body[key];
-    const string = `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-
-    strings.push(string);
-  });
-
-  return strings.join('&');
-};
-
-/**
- * body値をContent-Type `multipart/form-data`に最適化します。
- * @param {*} body
- * @return {*}
- */
-const formDataConverter = body => {
-  const formData = new FormData();
-  const keys = Object.keys(body);
-
-  keys.forEach(key => {
-    const value = body[key];
-
-    if (isObject_1(value) || Array.isArray(value)) {
-      formData.append(key, JSON.stringify(value));
-    } else if (value != null) {
-      formData.append(key, value);
-    }
-  });
-
-  return formData;
-};
-
-/**
- * 共通設定が施されたFetch API。
- * @param {riotx.Context} context
- * @param {String} url
- * @param {Object} options
- * @return {Promise}
- */
-const commonFetch = (context, url, options) => {
-  options = objectAssign({
-    mode: 'cors',
-    // redirect方法はレスポンスにそう形にする。
-    redirect: 'follow',
-    headers: {
-      // 何も指定しない場合はこれをデフォルトにする。
-      'Content-Type': 'application/json'
-    },
-    cache: 'no-store'
-  }, options);
-
-  // `Content-Type`に応じてbody内容を書き換えます。
-  if (!!options.body && (options.method === 'POST' || options.method === 'PUT')) {
-    switch (options.headers['Content-Type']) {
-    case 'application/json':
-      options.body = jsonConverter(options.body);
-      break;
-    case 'application/x-www-form-urlencoded':
-      options.body = urlEncodedStandardQueryStringConverter(options.body);
-      break;
-    case 'multipart/form-data':
-      options.body = formDataConverter(options.body);
-      break;
-    default:
-      break;
-    }
-  }
-
-  const networkingId = `networking_${Date.now()}`;
-  return Promise
-    .resolve()
-    .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
-      id: networkingId,
-      url,
-      options
-    }))
-    .then(() => Promise.race([
-      fetch(url, options),
-      new Promise((resolve, reject) => {
-        setTimeout(() => {
-          reject(new Error('時間がかかり過ぎたため通信を中断しました。'));
-        }, 1000 * 10);
-      })
-    ]))
-    .then(response => {
-      context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
-      return response;
-    })
-    .then(response => { // status check.
-      if (!response.ok) {
-        return Promise.reject(response);
-      }
-      return Promise.resolve(response);
-    })
-    .catch(err => {
-      context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
-      throw err;
-    });
-};
-
-var application$3 = {
-  /**
-   * `application`情報を返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  all: context => {
-    return context.state.application;
-  },
-
-  /**
-   * 起動状態を返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isLaunched: context => {
-    return context.state.application.isLaunched;
-  },
-
-  /**
-   * 遷移中か否かを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isNavigating: context => {
-    return context.state.application.isNavigating;
-  },
-
-  /**
-   * API通信中か否かを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isNetworking: context => {
-    return context.state.application.isNetworking;
-  },
-
-  /**
-   * ドラッグ中か否かを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isDragging: context => {
-    return context.state.application.isDragging;
-  },
-
-  /**
-   * メニューの開閉状態を返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isMenuOpened: context => {
-    return context.state.application.isMenuOpened;
-  },
-
-  /**
-   * エンドポイントフィルター用のテキストを返します。
-   * @param {riotx.Context} context
-   * @return {String}
-   */
-  endpointFilterText: context => {
-    return context.state.application.endpointFilterText;
-  }
-};
-
-/**
-     * Array filter
-     */
-    function filter$1(arr, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            if (callback(value, i, arr)) {
-                results.push(value);
-            }
-        }
-
-        return results;
-    }
-
-    var filter_1$1 = filter$1;
-
-/**
-     * Array map
-     */
-    function map$1(arr, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var results = [];
-        if (arr == null){
-            return results;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            results[i] = callback(arr[i], i, arr);
-        }
-
-        return results;
-    }
-
-     var map_1$1 = map$1;
-
-/**
-     * @return {array} Array of unique items
-     */
-    function unique$1(arr, compare){
-        compare = compare || isEqual$1;
-        return filter_1$1(arr, function(item, i, arr){
-            var n = arr.length;
-            while (++i < n) {
-                if ( compare(item, arr[i]) ) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
-
-    function isEqual$1(a, b){
-        return a === b;
-    }
-
-    var unique_1$1 = unique$1;
-
-/**
-     * Get object keys
-     */
-     var keys = Object.keys || function (obj) {
-            var keys = [];
-            forOwn_1$1(obj, function(val, key){
-                keys.push(key);
-            });
-            return keys;
-        };
-
-    var keys_1 = keys;
-
-var components$2 = {
-  /**
-   * 全情報を返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  all: context => {
-    return context.state.components;
-  },
-
-  /**
-   * 指定riotIDに対する要素を返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Object}
-   */
-  one: (context, riotId) => {
-    return context.state.components[riotId];
-  },
-
-  /**
-   * 指定riotIDに対する要素のAPIレスポンスを返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {*}
-   */
-  response: (context, riotId) => {
-    return context.state.components[riotId].response;
-  },
-
-  /**
-   * 指定riotIDに対する要素のschemaObjectを返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Object}
-   */
-  schemaObject: (context, riotId) => {
-    return context.state.components[riotId].schemaObject;
-  },
-
-  /**
-   * 指定riotIDに対する要素のparamterObject群を返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Array}
-   */
-  parameterObjects: (context, riotId) => {
-    return context.state.components[riotId].parameterObjects;
-  },
-
-  /**
-   * 全てののparamterObject群を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  parameterObjectsEntirely: context => {
-    let entireParameterObjects = [];
-    const weights = {};
-    forOwn_1$1(context.state.components, component => {
-      entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
-    });
-    entireParameterObjects = map_1$1(entireParameterObjects, entireParameterObject => {
-      const name = entireParameterObject.name;
-      weights[name] || (weights[name] = 0);
-      weights[name] = weights[name] + 1;
-      return objectAssign({}, entireParameterObject);
-    });
-    entireParameterObjects = unique_1$1(entireParameterObjects, (a, b) => {
-      return (a.name === b.name);
-    });
-    forEach_1$1(entireParameterObjects, entireParameterObject => {
-      entireParameterObject.weight = weights[entireParameterObject.name];
-    });
-    entireParameterObjects = sortBy_1$1(entireParameterObjects, entireParameterObject => {
-      return weights[entireParameterObject.name] * (-1);
-    });
-    return entireParameterObjects;
-  },
-
-  /**
-   * action(operationObject)群を返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Array}
-   */
-  actions: (context, riotId) => {
-    return map_1$1(context.state.components[riotId].actions, action => {
-      return action.operationObject;
-    });
-  },
-
-  /**
-   * 自身に関連するaction(operationObject)群を返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Array}
-   */
-  selfActions: (context, riotId) => {
-    const actions = context.state.components[riotId].actions;
-    const selfActions = filter_1$1(actions, action => {
-      return (!action.appendTo || action.appendTo === 'self');
-    });
-    return map_1$1(selfActions, action => {
-      return action.operationObject;
-    });
-  },
-
-  /**
-   * テーブル行に関連するaction(operationObject)群を返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Array}
-   */
-  rowActions: (context, riotId) => {
-    const actions = context.state.components[riotId].actions;
-    const selfActions = filter_1$1(actions, action => {
-      return (action.appendTo === 'row');
-    });
-    return map_1$1(selfActions, action => {
-      return action.operationObject;
-    });
-  },
-
-  /**
-   * 指定riotIDに対する要素のページング機能ON/OFFを返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Boolean}
-   */
-  hasPagination: (context, riotId) => {
-    return context.state.components[riotId].hasPagination;
-  },
-
-  /**
-   * 指定riotIDに対する要素の自動更新secを取得します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Number}
-   */
-  autoRefreshSec: (context, riotId) => {
-    return context.state.components[riotId].autoRefreshSec;
-  },
-
-  /**
-   * 指定riotIDに対する要素のページング情報を返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Object}
-   */
-  pagination: (context, riotId) => {
-    return context.state.components[riotId].pagination;
-  },
-
-  /**
-   * テーブル行のラベルに使用するkey群を返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Array}
-   */
-  tableLabels: (context, riotId) => {
-    return context.state.components[riotId].table_labels || [];
-  },
-
-  /**
-   * テーブル列のキー群を返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {Array}
-   */
-  tableColumns: (context, riotId) => {
-    const response = context.state.components[riotId].response;
-    if (!isArray_1$1(response) || !response.length) {
-      return [];
-    }
-    return keys_1(response[0]);
-  },
-
-  /**
-   * テーブル行に使用するprimaryキーを返します。
-   * @param {riotx.Context} context
-   * @param {String} riotId
-   * @return {String|null}
-   */
-  primaryKey: (context, riotId) => {
-    return context.state.components[riotId].primaryKey || null;
-  }
-};
-
-var current$2 = {
-  /**
-   * 選択中のendpointIDを返します。
-   * @param {riotx.Context} context
-   * @return {String|null}
-   */
-  all: context => {
-    return context.state.current;
-  }
-};
-
-/**
-     * Creates a new object with all the properties where the callback returns
-     * true.
-     */
-    function filterValues(obj, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var output = {};
-        forOwn_1$1(obj, function(value, key, obj) {
-            if (callback(value, key, obj)) {
-                output[key] = value;
-            }
-        });
-
-        return output;
-    }
-    var filter$4 = filterValues;
-
-/**
-     * Get object values
-     */
-    function values(obj) {
-        var vals = [];
-        forOwn_1$1(obj, function(val, key){
-            vals.push(val);
-        });
-        return vals;
-    }
-
-    var values_1 = values;
-
-const SECTION_DASHBOARD = 'dashboard';
-const SECTION_MANAGE = 'manage';
-
-var viron$2 = {
-  /**
-   * 全て返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  all: context => {
-    if (!context.state.viron) {
-      return null;
-    }
-    return context.state.viron;
-  },
-
-  /**
-   * VIRONデータが存在する否か。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  existence: context => {
-    return !!context.state.viron;
-  },
-
-  /**
-   * page群を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  pages: context => {
-    return context.state.viron.pages;
-  },
-
-  /**
-   * 指定idx値のpageのidを返します。
-   * @param {riotx.Context} context
-   * @param {Number} idx
-   * @return {String}
-   */
-  pageIdOf: (context, idx) => {
-    return context.state.viron.pages[idx].id;
-  },
-
-  /**
-   * 名前を返します。
-   * @param {riotx.Context} context
-   * @return {String|null}
-   */
-  name: context => {
-    if (!context.state.viron) {
-      return null;
-    }
-    return context.state.viron.name;
-  },
-
-  /**
-   * サムネイルを返します。
-   * @param {riotx.Context} context
-   * @return {String|null}
-   */
-  thumbnail: context => {
-    if (!context.state.viron) {
-      return null;
-    }
-    return context.state.viron.thumbnail;
-  },
-
-  /**
-   * ダッシュボードメニュー群を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  dashboard: context => {
-    if (!context.state.viron) {
-      return [];
-    }
-    return values_1(filter$4(context.state.viron.pages, page => {
-      if (page.section !== SECTION_DASHBOARD) {
-        return false;
-      }
-      return true;
-    }));
-  },
-
-  /**
-   * 管理画面メニュー群を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  manage: context => {
-    if (!context.state.viron) {
-      return [];
-    }
-    return values_1(filter$4(context.state.viron.pages, page => {
-      if (page.section !== SECTION_MANAGE) {
-        return false;
-      }
-      return true;
-    }));
-  },
-
-  /**
-   * メニュー内容を返します。
-   * @param {riot.Context} context
-   * @return {Array}
-   */
-  menu: context => {
-    const menu = [];
-    if (!context.state.viron || !context.state.viron.sections) {
-      return menu;
-    }
-    const sections = context.state.viron.sections;
-    forEach_1$1(sections, section => {
-      menu.push({
-        name: section.label || section.id,
-        id: section.id,
-        groups: []
-      });
-    });
-    const pages = context.state.viron.pages;
-    forEach_1$1(pages, page => {
-      const targetSection = find_1$1(menu, section => {
-        return (section.id === page.section);
-      });
-      const groupName = page.group;
-      const isIndependent = !groupName;
-      if (isIndependent) {
-        targetSection.groups.push({
-          pages: [{
-            name: page.name,
-            id: page.id
-          }],
-          isIndependent
-        });
-      } else {
-        if (!find_1$1(targetSection.groups, group => {
-          return (group.name === groupName);
-        })) {
-          targetSection.groups.push({
-            name: groupName,
-            pages: [],
-            isIndependent
-          });
-        }
-        const targetGroup = find_1$1(targetSection.groups, group => {
-          return (group.name === groupName);
-        });
-        targetGroup.pages.push({
-          name: page.name,
-          id: page.id
-        });
-      }
-    });
-    return menu;
-  }
-};
-
-var drawers$2 = {
-  /**
-   * 全てのドローワー情報を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  all: context => {
-    return context.state.drawers;
-  }
-};
-
-/**
-     * Get object size
-     */
-    function size(obj) {
-        var count = 0;
-        forOwn_1$1(obj, function(){
-            count++;
-        });
-        return count;
-    }
-
-    var size_1 = size;
-
-/**
-     * Typecast a value to a String, using an empty string value for null or
-     * undefined.
-     */
-    function toString(val){
-        return val == null ? '' : val.toString();
-    }
-
-    var toString_1 = toString;
-
-/**
-     * Searches for a given substring
-     */
-    function contains$1(str, substring, fromIndex){
-        str = toString_1(str);
-        substring = toString_1(substring);
-        return str.indexOf(substring, fromIndex) !== -1;
-    }
-
-    var contains_1$1 = contains$1;
-
-/**
- * 受け取ったエンドポイント群をorder昇順の配列として返します。
- * @param {Object} endpoints
- * @return {Array}
- */
-const sortByOrder = endpoints => {
-  let endpointsByOrder = [];
-  forOwn_1$1(endpoints, (endpoint, key) => {
-    endpoint.key = key;
-    endpointsByOrder.push(endpoint);
-  });
-  endpointsByOrder = sortBy_1$1(endpointsByOrder, endpoint => {
-    return endpoint.order;
-  });
-  return endpointsByOrder;
-};
-
-/**
- * 受け取ったエンドポイント群をfilterして返します。
- * @param {Array} endpoints
- * @param {String} filterText
- * @return {Array}
- */
-const filterBy = (endpoints, filterText) => {
-  filterText = filterText || '';
-  filterText = filterText.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
-  filterText = filterText.replace(/,/g, ' ');
-  const targetTexts = filter_1$1((filterText || '').split(' '), targetText => {
-    return !!targetText;
-  });
-  if (!targetTexts.length) {
-    return endpoints;
-  }
-
-  return filter_1$1(endpoints, endpoint => {
-    let isMatched = false;
-    forEach_1$1(targetTexts, targetText => {
-      if (contains_1$1(endpoint.url, targetText)) {
-        isMatched = true;
-      }
-      if (contains_1$1(endpoint.title, targetText)) {
-        isMatched = true;
-      }
-      if (contains_1$1(endpoint.name, targetText)) {
-        isMatched = true;
-      }
-      if (contains_1$1(endpoint.description, targetText)) {
-        isMatched = true;
-      }
-      if (contains_1$1(endpoint.memo, targetText)) {
-        isMatched = true;
-      }
-      forEach_1$1(endpoint.tags || [], tag => {
-        if (contains_1$1(tag, targetText)) {
-          isMatched = true;
-        }
-      });
-    });
-    return isMatched;
-  });
-};
-
-var endpoints$2 = {
-  /**
-   * 全endpointを返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  all: context => {
-    return context.state.endpoints;
-  },
-
-  /**
-   * 全endpointをorder昇順の配列として返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  allByOrder: context => {
-    let endpoints = objectAssign(context.state.endpoints);
-    endpoints = sortByOrder(endpoints);
-    return endpoints;
-  },
-
-  /**
-   * 全endpointをorder昇順のfilter済み配列として返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  allByOrderFiltered: context => {
-    let endpoints = objectAssign(context.state.endpoints);
-    endpoints = sortByOrder(endpoints);
-    endpoints = filterBy(endpoints, context.state.application.endpointFilterText);
-    return endpoints;
-  },
-
-  /**
-   * endpoint数を返します。
-   * @param {riotx.Context} context
-   * @return {Number}
-   */
-  count: context => {
-    return size_1(context.state.endpoints);
-  },
-
-  /**
-   * 認証トークンを省いた全endpointを返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  allWithoutToken: context => {
-    const endpoints = objectAssign({}, context.state.endpoints);
-    // 認証用トークンはexport対象外とする。
-    forOwn_1$1(endpoints, endpoint => {
-      delete endpoint.token;
-    });
-    return endpoints;
-  },
-
-  /**
-   * 指定keyにマッチするendpointを返します。
-   * @param {riotx.Context} context
-   * @param {String} key
-   * @return {Object}
-   */
-  one: (context, key) => {
-    return context.state.endpoints[key];
-  },
-
-  /**
-   * 指定urlにマッチするendpointを返します。
-   * @param {riotx.Context} context
-   * @param {String} url
-   * @return {Object}
-   */
-  oneByURL: (context, url) => {
-    const endpoints = context.state.endpoints;
-    return find_1$2(endpoints, endpoint => {
-      return endpoint.url === url;
-    });
-  }
-
-};
-
-var layout$2 = {
-  /**
-   * レイアウトタイプを返します。
-   * @param {riotx.Context} context
-   * @return {String}
-   */
-  type: context => {
-    return context.state.layout.type;
-  },
-
-  /**
-   * レイアウトタイプがdesktopならtrueを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isDesktop: context => {
-    return (context.state.layout.type === constants$4.layoutTypeDesktop);
-  },
-
-  /**
-   * レイアウトタイプがmobileならtrueを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isMobile: context => {
-    return (context.state.layout.type === constants$4.layoutTypeMobile);
-  },
-
-  /**
-   * 表示サイズを返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  size: context => {
-    return context.state.layout.size;
-  },
-
-  /**
-   * componentリストのgridレイアウトのcolumn数を返します。
-   * @param {riotx.Context} context
-   * @return {Number}
-   */
-  componentsGridColumnCount: context => {
-    return context.state.layout.componentsGridColumnCount;
-  }
-};
-
-var location$3 = {
-  /**
-   * 全情報を返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  all: context => {
-    return context.state.location;
-  },
-
-  /**
-   * トップページか判定します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  isTop: context => {
-    return (context.state.location.name === 'endpoints');
-  },
-
-  /**
-   * ページ名を返します。
-   * @param {riotx.Context} context
-   * @return {String}
-   */
-  name: context => {
-    return context.state.location.name;
-  },
-
-  /**
-   * ルーティング情報を返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  route: context => {
-    return context.state.location.route;
-  }
-};
-
-var menu = {
-  /**
-   * 有効状態を返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  enabled: context => {
-    return context.state.menu.isEnabled;
-  }
-};
-
-var modals$2 = {
-  /**
-   * 全てのモーダル情報を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  all: context => {
-    return context.state.modals;
-  }
-};
-
-var oas$2 = {
-  /**
-   * SwaggerClientを返します。
-   * @param {riotx.Context} context
-   * @return {SwaggerClient}
-   */
-  client: context => {
-    return context.state.oas.client;
-  },
-
-  /**
-   * resolve済みのOpenAPI Documentを返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  spec: context => {
-    return context.state.oas.client.spec;
-  },
-
-  /**
-   * resolve前のオリジナルのOpenAPI Documentを返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  originalSpec: context => {
-    return context.state.oas.client.originalSpec;
-  },
-
-  /**
-   * resolveされたAPI群を返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  apis: context => {
-    return context.state.oas.client.apis;
-  },
-
-  /**
-   * resolveされたAPI群をflatな構成にして返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  flatApis: context => {
-    // client.apisはタグ分けされているので、まずflatな構成にする。
-    const apis = {};
-    forOwn_1$1(context.state.oas.client.apis, obj => {
-      forOwn_1$1(obj, (api, operationId) => {
-        apis[operationId] = api;
-      });
-    });
-    return apis;
-  },
-
-  /**
-   * 指定したoperationIdにマッチするresolveされたAPIを返します。
-   * @param {riotx.Context} context
-   * @param {String} operationId
-   * @return {Function}
-   */
-  api: (context, operationId) => {
-    const apis = {};
-    forOwn_1$1(context.state.oas.client.apis, obj => {
-      forOwn_1$1(obj, (api, operationId) => {
-        apis[operationId] = api;
-      });
-    });
-    return apis[operationId];
-  },
-
-  /**
-   * 指定したpathとmethodにマッチするresolveされたAPIを返します。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @param {String} method
-   * @return {Function}
-   */
-  apiByPathAndMethod: (context, path, method) => {
-    const operationObject = context.state.oas.client.spec.paths[path][method];
-    const operationId = operationObject.operationId;
-    const apis = {};
-    forOwn_1$1(context.state.oas.client.apis, obj => {
-      forOwn_1$1(obj, (api, operationId) => {
-        apis[operationId] = api;
-      });
-    });
-    return apis[operationId];
-  },
-
-  /**
-   * 指定したpathにマッチするPathItemObjectを返します。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @return {Object}
-   */
-  pathItemObject: (context, path) => {
-    return context.state.oas.client.spec.paths[path];
-  },
-
-  /**
-   * 指定したoperationIdにマッチするPathItemObjectのmethod名を返します。
-   * @param {riotx.Context} context
-   * @param {String} operationId
-   * @return {String}
-   */
-  pathItemObjectMethodNameByOperationId: (context, operationId) => {
-    let ret;
-    forOwn_1$1(context.state.oas.client.spec.paths, pathItemObject => {
-      if (!!ret) {
-        return;
-      }
-      forOwn_1$1(pathItemObject, (operationObject, method) => {
-        if (!!ret) {
-          return;
-        }
-        if (operationObject.operationId === operationId) {
-          ret = method;
-        }
-      });
-    });
-    return ret;
-  },
-
-  /**
-   * 指定したpathとmethodにマッチするOperationObjectを返します。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @param {String} method
-   * @return {Object}
-   */
-  operationObject: (context, path, method) => {
-    return context.state.oas.client.spec.paths[path][method];
-  },
-
-  /**
-   * 指定したcomponentに関連するOperationObject(action)群を返します。
-   * @param {riotx.Context} context
-   * @param {Object} component
-   * @return {Array}
-   */
-  operationObjectsAsAction: (context, component) => {
-    const methods = ['get','put', 'post', 'delete'];
-    const basePath = component.api.path;
-    const primaryKey = component.primary;
-    const actions = component.actions || [];
-
-    // 関連API情報。後のOperationObject群抽出に使用します。
-    const pathRefs = [];
-    // 同じpath & method違いのoperationObjectは関連有りとみなす。
-    forEach_1$1(methods, method => {
-      // `get`はcomponent自身なのでスルーする。
-      if (method === 'get') {
-        return;
-      }
-      const isOperationObjectDefined = !!context.state.oas.client.spec.paths[basePath] && !!context.state.oas.client.spec.paths[basePath][method];
-      if (!isOperationObjectDefined) {
-        return;
-      }
-      pathRefs.push({
-        path: basePath,
-        method,
-        appendTo: 'self'
-      });
-    });
-    // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
-    // テーブルの各rowに紐づくOperationObjectとみなす。
-    if (!!primaryKey) {
-      const listBasePath = `${basePath}/{${primaryKey}}`;
-      forEach_1$1(methods, method => {
-        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[listBasePath] && !!context.state.oas.client.spec.paths[listBasePath][method];
-        if (!isOperationObjectDefined) {
-          return;
-        }
-        pathRefs.push({
-          path: listBasePath,
-          method,
-          appendTo: 'row'
-        });
-      });
-    }
-    // actionsに指定されたpath群のOperationObjectも関連有りとみなします。
-    // path内にprimaryKeyと同一名の変数があれば、それはテーブルrowに紐づくOperationObjectとみなします。
-    // primaryKeyと同一名の変数が無ければ、componentと紐づくOperationObjectとみなします。
-    forEach_1$1(actions, actionBasePath => {
-      const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
-      forEach_1$1(methods, method => {
-        const isOperationObjectDefined = !!context.state.oas.client.spec.paths[actionBasePath] && !!context.state.oas.client.spec.paths[actionBasePath][method];
-        if (!isOperationObjectDefined) {
-          return;
-        }
-        pathRefs.push({
-          path: actionBasePath,
-          method,
-          appendTo
-        });
-      });
-    });
-
-    // OperationObject群を抽出します。
-    const operationObjects = [];
-    forEach_1$1(pathRefs, ref => {
-      const operationObject = context.state.oas.client.spec.paths[ref.path][ref.method];
-      operationObjects.push(objectAssign({
-        operationObject
-      }, ref));
-    });
-
-    return operationObjects;
-  },
-
-  /**
-   * 指定したpathとmethodにマッチするOperationObjectのoperationIdを返します。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @param {String} method
-   * @return {String}
-   */
-  operationId: (context, path, method) => {
-    return context.state.oas.client.spec.paths[path][method].operationId;
-  },
-
-  /**
-   * 指定したpathとmethodにマッチするOperationObjectのParameterObject群を返します。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @param {String} method
-   * @return {Array}
-   */
-  parameterObjects: (context, path, method) => {
-    return context.state.oas.client.spec.paths[path][method].parameters || [];
-  },
-
-  /**
-   * 指定したpathとmethodにマッチするOperationObject群を返します。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @param {String} method
-   * @return {Object}
-   */
-  responseObjects: (context, path, method) => {
-    return context.state.oas.client.spec.paths[path][method].responses;
-  },
-
-  /**
-   * 指定したpathとmethodにマッチするOperationObjectのresponseObjectを返します。
-   * statusCodeを指定しない場合はデフォルトで200に設定されます。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @param {String} method
-   * @param {Number} statusCode
-   * @return {Object}
-   */
-  responseObject: (context, path, method, statusCode) => {
-    if ( statusCode === void 0 ) statusCode = 200;
-
-    return context.state.oas.client.spec.paths[path][method].responses[statusCode];
-  },
-
-  /**
-   * 指定したpathとmethodにマッチするOperationObjectのresponseObjectのschemaObjectを返します。
-   * statusCodeを指定しない場合はデフォルトで200に設定されます。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @param {String} method
-   * @param {Number} statusCode
-   * @return {Object}
-   */
-  schemaObject: (context, path, method, statusCode) => {
-    if ( statusCode === void 0 ) statusCode = 200;
-
-    return context.state.oas.client.spec.paths[path][method].responses[statusCode].schema;
-  }
-};
-
-var page$2 = {
-  /**
-   * 全情報を返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  all: context => {
-    return context.state.page || {};
-  },
-
-  /**
-   * ページIDを返します。
-   * @param {riotx.Context} context
-   * @return {String}
-   */
-  id: context => {
-    const page = context.state.page;
-    if (!page) {
-      return '';
-    }
-    return page.id;
-  },
-
-  /**
-   * ページ名を返します。
-   * @param {riotx.Context} context
-   * @return {String}
-   */
-  name: context => {
-    const page = context.state.page;
-    if (!page) {
-      return '';
-    }
-    return page.name;
-  },
-
-  /**
-   * コンポーネント群を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  components: context => {
-    const page = context.state.page;
-    if (!page) {
-      return [];
-    }
-    return page.components;
-  },
-
-  /**
-   * table表示のコンポーネント群を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  componentsTable: context => {
-    const page = context.state.page;
-    if (!page) {
-      return [];
-    }
-    return filter_1$1(page.components, component => {
-      return (component.style === 'table');
-    });
-  },
-
-  /**
-   * table表示以外のコンポーネント群を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  componentsNotTable: context => {
-    const page = context.state.page;
-    if (!page) {
-      return [];
-    }
-    return reject_1$1(page.components, component => {
-      return (component.style === 'table');
-    });
-  },
-
-  /**
-   * コンポーネント数を返します。
-   * @param {riotx.Context} context
-   * @return {Number}
-   */
-  componentsCount: context => {
-    const page = context.state.page;
-    if (!page) {
-      return 0;
-    }
-    return (page.components || []).length;
-  }
-};
-
-var popovers$2 = {
-  /**
-   * 全ての吹き出し情報を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  all: context => {
-    return context.state.popovers;
-  }
-};
-
-var toasts$2 = {
-  /**
-   * 全てのトースト情報を返します。
-   * @param {riotx.Context} context
-   * @return {Array}
-   */
-  all: context => {
-    return context.state.toasts;
-  }
-};
-
-var ua$2 = {
-  /**
-   * 全情報を返します。
-   * @param {riotx.Context} context
-   * @return {Object}
-   */
-  all: context => {
-    return context.state.ua;
-  },
-
-  /**
-   * Chromeか否かを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isChrome: context => {
-    return !!context.state.ua.chrome;
-  },
-
-  /**
-   * Safariか否かを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isSafari: context => {
-    return !!context.state.ua.safari;
-  },
-
-  /**
-   * Edgeか否かを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isEdge: context => {
-    return !!context.state.ua.edge;
-  },
-
-  /**
-   * Firefoxか否かを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  isFirefox: context => {
-    return !!context.state.ua.firefox;
-  },
-
-  /**
-   * 使用しているブラウザを返します。
-   * @param {riotx.Context} context
-   * @return {Boolean}
-   */
-  usingBrowser: context => {
-    const ua = context.state.ua;
-    if (!!ua.chrome) {
-      return 'chrome';
-    }
-    if (!!ua.safari) {
-      return 'safari';
-    }
-    if (!!ua.edge) {
-      return 'edge';
-    }
-    if (!!ua.firefox) {
-      return 'firefox';
-    }
-
-    return null;
-  }
-};
-
-const constants$5 = {
-  APPLICATION: 'APPLICATION',
-  APPLICATION_ISLAUNCHED: 'APPLICATION_ISLAUNCHED',
-  APPLICATION_ISNAVIGATING: 'APPLICATION_ISNAVIGATING',
-  APPLICATION_ISNETWORKING: 'APPLICATION_ISNETWORKING',
-  APPLICATION_ISDRAGGING: 'APPLICATION_ISDRAGGING',
-  APPLICATION_ISMENUOPENED: 'APPLICATION_ISMENUOPENED',
-  APPLICATION_ENDPOINT_FILTER_TEXT: 'APPLICATION_ENDPOINT_FILTER_TEXT',
-  COMPONENTS: 'COMPONENTS',
-  COMPONENTS_PARAMETER_OBJECTS: 'COMPONENTS_PARAMETER_OBJECTS',
-  COMPONENTS_ONE: 'COMPONENTS_ONE',
-  COMPONENTS_ONE_RESPONSE: 'COMPONENTS_ONE_RESPONSE',
-  COMPONENTS_ONE_SCHEMA_OBJECT: 'COMPONENTS_ONE_SCHEMA_OBJECT',
-  COMPONENTS_ONE_PARAMETER_OBJECTS: 'COMPONENTS_ONE_PARAMETER_OBJECTS',
-  COMPONENTS_ONE_ACTIONS: 'COMPONENTS_ONE_ACTIONS',
-  COMPONENTS_ONE_ACTIONS_SELF: 'COMPONENTS_ONE_ACTIONS_SELF',
-  COMPONENTS_ONE_ACTIONS_ROW: 'COMPONENTS_ONE_ACTIONS_ROW',
-  COMPONENTS_ONE_HAS_PAGINATION: 'COMPONENTS_ONE_HAS_PAGINATION',
-  COMPONENTS_ONE_AUTO_REFRESH_SEC: 'COMPONENTS_ONE_AUTO_REFRESH_SEC',
-  COMPONENTS_ONE_PAGINATION: 'COMPONENTS_ONE_PAGINATION',
-  COMPONENTS_ONE_TABLE_LABELS: 'COMPONENTS_ONE_TABLE_LABELS',
-  COMPONENTS_ONE_TABLE_COLUMNS: 'COMPONENTS_ONE_TABLE_COLUMNS',
-  COMPONENTS_ONE_PRIMARY_KEY: 'COMPONENTS_ONE_PRIMARY_KEY',
-  CURRENT: 'CURRENT',
-  VIRON: 'VIRON',
-  VIRON_EXISTENCE: 'VIRON_EXISTENCE',
-  VIRON_PAGES: 'VIRON_PAGES',
-  VIRON_PAGES_ID_OF: 'VIRON_PAGES_ID_OF',
-  VIRON_NAME: 'VIRON_NAME',
-  VIRON_THUMBNAIL: 'VIRON_THUMBNAIL',
-  VIRON_DASHBOARD: 'VIRON_DASHBOARD',
-  VIRON_MANAGE: 'VIRON_MANAGE',
-  VIRON_MENU: 'VIRON_MENU',
-  DRAWERS: 'DRAWERS',
-  ENDPOINTS: 'ENDPOINTS',
-  ENDPOINTS_BY_ORDER: 'ENDPOINTS_BY_ORDER',
-  ENDPOINTS_BY_ORDER_FILTERED: 'ENDPOINTS_BY_ORDER_FILTERED',
-  ENDPOINTS_COUNT: 'ENDPOINTS_COUNT',
-  ENDPOINTS_WITHOUT_TOKEN: 'ENDPOINTS_WITHOUT_TOKEN',
-  ENDPOINTS_ONE: 'ENDPOINTS_ONE',
-  ENDPOINTS_ONE_BY_URL: 'ENDPOINTS_ONE_BY_URL',
-  LAYOUT_TYPE: 'LAYOUT_TYPE',
-  LAYOUT_IS_DESKTOP: 'LAYOUT_IS_DESKTOP',
-  LAYOUT_IS_MOBILE: 'LAYOUT_IS_MOBILE',
-  LAYOUT_SIZE: 'LAYOUT_SIZE',
-  LAYOUT_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_COMPONENTS_GRID_COLUMN_COUNT',
-  LOCATION: 'LOCATION',
-  LOCATION_IS_TOP: 'LOCATION_IS_TOP',
-  LOCATION_NAME: 'LOCATION_NAME',
-  LOCATION_ROUTE: 'LOCATION_ROUTE',
-  MENU_ENABLED: 'MENU_ENABLED',
-  MODALS: 'MODALS',
-  OAS_CLIENT: 'OAS_CLIENT',
-  OAS_SPEC: 'OAS_SPEC',
-  OAS_ORIGINAL_SPEC: 'OAS_ORIGINAL_SPEC',
-  OAS_APIS: 'OAS_APIS',
-  OAS_FLAT_APIS: 'OAS_FLAT_APIS',
-  OAS_API: 'OAS_API',
-  OAS_API_BY_PATH_AND_METHOD: 'OAS_API_BY_PATH_AND_METHOD',
-  OAS_PATH_ITEM_OBJECT: 'OAS_PATH_ITEM_OBJECT',
-  OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID: 'OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID',
-  OAS_OPERATION_OBJECT: 'OAS_OPERATION_OBJECT',
-  OAS_OPERATION_OBJECTS_AS_ACTION: 'OAS_OPERATION_OBJECTS_AS_ACTION',
-  OAS_OPERATION_ID: 'OAS_OPERATION_ID',
-  OAS_PARAMETER_OBJECTS: 'OAS_PARAMETER_OBJECTS',
-  OAS_RESPONSE_OBJECT: 'OAS_RESPONSE_OBJECT',
-  OAS_SCHEMA_OBJECT: 'OAS_SCHEMA_OBJECT',
-  PAGE: 'PAGE',
-  PAGE_ID: 'PAGE_ID',
-  PAGE_NAME: 'PAGE_NAME',
-  PAGE_COMPONENTS: 'PAGE_COMPONENTS',
-  PAGE_COMPONENTS_TABLE: 'PAGE_COMPONENTS_TABLE',
-  PAGE_COMPONENTS_NOT_TABLE: 'PAGE_COMPONENTS_NOT_TABLE',
-  PAGE_COMPONENTS_COUNT: 'PAGE_COMPONENTS_COUNT',
-  POPOVERS: 'POPOVERS',
-  TOASTS: 'TOASTS',
-  UA: 'UA',
-  UA_IS_SAFARI: 'UA_IS_SAFARI',
-  UA_IS_EDGE: 'UA_IS_EDGE',
-  UA_IS_FIREFOX: 'UA_IS_FIREFOX',
-  UA_USING_BROWSER: 'UA_USING_BROWSER'
-};
-
-var getters = {
-  [constants$5.APPLICATION]: application$3.all,
-  [constants$5.APPLICATION_ISLAUNCHED]: application$3.isLaunched,
-  [constants$5.APPLICATION_ISNAVIGATING]: application$3.isNavigating,
-  [constants$5.APPLICATION_ISNETWORKING]: application$3.isNetworking,
-  [constants$5.APPLICATION_ISDRAGGING]: application$3.isDragging,
-  [constants$5.APPLICATION_ISMENUOPENED]: application$3.isMenuOpened,
-  [constants$5.APPLICATION_ENDPOINT_FILTER_TEXT]: application$3.endpointFilterText,
-  [constants$5.COMPONENTS]: components$2.all,
-  [constants$5.COMPONENTS_PARAMETER_OBJECTS]: components$2.parameterObjectsEntirely,
-  [constants$5.COMPONENTS_ONE]: components$2.one,
-  [constants$5.COMPONENTS_ONE_RESPONSE]: components$2.response,
-  [constants$5.COMPONENTS_ONE_SCHEMA_OBJECT]: components$2.schemaObject,
-  [constants$5.COMPONENTS_ONE_PARAMETER_OBJECTS]: components$2.parameterObjects,
-  [constants$5.COMPONENTS_ONE_ACTIONS]: components$2.actions,
-  [constants$5.COMPONENTS_ONE_ACTIONS_SELF]: components$2.selfActions,
-  [constants$5.COMPONENTS_ONE_ACTIONS_ROW]: components$2.rowActions,
-  [constants$5.COMPONENTS_ONE_HAS_PAGINATION]: components$2.hasPagination,
-  [constants$5.COMPONENTS_ONE_AUTO_REFRESH_SEC]: components$2.autoRefreshSec,
-  [constants$5.COMPONENTS_ONE_PAGINATION]: components$2.pagination,
-  [constants$5.COMPONENTS_ONE_TABLE_LABELS]: components$2.tableLabels,
-  [constants$5.COMPONENTS_ONE_TABLE_COLUMNS]: components$2.tableColumns,
-  [constants$5.COMPONENTS_ONE_PRIMARY_KEY]: components$2.primaryKey,
-  [constants$5.CURRENT]: current$2.all,
-  [constants$5.VIRON]: viron$2.all,
-  [constants$5.VIRON_EXISTENCE]: viron$2.existence,
-  [constants$5.VIRON_PAGES]: viron$2.pages,
-  [constants$5.VIRON_PAGES_ID_OF]: viron$2.pageIdOf,
-  [constants$5.VIRON_NAME]: viron$2.name,
-  [constants$5.VIRON_THUMBNAIL]: viron$2.thumbnail,
-  [constants$5.VIRON_DASHBOARD]: viron$2.dashboard,
-  [constants$5.VIRON_MANAGE]: viron$2.manage,
-  [constants$5.VIRON_MENU]: viron$2.menu,
-  [constants$5.DRAWERS]: drawers$2.all,
-  [constants$5.ENDPOINTS]: endpoints$2.all,
-  [constants$5.ENDPOINTS_BY_ORDER]: endpoints$2.allByOrder,
-  [constants$5.ENDPOINTS_BY_ORDER_FILTERED]: endpoints$2.allByOrderFiltered,
-  [constants$5.ENDPOINTS_COUNT]: endpoints$2.count,
-  [constants$5.ENDPOINTS_WITHOUT_TOKEN]: endpoints$2.allWithoutToken,
-  [constants$5.ENDPOINTS_ONE]: endpoints$2.one,
-  [constants$5.ENDPOINTS_ONE_BY_URL]: endpoints$2.oneByURL,
-  [constants$5.LAYOUT_TYPE]: layout$2.type,
-  [constants$5.LAYOUT_IS_DESKTOP]: layout$2.isDesktop,
-  [constants$5.LAYOUT_IS_MOBILE]: layout$2.isMobile,
-  [constants$5.LAYOUT_SIZE]: layout$2.size,
-  [constants$5.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT]: layout$2.componentsGridColumnCount,
-  [constants$5.LOCATION]: location$3.all,
-  [constants$5.LOCATION_IS_TOP]: location$3.isTop,
-  [constants$5.LOCATION_NAME]: location$3.name,
-  [constants$5.LOCATION_ROUTE]: location$3.route,
-  [constants$5.MENU_ENABLED]: menu.enabled,
-  [constants$5.MODALS]: modals$2.all,
-  [constants$5.OAS_CLIENT]: oas$2.client,
-  [constants$5.OAS_SPEC]: oas$2.spec,
-  [constants$5.OAS_ORIGINAL_SPEC]: oas$2.originalSpec,
-  [constants$5.OAS_APIS]: oas$2.apis,
-  [constants$5.OAS_FLAT_APIS]: oas$2.flatApis,
-  [constants$5.OAS_API]: oas$2.api,
-  [constants$5.OAS_API_BY_PATH_AND_METHOD]: oas$2.apiByPathAndMethod,
-  [constants$5.OAS_PATH_ITEM_OBJECT]: oas$2.pathItemObject,
-  [constants$5.OAS_PATH_ITEM_OBJECT_METHOD_NAME_BY_OPERATION_ID]: oas$2.pathItemObjectMethodNameByOperationId,
-  [constants$5.OAS_OPERATION_OBJECT]: oas$2.operationObject,
-  [constants$5.OAS_OPERATION_OBJECTS_AS_ACTION]: oas$2.operationObjectsAsAction,
-  [constants$5.OAS_OPERATION_ID]: oas$2.operationId,
-  [constants$5.OAS_PARAMETER_OBJECTS]: oas$2.parameterObjects,
-  [constants$5.OAS_RESPONSE_OBJECT]: oas$2.responseObject,
-  [constants$5.OAS_SCHEMA_OBJECT]: oas$2.schemaObject,
-  [constants$5.PAGE]: page$2.all,
-  [constants$5.PAGE_ID]: page$2.id,
-  [constants$5.PAGE_NAME]: page$2.name,
-  [constants$5.PAGE_COMPONENTS]: page$2.components,
-  [constants$5.PAGE_COMPONENTS_TABLE]: page$2.componentsTable,
-  [constants$5.PAGE_COMPONENTS_NOT_TABLE]: page$2.componentsNotTable,
-  [constants$5.PAGE_COMPONENTS_COUNT]: page$2.componentsCount,
-  [constants$5.POPOVERS]: popovers$2.all,
-  [constants$5.TOASTS]: toasts$2.all,
-  [constants$5.UA]: ua$2.all,
-  [constants$5.UA_IS_SAFARI]: ua$2.isSafari,
-  [constants$5.UA_IS_EDGE]: ua$2.isEdge,
-  [constants$5.UA_IS_FIREFOX]: ua$2.isFirefox,
-  [constants$5.UA_USING_BROWSER]: ua$2.usingBrowser
-};
-
-var auth = {
-  /**
-   * 指定されたエンドポイントのtokenを更新します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {String} token
-   * @return {Promise}
-   */
-  update: (context, endpointKey, token) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
-      });
-  },
-
-  /**
-   * 指定されたエンドポイントのtokenを削除します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @return {Promise}
-   */
-  remove: (context, endpointKey) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
-      });
-  },
-
-  /**
-   * 指定されたエンドポイントのtokenが有効か確認します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @return {Promise}
-   */
-  validate: (context, endpointKey) => {
-    const endpoint = context.getter(constants$5.ENDPOINTS_ONE, endpointKey);
-    return Promise
-      .resolve()
-      .then(() => commonFetch(context, endpoint.url, {
-        headers: {
-          'Authorization': endpoint.token
-        }
-      }))
-      .then(response => {
-        const token = response.headers.get('Authorization');
-        if (!!token) {
-          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
-        }
-        return true;
-      })
-      .catch(err => {
-        if (err.status !== 401) {
-          throw err;
-        }
-        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
-        return false;
-      });
-  },
-
-  /**
-   * 指定されたエンドポイントの認証手段を調べます。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @return {Promise}
-   */
-  getTypes: (context, endpointKey) => {
-    const endpoint = context.getter(constants$5.ENDPOINTS_ONE, endpointKey);
-    const fetchUrl = `${new URL(endpoint.url).origin}/viron_authtype`;
-
-    return Promise
-      .resolve()
-      .then(() => commonFetch(context, fetchUrl))
-      .then(response => response.json());
-  },
-
-  /**
-   * OAuth認証を行います。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {Object} authtype
-   * @return {Promise}
-   */
-  signinOAuth: (context, endpointKey, authtype) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        const endpoint = context.getter(constants$5.ENDPOINTS_ONE, endpointKey);
-        const origin = new URL(endpoint.url).origin;
-        const redirect_url = encodeURIComponent(`${location.href}oauthredirect/${endpointKey}`);
-        const fetchUrl = `${origin}${authtype.url}?redirect_url=${redirect_url}`;
-        location.href = fetchUrl;
-      });
-  },
-
-  /**
-   * メールxパスワード認証を行います。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {Object} authtype
-   * @param {String} email
-   * @param {String} password
-   * @return {Promise}
-   */
-  signinEmail: (context, endpointKey, authtype, email, password) => {
-    const endpoint = context.getter(constants$5.ENDPOINTS_ONE, endpointKey);
-    const fetchUrl = `${new URL(endpoint.url).origin}${authtype.url}`;
-
-    return Promise
-      .resolve()
-      .then(() => commonFetch(context, fetchUrl, {
-        method: authtype.method,
-        body: {
-          email,
-          password
-        }
-      }))
-      .then(response => {
-        const token = response.headers.get('Authorization');
-        context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
-      });
-  }
-};
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
-  }
-
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
-  }
-
-  return parts;
-}
-
-// Split a filename into [root, dir, basename, ext], unix version
-// 'root' is just a slash, or nothing.
-var splitPathRe =
-    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
-var splitPath = function(filename) {
-  return splitPathRe.exec(filename).slice(1);
-};
-
-// path.resolve([from ...], to)
-// posix version
-function resolve() {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = (i >= 0) ? arguments[i] : '/';
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter$6(resolvedPath.split('/'), function(p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-}
-
-// path.normalize(path)
-// posix version
-function normalize(path) {
-  var isPathAbsolute = isAbsolute$1(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter$6(path.split('/'), function(p) {
-    return !!p;
-  }), !isPathAbsolute).join('/');
-
-  if (!path && !isPathAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isPathAbsolute ? '/' : '') + path;
-}
-
-// posix version
-function isAbsolute$1(path) {
-  return path.charAt(0) === '/';
-}
-
-// posix version
-function join$1() {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return normalize(filter$6(paths, function(p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-}
-
-
-// path.relative(from, to)
-// posix version
-function relative(from, to) {
-  from = resolve(from).substr(1);
-  to = resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') { break; }
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') { break; }
-    }
-
-    if (start > end) { return []; }
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-}
-
-var sep = '/';
-var delimiter = ':';
-
-function dirname(path) {
-  var result = splitPath(path),
-      root = result[0],
-      dir = result[1];
-
-  if (!root && !dir) {
-    // No dirname whatsoever
-    return '.';
-  }
-
-  if (dir) {
-    // It has a dirname, strip trailing slash
-    dir = dir.substr(0, dir.length - 1);
-  }
-
-  return root + dir;
-}
-
-function basename$1(path, ext) {
-  var f = splitPath(path)[2];
-  // TODO: make this comparison case-insensitive on windows?
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
-  }
-  return f;
-}
-
-
-function extname(path) {
-  return splitPath(path)[3];
-}
-var path = {
-  extname: extname,
-  basename: basename$1,
-  dirname: dirname,
-  sep: sep,
-  delimiter: delimiter,
-  relative: relative,
-  join: join$1,
-  isAbsolute: isAbsolute$1,
-  normalize: normalize,
-  resolve: resolve
-};
-function filter$6 (xs, f) {
-    if (xs.filter) { return xs.filter(f); }
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        if (f(xs[i], i, xs)) { res.push(xs[i]); }
-    }
-    return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b' ?
-    function (str, start, len) { return str.substr(start, len) } :
-    function (str, start, len) {
-        if (start < 0) { start = str.length + start; }
-        return str.substr(start, len);
-    };
-
-
-var path$1 = Object.freeze({
-	resolve: resolve,
-	normalize: normalize,
-	isAbsolute: isAbsolute$1,
-	join: join$1,
-	relative: relative,
-	sep: sep,
-	delimiter: delimiter,
-	dirname: dirname,
-	basename: basename$1,
-	extname: extname,
-	default: path
-});
-
-var require$$0$2 = ( path$1 && path ) || path$1;
-
-/*!
- * content-disposition
- * Copyright(c) 2014 Douglas Christopher Wilson
- * MIT Licensed
- */
-
-'use strict';
-
-/**
- * Module exports.
- */
-
-var contentDisposition_1 = contentDisposition;
-var parse_1$1 = parse$1;
-
-/**
- * Module dependencies.
- */
-
-var basename = require$$0$2.basename;
-
-/**
- * RegExp to match non attr-char, *after* encodeURIComponent (i.e. not including "%")
- */
-
-var ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g; // eslint-disable-line no-control-regex
-
-/**
- * RegExp to match percent encoding escape.
- */
-
-var HEX_ESCAPE_REGEXP = /%[0-9A-Fa-f]{2}/;
-var HEX_ESCAPE_REPLACE_REGEXP = /%([0-9A-Fa-f]{2})/g;
-
-/**
- * RegExp to match non-latin1 characters.
- */
-
-var NON_LATIN1_REGEXP = /[^\x20-\x7e\xa0-\xff]/g;
-
-/**
- * RegExp to match quoted-pair in RFC 2616
- *
- * quoted-pair = "\" CHAR
- * CHAR        = <any US-ASCII character (octets 0 - 127)>
- */
-
-var QESC_REGEXP = /\\([\u0000-\u007f])/g;
-
-/**
- * RegExp to match chars that must be quoted-pair in RFC 2616
- */
-
-var QUOTE_REGEXP = /([\\"])/g;
-
-/**
- * RegExp for various RFC 2616 grammar
- *
- * parameter     = token "=" ( token | quoted-string )
- * token         = 1*<any CHAR except CTLs or separators>
- * separators    = "(" | ")" | "<" | ">" | "@"
- *               | "," | ";" | ":" | "\" | <">
- *               | "/" | "[" | "]" | "?" | "="
- *               | "{" | "}" | SP | HT
- * quoted-string = ( <"> *(qdtext | quoted-pair ) <"> )
- * qdtext        = <any TEXT except <">>
- * quoted-pair   = "\" CHAR
- * CHAR          = <any US-ASCII character (octets 0 - 127)>
- * TEXT          = <any OCTET except CTLs, but including LWS>
- * LWS           = [CRLF] 1*( SP | HT )
- * CRLF          = CR LF
- * CR            = <US-ASCII CR, carriage return (13)>
- * LF            = <US-ASCII LF, linefeed (10)>
- * SP            = <US-ASCII SP, space (32)>
- * HT            = <US-ASCII HT, horizontal-tab (9)>
- * CTL           = <any US-ASCII control character (octets 0 - 31) and DEL (127)>
- * OCTET         = <any 8-bit sequence of data>
- */
-
-var PARAM_REGEXP = /;[\x09\x20]*([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*=[\x09\x20]*("(?:[\x20!\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"|[!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*/g; // eslint-disable-line no-control-regex
-var TEXT_REGEXP = /^[\x20-\x7e\x80-\xff]+$/;
-var TOKEN_REGEXP = /^[!#$%&'*+.0-9A-Z^_`a-z|~-]+$/;
-
-/**
- * RegExp for various RFC 5987 grammar
- *
- * ext-value     = charset  "'" [ language ] "'" value-chars
- * charset       = "UTF-8" / "ISO-8859-1" / mime-charset
- * mime-charset  = 1*mime-charsetc
- * mime-charsetc = ALPHA / DIGIT
- *               / "!" / "#" / "$" / "%" / "&"
- *               / "+" / "-" / "^" / "_" / "`"
- *               / "{" / "}" / "~"
- * language      = ( 2*3ALPHA [ extlang ] )
- *               / 4ALPHA
- *               / 5*8ALPHA
- * extlang       = *3( "-" 3ALPHA )
- * value-chars   = *( pct-encoded / attr-char )
- * pct-encoded   = "%" HEXDIG HEXDIG
- * attr-char     = ALPHA / DIGIT
- *               / "!" / "#" / "$" / "&" / "+" / "-" / "."
- *               / "^" / "_" / "`" / "|" / "~"
- */
-
-var EXT_VALUE_REGEXP = /^([A-Za-z0-9!#$%&+\-^_`{}~]+)'(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)'((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+.^_`|~-])+)$/;
-
-/**
- * RegExp for various RFC 6266 grammar
- *
- * disposition-type = "inline" | "attachment" | disp-ext-type
- * disp-ext-type    = token
- * disposition-parm = filename-parm | disp-ext-parm
- * filename-parm    = "filename" "=" value
- *                  | "filename*" "=" ext-value
- * disp-ext-parm    = token "=" value
- *                  | ext-token "=" ext-value
- * ext-token        = <the characters in token, followed by "*">
- */
-
-var DISPOSITION_TYPE_REGEXP = /^([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*(?:$|;)/; // eslint-disable-line no-control-regex
-
-/**
- * Create an attachment Content-Disposition header.
- *
- * @param {string} [filename]
- * @param {object} [options]
- * @param {string} [options.type=attachment]
- * @param {string|boolean} [options.fallback=true]
- * @return {string}
- * @api public
- */
-
-function contentDisposition (filename, options) {
-  var opts = options || {};
-
-  // get type
-  var type = opts.type || 'attachment';
-
-  // get parameters
-  var params = createparams(filename, opts.fallback);
-
-  // format into string
-  return format(new ContentDisposition(type, params))
-}
-
-/**
- * Create parameters object from filename and fallback.
- *
- * @param {string} [filename]
- * @param {string|boolean} [fallback=true]
- * @return {object}
- * @api private
- */
-
-function createparams (filename, fallback) {
-  if (filename === undefined) {
-    return
-  }
-
-  var params = {};
-
-  if (typeof filename !== 'string') {
-    throw new TypeError('filename must be a string')
-  }
-
-  // fallback defaults to true
-  if (fallback === undefined) {
-    fallback = true;
-  }
-
-  if (typeof fallback !== 'string' && typeof fallback !== 'boolean') {
-    throw new TypeError('fallback must be a string or boolean')
-  }
-
-  if (typeof fallback === 'string' && NON_LATIN1_REGEXP.test(fallback)) {
-    throw new TypeError('fallback must be ISO-8859-1 string')
-  }
-
-  // restrict to file base name
-  var name = basename(filename);
-
-  // determine if name is suitable for quoted string
-  var isQuotedString = TEXT_REGEXP.test(name);
-
-  // generate fallback name
-  var fallbackName = typeof fallback !== 'string'
-    ? fallback && getlatin1(name)
-    : basename(fallback);
-  var hasFallback = typeof fallbackName === 'string' && fallbackName !== name;
-
-  // set extended filename parameter
-  if (hasFallback || !isQuotedString || HEX_ESCAPE_REGEXP.test(name)) {
-    params['filename*'] = name;
-  }
-
-  // set filename parameter
-  if (isQuotedString || hasFallback) {
-    params.filename = hasFallback
-      ? fallbackName
-      : name;
-  }
-
-  return params
-}
-
-/**
- * Format object to Content-Disposition header.
- *
- * @param {object} obj
- * @param {string} obj.type
- * @param {object} [obj.parameters]
- * @return {string}
- * @api private
- */
-
-function format (obj) {
-  var parameters = obj.parameters;
-  var type = obj.type;
-
-  if (!type || typeof type !== 'string' || !TOKEN_REGEXP.test(type)) {
-    throw new TypeError('invalid type')
-  }
-
-  // start with normalized type
-  var string = String(type).toLowerCase();
-
-  // append parameters
-  if (parameters && typeof parameters === 'object') {
-    var param;
-    var params = Object.keys(parameters).sort();
-
-    for (var i = 0; i < params.length; i++) {
-      param = params[i];
-
-      var val = param.substr(-1) === '*'
-        ? ustring(parameters[param])
-        : qstring(parameters[param]);
-
-      string += '; ' + param + '=' + val;
-    }
-  }
-
-  return string
-}
-
-/**
- * Decode a RFC 6987 field value (gracefully).
- *
- * @param {string} str
- * @return {string}
- * @api private
- */
-
-function decodefield (str) {
-  var match = EXT_VALUE_REGEXP.exec(str);
-
-  if (!match) {
-    throw new TypeError('invalid extended field value')
-  }
-
-  var charset = match[1].toLowerCase();
-  var encoded = match[2];
-  var value;
-
-  // to binary string
-  var binary = encoded.replace(HEX_ESCAPE_REPLACE_REGEXP, pdecode);
-
-  switch (charset) {
-    case 'iso-8859-1':
-      value = getlatin1(binary);
-      break
-    case 'utf-8':
-      value = new Buffer(binary, 'binary').toString('utf8');
-      break
-    default:
-      throw new TypeError('unsupported charset in extended field')
-  }
-
-  return value
-}
-
-/**
- * Get ISO-8859-1 version of string.
- *
- * @param {string} val
- * @return {string}
- * @api private
- */
-
-function getlatin1 (val) {
-  // simple Unicode -> ISO-8859-1 transformation
-  return String(val).replace(NON_LATIN1_REGEXP, '?')
-}
-
-/**
- * Parse Content-Disposition header string.
- *
- * @param {string} string
- * @return {object}
- * @api private
- */
-
-function parse$1 (string) {
-  if (!string || typeof string !== 'string') {
-    throw new TypeError('argument string is required')
-  }
-
-  var match = DISPOSITION_TYPE_REGEXP.exec(string);
-
-  if (!match) {
-    throw new TypeError('invalid type format')
-  }
-
-  // normalize type
-  var index = match[0].length;
-  var type = match[1].toLowerCase();
-
-  var key;
-  var names = [];
-  var params = {};
-  var value;
-
-  // calculate index to start at
-  index = PARAM_REGEXP.lastIndex = match[0].substr(-1) === ';'
-    ? index - 1
-    : index;
-
-  // match parameters
-  while ((match = PARAM_REGEXP.exec(string))) {
-    if (match.index !== index) {
-      throw new TypeError('invalid parameter format')
-    }
-
-    index += match[0].length;
-    key = match[1].toLowerCase();
-    value = match[2];
-
-    if (names.indexOf(key) !== -1) {
-      throw new TypeError('invalid duplicate parameter')
-    }
-
-    names.push(key);
-
-    if (key.indexOf('*') + 1 === key.length) {
-      // decode extended value
-      key = key.slice(0, -1);
-      value = decodefield(value);
-
-      // overwrite existing value
-      params[key] = value;
-      continue
-    }
-
-    if (typeof params[key] === 'string') {
-      continue
-    }
-
-    if (value[0] === '"') {
-      // remove quotes and escapes
-      value = value
-        .substr(1, value.length - 2)
-        .replace(QESC_REGEXP, '$1');
-    }
-
-    params[key] = value;
-  }
-
-  if (index !== -1 && index !== string.length) {
-    throw new TypeError('invalid parameter format')
-  }
-
-  return new ContentDisposition(type, params)
-}
-
-/**
- * Percent decode a single character.
- *
- * @param {string} str
- * @param {string} hex
- * @return {string}
- * @api private
- */
-
-function pdecode (str, hex) {
-  return String.fromCharCode(parseInt(hex, 16))
-}
-
-/**
- * Percent encode a single character.
- *
- * @param {string} char
- * @return {string}
- * @api private
- */
-
-function pencode (char) {
-  var hex = String(char)
-    .charCodeAt(0)
-    .toString(16)
-    .toUpperCase();
-  return hex.length === 1
-    ? '%0' + hex
-    : '%' + hex
-}
-
-/**
- * Quote a string for HTTP.
- *
- * @param {string} val
- * @return {string}
- * @api private
- */
-
-function qstring (val) {
-  var str = String(val);
-
-  return '"' + str.replace(QUOTE_REGEXP, '\\$1') + '"'
-}
-
-/**
- * Encode a Unicode string for HTTP (RFC 5987).
- *
- * @param {string} val
- * @return {string}
- * @api private
- */
-
-function ustring (val) {
-  var str = String(val);
-
-  // percent encode as UTF-8
-  var encoded = encodeURIComponent(str)
-    .replace(ENCODE_URL_ATTR_CHAR_REGEXP, pencode);
-
-  return 'UTF-8\'\'' + encoded
-}
-
-/**
- * Class for parsed Content-Disposition header for v8 optimization
- */
-
-function ContentDisposition (type, parameters) {
-  this.type = type;
-  this.parameters = parameters;
-}
-
-contentDisposition_1.parse = parse_1$1;
-
-var download = createCommonjsModule(function (module, exports) {
-//download.js v4.2, by dandavis; 2008-2016. [CCBY2] see http://danml.com/download.html for tests/usage
-// v1 landed a FF+Chrome compat way of downloading strings to local un-named files, upgraded to use a hidden frame and optional mime
-// v2 added named files via a[download], msSaveBlob, IE (10+) support, and window.URL support for larger+faster saves than dataURLs
-// v3 added dataURL and Blob Input, bind-toggle arity, and legacy dataURL fallback was improved with force-download mime and base64 support. 3.1 improved safari handling.
-// v4 adds AMD/UMD, commonJS, and plain browser support
-// v4.1 adds url download capability via solo URL argument (same domain/CORS only)
-// v4.2 adds semantic variable names, long (over 2MB) dataURL support, and hidden by default temp anchors
-// https://github.com/rndme/download
-
-(function (root, factory) {
-	if (typeof undefined === 'function' && undefined.amd) {
-		// AMD. Register as an anonymous module.
-		undefined([], factory);
-	} else {
-		// Node. Does not work with strict CommonJS, but
-		// only CommonJS-like environments that support module.exports,
-		// like Node.
-		module.exports = factory();
-	}
-}(commonjsGlobal, function () {
-
-	return function download(data, strFileName, strMimeType) {
-
-		var self = window, // this script is only for browsers anyway...
-			defaultMime = "application/octet-stream", // this default mime also triggers iframe downloads
-			mimeType = strMimeType || defaultMime,
-			payload = data,
-			url = !strFileName && !strMimeType && payload,
-			anchor = document.createElement("a"),
-			toString = function(a){return String(a);},
-			myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString),
-			fileName = strFileName || "download",
-			blob,
-			reader;
-			myBlob= myBlob.call ? myBlob.bind(self) : Blob ;
-	  
-		if(String(this)==="true"){ //reverse arguments, allowing download.bind(true, "text/xml", "export.xml") to act as a callback
-			payload=[payload, mimeType];
-			mimeType=payload[0];
-			payload=payload[1];
-		}
-
-
-		if(url && url.length< 2048){ // if no filename and no mime, assume a url was passed as the only argument
-			fileName = url.split("/").pop().split("?")[0];
-			anchor.href = url; // assign href prop to temp anchor
-		  	if(anchor.href.indexOf(url) !== -1){ // if the browser determines that it's a potentially valid url path:
-        		var ajax=new XMLHttpRequest();
-        		ajax.open( "GET", url, true);
-        		ajax.responseType = 'blob';
-        		ajax.onload= function(e){ 
-				  download(e.target.response, fileName, defaultMime);
-				};
-        		setTimeout(function(){ ajax.send();}, 0); // allows setting custom ajax headers using the return:
-			    return ajax;
-			} // end if valid url?
-		} // end if url?
-
-
-		//go ahead and download dataURLs right away
-		if(/^data\:[\w+\-]+\/[\w+\-]+[,;]/.test(payload)){
-		
-			if(payload.length > (1024*1024*1.999) && myBlob !== toString ){
-				payload=dataUrlToBlob(payload);
-				mimeType=payload.type || defaultMime;
-			}else{			
-				return navigator.msSaveBlob ?  // IE10 can't do a[download], only Blobs:
-					navigator.msSaveBlob(dataUrlToBlob(payload), fileName) :
-					saver(payload) ; // everyone else can save dataURLs un-processed
-			}
-			
-		}//end if dataURL passed?
-
-		blob = payload instanceof myBlob ?
-			payload :
-			new myBlob([payload], {type: mimeType}) ;
-
-
-		function dataUrlToBlob(strUrl) {
-			var parts= strUrl.split(/[:;,]/),
-			type= parts[1],
-			decoder= parts[2] == "base64" ? atob : decodeURIComponent,
-			binData= decoder( parts.pop() ),
-			mx= binData.length,
-			i= 0,
-			uiArr= new Uint8Array(mx);
-
-			for(i;i<mx;++i) { uiArr[i]= binData.charCodeAt(i); }
-
-			return new myBlob([uiArr], {type: type});
-		 }
-
-		function saver(url, winMode){
-
-			if ('download' in anchor) { //html5 A[download]
-				anchor.href = url;
-				anchor.setAttribute("download", fileName);
-				anchor.className = "download-js-link";
-				anchor.innerHTML = "downloading...";
-				anchor.style.display = "none";
-				document.body.appendChild(anchor);
-				setTimeout(function() {
-					anchor.click();
-					document.body.removeChild(anchor);
-					if(winMode===true){setTimeout(function(){ self.URL.revokeObjectURL(anchor.href);}, 250 );}
-				}, 66);
-				return true;
-			}
-
-			// handle non-a[download] safari as best we can:
-			if(/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)) {
-				url=url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
-				if(!window.open(url)){ // popup blocked, offer direct download:
-					if(confirm("Displaying New Document\n\nUse Save As... to download, then click back to return to this page.")){ location.href=url; }
-				}
-				return true;
-			}
-
-			//do iframe dataURL download (old ch+FF):
-			var f = document.createElement("iframe");
-			document.body.appendChild(f);
-
-			if(!winMode){ // force a mime that will download:
-				url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
-			}
-			f.src=url;
-			setTimeout(function(){ document.body.removeChild(f); }, 333);
-
-		}//end saver
-
-
-
-
-		if (navigator.msSaveBlob) { // IE10+ : (has Blob, but not a[download] or URL)
-			return navigator.msSaveBlob(blob, fileName);
-		}
-
-		if(self.URL){ // simple fast and modern way using Blob and URL:
-			saver(self.URL.createObjectURL(blob), true);
-		}else{
-			// handle non-Blob()+non-URL browsers:
-			if(typeof blob === "string" || blob.constructor===toString ){
-				try{
-					return saver( "data:" +  mimeType   + ";base64,"  +  self.btoa(blob)  );
-				}catch(y){
-					return saver( "data:" +  mimeType   + "," + encodeURIComponent(blob)  );
-				}
-			}
-
-			// Blob but not URL support:
-			reader=new FileReader();
-			reader.onload=function(e){
-				saver(this.result);
-			};
-			reader.readAsDataURL(blob);
-		}
-		return true;
-	}; /* end download() */
-}));
-});
-
-var components$3 = {
-  /**
-   * 一つのコンポーネント情報を取得します。
-   * @param {riotx.Context} context
-   * @param {String} component_uid
-   * @param {Object} component
-   * @param {Object} query
-   * @return {Promise}
-   */
-  get: (context, component_uid, component, query) => {
-    const method = component.api.method;
-    // GETメソッドのみサポート。
-    if (method !== 'get') {
-      return Promise.reject('only `get` method is allowed.');
-    }
-    let path = component.api.path;
-    if (path.indexOf('/') !== 0) {
-      path = '/' + path;
-    }
-    const actions = context.getter(constants$5.OAS_OPERATION_OBJECTS_AS_ACTION, component);
-
-    const api = context.getter(constants$5.OAS_API_BY_PATH_AND_METHOD, path, method);
-    const currentEndpointKey = context.getter(constants$5.CURRENT);
-    const currentEndpoint = context.getter(constants$5.ENDPOINTS_ONE, currentEndpointKey);
-    const token = currentEndpoint.token;
-    const networkingId = `networking_${Date.now()}`;
-
-    return Promise
-      .resolve()
-      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
-        id: networkingId
-      }))
-      .then(() => api(query, {
-        requestInterceptor: req => {
-          req.headers['Authorization'] = token;
-        }
-      }))
-      .then(res => {
-        if (!res.ok) {
-          return Promise.reject(res);
-        }
-        return res;
-      })
-      .then(res => {
-        // tokenを更新する。
-        const token = res.headers['Authorization'];
-        if (!!token) {
-          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-        }
-        // `component.pagination`からページングをサポートしているか判断する。
-        // サポートしていれば手動でページング情報を付加する。
-        let hasPagination = false;
-        let pagination;
-        if (component.pagination) {
-          const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
-          const size = Number(res.headers['x-pagination-limit'] || 0);
-          const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
-          pagination = {
-            // `x-pagination-current-page`等は独自仕様。
-            // VIRONを使用するサービスはこの仕様に沿う必要がある。
-            currentPage,
-            size,
-            maxPage
-          };
-          // 2ページ以上存在する場合のみページングをONにする。
-          if (maxPage >= 2) {
-            hasPagination = true;
-          }
-        }
-        context.commit(constants$2.COMPONENTS_UPDATE_ONE, {
-          component_uid,
-          response: res.obj,// APIレスポンス内容そのまま。
-          schemaObject: context.getter(constants$5.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
-          parameterObjects: context.getter(constants$5.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
-          actions,// 関連API群。
-          hasPagination,
-          pagination,// ページング関連。
-          autoRefreshSec: (component.auto_refresh_sec || 0),
-          primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
-          table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
-        });
-        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
-      })
-      .catch(err => {
-        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
-        throw err;
-      });
-  },
-
-  /**
-   * APIコールします。
-   * @param {riotx.Context} context
-   * @param {Object} operationObject
-   * @param {Object} params
-   * @return {Promise}
-   */
-  operate: (context, operationObject, params) => {
-    const api = context.getter(constants$5.OAS_API, operationObject.operationId);
-    const token = context.getter(constants$5.ENDPOINTS_ONE, context.getter(constants$5.CURRENT)).token;
-    const currentEndpointKey = context.getter(constants$5.CURRENT);
-    const networkingId = `networking_${Date.now()}`;
-
-    return Promise
-      .resolve()
-      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
-        id: networkingId
-      }))
-      .then(() => api(params, {
-        requestInterceptor: req => {
-          req.headers['Authorization'] = token;
-        }
-      }))
-      .then(res => {
-        if (!res.ok) {
-          return Promise.reject(res);
-        }
-        return res;
-      })
-      .then(res => {
-        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
-        // tokenを更新する。
-        const token = res.headers['Authorization'];
-        if (!!token) {
-          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-        }
-        // ダウンロード指定されていればダウンロードする。
-        const contentDispositionHeader = res.headers['content-disposition'];
-        if (!contentDispositionHeader) {
-          return res;
-        }
-        const downloadFileInfo = contentDisposition_1.parse(contentDispositionHeader);
-        if (downloadFileInfo.type !== 'attachment') {
-          return res;
-        }
-        download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
-        return res;
-      })
-      .catch(err => {
-        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
-        throw err;
-      });
-  },
-
-  /**
-   * 一件削除します。
-   * @param {riotx.Context} context
-   * @param {String} component_uid
-   * @return {Promise}
-   */
-  remove: (context, component_uid) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.COMPONENTS_REMOVE_ONE, component_uid);
-      });
-  },
-
-  /**
-   * 全件削除します。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  removeAll: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.COMPONENTS_REMOVE_ALL);
-      });
-  }
-};
-
-var current$3 = {
-  /**
-   * 選択中endpointKeyを更新します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @return {Promise}
-   */
-  update: (context, endpointKey) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.CURRENT, endpointKey);
-      });
-  },
-
-  /**
-   * 選択中endpointKeyを削除します。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  remove: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.CURRENT, null);
-      });
-  }
-};
-
-// APIは必須でサポートしなければならない URI
-const VIRON_URI = '/viron';
-
-var viron$3 = {
-  /**
-   * viron情報(各管理画面の基本情報)を取得します。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  get: context => {
-    const operationObject = context.getter(constants$5.OAS_OPERATION_OBJECT, VIRON_URI, 'get');
-    const api = context.getter(constants$5.OAS_API, operationObject.operationId);
-    const currentEndpointKey = context.getter(constants$5.CURRENT);
-    const currentEndpoint = context.getter(constants$5.ENDPOINTS_ONE, currentEndpointKey);
-    const token = currentEndpoint.token;
-    const networkingId = `networking_${Date.now()}`;
-
-    return Promise
-      .resolve()
-      .then(() => context.commit(constants$2.APPLICATION_NETWORKINGS_ADD, {
-        id: networkingId
-      }))
-      .then(() => api({}, {
-        requestInterceptor: req => {
-          req.headers['Authorization'] = token;
-        }
-      }))
-      .then(res => {
-        if (!res.ok) {
-          return Promise.reject(res);
-        }
-        return res;
-      })
-      .then(res => {
-        // tokenを更新する。
-        const token = res.headers['Authorization'];
-        if (!!token) {
-          context.commit(constants$2.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
-        }
-        context.commit(constants$2.VIRON, res.obj);
-        const endpoint = objectAssign({}, res.obj);
-        // pagesは不要なので削除。
-        delete endpoint.pages;
-        context.commit(constants$2.ENDPOINTS_UPDATE, currentEndpointKey, endpoint);
-        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
-      })
-      .catch(err => {
-        context.commit(constants$2.APPLICATION_NETWORKINGS_REMOVE, networkingId);
-        throw err;
-      });
-  },
-
-  /**
-   * viron情報を削除します。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  remove: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.VIRON, null);
-      });
-  }
-};
-
-var drawers$3 = {
-  /**
-   * ドローワーを追加します。
-   * @param {riotx.Context} context
-   * @param {String} tagName
-   * @param {Object} tagOpts
-   * @param {Object} drawerOpts
-   * @return {Promise}
-   */
-  add: (context, tagName, tagOpts, drawerOpts) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.DRAWERS_ADD, tagName, tagOpts, drawerOpts);
-      });
-  },
-
-  /**
-   * ドローワーを削除します。
-   * @param {riotx.Context} context
-   * @param {String} drawerId
-   * @return {Promise}
-   */
-  remove: (context, drawerId) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.DRAWERS_REMOVE, drawerId);
-      });
-  }
-};
-
-var endpoints$3 = {
-  /**
-   * 1件のエンドポイントを追加します。
-   * @param {riotx.Context} context
-   * @param {String} url
-   * @param {String} memo
-   * @return {Promise}
-   */
-  add: (context, url, memo) => {
-    return Promise
-      .resolve()
-      .then(() => commonFetch(context, url))
-      .catch(err => {
-        // 401エラーは想定内。
-        // 401 = endpointが存在しているので認証エラーになる。
-        // 401以外 = endpointが存在しない。
-        if (err.status !== 401) {
-          throw err;
-        }
-        //
-        const key = shortid.generate();
-        const newEndpoint = {
-          url: url,
-          memo: memo,
-          token: null,
-          title: '',
-          name: '',
-          description: '',
-          version: '',
-          color: '',
-          thumbnail: './img/viron_default.png',
-          tags: []
-        };
-        context.commit(constants$2.ENDPOINTS_ADD, key, newEndpoint);
-      });
-  },
-
-  /**
-   * 1件のエンドポイントを更新します
-   * @param {riotx.Context} context
-   * @param {String} url
-   * @param {Object} newEndpoint
-   * @return {Promise}
-   */
-  update: (context, key, newEndpoint) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.ENDPOINTS_UPDATE, key, newEndpoint);
-      });
-  },
-
-  /**
-   * 1件のエンドポイントを削除します。
-   * @param {riotx.Context} context
-   * @param {String} key
-   * @return {Promise}
-   */
-  remove: (context, key) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.ENDPOINTS_REMOVE, key);
-      });
-  },
-
-  /**
-   * 全てのエンドポイントを削除します。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  removeAll: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.ENDPOINTS_REMOVE_ALL);
-      });
-  },
-
-  /**
-   * 新エンドポイント群を既存エンドポイント群にmergeします。
-   * @param {riotx.Context} context
-   * @param {Object} endpoints
-   * @return {Promise}
-   */
-  mergeAll: (context, endpoints) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.ENDPOINTS_MERGE_ALL, endpoints);
-      });
-  },
-
-  /**
-   * 一件の新エンドポイントを既存エンドポイント群にmergeします。
-   * endpointKeyも新規生成します。
-   * @param {riotx.Context} context
-   * @param {Object} endpoint
-   * @return {Promise}
-   */
-  mergeOneWithKey: (context, endpoint) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        const key = shortid.generate();
-        context.commit(constants$2.ENDPOINTS_ADD, key, endpoint);
-      });
-  },
-
-  /**
-   * エンドポイントのorder値を整理します。
-   * order値が存在しない等への対応を行います。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  tidyUpOrder: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.ENDPOINTS_TIDY_UP_ORDER);
-      });
-  },
-
-  /**
-   * 指定されたエンドポイントのorder値を変更します。
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {Number} newOrder
-   * @return {Promise}
-   */
-  changeOrder: (context, endpointKey, newOrder) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder);
-      });
-  }
-};
-
-var layout$3 = {
-  /**
-   * アプリケーションの表示サイズを更新します。
-   * @param {riotx.Context} context
-   * @param {Number} width
-   * @param {Number} height
-   * @return {Promise}
-   */
-  updateSize: (context, width, height) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.LAYOUT_SIZE, width, height);
-      });
-  },
-
-  /**
-   * componentリストのgridレイアウトのcolumn数を更新します。
-   * @param {riotx.Context} context
-   * @param {Number} count
-   * @return {Promise}
-   */
-  updateComponentsGridColumnCount: (context, count) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT, count);
-      });
-  }
-};
-
-var location$4 = {
-  /**
-   * 更新します。
-   * @param {riotx.Context} context
-   * @param {Object} obj
-   * @return {Promise}
-   */
-  update: (context, obj) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.LOCATION, obj);
-      });
-  }
-};
-
-// モーダルを多重起動しないよう判定する変数
-let canCreateModal = true;
-// タイマーID管理用変数
-let timer;
-
-var modals$3 = {
-  /**
-   * モーダルを追加します。
-   * @param {riotx.Context} context
-   * @param {String} tagName
-   * @param {Object} tagOpts
-   * @param {Object} modalOpts
-   * @return {Promise}
-   */
-  add: (context, tagName, tagOpts, modalOpts) => {
-    if (!canCreateModal) {
-      console.warn('多重に起動しないよう、一定時間のモーダル作成を規制する。'); // eslint-disable-line no-console
-      return;
-    }
-
-    // モーダル作成を一時的に不可にする。
-    canCreateModal = false;
-    clearTimeout(timer);
-
-    // 一定時間後にモーダル作成可とする。
-    timer = setTimeout(() => {
-      canCreateModal = true;
-    }, 300);
-
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.MODALS_ADD, tagName, tagOpts, modalOpts);
-      });
-  },
-
-  /**
-   * モーダルを削除します。
-   * @param {riotx.Context} context
-   * @param {String} modalId
-   * @return {Promise}
-   */
-  remove: (context, modalId) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.MODALS_REMOVE, modalId);
-      });
-  }
-};
-
-/**
-     * Encode object into a query string.
-     */
-    function encode$2(obj){
-        var query = [],
-            arrValues, reg;
-        forOwn_1$1(obj, function (val, key) {
-            if (isArray_1$1(val)) {
-                arrValues = key + '=';
-                reg = new RegExp('&'+key+'+=$');
-                forEach_1$1(val, function (aValue) {
-                    arrValues += encodeURIComponent(aValue) + '&' + key + '=';
-                });
-                query.push(arrValues.replace(reg, ''));
-            } else {
-               query.push(key + '=' + encodeURIComponent(val));
-            }
-        });
-        return (query.length) ? '?' + query.join('&') : '';
-    }
-
-    var encode_1$2 = encode$2;
-
-// swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
-const SwaggerClient = window.SwaggerClient;
-
-var oas$3 = {
-  /**
-   * OAS準拠ファイルを取得/resolveし、SwaggerClientインスタンスを生成します。
-   * @see: https://github.com/swagger-api/swagger-js#swagger-specification-resolver
-   * @param {riotx.Context} context
-   * @param {String} endpointKey
-   * @param {String} url
-   * @param {String} token
-   * @return {Promise}
-   */
-  setup: (context, endpointKey, url, token) => {
-    return Promise
-      .resolve()
-      .then(() => SwaggerClient.http({
-        url,
-        headers: {
-          'Authorization': token
-        }
-      }))
-      .then(res => {
-        // 401エラーは想定内。
-        if (res.status === 401) {
-          const err = new Error();
-          err.name = '401 Authorization Required';
-          err.status = res.spec.status;
-          return Promise.reject(err);
-        }
-        return res;
-      })
-      .then(res => SwaggerClient({
-        spec: res.body
-      }))
-      .then(client => {
-        const errors = client.errors;
-        if (!!errors && !!errors.length) {
-          return Promise.reject(errors);
-        }
-        return client;
-      })
-      .then(client => {
-        context.commit(constants$2.OAS_CLIENT, client);
-        context.commit(constants$2.ENDPOINTS_UPDATE, endpointKey, client.spec.info);
-      });
-  },
-
-  /**
-   * OAS情報をクリアします。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  clear: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.OAS_CLIENT_CLEAR);
-      });
-  },
-
-  /**
-   * Autocompleteリストを取得します。
-   * @param {riotx.Context} context
-   * @param {String} path
-   * @param {Object} query
-   * @return {Promise}
-   */
-  getAutocomplete: (context, path, query) => {
-    const currentEndpointKey = context.getter(constants$5.CURRENT);
-    const currentEndpoint = context.getter(constants$5.ENDPOINTS_ONE, currentEndpointKey);
-    const token = currentEndpoint.token;
-    const url = `${new URL(currentEndpoint.url).origin}${path}${encode_1$2(query)}`;
-    return Promise
-      .resolve()
-      .then(() => commonFetch(context, url, {
-        headers: {
-          'Authorization': token
-        }
-      }))
-      .then(res => res.json());
-  }
-};
-
-var page$3 = {
-  /**
-   * ページ情報を取得します。
-   * @param {riotx.Context} context
-   * @param {String} pageId
-   * @return {Promise}
-   */
-  get: (context, pageId) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        const pages = context.getter(constants$5.VIRON_PAGES);
-        const page = find_1$2(pages, page => {
-          return (page.id === pageId);
-        });
-        context.commit(constants$2.PAGE, page);
-      });
-  },
-
-  /**
-   * ページ情報を削除します。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  remove: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.PAGE, null);
-      });
-  }
-};
-
-var popovers$3 = {
-  /**
-   * 吹き出しを追加します。
-   * @param {riotx.Context} context
-   * @param {String} tagName
-   * @param {Object} tagOpts
-   * @param {Object} popoverOpts
-   * @return {Promise}
-   */
-  add: (context, tagName, tagOpts, popoverOpts) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.POPOVERS_ADD, tagName, tagOpts, popoverOpts);
-      });
-  },
-
-  /**
-   * 吹き出しを削除します。
-   * @param {riotx.Context} context
-   * @param {String} popoverId
-   * @return {Promise}
-   */
-  remove: (context, popoverId) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.POPOVERS_REMOVE, popoverId);
-      });
-  }
-};
-
-var toasts$3 = {
-  /**
-   * トーストを追加します。
-   * @param {riotx.Context} context
-   * @param {Object} obj
-   * @return {Promise}
-   */
-  add: (context, obj) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.TOASTS_ADD, obj);
-      });
-  },
-
-  /**
-   * トーストを削除します。
-   * @param {riotx.Context} context
-   * @param {String} toastId
-   * @return {Promise}
-   */
-  remove: (context, toastId) => {
-    return Promise
-      .resolve()
-      .then(() => {
-        context.commit(constants$2.TOASTS_REMOVE, toastId);
-      });
-  }
-
-};
-
-var sua = createCommonjsModule(function (module) {
-/* Zepto v1.0-1-ga3cab6c - polyfill zepto detect event ajax form fx - zeptojs.com/license */
-/**
- * @name sua.js
- * @author Kei Funagayama <kei.topaz@gmail.com>
- * @overview UserAgent decision for browser. fork zepto.js(http://zeptojs.com/)
- * @license MIT
- */
-
-(function (global) {
-  'use strict';
-
-  /**
-   * UserAgent decision
-   *
-   * @method
-   * @param {String} useragent user agent
-   */
-  function SUA(useragent) {
-    if (!useragent && global && global.navigator && global.navigator.userAgent) {
-      // set browser user agent
-      useragent = global.navigator.userAgent;
-    }
-    if (!useragent) {
-      throw new Error('useragent setup error. useragent not found.');
-    }
-
-    /**
-     * Decision: ie
-     * @name ie
-     * @memberof ua
-     * @return {Boolean}
-     */
-    this.ie = !!(useragent.indexOf('MSIE') >= 0 || useragent.indexOf('Trident') >= 0 || useragent.indexOf('Edge') >= 0), this.webkit = useragent.match(/(WebKit|Webkit)\/([\d.]+)/), this.android = useragent.match(/(Android)\s+([\d.]+)/), this.android23 = useragent.match(/(Android)\s+(2\.3)([\d.]+)/), this.android4 = useragent.match(/(Android)\s+(4)([\d.]+)/), this.android5 = useragent.match(/(Android)\s+(5)([\d.]+)/), this.android6 = useragent.match(/(Android)\s+(6)([\d.]+)/), this.android7 = useragent.match(/(Android)\s+(7)([\d.]+)/), this.ipad = useragent.match(/(iPad).*OS\s([\d_]+)/), this.iphone = !this.ipad && useragent.match(/(iPhone\sOS)\s([\d_]+)/), this.webos = useragent.match(/(webOS|hpwOS)[\s\/]([\d.]+)/), this.touchpad = this.webos && useragent.match(/TouchPad/), this.kindle = useragent.match(/(Kindle)/), this.silk = useragent.match(/(Silk)/), this.blackberry = useragent.match(/(BlackBerry).*/), this.bb10 = useragent.match(/(BB10).*Version\/([\d.]+)/), this.rimtabletos = useragent.match(/(RIM\sTablet\sOS)\s([\d.]+)/), this.playbook = useragent.match(/PlayBook/), this.chrome = useragent.match(/Chrome\/([\d.]+)/) || useragent.match(/CriOS\/([\d.]+)/), this.firefox = useragent.match(/Firefox\/([\d.]+)/), this.wii = useragent.match(/Nintendo (Wii);/), this.wiiu = useragent.match(/Nintendo (WiiU)/), this.ds = useragent.match(/Nintendo (DS|3DS|DSi);/), this.nintendo_switch = useragent.match(/Nintendo (Switch);/), this.ps3 = useragent.match(/PLAYSTATION 3/), this.psp = useragent.match(/(PlayStation Portable)/), this.psvita = useragent.match(/(PlayStation Vita)/), this.windowsphone = useragent.match(/(Windows Phone |Windows Phone OS )([\d.]+)/), this.safari = useragent.match(/(Version)\/([0-9\.]+).*Safari\/([0-9\.]+)/), this.trident = useragent.match(/Trident\/([\d\.]+)/), this.xbox = useragent.match(/Xbox/), this.iphone5 = !('object' !== 'undefined' && module.exports) && this.iphone && screen && screen.width === 320 && screen.height === 568, this.vivaldi = useragent.match(/Vivaldi\/([\d.]+)/)
-
-    ;
-
-
-    /**
-     * Decision: iphone3
-     * @name iphone3
-     * @memberof ua
-     * @return {boolean}
-     */
-    this.iphone3 = this.iphone && global.devicePixelRatio === 1 ? true : false;
-
-
-    /**
-     * browser information
-     * @name browser
-     * @memberof ua
-     * @return {Object}
-     */
-    this.browser = {
-      locale: undefined, // ja-JP, en-us
-      lang: undefined, // ja, en ....
-      country: undefined // JP, us ...
-    };
-
-    /**
-     * os infomation
-     * @name os
-     * @memberof ua
-     * @return {Object}
-     */
-    this.os = {};
-
-    if (this.webkit && !this.ie) {
-      this.browser.webkit = true;
-      this.browser.version = this.webkit[1];
-    }
-
-    if (this.trident) {
-      this.browser.trident = true;
-      this.browser.version = this.trident[1];
-    }
-
-    if (this.android) {
-      this.os.android = true;
-      this.os.version = this.android[2];
-      try {
-        this.browser.locale = useragent.match(/(Android)\s(.+);\s([^;]+);/)[3];
-        this.browser.lang = this.browser.locale.substring(0, 2);
-        this.browser.country = this.browser.locale.substring(3);
-      } catch (e) {
-        //console.log('Failed to parse user agent string of Android.', useragent);
-      }
-    }
-    if (this.iphone) {
-      this.os.ios = this.os.iphone = true;
-      this.os.version = this.iphone[2].replace(/_/g, '.');
-    }
-
-    if (this.ipad) {
-      this.os.ios = this.os.ipad = true;
-      this.os.version = this.ipad[2].replace(/_/g, '.');
-    }
-
-    if (this.os.ios) {
-      var __ios_v_0 = null;
-      if (this.os.version) {
-        __ios_v_0 = this.os.version.substring(0, 1);
-      }
-      for (var i = 3; i < 10; i++) { // IOS 3->9
-        /**
-         * Decision: ios 3-9
-         * @name ios3-9
-         * @memberof ua
-         * @return {boolean}
-         */
-        this['ios' + i] = __ios_v_0 === "" + i;
-      }
-    }
-
-    if (this.webos) {
-      this.os.webos = true;
-      this.os.version = this.webos[2];
-    }
-    if (this.touchpad) {
-      this.os.touchpad = true;
-    }
-    if (this.blackberry) {
-      this.os.blackberry = true;
-    }
-    if (this.bb10) {
-      this.os.bb10 = true;
-      this.os.version = this.bb10[2];
-    }
-    if (this.rimtabletos) {
-      this.os.rimtabletos = true;
-      this.os.version = this.rimtabletos[2];
-    }
-    if (this.playbook) {
-      this.browser.playbook = true;
-    }
-    if (this.kindle) {
-      this.os.kindle = true;
-    }
-    if (this.silk) {
-      this.browser.silk = true;
-    }
-    if (!this.silk && this.os.android && useragent.match(/Kindle Fire/)) {
-      this.browser.silk = true;
-    }
-    if (this.chrome && !this.ie) {
-      this.browser.chrome = true;
-      this.browser.version = this.chrome[1];
-    }
-    if (this.firefox) {
-      this.browser.firefox = true;
-      this.browser.version = this.firefox[1];
-      if (useragent.match(/Android/)) { // firefox on android
-        this.android = ["Android", "Android", ""];
-      }
-    }
-    if (this.wii || this.ds || this.wiiu || this.nintendo_switch) {
-      this.os.nintendo = true;
-
-      if (this.wiiu || this.nintendo_switch) {
-        this.browser.nintendo = useragent.match(/NintendoBrowser\/([\d.]+)/);
-        this.browser.version = this.browser.nintendo[1];
-      }
-    }
-
-    if (this.windowsphone) {
-      this.browser.windowsphone = true;
-      this.browser.version = this.windowsphone[2];
-    }
-    if (this.safari) {
-      this.browser.safari = true;
-      this.browser.version = this.safari[2];
-    }
-
-    if (this.ie) {
-      this.browser.ie = /(MSIE|rv:?)\s?([\d\.]+)/.exec(useragent);
-      this.edge = false;
-
-      if (!this.browser.ie) { // Edge
-        this.browser.ie = /(Edge\/)(\d.+)/.exec(useragent);
-        this.browser.version = this.browser.ie[2];
-        this.edge = true;
-        // reset
-        this.chrome = false;
-        this.webkit = false;
-
-      } else if (!this.windowsphone) {
-        this.browser.version = (this.browser.ie) ? this.browser.ie[2] : '';
-      }
-
-      if (0 < this.browser.version.indexOf('.')) {
-        this.browser.majorversion = this.browser.version.substring(0, this.browser.version.indexOf('.'));
-      } else {
-        this.browser.majorversion = this.browser.version;
-      }
-    }
-
-    if (this.vivaldi) {
-      this.browser.vivaldi = true;
-      this.browser.version = this.vivaldi[1];
-    }
-
-    /**
-     * Decision: table
-     * @name table
-     * @memberof ua
-     * @return {boolean}
-     */
-    this.os.tablet = !!(this.ipad || this.kindle || this.playbook || (this.android && !useragent.match(/Mobile/)) || (this.firefox && useragent.match(/Tablet/)));
-
-    /**
-     * Decision: phone
-     * @name phone
-     * @memberof ua
-     * @return {boolean}
-     */
-    this.os.phone = !!(!this.os.tablet && (this.android || this.iphone || this.webos || this.blackberry || this.bb10 ||
-    (this.chrome && useragent.match(/Android/)) || (this.chrome && useragent.match(/CriOS\/([\d.]+)/)) || (this.firefox && useragent.match(/Mobile/)) || (this.windowsphone && useragent.match(/IEMobile/))));
-
-    /**
-     * Decision mobile (tablet or phone)
-     * @type {boolean}
-     */
-    this.mobile = !!(this.os.tablet || this.os.phone);
-
-    this.webview = {};
-    /**
-     * Decision: TwitterWebView
-     * @name twitterwebview
-     * @memberof ua
-     * @return {boolean}
-     */
-    if (useragent.match(/Twitter/)) {
-      this.webview.twitter = true;
-    }
-  }
-
-  SUA.VERSION = '2.1.0';
-
-  if ('object' !== 'undefined' && module.exports) {
-    // node
-    module.exports = SUA;
-  }
-
-  if (!global.SUA) {
-    // browser
-    global.SUA = SUA;
-  }
-
-})(commonjsGlobal);
-});
-
-var ua$3 = {
-  /**
-   * 初期設定を行います。
-   * @param {riotx.Context} context
-   * @return {Promise}
-   */
-  setup: context => {
-    return Promise
-      .resolve()
-      .then(() => {
-        const ua = new sua(navigator.userAgent);
-        context.commit(constants$2.UA, ua);
-      });
-  }
-};
-
-const constants$1 = {
-  APPLICATION_LAUNCH: 'APPLICATION_LAUNCH',
-  APPLICATION_NAVIGATION_START: 'APPLICATION_NAVIGATION_START',
-  APPLICATION_NAVIGATION_END: 'APPLICATION_NAVIGATION_END',
-  APPLICATION_DRAG_START: 'APPLICATION_DRAG_START',
-  APPLICATION_DRAG_END: 'APPLICATION_DRAG_END',
-  APPLICATION_MENU_TOGGLE: 'APPLICATION_MENU_TOGGLE',
-  APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT: 'APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT',
-  APPLICATION_RESET_ENDPOINT_FILTER_TEXT: 'APPLICATION_RESET_ENDPOINT_FILTER_TEXT',
-  AUTH_UPDATE: 'AUTH_UPADTE',
-  AUTH_REMOVE: 'AUTH_REMOVE',
-  AUTH_VALIDATE: 'AUTH_VALIDATE',
-  AUTH_GET_TYPES: 'AUTH_GET_TYPES',
-  AUTH_SIGNIN_OAUTH: 'AUTH_SIGNIN_OAUTH',
-  AUTH_SIGNIN_EMAIL: 'AUTH_SIGNIN_EMAIL',
-  COMPONENTS_GET_ONE: 'COMPONENTS_GET_ONE',
-  COMPONENTS_OPERATE_ONE: 'COMPONENTS_OPERATE_ONE',
-  COMPONENTS_REMOVE_ONE: 'COMPONENTS_REMOVE_ONE',
-  COMPONENTS_REMOVE_ALL: 'COMPONENTS_REMOVE_ALL',
-  CURRENT_UPDATE: 'CURRENT_UPDATE',
-  CURRENT_REMOVE: 'CURRENT_REMOVE',
-  VIRON_GET: 'VIRON_GET',
-  VIRON_REMOVE: 'VIRON_REMOVE',
-  DRAWERS_ADD: 'DRAWERS_ADD',
-  DRAWERS_REMOVE: 'DRAWERS_REMOVE',
-  ENDPOINTS_ADD: 'ENDPOINTS_ADD',
-  ENDPOINTS_UPDATE: 'ENDPOINTS_UPDATE',
-  ENDPOINTS_REMOVE: 'ENDPOINTS_REMOVE',
-  ENDPOINTS_REMOVE_ALL: 'ENDPOINTS_REMOVE_ALL',
-  ENDPOINTS_MERGE_ALL: 'ENDPOINTS_MERGE_ALL',
-  ENDPOINTS_MERGE_ONE_WITH_KEY: 'ENDPOINTS_MERGE_ONE_WITH_KEY',
-  ENDPOINTS_TIDY_UP_ORDER: 'ENDPOINTS_TIDY_UP_ORDER',
-  ENDPOINTS_CHANGE_ORDER: 'ENDPOINTS_CHANGE_ORDER',
-  LAYOUT_UPDATE_SIZE: 'LAYOUT_UPDATE_SIZE',
-  LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT: 'LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT',
-  LOCATION_UPDATE: 'LOCATION_UPDATE',
-  MODALS_ADD: 'MODALS_ADD',
-  MODALS_REMOVE: 'MODALS_REMOVE',
-  OAS_SETUP: 'OAS_SETUP',
-  OAS_CLEAR: 'OAS_CLEAR',
-  OAS_GET_AUTOCOMPLETE: 'OAS_GET_AUTOCOMPLETE',
-  OAUTH_ENDPOINT_KEY_REMOVE: 'OAUTH_ENDPOINT_KEY_REMOVE',
-  PAGE_GET: 'PAGE_GET',
-  PAGE_REMOVE: 'PAGE_REMOVE',
-  POPOVERS_ADD: 'POPOVERS_ADD',
-  POPOVERS_REMOVE: 'POPOVERS_REMOVE',
-  TOASTS_ADD: 'TOASTS_ADD',
-  TOASTS_REMOVE: 'TOASTS_REMOVE',
-  UA_SETUP: 'UA_SETUP'
-};
-
-var actions = {
-  [constants$1.APPLICATION_LAUNCH]: application.launch,
-  [constants$1.APPLICATION_NAVIGATION_START]: application.startNavigation,
-  [constants$1.APPLICATION_NAVIGATION_END]: application.endNavigation,
-  [constants$1.APPLICATION_DRAG_START]: application.startDrag,
-  [constants$1.APPLICATION_DRAG_END]: application.endDrag,
-  [constants$1.APPLICATION_MENU_TOGGLE]: application.toggleMenu,
-  [constants$1.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT]: application.updateEndpointFilterText,
-  [constants$1.APPLICATION_RESET_ENDPOINT_FILTER_TEXT]: application.resetEndpointFilterText,
-  [constants$1.AUTH_UPDATE]: auth.update,
-  [constants$1.AUTH_REMOVE]: auth.remove,
-  [constants$1.AUTH_VALIDATE]: auth.validate,
-  [constants$1.AUTH_GET_TYPES]: auth.getTypes,
-  [constants$1.AUTH_SIGNIN_OAUTH]: auth.signinOAuth,
-  [constants$1.AUTH_SIGNIN_EMAIL]: auth.signinEmail,
-  [constants$1.COMPONENTS_GET_ONE]: components$3.get,
-  [constants$1.COMPONENTS_OPERATE_ONE]: components$3.operate,
-  [constants$1.COMPONENTS_REMOVE_ONE]: components$3.remove,
-  [constants$1.COMPONENTS_REMOVE_ALL]: components$3.removeAll,
-  [constants$1.CURRENT_UPDATE]: current$3.update,
-  [constants$1.CURRENT_REMOVE]: current$3.remove,
-  [constants$1.VIRON_GET]: viron$3.get,
-  [constants$1.VIRON_REMOVE]: viron$3.remove,
-  [constants$1.DRAWERS_ADD]: drawers$3.add,
-  [constants$1.DRAWERS_REMOVE]: drawers$3.remove,
-  [constants$1.ENDPOINTS_ADD]: endpoints$3.add,
-  [constants$1.ENDPOINTS_UPDATE]: endpoints$3.update,
-  [constants$1.ENDPOINTS_REMOVE]: endpoints$3.remove,
-  [constants$1.ENDPOINTS_REMOVE_ALL]: endpoints$3.removeAll,
-  [constants$1.ENDPOINTS_MERGE_ALL]: endpoints$3.mergeAll,
-  [constants$1.ENDPOINTS_MERGE_ONE_WITH_KEY]: endpoints$3.mergeOneWithKey,
-  [constants$1.ENDPOINTS_TIDY_UP_ORDER]: endpoints$3.tidyUpOrder,
-  [constants$1.ENDPOINTS_CHANGE_ORDER]: endpoints$3.changeOrder,
-  [constants$1.LAYOUT_UPDATE_SIZE]: layout$3.updateSize,
-  [constants$1.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT]: layout$3.updateComponentsGridColumnCount,
-  [constants$1.LOCATION_UPDATE]: location$4.update,
-  [constants$1.MODALS_ADD]: modals$3.add,
-  [constants$1.MODALS_REMOVE]: modals$3.remove,
-  [constants$1.OAS_SETUP]: oas$3.setup,
-  [constants$1.OAS_CLEAR]: oas$3.clear,
-  [constants$1.OAS_GET_AUTOCOMPLETE]: oas$3.getAutocomplete,
-  [constants$1.PAGE_GET]: page$3.get,
-  [constants$1.PAGE_REMOVE]: page$3.remove,
-  [constants$1.POPOVERS_ADD]: popovers$3.add,
-  [constants$1.POPOVERS_REMOVE]: popovers$3.remove,
-  [constants$1.TOASTS_ADD]: toasts$3.add,
-  [constants$1.TOASTS_REMOVE]: toasts$3.remove,
-  [constants$1.UA_SETUP]: ua$3.setup
-};
-
 var script = function() {
   const updateText = () => {
     const json = JSON.stringify(this.opts.data, undefined, 4);
@@ -14655,7 +9015,7 @@ var ComponentsRoute = {
    */
   onBefore: (store, route, replace) => {
     const endpointKey = route.params.endpointKey;
-    const endpoint = store.getter(constants$5.ENDPOINTS_ONE, endpointKey);
+    const endpoint = store.getter('endpoints.one', endpointKey);
 
     // endpointが存在しなければTOPに戻す。
     if (!endpoint) {
@@ -14664,46 +9024,46 @@ var ComponentsRoute = {
         .then(() => {
           replace('/');
         })
-        .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+        .catch(err => store.action('modals.add', 'viron-error', {
           error: err
         }));
     }
 
     return Promise
       .resolve()
-      .then(() => store.action(constants$1.CURRENT_UPDATE, endpointKey))
+      .then(() => store.action('current.update', endpointKey))
       .then(() => {
         // 無駄な通信を減らすために、`viron`データを未取得の場合のみfetchする。
-        const isVironExist = store.getter(constants$5.VIRON_EXISTENCE);
+        const isVironExist = store.getter('viron.existence');
         if (isVironExist) {
           return Promise.resolve();
         }
         return Promise
           .resolve()
-          .then(() => store.action(constants$1.OAS_SETUP, endpointKey, endpoint.url, endpoint.token))
-          .then(() => store.action(constants$1.VIRON_GET));
+          .then(() => store.action('oas.setup', endpointKey, endpoint.url, endpoint.token))
+          .then(() => store.action('viron.get'));
       })
       .then(() => {
         // pageが指定されていない場合は`viron`のpageリストの先頭項目を自動選択する。
         if (!route.params.page) {
           return Promise.resolve().then(() => {
-            const pageName = store.getter(constants$5.VIRON_PAGES_ID_OF, 0);
+            const pageName = store.getter('viron.pageIdOf', 0);
             replace(`/${endpointKey}/${pageName}`);
           });
         }
-        return store.action(constants$1.PAGE_GET, route.params.page);
+        return store.action('page.get', route.params.page);
       })
       .catch(err => {
         // 401 = 認証エラー
         // 通常エラーと認証エラーで処理を振り分ける。
         if (err.status !== 401) {
-          return store.action(constants$1.MODALS_ADD, 'viron-error', {
+          return store.action('modals.add', 'viron-error', {
             error: err
           });
         }
         return Promise
           .resolve()
-          .then(() => store.action(constants$1.MODALS_ADD, 'viron-error', {
+          .then(() => store.action('modals.add', 'viron-error', {
             title: '認証切れ',
             message: '認証が切れました。再度ログインして下さい。'
           }))
@@ -14720,7 +9080,7 @@ var ComponentsRoute = {
    * @return {Promise}
    */
   onEnter: (store, route) => {
-    return store.action(constants$1.LOCATION_UPDATE, {
+    return store.action('location.update', {
       name: 'components',
       route
     });
@@ -14739,12 +9099,12 @@ var EndpointsRoute = {
     return Promise
       .resolve()
       .then(() => Promise.all([
-        store.action(constants$1.CURRENT_REMOVE),
-        store.action(constants$1.PAGE_REMOVE),
-        store.action(constants$1.OAS_CLEAR),
-        store.action(constants$1.VIRON_REMOVE)
+        store.action('current.remove'),
+        store.action('page.remove'),
+        store.action('oas.clear'),
+        store.action('viron.remove')
       ]))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   },
@@ -14756,7 +9116,7 @@ var EndpointsRoute = {
    * @return {Promise}
    */
   onEnter: (store, route) => {
-    return store.action(constants$1.LOCATION_UPDATE, {
+    return store.action('location.update', {
       name: 'endpoints',
       route
     });
@@ -14778,16 +9138,16 @@ var EndpointimportRoute = {
       .then(() => {
         const endpoint = JSON.parse(decodeURIComponent(route.queries.endpoint));
         url = endpoint.url;
-        return store.action(constants$1.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
+        return store.action('endpoints.mergeOneWithKey', endpoint);
       })
-      .then(() => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .then(() => store.action('modals.add', 'viron-error', {
         title: 'エンドポイント追加',
         message: `エンドポイント(${url})が一覧に追加されました。`
       }))
       .then(() => {
         replace('/');
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         title: 'エンドポイント追加 失敗',
         message: `エンドポイント(${url})を追加出来ませんでした。`,
         error: err
@@ -14803,7 +9163,7 @@ var NotfoundRoute = {
    * @return {Promise}
    */
   onEnter: (store, route) => {
-    return store.action(constants$1.LOCATION_UPDATE, {
+    return store.action('location.update', {
       name: 'notfound',
       route
     });
@@ -14827,11 +9187,11 @@ var OauthredirectRoute = {
     const tasks = [];
     if (isAuthorized) {
       to = `/${endpointKey}`;
-      tasks.push(store.action(constants$1.AUTH_UPDATE, endpointKey, decodeURIComponent(token)));
+      tasks.push(store.action('auth.update', endpointKey, decodeURIComponent(token)));
     } else {
       to = '/';
-      tasks.push(store.action(constants$1.AUTH_REMOVE, endpointKey));
-      tasks.push(store.action(constants$1.MODALS_ADD, 'viron-error', {
+      tasks.push(store.action('auth.remove', endpointKey));
+      tasks.push(store.action('modals.add', 'viron-error', {
         title: '認証失敗',
         message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
       }));
@@ -14842,7 +9202,7 @@ var OauthredirectRoute = {
       .then(() => {
         replace(to);
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   }
@@ -14863,7 +9223,7 @@ var router = {
         const router = new Router(Router.HASH);
         router
           .onBefore(() => Promise.all([
-            store.action(constants$1.APPLICATION_NAVIGATION_START)
+            store.action('application.startNavigation')
           ]))
           .on('/', route => EndpointsRoute.onEnter(store, route), (route, replace) => EndpointsRoute.onBefore(store, route, replace))
           .on('/oauthredirect/:endpointKey', () => Promise.resolve(), (route, replace) => OauthredirectRoute.onBefore(store, route, replace))
@@ -14871,9 +9231,9 @@ var router = {
           .on('/:endpointKey/:page?', route => ComponentsRoute.onEnter(store, route), (route, replace) => ComponentsRoute.onBefore(store, route, replace))
           .on('*', route => NotfoundRoute.onEnter(store, route))
           .onAfter(() => Promise.all([
-            store.action(constants$1.APPLICATION_NAVIGATION_END)
+            store.action('application.endNavigation')
           ]))
-          .onAfterOnce(() => store.action(constants$1.APPLICATION_LAUNCH));
+          .onAfterOnce(() => store.action('application.launch'));
         return router;
       })
       .then(router => {
@@ -15718,7 +10078,7 @@ var VERSION$1 = "0.9.4";
 /**
      * Array forEach
      */
-    function forEach$4(arr, callback, thisObj) {
+    function forEach$1(arr, callback, thisObj) {
         if (arr == null) {
             return;
         }
@@ -15733,22 +10093,22 @@ var VERSION$1 = "0.9.4";
         }
     }
 
-    var forEach_1$2 = forEach$4;
+    var forEach_1$1 = forEach$1;
 
 /**
      * Safer Object.hasOwnProperty
      */
-     function hasOwn$3(obj, prop){
+     function hasOwn$1(obj, prop){
          return Object.prototype.hasOwnProperty.call(obj, prop);
      }
 
-     var hasOwn_1$3 = hasOwn$3;
+     var hasOwn_1$1 = hasOwn$1;
 
-var _hasDontEnumBug$2;
-var _dontEnums$2;
+var _hasDontEnumBug$1;
+var _dontEnums$1;
 
-    function checkDontEnum$2(){
-        _dontEnums$2 = [
+    function checkDontEnum$1(){
+        _dontEnums$1 = [
                 'toString',
                 'toLocaleString',
                 'valueOf',
@@ -15758,10 +10118,10 @@ var _dontEnums$2;
                 'constructor'
             ];
 
-        _hasDontEnumBug$2 = true;
+        _hasDontEnumBug$1 = true;
 
         for (var key in {'toString': null}) {
-            _hasDontEnumBug$2 = false;
+            _hasDontEnumBug$1 = false;
         }
     }
 
@@ -15770,26 +10130,26 @@ var _dontEnums$2;
      * Enum bug on IE.
      * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
      */
-    function forIn$3(obj, fn, thisObj){
+    function forIn$1(obj, fn, thisObj){
         var key, i = 0;
         // no need to check if argument is a real object that way we can use
         // it for arrays, functions, date, etc.
 
         //post-pone check till needed
-        if (_hasDontEnumBug$2 == null) { checkDontEnum$2(); }
+        if (_hasDontEnumBug$1 == null) { checkDontEnum$1(); }
 
         for (key in obj) {
-            if (exec$2(fn, obj, key, thisObj) === false) {
+            if (exec$1(fn, obj, key, thisObj) === false) {
                 break;
             }
         }
 
 
-        if (_hasDontEnumBug$2) {
+        if (_hasDontEnumBug$1) {
             var ctor = obj.constructor,
                 isProto = !!ctor && obj === ctor.prototype;
 
-            while (key = _dontEnums$2[i++]) {
+            while (key = _dontEnums$1[i++]) {
                 // For constructor, if it is a prototype object the constructor
                 // is always non-enumerable unless defined otherwise (and
                 // enumerated above).  For non-prototype objects, it will have
@@ -15800,10 +10160,10 @@ var _dontEnums$2;
                 // different than Object prototype value.
                 if (
                     (key !== 'constructor' ||
-                        (!isProto && hasOwn_1$3(obj, key))) &&
+                        (!isProto && hasOwn_1$1(obj, key))) &&
                     obj[key] !== Object.prototype[key]
                 ) {
-                    if (exec$2(fn, obj, key, thisObj) === false) {
+                    if (exec$1(fn, obj, key, thisObj) === false) {
                         break;
                     }
                 }
@@ -15811,39 +10171,39 @@ var _dontEnums$2;
         }
     }
 
-    function exec$2(fn, obj, key, thisObj){
+    function exec$1(fn, obj, key, thisObj){
         return fn.call(thisObj, obj[key], key, obj);
     }
 
-    var forIn_1$3 = forIn$3;
+    var forIn_1$1 = forIn$1;
 
 /**
      * Similar to Array/forEach but works over object properties and fixes Don't
      * Enum bug on IE.
      * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
      */
-    function forOwn$4(obj, fn, thisObj){
-        forIn_1$3(obj, function(val, key){
-            if (hasOwn_1$3(obj, key)) {
+    function forOwn$1(obj, fn, thisObj){
+        forIn_1$1(obj, function(val, key){
+            if (hasOwn_1$1(obj, key)) {
                 return fn.call(thisObj, obj[key], key, obj);
             }
         });
     }
 
-    var forOwn_1$2 = forOwn$4;
+    var forOwn_1$1 = forOwn$1;
 
 /**
      * Get object keys
      */
-     var keys$2 = Object.keys || function (obj) {
+     var keys = Object.keys || function (obj) {
             var keys = [];
-            forOwn_1$2(obj, function(val, key){
+            forOwn_1$1(obj, function(val, key){
                 keys.push(key);
             });
             return keys;
         };
 
-    var keys_1$1 = keys$2;
+    var keys_1 = keys;
 
 /*
 object-assign
@@ -15852,11 +10212,11 @@ object-assign
 */
 
 /* eslint-disable no-unused-vars */
-var getOwnPropertySymbols$1 = Object.getOwnPropertySymbols;
-var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
-var propIsEnumerable$1 = Object.prototype.propertyIsEnumerable;
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
-function toObject$1(val) {
+function toObject(val) {
 	if (val === null || val === undefined) {
 		throw new TypeError('Object.assign cannot be called with null or undefined');
 	}
@@ -15864,7 +10224,7 @@ function toObject$1(val) {
 	return Object(val);
 }
 
-function shouldUseNative$1() {
+function shouldUseNative() {
 	try {
 		if (!Object.assign) {
 			return false;
@@ -15908,26 +10268,26 @@ function shouldUseNative$1() {
 	}
 }
 
-var index$1$1 = shouldUseNative$1() ? Object.assign : function (target, source) {
+var index$1$1 = shouldUseNative() ? Object.assign : function (target, source) {
 	var arguments$1 = arguments;
 
 	var from;
-	var to = toObject$1(target);
+	var to = toObject(target);
 	var symbols;
 
 	for (var s = 1; s < arguments.length; s++) {
 		from = Object(arguments$1[s]);
 
 		for (var key in from) {
-			if (hasOwnProperty$1.call(from, key)) {
+			if (hasOwnProperty.call(from, key)) {
 				to[key] = from[key];
 			}
 		}
 
-		if (getOwnPropertySymbols$1) {
-			symbols = getOwnPropertySymbols$1(from);
+		if (getOwnPropertySymbols) {
+			symbols = getOwnPropertySymbols(from);
 			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable$1.call(from, symbols[i])) {
+				if (propIsEnumerable.call(from, symbols[i])) {
 					to[symbols[i]] = from[symbols[i]];
 				}
 			}
@@ -16297,7 +10657,7 @@ Store.prototype.commit = function commit (name) {
   log.apply(void 0, [ '[commit(after)]', name, _state ].concat( args ));
   index$1$1(this.state, _state);
 
-  forEach_1$2(triggers, function (v) {
+  forEach_1$1(triggers, function (v) {
     // this.trigger(v, null, this.state, this);
     this$1.trigger(v, this$1.state, this$1);
   });
@@ -16391,7 +10751,7 @@ var RiotX = function RiotX() {
       // the context of `this` will be equal to riot tag instant.
       this.on('unmount', function () {
         this$1.off('*');
-        forEach_1$2(this$1._riotx_change_handlers, function (obj) {
+        forEach_1$1(this$1._riotx_change_handlers, function (obj) {
           obj.store.off(obj.evtName, obj.handler);
         });
         delete this$1.riotx;
@@ -16473,12 +10833,5433 @@ RiotX.prototype.reset = function reset () {
  * @returns {int} size
  */
 RiotX.prototype.size = function size () {
-  return keys_1$1(this.stores).length;
+  return keys_1(this.stores).length;
 };
 
 var index$1$2 = new RiotX();
 
-var store$1 = {
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+'use strict';
+/* eslint-disable no-unused-vars */
+var getOwnPropertySymbols$1 = Object.getOwnPropertySymbols;
+var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+var propIsEnumerable$1 = Object.prototype.propertyIsEnumerable;
+
+function toObject$1(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative$1() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (err) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+var objectAssign = shouldUseNative$1() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject$1(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty$1.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (getOwnPropertySymbols$1) {
+			symbols = getOwnPropertySymbols$1(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable$1.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+/**
+     * Safer Object.hasOwnProperty
+     */
+     function hasOwn$2(obj, prop){
+         return Object.prototype.hasOwnProperty.call(obj, prop);
+     }
+
+     var hasOwn_1$2 = hasOwn$2;
+
+var _hasDontEnumBug$2;
+var _dontEnums$2;
+
+    function checkDontEnum$2(){
+        _dontEnums$2 = [
+                'toString',
+                'toLocaleString',
+                'valueOf',
+                'hasOwnProperty',
+                'isPrototypeOf',
+                'propertyIsEnumerable',
+                'constructor'
+            ];
+
+        _hasDontEnumBug$2 = true;
+
+        for (var key in {'toString': null}) {
+            _hasDontEnumBug$2 = false;
+        }
+    }
+
+    /**
+     * Similar to Array/forEach but works over object properties and fixes Don't
+     * Enum bug on IE.
+     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
+     */
+    function forIn$2(obj, fn, thisObj){
+        var key, i = 0;
+        // no need to check if argument is a real object that way we can use
+        // it for arrays, functions, date, etc.
+
+        //post-pone check till needed
+        if (_hasDontEnumBug$2 == null) { checkDontEnum$2(); }
+
+        for (key in obj) {
+            if (exec$2(fn, obj, key, thisObj) === false) {
+                break;
+            }
+        }
+
+
+        if (_hasDontEnumBug$2) {
+            var ctor = obj.constructor,
+                isProto = !!ctor && obj === ctor.prototype;
+
+            while (key = _dontEnums$2[i++]) {
+                // For constructor, if it is a prototype object the constructor
+                // is always non-enumerable unless defined otherwise (and
+                // enumerated above).  For non-prototype objects, it will have
+                // to be defined on this object, since it cannot be defined on
+                // any prototype objects.
+                //
+                // For other [[DontEnum]] properties, check if the value is
+                // different than Object prototype value.
+                if (
+                    (key !== 'constructor' ||
+                        (!isProto && hasOwn_1$2(obj, key))) &&
+                    obj[key] !== Object.prototype[key]
+                ) {
+                    if (exec$2(fn, obj, key, thisObj) === false) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function exec$2(fn, obj, key, thisObj){
+        return fn.call(thisObj, obj[key], key, obj);
+    }
+
+    var forIn_1$2 = forIn$2;
+
+/**
+     * Similar to Array/forEach but works over object properties and fixes Don't
+     * Enum bug on IE.
+     * based on: http://whattheheadsaid.com/2010/10/a-safer-object-keys-compatibility-implementation
+     */
+    function forOwn$2(obj, fn, thisObj){
+        forIn_1$2(obj, function(val, key){
+            if (hasOwn_1$2(obj, key)) {
+                return fn.call(thisObj, obj[key], key, obj);
+            }
+        });
+    }
+
+    var forOwn_1$2 = forOwn$2;
+
+var exporter = (name, funcs) => {
+  const ret = {};
+  forOwn_1$2(funcs, (func, id) => {
+    ret[`${name}.${id}`] = func;
+  });
+  return ret;
+};
+
+var application = exporter('application', {
+  /**
+   * 起動状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  launch: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.launch', true);
+      });
+  },
+
+  /**
+   * 画面遷移状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  startNavigation: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.navigation', true);
+      });
+  },
+
+  /**
+   * 画面遷移完了状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  endNavigation: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.navigation', false);
+      });
+  },
+
+  /**
+   * ドラッグ状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  startDrag: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.drag', true);
+      });
+  },
+
+  /**
+   * ドラッグ完了状態にします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  endDrag: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.drag', false);
+      });
+  },
+
+  /**
+   * メニューの開閉状態をトグルします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  toggleMenu: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.menuToggle');
+      });
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストを更新します。
+   * @param {riotx.Context} context
+   * @param {String} newFilterText
+   * @return {Promise}
+   */
+  updateEndpointFilterText: (context, newFilterText) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.endpointFilterText', newFilterText);
+      });
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストをリセットします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  resetEndpointFilterText: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.endpointFilterText', '');
+      });
+  }
+});
+
+/**
+     * Gets the "kind" of value. (e.g. "String", "Number", etc)
+     */
+    function kindOf$1(val) {
+        return Object.prototype.toString.call(val).slice(8, -1);
+    }
+    var kindOf_1$1 = kindOf$1;
+
+/**
+     * Check if value is from a specific "kind".
+     */
+    function isKind$1(val, kind){
+        return kindOf_1$1(val) === kind;
+    }
+    var isKind_1$1 = isKind$1;
+
+/**
+     */
+    function isObject(val) {
+        return isKind_1$1(val, 'Object');
+    }
+    var isObject_1 = isObject;
+
+/**
+ * body値をContent-Type `application/json`に最適化します。
+ * @param {*} body
+ * @return {*}
+ */
+const jsonConverter = body => {
+  return JSON.stringify(body);
+};
+
+/**
+ * body値をContent-Type `application/x-www-form-urlencoded`に最適化します。
+ * @param {*} body
+ * @return {*}
+ */
+const urlEncodedStandardQueryStringConverter = body => {
+  const strings = [];
+  const keys = Object.keys(body);
+
+  keys.forEach(key => {
+    const value = body[key];
+    const string = `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+
+    strings.push(string);
+  });
+
+  return strings.join('&');
+};
+
+/**
+ * body値をContent-Type `multipart/form-data`に最適化します。
+ * @param {*} body
+ * @return {*}
+ */
+const formDataConverter = body => {
+  const formData = new FormData();
+  const keys = Object.keys(body);
+
+  keys.forEach(key => {
+    const value = body[key];
+
+    if (isObject_1(value) || Array.isArray(value)) {
+      formData.append(key, JSON.stringify(value));
+    } else if (value != null) {
+      formData.append(key, value);
+    }
+  });
+
+  return formData;
+};
+
+/**
+ * 共通設定が施されたFetch API。
+ * @param {riotx.Context} context
+ * @param {String} url
+ * @param {Object} options
+ * @return {Promise}
+ */
+const commonFetch = (context, url, options) => {
+  options = objectAssign({
+    mode: 'cors',
+    // redirect方法はレスポンスにそう形にする。
+    redirect: 'follow',
+    headers: {
+      // 何も指定しない場合はこれをデフォルトにする。
+      'Content-Type': 'application/json'
+    },
+    cache: 'no-store'
+  }, options);
+
+  // `Content-Type`に応じてbody内容を書き換えます。
+  if (!!options.body && (options.method === 'POST' || options.method === 'PUT')) {
+    switch (options.headers['Content-Type']) {
+    case 'application/json':
+      options.body = jsonConverter(options.body);
+      break;
+    case 'application/x-www-form-urlencoded':
+      options.body = urlEncodedStandardQueryStringConverter(options.body);
+      break;
+    case 'multipart/form-data':
+      options.body = formDataConverter(options.body);
+      break;
+    default:
+      break;
+    }
+  }
+
+  const networkingId = `networking_${Date.now()}`;
+  return Promise
+    .resolve()
+    .then(() => context.commit('application.addNetworking', {
+      id: networkingId,
+      url,
+      options
+    }))
+    .then(() => Promise.race([
+      fetch(url, options),
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error('時間がかかり過ぎたため通信を中断しました。'));
+        }, 1000 * 10);
+      })
+    ]))
+    .then(response => {
+      context.commit('application.removeNetworking', networkingId);
+      return response;
+    })
+    .then(response => { // status check.
+      if (!response.ok) {
+        return Promise.reject(response);
+      }
+      return Promise.resolve(response);
+    })
+    .catch(err => {
+      context.commit('application.removeNetworking', networkingId);
+      throw err;
+    });
+};
+
+var auth = exporter('auth', {
+  /**
+   * 指定されたエンドポイントのtokenを更新します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {String} token
+   * @return {Promise}
+   */
+  update: (context, endpointKey, token) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.updateToken', endpointKey, token);
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントのtokenを削除します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Promise}
+   */
+  remove: (context, endpointKey) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.updateToken', endpointKey, null);
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントのtokenが有効か確認します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Promise}
+   */
+  validate: (context, endpointKey) => {
+    const endpoint = context.getter('endpoints.one', endpointKey);
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, endpoint.url, {
+        headers: {
+          'Authorization': endpoint.token
+        }
+      }))
+      .then(response => {
+        const token = response.headers.get('Authorization');
+        if (!!token) {
+          context.commit('endpoints.updateToken', endpointKey, token);
+        }
+        return true;
+      })
+      .catch(err => {
+        if (err.status !== 401) {
+          throw err;
+        }
+        context.commit('endpoints.updateToken', endpointKey, null);
+        return false;
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントの認証手段を調べます。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Promise}
+   */
+  getTypes: (context, endpointKey) => {
+    const endpoint = context.getter('endpoints.one', endpointKey);
+    const fetchUrl = `${new URL(endpoint.url).origin}/viron_authtype`;
+
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, fetchUrl))
+      .then(response => response.json());
+  },
+
+  /**
+   * OAuth認証を行います。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Object} authtype
+   * @return {Promise}
+   */
+  signinOAuth: (context, endpointKey, authtype) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const endpoint = context.getter('endpoints.one', endpointKey);
+        const origin = new URL(endpoint.url).origin;
+        const redirect_url = encodeURIComponent(`${location.href}oauthredirect/${endpointKey}`);
+        const fetchUrl = `${origin}${authtype.url}?redirect_url=${redirect_url}`;
+        location.href = fetchUrl;
+      });
+  },
+
+  /**
+   * メールxパスワード認証を行います。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Object} authtype
+   * @param {String} email
+   * @param {String} password
+   * @return {Promise}
+   */
+  signinEmail: (context, endpointKey, authtype, email, password) => {
+    const endpoint = context.getter('endpoints.one', endpointKey);
+    const fetchUrl = `${new URL(endpoint.url).origin}${authtype.url}`;
+
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, fetchUrl, {
+        method: authtype.method,
+        body: {
+          email,
+          password
+        }
+      }))
+      .then(response => {
+        const token = response.headers.get('Authorization');
+        context.commit('endpoints.updateToken', endpointKey, token);
+      });
+  }
+});
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var last = parts[i];
+    if (last === '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// Split a filename into [root, dir, basename, ext], unix version
+// 'root' is just a slash, or nothing.
+var splitPathRe =
+    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+var splitPath = function(filename) {
+  return splitPathRe.exec(filename).slice(1);
+};
+
+// path.resolve([from ...], to)
+// posix version
+function resolve() {
+  var resolvedPath = '',
+      resolvedAbsolute = false;
+
+  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    var path = (i >= 0) ? arguments[i] : '/';
+
+    // Skip empty and invalid entries
+    if (typeof path !== 'string') {
+      throw new TypeError('Arguments to path.resolve must be strings');
+    } else if (!path) {
+      continue;
+    }
+
+    resolvedPath = path + '/' + resolvedPath;
+    resolvedAbsolute = path.charAt(0) === '/';
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeArray(filter$1(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+}
+
+// path.normalize(path)
+// posix version
+function normalize(path) {
+  var isPathAbsolute = isAbsolute$1(path),
+      trailingSlash = substr(path, -1) === '/';
+
+  // Normalize the path
+  path = normalizeArray(filter$1(path.split('/'), function(p) {
+    return !!p;
+  }), !isPathAbsolute).join('/');
+
+  if (!path && !isPathAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+
+  return (isPathAbsolute ? '/' : '') + path;
+}
+
+// posix version
+function isAbsolute$1(path) {
+  return path.charAt(0) === '/';
+}
+
+// posix version
+function join$1() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return normalize(filter$1(paths, function(p, index) {
+    if (typeof p !== 'string') {
+      throw new TypeError('Arguments to path.join must be strings');
+    }
+    return p;
+  }).join('/'));
+}
+
+
+// path.relative(from, to)
+// posix version
+function relative(from, to) {
+  from = resolve(from).substr(1);
+  to = resolve(to).substr(1);
+
+  function trim(arr) {
+    var start = 0;
+    for (; start < arr.length; start++) {
+      if (arr[start] !== '') { break; }
+    }
+
+    var end = arr.length - 1;
+    for (; end >= 0; end--) {
+      if (arr[end] !== '') { break; }
+    }
+
+    if (start > end) { return []; }
+    return arr.slice(start, end - start + 1);
+  }
+
+  var fromParts = trim(from.split('/'));
+  var toParts = trim(to.split('/'));
+
+  var length = Math.min(fromParts.length, toParts.length);
+  var samePartsLength = length;
+  for (var i = 0; i < length; i++) {
+    if (fromParts[i] !== toParts[i]) {
+      samePartsLength = i;
+      break;
+    }
+  }
+
+  var outputParts = [];
+  for (var i = samePartsLength; i < fromParts.length; i++) {
+    outputParts.push('..');
+  }
+
+  outputParts = outputParts.concat(toParts.slice(samePartsLength));
+
+  return outputParts.join('/');
+}
+
+var sep = '/';
+var delimiter = ':';
+
+function dirname(path) {
+  var result = splitPath(path),
+      root = result[0],
+      dir = result[1];
+
+  if (!root && !dir) {
+    // No dirname whatsoever
+    return '.';
+  }
+
+  if (dir) {
+    // It has a dirname, strip trailing slash
+    dir = dir.substr(0, dir.length - 1);
+  }
+
+  return root + dir;
+}
+
+function basename$1(path, ext) {
+  var f = splitPath(path)[2];
+  // TODO: make this comparison case-insensitive on windows?
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+}
+
+
+function extname(path) {
+  return splitPath(path)[3];
+}
+var path = {
+  extname: extname,
+  basename: basename$1,
+  dirname: dirname,
+  sep: sep,
+  delimiter: delimiter,
+  relative: relative,
+  join: join$1,
+  isAbsolute: isAbsolute$1,
+  normalize: normalize,
+  resolve: resolve
+};
+function filter$1 (xs, f) {
+    if (xs.filter) { return xs.filter(f); }
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (f(xs[i], i, xs)) { res.push(xs[i]); }
+    }
+    return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b' ?
+    function (str, start, len) { return str.substr(start, len) } :
+    function (str, start, len) {
+        if (start < 0) { start = str.length + start; }
+        return str.substr(start, len);
+    };
+
+
+var path$1 = Object.freeze({
+	resolve: resolve,
+	normalize: normalize,
+	isAbsolute: isAbsolute$1,
+	join: join$1,
+	relative: relative,
+	sep: sep,
+	delimiter: delimiter,
+	dirname: dirname,
+	basename: basename$1,
+	extname: extname,
+	default: path
+});
+
+var require$$0 = ( path$1 && path ) || path$1;
+
+/*!
+ * content-disposition
+ * Copyright(c) 2014 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+'use strict';
+
+/**
+ * Module exports.
+ */
+
+var contentDisposition_1 = contentDisposition;
+var parse_1$1 = parse$1;
+
+/**
+ * Module dependencies.
+ */
+
+var basename = require$$0.basename;
+
+/**
+ * RegExp to match non attr-char, *after* encodeURIComponent (i.e. not including "%")
+ */
+
+var ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g; // eslint-disable-line no-control-regex
+
+/**
+ * RegExp to match percent encoding escape.
+ */
+
+var HEX_ESCAPE_REGEXP = /%[0-9A-Fa-f]{2}/;
+var HEX_ESCAPE_REPLACE_REGEXP = /%([0-9A-Fa-f]{2})/g;
+
+/**
+ * RegExp to match non-latin1 characters.
+ */
+
+var NON_LATIN1_REGEXP = /[^\x20-\x7e\xa0-\xff]/g;
+
+/**
+ * RegExp to match quoted-pair in RFC 2616
+ *
+ * quoted-pair = "\" CHAR
+ * CHAR        = <any US-ASCII character (octets 0 - 127)>
+ */
+
+var QESC_REGEXP = /\\([\u0000-\u007f])/g;
+
+/**
+ * RegExp to match chars that must be quoted-pair in RFC 2616
+ */
+
+var QUOTE_REGEXP = /([\\"])/g;
+
+/**
+ * RegExp for various RFC 2616 grammar
+ *
+ * parameter     = token "=" ( token | quoted-string )
+ * token         = 1*<any CHAR except CTLs or separators>
+ * separators    = "(" | ")" | "<" | ">" | "@"
+ *               | "," | ";" | ":" | "\" | <">
+ *               | "/" | "[" | "]" | "?" | "="
+ *               | "{" | "}" | SP | HT
+ * quoted-string = ( <"> *(qdtext | quoted-pair ) <"> )
+ * qdtext        = <any TEXT except <">>
+ * quoted-pair   = "\" CHAR
+ * CHAR          = <any US-ASCII character (octets 0 - 127)>
+ * TEXT          = <any OCTET except CTLs, but including LWS>
+ * LWS           = [CRLF] 1*( SP | HT )
+ * CRLF          = CR LF
+ * CR            = <US-ASCII CR, carriage return (13)>
+ * LF            = <US-ASCII LF, linefeed (10)>
+ * SP            = <US-ASCII SP, space (32)>
+ * HT            = <US-ASCII HT, horizontal-tab (9)>
+ * CTL           = <any US-ASCII control character (octets 0 - 31) and DEL (127)>
+ * OCTET         = <any 8-bit sequence of data>
+ */
+
+var PARAM_REGEXP = /;[\x09\x20]*([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*=[\x09\x20]*("(?:[\x20!\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"|[!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*/g; // eslint-disable-line no-control-regex
+var TEXT_REGEXP = /^[\x20-\x7e\x80-\xff]+$/;
+var TOKEN_REGEXP = /^[!#$%&'*+.0-9A-Z^_`a-z|~-]+$/;
+
+/**
+ * RegExp for various RFC 5987 grammar
+ *
+ * ext-value     = charset  "'" [ language ] "'" value-chars
+ * charset       = "UTF-8" / "ISO-8859-1" / mime-charset
+ * mime-charset  = 1*mime-charsetc
+ * mime-charsetc = ALPHA / DIGIT
+ *               / "!" / "#" / "$" / "%" / "&"
+ *               / "+" / "-" / "^" / "_" / "`"
+ *               / "{" / "}" / "~"
+ * language      = ( 2*3ALPHA [ extlang ] )
+ *               / 4ALPHA
+ *               / 5*8ALPHA
+ * extlang       = *3( "-" 3ALPHA )
+ * value-chars   = *( pct-encoded / attr-char )
+ * pct-encoded   = "%" HEXDIG HEXDIG
+ * attr-char     = ALPHA / DIGIT
+ *               / "!" / "#" / "$" / "&" / "+" / "-" / "."
+ *               / "^" / "_" / "`" / "|" / "~"
+ */
+
+var EXT_VALUE_REGEXP = /^([A-Za-z0-9!#$%&+\-^_`{}~]+)'(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)'((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+.^_`|~-])+)$/;
+
+/**
+ * RegExp for various RFC 6266 grammar
+ *
+ * disposition-type = "inline" | "attachment" | disp-ext-type
+ * disp-ext-type    = token
+ * disposition-parm = filename-parm | disp-ext-parm
+ * filename-parm    = "filename" "=" value
+ *                  | "filename*" "=" ext-value
+ * disp-ext-parm    = token "=" value
+ *                  | ext-token "=" ext-value
+ * ext-token        = <the characters in token, followed by "*">
+ */
+
+var DISPOSITION_TYPE_REGEXP = /^([!#$%&'*+.0-9A-Z^_`a-z|~-]+)[\x09\x20]*(?:$|;)/; // eslint-disable-line no-control-regex
+
+/**
+ * Create an attachment Content-Disposition header.
+ *
+ * @param {string} [filename]
+ * @param {object} [options]
+ * @param {string} [options.type=attachment]
+ * @param {string|boolean} [options.fallback=true]
+ * @return {string}
+ * @api public
+ */
+
+function contentDisposition (filename, options) {
+  var opts = options || {};
+
+  // get type
+  var type = opts.type || 'attachment';
+
+  // get parameters
+  var params = createparams(filename, opts.fallback);
+
+  // format into string
+  return format(new ContentDisposition(type, params))
+}
+
+/**
+ * Create parameters object from filename and fallback.
+ *
+ * @param {string} [filename]
+ * @param {string|boolean} [fallback=true]
+ * @return {object}
+ * @api private
+ */
+
+function createparams (filename, fallback) {
+  if (filename === undefined) {
+    return
+  }
+
+  var params = {};
+
+  if (typeof filename !== 'string') {
+    throw new TypeError('filename must be a string')
+  }
+
+  // fallback defaults to true
+  if (fallback === undefined) {
+    fallback = true;
+  }
+
+  if (typeof fallback !== 'string' && typeof fallback !== 'boolean') {
+    throw new TypeError('fallback must be a string or boolean')
+  }
+
+  if (typeof fallback === 'string' && NON_LATIN1_REGEXP.test(fallback)) {
+    throw new TypeError('fallback must be ISO-8859-1 string')
+  }
+
+  // restrict to file base name
+  var name = basename(filename);
+
+  // determine if name is suitable for quoted string
+  var isQuotedString = TEXT_REGEXP.test(name);
+
+  // generate fallback name
+  var fallbackName = typeof fallback !== 'string'
+    ? fallback && getlatin1(name)
+    : basename(fallback);
+  var hasFallback = typeof fallbackName === 'string' && fallbackName !== name;
+
+  // set extended filename parameter
+  if (hasFallback || !isQuotedString || HEX_ESCAPE_REGEXP.test(name)) {
+    params['filename*'] = name;
+  }
+
+  // set filename parameter
+  if (isQuotedString || hasFallback) {
+    params.filename = hasFallback
+      ? fallbackName
+      : name;
+  }
+
+  return params
+}
+
+/**
+ * Format object to Content-Disposition header.
+ *
+ * @param {object} obj
+ * @param {string} obj.type
+ * @param {object} [obj.parameters]
+ * @return {string}
+ * @api private
+ */
+
+function format (obj) {
+  var parameters = obj.parameters;
+  var type = obj.type;
+
+  if (!type || typeof type !== 'string' || !TOKEN_REGEXP.test(type)) {
+    throw new TypeError('invalid type')
+  }
+
+  // start with normalized type
+  var string = String(type).toLowerCase();
+
+  // append parameters
+  if (parameters && typeof parameters === 'object') {
+    var param;
+    var params = Object.keys(parameters).sort();
+
+    for (var i = 0; i < params.length; i++) {
+      param = params[i];
+
+      var val = param.substr(-1) === '*'
+        ? ustring(parameters[param])
+        : qstring(parameters[param]);
+
+      string += '; ' + param + '=' + val;
+    }
+  }
+
+  return string
+}
+
+/**
+ * Decode a RFC 6987 field value (gracefully).
+ *
+ * @param {string} str
+ * @return {string}
+ * @api private
+ */
+
+function decodefield (str) {
+  var match = EXT_VALUE_REGEXP.exec(str);
+
+  if (!match) {
+    throw new TypeError('invalid extended field value')
+  }
+
+  var charset = match[1].toLowerCase();
+  var encoded = match[2];
+  var value;
+
+  // to binary string
+  var binary = encoded.replace(HEX_ESCAPE_REPLACE_REGEXP, pdecode);
+
+  switch (charset) {
+    case 'iso-8859-1':
+      value = getlatin1(binary);
+      break
+    case 'utf-8':
+      value = new Buffer(binary, 'binary').toString('utf8');
+      break
+    default:
+      throw new TypeError('unsupported charset in extended field')
+  }
+
+  return value
+}
+
+/**
+ * Get ISO-8859-1 version of string.
+ *
+ * @param {string} val
+ * @return {string}
+ * @api private
+ */
+
+function getlatin1 (val) {
+  // simple Unicode -> ISO-8859-1 transformation
+  return String(val).replace(NON_LATIN1_REGEXP, '?')
+}
+
+/**
+ * Parse Content-Disposition header string.
+ *
+ * @param {string} string
+ * @return {object}
+ * @api private
+ */
+
+function parse$1 (string) {
+  if (!string || typeof string !== 'string') {
+    throw new TypeError('argument string is required')
+  }
+
+  var match = DISPOSITION_TYPE_REGEXP.exec(string);
+
+  if (!match) {
+    throw new TypeError('invalid type format')
+  }
+
+  // normalize type
+  var index = match[0].length;
+  var type = match[1].toLowerCase();
+
+  var key;
+  var names = [];
+  var params = {};
+  var value;
+
+  // calculate index to start at
+  index = PARAM_REGEXP.lastIndex = match[0].substr(-1) === ';'
+    ? index - 1
+    : index;
+
+  // match parameters
+  while ((match = PARAM_REGEXP.exec(string))) {
+    if (match.index !== index) {
+      throw new TypeError('invalid parameter format')
+    }
+
+    index += match[0].length;
+    key = match[1].toLowerCase();
+    value = match[2];
+
+    if (names.indexOf(key) !== -1) {
+      throw new TypeError('invalid duplicate parameter')
+    }
+
+    names.push(key);
+
+    if (key.indexOf('*') + 1 === key.length) {
+      // decode extended value
+      key = key.slice(0, -1);
+      value = decodefield(value);
+
+      // overwrite existing value
+      params[key] = value;
+      continue
+    }
+
+    if (typeof params[key] === 'string') {
+      continue
+    }
+
+    if (value[0] === '"') {
+      // remove quotes and escapes
+      value = value
+        .substr(1, value.length - 2)
+        .replace(QESC_REGEXP, '$1');
+    }
+
+    params[key] = value;
+  }
+
+  if (index !== -1 && index !== string.length) {
+    throw new TypeError('invalid parameter format')
+  }
+
+  return new ContentDisposition(type, params)
+}
+
+/**
+ * Percent decode a single character.
+ *
+ * @param {string} str
+ * @param {string} hex
+ * @return {string}
+ * @api private
+ */
+
+function pdecode (str, hex) {
+  return String.fromCharCode(parseInt(hex, 16))
+}
+
+/**
+ * Percent encode a single character.
+ *
+ * @param {string} char
+ * @return {string}
+ * @api private
+ */
+
+function pencode (char) {
+  var hex = String(char)
+    .charCodeAt(0)
+    .toString(16)
+    .toUpperCase();
+  return hex.length === 1
+    ? '%0' + hex
+    : '%' + hex
+}
+
+/**
+ * Quote a string for HTTP.
+ *
+ * @param {string} val
+ * @return {string}
+ * @api private
+ */
+
+function qstring (val) {
+  var str = String(val);
+
+  return '"' + str.replace(QUOTE_REGEXP, '\\$1') + '"'
+}
+
+/**
+ * Encode a Unicode string for HTTP (RFC 5987).
+ *
+ * @param {string} val
+ * @return {string}
+ * @api private
+ */
+
+function ustring (val) {
+  var str = String(val);
+
+  // percent encode as UTF-8
+  var encoded = encodeURIComponent(str)
+    .replace(ENCODE_URL_ATTR_CHAR_REGEXP, pencode);
+
+  return 'UTF-8\'\'' + encoded
+}
+
+/**
+ * Class for parsed Content-Disposition header for v8 optimization
+ */
+
+function ContentDisposition (type, parameters) {
+  this.type = type;
+  this.parameters = parameters;
+}
+
+contentDisposition_1.parse = parse_1$1;
+
+var download = createCommonjsModule(function (module, exports) {
+//download.js v4.2, by dandavis; 2008-2016. [CCBY2] see http://danml.com/download.html for tests/usage
+// v1 landed a FF+Chrome compat way of downloading strings to local un-named files, upgraded to use a hidden frame and optional mime
+// v2 added named files via a[download], msSaveBlob, IE (10+) support, and window.URL support for larger+faster saves than dataURLs
+// v3 added dataURL and Blob Input, bind-toggle arity, and legacy dataURL fallback was improved with force-download mime and base64 support. 3.1 improved safari handling.
+// v4 adds AMD/UMD, commonJS, and plain browser support
+// v4.1 adds url download capability via solo URL argument (same domain/CORS only)
+// v4.2 adds semantic variable names, long (over 2MB) dataURL support, and hidden by default temp anchors
+// https://github.com/rndme/download
+
+(function (root, factory) {
+	if (typeof undefined === 'function' && undefined.amd) {
+		// AMD. Register as an anonymous module.
+		undefined([], factory);
+	} else {
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like environments that support module.exports,
+		// like Node.
+		module.exports = factory();
+	}
+}(commonjsGlobal, function () {
+
+	return function download(data, strFileName, strMimeType) {
+
+		var self = window, // this script is only for browsers anyway...
+			defaultMime = "application/octet-stream", // this default mime also triggers iframe downloads
+			mimeType = strMimeType || defaultMime,
+			payload = data,
+			url = !strFileName && !strMimeType && payload,
+			anchor = document.createElement("a"),
+			toString = function(a){return String(a);},
+			myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString),
+			fileName = strFileName || "download",
+			blob,
+			reader;
+			myBlob= myBlob.call ? myBlob.bind(self) : Blob ;
+	  
+		if(String(this)==="true"){ //reverse arguments, allowing download.bind(true, "text/xml", "export.xml") to act as a callback
+			payload=[payload, mimeType];
+			mimeType=payload[0];
+			payload=payload[1];
+		}
+
+
+		if(url && url.length< 2048){ // if no filename and no mime, assume a url was passed as the only argument
+			fileName = url.split("/").pop().split("?")[0];
+			anchor.href = url; // assign href prop to temp anchor
+		  	if(anchor.href.indexOf(url) !== -1){ // if the browser determines that it's a potentially valid url path:
+        		var ajax=new XMLHttpRequest();
+        		ajax.open( "GET", url, true);
+        		ajax.responseType = 'blob';
+        		ajax.onload= function(e){ 
+				  download(e.target.response, fileName, defaultMime);
+				};
+        		setTimeout(function(){ ajax.send();}, 0); // allows setting custom ajax headers using the return:
+			    return ajax;
+			} // end if valid url?
+		} // end if url?
+
+
+		//go ahead and download dataURLs right away
+		if(/^data\:[\w+\-]+\/[\w+\-]+[,;]/.test(payload)){
+		
+			if(payload.length > (1024*1024*1.999) && myBlob !== toString ){
+				payload=dataUrlToBlob(payload);
+				mimeType=payload.type || defaultMime;
+			}else{			
+				return navigator.msSaveBlob ?  // IE10 can't do a[download], only Blobs:
+					navigator.msSaveBlob(dataUrlToBlob(payload), fileName) :
+					saver(payload) ; // everyone else can save dataURLs un-processed
+			}
+			
+		}//end if dataURL passed?
+
+		blob = payload instanceof myBlob ?
+			payload :
+			new myBlob([payload], {type: mimeType}) ;
+
+
+		function dataUrlToBlob(strUrl) {
+			var parts= strUrl.split(/[:;,]/),
+			type= parts[1],
+			decoder= parts[2] == "base64" ? atob : decodeURIComponent,
+			binData= decoder( parts.pop() ),
+			mx= binData.length,
+			i= 0,
+			uiArr= new Uint8Array(mx);
+
+			for(i;i<mx;++i) { uiArr[i]= binData.charCodeAt(i); }
+
+			return new myBlob([uiArr], {type: type});
+		 }
+
+		function saver(url, winMode){
+
+			if ('download' in anchor) { //html5 A[download]
+				anchor.href = url;
+				anchor.setAttribute("download", fileName);
+				anchor.className = "download-js-link";
+				anchor.innerHTML = "downloading...";
+				anchor.style.display = "none";
+				document.body.appendChild(anchor);
+				setTimeout(function() {
+					anchor.click();
+					document.body.removeChild(anchor);
+					if(winMode===true){setTimeout(function(){ self.URL.revokeObjectURL(anchor.href);}, 250 );}
+				}, 66);
+				return true;
+			}
+
+			// handle non-a[download] safari as best we can:
+			if(/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)) {
+				url=url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
+				if(!window.open(url)){ // popup blocked, offer direct download:
+					if(confirm("Displaying New Document\n\nUse Save As... to download, then click back to return to this page.")){ location.href=url; }
+				}
+				return true;
+			}
+
+			//do iframe dataURL download (old ch+FF):
+			var f = document.createElement("iframe");
+			document.body.appendChild(f);
+
+			if(!winMode){ // force a mime that will download:
+				url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
+			}
+			f.src=url;
+			setTimeout(function(){ document.body.removeChild(f); }, 333);
+
+		}//end saver
+
+
+
+
+		if (navigator.msSaveBlob) { // IE10+ : (has Blob, but not a[download] or URL)
+			return navigator.msSaveBlob(blob, fileName);
+		}
+
+		if(self.URL){ // simple fast and modern way using Blob and URL:
+			saver(self.URL.createObjectURL(blob), true);
+		}else{
+			// handle non-Blob()+non-URL browsers:
+			if(typeof blob === "string" || blob.constructor===toString ){
+				try{
+					return saver( "data:" +  mimeType   + ";base64,"  +  self.btoa(blob)  );
+				}catch(y){
+					return saver( "data:" +  mimeType   + "," + encodeURIComponent(blob)  );
+				}
+			}
+
+			// Blob but not URL support:
+			reader=new FileReader();
+			reader.onload=function(e){
+				saver(this.result);
+			};
+			reader.readAsDataURL(blob);
+		}
+		return true;
+	}; /* end download() */
+}));
+});
+
+var components = exporter('components', {
+  /**
+   * 一つのコンポーネント情報を取得します。
+   * @param {riotx.Context} context
+   * @param {String} component_uid
+   * @param {Object} component
+   * @param {Object} query
+   * @return {Promise}
+   */
+  get: (context, component_uid, component, query) => {
+    const method = component.api.method;
+    // GETメソッドのみサポート。
+    if (method !== 'get') {
+      return Promise.reject('only `get` method is allowed.');
+    }
+    let path = component.api.path;
+    if (path.indexOf('/') !== 0) {
+      path = '/' + path;
+    }
+    const actions = context.getter('oas.operationObjectsAsAction', component);
+
+    const api = context.getter('oas.apiByPathAndMethod', path, method);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
+    const token = currentEndpoint.token;
+    const networkingId = `networking_${Date.now()}`;
+
+    return Promise
+      .resolve()
+      .then(() => context.commit('application.addNetworking', {
+        id: networkingId
+      }))
+      .then(() => api(query, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
+        }
+        // `component.pagination`からページングをサポートしているか判断する。
+        // サポートしていれば手動でページング情報を付加する。
+        let hasPagination = false;
+        let pagination;
+        if (component.pagination) {
+          const currentPage = Number(res.headers['x-pagination-current-page'] || 0);
+          const size = Number(res.headers['x-pagination-limit'] || 0);
+          const maxPage = Number(res.headers['x-pagination-total-pages'] || 0);
+          pagination = {
+            // `x-pagination-current-page`等は独自仕様。
+            // VIRONを使用するサービスはこの仕様に沿う必要がある。
+            currentPage,
+            size,
+            maxPage
+          };
+          // 2ページ以上存在する場合のみページングをONにする。
+          if (maxPage >= 2) {
+            hasPagination = true;
+          }
+        }
+        context.commit('components.updateOne', {
+          component_uid,
+          response: res.obj,// APIレスポンス内容そのまま。
+          schemaObject: context.getter('oas.schemaObject', path, method),// OASのschema。
+          parameterObjects: context.getter('oas.parameterObjects', path, method),// OASのparameterObject群。
+          actions,// 関連API群。
+          hasPagination,
+          pagination,// ページング関連。
+          autoRefreshSec: (component.auto_refresh_sec || 0),
+          primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
+          table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
+        });
+        context.commit('application.removeNetworking', networkingId);
+      })
+      .catch(err => {
+        context.commit('application.removeNetworking', networkingId);
+        throw err;
+      });
+  },
+
+  /**
+   * APIコールします。
+   * @param {riotx.Context} context
+   * @param {Object} operationObject
+   * @param {Object} params
+   * @return {Promise}
+   */
+  operate: (context, operationObject, params) => {
+    const api = context.getter('oas.api', operationObject.operationId);
+    const token = context.getter('endpoints.one', context.getter('current.all')).token;
+    const currentEndpointKey = context.getter('current.all');
+    const networkingId = `networking_${Date.now()}`;
+
+    return Promise
+      .resolve()
+      .then(() => context.commit('application.addNetworking', {
+        id: networkingId
+      }))
+      .then(() => api(params, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        context.commit('application.removeNetworking', networkingId);
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
+        }
+        // ダウンロード指定されていればダウンロードする。
+        const contentDispositionHeader = res.headers['content-disposition'];
+        if (!contentDispositionHeader) {
+          return res;
+        }
+        const downloadFileInfo = contentDisposition_1.parse(contentDispositionHeader);
+        if (downloadFileInfo.type !== 'attachment') {
+          return res;
+        }
+        download(res.data, downloadFileInfo.parameters.filename, res.headers['content-type']);
+        return res;
+      })
+      .catch(err => {
+        context.commit('application.removeNetworking', networkingId);
+        throw err;
+      });
+  },
+
+  /**
+   * 一件削除します。
+   * @param {riotx.Context} context
+   * @param {String} component_uid
+   * @return {Promise}
+   */
+  remove: (context, component_uid) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('components.removeOne', component_uid);
+      });
+  },
+
+  /**
+   * 全件削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  removeAll: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('components.removeAll');
+      });
+  }
+});
+
+var current = exporter('current', {
+  /**
+   * 選択中endpointKeyを更新します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @return {Promise}
+   */
+  update: (context, endpointKey) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('current.all', endpointKey);
+      });
+  },
+
+  /**
+   * 選択中endpointKeyを削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  remove: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('current.all', null);
+      });
+  }
+});
+
+var drawers = exporter('drawers', {
+  /**
+   * ドローワーを追加します。
+   * @param {riotx.Context} context
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} drawerOpts
+   * @return {Promise}
+   */
+  add: (context, tagName, tagOpts, drawerOpts) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('drawers.add', tagName, tagOpts, drawerOpts);
+      });
+  },
+
+  /**
+   * ドローワーを削除します。
+   * @param {riotx.Context} context
+   * @param {String} drawerId
+   * @return {Promise}
+   */
+  remove: (context, drawerId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('drawers.remove', drawerId);
+      });
+  }
+});
+
+'use strict';
+
+// Found this seed-based random generator somewhere
+// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
+
+var seed = 1;
+
+/**
+ * return a random number based on a seed
+ * @param seed
+ * @returns {number}
+ */
+function getNextValue() {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed/(233280.0);
+}
+
+function setSeed$1(_seed_) {
+    seed = _seed_;
+}
+
+var randomFromSeed = {
+    nextValue: getNextValue,
+    seed: setSeed$1
+};
+
+'use strict';
+
+
+
+var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
+var alphabet;
+var previousSeed;
+
+var shuffled;
+
+function reset() {
+    shuffled = false;
+}
+
+function setCharacters(_alphabet_) {
+    if (!_alphabet_) {
+        if (alphabet !== ORIGINAL) {
+            alphabet = ORIGINAL;
+            reset();
+        }
+        return;
+    }
+
+    if (_alphabet_ === alphabet) {
+        return;
+    }
+
+    if (_alphabet_.length !== ORIGINAL.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
+    }
+
+    var unique = _alphabet_.split('').filter(function(item, ind, arr){
+       return ind !== arr.lastIndexOf(item);
+    });
+
+    if (unique.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
+    }
+
+    alphabet = _alphabet_;
+    reset();
+}
+
+function characters(_alphabet_) {
+    setCharacters(_alphabet_);
+    return alphabet;
+}
+
+function setSeed(seed) {
+    randomFromSeed.seed(seed);
+    if (previousSeed !== seed) {
+        reset();
+        previousSeed = seed;
+    }
+}
+
+function shuffle$1() {
+    if (!alphabet) {
+        setCharacters(ORIGINAL);
+    }
+
+    var sourceArray = alphabet.split('');
+    var targetArray = [];
+    var r = randomFromSeed.nextValue();
+    var characterIndex;
+
+    while (sourceArray.length > 0) {
+        r = randomFromSeed.nextValue();
+        characterIndex = Math.floor(r * sourceArray.length);
+        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
+    }
+    return targetArray.join('');
+}
+
+function getShuffled() {
+    if (shuffled) {
+        return shuffled;
+    }
+    shuffled = shuffle$1();
+    return shuffled;
+}
+
+/**
+ * lookup shuffled letter
+ * @param index
+ * @returns {string}
+ */
+function lookup(index) {
+    var alphabetShuffled = getShuffled();
+    return alphabetShuffled[index];
+}
+
+var alphabet_1 = {
+    characters: characters,
+    seed: setSeed,
+    lookup: lookup,
+    shuffled: getShuffled
+};
+
+'use strict';
+
+var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
+
+function randomByte() {
+    if (!crypto || !crypto.getRandomValues) {
+        return Math.floor(Math.random() * 256) & 0x30;
+    }
+    var dest = new Uint8Array(1);
+    crypto.getRandomValues(dest);
+    return dest[0] & 0x30;
+}
+
+var randomByteBrowser = randomByte;
+
+'use strict';
+
+
+
+function encode(lookup, number) {
+    var loopCounter = 0;
+    var done;
+
+    var str = '';
+
+    while (!done) {
+        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByteBrowser() );
+        done = number < (Math.pow(16, loopCounter + 1 ) );
+        loopCounter++;
+    }
+    return str;
+}
+
+var encode_1 = encode;
+
+'use strict';
+
+
+/**
+ * Decode the id to get the version and worker
+ * Mainly for debugging and testing.
+ * @param id - the shortid-generated id.
+ */
+function decode(id) {
+    var characters = alphabet_1.shuffled();
+    return {
+        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
+        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
+    };
+}
+
+var decode_1 = decode;
+
+'use strict';
+
+
+
+
+// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
+// This number should be updated every year or so to keep the generated id short.
+// To regenerate `new Date() - 0` and bump the version. Always bump the version!
+var REDUCE_TIME = 1459707606518;
+
+// don't change unless we change the algos or REDUCE_TIME
+// must be an integer and less than 16
+var version = 6;
+
+// Counter is used when shortid is called multiple times in one second.
+var counter;
+
+// Remember the last time shortid was called in case counter is needed.
+var previousSeconds;
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function build(clusterWorkerId) {
+
+    var str = '';
+
+    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
+
+    if (seconds === previousSeconds) {
+        counter++;
+    } else {
+        counter = 0;
+        previousSeconds = seconds;
+    }
+
+    str = str + encode_1(alphabet_1.lookup, version);
+    str = str + encode_1(alphabet_1.lookup, clusterWorkerId);
+    if (counter > 0) {
+        str = str + encode_1(alphabet_1.lookup, counter);
+    }
+    str = str + encode_1(alphabet_1.lookup, seconds);
+
+    return str;
+}
+
+var build_1 = build;
+
+'use strict';
+
+
+function isShortId(id) {
+    if (!id || typeof id !== 'string' || id.length < 6 ) {
+        return false;
+    }
+
+    var characters = alphabet_1.characters();
+    var len = id.length;
+    for(var i = 0; i < len;i++) {
+        if (characters.indexOf(id[i]) === -1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+var isValid = isShortId;
+
+'use strict';
+
+var clusterWorkerIdBrowser = 0;
+
+var lib = createCommonjsModule(function (module) {
+'use strict';
+
+
+
+
+
+
+
+// if you are using cluster or multiple servers use this to make each instance
+// has a unique value for worker
+// Note: I don't know if this is automatically set when using third
+// party cluster solutions such as pm2.
+var clusterWorkerId = clusterWorkerIdBrowser || 0;
+
+/**
+ * Set the seed.
+ * Highly recommended if you don't want people to try to figure out your id schema.
+ * exposed as shortid.seed(int)
+ * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
+ */
+function seed(seedValue) {
+    alphabet_1.seed(seedValue);
+    return module.exports;
+}
+
+/**
+ * Set the cluster worker or machine id
+ * exposed as shortid.worker(int)
+ * @param workerId worker must be positive integer.  Number less than 16 is recommended.
+ * returns shortid module so it can be chained.
+ */
+function worker(workerId) {
+    clusterWorkerId = workerId;
+    return module.exports;
+}
+
+/**
+ *
+ * sets new characters to use in the alphabet
+ * returns the shuffled alphabet
+ */
+function characters(newCharacters) {
+    if (newCharacters !== undefined) {
+        alphabet_1.characters(newCharacters);
+    }
+
+    return alphabet_1.shuffled();
+}
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function generate() {
+  return build_1(clusterWorkerId);
+}
+
+// Export all other functions as properties of the generate function
+module.exports = generate;
+module.exports.generate = generate;
+module.exports.seed = seed;
+module.exports.worker = worker;
+module.exports.characters = characters;
+module.exports.decode = decode_1;
+module.exports.isValid = isValid;
+});
+
+'use strict';
+var shortid = lib;
+
+var endpoints = exporter('endpoints', {
+  /**
+   * 1件のエンドポイントを追加します。
+   * @param {riotx.Context} context
+   * @param {String} url
+   * @param {String} memo
+   * @return {Promise}
+   */
+  add: (context, url, memo) => {
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, url))
+      .catch(err => {
+        // 401エラーは想定内。
+        // 401 = endpointが存在しているので認証エラーになる。
+        // 401以外 = endpointが存在しない。
+        if (err.status !== 401) {
+          throw err;
+        }
+        //
+        const key = shortid.generate();
+        const newEndpoint = {
+          url: url,
+          memo: memo,
+          token: null,
+          title: '',
+          name: '',
+          description: '',
+          version: '',
+          color: '',
+          thumbnail: './img/viron_default.png',
+          tags: []
+        };
+        context.commit('endpoints.add', key, newEndpoint);
+      });
+  },
+
+  /**
+   * 1件のエンドポイントを更新します
+   * @param {riotx.Context} context
+   * @param {String} url
+   * @param {Object} newEndpoint
+   * @return {Promise}
+   */
+  update: (context, key, newEndpoint) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.update', key, newEndpoint);
+      });
+  },
+
+  /**
+   * 1件のエンドポイントを削除します。
+   * @param {riotx.Context} context
+   * @param {String} key
+   * @return {Promise}
+   */
+  remove: (context, key) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.remove', key);
+      });
+  },
+
+  /**
+   * 全てのエンドポイントを削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  removeAll: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.removeAll');
+      });
+  },
+
+  /**
+   * 新エンドポイント群を既存エンドポイント群にmergeします。
+   * @param {riotx.Context} context
+   * @param {Object} endpoints
+   * @return {Promise}
+   */
+  mergeAll: (context, endpoints) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.mergeAll', endpoints);
+      });
+  },
+
+  /**
+   * 一件の新エンドポイントを既存エンドポイント群にmergeします。
+   * endpointKeyも新規生成します。
+   * @param {riotx.Context} context
+   * @param {Object} endpoint
+   * @return {Promise}
+   */
+  mergeOneWithKey: (context, endpoint) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const key = shortid.generate();
+        context.commit('endpoints.add', key, endpoint);
+      });
+  },
+
+  /**
+   * エンドポイントのorder値を整理します。
+   * order値が存在しない等への対応を行います。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  tidyUpOrder: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.tidyUpOrder');
+      });
+  },
+
+  /**
+   * 指定されたエンドポイントのorder値を変更します。
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {Number} newOrder
+   * @return {Promise}
+   */
+  changeOrder: (context, endpointKey, newOrder) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.changeOrder', endpointKey, newOrder);
+      });
+  }
+});
+
+var layout = exporter('layout', {
+  /**
+   * アプリケーションの表示サイズを更新します。
+   * @param {riotx.Context} context
+   * @param {Number} width
+   * @param {Number} height
+   * @return {Promise}
+   */
+  updateSize: (context, width, height) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('layout.updateSize', width, height);
+      });
+  },
+
+  /**
+   * componentリストのgridレイアウトのcolumn数を更新します。
+   * @param {riotx.Context} context
+   * @param {Number} count
+   * @return {Promise}
+   */
+  updateComponentsGridColumnCount: (context, count) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('layout.updateComponentsGridColumnCount', count);
+      });
+  }
+});
+
+var location$1 = exporter('location', {
+  /**
+   * 更新します。
+   * @param {riotx.Context} context
+   * @param {Object} obj
+   * @return {Promise}
+   */
+  update: (context, obj) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('location.all', obj);
+      });
+  }
+});
+
+// モーダルを多重起動しないよう判定する変数
+let canCreateModal = true;
+// タイマーID管理用変数
+let timer;
+
+var modals = exporter('modals', {
+  /**
+   * モーダルを追加します。
+   * @param {riotx.Context} context
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} modalOpts
+   * @return {Promise}
+   */
+  add: (context, tagName, tagOpts, modalOpts) => {
+    if (!canCreateModal) {
+      console.warn('多重に起動しないよう、一定時間のモーダル作成を規制する。'); // eslint-disable-line no-console
+      return Promise.resolve();
+    }
+
+    // モーダル作成を一時的に不可にする。
+    canCreateModal = false;
+    clearTimeout(timer);
+
+    // 一定時間後にモーダル作成可とする。
+    timer = setTimeout(() => {
+      canCreateModal = true;
+    }, 300);
+
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('modals.add', tagName, tagOpts, modalOpts);
+      });
+  },
+
+  /**
+   * モーダルを削除します。
+   * @param {riotx.Context} context
+   * @param {String} modalId
+   * @return {Promise}
+   */
+  remove: (context, modalId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('modals.remove', modalId);
+      });
+  }
+});
+
+/**
+     */
+    var isArray$1 = Array.isArray || function (val) {
+        return isKind_1$1(val, 'Array');
+    };
+    var isArray_1$1 = isArray$1;
+
+/**
+     * Array forEach
+     */
+    function forEach$2(arr, callback, thisObj) {
+        if (arr == null) {
+            return;
+        }
+        var i = -1,
+            len = arr.length;
+        while (++i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if ( callback.call(thisObj, arr[i], i, arr) === false ) {
+                break;
+            }
+        }
+    }
+
+    var forEach_1$2 = forEach$2;
+
+/**
+     * Encode object into a query string.
+     */
+    function encode$2(obj){
+        var query = [],
+            arrValues, reg;
+        forOwn_1$2(obj, function (val, key) {
+            if (isArray_1$1(val)) {
+                arrValues = key + '=';
+                reg = new RegExp('&'+key+'+=$');
+                forEach_1$2(val, function (aValue) {
+                    arrValues += encodeURIComponent(aValue) + '&' + key + '=';
+                });
+                query.push(arrValues.replace(reg, ''));
+            } else {
+               query.push(key + '=' + encodeURIComponent(val));
+            }
+        });
+        return (query.length) ? '?' + query.join('&') : '';
+    }
+
+    var encode_1$2 = encode$2;
+
+// swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
+const SwaggerClient = window.SwaggerClient;
+
+var oas = exporter('oas', {
+  /**
+   * OAS準拠ファイルを取得/resolveし、SwaggerClientインスタンスを生成します。
+   * @see: https://github.com/swagger-api/swagger-js#swagger-specification-resolver
+   * @param {riotx.Context} context
+   * @param {String} endpointKey
+   * @param {String} url
+   * @param {String} token
+   * @return {Promise}
+   */
+  setup: (context, endpointKey, url, token) => {
+    return Promise
+      .resolve()
+      .then(() => SwaggerClient.http({
+        url,
+        headers: {
+          'Authorization': token
+        }
+      }))
+      .then(res => {
+        // 401エラーは想定内。
+        if (res.status === 401) {
+          const err = new Error();
+          err.name = '401 Authorization Required';
+          err.status = res.spec.status;
+          return Promise.reject(err);
+        }
+        return res;
+      })
+      .then(res => SwaggerClient({
+        spec: res.body
+      }))
+      .then(client => {
+        const errors = client.errors;
+        if (!!errors && !!errors.length) {
+          return Promise.reject(errors);
+        }
+        return client;
+      })
+      .then(client => {
+        context.commit('oas.client', client);
+        context.commit('endpoints.update', endpointKey, client.spec.info);
+      });
+  },
+
+  /**
+   * OAS情報をクリアします。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  clear: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('oas.clearClient');
+      });
+  },
+
+  /**
+   * Autocompleteリストを取得します。
+   * @param {riotx.Context} context
+   * @param {String} path
+   * @param {Object} query
+   * @return {Promise}
+   */
+  getAutocomplete: (context, path, query) => {
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
+    const token = currentEndpoint.token;
+    const url = `${new URL(currentEndpoint.url).origin}${path}${encode_1$2(query)}`;
+    return Promise
+      .resolve()
+      .then(() => commonFetch(context, url, {
+        headers: {
+          'Authorization': token
+        }
+      }))
+      .then(res => res.json());
+  }
+});
+
+/**
+     * Returns the first argument provided to it.
+     */
+    function identity$1(val){
+        return val;
+    }
+
+    var identity_1$1 = identity$1;
+
+/**
+     * Returns a function that gets a property of the passed object
+     */
+    function prop$1(name){
+        return function(obj){
+            return obj[name];
+        };
+    }
+
+    var prop_1$1 = prop$1;
+
+function containsMatch$1(array, pattern) {
+        var i = -1, length = array.length;
+        while (++i < length) {
+            if (deepMatches$1(array[i], pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function matchArray$1(target, pattern) {
+        var i = -1, patternLength = pattern.length;
+        while (++i < patternLength) {
+            if (!containsMatch$1(target, pattern[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function matchObject$1(target, pattern) {
+        var result = true;
+        forOwn_1$2(pattern, function(val, key) {
+            if (!deepMatches$1(target[key], val)) {
+                // Return false to break out of forOwn early
+                return (result = false);
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Recursively check if the objects match.
+     */
+    function deepMatches$1(target, pattern){
+        if (target && typeof target === 'object' &&
+            pattern && typeof pattern === 'object') {
+            if (isArray_1$1(target) && isArray_1$1(pattern)) {
+                return matchArray$1(target, pattern);
+            } else {
+                return matchObject$1(target, pattern);
+            }
+        } else {
+            return target === pattern;
+        }
+    }
+
+    var deepMatches_1$1 = deepMatches$1;
+
+/**
+     * Converts argument into a valid iterator.
+     * Used internally on most array/object/collection methods that receives a
+     * callback/iterator providing a shortcut syntax.
+     */
+    function makeIterator$1(src, thisObj){
+        if (src == null) {
+            return identity_1$1;
+        }
+        switch(typeof src) {
+            case 'function':
+                // function is the first to improve perf (most common case)
+                // also avoid using `Function#call` if not needed, which boosts
+                // perf a lot in some cases
+                return (typeof thisObj !== 'undefined')? function(val, i, arr){
+                    return src.call(thisObj, val, i, arr);
+                } : src;
+            case 'object':
+                return function(val){
+                    return deepMatches_1$1(val, src);
+                };
+            case 'string':
+            case 'number':
+                return prop_1$1(src);
+        }
+    }
+
+    var makeIterator_$1 = makeIterator$1;
+
+/**
+     * Object some
+     */
+    function some$1(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var result = false;
+        forOwn_1$2(obj, function(val, key) {
+            if (callback(val, key, obj)) {
+                result = true;
+                return false; // break
+            }
+        });
+        return result;
+    }
+
+    var some_1$1 = some$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$1(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var result;
+        some_1$1(obj, function(value, key, obj) {
+            if (callback(value, key, obj)) {
+                result = value;
+                return true; //break
+            }
+        });
+        return result;
+    }
+
+    var find_1$1 = find$1;
+
+var page = exporter('page', {
+  /**
+   * ページ情報を取得します。
+   * @param {riotx.Context} context
+   * @param {String} pageId
+   * @return {Promise}
+   */
+  get: (context, pageId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const pages = context.getter('viron.pages');
+        const page = find_1$1(pages, page => {
+          return (page.id === pageId);
+        });
+        context.commit('page.all', page);
+      });
+  },
+
+  /**
+   * ページ情報を削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  remove: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('page.all', null);
+      });
+  }
+});
+
+var popovers = exporter('popovers', {
+  /**
+   * 吹き出しを追加します。
+   * @param {riotx.Context} context
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} popoverOpts
+   * @return {Promise}
+   */
+  add: (context, tagName, tagOpts, popoverOpts) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('popovers.add', tagName, tagOpts, popoverOpts);
+      });
+  },
+
+  /**
+   * 吹き出しを削除します。
+   * @param {riotx.Context} context
+   * @param {String} popoverId
+   * @return {Promise}
+   */
+  remove: (context, popoverId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('popovers.remove', popoverId);
+      });
+  }
+});
+
+var toasts = exporter('toasts', {
+  /**
+   * トーストを追加します。
+   * @param {riotx.Context} context
+   * @param {Object} obj
+   * @return {Promise}
+   */
+  add: (context, obj) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('toasts.add', obj);
+      });
+  },
+
+  /**
+   * トーストを削除します。
+   * @param {riotx.Context} context
+   * @param {String} toastId
+   * @return {Promise}
+   */
+  remove: (context, toastId) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('toasts.remove', toastId);
+      });
+  }
+
+});
+
+var sua = createCommonjsModule(function (module) {
+/* Zepto v1.0-1-ga3cab6c - polyfill zepto detect event ajax form fx - zeptojs.com/license */
+/**
+ * @name sua.js
+ * @author Kei Funagayama <kei.topaz@gmail.com>
+ * @overview UserAgent decision for browser. fork zepto.js(http://zeptojs.com/)
+ * @license MIT
+ */
+
+(function (global) {
+  'use strict';
+
+  /**
+   * UserAgent decision
+   *
+   * @method
+   * @param {String} useragent user agent
+   */
+  function SUA(useragent) {
+    if (!useragent && global && global.navigator && global.navigator.userAgent) {
+      // set browser user agent
+      useragent = global.navigator.userAgent;
+    }
+    if (!useragent) {
+      throw new Error('useragent setup error. useragent not found.');
+    }
+
+    /**
+     * Decision: ie
+     * @name ie
+     * @memberof ua
+     * @return {Boolean}
+     */
+    this.ie = !!(useragent.indexOf('MSIE') >= 0 || useragent.indexOf('Trident') >= 0 || useragent.indexOf('Edge') >= 0), this.webkit = useragent.match(/(WebKit|Webkit)\/([\d.]+)/), this.android = useragent.match(/(Android)\s+([\d.]+)/), this.android23 = useragent.match(/(Android)\s+(2\.3)([\d.]+)/), this.android4 = useragent.match(/(Android)\s+(4)([\d.]+)/), this.android5 = useragent.match(/(Android)\s+(5)([\d.]+)/), this.android6 = useragent.match(/(Android)\s+(6)([\d.]+)/), this.android7 = useragent.match(/(Android)\s+(7)([\d.]+)/), this.ipad = useragent.match(/(iPad).*OS\s([\d_]+)/), this.iphone = !this.ipad && useragent.match(/(iPhone\sOS)\s([\d_]+)/), this.webos = useragent.match(/(webOS|hpwOS)[\s\/]([\d.]+)/), this.touchpad = this.webos && useragent.match(/TouchPad/), this.kindle = useragent.match(/(Kindle)/), this.silk = useragent.match(/(Silk)/), this.blackberry = useragent.match(/(BlackBerry).*/), this.bb10 = useragent.match(/(BB10).*Version\/([\d.]+)/), this.rimtabletos = useragent.match(/(RIM\sTablet\sOS)\s([\d.]+)/), this.playbook = useragent.match(/PlayBook/), this.chrome = useragent.match(/Chrome\/([\d.]+)/) || useragent.match(/CriOS\/([\d.]+)/), this.firefox = useragent.match(/Firefox\/([\d.]+)/), this.wii = useragent.match(/Nintendo (Wii);/), this.wiiu = useragent.match(/Nintendo (WiiU)/), this.ds = useragent.match(/Nintendo (DS|3DS|DSi);/), this.nintendo_switch = useragent.match(/Nintendo (Switch);/), this.ps3 = useragent.match(/PLAYSTATION 3/), this.psp = useragent.match(/(PlayStation Portable)/), this.psvita = useragent.match(/(PlayStation Vita)/), this.windowsphone = useragent.match(/(Windows Phone |Windows Phone OS )([\d.]+)/), this.safari = useragent.match(/(Version)\/([0-9\.]+).*Safari\/([0-9\.]+)/), this.trident = useragent.match(/Trident\/([\d\.]+)/), this.xbox = useragent.match(/Xbox/), this.iphone5 = !('object' !== 'undefined' && module.exports) && this.iphone && screen && screen.width === 320 && screen.height === 568, this.vivaldi = useragent.match(/Vivaldi\/([\d.]+)/)
+
+    ;
+
+
+    /**
+     * Decision: iphone3
+     * @name iphone3
+     * @memberof ua
+     * @return {boolean}
+     */
+    this.iphone3 = this.iphone && global.devicePixelRatio === 1 ? true : false;
+
+
+    /**
+     * browser information
+     * @name browser
+     * @memberof ua
+     * @return {Object}
+     */
+    this.browser = {
+      locale: undefined, // ja-JP, en-us
+      lang: undefined, // ja, en ....
+      country: undefined // JP, us ...
+    };
+
+    /**
+     * os infomation
+     * @name os
+     * @memberof ua
+     * @return {Object}
+     */
+    this.os = {};
+
+    if (this.webkit && !this.ie) {
+      this.browser.webkit = true;
+      this.browser.version = this.webkit[1];
+    }
+
+    if (this.trident) {
+      this.browser.trident = true;
+      this.browser.version = this.trident[1];
+    }
+
+    if (this.android) {
+      this.os.android = true;
+      this.os.version = this.android[2];
+      try {
+        this.browser.locale = useragent.match(/(Android)\s(.+);\s([^;]+);/)[3];
+        this.browser.lang = this.browser.locale.substring(0, 2);
+        this.browser.country = this.browser.locale.substring(3);
+      } catch (e) {
+        //console.log('Failed to parse user agent string of Android.', useragent);
+      }
+    }
+    if (this.iphone) {
+      this.os.ios = this.os.iphone = true;
+      this.os.version = this.iphone[2].replace(/_/g, '.');
+    }
+
+    if (this.ipad) {
+      this.os.ios = this.os.ipad = true;
+      this.os.version = this.ipad[2].replace(/_/g, '.');
+    }
+
+    if (this.os.ios) {
+      var __ios_v_0 = null;
+      if (this.os.version) {
+        __ios_v_0 = this.os.version.substring(0, 1);
+      }
+      for (var i = 3; i < 10; i++) { // IOS 3->9
+        /**
+         * Decision: ios 3-9
+         * @name ios3-9
+         * @memberof ua
+         * @return {boolean}
+         */
+        this['ios' + i] = __ios_v_0 === "" + i;
+      }
+    }
+
+    if (this.webos) {
+      this.os.webos = true;
+      this.os.version = this.webos[2];
+    }
+    if (this.touchpad) {
+      this.os.touchpad = true;
+    }
+    if (this.blackberry) {
+      this.os.blackberry = true;
+    }
+    if (this.bb10) {
+      this.os.bb10 = true;
+      this.os.version = this.bb10[2];
+    }
+    if (this.rimtabletos) {
+      this.os.rimtabletos = true;
+      this.os.version = this.rimtabletos[2];
+    }
+    if (this.playbook) {
+      this.browser.playbook = true;
+    }
+    if (this.kindle) {
+      this.os.kindle = true;
+    }
+    if (this.silk) {
+      this.browser.silk = true;
+    }
+    if (!this.silk && this.os.android && useragent.match(/Kindle Fire/)) {
+      this.browser.silk = true;
+    }
+    if (this.chrome && !this.ie) {
+      this.browser.chrome = true;
+      this.browser.version = this.chrome[1];
+    }
+    if (this.firefox) {
+      this.browser.firefox = true;
+      this.browser.version = this.firefox[1];
+      if (useragent.match(/Android/)) { // firefox on android
+        this.android = ["Android", "Android", ""];
+      }
+    }
+    if (this.wii || this.ds || this.wiiu || this.nintendo_switch) {
+      this.os.nintendo = true;
+
+      if (this.wiiu || this.nintendo_switch) {
+        this.browser.nintendo = useragent.match(/NintendoBrowser\/([\d.]+)/);
+        this.browser.version = this.browser.nintendo[1];
+      }
+    }
+
+    if (this.windowsphone) {
+      this.browser.windowsphone = true;
+      this.browser.version = this.windowsphone[2];
+    }
+    if (this.safari) {
+      this.browser.safari = true;
+      this.browser.version = this.safari[2];
+    }
+
+    if (this.ie) {
+      this.browser.ie = /(MSIE|rv:?)\s?([\d\.]+)/.exec(useragent);
+      this.edge = false;
+
+      if (!this.browser.ie) { // Edge
+        this.browser.ie = /(Edge\/)(\d.+)/.exec(useragent);
+        this.browser.version = this.browser.ie[2];
+        this.edge = true;
+        // reset
+        this.chrome = false;
+        this.webkit = false;
+
+      } else if (!this.windowsphone) {
+        this.browser.version = (this.browser.ie) ? this.browser.ie[2] : '';
+      }
+
+      if (0 < this.browser.version.indexOf('.')) {
+        this.browser.majorversion = this.browser.version.substring(0, this.browser.version.indexOf('.'));
+      } else {
+        this.browser.majorversion = this.browser.version;
+      }
+    }
+
+    if (this.vivaldi) {
+      this.browser.vivaldi = true;
+      this.browser.version = this.vivaldi[1];
+    }
+
+    /**
+     * Decision: table
+     * @name table
+     * @memberof ua
+     * @return {boolean}
+     */
+    this.os.tablet = !!(this.ipad || this.kindle || this.playbook || (this.android && !useragent.match(/Mobile/)) || (this.firefox && useragent.match(/Tablet/)));
+
+    /**
+     * Decision: phone
+     * @name phone
+     * @memberof ua
+     * @return {boolean}
+     */
+    this.os.phone = !!(!this.os.tablet && (this.android || this.iphone || this.webos || this.blackberry || this.bb10 ||
+    (this.chrome && useragent.match(/Android/)) || (this.chrome && useragent.match(/CriOS\/([\d.]+)/)) || (this.firefox && useragent.match(/Mobile/)) || (this.windowsphone && useragent.match(/IEMobile/))));
+
+    /**
+     * Decision mobile (tablet or phone)
+     * @type {boolean}
+     */
+    this.mobile = !!(this.os.tablet || this.os.phone);
+
+    this.webview = {};
+    /**
+     * Decision: TwitterWebView
+     * @name twitterwebview
+     * @memberof ua
+     * @return {boolean}
+     */
+    if (useragent.match(/Twitter/)) {
+      this.webview.twitter = true;
+    }
+  }
+
+  SUA.VERSION = '2.1.0';
+
+  if ('object' !== 'undefined' && module.exports) {
+    // node
+    module.exports = SUA;
+  }
+
+  if (!global.SUA) {
+    // browser
+    global.SUA = SUA;
+  }
+
+})(commonjsGlobal);
+});
+
+var ua = exporter('ua', {
+  /**
+   * 初期設定を行います。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  setup: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        const ua = new sua(navigator.userAgent);
+        context.commit('ua.all', ua);
+      });
+  }
+});
+
+// APIは必須でサポートしなければならない URI
+const VIRON_URI = '/viron';
+
+var viron = exporter('viron', {
+  /**
+   * viron情報(各管理画面の基本情報)を取得します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  get: context => {
+    const operationObject = context.getter('oas.operationObject', VIRON_URI, 'get');
+    const api = context.getter('oas.api', operationObject.operationId);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
+    const token = currentEndpoint.token;
+    const networkingId = `networking_${Date.now()}`;
+
+    return Promise
+      .resolve()
+      .then(() => context.commit('application.addNetworking', {
+        id: networkingId
+      }))
+      .then(() => api({}, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
+        }
+        context.commit('viron.all', res.obj);
+        const endpoint = objectAssign({}, res.obj);
+        // pagesは不要なので削除。
+        delete endpoint.pages;
+        context.commit('endpoints.update', currentEndpointKey, endpoint);
+        context.commit('application.removeNetworking', networkingId);
+      })
+      .catch(err => {
+        context.commit('application.removeNetworking', networkingId);
+        throw err;
+      });
+  },
+
+  /**
+   * viron情報を削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  remove: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('viron.all', null);
+      });
+  }
+});
+
+var actions = objectAssign(
+  {},
+  application,
+  auth,
+  components,
+  current,
+  drawers,
+  endpoints,
+  layout,
+  location$1,
+  modals,
+  oas,
+  page,
+  popovers,
+  toasts,
+  ua,
+  viron
+);
+
+var exporter$1 = (name, funcs) => {
+  const ret = {};
+  forOwn_1$2(funcs, (func, id) => {
+    ret[`${name}.${id}`] = (context, ...args) => {
+      return func(context.state, ...args);
+    };
+  });
+  return ret;
+};
+
+var application$1 = exporter$1('application', {
+  /**
+   * `application`情報を返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  all: state => {
+    return state.application;
+  },
+
+  /**
+   * バージョンを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  version: state => {
+    return state.application.version;
+  },
+
+  /**
+   * 起動状態を返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isLaunched: state => {
+    return state.application.isLaunched;
+  },
+
+  /**
+   * 遷移中か否かを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isNavigating: state => {
+    return state.application.isNavigating;
+  },
+
+  /**
+   * API通信中か否かを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isNetworking: state => {
+    return state.application.isNetworking;
+  },
+
+  /**
+   * ドラッグ中か否かを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isDragging: state => {
+    return state.application.isDragging;
+  },
+
+  /**
+   * メニューの開閉状態を返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isMenuOpened: state => {
+    return state.application.isMenuOpened;
+  },
+
+  /**
+   * エンドポイントフィルター用のテキストを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  endpointFilterText: state => {
+    return state.application.endpointFilterText;
+  }
+});
+
+/**
+     * Array filter
+     */
+    function filter$2(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var filter_1$1 = filter$2;
+
+/**
+     * Array map
+     */
+    function map$1(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null){
+            return results;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            results[i] = callback(arr[i], i, arr);
+        }
+
+        return results;
+    }
+
+     var map_1$1 = map$1;
+
+/**
+     * Merge sort (http://en.wikipedia.org/wiki/Merge_sort)
+     */
+    function mergeSort$1(arr, compareFn) {
+        if (arr == null) {
+            return [];
+        } else if (arr.length < 2) {
+            return arr;
+        }
+
+        if (compareFn == null) {
+            compareFn = defaultCompare$1;
+        }
+
+        var mid, left, right;
+
+        mid   = ~~(arr.length / 2);
+        left  = mergeSort$1( arr.slice(0, mid), compareFn );
+        right = mergeSort$1( arr.slice(mid, arr.length), compareFn );
+
+        return merge$1(left, right, compareFn);
+    }
+
+    function defaultCompare$1(a, b) {
+        return a < b ? -1 : (a > b? 1 : 0);
+    }
+
+    function merge$1(left, right, compareFn) {
+        var result = [];
+
+        while (left.length && right.length) {
+            if (compareFn(left[0], right[0]) <= 0) {
+                // if 0 it should preserve same order (stable)
+                result.push(left.shift());
+            } else {
+                result.push(right.shift());
+            }
+        }
+
+        if (left.length) {
+            result.push.apply(result, left);
+        }
+
+        if (right.length) {
+            result.push.apply(result, right);
+        }
+
+        return result;
+    }
+
+    var sort$1 = mergeSort$1;
+
+/*
+     * Sort array by the result of the callback
+     */
+    function sortBy$1(arr, callback, context){
+        callback = makeIterator_$1(callback, context);
+
+        return sort$1(arr, function(a, b) {
+            a = callback(a);
+            b = callback(b);
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        });
+    }
+
+    var sortBy_1$1 = sortBy$1;
+
+/**
+     * @return {array} Array of unique items
+     */
+    function unique$1(arr, compare){
+        compare = compare || isEqual$1;
+        return filter_1$1(arr, function(item, i, arr){
+            var n = arr.length;
+            while (++i < n) {
+                if ( compare(item, arr[i]) ) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    function isEqual$1(a, b){
+        return a === b;
+    }
+
+    var unique_1$1 = unique$1;
+
+/**
+     * Get object keys
+     */
+     var keys$1 = Object.keys || function (obj) {
+            var keys = [];
+            forOwn_1$2(obj, function(val, key){
+                keys.push(key);
+            });
+            return keys;
+        };
+
+    var keys_1$1 = keys$1;
+
+var components$1 = exporter$1('components', {
+  /**
+   * 全情報を返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  all: state => {
+    return state.state.components;
+  },
+
+  /**
+   * 指定riotIDに対する要素を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Object}
+   */
+  one: (state, riotId) => {
+    return state.components[riotId];
+  },
+
+  /**
+   * 指定riotIDに対する要素のAPIレスポンスを返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {*}
+   */
+  response: (state, riotId) => {
+    return state.components[riotId].response;
+  },
+
+  /**
+   * 指定riotIDに対する要素のschemaObjectを返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Object}
+   */
+  schemaObject: (state, riotId) => {
+    return state.components[riotId].schemaObject;
+  },
+
+  /**
+   * 指定riotIDに対する要素のparamterObject群を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Array}
+   */
+  parameterObjects: (state, riotId) => {
+    return state.components[riotId].parameterObjects;
+  },
+
+  /**
+   * 全てののparamterObject群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  parameterObjectsEntirely: state => {
+    let entireParameterObjects = [];
+    const weights = {};
+    forOwn_1$2(state.components, component => {
+      entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
+    });
+    entireParameterObjects = map_1$1(entireParameterObjects, entireParameterObject => {
+      const name = entireParameterObject.name;
+      weights[name] || (weights[name] = 0);
+      weights[name] = weights[name] + 1;
+      return objectAssign({}, entireParameterObject);
+    });
+    entireParameterObjects = unique_1$1(entireParameterObjects, (a, b) => {
+      return (a.name === b.name);
+    });
+    forEach_1$2(entireParameterObjects, entireParameterObject => {
+      entireParameterObject.weight = weights[entireParameterObject.name];
+    });
+    entireParameterObjects = sortBy_1$1(entireParameterObjects, entireParameterObject => {
+      return weights[entireParameterObject.name] * (-1);
+    });
+    return entireParameterObjects;
+  },
+
+  /**
+   * action(operationObject)群を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Array}
+   */
+  actions: (state, riotId) => {
+    return map_1$1(state.components[riotId].actions, action => {
+      return action.operationObject;
+    });
+  },
+
+  /**
+   * 自身に関連するaction(operationObject)群を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Array}
+   */
+  selfActions: (state, riotId) => {
+    const actions = state.components[riotId].actions;
+    const selfActions = filter_1$1(actions, action => {
+      return (!action.appendTo || action.appendTo === 'self');
+    });
+    return map_1$1(selfActions, action => {
+      return action.operationObject;
+    });
+  },
+
+  /**
+   * テーブル行に関連するaction(operationObject)群を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Array}
+   */
+  rowActions: (state, riotId) => {
+    const actions = state.components[riotId].actions;
+    const selfActions = filter_1$1(actions, action => {
+      return (action.appendTo === 'row');
+    });
+    return map_1$1(selfActions, action => {
+      return action.operationObject;
+    });
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング機能ON/OFFを返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Boolean}
+   */
+  hasPagination: (state, riotId) => {
+    return state.components[riotId].hasPagination;
+  },
+
+  /**
+   * 指定riotIDに対する要素の自動更新secを取得します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Number}
+   */
+  autoRefreshSec: (state, riotId) => {
+    return state.components[riotId].autoRefreshSec;
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング情報を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Object}
+   */
+  pagination: (state, riotId) => {
+    return state.components[riotId].pagination;
+  },
+
+  /**
+   * テーブル行のラベルに使用するkey群を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Array}
+   */
+  tableLabels: (state, riotId) => {
+    return state.components[riotId].table_labels || [];
+  },
+
+  /**
+   * テーブル列のキー群を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Array}
+   */
+  tableColumns: (state, riotId) => {
+    const response = state.components[riotId].response;
+    if (!isArray_1$1(response) || !response.length) {
+      return [];
+    }
+    return keys_1$1(response[0]);
+  },
+
+  /**
+   * テーブル行に使用するprimaryキーを返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {String|null}
+   */
+  primaryKey: (state, riotId) => {
+    return state.components[riotId].primaryKey || null;
+  }
+});
+
+var current$1 = exporter$1('current', {
+  /**
+   * 選択中のendpointIDを返します。
+   * @param {Object} state
+   * @return {String|null}
+   */
+  all: state => {
+    const version = state.application.version;
+    return state.current[version];
+  }
+});
+
+var drawers$1 = exporter$1('drawers', {
+  /**
+   * 全てのドローワー情報を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  all: state => {
+    return state.drawers;
+  }
+});
+
+/**
+     * Get object size
+     */
+    function size(obj) {
+        var count = 0;
+        forOwn_1$2(obj, function(){
+            count++;
+        });
+        return count;
+    }
+
+    var size_1 = size;
+
+/**
+     * Typecast a value to a String, using an empty string value for null or
+     * undefined.
+     */
+    function toString(val){
+        return val == null ? '' : val.toString();
+    }
+
+    var toString_1 = toString;
+
+/**
+     * Searches for a given substring
+     */
+    function contains$1(str, substring, fromIndex){
+        str = toString_1(str);
+        substring = toString_1(substring);
+        return str.indexOf(substring, fromIndex) !== -1;
+    }
+
+    var contains_1$1 = contains$1;
+
+/**
+ * 受け取ったエンドポイント群をorder昇順の配列として返します。
+ * @param {Object} endpoints
+ * @return {Array}
+ */
+const sortByOrder = endpoints => {
+  let endpointsByOrder = [];
+  forOwn_1$2(endpoints, (endpoint, key) => {
+    endpoint.key = key;
+    endpointsByOrder.push(endpoint);
+  });
+  endpointsByOrder = sortBy_1$1(endpointsByOrder, endpoint => {
+    return endpoint.order;
+  });
+  return endpointsByOrder;
+};
+
+/**
+ * 受け取ったエンドポイント群をfilterして返します。
+ * @param {Array} endpoints
+ * @param {String} filterText
+ * @return {Array}
+ */
+const filterBy = (endpoints, filterText) => {
+  filterText = filterText || '';
+  filterText = filterText.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+  filterText = filterText.replace(/,/g, ' ');
+  const targetTexts = filter_1$1((filterText || '').split(' '), targetText => {
+    return !!targetText;
+  });
+  if (!targetTexts.length) {
+    return endpoints;
+  }
+
+  return filter_1$1(endpoints, endpoint => {
+    let isMatched = false;
+    forEach_1$2(targetTexts, targetText => {
+      if (contains_1$1(endpoint.url, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.title, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.name, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.description, targetText)) {
+        isMatched = true;
+      }
+      if (contains_1$1(endpoint.memo, targetText)) {
+        isMatched = true;
+      }
+      forEach_1$2(endpoint.tags || [], tag => {
+        if (contains_1$1(tag, targetText)) {
+          isMatched = true;
+        }
+      });
+    });
+    return isMatched;
+  });
+};
+
+var endpoints$1 = exporter$1('endpoints', {
+  /**
+   * 全endpointを返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  all: state => {
+    const version = state.application.version;
+    return state.endpoints[version] || {};
+  },
+
+  /**
+   * 全endpointをorder昇順の配列として返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  allByOrder: state => {
+    const version = state.application.version;
+    let endpoints = objectAssign({}, state.endpoints[version]);
+    endpoints = sortByOrder(endpoints);
+    return endpoints;
+  },
+
+  /**
+   * 全endpointをorder昇順のfilter済み配列として返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  allByOrderFiltered: state => {
+    const version = state.application.version;
+    let endpoints = objectAssign({}, state.endpoints[version]);
+    endpoints = sortByOrder(endpoints);
+    endpoints = filterBy(endpoints, state.application.endpointFilterText);
+    return endpoints;
+  },
+
+  /**
+   * endpoint数を返します。
+   * @param {Object} state
+   * @return {Number}
+   */
+  count: state => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
+    return size_1(endpoints);
+  },
+
+  /**
+   * 認証トークンを省いた全endpointを返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  allWithoutToken: state => {
+    const version = state.application.version;
+    const endpoints = objectAssign({}, state.endpoints[version]);
+    // 認証用トークンはexport対象外とする。
+    forOwn_1$2(endpoints, endpoint => {
+      delete endpoint.token;
+    });
+    return endpoints;
+  },
+
+  /**
+   * 指定keyにマッチするendpointを返します。
+   * @param {Object} state
+   * @param {String} key
+   * @return {Object}
+   */
+  one: (state, key) => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
+    return endpoints[key];
+  },
+
+  /**
+   * 指定urlにマッチするendpointを返します。
+   * @param {Object} state
+   * @param {String} url
+   * @return {Object}
+   */
+  oneByURL: (state, url) => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
+    return find_1$1(endpoints, endpoint => {
+      return endpoint.url === url;
+    });
+  }
+
+});
+
+var constants$1 = {
+  // mobileとdesktopレイアウトの切り替え閾値。
+  layoutThreshold: 640,
+  // レイアウトタイプ。mobile or desktop用。
+  layoutTypeDesktop: 'desktop',
+  layoutTypeMobile: 'mobile',
+
+  // 認証方法。
+  authtypeEmail: 'email',
+  authtypeOauth: 'oauth'
+};
+
+var layout$1 = exporter$1('layout', {
+  /**
+   * レイアウトタイプを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  type: state => {
+    return state.layout.type;
+  },
+
+  /**
+   * レイアウトタイプがdesktopならtrueを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isDesktop: state => {
+    return (state.layout.type === constants$1.layoutTypeDesktop);
+  },
+
+  /**
+   * レイアウトタイプがmobileならtrueを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isMobile: state => {
+    return (state.layout.type === constants$1.layoutTypeMobile);
+  },
+
+  /**
+   * 表示サイズを返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  size: state => {
+    return state.layout.size;
+  },
+
+  /**
+   * componentリストのgridレイアウトのcolumn数を返します。
+   * @param {Object} state
+   * @return {Number}
+   */
+  componentsGridColumnCount: state => {
+    return state.layout.componentsGridColumnCount;
+  }
+});
+
+var location$2 = exporter$1('location', {
+  /**
+   * 全情報を返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  all: state => {
+    return state.location;
+  },
+
+  /**
+   * トップページか判定します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  isTop: state => {
+    return (state.location.name === 'endpoints');
+  },
+
+  /**
+   * ページ名を返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  name: state => {
+    return state.location.name;
+  },
+
+  /**
+   * ルーティング情報を返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  route: state => {
+    return state.location.route;
+  }
+});
+
+var modals$1 = exporter$1('modals', {
+  /**
+   * 全てのモーダル情報を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  all: state => {
+    return state.modals;
+  }
+});
+
+var oas$1 = exporter$1('oas', {
+  /**
+   * SwaggerClientを返します。
+   * @param {Object} state
+   * @return {SwaggerClient}
+   */
+  client: state => {
+    return state.oas.client;
+  },
+
+  /**
+   * resolve済みのOpenAPI Documentを返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  spec: state => {
+    return state.oas.client.spec;
+  },
+
+  /**
+   * resolve前のオリジナルのOpenAPI Documentを返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  originalSpec: state => {
+    return state.oas.client.originalSpec;
+  },
+
+  /**
+   * resolveされたAPI群を返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  apis: state => {
+    return state.oas.client.apis;
+  },
+
+  /**
+   * resolveされたAPI群をflatな構成にして返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  flatApis: state => {
+    // client.apisはタグ分けされているので、まずflatな構成にする。
+    const apis = {};
+    forOwn_1$2(state.oas.client.apis, obj => {
+      forOwn_1$2(obj, (api, operationId) => {
+        apis[operationId] = api;
+      });
+    });
+    return apis;
+  },
+
+  /**
+   * 指定したoperationIdにマッチするresolveされたAPIを返します。
+   * @param {Object} state
+   * @param {String} operationId
+   * @return {Function}
+   */
+  api: (state, operationId) => {
+    const apis = {};
+    forOwn_1$2(state.oas.client.apis, obj => {
+      forOwn_1$2(obj, (api, operationId) => {
+        apis[operationId] = api;
+      });
+    });
+    return apis[operationId];
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするresolveされたAPIを返します。
+   * @param {Object} state
+   * @param {String} path
+   * @param {String} method
+   * @return {Function}
+   */
+  apiByPathAndMethod: (state, path, method) => {
+    const operationObject = state.oas.client.spec.paths[path][method];
+    const operationId = operationObject.operationId;
+    const apis = {};
+    forOwn_1$2(state.oas.client.apis, obj => {
+      forOwn_1$2(obj, (api, operationId) => {
+        apis[operationId] = api;
+      });
+    });
+    return apis[operationId];
+  },
+
+  /**
+   * 指定したpathにマッチするPathItemObjectを返します。
+   * @param {Object} state
+   * @param {String} path
+   * @return {Object}
+   */
+  pathItemObject: (state, path) => {
+    return state.oas.client.spec.paths[path];
+  },
+
+  /**
+   * 指定したoperationIdにマッチするPathItemObjectのmethod名を返します。
+   * @param {Object} state
+   * @param {String} operationId
+   * @return {String}
+   */
+  pathItemObjectMethodNameByOperationId: (state, operationId) => {
+    let ret;
+    forOwn_1$2(state.oas.client.spec.paths, pathItemObject => {
+      if (!!ret) {
+        return;
+      }
+      forOwn_1$2(pathItemObject, (operationObject, method) => {
+        if (!!ret) {
+          return;
+        }
+        if (operationObject.operationId === operationId) {
+          ret = method;
+        }
+      });
+    });
+    return ret;
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectを返します。
+   * @param {Object} state
+   * @param {String} path
+   * @param {String} method
+   * @return {Object}
+   */
+  operationObject: (state, path, method) => {
+    return state.oas.client.spec.paths[path][method];
+  },
+
+  /**
+   * 指定したcomponentに関連するOperationObject(action)群を返します。
+   * @param {Object} state
+   * @param {Object} component
+   * @return {Array}
+   */
+  operationObjectsAsAction: (state, component) => {
+    const methods = ['get','put', 'post', 'delete'];
+    const basePath = component.api.path;
+    const primaryKey = component.primary;
+    const actions = component.actions || [];
+
+    // 関連API情報。後のOperationObject群抽出に使用します。
+    const pathRefs = [];
+    // 同じpath & method違いのoperationObjectは関連有りとみなす。
+    forEach_1$2(methods, method => {
+      // `get`はcomponent自身なのでスルーする。
+      if (method === 'get') {
+        return;
+      }
+      const isOperationObjectDefined = !!state.oas.client.spec.paths[basePath] && !!state.oas.client.spec.paths[basePath][method];
+      if (!isOperationObjectDefined) {
+        return;
+      }
+      pathRefs.push({
+        path: basePath,
+        method,
+        appendTo: 'self'
+      });
+    });
+    // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
+    // テーブルの各rowに紐づくOperationObjectとみなす。
+    if (!!primaryKey) {
+      const listBasePath = `${basePath}/{${primaryKey}}`;
+      forEach_1$2(methods, method => {
+        const isOperationObjectDefined = !!state.oas.client.spec.paths[listBasePath] && !!state.oas.client.spec.paths[listBasePath][method];
+        if (!isOperationObjectDefined) {
+          return;
+        }
+        pathRefs.push({
+          path: listBasePath,
+          method,
+          appendTo: 'row'
+        });
+      });
+    }
+    // actionsに指定されたpath群のOperationObjectも関連有りとみなします。
+    // path内にprimaryKeyと同一名の変数があれば、それはテーブルrowに紐づくOperationObjectとみなします。
+    // primaryKeyと同一名の変数が無ければ、componentと紐づくOperationObjectとみなします。
+    forEach_1$2(actions, actionBasePath => {
+      const appendTo = (actionBasePath.indexOf(`{${primaryKey}}`) >= 0 ? 'row' : 'self');
+      forEach_1$2(methods, method => {
+        const isOperationObjectDefined = !!state.oas.client.spec.paths[actionBasePath] && !!state.oas.client.spec.paths[actionBasePath][method];
+        if (!isOperationObjectDefined) {
+          return;
+        }
+        pathRefs.push({
+          path: actionBasePath,
+          method,
+          appendTo
+        });
+      });
+    });
+
+    // OperationObject群を抽出します。
+    const operationObjects = [];
+    forEach_1$2(pathRefs, ref => {
+      const operationObject = state.oas.client.spec.paths[ref.path][ref.method];
+      operationObjects.push(objectAssign({
+        operationObject
+      }, ref));
+    });
+
+    return operationObjects;
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectのoperationIdを返します。
+   * @param {Object} state
+   * @param {String} path
+   * @param {String} method
+   * @return {String}
+   */
+  operationId: (state, path, method) => {
+    return state.oas.client.spec.paths[path][method].operationId;
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectのParameterObject群を返します。
+   * @param {Object} state
+   * @param {String} path
+   * @param {String} method
+   * @return {Array}
+   */
+  parameterObjects: (state, path, method) => {
+    return state.oas.client.spec.paths[path][method].parameters || [];
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObject群を返します。
+   * @param {Object} state
+   * @param {String} path
+   * @param {String} method
+   * @return {Object}
+   */
+  responseObjects: (state, path, method) => {
+    return state.oas.client.spec.paths[path][method].responses;
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectのresponseObjectを返します。
+   * statusCodeを指定しない場合はデフォルトで200に設定されます。
+   * @param {Object} state
+   * @param {String} path
+   * @param {String} method
+   * @param {Number} statusCode
+   * @return {Object}
+   */
+  responseObject: (state, path, method, statusCode) => {
+    if ( statusCode === void 0 ) statusCode = 200;
+
+    return state.oas.client.spec.paths[path][method].responses[statusCode];
+  },
+
+  /**
+   * 指定したpathとmethodにマッチするOperationObjectのresponseObjectのschemaObjectを返します。
+   * statusCodeを指定しない場合はデフォルトで200に設定されます。
+   * @param {Object} state
+   * @param {String} path
+   * @param {String} method
+   * @param {Number} statusCode
+   * @return {Object}
+   */
+  schemaObject: (state, path, method, statusCode) => {
+    if ( statusCode === void 0 ) statusCode = 200;
+
+    return state.oas.client.spec.paths[path][method].responses[statusCode].schema;
+  }
+});
+
+/**
+     * Array.indexOf
+     */
+    function indexOf$1(arr, item, fromIndex) {
+        fromIndex = fromIndex || 0;
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length,
+            i = fromIndex < 0 ? len + fromIndex : fromIndex;
+        while (i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[i] === item) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    var indexOf_1$1 = indexOf$1;
+
+/**
+     * If array contains values.
+     */
+    function contains$3(arr, val) {
+        return indexOf_1$1(arr, val) !== -1;
+    }
+    var contains_1$2 = contains$3;
+
+/**
+     * Array reject
+     */
+    function reject$1(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (!callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var reject_1$1 = reject$1;
+
+var page$1 = exporter$1('page', {
+  /**
+   * 全情報を返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  all: state => {
+    return state.page || {};
+  },
+
+  /**
+   * ページIDを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  id: state => {
+    const page = state.page;
+    if (!page) {
+      return '';
+    }
+    return page.id;
+  },
+
+  /**
+   * ページ名を返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  name: state => {
+    const page = state.page;
+    if (!page) {
+      return '';
+    }
+    return page.name;
+  },
+
+  /**
+   * コンポーネント群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  components: state => {
+    const page = state.page;
+    if (!page) {
+      return [];
+    }
+    return page.components;
+  },
+
+  /**
+   * number等小型表示可能なコンポーネント群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  componentsInline: state => {
+    const page = state.page;
+    if (!page) {
+      return [];
+    }
+    return filter_1$1(page.components, component => {
+      return contains_1$2(['number'], component.style);
+    });
+  },
+
+  /**
+   * table表示のコンポーネント群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  componentsTable: state => {
+    const page = state.page;
+    if (!page) {
+      return [];
+    }
+    return filter_1$1(page.components, component => {
+      return (component.style === 'table');
+    });
+  },
+
+  /**
+   * table表示以外のコンポーネント群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  componentsNotTable: state => {
+    const page = state.page;
+    if (!page) {
+      return [];
+    }
+    return reject_1$1(page.components, component => {
+      return (component.style === 'table');
+    });
+  },
+
+  /**
+   * コンポーネント数を返します。
+   * @param {Object} state
+   * @return {Number}
+   */
+  componentsCount: state => {
+    const page = state.page;
+    if (!page) {
+      return 0;
+    }
+    return (page.components || []).length;
+  }
+});
+
+var popovers$1 = exporter$1('popovers', {
+  /**
+   * 全ての吹き出し情報を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  all: state => {
+    return state.popovers;
+  }
+});
+
+var toasts$1 = exporter$1('toasts', {
+  /**
+   * 全てのトースト情報を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  all: state => {
+    return state.toasts;
+  }
+});
+
+var ua$1 = exporter$1('ua', {
+  /**
+   * 全情報を返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  all: state => {
+    return state.ua;
+  },
+
+  /**
+   * Chromeか否かを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isChrome: state => {
+    return !!state.ua.chrome;
+  },
+
+  /**
+   * Safariか否かを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isSafari: state => {
+    return !!state.ua.safari;
+  },
+
+  /**
+   * Edgeか否かを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isEdge: state => {
+    return !!state.ua.edge;
+  },
+
+  /**
+   * Firefoxか否かを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  isFirefox: state => {
+    return !!state.ua.firefox;
+  },
+
+  /**
+   * 使用しているブラウザを返します。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  usingBrowser: state => {
+    const ua = state.ua;
+    if (!!ua.chrome) {
+      return 'chrome';
+    }
+    if (!!ua.safari) {
+      return 'safari';
+    }
+    if (!!ua.edge) {
+      return 'edge';
+    }
+    if (!!ua.firefox) {
+      return 'firefox';
+    }
+
+    return null;
+  }
+});
+
+/**
+     * Returns the index of the first item that matches criteria
+     */
+    function findIndex$1(arr, iterator, thisObj){
+        iterator = makeIterator_$1(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (iterator(arr[i], i, arr)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    var findIndex_1$1 = findIndex$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$3(arr, iterator, thisObj){
+        var idx = findIndex_1$1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var find_1$2 = find$3;
+
+/**
+     * Creates a new object with all the properties where the callback returns
+     * true.
+     */
+    function filterValues(obj, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var output = {};
+        forOwn_1$2(obj, function(value, key, obj) {
+            if (callback(value, key, obj)) {
+                output[key] = value;
+            }
+        });
+
+        return output;
+    }
+    var filter$5 = filterValues;
+
+/**
+     * Get object values
+     */
+    function values(obj) {
+        var vals = [];
+        forOwn_1$2(obj, function(val, key){
+            vals.push(val);
+        });
+        return vals;
+    }
+
+    var values_1 = values;
+
+const SECTION_DASHBOARD = 'dashboard';
+const SECTION_MANAGE = 'manage';
+
+var viron$1 = exporter$1('viron', {
+  /**
+   * 全て返します。
+   * @param {Object} state
+   * @return {Object}
+   */
+  all: state => {
+    if (!state.viron) {
+      return null;
+    }
+    return state.viron;
+  },
+
+  /**
+   * VIRONデータが存在する否か。
+   * @param {Object} state
+   * @return {Boolean}
+   */
+  existence: state => {
+    return !!state.viron;
+  },
+
+  /**
+   * page群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  pages: state => {
+    return state.viron.pages;
+  },
+
+  /**
+   * 指定idx値のpageのidを返します。
+   * @param {Object} state
+   * @param {Number} idx
+   * @return {String}
+   */
+  pageIdOf: (state, idx) => {
+    return state.viron.pages[idx].id;
+  },
+
+  /**
+   * 名前を返します。
+   * @param {Object} state
+   * @return {String|null}
+   */
+  name: state => {
+    if (!state.viron) {
+      return null;
+    }
+    return state.viron.name;
+  },
+
+  /**
+   * サムネイルを返します。
+   * @param {Object} state
+   * @return {String|null}
+   */
+  thumbnail: state => {
+    if (!state.viron) {
+      return null;
+    }
+    return state.viron.thumbnail;
+  },
+
+  /**
+   * ダッシュボードメニュー群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  dashboard: state => {
+    if (!state.viron) {
+      return [];
+    }
+    return values_1(filter$5(state.viron.pages, page => {
+      if (page.section !== SECTION_DASHBOARD) {
+        return false;
+      }
+      return true;
+    }));
+  },
+
+  /**
+   * 管理画面メニュー群を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  manage: state => {
+    if (!state.viron) {
+      return [];
+    }
+    return values_1(filter$5(state.viron.pages, page => {
+      if (page.section !== SECTION_MANAGE) {
+        return false;
+      }
+      return true;
+    }));
+  },
+
+  /**
+   * メニュー内容を返します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  menu: state => {
+    const menu = [];
+    if (!state.viron || !state.viron.sections) {
+      return menu;
+    }
+    const sections = state.viron.sections;
+    forEach_1$2(sections, section => {
+      menu.push({
+        name: section.label || section.id,
+        id: section.id,
+        groups: []
+      });
+    });
+    const pages = state.viron.pages;
+    forEach_1$2(pages, page => {
+      const targetSection = find_1$2(menu, section => {
+        return (section.id === page.section);
+      });
+      const groupName = page.group;
+      const isIndependent = !groupName;
+      if (isIndependent) {
+        targetSection.groups.push({
+          pages: [{
+            name: page.name,
+            id: page.id
+          }],
+          isIndependent
+        });
+      } else {
+        if (!find_1$2(targetSection.groups, group => {
+          return (group.name === groupName);
+        })) {
+          targetSection.groups.push({
+            name: groupName,
+            pages: [],
+            isIndependent
+          });
+        }
+        const targetGroup = find_1$2(targetSection.groups, group => {
+          return (group.name === groupName);
+        });
+        targetGroup.pages.push({
+          name: page.name,
+          id: page.id
+        });
+      }
+    });
+    return menu;
+  }
+});
+
+var getters = objectAssign(
+  {},
+  application$1,
+  components$1,
+  current$1,
+  drawers$1,
+  endpoints$1,
+  layout$1,
+  location$2,
+  modals$1,
+  oas$1,
+  page$1,
+  popovers$1,
+  toasts$1,
+  ua$1,
+  viron$1
+);
+
+var exporter$2 = (name, funcs) => {
+  const ret = {};
+  forOwn_1$2(funcs, (func, id) => {
+    ret[`${name}.${id}`] = (context, ...args) => {
+      return func(context.state, ...args);
+    };
+  });
+  return ret;
+};
+
+var application$2 = exporter$2('application', {
+  /**
+   * 起動ステータスを変更します。
+   * @param {Object} state
+   * @param {Boolean} bool
+   * @return {Array}
+   */
+  launch: (state, bool) => {
+    state.application.isLaunched = bool;
+    return ['application'];
+  },
+
+  /**
+   * 画面遷移ステータスを変更します。
+   * @param {Object} state
+
+   * @param {Boolean} bool
+   * @return {Array}
+   */
+  navigation: (state, bool) => {
+    state.application.isNavigating = bool;
+    return ['application'];
+  },
+
+  /**
+   * 通信中APIを追加します。
+   * @param {Object} state
+   * @param {Object} info
+   * @return {Array}
+   */
+  addNetworking: (state, info) => {
+    state.application.networkings.push(objectAssign({
+      id: `networking_${Date.now()}`
+    }, info));
+    state.application.isNetworking = true;
+    return ['application'];
+  },
+
+  /**
+   * 通信中APIを削除します。
+   * @param {Object} state
+   * @param {String} networkingId
+   * @return {Array}
+   */
+  removeNetworking: (state, networkingId) => {
+    state.application.networkings = reject_1$1(state.application.networkings, networking => {
+      return (networking.id === networkingId);
+    });
+    if (!state.application.networkings.length) {
+      state.application.isNetworking = false;
+    }
+    return ['application'];
+  },
+
+  /**
+   * ドラッグステータスを変更します。
+   * @param {Object} state
+   * @param {Boolean} bool
+   * @return {Array}
+   */
+  drag: (state, bool) => {
+    state.application.isDragging = bool;
+    return ['application'];
+  },
+
+  /**
+   * メニューの開閉状態を切り替えます。
+   * @param {Object} state
+   * @return {Array}
+   */
+  menuToggle: state => {
+    state.application.isMenuOpened = !state.application.isMenuOpened;
+    return ['application'];
+  },
+
+  /**
+   * エンドポイント用のフィルターテキストを更新します。
+   * @param {Object} state
+   * @param {String} newFilterText
+   * @return {Array}
+   */
+  endpointFilterText: (state, newFilterText) => {
+    state.application.endpointFilterText = newFilterText;
+    return ['application'];
+  }
+});
+
+var components$2 = exporter$2('components', {
+  /**
+   * 一件更新します。
+   * @param {Object} state
+   * @param {Object} params
+   * @return {Array}
+   */
+  updateOne: (state, params) => {
+    const component_uid = params.component_uid;
+    // 存在しなければ新規作成。
+    state.components[component_uid] = params;
+    return ['components', component_uid];
+  },
+
+  /**
+   * 一件削除します。
+   * @param {Object} state
+   * @param {String} component_uid
+   * @return {Array}
+   */
+  removeOne: (state, component_uid) => {
+    delete state.components[component_uid];
+    return ['components', component_uid];
+  },
+
+  /**
+   * 全件削除します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  removeAll: state => {
+    state.components = {};
+    return ['components'];
+  }
+});
+
+var store$1 = createCommonjsModule(function (module, exports) {
+"use strict"
+// Module export pattern from
+// https://github.com/umdjs/umd/blob/master/returnExports.js
+;(function (root, factory) {
+    if (typeof undefined === 'function' && undefined.amd) {
+        // AMD. Register as an anonymous module.
+        undefined([], factory);
+    } else {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    }
+}(commonjsGlobal, function () {
+	
+	// Store.js
+	var store = {},
+		win = (typeof window != 'undefined' ? window : commonjsGlobal),
+		doc = win.document,
+		localStorageName = 'localStorage',
+		scriptTag = 'script',
+		storage;
+
+	store.disabled = false;
+	store.version = '1.3.20';
+	store.set = function(key, value) {};
+	store.get = function(key, defaultVal) {};
+	store.has = function(key) { return store.get(key) !== undefined };
+	store.remove = function(key) {};
+	store.clear = function() {};
+	store.transact = function(key, defaultVal, transactionFn) {
+		if (transactionFn == null) {
+			transactionFn = defaultVal;
+			defaultVal = null;
+		}
+		if (defaultVal == null) {
+			defaultVal = {};
+		}
+		var val = store.get(key, defaultVal);
+		transactionFn(val);
+		store.set(key, val);
+	};
+	store.getAll = function() {};
+	store.forEach = function() {};
+
+	store.serialize = function(value) {
+		return JSON.stringify(value)
+	};
+	store.deserialize = function(value) {
+		if (typeof value != 'string') { return undefined }
+		try { return JSON.parse(value) }
+		catch(e) { return value || undefined }
+	};
+
+	// Functions to encapsulate questionable FireFox 3.6.13 behavior
+	// when about.config::dom.storage.enabled === false
+	// See https://github.com/marcuswestin/store.js/issues#issue/13
+	function isLocalStorageNameSupported() {
+		try { return (localStorageName in win && win[localStorageName]) }
+		catch(err) { return false }
+	}
+
+	if (isLocalStorageNameSupported()) {
+		storage = win[localStorageName];
+		store.set = function(key, val) {
+			if (val === undefined) { return store.remove(key) }
+			storage.setItem(key, store.serialize(val));
+			return val
+		};
+		store.get = function(key, defaultVal) {
+			var val = store.deserialize(storage.getItem(key));
+			return (val === undefined ? defaultVal : val)
+		};
+		store.remove = function(key) { storage.removeItem(key); };
+		store.clear = function() { storage.clear(); };
+		store.getAll = function() {
+			var ret = {};
+			store.forEach(function(key, val) {
+				ret[key] = val;
+			});
+			return ret
+		};
+		store.forEach = function(callback) {
+			for (var i=0; i<storage.length; i++) {
+				var key = storage.key(i);
+				callback(key, store.get(key));
+			}
+		};
+	} else if (doc && doc.documentElement.addBehavior) {
+		var storageOwner,
+			storageContainer;
+		// Since #userData storage applies only to specific paths, we need to
+		// somehow link our data to a specific path.  We choose /favicon.ico
+		// as a pretty safe option, since all browsers already make a request to
+		// this URL anyway and being a 404 will not hurt us here.  We wrap an
+		// iframe pointing to the favicon in an ActiveXObject(htmlfile) object
+		// (see: http://msdn.microsoft.com/en-us/library/aa752574(v=VS.85).aspx)
+		// since the iframe access rules appear to allow direct access and
+		// manipulation of the document element, even for a 404 page.  This
+		// document can be used instead of the current document (which would
+		// have been limited to the current path) to perform #userData storage.
+		try {
+			storageContainer = new ActiveXObject('htmlfile');
+			storageContainer.open();
+			storageContainer.write('<'+scriptTag+'>document.w=window</'+scriptTag+'><iframe src="/favicon.ico"></iframe>');
+			storageContainer.close();
+			storageOwner = storageContainer.w.frames[0].document;
+			storage = storageOwner.createElement('div');
+		} catch(e) {
+			// somehow ActiveXObject instantiation failed (perhaps some special
+			// security settings or otherwse), fall back to per-path storage
+			storage = doc.createElement('div');
+			storageOwner = doc.body;
+		}
+		var withIEStorage = function(storeFunction) {
+			return function() {
+				var args = Array.prototype.slice.call(arguments, 0);
+				args.unshift(storage);
+				// See http://msdn.microsoft.com/en-us/library/ms531081(v=VS.85).aspx
+				// and http://msdn.microsoft.com/en-us/library/ms531424(v=VS.85).aspx
+				storageOwner.appendChild(storage);
+				storage.addBehavior('#default#userData');
+				storage.load(localStorageName);
+				var result = storeFunction.apply(store, args);
+				storageOwner.removeChild(storage);
+				return result
+			}
+		};
+
+		// In IE7, keys cannot start with a digit or contain certain chars.
+		// See https://github.com/marcuswestin/store.js/issues/40
+		// See https://github.com/marcuswestin/store.js/issues/83
+		var forbiddenCharsRegex = new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]", "g");
+		var ieKeyFix = function(key) {
+			return key.replace(/^d/, '___$&').replace(forbiddenCharsRegex, '___')
+		};
+		store.set = withIEStorage(function(storage, key, val) {
+			key = ieKeyFix(key);
+			if (val === undefined) { return store.remove(key) }
+			storage.setAttribute(key, store.serialize(val));
+			storage.save(localStorageName);
+			return val
+		});
+		store.get = withIEStorage(function(storage, key, defaultVal) {
+			key = ieKeyFix(key);
+			var val = store.deserialize(storage.getAttribute(key));
+			return (val === undefined ? defaultVal : val)
+		});
+		store.remove = withIEStorage(function(storage, key) {
+			key = ieKeyFix(key);
+			storage.removeAttribute(key);
+			storage.save(localStorageName);
+		});
+		store.clear = withIEStorage(function(storage) {
+			var attributes = storage.XMLDocument.documentElement.attributes;
+			storage.load(localStorageName);
+			for (var i=attributes.length-1; i>=0; i--) {
+				storage.removeAttribute(attributes[i].name);
+			}
+			storage.save(localStorageName);
+		});
+		store.getAll = function(storage) {
+			var ret = {};
+			store.forEach(function(key, val) {
+				ret[key] = val;
+			});
+			return ret
+		};
+		store.forEach = withIEStorage(function(storage, callback) {
+			var attributes = storage.XMLDocument.documentElement.attributes;
+			for (var i=0, attr; attr=attributes[i]; ++i) {
+				callback(attr.name, store.deserialize(storage.getAttribute(attr.name)));
+			}
+		});
+	}
+
+	try {
+		var testKey = '__storejs__';
+		store.set(testKey, testKey);
+		if (store.get(testKey) != testKey) { store.disabled = true; }
+		store.remove(testKey);
+	} catch(e) {
+		store.disabled = true;
+	}
+	store.enabled = !store.disabled;
+	
+	return store
+}));
+});
+
+var current$2 = exporter$2('current', {
+  /**
+   * 値書き換え。
+   * @param {Object} state
+   * @param {String} endpointKey
+   * @return {Array}
+   */
+  all: (state, endpointKey) => {
+    const version = state.application.version;
+    state.current[version] = endpointKey;
+    store$1.set('current', state.current);
+    return ['current'];
+  }
+});
+
+var drawers$2 = exporter$2('drawers', {
+  /**
+   * ドローワーを追加します。
+   * @param {Object} state
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} drawerOpts
+   * @return {Array}
+   */
+  add: (state, tagName, tagOpts, drawerOpts) => {
+    if ( tagOpts === void 0 ) tagOpts = {};
+    if ( drawerOpts === void 0 ) drawerOpts = {};
+
+    state.drawers.push({
+      id: `drawer_${Date.now()}`,
+      tagName,
+      tagOpts,
+      drawerOpts
+    });
+    return ['drawers'];
+  },
+
+  /**
+   * ドローワーを削除します。
+   * @param {Object} state
+   * @param {String} drawerID
+   * @return {Array}
+   */
+  remove: (state, drawerID) => {
+    state.drawers = reject_1$1(state.drawers, drawer => {
+      return (drawer.id === drawerID);
+    });
+    return ['drawers'];
+  }
+});
+
+/**
+     */
+    function isNumber(val) {
+        return isKind_1$1(val, 'Number');
+    }
+    var isNumber_1 = isNumber;
+
+/**
+ * 受け取ったエンドポイント群をきれいに並び替えます。
+ * order値が存在しない場合は後方に配置されます。
+ * @param {Object} endpoints
+ * @return {Object}
+ */
+const putEndpointsInOrder = endpoints => {
+  // どのorder値よりも大きいであろう適当な値。
+  const bigNumber = 9999;
+  let ordered = [];
+  forOwn_1$2(endpoints, (endpoint, key) => {
+    ordered.push({
+      key,
+      order: (isNumber_1(endpoint.order) ? endpoint.order : bigNumber)
+    });
+  });
+  ordered = sortBy_1$1(ordered, obj => {
+    return obj.order;
+  });
+  forEach_1$2(ordered, (obj, order) => {
+    endpoints[obj.key].order = order;
+  });
+  return endpoints;
+};
+
+var endpoints$2 = exporter$2('endpoints', {
+  /**
+   * 1件のエンドポイントを追加します。
+   * @param {Object} state
+   * @param {String} endpointKey
+   * @param {Object} endpoint
+   * @return {Array}
+   */
+  add: (state, endpointKey, endpoint) => {
+    // order値が指定されていなければ自動的に設定する。
+    if (!isNumber_1(endpoint.order)) {
+      // リストの先頭に配置するために意図的にマイナス値を付与。
+      endpoint.order = -1;
+    }
+    const version = state.application.version;
+    let newEndpoints = objectAssign({}, state.endpoints[version]);
+    newEndpoints[endpointKey] = endpoint;
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    state.endpoints[version] = newEndpoints;
+    store$1.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  },
+
+  /**
+   * 指定されたエンドポイントを削除します。
+   * @param {Object} state
+   * @param {String} endpointKey
+   * @return {Array}
+   */
+  remove: (state, endpointKey) => {
+    const version = state.application.version;
+    let newEndpoints = objectAssign({}, state.endpoints[version]);
+    delete newEndpoints[endpointKey];
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    state.endpoints[version] = newEndpoints;
+    store$1.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  },
+
+  /**
+   * 全てのエンドポイントを削除します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  removeAll: state => {
+    const version = state.application.version;
+    state.endpoints[version] = {};
+    store$1.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  },
+
+  /**
+   * 指定されたエンドポイントを更新します。
+   * @param {Object} state
+   * @param {String} endpointKey
+   * @param {Object} endpoint
+   * @return {Array}
+   */
+  update: (state, endpointKey, endpoint) => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version];
+    if (!endpoint) {
+      endpoints[endpointKey] = null;
+    } else {
+      endpoints[endpointKey] = objectAssign({}, endpoints[endpointKey], endpoint);
+    }
+    store$1.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  },
+
+  /**
+   * 指定されたエンドポイントのtokenを更新します。
+   * @param {Object} state
+   * @param {String} endpointKey
+   * @param {String|null} token
+   * @return {Array}
+   */
+  updateToken: (state, endpointKey, token) => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version];
+    if (!!endpoints[endpointKey]) {
+      endpoints[endpointKey].token = token;
+    }
+    store$1.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  },
+
+  /**
+   * 新エンドポイント群をmergeします。
+   * @param {Object} state
+   * @param {Object} endpoints
+   * @return {Array}
+   */
+  mergeAll: (state, endpoints) => {
+    const version = state.application.version;
+    let modifiedEndpoints = objectAssign({}, state.endpoints[version]);
+
+    forOwn_1$2(endpoints, endpoint => {
+      let duplicatedEndpoint = find_1$1(modifiedEndpoints, val => {
+        return endpoint.url === val.url;
+      });
+
+      if (!duplicatedEndpoint) {
+        const key = shortid.generate();
+        modifiedEndpoints[key] = endpoint;
+      } else {
+        objectAssign(duplicatedEndpoint, endpoint);
+      }
+    });
+
+    modifiedEndpoints = putEndpointsInOrder(modifiedEndpoints);
+    state.endpoints[version] = modifiedEndpoints;
+    store$1.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  },
+
+  /**
+   * エンドポイント群のorder値を整理します。
+   * order値が存在しない場合は後方に配置されます。
+   * @param {Object} state
+   * @return {Array}
+   */
+  tidyUpOrder: state => {
+    const version = state.application.version;
+    const newEndpoints = putEndpointsInOrder(objectAssign({}, state.endpoints[version]));
+    state.endpoints[version] = newEndpoints;
+    store$1.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  },
+
+  /**
+   * 指定されたエンドポイントのorder値を変更します。
+   * 他エンドポイントのorder値もインクリメントされます。
+   * @param {Object} state
+   * @param {String} endpointKey
+   * @param {Number} newOrder
+   * @return {Array}
+   */
+  changeOrder: (state, endpointKey, newOrder) => {
+    const version = state.application.version;
+    let newEndpoints = objectAssign({}, state.endpoints[version]);
+    // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
+    newEndpoints[endpointKey].order = newOrder - 0.5;
+    newEndpoints = putEndpointsInOrder(newEndpoints);
+    state.endpoints[version] = newEndpoints;
+    store$1.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  }
+});
+
+var layout$2 = exporter$2('layout', {
+  /**
+   * 表示サイズを更新します。
+   * @param {Object} state
+   * @param {Number} width
+   * @param {Number} height
+   */
+  updateSize: (state, width, height) => {
+    state.layout.size.width = width;
+    state.layout.size.height = height;
+    if (width > constants$1.layoutThreshold) {
+      state.layout.type = constants$1.layoutTypeDesktop;
+    } else {
+      state.layout.type = constants$1.layoutTypeMobile;
+    }
+    return ['layout'];
+  },
+
+  /**
+   * componentリストのgridレイアウトのcolumn数を更新します。
+   * @param {Object} state
+   * @param {Number} count
+   * @return {Array}
+   */
+  updateComponentsGridColumnCount: (state, count) => {
+    state.layout.componentsGridColumnCount = count;
+    return ['layout'];
+  }
+});
+
+var location$3 = exporter$2('location', {
+  /**
+   * ページ情報を更新します。
+   * @param {Object} state
+   * @param {Object} obj
+   * @return {Array}
+   */
+  all: (state, obj) => {
+    state.location = objectAssign({}, state.location, obj);
+    return ['location'];
+  },
+
+  /**
+   * ページ名を更新します。
+   * @param {Object} state
+   * @param {String} name
+   * @return {Array}
+   */
+  name: (state, name) => {
+    state.location.name = name;
+    return ['location'];
+  },
+
+  /**
+   * ルーティング情報を更新します。
+   * @param {Object} state
+   * @param {Object} route
+   * @return {Array}
+   */
+  route: (state, route) => {
+    state.location.route = route;
+    return ['location'];
+  }
+});
+
+var modals$2 = exporter$2('modals', {
+  /**
+   * モーダルを追加します。
+   * @param {Object} state
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} modalOpts
+   * @return {Array}
+   */
+  add: (state, tagName, tagOpts, modalOpts) => {
+    if ( tagOpts === void 0 ) tagOpts = {};
+    if ( modalOpts === void 0 ) modalOpts = {};
+
+    state.modals.push({
+      id: `modal_${Date.now()}`,
+      tagName,
+      tagOpts,
+      modalOpts
+    });
+    return ['modals'];
+  },
+
+  /**
+   * モーダルを削除します。
+   * @param {Object} state
+   * @param {String} modalID
+   * @return {Array}
+   */
+  remove: (state, modalID) => {
+    state.modals = reject_1$1(state.modals, modal => {
+      return (modal.id === modalID);
+    });
+    return ['modals'];
+  }
+});
+
+var oas$2 = exporter$2('oas', {
+  /**
+   * SwaggerClientインスタンスを設定します。
+   * @param {Object} state
+   * @param {SwaggerClient} client
+   * @return {Array}
+   */
+  client: (state, client) => {
+    state.oas.client = client;
+    return ['oas'];
+  },
+
+  /**
+   * SwaggerClientインスタンスをクリアします。
+   * @param {Object} state
+   * @return {Array}
+   */
+  clearClient: state => {
+    state.oas.client = null;
+    return ['oas'];
+  }
+});
+
+var page$2 = exporter$2('page', {
+  /**
+   * ページ情報を書き換えます。
+   * @param {Object} state
+   * @param {Object|null} page
+   * @return {Array}
+   */
+  all: (state, page) => {
+    state.page = page;
+    return ['page'];
+  }
+});
+
+var popovers$2 = exporter$2('popovers', {
+  /**
+   * 吹き出しを追加します。
+   * @param {Object} state
+   * @param {String} tagName
+   * @param {Object} tagOpts
+   * @param {Object} popoverOpts
+   * @return {Array}
+   */
+  add: (state, tagName, tagOpts, popoverOpts) => {
+    if ( tagOpts === void 0 ) tagOpts = {};
+    if ( popoverOpts === void 0 ) popoverOpts = {};
+
+    state.popovers.push({
+      id: `popover_${Date.now()}`,
+      tagName,
+      tagOpts,
+      popoverOpts: objectAssign({
+        direction: 'T',
+        width: 100,
+        x: 0,
+        y: 0
+      }, popoverOpts)
+    });
+    return ['popovers'];
+  },
+
+  /**
+   * 吹き出しを削除します。
+   * @param {Object} state
+   * @param {String} popoverID
+   * @return {Array}
+   */
+  remove: (state, popoverID) => {
+    state.popovers = reject_1$1(state.popovers, popover => {
+      return (popover.id === popoverID);
+    });
+    return ['popovers'];
+  }
+});
+
+const generateId = () => {
+  return `toast_${Date.now()}`;
+};
+
+const TOAST_TYPE_NORMAL = 'normal';
+const TOAST_TIMEOUT = 3 * 1000;
+const TOAST_AUTO_HIDE = true;
+
+var toasts$2 = exporter$2('toasts', {
+  /**
+   * トーストを追加します。
+   * @param {Object} state
+   * @param {Object} obj
+   * @return {Array}
+   */
+  add: (state, obj) => {
+    const data = objectAssign({
+      type: TOAST_TYPE_NORMAL,
+      timeout: TOAST_TIMEOUT,
+      autoHide: TOAST_AUTO_HIDE
+    }, obj, {
+      id: generateId()
+    });
+
+    state.toasts.push(data);
+    return ['toasts'];
+  },
+
+  /**
+   * トーストを削除します。
+   * @param {Object} state
+   * @param {String} toastId
+   * @return {Array}
+   */
+  remove: (state, toastId) => {
+    state.toasts = reject_1$1(state.toasts, toast => {
+      return toast.id === toastId;
+    });
+
+    return ['toasts'];
+  }
+});
+
+var ua$2 = exporter$2('ua', {
+  /**
+   * UA情報を書き換えます。
+   * @param {Object} state
+   * @param {Object} ua
+   * @return {Array}
+   */
+  all: (state, ua) => {
+    state.ua = ua;
+    return ['ua'];
+  }
+});
+
+/**
+     * Combines an array with all the items of another.
+     * Does not allow duplicates and is case and type sensitive.
+     */
+    function combine$1(arr1, arr2) {
+        if (arr2 == null) {
+            return arr1;
+        }
+
+        var i = -1, len = arr2.length;
+        while (++i < len) {
+            if (indexOf_1$1(arr1, arr2[i]) === -1) {
+                arr1.push(arr2[i]);
+            }
+        }
+
+        return arr1;
+    }
+    var combine_1$1 = combine$1;
+
+var viron$2 = exporter$2('viron', {
+  /**
+   * @param {Object} state
+   * @param {Object|null} viron
+   * @return {Array}
+   */
+  all: (state, viron) => {
+    // メニューのカテゴライズ。下位互換のため、dashboardとmanageは必須項目とする。
+    if (!!viron) {
+      viron.sections = viron.sections || [];
+      if (!find_1$2(viron.sections, section => {
+        return (section.id === 'manage');
+      })) {
+        viron.sections = combine_1$1([{ id: 'manage', label: i18n$1.t('word.manage') }], viron.sections);
+      }
+      if (!find_1$2(viron.sections, section => {
+        return (section.id === 'dashboard');
+      })) {
+        viron.sections = combine_1$1([{ id: 'dashboard', label: i18n$1.t('word.dashboard') }], viron.sections);
+      }
+    }
+    state.viron = viron;
+    return ['viron'];
+  }
+});
+
+var mutations = objectAssign(
+  {},
+  application$2,
+  components$2,
+  current$2,
+  drawers$2,
+  endpoints$2,
+  layout$2,
+  location$3,
+  modals$2,
+  oas$2,
+  page$2,
+  popovers$2,
+  toasts$2,
+  ua$2,
+  viron$2
+);
+
+var exporter$3 = (name, any) => {
+  const ret = {};
+  ret[name] = any;
+  return ret;
+};
+
+var application$3 = exporter$3('application', {
+  // バージョン。https://cam-inc.github.io/viron/v1/の`v1`部分。
+  version: (() => {
+    const url = new URL(window.location.href);
+    if (url.hostname === 'localhost') {
+      return 'local';
+    }
+    return url.pathname.replace(/viron/, '').replace(/\//g, '');
+  })(),
+  // 起動状態。
+  isLaunched: false,
+  // 画面遷移中か否か。
+  isNavigating: false,
+  // 通信中のAPI群。
+  networkings: [],
+  // 通信中か否か(i.e. 一つでも通信中のAPIが存在するか?)
+  isNetworking: false,
+  // ドラッグ中か否か。
+  isDragging: false,
+  // 左カラムメニューの開閉状態
+  isMenuOpened: true,
+  // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
+  endpointFilterText: ''
+});
+
+var components$3 = exporter$3('components', {});
+
+// v0との下位互換性。
+if (!isObject_1(store$1.get('current'))) {
+  store$1.set('current', {});
+}
+
+// 選択されているエンドポイント。
+var current$3 = exporter$3('current', store$1.get('current', {}));
+
+var drawers$3 = exporter$3('drawers', []);
+
+// ローカルに保存されているエンドポイント一覧。
+var endpoints$3 = exporter$3('endpoints', store$1.get('endpoints', {}));
+
+var layout$3 = exporter$3('layout', {
+  // レイアウトタイプ。mobile or desktop。
+  type: (() => {
+    const width = window.innerWidth;
+    if (width > constants$1.layoutThreshold) {
+      return constants$1.layoutTypeDesktop;
+    }
+    return constants$1.layoutTypeMobile;
+  })(),
+  // 表示サイズ。
+  size: {
+    width: window.innerWidth,
+    height: window.innerHeight
+  },
+  // componentリストのgridレイアウトのcolumn数。
+  componentsGridColumnCount: (() => {
+    const htmlStyles = window.getComputedStyle(document.querySelector('html'));
+    const columnCount = Number(htmlStyles.getPropertyValue('--page-components-grid-column-count'));
+    return columnCount;
+  })()
+});
+
+var location$4 = exporter$3('location', {
+  // 表示中のページ名。
+  name: '',
+  // ルーティング情報。
+  route: {
+    params: {},
+    queries: {},
+    hash: ''
+  }
+});
+
+var modals$3 = exporter$3('modals', []);
+
+// OpenAPI Specificationに関する情報。
+var oas$3 = exporter$3('oas', {
+  // SwaggerClientによって生成されたSwaggerClientインスタンス。
+  // resolve済みのOpenAPI Document情報やhttpクライアント等が格納されている。
+  // @see: https://github.com/swagger-api/swagger-js#constructor-and-methods
+  client: null
+});
+
+// 選択中の`page`情報。
+// `page` = 左メニュー(viron)の一要素。
+var page$3 = exporter$3('page', null);
+
+var popovers$3 = exporter$3('popovers', []);
+
+var signinShowKey = exporter$3('signinShowKey', null);
+
+var toasts$3 = exporter$3('toasts', []);
+
+var ua$3 = exporter$3('ua', {});
+
+// `/viron`のデータ。
+var viron$3 = exporter$3('viron', null);
+
+var states = objectAssign(
+  {},
+  application$3,
+  components$3,
+  current$3,
+  drawers$3,
+  endpoints$3,
+  layout$3,
+  location$4,
+  modals$3,
+  oas$3,
+  page$3,
+  popovers$3,
+  signinShowKey,
+  toasts$3,
+  ua$3,
+  viron$3
+);
+
+const getComponentStateName = riotId => {
+  return `component_${riotId}`;
+};
+
+var store = {
   /**
    * riotx初期設定。
    * @return {Promise}
@@ -16501,14 +16282,206 @@ var store$1 = {
 
 var script$2 = function() {};
 
-riot$1.tag2('viron-components-page', '<div>Components!!!</div>', '', 'class="ComponentsPage"', function(opts) {
+riot$1.tag2('viron-components-page-graph-bar', '', '', 'class="ComponentsPage_Card_GraphBar"', function(opts) {
     this.external(script$2);
 });
 
 var script$3 = function() {};
 
-riot$1.tag2('viron-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
+riot$1.tag2('viron-components-page-graph-horizontal-bar', '', '', 'class="ComponentsPage_Card_GraphHorizontalBar"', function(opts) {
     this.external(script$3);
+});
+
+var script$4 = function() {};
+
+riot$1.tag2('viron-components-page-graph-horizontal-stacked-bar', '', '', 'class="ComponentsPage_Card_GraphHorizontalStackedBar"', function(opts) {
+    this.external(script$4);
+});
+
+var script$5 = function() {};
+
+riot$1.tag2('viron-components-page-graph-line', '', '', 'class="ComponentsPage_Card_GraphLine"', function(opts) {
+    this.external(script$5);
+});
+
+var script$6 = function() {};
+
+riot$1.tag2('viron-components-page-graph-scatterplot', '', '', 'class="ComponentsPage_Card_GraphScatterplot"', function(opts) {
+    this.external(script$6);
+});
+
+var script$7 = function() {};
+
+riot$1.tag2('viron-components-page-graph-stacked-area', '', '', 'class="ComponentsPage_Card_GraphStackedArea"', function(opts) {
+    this.external(script$7);
+});
+
+var script$8 = function() {};
+
+riot$1.tag2('viron-components-page-graph-stacked-bar', '', '', 'class="ComponentsPage_Card_GraphStackedBar"', function(opts) {
+    this.external(script$8);
+});
+
+/**
+     * covert value into number if numeric
+     */
+    function toNumber(val){
+        // numberic values should come first because of -0
+        if (typeof val === 'number') { return val; }
+        // we want all falsy values (besides -0) to return zero to avoid
+        // headaches
+        if (!val) { return 0; }
+        if (typeof val === 'string') { return parseFloat(val); }
+        // arrays are edge cases. `Number([4]) === 4`
+        if (isArray_1$1(val)) { return NaN; }
+        return Number(val);
+    }
+
+    var toNumber_1 = toNumber;
+
+/**
+     * Converts number into currency format
+     */
+    function currencyFormat(val, nDecimalDigits, decimalSeparator, thousandsSeparator) {
+        val = toNumber_1(val);
+        nDecimalDigits = nDecimalDigits == null? 2 : nDecimalDigits;
+        decimalSeparator = decimalSeparator == null? '.' : decimalSeparator;
+        thousandsSeparator = thousandsSeparator == null? ',' : thousandsSeparator;
+
+        //can't use enforce precision since it returns a number and we are
+        //doing a RegExp over the string
+        var fixed = val.toFixed(nDecimalDigits),
+            //separate begin [$1], middle [$2] and decimal digits [$4]
+            parts = new RegExp('^(-?\\d{1,3})((?:\\d{3})+)(\\.(\\d{'+ nDecimalDigits +'}))?$').exec( fixed );
+
+        if(parts){ //val >= 1000 || val <= -1000
+            return parts[1] + parts[2].replace(/\d{3}/g, thousandsSeparator + '$&') + (parts[4] ? decimalSeparator + parts[4] : '');
+        }else{
+            return fixed.replace('.', decimalSeparator);
+        }
+    }
+
+    var currencyFormat_1 = currencyFormat;
+
+var script$9 = function() {
+  const store = this.riotx.get();
+
+  /**
+   * OASに従いGETリクエストを送信します。
+   * @return {Promise}
+   */
+  const getData = () => {
+    return Promise
+      .resolve()
+      .then(() => {
+        this.isLoading = true;
+        this.update();
+      })
+      .then(() => store.action('components.get', this.opts.id, this.opts.def))
+      .then(() => {
+        this.isLoading = false;
+        this.error = null;
+        this.update();
+      })
+      .catch(err => {
+        this.isLoading = false;
+        if (err.status === 401) {
+          this.error = '認証エラー。';
+        } else {
+          const api = this.opts.def.api;
+          this.error = `[${api.method.toUpperCase()}·${api.path}]通信に失敗しました。`;
+        }
+        this.update();
+      });
+  };
+
+  /**
+   * レスポンスデータの正当性をチェックします。
+   * @param {Object} data
+   * @return {String|null}
+   */
+  const validate = data => {
+    if (!data) {
+      return 'TODO: エラーメッセージ';
+    }
+    if (!isNumber_1(data.value)) {
+      return 'TODO: エラーメッセージ';
+    }
+    return null;
+  };
+
+  // 通信レスポンス内容。
+  this.data = null;
+  // 通信中か否か。
+  this.isLoading = true;
+  // エラーメッセージ。
+  this.error = null;
+  // 1000桁毎にカンマを付けた値を返します。
+  this.getValue = () => {
+    return currencyFormat_1(this.data.value, 0);
+  };
+
+  this.listen(this.opts.id, () => {
+    this.data = store.getter('components.response', this.opts.id);
+    this.error = validate(this.data);
+    this.update();
+  });
+
+  this.on('mount', () => {
+    getData();
+  }).on('unmount', () => {
+    store.action('components.remove', this.opts.id);
+  });
+
+  this.handleRefreshButtonTap = () => {
+    getData();
+  };
+};
+
+riot$1.tag2('viron-components-page-number', '<div class="ComponentsPage_Card_Number__head"> <div class="ComponentsPage_Card_Number__title">{opts.def.name}</div> <div class="ComponentsPage_Card_Number__control"> <div onclick="{getClickHandler(\'handleRefreshButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRefreshButtonTap\')}"></div> </div> </div> <div class="ComponentsPage_Card_Number__body" if="{!isLoading}"> <virtual if="{!!error}"> <div class="ComponentsPage_Card_Number__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="ComponentsPage_Card_Number__value">{getValue()}</div> <div class="ComponentsPage_Card_Number__unit" if="{!!data.unit}">{data.unit}</div> </virtual> </div>', '', 'class="ComponentsPage_Card_Number"', function(opts) {
+    this.external(script$9);
+});
+
+var script$10 = function() {};
+
+riot$1.tag2('viron-components-page-table', '', '', 'class="ComponentsPage_Card_Table"', function(opts) {
+    this.external(script$10);
+});
+
+var script$11 = function() {
+  this.componentId = getComponentStateName(this._riot_id);
+};
+
+riot$1.tag2('viron-components-page-card', '<div class="ComponentsPage_Card__body"> <div data-is="viron-components-page-{opts.def.style}" id="{componentId}" def="{opts.def}"></div> </div>', '', 'class="ComponentsPage_Card"', function(opts) {
+    this.external(script$11);
+});
+
+var script$12 = function() {
+  const store = this.riotx.get();
+
+  this.components = store.getter('page.componentsInline');
+
+  this.listen('page', () => {
+    this.components = store.getter('page.componentsInline');
+    this.update();
+  });
+};
+
+riot$1.tag2('viron-components-page-inlines', '<div class="ComponentsPage_Inlines__list"> <viron-components-page-card each="{component in components}" def="{component}"></viron-components-page-card> </div>', '', 'class="ComponentsPage_Inlines"', function(opts) {
+    this.external(script$12);
+});
+
+var script$13 = function() {
+};
+
+riot$1.tag2('viron-components-page', '<div class="ComponentsPage__graphs"></div> <viron-components-page-inlines></viron-components-page-inlines> <div class="ComponentsPage__tables"></div>', '', 'class="ComponentsPage"', function(opts) {
+    this.external(script$13);
+});
+
+var script$14 = function() {};
+
+riot$1.tag2('viron-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
+    this.external(script$14);
 });
 
 riot$1.tag2('viron-icon-dots', '<svg viewbox="-3614 14066 16 4"> <g transform="translate(-3894 14025)"> <circle cx="2" cy="2" r="2" transform="translate(280 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(286 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(292 41)"></circle> </g> </svg>', '', 'class="icon Icon IconDots {opts.class}"', function(opts) {
@@ -16521,7 +16494,7 @@ riot$1.tag2('viron-icon-dots', '<svg viewbox="-3614 14066 16 4"> <g transform="t
     }
     var isString_1 = isString;
 
-var script$6 = function() {
+var script$17 = function() {
   /**
    * 文字列もしくはnullに変換します。
    * @param {String|null|undefined} value
@@ -16563,10 +16536,10 @@ var script$6 = function() {
 };
 
 riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__form" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="input" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\': opts.isdisabled}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$6);
+    this.external(script$17);
 });
 
-var script$7 = function() {
+var script$18 = function() {
   this.handleTap = () => {
     if (!this.opts.onselect) {
       return;
@@ -16576,10 +16549,10 @@ var script$7 = function() {
 };
 
 riot$1.tag2('viron-button', '<div class="Button__label">{opts.label}</div>', '', 'class="Button Button--{opts.theme || \'primary\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$7);
+    this.external(script$18);
 });
 
-var script$8 = function() {
+var script$19 = function() {
   const store = this.riotx.get();
 
   this.memo = this.opts.endpoint.memo;
@@ -16592,16 +16565,16 @@ var script$8 = function() {
   this.handleSaveButtonSelect = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.ENDPOINTS_UPDATE, this.opts.endpoint.key, {
+      .then(() => store.action('endpoints.update', this.opts.endpoint.key, {
         memo: this.memo
       }))
-      .then(() => store.action(constants$1.TOASTS_ADD, {
+      .then(() => store.action('toasts.add', {
         message: '保存完了。'
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -16612,7 +16585,7 @@ var script$8 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-menu-edit', '<div class="EndpointsPage_Endpoint_Menu_Edit__title">エンドポイント編集</div> <div class="EndpointsPage_Endpoint_Menu_Edit__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint_Menu_Edit__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint_Menu_Edit__inputs"> <viron-textarea label="メモ" val="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="EndpointsPage_Endpoint_Menu_Edit__control"> <viron-button label="保存" onselect="{handleSaveButtonSelect}"></viron-button> <viron-button theme="ghost" label="キャンセル" onselect="{handleCancelButtonSelect}"></viron-button> </div>', '', 'class="EndpointsPage_Endpoint_Menu_Edit"', function(opts) {
-    this.external(script$8);
+    this.external(script$19);
 });
 
 var qrious = createCommonjsModule(function (module, exports) {
@@ -18979,7 +18952,7 @@ var qrious = createCommonjsModule(function (module, exports) {
 
 });
 
-var script$9 = function() {
+var script$20 = function() {
   this.on('mount', () => {
     new qrious(objectAssign({}, this.opts.data, {
       element: this.refs.canvas
@@ -18988,10 +18961,10 @@ var script$9 = function() {
 };
 
 riot$1.tag2('viron-qrcode', '<canvas class="Qrcode_canvas" ref="canvas"></canvas>', '', 'class="Qrcode"', function(opts) {
-    this.external(script$9);
+    this.external(script$20);
 });
 
-var script$10 = function() {
+var script$21 = function() {
   const optimizedEndpoint = objectAssign({}, {
     url: this.opts.endpoint.url,
     memo: this.opts.endpoint.memo
@@ -19014,22 +18987,22 @@ var script$10 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-menu-qrcode', '<div class="EndpointsPage_Endpoint_Menu_QRCode__message">モバイル端末にエンドポイントを追加できます。<br>お好きなQRコードリーダーで読み込んで下さい。</div> <div class="EndpointsPage_Endpoint_Menu_QRCode__canvas"> <viron-qrcode data="{data}"></viron-qrcode> </div>', '', 'class="EndpointsPage_Endpoint_Menu_QRCode"', function(opts) {
-    this.external(script$10);
+    this.external(script$21);
 });
 
-var script$5 = function() {
+var script$16 = function() {
   const store = this.riotx.get();
 
   this.handleEditButtonTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'viron-endpoints-page-endpoint-menu-edit', {
+      .then(() => store.action('modals.add', 'viron-endpoints-page-endpoint-menu-edit', {
         endpoint: this.opts.endpoint
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -19037,14 +19010,14 @@ var script$5 = function() {
   this.handleDeleteButtonTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.ENDPOINTS_REMOVE, this.opts.endpoint.key))
-      .then(() => store.action(constants$1.TOASTS_ADD, {
+      .then(() => store.action('endpoints.remove', this.opts.endpoint.key))
+      .then(() => store.action('toasts.add', {
         message: 'エンドポイントを削除しました。'
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -19052,13 +19025,13 @@ var script$5 = function() {
   this.handleQRCodeButtonTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'viron-endpoints-page-endpoint-menu-qrcode', {
+      .then(() => store.action('modals.add', 'viron-endpoints-page-endpoint-menu-qrcode', {
         endpoint: this.opts.endpoint
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -19066,30 +19039,30 @@ var script$5 = function() {
   this.handleSignoutButtonTap = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.AUTH_REMOVE, this.opts.endpoint.key))
-      .then(() => store.action(constants$1.TOASTS_ADD, {
+      .then(() => store.action('auth.remove', this.opts.endpoint.key))
+      .then(() => store.action('toasts.add', {
         message: 'ログアウトしました。'
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-menu', '<div onclick="{getClickHandler(\'handleEditButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditButtonTap\')}">編集</div> <div onclick="{getClickHandler(\'handleDeleteButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDeleteButtonTap\')}">削除</div> <div onclick="{getClickHandler(\'handleQRCodeButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleQRCodeButtonTap\')}">QR Code</div> <div onclick="{getClickHandler(\'handleSignoutButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSignoutButtonTap\')}">サインアウト</div>', '', 'class="EndpointsPage_Endpoint_Menu"', function(opts) {
-    this.external(script$5);
+    this.external(script$16);
 });
 
-var script$11 = function() {};
+var script$22 = function() {};
 
 riot$1.tag2('viron-horizontal-rule', '<div class="HorizontalRule__line"></div> <virtual if="{!!opts.label}"> <div class="HorizontalRule__label">{opts.label}</div> <div class="HorizontalRule__line"></div> </virtual>', '', 'class="HorizontalRule"', function(opts) {
-    this.external(script$11);
+    this.external(script$22);
 });
 
-var script$12 = function() {
+var script$23 = function() {
   /**
    * 文字列もしくはnullに変換します。
    * @param {String|null|undefined} value
@@ -19131,10 +19104,10 @@ var script$12 = function() {
 };
 
 riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$12);
+    this.external(script$23);
 });
 
-var script$13 = function() {
+var script$24 = function() {
   const store = this.riotx.get();
 
   this.mailAddress = '';
@@ -19154,11 +19127,11 @@ var script$13 = function() {
     this.opts.closer();
     Promise
       .resolve()
-      .then(() => store.action(constants$1.AUTH_SIGNIN_EMAIL, this.opts.endpointkey, this.opts.authtype, this.mailAddress, this.password))
+      .then(() => store.action('auth.signinEmail', this.opts.endpointkey, this.opts.authtype, this.mailAddress, this.password))
       .then(() => {
         this.getRouter().navigateTo(`/${this.opts.endpointkey}`);
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         title: 'ログイン失敗',
         message: 'ログイン出来ませんでした。正しいメールアドレスとパスワードを使用しているか確認して下さい。使用したメールアドレスが予め管理者として登録されているか確認して下さい。',
         error: err
@@ -19167,40 +19140,40 @@ var script$13 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<viron-textinput placeholder="mail address" val="{mailAddress}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="password" type="password" val="{password}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button label="ログイン" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
-    this.external(script$13);
+    this.external(script$24);
 });
 
-var script$14 = function() {
+var script$25 = function() {
   const store = this.riotx.get();
 
   this.handleButtonSelect = () => {
     this.opts.closer();
     Promise
       .resolve()
-      .then(() => store.action(constants$1.AUTH_SIGNIN_OAUTH, this.opts.endpointkey, this.opts.authtype))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .then(() => store.action('auth.signinOAuth', this.opts.endpointkey, this.opts.authtype))
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-signin-oauth', '<viron-button label="{opts.authtype.provider}" onselect="{handleButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Oauth"', function(opts) {
-    this.external(script$14);
+    this.external(script$25);
 });
 
-var script$15 = function() {
+var script$26 = function() {
   const store = this.riotx.get();
 
-  this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
+  this.isDesktop = store.getter('layout.isDesktop');
   this.emails = filter_1$1(this.opts.authtypes, authtype => {
-    return (authtype.type === constants$4.authtypeEmail);
+    return (authtype.type === constants$1.authtypeEmail);
   });
   this.oauths = filter_1$1(this.opts.authtypes, authtype => {
-    return (authtype.type === constants$4.authtypeOauth);
+    return (authtype.type === constants$1.authtypeOauth);
   });
 
-  this.listen(constants$3.LAYOUT, () => {
-    this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
+  this.listen('layout', () => {
+    this.isDesktop = store.getter('layout.isDesktop');
     this.update();
   });
 
@@ -19211,10 +19184,10 @@ var script$15 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-signin', '<div class="EndpointsPage_Endpoint_Signin__main"> <div class="EndpointsPage_Endpoint_Signin__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint_Signin__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint_Signin__url">url: {opts.endpoint.url}</div> <div class="EndpointsPage_Endpoint_Signin__emails" if="{!!emails.length}"> <viron-endpoints-page-endpoint-signin-email each="{authtype in emails}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-email> </div> <virtual if="{!isDesktop &amp;&amp; !!oauths.length}"> <viron-horizontal-rule label="または"></viron-horizontal-rule> <div class="EndpointsPage_Endpoint_Signin__oauths"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </virtual> </div> <div class="EndpointsPage_Endpoint_Signin__aside" if="{isDesktop &amp;&amp; !!oauths.length}"> <div class="EndpointsPage_Endpoint_Signin__oauthMessage">または、こちらを<br>利用してログイン</div> <div class="EndpointsPage_Endpoint_Signin__oauths"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </div>', '', 'class="EndpointsPage_Endpoint_Signin"', function(opts) {
-    this.external(script$15);
+    this.external(script$26);
 });
 
-var script$4 = function() {
+var script$15 = function() {
   const store = this.riotx.get();
 
   this.handleTap = () => {
@@ -19223,7 +19196,7 @@ var script$4 = function() {
     const endpointKey = this.opts.endpoint.key;
     Promise
       .resolve()
-      .then(() => store.action(constants$1.AUTH_VALIDATE, endpointKey))
+      .then(() => store.action('auth.validate', endpointKey))
       .then(isValid => {
         if (isValid) {
           this.getRouter().navigateTo(`/${endpointKey}`);
@@ -19231,13 +19204,13 @@ var script$4 = function() {
         }
         return Promise
           .resolve()
-          .then(() => store.action(constants$1.AUTH_GET_TYPES, endpointKey))
-          .then(authtypes => store.action(constants$1.MODALS_ADD, 'viron-endpoints-page-endpoint-signin', {
+          .then(() => store.action('auth.getTypes', endpointKey))
+          .then(authtypes => store.action('modals.add', 'viron-endpoints-page-endpoint-signin', {
             endpoint: this.opts.endpoint,
             authtypes
           }, { isSpread: true }));
       })
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -19245,7 +19218,7 @@ var script$4 = function() {
   this.handleMenuTap = e => {
     e.stopPropagation();
     const rect = this.refs.menu.root.getBoundingClientRect();
-    store.action(constants$1.POPOVERS_ADD, 'viron-endpoints-page-endpoint-menu', {
+    store.action('popovers.add', 'viron-endpoints-page-endpoint-menu', {
       endpoint: this.opts.endpoint
     }, {
       x: rect.left + (rect.width / 2),
@@ -19256,55 +19229,55 @@ var script$4 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint', '<viron-icon-dots class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-dots> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint__description">description: {opts.endpoint.description}</div> <div class="EndpointsPage_Endpoint__memo">memo: {opts.endpoint.memo}</div> <div class="EndpointsPage_Endpoint__url">url: {opts.endpoint.url}</div> <div class="EndpointsPage_Endpoint__version">version: {opts.endpoint.version}</div> <div class="EndpointsPage_Endpoint__token">token: {opts.endpoint.token}</div> <div class="EndpointsPage_Endpoint__theme">theme: {opts.endpoint.color}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div>', '', 'class="card EndpointsPage_Endpoint" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$4);
+    this.external(script$15);
 });
 
-var script$16 = function() {
+var script$27 = function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
+  this.endpoints = store.getter('endpoints.allByOrderFiltered');
 
-  this.listen(constants$3.ENDPOINTS, () => {
-    this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER_FILTERED);
+  this.listen('endpoints', () => {
+    this.endpoints = store.getter('endpoints.allByOrderFiltered');
     this.update();
   });
 };
 
 riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__list"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage"', function(opts) {
-    this.external(script$16);
+    this.external(script$27);
 });
 
-var script$17 = function() {};
+var script$28 = function() {};
 
 riot$1.tag2('viron-notfound-page', '<div>Not Found...</div>', '', 'class="NotfoundPage"', function(opts) {
-    this.external(script$17);
+    this.external(script$28);
 });
 
-var script$18 = function() {
+var script$29 = function() {
 };
 
 riot$1.tag2('viron-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {opts.class}"', function(opts) {
-    this.external(script$18);
+    this.external(script$29);
 });
 
-var script$19 = function() {
+var script$30 = function() {
 };
 
 riot$1.tag2('viron-progress-circular', '<div class="ProgressCircular__spinner"> <viron-icon type="loading"></viron-icon> </div>', '', 'class="ProgressCircular"', function(opts) {
-    this.external(script$19);
+    this.external(script$30);
 });
 
-var script$20 = function() {
+var script$31 = function() {
 };
 
 riot$1.tag2('viron-progress-linear', '<div class="ProgressLinear__bar"> <div class="ProgressLinear__particle"></div> <div class="ProgressLinear__particle"></div> </div>', '', 'class="ProgressLinear {\'ProgressLinear--active\' : opts.isactive}"', function(opts) {
-    this.external(script$20);
+    this.external(script$31);
 });
 
 riot$1.tag2('viron-application-blocker', '', '', 'class="Application_Blocker"', function(opts) {
 });
 
-var script$21 = function() {
+var script$32 = function() {
   const store = this.riotx.get();
 
   // `tag` = drawer内に展開されるriot tagインスタンス。
@@ -19320,7 +19293,7 @@ var script$21 = function() {
     this.root.classList.remove('Drawer--visible');
 
     setTimeout(() => {
-      store.action(constants$1.DRAWERS_REMOVE, this.opts.id);
+      store.action('drawers.remove', this.opts.id);
     }, 1000);
   };
 
@@ -19356,22 +19329,22 @@ var script$21 = function() {
 };
 
 riot$1.tag2('viron-drawer', '<div class="Drawer__frame"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$21);
+    this.external(script$32);
 });
 
-var script$22 = function() {
+var script$33 = function() {
   const store = this.riotx.get();
 
-  this.drawers = store.getter(constants$5.DRAWERS);
+  this.drawers = store.getter('drawers.all');
 
-  this.listen(constants$3.DRAWERS, () => {
-    this.drawers = store.getter(constants$5.DRAWERS);
+  this.listen('drawers', () => {
+    this.drawers = store.getter('drawers.all');
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-drawers', '<virtual each="{drawers}"> <viron-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}"></viron-drawer> </virtual>', '', 'class="Application_Drawers"', function(opts) {
-    this.external(script$22);
+    this.external(script$33);
 });
 
 riot$1.tag2('viron-icon-arrow-right', '<svg viewbox="-3551.038 14059.998 10.039 16.002"> <path d="M1763.979-16723.969l-7.394-7.4a.291.291,0,0,1-.022-.025l-.381-.383a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.286,0l1.836,1.84a.191.191,0,0,1,0,.277l-5.819,5.822,5.819,5.818a.2.2,0,0,1,0,.287l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1763.979-16723.969Z" transform="translate(-1784.878 -2663.914) rotate(180)"></path> </svg>', '', 'class="icon Icon IconArrowRight {opts.class}"', function(opts) {
@@ -19398,7 +19371,7 @@ riot$1.tag2('viron-icon-logo', '<svg viewbox="-3675 13992 24 24"> <path d="M13.3
 riot$1.tag2('viron-icon-arrow-up', '<svg viewbox="-3494.002 14063 16.002 10.037"> <path d="M1706.943-16726.971l-5.963-5.963-1.433-1.434a.122.122,0,0,1-.019-.021l-.384-.385a.2.2,0,0,1,0-.283l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.842a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.818a.2.2,0,0,1,0,.281l-1.84,1.842a.2.2,0,0,1-.141.059A.2.2,0,0,1,1706.943-16726.971Z" transform="translate(-20220.914 12363.916) rotate(90)"></path> </svg>', '', 'class="icon Icon IconArrowUp {opts.class}"', function(opts) {
 });
 
-var script$24 = function() {
+var script$35 = function() {
   const store = this.riotx.get();
 
   this.isOpened = false;
@@ -19411,30 +19384,30 @@ var script$24 = function() {
   this.handleIndependentHeadTap = () => {
     this.opts.closer();
     const id = this.opts.group.pages[0].id;
-    this.getRouter().navigateTo(`/${store.getter(constants$5.CURRENT)}/${id}`);
+    this.getRouter().navigateTo(`/${store.getter('current.all')}/${id}`);
   };
 
   this.handlePageTap = e => {
     this.opts.closer();
     const id = e.item.page.id;
-    this.getRouter().navigateTo(`/${store.getter(constants$5.CURRENT)}/${id}`);
+    this.getRouter().navigateTo(`/${store.getter('current.all')}/${id}`);
   };
 };
 
 riot$1.tag2('viron-application-menu-group', '<virtual if="{!opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.name}</div> <viron-icon-arrow-up class="Application_Menu_Group__arrow"></viron-icon-arrow-up> </div> <div class="Application_Menu_Group__pages" if="{isOpened}"> <div class="Application_Menu_Group__page" each="{page in opts.group.pages}" onclick="{getClickHandler(\'handlePageTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePageTap\')}">{page.name}</div> </div> </virtual> <virtual if="{opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleIndependentHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleIndependentHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.pages[0].name}</div> </div> </virtual>', '', 'class="Application_Menu_Group {\'Application_Menu_Group--open\': isOpened}"', function(opts) {
-    this.external(script$24);
+    this.external(script$35);
 });
 
-var script$25 = function() {
+var script$36 = function() {
   const store = this.riotx.get();
 
   this.closer = () => {
     this.close();
   };
 
-  this.menu = store.getter(constants$5.VIRON_MENU);
-  this.listen(constants$3.VIRON, () => {
-    this.menu = store.getter(constants$5.VIRON_MENU);
+  this.menu = store.getter('viron.menu');
+  this.listen('viron', () => {
+    this.menu = store.getter('viron.menu');
     this.update();
   });
 
@@ -19445,16 +19418,16 @@ var script$25 = function() {
 };
 
 riot$1.tag2('viron-application-menu', '<div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div>', '', 'class="Application_Menu"', function(opts) {
-    this.external(script$25);
+    this.external(script$36);
 });
 
-var script$26 = function() {};
+var script$37 = function() {};
 
 riot$1.tag2('viron-application-header-autocomplete', '<div>autocomplete!!!</div>', '', 'class="Application_Header_Autocomplete"', function(opts) {
-    this.external(script$26);
+    this.external(script$37);
 });
 
-var script$28 = function() {
+var script$39 = function() {
   const store = this.riotx.get();
 
   this.endpointURL = '';
@@ -19474,8 +19447,8 @@ var script$28 = function() {
   this.handleAddButtonSelect = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.ENDPOINTS_ADD, this.endpointURL, this.memo))
-      .then(() => store.action(constants$1.TOASTS_ADD, {
+      .then(() => store.action('endpoints.add', this.endpointURL, this.memo))
+      .then(() => store.action('toasts.add', {
         message: 'エンドポイントを追加しました。'
       }))
       .then(() => {
@@ -19491,7 +19464,7 @@ var script$28 = function() {
           linkText = 'Self-Signed Certificate?';
           link = this.endpointURL;
         }
-        store.action(constants$1.TOASTS_ADD, {
+        store.action('toasts.add', {
           message: err.message,
           autoHide,
           linkText,
@@ -19506,10 +19479,10 @@ var script$28 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu-entry', '<div>新しい管理画面を追加する</div> <div class="Application_Header_Menu_Entry__inputs"> <viron-textinput label="エンドポイント" val="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" val="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="追加" onselect="{handleAddButtonSelect}"></viron-button> <viron-button theme="ghost" label="キャンセル" onselect="{handleCancelButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
-    this.external(script$28);
+    this.external(script$39);
 });
 
-var script$27 = function() {
+var script$38 = function() {
   const store = this.riotx.get();
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
@@ -19541,7 +19514,7 @@ var script$27 = function() {
    * エンドポイント追加用のモーダルを表示します。
    */
   this.showModalToAddEndpoint = () => {
-    store.action(constants$1.MODALS_ADD, 'viron-application-header-menu-entry');
+    store.action('modals.add', 'viron-application-header-menu-entry');
   };
 
   /**
@@ -19553,11 +19526,6 @@ var script$27 = function() {
     switch (actionId) {
     case 'show_credit':
       // TODO:
-      // TODO: debug用なので後で消すこと。
-      store.action(constants$1.TOASTS_ADD, {
-        message: 'testes',
-        autoHide: false
-      });
       this.close();
       break;
     case 'navigate_to_doc':
@@ -19592,45 +19560,45 @@ var script$27 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu', '<div class="Application_Header_Menu__list"> <div class="Application_Header_Menu__item" each="{action in actions}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}">{action.label}</div> </div>', '', 'class="Application_Header_Menu"', function(opts) {
-    this.external(script$27);
+    this.external(script$38);
 });
 
-var script$23 = function() {
+var script$34 = function() {
   const store = this.riotx.get();
 
   // TOPページか否か。
-  this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
+  this.isTopPage = store.getter('location.isTop');
   // メニューの開閉状態。
-  this.isMenuOpened = store.getter(constants$5.APPLICATION_ISMENUOPENED);
+  this.isMenuOpened = store.getter('application.isMenuOpened');
   // モバイルレイアウトか否か。
-  this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
+  this.isMobile = store.getter('layout.isMobile');
   // エンドポイント名。
-  this.name = store.getter(constants$5.VIRON_NAME);
+  this.name = store.getter('viron.name');
   // エンドポイントのサムネイル。
-  this.thumbnail = store.getter(constants$5.VIRON_THUMBNAIL);
+  this.thumbnail = store.getter('viron.thumbnail');
 
-  this.listen(constants$3.LOCATION, () => {
-    this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
+  this.listen('location', () => {
+    this.isTopPage = store.getter('location.isTop');
     this.update();
   });
-  this.listen(constants$3.APPLICATION, () => {
-    this.isMenuOpened = store.getter(constants$5.APPLICATION_ISMENUOPENED);
+  this.listen('application', () => {
+    this.isMenuOpened = store.getter('application.isMenuOpened');
     this.update();
   });
-  this.listen(constants$3.LAYOUT, () => {
-    this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
+  this.listen('layout', () => {
+    this.isMobile = store.getter('layout.isMobile');
     this.update();
   });
-  this.listen(constants$3.VIRON, () => {
-    this.name = store.getter(constants$5.VIRON_NAME);
-    this.thumbnail = store.getter(constants$5.VIRON_THUMBNAIL);
+  this.listen('viron', () => {
+    this.name = store.getter('viron.name');
+    this.thumbnail = store.getter('viron.thumbnail');
     this.update();
   });
 
   this.handleSearchIconTap = () => {
     // 検索用オートコンプリートをpopoverで開きます。
     const rect = this.refs.searchIcon.root.getBoundingClientRect();
-    store.action(constants$1.POPOVERS_ADD, 'viron-application-header-autocomplete', null, {
+    store.action('popovers.add', 'viron-application-header-autocomplete', null, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
       direction: 'TL'
@@ -19639,10 +19607,10 @@ var script$23 = function() {
 
   this.handleMenuToggleButtonTap = () => {
     if (!this.isMobile) {
-      store.action(constants$1.APPLICATION_MENU_TOGGLE);
+      store.action('application.toggleMenu');
       return;
     }
-    store.action(constants$1.MODALS_ADD, 'viron-application-menu', null, {
+    store.action('modals.add', 'viron-application-menu', null, {
       isSpread: true
     });
   };
@@ -19650,7 +19618,7 @@ var script$23 = function() {
   this.handleSquareIconTap = () => {
     // menu(エンドポイント関連のやつ)をpopoverで開きます。
     const rect = this.refs.squareIcon.root.getBoundingClientRect();
-    store.action(constants$1.POPOVERS_ADD, 'viron-application-header-menu', {
+    store.action('popovers.add', 'viron-application-header-menu', {
       type: 'endpoint'
     }, {
       x: rect.left + (rect.width / 2),
@@ -19663,7 +19631,7 @@ var script$23 = function() {
   this.handleDotsIconTap = () => {
     // menu(一般的なやつ)をpopoverで開きます。
     const rect = this.refs.dotsIcon.root.getBoundingClientRect();
-    store.action(constants$1.POPOVERS_ADD, 'viron-application-header-menu', {
+    store.action('popovers.add', 'viron-application-header-menu', {
       type: 'general'
     }, {
       x: rect.left + (rect.width / 2),
@@ -19675,13 +19643,13 @@ var script$23 = function() {
 };
 
 riot$1.tag2('viron-application-header', '<div class="Application_Header__item"> <virtual if="{isTopPage}"> <viron-icon-search class="Application_Header__searchIcon" ref="searchIcon" onclick="{getClickHandler(\'handleSearchIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchIconTap\')}"></viron-icon-search> </virtual> <virtual if="{!isTopPage}"> <virtual if="{isMenuOpened}"> <viron-icon-menu onclick="{getClickHandler(\'handleMenuToggleButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuToggleButtonTap\')}"></viron-icon-menu> </virtual> <virtual if="{!isMenuOpened}"> <viron-icon-menu-invert onclick="{getClickHandler(\'handleMenuToggleButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuToggleButtonTap\')}"></viron-icon-menu-invert> </virtual> </virtual> </div> <div class="Application_Header__item" if="{isMobile}"> <div class="Application_Header__thumbnail" riot-style="background-image:url({thumbnail});"></div> </div> <div class="Application_Header__item"> <virtual if="{isTopPage}"> <viron-icon-square class="Application_Header__squareIcon" ref="squareIcon" onclick="{getClickHandler(\'handleSquareIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSquareIconTap\')}"></viron-icon-square> </virtual> <virtual if="{!isTopPage}"> <virtual if="{!isMobile}"> <div class="Application_Header__info"> <div class="Application_Header__name">{name}</div> <viron-icon-arrow-right class="Application_Header__arrow"></viron-icon-arrow-right> <div class="Application_Header__thumbnail" riot-style="background-image:url({thumbnail});"></div> </div> </virtual> </virtual> <viron-icon-dots class="Application_Header__dotsIcon" ref="dotsIcon" onclick="{getClickHandler(\'handleDotsIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDotsIconTap\')}"></viron-icon-dots> </div>', '', 'class="Application_Header"', function(opts) {
-    this.external(script$23);
+    this.external(script$34);
 });
 
 riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
 });
 
-var script$29 = function() {
+var script$40 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -19697,13 +19665,13 @@ var script$29 = function() {
     this.isVisible = false;
     this.update();
     setTimeout(() => {
-      store.action(constants$1.MODALS_REMOVE, this.opts.id);
+      store.action('modals.remove', this.opts.id);
     }, 1000);
   };
 
-  this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
-  this.listen(constants$3.LAYOUT, () => {
-    this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
+  this.layoutType = store.getter('layout.type');
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
     this.update();
   });
 
@@ -19745,27 +19713,27 @@ var script$29 = function() {
 };
 
 riot$1.tag2('viron-modal', '<div class="Modal__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <viron-icon-close class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"></viron-icon-close> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {isVisible ? \'Modal--visible\' : \'\'} Modal--{opts.modalopts.theme} Modal--{layoutType} {opts.modalopts.isSpread ? \'Modal--spread\': \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$29);
+    this.external(script$40);
 });
 
-var script$30 = function() {
+var script$41 = function() {
   const store = this.riotx.get();
 
-  this.modals = store.getter(constants$5.MODALS);
-  this.listen(constants$3.MODALS, () => {
-    this.modals = store.getter(constants$5.MODALS);
+  this.modals = store.getter('modals.all');
+  this.listen('modals', () => {
+    this.modals = store.getter('modals.all');
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-modals', '<virtual each="{modals}"> <viron-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" modalopts="{modalOpts}"></viron-modal> </virtual>', '', 'class="Application_Modals"', function(opts) {
-    this.external(script$30);
+    this.external(script$41);
 });
 
 // Mouse系かTouch系か。
 const isTouchEventSupported$1 = 'ontouchstart' in document;
 
-var script$31 = function() {
+var script$42 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -19779,7 +19747,7 @@ var script$31 = function() {
   const fadeOut = () => {
     this.root.classList.remove('Popover--visible');
     setTimeout(() => {
-      store.action(constants$1.POPOVERS_REMOVE, this.opts.id);
+      store.action('popovers.remove', this.opts.id);
     }, 1000);
   };
 
@@ -19861,33 +19829,33 @@ var script$31 = function() {
 };
 
 riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
-    this.external(script$31);
+    this.external(script$42);
 });
 
-var script$32 = function() {
+var script$43 = function() {
   const store = this.riotx.get();
 
-  this.popovers = store.getter(constants$5.POPOVERS);
-  this.listen(constants$3.POPOVERS, () => {
-    this.popovers = store.getter(constants$5.POPOVERS);
+  this.popovers = store.getter('popovers.all');
+  this.listen('popovers', () => {
+    this.popovers = store.getter('popovers.all');
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <viron-popover id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover> </virtual>', '', 'class="Application_Popovers"', function(opts) {
-    this.external(script$32);
+    this.external(script$43);
 });
 
-var script$33 = function() {};
+var script$44 = function() {};
 
 riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
-    this.external(script$33);
+    this.external(script$44);
 });
 
 riot$1.tag2('viron-application-splash', '<div>TODO</div>', '', 'class="Application_Splash"', function(opts) {
 });
 
-var script$34 = function() {
+var script$45 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -19903,7 +19871,7 @@ var script$34 = function() {
     this.root.classList.remove('Toast--visible');
     // call action after the hide animation completes.
     setTimeout(() => {
-      store.action(constants$1.TOASTS_REMOVE, this.opts.id);
+      store.action('toasts.remove', this.opts.id);
     }, 1000);
   };
 
@@ -19929,22 +19897,22 @@ var script$34 = function() {
 };
 
 riot$1.tag2('viron-toast', '<div class="Toast__icon">TODO</div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" onclick="{getClickHandler(\'handleLinkTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLinkTap\')}">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$34);
+    this.external(script$45);
 });
 
-var script$35 = function() {
+var script$46 = function() {
   const store = this.riotx.get();
 
-  this.toasts = store.getter(constants$5.TOASTS);
+  this.toasts = store.getter('toasts.all');
 
-  this.listen(constants$3.TOASTS, () => {
-    this.toasts = store.getter(constants$5.TOASTS);
+  this.listen('toasts', () => {
+    this.toasts = store.getter('toasts.all');
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-toasts', '<virtual each="{toasts}"> <viron-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></viron-toast> </virtual>', '', 'class="Application_Toasts"', function(opts) {
-    this.external(script$35);
+    this.external(script$46);
 });
 
 /**
@@ -19992,7 +19960,7 @@ riot$1.tag2('viron-application-toasts', '<virtual each="{toasts}"> <viron-toast 
 
     var throttle_1 = throttle;
 
-var script$37 = function() {
+var script$48 = function() {
   const updateText = () => {
     const json = JSON.stringify(this.opts.data, undefined, 4);
     let text = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -20022,10 +19990,10 @@ var script$37 = function() {
 };
 
 riot$1.tag2('viron-prettyprint', '<pre class="PrettyPrint__pre" ref="canvas"></pre>', '', 'class="PrettyPrint {opts.class}"', function(opts) {
-    this.external(script$37);
+    this.external(script$48);
 });
 
-var script$38 = function() {
+var script$49 = function() {
   // タイプ。
   this.type = this.opts.type || 'info';
   // iconの種類。
@@ -20090,10 +20058,10 @@ var script$38 = function() {
 };
 
 riot$1.tag2('viron-message', '<div class="Message__head"> <div class="Message__icon"> <viron-icon type="{icon}"></viron-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message}">{message}</div> <viron-prettyprint class="Message__error" if="{!!detail}" data="{detail}"></viron-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
-    this.external(script$38);
+    this.external(script$49);
 });
 
-var script$39 = function() {
+var script$50 = function() {
   this.handleDeleteButtonClick = () => {
     this.opts.onConfirm();
     this.close();
@@ -20105,10 +20073,10 @@ var script$39 = function() {
 };
 
 riot$1.tag2('viron-application-confirm', '<div class="Application__confirmHead"> <div class="Application__confirmTitle">エンドポイント削除</div> <div class="Application__confirmDescription">全てのエンドポイントが削除されます。個別に削除したい場合は各エンドポイントカード内の削除ボタンから行って下さい。</div> </div> <div class="Application__confirmTail"> <viron-button label="全て削除する" type="emphasis" onclick="{handleDeleteButtonClick}"></viron-button> <viron-button label="キャンセル" onclick="{handleCancelButtonClick}"></viron-button> </div>', '', 'class="Application__confirm"', function(opts) {
-    this.external(script$39);
+    this.external(script$50);
 });
 
-var script$40 = function() {
+var script$51 = function() {
   this.handleClick = () => {
     if (this.opts.isdisabled) {
       return;
@@ -20118,10 +20086,10 @@ var script$40 = function() {
 };
 
 riot$1.tag2('viron-button_', '<div class="Button__content"> <div class="Button__icon" if="{!!opts.icon}"> <viron-icon type="{opts.icon}"></viron-icon> </div> <div class="Button__label">{opts.label}</div> </div>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" onclick="{handleClick}"', function(opts) {
-    this.external(script$40);
+    this.external(script$51);
 });
 
-var script$41 = function() {
+var script$52 = function() {
   /**
    * undefined等の値を考慮した最適な値を返します。
    * @param {String|null} value
@@ -20168,10 +20136,10 @@ var script$41 = function() {
 };
 
 riot$1.tag2('viron-textinputtt', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--ghost\' : (opts.theme === \'ghost\'), \'Textinput--disabled\' : opts.isdisabled}" onclick="{handleClick}"', function(opts) {
-    this.external(script$41);
+    this.external(script$52);
 });
 
-var script$42 = function() {
+var script$53 = function() {
   /**
    * undefined等の値を考慮した最適な値を返します。
    * @param {String|null} value
@@ -20218,10 +20186,10 @@ var script$42 = function() {
 };
 
 riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\' : opts.isdisabled}" onclick="{handleClick}"', function(opts) {
-    this.external(script$42);
+    this.external(script$53);
 });
 
-var script$43 = function() {
+var script$54 = function() {
   const store = this.riotx.get();
 
   this.isExist = false;
@@ -20230,7 +20198,7 @@ var script$43 = function() {
 
   this.handleEndpointURLChange = newEndpointURL => {
     this.endpointURL = newEndpointURL;
-    this.isExist = !!store.getter(constants$5.ENDPOINTS_ONE_BY_URL, newEndpointURL);
+    this.isExist = !!store.getter('endpoints.oneByURL', newEndpointURL);
     this.update();
   };
 
@@ -20242,8 +20210,8 @@ var script$43 = function() {
   this.handleRegisterButtonClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.ENDPOINTS_ADD, this.endpointURL, this.memo))
-      .then(() => store.action(constants$1.TOASTS_ADD, {
+      .then(() => store.action('endpoints.add', this.endpointURL, this.memo))
+      .then(() => store.action('toasts.add', {
         message: 'エンドポイントを追加しました。'
       }))
       .then(() => {
@@ -20259,7 +20227,7 @@ var script$43 = function() {
           linkText = 'Self-Signed Certificate?';
           link = this.endpointURL;
         }
-        store.action(constants$1.TOASTS_ADD, {
+        store.action('toasts.add', {
           message: err.message,
           autoHide,
           linkText,
@@ -20274,19 +20242,19 @@ var script$43 = function() {
 };
 
 riot$1.tag2('viron-application-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <viron-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application__entryControls"> <viron-button type="primary" isdisabled="{isExist}" onclick="{handleRegisterButtonClick}" label="新規作成"></viron-button> <viron-button type="secondary" onclick="{handleCancelButtonClick}" label="キャンセル"></viron-button> </div>', '', 'class="Application__entry"', function(opts) {
-    this.external(script$43);
+    this.external(script$54);
 });
 
-var script$44 = function() {
+var script$55 = function() {
   const store = this.riotx.get();
 
   // ドロップ待受中か否か。
-  this.isWatching = store.getter(constants$5.APPLICATION_ISDRAGGING);
+  this.isWatching = store.getter('application.isDragging');
   // ドロップ可能な状態か否か。
   this.isDroppable = false;
 
-  this.listen(constants$3.APPLICATION, () => {
-    this.isWatching = store.getter(constants$5.APPLICATION_ISDRAGGING);
+  this.listen('application', () => {
+    this.isWatching = store.getter('application.isDragging');
     this.update();
   });
 
@@ -20317,18 +20285,18 @@ var script$44 = function() {
     const newOrder = this.opts.order;
     Promise
       .resolve()
-      .then(() => store.action(constants$1.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('endpoints.changeOrder', endpointKey, newOrder))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
 };
 
 riot$1.tag2('viron-application-order-droparea', '<div class="Application__orderDropareaContent"></div> <div class="Application__orderDropareaHandler" ondragenter="{handleDragEnter}" ondragover="{handleDragOver}" ondragleave="{handleDragLeave}" ondrop="{handleDrop}"></div>', '', 'class="Application__orderDroparea {\'Application__orderDroparea--watching\' : isWatching, \'Application__orderDroparea--droppable\' : isDroppable}"', function(opts) {
-    this.external(script$44);
+    this.external(script$55);
 });
 
-var script$45 = function() {
+var script$56 = function() {
   const store = this.riotx.get();
 
   // ドラッグ開始時の処理。
@@ -20338,8 +20306,8 @@ var script$45 = function() {
 
     Promise
       .resolve()
-      .then(() => store.action(constants$1.APPLICATION_DRAG_START))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('application.startDrag'))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
@@ -20352,84 +20320,84 @@ var script$45 = function() {
   this.handleDragEnd = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.APPLICATION_DRAG_END))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('application.endDrag'))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
 };
 
 riot$1.tag2('viron-application-order-item', '<div class="Application__orderItemHead"> <div class="Application__orderItemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="Application__orderItemName">{opts.endpoint.name || \'-\'}</div> </div> <div class="Application__orderItemBody"> <div class="Application__orderItemUrl"> <div class="Application__orderItemUrlIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__orderItemUrlLabel">{opts.endpoint.url}</div> </div> </div>', '', 'class="Application__orderItem" draggable="{true}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}"', function(opts) {
-    this.external(script$45);
+    this.external(script$56);
 });
 
-var script$46 = function() {
+var script$57 = function() {
   const store = this.riotx.get();
 
-  this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER);
+  this.endpoints = store.getter('endpoints.allByOrder');
 
-  this.listen(constants$3.ENDPOINTS, () => {
-    this.endpoints = store.getter(constants$5.ENDPOINTS_BY_ORDER);
+  this.listen('endpoints', () => {
+    this.endpoints = store.getter('endpoints.allByOrder');
     this.update();
   });
 };
 
 riot$1.tag2('viron-application-order', '<div class="Application__orderTitle">並び順を変更</div> <div class="Application__orderDescription">ドラッグ&ドロップでエンドポイントの並び順を変更できます。</div> <div class="Application__orderPlayground"> <viron-application-order-droparea order="{0}"></viron-application-order-droparea> <virtual each="{endpoint, idx in endpoints}"> <viron-application-order-item endpoint="{endpoint}"></viron-application-order-item> <viron-application-order-droparea order="{idx + 1}"></viron-application-order-droparea> </virtual> </div>', '', 'class="Application__order"', function(opts) {
-    this.external(script$46);
+    this.external(script$57);
 });
 
-var script$36 = function() {
+var script$47 = function() {
   const store = this.riotx.get();
 
-  this.isLaunched = store.getter(constants$5.APPLICATION_ISLAUNCHED);
-  this.isNavigating = store.getter(constants$5.APPLICATION_ISNAVIGATING);
-  this.isNetworking = store.getter(constants$5.APPLICATION_ISNETWORKING);
+  this.isLaunched = store.getter('application.isLaunched');
+  this.isNavigating = store.getter('application.isNavigating');
+  this.isNetworking = store.getter('application.isNetworking');
   // 表示すべきページの名前。
-  this.pageName = store.getter(constants$5.LOCATION_NAME);
+  this.pageName = store.getter('location.name');
   // TOPページか否か。
-  this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
+  this.isTopPage = store.getter('location.isTop');
   // 表示すべきページのルーティング情報。
-  this.pageRoute = store.getter(constants$5.LOCATION_ROUTE);
+  this.pageRoute = store.getter('location.route');
   // エンドポイント数。
-  this.endpointsCount = store.getter(constants$5.ENDPOINTS_COUNT);
+  this.endpointsCount = store.getter('endpoints.one');
   // エンドポイントフィルター用のテキスト。
-  this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
+  this.endpointFilterText = store.getter('application.endpointFilterText');
   // バグに対処するため、ブラウザ毎クラス設定目的でブラウザ名を取得する。
-  this.usingBrowser = store.getter(constants$5.UA_USING_BROWSER);
+  this.usingBrowser = store.getter('ua.usingBrowser');
   // レスポンシブデザイン用。
-  this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
-  this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
-  this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
+  this.layoutType = store.getter('layout.type');
+  this.isDesktop = store.getter('layout.isDesktop');
+  this.isMobile = store.getter('layout.isMobile');
   // 左カラムの開閉状態。トップページでは常にopenとなる。
-  this.isAsideClosed = (!store.getter(constants$5.LOCATION_IS_TOP) && !store.getter(constants$5.APPLICATION_ISMENUOPENED));
+  this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
 
-  this.listen(constants$3.APPLICATION, () => {
-    this.isLaunched = store.getter(constants$5.APPLICATION_ISLAUNCHED);
-    this.isNavigating = store.getter(constants$5.APPLICATION_ISNAVIGATING);
-    this.isNetworking = store.getter(constants$5.APPLICATION_ISNETWORKING);
-    this.endpointFilterText = store.getter(constants$5.APPLICATION_ENDPOINT_FILTER_TEXT);
-    this.isAsideClosed = (!store.getter(constants$5.LOCATION_IS_TOP) && !store.getter(constants$5.APPLICATION_ISMENUOPENED));
+  this.listen('application', () => {
+    this.isLaunched = store.getter('application.isLaunched');
+    this.isNavigating = store.getter('application.isNavigating');
+    this.isNetworking = store.getter('application.isNetworking');
+    this.endpointFilterText = store.getter('application.endpointFilterText');
+    this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
     this.update();
   });
-  this.listen(constants$3.LOCATION, () => {
-    this.pageName = store.getter(constants$5.LOCATION_NAME);
-    this.isTopPage = store.getter(constants$5.LOCATION_IS_TOP);
-    this.pageRoute = store.getter(constants$5.LOCATION_ROUTE);
-    this.isAsideClosed = (!store.getter(constants$5.LOCATION_IS_TOP) && !store.getter(constants$5.APPLICATION_ISMENUOPENED));
+  this.listen('location', () => {
+    this.pageName = store.getter('location.name');
+    this.isTopPage = store.getter('location.isTop');
+    this.pageRoute = store.getter('location.route');
+    this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
     this.update();
   });
-  this.listen(constants$3.ENDPOINTS, () => {
-    this.endpointsCount = store.getter(constants$5.ENDPOINTS_COUNT);
+  this.listen('endpoints', () => {
+    this.endpointsCount = store.getter('endpoints.count');
     this.update();
   });
-  this.listen(constants$3.UA, () => {
-    this.usingBrowser = store.getter(constants$5.UA_USING_BROWSER);
+  this.listen('ua', () => {
+    this.usingBrowser = store.getter('ua.usingBrowser');
     this.update();
   });
-  this.listen(constants$3.LAYOUT, () => {
-    this.layoutType = store.getter(constants$5.LAYOUT_TYPE);
-    this.isDesktop = store.getter(constants$5.LAYOUT_IS_DESKTOP);
-    this.isMobile = store.getter(constants$5.LAYOUT_IS_MOBILE);
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.isDesktop = store.getter('layout.isDesktop');
+    this.isMobile = store.getter('layout.isMobile');
     this.update();
   });
 
@@ -20438,7 +20406,7 @@ var script$36 = function() {
   const handleResize = throttle_1(() => {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    store.action(constants$1.LAYOUT_UPDATE_SIZE, width, height);
+    store.action('layout.updateSize', width, height);
   }, 1000);
   this.on('mount', () => {
     window.addEventListener('resize', handleResize);
@@ -20449,14 +20417,14 @@ var script$36 = function() {
   this.handleEntryMenuItemClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'viron-application-entry'))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('modals.add', 'viron-application-entry'))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
 
   this.handleDownloadMenuItemClick = () => {
-    const endpoints = store.getter(constants$5.ENDPOINTS_WITHOUT_TOKEN);
+    const endpoints = store.getter('endpoints.allWithoutToken');
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
 
@@ -20472,8 +20440,8 @@ var script$36 = function() {
 
     // ファイルがjsonであるか
     // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
-    if (!store.getter(constants$5.UA_IS_EDGE) && file.type !== 'application/json') {
-      store.action(constants$1.MODALS_ADD, 'viron-message', {
+    if (!store.getter('ua.isEdge') && file.type !== 'application/json') {
+      store.action('modals.add', 'viron-message', {
         title: 'エンドポイント追加 失敗',
         message: 'JSONファイルを指定してください。',
         type: 'error'
@@ -20488,7 +20456,7 @@ var script$36 = function() {
 
     // 読み込みが失敗した。
     reader.onerror = err => {
-      store.action(constants$1.MODALS_ADD, 'viron-message', {
+      store.action('modals.add', 'viron-message', {
         title: 'エンドポイント追加 失敗',
         message: 'ファイルの読み込みに失敗しました。',
         error: err
@@ -20505,13 +20473,13 @@ var script$36 = function() {
         .resolve()
         .then(() => {
           const endpoints = JSON.parse(text);
-          return store.action(constants$1.ENDPOINTS_MERGE_ALL, endpoints);
+          return store.action('endpoints.mergeAll', endpoints);
         })
-        .then(() => store.action(constants$1.MODALS_ADD, 'viron-message', {
+        .then(() => store.action('modals.add', 'viron-message', {
           title: 'エンドポイント追加',
           message: 'エンドポイントが一覧に追加されました。'
         }))
-        .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+        .catch(err => store.action('modals.add', 'viron-message', {
           title: 'エンドポイント追加 失敗',
           error: err
         }));
@@ -20521,18 +20489,18 @@ var script$36 = function() {
   };
 
   this.handleOrderMenuItemClick = () => {
-    store.action(constants$1.MODALS_ADD, 'viron-application-order');
+    store.action('modals.add', 'viron-application-order');
   };
 
   this.handleClearMenuItemClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.MODALS_ADD, 'viron-application-confirm', {
+      .then(() => store.action('modals.add', 'viron-application-confirm', {
         onConfirm: () => {
-          store.action(constants$1.ENDPOINTS_REMOVE_ALL);
+          store.action('endpoints.removeAll');
         }
       }))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
@@ -20540,15 +20508,15 @@ var script$36 = function() {
   this.handleFilterChange = newText => {
     Promise
       .resolve()
-      .then(() => store.action(constants$1.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT, newText))
-      .catch(err => store.action(constants$1.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('application.updateEndpointFilterText', newText))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
 };
 
 riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__pageInfo">TODO</div> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
-    this.external(script$36);
+    this.external(script$47);
 });
 
 // エントリーポイント。
@@ -20558,21 +20526,21 @@ document.addEventListener('DOMContentLoaded', () => {
     .resolve()
     .then(() => i18n.init())
     .then(() => mixin.init())
-    .then(() => store$1.init())
-    .then(store => {
-      mainStore = store;
+    .then(() => store.init())
+    .then(store$$1 => {
+      mainStore = store$$1;
       // debug用にglobal公開しておく。
-      window.store = store;
+      window.store = store$$1;
     })
     .then(() => {
       riot$1.mount('viron');
     })
     .then(() => Promise.all([
-      mainStore.action(constants$1.ENDPOINTS_TIDY_UP_ORDER),
-      mainStore.action(constants$1.UA_SETUP)
+      mainStore.action('endpoints.tidyUpOrder'),
+      mainStore.action('ua.setup')
     ]))
     .then(() => router.init(mainStore))
-    .catch(err => mainStore.action(constants$1.MODALS_ADD, 'viron-message', {
+    .catch(err => mainStore.action('modals.add', 'viron-message', {
       message: 'Viron起動に失敗しました。Viron担当者にお問い合わせ下さい。',
       error: err
     }));
