@@ -78,7 +78,7 @@ export default exporter('page', {
       return [];
     }
     return filter(page.components, component => {
-      return (component.style === 'table');
+      return contains(['table'], component.style);
     });
   },
 

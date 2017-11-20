@@ -1,3 +1,10 @@
 .ComponentsPage_Inlines {
   display: block;
+
+  &__list {
+    & .ComponentsPage_Card {
+      width: 312px;
+      height: 144px;
+    }
+  }
 }

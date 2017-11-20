@@ -6,12 +6,66 @@ export default exporter('components', {
   /**
    * 一つのコンポーネント情報を取得します。
    * @param {riotx.Context} context
+   * @param {String} componentId
+   * @param {Object} componentDef
+   * @param {Object} query
+   * @return {Promise}
+   */
+  get: (context, componentId, componentDef, query = {}) => {
+    const method = componentDef.api.method;
+    // GETメソッドのみサポート。
+    if (method !== 'get') {
+      return Promise.reject('only `get` method is allowed.');
+    }
+    let path = componentDef.api.path;
+    if (path.indexOf('/') !== 0) {
+      path = '/' + path;
+    }
+    const api = context.getter('oas.apiByPathAndMethod', path, method);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
+    const token = currentEndpoint.token;
+    const networkingId = `networking_${Date.now()}`;
+    return Promise
+      .resolve()
+      .then(() => context.commit('application.addNetworking', {
+        id: networkingId
+      }))
+      .then(() => api(query, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
+        }
+        context.commit('components.updateOne', componentId, componentDef, res.obj);
+        context.commit('application.removeNetworking', networkingId);
+      })
+      .catch(err => {
+        context.commit('application.removeNetworking', networkingId);
+        throw err;
+      });
+  },
+
+  /**
+   * 一つのコンポーネント情報を取得します。
+   * @param {riotx.Context} context
    * @param {String} component_uid
    * @param {Object} component
    * @param {Object} query
    * @return {Promise}
    */
-  get: (context, component_uid, component, query) => {
+  _get: (context, component_uid, component, query) => {
     const method = component.api.method;
     // GETメソッドのみサポート。
     if (method !== 'get') {

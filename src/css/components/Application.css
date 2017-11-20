@@ -49,15 +49,8 @@
   }
 
   &__main {
-    padding: 24px;
     overflow-y: scroll;
     grid-area: main;
-  }
-
-  &__pageInfo {
-    margin-bottom: 24px;
-    font-size: 2.8rem;
-    font-weight: bold;
   }
 
   &--desktop&--asideClosed {
@@ -66,10 +59,20 @@
     }
   }
 
+  &--desktop {
+    & .Application__main {
+      padding: 24px;
+    }
+  }
+
   &--mobile {
     & .Application__container {
       grid-template-areas: "header" "main";
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    & .Application__main {
+      padding: 24px 4px;
     }
   }
 }

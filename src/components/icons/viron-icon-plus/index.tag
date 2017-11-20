@@ -1,0 +1,5 @@
+viron-icon-plus.icon.Icon.IconPlus(class="{ opts.class }")
+  svg(viewBox="-2612 10790 16 16")
+    g(transform="translate(-3874 10766)")
+      rect(width="16" height="3" rx="0.2" transform="translate(1262 30.5)")
+      rect(width="16" height="3" rx="0.2" transform="translate(1271.5 24) rotate(90)")

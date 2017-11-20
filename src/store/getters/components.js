@@ -1,6 +1,9 @@
 import filter from 'mout/array/filter';
+import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
+import indexOf from 'mout/array/indexOf';
 import map from 'mout/array/map';
+import sort from 'mout/array/sort';
 import sortBy from 'mout/array/sortBy';
 import unique from 'mout/array/unique';
 import isArray from 'mout/lang/isArray';
@@ -20,43 +23,132 @@ export default exporter('components', {
   },
 
   /**
-   * 指定riotIDに対する要素を返します。
+   * 指定componentIDに対する要素を返します。
    * @param {Object} state
-   * @param {String} riotId
+   * @param {String} componentId
    * @return {Object}
    */
-  one: (state, riotId) => {
-    return state.components[riotId];
+  one: (state, componentId) => {
+    return state.components[componentId];
   },
 
   /**
-   * 指定riotIDに対する要素のAPIレスポンスを返します。
+   * 指定componentIDに対する要素のcomponent定義を返します。
    * @param {Object} state
-   * @param {String} riotId
+   * @param {String} componentId
+   * @return {Object}
+   */
+  def: (state, componentId) => {
+    return state.components[componentId].def;
+  },
+
+  /**
+   * 指定componentIDに対する要素のAPIレスポンスを返します。
+   * @param {Object} state
+   * @param {String} componentId
    * @return {*}
    */
-  response: (state, riotId) => {
-    return state.components[riotId].response;
+  response: (state, componentId) => {
+    return state.components[componentId].response;
   },
 
   /**
-   * 指定riotIDに対する要素のschemaObjectを返します。
+   * 指定componentIDに対する要素のテーブルcolumn情報を返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @return {Array}
+   */
+  columns: (state, componentId) => {
+    const component = state.components[componentId];
+    const columns = component.columns;
+    // `table_labels` = 優先度が高いカラムkey群。
+    const tableLabels = component.def.table_labels || [];
+    return sort(columns, (a, b) => {
+      let idxA = indexOf(tableLabels, a.key);
+      let idxB = indexOf(tableLabels, b.key);
+      if (idxA >= 0) {
+        idxA = tableLabels.length - idxA;
+      }
+      if (idxB >= 0) {
+        idxB = tableLabels.length - idxB;
+      }
+      return (idxB - idxA);
+    });
+  },
+
+  /**
+   * 指定componentIDに対する要素のOperationObject群を返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @param {String} category
+   * @return {Array}
+   */
+  operations: (state, componentId, category) => {
+    const component = state.components[componentId];
+    let operations;
+    switch (category) {
+    case 'table':
+      operations = component.tableOperations;
+      break;
+    case 'row':
+      operations = component.rowOperations;
+      break;
+    default:
+      operations = component.operations || [];
+      break;
+    }
+    return operations;
+  },
+
+  /**
+   * 指定componentIDに対する要素のpostメソッドOperationObjectを返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @param {String} category
+   * @return {Object|null}
+   */
+  postOperation: (state, componentId, category) => {
+    const component = state.components[componentId];
+    let operations;
+    switch (category) {
+    case 'table':
+      operations = component.tableOperations;
+      break;
+    case 'row':
+      operations = component.rowOperations;
+      break;
+    default:
+      operations = component.operations || [];
+      break;
+    }
+    const path = component.def.api.path;
+    const operationObject = find(operations, operation => {
+      return (operation.path === path && operation.method === 'post');
+    });
+    if (!operationObject) {
+      return null;
+    }
+    return operationObject;
+  },
+
+  /**
+   * 指定componentIDに対する要素のschemaObjectを返します。
    * @param {Object} state
    * @param {String} riotId
    * @return {Object}
    */
-  schemaObject: (state, riotId) => {
-    return state.components[riotId].schemaObject;
+  _schemaObject: (state, componentId) => {
+    return state.components[componentId].schemaObject;
   },
 
   /**
-   * 指定riotIDに対する要素のparamterObject群を返します。
+   * 指定componentIDに対する要素のparamterObject群を返します。
    * @param {Object} state
    * @param {String} riotId
    * @return {Array}
    */
-  parameterObjects: (state, riotId) => {
-    return state.components[riotId].parameterObjects;
+  _parameterObjects: (state, componentId) => {
+    return state.components[componentId].parameterObjects;
   },
 
   /**
@@ -64,7 +156,7 @@ export default exporter('components', {
    * @param {Object} state
    * @return {Array}
    */
-  parameterObjectsEntirely: state => {
+  _parameterObjectsEntirely: state => {
     let entireParameterObjects = [];
     const weights = {};
     forOwn(state.components, component => {
@@ -94,7 +186,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  actions: (state, riotId) => {
+  _actions: (state, riotId) => {
     return map(state.components[riotId].actions, action => {
       return action.operationObject;
     });
@@ -106,7 +198,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  selfActions: (state, riotId) => {
+  _selfActions: (state, riotId) => {
     const actions = state.components[riotId].actions;
     const selfActions = filter(actions, action => {
       return (!action.appendTo || action.appendTo === 'self');
@@ -122,7 +214,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  rowActions: (state, riotId) => {
+  _rowActions: (state, riotId) => {
     const actions = state.components[riotId].actions;
     const selfActions = filter(actions, action => {
       return (action.appendTo === 'row');
@@ -138,7 +230,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {Boolean}
    */
-  hasPagination: (state, riotId) => {
+  _hasPagination: (state, riotId) => {
     return state.components[riotId].hasPagination;
   },
 
@@ -148,7 +240,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {Number}
    */
-  autoRefreshSec: (state, riotId) => {
+  _autoRefreshSec: (state, riotId) => {
     return state.components[riotId].autoRefreshSec;
   },
 
@@ -158,7 +250,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {Object}
    */
-  pagination: (state, riotId) => {
+  _pagination: (state, riotId) => {
     return state.components[riotId].pagination;
   },
 
@@ -168,7 +260,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  tableLabels: (state, riotId) => {
+  _tableLabels: (state, riotId) => {
     return state.components[riotId].table_labels || [];
   },
 
@@ -178,7 +270,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  tableColumns: (state, riotId) => {
+  _tableColumns: (state, riotId) => {
     const response = state.components[riotId].response;
     if (!isArray(response) || !response.length) {
       return [];
@@ -192,7 +284,7 @@ export default exporter('components', {
    * @param {String} riotId
    * @return {String|null}
    */
-  primaryKey: (state, riotId) => {
+  _primaryKey: (state, riotId) => {
     return state.components[riotId].primaryKey || null;
   }
 });

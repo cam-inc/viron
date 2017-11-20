@@ -36,6 +36,12 @@ select {
   appearance: none;
 }
 
+table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
 /* Chromeのautofill機能で背景色がyellowに設定される問題への対応 */
 @keyframes autofill {
   to {

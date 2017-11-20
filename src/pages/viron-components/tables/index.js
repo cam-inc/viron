@@ -1,9 +1,9 @@
 export default function() {
   const store = this.riotx.get();
 
-  this.name = store.getter('page.name');
+  this.components = store.getter('page.componentsTable');
   this.listen('page', () => {
-    this.name = store.getter('page.name');
+    this.components = store.getter('page.componentsTable');
     this.update();
   });
 }

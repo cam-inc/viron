@@ -11,6 +11,8 @@
 @import "ComponentsPage_Card_GraphStackedBar";
 @import "ComponentsPage_Card_Number";
 @import "ComponentsPage_Card_Table";
+@import "ComponentsPage_Card_Table_Operations";
+@import "ComponentsPage_Card_Table_Operations_Item";
 @import "ComponentsPage_Inlines";
 @import "EndpointsPage";
 @import "EndpointsPage_Endpoint";

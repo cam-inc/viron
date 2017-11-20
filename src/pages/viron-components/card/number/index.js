@@ -18,7 +18,6 @@ export default function() {
       .then(() => store.action('components.get', this.opts.id, this.opts.def))
       .then(() => {
         this.isLoading = false;
-        this.error = null;
         this.update();
       })
       .catch(err => {
@@ -27,7 +26,7 @@ export default function() {
           this.error = '認証エラー。';
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()}·${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
         }
         this.update();
       });
