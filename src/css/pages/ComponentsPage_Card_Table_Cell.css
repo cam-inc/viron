@@ -1,0 +1,16 @@
+.ComponentsPage_Card_Table_Cell {
+  padding: 24px;
+
+  &__string {
+    @apply --text-truncate;
+    font-size: 1.4rem;
+  }
+
+  &__image {
+    width: 64px;
+    height: 64px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+  }
+}

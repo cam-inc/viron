@@ -87,10 +87,6 @@
   }
 
   &__td {
-    @apply --text-truncate;
-    padding: 24px;
-    font-size: 1.4rem;
-
     & .Icon {
       width: 16px;
       height: 16px;
