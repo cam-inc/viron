@@ -1,10 +1,12 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('popovers', {
   /**
    * 全ての吹き出し情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  all: context => {
-    return context.state.popovers;
+  all: state => {
+    return state.popovers;
   }
-};
+});

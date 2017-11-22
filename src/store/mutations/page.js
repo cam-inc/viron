@@ -1,14 +1,14 @@
-import { constants as states } from '../states';
+import exporter from './exporter';
 
-export default {
+export default exporter('page', {
   /**
    * ページ情報を書き換えます。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {Object|null} page
    * @return {Array}
    */
-  all: (context, page) => {
-    context.state.page = page;
-    return [states.PAGE];
+  all: (state, page) => {
+    state.page = page;
+    return ['page'];
   }
-};
+});

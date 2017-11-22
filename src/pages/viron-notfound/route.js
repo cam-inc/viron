@@ -1,5 +1,3 @@
-import { constants as actions } from '../../store/actions';
-
 export default {
   /**
    * ページ遷移時の処理。
@@ -8,7 +6,7 @@ export default {
    * @return {Promise}
    */
   onEnter: (store, route) => {
-    return store.action(actions.LOCATION_UPDATE, {
+    return store.action('location.update', {
       name: 'notfound',
       route
     });

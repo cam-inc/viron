@@ -1,0 +1,109 @@
+.ComponentsPage_Card_Table {
+  display: block;
+
+  &__head {
+    @apply --layout-center-between;
+    padding: 24px;
+  }
+
+  &__headAside {
+    @apply --layout-center-start;
+  }
+
+  &__postOperation {
+    @apply --layout-center-center;
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+    cursor: pointer;
+    background-color: var(--color-base-gray);
+    border-radius: 50%;
+
+    &:hover,
+    &.hold {
+      background-color: var(--color-base-blue);
+    }
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+      color: var(--color-base-white);
+    }
+  }
+
+  &__title {
+    font-size: 1.6rem;
+  }
+
+  &__control {
+    @apply --layout-center-start;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 24px;
+      cursor: pointer;
+
+      &:hover,
+      &.hold {
+        color: var(--color-base-blue);
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  &__error {
+    color: var(--color-base-red);
+  }
+
+  &__tableWrapper {
+    overflow-x: auto;
+  }
+
+  &__table {
+  }
+
+  &__th {
+    @apply --text-truncate;
+    padding: 0 24px;
+    font-size: 1.2rem;
+    font-weight: normal;
+    color: var(--color-base-gray);
+    text-align: left;
+    border-bottom: 1px solid var(--color-base-gray-tertiary);
+  }
+
+  &__tbodyRow {
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-base-gray-tertiary);
+
+    &:hover,
+    &.hold {
+      background-color: var(--color-base-gray-tertiary);
+    }
+  }
+
+  &__td {
+    @apply --text-truncate;
+    padding: 24px;
+    font-size: 1.4rem;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+
+      &:hover,
+      &.hold {
+        color: var(--color-base-blue);
+      }
+    }
+  }
+
+  &__tbody tr td:first-child {
+    font-weight: bold;
+  }
+}

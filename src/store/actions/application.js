@@ -1,6 +1,6 @@
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('application', {
   /**
    * 起動状態にします。
    * @param {riotx.Context} context
@@ -10,7 +10,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_LAUNCH, true);
+        context.commit('application.launch', true);
       });
   },
 
@@ -23,7 +23,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_NAVIGATION, true);
+        context.commit('application.navigation', true);
       });
   },
 
@@ -36,7 +36,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_NAVIGATION, false);
+        context.commit('application.navigation', false);
       });
   },
 
@@ -49,7 +49,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_DRAG, true);
+        context.commit('application.drag', true);
       });
   },
 
@@ -62,7 +62,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_DRAG, false);
+        context.commit('application.drag', false);
       });
   },
 
@@ -75,7 +75,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_MENU_TOGGLE);
+        context.commit('application.menuToggle');
       });
   },
 
@@ -89,7 +89,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_ENDPOINT_FILTER_TEXT, newFilterText);
+        context.commit('application.endpointFilterText', newFilterText);
       });
   },
 
@@ -102,7 +102,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.APPLICATION_ENDPOINT_FILTER_TEXT, '');
+        context.commit('application.endpointFilterText', '');
       });
   }
-};
+});

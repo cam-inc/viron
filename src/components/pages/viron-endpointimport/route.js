@@ -1,4 +1,3 @@
-import { constants as actions } from '../../../store/actions';
 import '../../atoms/viron-message/index.tag';
 
 export default {
@@ -16,16 +15,16 @@ export default {
       .then(() => {
         const endpoint = JSON.parse(decodeURIComponent(route.queries.endpoint));
         url = endpoint.url;
-        return store.action(actions.ENDPOINTS_MERGE_ONE_WITH_KEY, endpoint);
+        return store.action('endpoints.mergeOneWithKey', endpoint);
       })
-      .then(() => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('modals.add', 'viron-message', {
         title: 'エンドポイント追加',
         message: `エンドポイント(${url})が一覧に追加されました。`
       }))
       .then(() => {
         replace('/');
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         title: 'エンドポイント追加 失敗',
         message: `エンドポイント(${url})を追加出来ませんでした。`,
         error: err

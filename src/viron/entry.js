@@ -1,6 +1,3 @@
-import { constants as actions } from '../store/actions';
-import { constants as getters } from '../store/getters';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -10,7 +7,7 @@ export default function() {
 
   this.handleEndpointURLChange = newEndpointURL => {
     this.endpointURL = newEndpointURL;
-    this.isExist = !!store.getter(getters.ENDPOINTS_ONE_BY_URL, newEndpointURL);
+    this.isExist = !!store.getter('endpoints.oneByURL', newEndpointURL);
     this.update();
   };
 
@@ -22,8 +19,8 @@ export default function() {
   this.handleRegisterButtonClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.ENDPOINTS_ADD, this.endpointURL, this.memo))
-      .then(() => store.action(actions.TOASTS_ADD, {
+      .then(() => store.action('endpoints.add', this.endpointURL, this.memo))
+      .then(() => store.action('toasts.add', {
         message: 'エンドポイントを追加しました。'
       }))
       .then(() => {
@@ -39,7 +36,7 @@ export default function() {
           linkText = 'Self-Signed Certificate?';
           link = this.endpointURL;
         }
-        store.action(actions.TOASTS_ADD, {
+        store.action('toasts.add', {
           message: err.message,
           autoHide,
           linkText,

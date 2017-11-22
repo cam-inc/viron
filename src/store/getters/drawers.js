@@ -1,10 +1,12 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('drawers', {
   /**
    * 全てのドローワー情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  all: context => {
-    return context.state.drawers;
+  all: state => {
+    return state.drawers;
   }
-};
+});

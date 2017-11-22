@@ -1,9 +1,5 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
-import { constants as actions } from '../../store/actions';
-import { constants as getters } from '../../store/getters';
-import { constants as states } from '../../store/states';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -20,13 +16,13 @@ export default function() {
     this.isVisible = false;
     this.update();
     setTimeout(() => {
-      store.action(actions.MODALS_REMOVE, this.opts.id);
+      store.action('modals.remove', this.opts.id);
     }, 1000);
   };
 
-  this.layoutType = store.getter(getters.LAYOUT_TYPE);
-  this.listen(states.LAYOUT, () => {
-    this.layoutType = store.getter(getters.LAYOUT_TYPE);
+  this.layoutType = store.getter('layout.type');
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
     this.update();
   });
 

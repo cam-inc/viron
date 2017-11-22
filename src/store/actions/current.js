@@ -1,6 +1,6 @@
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('current', {
   /**
    * 選択中endpointKeyを更新します。
    * @param {riotx.Context} context
@@ -11,7 +11,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.CURRENT, endpointKey);
+        context.commit('current.all', endpointKey);
       });
   },
 
@@ -24,7 +24,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.CURRENT, null);
+        context.commit('current.all', null);
       });
   }
-};
+});

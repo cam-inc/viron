@@ -1,4 +1,3 @@
-import { constants as actions } from '../../../../../store/actions';
 import '../../../../../components/viron-error/index.tag';
 
 export default function() {
@@ -14,16 +13,16 @@ export default function() {
   this.handleSaveButtonSelect = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.ENDPOINTS_UPDATE, this.opts.endpoint.key, {
+      .then(() => store.action('endpoints.update', this.opts.endpoint.key, {
         memo: this.memo
       }))
-      .then(() => store.action(actions.TOASTS_ADD, {
+      .then(() => store.action('toasts.add', {
         message: '保存完了。'
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };

@@ -1,1 +1,3 @@
-export default {};
+import exporter from './exporter';
+
+export default exporter('ua', {});

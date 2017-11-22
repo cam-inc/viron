@@ -1,5 +1,3 @@
-import { constants as actions } from '../../store/actions';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -16,7 +14,7 @@ export default function() {
     this.root.classList.remove('Toast--visible');
     // call action after the hide animation completes.
     setTimeout(() => {
-      store.action(actions.TOASTS_REMOVE, this.opts.id);
+      store.action('toasts.remove', this.opts.id);
     }, 1000);
   };
 

@@ -1,6 +1,5 @@
 import contains from 'mout/array/contains';
 import isNull from 'mout/lang/isNull';
-import { constants as actions } from '../../../store/actions';
 import '../../atoms/viron-prettyprint/index.tag';
 
 export default function() {
@@ -43,7 +42,7 @@ export default function() {
   }
 
   this.handleDetailClick = () => {
-    store.action(actions.MODALS_ADD, 'viron-prettyprint', {
+    store.action('modals.add', 'viron-prettyprint', {
       data : this.opts.data.cell
     });
   };

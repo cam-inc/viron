@@ -1,6 +1,7 @@
 import constants from '../../core/constants';
+import exporter from './exporter';
 
-export default {
+export default exporter('layout', {
   // レイアウトタイプ。mobile or desktop。
   type: (() => {
     const width = window.innerWidth;
@@ -20,4 +21,4 @@ export default {
     const columnCount = Number(htmlStyles.getPropertyValue('--page-components-grid-column-count'));
     return columnCount;
   })()
-};
+});

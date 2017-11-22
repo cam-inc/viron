@@ -1,12 +1,11 @@
 import encode from 'mout/queryString/encode';
 import { fetch } from '../../core/fetch';
-import { constants as getters } from '../getters';
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
 // swagger-client(swagger-js)は外部ファイル読み込みのため、SwaggerClientオブジェクトはglobal(i.e. window)に格納されている。
 const SwaggerClient = window.SwaggerClient;
 
-export default {
+export default exporter('oas', {
   /**
    * OAS準拠ファイルを取得/resolveし、SwaggerClientインスタンスを生成します。
    * @see: https://github.com/swagger-api/swagger-js#swagger-specification-resolver
@@ -46,8 +45,8 @@ export default {
         return client;
       })
       .then(client => {
-        context.commit(mutations.OAS_CLIENT, client);
-        context.commit(mutations.ENDPOINTS_UPDATE, endpointKey, client.spec.info);
+        context.commit('oas.client', client);
+        context.commit('endpoints.update', endpointKey, client.spec.info);
       });
   },
 
@@ -60,7 +59,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.OAS_CLIENT_CLEAR);
+        context.commit('oas.clearClient');
       });
   },
 
@@ -72,8 +71,8 @@ export default {
    * @return {Promise}
    */
   getAutocomplete: (context, path, query) => {
-    const currentEndpointKey = context.getter(getters.CURRENT);
-    const currentEndpoint = context.getter(getters.ENDPOINTS_ONE, currentEndpointKey);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
     const token = currentEndpoint.token;
     const url = `${new URL(currentEndpoint.url).origin}${path}${encode(query)}`;
     return Promise
@@ -85,4 +84,4 @@ export default {
       }))
       .then(res => res.json());
   }
-};
+});

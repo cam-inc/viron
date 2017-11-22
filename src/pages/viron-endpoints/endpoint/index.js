@@ -1,4 +1,3 @@
-import { constants as actions } from '../../../store/actions';
 import '../../../components/viron-error/index.tag';
 import './menu/index.tag';
 import './signin/index.tag';
@@ -12,7 +11,7 @@ export default function() {
     const endpointKey = this.opts.endpoint.key;
     Promise
       .resolve()
-      .then(() => store.action(actions.AUTH_VALIDATE, endpointKey))
+      .then(() => store.action('auth.validate', endpointKey))
       .then(isValid => {
         if (isValid) {
           this.getRouter().navigateTo(`/${endpointKey}`);
@@ -20,13 +19,13 @@ export default function() {
         }
         return Promise
           .resolve()
-          .then(() => store.action(actions.AUTH_GET_TYPES, endpointKey))
-          .then(authtypes => store.action(actions.MODALS_ADD, 'viron-endpoints-page-endpoint-signin', {
+          .then(() => store.action('auth.getTypes', endpointKey))
+          .then(authtypes => store.action('modals.add', 'viron-endpoints-page-endpoint-signin', {
             endpoint: this.opts.endpoint,
             authtypes
           }, { isSpread: true }));
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   };
@@ -34,7 +33,7 @@ export default function() {
   this.handleMenuTap = e => {
     e.stopPropagation();
     const rect = this.refs.menu.root.getBoundingClientRect();
-    store.action(actions.POPOVERS_ADD, 'viron-endpoints-page-endpoint-menu', {
+    store.action('popovers.add', 'viron-endpoints-page-endpoint-menu', {
       endpoint: this.opts.endpoint
     }, {
       x: rect.left + (rect.width / 2),

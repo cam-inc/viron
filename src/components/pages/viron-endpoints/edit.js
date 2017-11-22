@@ -1,5 +1,3 @@
-import { constants as actions } from '../../../store/actions';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -13,16 +11,16 @@ export default function() {
   this.handleEditButtonClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.ENDPOINTS_UPDATE, this.opts.endpointKey, {
+      .then(() => store.action('endpoints.update', this.opts.endpointKey, {
         memo: this.memo
       }))
-      .then(() => store.action(actions.TOASTS_ADD, {
+      .then(() => store.action('toasts.add', {
         message: 'エンドポイントを編集しました。'
       }))
       .then(() => {
         this.close();
       })
-      .catch(err => store.action(actions.TOASTS_ADD, {
+      .catch(err => store.action('toasts.add', {
         type: 'error',
         message: err.message
       }));

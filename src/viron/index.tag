@@ -8,7 +8,6 @@ viron.Application(class="Application--{ usingBrowser } Application--{ layoutType
     .Application__header
       viron-application-header
     .Application__main
-      .Application__pageInfo TODO
       .Application__page
         div(data-is="viron-{ pageName }-page" route="{ pageRoute }")
   viron-application-drawers

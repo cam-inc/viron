@@ -1,15 +1,17 @@
 import storage from 'store';
-import { constants as states } from '../states';
+import exporter from './exporter';
 
-export default {
+export default exporter('current', {
   /**
    * 値書き換え。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} endpointKey
    * @return {Array}
    */
-  all: (context, endpointKey) => {
-    context.state.current = storage.set(states.CURRENT, endpointKey);
-    return [states.CURRENT];
+  all: (state, endpointKey) => {
+    const version = state.application.version;
+    state.current[version] = endpointKey;
+    storage.set('current', state.current);
+    return ['current'];
   }
-};
+});

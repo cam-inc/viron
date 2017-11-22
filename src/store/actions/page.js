@@ -1,8 +1,7 @@
 import find from 'mout/object/find';
-import { constants as getters } from '../getters';
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('page', {
   /**
    * ページ情報を取得します。
    * @param {riotx.Context} context
@@ -13,11 +12,11 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        const pages = context.getter(getters.VIRON_PAGES);
+        const pages = context.getter('viron.pages');
         const page = find(pages, page => {
           return (page.id === pageId);
         });
-        context.commit(mutations.PAGE, page);
+        context.commit('page.all', page);
       });
   },
 
@@ -30,7 +29,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.PAGE, null);
+        context.commit('page.all', null);
       });
   }
-};
+});

@@ -1,6 +1,5 @@
 import isObject from 'mout/lang/isObject';
 import ObjectAssign from 'object-assign';
-import { constants as mutations } from '../store/mutations';
 
 /**
  * body値をContent-Type `application/json`に最適化します。
@@ -91,7 +90,7 @@ const commonFetch = (context, url, options) => {
   const networkingId = `networking_${Date.now()}`;
   return Promise
     .resolve()
-    .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+    .then(() => context.commit('application.addNetworking', {
       id: networkingId,
       url,
       options
@@ -105,7 +104,7 @@ const commonFetch = (context, url, options) => {
       })
     ]))
     .then(response => {
-      context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      context.commit('application.removeNetworking', networkingId);
       return response;
     })
     .then(response => { // status check.
@@ -115,7 +114,7 @@ const commonFetch = (context, url, options) => {
       return Promise.resolve(response);
     })
     .catch(err => {
-      context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+      context.commit('application.removeNetworking', networkingId);
       throw err;
     });
 };

@@ -1,8 +1,5 @@
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
-import { constants as getters } from '../../../store/getters';
-import { constants as states } from '../../../store/states';
-
 export default function() {
   const store = this.riotx.get();
 
@@ -33,21 +30,21 @@ export default function() {
     return ret;
   };
 
-  const current = store.getter(getters.CURRENT);
-  this.endpoint = store.getter(getters.ENDPOINTS_ONE, current);
-  const dashboard = store.getter(getters.VIRON_DASHBOARD);
-  const manage = store.getter(getters.VIRON_MANAGE);
+  const current = store.getter('current.all');
+  this.endpoint = store.getter('endpoints.one', current);
+  const dashboard = store.getter('viron.dashboard');
+  const manage = store.getter('viron.manage');
   this.groupedDashboard = group(dashboard);
   this.groupedManage = group(manage);
 
-  this.listen(states.ENDPOINTS, () => {
-    const current = store.getter(getters.CURRENT);
-    this.endpoint = store.getter(getters.ENDPOINTS_ONE, current);
+  this.listen('endpoints', () => {
+    const current = store.getter('current.all');
+    this.endpoint = store.getter('endpoints.one', current);
     this.update();
   });
-  this.listen(states.VIRON, () => {
-    const dashboard = store.getter(getters.VIRON_DASHBOARD);
-    const manage = store.getter(getters.VIRON_MANAGE);
+  this.listen('viron', () => {
+    const dashboard = store.getter('viron.dashbboard');
+    const manage = store.getter('viron.manage');
     this.groupedDashboard = group(dashboard);
     this.groupedManage = group(manage);
     this.update();

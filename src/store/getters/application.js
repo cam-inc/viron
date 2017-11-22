@@ -1,64 +1,75 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('application', {
   /**
    * `application`情報を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  all: context => {
-    return context.state.application;
+  all: state => {
+    return state.application;
+  },
+
+  /**
+   * バージョンを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  version: state => {
+    return state.application.version;
   },
 
   /**
    * 起動状態を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isLaunched: context => {
-    return context.state.application.isLaunched;
+  isLaunched: state => {
+    return state.application.isLaunched;
   },
 
   /**
    * 遷移中か否かを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isNavigating: context => {
-    return context.state.application.isNavigating;
+  isNavigating: state => {
+    return state.application.isNavigating;
   },
 
   /**
    * API通信中か否かを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isNetworking: context => {
-    return context.state.application.isNetworking;
+  isNetworking: state => {
+    return state.application.isNetworking;
   },
 
   /**
    * ドラッグ中か否かを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isDragging: context => {
-    return context.state.application.isDragging;
+  isDragging: state => {
+    return state.application.isDragging;
   },
 
   /**
    * メニューの開閉状態を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Boolean}
    */
-  isMenuOpened: context => {
-    return context.state.application.isMenuOpened;
+  isMenuOpened: state => {
+    return state.application.isMenuOpened;
   },
 
   /**
    * エンドポイントフィルター用のテキストを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {String}
    */
-  endpointFilterText: context => {
-    return context.state.application.endpointFilterText;
+  endpointFilterText: state => {
+    return state.application.endpointFilterText;
   }
-};
+});

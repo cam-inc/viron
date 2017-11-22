@@ -1,8 +1,5 @@
 import download from 'downloadjs';
 import throttle from 'mout/function/throttle';
-import { constants as actions } from '../store/actions';
-import { constants as getters } from '../store/getters';
-import { constants as states } from '../store/states';
 import '../components/atoms/viron-message/index.tag';
 import './confirm.tag';
 import './entry.tag';
@@ -11,55 +8,55 @@ import './order.tag';
 export default function() {
   const store = this.riotx.get();
 
-  this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
-  this.isNavigating = store.getter(getters.APPLICATION_ISNAVIGATING);
-  this.isNetworking = store.getter(getters.APPLICATION_ISNETWORKING);
+  this.isLaunched = store.getter('application.isLaunched');
+  this.isNavigating = store.getter('application.isNavigating');
+  this.isNetworking = store.getter('application.isNetworking');
   // 表示すべきページの名前。
-  this.pageName = store.getter(getters.LOCATION_NAME);
+  this.pageName = store.getter('location.name');
   // TOPページか否か。
-  this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
+  this.isTopPage = store.getter('location.isTop');
   // 表示すべきページのルーティング情報。
-  this.pageRoute = store.getter(getters.LOCATION_ROUTE);
+  this.pageRoute = store.getter('location.route');
   // エンドポイント数。
-  this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+  this.endpointsCount = store.getter('endpoints.one');
   // エンドポイントフィルター用のテキスト。
-  this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
+  this.endpointFilterText = store.getter('application.endpointFilterText');
   // バグに対処するため、ブラウザ毎クラス設定目的でブラウザ名を取得する。
-  this.usingBrowser = store.getter(getters.UA_USING_BROWSER);
+  this.usingBrowser = store.getter('ua.usingBrowser');
   // レスポンシブデザイン用。
-  this.layoutType = store.getter(getters.LAYOUT_TYPE);
-  this.isDesktop = store.getter(getters.LAYOUT_IS_DESKTOP);
-  this.isMobile = store.getter(getters.LAYOUT_IS_MOBILE);
+  this.layoutType = store.getter('layout.type');
+  this.isDesktop = store.getter('layout.isDesktop');
+  this.isMobile = store.getter('layout.isMobile');
   // 左カラムの開閉状態。トップページでは常にopenとなる。
-  this.isAsideClosed = (!store.getter(getters.LOCATION_IS_TOP) && !store.getter(getters.APPLICATION_ISMENUOPENED));
+  this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
 
-  this.listen(states.APPLICATION, () => {
-    this.isLaunched = store.getter(getters.APPLICATION_ISLAUNCHED);
-    this.isNavigating = store.getter(getters.APPLICATION_ISNAVIGATING);
-    this.isNetworking = store.getter(getters.APPLICATION_ISNETWORKING);
-    this.endpointFilterText = store.getter(getters.APPLICATION_ENDPOINT_FILTER_TEXT);
-    this.isAsideClosed = (!store.getter(getters.LOCATION_IS_TOP) && !store.getter(getters.APPLICATION_ISMENUOPENED));
+  this.listen('application', () => {
+    this.isLaunched = store.getter('application.isLaunched');
+    this.isNavigating = store.getter('application.isNavigating');
+    this.isNetworking = store.getter('application.isNetworking');
+    this.endpointFilterText = store.getter('application.endpointFilterText');
+    this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
     this.update();
   });
-  this.listen(states.LOCATION, () => {
-    this.pageName = store.getter(getters.LOCATION_NAME);
-    this.isTopPage = store.getter(getters.LOCATION_IS_TOP);
-    this.pageRoute = store.getter(getters.LOCATION_ROUTE);
-    this.isAsideClosed = (!store.getter(getters.LOCATION_IS_TOP) && !store.getter(getters.APPLICATION_ISMENUOPENED));
+  this.listen('location', () => {
+    this.pageName = store.getter('location.name');
+    this.isTopPage = store.getter('location.isTop');
+    this.pageRoute = store.getter('location.route');
+    this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
     this.update();
   });
-  this.listen(states.ENDPOINTS, () => {
-    this.endpointsCount = store.getter(getters.ENDPOINTS_COUNT);
+  this.listen('endpoints', () => {
+    this.endpointsCount = store.getter('endpoints.count');
     this.update();
   });
-  this.listen(states.UA, () => {
-    this.usingBrowser = store.getter(getters.UA_USING_BROWSER);
+  this.listen('ua', () => {
+    this.usingBrowser = store.getter('ua.usingBrowser');
     this.update();
   });
-  this.listen(states.LAYOUT, () => {
-    this.layoutType = store.getter(getters.LAYOUT_TYPE);
-    this.isDesktop = store.getter(getters.LAYOUT_IS_DESKTOP);
-    this.isMobile = store.getter(getters.LAYOUT_IS_MOBILE);
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.isDesktop = store.getter('layout.isDesktop');
+    this.isMobile = store.getter('layout.isMobile');
     this.update();
   });
 
@@ -68,7 +65,7 @@ export default function() {
   const handleResize = throttle(() => {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    store.action(actions.LAYOUT_UPDATE_SIZE, width, height);
+    store.action('layout.updateSize', width, height);
   }, 1000);
   this.on('mount', () => {
     window.addEventListener('resize', handleResize);
@@ -79,14 +76,14 @@ export default function() {
   this.handleEntryMenuItemClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-application-entry'))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('modals.add', 'viron-application-entry'))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
 
   this.handleDownloadMenuItemClick = () => {
-    const endpoints = store.getter(getters.ENDPOINTS_WITHOUT_TOKEN);
+    const endpoints = store.getter('endpoints.allWithoutToken');
     download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
   };
 
@@ -102,8 +99,8 @@ export default function() {
 
     // ファイルがjsonであるか
     // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
-    if (!store.getter(getters.UA_IS_EDGE) && file.type !== 'application/json') {
-      store.action(actions.MODALS_ADD, 'viron-message', {
+    if (!store.getter('ua.isEdge') && file.type !== 'application/json') {
+      store.action('modals.add', 'viron-message', {
         title: 'エンドポイント追加 失敗',
         message: 'JSONファイルを指定してください。',
         type: 'error'
@@ -118,7 +115,7 @@ export default function() {
 
     // 読み込みが失敗した。
     reader.onerror = err => {
-      store.action(actions.MODALS_ADD, 'viron-message', {
+      store.action('modals.add', 'viron-message', {
         title: 'エンドポイント追加 失敗',
         message: 'ファイルの読み込みに失敗しました。',
         error: err
@@ -135,13 +132,13 @@ export default function() {
         .resolve()
         .then(() => {
           const endpoints = JSON.parse(text);
-          return store.action(actions.ENDPOINTS_MERGE_ALL, endpoints);
+          return store.action('endpoints.mergeAll', endpoints);
         })
-        .then(() => store.action(actions.MODALS_ADD, 'viron-message', {
+        .then(() => store.action('modals.add', 'viron-message', {
           title: 'エンドポイント追加',
           message: 'エンドポイントが一覧に追加されました。'
         }))
-        .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+        .catch(err => store.action('modals.add', 'viron-message', {
           title: 'エンドポイント追加 失敗',
           error: err
         }));
@@ -151,18 +148,18 @@ export default function() {
   };
 
   this.handleOrderMenuItemClick = () => {
-    store.action(actions.MODALS_ADD, 'viron-application-order');
+    store.action('modals.add', 'viron-application-order');
   };
 
   this.handleClearMenuItemClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-application-confirm', {
+      .then(() => store.action('modals.add', 'viron-application-confirm', {
         onConfirm: () => {
-          store.action(actions.ENDPOINTS_REMOVE_ALL);
+          store.action('endpoints.removeAll');
         }
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
@@ -170,8 +167,8 @@ export default function() {
   this.handleFilterChange = newText => {
     Promise
       .resolve()
-      .then(() => store.action(actions.APPLICATION_UPDATE_ENDPOINT_FILTER_TEXT, newText))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('application.updateEndpointFilterText', newText))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

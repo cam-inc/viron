@@ -1,7 +1,7 @@
+import ObjectAssign from 'object-assign';
 import application from './application';
 import components from './components';
 import current from './current';
-import viron from './viron';
 import drawers from './drawers';
 import endpoints from './endpoints';
 import layout from './layout';
@@ -13,46 +13,31 @@ import popovers from './popovers';
 import signinShowKey from './signinShowKey';
 import toasts from './toasts';
 import ua from './ua';
+import viron from './viron';
 
-const constants = {
-  APPLICATION: 'APPLICATION',
-  COMPONENTS: 'COMPONENTS',
-  COMPONENTS_ONE: riotId => {
-    return `component_${riotId}`;
-  },
-  CURRENT: 'CURRENT',
-  VIRON: 'VIRON',
-  OAS: 'OAS',
-  DRAWERS: 'DRAWERS',
-  ENDPOINTS: 'ENDPOINTS',
-  LAYOUT: 'LAYOUT',
-  LOCATION: 'LOCATION',
-  MODALS: 'MODALS',
-  PAGE: 'PAGE',
-  POPOVERS: 'POPOVERS',
-  SIGNIN_SHOW_KEY: 'SIGNIN_SHOW_KEY',
-  TOASTS: 'TOASTS',
-  UA: 'UA'
-};
-
-export default {
+export default ObjectAssign(
+  {},
   application,
   components,
   current,
-  viron,
-  oas,
   drawers,
   endpoints,
   layout,
   location,
   modals,
+  oas,
   page,
   popovers,
   signinShowKey,
   toasts,
-  ua
+  ua,
+  viron
+);
+
+const getComponentStateName = riotId => {
+  return `component_${riotId}`;
 };
 
 export {
-  constants
+  getComponentStateName
 };

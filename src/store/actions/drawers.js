@@ -1,6 +1,6 @@
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('drawers', {
   /**
    * ドローワーを追加します。
    * @param {riotx.Context} context
@@ -13,7 +13,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.DRAWERS_ADD, tagName, tagOpts, drawerOpts);
+        context.commit('drawers.add', tagName, tagOpts, drawerOpts);
       });
   },
 
@@ -27,7 +27,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.DRAWERS_REMOVE, drawerId);
+        context.commit('drawers.remove', drawerId);
       });
   }
-};
+});

@@ -1,5 +1,4 @@
 import ObjectAssign from 'object-assign';
-import { constants as actions } from '../../../store/actions';
 import '../../atoms/viron-message/index.tag';
 
 export default function() {
@@ -20,7 +19,7 @@ export default function() {
   this.handleExecuteButtonClick = () => {
     Promise
       .resolve()
-      .then(() => store.action(actions.COMPONENTS_OPERATE_ONE, this.opts.operationObject, this.queries))
+      .then(() => store.action('components.operate', this.opts.operationObject, this.queries))
       .then(() => {
         this.close();
         this.opts.onSuccess();
@@ -29,14 +28,14 @@ export default function() {
         // 401 = 認証エラー
         // 通常エラーと認証エラーで処理を振り分ける。
         if (err.status !== 401) {
-          return store.action(actions.MODALS_ADD, 'viron-message', {
+          return store.action('modals.add', 'viron-message', {
             message: `APIパラメータやOASが正しいか確認して下さい。[${this.opts.operationObject.summary || ''}]`,
             error: err
           });
         }
         return Promise
           .resolve()
-          .then(() => store.action(actions.MODALS_ADD, 'viron-message', {
+          .then(() => store.action('modals.add', 'viron-message', {
             title: '認証切れ',
             message: '認証が切れました。再度ログインして下さい。'
           }))

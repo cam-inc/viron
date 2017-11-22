@@ -1,0 +1,8 @@
+.ComponentsPage_Card_Table_Operations {
+  display: block;
+  padding: 0 24px;
+
+  & .ComponentsPage_Card_Table_Operations_Item:last-child {
+    border-bottom: none;
+  }
+}

@@ -1,4 +1,3 @@
-import { constants as actions } from '../../store/actions';
 import '../../components/viron-error/index.tag';
 
 export default {
@@ -18,11 +17,11 @@ export default {
     const tasks = [];
     if (isAuthorized) {
       to = `/${endpointKey}`;
-      tasks.push(store.action(actions.AUTH_UPDATE, endpointKey, decodeURIComponent(token)));
+      tasks.push(store.action('auth.update', endpointKey, decodeURIComponent(token)));
     } else {
       to = '/';
-      tasks.push(store.action(actions.AUTH_REMOVE, endpointKey));
-      tasks.push(store.action(actions.MODALS_ADD, 'viron-error', {
+      tasks.push(store.action('auth.remove', endpointKey));
+      tasks.push(store.action('modals.add', 'viron-error', {
         title: '認証失敗',
         message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
       }));
@@ -33,7 +32,7 @@ export default {
       .then(() => {
         replace(to);
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   }

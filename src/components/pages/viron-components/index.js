@@ -7,19 +7,16 @@ import keys from 'mout/object/keys';
 import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
 import chart from '../../../core/chart';
-import { constants as actions } from '../../../store/actions';
-import { constants as getters } from '../../../store/getters';
-import { constants as states } from '../../../store/states';
 import '../../organisms/viron-component/search.tag';
 import '../../atoms/viron-message/index.tag';
 
 export default function() {
   const store = this.riotx.get();
 
-  this.name = store.getter(getters.PAGE_NAME);
-  this.tableComponents = store.getter(getters.PAGE_COMPONENTS_TABLE);
-  this.notTableComponents = store.getter(getters.PAGE_COMPONENTS_NOT_TABLE);
-  this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
+  this.name = store.getter('page.name');
+  this.tableComponents = store.getter('page.componentsTable');
+  this.notTableComponents = store.getter('page.componentsNotTable');
+  this.componentsCount = store.getter('page.componentsCount');
   // リクエストパラメータ定義。
   this.parameterObjects = [];
   // tooltip表示中か否か。
@@ -47,7 +44,7 @@ export default function() {
   };
   // componentで定義されている値のみ抽出します。
   this.getCurrentSearchRequestParametersForComponent = component => {
-    const parameterObjects = store.getter(getters.OAS_PARAMETER_OBJECTS, component.api.path, component.api.method);
+    const parameterObjects = store.getter('oas.parameterObjects', component.api.path, component.api.method);
     const names = [];
     forEach(parameterObjects, parameterObject => {
       names.push(parameterObject.name);
@@ -87,7 +84,7 @@ export default function() {
    */
   const updateGridColumnCount = () => {
     const columnCount = getGridColumnCountForCurrentViewport();
-    store.action(actions.LAYOUT_UPDATE_COMPONENTS_GRID_COLUMN_COUNT, columnCount);
+    store.action('layout.updateComponentsGridColumnCount', columnCount);
   };
 
   // resizeイベントハンドラーの発火回数を減らす。
@@ -100,24 +97,24 @@ export default function() {
     window.removeEventListener('resize', handleResize);
   });
 
-  this.listen(states.LAYOUT, () => {
-    const columnCount = store.getter(getters.LAYOUT_COMPONENTS_GRID_COLUMN_COUNT);
+  this.listen('layout', () => {
+    const columnCount = store.getter('layout.componentsGridColumnCount');
     document.documentElement.style.setProperty('--page-components-grid-column-count', columnCount);
     // tauchartはresize時に自動で再レンダリングするが、column数変更時にはresizeイベントが発火しないため再レンダリングが実行されない。
     // column数変更時も再レンダリングさせるために手動でresizeイベントハンドラを実行する。
     chart.Chart.resizeOnWindowEvent();
   });
-  this.listen(states.PAGE, () => {
-    this.name = store.getter(getters.PAGE_NAME);
-    this.tableComponents = store.getter(getters.PAGE_COMPONENTS_TABLE);
-    this.notTableComponents = store.getter(getters.PAGE_COMPONENTS_NOT_TABLE);
-    this.componentsCount = store.getter(getters.PAGE_COMPONENTS_COUNT);
+  this.listen('page', () => {
+    this.name = store.getter('page.name');
+    this.tableComponents = store.getter('page.componentsTable');
+    this.notTableComponents = store.getter('page.componentsNotTable');
+    this.componentsCount = store.getter('page.componentsCount');
     this.update();
     updateGridColumnCount();
   });
 
-  this.listen(states.COMPONENTS, () => {
-    this.parameterObjects = store.getter(getters.COMPONENTS_PARAMETER_OBJECTS);
+  this.listen('components', () => {
+    this.parameterObjects = store.getter('components.parameterObjectsEntirely');
     this.update();
   });
 
@@ -142,7 +139,7 @@ export default function() {
 
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-component-search', {
+      .then(() => store.action('modals.add', 'viron-component-search', {
         parameterObjects: escapedParameterObjects,
         initialParameters: ObjectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
@@ -157,7 +154,7 @@ export default function() {
           });
         }
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

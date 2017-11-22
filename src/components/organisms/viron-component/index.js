@@ -4,9 +4,7 @@ import isUndefined from 'mout/lang/isUndefined';
 import keys from 'mout/object/keys';
 import objectReject from 'mout/object/reject';
 import ObjectAssign from 'object-assign';
-import { constants as actions } from '../../../store/actions';
-import { constants as getters } from '../../../store/getters';
-import { constants as states } from '../../../store/states';
+import { getComponentStateName } from '../../../store/states';
 import '../../atoms/viron-message/index.tag';
 import './filter.tag';
 import './search.tag';
@@ -130,13 +128,13 @@ export default function() {
           resolve();
         }, 300);
       }))
-      .then(() => store.action(actions.COMPONENTS_GET_ONE, this._riot_id, this.opts.component, this.currentSearchRequestParameters))
+      .then(() => store.action('components.get', this._riot_id, this.opts.component, this.currentSearchRequestParameters))
       .catch(err => {
         // 401 = 認証エラー
         // 通常エラーと認証エラーで処理を振り分ける。
         if (err.status !== 401) {
           const api = this.opts.component.api;
-          return store.action(actions.MODALS_ADD, {
+          return store.action('modals.add', {
             title: '通信失敗',
             message: `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。該当するAPIがOAS上に正しく定義されているかご確認下さい。`,
             error: err
@@ -144,7 +142,7 @@ export default function() {
         }
         return Promise
           .resolve()
-          .then(() => store.action(actions.MODALS_ADD, 'viron-message', {
+          .then(() => store.action('modals.add', 'viron-message', {
             title: '認証切れ',
             message: '認証が切れました。再度ログインして下さい。'
           }))
@@ -257,22 +255,22 @@ export default function() {
     this.currentSearchRequestParameters = ObjectAssign(this.currentSearchRequestParameters, this.opts.entirecurrentsearchrequestparameters || {});
   }).on('unmount', () => {
     inactivateAutoRefresh();
-    store.action(actions.COMPONENTS_REMOVE_ONE, this._riot_id);
+    store.action('components.remove', this._riot_id);
   });
 
-  this.listen(states.COMPONENTS_ONE(this._riot_id), () => {
+  this.listen(getComponentStateName(this._riot_id), () => {
     this.isPending = false;
-    this.response = store.getter(getters.COMPONENTS_ONE_RESPONSE, this._riot_id);
-    this.schemaObject = store.getter(getters.COMPONENTS_ONE_SCHEMA_OBJECT, this._riot_id);
-    this.parameterObjects = store.getter(getters.COMPONENTS_ONE_PARAMETER_OBJECTS, this._riot_id);
-    this.selfActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_SELF, this._riot_id);
-    this.rowActions = store.getter(getters.COMPONENTS_ONE_ACTIONS_ROW, this._riot_id);
-    this.hasPagination = store.getter(getters.COMPONENTS_ONE_HAS_PAGINATION, this._riot_id);
-    this.autoRefreshSec = store.getter(getters.COMPONENTS_ONE_AUTO_REFRESH_SEC, this._riot_id);
-    this.pagination = store.getter(getters.COMPONENTS_ONE_PAGINATION, this._riot_id);
-    this.primaryKey = store.getter(getters.COMPONENTS_ONE_PRIMARY_KEY, this._riot_id);
-    this.tableLabels = store.getter(getters.COMPONENTS_ONE_TABLE_LABELS, this._riot_id);
-    this.tableColumns = store.getter(getters.COMPONENTS_ONE_TABLE_COLUMNS, this._riot_id);
+    this.response = store.getter('components.response', this._riot_id);
+    this.schemaObject = store.getter('components.schemaObject', this._riot_id);
+    this.parameterObjects = store.getter('components.parameterObjects', this._riot_id);
+    this.selfActions = store.getter('components.selfActions', this._riot_id);
+    this.rowActions = store.getter('components.rowActions', this._riot_id);
+    this.hasPagination = store.getter('components.hasPagination', this._riot_id);
+    this.autoRefreshSec = store.getter('components.autoRefreshSec', this._riot_id);
+    this.pagination = store.getter('components.pagination', this._riot_id);
+    this.primaryKey = store.getter('components.primaryKey', this._riot_id);
+    this.tableLabels = store.getter('components.tableLabels', this._riot_id);
+    this.tableColumns = store.getter('components.tableColumns', this._riot_id);
     this.validateResponse(this.response);
     activateAutoRefresh();
     this.update();
@@ -288,7 +286,7 @@ export default function() {
     }
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-component-filter', {
+      .then(() => store.action('modals.add', 'viron-component-filter', {
         tableColumns: this.tableColumns,
         selectedTableColumns: this.selectedTableColumns,
         onComplete: newSelectedTableColumns => {
@@ -296,7 +294,7 @@ export default function() {
           this.update();
         }
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };
@@ -316,7 +314,7 @@ export default function() {
 
     Promise
       .resolve()
-      .then(() => store.action(actions.MODALS_ADD, 'viron-component-search', {
+      .then(() => store.action('modals.add', 'viron-component-search', {
         parameterObjects: escapedParameterObjects,
         initialParameters: ObjectAssign({}, this.currentSearchRequestParameters),
         onComplete: parameters => {
@@ -324,7 +322,7 @@ export default function() {
           this.updater(parameters);
         }
       }))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

@@ -1,18 +1,15 @@
-import { constants as actions } from '../store/actions';
-import { constants as getters } from '../store/getters';
-import { constants as states } from '../store/states';
 import '../components/atoms/viron-message/index.tag';
 
 export default function() {
   const store = this.riotx.get();
 
   // ドロップ待受中か否か。
-  this.isWatching = store.getter(getters.APPLICATION_ISDRAGGING);
+  this.isWatching = store.getter('application.isDragging');
   // ドロップ可能な状態か否か。
   this.isDroppable = false;
 
-  this.listen(states.APPLICATION, () => {
-    this.isWatching = store.getter(getters.APPLICATION_ISDRAGGING);
+  this.listen('application', () => {
+    this.isWatching = store.getter('application.isDragging');
     this.update();
   });
 
@@ -43,8 +40,8 @@ export default function() {
     const newOrder = this.opts.order;
     Promise
       .resolve()
-      .then(() => store.action(actions.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .then(() => store.action('endpoints.changeOrder', endpointKey, newOrder))
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

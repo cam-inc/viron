@@ -1,32 +1,32 @@
 import constants from '../../core/constants';
-import { constants as states } from '../states';
+import exporter from './exporter';
 
-export default {
+export default exporter('layout', {
   /**
    * 表示サイズを更新します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {Number} width
    * @param {Number} height
    */
-  updateSize: (context, width, height) => {
-    context.state.layout.size.width = width;
-    context.state.layout.size.height = height;
+  updateSize: (state, width, height) => {
+    state.layout.size.width = width;
+    state.layout.size.height = height;
     if (width > constants.layoutThreshold) {
-      context.state.layout.type = constants.layoutTypeDesktop;
+      state.layout.type = constants.layoutTypeDesktop;
     } else {
-      context.state.layout.type = constants.layoutTypeMobile;
+      state.layout.type = constants.layoutTypeMobile;
     }
-    return [states.LAYOUT];
+    return ['layout'];
   },
 
   /**
    * componentリストのgridレイアウトのcolumn数を更新します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {Number} count
    * @return {Array}
    */
-  updateComponentsGridColumnCount: (context, count) => {
-    context.state.layout.componentsGridColumnCount = count;
-    return [states.LAYOUT];
+  updateComponentsGridColumnCount: (state, count) => {
+    state.layout.componentsGridColumnCount = count;
+    return ['layout'];
   }
-};
+});

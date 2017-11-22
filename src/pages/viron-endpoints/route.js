@@ -1,4 +1,3 @@
-import { constants as actions } from '../../store/actions';
 import '../../components/viron-error/index.tag';
 
 export default {
@@ -13,12 +12,12 @@ export default {
     return Promise
       .resolve()
       .then(() => Promise.all([
-        store.action(actions.CURRENT_REMOVE),
-        store.action(actions.PAGE_REMOVE),
-        store.action(actions.OAS_CLEAR),
-        store.action(actions.VIRON_REMOVE)
+        store.action('current.remove'),
+        store.action('page.remove'),
+        store.action('oas.clear'),
+        store.action('viron.remove')
       ]))
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-error', {
+      .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
   },
@@ -30,7 +29,7 @@ export default {
    * @return {Promise}
    */
   onEnter: (store, route) => {
-    return store.action(actions.LOCATION_UPDATE, {
+    return store.action('location.update', {
       name: 'endpoints',
       route
     });

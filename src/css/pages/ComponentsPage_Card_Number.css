@@ -1,0 +1,47 @@
+.ComponentsPage_Card_Number {
+  display: block;
+  padding: 24px;
+
+  &__head {
+    @apply --layout-center-center;
+    margin-bottom: 4px;
+  }
+
+  &__title {
+    @apply --text-truncate;
+    flex-grow: 1;
+    font-size: 1.6rem;
+  }
+
+  &__control {
+    @apply --layout-center-center;
+    /* TODO: debug用 */
+    & > div {
+      width: 10px;
+      height: 10px;
+      cursor: pointer;
+      background-color: var(--color-base-gray);
+    }
+  }
+
+  &__body {
+    @apply --layout-end-end;
+  }
+
+  &__value {
+    @apply --text-truncate;
+    flex-grow: 1;
+    font-size: 3.8rem;
+    font-weight: bold;
+    text-align: right;
+  }
+
+  &__unit {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  &__error {
+    color: var(--color-base-red);
+  }
+}

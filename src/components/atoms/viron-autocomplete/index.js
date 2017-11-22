@@ -2,7 +2,6 @@ import isNull from 'mout/lang/isNull';
 import isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
 import ObjectAssign from 'object-assign';
-import { constants as actions } from '../../../store/actions';
 import '../../atoms/viron-message/index.tag';
 
 export default function() {
@@ -21,14 +20,14 @@ export default function() {
 
     Promise
       .resolve()
-      .then(() => store.action(actions.OAS_GET_AUTOCOMPLETE, path, ObjectAssign({}, query, {
+      .then(() => store.action('oas.getAutocomplete', path, ObjectAssign({}, query, {
         [field]: val
       })))
       .then(options => {
         this.options = options;
         this.update();
       })
-      .catch(err => store.action(actions.MODALS_ADD, 'viron-message', {
+      .catch(err => store.action('modals.add', 'viron-message', {
         error: err
       }));
   };

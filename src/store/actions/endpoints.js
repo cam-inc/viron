@@ -1,8 +1,8 @@
 import shortid from 'shortid';
 import { fetch } from '../../core/fetch';
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('endpoints', {
   /**
    * 1件のエンドポイントを追加します。
    * @param {riotx.Context} context
@@ -35,7 +35,7 @@ export default {
           thumbnail: './img/viron_default.png',
           tags: []
         };
-        context.commit(mutations.ENDPOINTS_ADD, key, newEndpoint);
+        context.commit('endpoints.add', key, newEndpoint);
       });
   },
 
@@ -50,7 +50,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_UPDATE, key, newEndpoint);
+        context.commit('endpoints.update', key, newEndpoint);
       });
   },
 
@@ -64,7 +64,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_REMOVE, key);
+        context.commit('endpoints.remove', key);
       });
   },
 
@@ -77,7 +77,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_REMOVE_ALL);
+        context.commit('endpoints.removeAll');
       });
   },
 
@@ -91,7 +91,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_MERGE_ALL, endpoints);
+        context.commit('endpoints.mergeAll', endpoints);
       });
   },
 
@@ -107,7 +107,7 @@ export default {
       .resolve()
       .then(() => {
         const key = shortid.generate();
-        context.commit(mutations.ENDPOINTS_ADD, key, endpoint);
+        context.commit('endpoints.add', key, endpoint);
       });
   },
 
@@ -121,7 +121,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_TIDY_UP_ORDER);
+        context.commit('endpoints.tidyUpOrder');
       });
   },
 
@@ -136,7 +136,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_CHANGE_ORDER, endpointKey, newOrder);
+        context.commit('endpoints.changeOrder', endpointKey, newOrder);
       });
   }
-};
+});

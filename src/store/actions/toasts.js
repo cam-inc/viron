@@ -1,6 +1,6 @@
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('toasts', {
   /**
    * トーストを追加します。
    * @param {riotx.Context} context
@@ -11,7 +11,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.TOASTS_ADD, obj);
+        context.commit('toasts.add', obj);
       });
   },
 
@@ -25,8 +25,8 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.TOASTS_REMOVE, toastId);
+        context.commit('toasts.remove', toastId);
       });
   }
 
-};
+});

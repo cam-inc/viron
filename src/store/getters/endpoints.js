@@ -6,6 +6,7 @@ import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
 import contains from 'mout/string/contains';
 import ObjectAssign from 'object-assign';
+import exporter from './exporter';
 
 /**
  * 受け取ったエンドポイント群をorder昇順の配列として返します。
@@ -69,55 +70,61 @@ const filterBy = (endpoints, filterText) => {
   });
 };
 
-export default {
+export default exporter('endpoints', {
   /**
    * 全endpointを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  all: context => {
-    return context.state.endpoints;
+  all: state => {
+    const version = state.application.version;
+    return state.endpoints[version] || {};
   },
 
   /**
    * 全endpointをorder昇順の配列として返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  allByOrder: context => {
-    let endpoints = ObjectAssign(context.state.endpoints);
+  allByOrder: state => {
+    const version = state.application.version;
+    let endpoints = ObjectAssign({}, state.endpoints[version]);
     endpoints = sortByOrder(endpoints);
     return endpoints;
   },
 
   /**
    * 全endpointをorder昇順のfilter済み配列として返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Array}
    */
-  allByOrderFiltered: context => {
-    let endpoints = ObjectAssign(context.state.endpoints);
+  allByOrderFiltered: state => {
+    const version = state.application.version;
+    let endpoints = ObjectAssign({}, state.endpoints[version]);
     endpoints = sortByOrder(endpoints);
-    endpoints = filterBy(endpoints, context.state.application.endpointFilterText);
+    endpoints = filterBy(endpoints, state.application.endpointFilterText);
     return endpoints;
   },
 
   /**
    * endpoint数を返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Number}
    */
-  count: context => {
-    return size(context.state.endpoints);
+  count: state => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
+    return size(endpoints);
   },
 
   /**
    * 認証トークンを省いた全endpointを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {Object}
    */
-  allWithoutToken: context => {
-    const endpoints = ObjectAssign({}, context.state.endpoints);
+  allWithoutToken: state => {
+    const version = state.application.version;
+    const endpoints = ObjectAssign({}, state.endpoints[version]);
     // 認証用トークンはexport対象外とする。
     forOwn(endpoints, endpoint => {
       delete endpoint.token;
@@ -127,25 +134,28 @@ export default {
 
   /**
    * 指定keyにマッチするendpointを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} key
    * @return {Object}
    */
-  one: (context, key) => {
-    return context.state.endpoints[key];
+  one: (state, key) => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
+    return endpoints[key];
   },
 
   /**
    * 指定urlにマッチするendpointを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @param {String} url
    * @return {Object}
    */
-  oneByURL: (context, url) => {
-    const endpoints = context.state.endpoints;
+  oneByURL: (state, url) => {
+    const version = state.application.version;
+    const endpoints = state.endpoints[version] || {};
     return find(endpoints, endpoint => {
       return endpoint.url === url;
     });
   }
 
-};
+});

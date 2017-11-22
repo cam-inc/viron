@@ -1,10 +1,13 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('current', {
   /**
    * 選択中のendpointIDを返します。
-   * @param {riotx.Context} context
+   * @param {Object} state
    * @return {String|null}
    */
-  all: context => {
-    return context.state.current;
+  all: state => {
+    const version = state.application.version;
+    return state.current[version];
   }
-};
+});

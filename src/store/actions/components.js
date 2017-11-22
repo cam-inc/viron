@@ -1,38 +1,34 @@
 import contentDisposition from 'content-disposition';
 import download from 'downloadjs';
-import { constants as getters } from '../getters';
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('components', {
   /**
    * 一つのコンポーネント情報を取得します。
    * @param {riotx.Context} context
-   * @param {String} component_uid
-   * @param {Object} component
+   * @param {String} componentId
+   * @param {Object} componentDef
    * @param {Object} query
    * @return {Promise}
    */
-  get: (context, component_uid, component, query) => {
-    const method = component.api.method;
+  get: (context, componentId, componentDef, query = {}) => {
+    const method = componentDef.api.method;
     // GETメソッドのみサポート。
     if (method !== 'get') {
       return Promise.reject('only `get` method is allowed.');
     }
-    let path = component.api.path;
+    let path = componentDef.api.path;
     if (path.indexOf('/') !== 0) {
       path = '/' + path;
     }
-    const actions = context.getter(getters.OAS_OPERATION_OBJECTS_AS_ACTION, component);
-
-    const api = context.getter(getters.OAS_API_BY_PATH_AND_METHOD, path, method);
-    const currentEndpointKey = context.getter(getters.CURRENT);
-    const currentEndpoint = context.getter(getters.ENDPOINTS_ONE, currentEndpointKey);
+    const api = context.getter('oas.apiByPathAndMethod', path, method);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
     const token = currentEndpoint.token;
     const networkingId = `networking_${Date.now()}`;
-
     return Promise
       .resolve()
-      .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+      .then(() => context.commit('application.addNetworking', {
         id: networkingId
       }))
       .then(() => api(query, {
@@ -50,7 +46,64 @@ export default {
         // tokenを更新する。
         const token = res.headers['Authorization'];
         if (!!token) {
-          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
+        }
+        context.commit('components.updateOne', componentId, componentDef, res.obj);
+        context.commit('application.removeNetworking', networkingId);
+      })
+      .catch(err => {
+        context.commit('application.removeNetworking', networkingId);
+        throw err;
+      });
+  },
+
+  /**
+   * 一つのコンポーネント情報を取得します。
+   * @param {riotx.Context} context
+   * @param {String} component_uid
+   * @param {Object} component
+   * @param {Object} query
+   * @return {Promise}
+   */
+  _get: (context, component_uid, component, query) => {
+    const method = component.api.method;
+    // GETメソッドのみサポート。
+    if (method !== 'get') {
+      return Promise.reject('only `get` method is allowed.');
+    }
+    let path = component.api.path;
+    if (path.indexOf('/') !== 0) {
+      path = '/' + path;
+    }
+    const actions = context.getter('oas.operationObjectsAsAction', component);
+
+    const api = context.getter('oas.apiByPathAndMethod', path, method);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
+    const token = currentEndpoint.token;
+    const networkingId = `networking_${Date.now()}`;
+
+    return Promise
+      .resolve()
+      .then(() => context.commit('application.addNetworking', {
+        id: networkingId
+      }))
+      .then(() => api(query, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
         // `component.pagination`からページングをサポートしているか判断する。
         // サポートしていれば手動でページング情報を付加する。
@@ -72,11 +125,11 @@ export default {
             hasPagination = true;
           }
         }
-        context.commit(mutations.COMPONENTS_UPDATE_ONE, {
+        context.commit('components.updateOne', {
           component_uid,
           response: res.obj,// APIレスポンス内容そのまま。
-          schemaObject: context.getter(getters.OAS_SCHEMA_OBJECT, path, method),// OASのschema。
-          parameterObjects: context.getter(getters.OAS_PARAMETER_OBJECTS, path, method),// OASのparameterObject群。
+          schemaObject: context.getter('oas.schemaObject', path, method),// OASのschema。
+          parameterObjects: context.getter('oas.parameterObjects', path, method),// OASのparameterObject群。
           actions,// 関連API群。
           hasPagination,
           pagination,// ページング関連。
@@ -84,10 +137,10 @@ export default {
           primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
           table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
         });
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
       })
       .catch(err => {
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
         throw err;
       });
   },
@@ -100,14 +153,14 @@ export default {
    * @return {Promise}
    */
   operate: (context, operationObject, params) => {
-    const api = context.getter(getters.OAS_API, operationObject.operationId);
-    const token = context.getter(getters.ENDPOINTS_ONE, context.getter(getters.CURRENT)).token;
-    const currentEndpointKey = context.getter(getters.CURRENT);
+    const api = context.getter('oas.api', operationObject.operationId);
+    const token = context.getter('endpoints.one', context.getter('current.all')).token;
+    const currentEndpointKey = context.getter('current.all');
     const networkingId = `networking_${Date.now()}`;
 
     return Promise
       .resolve()
-      .then(() => context.commit(mutations.APPLICATION_NETWORKINGS_ADD, {
+      .then(() => context.commit('application.addNetworking', {
         id: networkingId
       }))
       .then(() => api(params, {
@@ -122,11 +175,11 @@ export default {
         return res;
       })
       .then(res => {
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
         // tokenを更新する。
         const token = res.headers['Authorization'];
         if (!!token) {
-          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, currentEndpointKey, token);
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
         // ダウンロード指定されていればダウンロードする。
         const contentDispositionHeader = res.headers['content-disposition'];
@@ -141,7 +194,7 @@ export default {
         return res;
       })
       .catch(err => {
-        context.commit(mutations.APPLICATION_NETWORKINGS_REMOVE, networkingId);
+        context.commit('application.removeNetworking', networkingId);
         throw err;
       });
   },
@@ -156,7 +209,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.COMPONENTS_REMOVE_ONE, component_uid);
+        context.commit('components.removeOne', component_uid);
       });
   },
 
@@ -169,7 +222,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.COMPONENTS_REMOVE_ALL);
+        context.commit('components.removeAll');
       });
   }
-};
+});

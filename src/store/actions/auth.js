@@ -1,8 +1,7 @@
 import { fetch } from '../../core/fetch';
-import { constants as getters } from '../getters';
-import { constants as mutations } from '../mutations';
+import exporter from './exporter';
 
-export default {
+export default exporter('auth', {
   /**
    * 指定されたエンドポイントのtokenを更新します。
    * @param {riotx.Context} context
@@ -14,7 +13,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        context.commit('endpoints.updateToken', endpointKey, token);
       });
   },
 
@@ -28,7 +27,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
+        context.commit('endpoints.updateToken', endpointKey, null);
       });
   },
 
@@ -39,7 +38,7 @@ export default {
    * @return {Promise}
    */
   validate: (context, endpointKey) => {
-    const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
+    const endpoint = context.getter('endpoints.one', endpointKey);
     return Promise
       .resolve()
       .then(() => fetch(context, endpoint.url, {
@@ -50,7 +49,7 @@ export default {
       .then(response => {
         const token = response.headers.get('Authorization');
         if (!!token) {
-          context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+          context.commit('endpoints.updateToken', endpointKey, token);
         }
         return true;
       })
@@ -58,7 +57,7 @@ export default {
         if (err.status !== 401) {
           throw err;
         }
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, null);
+        context.commit('endpoints.updateToken', endpointKey, null);
         return false;
       });
   },
@@ -70,7 +69,7 @@ export default {
    * @return {Promise}
    */
   getTypes: (context, endpointKey) => {
-    const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
+    const endpoint = context.getter('endpoints.one', endpointKey);
     const fetchUrl = `${new URL(endpoint.url).origin}/viron_authtype`;
 
     return Promise
@@ -90,7 +89,7 @@ export default {
     return Promise
       .resolve()
       .then(() => {
-        const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
+        const endpoint = context.getter('endpoints.one', endpointKey);
         const origin = new URL(endpoint.url).origin;
         const redirect_url = encodeURIComponent(`${location.href}oauthredirect/${endpointKey}`);
         const fetchUrl = `${origin}${authtype.url}?redirect_url=${redirect_url}`;
@@ -108,7 +107,7 @@ export default {
    * @return {Promise}
    */
   signinEmail: (context, endpointKey, authtype, email, password) => {
-    const endpoint = context.getter(getters.ENDPOINTS_ONE, endpointKey);
+    const endpoint = context.getter('endpoints.one', endpointKey);
     const fetchUrl = `${new URL(endpoint.url).origin}${authtype.url}`;
 
     return Promise
@@ -122,7 +121,7 @@ export default {
       }))
       .then(response => {
         const token = response.headers.get('Authorization');
-        context.commit(mutations.ENDPOINTS_UPDATE_TOKEN, endpointKey, token);
+        context.commit('endpoints.updateToken', endpointKey, token);
       });
   }
-};
+});

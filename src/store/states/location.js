@@ -1,4 +1,6 @@
-export default {
+import exporter from './exporter';
+
+export default exporter('location', {
   // 表示中のページ名。
   name: '',
   // ルーティング情報。
@@ -7,4 +9,4 @@ export default {
     queries: {},
     hash: ''
   }
-};
+});
