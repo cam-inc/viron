@@ -9,7 +9,7 @@ export default function() {
   this.opts.val = this.opts.val || {};
 
   /**
-   * Formを表示するかチェックします。
+   * Form表示するかチェックします。
    * @param {Object} parameterObject
    * @return {Boolean}
    */
@@ -29,7 +29,7 @@ export default function() {
   };
 
   /**
-   * Schemaを表示するかチェックします。
+   * Schema表示するかチェックします。
    * @param {Object} parameterObject
    * @return {Boolean}
    */
@@ -40,6 +40,26 @@ export default function() {
     if (parameterObject.in === 'body') {
       return true;
     }
+    return false;
+  };
+
+  /**
+   * Items表示するかチェックします。
+   * @param {Object} parameterObject
+   * @return {Boolean}
+   */
+  this.isItemsMode = parameterObject => {
+    // `in`の値は"query", "header", "path", "formData", "body"のいずれか。
+    // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
+    if (contains(['query', 'header', 'path', 'formData'], parameterObject.in)) {
+      // `in`が`body`以外の場合、typeは必ず"string", "number", "integer", "boolean", "array", "fileのいずれかになる。
+      if (parameterObject.type === 'array') {
+        return true;
+      }
+      // typeがarray以外の場合。
+      return false;
+    }
+    // inがbodyの場合。
     return false;
   };
 

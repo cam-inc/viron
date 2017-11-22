@@ -1,3 +1,4 @@
+import append from 'mout/array/append';
 import contains from 'mout/array/contains';
 import deepClone from 'mout/lang/deepClone';
 import isArray from 'mout/lang/isArray';
@@ -40,10 +41,12 @@ export default function() {
   }
   // 入れ子構造か否か。
   this.isMulti = contains(['object', 'array'], this.type);
-  // Formを表示するか否か。
+  // Form表示するか否か。
   this.isFormMode = contains(['boolean', 'integer', 'number', 'null', 'string'], this.type);
-  // Schema群を表示するか否か。
+  // Schema群表示するか否か。
   this.isSchemaMode = (this.type === 'object');
+  // Items表示するか否か。
+  this.isItemsMode = (this.type === 'array');
 
   /**
    * 単一Propertyのvalueを返します。
@@ -79,6 +82,83 @@ export default function() {
   };
 
   /**
+   * ItemsObjectのtypeが`schema` `items` `form`がチェックします。
+   * @param {String} mode 'schema' 'items' or 'form'
+   * @return {Boolean}
+   */
+  this.isItemsType = mode => {
+    let ret = false;
+    const type = schemaObject.items.type;
+    switch (mode) {
+    case 'form':
+      ret = contains(['boolean', 'integer','number', 'null', 'string'], type);
+      break;
+    case 'schema':
+      ret = (type === 'object');
+      break;
+    case 'items':
+      ret = (type === 'array');
+      break;
+    default:
+      ret = false;
+      break;
+    }
+    return ret;
+  };
+
+  /**
+   * itemsの要素のSchemaObjectを返します。
+   * @return {Object}
+   */
+  this.getItemsObject = () => {
+    return schemaObject.items;
+  };
+
+  /**
+   * itemsの要素の名前を返します。
+   * @param {Number} idx
+   * @return {Object}
+   */
+  this.getItemName = idx => {
+    return `${this.title}[${idx}]`;
+  };
+
+  /**
+   * plusボタンがタップされた時の処理。
+   */
+  this.handlePlusButtonTap = () => {
+    // 要素を追加します。
+    let newVal = deepClone(this.opts.val);
+    // 未定義なら空配列を生成する。
+    if (isUndefined(newVal)) {
+      newVal = [];
+    }
+    const items = schemaObject.items;
+    // type値によって作成する要素を分ける。
+    // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object
+    // typeは"string", "number", "integer", "boolean", or "array"のいずれかと書いてあるが、"null"と"object"もプラスで想定する。
+    // 追加分は先頭に。
+    switch (items.type) {
+    case 'string':
+    case 'number':
+    case 'integer':
+    case 'boolean':
+    case 'null':
+      newVal = append([undefined], newVal);
+      break;
+    case 'object':
+      newVal = append([{}], newVal);
+      break;
+    case 'array':
+      newVal = append([[]], newVal);
+      break;
+    default:
+      break;
+    }
+    this.opts.onchange(this.opts.identifier, newVal);
+  };
+
+  /**
    * form: 入力値が変更された時の処理。
    * @param {String} key
    * @param {*} newValue
@@ -111,6 +191,21 @@ export default function() {
     if (!size(ret)) {
       ret = undefined;
     }
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * item: 入力値が変更された時の処理。
+   * typeがarrayの時のみヒットします。
+   * @param {Number} idx
+   * @param {*} newValue
+   */
+  this.handleItemChange = (idx, newValue) => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    const ret = deepClone(this.opts.val);
+    ret[idx] = newValue;
     this.opts.onchange(this.opts.identifier, ret);
   };
 

@@ -12,6 +12,18 @@
     font-size: 1.6rem;
   }
 
+  &__plus {
+    width: 16px;
+    height: 16px;
+    margin-left: 16px;
+    cursor: pointer;
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-blue);
+    }
+  }
+
   &__body {
     padding: 24px;
     background-color: var(--color-base-gray-tertiary);
