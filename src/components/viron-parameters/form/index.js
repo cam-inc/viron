@@ -1,5 +1,6 @@
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
+import isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
 
 const UI_TEXTINPUT = 'textinput';
@@ -24,8 +25,6 @@ export default function() {
   if (data.required) {
     this.title = `${this.title} *`;
   }
-  // 入力値。
-  this.val = null;
 
   // 入力に使用するUIコンポーネント名。
   // opts.dataの値から適切なUIコンポーネントを推測します。
@@ -116,6 +115,21 @@ export default function() {
     // 文字列 or undefinedに強制変換。
     let ret;
     if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Numberinput: 入力値が変更された時の処理。
+   * @param {Number|null} newValue
+   */
+  this.handleNumberinputChange = newValue => {
+    // 数値 or undefinedに強制変換。
+    let ret;
+    if (!isNumber(newValue)) {
       ret = undefined;
     } else {
       ret = newValue;

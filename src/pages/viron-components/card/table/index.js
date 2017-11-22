@@ -1,5 +1,10 @@
+import forEach from 'mout/array/forEach';
+import forOwn from 'mout/object/forOwn';
+import deepClone from 'mout/lang/deepClone';
 import isArray from 'mout/lang/isArray';
+import isNull from 'mout/lang/isNull';
 import isObject from 'mout/lang/isObject';
+import isUndefined from 'mout/lang/isUndefined';
 import '../../operation/index.tag';
 import '../../search/index.tag';
 import './operations/index.tag';
@@ -59,10 +64,12 @@ export default function() {
   /**
    * 入力フォームを開きます。
    * @param {Object} operationObject
+   * @param {Object} initialValue
    */
-  const openOperationDrawer = operationObject => {
+  const openOperationDrawer = (operationObject, initialVal) => {
     store.action('drawers.add', 'viron-components-page-operation', {
       operationObject,
+      initialVal,
       onSuccess: () => {
         getData();
       }
@@ -142,9 +149,34 @@ export default function() {
 
   this.handleRowSettingButtonTap = e => {
     e.stopPropagation();
+    const rowData = e.item.row;
     const rect = e.currentTarget.getBoundingClientRect();
     store.action('popovers.add', 'viron-components-page-table-operations', {
-      operations: this.rowOperations
+      operations: this.rowOperations,
+      onSelect: operationObject => {
+        const initialVal = {};
+        // ParameterObjectから初期値を推測します。
+        // TODO: 精度up可能か?
+        forEach(operationObject.parameters || [], parameterObject => {
+          const name = parameterObject.name;
+          const _in = parameterObject.in;
+          if (_in === 'body') {
+            initialVal[name] = {};
+            forOwn(parameterObject.schema.properties || {}, (val, key) => {
+              // undefinedとnullを省く。
+              if (!isUndefined(rowData[key]) && !isNull(rowData[key])) {
+                initialVal[name][key] = rowData[key];
+              }
+            });
+          } else {
+            // undefinedとnullを省く。
+            if (!isUndefined(rowData[name]) && !isNull(rowData[name])) {
+              initialVal[name] = rowData[name];
+            }
+          }
+        });
+        openOperationDrawer(operationObject, deepClone(initialVal));
+      }
     }, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,

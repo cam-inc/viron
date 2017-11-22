@@ -5,7 +5,7 @@ export default function() {
   const operationObject = this.opts.operationObject;
 
   // 入力値。
-  this.val = {};
+  this.val = this.opts.initialVal || {};
   // タイトル
   this.title = operationObject.summary || operationObject.operationId;
   // submitボタンのラベリング。
