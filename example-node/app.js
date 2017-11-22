@@ -1,9 +1,11 @@
 require('dotenv').config();
 
+const fs = require('fs');
 const http = require('http');
 const https = require('https');
 
 const app = require('express')();
+const yaml = require('js-yaml');
 const SwaggerExpress = require('swagger-express-mw');
 
 const shared = require('./shared');
@@ -15,10 +17,11 @@ context.init()
   .then(() => {
     const vironlib = context.getVironLib();
     const helperSwagger = vironlib.swagger.helper;
+    const swagger = yaml.safeLoad(fs.readFileSync(`${__dirname}/swagger/swagger.yaml`, 'utf8'));
     const config = {
       appRoot: __dirname,
       configDir: `${__dirname}/config`,
-      swaggerFile: `${__dirname}/swagger/swagger.yaml`,
+      swagger: swagger,
       swaggerSecurityHandlers: {
         /**
          * JWT middleware
@@ -33,21 +36,16 @@ context.init()
       },
     };
 
-    return new Promise((resolve, reject) => {
-      SwaggerExpress.create(config, (err, swaggerExpress) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(swaggerExpress);
-      });
-    })
-      .then(swaggerExpress => {
-      // swagger.jsonを動的に書き換える
-        return helperSwagger.autoGenerate(swaggerExpress, context.getStoreMain().models)
-          .then(() => {
-            return swaggerExpress;
-          })
-        ;
+    return helperSwagger.autoGenerate(swagger)
+      .then(() => {
+        return new Promise((resolve, reject) => {
+          SwaggerExpress.create(config, (err, swaggerExpress) => {
+            if (err) {
+              return reject(err);
+            }
+            return resolve(swaggerExpress);
+          });
+        });
       })
       .then(swaggerExpress => {
         // add middlewares here.
