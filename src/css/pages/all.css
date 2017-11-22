@@ -14,6 +14,8 @@
 @import "ComponentsPage_Card_Table_Operations";
 @import "ComponentsPage_Card_Table_Operations_Item";
 @import "ComponentsPage_Inlines";
+@import "ComponentsPage_Operation";
+@import "ComponentsPage_Search";
 @import "EndpointsPage";
 @import "EndpointsPage_Endpoint";
 @import "EndpointsPage_Endpoint_Menu";

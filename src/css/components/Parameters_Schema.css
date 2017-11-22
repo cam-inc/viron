@@ -1,0 +1,25 @@
+.Parameters_Schema {
+  display: inline-block;
+
+  &__head {
+    @apply --layout-center-start;
+    padding: 18px;
+    margin-bottom: 8px;
+    border-left: 8px solid var(--color-base-blue);
+  }
+
+  &__title {
+    font-size: 1.6rem;
+  }
+
+  &__body {
+    padding: 24px;
+    background-color: var(--color-base-gray-tertiary);
+    border: 1px solid var(--color-base-gray);
+    border-radius: 2px;
+  }
+
+  &--multi {
+    display: block;
+  }
+}

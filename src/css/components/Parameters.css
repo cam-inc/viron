@@ -1,0 +1,11 @@
+.Parameters {
+  display: block;
+
+  &__parameter {
+    margin-bottom: 32px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

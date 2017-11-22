@@ -1,0 +1,83 @@
+.Uploader {
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+
+  &__form {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__label {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    cursor: pointer;
+    background-color: var(--color-base-white);
+    border: 1px solid var(--color-base-gray);
+    border-radius: 2px;
+  }
+
+  &__empty {
+    @apply --layout-center-center;
+    width: 100%;
+    height: 100%;
+    font-size: 50px;
+    background-color: var(--color-base-gray);
+
+    & .Icon {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+  &__cover {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-base-black);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+
+  &__dragHandler {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  &__reset {
+    @apply --layout-center-center;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+
+    & .Icon {
+      width: 14px;
+      height: 14px;
+      color: var(--color-base-white);
+    }
+  }
+
+  &--dragWatching {
+    & .Uploader__label {
+      background-color: var(--color-base-blue);
+    }
+  }
+}

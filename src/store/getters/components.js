@@ -132,6 +132,16 @@ export default exporter('components', {
   },
 
   /**
+   * 指定componentIDに対する要素の検索用ParameterObject群を返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @return {Array}
+   */
+  searchParameters: (state, componentId) => {
+    return state.components[componentId]['searchParameters'];
+  },
+
+  /**
    * 指定componentIDに対する要素のschemaObjectを返します。
    * @param {Object} state
    * @param {String} riotId

@@ -1,0 +1,12 @@
+.Parameters_Form {
+  display: block;
+
+  &__head {
+    @apply --layout-center-start;
+    margin-bottom: 8px;
+  }
+
+  &__title {
+    font-size: 1.2rem;
+  }
+}

@@ -1,0 +1,62 @@
+.ComponentsPage_Operation {
+  @apply --layout-column-center-stretch;
+  height: 100%;
+
+  &__head {
+    position: relative;
+    flex-shrink: 0;
+    padding: 76px 64px 18px;
+  }
+
+  &__title {
+    font-size: 2.8rem;
+    font-weight: bold;
+  }
+
+  &__cancel {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-blue);
+    }
+  }
+
+  &__body {
+    flex-grow: 1;
+    overflow-y: scroll;
+  }
+
+  &__tail {
+    flex-shrink: 0;
+  }
+
+  &__submit {
+    @apply --layout-center-center;
+    height: 64px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--color-base-white);
+    cursor: pointer;
+    background-color: var(--color-base-blue);
+
+    &:hover,
+    &.hold {
+      background-color: var(--color-base-blue-secondary);
+    }
+
+    &--emphasised {
+      background-color: var(--color-base-red);
+
+      &:hover,
+      &.hold {
+        background-color: var(--color-base-red-secondary);
+      }
+    }
+  }
+}

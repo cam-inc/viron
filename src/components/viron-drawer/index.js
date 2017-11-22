@@ -9,22 +9,30 @@ export default function() {
 
   const fadeIn = () => {
     setTimeout(() => {
-      this.root.classList.add('Drawer--visible');
+      this.isVisible = true;
+      this.update();
     }, 100);
   };
 
   const fadeOut = () => {
-    this.root.classList.remove('Drawer--visible');
+    this.isVisible = false;
+    this.update();
 
     setTimeout(() => {
       store.action('drawers.remove', this.opts.id);
     }, 1000);
   };
 
+  this.layoutType = store.getter('layout.type');
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.update();
+  });
+
   this.on('mount', () => {
     tag = riot.mount(this.refs.content, this.opts.tagname, ObjectAssign({
       isDrawer: true,
-      drawerCloser: this.fadeOut
+      drawerCloser: fadeOut
     }, this.opts.tagopts))[0];
     fadeIn();
     window.addEventListener('keydown', this.handleKeyDown);
@@ -34,17 +42,19 @@ export default function() {
     window.removeEventListener('keydown', this.handleKeyDown);
   });
 
-  this.handleTap = e => {
-    if (!e.target.classList.contains('Drawer')) {
-      return;
-    }
+  this.handleTap = () => {
     fadeOut();
+  };
+
+  this.handleFrameTap = e => {
+    // 内部イベントを外部に伝播させない。
+    e.stopPropagation();
   };
 
   this.handleKeyDown = e => {
     switch (e.keyCode) {
     case 27:// Esc
-      this.fadeOut();
+      fadeOut();
       break;
     default:
       break;

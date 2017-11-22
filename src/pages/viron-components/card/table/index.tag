@@ -6,7 +6,7 @@ viron-components-page-table.ComponentsPage_Card_Table
       .ComponentsPage_Card_Table__title { opts.def.name }
     .ComponentsPage_Card_Table__headAside
       .ComponentsPage_Card_Table__control
-        viron-icon-search(onTap="{ handleSearchButtonTap }")
+        viron-icon-search(if="{ searchParameters.length }" onTap="{ handleSearchButtonTap }")
         viron-icon-filter(onTap="{ handleFilterButtonTap }")
         viron-icon-reload(onTap="{ handleReloadButtonTap }")
         viron-icon-setting(if="{ tableOperations.length }" ref="settingIcon" onTap="{ handleSettingButtonTap }")

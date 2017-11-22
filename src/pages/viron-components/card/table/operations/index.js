@@ -1,5 +1,6 @@
 export default function() {
-  this.closer = () => {
+  this.handleItemSelect = operationObject => {
     this.close();
+    this.opts.onSelect(operationObject);
   };
 }

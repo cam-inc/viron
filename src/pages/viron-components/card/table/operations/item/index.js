@@ -1,5 +1,5 @@
 export default function() {
   this.handleTap = () => {
-    this.opts.closer();
+    this.opts.onselect(this.opts.operation);
   };
 }

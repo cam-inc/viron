@@ -1,3 +1,5 @@
+import filter from 'mout/array/filter';
+import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
 import ObjectAssign from 'object-assign';
@@ -17,11 +19,25 @@ export default exporter('components', {
       def: componentDef,
       response
     };
+    const method = componentDef.api.method;
+    const path = componentDef.api.path;
+    const queries = componentDef.query;
+    // 検索用パラメータ群。
+    const parameters = state.oas.client.spec.paths[path][method].parameters || [];
+    state.components[componentId]['searchParameters'] = filter(parameters, parameter => {
+      if (parameter.in !== 'query') {
+        return false;
+      }
+      if (!find(queries, query => {
+        return (query.key === parameter.name);
+      })) {
+        return false;
+      }
+      return true;
+    });
     // styleがテーブルの場合。
     if (componentDef.style === 'table') {
       // テーブルのカラム情報を付与します。
-      const method = componentDef.api.method;
-      const path = componentDef.api.path;
       const properties = state.oas.client.spec.paths[path][method].responses[200].schema.items.properties;
       const columns = [];
       forOwn(properties, (property, key) => {

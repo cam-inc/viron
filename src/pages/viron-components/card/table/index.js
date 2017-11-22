@@ -1,5 +1,7 @@
 import isArray from 'mout/lang/isArray';
 import isObject from 'mout/lang/isObject';
+import '../../operation/index.tag';
+import '../../search/index.tag';
 import './operations/index.tag';
 
 export default function() {
@@ -54,6 +56,19 @@ export default function() {
     return null;
   };
 
+  /**
+   * 入力フォームを開きます。
+   * @param {Object} operationObject
+   */
+  const openOperationDrawer = operationObject => {
+    store.action('drawers.add', 'viron-components-page-operation', {
+      operationObject,
+      onSuccess: () => {
+        getData();
+      }
+    });
+  };
+
   // 通信レスポンス内容。
   this.data = null;
   // テーブルカラム定義。
@@ -64,6 +79,8 @@ export default function() {
   this.rowOperations = [];
   // 行追加operation。
   this.postOperation = null;
+  // 検索用パラメータ群。
+  this.searchParameters = [];
   // 通信中か否か。
   this.isLoading = true;
   // エラーメッセージ。
@@ -75,6 +92,7 @@ export default function() {
     this.tableOperations = store.getter('components.operations', this.opts.id, 'table');
     this.rowOperations = store.getter('components.operations', this.opts.id, 'row');
     this.postOperation = store.getter('components.postOperation', this.opts.id, 'table');
+    this.searchParameters = store.getter('components.searchParameters', this.opts.id);
     this.error = validate(this.data);
     this.update();
   });
@@ -86,11 +104,13 @@ export default function() {
   });
 
   this.handlePostButtonTap = () => {
-    // TODO
+    openOperationDrawer(this.postOperation);
   };
 
   this.handleSearchButtonTap = () => {
-    // TODO
+    store.action('modals.add', 'viron-components-page-search', {
+      parameterObjects: this.searchParameters
+    });
   };
 
   this.handleFilterButtonTap = () => {
@@ -104,7 +124,10 @@ export default function() {
   this.handleSettingButtonTap = () => {
     const rect = this.refs.settingIcon.root.getBoundingClientRect();
     store.action('popovers.add', 'viron-components-page-table-operations', {
-      operations: this.tableOperations
+      operations: this.tableOperations,
+      onSelect: operationObject => {
+        openOperationDrawer(operationObject);
+      }
     }, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,

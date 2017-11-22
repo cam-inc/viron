@@ -9,7 +9,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    width: calc(100% - 88px);
+    width: calc(100% - var(--component-application-menu-width));
     height: 100%;
     overflow-y: scroll;
     background-color: var(--color-base-white);
@@ -21,11 +21,17 @@
 
   &--visible {
     pointer-events: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
 
     & .Drawer__frame {
       opacity: 1;
       transform: translateX(0);
     }
-  }/* need for FF */
+  }
+
+  &--mobile {
+    & .Drawer__frame {
+      width: 100%;
+    }
+  }
 }
