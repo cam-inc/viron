@@ -16,14 +16,18 @@ viron-parameters-form.Parameters_Form
       viron-uploader(accept="*" onChange="{ handleUploaderChange }")
     virtual(if="{ uiType === 'html' }")
       viron-html(val="{ opts.val }" onChange="{ handleHtmlChange }")
+    virtual(if="{ uiType === 'pug' }")
+      viron-pug(val="{ opts.val }" onChange="{ handlePugChange }")
     virtual(if="{ uiType === 'autocomplete' }")
       viron-autocomplete(val="{ opts.val }" config="{ autocompleteConfig }" onChange="{ handleAutocompleteChange }")
 
   script.
+    // TODO: 全てのフォーム動作確認。
     import '../../../components/viron-autocomplete/index.tag';
     import '../../../components/viron-checkbox/index.tag';
     import '../../../components/viron-html/index.tag';
     import '../../../components/viron-numberinput/index.tag';
+    import '../../../components/viron-pug/index.tag';
     import '../../../components/viron-select/index.tag';
     import '../../../components/viron-textarea/index.tag';
     import '../../../components/viron-textinput/index.tag';

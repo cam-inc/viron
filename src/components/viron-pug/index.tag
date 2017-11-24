@@ -1,0 +1,15 @@
+viron-pug.Pug
+  .Pug__tabs
+    .Pug__tab(class="{ 'Pug__tab--selected': isEditorMode }" onTap="{ handleEditorTabTap }") エディタ
+    .Pug__tab(class="{ 'Pug__tab--selected': isPreviewMode }" onTap="{ handlePreviewTabTap }") プレビュー
+  .Pug__body
+    .Pug__editor(if="{ isEditorMode }")
+      viron-textarea(val="{ opts.val }" onChange="{ handleEditorChange }")
+    .Pug__preview(if="{ isPreviewMode }")
+      viron-prettyhtml(data="{ opts.val }")
+
+  script.
+    import '../../components/viron-prettyhtml/index.tag';
+    import '../../components/viron-textarea/index.tag';
+    import script from './index';
+    this.external(script);
