@@ -186,6 +186,15 @@ const show = (req, res) => {
               ], ['id', 'job', 'name']),
             ],
           },
+          {
+            id: 'formdata',
+            name: 'フォームデータ',
+            components: [
+              genTableComponent('string', 'get', '/formdata/string', null, null, ['?']),
+              genTableComponent('number', 'get', '/formdata/number', null, null, ['?']),
+              genTableComponent('boolean', 'get', '/formdata/boolean', null, null, ['?']),
+            ],
+          },
         ],
         [constant.GROUP_BLOG]: [
           {
