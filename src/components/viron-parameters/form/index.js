@@ -140,6 +140,14 @@ export default function() {
   };
 
   /**
+   * Checkbox: 入力値が変更された時の処理。
+   * @param {Boolean} isChecked
+   */
+  this.handleCheckboxChange = isChecked => {
+    change(isChecked);
+  };
+
+  /**
    * Select: 入力値が変更された時の処理。
    * @param {Array} newOptions
    */

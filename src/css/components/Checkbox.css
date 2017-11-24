@@ -1,0 +1,45 @@
+.Checkbox {
+  display: block;
+  cursor: pointer;
+
+  &__content {
+    @apply --layout-center-start;
+  }
+
+  &__mark {
+    @apply --layout-center-center;
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-base-white);
+    border: 1px solid var(--color-base-black);
+    border-radius: 2px;
+    transition-duration: 100ms;
+    transition-property: background-color;
+
+    & .Icon {
+      width: 12px;
+      height: 12px;
+      color: var(--color-base-white);
+      opacity: 0;
+      transition-duration: 100ms;
+      transition-property: opacity, transform;
+      transform: scale(0);
+    }
+  }
+
+  &__label {
+    margin-left: 8px;
+    font-size: 1.4rem;
+  }
+
+  &--checked {
+    & .Checkbox__mark {
+      background-color: var(--color-base-black);
+
+      & .Icon {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+}
