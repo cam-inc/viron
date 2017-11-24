@@ -5,6 +5,7 @@ const http = require('http');
 const https = require('https');
 
 const app = require('express')();
+const multer = require('multer')();
 const yaml = require('js-yaml');
 const SwaggerExpress = require('swagger-express-mw');
 
@@ -63,6 +64,8 @@ context.init()
           }
           next();
         });
+
+        app.use(multer.fields([]));
 
         // add routing
         swaggerExpress.register(app);
