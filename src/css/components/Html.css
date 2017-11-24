@@ -1,0 +1,29 @@
+.Html {
+  display: block;
+
+  &__tabs {
+    @apply --layout-center-start;
+  }
+
+  &__tab {
+    cursor: pointer;
+    margin-right: 8px;
+
+    &:hover,
+    &.hold,
+    &--selected {
+      color: var(--color-base-blue);
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &__preview {
+    background-color: var(--color-base-white);
+    padding: 14px 18px;
+    border: 1px solid var(--color-base-gray);
+    border-radius: 2px;
+  }
+}

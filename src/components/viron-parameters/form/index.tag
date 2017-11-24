@@ -14,12 +14,15 @@ viron-parameters-form.Parameters_Form
       viron-select(options="{ getSelectOptions() }" onChange="{ handleSelectChange }")
     virtual(if="{ uiType === 'uploader' }")
       viron-uploader(accept="*" onChange="{ handleUploaderChange }")
+    virtual(if="{ uiType === 'html' }")
+      viron-html(val="{ opts.val }" onChange="{ handleHtmlChange }")
     virtual(if="{ uiType === 'autocomplete' }")
       viron-autocomplete(val="{ opts.val }" config="{ autocompleteConfig }" onChange="{ handleAutocompleteChange }")
 
   script.
     import '../../../components/viron-autocomplete/index.tag';
     import '../../../components/viron-checkbox/index.tag';
+    import '../../../components/viron-html/index.tag';
     import '../../../components/viron-numberinput/index.tag';
     import '../../../components/viron-select/index.tag';
     import '../../../components/viron-textarea/index.tag';

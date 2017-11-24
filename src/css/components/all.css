@@ -19,12 +19,14 @@
 @import "Drawer";
 @import "Error";
 @import "HorizontalRule";
+@import "Html";
 @import "Modal";
 @import "Numberinput";
 @import "Parameters";
 @import "Parameters_Form";
 @import "Parameters_Schema";
 @import "Popover";
+@import "Prettyhtml";
 @import "Prettyprint";
 @import "Qrcode";
 @import "Select";

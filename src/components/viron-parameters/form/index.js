@@ -50,7 +50,9 @@ export default function() {
         //return UI_DATEPICKER;
         return UI_TEXTINPUT;
       case 'multiline':
-        return UI_TEXTAREA;
+        // TODO: debug
+        return UI_HTML;
+        //return UI_TEXTAREA;
       case 'wyswyg':
         return UI_WYSWYG;
       case 'pug':
@@ -129,6 +131,21 @@ export default function() {
    * @param {String|null} newValue
    */
   this.handleTextareaChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Html: 入力値が変更された時の処理。
+   * @param {String|null} newHtml
+   */
+  this.handleHtmlChange = newValue => {
     // 文字列 or undefinedに強制変換。
     let ret;
     if (!newValue) {
