@@ -1,4 +1,3 @@
-import deepClone from 'mout/lang/deepClone';
 import isUndefined from 'mout/lang/isUndefined';
 import forOwn from 'mout/object/forOwn';
 
@@ -12,7 +11,7 @@ export default function() {
     if (!this.opts.onchange) {
       return;
     }
-    const ret = deepClone(this.opts.val);
+    const ret = this.opts.val;
     ret[key] = newVal;
     // 値がundefinedのkeyを削除する。
     forOwn(ret, (val, key) => {

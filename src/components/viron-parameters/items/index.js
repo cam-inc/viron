@@ -32,12 +32,7 @@ export default function() {
     if (!this.opts.onchange) {
       return;
     }
-    let ret;
-    if (isUndefined(this.opts.val)) {
-      ret = [];
-    } else {
-      ret = deepClone(this.opts.val);
-    }
+    let ret = this.opts.val || [];
     let newItem = null;
     // type値によって作成する要素を分ける。
     // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object
@@ -63,7 +58,7 @@ export default function() {
       return;
     }
     const idx = e.item.idx;
-    let ret = deepClone(this.opts.val);
+    let ret = this.opts.val;
     ret.splice(idx, 1);
     this.opts.onchange(this.opts.identifier, ret);
   };
@@ -77,7 +72,7 @@ export default function() {
     if (!this.opts.onchange) {
       return;
     }
-    const ret = deepClone(this.opts.val);
+    const ret = this.opts.val;
     ret[idx] = newVal;
     this.opts.onchange(this.opts.identifier, ret);
   };

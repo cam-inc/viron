@@ -104,12 +104,7 @@ export default function() {
     if (!this.opts.onchange) {
       return;
     }
-    let ret;
-    if (isUndefined(this.opts.val)) {
-      ret = {};
-    } else {
-      ret = deepClone(this.opts.val);
-    }
+    let ret = this.opts.val || {};
     ret[key] = newVal;
     // 値がundefinedのkeyを削除する。
     forOwn(ret, (val, key) => {

@@ -1,3 +1,4 @@
+import deepClone from 'mout/lang/deepClone';
 import '../../../components/viron-error/index.tag';
 
 export default function() {
@@ -5,7 +6,8 @@ export default function() {
   const operationObject = this.opts.operationObject;
 
   // 入力値。
-  this.val = this.opts.initialVal || {};
+  // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
+  this.val = deepClone(this.opts.initialVal || {});
   // タイトル
   this.title = operationObject.summary || operationObject.operationId;
   // submitボタンのラベリング。
