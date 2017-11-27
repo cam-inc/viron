@@ -8,10 +8,18 @@ html
     meta(http-equiv="Cache-Control" content="no-cache")
     title Viron - Automated design-based management console
     link(rel="stylesheet" href=`./css/app.min.css?_=${version}`)
+    <!-- Froala WYSWYG Editor -->
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css")
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.7.2/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css")
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.7.2/css/froala_style.min.css" rel="stylesheet" type="text/css")
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.7.2/css/plugins/color.min.css" rel="stylesheet" type="text/css")
 
   body
     viron
     script(src=`./js/swagger-client.js?_=${version}`)
-    script(src="https://cdn.quilljs.com/1.3.1/quill.js")
+    <!-- Froala WYSWYG Editor -->
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.7.2/js/froala_editor.pkgd.min.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.7.2/js/plugins/colors.min.js")
     script(src="https://pugjs.org/js/pug.js")
     script(src=`./js/app.js?_=${version}`)

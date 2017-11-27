@@ -239,4 +239,20 @@ export default function() {
     }
     change(newText);
   };
+
+  /**
+   * Wyswyg: 入力値が変更された時の処理。
+   * @param {String|null} newValue
+   */
+  this.handleWyswygChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
 }

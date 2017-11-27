@@ -20,6 +20,10 @@ viron-parameters-form.Parameters_Form
       viron-pug(val="{ opts.val }" onChange="{ handlePugChange }")
     virtual(if="{ uiType === 'autocomplete' }")
       viron-autocomplete(val="{ opts.val }" config="{ autocompleteConfig }" onChange="{ handleAutocompleteChange }")
+    virtual(if="{ uiType === 'wyswyg' }")
+      viron-wyswyg(val="{ opts.val }" onChange="{ handleWyswygChange }")
+    virtual(if="{ uiType === 'null' }")
+      div TODO
 
   script.
     // TODO: 全てのフォーム動作確認。
@@ -32,5 +36,6 @@ viron-parameters-form.Parameters_Form
     import '../../../components/viron-textarea/index.tag';
     import '../../../components/viron-textinput/index.tag';
     import '../../../components/viron-uploader/index.tag';
+    import '../../../components/viron-wyswyg/index.tag';
     import script from './index';
     this.external(script);

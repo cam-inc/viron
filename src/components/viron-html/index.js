@@ -1,3 +1,5 @@
+// TODO: froalaのCodeMirrowプラグインが使えるかも。
+
 export default function() {
   /**
    * 入力値をhtmlに変換します。
