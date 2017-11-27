@@ -1,0 +1,27 @@
+.Parameters_Properties {
+  display: block;
+
+  &__head {
+    @apply --layout-center-start;
+    margin-bottom: 8px;
+  }
+
+  &__label {
+    color: var(--color-base-gray);
+  }
+
+  &__body {
+    padding: 34px 24px;
+    background-color: var(--color-base-gray-tertiary);
+    border: 1px solid var(--color-base-gray);
+    border-radius: 2px;
+
+    & .Parameters_Properties__item {
+      margin-bottom: 24px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

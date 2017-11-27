@@ -1,7 +1,7 @@
 .Parameters {
   display: block;
 
-  &__parameter {
+  & .Parameters_Parameter {
     margin-bottom: 32px;
 
     &:last-child {

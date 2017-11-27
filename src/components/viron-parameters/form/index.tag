@@ -1,4 +1,4 @@
-viron-parameters-form.Parameters_Form
+viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--midget': isMidget }")
   .Parameters_Form__head
     .Parameters_Form__title { title }
   .Parameters_Form__body

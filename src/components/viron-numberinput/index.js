@@ -57,13 +57,6 @@ export default function() {
     return value;
   };
 
-  this.on('mount', () => {
-    this.refs.input.value = this.normalizeValue(this.opts.val);
-    this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
-  }).on('updated', () => {
-    this.refs.input.value = this.normalizeValue(this.opts.val);
-  });
-
   this.handleTap = () => {
     this.refs.input.focus();
   };

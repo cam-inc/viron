@@ -24,7 +24,9 @@
 @import "Numberinput";
 @import "Parameters";
 @import "Parameters_Form";
-@import "Parameters_Schema";
+@import "Parameters_Items";
+@import "Parameters_Parameter";
+@import "Parameters_Properties";
 @import "Popover";
 @import "Prettyhtml";
 @import "Prettyprint";

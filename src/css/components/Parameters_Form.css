@@ -9,4 +9,8 @@
   &__title {
     font-size: 1.2rem;
   }
+
+  &--midget {
+    display: inline-block;
+  }
 }

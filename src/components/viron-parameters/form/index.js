@@ -18,7 +18,7 @@ const UI_AUTOCOMPLETE = 'autocomplete';
 
 export default function() {
   // ショートカット。
-  const data = this.opts.formdata;
+  const data = this.opts.formobject;
   // 入力フォームのタイトル。
   // 入力必須ならば米印を付ける。
   this.title = data.description || data.name;
@@ -74,6 +74,30 @@ export default function() {
       break;
     }
   })();
+
+  // 表示タイプ。display値に使用される。
+  this.isMidget = false;
+  switch (this.uiType) {
+  case UI_TEXTINPUT:
+  case UI_NUMBERINPUT:
+  case UI_CHECKBOX:
+  case UI_SELECT:
+  case UI_DATEPICKER:
+  case UI_UPLOADER:
+  case UI_NULL:
+  case UI_AUTOCOMPLETE:
+    this.isMidget = true;
+    break;
+  case UI_TEXTAREA:
+  case UI_HTML:
+  case UI_WYSWYG:
+  case UI_PUG:
+    this.isMidget = false;
+    break;
+  default:
+    this.isMidget = false;
+    break;
+  }
 
   /**
    * Selectコンポーネントの選択肢を返します。
