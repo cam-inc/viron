@@ -36,18 +36,11 @@ definitions:
     description: A Admin Role
     example:
       paths:
-      - allow: true
-        path: GET:/user
+        "GET:/user": true
       role_id: operator
     properties:
       paths:
-        description: target path
-        example:
-        - allow: true
-          path: GET:/user
-        items:
-          $ref: '#/definitions/adminrolepath'
-        type: array
+        $ref: '#/definitions/adminrolepath'
       role_id:
         description: role id
         example: operator
@@ -293,27 +286,19 @@ definitions:
   CreateAdminRolePayload:
     example:
       paths:
-      - allow: true
-        path: GET:/user
-      - allow: true
-        path: GET:/user
+      - "GET:/user": true
       role_id: operator
     properties:
       paths:
-        description: target path
-        example:
-        - allow: true
-          path: GET:/user
-        - allow: true
-          path: GET:/user
-        items:
-          $ref: '#/definitions/adminrolepath'
-        type: array
+        $ref: '#/definitions/adminrolepath'
       role_id:
         description: role id
         example: operator
         type: string
     type: object
+    required:
+    - role_id
+    - paths
 
   CreateAdminUserPayload:
     example:
@@ -547,17 +532,11 @@ definitions:
   UpdateAdminRolePayload:
     example:
       paths:
-      - allow: true
-        path: GET:/user
+      - "GET:/user": true
     properties:
       paths:
         description: target path
-        example:
-        - allow: true
-          path: GET:/user
-        items:
-          $ref: '#/definitions/adminrolepath'
-        type: array
+        $ref: '#/definitions/adminrolepath'
     type: object
 
   UpdateAdminUserPayload:
@@ -966,22 +945,10 @@ definitions:
 
   adminrolepath:
     example:
-      allow: true
-      path: GET:/user
+      "GET:/user": true
     properties:
-      allow:
-        description: allow the path
-        example: true
+      path: # AutoGenerate
         type: boolean
-      path:
-        description: path
-        enum:
-        - AutoGenerate # @see node-vironlib/swagger.js
-        example: GET:/user
-        type: string
-    required:
-    - path
-    - allow
     type: object
 
   api:
