@@ -65,7 +65,7 @@ context.init()
           next();
         });
 
-        app.use(multer.fields([]));
+        app.use(multer.fields([{name: 'payload'}]));
 
         // add routing
         swaggerExpress.register(app);
