@@ -1,7 +1,6 @@
 import append from 'mout/array/append';
 import contains from 'mout/array/contains';
 import deepClone from 'mout/lang/deepClone';
-import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
   const itemsObject = this.opts.itemsobject;
