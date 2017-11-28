@@ -12272,12 +12272,68 @@ var components = exporter('components', {
   /**
    * 一つのコンポーネント情報を取得します。
    * @param {riotx.Context} context
+   * @param {String} componentId
+   * @param {Object} componentDef
+   * @param {Object} query
+   * @return {Promise}
+   */
+  get: (context, componentId, componentDef, query) => {
+    if ( query === void 0 ) query = {};
+
+    const method = componentDef.api.method;
+    // GETメソッドのみサポート。
+    if (method !== 'get') {
+      return Promise.reject('only `get` method is allowed.');
+    }
+    let path = componentDef.api.path;
+    if (path.indexOf('/') !== 0) {
+      path = '/' + path;
+    }
+    const api = context.getter('oas.apiByPathAndMethod', path, method);
+    const currentEndpointKey = context.getter('current.all');
+    const currentEndpoint = context.getter('endpoints.one', currentEndpointKey);
+    const token = currentEndpoint.token;
+    const networkingId = `networking_${Date.now()}`;
+    return Promise
+      .resolve()
+      .then(() => context.commit('application.addNetworking', {
+        id: networkingId
+      }))
+      .then(() => api(query, {
+        requestInterceptor: req => {
+          req.headers['Authorization'] = token;
+        }
+      }))
+      .then(res => {
+        if (!res.ok) {
+          return Promise.reject(res);
+        }
+        return res;
+      })
+      .then(res => {
+        // tokenを更新する。
+        const token = res.headers['Authorization'];
+        if (!!token) {
+          context.commit('endpoints.updateToken', currentEndpointKey, token);
+        }
+        context.commit('components.updateOne', componentId, componentDef, res.obj);
+        context.commit('application.removeNetworking', networkingId);
+      })
+      .catch(err => {
+        context.commit('application.removeNetworking', networkingId);
+        throw err;
+      });
+  },
+
+  /**
+   * 一つのコンポーネント情報を取得します。
+   * @param {riotx.Context} context
    * @param {String} component_uid
    * @param {Object} component
    * @param {Object} query
    * @return {Promise}
    */
-  get: (context, component_uid, component, query) => {
+  _get: (context, component_uid, component, query) => {
     const method = component.api.method;
     // GETメソッドのみサポート。
     if (method !== 'get') {
@@ -13884,6 +13940,63 @@ var application$1 = exporter$1('application', {
     var filter_1$1 = filter$2;
 
 /**
+     * Returns the index of the first item that matches criteria
+     */
+    function findIndex$1(arr, iterator, thisObj){
+        iterator = makeIterator_$1(iterator, thisObj);
+        if (arr == null) {
+            return -1;
+        }
+
+        var i = -1, len = arr.length;
+        while (++i < len) {
+            if (iterator(arr[i], i, arr)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    var findIndex_1$1 = findIndex$1;
+
+/**
+     * Returns first item that matches criteria
+     */
+    function find$3(arr, iterator, thisObj){
+        var idx = findIndex_1$1(arr, iterator, thisObj);
+        return idx >= 0? arr[idx] : void(0);
+    }
+
+    var find_1$2 = find$3;
+
+/**
+     * Array.indexOf
+     */
+    function indexOf$1(arr, item, fromIndex) {
+        fromIndex = fromIndex || 0;
+        if (arr == null) {
+            return -1;
+        }
+
+        var len = arr.length,
+            i = fromIndex < 0 ? len + fromIndex : fromIndex;
+        while (i < len) {
+            // we iterate over sparse items since there is no way to make it
+            // work properly on IE 7-8. see #64
+            if (arr[i] === item) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    var indexOf_1$1 = indexOf$1;
+
+/**
      * Array map
      */
     function map$1(arr, callback, thisObj) {
@@ -14016,43 +14129,142 @@ var components$1 = exporter$1('components', {
   },
 
   /**
-   * 指定riotIDに対する要素を返します。
+   * 指定componentIDに対する要素を返します。
    * @param {Object} state
-   * @param {String} riotId
+   * @param {String} componentId
    * @return {Object}
    */
-  one: (state, riotId) => {
-    return state.components[riotId];
+  one: (state, componentId) => {
+    return state.components[componentId];
   },
 
   /**
-   * 指定riotIDに対する要素のAPIレスポンスを返します。
+   * 指定componentIDに対する要素のcomponent定義を返します。
    * @param {Object} state
-   * @param {String} riotId
+   * @param {String} componentId
+   * @return {Object}
+   */
+  def: (state, componentId) => {
+    return state.components[componentId].def;
+  },
+
+  /**
+   * 指定componentIDに対する要素のAPIレスポンスを返します。
+   * @param {Object} state
+   * @param {String} componentId
    * @return {*}
    */
-  response: (state, riotId) => {
-    return state.components[riotId].response;
+  response: (state, componentId) => {
+    return state.components[componentId].response;
   },
 
   /**
-   * 指定riotIDに対する要素のschemaObjectを返します。
+   * 指定componentIDに対する要素のテーブルcolumn情報を返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @return {Array}
+   */
+  columns: (state, componentId) => {
+    const component = state.components[componentId];
+    const columns = component.columns;
+    // `table_labels` = 優先度が高いカラムkey群。
+    const tableLabels = component.def.table_labels || [];
+    return sort$1(columns, (a, b) => {
+      let idxA = indexOf_1$1(tableLabels, a.key);
+      let idxB = indexOf_1$1(tableLabels, b.key);
+      if (idxA >= 0) {
+        idxA = tableLabels.length - idxA;
+      }
+      if (idxB >= 0) {
+        idxB = tableLabels.length - idxB;
+      }
+      return (idxB - idxA);
+    });
+  },
+
+  /**
+   * 指定componentIDに対する要素のOperationObject群を返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @param {String} category
+   * @return {Array}
+   */
+  operations: (state, componentId, category) => {
+    const component = state.components[componentId];
+    let operations;
+    switch (category) {
+    case 'table':
+      operations = component.tableOperations;
+      break;
+    case 'row':
+      operations = component.rowOperations;
+      break;
+    default:
+      operations = component.operations || [];
+      break;
+    }
+    return operations;
+  },
+
+  /**
+   * 指定componentIDに対する要素のpostメソッドOperationObjectを返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @param {String} category
+   * @return {Object|null}
+   */
+  postOperation: (state, componentId, category) => {
+    const component = state.components[componentId];
+    let operations;
+    switch (category) {
+    case 'table':
+      operations = component.tableOperations;
+      break;
+    case 'row':
+      operations = component.rowOperations;
+      break;
+    default:
+      operations = component.operations || [];
+      break;
+    }
+    const path = component.def.api.path;
+    const operationObject = find_1$2(operations, operation => {
+      return (operation.path === path && operation.method === 'post');
+    });
+    if (!operationObject) {
+      return null;
+    }
+    return operationObject;
+  },
+
+  /**
+   * 指定componentIDに対する要素の検索用ParameterObject群を返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @return {Array}
+   */
+  searchParameters: (state, componentId) => {
+    return state.components[componentId]['searchParameters'];
+  },
+
+  /**
+   * 指定componentIDに対する要素のschemaObjectを返します。
    * @param {Object} state
    * @param {String} riotId
    * @return {Object}
    */
-  schemaObject: (state, riotId) => {
-    return state.components[riotId].schemaObject;
+  _schemaObject: (state, componentId) => {
+    return state.components[componentId].schemaObject;
   },
 
   /**
-   * 指定riotIDに対する要素のparamterObject群を返します。
+   * 指定componentIDに対する要素のparamterObject群を返します。
    * @param {Object} state
    * @param {String} riotId
    * @return {Array}
    */
-  parameterObjects: (state, riotId) => {
-    return state.components[riotId].parameterObjects;
+  _parameterObjects: (state, componentId) => {
+    return state.components[componentId].parameterObjects;
   },
 
   /**
@@ -14060,7 +14272,7 @@ var components$1 = exporter$1('components', {
    * @param {Object} state
    * @return {Array}
    */
-  parameterObjectsEntirely: state => {
+  _parameterObjectsEntirely: state => {
     let entireParameterObjects = [];
     const weights = {};
     forOwn_1$2(state.components, component => {
@@ -14090,7 +14302,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  actions: (state, riotId) => {
+  _actions: (state, riotId) => {
     return map_1$1(state.components[riotId].actions, action => {
       return action.operationObject;
     });
@@ -14102,7 +14314,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  selfActions: (state, riotId) => {
+  _selfActions: (state, riotId) => {
     const actions = state.components[riotId].actions;
     const selfActions = filter_1$1(actions, action => {
       return (!action.appendTo || action.appendTo === 'self');
@@ -14118,7 +14330,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  rowActions: (state, riotId) => {
+  _rowActions: (state, riotId) => {
     const actions = state.components[riotId].actions;
     const selfActions = filter_1$1(actions, action => {
       return (action.appendTo === 'row');
@@ -14134,7 +14346,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {Boolean}
    */
-  hasPagination: (state, riotId) => {
+  _hasPagination: (state, riotId) => {
     return state.components[riotId].hasPagination;
   },
 
@@ -14144,7 +14356,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {Number}
    */
-  autoRefreshSec: (state, riotId) => {
+  _autoRefreshSec: (state, riotId) => {
     return state.components[riotId].autoRefreshSec;
   },
 
@@ -14154,7 +14366,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {Object}
    */
-  pagination: (state, riotId) => {
+  _pagination: (state, riotId) => {
     return state.components[riotId].pagination;
   },
 
@@ -14164,7 +14376,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  tableLabels: (state, riotId) => {
+  _tableLabels: (state, riotId) => {
     return state.components[riotId].table_labels || [];
   },
 
@@ -14174,7 +14386,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {Array}
    */
-  tableColumns: (state, riotId) => {
+  _tableColumns: (state, riotId) => {
     const response = state.components[riotId].response;
     if (!isArray_1$1(response) || !response.length) {
       return [];
@@ -14188,7 +14400,7 @@ var components$1 = exporter$1('components', {
    * @param {String} riotId
    * @return {String|null}
    */
-  primaryKey: (state, riotId) => {
+  _primaryKey: (state, riotId) => {
     return state.components[riotId].primaryKey || null;
   }
 });
@@ -14784,32 +14996,6 @@ var oas$1 = exporter$1('oas', {
 });
 
 /**
-     * Array.indexOf
-     */
-    function indexOf$1(arr, item, fromIndex) {
-        fromIndex = fromIndex || 0;
-        if (arr == null) {
-            return -1;
-        }
-
-        var len = arr.length,
-            i = fromIndex < 0 ? len + fromIndex : fromIndex;
-        while (i < len) {
-            // we iterate over sparse items since there is no way to make it
-            // work properly on IE 7-8. see #64
-            if (arr[i] === item) {
-                return i;
-            }
-
-            i++;
-        }
-
-        return -1;
-    }
-
-    var indexOf_1$1 = indexOf$1;
-
-/**
      * If array contains values.
      */
     function contains$3(arr, val) {
@@ -14915,7 +15101,7 @@ var page$1 = exporter$1('page', {
       return [];
     }
     return filter_1$1(page.components, component => {
-      return (component.style === 'table');
+      return contains_1$2(['table'], component.style);
     });
   },
 
@@ -15039,37 +15225,6 @@ var ua$1 = exporter$1('ua', {
     return null;
   }
 });
-
-/**
-     * Returns the index of the first item that matches criteria
-     */
-    function findIndex$1(arr, iterator, thisObj){
-        iterator = makeIterator_$1(iterator, thisObj);
-        if (arr == null) {
-            return -1;
-        }
-
-        var i = -1, len = arr.length;
-        while (++i < len) {
-            if (iterator(arr[i], i, arr)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    var findIndex_1$1 = findIndex$1;
-
-/**
-     * Returns first item that matches criteria
-     */
-    function find$3(arr, iterator, thisObj){
-        var idx = findIndex_1$1(arr, iterator, thisObj);
-        return idx >= 0? arr[idx] : void(0);
-    }
-
-    var find_1$2 = find$3;
 
 /**
      * Creates a new object with all the properties where the callback returns
@@ -15378,25 +15533,110 @@ var components$2 = exporter$2('components', {
   /**
    * 一件更新します。
    * @param {Object} state
-   * @param {Object} params
+   * @param {String} componentId
+   * @param {Object} componentDef
+   * @param {*} response
    * @return {Array}
    */
-  updateOne: (state, params) => {
-    const component_uid = params.component_uid;
-    // 存在しなければ新規作成。
-    state.components[component_uid] = params;
-    return ['components', component_uid];
+  updateOne: (state, componentId, componentDef, response) => {
+    state.components[componentId] = {
+      def: componentDef,
+      response
+    };
+    const method = componentDef.api.method;
+    const path = componentDef.api.path;
+    const queries = componentDef.query;
+    // 検索用パラメータ群。
+    const parameters = state.oas.client.spec.paths[path][method].parameters || [];
+    state.components[componentId]['searchParameters'] = filter_1$1(parameters, parameter => {
+      if (parameter.in !== 'query') {
+        return false;
+      }
+      if (!find_1$2(queries, query => {
+        return (query.key === parameter.name);
+      })) {
+        return false;
+      }
+      return true;
+    });
+    // styleがテーブルの場合。
+    if (componentDef.style === 'table') {
+      // テーブルのカラム情報を付与します。
+      const properties = state.oas.client.spec.paths[path][method].responses[200].schema.items.properties;
+      const columns = [];
+      forOwn_1$2(properties, (property, key) => {
+        columns.push(objectAssign({
+          key
+        }, property));
+      });
+      state.components[componentId]['columns'] = columns;
+      // テーブル/行に対するアクションを付与します。
+      const tableOperations = [];
+      const rowOperations = [];
+      // 同じpath & method違いのoperationObjectは関連有りとみなす。
+      // `get`はcomponent自身なのでスルーする。
+      forEach_1$2(['put', 'post', 'delete'], method => {
+        const operationObject = !!state.oas.client.spec.paths[path] && state.oas.client.spec.paths[path][method];
+        if (!operationObject) {
+          return;
+        }
+        tableOperations.push(objectAssign({
+          method,
+          path
+        }, operationObject));
+      });
+      // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
+      // テーブルの各rowに紐づくOperationObjectとみなす。
+      const primary = componentDef.primary;
+      if (!!primary) {
+        forEach_1$2(['get', 'put', 'post', 'delete'], method => {
+          const operationObject = !!state.oas.client.spec.paths[`${path}/{${primary}}`] && state.oas.client.spec.paths[`${path}/{${primary}}`][method];
+          if (!operationObject) {
+            return;
+          }
+          rowOperations.push(objectAssign({
+            method,
+            path: `${path}/{${primary}}`
+          }, operationObject));
+        });
+      }
+      // actionsに指定されたpath群のOperationObjectも関連有りとみなします。
+      // path内にprimaryKeyと同一名の変数があれば、それはテーブルrowに紐づくOperationObjectとみなします。
+      // primaryKeyと同一名の変数が無ければ、テーブルと紐づくOperationObjectとみなします。
+      forEach_1$2(componentDef.actions || [], action => {
+        const isRowRelated = (action.indexOf(`{${primary}}`) >= 0);
+        forEach_1$2(['get', 'put', 'post', 'delete'], method => {
+          const operationObject = !!state.oas.client.spec.paths[action] && state.oas.client.spec.paths[action][method];
+          if (!operationObject) {
+            return;
+          }
+          let target;
+          if (isRowRelated) {
+            target = rowOperations;
+          } else {
+            target = tableOperations;
+          }
+          target.push(objectAssign({
+            method,
+            path: action
+          }, operationObject));
+        });
+      });
+      state.components[componentId]['tableOperations'] = tableOperations;
+      state.components[componentId]['rowOperations'] = rowOperations;
+    }
+    return ['components', componentId];
   },
 
   /**
    * 一件削除します。
    * @param {Object} state
-   * @param {String} component_uid
+   * @param {String} componentId
    * @return {Array}
    */
-  removeOne: (state, component_uid) => {
-    delete state.components[component_uid];
-    return ['components', component_uid];
+  removeOne: (state, componentId) => {
+    delete state.components[componentId];
+    return ['components', componentId];
   },
 
   /**
@@ -16380,7 +16620,6 @@ var script$9 = function() {
       .then(() => store.action('components.get', this.opts.id, this.opts.def))
       .then(() => {
         this.isLoading = false;
-        this.error = null;
         this.update();
       })
       .catch(err => {
@@ -16389,7 +16628,7 @@ var script$9 = function() {
           this.error = '認証エラー。';
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()}·${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
         }
         this.update();
       });
@@ -16442,50 +16681,34 @@ riot$1.tag2('viron-components-page-number', '<div class="ComponentsPage_Card_Num
     this.external(script$9);
 });
 
-var script$10 = function() {};
-
-riot$1.tag2('viron-components-page-table', '', '', 'class="ComponentsPage_Card_Table"', function(opts) {
-    this.external(script$10);
+riot$1.tag2('viron-icon-filter', '<svg viewbox="-1832 11377 16.002 16"> <g transform="translate(-2104 11230)"> <rect width="12" height="1.5" rx="0.4" transform="translate(276 154.25)"></rect> <rect width="6" height="1.5" rx="0.4" transform="translate(282 148.75)"></rect> <rect width="12" height="1.5" rx="0.4" transform="translate(284 161.25) rotate(180)"></rect> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4426 19745.5)"></path> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4415 19751)"></path> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4420.501 19740)"></path> <rect width="7" height="1.5" rx="0.4" transform="translate(272 148.75)"></rect> </g> </svg>', '', 'class="icon Icon IconFilter {opts.class}"', function(opts) {
 });
 
-var script$11 = function() {
-  this.componentId = getComponentStateName(this._riot_id);
-};
-
-riot$1.tag2('viron-components-page-card', '<div class="ComponentsPage_Card__body"> <div data-is="viron-components-page-{opts.def.style}" id="{componentId}" def="{opts.def}"></div> </div>', '', 'class="ComponentsPage_Card"', function(opts) {
-    this.external(script$11);
+riot$1.tag2('viron-icon-plus', '<svg viewbox="-2612 10790 16 16"> <g transform="translate(-3874 10766)"> <rect width="16" height="3" rx="0.2" transform="translate(1262 30.5)"></rect> <rect width="16" height="3" rx="0.2" transform="translate(1271.5 24) rotate(90)"></rect> </g> </svg>', '', 'class="icon Icon IconPlus {opts.class}"', function(opts) {
 });
 
-var script$12 = function() {
-  const store = this.riotx.get();
-
-  this.components = store.getter('page.componentsInline');
-
-  this.listen('page', () => {
-    this.components = store.getter('page.componentsInline');
-    this.update();
-  });
-};
-
-riot$1.tag2('viron-components-page-inlines', '<div class="ComponentsPage_Inlines__list"> <viron-components-page-card each="{component in components}" def="{component}"></viron-components-page-card> </div>', '', 'class="ComponentsPage_Inlines"', function(opts) {
-    this.external(script$12);
+riot$1.tag2('viron-icon-reload', '<svg viewbox="-1791 11377 14.063 16"> <path d="M43.991,5.189a.469.469,0,0,0-.679-.126L41.791,6.2a.469.469,0,0,0-.123.613,4.082,4.082,0,0,1,.582,2.09,4.219,4.219,0,1,1-8.437,0,4.224,4.224,0,0,1,3.75-4.193v1.38a.469.469,0,0,0,.75.375l3.75-2.812a.469.469,0,0,0,0-.75L38.312.094a.469.469,0,0,0-.75.375V1.891a7.049,7.049,0,1,0,6.428,3.3Z" transform="translate(-1822 11377)"></path> </svg>', '', 'class="icon Icon IconReload {opts.class}"', function(opts) {
 });
 
-var script$13 = function() {
-};
-
-riot$1.tag2('viron-components-page', '<div class="ComponentsPage__graphs"></div> <viron-components-page-inlines></viron-components-page-inlines> <div class="ComponentsPage__tables"></div>', '', 'class="ComponentsPage"', function(opts) {
-    this.external(script$13);
+riot$1.tag2('viron-icon-search', '<svg viewbox="-3434 14059.999 15.999 16.003"> <path d="M3710.818-13811.056l-3.051-3.05a6.957,6.957,0,0,1-3.768,1.1,7.008,7.008,0,0,1-7-7,7.008,7.008,0,0,1,7-7,7.008,7.008,0,0,1,7,7,6.957,6.957,0,0,1-1.107,3.773l3.051,3.049a.205.205,0,0,1,0,.284l-1.839,1.839a.206.206,0,0,1-.142.058A.206.206,0,0,1,3710.818-13811.056ZM3700-13820a4,4,0,0,0,4,4,4,4,0,0,0,4-4,4,4,0,0,0-4-4A4,4,0,0,0,3700-13820Z" transform="translate(-7131 27887)"></path> </svg>', '', 'class="icon Icon IconSearch {opts.class}"', function(opts) {
 });
 
-var script$14 = function() {};
-
-riot$1.tag2('viron-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
-    this.external(script$14);
+riot$1.tag2('viron-icon-setting', '<svg viewbox="-3464 14060 16 16.001"> <path d="M15.953,7.112a.521.521,0,0,0-.514-.394,1.767,1.767,0,0,1-1.209-3.075.444.444,0,0,0,.049-.6A7.916,7.916,0,0,0,13.01,1.76a.445.445,0,0,0-.608.049,1.844,1.844,0,0,1-2,.448A1.777,1.777,0,0,1,9.327.521.444.444,0,0,0,8.934.053a7.987,7.987,0,0,0-1.8,0,.445.445,0,0,0-.4.458,1.78,1.78,0,0,1-1.1,1.707,1.849,1.849,0,0,1-1.98-.451.446.446,0,0,0-.6-.051,7.946,7.946,0,0,0-1.294,1.28.445.445,0,0,0,.048.608,1.773,1.773,0,0,1,.447,2A1.85,1.85,0,0,1,.518,6.677a.435.435,0,0,0-.462.393,8.014,8.014,0,0,0,0,1.819.529.529,0,0,0,.525.393,1.755,1.755,0,0,1,1.646,1.1,1.779,1.779,0,0,1-.447,1.978.445.445,0,0,0-.049.6,7.945,7.945,0,0,0,1.266,1.28.445.445,0,0,0,.609-.048A1.841,1.841,0,0,1,5.6,13.743,1.774,1.774,0,0,1,6.679,15.48a.444.444,0,0,0,.393.467,7.962,7.962,0,0,0,1.8,0,.445.445,0,0,0,.4-.458,1.778,1.778,0,0,1,1.095-1.706,1.846,1.846,0,0,1,1.981.451.447.447,0,0,0,.6.05,7.965,7.965,0,0,0,1.294-1.28.444.444,0,0,0-.048-.608,1.773,1.773,0,0,1-.448-2,1.791,1.791,0,0,1,1.637-1.085l.1,0a.445.445,0,0,0,.468-.392A8.007,8.007,0,0,0,15.953,7.112ZM8.015,10.686a2.669,2.669,0,1,1,2.668-2.669A2.671,2.671,0,0,1,8.015,10.686Z" transform="translate(-3464.003 14060)"></path> </svg>', '', 'class="icon Icon IconSetting {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-dots', '<svg viewbox="-3614 14066 16 4"> <g transform="translate(-3894 14025)"> <circle cx="2" cy="2" r="2" transform="translate(280 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(286 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(292 41)"></circle> </g> </svg>', '', 'class="icon Icon IconDots {opts.class}"', function(opts) {
-});
+/**
+     */
+    function isBoolean(val) {
+        return isKind_1$1(val, 'Boolean');
+    }
+    var isBoolean_1 = isBoolean;
+
+/**
+     */
+    function isNull(val){
+        return val === null;
+    }
+    var isNull_1 = isNull;
 
 /**
      */
@@ -16494,7 +16717,5923 @@ riot$1.tag2('viron-icon-dots', '<svg viewbox="-3614 14066 16 4"> <g transform="t
     }
     var isString_1 = isString;
 
-var script$17 = function() {
+var script$10 = function() {
+  // メディア系か否か。
+  this.isMedia = false;
+  // 画像系か否か。
+  this.isImage = false;
+  // typeに応じて表示を切り替えます。
+  this.value = (() => {
+    const data = this.opts.data;
+    if (isNull_1(data)) {
+      return 'null';
+    }
+    if (isBoolean_1(data)) {
+      return (data ? 'true' : 'false');
+    }
+    if (isNumber_1(data)) {
+      return String(data);
+    }
+    if (isArray_1$1(data) || isObject_1(data)) {
+      return 'TODO';
+    }
+    if (isString_1(data)) {
+      // 拡張子から最適な表示方法を推測します。
+      const split = data.split('.');
+      if (split.length < 2) {
+        // 拡張子がなければそのまま表示する。
+        return data;
+      }
+      const suffix = split[split.length - 1];
+      // 画像系チェック。
+      if (contains_1$2(['png', 'jpg', 'gif'], suffix)) {
+        this.isMedia = true;
+        this.isImage = true;
+        return data;
+      }
+      // TODO: 動画系もチェックすること。
+      // 推測できない場合はそのまま表示。
+      return data;
+    }
+    return data;
+  })();
+};
+
+riot$1.tag2('viron-components-page-table-cell', '<virtual if="{!isMedia}"> <div class="ComponentsPage_Card_Table_Cell__string">{value}</div> </virtual> <virtual if="{isMedia}"> <virtual if="{isImage}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url({value});"></div> </virtual> </virtual>', '', 'class="ComponentsPage_Card_Table_Cell"', function(opts) {
+    this.external(script$10);
+});
+
+/**
+     * Checks if the value is created by the `Object` constructor.
+     */
+    function isPlainObject(value) {
+        return (!!value && typeof value === 'object' &&
+            value.constructor === Object);
+    }
+
+    var isPlainObject_1 = isPlainObject;
+
+/**
+    * Combine properties from all the objects into first one.
+    * - This method affects target object in place, if you want to create a new Object pass an empty object as first param.
+    * @param {object} target    Target Object
+    * @param {...object} objects    Objects to be combined (0...n objects).
+    * @return {object} Target Object.
+    */
+    function mixIn(target, objects){
+        var i = 0,
+            n = arguments.length,
+            obj;
+        while(++i < n){
+            obj = arguments[i];
+            if (obj != null) {
+                forOwn_1$2(obj, copyProp, target);
+            }
+        }
+        return target;
+    }
+
+    function copyProp(val, key){
+        this[key] = val;
+    }
+
+    var mixIn_1 = mixIn;
+
+/**
+     * Clone native types.
+     */
+    function clone(val){
+        switch (kindOf_1$1(val)) {
+            case 'Object':
+                return cloneObject$1(val);
+            case 'Array':
+                return cloneArray$1(val);
+            case 'RegExp':
+                return cloneRegExp(val);
+            case 'Date':
+                return cloneDate(val);
+            default:
+                return val;
+        }
+    }
+
+    function cloneObject$1(source) {
+        if (isPlainObject_1(source)) {
+            return mixIn_1({}, source);
+        } else {
+            return source;
+        }
+    }
+
+    function cloneRegExp(r) {
+        var flags = '';
+        flags += r.multiline ? 'm' : '';
+        flags += r.global ? 'g' : '';
+        flags += r.ignoreCase ? 'i' : '';
+        return new RegExp(r.source, flags);
+    }
+
+    function cloneDate(date) {
+        return new Date(+date);
+    }
+
+    function cloneArray$1(arr) {
+        return arr.slice();
+    }
+
+    var clone_1 = clone;
+
+/**
+     * Recursively clone native types.
+     */
+    function deepClone(val, instanceClone) {
+        switch ( kindOf_1$1(val) ) {
+            case 'Object':
+                return cloneObject(val, instanceClone);
+            case 'Array':
+                return cloneArray(val, instanceClone);
+            default:
+                return clone_1(val);
+        }
+    }
+
+    function cloneObject(source, instanceClone) {
+        if (isPlainObject_1(source)) {
+            var out = {};
+            forOwn_1$2(source, function(val, key) {
+                this[key] = deepClone(val, instanceClone);
+            }, out);
+            return out;
+        } else if (instanceClone) {
+            return instanceClone(source);
+        } else {
+            return source;
+        }
+    }
+
+    function cloneArray(arr, instanceClone) {
+        var out = [],
+            i = -1,
+            n = arr.length;
+        while (++i < n) {
+            out[i] = deepClone(arr[i], instanceClone);
+        }
+        return out;
+    }
+
+    var deepClone_1 = deepClone;
+
+var UNDEF$1;
+
+    /**
+     */
+    function isUndef(val){
+        return val === UNDEF$1;
+    }
+    var isUndefined = isUndef;
+
+var script$12 = function() {
+  const store = this.riotx.get();
+
+  this.options = [];
+
+  const config = this.opts.config;
+  const path = config.path;
+  const field = config.field;
+  const query = config.query || {};
+  const fetchAutocompleteOptions = val => {
+    if (isNull_1(val) || isUndefined(val)) {
+      return;
+    }
+
+    Promise
+      .resolve()
+      .then(() => store.action('oas.getAutocomplete', path, objectAssign({}, query, {
+        [field]: val
+      })))
+      .then(options => {
+        this.options = options;
+        this.update();
+      })
+      .catch(err => store.action('modals.add', 'viron-error', {
+        error: err
+      }));
+  };
+
+  /**
+   * undefined等の値を考慮した最適な値を返します。
+   * @param {String|null} value
+   * @return {String|null}
+   */
+  this.normalizeValue = value => {
+    if (isNumber_1(value)) {
+      return String(value);
+    }
+    if (isUndefined(value)) {
+      return null;
+    }
+    return value;
+  };
+
+  this.on('mount', () => {
+    this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
+    fetchAutocompleteOptions(this.normalizeValue(this.refs.input.value));
+  });
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    this.opts.onchange && this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleInputInput = e => {
+    e.preventUpdate = true;
+    fetchAutocompleteOptions(this.normalizeValue(e.target.value));
+    this.opts.onchange && this.opts.onchange(this.normalizeValue(e.target.value), this.opts.id);
+  };
+
+  this.handleInputChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
+  };
+};
+
+riot$1.tag2('viron-autocomplete', '<div class="Autocomplete__label" if="{!!opts.label}">{opts.label}</div> <form onsubmit="{handleFormSubmit}"> <input class="Autocomplete__input" type="text" ref="input" list="{_riot_id}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form> <datalist id="{_riot_id}"> <option each="{opt in options}" riot-value="{opt.value}">{opt.name}</option> </datalist>', '', 'class="Autocomplete {\'Autocomplete--disabled\': opts.isdisabled, \'Autocomplete--error\': opts.haserror}"', function(opts) {
+    this.external(script$12);
+});
+
+riot$1.tag2('viron-icon-check', '<svg viewbox="-2582 10792 15.997 11.266"> <g transform="translate(-2935 10688)"> <g transform="translate(122.702 -49.51)"> <rect width="12.32" height="2.989" rx="0.2" transform="translate(235.47 162.221) rotate(-45)"></rect> <rect width="9.682" height="2.989" rx="0.2" transform="translate(232.412 155.815) rotate(45)"></rect> </g> </g> </svg>', '', 'class="icon Icon IconCheck {opts.class}"', function(opts) {
+});
+
+var script$13 = function() {
+  this.handleTap = () => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    this.opts.onchange(!this.opts.ischecked, this.opts.id);
+  };
+};
+
+riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon-check></viron-icon-check> </div> <div class="Checkbox__label" if="{!!opts.label}">{opts.label}</div> </div>', '', 'class="Checkbox {\'Checkbox--checked\': opts.ischecked, \'Checkbox--error\': opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$13);
+});
+
+var beautify = createCommonjsModule(function (module, exports) {
+/*jshint curly:false, eqeqeq:true, laxbreak:true, noempty:false */
+/* AUTO-GENERATED. DO NOT MODIFY. */
+/* see js/src/javascript/index.js */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+ JS Beautifier
+---------------
+
+
+  Written by Einar Lielmanis, <einar@jsbeautifier.org>
+      http://jsbeautifier.org/
+
+  Originally converted to javascript by Vital, <vital76@gmail.com>
+  "End braces on own line" added by Chris J. Shull, <chrisjshull@gmail.com>
+  Parsing improvements for brace-less statements by Liam Newman <bitwiseman@gmail.com>
+
+
+  Usage:
+    js_beautify(js_source_text);
+    js_beautify(js_source_text, options);
+
+  The options are:
+    indent_size (default 4)          - indentation size,
+    indent_char (default space)      - character to indent with,
+    preserve_newlines (default true) - whether existing line breaks should be preserved,
+    max_preserve_newlines (default unlimited) - maximum number of line breaks to be preserved in one chunk,
+
+    jslint_happy (default false) - if true, then jslint-stricter mode is enforced.
+
+            jslint_happy        !jslint_happy
+            ---------------------------------
+            function ()         function()
+
+            switch () {         switch() {
+            case 1:               case 1:
+              break;                break;
+            }                   }
+
+    space_after_anon_function (default false) - should the space before an anonymous function's parens be added, "function()" vs "function ()",
+          NOTE: This option is overriden by jslint_happy (i.e. if jslint_happy is true, space_after_anon_function is true by design)
+
+    brace_style (default "collapse") - "collapse" | "expand" | "end-expand" | "none" | any of the former + ",preserve-inline"
+            put braces on the same line as control statements (default), or put braces on own line (Allman / ANSI style), or just put end braces on own line, or attempt to keep them where they are.
+            preserve-inline will try to preserve inline blocks of curly braces
+
+    space_before_conditional (default true) - should the space before conditional statement be added, "if(true)" vs "if (true)",
+
+    unescape_strings (default false) - should printable characters in strings encoded in \xNN notation be unescaped, "example" vs "\x65\x78\x61\x6d\x70\x6c\x65"
+
+    wrap_line_length (default unlimited) - lines should wrap at next opportunity after this number of characters.
+          NOTE: This is not a hard limit. Lines will continue until a point where a newline would
+                be preserved if it were present.
+
+    end_with_newline (default false)  - end output with a newline
+
+
+    e.g
+
+    js_beautify(js_source_text, {
+      'indent_size': 1,
+      'indent_char': '\t'
+    });
+
+*/
+
+(function() {
+var legacy_beautify_js =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports) {
+
+/* jshint curly: false */
+// This section of code is taken from acorn.
+//
+// Acorn was written by Marijn Haverbeke and released under an MIT
+// license. The Unicode regexps (for identifiers and whitespace) were
+// taken from [Esprima](http://esprima.org) by Ariya Hidayat.
+//
+// Git repositories for Acorn are available at
+//
+//     http://marijnhaverbeke.nl/git/acorn
+//     https://github.com/marijnh/acorn.git
+
+// ## Character categories
+
+// Big ugly regular expressions that match characters in the
+// whitespace, identifier, and identifier-start categories. These
+// are only applied when a character is found to actually have a
+// code point above 128.
+
+var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
+var nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f";
+var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
+var nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonASCIIidentifierChars + "]");
+
+// Whether a single character denotes a newline.
+
+exports.newline = /[\n\r\u2028\u2029]/;
+
+// Matches a whole line break (where CRLF is considered a single
+// line break). Used to count lines.
+
+// in javascript, these two differ
+// in python they are the same, different methods are called on them
+exports.lineBreak = new RegExp('\r\n|' + exports.newline.source);
+exports.allLineBreaks = new RegExp(exports.lineBreak.source, 'g');
+
+
+// Test whether a given character code starts an identifier.
+
+exports.isIdentifierStart = function(code) {
+    // permit $ (36) and @ (64). @ is used in ES7 decorators.
+    if (code < 65) { return code === 36 || code === 64; }
+    // 65 through 91 are uppercase letters.
+    if (code < 91) { return true; }
+    // permit _ (95).
+    if (code < 97) { return code === 95; }
+    // 97 through 123 are lowercase letters.
+    if (code < 123) { return true; }
+    return code >= 0xaa && nonASCIIidentifierStart.test(String.fromCharCode(code));
+};
+
+// Test whether a given character is part of an identifier.
+
+exports.isIdentifierChar = function(code) {
+    if (code < 48) { return code === 36; }
+    if (code < 58) { return true; }
+    if (code < 65) { return false; }
+    if (code < 91) { return true; }
+    if (code < 97) { return code === 95; }
+    if (code < 123) { return true; }
+    return code >= 0xaa && nonASCIIidentifier.test(String.fromCharCode(code));
+};
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+    The MIT License (MIT)
+
+    Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation files
+    (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+var mergeOpts = __webpack_require__(3).mergeOpts;
+var acorn = __webpack_require__(0);
+var Output = __webpack_require__(4).Output;
+var Tokenizer = __webpack_require__(7).Tokenizer;
+
+function remove_redundant_indentation(output, frame) {
+    // This implementation is effective but has some issues:
+    //     - can cause line wrap to happen too soon due to indent removal
+    //           after wrap points are calculated
+    // These issues are minor compared to ugly indentation.
+
+    if (frame.multiline_frame ||
+        frame.mode === MODE.ForInitializer ||
+        frame.mode === MODE.Conditional) {
+        return;
+    }
+
+    // remove one indent from each line inside this section
+    var start_index = frame.start_line_index;
+
+    output.remove_indent(start_index);
+}
+
+function in_array(what, arr) {
+    for (var i = 0; i < arr.length; i += 1) {
+        if (arr[i] === what) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function trim(s) {
+    return s.replace(/^\s+|\s+$/g, '');
+}
+
+function ltrim(s) {
+    return s.replace(/^\s+/g, '');
+}
+
+// function rtrim(s) {
+//     return s.replace(/\s+$/g, '');
+// }
+
+
+function generateMapFromStrings(list) {
+    var result = {};
+    for (var x = 0; x < list.length; x++) {
+        // make the mapped names underscored instead of dash
+        result[list[x].replace(/-/g, '_')] = list[x];
+    }
+    return result;
+}
+
+function sanitizeOperatorPosition(opPosition) {
+    opPosition = opPosition || OPERATOR_POSITION.before_newline;
+
+    if (!in_array(opPosition, validPositionValues)) {
+        throw new Error("Invalid Option Value: The option 'operator_position' must be one of the following values\n" +
+            validPositionValues +
+            "\nYou passed in: '" + opPosition + "'");
+    }
+
+    return opPosition;
+}
+
+var validPositionValues = ['before-newline', 'after-newline', 'preserve-newline'];
+
+// Generate map from array
+var OPERATOR_POSITION = generateMapFromStrings(validPositionValues);
+
+var OPERATOR_POSITION_BEFORE_OR_PRESERVE = [OPERATOR_POSITION.before_newline, OPERATOR_POSITION.preserve_newline];
+
+var MODE = {
+    BlockStatement: 'BlockStatement', // 'BLOCK'
+    Statement: 'Statement', // 'STATEMENT'
+    ObjectLiteral: 'ObjectLiteral', // 'OBJECT',
+    ArrayLiteral: 'ArrayLiteral', //'[EXPRESSION]',
+    ForInitializer: 'ForInitializer', //'(FOR-EXPRESSION)',
+    Conditional: 'Conditional', //'(COND-EXPRESSION)',
+    Expression: 'Expression' //'(EXPRESSION)'
+};
+
+function Beautifier(js_source_text, options) {
+    "use strict";
+    var output;
+    var tokens = [],
+        token_pos;
+    var tokenizer;
+    var current_token;
+    var last_type, last_last_text, indent_string;
+    var flags, previous_flags, flag_store;
+    var prefix;
+
+    var handlers, opt;
+    var baseIndentString = '';
+
+    handlers = {
+        'TK_START_EXPR': handle_start_expr,
+        'TK_END_EXPR': handle_end_expr,
+        'TK_START_BLOCK': handle_start_block,
+        'TK_END_BLOCK': handle_end_block,
+        'TK_WORD': handle_word,
+        'TK_RESERVED': handle_word,
+        'TK_SEMICOLON': handle_semicolon,
+        'TK_STRING': handle_string,
+        'TK_EQUALS': handle_equals,
+        'TK_OPERATOR': handle_operator,
+        'TK_COMMA': handle_comma,
+        'TK_BLOCK_COMMENT': handle_block_comment,
+        'TK_COMMENT': handle_comment,
+        'TK_DOT': handle_dot,
+        'TK_UNKNOWN': handle_unknown,
+        'TK_EOF': handle_eof
+    };
+
+    function create_flags(flags_base, mode) {
+        var next_indent_level = 0;
+        if (flags_base) {
+            next_indent_level = flags_base.indentation_level;
+            if (!output.just_added_newline() &&
+                flags_base.line_indent_level > next_indent_level) {
+                next_indent_level = flags_base.line_indent_level;
+            }
+        }
+
+        var next_flags = {
+            mode: mode,
+            parent: flags_base,
+            last_text: flags_base ? flags_base.last_text : '', // last token text
+            last_word: flags_base ? flags_base.last_word : '', // last 'TK_WORD' passed
+            declaration_statement: false,
+            declaration_assignment: false,
+            multiline_frame: false,
+            inline_frame: false,
+            if_block: false,
+            else_block: false,
+            do_block: false,
+            do_while: false,
+            import_block: false,
+            in_case_statement: false, // switch(..){ INSIDE HERE }
+            in_case: false, // we're on the exact line with "case 0:"
+            case_body: false, // the indented case-action block
+            indentation_level: next_indent_level,
+            line_indent_level: flags_base ? flags_base.line_indent_level : next_indent_level,
+            start_line_index: output.get_line_number(),
+            ternary_depth: 0
+        };
+        return next_flags;
+    }
+
+    // Some interpreters have unexpected results with foo = baz || bar;
+    options = options ? options : {};
+
+    // Allow the setting of language/file-type specific options
+    // with inheritance of overall settings
+    options = mergeOpts(options, 'js');
+
+    opt = {};
+
+    // compatibility, re
+    if (options.brace_style === "expand-strict") { //graceful handling of deprecated option
+        options.brace_style = "expand";
+    } else if (options.brace_style === "collapse-preserve-inline") { //graceful handling of deprecated option
+        options.brace_style = "collapse,preserve-inline";
+    } else if (options.braces_on_own_line !== undefined) { //graceful handling of deprecated option
+        options.brace_style = options.braces_on_own_line ? "expand" : "collapse";
+    } else if (!options.brace_style) //Nothing exists to set it
+    {
+        options.brace_style = "collapse";
+    }
+
+
+    var brace_style_split = options.brace_style.split(/[^a-zA-Z0-9_\-]+/);
+    opt.brace_style = brace_style_split[0];
+    opt.brace_preserve_inline = brace_style_split[1] ? brace_style_split[1] : false;
+
+    opt.indent_size = options.indent_size ? parseInt(options.indent_size, 10) : 4;
+    opt.indent_char = options.indent_char ? options.indent_char : ' ';
+    opt.eol = options.eol ? options.eol : 'auto';
+    opt.preserve_newlines = (options.preserve_newlines === undefined) ? true : options.preserve_newlines;
+    opt.unindent_chained_methods = (options.unindent_chained_methods === undefined) ? false : options.unindent_chained_methods;
+    opt.break_chained_methods = (options.break_chained_methods === undefined) ? false : options.break_chained_methods;
+    opt.max_preserve_newlines = (options.max_preserve_newlines === undefined) ? 0 : parseInt(options.max_preserve_newlines, 10);
+    opt.space_in_paren = (options.space_in_paren === undefined) ? false : options.space_in_paren;
+    opt.space_in_empty_paren = (options.space_in_empty_paren === undefined) ? false : options.space_in_empty_paren;
+    opt.jslint_happy = (options.jslint_happy === undefined) ? false : options.jslint_happy;
+    opt.space_after_anon_function = (options.space_after_anon_function === undefined) ? false : options.space_after_anon_function;
+    opt.keep_array_indentation = (options.keep_array_indentation === undefined) ? false : options.keep_array_indentation;
+    opt.space_before_conditional = (options.space_before_conditional === undefined) ? true : options.space_before_conditional;
+    opt.unescape_strings = (options.unescape_strings === undefined) ? false : options.unescape_strings;
+    opt.wrap_line_length = (options.wrap_line_length === undefined) ? 0 : parseInt(options.wrap_line_length, 10);
+    opt.e4x = (options.e4x === undefined) ? false : options.e4x;
+    opt.end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
+    opt.comma_first = (options.comma_first === undefined) ? false : options.comma_first;
+    opt.operator_position = sanitizeOperatorPosition(options.operator_position);
+
+    // For testing of beautify ignore:start directive
+    opt.test_output_raw = (options.test_output_raw === undefined) ? false : options.test_output_raw;
+
+    // force opt.space_after_anon_function to true if opt.jslint_happy
+    if (opt.jslint_happy) {
+        opt.space_after_anon_function = true;
+    }
+
+    if (options.indent_with_tabs) {
+        opt.indent_char = '\t';
+        opt.indent_size = 1;
+    }
+
+    if (opt.eol === 'auto') {
+        opt.eol = '\n';
+        if (js_source_text && acorn.lineBreak.test(js_source_text || '')) {
+            opt.eol = js_source_text.match(acorn.lineBreak)[0];
+        }
+    }
+
+    opt.eol = opt.eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
+
+    //----------------------------------
+    indent_string = '';
+    while (opt.indent_size > 0) {
+        indent_string += opt.indent_char;
+        opt.indent_size -= 1;
+    }
+
+    var preindent_index = 0;
+    if (js_source_text && js_source_text.length) {
+        while ((js_source_text.charAt(preindent_index) === ' ' ||
+                js_source_text.charAt(preindent_index) === '\t')) {
+            preindent_index += 1;
+        }
+        baseIndentString = js_source_text.substring(0, preindent_index);
+        js_source_text = js_source_text.substring(preindent_index);
+    }
+
+    last_type = 'TK_START_BLOCK'; // last token type
+    last_last_text = ''; // pre-last token text
+    output = new Output(indent_string, baseIndentString);
+
+    // If testing the ignore directive, start with output disable set to true
+    output.raw = opt.test_output_raw;
+
+
+    // Stack of parsing/formatting states, including MODE.
+    // We tokenize, parse, and output in an almost purely a forward-only stream of token input
+    // and formatted output.  This makes the beautifier less accurate than full parsers
+    // but also far more tolerant of syntax errors.
+    //
+    // For example, the default mode is MODE.BlockStatement. If we see a '{' we push a new frame of type
+    // MODE.BlockStatement on the the stack, even though it could be object literal.  If we later
+    // encounter a ":", we'll switch to to MODE.ObjectLiteral.  If we then see a ";",
+    // most full parsers would die, but the beautifier gracefully falls back to
+    // MODE.BlockStatement and continues on.
+    flag_store = [];
+    set_mode(MODE.BlockStatement);
+
+    this.beautify = function() {
+
+        /*jshint onevar:true */
+        var sweet_code;
+        tokenizer = new Tokenizer(js_source_text, opt, indent_string);
+        tokens = tokenizer.tokenize();
+        token_pos = 0;
+
+        current_token = get_token();
+        while (current_token) {
+            handlers[current_token.type]();
+
+            last_last_text = flags.last_text;
+            last_type = current_token.type;
+            flags.last_text = current_token.text;
+
+            token_pos += 1;
+            current_token = get_token();
+        }
+
+        sweet_code = output.get_code(opt.end_with_newline, opt.eol);
+
+        return sweet_code;
+    };
+
+    function handle_whitespace_and_comments(local_token, preserve_statement_flags) {
+        var newlines = local_token.newlines;
+        var keep_whitespace = opt.keep_array_indentation && is_array(flags.mode);
+        var temp_token = current_token;
+
+        for (var h = 0; h < local_token.comments_before.length; h++) {
+            // The cleanest handling of inline comments is to treat them as though they aren't there.
+            // Just continue formatting and the behavior should be logical.
+            // Also ignore unknown tokens.  Again, this should result in better behavior.
+            current_token = local_token.comments_before[h];
+            handle_whitespace_and_comments(current_token, preserve_statement_flags);
+            handlers[current_token.type](preserve_statement_flags);
+        }
+        current_token = temp_token;
+
+        if (keep_whitespace) {
+            for (var i = 0; i < newlines; i += 1) {
+                print_newline(i > 0, preserve_statement_flags);
+            }
+        } else {
+            if (opt.max_preserve_newlines && newlines > opt.max_preserve_newlines) {
+                newlines = opt.max_preserve_newlines;
+            }
+
+            if (opt.preserve_newlines) {
+                if (local_token.newlines > 1) {
+                    print_newline(false, preserve_statement_flags);
+                    for (var j = 1; j < newlines; j += 1) {
+                        print_newline(true, preserve_statement_flags);
+                    }
+                }
+            }
+        }
+
+    }
+
+    // we could use just string.split, but
+    // IE doesn't like returning empty strings
+    function split_linebreaks(s) {
+        //return s.split(/\x0d\x0a|\x0a/);
+
+        s = s.replace(acorn.allLineBreaks, '\n');
+        var out = [],
+            idx = s.indexOf("\n");
+        while (idx !== -1) {
+            out.push(s.substring(0, idx));
+            s = s.substring(idx + 1);
+            idx = s.indexOf("\n");
+        }
+        if (s.length) {
+            out.push(s);
+        }
+        return out;
+    }
+
+    var newline_restricted_tokens = ['break', 'continue', 'return', 'throw', 'yield'];
+
+    function allow_wrap_or_preserved_newline(force_linewrap) {
+        force_linewrap = (force_linewrap === undefined) ? false : force_linewrap;
+
+        // Never wrap the first token on a line
+        if (output.just_added_newline()) {
+            return;
+        }
+
+        var shouldPreserveOrForce = (opt.preserve_newlines && current_token.wanted_newline) || force_linewrap;
+        var operatorLogicApplies = in_array(flags.last_text, tokenizer.positionable_operators) || in_array(current_token.text, tokenizer.positionable_operators);
+
+        if (operatorLogicApplies) {
+            var shouldPrintOperatorNewline = (
+                    in_array(flags.last_text, tokenizer.positionable_operators) &&
+                    in_array(opt.operator_position, OPERATOR_POSITION_BEFORE_OR_PRESERVE)
+                ) ||
+                in_array(current_token.text, tokenizer.positionable_operators);
+            shouldPreserveOrForce = shouldPreserveOrForce && shouldPrintOperatorNewline;
+        }
+
+        if (shouldPreserveOrForce) {
+            print_newline(false, true);
+        } else if (opt.wrap_line_length) {
+            if (last_type === 'TK_RESERVED' && in_array(flags.last_text, newline_restricted_tokens)) {
+                // These tokens should never have a newline inserted
+                // between them and the following expression.
+                return;
+            }
+            var proposed_line_length = output.current_line.get_character_count() + current_token.text.length +
+                (output.space_before_token ? 1 : 0);
+            if (proposed_line_length >= opt.wrap_line_length) {
+                print_newline(false, true);
+            }
+        }
+    }
+
+    function print_newline(force_newline, preserve_statement_flags) {
+        if (!preserve_statement_flags) {
+            if (flags.last_text !== ';' && flags.last_text !== ',' && flags.last_text !== '=' && last_type !== 'TK_OPERATOR') {
+                var next_token = get_token(1);
+                while (flags.mode === MODE.Statement &&
+                    !(flags.if_block && next_token && next_token.type === 'TK_RESERVED' && next_token.text === 'else') &&
+                    !flags.do_block) {
+                    restore_mode();
+                }
+            }
+        }
+
+        if (output.add_new_line(force_newline)) {
+            flags.multiline_frame = true;
+        }
+    }
+
+    function print_token_line_indentation() {
+        if (output.just_added_newline()) {
+            if (opt.keep_array_indentation && is_array(flags.mode) && current_token.wanted_newline) {
+                output.current_line.push(current_token.whitespace_before);
+                output.space_before_token = false;
+            } else if (output.set_indent(flags.indentation_level)) {
+                flags.line_indent_level = flags.indentation_level;
+            }
+        }
+    }
+
+    function print_token(printable_token) {
+        if (output.raw) {
+            output.add_raw_token(current_token);
+            return;
+        }
+
+        if (opt.comma_first && last_type === 'TK_COMMA' &&
+            output.just_added_newline()) {
+            if (output.previous_line.last() === ',') {
+                var popped = output.previous_line.pop();
+                // if the comma was already at the start of the line,
+                // pull back onto that line and reprint the indentation
+                if (output.previous_line.is_empty()) {
+                    output.previous_line.push(popped);
+                    output.trim(true);
+                    output.current_line.pop();
+                    output.trim();
+                }
+
+                // add the comma in front of the next token
+                print_token_line_indentation();
+                output.add_token(',');
+                output.space_before_token = true;
+            }
+        }
+
+        printable_token = printable_token || current_token.text;
+        print_token_line_indentation();
+        output.add_token(printable_token);
+    }
+
+    function indent() {
+        flags.indentation_level += 1;
+    }
+
+    function deindent() {
+        if (flags.indentation_level > 0 &&
+            ((!flags.parent) || flags.indentation_level > flags.parent.indentation_level)) {
+            flags.indentation_level -= 1;
+
+        }
+    }
+
+    function set_mode(mode) {
+        if (flags) {
+            flag_store.push(flags);
+            previous_flags = flags;
+        } else {
+            previous_flags = create_flags(null, mode);
+        }
+
+        flags = create_flags(previous_flags, mode);
+    }
+
+    function is_array(mode) {
+        return mode === MODE.ArrayLiteral;
+    }
+
+    function is_expression(mode) {
+        return in_array(mode, [MODE.Expression, MODE.ForInitializer, MODE.Conditional]);
+    }
+
+    function restore_mode() {
+        if (flag_store.length > 0) {
+            previous_flags = flags;
+            flags = flag_store.pop();
+            if (previous_flags.mode === MODE.Statement && !opt.unindent_chained_methods) {
+                remove_redundant_indentation(output, previous_flags);
+            }
+        }
+    }
+
+    function start_of_object_property() {
+        return flags.parent.mode === MODE.ObjectLiteral && flags.mode === MODE.Statement && (
+            (flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set'])));
+    }
+
+    function start_of_statement() {
+        if (
+            (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') ||
+            (last_type === 'TK_RESERVED' && flags.last_text === 'do') ||
+            (last_type === 'TK_RESERVED' && in_array(flags.last_text, newline_restricted_tokens) && !current_token.wanted_newline) ||
+            (last_type === 'TK_RESERVED' && flags.last_text === 'else' &&
+                !(current_token.type === 'TK_RESERVED' && current_token.text === 'if' && !current_token.comments_before.length)) ||
+            (last_type === 'TK_END_EXPR' && (previous_flags.mode === MODE.ForInitializer || previous_flags.mode === MODE.Conditional)) ||
+            (last_type === 'TK_WORD' && flags.mode === MODE.BlockStatement &&
+                !flags.in_case &&
+                !(current_token.text === '--' || current_token.text === '++') &&
+                last_last_text !== 'function' &&
+                current_token.type !== 'TK_WORD' && current_token.type !== 'TK_RESERVED') ||
+            (flags.mode === MODE.ObjectLiteral && (
+                (flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set']))))
+        ) {
+
+            set_mode(MODE.Statement);
+            if (!opt.unindent_chained_methods) {
+                indent();
+            }
+
+            handle_whitespace_and_comments(current_token, true);
+
+            // Issue #276:
+            // If starting a new statement with [if, for, while, do], push to a new line.
+            // if (a) if (b) if(c) d(); else e(); else f();
+            if (!start_of_object_property()) {
+                allow_wrap_or_preserved_newline(
+                    current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['do', 'for', 'if', 'while']));
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    function all_lines_start_with(lines, c) {
+        for (var i = 0; i < lines.length; i++) {
+            var line = trim(lines[i]);
+            if (line.charAt(0) !== c) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function each_line_matches_indent(lines, indent) {
+        var i = 0,
+            len = lines.length,
+            line;
+        for (; i < len; i++) {
+            line = lines[i];
+            // allow empty lines to pass through
+            if (line && line.indexOf(indent) !== 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function is_special_word(word) {
+        return in_array(word, ['case', 'return', 'do', 'if', 'throw', 'else']);
+    }
+
+    function get_token(offset) {
+        var index = token_pos + (offset || 0);
+        return (index < 0 || index >= tokens.length) ? null : tokens[index];
+    }
+
+    function handle_start_expr() {
+        // The conditional starts the statement if appropriate.
+        if (!start_of_statement()) {
+            handle_whitespace_and_comments(current_token);
+        }
+
+        var next_mode = MODE.Expression;
+        if (current_token.text === '[') {
+
+            if (last_type === 'TK_WORD' || flags.last_text === ')') {
+                // this is array index specifier, break immediately
+                // a[x], fn()[x]
+                if (last_type === 'TK_RESERVED' && in_array(flags.last_text, tokenizer.line_starters)) {
+                    output.space_before_token = true;
+                }
+                set_mode(next_mode);
+                print_token();
+                indent();
+                if (opt.space_in_paren) {
+                    output.space_before_token = true;
+                }
+                return;
+            }
+
+            next_mode = MODE.ArrayLiteral;
+            if (is_array(flags.mode)) {
+                if (flags.last_text === '[' ||
+                    (flags.last_text === ',' && (last_last_text === ']' || last_last_text === '}'))) {
+                    // ], [ goes to new line
+                    // }, [ goes to new line
+                    if (!opt.keep_array_indentation) {
+                        print_newline();
+                    }
+                }
+            }
+
+        } else {
+            if (last_type === 'TK_RESERVED' && flags.last_text === 'for') {
+                next_mode = MODE.ForInitializer;
+            } else if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['if', 'while'])) {
+                next_mode = MODE.Conditional;
+            } else {
+                // next_mode = MODE.Expression;
+            }
+        }
+
+        if (flags.last_text === ';' || last_type === 'TK_START_BLOCK') {
+            print_newline();
+        } else if (last_type === 'TK_END_EXPR' || last_type === 'TK_START_EXPR' || last_type === 'TK_END_BLOCK' || flags.last_text === '.') {
+            // TODO: Consider whether forcing this is required.  Review failing tests when removed.
+            allow_wrap_or_preserved_newline(current_token.wanted_newline);
+            // do nothing on (( and )( and ][ and ]( and .(
+        } else if (!(last_type === 'TK_RESERVED' && current_token.text === '(') && last_type !== 'TK_WORD' && last_type !== 'TK_OPERATOR') {
+            output.space_before_token = true;
+        } else if ((last_type === 'TK_RESERVED' && (flags.last_word === 'function' || flags.last_word === 'typeof')) ||
+            (flags.last_text === '*' &&
+                (in_array(last_last_text, ['function', 'yield']) ||
+                    (flags.mode === MODE.ObjectLiteral && in_array(last_last_text, ['{', ',']))))) {
+            // function() vs function ()
+            // yield*() vs yield* ()
+            // function*() vs function* ()
+            if (opt.space_after_anon_function) {
+                output.space_before_token = true;
+            }
+        } else if (last_type === 'TK_RESERVED' && (in_array(flags.last_text, tokenizer.line_starters) || flags.last_text === 'catch')) {
+            if (opt.space_before_conditional) {
+                output.space_before_token = true;
+            }
+        }
+
+        // Should be a space between await and an IIFE, or async and an arrow function
+        if (current_token.text === '(' && last_type === 'TK_RESERVED' && in_array(flags.last_word, ['await', 'async'])) {
+            output.space_before_token = true;
+        }
+
+        // Support of this kind of newline preservation.
+        // a = (b &&
+        //     (c || d));
+        if (current_token.text === '(') {
+            if (last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+                if (!start_of_object_property()) {
+                    allow_wrap_or_preserved_newline();
+                }
+            }
+        }
+
+        // Support preserving wrapped arrow function expressions
+        // a.b('c',
+        //     () => d.e
+        // )
+        if (current_token.text === '(' && last_type !== 'TK_WORD' && last_type !== 'TK_RESERVED') {
+            allow_wrap_or_preserved_newline();
+        }
+
+        set_mode(next_mode);
+        print_token();
+        if (opt.space_in_paren) {
+            output.space_before_token = true;
+        }
+
+        // In all cases, if we newline while inside an expression it should be indented.
+        indent();
+    }
+
+    function handle_end_expr() {
+        // statements inside expressions are not valid syntax, but...
+        // statements must all be closed when their container closes
+        while (flags.mode === MODE.Statement) {
+            restore_mode();
+        }
+
+        handle_whitespace_and_comments(current_token);
+
+        if (flags.multiline_frame) {
+            allow_wrap_or_preserved_newline(current_token.text === ']' && is_array(flags.mode) && !opt.keep_array_indentation);
+        }
+
+        if (opt.space_in_paren) {
+            if (last_type === 'TK_START_EXPR' && !opt.space_in_empty_paren) {
+                // () [] no inner space in empty parens like these, ever, ref #320
+                output.trim();
+                output.space_before_token = false;
+            } else {
+                output.space_before_token = true;
+            }
+        }
+        if (current_token.text === ']' && opt.keep_array_indentation) {
+            print_token();
+            restore_mode();
+        } else {
+            restore_mode();
+            print_token();
+        }
+        remove_redundant_indentation(output, previous_flags);
+
+        // do {} while () // no statement required after
+        if (flags.do_while && previous_flags.mode === MODE.Conditional) {
+            previous_flags.mode = MODE.Expression;
+            flags.do_block = false;
+            flags.do_while = false;
+
+        }
+    }
+
+    function handle_start_block() {
+        handle_whitespace_and_comments(current_token);
+
+        // Check if this is should be treated as a ObjectLiteral
+        var next_token = get_token(1);
+        var second_token = get_token(2);
+        if (second_token && (
+                (in_array(second_token.text, [':', ',']) && in_array(next_token.type, ['TK_STRING', 'TK_WORD', 'TK_RESERVED'])) ||
+                (in_array(next_token.text, ['get', 'set', '...']) && in_array(second_token.type, ['TK_WORD', 'TK_RESERVED']))
+            )) {
+            // We don't support TypeScript,but we didn't break it for a very long time.
+            // We'll try to keep not breaking it.
+            if (!in_array(last_last_text, ['class', 'interface'])) {
+                set_mode(MODE.ObjectLiteral);
+            } else {
+                set_mode(MODE.BlockStatement);
+            }
+        } else if (last_type === 'TK_OPERATOR' && flags.last_text === '=>') {
+            // arrow function: (param1, paramN) => { statements }
+            set_mode(MODE.BlockStatement);
+        } else if (in_array(last_type, ['TK_EQUALS', 'TK_START_EXPR', 'TK_COMMA', 'TK_OPERATOR']) ||
+            (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['return', 'throw', 'import', 'default']))
+        ) {
+            // Detecting shorthand function syntax is difficult by scanning forward,
+            //     so check the surrounding context.
+            // If the block is being returned, imported, export default, passed as arg,
+            //     assigned with = or assigned in a nested object, treat as an ObjectLiteral.
+            set_mode(MODE.ObjectLiteral);
+        } else {
+            set_mode(MODE.BlockStatement);
+        }
+
+        var empty_braces = !next_token.comments_before.length && next_token.text === '}';
+        var empty_anonymous_function = empty_braces && flags.last_word === 'function' &&
+            last_type === 'TK_END_EXPR';
+
+        if (opt.brace_preserve_inline) // check for inline, set inline_frame if so
+        {
+            // search forward for a newline wanted inside this block
+            var index = 0;
+            var check_token = null;
+            flags.inline_frame = true;
+            do {
+                index += 1;
+                check_token = get_token(index);
+                if (check_token.wanted_newline) {
+                    flags.inline_frame = false;
+                    break;
+                }
+            } while (check_token.type !== 'TK_EOF' &&
+                !(check_token.type === 'TK_END_BLOCK' && check_token.opened === current_token));
+        }
+
+        if ((opt.brace_style === "expand" ||
+                (opt.brace_style === "none" && current_token.wanted_newline)) &&
+            !flags.inline_frame) {
+            if (last_type !== 'TK_OPERATOR' &&
+                (empty_anonymous_function ||
+                    last_type === 'TK_EQUALS' ||
+                    (last_type === 'TK_RESERVED' && is_special_word(flags.last_text) && flags.last_text !== 'else'))) {
+                output.space_before_token = true;
+            } else {
+                print_newline(false, true);
+            }
+        } else { // collapse || inline_frame
+            if (is_array(previous_flags.mode) && (last_type === 'TK_START_EXPR' || last_type === 'TK_COMMA')) {
+                if (last_type === 'TK_COMMA' || opt.space_in_paren) {
+                    output.space_before_token = true;
+                }
+
+                if (last_type === 'TK_COMMA' || (last_type === 'TK_START_EXPR' && flags.inline_frame)) {
+                    allow_wrap_or_preserved_newline();
+                    previous_flags.multiline_frame = previous_flags.multiline_frame || flags.multiline_frame;
+                    flags.multiline_frame = false;
+                }
+            }
+            if (last_type !== 'TK_OPERATOR' && last_type !== 'TK_START_EXPR') {
+                if (last_type === 'TK_START_BLOCK' && !flags.inline_frame) {
+                    print_newline();
+                } else {
+                    output.space_before_token = true;
+                }
+            }
+        }
+        print_token();
+        indent();
+    }
+
+    function handle_end_block() {
+        // statements must all be closed when their container closes
+        handle_whitespace_and_comments(current_token);
+
+        while (flags.mode === MODE.Statement) {
+            restore_mode();
+        }
+
+        var empty_braces = last_type === 'TK_START_BLOCK';
+
+        if (flags.inline_frame && !empty_braces) { // try inline_frame (only set if opt.braces-preserve-inline) first
+            output.space_before_token = true;
+        } else if (opt.brace_style === "expand") {
+            if (!empty_braces) {
+                print_newline();
+            }
+        } else {
+            // skip {}
+            if (!empty_braces) {
+                if (is_array(flags.mode) && opt.keep_array_indentation) {
+                    // we REALLY need a newline here, but newliner would skip that
+                    opt.keep_array_indentation = false;
+                    print_newline();
+                    opt.keep_array_indentation = true;
+
+                } else {
+                    print_newline();
+                }
+            }
+        }
+        restore_mode();
+        print_token();
+    }
+
+    function handle_word() {
+        if (current_token.type === 'TK_RESERVED') {
+            if (in_array(current_token.text, ['set', 'get']) && flags.mode !== MODE.ObjectLiteral) {
+                current_token.type = 'TK_WORD';
+            } else if (in_array(current_token.text, ['as', 'from']) && !flags.import_block) {
+                current_token.type = 'TK_WORD';
+            } else if (flags.mode === MODE.ObjectLiteral) {
+                var next_token = get_token(1);
+                if (next_token.text === ':') {
+                    current_token.type = 'TK_WORD';
+                }
+            }
+        }
+
+        if (start_of_statement()) {
+            // The conditional starts the statement if appropriate.
+            if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') {
+                flags.declaration_statement = true;
+            }
+        } else if (current_token.wanted_newline && !is_expression(flags.mode) &&
+            (last_type !== 'TK_OPERATOR' || (flags.last_text === '--' || flags.last_text === '++')) &&
+            last_type !== 'TK_EQUALS' &&
+            (opt.preserve_newlines || !(last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const', 'set', 'get'])))) {
+            handle_whitespace_and_comments(current_token);
+            print_newline();
+        } else {
+            handle_whitespace_and_comments(current_token);
+        }
+
+        if (flags.do_block && !flags.do_while) {
+            if (current_token.type === 'TK_RESERVED' && current_token.text === 'while') {
+                // do {} ## while ()
+                output.space_before_token = true;
+                print_token();
+                output.space_before_token = true;
+                flags.do_while = true;
+                return;
+            } else {
+                // do {} should always have while as the next word.
+                // if we don't see the expected while, recover
+                print_newline();
+                flags.do_block = false;
+            }
+        }
+
+        // if may be followed by else, or not
+        // Bare/inline ifs are tricky
+        // Need to unwind the modes correctly: if (a) if (b) c(); else d(); else e();
+        if (flags.if_block) {
+            if (!flags.else_block && (current_token.type === 'TK_RESERVED' && current_token.text === 'else')) {
+                flags.else_block = true;
+            } else {
+                while (flags.mode === MODE.Statement) {
+                    restore_mode();
+                }
+                flags.if_block = false;
+                flags.else_block = false;
+            }
+        }
+
+        if (current_token.type === 'TK_RESERVED' && (current_token.text === 'case' || (current_token.text === 'default' && flags.in_case_statement))) {
+            print_newline();
+            if (flags.case_body || opt.jslint_happy) {
+                // switch cases following one another
+                deindent();
+                flags.case_body = false;
+            }
+            print_token();
+            flags.in_case = true;
+            flags.in_case_statement = true;
+            return;
+        }
+
+        if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+            if (!start_of_object_property()) {
+                allow_wrap_or_preserved_newline();
+            }
+        }
+
+        if (current_token.type === 'TK_RESERVED' && current_token.text === 'function') {
+            if (in_array(flags.last_text, ['}', ';']) ||
+                (output.just_added_newline() && !(in_array(flags.last_text, ['(', '[', '{', ':', '=', ',']) || last_type === 'TK_OPERATOR'))) {
+                // make sure there is a nice clean space of at least one blank line
+                // before a new function definition
+                if (!output.just_added_blankline() && !current_token.comments_before.length) {
+                    print_newline();
+                    print_newline(true);
+                }
+            }
+            if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD') {
+                if (last_type === 'TK_RESERVED' && (
+                        in_array(flags.last_text, ['get', 'set', 'new', 'export', 'async']) ||
+                        in_array(flags.last_text, newline_restricted_tokens))) {
+                    output.space_before_token = true;
+                } else if (last_type === 'TK_RESERVED' && flags.last_text === 'default' && last_last_text === 'export') {
+                    output.space_before_token = true;
+                } else {
+                    print_newline();
+                }
+            } else if (last_type === 'TK_OPERATOR' || flags.last_text === '=') {
+                // foo = function
+                output.space_before_token = true;
+            } else if (!flags.multiline_frame && (is_expression(flags.mode) || is_array(flags.mode))) {
+                // (function
+            } else {
+                print_newline();
+            }
+
+            print_token();
+            flags.last_word = current_token.text;
+            return;
+        }
+
+        prefix = 'NONE';
+
+        if (last_type === 'TK_END_BLOCK') {
+
+            if (previous_flags.inline_frame) {
+                prefix = 'SPACE';
+            } else if (!(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally', 'from']))) {
+                prefix = 'NEWLINE';
+            } else {
+                if (opt.brace_style === "expand" ||
+                    opt.brace_style === "end-expand" ||
+                    (opt.brace_style === "none" && current_token.wanted_newline)) {
+                    prefix = 'NEWLINE';
+                } else {
+                    prefix = 'SPACE';
+                    output.space_before_token = true;
+                }
+            }
+        } else if (last_type === 'TK_SEMICOLON' && flags.mode === MODE.BlockStatement) {
+            // TODO: Should this be for STATEMENT as well?
+            prefix = 'NEWLINE';
+        } else if (last_type === 'TK_SEMICOLON' && is_expression(flags.mode)) {
+            prefix = 'SPACE';
+        } else if (last_type === 'TK_STRING') {
+            prefix = 'NEWLINE';
+        } else if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' ||
+            (flags.last_text === '*' &&
+                (in_array(last_last_text, ['function', 'yield']) ||
+                    (flags.mode === MODE.ObjectLiteral && in_array(last_last_text, ['{', ',']))))) {
+            prefix = 'SPACE';
+        } else if (last_type === 'TK_START_BLOCK') {
+            if (flags.inline_frame) {
+                prefix = 'SPACE';
+            } else {
+                prefix = 'NEWLINE';
+            }
+        } else if (last_type === 'TK_END_EXPR') {
+            output.space_before_token = true;
+            prefix = 'NEWLINE';
+        }
+
+        if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, tokenizer.line_starters) && flags.last_text !== ')') {
+            if (flags.inline_frame || flags.last_text === 'else' || flags.last_text === 'export') {
+                prefix = 'SPACE';
+            } else {
+                prefix = 'NEWLINE';
+            }
+
+        }
+
+        if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally'])) {
+            if ((!(last_type === 'TK_END_BLOCK' && previous_flags.mode === MODE.BlockStatement) ||
+                    opt.brace_style === "expand" ||
+                    opt.brace_style === "end-expand" ||
+                    (opt.brace_style === "none" && current_token.wanted_newline)) &&
+                !flags.inline_frame) {
+                print_newline();
+            } else {
+                output.trim(true);
+                var line = output.current_line;
+                // If we trimmed and there's something other than a close block before us
+                // put a newline back in.  Handles '} // comment' scenario.
+                if (line.last() !== '}') {
+                    print_newline();
+                }
+                output.space_before_token = true;
+            }
+        } else if (prefix === 'NEWLINE') {
+            if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+                // no newline between 'return nnn'
+                output.space_before_token = true;
+            } else if (last_type !== 'TK_END_EXPR') {
+                if ((last_type !== 'TK_START_EXPR' || !(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['var', 'let', 'const']))) && flags.last_text !== ':') {
+                    // no need to force newline on 'var': for (var x = 0...)
+                    if (current_token.type === 'TK_RESERVED' && current_token.text === 'if' && flags.last_text === 'else') {
+                        // no newline for } else if {
+                        output.space_before_token = true;
+                    } else {
+                        print_newline();
+                    }
+                }
+            } else if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, tokenizer.line_starters) && flags.last_text !== ')') {
+                print_newline();
+            }
+        } else if (flags.multiline_frame && is_array(flags.mode) && flags.last_text === ',' && last_last_text === '}') {
+            print_newline(); // }, in lists get a newline treatment
+        } else if (prefix === 'SPACE') {
+            output.space_before_token = true;
+        }
+        print_token();
+        flags.last_word = current_token.text;
+
+        if (current_token.type === 'TK_RESERVED') {
+            if (current_token.text === 'do') {
+                flags.do_block = true;
+            } else if (current_token.text === 'if') {
+                flags.if_block = true;
+            } else if (current_token.text === 'import') {
+                flags.import_block = true;
+            } else if (flags.import_block && current_token.type === 'TK_RESERVED' && current_token.text === 'from') {
+                flags.import_block = false;
+            }
+        }
+    }
+
+    function handle_semicolon() {
+        if (start_of_statement()) {
+            // The conditional starts the statement if appropriate.
+            // Semicolon can be the start (and end) of a statement
+            output.space_before_token = false;
+        } else {
+            handle_whitespace_and_comments(current_token);
+        }
+
+        var next_token = get_token(1);
+        while (flags.mode === MODE.Statement &&
+            !(flags.if_block && next_token && next_token.type === 'TK_RESERVED' && next_token.text === 'else') &&
+            !flags.do_block) {
+            restore_mode();
+        }
+
+        // hacky but effective for the moment
+        if (flags.import_block) {
+            flags.import_block = false;
+        }
+        print_token();
+    }
+
+    function handle_string() {
+        if (start_of_statement()) {
+            // The conditional starts the statement if appropriate.
+            // One difference - strings want at least a space before
+            output.space_before_token = true;
+        } else {
+            handle_whitespace_and_comments(current_token);
+            if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' || flags.inline_frame) {
+                output.space_before_token = true;
+            } else if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+                if (!start_of_object_property()) {
+                    allow_wrap_or_preserved_newline();
+                }
+            } else {
+                print_newline();
+            }
+        }
+        print_token();
+    }
+
+    function handle_equals() {
+        if (start_of_statement()) {
+            // The conditional starts the statement if appropriate.
+        } else {
+            handle_whitespace_and_comments(current_token);
+        }
+
+        if (flags.declaration_statement) {
+            // just got an '=' in a var-line, different formatting/line-breaking, etc will now be done
+            flags.declaration_assignment = true;
+        }
+        output.space_before_token = true;
+        print_token();
+        output.space_before_token = true;
+    }
+
+    function handle_comma() {
+        handle_whitespace_and_comments(current_token, true);
+
+        print_token();
+        output.space_before_token = true;
+        if (flags.declaration_statement) {
+            if (is_expression(flags.parent.mode)) {
+                // do not break on comma, for(var a = 1, b = 2)
+                flags.declaration_assignment = false;
+            }
+
+            if (flags.declaration_assignment) {
+                flags.declaration_assignment = false;
+                print_newline(false, true);
+            } else if (opt.comma_first) {
+                // for comma-first, we want to allow a newline before the comma
+                // to turn into a newline after the comma, which we will fixup later
+                allow_wrap_or_preserved_newline();
+            }
+        } else if (flags.mode === MODE.ObjectLiteral ||
+            (flags.mode === MODE.Statement && flags.parent.mode === MODE.ObjectLiteral)) {
+            if (flags.mode === MODE.Statement) {
+                restore_mode();
+            }
+
+            if (!flags.inline_frame) {
+                print_newline();
+            }
+        } else if (opt.comma_first) {
+            // EXPR or DO_BLOCK
+            // for comma-first, we want to allow a newline before the comma
+            // to turn into a newline after the comma, which we will fixup later
+            allow_wrap_or_preserved_newline();
+        }
+    }
+
+    function handle_operator() {
+        var isGeneratorAsterisk = current_token.text === '*' &&
+            ((last_type === 'TK_RESERVED' && in_array(flags.last_text, ['function', 'yield'])) ||
+                (in_array(last_type, ['TK_START_BLOCK', 'TK_COMMA', 'TK_END_BLOCK', 'TK_SEMICOLON']))
+            );
+        var isUnary = in_array(current_token.text, ['-', '+']) && (
+            in_array(last_type, ['TK_START_BLOCK', 'TK_START_EXPR', 'TK_EQUALS', 'TK_OPERATOR']) ||
+            in_array(flags.last_text, tokenizer.line_starters) ||
+            flags.last_text === ','
+        );
+
+        if (start_of_statement()) {
+            // The conditional starts the statement if appropriate.
+        } else {
+            var preserve_statement_flags = !isGeneratorAsterisk;
+            handle_whitespace_and_comments(current_token, preserve_statement_flags);
+        }
+
+        if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+            // "return" had a special handling in TK_WORD. Now we need to return the favor
+            output.space_before_token = true;
+            print_token();
+            return;
+        }
+
+        // hack for actionscript's import .*;
+        if (current_token.text === '*' && last_type === 'TK_DOT') {
+            print_token();
+            return;
+        }
+
+        if (current_token.text === '::') {
+            // no spaces around exotic namespacing syntax operator
+            print_token();
+            return;
+        }
+
+        // Allow line wrapping between operators when operator_position is
+        //   set to before or preserve
+        if (last_type === 'TK_OPERATOR' && in_array(opt.operator_position, OPERATOR_POSITION_BEFORE_OR_PRESERVE)) {
+            allow_wrap_or_preserved_newline();
+        }
+
+        if (current_token.text === ':' && flags.in_case) {
+            flags.case_body = true;
+            indent();
+            print_token();
+            print_newline();
+            flags.in_case = false;
+            return;
+        }
+
+        var space_before = true;
+        var space_after = true;
+        var in_ternary = false;
+        if (current_token.text === ':') {
+            if (flags.ternary_depth === 0) {
+                // Colon is invalid javascript outside of ternary and object, but do our best to guess what was meant.
+                space_before = false;
+            } else {
+                flags.ternary_depth -= 1;
+                in_ternary = true;
+            }
+        } else if (current_token.text === '?') {
+            flags.ternary_depth += 1;
+        }
+
+        // let's handle the operator_position option prior to any conflicting logic
+        if (!isUnary && !isGeneratorAsterisk && opt.preserve_newlines && in_array(current_token.text, tokenizer.positionable_operators)) {
+            var isColon = current_token.text === ':';
+            var isTernaryColon = (isColon && in_ternary);
+            var isOtherColon = (isColon && !in_ternary);
+
+            switch (opt.operator_position) {
+                case OPERATOR_POSITION.before_newline:
+                    // if the current token is : and it's not a ternary statement then we set space_before to false
+                    output.space_before_token = !isOtherColon;
+
+                    print_token();
+
+                    if (!isColon || isTernaryColon) {
+                        allow_wrap_or_preserved_newline();
+                    }
+
+                    output.space_before_token = true;
+                    return;
+
+                case OPERATOR_POSITION.after_newline:
+                    // if the current token is anything but colon, or (via deduction) it's a colon and in a ternary statement,
+                    //   then print a newline.
+
+                    output.space_before_token = true;
+
+                    if (!isColon || isTernaryColon) {
+                        if (get_token(1).wanted_newline) {
+                            print_newline(false, true);
+                        } else {
+                            allow_wrap_or_preserved_newline();
+                        }
+                    } else {
+                        output.space_before_token = false;
+                    }
+
+                    print_token();
+
+                    output.space_before_token = true;
+                    return;
+
+                case OPERATOR_POSITION.preserve_newline:
+                    if (!isOtherColon) {
+                        allow_wrap_or_preserved_newline();
+                    }
+
+                    // if we just added a newline, or the current token is : and it's not a ternary statement,
+                    //   then we set space_before to false
+                    space_before = !(output.just_added_newline() || isOtherColon);
+
+                    output.space_before_token = space_before;
+                    print_token();
+                    output.space_before_token = true;
+                    return;
+            }
+        }
+
+        if (isGeneratorAsterisk) {
+            allow_wrap_or_preserved_newline();
+            space_before = false;
+            var next_token = get_token(1);
+            space_after = next_token && in_array(next_token.type, ['TK_WORD', 'TK_RESERVED']);
+        } else if (current_token.text === '...') {
+            allow_wrap_or_preserved_newline();
+            space_before = last_type === 'TK_START_BLOCK';
+            space_after = false;
+        } else if (in_array(current_token.text, ['--', '++', '!', '~']) || isUnary) {
+            // unary operators (and binary +/- pretending to be unary) special cases
+
+            space_before = false;
+            space_after = false;
+
+            // http://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
+            // if there is a newline between -- or ++ and anything else we should preserve it.
+            if (current_token.wanted_newline && (current_token.text === '--' || current_token.text === '++')) {
+                print_newline(false, true);
+            }
+
+            if (flags.last_text === ';' && is_expression(flags.mode)) {
+                // for (;; ++i)
+                //        ^^^
+                space_before = true;
+            }
+
+            if (last_type === 'TK_RESERVED') {
+                space_before = true;
+            } else if (last_type === 'TK_END_EXPR') {
+                space_before = !(flags.last_text === ']' && (current_token.text === '--' || current_token.text === '++'));
+            } else if (last_type === 'TK_OPERATOR') {
+                // a++ + ++b;
+                // a - -b
+                space_before = in_array(current_token.text, ['--', '-', '++', '+']) && in_array(flags.last_text, ['--', '-', '++', '+']);
+                // + and - are not unary when preceeded by -- or ++ operator
+                // a-- + b
+                // a * +b
+                // a - -b
+                if (in_array(current_token.text, ['+', '-']) && in_array(flags.last_text, ['--', '++'])) {
+                    space_after = true;
+                }
+            }
+
+
+            if (((flags.mode === MODE.BlockStatement && !flags.inline_frame) || flags.mode === MODE.Statement) &&
+                (flags.last_text === '{' || flags.last_text === ';')) {
+                // { foo; --i }
+                // foo(); --bar;
+                print_newline();
+            }
+        }
+
+        output.space_before_token = output.space_before_token || space_before;
+        print_token();
+        output.space_before_token = space_after;
+    }
+
+    function handle_block_comment(preserve_statement_flags) {
+        if (output.raw) {
+            output.add_raw_token(current_token);
+            if (current_token.directives && current_token.directives.preserve === 'end') {
+                // If we're testing the raw output behavior, do not allow a directive to turn it off.
+                output.raw = opt.test_output_raw;
+            }
+            return;
+        }
+
+        if (current_token.directives) {
+            print_newline(false, preserve_statement_flags);
+            print_token();
+            if (current_token.directives.preserve === 'start') {
+                output.raw = true;
+            }
+            print_newline(false, true);
+            return;
+        }
+
+        // inline block
+        if (!acorn.newline.test(current_token.text) && !current_token.wanted_newline) {
+            output.space_before_token = true;
+            print_token();
+            output.space_before_token = true;
+            return;
+        }
+
+        var lines = split_linebreaks(current_token.text);
+        var j; // iterator for this case
+        var javadoc = false;
+        var starless = false;
+        var lastIndent = current_token.whitespace_before;
+        var lastIndentLength = lastIndent.length;
+
+        // block comment starts with a new line
+        print_newline(false, preserve_statement_flags);
+        if (lines.length > 1) {
+            javadoc = all_lines_start_with(lines.slice(1), '*');
+            starless = each_line_matches_indent(lines.slice(1), lastIndent);
+        }
+
+        // first line always indented
+        print_token(lines[0]);
+        for (j = 1; j < lines.length; j++) {
+            print_newline(false, true);
+            if (javadoc) {
+                // javadoc: reformat and re-indent
+                print_token(' ' + ltrim(lines[j]));
+            } else if (starless && lines[j].length > lastIndentLength) {
+                // starless: re-indent non-empty content, avoiding trim
+                print_token(lines[j].substring(lastIndentLength));
+            } else {
+                // normal comments output raw
+                output.add_token(lines[j]);
+            }
+        }
+
+        // for comments of more than one line, make sure there's a new line after
+        print_newline(false, preserve_statement_flags);
+    }
+
+    function handle_comment(preserve_statement_flags) {
+        if (current_token.wanted_newline) {
+            print_newline(false, preserve_statement_flags);
+        } else {
+            output.trim(true);
+        }
+
+        output.space_before_token = true;
+        print_token();
+        print_newline(false, preserve_statement_flags);
+    }
+
+    function handle_dot() {
+        if (start_of_statement()) {
+            // The conditional starts the statement if appropriate.
+        } else {
+            handle_whitespace_and_comments(current_token, true);
+        }
+
+        if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+            output.space_before_token = true;
+        } else {
+            // allow preserved newlines before dots in general
+            // force newlines on dots after close paren when break_chained - for bar().baz()
+            allow_wrap_or_preserved_newline(flags.last_text === ')' && opt.break_chained_methods);
+        }
+
+        print_token();
+    }
+
+    function handle_unknown(preserve_statement_flags) {
+        print_token();
+
+        if (current_token.text[current_token.text.length - 1] === '\n') {
+            print_newline(false, preserve_statement_flags);
+        }
+    }
+
+    function handle_eof() {
+        // Unwind any open statements
+        while (flags.mode === MODE.Statement) {
+            restore_mode();
+        }
+        handle_whitespace_and_comments(current_token);
+    }
+}
+
+module.exports.Beautifier = Beautifier;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
+function InputScanner(input) {
+    var _input = input;
+    var _input_length = _input.length;
+    var _position = 0;
+
+    this.back = function() {
+        _position -= 1;
+    };
+
+    this.hasNext = function() {
+        return _position < _input_length;
+    };
+
+    this.next = function() {
+        var val = null;
+        if (this.hasNext()) {
+            val = _input.charAt(_position);
+            _position += 1;
+        }
+        return val;
+    };
+
+    this.peek = function(index) {
+        var val = null;
+        index = index || 0;
+        index += _position;
+        if (index >= 0 && index < _input_length) {
+            val = _input.charAt(index);
+        }
+        return val;
+    };
+
+    this.peekCharCode = function(index) {
+        var val = 0;
+        index = index || 0;
+        index += _position;
+        if (index >= 0 && index < _input_length) {
+            val = _input.charCodeAt(index);
+        }
+        return val;
+    };
+
+    this.test = function(pattern, index) {
+        index = index || 0;
+        pattern.lastIndex = _position + index;
+        return pattern.test(_input);
+    };
+
+    this.testChar = function(pattern, index) {
+        var val = this.peek(index);
+        return val !== null && pattern.test(val);
+    };
+
+    this.match = function(pattern) {
+        pattern.lastIndex = _position;
+        var pattern_match = pattern.exec(_input);
+        if (pattern_match && pattern_match.index === _position) {
+            _position += pattern_match[0].length;
+        } else {
+            pattern_match = null;
+        }
+        return pattern_match;
+    };
+}
+
+
+module.exports.InputScanner = InputScanner;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+    The MIT License (MIT)
+
+    Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation files
+    (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+function mergeOpts(allOptions, targetType) {
+    var finalOpts = {};
+    var name;
+
+    for (name in allOptions) {
+        if (name !== targetType) {
+            finalOpts[name] = allOptions[name];
+        }
+    }
+
+    //merge in the per type settings for the targetType
+    if (targetType in allOptions) {
+        for (name in allOptions[targetType]) {
+            finalOpts[name] = allOptions[targetType][name];
+        }
+    }
+    return finalOpts;
+}
+
+module.exports.mergeOpts = mergeOpts;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
+function OutputLine(parent) {
+    var _character_count = 0;
+    // use indent_count as a marker for lines that have preserved indentation
+    var _indent_count = -1;
+
+    var _items = [];
+    var _empty = true;
+
+    this.set_indent = function(level) {
+        _character_count = parent.baseIndentLength + level * parent.indent_length;
+        _indent_count = level;
+    };
+
+    this.get_character_count = function() {
+        return _character_count;
+    };
+
+    this.is_empty = function() {
+        return _empty;
+    };
+
+    this.last = function() {
+        if (!this._empty) {
+            return _items[_items.length - 1];
+        } else {
+            return null;
+        }
+    };
+
+    this.push = function(input) {
+        _items.push(input);
+        _character_count += input.length;
+        _empty = false;
+    };
+
+    this.pop = function() {
+        var item = null;
+        if (!_empty) {
+            item = _items.pop();
+            _character_count -= item.length;
+            _empty = _items.length === 0;
+        }
+        return item;
+    };
+
+    this.remove_indent = function() {
+        if (_indent_count > 0) {
+            _indent_count -= 1;
+            _character_count -= parent.indent_length;
+        }
+    };
+
+    this.trim = function() {
+        while (this.last() === ' ') {
+            _items.pop();
+            _character_count -= 1;
+        }
+        _empty = _items.length === 0;
+    };
+
+    this.toString = function() {
+        var result = '';
+        if (!this._empty) {
+            if (_indent_count >= 0) {
+                result = parent.indent_cache[_indent_count];
+            }
+            result += _items.join('');
+        }
+        return result;
+    };
+}
+
+function Output(indent_string, baseIndentString) {
+    baseIndentString = baseIndentString || '';
+    this.indent_cache = [baseIndentString];
+    this.baseIndentLength = baseIndentString.length;
+    this.indent_length = indent_string.length;
+    this.raw = false;
+
+    var lines = [];
+    this.baseIndentString = baseIndentString;
+    this.indent_string = indent_string;
+    this.previous_line = null;
+    this.current_line = null;
+    this.space_before_token = false;
+
+    this.add_outputline = function() {
+        this.previous_line = this.current_line;
+        this.current_line = new OutputLine(this);
+        lines.push(this.current_line);
+    };
+
+    // initialize
+    this.add_outputline();
+
+
+    this.get_line_number = function() {
+        return lines.length;
+    };
+
+    // Using object instead of string to allow for later expansion of info about each line
+    this.add_new_line = function(force_newline) {
+        if (this.get_line_number() === 1 && this.just_added_newline()) {
+            return false; // no newline on start of file
+        }
+
+        if (force_newline || !this.just_added_newline()) {
+            if (!this.raw) {
+                this.add_outputline();
+            }
+            return true;
+        }
+
+        return false;
+    };
+
+    this.get_code = function(end_with_newline, eol) {
+        var sweet_code = lines.join('\n').replace(/[\r\n\t ]+$/, '');
+
+        if (end_with_newline) {
+            sweet_code += '\n';
+        }
+
+        if (eol !== '\n') {
+            sweet_code = sweet_code.replace(/[\n]/g, eol);
+        }
+
+        return sweet_code;
+    };
+
+    this.set_indent = function(level) {
+        // Never indent your first output indent at the start of the file
+        if (lines.length > 1) {
+            while (level >= this.indent_cache.length) {
+                this.indent_cache.push(this.indent_cache[this.indent_cache.length - 1] + this.indent_string);
+            }
+
+            this.current_line.set_indent(level);
+            return true;
+        }
+        this.current_line.set_indent(0);
+        return false;
+    };
+
+    this.add_raw_token = function(token) {
+        for (var x = 0; x < token.newlines; x++) {
+            this.add_outputline();
+        }
+        this.current_line.push(token.whitespace_before);
+        this.current_line.push(token.text);
+        this.space_before_token = false;
+    };
+
+    this.add_token = function(printable_token) {
+        this.add_space_before_token();
+        this.current_line.push(printable_token);
+    };
+
+    this.add_space_before_token = function() {
+        if (this.space_before_token && !this.just_added_newline()) {
+            this.current_line.push(' ');
+        }
+        this.space_before_token = false;
+    };
+
+    this.remove_indent = function(index) {
+        var output_length = lines.length;
+        while (index < output_length) {
+            lines[index].remove_indent();
+            index++;
+        }
+    };
+
+    this.trim = function(eat_newlines) {
+        eat_newlines = (eat_newlines === undefined) ? false : eat_newlines;
+
+        this.current_line.trim(indent_string, baseIndentString);
+
+        while (eat_newlines && lines.length > 1 &&
+            this.current_line.is_empty()) {
+            lines.pop();
+            this.current_line = lines[lines.length - 1];
+            this.current_line.trim();
+        }
+
+        this.previous_line = lines.length > 1 ? lines[lines.length - 2] : null;
+    };
+
+    this.just_added_newline = function() {
+        return this.current_line.is_empty();
+    };
+
+    this.just_added_blankline = function() {
+        if (this.just_added_newline()) {
+            if (lines.length === 1) {
+                return true; // start of the file and newline = blank
+            }
+
+            var line = lines[lines.length - 2];
+            return line.is_empty();
+        }
+        return false;
+    };
+}
+
+module.exports.Output = Output;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
+function Token(type, text, newlines, whitespace_before, parent) {
+    this.type = type;
+    this.text = text;
+
+    // comments_before are
+    // comments that have a new line before them
+    // and may or may not have a newline after
+    // this is a set of comments before
+    this.comments_before = /* inline comment*/ [];
+
+
+    this.comments_after = []; // no new line before and newline after
+    this.newlines = newlines || 0;
+    this.wanted_newline = newlines > 0;
+    this.whitespace_before = whitespace_before || '';
+    this.parent = parent || null;
+    this.opened = null;
+    this.directives = null;
+}
+
+module.exports.Token = Token;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+    The MIT License (MIT)
+
+    Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation files
+    (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+var Beautifier = __webpack_require__(1).Beautifier;
+
+function js_beautify(js_source_text, options) {
+    var beautifier = new Beautifier(js_source_text, options);
+    return beautifier.beautify();
+}
+
+module.exports = js_beautify;
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+    The MIT License (MIT)
+
+    Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation files
+    (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+var InputScanner = __webpack_require__(2).InputScanner;
+var Token = __webpack_require__(5).Token;
+var acorn = __webpack_require__(0);
+
+function trim(s) {
+    return s.replace(/^\s+|\s+$/g, '');
+}
+
+function in_array(what, arr) {
+    for (var i = 0; i < arr.length; i += 1) {
+        if (arr[i] === what) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function Tokenizer(input_string, opts) {
+
+    var whitespace = "\n\r\t ".split('');
+    var digit = /[0-9]/;
+    var digit_bin = /[01]/;
+    var digit_oct = /[01234567]/;
+    var digit_hex = /[0123456789abcdefABCDEF]/;
+
+    this.positionable_operators = '!= !== % & && * ** + - / : < << <= == === > >= >> >>> ? ^ | ||'.split(' ');
+    var punct = this.positionable_operators.concat(
+        // non-positionable operators - these do not follow operator position settings
+        '! %= &= *= **= ++ += , -- -= /= :: <<= = => >>= >>>= ^= |= ~ ...'.split(' '));
+
+    // words which should always start on new line.
+    this.line_starters = 'continue,try,throw,return,var,let,const,if,switch,case,default,for,while,break,function,import,export'.split(',');
+    var reserved_words = this.line_starters.concat(['do', 'in', 'of', 'else', 'get', 'set', 'new', 'catch', 'finally', 'typeof', 'yield', 'async', 'await', 'from', 'as']);
+
+    //  /* ... */ comment ends with nearest */ or end of file
+    var block_comment_pattern = /([\s\S]*?)((?:\*\/)|$)/g;
+
+    // comment ends just before nearest linefeed or end of file
+    var comment_pattern = /([^\n\r\u2028\u2029]*)/g;
+
+    var directives_block_pattern = /\/\* beautify( \w+[:]\w+)+ \*\//g;
+    var directive_pattern = / (\w+)[:](\w+)/g;
+    var directives_end_ignore_pattern = /([\s\S]*?)((?:\/\*\sbeautify\signore:end\s\*\/)|$)/g;
+
+    var template_pattern = /((<\?php|<\?=)[\s\S]*?\?>)|(<%[\s\S]*?%>)/g;
+
+    var n_newlines, whitespace_before_token, in_html_comment, tokens;
+    var input;
+
+    this.tokenize = function() {
+        input = new InputScanner(input_string);
+        in_html_comment = false;
+        tokens = [];
+
+        var next, last;
+        var token_values;
+        var open = null;
+        var open_stack = [];
+        var comments = [];
+
+        while (!(last && last.type === 'TK_EOF')) {
+            token_values = tokenize_next();
+            next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
+            while (next.type === 'TK_COMMENT' || next.type === 'TK_BLOCK_COMMENT' || next.type === 'TK_UNKNOWN') {
+                if (next.type === 'TK_BLOCK_COMMENT') {
+                    next.directives = token_values[2];
+                }
+                comments.push(next);
+                token_values = tokenize_next();
+                next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
+            }
+
+            if (comments.length) {
+                next.comments_before = comments;
+                comments = [];
+            }
+
+            if (next.type === 'TK_START_BLOCK' || next.type === 'TK_START_EXPR') {
+                next.parent = last;
+                open_stack.push(open);
+                open = next;
+            } else if ((next.type === 'TK_END_BLOCK' || next.type === 'TK_END_EXPR') &&
+                (open && (
+                    (next.text === ']' && open.text === '[') ||
+                    (next.text === ')' && open.text === '(') ||
+                    (next.text === '}' && open.text === '{')))) {
+                next.parent = open.parent;
+                next.opened = open;
+
+                open = open_stack.pop();
+            }
+
+            tokens.push(next);
+            last = next;
+        }
+
+        return tokens;
+    };
+
+    function get_directives(text) {
+        if (!text.match(directives_block_pattern)) {
+            return null;
+        }
+
+        var directives = {};
+        directive_pattern.lastIndex = 0;
+        var directive_match = directive_pattern.exec(text);
+
+        while (directive_match) {
+            directives[directive_match[1]] = directive_match[2];
+            directive_match = directive_pattern.exec(text);
+        }
+
+        return directives;
+    }
+
+    function tokenize_next() {
+        var resulting_string;
+        var whitespace_on_this_line = [];
+
+        n_newlines = 0;
+        whitespace_before_token = '';
+
+        var c = input.next();
+
+        if (c === null) {
+            return ['', 'TK_EOF'];
+        }
+
+        var last_token;
+        if (tokens.length) {
+            last_token = tokens[tokens.length - 1];
+        } else {
+            // For the sake of tokenizing we can pretend that there was on open brace to start
+            last_token = new Token('TK_START_BLOCK', '{');
+        }
+
+        while (in_array(c, whitespace)) {
+
+            if (acorn.newline.test(c)) {
+                if (!(c === '\n' && input.peek(-2) === '\r')) {
+                    n_newlines += 1;
+                    whitespace_on_this_line = [];
+                }
+            } else {
+                whitespace_on_this_line.push(c);
+            }
+
+            c = input.next();
+
+            if (c === null) {
+                return ['', 'TK_EOF'];
+            }
+        }
+
+        if (whitespace_on_this_line.length) {
+            whitespace_before_token = whitespace_on_this_line.join('');
+        }
+
+        if (digit.test(c) || (c === '.' && input.testChar(digit))) {
+            var allow_decimal = true;
+            var allow_e = true;
+            var local_digit = digit;
+
+            if (c === '0' && input.testChar(/[XxOoBb]/)) {
+                // switch to hex/oct/bin number, no decimal or e, just hex/oct/bin digits
+                allow_decimal = false;
+                allow_e = false;
+                if (input.testChar(/[Bb]/)) {
+                    local_digit = digit_bin;
+                } else if (input.testChar(/[Oo]/)) {
+                    local_digit = digit_oct;
+                } else {
+                    local_digit = digit_hex;
+                }
+                c += input.next();
+            } else if (c === '.') {
+                // Already have a decimal for this literal, don't allow another
+                allow_decimal = false;
+            } else {
+                // we know this first loop will run.  It keeps the logic simpler.
+                c = '';
+                input.back();
+            }
+
+            // Add the digits
+            while (input.testChar(local_digit)) {
+                c += input.next();
+
+                if (allow_decimal && input.peek() === '.') {
+                    c += input.next();
+                    allow_decimal = false;
+                }
+
+                // a = 1.e-7 is valid, so we test for . then e in one loop
+                if (allow_e && input.testChar(/[Ee]/)) {
+                    c += input.next();
+
+                    if (input.testChar(/[+-]/)) {
+                        c += input.next();
+                    }
+
+                    allow_e = false;
+                    allow_decimal = false;
+                }
+            }
+
+            return [c, 'TK_WORD'];
+        }
+
+        if (acorn.isIdentifierStart(input.peekCharCode(-1))) {
+            if (input.hasNext()) {
+                while (acorn.isIdentifierChar(input.peekCharCode())) {
+                    c += input.next();
+                    if (!input.hasNext()) {
+                        break;
+                    }
+                }
+            }
+
+            if (!(last_token.type === 'TK_DOT' ||
+                    (last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['set', 'get']))) &&
+                in_array(c, reserved_words)) {
+                if (c === 'in' || c === 'of') { // hack for 'in' and 'of' operators
+                    return [c, 'TK_OPERATOR'];
+                }
+                return [c, 'TK_RESERVED'];
+            }
+
+            return [c, 'TK_WORD'];
+        }
+
+        if (c === '(' || c === '[') {
+            return [c, 'TK_START_EXPR'];
+        }
+
+        if (c === ')' || c === ']') {
+            return [c, 'TK_END_EXPR'];
+        }
+
+        if (c === '{') {
+            return [c, 'TK_START_BLOCK'];
+        }
+
+        if (c === '}') {
+            return [c, 'TK_END_BLOCK'];
+        }
+
+        if (c === ';') {
+            return [c, 'TK_SEMICOLON'];
+        }
+
+        if (c === '/') {
+            var comment = '';
+            var comment_match;
+            // peek for comment /* ... */
+            if (input.peek() === '*') {
+                input.next();
+                comment_match = input.match(block_comment_pattern);
+                comment = '/*' + comment_match[0];
+                var directives = get_directives(comment);
+                if (directives && directives.ignore === 'start') {
+                    comment_match = input.match(directives_end_ignore_pattern);
+                    comment += comment_match[0];
+                }
+                comment = comment.replace(acorn.allLineBreaks, '\n');
+                return [comment, 'TK_BLOCK_COMMENT', directives];
+            }
+            // peek for comment // ...
+            if (input.peek() === '/') {
+                input.next();
+                comment_match = input.match(comment_pattern);
+                comment = '//' + comment_match[0];
+                return [comment, 'TK_COMMENT'];
+            }
+
+        }
+
+        var startXmlRegExp = /<()([-a-zA-Z:0-9_.]+|{[\s\S]+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{[\s\S]+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{[\s\S]+?}))*\s*(\/?)\s*>/g;
+
+        if (c === '`' || c === "'" || c === '"' || // string
+            (
+                (c === '/') || // regexp
+                (opts.e4x && c === "<" && input.test(startXmlRegExp, -1)) // xml
+            ) && ( // regex and xml can only appear in specific locations during parsing
+                (last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['return', 'case', 'throw', 'else', 'do', 'typeof', 'yield'])) ||
+                (last_token.type === 'TK_END_EXPR' && last_token.text === ')' &&
+                    last_token.parent && last_token.parent.type === 'TK_RESERVED' && in_array(last_token.parent.text, ['if', 'while', 'for'])) ||
+                (in_array(last_token.type, ['TK_COMMENT', 'TK_START_EXPR', 'TK_START_BLOCK',
+                    'TK_END_BLOCK', 'TK_OPERATOR', 'TK_EQUALS', 'TK_EOF', 'TK_SEMICOLON', 'TK_COMMA'
+                ]))
+            )) {
+
+            var sep = c,
+                esc = false,
+                has_char_escapes = false;
+
+            resulting_string = c;
+
+            if (sep === '/') {
+                //
+                // handle regexp
+                //
+                var in_char_class = false;
+                while (input.hasNext() &&
+                    ((esc || in_char_class || input.peek() !== sep) &&
+                        !input.testChar(acorn.newline))) {
+                    resulting_string += input.peek();
+                    if (!esc) {
+                        esc = input.peek() === '\\';
+                        if (input.peek() === '[') {
+                            in_char_class = true;
+                        } else if (input.peek() === ']') {
+                            in_char_class = false;
+                        }
+                    } else {
+                        esc = false;
+                    }
+                    input.next();
+                }
+            } else if (opts.e4x && sep === '<') {
+                //
+                // handle e4x xml literals
+                //
+
+                var xmlRegExp = /[\s\S]*?<(\/?)([-a-zA-Z:0-9_.]+|{[\s\S]+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{[\s\S]+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{[\s\S]+?}))*\s*(\/?)\s*>/g;
+                input.back();
+                var xmlStr = '';
+                var match = input.match(startXmlRegExp);
+                if (match) {
+                    // Trim root tag to attempt to
+                    var rootTag = match[2].replace(/^{\s+/, '{').replace(/\s+}$/, '}');
+                    var isCurlyRoot = rootTag.indexOf('{') === 0;
+                    var depth = 0;
+                    while (match) {
+                        var isEndTag = !!match[1];
+                        var tagName = match[2];
+                        var isSingletonTag = (!!match[match.length - 1]) || (tagName.slice(0, 8) === "![CDATA[");
+                        if (!isSingletonTag &&
+                            (tagName === rootTag || (isCurlyRoot && tagName.replace(/^{\s+/, '{').replace(/\s+}$/, '}')))) {
+                            if (isEndTag) {
+                                --depth;
+                            } else {
+                                ++depth;
+                            }
+                        }
+                        xmlStr += match[0];
+                        if (depth <= 0) {
+                            break;
+                        }
+                        match = input.match(xmlRegExp);
+                    }
+                    // if we didn't close correctly, keep unformatted.
+                    if (!match) {
+                        xmlStr += input.match(/[\s\S]*/g)[0];
+                    }
+                    xmlStr = xmlStr.replace(acorn.allLineBreaks, '\n');
+                    return [xmlStr, "TK_STRING"];
+                }
+            } else {
+                //
+                // handle string
+                //
+                var parse_string = function(delimiter, allow_unescaped_newlines, start_sub) {
+                    // Template strings can travers lines without escape characters.
+                    // Other strings cannot
+                    var current_char;
+                    while (input.hasNext()) {
+                        current_char = input.peek();
+                        if (!(esc || (current_char !== delimiter &&
+                                (allow_unescaped_newlines || !acorn.newline.test(current_char))))) {
+                            break;
+                        }
+
+                        // Handle \r\n linebreaks after escapes or in template strings
+                        if ((esc || allow_unescaped_newlines) && acorn.newline.test(current_char)) {
+                            if (current_char === '\r' && input.peek(1) === '\n') {
+                                input.next();
+                                current_char = input.peek();
+                            }
+                            resulting_string += '\n';
+                        } else {
+                            resulting_string += current_char;
+                        }
+
+                        if (esc) {
+                            if (current_char === 'x' || current_char === 'u') {
+                                has_char_escapes = true;
+                            }
+                            esc = false;
+                        } else {
+                            esc = current_char === '\\';
+                        }
+
+                        input.next();
+
+                        if (start_sub && resulting_string.indexOf(start_sub, resulting_string.length - start_sub.length) !== -1) {
+                            if (delimiter === '`') {
+                                parse_string('}', allow_unescaped_newlines, '`');
+                            } else {
+                                parse_string('`', allow_unescaped_newlines, '${');
+                            }
+
+                            if (input.hasNext()) {
+                                resulting_string += input.next();
+                            }
+                        }
+                    }
+                };
+
+                if (sep === '`') {
+                    parse_string('`', true, '${');
+                } else {
+                    parse_string(sep);
+                }
+            }
+
+            if (has_char_escapes && opts.unescape_strings) {
+                resulting_string = unescape_string(resulting_string);
+            }
+
+            if (input.peek() === sep) {
+                resulting_string += sep;
+                input.next();
+
+                if (sep === '/') {
+                    // regexps may have modifiers /regexp/MOD , so fetch those, too
+                    // Only [gim] are valid, but if the user puts in garbage, do what we can to take it.
+                    while (input.hasNext() && acorn.isIdentifierStart(input.peekCharCode())) {
+                        resulting_string += input.next();
+                    }
+                }
+            }
+            return [resulting_string, 'TK_STRING'];
+        }
+
+        if (c === '#') {
+
+            if (tokens.length === 0 && input.peek() === '!') {
+                // shebang
+                resulting_string = c;
+                while (input.hasNext() && c !== '\n') {
+                    c = input.next();
+                    resulting_string += c;
+                }
+                return [trim(resulting_string) + '\n', 'TK_UNKNOWN'];
+            }
+
+
+
+            // Spidermonkey-specific sharp variables for circular references
+            // https://developer.mozilla.org/En/Sharp_variables_in_JavaScript
+            // http://mxr.mozilla.org/mozilla-central/source/js/src/jsscan.cpp around line 1935
+            var sharp = '#';
+            if (input.hasNext() && input.testChar(digit)) {
+                do {
+                    c = input.next();
+                    sharp += c;
+                } while (input.hasNext() && c !== '#' && c !== '=');
+                if (c === '#') {
+                    //
+                } else if (input.peek() === '[' && input.peek(1) === ']') {
+                    sharp += '[]';
+                    input.next();
+                    input.next();
+                } else if (input.peek() === '{' && input.peek(1) === '}') {
+                    sharp += '{}';
+                    input.next();
+                    input.next();
+                }
+                return [sharp, 'TK_WORD'];
+            }
+        }
+
+        if (c === '<' && (input.peek() === '?' || input.peek() === '%')) {
+            input.back();
+            var template_match = input.match(template_pattern);
+            if (template_match) {
+                c = template_match[0];
+                c = c.replace(acorn.allLineBreaks, '\n');
+                return [c, 'TK_STRING'];
+            }
+        }
+
+        if (c === '<' && input.match(/\!--/g)) {
+            c = '<!--';
+            while (input.hasNext() && !input.testChar(acorn.newline)) {
+                c += input.next();
+            }
+            in_html_comment = true;
+            return [c, 'TK_COMMENT'];
+        }
+
+        if (c === '-' && in_html_comment && input.match(/->/g)) {
+            in_html_comment = false;
+            return ['-->', 'TK_COMMENT'];
+        }
+
+        if (c === '.') {
+            if (input.peek() === '.' && input.peek(1) === '.') {
+                c += input.next() + input.next();
+                return [c, 'TK_OPERATOR'];
+            }
+            return [c, 'TK_DOT'];
+        }
+
+        if (in_array(c, punct)) {
+            while (input.hasNext() && in_array(c + input.peek(), punct)) {
+                c += input.next();
+                if (!input.hasNext()) {
+                    break;
+                }
+            }
+
+            if (c === ',') {
+                return [c, 'TK_COMMA'];
+            } else if (c === '=') {
+                return [c, 'TK_EQUALS'];
+            } else {
+                return [c, 'TK_OPERATOR'];
+            }
+        }
+
+        return [c, 'TK_UNKNOWN'];
+    }
+
+
+    function unescape_string(s) {
+        // You think that a regex would work for this
+        // return s.replace(/\\x([0-9a-f]{2})/gi, function(match, val) {
+        //         return String.fromCharCode(parseInt(val, 16));
+        //     })
+        // However, dealing with '\xff', '\\xff', '\\\xff' makes this more fun.
+        var out = '',
+            escaped = 0;
+
+        var input_scan = new InputScanner(s);
+        var matched = null;
+
+        while (input_scan.hasNext()) {
+            // Keep any whitespace, non-slash characters
+            // also keep slash pairs.
+            matched = input_scan.match(/([\s]|[^\\]|\\\\)+/g);
+
+            if (matched) {
+                out += matched[0];
+            }
+
+            if (input_scan.peek() === '\\') {
+                input_scan.next();
+                if (input_scan.peek() === 'x') {
+                    matched = input_scan.match(/x([0-9A-Fa-f]{2})/g);
+                } else if (input_scan.peek() === 'u') {
+                    matched = input_scan.match(/u([0-9A-Fa-f]{4})/g);
+                } else {
+                    out += '\\';
+                    if (input_scan.hasNext()) {
+                        out += input_scan.next();
+                    }
+                    continue;
+                }
+
+                // If there's some error decoding, return the original string
+                if (!matched) {
+                    return s;
+                }
+
+                escaped = parseInt(matched[1], 16);
+
+                if (escaped > 0x7e && escaped <= 0xff && matched[0].indexOf('x') === 0) {
+                    // we bail out on \x7f..\xff,
+                    // leaving whole string escaped,
+                    // as it's probably completely binary
+                    return s;
+                } else if (escaped >= 0x00 && escaped < 0x20) {
+                    // leave 0x00...0x1f escaped
+                    out += '\\' + matched[0];
+                    continue;
+                } else if (escaped === 0x22 || escaped === 0x27 || escaped === 0x5c) {
+                    // single-quote, apostrophe, backslash - escape these
+                    out += '\\' + String.fromCharCode(escaped);
+                } else {
+                    out += String.fromCharCode(escaped);
+                }
+            }
+        }
+
+        return out;
+    }
+}
+
+module.exports.Tokenizer = Tokenizer;
+
+/***/ })
+/******/ ]);
+var js_beautify = legacy_beautify_js;
+/* Footer */
+if (typeof undefined === "function" && undefined.amd) {
+    // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
+    undefined([], function() {
+        return { js_beautify: js_beautify };
+    });
+} else {
+    // Add support for CommonJS. Just put this file somewhere on your require.paths
+    // and you will be able to `var js_beautify = require("beautify").js_beautify`.
+    exports.js_beautify = js_beautify;
+}
+
+}());
+});
+
+unwrapExports(beautify);
+
+var beautifyCss = createCommonjsModule(function (module, exports) {
+/*jshint curly:false, eqeqeq:true, laxbreak:true, noempty:false */
+/* AUTO-GENERATED. DO NOT MODIFY. */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+
+ CSS Beautifier
+---------------
+
+    Written by Harutyun Amirjanyan, (amirjanyan@gmail.com)
+
+    Based on code initially developed by: Einar Lielmanis, <einar@jsbeautifier.org>
+        http://jsbeautifier.org/
+
+    Usage:
+        css_beautify(source_text);
+        css_beautify(source_text, options);
+
+    The options are (default in brackets):
+        indent_size (4)                         — indentation size,
+        indent_char (space)                     — character to indent with,
+        selector_separator_newline (true)       - separate selectors with newline or
+                                                  not (e.g. "a,\nbr" or "a, br")
+        end_with_newline (false)                - end with a newline
+        newline_between_rules (true)            - add a new line after every css rule
+        space_around_selector_separator (false) - ensure space around selector separators:
+                                                  '>', '+', '~' (e.g. "a>b" -> "a > b")
+    e.g
+
+    css_beautify(css_source_text, {
+      'indent_size': 1,
+      'indent_char': '\t',
+      'selector_separator': ' ',
+      'end_with_newline': false,
+      'newline_between_rules': true,
+      'space_around_selector_separator': true
+    });
+*/
+
+// http://www.w3.org/TR/CSS21/syndata.html#tokenization
+// http://www.w3.org/TR/css3-syntax/
+
+(function() {
+var legacy_beautify_css =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
+var mergeOpts = __webpack_require__(2).mergeOpts;
+var acorn = __webpack_require__(1);
+var Output = __webpack_require__(3).Output;
+
+
+var lineBreak = acorn.lineBreak;
+var allLineBreaks = acorn.allLineBreaks;
+
+function Beautifier(source_text, options) {
+    options = options || {};
+
+    // Allow the setting of language/file-type specific options
+    // with inheritance of overall settings
+    options = mergeOpts(options, 'css');
+
+    source_text = source_text || '';
+
+    var newlinesFromLastWSEat = 0;
+    var indentSize = options.indent_size ? parseInt(options.indent_size, 10) : 4;
+    var indentCharacter = options.indent_char || ' ';
+    var preserve_newlines = (options.preserve_newlines === undefined) ? false : options.preserve_newlines;
+    var selectorSeparatorNewline = (options.selector_separator_newline === undefined) ? true : options.selector_separator_newline;
+    var end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
+    var newline_between_rules = (options.newline_between_rules === undefined) ? true : options.newline_between_rules;
+    var space_around_combinator = (options.space_around_combinator === undefined) ? false : options.space_around_combinator;
+    space_around_combinator = space_around_combinator || ((options.space_around_selector_separator === undefined) ? false : options.space_around_selector_separator);
+    var eol = options.eol ? options.eol : 'auto';
+
+    if (options.indent_with_tabs) {
+        indentCharacter = '\t';
+        indentSize = 1;
+    }
+
+    if (eol === 'auto') {
+        eol = '\n';
+        if (source_text && lineBreak.test(source_text || '')) {
+            eol = source_text.match(lineBreak)[0];
+        }
+    }
+
+    eol = eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
+
+    // HACK: newline parsing inconsistent. This brute force normalizes the input.
+    source_text = source_text.replace(allLineBreaks, '\n');
+
+    // tokenizer
+    var whiteRe = /^\s+$/;
+
+    var pos = -1,
+        ch;
+    var parenLevel = 0;
+
+    function next() {
+        ch = source_text.charAt(++pos);
+        return ch || '';
+    }
+
+    function peek(skipWhitespace) {
+        var result = '';
+        var prev_pos = pos;
+        if (skipWhitespace) {
+            eatWhitespace();
+        }
+        result = source_text.charAt(pos + 1) || '';
+        pos = prev_pos - 1;
+        next();
+        return result;
+    }
+
+    function eatString(endChars) {
+        var start = pos;
+        while (next()) {
+            if (ch === "\\") {
+                next();
+            } else if (endChars.indexOf(ch) !== -1) {
+                break;
+            } else if (ch === "\n") {
+                break;
+            }
+        }
+        return source_text.substring(start, pos + 1);
+    }
+
+    function peekString(endChar) {
+        var prev_pos = pos;
+        var str = eatString(endChar);
+        pos = prev_pos - 1;
+        next();
+        return str;
+    }
+
+    function eatWhitespace(preserve_newlines_local) {
+        var result = 0;
+        while (whiteRe.test(peek())) {
+            next();
+            if (ch === '\n' && preserve_newlines_local && preserve_newlines) {
+                output.add_new_line(true);
+                result++;
+            }
+        }
+        newlinesFromLastWSEat = result;
+        return result;
+    }
+
+    function skipWhitespace() {
+        var result = '';
+        if (ch && whiteRe.test(ch)) {
+            result = ch;
+        }
+        while (whiteRe.test(next())) {
+            result += ch;
+        }
+        return result;
+    }
+
+    function eatComment() {
+        var start = pos;
+        var singleLine = peek() === "/";
+        next();
+        while (next()) {
+            if (!singleLine && ch === "*" && peek() === "/") {
+                next();
+                break;
+            } else if (singleLine && ch === "\n") {
+                return source_text.substring(start, pos);
+            }
+        }
+
+        return source_text.substring(start, pos) + ch;
+    }
+
+
+    function lookBack(str) {
+        return source_text.substring(pos - str.length, pos).toLowerCase() ===
+            str;
+    }
+
+    // Nested pseudo-class if we are insideRule
+    // and the next special character found opens
+    // a new block
+    function foundNestedPseudoClass() {
+        var openParen = 0;
+        for (var i = pos + 1; i < source_text.length; i++) {
+            var ch = source_text.charAt(i);
+            if (ch === "{") {
+                return true;
+            } else if (ch === '(') {
+                // pseudoclasses can contain ()
+                openParen += 1;
+            } else if (ch === ')') {
+                if (openParen === 0) {
+                    return false;
+                }
+                openParen -= 1;
+            } else if (ch === ";" || ch === "}") {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // printer
+    var baseIndentString = '';
+    var preindent_index = 0;
+    if (source_text && source_text.length) {
+        while ((source_text.charAt(preindent_index) === ' ' ||
+                source_text.charAt(preindent_index) === '\t')) {
+            preindent_index += 1;
+        }
+        baseIndentString = source_text.substring(0, preindent_index);
+        js_source_text = source_text.substring(preindent_index);
+    }
+
+
+    var singleIndent = new Array(indentSize + 1).join(indentCharacter);
+    var indentLevel;
+    var nestedLevel;
+    var output;
+
+    function print_string(output_string) {
+        if (output.just_added_newline()) {
+            output.set_indent(indentLevel);
+        }
+        output.add_token(output_string);
+    }
+
+    function preserveSingleSpace(isAfterSpace) {
+        if (isAfterSpace) {
+            output.space_before_token = true;
+        }
+    }
+
+    function indent() {
+        indentLevel++;
+    }
+
+    function outdent() {
+        if (indentLevel > 0) {
+            indentLevel--;
+        }
+    }
+
+    /*_____________________--------------------_____________________*/
+
+    this.beautify = function() {
+        // reset
+        output = new Output(singleIndent, baseIndentString);
+        indentLevel = 0;
+        nestedLevel = 0;
+
+        pos = -1;
+        ch = null;
+        parenLevel = 0;
+
+        var insideRule = false;
+        var insidePropertyValue = false;
+        var enteringConditionalGroup = false;
+        var top_ch = '';
+        var last_top_ch = '';
+
+        while (true) {
+            var whitespace = skipWhitespace();
+            var isAfterSpace = whitespace !== '';
+            var isAfterNewline = whitespace.indexOf('\n') !== -1;
+            last_top_ch = top_ch;
+            top_ch = ch;
+
+            if (!ch) {
+                break;
+            } else if (ch === '/' && peek() === '*') { /* css comment */
+                var header = indentLevel === 0;
+
+                if (isAfterNewline || header) {
+                    output.add_new_line();
+                }
+
+                print_string(eatComment());
+                output.add_new_line();
+                if (header) {
+                    output.add_new_line(true);
+                }
+            } else if (ch === '/' && peek() === '/') { // single line comment
+                if (!isAfterNewline && last_top_ch !== '{') {
+                    output.trim(true);
+                }
+                output.space_before_token = true;
+                print_string(eatComment());
+                output.add_new_line();
+            } else if (ch === '@') {
+                preserveSingleSpace(isAfterSpace);
+
+                // deal with less propery mixins @{...}
+                if (peek() === '{') {
+                    print_string(eatString('}'));
+                } else {
+                    print_string(ch);
+
+                    // strip trailing space, if present, for hash property checks
+                    var variableOrRule = peekString(": ,;{}()[]/='\"");
+
+                    if (variableOrRule.match(/[ :]$/)) {
+                        // we have a variable or pseudo-class, add it and insert one space before continuing
+                        next();
+                        variableOrRule = eatString(": ").replace(/\s$/, '');
+                        print_string(variableOrRule);
+                        output.space_before_token = true;
+                    }
+
+                    variableOrRule = variableOrRule.replace(/\s$/, '');
+
+                    // might be a nesting at-rule
+                    if (variableOrRule in this.NESTED_AT_RULE) {
+                        nestedLevel += 1;
+                        if (variableOrRule in this.CONDITIONAL_GROUP_RULE) {
+                            enteringConditionalGroup = true;
+                        }
+                    }
+                }
+            } else if (ch === '#' && peek() === '{') {
+                preserveSingleSpace(isAfterSpace);
+                print_string(eatString('}'));
+            } else if (ch === '{') {
+                if (peek(true) === '}') {
+                    eatWhitespace();
+                    next();
+                    output.space_before_token = true;
+                    print_string("{}");
+                    if (!eatWhitespace(true)) {
+                        output.add_new_line();
+                    }
+
+                    if (newlinesFromLastWSEat < 2 && newline_between_rules && indentLevel === 0) {
+                        output.add_new_line(true);
+                    }
+                } else {
+                    indent();
+                    output.space_before_token = true;
+                    print_string(ch);
+                    if (!eatWhitespace(true)) {
+                        output.add_new_line();
+                    }
+
+                    // when entering conditional groups, only rulesets are allowed
+                    if (enteringConditionalGroup) {
+                        enteringConditionalGroup = false;
+                        insideRule = (indentLevel > nestedLevel);
+                    } else {
+                        // otherwise, declarations are also allowed
+                        insideRule = (indentLevel >= nestedLevel);
+                    }
+                }
+            } else if (ch === '}') {
+                outdent();
+                output.add_new_line();
+                print_string(ch);
+                insideRule = false;
+                insidePropertyValue = false;
+                if (nestedLevel) {
+                    nestedLevel--;
+                }
+
+                if (!eatWhitespace(true)) {
+                    output.add_new_line();
+                }
+
+                if (newlinesFromLastWSEat < 2 && newline_between_rules && indentLevel === 0) {
+                    output.add_new_line(true);
+                }
+            } else if (ch === ":") {
+                eatWhitespace();
+                if ((insideRule || enteringConditionalGroup) &&
+                    !(lookBack("&") || foundNestedPseudoClass()) &&
+                    !lookBack("(")) {
+                    // 'property: value' delimiter
+                    // which could be in a conditional group query
+                    print_string(':');
+                    if (!insidePropertyValue) {
+                        insidePropertyValue = true;
+                        output.space_before_token = true;
+                    }
+                } else {
+                    // sass/less parent reference don't use a space
+                    // sass nested pseudo-class don't use a space
+
+                    // preserve space before pseudoclasses/pseudoelements, as it means "in any child"
+                    if (lookBack(" ")) {
+                        output.space_before_token = true;
+                    }
+                    if (peek() === ":") {
+                        // pseudo-element
+                        next();
+                        print_string("::");
+                    } else {
+                        // pseudo-class
+                        print_string(':');
+                    }
+                }
+            } else if (ch === '"' || ch === '\'') {
+                preserveSingleSpace(isAfterSpace);
+                print_string(eatString(ch));
+            } else if (ch === ';') {
+                insidePropertyValue = false;
+                print_string(ch);
+                if (!eatWhitespace(true)) {
+                    output.add_new_line();
+                }
+            } else if (ch === '(') { // may be a url
+                if (lookBack("url")) {
+                    print_string(ch);
+                    eatWhitespace();
+                    if (next()) {
+                        if (ch !== ')' && ch !== '"' && ch !== '\'') {
+                            print_string(eatString(')'));
+                        } else {
+                            pos--;
+                        }
+                    }
+                } else {
+                    parenLevel++;
+                    preserveSingleSpace(isAfterSpace);
+                    print_string(ch);
+                    eatWhitespace();
+                }
+            } else if (ch === ')') {
+                print_string(ch);
+                parenLevel--;
+            } else if (ch === ',') {
+                print_string(ch);
+                if (!eatWhitespace(true) && selectorSeparatorNewline && !insidePropertyValue && parenLevel < 1) {
+                    output.add_new_line();
+                } else {
+                    output.space_before_token = true;
+                }
+            } else if ((ch === '>' || ch === '+' || ch === '~') &&
+                !insidePropertyValue && parenLevel < 1) {
+                //handle combinator spacing
+                if (space_around_combinator) {
+                    output.space_before_token = true;
+                    print_string(ch);
+                    output.space_before_token = true;
+                } else {
+                    print_string(ch);
+                    eatWhitespace();
+                    // squash extra whitespace
+                    if (ch && whiteRe.test(ch)) {
+                        ch = '';
+                    }
+                }
+            } else if (ch === ']') {
+                print_string(ch);
+            } else if (ch === '[') {
+                preserveSingleSpace(isAfterSpace);
+                print_string(ch);
+            } else if (ch === '=') { // no whitespace before or after
+                eatWhitespace();
+                print_string('=');
+                if (whiteRe.test(ch)) {
+                    ch = '';
+                }
+
+            } else {
+                preserveSingleSpace(isAfterSpace);
+                print_string(ch);
+            }
+        }
+
+        var sweetCode = output.get_code(end_with_newline, eol);
+
+        return sweetCode;
+    };
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/At-rule
+    this.NESTED_AT_RULE = {
+        "@page": true,
+        "@font-face": true,
+        "@keyframes": true,
+        // also in CONDITIONAL_GROUP_RULE below
+        "@media": true,
+        "@supports": true,
+        "@document": true
+    };
+    this.CONDITIONAL_GROUP_RULE = {
+        "@media": true,
+        "@supports": true,
+        "@document": true
+    };
+}
+
+module.exports.Beautifier = Beautifier;
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+/* jshint curly: false */
+// This section of code is taken from acorn.
+//
+// Acorn was written by Marijn Haverbeke and released under an MIT
+// license. The Unicode regexps (for identifiers and whitespace) were
+// taken from [Esprima](http://esprima.org) by Ariya Hidayat.
+//
+// Git repositories for Acorn are available at
+//
+//     http://marijnhaverbeke.nl/git/acorn
+//     https://github.com/marijnh/acorn.git
+
+// ## Character categories
+
+// Big ugly regular expressions that match characters in the
+// whitespace, identifier, and identifier-start categories. These
+// are only applied when a character is found to actually have a
+// code point above 128.
+
+var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
+var nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f";
+var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
+var nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonASCIIidentifierChars + "]");
+
+// Whether a single character denotes a newline.
+
+exports.newline = /[\n\r\u2028\u2029]/;
+
+// Matches a whole line break (where CRLF is considered a single
+// line break). Used to count lines.
+
+// in javascript, these two differ
+// in python they are the same, different methods are called on them
+exports.lineBreak = new RegExp('\r\n|' + exports.newline.source);
+exports.allLineBreaks = new RegExp(exports.lineBreak.source, 'g');
+
+
+// Test whether a given character code starts an identifier.
+
+exports.isIdentifierStart = function(code) {
+    // permit $ (36) and @ (64). @ is used in ES7 decorators.
+    if (code < 65) { return code === 36 || code === 64; }
+    // 65 through 91 are uppercase letters.
+    if (code < 91) { return true; }
+    // permit _ (95).
+    if (code < 97) { return code === 95; }
+    // 97 through 123 are lowercase letters.
+    if (code < 123) { return true; }
+    return code >= 0xaa && nonASCIIidentifierStart.test(String.fromCharCode(code));
+};
+
+// Test whether a given character is part of an identifier.
+
+exports.isIdentifierChar = function(code) {
+    if (code < 48) { return code === 36; }
+    if (code < 58) { return true; }
+    if (code < 65) { return false; }
+    if (code < 91) { return true; }
+    if (code < 97) { return code === 95; }
+    if (code < 123) { return true; }
+    return code >= 0xaa && nonASCIIidentifier.test(String.fromCharCode(code));
+};
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+    The MIT License (MIT)
+
+    Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation files
+    (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+function mergeOpts(allOptions, targetType) {
+    var finalOpts = {};
+    var name;
+
+    for (name in allOptions) {
+        if (name !== targetType) {
+            finalOpts[name] = allOptions[name];
+        }
+    }
+
+    //merge in the per type settings for the targetType
+    if (targetType in allOptions) {
+        for (name in allOptions[targetType]) {
+            finalOpts[name] = allOptions[targetType][name];
+        }
+    }
+    return finalOpts;
+}
+
+module.exports.mergeOpts = mergeOpts;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
+function OutputLine(parent) {
+    var _character_count = 0;
+    // use indent_count as a marker for lines that have preserved indentation
+    var _indent_count = -1;
+
+    var _items = [];
+    var _empty = true;
+
+    this.set_indent = function(level) {
+        _character_count = parent.baseIndentLength + level * parent.indent_length;
+        _indent_count = level;
+    };
+
+    this.get_character_count = function() {
+        return _character_count;
+    };
+
+    this.is_empty = function() {
+        return _empty;
+    };
+
+    this.last = function() {
+        if (!this._empty) {
+            return _items[_items.length - 1];
+        } else {
+            return null;
+        }
+    };
+
+    this.push = function(input) {
+        _items.push(input);
+        _character_count += input.length;
+        _empty = false;
+    };
+
+    this.pop = function() {
+        var item = null;
+        if (!_empty) {
+            item = _items.pop();
+            _character_count -= item.length;
+            _empty = _items.length === 0;
+        }
+        return item;
+    };
+
+    this.remove_indent = function() {
+        if (_indent_count > 0) {
+            _indent_count -= 1;
+            _character_count -= parent.indent_length;
+        }
+    };
+
+    this.trim = function() {
+        while (this.last() === ' ') {
+            _items.pop();
+            _character_count -= 1;
+        }
+        _empty = _items.length === 0;
+    };
+
+    this.toString = function() {
+        var result = '';
+        if (!this._empty) {
+            if (_indent_count >= 0) {
+                result = parent.indent_cache[_indent_count];
+            }
+            result += _items.join('');
+        }
+        return result;
+    };
+}
+
+function Output(indent_string, baseIndentString) {
+    baseIndentString = baseIndentString || '';
+    this.indent_cache = [baseIndentString];
+    this.baseIndentLength = baseIndentString.length;
+    this.indent_length = indent_string.length;
+    this.raw = false;
+
+    var lines = [];
+    this.baseIndentString = baseIndentString;
+    this.indent_string = indent_string;
+    this.previous_line = null;
+    this.current_line = null;
+    this.space_before_token = false;
+
+    this.add_outputline = function() {
+        this.previous_line = this.current_line;
+        this.current_line = new OutputLine(this);
+        lines.push(this.current_line);
+    };
+
+    // initialize
+    this.add_outputline();
+
+
+    this.get_line_number = function() {
+        return lines.length;
+    };
+
+    // Using object instead of string to allow for later expansion of info about each line
+    this.add_new_line = function(force_newline) {
+        if (this.get_line_number() === 1 && this.just_added_newline()) {
+            return false; // no newline on start of file
+        }
+
+        if (force_newline || !this.just_added_newline()) {
+            if (!this.raw) {
+                this.add_outputline();
+            }
+            return true;
+        }
+
+        return false;
+    };
+
+    this.get_code = function(end_with_newline, eol) {
+        var sweet_code = lines.join('\n').replace(/[\r\n\t ]+$/, '');
+
+        if (end_with_newline) {
+            sweet_code += '\n';
+        }
+
+        if (eol !== '\n') {
+            sweet_code = sweet_code.replace(/[\n]/g, eol);
+        }
+
+        return sweet_code;
+    };
+
+    this.set_indent = function(level) {
+        // Never indent your first output indent at the start of the file
+        if (lines.length > 1) {
+            while (level >= this.indent_cache.length) {
+                this.indent_cache.push(this.indent_cache[this.indent_cache.length - 1] + this.indent_string);
+            }
+
+            this.current_line.set_indent(level);
+            return true;
+        }
+        this.current_line.set_indent(0);
+        return false;
+    };
+
+    this.add_raw_token = function(token) {
+        for (var x = 0; x < token.newlines; x++) {
+            this.add_outputline();
+        }
+        this.current_line.push(token.whitespace_before);
+        this.current_line.push(token.text);
+        this.space_before_token = false;
+    };
+
+    this.add_token = function(printable_token) {
+        this.add_space_before_token();
+        this.current_line.push(printable_token);
+    };
+
+    this.add_space_before_token = function() {
+        if (this.space_before_token && !this.just_added_newline()) {
+            this.current_line.push(' ');
+        }
+        this.space_before_token = false;
+    };
+
+    this.remove_indent = function(index) {
+        var output_length = lines.length;
+        while (index < output_length) {
+            lines[index].remove_indent();
+            index++;
+        }
+    };
+
+    this.trim = function(eat_newlines) {
+        eat_newlines = (eat_newlines === undefined) ? false : eat_newlines;
+
+        this.current_line.trim(indent_string, baseIndentString);
+
+        while (eat_newlines && lines.length > 1 &&
+            this.current_line.is_empty()) {
+            lines.pop();
+            this.current_line = lines[lines.length - 1];
+            this.current_line.trim();
+        }
+
+        this.previous_line = lines.length > 1 ? lines[lines.length - 2] : null;
+    };
+
+    this.just_added_newline = function() {
+        return this.current_line.is_empty();
+    };
+
+    this.just_added_blankline = function() {
+        if (this.just_added_newline()) {
+            if (lines.length === 1) {
+                return true; // start of the file and newline = blank
+            }
+
+            var line = lines[lines.length - 2];
+            return line.is_empty();
+        }
+        return false;
+    };
+}
+
+module.exports.Output = Output;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+    The MIT License (MIT)
+
+    Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation files
+    (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+var Beautifier = __webpack_require__(0).Beautifier;
+
+function css_beautify(source_text, options) {
+    var beautifier = new Beautifier(source_text, options);
+    return beautifier.beautify();
+}
+
+module.exports = css_beautify;
+
+/***/ })
+/******/ ]);
+var css_beautify = legacy_beautify_css;
+/* Footer */
+if (typeof undefined === "function" && undefined.amd) {
+    // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
+    undefined([], function() {
+        return {
+            css_beautify: css_beautify
+        };
+    });
+} else {
+    // Add support for CommonJS. Just put this file somewhere on your require.paths
+    // and you will be able to `var html_beautify = require("beautify").html_beautify`.
+    exports.css_beautify = css_beautify;
+}
+
+}());
+});
+
+unwrapExports(beautifyCss);
+
+var beautifyHtml = createCommonjsModule(function (module, exports) {
+/*jshint curly:false, eqeqeq:true, laxbreak:true, noempty:false */
+/* AUTO-GENERATED. DO NOT MODIFY. */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+
+ Style HTML
+---------------
+
+  Written by Nochum Sossonko, (nsossonko@hotmail.com)
+
+  Based on code initially developed by: Einar Lielmanis, <einar@jsbeautifier.org>
+    http://jsbeautifier.org/
+
+  Usage:
+    style_html(html_source);
+
+    style_html(html_source, options);
+
+  The options are:
+    indent_inner_html (default false)  — indent <head> and <body> sections,
+    indent_size (default 4)          — indentation size,
+    indent_char (default space)      — character to indent with,
+    wrap_line_length (default 250)            -  maximum amount of characters per line (0 = disable)
+    brace_style (default "collapse") - "collapse" | "expand" | "end-expand" | "none"
+            put braces on the same line as control statements (default), or put braces on own line (Allman / ANSI style), or just put end braces on own line, or attempt to keep them where they are.
+    unformatted (defaults to inline tags) - list of tags, that shouldn't be reformatted
+    content_unformatted (defaults to pre tag) - list of tags, whose content shouldn't be reformatted
+    indent_scripts (default normal)  - "keep"|"separate"|"normal"
+    preserve_newlines (default true) - whether existing line breaks before elements should be preserved
+                                        Only works before elements, not inside tags or for text.
+    max_preserve_newlines (default unlimited) - maximum number of line breaks to be preserved in one chunk
+    indent_handlebars (default false) - format and indent {{#foo}} and {{/foo}}
+    end_with_newline (false)          - end with a newline
+    extra_liners (default [head,body,/html]) -List of tags that should have an extra newline before them.
+
+    e.g.
+
+    style_html(html_source, {
+      'indent_inner_html': false,
+      'indent_size': 2,
+      'indent_char': ' ',
+      'wrap_line_length': 78,
+      'brace_style': 'expand',
+      'preserve_newlines': true,
+      'max_preserve_newlines': 5,
+      'indent_handlebars': false,
+      'extra_liners': ['/html']
+    });
+*/
+
+(function() {
+var legacy_beautify_html =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
+var mergeOpts = __webpack_require__(2).mergeOpts;
+var acorn = __webpack_require__(1);
+
+
+var lineBreak = acorn.lineBreak;
+var allLineBreaks = acorn.allLineBreaks;
+
+// function trim(s) {
+//     return s.replace(/^\s+|\s+$/g, '');
+// }
+
+function ltrim(s) {
+    return s.replace(/^\s+/g, '');
+}
+
+function rtrim(s) {
+    return s.replace(/\s+$/g, '');
+}
+
+function Beautifier(html_source, options, js_beautify, css_beautify) {
+    //Wrapper function to invoke all the necessary constructors and deal with the output.
+    html_source = html_source || '';
+
+    var multi_parser,
+        indent_inner_html,
+        indent_body_inner_html,
+        indent_head_inner_html,
+        indent_size,
+        indent_character,
+        wrap_line_length,
+        brace_style,
+        unformatted,
+        content_unformatted,
+        preserve_newlines,
+        max_preserve_newlines,
+        indent_handlebars,
+        wrap_attributes,
+        wrap_attributes_indent_size,
+        is_wrap_attributes_force,
+        is_wrap_attributes_force_expand_multiline,
+        is_wrap_attributes_force_aligned,
+        end_with_newline,
+        extra_liners,
+        eol;
+
+    options = options || {};
+
+    // Allow the setting of language/file-type specific options
+    // with inheritance of overall settings
+    options = mergeOpts(options, 'html');
+
+    // backwards compatibility to 1.3.4
+    if ((options.wrap_line_length === undefined || parseInt(options.wrap_line_length, 10) === 0) &&
+        (options.max_char !== undefined && parseInt(options.max_char, 10) !== 0)) {
+        options.wrap_line_length = options.max_char;
+    }
+
+    indent_inner_html = (options.indent_inner_html === undefined) ? false : options.indent_inner_html;
+    indent_body_inner_html = (options.indent_body_inner_html === undefined) ? true : options.indent_body_inner_html;
+    indent_head_inner_html = (options.indent_head_inner_html === undefined) ? true : options.indent_head_inner_html;
+    indent_size = (options.indent_size === undefined) ? 4 : parseInt(options.indent_size, 10);
+    indent_character = (options.indent_char === undefined) ? ' ' : options.indent_char;
+    brace_style = (options.brace_style === undefined) ? 'collapse' : options.brace_style;
+    wrap_line_length = parseInt(options.wrap_line_length, 10) === 0 ? 32786 : parseInt(options.wrap_line_length || 250, 10);
+    unformatted = options.unformatted || [
+        // https://www.w3.org/TR/html5/dom.html#phrasing-content
+        'a', 'abbr', 'area', 'audio', 'b', 'bdi', 'bdo', 'br', 'button', 'canvas', 'cite',
+        'code', 'data', 'datalist', 'del', 'dfn', 'em', 'embed', 'i', 'iframe', 'img',
+        'input', 'ins', 'kbd', 'keygen', 'label', 'map', 'mark', 'math', 'meter', 'noscript',
+        'object', 'output', 'progress', 'q', 'ruby', 's', 'samp', /* 'script', */ 'select', 'small',
+        'span', 'strong', 'sub', 'sup', 'svg', 'template', 'textarea', 'time', 'u', 'var',
+        'video', 'wbr', 'text',
+        // prexisting - not sure of full effect of removing, leaving in
+        'acronym', 'address', 'big', 'dt', 'ins', 'strike', 'tt',
+    ];
+    content_unformatted = options.content_unformatted || [
+        'pre',
+    ];
+    preserve_newlines = (options.preserve_newlines === undefined) ? true : options.preserve_newlines;
+    max_preserve_newlines = preserve_newlines ?
+        (isNaN(parseInt(options.max_preserve_newlines, 10)) ? 32786 : parseInt(options.max_preserve_newlines, 10)) :
+        0;
+    indent_handlebars = (options.indent_handlebars === undefined) ? false : options.indent_handlebars;
+    wrap_attributes = (options.wrap_attributes === undefined) ? 'auto' : options.wrap_attributes;
+    wrap_attributes_indent_size = (isNaN(parseInt(options.wrap_attributes_indent_size, 10))) ? indent_size : parseInt(options.wrap_attributes_indent_size, 10);
+    is_wrap_attributes_force = wrap_attributes.substr(0, 'force'.length) === 'force';
+    is_wrap_attributes_force_expand_multiline = (wrap_attributes === 'force-expand-multiline');
+    is_wrap_attributes_force_aligned = (wrap_attributes === 'force-aligned');
+    end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
+    extra_liners = (typeof options.extra_liners === 'object') && options.extra_liners ?
+        options.extra_liners.concat() : (typeof options.extra_liners === 'string') ?
+        options.extra_liners.split(',') : 'head,body,/html'.split(',');
+    eol = options.eol ? options.eol : 'auto';
+
+    if (options.indent_with_tabs) {
+        indent_character = '\t';
+        indent_size = 1;
+    }
+
+    if (eol === 'auto') {
+        eol = '\n';
+        if (html_source && lineBreak.test(html_source || '')) {
+            eol = html_source.match(lineBreak)[0];
+        }
+    }
+
+    eol = eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
+
+    // HACK: newline parsing inconsistent. This brute force normalizes the input.
+    html_source = html_source.replace(allLineBreaks, '\n');
+
+    function Parser() {
+
+        this.pos = 0; //Parser position
+        this.token = '';
+        this.current_mode = 'CONTENT'; //reflects the current Parser mode: TAG/CONTENT
+        this.tags = { //An object to hold tags, their position, and their parent-tags, initiated with default values
+            parent: 'parent1',
+            parentcount: 1,
+            parent1: ''
+        };
+        this.tag_type = '';
+        this.token_text = this.last_token = this.last_text = this.token_type = '';
+        this.newlines = 0;
+        this.indent_content = indent_inner_html;
+        this.indent_body_inner_html = indent_body_inner_html;
+        this.indent_head_inner_html = indent_head_inner_html;
+
+        this.Utils = { //Uilities made available to the various functions
+            whitespace: "\n\r\t ".split(''),
+
+            single_token: options.void_elements || [
+                // HTLM void elements - aka self-closing tags - aka singletons
+                // https://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+                'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen',
+                'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr',
+                // NOTE: Optional tags - are not understood.
+                // https://www.w3.org/TR/html5/syntax.html#optional-tags
+                // The rules for optional tags are too complex for a simple list
+                // Also, the content of these tags should still be indented in many cases.
+                // 'li' is a good exmple.
+
+                // Doctype and xml elements
+                '!doctype', '?xml',
+                // ?php tag
+                '?php',
+                // other tags that were in this list, keeping just in case
+                'basefont', 'isindex'
+            ],
+            extra_liners: extra_liners, //for tags that need a line of whitespace before them
+            in_array: function(what, arr) {
+                for (var i = 0; i < arr.length; i++) {
+                    if (what === arr[i]) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+
+        // Return true if the given text is composed entirely of whitespace.
+        this.is_whitespace = function(text) {
+            for (var n = 0; n < text.length; n++) {
+                if (!this.Utils.in_array(text.charAt(n), this.Utils.whitespace)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        this.traverse_whitespace = function() {
+            var input_char = '';
+
+            input_char = this.input.charAt(this.pos);
+            if (this.Utils.in_array(input_char, this.Utils.whitespace)) {
+                this.newlines = 0;
+                while (this.Utils.in_array(input_char, this.Utils.whitespace)) {
+                    if (preserve_newlines && input_char === '\n' && this.newlines <= max_preserve_newlines) {
+                        this.newlines += 1;
+                    }
+
+                    this.pos++;
+                    input_char = this.input.charAt(this.pos);
+                }
+                return true;
+            }
+            return false;
+        };
+
+        // Append a space to the given content (string array) or, if we are
+        // at the wrap_line_length, append a newline/indentation.
+        // return true if a newline was added, false if a space was added
+        this.space_or_wrap = function(content) {
+            if (this.line_char_count >= this.wrap_line_length) { //insert a line when the wrap_line_length is reached
+                this.print_newline(false, content);
+                this.print_indentation(content);
+                return true;
+            } else {
+                this.line_char_count++;
+                content.push(' ');
+                return false;
+            }
+        };
+
+        this.get_content = function() { //function to capture regular content between tags
+            var input_char = '',
+                content = [],
+                handlebarsStarted = 0;
+
+            while (this.input.charAt(this.pos) !== '<' || handlebarsStarted === 2) {
+                if (this.pos >= this.input.length) {
+                    return content.length ? content.join('') : ['', 'TK_EOF'];
+                }
+
+                if (handlebarsStarted < 2 && this.traverse_whitespace()) {
+                    this.space_or_wrap(content);
+                    continue;
+                }
+
+                input_char = this.input.charAt(this.pos);
+
+                if (indent_handlebars) {
+                    if (input_char === '{') {
+                        handlebarsStarted += 1;
+                    } else if (handlebarsStarted < 2) {
+                        handlebarsStarted = 0;
+                    }
+
+                    if (input_char === '}' && handlebarsStarted > 0) {
+                        if (handlebarsStarted-- === 0) {
+                            break;
+                        }
+                    }
+                    // Handlebars parsing is complicated.
+                    // {{#foo}} and {{/foo}} are formatted tags.
+                    // {{something}} should get treated as content, except:
+                    // {{else}} specifically behaves like {{#if}} and {{/if}}
+                    var peek3 = this.input.substr(this.pos, 3);
+                    if (peek3 === '{{#' || peek3 === '{{/') {
+                        // These are tags and not content.
+                        break;
+                    } else if (peek3 === '{{!') {
+                        return [this.get_tag(), 'TK_TAG_HANDLEBARS_COMMENT'];
+                    } else if (this.input.substr(this.pos, 2) === '{{') {
+                        if (this.get_tag(true) === '{{else}}') {
+                            break;
+                        }
+                    }
+                }
+
+                this.pos++;
+                this.line_char_count++;
+                content.push(input_char); //letter at-a-time (or string) inserted to an array
+            }
+            return content.length ? content.join('') : '';
+        };
+
+        this.get_contents_to = function(name) { //get the full content of a script or style to pass to js_beautify
+            if (this.pos === this.input.length) {
+                return ['', 'TK_EOF'];
+            }
+            var content = '';
+            var reg_match = new RegExp('</' + name + '\\s*>', 'igm');
+            reg_match.lastIndex = this.pos;
+            var reg_array = reg_match.exec(this.input);
+            var end_script = reg_array ? reg_array.index : this.input.length; //absolute end of script
+            if (this.pos < end_script) { //get everything in between the script tags
+                content = this.input.substring(this.pos, end_script);
+                this.pos = end_script;
+            }
+            return content;
+        };
+
+        this.record_tag = function(tag) { //function to record a tag and its parent in this.tags Object
+            if (this.tags[tag + 'count']) { //check for the existence of this tag type
+                this.tags[tag + 'count']++;
+                this.tags[tag + this.tags[tag + 'count']] = this.indent_level; //and record the present indent level
+            } else { //otherwise initialize this tag type
+                this.tags[tag + 'count'] = 1;
+                this.tags[tag + this.tags[tag + 'count']] = this.indent_level; //and record the present indent level
+            }
+            this.tags[tag + this.tags[tag + 'count'] + 'parent'] = this.tags.parent; //set the parent (i.e. in the case of a div this.tags.div1parent)
+            this.tags.parent = tag + this.tags[tag + 'count']; //and make this the current parent (i.e. in the case of a div 'div1')
+        };
+
+        this.retrieve_tag = function(tag) { //function to retrieve the opening tag to the corresponding closer
+            if (this.tags[tag + 'count']) { //if the openener is not in the Object we ignore it
+                var temp_parent = this.tags.parent; //check to see if it's a closable tag.
+                while (temp_parent) { //till we reach '' (the initial value);
+                    if (tag + this.tags[tag + 'count'] === temp_parent) { //if this is it use it
+                        break;
+                    }
+                    temp_parent = this.tags[temp_parent + 'parent']; //otherwise keep on climbing up the DOM Tree
+                }
+                if (temp_parent) { //if we caught something
+                    this.indent_level = this.tags[tag + this.tags[tag + 'count']]; //set the indent_level accordingly
+                    this.tags.parent = this.tags[temp_parent + 'parent']; //and set the current parent
+                }
+                delete this.tags[tag + this.tags[tag + 'count'] + 'parent']; //delete the closed tags parent reference...
+                delete this.tags[tag + this.tags[tag + 'count']]; //...and the tag itself
+                if (this.tags[tag + 'count'] === 1) {
+                    delete this.tags[tag + 'count'];
+                } else {
+                    this.tags[tag + 'count']--;
+                }
+            }
+        };
+
+        this.indent_to_tag = function(tag) {
+            // Match the indentation level to the last use of this tag, but don't remove it.
+            if (!this.tags[tag + 'count']) {
+                return;
+            }
+            var temp_parent = this.tags.parent;
+            while (temp_parent) {
+                if (tag + this.tags[tag + 'count'] === temp_parent) {
+                    break;
+                }
+                temp_parent = this.tags[temp_parent + 'parent'];
+            }
+            if (temp_parent) {
+                this.indent_level = this.tags[tag + this.tags[tag + 'count']];
+            }
+        };
+
+        this.get_tag = function(peek) { //function to get a full tag and parse its type
+            var input_char = '',
+                content = [],
+                comment = '',
+                space = false,
+                first_attr = true,
+                has_wrapped_attrs = false,
+                tag_start, tag_end,
+                tag_start_char,
+                orig_pos = this.pos,
+                orig_line_char_count = this.line_char_count,
+                is_tag_closed = false,
+                tail;
+
+            peek = peek !== undefined ? peek : false;
+
+            do {
+                if (this.pos >= this.input.length) {
+                    if (peek) {
+                        this.pos = orig_pos;
+                        this.line_char_count = orig_line_char_count;
+                    }
+                    return content.length ? content.join('') : ['', 'TK_EOF'];
+                }
+
+                input_char = this.input.charAt(this.pos);
+                this.pos++;
+
+                if (this.Utils.in_array(input_char, this.Utils.whitespace)) { //don't want to insert unnecessary space
+                    space = true;
+                    continue;
+                }
+
+                if (input_char === "'" || input_char === '"') {
+                    input_char += this.get_unformatted(input_char);
+                    space = true;
+                }
+
+                if (input_char === '=') { //no space before =
+                    space = false;
+                }
+                tail = this.input.substr(this.pos - 1);
+                if (is_wrap_attributes_force_expand_multiline && has_wrapped_attrs && !is_tag_closed && (input_char === '>' || input_char === '/')) {
+                    if (tail.match(/^\/?\s*>/)) {
+                        space = false;
+                        is_tag_closed = true;
+                        this.print_newline(false, content);
+                        this.print_indentation(content);
+                    }
+                }
+                if (content.length && content[content.length - 1] !== '=' && input_char !== '>' && space) {
+                    //no space after = or before >
+                    var wrapped = this.space_or_wrap(content);
+                    var indentAttrs = wrapped && input_char !== '/' && !is_wrap_attributes_force;
+                    space = false;
+
+                    if (is_wrap_attributes_force && input_char !== '/') {
+                        var force_first_attr_wrap = false;
+                        if (is_wrap_attributes_force_expand_multiline && first_attr) {
+                            var is_only_attribute = tail.match(/^\S*(="([^"]|\\")*")?\s*\/?\s*>/) !== null;
+                            force_first_attr_wrap = !is_only_attribute;
+                        }
+                        if (!first_attr || force_first_attr_wrap) {
+                            this.print_newline(false, content);
+                            this.print_indentation(content);
+                            indentAttrs = true;
+                        }
+                    }
+                    if (indentAttrs) {
+                        has_wrapped_attrs = true;
+
+                        //indent attributes an auto, forced, or forced-align line-wrap
+                        var alignment_size = wrap_attributes_indent_size;
+                        if (is_wrap_attributes_force_aligned) {
+                            alignment_size = content.indexOf(' ') + 1;
+                        }
+
+                        for (var count = 0; count < alignment_size; count++) {
+                            // only ever further indent with spaces since we're trying to align characters
+                            content.push(' ');
+                        }
+                    }
+                    if (first_attr) {
+                        for (var i = 0; i < content.length; i++) {
+                            if (content[i] === ' ') {
+                                first_attr = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (indent_handlebars && tag_start_char === '<') {
+                    // When inside an angle-bracket tag, put spaces around
+                    // handlebars not inside of strings.
+                    if ((input_char + this.input.charAt(this.pos)) === '{{') {
+                        input_char += this.get_unformatted('}}');
+                        if (content.length && content[content.length - 1] !== ' ' && content[content.length - 1] !== '<') {
+                            input_char = ' ' + input_char;
+                        }
+                        space = true;
+                    }
+                }
+
+                if (input_char === '<' && !tag_start_char) {
+                    tag_start = this.pos - 1;
+                    tag_start_char = '<';
+                }
+
+                if (indent_handlebars && !tag_start_char) {
+                    if (content.length >= 2 && content[content.length - 1] === '{' && content[content.length - 2] === '{') {
+                        if (input_char === '#' || input_char === '/' || input_char === '!') {
+                            tag_start = this.pos - 3;
+                        } else {
+                            tag_start = this.pos - 2;
+                        }
+                        tag_start_char = '{';
+                    }
+                }
+
+                this.line_char_count++;
+                content.push(input_char); //inserts character at-a-time (or string)
+
+                if (content[1] && (content[1] === '!' || content[1] === '?' || content[1] === '%')) { //if we're in a comment, do something special
+                    // We treat all comments as literals, even more than preformatted tags
+                    // we just look for the appropriate close tag
+                    content = [this.get_comment(tag_start)];
+                    break;
+                }
+
+                if (indent_handlebars && content[1] && content[1] === '{' && content[2] && content[2] === '!') { //if we're in a comment, do something special
+                    // We treat all comments as literals, even more than preformatted tags
+                    // we just look for the appropriate close tag
+                    content = [this.get_comment(tag_start)];
+                    break;
+                }
+
+                if (indent_handlebars && tag_start_char === '{' && content.length > 2 && content[content.length - 2] === '}' && content[content.length - 1] === '}') {
+                    break;
+                }
+            } while (input_char !== '>');
+
+            var tag_complete = content.join('');
+            var tag_index;
+            var tag_offset;
+
+            // must check for space first otherwise the tag could have the first attribute included, and
+            // then not un-indent correctly
+            if (tag_complete.indexOf(' ') !== -1) { //if there's whitespace, thats where the tag name ends
+                tag_index = tag_complete.indexOf(' ');
+            } else if (tag_complete.indexOf('\n') !== -1) { //if there's a line break, thats where the tag name ends
+                tag_index = tag_complete.indexOf('\n');
+            } else if (tag_complete.charAt(0) === '{') {
+                tag_index = tag_complete.indexOf('}');
+            } else { //otherwise go with the tag ending
+                tag_index = tag_complete.indexOf('>');
+            }
+            if (tag_complete.charAt(0) === '<' || !indent_handlebars) {
+                tag_offset = 1;
+            } else {
+                tag_offset = tag_complete.charAt(2) === '#' ? 3 : 2;
+            }
+            var tag_check = tag_complete.substring(tag_offset, tag_index).toLowerCase();
+            if (tag_complete.charAt(tag_complete.length - 2) === '/' ||
+                this.Utils.in_array(tag_check, this.Utils.single_token)) { //if this tag name is a single tag type (either in the list or has a closing /)
+                if (!peek) {
+                    this.tag_type = 'SINGLE';
+                }
+            } else if (indent_handlebars && tag_complete.charAt(0) === '{' && tag_check === 'else') {
+                if (!peek) {
+                    this.indent_to_tag('if');
+                    this.tag_type = 'HANDLEBARS_ELSE';
+                    this.indent_content = true;
+                    this.traverse_whitespace();
+                }
+            } else if (this.is_unformatted(tag_check, unformatted) ||
+                this.is_unformatted(tag_check, content_unformatted)) {
+                // do not reformat the "unformatted" or "content_unformatted" tags
+                comment = this.get_unformatted('</' + tag_check + '>', tag_complete); //...delegate to get_unformatted function
+                content.push(comment);
+                this.tag_type = 'SINGLE';
+            } else if (tag_check === 'script' &&
+                (tag_complete.search('type') === -1 ||
+                    (tag_complete.search('type') > -1 &&
+                        tag_complete.search(/\b(text|application|dojo)\/(x-)?(javascript|ecmascript|jscript|livescript|(ld\+)?json|method|aspect)/) > -1))) {
+                if (!peek) {
+                    this.record_tag(tag_check);
+                    this.tag_type = 'SCRIPT';
+                }
+            } else if (tag_check === 'style' &&
+                (tag_complete.search('type') === -1 ||
+                    (tag_complete.search('type') > -1 && tag_complete.search('text/css') > -1))) {
+                if (!peek) {
+                    this.record_tag(tag_check);
+                    this.tag_type = 'STYLE';
+                }
+            } else if (tag_check.charAt(0) === '!') { //peek for <! comment
+                // for comments content is already correct.
+                if (!peek) {
+                    this.tag_type = 'SINGLE';
+                    this.traverse_whitespace();
+                }
+            } else if (!peek) {
+                if (tag_check.charAt(0) === '/') { //this tag is a double tag so check for tag-ending
+                    this.retrieve_tag(tag_check.substring(1)); //remove it and all ancestors
+                    this.tag_type = 'END';
+                } else { //otherwise it's a start-tag
+                    this.record_tag(tag_check); //push it on the tag stack
+                    if (tag_check.toLowerCase() !== 'html') {
+                        this.indent_content = true;
+                    }
+                    this.tag_type = 'START';
+                }
+
+                // Allow preserving of newlines after a start or end tag
+                if (this.traverse_whitespace()) {
+                    this.space_or_wrap(content);
+                }
+
+                if (this.Utils.in_array(tag_check, this.Utils.extra_liners)) { //check if this double needs an extra line
+                    this.print_newline(false, this.output);
+                    if (this.output.length && this.output[this.output.length - 2] !== '\n') {
+                        this.print_newline(true, this.output);
+                    }
+                }
+            }
+
+            if (peek) {
+                this.pos = orig_pos;
+                this.line_char_count = orig_line_char_count;
+            }
+
+            return content.join(''); //returns fully formatted tag
+        };
+
+        this.get_comment = function(start_pos) { //function to return comment content in its entirety
+            // this is will have very poor perf, but will work for now.
+            var comment = '',
+                delimiter = '>',
+                matched = false;
+
+            this.pos = start_pos;
+            var input_char = this.input.charAt(this.pos);
+            this.pos++;
+
+            while (this.pos <= this.input.length) {
+                comment += input_char;
+
+                // only need to check for the delimiter if the last chars match
+                if (comment.charAt(comment.length - 1) === delimiter.charAt(delimiter.length - 1) &&
+                    comment.indexOf(delimiter) !== -1) {
+                    break;
+                }
+
+                // only need to search for custom delimiter for the first few characters
+                if (!matched && comment.length < 10) {
+                    if (comment.indexOf('<![if') === 0) { //peek for <![if conditional comment
+                        delimiter = '<![endif]>';
+                        matched = true;
+                    } else if (comment.indexOf('<![cdata[') === 0) { //if it's a <[cdata[ comment...
+                        delimiter = ']]>';
+                        matched = true;
+                    } else if (comment.indexOf('<![') === 0) { // some other ![ comment? ...
+                        delimiter = ']>';
+                        matched = true;
+                    } else if (comment.indexOf('<!--') === 0) { // <!-- comment ...
+                        delimiter = '-->';
+                        matched = true;
+                    } else if (comment.indexOf('{{!--') === 0) { // {{!-- handlebars comment
+                        delimiter = '--}}';
+                        matched = true;
+                    } else if (comment.indexOf('{{!') === 0) { // {{! handlebars comment
+                        if (comment.length === 5 && comment.indexOf('{{!--') === -1) {
+                            delimiter = '}}';
+                            matched = true;
+                        }
+                    } else if (comment.indexOf('<?') === 0) { // {{! handlebars comment
+                        delimiter = '?>';
+                        matched = true;
+                    } else if (comment.indexOf('<%') === 0) { // {{! handlebars comment
+                        delimiter = '%>';
+                        matched = true;
+                    }
+                }
+
+                input_char = this.input.charAt(this.pos);
+                this.pos++;
+            }
+
+            return comment;
+        };
+
+        function tokenMatcher(delimiter) {
+            var token = '';
+
+            var add = function(str) {
+                var newToken = token + str.toLowerCase();
+                token = newToken.length <= delimiter.length ? newToken : newToken.substr(newToken.length - delimiter.length, delimiter.length);
+            };
+
+            var doesNotMatch = function() {
+                return token.indexOf(delimiter) === -1;
+            };
+
+            return {
+                add: add,
+                doesNotMatch: doesNotMatch
+            };
+        }
+
+        this.get_unformatted = function(delimiter, orig_tag) { //function to return unformatted content in its entirety
+            if (orig_tag && orig_tag.toLowerCase().indexOf(delimiter) !== -1) {
+                return '';
+            }
+            var input_char = '';
+            var content = '';
+            var space = true;
+
+            var delimiterMatcher = tokenMatcher(delimiter);
+
+            do {
+
+                if (this.pos >= this.input.length) {
+                    return content;
+                }
+
+                input_char = this.input.charAt(this.pos);
+                this.pos++;
+
+                if (this.Utils.in_array(input_char, this.Utils.whitespace)) {
+                    if (!space) {
+                        this.line_char_count--;
+                        continue;
+                    }
+                    if (input_char === '\n' || input_char === '\r') {
+                        content += '\n';
+                        /*  Don't change tab indention for unformatted blocks.  If using code for html editing, this will greatly affect <pre> tags if they are specified in the 'unformatted array'
+            for (var i=0; i<this.indent_level; i++) {
+              content += this.indent_string;
+            }
+            space = false; //...and make sure other indentation is erased
+            */
+                        this.line_char_count = 0;
+                        continue;
+                    }
+                }
+                content += input_char;
+                delimiterMatcher.add(input_char);
+                this.line_char_count++;
+                space = true;
+
+                if (indent_handlebars && input_char === '{' && content.length && content.charAt(content.length - 2) === '{') {
+                    // Handlebars expressions in strings should also be unformatted.
+                    content += this.get_unformatted('}}');
+                    // Don't consider when stopping for delimiters.
+                }
+            } while (delimiterMatcher.doesNotMatch());
+
+            return content;
+        };
+
+        this.get_token = function() { //initial handler for token-retrieval
+            var token;
+
+            if (this.last_token === 'TK_TAG_SCRIPT' || this.last_token === 'TK_TAG_STYLE') { //check if we need to format javascript
+                var type = this.last_token.substr(7);
+                token = this.get_contents_to(type);
+                if (typeof token !== 'string') {
+                    return token;
+                }
+                return [token, 'TK_' + type];
+            }
+            if (this.current_mode === 'CONTENT') {
+                token = this.get_content();
+                if (typeof token !== 'string') {
+                    return token;
+                } else {
+                    return [token, 'TK_CONTENT'];
+                }
+            }
+
+            if (this.current_mode === 'TAG') {
+                token = this.get_tag();
+                if (typeof token !== 'string') {
+                    return token;
+                } else {
+                    var tag_name_type = 'TK_TAG_' + this.tag_type;
+                    return [token, tag_name_type];
+                }
+            }
+        };
+
+        this.get_full_indent = function(level) {
+            level = this.indent_level + level || 0;
+            if (level < 1) {
+                return '';
+            }
+
+            return Array(level + 1).join(this.indent_string);
+        };
+
+        this.is_unformatted = function(tag_check, unformatted) {
+            //is this an HTML5 block-level link?
+            if (!this.Utils.in_array(tag_check, unformatted)) {
+                return false;
+            }
+
+            if (tag_check.toLowerCase() !== 'a' || !this.Utils.in_array('a', unformatted)) {
+                return true;
+            }
+
+            //at this point we have an  tag; is its first child something we want to remain
+            //unformatted?
+            var next_tag = this.get_tag(true /* peek. */ );
+
+            // test next_tag to see if it is just html tag (no external content)
+            var tag = (next_tag || "").match(/^\s*<\s*\/?([a-z]*)\s*[^>]*>\s*$/);
+
+            // if next_tag comes back but is not an isolated tag, then
+            // let's treat the 'a' tag as having content
+            // and respect the unformatted option
+            if (!tag || this.Utils.in_array(tag[1], unformatted)) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+
+        this.printer = function(js_source, indent_character, indent_size, wrap_line_length, brace_style) { //handles input/output and some other printing functions
+
+            this.input = js_source || ''; //gets the input for the Parser
+
+            // HACK: newline parsing inconsistent. This brute force normalizes the input.
+            this.input = this.input.replace(/\r\n|[\r\u2028\u2029]/g, '\n');
+
+            this.output = [];
+            this.indent_character = indent_character;
+            this.indent_string = '';
+            this.indent_size = indent_size;
+            this.brace_style = brace_style;
+            this.indent_level = 0;
+            this.wrap_line_length = wrap_line_length;
+            this.line_char_count = 0; //count to see if wrap_line_length was exceeded
+
+            for (var i = 0; i < this.indent_size; i++) {
+                this.indent_string += this.indent_character;
+            }
+
+            this.print_newline = function(force, arr) {
+                this.line_char_count = 0;
+                if (!arr || !arr.length) {
+                    return;
+                }
+                if (force || (arr[arr.length - 1] !== '\n')) { //we might want the extra line
+                    if ((arr[arr.length - 1] !== '\n')) {
+                        arr[arr.length - 1] = rtrim(arr[arr.length - 1]);
+                    }
+                    arr.push('\n');
+                }
+            };
+
+            this.print_indentation = function(arr) {
+                for (var i = 0; i < this.indent_level; i++) {
+                    arr.push(this.indent_string);
+                    this.line_char_count += this.indent_string.length;
+                }
+            };
+
+            this.print_token = function(text) {
+                // Avoid printing initial whitespace.
+                if (this.is_whitespace(text) && !this.output.length) {
+                    return;
+                }
+                if (text || text !== '') {
+                    if (this.output.length && this.output[this.output.length - 1] === '\n') {
+                        this.print_indentation(this.output);
+                        text = ltrim(text);
+                    }
+                }
+                this.print_token_raw(text);
+            };
+
+            this.print_token_raw = function(text) {
+                // If we are going to print newlines, truncate trailing
+                // whitespace, as the newlines will represent the space.
+                if (this.newlines > 0) {
+                    text = rtrim(text);
+                }
+
+                if (text && text !== '') {
+                    if (text.length > 1 && text.charAt(text.length - 1) === '\n') {
+                        // unformatted tags can grab newlines as their last character
+                        this.output.push(text.slice(0, -1));
+                        this.print_newline(false, this.output);
+                    } else {
+                        this.output.push(text);
+                    }
+                }
+
+                for (var n = 0; n < this.newlines; n++) {
+                    this.print_newline(n > 0, this.output);
+                }
+                this.newlines = 0;
+            };
+
+            this.indent = function() {
+                this.indent_level++;
+            };
+
+            this.unindent = function() {
+                if (this.indent_level > 0) {
+                    this.indent_level--;
+                }
+            };
+        };
+        return this;
+    }
+
+    /*_____________________--------------------_____________________*/
+
+    this.beautify = function() {
+        multi_parser = new Parser(); //wrapping functions Parser
+        multi_parser.printer(html_source, indent_character, indent_size, wrap_line_length, brace_style); //initialize starting values
+        while (true) {
+            var t = multi_parser.get_token();
+            multi_parser.token_text = t[0];
+            multi_parser.token_type = t[1];
+
+            if (multi_parser.token_type === 'TK_EOF') {
+                break;
+            }
+
+            switch (multi_parser.token_type) {
+                case 'TK_TAG_START':
+                    multi_parser.print_newline(false, multi_parser.output);
+                    multi_parser.print_token(multi_parser.token_text);
+                    if (multi_parser.indent_content) {
+                        if ((multi_parser.indent_body_inner_html || !multi_parser.token_text.match(/<body(?:.*)>/)) &&
+                            (multi_parser.indent_head_inner_html || !multi_parser.token_text.match(/<head(?:.*)>/))) {
+
+                            multi_parser.indent();
+                        }
+
+                        multi_parser.indent_content = false;
+                    }
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_STYLE':
+                case 'TK_TAG_SCRIPT':
+                    multi_parser.print_newline(false, multi_parser.output);
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_END':
+                    //Print new line only if the tag has no content and has child
+                    if (multi_parser.last_token === 'TK_CONTENT' && multi_parser.last_text === '') {
+                        var tag_name = (multi_parser.token_text.match(/\w+/) || [])[0];
+                        var tag_extracted_from_last_output = null;
+                        if (multi_parser.output.length) {
+                            tag_extracted_from_last_output = multi_parser.output[multi_parser.output.length - 1].match(/(?:<|{{#)\s*(\w+)/);
+                        }
+                        if (tag_extracted_from_last_output === null ||
+                            (tag_extracted_from_last_output[1] !== tag_name && !multi_parser.Utils.in_array(tag_extracted_from_last_output[1], unformatted))) {
+                            multi_parser.print_newline(false, multi_parser.output);
+                        }
+                    }
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_SINGLE':
+                    // Don't add a newline before elements that should remain unformatted.
+                    var tag_check = multi_parser.token_text.match(/^\s*<([a-z-]+)/i);
+                    if (!tag_check || !multi_parser.Utils.in_array(tag_check[1], unformatted)) {
+                        multi_parser.print_newline(false, multi_parser.output);
+                    }
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_HANDLEBARS_ELSE':
+                    // Don't add a newline if opening {{#if}} tag is on the current line
+                    var foundIfOnCurrentLine = false;
+                    for (var lastCheckedOutput = multi_parser.output.length - 1; lastCheckedOutput >= 0; lastCheckedOutput--) {
+                        if (multi_parser.output[lastCheckedOutput] === '\n') {
+                            break;
+                        } else {
+                            if (multi_parser.output[lastCheckedOutput].match(/{{#if/)) {
+                                foundIfOnCurrentLine = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!foundIfOnCurrentLine) {
+                        multi_parser.print_newline(false, multi_parser.output);
+                    }
+                    multi_parser.print_token(multi_parser.token_text);
+                    if (multi_parser.indent_content) {
+                        multi_parser.indent();
+                        multi_parser.indent_content = false;
+                    }
+                    multi_parser.current_mode = 'CONTENT';
+                    break;
+                case 'TK_TAG_HANDLEBARS_COMMENT':
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'TAG';
+                    break;
+                case 'TK_CONTENT':
+                    multi_parser.print_token(multi_parser.token_text);
+                    multi_parser.current_mode = 'TAG';
+                    break;
+                case 'TK_STYLE':
+                case 'TK_SCRIPT':
+                    if (multi_parser.token_text !== '') {
+                        multi_parser.print_newline(false, multi_parser.output);
+                        var text = multi_parser.token_text,
+                            _beautifier,
+                            script_indent_level = 1;
+                        if (multi_parser.token_type === 'TK_SCRIPT') {
+                            _beautifier = typeof js_beautify === 'function' && js_beautify;
+                        } else if (multi_parser.token_type === 'TK_STYLE') {
+                            _beautifier = typeof css_beautify === 'function' && css_beautify;
+                        }
+
+                        if (options.indent_scripts === "keep") {
+                            script_indent_level = 0;
+                        } else if (options.indent_scripts === "separate") {
+                            script_indent_level = -multi_parser.indent_level;
+                        }
+
+                        var indentation = multi_parser.get_full_indent(script_indent_level);
+                        if (_beautifier) {
+
+                            // call the Beautifier if avaliable
+                            var Child_options = function() {
+                                this.eol = '\n';
+                            };
+                            Child_options.prototype = options;
+                            var child_options = new Child_options();
+                            text = _beautifier(text.replace(/^\s*/, indentation), child_options);
+                        } else {
+                            // simply indent the string otherwise
+                            var white = text.match(/^\s*/)[0];
+                            var _level = white.match(/[^\n\r]*$/)[0].split(multi_parser.indent_string).length - 1;
+                            var reindent = multi_parser.get_full_indent(script_indent_level - _level);
+                            text = text.replace(/^\s*/, indentation)
+                                .replace(/\r\n|\r|\n/g, '\n' + reindent)
+                                .replace(/\s+$/, '');
+                        }
+                        if (text) {
+                            multi_parser.print_token_raw(text);
+                            multi_parser.print_newline(true, multi_parser.output);
+                        }
+                    }
+                    multi_parser.current_mode = 'TAG';
+                    break;
+                default:
+                    // We should not be getting here but we don't want to drop input on the floor
+                    // Just output the text and move on
+                    if (multi_parser.token_text !== '') {
+                        multi_parser.print_token(multi_parser.token_text);
+                    }
+                    break;
+            }
+            multi_parser.last_token = multi_parser.token_type;
+            multi_parser.last_text = multi_parser.token_text;
+        }
+        var sweet_code = multi_parser.output.join('').replace(/[\r\n\t ]+$/, '');
+
+        // establish end_with_newline
+        if (end_with_newline) {
+            sweet_code += '\n';
+        }
+
+        if (eol !== '\n') {
+            sweet_code = sweet_code.replace(/[\n]/g, eol);
+        }
+
+        return sweet_code;
+    };
+}
+
+module.exports.Beautifier = Beautifier;
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+/* jshint curly: false */
+// This section of code is taken from acorn.
+//
+// Acorn was written by Marijn Haverbeke and released under an MIT
+// license. The Unicode regexps (for identifiers and whitespace) were
+// taken from [Esprima](http://esprima.org) by Ariya Hidayat.
+//
+// Git repositories for Acorn are available at
+//
+//     http://marijnhaverbeke.nl/git/acorn
+//     https://github.com/marijnh/acorn.git
+
+// ## Character categories
+
+// Big ugly regular expressions that match characters in the
+// whitespace, identifier, and identifier-start categories. These
+// are only applied when a character is found to actually have a
+// code point above 128.
+
+var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
+var nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f";
+var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
+var nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonASCIIidentifierChars + "]");
+
+// Whether a single character denotes a newline.
+
+exports.newline = /[\n\r\u2028\u2029]/;
+
+// Matches a whole line break (where CRLF is considered a single
+// line break). Used to count lines.
+
+// in javascript, these two differ
+// in python they are the same, different methods are called on them
+exports.lineBreak = new RegExp('\r\n|' + exports.newline.source);
+exports.allLineBreaks = new RegExp(exports.lineBreak.source, 'g');
+
+
+// Test whether a given character code starts an identifier.
+
+exports.isIdentifierStart = function(code) {
+    // permit $ (36) and @ (64). @ is used in ES7 decorators.
+    if (code < 65) { return code === 36 || code === 64; }
+    // 65 through 91 are uppercase letters.
+    if (code < 91) { return true; }
+    // permit _ (95).
+    if (code < 97) { return code === 95; }
+    // 97 through 123 are lowercase letters.
+    if (code < 123) { return true; }
+    return code >= 0xaa && nonASCIIidentifierStart.test(String.fromCharCode(code));
+};
+
+// Test whether a given character is part of an identifier.
+
+exports.isIdentifierChar = function(code) {
+    if (code < 48) { return code === 36; }
+    if (code < 58) { return true; }
+    if (code < 65) { return false; }
+    if (code < 91) { return true; }
+    if (code < 97) { return code === 95; }
+    if (code < 123) { return true; }
+    return code >= 0xaa && nonASCIIidentifier.test(String.fromCharCode(code));
+};
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+    The MIT License (MIT)
+
+    Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation files
+    (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+function mergeOpts(allOptions, targetType) {
+    var finalOpts = {};
+    var name;
+
+    for (name in allOptions) {
+        if (name !== targetType) {
+            finalOpts[name] = allOptions[name];
+        }
+    }
+
+    //merge in the per type settings for the targetType
+    if (targetType in allOptions) {
+        for (name in allOptions[targetType]) {
+            finalOpts[name] = allOptions[targetType][name];
+        }
+    }
+    return finalOpts;
+}
+
+module.exports.mergeOpts = mergeOpts;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*jshint curly:true, eqeqeq:true, laxbreak:true, noempty:false */
+/*
+
+    The MIT License (MIT)
+
+    Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation files
+    (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+*/
+
+var Beautifier = __webpack_require__(0).Beautifier;
+
+function style_html(html_source, options, js_beautify, css_beautify) {
+    var beautifier = new Beautifier(html_source, options, js_beautify, css_beautify);
+    return beautifier.beautify();
+}
+
+module.exports = style_html;
+
+/***/ })
+/******/ ]);
+var style_html = legacy_beautify_html;
+/* Footer */
+if (typeof undefined === "function" && undefined.amd) {
+    // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
+    undefined(["require", "./beautify", "./beautify-css"], function(requireamd) {
+        var js_beautify = requireamd("./beautify");
+        var css_beautify = requireamd("./beautify-css");
+
+        return {
+            html_beautify: function(html_source, options) {
+                return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
+            }
+        };
+    });
+} else {
+    // Add support for CommonJS. Just put this file somewhere on your require.paths
+    // and you will be able to `var html_beautify = require("beautify").html_beautify`.
+    var js_beautify = beautify;
+    var css_beautify = beautifyCss;
+
+    exports.html_beautify = function(html_source, options) {
+        return style_html(html_source, options, js_beautify.js_beautify, css_beautify.css_beautify);
+    };
+}
+
+}());
+});
+
+unwrapExports(beautifyHtml);
+
+var js = createCommonjsModule(function (module) {
+/*
+  The MIT License (MIT)
+
+  Copyright (c) 2007-2017 Einar Lielmanis, Liam Newman, and contributors.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
+
+/**
+The following batches are equivalent:
+
+var beautify_js = require('js-beautify');
+var beautify_js = require('js-beautify').js;
+var beautify_js = require('js-beautify').js_beautify;
+
+var beautify_css = require('js-beautify').css;
+var beautify_css = require('js-beautify').css_beautify;
+
+var beautify_html = require('js-beautify').html;
+var beautify_html = require('js-beautify').html_beautify;
+
+All methods returned accept two arguments, the source string and an options object.
+**/
+
+function get_beautify(js_beautify, css_beautify, html_beautify) {
+    // the default is js
+    var beautify$$1 = function(src, config) {
+        return js_beautify.js_beautify(src, config);
+    };
+
+    // short aliases
+    beautify$$1.js = js_beautify.js_beautify;
+    beautify$$1.css = css_beautify.css_beautify;
+    beautify$$1.html = html_beautify.html_beautify;
+
+    // legacy aliases
+    beautify$$1.js_beautify = js_beautify.js_beautify;
+    beautify$$1.css_beautify = css_beautify.css_beautify;
+    beautify$$1.html_beautify = html_beautify.html_beautify;
+
+    return beautify$$1;
+}
+
+if (typeof undefined === "function" && undefined.amd) {
+    // Add support for AMD ( https://github.com/amdjs/amdjs-api/wiki/AMD#defineamd-property- )
+    undefined([
+        "./lib/beautify",
+        "./lib/beautify-css",
+        "./lib/beautify-html"
+    ], function(js_beautify, css_beautify, html_beautify) {
+        return get_beautify(js_beautify, css_beautify, html_beautify);
+    });
+} else {
+    (function(mod) {
+        var js_beautify = beautify;
+        var css_beautify = beautifyCss;
+        var html_beautify = beautifyHtml;
+
+        mod.exports = get_beautify(js_beautify, css_beautify, html_beautify);
+
+    })(module);
+}
+});
+
+/*!
+ * is-whitespace <https://github.com/jonschlinkert/is-whitespace>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+var cache;
+
+var isWhitespace = function isWhitespace(str) {
+  return (typeof str === 'string') && regex().test(str);
+};
+
+function regex() {
+  // ensure that runtime compilation only happens once
+  return cache || (cache = new RegExp('^[\\s\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF"]+$'));
+}
+
+/*!
+ * is-extendable <https://github.com/jonschlinkert/is-extendable>
+ *
+ * Copyright (c) 2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ */
+
+'use strict';
+
+var isExtendable = function isExtendable(val) {
+  return typeof val !== 'undefined' && val !== null
+    && (typeof val === 'object' || typeof val === 'function');
+};
+
+'use strict';
+
+
+
+var extendShallow = function extend(o/*, objects*/) {
+  if (!isExtendable(o)) { o = {}; }
+
+  var len = arguments.length;
+  for (var i = 1; i < len; i++) {
+    var obj = arguments[i];
+
+    if (isExtendable(obj)) {
+      assign(o, obj);
+    }
+  }
+  return o;
+};
+
+function assign(a, b) {
+  for (var key in b) {
+    if (hasOwn$5(b, key)) {
+      a[key] = b[key];
+    }
+  }
+}
+
+/**
+ * Returns true if the given `key` is an own property of `obj`.
+ */
+
+function hasOwn$5(obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+/*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+// The _isBuffer check is for Safari 5-7 support, because it's missing
+// Object.prototype.constructor. Remove this eventually
+var isBuffer_1 = function (obj) {
+  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+};
+
+function isBuffer (obj) {
+  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
+
+// For Node v0.10 support. Remove this eventually.
+function isSlowBuffer (obj) {
+  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
+}
+
+var toString$2 = Object.prototype.toString;
+
+/**
+ * Get the native `typeof` a value.
+ *
+ * @param  {*} `val`
+ * @return {*} Native javascript type
+ */
+
+var kindOf$3 = function kindOf(val) {
+  // primitivies
+  if (typeof val === 'undefined') {
+    return 'undefined';
+  }
+  if (val === null) {
+    return 'null';
+  }
+  if (val === true || val === false || val instanceof Boolean) {
+    return 'boolean';
+  }
+  if (typeof val === 'string' || val instanceof String) {
+    return 'string';
+  }
+  if (typeof val === 'number' || val instanceof Number) {
+    return 'number';
+  }
+
+  // functions
+  if (typeof val === 'function' || val instanceof Function) {
+    return 'function';
+  }
+
+  // array
+  if (typeof Array.isArray !== 'undefined' && Array.isArray(val)) {
+    return 'array';
+  }
+
+  // check for instances of RegExp and Date before calling `toString`
+  if (val instanceof RegExp) {
+    return 'regexp';
+  }
+  if (val instanceof Date) {
+    return 'date';
+  }
+
+  // other objects
+  var type = toString$2.call(val);
+
+  if (type === '[object RegExp]') {
+    return 'regexp';
+  }
+  if (type === '[object Date]') {
+    return 'date';
+  }
+  if (type === '[object Arguments]') {
+    return 'arguments';
+  }
+  if (type === '[object Error]') {
+    return 'error';
+  }
+
+  // buffer
+  if (isBuffer_1(val)) {
+    return 'buffer';
+  }
+
+  // es6: Map, WeakMap, Set, WeakSet
+  if (type === '[object Set]') {
+    return 'set';
+  }
+  if (type === '[object WeakSet]') {
+    return 'weakset';
+  }
+  if (type === '[object Map]') {
+    return 'map';
+  }
+  if (type === '[object WeakMap]') {
+    return 'weakmap';
+  }
+  if (type === '[object Symbol]') {
+    return 'symbol';
+  }
+
+  // typed arrays
+  if (type === '[object Int8Array]') {
+    return 'int8array';
+  }
+  if (type === '[object Uint8Array]') {
+    return 'uint8array';
+  }
+  if (type === '[object Uint8ClampedArray]') {
+    return 'uint8clampedarray';
+  }
+  if (type === '[object Int16Array]') {
+    return 'int16array';
+  }
+  if (type === '[object Uint16Array]') {
+    return 'uint16array';
+  }
+  if (type === '[object Int32Array]') {
+    return 'int32array';
+  }
+  if (type === '[object Uint32Array]') {
+    return 'uint32array';
+  }
+  if (type === '[object Float32Array]') {
+    return 'float32array';
+  }
+  if (type === '[object Float64Array]') {
+    return 'float64array';
+  }
+
+  // must be a plain object
+  return 'object';
+};
+
+/*!
+ * condense-newlines <https://github.com/jonschlinkert/condense-newlines>
+ *
+ * Copyright (c) 2014 Jon Schlinkert, contributors.
+ * Licensed under the MIT License
+ */
+
+'use strict';
+
+
+
+
+
+var condenseNewlines = function(str, options) {
+  var opts = extendShallow({}, options);
+  var sep = opts.sep || '\n\n';
+  var min = opts.min;
+  var re;
+
+  if (typeof min === 'number' && min !== 2) {
+    re = new RegExp('(\\r\\n|\\n|\\u2424) {' + min + ',}');
+  }
+  if (typeof re === 'undefined') {
+    re = opts.regex || /(\r\n|\n|\u2424){2,}/g;
+  }
+
+  // if a line is 100% whitespace it will be trimmed, so that
+  // later we can condense newlines correctly
+  if (opts.keepWhitespace !== true) {
+    str = str.split('\n').map(function(line) {
+      return isWhitespace(line) ? line.trim() : line;
+    }).join('\n');
+  }
+
+  str = trailingNewline(str, opts);
+  return str.replace(re, sep);
+};
+
+function trailingNewline(str, options) {
+  var val = options.trailingNewline;
+  if (val === false) {
+    return str;
+  }
+
+  switch (kindOf$3(val)) {
+    case 'string':
+      str = str.replace(/\s+$/, options.trailingNewline);
+      break;
+    case 'function':
+      str = options.trailingNewline(str);
+      break;
+    case 'undefined':
+    case 'boolean':
+    default: {
+      str = str.replace(/\s+$/, '\n');
+      break;
+    }
+  }
+  return str;
+}
+
+/*!
+ * pretty <https://github.com/jonschlinkert/pretty>
+ *
+ * Copyright (c) 2013-2015, 2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+'use strict';
+
+
+
+
+var defaults$1 = {
+  unformatted: ['code', 'pre', 'em', 'strong', 'span'],
+  indent_inner_html: true,
+  indent_char: ' ',
+  indent_size: 2,
+  sep: '\n'
+};
+
+var pretty = function pretty(str, options) {
+  var opts = extendShallow({}, defaults$1, options);
+  str = js.html(str, opts);
+
+  if (opts.ocd === true) {
+    if (opts.newlines) { opts.sep = opts.newlines; }
+    return ocd(str, opts);
+  }
+
+  return str;
+};
+
+function ocd(str, options) {
+  // Normalize and condense all newlines
+  return condenseNewlines(str, options)
+    // Remove empty whitespace the top of a file.
+    .replace(/^\s+/g, '')
+    // Remove extra whitespace from eof
+    .replace(/\s+$/g, '\n')
+
+    // Add a space above each comment
+    .replace(/(\s*<!--)/g, '\n$1')
+    // Bring closing comments up to the same line as closing tag.
+    .replace(/>(\s*)(?=<!--\s*\/)/g, '> ');
+}
+
+var script$14 = function() {
+  this.getBeautifiedHtml = () => {
+    const data = this.opts.data;
+    if (!data) {
+      return '';
+    }
+    return pretty(data);
+  };
+};
+
+riot$1.tag2('viron-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="Prettyhtml"', function(opts) {
+    this.external(script$14);
+});
+
+var script$15 = function() {
   /**
    * 文字列もしくはnullに変換します。
    * @param {String|null|undefined} value
@@ -16535,11 +22674,6835 @@ var script$17 = function() {
   };
 };
 
-riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__form" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="input" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\': opts.isdisabled}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__form" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="input" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\': opts.isdisabled, \'Textarea--error\': opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$15);
+});
+
+// TODO: froalaのCodeMirrowプラグインが使えるかも。
+
+var script$16 = function() {
+  /**
+   * 入力値をhtmlに変換します。
+   */
+  this.isEditorMode = true;
+  this.isPreviewMode = false;
+
+  this.on('mount', () => {
+    this.update();
+  }).on('update', () => {
+    
+  });
+
+  this.handleEditorTabTap = () => {
+    this.isEditorMode = true;
+    this.isPreviewMode = false;
+    this.update();
+  };
+
+  this.handlePreviewTabTap = () => {
+    this.isEditorMode = false;
+    this.isPreviewMode = true;
+    this.update();
+  };
+
+  /**
+   * editor値が変更された時の処理。
+   * @param {String} newText
+   */
+  this.handleEditorChange = newText => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    this.opts.onchange(newText);
+  };
+};
+
+riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\': isEditorMode}" onclick="{getClickHandler(\'handleEditorTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditorTabTap\')}">エディタ</div> <div class="Html__tab {\'Html__tab--selected\': isPreviewMode}" onclick="{getClickHandler(\'handlePreviewTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePreviewTabTap\')}">プレビュー</div> </div> <div class="Html__body"> <div class="Html__editor" if="{isEditorMode}"> <viron-textarea val="{opts.val}" onchange="{handleEditorChange}"></viron-textarea> </div> <div class="Html__preview" if="{isPreviewMode}"> <viron-prettyhtml data="{opts.val}"></viron-prettyhtml> </div> </div>', '', 'class="Html {\'Html--disabled\': opts.isdisabled, \'Html--error\': opts.haserror}"', function(opts) {
+    this.external(script$16);
+});
+
+/**
+     * ES6 Number.isNaN
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN
+     */
+    function isNaN$3(val){
+        // jshint eqeqeq:false
+        return typeof val === 'number' && val != val;
+    }
+
+    var _isNaN$1 = isNaN$3;
+
+/**
+     * Check if value is NaN for realz
+     */
+    function isNaN$1(val){
+        // based on the fact that NaN !== NaN
+        // need to check if it's a number to avoid conflicts with host objects
+        // also need to coerce ToNumber to avoid edge case `new Number(NaN)`
+        return !isNumber_1(val) || _isNaN$1(Number(val));
+    }
+
+    var _isNaN = isNaN$1;
+
+var script$17 = function() {
+  /**
+   * moutの`isNumber`のラッパー関数。
+   * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
+   * @param {*} num
+   */
+  this.normalizeValue = value => {
+    // nullの場合はそのまま扱う。
+    if (isNull_1(value)) {
+      return value;
+    }
+
+    // undefined時はnullとして扱う。
+    if (isUndefined(value)) {
+      return null;
+    }
+
+    // 文字列を受け取った場合は形式によって返却値が変わる。
+    if (isString_1(value)) {
+      // 数字と`-`と`.`のみも文字列に変換する。
+      value = value.replace(/[^-^0-9]/g, '');
+      // 空文字列の場合はnullとして扱う。
+      if (!value.length) {
+        return null;
+      }
+      // 数値に変換する。
+      // `-12` -> -12
+      // `1.2` -> 1.2
+      // `1.0` -> 1
+      // `0012` -> 12
+      // `1-2` ->  NaN
+      value = Number(value);
+      // NaNはnullとして扱う。
+      if (_isNaN(value)) {
+        return null;
+      }
+    }
+    // この時点で`value`は必ずNumberとなる。
+    return value;
+  };
+
+  this.handleTap = () => {
+    this.refs.input.focus();
+  };
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    if (!this.opts.onchange) {
+      return;
+    }
+    const newVal = this.normalizeValue(this.opts.val);
+    this.opts.onchange(newVal, this.opts.id);
+  };
+
+  // `blur`時にも`change`イベントが発火する。
+  // 不都合な挙動なのでイベント伝播を止める。
+  this.handleInputChange = e => {
+    e.stopPropagation();
+  };
+
+  this.handleInputInput = e => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    const newVal = this.normalizeValue(e.target.value);
+    this.opts.onchange(newVal, this.opts.id);
+  };
+};
+
+riot$1.tag2('viron-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Numberinput__input" ref="input" type="text" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Numberinput {\'Numberinput--disabled\': opts.isdisabled, \'Numberinput--error\': opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$17);
 });
 
 var script$18 = function() {
+  /**
+   * 入力値をhtmlに変換します。
+   */
+  this.isEditorMode = true;
+  this.isPreviewMode = false;
+
+  this.on('mount', () => {
+    this.update();
+  }).on('update', () => {
+    
+  });
+
+  this.handleEditorTabTap = () => {
+    this.isEditorMode = true;
+    this.isPreviewMode = false;
+    this.update();
+  };
+
+  this.handlePreviewTabTap = () => {
+    this.isEditorMode = false;
+    this.isPreviewMode = true;
+    this.update();
+  };
+
+  /**
+   * editor値が変更された時の処理。
+   * @param {String} newText
+   */
+  this.handleEditorChange = newText => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    this.opts.onchange(newText);
+  };
+};
+
+riot$1.tag2('viron-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\': isEditorMode}" onclick="{getClickHandler(\'handleEditorTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditorTabTap\')}">エディタ</div> <div class="Pug__tab {\'Pug__tab--selected\': isPreviewMode}" onclick="{getClickHandler(\'handlePreviewTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePreviewTabTap\')}">プレビュー</div> </div> <div class="Pug__body"> <div class="Pug__editor" if="{isEditorMode}"> <viron-textarea val="{opts.val}" onchange="{handleEditorChange}"></viron-textarea> </div> <div class="Pug__preview" if="{isPreviewMode}"> <viron-prettyhtml data="{opts.val}"></viron-prettyhtml> </div> </div>', '', 'class="Pug {\'Pug--disabled\': opts.isdisabled, \'Pug--error\': opts.haserror}"', function(opts) {
+    this.external(script$18);
+});
+
+riot$1.tag2('viron-icon-arrow-down', '<svg viewbox="-3523.999 14062.964 16.004 10.037"> <path d="M1736.94-16726.932l-5.963-5.963-1.433-1.432-.019-.023-.384-.385a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.84a.2.2,0,0,1,0,.277l-5.82,5.824,5.82,5.818a.205.205,0,0,1,0,.283l-1.84,1.84a.2.2,0,0,1-.141.061A.2.2,0,0,1,1736.94-16726.932Z" transform="translate(13218.876 15802.083) rotate(-90)"></path> </svg>', '', 'class="icon Icon IconArrowDown {opts.class}"', function(opts) {
+});
+
+var script$19 = function() {
+  const getNewOptions = () => {
+    const selectedIndex = this.refs.select.selectedIndex;
+    const newOptions = [];
+    forEach_1$2(this.opts.options, (option, idx) => {
+      newOptions.push(objectAssign({}, option, {
+        isSelected: (idx === selectedIndex)
+      }));
+    });
+    return newOptions;
+  };
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    if (!this.opts.onchange) {
+      return;
+    }
+    this.opts.onchange(getNewOptions());
+  };
+
+  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
+  // そのため、`input`イベントを積極的に使用する。
+  this.handleSelectInput = () => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    this.opts.onchange(getNewOptions());
+  };
+
+  this.handleSelectChange = e => {
+    // `blur`時に`change`イベントが発火する。
+    // 不都合な挙動なのでイベント伝播を止める。
+    e.stopPropagation();
+  };
+};
+
+riot$1.tag2('viron-select', '<form class="Select__form" onsubmit="{handleFormSubmit}"> <select class="Select__select" ref="select" oninput="{handleSelectInput}" onchange="{handleSelectChange}"> <option class="Select__option" each="{option in opts.options}" selected="{option.isSelected}">{option.label}</option> </select> <viron-icon-arrow-down class="Select__icon"></viron-icon-arrow-down> </form>', '', 'class="Select {\'Select--disabled\': opts.isdisabled, \'Select--error\': opts.haserror}"', function(opts) {
+    this.external(script$19);
+});
+
+var script$20 = function() {
+  /**
+   * 文字列もしくはnullに変換します。
+   * @param {String|null|undefined} value
+   * @return {String|null}
+   */
+  this.normalizeValue = value => {
+    if (!isString_1(value)) {
+      return null;
+    }
+    return value;
+  };
+
+  this.handleTap = () => {
+    this.refs.input.focus();
+  };
+
+  this.handleFormSubmit = e => {
+    e.preventDefault();
+    if (!this.opts.onchange) {
+      return;
+    }
+    const newVal = this.normalizeValue(this.opts.val);
+    this.opts.onchange(newVal, this.opts.id);
+  };
+
+  // `blur`時にも`change`イベントが発火する。
+  // 不都合な挙動なのでイベント伝播を止める。
+  this.handleInputChange = e => {
+    e.stopPropagation();
+  };
+
+  this.handleInputInput = e => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    const newVal = this.normalizeValue(e.target.value);
+    this.opts.onchange(newVal, this.opts.id);
+  };
+};
+
+riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled, \'Textinput--error\': opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$20);
+});
+
+riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
+});
+
+riot$1.tag2('viron-icon-square', '<svg viewbox="-3674 14061 15.998 13.998"> <path d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)"></path> </svg>', '', 'class="icon Icon IconSquare {opts.class}"', function(opts) {
+});
+
+var script$21 = function() {
+  this.inputId = `Uploader__input${this.__riot_id}`;
+  this.file = null;
+  this.fileName = null;
+  this.isTypeOfImage = false;
+  this.blobURL = this.opts.initialbloburl || null;
+  this.isDragWatching = false;
+  this.isDroppable = false;
+
+  this.reset = () => {
+    window.URL.revokeObjectURL(this.blobURL);
+    this.refs.form.reset();
+    this.file = null;
+    this.fileName = null;
+    this.isTypeOfImage = false;
+    this.blobURL = this.opts.initialbloburl || null;
+    this.opts.onchange && this.opts.onchange(this.file, this.blobURL);
+  };
+
+  this.handleChange = e => {
+    e.stopPropagation();
+  };
+
+  /**
+   * fileが変更された時の処理。
+   * DnD経由でも実行されます。
+   * @param {Object} e
+   * @param {Boolean} fromDnD Dnd経由か否か。
+   */
+  this.handleFileChange = (e, fromDnD) => {
+    let files;
+    if (fromDnD) {
+      files = e.dataTransfer.files;
+    } else {
+      files = e.target.files;
+    }
+    if (!files.length) {
+      this.reset();
+      return;
+    }
+
+    const file = files[0];
+    this.file = file;
+    this.fileName = file.name;
+    this.isTypeOfImage = (file.type.indexOf('image/') === 0);
+    this.blobURL = window.URL.createObjectURL(file);
+    this.opts.onchange && this.opts.onchange(this.file, this.blobURL);
+  };
+
+  this.handleHandlerDragEnter = e => {
+    e.preventDefault();
+    this.isDragWatching = true;
+    this.update();
+  };
+
+  this.handleHandlerDragOver = e => {
+    e.preventDefault();
+  };
+
+  this.handleHandlerDragLeave = () => {
+    this.isDragWatching = false;
+    this.update();
+  };
+
+  this.handleHandlerDrop = e => {
+    e.preventDefault();
+    this.isDragWatching = false;
+    this.update();
+    this.handleFileChange(e, true);
+  };
+
+  this.handleResetButtonTap = () => {
+    this.reset();
+  };
+};
+
+riot$1.tag2('viron-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <viron-icon-square></viron-icon-square> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfImage}" riot-style="background-image:url({blobURL});"></div> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" onclick="{getClickHandler(\'handleResetButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleResetButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--dragWatching\' : isDragWatching, \'Uploader--disabled\': opts.isdisabled, \'Uploader--error\': opts.haserror}" onchange="{handleChange}"', function(opts) {
+    this.external(script$21);
+});
+
+// TODO: Froalaを購入すること。
+// Froala WYSWYG EditorがjQuery依存。
+// jQuery使いたくないけど、Froalaは使いたいので仕方なく。
+const $ = window.$;
+// Froalaエディタのオプション群。
+const defaultEditorOptions = {
+  // 文字数カウンタを非表示に。
+  charCounterCount: false
+};
+
+var script$22 = function() {
+  this.on('mount', () => {
+    $(this.refs.editor).froalaEditor(objectAssign({}, defaultEditorOptions, {
+      // 上書きするならここに。
+    }));
+  });
+};
+
+riot$1.tag2('viron-wyswyg', '<div class="Wyswyg__editor" ref="editor"></div>', '', 'class="Wyswyg {\'Wyswyg--disabled\': opts.isdisabled, \'Wyswyg--error\': opts.haserror}"', function(opts) {
+    this.external(script$22);
+});
+
+var script$23 = function() {
+  // 表示状態
+  this.isVisible = false;
+
+  this.on('mount', () => {
+    setTimeout(() => {
+      if (!this.isMounted) {
+        return;
+      }
+      this.isVisible = true;
+      this.update();
+    }, 100);
+  });
+};
+
+riot$1.tag2('viron-parameters-popover', '<div class="Parameters_Popover__message">{opts.message}</div> <div class="Parameters_Popover__arrow"></div>', '', 'class="Parameters_Popover {\'Parameters_Popover--visible\': isVisible}"', function(opts) {
+    this.external(script$23);
+});
+
+const UI_TEXTINPUT = 'textinput';
+const UI_TEXTAREA = 'textarea';
+const UI_HTML = 'html';
+const UI_NUMBERINPUT = 'numberinput';
+const UI_CHECKBOX = 'checkbox';
+const UI_SELECT = 'select';
+const UI_UPLOADER = 'uploader';
+const UI_WYSWYG = 'wyswyg';
+const UI_PUG = 'pug';
+const UI_NULL = 'null';
+const UI_AUTOCOMPLETE = 'autocomplete';
+
+var util = {
+  /**
+   * FormObjectから最適なUIタイプを推測します。
+   * @param {Object} formObject
+   * @return {String}
+   */
+  getUIType: formObject => {
+    // typeが`array`や`object`の時にform.tagが使用されることは無い。
+    // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+    // 選択肢があるとき。
+    if (!!formObject.enum) {
+      return UI_SELECT;
+    }
+    // autocomplete有効時。
+    if (!!formObject['x-autocomplete']) {
+      return UI_AUTOCOMPLETE;
+    }
+    const type = formObject.type;
+    const format = formObject.format;
+    switch (type) {
+    case 'string':
+      switch (format) {
+      case 'date-time':
+        //return UI_DATEPICKER;
+        return UI_TEXTINPUT;
+      case 'multiline':
+        return UI_TEXTAREA;
+      case 'wyswyg':
+        return UI_WYSWYG;
+      case 'pug':
+        return UI_PUG;
+      case 'html':
+        return UI_HTML;
+      default:
+        return UI_TEXTINPUT;
+      }
+    case 'number':
+    case 'integer':
+      return UI_NUMBERINPUT;
+    case 'boolean':
+      return UI_CHECKBOX;
+    case 'file':
+      return UI_UPLOADER;
+    case 'null':
+      return UI_NULL;
+    default:
+      // OpenAPI Documentが正しければ処理がここに来ることはない。
+      break;
+    }
+  },
+
+  /**
+   * FormUIを横幅いっぱいに表示するか否かを調べます。
+   * @param {Object} formObject
+   * @return {Boolean}
+   */
+  isWide: formObject => {
+    switch (formObject.type) {
+    case 'string':
+      switch (formObject.format) {
+
+      case 'multiline':
+      case 'wyswyg':
+      case 'pug':
+      case 'html':
+        return true;
+      case 'date-time':
+      default:
+        return false;
+      }
+    case 'number':
+    case 'integer':
+    case 'boolean':
+    case 'file':
+    case 'null':
+    default:
+      return false;
+    }
+  }
+
+};
+
+var hookCallback;
+
+function hooks () {
+    return hookCallback.apply(null, arguments);
+}
+
+// This is done to register the method called with moment()
+// without creating circular dependencies.
+function setHookCallback (callback) {
+    hookCallback = callback;
+}
+
+function isArray$4(input) {
+    return input instanceof Array || Object.prototype.toString.call(input) === '[object Array]';
+}
+
+function isObject$3(input) {
+    // IE8 will treat undefined and null as object if it wasn't for
+    // input != null
+    return input != null && Object.prototype.toString.call(input) === '[object Object]';
+}
+
+function isObjectEmpty(obj) {
+    if (Object.getOwnPropertyNames) {
+        return (Object.getOwnPropertyNames(obj).length === 0);
+    } else {
+        var k;
+        for (k in obj) {
+            if (obj.hasOwnProperty(k)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+function isUndefined$2(input) {
+    return input === void 0;
+}
+
+function isNumber$3(input) {
+    return typeof input === 'number' || Object.prototype.toString.call(input) === '[object Number]';
+}
+
+function isDate(input) {
+    return input instanceof Date || Object.prototype.toString.call(input) === '[object Date]';
+}
+
+function map$3(arr, fn) {
+    var res = [], i;
+    for (i = 0; i < arr.length; ++i) {
+        res.push(fn(arr[i], i));
+    }
+    return res;
+}
+
+function hasOwnProp(a, b) {
+    return Object.prototype.hasOwnProperty.call(a, b);
+}
+
+function extend$2(a, b) {
+    for (var i in b) {
+        if (hasOwnProp(b, i)) {
+            a[i] = b[i];
+        }
+    }
+
+    if (hasOwnProp(b, 'toString')) {
+        a.toString = b.toString;
+    }
+
+    if (hasOwnProp(b, 'valueOf')) {
+        a.valueOf = b.valueOf;
+    }
+
+    return a;
+}
+
+function createUTC (input, format, locale, strict) {
+    return createLocalOrUTC(input, format, locale, strict, true).utc();
+}
+
+function defaultParsingFlags() {
+    // We need to deep clone this object.
+    return {
+        empty           : false,
+        unusedTokens    : [],
+        unusedInput     : [],
+        overflow        : -2,
+        charsLeftOver   : 0,
+        nullInput       : false,
+        invalidMonth    : null,
+        invalidFormat   : false,
+        userInvalidated : false,
+        iso             : false,
+        parsedDateParts : [],
+        meridiem        : null,
+        rfc2822         : false,
+        weekdayMismatch : false
+    };
+}
+
+function getParsingFlags(m) {
+    if (m._pf == null) {
+        m._pf = defaultParsingFlags();
+    }
+    return m._pf;
+}
+
+var some$3;
+if (Array.prototype.some) {
+    some$3 = Array.prototype.some;
+} else {
+    some$3 = function (fun) {
+        var t = Object(this);
+        var len = t.length >>> 0;
+
+        for (var i = 0; i < len; i++) {
+            if (i in t && fun.call(this, t[i], i, t)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+}
+
+function isValid$3(m) {
+    if (m._isValid == null) {
+        var flags = getParsingFlags(m);
+        var parsedParts = some$3.call(flags.parsedDateParts, function (i) {
+            return i != null;
+        });
+        var isNowValid = !isNaN(m._d.getTime()) &&
+            flags.overflow < 0 &&
+            !flags.empty &&
+            !flags.invalidMonth &&
+            !flags.invalidWeekday &&
+            !flags.weekdayMismatch &&
+            !flags.nullInput &&
+            !flags.invalidFormat &&
+            !flags.userInvalidated &&
+            (!flags.meridiem || (flags.meridiem && parsedParts));
+
+        if (m._strict) {
+            isNowValid = isNowValid &&
+                flags.charsLeftOver === 0 &&
+                flags.unusedTokens.length === 0 &&
+                flags.bigHour === undefined;
+        }
+
+        if (Object.isFrozen == null || !Object.isFrozen(m)) {
+            m._isValid = isNowValid;
+        }
+        else {
+            return isNowValid;
+        }
+    }
+    return m._isValid;
+}
+
+function createInvalid (flags) {
+    var m = createUTC(NaN);
+    if (flags != null) {
+        extend$2(getParsingFlags(m), flags);
+    }
+    else {
+        getParsingFlags(m).userInvalidated = true;
+    }
+
+    return m;
+}
+
+// Plugins that add properties should also add the key here (null value),
+// so we can properly clone ourselves.
+var momentProperties = hooks.momentProperties = [];
+
+function copyConfig(to, from) {
+    var i, prop, val;
+
+    if (!isUndefined$2(from._isAMomentObject)) {
+        to._isAMomentObject = from._isAMomentObject;
+    }
+    if (!isUndefined$2(from._i)) {
+        to._i = from._i;
+    }
+    if (!isUndefined$2(from._f)) {
+        to._f = from._f;
+    }
+    if (!isUndefined$2(from._l)) {
+        to._l = from._l;
+    }
+    if (!isUndefined$2(from._strict)) {
+        to._strict = from._strict;
+    }
+    if (!isUndefined$2(from._tzm)) {
+        to._tzm = from._tzm;
+    }
+    if (!isUndefined$2(from._isUTC)) {
+        to._isUTC = from._isUTC;
+    }
+    if (!isUndefined$2(from._offset)) {
+        to._offset = from._offset;
+    }
+    if (!isUndefined$2(from._pf)) {
+        to._pf = getParsingFlags(from);
+    }
+    if (!isUndefined$2(from._locale)) {
+        to._locale = from._locale;
+    }
+
+    if (momentProperties.length > 0) {
+        for (i = 0; i < momentProperties.length; i++) {
+            prop = momentProperties[i];
+            val = from[prop];
+            if (!isUndefined$2(val)) {
+                to[prop] = val;
+            }
+        }
+    }
+
+    return to;
+}
+
+var updateInProgress = false;
+
+// Moment prototype object
+function Moment(config) {
+    copyConfig(this, config);
+    this._d = new Date(config._d != null ? config._d.getTime() : NaN);
+    if (!this.isValid()) {
+        this._d = new Date(NaN);
+    }
+    // Prevent infinite loop in case updateOffset creates new moment
+    // objects.
+    if (updateInProgress === false) {
+        updateInProgress = true;
+        hooks.updateOffset(this);
+        updateInProgress = false;
+    }
+}
+
+function isMoment (obj) {
+    return obj instanceof Moment || (obj != null && obj._isAMomentObject != null);
+}
+
+function absFloor (number) {
+    if (number < 0) {
+        // -0 -> 0
+        return Math.ceil(number) || 0;
+    } else {
+        return Math.floor(number);
+    }
+}
+
+function toInt(argumentForCoercion) {
+    var coercedNumber = +argumentForCoercion,
+        value = 0;
+
+    if (coercedNumber !== 0 && isFinite(coercedNumber)) {
+        value = absFloor(coercedNumber);
+    }
+
+    return value;
+}
+
+// compare two arrays, return the number of differences
+function compareArrays(array1, array2, dontConvert) {
+    var len = Math.min(array1.length, array2.length),
+        lengthDiff = Math.abs(array1.length - array2.length),
+        diffs = 0,
+        i;
+    for (i = 0; i < len; i++) {
+        if ((dontConvert && array1[i] !== array2[i]) ||
+            (!dontConvert && toInt(array1[i]) !== toInt(array2[i]))) {
+            diffs++;
+        }
+    }
+    return diffs + lengthDiff;
+}
+
+function warn(msg) {
+    if (hooks.suppressDeprecationWarnings === false &&
+            (typeof console !==  'undefined') && console.warn) {
+        console.warn('Deprecation warning: ' + msg);
+    }
+}
+
+function deprecate(msg, fn) {
+    var firstTime = true;
+
+    return extend$2(function () {
+        if (hooks.deprecationHandler != null) {
+            hooks.deprecationHandler(null, msg);
+        }
+        if (firstTime) {
+            var args = [];
+            var arg;
+            for (var i = 0; i < arguments.length; i++) {
+                arg = '';
+                if (typeof arguments[i] === 'object') {
+                    arg += '\n[' + i + '] ';
+                    for (var key in arguments[0]) {
+                        arg += key + ': ' + arguments[0][key] + ', ';
+                    }
+                    arg = arg.slice(0, -2); // Remove trailing comma and space
+                } else {
+                    arg = arguments[i];
+                }
+                args.push(arg);
+            }
+            warn(msg + '\nArguments: ' + Array.prototype.slice.call(args).join('') + '\n' + (new Error()).stack);
+            firstTime = false;
+        }
+        return fn.apply(this, arguments);
+    }, fn);
+}
+
+var deprecations = {};
+
+function deprecateSimple(name, msg) {
+    if (hooks.deprecationHandler != null) {
+        hooks.deprecationHandler(name, msg);
+    }
+    if (!deprecations[name]) {
+        warn(msg);
+        deprecations[name] = true;
+    }
+}
+
+hooks.suppressDeprecationWarnings = false;
+hooks.deprecationHandler = null;
+
+function isFunction$1(input) {
+    return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
+}
+
+function set (config) {
+    var prop, i;
+    for (i in config) {
+        prop = config[i];
+        if (isFunction$1(prop)) {
+            this[i] = prop;
+        } else {
+            this['_' + i] = prop;
+        }
+    }
+    this._config = config;
+    // Lenient ordinal parsing accepts just a number in addition to
+    // number + (possibly) stuff coming from _dayOfMonthOrdinalParse.
+    // TODO: Remove "ordinalParse" fallback in next major release.
+    this._dayOfMonthOrdinalParseLenient = new RegExp(
+        (this._dayOfMonthOrdinalParse.source || this._ordinalParse.source) +
+            '|' + (/\d{1,2}/).source);
+}
+
+function mergeConfigs(parentConfig, childConfig) {
+    var res = extend$2({}, parentConfig), prop;
+    for (prop in childConfig) {
+        if (hasOwnProp(childConfig, prop)) {
+            if (isObject$3(parentConfig[prop]) && isObject$3(childConfig[prop])) {
+                res[prop] = {};
+                extend$2(res[prop], parentConfig[prop]);
+                extend$2(res[prop], childConfig[prop]);
+            } else if (childConfig[prop] != null) {
+                res[prop] = childConfig[prop];
+            } else {
+                delete res[prop];
+            }
+        }
+    }
+    for (prop in parentConfig) {
+        if (hasOwnProp(parentConfig, prop) &&
+                !hasOwnProp(childConfig, prop) &&
+                isObject$3(parentConfig[prop])) {
+            // make sure changes to properties don't modify parent config
+            res[prop] = extend$2({}, res[prop]);
+        }
+    }
+    return res;
+}
+
+function Locale(config) {
+    if (config != null) {
+        this.set(config);
+    }
+}
+
+var keys$3;
+
+if (Object.keys) {
+    keys$3 = Object.keys;
+} else {
+    keys$3 = function (obj) {
+        var i, res = [];
+        for (i in obj) {
+            if (hasOwnProp(obj, i)) {
+                res.push(i);
+            }
+        }
+        return res;
+    };
+}
+
+var defaultCalendar = {
+    sameDay : '[Today at] LT',
+    nextDay : '[Tomorrow at] LT',
+    nextWeek : 'dddd [at] LT',
+    lastDay : '[Yesterday at] LT',
+    lastWeek : '[Last] dddd [at] LT',
+    sameElse : 'L'
+};
+
+function calendar (key, mom, now) {
+    var output = this._calendar[key] || this._calendar['sameElse'];
+    return isFunction$1(output) ? output.call(mom, now) : output;
+}
+
+var defaultLongDateFormat = {
+    LTS  : 'h:mm:ss A',
+    LT   : 'h:mm A',
+    L    : 'MM/DD/YYYY',
+    LL   : 'MMMM D, YYYY',
+    LLL  : 'MMMM D, YYYY h:mm A',
+    LLLL : 'dddd, MMMM D, YYYY h:mm A'
+};
+
+function longDateFormat (key) {
+    var format = this._longDateFormat[key],
+        formatUpper = this._longDateFormat[key.toUpperCase()];
+
+    if (format || !formatUpper) {
+        return format;
+    }
+
+    this._longDateFormat[key] = formatUpper.replace(/MMMM|MM|DD|dddd/g, function (val) {
+        return val.slice(1);
+    });
+
+    return this._longDateFormat[key];
+}
+
+var defaultInvalidDate = 'Invalid date';
+
+function invalidDate () {
+    return this._invalidDate;
+}
+
+var defaultOrdinal = '%d';
+var defaultDayOfMonthOrdinalParse = /\d{1,2}/;
+
+function ordinal (number) {
+    return this._ordinal.replace('%d', number);
+}
+
+var defaultRelativeTime = {
+    future : 'in %s',
+    past   : '%s ago',
+    s  : 'a few seconds',
+    ss : '%d seconds',
+    m  : 'a minute',
+    mm : '%d minutes',
+    h  : 'an hour',
+    hh : '%d hours',
+    d  : 'a day',
+    dd : '%d days',
+    M  : 'a month',
+    MM : '%d months',
+    y  : 'a year',
+    yy : '%d years'
+};
+
+function relativeTime (number, withoutSuffix, string, isFuture) {
+    var output = this._relativeTime[string];
+    return (isFunction$1(output)) ?
+        output(number, withoutSuffix, string, isFuture) :
+        output.replace(/%d/i, number);
+}
+
+function pastFuture (diff, output) {
+    var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
+    return isFunction$1(format) ? format(output) : format.replace(/%s/i, output);
+}
+
+var aliases = {};
+
+function addUnitAlias (unit, shorthand) {
+    var lowerCase = unit.toLowerCase();
+    aliases[lowerCase] = aliases[lowerCase + 's'] = aliases[shorthand] = unit;
+}
+
+function normalizeUnits(units) {
+    return typeof units === 'string' ? aliases[units] || aliases[units.toLowerCase()] : undefined;
+}
+
+function normalizeObjectUnits(inputObject) {
+    var normalizedInput = {},
+        normalizedProp,
+        prop;
+
+    for (prop in inputObject) {
+        if (hasOwnProp(inputObject, prop)) {
+            normalizedProp = normalizeUnits(prop);
+            if (normalizedProp) {
+                normalizedInput[normalizedProp] = inputObject[prop];
+            }
+        }
+    }
+
+    return normalizedInput;
+}
+
+var priorities = {};
+
+function addUnitPriority(unit, priority) {
+    priorities[unit] = priority;
+}
+
+function getPrioritizedUnits(unitsObj) {
+    var units = [];
+    for (var u in unitsObj) {
+        units.push({unit: u, priority: priorities[u]});
+    }
+    units.sort(function (a, b) {
+        return a.priority - b.priority;
+    });
+    return units;
+}
+
+function zeroFill(number, targetLength, forceSign) {
+    var absNumber = '' + Math.abs(number),
+        zerosToFill = targetLength - absNumber.length,
+        sign = number >= 0;
+    return (sign ? (forceSign ? '+' : '') : '-') +
+        Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
+}
+
+var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
+
+var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
+
+var formatFunctions = {};
+
+var formatTokenFunctions = {};
+
+// token:    'M'
+// padded:   ['MM', 2]
+// ordinal:  'Mo'
+// callback: function () { this.month() + 1 }
+function addFormatToken (token, padded, ordinal, callback) {
+    var func = callback;
+    if (typeof callback === 'string') {
+        func = function () {
+            return this[callback]();
+        };
+    }
+    if (token) {
+        formatTokenFunctions[token] = func;
+    }
+    if (padded) {
+        formatTokenFunctions[padded[0]] = function () {
+            return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
+        };
+    }
+    if (ordinal) {
+        formatTokenFunctions[ordinal] = function () {
+            return this.localeData().ordinal(func.apply(this, arguments), token);
+        };
+    }
+}
+
+function removeFormattingTokens(input) {
+    if (input.match(/\[[\s\S]/)) {
+        return input.replace(/^\[|\]$/g, '');
+    }
+    return input.replace(/\\/g, '');
+}
+
+function makeFormatFunction(format) {
+    var array = format.match(formattingTokens), i, length;
+
+    for (i = 0, length = array.length; i < length; i++) {
+        if (formatTokenFunctions[array[i]]) {
+            array[i] = formatTokenFunctions[array[i]];
+        } else {
+            array[i] = removeFormattingTokens(array[i]);
+        }
+    }
+
+    return function (mom) {
+        var output = '', i;
+        for (i = 0; i < length; i++) {
+            output += isFunction$1(array[i]) ? array[i].call(mom, format) : array[i];
+        }
+        return output;
+    };
+}
+
+// format date using native date object
+function formatMoment(m, format) {
+    if (!m.isValid()) {
+        return m.localeData().invalidDate();
+    }
+
+    format = expandFormat(format, m.localeData());
+    formatFunctions[format] = formatFunctions[format] || makeFormatFunction(format);
+
+    return formatFunctions[format](m);
+}
+
+function expandFormat(format, locale) {
+    var i = 5;
+
+    function replaceLongDateFormatTokens(input) {
+        return locale.longDateFormat(input) || input;
+    }
+
+    localFormattingTokens.lastIndex = 0;
+    while (i >= 0 && localFormattingTokens.test(format)) {
+        format = format.replace(localFormattingTokens, replaceLongDateFormatTokens);
+        localFormattingTokens.lastIndex = 0;
+        i -= 1;
+    }
+
+    return format;
+}
+
+var match1         = /\d/;            //       0 - 9
+var match2         = /\d\d/;          //      00 - 99
+var match3         = /\d{3}/;         //     000 - 999
+var match4         = /\d{4}/;         //    0000 - 9999
+var match6         = /[+-]?\d{6}/;    // -999999 - 999999
+var match1to2      = /\d\d?/;         //       0 - 99
+var match3to4      = /\d\d\d\d?/;     //     999 - 9999
+var match5to6      = /\d\d\d\d\d\d?/; //   99999 - 999999
+var match1to3      = /\d{1,3}/;       //       0 - 999
+var match1to4      = /\d{1,4}/;       //       0 - 9999
+var match1to6      = /[+-]?\d{1,6}/;  // -999999 - 999999
+
+var matchUnsigned  = /\d+/;           //       0 - inf
+var matchSigned    = /[+-]?\d+/;      //    -inf - inf
+
+var matchOffset    = /Z|[+-]\d\d:?\d\d/gi; // +00:00 -00:00 +0000 -0000 or Z
+var matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi; // +00 -00 +00:00 -00:00 +0000 -0000 or Z
+
+var matchTimestamp = /[+-]?\d+(\.\d{1,3})?/; // 123456789 123456789.123
+
+// any word (or two) characters or numbers including two/three word month in arabic.
+// includes scottish gaelic two word and hyphenated months
+var matchWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i;
+
+
+var regexes = {};
+
+function addRegexToken (token, regex, strictRegex) {
+    regexes[token] = isFunction$1(regex) ? regex : function (isStrict, localeData) {
+        return (isStrict && strictRegex) ? strictRegex : regex;
+    };
+}
+
+function getParseRegexForToken (token, config) {
+    if (!hasOwnProp(regexes, token)) {
+        return new RegExp(unescapeFormat(token));
+    }
+
+    return regexes[token](config._strict, config._locale);
+}
+
+// Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+function unescapeFormat(s) {
+    return regexEscape$1(s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
+        return p1 || p2 || p3 || p4;
+    }));
+}
+
+function regexEscape$1(s) {
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+var tokens = {};
+
+function addParseToken (token, callback) {
+    var i, func = callback;
+    if (typeof token === 'string') {
+        token = [token];
+    }
+    if (isNumber$3(callback)) {
+        func = function (input, array) {
+            array[callback] = toInt(input);
+        };
+    }
+    for (i = 0; i < token.length; i++) {
+        tokens[token[i]] = func;
+    }
+}
+
+function addWeekParseToken (token, callback) {
+    addParseToken(token, function (input, array, config, token) {
+        config._w = config._w || {};
+        callback(input, config._w, config, token);
+    });
+}
+
+function addTimeToArrayFromToken(token, input, config) {
+    if (input != null && hasOwnProp(tokens, token)) {
+        tokens[token](input, config._a, config, token);
+    }
+}
+
+var YEAR = 0;
+var MONTH = 1;
+var DATE = 2;
+var HOUR = 3;
+var MINUTE = 4;
+var SECOND = 5;
+var MILLISECOND = 6;
+var WEEK = 7;
+var WEEKDAY = 8;
+
+// FORMATTING
+
+addFormatToken('Y', 0, 0, function () {
+    var y = this.year();
+    return y <= 9999 ? '' + y : '+' + y;
+});
+
+addFormatToken(0, ['YY', 2], 0, function () {
+    return this.year() % 100;
+});
+
+addFormatToken(0, ['YYYY',   4],       0, 'year');
+addFormatToken(0, ['YYYYY',  5],       0, 'year');
+addFormatToken(0, ['YYYYYY', 6, true], 0, 'year');
+
+// ALIASES
+
+addUnitAlias('year', 'y');
+
+// PRIORITIES
+
+addUnitPriority('year', 1);
+
+// PARSING
+
+addRegexToken('Y',      matchSigned);
+addRegexToken('YY',     match1to2, match2);
+addRegexToken('YYYY',   match1to4, match4);
+addRegexToken('YYYYY',  match1to6, match6);
+addRegexToken('YYYYYY', match1to6, match6);
+
+addParseToken(['YYYYY', 'YYYYYY'], YEAR);
+addParseToken('YYYY', function (input, array) {
+    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+});
+addParseToken('YY', function (input, array) {
+    array[YEAR] = hooks.parseTwoDigitYear(input);
+});
+addParseToken('Y', function (input, array) {
+    array[YEAR] = parseInt(input, 10);
+});
+
+// HELPERS
+
+function daysInYear(year) {
+    return isLeapYear(year) ? 366 : 365;
+}
+
+function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+// HOOKS
+
+hooks.parseTwoDigitYear = function (input) {
+    return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
+};
+
+// MOMENTS
+
+var getSetYear = makeGetSet('FullYear', true);
+
+function getIsLeapYear () {
+    return isLeapYear(this.year());
+}
+
+function makeGetSet (unit, keepTime) {
+    return function (value) {
+        if (value != null) {
+            set$1(this, unit, value);
+            hooks.updateOffset(this, keepTime);
+            return this;
+        } else {
+            return get$1(this, unit);
+        }
+    };
+}
+
+function get$1 (mom, unit) {
+    return mom.isValid() ?
+        mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]() : NaN;
+}
+
+function set$1 (mom, unit, value) {
+    if (mom.isValid() && !isNaN(value)) {
+        if (unit === 'FullYear' && isLeapYear(mom.year()) && mom.month() === 1 && mom.date() === 29) {
+            mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value, mom.month(), daysInMonth(value, mom.month()));
+        }
+        else {
+            mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
+        }
+    }
+}
+
+// MOMENTS
+
+function stringGet (units) {
+    units = normalizeUnits(units);
+    if (isFunction$1(this[units])) {
+        return this[units]();
+    }
+    return this;
+}
+
+
+function stringSet (units, value) {
+    if (typeof units === 'object') {
+        units = normalizeObjectUnits(units);
+        var prioritized = getPrioritizedUnits(units);
+        for (var i = 0; i < prioritized.length; i++) {
+            this[prioritized[i].unit](units[prioritized[i].unit]);
+        }
+    } else {
+        units = normalizeUnits(units);
+        if (isFunction$1(this[units])) {
+            return this[units](value);
+        }
+    }
+    return this;
+}
+
+function mod(n, x) {
+    return ((n % x) + x) % x;
+}
+
+var indexOf$4;
+
+if (Array.prototype.indexOf) {
+    indexOf$4 = Array.prototype.indexOf;
+} else {
+    indexOf$4 = function (o) {
+        // I know
+        var i;
+        for (i = 0; i < this.length; ++i) {
+            if (this[i] === o) {
+                return i;
+            }
+        }
+        return -1;
+    };
+}
+
+function daysInMonth(year, month) {
+    if (isNaN(year) || isNaN(month)) {
+        return NaN;
+    }
+    var modMonth = mod(month, 12);
+    year += (month - modMonth) / 12;
+    return modMonth === 1 ? (isLeapYear(year) ? 29 : 28) : (31 - modMonth % 7 % 2);
+}
+
+// FORMATTING
+
+addFormatToken('M', ['MM', 2], 'Mo', function () {
+    return this.month() + 1;
+});
+
+addFormatToken('MMM', 0, 0, function (format) {
+    return this.localeData().monthsShort(this, format);
+});
+
+addFormatToken('MMMM', 0, 0, function (format) {
+    return this.localeData().months(this, format);
+});
+
+// ALIASES
+
+addUnitAlias('month', 'M');
+
+// PRIORITY
+
+addUnitPriority('month', 8);
+
+// PARSING
+
+addRegexToken('M',    match1to2);
+addRegexToken('MM',   match1to2, match2);
+addRegexToken('MMM',  function (isStrict, locale) {
+    return locale.monthsShortRegex(isStrict);
+});
+addRegexToken('MMMM', function (isStrict, locale) {
+    return locale.monthsRegex(isStrict);
+});
+
+addParseToken(['M', 'MM'], function (input, array) {
+    array[MONTH] = toInt(input) - 1;
+});
+
+addParseToken(['MMM', 'MMMM'], function (input, array, config, token) {
+    var month = config._locale.monthsParse(input, token, config._strict);
+    // if we didn't find a month name, mark the date as invalid.
+    if (month != null) {
+        array[MONTH] = month;
+    } else {
+        getParsingFlags(config).invalidMonth = input;
+    }
+});
+
+// LOCALES
+
+var MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/;
+var defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_');
+function localeMonths (m, format) {
+    if (!m) {
+        return isArray$4(this._months) ? this._months :
+            this._months['standalone'];
+    }
+    return isArray$4(this._months) ? this._months[m.month()] :
+        this._months[(this._months.isFormat || MONTHS_IN_FORMAT).test(format) ? 'format' : 'standalone'][m.month()];
+}
+
+var defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_');
+function localeMonthsShort (m, format) {
+    if (!m) {
+        return isArray$4(this._monthsShort) ? this._monthsShort :
+            this._monthsShort['standalone'];
+    }
+    return isArray$4(this._monthsShort) ? this._monthsShort[m.month()] :
+        this._monthsShort[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
+}
+
+function handleStrictParse(monthName, format, strict) {
+    var i, ii, mom, llc = monthName.toLocaleLowerCase();
+    if (!this._monthsParse) {
+        // this is not used
+        this._monthsParse = [];
+        this._longMonthsParse = [];
+        this._shortMonthsParse = [];
+        for (i = 0; i < 12; ++i) {
+            mom = createUTC([2000, i]);
+            this._shortMonthsParse[i] = this.monthsShort(mom, '').toLocaleLowerCase();
+            this._longMonthsParse[i] = this.months(mom, '').toLocaleLowerCase();
+        }
+    }
+
+    if (strict) {
+        if (format === 'MMM') {
+            ii = indexOf$4.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$4.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    } else {
+        if (format === 'MMM') {
+            ii = indexOf$4.call(this._shortMonthsParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$4.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$4.call(this._longMonthsParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$4.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    }
+}
+
+function localeMonthsParse (monthName, format, strict) {
+    var i, mom, regex;
+
+    if (this._monthsParseExact) {
+        return handleStrictParse.call(this, monthName, format, strict);
+    }
+
+    if (!this._monthsParse) {
+        this._monthsParse = [];
+        this._longMonthsParse = [];
+        this._shortMonthsParse = [];
+    }
+
+    // TODO: add sorting
+    // Sorting makes sure if one month (or abbr) is a prefix of another
+    // see sorting in computeMonthsParse
+    for (i = 0; i < 12; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, i]);
+        if (strict && !this._longMonthsParse[i]) {
+            this._longMonthsParse[i] = new RegExp('^' + this.months(mom, '').replace('.', '') + '$', 'i');
+            this._shortMonthsParse[i] = new RegExp('^' + this.monthsShort(mom, '').replace('.', '') + '$', 'i');
+        }
+        if (!strict && !this._monthsParse[i]) {
+            regex = '^' + this.months(mom, '') + '|^' + this.monthsShort(mom, '');
+            this._monthsParse[i] = new RegExp(regex.replace('.', ''), 'i');
+        }
+        // test the regex
+        if (strict && format === 'MMMM' && this._longMonthsParse[i].test(monthName)) {
+            return i;
+        } else if (strict && format === 'MMM' && this._shortMonthsParse[i].test(monthName)) {
+            return i;
+        } else if (!strict && this._monthsParse[i].test(monthName)) {
+            return i;
+        }
+    }
+}
+
+// MOMENTS
+
+function setMonth (mom, value) {
+    var dayOfMonth;
+
+    if (!mom.isValid()) {
+        // No op
+        return mom;
+    }
+
+    if (typeof value === 'string') {
+        if (/^\d+$/.test(value)) {
+            value = toInt(value);
+        } else {
+            value = mom.localeData().monthsParse(value);
+            // TODO: Another silent failure?
+            if (!isNumber$3(value)) {
+                return mom;
+            }
+        }
+    }
+
+    dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
+    mom._d['set' + (mom._isUTC ? 'UTC' : '') + 'Month'](value, dayOfMonth);
+    return mom;
+}
+
+function getSetMonth (value) {
+    if (value != null) {
+        setMonth(this, value);
+        hooks.updateOffset(this, true);
+        return this;
+    } else {
+        return get$1(this, 'Month');
+    }
+}
+
+function getDaysInMonth () {
+    return daysInMonth(this.year(), this.month());
+}
+
+var defaultMonthsShortRegex = matchWord;
+function monthsShortRegex (isStrict) {
+    if (this._monthsParseExact) {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            computeMonthsParse.call(this);
+        }
+        if (isStrict) {
+            return this._monthsShortStrictRegex;
+        } else {
+            return this._monthsShortRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_monthsShortRegex')) {
+            this._monthsShortRegex = defaultMonthsShortRegex;
+        }
+        return this._monthsShortStrictRegex && isStrict ?
+            this._monthsShortStrictRegex : this._monthsShortRegex;
+    }
+}
+
+var defaultMonthsRegex = matchWord;
+function monthsRegex (isStrict) {
+    if (this._monthsParseExact) {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            computeMonthsParse.call(this);
+        }
+        if (isStrict) {
+            return this._monthsStrictRegex;
+        } else {
+            return this._monthsRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_monthsRegex')) {
+            this._monthsRegex = defaultMonthsRegex;
+        }
+        return this._monthsStrictRegex && isStrict ?
+            this._monthsStrictRegex : this._monthsRegex;
+    }
+}
+
+function computeMonthsParse () {
+    function cmpLenRev(a, b) {
+        return b.length - a.length;
+    }
+
+    var shortPieces = [], longPieces = [], mixedPieces = [],
+        i, mom;
+    for (i = 0; i < 12; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, i]);
+        shortPieces.push(this.monthsShort(mom, ''));
+        longPieces.push(this.months(mom, ''));
+        mixedPieces.push(this.months(mom, ''));
+        mixedPieces.push(this.monthsShort(mom, ''));
+    }
+    // Sorting makes sure if one month (or abbr) is a prefix of another it
+    // will match the longer piece.
+    shortPieces.sort(cmpLenRev);
+    longPieces.sort(cmpLenRev);
+    mixedPieces.sort(cmpLenRev);
+    for (i = 0; i < 12; i++) {
+        shortPieces[i] = regexEscape$1(shortPieces[i]);
+        longPieces[i] = regexEscape$1(longPieces[i]);
+    }
+    for (i = 0; i < 24; i++) {
+        mixedPieces[i] = regexEscape$1(mixedPieces[i]);
+    }
+
+    this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+    this._monthsShortRegex = this._monthsRegex;
+    this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+    this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+}
+
+function createDate (y, m, d, h, M, s, ms) {
+    // can't just apply() to create a date:
+    // https://stackoverflow.com/q/181348
+    var date = new Date(y, m, d, h, M, s, ms);
+
+    // the date constructor remaps years 0-99 to 1900-1999
+    if (y < 100 && y >= 0 && isFinite(date.getFullYear())) {
+        date.setFullYear(y);
+    }
+    return date;
+}
+
+function createUTCDate (y) {
+    var date = new Date(Date.UTC.apply(null, arguments));
+
+    // the Date.UTC function remaps years 0-99 to 1900-1999
+    if (y < 100 && y >= 0 && isFinite(date.getUTCFullYear())) {
+        date.setUTCFullYear(y);
+    }
+    return date;
+}
+
+// start-of-first-week - start-of-year
+function firstWeekOffset(year, dow, doy) {
+    var // first-week day -- which january is always in the first week (4 for iso, 1 for other)
+        fwd = 7 + dow - doy,
+        // first-week day local weekday -- which local weekday is fwd
+        fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
+
+    return -fwdlw + fwd - 1;
+}
+
+// https://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year.2C_week_number_and_weekday
+function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
+    var localWeekday = (7 + weekday - dow) % 7,
+        weekOffset = firstWeekOffset(year, dow, doy),
+        dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset,
+        resYear, resDayOfYear;
+
+    if (dayOfYear <= 0) {
+        resYear = year - 1;
+        resDayOfYear = daysInYear(resYear) + dayOfYear;
+    } else if (dayOfYear > daysInYear(year)) {
+        resYear = year + 1;
+        resDayOfYear = dayOfYear - daysInYear(year);
+    } else {
+        resYear = year;
+        resDayOfYear = dayOfYear;
+    }
+
+    return {
+        year: resYear,
+        dayOfYear: resDayOfYear
+    };
+}
+
+function weekOfYear(mom, dow, doy) {
+    var weekOffset = firstWeekOffset(mom.year(), dow, doy),
+        week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1,
+        resWeek, resYear;
+
+    if (week < 1) {
+        resYear = mom.year() - 1;
+        resWeek = week + weeksInYear(resYear, dow, doy);
+    } else if (week > weeksInYear(mom.year(), dow, doy)) {
+        resWeek = week - weeksInYear(mom.year(), dow, doy);
+        resYear = mom.year() + 1;
+    } else {
+        resYear = mom.year();
+        resWeek = week;
+    }
+
+    return {
+        week: resWeek,
+        year: resYear
+    };
+}
+
+function weeksInYear(year, dow, doy) {
+    var weekOffset = firstWeekOffset(year, dow, doy),
+        weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
+    return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
+}
+
+// FORMATTING
+
+addFormatToken('w', ['ww', 2], 'wo', 'week');
+addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
+
+// ALIASES
+
+addUnitAlias('week', 'w');
+addUnitAlias('isoWeek', 'W');
+
+// PRIORITIES
+
+addUnitPriority('week', 5);
+addUnitPriority('isoWeek', 5);
+
+// PARSING
+
+addRegexToken('w',  match1to2);
+addRegexToken('ww', match1to2, match2);
+addRegexToken('W',  match1to2);
+addRegexToken('WW', match1to2, match2);
+
+addWeekParseToken(['w', 'ww', 'W', 'WW'], function (input, week, config, token) {
+    week[token.substr(0, 1)] = toInt(input);
+});
+
+// HELPERS
+
+// LOCALES
+
+function localeWeek (mom) {
+    return weekOfYear(mom, this._week.dow, this._week.doy).week;
+}
+
+var defaultLocaleWeek = {
+    dow : 0, // Sunday is the first day of the week.
+    doy : 6  // The week that contains Jan 1st is the first week of the year.
+};
+
+function localeFirstDayOfWeek () {
+    return this._week.dow;
+}
+
+function localeFirstDayOfYear () {
+    return this._week.doy;
+}
+
+// MOMENTS
+
+function getSetWeek (input) {
+    var week = this.localeData().week(this);
+    return input == null ? week : this.add((input - week) * 7, 'd');
+}
+
+function getSetISOWeek (input) {
+    var week = weekOfYear(this, 1, 4).week;
+    return input == null ? week : this.add((input - week) * 7, 'd');
+}
+
+// FORMATTING
+
+addFormatToken('d', 0, 'do', 'day');
+
+addFormatToken('dd', 0, 0, function (format) {
+    return this.localeData().weekdaysMin(this, format);
+});
+
+addFormatToken('ddd', 0, 0, function (format) {
+    return this.localeData().weekdaysShort(this, format);
+});
+
+addFormatToken('dddd', 0, 0, function (format) {
+    return this.localeData().weekdays(this, format);
+});
+
+addFormatToken('e', 0, 0, 'weekday');
+addFormatToken('E', 0, 0, 'isoWeekday');
+
+// ALIASES
+
+addUnitAlias('day', 'd');
+addUnitAlias('weekday', 'e');
+addUnitAlias('isoWeekday', 'E');
+
+// PRIORITY
+addUnitPriority('day', 11);
+addUnitPriority('weekday', 11);
+addUnitPriority('isoWeekday', 11);
+
+// PARSING
+
+addRegexToken('d',    match1to2);
+addRegexToken('e',    match1to2);
+addRegexToken('E',    match1to2);
+addRegexToken('dd',   function (isStrict, locale) {
+    return locale.weekdaysMinRegex(isStrict);
+});
+addRegexToken('ddd',   function (isStrict, locale) {
+    return locale.weekdaysShortRegex(isStrict);
+});
+addRegexToken('dddd',   function (isStrict, locale) {
+    return locale.weekdaysRegex(isStrict);
+});
+
+addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
+    var weekday = config._locale.weekdaysParse(input, token, config._strict);
+    // if we didn't get a weekday name, mark the date as invalid
+    if (weekday != null) {
+        week.d = weekday;
+    } else {
+        getParsingFlags(config).invalidWeekday = input;
+    }
+});
+
+addWeekParseToken(['d', 'e', 'E'], function (input, week, config, token) {
+    week[token] = toInt(input);
+});
+
+// HELPERS
+
+function parseWeekday(input, locale) {
+    if (typeof input !== 'string') {
+        return input;
+    }
+
+    if (!isNaN(input)) {
+        return parseInt(input, 10);
+    }
+
+    input = locale.weekdaysParse(input);
+    if (typeof input === 'number') {
+        return input;
+    }
+
+    return null;
+}
+
+function parseIsoWeekday(input, locale) {
+    if (typeof input === 'string') {
+        return locale.weekdaysParse(input) % 7 || 7;
+    }
+    return isNaN(input) ? null : input;
+}
+
+// LOCALES
+
+var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_');
+function localeWeekdays (m, format) {
+    if (!m) {
+        return isArray$4(this._weekdays) ? this._weekdays :
+            this._weekdays['standalone'];
+    }
+    return isArray$4(this._weekdays) ? this._weekdays[m.day()] :
+        this._weekdays[this._weekdays.isFormat.test(format) ? 'format' : 'standalone'][m.day()];
+}
+
+var defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
+function localeWeekdaysShort (m) {
+    return (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
+}
+
+var defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_');
+function localeWeekdaysMin (m) {
+    return (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
+}
+
+function handleStrictParse$1(weekdayName, format, strict) {
+    var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+        this._shortWeekdaysParse = [];
+        this._minWeekdaysParse = [];
+
+        for (i = 0; i < 7; ++i) {
+            mom = createUTC([2000, 1]).day(i);
+            this._minWeekdaysParse[i] = this.weekdaysMin(mom, '').toLocaleLowerCase();
+            this._shortWeekdaysParse[i] = this.weekdaysShort(mom, '').toLocaleLowerCase();
+            this._weekdaysParse[i] = this.weekdays(mom, '').toLocaleLowerCase();
+        }
+    }
+
+    if (strict) {
+        if (format === 'dddd') {
+            ii = indexOf$4.call(this._weekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else if (format === 'ddd') {
+            ii = indexOf$4.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$4.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    } else {
+        if (format === 'dddd') {
+            ii = indexOf$4.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$4.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$4.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else if (format === 'ddd') {
+            ii = indexOf$4.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$4.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$4.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        } else {
+            ii = indexOf$4.call(this._minWeekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$4.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+                return ii;
+            }
+            ii = indexOf$4.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+        }
+    }
+}
+
+function localeWeekdaysParse (weekdayName, format, strict) {
+    var i, mom, regex;
+
+    if (this._weekdaysParseExact) {
+        return handleStrictParse$1.call(this, weekdayName, format, strict);
+    }
+
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+        this._minWeekdaysParse = [];
+        this._shortWeekdaysParse = [];
+        this._fullWeekdaysParse = [];
+    }
+
+    for (i = 0; i < 7; i++) {
+        // make the regex if we don't have it already
+
+        mom = createUTC([2000, 1]).day(i);
+        if (strict && !this._fullWeekdaysParse[i]) {
+            this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
+            this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
+            this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+        }
+        if (!this._weekdaysParse[i]) {
+            regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
+            this._weekdaysParse[i] = new RegExp(regex.replace('.', ''), 'i');
+        }
+        // test the regex
+        if (strict && format === 'dddd' && this._fullWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (strict && format === 'ddd' && this._shortWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (strict && format === 'dd' && this._minWeekdaysParse[i].test(weekdayName)) {
+            return i;
+        } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
+            return i;
+        }
+    }
+}
+
+// MOMENTS
+
+function getSetDayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
+    if (input != null) {
+        input = parseWeekday(input, this.localeData());
+        return this.add(input - day, 'd');
+    } else {
+        return day;
+    }
+}
+
+function getSetLocaleDayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
+    return input == null ? weekday : this.add(input - weekday, 'd');
+}
+
+function getSetISODayOfWeek (input) {
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+
+    // behaves the same as moment#day except
+    // as a getter, returns 7 instead of 0 (1-7 range instead of 0-6)
+    // as a setter, sunday should belong to the previous week.
+
+    if (input != null) {
+        var weekday = parseIsoWeekday(input, this.localeData());
+        return this.day(this.day() % 7 ? weekday : weekday - 7);
+    } else {
+        return this.day() || 7;
+    }
+}
+
+var defaultWeekdaysRegex = matchWord;
+function weekdaysRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysStrictRegex;
+        } else {
+            return this._weekdaysRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            this._weekdaysRegex = defaultWeekdaysRegex;
+        }
+        return this._weekdaysStrictRegex && isStrict ?
+            this._weekdaysStrictRegex : this._weekdaysRegex;
+    }
+}
+
+var defaultWeekdaysShortRegex = matchWord;
+function weekdaysShortRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysShortStrictRegex;
+        } else {
+            return this._weekdaysShortRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysShortRegex')) {
+            this._weekdaysShortRegex = defaultWeekdaysShortRegex;
+        }
+        return this._weekdaysShortStrictRegex && isStrict ?
+            this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
+    }
+}
+
+var defaultWeekdaysMinRegex = matchWord;
+function weekdaysMinRegex (isStrict) {
+    if (this._weekdaysParseExact) {
+        if (!hasOwnProp(this, '_weekdaysRegex')) {
+            computeWeekdaysParse.call(this);
+        }
+        if (isStrict) {
+            return this._weekdaysMinStrictRegex;
+        } else {
+            return this._weekdaysMinRegex;
+        }
+    } else {
+        if (!hasOwnProp(this, '_weekdaysMinRegex')) {
+            this._weekdaysMinRegex = defaultWeekdaysMinRegex;
+        }
+        return this._weekdaysMinStrictRegex && isStrict ?
+            this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
+    }
+}
+
+
+function computeWeekdaysParse () {
+    function cmpLenRev(a, b) {
+        return b.length - a.length;
+    }
+
+    var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [],
+        i, mom, minp, shortp, longp;
+    for (i = 0; i < 7; i++) {
+        // make the regex if we don't have it already
+        mom = createUTC([2000, 1]).day(i);
+        minp = this.weekdaysMin(mom, '');
+        shortp = this.weekdaysShort(mom, '');
+        longp = this.weekdays(mom, '');
+        minPieces.push(minp);
+        shortPieces.push(shortp);
+        longPieces.push(longp);
+        mixedPieces.push(minp);
+        mixedPieces.push(shortp);
+        mixedPieces.push(longp);
+    }
+    // Sorting makes sure if one weekday (or abbr) is a prefix of another it
+    // will match the longer piece.
+    minPieces.sort(cmpLenRev);
+    shortPieces.sort(cmpLenRev);
+    longPieces.sort(cmpLenRev);
+    mixedPieces.sort(cmpLenRev);
+    for (i = 0; i < 7; i++) {
+        shortPieces[i] = regexEscape$1(shortPieces[i]);
+        longPieces[i] = regexEscape$1(longPieces[i]);
+        mixedPieces[i] = regexEscape$1(mixedPieces[i]);
+    }
+
+    this._weekdaysRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+    this._weekdaysShortRegex = this._weekdaysRegex;
+    this._weekdaysMinRegex = this._weekdaysRegex;
+
+    this._weekdaysStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+    this._weekdaysShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+    this._weekdaysMinStrictRegex = new RegExp('^(' + minPieces.join('|') + ')', 'i');
+}
+
+// FORMATTING
+
+function hFormat() {
+    return this.hours() % 12 || 12;
+}
+
+function kFormat() {
+    return this.hours() || 24;
+}
+
+addFormatToken('H', ['HH', 2], 0, 'hour');
+addFormatToken('h', ['hh', 2], 0, hFormat);
+addFormatToken('k', ['kk', 2], 0, kFormat);
+
+addFormatToken('hmm', 0, 0, function () {
+    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2);
+});
+
+addFormatToken('hmmss', 0, 0, function () {
+    return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2) +
+        zeroFill(this.seconds(), 2);
+});
+
+addFormatToken('Hmm', 0, 0, function () {
+    return '' + this.hours() + zeroFill(this.minutes(), 2);
+});
+
+addFormatToken('Hmmss', 0, 0, function () {
+    return '' + this.hours() + zeroFill(this.minutes(), 2) +
+        zeroFill(this.seconds(), 2);
+});
+
+function meridiem (token, lowercase) {
+    addFormatToken(token, 0, 0, function () {
+        return this.localeData().meridiem(this.hours(), this.minutes(), lowercase);
+    });
+}
+
+meridiem('a', true);
+meridiem('A', false);
+
+// ALIASES
+
+addUnitAlias('hour', 'h');
+
+// PRIORITY
+addUnitPriority('hour', 13);
+
+// PARSING
+
+function matchMeridiem (isStrict, locale) {
+    return locale._meridiemParse;
+}
+
+addRegexToken('a',  matchMeridiem);
+addRegexToken('A',  matchMeridiem);
+addRegexToken('H',  match1to2);
+addRegexToken('h',  match1to2);
+addRegexToken('k',  match1to2);
+addRegexToken('HH', match1to2, match2);
+addRegexToken('hh', match1to2, match2);
+addRegexToken('kk', match1to2, match2);
+
+addRegexToken('hmm', match3to4);
+addRegexToken('hmmss', match5to6);
+addRegexToken('Hmm', match3to4);
+addRegexToken('Hmmss', match5to6);
+
+addParseToken(['H', 'HH'], HOUR);
+addParseToken(['k', 'kk'], function (input, array, config) {
+    var kInput = toInt(input);
+    array[HOUR] = kInput === 24 ? 0 : kInput;
+});
+addParseToken(['a', 'A'], function (input, array, config) {
+    config._isPm = config._locale.isPM(input);
+    config._meridiem = input;
+});
+addParseToken(['h', 'hh'], function (input, array, config) {
+    array[HOUR] = toInt(input);
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('hmm', function (input, array, config) {
+    var pos = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos));
+    array[MINUTE] = toInt(input.substr(pos));
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('hmmss', function (input, array, config) {
+    var pos1 = input.length - 4;
+    var pos2 = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos1));
+    array[MINUTE] = toInt(input.substr(pos1, 2));
+    array[SECOND] = toInt(input.substr(pos2));
+    getParsingFlags(config).bigHour = true;
+});
+addParseToken('Hmm', function (input, array, config) {
+    var pos = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos));
+    array[MINUTE] = toInt(input.substr(pos));
+});
+addParseToken('Hmmss', function (input, array, config) {
+    var pos1 = input.length - 4;
+    var pos2 = input.length - 2;
+    array[HOUR] = toInt(input.substr(0, pos1));
+    array[MINUTE] = toInt(input.substr(pos1, 2));
+    array[SECOND] = toInt(input.substr(pos2));
+});
+
+// LOCALES
+
+function localeIsPM (input) {
+    // IE8 Quirks Mode & IE7 Standards Mode do not allow accessing strings like arrays
+    // Using charAt should be more compatible.
+    return ((input + '').toLowerCase().charAt(0) === 'p');
+}
+
+var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i;
+function localeMeridiem (hours, minutes, isLower) {
+    if (hours > 11) {
+        return isLower ? 'pm' : 'PM';
+    } else {
+        return isLower ? 'am' : 'AM';
+    }
+}
+
+
+// MOMENTS
+
+// Setting the hour should keep the time, because the user explicitly
+// specified which hour he wants. So trying to maintain the same hour (in
+// a new timezone) makes sense. Adding/subtracting hours does not follow
+// this rule.
+var getSetHour = makeGetSet('Hours', true);
+
+// months
+// week
+// weekdays
+// meridiem
+var baseConfig = {
+    calendar: defaultCalendar,
+    longDateFormat: defaultLongDateFormat,
+    invalidDate: defaultInvalidDate,
+    ordinal: defaultOrdinal,
+    dayOfMonthOrdinalParse: defaultDayOfMonthOrdinalParse,
+    relativeTime: defaultRelativeTime,
+
+    months: defaultLocaleMonths,
+    monthsShort: defaultLocaleMonthsShort,
+
+    week: defaultLocaleWeek,
+
+    weekdays: defaultLocaleWeekdays,
+    weekdaysMin: defaultLocaleWeekdaysMin,
+    weekdaysShort: defaultLocaleWeekdaysShort,
+
+    meridiemParse: defaultLocaleMeridiemParse
+};
+
+// internal storage for locale config files
+var locales = {};
+var localeFamilies = {};
+var globalLocale;
+
+function normalizeLocale(key) {
+    return key ? key.toLowerCase().replace('_', '-') : key;
+}
+
+// pick the locale from the array
+// try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
+// substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
+function chooseLocale(names) {
+    var i = 0, j, next, locale, split;
+
+    while (i < names.length) {
+        split = normalizeLocale(names[i]).split('-');
+        j = split.length;
+        next = normalizeLocale(names[i + 1]);
+        next = next ? next.split('-') : null;
+        while (j > 0) {
+            locale = loadLocale(split.slice(0, j).join('-'));
+            if (locale) {
+                return locale;
+            }
+            if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
+                //the next array item is better than a shallower substring of this one
+                break;
+            }
+            j--;
+        }
+        i++;
+    }
+    return null;
+}
+
+function loadLocale(name) {
+    var oldLocale = null;
+    // TODO: Find a better way to register and load all the locales in Node
+    if (!locales[name] && (typeof module !== 'undefined') &&
+            module && module.exports) {
+        try {
+            oldLocale = globalLocale._abbr;
+            var aliasedRequire = require;
+            aliasedRequire('./locale/' + name);
+            getSetGlobalLocale(oldLocale);
+        } catch (e) {}
+    }
+    return locales[name];
+}
+
+// This function will load locale and then set the global locale.  If
+// no arguments are passed in, it will simply return the current global
+// locale key.
+function getSetGlobalLocale (key, values) {
+    var data;
+    if (key) {
+        if (isUndefined$2(values)) {
+            data = getLocale(key);
+        }
+        else {
+            data = defineLocale(key, values);
+        }
+
+        if (data) {
+            // moment.duration._locale = moment._locale = data;
+            globalLocale = data;
+        }
+    }
+
+    return globalLocale._abbr;
+}
+
+function defineLocale (name, config) {
+    if (config !== null) {
+        var parentConfig = baseConfig;
+        config.abbr = name;
+        if (locales[name] != null) {
+            deprecateSimple('defineLocaleOverride',
+                    'use moment.updateLocale(localeName, config) to change ' +
+                    'an existing locale. moment.defineLocale(localeName, ' +
+                    'config) should only be used for creating a new locale ' +
+                    'See http://momentjs.com/guides/#/warnings/define-locale/ for more info.');
+            parentConfig = locales[name]._config;
+        } else if (config.parentLocale != null) {
+            if (locales[config.parentLocale] != null) {
+                parentConfig = locales[config.parentLocale]._config;
+            } else {
+                if (!localeFamilies[config.parentLocale]) {
+                    localeFamilies[config.parentLocale] = [];
+                }
+                localeFamilies[config.parentLocale].push({
+                    name: name,
+                    config: config
+                });
+                return null;
+            }
+        }
+        locales[name] = new Locale(mergeConfigs(parentConfig, config));
+
+        if (localeFamilies[name]) {
+            localeFamilies[name].forEach(function (x) {
+                defineLocale(x.name, x.config);
+            });
+        }
+
+        // backwards compat for now: also set the locale
+        // make sure we set the locale AFTER all child locales have been
+        // created, so we won't end up with the child locale set.
+        getSetGlobalLocale(name);
+
+
+        return locales[name];
+    } else {
+        // useful for testing
+        delete locales[name];
+        return null;
+    }
+}
+
+function updateLocale(name, config) {
+    if (config != null) {
+        var locale, tmpLocale, parentConfig = baseConfig;
+        // MERGE
+        tmpLocale = loadLocale(name);
+        if (tmpLocale != null) {
+            parentConfig = tmpLocale._config;
+        }
+        config = mergeConfigs(parentConfig, config);
+        locale = new Locale(config);
+        locale.parentLocale = locales[name];
+        locales[name] = locale;
+
+        // backwards compat for now: also set the locale
+        getSetGlobalLocale(name);
+    } else {
+        // pass null for config to unupdate, useful for tests
+        if (locales[name] != null) {
+            if (locales[name].parentLocale != null) {
+                locales[name] = locales[name].parentLocale;
+            } else if (locales[name] != null) {
+                delete locales[name];
+            }
+        }
+    }
+    return locales[name];
+}
+
+// returns locale data
+function getLocale (key) {
+    var locale;
+
+    if (key && key._locale && key._locale._abbr) {
+        key = key._locale._abbr;
+    }
+
+    if (!key) {
+        return globalLocale;
+    }
+
+    if (!isArray$4(key)) {
+        //short-circuit everything else
+        locale = loadLocale(key);
+        if (locale) {
+            return locale;
+        }
+        key = [key];
+    }
+
+    return chooseLocale(key);
+}
+
+function listLocales() {
+    return keys$3(locales);
+}
+
+function checkOverflow (m) {
+    var overflow;
+    var a = m._a;
+
+    if (a && getParsingFlags(m).overflow === -2) {
+        overflow =
+            a[MONTH]       < 0 || a[MONTH]       > 11  ? MONTH :
+            a[DATE]        < 1 || a[DATE]        > daysInMonth(a[YEAR], a[MONTH]) ? DATE :
+            a[HOUR]        < 0 || a[HOUR]        > 24 || (a[HOUR] === 24 && (a[MINUTE] !== 0 || a[SECOND] !== 0 || a[MILLISECOND] !== 0)) ? HOUR :
+            a[MINUTE]      < 0 || a[MINUTE]      > 59  ? MINUTE :
+            a[SECOND]      < 0 || a[SECOND]      > 59  ? SECOND :
+            a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND :
+            -1;
+
+        if (getParsingFlags(m)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
+            overflow = DATE;
+        }
+        if (getParsingFlags(m)._overflowWeeks && overflow === -1) {
+            overflow = WEEK;
+        }
+        if (getParsingFlags(m)._overflowWeekday && overflow === -1) {
+            overflow = WEEKDAY;
+        }
+
+        getParsingFlags(m).overflow = overflow;
+    }
+
+    return m;
+}
+
+// Pick the first defined of two or three arguments.
+function defaults$2(a, b, c) {
+    if (a != null) {
+        return a;
+    }
+    if (b != null) {
+        return b;
+    }
+    return c;
+}
+
+function currentDateArray(config) {
+    // hooks is actually the exported moment object
+    var nowValue = new Date(hooks.now());
+    if (config._useUTC) {
+        return [nowValue.getUTCFullYear(), nowValue.getUTCMonth(), nowValue.getUTCDate()];
+    }
+    return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
+}
+
+// convert an array to a date.
+// the array should mirror the parameters below
+// note: all values past the year are optional and will default to the lowest possible value.
+// [year, month, day , hour, minute, second, millisecond]
+function configFromArray (config) {
+    var i, date, input = [], currentDate, yearToUse;
+
+    if (config._d) {
+        return;
+    }
+
+    currentDate = currentDateArray(config);
+
+    //compute day of the year from weeks and weekdays
+    if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
+        dayOfYearFromWeekInfo(config);
+    }
+
+    //if the day of the year is set, figure out what it is
+    if (config._dayOfYear != null) {
+        yearToUse = defaults$2(config._a[YEAR], currentDate[YEAR]);
+
+        if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
+            getParsingFlags(config)._overflowDayOfYear = true;
+        }
+
+        date = createUTCDate(yearToUse, 0, config._dayOfYear);
+        config._a[MONTH] = date.getUTCMonth();
+        config._a[DATE] = date.getUTCDate();
+    }
+
+    // Default to current date.
+    // * if no year, month, day of month are given, default to today
+    // * if day of month is given, default month and year
+    // * if month is given, default only year
+    // * if year is given, don't default anything
+    for (i = 0; i < 3 && config._a[i] == null; ++i) {
+        config._a[i] = input[i] = currentDate[i];
+    }
+
+    // Zero out whatever was not defaulted, including time
+    for (; i < 7; i++) {
+        config._a[i] = input[i] = (config._a[i] == null) ? (i === 2 ? 1 : 0) : config._a[i];
+    }
+
+    // Check for 24:00:00.000
+    if (config._a[HOUR] === 24 &&
+            config._a[MINUTE] === 0 &&
+            config._a[SECOND] === 0 &&
+            config._a[MILLISECOND] === 0) {
+        config._nextDay = true;
+        config._a[HOUR] = 0;
+    }
+
+    config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
+    // Apply timezone offset from input. The actual utcOffset can be changed
+    // with parseZone.
+    if (config._tzm != null) {
+        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+    }
+
+    if (config._nextDay) {
+        config._a[HOUR] = 24;
+    }
+
+    // check for mismatching day of week
+    if (config._w && typeof config._w.d !== 'undefined' && config._w.d !== config._d.getDay()) {
+        getParsingFlags(config).weekdayMismatch = true;
+    }
+}
+
+function dayOfYearFromWeekInfo(config) {
+    var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
+
+    w = config._w;
+    if (w.GG != null || w.W != null || w.E != null) {
+        dow = 1;
+        doy = 4;
+
+        // TODO: We need to take the current isoWeekYear, but that depends on
+        // how we interpret now (local, utc, fixed offset). So create
+        // a now version of current config (take local/utc/offset flags, and
+        // create now).
+        weekYear = defaults$2(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
+        week = defaults$2(w.W, 1);
+        weekday = defaults$2(w.E, 1);
+        if (weekday < 1 || weekday > 7) {
+            weekdayOverflow = true;
+        }
+    } else {
+        dow = config._locale._week.dow;
+        doy = config._locale._week.doy;
+
+        var curWeek = weekOfYear(createLocal(), dow, doy);
+
+        weekYear = defaults$2(w.gg, config._a[YEAR], curWeek.year);
+
+        // Default to current week.
+        week = defaults$2(w.w, curWeek.week);
+
+        if (w.d != null) {
+            // weekday -- low day numbers are considered next week
+            weekday = w.d;
+            if (weekday < 0 || weekday > 6) {
+                weekdayOverflow = true;
+            }
+        } else if (w.e != null) {
+            // local weekday -- counting starts from begining of week
+            weekday = w.e + dow;
+            if (w.e < 0 || w.e > 6) {
+                weekdayOverflow = true;
+            }
+        } else {
+            // default to begining of week
+            weekday = dow;
+        }
+    }
+    if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+        getParsingFlags(config)._overflowWeeks = true;
+    } else if (weekdayOverflow != null) {
+        getParsingFlags(config)._overflowWeekday = true;
+    } else {
+        temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+        config._a[YEAR] = temp.year;
+        config._dayOfYear = temp.dayOfYear;
+    }
+}
+
+// iso 8601 regex
+// 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
+var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+
+var tzRegex = /Z|[+-]\d\d(?::?\d\d)?/;
+
+var isoDates = [
+    ['YYYYYY-MM-DD', /[+-]\d{6}-\d\d-\d\d/],
+    ['YYYY-MM-DD', /\d{4}-\d\d-\d\d/],
+    ['GGGG-[W]WW-E', /\d{4}-W\d\d-\d/],
+    ['GGGG-[W]WW', /\d{4}-W\d\d/, false],
+    ['YYYY-DDD', /\d{4}-\d{3}/],
+    ['YYYY-MM', /\d{4}-\d\d/, false],
+    ['YYYYYYMMDD', /[+-]\d{10}/],
+    ['YYYYMMDD', /\d{8}/],
+    // YYYYMM is NOT allowed by the standard
+    ['GGGG[W]WWE', /\d{4}W\d{3}/],
+    ['GGGG[W]WW', /\d{4}W\d{2}/, false],
+    ['YYYYDDD', /\d{7}/]
+];
+
+// iso time formats and regexes
+var isoTimes = [
+    ['HH:mm:ss.SSSS', /\d\d:\d\d:\d\d\.\d+/],
+    ['HH:mm:ss,SSSS', /\d\d:\d\d:\d\d,\d+/],
+    ['HH:mm:ss', /\d\d:\d\d:\d\d/],
+    ['HH:mm', /\d\d:\d\d/],
+    ['HHmmss.SSSS', /\d\d\d\d\d\d\.\d+/],
+    ['HHmmss,SSSS', /\d\d\d\d\d\d,\d+/],
+    ['HHmmss', /\d\d\d\d\d\d/],
+    ['HHmm', /\d\d\d\d/],
+    ['HH', /\d\d/]
+];
+
+var aspNetJsonRegex = /^\/?Date\((\-?\d+)/i;
+
+// date from iso format
+function configFromISO(config) {
+    var i, l,
+        string = config._i,
+        match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string),
+        allowTime, dateFormat, timeFormat, tzFormat;
+
+    if (match) {
+        getParsingFlags(config).iso = true;
+
+        for (i = 0, l = isoDates.length; i < l; i++) {
+            if (isoDates[i][1].exec(match[1])) {
+                dateFormat = isoDates[i][0];
+                allowTime = isoDates[i][2] !== false;
+                break;
+            }
+        }
+        if (dateFormat == null) {
+            config._isValid = false;
+            return;
+        }
+        if (match[3]) {
+            for (i = 0, l = isoTimes.length; i < l; i++) {
+                if (isoTimes[i][1].exec(match[3])) {
+                    // match[2] should be 'T' or space
+                    timeFormat = (match[2] || ' ') + isoTimes[i][0];
+                    break;
+                }
+            }
+            if (timeFormat == null) {
+                config._isValid = false;
+                return;
+            }
+        }
+        if (!allowTime && timeFormat != null) {
+            config._isValid = false;
+            return;
+        }
+        if (match[4]) {
+            if (tzRegex.exec(match[4])) {
+                tzFormat = 'Z';
+            } else {
+                config._isValid = false;
+                return;
+            }
+        }
+        config._f = dateFormat + (timeFormat || '') + (tzFormat || '');
+        configFromStringAndFormat(config);
+    } else {
+        config._isValid = false;
+    }
+}
+
+// RFC 2822 regex: For details see https://tools.ietf.org/html/rfc2822#section-3.3
+var rfc2822 = /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/;
+
+function extractFromRFC2822Strings(yearStr, monthStr, dayStr, hourStr, minuteStr, secondStr) {
+    var result = [
+        untruncateYear(yearStr),
+        defaultLocaleMonthsShort.indexOf(monthStr),
+        parseInt(dayStr, 10),
+        parseInt(hourStr, 10),
+        parseInt(minuteStr, 10)
+    ];
+
+    if (secondStr) {
+        result.push(parseInt(secondStr, 10));
+    }
+
+    return result;
+}
+
+function untruncateYear(yearStr) {
+    var year = parseInt(yearStr, 10);
+    if (year <= 49) {
+        return 2000 + year;
+    } else if (year <= 999) {
+        return 1900 + year;
+    }
+    return year;
+}
+
+function preprocessRFC2822(s) {
+    // Remove comments and folding whitespace and replace multiple-spaces with a single space
+    return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').trim();
+}
+
+function checkWeekday(weekdayStr, parsedInput, config) {
+    if (weekdayStr) {
+        // TODO: Replace the vanilla JS Date object with an indepentent day-of-week check.
+        var weekdayProvided = defaultLocaleWeekdaysShort.indexOf(weekdayStr),
+            weekdayActual = new Date(parsedInput[0], parsedInput[1], parsedInput[2]).getDay();
+        if (weekdayProvided !== weekdayActual) {
+            getParsingFlags(config).weekdayMismatch = true;
+            config._isValid = false;
+            return false;
+        }
+    }
+    return true;
+}
+
+var obsOffsets = {
+    UT: 0,
+    GMT: 0,
+    EDT: -4 * 60,
+    EST: -5 * 60,
+    CDT: -5 * 60,
+    CST: -6 * 60,
+    MDT: -6 * 60,
+    MST: -7 * 60,
+    PDT: -7 * 60,
+    PST: -8 * 60
+};
+
+function calculateOffset(obsOffset, militaryOffset, numOffset) {
+    if (obsOffset) {
+        return obsOffsets[obsOffset];
+    } else if (militaryOffset) {
+        // the only allowed military tz is Z
+        return 0;
+    } else {
+        var hm = parseInt(numOffset, 10);
+        var m = hm % 100, h = (hm - m) / 100;
+        return h * 60 + m;
+    }
+}
+
+// date and time from ref 2822 format
+function configFromRFC2822(config) {
+    var match = rfc2822.exec(preprocessRFC2822(config._i));
+    if (match) {
+        var parsedArray = extractFromRFC2822Strings(match[4], match[3], match[2], match[5], match[6], match[7]);
+        if (!checkWeekday(match[1], parsedArray, config)) {
+            return;
+        }
+
+        config._a = parsedArray;
+        config._tzm = calculateOffset(match[8], match[9], match[10]);
+
+        config._d = createUTCDate.apply(null, config._a);
+        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+
+        getParsingFlags(config).rfc2822 = true;
+    } else {
+        config._isValid = false;
+    }
+}
+
+// date from iso format or fallback
+function configFromString(config) {
+    var matched = aspNetJsonRegex.exec(config._i);
+
+    if (matched !== null) {
+        config._d = new Date(+matched[1]);
+        return;
+    }
+
+    configFromISO(config);
+    if (config._isValid === false) {
+        delete config._isValid;
+    } else {
+        return;
+    }
+
+    configFromRFC2822(config);
+    if (config._isValid === false) {
+        delete config._isValid;
+    } else {
+        return;
+    }
+
+    // Final attempt, use Input Fallback
+    hooks.createFromInputFallback(config);
+}
+
+hooks.createFromInputFallback = deprecate(
+    'value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), ' +
+    'which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are ' +
+    'discouraged and will be removed in an upcoming major release. Please refer to ' +
+    'http://momentjs.com/guides/#/warnings/js-date/ for more info.',
+    function (config) {
+        config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
+    }
+);
+
+// constant that refers to the ISO standard
+hooks.ISO_8601 = function () {};
+
+// constant that refers to the RFC 2822 form
+hooks.RFC_2822 = function () {};
+
+// date from string and format string
+function configFromStringAndFormat(config) {
+    // TODO: Move this to another part of the creation flow to prevent circular deps
+    if (config._f === hooks.ISO_8601) {
+        configFromISO(config);
+        return;
+    }
+    if (config._f === hooks.RFC_2822) {
+        configFromRFC2822(config);
+        return;
+    }
+    config._a = [];
+    getParsingFlags(config).empty = true;
+
+    // This array is used to make a Date, either with `new Date` or `Date.UTC`
+    var string = '' + config._i,
+        i, parsedInput, tokens, token, skipped,
+        stringLength = string.length,
+        totalParsedInputLength = 0;
+
+    tokens = expandFormat(config._f, config._locale).match(formattingTokens) || [];
+
+    for (i = 0; i < tokens.length; i++) {
+        token = tokens[i];
+        parsedInput = (string.match(getParseRegexForToken(token, config)) || [])[0];
+        // console.log('token', token, 'parsedInput', parsedInput,
+        //         'regex', getParseRegexForToken(token, config));
+        if (parsedInput) {
+            skipped = string.substr(0, string.indexOf(parsedInput));
+            if (skipped.length > 0) {
+                getParsingFlags(config).unusedInput.push(skipped);
+            }
+            string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
+            totalParsedInputLength += parsedInput.length;
+        }
+        // don't parse if it's not a known token
+        if (formatTokenFunctions[token]) {
+            if (parsedInput) {
+                getParsingFlags(config).empty = false;
+            }
+            else {
+                getParsingFlags(config).unusedTokens.push(token);
+            }
+            addTimeToArrayFromToken(token, parsedInput, config);
+        }
+        else if (config._strict && !parsedInput) {
+            getParsingFlags(config).unusedTokens.push(token);
+        }
+    }
+
+    // add remaining unparsed input length to the string
+    getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
+    if (string.length > 0) {
+        getParsingFlags(config).unusedInput.push(string);
+    }
+
+    // clear _12h flag if hour is <= 12
+    if (config._a[HOUR] <= 12 &&
+        getParsingFlags(config).bigHour === true &&
+        config._a[HOUR] > 0) {
+        getParsingFlags(config).bigHour = undefined;
+    }
+
+    getParsingFlags(config).parsedDateParts = config._a.slice(0);
+    getParsingFlags(config).meridiem = config._meridiem;
+    // handle meridiem
+    config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
+
+    configFromArray(config);
+    checkOverflow(config);
+}
+
+
+function meridiemFixWrap (locale, hour, meridiem) {
+    var isPm;
+
+    if (meridiem == null) {
+        // nothing to do
+        return hour;
+    }
+    if (locale.meridiemHour != null) {
+        return locale.meridiemHour(hour, meridiem);
+    } else if (locale.isPM != null) {
+        // Fallback
+        isPm = locale.isPM(meridiem);
+        if (isPm && hour < 12) {
+            hour += 12;
+        }
+        if (!isPm && hour === 12) {
+            hour = 0;
+        }
+        return hour;
+    } else {
+        // this is not supposed to happen
+        return hour;
+    }
+}
+
+// date from string and array of format strings
+function configFromStringAndArray(config) {
+    var tempConfig,
+        bestMoment,
+
+        scoreToBeat,
+        i,
+        currentScore;
+
+    if (config._f.length === 0) {
+        getParsingFlags(config).invalidFormat = true;
+        config._d = new Date(NaN);
+        return;
+    }
+
+    for (i = 0; i < config._f.length; i++) {
+        currentScore = 0;
+        tempConfig = copyConfig({}, config);
+        if (config._useUTC != null) {
+            tempConfig._useUTC = config._useUTC;
+        }
+        tempConfig._f = config._f[i];
+        configFromStringAndFormat(tempConfig);
+
+        if (!isValid$3(tempConfig)) {
+            continue;
+        }
+
+        // if there is any input that was not parsed add a penalty for that format
+        currentScore += getParsingFlags(tempConfig).charsLeftOver;
+
+        //or tokens
+        currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
+
+        getParsingFlags(tempConfig).score = currentScore;
+
+        if (scoreToBeat == null || currentScore < scoreToBeat) {
+            scoreToBeat = currentScore;
+            bestMoment = tempConfig;
+        }
+    }
+
+    extend$2(config, bestMoment || tempConfig);
+}
+
+function configFromObject(config) {
+    if (config._d) {
+        return;
+    }
+
+    var i = normalizeObjectUnits(config._i);
+    config._a = map$3([i.year, i.month, i.day || i.date, i.hour, i.minute, i.second, i.millisecond], function (obj) {
+        return obj && parseInt(obj, 10);
+    });
+
+    configFromArray(config);
+}
+
+function createFromConfig (config) {
+    var res = new Moment(checkOverflow(prepareConfig(config)));
+    if (res._nextDay) {
+        // Adding is smart enough around DST
+        res.add(1, 'd');
+        res._nextDay = undefined;
+    }
+
+    return res;
+}
+
+function prepareConfig (config) {
+    var input = config._i,
+        format = config._f;
+
+    config._locale = config._locale || getLocale(config._l);
+
+    if (input === null || (format === undefined && input === '')) {
+        return createInvalid({nullInput: true});
+    }
+
+    if (typeof input === 'string') {
+        config._i = input = config._locale.preparse(input);
+    }
+
+    if (isMoment(input)) {
+        return new Moment(checkOverflow(input));
+    } else if (isDate(input)) {
+        config._d = input;
+    } else if (isArray$4(format)) {
+        configFromStringAndArray(config);
+    } else if (format) {
+        configFromStringAndFormat(config);
+    }  else {
+        configFromInput(config);
+    }
+
+    if (!isValid$3(config)) {
+        config._d = null;
+    }
+
+    return config;
+}
+
+function configFromInput(config) {
+    var input = config._i;
+    if (isUndefined$2(input)) {
+        config._d = new Date(hooks.now());
+    } else if (isDate(input)) {
+        config._d = new Date(input.valueOf());
+    } else if (typeof input === 'string') {
+        configFromString(config);
+    } else if (isArray$4(input)) {
+        config._a = map$3(input.slice(0), function (obj) {
+            return parseInt(obj, 10);
+        });
+        configFromArray(config);
+    } else if (isObject$3(input)) {
+        configFromObject(config);
+    } else if (isNumber$3(input)) {
+        // from milliseconds
+        config._d = new Date(input);
+    } else {
+        hooks.createFromInputFallback(config);
+    }
+}
+
+function createLocalOrUTC (input, format, locale, strict, isUTC) {
+    var c = {};
+
+    if (locale === true || locale === false) {
+        strict = locale;
+        locale = undefined;
+    }
+
+    if ((isObject$3(input) && isObjectEmpty(input)) ||
+            (isArray$4(input) && input.length === 0)) {
+        input = undefined;
+    }
+    // object construction must be done this way.
+    // https://github.com/moment/moment/issues/1423
+    c._isAMomentObject = true;
+    c._useUTC = c._isUTC = isUTC;
+    c._l = locale;
+    c._i = input;
+    c._f = format;
+    c._strict = strict;
+
+    return createFromConfig(c);
+}
+
+function createLocal (input, format, locale, strict) {
+    return createLocalOrUTC(input, format, locale, strict, false);
+}
+
+var prototypeMin = deprecate(
+    'moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/',
+    function () {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+            return other < this ? this : other;
+        } else {
+            return createInvalid();
+        }
+    }
+);
+
+var prototypeMax = deprecate(
+    'moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/',
+    function () {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+            return other > this ? this : other;
+        } else {
+            return createInvalid();
+        }
+    }
+);
+
+// Pick a moment m from moments so that m[fn](other) is true for all
+// other. This relies on the function fn to be transitive.
+//
+// moments should either be an array of moment objects or an array, whose
+// first element is an array of moment objects.
+function pickBy(fn, moments) {
+    var res, i;
+    if (moments.length === 1 && isArray$4(moments[0])) {
+        moments = moments[0];
+    }
+    if (!moments.length) {
+        return createLocal();
+    }
+    res = moments[0];
+    for (i = 1; i < moments.length; ++i) {
+        if (!moments[i].isValid() || moments[i][fn](res)) {
+            res = moments[i];
+        }
+    }
+    return res;
+}
+
+// TODO: Use [].sort instead?
+function min$1 () {
+    var args = [].slice.call(arguments, 0);
+
+    return pickBy('isBefore', args);
+}
+
+function max$1 () {
+    var args = [].slice.call(arguments, 0);
+
+    return pickBy('isAfter', args);
+}
+
+var now = function () {
+    return Date.now ? Date.now() : +(new Date());
+};
+
+var ordering = ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute', 'second', 'millisecond'];
+
+function isDurationValid(m) {
+    for (var key in m) {
+        if (!(indexOf$4.call(ordering, key) !== -1 && (m[key] == null || !isNaN(m[key])))) {
+            return false;
+        }
+    }
+
+    var unitHasDecimal = false;
+    for (var i = 0; i < ordering.length; ++i) {
+        if (m[ordering[i]]) {
+            if (unitHasDecimal) {
+                return false; // only allow non-integers for smallest unit
+            }
+            if (parseFloat(m[ordering[i]]) !== toInt(m[ordering[i]])) {
+                unitHasDecimal = true;
+            }
+        }
+    }
+
+    return true;
+}
+
+function isValid$4() {
+    return this._isValid;
+}
+
+function createInvalid$1() {
+    return createDuration(NaN);
+}
+
+function Duration (duration) {
+    var normalizedInput = normalizeObjectUnits(duration),
+        years = normalizedInput.year || 0,
+        quarters = normalizedInput.quarter || 0,
+        months = normalizedInput.month || 0,
+        weeks = normalizedInput.week || 0,
+        days = normalizedInput.day || 0,
+        hours = normalizedInput.hour || 0,
+        minutes = normalizedInput.minute || 0,
+        seconds = normalizedInput.second || 0,
+        milliseconds = normalizedInput.millisecond || 0;
+
+    this._isValid = isDurationValid(normalizedInput);
+
+    // representation for dateAddRemove
+    this._milliseconds = +milliseconds +
+        seconds * 1e3 + // 1000
+        minutes * 6e4 + // 1000 * 60
+        hours * 1000 * 60 * 60; //using 1000 * 60 * 60 instead of 36e5 to avoid floating point rounding errors https://github.com/moment/moment/issues/2978
+    // Because of dateAddRemove treats 24 hours as different from a
+    // day when working around DST, we need to store them separately
+    this._days = +days +
+        weeks * 7;
+    // It is impossible to translate months into days without knowing
+    // which months you are are talking about, so we have to store
+    // it separately.
+    this._months = +months +
+        quarters * 3 +
+        years * 12;
+
+    this._data = {};
+
+    this._locale = getLocale();
+
+    this._bubble();
+}
+
+function isDuration (obj) {
+    return obj instanceof Duration;
+}
+
+function absRound (number) {
+    if (number < 0) {
+        return Math.round(-1 * number) * -1;
+    } else {
+        return Math.round(number);
+    }
+}
+
+// FORMATTING
+
+function offset (token, separator) {
+    addFormatToken(token, 0, 0, function () {
+        var offset = this.utcOffset();
+        var sign = '+';
+        if (offset < 0) {
+            offset = -offset;
+            sign = '-';
+        }
+        return sign + zeroFill(~~(offset / 60), 2) + separator + zeroFill(~~(offset) % 60, 2);
+    });
+}
+
+offset('Z', ':');
+offset('ZZ', '');
+
+// PARSING
+
+addRegexToken('Z',  matchShortOffset);
+addRegexToken('ZZ', matchShortOffset);
+addParseToken(['Z', 'ZZ'], function (input, array, config) {
+    config._useUTC = true;
+    config._tzm = offsetFromString(matchShortOffset, input);
+});
+
+// HELPERS
+
+// timezone chunker
+// '+10:00' > ['10',  '00']
+// '-1530'  > ['-15', '30']
+var chunkOffset = /([\+\-]|\d\d)/gi;
+
+function offsetFromString(matcher, string) {
+    var matches = (string || '').match(matcher);
+
+    if (matches === null) {
+        return null;
+    }
+
+    var chunk   = matches[matches.length - 1] || [];
+    var parts   = (chunk + '').match(chunkOffset) || ['-', 0, 0];
+    var minutes = +(parts[1] * 60) + toInt(parts[2]);
+
+    return minutes === 0 ?
+      0 :
+      parts[0] === '+' ? minutes : -minutes;
+}
+
+// Return a moment from input, that is local/utc/zone equivalent to model.
+function cloneWithOffset(input, model) {
+    var res, diff;
+    if (model._isUTC) {
+        res = model.clone();
+        diff = (isMoment(input) || isDate(input) ? input.valueOf() : createLocal(input).valueOf()) - res.valueOf();
+        // Use low-level api, because this fn is low-level api.
+        res._d.setTime(res._d.valueOf() + diff);
+        hooks.updateOffset(res, false);
+        return res;
+    } else {
+        return createLocal(input).local();
+    }
+}
+
+function getDateOffset (m) {
+    // On Firefox.24 Date#getTimezoneOffset returns a floating point.
+    // https://github.com/moment/moment/pull/1871
+    return -Math.round(m._d.getTimezoneOffset() / 15) * 15;
+}
+
+// HOOKS
+
+// This function will be called whenever a moment is mutated.
+// It is intended to keep the offset in sync with the timezone.
+hooks.updateOffset = function () {};
+
+// MOMENTS
+
+// keepLocalTime = true means only change the timezone, without
+// affecting the local hour. So 5:31:26 +0300 --[utcOffset(2, true)]-->
+// 5:31:26 +0200 It is possible that 5:31:26 doesn't exist with offset
+// +0200, so we adjust the time as needed, to be valid.
+//
+// Keeping the time actually adds/subtracts (one hour)
+// from the actual represented time. That is why we call updateOffset
+// a second time. In case it wants us to change the offset again
+// _changeInProgress == true case, then we have to adjust, because
+// there is no such time in the given timezone.
+function getSetOffset (input, keepLocalTime, keepMinutes) {
+    var offset = this._offset || 0,
+        localAdjust;
+    if (!this.isValid()) {
+        return input != null ? this : NaN;
+    }
+    if (input != null) {
+        if (typeof input === 'string') {
+            input = offsetFromString(matchShortOffset, input);
+            if (input === null) {
+                return this;
+            }
+        } else if (Math.abs(input) < 16 && !keepMinutes) {
+            input = input * 60;
+        }
+        if (!this._isUTC && keepLocalTime) {
+            localAdjust = getDateOffset(this);
+        }
+        this._offset = input;
+        this._isUTC = true;
+        if (localAdjust != null) {
+            this.add(localAdjust, 'm');
+        }
+        if (offset !== input) {
+            if (!keepLocalTime || this._changeInProgress) {
+                addSubtract(this, createDuration(input - offset, 'm'), 1, false);
+            } else if (!this._changeInProgress) {
+                this._changeInProgress = true;
+                hooks.updateOffset(this, true);
+                this._changeInProgress = null;
+            }
+        }
+        return this;
+    } else {
+        return this._isUTC ? offset : getDateOffset(this);
+    }
+}
+
+function getSetZone (input, keepLocalTime) {
+    if (input != null) {
+        if (typeof input !== 'string') {
+            input = -input;
+        }
+
+        this.utcOffset(input, keepLocalTime);
+
+        return this;
+    } else {
+        return -this.utcOffset();
+    }
+}
+
+function setOffsetToUTC (keepLocalTime) {
+    return this.utcOffset(0, keepLocalTime);
+}
+
+function setOffsetToLocal (keepLocalTime) {
+    if (this._isUTC) {
+        this.utcOffset(0, keepLocalTime);
+        this._isUTC = false;
+
+        if (keepLocalTime) {
+            this.subtract(getDateOffset(this), 'm');
+        }
+    }
+    return this;
+}
+
+function setOffsetToParsedOffset () {
+    if (this._tzm != null) {
+        this.utcOffset(this._tzm, false, true);
+    } else if (typeof this._i === 'string') {
+        var tZone = offsetFromString(matchOffset, this._i);
+        if (tZone != null) {
+            this.utcOffset(tZone);
+        }
+        else {
+            this.utcOffset(0, true);
+        }
+    }
+    return this;
+}
+
+function hasAlignedHourOffset (input) {
+    if (!this.isValid()) {
+        return false;
+    }
+    input = input ? createLocal(input).utcOffset() : 0;
+
+    return (this.utcOffset() - input) % 60 === 0;
+}
+
+function isDaylightSavingTime () {
+    return (
+        this.utcOffset() > this.clone().month(0).utcOffset() ||
+        this.utcOffset() > this.clone().month(5).utcOffset()
+    );
+}
+
+function isDaylightSavingTimeShifted () {
+    if (!isUndefined$2(this._isDSTShifted)) {
+        return this._isDSTShifted;
+    }
+
+    var c = {};
+
+    copyConfig(c, this);
+    c = prepareConfig(c);
+
+    if (c._a) {
+        var other = c._isUTC ? createUTC(c._a) : createLocal(c._a);
+        this._isDSTShifted = this.isValid() &&
+            compareArrays(c._a, other.toArray()) > 0;
+    } else {
+        this._isDSTShifted = false;
+    }
+
+    return this._isDSTShifted;
+}
+
+function isLocal () {
+    return this.isValid() ? !this._isUTC : false;
+}
+
+function isUtcOffset () {
+    return this.isValid() ? this._isUTC : false;
+}
+
+function isUtc () {
+    return this.isValid() ? this._isUTC && this._offset === 0 : false;
+}
+
+// ASP.NET json date format regex
+var aspNetRegex = /^(\-|\+)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
+
+// from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
+// somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
+// and further modified to allow for strings containing both week and day
+var isoRegex = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
+
+function createDuration (input, key) {
+    var duration = input,
+        // matching against regexp is expensive, do it on demand
+        match = null,
+        sign,
+        ret,
+        diffRes;
+
+    if (isDuration(input)) {
+        duration = {
+            ms : input._milliseconds,
+            d  : input._days,
+            M  : input._months
+        };
+    } else if (isNumber$3(input)) {
+        duration = {};
+        if (key) {
+            duration[key] = input;
+        } else {
+            duration.milliseconds = input;
+        }
+    } else if (!!(match = aspNetRegex.exec(input))) {
+        sign = (match[1] === '-') ? -1 : 1;
+        duration = {
+            y  : 0,
+            d  : toInt(match[DATE])                         * sign,
+            h  : toInt(match[HOUR])                         * sign,
+            m  : toInt(match[MINUTE])                       * sign,
+            s  : toInt(match[SECOND])                       * sign,
+            ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
+        };
+    } else if (!!(match = isoRegex.exec(input))) {
+        sign = (match[1] === '-') ? -1 : (match[1] === '+') ? 1 : 1;
+        duration = {
+            y : parseIso(match[2], sign),
+            M : parseIso(match[3], sign),
+            w : parseIso(match[4], sign),
+            d : parseIso(match[5], sign),
+            h : parseIso(match[6], sign),
+            m : parseIso(match[7], sign),
+            s : parseIso(match[8], sign)
+        };
+    } else if (duration == null) {// checks for null or undefined
+        duration = {};
+    } else if (typeof duration === 'object' && ('from' in duration || 'to' in duration)) {
+        diffRes = momentsDifference(createLocal(duration.from), createLocal(duration.to));
+
+        duration = {};
+        duration.ms = diffRes.milliseconds;
+        duration.M = diffRes.months;
+    }
+
+    ret = new Duration(duration);
+
+    if (isDuration(input) && hasOwnProp(input, '_locale')) {
+        ret._locale = input._locale;
+    }
+
+    return ret;
+}
+
+createDuration.fn = Duration.prototype;
+createDuration.invalid = createInvalid$1;
+
+function parseIso (inp, sign) {
+    // We'd normally use ~~inp for this, but unfortunately it also
+    // converts floats to ints.
+    // inp may be undefined, so careful calling replace on it.
+    var res = inp && parseFloat(inp.replace(',', '.'));
+    // apply sign while we're at it
+    return (isNaN(res) ? 0 : res) * sign;
+}
+
+function positiveMomentsDifference(base, other) {
+    var res = {milliseconds: 0, months: 0};
+
+    res.months = other.month() - base.month() +
+        (other.year() - base.year()) * 12;
+    if (base.clone().add(res.months, 'M').isAfter(other)) {
+        --res.months;
+    }
+
+    res.milliseconds = +other - +(base.clone().add(res.months, 'M'));
+
+    return res;
+}
+
+function momentsDifference(base, other) {
+    var res;
+    if (!(base.isValid() && other.isValid())) {
+        return {milliseconds: 0, months: 0};
+    }
+
+    other = cloneWithOffset(other, base);
+    if (base.isBefore(other)) {
+        res = positiveMomentsDifference(base, other);
+    } else {
+        res = positiveMomentsDifference(other, base);
+        res.milliseconds = -res.milliseconds;
+        res.months = -res.months;
+    }
+
+    return res;
+}
+
+// TODO: remove 'name' arg after deprecation is removed
+function createAdder(direction, name) {
+    return function (val, period) {
+        var dur, tmp;
+        //invert the arguments, but complain about it
+        if (period !== null && !isNaN(+period)) {
+            deprecateSimple(name, 'moment().' + name  + '(period, number) is deprecated. Please use moment().' + name + '(number, period). ' +
+            'See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.');
+            tmp = val; val = period; period = tmp;
+        }
+
+        val = typeof val === 'string' ? +val : val;
+        dur = createDuration(val, period);
+        addSubtract(this, dur, direction);
+        return this;
+    };
+}
+
+function addSubtract (mom, duration, isAdding, updateOffset) {
+    var milliseconds = duration._milliseconds,
+        days = absRound(duration._days),
+        months = absRound(duration._months);
+
+    if (!mom.isValid()) {
+        // No op
+        return;
+    }
+
+    updateOffset = updateOffset == null ? true : updateOffset;
+
+    if (months) {
+        setMonth(mom, get$1(mom, 'Month') + months * isAdding);
+    }
+    if (days) {
+        set$1(mom, 'Date', get$1(mom, 'Date') + days * isAdding);
+    }
+    if (milliseconds) {
+        mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
+    }
+    if (updateOffset) {
+        hooks.updateOffset(mom, days || months);
+    }
+}
+
+var add      = createAdder(1, 'add');
+var subtract = createAdder(-1, 'subtract');
+
+function getCalendarFormat(myMoment, now) {
+    var diff = myMoment.diff(now, 'days', true);
+    return diff < -6 ? 'sameElse' :
+            diff < -1 ? 'lastWeek' :
+            diff < 0 ? 'lastDay' :
+            diff < 1 ? 'sameDay' :
+            diff < 2 ? 'nextDay' :
+            diff < 7 ? 'nextWeek' : 'sameElse';
+}
+
+function calendar$1 (time, formats) {
+    // We want to compare the start of today, vs this.
+    // Getting start-of-today depends on whether we're local/utc/offset or not.
+    var now = time || createLocal(),
+        sod = cloneWithOffset(now, this).startOf('day'),
+        format = hooks.calendarFormat(this, sod) || 'sameElse';
+
+    var output = formats && (isFunction$1(formats[format]) ? formats[format].call(this, now) : formats[format]);
+
+    return this.format(output || this.localeData().calendar(format, this, createLocal(now)));
+}
+
+function clone$2 () {
+    return new Moment(this);
+}
+
+function isAfter (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input);
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(!isUndefined$2(units) ? units : 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() > localInput.valueOf();
+    } else {
+        return localInput.valueOf() < this.clone().startOf(units).valueOf();
+    }
+}
+
+function isBefore (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input);
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(!isUndefined$2(units) ? units : 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() < localInput.valueOf();
+    } else {
+        return this.clone().endOf(units).valueOf() < localInput.valueOf();
+    }
+}
+
+function isBetween (from, to, units, inclusivity) {
+    inclusivity = inclusivity || '()';
+    return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
+        (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
+}
+
+function isSame (input, units) {
+    var localInput = isMoment(input) ? input : createLocal(input),
+        inputMs;
+    if (!(this.isValid() && localInput.isValid())) {
+        return false;
+    }
+    units = normalizeUnits(units || 'millisecond');
+    if (units === 'millisecond') {
+        return this.valueOf() === localInput.valueOf();
+    } else {
+        inputMs = localInput.valueOf();
+        return this.clone().startOf(units).valueOf() <= inputMs && inputMs <= this.clone().endOf(units).valueOf();
+    }
+}
+
+function isSameOrAfter (input, units) {
+    return this.isSame(input, units) || this.isAfter(input,units);
+}
+
+function isSameOrBefore (input, units) {
+    return this.isSame(input, units) || this.isBefore(input,units);
+}
+
+function diff (input, units, asFloat) {
+    var that,
+        zoneDelta,
+        delta, output;
+
+    if (!this.isValid()) {
+        return NaN;
+    }
+
+    that = cloneWithOffset(input, this);
+
+    if (!that.isValid()) {
+        return NaN;
+    }
+
+    zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
+
+    units = normalizeUnits(units);
+
+    switch (units) {
+        case 'year': output = monthDiff(this, that) / 12; break;
+        case 'month': output = monthDiff(this, that); break;
+        case 'quarter': output = monthDiff(this, that) / 3; break;
+        case 'second': output = (this - that) / 1e3; break; // 1000
+        case 'minute': output = (this - that) / 6e4; break; // 1000 * 60
+        case 'hour': output = (this - that) / 36e5; break; // 1000 * 60 * 60
+        case 'day': output = (this - that - zoneDelta) / 864e5; break; // 1000 * 60 * 60 * 24, negate dst
+        case 'week': output = (this - that - zoneDelta) / 6048e5; break; // 1000 * 60 * 60 * 24 * 7, negate dst
+        default: output = this - that;
+    }
+
+    return asFloat ? output : absFloor(output);
+}
+
+function monthDiff (a, b) {
+    // difference in months
+    var wholeMonthDiff = ((b.year() - a.year()) * 12) + (b.month() - a.month()),
+        // b is in (anchor - 1 month, anchor + 1 month)
+        anchor = a.clone().add(wholeMonthDiff, 'months'),
+        anchor2, adjust;
+
+    if (b - anchor < 0) {
+        anchor2 = a.clone().add(wholeMonthDiff - 1, 'months');
+        // linear across the month
+        adjust = (b - anchor) / (anchor - anchor2);
+    } else {
+        anchor2 = a.clone().add(wholeMonthDiff + 1, 'months');
+        // linear across the month
+        adjust = (b - anchor) / (anchor2 - anchor);
+    }
+
+    //check for negative zero, return zero if negative zero
+    return -(wholeMonthDiff + adjust) || 0;
+}
+
+hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
+
+function toString$3 () {
+    return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+}
+
+function toISOString() {
+    if (!this.isValid()) {
+        return null;
+    }
+    var m = this.clone().utc();
+    if (m.year() < 0 || m.year() > 9999) {
+        return formatMoment(m, 'YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+    }
+    if (isFunction$1(Date.prototype.toISOString)) {
+        // native implementation is ~50x faster, use it when we can
+        return this.toDate().toISOString();
+    }
+    return formatMoment(m, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+}
+
+/**
+ * Return a human readable representation of a moment that can
+ * also be evaluated to get a new moment which is the same
+ *
+ * @link https://nodejs.org/dist/latest/docs/api/util.html#util_custom_inspect_function_on_objects
+ */
+function inspect () {
+    if (!this.isValid()) {
+        return 'moment.invalid(/* ' + this._i + ' */)';
+    }
+    var func = 'moment';
+    var zone = '';
+    if (!this.isLocal()) {
+        func = this.utcOffset() === 0 ? 'moment.utc' : 'moment.parseZone';
+        zone = 'Z';
+    }
+    var prefix = '[' + func + '("]';
+    var year = (0 <= this.year() && this.year() <= 9999) ? 'YYYY' : 'YYYYYY';
+    var datetime = '-MM-DD[T]HH:mm:ss.SSS';
+    var suffix = zone + '[")]';
+
+    return this.format(prefix + year + datetime + suffix);
+}
+
+function format$2 (inputString) {
+    if (!inputString) {
+        inputString = this.isUtc() ? hooks.defaultFormatUtc : hooks.defaultFormat;
+    }
+    var output = formatMoment(this, inputString);
+    return this.localeData().postformat(output);
+}
+
+function from (time, withoutSuffix) {
+    if (this.isValid() &&
+            ((isMoment(time) && time.isValid()) ||
+             createLocal(time).isValid())) {
+        return createDuration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
+    } else {
+        return this.localeData().invalidDate();
+    }
+}
+
+function fromNow (withoutSuffix) {
+    return this.from(createLocal(), withoutSuffix);
+}
+
+function to (time, withoutSuffix) {
+    if (this.isValid() &&
+            ((isMoment(time) && time.isValid()) ||
+             createLocal(time).isValid())) {
+        return createDuration({from: this, to: time}).locale(this.locale()).humanize(!withoutSuffix);
+    } else {
+        return this.localeData().invalidDate();
+    }
+}
+
+function toNow (withoutSuffix) {
+    return this.to(createLocal(), withoutSuffix);
+}
+
+// If passed a locale key, it will set the locale for this
+// instance.  Otherwise, it will return the locale configuration
+// variables for this instance.
+function locale (key) {
+    var newLocaleData;
+
+    if (key === undefined) {
+        return this._locale._abbr;
+    } else {
+        newLocaleData = getLocale(key);
+        if (newLocaleData != null) {
+            this._locale = newLocaleData;
+        }
+        return this;
+    }
+}
+
+var lang = deprecate(
+    'moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.',
+    function (key) {
+        if (key === undefined) {
+            return this.localeData();
+        } else {
+            return this.locale(key);
+        }
+    }
+);
+
+function localeData () {
+    return this._locale;
+}
+
+function startOf (units) {
+    units = normalizeUnits(units);
+    // the following switch intentionally omits break keywords
+    // to utilize falling through the cases.
+    switch (units) {
+        case 'year':
+            this.month(0);
+            /* falls through */
+        case 'quarter':
+        case 'month':
+            this.date(1);
+            /* falls through */
+        case 'week':
+        case 'isoWeek':
+        case 'day':
+        case 'date':
+            this.hours(0);
+            /* falls through */
+        case 'hour':
+            this.minutes(0);
+            /* falls through */
+        case 'minute':
+            this.seconds(0);
+            /* falls through */
+        case 'second':
+            this.milliseconds(0);
+    }
+
+    // weeks are a special case
+    if (units === 'week') {
+        this.weekday(0);
+    }
+    if (units === 'isoWeek') {
+        this.isoWeekday(1);
+    }
+
+    // quarters are also special
+    if (units === 'quarter') {
+        this.month(Math.floor(this.month() / 3) * 3);
+    }
+
+    return this;
+}
+
+function endOf (units) {
+    units = normalizeUnits(units);
+    if (units === undefined || units === 'millisecond') {
+        return this;
+    }
+
+    // 'date' is an alias for 'day', so it should be considered as such.
+    if (units === 'date') {
+        units = 'day';
+    }
+
+    return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
+}
+
+function valueOf () {
+    return this._d.valueOf() - ((this._offset || 0) * 60000);
+}
+
+function unix () {
+    return Math.floor(this.valueOf() / 1000);
+}
+
+function toDate () {
+    return new Date(this.valueOf());
+}
+
+function toArray () {
+    var m = this;
+    return [m.year(), m.month(), m.date(), m.hour(), m.minute(), m.second(), m.millisecond()];
+}
+
+function toObject$2 () {
+    var m = this;
+    return {
+        years: m.year(),
+        months: m.month(),
+        date: m.date(),
+        hours: m.hours(),
+        minutes: m.minutes(),
+        seconds: m.seconds(),
+        milliseconds: m.milliseconds()
+    };
+}
+
+function toJSON () {
+    // new Date(NaN).toJSON() === null
+    return this.isValid() ? this.toISOString() : null;
+}
+
+function isValid$5 () {
+    return isValid$3(this);
+}
+
+function parsingFlags () {
+    return extend$2({}, getParsingFlags(this));
+}
+
+function invalidAt () {
+    return getParsingFlags(this).overflow;
+}
+
+function creationData() {
+    return {
+        input: this._i,
+        format: this._f,
+        locale: this._locale,
+        isUTC: this._isUTC,
+        strict: this._strict
+    };
+}
+
+// FORMATTING
+
+addFormatToken(0, ['gg', 2], 0, function () {
+    return this.weekYear() % 100;
+});
+
+addFormatToken(0, ['GG', 2], 0, function () {
+    return this.isoWeekYear() % 100;
+});
+
+function addWeekYearFormatToken (token, getter) {
+    addFormatToken(0, [token, token.length], 0, getter);
+}
+
+addWeekYearFormatToken('gggg',     'weekYear');
+addWeekYearFormatToken('ggggg',    'weekYear');
+addWeekYearFormatToken('GGGG',  'isoWeekYear');
+addWeekYearFormatToken('GGGGG', 'isoWeekYear');
+
+// ALIASES
+
+addUnitAlias('weekYear', 'gg');
+addUnitAlias('isoWeekYear', 'GG');
+
+// PRIORITY
+
+addUnitPriority('weekYear', 1);
+addUnitPriority('isoWeekYear', 1);
+
+
+// PARSING
+
+addRegexToken('G',      matchSigned);
+addRegexToken('g',      matchSigned);
+addRegexToken('GG',     match1to2, match2);
+addRegexToken('gg',     match1to2, match2);
+addRegexToken('GGGG',   match1to4, match4);
+addRegexToken('gggg',   match1to4, match4);
+addRegexToken('GGGGG',  match1to6, match6);
+addRegexToken('ggggg',  match1to6, match6);
+
+addWeekParseToken(['gggg', 'ggggg', 'GGGG', 'GGGGG'], function (input, week, config, token) {
+    week[token.substr(0, 2)] = toInt(input);
+});
+
+addWeekParseToken(['gg', 'GG'], function (input, week, config, token) {
+    week[token] = hooks.parseTwoDigitYear(input);
+});
+
+// MOMENTS
+
+function getSetWeekYear (input) {
+    return getSetWeekYearHelper.call(this,
+            input,
+            this.week(),
+            this.weekday(),
+            this.localeData()._week.dow,
+            this.localeData()._week.doy);
+}
+
+function getSetISOWeekYear (input) {
+    return getSetWeekYearHelper.call(this,
+            input, this.isoWeek(), this.isoWeekday(), 1, 4);
+}
+
+function getISOWeeksInYear () {
+    return weeksInYear(this.year(), 1, 4);
+}
+
+function getWeeksInYear () {
+    var weekInfo = this.localeData()._week;
+    return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
+}
+
+function getSetWeekYearHelper(input, week, weekday, dow, doy) {
+    var weeksTarget;
+    if (input == null) {
+        return weekOfYear(this, dow, doy).year;
+    } else {
+        weeksTarget = weeksInYear(input, dow, doy);
+        if (week > weeksTarget) {
+            week = weeksTarget;
+        }
+        return setWeekAll.call(this, input, week, weekday, dow, doy);
+    }
+}
+
+function setWeekAll(weekYear, week, weekday, dow, doy) {
+    var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy),
+        date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
+
+    this.year(date.getUTCFullYear());
+    this.month(date.getUTCMonth());
+    this.date(date.getUTCDate());
+    return this;
+}
+
+// FORMATTING
+
+addFormatToken('Q', 0, 'Qo', 'quarter');
+
+// ALIASES
+
+addUnitAlias('quarter', 'Q');
+
+// PRIORITY
+
+addUnitPriority('quarter', 7);
+
+// PARSING
+
+addRegexToken('Q', match1);
+addParseToken('Q', function (input, array) {
+    array[MONTH] = (toInt(input) - 1) * 3;
+});
+
+// MOMENTS
+
+function getSetQuarter (input) {
+    return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
+}
+
+// FORMATTING
+
+addFormatToken('D', ['DD', 2], 'Do', 'date');
+
+// ALIASES
+
+addUnitAlias('date', 'D');
+
+// PRIOROITY
+addUnitPriority('date', 9);
+
+// PARSING
+
+addRegexToken('D',  match1to2);
+addRegexToken('DD', match1to2, match2);
+addRegexToken('Do', function (isStrict, locale) {
+    // TODO: Remove "ordinalParse" fallback in next major release.
+    return isStrict ?
+      (locale._dayOfMonthOrdinalParse || locale._ordinalParse) :
+      locale._dayOfMonthOrdinalParseLenient;
+});
+
+addParseToken(['D', 'DD'], DATE);
+addParseToken('Do', function (input, array) {
+    array[DATE] = toInt(input.match(match1to2)[0], 10);
+});
+
+// MOMENTS
+
+var getSetDayOfMonth = makeGetSet('Date', true);
+
+// FORMATTING
+
+addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
+
+// ALIASES
+
+addUnitAlias('dayOfYear', 'DDD');
+
+// PRIORITY
+addUnitPriority('dayOfYear', 4);
+
+// PARSING
+
+addRegexToken('DDD',  match1to3);
+addRegexToken('DDDD', match3);
+addParseToken(['DDD', 'DDDD'], function (input, array, config) {
+    config._dayOfYear = toInt(input);
+});
+
+// HELPERS
+
+// MOMENTS
+
+function getSetDayOfYear (input) {
+    var dayOfYear = Math.round((this.clone().startOf('day') - this.clone().startOf('year')) / 864e5) + 1;
+    return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
+}
+
+// FORMATTING
+
+addFormatToken('m', ['mm', 2], 0, 'minute');
+
+// ALIASES
+
+addUnitAlias('minute', 'm');
+
+// PRIORITY
+
+addUnitPriority('minute', 14);
+
+// PARSING
+
+addRegexToken('m',  match1to2);
+addRegexToken('mm', match1to2, match2);
+addParseToken(['m', 'mm'], MINUTE);
+
+// MOMENTS
+
+var getSetMinute = makeGetSet('Minutes', false);
+
+// FORMATTING
+
+addFormatToken('s', ['ss', 2], 0, 'second');
+
+// ALIASES
+
+addUnitAlias('second', 's');
+
+// PRIORITY
+
+addUnitPriority('second', 15);
+
+// PARSING
+
+addRegexToken('s',  match1to2);
+addRegexToken('ss', match1to2, match2);
+addParseToken(['s', 'ss'], SECOND);
+
+// MOMENTS
+
+var getSetSecond = makeGetSet('Seconds', false);
+
+// FORMATTING
+
+addFormatToken('S', 0, 0, function () {
+    return ~~(this.millisecond() / 100);
+});
+
+addFormatToken(0, ['SS', 2], 0, function () {
+    return ~~(this.millisecond() / 10);
+});
+
+addFormatToken(0, ['SSS', 3], 0, 'millisecond');
+addFormatToken(0, ['SSSS', 4], 0, function () {
+    return this.millisecond() * 10;
+});
+addFormatToken(0, ['SSSSS', 5], 0, function () {
+    return this.millisecond() * 100;
+});
+addFormatToken(0, ['SSSSSS', 6], 0, function () {
+    return this.millisecond() * 1000;
+});
+addFormatToken(0, ['SSSSSSS', 7], 0, function () {
+    return this.millisecond() * 10000;
+});
+addFormatToken(0, ['SSSSSSSS', 8], 0, function () {
+    return this.millisecond() * 100000;
+});
+addFormatToken(0, ['SSSSSSSSS', 9], 0, function () {
+    return this.millisecond() * 1000000;
+});
+
+
+// ALIASES
+
+addUnitAlias('millisecond', 'ms');
+
+// PRIORITY
+
+addUnitPriority('millisecond', 16);
+
+// PARSING
+
+addRegexToken('S',    match1to3, match1);
+addRegexToken('SS',   match1to3, match2);
+addRegexToken('SSS',  match1to3, match3);
+
+var token;
+for (token = 'SSSS'; token.length <= 9; token += 'S') {
+    addRegexToken(token, matchUnsigned);
+}
+
+function parseMs(input, array) {
+    array[MILLISECOND] = toInt(('0.' + input) * 1000);
+}
+
+for (token = 'S'; token.length <= 9; token += 'S') {
+    addParseToken(token, parseMs);
+}
+// MOMENTS
+
+var getSetMillisecond = makeGetSet('Milliseconds', false);
+
+// FORMATTING
+
+addFormatToken('z',  0, 0, 'zoneAbbr');
+addFormatToken('zz', 0, 0, 'zoneName');
+
+// MOMENTS
+
+function getZoneAbbr () {
+    return this._isUTC ? 'UTC' : '';
+}
+
+function getZoneName () {
+    return this._isUTC ? 'Coordinated Universal Time' : '';
+}
+
+var proto = Moment.prototype;
+
+proto.add               = add;
+proto.calendar          = calendar$1;
+proto.clone             = clone$2;
+proto.diff              = diff;
+proto.endOf             = endOf;
+proto.format            = format$2;
+proto.from              = from;
+proto.fromNow           = fromNow;
+proto.to                = to;
+proto.toNow             = toNow;
+proto.get               = stringGet;
+proto.invalidAt         = invalidAt;
+proto.isAfter           = isAfter;
+proto.isBefore          = isBefore;
+proto.isBetween         = isBetween;
+proto.isSame            = isSame;
+proto.isSameOrAfter     = isSameOrAfter;
+proto.isSameOrBefore    = isSameOrBefore;
+proto.isValid           = isValid$5;
+proto.lang              = lang;
+proto.locale            = locale;
+proto.localeData        = localeData;
+proto.max               = prototypeMax;
+proto.min               = prototypeMin;
+proto.parsingFlags      = parsingFlags;
+proto.set               = stringSet;
+proto.startOf           = startOf;
+proto.subtract          = subtract;
+proto.toArray           = toArray;
+proto.toObject          = toObject$2;
+proto.toDate            = toDate;
+proto.toISOString       = toISOString;
+proto.inspect           = inspect;
+proto.toJSON            = toJSON;
+proto.toString          = toString$3;
+proto.unix              = unix;
+proto.valueOf           = valueOf;
+proto.creationData      = creationData;
+
+// Year
+proto.year       = getSetYear;
+proto.isLeapYear = getIsLeapYear;
+
+// Week Year
+proto.weekYear    = getSetWeekYear;
+proto.isoWeekYear = getSetISOWeekYear;
+
+// Quarter
+proto.quarter = proto.quarters = getSetQuarter;
+
+// Month
+proto.month       = getSetMonth;
+proto.daysInMonth = getDaysInMonth;
+
+// Week
+proto.week           = proto.weeks        = getSetWeek;
+proto.isoWeek        = proto.isoWeeks     = getSetISOWeek;
+proto.weeksInYear    = getWeeksInYear;
+proto.isoWeeksInYear = getISOWeeksInYear;
+
+// Day
+proto.date       = getSetDayOfMonth;
+proto.day        = proto.days             = getSetDayOfWeek;
+proto.weekday    = getSetLocaleDayOfWeek;
+proto.isoWeekday = getSetISODayOfWeek;
+proto.dayOfYear  = getSetDayOfYear;
+
+// Hour
+proto.hour = proto.hours = getSetHour;
+
+// Minute
+proto.minute = proto.minutes = getSetMinute;
+
+// Second
+proto.second = proto.seconds = getSetSecond;
+
+// Millisecond
+proto.millisecond = proto.milliseconds = getSetMillisecond;
+
+// Offset
+proto.utcOffset            = getSetOffset;
+proto.utc                  = setOffsetToUTC;
+proto.local                = setOffsetToLocal;
+proto.parseZone            = setOffsetToParsedOffset;
+proto.hasAlignedHourOffset = hasAlignedHourOffset;
+proto.isDST                = isDaylightSavingTime;
+proto.isLocal              = isLocal;
+proto.isUtcOffset          = isUtcOffset;
+proto.isUtc                = isUtc;
+proto.isUTC                = isUtc;
+
+// Timezone
+proto.zoneAbbr = getZoneAbbr;
+proto.zoneName = getZoneName;
+
+// Deprecations
+proto.dates  = deprecate('dates accessor is deprecated. Use date instead.', getSetDayOfMonth);
+proto.months = deprecate('months accessor is deprecated. Use month instead', getSetMonth);
+proto.years  = deprecate('years accessor is deprecated. Use year instead', getSetYear);
+proto.zone   = deprecate('moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/', getSetZone);
+proto.isDSTShifted = deprecate('isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information', isDaylightSavingTimeShifted);
+
+function createUnix (input) {
+    return createLocal(input * 1000);
+}
+
+function createInZone () {
+    return createLocal.apply(null, arguments).parseZone();
+}
+
+function preParsePostFormat (string) {
+    return string;
+}
+
+var proto$1 = Locale.prototype;
+
+proto$1.calendar        = calendar;
+proto$1.longDateFormat  = longDateFormat;
+proto$1.invalidDate     = invalidDate;
+proto$1.ordinal         = ordinal;
+proto$1.preparse        = preParsePostFormat;
+proto$1.postformat      = preParsePostFormat;
+proto$1.relativeTime    = relativeTime;
+proto$1.pastFuture      = pastFuture;
+proto$1.set             = set;
+
+// Month
+proto$1.months            =        localeMonths;
+proto$1.monthsShort       =        localeMonthsShort;
+proto$1.monthsParse       =        localeMonthsParse;
+proto$1.monthsRegex       = monthsRegex;
+proto$1.monthsShortRegex  = monthsShortRegex;
+
+// Week
+proto$1.week = localeWeek;
+proto$1.firstDayOfYear = localeFirstDayOfYear;
+proto$1.firstDayOfWeek = localeFirstDayOfWeek;
+
+// Day of Week
+proto$1.weekdays       =        localeWeekdays;
+proto$1.weekdaysMin    =        localeWeekdaysMin;
+proto$1.weekdaysShort  =        localeWeekdaysShort;
+proto$1.weekdaysParse  =        localeWeekdaysParse;
+
+proto$1.weekdaysRegex       =        weekdaysRegex;
+proto$1.weekdaysShortRegex  =        weekdaysShortRegex;
+proto$1.weekdaysMinRegex    =        weekdaysMinRegex;
+
+// Hours
+proto$1.isPM = localeIsPM;
+proto$1.meridiem = localeMeridiem;
+
+function get$2 (format, index, field, setter) {
+    var locale = getLocale();
+    var utc = createUTC().set(setter, index);
+    return locale[field](utc, format);
+}
+
+function listMonthsImpl (format, index, field) {
+    if (isNumber$3(format)) {
+        index = format;
+        format = undefined;
+    }
+
+    format = format || '';
+
+    if (index != null) {
+        return get$2(format, index, field, 'month');
+    }
+
+    var i;
+    var out = [];
+    for (i = 0; i < 12; i++) {
+        out[i] = get$2(format, i, field, 'month');
+    }
+    return out;
+}
+
+// ()
+// (5)
+// (fmt, 5)
+// (fmt)
+// (true)
+// (true, 5)
+// (true, fmt, 5)
+// (true, fmt)
+function listWeekdaysImpl (localeSorted, format, index, field) {
+    if (typeof localeSorted === 'boolean') {
+        if (isNumber$3(format)) {
+            index = format;
+            format = undefined;
+        }
+
+        format = format || '';
+    } else {
+        format = localeSorted;
+        index = format;
+        localeSorted = false;
+
+        if (isNumber$3(format)) {
+            index = format;
+            format = undefined;
+        }
+
+        format = format || '';
+    }
+
+    var locale = getLocale(),
+        shift = localeSorted ? locale._week.dow : 0;
+
+    if (index != null) {
+        return get$2(format, (index + shift) % 7, field, 'day');
+    }
+
+    var i;
+    var out = [];
+    for (i = 0; i < 7; i++) {
+        out[i] = get$2(format, (i + shift) % 7, field, 'day');
+    }
+    return out;
+}
+
+function listMonths (format, index) {
+    return listMonthsImpl(format, index, 'months');
+}
+
+function listMonthsShort (format, index) {
+    return listMonthsImpl(format, index, 'monthsShort');
+}
+
+function listWeekdays (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdays');
+}
+
+function listWeekdaysShort (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysShort');
+}
+
+function listWeekdaysMin (localeSorted, format, index) {
+    return listWeekdaysImpl(localeSorted, format, index, 'weekdaysMin');
+}
+
+getSetGlobalLocale('en', {
+    dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
+    ordinal : function (number) {
+        var b = number % 10,
+            output = (toInt(number % 100 / 10) === 1) ? 'th' :
+            (b === 1) ? 'st' :
+            (b === 2) ? 'nd' :
+            (b === 3) ? 'rd' : 'th';
+        return number + output;
+    }
+});
+
+// Side effect imports
+hooks.lang = deprecate('moment.lang is deprecated. Use moment.locale instead.', getSetGlobalLocale);
+hooks.langData = deprecate('moment.langData is deprecated. Use moment.localeData instead.', getLocale);
+
+var mathAbs = Math.abs;
+
+function abs () {
+    var data           = this._data;
+
+    this._milliseconds = mathAbs(this._milliseconds);
+    this._days         = mathAbs(this._days);
+    this._months       = mathAbs(this._months);
+
+    data.milliseconds  = mathAbs(data.milliseconds);
+    data.seconds       = mathAbs(data.seconds);
+    data.minutes       = mathAbs(data.minutes);
+    data.hours         = mathAbs(data.hours);
+    data.months        = mathAbs(data.months);
+    data.years         = mathAbs(data.years);
+
+    return this;
+}
+
+function addSubtract$1 (duration, input, value, direction) {
+    var other = createDuration(input, value);
+
+    duration._milliseconds += direction * other._milliseconds;
+    duration._days         += direction * other._days;
+    duration._months       += direction * other._months;
+
+    return duration._bubble();
+}
+
+// supports only 2.0-style add(1, 's') or add(duration)
+function add$1 (input, value) {
+    return addSubtract$1(this, input, value, 1);
+}
+
+// supports only 2.0-style subtract(1, 's') or subtract(duration)
+function subtract$1 (input, value) {
+    return addSubtract$1(this, input, value, -1);
+}
+
+function absCeil (number) {
+    if (number < 0) {
+        return Math.floor(number);
+    } else {
+        return Math.ceil(number);
+    }
+}
+
+function bubble () {
+    var milliseconds = this._milliseconds;
+    var days         = this._days;
+    var months       = this._months;
+    var data         = this._data;
+    var seconds, minutes, hours, years, monthsFromDays;
+
+    // if we have a mix of positive and negative values, bubble down first
+    // check: https://github.com/moment/moment/issues/2166
+    if (!((milliseconds >= 0 && days >= 0 && months >= 0) ||
+            (milliseconds <= 0 && days <= 0 && months <= 0))) {
+        milliseconds += absCeil(monthsToDays(months) + days) * 864e5;
+        days = 0;
+        months = 0;
+    }
+
+    // The following code bubbles up values, see the tests for
+    // examples of what that means.
+    data.milliseconds = milliseconds % 1000;
+
+    seconds           = absFloor(milliseconds / 1000);
+    data.seconds      = seconds % 60;
+
+    minutes           = absFloor(seconds / 60);
+    data.minutes      = minutes % 60;
+
+    hours             = absFloor(minutes / 60);
+    data.hours        = hours % 24;
+
+    days += absFloor(hours / 24);
+
+    // convert days to months
+    monthsFromDays = absFloor(daysToMonths(days));
+    months += monthsFromDays;
+    days -= absCeil(monthsToDays(monthsFromDays));
+
+    // 12 months -> 1 year
+    years = absFloor(months / 12);
+    months %= 12;
+
+    data.days   = days;
+    data.months = months;
+    data.years  = years;
+
+    return this;
+}
+
+function daysToMonths (days) {
+    // 400 years have 146097 days (taking into account leap year rules)
+    // 400 years have 12 months === 4800
+    return days * 4800 / 146097;
+}
+
+function monthsToDays (months) {
+    // the reverse of daysToMonths
+    return months * 146097 / 4800;
+}
+
+function as (units) {
+    if (!this.isValid()) {
+        return NaN;
+    }
+    var days;
+    var months;
+    var milliseconds = this._milliseconds;
+
+    units = normalizeUnits(units);
+
+    if (units === 'month' || units === 'year') {
+        days   = this._days   + milliseconds / 864e5;
+        months = this._months + daysToMonths(days);
+        return units === 'month' ? months : months / 12;
+    } else {
+        // handle milliseconds separately because of floating point math errors (issue #1867)
+        days = this._days + Math.round(monthsToDays(this._months));
+        switch (units) {
+            case 'week'   : return days / 7     + milliseconds / 6048e5;
+            case 'day'    : return days         + milliseconds / 864e5;
+            case 'hour'   : return days * 24    + milliseconds / 36e5;
+            case 'minute' : return days * 1440  + milliseconds / 6e4;
+            case 'second' : return days * 86400 + milliseconds / 1000;
+            // Math.floor prevents floating point math errors here
+            case 'millisecond': return Math.floor(days * 864e5) + milliseconds;
+            default: throw new Error('Unknown unit ' + units);
+        }
+    }
+}
+
+// TODO: Use this.as('ms')?
+function valueOf$1 () {
+    if (!this.isValid()) {
+        return NaN;
+    }
+    return (
+        this._milliseconds +
+        this._days * 864e5 +
+        (this._months % 12) * 2592e6 +
+        toInt(this._months / 12) * 31536e6
+    );
+}
+
+function makeAs (alias) {
+    return function () {
+        return this.as(alias);
+    };
+}
+
+var asMilliseconds = makeAs('ms');
+var asSeconds      = makeAs('s');
+var asMinutes      = makeAs('m');
+var asHours        = makeAs('h');
+var asDays         = makeAs('d');
+var asWeeks        = makeAs('w');
+var asMonths       = makeAs('M');
+var asYears        = makeAs('y');
+
+function clone$3 () {
+    return createDuration(this);
+}
+
+function get$3 (units) {
+    units = normalizeUnits(units);
+    return this.isValid() ? this[units + 's']() : NaN;
+}
+
+function makeGetter(name) {
+    return function () {
+        return this.isValid() ? this._data[name] : NaN;
+    };
+}
+
+var milliseconds = makeGetter('milliseconds');
+var seconds      = makeGetter('seconds');
+var minutes      = makeGetter('minutes');
+var hours        = makeGetter('hours');
+var days         = makeGetter('days');
+var months       = makeGetter('months');
+var years        = makeGetter('years');
+
+function weeks () {
+    return absFloor(this.days() / 7);
+}
+
+var round = Math.round;
+var thresholds = {
+    ss: 44,         // a few seconds to seconds
+    s : 45,         // seconds to minute
+    m : 45,         // minutes to hour
+    h : 22,         // hours to day
+    d : 26,         // days to month
+    M : 11          // months to year
+};
+
+// helper function for moment.fn.from, moment.fn.fromNow, and moment.duration.fn.humanize
+function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale) {
+    return locale.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
+}
+
+function relativeTime$1 (posNegDuration, withoutSuffix, locale) {
+    var duration = createDuration(posNegDuration).abs();
+    var seconds  = round(duration.as('s'));
+    var minutes  = round(duration.as('m'));
+    var hours    = round(duration.as('h'));
+    var days     = round(duration.as('d'));
+    var months   = round(duration.as('M'));
+    var years    = round(duration.as('y'));
+
+    var a = seconds <= thresholds.ss && ['s', seconds]  ||
+            seconds < thresholds.s   && ['ss', seconds] ||
+            minutes <= 1             && ['m']           ||
+            minutes < thresholds.m   && ['mm', minutes] ||
+            hours   <= 1             && ['h']           ||
+            hours   < thresholds.h   && ['hh', hours]   ||
+            days    <= 1             && ['d']           ||
+            days    < thresholds.d   && ['dd', days]    ||
+            months  <= 1             && ['M']           ||
+            months  < thresholds.M   && ['MM', months]  ||
+            years   <= 1             && ['y']           || ['yy', years];
+
+    a[2] = withoutSuffix;
+    a[3] = +posNegDuration > 0;
+    a[4] = locale;
+    return substituteTimeAgo.apply(null, a);
+}
+
+// This function allows you to set the rounding function for relative time strings
+function getSetRelativeTimeRounding (roundingFunction) {
+    if (roundingFunction === undefined) {
+        return round;
+    }
+    if (typeof(roundingFunction) === 'function') {
+        round = roundingFunction;
+        return true;
+    }
+    return false;
+}
+
+// This function allows you to set a threshold for relative time strings
+function getSetRelativeTimeThreshold (threshold, limit) {
+    if (thresholds[threshold] === undefined) {
+        return false;
+    }
+    if (limit === undefined) {
+        return thresholds[threshold];
+    }
+    thresholds[threshold] = limit;
+    if (threshold === 's') {
+        thresholds.ss = limit - 1;
+    }
+    return true;
+}
+
+function humanize (withSuffix) {
+    if (!this.isValid()) {
+        return this.localeData().invalidDate();
+    }
+
+    var locale = this.localeData();
+    var output = relativeTime$1(this, !withSuffix, locale);
+
+    if (withSuffix) {
+        output = locale.pastFuture(+this, output);
+    }
+
+    return locale.postformat(output);
+}
+
+var abs$1 = Math.abs;
+
+function sign(x) {
+    return ((x > 0) - (x < 0)) || +x;
+}
+
+function toISOString$1() {
+    // for ISO strings we do not use the normal bubbling rules:
+    //  * milliseconds bubble up until they become hours
+    //  * days do not bubble at all
+    //  * months bubble up until they become years
+    // This is because there is no context-free conversion between hours and days
+    // (think of clock changes)
+    // and also not between days and months (28-31 days per month)
+    if (!this.isValid()) {
+        return this.localeData().invalidDate();
+    }
+
+    var seconds = abs$1(this._milliseconds) / 1000;
+    var days         = abs$1(this._days);
+    var months       = abs$1(this._months);
+    var minutes, hours, years;
+
+    // 3600 seconds -> 60 minutes -> 1 hour
+    minutes           = absFloor(seconds / 60);
+    hours             = absFloor(minutes / 60);
+    seconds %= 60;
+    minutes %= 60;
+
+    // 12 months -> 1 year
+    years  = absFloor(months / 12);
+    months %= 12;
+
+
+    // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
+    var Y = years;
+    var M = months;
+    var D = days;
+    var h = hours;
+    var m = minutes;
+    var s = seconds ? seconds.toFixed(3).replace(/\.?0+$/, '') : '';
+    var total = this.asSeconds();
+
+    if (!total) {
+        // this is the same as C#'s (Noda) and python (isodate)...
+        // but not other JS (goog.date)
+        return 'P0D';
+    }
+
+    var totalSign = total < 0 ? '-' : '';
+    var ymSign = sign(this._months) !== sign(total) ? '-' : '';
+    var daysSign = sign(this._days) !== sign(total) ? '-' : '';
+    var hmsSign = sign(this._milliseconds) !== sign(total) ? '-' : '';
+
+    return totalSign + 'P' +
+        (Y ? ymSign + Y + 'Y' : '') +
+        (M ? ymSign + M + 'M' : '') +
+        (D ? daysSign + D + 'D' : '') +
+        ((h || m || s) ? 'T' : '') +
+        (h ? hmsSign + h + 'H' : '') +
+        (m ? hmsSign + m + 'M' : '') +
+        (s ? hmsSign + s + 'S' : '');
+}
+
+var proto$2 = Duration.prototype;
+
+proto$2.isValid        = isValid$4;
+proto$2.abs            = abs;
+proto$2.add            = add$1;
+proto$2.subtract       = subtract$1;
+proto$2.as             = as;
+proto$2.asMilliseconds = asMilliseconds;
+proto$2.asSeconds      = asSeconds;
+proto$2.asMinutes      = asMinutes;
+proto$2.asHours        = asHours;
+proto$2.asDays         = asDays;
+proto$2.asWeeks        = asWeeks;
+proto$2.asMonths       = asMonths;
+proto$2.asYears        = asYears;
+proto$2.valueOf        = valueOf$1;
+proto$2._bubble        = bubble;
+proto$2.clone          = clone$3;
+proto$2.get            = get$3;
+proto$2.milliseconds   = milliseconds;
+proto$2.seconds        = seconds;
+proto$2.minutes        = minutes;
+proto$2.hours          = hours;
+proto$2.days           = days;
+proto$2.weeks          = weeks;
+proto$2.months         = months;
+proto$2.years          = years;
+proto$2.humanize       = humanize;
+proto$2.toISOString    = toISOString$1;
+proto$2.toString       = toISOString$1;
+proto$2.toJSON         = toISOString$1;
+proto$2.locale         = locale;
+proto$2.localeData     = localeData;
+
+// Deprecations
+proto$2.toIsoString = deprecate('toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)', toISOString$1);
+proto$2.lang = lang;
+
+// Side effect imports
+
+// FORMATTING
+
+addFormatToken('X', 0, 0, 'unix');
+addFormatToken('x', 0, 0, 'valueOf');
+
+// PARSING
+
+addRegexToken('x', matchSigned);
+addRegexToken('X', matchTimestamp);
+addParseToken('X', function (input, array, config) {
+    config._d = new Date(parseFloat(input, 10) * 1000);
+});
+addParseToken('x', function (input, array, config) {
+    config._d = new Date(toInt(input));
+});
+
+// Side effect imports
+
+//! moment.js
+//! version : 2.19.2
+//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
+//! license : MIT
+//! momentjs.com
+
+hooks.version = '2.19.2';
+
+setHookCallback(createLocal);
+
+hooks.fn                    = proto;
+hooks.min                   = min$1;
+hooks.max                   = max$1;
+hooks.now                   = now;
+hooks.utc                   = createUTC;
+hooks.unix                  = createUnix;
+hooks.months                = listMonths;
+hooks.isDate                = isDate;
+hooks.locale                = getSetGlobalLocale;
+hooks.invalid               = createInvalid;
+hooks.duration              = createDuration;
+hooks.isMoment              = isMoment;
+hooks.weekdays              = listWeekdays;
+hooks.parseZone             = createInZone;
+hooks.localeData            = getLocale;
+hooks.isDuration            = isDuration;
+hooks.monthsShort           = listMonthsShort;
+hooks.weekdaysMin           = listWeekdaysMin;
+hooks.defineLocale          = defineLocale;
+hooks.updateLocale          = updateLocale;
+hooks.locales               = listLocales;
+hooks.weekdaysShort         = listWeekdaysShort;
+hooks.normalizeUnits        = normalizeUnits;
+hooks.relativeTimeRounding  = getSetRelativeTimeRounding;
+hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
+hooks.calendarFormat        = getCalendarFormat;
+hooks.prototype             = proto;
+
+/**
+     * Check if value is an integer
+     */
+    function isInteger(val){
+        return isNumber_1(val) && (val % 1 === 0);
+    }
+
+    var isInteger_1 = isInteger;
+
+'use strict';
+
+// Load modules
+
+// Delcare internals
+
+var internals = {
+    rfc3986: {}
+};
+
+internals.generate = function () {
+
+    /**
+     * elements separated by forward slash ("/") are alternatives.
+     */
+    var or = '|';
+
+    /**
+     * DIGIT = %x30-39 ; 0-9
+     */
+    var digit = '0-9';
+    var digitOnly = '[' + digit + ']';
+
+    /**
+     * ALPHA = %x41-5A / %x61-7A   ; A-Z / a-z
+     */
+    var alpha = 'a-zA-Z';
+    var alphaOnly = '[' + alpha + ']';
+
+    /**
+     * cidr       = DIGIT                ; 0-9
+     *            / %x31-32 DIGIT         ; 10-29
+     *            / "3" %x30-32           ; 30-32
+     */
+    internals.rfc3986.cidr = digitOnly + or + '[1-2]' + digitOnly + or + '3' + '[0-2]';
+
+    /**
+     * HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+     */
+    var hexDigit = digit + 'A-Fa-f';
+    var hexDigitOnly = '[' + hexDigit + ']';
+
+    /**
+     * unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+     */
+    var unreserved = alpha + digit + '-\\._~';
+
+    /**
+     * sub-delims = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+     */
+    var subDelims = '!\\$&\'\\(\\)\\*\\+,;=';
+
+    /**
+     * pct-encoded = "%" HEXDIG HEXDIG
+     */
+    var pctEncoded = '%' + hexDigit;
+
+    /**
+     * pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
+     */
+    var pchar = unreserved + pctEncoded + subDelims + ':@';
+    var pcharOnly = '[' + pchar + ']';
+
+    /**
+     * Rule to support zero-padded addresses.
+     */
+    var zeroPad = '0?';
+
+    /**
+     * dec-octet   = DIGIT                 ; 0-9
+     *            / %x31-39 DIGIT         ; 10-99
+     *            / "1" 2DIGIT            ; 100-199
+     *            / "2" %x30-34 DIGIT     ; 200-249
+     *            / "25" %x30-35          ; 250-255
+     */
+    var decOctect = '(?:' + zeroPad + zeroPad + digitOnly + or + zeroPad + '[1-9]' + digitOnly + or + '1' + digitOnly + digitOnly + or + '2' + '[0-4]' + digitOnly + or + '25' + '[0-5])';
+
+    /**
+     * IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
+     */
+    internals.rfc3986.IPv4address = '(?:' + decOctect + '\\.){3}' + decOctect;
+
+    /**
+     * h16 = 1*4HEXDIG ; 16 bits of address represented in hexadecimal
+     * ls32 = ( h16 ":" h16 ) / IPv4address ; least-significant 32 bits of address
+     * IPv6address =                            6( h16 ":" ) ls32
+     *             /                       "::" 5( h16 ":" ) ls32
+     *             / [               h16 ] "::" 4( h16 ":" ) ls32
+     *             / [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+     *             / [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+     *             / [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+     *             / [ *4( h16 ":" ) h16 ] "::"              ls32
+     *             / [ *5( h16 ":" ) h16 ] "::"              h16
+     *             / [ *6( h16 ":" ) h16 ] "::"
+     */
+    var h16 = hexDigitOnly + '{1,4}';
+    var ls32 = '(?:' + h16 + ':' + h16 + '|' + internals.rfc3986.IPv4address + ')';
+    var IPv6SixHex = '(?:' + h16 + ':){6}' + ls32;
+    var IPv6FiveHex = '::(?:' + h16 + ':){5}' + ls32;
+    var IPv6FourHex = '(?:' + h16 + ')?::(?:' + h16 + ':){4}' + ls32;
+    var IPv6ThreeHex = '(?:(?:' + h16 + ':){0,1}' + h16 + ')?::(?:' + h16 + ':){3}' + ls32;
+    var IPv6TwoHex = '(?:(?:' + h16 + ':){0,2}' + h16 + ')?::(?:' + h16 + ':){2}' + ls32;
+    var IPv6OneHex = '(?:(?:' + h16 + ':){0,3}' + h16 + ')?::' + h16 + ':' + ls32;
+    var IPv6NoneHex = '(?:(?:' + h16 + ':){0,4}' + h16 + ')?::' + ls32;
+    var IPv6NoneHex2 = '(?:(?:' + h16 + ':){0,5}' + h16 + ')?::' + h16;
+    var IPv6NoneHex3 = '(?:(?:' + h16 + ':){0,6}' + h16 + ')?::';
+    internals.rfc3986.IPv6address = '(?:' + IPv6SixHex + or + IPv6FiveHex + or + IPv6FourHex + or + IPv6ThreeHex + or + IPv6TwoHex + or + IPv6OneHex + or + IPv6NoneHex + or + IPv6NoneHex2 + or + IPv6NoneHex3 + ')';
+
+    /**
+     * IPvFuture = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+     */
+    internals.rfc3986.IPvFuture = 'v' + hexDigitOnly + '+\\.[' + unreserved + subDelims + ':]+';
+
+    /**
+     * scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+     */
+    internals.rfc3986.scheme = alphaOnly + '[' + alpha + digit + '+-\\.]*';
+
+    /**
+     * userinfo = *( unreserved / pct-encoded / sub-delims / ":" )
+     */
+    var userinfo = '[' + unreserved + pctEncoded + subDelims + ':]*';
+
+    /**
+     * IP-literal = "[" ( IPv6address / IPvFuture  ) "]"
+     */
+    internals.rfc3986.IPLiteral = '\\[(?:' + internals.rfc3986.IPv6address + or + internals.rfc3986.IPvFuture + ')\\]';
+
+    /**
+     * reg-name = *( unreserved / pct-encoded / sub-delims )
+     */
+    var regName = '[' + unreserved + pctEncoded + subDelims + ']{0,255}';
+
+    /**
+     * host = IP-literal / IPv4address / reg-name
+     */
+    var host = '(?:' + internals.rfc3986.IPLiteral + or + internals.rfc3986.IPv4address + or + regName + ')';
+
+    /**
+     * port = *DIGIT
+     */
+    var port = digitOnly + '*';
+
+    /**
+     * authority   = [ userinfo "@" ] host [ ":" port ]
+     */
+    var authority = '(?:' + userinfo + '@)?' + host + '(?::' + port + ')?';
+
+    /**
+     * segment       = *pchar
+     * segment-nz    = 1*pchar
+     * path          = path-abempty    ; begins with "/" or is empty
+     *               / path-absolute   ; begins with "/" but not "//"
+     *               / path-noscheme   ; begins with a non-colon segment
+     *               / path-rootless   ; begins with a segment
+     *               / path-empty      ; zero characters
+     * path-abempty  = *( "/" segment )
+     * path-absolute = "/" [ segment-nz *( "/" segment ) ]
+     * path-rootless = segment-nz *( "/" segment )
+     */
+    var segment = pcharOnly + '*';
+    var segmentNz = pcharOnly + '+';
+    var pathAbEmpty = '(?:\\/' + segment + ')*';
+    var pathAbsolute = '\\/(?:' + segmentNz + pathAbEmpty + ')?';
+    var pathRootless = segmentNz + pathAbEmpty;
+
+    /**
+     * hier-part = "//" authority path
+     */
+    internals.rfc3986.hierPart = '(?:' + '(?:\\/\\/' + authority + pathAbEmpty + ')' + or + pathAbsolute + or + pathRootless + ')';
+
+    /**
+     * query = *( pchar / "/" / "?" )
+     */
+    internals.rfc3986.query = '[' + pchar + '\\/\\?]*(?=#|$)'; //Finish matching either at the fragment part or end of the line.
+
+    /**
+     * fragment = *( pchar / "/" / "?" )
+     */
+    internals.rfc3986.fragment = '[' + pchar + '\\/\\?]*';
+
+    /**
+     * URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+     *
+     * OR
+     *
+     * relative-ref = relative-part [ "?" query ] [ "#" fragment ]
+     */
+    internals.rfc3986.uri = '^(?:' + internals.rfc3986.scheme + ':' + internals.rfc3986.hierPart + ')(?:\\?' + internals.rfc3986.query + ')?' + '(?:#' + internals.rfc3986.fragment + ')?$';
+};
+
+internals.generate();
+
+var rfc3986 = internals.rfc3986;
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.2
+// OAS2.0はJSON Schema SpecのDraft4を使用している。誤って最新Draftを参照しないように注意すること。
+const resultTemplate = {
+  isValid: true,
+  message: ''
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.1
+const multipleOf = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'multipleOf')) {
+    return result;
+  }
+  const multipleOf = constraints.multipleOf;
+  if (!isNumber_1(multipleOf) || multipleOf < 0) {
+    return result;
+  }
+  if ((value % multipleOf) !== 0) {
+    result.isValid = false;
+    result.message = `${multipleOf}で割り切れる数値にして下さい。`;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.2
+const maximumAndExclusiveMaximum = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'maximum')) {
+    return result;
+  }
+  const maximum = constraints.maximum;
+  if (!isNumber_1(maximum)) {
+    return result;
+  }
+  // 未定義時はfalse扱い。
+  const exclusiveMaximum = !!constraints.exclusiveMaximum;
+  if (exclusiveMaximum) {
+    if (value >= maximum) {
+      result.isValid = false;
+      result.message = `${maximum}より小さい数値にして下さい。`;
+      return result;
+    }
+  } else {
+    if (value > maximum) {
+      result.isValid = false;
+      result.message = `${maximum}以下の数値にして下さい。`;
+      return result;
+    }
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.3
+const minimumAndExclusiveMinimum = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'minimum')) {
+    return result;
+  }
+  const minimum = constraints.minimum;
+  if (!isNumber_1(minimum)) {
+    return result;
+  }
+  // 未定義時はfalse扱い。
+  const exclusiveMinimum = !!constraints.exclusiveMinimum;
+  if (exclusiveMinimum) {
+    if (value <= minimum) {
+      result.isValid = false;
+      result.message = `${minimum}より大きい数値にして下さい。`;
+      return result;
+    }
+  } else {
+    if (value < minimum) {
+      result.isValid = false;
+      result.message = `${minimum}以上の数値にして下さい。`;
+      return result;
+    }
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.1
+const maxLength = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'maxLength')) {
+    return result;
+  }
+  const maxLength = constraints.maxLength;
+  if (!isInteger_1(maxLength) || maxLength < 0) {
+    return result;
+  }
+  if (value.length > maxLength) {
+    result.isValid = false;
+    result.message = `文字数を${maxLength}以下にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.2
+const minLength = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // デフォルト値は`0`。
+  const minLength = constraints.minLength || 0;
+  if (value.length < minLength) {
+    result.isValid = false;
+    result.message = `文字数を${minLength}以上にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.3
+const pattern = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'pattern')) {
+    return result;
+  }
+  // ECMA 262 regular expression dialect.
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.3.1
+  const pattern = constraints.pattern;
+  if (!value.match(pattern)) {
+    result.isValid = false;
+    result.message = `${pattern}にマッチさせて下さい。`;
+    return result;
+  }
+  return result;
+};
+
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1
+const additionalItemsAndItems = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // SchemaObjectもしくは[SchemaObbject]。未定義時は空SchemaObject。
+  let items;
+  // booleanもしくはSchemaObject。
+  let additionalItems;
+  if (hasOwn_1$2(constraints, 'items')) {
+    items = constraints.items;
+  } else {
+    items = {};
+  }
+  if (hasOwn_1$2(constraints, 'additionalItems')) {
+    additionalItems = constraints.additionalItems;
+  } else {
+    additionalItems = {};
+  }
+  // itemsが未定義もしくはオブジェクトならばvalidate結果は常にOK。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.2
+  if (isUndefined(items) || isObject_1(items)) {
+    return result;
+  }
+  // additionalItemsがBooleanのtrueもしくはobjectならばvalidate結果は常にOK。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.2
+  if ((isBoolean_1(additionalItems) && additionalItems) || isObject_1(additionalItems)) {
+    return result;
+  }
+  // additionalItemsがBooleanのfalseでありitemsがarrayの場合、
+  // value配列の長さがitemsの長さ以下ならばvalidate結果はOK。
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.1.3
+  if ((isBoolean_1(additionalItems) && !additionalItems) && isArray_1$1(items)) {
+    if (value.length <= items.length) {
+      return result;
+    }
+  }
+  result.isValid = false;
+  result.message = `要素数を${items.length}以下にして下さい。`;
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.2
+const maxItems = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'maxItems')) {
+    return result;
+  }
+  const maxItems = constraints.maxItems;
+  if (!isInteger_1(maxItems) || maxItems < 0) {
+    return result;
+  }
+  if (value.length > maxItems) {
+    result.isValid = false;
+    result.message = `要素数を${maxItems}以下にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.3
+const minItems = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // デフォルト値は`0`。
+  const minItems = constraints.minItems || 0;
+  if (value.length < minItems) {
+    result.isValid = false;
+    result.message = `要素数を${minItems}以上にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.4
+const uniqueItems = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // デフォルト値はfalse。
+  const uniqueItems = constraints.uniqueItems || false;
+  if (!uniqueItems) {
+    return result;
+  }
+  if (value.length !== unique_1$1(value, (a, b) => {
+    a = JSON.stringify(deepClone_1(a));
+    b = JSON.stringify(deepClone_1(b));
+    return (a === b);
+  }).length) {
+    result.isValid = false;
+    result.message = '内容が重複しない要素で構成して下さい。';
+    return result;
+  }
+  return result;
+};
+
+// @see https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.1
+const maxProperties = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'maxProperties')) {
+    return result;
+  }
+  const maxProperties = constraints.maxProperties;
+  if (!isInteger_1(maxProperties) || maxProperties < 0) {
+    return result;
+  }
+  if (size_1(value) > maxProperties) {
+    result.isValid = false;
+    result.message = `要素数を${maxProperties}以下にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.2
+const minProperties = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // デフォルト値は`0`。
+  const minProperties = constraints.minProperties || 0;
+  if (size_1(value) < minProperties) {
+    result.isValid = false;
+    result.message = `要素数を${minProperties}以上にして下さい。`;
+    return result;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.3
+const required = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'required')) {
+    return result;
+  }
+  const required = constraints.required;
+  if (!isArray_1$1(required) || !required.length) {
+    return result;
+  }
+  forEach_1$2(required, key => {
+    if (!hasOwn_1$2(value, key)) {
+      result.isValid = false;
+      result.message = `要素に${key}を含めて下さい。`;
+    }
+  });
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4
+const additionalPropertiesAndPropertiesAndPatternProperties = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  // Object。valueはSchemaObject。デフォルト空Object。
+  let additionalProperties;// eslint-disable-line no-unused-vars
+  if (!hasOwn_1$2(constraints, 'properties')) {
+    
+  } else {
+    
+  }
+  if (!hasOwn_1$2(constraints, 'patternProperties')) {
+    
+  } else {
+    
+  }
+  if (!hasOwn_1$2(constraints, 'additionalProperties')) {
+    additionalProperties = {};
+  } else {
+    additionalProperties = constraints.additionalProperties;
+  }
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.2
+  if ((isBoolean_1(additionalProperties) && additionalProperties) || isObject_1(additionalProperties)) {
+    return result;
+  }
+  if (isBoolean_1(additionalProperties) && !additionalProperties) {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.4.4
+    // TODO:
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4.5
+const dependencies = (value, constraints) => {// eslint-disable-line no-unused-vars
+  const result = objectAssign({}, resultTemplate);
+  // TODO:
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.1
+const _enum = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'enum')) {
+    return result;
+  }
+  const _enum = constraints.enum;
+  if (!isArray_1$1(_enum)) {
+    return result;
+  }
+  let isFound = false;
+  forEach_1$2(_enum, item => {
+    if (value === item) {
+      isFound = true;
+    }
+  });
+  if (!isFound) {
+    result.isValid = false;
+    result.message = `${JSON.stringify(_enum)}のいずれかの値を設定して下さい。`;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2
+const _type = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'type')) {
+    return result;
+  }
+  // typeはarrayもしくはstring
+  let types;
+  if (isArray_1$1(constraints.type)) {
+    types = constraints.type;
+  } else {
+    types = [constraints.type];
+  }
+  let isValid = false;
+  forEach_1$2(types, type => {
+    switch (type) {
+    case 'integer':
+    case 'number':
+      if (isNumber_1(value)) {
+        isValid = true;
+      }
+      break;
+    case 'string':
+      if (isString_1(value)) {
+        isValid = true;
+      }
+      break;
+    case 'array':
+      if (isArray_1$1(value)) {
+        isValid = true;
+      }
+      break;
+    case 'object':
+      if (isObject_1(value)) {
+        isValid = true;
+      }
+      break;
+    case 'boolean':
+      if (isBoolean_1(value)) {
+        isValid = true;
+      }
+      break;
+    case 'null':
+      if (isNull_1(value)) {
+        isValid = true;
+      }
+      break;
+    case 'file':
+      // primitive typeには含まれないが`file`もサポートする。
+      if (!!value && isString_1(value.name)) {
+        isValid = true;
+      }
+      break;
+    default:
+      break;
+    }
+  });
+  if (!isValid) {
+    result.isValid = false;
+    result.message = `型を${JSON.stringify(types)}のいずれかにして下さい。`;
+  }
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.3
+const allOf = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'allOf')) {
+    return result;
+  }
+  const allOf = constraints.allOf;
+  if (!isArray_1$1(allOf)) {
+    return result;
+  }
+  // TODO:
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.4
+const anyOf = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'anyOf')) {
+    return result;
+  }
+  const anyOf = constraints.anyOf;
+  if (!isArray_1$1(anyOf)) {
+    return result;
+  }
+  // TODO:
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.5
+const oneOf = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'oneOf')) {
+    return result;
+  }
+  const oneOf = constraints.oneOf;
+  if (!isArray_1$1(oneOf)) {
+    return result;
+  }
+  // TODO:
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.6
+const not = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'not')) {
+    return result;
+  }
+  const not = constraints.not;
+  if (!isArray_1$1(not)) {
+    return result;
+  }
+  // TODO:
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.7
+const definitions = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'definitions')) {
+    return result;
+  }
+  const definitions = constraints.definitions;
+  if (!isArray_1$1(definitions)) {
+    return result;
+  }
+  // TODO:
+  return result;
+};
+
+// @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.2
+const format$1 = (value, constraints) => {
+  const result = objectAssign({}, resultTemplate);
+  if (!hasOwn_1$2(constraints, 'format')) {
+    return result;
+  }
+  const format = constraints.format;
+  if (!isString_1(format)) {
+    return result;
+  }
+  switch (format) {
+  case 'date-time': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.1
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+    // RFC 3339に則った書き方かバリデートする
+    const pattern = /^(\d{4})-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+\-])([01]\d|2[0-3]):([0-5]\d))$/;
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"date-time"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    // 存在する日付かチェックする(e.g. うるう年)
+    const isValid = hooks(value).isValid();
+    if (!isValid) {
+      result.isValid = false;
+      result.message = '存在する日付を入力してください。';
+      return result;
+    }
+    break;
+  }
+  case 'email': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.2
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+    // RFC 5322に則った書き方かバリデートする
+    const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"email"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    break;
+  }
+  case 'hostname': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.3
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+    // hostnameが255文字を超えていたらエラー
+    if (value.length > 255) {
+      result.isValid = false;
+      result.message = '"hostname"は255文字以内で入力してください。';
+      return result;
+    }
+    // RFC 1034に則った書き方かバリデートする
+    const pattern = /^[a-z\d]([a-z\d\-]{0,61}[a-z\d])?(\.[a-z\d]([a-z\d\-]{0,61}[‌​a-z\d])?)*$/i; // eslint-disable-line no-irregular-whitespace
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"hostname"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    break;
+  }
+  case 'ipv4': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.4
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+    // RFC 2673に則った書き方かバリデートする
+    const pattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"ipv4"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    break;
+  }
+  case 'ipv6': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.5
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+    if (value.match(/::/)) {
+      let targetColon = 7;
+      // IPv4互換バージョンを使用している場合、ターゲット番号は：6
+      if (value.match(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
+        targetColon = 6;
+      }
+      // ipv6の形を成形する
+      if (value.match(/^::/)) {
+        value = value.replace('::', '0::');
+      }
+      if (value.match(/::$/)) {
+        value = value.replace('::', '::0');
+      }
+      while (value.match(/:/g).length < targetColon) {
+        value = value.replace('::', ':0::');
+      }
+      value = value.replace('::', ':0:');
+    }
+
+    // RFC 2373に則った書き方かバリデートする
+    let patterns = [
+      /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/,
+      /^([0-9a-fA-F]{1,4}:){6}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+    ];
+    let matchResult = false;
+    forEach_1$2(patterns, pattern => {
+      const isMatch = value.match(pattern);
+      if (!isNull_1(isMatch)) {
+        matchResult = true;
+      }
+    });
+    if (!matchResult) {
+      result.isValid = false;
+      result.message = '"ipv6"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    break;
+  }
+  case 'uri': {
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7.3.6
+    // String型のときだけバリデートする
+    if (!isString_1(value)) {
+      return result;
+    }
+    // RFC 3986に則った書き方かバリデートする
+    const pattern = rfc3986.uri;
+    const isMatch = value.match(pattern);
+    if (isNull_1(isMatch)) {
+      result.isValid = false;
+      result.message = '"uri"に則ったフォーマットで入力してください。';
+      return result;
+    }
+    break;
+  }
+  /*
+    case 'todo: custom format here':
+    // TODO: 独自フォーマットがあればここに。
+    break;
+  */
+  default:
+    break;
+  }
+  return result;
+};
+
+var validator = {
+  /**
+   * @param {*} value
+   * @param {Object} schemaObject
+   * @return {Array}
+   */
+  errors: (value, schemaObject) => {
+    const results = [];
+
+    // undefinedは未入力扱いなのでvalidate対象にしない。
+    // ただし、required(self)がtrueの場合はエラー。
+    if (isUndefined(value)) {
+      if (schemaObject.required) {
+        return ['必須項目です。'];
+      }
+      return results;
+    }
+
+    // 先にtypeチェックを済ませておく。
+    // type
+    const result = _type(value, schemaObject);
+    if (!result.isValid) {
+      return [result.message];
+    }
+
+    // typeは7つのprimitive typesのいずれか。
+    // 配列もあり得るがvironでは考慮しない。
+    // type別のvalidate。
+    const type = schemaObject.type;
+    switch (type) {
+    case 'number':
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1
+      results.push(multipleOf(value, schemaObject));
+      results.push(maximumAndExclusiveMaximum(value, schemaObject));
+      results.push(minimumAndExclusiveMinimum(value, schemaObject));
+      break;
+    case 'string':
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2
+      results.push(maxLength(value, schemaObject));
+      results.push(minLength(value, schemaObject));
+      results.push(pattern(value, schemaObject));
+      break;
+    case 'array':
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3
+      results.push(additionalItemsAndItems(value, schemaObject));
+      results.push(maxItems(value, schemaObject));
+      results.push(minItems(value, schemaObject));
+      results.push(uniqueItems(value, schemaObject));
+      break;
+    case 'object':
+      // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.4
+      results.push(maxProperties(value, schemaObject));
+      results.push(minProperties(value, schemaObject));
+      results.push(required(value, schemaObject));
+      results.push(additionalPropertiesAndPropertiesAndPatternProperties(value, schemaObject));
+      results.push(dependencies(value, schemaObject));
+      break;
+    default:
+      break;
+    }
+
+    // 全てのtypeが対象。
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5
+    results.push(_enum(value, schemaObject));
+    // typeは先行チェック済。
+    results.push(allOf(value, schemaObject));
+    results.push(anyOf(value, schemaObject));
+    results.push(oneOf(value, schemaObject));
+    results.push(not(value, schemaObject));
+    results.push(definitions(value, schemaObject));
+
+    // format関連。
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-7
+    results.push(format$1(value, schemaObject));
+
+    // isValid値がfalseの結果だけ返す。
+    return map_1$1(reject_1$1(results, result => {
+      return result.isValid;
+    }), result => {
+      return result.message;
+    });
+  }
+};
+
+var script$24 = function() {
+  // ショートカット。
+  const formObject = this.opts.formobject;
+  // 入力フォームのタイトル。
+  // 入力必須ならば米印を付ける。
+  this.title = formObject.description || formObject.name;
+  if (formObject.required) {
+    this.title = `${this.title} *`;
+  }
+  // autocomplete設定。
+  this.autocompleteConfig = formObject['x-autocomplete'];
+
+  // 入力に使用するUIコンポーネント名。
+  // opts.formObjectの値から適切なUIコンポーネントを推測します。
+  this.uiType = util.getUIType(formObject);
+
+  // エラー関連。
+  this.errors = [];
+  this.hasError = false;
+  const validate = () => {
+    this.errors = validator.errors(this.opts.val, formObject);
+    this.hasError = !!this.errors.length;
+  };
+
+  /**
+   * Selectコンポーネントの選択肢を返します。
+   * @return {Array}
+   */
+  this.getSelectOptions = () => {
+    const options = [];
+    if (isUndefined(this.opts.val)) {
+      options.push({
+        label: '-- select an option --',
+        isSelected: true,
+        isDiabled: true
+      });
+    }
+    forEach_1$2(formObject.enum, (v, idx) => {
+      options.push({
+        id: `select_${idx}`,
+        label: v,
+        isSelected: (v === this.opts.val)
+      });
+    });
+    return options;
+  };
+
+  validate();
+  this.on('update', () => {
+    validate();
+  });
+
+  /**
+   * changeイベントを発火します。
+   * @param {*} value
+   */
+  const change = value => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    this.opts.onchange(this.opts.identifier, value);
+  };
+
+  /**
+   * Textinput: 入力値が変更された時の処理。
+   * @param {String|null} newValue
+   */
+  this.handleTextinputChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Textarea: 入力値が変更された時の処理。
+   * @param {String|null} newValue
+   */
+  this.handleTextareaChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Html: 入力値が変更された時の処理。
+   * @param {String|null} newHtml
+   */
+  this.handleHtmlChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Pug: 入力値が変更された時の処理。
+   * @param {String|null} newHtml
+   */
+  this.handlePugChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Numberinput: 入力値が変更された時の処理。
+   * @param {Number|null} newValue
+   */
+  this.handleNumberinputChange = newValue => {
+    // 数値 or undefinedに強制変換。
+    let ret;
+    if (!isNumber_1(newValue)) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Checkbox: 入力値が変更された時の処理。
+   * @param {Boolean} isChecked
+   */
+  this.handleCheckboxChange = isChecked => {
+    change(isChecked);
+  };
+
+  /**
+   * Select: 入力値が変更された時の処理。
+   * @param {Array} newOptions
+   */
+  this.handleSelectChange = newOptions => {
+    const option = find_1$2(newOptions, option => {
+      return option.isSelected;
+    });
+    const value = (option ? option.label : undefined);
+    change(value);
+  };
+
+  /**
+   * Uploader: 入力値が変更された時の処理。
+   * @param {File} newFile
+   */
+  this.handleUploaderChange = newFile => {
+    let ret;
+    if (!newFile) {
+      ret = undefined;
+    } else {
+      ret = newFile;
+    }
+    change(ret);
+  };
+
+  /**
+   * Autocomplete: 入力値が変更された時の処理。
+   * @param {String} newText
+   */
+  this.handleAutocompleteChange = newText => {
+    switch (formObject.type) {
+    case 'string':
+      if (!newText) {
+        newText = undefined;
+      }
+      break;
+    case 'number':
+    case 'integer':
+      // 数値 or undefinedに強制変換。
+      if (!isNumber_1(newText)) {
+        newText = undefined;
+      }
+      break;
+    }
+    change(newText);
+  };
+
+  /**
+   * Wyswyg: 入力値が変更された時の処理。
+   * @param {String|null} newValue
+   */
+  this.handleWyswygChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+};
+
+riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> </div> <div class="Parameters_Form__body"> <div class="Parameters_Form__error" if="{hasError}"> <viron-parameters-popover message="{errors[0]}"></viron-parameters-popover> </div> <virtual if="{uiType === \'textinput\'}"> <viron-textinput val="{opts.val}" iserror="{hasError}" onchange="{handleTextinputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" iserror="{hasError}" onchange="{handleTextareaChange}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" iserror="{hasError}" onchange="{handleNumberinputChange}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="*" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" iserror="{hasError}" onchange="{handleHtmlChange}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" iserror="{hasError}" onchange="{handlePugChange}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" iserror="{hasError}" config="{autocompleteConfig}" onchange="{handleAutocompleteChange}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO</div> </virtual> </div>', '', 'class="Parameters_Form"', function(opts) {
+    this.external(script$24);
+});
+
+var script$25 = function() {
+  // PropertiesObject = typeがobjectであるSchemaObject。
+  const propertiesObject = this.propertiesObject = this.opts.propertiesobject;
+
+  // エラー関連。
+  this.errors = [];
+  this.hasError = false;
+  const validate = () => {
+    this.errors = validator.errors(this.opts.val, objectAssign({
+      required: this.opts.required
+    }, propertiesObject));
+    this.hasError = !!this.errors.length;
+  };
+
+  validate();
+  this.on('update', () => {
+    validate();
+  });
+
+  // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2
+  // primitive typesは"array","boolean","integer","number","null","object","string"の7つと定義されている。
+  /**
+   * Form表示か否かを判定します。
+   * @param {Object} property
+   * @return {Boolean}
+   */
+  this.isFormMode = property => {
+    return contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], property.type);
+  };
+
+  /**
+   * Properties表示か否かを判定します。
+   * @param {Object} property
+   * @return {Boolean}
+   */
+  this.isPropertiesMode = property => {
+    return (property.type === 'object');
+  };
+
+  /**
+   * Items表示か否かを判定します。
+   * @param {Object} property
+   * @return {Boolean}
+   */
+  this.isItemsMode = property => {
+    return (property.type === 'array');
+  };
+
+  /**
+   * 対象keyに対するvalueを返します。
+   * opts.valがundefinedなら返り値もundefinedになります。
+   * @param {String} key
+   * @return {*}
+   */
+  this.getVal = key => {
+    if (!isObject_1(this.opts.val)) {
+      return undefined;
+    }
+    return this.opts.val[key];
+  };
+
+  /**
+   * FormObjectに変換します。
+   * @param {String} key
+   * @param {Object} property
+   * @return {Object}
+   */
+  this.getFormObject = (key, property) => {
+    const ret = deepClone_1(property);
+    ret.name = key;
+    ret.required = contains_1$2(propertiesObject.required, key);
+    return ret;
+  };
+
+  /**
+   * PropertiesObjectに変換します。
+   * @param {String} key
+   * @param {Object} property
+   * @return {Object}
+   */
+  this.getPropertiesObject = (key, property) => {
+    const ret = deepClone_1(property);
+    return ret;
+  };
+
+  /**
+   * SchemaObjectに変換します。
+   * @param {String} key
+   * @param {Object} property
+   * @return {Object}
+   */
+  this.getSchemaObject = (key, property) => {
+    const ret = deepClone_1(property);
+    return ret;
+  };
+
+  /**
+   * 指定keyがrequiredか否か調べます。
+   * @param {String} key
+   * @return {Boolean}
+   */
+  this.getRequired = key => {
+    return contains_1$2(propertiesObject.required, key);
+  };
+
+  /**
+   * 横幅いっぱいに表示するか否か調べます。
+   * @param {String} key
+   * @param {Object} property
+   * @return {Boolean}
+   */
+  this.isWide = (key, property) => {
+    if (contains_1$2(['array', 'object'], property.type)) {
+      return true;
+    }
+    const formObject = this.getFormObject(key, property);
+    return util.isWide(formObject);
+  };
+
+  /**
+   * 各propertyが変更された時の処理。
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handlePropertyChange = (key, newVal) => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    let ret = this.opts.val || {};
+    ret[key] = newVal;
+    // 値がundefinedのkeyを削除する。
+    forOwn_1$2(ret, (val, key) => {
+      if (isUndefined(val)) {
+        delete ret[key];
+      }
+    });
+    // TODO: オブジェクトが空の場合はどーする？
+    if (!size_1(ret)) {
+      ret = undefined;
+    }
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+};
+
+riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__error" if="{hasError}"> <viron-parameters-popover message="{errors[0]}"></viron-parameters-popover> </div> <div class="Parameters_Properties__head"> <div class="Parameters_Properties__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> </div> <div class="Parameters_Properties__body"> <div class="Parameters_Properties__item {\'Parameters_Properties__item--wide\': parent.isWide(key, property)}" each="{property, key in propertiesObject.properties}"> <virtual if="{isFormMode(property)}"> <viron-parameters-form no-reorder identifier="{key}" val="{parent.getVal(key)}" formobject="{parent.getFormObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode(property)}"> <viron-parameters-properties no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" required="{parent.getRequired(key)}" propertiesobject="{parent.getPropertiesObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode(property)}"> <viron-parameters-items no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" required="{parent.getRequired(key)}" schemaobject="{parent.getSchemaObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-items> </virtual> </div> </div>', '', 'class="Parameters_Properties"', function(opts) {
+    this.external(script$25);
+});
+
+/**
+     * Appends an array to the end of another.
+     * The first array will be modified.
+     */
+    function append$1(arr1, arr2) {
+        if (arr2 == null) {
+            return arr1;
+        }
+
+        var pad = arr1.length,
+            i = -1,
+            len = arr2.length;
+        while (++i < len) {
+            arr1[pad + i] = arr2[i];
+        }
+        return arr1;
+    }
+    var append_1$1 = append$1;
+
+var script$26 = function() {
+  const schemaObject = this.schemaObject = this.opts.schemaobject;
+  const itemsObject = this.opts.schemaobject.items;
+
+  // ItemsObjectのtype値は"string", "number", "integer", "boolean", "array"のいずれか。
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-8
+  // OAS2.0仕様通りではないが、"object"と"null"も許可する。
+  this.isFormMode = contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], itemsObject.type);
+  this.isPropertiesMode = (itemsObject.type === 'object');
+  this.isItemsMode = (itemsObject.type === 'array');
+  if (this.isFormMode) {
+    const formObject = deepClone_1(itemsObject);
+    this.formObject = formObject;
+  }
+  if (this.isPropertiesMode) {
+    const propertiesObject = deepClone_1(itemsObject);
+    this.propertiesObject = propertiesObject;
+  }
+  if (this.isItemsMode) {
+    const _itemsObject = deepClone_1(itemsObject.items);
+    this.itemsObject = _itemsObject;
+  }
+  // エラー関連。
+  this.errors = [];
+  this.hasError = false;
+  const validate = () => {
+    this.errors = validator.errors(this.opts.val, objectAssign({
+      required: this.opts.required
+    }, schemaObject));
+    this.hasError = !!this.errors.length;
+  };
+
+  validate();
+  this.on('update', () => {
+    validate();
+  });
+
+  /**
+   * item追加ボタンがタップされた時の処理。
+   */
+  this.handleAddButtonTap = () => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    let ret = this.opts.val || [];
+    let newItem = null;
+    // type値によって作成する要素を分ける。
+    // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object
+    // typeは"string", "number", "integer", "boolean", or "array"のいずれかと書いてあるが、"null"と"object"もプラスで想定する。
+    // 追加分は先頭に。
+    if (this.isFormMode) {
+      newItem = undefined;
+    } else if (this.isPropertiesMode) {
+      newItem = {};
+    } else if (this.isItemsMode) {
+      newItem = [];
+    }
+    ret = append_1$1([newItem], ret);
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * item削除ボタンがタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleRemoveButtonTap = e => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    const idx = e.item.idx;
+    let ret = this.opts.val;
+    ret.splice(idx, 1);
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * 各itemが変更された時の処理。
+   * @param {Number} idx
+   * @param {*} newVal
+   */
+  this.handleItemChange = (idx, newVal) => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    const ret = this.opts.val;
+    ret[idx] = newVal;
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+};
+
+riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__error" if="{hasError}"> <viron-parameters-popover message="{errors[0]}"></viron-parameters-popover> </div> <div class="Parameters_Items__addButton" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__openButton">項目を全て開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__removeButton" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" formobject="{parent.formObject}" onchange="{parent.handleItemChange}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" propertiesobject="{parent.propertiesObject}" onchange="{parent.handleItemChange}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" schemaobject="{parent.schemaObject}" onchange="{parent.handleItemChange}"></viron-parameters-items> </virtual> </div> </div> </div>', '', 'class="Parameters_Items"', function(opts) {
+    this.external(script$26);
+});
+
+var script$27 = function() {
+  const parameterObject = this.parameterObject = this.opts.parameterobject;
+
+  // Form関連。
+  this.isFormMode = false;
+  this.formObject = null;
+  // Properties関連。
+  this.isPropertiesMode = false;
+  this.propertiesObject = null;
+  this.propertiesLabel = null;
+  // Items関連。
+  this.isItemsMode = false;
+  this.schemaObject = null;
+  this.itemsLabel = null;
+
+  // 各変数を設定。
+  // `in`の値は"query", "header", "path", "formData", "body"のいずれか。
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
+  if (contains_1$2(['query', 'header', 'path', 'formData'], parameterObject.in)) {
+    // `in`が`body`以外の場合、typeは必ず"string", "number", "integer", "boolean", "array", "fileのいずれかになる。
+    if (contains_1$2(['string', 'number', 'integer', 'boolean', 'file'], parameterObject.type)) {
+      this.isFormMode = true;
+      const formObject = deepClone_1(parameterObject);
+      delete formObject.in;
+      this.formObject = formObject;
+    } else {
+      // typeがarrayの場合。
+      this.isItemsMode = true;
+      const schemaObject = deepClone_1(parameterObject);
+      this.schemaObject = schemaObject;
+      this.itemsLabel = parameterObject.description || parameterObject.name;
+    }
+  } else {
+    // inがbodyの場合。
+    // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2
+    // primitive typesは"array","boolean","integer","number","null","object","string"の7つと定義されている。
+    const schema = parameterObject.schema;
+    if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], schema.type)) {
+      this.isFormMode = true;
+      const formObject = deepClone_1(parameterObject.schema);
+      this.formObject = formObject;
+    } else if (schema.type === 'object') {
+      this.isPropertiesMode = true;
+      const propertiesObject = deepClone_1(schema);
+      this.propertiesObject = propertiesObject;
+      this.propertiesLabel = parameterObject.description || parameterObject.name;
+    } else {
+      // typeがarrayの場合。
+      this.isItemsMode = true;
+      const schemaObject = deepClone_1(schema);
+      this.schemaObject = schemaObject;
+      this.itemsLabel = parameterObject.description || parameterObject.name;
+    }
+  }
+
+  /**
+   * Parameterが変更された時の処理。
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handleValChange = (key, newVal) => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    // keyはopts.parameterObject.nameと同じ。
+    this.opts.onchange(key, newVal);
+  };
+};
+
+riot$1.tag2('viron-parameters-parameter', '<virtual if="{isFormMode}"> <viron-parameters-form formobject="{formObject}" identifier="{parameterObject.name}" val="{opts.val}" onchange="{parent.handleValChange}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameters-properties label="{propertiesLabel}" identifier="{parameterObject.name}" val="{opts.val}" required="{parameterObject.required}" propertiesobject="{propertiesObject}" onchange="{parent.handleValChange}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode}"> <viron-parameters-items label="{itemsLabel}" identifier="{parameterObject.name}" val="{opts.val}" required="{parameterObject.required}" schemaobject="{schemaObject}" onchange="{handleValChange}"></viron-parameters-items> </virtual>', '', 'class="Parameters_Parameter {\'Parameters_Parameter--wide\' : (isPropertiesMode || isItemsMode )}"', function(opts) {
+    this.external(script$27);
+});
+
+var script$28 = function() {
+  /**
+   * 入力値が変更された時の処理。
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handleValChange = (key, newVal) => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    const ret = this.opts.val;
+    ret[key] = newVal;
+    // 値がundefinedのkeyを削除する。
+    forOwn_1$2(ret, (val, key) => {
+      if (isUndefined(val)) {
+        delete ret[key];
+      }
+    });
+    this.opts.onchange(ret);
+  };
+};
+
+riot$1.tag2('viron-parameters', '<viron-parameters-parameter each="{parameterObject in opts.parameterobjects}" val="{parent.opts.val[parameterObject.name]}" parameterobject="{parameterObject}" onchange="{parent.handleValChange}"></viron-parameters-parameter>', '', 'class="Parameters"', function(opts) {
+    this.external(script$28);
+});
+
+var script$29 = function() {
+  const store = this.riotx.get();
+  const operationObject = this.opts.operationObject;
+
+  // 入力値。
+  // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
+  this.val = deepClone_1(this.opts.initialVal || {});
+  // タイトル
+  this.title = operationObject.summary || operationObject.operationId;
+  // submitボタンのラベリング。
+  this.submitLabel = null;
+  // submitボタンのmodifier。
+  this.submitModifier = null;
+  // methodで振り分けます。
+  switch (store.getter('oas.pathItemObjectMethodNameByOperationId', operationObject.operationId)) {
+  case 'get':
+    this.submitLabel = '取得する';
+    break;
+  case 'post':
+    this.submitLabel = '新規作成する';
+    break;
+  case 'put':
+    this.submitLabel = '保存する';
+    break;
+  case 'delete':
+    this.submitLabel = '削除する';
+    this.submitModifier = 'emphasised';
+    break;
+  default:
+    this.submitLabel = '実行する';
+  }
+
+  this.handleCancelTap = () => {
+    this.close();
+  };
+
+  this.handleParametersChange = newValue => {
+    this.val = newValue;
+    this.update();
+  };
+
+  this.handleSubmitTap = () => {
+    Promise
+      .resolve()
+      .then(() => store.action('components.operate', operationObject, this.val))
+      .then(() => {
+        this.close();
+        this.opts.onSuccess();
+      })
+      .catch(err => {
+        if (err.status === 401) {
+          return store.action('modals.add', 'viron-error', {
+            title: '認証切れ'
+          }).then(() => {
+            this.getRouter().navigateTo('/');
+          });
+        }
+        return store.action('modals.add', 'viron-error', {
+          error: err
+        });
+      });
+  };
+};
+
+riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">キャンセル</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" parameterobjects="{opts.operationObject.parameters}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation"', function(opts) {
+    this.external(script$29);
+});
+
+var script$30 = function() {
+  this.val = {};
+
+  this.handleParametersChange = newValue => {
+    this.val = newValue;
+    this.update();
+  };
+};
+
+riot$1.tag2('viron-components-page-search', '<div class="ComponentsPage_Search__head"></div> <div class="ComponentsPage_Search__body"> <viron-parameters val="{val}" parameterobjects="{opts.parameterObjects}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Search__tail"></div>', '', 'class="ComponentsPage_Search"', function(opts) {
+    this.external(script$30);
+});
+
+var script$31 = function() {
+  this.handleTap = () => {
+    this.opts.onselect(this.opts.operation);
+  };
+};
+
+riot$1.tag2('viron-components-page-table-operations-item', '<span>{opts.operation.summary || opts.operation.operationId}</span>', '', 'class="ComponentsPage_Card_Table_Operations_Item" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$31);
+});
+
+var script$32 = function() {
+  this.handleItemSelect = operationObject => {
+    this.close();
+    this.opts.onSelect(operationObject);
+  };
+};
+
+riot$1.tag2('viron-components-page-table-operations', '<viron-components-page-table-operations-item each="{operation in opts.operations}" operation="{operation}" onselect="{handleItemSelect}"></viron-components-page-table-operations-item>', '', 'class="ComponentsPage_Card_Table_Operations"', function(opts) {
+    this.external(script$32);
+});
+
+var script$11 = function() {
+  const store = this.riotx.get();
+
+  /**
+   * OASに従いGETリクエストを送信します。
+   * @return {Promise}
+   */
+  const getData = () => {
+    return Promise
+      .resolve()
+      .then(() => {
+        this.isLoading = true;
+        this.update();
+      })
+      .then(() => store.action('components.get', this.opts.id, this.opts.def))
+      .then(() => {
+        this.isLoading = false;
+        this.update();
+      })
+      .catch(err => {
+        this.isLoading = false;
+        if (err.status === 401) {
+          this.error = '認証エラー。';
+        } else {
+          const api = this.opts.def.api;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
+        }
+        this.update();
+      });
+  };
+
+  /**
+   * レスポンスデータの正当性をチェックします。
+   * @param {Object} data
+   * @return {String|null}
+   */
+  const validate = data => {
+    if (!data) {
+      return 'TODO: エラーメッセージ';
+    }
+    if (!isArray_1$1(data)) {
+      return 'TODO: エラーメッセージ';
+    }
+    if (!data.length) {
+      return 'TODO: エラーメッセージ';
+    }
+    if (!isObject_1(data[0])) {
+      return 'TODO: エラーメッセージ';
+    }
+    return null;
+  };
+
+  /**
+   * 入力フォームを開きます。
+   * @param {Object} operationObject
+   * @param {Object} initialValue
+   */
+  const openOperationDrawer = (operationObject, initialVal) => {
+    store.action('drawers.add', 'viron-components-page-operation', {
+      operationObject,
+      initialVal,
+      onSuccess: () => {
+        getData();
+      }
+    });
+  };
+
+  // 通信レスポンス内容。
+  this.data = null;
+  // テーブルカラム定義。
+  this.columns = [];
+  // テーブルに対するoperation群。
+  this.tableOperations = [];
+  // テーブル行に対するoperation群。
+  this.rowOperations = [];
+  // 行追加operation。
+  this.postOperation = null;
+  // 検索用パラメータ群。
+  this.searchParameters = [];
+  // 通信中か否か。
+  this.isLoading = true;
+  // エラーメッセージ。
+  this.error = null;
+
+  this.listen(this.opts.id, () => {
+    this.data = store.getter('components.response', this.opts.id);
+    this.columns = store.getter('components.columns', this.opts.id);
+    this.tableOperations = store.getter('components.operations', this.opts.id, 'table');
+    this.rowOperations = store.getter('components.operations', this.opts.id, 'row');
+    this.postOperation = store.getter('components.postOperation', this.opts.id, 'table');
+    this.searchParameters = store.getter('components.searchParameters', this.opts.id);
+    this.error = validate(this.data);
+    this.update();
+  });
+
+  this.on('mount', () => {
+    getData();
+  }).on('unmount', () => {
+    store.action('components.remove', this.opts.id);
+  });
+
+  this.handlePostButtonTap = () => {
+    openOperationDrawer(this.postOperation);
+  };
+
+  this.handleSearchButtonTap = () => {
+    store.action('modals.add', 'viron-components-page-search', {
+      parameterObjects: this.searchParameters
+    });
+  };
+
+  this.handleFilterButtonTap = () => {
+    // TODO
+  };
+
+  this.handleReloadButtonTap = () => {
+    getData();
+  };
+
+  this.handleSettingButtonTap = () => {
+    const rect = this.refs.settingIcon.root.getBoundingClientRect();
+    store.action('popovers.add', 'viron-components-page-table-operations', {
+      operations: this.tableOperations,
+      onSelect: operationObject => {
+        openOperationDrawer(operationObject);
+      }
+    }, {
+      x: rect.left + (rect.width / 2),
+      y: rect.bottom,
+      width: 240,
+      direction: 'TR'
+    });
+  };
+
+  this.handleRowTap = () => {
+    // TODO
+  };
+
+  this.handleRowSettingButtonTap = e => {
+    e.stopPropagation();
+    const rowData = e.item.row;
+    const rect = e.currentTarget.getBoundingClientRect();
+    store.action('popovers.add', 'viron-components-page-table-operations', {
+      operations: this.rowOperations,
+      onSelect: operationObject => {
+        const initialVal = {};
+        // ParameterObjectから初期値を推測します。
+        // TODO: 精度up可能か?
+        forEach_1$2(operationObject.parameters || [], parameterObject => {
+          const name = parameterObject.name;
+          const _in = parameterObject.in;
+          if (_in === 'body') {
+            initialVal[name] = {};
+            forOwn_1$2(parameterObject.schema.properties || {}, (val, key) => {
+              // undefinedとnullを省く。
+              if (!isUndefined(rowData[key]) && !isNull_1(rowData[key])) {
+                initialVal[name][key] = rowData[key];
+              }
+            });
+          } else {
+            // undefinedとnullを省く。
+            if (!isUndefined(rowData[name]) && !isNull_1(rowData[name])) {
+              initialVal[name] = rowData[name];
+            }
+          }
+        });
+        openOperationDrawer(operationObject, deepClone_1(initialVal));
+      }
+    }, {
+      x: rect.left + (rect.width / 2),
+      y: rect.bottom,
+      width: 240,
+      direction: 'TR'
+    });
+  };
+};
+
+riot$1.tag2('viron-components-page-table', '<div class="ComponentsPage_Card_Table__head"> <div class="ComponentsPage_Card_Table__headAside"> <div class="ComponentsPage_Card_Table__postOperation" if="{postOperation}" onclick="{getClickHandler(\'handlePostButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePostButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="ComponentsPage_Card_Table__title">{opts.def.name}</div> </div> <div class="ComponentsPage_Card_Table__headAside"> <div class="ComponentsPage_Card_Table__control"> <viron-icon-search if="{searchParameters.length}" onclick="{getClickHandler(\'handleSearchButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchButtonTap\')}"></viron-icon-search> <viron-icon-filter onclick="{getClickHandler(\'handleFilterButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFilterButtonTap\')}"></viron-icon-filter> <viron-icon-reload onclick="{getClickHandler(\'handleReloadButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleReloadButtonTap\')}"></viron-icon-reload> <viron-icon-setting if="{tableOperations.length}" ref="settingIcon" onclick="{getClickHandler(\'handleSettingButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSettingButtonTap\')}"></viron-icon-setting> </div> </div> </div> <div class="ComponentsPage_Card_Table__body" if="{!isLoading}"> <virtual if="{!!error}"> <div class="ComponentsPage_Card_Table__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="ComponentsPage_Card_Table__tableWrapper"> <table class="ComponentsPage_Card_Table__table"> <thead class="ComponentsPage_Card_Table__thead"> <tr class="ComponentsPage_Card_Table__theadRow"> <th class="ComponentsPage_Card_Table__th" each="{column in columns}">{column.description || column.key}</th> <th class="ComponentsPage_Card_Table__th" if="{rowOperations.length}"></th> </tr> </thead> <tbody class="ComponentsPage_Card_Table__tbody"> <tr class="ComponentsPage_Card_Table__tbodyRow" each="{row in data}" onclick="{getClickHandler(\'handleRowTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRowTap\')}"> <td each="{column in columns}" data-is="viron-components-page-table-cell" data="{row[column.key]}"></td> <td class="ComponentsPage_Card_Table__td" if="{rowOperations.length}"> <viron-icon-setting ref="rowSettingIcon" onclick="{getClickHandler(\'handleRowSettingButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRowSettingButtonTap\')}"></viron-icon-setting> </td> </tr> </tbody> </table> </div> </virtual> </div>', '', 'class="ComponentsPage_Card_Table"', function(opts) {
+    this.external(script$11);
+});
+
+var script$33 = function() {
+  this.componentId = getComponentStateName(this._riot_id);
+};
+
+riot$1.tag2('viron-components-page-card', '<div class="ComponentsPage_Card__body"> <div data-is="viron-components-page-{opts.def.style}" id="{componentId}" def="{opts.def}"></div> </div>', '', 'class="ComponentsPage_Card"', function(opts) {
+    this.external(script$33);
+});
+
+var script$34 = function() {
+  const store = this.riotx.get();
+
+  this.components = store.getter('page.componentsInline');
+
+  this.listen('page', () => {
+    this.components = store.getter('page.componentsInline');
+    this.update();
+  });
+};
+
+riot$1.tag2('viron-components-page-inlines', '<div class="ComponentsPage_Inlines__list"> <viron-components-page-card each="{component in components}" def="{component}"></viron-components-page-card> </div>', '', 'class="ComponentsPage_Inlines"', function(opts) {
+    this.external(script$34);
+});
+
+var script$35 = function() {
+  const store = this.riotx.get();
+
+  this.components = store.getter('page.componentsTable');
+  this.listen('page', () => {
+    this.components = store.getter('page.componentsTable');
+    this.update();
+  });
+};
+
+riot$1.tag2('viron-components-page-tables', '<div class="ComponentsPage_Tables__list"> <viron-components-page-card each="{component in components}" def="{component}"></viron-components-page-card> </div>', '', 'class="ComponentsPage_Tables"', function(opts) {
+    this.external(script$35);
+});
+
+var script$36 = function() {
+  const store = this.riotx.get();
+
+  this.name = store.getter('page.name');
+  this.listen('page', () => {
+    this.name = store.getter('page.name');
+    this.update();
+  });
+};
+
+riot$1.tag2('viron-components-page', '<div class="ComponentsPage__name">{name}</div> <div class="ComponentsPage__graphs"></div> <div class="ComponentsPage__inlines"> <viron-components-page-inlines></viron-components-page-inlines> </div> <div class="ComponentsPage__tables"> <viron-components-page-tables></viron-components-page-tables> </div>', '', 'class="ComponentsPage"', function(opts) {
+    this.external(script$36);
+});
+
+var script$37 = function() {};
+
+riot$1.tag2('viron-tag', '<div class="Tag__label">{opts.label}</div>', '', 'class="Tag"', function(opts) {
+    this.external(script$37);
+});
+
+riot$1.tag2('viron-icon-dots', '<svg viewbox="-3614 14066 16 4"> <g transform="translate(-3894 14025)"> <circle cx="2" cy="2" r="2" transform="translate(280 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(286 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(292 41)"></circle> </g> </svg>', '', 'class="icon Icon IconDots {opts.class}"', function(opts) {
+});
+
+var script$40 = function() {
   this.handleTap = () => {
     if (!this.opts.onselect) {
       return;
@@ -16549,10 +29512,10 @@ var script$18 = function() {
 };
 
 riot$1.tag2('viron-button', '<div class="Button__label">{opts.label}</div>', '', 'class="Button Button--{opts.theme || \'primary\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$18);
+    this.external(script$40);
 });
 
-var script$19 = function() {
+var script$41 = function() {
   const store = this.riotx.get();
 
   this.memo = this.opts.endpoint.memo;
@@ -16585,7 +29548,7 @@ var script$19 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-menu-edit', '<div class="EndpointsPage_Endpoint_Menu_Edit__title">エンドポイント編集</div> <div class="EndpointsPage_Endpoint_Menu_Edit__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint_Menu_Edit__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint_Menu_Edit__inputs"> <viron-textarea label="メモ" val="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="EndpointsPage_Endpoint_Menu_Edit__control"> <viron-button label="保存" onselect="{handleSaveButtonSelect}"></viron-button> <viron-button theme="ghost" label="キャンセル" onselect="{handleCancelButtonSelect}"></viron-button> </div>', '', 'class="EndpointsPage_Endpoint_Menu_Edit"', function(opts) {
-    this.external(script$19);
+    this.external(script$41);
 });
 
 var qrious = createCommonjsModule(function (module, exports) {
@@ -18952,7 +31915,7 @@ var qrious = createCommonjsModule(function (module, exports) {
 
 });
 
-var script$20 = function() {
+var script$42 = function() {
   this.on('mount', () => {
     new qrious(objectAssign({}, this.opts.data, {
       element: this.refs.canvas
@@ -18961,10 +31924,10 @@ var script$20 = function() {
 };
 
 riot$1.tag2('viron-qrcode', '<canvas class="Qrcode_canvas" ref="canvas"></canvas>', '', 'class="Qrcode"', function(opts) {
-    this.external(script$20);
+    this.external(script$42);
 });
 
-var script$21 = function() {
+var script$43 = function() {
   const optimizedEndpoint = objectAssign({}, {
     url: this.opts.endpoint.url,
     memo: this.opts.endpoint.memo
@@ -18987,10 +31950,10 @@ var script$21 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-menu-qrcode', '<div class="EndpointsPage_Endpoint_Menu_QRCode__message">モバイル端末にエンドポイントを追加できます。<br>お好きなQRコードリーダーで読み込んで下さい。</div> <div class="EndpointsPage_Endpoint_Menu_QRCode__canvas"> <viron-qrcode data="{data}"></viron-qrcode> </div>', '', 'class="EndpointsPage_Endpoint_Menu_QRCode"', function(opts) {
-    this.external(script$21);
+    this.external(script$43);
 });
 
-var script$16 = function() {
+var script$39 = function() {
   const store = this.riotx.get();
 
   this.handleEditButtonTap = () => {
@@ -19053,61 +32016,16 @@ var script$16 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-menu', '<div onclick="{getClickHandler(\'handleEditButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditButtonTap\')}">編集</div> <div onclick="{getClickHandler(\'handleDeleteButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDeleteButtonTap\')}">削除</div> <div onclick="{getClickHandler(\'handleQRCodeButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleQRCodeButtonTap\')}">QR Code</div> <div onclick="{getClickHandler(\'handleSignoutButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSignoutButtonTap\')}">サインアウト</div>', '', 'class="EndpointsPage_Endpoint_Menu"', function(opts) {
-    this.external(script$16);
+    this.external(script$39);
 });
 
-var script$22 = function() {};
+var script$44 = function() {};
 
 riot$1.tag2('viron-horizontal-rule', '<div class="HorizontalRule__line"></div> <virtual if="{!!opts.label}"> <div class="HorizontalRule__label">{opts.label}</div> <div class="HorizontalRule__line"></div> </virtual>', '', 'class="HorizontalRule"', function(opts) {
-    this.external(script$22);
+    this.external(script$44);
 });
 
-var script$23 = function() {
-  /**
-   * 文字列もしくはnullに変換します。
-   * @param {String|null|undefined} value
-   * @return {String|null}
-   */
-  this.normalizeValue = value => {
-    if (!isString_1(value)) {
-      return null;
-    }
-    return value;
-  };
-
-  this.handleTap = () => {
-    this.refs.input.focus();
-  };
-
-  this.handleFormSubmit = e => {
-    e.preventDefault();
-    if (!this.opts.onchange) {
-      return;
-    }
-    const newVal = this.normalizeValue(this.opts.val);
-    this.opts.onchange(newVal, this.opts.id);
-  };
-
-  // `blur`時にも`change`イベントが発火する。
-  // 不都合な挙動なのでイベント伝播を止める。
-  this.handleInputChange = e => {
-    e.stopPropagation();
-  };
-
-  this.handleInputInput = e => {
-    if (!this.opts.onchange) {
-      return;
-    }
-    const newVal = this.normalizeValue(e.target.value);
-    this.opts.onchange(newVal, this.opts.id);
-  };
-};
-
-riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$23);
-});
-
-var script$24 = function() {
+var script$45 = function() {
   const store = this.riotx.get();
 
   this.mailAddress = '';
@@ -19140,10 +32058,10 @@ var script$24 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<viron-textinput placeholder="mail address" val="{mailAddress}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="password" type="password" val="{password}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button label="ログイン" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
-    this.external(script$24);
+    this.external(script$45);
 });
 
-var script$25 = function() {
+var script$46 = function() {
   const store = this.riotx.get();
 
   this.handleButtonSelect = () => {
@@ -19158,10 +32076,10 @@ var script$25 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-signin-oauth', '<viron-button label="{opts.authtype.provider}" onselect="{handleButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Oauth"', function(opts) {
-    this.external(script$25);
+    this.external(script$46);
 });
 
-var script$26 = function() {
+var script$47 = function() {
   const store = this.riotx.get();
 
   this.isDesktop = store.getter('layout.isDesktop');
@@ -19184,10 +32102,10 @@ var script$26 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint-signin', '<div class="EndpointsPage_Endpoint_Signin__main"> <div class="EndpointsPage_Endpoint_Signin__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint_Signin__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint_Signin__url">url: {opts.endpoint.url}</div> <div class="EndpointsPage_Endpoint_Signin__emails" if="{!!emails.length}"> <viron-endpoints-page-endpoint-signin-email each="{authtype in emails}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-email> </div> <virtual if="{!isDesktop &amp;&amp; !!oauths.length}"> <viron-horizontal-rule label="または"></viron-horizontal-rule> <div class="EndpointsPage_Endpoint_Signin__oauths"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </virtual> </div> <div class="EndpointsPage_Endpoint_Signin__aside" if="{isDesktop &amp;&amp; !!oauths.length}"> <div class="EndpointsPage_Endpoint_Signin__oauthMessage">または、こちらを<br>利用してログイン</div> <div class="EndpointsPage_Endpoint_Signin__oauths"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </div>', '', 'class="EndpointsPage_Endpoint_Signin"', function(opts) {
-    this.external(script$26);
+    this.external(script$47);
 });
 
-var script$15 = function() {
+var script$38 = function() {
   const store = this.riotx.get();
 
   this.handleTap = () => {
@@ -19229,10 +32147,10 @@ var script$15 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page-endpoint', '<viron-icon-dots class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-dots> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="EndpointsPage_Endpoint__name">name: {opts.endpoint.name}</div> <div class="EndpointsPage_Endpoint__description">description: {opts.endpoint.description}</div> <div class="EndpointsPage_Endpoint__memo">memo: {opts.endpoint.memo}</div> <div class="EndpointsPage_Endpoint__url">url: {opts.endpoint.url}</div> <div class="EndpointsPage_Endpoint__version">version: {opts.endpoint.version}</div> <div class="EndpointsPage_Endpoint__token">token: {opts.endpoint.token}</div> <div class="EndpointsPage_Endpoint__theme">theme: {opts.endpoint.color}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div>', '', 'class="card EndpointsPage_Endpoint" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$15);
+    this.external(script$38);
 });
 
-var script$27 = function() {
+var script$48 = function() {
   const store = this.riotx.get();
 
   this.endpoints = store.getter('endpoints.allByOrderFiltered');
@@ -19244,40 +32162,40 @@ var script$27 = function() {
 };
 
 riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__list"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage"', function(opts) {
-    this.external(script$27);
+    this.external(script$48);
 });
 
-var script$28 = function() {};
+var script$49 = function() {};
 
 riot$1.tag2('viron-notfound-page', '<div>Not Found...</div>', '', 'class="NotfoundPage"', function(opts) {
-    this.external(script$28);
+    this.external(script$49);
 });
 
-var script$29 = function() {
+var script$50 = function() {
 };
 
 riot$1.tag2('viron-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {opts.class}"', function(opts) {
-    this.external(script$29);
+    this.external(script$50);
 });
 
-var script$30 = function() {
+var script$51 = function() {
 };
 
 riot$1.tag2('viron-progress-circular', '<div class="ProgressCircular__spinner"> <viron-icon type="loading"></viron-icon> </div>', '', 'class="ProgressCircular"', function(opts) {
-    this.external(script$30);
+    this.external(script$51);
 });
 
-var script$31 = function() {
+var script$52 = function() {
 };
 
 riot$1.tag2('viron-progress-linear', '<div class="ProgressLinear__bar"> <div class="ProgressLinear__particle"></div> <div class="ProgressLinear__particle"></div> </div>', '', 'class="ProgressLinear {\'ProgressLinear--active\' : opts.isactive}"', function(opts) {
-    this.external(script$31);
+    this.external(script$52);
 });
 
 riot$1.tag2('viron-application-blocker', '', '', 'class="Application_Blocker"', function(opts) {
 });
 
-var script$32 = function() {
+var script$53 = function() {
   const store = this.riotx.get();
 
   // `tag` = drawer内に展開されるriot tagインスタンス。
@@ -19285,22 +32203,30 @@ var script$32 = function() {
 
   const fadeIn = () => {
     setTimeout(() => {
-      this.root.classList.add('Drawer--visible');
+      this.isVisible = true;
+      this.update();
     }, 100);
   };
 
   const fadeOut = () => {
-    this.root.classList.remove('Drawer--visible');
+    this.isVisible = false;
+    this.update();
 
     setTimeout(() => {
       store.action('drawers.remove', this.opts.id);
     }, 1000);
   };
 
+  this.layoutType = store.getter('layout.type');
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.update();
+  });
+
   this.on('mount', () => {
     tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
       isDrawer: true,
-      drawerCloser: this.fadeOut
+      drawerCloser: fadeOut
     }, this.opts.tagopts))[0];
     fadeIn();
     window.addEventListener('keydown', this.handleKeyDown);
@@ -19310,17 +32236,19 @@ var script$32 = function() {
     window.removeEventListener('keydown', this.handleKeyDown);
   });
 
-  this.handleTap = e => {
-    if (!e.target.classList.contains('Drawer')) {
-      return;
-    }
+  this.handleTap = () => {
     fadeOut();
+  };
+
+  this.handleFrameTap = e => {
+    // 内部イベントを外部に伝播させない。
+    e.stopPropagation();
   };
 
   this.handleKeyDown = e => {
     switch (e.keyCode) {
     case 27:// Esc
-      this.fadeOut();
+      fadeOut();
       break;
     default:
       break;
@@ -19328,11 +32256,11 @@ var script$32 = function() {
   };
 };
 
-riot$1.tag2('viron-drawer', '<div class="Drawer__frame"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$32);
+riot$1.tag2('viron-drawer', '<div class="Drawer__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme} {isVisible ? \'Drawer--visible\' : \'\'} Drawer--{layoutType}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$53);
 });
 
-var script$33 = function() {
+var script$54 = function() {
   const store = this.riotx.get();
 
   this.drawers = store.getter('drawers.all');
@@ -19344,7 +32272,7 @@ var script$33 = function() {
 };
 
 riot$1.tag2('viron-application-drawers', '<virtual each="{drawers}"> <viron-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}"></viron-drawer> </virtual>', '', 'class="Application_Drawers"', function(opts) {
-    this.external(script$33);
+    this.external(script$54);
 });
 
 riot$1.tag2('viron-icon-arrow-right', '<svg viewbox="-3551.038 14059.998 10.039 16.002"> <path d="M1763.979-16723.969l-7.394-7.4a.291.291,0,0,1-.022-.025l-.381-.383a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.286,0l1.836,1.84a.191.191,0,0,1,0,.277l-5.819,5.822,5.819,5.818a.2.2,0,0,1,0,.287l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1763.979-16723.969Z" transform="translate(-1784.878 -2663.914) rotate(180)"></path> </svg>', '', 'class="icon Icon IconArrowRight {opts.class}"', function(opts) {
@@ -19356,12 +32284,6 @@ riot$1.tag2('viron-icon-menu', '<svg viewbox="-3635 13999.001 24 9.4"> <g transf
 riot$1.tag2('viron-icon-menu-invert', '<svg viewbox="-3595 13999.001 24 9.4"> <g transform="translate(-3317.6 14031.401) rotate(180)"> <rect width="16" height="3" rx="0.4" transform="translate(253.4 29.4)"></rect> <rect class="cls-1" width="16" height="3" rx="0.4" transform="translate(261.4 23)"></rect> </g> </svg>', '', 'class="icon Icon IconMenuInvert {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-search', '<svg viewbox="-3434 14059.999 15.999 16.003"> <path d="M3710.818-13811.056l-3.051-3.05a6.957,6.957,0,0,1-3.768,1.1,7.008,7.008,0,0,1-7-7,7.008,7.008,0,0,1,7-7,7.008,7.008,0,0,1,7,7,6.957,6.957,0,0,1-1.107,3.773l3.051,3.049a.205.205,0,0,1,0,.284l-1.839,1.839a.206.206,0,0,1-.142.058A.206.206,0,0,1,3710.818-13811.056ZM3700-13820a4,4,0,0,0,4,4,4,4,0,0,0,4-4,4,4,0,0,0-4-4A4,4,0,0,0,3700-13820Z" transform="translate(-7131 27887)"></path> </svg>', '', 'class="icon Icon IconSearch {opts.class}"', function(opts) {
-});
-
-riot$1.tag2('viron-icon-square', '<svg viewbox="-3674 14061 15.998 13.998"> <path d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)"></path> </svg>', '', 'class="icon Icon IconSquare {opts.class}"', function(opts) {
-});
-
 riot$1.tag2('viron-icon-arrow-left', '<svg viewbox="-3581 14060.002 10.04 16.002"> <path d="M1793.942-16723.971l-7.4-7.4-.018-.023-.385-.385a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.816a.2.2,0,0,1,0,.287l-1.84,1.84a.2.2,0,0,1-.141.057A.2.2,0,0,1,1793.942-16723.971Z" transform="translate(-5367.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconArrowLeft {opts.class}"', function(opts) {
 });
 
@@ -19371,7 +32293,7 @@ riot$1.tag2('viron-icon-logo', '<svg viewbox="-3675 13992 24 24"> <path d="M13.3
 riot$1.tag2('viron-icon-arrow-up', '<svg viewbox="-3494.002 14063 16.002 10.037"> <path d="M1706.943-16726.971l-5.963-5.963-1.433-1.434a.122.122,0,0,1-.019-.021l-.384-.385a.2.2,0,0,1,0-.283l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.842a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.818a.2.2,0,0,1,0,.281l-1.84,1.842a.2.2,0,0,1-.141.059A.2.2,0,0,1,1706.943-16726.971Z" transform="translate(-20220.914 12363.916) rotate(90)"></path> </svg>', '', 'class="icon Icon IconArrowUp {opts.class}"', function(opts) {
 });
 
-var script$35 = function() {
+var script$56 = function() {
   const store = this.riotx.get();
 
   this.isOpened = false;
@@ -19395,10 +32317,10 @@ var script$35 = function() {
 };
 
 riot$1.tag2('viron-application-menu-group', '<virtual if="{!opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.name}</div> <viron-icon-arrow-up class="Application_Menu_Group__arrow"></viron-icon-arrow-up> </div> <div class="Application_Menu_Group__pages" if="{isOpened}"> <div class="Application_Menu_Group__page" each="{page in opts.group.pages}" onclick="{getClickHandler(\'handlePageTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePageTap\')}">{page.name}</div> </div> </virtual> <virtual if="{opts.group.isIndependent}"> <div class="Application_Menu_Group__head" onclick="{getClickHandler(\'handleIndependentHeadTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleIndependentHeadTap\')}"> <div class="Application_Menu_Group__name">{opts.group.pages[0].name}</div> </div> </virtual>', '', 'class="Application_Menu_Group {\'Application_Menu_Group--open\': isOpened}"', function(opts) {
-    this.external(script$35);
+    this.external(script$56);
 });
 
-var script$36 = function() {
+var script$57 = function() {
   const store = this.riotx.get();
 
   this.closer = () => {
@@ -19418,16 +32340,16 @@ var script$36 = function() {
 };
 
 riot$1.tag2('viron-application-menu', '<div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div>', '', 'class="Application_Menu"', function(opts) {
-    this.external(script$36);
+    this.external(script$57);
 });
 
-var script$37 = function() {};
+var script$58 = function() {};
 
 riot$1.tag2('viron-application-header-autocomplete', '<div>autocomplete!!!</div>', '', 'class="Application_Header_Autocomplete"', function(opts) {
-    this.external(script$37);
+    this.external(script$58);
 });
 
-var script$39 = function() {
+var script$60 = function() {
   const store = this.riotx.get();
 
   this.endpointURL = '';
@@ -19479,10 +32401,10 @@ var script$39 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu-entry', '<div>新しい管理画面を追加する</div> <div class="Application_Header_Menu_Entry__inputs"> <viron-textinput label="エンドポイント" val="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" val="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="追加" onselect="{handleAddButtonSelect}"></viron-button> <viron-button theme="ghost" label="キャンセル" onselect="{handleCancelButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
-    this.external(script$39);
+    this.external(script$60);
 });
 
-var script$38 = function() {
+var script$59 = function() {
   const store = this.riotx.get();
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
@@ -19560,10 +32482,10 @@ var script$38 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu', '<div class="Application_Header_Menu__list"> <div class="Application_Header_Menu__item" each="{action in actions}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}">{action.label}</div> </div>', '', 'class="Application_Header_Menu"', function(opts) {
-    this.external(script$38);
+    this.external(script$59);
 });
 
-var script$34 = function() {
+var script$55 = function() {
   const store = this.riotx.get();
 
   // TOPページか否か。
@@ -19643,13 +32565,10 @@ var script$34 = function() {
 };
 
 riot$1.tag2('viron-application-header', '<div class="Application_Header__item"> <virtual if="{isTopPage}"> <viron-icon-search class="Application_Header__searchIcon" ref="searchIcon" onclick="{getClickHandler(\'handleSearchIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchIconTap\')}"></viron-icon-search> </virtual> <virtual if="{!isTopPage}"> <virtual if="{isMenuOpened}"> <viron-icon-menu onclick="{getClickHandler(\'handleMenuToggleButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuToggleButtonTap\')}"></viron-icon-menu> </virtual> <virtual if="{!isMenuOpened}"> <viron-icon-menu-invert onclick="{getClickHandler(\'handleMenuToggleButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuToggleButtonTap\')}"></viron-icon-menu-invert> </virtual> </virtual> </div> <div class="Application_Header__item" if="{isMobile}"> <div class="Application_Header__thumbnail" riot-style="background-image:url({thumbnail});"></div> </div> <div class="Application_Header__item"> <virtual if="{isTopPage}"> <viron-icon-square class="Application_Header__squareIcon" ref="squareIcon" onclick="{getClickHandler(\'handleSquareIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSquareIconTap\')}"></viron-icon-square> </virtual> <virtual if="{!isTopPage}"> <virtual if="{!isMobile}"> <div class="Application_Header__info"> <div class="Application_Header__name">{name}</div> <viron-icon-arrow-right class="Application_Header__arrow"></viron-icon-arrow-right> <div class="Application_Header__thumbnail" riot-style="background-image:url({thumbnail});"></div> </div> </virtual> </virtual> <viron-icon-dots class="Application_Header__dotsIcon" ref="dotsIcon" onclick="{getClickHandler(\'handleDotsIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDotsIconTap\')}"></viron-icon-dots> </div>', '', 'class="Application_Header"', function(opts) {
-    this.external(script$34);
+    this.external(script$55);
 });
 
-riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
-});
-
-var script$40 = function() {
+var script$61 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -19713,10 +32632,10 @@ var script$40 = function() {
 };
 
 riot$1.tag2('viron-modal', '<div class="Modal__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <viron-icon-close class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"></viron-icon-close> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {isVisible ? \'Modal--visible\' : \'\'} Modal--{opts.modalopts.theme} Modal--{layoutType} {opts.modalopts.isSpread ? \'Modal--spread\': \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$40);
+    this.external(script$61);
 });
 
-var script$41 = function() {
+var script$62 = function() {
   const store = this.riotx.get();
 
   this.modals = store.getter('modals.all');
@@ -19727,13 +32646,13 @@ var script$41 = function() {
 };
 
 riot$1.tag2('viron-application-modals', '<virtual each="{modals}"> <viron-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" modalopts="{modalOpts}"></viron-modal> </virtual>', '', 'class="Application_Modals"', function(opts) {
-    this.external(script$41);
+    this.external(script$62);
 });
 
 // Mouse系かTouch系か。
 const isTouchEventSupported$1 = 'ontouchstart' in document;
 
-var script$42 = function() {
+var script$63 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -19829,10 +32748,10 @@ var script$42 = function() {
 };
 
 riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
-    this.external(script$42);
+    this.external(script$63);
 });
 
-var script$43 = function() {
+var script$64 = function() {
   const store = this.riotx.get();
 
   this.popovers = store.getter('popovers.all');
@@ -19843,19 +32762,19 @@ var script$43 = function() {
 };
 
 riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <viron-popover id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover> </virtual>', '', 'class="Application_Popovers"', function(opts) {
-    this.external(script$43);
+    this.external(script$64);
 });
 
-var script$44 = function() {};
+var script$65 = function() {};
 
 riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
-    this.external(script$44);
+    this.external(script$65);
 });
 
 riot$1.tag2('viron-application-splash', '<div>TODO</div>', '', 'class="Application_Splash"', function(opts) {
 });
 
-var script$45 = function() {
+var script$66 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -19897,10 +32816,10 @@ var script$45 = function() {
 };
 
 riot$1.tag2('viron-toast', '<div class="Toast__icon">TODO</div> <div class="Toast__message">{opts.message}</div> <div class="Toast__link" if="{!!opts.link}" onclick="{getClickHandler(\'handleLinkTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLinkTap\')}">{opts.linktext}</div>', '', 'class="Toast Toast--{opts.type}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$45);
+    this.external(script$66);
 });
 
-var script$46 = function() {
+var script$67 = function() {
   const store = this.riotx.get();
 
   this.toasts = store.getter('toasts.all');
@@ -19912,23 +32831,23 @@ var script$46 = function() {
 };
 
 riot$1.tag2('viron-application-toasts', '<virtual each="{toasts}"> <viron-toast id="{id}" type="{type}" message="{message}" autohide="{autoHide}" timeout="{timeout}" link="{link}" linktext="{linkText}"></viron-toast> </virtual>', '', 'class="Application_Toasts"', function(opts) {
-    this.external(script$46);
+    this.external(script$67);
 });
 
 /**
      * Get current time in miliseconds
      */
-    function now(){
+    function now$1(){
         // yes, we defer the work to another function to allow mocking it
         // during the tests
-        return now.get();
+        return now$1.get();
     }
 
-    now.get = (typeof Date.now === 'function')? Date.now : function(){
+    now$1.get = (typeof Date.now === 'function')? Date.now : function(){
         return +(new Date());
     };
 
-    var now_1 = now;
+    var now_1 = now$1;
 
 /**
      */
@@ -19960,7 +32879,7 @@ riot$1.tag2('viron-application-toasts', '<virtual each="{toasts}"> <viron-toast 
 
     var throttle_1 = throttle;
 
-var script$48 = function() {
+var script$69 = function() {
   const updateText = () => {
     const json = JSON.stringify(this.opts.data, undefined, 4);
     let text = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -19990,10 +32909,10 @@ var script$48 = function() {
 };
 
 riot$1.tag2('viron-prettyprint', '<pre class="PrettyPrint__pre" ref="canvas"></pre>', '', 'class="PrettyPrint {opts.class}"', function(opts) {
-    this.external(script$48);
+    this.external(script$69);
 });
 
-var script$49 = function() {
+var script$70 = function() {
   // タイプ。
   this.type = this.opts.type || 'info';
   // iconの種類。
@@ -20058,295 +32977,10 @@ var script$49 = function() {
 };
 
 riot$1.tag2('viron-message', '<div class="Message__head"> <div class="Message__icon"> <viron-icon type="{icon}"></viron-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message}">{message}</div> <viron-prettyprint class="Message__error" if="{!!detail}" data="{detail}"></viron-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
-    this.external(script$49);
+    this.external(script$70);
 });
 
-var script$50 = function() {
-  this.handleDeleteButtonClick = () => {
-    this.opts.onConfirm();
-    this.close();
-  };
-
-  this.handleCancelButtonClick = () => {
-    this.close();
-  };
-};
-
-riot$1.tag2('viron-application-confirm', '<div class="Application__confirmHead"> <div class="Application__confirmTitle">エンドポイント削除</div> <div class="Application__confirmDescription">全てのエンドポイントが削除されます。個別に削除したい場合は各エンドポイントカード内の削除ボタンから行って下さい。</div> </div> <div class="Application__confirmTail"> <viron-button label="全て削除する" type="emphasis" onclick="{handleDeleteButtonClick}"></viron-button> <viron-button label="キャンセル" onclick="{handleCancelButtonClick}"></viron-button> </div>', '', 'class="Application__confirm"', function(opts) {
-    this.external(script$50);
-});
-
-var script$51 = function() {
-  this.handleClick = () => {
-    if (this.opts.isdisabled) {
-      return;
-    }
-    this.opts.onclick && this.opts.onclick(this.opts.id);
-  };
-};
-
-riot$1.tag2('viron-button_', '<div class="Button__content"> <div class="Button__icon" if="{!!opts.icon}"> <viron-icon type="{opts.icon}"></viron-icon> </div> <div class="Button__label">{opts.label}</div> </div>', '', 'class="Button Button--{opts.type || \'primary\'} {opts.class} {opts.isdisabled ? \'Button--disabled\' : \'\'}" onclick="{handleClick}"', function(opts) {
-    this.external(script$51);
-});
-
-var script$52 = function() {
-  /**
-   * undefined等の値を考慮した最適な値を返します。
-   * @param {String|null} value
-   * @return {String|null}
-   */
-  this.normalizeValue = value => {
-    if (!isString_1(value)) {
-      return null;
-    }
-    return value;
-  };
-
-  this.on('mount', () => {
-    this.refs.input.value = this.normalizeValue(this.opts.text);
-    this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
-  }).on('updated', () => {
-    const text = this.opts.text;
-    if (!isString_1(text)) {
-      this.refs.input.value = this.normalizeValue(text);
-    }
-  });
-
-  this.handleClick = () => {
-    this.refs.form.focus();
-  };
-
-  this.handleFormSubmit = e => {
-    e.preventDefault();
-    this.opts.onchange && this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
-  };
-
-  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
-  // そのため、`input`イベントを積極的に使用する。
-  this.handleInputInput = e => {
-    e.preventUpdate = true;
-    this.opts.onchange && this.opts.onchange(this.normalizeValue(e.target.value), this.opts.id);
-  };
-
-  this.handleInputChange = e => {
-    // `blur`時に`change`イベントが発火する。
-    // 不都合な挙動なのでイベント伝播を止める。
-    e.stopPropagation();
-  };
-};
-
-riot$1.tag2('viron-textinputtt', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.text)}" placeholder="{opts.placeholder || \'\'}" pattern="{opts.pattern}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--ghost\' : (opts.theme === \'ghost\'), \'Textinput--disabled\' : opts.isdisabled}" onclick="{handleClick}"', function(opts) {
-    this.external(script$52);
-});
-
-var script$53 = function() {
-  /**
-   * undefined等の値を考慮した最適な値を返します。
-   * @param {String|null} value
-   * @return {String|null}
-   */
-  this.normalizeValue = value => {
-    if (!isString_1(value)) {
-      return null;
-    }
-    return value;
-  };
-
-  this.on('mount', () => {
-    this.refs.textarea.value = this.normalizeValue(this.opts.text);
-    this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
-  }).on('updated', () => {
-    const text = this.opts.text;
-    if (!isString_1(text)) {
-      this.refs.textarea.value = this.normalizeValue(text);
-    }
-  });
-
-  this.handleClick = () => {
-    this.refs.form.focus();
-  };
-
-  this.handleFormSubmit = e => {
-    e.preventDefault();
-    this.opts.onchange && this.opts.onchange(this.normalizeValue(this.opts.text), this.opts.id);
-  };
-
-  // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
-  // そのため、`input`イベントを積極的に使用する。
-  this.handleTextareaInput = e => {
-    e.preventUpdate = true;
-    this.opts.onchange && this.opts.onchange(this.normalizeValue(e.target.value), this.opts.id);
-  };
-
-  this.handleTextareaChange = e => {
-    // `blur`時に`change`イベントが発火する。
-    // 不都合な挙動なのでイベント伝播を止める。
-    e.stopPropagation();
-  };
-};
-
-riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__content" ref="form" onsubmit="{handleFormSubmit}"> <textarea class="Textarea__input" ref="textarea" riot-value="{normalizeValue(opts.text)}" maxlength="{opts.maxlength}" placeholder="{opts.placeholder || \'\'}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}"></textarea> </form>', '', 'class="Textarea {\'Textarea--disabled\' : opts.isdisabled}" onclick="{handleClick}"', function(opts) {
-    this.external(script$53);
-});
-
-var script$54 = function() {
-  const store = this.riotx.get();
-
-  this.isExist = false;
-  this.endpointURL = '';
-  this.memo = '';
-
-  this.handleEndpointURLChange = newEndpointURL => {
-    this.endpointURL = newEndpointURL;
-    this.isExist = !!store.getter('endpoints.oneByURL', newEndpointURL);
-    this.update();
-  };
-
-  this.handleMemoChange = newMemo => {
-    this.memo = newMemo;
-    this.update();
-  };
-
-  this.handleRegisterButtonClick = () => {
-    Promise
-      .resolve()
-      .then(() => store.action('endpoints.add', this.endpointURL, this.memo))
-      .then(() => store.action('toasts.add', {
-        message: 'エンドポイントを追加しました。'
-      }))
-      .then(() => {
-        this.close();
-      })
-      .catch(err => {
-        let autoHide = true;
-        let linkText;
-        let link;
-        // サーバが自己証明書を使用している場合にページ遷移を促す。
-        if (this.endpointURL.startsWith('https://')) {
-          autoHide = false;
-          linkText = 'Self-Signed Certificate?';
-          link = this.endpointURL;
-        }
-        store.action('toasts.add', {
-          message: err.message,
-          autoHide,
-          linkText,
-          link
-        });
-      });
-  };
-
-  this.handleCancelButtonClick = () => {
-    this.close();
-  };
-};
-
-riot$1.tag2('viron-application-entry', '<div class="Application__entryTitle">新しい管理画面を作成する</div> <div class="Application__entryMessage" if="{isExist}">そのエンドポイントは既に登録済みです。</div> <div class="Application__entryForm"> <viron-textinput label="エンドポイント" text="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> <viron-textarea label="メモ" text="{memo}" onchange="{handleMemoChange}"></viron-textarea> </div> <div class="Application__entryControls"> <viron-button type="primary" isdisabled="{isExist}" onclick="{handleRegisterButtonClick}" label="新規作成"></viron-button> <viron-button type="secondary" onclick="{handleCancelButtonClick}" label="キャンセル"></viron-button> </div>', '', 'class="Application__entry"', function(opts) {
-    this.external(script$54);
-});
-
-var script$55 = function() {
-  const store = this.riotx.get();
-
-  // ドロップ待受中か否か。
-  this.isWatching = store.getter('application.isDragging');
-  // ドロップ可能な状態か否か。
-  this.isDroppable = false;
-
-  this.listen('application', () => {
-    this.isWatching = store.getter('application.isDragging');
-    this.update();
-  });
-
-  // ドラッグしている要素がドロップ領域に入った時の処理。
-  this.handleDragEnter = e => {
-    e.preventDefault();
-    this.isDroppable = true;
-    this.update();
-  };
-
-  // ドラッグしている要素がドロップ領域にある間の処理。
-  this.handleDragOver = e => {
-    e.preventDefault();
-  };
-
-  // ドラッグしている要素がドロップ領域から出た時の処理。
-  this.handleDragLeave = () => {
-    this.isDroppable = false;
-    this.update();
-  };
-
-  // ドラッグしている要素がドロップ領域にドロップされた時の処理。
-  this.handleDrop = e => {
-    this.isDroppable = false;
-    this.update();
-
-    const endpointKey = e.dataTransfer.getData('text/plain');
-    const newOrder = this.opts.order;
-    Promise
-      .resolve()
-      .then(() => store.action('endpoints.changeOrder', endpointKey, newOrder))
-      .catch(err => store.action('modals.add', 'viron-message', {
-        error: err
-      }));
-  };
-};
-
-riot$1.tag2('viron-application-order-droparea', '<div class="Application__orderDropareaContent"></div> <div class="Application__orderDropareaHandler" ondragenter="{handleDragEnter}" ondragover="{handleDragOver}" ondragleave="{handleDragLeave}" ondrop="{handleDrop}"></div>', '', 'class="Application__orderDroparea {\'Application__orderDroparea--watching\' : isWatching, \'Application__orderDroparea--droppable\' : isDroppable}"', function(opts) {
-    this.external(script$55);
-});
-
-var script$56 = function() {
-  const store = this.riotx.get();
-
-  // ドラッグ開始時の処理。
-  this.handleDragStart = e => {
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', this.opts.endpoint.key);
-
-    Promise
-      .resolve()
-      .then(() => store.action('application.startDrag'))
-      .catch(err => store.action('modals.add', 'viron-message', {
-        error: err
-      }));
-  };
-
-  // ドラッグしている間の処理。
-  this.handleDrag = () => {
-  };
-
-  // ドラッグ終了時の処理。
-  this.handleDragEnd = () => {
-    Promise
-      .resolve()
-      .then(() => store.action('application.endDrag'))
-      .catch(err => store.action('modals.add', 'viron-message', {
-        error: err
-      }));
-  };
-};
-
-riot$1.tag2('viron-application-order-item', '<div class="Application__orderItemHead"> <div class="Application__orderItemThumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> <div class="Application__orderItemName">{opts.endpoint.name || \'-\'}</div> </div> <div class="Application__orderItemBody"> <div class="Application__orderItemUrl"> <div class="Application__orderItemUrlIcon"> <viron-icon type="link"></viron-icon> </div> <div class="Application__orderItemUrlLabel">{opts.endpoint.url}</div> </div> </div>', '', 'class="Application__orderItem" draggable="{true}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}"', function(opts) {
-    this.external(script$56);
-});
-
-var script$57 = function() {
-  const store = this.riotx.get();
-
-  this.endpoints = store.getter('endpoints.allByOrder');
-
-  this.listen('endpoints', () => {
-    this.endpoints = store.getter('endpoints.allByOrder');
-    this.update();
-  });
-};
-
-riot$1.tag2('viron-application-order', '<div class="Application__orderTitle">並び順を変更</div> <div class="Application__orderDescription">ドラッグ&ドロップでエンドポイントの並び順を変更できます。</div> <div class="Application__orderPlayground"> <viron-application-order-droparea order="{0}"></viron-application-order-droparea> <virtual each="{endpoint, idx in endpoints}"> <viron-application-order-item endpoint="{endpoint}"></viron-application-order-item> <viron-application-order-droparea order="{idx + 1}"></viron-application-order-droparea> </virtual> </div>', '', 'class="Application__order"', function(opts) {
-    this.external(script$57);
-});
-
-var script$47 = function() {
+var script$68 = function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter('application.isLaunched');
@@ -20413,110 +33047,10 @@ var script$47 = function() {
   }).on('unmount', () => {
     window.removeEventListener('resize', handleResize);
   });
-
-  this.handleEntryMenuItemClick = () => {
-    Promise
-      .resolve()
-      .then(() => store.action('modals.add', 'viron-application-entry'))
-      .catch(err => store.action('modals.add', 'viron-message', {
-        error: err
-      }));
-  };
-
-  this.handleDownloadMenuItemClick = () => {
-    const endpoints = store.getter('endpoints.allWithoutToken');
-    download(JSON.stringify(endpoints), 'endpoints.json', 'application/json');
-  };
-
-  this.handleFileChange = e => {
-    const inputFile = e.target;
-    const file = inputFile.files[0];
-
-    // ファイルを取得出来たか。
-    if (!file) {
-      inputFile.value = null;
-      return;
-    }
-
-    // ファイルがjsonであるか
-    // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
-    if (!store.getter('ua.isEdge') && file.type !== 'application/json') {
-      store.action('modals.add', 'viron-message', {
-        title: 'エンドポイント追加 失敗',
-        message: 'JSONファイルを指定してください。',
-        type: 'error'
-      });
-      inputFile.value = null;
-      return;
-    }
-
-    // ファイルをテキストとして読み込む。
-    const reader = new FileReader();
-    reader.readAsText(file);
-
-    // 読み込みが失敗した。
-    reader.onerror = err => {
-      store.action('modals.add', 'viron-message', {
-        title: 'エンドポイント追加 失敗',
-        message: 'ファイルの読み込みに失敗しました。',
-        error: err
-      });
-      inputFile.value = null;
-    };
-
-    // 読み込みが成功し、完了した。
-    reader.onload = event => {
-      const text = event.target.result;
-
-      // エンドポイント追加処理開始
-      Promise
-        .resolve()
-        .then(() => {
-          const endpoints = JSON.parse(text);
-          return store.action('endpoints.mergeAll', endpoints);
-        })
-        .then(() => store.action('modals.add', 'viron-message', {
-          title: 'エンドポイント追加',
-          message: 'エンドポイントが一覧に追加されました。'
-        }))
-        .catch(err => store.action('modals.add', 'viron-message', {
-          title: 'エンドポイント追加 失敗',
-          error: err
-        }));
-      // inputしたjsonをリセットする。
-      inputFile.value = null;
-    };
-  };
-
-  this.handleOrderMenuItemClick = () => {
-    store.action('modals.add', 'viron-application-order');
-  };
-
-  this.handleClearMenuItemClick = () => {
-    Promise
-      .resolve()
-      .then(() => store.action('modals.add', 'viron-application-confirm', {
-        onConfirm: () => {
-          store.action('endpoints.removeAll');
-        }
-      }))
-      .catch(err => store.action('modals.add', 'viron-message', {
-        error: err
-      }));
-  };
-
-  this.handleFilterChange = newText => {
-    Promise
-      .resolve()
-      .then(() => store.action('application.updateEndpointFilterText', newText))
-      .catch(err => store.action('modals.add', 'viron-message', {
-        error: err
-      }));
-  };
 };
 
-riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__pageInfo">TODO</div> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
-    this.external(script$47);
+riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main"> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-progress-linear isactive="{isNavigating || isNetworking}"></viron-progress-linear> <viron-progress-circular if="{isNetworking}"></viron-progress-circular> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
+    this.external(script$68);
 });
 
 // エントリーポイント。
