@@ -1,5 +1,5 @@
-viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--midget': isMidget }")
-  .Parameters_Form__head
+viron-parameters-form.Parameters_Form
+  .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
     .Parameters_Form__title { title }
   .Parameters_Form__body
     virtual(if="{ uiType === 'textinput' }")
@@ -9,7 +9,7 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--midget': isMidg
     virtual(if="{ uiType === 'numberinput' }")
       viron-numberinput(val="{ opts.val }" onChange="{ handleNumberinputChange }")
     virtual(if="{ uiType === 'checkbox' }")
-      viron-checkbox(isChecked="{ opts.val }" onChange="{ handleCheckboxChange }")
+      viron-checkbox(isChecked="{ opts.val }" label="{ title }" onChange="{ handleCheckboxChange }")
     virtual(if="{ uiType === 'select' }")
       viron-select(options="{ getSelectOptions() }" onChange="{ handleSelectChange }")
     virtual(if="{ uiType === 'uploader' }")

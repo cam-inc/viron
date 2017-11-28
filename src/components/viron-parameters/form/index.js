@@ -2,102 +2,23 @@ import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
-
-const UI_TEXTINPUT = 'textinput';
-const UI_TEXTAREA = 'textarea';
-const UI_HTML = 'html';
-const UI_NUMBERINPUT = 'numberinput';
-const UI_CHECKBOX = 'checkbox';
-const UI_SELECT = 'select';
-const UI_DATEPICKER = 'datepicker';// eslint-disable-line no-unused-vars
-const UI_UPLOADER = 'uploader';
-const UI_WYSWYG = 'wyswyg';
-const UI_PUG = 'pug';
-const UI_NULL = 'null';
-const UI_AUTOCOMPLETE = 'autocomplete';
+import util from '../util';
 
 export default function() {
   // ショートカット。
-  const data = this.opts.formobject;
+  const formObject = this.opts.formobject;
   // 入力フォームのタイトル。
   // 入力必須ならば米印を付ける。
-  this.title = data.description || data.name;
-  if (data.required) {
+  this.title = formObject.description || formObject.name;
+  if (formObject.required) {
     this.title = `${this.title} *`;
   }
   // autocomplete設定。
-  this.autocompleteConfig = data['x-autocomplete'];
+  this.autocompleteConfig = formObject['x-autocomplete'];
 
   // 入力に使用するUIコンポーネント名。
-  // opts.dataの値から適切なUIコンポーネントを推測します。
-  this.uiType = (() => {
-    // typeが`array`や`object`の時にform.tagが使用されることは無い。
-    // @see: http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
-    // 選択肢があるとき。
-    if (!!data.enum) {
-      return UI_SELECT;
-    }
-    // autocomplete有効時。
-    if (!!data['x-autocomplete']) {
-      return UI_AUTOCOMPLETE;
-    }
-    const type = data.type;
-    const format = data.format;
-    switch (type) {
-    case 'string':
-      switch (format) {
-      case 'date-time':
-        //return UI_DATEPICKER;
-        return UI_TEXTINPUT;
-      case 'multiline':
-        return UI_TEXTAREA;
-      case 'wyswyg':
-        return UI_WYSWYG;
-      case 'pug':
-        return UI_PUG;
-      case 'html':
-        return UI_HTML;
-      default:
-        return UI_TEXTINPUT;
-      }
-    case 'number':
-    case 'integer':
-      return UI_NUMBERINPUT;
-    case 'boolean':
-      return UI_CHECKBOX;
-    case 'file':
-      return UI_UPLOADER;
-    case 'null':
-      return UI_NULL;
-    default:
-      // OpenAPI Documentが正しければ処理がここに来ることはない。
-      break;
-    }
-  })();
-
-  // 表示タイプ。display値に使用される。
-  this.isMidget = false;
-  switch (this.uiType) {
-  case UI_TEXTINPUT:
-  case UI_NUMBERINPUT:
-  case UI_CHECKBOX:
-  case UI_SELECT:
-  case UI_DATEPICKER:
-  case UI_UPLOADER:
-  case UI_NULL:
-  case UI_AUTOCOMPLETE:
-    this.isMidget = true;
-    break;
-  case UI_TEXTAREA:
-  case UI_HTML:
-  case UI_WYSWYG:
-  case UI_PUG:
-    this.isMidget = false;
-    break;
-  default:
-    this.isMidget = false;
-    break;
-  }
+  // opts.formObjectの値から適切なUIコンポーネントを推測します。
+  this.uiType = util.getUIType(formObject);
 
   /**
    * Selectコンポーネントの選択肢を返します。
@@ -112,7 +33,7 @@ export default function() {
         isDiabled: true
       });
     }
-    forEach(data.enum, (v, idx) => {
+    forEach(formObject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
         label: v,
@@ -247,7 +168,7 @@ export default function() {
    * @param {String} newText
    */
   this.handleAutocompleteChange = newText => {
-    switch (data.type) {
+    switch (formObject.type) {
     case 'string':
       if (!newText) {
         newText = undefined;

@@ -1,11 +1,11 @@
 .Parameters {
-  display: block;
+  display: grid;
+  grid-column-gap: 24px;
+  grid-row-gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-auto-rows: auto;
 
-  & .Parameters_Parameter {
-    margin-bottom: 32px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
+  & .Parameters_Parameter--wide {
+    grid-column: 1 / -1;
   }
 }

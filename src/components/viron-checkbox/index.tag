@@ -1,5 +1,5 @@
 viron-checkbox.Checkbox(class="{ 'Checkbox--checked': opts.ischecked }" onTap="{ handleTap }")
-  .Checkbox__conent
+  .Checkbox__content
     .Checkbox__mark
       viron-icon-check
     .Checkbox__label(if="{ !!opts.label }") { opts.label }

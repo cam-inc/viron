@@ -4,6 +4,7 @@ import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
+import util from '../util';
 
 export default function() {
   // PropertiesObject = typeがobjectであるSchemaObject。
@@ -70,7 +71,7 @@ export default function() {
    * @param {Object} property
    * @return {Object}
    */
-  this.getProperiesObject = (key, property) => {
+  this.getPropertiesObject = (key, property) => {
     const ret = deepClone(property);
     return ret;
   };
@@ -93,6 +94,20 @@ export default function() {
    */
   this.getRequired = key => {
     return contains(propertiesObject.required, key);
+  };
+
+  /**
+   * 横幅いっぱいに表示するか否か調べます。
+   * @param {String} key
+   * @param {Object} property
+   * @return {Boolean}
+   */
+  this.isWide = (key, property) => {
+    if (contains(['array', 'object'], property.type)) {
+      return true;
+    }
+    const formObject = this.getFormObject(key, property);
+    return util.isWide(formObject);
   };
 
   /**

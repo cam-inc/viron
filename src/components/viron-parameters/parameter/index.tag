@@ -1,4 +1,4 @@
-viron-parameters-parameter.Parameters_Parameter
+viron-parameters-parameter.Parameters_Parameter(class="{ 'Parameters_Parameter--wide' : (isPropertiesMode || isItemsMode ) }")
   virtual(if="{ isFormMode }")
     viron-parameters-form(formObject="{ formObject }" identifier="{ parameterObject.name }" val="{ opts.val }" onChange="{ parent.handleValChange }")
   virtual(if="{ isPropertiesMode }")
