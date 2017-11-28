@@ -28966,6 +28966,20 @@ riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__e
     }
     var append_1$1 = append$1;
 
+/**
+     * Iterates over a callback a set amount of times
+     */
+    function times(n, callback, thisObj){
+        var i = -1;
+        while (++i < n) {
+            if ( callback.call(thisObj, i) === false ) {
+                break;
+            }
+        }
+    }
+
+    var times_1 = times;
+
 var script$26 = function() {
   const schemaObject = this.schemaObject = this.opts.schemaobject;
   const itemsObject = this.opts.schemaobject.items;
@@ -28998,10 +29012,25 @@ var script$26 = function() {
     this.hasError = !!this.errors.length;
   };
 
+  // itemの開閉状態。
+  this.itemsOpened = [];
+  times_1((this.opts.val || []).length, idx => {
+    this.itemsOpened[idx] = false;
+  });
+
   validate();
   this.on('update', () => {
     validate();
   });
+
+  /**
+   * 指定idxのitemの開閉状態を調べます。
+   * @param {Number} idx
+   * @return {Boolean}
+   */
+  this.isItemOpened = idx => {
+    return this.itemsOpened[idx];
+  };
 
   /**
    * item追加ボタンがタップされた時の処理。
@@ -29024,7 +29053,19 @@ var script$26 = function() {
       newItem = [];
     }
     ret = append_1$1([newItem], ret);
+    this.itemsOpened = append_1$1([true], this.itemsOpened);
+    this.update();
     this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * 全てのアイテムを開くボタンがタップされた時の処理。
+   */
+  this.handleOpenAllButtonTap = () => {
+    this.itemsOpened = map_1$1(this.itemsOpened, () => {
+      return true;
+    });
+    this.update();
   };
 
   /**
@@ -29038,8 +29079,31 @@ var script$26 = function() {
     const idx = e.item.idx;
     let ret = this.opts.val;
     ret.splice(idx, 1);
+    this.itemsOpened.splice(idx, 1);
+    this.update();
     this.opts.onchange(this.opts.identifier, ret);
   };
+
+  /**
+   * とじるボタンがタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleCloseButtonTap = e => {
+    const idx = e.item.idx;
+    this.itemsOpened[idx] = !this.itemsOpened[idx];
+    this.update();
+  };
+
+  /**
+   * 簡易表示要素がタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleItemBriefTap = e => {
+    const idx = e.item.idx;
+    this.itemsOpened[idx] = true;
+    this.update();
+  };
+
 
   /**
    * 各itemが変更された時の処理。
@@ -29056,7 +29120,7 @@ var script$26 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__error" if="{hasError}"> <viron-parameters-popover message="{errors[0]}"></viron-parameters-popover> </div> <div class="Parameters_Items__addButton" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__openButton">項目を全て開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__removeButton" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" formobject="{parent.formObject}" onchange="{parent.handleItemChange}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" propertiesobject="{parent.propertiesObject}" onchange="{parent.handleItemChange}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" schemaobject="{parent.schemaObject}" onchange="{parent.handleItemChange}"></viron-parameters-items> </virtual> </div> </div> </div>', '', 'class="Parameters_Items"', function(opts) {
+riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__error" if="{hasError}"> <viron-parameters-popover message="{errors[0]}"></viron-parameters-popover> </div> <div class="Parameters_Items__addButton" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__openButton" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">項目をすべて開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__removeButton" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" formobject="{parent.formObject}" onchange="{parent.handleItemChange}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" propertiesobject="{parent.propertiesObject}" onchange="{parent.handleItemChange}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" schemaobject="{parent.schemaObject}" onchange="{parent.handleItemChange}"></viron-parameters-items> </virtual> </div> <div class="Parameters_Items__itemTail"> <div class="Parameters_Items__removeButton" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <div class="Parameters_Items__closeButtonLabel">とじる</div> <viron-icon-check></viron-icon-check> </div> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div>TODO: 簡略版</div> </div> </div> </div>', '', 'class="Parameters_Items"', function(opts) {
     this.external(script$26);
 });
 
