@@ -1,4 +1,4 @@
-viron-html.Html
+viron-html.Html(class="{ 'Html--disabled': opts.isdisabled, 'Html--error': opts.haserror }")
   .Html__tabs
     .Html__tab(class="{ 'Html__tab--selected': isEditorMode }" onTap="{ handleEditorTabTap }") エディタ
     .Html__tab(class="{ 'Html__tab--selected': isPreviewMode }" onTap="{ handlePreviewTabTap }") プレビュー

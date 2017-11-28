@@ -26,4 +26,10 @@
     height: 16px;
     margin: auto;
   }
+
+  &--error {
+    & .Select__form {
+      border-color: var(--color-base-red);
+    }
+  }
 }

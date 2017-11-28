@@ -1,4 +1,4 @@
-viron-pug.Pug
+viron-pug.Pug(class="{ 'Pug--disabled': opts.isdisabled, 'Pug--error': opts.haserror }")
   .Pug__tabs
     .Pug__tab(class="{ 'Pug__tab--selected': isEditorMode }" onTap="{ handleEditorTabTap }") エディタ
     .Pug__tab(class="{ 'Pug__tab--selected': isPreviewMode }" onTap="{ handlePreviewTabTap }") プレビュー

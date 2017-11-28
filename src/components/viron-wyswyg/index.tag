@@ -1,4 +1,4 @@
-viron-wyswyg.Wyswyg
+viron-wyswyg.Wyswyg(class="{ 'Wyswyg--disabled': opts.isdisabled, 'Wyswyg--error': opts.haserror }")
   .Wyswyg__editor(ref="editor")
 
   script.

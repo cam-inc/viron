@@ -1,4 +1,4 @@
-viron-uploader.Uploader(class="{ 'Uploader--dragWatching' : isDragWatching }" onChange="{ handleChange }")
+viron-uploader.Uploader(class="{ 'Uploader--dragWatching' : isDragWatching, 'Uploader--disabled': opts.isdisabled, 'Uploader--error': opts.haserror }" onChange="{ handleChange }")
   form.Uploader__form(ref="form")
     input.Uploader__input(type="file" id="{ inputId }" accept="{ opts.accept || 'image/*' }" onChange="{ handleFileChange }")
     label.Uploader__label(for="{ inputId }")

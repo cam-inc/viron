@@ -653,8 +653,8 @@ export default {
       return results;
     }
 
-    // 先にtypeチェックだけ済ませておく。
-    let result = results.push(_type(value, schemaObject));
+    // 先にtypeチェックを済ませておく。
+    let result = _type(value, schemaObject);
     if (!result.isValid) {
       return [result];
     }

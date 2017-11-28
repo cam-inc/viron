@@ -3,6 +3,7 @@ import forEach from 'mout/array/forEach';
 import isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
 import util from '../util';
+import validator from '../validator';
 
 export default function() {
   // ショートカット。
@@ -19,6 +20,14 @@ export default function() {
   // 入力に使用するUIコンポーネント名。
   // opts.formObjectの値から適切なUIコンポーネントを推測します。
   this.uiType = util.getUIType(formObject);
+
+  // エラー関連。
+  this.errors = [];
+  this.hasError = false;
+  const validate = () => {
+    this.errors = validator.errors(this.opts.val, formObject);
+    this.hasError = !!this.errors.length;
+  };
 
   /**
    * Selectコンポーネントの選択肢を返します。
@@ -42,6 +51,11 @@ export default function() {
     });
     return options;
   };
+
+  validate();
+  this.on('update', () => {
+    validate();
+  });
 
   /**
    * changeイベントを発火します。

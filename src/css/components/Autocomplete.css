@@ -15,10 +15,16 @@
     border: 1px solid var(--color-base-gray);
     border-radius: 2px;
 
+    &:focus,
     &:hover,
     &hold {
-      background-color: var(--color-base-blue-tertiary);
-      border-color: var(--color-base-blue-secondary);
+      border-color: var(--color-base-blue);
+    }
+  }
+
+  &--error {
+    & .Autocomplete__input {
+      border-color: var(--color-base-red);
     }
   }
 }

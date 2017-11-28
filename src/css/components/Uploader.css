@@ -80,4 +80,10 @@
       background-color: var(--color-base-blue);
     }
   }
+
+  &--error {
+    & .Uploader__label {
+      border-color: var(--color-base-red);
+    }
+  }
 }

@@ -11,7 +11,7 @@
     width: 16px;
     height: 16px;
     background-color: var(--color-base-white);
-    border: 1px solid var(--color-base-black);
+    border: 1px solid var(--color-base-gray);
     border-radius: 2px;
     transition-duration: 100ms;
     transition-property: background-color;
@@ -40,6 +40,12 @@
         opacity: 1;
         transform: scale(1);
       }
+    }
+  }
+
+  &--error {
+    & .Checkbox__mark {
+      border-color: var(--color-base-red);
     }
   }
 }

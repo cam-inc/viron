@@ -1,4 +1,4 @@
-viron-autocomplete.Autocomplete
+viron-autocomplete.Autocomplete(class="{ 'Autocomplete--disabled': opts.isdisabled, 'Autocomplete--error': opts.haserror }")
   .Autocomplete__label(if="{ !!opts.label }") { opts.label }
   form(onSubmit="{ handleFormSubmit }")
     input.Autocomplete__input(type="text" ref="input" list="{ _riot_id }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
