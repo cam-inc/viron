@@ -2,6 +2,8 @@ viron-parameters-form.Parameters_Form
   .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
     .Parameters_Form__title { title }
   .Parameters_Form__body
+    .Parameters_Form__error(if="{ hasError }")
+      viron-parameters-popover(message="{ errors[0].message }")
     virtual(if="{ uiType === 'textinput' }")
       viron-textinput(val="{ opts.val }" isError="{ hasError }" onChange="{ handleTextinputChange }")
     virtual(if="{ uiType === 'textarea' }")
@@ -37,5 +39,6 @@ viron-parameters-form.Parameters_Form
     import '../../../components/viron-textinput/index.tag';
     import '../../../components/viron-uploader/index.tag';
     import '../../../components/viron-wyswyg/index.tag';
+    import '../popover/index.tag';
     import script from './index';
     this.external(script);

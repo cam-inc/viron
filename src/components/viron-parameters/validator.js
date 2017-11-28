@@ -649,17 +649,20 @@ export default {
     const results = [];
 
     // undefinedは未入力扱いなのでvalidate対象にしない。
+    // ただし、required(self)がtrueの場合はエラー。
     if (isUndefined(value)) {
+      if (schemaObject.required) {
+        return ['必須項目です。'];
+      }
       return results;
     }
 
     // 先にtypeチェックを済ませておく。
-    let result = _type(value, schemaObject);
+    // type
+    const result = _type(value, schemaObject);
     if (!result.isValid) {
-      return [result];
+      return [result.message];
     }
-
-    // TODO: self required
 
     // typeは7つのprimitive typesのいずれか。
     // 配列もあり得るがvironでは考慮しない。
