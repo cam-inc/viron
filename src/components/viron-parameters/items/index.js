@@ -1,5 +1,7 @@
 import append from 'mout/array/append';
 import contains from 'mout/array/contains';
+import map from 'mout/array/map';
+import times from 'mout/function/times';
 import deepClone from 'mout/lang/deepClone';
 import ObjectAssign from 'object-assign';
 import validator from '../validator';
@@ -36,10 +38,25 @@ export default function() {
     this.hasError = !!this.errors.length;
   };
 
+  // itemの開閉状態。
+  this.itemsOpened = [];
+  times((this.opts.val || []).length, idx => {
+    this.itemsOpened[idx] = false;
+  });
+
   validate();
   this.on('update', () => {
     validate();
   });
+
+  /**
+   * 指定idxのitemの開閉状態を調べます。
+   * @param {Number} idx
+   * @return {Boolean}
+   */
+  this.isItemOpened = idx => {
+    return this.itemsOpened[idx];
+  };
 
   /**
    * item追加ボタンがタップされた時の処理。
@@ -62,7 +79,19 @@ export default function() {
       newItem = [];
     }
     ret = append([newItem], ret);
+    this.itemsOpened = append([true], this.itemsOpened);
+    this.update();
     this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * 全てのアイテムを開くボタンがタップされた時の処理。
+   */
+  this.handleOpenAllButtonTap = () => {
+    this.itemsOpened = map(this.itemsOpened, () => {
+      return true;
+    });
+    this.update();
   };
 
   /**
@@ -76,8 +105,31 @@ export default function() {
     const idx = e.item.idx;
     let ret = this.opts.val;
     ret.splice(idx, 1);
+    this.itemsOpened.splice(idx, 1);
+    this.update();
     this.opts.onchange(this.opts.identifier, ret);
   };
+
+  /**
+   * とじるボタンがタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleCloseButtonTap = e => {
+    const idx = e.item.idx;
+    this.itemsOpened[idx] = !this.itemsOpened[idx];
+    this.update();
+  };
+
+  /**
+   * 簡易表示要素がタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleItemBriefTap = e => {
+    const idx = e.item.idx;
+    this.itemsOpened[idx] = true;
+    this.update();
+  };
+
 
   /**
    * 各itemが変更された時の処理。
