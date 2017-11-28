@@ -195,6 +195,13 @@ const show = (req, res) => {
               genTableComponent('boolean', 'get', '/formdata/boolean', null, null, ['?']),
             ],
           },
+          {
+            id: 'defaultform',
+            name: 'デフォルト',
+            components: [
+              genTableComponent('デフォルト', 'get', '/default', 'id', null, ['id']),
+            ],
+          },
         ],
         [constant.GROUP_BLOG]: [
           {
