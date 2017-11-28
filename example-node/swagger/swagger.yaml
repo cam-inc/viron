@@ -1596,6 +1596,72 @@ definitions:
         example: 詳細詳細詳細詳細
         type: string
 
+  DefaultFormCollection:
+    items:
+      $ref: '#/definitions/DefaultForm'
+    type: array
+
+  DefaultForm:
+    type: object
+    properties:
+      id:
+        description: id of default
+        example: d1
+        type: string
+      str:
+        description: string
+        example: strrrrr
+        type: string
+        default: default-str
+      bool:
+        description: boolean
+        example: true
+        type: boolean
+        default: true
+      num:
+        description: number
+        example: 99
+        type: number
+        default: 10
+      arr:
+        type: array
+        items:
+          type: object
+          properties:
+            str:
+              description: string
+              example: strrrrr
+              type: string
+              default: default-arr-str
+            bool:
+              description: boolean
+              example: true
+              type: boolean
+              default: false
+            num:
+              description: number
+              example: 99
+              type: number
+              default: 100
+      obj:
+        type: object
+        properties:
+          str:
+            description: string
+            example: strrrrr
+            type: string
+            default: default-obj-str
+          bool:
+            description: boolean
+            example: true
+            type: boolean
+            default: true
+          num:
+            description: number
+            example: 99
+            type: number
+            default: 1000
+
 #################################################
 # paths
 # - APIの一覧
@@ -2811,6 +2877,9 @@ paths:
         name: payload
         required: true
         type: file
+      - in: formData
+        name: text
+        type: string
       consumes:
       - "multipart/form-data"
         #- "application/x-www-form-urlencoded"
@@ -3725,6 +3794,132 @@ paths:
       summary: フォーマット更新
       tags:
       - format
+
+  /default:
+    get:
+      x-swagger-router-controller: default
+      description: デフォルト 一覧
+      operationId: default#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DefaultFormCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: デフォルト 一覧
+      tags:
+      - default
+
+    post:
+      x-swagger-router-controller: default
+      description: デフォルト 作成
+      operationId: default#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/DefaultForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DefaultForm'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: デフォルト 作成
+      tags:
+      - defualt
+
+  /default/{id}:
+    put:
+      x-swagger-router-controller: default
+      description: デフォルト 更新
+      operationId: default#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/DefaultForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DefaultForm'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: デフォルト 更新
+      tags:
+      - default
 
   /multiquery/a:
     get:
