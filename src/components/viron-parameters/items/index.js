@@ -1,9 +1,12 @@
 import append from 'mout/array/append';
 import contains from 'mout/array/contains';
 import deepClone from 'mout/lang/deepClone';
+import ObjectAssign from 'object-assign';
+import validator from '../validator';
 
 export default function() {
-  const itemsObject = this.opts.itemsobject;
+  const schemaObject = this.schemaObject = this.opts.schemaobject;
+  const itemsObject = this.opts.schemaobject.items;
 
   // ItemsObjectのtype値は"string", "number", "integer", "boolean", "array"のいずれか。
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-8
@@ -23,6 +26,20 @@ export default function() {
     const _itemsObject = deepClone(itemsObject.items);
     this.itemsObject = _itemsObject;
   }
+  // エラー関連。
+  this.errors = [];
+  this.hasError = false;
+  const validate = () => {
+    this.errors = validator.errors(this.opts.val, ObjectAssign({
+      required: this.opts.required
+    }, schemaObject));
+    this.hasError = !!this.errors.length;
+  };
+
+  validate();
+  this.on('update', () => {
+    validate();
+  });
 
   /**
    * item追加ボタンがタップされた時の処理。

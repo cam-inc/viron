@@ -2,8 +2,10 @@
 // OAS2.0はJSON Schema SpecのDraft4を使用している。誤って最新Draftを参照しないように注意すること。
 import moment from 'moment';
 import forEach from 'mout/array/forEach';
+import map from 'mout/array/map';
 import reject from 'mout/array/reject';
 import unique from 'mout/array/unique';
+import deepClone from 'mout/lang/deepClone';
 import isArray from 'mout/lang/isArray';
 import isBoolean from 'mout/lang/isBoolean';
 import isInteger from 'mout/lang/isInteger';
@@ -223,7 +225,11 @@ const uniqueItems = (value, constraints) => {
   if (!uniqueItems) {
     return result;
   }
-  if (value.length !== unique(value).length) {
+  if (value.length !== unique(value, (a, b) => {
+    a = JSON.stringify(deepClone(a));
+    b = JSON.stringify(deepClone(b));
+    return (a === b);
+  }).length) {
     result.isValid = false;
     result.message = '内容が重複しない要素で構成して下さい。';
     return result;
@@ -715,8 +721,10 @@ export default {
     results.push(format(value, schemaObject));
 
     // isValid値がfalseの結果だけ返す。
-    return reject(results, result => {
+    return map(reject(results, result => {
       return result.isValid;
+    }), result => {
+      return result.message;
     });
   }
 };

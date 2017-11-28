@@ -3,7 +3,7 @@ viron-parameters-form.Parameters_Form
     .Parameters_Form__title { title }
   .Parameters_Form__body
     .Parameters_Form__error(if="{ hasError }")
-      viron-parameters-popover(message="{ errors[0].message }")
+      viron-parameters-popover(message="{ errors[0] }")
     virtual(if="{ uiType === 'textinput' }")
       viron-textinput(val="{ opts.val }" isError="{ hasError }" onChange="{ handleTextinputChange }")
     virtual(if="{ uiType === 'textarea' }")

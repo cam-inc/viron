@@ -1,5 +1,7 @@
 viron-parameters-items.Parameters_Items
   .Parameters_Items__head
+    .Parameters_Items__error(if="{ hasError }")
+      viron-parameters-popover(message="{ errors[0] }")
     .Parameters_Items__addButton(onTap="{ handleAddButtonTap }")
       viron-icon-plus
     .Parameters_Items__label { opts.label }{ opts.required ? ' *' : '' }
@@ -14,11 +16,12 @@ viron-parameters-items.Parameters_Items
         virtual(if="{ parent.isPropertiesMode }")
           viron-parameters-properties(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" propertiesObject="{ parent.propertiesObject }" onChange="{ parent.handleItemChange }")
         virtual(if="{ parent.isItemsMode }")
-          viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" itemsObject="{ parent.itemsObject }" onChange="{ parent.handleItemChange }")
+          viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" schemaObject="{ parent.schemaObject }" onChange="{ parent.handleItemChange }")
 
   script.
     import '../../../components/icons/viron-icon-plus/index.tag';
     import '../form/index.tag';
+    import '../popover/index.tag';
     import '../properties/index.tag';
     import script from './index';
     this.external(script);
