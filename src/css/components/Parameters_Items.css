@@ -6,16 +6,6 @@
     position: relative;
   }
 
-  &__error {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    width: 0;
-    height: 0;
-    margin: auto;
-  }
-
   &__addButton {
     @apply --layout-center-center;
     flex-shrink: 0;
@@ -43,10 +33,19 @@
     }
   }
 
+  &__headContent {
+    flex-grow: 1;
+  }
+
   &__label {
     @apply --text-truncate;
-    flex-grow: 1;
     font-size: 16px;
+  }
+
+  &__error {
+    @apply --text-truncate;
+    color: var(--color-base-red);
+    margin-top: 4px;
   }
 
   &__openButton {

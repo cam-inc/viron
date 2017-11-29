@@ -1,10 +1,10 @@
 viron-parameters-items.Parameters_Items
   .Parameters_Items__head
-    .Parameters_Items__error(if="{ hasError }")
-      viron-parameters-popover(message="{ errors[0] }")
     .Parameters_Items__addButton(onTap="{ handleAddButtonTap }")
       viron-icon-plus
-    .Parameters_Items__label { opts.label }{ opts.required ? ' *' : '' }
+    .Parameters_Items__headContent
+      .Parameters_Items__label { opts.label }{ opts.required ? ' *' : '' }
+      .Parameters_Items__error(if="{ hasError }") { errors[0] }
     .Parameters_Items__openButton(onTap="{ handleOpenAllButtonTap }") 項目をすべて開く
   .Parameters_Items__body(if="{ !!opts.val && !!opts.val.length }")
     .Parameters_Items__item(each="{ val, idx in opts.val }" class="{ 'Parameters_Items__item--opened': parent.isItemOpened(idx) }")
@@ -31,7 +31,6 @@ viron-parameters-items.Parameters_Items
     import '../../../components/icons/viron-icon-check/index.tag';
     import '../../../components/icons/viron-icon-plus/index.tag';
     import '../form/index.tag';
-    import '../popover/index.tag';
     import '../properties/index.tag';
     import script from './index';
     this.external(script);

@@ -2,16 +2,6 @@
   position: relative;
   display: block;
 
-  &__error {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    width: 0;
-    height: 0;
-    margin: auto;
-  }
-
   &__head {
     @apply --layout-center-start;
     margin-bottom: 8px;
@@ -19,6 +9,11 @@
 
   &__label {
     color: var(--color-base-gray);
+  }
+
+  &__error {
+    margin-bottom: 8px;
+    color: var(--color-base-red);
   }
 
   &__body {

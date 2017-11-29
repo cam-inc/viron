@@ -1,8 +1,7 @@
 viron-parameters-properties.Parameters_Properties
-  .Parameters_Properties__error(if="{ hasError }")
-    viron-parameters-popover(message="{ errors[0] }")
   .Parameters_Properties__head
     .Parameters_Properties__label { opts.label }{ opts.required ? ' *' : '' }
+  .Parameters_Properties__error(if="{ hasError }") { errors[0] }
   .Parameters_Properties__body
     .Parameters_Properties__item(each="{ property, key in propertiesObject.properties }" class="{ 'Parameters_Properties__item--wide': parent.isWide(key, property) }")
       virtual(if="{ isFormMode(property) }")
@@ -16,6 +15,5 @@ viron-parameters-properties.Parameters_Properties
   script.
     import '../form/index.tag';
     import '../items/index.tag';
-    import '../popover/index.tag';
     import script from './index';
     this.external(script);
