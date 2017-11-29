@@ -23108,6 +23108,133 @@ const UI_PUG = 'pug';
 const UI_NULL = 'null';
 const UI_AUTOCOMPLETE = 'autocomplete';
 
+// ParameterObjectに対する処理。
+/**
+ * ParameterObject定義に沿ってデフォルト値をセットします。
+ * @param {Object} parameterObject
+ * @param {Object} val
+ */
+const checkParameterObject = (parameterObject, val) => {
+  const name = parameterObject.name;
+  const _default = parameterObject.default;
+  const required = parameterObject.required;
+  const _in = parameterObject.in;
+  // 値が設定されていればスルー。
+  if (!isUndefined(val[name])) {
+    return;
+  }
+  // defaultが設定されていればそれを使用する。
+  if (!isUndefined(_default)) {
+    val[name] = deepClone_1(_default);
+    return;
+  }
+  // requiredがfalseならスルー。
+  if (!required) {
+    return;
+  }
+  // この時点で、入力必須だけどユーザ未入力な状態。可能な限り初期値を設定する。
+  // inは"query", "header", "path", "formData", "body"のいずれか。
+  if (contains_1$2(['formData', 'header', 'path', 'query'], _in)) {
+    // 初期値設定不可能。
+    return;
+  }
+  // この時点でinは必ず'body'になる。
+  const schema = parameterObject.schema;
+  if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], schema.type)) {
+    // 初期値設定不可能。
+    return;
+  }
+  if (schema.type === 'object') {
+    val[name] = {};
+    generateDefaultProperties(schema, val[name]);
+  }
+  if (schema.type === 'array') {
+    val = [];
+    // 最低要素数が決まっていれば予めその要素数分を生成する。
+    const minItems = schema.minItems;
+    if (isInteger_1(minItems) && minItems > 0) {
+      times_1(minItems, () => {
+        val.push(generateDefaultItem(schema.items));
+      });
+    }
+  }
+};
+
+/**
+ * SchemaObjectのpropertiesを元に初期値を生成して返却します。
+ * @param {Object} schemaObject
+ * @param {Object} val
+ * @return {Object}
+ */
+const generateDefaultProperties = (schemaObject, val) => {
+  if ( val === void 0 ) val = {};
+
+  const properties = schemaObject.properties;
+  const required = schemaObject.required || [];
+  forOwn_1$2(properties, (property, key) => {
+    if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], property.type)) {
+      if (!isUndefined(val[key])) {
+        return;
+      }
+      if (isUndefined(property.default)) {
+        return;
+      }
+      val[key] = property.default;
+    }
+    if (property.type === 'object') {
+      if (!contains_1$2(required, key)) {
+        return;
+      }
+      val[key] = {};
+      generateDefaultProperties(property, val[key]);
+    }
+    if (property.type === 'array') {
+      if (!contains_1$2(required, key)) {
+        return;
+      }
+      val[key] = [];
+      const minItems = property.minItems;
+      if (isInteger_1(minItems) && minItems > 0) {
+        times_1(minItems, () => {
+          val[key].push(generateDefaultItem(property.items));
+        });
+      }
+    }
+  });
+  return val;
+};
+
+/**
+ * ItemsObjectを元に初期値を生成して返却します。
+ * @param {Object|Array<Object>} itemsObject
+ * @return {*}
+ */
+const generateDefaultItem = itemsObject => {
+  if (isArray_1$1(itemsObject)) {
+    itemsObject = itemsObject[0];
+  }
+  if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], itemsObject.type)) {
+    return itemsObject.default;
+  }
+  if (itemsObject.type === 'object' && itemsObject) {
+    return generateDefaultProperties(itemsObject);
+  }
+  if (itemsObject.type === 'array') {
+    if (!itemsObject.required) {
+      return undefined;
+    }
+    const ret = [];
+    const minItems = itemsObject.minItems;
+    if (isInteger_1(minItems) && minItems > 0) {
+      times_1(minItems, () => {
+        ret.push(generateDefaultItem(itemsObject.items));
+      });
+    }
+    return ret;
+  }
+  return undefined;
+};
+
 var util = {
   /**
    * FormObjectから最適なUIタイプを推測します。
@@ -23160,31 +23287,35 @@ var util = {
   },
 
   /**
-   * FormUIを横幅いっぱいに表示するか否かを調べます。
+   * FormUIの横幅スタイルを返します。
    * @param {Object} formObject
-   * @return {Boolean}
+   * @return {String} 'spreadSmall', 'spreadMedium', 'spreadLarge' or 'spreadFull'
    */
-  isWide: formObject => {
+  getSpreadStyle: formObject => {
+    if (!!formObject.enum) {
+      return 'spreadMedium';
+    }
     switch (formObject.type) {
     case 'string':
       switch (formObject.format) {
-
       case 'multiline':
       case 'wyswyg':
       case 'pug':
       case 'html':
-        return true;
+        return 'spreadFull';
       case 'date-time':
+        return 'spreadMedium';
       default:
-        return false;
+        return 'spreadLarge';
       }
     case 'number':
     case 'integer':
+      return 'spreadMedium';
     case 'boolean':
     case 'file':
     case 'null':
     default:
-      return false;
+      return 'spreadSmall';
     }
   },
 
@@ -23198,130 +23329,22 @@ var util = {
     if ( parameterObjects === void 0 ) parameterObjects = [];
     if ( initialVal === void 0 ) initialVal = {};
 
-    // ParameterObjectに対する処理。
-    const checkParameterObject = (parameterObject, val) => {
-      const name = parameterObject.name;
-      const _default = parameterObject.default;
-      const required = parameterObject.required;
-      const _in = parameterObject.in;
-      // 値が設定されていればスルー。
-      if (!isUndefined(val.name)) {
-        return;
-      }
-      // defaultが設定されていればそれを使用する。
-      if (!isUndefined(_default)) {
-        val[name] = deepClone_1(_default);
-        return;
-      }
-      // requiredがfalseならスルー。
-      if (!required) {
-        return;
-      }
-      // この時点で、入力必須だけどユーザ未入力な状態。可能な限り初期値を設定する。
-      // inは"query", "header", "path", "formData", "body"のいずれか。
-      if (contains_1$2(['formData', 'header', 'path', 'query'], _in)) {
-        // 初期値設定不可能。
-        return;
-      }
-      // この時点でinは必ず'body'になる。
-      const schema = parameterObject.schema;
-      if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], schema.type)) {
-        // 初期値設定不可能。
-        return;
-      }
-      if (schema.type === 'object') {
-        val[name] = {};
-        generateDefaultProperties(schema, val[name]);
-      }
-      if (schema.type === 'array') {
-        val = [];
-        // 最低要素数が決まっていれば予めその要素数分を生成する。
-        const minItems = schema.minItems;
-        if (isInteger_1(minItems) && minItems > 0) {
-          times_1(minItems, () => {
-            val.push(generateDefaultItem(schema.items));
-          });
-        }
-      }
-    };
-
-    // SchemaObjectのpropertiesを元に初期値を生成して返却します。
-    // @param {Object} schemaObject
-    // @param {Object} val
-    // @param {Object}
-    const generateDefaultProperties = (schemaObject, val) => {
-      if ( val === void 0 ) val = {};
-
-      const properties = schemaObject.properties;
-      const required = schemaObject.required || [];
-      forOwn_1$2(properties, (property, key) => {
-        if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], property.type)) {
-          if (!isUndefined(val[key])) {
-            return;
-          }
-          if (isUndefined(property.default)) {
-            return;
-          }
-          val[key] = property.default;
-        }
-        if (property.type === 'object') {
-          if (!contains_1$2(required, key)) {
-            return;
-          }
-          val[key] = {};
-          generateDefaultProperties(property, val[key]);
-        }
-        if (property.type === 'array') {
-          if (!contains_1$2(required, key)) {
-            return;
-          }
-          val[key] = [];
-          const minItems = property.minItems;
-          if (isInteger_1(minItems) && minItems > 0) {
-            times_1(minItems, () => {
-              val[key].push(generateDefaultItem(property.items));
-            });
-          }
-        }
-      });
-      return val;
-    };
-
-    // ItemsObjectを元に初期値を生成して返却します。
-    // @param {Object|Array<Object>} itemsObject
-    // @return {*}
-    const generateDefaultItem = itemsObject => {
-      if (isArray_1$1(itemsObject)) {
-        itemsObject = itemsObject[0];
-      }
-      if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], itemsObject.type)) {
-        return itemsObject.default;
-      }
-      if (itemsObject.type === 'object' && itemsObject) {
-        return generateDefaultProperties(itemsObject);
-      }
-      if (itemsObject.type === 'array') {
-        if (!itemsObject.required) {
-          return undefined;
-        }
-        const ret = [];
-        const minItems = itemsObject.minItems;
-        if (isInteger_1(minItems) && minItems > 0) {
-          times_1(minItems, () => {
-            ret.push(generateDefaultItem(itemsObject.items));
-          });
-        }
-        return ret;
-      }
-      return undefined;
-    };
-
     const val = deepClone_1(initialVal);
     forEach_1$2(parameterObjects, parameterObject => {
       checkParameterObject(parameterObject, val);
     });
     return val;
-  }
+  },
+
+  /**
+   * ショートカット: generateDefaultProperties
+   */
+  generateDefaultProperties,
+
+  /**
+   * ショートカット: generateDefaultItem
+   */
+  generateDefaultItem
 
 };
 
@@ -29054,17 +29077,17 @@ var script$25 = function() {
   };
 
   /**
-   * 横幅いっぱいに表示するか否か調べます。
+   * 横幅調整用の文字列を返します。
    * @param {String} key
    * @param {Object} property
-   * @return {Boolean}
+   * @return {String} 'spreadSmall', 'spreadMedium', 'spreadLarge' or 'spreadFull'
    */
-  this.isWide = (key, property) => {
+  this.getSpreadStyle = (key, property) => {
     if (contains_1$2(['array', 'object'], property.type)) {
-      return true;
+      return 'spreadFull';
     }
     const formObject = this.getFormObject(key, property);
-    return util.isWide(formObject);
+    return util.getSpreadStyle(formObject);
   };
 
   /**
@@ -29092,7 +29115,7 @@ var script$25 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__error" if="{hasError}"> <viron-parameters-popover message="{errors[0]}"></viron-parameters-popover> </div> <div class="Parameters_Properties__head"> <div class="Parameters_Properties__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> </div> <div class="Parameters_Properties__body"> <div class="Parameters_Properties__item {\'Parameters_Properties__item--wide\': parent.isWide(key, property)}" each="{property, key in propertiesObject.properties}"> <virtual if="{isFormMode(property)}"> <viron-parameters-form no-reorder identifier="{key}" val="{parent.getVal(key)}" formobject="{parent.getFormObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode(property)}"> <viron-parameters-properties no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" required="{parent.getRequired(key)}" propertiesobject="{parent.getPropertiesObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode(property)}"> <viron-parameters-items no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" required="{parent.getRequired(key)}" schemaobject="{parent.getSchemaObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-items> </virtual> </div> </div>', '', 'class="Parameters_Properties"', function(opts) {
+riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__head"> <div class="Parameters_Properties__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> </div> <div class="Parameters_Properties__error" if="{hasError}">{errors[0]}</div> <div class="Parameters_Properties__body"> <div class="Parameters_Properties__item {\'Parameters_Properties__item--\' + parent.getSpreadStyle(key, property)}" each="{property, key in propertiesObject.properties}"> <virtual if="{isFormMode(property)}"> <viron-parameters-form no-reorder identifier="{key}" val="{parent.getVal(key)}" formobject="{parent.getFormObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode(property)}"> <viron-parameters-properties no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" required="{parent.getRequired(key)}" propertiesobject="{parent.getPropertiesObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode(property)}"> <viron-parameters-items no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" required="{parent.getRequired(key)}" schemaobject="{parent.getSchemaObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-items> </virtual> </div> </div>', '', 'class="Parameters_Properties"', function(opts) {
     this.external(script$25);
 });
 
@@ -29168,6 +29191,90 @@ var script$26 = function() {
   };
 
   /**
+   * 簡易表示のタイトル部を返します。
+   * @param {*} val
+   * @param {Number} idx
+   * @return {String}
+   */
+  this.getBriefItemTitle = (val, idx) => {
+    if (this.isFormMode) {
+      switch (this.formObject.type) {
+      case 'string':
+        return val || '-';
+      case 'number':
+      case 'integer':
+        return isUndefined(val) ? '-' : String(val);
+      case 'boolean':
+        return isBoolean_1(val) ? String(val) : '-';
+      case 'file':
+        return 'file';
+      case 'null':
+        return isNull_1(val) ? 'null' : '-';
+      default:
+        return '-';
+      }
+    }
+    if (this.isPropertiesMode) {
+      // 最初にundefinedではない要素値を使用します。
+      let ret;
+      const properties = this.propertiesObject.properties;
+      const _keys = keys_1$1(properties);
+      forEach_1$2(_keys, key => {
+        if (!isUndefined(ret)) {
+          return;
+        }
+        if (isUndefined(val[key])) {
+          return;
+        }
+        if (isObject_1(val[key])) {
+          ret = '{Object}';
+        } else if (isArray_1$1(val[key])) {
+          ret = '[Array]';
+        } else {
+          ret = String(val[key]);
+        }
+      });
+      if (!ret) {
+        ret = '-';
+      }
+      return ret;
+    }
+    if (this.isItemsMode) {
+      return `[${idx}]`;
+    }
+    return '-';
+  };
+
+  /**
+   * 簡易表示のボディ部を返します。
+   * @param {*} val
+   * @return {String}
+   */
+  this.getBriefItemDescription = val => {
+    if (!this.isPropertiesMode) {
+      return '-';
+    }
+    let ret = '';
+    const properties = this.propertiesObject.properties;
+    const _keys = keys_1$1(properties);
+    forEach_1$2(_keys, key => {
+      const k = properties[key].description || key;
+      let v = '-';
+      if (!isUndefined(val[key])) {
+        if (isObject_1(val[key])) {
+          v = '{Object}';
+        } else if (isArray_1$1(val[key])) {
+          v = '[Array]';
+        } else {
+          v = String(val[key]);
+        }
+      }
+      ret = `${ret} ${k}:${v}`;
+    });
+    return ret;
+  };
+
+  /**
    * item追加ボタンがタップされた時の処理。
    */
   this.handleAddButtonTap = () => {
@@ -29181,14 +29288,14 @@ var script$26 = function() {
     // typeは"string", "number", "integer", "boolean", or "array"のいずれかと書いてあるが、"null"と"object"もプラスで想定する。
     // 追加分は先頭に。
     if (this.isFormMode) {
-      newItem = undefined;
+      newItem = this.formObject.default;
     } else if (this.isPropertiesMode) {
-      newItem = {};
+      newItem = util.generateDefaultProperties(this.propertiesObject);
     } else if (this.isItemsMode) {
       newItem = [];
     }
     ret = append_1$1([newItem], ret);
-    this.itemsOpened = append_1$1([true], this.itemsOpened);
+    this.itemsOpened = append_1$1([false], this.itemsOpened);
     this.update();
     this.opts.onchange(this.opts.identifier, ret);
   };
@@ -29228,7 +29335,7 @@ var script$26 = function() {
    */
   this.handleCloseButtonTap = e => {
     const idx = e.item.idx;
-    this.itemsOpened[idx] = !this.itemsOpened[idx];
+    this.itemsOpened[idx] = false;
     this.update();
   };
 
@@ -29258,7 +29365,7 @@ var script$26 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__error" if="{hasError}"> <viron-parameters-popover message="{errors[0]}"></viron-parameters-popover> </div> <div class="Parameters_Items__addButton" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__openButton" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">項目をすべて開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__removeButton" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" formobject="{parent.formObject}" onchange="{parent.handleItemChange}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" propertiesobject="{parent.propertiesObject}" onchange="{parent.handleItemChange}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" schemaobject="{parent.schemaObject}" onchange="{parent.handleItemChange}"></viron-parameters-items> </virtual> </div> <div class="Parameters_Items__itemTail"> <div class="Parameters_Items__removeButton" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <div class="Parameters_Items__closeButtonLabel">とじる</div> <viron-icon-check></viron-icon-check> </div> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div>TODO: 簡略版</div> </div> </div> </div>', '', 'class="Parameters_Items"', function(opts) {
+riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__addButton" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__headContent"> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__error" if="{hasError}">{errors[0]}</div> </div> <div class="Parameters_Items__openButton" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">項目をすべて開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__removeButton" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" formobject="{parent.formObject}" onchange="{parent.handleItemChange}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" propertiesobject="{parent.propertiesObject}" onchange="{parent.handleItemChange}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" schemaobject="{parent.schemaObject.items}" onchange="{parent.handleItemChange}"></viron-parameters-items> </virtual> </div> <div class="Parameters_Items__itemTail"> <div class="Parameters_Items__removeButton" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <div class="Parameters_Items__closeButtonLabel">とじる</div> <viron-icon-check></viron-icon-check> </div> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div class="Parameters_Items__itemBriefTitle">{parent.getBriefItemTitle(val, idx)}</div> <div class="Parameters_Items__itemBriefDescription" if="{parent.isPropertiesMode}">{parent.getBriefItemDescription(val)}</div> </div> </div> </div>', '', 'class="Parameters_Items"', function(opts) {
     this.external(script$26);
 });
 
@@ -29277,6 +29384,9 @@ var script$27 = function() {
   this.schemaObject = null;
   this.itemsLabel = null;
 
+  // 横幅調整。
+  this.spreadStyle = 'spreadSmall';
+
   // 各変数を設定。
   // `in`の値は"query", "header", "path", "formData", "body"のいずれか。
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
@@ -29287,12 +29397,14 @@ var script$27 = function() {
       const formObject = deepClone_1(parameterObject);
       delete formObject.in;
       this.formObject = formObject;
+      this.spreadStyle = util.getSpreadStyle(formObject);
     } else {
       // typeがarrayの場合。
       this.isItemsMode = true;
       const schemaObject = deepClone_1(parameterObject);
       this.schemaObject = schemaObject;
       this.itemsLabel = parameterObject.description || parameterObject.name;
+      this.spreadStyle = 'spreadFull';
     }
   } else {
     // inがbodyの場合。
@@ -29303,17 +29415,20 @@ var script$27 = function() {
       this.isFormMode = true;
       const formObject = deepClone_1(parameterObject.schema);
       this.formObject = formObject;
+      this.spreadStyle = util.getSpreadStyle(formObject);
     } else if (schema.type === 'object') {
       this.isPropertiesMode = true;
       const propertiesObject = deepClone_1(schema);
       this.propertiesObject = propertiesObject;
       this.propertiesLabel = parameterObject.description || parameterObject.name;
+      this.spreadStyle = 'spreadFull';
     } else {
       // typeがarrayの場合。
       this.isItemsMode = true;
       const schemaObject = deepClone_1(schema);
       this.schemaObject = schemaObject;
       this.itemsLabel = parameterObject.description || parameterObject.name;
+      this.spreadStyle = 'spreadFull';
     }
   }
 
@@ -29331,7 +29446,7 @@ var script$27 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters-parameter', '<virtual if="{isFormMode}"> <viron-parameters-form formobject="{formObject}" identifier="{parameterObject.name}" val="{opts.val}" onchange="{parent.handleValChange}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameters-properties label="{propertiesLabel}" identifier="{parameterObject.name}" val="{opts.val}" required="{parameterObject.required}" propertiesobject="{propertiesObject}" onchange="{parent.handleValChange}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode}"> <viron-parameters-items label="{itemsLabel}" identifier="{parameterObject.name}" val="{opts.val}" required="{parameterObject.required}" schemaobject="{schemaObject}" onchange="{handleValChange}"></viron-parameters-items> </virtual>', '', 'class="Parameters_Parameter {\'Parameters_Parameter--wide\' : (isPropertiesMode || isItemsMode )}"', function(opts) {
+riot$1.tag2('viron-parameters-parameter', '<virtual if="{isFormMode}"> <viron-parameters-form formobject="{formObject}" identifier="{parameterObject.name}" val="{opts.val}" onchange="{parent.handleValChange}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameters-properties label="{propertiesLabel}" identifier="{parameterObject.name}" val="{opts.val}" required="{parameterObject.required}" propertiesobject="{propertiesObject}" onchange="{parent.handleValChange}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode}"> <viron-parameters-items label="{itemsLabel}" identifier="{parameterObject.name}" val="{opts.val}" required="{parameterObject.required}" schemaobject="{schemaObject}" onchange="{handleValChange}"></viron-parameters-items> </virtual>', '', 'class="Parameters_Parameter {\'Parameters_Parameter--\' + spreadStyle}"', function(opts) {
     this.external(script$27);
 });
 
