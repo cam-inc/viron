@@ -1603,6 +1603,9 @@ definitions:
 
   DefaultForm:
     type: object
+    required:
+    - obj
+    - arr
     properties:
       id:
         description: id of default
@@ -1625,6 +1628,7 @@ definitions:
         default: 10
       arr:
         type: array
+        minItems: 3
         items:
           type: object
           properties:
