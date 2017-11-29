@@ -17,7 +17,7 @@ viron-parameters-items.Parameters_Items
           virtual(if="{ parent.isPropertiesMode }")
             viron-parameters-properties(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" propertiesObject="{ parent.propertiesObject }" onChange="{ parent.handleItemChange }")
           virtual(if="{ parent.isItemsMode }")
-            viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" schemaObject="{ parent.schemaObject }" onChange="{ parent.handleItemChange }")
+            viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" schemaObject="{ parent.schemaObject.items }" onChange="{ parent.handleItemChange }")
         .Parameters_Items__itemTail
           .Parameters_Items__removeButton(onTap="{ handleRemoveButtonTap }") この項目を削除
           .Parameters_Items__closeButton(onTap="{ handleCloseButtonTap }")

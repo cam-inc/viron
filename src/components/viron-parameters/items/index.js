@@ -4,6 +4,7 @@ import map from 'mout/array/map';
 import times from 'mout/function/times';
 import deepClone from 'mout/lang/deepClone';
 import ObjectAssign from 'object-assign';
+import util from '../util';
 import validator from '../validator';
 
 export default function() {
@@ -72,11 +73,11 @@ export default function() {
     // typeは"string", "number", "integer", "boolean", or "array"のいずれかと書いてあるが、"null"と"object"もプラスで想定する。
     // 追加分は先頭に。
     if (this.isFormMode) {
-      newItem = undefined;
+      newItem = this.formObject.default;
     } else if (this.isPropertiesMode) {
-      newItem = {};
+      newItem = util.generateDefaultProperties(this.propertiesObject);
     } else if (this.isItemsMode) {
-      newItem = [];
+      newItem = util.generateDefaultItem(this.schemaObject) || [];
     }
     ret = append([newItem], ret);
     this.itemsOpened = append([true], this.itemsOpened);

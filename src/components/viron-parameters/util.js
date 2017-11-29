@@ -20,6 +20,131 @@ const UI_PUG = 'pug';
 const UI_NULL = 'null';
 const UI_AUTOCOMPLETE = 'autocomplete';
 
+// ParameterObjectに対する処理。
+/**
+ * ParameterObject定義に沿ってデフォルト値をセットします。
+ * @param {Object} parameterObject
+ * @param {Object} val
+ */
+const checkParameterObject = (parameterObject, val) => {
+  const name = parameterObject.name;
+  const _default = parameterObject.default;
+  const required = parameterObject.required;
+  const _in = parameterObject.in;
+  // 値が設定されていればスルー。
+  if (!isUndefined(val[name])) {
+    return;
+  }
+  // defaultが設定されていればそれを使用する。
+  if (!isUndefined(_default)) {
+    val[name] = deepClone(_default);
+    return;
+  }
+  // requiredがfalseならスルー。
+  if (!required) {
+    return;
+  }
+  // この時点で、入力必須だけどユーザ未入力な状態。可能な限り初期値を設定する。
+  // inは"query", "header", "path", "formData", "body"のいずれか。
+  if (contains(['formData', 'header', 'path', 'query'], _in)) {
+    // 初期値設定不可能。
+    return;
+  }
+  // この時点でinは必ず'body'になる。
+  const schema = parameterObject.schema;
+  if (contains(['boolean', 'integer', 'number', 'null', 'string'], schema.type)) {
+    // 初期値設定不可能。
+    return;
+  }
+  if (schema.type === 'object') {
+    val[name] = {};
+    generateDefaultProperties(schema, val[name]);
+  }
+  if (schema.type === 'array') {
+    val = [];
+    // 最低要素数が決まっていれば予めその要素数分を生成する。
+    const minItems = schema.minItems;
+    if (isInteger(minItems) && minItems > 0) {
+      times(minItems, () => {
+        val.push(generateDefaultItem(schema.items));
+      });
+    }
+  }
+};
+
+/**
+ * SchemaObjectのpropertiesを元に初期値を生成して返却します。
+ * @param {Object} schemaObject
+ * @param {Object} val
+ * @return {Object}
+ */
+const generateDefaultProperties = (schemaObject, val = {}) => {
+  const properties = schemaObject.properties;
+  const required = schemaObject.required || [];
+  forOwn(properties, (property, key) => {
+    if (contains(['boolean', 'integer', 'number', 'null', 'string'], property.type)) {
+      if (!isUndefined(val[key])) {
+        return;
+      }
+      if (isUndefined(property.default)) {
+        return;
+      }
+      val[key] = property.default;
+    }
+    if (property.type === 'object') {
+      if (!contains(required, key)) {
+        return;
+      }
+      val[key] = {};
+      generateDefaultProperties(property, val[key]);
+    }
+    if (property.type === 'array') {
+      if (!contains(required, key)) {
+        return;
+      }
+      val[key] = [];
+      const minItems = property.minItems;
+      if (isInteger(minItems) && minItems > 0) {
+        times(minItems, () => {
+          val[key].push(generateDefaultItem(property.items));
+        });
+      }
+    }
+  });
+  return val;
+};
+
+/**
+ * ItemsObjectを元に初期値を生成して返却します。
+ * @param {Object|Array<Object>} itemsObject
+ * @return {*}
+ */
+const generateDefaultItem = itemsObject => {
+  if (isArray(itemsObject)) {
+    itemsObject = itemsObject[0];
+  }
+  if (contains(['boolean', 'integer', 'number', 'null', 'string'], itemsObject.type)) {
+    return itemsObject.default;
+  }
+  if (itemsObject.type === 'object' && itemsObject) {
+    return generateDefaultProperties(itemsObject);
+  }
+  if (itemsObject.type === 'array') {
+    if (!itemsObject.required) {
+      return undefined;
+    }
+    const ret = [];
+    const minItems = itemsObject.minItems;
+    if (isInteger(minItems) && minItems > 0) {
+      times(minItems, () => {
+        ret.push(generateDefaultItem(itemsObject.items));
+      });
+    }
+    return ret;
+  }
+  return undefined;
+};
+
 export default {
   /**
    * FormObjectから最適なUIタイプを推測します。
@@ -107,127 +232,21 @@ export default {
    * @return {Object}
    */
   generateInitialVal: (parameterObjects = [], initialVal = {}) => {
-    // ParameterObjectに対する処理。
-    const checkParameterObject = (parameterObject, val) => {
-      const name = parameterObject.name;
-      const _default = parameterObject.default;
-      const required = parameterObject.required;
-      const _in = parameterObject.in;
-      // 値が設定されていればスルー。
-      if (!isUndefined(val[name])) {
-        return;
-      }
-      // defaultが設定されていればそれを使用する。
-      if (!isUndefined(_default)) {
-        val[name] = deepClone(_default);
-        return;
-      }
-      // requiredがfalseならスルー。
-      if (!required) {
-        return;
-      }
-      // この時点で、入力必須だけどユーザ未入力な状態。可能な限り初期値を設定する。
-      // inは"query", "header", "path", "formData", "body"のいずれか。
-      if (contains(['formData', 'header', 'path', 'query'], _in)) {
-        // 初期値設定不可能。
-        return;
-      }
-      // この時点でinは必ず'body'になる。
-      const schema = parameterObject.schema;
-      if (contains(['boolean', 'integer', 'number', 'null', 'string'], schema.type)) {
-        // 初期値設定不可能。
-        return;
-      }
-      if (schema.type === 'object') {
-        val[name] = {};
-        generateDefaultProperties(schema, val[name]);
-      }
-      if (schema.type === 'array') {
-        val = [];
-        // 最低要素数が決まっていれば予めその要素数分を生成する。
-        const minItems = schema.minItems;
-        if (isInteger(minItems) && minItems > 0) {
-          times(minItems, () => {
-            val.push(generateDefaultItem(schema.items));
-          });
-        }
-      }
-    };
-
-    // SchemaObjectのpropertiesを元に初期値を生成して返却します。
-    // @param {Object} schemaObject
-    // @param {Object} val
-    // @param {Object}
-    const generateDefaultProperties = (schemaObject, val = {}) => {
-      const properties = schemaObject.properties;
-      const required = schemaObject.required || [];
-      forOwn(properties, (property, key) => {
-        if (contains(['boolean', 'integer', 'number', 'null', 'string'], property.type)) {
-          if (!isUndefined(val[key])) {
-            return;
-          }
-          if (isUndefined(property.default)) {
-            return;
-          }
-          val[key] = property.default;
-        }
-        if (property.type === 'object') {
-          if (!contains(required, key)) {
-            return;
-          }
-          val[key] = {};
-          generateDefaultProperties(property, val[key]);
-        }
-        if (property.type === 'array') {
-          if (!contains(required, key)) {
-            return;
-          }
-          val[key] = [];
-          const minItems = property.minItems;
-          if (isInteger(minItems) && minItems > 0) {
-            times(minItems, () => {
-              val[key].push(generateDefaultItem(property.items));
-            });
-          }
-        }
-      });
-      return val;
-    };
-
-    // ItemsObjectを元に初期値を生成して返却します。
-    // @param {Object|Array<Object>} itemsObject
-    // @return {*}
-    const generateDefaultItem = itemsObject => {
-      if (isArray(itemsObject)) {
-        itemsObject = itemsObject[0];
-      }
-      if (contains(['boolean', 'integer', 'number', 'null', 'string'], itemsObject.type)) {
-        return itemsObject.default;
-      }
-      if (itemsObject.type === 'object' && itemsObject) {
-        return generateDefaultProperties(itemsObject);
-      }
-      if (itemsObject.type === 'array') {
-        if (!itemsObject.required) {
-          return undefined;
-        }
-        const ret = [];
-        const minItems = itemsObject.minItems;
-        if (isInteger(minItems) && minItems > 0) {
-          times(minItems, () => {
-            ret.push(generateDefaultItem(itemsObject.items));
-          });
-        }
-        return ret;
-      }
-      return undefined;
-    };
-
     const val = deepClone(initialVal);
     forEach(parameterObjects, parameterObject => {
       checkParameterObject(parameterObject, val);
     });
     return val;
-  }
+  },
+
+  /**
+   * ショートカット: generateDefaultProperties
+   */
+  generateDefaultProperties,
+
+  /**
+   * ショートカット: generateDefaultItem
+   */
+  generateDefaultItem
 
 };
