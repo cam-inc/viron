@@ -44,8 +44,8 @@
 
   &__error {
     @apply --text-truncate;
-    color: var(--color-base-red);
     margin-top: 4px;
+    color: var(--color-base-red);
   }
 
   &__openButton {

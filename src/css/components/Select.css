@@ -35,6 +35,7 @@
 
   &--error {
     & .Select__form {
+      background-color: var(--color-base-red-tertiary);
       border-color: var(--color-base-red);
     }
   }

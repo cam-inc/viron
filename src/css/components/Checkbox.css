@@ -45,6 +45,7 @@
 
   &--error {
     & .Checkbox__mark {
+      background-color: var(--color-base-red-tertiary);
       border-color: var(--color-base-red);
     }
   }

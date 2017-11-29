@@ -24,6 +24,7 @@
 
   &--error {
     & .Numberinput__input {
+      background-color: var(--color-base-red-tertiary);
       border-color: var(--color-base-red);
     }
   }
