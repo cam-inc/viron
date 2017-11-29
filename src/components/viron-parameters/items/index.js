@@ -105,6 +105,9 @@ export default function() {
     const idx = e.item.idx;
     let ret = this.opts.val;
     ret.splice(idx, 1);
+    if (!ret.length) {
+      ret = undefined;
+    }
     this.itemsOpened.splice(idx, 1);
     this.update();
     this.opts.onchange(this.opts.identifier, ret);
