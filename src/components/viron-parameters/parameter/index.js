@@ -1,5 +1,6 @@
 import contains from 'mout/array/contains';
 import deepClone from 'mout/lang/deepClone';
+import util from '../util';
 
 export default function() {
   const parameterObject = this.parameterObject = this.opts.parameterobject;
@@ -16,6 +17,9 @@ export default function() {
   this.schemaObject = null;
   this.itemsLabel = null;
 
+  // 横幅調整。
+  this.spreadStyle = 'spreadSmall';
+
   // 各変数を設定。
   // `in`の値は"query", "header", "path", "formData", "body"のいずれか。
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
@@ -26,12 +30,14 @@ export default function() {
       const formObject = deepClone(parameterObject);
       delete formObject.in;
       this.formObject = formObject;
+      this.spreadStyle = util.getSpreadStyle(formObject);
     } else {
       // typeがarrayの場合。
       this.isItemsMode = true;
       const schemaObject = deepClone(parameterObject);
       this.schemaObject = schemaObject;
       this.itemsLabel = parameterObject.description || parameterObject.name;
+      this.spreadStyle = 'spreadFull';
     }
   } else {
     // inがbodyの場合。
@@ -42,17 +48,20 @@ export default function() {
       this.isFormMode = true;
       const formObject = deepClone(parameterObject.schema);
       this.formObject = formObject;
+      this.spreadStyle = util.getSpreadStyle(formObject);
     } else if (schema.type === 'object') {
       this.isPropertiesMode = true;
       const propertiesObject = deepClone(schema);
       this.propertiesObject = propertiesObject;
       this.propertiesLabel = parameterObject.description || parameterObject.name;
+      this.spreadStyle = 'spreadFull';
     } else {
       // typeがarrayの場合。
       this.isItemsMode = true;
       const schemaObject = deepClone(schema);
       this.schemaObject = schemaObject;
       this.itemsLabel = parameterObject.description || parameterObject.name;
+      this.spreadStyle = 'spreadFull';
     }
   }
 

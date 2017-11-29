@@ -114,17 +114,17 @@ export default function() {
   };
 
   /**
-   * 横幅いっぱいに表示するか否か調べます。
+   * 横幅調整用の文字列を返します。
    * @param {String} key
    * @param {Object} property
-   * @return {Boolean}
+   * @return {String} 'spreadSmall', 'spreadMedium', 'spreadLarge' or 'spreadFull'
    */
-  this.isWide = (key, property) => {
+  this.getSpreadStyle = (key, property) => {
     if (contains(['array', 'object'], property.type)) {
-      return true;
+      return 'spreadFull';
     }
     const formObject = this.getFormObject(key, property);
-    return util.isWide(formObject);
+    return util.getSpreadStyle(formObject);
   };
 
   /**

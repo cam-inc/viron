@@ -3,7 +3,7 @@ viron-parameters-properties.Parameters_Properties
     .Parameters_Properties__label { opts.label }{ opts.required ? ' *' : '' }
   .Parameters_Properties__error(if="{ hasError }") { errors[0] }
   .Parameters_Properties__body
-    .Parameters_Properties__item(each="{ property, key in propertiesObject.properties }" class="{ 'Parameters_Properties__item--wide': parent.isWide(key, property) }")
+    .Parameters_Properties__item(each="{ property, key in propertiesObject.properties }" class="{ 'Parameters_Properties__item--' + parent.getSpreadStyle(key, property) }")
       virtual(if="{ isFormMode(property) }")
         viron-parameters-form(no-reorder identifier="{ key }" val="{ parent.getVal(key) }" formObject="{ parent.getFormObject(key, property) }" onChange="{ parent.handlePropertyChange }")
       virtual(if="{ isPropertiesMode(property) }")

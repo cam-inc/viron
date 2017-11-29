@@ -197,31 +197,35 @@ export default {
   },
 
   /**
-   * FormUIを横幅いっぱいに表示するか否かを調べます。
+   * FormUIの横幅スタイルを返します。
    * @param {Object} formObject
-   * @return {Boolean}
+   * @return {String} 'spreadSmall', 'spreadMedium', 'spreadLarge' or 'spreadFull'
    */
-  isWide: formObject => {
+  getSpreadStyle: formObject => {
+    if (!!formObject.enum) {
+      return 'spreadMedium';
+    }
     switch (formObject.type) {
     case 'string':
       switch (formObject.format) {
-
       case 'multiline':
       case 'wyswyg':
       case 'pug':
       case 'html':
-        return true;
+        return 'spreadFull';
       case 'date-time':
+        return 'spreadMedium';
       default:
-        return false;
+        return 'spreadLarge';
       }
     case 'number':
     case 'integer':
+      return 'spreadMedium';
     case 'boolean':
     case 'file':
     case 'null':
     default:
-      return false;
+      return 'spreadSmall';
     }
   },
 
