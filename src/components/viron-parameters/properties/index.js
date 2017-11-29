@@ -4,11 +4,28 @@ import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
+import ObjectAssign from 'object-assign';
 import util from '../util';
+import validator from '../validator';
 
 export default function() {
   // PropertiesObject = typeがobjectであるSchemaObject。
   const propertiesObject = this.propertiesObject = this.opts.propertiesobject;
+
+  // エラー関連。
+  this.errors = [];
+  this.hasError = false;
+  const validate = () => {
+    this.errors = validator.errors(this.opts.val, ObjectAssign({
+      required: this.opts.required
+    }, propertiesObject));
+    this.hasError = !!this.errors.length;
+  };
+
+  validate();
+  this.on('update', () => {
+    validate();
+  });
 
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2
   // primitive typesは"array","boolean","integer","number","null","object","string"の7つと定義されている。
@@ -77,14 +94,14 @@ export default function() {
   };
 
   /**
-   * ItemsObjectに変換します。
+   * SchemaObjectに変換します。
    * @param {String} key
    * @param {Object} property
    * @return {Object}
    */
-  this.getItemsObject = (key, property) => {
+  this.getSchemaObject = (key, property) => {
     const ret = deepClone(property);
-    return ret.items;
+    return ret;
   };
 
   /**

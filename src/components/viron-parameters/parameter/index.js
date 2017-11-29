@@ -13,7 +13,7 @@ export default function() {
   this.propertiesLabel = null;
   // Items関連。
   this.isItemsMode = false;
-  this.itemsObject = null;
+  this.schemaObject = null;
   this.itemsLabel = null;
 
   // 各変数を設定。
@@ -29,8 +29,8 @@ export default function() {
     } else {
       // typeがarrayの場合。
       this.isItemsMode = true;
-      const itemsObject = deepClone(parameterObject.items);
-      this.itemsObject = itemsObject;
+      const schemaObject = deepClone(parameterObject);
+      this.schemaObject = schemaObject;
       this.itemsLabel = parameterObject.description || parameterObject.name;
     }
   } else {
@@ -50,8 +50,8 @@ export default function() {
     } else {
       // typeがarrayの場合。
       this.isItemsMode = true;
-      const itemsObject = deepClone(schema.items);
-      this.itemsObject = itemsObject;
+      const schemaObject = deepClone(schema);
+      this.schemaObject = schemaObject;
       this.itemsLabel = parameterObject.description || parameterObject.name;
     }
   }

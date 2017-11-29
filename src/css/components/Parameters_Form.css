@@ -13,4 +13,14 @@
   &__body {
     position: relative;
   }
+
+  &__error {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    margin: auto;
+  }
 }

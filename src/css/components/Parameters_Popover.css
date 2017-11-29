@@ -1,0 +1,45 @@
+:root {
+  --component-parameters-popover-width: 200px;
+  --component-parameters-popover-arrow-size: 10px;
+  --component-parameters-popover-arrow-color: #900b0b;
+}
+
+.Parameters_Popover {
+  position: relative;
+  display: block;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  transition-duration: 300ms;
+  transition-property: transform, opacity;
+  transform: scale(0.8);
+
+  &__message {
+    position: absolute;
+    bottom: var(--component-parameters-popover-arrow-size);
+    left: calc(-1 * var(--component-parameters-popover-width) / 2);
+    width: var(--component-parameters-popover-width);
+    padding: 18px;
+    font-size: 1.2rem;
+    color: var(--color-base-white);
+    background-color: var(--component-parameters-popover-arrow-color);
+    border-radius: 2px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &__arrow {
+    position: absolute;
+    top: calc(-1 * var(--component-parameters-popover-arrow-size));
+    left: calc(-1 * var(--component-parameters-popover-arrow-size) / 2);
+    width: 0;
+    height: 0;
+    border-color: var(--component-parameters-popover-arrow-color) transparent transparent transparent;
+    border-style: solid;
+    border-width: var(--component-parameters-popover-arrow-size) calc(var(--component-parameters-popover-arrow-size) / 2) 0 calc(var(--component-parameters-popover-arrow-size) / 2);
+  }
+
+  &--visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
