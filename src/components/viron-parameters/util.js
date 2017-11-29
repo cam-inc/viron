@@ -114,7 +114,7 @@ export default {
       const required = parameterObject.required;
       const _in = parameterObject.in;
       // 値が設定されていればスルー。
-      if (!isUndefined(val.name)) {
+      if (!isUndefined(val[name])) {
         return;
       }
       // defaultが設定されていればそれを使用する。
