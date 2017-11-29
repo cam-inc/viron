@@ -23073,6 +23073,29 @@ riot$1.tag2('viron-parameters-popover', '<div class="Parameters_Popover__message
     this.external(script$23);
 });
 
+/**
+     * Iterates over a callback a set amount of times
+     */
+    function times(n, callback, thisObj){
+        var i = -1;
+        while (++i < n) {
+            if ( callback.call(thisObj, i) === false ) {
+                break;
+            }
+        }
+    }
+
+    var times_1 = times;
+
+/**
+     * Check if value is an integer
+     */
+    function isInteger(val){
+        return isNumber_1(val) && (val % 1 === 0);
+    }
+
+    var isInteger_1 = isInteger;
+
 const UI_TEXTINPUT = 'textinput';
 const UI_TEXTAREA = 'textarea';
 const UI_HTML = 'html';
@@ -23163,6 +23186,141 @@ var util = {
     default:
       return false;
     }
+  },
+
+  /**
+   * OASのdefaultを元にフォーム入力初期値を算出します。
+   * @param {Array} parameterObjects
+   * @param {Object} initialVal
+   * @return {Object}
+   */
+  generateInitialVal: (parameterObjects, initialVal) => {
+    if ( parameterObjects === void 0 ) parameterObjects = [];
+    if ( initialVal === void 0 ) initialVal = {};
+
+    // ParameterObjectに対する処理。
+    const checkParameterObject = (parameterObject, val) => {
+      const name = parameterObject.name;
+      const _default = parameterObject.default;
+      const required = parameterObject.required;
+      const _in = parameterObject.in;
+      // 値が設定されていればスルー。
+      if (!isUndefined(val.name)) {
+        return;
+      }
+      // defaultが設定されていればそれを使用する。
+      if (!isUndefined(_default)) {
+        val[name] = deepClone_1(_default);
+        return;
+      }
+      // requiredがfalseならスルー。
+      if (!required) {
+        return;
+      }
+      // この時点で、入力必須だけどユーザ未入力な状態。可能な限り初期値を設定する。
+      // inは"query", "header", "path", "formData", "body"のいずれか。
+      if (contains_1$2(['formData', 'header', 'path', 'query'], _in)) {
+        // 初期値設定不可能。
+        return;
+      }
+      // この時点でinは必ず'body'になる。
+      const schema = parameterObject.schema;
+      if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], schema.type)) {
+        // 初期値設定不可能。
+        return;
+      }
+      if (schema.type === 'object') {
+        val[name] = {};
+        generateDefaultProperties(schema, val[name]);
+      }
+      if (schema.type === 'array') {
+        val = [];
+        // 最低要素数が決まっていれば予めその要素数分を生成する。
+        const minItems = schema.minItems;
+        if (isInteger_1(minItems) && minItems > 0) {
+          times_1(minItems, () => {
+            val.push(generateDefaultItem(schema.items));
+          });
+        }
+      }
+    };
+
+    // SchemaObjectのpropertiesを元に初期値を生成して返却します。
+    // @param {Object} schemaObject
+    // @param {Object} val
+    // @param {Object}
+    const generateDefaultProperties = (schemaObject, val) => {
+      if ( val === void 0 ) val = {};
+
+      const properties = schemaObject.properties;
+      const required = schemaObject.required || [];
+      forOwn_1$2(properties, (property, key) => {
+        if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], property.type)) {
+          if (!isUndefined(val[key])) {
+            return;
+          }
+          if (isUndefined(property.default)) {
+            return;
+          }
+          val[key] = property.default;
+        }
+        if (property.type === 'object') {
+          if (!contains_1$2(required, key)) {
+            return;
+          }
+          val[key] = {};
+          generateDefaultProperties(property, val[key]);
+        }
+        if (property.type === 'array') {
+          if (!contains_1$2(required, key)) {
+            return;
+          }
+          val[key] = [];
+          const minItems = property.minItems;
+          if (isInteger_1(minItems) && minItems > 0) {
+            times_1(minItems, () => {
+              val[key].push(generateDefaultItem(property.items));
+            });
+          }
+        }
+      });
+      return val;
+    };
+
+    // ItemsObjectを元に初期値を生成して返却します。
+    // @param {Object|Array<Object>} itemsObject
+    // @return {*}
+    const generateDefaultItem = itemsObject => {
+      if (isArray_1$1(itemsObject)) {
+        itemsObject = itemsObject[0];
+      }
+      if (contains_1$2(['boolean', 'integer', 'number', 'null', 'string'], itemsObject.type)) {
+        return itemsObject.default;
+      }
+      if (itemsObject.type === 'object' && itemsObject) {
+        return generateDefaultProperties(itemsObject);
+      }
+      if (itemsObject.type === 'array') {
+        if (!itemsObject.required) {
+          return undefined;
+        }
+        const ret = [];
+        const minItems = itemsObject.minItems;
+        if (isInteger_1(minItems) && minItems > 0) {
+          times_1(minItems, () => {
+            ret.push(generateDefaultItem(itemsObject.items));
+          });
+        }
+        return ret;
+      }
+      return undefined;
+    };
+
+    const val = deepClone_1(initialVal);
+    forEach_1$2(parameterObjects, parameterObject => {
+      checkParameterObject(parameterObject, val);
+    });
+    return val;
   }
 
 };
@@ -27672,15 +27830,6 @@ hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
 hooks.calendarFormat        = getCalendarFormat;
 hooks.prototype             = proto;
 
-/**
-     * Check if value is an integer
-     */
-    function isInteger(val){
-        return isNumber_1(val) && (val % 1 === 0);
-    }
-
-    var isInteger_1 = isInteger;
-
 'use strict';
 
 // Load modules
@@ -28966,20 +29115,6 @@ riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__e
     }
     var append_1$1 = append$1;
 
-/**
-     * Iterates over a callback a set amount of times
-     */
-    function times(n, callback, thisObj){
-        var i = -1;
-        while (++i < n) {
-            if ( callback.call(thisObj, i) === false ) {
-                break;
-            }
-        }
-    }
-
-    var times_1 = times;
-
 var script$26 = function() {
   const schemaObject = this.schemaObject = this.opts.schemaobject;
   const itemsObject = this.opts.schemaobject.items;
@@ -29229,7 +29364,7 @@ var script$29 = function() {
 
   // 入力値。
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
-  this.val = deepClone_1(this.opts.initialVal || {});
+  this.val = util.generateInitialVal(operationObject.parameters, this.opts.initialVal);
   // タイトル
   this.title = operationObject.summary || operationObject.operationId;
   // submitボタンのラベリング。
