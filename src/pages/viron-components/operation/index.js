@@ -1,5 +1,5 @@
-import deepClone from 'mout/lang/deepClone';
 import '../../../components/viron-error/index.tag';
+import util from '../../../components/viron-parameters/util';
 
 export default function() {
   const store = this.riotx.get();
@@ -7,7 +7,7 @@ export default function() {
 
   // 入力値。
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
-  this.val = deepClone(this.opts.initialVal || {});
+  this.val = util.generateInitialVal(operationObject.parameters, this.opts.initialVal);
   // タイトル
   this.title = operationObject.summary || operationObject.operationId;
   // submitボタンのラベリング。
