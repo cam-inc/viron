@@ -16,18 +16,23 @@
     height: 32px;
     margin-right: 8px;
     cursor: pointer;
-    background-color: var(--color-base-gray);
+    background-color: var(--color-base-blue);
     border-radius: 50%;
-
-    &:hover,
-    &.hold {
-      background-color: var(--color-base-blue);
-    }
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 
     & .Icon {
       width: 16px;
       height: 16px;
       color: var(--color-base-white);
+    }
+
+    &:hover,
+    &.hold {
+      background-color: var(--color-base-white);
+
+      & .Icon {
+        color: var(--color-base-blue);
+      }
     }
   }
 

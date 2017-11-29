@@ -24,7 +24,8 @@ viron-parameters-items.Parameters_Items
             .Parameters_Items__closeButtonLabel とじる
             viron-icon-check
       .Parameters_Items__itemBrief(onTap="{ handleItemBriefTap }")
-        div TODO: 簡略版
+        .Parameters_Items__itemBriefTitle { parent.getBriefItemTitle(val, idx) }
+        .Parameters_Items__itemBriefDescription(if="{ parent.isPropertiesMode }") { parent.getBriefItemDescription(val) }
 
   script.
     import '../../../components/icons/viron-icon-check/index.tag';

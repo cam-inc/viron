@@ -1,8 +1,15 @@
 import append from 'mout/array/append';
 import contains from 'mout/array/contains';
+import forEach from 'mout/array/forEach';
 import map from 'mout/array/map';
 import times from 'mout/function/times';
 import deepClone from 'mout/lang/deepClone';
+import isArray from 'mout/lang/isArray';
+import isBoolean from 'mout/lang/isBoolean';
+import isNull from 'mout/lang/isNull';
+import isObject from 'mout/lang/isObject';
+import isUndefined from 'mout/lang/isUndefined';
+import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
 import util from '../util';
 import validator from '../validator';
@@ -60,6 +67,90 @@ export default function() {
   };
 
   /**
+   * 簡易表示のタイトル部を返します。
+   * @param {*} val
+   * @param {Number} idx
+   * @return {String}
+   */
+  this.getBriefItemTitle = (val, idx) => {
+    if (this.isFormMode) {
+      switch (this.formObject.type) {
+      case 'string':
+        return val || '-';
+      case 'number':
+      case 'integer':
+        return isUndefined(val) ? '-' : String(val);
+      case 'boolean':
+        return isBoolean(val) ? String(val) : '-';
+      case 'file':
+        return 'file';
+      case 'null':
+        return isNull(val) ? 'null' : '-';
+      default:
+        return '-';
+      }
+    }
+    if (this.isPropertiesMode) {
+      // 最初にundefinedではない要素値を使用します。
+      let ret;
+      const properties = this.propertiesObject.properties;
+      const _keys = keys(properties);
+      forEach(_keys, key => {
+        if (!isUndefined(ret)) {
+          return;
+        }
+        if (isUndefined(val[key])) {
+          return;
+        }
+        if (isObject(val[key])) {
+          ret = '{Object}';
+        } else if (isArray(val[key])) {
+          ret = '[Array]';
+        } else {
+          ret = String(val[key]);
+        }
+      });
+      if (!ret) {
+        ret = '-';
+      }
+      return ret;
+    }
+    if (this.isItemsMode) {
+      return `[${idx}]`;
+    }
+    return '-';
+  };
+
+  /**
+   * 簡易表示のボディ部を返します。
+   * @param {*} val
+   * @return {String}
+   */
+  this.getBriefItemDescription = val => {
+    if (!this.isPropertiesMode) {
+      return '-';
+    }
+    let ret = '';
+    const properties = this.propertiesObject.properties;
+    const _keys = keys(properties);
+    forEach(_keys, key => {
+      const k = properties[key].description || key;
+      let v = '-';
+      if (!isUndefined(val[key])) {
+        if (isObject(val[key])) {
+          v = '{Object}';
+        } else if (isArray(val[key])) {
+          v = '[Array]';
+        } else {
+          v = String(val[key]);
+        }
+      }
+      ret = `${ret} ${k}:${v}`;
+    });
+    return ret;
+  };
+
+  /**
    * item追加ボタンがタップされた時の処理。
    */
   this.handleAddButtonTap = () => {
@@ -77,10 +168,10 @@ export default function() {
     } else if (this.isPropertiesMode) {
       newItem = util.generateDefaultProperties(this.propertiesObject);
     } else if (this.isItemsMode) {
-      newItem = util.generateDefaultItem(this.schemaObject) || [];
+      newItem = [];
     }
     ret = append([newItem], ret);
-    this.itemsOpened = append([true], this.itemsOpened);
+    this.itemsOpened = append([false], this.itemsOpened);
     this.update();
     this.opts.onchange(this.opts.identifier, ret);
   };
@@ -120,7 +211,7 @@ export default function() {
    */
   this.handleCloseButtonTap = e => {
     const idx = e.item.idx;
-    this.itemsOpened[idx] = !this.itemsOpened[idx];
+    this.itemsOpened[idx] = false;
     this.update();
   };
 
