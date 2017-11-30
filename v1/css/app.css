@@ -999,6 +999,13 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Autocomplete--disabled .Autocomplete__input {
+      cursor: not-allowed;
+      background-color: #f9f9f9;
+      background-color: var(--color-base-gray-tertiary);
+      border-color: #d1d1d1;
+      border-color: var(--color-base-gray);
+    }
 .Button {
   display: flex;
   align-items: center;
@@ -1087,6 +1094,19 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Checkbox--disabled {
+    cursor: not-allowed;
+  }
+.Checkbox--disabled .Checkbox__mark {
+      background-color: #f9f9f9;
+      background-color: var(--color-base-gray-tertiary);
+      border-color: #d1d1d1;
+      border-color: var(--color-base-gray);
+    }
+.Checkbox--disabled .Checkbox__mark .Icon {
+        color: #d1d1d1;
+        color: var(--color-base-gray);
+      }
 .Drawer {
   display: block;
   pointer-events: none;
@@ -1254,13 +1274,20 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Numberinput--disabled .Numberinput__input {
+      cursor: not-allowed;
+      background-color: #f9f9f9;
+      background-color: var(--color-base-gray-tertiary);
+      border-color: #d1d1d1;
+      border-color: var(--color-base-gray);
+    }
 .Parameters {
   display: -ms-grid;
   display: grid;
   grid-column-gap: 24px;
   grid-row-gap: 12px;
-  -ms-grid-columns: (minmax(134px, 1fr))[auto-fit];
-      grid-template-columns: repeat(auto-fit, minmax(134px, 1fr));
+  -ms-grid-columns: (minmax(134px, 1fr))[auto-fill];
+      grid-template-columns: repeat(auto-fill, minmax(134px, 1fr));
   grid-auto-rows: auto;
 }
 .Parameters .Parameters_Parameter--spreadSmall {
@@ -1537,8 +1564,8 @@ select {
     display: grid;
     grid-column-gap: 24px;
     grid-row-gap: 12px;
-    -ms-grid-columns: (minmax(134px, 1fr))[auto-fit];
-        grid-template-columns: repeat(auto-fit, minmax(134px, 1fr));
+    -ms-grid-columns: (minmax(134px, 1fr))[auto-fill];
+        grid-template-columns: repeat(auto-fill, minmax(134px, 1fr));
     grid-auto-rows: auto;
   }
 .Parameters_Properties__item--spreadSmall {
@@ -1837,6 +1864,15 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Select--disabled .Select__form {
+      background-color: #f9f9f9;
+      background-color: var(--color-base-gray-tertiary);
+      border-color: #d1d1d1;
+      border-color: var(--color-base-gray);
+    }
+.Select--disabled .Select__select {
+      cursor: not-allowed;
+    }
 .Tag {
   display: inline-block;
   padding: 2px 4px;
@@ -1875,6 +1911,13 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Textarea--error .Textarea__input {
+      cursor: not-allowed;
+      background-color: #f9f9f9;
+      background-color: var(--color-base-gray-tertiary);
+      border-color: #d1d1d1;
+      border-color: var(--color-base-gray);
+    }
 .Textinput {
   display: block;
 }
@@ -1904,6 +1947,13 @@ select {
       background-color: var(--color-base-red-tertiary);
       border-color: #f57177;
       border-color: var(--color-base-red);
+    }
+.Textinput--disabled .Textinput__input {
+      cursor: not-allowed;
+      background-color: #f9f9f9;
+      background-color: var(--color-base-gray-tertiary);
+      border-color: #d1d1d1;
+      border-color: var(--color-base-gray);
     }
 .Toast {
   display: flex;
@@ -2041,6 +2091,11 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Uploader--disabled .Uploader__label {
+      cursor: not-allowed;
+      border-color: #d1d1d1;
+      border-color: var(--color-base-gray);
+    }
 .Wyswyg {
   display: block;
 }
@@ -2054,12 +2109,33 @@ select {
     font-size: 2.8rem;
     font-weight: bold;
   }
-.ComponentsPage__inlines {
-    margin-top: 24px;
+.ComponentsPage__container {
+    display: -ms-grid;
+    display: grid;
+    grid-gap: 24px;
+    -ms-grid-columns: (312px)[auto-fill];
+        grid-template-columns: repeat(auto-fill, 312px);
+    grid-auto-rows: 144px;
   }
-.ComponentsPage__tables {
-    margin-top: 24px;
-  }
+.ComponentsPage .ComponentsPage_Card--columnSpreadSmall {
+      -ms-grid-column-span: 1;
+          grid-column-end: span 1;
+    }
+.ComponentsPage .ComponentsPage_Card--columnSpreadFull {
+      grid-column: 1 / -1;
+    }
+.ComponentsPage .ComponentsPage_Card--rowSpreadSmall {
+      -ms-grid-row-span: 1;
+          grid-row-end: span 1;
+    }
+.ComponentsPage .ComponentsPage_Card--rowSpreadMedium {
+      -ms-grid-row-span: 2;
+          grid-row-end: span 2;
+    }
+.ComponentsPage .ComponentsPage_Card--rowSpreadLarge {
+      -ms-grid-row-span: 3;
+          grid-row-end: span 3;
+    }
 .ComponentsPage_Card {
   display: block;
   background-color: #fff;
@@ -2286,13 +2362,6 @@ select {
     color: #627edf;
     color: var(--color-base-blue);
   }
-.ComponentsPage_Inlines {
-  display: block;
-}
-.ComponentsPage_Inlines__list .ComponentsPage_Card {
-      width: 312px;
-      height: 144px;
-    }
 .ComponentsPage_Operation {
   display: flex;
   flex-direction: column;
@@ -2363,16 +2432,26 @@ select {
 .EndpointsPage {
   display: block;
 }
+.EndpointsPage__container {
+    display: -ms-grid;
+    display: grid;
+    grid-gap: 24px;
+    -ms-grid-columns: (312px)[auto-fill];
+        grid-template-columns: repeat(auto-fill, 312px);
+    grid-auto-rows: 144px;
+  }
 .EndpointsPage_Endpoint {
   display: block;
+  overflow: hidden;
   cursor: pointer;
 }
-.EndpointsPage_Endpoint__menu {
-    width: 12px;
-    height: 12px;
-    cursor: pointer;
+.EndpointsPage_Endpoint__head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   }
 .EndpointsPage_Endpoint__thumbnail {
+    flex-shrink: 0;
     width: 24px;
     height: 24px;
     background-repeat: no-repeat;
@@ -2380,6 +2459,40 @@ select {
     background-size: cover;
     border-radius: 50%;
   }
+.EndpointsPage_Endpoint__headContent {
+    flex-grow: 1;
+    overflow: hidden;
+  }
+.EndpointsPage_Endpoint__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    font-weight: bold;
+  }
+.EndpointsPage_Endpoint__url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+  }
+.EndpointsPage_Endpoint__menu {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+  }
+.EndpointsPage_Endpoint__tags {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  }
+.EndpointsPage_Endpoint__tags .Tag {
+      margin-right: 8px;
+    }
+.EndpointsPage_Endpoint__tags .Tag:last-child {
+        margin-right: 0;
+      }
 .EndpointsPage_Endpoint_Menu {
   display: block;
 }
