@@ -49,4 +49,17 @@
       border-color: var(--color-base-red);
     }
   }
+
+  &--disabled {
+    cursor: not-allowed;
+
+    & .Checkbox__mark {
+      background-color: var(--color-base-gray-tertiary);
+      border-color: var(--color-base-gray);
+
+      & .Icon {
+        color: var(--color-base-gray);
+      }
+    }
+  }
 }

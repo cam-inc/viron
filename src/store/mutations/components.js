@@ -64,6 +64,7 @@ export default exporter('components', {
       // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
       // テーブルの各rowに紐づくOperationObjectとみなす。
       const primary = componentDef.primary;
+      state.components[componentId]['primary'] = primary;
       if (!!primary) {
         forEach(['get', 'put', 'post', 'delete'], method => {
           const operationObject = !!state.oas.client.spec.paths[`${path}/{${primary}}`] && state.oas.client.spec.paths[`${path}/{${primary}}`][method];

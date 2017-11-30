@@ -18,6 +18,9 @@ export default function() {
     if (!this.opts.onchange) {
       return;
     }
+    if (this.opts.isdisabled) {
+      return;
+    }
     this.opts.onchange(getNewOptions());
   };
 
@@ -25,6 +28,9 @@ export default function() {
   // そのため、`input`イベントを積極的に使用する。
   this.handleSelectInput = () => {
     if (!this.opts.onchange) {
+      return;
+    }
+    if (this.opts.isdisabled) {
       return;
     }
     this.opts.onchange(getNewOptions());

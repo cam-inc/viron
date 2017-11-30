@@ -3,6 +3,9 @@ export default function() {
     if (!this.opts.onchange) {
       return;
     }
+    if (this.opts.isdisabled) {
+      return;
+    }
     this.opts.onchange(!this.opts.ischecked, this.opts.id);
   };
 }

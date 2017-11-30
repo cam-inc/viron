@@ -8,6 +8,7 @@ export default function() {
   // Form関連。
   this.isFormMode = false;
   this.formObject = null;
+  this.isFormDisabled = false;
   // Properties関連。
   this.isPropertiesMode = false;
   this.propertiesObject = null;
@@ -31,6 +32,10 @@ export default function() {
       delete formObject.in;
       this.formObject = formObject;
       this.spreadStyle = util.getSpreadStyle(formObject);
+      // テーブルのprimaryKeyとnameが一致した場合は、入力フォームを強制的にdisableにします。
+      if (parameterObject.in === 'path' && parameterObject.name === this.opts.primary) {
+        this.isFormDisabled = true;
+      }
     } else {
       // typeがarrayの場合。
       this.isItemsMode = true;

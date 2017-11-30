@@ -142,6 +142,16 @@ export default exporter('components', {
   },
 
   /**
+   * 指定componentIDに対する要素のprimaryキーを返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @return {String|undefined}
+   */
+  primary: (state, componentId) => {
+    return state.components[componentId]['primary'];
+  },
+
+  /**
    * 指定componentIDに対する要素のschemaObjectを返します。
    * @param {Object} state
    * @param {String} riotId

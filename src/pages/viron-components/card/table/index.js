@@ -70,6 +70,7 @@ export default function() {
     store.action('drawers.add', 'viron-components-page-operation', {
       operationObject,
       initialVal,
+      primary: this.primary,
       onSuccess: () => {
         getData();
       }
@@ -88,6 +89,8 @@ export default function() {
   this.postOperation = null;
   // 検索用パラメータ群。
   this.searchParameters = [];
+  // primaryキー
+  this.primary = null;
   // 通信中か否か。
   this.isLoading = true;
   // エラーメッセージ。
@@ -100,6 +103,7 @@ export default function() {
     this.rowOperations = store.getter('components.operations', this.opts.id, 'row');
     this.postOperation = store.getter('components.postOperation', this.opts.id, 'table');
     this.searchParameters = store.getter('components.searchParameters', this.opts.id);
+    this.primary = store.getter('components.primary', this.opts.id);
     this.error = validate(this.data);
     this.update();
   });

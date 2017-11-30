@@ -28,4 +28,12 @@
       border-color: var(--color-base-red);
     }
   }
+
+  &--disabled {
+    & .Textinput__input {
+      cursor: not-allowed;
+      background-color: var(--color-base-gray-tertiary);
+      border-color: var(--color-base-gray);
+    }
+  }
 }

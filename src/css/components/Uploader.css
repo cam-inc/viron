@@ -86,4 +86,11 @@
       border-color: var(--color-base-red);
     }
   }
+
+  &--disabled {
+    & .Uploader__label {
+      cursor: not-allowed;
+      border-color: var(--color-base-gray);
+    }
+  }
 }
