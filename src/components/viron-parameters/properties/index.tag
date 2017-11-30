@@ -3,7 +3,9 @@ viron-parameters-properties.Parameters_Properties
     .Parameters_Properties__label { opts.label }{ opts.required ? ' *' : '' }
   .Parameters_Properties__error(if="{ hasError }") { errors[0] }
   .Parameters_Properties__body
-    .Parameters_Properties__item(each="{ property, key in propertiesObject.properties }" class="{ 'Parameters_Properties__item--' + parent.getSpreadStyle(key, property) }")
+    // readOnlyフラグがOFFのpropertyのみ対象とする。
+    // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-13
+    .Parameters_Properties__item(each="{ property, key in propertiesObject.properties }" if="{ !property.readOnly }" class="{ 'Parameters_Properties__item--' + parent.getSpreadStyle(key, property) }")
       virtual(if="{ isFormMode(property) }")
         viron-parameters-form(no-reorder identifier="{ key }" val="{ parent.getVal(key) }" formObject="{ parent.getFormObject(key, property) }" onChange="{ parent.handlePropertyChange }")
       virtual(if="{ isPropertiesMode(property) }")
