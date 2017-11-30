@@ -8,7 +8,7 @@ import './viron/index.tag';
 import './components/atoms/viron-message/index.tag';
 
 // エントリーポイント。
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   let mainStore;
   Promise
     .resolve()
