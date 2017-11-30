@@ -1,6 +1,5 @@
-viron-components-page-card.ComponentsPage_Card
-  .ComponentsPage_Card__body
-    div(data-is="viron-components-page-{ opts.def.style }" id="{ componentId }" def="{ opts.def }")
+viron-components-page-card.ComponentsPage_Card(class="ComponentsPage_Card--{ columnSize } ComponentsPage_Card--{ rowSize }")
+  div(data-is="viron-components-page-{ opts.def.style }" id="{ componentId }" def="{ opts.def }")
 
 
   script.
