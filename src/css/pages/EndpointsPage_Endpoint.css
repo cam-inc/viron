@@ -1,19 +1,53 @@
 .EndpointsPage_Endpoint {
   display: block;
+  overflow: hidden;
   cursor: pointer;
 
-  &__menu {
-    width: 12px;
-    height: 12px;
-    cursor: pointer;
+  &__head {
+    @apply --layout-center-center;
   }
 
   &__thumbnail {
+    flex-shrink: 0;
     width: 24px;
     height: 24px;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     border-radius: 50%;
+  }
+
+  &__headContent {
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  &__name {
+    @apply --text-truncate;
+    font-weight: bold;
+  }
+
+  &__url {
+    @apply --text-truncate;
+    color: var(--color-base-gray);
+  }
+
+  &__menu {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+  }
+
+  &__tags {
+    @apply --layout-center-start;
+
+    & .Tag {
+      margin-right: 8px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
   }
 }

@@ -1,15 +1,14 @@
 viron-endpoints-page-endpoint.card.EndpointsPage_Endpoint(onTap="{ handleTap }")
-  viron-icon-dots.EndpointsPage_Endpoint__menu(ref="menu" onTap="{ handleMenuTap }")
-  .EndpointsPage_Endpoint__thumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
-  .EndpointsPage_Endpoint__name name: { opts.endpoint.name }
-  .EndpointsPage_Endpoint__description description: { opts.endpoint.description }
-  .EndpointsPage_Endpoint__memo memo: { opts.endpoint.memo }
-  .EndpointsPage_Endpoint__url url: { opts.endpoint.url }
-  .EndpointsPage_Endpoint__version version: { opts.endpoint.version }
-  .EndpointsPage_Endpoint__token token: { opts.endpoint.token }
-  .EndpointsPage_Endpoint__theme theme: { opts.endpoint.color }
-  .EndpointsPage_Endpoint__tags
-    viron-tag(each="{ tag in opts.endpoint.tags }" label="{ tag }")
+  .EndpointsPage_Endpoint__head
+    .EndpointsPage_Endpoint__thumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
+    .EndpointsPage_Endpoint__headContent
+      .EndpointsPage_Endpoint__name { opts.endpoint.name }
+      .EndpointsPage_Endpoint__url url: { opts.endpoint.url }
+    viron-icon-dots.EndpointsPage_Endpoint__menu(ref="menu" onTap="{ handleMenuTap }")
+  .EndpointsPage_Endpoint__body
+    .EndpointsPage_Endpoint__description description: { opts.endpoint.description }
+    .EndpointsPage_Endpoint__tags
+      viron-tag(each="{ tag in opts.endpoint.tags }" label="{ tag }")
 
   script.
     import '../../../components/viron-tag/index.tag';

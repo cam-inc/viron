@@ -1,5 +1,5 @@
 viron-endpoints-page.EndpointsPage
-  .EndpointsPage__list
+  .EndpointsPage__container
     viron-endpoints-page-endpoint(each="{ endpoint in endpoints }" endpoint="{ endpoint }")
 
   script.

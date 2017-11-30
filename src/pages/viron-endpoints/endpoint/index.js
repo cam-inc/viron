@@ -38,7 +38,7 @@ export default function() {
     }, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
-      direction: 'TL'
+      direction: 'TR'
     });
   };
 }
