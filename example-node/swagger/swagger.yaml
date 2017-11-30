@@ -625,8 +625,10 @@ definitions:
         enum:
         - male
         - female
+        - other
         example: male
         type: string
+        readOnly: true
       updatedAt:
         description: 更新日時
         example: 1994-04-27T12:25:11+09:00
@@ -937,8 +939,10 @@ definitions:
         enum:
         - male
         - female
+        - other
         example: male
         type: string
+        readOnly: true
     required:
     - name
     type: object
