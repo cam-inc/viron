@@ -28,13 +28,25 @@ const defaultEditorOptions = {
   toolbarSticky: false,
   // toolbarボタン群。
   toolbarButtons: [
-    'fullscreen', 'html', '|', '|', 'undo', 'redo', 'selectAll', 'clearFormatting', '|', 'spellChecker', 'print', 'help', '-',
-    'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'insertLink', 'insertImage', 'insertVideo', 'embedly', 'insertFile', '|', 'fontFamily', 'fontSize', 'color', 'inlineStyle', '|', 'emoticons', 'specialCharacters', '-',
-    'paragraphFormat', 'paragraphStyle', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertTable', 'insertHR'
+    'fullscreen', 'html', '|', 'undo', 'redo', 'selectAll', 'clearFormatting', '|', 'help', '-',
+    'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'insertLink', 'insertImage', '|', 'fontFamily', 'fontSize', 'color', '-',
+    'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertTable', 'insertHR'
   ],
   // 小さい画面でもtoolbarButtonsと同じボタン群を表示するためにnullをセット。
   toolbarButtonsSM: null,
   toolbarButtonsXS: null,
+  // リンクプラグイン設定。
+  linkEditButtons: 	['linkOpen', 'linkEdit', 'linkRemove'],
+  linkList: [{
+    text: 'Viron',
+    href: 'https://cam-inc.github.io/viron-doc/',
+    target: '_blank'
+  }],
+  // 画像プラグイン設定。
+  imageDefaultWidth: 80,
+  imageEditButtons: ['imageReplace', 'imageAlign', 'imageCaption', 'imageRemove', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove', '-', 'imageDisplay', 'imageAlt', 'imageSize'],
+  imageUpload: false,
+  imageUploadRemoteUrls: false,
   // p, div or brを指定可能。
   enter: $.FroalaEditor.ENTER_P,
   // ショートカット可能なボタン群。
