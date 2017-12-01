@@ -7,32 +7,29 @@ export default exporter('endpoints', {
    * 1件のエンドポイントを追加します。
    * @param {riotx.Context} context
    * @param {String} url
-   * @param {String} memo
    * @return {Promise}
    */
-  add: (context, url, memo) => {
+  add: (context, url) => {
     return Promise
       .resolve()
       .then(() => fetch(context, url))
       .catch(err => {
         // 401エラーは想定内。
         // 401 = endpointが存在しているので認証エラーになる。
-        // 401以外 = endpointが存在しない。
         if (err.status !== 401) {
           throw err;
         }
-        //
+        // 401以外 = endpointが存在しない。
         const key = shortid.generate();
         const newEndpoint = {
           url: url,
-          memo: memo,
           token: null,
           title: '',
           name: '',
           description: '',
           version: '',
           color: '',
-          thumbnail: './img/viron_default.png',
+          thumbnail: null,
           tags: []
         };
         context.commit('endpoints.add', key, newEndpoint);

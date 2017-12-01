@@ -38,6 +38,7 @@ export default function() {
     }, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
+      width: 228,
       direction: 'TR'
     });
   };

@@ -1,5 +1,5 @@
 viron-endpoints-page-endpoint-signin-oauth.EndpointsPage_Endpoint_Signin_Oauth
-  viron-button(label="{ opts.authtype.provider }" onSelect="{ handleButtonSelect }")
+  viron-button(label="{ opts.authtype.provider }" theme="secondary" onSelect="{ handleButtonSelect }")
 
   script.
     import '../../../../../components/viron-button/index.tag';

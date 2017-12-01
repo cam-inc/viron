@@ -1,8 +1,11 @@
 viron-endpoints-page-endpoint-signin.EndpointsPage_Endpoint_Signin
   .EndpointsPage_Endpoint_Signin__main
-    .EndpointsPage_Endpoint_Signin__thumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
-    .EndpointsPage_Endpoint_Signin__name name: { opts.endpoint.name }
-    .EndpointsPage_Endpoint_Signin__url url: { opts.endpoint.url }
+    virtual(if="{ !!opts.endpoint.thumbnail }")
+      .EndpointsPage_Endpoint_Signin__thumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
+    virtual(if="{ !opts.endpoint.thumbnail }")
+      .EndpointsPage_Endpoint_Signin__thumbnailDefault
+        viron-icon-star
+    .EndpointsPage_Endpoint_Signin__name { opts.endpoint.name || '- - -' }
     .EndpointsPage_Endpoint_Signin__emails(if="{ !!emails.length }")
       viron-endpoints-page-endpoint-signin-email(each="{ authtype in emails }" authtype="{ authtype }" endpointKey="{ parent.opts.endpoint.key }" closer="{ closer }")
     virtual(if="{ !isDesktop && !!oauths.length }")
@@ -19,6 +22,7 @@ viron-endpoints-page-endpoint-signin.EndpointsPage_Endpoint_Signin
 
   script.
     import '../../../../components/viron-horizontal-rule/index.tag';
+    import '../../../../components/icons/viron-icon-star/index.tag';
     import './email/index.tag';
     import './oauth/index.tag';
     import script from './index';

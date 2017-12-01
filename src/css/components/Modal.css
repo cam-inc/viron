@@ -19,11 +19,16 @@
   &__closeButton {
     @apply --layout-center-center;
     position: absolute;
-    top: 12px;
-    left: 12px;
-    width: 12px;
-    height: 12px;
+    top: 24px;
+    left: 24px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-gray);
+    }
   }
 
   &--visible {

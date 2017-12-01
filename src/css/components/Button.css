@@ -9,6 +9,19 @@
   }
 
   &--primary {
+    background-color: var(--color-base-blue);
+
+    &:hover,
+    &.hold {
+      background-color: var(--color-base-blue-secondary);
+    }
+
+    & .Button__label {
+      color: var(--color-base-white);
+    }
+  }
+
+  &--secondary {
     background-color: var(--color-base-red);
 
     &:hover,

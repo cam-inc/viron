@@ -6,6 +6,7 @@
 @import "Application_Header";
 @import "Application_Header_Autocomplete";
 @import "Application_Header_Menu";
+@import "Application_Header_Menu_Entry";
 @import "Application_Menu";
 @import "Application_Menu_Group";
 @import "Application_Modals";

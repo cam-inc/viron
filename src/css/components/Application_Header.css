@@ -11,6 +11,11 @@
       width: 16px;
       height: 16px;
       cursor: pointer;
+
+      &:hover,
+      &.hold {
+        color: var(--color-base-blue);
+      }
     }
   }
 
