@@ -1,7 +1,5 @@
-viron-toast.Toast(class="Toast--{ opts.type }" onTap="{ handleTap }")
-  .Toast__icon TODO
+viron-toast.Toast(class="{ 'Toast--visible' : isVisible, 'Toast--error' : opts.iserror }" onTap="{ handleTap }")
   .Toast__message { opts.message }
-  .Toast__link(if="{ !!opts.link }" onTap="{ handleLinkTap }") { opts.linktext }
 
   script.
     import script from './index';
