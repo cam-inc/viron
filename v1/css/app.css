@@ -6,6 +6,7 @@
   --color-base-black: #484848;
   --color-base-black-secondary: #a3a3a3;
   --color-base-gray: #d1d1d1;
+  --color-base-gray-secondary: #cecece;
   --color-base-gray-tertiary: #f9f9f9;
   --color-base-white: #fff;
   --color-base-red: #f57177;
@@ -737,6 +738,11 @@ select {
       height: 16px;
       cursor: pointer;
     }
+.Application_Header__item > .Icon:hover,
+      .Application_Header__item > .Icon.hold {
+        color: #627edf;
+        color: var(--color-base-blue);
+      }
 .Application_Header__thumbnail {
     width: 32px;
     height: 32px;
@@ -788,6 +794,31 @@ select {
       color: #627edf;
       color: var(--color-base-blue);
     }
+.Application_Header_Menu_Entry {
+  display: block;
+}
+.Application_Header_Menu_Entry__title {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.Application_Header_Menu_Entry__message {
+    color: #f57177;
+    color: var(--color-base-red);
+  }
+.Application_Header_Menu_Entry__selfSignedCertificate {
+    display: inline-block;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+.Application_Header_Menu_Entry__selfSignedCertificate:hover,
+    .Application_Header_Menu_Entry__selfSignedCertificate.hold {
+      opacity: 0.5;
+    }
+.Application_Header_Menu_Entry__inputs {
+    margin: 32px 0;
+  }
 .Application_Menu {
   display: flex;
   flex-direction: column;
@@ -958,10 +989,10 @@ select {
 }
 .Application_Toasts .Toast {
     position: absolute;
-    top: -58px;
+    top: -64px;
     left: 0;
     width: 100%;
-    height: 58px;
+    height: 64px;
     pointer-events: auto;
     transition-duration: 300ms;
     transition-property: top, opacity;
@@ -1018,15 +1049,28 @@ select {
     font-size: 1.6rem;
   }
 .Button--primary {
-    background-color: #f57177;
-    background-color: var(--color-base-red);
+    background-color: #627edf;
+    background-color: var(--color-base-blue);
   }
 .Button--primary:hover,
     .Button--primary.hold {
+      background-color: #c0cbf2;
+      background-color: var(--color-base-blue-secondary);
+    }
+.Button--primary .Button__label {
+      color: #fff;
+      color: var(--color-base-white);
+    }
+.Button--secondary {
+    background-color: #f57177;
+    background-color: var(--color-base-red);
+  }
+.Button--secondary:hover,
+    .Button--secondary.hold {
       background-color: #fab7ba;
       background-color: var(--color-base-red-secondary);
     }
-.Button--primary .Button__label {
+.Button--secondary .Button__label {
       color: #fff;
       color: var(--color-base-white);
     }
@@ -1212,12 +1256,17 @@ select {
   align-items: center;
   justify-content: center;
     position: absolute;
-    top: 12px;
-    left: 12px;
-    width: 12px;
-    height: 12px;
+    top: 24px;
+    left: 24px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
   }
+.Modal__closeButton:hover,
+    .Modal__closeButton.hold {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+    }
 .Modal--visible {
     pointer-events: auto;
     background-color: rgba(0, 0, 0, 0.4);
@@ -1875,11 +1924,13 @@ select {
     }
 .Tag {
   display: inline-block;
-  padding: 2px 4px;
-  color: #fff;
-  color: var(--color-base-white);
-  background-color: #d1d1d1;
-  background-color: var(--color-base-gray);
+  padding: 1px 4px 2px;
+  font-size: 1.2rem;
+  color: #d1d1d1;
+  color: var(--color-base-gray);
+  background-color: #f9f9f9;
+  background-color: var(--color-base-gray-tertiary);
+  border-radius: 2px;
 }
 .Textarea {
   display: block;
@@ -1959,53 +2010,31 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  height: 64px;
+  padding: 0 32px;
   cursor: pointer;
-  background-color: #fff;
-  background-color: var(--color-base-white);
+  background-color: #627edf;
+  background-color: var(--color-base-blue);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
   transition-duration: 300ms;
   transition-property: opacity;
 }
-.Toast__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-    margin-right: 12px;
-    font-size: 14px;
-    color: #fff;
-    color: var(--color-base-white);
-    border-radius: 50%;
-  }
 .Toast__message {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-    flex-grow: 1;
-    font-size: 1.2rem;
-  }
-.Toast__link {
-    flex-shrink: 0;
-    margin-left: 12px;
-    font-size: 1.2rem;
-    text-decoration: underline;
-    cursor: pointer;
+    font-size: 1.6rem;
+    color: #fff;
+    color: var(--color-base-white);
   }
 .Toast--visible {
     opacity: 1;
   }
-.Toast--normal .Toast__icon {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-    }
-.Toast--normal .Toast__icon {
-      background-color: #f57177;
-      background-color: var(--color-base-red);
-    }
+.Toast--error {
+    background-color: #f57177;
+    background-color: var(--color-base-red);
+  }
 .Uploader {
   position: relative;
   display: inline-block;
@@ -2099,6 +2128,14 @@ select {
 .Wyswyg {
   display: block;
 }
+.Wyswyg__editor ul {
+      list-style-position: inside;
+      list-style-type: disc;
+    }
+.Wyswyg__editor ol {
+      list-style-position: inside;
+      list-style-type: decimal;
+    }
 /* ITCSS: Components(Page) */
 /* Designed components, chunks of UI. */
 .ComponentsPage {
@@ -2113,8 +2150,8 @@ select {
     display: -ms-grid;
     display: grid;
     grid-gap: 24px;
-    -ms-grid-columns: (312px)[auto-fill];
-        grid-template-columns: repeat(auto-fill, 312px);
+    -ms-grid-columns: (minmax(312px, 1fr))[auto-fill];
+        grid-template-columns: repeat(auto-fill, minmax(312px, 1fr));
     grid-auto-rows: 144px;
   }
 .ComponentsPage .ComponentsPage_Card--columnSpreadSmall {
@@ -2432,55 +2469,152 @@ select {
 .EndpointsPage {
   display: block;
 }
+.EndpointsPage__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+    margin-bottom: 32px;
+  }
+.EndpointsPage__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    flex-grow: 1;
+    font-size: 2.8rem;
+    font-weight: bold;
+  }
+.EndpointsPage__orderButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    background-color: #d1d1d1;
+    background-color: var(--color-base-gray);
+    border-radius: 50%;
+  }
+.EndpointsPage__orderButton .Icon {
+      width: 16px;
+      height: 16px;
+    }
+.EndpointsPage__orderButton:hover,
+    .EndpointsPage__orderButton.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+    }
+.EndpointsPage__orderButton:hover .Icon, .EndpointsPage__orderButton.hold .Icon {
+        color: #fff;
+        color: var(--color-base-white);
+      }
 .EndpointsPage__container {
     display: -ms-grid;
     display: grid;
     grid-gap: 24px;
-    -ms-grid-columns: (312px)[auto-fill];
-        grid-template-columns: repeat(auto-fill, 312px);
+    -ms-grid-columns: (minmax(312px, 1fr))[auto-fill];
+        grid-template-columns: repeat(auto-fill, minmax(312px, 1fr));
     grid-auto-rows: 144px;
   }
 .EndpointsPage_Endpoint {
   display: block;
+  padding: 24px;
   overflow: hidden;
   cursor: pointer;
+  background-color: #fff;
+  background-color: var(--color-base-white);
+  border: 1px solid #d1d1d1;
+  border: 1px solid var(--color-base-gray);
+  border-radius: 6px;
 }
+.EndpointsPage_Endpoint:hover,
+  .EndpointsPage_Endpoint.hold {
+    border-color: #627edf;
+    border-color: var(--color-base-blue);
+  }
 .EndpointsPage_Endpoint__head {
   display: flex;
   align-items: center;
   justify-content: center;
+    margin-bottom: 14px;
   }
 .EndpointsPage_Endpoint__thumbnail {
     flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     border-radius: 50%;
   }
+.EndpointsPage_Endpoint__thumbnailDefault {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background-color: #a6b2de;
+    border-radius: 50%;
+  }
+.EndpointsPage_Endpoint__thumbnailDefault .Icon {
+      width: 16px;
+      height: 16px;
+      color: #fff;
+      color: var(--color-base-white);
+    }
 .EndpointsPage_Endpoint__headContent {
     flex-grow: 1;
+    margin: 0 14px;
     overflow: hidden;
   }
 .EndpointsPage_Endpoint__name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+    font-size: 1.6rem;
     font-weight: bold;
+  }
+.EndpointsPage_Endpoint__urlWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  }
+.EndpointsPage_Endpoint__color {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    border: 2px solid #e9eefb;
+    border: 2px solid var(--color-base-blue-tertiary);
+    border-radius: 50%;
   }
 .EndpointsPage_Endpoint__url {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+    flex-grow: 1;
     color: #d1d1d1;
     color: var(--color-base-gray);
   }
 .EndpointsPage_Endpoint__menu {
     flex-shrink: 0;
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
+  }
+.EndpointsPage_Endpoint__menu:hover,
+    .EndpointsPage_Endpoint__menu.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+.EndpointsPage_Endpoint__description {
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
   }
 .EndpointsPage_Endpoint__tags {
   display: flex;
@@ -2496,12 +2630,39 @@ select {
 .EndpointsPage_Endpoint_Menu {
   display: block;
 }
-.EndpointsPage_Endpoint_Menu_Edit {
-  display: block;
-}
+.EndpointsPage_Endpoint_Menu__list {
+    padding: 0 18px;
+  }
+.EndpointsPage_Endpoint_Menu__item {
+    padding: 18px 0;
+    font-size: 1.4rem;
+    cursor: pointer;
+    border-bottom: 1px solid #d1d1d1;
+    border-bottom: 1px solid var(--color-base-gray);
+  }
+.EndpointsPage_Endpoint_Menu__item:last-child {
+      border-bottom: none;
+    }
+.EndpointsPage_Endpoint_Menu__item:hover,
+    .EndpointsPage_Endpoint_Menu__item.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
 .EndpointsPage_Endpoint_Menu_QRCode {
   display: block;
 }
+.EndpointsPage_Endpoint_Menu_QRCode__title {
+    margin-bottom: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.EndpointsPage_Endpoint_Menu_QRCode__message {
+    margin-bottom: 12px;
+  }
+.EndpointsPage_Endpoint_Menu_QRCode__canvas canvas {
+      display: block;
+      margin: 0 auto;
+    }
 .EndpointsPage_Endpoint_Signin {
   display: flex;
   align-items: stretch;
@@ -2518,17 +2679,31 @@ select {
     width: 64px;
     height: 64px;
     margin: 0 auto 24px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
     border-radius: 50%;
   }
+.EndpointsPage_Endpoint_Signin__thumbnailDefault {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    background-color: #a6b2de;
+    border-radius: 50%;
+  }
+.EndpointsPage_Endpoint_Signin__thumbnailDefault .Icon {
+      width: 32px;
+      height: 326px;
+      color: #fff;
+      color: var(--color-base-white);
+    }
 .EndpointsPage_Endpoint_Signin__name {
     margin-bottom: 24px;
     font-size: 1.4rem;
     text-align: center;
-  }
-.EndpointsPage_Endpoint_Signin__url {
-    margin-bottom: 24px;
-    color: #d1d1d1;
-    color: var(--color-base-gray);
   }
 .EndpointsPage_Endpoint_Signin__emails .EndpointsPage_Endpoint_Signin_Email {
     margin-bottom: 24px;
