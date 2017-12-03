@@ -1,12 +1,11 @@
+import './credit/index.tag';
 import './entry/index.tag';
 
 export default function() {
   const store = this.riotx.get();
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
-    { label: 'ヘルプ', id: 'navigate_to_doc' },
-    { label: 'ラーニング', id: 'navigate_to_doc' },
-    { label: 'キャッシュクリア', id: 'clear_cache' }
+    { label: 'ヘルプ', id: 'navigate_to_doc' }
   ];
   const endpointActions = [
     { label: '追加', id: 'add_endpoint' },
@@ -31,8 +30,15 @@ export default function() {
   /**
    * エンドポイント追加用のモーダルを表示します。
    */
-  this.showModalToAddEndpoint = () => {
+  this.showEntryModal = () => {
     store.action('modals.add', 'viron-application-header-menu-entry');
+  };
+
+  /**
+   * クレジット表示用のモーダルを表示します。
+   */
+  this.showCreditModal = () => {
+    store.action('modals.add', 'viron-application-header-menu-credit');
   };
 
   /**
@@ -43,19 +49,15 @@ export default function() {
     const actionId = e.item.action.id;
     switch (actionId) {
     case 'show_credit':
-      // TODO:
+      this.showCreditModal();
       this.close();
       break;
     case 'navigate_to_doc':
       window.open('https://cam-inc.github.io/viron-doc/', '_blank');
       this.close();
       break;
-    case 'clear_cache':
-      // TODO:
-      this.close();
-      break;
     case 'add_endpoint':
-      this.showModalToAddEndpoint();
+      this.showEntryModal();
       this.close();
       break;
     case 'export_endpoints':
