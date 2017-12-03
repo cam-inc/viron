@@ -48,7 +48,7 @@ export default exporter('components', {
         if (!!token) {
           context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
-        context.commit('components.updateOne', componentId, componentDef, res.obj);
+        context.commit('components.updateOne', componentId, componentDef, res.obj, res.headers);
         context.commit('application.removeNetworking', networkingId);
       })
       .catch(err => {

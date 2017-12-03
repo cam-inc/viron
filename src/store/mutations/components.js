@@ -12,9 +12,10 @@ export default exporter('components', {
    * @param {String} componentId
    * @param {Object} componentDef
    * @param {*} response
+   * @param {Response.Headers} headers
    * @return {Array}
    */
-  updateOne: (state, componentId, componentDef, response) => {
+  updateOne: (state, componentId, componentDef, response, headers) => {
     state.components[componentId] = {
       def: componentDef,
       response
@@ -35,6 +36,14 @@ export default exporter('components', {
       }
       return true;
     });
+    // ページング機能ONの場合。
+    if (componentDef.pagination) {
+      state.components[componentId]['pagination'] = {
+        current: Number(headers['x-pagination-current-page'] || 0),
+        size: Number(headers['x-pagination-limit'] || 0),
+        max: Number(headers['x-pagination-total-pages'] || 0)
+      };
+    }
     // styleがテーブルの場合。
     if (componentDef.style === 'table') {
       // テーブルのカラム情報を付与します。

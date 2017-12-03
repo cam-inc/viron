@@ -23,7 +23,11 @@ export default function() {
         this.isLoading = true;
         this.update();
       })
-      .then(() => store.action('components.get', this.opts.id, this.opts.def))
+      .then(() => Promise.all([
+        // チカチカを防ぐ。
+        new Promise(resolve => setTimeout(resolve, 300)),
+        store.action('components.get', this.opts.id, this.opts.def)
+      ]))
       .then(() => {
         this.isLoading = false;
         this.update();
@@ -95,6 +99,10 @@ export default function() {
   this.isLoading = true;
   // エラーメッセージ。
   this.error = null;
+  // ページネーションが存在するか否か。
+  this.hasPagination = false;
+  // ページネーション情報。
+  this.pagination = null;
 
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
@@ -105,6 +113,8 @@ export default function() {
     this.searchParameters = store.getter('components.searchParameters', this.opts.id);
     this.primary = store.getter('components.primary', this.opts.id);
     this.error = validate(this.data);
+    this.hasPagination = store.getter('components.hasPagination', this.opts.id);
+    this.pagination = store.getter('components.pagination', this.opts.id);
     this.update();
   });
 
@@ -187,5 +197,9 @@ export default function() {
       width: 240,
       direction: 'TR'
     });
+  };
+
+  this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
+    // TODO
   };
 }

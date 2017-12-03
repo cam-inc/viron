@@ -152,6 +152,26 @@ export default exporter('components', {
   },
 
   /**
+   * 指定riotIDに対する要素のページング情報を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Object|null}
+   */
+  pagination: (state, riotId) => {
+    return state.components[riotId].pagination || null;
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング機能がONか調べます。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Boolean}
+   */
+  hasPagination: (state, riotId) => {
+    return (state.components[riotId].def.pagination && state.components[riotId].pagination.max >= 2);
+  },
+
+  /**
    * 指定componentIDに対する要素のschemaObjectを返します。
    * @param {Object} state
    * @param {String} riotId

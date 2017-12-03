@@ -17,6 +17,7 @@ viron-components-page-number.ComponentsPage_Card_Number
           .ComponentsPage_Card_Number__value { getValue() }
           .ComponentsPage_Card_Number__unit(if="{ !!data.unit }") { data.unit }
           .ComponentsPage_Card_Number__unit 円
+  .ComponentsPage_Card_Number__blocker(if="{ isLoading }")
 
   script.
     import '../../../../components/icons/viron-icon-reload/index.tag';
