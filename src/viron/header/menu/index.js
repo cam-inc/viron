@@ -1,5 +1,8 @@
+import './clear/index.tag';
 import './credit/index.tag';
 import './entry/index.tag';
+import './export/index.tag';
+import './import/index.tag';
 
 export default function() {
   const store = this.riotx.get();
@@ -35,6 +38,27 @@ export default function() {
   };
 
   /**
+   * エンドポイント一覧export用のモーダルを表示します。
+   */
+  this.showExportModal = () => {
+    store.action('modals.add', 'viron-application-header-menu-export');
+  };
+
+  /**
+   * エンドポイント一覧import用のモーダルを表示します。
+   */
+  this.showImportModal = () => {
+    store.action('modals.add', 'viron-application-header-menu-import');
+  };
+
+  /**
+   * エンドポイント一覧削除用のモーダルを表示します。
+   */
+  this.showClearModal = () => {
+    store.action('modals.add', 'viron-application-header-menu-clear');
+  };
+
+  /**
    * クレジット表示用のモーダルを表示します。
    */
   this.showCreditModal = () => {
@@ -61,15 +85,15 @@ export default function() {
       this.close();
       break;
     case 'export_endpoints':
-      // TODO:
+      this.showExportModal();
       this.close();
       break;
     case 'import_endpoints':
-      // TODO:
+      this.showImportModal();
       this.close();
       break;
     case 'remove_all_endpoints':
-      // TODO:
+      this.showClearModal();
       this.close();
       break;
     default:

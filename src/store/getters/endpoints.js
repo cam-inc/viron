@@ -1,6 +1,7 @@
 import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
 import sortBy from 'mout/array/sortBy';
+import deepClone from 'mout/lang/deepClone';
 import find from 'mout/object/find';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
@@ -124,7 +125,7 @@ export default exporter('endpoints', {
    */
   allWithoutToken: state => {
     const version = state.application.version;
-    const endpoints = ObjectAssign({}, state.endpoints[version]);
+    const endpoints = deepClone(state.endpoints[version]);
     // 認証用トークンはexport対象外とする。
     forOwn(endpoints, endpoint => {
       delete endpoint.token;
