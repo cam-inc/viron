@@ -1,9 +1,11 @@
 .ComponentsPage_Card_Number {
-  display: block;
+  @apply --layout-column-center-stretch;
+  height: 100%;
   padding: 24px;
 
   &__head {
     @apply --layout-center-center;
+    flex-shrink: 0;
     margin-bottom: 4px;
   }
 
@@ -29,7 +31,25 @@
   }
 
   &__body {
-    @apply --layout-end-end;
+    @apply --layout-center-center;
+    flex-grow: 1;
+  }
+
+  &__progress {
+    @apply --animation-spin;
+    transform-origin: center center;
+
+    & .Icon {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &__valueWrapper {
+
+    @apply --layout-end-center;
+    flex-grow: 1;
+    overflow: hidden;
   }
 
   &__value {

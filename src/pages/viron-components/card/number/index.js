@@ -15,7 +15,11 @@ export default function() {
         this.isLoading = true;
         this.update();
       })
-      .then(() => store.action('components.get', this.opts.id, this.opts.def))
+      .then(() => Promise.all([
+        // チカチカを防ぐ。
+        new Promise(resolve => setTimeout(resolve, 300)),
+        store.action('components.get', this.opts.id, this.opts.def)
+      ]))
       .then(() => {
         this.isLoading = false;
         this.update();
