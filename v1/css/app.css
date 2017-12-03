@@ -18,6 +18,15 @@
 }
 /* ITCSS: Tools */
 /* Default mixins and functions. */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
 /* flexboxによるレイアウト*/
 /* syntax: --layout-[vertial]-[horizontal] */
 /* syntax(column): --layout-column-[vertial]-[horizontal] */
@@ -794,6 +803,21 @@ select {
       color: #627edf;
       color: var(--color-base-blue);
     }
+.Application_Header_Menu_Clear {
+  display: block;
+}
+.Application_Header_Menu_Clear__title {
+    margin-bottom: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.Application_Header_Menu_Clear__description {
+    margin-bottom: 12px;
+  }
+.Application_Header_Menu_Clear__control {
+  }
+.Application_Header_Menu_Credit {
+}
 .Application_Header_Menu_Entry {
   display: block;
 }
@@ -819,14 +843,71 @@ select {
 .Application_Header_Menu_Entry__inputs {
     margin: 32px 0;
   }
+.Application_Header_Menu_Export {
+  display: block;
+}
+.Application_Header_Menu_Export__title {
+    margin-bottom: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.Application_Header_Menu_Export__description {
+    margin-bottom: 12px;
+  }
+.Application_Header_Menu_Export__control {
+  }
+.Application_Header_Menu_Import {
+  display: block;
+}
+.Application_Header_Menu_Import__title {
+    margin-bottom: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.Application_Header_Menu_Import__description {
+    margin-bottom: 12px;
+  }
+.Application_Header_Menu_Import__error {
+    margin-bottom: 12px;
+    color: #f57177;
+    color: var(--color-base-red);
+  }
+.Application_Header_Menu_Import__control {
+  }
 .Application_Menu {
+  position: relative;
+  display: block;
+  height: 100%;
+  background-color: #fff;
+  background-color: var(--color-base-white);
+}
+.Application_Menu__bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: url("https://source.unsplash.com/random");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+  }
+.Application_Menu__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+.Application_Menu__content {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  background-color: #fff;
-  background-color: var(--color-base-white);
-}
+    position: relative;
+    height: 100%;
+  }
 .Application_Menu__head {
   display: flex;
   align-items: center;
@@ -839,10 +920,14 @@ select {
     width: 8px;
     height: 8px;
     margin-right: 16px;
+    color: #f57177;
+    color: var(--color-base-red);
   }
 .Application_Menu__logo {
     width: 24px;
     height: 24px;
+    color: #f57177;
+    color: var(--color-base-red);
     cursor: pointer;
   }
 .Application_Menu__logo:hover,
@@ -855,15 +940,27 @@ select {
     overflow-y: scroll;
   }
 .Application_Menu__sectionName {
-    padding: 8px;
-    font-weight: bold;
-    background-color: #e9eefb;
-    background-color: var(--color-base-blue-tertiary);
+    padding: 8px 16px;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+    border-bottom: 1px solid #d1d1d1;
+    border-bottom: 1px solid var(--color-base-gray);
   }
 .Application_Menu__groups .Application_Menu_Group {
     border-bottom: 1px solid #d1d1d1;
     border-bottom: 1px solid var(--color-base-gray);
   }
+.Application_Menu__groups .Application_Menu_Group:last-child {
+      border-bottom: none;
+    }
+.Application_Menu--desktop .Application_Menu_Group {
+      color: #fff;
+      color: var(--color-base-white);
+    }
+.Application_Menu--mobile .Application_Menu__bg,
+    .Application_Menu--mobile .Application_Menu__overlay {
+      display: none;
+    }
 .Application_Menu_Group {
   display: block;
 }
@@ -1045,6 +1142,9 @@ select {
   cursor: pointer;
   border-radius: 24px;
 }
+.Button--disabled {
+    cursor: not-allowed;
+  }
 .Button__label {
     font-size: 1.6rem;
   }
@@ -1052,7 +1152,8 @@ select {
     background-color: #627edf;
     background-color: var(--color-base-blue);
   }
-.Button--primary:hover,
+.Button--primary.Button--disabled,
+    .Button--primary:hover,
     .Button--primary.hold {
       background-color: #c0cbf2;
       background-color: var(--color-base-blue-secondary);
@@ -1065,7 +1166,8 @@ select {
     background-color: #f57177;
     background-color: var(--color-base-red);
   }
-.Button--secondary:hover,
+.Button--secondary.Button--disabled,
+    .Button--secondary:hover,
     .Button--secondary.hold {
       background-color: #fab7ba;
       background-color: var(--color-base-red-secondary);
@@ -1078,12 +1180,13 @@ select {
     border: 2px solid #484848;
     border: 2px solid var(--color-base-black);
   }
-.Button--ghost:hover,
+.Button--ghost.Button--disabled,
+    .Button--ghost:hover,
     .Button--ghost.hold {
       border-color: #a3a3a3;
       border-color: var(--color-base-black-secondary);
     }
-.Button--ghost:hover .Button__label, .Button--ghost.hold .Button__label {
+.Button--ghost.Button--disabled .Button__label, .Button--ghost:hover .Button__label, .Button--ghost.hold .Button__label {
         color: #a3a3a3;
         color: var(--color-base-black-secondary);
       }
@@ -1330,6 +1433,72 @@ select {
       border-color: #d1d1d1;
       border-color: var(--color-base-gray);
     }
+.Pagination {
+  display: block;
+}
+.Pagination__control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
+.Pagination__control .Pagination__button {
+      margin-right: 8px;
+    }
+.Pagination__control .Pagination__button:last-child {
+        margin-right: 0;
+      }
+.Pagination__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    border: 1px solid #d1d1d1;
+    border: 1px solid var(--color-base-gray);
+    border-radius: 2px;
+  }
+.Pagination__button .Icon {
+      width: 10px;
+      height: 10px;
+    }
+.Pagination__button--selected,
+    .Pagination__button:hover.Pagination__button:not(.Pagination__button--disabled),
+    .Pagination__button.hold.Pagination__button:not(.Pagination__button--disabled) {
+      color: #fff;
+      color: var(--color-base-white);
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      border-color: #627edf;
+      border-color: var(--color-base-blue);
+    }
+.Pagination__button--disabled {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+      cursor: not-allowed;
+      background-color: #f9f9f9;
+      background-color: var(--color-base-gray-tertiary);
+      border-color: #d1d1d1;
+      border-color: var(--color-base-gray);
+    }
+.Pagination__button--moderate {
+      background-color: transparent;
+      border-color: transparent;
+    }
+.Pagination__button--moderate .Pagination__dotsIcon {
+        display: flex;
+      }
+.Pagination__button--moderate .Pagination__arrowIcon {
+        display: none;
+      }
+.Pagination__button--moderate:hover .Pagination__dotsIcon, .Pagination__button--moderate.hold .Pagination__dotsIcon {
+          display: none;
+        }
+.Pagination__button--moderate:hover .Pagination__arrowIcon, .Pagination__button--moderate.hold .Pagination__arrowIcon {
+          display: flex;
+        }
 .Parameters {
   display: -ms-grid;
   display: grid;
@@ -2203,13 +2372,19 @@ select {
   display: block;
 }
 .ComponentsPage_Card_Number {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  height: 100%;
   padding: 24px;
 }
 .ComponentsPage_Card_Number__head {
   display: flex;
   align-items: center;
   justify-content: center;
+    flex-shrink: 0;
     margin-bottom: 4px;
   }
 .ComponentsPage_Card_Number__title {
@@ -2224,18 +2399,39 @@ select {
   align-items: center;
   justify-content: center;
   }
-/* TODO: debug用 */
-.ComponentsPage_Card_Number__control > div {
+.ComponentsPage_Card_Number__control .Icon {
       width: 10px;
       height: 10px;
       cursor: pointer;
-      background-color: #d1d1d1;
-      background-color: var(--color-base-gray);
     }
+.ComponentsPage_Card_Number__control .Icon:hover,
+      .ComponentsPage_Card_Number__control .Icon.hold {
+        color: #627edf;
+        color: var(--color-base-blue);
+      }
 .ComponentsPage_Card_Number__body {
   display: flex;
+  align-items: center;
+  justify-content: center;
+    flex-grow: 1;
+  }
+.ComponentsPage_Card_Number__progress {
+  animation-name: spin;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+    transform-origin: center center;
+  }
+.ComponentsPage_Card_Number__progress .Icon {
+      width: 24px;
+      height: 24px;
+    }
+.ComponentsPage_Card_Number__valueWrapper {
+  display: flex;
   align-items: flex-end;
-  justify-content: flex-end;
+  justify-content: center;
+    flex-grow: 1;
+    overflow: hidden;
   }
 .ComponentsPage_Card_Number__value {
   overflow: hidden;
@@ -2254,13 +2450,26 @@ select {
     color: #f57177;
     color: var(--color-base-red);
   }
+.ComponentsPage_Card_Number__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .ComponentsPage_Card_Table {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  height: 100%;
 }
 .ComponentsPage_Card_Table__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+    flex-shrink: 0;
     padding: 24px;
   }
 .ComponentsPage_Card_Table__headAside {
@@ -2318,12 +2527,53 @@ select {
 .ComponentsPage_Card_Table__control .Icon:last-child {
         margin-right: 0;
       }
+.ComponentsPage_Card_Table__body {
+    position: relative;
+    flex-grow: 1;
+  }
+.ComponentsPage_Card_Table__progressWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+.ComponentsPage_Card_Table__progress {
+  animation-name: spin;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+    transform-origin: center center;
+  }
+.ComponentsPage_Card_Table__progress .Icon {
+      width: 24px;
+      height: 24px;
+    }
+.ComponentsPage_Card_Table__errorWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 24px;
+  }
 .ComponentsPage_Card_Table__error {
     color: #f57177;
     color: var(--color-base-red);
   }
 .ComponentsPage_Card_Table__tableWrapper {
-    overflow-x: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: scroll;
   }
 .ComponentsPage_Card_Table__table {
   }
@@ -2362,6 +2612,17 @@ select {
       }
 .ComponentsPage_Card_Table__tbody tr td:first-child {
     font-weight: bold;
+  }
+.ComponentsPage_Card_Table__tail {
+    flex-shrink: 0;
+    padding: 24px;
+  }
+.ComponentsPage_Card_Table__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 .ComponentsPage_Card_Table_Cell {
   padding: 24px;
@@ -2736,6 +2997,11 @@ select {
 .EndpointsPage_Endpoint_Signin_Email {
   display: block;
 }
+.EndpointsPage_Endpoint_Signin_Email__error {
+    margin-bottom: 12px;
+    color: #f57177;
+    color: var(--color-base-red);
+  }
 .EndpointsPage_Endpoint_Signin_Email .Textinput {
     margin-bottom: 12px;
   }
