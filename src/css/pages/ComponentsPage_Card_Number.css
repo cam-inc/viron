@@ -15,12 +15,16 @@
 
   &__control {
     @apply --layout-center-center;
-    /* TODO: debug用 */
-    & > div {
+
+    & .Icon {
       width: 10px;
       height: 10px;
       cursor: pointer;
-      background-color: var(--color-base-gray);
+
+      &:hover,
+      &.hold {
+        color: var(--color-base-blue);
+      }
     }
   }
 

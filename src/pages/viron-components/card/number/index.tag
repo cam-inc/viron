@@ -2,7 +2,7 @@ viron-components-page-number.ComponentsPage_Card_Number
   .ComponentsPage_Card_Number__head
     .ComponentsPage_Card_Number__title { opts.def.name }
     .ComponentsPage_Card_Number__control
-      div(onTap="{ handleRefreshButtonTap }")
+      viron-icon-reload(onTap="{ handleRefreshButtonTap }")
   .ComponentsPage_Card_Number__body(if="{ !isLoading }")
     // エラー時
     virtual(if="{ !!error }")
@@ -13,5 +13,6 @@ viron-components-page-number.ComponentsPage_Card_Number
       .ComponentsPage_Card_Number__unit(if="{ !!data.unit }") { data.unit }
 
   script.
+    import '../../../../components/icons/viron-icon-reload/index.tag';
     import script from './index';
     this.external(script);
