@@ -31,6 +31,10 @@ module.exports = sequelize => {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      thumbnail: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      }
     },
     {
       timestamps: true,
