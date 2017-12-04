@@ -63,6 +63,13 @@
     }
   }
 
+  &__searchIcon,
+  &__filterIcon {
+    &--active {
+      color: var(--color-base-blue);
+    }
+  }
+
   &__body {
     position: relative;
     flex-grow: 1;

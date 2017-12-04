@@ -6,6 +6,7 @@ import deepClone from 'mout/lang/deepClone';
 import ObjectAssign from 'object-assign';
 
 export default function() {
+  this.isApplyButtonDisabled = false;
   const selectedColumnKeys = this.opts.selectedColumnKeys;
   this.columns = map(deepClone(this.opts.columns), column => {
     let isSelected;
@@ -25,6 +26,14 @@ export default function() {
     if (!!target) {
       target.isSelected = newIsSelected;
     }
+    // 全て未選択の時はボタン非活性化。
+    if (!find(this.columns, column => {
+      return column.isSelected;
+    })) {
+      this.isApplyButtonDisabled = true;
+    } else {
+      this.isApplyButtonDisabled = false;
+    }
     this.update();
   };
 
@@ -33,11 +42,15 @@ export default function() {
       this.close();
       return;
     }
-    const newSelectedColumnKeys = map(filter(this.columns, column => {
+    let newSelectedColumnKeys = map(filter(this.columns, column => {
       return column.isSelected;
     }), column => {
       return column.key;
     });
+    // 全て選択されている場合はnullを返す。
+    if (newSelectedColumnKeys.length === this.columns.length) {
+      newSelectedColumnKeys = null;
+    }
     this.opts.onChange(newSelectedColumnKeys);
     this.close();
   };

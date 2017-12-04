@@ -5,7 +5,7 @@ viron-components-page-filter.ComponentsPage_Filter
     .ComponentsPage_Filter__item(each="{ column in columns }")
       viron-checkbox(id="{ column.key }" label="{ column.description || column.key }" isChecked="{ column.isSelected }" onChange="{ handleItemChange }")
   .ComponentsPage_Filter__control
-    viron-button(label="適用する" onSelect="{ handleApplyButtonTap }")
+    viron-button(label="適用する" isDisabled="{ isApplyButtonDisabled }" onSelect="{ handleApplyButtonTap }")
 
   script.
     import '../../../components/viron-button/index.tag';

@@ -2,11 +2,13 @@ import contains from 'mout/array/contains';
 import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
+import size from 'mout/object/size';
 import deepClone from 'mout/lang/deepClone';
 import isArray from 'mout/lang/isArray';
 import isNull from 'mout/lang/isNull';
 import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
+import ObjectAssign from 'object-assign';
 import '../../filter/index.tag';
 import '../../operation/index.tag';
 import '../../search/index.tag';
@@ -17,9 +19,17 @@ export default function() {
 
   /**
    * OASに従いGETリクエストを送信します。
+   * @param {Object} pagination
    * @return {Promise}
    */
-  const getData = () => {
+  const getData = pagination => {
+    if (!pagination && this.hasPagination) {
+      const size = this.pagination.size;
+      const current = this.pagination.current;
+      pagination.limit = size;
+      pagination.offset = (current - 1) * size;
+    }
+    const queries = ObjectAssign({}, this.searchQueries, pagination);
     return Promise
       .resolve()
       .then(() => {
@@ -29,7 +39,7 @@ export default function() {
       .then(() => Promise.all([
         // チカチカを防ぐ。
         new Promise(resolve => setTimeout(resolve, 300)),
-        store.action('components.get', this.opts.id, this.opts.def)
+        store.action('components.get', this.opts.id, this.opts.def, queries)
       ]))
       .then(() => {
         this.isLoading = false;
@@ -60,7 +70,7 @@ export default function() {
       return 'TODO: エラーメッセージ';
     }
     if (!data.length) {
-      return 'TODO: エラーメッセージ';
+      return '0件';
     }
     if (!isObject(data[0])) {
       return 'TODO: エラーメッセージ';
@@ -108,6 +118,9 @@ export default function() {
   this.hasPagination = false;
   // ページネーション情報。
   this.pagination = null;
+  // 検索クエリ群。
+  this.searchQueries = {};
+  this.hasSearchQueries = false;
 
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
@@ -149,7 +162,13 @@ export default function() {
 
   this.handleSearchButtonTap = () => {
     store.action('modals.add', 'viron-components-page-search', {
-      parameterObjects: this.searchParameters
+      parameterObjects: this.searchParameters,
+      initialVal: this.searchQueries,
+      onSearch: newSearchQueries => {
+        this.searchQueries = newSearchQueries;
+        this.hasSearchQueries = !!size(newSearchQueries);
+        getData();
+      }
     });
   };
 
@@ -159,7 +178,7 @@ export default function() {
       selectedColumnKeys: this.visibleColumnKeys,
       onChange: newSelectedColumnKeys => {
         this.visibleColumnKeys = newSelectedColumnKeys;
-        this.update();
+        getData();
       }
     });
   };
@@ -226,6 +245,10 @@ export default function() {
   };
 
   this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
-    // TODO
+    const size = this.pagination.size;
+    getData({
+      limit: size,
+      offset: (newPage - 1) * size
+    });
   };
 }
