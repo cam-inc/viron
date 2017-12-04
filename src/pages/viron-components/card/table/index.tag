@@ -26,11 +26,11 @@ viron-components-page-table.ComponentsPage_Card_Table
           table.ComponentsPage_Card_Table__table
             thead.ComponentsPage_Card_Table__thead
               tr.ComponentsPage_Card_Table__theadRow
-                th.ComponentsPage_Card_Table__th(each="{ column in columns }") { column.description || column.key }
+                th.ComponentsPage_Card_Table__th(each="{ column in getFilteredColumns() }") { column.description || column.key }
                 th.ComponentsPage_Card_Table__th(if="{ rowOperations.length }")
             tbody.ComponentsPage_Card_Table__tbody
               tr.ComponentsPage_Card_Table__tbodyRow(each="{ row in data }" onTap="{ handleRowTap }")
-                td(each="{ column in columns }" data-is="viron-components-page-table-cell" data="{ row[column.key] }")
+                td(each="{ column in parent.getFilteredColumns() }" data-is="viron-components-page-table-cell" data="{ row[column.key] }")
                 td.ComponentsPage_Card_Table__td(if="{ rowOperations.length }")
                   viron-icon-setting(ref="rowSettingIcon" onTap="{ handleRowSettingButtonTap }")
   .ComponentsPage_Card_Table__tail(if="{ hasPagination }")

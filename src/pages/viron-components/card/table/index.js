@@ -1,3 +1,5 @@
+import contains from 'mout/array/contains';
+import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
 import deepClone from 'mout/lang/deepClone';
@@ -5,6 +7,7 @@ import isArray from 'mout/lang/isArray';
 import isNull from 'mout/lang/isNull';
 import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
+import '../../filter/index.tag';
 import '../../operation/index.tag';
 import '../../search/index.tag';
 import './operations/index.tag';
@@ -85,6 +88,8 @@ export default function() {
   this.data = null;
   // テーブルカラム定義。
   this.columns = [];
+  // 表示させるべきカラム群。filter機能でON/OFFされます。null = すべて表示。
+  this.visibleColumnKeys = null;
   // テーブルに対するoperation群。
   this.tableOperations = [];
   // テーブル行に対するoperation群。
@@ -118,6 +123,20 @@ export default function() {
     this.update();
   });
 
+  /**
+   * 表示対象カラムのみを返します。
+   * @return {Array}
+   */
+  this.getFilteredColumns = () => {
+    // nullやundefined時は全てのカラムを表示する。
+    if (!this.visibleColumnKeys) {
+      return this.columns;
+    }
+    return filter(this.columns, column => {
+      return contains(this.visibleColumnKeys, column.key);
+    });
+  };
+
   this.on('mount', () => {
     getData();
   }).on('unmount', () => {
@@ -135,7 +154,14 @@ export default function() {
   };
 
   this.handleFilterButtonTap = () => {
-    // TODO
+    store.action('modals.add', 'viron-components-page-filter', {
+      columns: this.columns,
+      selectedColumnKeys: this.visibleColumnKeys,
+      onChange: newSelectedColumnKeys => {
+        this.visibleColumnKeys = newSelectedColumnKeys;
+        this.update();
+      }
+    });
   };
 
   this.handleReloadButtonTap = () => {
