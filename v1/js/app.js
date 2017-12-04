@@ -14116,6 +14116,13 @@ var application$1 = exporter$1('application', {
     var unique_1$1 = unique$1;
 
 /**
+     */
+    function isNumber(val) {
+        return isKind_1$1(val, 'Number');
+    }
+    var isNumber_1 = isNumber;
+
+/**
      * Get object keys
      */
      var keys$1 = Object.keys || function (obj) {
@@ -14288,6 +14295,20 @@ var components$1 = exporter$1('components', {
   },
 
   /**
+   * 指定riotIDに対する要素の自動更新secを取得します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Number|null}
+   */
+  autoRefreshSec: (state, riotId) => {
+    const autoRefreshSec = state.components[riotId].autoRefreshSec;
+    if (!isNumber_1(autoRefreshSec)) {
+      return null;
+    }
+    return autoRefreshSec;
+  },
+
+  /**
    * 指定componentIDに対する要素のschemaObjectを返します。
    * @param {Object} state
    * @param {String} riotId
@@ -14388,16 +14409,6 @@ var components$1 = exporter$1('components', {
    */
   _hasPagination: (state, riotId) => {
     return state.components[riotId].hasPagination;
-  },
-
-  /**
-   * 指定riotIDに対する要素の自動更新secを取得します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Number}
-   */
-  _autoRefreshSec: (state, riotId) => {
-    return state.components[riotId].autoRefreshSec;
   },
 
   /**
@@ -15728,6 +15739,10 @@ var components$2 = exporter$2('components', {
         max: Number(headers['x-pagination-total-pages'] || 0)
       };
     }
+    // 自動更新機能ONの場合。
+    if (isNumber_1(componentDef.auto_refresh_sec)) {
+      state.components[componentId]['autoRefreshSec'] = componentDef.auto_refresh_sec;
+    }
     // styleがテーブルの場合。
     if (componentDef.style === 'table') {
       // テーブルのカラム情報を付与します。
@@ -16061,13 +16076,6 @@ var drawers$2 = exporter$2('drawers', {
     return ['drawers'];
   }
 });
-
-/**
-     */
-    function isNumber(val) {
-        return isKind_1$1(val, 'Number');
-    }
-    var isNumber_1 = isNumber;
 
 /**
  * 受け取ったエンドポイント群をきれいに並び替えます。
@@ -16829,6 +16837,24 @@ var script$9 = function() {
   this.isLoading = true;
   // エラーメッセージ。
   this.error = null;
+  // 自動更新間隔。
+  this.autoRefreshSec = null;
+  let autoRefreshIntervalId = null;
+  const activateAutoRefresh = () => {
+    if (!this.autoRefreshSec) {
+      return;
+    }
+    if (autoRefreshIntervalId) {
+      return;
+    }
+    autoRefreshIntervalId = window.setInterval(() => {
+      getData();
+    }, this.autoRefreshSec * 1000);
+  };
+  const inactivateAutoRefresh = () => {
+    window.clearInterval(autoRefreshIntervalId);
+    autoRefreshIntervalId = null;
+  };
   // 1000桁毎にカンマを付けた値を返します。
   this.getValue = () => {
     return currencyFormat_1(this.data.value, 0);
@@ -16837,12 +16863,15 @@ var script$9 = function() {
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
     this.error = validate(this.data);
+    this.autoRefreshSec = store.getter('components.autoRefreshSec', this.opts.id);
+    activateAutoRefresh();
     this.update();
   });
 
   this.on('mount', () => {
     getData();
   }).on('unmount', () => {
+    inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
   });
 
@@ -30126,6 +30155,24 @@ var script$12 = function() {
   // 検索クエリ群。
   this.searchQueries = {};
   this.hasSearchQueries = false;
+  // 自動更新間隔。
+  this.autoRefreshSec = null;
+  let autoRefreshIntervalId = null;
+  const activateAutoRefresh = () => {
+    if (!this.autoRefreshSec) {
+      return;
+    }
+    if (autoRefreshIntervalId) {
+      return;
+    }
+    autoRefreshIntervalId = window.setInterval(() => {
+      getData();
+    }, this.autoRefreshSec * 1000);
+  };
+  const inactivateAutoRefresh = () => {
+    window.clearInterval(autoRefreshIntervalId);
+    autoRefreshIntervalId = null;
+  };
 
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
@@ -30138,6 +30185,8 @@ var script$12 = function() {
     this.error = validate(this.data);
     this.hasPagination = store.getter('components.hasPagination', this.opts.id);
     this.pagination = store.getter('components.pagination', this.opts.id);
+    this.autoRefreshSec = store.getter('components.autoRefreshSec', this.opts.id);
+    activateAutoRefresh();
     this.update();
   });
 
@@ -30158,6 +30207,7 @@ var script$12 = function() {
   this.on('mount', () => {
     getData();
   }).on('unmount', () => {
+    inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
   });
 
