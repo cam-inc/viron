@@ -49,7 +49,12 @@ const create = (req, res, next) => {
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const Users = store.models.Users;
-  return storeHelper.create(store, Users, req.body)
+  const file = req.files.image && req.files.image[0];
+  const user = Object.assign({}, req.body);
+  if (file) {
+    user.thumbnail = file.buffer.toString('base64');
+  }
+  return storeHelper.create(store, Users, user)
     .then(data => {
       res.json(data);
     })
@@ -124,7 +129,12 @@ const update = (req, res, next) => {
   const query = {
     id: req.swagger.params.id.value,
   };
-  return storeHelper.update(store, Users, query, req.body)
+  const file = req.files.image && req.files.image[0];
+  const user = Object.assign({}, req.body);
+  if (file) {
+    user.thumbnail = file.buffer.toString('base64');
+  }
+  return storeHelper.update(store, Users, query, user)
     .then(data => {
       res.json(data);
     })
@@ -140,7 +150,7 @@ const update = (req, res, next) => {
  * @returns {Promise.<TResult>}
  */
 const upload = (req, res) => {
-  const file = req.files.payload[0];
+  const file = req.files.image[0];
   if (file.mimetype !== 'text/csv') {
     console.warn(`invalid file format: ${file.originalname}`);
     return res.json({});

@@ -629,6 +629,10 @@ definitions:
         example: male
         type: string
         readOnly: true
+      thumbnail:
+        description: サムネイル画像
+        type: string
+        format: base64
       updatedAt:
         description: 更新日時
         example: 1994-04-27T12:25:11+09:00
@@ -903,48 +907,6 @@ definitions:
     items:
       $ref: '#/definitions/User'
     type: array
-
-  CreateUserPayload:
-    example:
-      birthday: 1995-05-12T09:45:56Z
-      blood_type: A
-      job: 大学生
-      name: 山田 太郎
-      sex: male
-    properties:
-      birthday:
-        description: 誕生日
-        example: 1995-05-12T09:45:56Z
-        format: date-time
-        type: string
-      blood_type:
-        description: 血液型
-        enum:
-        - A
-        - B
-        - O
-        - AB
-        example: A
-        type: string
-      job:
-        description: 職業
-        example: 大学生
-        type: string
-      name:
-        description: 名前
-        example: 山田 太郎
-        type: string
-      sex:
-        description: 性別
-        enum:
-        - male
-        - female
-        - other
-        example: male
-        type: string
-    required:
-    - name
-    type: object
 
   UpdateUserPayload:
     example:
@@ -2853,11 +2815,43 @@ paths:
       description: ユーザの作成
       operationId: user#create
       parameters:
-      - in: body
-        name: payload
+      - in: formData
+        name: birthday
+        description: 誕生日
+        format: date-time
+        type: string
+      - in: formData
+        name: blood_type
+        description: 血液型
+        enum:
+        - A
+        - B
+        - O
+        - AB
+        type: string
+      - in: formData
+        name: job
+        description: 職業
+        type: string
+      - in: formData
+        name: name
+        description: 名前
+        type: string
         required: true
-        schema:
-          $ref: '#/definitions/CreateUserPayload'
+      - in: formData
+        name: sex
+        description: 性別
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      - in: formData
+        name: image
+        type: file
+        description: サムネイル
+      consumes:
+      - "multipart/form-data"
       produces:
       - application/json
       responses:
@@ -2924,7 +2918,7 @@ paths:
       operationId: user#upload
       parameters:
       - in: formData
-        name: payload
+        name: image
         required: true
         type: file
       - in: formData
@@ -3034,11 +3028,43 @@ paths:
         name: id
         required: true
         type: integer
-      - in: body
-        name: payload
+      - in: formData
+        name: birthday
+        description: 誕生日
+        format: date-time
+        type: string
+      - in: formData
+        name: blood_type
+        description: 血液型
+        enum:
+        - A
+        - B
+        - O
+        - AB
+        type: string
+      - in: formData
+        name: job
+        description: 職業
+        type: string
+      - in: formData
+        name: name
+        description: 名前
+        type: string
         required: true
-        schema:
-          $ref: '#/definitions/UpdateUserPayload'
+      - in: formData
+        name: sex
+        description: 性別
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      - in: formData
+        name: image
+        type: file
+        description: サムネイル
+      consumes:
+      - "multipart/form-data"
       produces:
       - application/json
       responses:

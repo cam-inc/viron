@@ -65,7 +65,7 @@ context.init()
           next();
         });
 
-        app.use(multer.fields([{name: 'payload'}]));
+        app.use(multer.fields([{name: 'image'}]));
 
         // add routing
         swaggerExpress.register(app);
