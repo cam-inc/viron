@@ -941,14 +941,11 @@ select {
   }
 .Application_Menu__sectionName {
     padding: 8px 16px;
-    color: #d1d1d1;
-    color: var(--color-base-gray);
-    border-bottom: 1px solid #d1d1d1;
-    border-bottom: 1px solid var(--color-base-gray);
+    color: rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 .Application_Menu__groups .Application_Menu_Group {
-    border-bottom: 1px solid #d1d1d1;
-    border-bottom: 1px solid var(--color-base-gray);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 .Application_Menu__groups .Application_Menu_Group:last-child {
       border-bottom: none;
@@ -2637,14 +2634,23 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+    display: inline-block;
     font-size: 1.4rem;
+    cursor: pointer;
   }
+.ComponentsPage_Card_Table_Cell__string:hover,
+    .ComponentsPage_Card_Table_Cell__string.hold {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+    }
 .ComponentsPage_Card_Table_Cell__image {
     width: 64px;
     height: 64px;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
+  }
+.ComponentsPage_Card_Table_Cell__video {
   }
 .ComponentsPage_Card_Table_Operations {
   display: block;
@@ -2745,6 +2751,105 @@ select {
         background-color: #fab7ba;
         background-color: var(--color-base-red-secondary);
       }
+.ComponentsPage_Preview {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  height: 100%;
+}
+.ComponentsPage_Preview__head {
+    position: relative;
+    flex-shrink: 0;
+    padding: 76px 64px 18px;
+  }
+.ComponentsPage_Preview__title {
+    font-size: 2.8rem;
+    font-weight: bold;
+  }
+.ComponentsPage_Preview__operationsButton {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+.ComponentsPage_Preview__operationsButton .Icon {
+      width: 16px;
+      height: 16px;
+    }
+.ComponentsPage_Preview__operationsButton:hover,
+    .ComponentsPage_Preview__operationsButton.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+.ComponentsPage_Preview__backButton {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+.ComponentsPage_Preview__backButton .Icon {
+      width: 16px;
+      height: 16px;
+    }
+.ComponentsPage_Preview__backButton:hover,
+    .ComponentsPage_Preview__backButton.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+.ComponentsPage_Preview__body {
+    flex-grow: 1;
+    padding: 0 64px 64px;
+    overflow-y: scroll;
+  }
+.ComponentsPage_Preview__tail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    flex-shrink: 0;
+    height: 64px;
+    border-top: 1px solid #d1d1d1;
+    border-top: 1px solid var(--color-base-gray);
+  }
+.ComponentsPage_Preview__prevButton,
+  .ComponentsPage_Preview__nextButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+  }
+.ComponentsPage_Preview__prevButton .Icon, .ComponentsPage_Preview__nextButton .Icon {
+      width: 16px;
+      height: 16px;
+    }
+.ComponentsPage_Preview__prevButton:hover,
+    .ComponentsPage_Preview__prevButton.hold,
+    .ComponentsPage_Preview__nextButton:hover,
+    .ComponentsPage_Preview__nextButton.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+.ComponentsPage_Preview__prevButton--disabled, .ComponentsPage_Preview__nextButton--disabled {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+      cursor: not-allowed;
+    }
+.ComponentsPage_Preview__prevButton--disabled:hover,
+      .ComponentsPage_Preview__prevButton--disabled.hold,
+      .ComponentsPage_Preview__nextButton--disabled:hover,
+      .ComponentsPage_Preview__nextButton--disabled.hold {
+        color: #d1d1d1;
+        color: var(--color-base-gray);
+      }
+.ComponentsPage_Preview__prevButton {
+    margin-right: 60px;
+  }
 .ComponentsPage_Search {
   display: block;
 }
