@@ -3,7 +3,14 @@
 
   &__string {
     @apply --text-truncate;
+    display: inline-block;
     font-size: 1.4rem;
+    cursor: pointer;
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-gray);
+    }
   }
 
   &__image {
@@ -12,5 +19,8 @@
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
+  }
+
+  &__video {
   }
 }
