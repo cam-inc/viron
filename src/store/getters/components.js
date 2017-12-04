@@ -7,6 +7,7 @@ import sort from 'mout/array/sort';
 import sortBy from 'mout/array/sortBy';
 import unique from 'mout/array/unique';
 import isArray from 'mout/lang/isArray';
+import isNumber from 'mout/lang/isNumber';
 import forOwn from 'mout/object/forOwn';
 import keys from 'mout/object/keys';
 import ObjectAssign from 'object-assign';
@@ -142,6 +143,50 @@ export default exporter('components', {
   },
 
   /**
+   * 指定componentIDに対する要素のprimaryキーを返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @return {String|undefined}
+   */
+  primary: (state, componentId) => {
+    return state.components[componentId]['primary'];
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング情報を返します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Object|null}
+   */
+  pagination: (state, riotId) => {
+    return state.components[riotId].pagination || null;
+  },
+
+  /**
+   * 指定riotIDに対する要素のページング機能がONか調べます。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Boolean}
+   */
+  hasPagination: (state, riotId) => {
+    return (state.components[riotId].def.pagination && state.components[riotId].pagination.max >= 2);
+  },
+
+  /**
+   * 指定riotIDに対する要素の自動更新secを取得します。
+   * @param {Object} state
+   * @param {String} riotId
+   * @return {Number|null}
+   */
+  autoRefreshSec: (state, riotId) => {
+    const autoRefreshSec = state.components[riotId].autoRefreshSec;
+    if (!isNumber(autoRefreshSec)) {
+      return null;
+    }
+    return autoRefreshSec;
+  },
+
+  /**
    * 指定componentIDに対する要素のschemaObjectを返します。
    * @param {Object} state
    * @param {String} riotId
@@ -242,16 +287,6 @@ export default exporter('components', {
    */
   _hasPagination: (state, riotId) => {
     return state.components[riotId].hasPagination;
-  },
-
-  /**
-   * 指定riotIDに対する要素の自動更新secを取得します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Number}
-   */
-  _autoRefreshSec: (state, riotId) => {
-    return state.components[riotId].autoRefreshSec;
   },
 
   /**

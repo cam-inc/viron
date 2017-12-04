@@ -1,6 +1,35 @@
 .Application_Menu {
-  @apply --layout-column-center-stretch;
+  position: relative;
+  display: block;
+  height: 100%;
   background-color: var(--color-base-white);
+
+  &__bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: url("https://source.unsplash.com/random");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  &__content {
+    @apply --layout-column-center-stretch;
+    position: relative;
+    height: 100%;
+  }
 
   &__head {
     @apply --layout-center-start;
@@ -13,11 +42,13 @@
     width: 8px;
     height: 8px;
     margin-right: 16px;
+    color: var(--color-base-red);
   }
 
   &__logo {
     width: 24px;
     height: 24px;
+    color: var(--color-base-red);
     cursor: pointer;
 
     &:hover,
@@ -32,12 +63,29 @@
   }
 
   &__sectionName {
-    padding: 8px;
-    font-weight: bold;
-    background-color: var(--color-base-blue-tertiary);
+    padding: 8px 16px;
+    color: var(--color-base-gray);
+    border-bottom: 1px solid var(--color-base-gray);
   }
 
   &__groups .Application_Menu_Group {
     border-bottom: 1px solid var(--color-base-gray);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &--desktop {
+    & .Application_Menu_Group {
+      color: var(--color-base-white);
+    }
+  }
+
+  &--mobile {
+    & .Application_Menu__bg,
+    & .Application_Menu__overlay {
+      display: none;
+    }
   }
 }

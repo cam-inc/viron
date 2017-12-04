@@ -1,8 +1,11 @@
 .ComponentsPage_Card_Table {
-  display: block;
+  @apply --layout-column-center-stretch;
+  position: relative;
+  height: 100%;
 
   &__head {
     @apply --layout-center-between;
+    flex-shrink: 0;
     padding: 24px;
   }
 
@@ -60,12 +63,58 @@
     }
   }
 
+  &__searchIcon,
+  &__filterIcon {
+    &--active {
+      color: var(--color-base-blue);
+    }
+  }
+
+  &__body {
+    position: relative;
+    flex-grow: 1;
+  }
+
+  &__progressWrapper {
+    @apply --layout-center-center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  &__progress {
+    @apply --animation-spin;
+    transform-origin: center center;
+
+    & .Icon {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &__errorWrapper {
+    @apply --layout-center-center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 24px;
+  }
+
   &__error {
     color: var(--color-base-red);
   }
 
   &__tableWrapper {
-    overflow-x: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: scroll;
   }
 
   &__table {
@@ -106,5 +155,18 @@
 
   &__tbody tr td:first-child {
     font-weight: bold;
+  }
+
+  &__tail {
+    flex-shrink: 0;
+    padding: 24px;
+  }
+
+  &__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 }

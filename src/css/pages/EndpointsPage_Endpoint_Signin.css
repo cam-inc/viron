@@ -14,18 +14,31 @@
     width: 64px;
     height: 64px;
     margin: 0 auto 24px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
     border-radius: 50%;
+  }
+
+  &__thumbnailDefault {
+    @apply --layout-center-center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    background-color: #a6b2de;
+    border-radius: 50%;
+
+    & .Icon {
+      width: 32px;
+      height: 326px;
+      color: var(--color-base-white);
+    }
   }
 
   &__name {
     margin-bottom: 24px;
     font-size: 1.4rem;
     text-align: center;
-  }
-
-  &__url {
-    margin-bottom: 24px;
-    color: var(--color-base-gray);
   }
 
   &__emails .EndpointsPage_Endpoint_Signin_Email {

@@ -4,13 +4,32 @@
   cursor: pointer;
   border-radius: 24px;
 
+  &--disabled {
+    cursor: not-allowed;
+  }
+
   &__label {
     font-size: 1.6rem;
   }
 
   &--primary {
+    background-color: var(--color-base-blue);
+
+    &.Button--disabled,
+    &:hover,
+    &.hold {
+      background-color: var(--color-base-blue-secondary);
+    }
+
+    & .Button__label {
+      color: var(--color-base-white);
+    }
+  }
+
+  &--secondary {
     background-color: var(--color-base-red);
 
+    &.Button--disabled,
     &:hover,
     &.hold {
       background-color: var(--color-base-red-secondary);
@@ -24,6 +43,7 @@
   &--ghost {
     border: 2px solid var(--color-base-black);
 
+    &.Button--disabled,
     &:hover,
     &.hold {
       border-color: var(--color-base-black-secondary);

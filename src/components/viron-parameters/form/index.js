@@ -191,6 +191,7 @@ export default function() {
     case 'number':
     case 'integer':
       // 数値 or undefinedに強制変換。
+      newText = Number(newText);
       if (!isNumber(newText)) {
         newText = undefined;
       }

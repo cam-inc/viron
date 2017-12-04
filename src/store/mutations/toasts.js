@@ -6,9 +6,7 @@ const generateId = () => {
   return `toast_${Date.now()}`;
 };
 
-const TOAST_TYPE_NORMAL = 'normal';
 const TOAST_TIMEOUT = 3 * 1000;
-const TOAST_AUTO_HIDE = true;
 
 export default exporter('toasts', {
   /**
@@ -19,9 +17,8 @@ export default exporter('toasts', {
    */
   add: (state, obj) => {
     const data = ObjectAssign({
-      type: TOAST_TYPE_NORMAL,
       timeout: TOAST_TIMEOUT,
-      autoHide: TOAST_AUTO_HIDE
+      autoHide: true
     }, obj, {
       id: generateId()
     });

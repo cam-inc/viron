@@ -1,6 +1,7 @@
 import filter from 'mout/array/filter';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
+import isNumber from 'mout/lang/isNumber';
 import forOwn from 'mout/object/forOwn';
 import ObjectAssign from 'object-assign';
 import exporter from './exporter';
@@ -12,9 +13,10 @@ export default exporter('components', {
    * @param {String} componentId
    * @param {Object} componentDef
    * @param {*} response
+   * @param {Response.Headers} headers
    * @return {Array}
    */
-  updateOne: (state, componentId, componentDef, response) => {
+  updateOne: (state, componentId, componentDef, response, headers) => {
     state.components[componentId] = {
       def: componentDef,
       response
@@ -35,6 +37,18 @@ export default exporter('components', {
       }
       return true;
     });
+    // ページング機能ONの場合。
+    if (componentDef.pagination) {
+      state.components[componentId]['pagination'] = {
+        current: Number(headers['x-pagination-current-page'] || 0),
+        size: Number(headers['x-pagination-limit'] || 0),
+        max: Number(headers['x-pagination-total-pages'] || 0)
+      };
+    }
+    // 自動更新機能ONの場合。
+    if (isNumber(componentDef.auto_refresh_sec)) {
+      state.components[componentId]['autoRefreshSec'] = componentDef.auto_refresh_sec;
+    }
     // styleがテーブルの場合。
     if (componentDef.style === 'table') {
       // テーブルのカラム情報を付与します。
@@ -64,6 +78,7 @@ export default exporter('components', {
       // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
       // テーブルの各rowに紐づくOperationObjectとみなす。
       const primary = componentDef.primary;
+      state.components[componentId]['primary'] = primary;
       if (!!primary) {
         forEach(['get', 'put', 'post', 'delete'], method => {
           const operationObject = !!state.oas.client.spec.paths[`${path}/{${primary}}`] && state.oas.client.spec.paths[`${path}/{${primary}}`][method];

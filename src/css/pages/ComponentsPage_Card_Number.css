@@ -1,9 +1,12 @@
 .ComponentsPage_Card_Number {
-  display: block;
+  @apply --layout-column-center-stretch;
+  position: relative;
+  height: 100%;
   padding: 24px;
 
   &__head {
     @apply --layout-center-center;
+    flex-shrink: 0;
     margin-bottom: 4px;
   }
 
@@ -15,17 +18,38 @@
 
   &__control {
     @apply --layout-center-center;
-    /* TODO: debug用 */
-    & > div {
+
+    & .Icon {
       width: 10px;
       height: 10px;
       cursor: pointer;
-      background-color: var(--color-base-gray);
+
+      &:hover,
+      &.hold {
+        color: var(--color-base-blue);
+      }
     }
   }
 
   &__body {
-    @apply --layout-end-end;
+    @apply --layout-center-center;
+    flex-grow: 1;
+  }
+
+  &__progress {
+    @apply --animation-spin;
+    transform-origin: center center;
+
+    & .Icon {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &__valueWrapper {
+    @apply --layout-end-center;
+    flex-grow: 1;
+    overflow: hidden;
   }
 
   &__value {
@@ -43,5 +67,13 @@
 
   &__error {
     color: var(--color-base-red);
+  }
+
+  &__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 }

@@ -1,5 +1,5 @@
 viron-parameters.Parameters
-  viron-parameters-parameter(each="{ parameterObject in opts.parameterobjects }" val="{ parent.opts.val[parameterObject.name] }" parameterObject="{ parameterObject }" onChange="{ parent.handleValChange }")
+  viron-parameters-parameter(each="{ parameterObject in opts.parameterobjects }" val="{ parent.opts.val[parameterObject.name] }" parameterObject="{ parameterObject }" primary="{ parent.opts.primary }" onChange="{ parent.handleValChange }")
 
   script.
     import './parameter/index.tag';

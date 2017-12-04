@@ -1,0 +1,28 @@
+.Application_Header_Menu_Entry {
+  display: block;
+
+  &__title {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  &__message {
+    color: var(--color-base-red);
+  }
+
+  &__selfSignedCertificate {
+    display: inline-block;
+    color: var(--color-base-gray);
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover,
+    &.hold {
+      opacity: 0.5;
+    }
+  }
+
+  &__inputs {
+    margin: 32px 0;
+  }
+}

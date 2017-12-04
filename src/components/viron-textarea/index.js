@@ -14,12 +14,18 @@ export default function() {
   };
 
   this.handleTap = () => {
+    if (this.opts.isdisabled) {
+      return;
+    }
     this.refs.input.focus();
   };
 
   this.handleFormSubmit = e => {
     e.preventDefault();
     if (!this.opts.onchange) {
+      return;
+    }
+    if (this.opts.isdisabled) {
       return;
     }
     const newVal = this.normalizeValue(this.opts.val);
@@ -34,6 +40,9 @@ export default function() {
 
   this.handleTextareaInput = e => {
     if (!this.opts.onchange) {
+      return;
+    }
+    if (this.opts.isdisabled) {
       return;
     }
     const newVal = this.normalizeValue(e.target.value);

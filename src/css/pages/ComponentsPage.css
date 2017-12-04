@@ -12,6 +12,7 @@
     grid-gap: 24px;
     grid-template-columns: repeat(auto-fill, 312px);
     grid-auto-rows: 144px;
+    justify-content: center;
   }
 
   & .ComponentsPage_Card {

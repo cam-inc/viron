@@ -28,6 +28,12 @@ export default function() {
    * @param {Boolean} fromDnD Dnd経由か否か。
    */
   this.handleFileChange = (e, fromDnD) => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    if (this.opts.isdisabled) {
+      return;
+    }
     let files;
     if (fromDnD) {
       files = e.dataTransfer.files;
@@ -44,11 +50,14 @@ export default function() {
     this.fileName = file.name;
     this.isTypeOfImage = (file.type.indexOf('image/') === 0);
     this.blobURL = window.URL.createObjectURL(file);
-    this.opts.onchange && this.opts.onchange(this.file, this.blobURL);
+    this.opts.onchange(this.file, this.blobURL);
   };
 
   this.handleHandlerDragEnter = e => {
     e.preventDefault();
+    if (this.opts.isdisabled) {
+      return;
+    }
     this.isDragWatching = true;
     this.update();
   };
@@ -58,18 +67,27 @@ export default function() {
   };
 
   this.handleHandlerDragLeave = () => {
+    if (this.opts.isdisabled) {
+      return;
+    }
     this.isDragWatching = false;
     this.update();
   };
 
   this.handleHandlerDrop = e => {
     e.preventDefault();
+    if (this.opts.isdisabled) {
+      return;
+    }
     this.isDragWatching = false;
     this.update();
     this.handleFileChange(e, true);
   };
 
   this.handleResetButtonTap = () => {
+    if (this.opts.isdisabled) {
+      return;
+    }
     this.reset();
   };
 }

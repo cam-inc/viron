@@ -14,12 +14,12 @@
 @import "ComponentsPage_Card_Table_Cell";
 @import "ComponentsPage_Card_Table_Operations";
 @import "ComponentsPage_Card_Table_Operations_Item";
+@import "ComponentsPage_Filter";
 @import "ComponentsPage_Operation";
 @import "ComponentsPage_Search";
 @import "EndpointsPage";
 @import "EndpointsPage_Endpoint";
 @import "EndpointsPage_Endpoint_Menu";
-@import "EndpointsPage_Endpoint_Menu_Edit";
 @import "EndpointsPage_Endpoint_Menu_QRCode";
 @import "EndpointsPage_Endpoint_Signin";
 @import "EndpointsPage_Endpoint_Signin_Email";

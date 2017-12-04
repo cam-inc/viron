@@ -48,21 +48,31 @@ export default function() {
   };
 
   this.on('mount', () => {
-    this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
     fetchAutocompleteOptions(this.normalizeValue(this.refs.input.value));
   });
 
   this.handleFormSubmit = e => {
     e.preventDefault();
-    this.opts.onchange && this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
+    if (!this.opts.onchange) {
+      return;
+    }
+    if (this.opts.isdisabled) {
+      return;
+    }
+    this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
   };
 
   // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
   // そのため、`input`イベントを積極的に使用する。
   this.handleInputInput = e => {
-    e.preventUpdate = true;
+    if (!this.opts.onchange) {
+      return;
+    }
+    if (this.opts.isdisabled) {
+      return;
+    }
     fetchAutocompleteOptions(this.normalizeValue(e.target.value));
-    this.opts.onchange && this.opts.onchange(this.normalizeValue(e.target.value), this.opts.id);
+    this.opts.onchange(this.normalizeValue(e.target.value), this.opts.id);
   };
 
   this.handleInputChange = e => {

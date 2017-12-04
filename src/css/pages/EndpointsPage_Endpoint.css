@@ -1,42 +1,95 @@
 .EndpointsPage_Endpoint {
   display: block;
+  padding: 24px;
   overflow: hidden;
   cursor: pointer;
+  background-color: var(--color-base-white);
+  border: 1px solid var(--color-base-gray);
+  border-radius: 6px;
+
+  &:hover,
+  &.hold {
+    border-color: var(--color-base-blue);
+  }
 
   &__head {
     @apply --layout-center-center;
+    margin-bottom: 14px;
   }
 
   &__thumbnail {
     flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     border-radius: 50%;
   }
 
+  &__thumbnailDefault {
+    @apply --layout-center-center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background-color: #a6b2de;
+    border-radius: 50%;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+      color: var(--color-base-white);
+    }
+  }
+
   &__headContent {
     flex-grow: 1;
+    margin: 0 14px;
     overflow: hidden;
   }
 
   &__name {
     @apply --text-truncate;
+    font-size: 1.6rem;
     font-weight: bold;
+  }
+
+  &__urlWrapper {
+    @apply --layout-center-start;
+  }
+
+  &__color {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    background-color: var(--color-base-white);
+    border: 2px solid var(--color-base-blue-tertiary);
+    border-radius: 50%;
   }
 
   &__url {
     @apply --text-truncate;
+    flex-grow: 1;
     color: var(--color-base-gray);
   }
 
   &__menu {
     flex-shrink: 0;
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-blue);
+    }
+  }
+
+  &__description {
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+    color: var(--color-base-gray);
   }
 
   &__tags {

@@ -1,4 +1,4 @@
-viron-button.Button(class="Button--{ opts.theme || 'primary' }" onTap="{ handleTap }")
+viron-button.Button(class="Button--{ opts.theme || 'primary' } { opts.isdisabled ? 'Button--disabled' : '' }" onTap="{ handleTap }")
   .Button__label { opts.label }
 
   script.

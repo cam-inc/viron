@@ -1,7 +1,7 @@
-viron-autocomplete.Autocomplete(class="{ 'Autocomplete--disabled': opts.isdisabled, 'Autocomplete--error': opts.haserror }")
+viron-autocomplete.Autocomplete(class="{ 'Autocomplete--disabled': opts.isdisabled, 'Autocomplete--error': opts.iserror }")
   .Autocomplete__label(if="{ !!opts.label }") { opts.label }
   form(onSubmit="{ handleFormSubmit }")
-    input.Autocomplete__input(type="text" ref="input" list="{ _riot_id }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
+    input.Autocomplete__input(type="text" value="{ opts.val }" ref="input" list="{ _riot_id }" disabled="{ opts.isdisabled }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
   datalist(id="{ _riot_id }")
     option(each="{ opt in options }" value="{ opt.value }") { opt.name }
 

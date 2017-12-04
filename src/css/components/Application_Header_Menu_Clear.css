@@ -1,0 +1,16 @@
+.Application_Header_Menu_Clear {
+  display: block;
+
+  &__title {
+    margin-bottom: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  &__description {
+    margin-bottom: 12px;
+  }
+
+  &__control {
+  }
+}

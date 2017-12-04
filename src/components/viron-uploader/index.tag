@@ -1,6 +1,6 @@
 viron-uploader.Uploader(class="{ 'Uploader--dragWatching' : isDragWatching, 'Uploader--disabled': opts.isdisabled, 'Uploader--error': opts.haserror }" onChange="{ handleChange }")
   form.Uploader__form(ref="form")
-    input.Uploader__input(type="file" id="{ inputId }" accept="{ opts.accept || 'image/*' }" onChange="{ handleFileChange }")
+    input.Uploader__input(type="file" id="{ inputId }" accept="{ opts.accept || 'image/*' }" disabled="{ opts.isdisabled }" onChange="{ handleFileChange }")
     label.Uploader__label(for="{ inputId }")
       .Uploader__empty(if="{ !file || !blobURL }")
         viron-icon-square

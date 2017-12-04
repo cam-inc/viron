@@ -1,10 +1,15 @@
+import contains from 'mout/array/contains';
+import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
+import size from 'mout/object/size';
 import deepClone from 'mout/lang/deepClone';
 import isArray from 'mout/lang/isArray';
 import isNull from 'mout/lang/isNull';
 import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
+import ObjectAssign from 'object-assign';
+import '../../filter/index.tag';
 import '../../operation/index.tag';
 import '../../search/index.tag';
 import './operations/index.tag';
@@ -14,16 +19,28 @@ export default function() {
 
   /**
    * OASに従いGETリクエストを送信します。
+   * @param {Object} pagination
    * @return {Promise}
    */
-  const getData = () => {
+  const getData = pagination => {
+    if (!pagination && this.hasPagination) {
+      const size = this.pagination.size;
+      const current = this.pagination.current;
+      pagination.limit = size;
+      pagination.offset = (current - 1) * size;
+    }
+    const queries = ObjectAssign({}, this.searchQueries, pagination);
     return Promise
       .resolve()
       .then(() => {
         this.isLoading = true;
         this.update();
       })
-      .then(() => store.action('components.get', this.opts.id, this.opts.def))
+      .then(() => Promise.all([
+        // チカチカを防ぐ。
+        new Promise(resolve => setTimeout(resolve, 300)),
+        store.action('components.get', this.opts.id, this.opts.def, queries)
+      ]))
       .then(() => {
         this.isLoading = false;
         this.update();
@@ -53,7 +70,7 @@ export default function() {
       return 'TODO: エラーメッセージ';
     }
     if (!data.length) {
-      return 'TODO: エラーメッセージ';
+      return '0件';
     }
     if (!isObject(data[0])) {
       return 'TODO: エラーメッセージ';
@@ -70,6 +87,7 @@ export default function() {
     store.action('drawers.add', 'viron-components-page-operation', {
       operationObject,
       initialVal,
+      primary: this.primary,
       onSuccess: () => {
         getData();
       }
@@ -80,6 +98,8 @@ export default function() {
   this.data = null;
   // テーブルカラム定義。
   this.columns = [];
+  // 表示させるべきカラム群。filter機能でON/OFFされます。null = すべて表示。
+  this.visibleColumnKeys = null;
   // テーブルに対するoperation群。
   this.tableOperations = [];
   // テーブル行に対するoperation群。
@@ -88,10 +108,37 @@ export default function() {
   this.postOperation = null;
   // 検索用パラメータ群。
   this.searchParameters = [];
+  // primaryキー
+  this.primary = null;
   // 通信中か否か。
   this.isLoading = true;
   // エラーメッセージ。
   this.error = null;
+  // ページネーションが存在するか否か。
+  this.hasPagination = false;
+  // ページネーション情報。
+  this.pagination = null;
+  // 検索クエリ群。
+  this.searchQueries = {};
+  this.hasSearchQueries = false;
+  // 自動更新間隔。
+  this.autoRefreshSec = null;
+  let autoRefreshIntervalId = null;
+  const activateAutoRefresh = () => {
+    if (!this.autoRefreshSec) {
+      return;
+    }
+    if (autoRefreshIntervalId) {
+      return;
+    }
+    autoRefreshIntervalId = window.setInterval(() => {
+      getData();
+    }, this.autoRefreshSec * 1000);
+  };
+  const inactivateAutoRefresh = () => {
+    window.clearInterval(autoRefreshIntervalId);
+    autoRefreshIntervalId = null;
+  };
 
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
@@ -100,13 +147,33 @@ export default function() {
     this.rowOperations = store.getter('components.operations', this.opts.id, 'row');
     this.postOperation = store.getter('components.postOperation', this.opts.id, 'table');
     this.searchParameters = store.getter('components.searchParameters', this.opts.id);
+    this.primary = store.getter('components.primary', this.opts.id);
     this.error = validate(this.data);
+    this.hasPagination = store.getter('components.hasPagination', this.opts.id);
+    this.pagination = store.getter('components.pagination', this.opts.id);
+    this.autoRefreshSec = store.getter('components.autoRefreshSec', this.opts.id);
+    activateAutoRefresh();
     this.update();
   });
+
+  /**
+   * 表示対象カラムのみを返します。
+   * @return {Array}
+   */
+  this.getFilteredColumns = () => {
+    // nullやundefined時は全てのカラムを表示する。
+    if (!this.visibleColumnKeys) {
+      return this.columns;
+    }
+    return filter(this.columns, column => {
+      return contains(this.visibleColumnKeys, column.key);
+    });
+  };
 
   this.on('mount', () => {
     getData();
   }).on('unmount', () => {
+    inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
   });
 
@@ -116,12 +183,25 @@ export default function() {
 
   this.handleSearchButtonTap = () => {
     store.action('modals.add', 'viron-components-page-search', {
-      parameterObjects: this.searchParameters
+      parameterObjects: this.searchParameters,
+      initialVal: this.searchQueries,
+      onSearch: newSearchQueries => {
+        this.searchQueries = newSearchQueries;
+        this.hasSearchQueries = !!size(newSearchQueries);
+        getData();
+      }
     });
   };
 
   this.handleFilterButtonTap = () => {
-    // TODO
+    store.action('modals.add', 'viron-components-page-filter', {
+      columns: this.columns,
+      selectedColumnKeys: this.visibleColumnKeys,
+      onChange: newSelectedColumnKeys => {
+        this.visibleColumnKeys = newSelectedColumnKeys;
+        getData();
+      }
+    });
   };
 
   this.handleReloadButtonTap = () => {
@@ -182,6 +262,14 @@ export default function() {
       y: rect.bottom,
       width: 240,
       direction: 'TR'
+    });
+  };
+
+  this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
+    const size = this.pagination.size;
+    getData({
+      limit: size,
+      offset: (newPage - 1) * size
     });
   };
 }

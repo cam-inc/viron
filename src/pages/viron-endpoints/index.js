@@ -7,4 +7,8 @@ export default function() {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
     this.update();
   });
+
+  this.handleOrderButtonTap = () => {
+    // TODO: 並び替え
+  };
 }

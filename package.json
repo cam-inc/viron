@@ -24,12 +24,13 @@
   "homepage": "https://github.com/cam-inc/viron#readme",
   "scripts": {
     "prepush": "npm run test",
-    "start": "run-s build:clean build:prepare build:html build:swagger build:img build:font watch",
-    "build": "run-s build:clean build:prepare build:html build:swagger build:img build:font build:js build:css",
+    "start": "run-s build:clean build:prepare build:html build:swagger build:froala build:img build:font build:css watch",
+    "build": "run-s build:clean build:prepare build:html build:swagger build:froala build:img build:font build:js build:css",
     "build:clean": "rm -rf dist",
     "build:prepare": "mkdir -p dist && mkdir -p dist/js",
     "build:html": "pug public -O package.json --out dist",
     "build:swagger": "cp public/js/swagger-client.js dist/js/swagger-client.js",
+    "build:froala": "cp -r public/froala dist/froala",
     "build:img": "imagemin public/img/**/* --out-dir=dist/img",
     "build:font": "cp -r public/font dist/font",
     "build:js": "run-s build:js:bundle build:js:minify",
@@ -38,9 +39,10 @@
     "build:css": "run-s build:css:bundle build:css:minify",
     "build:css:bundle": "postcss src/css/app.css -o dist/css/app.css",
     "build:css:minify": "csswring dist/css/app.css dist/css/app.min.css",
-    "watch": "run-p watch:js watch:css",
+    "watch": "run-p watch:html watch:js watch:css",
+    "watch:html": "chokidar 'public/*.pug' -c 'npm run build:html'",
     "watch:js": "rollup -c rollup.local.config.js --watch",
-    "watch:css": "watch 'npm run build:css' src/css",
+    "watch:css": "chokidar 'src/css/**/*.css' -c 'npm run build:css'",
     "test": "run-s format lint spec",
     "format": "run-p format:js format:css",
     "format:js": "echo format:js",
@@ -78,9 +80,11 @@
     "sua.js": "^2.1.0",
     "taucharts": "^1.2.2",
     "tinycolor2": "^1.4.1",
+    "valid-url": "^1.0.9",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "chokidar-cli": "^1.2.0",
     "csswring": "^6.0.1",
     "eslint": "^4.10.0",
     "gh-pages": "^1.0.0",
@@ -115,7 +119,6 @@
     "stylelint": "^8.2.0",
     "stylelint-suitcss": "^1.0.0",
     "suitcss-base": "^4.0.0",
-    "uglify-es": "^3.1.8",
-    "watch": "^1.0.2"
+    "uglify-es": "^3.1.8"
   }
 }

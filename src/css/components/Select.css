@@ -39,4 +39,15 @@
       border-color: var(--color-base-red);
     }
   }
+
+  &--disabled {
+    & .Select__form {
+      background-color: var(--color-base-gray-tertiary);
+      border-color: var(--color-base-gray);
+    }
+
+    & .Select__select {
+      cursor: not-allowed;
+    }
+  }
 }

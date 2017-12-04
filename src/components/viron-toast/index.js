@@ -3,15 +3,19 @@ export default function() {
 
   let autoHideTimerID;
 
+  this.isVisible = false;
+
   const show = () => {
     // need to set delay after dom mountation.
     setTimeout(() => {
-      this.root.classList.add('Toast--visible');
+      this.isVisible = true;
+      this.update();
     }, 100);
   };
 
   const hide = () => {
-    this.root.classList.remove('Toast--visible');
+    this.isVisible = false;
+    this.update();
     // call action after the hide animation completes.
     setTimeout(() => {
       store.action('toasts.remove', this.opts.id);
@@ -32,9 +36,5 @@ export default function() {
   this.handleTap = () => {
     clearTimeout(autoHideTimerID);
     hide();
-  };
-
-  this.handleLinkTap = () => {
-    window.open(this.opts.link);
   };
 }

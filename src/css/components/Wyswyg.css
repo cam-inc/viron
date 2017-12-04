@@ -1,3 +1,15 @@
 .Wyswyg {
   display: block;
+
+  &__editor {
+    ul {
+      list-style-position: inside;
+      list-style-type: disc;
+    }
+
+    ol {
+      list-style-position: inside;
+      list-style-type: decimal;
+    }
+  }
 }
