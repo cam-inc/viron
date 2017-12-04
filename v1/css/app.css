@@ -1451,8 +1451,9 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-    width: 24px;
+    min-width: 24px;
     height: 24px;
+    padding: 0 4px;
     cursor: pointer;
     background-color: #fff;
     background-color: var(--color-base-white);
@@ -2527,6 +2528,10 @@ select {
 .ComponentsPage_Card_Table__control .Icon:last-child {
         margin-right: 0;
       }
+.ComponentsPage_Card_Table__searchIcon--active, .ComponentsPage_Card_Table__filterIcon--active {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
 .ComponentsPage_Card_Table__body {
     position: relative;
     flex-grow: 1;
@@ -2660,6 +2665,21 @@ select {
     color: #627edf;
     color: var(--color-base-blue);
   }
+.ComponentsPage_Filter {
+  display: block;
+}
+.ComponentsPage_Filter__title {
+    margin-bottom: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.ComponentsPage_Filter__description {
+    margin-bottom: 12px;
+  }
+.ComponentsPage_Filter__list {
+    padding-left: 12px;
+    margin-bottom: 12px;
+  }
 .ComponentsPage_Operation {
   display: flex;
   flex-direction: column;
@@ -2727,6 +2747,17 @@ select {
 .ComponentsPage_Search {
   display: block;
 }
+.ComponentsPage_Search__title {
+    margin-bottom: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.ComponentsPage_Search__description {
+    margin-bottom: 12px;
+  }
+.ComponentsPage_Search__body {
+    margin-bottom: 12px;
+  }
 .EndpointsPage {
   display: block;
 }
