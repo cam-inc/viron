@@ -1,6 +1,7 @@
 import filter from 'mout/array/filter';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
+import isNumber from 'mout/lang/isNumber';
 import forOwn from 'mout/object/forOwn';
 import ObjectAssign from 'object-assign';
 import exporter from './exporter';
@@ -43,6 +44,10 @@ export default exporter('components', {
         size: Number(headers['x-pagination-limit'] || 0),
         max: Number(headers['x-pagination-total-pages'] || 0)
       };
+    }
+    // 自動更新機能ONの場合。
+    if (isNumber(componentDef.auto_refresh_sec)) {
+      state.components[componentId]['autoRefreshSec'] = componentDef.auto_refresh_sec;
     }
     // styleがテーブルの場合。
     if (componentDef.style === 'table') {

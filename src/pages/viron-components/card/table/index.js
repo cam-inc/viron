@@ -121,6 +121,24 @@ export default function() {
   // 検索クエリ群。
   this.searchQueries = {};
   this.hasSearchQueries = false;
+  // 自動更新間隔。
+  this.autoRefreshSec = null;
+  let autoRefreshIntervalId = null;
+  const activateAutoRefresh = () => {
+    if (!this.autoRefreshSec) {
+      return;
+    }
+    if (autoRefreshIntervalId) {
+      return;
+    }
+    autoRefreshIntervalId = window.setInterval(() => {
+      getData();
+    }, this.autoRefreshSec * 1000);
+  };
+  const inactivateAutoRefresh = () => {
+    window.clearInterval(autoRefreshIntervalId);
+    autoRefreshIntervalId = null;
+  };
 
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
@@ -133,6 +151,8 @@ export default function() {
     this.error = validate(this.data);
     this.hasPagination = store.getter('components.hasPagination', this.opts.id);
     this.pagination = store.getter('components.pagination', this.opts.id);
+    this.autoRefreshSec = store.getter('components.autoRefreshSec', this.opts.id);
+    activateAutoRefresh();
     this.update();
   });
 
@@ -153,6 +173,7 @@ export default function() {
   this.on('mount', () => {
     getData();
   }).on('unmount', () => {
+    inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
   });
 

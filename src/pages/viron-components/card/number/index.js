@@ -57,6 +57,24 @@ export default function() {
   this.isLoading = true;
   // エラーメッセージ。
   this.error = null;
+  // 自動更新間隔。
+  this.autoRefreshSec = null;
+  let autoRefreshIntervalId = null;
+  const activateAutoRefresh = () => {
+    if (!this.autoRefreshSec) {
+      return;
+    }
+    if (autoRefreshIntervalId) {
+      return;
+    }
+    autoRefreshIntervalId = window.setInterval(() => {
+      getData();
+    }, this.autoRefreshSec * 1000);
+  };
+  const inactivateAutoRefresh = () => {
+    window.clearInterval(autoRefreshIntervalId);
+    autoRefreshIntervalId = null;
+  };
   // 1000桁毎にカンマを付けた値を返します。
   this.getValue = () => {
     return currencyFormat(this.data.value, 0);
@@ -65,12 +83,15 @@ export default function() {
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
     this.error = validate(this.data);
+    this.autoRefreshSec = store.getter('components.autoRefreshSec', this.opts.id);
+    activateAutoRefresh();
     this.update();
   });
 
   this.on('mount', () => {
     getData();
   }).on('unmount', () => {
+    inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
   });
 
