@@ -6,6 +6,7 @@ import isNull from 'mout/lang/isNull';
 import isNumber from 'mout/lang/isNumber';
 import isObject from 'mout/lang/isObject';
 import isString from 'mout/lang/isString';
+import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
   const store = this.riotx.get();
@@ -65,6 +66,10 @@ export default function() {
       // 推測できない場合はそのまま表示。
       this.isText = true;
       return data;
+    }
+    if (isUndefined(data)) {
+      this.isText = true;
+      return '';
     }
     // それ以外。強制的に文字列化。
     this.isText = true;

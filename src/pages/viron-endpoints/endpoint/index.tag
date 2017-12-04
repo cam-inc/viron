@@ -10,7 +10,7 @@ viron-endpoints-page-endpoint.EndpointsPage_Endpoint(onTap="{ handleTap }")
       .EndpointsPage_Endpoint__urlWrapper
         // TODO: 色設定
         .EndpointsPage_Endpoint__color
-        .EndpointsPage_Endpoint__url { opts.endpoint.url } { opts.endpoint.url }
+        .EndpointsPage_Endpoint__url { opts.endpoint.url }
     viron-icon-setting.EndpointsPage_Endpoint__menu(ref="menu" onTap="{ handleMenuTap }")
   .EndpointsPage_Endpoint__body
     // thumbnailが存在したら過去に一度でもサインインしたと判断。

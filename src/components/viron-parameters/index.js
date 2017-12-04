@@ -2,6 +2,7 @@ import isUndefined from 'mout/lang/isUndefined';
 import forOwn from 'mout/object/forOwn';
 
 export default function() {
+
   /**
    * 入力値が変更された時の処理。
    * @param {String} key

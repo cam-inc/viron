@@ -1,0 +1,98 @@
+.ComponentsPage_Preview {
+  @apply --layout-column-center-stretch;
+  height: 100%;
+
+  &__head {
+    position: relative;
+    flex-shrink: 0;
+    padding: 76px 64px 18px;
+  }
+
+  &__title {
+    font-size: 2.8rem;
+    font-weight: bold;
+  }
+
+  &__operationsButton {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-blue);
+    }
+  }
+
+  &__backButton {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-blue);
+    }
+  }
+
+  &__body {
+    flex-grow: 1;
+    padding: 0 64px 64px;
+    overflow-y: scroll;
+  }
+
+  &__tail {
+    @apply --layout-center-center;
+    flex-shrink: 0;
+    height: 64px;
+    border-top: 1px solid var(--color-base-gray);
+  }
+
+  &__prevButton,
+  &__nextButton {
+    @apply --layout-center-center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover,
+    &.hold {
+      color: var(--color-base-blue);
+    }
+
+    &--disabled {
+      color: var(--color-base-gray);
+      cursor: not-allowed;
+
+      &:hover,
+      &.hold {
+        color: var(--color-base-gray);
+      }
+    }
+  }
+
+  &__prevButton {
+    margin-right: 60px;
+  }
+}

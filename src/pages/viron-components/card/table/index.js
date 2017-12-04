@@ -11,6 +11,7 @@ import isUndefined from 'mout/lang/isUndefined';
 import ObjectAssign from 'object-assign';
 import '../../filter/index.tag';
 import '../../operation/index.tag';
+import '../../preview/index.tag';
 import '../../search/index.tag';
 import './operations/index.tag';
 
@@ -76,6 +77,36 @@ export default function() {
       return 'TODO: エラーメッセージ';
     }
     return null;
+  };
+
+  /**
+   * 初期値を生成した上で入力フォームを開きます。
+   * @param {Object} operationObject
+   * @param {Object} rowData
+   */
+  const createInitialValueAndOpenOperationDrawer = (operationObject, rowData) => {
+    const initialVal = {};
+    // ParameterObjectから初期値を推測します。
+    // TODO: 精度up可能か?
+    forEach(operationObject.parameters || [], parameterObject => {
+      const name = parameterObject.name;
+      const _in = parameterObject.in;
+      if (_in === 'body') {
+        initialVal[name] = {};
+        forOwn(parameterObject.schema.properties || {}, (val, key) => {
+          // undefinedとnullを省く。
+          if (!isUndefined(rowData[key]) && !isNull(rowData[key])) {
+            initialVal[name][key] = rowData[key];
+          }
+        });
+      } else {
+        // undefinedとnullを省く。
+        if (!isUndefined(rowData[name]) && !isNull(rowData[name])) {
+          initialVal[name] = rowData[name];
+        }
+      }
+    });
+    openOperationDrawer(operationObject, deepClone(initialVal));
   };
 
   /**
@@ -223,8 +254,40 @@ export default function() {
     });
   };
 
-  this.handleRowTap = () => {
-    // TODO
+  this.handleRowTap = e => {
+    const name = 'preview';
+    // プレビュー用に擬似的なParameterObjectsを作成する。
+    const properties = {};
+    forEach(this.columns, column => {
+      const property = deepClone(column);
+      const key = property.key;
+      delete property.key;
+      properties[key] = property;
+    });
+    const parameterObjects = [{
+      'in': 'body',
+      name,
+      schema: {
+        type: 'object',
+        properties
+      }
+    }];
+    // プレビュー用に擬似的なinitialValueを作成する。
+    const dataList = [];
+    forEach(this.data, data => {
+      const d = {};
+      d[name] = deepClone(data);
+      dataList.push(d);
+    });
+    store.action('drawers.add', 'viron-components-page-preview', {
+      parameterObjects,
+      dataList,
+      selectedIdx: e.item.idx,
+      operations: this.rowOperations,
+      onOperationSelect: (operationObject, dataListIdx) => {
+        createInitialValueAndOpenOperationDrawer(operationObject, this.data[dataListIdx]);
+      }
+    });
   };
 
   this.handleRowSettingButtonTap = e => {
@@ -234,28 +297,7 @@ export default function() {
     store.action('popovers.add', 'viron-components-page-table-operations', {
       operations: this.rowOperations,
       onSelect: operationObject => {
-        const initialVal = {};
-        // ParameterObjectから初期値を推測します。
-        // TODO: 精度up可能か?
-        forEach(operationObject.parameters || [], parameterObject => {
-          const name = parameterObject.name;
-          const _in = parameterObject.in;
-          if (_in === 'body') {
-            initialVal[name] = {};
-            forOwn(parameterObject.schema.properties || {}, (val, key) => {
-              // undefinedとnullを省く。
-              if (!isUndefined(rowData[key]) && !isNull(rowData[key])) {
-                initialVal[name][key] = rowData[key];
-              }
-            });
-          } else {
-            // undefinedとnullを省く。
-            if (!isUndefined(rowData[name]) && !isNull(rowData[name])) {
-              initialVal[name] = rowData[name];
-            }
-          }
-        });
-        openOperationDrawer(operationObject, deepClone(initialVal));
+        createInitialValueAndOpenOperationDrawer(operationObject, rowData);
       }
     }, {
       x: rect.left + (rect.width / 2),
