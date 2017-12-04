@@ -64,12 +64,12 @@
 
   &__sectionName {
     padding: 8px 16px;
-    color: var(--color-base-gray);
-    border-bottom: 1px solid var(--color-base-gray);
+    color: rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   &__groups .Application_Menu_Group {
-    border-bottom: 1px solid var(--color-base-gray);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 
     &:last-child {
       border-bottom: none;

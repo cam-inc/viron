@@ -17,11 +17,14 @@ export default function() {
   this.isText = false;
   // 画像系か否か。
   this.isImage = false;
+  // base64系か否か。
+  this.isBase64 = false;
   // 動画系か否か。
   this.isVideo = false;
   this.videoType = null;
   // typeに応じて表示を切り替えます。
   this.value = (() => {
+
     const data = this.opts.data;
     if (isNull(data)) {
       this.isText = true;
@@ -44,6 +47,12 @@ export default function() {
       return '{...}';
     }
     if (isString(data)) {
+      // base64から画像とする。
+      // TODO: format値は'image' 'image/jpg'とかの方がベターかも。
+      if (this.opts.column.format === 'base64') {
+        this.isBase64 = true;
+        return data;
+      }
       // 拡張子から最適な表示方法を推測します。
       const split = data.split('.');
       if (split.length < 2) {
