@@ -150,6 +150,8 @@ export default function() {
   this.hasPagination = false;
   // ページネーション情報。
   this.pagination = null;
+  // ページネーションコンポーネントのボタン数。
+  this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
   // 検索クエリ群。
   this.searchQueries = {};
   this.hasSearchQueries = false;
@@ -172,6 +174,10 @@ export default function() {
     autoRefreshIntervalId = null;
   };
 
+  this.listen('layout', () => {
+    this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
+    this.update();
+  });
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
     this.columns = store.getter('components.columns', this.opts.id);

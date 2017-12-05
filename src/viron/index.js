@@ -28,6 +28,10 @@ export default function() {
 
   this.listen('application', () => {
     this.isLaunched = store.getter('application.isLaunched');
+    // ページ遷移が完了した時のみscrollを発火させる。
+    if (this.isNavigating && !store.getter('application.isNavigating')) {
+      this.refs.main.scrollTop = 0;
+    }
     this.isNavigating = store.getter('application.isNavigating');
     this.isNetworking = store.getter('application.isNetworking');
     this.endpointFilterText = store.getter('application.endpointFilterText');

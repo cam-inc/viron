@@ -34,7 +34,7 @@ viron-components-page-table.ComponentsPage_Card_Table
                 td.ComponentsPage_Card_Table__td(if="{ rowOperations.length }")
                   viron-icon-setting(ref="rowSettingIcon" onTap="{ handleRowSettingButtonTap }")
   .ComponentsPage_Card_Table__tail(if="{ hasPagination }")
-    viron-pagination(max="{ pagination.max }" size="{ 5 }" current="{ pagination.current }" onChange="{ handlePaginationChange }")
+    viron-pagination(max="{ pagination.max }" size="{ paginationSize }" current="{ pagination.current }" onChange="{ handlePaginationChange }")
   .ComponentsPage_Card_Table__blocker(if="{ isLoading }")
 
   script.

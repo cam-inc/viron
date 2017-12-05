@@ -7,7 +7,7 @@ viron.Application(class="Application--{ usingBrowser } Application--{ layoutType
           viron-application-menu(if="{ !isTopPage }")
     .Application__header
       viron-application-header
-    .Application__main
+    .Application__main(ref="main")
       .Application__page
         div(data-is="viron-{ pageName }-page" route="{ pageRoute }")
   viron-application-drawers
