@@ -27,6 +27,27 @@
     transform: rotate(360deg);
   }
 }
+@keyframes flash {
+  0% {
+    opacity: 1;
+  }
+
+  25% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
 /* flexboxによるレイアウト*/
 /* syntax: --layout-[vertial]-[horizontal] */
 /* syntax(column): --layout-column-[vertial]-[horizontal] */
@@ -713,6 +734,20 @@ select {
   bottom: 0;
   left: 0;
 }
+.Application_Dimmer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+  opacity: 0;
+  transition-duration: 500ms;
+  transition-property: opacity;
+}
+.Application_Dimmer--active {
+    opacity: 0.8;
+  }
 .Application_Drawers {
   position: absolute;
   top: 0;
@@ -1064,14 +1099,110 @@ select {
     height: 24px;
     margin-bottom: 24px;
   }
+@keyframes Application_ProgressLinear-indeterminate1 {
+  /* |-----|---x-||-----||-----| */
+  0% {
+    right: 100%;
+    left: -35%;
+  }
+  /* |-----|-----||-----||xxxx-| */
+  60% {
+    right: -90%;
+    left: 100%;
+  }
+
+  100% {
+    right: -90%;
+    left: 100%;
+  }
+}
+@keyframes Application_ProgressLinear-indeterminate2 {
+  /* |xxxxx|xxxxx||-----||-----| */
+  0% {
+    right: 100%;
+    left: -200%;
+  }
+  /* |-----|-----||-----||-x----| */
+  60% {
+    right: -8%;
+    left: 107%;
+  }
+
+  100% {
+    right: -8%;
+    left: 107%;
+  }
+}
+.Application_ProgressLinear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: block;
+}
+.Application_ProgressLinear__bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: none;
+    height: 4px;
+    background-color: #d1d1d1;
+    background-color: var(--color-base-gray);
+  }
+.Application_ProgressLinear__particle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: 100%;
+    background-color: #627edf;
+    background-color: var(--color-base-blue);
+    transition: transform 0.2s linear;
+    transform-origin: left;
+    will-change: left, right;
+  }
+.Application_ProgressLinear__particle:nth-child(1) {
+      animation: Application_ProgressLinear-indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+    }
+.Application_ProgressLinear__particle:nth-child(2) {
+      animation: Application_ProgressLinear-indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+      animation-delay: 1.15s;
+    }
+.Application_ProgressLinear--active .Application_ProgressLinear__bar {
+      display: block;
+    }
 .Application_Splash {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: blue;
+  background-color: #484848;
+  background-color: var(--color-base-black);
 }
+.Application_Splash__logo {
+  animation-name: flash;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+    width: 36px;
+    height: 36px;
+    color: #fff;
+    color: var(--color-base-white);
+  }
+.Application_Splash__todo {
+  animation-name: flash;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+    margin: 0 12px;
+    color: #fff;
+    color: var(--color-base-white);
+  }
 .Application_Toasts {
   position: absolute;
   top: 0;
@@ -3010,6 +3141,9 @@ select {
       color: var(--color-base-blue);
     }
 .EndpointsPage_Endpoint__description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
     margin-bottom: 16px;
     font-size: 1.2rem;
     color: #d1d1d1;
