@@ -6,6 +6,12 @@ export default function() {
 
   // サインイン済みか否か。
   this.isSignined = !!this.opts.endpoint.token;
+  this.isDesktop = store.getter('layout.isDesktop');
+
+  this.listen('layout', () => {
+    this.isDesktop = store.getter('layout.isDesktop');
+    this.update();
+  });
 
   this.handleQRCodeButtonTap = () => {
     Promise

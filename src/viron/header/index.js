@@ -9,6 +9,8 @@ export default function() {
   this.isTopPage = store.getter('location.isTop');
   // メニューの開閉状態。
   this.isMenuOpened = store.getter('application.isMenuOpened');
+  // デスクトップレイアウトか否か。
+  this.isDesktop = store.getter('layout.isDesktop');
   // モバイルレイアウトか否か。
   this.isMobile = store.getter('layout.isMobile');
   // エンドポイント名。
@@ -25,6 +27,7 @@ export default function() {
     this.update();
   });
   this.listen('layout', () => {
+    this.isDesktop = store.getter('layout.isDesktop');
     this.isMobile = store.getter('layout.isMobile');
     this.update();
   });

@@ -1,6 +1,6 @@
 viron-application-header.Application_Header
   .Application_Header__item
-    virtual(if="{ isTopPage }")
+    virtual(if="{ isTopPage && isDesktop }")
       viron-icon-search.Application_Header__searchIcon(ref="searchIcon" onTap="{ handleSearchIconTap }")
     virtual(if="{ !isTopPage }")
       virtual(if="{ isMenuOpened }")

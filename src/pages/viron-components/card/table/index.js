@@ -25,6 +25,7 @@ export default function() {
    */
   const getData = pagination => {
     if (!pagination && this.hasPagination) {
+      pagination = {};
       const size = this.pagination.size;
       const current = this.pagination.current;
       pagination.limit = size;

@@ -1,0 +1,15 @@
+.Application_Dimmer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+  opacity: 0;
+  transition-duration: 500ms;
+  transition-property: opacity;
+
+  &--active {
+    opacity: 0.8;
+  }
+}

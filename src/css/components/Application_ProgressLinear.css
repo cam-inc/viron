@@ -1,0 +1,80 @@
+@keyframes Application_ProgressLinear-indeterminate1 {
+  /* |-----|---x-||-----||-----| */
+  0% {
+    right: 100%;
+    left: -35%;
+  }
+  /* |-----|-----||-----||xxxx-| */
+  60% {
+    right: -90%;
+    left: 100%;
+  }
+
+  100% {
+    right: -90%;
+    left: 100%;
+  }
+}
+
+@keyframes Application_ProgressLinear-indeterminate2 {
+  /* |xxxxx|xxxxx||-----||-----| */
+  0% {
+    right: 100%;
+    left: -200%;
+  }
+  /* |-----|-----||-----||-x----| */
+  60% {
+    right: -8%;
+    left: 107%;
+  }
+
+  100% {
+    right: -8%;
+    left: 107%;
+  }
+}
+
+.Application_ProgressLinear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: block;
+
+  &__bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: none;
+    height: 4px;
+    background-color: var(--color-base-gray);
+  }
+
+  &__particle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: 100%;
+    background-color: var(--color-base-blue);
+    transition: transform 0.2s linear;
+    transform-origin: left;
+    will-change: left, right;
+
+    &:nth-child(1) {
+      animation: Application_ProgressLinear-indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+    }
+
+    &:nth-child(2) {
+      animation: Application_ProgressLinear-indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+      animation-delay: 1.15s;
+    }
+  }
+
+  &--active {
+    .Application_ProgressLinear__bar {
+      display: block;
+    }
+  }
+}

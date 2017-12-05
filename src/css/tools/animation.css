@@ -8,9 +8,38 @@
   }
 }
 
+@keyframes flash {
+  0% {
+    opacity: 1;
+  }
+
+  25% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 :root {
   --animation-spin {
     animation-name: spin;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  --animation-flash {
+    animation-name: flash;
     animation-duration: 1s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;

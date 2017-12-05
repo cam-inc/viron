@@ -87,6 +87,7 @@
   }
 
   &__description {
+    @apply --text-truncate;
     margin-bottom: 16px;
     font-size: 1.2rem;
     color: var(--color-base-gray);

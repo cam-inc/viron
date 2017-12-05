@@ -26,5 +26,4 @@ export default function() {
     this.rowSize = 'rowSpreadSmall';
     break;
   }
-
 }

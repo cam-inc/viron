@@ -1,8 +1,22 @@
 .Application_Splash {
+  @apply --layout-center-center;
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: blue;
+  background-color: var(--color-base-black);
+
+  &__logo {
+    @apply --animation-flash;
+    width: 36px;
+    height: 36px;
+    color: var(--color-base-white);
+  }
+
+  &__todo {
+    @apply --animation-flash;
+    margin: 0 12px;
+    color: var(--color-base-white);
+  }
 }
