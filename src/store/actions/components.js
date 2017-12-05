@@ -49,10 +49,10 @@ export default exporter('components', {
           context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
         context.commit('components.updateOne', componentId, componentDef, res.obj, res.headers);
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
       })
       .catch(err => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         throw err;
       });
   },
@@ -137,10 +137,10 @@ export default exporter('components', {
           primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
           table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
         });
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
       })
       .catch(err => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         throw err;
       });
   },
@@ -175,7 +175,7 @@ export default exporter('components', {
         return res;
       })
       .then(res => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         // tokenを更新する。
         const token = res.headers['Authorization'];
         if (!!token) {
@@ -194,7 +194,7 @@ export default exporter('components', {
         return res;
       })
       .catch(err => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         throw err;
       });
   },

@@ -44,15 +44,31 @@ export default exporter('application', {
    * 通信中APIを削除します。
    * @param {Object} state
    * @param {String} networkingId
+   * @param {riotx.Context} context
    * @return {Array}
    */
-  removeNetworking: (state, networkingId) => {
+  removeNetworking: (state, networkingId, context) => {
     state.application.networkings = reject(state.application.networkings, networking => {
       return (networking.id === networkingId);
     });
-    if (!state.application.networkings.length) {
+    if (!!context) {
+      // 意図的に通信状態チェックを遅らせます。
+      setTimeout(() => {
+        context.commit('application.isNetworking');
+      }, 500);
+    } else if (!state.application.networkings.length) {
       state.application.isNetworking = false;
     }
+    return ['application'];
+  },
+
+  /**
+   * 通信状態を更新します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  isNetworking: state => {
+    state.application.isNetworking = !!state.application.networkings.length;
     return ['application'];
   },
 

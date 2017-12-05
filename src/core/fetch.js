@@ -104,7 +104,7 @@ const commonFetch = (context, url, options) => {
       })
     ]))
     .then(response => {
-      context.commit('application.removeNetworking', networkingId);
+      context.commit('application.removeNetworking', networkingId, context);
       return response;
     })
     .then(response => { // status check.
@@ -114,7 +114,7 @@ const commonFetch = (context, url, options) => {
       return Promise.resolve(response);
     })
     .catch(err => {
-      context.commit('application.removeNetworking', networkingId);
+      context.commit('application.removeNetworking', networkingId, context);
       throw err;
     });
 };

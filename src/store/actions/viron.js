@@ -45,10 +45,10 @@ export default exporter('viron', {
         // pagesは不要なので削除。
         delete endpoint.pages;
         context.commit('endpoints.update', currentEndpointKey, endpoint);
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
       })
       .catch(err => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         throw err;
       });
   },
