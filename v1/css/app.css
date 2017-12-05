@@ -1462,6 +1462,16 @@ select {
     border: 1px solid var(--color-base-gray);
     border-radius: 2px;
   }
+.Icon {
+  position: relative;
+}
+.Icon__catcher {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    bottom: -8px;
+    left: -8px;
+  }
 .Modal {
   display: flex;
   align-items: center;

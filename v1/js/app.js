@@ -16737,7 +16737,7 @@ riot$1.tag2('viron-components-page-graph-stacked-bar', '', '', 'class="Component
     this.external(script$8);
 });
 
-riot$1.tag2('viron-icon-reload', '<svg viewbox="-1791 11377 14.063 16"> <path d="M43.991,5.189a.469.469,0,0,0-.679-.126L41.791,6.2a.469.469,0,0,0-.123.613,4.082,4.082,0,0,1,.582,2.09,4.219,4.219,0,1,1-8.437,0,4.224,4.224,0,0,1,3.75-4.193v1.38a.469.469,0,0,0,.75.375l3.75-2.812a.469.469,0,0,0,0-.75L38.312.094a.469.469,0,0,0-.75.375V1.891a7.049,7.049,0,1,0,6.428,3.3Z" transform="translate(-1822 11377)"></path> </svg>', '', 'class="icon Icon IconReload {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-reload', '<svg viewbox="-1791 11377 14.063 16"> <path d="M43.991,5.189a.469.469,0,0,0-.679-.126L41.791,6.2a.469.469,0,0,0-.123.613,4.082,4.082,0,0,1,.582,2.09,4.219,4.219,0,1,1-8.437,0,4.224,4.224,0,0,1,3.75-4.193v1.38a.469.469,0,0,0,.75.375l3.75-2.812a.469.469,0,0,0,0-.75L38.312.094a.469.469,0,0,0-.75.375V1.891a7.049,7.049,0,1,0,6.428,3.3Z" transform="translate(-1822 11377)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconReload {opts.class}"', function(opts) {
 });
 
 /**
@@ -16884,25 +16884,25 @@ riot$1.tag2('viron-components-page-number', '<div class="ComponentsPage_Card_Num
     this.external(script$9);
 });
 
-riot$1.tag2('viron-icon-filter', '<svg viewbox="-1832 11377 16.002 16"> <g transform="translate(-2104 11230)"> <rect width="12" height="1.5" rx="0.4" transform="translate(276 154.25)"></rect> <rect width="6" height="1.5" rx="0.4" transform="translate(282 148.75)"></rect> <rect width="12" height="1.5" rx="0.4" transform="translate(284 161.25) rotate(180)"></rect> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4426 19745.5)"></path> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4415 19751)"></path> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4420.501 19740)"></path> <rect width="7" height="1.5" rx="0.4" transform="translate(272 148.75)"></rect> </g> </svg>', '', 'class="icon Icon IconFilter {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-filter', '<svg viewbox="-1832 11377 16.002 16"> <g transform="translate(-2104 11230)"> <rect width="12" height="1.5" rx="0.4" transform="translate(276 154.25)"></rect> <rect width="6" height="1.5" rx="0.4" transform="translate(282 148.75)"></rect> <rect width="12" height="1.5" rx="0.4" transform="translate(284 161.25) rotate(180)"></rect> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4426 19745.5)"></path> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4415 19751)"></path> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4420.501 19740)"></path> <rect width="7" height="1.5" rx="0.4" transform="translate(272 148.75)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFilter {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-plus', '<svg viewbox="-2612 10790 16 16"> <g transform="translate(-3874 10766)"> <rect width="16" height="3" rx="0.2" transform="translate(1262 30.5)"></rect> <rect width="16" height="3" rx="0.2" transform="translate(1271.5 24) rotate(90)"></rect> </g> </svg>', '', 'class="icon Icon IconPlus {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-plus', '<svg viewbox="-2612 10790 16 16"> <g transform="translate(-3874 10766)"> <rect width="16" height="3" rx="0.2" transform="translate(1262 30.5)"></rect> <rect width="16" height="3" rx="0.2" transform="translate(1271.5 24) rotate(90)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconPlus {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-search', '<svg viewbox="-3434 14059.999 15.999 16.003"> <path d="M3710.818-13811.056l-3.051-3.05a6.957,6.957,0,0,1-3.768,1.1,7.008,7.008,0,0,1-7-7,7.008,7.008,0,0,1,7-7,7.008,7.008,0,0,1,7,7,6.957,6.957,0,0,1-1.107,3.773l3.051,3.049a.205.205,0,0,1,0,.284l-1.839,1.839a.206.206,0,0,1-.142.058A.206.206,0,0,1,3710.818-13811.056ZM3700-13820a4,4,0,0,0,4,4,4,4,0,0,0,4-4,4,4,0,0,0-4-4A4,4,0,0,0,3700-13820Z" transform="translate(-7131 27887)"></path> </svg>', '', 'class="icon Icon IconSearch {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-search', '<svg viewbox="-3434 14059.999 15.999 16.003"> <path d="M3710.818-13811.056l-3.051-3.05a6.957,6.957,0,0,1-3.768,1.1,7.008,7.008,0,0,1-7-7,7.008,7.008,0,0,1,7-7,7.008,7.008,0,0,1,7,7,6.957,6.957,0,0,1-1.107,3.773l3.051,3.049a.205.205,0,0,1,0,.284l-1.839,1.839a.206.206,0,0,1-.142.058A.206.206,0,0,1,3710.818-13811.056ZM3700-13820a4,4,0,0,0,4,4,4,4,0,0,0,4-4,4,4,0,0,0-4-4A4,4,0,0,0,3700-13820Z" transform="translate(-7131 27887)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSearch {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-setting', '<svg viewbox="-3464 14060 16 16.001"> <path d="M15.953,7.112a.521.521,0,0,0-.514-.394,1.767,1.767,0,0,1-1.209-3.075.444.444,0,0,0,.049-.6A7.916,7.916,0,0,0,13.01,1.76a.445.445,0,0,0-.608.049,1.844,1.844,0,0,1-2,.448A1.777,1.777,0,0,1,9.327.521.444.444,0,0,0,8.934.053a7.987,7.987,0,0,0-1.8,0,.445.445,0,0,0-.4.458,1.78,1.78,0,0,1-1.1,1.707,1.849,1.849,0,0,1-1.98-.451.446.446,0,0,0-.6-.051,7.946,7.946,0,0,0-1.294,1.28.445.445,0,0,0,.048.608,1.773,1.773,0,0,1,.447,2A1.85,1.85,0,0,1,.518,6.677a.435.435,0,0,0-.462.393,8.014,8.014,0,0,0,0,1.819.529.529,0,0,0,.525.393,1.755,1.755,0,0,1,1.646,1.1,1.779,1.779,0,0,1-.447,1.978.445.445,0,0,0-.049.6,7.945,7.945,0,0,0,1.266,1.28.445.445,0,0,0,.609-.048A1.841,1.841,0,0,1,5.6,13.743,1.774,1.774,0,0,1,6.679,15.48a.444.444,0,0,0,.393.467,7.962,7.962,0,0,0,1.8,0,.445.445,0,0,0,.4-.458,1.778,1.778,0,0,1,1.095-1.706,1.846,1.846,0,0,1,1.981.451.447.447,0,0,0,.6.05,7.965,7.965,0,0,0,1.294-1.28.444.444,0,0,0-.048-.608,1.773,1.773,0,0,1-.448-2,1.791,1.791,0,0,1,1.637-1.085l.1,0a.445.445,0,0,0,.468-.392A8.007,8.007,0,0,0,15.953,7.112ZM8.015,10.686a2.669,2.669,0,1,1,2.668-2.669A2.671,2.671,0,0,1,8.015,10.686Z" transform="translate(-3464.003 14060)"></path> </svg>', '', 'class="icon Icon IconSetting {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-setting', '<svg viewbox="-3464 14060 16 16.001"> <path d="M15.953,7.112a.521.521,0,0,0-.514-.394,1.767,1.767,0,0,1-1.209-3.075.444.444,0,0,0,.049-.6A7.916,7.916,0,0,0,13.01,1.76a.445.445,0,0,0-.608.049,1.844,1.844,0,0,1-2,.448A1.777,1.777,0,0,1,9.327.521.444.444,0,0,0,8.934.053a7.987,7.987,0,0,0-1.8,0,.445.445,0,0,0-.4.458,1.78,1.78,0,0,1-1.1,1.707,1.849,1.849,0,0,1-1.98-.451.446.446,0,0,0-.6-.051,7.946,7.946,0,0,0-1.294,1.28.445.445,0,0,0,.048.608,1.773,1.773,0,0,1,.447,2A1.85,1.85,0,0,1,.518,6.677a.435.435,0,0,0-.462.393,8.014,8.014,0,0,0,0,1.819.529.529,0,0,0,.525.393,1.755,1.755,0,0,1,1.646,1.1,1.779,1.779,0,0,1-.447,1.978.445.445,0,0,0-.049.6,7.945,7.945,0,0,0,1.266,1.28.445.445,0,0,0,.609-.048A1.841,1.841,0,0,1,5.6,13.743,1.774,1.774,0,0,1,6.679,15.48a.444.444,0,0,0,.393.467,7.962,7.962,0,0,0,1.8,0,.445.445,0,0,0,.4-.458,1.778,1.778,0,0,1,1.095-1.706,1.846,1.846,0,0,1,1.981.451.447.447,0,0,0,.6.05,7.965,7.965,0,0,0,1.294-1.28.444.444,0,0,0-.048-.608,1.773,1.773,0,0,1-.448-2,1.791,1.791,0,0,1,1.637-1.085l.1,0a.445.445,0,0,0,.468-.392A8.007,8.007,0,0,0,15.953,7.112ZM8.015,10.686a2.669,2.669,0,1,1,2.668-2.669A2.671,2.671,0,0,1,8.015,10.686Z" transform="translate(-3464.003 14060)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSetting {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-arrow-left', '<svg viewbox="-3581 14060.002 10.04 16.002"> <path d="M1793.942-16723.971l-7.4-7.4-.018-.023-.385-.385a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.816a.2.2,0,0,1,0,.287l-1.84,1.84a.2.2,0,0,1-.141.057A.2.2,0,0,1,1793.942-16723.971Z" transform="translate(-5367.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconArrowLeft {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-arrow-left', '<svg viewbox="-3581 14060.002 10.04 16.002"> <path d="M1793.942-16723.971l-7.4-7.4-.018-.023-.385-.385a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.816a.2.2,0,0,1,0,.287l-1.84,1.84a.2.2,0,0,1-.141.057A.2.2,0,0,1,1793.942-16723.971Z" transform="translate(-5367.083 30799.918)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconArrowLeft {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-arrow-right', '<svg viewbox="-3551.038 14059.998 10.039 16.002"> <path d="M1763.979-16723.969l-7.394-7.4a.291.291,0,0,1-.022-.025l-.381-.383a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.286,0l1.836,1.84a.191.191,0,0,1,0,.277l-5.819,5.822,5.819,5.818a.2.2,0,0,1,0,.287l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1763.979-16723.969Z" transform="translate(-1784.878 -2663.914) rotate(180)"></path> </svg>', '', 'class="icon Icon IconArrowRight {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-arrow-right', '<svg viewbox="-3551.038 14059.998 10.039 16.002"> <path d="M1763.979-16723.969l-7.394-7.4a.291.291,0,0,1-.022-.025l-.381-.383a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.286,0l1.836,1.84a.191.191,0,0,1,0,.277l-5.819,5.822,5.819,5.818a.2.2,0,0,1,0,.287l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1763.979-16723.969Z" transform="translate(-1784.878 -2663.914) rotate(180)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconArrowRight {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-dots', '<svg viewbox="-3614 14066 16 4"> <g transform="translate(-3894 14025)"> <circle cx="2" cy="2" r="2" transform="translate(280 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(286 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(292 41)"></circle> </g> </svg>', '', 'class="icon Icon IconDots {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-dots', '<svg viewbox="-3614 14066 16 4"> <g transform="translate(-3894 14025)"> <circle cx="2" cy="2" r="2" transform="translate(280 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(286 41)"></circle> <circle cx="2" cy="2" r="2" transform="translate(292 41)"></circle> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconDots {opts.class}"', function(opts) {
 });
 
 /**
@@ -17366,7 +17366,7 @@ riot$1.tag2('viron-button', '<div class="Button__label">{opts.label}</div>', '',
     this.external(script$13);
 });
 
-riot$1.tag2('viron-icon-check', '<svg viewbox="-2582 10792 15.997 11.266"> <g transform="translate(-2935 10688)"> <g transform="translate(122.702 -49.51)"> <rect width="12.32" height="2.989" rx="0.2" transform="translate(235.47 162.221) rotate(-45)"></rect> <rect width="9.682" height="2.989" rx="0.2" transform="translate(232.412 155.815) rotate(45)"></rect> </g> </g> </svg>', '', 'class="icon Icon IconCheck {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-check', '<svg viewbox="-2582 10792 15.997 11.266"> <g transform="translate(-2935 10688)"> <g transform="translate(122.702 -49.51)"> <rect width="12.32" height="2.989" rx="0.2" transform="translate(235.47 162.221) rotate(-45)"></rect> <rect width="9.682" height="2.989" rx="0.2" transform="translate(232.412 155.815) rotate(45)"></rect> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconCheck {opts.class}"', function(opts) {
 });
 
 var script$14 = function() {
@@ -23409,7 +23409,7 @@ riot$1.tag2('viron-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__t
     this.external(script$21);
 });
 
-riot$1.tag2('viron-icon-arrow-down', '<svg viewbox="-3523.999 14062.964 16.004 10.037"> <path d="M1736.94-16726.932l-5.963-5.963-1.433-1.432-.019-.023-.384-.385a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.84a.2.2,0,0,1,0,.277l-5.82,5.824,5.82,5.818a.205.205,0,0,1,0,.283l-1.84,1.84a.2.2,0,0,1-.141.061A.2.2,0,0,1,1736.94-16726.932Z" transform="translate(13218.876 15802.083) rotate(-90)"></path> </svg>', '', 'class="icon Icon IconArrowDown {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-arrow-down', '<svg viewbox="-3523.999 14062.964 16.004 10.037"> <path d="M1736.94-16726.932l-5.963-5.963-1.433-1.432-.019-.023-.384-.385a.2.2,0,0,1,0-.281l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.84a.2.2,0,0,1,0,.277l-5.82,5.824,5.82,5.818a.205.205,0,0,1,0,.283l-1.84,1.84a.2.2,0,0,1-.141.061A.2.2,0,0,1,1736.94-16726.932Z" transform="translate(13218.876 15802.083) rotate(-90)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconArrowDown {opts.class}"', function(opts) {
 });
 
 var script$22 = function() {
@@ -23509,10 +23509,10 @@ riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}
     this.external(script$23);
 });
 
-riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-square', '<svg viewbox="-3674 14061 15.998 13.998"> <path d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)"></path> </svg>', '', 'class="icon Icon IconSquare {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-square', '<svg viewbox="-3674 14061 15.998 13.998"> <path d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSquare {opts.class}"', function(opts) {
 });
 
 var script$24 = function() {
@@ -30705,7 +30705,7 @@ riot$1.tag2('viron-components-page', '<div class="ComponentsPage__name">{name}</
     this.external(script$38);
 });
 
-riot$1.tag2('viron-icon-move', '<svg viewbox="-1076 13435 16 16"> <path d="M15.83,7.6,13.545,5.317a.571.571,0,0,0-.973.4V6.862H9.143V3.434h1.143a.568.568,0,0,0,.4-.973L8.4.175a.561.561,0,0,0-.8,0L5.312,2.46a.571.571,0,0,0,.4.973H6.857V6.862H3.429V5.719a.568.568,0,0,0-.973-.4L.17,7.6a.561.561,0,0,0,0,.8l2.286,2.286a.572.572,0,0,0,.973-.4V9.148H6.857v3.429H5.714a.568.568,0,0,0-.4.973L7.6,15.835a.561.561,0,0,0,.8,0l2.286-2.286a.572.572,0,0,0-.4-.973H9.143V9.148h3.429v1.143a.568.568,0,0,0,.973.4L15.83,8.407a.561.561,0,0,0,0-.8Z" transform="translate(-1076 13434.995)"></path> </svg>', '', 'class="icon Icon IconMove {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-move', '<svg viewbox="-1076 13435 16 16"> <path d="M15.83,7.6,13.545,5.317a.571.571,0,0,0-.973.4V6.862H9.143V3.434h1.143a.568.568,0,0,0,.4-.973L8.4.175a.561.561,0,0,0-.8,0L5.312,2.46a.571.571,0,0,0,.4.973H6.857V6.862H3.429V5.719a.568.568,0,0,0-.973-.4L.17,7.6a.561.561,0,0,0,0,.8l2.286,2.286a.572.572,0,0,0,.973-.4V9.148H6.857v3.429H5.714a.568.568,0,0,0-.4.973L7.6,15.835a.561.561,0,0,0,.8,0l2.286-2.286a.572.572,0,0,0-.4-.973H9.143V9.148h3.429v1.143a.568.568,0,0,0,.973.4L15.83,8.407a.561.561,0,0,0,0-.8Z" transform="translate(-1076 13434.995)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconMove {opts.class}"', function(opts) {
 });
 
 var script$39 = function() {};
@@ -30714,7 +30714,7 @@ riot$1.tag2('viron-tag', '<div class="Tag__label">{opts.label}</div>', '', 'clas
     this.external(script$39);
 });
 
-riot$1.tag2('viron-icon-star', '<svg viewbox="-1994 12644 16 15.329"> <path d="M15.652,7.994a1.148,1.148,0,0,0-.636-1.957l-3.874-.563A.506.506,0,0,1,10.76,5.2L9.028,1.686a1.147,1.147,0,0,0-2.058,0L5.238,5.2a.507.507,0,0,1-.382.277L.983,6.037A1.148,1.148,0,0,0,.346,7.994l2.8,2.732a.507.507,0,0,1,.146.449l-.661,3.858a1.123,1.123,0,0,0,.25.93,1.159,1.159,0,0,0,1.414.279l3.465-1.822a.519.519,0,0,1,.472,0L11.7,16.242a1.136,1.136,0,0,0,.534.134,1.151,1.151,0,0,0,.88-.413,1.123,1.123,0,0,0,.25-.93L12.7,11.175a.507.507,0,0,1,.146-.449Z" transform="translate(-1993.999 12642.953)"></path> </svg>', '', 'class="icon Icon IconStar {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-star', '<svg viewbox="-1994 12644 16 15.329"> <path d="M15.652,7.994a1.148,1.148,0,0,0-.636-1.957l-3.874-.563A.506.506,0,0,1,10.76,5.2L9.028,1.686a1.147,1.147,0,0,0-2.058,0L5.238,5.2a.507.507,0,0,1-.382.277L.983,6.037A1.148,1.148,0,0,0,.346,7.994l2.8,2.732a.507.507,0,0,1,.146.449l-.661,3.858a1.123,1.123,0,0,0,.25.93,1.159,1.159,0,0,0,1.414.279l3.465-1.822a.519.519,0,0,1,.472,0L11.7,16.242a1.136,1.136,0,0,0,.534.134,1.151,1.151,0,0,0,.88-.413,1.123,1.123,0,0,0,.25-.93L12.7,11.175a.507.507,0,0,1,.146-.449Z" transform="translate(-1993.999 12642.953)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconStar {opts.class}"', function(opts) {
 });
 
 var qrious = createCommonjsModule(function (module, exports) {
@@ -33443,16 +33443,16 @@ riot$1.tag2('viron-application-drawers', '<virtual each="{drawers}"> <viron-draw
     this.external(script$53);
 });
 
-riot$1.tag2('viron-icon-menu', '<svg viewbox="-3635 13999.001 24 9.4"> <g transform="translate(-3357.6 14031.401) rotate(180)"> <rect width="16" height="3" rx="0.4" transform="translate(261.4 29.4)"></rect> <rect width="16" height="3" rx="0.4" transform="translate(253.4 23)"></rect> </g> </svg>', '', 'class="icon Icon IconMenu {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-menu', '<svg viewbox="-3635 13999.001 24 9.4"> <g transform="translate(-3357.6 14031.401) rotate(180)"> <rect width="16" height="3" rx="0.4" transform="translate(261.4 29.4)"></rect> <rect width="16" height="3" rx="0.4" transform="translate(253.4 23)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconMenu {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-menu-invert', '<svg viewbox="-3595 13999.001 24 9.4"> <g transform="translate(-3317.6 14031.401) rotate(180)"> <rect width="16" height="3" rx="0.4" transform="translate(253.4 29.4)"></rect> <rect class="cls-1" width="16" height="3" rx="0.4" transform="translate(261.4 23)"></rect> </g> </svg>', '', 'class="icon Icon IconMenuInvert {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-menu-invert', '<svg viewbox="-3595 13999.001 24 9.4"> <g transform="translate(-3317.6 14031.401) rotate(180)"> <rect width="16" height="3" rx="0.4" transform="translate(253.4 29.4)"></rect> <rect class="cls-1" width="16" height="3" rx="0.4" transform="translate(261.4 23)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconMenuInvert {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-logo', '<svg viewbox="-3675 13992 24 24"> <path d="M13.333,0H0V24H24V0Zm0,2.667h8V5.333h-8Zm-10.667,0h8v8h-8ZM21.333,21.333H2.667v-8H21.333Zm0-10.667h-8V8h8Z" transform="translate(-3675 13992)"></path> </svg>', '', 'class="icon Icon IconLogo {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-logo', '<svg viewbox="-3675 13992 24 24"> <path d="M13.333,0H0V24H24V0Zm0,2.667h8V5.333h-8Zm-10.667,0h8v8h-8ZM21.333,21.333H2.667v-8H21.333Zm0-10.667h-8V8h8Z" transform="translate(-3675 13992)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconLogo {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-arrow-up', '<svg viewbox="-3494.002 14063 16.002 10.037"> <path d="M1706.943-16726.971l-5.963-5.963-1.433-1.434a.122.122,0,0,1-.019-.021l-.384-.385a.2.2,0,0,1,0-.283l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.842a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.818a.2.2,0,0,1,0,.281l-1.84,1.842a.2.2,0,0,1-.141.059A.2.2,0,0,1,1706.943-16726.971Z" transform="translate(-20220.914 12363.916) rotate(90)"></path> </svg>', '', 'class="icon Icon IconArrowUp {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-arrow-up', '<svg viewbox="-3494.002 14063 16.002 10.037"> <path d="M1706.943-16726.971l-5.963-5.963-1.433-1.434a.122.122,0,0,1-.019-.021l-.384-.385a.2.2,0,0,1,0-.283l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.842a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.818a.2.2,0,0,1,0,.281l-1.84,1.842a.2.2,0,0,1-.141.059A.2.2,0,0,1,1706.943-16726.971Z" transform="translate(-20220.914 12363.916) rotate(90)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconArrowUp {opts.class}"', function(opts) {
 });
 
 var script$55 = function() {
