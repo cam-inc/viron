@@ -16,7 +16,7 @@
   &__button {
     @apply --layout-center-center;
 
-    @mixin hover &: not (&--disabled) {
+    @mixin hover &:not(&--disabled) {
       color: var(--color-base-white);
       background-color: var(--color-base-blue);
       border-color: var(--color-base-blue);
