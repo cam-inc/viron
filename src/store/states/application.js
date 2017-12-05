@@ -9,6 +9,8 @@ export default exporter('application', {
     }
     return url.pathname.replace(/viron/, '').replace(/\//g, '');
   })(),
+  // vironの最新バージョン。
+  latestVersion: 'v1',
   // 起動状態。
   isLaunched: false,
   // 画面遷移中か否か。

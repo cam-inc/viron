@@ -20,6 +20,15 @@ export default exporter('application', {
   },
 
   /**
+   * 最新バージョンを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  latestVersion: state => {
+    return state.application.latestVersion;
+  },
+
+  /**
    * 起動状態を返します。
    * @param {Object} state
    * @return {Boolean}
