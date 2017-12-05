@@ -11280,7 +11280,7 @@ const commonFetch = (context, url, options) => {
       })
     ]))
     .then(response => {
-      context.commit('application.removeNetworking', networkingId);
+      context.commit('application.removeNetworking', networkingId, context);
       return response;
     })
     .then(response => { // status check.
@@ -11290,7 +11290,7 @@ const commonFetch = (context, url, options) => {
       return Promise.resolve(response);
     })
     .catch(err => {
-      context.commit('application.removeNetworking', networkingId);
+      context.commit('application.removeNetworking', networkingId, context);
       throw err;
     });
 };
@@ -12330,10 +12330,10 @@ var components = exporter('components', {
           context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
         context.commit('components.updateOne', componentId, componentDef, res.obj, res.headers);
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
       })
       .catch(err => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         throw err;
       });
   },
@@ -12418,10 +12418,10 @@ var components = exporter('components', {
           primaryKey: component.primary || null,// テーブルで使用するprimaryキー。
           table_labels: component.table_labels || []// テーブル行名で優先度が高いkey群。
         });
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
       })
       .catch(err => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         throw err;
       });
   },
@@ -12456,7 +12456,7 @@ var components = exporter('components', {
         return res;
       })
       .then(res => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         // tokenを更新する。
         const token = res.headers['Authorization'];
         if (!!token) {
@@ -12475,7 +12475,7 @@ var components = exporter('components', {
         return res;
       })
       .catch(err => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         throw err;
       });
   },
@@ -13801,10 +13801,10 @@ var viron = exporter('viron', {
         // pagesは不要なので削除。
         delete endpoint.pages;
         context.commit('endpoints.update', currentEndpointKey, endpoint);
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
       })
       .catch(err => {
-        context.commit('application.removeNetworking', networkingId);
+        context.commit('application.removeNetworking', networkingId, context);
         throw err;
       });
   },
@@ -13869,6 +13869,15 @@ var application$1 = exporter$1('application', {
    */
   version: state => {
     return state.application.version;
+  },
+
+  /**
+   * 最新バージョンを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  latestVersion: state => {
+    return state.application.latestVersion;
   },
 
   /**
@@ -15655,15 +15664,31 @@ var application$2 = exporter$2('application', {
    * 通信中APIを削除します。
    * @param {Object} state
    * @param {String} networkingId
+   * @param {riotx.Context} context
    * @return {Array}
    */
-  removeNetworking: (state, networkingId) => {
+  removeNetworking: (state, networkingId, context) => {
     state.application.networkings = reject_1$1(state.application.networkings, networking => {
       return (networking.id === networkingId);
     });
-    if (!state.application.networkings.length) {
+    if (!!context) {
+      // 意図的に通信状態チェックを遅らせます。
+      setTimeout(() => {
+        context.commit('application.isNetworking');
+      }, 500);
+    } else if (!state.application.networkings.length) {
       state.application.isNetworking = false;
     }
+    return ['application'];
+  },
+
+  /**
+   * 通信状態を更新します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  isNetworking: state => {
+    state.application.isNetworking = !!state.application.networkings.length;
     return ['application'];
   },
 
@@ -16562,6 +16587,8 @@ var application$3 = exporter$3('application', {
     }
     return url.pathname.replace(/viron/, '').replace(/\//g, '');
   })(),
+  // vironの最新バージョン。
+  latestVersion: 'v1',
   // 起動状態。
   isLaunched: false,
   // 画面遷移中か否か。
@@ -33100,12 +33127,15 @@ riot$1.tag2('viron-qrcode', '<canvas class="Qrcode_canvas" ref="canvas"></canvas
 });
 
 var script$43 = function() {
+  const store = this.riotx.get();
+
   const optimizedEndpoint = objectAssign({}, {
     url: this.opts.endpoint.url,
     memo: this.opts.endpoint.memo
   });
+  const version = store.getter('application.latestVersion');
   const encodedEndpoint = encodeURIComponent(JSON.stringify(optimizedEndpoint));
-  const value = `${location.origin}/#/endpointimport?endpoint=${encodedEndpoint}`;
+  const value = `https://cam-inc.github.io/viron/${version}/#/endpointimport?endpoint=${encodedEndpoint}`;
 
   this.data = {
     // background: 'green',
@@ -34293,9 +34323,21 @@ riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></d
 });
 
 var script$69 = function() {
+  this.isAnimating = this.opts.isactive;
+
+  this.on('update', () => {
+    if (this.opts.isactive) {
+      this.isAnimating = true;
+    } else if (this.isAnimating) {
+      setTimeout(() => {
+        this.isAnimating = false;
+        this.update();
+      }, 300);
+    }
+  });
 };
 
-riot$1.tag2('viron-application-progress-linear', '<div class="Application_ProgressLinear__bar"> <div class="Application_ProgressLinear__particle"></div> <div class="Application_ProgressLinear__particle"></div> </div>', '', 'class="Application_ProgressLinear {\'Application_ProgressLinear--active\' : opts.isactive}"', function(opts) {
+riot$1.tag2('viron-application-progress-linear', '<div class="Application_ProgressLinear__bar"> <div class="Application_ProgressLinear__particle"></div> <div class="Application_ProgressLinear__particle"></div> </div>', '', 'class="Application_ProgressLinear {\'Application_ProgressLinear--visible\' : opts.isactive, \'Application_ProgressLinear--animating\' : isAnimating}"', function(opts) {
     this.external(script$69);
 });
 
