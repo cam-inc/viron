@@ -43,12 +43,14 @@
 
   &__bar {
     position: absolute;
-    top: 0;
+    top: -4px;
     right: 0;
     left: 0;
-    display: none;
     height: 4px;
     background-color: var(--color-base-gray);
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: top, opacity;
   }
 
   &__particle {
@@ -61,20 +63,23 @@
     transition: transform 0.2s linear;
     transform-origin: left;
     will-change: left, right;
+  }
 
-    &:nth-child(1) {
-      animation: Application_ProgressLinear-indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
-    }
-
-    &:nth-child(2) {
-      animation: Application_ProgressLinear-indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
-      animation-delay: 1.15s;
+  &--visible {
+    .Application_ProgressLinear__bar {
+      top: 0;
+      opacity: 1;
     }
   }
 
-  &--active {
-    .Application_ProgressLinear__bar {
-      display: block;
+  &--animating {
+    & .Application_ProgressLinear__particle:nth-child(1) {
+      animation: Application_ProgressLinear-indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+    }
+
+    & .Application_ProgressLinear__particle:nth-child(2) {
+      animation: Application_ProgressLinear-indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+      animation-delay: 1.15s;
     }
   }
 }
