@@ -7,3 +7,4 @@ viron-icon-exclamation-circle.icon.Icon.IconExclamationCircle(class="{ opts.clas
       g(transform="translate(9.621 -0.445)")
         rect(width="5" height="2" rx="0.4" transform="translate(362.379 192.945) rotate(-90)")
         rect(width="2" height="2" rx="0.4" transform="translate(362.379 195.945) rotate(-90)")
+  .Icon__catcher(if="{ !opts.nocatcher }")

@@ -1,0 +1,11 @@
+.Icon {
+  position: relative;
+
+  &__catcher {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    bottom: -8px;
+    left: -8px;
+  }
+}
