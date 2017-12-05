@@ -14,6 +14,9 @@
   }
 
   &__operationsButton {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
     position: absolute;
     top: 24px;
     right: 24px;
@@ -25,14 +28,12 @@
       width: 16px;
       height: 16px;
     }
-
-    &:hover,
-    &.hold {
-      color: var(--color-base-blue);
-    }
   }
 
   &__backButton {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
     position: absolute;
     top: 24px;
     left: 24px;
@@ -43,11 +44,6 @@
     & .Icon {
       width: 16px;
       height: 16px;
-    }
-
-    &:hover,
-    &.hold {
-      color: var(--color-base-blue);
     }
   }
 
@@ -67,6 +63,10 @@
   &__prevButton,
   &__nextButton {
     @apply --layout-center-center;
+
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
     width: 36px;
     height: 36px;
     cursor: pointer;
@@ -76,19 +76,12 @@
       height: 16px;
     }
 
-    &:hover,
-    &.hold {
-      color: var(--color-base-blue);
-    }
-
     &--disabled {
-      color: var(--color-base-gray);
-      cursor: not-allowed;
-
-      &:hover,
-      &.hold {
+      @mixin hover {
         color: var(--color-base-gray);
       }
+      color: var(--color-base-gray);
+      cursor: not-allowed;
     }
   }
 

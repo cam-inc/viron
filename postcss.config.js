@@ -3,6 +3,7 @@ module.exports = {
   plugins: {
     'postcss-import': {},
     'postcss-apply': {},
+    'postcss-mixins': {},
     'postcss-custom-properties': {
       "preserve": true
     },

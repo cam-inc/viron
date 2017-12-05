@@ -11,15 +11,13 @@
   }
 
   &__selfSignedCertificate {
+    @mixin hover {
+      opacity: 0.5;
+    }
     display: inline-block;
     color: var(--color-base-gray);
     text-decoration: underline;
     cursor: pointer;
-
-    &:hover,
-    &.hold {
-      opacity: 0.5;
-    }
   }
 
   &__inputs {

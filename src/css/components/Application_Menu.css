@@ -46,15 +46,13 @@
   }
 
   &__logo {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
     width: 24px;
     height: 24px;
     color: var(--color-base-red);
     cursor: pointer;
-
-    &:hover,
-    &.hold {
-      color: var(--color-base-blue);
-    }
   }
 
   &__body {

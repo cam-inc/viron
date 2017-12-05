@@ -3,14 +3,13 @@
 
   &__string {
     @apply --text-truncate;
+
+    @mixin hover {
+      color: var(--color-base-gray);
+    }
     display: inline-block;
     font-size: 1.4rem;
     cursor: pointer;
-
-    &:hover,
-    &.hold {
-      color: var(--color-base-gray);
-    }
   }
 
   &__image {

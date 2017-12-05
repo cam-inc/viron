@@ -18,17 +18,16 @@
 
   &__closeButton {
     @apply --layout-center-center;
+
+    @mixin hover {
+      color: var(--color-base-gray);
+    }
     position: absolute;
     top: 24px;
     left: 24px;
     width: 16px;
     height: 16px;
     cursor: pointer;
-
-    &:hover,
-    &.hold {
-      color: var(--color-base-gray);
-    }
   }
 
   &--visible {

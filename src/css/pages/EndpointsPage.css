@@ -15,6 +15,14 @@
 
   &__orderButton {
     @apply --layout-center-center;
+
+    @mixin hover {
+      background-color: var(--color-base-blue);
+
+      & .Icon {
+        color: var(--color-base-white);
+      }
+    }
     flex-shrink: 0;
     width: 32px;
     height: 32px;
@@ -25,15 +33,6 @@
     & .Icon {
       width: 16px;
       height: 16px;
-    }
-
-    &:hover,
-    &.hold {
-      background-color: var(--color-base-blue);
-
-      & .Icon {
-        color: var(--color-base-white);
-      }
     }
   }
 

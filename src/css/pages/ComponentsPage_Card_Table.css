@@ -15,6 +15,14 @@
 
   &__postOperation {
     @apply --layout-center-center;
+
+    @mixin hover {
+      background-color: var(--color-base-white);
+
+      & .Icon {
+        color: var(--color-base-blue);
+      }
+    }
     width: 32px;
     height: 32px;
     margin-right: 8px;
@@ -28,15 +36,6 @@
       height: 16px;
       color: var(--color-base-white);
     }
-
-    &:hover,
-    &.hold {
-      background-color: var(--color-base-white);
-
-      & .Icon {
-        color: var(--color-base-blue);
-      }
-    }
   }
 
   &__title {
@@ -47,15 +46,13 @@
     @apply --layout-center-start;
 
     & .Icon {
+      @mixin hover {
+        color: var(--color-base-blue);
+      }
       width: 16px;
       height: 16px;
       margin-right: 24px;
       cursor: pointer;
-
-      &:hover,
-      &.hold {
-        color: var(--color-base-blue);
-      }
 
       &:last-child {
         margin-right: 0;
@@ -131,25 +128,21 @@
   }
 
   &__tbodyRow {
-    cursor: pointer;
-    border-bottom: 1px solid var(--color-base-gray-tertiary);
-
-    &:hover,
-    &.hold {
+    @mixin hover {
       background-color: var(--color-base-gray-tertiary);
     }
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-base-gray-tertiary);
   }
 
   &__td {
     & .Icon {
+      @mixin hover {
+        color: var(--color-base-blue);
+      }
       width: 16px;
       height: 16px;
       cursor: pointer;
-
-      &:hover,
-      &.hold {
-        color: var(--color-base-blue);
-      }
     }
   }
 

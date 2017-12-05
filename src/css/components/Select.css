@@ -2,14 +2,15 @@
   display: block;
 
   &__form {
+    @mixin hover {
+      border-color: var(--color-base-blue);
+    }
     position: relative;
     background-color: var(--color-base-white);
     border: 1px solid var(--color-base-gray);
     border-radius: 2px;
 
-    &:focus,
-    &:hover,
-    &.hold {
+    &:focus {
       border-color: var(--color-base-blue);
     }
   }

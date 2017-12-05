@@ -6,11 +6,12 @@
   }
 
   &__tab {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
     margin-right: 8px;
     cursor: pointer;
 
-    &:hover,
-    &.hold,
     &--selected {
       color: var(--color-base-blue);
     }

@@ -13,11 +13,12 @@
   }
 
   &--primary {
+    @mixin hover {
+      background-color: var(--color-base-blue-secondary);
+    }
     background-color: var(--color-base-blue);
 
-    &.Button--disabled,
-    &:hover,
-    &.hold {
+    &.Button--disabled {
       background-color: var(--color-base-blue-secondary);
     }
 
@@ -27,11 +28,12 @@
   }
 
   &--secondary {
+    @mixin hover {
+      background-color: var(--color-base-red-secondary);
+    }
     background-color: var(--color-base-red);
 
-    &.Button--disabled,
-    &:hover,
-    &.hold {
+    &.Button--disabled {
       background-color: var(--color-base-red-secondary);
     }
 
@@ -41,11 +43,16 @@
   }
 
   &--ghost {
+    @mixin hover {
+      border-color: var(--color-base-black-secondary);
+
+      & .Button__label {
+        color: var(--color-base-black-secondary);
+      }
+    }
     border: 2px solid var(--color-base-black);
 
-    &.Button--disabled,
-    &:hover,
-    &.hold {
+    &.Button--disabled {
       border-color: var(--color-base-black-secondary);
 
       & .Button__label {

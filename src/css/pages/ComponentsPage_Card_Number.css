@@ -20,14 +20,12 @@
     @apply --layout-center-center;
 
     & .Icon {
+      @mixin hover {
+        color: var(--color-base-blue);
+      }
       width: 10px;
       height: 10px;
       cursor: pointer;
-
-      &:hover,
-      &.hold {
-        color: var(--color-base-blue);
-      }
     }
   }
 

@@ -8,6 +8,14 @@
 
   &__addButton {
     @apply --layout-center-center;
+
+    @mixin hover {
+      background-color: var(--color-base-blue);
+
+      & .Icon {
+        color: var(--color-base-white);
+      }
+    }
     flex-shrink: 0;
     width: 32px;
     height: 32px;
@@ -21,15 +29,6 @@
       width: 16px;
       height: 16px;
       color: var(--color-base-blue);
-    }
-
-    &:hover,
-    &.hold {
-      background-color: var(--color-base-blue);
-
-      & .Icon {
-        color: var(--color-base-white);
-      }
     }
   }
 
@@ -49,14 +48,12 @@
   }
 
   &__openButton {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
     flex-shrink: 0;
     font-size: 14px;
     cursor: pointer;
-
-    &:hover,
-    &.hold {
-      color: var(--color-base-blue);
-    }
   }
 
   &__body {
@@ -95,12 +92,10 @@
   }
 
   &__itemBrief {
-    cursor: pointer;
-
-    &:hover,
-    &.hold {
+    @mixin hover {
       color: var(--color-base-blue);
     }
+    cursor: pointer;
   }
 
   &__itemBriefTitle {
@@ -127,24 +122,21 @@
   }
 
   &__removeButton {
-    font-size: 1.4rem;
-    cursor: pointer;
-
-    &:hover,
-    &.hold {
+    @mixin hover {
       color: var(--color-base-blue);
     }
+    font-size: 1.4rem;
+    cursor: pointer;
   }
 
   &__closeButton {
     @apply --layout-center-between;
-    font-size: 1.4rem;
-    cursor: pointer;
 
-    &:hover,
-    &.hold {
+    @mixin hover {
       color: var(--color-base-blue);
     }
+    font-size: 1.4rem;
+    cursor: pointer;
 
     & .Icon {
       width: 16px;

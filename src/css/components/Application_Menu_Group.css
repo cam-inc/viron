@@ -3,14 +3,13 @@
 
   &__head {
     @apply --layout-center-center;
+
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
     height: 64px;
     padding: 0 16px 0 32px;
     cursor: pointer;
-
-    &:hover,
-    &.hold {
-      color: var(--color-base-blue);
-    }
   }
 
   &__name {
@@ -28,14 +27,12 @@
   }
 
   &__page {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
     padding: 16px 16px 16px 32px;
     font-size: 1.4rem;
     cursor: pointer;
-
-    &:hover,
-    &.hold {
-      color: var(--color-base-blue);
-    }
   }
 
   &--open {

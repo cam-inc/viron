@@ -1,0 +1,11 @@
+@define-mixin hover $selector {
+  @media (hover: hover) {
+    &:hover$(selector) {
+      @mixin-content ;
+    }
+  }
+
+  &.hold$(selector) {
+    @mixin-content ;
+  }
+}
