@@ -17469,7 +17469,6 @@ var script$15 = function() {
 
   this.handleApplyButtonTap = () => {
     if (!this.opts.onChange) {
-      this.close();
       return;
     }
     let newSelectedColumnKeys = map_1$1(filter_1$1(this.columns, column => {
@@ -17482,7 +17481,6 @@ var script$15 = function() {
       newSelectedColumnKeys = null;
     }
     this.opts.onChange(newSelectedColumnKeys);
-    this.close();
   };
 };
 
@@ -30606,7 +30604,7 @@ var script$12 = function() {
   };
 
   this.handleSearchButtonTap = () => {
-    store.action('modals.add', 'viron-components-page-search', {
+    store.action('drawers.add', 'viron-components-page-search', {
       parameterObjects: this.searchParameters,
       initialVal: this.searchQueries,
       onSearch: newSearchQueries => {
@@ -30614,18 +30612,18 @@ var script$12 = function() {
         this.hasSearchQueries = !!size_1(newSearchQueries);
         getData();
       }
-    });
+    }, { isNarrow: true });
   };
 
   this.handleFilterButtonTap = () => {
-    store.action('modals.add', 'viron-components-page-filter', {
+    store.action('drawers.add', 'viron-components-page-filter', {
       columns: this.columns,
       selectedColumnKeys: this.visibleColumnKeys,
       onChange: newSelectedColumnKeys => {
         this.visibleColumnKeys = newSelectedColumnKeys;
         getData();
       }
-    });
+    }, { isNarrow: true });
   };
 
   this.handleReloadButtonTap = () => {
@@ -33367,7 +33365,7 @@ var script$40 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__head"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint__headContent"> <div class="EndpointsPage_Endpoint__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint__urlWrapper"> <div class="EndpointsPage_Endpoint__color"></div> <div class="EndpointsPage_Endpoint__url">{opts.endpoint.url}</div> </div> </div> <viron-icon-setting class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-setting> </div> <div class="EndpointsPage_Endpoint__body"> <div class="EndpointsPage_Endpoint__description">{!!opts.endpoint.thumbnail ? (opts.endpoint.description || \'-\') : \'ログインで管理画面情報を取得できます\'}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div> </div>', '', 'class="EndpointsPage_Endpoint" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__head"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint__headContent"> <div class="EndpointsPage_Endpoint__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint__urlWrapper"> <div class="EndpointsPage_Endpoint__color EndpointsPage_Endpoint__color--{opts.endpoint.color || \'purple\'}"></div> <div class="EndpointsPage_Endpoint__url">{opts.endpoint.url}</div> </div> </div> <viron-icon-setting class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-setting> </div> <div class="EndpointsPage_Endpoint__body"> <div class="EndpointsPage_Endpoint__description">{!!opts.endpoint.thumbnail ? (opts.endpoint.description || \'-\') : \'ログインで管理画面情報を取得できます\'}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div> </div>', '', 'class="EndpointsPage_Endpoint" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$40);
 });
 
@@ -33483,7 +33481,7 @@ var script$52 = function() {
   };
 };
 
-riot$1.tag2('viron-drawer', '<div class="Drawer__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme} {isVisible ? \'Drawer--visible\' : \'\'} Drawer--{layoutType}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-drawer', '<div class="Drawer__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Drawer__content" ref="content"></div> </div>', '', 'class="Drawer Drawer--{opts.theme} {isVisible ? \'Drawer--visible\' : \'\'} Drawer--{layoutType} {opts.isnarrow ? \'Drawer--narrow\' : \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$52);
 });
 
@@ -33498,7 +33496,7 @@ var script$53 = function() {
   });
 };
 
-riot$1.tag2('viron-application-drawers', '<virtual each="{drawers}"> <viron-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}"></viron-drawer> </virtual>', '', 'class="Application_Drawers"', function(opts) {
+riot$1.tag2('viron-application-drawers', '<virtual each="{drawers}"> <viron-drawer id="{id}" tagname="{tagName}" tagopts="{tagOpts}" theme="{drawerOpts.theme}" isnarrow="{drawerOpts.isNarrow}"></viron-drawer> </virtual>', '', 'class="Application_Drawers"', function(opts) {
     this.external(script$53);
 });
 
