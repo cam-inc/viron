@@ -11,16 +11,20 @@ export default function() {
 
   const fadeIn = () => {
     setTimeout(() => {
-      this.root.classList.add('Popover--visible');
+      this.isVisible = true;
+      this.update();
     }, 100);
   };
 
   const fadeOut = () => {
-    this.root.classList.remove('Popover--visible');
+    this.isVisible = false;
+    this.update();
     setTimeout(() => {
       store.action('popovers.remove', this.opts.id);
     }, 1000);
   };
+
+  this.isVisible = false;
 
   this.on('mount', () => {
     tag = riot.mount(this.refs.content, this.opts.tagname, ObjectAssign({

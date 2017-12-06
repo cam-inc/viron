@@ -1,0 +1,31 @@
+.PopoverSpread {
+  @apply --layout-center-center;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;
+
+  &__frame {
+    position: relative;
+    width: 100%;
+    min-height: 100px;
+    max-height: 80%;
+    overflow-y: scroll;
+    background-color: var(--color-base-white);
+    border-radius: 8px;
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transform: scale(0.8);
+  }
+
+  &--visible {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+
+    & .PopoverSpread__frame {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

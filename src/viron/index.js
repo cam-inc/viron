@@ -65,10 +65,7 @@ export default function() {
   const handleResize = throttle(() => {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    Promise.all([
-      store.action('layout.updateSize', width, height),
-      store.action('popovers.removeAll')
-    ]);
+    store.action('layout.updateSize', width, height);
   }, 1000);
   this.on('mount', () => {
     window.addEventListener('resize', handleResize);
