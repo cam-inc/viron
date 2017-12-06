@@ -220,7 +220,7 @@ export default function() {
   };
 
   this.handleSearchButtonTap = () => {
-    store.action('modals.add', 'viron-components-page-search', {
+    store.action('drawers.add', 'viron-components-page-search', {
       parameterObjects: this.searchParameters,
       initialVal: this.searchQueries,
       onSearch: newSearchQueries => {
@@ -228,18 +228,18 @@ export default function() {
         this.hasSearchQueries = !!size(newSearchQueries);
         getData();
       }
-    });
+    }, { isNarrow: true });
   };
 
   this.handleFilterButtonTap = () => {
-    store.action('modals.add', 'viron-components-page-filter', {
+    store.action('drawers.add', 'viron-components-page-filter', {
       columns: this.columns,
       selectedColumnKeys: this.visibleColumnKeys,
       onChange: newSelectedColumnKeys => {
         this.visibleColumnKeys = newSelectedColumnKeys;
         getData();
       }
-    });
+    }, { isNarrow: true });
   };
 
   this.handleReloadButtonTap = () => {

@@ -39,7 +39,6 @@ export default function() {
 
   this.handleApplyButtonTap = () => {
     if (!this.opts.onChange) {
-      this.close();
       return;
     }
     let newSelectedColumnKeys = map(filter(this.columns, column => {
@@ -52,6 +51,5 @@ export default function() {
       newSelectedColumnKeys = null;
     }
     this.opts.onChange(newSelectedColumnKeys);
-    this.close();
   };
 }

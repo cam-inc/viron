@@ -29,7 +29,13 @@
     }
   }
 
-  &--mobile {
+  &--narrow {
+    & .Drawer__frame {
+      width: 320px;
+    }
+  }
+
+  &--mobile:not(&--narrow) {
     & .Drawer__frame {
       width: 100%;
     }
