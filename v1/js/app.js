@@ -17412,6 +17412,9 @@ riot$1.tag2('viron-components-page-table-cell', '<virtual if="{isText}"> <div cl
     this.external(script$11);
 });
 
+riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
+});
+
 var script$13 = function() {
   this.handleTap = () => {
     if (this.opts.isdisabled) {
@@ -17443,11 +17446,13 @@ var script$14 = function() {
   };
 };
 
-riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon-check></viron-icon-check> </div> <div class="Checkbox__label" if="{!!opts.label}">{opts.label}</div> </div>', '', 'class="Checkbox {\'Checkbox--checked\': opts.ischecked, \'Checkbox--error\': opts.iserror, \'Checkbox--disabled\': opts.isdisabled}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon-check></viron-icon-check> </div> <div class="Checkbox__label" if="{!!opts.label}">{opts.label}</div> </div>', '', 'class="Checkbox {\'Checkbox--checked\': opts.ischecked, \'Checkbox--error\': opts.iserror, \'Checkbox--disabled\': opts.isdisabled} Checkbox--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$14);
 });
 
 var script$15 = function() {
+  const store = this.riotx.get();
+
   this.isApplyButtonDisabled = false;
   const selectedColumnKeys = this.opts.selectedColumnKeys;
   this.columns = map_1$1(deepClone_1(this.opts.columns), column => {
@@ -17460,6 +17465,37 @@ var script$15 = function() {
       isSelected
     });
   });
+  // 全選択ボタンの活性状態。
+  // 全て選択されている場合はnullを返す。
+  this.isAllSelected = (!selectedColumnKeys || selectedColumnKeys.length === this.columns.length);
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
+  this.listen('layout', () => {
+    this.isMobile = store.getter('layout.isMobile');
+    this.update();
+  });
+
+  this.handleCloseButtonTap = () => {
+    this.close();
+  };
+
+  this.handleAllSelectChange = newIsChecked => {
+    this.isAllSelected = newIsChecked;
+    map_1$1(this.columns, column => {
+      column.isSelected = newIsChecked;
+      return column;
+    });
+    // 全て未選択の時はボタン非活性化。
+    if (!find_1$2(this.columns, column => {
+      return column.isSelected;
+    })) {
+      this.isApplyButtonDisabled = true;
+    } else {
+      this.isApplyButtonDisabled = false;
+    }
+    this.update();
+  };
 
   this.handleItemChange = (newIsSelected, key) => {
     const target = find_1$2(this.columns, column => {
@@ -17475,6 +17511,14 @@ var script$15 = function() {
       this.isApplyButtonDisabled = true;
     } else {
       this.isApplyButtonDisabled = false;
+    }
+    // 全て選択されている時は全選択ボタン活性化。
+    if (find_1$2(this.columns, column => {
+      return !column.isSelected;
+    })) {
+      this.isAllSelected = false;
+    } else {
+      this.isAllSelected = true;
     }
     this.update();
   };
@@ -17493,10 +17537,13 @@ var script$15 = function() {
       newSelectedColumnKeys = null;
     }
     this.opts.onChange(newSelectedColumnKeys);
+    if (this.isMobile) {
+      this.close();
+    }
   };
 };
 
-riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__title">表示項目フィルター</div> <div class="ComponentsPage_Filter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> <div class="ComponentsPage_Filter__list"> <div class="ComponentsPage_Filter__item" each="{column in columns}"> <viron-checkbox id="{column.key}" label="{column.description || column.key}" ischecked="{column.isSelected}" onchange="{handleItemChange}"></viron-checkbox> </div> </div> <div class="ComponentsPage_Filter__control"> <viron-button label="適用する" isdisabled="{isApplyButtonDisabled}" onselect="{handleApplyButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Filter"', function(opts) {
+riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__head"> <div class="ComponentsPage_Filter__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Filter__title">表示項目フィルター</div> <div class="ComponentsPage_Filter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> <div class="ComponentsPage_Filter__control"> <div class="ComponentsPage_Filter__item"> <viron-checkbox label="全て選択する" ischecked="{isAllSelected}" theme="ghost" onchange="{handleAllSelectChange}"></viron-checkbox> </div> </div> </div> <div class="ComponentsPage_Filter__body"> <div class="ComponentsPage_Filter__item" each="{column in columns}"> <viron-checkbox id="{column.key}" label="{column.description || column.key}" ischecked="{column.isSelected}" theme="ghost" onchange="{handleItemChange}"></viron-checkbox> </div> </div> <div class="ComponentsPage_Filter__tail"> <viron-button label="適用する" isdisabled="{isApplyButtonDisabled}" onselect="{handleApplyButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Filter"', function(opts) {
     this.external(script$15);
 });
 
@@ -23567,9 +23614,6 @@ var script$23 = function() {
 
 riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled, \'Textinput--error\': opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$23);
-});
-
-riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
 });
 
 riot$1.tag2('viron-icon-square', '<svg viewbox="-3674 14061 15.998 13.998"> <path d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSquare {opts.class}"', function(opts) {

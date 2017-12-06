@@ -1435,6 +1435,8 @@ select {
       }
 .Checkbox {
   display: block;
+  color: #484848;
+  color: var(--color-base-black);
   cursor: pointer;
 }
 .Checkbox__content {
@@ -1486,17 +1488,32 @@ select {
     }
 .Checkbox--disabled {
     cursor: not-allowed;
+    opacity: 0.5;
   }
-.Checkbox--disabled .Checkbox__mark {
-      background-color: #f9f9f9;
-      background-color: var(--color-base-gray-tertiary);
-      border-color: #d1d1d1;
-      border-color: var(--color-base-gray);
+.Checkbox--ghost {
+    color: #fff;
+    color: var(--color-base-white);
+  }
+.Checkbox--ghost .Checkbox__mark {
+      background-color: transparent;
     }
-.Checkbox--disabled .Checkbox__mark .Icon {
-        color: #d1d1d1;
-        color: var(--color-base-gray);
+.Checkbox--ghost .Checkbox__mark .Icon {
+        color: #484848;
+        color: var(--color-base-black);
       }
+.Checkbox--ghost.Checkbox--checked .Checkbox__mark {
+        background-color: #627edf;
+        background-color: var(--color-base-blue);
+        border: none;
+      }
+.Checkbox--ghost.Checkbox--error .Checkbox__mark {
+        border-color: #f57177;
+        border-color: var(--color-base-red);
+      }
+.Checkbox--ghost.Checkbox--error .Checkbox__mark .Icon {
+          color: #d1d1d1;
+          color: var(--color-base-gray);
+        }
 .Drawer {
   display: block;
   pointer-events: none;
@@ -1521,16 +1538,16 @@ select {
   }
 .Drawer--visible {
     pointer-events: auto;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(255, 255, 255, 0.2);
   }
 .Drawer--visible .Drawer__frame {
       opacity: 1;
       transform: translateX(0);
     }
 .Drawer--narrow .Drawer__frame {
-      width: 320px;
+      width: 384px;
     }
-.Drawer--mobile:not(.Drawer--narrow) .Drawer__frame {
+.Drawer--mobile .Drawer__frame {
       width: 100%;
     }
 .Error {
@@ -3125,19 +3142,69 @@ select {
     color: var(--color-base-blue);
   }
 .ComponentsPage_Filter {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  height: 100%;
+  color: #fff;
+  color: var(--color-base-white);
+  background-color: #484848;
+  background-color: var(--color-base-black);
 }
+.ComponentsPage_Filter__head {
+    flex-shrink: 0;
+    padding-top: 24px;
+  }
+.ComponentsPage_Filter__closeButton {
+    margin: 0 0 56px 24px;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .ComponentsPage_Filter__closeButton:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.ComponentsPage_Filter__closeButton.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
+.ComponentsPage_Filter__closeButton .Icon {
+      width: 16px;
+      height: 16px;
+    }
 .ComponentsPage_Filter__title {
-    margin-bottom: 12px;
+    margin: 0 32px 12px;
     font-size: 2rem;
     font-weight: bold;
   }
 .ComponentsPage_Filter__description {
-    margin-bottom: 12px;
+    margin: 0 32px 32px;
+    font-size: 1.6rem;
   }
-.ComponentsPage_Filter__list {
-    padding-left: 12px;
-    margin-bottom: 12px;
+.ComponentsPage_Filter__control {
+    padding: 0 64px;
+  }
+.ComponentsPage_Filter__control .ComponentsPage_Filter__item {
+      border-bottom-color: #fff;
+      border-bottom-color: var(--color-base-white);
+    }
+.ComponentsPage_Filter__body {
+    flex-grow: 1;
+    padding: 0 64px;
+    overflow-y: scroll;
+  }
+.ComponentsPage_Filter__item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+    height: 50px;
+    border-bottom: 1px solid rgba(149, 152, 154, 0.3);
+  }
+.ComponentsPage_Filter__tail {
+    flex-shrink: 0;
+    padding: 32px 64px;
   }
 .ComponentsPage_Operation {
   display: flex;
