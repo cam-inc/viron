@@ -9,7 +9,7 @@ viron-endpoints-page-endpoint.EndpointsPage_Endpoint(onTap="{ handleTap }")
       .EndpointsPage_Endpoint__name { opts.endpoint.name || '- - -' }
       .EndpointsPage_Endpoint__urlWrapper
         // TODO: 色設定
-        .EndpointsPage_Endpoint__color
+        .EndpointsPage_Endpoint__color(class="EndpointsPage_Endpoint__color--{ opts.endpoint.color || 'purple' }")
         .EndpointsPage_Endpoint__url { opts.endpoint.url }
     viron-icon-setting.EndpointsPage_Endpoint__menu(ref="menu" onTap="{ handleMenuTap }")
   .EndpointsPage_Endpoint__body
