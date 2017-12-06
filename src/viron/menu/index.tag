@@ -1,6 +1,5 @@
 viron-application-menu.Application_Menu(class="Application_Menu--{ layoutType }")
   .Application_Menu__bg
-  .Application_Menu__overlay
   .Application_Menu__content
     .Application_Menu__head
       viron-icon-arrow-left.Application_Menu__arrow
