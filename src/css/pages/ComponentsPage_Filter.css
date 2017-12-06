@@ -1,18 +1,60 @@
 .ComponentsPage_Filter {
-  display: block;
+  @apply --layout-column-center-stretch;
+  height: 100%;
+  color: var(--color-base-white);
+  background-color: var(--color-base-black);
+
+  &__head {
+    flex-shrink: 0;
+    padding-top: 24px;
+  }
+
+  &__closeButton {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    margin: 0 0 56px 24px;
+    cursor: pointer;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
 
   &__title {
-    margin-bottom: 12px;
+    margin: 0 32px 12px;
     font-size: 2rem;
     font-weight: bold;
   }
 
   &__description {
-    margin-bottom: 12px;
+    margin: 0 32px 32px;
+    font-size: 1.6rem;
   }
 
-  &__list {
-    padding-left: 12px;
-    margin-bottom: 12px;
+  &__control {
+    padding: 0 64px;
+
+    & .ComponentsPage_Filter__item {
+      border-bottom-color: var(--color-base-white);
+    }
+  }
+
+  &__body {
+    flex-grow: 1;
+    padding: 0 64px;
+    overflow-y: scroll;
+  }
+
+  &__item {
+    @apply --layout-center-start;
+    height: 50px;
+    border-bottom: 1px solid rgba(149, 152, 154, 0.3);
+  }
+
+  &__tail {
+    flex-shrink: 0;
+    padding: 32px 64px;
   }
 }

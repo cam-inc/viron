@@ -21,7 +21,7 @@
 
   &--visible {
     pointer-events: auto;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(255, 255, 255, 0.2);
 
     & .Drawer__frame {
       opacity: 1;
@@ -31,11 +31,11 @@
 
   &--narrow {
     & .Drawer__frame {
-      width: 320px;
+      width: 384px;
     }
   }
 
-  &--mobile:not(&--narrow) {
+  &--mobile {
     & .Drawer__frame {
       width: 100%;
     }

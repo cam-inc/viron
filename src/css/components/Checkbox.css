@@ -1,5 +1,6 @@
 .Checkbox {
   display: block;
+  color: var(--color-base-black);
   cursor: pointer;
 
   &__content {
@@ -52,13 +53,34 @@
 
   &--disabled {
     cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &--ghost {
+    color: var(--color-base-white);
 
     & .Checkbox__mark {
-      background-color: var(--color-base-gray-tertiary);
-      border-color: var(--color-base-gray);
+      background-color: transparent;
 
       & .Icon {
-        color: var(--color-base-gray);
+        color: var(--color-base-black);
+      }
+    }
+
+    &.Checkbox--checked {
+      & .Checkbox__mark {
+        background-color: var(--color-base-blue);
+        border: none;
+      }
+    }
+
+    &.Checkbox--error {
+      & .Checkbox__mark {
+        border-color: var(--color-base-red);
+
+        & .Icon {
+          color: var(--color-base-gray);
+        }
       }
     }
   }

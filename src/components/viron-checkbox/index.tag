@@ -1,4 +1,4 @@
-viron-checkbox.Checkbox(class="{ 'Checkbox--checked': opts.ischecked, 'Checkbox--error': opts.iserror, 'Checkbox--disabled': opts.isdisabled }" onTap="{ handleTap }")
+viron-checkbox.Checkbox(class="{ 'Checkbox--checked': opts.ischecked, 'Checkbox--error': opts.iserror, 'Checkbox--disabled': opts.isdisabled } Checkbox--{ opts.theme }" onTap="{ handleTap }")
   .Checkbox__content
     .Checkbox__mark
       viron-icon-check
