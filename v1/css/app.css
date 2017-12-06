@@ -2559,6 +2559,8 @@ select {
     }
 .Textinput {
   display: block;
+  color: #484848;
+  color: var(--color-base-black);
 }
 .Textinput__label {
     margin-bottom: 4px;
@@ -2601,6 +2603,15 @@ select {
       background-color: var(--color-base-gray-tertiary);
       border-color: #d1d1d1;
       border-color: var(--color-base-gray);
+    }
+.Textinput--ghost {
+    color: #fff;
+    color: var(--color-base-white);
+  }
+.Textinput--ghost .Textinput__input {
+      color: #fff;
+      color: var(--color-base-white);
+      background-color: transparent;
     }
 .Toast {
   display: flex;
@@ -3401,18 +3412,55 @@ select {
     margin-right: 60px;
   }
 .ComponentsPage_Search {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  height: 100%;
+  color: #fff;
+  color: var(--color-base-white);
+  background-color: #484848;
+  background-color: var(--color-base-black);
 }
+.ComponentsPage_Search__head {
+    flex-shrink: 0;
+    padding-top: 24px;
+  }
+.ComponentsPage_Search__closeButton {
+    margin: 0 0 56px 24px;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .ComponentsPage_Search__closeButton:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.ComponentsPage_Search__closeButton.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
+.ComponentsPage_Search__closeButton .Icon {
+      width: 16px;
+      height: 16px;
+    }
 .ComponentsPage_Search__title {
-    margin-bottom: 12px;
+    margin: 0 32px 12px;
     font-size: 2rem;
     font-weight: bold;
   }
 .ComponentsPage_Search__description {
-    margin-bottom: 12px;
+    margin: 0 32px 32px;
+    font-size: 1.6rem;
   }
 .ComponentsPage_Search__body {
-    margin-bottom: 12px;
+    flex-grow: 1;
+    padding: 0 64px;
+    overflow-y: scroll;
+  }
+.ComponentsPage_Search__tail {
+    flex-shrink: 0;
+    padding: 32px 64px;
   }
 .EndpointsPage {
   display: block;
