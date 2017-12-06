@@ -809,6 +809,40 @@ select {
   align-items: center;
   justify-content: center;
   }
+.Application_Header__color {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    background-color: #c092f5;
+    border-radius: 50%;
+  }
+.Application_Header__color--purple {
+      background-color: #c092f5;
+    }
+.Application_Header__color--blue {
+      background-color: #61c8ff;
+    }
+.Application_Header__color--green {
+      background-color: #7cd6ab;
+    }
+.Application_Header__color--yellow {
+      background-color: #ffc96b;
+    }
+.Application_Header__color--red {
+      background-color: #f57177;
+    }
+.Application_Header__color--gray {
+      background-color: #cbcfd4;
+    }
+.Application_Header__color--black {
+      background-color: #484848;
+    }
+.Application_Header__color--white {
+      background-color: #fff;
+      border: 2px solid #d1d1d1;
+      border: 2px solid var(--color-base-gray);
+    }
 .Application_Header__name {
     margin-right: 8px;
     font-size: 1.2rem;
@@ -1588,11 +1622,14 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-    position: absolute;
+    position: -webkit-sticky;
+    position: sticky;
     top: 24px;
     left: 24px;
+    /* z-index使いたくないけど仕方なく */
+    z-index: 1;
     width: 16px;
-    height: 16px;
+    height: 0;
     cursor: pointer;
   }
 @media (hover: hover) {
@@ -1605,6 +1642,13 @@ select {
       color: #d1d1d1;
       color: var(--color-base-gray);
   }
+.Modal__closeButton .Icon {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 16px;
+      height: 16px;
+    }
 .Modal--visible {
     pointer-events: auto;
     background-color: rgba(0, 0, 0, 0.4);
