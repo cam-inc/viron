@@ -23,8 +23,8 @@
       color: var(--color-base-gray);
     }
     position: sticky;
-    top: 24px;
-    left: 24px;
+    top: 0;
+    left: 0;
     /* z-index使いたくないけど仕方なく */
     z-index: 1;
     width: 16px;
@@ -33,8 +33,8 @@
 
     & .Icon {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: -32px;
+      left: -32px;
       width: 16px;
       height: 16px;
     }
@@ -53,6 +53,13 @@
   &--spread {
     & .Modal__frame {
       padding: 0;
+    }
+
+    & .Modal__closeButton {
+      & .Icon {
+        top: 26px;
+        left: 26px;
+      }
     }
   }
 
