@@ -988,10 +988,10 @@ select {
 .Application_Menu__sectionName {
     padding: 8px 16px;
     color: rgba(255, 255, 255, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   }
 .Application_Menu__groups .Application_Menu_Group {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   }
 .Application_Menu__groups .Application_Menu_Group:last-child {
       border-bottom: none;
@@ -1000,8 +1000,18 @@ select {
       color: #fff;
       color: var(--color-base-white);
     }
+.Application_Menu--mobile {
+    padding-top: 44px;
+  }
 .Application_Menu--mobile .Application_Menu__bg {
       display: none;
+    }
+.Application_Menu--mobile .Application_Menu__sectionName {
+      color: rgba(72, 72, 4, 0.4);
+      border-bottom-color: rgba(72, 72, 4, 0.2);
+    }
+.Application_Menu--mobile .Application_Menu__groups .Application_Menu_Group {
+      border-bottom-color: rgba(72, 72, 4, 0.2);
     }
 .Application_Menu_Group {
   display: block;
@@ -1038,6 +1048,11 @@ select {
     transition-duration: 100ms;
     transition-property: transform;
   }
+.Application_Menu_Group__pages {
+    overflow: hidden;
+    transition-duration: 300ms;
+    transition-property: height, opacity;
+  }
 .Application_Menu_Group__page {
     padding: 16px 16px 16px 32px;
     font-size: 1.4rem;
@@ -1055,6 +1070,9 @@ select {
   }
 .Application_Menu_Group--open .Application_Menu_Group__arrow {
       transform: rotate(180deg);
+    }
+.Application_Menu_Group--open .Application_Menu_Group__pages {
+      opacity: 1;
     }
 .Application_Modals {
   position: absolute;
