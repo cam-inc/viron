@@ -22,12 +22,22 @@
     @mixin hover {
       color: var(--color-base-gray);
     }
-    position: absolute;
+    position: sticky;
     top: 24px;
     left: 24px;
+    /* z-index使いたくないけど仕方なく */
+    z-index: 1;
     width: 16px;
-    height: 16px;
+    height: 0;
     cursor: pointer;
+
+    & .Icon {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 16px;
+      height: 16px;
+    }
   }
 
   &--visible {
