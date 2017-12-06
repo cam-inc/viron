@@ -318,8 +318,12 @@ definitions:
         description: admin role id
         example: viewer
         type: string
-        enum:
-        - AutoGenerate
+        x-autogen-enum:
+          model: admin_roles
+          field: role_id
+          defaults:
+          - super
+          - viewer
     required:
     - email
     - password
@@ -552,8 +556,12 @@ definitions:
         description: admin role id
         example: viewer
         type: string
-        enum:
-        - AutoGenerate
+        x-autogen-enum:
+          model: admin_roles
+          field: role_id
+          defaults:
+          - super
+          - viewer
     required:
     - role_id
     type: object
