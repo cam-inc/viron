@@ -25,11 +25,17 @@
   }
 
   &__asideAdjuster {
+    /* for Safari bug */
+    position: relative;
     flex-grow: 1;
     overflow: hidden;
   }
 
   &__asideContent {
+    /* for Safari bug */
+    position: absolute;
+    top: 0;
+    left: 0;
     width: var(--component-application-menu-width);
     height: 100%;
 
