@@ -73,6 +73,18 @@ export default exporter('viron', {
   },
 
   /**
+   * カラーを返します。
+   * @param {Object} state
+   * @return {String|null}
+   */
+  color: state => {
+    if (!state.viron) {
+      return null;
+    }
+    return state.viron.color;
+  },
+
+  /**
    * ダッシュボードメニュー群を返します。
    * @param {Object} state
    * @return {Array}

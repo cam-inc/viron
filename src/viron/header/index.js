@@ -17,6 +17,8 @@ export default function() {
   this.name = store.getter('viron.name');
   // エンドポイントのサムネイル。
   this.thumbnail = store.getter('viron.thumbnail');
+  // エンドポイントのカラー。
+  this.color = store.getter('viron.color');
 
   this.listen('location', () => {
     this.isTopPage = store.getter('location.isTop');
@@ -34,6 +36,7 @@ export default function() {
   this.listen('viron', () => {
     this.name = store.getter('viron.name');
     this.thumbnail = store.getter('viron.thumbnail');
+    this.color = store.getter('viron.color');
     this.update();
   });
 
