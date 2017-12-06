@@ -687,10 +687,16 @@ select {
     grid-area: aside;
   }
 .Application__asideAdjuster {
+    /* for Safari bug */
+    position: relative;
     flex-grow: 1;
     overflow: hidden;
   }
 .Application__asideContent {
+    /* for Safari bug */
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 192px;
     width: var(--component-application-menu-width);
     height: 100%;
