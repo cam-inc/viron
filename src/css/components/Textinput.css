@@ -1,5 +1,6 @@
 .Textinput {
   display: block;
+  color: var(--color-base-black);
 
   &__label {
     margin-bottom: 4px;
@@ -35,6 +36,15 @@
       cursor: not-allowed;
       background-color: var(--color-base-gray-tertiary);
       border-color: var(--color-base-gray);
+    }
+  }
+
+  &--ghost {
+    color: var(--color-base-white);
+
+    & .Textinput__input {
+      color: var(--color-base-white);
+      background-color: transparent;
     }
   }
 }

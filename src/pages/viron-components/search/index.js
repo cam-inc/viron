@@ -5,6 +5,10 @@ export default function() {
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
   this.val = util.generateInitialVal(this.opts.parameterObjects, this.opts.initialVal);
 
+  this.handleCloseButtonTap = () => {
+    this.close();
+  };
+
   this.handleParametersChange = newValue => {
     this.val = newValue;
     this.update();
