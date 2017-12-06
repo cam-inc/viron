@@ -1661,8 +1661,6 @@ select {
   }
 .Modal__closeButton .Icon {
       position: absolute;
-      top: -32px;
-      left: -32px;
       width: 16px;
       height: 16px;
     }
@@ -1674,13 +1672,6 @@ select {
       opacity: 1;
       transform: scale(1);
     }
-.Modal--spread .Modal__frame {
-      padding: 0;
-    }
-.Modal--spread .Modal__closeButton .Icon {
-        top: 26px;
-        left: 26px;
-      }
 .Modal--desktop .Modal__frame {
       min-width: 300px;
       max-width: 80%;
@@ -1688,14 +1679,33 @@ select {
       max-height: 80%;
       border-radius: 8px;
     }
+.Modal--desktop .Modal__closeButton .Icon {
+        top: -32px;
+        left: -32px;
+      }
+.Modal--desktop.Modal--spread .Modal__frame {
+        padding: 0;
+      }
+.Modal--desktop.Modal--spread .Modal__closeButton .Icon {
+          top: 26px;
+          left: 26px;
+        }
 .Modal--mobile .Modal__frame {
       width: 100%;
       height: 100%;
       padding: 64px 12px 12px;
     }
+.Modal--mobile .Modal__closeButton .Icon {
+        top: -38px;
+        left: 0;
+      }
 .Modal--mobile.Modal--spread .Modal__frame {
-      padding: 0;
-    }
+        padding: 0;
+      }
+.Modal--mobile.Modal--spread .Modal__closeButton .Icon {
+          top: 26px;
+          left: 12px;
+        }
 .Numberinput {
   display: block;
 }
