@@ -52,12 +52,13 @@
   &__aside {
     position: relative;
     flex-shrink: 0;
-    width: 198px;
+    width: 197px;
     padding: 28px 32px;
-    background-image: url("https://source.unsplash.com/random");
+    background-color: #0f1212;
+    background-image: url("../img/bg_signin.png");
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
+    background-position: center bottom;
+    background-size: 197px 482px;
   }
 
   &__oauthMessage {
