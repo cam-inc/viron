@@ -33,8 +33,6 @@
 
     & .Icon {
       position: absolute;
-      top: -32px;
-      left: -32px;
       width: 16px;
       height: 16px;
     }
@@ -50,19 +48,6 @@
     }
   }
 
-  &--spread {
-    & .Modal__frame {
-      padding: 0;
-    }
-
-    & .Modal__closeButton {
-      & .Icon {
-        top: 26px;
-        left: 26px;
-      }
-    }
-  }
-
   &--desktop {
     & .Modal__frame {
       min-width: 300px;
@@ -70,6 +55,26 @@
       min-height: 100px;
       max-height: 80%;
       border-radius: 8px;
+    }
+
+    & .Modal__closeButton {
+      & .Icon {
+        top: -32px;
+        left: -32px;
+      }
+    }
+
+    &.Modal--spread {
+      & .Modal__frame {
+        padding: 0;
+      }
+
+      & .Modal__closeButton {
+        & .Icon {
+          top: 26px;
+          left: 26px;
+        }
+      }
     }
   }
 
@@ -80,8 +85,24 @@
       padding: 64px 12px 12px;
     }
 
-    &.Modal--spread .Modal__frame {
-      padding: 0;
+    & .Modal__closeButton {
+      & .Icon {
+        top: -38px;
+        left: 0;
+      }
+    }
+
+    &.Modal--spread {
+      & .Modal__frame {
+        padding: 0;
+      }
+
+      & .Modal__closeButton {
+        & .Icon {
+          top: 26px;
+          left: 12px;
+        }
+      }
     }
   }
 }
