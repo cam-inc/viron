@@ -29,5 +29,18 @@ export default exporter('popovers', {
       .then(() => {
         context.commit('popovers.remove', popoverId);
       });
+  },
+
+  /**
+   * 全ての吹き出しを削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  removeAll: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('popovers.removeAll');
+      });
   }
 });

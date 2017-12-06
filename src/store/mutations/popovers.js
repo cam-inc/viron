@@ -37,5 +37,15 @@ export default exporter('popovers', {
       return (popover.id === popoverID);
     });
     return ['popovers'];
+  },
+
+  /**
+   * 全ての吹き出しを削除します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  removeAll: state => {
+    state.popovers = [];
+    return ['popovers'];
   }
 });
