@@ -13456,6 +13456,19 @@ var popovers = exporter('popovers', {
       .then(() => {
         context.commit('popovers.remove', popoverId);
       });
+  },
+
+  /**
+   * 全ての吹き出しを削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  removeAll: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('popovers.removeAll');
+      });
   }
 });
 
@@ -16451,6 +16464,16 @@ var popovers$2 = exporter$2('popovers', {
     state.popovers = reject_1$1(state.popovers, popover => {
       return (popover.id === popoverID);
     });
+    return ['popovers'];
+  },
+
+  /**
+   * 全ての吹き出しを削除します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  removeAll: state => {
+    state.popovers = [];
     return ['popovers'];
   }
 });
@@ -33551,7 +33574,7 @@ var script$56 = function() {
   };
 };
 
-riot$1.tag2('viron-application-menu', '<div class="Application_Menu__bg"></div> <div class="Application_Menu__overlay"></div> <div class="Application_Menu__content"> <div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div> </div>', '', 'class="Application_Menu Application_Menu--{layoutType}"', function(opts) {
+riot$1.tag2('viron-application-menu', '<div class="Application_Menu__bg"></div> <div class="Application_Menu__content"> <div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div> </div>', '', 'class="Application_Menu Application_Menu--{layoutType}"', function(opts) {
     this.external(script$56);
 });
 
@@ -34210,16 +34233,20 @@ var script$66 = function() {
 
   const fadeIn = () => {
     setTimeout(() => {
-      this.root.classList.add('Popover--visible');
+      this.isVisible = true;
+      this.update();
     }, 100);
   };
 
   const fadeOut = () => {
-    this.root.classList.remove('Popover--visible');
+    this.isVisible = false;
+    this.update();
     setTimeout(() => {
       store.action('popovers.remove', this.opts.id);
     }, 1000);
   };
+
+  this.isVisible = false;
 
   this.on('mount', () => {
     tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
@@ -34298,31 +34325,101 @@ var script$66 = function() {
   };
 };
 
-riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
+riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover {isVisible ? \'Popover--visible\' : \'\'} Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
     this.external(script$66);
 });
 
 var script$67 = function() {
   const store = this.riotx.get();
 
+  let tag;
+
+  const fadeIn = () => {
+    setTimeout(() => {
+      this.isVisible = true;
+      this.update();
+    }, 100);
+  };
+
+  const fadeOut = () => {
+    this.isVisible = false;
+    this.update();
+    setTimeout(() => {
+      store.action('popovers.remove', this.opts.id);
+    }, 1000);
+  };
+
+  this.on('mount', () => {
+    tag = riot$1.mount(this.refs.content, this.opts.tagname, objectAssign({
+      isPopover: true,
+      popoverCloser: fadeOut
+    }, this.opts.tagopts))[0];
+    fadeIn();
+    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('resize', this.handleWindowResize);
+  }).on('before-unmount', () => {
+    tag.unmount(true);
+  }).on('unmount', () => {
+    window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('resize', this.handleWindowResize);
+  });
+
+  this.handleTap = () => {
+    fadeOut();
+  };
+
+  this.handleFrameTap = e => {
+    // 内部イベントを外部に伝播させない。
+    e.stopPropagation();
+  };
+
+  this.handleKeyDown = e => {
+    switch (e.keyCode) {
+    case 27: // Esc
+      fadeOut();
+      break;
+    default:
+      break;
+    }
+  };
+
+  this.handleWindowResize = () => {
+    fadeOut();
+  };
+};
+
+riot$1.tag2('viron-popover-spread', '<div class="PopoverSpread__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="PopoverSpread__content" ref="content"></div> </div>', '', 'class="PopoverSpread {isVisible ? \'PopoverSpread--visible\' : \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$67);
+});
+
+var script$68 = function() {
+  const store = this.riotx.get();
+
   this.popovers = store.getter('popovers.all');
+  this.isDesktop = store.getter('layout.isDesktop');
+  this.isMobile = store.getter('layout.isMobile');
   this.listen('popovers', () => {
     this.popovers = store.getter('popovers.all');
     this.update();
   });
+  this.listen('layout', () => {
+    this.isDesktop = store.getter('layout.isDesktop');
+    this.isMobile = store.getter('layout.isMobile');
+    this.update();
+  });
 };
 
-riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <viron-popover id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover> </virtual>', '', 'class="Application_Popovers"', function(opts) {
-    this.external(script$67);
-});
-
-var script$68 = function() {};
-
-riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
+riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <virtual if="{isDesktop}"> <viron-popover id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover> </virtual> <virtual if="{isMobile}"> <viron-popover-spread id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover-spread> </virtual> </virtual>', '', 'class="Application_Popovers"', function(opts) {
     this.external(script$68);
 });
 
-var script$69 = function() {
+var script$69 = function() {};
+
+riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
+    this.external(script$69);
+});
+
+var script$70 = function() {
   this.isAnimating = this.opts.isactive;
 
   this.on('update', () => {
@@ -34338,16 +34435,16 @@ var script$69 = function() {
 };
 
 riot$1.tag2('viron-application-progress-linear', '<div class="Application_ProgressLinear__bar"> <div class="Application_ProgressLinear__particle"></div> <div class="Application_ProgressLinear__particle"></div> </div>', '', 'class="Application_ProgressLinear {\'Application_ProgressLinear--visible\' : opts.isactive, \'Application_ProgressLinear--animating\' : isAnimating}"', function(opts) {
-    this.external(script$69);
-});
-
-var script$70 = function() {};
-
-riot$1.tag2('viron-application-splash', '<div class="Application_Splash__todo">TODO</div> <viron-icon-logo class="Application_Splash__logo"></viron-icon-logo> <div class="Application_Splash__todo">Viron</div>', '', 'class="Application_Splash"', function(opts) {
     this.external(script$70);
 });
 
-var script$71 = function() {
+var script$71 = function() {};
+
+riot$1.tag2('viron-application-splash', '<div class="Application_Splash__todo">TODO</div> <viron-icon-logo class="Application_Splash__logo"></viron-icon-logo> <div class="Application_Splash__todo">Viron</div>', '', 'class="Application_Splash"', function(opts) {
+    this.external(script$71);
+});
+
+var script$72 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -34389,10 +34486,10 @@ var script$71 = function() {
 };
 
 riot$1.tag2('viron-toast', '<div class="Toast__message">{opts.message}</div>', '', 'class="Toast {\'Toast--visible\' : isVisible, \'Toast--error\' : opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$71);
+    this.external(script$72);
 });
 
-var script$72 = function() {
+var script$73 = function() {
   const store = this.riotx.get();
 
   this.toasts = store.getter('toasts.all');
@@ -34404,17 +34501,17 @@ var script$72 = function() {
 };
 
 riot$1.tag2('viron-application-toasts', '<virtual each="{toasts}"> <viron-toast id="{id}" message="{message}" autohide="{autoHide}" timeout="{timeout}" iserror="{isError}"></viron-toast> </virtual>', '', 'class="Application_Toasts"', function(opts) {
-    this.external(script$72);
-});
-
-var script$74 = function() {
-};
-
-riot$1.tag2('viron-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {opts.class}"', function(opts) {
-    this.external(script$74);
+    this.external(script$73);
 });
 
 var script$75 = function() {
+};
+
+riot$1.tag2('viron-icon', '', '', 'class="Icon Icon--{opts.type || \'question\'} {opts.class}"', function(opts) {
+    this.external(script$75);
+});
+
+var script$76 = function() {
   const updateText = () => {
     const json = JSON.stringify(this.opts.data, undefined, 4);
     let text = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -34444,10 +34541,10 @@ var script$75 = function() {
 };
 
 riot$1.tag2('viron-prettyprint', '<pre class="PrettyPrint__pre" ref="canvas"></pre>', '', 'class="PrettyPrint {opts.class}"', function(opts) {
-    this.external(script$75);
+    this.external(script$76);
 });
 
-var script$76 = function() {
+var script$77 = function() {
   // タイプ。
   this.type = this.opts.type || 'info';
   // iconの種類。
@@ -34512,10 +34609,10 @@ var script$76 = function() {
 };
 
 riot$1.tag2('viron-message', '<div class="Message__head"> <div class="Message__icon"> <viron-icon type="{icon}"></viron-icon> </div> <div class="Message__title">{title}</div> </div> <div class="Message__text" if="{!!message}">{message}</div> <viron-prettyprint class="Message__error" if="{!!detail}" data="{detail}"></viron-prettyprint>', '', 'class="Message Message--{type}"', function(opts) {
-    this.external(script$76);
+    this.external(script$77);
 });
 
-var script$73 = function() {
+var script$74 = function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter('application.isLaunched');
@@ -34589,7 +34686,7 @@ var script$73 = function() {
 };
 
 riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main" ref="main"> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-application-progress-linear isactive="{isNavigating || isNetworking}"></viron-application-progress-linear> <viron-application-dimmer if="{isNavigating}"></viron-application-dimmer> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
-    this.external(script$73);
+    this.external(script$74);
 });
 
 // エントリーポイント。

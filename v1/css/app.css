@@ -936,18 +936,10 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
-    background-image: url("https://source.unsplash.com/random");
+    background-image: url("../img/bg_menu.png");
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
-  }
-.Application_Menu__overlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.6);
   }
 .Application_Menu__content {
   display: flex;
@@ -1008,8 +1000,7 @@ select {
       color: #fff;
       color: var(--color-base-white);
     }
-.Application_Menu--mobile .Application_Menu__bg,
-    .Application_Menu--mobile .Application_Menu__overlay {
+.Application_Menu--mobile .Application_Menu__bg {
       display: none;
     }
 .Application_Menu_Group {
@@ -1093,6 +1084,13 @@ select {
 .Application_Popovers .Popover {
     position: absolute;
   }
+.Application_Popovers .PopoverSpread {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Application_Poster {
   position: relative;
   display: block;
@@ -1103,18 +1101,10 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
-    background-image: url("https://source.unsplash.com/random");
+    background-image: url("../img/bg_menu.png");
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
-  }
-.Application_Poster__overlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.6);
   }
 .Application_Poster__content {
     position: relative;
@@ -2264,6 +2254,37 @@ select {
       border-color: transparent var(--color-base-white) transparent transparent;
       border-width: calc(10px / 2) 10px calc(10px / 2) 0;
       border-width: calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0;
+    }
+.PopoverSpread {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;
+}
+.PopoverSpread__frame {
+    position: relative;
+    width: 100%;
+    min-height: 100px;
+    max-height: 80%;
+    overflow-y: scroll;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    border-radius: 8px;
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transform: scale(0.8);
+  }
+.PopoverSpread--visible {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+.PopoverSpread--visible .PopoverSpread__frame {
+      opacity: 1;
+      transform: scale(1);
     }
 .Prettyhtml {
   display: block;
@@ -3534,12 +3555,13 @@ select {
 .EndpointsPage_Endpoint_Signin__aside {
     position: relative;
     flex-shrink: 0;
-    width: 198px;
+    width: 197px;
     padding: 28px 32px;
-    background-image: url("https://source.unsplash.com/random");
+    background-color: #0f1212;
+    background-image: url("../img/bg_signin.png");
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
+    background-position: center bottom;
+    background-size: 197px 482px;
   }
 .EndpointsPage_Endpoint_Signin__oauthMessage {
     margin-bottom: 36px;
