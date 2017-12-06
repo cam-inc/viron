@@ -3,6 +3,18 @@ export default function() {
 
   this.isOpened = false;
 
+  this.getPagesHeight = () => {
+    if (!this.isOpened) {
+      return 0;
+    }
+    const elm = this.refs.pagesInner;
+    if (!elm) {
+      return 0;
+    }
+    const rect = elm.getBoundingClientRect();
+    return rect.height;
+  };
+
   this.handleHeadTap = () => {
     this.isOpened = !this.isOpened;
     this.update();

@@ -26,6 +26,12 @@
     transition-property: transform;
   }
 
+  &__pages {
+    overflow: hidden;
+    transition-duration: 300ms;
+    transition-property: height, opacity;
+  }
+
   &__page {
     @mixin hover {
       color: var(--color-base-blue);
@@ -38,6 +44,10 @@
   &--open {
     .Application_Menu_Group__arrow {
       transform: rotate(180deg);
+    }
+
+    .Application_Menu_Group__pages {
+      opacity: 1;
     }
   }
 }

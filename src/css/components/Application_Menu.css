@@ -54,11 +54,11 @@
   &__sectionName {
     padding: 8px 16px;
     color: rgba(255, 255, 255, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   &__groups .Application_Menu_Group {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 
     &:last-child {
       border-bottom: none;
@@ -72,8 +72,19 @@
   }
 
   &--mobile {
+    padding-top: 44px;
+
     & .Application_Menu__bg {
       display: none;
+    }
+
+    & .Application_Menu__sectionName {
+      color: rgba(72, 72, 4, 0.4);
+      border-bottom-color: rgba(72, 72, 4, 0.2);
+    }
+
+    & .Application_Menu__groups .Application_Menu_Group {
+      border-bottom-color: rgba(72, 72, 4, 0.2);
     }
   }
 }
