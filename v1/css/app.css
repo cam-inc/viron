@@ -3041,11 +3041,13 @@ select {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+    overflow: hidden;
   }
 .ComponentsPage_Card_Table__postOperation {
   display: flex;
   align-items: center;
   justify-content: center;
+    flex-shrink: 0;
     width: 32px;
     height: 32px;
     margin-right: 8px;
@@ -3081,6 +3083,9 @@ select {
       color: var(--color-base-white);
     }
 .ComponentsPage_Card_Table__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
     font-size: 1.6rem;
   }
 .ComponentsPage_Card_Table__control {
