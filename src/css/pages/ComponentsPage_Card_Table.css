@@ -14,6 +14,7 @@
 
   &__headAside {
     @apply --layout-center-start;
+    overflow: hidden;
   }
 
   &__postOperation {
@@ -26,6 +27,7 @@
         color: var(--color-base-blue);
       }
     }
+    flex-shrink: 0;
     width: 32px;
     height: 32px;
     margin-right: 8px;
@@ -42,6 +44,7 @@
   }
 
   &__title {
+    @apply --text-truncate;
     font-size: 1.6rem;
   }
 
