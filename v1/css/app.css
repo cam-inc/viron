@@ -680,6 +680,33 @@ select {
     -ms-grid-columns: var(--component-application-menu-width) minmax(0, 1fr);
         grid-template-columns: var(--component-application-menu-width) minmax(0, 1fr);
   }
+.Application .Application__container {
+    z-index: 1;
+  }
+.Application .Application_Drawers {
+    z-index: 2;
+  }
+.Application .Application_Modals {
+    z-index: 3;
+  }
+.Application .Application_Popovers {
+    z-index: 4;
+  }
+.Application .Application_Toasts {
+    z-index: 5;
+  }
+.Application .Application_ProgressLinear {
+    z-index: 6;
+  }
+.Application .Application_Dimmer {
+    z-index: 7;
+  }
+.Application .Application_Blocker {
+    z-index: 8;
+  }
+.Application .Application_Splash {
+    z-index: 9;
+  }
 .Application__aside {
   display: flex;
   align-items: stretch;
@@ -718,12 +745,16 @@ select {
     overflow-y: scroll;
     grid-area: main;
   }
+.Application__page {
+    /* Safariのposition:stickyバグ対応 */
+    padding-top: 24px;
+  }
 .Application--desktop.Application--asideClosed .Application__container {
       -ms-grid-columns: 0 minmax(0, 1fr);
           grid-template-columns: 0 minmax(0, 1fr);
     }
 .Application--desktop .Application__main {
-      padding: 24px;
+      padding: 0 24px 24px;
     }
 .Application--mobile .Application__container {
       grid-template-areas: "header" "main";
@@ -731,7 +762,7 @@ select {
           grid-template-columns: minmax(0, 1fr);
     }
 .Application--mobile .Application__main {
-      padding: 24px 4px;
+      padding: 0 4px 24px;
     }
 .Application_Blocker {
   position: absolute;
@@ -2435,7 +2466,6 @@ select {
 .PopoverSpread__frame {
     position: relative;
     width: 100%;
-    min-height: 100px;
     max-height: 80%;
     overflow-y: scroll;
     background-color: #fff;
@@ -2827,6 +2857,10 @@ select {
     }
 /* ITCSS: Components(Page) */
 /* Designed components, chunks of UI. */
+:root {
+  --page-components-grid-row-height: 144px;
+  --page-components-grid-gap: 24px;
+}
 .ComponentsPage {
   display: block;
 }
@@ -2839,9 +2873,10 @@ select {
     display: -ms-grid;
     display: grid;
     grid-gap: 24px;
+    grid-gap: var(--page-components-grid-gap);
     -ms-grid-columns: (312px)[auto-fill];
         grid-template-columns: repeat(auto-fill, 312px);
-    grid-auto-rows: 144px;
+    grid-auto-rows: auto;
     justify-content: center;
   }
 .ComponentsPage .ComponentsPage_Card--columnSpreadSmall {
@@ -2852,16 +2887,15 @@ select {
       grid-column: 1 / -1;
     }
 .ComponentsPage .ComponentsPage_Card--rowSpreadSmall {
-      -ms-grid-row-span: 1;
-          grid-row-end: span 1;
+      height: 144px;
+      height: var(--page-components-grid-row-height);
     }
 .ComponentsPage .ComponentsPage_Card--rowSpreadMedium {
-      -ms-grid-row-span: 2;
-          grid-row-end: span 2;
+      height: calc((144px * 2) + 24px);
+      height: calc((var(--page-components-grid-row-height) * 2) + var(--page-components-grid-gap));
     }
 .ComponentsPage .ComponentsPage_Card--rowSpreadLarge {
-      -ms-grid-row-span: 3;
-          grid-row-end: span 3;
+      height: auto;
     }
 .ComponentsPage_Card {
   display: block;
@@ -2989,14 +3023,19 @@ select {
   align-items: stretch;
   justify-content: center;
   position: relative;
-  height: 100%;
 }
 .ComponentsPage_Card_Table__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1;
     flex-shrink: 0;
     padding: 24px;
+    background-color: #fff;
+    background-color: var(--color-base-white);
   }
 .ComponentsPage_Card_Table__headAside {
   display: flex;
@@ -3075,16 +3114,14 @@ select {
 .ComponentsPage_Card_Table__body {
     position: relative;
     flex-grow: 1;
+    width: 100%;
+    overflow: scroll;
   }
 .ComponentsPage_Card_Table__progressWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    height: 120px;
   }
 .ComponentsPage_Card_Table__progress {
   animation-name: spin;
@@ -3101,11 +3138,6 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
     padding: 24px;
   }
 .ComponentsPage_Card_Table__error {
@@ -3113,12 +3145,8 @@ select {
     color: var(--color-base-red);
   }
 .ComponentsPage_Card_Table__tableWrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: scroll;
+    /* Safariバグへの対応 */
+    width: 0;
   }
 .ComponentsPage_Card_Table__table {
   }
@@ -3135,6 +3163,12 @@ select {
     border-bottom: 1px solid #f9f9f9;
     border-bottom: 1px solid var(--color-base-gray-tertiary);
   }
+.ComponentsPage_Card_Table__th--sticky {
+      position: -webkit-sticky;
+      position: sticky;
+      right: 0;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
+    }
 .ComponentsPage_Card_Table__tbodyRow {
     cursor: pointer;
     border-bottom: 1px solid #f9f9f9;
@@ -3153,6 +3187,7 @@ select {
 .ComponentsPage_Card_Table__td .Icon {
       width: 16px;
       height: 16px;
+      margin: 0 auto;
       cursor: pointer;
     }
 @media (hover: hover) {
@@ -3165,6 +3200,12 @@ select {
         color: #627edf;
         color: var(--color-base-blue);
   }
+.ComponentsPage_Card_Table__td--sticky {
+      position: -webkit-sticky;
+      position: sticky;
+      right: 0;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
+    }
 .ComponentsPage_Card_Table__tbody tr td:first-child {
     font-weight: bold;
   }
