@@ -17313,6 +17313,8 @@ var script$11 = function() {
 
   // クリップっボードコピーをサポートしているか否か。
   let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
   // テキスト系か否か。
   this.isText = false;
   // 画像系か否か。
@@ -17324,7 +17326,6 @@ var script$11 = function() {
   this.videoType = null;
   // typeに応じて表示を切り替えます。
   this.value = (() => {
-
     const data = this.opts.data;
     if (isNull_1(data)) {
       this.isText = true;
@@ -17385,8 +17386,12 @@ var script$11 = function() {
     return String(data);
   })();
 
+  this.listen('layout', () => {
+    this.isMobile = store.getter('layout.isMobile');
+  });
+
   this.handleStringTap = e => {
-    if (!isClipboardCopySupported) {
+    if (this.isMobile || !isClipboardCopySupported) {
       return;
     }
     e.stopPropagation();
@@ -17468,10 +17473,12 @@ var script$15 = function() {
   // 全選択ボタンの活性状態。
   // 全て選択されている場合はnullを返す。
   this.isAllSelected = (!selectedColumnKeys || selectedColumnKeys.length === this.columns.length);
+  this.layoutType = store.getter('layout.type');
   // モバイル用レイアウトか否か。
   this.isMobile = store.getter('layout.isMobile');
 
   this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
     this.isMobile = store.getter('layout.isMobile');
     this.update();
   });
@@ -17543,7 +17550,7 @@ var script$15 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__head"> <div class="ComponentsPage_Filter__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Filter__title">表示項目フィルター</div> <div class="ComponentsPage_Filter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> <div class="ComponentsPage_Filter__control"> <div class="ComponentsPage_Filter__item"> <viron-checkbox label="全て選択する" ischecked="{isAllSelected}" theme="ghost" onchange="{handleAllSelectChange}"></viron-checkbox> </div> </div> </div> <div class="ComponentsPage_Filter__body"> <div class="ComponentsPage_Filter__item" each="{column in columns}"> <viron-checkbox id="{column.key}" label="{column.description || column.key}" ischecked="{column.isSelected}" theme="ghost" onchange="{handleItemChange}"></viron-checkbox> </div> </div> <div class="ComponentsPage_Filter__tail"> <viron-button label="適用する" isdisabled="{isApplyButtonDisabled}" onselect="{handleApplyButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Filter"', function(opts) {
+riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__head"> <div class="ComponentsPage_Filter__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Filter__title">表示項目フィルター</div> <div class="ComponentsPage_Filter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> <div class="ComponentsPage_Filter__control"> <div class="ComponentsPage_Filter__item"> <viron-checkbox label="全て選択する" ischecked="{isAllSelected}" theme="ghost" onchange="{handleAllSelectChange}"></viron-checkbox> </div> </div> </div> <div class="ComponentsPage_Filter__body"> <div class="ComponentsPage_Filter__item" each="{column in columns}"> <viron-checkbox id="{column.key}" label="{column.description || column.key}" ischecked="{column.isSelected}" theme="ghost" onchange="{handleItemChange}"></viron-checkbox> </div> </div> <div class="ComponentsPage_Filter__tail"> <viron-button label="適用する" isdisabled="{isApplyButtonDisabled}" onselect="{handleApplyButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Filter ComponentsPage_Filter--{layoutType}"', function(opts) {
     this.external(script$15);
 });
 
@@ -30335,6 +30342,7 @@ var script$32 = function() {
   const store = this.riotx.get();
   const operationObject = this.opts.operationObject;
 
+  this.layoutType = store.getter('layout.type');
   // 入力値。
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
   this.val = util.generateInitialVal(operationObject.parameters, this.opts.initialVal);
@@ -30385,6 +30393,11 @@ var script$32 = function() {
       });
   };
 
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.update();
+  });
+
   this.handleCancelTap = () => {
     this.close();
   };
@@ -30406,7 +30419,7 @@ var script$32 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">キャンセル</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" parameterobjects="{opts.operationObject.parameters}" primary="{opts.primary}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation"', function(opts) {
+riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">キャンセル</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" parameterobjects="{opts.operationObject.parameters}" primary="{opts.primary}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation ComponentsPage_Operation--{layoutType}"', function(opts) {
     this.external(script$32);
 });
 
@@ -30485,7 +30498,7 @@ var script$34 = function() {
   const dataList = this.opts.dataList;
   const initialSelectedIdx = this.opts.selectedIdx;
 
-  // 入力値。
+  this.layoutType = store.getter('layout.type');
   this.parameterObjects = this.opts.parameterObjects;
   this.operations = this.opts.operations || [];
   this.val = null;
@@ -30504,6 +30517,11 @@ var script$34 = function() {
     this.isNextButtonDisabled = (idx === (dataList.length - 1));
   };
   changeData(initialSelectedIdx);
+
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.update();
+  });
 
   this.handleOperationsButtonTap = e => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -30542,14 +30560,22 @@ var script$34 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-preview', '<div class="ComponentsPage_Preview__head"> <div class="ComponentsPage_Preview__title">プレビュー</div> <div class="ComponentsPage_Preview__operationsButton" if="{!!this.operations.length}" onclick="{getClickHandler(\'handleOperationsButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOperationsButtonTap\')}"> <viron-icon-setting></viron-icon-setting> </div> <div class="ComponentsPage_Preview__backButton" onclick="{getClickHandler(\'handleBackButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBackButtonTap\')}"> <viron-icon-arrow-left></viron-icon-arrow-left> </div> </div> <div class="ComponentsPage_Preview__body"> <viron-parameters val="{val}" parameterobjects="{parameterObjects}"></viron-parameters> </div> <div class="ComponentsPage_Preview__tail"> <div class="ComponentsPage_Preview__prevButton {\'ComponentsPage_Preview__prevButton--disabled\': isPrevButtonDisabled}" onclick="{getClickHandler(\'handlePrevButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePrevButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="ComponentsPage_Preview__nextButton {\'ComponentsPage_Preview__prevButton--disabled\': isNextButtonDisabled}" onclick="{getClickHandler(\'handleNextButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleNextButtonTap\')}"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div>', '', 'class="ComponentsPage_Preview"', function(opts) {
+riot$1.tag2('viron-components-page-preview', '<div class="ComponentsPage_Preview__head"> <div class="ComponentsPage_Preview__title">プレビュー</div> <div class="ComponentsPage_Preview__operationsButton" if="{!!this.operations.length}" onclick="{getClickHandler(\'handleOperationsButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOperationsButtonTap\')}"> <viron-icon-setting></viron-icon-setting> </div> <div class="ComponentsPage_Preview__backButton" onclick="{getClickHandler(\'handleBackButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBackButtonTap\')}"> <viron-icon-arrow-left></viron-icon-arrow-left> </div> </div> <div class="ComponentsPage_Preview__body"> <viron-parameters val="{val}" parameterobjects="{parameterObjects}"></viron-parameters> </div> <div class="ComponentsPage_Preview__tail"> <div class="ComponentsPage_Preview__prevButton {\'ComponentsPage_Preview__prevButton--disabled\': isPrevButtonDisabled}" onclick="{getClickHandler(\'handlePrevButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePrevButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="ComponentsPage_Preview__nextButton {\'ComponentsPage_Preview__prevButton--disabled\': isNextButtonDisabled}" onclick="{getClickHandler(\'handleNextButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleNextButtonTap\')}"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div>', '', 'class="ComponentsPage_Preview ComponentsPage_Preview--{layoutType}"', function(opts) {
     this.external(script$34);
 });
 
 var script$37 = function() {
+  const store = this.riotx.get();
+
+  this.layoutType = store.getter('layout.type');
   // 入力値。
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
   this.val = util.generateInitialVal(this.opts.parameterObjects, this.opts.initialVal);
+
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.update();
+  });
 
   this.handleCloseButtonTap = () => {
     this.close();
@@ -30570,7 +30596,7 @@ var script$37 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-search', '<div class="ComponentsPage_Search__head"> <div class="ComponentsPage_Filter__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Search__title">検索</div> <div class="ComponentsPage_Search__description">クエリパラメータを指定して下さい。</div> </div> <div class="ComponentsPage_Search__body"> <viron-parameters val="{val}" theme="ghost" parameterobjects="{opts.parameterObjects}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Search__tail"> <viron-button label="検索する" onselect="{handleSearchButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Search"', function(opts) {
+riot$1.tag2('viron-components-page-search', '<div class="ComponentsPage_Search__head"> <div class="ComponentsPage_Search__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Search__title">検索</div> <div class="ComponentsPage_Search__description">クエリパラメータを指定して下さい。</div> </div> <div class="ComponentsPage_Search__body"> <viron-parameters val="{val}" theme="ghost" parameterobjects="{opts.parameterObjects}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Search__tail"> <viron-button label="検索する" onselect="{handleSearchButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Search ComponentsPage_Search--{layoutType}"', function(opts) {
     this.external(script$37);
 });
 
@@ -30923,14 +30949,19 @@ var script$39 = function() {
 
   this.name = store.getter('page.name');
   this.components = store.getter('page.components');
+  this.layoutType = store.getter('layout.type');
   this.listen('page', () => {
     this.name = store.getter('page.name');
     this.components = store.getter('page.components');
     this.update();
   });
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.update();
+  });
 };
 
-riot$1.tag2('viron-components-page', '<div class="ComponentsPage__name">{name}</div> <div class="ComponentsPage__container"> <viron-components-page-card each="{component in components}" def="{component}"></viron-components-page-card> </div>', '', 'class="ComponentsPage"', function(opts) {
+riot$1.tag2('viron-components-page', '<div class="ComponentsPage__name">{name}</div> <div class="ComponentsPage__container"> <viron-components-page-card each="{component in components}" def="{component}"></viron-components-page-card> </div>', '', 'class="ComponentsPage ComponentsPage--{layoutType}"', function(opts) {
     this.external(script$39);
 });
 
@@ -33562,6 +33593,8 @@ var script$49 = function() {
   const store = this.riotx.get();
 
   this.isDesktop = store.getter('layout.isDesktop');
+  this.isMobile = store.getter('layout.isMobile');
+  this.layoutType = store.getter('layout.type');
   this.endpoints = store.getter('endpoints.allByOrderFiltered');
 
   this.listen('endpoints', () => {
@@ -33570,6 +33603,8 @@ var script$49 = function() {
   });
   this.listen('layout', () => {
     this.isDesktop = store.getter('layout.isDesktop');
+    this.isMobile = store.getter('layout.isMobile');
+    this.layoutType = store.getter('layout.type');
     this.update();
   });
 
@@ -33578,7 +33613,7 @@ var script$49 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> <div class="EndpointsPage__orderButton" if="{isDesktop}" onclick="{getClickHandler(\'handleOrderButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOrderButtonTap\')}"> <viron-icon-move></viron-icon-move> </div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage"', function(opts) {
+riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> <div class="EndpointsPage__orderButton" if="{isDesktop}" onclick="{getClickHandler(\'handleOrderButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOrderButtonTap\')}"> <viron-icon-move></viron-icon-move> </div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
     this.external(script$49);
 });
 
@@ -34142,16 +34177,18 @@ riot$1.tag2('viron-application-header-menu-import', '<div class="Application_Hea
 
 var script$59 = function() {
   const store = this.riotx.get();
+  const isDesktop = store.getter('layout.isDesktop');
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
     { label: 'ヘルプ', id: 'navigate_to_doc' }
   ];
-  const endpointActions = [
-    { label: '追加', id: 'add_endpoint' },
-    { label: 'ホームを保存', id: 'export_endpoints' },
-    { label: 'ホームを読み込み', id: 'import_endpoints' },
-    { label: '全てのカードを削除', id: 'remove_all_endpoints' }
-  ];
+  const endpointActions = [];
+  endpointActions.push({ label: '追加', id: 'add_endpoint' });
+  if (isDesktop) {
+    endpointActions.push({ label: 'ホームを保存', id: 'export_endpoints' });
+    endpointActions.push({ label: 'ホームを読み込み', id: 'import_endpoints' });
+  }
+  endpointActions.push({ label: '全てのカードを削除', id: 'remove_all_endpoints' });
 
   // メニュー項目群。
   this.actions = [];

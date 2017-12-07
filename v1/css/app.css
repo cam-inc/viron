@@ -2865,9 +2865,15 @@ select {
   display: block;
 }
 .ComponentsPage__name {
+    font-weight: bold;
+  }
+.ComponentsPage--desktop .ComponentsPage__name {
     margin-bottom: 24px;
     font-size: 2.8rem;
-    font-weight: bold;
+  }
+.ComponentsPage--mobile .ComponentsPage__name {
+    margin-bottom: 8px;
+    font-size: 1.4rem;
   }
 .ComponentsPage__container {
     display: -ms-grid;
@@ -3275,7 +3281,6 @@ select {
     padding-top: 24px;
   }
 .ComponentsPage_Filter__closeButton {
-    margin: 0 0 56px 24px;
     cursor: pointer;
   }
 @media (hover: hover) {
@@ -3292,26 +3297,52 @@ select {
       width: 16px;
       height: 16px;
     }
+.ComponentsPage_Filter--desktop .ComponentsPage_Filter__closeButton {
+    margin: 0 0 56px 24px;
+  }
+.ComponentsPage_Filter--mobile .ComponentsPage_Filter__closeButton {
+    margin: 0 0 16px 16px;
+  }
 .ComponentsPage_Filter__title {
-    margin: 0 32px 12px;
-    font-size: 2rem;
     font-weight: bold;
   }
+.ComponentsPage_Filter--desktop .ComponentsPage_Filter__title {
+    margin: 0 32px 12px;
+    font-size: 2rem;
+  }
+.ComponentsPage_Filter--mobile .ComponentsPage_Filter__title {
+    margin: 0 16px 8px;
+    font-size: 1.4rem;
+  }
 .ComponentsPage_Filter__description {
+  }
+.ComponentsPage_Filter--desktop .ComponentsPage_Filter__description {
     margin: 0 32px 32px;
     font-size: 1.6rem;
   }
-.ComponentsPage_Filter__control {
-    padding: 0 64px;
+.ComponentsPage_Filter--mobile .ComponentsPage_Filter__description {
+    margin: 0 16px 8px;
+    font-size: 1.2rem;
   }
 .ComponentsPage_Filter__control .ComponentsPage_Filter__item {
       border-bottom-color: #fff;
       border-bottom-color: var(--color-base-white);
     }
+.ComponentsPage_Filter--desktop .ComponentsPage_Filter__control {
+    padding: 0 64px;
+  }
+.ComponentsPage_Filter--mobile .ComponentsPage_Filter__control {
+    padding: 0 24px;
+  }
 .ComponentsPage_Filter__body {
     flex-grow: 1;
-    padding: 0 64px;
     overflow-y: scroll;
+  }
+.ComponentsPage_Filter--desktop .ComponentsPage_Filter__body {
+    padding: 0 64px;
+  }
+.ComponentsPage_Filter--mobile .ComponentsPage_Filter__body {
+    padding: 0 24px;
   }
 .ComponentsPage_Filter__item {
   display: flex;
@@ -3322,7 +3353,12 @@ select {
   }
 .ComponentsPage_Filter__tail {
     flex-shrink: 0;
+  }
+.ComponentsPage_Filter--desktop .ComponentsPage_Filter__tail {
     padding: 32px 64px;
+  }
+.ComponentsPage_Filter--mobile .ComponentsPage_Filter__tail {
+    padding: 8px 16px;
   }
 .ComponentsPage_Operation {
   display: flex;
@@ -3334,11 +3370,24 @@ select {
 .ComponentsPage_Operation__head {
     position: relative;
     flex-shrink: 0;
+  }
+.ComponentsPage_Operation--desktop .ComponentsPage_Operation__head {
     padding: 76px 64px 18px;
   }
+.ComponentsPage_Operation--mobile .ComponentsPage_Operation__head {
+    padding: 22px 104px 18px 18px;
+  }
 .ComponentsPage_Operation__title {
-    font-size: 2.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
     font-weight: bold;
+  }
+.ComponentsPage_Operation--desktop .ComponentsPage_Operation__title {
+    font-size: 2.8rem;
+  }
+.ComponentsPage_Operation--mobile .ComponentsPage_Operation__title {
+    font-size: 1.6rem;
   }
 .ComponentsPage_Operation__cancel {
     position: absolute;
@@ -3360,8 +3409,13 @@ select {
   }
 .ComponentsPage_Operation__body {
     flex-grow: 1;
-    padding: 0 64px 64px;
     overflow-y: scroll;
+  }
+.ComponentsPage_Operation--desktop .ComponentsPage_Operation__body {
+    padding: 0 64px 64px;
+  }
+.ComponentsPage_Operation--mobile .ComponentsPage_Operation__body {
+    padding: 0 16px 16px;
   }
 .ComponentsPage_Operation__tail {
     flex-shrink: 0;
@@ -3413,11 +3467,24 @@ select {
 .ComponentsPage_Preview__head {
     position: relative;
     flex-shrink: 0;
+  }
+.ComponentsPage_Preview--desktop .ComponentsPage_Preview__head {
     padding: 76px 64px 18px;
   }
+.ComponentsPage_Preview--mobile .ComponentsPage_Preview__head {
+    padding: 18px 64px;
+  }
 .ComponentsPage_Preview__title {
-    font-size: 2.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
     font-weight: bold;
+  }
+.ComponentsPage_Preview--desktop .ComponentsPage_Preview__title {
+    font-size: 2.8rem;
+  }
+.ComponentsPage_Preview--mobile .ComponentsPage_Preview__title {
+    font-size: 1.6rem;
   }
 .ComponentsPage_Preview__operationsButton {
     position: absolute;
@@ -3465,8 +3532,13 @@ select {
     }
 .ComponentsPage_Preview__body {
     flex-grow: 1;
-    padding: 0 64px 64px;
     overflow-y: scroll;
+  }
+.ComponentsPage_Preview--desktop .ComponentsPage_Preview__body {
+    padding: 0 64px 64px;
+  }
+.ComponentsPage_Preview--mobile .ComponentsPage_Preview__body {
+    padding: 0 16px 16px;
   }
 .ComponentsPage_Preview__tail {
   display: flex;
@@ -3534,7 +3606,6 @@ select {
     padding-top: 24px;
   }
 .ComponentsPage_Search__closeButton {
-    margin: 0 0 56px 24px;
     cursor: pointer;
   }
 @media (hover: hover) {
@@ -3551,23 +3622,51 @@ select {
       width: 16px;
       height: 16px;
     }
+.ComponentsPage_Search--desktop .ComponentsPage_Search__closeButton {
+    margin: 0 0 56px 24px;
+  }
+.ComponentsPage_Search--mobile .ComponentsPage_Search__closeButton {
+    margin: 0 0 16px 16px;
+  }
 .ComponentsPage_Search__title {
-    margin: 0 32px 12px;
-    font-size: 2rem;
     font-weight: bold;
   }
+.ComponentsPage_Search--desktop .ComponentsPage_Search__title {
+    margin: 0 32px 12px;
+    font-size: 2rem;
+  }
+.ComponentsPage_Search--mobile .ComponentsPage_Search__title {
+    margin: 0 16px 8px;
+    font-size: 1.4rem;
+  }
 .ComponentsPage_Search__description {
+  }
+.ComponentsPage_Search--desktop .ComponentsPage_Search__description {
     margin: 0 32px 32px;
     font-size: 1.6rem;
   }
+.ComponentsPage_Search--mobile .ComponentsPage_Search__description {
+    margin: 0 16px 8px;
+    font-size: 1.2rem;
+  }
 .ComponentsPage_Search__body {
     flex-grow: 1;
-    padding: 0 64px;
     overflow-y: scroll;
+  }
+.ComponentsPage_Search--desktop .ComponentsPage_Search__body {
+    padding: 0 64px;
+  }
+.ComponentsPage_Search--mobile .ComponentsPage_Search__body {
+    padding: 0 24px;
   }
 .ComponentsPage_Search__tail {
     flex-shrink: 0;
+  }
+.ComponentsPage_Search--desktop .ComponentsPage_Search__tail {
     padding: 32px 64px;
+  }
+.ComponentsPage_Search--mobile .ComponentsPage_Search__tail {
+    padding: 8px 16px;
   }
 .EndpointsPage {
   display: block;
@@ -3576,15 +3675,25 @@ select {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  }
+.EndpointsPage--desktop .EndpointsPage__head {
     margin-bottom: 32px;
+  }
+.EndpointsPage--mobile .EndpointsPage__head {
+    margin-bottom: 8px;
   }
 .EndpointsPage__title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
     flex-grow: 1;
-    font-size: 2.8rem;
     font-weight: bold;
+  }
+.EndpointsPage--desktop .EndpointsPage__title {
+    font-size: 2.8rem;
+  }
+.EndpointsPage--mobile .EndpointsPage__title {
+    font-size: 1.4rem;
   }
 .EndpointsPage__orderButton {
   display: flex;
