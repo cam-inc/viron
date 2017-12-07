@@ -864,30 +864,8 @@ select {
 }
 .Application_Header_Menu {
   display: block;
+  padding: 0 18px;
 }
-.Application_Header_Menu__list {
-    padding: 0 18px;
-  }
-.Application_Header_Menu__item {
-    padding: 18px 0;
-    font-size: 1.4rem;
-    cursor: pointer;
-    border-bottom: 1px solid #d1d1d1;
-    border-bottom: 1px solid var(--color-base-gray);
-  }
-@media (hover: hover) {
-    .Application_Header_Menu__item:hover {
-      color: #627edf;
-      color: var(--color-base-blue);
-    }
-  }
-.Application_Header_Menu__item.hold {
-      color: #627edf;
-      color: var(--color-base-blue);
-  }
-.Application_Header_Menu__item:last-child {
-      border-bottom: none;
-    }
 .Application_Header_Menu_Clear {
   display: block;
 }
@@ -1355,6 +1333,7 @@ select {
   align-items: center;
   justify-content: center;
   height: 48px;
+  padding: 0 24px;
   cursor: pointer;
   border-radius: 24px;
 }
@@ -1520,6 +1499,48 @@ select {
           color: #d1d1d1;
           color: var(--color-base-gray);
         }
+.Dialog {
+  display: block;
+  min-width: 240px;
+}
+.Dialog__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 32px;
+    color: #fff;
+    color: var(--color-base-white);
+    background-color: #d1d1d1;
+    background-color: var(--color-base-gray);
+    border-radius: 50%;
+  }
+.Dialog__icon .Icon {
+      width: 42px;
+      height: 42px;
+    }
+.Dialog__title {
+    margin-bottom: 8px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.Dialog__message {
+    margin-bottom: 24px;
+    font-size: 1.6rem;
+  }
+.Dialog__control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
+.Dialog__control .Button {
+      flex-grow: 1;
+      margin-right: 16px;
+    }
+.Dialog__control .Button:last-child {
+        margin-right: 0;
+      }
 .Drawer {
   display: block;
   pointer-events: none;
@@ -1621,6 +1642,52 @@ select {
     bottom: -8px;
     left: -8px;
   }
+.List {
+  display: block;
+}
+.List__body {
+    overflow: hidden;
+  }
+.List__itemsWrapper {
+    position: relative;
+    transition-duration: 300ms;
+    transition-property: top;
+  }
+.List__item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+    height: 50px;
+    cursor: pointer;
+    border-bottom: 1px solid #d1d1d1;
+    border-bottom: 1px solid var(--color-base-gray);
+  }
+@media (hover: hover) {
+    .List__item:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.List__item.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
+.List .List__item:last-child {
+    border-bottom: none;
+  }
+.List__icon {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-right: 12px;
+  }
+.List__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    flex-grow: 1;
+    font-size: 1.4rem;
+  }
 .Modal {
   display: flex;
   align-items: center;
@@ -1699,7 +1766,7 @@ select {
 .Modal--mobile .Modal__frame {
       width: 100%;
       height: 100%;
-      padding: 64px 12px 12px;
+      padding: 64px 32px 32px;
     }
 .Modal--mobile .Modal__closeButton .Icon {
         top: -38px;
@@ -3147,27 +3214,6 @@ select {
   display: block;
   padding: 0 24px;
 }
-.ComponentsPage_Card_Table_Operations .ComponentsPage_Card_Table_Operations_Item:last-child {
-    border-bottom: none;
-  }
-.ComponentsPage_Card_Table_Operations_Item {
-  display: block;
-  padding: 16px 0;
-  font-size: 1.4rem;
-  cursor: pointer;
-  border-bottom: 1px solid #f9f9f9;
-  border-bottom: 1px solid var(--color-base-gray-tertiary);
-}
-@media (hover: hover) {
-    .ComponentsPage_Card_Table_Operations_Item:hover {
-    color: #627edf;
-    color: var(--color-base-blue);
-    }
-  }
-.ComponentsPage_Card_Table_Operations_Item.hold {
-    color: #627edf;
-    color: var(--color-base-blue);
-  }
 .ComponentsPage_Filter {
   display: flex;
   flex-direction: column;
@@ -3688,30 +3734,8 @@ select {
       }
 .EndpointsPage_Endpoint_Menu {
   display: block;
+  padding: 0 18px;
 }
-.EndpointsPage_Endpoint_Menu__list {
-    padding: 0 18px;
-  }
-.EndpointsPage_Endpoint_Menu__item {
-    padding: 18px 0;
-    font-size: 1.4rem;
-    cursor: pointer;
-    border-bottom: 1px solid #d1d1d1;
-    border-bottom: 1px solid var(--color-base-gray);
-  }
-@media (hover: hover) {
-    .EndpointsPage_Endpoint_Menu__item:hover {
-      color: #627edf;
-      color: var(--color-base-blue);
-    }
-  }
-.EndpointsPage_Endpoint_Menu__item.hold {
-      color: #627edf;
-      color: var(--color-base-blue);
-  }
-.EndpointsPage_Endpoint_Menu__item:last-child {
-      border-bottom: none;
-    }
 .EndpointsPage_Endpoint_Menu_QRCode {
   display: block;
 }
