@@ -82,7 +82,7 @@
     & .Modal__frame {
       width: 100%;
       height: 100%;
-      padding: 64px 12px 12px;
+      padding: 64px 32px 32px;
     }
 
     & .Modal__closeButton {

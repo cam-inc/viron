@@ -1,3 +1,4 @@
+import '../../../components/viron-dialog/index.tag';
 import '../../../components/viron-error/index.tag';
 import util from '../../../components/viron-parameters/util';
 
@@ -33,16 +34,7 @@ export default function() {
     this.submitLabel = '実行する';
   }
 
-  this.handleCancelTap = () => {
-    this.close();
-  };
-
-  this.handleParametersChange = newValue => {
-    this.val = newValue;
-    this.update();
-  };
-
-  this.handleSubmitTap = () => {
+  const operate = () => {
     Promise
       .resolve()
       .then(() => store.action('components.operate', operationObject, this.val))
@@ -62,5 +54,25 @@ export default function() {
           error: err
         });
       });
+  };
+
+  this.handleCancelTap = () => {
+    this.close();
+  };
+
+  this.handleParametersChange = newValue => {
+    this.val = newValue;
+    this.update();
+  };
+
+  this.handleSubmitTap = () => {
+    Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
+      title: this.title,
+      message: '本当に実行しますか？',
+      labelPositive: this.submitLabel,
+      onPositiveSelect: () => {
+        operate();
+      }
+    }));
   };
 }

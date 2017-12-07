@@ -1,0 +1,43 @@
+.Dialog {
+  display: block;
+  min-width: 240px;
+
+  &__icon {
+    @apply --layout-center-center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 32px;
+    color: var(--color-base-white);
+    background-color: var(--color-base-gray);
+    border-radius: 50%;
+
+    & .Icon {
+      width: 42px;
+      height: 42px;
+    }
+  }
+
+  &__title {
+    margin-bottom: 8px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  &__message {
+    margin-bottom: 24px;
+    font-size: 1.6rem;
+  }
+
+  &__control {
+    @apply --layout-center-center;
+
+    & .Button {
+      flex-grow: 1;
+      margin-right: 16px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
