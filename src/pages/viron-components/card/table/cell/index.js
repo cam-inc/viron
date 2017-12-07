@@ -13,6 +13,8 @@ export default function() {
 
   // クリップっボードコピーをサポートしているか否か。
   let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
   // テキスト系か否か。
   this.isText = false;
   // 画像系か否か。
@@ -24,7 +26,6 @@ export default function() {
   this.videoType = null;
   // typeに応じて表示を切り替えます。
   this.value = (() => {
-
     const data = this.opts.data;
     if (isNull(data)) {
       this.isText = true;
@@ -85,8 +86,12 @@ export default function() {
     return String(data);
   })();
 
+  this.listen('layout', () => {
+    this.isMobile = store.getter('layout.isMobile');
+  });
+
   this.handleStringTap = e => {
-    if (!isClipboardCopySupported) {
+    if (this.isMobile || !isClipboardCopySupported) {
       return;
     }
     e.stopPropagation();

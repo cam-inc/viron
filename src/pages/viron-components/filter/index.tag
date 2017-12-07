@@ -1,4 +1,4 @@
-viron-components-page-filter.ComponentsPage_Filter
+viron-components-page-filter.ComponentsPage_Filter(class="ComponentsPage_Filter--{ layoutType }")
   .ComponentsPage_Filter__head
     .ComponentsPage_Filter__closeButton(onTap="{ handleCloseButtonTap }")
       viron-icon-close

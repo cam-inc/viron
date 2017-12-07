@@ -6,16 +6,18 @@ import './import/index.tag';
 
 export default function() {
   const store = this.riotx.get();
+  const isDesktop = store.getter('layout.isDesktop');
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
     { label: 'ヘルプ', id: 'navigate_to_doc' }
   ];
-  const endpointActions = [
-    { label: '追加', id: 'add_endpoint' },
-    { label: 'ホームを保存', id: 'export_endpoints' },
-    { label: 'ホームを読み込み', id: 'import_endpoints' },
-    { label: '全てのカードを削除', id: 'remove_all_endpoints' }
-  ];
+  const endpointActions = [];
+  endpointActions.push({ label: '追加', id: 'add_endpoint' });
+  if (isDesktop) {
+    endpointActions.push({ label: 'ホームを保存', id: 'export_endpoints' });
+    endpointActions.push({ label: 'ホームを読み込み', id: 'import_endpoints' });
+  }
+  endpointActions.push({ label: '全てのカードを削除', id: 'remove_all_endpoints' });
 
   // メニュー項目群。
   this.actions = [];

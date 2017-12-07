@@ -1,4 +1,4 @@
-viron-components-page-preview.ComponentsPage_Preview
+viron-components-page-preview.ComponentsPage_Preview(class="ComponentsPage_Preview--{ layoutType }")
   .ComponentsPage_Preview__head
     .ComponentsPage_Preview__title プレビュー
     .ComponentsPage_Preview__operationsButton(if="{ !!this.operations.length }" onTap="{ handleOperationsButtonTap }")

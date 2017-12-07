@@ -1,4 +1,4 @@
-viron-components-page-operation.ComponentsPage_Operation
+viron-components-page-operation.ComponentsPage_Operation(class="ComponentsPage_Operation--{ layoutType }")
   .ComponentsPage_Operation__head
     .ComponentsPage_Operation__title { title }
     .ComponentsPage_Operation__cancel(onTap="{ handleCancelTap }") キャンセル

@@ -6,6 +6,7 @@ export default function() {
   const store = this.riotx.get();
   const operationObject = this.opts.operationObject;
 
+  this.layoutType = store.getter('layout.type');
   // 入力値。
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
   this.val = util.generateInitialVal(operationObject.parameters, this.opts.initialVal);
@@ -55,6 +56,11 @@ export default function() {
         });
       });
   };
+
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.update();
+  });
 
   this.handleCancelTap = () => {
     this.close();

@@ -6,7 +6,7 @@ export default function() {
   const dataList = this.opts.dataList;
   const initialSelectedIdx = this.opts.selectedIdx;
 
-  // 入力値。
+  this.layoutType = store.getter('layout.type');
   this.parameterObjects = this.opts.parameterObjects;
   this.operations = this.opts.operations || [];
   this.val = null;
@@ -25,6 +25,11 @@ export default function() {
     this.isNextButtonDisabled = (idx === (dataList.length - 1));
   };
   changeData(initialSelectedIdx);
+
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.update();
+  });
 
   this.handleOperationsButtonTap = e => {
     const rect = e.currentTarget.getBoundingClientRect();

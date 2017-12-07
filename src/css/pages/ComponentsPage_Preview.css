@@ -5,12 +5,27 @@
   &__head {
     position: relative;
     flex-shrink: 0;
+  }
+
+  &--desktop &__head {
     padding: 76px 64px 18px;
   }
 
+  &--mobile &__head {
+    padding: 18px 64px;
+  }
+
   &__title {
-    font-size: 2.8rem;
+    @apply --text-truncate;
     font-weight: bold;
+  }
+
+  &--desktop &__title {
+    font-size: 2.8rem;
+  }
+
+  &--mobile &__title {
+    font-size: 1.6rem;
   }
 
   &__operationsButton {
@@ -49,8 +64,15 @@
 
   &__body {
     flex-grow: 1;
-    padding: 0 64px 64px;
     overflow-y: scroll;
+  }
+
+  &--desktop &__body {
+    padding: 0 64px 64px;
+  }
+
+  &--mobile &__body {
+    padding: 0 16px 16px;
   }
 
   &__tail {

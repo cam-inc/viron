@@ -23,10 +23,12 @@ export default function() {
   // 全選択ボタンの活性状態。
   // 全て選択されている場合はnullを返す。
   this.isAllSelected = (!selectedColumnKeys || selectedColumnKeys.length === this.columns.length);
+  this.layoutType = store.getter('layout.type');
   // モバイル用レイアウトか否か。
   this.isMobile = store.getter('layout.isMobile');
 
   this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
     this.isMobile = store.getter('layout.isMobile');
     this.update();
   });

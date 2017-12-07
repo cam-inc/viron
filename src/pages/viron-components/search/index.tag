@@ -1,6 +1,6 @@
-viron-components-page-search.ComponentsPage_Search
+viron-components-page-search.ComponentsPage_Search(class="ComponentsPage_Search--{ layoutType }")
   .ComponentsPage_Search__head
-    .ComponentsPage_Filter__closeButton(onTap="{ handleCloseButtonTap }")
+    .ComponentsPage_Search__closeButton(onTap="{ handleCloseButtonTap }")
       viron-icon-close
     .ComponentsPage_Search__title 検索
     .ComponentsPage_Search__description クエリパラメータを指定して下さい。

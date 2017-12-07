@@ -1,4 +1,4 @@
-viron-endpoints-page.EndpointsPage
+viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
   .EndpointsPage__head
     .EndpointsPage__title ホーム
     .EndpointsPage__orderButton(if="{ isDesktop }" onTap="{ handleOrderButtonTap }")
