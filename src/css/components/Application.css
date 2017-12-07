@@ -19,6 +19,42 @@
     grid-template-columns: var(--component-application-menu-width) minmax(0, 1fr);
   }
 
+  & &__container {
+    z-index: 1;
+  }
+
+  & .Application_Drawers {
+    z-index: 2;
+  }
+
+  & .Application_Modals {
+    z-index: 3;
+  }
+
+  & .Application_Popovers {
+    z-index: 4;
+  }
+
+  & .Application_Toasts {
+    z-index: 5;
+  }
+
+  & .Application_ProgressLinear {
+    z-index: 6;
+  }
+
+  & .Application_Dimmer {
+    z-index: 7;
+  }
+
+  & .Application_Blocker {
+    z-index: 8;
+  }
+
+  & .Application_Splash {
+    z-index: 9;
+  }
+
   &__aside {
     @apply --layout-stretch-center;
     grid-area: aside;
@@ -59,6 +95,11 @@
     grid-area: main;
   }
 
+  &__page {
+    /* Safariのposition:stickyバグ対応 */
+    padding-top: 24px;
+  }
+
   &--desktop&--asideClosed {
     .Application__container {
       grid-template-columns: 0 minmax(0, 1fr);
@@ -67,7 +108,7 @@
 
   &--desktop {
     & .Application__main {
-      padding: 24px;
+      padding: 0 24px 24px;
     }
   }
 
@@ -78,7 +119,7 @@
     }
 
     & .Application__main {
-      padding: 24px 4px;
+      padding: 0 4px 24px;
     }
   }
 }

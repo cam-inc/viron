@@ -27,11 +27,11 @@ viron-components-page-table.ComponentsPage_Card_Table
             thead.ComponentsPage_Card_Table__thead
               tr.ComponentsPage_Card_Table__theadRow
                 th.ComponentsPage_Card_Table__th(each="{ column in getFilteredColumns() }") { column.description || column.key }
-                th.ComponentsPage_Card_Table__th(if="{ rowOperations.length }")
+                th.ComponentsPage_Card_Table__th.ComponentsPage_Card_Table__th--sticky(if="{ rowOperations.length }") 操作
             tbody.ComponentsPage_Card_Table__tbody
               tr.ComponentsPage_Card_Table__tbodyRow(each="{ row, idx in data }" onTap="{ handleRowTap }")
                 td(each="{ column in parent.getFilteredColumns() }" data-is="viron-components-page-table-cell" data="{ row[column.key] }" column="{ column }")
-                td.ComponentsPage_Card_Table__td(if="{ rowOperations.length }")
+                td.ComponentsPage_Card_Table__td.ComponentsPage_Card_Table__td--sticky(if="{ rowOperations.length }")
                   viron-icon-setting(ref="rowSettingIcon" onTap="{ handleRowSettingButtonTap }")
   .ComponentsPage_Card_Table__tail(if="{ hasPagination }")
     viron-pagination(max="{ pagination.max }" size="{ paginationSize }" current="{ pagination.current }" onChange="{ handlePaginationChange }")

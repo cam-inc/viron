@@ -1,12 +1,15 @@
 .ComponentsPage_Card_Table {
   @apply --layout-column-center-stretch;
   position: relative;
-  height: 100%;
 
   &__head {
     @apply --layout-center-between;
+    position: sticky;
+    top: 0;
+    z-index: 1;
     flex-shrink: 0;
     padding: 24px;
+    background-color: var(--color-base-white);
   }
 
   &__headAside {
@@ -70,15 +73,13 @@
   &__body {
     position: relative;
     flex-grow: 1;
+    width: 100%;
+    overflow: scroll;
   }
 
   &__progressWrapper {
     @apply --layout-center-center;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    height: 120px;
   }
 
   &__progress {
@@ -93,11 +94,6 @@
 
   &__errorWrapper {
     @apply --layout-center-center;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
     padding: 24px;
   }
 
@@ -106,12 +102,8 @@
   }
 
   &__tableWrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: scroll;
+    /* Safariバグへの対応 */
+    width: 0;
   }
 
   &__table {
@@ -125,6 +117,12 @@
     color: var(--color-base-gray);
     text-align: left;
     border-bottom: 1px solid var(--color-base-gray-tertiary);
+
+    &--sticky {
+      position: sticky;
+      right: 0;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
+    }
   }
 
   &__tbodyRow {
@@ -142,7 +140,14 @@
       }
       width: 16px;
       height: 16px;
+      margin: 0 auto;
       cursor: pointer;
+    }
+
+    &--sticky {
+      position: sticky;
+      right: 0;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
     }
   }
 

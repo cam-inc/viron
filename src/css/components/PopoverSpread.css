@@ -8,7 +8,6 @@
   &__frame {
     position: relative;
     width: 100%;
-    min-height: 100px;
     max-height: 80%;
     overflow-y: scroll;
     background-color: var(--color-base-white);

@@ -1,3 +1,8 @@
+:root {
+  --page-components-grid-row-height: 144px;
+  --page-components-grid-gap: 24px;
+}
+
 .ComponentsPage {
   display: block;
 
@@ -9,9 +14,9 @@
 
   &__container {
     display: grid;
-    grid-gap: 24px;
+    grid-gap: var(--page-components-grid-gap);
     grid-template-columns: repeat(auto-fill, 312px);
-    grid-auto-rows: 144px;
+    grid-auto-rows: auto;
     justify-content: center;
   }
 
@@ -25,15 +30,15 @@
     }
 
     &--rowSpreadSmall {
-      grid-row-end: span 1;
+      height: var(--page-components-grid-row-height);
     }
 
     &--rowSpreadMedium {
-      grid-row-end: span 2;
+      height: calc((var(--page-components-grid-row-height) * 2) + var(--page-components-grid-gap));
     }
 
     &--rowSpreadLarge {
-      grid-row-end: span 3;
+      height: auto;
     }
   }
 }
