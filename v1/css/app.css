@@ -1333,7 +1333,6 @@ select {
   align-items: center;
   justify-content: center;
   height: 48px;
-  padding: 0 24px;
   cursor: pointer;
   border-radius: 24px;
 }
