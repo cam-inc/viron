@@ -1,21 +1,4 @@
 .EndpointsPage_Endpoint_Menu {
   display: block;
-
-  &__list {
-    padding: 0 18px;
-  }
-
-  &__item {
-    @mixin hover {
-      color: var(--color-base-blue);
-    }
-    padding: 18px 0;
-    font-size: 1.4rem;
-    cursor: pointer;
-    border-bottom: 1px solid var(--color-base-gray);
-
-    &:last-child {
-      border-bottom: none;
-    }
-  }
+  padding: 0 18px;
 }

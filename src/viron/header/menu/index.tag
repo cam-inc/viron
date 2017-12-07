@@ -1,7 +1,7 @@
 viron-application-header-menu.Application_Header_Menu
-  .Application_Header_Menu__list
-    .Application_Header_Menu__item(each="{ action in actions }" onTap="{ handleItemTap }") { action.label }
+  viron-list(list="{ actions }" size="{ 5 }" onSelect="{ handleActionSelect }")
 
   script.
+    import '../../../components/viron-list/index.tag';
     import script from './index';
     this.external(script);

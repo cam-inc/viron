@@ -1,7 +1,7 @@
 viron-components-page-table-operations.ComponentsPage_Card_Table_Operations
-  viron-components-page-table-operations-item(each="{ operation in opts.operations }" operation="{ operation }" onSelect="{ handleItemSelect }")
+  viron-list(list="{ list }" size="{ 5 }" onSelect="{ handleItemSelect }")
 
   script.
-    import './item/index.tag';
+    import '../../../../../components/viron-list/index.tag';
     import script from './index';
     this.external(script);

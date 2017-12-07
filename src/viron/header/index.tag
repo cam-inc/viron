@@ -15,7 +15,7 @@ viron-application-header.Application_Header
     virtual(if="{ !isTopPage }")
       virtual(if="{ !isMobile }")
         .Application_Header__info
-          .Application_Header__color(class="Application_Header__color--{ todo }")
+          .Application_Header__color(class="Application_Header__color--{ color }")
           .Application_Header__name { name }
           viron-icon-arrow-right.Application_Header__arrow
           .Application_Header__thumbnail(style="background-image:url({ thumbnail })")

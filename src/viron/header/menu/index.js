@@ -67,11 +67,10 @@ export default function() {
 
   /**
    * メニュー項目がクリック/タップされた時の処理。
-   * @param {Object} e
+   * @param {String} id
    */
-  this.handleItemTap = e => {
-    const actionId = e.item.action.id;
-    switch (actionId) {
+  this.handleActionSelect = id => {
+    switch (id) {
     case 'show_credit':
       this.showCreditModal();
       this.close();

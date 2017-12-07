@@ -5,15 +5,19 @@ export default function() {
   const store = this.riotx.get();
 
   // サインイン済みか否か。
-  this.isSignined = !!this.opts.endpoint.token;
-  this.isDesktop = store.getter('layout.isDesktop');
+  const isSignined = !!this.opts.endpoint.token;
+  const isDesktop = store.getter('layout.isDesktop');
 
-  this.listen('layout', () => {
-    this.isDesktop = store.getter('layout.isDesktop');
-    this.update();
-  });
+  this.list = [];
+  if (isDesktop) {
+    this.list.push({ id: 'qrcode', label: 'QRコード' });
+  }
+  this.list.push({ id: 'remove', label: 'エンドポイントを削除' });
+  if (isSignined) {
+    this.list.push({ id: 'signout', label: 'ログアウト' });
+  }
 
-  this.handleQRCodeButtonTap = () => {
+  const showQRCode = () => {
     Promise
       .resolve()
       .then(() => store.action('modals.add', 'viron-endpoints-page-endpoint-menu-qrcode', {
@@ -27,7 +31,7 @@ export default function() {
       }));
   };
 
-  this.handleDeleteButtonTap = () => {
+  const removeEndpoint = () => {
     Promise
       .resolve()
       .then(() => store.action('endpoints.remove', this.opts.endpoint.key))
@@ -42,7 +46,7 @@ export default function() {
       }));
   };
 
-  this.handleSignoutButtonTap = () => {
+  const signout = () => {
     Promise
       .resolve()
       .then(() => store.action('auth.remove', this.opts.endpoint.key))
@@ -55,5 +59,21 @@ export default function() {
       .catch(err => store.action('modals.add', 'viron-error', {
         error: err
       }));
+  };
+
+  this.handleItemSelect = id => {
+    switch (id) {
+    case 'qrcode':
+      showQRCode();
+      break;
+    case 'remove':
+      removeEndpoint();
+      break;
+    case 'signout':
+      signout();
+      break;
+    default:
+      break;
+    }
   };
 }
