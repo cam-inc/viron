@@ -21,6 +21,7 @@
 @import "Application_Splash";
 @import "Application_Toasts";
 @import "Autocomplete";
+@import "Base64";
 @import "Button";
 @import "Checkbox";
 @import "Dialog";

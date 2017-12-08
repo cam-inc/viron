@@ -18,6 +18,8 @@ export default function() {
   this.autocompleteConfig = formObject['x-autocomplete'];
   // uploaderのaccept値。
   this.accept = formObject['x-accept'] || '*';
+  // MIME-type
+  this.mimeType = formObject['x-mime-type'];
 
   // 入力に使用するUIコンポーネント名。
   // opts.formObjectの値から適切なUIコンポーネントを推測します。
@@ -175,6 +177,21 @@ export default function() {
       ret = undefined;
     } else {
       ret = newFile;
+    }
+    change(ret);
+  };
+
+  /**
+   * Base64: 入力値が変更された時の処理。
+   * @param {String|null} newValue
+   */
+  this.handleBase64Change = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
     }
     change(ret);
   };

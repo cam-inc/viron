@@ -16,6 +16,8 @@ viron-parameters-form.Parameters_Form
       viron-select(options="{ getSelectOptions() }" theme="{ opts.theme }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleSelectChange }")
     virtual(if="{ uiType === 'uploader' }")
       viron-uploader(accept="{ accept }" theme="{ opts.theme }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleUploaderChange }")
+    virtual(if="{ uiType === 'base64' }")
+      viron-base64(val="{ opts.val }" mimeType="{ mimeType }" onChange="{ handleBase64Change }")
     virtual(if="{ uiType === 'html' }")
       viron-html(val="{ opts.val }" theme="{ opts.theme }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleHtmlChange }")
     virtual(if="{ uiType === 'pug' }")
@@ -30,6 +32,7 @@ viron-parameters-form.Parameters_Form
   script.
     // TODO: 全てのフォーム動作確認。
     import '../../../components/viron-autocomplete/index.tag';
+    import '../../../components/viron-base64/index.tag';
     import '../../../components/viron-checkbox/index.tag';
     import '../../../components/viron-html/index.tag';
     import '../../../components/viron-numberinput/index.tag';

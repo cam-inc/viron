@@ -19,6 +19,7 @@ const UI_WYSWYG = 'wyswyg';
 const UI_PUG = 'pug';
 const UI_NULL = 'null';
 const UI_AUTOCOMPLETE = 'autocomplete';
+const UI_BASE64 = 'base64';
 
 // ParameterObjectに対する処理。
 /**
@@ -178,6 +179,8 @@ export default {
         return UI_PUG;
       case 'html':
         return UI_HTML;
+      case 'base64':
+        return UI_BASE64;
       default:
         return UI_TEXTINPUT;
       }
@@ -208,6 +211,8 @@ export default {
     switch (formObject.type) {
     case 'string':
       switch (formObject.format) {
+      case 'base64':
+        return 'spreadSmall';
       case 'multiline':
       case 'wyswyg':
       case 'pug':
