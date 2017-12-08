@@ -11,12 +11,17 @@
     right: 0;
     width: calc(100% - var(--component-application-menu-width));
     height: 100%;
-    overflow-y: scroll;
     background-color: var(--color-base-white);
     opacity: 0;
     transition-duration: 300ms;
     transition-property: transform, opacity;
     transform: translateX(100px);
+  }
+
+  &__contentWrapper {
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
   }
 
   &--visible {
