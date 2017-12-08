@@ -1,3 +1,4 @@
+import clipboard from 'clipboard-js';
 import isNull from 'mout/lang/isNull';
 import isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
@@ -6,6 +7,11 @@ import '../../components/viron-error/index.tag';
 
 export default function() {
   const store = this.riotx.get();
+
+  // クリップっボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
 
   this.options = [];
 
@@ -83,5 +89,23 @@ export default function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(this.opts.val);
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 }

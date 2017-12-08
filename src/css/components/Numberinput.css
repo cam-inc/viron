@@ -25,11 +25,16 @@
   }
 
   &__blocker {
+    @mixin hover {
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
   }
 
   &--error {

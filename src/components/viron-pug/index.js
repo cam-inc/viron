@@ -1,3 +1,5 @@
+import clipboard from 'clipboard-js';
+
 export default function() {
   /**
    * 入力値をhtmlに変換します。
@@ -5,6 +7,13 @@ export default function() {
   const compile = () => {
 
   };
+
+  const store = this.riotx.get();
+
+  // クリップっボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
 
   // タブの選択状態。
   this.isEditorMode = true;
@@ -42,5 +51,24 @@ export default function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(this.opts.val);
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 }
