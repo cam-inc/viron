@@ -18,8 +18,7 @@
     @mixin hover {
       border-color: var(--color-base-blue);
 
-      & .Uploader__empty,
-      & .Uploader__csv {
+      & .Uploader__icon {
         color: var(--color-base-blue);
       }
     }
@@ -35,8 +34,7 @@
     border-radius: 2px;
   }
 
-  &__empty,
-  &__csv {
+  &__icon {
     @apply --layout-center-center;
     width: 100%;
     height: 100%;
@@ -97,8 +95,7 @@
       border-color: var(--color-base-blue);
     }
 
-    & .Uploader__csv,
-    & .Uploader__empty {
+    & .Uploader__icon {
       color: var(--color-base-blue);
     }
   }
@@ -108,8 +105,7 @@
       border-color: var(--color-base-red);
     }
 
-    & .Uploader__csv,
-    & .Uploader__empty {
+    & .Uploader__icon {
       color: var(--color-base-red);
     }
   }

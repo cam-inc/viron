@@ -4,6 +4,7 @@ export default function() {
   this.fileName = null;
   this.isTypeOfImage = false;
   this.isTypeOfCsv = false;
+  this.isTypeOfOther = false;
   this.blobURL = this.opts.initialbloburl || null;
   this.isDragWatching = false;
   this.isDroppable = false;
@@ -15,6 +16,7 @@ export default function() {
     this.fileName = null;
     this.isTypeOfImage = false;
     this.isTypeOfCsv = false;
+    this.isTypeOfOther = false;
     this.blobURL = this.opts.initialbloburl || null;
     this.opts.onchange && this.opts.onchange(this.file, this.blobURL);
   };
@@ -50,8 +52,19 @@ export default function() {
     const file = files[0];
     this.file = file;
     this.fileName = file.name;
-    this.isTypeOfImage = (file.type.indexOf('image/') === 0);
-    this.isTypeOfCsv = (file.type.indexOf('text/csv') === 0);
+    if (file.type.indexOf('image/') === 0) {
+      this.isTypeOfImage = true;
+      this.isTypeOfCsv = false;
+      this.isTypeOfOther = false;
+    } else if (file.type.indexOf('text/csv') === 0) {
+      this.isTypeOfImage = false;
+      this.isTypeOfCsv = true;
+      this.isTypeOfOther = false;
+    } else {
+      this.isTypeOfImage = false;
+      this.isTypeOfCsv = false;
+      this.isTypeOfOther = true;
+    }
     this.blobURL = window.URL.createObjectURL(file);
     this.opts.onchange(this.file, this.blobURL);
   };
