@@ -2,10 +2,12 @@ viron-components-page-table-cell.ComponentsPage_Card_Table_Cell
   virtual(if="{ isText }")
     .ComponentsPage_Card_Table_Cell__string(onTap="{ handleStringTap }") { value }
   virtual(if="{ isImage }")
-    .ComponentsPage_Card_Table_Cell__image(style="background-image:url({ value })")
-  virtual(if="{ isBase64 }")
-    // TODO: base64にdata:image/png;base64,は含まれないの？
-    .ComponentsPage_Card_Table_Cell__image(style="background-image:url(data:image/png;base64,{ value })")
+    virtual(if="{ !isBase64 }")
+      .ComponentsPage_Card_Table_Cell__image(style="background-image:url({ value })")
+    virtual(if="{ isBase64 }")
+      // Data URI Schemeで表示する。
+      // @see: https://ja.wikipedia.org/wiki/Data_URI_scheme
+      .ComponentsPage_Card_Table_Cell__image(style="background-image:url(data:{ mimeType };base64,{ value })")
   virtual(if="{ isVideo }")
     ComponentsPage_Card_Table_Cell__video TODO
     //video.ComponentsPage_Card_Table_Cell__video(controls)

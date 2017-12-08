@@ -15,7 +15,7 @@ viron-parameters-form.Parameters_Form
     virtual(if="{ uiType === 'select' }")
       viron-select(options="{ getSelectOptions() }" theme="{ opts.theme }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleSelectChange }")
     virtual(if="{ uiType === 'uploader' }")
-      viron-uploader(accept="*" theme="{ opts.theme }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleUploaderChange }")
+      viron-uploader(accept="{ accept }" theme="{ opts.theme }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleUploaderChange }")
     virtual(if="{ uiType === 'html' }")
       viron-html(val="{ opts.val }" theme="{ opts.theme }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleHtmlChange }")
     virtual(if="{ uiType === 'pug' }")

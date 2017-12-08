@@ -16,6 +16,8 @@ export default function() {
   }
   // autocomplete設定。
   this.autocompleteConfig = formObject['x-autocomplete'];
+  // uploaderのaccept値。
+  this.accept = formObject['x-accept'] || '*';
 
   // 入力に使用するUIコンポーネント名。
   // opts.formObjectの値から適切なUIコンポーネントを推測します。
