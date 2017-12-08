@@ -16,23 +16,32 @@ export default function() {
   this.submitLabel = null;
   // submitボタンのmodifier。
   this.submitModifier = null;
+  // 完了時のメッセージ。
+  let successMessage = null;
   // methodで振り分けます。
-  switch (store.getter('oas.pathItemObjectMethodNameByOperationId', operationObject.operationId)) {
+  const method = store.getter('oas.pathItemObjectMethodNameByOperationId', operationObject.operationId);
+  switch (method) {
   case 'get':
     this.submitLabel = '取得する';
+    this.successMessage = '取得しました。';
     break;
   case 'post':
     this.submitLabel = '新規作成する';
+    successMessage = '新規作成しました。';
     break;
   case 'put':
     this.submitLabel = '保存する';
+    successMessage = '保存しました。';
     break;
   case 'delete':
     this.submitLabel = '削除する';
     this.submitModifier = 'emphasised';
+    successMessage = '削除しました。';
     break;
   default:
     this.submitLabel = '実行する';
+    successMessage = '完了しました。';
+    break;
   }
 
   const operate = () => {
@@ -42,6 +51,9 @@ export default function() {
       .then(() => {
         this.close();
         this.opts.onSuccess();
+        return store.action('toasts.add', {
+          message: successMessage
+        });
       })
       .catch(err => {
         if (err.status === 401) {
