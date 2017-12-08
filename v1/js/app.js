@@ -23623,7 +23623,10 @@ riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}
     this.external(script$23);
 });
 
-riot$1.tag2('viron-icon-square', '<svg viewbox="-3674 14061 15.998 13.998"> <path d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSquare {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-file-add', '<svg viewbox="2937 22889 57.219 64.002"> <g transform="translate(2863 22751)"> <g transform="translate(-347 -90)"> <g transform="translate(421 228)"> <path d="M6.449,56.554a2.5,2.5,0,0,1-2.5-2.5V6.449a2.5,2.5,0,0,1,2.5-2.482l22.825-.02v8.442a4.476,4.476,0,0,0,4.476,4.476l8.259-.02.041,19.509a13.014,13.014,0,0,1,1.79-.122,15.508,15.508,0,0,1,2.2.163V15.237L30.739,0H6.449A6.451,6.451,0,0,0,0,6.449V54.072a6.451,6.451,0,0,0,6.449,6.449H33.363a14.909,14.909,0,0,1-2.645-3.947H6.449Z"></path> </g> <g transform="translate(169.449 90.915)"> <g transform="translate(282 174.316)"> <path d="M-4190.615-7823.229A13.4,13.4,0,0,1-4204-7836.616,13.4,13.4,0,0,1-4190.615-7850a13.4,13.4,0,0,1,13.385,13.385A13.4,13.4,0,0,1-4190.615-7823.229Zm-6.292-14.64a.4.4,0,0,0-.4.4v1.71a.4.4,0,0,0,.4.4h5.038v5.038a.4.4,0,0,0,.4.4h1.71a.4.4,0,0,0,.4-.4v-5.038h5.038a.4.4,0,0,0,.4-.4v-1.71a.4.4,0,0,0-.4-.4h-5.038v-5.04a.4.4,0,0,0-.4-.4h-1.71a.4.4,0,0,0-.4.4v5.04Z" transform="translate(4204 7850)"></path> </g> </g> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFileAdd {opts.class}"', function(opts) {
+});
+
+riot$1.tag2('viron-icon-file-csv', '<svg viewbox="3040.477 22887.934 49.316 60.576"> <path d="M42.872,60.575H9.675a6.454,6.454,0,0,1-6.448-6.447V51.24H2.6a2.6,2.6,0,0,1-2.6-2.6V32.886a2.6,2.6,0,0,1,2.6-2.6h.629V6.448A6.455,6.455,0,0,1,9.675,0H34L49.316,15.259v38.87A6.453,6.453,0,0,1,42.872,60.575ZM7.177,51.239v2.89a2.5,2.5,0,0,0,2.5,2.5h33.2a2.5,2.5,0,0,0,2.495-2.5l-.093-37.306L37,16.846a4.476,4.476,0,0,1-4.471-4.47V3.929L9.675,3.952a2.5,2.5,0,0,0-2.5,2.5v23.84H38.124a2.6,2.6,0,0,1,2.6,2.6V48.641a2.6,2.6,0,0,1-2.6,2.6H7.177Zm10.262-6.831a.6.6,0,0,0-.3.084.521.521,0,0,0-.28.48,1.662,1.662,0,0,0,.248.872,1.247,1.247,0,0,0,.664.553,6.509,6.509,0,0,0,2.256.352c2.749,0,4.144-1.131,4.144-3.361a3.17,3.17,0,0,0-.84-2.272,7.269,7.269,0,0,0-3-1.568c-1-.33-1.5-.884-1.5-1.648a1.3,1.3,0,0,1,.417-1.024,1.788,1.788,0,0,1,1.216-.368,6.72,6.72,0,0,1,2.384.448.691.691,0,0,0,.257.053.646.646,0,0,0,.35-.108.586.586,0,0,0,.288-.52,1.472,1.472,0,0,0-.256-.841,1.168,1.168,0,0,0-.672-.488,8.977,8.977,0,0,0-2.512-.3,4.058,4.058,0,0,0-2.736.849,2.907,2.907,0,0,0-.976,2.3,3.124,3.124,0,0,0,.856,2.208,6.7,6.7,0,0,0,2.776,1.552,3.284,3.284,0,0,1,1.3.728A1.453,1.453,0,0,1,21.9,43.42c0,1.019-.684,1.536-2.032,1.536a5.049,5.049,0,0,1-2.16-.481A.606.606,0,0,0,17.439,44.408Zm-5.713-9.66a5.161,5.161,0,0,0-4.008,1.577,6.368,6.368,0,0,0-1.432,4.424,6.228,6.228,0,0,0,1.48,4.44,5.282,5.282,0,0,0,4.008,1.561,11.7,11.7,0,0,0,2-.144,1.013,1.013,0,0,0,.671-.4,1.237,1.237,0,0,0,.256-.768.659.659,0,0,0-.288-.56.758.758,0,0,0-.449-.15.851.851,0,0,0-.191.023,7.671,7.671,0,0,1-1.76.208,3.134,3.134,0,0,1-2.5-1.1,4.656,4.656,0,0,1-.944-3.1,4.758,4.758,0,0,1,.9-3.1,3.075,3.075,0,0,1,2.488-1.088,7.264,7.264,0,0,1,1.728.193.865.865,0,0,0,.19.022.724.724,0,0,0,.442-.151.665.665,0,0,0,.28-.56,1.194,1.194,0,0,0-.272-.768,1.077,1.077,0,0,0-.688-.4A12.221,12.221,0,0,0,11.726,34.747Zm14.4.16a.857.857,0,0,0-.816,1.136l3.136,9.409a1.556,1.556,0,0,0,.6.823,1.665,1.665,0,0,0,.984.312,1.633,1.633,0,0,0,.976-.312,1.66,1.66,0,0,0,.608-.823l3.136-9.44a.838.838,0,0,0-.112-.76.778.778,0,0,0-.672-.344,1.559,1.559,0,0,0-1.488,1.12L30.062,44.38l-2.416-8.32a1.582,1.582,0,0,0-1.52-1.152Z" transform="translate(3040.477 22887.934)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFileCSV {opts.class}"', function(opts) {
 });
 
 var script$24 = function() {
@@ -23631,6 +23634,7 @@ var script$24 = function() {
   this.file = null;
   this.fileName = null;
   this.isTypeOfImage = false;
+  this.isTypeOfCsv = false;
   this.blobURL = this.opts.initialbloburl || null;
   this.isDragWatching = false;
   this.isDroppable = false;
@@ -23641,6 +23645,7 @@ var script$24 = function() {
     this.file = null;
     this.fileName = null;
     this.isTypeOfImage = false;
+    this.isTypeOfCsv = false;
     this.blobURL = this.opts.initialbloburl || null;
     this.opts.onchange && this.opts.onchange(this.file, this.blobURL);
   };
@@ -23677,6 +23682,7 @@ var script$24 = function() {
     this.file = file;
     this.fileName = file.name;
     this.isTypeOfImage = (file.type.indexOf('image/') === 0);
+    this.isTypeOfCsv = (file.type.indexOf('text/csv') === 0);
     this.blobURL = window.URL.createObjectURL(file);
     this.opts.onchange(this.file, this.blobURL);
   };
@@ -23720,7 +23726,7 @@ var script$24 = function() {
   };
 };
 
-riot$1.tag2('viron-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <viron-icon-square></viron-icon-square> </div> <div class="Uploader__cover" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfImage}" riot-style="background-image:url({blobURL});"></div> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" onclick="{getClickHandler(\'handleResetButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleResetButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--dragWatching\' : isDragWatching, \'Uploader--disabled\': opts.isdisabled, \'Uploader--error\': opts.haserror}" onchange="{handleChange}"', function(opts) {
+riot$1.tag2('viron-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <viron-icon-file-add></viron-icon-file-add> </div> <div class="Uploader__image" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfImage}" riot-style="background-image:url({blobURL});"></div> <div class="Uploader__csv" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfCsv}"> <viron-icon-file-csv></viron-icon-file-csv> </div> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" onclick="{getClickHandler(\'handleResetButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleResetButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--dragWatching\' : isDragWatching, \'Uploader--disabled\': opts.isdisabled, \'Uploader--error\': opts.haserror}" onchange="{handleChange}"', function(opts) {
     this.external(script$24);
 });
 
@@ -30308,6 +30314,9 @@ riot$1.tag2('viron-icon-move', '<svg viewbox="-1076 13435 16 16"> <path d="M15.8
 });
 
 riot$1.tag2('viron-icon-plus-circle', '<svg viewbox="-2912 10816 16 16"> <g transform="translate(-3277 10632.5)"> <g transform="translate(365 183.5)"> <circle cx="8" cy="8" r="8"></circle> <circle cx="8" cy="8" r="7.25"></circle> </g> <g transform="translate(9.621 -0.445)"> <rect width="8" height="2" rx="0.4" transform="translate(367.379 192.945) rotate(180)"></rect> <rect width="8" height="2" rx="0.4" transform="translate(362.379 195.945) rotate(-90)"></rect> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconPlusCircle {opts.class}"', function(opts) {
+});
+
+riot$1.tag2('viron-icon-square', '<svg viewbox="-3674 14061 15.998 13.998"> <path d="M1869-16726h-14a1,1,0,0,1-1-1v-12a1,1,0,0,1,1-1h14a1,1,0,0,1,1,1v12A1,1,0,0,1,1869-16726Zm-12-11v8h10v-8Z" transform="translate(-5528 30801)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSquare {opts.class}"', function(opts) {
 });
 
 riot$1.tag2('viron-icon-star', '<svg viewbox="-1994 12644 16 15.329"> <path d="M15.652,7.994a1.148,1.148,0,0,0-.636-1.957l-3.874-.563A.506.506,0,0,1,10.76,5.2L9.028,1.686a1.147,1.147,0,0,0-2.058,0L5.238,5.2a.507.507,0,0,1-.382.277L.983,6.037A1.148,1.148,0,0,0,.346,7.994l2.8,2.732a.507.507,0,0,1,.146.449l-.661,3.858a1.123,1.123,0,0,0,.25.93,1.159,1.159,0,0,0,1.414.279l3.465-1.822a.519.519,0,0,1,.472,0L11.7,16.242a1.136,1.136,0,0,0,.534.134,1.151,1.151,0,0,0,.88-.413,1.123,1.123,0,0,0,.25-.93L12.7,11.175a.507.507,0,0,1,.146-.449Z" transform="translate(-1993.999 12642.953)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconStar {opts.class}"', function(opts) {

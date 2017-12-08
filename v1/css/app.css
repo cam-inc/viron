@@ -2756,9 +2756,9 @@ select {
   }
 .Uploader {
   position: relative;
-  display: inline-block;
-  width: 100px;
-  height: 100px;
+  display: block;
+  width: 128px;
+  height: 128px;
 }
 .Uploader__form {
     position: relative;
@@ -2776,27 +2776,49 @@ select {
     left: 0;
     display: block;
     cursor: pointer;
-    background-color: #fff;
-    background-color: var(--color-base-white);
+    background-color: #f9f9f9;
+    background-color: var(--color-base-gray-tertiary);
     border: 1px solid #d1d1d1;
     border: 1px solid var(--color-base-gray);
     border-radius: 2px;
   }
-.Uploader__empty {
+@media (hover: hover) {
+    .Uploader__label:hover {
+      border-color: #627edf;
+      border-color: var(--color-base-blue);
+    }
+
+      .Uploader__label:hover .Uploader__empty,
+      .Uploader__label:hover .Uploader__csv {
+        color: #627edf;
+        color: var(--color-base-blue);
+      }
+  }
+.Uploader__label.hold {
+      border-color: #627edf;
+      border-color: var(--color-base-blue);
+  }
+.Uploader__label.hold .Uploader__empty,
+      .Uploader__label.hold .Uploader__csv {
+        color: #627edf;
+        color: var(--color-base-blue);
+      }
+.Uploader__empty,
+  .Uploader__csv {
   display: flex;
   align-items: center;
   justify-content: center;
     width: 100%;
     height: 100%;
     font-size: 50px;
-    background-color: #d1d1d1;
-    background-color: var(--color-base-gray);
+    color: #d1d1d1;
+    color: var(--color-base-gray);
   }
-.Uploader__empty .Icon {
-      width: 30px;
-      height: 30px;
+.Uploader__empty .Icon, .Uploader__csv .Icon {
+      width: 64px;
+      height: 64px;
     }
-.Uploader__cover {
+.Uploader__image {
     width: 100%;
     height: 100%;
     background-color: #484848;
@@ -2817,32 +2839,54 @@ select {
   align-items: center;
   justify-content: center;
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
+    top: -12px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
     color: #fff;
-    background-color: rgba(0, 0, 0, 0.5);
+    color: var(--color-base-white);
+    cursor: pointer;
+    background-color: #484848;
+    background-color: var(--color-base-black);
     border-radius: 50%;
   }
-.Uploader__reset .Icon {
-      width: 14px;
-      height: 14px;
-      color: #fff;
-      color: var(--color-base-white);
+@media (hover: hover) {
+    .Uploader__reset:hover {
+      background-color: #d1d1d1;
+      background-color: var(--color-base-gray);
     }
+  }
+.Uploader__reset.hold {
+      background-color: #d1d1d1;
+      background-color: var(--color-base-gray);
+  }
+.Uploader__reset .Icon {
+      width: 12px;
+      height: 12px;
+    }
+.Uploader__fileName {
+    margin-top: 4px;
+  }
 .Uploader--dragWatching .Uploader__label {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
+      border-color: #627edf;
+      border-color: var(--color-base-blue);
+    }
+.Uploader--dragWatching .Uploader__csv,
+    .Uploader--dragWatching .Uploader__empty {
+      color: #627edf;
+      color: var(--color-base-blue);
     }
 .Uploader--error .Uploader__label {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Uploader--error .Uploader__csv,
+    .Uploader--error .Uploader__empty {
+      color: #f57177;
+      color: var(--color-base-red);
+    }
 .Uploader--disabled .Uploader__label {
       cursor: not-allowed;
-      border-color: #d1d1d1;
-      border-color: var(--color-base-gray);
     }
 .Wyswyg {
   display: block;
