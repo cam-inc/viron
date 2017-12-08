@@ -1359,6 +1359,20 @@ select {
       border-color: #d1d1d1;
       border-color: var(--color-base-gray);
     }
+.Base64 {
+  display: block;
+  width: 128px;
+  height: 128px;
+}
+.Base64__content {
+    width: 100%;
+    height: 100%;
+    background-color: #484848;
+    background-color: var(--color-base-black);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+  }
 .Button {
   display: flex;
   align-items: center;
