@@ -1,8 +1,8 @@
 .Uploader {
   position: relative;
-  display: inline-block;
-  width: 100px;
-  height: 100px;
+  display: block;
+  width: 128px;
+  height: 128px;
 
   &__form {
     position: relative;
@@ -15,6 +15,14 @@
   }
 
   &__label {
+    @mixin hover {
+      border-color: var(--color-base-blue);
+
+      & .Uploader__empty,
+      & .Uploader__csv {
+        color: var(--color-base-blue);
+      }
+    }
     position: absolute;
     top: 0;
     right: 0;
@@ -22,25 +30,26 @@
     left: 0;
     display: block;
     cursor: pointer;
-    background-color: var(--color-base-white);
+    background-color: var(--color-base-gray-tertiary);
     border: 1px solid var(--color-base-gray);
     border-radius: 2px;
   }
 
-  &__empty {
+  &__empty,
+  &__csv {
     @apply --layout-center-center;
     width: 100%;
     height: 100%;
     font-size: 50px;
-    background-color: var(--color-base-gray);
+    color: var(--color-base-gray);
 
     & .Icon {
-      width: 30px;
-      height: 30px;
+      width: 64px;
+      height: 64px;
     }
   }
 
-  &__cover {
+  &__image {
     width: 100%;
     height: 100%;
     background-color: var(--color-base-black);
@@ -59,25 +68,38 @@
 
   &__reset {
     @apply --layout-center-center;
+
+    @mixin hover {
+      background-color: var(--color-base-gray);
+    }
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
-    color: #fff;
-    background-color: rgba(0, 0, 0, 0.5);
+    top: -12px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    color: var(--color-base-white);
+    cursor: pointer;
+    background-color: var(--color-base-black);
     border-radius: 50%;
 
     & .Icon {
-      width: 14px;
-      height: 14px;
-      color: var(--color-base-white);
+      width: 12px;
+      height: 12px;
     }
+  }
+
+  &__fileName {
+    margin-top: 4px;
   }
 
   &--dragWatching {
     & .Uploader__label {
-      background-color: var(--color-base-blue);
+      border-color: var(--color-base-blue);
+    }
+
+    & .Uploader__csv,
+    & .Uploader__empty {
+      color: var(--color-base-blue);
     }
   }
 
@@ -85,12 +107,16 @@
     & .Uploader__label {
       border-color: var(--color-base-red);
     }
+
+    & .Uploader__csv,
+    & .Uploader__empty {
+      color: var(--color-base-red);
+    }
   }
 
   &--disabled {
     & .Uploader__label {
       cursor: not-allowed;
-      border-color: var(--color-base-gray);
     }
   }
 }
