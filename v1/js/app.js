@@ -17321,12 +17321,14 @@ var script$11 = function() {
   this.isImage = false;
   // base64系か否か。
   this.isBase64 = false;
+  this.mimeType = null;
   // 動画系か否か。
   this.isVideo = false;
   this.videoType = null;
   // typeに応じて表示を切り替えます。
   this.value = (() => {
     const data = this.opts.data;
+    const column = this.opts.column;
     if (isNull_1(data)) {
       this.isText = true;
       return 'null';
@@ -17348,10 +17350,19 @@ var script$11 = function() {
       return '{...}';
     }
     if (isString_1(data)) {
-      // base64から画像とする。
-      // TODO: format値は'image' 'image/jpg'とかの方がベターかも。
-      if (this.opts.column.format === 'base64') {
+      if (column.format === 'base64') {
         this.isBase64 = true;
+        // MIME-type設定。指定無しであればpng画像とする。
+        this.mimeType = column['x-mime-type'] || 'image/png';
+        switch (this.mimeType) {
+        case 'image/png':
+        case 'image/gif':
+        case 'image/jpeg':
+          this.isImage = true;
+          break;
+        default:
+          break;
+        }
         return data;
       }
       // 拡張子から最適な表示方法を推測します。
@@ -17413,7 +17424,7 @@ var script$11 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-table-cell', '<virtual if="{isText}"> <div class="ComponentsPage_Card_Table_Cell__string" onclick="{getClickHandler(\'handleStringTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleStringTap\')}">{value}</div> </virtual> <virtual if="{isImage}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url({value});"></div> </virtual> <virtual if="{isBase64}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url(data:image/png;base64,{value});"></div> </virtual> <virtual if="{isVideo}"> <componentspage_card_table_cell__video>TODO</ComponentsPage_Card_Table_Cell__video> </virtual>', '', 'class="ComponentsPage_Card_Table_Cell"', function(opts) {
+riot$1.tag2('viron-components-page-table-cell', '<virtual if="{isText}"> <div class="ComponentsPage_Card_Table_Cell__string" onclick="{getClickHandler(\'handleStringTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleStringTap\')}">{value}</div> </virtual> <virtual if="{isImage}"> <virtual if="{!isBase64}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url({value});"></div> </virtual> <virtual if="{isBase64}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url(data:{mimeType};base64,{value});"></div> </virtual> </virtual> <virtual if="{isVideo}"> <componentspage_card_table_cell__video>TODO</ComponentsPage_Card_Table_Cell__video> </virtual>', '', 'class="ComponentsPage_Card_Table_Cell"', function(opts) {
     this.external(script$11);
 });
 
@@ -23623,6 +23634,9 @@ riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}
     this.external(script$23);
 });
 
+riot$1.tag2('viron-icon-file', '<svg viewbox="3093.704 22727.934 46.089 60.576"> <path d="M78.81,0H54.481a6.457,6.457,0,0,0-6.447,6.447V54.128a6.454,6.454,0,0,0,6.447,6.447h33.2a6.454,6.454,0,0,0,6.445-6.447V15.259Zm8.867,56.627h-33.2a2.5,2.5,0,0,1-2.5-2.5V51.239s0-20.952,0-44.792a2.5,2.5,0,0,1,2.5-2.495l22.852-.024v8.447A4.473,4.473,0,0,0,81.8,16.847l8.275-.024.093,37.305A2.5,2.5,0,0,1,87.678,56.627Z" transform="translate(3045.671 22727.934)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFile {opts.class}"', function(opts) {
+});
+
 riot$1.tag2('viron-icon-file-add', '<svg viewbox="2937 22889 57.219 64.002"> <g transform="translate(2863 22751)"> <g transform="translate(-347 -90)"> <g transform="translate(421 228)"> <path d="M6.449,56.554a2.5,2.5,0,0,1-2.5-2.5V6.449a2.5,2.5,0,0,1,2.5-2.482l22.825-.02v8.442a4.476,4.476,0,0,0,4.476,4.476l8.259-.02.041,19.509a13.014,13.014,0,0,1,1.79-.122,15.508,15.508,0,0,1,2.2.163V15.237L30.739,0H6.449A6.451,6.451,0,0,0,0,6.449V54.072a6.451,6.451,0,0,0,6.449,6.449H33.363a14.909,14.909,0,0,1-2.645-3.947H6.449Z"></path> </g> <g transform="translate(169.449 90.915)"> <g transform="translate(282 174.316)"> <path d="M-4190.615-7823.229A13.4,13.4,0,0,1-4204-7836.616,13.4,13.4,0,0,1-4190.615-7850a13.4,13.4,0,0,1,13.385,13.385A13.4,13.4,0,0,1-4190.615-7823.229Zm-6.292-14.64a.4.4,0,0,0-.4.4v1.71a.4.4,0,0,0,.4.4h5.038v5.038a.4.4,0,0,0,.4.4h1.71a.4.4,0,0,0,.4-.4v-5.038h5.038a.4.4,0,0,0,.4-.4v-1.71a.4.4,0,0,0-.4-.4h-5.038v-5.04a.4.4,0,0,0-.4-.4h-1.71a.4.4,0,0,0-.4.4v5.04Z" transform="translate(4204 7850)"></path> </g> </g> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFileAdd {opts.class}"', function(opts) {
 });
 
@@ -23635,6 +23649,7 @@ var script$24 = function() {
   this.fileName = null;
   this.isTypeOfImage = false;
   this.isTypeOfCsv = false;
+  this.isTypeOfOther = false;
   this.blobURL = this.opts.initialbloburl || null;
   this.isDragWatching = false;
   this.isDroppable = false;
@@ -23646,6 +23661,7 @@ var script$24 = function() {
     this.fileName = null;
     this.isTypeOfImage = false;
     this.isTypeOfCsv = false;
+    this.isTypeOfOther = false;
     this.blobURL = this.opts.initialbloburl || null;
     this.opts.onchange && this.opts.onchange(this.file, this.blobURL);
   };
@@ -23681,8 +23697,19 @@ var script$24 = function() {
     const file = files[0];
     this.file = file;
     this.fileName = file.name;
-    this.isTypeOfImage = (file.type.indexOf('image/') === 0);
-    this.isTypeOfCsv = (file.type.indexOf('text/csv') === 0);
+    if (file.type.indexOf('image/') === 0) {
+      this.isTypeOfImage = true;
+      this.isTypeOfCsv = false;
+      this.isTypeOfOther = false;
+    } else if (file.type.indexOf('text/csv') === 0) {
+      this.isTypeOfImage = false;
+      this.isTypeOfCsv = true;
+      this.isTypeOfOther = false;
+    } else {
+      this.isTypeOfImage = false;
+      this.isTypeOfCsv = false;
+      this.isTypeOfOther = true;
+    }
     this.blobURL = window.URL.createObjectURL(file);
     this.opts.onchange(this.file, this.blobURL);
   };
@@ -23726,7 +23753,7 @@ var script$24 = function() {
   };
 };
 
-riot$1.tag2('viron-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'image/*\'}" disabled="{opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <div class="Uploader__empty" if="{!file || !blobURL}"> <viron-icon-file-add></viron-icon-file-add> </div> <div class="Uploader__image" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfImage}" riot-style="background-image:url({blobURL});"></div> <div class="Uploader__csv" if="{!!file &amp;&amp; !!blobURL &amp;&amp; isTypeOfCsv}"> <viron-icon-file-csv></viron-icon-file-csv> </div> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" onclick="{getClickHandler(\'handleResetButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleResetButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--dragWatching\' : isDragWatching, \'Uploader--disabled\': opts.isdisabled, \'Uploader--error\': opts.haserror}" onchange="{handleChange}"', function(opts) {
+riot$1.tag2('viron-uploader', '<form class="Uploader__form" ref="form"> <input class="Uploader__input" type="file" id="{inputId}" accept="{opts.accept || \'*\'}" disabled="{opts.isdisabled}" onchange="{handleFileChange}"> <label class="Uploader__label" for="{inputId}"> <virtual if="{!file || !blobURL}"> <div class="Uploader__icon"> <viron-icon-file-add></viron-icon-file-add> </div> </virtual> <virtual if="{!!file &amp;&amp; !!blobURL}"> <virtual if="{isTypeOfImage}"> <div class="Uploader__image" riot-style="background-image:url({blobURL});"></div> </virtual> <virtual if="{isTypeOfCsv}"> <div class="Uploader__icon"> <viron-icon-file-csv></viron-icon-file-csv> </div> </virtual> <virtual if="{isTypeOfOther}"> <div class="Uploader__icon"> <viron-icon-file></viron-icon-file> </div> </virtual> </virtual> <div class="Uploader__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> </label> </form> <div class="Uploader__reset" if="{!!file}" onclick="{getClickHandler(\'handleResetButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleResetButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Uploader__fileName" if="{!!fileName}">{fileName}</div>', '', 'class="Uploader {\'Uploader--dragWatching\' : isDragWatching, \'Uploader--disabled\': opts.isdisabled, \'Uploader--error\': opts.haserror}" onchange="{handleChange}"', function(opts) {
     this.external(script$24);
 });
 
@@ -29573,6 +29600,8 @@ var script$27 = function() {
   }
   // autocomplete設定。
   this.autocompleteConfig = formObject['x-autocomplete'];
+  // uploaderのaccept値。
+  this.accept = formObject['x-accept'] || '*';
 
   // 入力に使用するUIコンポーネント名。
   // opts.formObjectの値から適切なUIコンポーネントを推測します。
@@ -29774,7 +29803,7 @@ var script$27 = function() {
 
 };
 
-riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> </div> <div class="Parameters_Form__body"> <div class="Parameters_Form__error" if="{hasError}"> <viron-parameters-popover theme="{opts.theme}" message="{errors[0]}"></viron-parameters-popover> </div> <virtual if="{uiType === \'textinput\'}"> <viron-textinput val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleTextinputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleTextareaChange}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleNumberinputChange}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="*" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleHtmlChange}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handlePugChange}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" config="{autocompleteConfig}" onchange="{handleAutocompleteChange}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO</div> </virtual> </div>', '', 'class="Parameters_Form"', function(opts) {
+riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> </div> <div class="Parameters_Form__body"> <div class="Parameters_Form__error" if="{hasError}"> <viron-parameters-popover theme="{opts.theme}" message="{errors[0]}"></viron-parameters-popover> </div> <virtual if="{uiType === \'textinput\'}"> <viron-textinput val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleTextinputChange}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleTextareaChange}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleNumberinputChange}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="{accept}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleHtmlChange}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handlePugChange}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" config="{autocompleteConfig}" onchange="{handleAutocompleteChange}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" theme="{opts.theme}" isdisabled="{opts.isdisabled}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'null\'}"> <div>TODO</div> </virtual> </div>', '', 'class="Parameters_Form"', function(opts) {
     this.external(script$27);
 });
 

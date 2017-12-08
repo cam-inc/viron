@@ -2788,8 +2788,7 @@ select {
       border-color: var(--color-base-blue);
     }
 
-      .Uploader__label:hover .Uploader__empty,
-      .Uploader__label:hover .Uploader__csv {
+      .Uploader__label:hover .Uploader__icon {
         color: #627edf;
         color: var(--color-base-blue);
       }
@@ -2798,13 +2797,11 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
   }
-.Uploader__label.hold .Uploader__empty,
-      .Uploader__label.hold .Uploader__csv {
+.Uploader__label.hold .Uploader__icon {
         color: #627edf;
         color: var(--color-base-blue);
       }
-.Uploader__empty,
-  .Uploader__csv {
+.Uploader__icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2814,7 +2811,7 @@ select {
     color: #d1d1d1;
     color: var(--color-base-gray);
   }
-.Uploader__empty .Icon, .Uploader__csv .Icon {
+.Uploader__icon .Icon {
       width: 64px;
       height: 64px;
     }
@@ -2871,8 +2868,7 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
-.Uploader--dragWatching .Uploader__csv,
-    .Uploader--dragWatching .Uploader__empty {
+.Uploader--dragWatching .Uploader__icon {
       color: #627edf;
       color: var(--color-base-blue);
     }
@@ -2880,8 +2876,7 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
-.Uploader--error .Uploader__csv,
-    .Uploader--error .Uploader__empty {
+.Uploader--error .Uploader__icon {
       color: #f57177;
       color: var(--color-base-red);
     }
