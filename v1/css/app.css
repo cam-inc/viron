@@ -1353,6 +1353,19 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Autocomplete__blocker:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
+  }
+.Autocomplete__blocker.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
   }
 .Autocomplete--error .Autocomplete__input {
       background-color: #f9efee;
@@ -1713,6 +1726,19 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Html__blocker:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
+  }
+.Html__blocker.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
   }
 .Icon {
   position: relative;
@@ -1900,6 +1926,19 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Numberinput__blocker:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
+  }
+.Numberinput__blocker.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
   }
 .Numberinput--error .Numberinput__input {
       background-color: #f9efee;
@@ -2615,6 +2654,19 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Pug__blocker:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
+  }
+.Pug__blocker.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
   }
 .Qrcode {
   display: block;
@@ -2739,6 +2791,19 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Textarea__blocker:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
+  }
+.Textarea__blocker.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
   }
 .Textarea--error .Textarea__input {
       background-color: #f9efee;
@@ -2794,6 +2859,19 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Textinput__blocker:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
+  }
+.Textinput__blocker.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
   }
 .Textinput--error .Textinput__input {
       background-color: #f9efee;

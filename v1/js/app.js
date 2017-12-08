@@ -17572,6 +17572,11 @@ riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__
 var script$16 = function() {
   const store = this.riotx.get();
 
+  // クリップっボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
   this.options = [];
 
   const config = this.opts.config;
@@ -17648,6 +17653,24 @@ var script$16 = function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(this.opts.val);
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 };
 
@@ -23329,6 +23352,13 @@ riot$1.tag2('viron-prettyhtml', '<pre>{getBeautifiedHtml()}</pre>', '', 'class="
 });
 
 var script$19 = function() {
+  const store = this.riotx.get();
+
+  // クリップっボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
   /**
    * 文字列もしくはnullに変換します。
    * @param {String|null|undefined} value
@@ -23379,6 +23409,24 @@ var script$19 = function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(this.opts.val);
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 };
 
@@ -23387,11 +23435,18 @@ riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">
 });
 
 // TODO: froalaのCodeMirrowプラグインが使えるかも。
-
 var script$20 = function() {
   /**
    * 入力値をhtmlに変換します。
    */
+  const store = this.riotx.get();
+
+  // クリップっボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
+  // タブの選択状態。
   this.isEditorMode = true;
   this.isPreviewMode = false;
 
@@ -23426,6 +23481,24 @@ var script$20 = function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(this.opts.val);
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 };
 
@@ -23457,10 +23530,29 @@ riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Htm
     var _isNaN = isNaN$1;
 
 var script$21 = function() {
+  const store = this.riotx.get();
+
+  // クリップっボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
   /**
    * moutの`isNumber`のラッパー関数。
    * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
    * @param {*} num
+   */
+  const isNumber = num => {// eslint-disable-line no-unused-vars
+    if (_isNaN(num)) {
+      return false;
+    }
+    return isNumber_1(num);
+  };
+
+  /**
+   * 数値もしくはnullに変換します。
+   * @param {String|Number|null|undefined} value
+   * @return {Number|null}
    */
   this.normalizeValue = value => {
     // nullの場合はそのまま扱う。
@@ -23526,6 +23618,24 @@ var script$21 = function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !isNumber(this.opts.val)) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(this.opts.val);
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 };
 
@@ -23537,6 +23647,14 @@ var script$22 = function() {
   /**
    * 入力値をhtmlに変換します。
    */
+  const store = this.riotx.get();
+
+  // クリップっボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
+  // タブの選択状態。
   this.isEditorMode = true;
   this.isPreviewMode = false;
 
@@ -23571,6 +23689,25 @@ var script$22 = function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(this.opts.val);
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 };
 
@@ -23632,6 +23769,13 @@ riot$1.tag2('viron-select', '<form class="Select__form" onsubmit="{handleFormSub
 });
 
 var script$24 = function() {
+  const store = this.riotx.get();
+
+  // クリップっボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
   /**
    * 文字列もしくはnullに変換します。
    * @param {String|null|undefined} value
@@ -23679,6 +23823,24 @@ var script$24 = function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(this.opts.val);
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 };
 
@@ -30515,23 +30677,32 @@ var script$33 = function() {
   this.submitLabel = null;
   // submitボタンのmodifier。
   this.submitModifier = null;
+  // 完了時のメッセージ。
+  let successMessage = null;
   // methodで振り分けます。
-  switch (store.getter('oas.pathItemObjectMethodNameByOperationId', operationObject.operationId)) {
+  const method = store.getter('oas.pathItemObjectMethodNameByOperationId', operationObject.operationId);
+  switch (method) {
   case 'get':
     this.submitLabel = '取得する';
+    this.successMessage = '取得しました。';
     break;
   case 'post':
     this.submitLabel = '新規作成する';
+    successMessage = '新規作成しました。';
     break;
   case 'put':
     this.submitLabel = '保存する';
+    successMessage = '保存しました。';
     break;
   case 'delete':
     this.submitLabel = '削除する';
     this.submitModifier = 'emphasised';
+    successMessage = '削除しました。';
     break;
   default:
     this.submitLabel = '実行する';
+    successMessage = '完了しました。';
+    break;
   }
 
   const operate = () => {
@@ -30541,6 +30712,9 @@ var script$33 = function() {
       .then(() => {
         this.close();
         this.opts.onSuccess();
+        return store.action('toasts.add', {
+          message: successMessage
+        });
       })
       .catch(err => {
         if (err.status === 401) {
