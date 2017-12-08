@@ -1315,6 +1315,7 @@ select {
       top: 0;
     }
 .Autocomplete {
+  position: relative;
   display: block;
 }
 .Autocomplete__label {
@@ -1346,6 +1347,13 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
+.Autocomplete__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Autocomplete--error .Autocomplete__input {
       background-color: #f9efee;
       background-color: var(--color-base-red-tertiary);
@@ -1360,6 +1368,7 @@ select {
       border-color: var(--color-base-gray);
     }
 .Base64 {
+  position: relative;
   display: block;
   width: 128px;
   height: 128px;
@@ -1372,6 +1381,13 @@ select {
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
+  }
+.Base64__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 .Button {
   display: flex;
@@ -1463,15 +1479,16 @@ select {
         color: var(--color-base-black-secondary);
       }
 .Checkbox {
+  position: relative;
   display: block;
   color: #484848;
   color: var(--color-base-black);
-  cursor: pointer;
 }
 .Checkbox__content {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+    cursor: pointer;
   }
 .Checkbox__mark {
   display: flex;
@@ -1501,6 +1518,13 @@ select {
     margin-left: 8px;
     font-size: 1.4rem;
   }
+.Checkbox__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Checkbox--checked .Checkbox__mark {
       background-color: #484848;
       background-color: var(--color-base-black);
@@ -1516,9 +1540,11 @@ select {
       border-color: var(--color-base-red);
     }
 .Checkbox--disabled {
-    cursor: not-allowed;
     opacity: 0.5;
   }
+.Checkbox--disabled .Checkbox__content {
+      cursor: not-allowed;
+    }
 .Checkbox--ghost {
     color: #fff;
     color: var(--color-base-white);
@@ -1640,6 +1666,7 @@ select {
     font-size: 1.4rem;
   }
 .Html {
+  position: relative;
   display: block;
 }
 .Html__tabs {
@@ -1675,6 +1702,13 @@ select {
     border: 1px solid #d1d1d1;
     border: 1px solid var(--color-base-gray);
     border-radius: 2px;
+  }
+.Html__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 .Icon {
   position: relative;
@@ -1824,6 +1858,7 @@ select {
           left: 12px;
         }
 .Numberinput {
+  position: relative;
   display: block;
 }
 .Numberinput__label {
@@ -1855,6 +1890,13 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
+.Numberinput__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Numberinput--error .Numberinput__input {
       background-color: #f9efee;
       background-color: var(--color-base-red-tertiary);
@@ -2526,6 +2568,7 @@ select {
     color: red;
   }
 .Pug {
+  position: relative;
   display: block;
 }
 .Pug__tabs {
@@ -2562,6 +2605,13 @@ select {
     border: 1px solid var(--color-base-gray);
     border-radius: 2px;
   }
+.Pug__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Qrcode {
   display: block;
 }
@@ -2570,6 +2620,7 @@ select {
     margin: 0 auto;
   }
 .Select {
+  position: relative;
   display: block;
 }
 .Select__form {
@@ -2613,6 +2664,13 @@ select {
     height: 16px;
     margin: auto;
   }
+.Select__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Select--error .Select__form {
       background-color: #f9efee;
       background-color: var(--color-base-red-tertiary);
@@ -2639,6 +2697,7 @@ select {
   border-radius: 2px;
 }
 .Textarea {
+  position: relative;
   display: block;
 }
 .Textarea__label {
@@ -2670,6 +2729,13 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
+.Textarea__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Textarea--error .Textarea__input {
       background-color: #f9efee;
       background-color: var(--color-base-red-tertiary);
@@ -2684,6 +2750,7 @@ select {
       border-color: var(--color-base-gray);
     }
 .Textinput {
+  position: relative;
   display: block;
   color: #484848;
   color: var(--color-base-black);
@@ -2717,6 +2784,13 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
+.Textinput__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Textinput--error .Textinput__input {
       background-color: #f9efee;
       background-color: var(--color-base-red-tertiary);
@@ -2878,6 +2952,13 @@ select {
 .Uploader__fileName {
     margin-top: 4px;
   }
+.Uploader__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
 .Uploader--dragWatching .Uploader__label {
       border-color: #627edf;
       border-color: var(--color-base-blue);
@@ -2898,6 +2979,7 @@ select {
       cursor: not-allowed;
     }
 .Wyswyg {
+  position: relative;
   display: block;
 }
 .Wyswyg__editor ul {
@@ -2908,6 +2990,15 @@ select {
       list-style-position: inside;
       list-style-type: decimal;
     }
+.Wyswyg__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    /* TODO: Froalaがz-index使っているので。*/
+    z-index: 999;
+  }
 /* ITCSS: Components(Page) */
 /* Designed components, chunks of UI. */
 :root {
