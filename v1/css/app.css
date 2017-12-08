@@ -1625,13 +1625,17 @@ select {
     width: calc(100% - 192px);
     width: calc(100% - var(--component-application-menu-width));
     height: 100%;
-    overflow-y: scroll;
     background-color: #fff;
     background-color: var(--color-base-white);
     opacity: 0;
     transition-duration: 300ms;
     transition-property: transform, opacity;
     transform: translateX(100px);
+  }
+.Drawer__contentWrapper {
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
   }
 .Drawer--visible {
     pointer-events: auto;
