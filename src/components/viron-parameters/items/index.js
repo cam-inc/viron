@@ -154,6 +154,9 @@ export default function() {
    * item追加ボタンがタップされた時の処理。
    */
   this.handleAddButtonTap = () => {
+    if (this.opts.ispreview) {
+      return;
+    }
     if (!this.opts.onchange) {
       return;
     }
@@ -191,6 +194,9 @@ export default function() {
    * @param {Object} e
    */
   this.handleRemoveButtonTap = e => {
+    if (this.opts.ispreview) {
+      return;
+    }
     if (!this.opts.onchange) {
       return;
     }

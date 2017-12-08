@@ -83,4 +83,8 @@ export default function() {
     const newVal = this.normalizeValue(e.target.value);
     this.opts.onchange(newVal, this.opts.id);
   };
+
+  this.handleBlockerTap = e => {
+    e.stopPropagation();
+  };
 }

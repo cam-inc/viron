@@ -106,4 +106,8 @@ export default function() {
     }
     this.reset();
   };
+
+  this.handleBlockerTap = e => {
+    e.stopPropagation();
+  };
 }

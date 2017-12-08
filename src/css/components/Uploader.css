@@ -90,6 +90,14 @@
     margin-top: 4px;
   }
 
+  &__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
   &--dragWatching {
     & .Uploader__label {
       border-color: var(--color-base-blue);

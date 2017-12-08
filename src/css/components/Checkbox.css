@@ -1,10 +1,11 @@
 .Checkbox {
+  position: relative;
   display: block;
   color: var(--color-base-black);
-  cursor: pointer;
 
   &__content {
     @apply --layout-center-start;
+    cursor: pointer;
   }
 
   &__mark {
@@ -33,6 +34,14 @@
     font-size: 1.4rem;
   }
 
+  &__blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
   &--checked {
     & .Checkbox__mark {
       background-color: var(--color-base-black);
@@ -52,8 +61,11 @@
   }
 
   &--disabled {
-    cursor: not-allowed;
     opacity: 0.5;
+
+    & .Checkbox__content {
+      cursor: not-allowed;
+    }
   }
 
   &--ghost {

@@ -3,6 +3,7 @@ viron-select.Select(class="{ 'Select--disabled': opts.isdisabled, 'Select--error
     select.Select__select(ref="select" disabled="{ opts.isdisabled }" onInput="{ handleSelectInput }" onChange="{ handleSelectChange }")
       option.Select__option(each="{ option in opts.options }" selected="{ option.isSelected }") { option.label }
     viron-icon-arrow-down.Select__icon
+  .Select__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
 
   script.
     import '../../components/icons/viron-icon-arrow-down/index.tag';

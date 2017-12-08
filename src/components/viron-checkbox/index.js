@@ -8,4 +8,8 @@ export default function() {
     }
     this.opts.onchange(!this.opts.ischecked, this.opts.id);
   };
+
+  this.handleBlockerTap = e => {
+    e.stopPropagation();
+  };
 }

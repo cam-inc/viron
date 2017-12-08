@@ -3,6 +3,10 @@ export default function() {
   this.isVisible = false;
 
   this.on('mount', () => {
+    // プレビューモードでは何も表示しない。
+    if (this.opts.ispreview) {
+      return;
+    }
     setTimeout(() => {
       if (!this.isMounted) {
         return;

@@ -3,6 +3,7 @@ viron-checkbox.Checkbox(class="{ 'Checkbox--checked': opts.ischecked, 'Checkbox-
     .Checkbox__mark
       viron-icon-check
     .Checkbox__label(if="{ !!opts.label }") { opts.label }
+  .Checkbox__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
 
   script.
     import '../../components/icons/viron-icon-check/index.tag';

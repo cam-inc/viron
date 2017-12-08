@@ -39,4 +39,8 @@ export default function() {
     }
     this.opts.onchange(newText);
   };
+
+  this.handleBlockerTap = e => {
+    e.stopPropagation();
+  };
 }

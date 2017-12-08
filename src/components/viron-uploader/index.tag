@@ -18,6 +18,7 @@ viron-uploader.Uploader(class="{ 'Uploader--dragWatching' : isDragWatching, 'Upl
   .Uploader__reset(if="{ !!file }" onTap="{ handleResetButtonTap }")
     viron-icon-close
   .Uploader__fileName(if="{ !!fileName }") { fileName }
+  .Uploader__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
 
   script.
     import '../../components/icons/viron-icon-close/index.tag';

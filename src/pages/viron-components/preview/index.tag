@@ -6,7 +6,7 @@ viron-components-page-preview.ComponentsPage_Preview(class="ComponentsPage_Previ
     .ComponentsPage_Preview__backButton(onTap="{ handleBackButtonTap }")
       viron-icon-arrow-left
   .ComponentsPage_Preview__body
-    viron-parameters(val="{ val }" parameterObjects="{ parameterObjects }")
+    viron-parameters(val="{ val }" isPreview="{ true }" parameterObjects="{ parameterObjects }")
   .ComponentsPage_Preview__tail
     .ComponentsPage_Preview__prevButton(class="{ 'ComponentsPage_Preview__prevButton--disabled': isPrevButtonDisabled }" onTap="{ handlePrevButtonTap }")
       viron-icon-arrow-up

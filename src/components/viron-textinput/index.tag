@@ -2,6 +2,7 @@ viron-textinput.Textinput(class="{ 'Textinput--disabled': opts.isdisabled, 'Text
   .Textinput__label(if="{ !!opts.label }") { opts.label }
   form.Textinput__form(ref="form" onSubmit="{ handleFormSubmit }")
     input.Textinput__input(ref="input" type="{ opts.type || 'text' }" value="{ normalizeValue(opts.val) }" placeholder="{ opts.placeholder }" disabled="{ !!opts.isdisabled }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
+  .Textinput__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
 
   script.
     import script from './index';

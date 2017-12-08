@@ -8,4 +8,8 @@ export default function() {
   if (mimeType.indexOf('image') === 0) {
     this.isImage = true;
   }
+
+  this.handleBlockerTap = e => {
+    e.stopPropagation();
+  };
 }

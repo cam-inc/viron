@@ -7,6 +7,7 @@ viron-html.Html(class="{ 'Html--disabled': opts.isdisabled, 'Html--error': opts.
       viron-textarea(val="{ opts.val }" isDisabled="{ opts.isdisabled }" onChange="{ handleEditorChange }")
     .Html__preview(if="{ isPreviewMode }")
       viron-prettyhtml(data="{ opts.val }")
+  .Html__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
 
   script.
     import '../../components/viron-prettyhtml/index.tag';

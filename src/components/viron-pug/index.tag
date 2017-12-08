@@ -7,6 +7,7 @@ viron-pug.Pug(class="{ 'Pug--disabled': opts.isdisabled, 'Pug--error': opts.hase
       viron-textarea(val="{ opts.val }" isDisabled="{ opts.isdisabled }" onChange="{ handleEditorChange }")
     .Pug__preview(if="{ isPreviewMode }")
       viron-prettyhtml(data="{ opts.val }")
+  .Pug__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
 
   script.
     import '../../components/viron-prettyhtml/index.tag';

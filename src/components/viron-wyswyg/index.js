@@ -94,4 +94,8 @@ export default function() {
     }
     this.opts.onblur();
   };
+
+  this.handleBlockerTap = e => {
+    e.stopPropagation();
+  };
 }
