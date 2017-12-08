@@ -24006,6 +24006,35 @@ const UI_NULL = 'null';
 const UI_AUTOCOMPLETE = 'autocomplete';
 const UI_BASE64 = 'base64';
 
+/**
+ * 値がnullの場合は強制的にundefinedに変換します。
+ * @param {Object} obj
+ * @return {Object}
+ */
+const trimNull = obj => {
+  const ret = deepClone_1(obj);
+  const trim = val => {
+    let loop;
+    if (isObject_1(val)) {
+      loop = forOwn_1$2;
+    } else if (isArray_1$1(val)) {
+      loop = forEach_1$2;
+    } else {
+      return;
+    }
+    loop(val, (v, k) => {
+      if (isNull_1(v)) {
+        val[k] = undefined;
+      }
+      if (isObject_1(v) || isArray_1$1(v)) {
+        trim(v);
+      }
+    });
+  };
+  trim(ret);
+  return ret;
+};
+
 // ParameterObjectに対する処理。
 /**
  * ParameterObject定義に沿ってデフォルト値をセットします。
@@ -24231,7 +24260,7 @@ var util = {
     if ( parameterObjects === void 0 ) parameterObjects = [];
     if ( initialVal === void 0 ) initialVal = {};
 
-    const val = deepClone_1(initialVal);
+    const val = trimNull(initialVal);
     forEach_1$2(parameterObjects, parameterObject => {
       checkParameterObject(parameterObject, val);
     });
@@ -24246,8 +24275,12 @@ var util = {
   /**
    * ショートカット: generateDefaultItem
    */
-  generateDefaultItem
+  generateDefaultItem,
 
+  /**
+   * ショートカット: trimNull
+   */
+  trimNull
 };
 
 var hookCallback;
