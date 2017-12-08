@@ -4,6 +4,8 @@ import times from 'mout/function/times';
 import deepClone from 'mout/lang/deepClone';
 import isArray from 'mout/lang/isArray';
 import isInteger from 'mout/lang/isInteger';
+import isNull from 'mout/lang/isNull';
+import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import forOwn from 'mout/object/forOwn';
 
@@ -20,6 +22,35 @@ const UI_PUG = 'pug';
 const UI_NULL = 'null';
 const UI_AUTOCOMPLETE = 'autocomplete';
 const UI_BASE64 = 'base64';
+
+/**
+ * 値がnullの場合は強制的にundefinedに変換します。
+ * @param {Object} obj
+ * @return {Object}
+ */
+const trimNull = obj => {
+  const ret = deepClone(obj);
+  const trim = val => {
+    let loop;
+    if (isObject(val)) {
+      loop = forOwn;
+    } else if (isArray(val)) {
+      loop = forEach;
+    } else {
+      return;
+    }
+    loop(val, (v, k) => {
+      if (isNull(v)) {
+        val[k] = undefined;
+      }
+      if (isObject(v) || isArray(v)) {
+        trim(v);
+      }
+    });
+  };
+  trim(ret);
+  return ret;
+};
 
 // ParameterObjectに対する処理。
 /**
@@ -241,7 +272,7 @@ export default {
    * @return {Object}
    */
   generateInitialVal: (parameterObjects = [], initialVal = {}) => {
-    const val = deepClone(initialVal);
+    const val = trimNull(initialVal);
     forEach(parameterObjects, parameterObject => {
       checkParameterObject(parameterObject, val);
     });
@@ -256,6 +287,10 @@ export default {
   /**
    * ショートカット: generateDefaultItem
    */
-  generateDefaultItem
+  generateDefaultItem,
 
+  /**
+   * ショートカット: trimNull
+   */
+  trimNull
 };
