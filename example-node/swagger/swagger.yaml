@@ -641,6 +641,7 @@ definitions:
         description: サムネイル画像
         type: string
         format: base64
+        x-mime-type: image/png
       updatedAt:
         description: 更新日時
         example: 1994-04-27T12:25:11+09:00
@@ -2858,6 +2859,7 @@ paths:
         name: image
         type: file
         description: サムネイル
+        x-accept: image/*
       consumes:
       - "multipart/form-data"
       produces:
