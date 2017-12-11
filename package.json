@@ -61,6 +61,7 @@
     "content-disposition": "^0.5.2",
     "downloadjs": "1.4.4",
     "esr": "^0.9.2",
+    "highcharts": "^6.0.3",
     "i18next": "^10.0.7",
     "i18next-browser-languagedetector": "^2.1.0",
     "marked": "^0.3.6",
