@@ -481,57 +481,25 @@ definitions:
     - value
     type: object
 
-  Statsplanet:
-    description: Planets data
+  StatsChart:
+    description: Chart data
     example:
-      color: blue
-      data:
-      - name: example-name
-        distance: 11111
-      guide:
-        x:
-          label: distance
-        y:
-          label: name
-      size: temperature
-      x: name
-      y: distance
+      chart:
+        type: area
+      series:
+      - name: One
+        data:
+        - 10
     properties:
-      color:
-        description: ドットの色分けに使用するkey
-        example: blue
-        type: string
-      data:
-        description: グラフデータ
-        example:
-        - name: example-name
-          distance: 11111
-        items:
-          additionalProperties: true
-          example:
-            name: example-name
-            distance: 11111
-          type: object
+      series:
         type: array
-      guide:
-        $ref: '#/definitions/StatsGuideType'
-      size:
-        description: ドットの大きさに使用するkey
-        example: temperature
-        type: string
-      x:
-        description: X軸に使用するkey
-        example: name
-        type: string
-      y:
-        description: Y軸に使用するkey
-        example: distance
-        type: string
-    required:
-    - data
-    - x
-    - y
-    type: object
+        items:
+          type: object
+          additionalProperties: true
+          properties:
+            data:
+              type: array
+              items: {}
 
   UpdateAdminRolePayload:
     example:
@@ -2565,18 +2533,18 @@ paths:
       tags:
       - stats_mau
 
-  /stats/planet/bar:
+  /stats/chart/area:
     get:
-      x-swagger-router-controller: stats_planet
-      description: Planets Information
-      operationId: stats_planet#bar
+      x-swagger-router-controller: stats_chart
+      description: Area Chart Data
+      operationId: stats_chart#area
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsplanet'
+            $ref: '#/definitions/StatsChart'
         "400":
           description: Bad Request
           schema:
@@ -2587,22 +2555,22 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - https
-      summary: bar stats_planet
+      summary: area stats_chart
       tags:
-      - stats_planet
+      - stats_chart
 
-  /stats/planet/horizontal-bar:
+  /stats/chart/arearange:
     get:
-      x-swagger-router-controller: stats_planet
-      description: Planets Information
-      operationId: stats_planet#horizontal_bar
+      x-swagger-router-controller: stats_chart
+      description: Arearange Chart Data
+      operationId: stats_chart#arearange
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsplanet'
+            $ref: '#/definitions/StatsChart'
         "400":
           description: Bad Request
           schema:
@@ -2613,22 +2581,22 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - https
-      summary: horizontal-bar stats_planet
+      summary: areaarange stats_chart
       tags:
-      - stats_planet
+      - stats_chart
 
-  /stats/planet/horizontal-stacked-bar:
+  /stats/chart/areaspline:
     get:
-      x-swagger-router-controller: stats_planet
-      description: Planets Information
-      operationId: stats_planet#horizontal_stacked_bar
+      x-swagger-router-controller: stats_chart
+      description: Areaspline Chart Data
+      operationId: stats_chart#areaspline
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsplanet'
+            $ref: '#/definitions/StatsChart'
         "400":
           description: Bad Request
           schema:
@@ -2639,22 +2607,22 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - https
-      summary: horizontal-stacked-bar stats_planet
+      summary: areaspline stats_chart
       tags:
-      - stats_planet
+      - stats_chart
 
-  /stats/planet/line:
+  /stats/chart/areasplinerange:
     get:
-      x-swagger-router-controller: stats_planet
-      description: Planets Information
-      operationId: stats_planet#line
+      x-swagger-router-controller: stats_chart
+      description: Areasplinerange Chart Data
+      operationId: stats_chart#areasplinerange
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsplanet'
+            $ref: '#/definitions/StatsChart'
         "400":
           description: Bad Request
           schema:
@@ -2665,22 +2633,22 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - https
-      summary: line stats_planet
+      summary: areasplinerange stats_chart
       tags:
-      - stats_planet
+      - stats_chart
 
-  /stats/planet/scatterplot:
+  /stats/chart/bar:
     get:
-      x-swagger-router-controller: stats_planet
-      description: Planets Information
-      operationId: stats_planet#scatterplot
+      x-swagger-router-controller: stats_chart
+      description: Bar Chart Data
+      operationId: stats_chart#bar
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsplanet'
+            $ref: '#/definitions/StatsChart'
         "400":
           description: Bad Request
           schema:
@@ -2691,22 +2659,22 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - https
-      summary: scatterplot stats_planet
+      summary: bar stats_chart
       tags:
-      - stats_planet
+      - stats_chart
 
-  /stats/planet/stacked-area:
+  /stats/chart/bellcurve:
     get:
-      x-swagger-router-controller: stats_planet
-      description: Planets Information
-      operationId: stats_planet#stacked_area
+      x-swagger-router-controller: stats_chart
+      description: Bellcurve Chart Data
+      operationId: stats_chart#bellcurve
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsplanet'
+            $ref: '#/definitions/StatsChart'
         "400":
           description: Bad Request
           schema:
@@ -2717,22 +2685,22 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - https
-      summary: stacked-area stats_planet
+      summary: bellcurve stats_chart
       tags:
-      - stats_planet
+      - stats_chart
 
-  /stats/planet/stacked-bar:
+  /stats/chart/boxplot:
     get:
-      x-swagger-router-controller: stats_planet
-      description: Planets Information
-      operationId: stats_planet#stacked-bar
+      x-swagger-router-controller: stats_chart
+      description: Boxplot Chart Data
+      operationId: stats_chart#boxplot
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsplanet'
+            $ref: '#/definitions/StatsChart'
         "400":
           description: Bad Request
           schema:
@@ -2743,9 +2711,737 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - https
-      summary: stacked-bar stats_planet
+      summary: boxplot stats_chart
       tags:
-      - stats_planet
+      - stats_chart
+
+  /stats/chart/bubble:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Bubble Chart Data
+      operationId: stats_chart#bubble
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: bubble stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/bullet:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Bullet Chart Data
+      operationId: stats_chart#bullet
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: bullet stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/column:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Column Chart Data
+      operationId: stats_chart#column
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: column stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/columnrange:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Columnrange Chart Data
+      operationId: stats_chart#columnrange
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: columnrange stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/errorbar:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Errorbar Chart Data
+      operationId: stats_chart#errorbar
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: errorbar stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/funnel:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Funnel Chart Data
+      operationId: stats_chart#funnel
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: funnel stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/gauge:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Gauge Chart Data
+      operationId: stats_chart#gauge
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: gauge stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/heatmap:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Heatmap Chart Data
+      operationId: stats_chart#heatmap
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: heatmap stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/histogram:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Histogram Chart Data
+      operationId: stats_chart#histogram
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: histogram stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/line:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Line Chart Data
+      operationId: stats_chart#line
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: line stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/pareto:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Pareto Chart Data
+      operationId: stats_chart#pareto
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: pareto stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/pie:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Pie Chart Data
+      operationId: stats_chart#pie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: pie stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/polygon:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Polygon Chart Data
+      operationId: stats_chart#polygon
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: polygon stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/pyramid:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Pyramid Chart Data
+      operationId: stats_chart#pyramid
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: pyramid stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/sankey:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Sankey Chart Data
+      operationId: stats_chart#sankey
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: sankey stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/scatter:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Scatter Chart Data
+      operationId: stats_chart#scatter
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: scatter stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/solidGauge:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: SolidGauge Chart Data
+      operationId: stats_chart#solidGauge
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: solidGauge stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/spline:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Spline Chart Data
+      operationId: stats_chart#spline
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: spline stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/streamgraph:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Streamgraph Chart Data
+      operationId: stats_chart#streamgraph
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: streamgraph stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/sunburst:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Sunburst Chart Data
+      operationId: stats_chart#sunburst
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: sunburst stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/tilemap:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Tilemap Chart Data
+      operationId: stats_chart#tilemap
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: tilemap stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/variablePie:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: VariablePie Chart Data
+      operationId: stats_chart#variablePie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: variablePie stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/variwide:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Variwide Chart Data
+      operationId: stats_chart#variwide
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: variwide stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/vector:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Vector Chart Data
+      operationId: stats_chart#vector
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: vector stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/waterfall:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Waterfall Chart Data
+      operationId: stats_chart#waterfall
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: waterfall stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/windbarb:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Windbarb Chart Data
+      operationId: stats_chart#windbarb
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: windbarb stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/wordcloud:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Wordcloud Chart Data
+      operationId: stats_chart#wordcloud
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: wordcloud stats_chart
+      tags:
+      - stats_chart
+
+  /stats/chart/xrange:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Xrange Chart Data
+      operationId: stats_chart#xrange
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      summary: xrange stats_chart
+      tags:
+      - stats_chart
 
   /swagger.json:
     get:
