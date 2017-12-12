@@ -1,6 +1,5 @@
 import isObject from 'mout/lang/isObject';
 import chart from '../../../../core/chart';
-import { sample01 as sampleData } from '../../../../core/chart';
 
 export default function() {
   const store = this.riotx.get();
@@ -13,9 +12,7 @@ export default function() {
     if (!canvasElm) {
       return;
     }
-    // TODO: just for debug.
-    //const data = this.data;
-    const data = sampleData;
+    const data = this.data;
     chart.chart(canvasElm, data);
   };
 

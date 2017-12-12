@@ -19,11 +19,15 @@ export default {
     // 全てのchartタイプ共通の設定。
     series: {
       borderWidth: 0,
+      fillOpacity: 0.25,
       marker: {
         fillColor: 'white',
         lineWidth: 2,
         lineColor: null // inherit from series
       }
+    },
+    bullet: {
+      borderWidth: 0
     }
   },
   tooltip: {

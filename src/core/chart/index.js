@@ -1,20 +1,56 @@
 import Highcharts from 'highcharts';
+import HighchartsMore from 'highcharts/highcharts-more';
 import annotations from 'highcharts/modules/annotations';
 import boost from 'highcharts/modules/boost';
+import bullet from 'highcharts/modules/bullet';
 import drilldown from 'highcharts/modules/drilldown';
 import exporting from 'highcharts/modules/exporting';
+import funnel from 'highcharts/modules/funnel';
+import heatmap from 'highcharts/modules/heatmap';
+import histogramBellcurve from 'highcharts/modules/histogram-bellcurve';
 import offlineExporting from 'highcharts/modules/offline-exporting';
+import pareto from 'highcharts/modules/pareto';
+import sankey from 'highcharts/modules/sankey';
 import seriesLabel from 'highcharts/modules/series-label';
+import solidGauge from 'highcharts/modules/solid-gauge';
+import streamgraph from 'highcharts/modules/streamgraph';
+import sunburst from 'highcharts/modules/sunburst';
+import tilemap from 'highcharts/modules/tilemap';
+import treemap from 'highcharts/modules/treemap';
+import variablePie from 'highcharts/modules/variable-pie';
+import variwide from 'highcharts/modules/variwide';
+import vector from 'highcharts/modules/vector';
+import windbarb from 'highcharts/modules/windbarb';
+import wordcloud from 'highcharts/modules/wordcloud';
+import xrange from 'highcharts/modules/xrange';
 import themes from './themes';
 
 themes.applyTheme('white');
 
+HighchartsMore(Highcharts);
 annotations(Highcharts);
 boost(Highcharts);
+bullet(Highcharts);
 drilldown(Highcharts);
 exporting(Highcharts);
+funnel(Highcharts);
+heatmap(Highcharts);
+histogramBellcurve(Highcharts);
 offlineExporting(Highcharts);
+pareto(Highcharts);
+sankey(Highcharts);
 seriesLabel(Highcharts);
+solidGauge(Highcharts);
+streamgraph(Highcharts);
+sunburst(Highcharts);
+tilemap(Highcharts);
+treemap(Highcharts);
+variablePie(Highcharts);
+variwide(Highcharts);
+vector(Highcharts);
+windbarb(Highcharts);
+wordcloud(Highcharts);
+xrange(Highcharts);
 
 // 全チャート共通の設定。
 Highcharts.setOptions({
@@ -41,35 +77,21 @@ Highcharts.setOptions({
   plotOptions: {
     // 全てのchartタイプ共通の設定。
     series: {
-      allowPointSelect: true,
       animation: { duration: 300 },
-      dataLabels: {
-        enabled: true
-      },
       boostThreshold: 2000,
       cursor: 'pointer',
-      label: { enabled: true },
-      marker: { enabled: true }
+      label: { enabled: false }
+    },
+    heatmap: {
+      dataLabels: { enabled: true }
     }
   },
   tooltip: {
     crosshairs: true,
     enabled: true
-  }
+  },
+  xAxis: { title: null },
+  yAxis: { title: null }
 });
 
 export default Highcharts;
-
-const sample01 = {
-  chart: { type: 'column' },
-  series: [
-    { data: [0,10,20,30,40,50,60] },
-    { data: [0,1,2,3,4,5,6], dashStyle: 'longdash' },
-  ]
-};
-const sample02 = {};
-
-export {
-  sample01,
-  sample02
-};
