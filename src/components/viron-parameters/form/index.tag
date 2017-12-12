@@ -26,6 +26,8 @@ viron-parameters-form.Parameters_Form
       viron-autocomplete(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" config="{ autocompleteConfig }" onChange="{ handleAutocompleteChange }")
     virtual(if="{ uiType === 'wyswyg' }")
       viron-wyswyg(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleWyswygChange }")
+    virtual(if="{ uiType === 'image' }")
+      viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }")
     virtual(if="{ uiType === 'null' }")
       div TODO
 
@@ -35,6 +37,7 @@ viron-parameters-form.Parameters_Form
     import '../../../components/viron-base64/index.tag';
     import '../../../components/viron-checkbox/index.tag';
     import '../../../components/viron-html/index.tag';
+    import '../../../components/viron-image/index.tag';
     import '../../../components/viron-numberinput/index.tag';
     import '../../../components/viron-pug/index.tag';
     import '../../../components/viron-select/index.tag';

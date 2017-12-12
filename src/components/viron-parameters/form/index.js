@@ -1,3 +1,4 @@
+import contains from 'mout/array/contains';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import isNumber from 'mout/lang/isNumber';
@@ -23,7 +24,23 @@ export default function() {
 
   // 入力に使用するUIコンポーネント名。
   // opts.formObjectの値から適切なUIコンポーネントを推測します。
-  this.uiType = util.getUIType(formObject);
+  // 文字列 & previewモード & 拡張子imageの場合のみ強制的に画像を表示します。
+  this.uiType = (() => {
+    if (!this.opts.ispreview || formObject.type !== 'string' || !this.opts.val) {
+      return util.getUIType(formObject);
+    }
+    // 拡張子から最適な表示方法を推測します。
+    const split = this.opts.val.split('.');
+    if (split.length < 2) {
+      return util.getUIType(formObject);
+    }
+    const suffix = split[split.length - 1];
+    // 画像系チェック。
+    if (contains(['png', 'jpg', 'gif'], suffix)) {
+      return 'image';
+    }
+    return util.getUIType(formObject);
+  })();
 
   // エラー関連。
   this.errors = [];
