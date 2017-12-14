@@ -29,8 +29,6 @@ module.exports = {
   //VIRON_STYLE_TABLE: vironlib.constants.VIRON_STYLE_TABLE,
   //VIRON_STYLE_NUMBER: vironlib.constants.VIRON_STYLE_NUMBER,
   //VIRON_STYLE_CHART: vironlib.constants.VIRON_STYLE_CHART,
-  // TODO: vironlibを変更すること。
-  VIRON_STYLE_CHART: 'chart',
   //VIRON_SECTION_DASHBOARD: vironlib.constants.VIRON_SECTION_DASHBOARD,
   //VIRON_SECTION_MANAGE: vironlib.constants.VIRON_SECTION_MANAGE,
 };
