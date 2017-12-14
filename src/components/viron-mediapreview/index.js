@@ -1,7 +1,7 @@
-import ObjectAssign from 'object-assign';
-import riot from 'riot';
 export default function() {
   const store = this.riotx.get();
+
+  this.path = this.opts.tagopts.path;
 
   const fadeIn = () => {
     setTimeout(() => {

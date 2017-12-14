@@ -31,28 +31,32 @@
     z-index: 3;
   }
 
-  & .Application_Popovers {
+  & .Application_Mediapreviews {
     z-index: 4;
   }
 
-  & .Application_Toasts {
+  & .Application_Popovers {
     z-index: 5;
   }
 
-  & .Application_ProgressLinear {
+  & .Application_Toasts {
     z-index: 6;
   }
 
-  & .Application_Dimmer {
+  & .Application_ProgressLinear {
     z-index: 7;
   }
 
-  & .Application_Blocker {
+  & .Application_Dimmer {
     z-index: 8;
   }
 
-  & .Application_Splash {
+  & .Application_Blocker {
     z-index: 9;
+  }
+
+  & .Application_Splash {
+    z-index: 10;
   }
 
   &__aside {

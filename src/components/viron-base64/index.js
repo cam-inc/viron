@@ -1,4 +1,5 @@
 export default function() {
+  const store = this.riotx.get();
   const mimeType = this.opts.mimetype || '';
 
   this.isImage = false;
@@ -11,5 +12,12 @@ export default function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    if (!this.opts.ispreview) {
+      return;
+    }
+    store.action('mediapreviews.add', {
+      path: `data:${this.mimeType};base64,${this.opts.val}`
+    });
+
   };
 }

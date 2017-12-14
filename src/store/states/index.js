@@ -6,6 +6,7 @@ import drawers from './drawers';
 import endpoints from './endpoints';
 import layout from './layout';
 import location from './location';
+import mediapreviews from './mediapreviews';
 import modals from './modals';
 import oas from './oas';
 import page from './page';
@@ -24,6 +25,7 @@ export default ObjectAssign(
   endpoints,
   layout,
   location,
+  mediapreviews,
   modals,
   oas,
   page,

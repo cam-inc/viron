@@ -5,7 +5,7 @@ let canCreateMediapreview = true;
 // タイマーID管理用変数
 let timer;
 
-export default exporter('modals', {
+export default exporter('mediapreviews', {
   /**
    * メディアプレビューを追加します。
    * @param {riotx.Context} context

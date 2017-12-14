@@ -10,7 +10,7 @@ export default exporter('mediapreviews', {
    * @return {Array}
    */
   add: (state, tagOpts = {}, mediapreviewOpts = {}) => {
-    state.modals.push({
+    state.mediapreviews.push({
       id: `mediapreview_${Date.now()}`,
       tagOpts,
       mediapreviewOpts
