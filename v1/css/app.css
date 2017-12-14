@@ -3644,12 +3644,13 @@ select {
     left: 0;
   }
 .ComponentsPage_Card_Table_Cell {
-  padding: 24px;
-}
-.ComponentsPage_Card_Table_Cell__string {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 300px;
+  padding: 24px;
+}
+.ComponentsPage_Card_Table_Cell__string {
     display: inline-block;
     font-size: 1.4rem;
     cursor: pointer;
