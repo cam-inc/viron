@@ -1,4 +1,4 @@
-viron-select.Select(class="{ 'Select--disabled': opts.isdisabled, 'Select--error': opts.haserror }")
+viron-select.Select(class="{ 'Select--disabled': opts.isdisabled, 'Select--error': opts.iserror }")
   form.Select__form(onSubmit="{ handleFormSubmit }")
     select.Select__select(ref="select" disabled="{ opts.isdisabled }" onInput="{ handleSelectInput }" onChange="{ handleSelectChange }")
       option.Select__option(each="{ option in opts.options }" selected="{ option.isSelected }") { option.label }

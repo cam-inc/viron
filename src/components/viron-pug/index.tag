@@ -4,7 +4,7 @@ viron-pug.Pug(class="{ 'Pug--disabled': opts.isdisabled, 'Pug--error': opts.hase
     .Pug__tab(class="{ 'Pug__tab--selected': isPreviewMode }" onTap="{ handlePreviewTabTap }") プレビュー
   .Pug__body
     .Pug__editor(if="{ isEditorMode }")
-      viron-textarea(val="{ opts.val }" isDisabled="{ opts.isdisabled }" onChange="{ handleEditorChange }")
+      viron-textarea(val="{ opts.val }" isDisabled="{ opts.isdisabled }" onChange="{ handleEditorChange }" onFocus="{ handleEditorFocus }" onBlur="{ handleEditorBlur }")
     .Pug__preview(if="{ isPreviewMode }")
       viron-prettyhtml(data="{ opts.val }")
   .Pug__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")

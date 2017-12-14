@@ -87,6 +87,20 @@ export default function() {
     e.stopPropagation();
   };
 
+  this.handleInputFocus = () => {
+    if (!this.opts.onfocus) {
+      return;
+    }
+    this.opts.onfocus();
+  };
+
+  this.handleInputBlur = () => {
+    if (!this.opts.onblur) {
+      return;
+    }
+    this.opts.onblur();
+  };
+
   this.handleBlockerTap = e => {
     e.stopPropagation();
     if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {

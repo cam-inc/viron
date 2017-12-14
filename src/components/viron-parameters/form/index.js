@@ -50,6 +50,9 @@ export default function() {
     this.hasError = !!this.errors.length;
   };
 
+  // フォーム選択状態。
+  this.isFocus = false;
+
   /**
    * Selectコンポーネントの選択肢を返します。
    * @return {Array}
@@ -87,6 +90,22 @@ export default function() {
       return;
     }
     this.opts.onchange(this.opts.identifier, value);
+  };
+
+  /**
+   * フォーカスされた時の処理。
+   */
+  this.handleFormFocus = () => {
+    this.isFocus = true;
+    this.update();
+  };
+
+  /**
+   * フォーカスが外れた時の処理。
+   */
+  this.handleFormBlur = () => {
+    this.isFocus = false;
+    this.update();
   };
 
   /**

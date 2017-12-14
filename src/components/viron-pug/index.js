@@ -49,6 +49,20 @@ export default function() {
     this.opts.onchange(newText);
   };
 
+  this.handleEditorFocus = () => {
+    if (!this.opts.onfocus) {
+      return;
+    }
+    this.opts.onfocus();
+  };
+
+  this.handleEditorBlur = () => {
+    if (!this.opts.onblur) {
+      return;
+    }
+    this.opts.onblur();
+  };
+
   this.handleBlockerTap = e => {
     e.stopPropagation();
     e.stopPropagation();

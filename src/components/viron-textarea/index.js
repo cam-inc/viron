@@ -57,6 +57,20 @@ export default function() {
     this.opts.onchange(newVal, this.opts.id);
   };
 
+  this.handleTextareaFocus = () => {
+    if (!this.opts.onfocus) {
+      return;
+    }
+    this.opts.onfocus();
+  };
+
+  this.handleTextareaBlur = () => {
+    if (!this.opts.onblur) {
+      return;
+    }
+    this.opts.onblur();
+  };
+
   this.handleBlockerTap = e => {
     e.stopPropagation();
     if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {

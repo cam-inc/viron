@@ -4,7 +4,7 @@ viron-html.Html(class="{ 'Html--disabled': opts.isdisabled, 'Html--error': opts.
     .Html__tab(class="{ 'Html__tab--selected': isPreviewMode }" onTap="{ handlePreviewTabTap }") プレビュー
   .Html__body
     .Html__editor(if="{ isEditorMode }")
-      viron-textarea(val="{ opts.val }" isDisabled="{ opts.isdisabled }" onChange="{ handleEditorChange }")
+      viron-textarea(val="{ opts.val }" isDisabled="{ opts.isdisabled }" onChange="{ handleEditorChange }" onFocus="{ handleEditorFocus }" onBlur="{ handleEditorBlur }")
     .Html__preview(if="{ isPreviewMode }")
       viron-prettyhtml(data="{ opts.val }")
   .Html__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
