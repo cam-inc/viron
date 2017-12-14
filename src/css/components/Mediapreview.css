@@ -1,0 +1,48 @@
+.Mediapreview {
+  @apply --layout-center-center;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;
+
+  &__frame {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    background-color: var(--color-base-gray-tertiary);
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transform: scale(0.8);
+  }
+
+  &__closeButton {
+    @apply --layout-center-center;
+
+    @mixin hover {
+      color: var(--color-base-gray);
+    }
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &--visible {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+
+    & .Mediapreview__frame {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+}

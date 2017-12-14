@@ -11,6 +11,7 @@ viron.Application(class="Application--{ usingBrowser } Application--{ layoutType
       .Application__page
         div(data-is="viron-{ pageName }-page" route="{ pageRoute }")
   viron-application-drawers
+  viron-application-mediapreviews
   viron-application-modals
   viron-application-popovers
   viron-application-toasts
@@ -27,6 +28,7 @@ viron.Application(class="Application--{ usingBrowser } Application--{ layoutType
     import './dimmer/index.tag';
     import './drawers/index.tag';
     import './header/index.tag';
+    import './mediapreviews/index.tag';
     import './menu/index.tag';
     import './modals/index.tag';
     import './popovers/index.tag';

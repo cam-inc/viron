@@ -39,6 +39,9 @@ export default {
             if (this.opts.isModal) {
               this.opts.modalCloser();
             }
+            if (this.opts.isMediapreview) {
+              this.opts.mediapreviewCloser();
+            }
             if (this.opts.isDrawer) {
               this.opts.drawerCloser();
             }
