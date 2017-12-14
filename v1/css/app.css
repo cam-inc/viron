@@ -689,23 +689,26 @@ select {
 .Application .Application_Modals {
     z-index: 3;
   }
-.Application .Application_Popovers {
+.Application .Application_Mediapreviews {
     z-index: 4;
   }
-.Application .Application_Toasts {
+.Application .Application_Popovers {
     z-index: 5;
   }
-.Application .Application_ProgressLinear {
+.Application .Application_Toasts {
     z-index: 6;
   }
-.Application .Application_Dimmer {
+.Application .Application_ProgressLinear {
     z-index: 7;
   }
-.Application .Application_Blocker {
+.Application .Application_Dimmer {
     z-index: 8;
   }
-.Application .Application_Splash {
+.Application .Application_Blocker {
     z-index: 9;
+  }
+.Application .Application_Splash {
+    z-index: 10;
   }
 .Application__aside {
   display: flex;
@@ -971,6 +974,22 @@ select {
     color: var(--color-base-red);
   }
 .Application_Header_Menu_Import__control {
+  }
+.Application_Mediapreviews {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  pointer-events: none;
+}
+.Application_Mediapreviews .Mediapreview {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 .Application_Menu {
   position: relative;
@@ -1401,6 +1420,19 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Base64__blocker:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
+  }
+.Base64__blocker.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
   }
 .Button {
   display: flex;
@@ -1771,6 +1803,19 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Image__blocker:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
+    }
+  }
+.Image__blocker.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+      opacity: 0.1;
   }
 .List {
   display: block;
@@ -1818,6 +1863,69 @@ select {
     flex-grow: 1;
     font-size: 1.4rem;
   }
+.Mediapreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition-duration: 300ms;
+  transition-property: background-color;
+}
+.Mediapreview__frame {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    opacity: 0;
+    transition-duration: 300ms;
+    transition-property: transform, opacity;
+    transform: scale(0.8);
+  }
+.Mediapreview__image {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+  }
+.Mediapreview__closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 24px;
+    height: 24px;
+    color: #fff;
+    color: var(--color-base-white);
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Mediapreview__closeButton:hover {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+    }
+  }
+.Mediapreview__closeButton.hold {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+  }
+.Mediapreview__closeButton .Icon {
+      width: 16px;
+      height: 16px;
+    }
+.Mediapreview--visible {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+.Mediapreview--visible .Mediapreview__frame {
+      opacity: 1;
+      transform: scale(1);
+    }
 .Modal {
   display: flex;
   align-items: center;
@@ -2833,7 +2941,7 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
-.Textarea--error .Textarea__input {
+.Textarea--disabled .Textarea__input {
       cursor: not-allowed;
       background-color: #f9f9f9;
       background-color: var(--color-base-gray-tertiary);
@@ -3173,6 +3281,7 @@ select {
   align-items: center;
   justify-content: center;
     flex-shrink: 0;
+    margin-bottom: 4px;
   }
 .ComponentsPage_Card_Chart__title {
   overflow: hidden;
