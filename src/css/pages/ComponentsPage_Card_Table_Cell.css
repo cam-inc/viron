@@ -1,9 +1,9 @@
 .ComponentsPage_Card_Table_Cell {
+  @apply --text-truncate;
+  max-width: 300px;
   padding: 24px;
 
   &__string {
-    @apply --text-truncate;
-
     @mixin hover {
       color: var(--color-base-gray);
     }
