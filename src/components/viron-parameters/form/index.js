@@ -62,6 +62,7 @@ export default function() {
     if (isUndefined(this.opts.val)) {
       options.push({
         label: '-- select an option --',
+        value: undefined,
         isSelected: true,
         isDiabled: true
       });
@@ -70,6 +71,7 @@ export default function() {
       options.push({
         id: `select_${idx}`,
         label: v,
+        value: v,
         isSelected: (v === this.opts.val)
       });
     });

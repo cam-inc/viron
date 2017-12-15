@@ -65,9 +65,7 @@ Highcharts.setOptions({
     zoomType: 'x'
   },
   credits: { enabled: false },
-  exporting: {
-    // TODO
-  },
+  exporting: { enabled: false },
   legend: {
     enabled: true,
     navigation: {

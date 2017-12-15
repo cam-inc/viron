@@ -8,16 +8,8 @@ export default function() {
   this.rowSize = 'rowSpreadSmall';
   switch (this.opts.def.style) {
   case 'chart':
-  case 'graph-bar':
-  case 'graph-horizontal-bar':
-  case 'graph-horizontal-stacked-bar':
-  case 'graph-line':
-  case 'graph-scatterplot':
-  case 'graph-stacked-area':
-  case 'graph-stacked-bar':
     this.cardType = 'chart';
-    //this.columnSize = 'columnSpreadSmall';
-    this.columnSize = 'columnSpreadFull';
+    this.columnSize = 'columnSpreadSmall';
     this.rowSize = 'rowSpreadMedium';
     break;
   case 'table':
