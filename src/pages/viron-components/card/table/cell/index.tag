@@ -1,6 +1,6 @@
 viron-components-page-table-cell.ComponentsPage_Card_Table_Cell
   virtual(if="{ isText }")
-    .ComponentsPage_Card_Table_Cell__string(onTap="{ handleStringTap }") { value }
+    .ComponentsPage_Card_Table_Cell__string { value }
   virtual(if="{ isImage }")
     virtual(if="{ !isBase64 }")
       .ComponentsPage_Card_Table_Cell__image(style="background-image:url({ value })")

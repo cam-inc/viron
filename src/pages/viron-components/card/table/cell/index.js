@@ -1,4 +1,3 @@
-import clipboard from 'clipboard-js';
 import contains from 'mout/array/contains';
 import isArray from 'mout/lang/isArray';
 import isBoolean from 'mout/lang/isBoolean';
@@ -9,12 +8,6 @@ import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 
 export default function() {
-  const store = this.riotx.get();
-
-  // クリップっボードコピーをサポートしているか否か。
-  let isClipboardCopySupported = true;
-  // モバイル用レイアウトか否か。
-  this.isMobile = store.getter('layout.isMobile');
   // テキスト系か否か。
   this.isText = false;
   // 画像系か否か。
@@ -96,30 +89,4 @@ export default function() {
     this.isText = true;
     return String(data);
   })();
-
-  this.listen('layout', () => {
-    this.isMobile = store.getter('layout.isMobile');
-  });
-
-  this.handleStringTap = e => {
-    if (this.isMobile || !isClipboardCopySupported) {
-      return;
-    }
-    e.stopPropagation();
-    Promise
-      .resolve()
-      .then(() => {
-        return clipboard.copy(this.value);
-      })
-      .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
-      }))
-      .catch(() => {
-        isClipboardCopySupported = false;
-        store.action('toasts.add', {
-          type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
-        });
-      });
-  };
 }
