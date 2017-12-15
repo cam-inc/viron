@@ -3653,17 +3653,6 @@ select {
 .ComponentsPage_Card_Table_Cell__string {
     display: inline-block;
     font-size: 1.4rem;
-    cursor: pointer;
-  }
-@media (hover: hover) {
-    .ComponentsPage_Card_Table_Cell__string:hover {
-      color: #d1d1d1;
-      color: var(--color-base-gray);
-    }
-  }
-.ComponentsPage_Card_Table_Cell__string.hold {
-      color: #d1d1d1;
-      color: var(--color-base-gray);
   }
 .ComponentsPage_Card_Table_Cell__image {
     width: 64px;
