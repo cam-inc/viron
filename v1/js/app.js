@@ -17960,9 +17960,7 @@ highcharts.setOptions({
     zoomType: 'x'
   },
   credits: { enabled: false },
-  exporting: {
-    // TODO
-  },
+  exporting: { enabled: false },
   legend: {
     enabled: true,
     navigation: {
@@ -18398,6 +18396,265 @@ riot$1.tag2('viron-pagination', '<div class="Pagination__control"> <virtual if="
     this.external(script$4);
 });
 
+/**
+     */
+    function isBoolean(val) {
+        return isKind_1$1(val, 'Boolean');
+    }
+    var isBoolean_1 = isBoolean;
+
+/**
+     */
+    function isNull(val){
+        return val === null;
+    }
+    var isNull_1 = isNull;
+
+/**
+     */
+    function isString(val) {
+        return isKind_1$1(val, 'String');
+    }
+    var isString_1 = isString;
+
+var UNDEF$1;
+
+    /**
+     */
+    function isUndef(val){
+        return val === UNDEF$1;
+    }
+    var isUndefined = isUndef;
+
+var script$5 = function() {
+  // テキスト系か否か。
+  this.isText = false;
+  // 画像系か否か。
+  this.isImage = false;
+  // base64系か否か。
+  this.isBase64 = false;
+  this.mimeType = null;
+  // 動画系か否か。
+  this.isVideo = false;
+  this.videoType = null;
+  // typeに応じて表示を切り替えます。
+  this.value = (() => {
+    const data = this.opts.data;
+    const column = this.opts.column;
+    if (isNull_1(data)) {
+      this.isText = true;
+      return 'null';
+    }
+    if (isBoolean_1(data)) {
+      this.isText = true;
+      return (data ? 'true' : 'false');
+    }
+    if (isNumber_1(data)) {
+      this.isText = true;
+      return String(data);
+    }
+    if (isArray_1$1(data)) {
+      this.isText = true;
+      return '[...]';
+    }
+    if (isObject_1(data)) {
+      this.isText = true;
+      return '{...}';
+    }
+    if (isString_1(data)) {
+      if (column.format === 'base64') {
+        this.isBase64 = true;
+        // MIME-type設定。指定無しであればpng画像とする。
+        this.mimeType = column['x-mime-type'] || 'image/png';
+        switch (this.mimeType) {
+        case 'image/png':
+        case 'image/gif':
+        case 'image/jpeg':
+          this.isImage = true;
+          break;
+        default:
+          break;
+        }
+        return data;
+      }
+      // 拡張子から最適な表示方法を推測します。
+      const split = data.split('.');
+      if (split.length < 2) {
+        // 拡張子がなければそのまま表示する。
+        this.isText = true;
+        return data;
+      }
+      const suffix = split[split.length - 1];
+      // 画像系チェック。
+      if (contains_1$2(['png', 'jpg', 'gif'], suffix)) {
+        this.isImage = true;
+        return data;
+      }
+      // 動画系チェック。
+      if (contains_1$2(['mp4', 'ogv', 'webm'], suffix)) {
+        this.isVideo = true;
+        this.videoType = suffix;
+        return data;
+      }
+      // 推測できない場合はそのまま表示。
+      this.isText = true;
+      return data;
+    }
+    if (isUndefined(data)) {
+      this.isText = true;
+      return '';
+    }
+    // それ以外。強制的に文字列化。
+    this.isText = true;
+    return String(data);
+  })();
+};
+
+riot$1.tag2('viron-components-page-table-cell', '<virtual if="{isText}"> <div class="ComponentsPage_Card_Table_Cell__string">{value}</div> </virtual> <virtual if="{isImage}"> <virtual if="{!isBase64}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url({value});"></div> </virtual> <virtual if="{isBase64}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url(data:{mimeType};base64,{value});"></div> </virtual> </virtual> <virtual if="{isVideo}"> <componentspage_card_table_cell__video>TODO</ComponentsPage_Card_Table_Cell__video> </virtual>', '', 'class="ComponentsPage_Card_Table_Cell"', function(opts) {
+    this.external(script$5);
+});
+
+riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
+});
+
+var script$7 = function() {
+  this.handleTap = () => {
+    if (this.opts.isdisabled) {
+      return;
+    }
+    if (!this.opts.onselect) {
+      return;
+    }
+    this.opts.onselect();
+  };
+};
+
+riot$1.tag2('viron-button', '<div class="Button__label">{opts.label}</div>', '', 'class="Button Button--{opts.theme || \'primary\'} {opts.isdisabled ? \'Button--disabled\' : \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$7);
+});
+
+riot$1.tag2('viron-icon-check', '<svg viewbox="-2582 10792 15.997 11.266"> <g transform="translate(-2935 10688)"> <g transform="translate(122.702 -49.51)"> <rect width="12.32" height="2.989" rx="0.2" transform="translate(235.47 162.221) rotate(-45)"></rect> <rect width="9.682" height="2.989" rx="0.2" transform="translate(232.412 155.815) rotate(45)"></rect> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconCheck {opts.class}"', function(opts) {
+});
+
+var script$8 = function() {
+  this.handleTap = () => {
+    if (!this.opts.onchange) {
+      return;
+    }
+    if (this.opts.isdisabled) {
+      return;
+    }
+    this.opts.onchange(!this.opts.ischecked, this.opts.id);
+  };
+
+  this.handleBlockerTap = e => {
+    e.stopPropagation();
+  };
+};
+
+riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon-check></viron-icon-check> </div> <div class="Checkbox__label" if="{!!opts.label}">{opts.label}</div> </div> <div class="Checkbox__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Checkbox {\'Checkbox--checked\': opts.ischecked, \'Checkbox--error\': opts.iserror, \'Checkbox--disabled\': opts.isdisabled} Checkbox--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+    this.external(script$8);
+});
+
+var script$9 = function() {
+  const store = this.riotx.get();
+
+  this.isApplyButtonDisabled = false;
+  const selectedColumnKeys = this.opts.selectedColumnKeys;
+  this.columns = map_1$1(deepClone_1(this.opts.columns), column => {
+    let isSelected;
+    // selectedColumnがnullやundefinedの時は全選択状態と判定する。
+    if (!selectedColumnKeys || contains_1$2(selectedColumnKeys, column.key)) {
+      isSelected = true;
+    }
+    return objectAssign(column, {
+      isSelected
+    });
+  });
+  // 全選択ボタンの活性状態。
+  // 全て選択されている場合はnullを返す。
+  this.isAllSelected = (!selectedColumnKeys || selectedColumnKeys.length === this.columns.length);
+  this.layoutType = store.getter('layout.type');
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
+  this.listen('layout', () => {
+    this.layoutType = store.getter('layout.type');
+    this.isMobile = store.getter('layout.isMobile');
+    this.update();
+  });
+
+  this.handleCloseButtonTap = () => {
+    this.close();
+  };
+
+  this.handleAllSelectChange = newIsChecked => {
+    this.isAllSelected = newIsChecked;
+    map_1$1(this.columns, column => {
+      column.isSelected = newIsChecked;
+      return column;
+    });
+    // 全て未選択の時はボタン非活性化。
+    if (!find_1$2(this.columns, column => {
+      return column.isSelected;
+    })) {
+      this.isApplyButtonDisabled = true;
+    } else {
+      this.isApplyButtonDisabled = false;
+    }
+    this.update();
+  };
+
+  this.handleItemChange = (newIsSelected, key) => {
+    const target = find_1$2(this.columns, column => {
+      return (column.key === key);
+    });
+    if (!!target) {
+      target.isSelected = newIsSelected;
+    }
+    // 全て未選択の時はボタン非活性化。
+    if (!find_1$2(this.columns, column => {
+      return column.isSelected;
+    })) {
+      this.isApplyButtonDisabled = true;
+    } else {
+      this.isApplyButtonDisabled = false;
+    }
+    // 全て選択されている時は全選択ボタン活性化。
+    if (find_1$2(this.columns, column => {
+      return !column.isSelected;
+    })) {
+      this.isAllSelected = false;
+    } else {
+      this.isAllSelected = true;
+    }
+    this.update();
+  };
+
+  this.handleApplyButtonTap = () => {
+    if (!this.opts.onChange) {
+      return;
+    }
+    let newSelectedColumnKeys = map_1$1(filter_1$1(this.columns, column => {
+      return column.isSelected;
+    }), column => {
+      return column.key;
+    });
+    // 全て選択されている場合はnullを返す。
+    if (newSelectedColumnKeys.length === this.columns.length) {
+      newSelectedColumnKeys = null;
+    }
+    this.opts.onChange(newSelectedColumnKeys);
+    if (this.isMobile) {
+      this.close();
+    }
+  };
+};
+
+riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__head"> <div class="ComponentsPage_Filter__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Filter__title">表示項目フィルター</div> <div class="ComponentsPage_Filter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> <div class="ComponentsPage_Filter__control"> <div class="ComponentsPage_Filter__item"> <viron-checkbox label="全て選択する" ischecked="{isAllSelected}" theme="ghost" onchange="{handleAllSelectChange}"></viron-checkbox> </div> </div> </div> <div class="ComponentsPage_Filter__body"> <div class="ComponentsPage_Filter__item" each="{column in columns}"> <viron-checkbox id="{column.key}" label="{column.description || column.key}" ischecked="{column.isSelected}" theme="ghost" onchange="{handleItemChange}"></viron-checkbox> </div> </div> <div class="ComponentsPage_Filter__tail"> <viron-button label="適用する" isdisabled="{isApplyButtonDisabled}" onselect="{handleApplyButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Filter ComponentsPage_Filter--{layoutType}"', function(opts) {
+    this.external(script$9);
+});
+
 var clipboard = createCommonjsModule(function (module) {
 //  Import support https://stackoverflow.com/questions/13673346/supporting-both-commonjs-and-amd
 (function(name, definition) {
@@ -18574,297 +18831,6 @@ var clipboard = createCommonjsModule(function (module) {
 
   return clipboard;
 }));
-});
-
-/**
-     */
-    function isBoolean(val) {
-        return isKind_1$1(val, 'Boolean');
-    }
-    var isBoolean_1 = isBoolean;
-
-/**
-     */
-    function isNull(val){
-        return val === null;
-    }
-    var isNull_1 = isNull;
-
-/**
-     */
-    function isString(val) {
-        return isKind_1$1(val, 'String');
-    }
-    var isString_1 = isString;
-
-var UNDEF$1;
-
-    /**
-     */
-    function isUndef(val){
-        return val === UNDEF$1;
-    }
-    var isUndefined = isUndef;
-
-var script$5 = function() {
-  const store = this.riotx.get();
-
-  // クリップっボードコピーをサポートしているか否か。
-  let isClipboardCopySupported = true;
-  // モバイル用レイアウトか否か。
-  this.isMobile = store.getter('layout.isMobile');
-  // テキスト系か否か。
-  this.isText = false;
-  // 画像系か否か。
-  this.isImage = false;
-  // base64系か否か。
-  this.isBase64 = false;
-  this.mimeType = null;
-  // 動画系か否か。
-  this.isVideo = false;
-  this.videoType = null;
-  // typeに応じて表示を切り替えます。
-  this.value = (() => {
-    const data = this.opts.data;
-    const column = this.opts.column;
-    if (isNull_1(data)) {
-      this.isText = true;
-      return 'null';
-    }
-    if (isBoolean_1(data)) {
-      this.isText = true;
-      return (data ? 'true' : 'false');
-    }
-    if (isNumber_1(data)) {
-      this.isText = true;
-      return String(data);
-    }
-    if (isArray_1$1(data)) {
-      this.isText = true;
-      return '[...]';
-    }
-    if (isObject_1(data)) {
-      this.isText = true;
-      return '{...}';
-    }
-    if (isString_1(data)) {
-      if (column.format === 'base64') {
-        this.isBase64 = true;
-        // MIME-type設定。指定無しであればpng画像とする。
-        this.mimeType = column['x-mime-type'] || 'image/png';
-        switch (this.mimeType) {
-        case 'image/png':
-        case 'image/gif':
-        case 'image/jpeg':
-          this.isImage = true;
-          break;
-        default:
-          break;
-        }
-        return data;
-      }
-      // 拡張子から最適な表示方法を推測します。
-      const split = data.split('.');
-      if (split.length < 2) {
-        // 拡張子がなければそのまま表示する。
-        this.isText = true;
-        return data;
-      }
-      const suffix = split[split.length - 1];
-      // 画像系チェック。
-      if (contains_1$2(['png', 'jpg', 'gif'], suffix)) {
-        this.isImage = true;
-        return data;
-      }
-      // 動画系チェック。
-      if (contains_1$2(['mp4', 'ogv', 'webm'], suffix)) {
-        this.isVideo = true;
-        this.videoType = suffix;
-        return data;
-      }
-      // 推測できない場合はそのまま表示。
-      this.isText = true;
-      return data;
-    }
-    if (isUndefined(data)) {
-      this.isText = true;
-      return '';
-    }
-    // それ以外。強制的に文字列化。
-    this.isText = true;
-    return String(data);
-  })();
-
-  this.listen('layout', () => {
-    this.isMobile = store.getter('layout.isMobile');
-  });
-
-  this.handleStringTap = e => {
-    if (this.isMobile || !isClipboardCopySupported) {
-      return;
-    }
-    e.stopPropagation();
-    Promise
-      .resolve()
-      .then(() => {
-        return clipboard.copy(this.value);
-      })
-      .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
-      }))
-      .catch(() => {
-        isClipboardCopySupported = false;
-        store.action('toasts.add', {
-          type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
-        });
-      });
-  };
-};
-
-riot$1.tag2('viron-components-page-table-cell', '<virtual if="{isText}"> <div class="ComponentsPage_Card_Table_Cell__string" onclick="{getClickHandler(\'handleStringTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleStringTap\')}">{value}</div> </virtual> <virtual if="{isImage}"> <virtual if="{!isBase64}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url({value});"></div> </virtual> <virtual if="{isBase64}"> <div class="ComponentsPage_Card_Table_Cell__image" riot-style="background-image:url(data:{mimeType};base64,{value});"></div> </virtual> </virtual> <virtual if="{isVideo}"> <componentspage_card_table_cell__video>TODO</ComponentsPage_Card_Table_Cell__video> </virtual>', '', 'class="ComponentsPage_Card_Table_Cell"', function(opts) {
-    this.external(script$5);
-});
-
-riot$1.tag2('viron-icon-close', '<svg viewbox="-3644.002 14060.002 16.001 16.002"> <path d="M1859.9-16723.971l-5.819-5.822-5.818,5.818a.2.2,0,0,1-.281,0l-1.84-1.842a.2.2,0,0,1,0-.281l5.818-5.816-5.818-5.82a.2.2,0,0,1,0-.281l1.84-1.84a.2.2,0,0,1,.281,0l5.818,5.818,5.82-5.818a.2.2,0,0,1,.286,0l1.84,1.84a.2.2,0,0,1,0,.281l-5.823,5.82,5.819,5.82a.2.2,0,0,1,0,.283l-1.836,1.84a.21.21,0,0,1-.143.057A.21.21,0,0,1,1859.9-16723.971Z" transform="translate(-5490.083 30799.918)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconClose {opts.class}"', function(opts) {
-});
-
-var script$7 = function() {
-  this.handleTap = () => {
-    if (this.opts.isdisabled) {
-      return;
-    }
-    if (!this.opts.onselect) {
-      return;
-    }
-    this.opts.onselect();
-  };
-};
-
-riot$1.tag2('viron-button', '<div class="Button__label">{opts.label}</div>', '', 'class="Button Button--{opts.theme || \'primary\'} {opts.isdisabled ? \'Button--disabled\' : \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$7);
-});
-
-riot$1.tag2('viron-icon-check', '<svg viewbox="-2582 10792 15.997 11.266"> <g transform="translate(-2935 10688)"> <g transform="translate(122.702 -49.51)"> <rect width="12.32" height="2.989" rx="0.2" transform="translate(235.47 162.221) rotate(-45)"></rect> <rect width="9.682" height="2.989" rx="0.2" transform="translate(232.412 155.815) rotate(45)"></rect> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconCheck {opts.class}"', function(opts) {
-});
-
-var script$8 = function() {
-  this.handleTap = () => {
-    if (!this.opts.onchange) {
-      return;
-    }
-    if (this.opts.isdisabled) {
-      return;
-    }
-    this.opts.onchange(!this.opts.ischecked, this.opts.id);
-  };
-
-  this.handleBlockerTap = e => {
-    e.stopPropagation();
-  };
-};
-
-riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon-check></viron-icon-check> </div> <div class="Checkbox__label" if="{!!opts.label}">{opts.label}</div> </div> <div class="Checkbox__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Checkbox {\'Checkbox--checked\': opts.ischecked, \'Checkbox--error\': opts.iserror, \'Checkbox--disabled\': opts.isdisabled} Checkbox--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$8);
-});
-
-var script$9 = function() {
-  const store = this.riotx.get();
-
-  this.isApplyButtonDisabled = false;
-  const selectedColumnKeys = this.opts.selectedColumnKeys;
-  this.columns = map_1$1(deepClone_1(this.opts.columns), column => {
-    let isSelected;
-    // selectedColumnがnullやundefinedの時は全選択状態と判定する。
-    if (!selectedColumnKeys || contains_1$2(selectedColumnKeys, column.key)) {
-      isSelected = true;
-    }
-    return objectAssign(column, {
-      isSelected
-    });
-  });
-  // 全選択ボタンの活性状態。
-  // 全て選択されている場合はnullを返す。
-  this.isAllSelected = (!selectedColumnKeys || selectedColumnKeys.length === this.columns.length);
-  this.layoutType = store.getter('layout.type');
-  // モバイル用レイアウトか否か。
-  this.isMobile = store.getter('layout.isMobile');
-
-  this.listen('layout', () => {
-    this.layoutType = store.getter('layout.type');
-    this.isMobile = store.getter('layout.isMobile');
-    this.update();
-  });
-
-  this.handleCloseButtonTap = () => {
-    this.close();
-  };
-
-  this.handleAllSelectChange = newIsChecked => {
-    this.isAllSelected = newIsChecked;
-    map_1$1(this.columns, column => {
-      column.isSelected = newIsChecked;
-      return column;
-    });
-    // 全て未選択の時はボタン非活性化。
-    if (!find_1$2(this.columns, column => {
-      return column.isSelected;
-    })) {
-      this.isApplyButtonDisabled = true;
-    } else {
-      this.isApplyButtonDisabled = false;
-    }
-    this.update();
-  };
-
-  this.handleItemChange = (newIsSelected, key) => {
-    const target = find_1$2(this.columns, column => {
-      return (column.key === key);
-    });
-    if (!!target) {
-      target.isSelected = newIsSelected;
-    }
-    // 全て未選択の時はボタン非活性化。
-    if (!find_1$2(this.columns, column => {
-      return column.isSelected;
-    })) {
-      this.isApplyButtonDisabled = true;
-    } else {
-      this.isApplyButtonDisabled = false;
-    }
-    // 全て選択されている時は全選択ボタン活性化。
-    if (find_1$2(this.columns, column => {
-      return !column.isSelected;
-    })) {
-      this.isAllSelected = false;
-    } else {
-      this.isAllSelected = true;
-    }
-    this.update();
-  };
-
-  this.handleApplyButtonTap = () => {
-    if (!this.opts.onChange) {
-      return;
-    }
-    let newSelectedColumnKeys = map_1$1(filter_1$1(this.columns, column => {
-      return column.isSelected;
-    }), column => {
-      return column.key;
-    });
-    // 全て選択されている場合はnullを返す。
-    if (newSelectedColumnKeys.length === this.columns.length) {
-      newSelectedColumnKeys = null;
-    }
-    this.opts.onChange(newSelectedColumnKeys);
-    if (this.isMobile) {
-      this.close();
-    }
-  };
-};
-
-riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__head"> <div class="ComponentsPage_Filter__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Filter__title">表示項目フィルター</div> <div class="ComponentsPage_Filter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> <div class="ComponentsPage_Filter__control"> <div class="ComponentsPage_Filter__item"> <viron-checkbox label="全て選択する" ischecked="{isAllSelected}" theme="ghost" onchange="{handleAllSelectChange}"></viron-checkbox> </div> </div> </div> <div class="ComponentsPage_Filter__body"> <div class="ComponentsPage_Filter__item" each="{column in columns}"> <viron-checkbox id="{column.key}" label="{column.description || column.key}" ischecked="{column.isSelected}" theme="ghost" onchange="{handleItemChange}"></viron-checkbox> </div> </div> <div class="ComponentsPage_Filter__tail"> <viron-button label="適用する" isdisabled="{isApplyButtonDisabled}" onselect="{handleApplyButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Filter ComponentsPage_Filter--{layoutType}"', function(opts) {
-    this.external(script$9);
 });
 
 var script$10 = function() {
@@ -31317,6 +31283,7 @@ var script$23 = function() {
     if (isUndefined(this.opts.val)) {
       options.push({
         label: '-- select an option --',
+        value: undefined,
         isSelected: true,
         isDiabled: true
       });
@@ -31325,6 +31292,7 @@ var script$23 = function() {
       options.push({
         id: `select_${idx}`,
         label: v,
+        value: v,
         isSelected: (v === this.opts.val)
       });
     });
@@ -32700,16 +32668,8 @@ var script$34 = function() {
   this.rowSize = 'rowSpreadSmall';
   switch (this.opts.def.style) {
   case 'chart':
-  case 'graph-bar':
-  case 'graph-horizontal-bar':
-  case 'graph-horizontal-stacked-bar':
-  case 'graph-line':
-  case 'graph-scatterplot':
-  case 'graph-stacked-area':
-  case 'graph-stacked-bar':
     this.cardType = 'chart';
-    //this.columnSize = 'columnSpreadSmall';
-    this.columnSize = 'columnSpreadFull';
+    this.columnSize = 'columnSpreadSmall';
     this.rowSize = 'rowSpreadMedium';
     break;
   case 'table':
