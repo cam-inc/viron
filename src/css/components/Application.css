@@ -100,6 +100,8 @@
   }
 
   &__page {
+    /* Chromeのバグ対応 DnDすると要素の横幅が0になる.. */
+    min-height: 101%;
     /* Safariのposition:stickyバグ対応 */
     padding-top: 24px;
   }

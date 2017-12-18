@@ -1,19 +1,25 @@
 .EndpointsPage_Endpoint {
-  @mixin hover {
-    border-color: var(--color-base-blue);
-  }
-  display: block;
-  padding: 24px;
-  overflow: hidden;
-  cursor: pointer;
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-base-gray);
-  border-radius: 6px;
+  @apply --layout-stretch-center;
   position: relative;
+  width: 100%;
+
+  &__content {
+    @mixin hover {
+      border-color: var(--color-base-blue);
+    }
+    display: block;
+    flex-grow: 1;
+    padding: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: var(--color-base-white);
+    border: 1px solid var(--color-base-gray);
+    border-radius: 6px;
+  }
 
   &__head {
     @apply --layout-center-center;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
   }
 
   &__thumbnail {
@@ -49,7 +55,7 @@
 
   &__name {
     @apply --text-truncate;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: bold;
   }
 
@@ -117,7 +123,7 @@
 
   &__description {
     @apply --text-truncate;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     font-size: 1.2rem;
     color: var(--color-base-gray);
   }
@@ -134,15 +140,38 @@
     }
   }
 
+  &__dropareaMarker {
+    flex-shrink: 0;
+    width: 0;
+    overflow: hidden;
+    background-color: var(--color-base-blue-secondary);
+    border-radius: 6px;
+    transition-duration: 300ms;
+    transition-property: width, margin;
+
+    &--active {
+      width: 144px;
+    }
+
+    &--prev&--active {
+      margin-right: 24px;
+    }
+
+    &--next&--active {
+      margin-left: 24px;
+    }
+  }
+
   &__droparea {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 50%;
-    background-color: var(--color-base-blue);
+
     &--prev {
       left: 0;
     }
+
     &--next {
       right: 0;
     }
