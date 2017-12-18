@@ -35293,6 +35293,96 @@ riot$1.tag2('viron-endpoints-page-endpoint-signin', '<div class="EndpointsPage_E
 var script$37 = function() {
   const store = this.riotx.get();
 
+  // 自身がドラッグされているか否か。
+  this.isSelfDragged = false;
+  // ドロップ待受中か否か。
+  this.isDragging = store.getter('application.isDragging');
+  // ドロップ可能な状態か否か。
+  this.isPrevDroppable = false;
+  this.isNextDroppable = false;
+
+  this.listen('application', () => {
+    this.isDragging = store.getter('application.isDragging');
+    this.update();
+  });
+
+  this.handleDragStart = e => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.opts.endpoint.key);
+    store.action('application.startDrag');
+    this.isSelfDragged = true;
+    this.update();
+  };
+
+  this.handleDrag = () => {
+    // 特に何もしない。
+  };
+
+  this.handleDragEnd = () => {
+    store.action('application.endDrag');
+    this.isSelfDragged = false;
+    this.update();
+  };
+
+  // ドラッグしている要素がドロップ領域に入った時の処理。
+  this.handlePrevDragEnter = e => {
+    e.preventDefault();
+    this.isPrevDroppable = true;
+    this.update();
+  };
+
+  // ドラッグしている要素がドロップ領域に入った時の処理。
+  this.handleNextDragEnter = e => {
+    e.preventDefault();
+    this.isNextDroppable = true;
+    this.update();
+  };
+
+  // ドラッグしている要素がドロップ領域にある間の処理。
+  this.handlePrevDragOver = e => {
+    e.preventDefault();
+  };
+
+  // ドラッグしている要素がドロップ領域にある間の処理。
+  this.handleNextDragOver = e => {
+    e.preventDefault();
+  };
+
+  // ドラッグしている要素がドロップ領域から出た時の処理。
+  this.handlePrevDragLeave = () => {
+    this.isPrevDroppable = false;
+    this.update();
+  };
+
+  // ドラッグしている要素がドロップ領域から出た時の処理。
+  this.handleNextDragLeave = () => {
+    this.isNextDroppable = false;
+    this.update();
+  };
+
+  const sortEndpoints = (e, newOrder) => {
+    const endpointKey = e.dataTransfer.getData('text/plain');
+    Promise
+      .resolve()
+      .then(() => store.action('endpoints.changeOrder', endpointKey, newOrder))
+      .catch(err => store.action('modals.add', 'viron-error', {
+        error: err
+      }));
+  };
+  // ドラッグしている要素がドロップ領域にドロップされた時の処理。
+  this.handlePrevDrop = e => {
+    this.isPrevDroppable = false;
+    this.update();
+    sortEndpoints(e, this.opts.endpoint.order);
+  };
+
+  // ドラッグしている要素がドロップ領域にドロップされた時の処理。
+  this.handleNextDrop = e => {
+    this.isNextDroppable = false;
+    this.update();
+    sortEndpoints(e, this.opts.endpoint.order + 1);
+  };
+
   this.handleTap = () => {
     // サインイン済みならばendpointページに遷移させる。
     // サインインしていなければ認証モーダルを表示する。
@@ -35332,7 +35422,7 @@ var script$37 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__head"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint__headContent"> <div class="EndpointsPage_Endpoint__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint__urlWrapper"> <div class="EndpointsPage_Endpoint__color EndpointsPage_Endpoint__color--{opts.endpoint.color || \'purple\'}"></div> <div class="EndpointsPage_Endpoint__url">{opts.endpoint.url}</div> </div> </div> <viron-icon-setting class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-setting> </div> <div class="EndpointsPage_Endpoint__body"> <div class="EndpointsPage_Endpoint__description">{!!opts.endpoint.thumbnail ? (opts.endpoint.description || \'-\') : \'ログインで管理画面情報を取得できます\'}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div> </div>', '', 'class="EndpointsPage_Endpoint" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--prev {\'EndpointsPage_Endpoint__dropareaMarker--active\': isPrevDroppable}"></div> <div class="EndpointsPage_Endpoint__content"> <div class="EndpointsPage_Endpoint__head"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint__headContent"> <div class="EndpointsPage_Endpoint__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint__urlWrapper"> <div class="EndpointsPage_Endpoint__color EndpointsPage_Endpoint__color--{opts.endpoint.color || \'purple\'}"></div> <div class="EndpointsPage_Endpoint__url">{opts.endpoint.url}</div> </div> </div> <viron-icon-setting class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-setting> </div> <div class="EndpointsPage_Endpoint__body"> <div class="EndpointsPage_Endpoint__description">{!!opts.endpoint.thumbnail ? (opts.endpoint.description || \'-\') : \'ログインで管理画面情報を取得できます\'}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div> </div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--prev" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handlePrevDragEnter}" ondragover="{handlePrevDragOver}" ondragleave="{handlePrevDragLeave}" ondrop="{handlePrevDrop}"></div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--next" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handleNextDragEnter}" ondragover="{handleNextDragOver}" ondragleave="{handleNextDragLeave}" ondrop="{handleNextDrop}"></div> </div> <div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--next {\'EndpointsPage_Endpoint__dropareaMarker--active\': isNextDroppable}"></div>', '', 'class="EndpointsPage_Endpoint" draggable="{opts.isdraggable}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$37);
 });
 
@@ -35343,6 +35433,8 @@ var script$45 = function() {
   this.isMobile = store.getter('layout.isMobile');
   this.layoutType = store.getter('layout.type');
   this.endpoints = store.getter('endpoints.allByOrderFiltered');
+  // エンドポイントカードがDnD可能な状態か否か。
+  this.isDraggable = this.isDesktop;
 
   this.listen('endpoints', () => {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
@@ -35352,15 +35444,17 @@ var script$45 = function() {
     this.isDesktop = store.getter('layout.isDesktop');
     this.isMobile = store.getter('layout.isMobile');
     this.layoutType = store.getter('layout.type');
+    this.isDraggable = this.isDesktop;
     this.update();
   });
 
   this.handleOrderButtonTap = () => {
-    // TODO: 並び替え
+    this.isDraggable = !this.isDraggable;
+    this.update();
   };
 };
 
-riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> <div class="EndpointsPage__orderButton" if="{isDesktop}" onclick="{getClickHandler(\'handleOrderButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOrderButtonTap\')}"> <viron-icon-move></viron-icon-move> </div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
+riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}" isdraggable="{parent.isDraggable}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
     this.external(script$45);
 });
 

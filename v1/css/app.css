@@ -749,6 +749,8 @@ select {
     grid-area: main;
   }
 .Application__page {
+    /* Chromeのバグ対応 DnDすると要素の横幅が0になる.. */
+    min-height: 101%;
     /* Safariのposition:stickyバグ対応 */
     padding-top: 24px;
   }
@@ -4149,31 +4151,39 @@ select {
     justify-content: center;
   }
 .EndpointsPage_Endpoint {
-  display: block;
-  padding: 24px;
-  overflow: hidden;
-  cursor: pointer;
-  background-color: #fff;
-  background-color: var(--color-base-white);
-  border: 1px solid #d1d1d1;
-  border: 1px solid var(--color-base-gray);
-  border-radius: 6px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  width: 100%;
 }
+.EndpointsPage_Endpoint__content {
+    display: block;
+    flex-grow: 1;
+    padding: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #fff;
+    background-color: var(--color-base-white);
+    border: 1px solid #d1d1d1;
+    border: 1px solid var(--color-base-gray);
+    border-radius: 6px;
+  }
 @media (hover: hover) {
-    .EndpointsPage_Endpoint:hover {
-    border-color: #627edf;
-    border-color: var(--color-base-blue);
+    .EndpointsPage_Endpoint__content:hover {
+      border-color: #627edf;
+      border-color: var(--color-base-blue);
     }
   }
-.EndpointsPage_Endpoint.hold {
-    border-color: #627edf;
-    border-color: var(--color-base-blue);
+.EndpointsPage_Endpoint__content.hold {
+      border-color: #627edf;
+      border-color: var(--color-base-blue);
   }
 .EndpointsPage_Endpoint__head {
   display: flex;
   align-items: center;
   justify-content: center;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
   }
 .EndpointsPage_Endpoint__thumbnail {
     flex-shrink: 0;
@@ -4209,7 +4219,7 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: bold;
   }
 .EndpointsPage_Endpoint__urlWrapper {
@@ -4279,7 +4289,7 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     font-size: 1.2rem;
     color: #d1d1d1;
     color: var(--color-base-gray);
@@ -4295,6 +4305,37 @@ select {
 .EndpointsPage_Endpoint__tags .Tag:last-child {
         margin-right: 0;
       }
+.EndpointsPage_Endpoint__dropareaMarker {
+    flex-shrink: 0;
+    width: 0;
+    overflow: hidden;
+    background-color: #c0cbf2;
+    background-color: var(--color-base-blue-secondary);
+    border-radius: 6px;
+    transition-duration: 300ms;
+    transition-property: width, margin;
+  }
+.EndpointsPage_Endpoint__dropareaMarker--active {
+      width: 144px;
+    }
+.EndpointsPage_Endpoint__dropareaMarker--prev.EndpointsPage_Endpoint__dropareaMarker--active {
+      margin-right: 24px;
+    }
+.EndpointsPage_Endpoint__dropareaMarker--next.EndpointsPage_Endpoint__dropareaMarker--active {
+      margin-left: 24px;
+    }
+.EndpointsPage_Endpoint__droparea {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+  }
+.EndpointsPage_Endpoint__droparea--prev {
+      left: 0;
+    }
+.EndpointsPage_Endpoint__droparea--next {
+      right: 0;
+    }
 .EndpointsPage_Endpoint_Menu {
   display: block;
   padding: 0 18px;
