@@ -2917,9 +2917,9 @@ select {
       border-color: var(--color-base-blue);
     }
 .Textarea__input--break {
-  word-break: break-all;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+      word-break: break-word;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
       white-space: pre-wrap;
     }
 .Textarea__blocker {
