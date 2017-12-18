@@ -67,7 +67,7 @@ export default function() {
       }
       const suffix = split[split.length - 1];
       // 画像系チェック。
-      if (contains(['png', 'jpg', 'gif'], suffix)) {
+      if (contains(['png', 'jpg', 'jpeg', 'gif'], suffix)) {
         this.isImage = true;
         return data;
       }
