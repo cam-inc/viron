@@ -5,6 +5,8 @@ export default function() {
   this.isMobile = store.getter('layout.isMobile');
   this.layoutType = store.getter('layout.type');
   this.endpoints = store.getter('endpoints.allByOrderFiltered');
+  // エンドポイントカードがDnD可能な状態か否か。
+  this.isDraggable = true;
 
   this.listen('endpoints', () => {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
@@ -18,6 +20,7 @@ export default function() {
   });
 
   this.handleOrderButtonTap = () => {
-    // TODO: 並び替え
+    this.isDraggable = !this.isDraggable;
+    this.update();
   };
 }

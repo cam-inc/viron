@@ -9,6 +9,7 @@
   background-color: var(--color-base-white);
   border: 1px solid var(--color-base-gray);
   border-radius: 6px;
+  position: relative;
 
   &__head {
     @apply --layout-center-center;
@@ -130,6 +131,20 @@
       &:last-child {
         margin-right: 0;
       }
+    }
+  }
+
+  &__droparea {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background-color: var(--color-base-blue);
+    &--prev {
+      left: 0;
+    }
+    &--next {
+      right: 0;
     }
   }
 }

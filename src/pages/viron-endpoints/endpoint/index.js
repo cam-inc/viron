@@ -5,6 +5,36 @@ import './signin/index.tag';
 export default function() {
   const store = this.riotx.get();
 
+  // 自身がドラッグされているか否か。
+  this.isDragging = false;
+  // ドロップ待受中か否か。
+  this.isWatching = store.getter('application.isDragging');
+  // ドロップ可能な状態か否か。
+  this.isDroppable = false;
+
+  this.listen('application', () => {
+    this.isWatching = store.getter('application.isDragging');
+    this.update();
+  });
+
+  this.handleDragStart = e => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.opts.endpoint.key);
+    store.action('application.startDrag');
+    this.isDragging = true;
+    this.update();
+  };
+
+  this.handleDrag = () => {
+    // 特に何もしない。
+  };
+
+  this.handleDragEnd = e => {
+    store.action('application.endDrag');
+    this.isDragging = false;
+    this.update();
+  };
+
   this.handleTap = () => {
     // サインイン済みならばendpointページに遷移させる。
     // サインインしていなければ認証モーダルを表示する。

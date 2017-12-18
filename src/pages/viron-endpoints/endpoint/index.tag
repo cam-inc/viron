@@ -1,4 +1,4 @@
-viron-endpoints-page-endpoint.EndpointsPage_Endpoint(onTap="{ handleTap }")
+viron-endpoints-page-endpoint.EndpointsPage_Endpoint(draggable="{ opts.isdraggable }" onDragStart="{ handleDragStart }" onDrag="{ handleDrag }" onDragEnd="{ handleDragEnd }" onTap="{ handleTap }")
   .EndpointsPage_Endpoint__head
     virtual(if="{ !!opts.endpoint.thumbnail }")
       .EndpointsPage_Endpoint__thumbnail(style="background-image:url({ opts.endpoint.thumbnail });")
@@ -17,6 +17,8 @@ viron-endpoints-page-endpoint.EndpointsPage_Endpoint(onTap="{ handleTap }")
     .EndpointsPage_Endpoint__description { !!opts.endpoint.thumbnail ? (opts.endpoint.description || '-') : 'ログインで管理画面情報を取得できます' }
     .EndpointsPage_Endpoint__tags
       viron-tag(each="{ tag in opts.endpoint.tags }" label="{ tag }")
+  .EndpointsPage_Endpoint__droparea.EndpointsPage_Endpoint__droparea--prev(if="{ isWatching }")
+  .EndpointsPage_Endpoint__droparea.EndpointsPage_Endpoint__droparea--next(if="{ isWatching }")
 
   script.
     import '../../../components/viron-tag/index.tag';
