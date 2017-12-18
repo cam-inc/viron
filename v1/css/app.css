@@ -1251,6 +1251,7 @@ select {
     right: 0;
     left: 0;
     height: 4px;
+    overflow: hidden;
     background-color: #d1d1d1;
     background-color: var(--color-base-gray);
     opacity: 0;
