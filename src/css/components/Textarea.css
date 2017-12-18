@@ -22,6 +22,11 @@
     &:focus {
       border-color: var(--color-base-blue);
     }
+
+    &--break {
+      @apply --text-break;
+      white-space: pre-wrap;
+    }
   }
 
   &__blocker {

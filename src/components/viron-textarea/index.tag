@@ -4,7 +4,7 @@ viron-textarea.Textarea(class="{ 'Textarea--disabled': opts.isdisabled, 'Textare
     virtual(if="{ !opts.ispreview }")
       textarea.Textarea__input(ref="input" value="{ normalizeValue(opts.val) }" placeholder="{ opts.placeholder }" disabled="{ !!opts.isdisabled }" onInput="{ handleTextareaInput }" onChange="{ handleTextareaChange }" onFocus="{ handleTextareaFocus }" onBlur="{ handleTextareaBlur }")
     virtual(if="{ opts.ispreview }")
-      .Textarea__input { normalizeValue(opts.val) }
+      pre.Textarea__input.Textarea__input--break { normalizeValue(opts.val) }
   .Textarea__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
 
   script.
