@@ -5,7 +5,7 @@ import './core/polyfill';
 import router from './core/router';
 import store from './store';
 import './viron/index.tag';
-import './components/atoms/viron-message/index.tag';
+import './components/viron-error/index.tag';
 
 // エントリーポイント。
 window.addEventListener('load', () => {
@@ -29,7 +29,7 @@ window.addEventListener('load', () => {
       mainStore.action('ua.setup')
     ]))
     .then(() => router.init(mainStore))
-    .catch(err => mainStore.action('modals.add', 'viron-message', {
+    .catch(err => mainStore.action('modals.add', 'viron-error', {
       message: 'Viron起動に失敗しました。Viron担当者にお問い合わせ下さい。',
       error: err
     }));

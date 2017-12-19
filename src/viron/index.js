@@ -1,5 +1,4 @@
 import throttle from 'mout/function/throttle';
-import '../components/atoms/viron-message/index.tag';
 
 export default function() {
   const store = this.riotx.get();
