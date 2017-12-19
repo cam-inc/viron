@@ -48,6 +48,14 @@
       width: 16px;
       height: 16px;
     }
+
+    &--active {
+      background-color: var(--color-base-blue);
+
+      & .Icon {
+        color: var(--color-base-white);
+      }
+    }
   }
 
   &__container {

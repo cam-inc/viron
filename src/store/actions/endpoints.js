@@ -22,6 +22,7 @@ export default exporter('endpoints', {
         // 401以外 = endpointが存在しない。
         const key = shortid.generate();
         const newEndpoint = {
+          key,
           url: url,
           token: null,
           title: '',
@@ -104,6 +105,7 @@ export default exporter('endpoints', {
       .resolve()
       .then(() => {
         const key = shortid.generate();
+        endpoint.key = key;
         context.commit('endpoints.add', key, endpoint);
       });
   },
@@ -134,6 +136,19 @@ export default exporter('endpoints', {
       .resolve()
       .then(() => {
         context.commit('endpoints.changeOrder', endpointKey, newOrder);
+      });
+  },
+
+  /**
+   * ゴミとなるエンドポイントを削除します。
+   * @param {riotx.Context} context
+   * @return {Promise}
+   */
+  cleanup: context => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('endpoints.cleanup');
       });
   }
 });

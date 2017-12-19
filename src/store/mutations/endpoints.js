@@ -1,6 +1,7 @@
 import forEach from 'mout/array/forEach';
 import sortBy from 'mout/array/sortBy';
 import isNumber from 'mout/lang/isNumber';
+import isObject from 'mout/lang/isObject';
 import forOwn from 'mout/object/forOwn';
 import find from 'mout/object/find';
 import ObjectAssign from 'object-assign';
@@ -95,7 +96,7 @@ export default exporter('endpoints', {
     const version = state.application.version;
     const endpoints = state.endpoints[version];
     if (!endpoint) {
-      endpoints[endpointKey] = null;
+      delete endpoints[endpointKey];
     } else {
       endpoints[endpointKey] = ObjectAssign({}, endpoints[endpointKey], endpoint);
     }
@@ -137,6 +138,7 @@ export default exporter('endpoints', {
 
       if (!duplicatedEndpoint) {
         const key = shortid.generate();
+        endpoint.key = key;
         modifiedEndpoints[key] = endpoint;
       } else {
         ObjectAssign(duplicatedEndpoint, endpoint);
@@ -177,6 +179,24 @@ export default exporter('endpoints', {
     // x番目とx+1番目の中間に配置するために0.5をマイナスしている。
     newEndpoints[endpointKey].order = newOrder - 0.5;
     newEndpoints = putEndpointsInOrder(newEndpoints);
+    state.endpoints[version] = newEndpoints;
+    storage.set('endpoints', state.endpoints);
+    return ['endpoints'];
+  },
+
+  /**
+   * ゴミとなるendpointが存在する場合は削除します。
+   * @param {Object} state
+   * @return {Array}
+   */
+  cleanup: state => {
+    const version = state.application.version;
+    let newEndpoints = ObjectAssign({}, state.endpoints[version]);
+    forOwn(newEndpoints, endpoint => {
+      if (!isObject(endpoint)) {
+        delete newEndpoints[endpoint.key];
+      }
+    });
     state.endpoints[version] = newEndpoints;
     storage.set('endpoints', state.endpoints);
     return ['endpoints'];

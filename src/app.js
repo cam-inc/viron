@@ -23,6 +23,7 @@ window.addEventListener('load', () => {
     .then(() => {
       riot.mount('viron');
     })
+    .then(() => mainStore.action('endpoints.cleanup'))
     .then(() => Promise.all([
       mainStore.action('endpoints.tidyUpOrder'),
       mainStore.action('ua.setup')
