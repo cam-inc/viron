@@ -2023,6 +2023,8 @@ select {
 .Numberinput {
   position: relative;
   display: block;
+  color: #484848;
+  color: var(--color-base-black);
 }
 .Numberinput__label {
     margin-bottom: 4px;
@@ -2085,6 +2087,15 @@ select {
       background-color: var(--color-base-gray-tertiary);
       border-color: #d1d1d1;
       border-color: var(--color-base-gray);
+    }
+.Numberinput--ghost {
+    color: #fff;
+    color: var(--color-base-white);
+  }
+.Numberinput--ghost .Numberinput__input {
+      color: #fff;
+      color: var(--color-base-white);
+      background-color: transparent;
     }
 .Pagination {
   display: block;
@@ -3229,17 +3240,61 @@ select {
 .ComponentsPage {
   display: block;
 }
+.ComponentsPage__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  }
+.ComponentsPage--desktop .ComponentsPage__head {
+    margin-bottom: 24px;
+  }
+.ComponentsPage--mobile .ComponentsPage__head {
+    margin-bottom: 8px;
+  }
 .ComponentsPage__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    flex-grow: 1;
     font-weight: bold;
   }
 .ComponentsPage--desktop .ComponentsPage__name {
-    margin-bottom: 24px;
     font-size: 2.8rem;
   }
 .ComponentsPage--mobile .ComponentsPage__name {
-    margin-bottom: 8px;
     font-size: 1.4rem;
   }
+.ComponentsPage__control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    flex-shrink: 0;
+  }
+.ComponentsPage__crossSearch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .ComponentsPage__crossSearch:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.ComponentsPage__crossSearch.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
+.ComponentsPage__crossSearch--active {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+.ComponentsPage__crossSearch .Icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
 .ComponentsPage__container {
     display: -ms-grid;
     display: grid;

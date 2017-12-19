@@ -14003,29 +14003,6 @@ var application$1 = exporter$1('application', {
 });
 
 /**
-     * Array filter
-     */
-    function filter$2(arr, callback, thisObj) {
-        callback = makeIterator_$1(callback, thisObj);
-        var results = [];
-        if (arr == null) {
-            return results;
-        }
-
-        var i = -1, len = arr.length, value;
-        while (++i < len) {
-            value = arr[i];
-            if (callback(value, i, arr)) {
-                results.push(value);
-            }
-        }
-
-        return results;
-    }
-
-    var filter_1$1 = filter$2;
-
-/**
      * Returns the index of the first item that matches criteria
      */
     function findIndex$1(arr, iterator, thisObj){
@@ -14170,6 +14147,29 @@ var application$1 = exporter$1('application', {
     var sortBy_1$1 = sortBy$1;
 
 /**
+     * Array filter
+     */
+    function filter$2(arr, callback, thisObj) {
+        callback = makeIterator_$1(callback, thisObj);
+        var results = [];
+        if (arr == null) {
+            return results;
+        }
+
+        var i = -1, len = arr.length, value;
+        while (++i < len) {
+            value = arr[i];
+            if (callback(value, i, arr)) {
+                results.push(value);
+            }
+        }
+
+        return results;
+    }
+
+    var filter_1$1 = filter$2;
+
+/**
      * @return {array} Array of unique items
      */
     function unique$1(arr, compare){
@@ -14197,19 +14197,6 @@ var application$1 = exporter$1('application', {
         return isKind_1$1(val, 'Number');
     }
     var isNumber_1 = isNumber;
-
-/**
-     * Get object keys
-     */
-     var keys$1 = Object.keys || function (obj) {
-            var keys = [];
-            forOwn_1$2(obj, function(val, key){
-                keys.push(key);
-            });
-            return keys;
-        };
-
-    var keys_1$1 = keys$1;
 
 var components$1 = exporter$1('components', {
   /**
@@ -14385,151 +14372,31 @@ var components$1 = exporter$1('components', {
   },
 
   /**
-   * 指定componentIDに対する要素のschemaObjectを返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Object}
-   */
-  _schemaObject: (state, componentId) => {
-    return state.components[componentId].schemaObject;
-  },
-
-  /**
-   * 指定componentIDに対する要素のparamterObject群を返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Array}
-   */
-  _parameterObjects: (state, componentId) => {
-    return state.components[componentId].parameterObjects;
-  },
-
-  /**
-   * 全てののparamterObject群を返します。
+   * 横断検索用のParameterObject群を返します。
    * @param {Object} state
    * @return {Array}
    */
-  _parameterObjectsEntirely: state => {
-    let entireParameterObjects = [];
-    const weights = {};
+  parameterObjectsForCrossSearch: state => {
+    let parameterObjects = [];
     forOwn_1$2(state.components, component => {
-      entireParameterObjects = entireParameterObjects.concat(component.parameterObjects || []);
+      parameterObjects = parameterObjects.concat(component.searchParameters || []);
     });
-    entireParameterObjects = map_1$1(entireParameterObjects, entireParameterObject => {
-      const name = entireParameterObject.name;
+    const weights = {};
+    parameterObjects = map_1$1(parameterObjects, parameterObject => {
+      const name = parameterObject.name;
       weights[name] || (weights[name] = 0);
       weights[name] = weights[name] + 1;
-      return objectAssign({}, entireParameterObject);
+      return objectAssign({}, parameterObject);
     });
-    entireParameterObjects = unique_1$1(entireParameterObjects, (a, b) => {
+    parameterObjects = unique_1$1(parameterObjects, (a, b) => {
       return (a.name === b.name);
     });
-    forEach_1$2(entireParameterObjects, entireParameterObject => {
-      entireParameterObject.weight = weights[entireParameterObject.name];
+    parameterObjects = sortBy_1$1(parameterObjects, parameterObject => {
+      return weights[parameterObject.name] * (-1);
     });
-    entireParameterObjects = sortBy_1$1(entireParameterObjects, entireParameterObject => {
-      return weights[entireParameterObject.name] * (-1);
-    });
-    return entireParameterObjects;
-  },
-
-  /**
-   * action(operationObject)群を返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Array}
-   */
-  _actions: (state, riotId) => {
-    return map_1$1(state.components[riotId].actions, action => {
-      return action.operationObject;
-    });
-  },
-
-  /**
-   * 自身に関連するaction(operationObject)群を返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Array}
-   */
-  _selfActions: (state, riotId) => {
-    const actions = state.components[riotId].actions;
-    const selfActions = filter_1$1(actions, action => {
-      return (!action.appendTo || action.appendTo === 'self');
-    });
-    return map_1$1(selfActions, action => {
-      return action.operationObject;
-    });
-  },
-
-  /**
-   * テーブル行に関連するaction(operationObject)群を返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Array}
-   */
-  _rowActions: (state, riotId) => {
-    const actions = state.components[riotId].actions;
-    const selfActions = filter_1$1(actions, action => {
-      return (action.appendTo === 'row');
-    });
-    return map_1$1(selfActions, action => {
-      return action.operationObject;
-    });
-  },
-
-  /**
-   * 指定riotIDに対する要素のページング機能ON/OFFを返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Boolean}
-   */
-  _hasPagination: (state, riotId) => {
-    return state.components[riotId].hasPagination;
-  },
-
-  /**
-   * 指定riotIDに対する要素のページング情報を返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Object}
-   */
-  _pagination: (state, riotId) => {
-    return state.components[riotId].pagination;
-  },
-
-  /**
-   * テーブル行のラベルに使用するkey群を返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Array}
-   */
-  _tableLabels: (state, riotId) => {
-    return state.components[riotId].table_labels || [];
-  },
-
-  /**
-   * テーブル列のキー群を返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {Array}
-   */
-  _tableColumns: (state, riotId) => {
-    const response = state.components[riotId].response;
-    if (!isArray_1$1(response) || !response.length) {
-      return [];
-    }
-    return keys_1$1(response[0]);
-  },
-
-  /**
-   * テーブル行に使用するprimaryキーを返します。
-   * @param {Object} state
-   * @param {String} riotId
-   * @return {String|null}
-   */
-  _primaryKey: (state, riotId) => {
-    return state.components[riotId].primaryKey || null;
+    return parameterObjects;
   }
+
 });
 
 var current$1 = exporter$1('current', {
@@ -16861,6 +16728,9 @@ var store = {
   }
 };
 
+riot$1.tag2('viron-icon-search', '<svg viewbox="-3434 14059.999 15.999 16.003"> <path d="M3710.818-13811.056l-3.051-3.05a6.957,6.957,0,0,1-3.768,1.1,7.008,7.008,0,0,1-7-7,7.008,7.008,0,0,1,7-7,7.008,7.008,0,0,1,7,7,6.957,6.957,0,0,1-1.107,3.773l3.051,3.049a.205.205,0,0,1,0,.284l-1.839,1.839a.206.206,0,0,1-.142.058A.206.206,0,0,1,3710.818-13811.056ZM3700-13820a4,4,0,0,0,4,4,4,4,0,0,0,4-4,4,4,0,0,0-4-4A4,4,0,0,0,3700-13820Z" transform="translate(-7131 27887)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSearch {opts.class}"', function(opts) {
+});
+
 riot$1.tag2('viron-icon-reload', '<svg viewbox="-1791 11377 14.063 16"> <path d="M43.991,5.189a.469.469,0,0,0-.679-.126L41.791,6.2a.469.469,0,0,0-.123.613,4.082,4.082,0,0,1,.582,2.09,4.219,4.219,0,1,1-8.437,0,4.224,4.224,0,0,1,3.75-4.193v1.38a.469.469,0,0,0,.75.375l3.75-2.812a.469.469,0,0,0,0-.75L38.312.094a.469.469,0,0,0-.75.375V1.891a7.049,7.049,0,1,0,6.428,3.3Z" transform="translate(-1822 11377)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconReload {opts.class}"', function(opts) {
 });
 
@@ -18246,9 +18116,6 @@ riot$1.tag2('viron-icon-filter', '<svg viewbox="-1832 11377 16.002 16"> <g trans
 });
 
 riot$1.tag2('viron-icon-plus', '<svg viewbox="-2612 10790 16 16"> <g transform="translate(-3874 10766)"> <rect width="16" height="3" rx="0.2" transform="translate(1262 30.5)"></rect> <rect width="16" height="3" rx="0.2" transform="translate(1271.5 24) rotate(90)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconPlus {opts.class}"', function(opts) {
-});
-
-riot$1.tag2('viron-icon-search', '<svg viewbox="-3434 14059.999 15.999 16.003"> <path d="M3710.818-13811.056l-3.051-3.05a6.957,6.957,0,0,1-3.768,1.1,7.008,7.008,0,0,1-7-7,7.008,7.008,0,0,1,7-7,7.008,7.008,0,0,1,7,7,6.957,6.957,0,0,1-1.107,3.773l3.051,3.049a.205.205,0,0,1,0,.284l-1.839,1.839a.206.206,0,0,1-.142.058A.206.206,0,0,1,3710.818-13811.056ZM3700-13820a4,4,0,0,0,4,4,4,4,0,0,0,4-4,4,4,0,0,0-4-4A4,4,0,0,0,3700-13820Z" transform="translate(-7131 27887)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSearch {opts.class}"', function(opts) {
 });
 
 riot$1.tag2('viron-icon-setting', '<svg viewbox="-3464 14060 16 16.001"> <path d="M15.953,7.112a.521.521,0,0,0-.514-.394,1.767,1.767,0,0,1-1.209-3.075.444.444,0,0,0,.049-.6A7.916,7.916,0,0,0,13.01,1.76a.445.445,0,0,0-.608.049,1.844,1.844,0,0,1-2,.448A1.777,1.777,0,0,1,9.327.521.444.444,0,0,0,8.934.053a7.987,7.987,0,0,0-1.8,0,.445.445,0,0,0-.4.458,1.78,1.78,0,0,1-1.1,1.707,1.849,1.849,0,0,1-1.98-.451.446.446,0,0,0-.6-.051,7.946,7.946,0,0,0-1.294,1.28.445.445,0,0,0,.048.608,1.773,1.773,0,0,1,.447,2A1.85,1.85,0,0,1,.518,6.677a.435.435,0,0,0-.462.393,8.014,8.014,0,0,0,0,1.819.529.529,0,0,0,.525.393,1.755,1.755,0,0,1,1.646,1.1,1.779,1.779,0,0,1-.447,1.978.445.445,0,0,0-.049.6,7.945,7.945,0,0,0,1.266,1.28.445.445,0,0,0,.609-.048A1.841,1.841,0,0,1,5.6,13.743,1.774,1.774,0,0,1,6.679,15.48a.444.444,0,0,0,.393.467,7.962,7.962,0,0,0,1.8,0,.445.445,0,0,0,.4-.458,1.778,1.778,0,0,1,1.095-1.706,1.846,1.846,0,0,1,1.981.451.447.447,0,0,0,.6.05,7.965,7.965,0,0,0,1.294-1.28.444.444,0,0,0-.048-.608,1.773,1.773,0,0,1-.448-2,1.791,1.791,0,0,1,1.637-1.085l.1,0a.445.445,0,0,0,.468-.392A8.007,8.007,0,0,0,15.953,7.112ZM8.015,10.686a2.669,2.669,0,1,1,2.668-2.669A2.671,2.671,0,0,1,8.015,10.686Z" transform="translate(-3464.003 14060)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSetting {opts.class}"', function(opts) {
@@ -24985,7 +24852,7 @@ var script$16 = function() {
   };
 };
 
-riot$1.tag2('viron-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Numberinput__input" ref="input" type="text" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <div class="Numberinput__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Numberinput {\'Numberinput--disabled\': opts.isdisabled, \'Numberinput--error\': opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Numberinput__input" ref="input" type="text" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <div class="Numberinput__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Numberinput {\'Numberinput--disabled\': opts.isdisabled, \'Numberinput--error\': opts.iserror} Numberinput--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$16);
 });
 
@@ -26207,12 +26074,12 @@ function Locale(config) {
     }
 }
 
-var keys$3;
+var keys$1;
 
 if (Object.keys) {
-    keys$3 = Object.keys;
+    keys$1 = Object.keys;
 } else {
-    keys$3 = function (obj) {
+    keys$1 = function (obj) {
         var i, res = [];
         for (i in obj) {
             if (hasOwnProp(obj, i)) {
@@ -27780,7 +27647,7 @@ function getLocale (key) {
 }
 
 function listLocales() {
-    return keys$3(locales);
+    return keys$1(locales);
 }
 
 function checkOverflow (m) {
@@ -31666,6 +31533,19 @@ riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__h
     }
     var append_1$1 = append$1;
 
+/**
+     * Get object keys
+     */
+     var keys$2 = Object.keys || function (obj) {
+            var keys = [];
+            forOwn_1$2(obj, function(val, key){
+                keys.push(key);
+            });
+            return keys;
+        };
+
+    var keys_1$1 = keys$2;
+
 var script$25 = function() {
   const schemaObject = this.schemaObject = this.opts.schemaobject;
   const itemsObject = this.opts.schemaobject.items;
@@ -32487,7 +32367,12 @@ var script$6 = function() {
   this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
   // 検索クエリ群。
   this.searchQueries = {};
-  this.hasSearchQueries = false;
+  forOwn_1$2(this.opts.crosssearchqueries, (value, key) => {
+    if (!isUndefined(value)) {
+      this.searchQueries[key] = value;
+    }
+  });
+  this.hasSearchQueries = !!size_1(this.searchQueries);
   // 自動更新間隔。
   this.autoRefreshSec = null;
   let autoRefreshIntervalId = null;
@@ -32541,8 +32426,36 @@ var script$6 = function() {
     });
   };
 
+  let prevCrossSearchQueries = objectAssign(this.opts.crosssearchqueries);
   this.on('mount', () => {
     getData();
+  }).on('updated', () => {
+    const newCrossSearchQueries = this.opts.crosssearchqueries;
+    let isCrossSearchQueriesChanged = false;
+    // 値が一つでも違ったらtrue。
+    forOwn_1$2(newCrossSearchQueries, (value, key) => {
+      if (value !== prevCrossSearchQueries[key]) {
+        isCrossSearchQueriesChanged = true;
+      }
+    });
+    // 長さが違ってもtrue。
+    if (size_1(newCrossSearchQueries) !== size_1(prevCrossSearchQueries)) {
+      isCrossSearchQueriesChanged = true;
+    }
+    // 変更があればデータ更新。
+    if (isCrossSearchQueriesChanged) {
+      forOwn_1$2(newCrossSearchQueries, (value, key) => {
+        if (!isUndefined(value)) {
+          this.searchQueries[key] = value;
+        } else {
+          delete this.searchQueries[key];
+        }
+      });
+      this.hasSearchQueries = !!size_1(this.searchQueries);
+      getData();
+    }
+    // 次回更新用にストック。
+    prevCrossSearchQueries = objectAssign({}, this.opts.crosssearchqueries);
   }).on('unmount', () => {
     inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
@@ -32687,7 +32600,7 @@ var script$34 = function() {
   }
 };
 
-riot$1.tag2('viron-components-page-card', '<div data-is="viron-components-page-{cardType}" id="{componentId}" def="{opts.def}"></div>', '', 'class="ComponentsPage_Card ComponentsPage_Card--{columnSize} ComponentsPage_Card--{rowSize}"', function(opts) {
+riot$1.tag2('viron-components-page-card', '<div data-is="viron-components-page-{cardType}" id="{componentId}" def="{opts.def}" crosssearchqueries="{opts.crosssearchqueries}"></div>', '', 'class="ComponentsPage_Card ComponentsPage_Card--{columnSize} ComponentsPage_Card--{rowSize}"', function(opts) {
     this.external(script$34);
 });
 
@@ -32697,18 +32610,57 @@ var script$35 = function() {
   this.name = store.getter('page.name');
   this.components = store.getter('page.components');
   this.layoutType = store.getter('layout.type');
+  this.isDesktop = store.getter('layout.isDesktop');
+  this.parameterObjectsForCrossSearch = store.getter('components.parameterObjectsForCrossSearch');
+  this.isCrossSearchEnabled = (this.parameterObjectsForCrossSearch.length >= 2);
+  this.crossSearchQueries = {};
+  this.hasCrossSearchQueries = false;
   this.listen('page', () => {
     this.name = store.getter('page.name');
     this.components = store.getter('page.components');
+    // ページが変わったタイミングでリセットする。
+    this.crossSearchQueries = {};
+    this.hasCrossSearchQueries = false;
     this.update();
   });
   this.listen('layout', () => {
     this.layoutType = store.getter('layout.type');
+    this.isDesktop = store.getter('layout.isDesktop');
     this.update();
   });
+  this.listen('components', () => {
+    this.parameterObjectsForCrossSearch = store.getter('components.parameterObjectsForCrossSearch');
+    this.isCrossSearchEnabled = (this.parameterObjectsForCrossSearch.length >= 2);
+    this.update();
+  });
+
+  /**
+   * GET /vironに定義された情報を元に、対象となるクエリを横断検索クエリから抽出します。
+   * @param {Object} def
+   * @return {Object}
+   */
+  this.getCrossSearchQueriesByDef = def => {
+    const ret = {};
+    forEach_1$2(def.query, query => {
+      ret[query.key] = this.crossSearchQueries[query.key];
+    });
+    return ret;
+  };
+
+  this.handleCrossSearchTap = () => {
+    store.action('drawers.add', 'viron-components-page-search', {
+      parameterObjects: this.parameterObjectsForCrossSearch,
+      initialVal: this.crossSearchQueries,
+      onSearch: newSearchQueries => {
+        this.crossSearchQueries = newSearchQueries;
+        this.hasCrossSearchQueries = !!size_1(newSearchQueries);
+        this.update();
+      }
+    }, { isNarrow: true });
+  };
 };
 
-riot$1.tag2('viron-components-page', '<div class="ComponentsPage__name">{name}</div> <div class="ComponentsPage__container"> <viron-components-page-card each="{component in components}" def="{component}"></viron-components-page-card> </div>', '', 'class="ComponentsPage ComponentsPage--{layoutType}"', function(opts) {
+riot$1.tag2('viron-components-page', '<div class="ComponentsPage__head"> <div class="ComponentsPage__name">{name}</div> <div class="ComponentsPage__control" if="{isDesktop}"> <div class="ComponentsPage__crossSearch {\'ComponentsPage__crossSearch--active\': hasCrossSearchQueries}" if="{isCrossSearchEnabled}" onclick="{getClickHandler(\'handleCrossSearchTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCrossSearchTap\')}"> <viron-icon-search></viron-icon-search> <div>全体検索</div> </div> </div> </div> <div class="ComponentsPage__container"> <viron-components-page-card each="{component in components}" def="{component}" crosssearchqueries="{parent.getCrossSearchQueriesByDef(component)}"></viron-components-page-card> </div>', '', 'class="ComponentsPage ComponentsPage--{layoutType}"', function(opts) {
     this.external(script$35);
 });
 
@@ -35434,7 +35386,7 @@ var script$45 = function() {
   this.layoutType = store.getter('layout.type');
   this.endpoints = store.getter('endpoints.allByOrderFiltered');
   // エンドポイントカードがDnD可能な状態か否か。
-  this.isDraggable = this.isDesktop;
+  this.isDraggable = false;
 
   this.listen('endpoints', () => {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
@@ -35444,17 +35396,22 @@ var script$45 = function() {
     this.isDesktop = store.getter('layout.isDesktop');
     this.isMobile = store.getter('layout.isMobile');
     this.layoutType = store.getter('layout.type');
-    this.isDraggable = this.isDesktop;
+    if (!this.isDesktop) {
+      this.isDraggable = false;
+    }
     this.update();
   });
 
   this.handleOrderButtonTap = () => {
+    if (!this.isDesktop) {
+      return;
+    }
     this.isDraggable = !this.isDraggable;
     this.update();
   };
 };
 
-riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}" isdraggable="{parent.isDraggable}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
+riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> <div class="EndpointsPage__orderButton" if="{isDesktop}" onclick="{getClickHandler(\'handleOrderButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOrderButtonTap\')}"> <viron-icon-move if="{!isDraggable}"></viron-icon-move> <viron-icon-check if="{isDraggable}"></viron-icon-check> </div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}" isdraggable="{parent.isDraggable}"></viron-endpoints-page-endpoint> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
     this.external(script$45);
 });
 
