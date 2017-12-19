@@ -6,7 +6,7 @@ viron-components-page.ComponentsPage(class="ComponentsPage--{ layoutType }")
         viron-icon-search
         div 全体検索
   .ComponentsPage__container
-    viron-components-page-card(each="{ component in components }" def="{ component }")
+    viron-components-page-card(each="{ component in components }" def="{ component }" crossSearchQueries="{ parent.getCrossSearchQueriesByDef(component) }")
 
   script.
     import '../../components/icons/viron-icon-search/index.tag';

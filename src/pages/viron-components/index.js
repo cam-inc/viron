@@ -1,3 +1,4 @@
+import forEach from 'mout/array/forEach';
 import size from 'mout/object/size';
 import './search/index.tag';
 
@@ -30,6 +31,19 @@ export default function() {
     this.isCrossSearchEnabled = (this.parameterObjectsForCrossSearch.length >= 2);
     this.update();
   });
+
+  /**
+   * GET /vironに定義された情報を元に、対象となるクエリを横断検索クエリから抽出します。
+   * @param {Object} def
+   * @return {Object}
+   */
+  this.getCrossSearchQueriesByDef = def => {
+    const ret = {};
+    forEach(def.query, query => {
+      ret[query.key] = this.crossSearchQueries[query.key];
+    });
+    return ret;
+  };
 
   this.handleCrossSearchTap = () => {
     store.action('drawers.add', 'viron-components-page-search', {

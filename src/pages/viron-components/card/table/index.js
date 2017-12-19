@@ -154,7 +154,12 @@ export default function() {
   this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
   // 検索クエリ群。
   this.searchQueries = {};
-  this.hasSearchQueries = false;
+  forOwn(this.opts.crosssearchqueries, (value, key) => {
+    if (!isUndefined(value)) {
+      this.searchQueries[key] = value;
+    }
+  });
+  this.hasSearchQueries = !!size(this.searchQueries);
   // 自動更新間隔。
   this.autoRefreshSec = null;
   let autoRefreshIntervalId = null;
@@ -208,8 +213,36 @@ export default function() {
     });
   };
 
+  let prevCrossSearchQueries = ObjectAssign(this.opts.crosssearchqueries);
   this.on('mount', () => {
     getData();
+  }).on('updated', () => {
+    const newCrossSearchQueries = this.opts.crosssearchqueries;
+    let isCrossSearchQueriesChanged = false;
+    // 値が一つでも違ったらtrue。
+    forOwn(newCrossSearchQueries, (value, key) => {
+      if (value !== prevCrossSearchQueries[key]) {
+        isCrossSearchQueriesChanged = true;
+      }
+    });
+    // 長さが違ってもtrue。
+    if (size(newCrossSearchQueries) !== size(prevCrossSearchQueries)) {
+      isCrossSearchQueriesChanged = true;
+    }
+    // 変更があればデータ更新。
+    if (isCrossSearchQueriesChanged) {
+      forOwn(newCrossSearchQueries, (value, key) => {
+        if (!isUndefined(value)) {
+          this.searchQueries[key] = value;
+        } else {
+          delete this.searchQueries[key];
+        }
+      });
+      this.hasSearchQueries = !!size(this.searchQueries);
+      getData();
+    }
+    // 次回更新用にストック。
+    prevCrossSearchQueries = ObjectAssign({}, this.opts.crosssearchqueries);
   }).on('unmount', () => {
     inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
