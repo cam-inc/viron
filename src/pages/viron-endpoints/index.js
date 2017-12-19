@@ -6,7 +6,7 @@ export default function() {
   this.layoutType = store.getter('layout.type');
   this.endpoints = store.getter('endpoints.allByOrderFiltered');
   // エンドポイントカードがDnD可能な状態か否か。
-  this.isDraggable = this.isDesktop;
+  this.isDraggable = false;
 
   this.listen('endpoints', () => {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
@@ -16,11 +16,16 @@ export default function() {
     this.isDesktop = store.getter('layout.isDesktop');
     this.isMobile = store.getter('layout.isMobile');
     this.layoutType = store.getter('layout.type');
-    this.isDraggable = this.isDesktop;
+    if (!this.isDesktop) {
+      this.isDraggable = false;
+    }
     this.update();
   });
 
   this.handleOrderButtonTap = () => {
+    if (!this.isDesktop) {
+      return;
+    }
     this.isDraggable = !this.isDraggable;
     this.update();
   };
