@@ -1,9 +1,15 @@
 viron-components-page.ComponentsPage(class="ComponentsPage--{ layoutType }")
-  .ComponentsPage__name { name }
+  .ComponentsPage__head
+    .ComponentsPage__name { name }
+    .ComponentsPage__control(if="{ isDesktop }")
+      .ComponentsPage__crossSearch(if="{ isCrossSearchEnabled }" class="{ 'ComponentsPage__crossSearch--active': hasCrossSearchQueries }" onTap="{ handleCrossSearchTap }")
+        viron-icon-search
+        div 全体検索
   .ComponentsPage__container
     viron-components-page-card(each="{ component in components }" def="{ component }")
 
   script.
+    import '../../components/icons/viron-icon-search/index.tag';
     import './card/index.tag';
     import script from './index';
     this.external(script);

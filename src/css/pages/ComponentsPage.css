@@ -6,18 +6,54 @@
 .ComponentsPage {
   display: block;
 
+  &__head {
+    @apply --layout-center-start;
+  }
+
+  &--desktop &__head {
+    margin-bottom: 24px;
+  }
+
+  &--mobile &__head {
+    margin-bottom: 8px;
+  }
+
   &__name {
+    @apply --text-truncate;
+    flex-grow: 1;
     font-weight: bold;
   }
 
   &--desktop &__name {
-    margin-bottom: 24px;
     font-size: 2.8rem;
   }
 
   &--mobile &__name {
-    margin-bottom: 8px;
     font-size: 1.4rem;
+  }
+
+  &__control {
+    @apply --layout-center-center;
+    flex-shrink: 0;
+  }
+
+  &__crossSearch {
+    @apply --layout-center-center;
+
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    cursor: pointer;
+
+    &--active {
+      color: var(--color-base-blue);
+    }
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
   }
 
   &__container {
