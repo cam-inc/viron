@@ -808,9 +808,8 @@ select {
   }
 .Application_Header {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
-  padding: 0 24px;
   background-color: #f6f6f6;
   border-bottom: 1px solid #e8e8e7;
 }
@@ -833,6 +832,13 @@ select {
 .Application_Header__item > .Icon.hold {
         color: #627edf;
         color: var(--color-base-blue);
+  }
+.Application_Header__item--tail {
+      padding-right: 24px;
+    }
+.Application_Header__menuIcon.Icon {
+    width: 40px;
+    padding-left: 24px;
   }
 .Application_Header__thumbnail {
     width: 32px;
@@ -895,9 +901,50 @@ select {
     height: 8px;
     margin-right: 8px;
   }
-.Application_Header_Autocomplete {
-  display: block;
+.Application_Header_Filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 100%;
+  padding: 0 24px;
+  overflow: hidden;
+  transition-duration: 300ms;
+  transition-property: width;
 }
+.Application_Header_Filter--opened {
+    width: 384px;
+    background-color: #f0f0ef;
+  }
+.Application_Header_Filter__closeIcon,
+  .Application_Header_Filter__searchIcon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Application_Header_Filter__closeIcon:hover, .Application_Header_Filter__searchIcon:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.Application_Header_Filter__closeIcon.hold, .Application_Header_Filter__searchIcon.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
+.Application_Header_Filter__form {
+    flex-grow: 1;
+    transition-duration: 300ms;
+    transition-property: margin;
+  }
+.Application_Header_Filter--opened .Application_Header_Filter__form {
+    margin: 0 24px;
+  }
+.Application_Header_Filter__input {
+    display: block;
+    width: 100%;
+  }
 .Application_Header_Menu {
   display: block;
   padding: 0 18px;
@@ -4196,6 +4243,14 @@ select {
       width: 16px;
       height: 16px;
     }
+.EndpointsPage__orderButton--active {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
+    }
+.EndpointsPage__orderButton--active .Icon {
+        color: #fff;
+        color: var(--color-base-white);
+      }
 .EndpointsPage__container {
     display: -ms-grid;
     display: grid;
