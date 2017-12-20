@@ -904,8 +904,8 @@ select {
 .Application_Header_Filter {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
+  justify-content: flex-start;
+  width: 248px;
   height: 100%;
   padding: 0 24px;
   overflow: hidden;
@@ -944,6 +944,54 @@ select {
 .Application_Header_Filter__input {
     display: block;
     width: 100%;
+  }
+.Application_Header_Filter__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    width: 200px;
+    margin-left: 8px;
+    overflow: hidden;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+  }
+.Application_Header_Filter_Autocomplete {
+  display: block;
+  padding: 24px 16px;
+}
+.Application_Header_Filter_Autocomplete__empty {
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+    text-align: center;
+  }
+.Application_Header_Filter_Autocomplete__list {
+    margin-bottom: 16px;
+  }
+.Application_Header_Filter_Autocomplete__list:last-child {
+      margin-bottom: 0;
+    }
+.Application_Header_Filter_Autocomplete__label {
+    margin-bottom: 16px;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+  }
+.Application_Header_Filter_Autocomplete__item {
+    margin: 0 16px 16px;
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Application_Header_Filter_Autocomplete__item:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.Application_Header_Filter_Autocomplete__item.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
+.Application_Header_Filter_Autocomplete__list .Application_Header_Filter_Autocomplete__item:last-child {
+    margin-bottom: 0;
   }
 .Application_Header_Menu {
   display: block;
