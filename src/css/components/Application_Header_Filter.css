@@ -1,0 +1,40 @@
+.Application_Header_Filter {
+  @apply --layout-center-center;
+  width: 40px;
+  height: 100%;
+  padding: 0 24px;
+  overflow: hidden;
+  transition-duration: 300ms;
+  transition-property: width;
+
+  &--opened {
+    width: 384px;
+    background-color: #f0f0ef;
+  }
+
+  &__closeIcon,
+  &__searchIcon {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  &__form {
+    flex-grow: 1;
+    transition-duration: 300ms;
+    transition-property: margin;
+  }
+
+  &--opened &__form {
+    margin: 0 24px;
+  }
+
+  &__input {
+    display: block;
+    width: 100%;
+  }
+}

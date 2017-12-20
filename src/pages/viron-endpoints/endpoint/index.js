@@ -14,6 +14,11 @@ export default function() {
   this.isNextDroppable = false;
 
   this.listen('application', () => {
+    // endpointフィルター時エラーを抑制するため。
+    // unmount後にapplicationのchangeイベントを受け取ってしまうのがそもそもの原因。
+    if (!this.isMounted) {
+      return;
+    }
     this.isDragging = store.getter('application.isDragging');
     this.update();
   });

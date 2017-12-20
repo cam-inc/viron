@@ -1,5 +1,4 @@
 import '../menu/index.tag';
-import './autocomplete/index.tag';
 import './menu/index.tag';
 
 export default function() {
@@ -39,16 +38,6 @@ export default function() {
     this.color = store.getter('viron.color');
     this.update();
   });
-
-  this.handleSearchIconTap = () => {
-    // 検索用オートコンプリートをpopoverで開きます。
-    const rect = this.refs.searchIcon.root.getBoundingClientRect();
-    store.action('popovers.add', 'viron-application-header-autocomplete', null, {
-      x: rect.left + (rect.width / 2),
-      y: rect.bottom,
-      direction: 'TL'
-    });
-  };
 
   this.handleMenuToggleButtonTap = () => {
     if (!this.isMobile) {

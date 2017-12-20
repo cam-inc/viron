@@ -8,6 +8,10 @@ export default function() {
   // エンドポイントカードがDnD可能な状態か否か。
   this.isDraggable = false;
 
+  this.listen('application', () => {
+    this.endpoints = store.getter('endpoints.allByOrderFiltered');
+    this.update();
+  });
   this.listen('endpoints', () => {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
     this.update();

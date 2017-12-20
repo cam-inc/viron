@@ -101,7 +101,7 @@
   }
 
   /* 下揃え & 左右スペースを空けて目一杯に広げる */
-  --layout-stretch-between: {
+  --layout-end-between: {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
