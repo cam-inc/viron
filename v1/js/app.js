@@ -16170,9 +16170,9 @@ var endpoints$2 = exporter$2('endpoints', {
   cleanup: state => {
     const version = state.application.version;
     let newEndpoints = objectAssign({}, state.endpoints[version]);
-    forOwn_1$2(newEndpoints, endpoint => {
+    forOwn_1$2(newEndpoints, (endpoint, key) => {
       if (!isObject_1(endpoint)) {
-        delete newEndpoints[endpoint.key];
+        delete newEndpoints[key];
       }
     });
     state.endpoints[version] = newEndpoints;
