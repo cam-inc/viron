@@ -1,6 +1,8 @@
 import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
+import slice from 'mout/array/slice';
 import sortBy from 'mout/array/sortBy';
+import unique from 'mout/array/unique';
 import deepClone from 'mout/lang/deepClone';
 import find from 'mout/object/find';
 import forOwn from 'mout/object/forOwn';
@@ -105,6 +107,90 @@ export default exporter('endpoints', {
     endpoints = sortByOrder(endpoints);
     endpoints = filterBy(endpoints, state.application.endpointFilterText);
     return endpoints;
+  },
+
+  /**
+   * nameのみを抽出して返します。filterされます。
+   * @param {Object} state
+   * @param {Number} maxSize
+   * @return {Array}
+   */
+  namesFiltered: (state, maxSize) => {
+    const version = state.application.version;
+    let endpoints = ObjectAssign({}, state.endpoints[version]);
+    endpoints = sortByOrder(endpoints);
+    let names = [];
+    forEach(endpoints, endpoint => {
+      if (!!endpoint.name) {
+        names.push(endpoint.name);
+      }
+    });
+    names = unique(names, (a, b) => {
+      return a === b;
+    });
+    let filterText = state.application.endpointTempFilterText;
+    filterText = filterText.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    filterText = filterText.replace(/,/g, ' ');
+    const targetTexts = filter((filterText || '').split(' '), targetText => {
+      return !!targetText;
+    });
+    if (!!targetTexts.length) {
+      names = filter(names, name => {
+        let isMatched = true;
+        forEach(targetTexts, targetText => {
+          if (!contains(name, targetText)) {
+            isMatched = false;
+          }
+        });
+        return isMatched;
+      });
+    }
+    if (!!maxSize) {
+      names = slice(names, 0, maxSize);
+    }
+    return names;
+  },
+
+  /**
+   * tag値のみを抽出して返します。filterされます。
+   * @param {Object} state
+   * @param {Number} maxSize
+   * @return {Array}
+   */
+  tagsFiltered: (state, maxSize) => {
+    const version = state.application.version;
+    let endpoints = ObjectAssign({}, state.endpoints[version]);
+    endpoints = sortByOrder(endpoints);
+    let tags = [];
+    forEach(endpoints, endpoint => {
+      forEach(endpoint.tags || [], tag => {
+        tags.push(tag);
+      });
+    });
+    tags = unique(tags, (a, b) => {
+      return a === b;
+    });
+    let filterText = state.application.endpointTempFilterText;
+    filterText = filterText.replace(/　/g, ' ');// eslint-disable-line no-irregular-whitespace
+    filterText = filterText.replace(/,/g, ' ');
+    const targetTexts = filter((filterText || '').split(' '), targetText => {
+      return !!targetText;
+    });
+    if (!!targetTexts.length) {
+      tags = filter(tags, name => {
+        let isMatched = true;
+        forEach(targetTexts, targetText => {
+          if (!contains(name, targetText)) {
+            isMatched = false;
+          }
+        });
+        return isMatched;
+      });
+    }
+    if (!!maxSize) {
+      tags = slice(tags, 0, maxSize);
+    }
+    return tags;
   },
 
   /**

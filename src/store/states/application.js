@@ -24,5 +24,7 @@ export default exporter('application', {
   // 左カラムメニューの開閉状態
   isMenuOpened: true,
   // エンドポイントページに用いるエンドポイントフィルター用のテキスト。
-  endpointFilterText: ''
+  endpointFilterText: '',
+  // エンドポイントページに用いるエンドポイントフィルター用の確定前テキスト。
+  endpointTempFilterText: ''
 });

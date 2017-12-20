@@ -1,15 +1,19 @@
 import '../../../components/viron-error/index.tag';
+import './autocomplete/index.tag';
 
 export default function() {
   const store = this.riotx.get();
 
   this.isOpened = false;
-
+  this.filterText = store.getter('application.endpointFilterText');
   this.listen('application', () => {
     if (!this.refs.input) {
       return;
     }
-    this.refs.input.value = store.getter('application.endpointFilterText');
+    const newFilterText = store.getter('application.endpointFilterText');
+    if (newFilterText !== this.filterText) {
+      this.refs.input.value = this.filterText = store.getter('application.endpointFilterText');
+    }
   });
 
   this.handleCloseIconMouseDown = e => {
@@ -68,6 +72,26 @@ export default function() {
       }));
   };
 
+  this.handleInputFocus = () => {
+    new Promise(resolve => {
+      // 開閉アニメーション完了を待つ必要があるので。
+      setTimeout(resolve, 500);
+    })
+      .then(() => {
+        const rootElm = this.root;
+        if (!rootElm) {
+          return;
+        }
+        const rect = rootElm.getBoundingClientRect();
+        store.action('popovers.add', 'viron-application-header-filter-autocomplete', null, {
+          x: rect.left + (rect.width / 2),
+          y: rect.bottom - 10,
+          width: rect.width,
+          direction: 'T'
+        });
+      });
+  };
+
   this.handleInputBlur = () => {
     this.isOpened = false;
     this.update();
@@ -77,7 +101,13 @@ export default function() {
     e.stopPropagation();
   };
 
-  this.handleInputInput = () => {
-    // TODO: autocomplete
+  this.handleInputInput = e => {
+    const text = e.target.value || '';
+    Promise
+      .resolve()
+      .then(() => store.action('application.updateEndpointTempFilterText', text))
+      .catch(err => store.action('modals.add', 'viron-error', {
+        error: err
+      }));
   };
 }

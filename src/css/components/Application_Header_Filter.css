@@ -1,6 +1,6 @@
 .Application_Header_Filter {
-  @apply --layout-center-center;
-  width: 40px;
+  @apply --layout-center-start;
+  width: 248px;
   height: 100%;
   padding: 0 24px;
   overflow: hidden;
@@ -36,5 +36,13 @@
   &__input {
     display: block;
     width: 100%;
+  }
+
+  &__text {
+    @apply --text-truncate;
+    width: 200px;
+    margin-left: 8px;
+    overflow: hidden;
+    color: var(--color-base-gray);
   }
 }

@@ -102,5 +102,16 @@ export default exporter('application', {
   endpointFilterText: (state, newFilterText) => {
     state.application.endpointFilterText = newFilterText;
     return ['application'];
+  },
+
+  /**
+   * エンドポイント用の一時フィルターテキストを更新します。
+   * @param {Object} state
+   * @param {String} newTempFilterText
+   * @return {Array}
+   */
+  endpointTempFilterText: (state, newTempFilterText) => {
+    state.application.endpointTempFilterText = newTempFilterText;
+    return ['application'];
   }
 });

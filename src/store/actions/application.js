@@ -90,6 +90,21 @@ export default exporter('application', {
       .resolve()
       .then(() => {
         context.commit('application.endpointFilterText', newFilterText);
+        context.commit('application.endpointTempFilterText', newFilterText);
+      });
+  },
+
+  /**
+   * エンドポイントフィルター用の一時テキストを更新します。
+   * @param {riotx.Context} context
+   * @param {String} newTempFilterText
+   * @return {Promise}
+   */
+  updateEndpointTempFilterText: (context, newTempFilterText) => {
+    return Promise
+      .resolve()
+      .then(() => {
+        context.commit('application.endpointTempFilterText', newTempFilterText);
       });
   },
 
@@ -103,6 +118,7 @@ export default exporter('application', {
       .resolve()
       .then(() => {
         context.commit('application.endpointFilterText', '');
+        context.commit('application.endpointTempFilterText', '');
       });
   }
 });

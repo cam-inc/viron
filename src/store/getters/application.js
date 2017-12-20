@@ -80,5 +80,14 @@ export default exporter('application', {
    */
   endpointFilterText: state => {
     return state.application.endpointFilterText;
+  },
+
+  /**
+   * エンドポイントフィルター用の一時テキストを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  endpointTempFilterText: state => {
+    return state.application.endpointTempFilterText;
   }
 });

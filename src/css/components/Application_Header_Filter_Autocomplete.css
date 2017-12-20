@@ -1,0 +1,35 @@
+.Application_Header_Filter_Autocomplete {
+  display: block;
+  padding: 24px 16px;
+
+  &__empty {
+    color: var(--color-base-gray);
+    text-align: center;
+  }
+
+  &__list {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__label {
+    margin-bottom: 16px;
+    color: var(--color-base-gray);
+  }
+
+  &__item {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    margin: 0 16px 16px;
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+
+  &__list &__item:last-child {
+    margin-bottom: 0;
+  }
+}
