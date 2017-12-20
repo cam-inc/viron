@@ -192,9 +192,9 @@ export default exporter('endpoints', {
   cleanup: state => {
     const version = state.application.version;
     let newEndpoints = ObjectAssign({}, state.endpoints[version]);
-    forOwn(newEndpoints, endpoint => {
+    forOwn(newEndpoints, (endpoint, key) => {
       if (!isObject(endpoint)) {
-        delete newEndpoints[endpoint.key];
+        delete newEndpoints[key];
       }
     });
     state.endpoints[version] = newEndpoints;
