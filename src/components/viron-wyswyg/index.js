@@ -29,23 +29,25 @@ import 'tinymce/plugins/toc/plugin';
 
 const url = new URL(window.location.href);
 const baseConfig = {
-  menu: [
-    'undo redo'
-  ],
+  menubar: 'file edit view',
+  menu: {
+    edit: { title: 'Edit', items: 'cut, copy, paste' },
+    view: { title: 'View', items: 'table, tabledelete, tablecellprops, tablemergecells, tablesplitcells, tableinsertrowbefore, tableinsertrowafter, tabledeleterow, tablerowprops, tablecutrow, tablecopyrow, tablepasterowbefore, tablepasterowafter, tableinsertcolbefore, tableinsertcolafter, tabledeletecol' }
+  },
   toolbar: [
     'newdocument | bold italic underline strikethrough',
     'alignleft aligncenter alignright | alignjustify alignnone',
     'styleselect formatselect fontselect fontsizeselect',
-    'cut copy paste | outdent indent | blockquote',
+    'outdent indent | blockquote',
     'undo redo removeformat subscript superscript insert',
     'code hr bullist numlist | link unlink openlink',
     'image | charmap pastetext print preview anchor pagebreak searchreplace',
     'help fullscreen insertdatetime media nonbreaking',
-    'table tabledelete tablecellprops tablemergecells tablesplitcells tableinsertrowbefore tableinsertrowafter tabledeleterow tablerowprops tablecutrow tablecopyrow tablepasterowbefore tablepasterowafter tableinsertcolbefore tableinsertcolafter tabledeletecol',
     'rotateleft rotateright flipv fliph editimage imageoptions | fullpage',
     'ltr rtl | emoticons template | forecolor backcolor | toc'
   ],
   plugins: ['code', 'hr', 'lists', 'link', 'image', 'charmap', 'paste', 'print', 'preview', 'anchor', 'pagebreak', 'searchreplace', 'help', 'fullscreen', 'insertdatetime', 'media', 'nonbreaking', 'table', 'imagetools', 'fullpage', 'directionality', 'emoticons', 'template', 'textcolor', 'toc'],
+  min_height: 300,
   branding: false,
   relative_urls : false,
   remove_script_host : true,
