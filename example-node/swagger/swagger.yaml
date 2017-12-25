@@ -756,6 +756,72 @@ definitions:
       $ref: '#/definitions/UserBlogEntry'
     type: array
 
+  UserFavorite:
+    description: A User Favorite Entry
+    example:
+      user_id: 1
+      user_blog_id: 11
+    properties:
+      user_id:
+        description: ユーザーID
+        example: 1
+        format: int64
+        type: integer
+      user_blog_ids:
+        description: お気に入り一覧
+        x-autogen-checklist:
+          field: id
+          model: user_blogs
+          default: false
+    required:
+    - user_id
+    type: object
+
+  UserFavoriteCollection:
+    description: an array of UserFavorite
+    items:
+      $ref: '#/definitions/UserFavorite'
+    type: array
+
+  UserFavoriteCreatePayload:
+    properties:
+      user_id:
+        description: ユーザーID
+        example: 11
+        format: int64
+        type: integer
+        x-autocomplete:
+          field: name
+          path: /viron_autocomplete
+          query:
+            model: user
+            value: id
+      user_blog_ids:
+        description: ブログ選択
+        x-autogen-checklist:
+          field: id
+          model: user_blogs
+          default: false
+    title: UserFavoriteCreatePayload
+    required:
+    - user_id
+    - user_blog_ids
+    type: object
+
+  UserFavoriteUpdatePayload:
+    properties:
+      user_blog_ids:
+        description: ブログ選択
+        x-autogen-checklist:
+          field: id
+          model: user_blogs
+          default: false
+    title: UserFavoriteUpdatePayload
+    required:
+    - user_blog_ids
+    type: object
+
+
   UserBlogCollection:
     description: UserBlogCollection is the media type for an array of UserBlog
     example:
@@ -4198,6 +4264,168 @@ paths:
       summary: ユーザブログ記事更新
       tags:
       - user_blog_entry
+
+  /userfavorite:
+    get:
+      x-swagger-router-controller: user_favorite
+      description: お気に入りの一覧
+      operationId: user_favorite#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserFavoriteCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: お気に入り一覧
+      tags:
+      - user_favorite
+
+    post:
+      x-swagger-router-controller: user_favorite
+      description: お気に入りの作成
+      operationId: user_favorite#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserFavoriteCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserFavorite'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: お気に入り作成
+      tags:
+      - user_favorite
+
+  /userfavorite/{user_id}:
+    put:
+      x-swagger-router-controller: user_favorite
+      description: お気に入りの更新
+      operationId: user_favorite#update
+      parameters:
+      - description: user_id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserFavoriteUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserFavorite'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: お気に入り更新
+      tags:
+      - user_favorite
+
+    delete:
+      x-swagger-router-controller: user_favorite
+      description: お気に入りの削除
+      operationId: user_favorite#remove
+      parameters:
+      - description: user_id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - https
+      security:
+      - jwt:
+        - api:access
+      summary: お気に入り削除
+      tags:
+      - user_favorite
 
   /validator:
     get:

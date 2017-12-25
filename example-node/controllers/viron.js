@@ -163,6 +163,13 @@ const show = (req, res) => {
               genTableComponent('ユーザブログ記事', 'get', '/userblogentry', 'id', null, ['id', 'user_blog_id']),
             ],
           },
+          {
+            id: 'userfavorite',
+            name: 'お気に入り',
+            components: [
+              genTableComponent('お気に入り', 'get', '/userfavorite', 'user_id', null, ['id', 'user_id']),
+            ],
+          },
         ],
         [constant.GROUP_EXAMPLE]: [
           {
