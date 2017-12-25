@@ -2,16 +2,8 @@
   position: relative;
   display: block;
 
-  &__editor {
-    ul {
-      list-style-position: inside;
-      list-style-type: disc;
-    }
-
-    ol {
-      list-style-position: inside;
-      list-style-type: decimal;
-    }
+  &__form {
+    display: block;
   }
 
   &__blocker {
@@ -20,7 +12,5 @@
     right: 0;
     bottom: 0;
     left: 0;
-    /* TODO: Froalaがz-index使っているので。*/
-    z-index: 999;
   }
 }

@@ -1,94 +1,105 @@
 import throttle from 'mout/function/throttle';
 import ObjectAssign from 'object-assign';
+import TinyMCE from 'tinymce';
+import 'tinymce/plugins/anchor/plugin';
+import 'tinymce/plugins/charmap/plugin';
+import 'tinymce/plugins/code/plugin';
+import 'tinymce/plugins/directionality/plugin';
+import 'tinymce/plugins/emoticons/plugin';
+import 'tinymce/plugins/fullpage/plugin';
+import 'tinymce/plugins/fullscreen/plugin';
+import 'tinymce/plugins/help/plugin';
+import 'tinymce/plugins/hr/plugin';
+import 'tinymce/plugins/image/plugin';
+import 'tinymce/plugins/imagetools/plugin';
+import 'tinymce/plugins/insertdatetime/plugin';
+import 'tinymce/plugins/link/plugin';
+import 'tinymce/plugins/lists/plugin';
+import 'tinymce/plugins/media/plugin';
+import 'tinymce/plugins/nonbreaking/plugin';
+import 'tinymce/plugins/pagebreak/plugin';
+import 'tinymce/plugins/paste/plugin';
+import 'tinymce/plugins/preview/plugin';
+import 'tinymce/plugins/print/plugin';
+import 'tinymce/plugins/searchreplace/plugin';
+import 'tinymce/plugins/table/plugin';
+import 'tinymce/plugins/template/plugin';
+import 'tinymce/plugins/textcolor/plugin';
+import 'tinymce/plugins/toc/plugin';
 
-// TODO: Froalaを購入すること。
-// Froala WYSWYG EditorがjQuery依存。
-// jQuery使いたくないけど、Froalaは使いたいので仕方なく。
-const $ = window.$;
-
-// Froalaエディタのオプション群。
-const defaultEditorOptions = {
-  // 文字数カウンタを非表示に。
-  charCounterCount: false,
-  // 画像等の文字間へのDnDを許可しない。
-  dragInline: false,
-  // 高さ調整。
-  heightMin: 100,
-  heightMax: 500,
-  // 言語設定 TODO: どの言語を使っているか、i18nextから取得したい。
-  language: 'ja',
-  placeholderText: 'Start typing here...',
-  // コピペ時に余分タグをペーストしない。
-  pastePlain: true,
-  // 選択範囲のスタイルをtoolbarに詳細表示する。
-  fontFamilySelection: true,
-  fontSizeSelection: true,
-  paragraphFormatSelection: true,
-  // toolbarが上部吸着しないように。
-  toolbarSticky: false,
-  // toolbarボタン群。
-  toolbarButtons: [
-    'fullscreen', 'html', '|', 'undo', 'redo', 'selectAll', 'clearFormatting', '|', 'help', '-',
-    'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'insertLink', 'insertImage', '|', 'fontFamily', 'fontSize', 'color', '-',
-    'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertTable', 'insertHR'
+const url = new URL(window.location.href);
+const baseConfig = {
+  menu: [
+    'undo redo'
   ],
-  // 小さい画面でもtoolbarButtonsと同じボタン群を表示するためにnullをセット。
-  toolbarButtonsSM: null,
-  toolbarButtonsXS: null,
-  // リンクプラグイン設定。
-  linkEditButtons: 	['linkOpen', 'linkEdit', 'linkRemove'],
-  linkList: [{
-    text: 'Viron',
-    href: 'https://cam-inc.github.io/viron-doc/',
-    target: '_blank'
-  }],
-  // 画像プラグイン設定。
-  imageDefaultWidth: 80,
-  imageEditButtons: ['imageReplace', 'imageAlign', 'imageCaption', 'imageRemove', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove', '-', 'imageDisplay', 'imageAlt', 'imageSize'],
-  imageUpload: false,
-  imageUploadRemoteUrls: false,
-  // p, div or brを指定可能。
-  enter: $.FroalaEditor.ENTER_P,
-  // ショートカット可能なボタン群。
-  shortcutsEnabled: ['bold', 'italic']
+  toolbar: [
+    'newdocument | bold italic underline strikethrough',
+    'alignleft aligncenter alignright | alignjustify alignnone',
+    'styleselect formatselect fontselect fontsizeselect',
+    'cut copy paste | outdent indent | blockquote',
+    'undo redo removeformat subscript superscript insert',
+    'code hr bullist numlist | link unlink openlink',
+    'image | charmap pastetext print preview anchor pagebreak searchreplace',
+    'help fullscreen insertdatetime media nonbreaking',
+    'table tabledelete tablecellprops tablemergecells tablesplitcells tableinsertrowbefore tableinsertrowafter tabledeleterow tablerowprops tablecutrow tablecopyrow tablepasterowbefore tablepasterowafter tableinsertcolbefore tableinsertcolafter tabledeletecol',
+    'rotateleft rotateright flipv fliph editimage imageoptions | fullpage',
+    'ltr rtl | emoticons template | forecolor backcolor | toc'
+  ],
+  plugins: ['code', 'hr', 'lists', 'link', 'image', 'charmap', 'paste', 'print', 'preview', 'anchor', 'pagebreak', 'searchreplace', 'help', 'fullscreen', 'insertdatetime', 'media', 'nonbreaking', 'table', 'imagetools', 'fullpage', 'directionality', 'emoticons', 'template', 'textcolor', 'toc'],
+  branding: false,
+  relative_urls : false,
+  remove_script_host : true,
+  document_base_url : `${url.origin}${url.pathname}tinymce`,
+  skin: 'lightgray',
+  skin_url: 'skins/lightgray',
+  theme: 'modern',
+  theme_url: 'themes/modern/theme.js',
+  body_class: 'Wyswyg__body',
+  mobile: {
+    theme: 'mobile',
+    theme_url: 'themes/mobile/theme.js'
+  }
 };
 
 export default function() {
+  this.editor = null;
+
   this.on('mount', () => {
-    // 初期値をセットする。
-    this.refs.editor.innerHTML = this.opts.val || '';
-    // エディター作成。
-    $(this.refs.editor)
-      .on('froalaEditor.contentChanged', this.handleEditorChange)
-      .on('froalaEditor.focus', this.handleEditorFocus)
-      .on('froalaEditor.blur', this.handleEditorBlur)
-      .froalaEditor(ObjectAssign({}, defaultEditorOptions, {
-        // 上書きするならここに。
-      }));
+    TinyMCE.init(ObjectAssign({}, baseConfig, {
+      target: this.refs.editor,
+      selector: `.Wyswyg__editor${this._riot_id}`,
+      init_instance_callback: editor => {
+        this.editor = editor;
+        this.editor.on('Change', this.handleEditorChange);
+        this.editor.on('focus', this.handleEditorFocus);
+        this.editor.on('blur', this.handleEditorBlur);
+      }
+    }));
   }).on('before-unmount', () => {
-    $(this.refs.editor)
-      .off('froalaEditor.contentChanged', this.handleEditorChange)
-      .off('froalaEditor.focus', this.handleEditorFocus)
-      .off('froalaEditor.blur', this.handleEditorBlur);
+    this.editor.off('Change', this.handleEditorChange);
+    this.editor.off('focus', this.handleEditorFocus);
+    this.editor.off('blur', this.handleEditorBlur);
+    this.editor.destroy();
+    this.editor = null;
   });
 
   // 発火回数を間引く。
-  this.handleEditorChange = throttle((e, editor) => {
+  this.handleEditorChange = throttle(() => {
     if (!this.opts.onchange) {
       return;
     }
-    const html = editor.html.get();
+    const html = this.editor.getContent();
     this.opts.onchange(html);
   }, 1000);
 
-  this.handleEditorFocus = (e, editor) => {// eslint-disable-line no-unused-vars
+  this.handleEditorFocus = () => {
     if (!this.opts.onfocus) {
       return;
     }
     this.opts.onfocus();
   };
 
-  this.handleEditorBlur = (e, editor) => {// eslint-disable-line no-unused-vars
+  this.handleEditorBlur = () => {
     if (!this.opts.onblur) {
       return;
     }

@@ -1,5 +1,6 @@
 viron-wyswyg.Wyswyg(class="{ 'Wyswyg--disabled': opts.isdisabled, 'Wyswyg--error': opts.haserror }")
-  .Wyswyg__editor(ref="editor")
+  form.Wyswyg__form
+    textarea(class="Wyswyg__editor{ _riot_id }")
   .Wyswyg__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
 
   script.
