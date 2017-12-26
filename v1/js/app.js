@@ -17953,8 +17953,18 @@ highcharts.setOptions({
     crosshairs: true,
     enabled: true
   },
-  xAxis: { title: null },
-  yAxis: { title: null }
+  xAxis: {
+    title: null,
+    labels: {
+      style: { fontSize: '8px' }
+    }
+  },
+  yAxis: {
+    title: null,
+    labels: {
+      style: { fontSize: '8px' }
+    }
+  }
 });
 
 var script$2 = function() {
