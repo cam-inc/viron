@@ -18220,7 +18220,7 @@ var script$3 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-number', '<div class="ComponentsPage_Card_Number__head"> <div class="ComponentsPage_Card_Number__title">{opts.def.name}</div> <div class="ComponentsPage_Card_Number__control"> <viron-icon-reload onclick="{getClickHandler(\'handleRefreshButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRefreshButtonTap\')}"></viron-icon-reload> </div> </div> <div class="ComponentsPage_Card_Number__body"> <virtual if="{isLoading}"> <div class="ComponentsPage_Card_Number__progress"> <viron-icon-reload></viron-icon-reload> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="ComponentsPage_Card_Number__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="ComponentsPage_Card_Number__valueWrapper"> <div class="ComponentsPage_Card_Number__value">{getValue()}</div> <div class="ComponentsPage_Card_Number__unit" if="{!!data.unit}">{data.unit}</div> <div class="ComponentsPage_Card_Number__unit">円</div> </div> </virtual> </virtual> </div> <div class="ComponentsPage_Card_Number__blocker" if="{isLoading}"></div>', '', 'class="ComponentsPage_Card_Number"', function(opts) {
+riot$1.tag2('viron-components-page-number', '<div class="ComponentsPage_Card_Number__head"> <div class="ComponentsPage_Card_Number__title">{opts.def.name}</div> <div class="ComponentsPage_Card_Number__control"> <viron-icon-reload onclick="{getClickHandler(\'handleRefreshButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRefreshButtonTap\')}"></viron-icon-reload> </div> </div> <div class="ComponentsPage_Card_Number__body"> <virtual if="{isLoading}"> <div class="ComponentsPage_Card_Number__progress"> <viron-icon-reload></viron-icon-reload> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="ComponentsPage_Card_Number__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="ComponentsPage_Card_Number__valueWrapper"> <div class="ComponentsPage_Card_Number__value">{getValue()}</div> <div class="ComponentsPage_Card_Number__unit" if="{!!data.unit}">{data.unit}</div> </div> </virtual> </virtual> </div> <div class="ComponentsPage_Card_Number__blocker" if="{isLoading}"></div>', '', 'class="ComponentsPage_Card_Number"', function(opts) {
     this.external(script$3);
 });
 
@@ -24843,7 +24843,7 @@ riot$1.tag2('viron-image', '<div class="Image__content" riot-style="background-i
 var script$16 = function() {
   const store = this.riotx.get();
 
-  // クリップっボードコピーをサポートしているか否か。
+  // クリップボードコピーをサポートしているか否か。
   let isClipboardCopySupported = true;
   // モバイル用レイアウトか否か。
   this.isMobile = store.getter('layout.isMobile');
@@ -24949,7 +24949,7 @@ var script$16 = function() {
     Promise
       .resolve()
       .then(() => {
-        return clipboard.copy(this.opts.val);
+        return clipboard.copy(String(this.opts.val));
       })
       .then(() => store.action('toasts.add', {
         message: 'クリップボードへコピーしました。'
