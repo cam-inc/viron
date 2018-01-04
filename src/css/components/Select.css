@@ -33,6 +33,7 @@
     width: 16px;
     height: 16px;
     margin: auto;
+    pointer-events: none;
   }
 
   &__blocker {
