@@ -11,7 +11,9 @@ export default exporter('drawers', {
    * @return {Array}
    */
   add: (state, tagName, tagOpts = {}, drawerOpts = {}) => {
-    state.drawers.push({
+    // 意図的に配列の先頭に追加している。
+    // TinyMCEのdom監視が強いため。
+    state.drawers.unshift({
       id: `drawer_${Date.now()}`,
       tagName,
       tagOpts,
