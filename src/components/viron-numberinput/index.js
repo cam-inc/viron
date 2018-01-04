@@ -8,7 +8,7 @@ import isUndefined from 'mout/lang/isUndefined';
 export default function() {
   const store = this.riotx.get();
 
-  // クリップっボードコピーをサポートしているか否か。
+  // クリップボードコピーをサポートしているか否か。
   let isClipboardCopySupported = true;
   // モバイル用レイアウトか否か。
   this.isMobile = store.getter('layout.isMobile');
@@ -114,7 +114,7 @@ export default function() {
     Promise
       .resolve()
       .then(() => {
-        return clipboard.copy(this.opts.val);
+        return clipboard.copy(String(this.opts.val));
       })
       .then(() => store.action('toasts.add', {
         message: 'クリップボードへコピーしました。'
