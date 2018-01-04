@@ -51,8 +51,10 @@
     "lint:js": "eslint src",
     "lint:css": "stylelint src/css/**/*.css",
     "spec": "mocha",
-    "deploy": "node task/deploy.js",
-    "release": "run-s build deploy",
+    "deploy:beta": "node task/deploy.js -b",
+    "deploy:prd": "node task/deploy.js",
+    "release:beta": "run-s build deploy:beta",
+    "release:prd": "run-s build deploy:prd",
     "ncu": "ncu"
   },
   "dependencies": {
@@ -87,6 +89,7 @@
   },
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
+    "commander": "^2.12.2",
     "csswring": "^6.0.1",
     "eslint": "^4.10.0",
     "gh-pages": "^1.0.0",
