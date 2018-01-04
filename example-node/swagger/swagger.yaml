@@ -33,17 +33,15 @@ schemes:
 #################################################
 definitions:
   AdminRole:
-    description: A Admin Role
     example:
       paths:
         "GET:/user": true
       role_id: operator
     properties:
       paths:
-        $ref: '#/definitions/adminrolepath'
+        $ref: '#/definitions/AdminRolePath'
       role_id:
-        description: role id
-        example: operator
+        description: ユーザ権限ID
         type: string
     required:
     - role_id
@@ -51,35 +49,25 @@ definitions:
     type: object
 
   AdminRoleCollection:
-    description: AdminRoleCollection is the media type for an array of AdminRole
-    example:
-    - paths:
-      - allow: true
-        path: GET:/user
-      role_id: operator
     items:
       $ref: '#/definitions/AdminRole'
     type: array
 
   AdminUser:
-    description: A Admin User
     example:
       email: test@viron.com
       id: 1
       role_id: operator
     properties:
       email:
-        description: login id
-        example: test@viron.com
+        description: E-Mail
         type: string
       id:
-        description: unique id
-        example: 1
+        description: ユニークID
         format: int64
         type: integer
       role_id:
-        description: role id
-        example: operator
+        description: ユーザ権限ID
         type: string
     required:
     - id
@@ -87,17 +75,11 @@ definitions:
     type: object
 
   AdminUserCollection:
-    description: AdminUserCollection is the media type for an array of AdminUser
-    example:
-    - email: test@viron.com
-      id: 1
-      role_id: operator
     items:
       $ref: '#/definitions/AdminUser'
     type: array
 
   AuditLog:
-    description: A Audit Log
     example:
       createdAt: 2006-02-12T07:09:13+09:00
       request_body: '{"name":"test", "id":1}'
@@ -108,52 +90,35 @@ definitions:
       user_id: test@viron.com
     properties:
       createdAt:
-        description: created time
-        example: 2006-02-12T07:09:13+09:00
+        description: 日時
         format: date-time
         type: string
       request_body:
-        description: request body
-        example: '{"name":"test", "id":1}'
+        description: リクエストボディ
         type: string
       request_method:
-        description: http request method
-        example: GET
+        description: リクエストメソッド
         type: string
       request_uri:
-        description: request uri
-        example: /user
+        description: リクエストURI
         type: string
       source_ip:
-        description: source ip address
-        example: 200.200.200.200
+        description: ソースIP
         type: string
       status_code:
-        description: http status code
-        example: 200
+        description: ステータスコード
         type: integer
       user_id:
-        description: user id
-        example: Et saepe nihil in earum sint.
+        description: ユーザ
         type: string
     type: object
 
   AuditLogCollection:
-    description: AuditLogCollection is the media type for an array of AuditLog
-    example:
-    - createdAt: 2006-02-12T07:09:13+09:00
-      request_body: '{"name":"test", "id":1}'
-      request_method: GET
-      request_uri: '/user'
-      source_ip: 200.200.200.200
-      status_code: 200
-      user_id: test@viron.com
     items:
       $ref: '#/definitions/AuditLog'
     type: array
 
   AuthType:
-    description: A Auth Type
     example:
       method: POST
       provider: google
@@ -161,20 +126,16 @@ definitions:
       url: '/googlesignin'
     properties:
       method:
-        description: request method
-        example: POST
+        description: リクエストメソッド
         type: string
       provider:
-        description: auth provider
-        example: google
+        description: 認証プロバイダ
         type: string
       type:
-        description: auth type
-        example: oauth
+        description: 認証方式
         type: string
       url:
-        description: request url
-        example: '/googlesignin'
+        description: リクエストURL
         type: string
     required:
     - type
@@ -184,56 +145,37 @@ definitions:
     type: object
 
   AuthTypeCollection:
-    description: AuthTypeCollection is the media type for an array of AuthType
-    example:
-    - method: POST
-      provider: google
-      type: oauth
-      url: '/googlesignin'
     items:
       $ref: '#/definitions/AuthType'
     type: array
 
   BlogDesign:
-    description: A BlogDesign Master
     example:
       background_image: http://hoge.com/a.png
       base_color: blue
       createdAt: 1990-04-23T00:18:19+09:00
-      deletedAt: 1999-04-23T00:18:19+09:00
       id: des_001
       name: design name
       updatedAt: 1971-03-24T08:40:07+09:00
     properties:
       background_image:
         description: 背景画像
-        example: http://hoge.com/a.png
         type: string
       base_color:
         description: ベースカラー
-        example: blue
         type: string
       createdAt:
         description: 作成日時
-        example: 1990-04-23T00:18:19+09:00
-        format: date-time
-        type: string
-      deletedAt:
-        description: 削除日時
-        example: 1999-04-23T00:18:19+09:00
         format: date-time
         type: string
       id:
         description: デザインID
-        example: des_001
         type: string
       name:
         description: 名前
-        example: design name
         type: string
       updatedAt:
         description: 更新日時
-        example: 1971-03-24T08:40:07+09:00
         format: date-time
         type: string
     required:
@@ -241,15 +183,6 @@ definitions:
     type: object
 
   BlogDesignCollection:
-    description: BlogDesignCollection is the media type for an array of BlogDesign
-    example:
-    - background_image: http://hoge.com/a.png
-      base_color: blue
-      createdAt: 1990-04-23T00:18:19+09:00
-      deletedAt: 1999-04-23T00:18:19+09:00
-      id: des_001
-      name: design name
-      updatedAt: 1971-03-24T08:40:07+09:00
     items:
       $ref: '#/definitions/BlogDesign'
     type: array
@@ -258,29 +191,24 @@ definitions:
     example:
       background_image: http://hoge.com/a.png
       base_color: blue
-      id: des_001
+      id: pop1
       name: design name
     properties:
       background_image:
         description: 背景画像
-        example: http://hoge.com/a.png
         type: string
       base_color:
         description: ベースカラー
-        example: blue
         type: string
       id:
         description: デザインID
-        example: des_001
         type: string
       name:
         description: 名前
-        example: design name
         type: string
     required:
     - id
     - name
-    - base_color
     type: object
 
   CreateAdminRolePayload:
@@ -290,10 +218,9 @@ definitions:
       role_id: operator
     properties:
       paths:
-        $ref: '#/definitions/adminrolepath'
+        $ref: '#/definitions/AdminRolePath'
       role_id:
         description: role id
-        example: operator
         type: string
     type: object
     required:
@@ -307,16 +234,13 @@ definitions:
       role_id: viewer
     properties:
       email:
-        description: login user mail address
-        example: user@sample.com
+        description: E-Mail
         type: string
       password:
-        description: password for email auth
-        example: XXXXXXXXXXXXXXXX
+        description: パスワード
         type: string
       role_id:
-        description: admin role id
-        example: viewer
+        description: ユーザ権限ID
         type: string
         x-autogen-enum:
           model: admin_roles
@@ -330,7 +254,6 @@ definitions:
     type: object
 
   Viron:
-    description: A Viron settings data
     example:
       color: white
       name: Viron Example Project for Node.js
@@ -357,7 +280,7 @@ definitions:
       tags:
       - viron
       - example
-      thumbnail: Iure nisi.
+      thumbnail: https://image.com/thumb.png
     properties:
       color:
         default: white
@@ -365,48 +288,18 @@ definitions:
         - white
         - black
         - perple
-        example: white
         type: string
       name:
-        description: Name pattern
-        example: Viron Example Project for Node.js
         type: string
       pages:
-        description: A Pages format
-        example:
-        - components:
-          - api:
-              method: get
-              path: /stats/dau
-            name: DAU
-            options:
-            - key: key
-              value: value
-            pagination: true
-            query:
-            - key: key
-              type: string
-            style: number
-            table_labels:
-            - name
-          group: empty
-          id: quickview
-          name: クイックビュー
-          section: dashboard
         items:
-          $ref: '#/definitions/page'
+          $ref: '#/definitions/Page'
         type: array
       tags:
-        description: tags
-        example:
-        - viron
         items:
-          example: viron
           type: string
         type: array
       thumbnail:
-        description: thumbnail of endpoint
-        example: https://viron.com/thumbnail.png
         type: string
     required:
     - name
@@ -422,45 +315,16 @@ definitions:
       password: XXXXXXXXXXXX
     properties:
       email:
-        example: user1@viron.com
         type: string
       password:
-        example: XXXXXXXXXXXX
         type: string
-    type: object
-
-  StatsGuideType:
-    example:
-      x:
-        label: x-label
-      y:
-        label: y-label
-    properties:
-      x:
-        $ref: '#/definitions/StatsLabelType'
-      y:
-        $ref: '#/definitions/StatsLabelType'
-    type: object
-
-  StatsLabelType:
-    example:
-      label: yyyymmdd
-    properties:
-      label:
-        example: yyyymmdd
-        type: string
-    required:
-    - label
     type: object
 
   Statsdau:
-    description: A DAU data
     example:
       value: 12345678
     properties:
       value:
-        description: DAU of Stats
-        example: 12345678
         format: int64
         type: integer
     required:
@@ -468,13 +332,10 @@ definitions:
     type: object
 
   Statsmau:
-    description: A MAU data
     example:
       value: 98765432
     properties:
       value:
-        description: MAU of Stats
-        example: 98765432
         format: int64
         type: integer
     required:
@@ -482,7 +343,6 @@ definitions:
     type: object
 
   StatsChart:
-    description: Chart data
     example:
       chart:
         type: area
@@ -507,8 +367,7 @@ definitions:
       - "GET:/user": true
     properties:
       paths:
-        description: target path
-        $ref: '#/definitions/adminrolepath'
+        $ref: '#/definitions/AdminRolePath'
     type: object
 
   UpdateAdminUserPayload:
@@ -517,12 +376,10 @@ definitions:
       role_id: viewer
     properties:
       password:
-        description: password for email auth
-        example: XXXXXXXXXXXXXXXX
+        description: パスワード
         type: string
       role_id:
-        description: admin role id
-        example: viewer
+        description: ユーザ権限ID
         type: string
         x-autogen-enum:
           model: admin_roles
@@ -539,20 +396,17 @@ definitions:
       password: XXXXXXXXXXXXXXXX
     properties:
       password:
-        description: password for email auth
-        example: XXXXXXXXXXXXXXXX
+        description: パスワード
         type: string
     required:
     - password
     type: object
 
   User:
-    description: A User
     example:
       birthday: 1995-05-12T09:45:56Z
       blood_type: A
       createdAt: 2010-04-14T11:16:32+09:00
-      deletedAt: 2014-04-27T12:25:11+09:00
       id: 1
       job: 大学生
       name: 山田 太郎
@@ -561,7 +415,6 @@ definitions:
     properties:
       birthday:
         description: 誕生日
-        example: 1995-05-12T09:45:56Z
         format: date-time
         type: string
       blood_type:
@@ -571,30 +424,20 @@ definitions:
         - B
         - O
         - AB
-        example: A
         type: string
       createdAt:
         description: 作成日時
-        example: 2010-04-14T11:16:32+09:00
-        format: date-time
-        type: string
-      deletedAt:
-        description: 削除日時
-        example: 2014-04-27T12:25:11+09:00
         format: date-time
         type: string
       id:
         description: ユーザーID
-        example: 1
         format: int64
         type: integer
       job:
         description: 職業
-        example: 大学生
         type: string
       name:
         description: 名前
-        example: 山田 太郎
         type: string
       sex:
         description: 性別
@@ -602,7 +445,6 @@ definitions:
         - male
         - female
         - other
-        example: male
         type: string
         readOnly: true
       thumbnail:
@@ -612,7 +454,6 @@ definitions:
         x-mime-type: image/png
       updatedAt:
         description: 更新日時
-        example: 1994-04-27T12:25:11+09:00
         format: date-time
         type: string
     required:
@@ -621,7 +462,6 @@ definitions:
     type: object
 
   UserBlog:
-    description: A User Blog
     example:
       created_at: 1993-07-26T02:54:17+09:00
       design_id: simple
@@ -634,12 +474,6 @@ definitions:
     properties:
       createdAt:
         description: 作成日時
-        example: 1993-07-26T02:54:17+09:00
-        format: date-time
-        type: string
-      deletedAt:
-        description: 削除日時
-        example: 1999-11-12T02:46:55+09:00
         format: date-time
         type: string
       design_id:
@@ -649,33 +483,26 @@ definitions:
         - tile
         - 2column
         - 3column
-        example: simple
         type: string
       genre:
         description: ジャンル
-        example: game
         type: string
       id:
         description: ユーザーブログID
-        example: 11
         format: int64
         type: integer
       sub_title:
         description: サブタイトル
-        example: diary
         type: string
       title:
         description: タイトル
-        example: user's blog
         type: string
       updatedAt:
         description: 更新日時
-        example: 1979-11-12T02:46:55+09:00
         format: date-time
         type: string
       user_id:
         description: ユーザーID
-        example: 1
         format: int64
         type: integer
     required:
@@ -686,11 +513,9 @@ definitions:
     type: object
 
   UserBlogEntry:
-    description: A User Blog Entry
     example:
-      content: Velit iure doloribus.
+      content: <h1>diary 1/4</h1><div>text....</div>
       createdAt: 1991-02-16T10:17:41+09:00
-      deletedAt: 2005-10-21T03:42:51+09:00
       id: 111
       theme: diary
       title: 今日の日記
@@ -699,39 +524,28 @@ definitions:
     properties:
       content:
         description: 内容
-        example: Velit iure doloribus.
         type: string
+        format: wyswyg
       createdAt:
         description: 作成日時
-        example: 1991-02-16T10:17:41+09:00
-        format: date-time
-        type: string
-      deletedAt:
-        description: 削除日時
-        example: 2005-02-16T10:17:41+09:00
         format: date-time
         type: string
       id:
         description: ユーザーブログ記事ID
-        example: 111
         format: int64
         type: integer
       theme:
         description: テーマ
-        example: diary
         type: string
       title:
         description: タイトル
-        example: 今日の日記
         type: string
       updatedAt:
         description: 更新日時
-        example: 2003-10-21T03:42:51+09:00
         format: date-time
         type: string
       user_blog_id:
         description: ユーザーブログID
-        example: 11
         format: int64
         type: integer
     required:
@@ -742,29 +556,17 @@ definitions:
     type: object
 
   UserBlogEntryCollection:
-    description: UserBlogEntryCollection is the media type for an array of UserBlogEntry
-    example:
-    - content: Velit iure doloribus.
-      createdAt: 1991-02-16T10:17:41+09:00
-      deletedAt: 2005-10-21T03:42:51+09:00
-      id: 111
-      theme: diary
-      title: 今日の日記
-      updatedAt: 2003-10-21T03:42:51+09:00
-      user_blog_id: 11
     items:
       $ref: '#/definitions/UserBlogEntry'
     type: array
 
   UserFavorite:
-    description: A User Favorite Entry
     example:
       user_id: 1
       user_blog_id: 11
     properties:
       user_id:
         description: ユーザーID
-        example: 1
         format: int64
         type: integer
       user_blog_ids:
@@ -778,7 +580,6 @@ definitions:
     type: object
 
   UserFavoriteCollection:
-    description: an array of UserFavorite
     items:
       $ref: '#/definitions/UserFavorite'
     type: array
@@ -794,7 +595,7 @@ definitions:
           field: name
           path: /viron_autocomplete
           query:
-            model: user
+            model: users
             value: id
       user_blog_ids:
         description: ブログ選択
@@ -802,7 +603,6 @@ definitions:
           field: id
           model: user_blogs
           default: false
-    title: UserFavoriteCreatePayload
     required:
     - user_id
     - user_blog_ids
@@ -816,68 +616,34 @@ definitions:
           field: id
           model: user_blogs
           default: false
-    title: UserFavoriteUpdatePayload
     required:
     - user_blog_ids
     type: object
 
-
   UserBlogCollection:
-    description: UserBlogCollection is the media type for an array of UserBlog
-    example:
-    - createdAt: 1993-07-26T02:54:17+09:00
-      deletedAt: 1999-07-26T02:54:17+09:00
-      design_id: simple
-      genre: game
-      id: 11
-      sub_title: diary
-      title: user's blog
-      updatedAt: 1979-11-12T02:46:55+09:00
-      user_id: 1
-    - created_at: 1993-07-26T02:54:17+09:00
-      deletedAt: 1999-07-26T02:54:17+09:00
-      design_id: simple
-      genre: game
-      id: 11
-      sub_title: diary
-      title: user's blog
-      updated_at: 1979-11-12T02:46:55+09:00
-      user_id: 1
-    - created_at: 1993-07-26T02:54:17+09:00
-      deletedAt: 1999-07-26T02:54:17+09:00
-      design_id: simple
-      genre: game
-      id: 11
-      sub_title: diary
-      title: user's blog
-      updated_at: 1979-11-12T02:46:55+09:00
-      user_id: 1
     items:
       $ref: '#/definitions/UserBlog'
     type: array
 
   UserBlogEntryPayload:
     example:
-      content: Corporis officiis distinctio optio voluptatem.
+      content: <h1>diary 1/4</h1><div>text....</div>
       theme: diary
       title: 今日の日記
       user_blog_id: 11
     properties:
       content:
         description: 内容
-        example: Corporis officiis distinctio optio voluptatem.
         type: string
+        format: wyswyg
       theme:
         description: テーマ
-        example: diary
         type: string
       title:
         description: タイトル
-        example: 今日の日記
         type: string
       user_blog_id:
         description: ユーザーブログID
-        example: 11
         format: int64
         type: integer
         x-autocomplete:
@@ -886,7 +652,6 @@ definitions:
           query:
             model: user_blogs
             value: id
-    title: UserBlogEntryPayload
     required:
     - user_blog_id
     type: object
@@ -906,23 +671,18 @@ definitions:
         - tile
         - 2column
         - 3column
-        example: simple
         type: string
       genre:
         description: ジャンル
-        example: game
         type: string
       sub_title:
         description: サブタイトル
-        example: diary
         type: string
       title:
         description: タイトル
-        example: user's blog
         type: string
       user_id:
         description: ユーザーID
-        example: 1
         format: int64
         type: integer
         x-autocomplete:
@@ -936,65 +696,12 @@ definitions:
     type: object
 
   UserCollection:
-    description: UserCollection is the media type for an array of User
-    example:
-    - birthday: 1995-05-12T09:45:56Z
-      blood_type: A
-      createdAt: 2010-04-14T11:16:32+09:00
-      deletedAt: 2014-04-27T12:25:11+09:00
-      id: 1
-      job: 大学生
-      name: 山田 太郎
-      sex: male
-      updatedAt: 1994-04-27T12:25:11+09:00
     items:
       $ref: '#/definitions/User'
     type: array
 
-  UpdateUserPayload:
-    example:
-      birthday: 1995-05-12T09:45:56Z
-      blood_type: A
-      job: 大学生
-      name: 山田 太郎
-      sex: male
-    properties:
-      birthday:
-        description: 誕生日
-        example: 1995-05-12T09:45:56Z
-        format: date-time
-        type: string
-      blood_type:
-        description: 血液型
-        enum:
-        - A
-        - B
-        - O
-        - AB
-        example: A
-        type: string
-      job:
-        description: 職業
-        example: 大学生
-        type: string
-      name:
-        description: 名前
-        example: 山田 太郎
-        type: string
-      sex:
-        description: 性別
-        enum:
-        - male
-        - female
-        - other
-        example: male
-        type: string
-        readOnly: true
-    required:
-    - name
-    type: object
-
-  adminrolepath:
+  AdminRolePath:
+    description: 許可リクエスト
     example:
       "GET:/user": true
     properties:
@@ -1002,8 +709,7 @@ definitions:
         type: boolean
     type: object
 
-  api:
-    description: Accessing api information type
+  Api:
     example:
       method: get
       path: /quickview
@@ -1021,8 +727,7 @@ definitions:
     - method
     type: object
 
-  component:
-    description: A Component type
+  Component:
     example:
       api:
         method: get
@@ -1035,36 +740,28 @@ definitions:
       query:
       - key: key
         type: string
-      style: Style of Web Component
+      style: Style of Component
       table_labels:
-      - Aut et.
-      - Aut et.
+      - id
+      - name
     properties:
       api:
-        $ref: '#/definitions/api'
+        $ref: '#/definitions/Api'
       name:
         description: Title of page
-        example: ユーザー
         type: string
       options:
         description: style options
-        example:
-        - key: key
-          value: value
         items:
-          $ref: '#/definitions/option'
+          $ref: '#/definitions/Option'
         type: array
       pagination:
         description: allow pagination
-        example: true
         type: boolean
       query:
         description: query for request
-        example:
-        - key: key
-          type: string
         items:
-          $ref: '#/definitions/query'
+          $ref: '#/definitions/Query'
         type: array
       style:
         default: number
@@ -1072,21 +769,11 @@ definitions:
         - number
         - list
         - table
-        - graph-scatterplot
-        - graph-line
-        - graph-bar
-        - graph-horizontal-bar
-        - graph-stacked-bar
-        - graph-horizontal-stacked-bar
-        - graph-stacked-area
-        example: Style of Web Component
+        - chart
         type: string
       table_labels:
         description: keys of table row
-        example:
-        - name
         items:
-          example: name
           type: string
         type: array
     required:
@@ -1096,63 +783,50 @@ definitions:
     - pagination
     type: object
 
-  error:
-    description: Error response media type
+  Error:
     example:
       code: invalid_value
       detail: Value of ID must be an integer
-      id: 3F1FKVRR
+      id: #F-0000-0001
       meta:
         timestamp: 1502172152
       status: "400"
     properties:
       code:
-        description: an application-specific error code, expressed as a string value.
-        example: invalid_value
+        description: エラーコード
         type: string
       detail:
-        description: a human-readable explanation specific to this occurrence of the
-          problem.
-        example: Value of ID must be an integer
+        description: 詳細
         type: string
       id:
-        description: a unique identifier for this particular occurrence of the problem.
-        example: 3F1FKVRR
+        description: ID
         type: string
       meta:
         additionalProperties: true
-        description: a meta object containing non-standard meta-information about
-          the error.
-        example:
-          timestamp: 1502172152
+        description: メタ情報
         type: object
       status:
-        description: the HTTP status code applicable to this problem, expressed as
-          a string value.
-        example: "400"
+        description: ステータスコード
         type: string
     type: object
 
-  option:
+  Option:
     example:
       key: key
       value: value
     properties:
       key:
         description: Key
-        example: key
         type: string
       value:
         description: Value
-        example: value
         type: string
     required:
     - key
     - value
     type: object
 
-  page:
-    description: A page type
+  Page:
     example:
       components:
       - api:
@@ -1166,33 +840,17 @@ definitions:
         query:
         - key: key
           type: string
-        style: Style of Web Component
+        style: Style of Component
         table_labels:
         - name
-      group: Group of page
-      id: Repellat iure non.
-      name: Maxime consequuntur quia aliquid omnis aut.
-      section: Section of page
+      group: kpi
+      id: quickview
+      name: クイックビュー
+      section: dashboard
     properties:
       components:
-        description: A components format
-        example:
-        - api:
-            method: get
-            path: /user
-          name: ユーザー
-          options:
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - name
         items:
-          $ref: '#/definitions/component'
+          $ref: '#/definitions/Component'
         type: array
       group:
         enum:
@@ -1201,22 +859,18 @@ definitions:
         - user
         - blog
         - admin
-        example: Group of page
         type: string
       id:
-        description: id of page
-        example: quickview
+        description: ページID
         type: string
       name:
-        description: Title of page
-        example: クイックビュー
+        description: 名称
         type: string
       section:
         default: manage
         enum:
         - manage
         - dashboard
-        example: Section of page
         type: string
     required:
     - id
@@ -1226,7 +880,7 @@ definitions:
     - components
     type: object
 
-  query:
+  Query:
     example:
       key: key
       type: string
@@ -1325,16 +979,6 @@ definitions:
         example: abcde
         type: string
         pattern: "[a-z]"
-      #additional_items:
-      #  type: array
-      #  items:
-      #    - type: object
-      #      properties:
-      #        name:
-      #          type: string
-      #        age:
-      #          type: integer
-      #  additionalItems: false
       max_items:
         description: 3要素以下であること
         example:
@@ -1405,36 +1049,6 @@ definitions:
           key4:
             type: integer
         minProperties: 2
-      #additional_properties:
-      #  description: ???
-      #  type: object
-      #  properties:
-      #    x-key1:
-      #      type: string
-      #    x-key2:
-      #      type: number
-      #  patternProperties:
-      #    "^x-":
-      #      type: string
-      #  additionalProperties: false
-      #dependencies:
-      #  description: ほげ
-      #  example:
-      #    name: aiueo
-      #    credit_card: 1111111111111111
-      #    billing_address: address
-      #  properties:
-      #    name:
-      #      type: string
-      #    credit_card:
-      #      type: number
-      #    billing_address:
-      #      type: string
-      #  required:
-      #  - name
-      #  dependencies:
-      #    credit_card:
-      #    - billing_address
       all_of:
         description: 5文字以上10文字以下
         example: aaaaaaaaaa
@@ -1443,16 +1057,6 @@ definitions:
         - type: string
         - maxLength: 10
         - minLength: 5
-      #any_of:
-      #  description: 5文字以上のStringもしくは3桁以下のNumber
-      #  type:
-      #    - string
-      #    - number
-      #  anyOf:
-      #  - type: string
-      #    minLength: 5
-      #  - type: number
-      #    maxLength: 3
 
   NestedArrayCollection:
     items:
@@ -1730,11 +1334,9 @@ paths:
       responses:
         "301":
           description: Moved Permanently
-      schemes:
-      - https
-      summary: show root
+      summary: ルート
       tags:
-      - root
+      - swagger
 
   /adminrole:
     get:
@@ -1742,8 +1344,6 @@ paths:
       description: ユーザ権限の一覧
       operationId: admin_role#list
       parameters: []
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -1752,13 +1352,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -1776,8 +1374,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/CreateAdminRolePayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -1786,17 +1382,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -1815,67 +1409,25 @@ paths:
         name: role_id
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: ユーザ権限削除
-      tags:
-      - admin_role
-
-    get:
-      x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の取得
-      operationId: admin_role#show
-      parameters:
-      - description: role id
-        in: path
-        name: role_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/AdminRole'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: ユーザ権限取得
       tags:
       - admin_role
 
@@ -1894,8 +1446,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UpdateAdminRolePayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -1904,17 +1454,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -1927,8 +1475,6 @@ paths:
       x-swagger-router-controller: viron_admin_user
       description: 管理ユーザの一覧
       operationId: admin_user#list
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -1937,17 +1483,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -1965,8 +1509,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/CreateAdminUserPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -1975,17 +1517,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -2004,67 +1544,25 @@ paths:
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: 管理ユーザ削除
-      tags:
-      - admin_user
-
-    get:
-      x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザ情報の取得
-      operationId: admin_user#show
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/AdminUser'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: 管理ユーザ取得
       tags:
       - admin_user
 
@@ -2083,8 +1581,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UpdateAdminUserPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2093,17 +1589,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -2127,23 +1621,41 @@ paths:
         name: offset
         required: false
         type: integer
-      - description: http request method
+      - description: リクエストメソッド
         in: query
         name: request_method
         required: false
         type: string
-      - description: user id
+        enum:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      - description: ユーザ
         in: query
         name: user_id
         required: false
         type: string
-      - description: request uri
+      - description: リクエストURI
         in: query
         name: request_uri
         required: false
         type: string
-      produces:
-      - application/json
+      - description: 日時
+        in: query
+        name: createdAt
+        required: false
+        type: string
+      - description: ソースIP
+        in: query
+        name: source_ip
+        required: false
+        type: string
+      - description: ステータスコード
+        in: query
+        name: status_code
+        required: false
+        type: integer
       responses:
         "200":
           description: OK
@@ -2152,13 +1664,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -2182,8 +1692,16 @@ paths:
         name: offset
         required: false
         type: integer
-      produces:
-      - application/json
+      - description: デザインID
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: 名前
+        in: query
+        name: name
+        required: false
+        type: string
       responses:
         "200":
           description: OK
@@ -2192,17 +1710,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -2220,8 +1736,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/BlogDesignPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2230,17 +1744,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -2259,67 +1771,25 @@ paths:
         name: id
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: ブログデザイン削除
-      tags:
-      - blog_design
-
-    get:
-      x-swagger-router-controller: blog_design
-      description: ブログデザイン情報の取得
-      operationId: blog_design#show
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/BlogDesign'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: ブログデザイン取得
       tags:
       - blog_design
 
@@ -2338,8 +1808,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/BlogDesignPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2348,17 +1816,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -2371,8 +1837,6 @@ paths:
       x-swagger-router-controller: viron
       description: viron settings
       operationId: viron#show
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2381,17 +1845,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
-      summary: show viron
+      summary: エンドポイント全体情報 取得
       tags:
       - viron
 
@@ -2400,18 +1862,14 @@ paths:
       x-swagger-router-controller: viron_authtype
       description: get auth types
       operationId: auth_type#list
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/AuthTypeCollection'
-      schemes:
-      - https
-      summary: list auth_type
+      summary: 認証方式一覧
       tags:
-      - auth_type
+      - auth
 
   /googleoauth2callback:
     get:
@@ -2444,9 +1902,7 @@ paths:
               type: string
         "307":
           description: Temporary Redirect
-      schemes:
-      - https
-      summary: googleoauth2callback auth
+      summary: GoogleOAuth2 リダイレクトパス
       tags:
       - auth
 
@@ -2471,9 +1927,7 @@ paths:
             Location:
               description: redirect url
               type: string
-      schemes:
-      - https
-      summary: googlesignin auth
+      summary: GoogleOAuth2 認証
       tags:
       - auth
 
@@ -2482,18 +1936,14 @@ paths:
       x-swagger-router-controller: ping
       description: check alive
       operationId: ping#show
-      produces:
-      - text/plain
       responses:
         "200":
           description: OK
           schema:
             type: string
-      schemes:
-      - https
-      summary: show ping
+      summary: ping
       tags:
-      - ping
+      - system
 
   /signin:
     post:
@@ -2518,17 +1968,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       summary: サインイン
       tags:
       - auth
@@ -2541,8 +1989,6 @@ paths:
       responses:
         "204":
           description: No Content
-      schemes:
-      - https
       summary: サインアウト
       tags:
       - auth
@@ -2552,8 +1998,6 @@ paths:
       x-swagger-router-controller: stats
       description: Service Daily Activity User
       operationId: stats#dau
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2562,24 +2006,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: show stats_dau
+            $ref: '#/definitions/Error'
+      summary: DAU取得
       tags:
-      - stats_dau
+      - stats
 
   /stats/mau:
     get:
       x-swagger-router-controller: stats
       description: Service Monthly Activity User
       operationId: stats#mau
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2588,24 +2028,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: show stats_mau
+            $ref: '#/definitions/Error'
+      summary: MAU取得
       tags:
-      - stats_mau
+      - stats
 
   /stats/chart/area:
     get:
       x-swagger-router-controller: stats_chart
       description: Area Chart Data
       operationId: stats_chart#area
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2614,24 +2050,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: area stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(area)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/arearange:
     get:
       x-swagger-router-controller: stats_chart
       description: Arearange Chart Data
       operationId: stats_chart#arearange
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2640,24 +2072,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: areaarange stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(areaarange)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/areaspline:
     get:
       x-swagger-router-controller: stats_chart
       description: Areaspline Chart Data
       operationId: stats_chart#areaspline
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2666,24 +2094,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: areaspline stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(areaspline)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/areasplinerange:
     get:
       x-swagger-router-controller: stats_chart
       description: Areasplinerange Chart Data
       operationId: stats_chart#areasplinerange
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2692,24 +2116,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: areasplinerange stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(areasplinerange)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/bar:
     get:
       x-swagger-router-controller: stats_chart
       description: Bar Chart Data
       operationId: stats_chart#bar
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2718,24 +2138,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: bar stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(bar)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/bellcurve:
     get:
       x-swagger-router-controller: stats_chart
       description: Bellcurve Chart Data
       operationId: stats_chart#bellcurve
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2744,24 +2160,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: bellcurve stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(bellcurve)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/boxplot:
     get:
       x-swagger-router-controller: stats_chart
       description: Boxplot Chart Data
       operationId: stats_chart#boxplot
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2770,24 +2182,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: boxplot stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(boxplot)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/bubble:
     get:
       x-swagger-router-controller: stats_chart
       description: Bubble Chart Data
       operationId: stats_chart#bubble
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2796,24 +2204,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: bubble stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(bubble)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/bullet:
     get:
       x-swagger-router-controller: stats_chart
       description: Bullet Chart Data
       operationId: stats_chart#bullet
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2822,24 +2226,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: bullet stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(bullet)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/column:
     get:
       x-swagger-router-controller: stats_chart
       description: Column Chart Data
       operationId: stats_chart#column
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2848,24 +2248,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: column stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(column)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/columnrange:
     get:
       x-swagger-router-controller: stats_chart
       description: Columnrange Chart Data
       operationId: stats_chart#columnrange
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2874,24 +2270,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: columnrange stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(columnrange)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/errorbar:
     get:
       x-swagger-router-controller: stats_chart
       description: Errorbar Chart Data
       operationId: stats_chart#errorbar
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2900,24 +2292,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: errorbar stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(errorbar)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/funnel:
     get:
       x-swagger-router-controller: stats_chart
       description: Funnel Chart Data
       operationId: stats_chart#funnel
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2926,24 +2314,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: funnel stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(funnel)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/gauge:
     get:
       x-swagger-router-controller: stats_chart
       description: Gauge Chart Data
       operationId: stats_chart#gauge
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2952,24 +2336,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: gauge stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(gauge)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/heatmap:
     get:
       x-swagger-router-controller: stats_chart
       description: Heatmap Chart Data
       operationId: stats_chart#heatmap
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -2978,24 +2358,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: heatmap stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(heatmap)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/histogram:
     get:
       x-swagger-router-controller: stats_chart
       description: Histogram Chart Data
       operationId: stats_chart#histogram
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3004,24 +2380,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: histogram stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(histogram)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/line:
     get:
       x-swagger-router-controller: stats_chart
       description: Line Chart Data
       operationId: stats_chart#line
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3030,24 +2402,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: line stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(line)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/pareto:
     get:
       x-swagger-router-controller: stats_chart
       description: Pareto Chart Data
       operationId: stats_chart#pareto
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3056,24 +2424,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: pareto stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(pareto)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/pie:
     get:
       x-swagger-router-controller: stats_chart
       description: Pie Chart Data
       operationId: stats_chart#pie
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3082,24 +2446,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: pie stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(pie)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/polygon:
     get:
       x-swagger-router-controller: stats_chart
       description: Polygon Chart Data
       operationId: stats_chart#polygon
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3108,24 +2468,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: polygon stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(polygon)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/pyramid:
     get:
       x-swagger-router-controller: stats_chart
       description: Pyramid Chart Data
       operationId: stats_chart#pyramid
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3134,24 +2490,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: pyramid stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(pyramid)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/sankey:
     get:
       x-swagger-router-controller: stats_chart
       description: Sankey Chart Data
       operationId: stats_chart#sankey
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3160,24 +2512,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: sankey stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(sankey)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/scatter:
     get:
       x-swagger-router-controller: stats_chart
       description: Scatter Chart Data
       operationId: stats_chart#scatter
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3186,24 +2534,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: scatter stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(scatter)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/solidGauge:
     get:
       x-swagger-router-controller: stats_chart
       description: SolidGauge Chart Data
       operationId: stats_chart#solidGauge
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3212,24 +2556,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: solidGauge stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(solidGauge)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/spline:
     get:
       x-swagger-router-controller: stats_chart
       description: Spline Chart Data
       operationId: stats_chart#spline
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3238,24 +2578,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: spline stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(spline)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/streamgraph:
     get:
       x-swagger-router-controller: stats_chart
       description: Streamgraph Chart Data
       operationId: stats_chart#streamgraph
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3264,24 +2600,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: streamgraph stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(streamgraph)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/sunburst:
     get:
       x-swagger-router-controller: stats_chart
       description: Sunburst Chart Data
       operationId: stats_chart#sunburst
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3290,24 +2622,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: sunburst stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(sunburst)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/tilemap:
     get:
       x-swagger-router-controller: stats_chart
       description: Tilemap Chart Data
       operationId: stats_chart#tilemap
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3316,24 +2644,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: tilemap stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(tilemap)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/variablePie:
     get:
       x-swagger-router-controller: stats_chart
       description: VariablePie Chart Data
       operationId: stats_chart#variablePie
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3342,24 +2666,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: variablePie stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(variablePie)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/variwide:
     get:
       x-swagger-router-controller: stats_chart
       description: Variwide Chart Data
       operationId: stats_chart#variwide
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3368,24 +2688,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: variwide stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(variwide)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/vector:
     get:
       x-swagger-router-controller: stats_chart
       description: Vector Chart Data
       operationId: stats_chart#vector
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3394,24 +2710,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: vector stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(vector)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/waterfall:
     get:
       x-swagger-router-controller: stats_chart
       description: Waterfall Chart Data
       operationId: stats_chart#waterfall
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3420,24 +2732,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: waterfall stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(waterfall)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/windbarb:
     get:
       x-swagger-router-controller: stats_chart
       description: Windbarb Chart Data
       operationId: stats_chart#windbarb
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3446,24 +2754,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: windbarb stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(windbarb)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/wordcloud:
     get:
       x-swagger-router-controller: stats_chart
       description: Wordcloud Chart Data
       operationId: stats_chart#wordcloud
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3472,24 +2776,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: wordcloud stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(wordcloud)
       tags:
-      - stats_chart
+      - stats
 
   /stats/chart/xrange:
     get:
       x-swagger-router-controller: stats_chart
       description: Xrange Chart Data
       operationId: stats_chart#xrange
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3498,24 +2798,20 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      summary: xrange stats_chart
+            $ref: '#/definitions/Error'
+      summary: chart(xrange)
       tags:
-      - stats_chart
+      - stats
 
   /swagger.json:
     get:
       x-swagger-router-controller: swagger
       description: swagger.jsonの取得
       operationId: swagger#show
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3524,17 +2820,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -3553,8 +2847,6 @@ paths:
         name: name
         required: false
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3563,17 +2855,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -3623,9 +2913,7 @@ paths:
         description: サムネイル
         x-accept: image/*
       consumes:
-      - "multipart/form-data"
-      produces:
-      - application/json
+      - multipart/form-data
       responses:
         "200":
           description: OK
@@ -3634,17 +2922,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -3657,25 +2943,21 @@ paths:
       x-swagger-router-controller: user
       description: ユーザ一覧をcsvファイルでダウンロード
       operationId: user#download
-      produces:
-      - text/plain
       responses:
         "200":
           description: OK
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -3697,17 +2979,14 @@ paths:
         name: text
         type: string
       consumes:
-      - "multipart/form-data"
-        #- "application/x-www-form-urlencoded"
+      - multipart/form-data
       responses:
         "204":
           description: No Content
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -3726,67 +3005,25 @@ paths:
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: ユーザ削除
-      tags:
-      - user
-
-    get:
-      x-swagger-router-controller: user
-      description: ユーザ情報の取得
-      operationId: user#show
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: ユーザ取得
       tags:
       - user
 
@@ -3795,7 +3032,7 @@ paths:
       description: ユーザ情報の更新
       operationId: user#update
       parameters:
-      - description: id
+      - description: ID
         in: path
         name: id
         required: true
@@ -3836,9 +3073,7 @@ paths:
         type: file
         description: サムネイル
       consumes:
-      - "multipart/form-data"
-      produces:
-      - application/json
+      - multipart/form-data
       responses:
         "200":
           description: OK
@@ -3847,17 +3082,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -3881,8 +3114,21 @@ paths:
         name: offset
         required: false
         type: integer
-      produces:
-      - application/json
+      - description: ユーザID
+        in: query
+        name: user_id
+        required: false
+        type: integer
+      - description: ジャンル
+        in: query
+        name: genre
+        required: false
+        type: string
+      - description: タイトル
+        in: query
+        name: title
+        required: false
+        type: string
       responses:
         "200":
           description: OK
@@ -3891,17 +3137,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -3919,8 +3163,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UserBlogPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -3929,17 +3171,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -3958,67 +3198,25 @@ paths:
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: ユーザブログ削除
-      tags:
-      - user_blog
-
-    get:
-      x-swagger-router-controller: user_blog
-      description: ユーザブログ情報の取得
-      operationId: user_blog#show
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/UserBlog'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: ユーザブログ取得
       tags:
       - user_blog
 
@@ -4037,8 +3235,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UserBlogPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4047,17 +3243,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -4081,8 +3275,21 @@ paths:
         name: offset
         required: false
         type: integer
-      produces:
-      - application/json
+      - description: ユーザブログID
+        in: query
+        name: user_blog_id
+        required: false
+        type: integer
+      - description: タイトル
+        in: query
+        name: title
+        required: false
+        type: string
+      - description: テーマ
+        in: query
+        name: theme
+        required: false
+        type: string
       responses:
         "200":
           description: OK
@@ -4091,17 +3298,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -4119,8 +3324,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UserBlogEntryPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4129,17 +3332,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -4158,67 +3359,25 @@ paths:
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: ユーザブログ記事削除
-      tags:
-      - user_blog_entry
-
-    get:
-      x-swagger-router-controller: user_blog_entry
-      description: ユーザブログ記事情報の取得
-      operationId: user_blog_entry#show
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/UserBlogEntry'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: ユーザブログ記事取得
       tags:
       - user_blog_entry
 
@@ -4237,8 +3396,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UserBlogEntryPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4247,17 +3404,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -4281,8 +3436,6 @@ paths:
         name: offset
         required: false
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4291,17 +3444,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -4319,8 +3470,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UserFavoriteCreatePayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4329,17 +3478,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -4353,7 +3500,7 @@ paths:
       description: お気に入りの更新
       operationId: user_favorite#update
       parameters:
-      - description: user_id
+      - description: ユーザID
         in: path
         name: user_id
         required: true
@@ -4363,8 +3510,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UserFavoriteUpdatePayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4373,17 +3518,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -4401,25 +3544,21 @@ paths:
         name: user_id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -4443,8 +3582,6 @@ paths:
         name: offset
         required: false
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4453,23 +3590,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: バリデータ
       tags:
-      - validator
+      - sample
 
     post:
       x-swagger-router-controller: validator
@@ -4481,8 +3616,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/Validator'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4491,23 +3624,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: バリデータ作成
       tags:
-      - validator
+      - sample
 
   /validator/{id}:
     put:
@@ -4525,8 +3656,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/Validator'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4535,23 +3664,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: バリデータ更新
       tags:
-      - validator
+      - sample
 
   /nestedarray:
     get:
@@ -4569,8 +3696,6 @@ paths:
         name: offset
         required: false
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4579,23 +3704,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: ネスト配列一覧
       tags:
-      - nested_array
+      - sample
 
     post:
       x-swagger-router-controller: nested_array
@@ -4607,8 +3730,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/NestedArray'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4617,23 +3738,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: ネスト配列作成
       tags:
-      - nested_array
+      - sample
 
   /nestedarray/{id}:
     put:
@@ -4651,8 +3770,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/NestedArray'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4661,23 +3778,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: ネスト配列更新
       tags:
-      - netsted_array
+      - sample
 
   /format:
     get:
@@ -4695,8 +3810,6 @@ paths:
         name: offset
         required: false
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4705,23 +3818,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: フォーマット一覧
       tags:
-      - format
+      - sample
 
     post:
       x-swagger-router-controller: format
@@ -4733,8 +3844,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/Format'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4743,23 +3852,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: フォーマット作成
       tags:
-      - format
+      - sample
 
   /format/{id}:
     put:
@@ -4777,8 +3884,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/Format'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4787,23 +3892,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: フォーマット更新
       tags:
-      - format
+      - sample
 
   /default:
     get:
@@ -4821,8 +3924,6 @@ paths:
         name: offset
         required: false
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4831,23 +3932,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: デフォルト 一覧
       tags:
-      - default
+      - sample
 
     post:
       x-swagger-router-controller: default
@@ -4859,8 +3958,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/DefaultForm'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4869,23 +3966,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: デフォルト 作成
       tags:
-      - defualt
+      - sample
 
   /default/{id}:
     put:
@@ -4903,8 +3998,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/DefaultForm'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4913,23 +4006,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: デフォルト 更新
       tags:
-      - default
+      - sample
 
   /multiquery/a:
     get:
@@ -4957,8 +4048,6 @@ paths:
         name: name
         required: false
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -4967,23 +4056,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: 横断検索
       tags:
-      - multiquery
+      - sample
 
   /multiquery/b:
     get:
@@ -5016,8 +4103,6 @@ paths:
         name: age
         required: false
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -5026,23 +4111,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: 横断検索
       tags:
-      - multiquery
+      - sample
 
   /multiquery/c:
     get:
@@ -5070,8 +4153,6 @@ paths:
         name: age
         required: false
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -5080,23 +4161,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: 横断検索
       tags:
-      - multiquery
+      - sample
 
   /multiquery/d:
     get:
@@ -5124,8 +4203,6 @@ paths:
         name: address
         required: false
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -5134,23 +4211,21 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: 横断検索
       tags:
-      - multiquery
+      - sample
 
   /multiquery/e:
     get:
@@ -5183,8 +4258,6 @@ paths:
         name: name
         required: false
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -5193,45 +4266,39 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: 横断検索
       tags:
-      - multiquery
+      - sample
 
   /formdata/string:
     get:
       x-swagger-router-controller: formdata
       description: フォームデータ
       operationId: formdata#string#show
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
               type: string
-      schemes:
-      - https
       security:
       - jwt:
         - api:access
       summary: フォームデータ
       tags:
-      - formdata
+      - sample
     post:
       x-swagger-router-controller: formdata
       description: フォームデータ
@@ -5243,8 +4310,6 @@ paths:
         type: array
         items:
           type: string
-      produces:
-      - application/json
       consumes:
       - multipart/form-data
       responses:
@@ -5253,36 +4318,30 @@ paths:
           schema:
             items:
               type: string
-      schemes:
-      - https
       security:
       - jwt:
         - api:access
       summary: フォーム作成
       tags:
-      - form
+      - sample
 
   /formdata/number:
     get:
       x-swagger-router-controller: formdata
       description: フォームデータ
       operationId: formdata#number#show
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
               type: number
-      schemes:
-      - https
       security:
       - jwt:
         - api:access
       summary: フォームデータ
       tags:
-      - formdata
+      - sample
     post:
       x-swagger-router-controller: formdata
       description: フォームデータ
@@ -5294,8 +4353,6 @@ paths:
         type: array
         items:
           type: number
-      produces:
-      - application/json
       consumes:
       - multipart/form-data
       responses:
@@ -5304,36 +4361,31 @@ paths:
           schema:
             items:
               type: number
-      schemes:
-      - https
       security:
       - jwt:
         - api:access
       summary: フォーム作成
       tags:
-      - form
+      - sample
 
   /formdata/boolean:
     get:
       x-swagger-router-controller: formdata
       description: フォームデータ
       operationId: formdata#boolean#show
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
               type: boolean
-      schemes:
-      - https
       security:
       - jwt:
         - api:access
       summary: フォームデータ
       tags:
-      - formdata
+      - sample
+
     post:
       x-swagger-router-controller: formdata
       description: フォームデータ
@@ -5345,8 +4397,6 @@ paths:
         type: array
         items:
           type: boolean
-      produces:
-      - application/json
       consumes:
       - multipart/form-data
       responses:
@@ -5355,22 +4405,18 @@ paths:
           schema:
             items:
               type: boolean
-      schemes:
-      - https
       security:
       - jwt:
         - api:access
       summary: フォーム作成
       tags:
-      - form
+      - sample
 
   /viron_autocomplete:
     get:
       x-swagger-router-controller: viron_autocomplete
       description: オートコンプリート
       operationId: viron_autocomplete#list
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -5386,31 +4432,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
       summary: 横断検索
       tags:
-      - multiquery
+      - sample
 
   /account:
     get:
       x-swagger-router-controller: viron_account
       description: アカウント情報取得
       operationId: account#list
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -5419,17 +4461,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -5438,44 +4478,6 @@ paths:
       - account
 
   /account/{id}:
-    get:
-      x-swagger-router-controller: viron_account
-      description: アカウント情報取得
-      operationId: account#show
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/AdminUser'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: 管理ユーザ取得
-      tags:
-      - account
-
     put:
       x-swagger-router-controller: viron_account
       description: アカウント情報の更新
@@ -5491,8 +4493,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/UpdateAccountPayload'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -5501,17 +4501,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - https
+            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -5520,13 +4518,33 @@ paths:
       - account
 
 #################################################
+# tags
+#################################################
+tags:
+  - name: viron
+  - name: swagger
+  - name: auth
+  - name: admin_role
+  - name: admin_user
+  - name: audit_log
+  - name: account
+  - name: user
+  - name: user_blog
+  - name: user_blog_entry
+  - name: user_favorite
+  - name: blog_design
+  - name: stats
+  - name: sample
+  - name: system
+
+#################################################
 # securityDefinitions
 # - API全体で利用できる認証スキーム
 #################################################
 securityDefinitions:
   jwt:
     type: oauth2
-    authorizationUrl: /signin
+    authorizationUrl: https://localhost:3000/signin
     flow: implicit
     scopes:
       api:access: API access

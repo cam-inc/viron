@@ -77,32 +77,6 @@ const remove = (req, res, next) => {
 };
 
 /**
- * Controller : Show  Blog Design
- * HTTP Method : GET
- * PATH : /blogdesign/:id
- *
- * @returns {Promise.<TResult>}
- */
-const show = (req, res, next) => {
-  const vironlib = context.getVironLib();
-  const storeHelper = vironlib.stores.helper;
-  const store = context.getStoreMain();
-  const BlogDesigns = store.models.BlogDesigns;
-  const query = {
-    id: req.swagger.params.id.value,
-  };
-  const options = {
-    attributes: Object.keys(req.swagger.operation.responses['200'].schema.properties),
-  };
-  return storeHelper.findOne(store, BlogDesigns, query, options)
-    .then(data => {
-      res.json(data);
-    })
-    .catch(next)
-  ;
-};
-
-/**
  * Controller : update  Blog Design
  * HTTP Method : PUT
  * PATH : /blogdesign/:id
@@ -129,6 +103,5 @@ module.exports = {
   'blog_design#list': list,
   'blog_design#create': create,
   'blog_design#remove': remove,
-  'blog_design#show': show,
   'blog_design#update': update,
 };
