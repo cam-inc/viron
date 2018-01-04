@@ -88,8 +88,18 @@ Highcharts.setOptions({
     crosshairs: true,
     enabled: true
   },
-  xAxis: { title: null },
-  yAxis: { title: null }
+  xAxis: {
+    title: null,
+    labels: {
+      style: { fontSize: '8px' }
+    }
+  },
+  yAxis: {
+    title: null,
+    labels: {
+      style: { fontSize: '8px' }
+    }
+  }
 });
 
 export default Highcharts;
