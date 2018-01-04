@@ -47,10 +47,8 @@ export default function() {
   this.on('mount', () => {
     TinyMCE.init(ObjectAssign({}, baseConfig, {
       selector: `.Wyswyg__editor${this._riot_id}`,
-      setup: editor => {
-        this.editor = editor;
-      },
       init_instance_callback: editor => {
+        this.editor = editor;
         !!this.opts.val && this.editor.setContent(this.opts.val);
         this.editor.on('Change', this.handleEditorChange);
         this.editor.on('focus', this.handleEditorFocus);
