@@ -143,7 +143,7 @@ const show = (req, res) => {
             components: [
               genTableComponent('ユーザ', 'get', '/user', 'id', [
                 {key: 'name', type: 'string'}
-              ], ['id', 'name'], [
+              ], ['id', 'name', 'job', 'sex'], [
                 '/user/upload/csv',
                 '/user/download/csv',
               ]),
@@ -153,14 +153,22 @@ const show = (req, res) => {
             id: 'userblog',
             name: 'ユーザブログ',
             components: [
-              genTableComponent('ユーザブログ', 'get', '/userblog', 'id', null, ['id', 'user_id']),
+              genTableComponent('ユーザブログ', 'get', '/userblog', 'id', [
+                {key: 'user_id', type: 'integer'},
+                {key: 'genre', type: 'string'},
+                {key: 'title', type: 'string'},
+              ], ['id', 'user_id', 'genre', 'title', 'sub_title']),
             ],
           },
           {
             id: 'userblogentry',
             name: 'ユーザブログ記事',
             components: [
-              genTableComponent('ユーザブログ記事', 'get', '/userblogentry', 'id', null, ['id', 'user_blog_id']),
+              genTableComponent('ユーザブログ記事', 'get', '/userblogentry', 'id', [
+                {key: 'user_blog_id', type: 'integer'},
+                {key: 'title', type: 'string'},
+                {key: 'theme', type: 'string'},
+              ], ['id', 'user_blog_id', 'title', 'theme']),
             ],
           },
           {
@@ -168,6 +176,18 @@ const show = (req, res) => {
             name: 'お気に入り',
             components: [
               genTableComponent('お気に入り', 'get', '/userfavorite', 'user_id', null, ['id', 'user_id']),
+            ],
+          },
+        ],
+        [constant.GROUP_BLOG]: [
+          {
+            id: 'blogdesign',
+            name: 'ブログデザイン',
+            components: [
+              genTableComponent('ブログデザイン', 'get', '/blogdesign', 'id', [
+                {key: 'id', type: 'string'},
+                {key: 'name', type: 'string'},
+              ], ['id', 'name']),
             ],
           },
         ],
@@ -238,15 +258,6 @@ const show = (req, res) => {
             ],
           },
         ],
-        [constant.GROUP_BLOG]: [
-          {
-            id: 'blogdesign',
-            name: 'ブログデザイン',
-            components: [
-              genTableComponent('ブログデザイン', 'get', '/blogdesign', 'id', null, ['id', 'name']),
-            ],
-          },
-        ],
         // Admin
         [constant.GROUP_ADMIN]: [
           {
@@ -260,21 +271,28 @@ const show = (req, res) => {
             id: 'adminuser',
             name: 'Viron 管理ユーザ',
             components: [
-              genTableComponent('Viron 管理ユーザ', 'get', '/adminuser', 'id', null, ['email', 'role_id']),
+              genTableComponent('Viron 管理ユーザ', 'get', '/adminuser', 'id', null, ['id', 'email', 'role_id']),
             ],
           },
           {
             id: 'auditlog',
             name: 'Viron 監査ログ',
             components: [
-              genTableComponent('Viron 監査ログ', 'get', '/auditlog', null, null, ['createdAt', 'request_uri', 'request_method']),
+              genTableComponent('Viron 監査ログ', 'get', '/auditlog', null, [
+                {key: 'createdAt', type: 'string'},
+                {key: 'request_uri', type: 'string'},
+                {key: 'request_method', type: 'string'},
+                {key: 'source_ip', type: 'string'},
+                {key: 'status_code', type: 'integer'},
+                {key: 'user_id', type: 'string'},
+              ], ['createdAt', 'request_uri', 'request_method', 'status_code', 'user_id']),
             ],
           },
           {
             id: 'account',
             name: 'アカウント設定',
             components: [
-              genTableComponent('アカウント設定', 'get', '/account', 'id', null, ['email', 'role_id']),
+              genTableComponent('アカウント設定', 'get', '/account', 'id', null, ['id', 'email', 'role_id']),
             ],
           },
         ],

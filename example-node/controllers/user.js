@@ -89,32 +89,6 @@ const remove = (req, res, next) => {
 };
 
 /**
- * Controller : Show  User
- * HTTP Method : GET
- * PATH : /user/:id
- *
- * @returns {Promise.<TResult>}
- */
-const show = (req, res, next) => {
-  const vironlib = context.getVironLib();
-  const storeHelper = vironlib.stores.helper;
-  const store = context.getStoreMain();
-  const Users = store.models.Users;
-  const query = {
-    id: req.swagger.params.id.value,
-  };
-  const options = {
-    attributes: Object.keys(req.swagger.operation.responses['200'].schema.properties),
-  };
-  return storeHelper.findOne(store, Users, query, options)
-    .then(data => {
-      res.json(data);
-    })
-    .catch(next)
-  ;
-};
-
-/**
  * Controller : update  User
  * HTTP Method : PUT
  * PATH : /user/:id
@@ -220,7 +194,6 @@ module.exports = {
   'user#list': list,
   'user#create': create,
   'user#remove': remove,
-  'user#show': show,
   'user#update': update,
   'user#upload': upload,
   'user#download': download,
