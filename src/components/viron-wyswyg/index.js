@@ -50,6 +50,7 @@ export default function() {
       selector: `.Wyswyg__editor${this._riot_id}`,
       init_instance_callback: editor => {
         this.editor = editor;
+        !!this.opts.val && this.editor.setContent(this.opts.val);
         this.editor.on('Change', this.handleEditorChange);
         this.editor.on('focus', this.handleEditorFocus);
         this.editor.on('blur', this.handleEditorBlur);
@@ -59,6 +60,8 @@ export default function() {
     this.editor.off('Change', this.handleEditorChange);
     this.editor.off('focus', this.handleEditorFocus);
     this.editor.off('blur', this.handleEditorBlur);
+    // destroy時にエラーが発生する。TinyMCEの対応待ち。
+    // @see: https://github.com/tinymce/tinymce/issues/3765
     this.editor.destroy();
     this.editor = null;
   });
