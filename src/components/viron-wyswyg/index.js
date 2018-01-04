@@ -1,57 +1,35 @@
 import throttle from 'mout/function/throttle';
 import ObjectAssign from 'object-assign';
 import TinyMCE from 'tinymce';
-import 'tinymce/plugins/anchor/plugin';
-import 'tinymce/plugins/charmap/plugin';
 import 'tinymce/plugins/code/plugin';
-import 'tinymce/plugins/directionality/plugin';
-import 'tinymce/plugins/emoticons/plugin';
-import 'tinymce/plugins/fullpage/plugin';
 import 'tinymce/plugins/fullscreen/plugin';
-import 'tinymce/plugins/help/plugin';
 import 'tinymce/plugins/hr/plugin';
 import 'tinymce/plugins/image/plugin';
-import 'tinymce/plugins/imagetools/plugin';
-import 'tinymce/plugins/insertdatetime/plugin';
 import 'tinymce/plugins/link/plugin';
 import 'tinymce/plugins/lists/plugin';
-import 'tinymce/plugins/media/plugin';
-import 'tinymce/plugins/nonbreaking/plugin';
-import 'tinymce/plugins/pagebreak/plugin';
 import 'tinymce/plugins/paste/plugin';
-import 'tinymce/plugins/preview/plugin';
-import 'tinymce/plugins/print/plugin';
 import 'tinymce/plugins/searchreplace/plugin';
 import 'tinymce/plugins/table/plugin';
-import 'tinymce/plugins/template/plugin';
 import 'tinymce/plugins/textcolor/plugin';
-import 'tinymce/plugins/toc/plugin';
 
 const url = new URL(window.location.href);
 const baseConfig = {
-  menubar: 'file edit view',
   menu: {
-    edit: { title: 'Edit', items: 'cut, copy, paste' },
-    view: { title: 'View', items: 'table, tabledelete, tablecellprops, tablemergecells, tablesplitcells, tableinsertrowbefore, tableinsertrowafter, tabledeleterow, tablerowprops, tablecutrow, tablecopyrow, tablepasterowbefore, tablepasterowafter, tableinsertcolbefore, tableinsertcolafter, tabledeletecol' }
+    edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+    insert: { title: 'Insert', items: 'image link | inserttable hr' },
+    format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat'},
+    tools: {title: 'Tools', items: 'code fullscreen'}
   },
   toolbar: [
-    'newdocument | bold italic underline strikethrough',
-    'alignleft aligncenter alignright | alignjustify alignnone',
-    'styleselect formatselect fontselect fontsizeselect',
-    'outdent indent | blockquote',
-    'undo redo removeformat subscript superscript insert',
-    'code hr bullist numlist | link unlink openlink',
-    'image | charmap pastetext print preview anchor pagebreak searchreplace',
-    'help fullscreen insertdatetime media nonbreaking',
-    'rotateleft rotateright flipv fliph editimage imageoptions | fullpage',
-    'ltr rtl | emoticons template | forecolor backcolor | toc'
+    'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image link unlink',
+    'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
   ],
-  plugins: ['code', 'hr', 'lists', 'link', 'image', 'charmap', 'paste', 'print', 'preview', 'anchor', 'pagebreak', 'searchreplace', 'help', 'fullscreen', 'insertdatetime', 'media', 'nonbreaking', 'table', 'imagetools', 'fullpage', 'directionality', 'emoticons', 'template', 'textcolor', 'toc'],
+  plugins: ['code', 'hr', 'lists', 'link', 'image', 'paste', 'searchreplace', 'fullscreen', 'table', 'textcolor'],
   min_height: 300,
   branding: false,
-  relative_urls : false,
-  remove_script_host : true,
-  document_base_url : `${url.origin}${url.pathname}tinymce`,
+  relative_urls: false,
+  remove_script_host: true,
+  document_base_url: `${url.origin}${url.pathname}tinymce`,
   skin: 'lightgray',
   skin_url: 'skins/lightgray',
   theme: 'modern',
