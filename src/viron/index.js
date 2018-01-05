@@ -6,6 +6,7 @@ export default function() {
   this.isLaunched = store.getter('application.isLaunched');
   this.isNavigating = store.getter('application.isNavigating');
   this.isNetworking = store.getter('application.isNetworking');
+  this.theme = store.getter('viron.theme');
   // 表示すべきページの名前。
   this.pageName = store.getter('location.name');
   // TOPページか否か。
@@ -35,6 +36,10 @@ export default function() {
     this.isNetworking = store.getter('application.isNetworking');
     this.endpointFilterText = store.getter('application.endpointFilterText');
     this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
+    this.update();
+  });
+  this.listen('viron', () => {
+    this.theme = store.getter('viron.theme');
     this.update();
   });
   this.listen('location', () => {

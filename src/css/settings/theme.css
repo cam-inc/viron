@@ -1,0 +1,11 @@
+:root {
+  /* 各cssファイルから参照される変数群。値は適当。 */
+  --theme-text: #fff;
+
+  /* --theme-fooを上書きするため。 */
+  /* standard */
+  --theme-standard-text: #484848;
+
+  /* midnight */
+  --theme-midnight-text: red;
+}

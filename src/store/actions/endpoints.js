@@ -31,7 +31,8 @@ export default exporter('endpoints', {
           version: '',
           color: '',
           thumbnail: null,
-          tags: []
+          tags: [],
+          theme: 'standard'
         };
         context.commit('endpoints.add', key, newEndpoint);
       });

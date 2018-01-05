@@ -5,7 +5,8 @@ module.exports = {
     'postcss-apply': {},
     'postcss-mixins': {},
     'postcss-custom-properties': {
-      "preserve": true
+      'preserve': true,
+      'warnings': false
     },
     'postcss-flexbugs-fixes': {},
     'autoprefixer': {

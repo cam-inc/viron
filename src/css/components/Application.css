@@ -7,6 +7,8 @@
   position: relative;
   display: block;
   height: 100%;
+  color: var(--theme-text);
+  background-color: #f0f0ef;
 
   &__container {
     display: grid;
@@ -127,5 +129,17 @@
     & .Application__main {
       padding: 0 4px 24px;
     }
+  }
+
+  /* theme関連 */
+  &--standard {
+    --theme-text: var(--theme-standard-text);
+  }
+
+  &--midnight {
+    --theme-text: var(--theme-midnight-text);
+  }
+
+  &--terminal {
   }
 }
