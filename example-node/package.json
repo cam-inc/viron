@@ -20,7 +20,7 @@
     "mout": "^1.0.0",
     "multer": "^1.3.0",
     "mysql2": "^1.3.6",
-    "node-vironlib": "^1.5.8",
+    "node-vironlib": "^1.5.9",
     "sequelize": "^4.3.2",
     "swagger-express-mw": "0.7.0"
   },
