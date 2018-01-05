@@ -12,8 +12,8 @@
     padding: 24px;
     overflow: hidden;
     cursor: pointer;
-    background-color: var(--color-base-white);
-    border: 1px solid var(--color-base-gray);
+    background-color: var(--theme-endpointCard-bg);
+    border: 1px solid var(--theme-endpointCard-border);
     border-radius: 6px;
   }
 

@@ -7,8 +7,8 @@
   position: relative;
   display: block;
   height: 100%;
-  color: var(--theme-text);
-  background-color: #f0f0ef;
+  color: var(--theme-app-text);
+  background-color: var(--theme-app-bg);
 
   &__container {
     display: grid;
@@ -133,13 +133,41 @@
 
   /* theme関連 */
   &--standard {
-    --theme-text: var(--theme-standard-text);
+    --theme-app-text: var(--theme-standard-app-text);
+    --theme-app-bg: var(--theme-standard-app-bg);
+    --theme-poster-overlay: var(--theme-standard-poster-overlay);
+    --theme-menu-logo: var(--theme-standard-menu-logo);
+    --theme-menu-text: var(--theme-standard-menu-text);
+    --theme-menu-arrow: var(--theme-standard-menu-arrow);
+    --theme-menu-overlay: var(--theme-standard-menu-overlay);
+    --theme-header-bg: var(--theme-standard-header-bg);
+    --theme-endpointCard-bg: var(--theme-standard-endpointCard-bg);
+    --theme-endpointCard-border: var(--theme-standard-endpointCard-border);
   }
 
   &--midnight {
-    --theme-text: var(--theme-midnight-text);
+    --theme-app-text: var(--theme-midnight-app-text);
+    --theme-app-bg: var(--theme-midnight-app-bg);
+    --theme-poster-overlay: var(--theme-midnight-poster-overlay);
+    --theme-menu-logo: var(--theme-midnight-menu-logo);
+    --theme-menu-text: var(--theme-midnight-menu-text);
+    --theme-menu-arrow: var(--theme-midnight-menu-arrow);
+    --theme-menu-overlay: var(--theme-midnight-menu-overlay);
+    --theme-header-bg: var(--theme-midnight-header-bg);
+    --theme-endpointCard-bg: var(--theme-midnight-endpointCard-bg);
+    --theme-endpointCard-border: var(--theme-midnight-endpointCard-border);
   }
 
   &--terminal {
+    --theme-app-text: var(--theme-terminal-app-text);
+    --theme-app-bg: var(--theme-terminal-app-bg);
+    --theme-poster-overlay: var(--theme-terminal-poster-overlay);
+    --theme-menu-logo: var(--theme-terminal-menu-logo);
+    --theme-menu-text: var(--theme-terminal-menu-text);
+    --theme-menu-arrow: var(--theme-terminal-menu-arrow);
+    --theme-menu-overlay: var(--theme-terminal-menu-overlay);
+    --theme-header-bg: var(--theme-terminal-header-bg);
+    --theme-endpointCard-bg: var(--theme-terminal-endpointCard-bg);
+    --theme-endpointCard-border: var(--theme-terminal-endpointCard-border);
   }
 }

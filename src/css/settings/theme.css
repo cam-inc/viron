@@ -1,11 +1,50 @@
 :root {
   /* 各cssファイルから参照される変数群。値は適当。 */
-  --theme-text: #fff;
+  --theme-app-text: #fff;
+  --theme-app-bg: #fff;
+  --theme-poster-overlay: #fff;
+  --theme-menu-logo: #fff;
+  --theme-menu-text: #fff;
+  --theme-menu-arrow: #fff;
+  --theme-menu-overlay: #fff;
+  --theme-header-bg: #fff;
+  --theme-endpointCard-bg: #fff;
+  --theme-endpointCard-border: #fff;
 
   /* --theme-fooを上書きするため。 */
   /* standard */
-  --theme-standard-text: #484848;
+  --theme-standard-app-text: #484848;
+  --theme-standard-app-bg: #f0f0ef;
+  --theme-standard-poster-overlay: transparent;
+  --theme-standard-menu-logo: #f57177;
+  --theme-standard-menu-text: #fff;
+  --theme-standard-menu-arrow: #f57177;
+  --theme-standard-menu-overlay: transparent;
+  --theme-standard-header-bg: #f9f9f9;
+  --theme-standard-endpointCard-bg: #fff;
+  --theme-standard-endpointCard-border: #c6c6c5;
 
   /* midnight */
-  --theme-midnight-text: red;
+  --theme-midnight-app-text: #00c8ff;
+  --theme-midnight-app-bg: #001217;
+  --theme-midnight-poster-overlay: #001d26;
+  --theme-midnight-menu-logo: #00c8ff;
+  --theme-midnight-menu-text: #00c8ff;
+  --theme-midnight-menu-arrow: #00c8ff;
+  --theme-midnight-menu-overlay: #001d26;
+  --theme-midnight-header-bg: #001820;
+  --theme-midnight-endpointCard-bg: #001217;
+  --theme-midnight-endpointCard-border: #004051;
+
+  /* terminal */
+  --theme-terminal-app-text: #35dcba;
+  --theme-terminal-app-bg: #000;
+  --theme-terminal-poster-overlay: #091714;
+  --theme-terminal-menu-logo: #35dcba;
+  --theme-terminal-menu-text: #35dcba;
+  --theme-terminal-menu-arrow: #35dcba;
+  --theme-terminal-menu-overlay: #091714;
+  --theme-terminal-header-bg: #050d0c;
+  --theme-terminal-endpointCard-bg: #000;
+  --theme-terminal-endpointCard-border: #0d372f;
 }

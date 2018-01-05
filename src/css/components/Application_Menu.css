@@ -16,6 +16,15 @@
     background-size: cover;
   }
 
+  &__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: var(--theme-menu-overlay);
+  }
+
   &__content {
     @apply --layout-column-center-stretch;
     position: relative;
@@ -33,7 +42,7 @@
     width: 8px;
     height: 8px;
     margin-right: 16px;
-    color: var(--color-base-red);
+    color: var(--theme-menu-arrow);
   }
 
   &__logo {
@@ -42,7 +51,7 @@
     }
     width: 24px;
     height: 24px;
-    color: var(--color-base-red);
+    color: var(--theme-menu-logo);
     cursor: pointer;
   }
 
@@ -67,7 +76,7 @@
 
   &--desktop {
     & .Application_Menu_Group {
-      color: var(--color-base-white);
+      color: var(--theme-menu-text);
     }
   }
 
