@@ -2958,6 +2958,7 @@ select {
     width: 16px;
     height: 16px;
     margin: auto;
+    pointer-events: none;
   }
 .Select__blocker {
     position: absolute;
@@ -3309,22 +3310,15 @@ select {
   position: relative;
   display: block;
 }
-.Wyswyg__editor ul {
-      list-style-position: inside;
-      list-style-type: disc;
-    }
-.Wyswyg__editor ol {
-      list-style-position: inside;
-      list-style-type: decimal;
-    }
+.Wyswyg__form {
+    display: block;
+  }
 .Wyswyg__blocker {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    /* TODO: Froalaがz-index使っているので。*/
-    z-index: 999;
   }
 /* ITCSS: Components(Page) */
 /* Designed components, chunks of UI. */
