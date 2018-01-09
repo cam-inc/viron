@@ -147,6 +147,13 @@
     --theme-popover-bg: var(--theme-standard-popover-bg);
     --theme-tag-text: var(--theme-standard-tag-text);
     --theme-tag-bg: var(--theme-standard-tag-bg);
+    --theme-componentCard-bg: var(--theme-standard-componentCard-bg);
+    --theme-componentCard-border: var(--theme-standard-componentCard-border);
+    --theme-componentCardTable-bg: var(--theme-standard-componentCardTable-bg);
+    --theme-componentCardTable-grad-start: var(--theme-standard-componentCardTable-grad-start);
+    --theme-componentCardTable-grad-end: var(--theme-standard-componentCardTable-grad-end);
+    --theme-componentCardTable-row-border: var(--theme-standard-componentCardTable-row-border);
+    --theme-componentCardTable-cell-hover: var(--theme-standard-componentCardTable-cell-hover);
   }
 
   &--midnight {
@@ -164,6 +171,13 @@
     --theme-popover-bg: var(--theme-midnight-popover-bg);
     --theme-tag-text: var(--theme-midnight-tag-text);
     --theme-tag-bg: var(--theme-midnight-tag-bg);
+    --theme-componentCard-bg: var(--theme-midnight-componentCard-bg);
+    --theme-componentCard-border: var(--theme-midnight-componentCard-border);
+    --theme-componentCardTable-bg: var(--theme-midnight-componentCardTable-bg);
+    --theme-componentCardTable-grad-start: var(--theme-midnight-componentCardTable-grad-start);
+    --theme-componentCardTable-grad-end: var(--theme-midnight-componentCardTable-grad-end);
+    --theme-componentCardTable-row-border: var(--theme-midnight-componentCardTable-row-border);
+    --theme-componentCardTable-cell-hover: var(--theme-midnight-componentCardTable-cell-hover);
   }
 
   &--terminal {
@@ -181,5 +195,12 @@
     --theme-popover-bg: var(--theme-terminal-popover-bg);
     --theme-tag-text: var(--theme-terminal-tag-text);
     --theme-tag-bg: var(--theme-terminal-tag-bg);
+    --theme-componentCard-bg: var(--theme-terminal-componentCard-bg);
+    --theme-componentCard-border: var(--theme-terminal-componentCard-border);
+    --theme-componentCardTable-bg: var(--theme-terminal-componentCardTable-bg);
+    --theme-componentCardTable-grad-start: var(--theme-terminal-componentCardTable-grad-start);
+    --theme-componentCardTable-grad-end: var(--theme-terminal-componentCardTable-grad-end);
+    --theme-componentCardTable-row-border: var(--theme-terminal-componentCardTable-row-border);
+    --theme-componentCardTable-cell-hover: var(--theme-terminal-componentCardTable-cell-hover);
   }
 }

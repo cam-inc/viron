@@ -14,6 +14,13 @@
   --theme-popover-bg: #fff;
   --theme-tag-text: #fff;
   --theme-tag-bg: #fff;
+  --theme-componentCard-bg: #fff;
+  --theme-componentCard-border: #fff;
+  --theme-componentCardTable-bg: #fff;
+  --theme-componentCardTable-grad-start: #fff;
+  --theme-componentCardTable-grad-end: #fff;
+  --theme-componentCardTable-row-border: #fff;
+  --theme-componentCardTable-cell-hover: #fff;
 
   /* --theme-fooを上書きするため。 */
   /* standard */
@@ -31,6 +38,13 @@
   --theme-standard-popover-bg: #fff;
   --theme-standard-tag-text: #d1d1d1;
   --theme-standard-tag-bg: #f9f9f9;
+  --theme-standard-componentCard-bg: #fff;
+  --theme-standard-componentCard-border: #c6c6c5;
+  --theme-standard-componentCardTable-bg: #fff;
+  --theme-standard-componentCardTable-grad-start: rgba(255, 255, 255, 0);
+  --theme-standard-componentCardTable-grad-end: rgba(255, 255, 255, 1);
+  --theme-standard-componentCardTable-row-border: #f9f9f9;
+  --theme-standard-componentCardTable-cell-hover: #f9f9f9;
 
   /* midnight */
   --theme-midnight-app-text: #00c8ff;
@@ -47,6 +61,13 @@
   --theme-midnight-popover-bg: #001d26;
   --theme-midnight-tag-text: #00c8ff;
   --theme-midnight-tag-bg: #001d26;
+  --theme-midnight-componentCard-bg: #001217;
+  --theme-midnight-componentCard-border: #004051;
+  --theme-midnight-componentCardTable-bg: #001217;
+  --theme-midnight-componentCardTable-grad-start: rgba(0, 18, 23, 0);
+  --theme-midnight-componentCardTable-grad-end: rgba(0, 18, 23, 1);
+  --theme-midnight-componentCardTable-row-border: #001d26;
+  --theme-midnight-componentCardTable-cell-hover: #001d26;
 
   /* terminal */
   --theme-terminal-app-text: #35dcba;
@@ -63,4 +84,11 @@
   --theme-terminal-popover-bg: #091714;
   --theme-terminal-tag-text: #35dcba;
   --theme-terminal-tag-bg: #091714;
+  --theme-terminal-componentCard-bg: #000;
+  --theme-terminal-componentCard-border: #0d372f;
+  --theme-terminal-componentCardTable-bg: #000;
+  --theme-terminal-componentCardTable-grad-start: rgba(0, 0, 0, 0);
+  --theme-terminal-componentCardTable-grad-end: rgba(0, 0, 0, 1);
+  --theme-terminal-componentCardTable-row-border: #091714;
+  --theme-terminal-componentCardTable-cell-hover: #091714;
 }

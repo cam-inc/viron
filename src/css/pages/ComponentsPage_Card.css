@@ -1,6 +1,6 @@
 .ComponentsPage_Card {
   display: block;
-  background-color: var(--color-base-white);
-  border: 1px solid var(--color-base-gray);
+  background-color: var(--theme-componentCard-bg);
+  border: 1px solid var(--theme-componentCard-border);
   border-radius: 4px;
 }
