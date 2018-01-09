@@ -12851,7 +12851,8 @@ var endpoints = exporter('endpoints', {
           version: '',
           color: '',
           thumbnail: null,
-          tags: []
+          tags: [],
+          theme: 'standard'
         };
         context.commit('endpoints.add', key, newEndpoint);
       });
@@ -15530,6 +15531,22 @@ var viron$1 = exporter$1('viron', {
   },
 
   /**
+   * themeを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  theme: state => {
+    const defaultTheme = 'standard';
+    if (!state.viron) {
+      return defaultTheme;
+    }
+    if (!contains_1$2(['standard', 'midnight', 'terminal'], state.viron.theme)) {
+      return defaultTheme;
+    }
+    return state.viron.theme;
+  },
+
+  /**
    * ダッシュボードメニュー群を返します。
    * @param {Object} state
    * @return {Array}
@@ -17929,7 +17946,8 @@ highcharts.setOptions({
   },
   chart: {
     defaultSeriesType: 'bar',
-    zoomType: 'x'
+    zoomType: 'x',
+    backgroundColor: 'transparent'
   },
   credits: { enabled: false },
   exporting: { enabled: false },
@@ -105677,7 +105695,7 @@ var script$55 = function() {
   };
 };
 
-riot$1.tag2('viron-application-menu', '<div class="Application_Menu__bg"></div> <div class="Application_Menu__content"> <div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div> </div>', '', 'class="Application_Menu Application_Menu--{layoutType}"', function(opts) {
+riot$1.tag2('viron-application-menu', '<div class="Application_Menu__bg"></div> <div class="Application_Menu__overlay"></div> <div class="Application_Menu__content"> <div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div> </div>', '', 'class="Application_Menu Application_Menu--{layoutType}"', function(opts) {
     this.external(script$55);
 });
 
@@ -106575,7 +106593,7 @@ riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <virtual 
 
 var script$69 = function() {};
 
-riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
+riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
     this.external(script$69);
 });
 
@@ -106600,7 +106618,7 @@ riot$1.tag2('viron-application-progress-linear', '<div class="Application_Progre
 
 var script$71 = function() {};
 
-riot$1.tag2('viron-application-splash', '<div class="Application_Splash__todo">TODO</div> <viron-icon-logo class="Application_Splash__logo"></viron-icon-logo> <div class="Application_Splash__todo">Viron</div>', '', 'class="Application_Splash"', function(opts) {
+riot$1.tag2('viron-application-splash', '<div class="Application_Splash__container"> <viron-icon-logo class="Application_Splash__logo"></viron-icon-logo> <div class="Application_Splash__label">Viron</div> </div>', '', 'class="Application_Splash"', function(opts) {
     this.external(script$71);
 });
 
@@ -106670,6 +106688,7 @@ var script$74 = function() {
   this.isLaunched = store.getter('application.isLaunched');
   this.isNavigating = store.getter('application.isNavigating');
   this.isNetworking = store.getter('application.isNetworking');
+  this.theme = store.getter('viron.theme');
   // 表示すべきページの名前。
   this.pageName = store.getter('location.name');
   // TOPページか否か。
@@ -106699,6 +106718,10 @@ var script$74 = function() {
     this.isNetworking = store.getter('application.isNetworking');
     this.endpointFilterText = store.getter('application.endpointFilterText');
     this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
+    this.update();
+  });
+  this.listen('viron', () => {
+    this.theme = store.getter('viron.theme');
     this.update();
   });
   this.listen('location', () => {
@@ -106737,7 +106760,7 @@ var script$74 = function() {
   });
 };
 
-riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main" ref="main"> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-mediapreviews></viron-application-mediapreviews> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-application-progress-linear isactive="{isNavigating || isNetworking}"></viron-application-progress-linear> <viron-application-dimmer if="{isNavigating}"></viron-application-dimmer> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
+riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main" ref="main"> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-mediapreviews></viron-application-mediapreviews> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-application-progress-linear isactive="{isNavigating || isNetworking}"></viron-application-progress-linear> <viron-application-dimmer if="{isNavigating}"></viron-application-dimmer> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} Application--{theme} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
     this.external(script$74);
 });
 
