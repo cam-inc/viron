@@ -12,6 +12,8 @@
   --theme-endpointCard-bg: #fff;
   --theme-endpointCard-border: #fff;
   --theme-popover-bg: #fff;
+  --theme-tag-text: #fff;
+  --theme-tag-bg: #fff;
 
   /* --theme-fooを上書きするため。 */
   /* standard */
@@ -27,6 +29,8 @@
   --theme-standard-endpointCard-bg: #fff;
   --theme-standard-endpointCard-border: #c6c6c5;
   --theme-standard-popover-bg: #fff;
+  --theme-standard-tag-text: #d1d1d1;
+  --theme-standard-tag-bg: #f9f9f9;
 
   /* midnight */
   --theme-midnight-app-text: #00c8ff;
@@ -41,6 +45,8 @@
   --theme-midnight-endpointCard-bg: #001217;
   --theme-midnight-endpointCard-border: #004051;
   --theme-midnight-popover-bg: #001d26;
+  --theme-midnight-tag-text: #00c8ff;
+  --theme-midnight-tag-bg: #001d26;
 
   /* terminal */
   --theme-terminal-app-text: #35dcba;
@@ -55,4 +61,6 @@
   --theme-terminal-endpointCard-bg: #000;
   --theme-terminal-endpointCard-border: #0d372f;
   --theme-terminal-popover-bg: #091714;
+  --theme-terminal-tag-text: #35dcba;
+  --theme-terminal-tag-bg: #091714;
 }
