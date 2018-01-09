@@ -21,6 +21,9 @@
   --theme-componentCardTable-grad-end: #fff;
   --theme-componentCardTable-row-border: #fff;
   --theme-componentCardTable-cell-hover: #fff;
+  --theme-pagination-bg: #fff;
+  --theme-pagination-bg-disabled: #fff;
+  --theme-pagination-border: #fff;
 
   /* --theme-fooを上書きするため。 */
   /* standard */
@@ -45,6 +48,9 @@
   --theme-standard-componentCardTable-grad-end: rgba(255, 255, 255, 1);
   --theme-standard-componentCardTable-row-border: #f9f9f9;
   --theme-standard-componentCardTable-cell-hover: #f9f9f9;
+  --theme-standard-pagination-bg: #fff;
+  --theme-standard-pagination-bg-disabled: #f9f9f9;
+  --theme-standard-pagination-border: #d1d1d1;
 
   /* midnight */
   --theme-midnight-app-text: #00c8ff;
@@ -68,6 +74,9 @@
   --theme-midnight-componentCardTable-grad-end: rgba(0, 18, 23, 1);
   --theme-midnight-componentCardTable-row-border: #001d26;
   --theme-midnight-componentCardTable-cell-hover: #001d26;
+  --theme-midnight-pagination-bg: #001217;
+  --theme-midnight-pagination-bg-disabled: #004051;
+  --theme-midnight-pagination-border: #004051;
 
   /* terminal */
   --theme-terminal-app-text: #35dcba;
@@ -91,4 +100,7 @@
   --theme-terminal-componentCardTable-grad-end: rgba(0, 0, 0, 1);
   --theme-terminal-componentCardTable-row-border: #091714;
   --theme-terminal-componentCardTable-cell-hover: #091714;
+  --theme-terminal-pagination-bg: #000;
+  --theme-terminal-pagination-bg-disabled: #0d372f;
+  --theme-terminal-pagination-border: #0d372f;
 }

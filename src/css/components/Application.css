@@ -154,6 +154,9 @@
     --theme-componentCardTable-grad-end: var(--theme-standard-componentCardTable-grad-end);
     --theme-componentCardTable-row-border: var(--theme-standard-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: var(--theme-standard-componentCardTable-cell-hover);
+    --theme-pagination-bg: var(--theme-standard-pagination-bg);
+    --theme-pagination-bg-disabled: var(--theme-standard-pagination-bg-disabled);
+    --theme-pagination-border: var(--theme-standard-pagination-border);
   }
 
   &--midnight {
@@ -178,6 +181,9 @@
     --theme-componentCardTable-grad-end: var(--theme-midnight-componentCardTable-grad-end);
     --theme-componentCardTable-row-border: var(--theme-midnight-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: var(--theme-midnight-componentCardTable-cell-hover);
+    --theme-pagination-bg: var(--theme-midnight-pagination-bg);
+    --theme-pagination-bg-disabled: var(--theme-midnight-pagination-bg-disabled);
+    --theme-pagination-border: var(--theme-midnight-pagination-border);
   }
 
   &--terminal {
@@ -202,5 +208,8 @@
     --theme-componentCardTable-grad-end: var(--theme-terminal-componentCardTable-grad-end);
     --theme-componentCardTable-row-border: var(--theme-terminal-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: var(--theme-terminal-componentCardTable-cell-hover);
+    --theme-pagination-bg: var(--theme-terminal-pagination-bg);
+    --theme-pagination-bg-disabled: var(--theme-terminal-pagination-bg-disabled);
+    --theme-pagination-border: var(--theme-terminal-pagination-border);
   }
 }
