@@ -20,7 +20,7 @@
   &__frameInner {
     position: relative;
     overflow-y: scroll;
-    background-color: var(--color-base-white);
+    background-color: var(--theme-popover-bg);
     border-radius: 2px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   }
@@ -74,7 +74,7 @@
   &--TR {
     & .Popover__arrow {
       left: calc(-1 * var(--component-popover-arrow-size) / 2);
-      border-color: transparent transparent var(--color-base-white) transparent;
+      border-color: transparent transparent var(--theme-popover-bg) transparent;
       border-width: 0 calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2);
     }
   }
@@ -117,7 +117,7 @@
     & .Popover__arrow {
       top: calc(-1 * var(--component-popover-arrow-size) / 2);
       left: calc(-1 * var(--component-popover-arrow-size));
-      border-color: transparent transparent transparent var(--color-base-white);
+      border-color: transparent transparent transparent var(--theme-popover-bg);
       border-width: calc(var(--component-popover-arrow-size) / 2) 0 calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size);
     }
   }
@@ -156,7 +156,7 @@
     & .Popover__arrow {
       top: calc(-1 * var(--component-popover-arrow-size));
       left: calc(-1 * var(--component-popover-arrow-size) / 2);
-      border-color: var(--color-base-white) transparent transparent transparent;
+      border-color: var(--theme-popover-bg) transparent transparent transparent;
       border-width: var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0 calc(var(--component-popover-arrow-size) / 2);
     }
   }
@@ -198,7 +198,7 @@
     & .Popover__arrow {
       top: calc(-1 * var(--component-popover-arrow-size) / 2);
       right: calc(-1 * var(--component-popover-arrow-size));
-      border-color: transparent var(--color-base-white) transparent transparent;
+      border-color: transparent var(--theme-popover-bg) transparent transparent;
       border-width: calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0;
     }
   }

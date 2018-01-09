@@ -143,6 +143,7 @@
     --theme-header-bg: var(--theme-standard-header-bg);
     --theme-endpointCard-bg: var(--theme-standard-endpointCard-bg);
     --theme-endpointCard-border: var(--theme-standard-endpointCard-border);
+    --theme-popover-bg: var(--theme-standard-popover-bg);
   }
 
   &--midnight {
@@ -156,6 +157,7 @@
     --theme-header-bg: var(--theme-midnight-header-bg);
     --theme-endpointCard-bg: var(--theme-midnight-endpointCard-bg);
     --theme-endpointCard-border: var(--theme-midnight-endpointCard-border);
+    --theme-popover-bg: var(--theme-midnight-popover-bg);
   }
 
   &--terminal {
@@ -169,5 +171,6 @@
     --theme-header-bg: var(--theme-terminal-header-bg);
     --theme-endpointCard-bg: var(--theme-terminal-endpointCard-bg);
     --theme-endpointCard-border: var(--theme-terminal-endpointCard-border);
+    --theme-popover-bg: var(--theme-terminal-popover-bg);
   }
 }
