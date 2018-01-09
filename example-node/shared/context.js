@@ -55,6 +55,12 @@ class Context {
           acl: this.getConfigAcl(),
           audit_log: {
             audit_logs: store.models.AuditLogs,
+            unless: {
+              path: [{
+                url: new RegExp('/stats/*'),
+                methods: ['GET'],
+              }],
+            },
           },
           admin_user: {
             admin_users: store.models.AdminUsers,

@@ -2,8 +2,9 @@
  * GET: /stats/dau
  */
 const dau = (req, res) => {
+  const date = new Date();
   res.json({
-    value: 1234567,
+    value: 1234567 + date.getFullYear() + date.getMonth() + date.getDate() + date.getHours() + date.getMinutes(),
   });
 };
 
@@ -11,8 +12,9 @@ const dau = (req, res) => {
  * GET: /stats/mau
  */
 const mau = (req, res) => {
+  const date = new Date();
   res.json({
-    value: 9876543,
+    value: 9876543 + date.getFullYear() + date.getMonth() + date.getDate() + date.getHours() + date.getMinutes(),
   });
 };
 

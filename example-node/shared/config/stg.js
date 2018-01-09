@@ -2,7 +2,7 @@ module.exports = helper => {
   const config = {
     host: `${process.env.VIRON_HOSTNAME}:443`,
     // vironlibのadmin_roleが使用するユーザー作成時の初期ロール名
-    default_role: 'viewer',
+    default_role: 'visiter',
     // vironlibのadmin_roleが使用するスーパーユーザーのロール名
     super_role: 'super',
 
