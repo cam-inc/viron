@@ -1,5 +1,6 @@
 .Modal {
   @apply --layout-center-center;
+  color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
   transition-duration: 300ms;
