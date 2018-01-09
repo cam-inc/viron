@@ -41,7 +41,7 @@
     width: 32px;
     height: 32px;
     cursor: pointer;
-    background-color: var(--color-base-gray);
+    background-color: var(--theme-orderButton-bg);
     border-radius: 50%;
 
     & .Icon {

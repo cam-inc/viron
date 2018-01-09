@@ -8,6 +8,7 @@
   --theme-menu-arrow: #fff;
   --theme-menu-overlay: #fff;
   --theme-header-bg: #fff;
+  --theme-orderButton-bg: #fff;
   --theme-endpointCard-bg: #fff;
   --theme-endpointCard-border: #fff;
   --theme-popover-bg: #fff;
@@ -22,6 +23,7 @@
   --theme-standard-menu-arrow: #f57177;
   --theme-standard-menu-overlay: transparent;
   --theme-standard-header-bg: #f9f9f9;
+  --theme-standard-orderButton-bg: #d1d1d1;
   --theme-standard-endpointCard-bg: #fff;
   --theme-standard-endpointCard-border: #c6c6c5;
   --theme-standard-popover-bg: #fff;
@@ -35,6 +37,7 @@
   --theme-midnight-menu-arrow: #00c8ff;
   --theme-midnight-menu-overlay: #001d26;
   --theme-midnight-header-bg: #001820;
+  --theme-midnight-orderButton-bg: #001d26;
   --theme-midnight-endpointCard-bg: #001217;
   --theme-midnight-endpointCard-border: #004051;
   --theme-midnight-popover-bg: #001d26;
@@ -48,6 +51,7 @@
   --theme-terminal-menu-arrow: #35dcba;
   --theme-terminal-menu-overlay: #091714;
   --theme-terminal-header-bg: #050d0c;
+  --theme-terminal-orderButton-bg: #091714;
   --theme-terminal-endpointCard-bg: #000;
   --theme-terminal-endpointCard-border: #0d372f;
   --theme-terminal-popover-bg: #091714;
