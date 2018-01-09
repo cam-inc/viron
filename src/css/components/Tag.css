@@ -2,7 +2,7 @@
   display: inline-block;
   padding: 1px 4px 2px;
   font-size: 1.2rem;
-  color: var(--color-base-gray);
-  background-color: var(--color-base-gray-tertiary);
+  color: var(--theme-tag-text);
+  background-color: var(--theme-tag-bg);
   border-radius: 2px;
 }

@@ -34,7 +34,6 @@
     "selector-pseudo-element-no-unknown": true,
     "string-quotes": "double",
     "unit-no-unknown": true,
-    "suitcss/custom-property-no-outside-root": true,
     "suitcss/selector-root-no-composition": true
   }
 }

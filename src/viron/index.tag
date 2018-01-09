@@ -1,4 +1,4 @@
-viron.Application(class="Application--{ usingBrowser } Application--{ layoutType } { isAsideClosed ? 'Application--asideClosed' : '' }")
+viron.Application(class="Application--{ usingBrowser } Application--{ layoutType } Application--{ theme } { isAsideClosed ? 'Application--asideClosed' : '' }")
   .Application__container
     .Application__aside(if="{ isDesktop }")
       .Application__asideAdjuster

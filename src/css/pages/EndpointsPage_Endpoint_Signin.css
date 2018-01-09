@@ -30,7 +30,7 @@
 
     & .Icon {
       width: 32px;
-      height: 326px;
+      height: 32px;
       color: var(--color-base-white);
     }
   }

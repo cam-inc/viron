@@ -42,10 +42,7 @@ body {
   /* 320px = iPhoneSEの横幅。これを最小値とする。 */
   min-width: 320px;
   font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
-  font-size: 12px;
   line-height: 1.5;
-  color: var(--color-base-black);
-  background-color: #f0f0ef;
 }
 
 input,
