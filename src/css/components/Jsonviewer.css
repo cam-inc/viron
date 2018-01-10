@@ -1,22 +1,22 @@
-.json {
+.Jsonviewer {
     font-family: 'Source Code Pro', monospace;
     font-size: 16px;
 
     & > {
-        .json__item {
+        .Jsonviewer__item {
             display: block;
         }
     }
 }
 
-.json__item {
+.Jsonviewer__item {
     display: none;
     margin-top: 10px;
     padding-left: 20px;
     user-select: none;
 }
 
-.json__item--collapsible {
+.Jsonviewer__item--collapsible {
     cursor: pointer;
     overflow: hidden;
     position: relative;
@@ -38,22 +38,22 @@
     }
 
     &:hover {
-        & > .json__key,
-        & > .json__value {
+        & > .Jsonviewer__key,
+        & > .Jsonviewer__value {
             text-decoration: underline;
         }
     }
 }
 
-.json__toggle {
+.Jsonviewer__toggle {
     display: none;
 
-    &:checked ~ .json__item {
+    &:checked ~ .Jsonviewer__item {
         display: block;
     }
 }
 
-.json__key {
+.Jsonviewer__key {
     color: darkblue;
     display: inline;
 
@@ -62,18 +62,18 @@
     }
 }
 
-.json__value {
+.Jsonviewer__value {
     display: inline;
 }
 
-.json__value--string {
+.Jsonviewer__value--string {
     color: green;
 }
 
-.json__value--number {
+.Jsonviewer__value--number {
     color: blue;
 }
 
-.json__value--boolean {
+.Jsonviewer__value--boolean {
     color: red;
 }

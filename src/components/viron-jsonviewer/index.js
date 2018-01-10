@@ -3,9 +3,9 @@ export default function() {
   const updateJsonViewer = (collapsible=false) => {
     const json = this.opts.json;
     const TAG_TEMPLATES = {
-      item: '<div class="json__item"><div class="json__key">%KEY%</div><div class="json__value json__value--%TYPE%">%VALUE%</div></div>',
-      itemCollapsible: '<label class="json__item json__item--collapsible"><input type="checkbox" class="json__toggle"/><div class="json__key">%KEY%</div><div class="json__value json__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>',
-      itemCollapsibleOpen: '<label class="json__item json__item--collapsible"><input type="checkbox" checked class="json__toggle"/><div class="json__key">%KEY%</div><div class="json__value json__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>'
+      item: '<div class="Jsonviewer__item"><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--%TYPE%">%VALUE%</div></div>',
+      itemCollapsible: '<label class="Jsonviewer__item Jsonviewer__item--collapsible"><input type="checkbox" class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>',
+      itemCollapsibleOpen: '<label class="Jsonviewer__item Jsonviewer__item--collapsible"><input type="checkbox" checked class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>'
     };
 
     const createItem = (key, value, type) => {
@@ -47,7 +47,7 @@ export default function() {
     };
 
     const parseObject = responseJson => {
-      let displayJson = '<div class="json">';
+      let displayJson = '<div class="Jsonviewer">';
       for (const item in responseJson) {
         const key = item;
         const value = responseJson[key];
