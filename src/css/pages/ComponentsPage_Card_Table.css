@@ -9,7 +9,7 @@
     z-index: 1;
     flex-shrink: 0;
     padding: 24px;
-    background-color: var(--color-base-white);
+    background-color: var(--theme-componentCardTable-bg);
   }
 
   &__headAside {
@@ -114,26 +114,32 @@
 
   &__th {
     @apply --text-truncate;
-    padding: 0 24px;
+    padding: 8px 24px;
     font-size: 1.2rem;
     font-weight: normal;
     color: var(--color-base-gray);
     text-align: left;
-    border-bottom: 1px solid var(--color-base-gray-tertiary);
+    border-bottom: 1px solid var(--theme-componentCardTable-row-border);
 
     &--sticky {
       position: sticky;
       right: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
+      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start), 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
     }
   }
 
   &__tbodyRow {
     @mixin hover {
-      background-color: var(--color-base-gray-tertiary);
+      background-color: var(--theme-componentCardTable-cell-hover);
     }
     cursor: pointer;
-    border-bottom: 1px solid var(--color-base-gray-tertiary);
+    border-bottom: 1px solid var(--theme-componentCardTable-row-border);
+  }
+
+  &__tbody &__tbodyRow {
+    &:last-child {
+      border-bottom: none;
+    }
   }
 
   &__td {
@@ -150,7 +156,7 @@
     &--sticky {
       position: sticky;
       right: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
+      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
     }
   }
 

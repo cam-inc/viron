@@ -1,3 +1,4 @@
+import contains from 'mout/array/contains';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import filter from 'mout/object/filter';
@@ -82,6 +83,22 @@ export default exporter('viron', {
       return null;
     }
     return state.viron.color;
+  },
+
+  /**
+   * themeを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  theme: state => {
+    const defaultTheme = 'standard';
+    if (!state.viron) {
+      return defaultTheme;
+    }
+    if (!contains(['standard', 'midnight', 'terminal'], state.viron.theme)) {
+      return defaultTheme;
+    }
+    return state.viron.theme;
   },
 
   /**

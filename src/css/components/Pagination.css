@@ -25,8 +25,8 @@
     height: 24px;
     padding: 0 4px;
     cursor: pointer;
-    background-color: var(--color-base-white);
-    border: 1px solid var(--color-base-gray);
+    background-color: var(--theme-pagination-bg);
+    border: 1px solid var(--theme-pagination-border);
     border-radius: 2px;
 
     & .Icon {
@@ -43,8 +43,8 @@
     &--disabled {
       color: var(--color-base-gray);
       cursor: not-allowed;
-      background-color: var(--color-base-gray-tertiary);
-      border-color: var(--color-base-gray);
+      background-color: var(--theme-pagination-bg-disabled);
+      border-color: var(--theme-pagination-bg-disabled);
     }
 
     &--moderate {

@@ -7,16 +7,18 @@
   left: 0;
   background-color: var(--color-base-black);
 
-  &__logo {
+  &__container {
     @apply --animation-flash;
-    width: 36px;
-    height: 36px;
     color: var(--color-base-white);
   }
 
-  &__todo {
-    @apply --animation-flash;
-    margin: 0 12px;
-    color: var(--color-base-white);
+  &__logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  &__label {
+    margin-top: 4px;
+    text-align: center;
   }
 }

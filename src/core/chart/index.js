@@ -62,7 +62,8 @@ Highcharts.setOptions({
   },
   chart: {
     defaultSeriesType: 'bar',
-    zoomType: 'x'
+    zoomType: 'x',
+    backgroundColor: 'transparent'
   },
   credits: { enabled: false },
   exporting: { enabled: false },

@@ -1,3 +1,4 @@
 /* ITCSS: Settings */
 /* Global variables, config switches. */
 @import "color.css";
+@import "theme.css";
