@@ -1,3 +1,3 @@
 export default function() {
-  console.log("コンポーネント");
+  this.json = this.opts.json;
 }
