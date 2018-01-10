@@ -1,5 +1,5 @@
 export default function() {
-  this.inputId = `Uploader__input_${this._riot_id}`;
+  this.inputId = `Uploader__input${this._riot_id}`;
   this.file = null;
   this.fileName = null;
   this.isTypeOfImage = false;
