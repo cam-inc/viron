@@ -1,79 +1,79 @@
 .Jsonviewer {
-    font-family: 'Source Code Pro', monospace;
-    font-size: 16px;
+  font-family: "Source Code Pro", monospace;
+  font-size: 16px;
 
-    & > {
-        .Jsonviewer__item {
-            display: block;
-        }
+  & >  {
+    .Jsonviewer__item {
+      display: block;
     }
+  }
 }
 
 .Jsonviewer__item {
-    display: none;
-    margin-top: 10px;
-    padding-left: 20px;
-    user-select: none;
+  display: none;
+  padding-left: 20px;
+  margin-top: 10px;
+  user-select: none;
 }
 
 .Jsonviewer__item--collapsible {
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
 
-    &::before {
-        content: '+';
-        position: absolute;
-        left: 5px;
-    }
+  &::before {
+    position: absolute;
+    left: 5px;
+    content: "+";
+  }
 
-    &::after {
-        background-color: lightgrey;
-        content: '';
-        height: 100%;
-        left: 9px;
-        position: absolute;
-        top: 26px;
-        width: 1px;
-    }
+  &::after {
+    position: absolute;
+    top: 26px;
+    left: 9px;
+    width: 1px;
+    height: 100%;
+    content: "";
+    background-color: lightgrey;
+  }
 
-    &:hover {
-        & > .Jsonviewer__key,
-        & > .Jsonviewer__value {
-            text-decoration: underline;
-        }
+  &:hover {
+    & > .Jsonviewer__key,
+    & > .Jsonviewer__value {
+      text-decoration: underline;
     }
+  }
 }
 
 .Jsonviewer__toggle {
-    display: none;
+  display: none;
 
-    &:checked ~ .Jsonviewer__item {
-        display: block;
-    }
+  &:checked ~ .Jsonviewer__item {
+    display: block;
+  }
 }
 
 .Jsonviewer__key {
-    color: darkblue;
-    display: inline;
+  display: inline;
+  color: darkblue;
 
-    &::after {
-        content: ': ';
-    }
+  &::after {
+    content: ": ";
+  }
 }
 
 .Jsonviewer__value {
-    display: inline;
+  display: inline;
 }
 
 .Jsonviewer__value--string {
-    color: green;
+  color: green;
 }
 
 .Jsonviewer__value--number {
-    color: blue;
+  color: blue;
 }
 
 .Jsonviewer__value--boolean {
-    color: red;
+  color: red;
 }

@@ -1,7 +1,9 @@
 export default function() {
 
-  const updateJsonViewer = (collapsible=false) => {
+  const createJsonViewer = () => {
     const json = this.opts.json;
+    const collapsible = false;
+
     const TAG_TEMPLATES = {
       item: '<div class="Jsonviewer__item"><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--%TYPE%">%VALUE%</div></div>',
       itemCollapsible: '<label class="Jsonviewer__item Jsonviewer__item--collapsible"><input type="checkbox" class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>',
@@ -57,10 +59,10 @@ export default function() {
       return displayJson;
     };
 
-    this.refs.jsonviewer.innerHTML = parseObject(json);
+    return parseObject(json);
   };
 
   this.on('mount', () => {
-    updateJsonViewer();
+    this.refs.jsonviewer.innerHTML = createJsonViewer();
   });
 }
