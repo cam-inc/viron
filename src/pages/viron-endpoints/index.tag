@@ -4,8 +4,8 @@ viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
     .EndpointsPage__orderButton(if="{ isDesktop }" class="{ 'EndpointsPage__orderButton--active': isDraggable }" onTap="{ handleOrderButtonTap }")
       viron-icon-move
   .EndpointsPage__container
-    viron-jsonviewer(json="{ json }")
-    viron-endpoints-page-endpoint(each="{ endpoint in endpoints }" endpoint="{ endpoint }" isDraggable="{ parent.isDraggable }")
+    viron-jsonviewer(if="{ json }" json="{ json }")
+    //- viron-endpoints-page-endpoint(each="{ endpoint in endpoints }" endpoint="{ endpoint }" isDraggable="{ parent.isDraggable }")
 
   script.
     import '../../components/icons/viron-icon-move/index.tag';

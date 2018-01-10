@@ -1,6 +1,5 @@
 viron-jsonviewer
-  div(each="{ obj in json }")
-    div { obj }
+  div(ref="jsonviewer")
 
   script.
     import script from './index';
