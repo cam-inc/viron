@@ -1,6 +1,6 @@
 export default function() {
 
-  const updateJsonViewer = (responseJson, collapsible=false) => {
+  const updateJsonViewer = (collapsible=false) => {
     const json = this.opts.json;
     const TAG_TEMPLATES = {
       item: '<div class="json__item"><div class="json__key">%KEY%</div><div class="json__value json__value--%TYPE%">%VALUE%</div></div>',

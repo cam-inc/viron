@@ -1,0 +1,79 @@
+.json {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+
+    & > {
+        .json__item {
+            display: block;
+        }
+    }
+}
+
+.json__item {
+    display: none;
+    margin-top: 10px;
+    padding-left: 20px;
+    user-select: none;
+}
+
+.json__item--collapsible {
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+        content: '+';
+        position: absolute;
+        left: 5px;
+    }
+
+    &::after {
+        background-color: lightgrey;
+        content: '';
+        height: 100%;
+        left: 9px;
+        position: absolute;
+        top: 26px;
+        width: 1px;
+    }
+
+    &:hover {
+        & > .json__key,
+        & > .json__value {
+            text-decoration: underline;
+        }
+    }
+}
+
+.json__toggle {
+    display: none;
+
+    &:checked ~ .json__item {
+        display: block;
+    }
+}
+
+.json__key {
+    color: darkblue;
+    display: inline;
+
+    &::after {
+        content: ': ';
+    }
+}
+
+.json__value {
+    display: inline;
+}
+
+.json__value--string {
+    color: green;
+}
+
+.json__value--number {
+    color: blue;
+}
+
+.json__value--boolean {
+    color: red;
+}
