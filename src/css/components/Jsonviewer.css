@@ -1,83 +1,80 @@
 .Jsonviewer {
-  font-family: "Source Code Pro", monospace;
-  font-size: 16px;
 
   & >  {
     .Jsonviewer__item {
       display: block;
     }
   }
-}
 
-.Jsonviewer__item {
-  display: none;
-  padding-left: 20px;
-  margin-top: 10px;
-  user-select: none;
-}
-
-.Jsonviewer__item--collapsible {
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-
-  &::before {
-    position: absolute;
-    left: 5px;
-    content: "+";
+  &__item {
+    display: none;
+    padding-left: 20px;
+    margin-top: 10px;
+    user-select: none;
   }
 
-  &::after {
-    position: absolute;
-    top: 26px;
-    left: 9px;
-    width: 1px;
-    height: 100%;
-    content: "";
-    background-color: lightgrey;
-  }
+  &__collapsible {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
 
-  &:hover {
-    & > .Jsonviewer__key,
-    & > .Jsonviewer__value {
-      text-decoration: underline;
+    &::before {
+      position: absolute;
+      left: 5px;
+      content: "+";
+    }
+
+    &::after {
+      position: absolute;
+      top: 26px;
+      left: 9px;
+      width: 1px;
+      height: 100%;
+      content: "";
+      background-color: lightgrey;
+    }
+
+    &:hover {
+      & > .Jsonviewer__key,
+      & > .Jsonviewer__value {
+        text-decoration: underline;
+      }
     }
   }
-}
 
-.Jsonviewer__toggle {
-  display: none;
+  &__toggle {
+    display: none;
+    &:checked ~ .Jsonviewer__item {
+      display: block;
+    }
+  }
 
-  &:checked ~ .Jsonviewer__item {
-    display: block;
+  &__key {
+    display: inline;
+    color: darkblue;
+    &::after {
+      content: ": ";
+    }
+  }
+
+  &__value {
+    display: inline;
+  }
+
+  &__string {
+    color: green;
+  }
+
+  &__number {
+    color: blue;
+  }
+
+  &__boolean {
+    color: blueviolet;
+  }
+
+  &__object {
+    color: red;
   }
 }
 
-.Jsonviewer__key {
-  display: inline;
-  color: darkblue;
-
-  &::after {
-    content: ": ";
-  }
-}
-
-.Jsonviewer__value {
-  display: inline;
-}
-
-.Jsonviewer__value--string {
-  color: green;
-}
-
-.Jsonviewer__value--number {
-  color: blue;
-}
-
-.Jsonviewer__value--boolean {
-  color: blueviolet;
-}
-
-.Jsonviewer__value--object {
-  color: red;
-}

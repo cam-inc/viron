@@ -1,16 +1,16 @@
 export default function() {
 
   const createJsonViewer = () => {
-    const TAG_TEMPLATES = {
-      item: '<div class="Jsonviewer__item"><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--%TYPE%">%VALUE%</div></div>',
-      itemClose: '<label class="Jsonviewer__item Jsonviewer__item--collapsible"><input type="checkbox" class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>',
-      itemOepn: '<label class="Jsonviewer__item Jsonviewer__item--collapsible"><input type="checkbox" checked class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>'
+    const tagTemplates = {
+      item: '<div class="Jsonviewer__item"><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__%TYPE%">%VALUE%</div></div>',
+      itemClose: '<label class="Jsonviewer__item Jsonviewer__collapsible"><input type="checkbox" class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>',
+      itemOepn: '<label class="Jsonviewer__item Jsonviewer__collapsible"><input type="checkbox" checked class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>'
     };
     const json = this.opts.json;
     const isOpenItem = !!this.opts.isOpen || false;
 
     const createItem = (key, value, type) => {
-      let elem = TAG_TEMPLATES.item.replace('%KEY%', key);
+      let elem = tagTemplates.item.replace('%KEY%', key);
       elem = elem.replace('%TYPE%', type);
       elem = type === 'string'
         ? elem.replace('%VALUE%', '"' + value + '"')
@@ -20,7 +20,7 @@ export default function() {
 
     const createCollapsibleItem = (key, value, type, children) => {
       const tpl = isOpenItem ? 'itemOepn' : 'itemClose';
-      let elem = TAG_TEMPLATES[tpl].replace('%KEY%', key);
+      let elem = tagTemplates[tpl].replace('%KEY%', key);
       elem = elem.replace('%VALUE%', type);
       elem = elem.replace('%TYPE%', type);
       elem = elem.replace('%CHILDREN%', children);
