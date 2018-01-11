@@ -2,15 +2,13 @@ export default function() {
 
   const createJsonViewer = () => {
     const tagTemplates = {
-      item: '<div class="Jsonviewer__item"><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__%TYPE%">%VALUE%</div></div>',
-      itemClose: '<label class="Jsonviewer__item Jsonviewer__collapsible"><input type="checkbox" class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>',
-      itemOepn: '<label class="Jsonviewer__item Jsonviewer__collapsible"><input type="checkbox" checked class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__value--type-%TYPE%">%VALUE%</div>%CHILDREN%</label>'
+      childItem: '<div class="Jsonviewer__item"><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__%TYPE%">%VALUE%</div></div>',
+      parentItem: '<label class="Jsonviewer__item Jsonviewer__collapsible"><input type="checkbox" %CHECKED% class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value">%VALUE%</div>%CHILDREN%</label>',
     };
-    const json = this.opts.json;
-    const isOpenItem = !!this.opts.isOpen || false;
-
+    const json = this.opts.data;
+    const hasOpenedItems = !!this.opts.hasoepneditem || false;
     const createItem = (key, value, type) => {
-      let elem = tagTemplates.item.replace('%KEY%', key);
+      let elem = tagTemplates.childItem.replace('%KEY%', key);
       elem = elem.replace('%TYPE%', type);
       elem = type === 'string'
         ? elem.replace('%VALUE%', '"' + value + '"')
@@ -19,10 +17,9 @@ export default function() {
     };
 
     const createCollapsibleItem = (key, value, type, children) => {
-      const tpl = isOpenItem ? 'itemOepn' : 'itemClose';
-      let elem = tagTemplates[tpl].replace('%KEY%', key);
+      let elem = tagTemplates.parentItem.replace('%KEY%', key);
+      elem = hasOpenedItems ? elem.replace('%CHECKED%', 'checked') : elem.replace('%CHECKED%', '');
       elem = elem.replace('%VALUE%', type);
-      elem = elem.replace('%TYPE%', type);
       elem = elem.replace('%CHILDREN%', children);
       return elem;
     };

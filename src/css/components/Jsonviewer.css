@@ -1,5 +1,4 @@
 .Jsonviewer {
-
   & >  {
     .Jsonviewer__item {
       display: block;
@@ -44,6 +43,7 @@
 
   &__toggle {
     display: none;
+
     &:checked ~ .Jsonviewer__item {
       display: block;
     }
@@ -52,6 +52,7 @@
   &__key {
     display: inline;
     color: darkblue;
+
     &::after {
       content: ": ";
     }
