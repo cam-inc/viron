@@ -27,7 +27,7 @@ viron-parameters-form.Parameters_Form
     virtual(if="{ uiType === 'wyswyg' }")
       viron-wyswyg(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleWyswygChange }")
     virtual(if="{ uiType === 'image' }")
-      viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isReadOnly="{ isDisabled }")
+      viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview || isDisabled }")
     virtual(if="{ uiType === 'null' }")
       div TODO
 
