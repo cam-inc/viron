@@ -1,5 +1,5 @@
 viron-jsonviewer
-  div(ref="jsonviewer")
+  div(ref="target")
 
   script.
     import script from './index';

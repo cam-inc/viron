@@ -75,5 +75,9 @@
 }
 
 .Jsonviewer__value--boolean {
+  color: blueviolet;
+}
+
+.Jsonviewer__value--object {
   color: red;
 }
