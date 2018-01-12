@@ -1120,10 +1120,19 @@ select {
 .Application_Header__thumbnail {
     width: 32px;
     height: 32px;
+    cursor: pointer;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     border-radius: 50%;
+  }
+@media (hover: hover) {
+    .Application_Header__thumbnail:hover {
+      opacity: 0.5;
+    }
+  }
+.Application_Header__thumbnail.hold {
+      opacity: 0.5;
   }
 .Application_Header__info,
   .Application_Header__squareIcon {
@@ -1270,6 +1279,78 @@ select {
 .Application_Header_Filter_Autocomplete__list .Application_Header_Filter_Autocomplete__item:last-child {
     margin-bottom: 0;
   }
+.Application_Header_Info {
+  display: block;
+  padding: 32px;
+}
+.Application_Header_Info__name {
+    margin-bottom: 8px;
+    font-size: 1.6rem;
+    font-weight: bold;
+  }
+.Application_Header_Info__urlWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  }
+.Application_Header_Info__color {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    background-color: #c092f5;
+    border-radius: 50%;
+  }
+.Application_Header_Info__color--purple {
+      background-color: #c092f5;
+    }
+.Application_Header_Info__color--blue {
+      background-color: #61c8ff;
+    }
+.Application_Header_Info__color--green {
+      background-color: #7cd6ab;
+    }
+.Application_Header_Info__color--yellow {
+      background-color: #ffc96b;
+    }
+.Application_Header_Info__color--red {
+      background-color: #f57177;
+    }
+.Application_Header_Info__color--gray {
+      background-color: #cbcfd4;
+    }
+.Application_Header_Info__color--black {
+      background-color: #484848;
+    }
+.Application_Header_Info__color--white {
+      background-color: #fff;
+      border: 2px solid #d1d1d1;
+      border: 2px solid var(--color-base-gray);
+    }
+.Application_Header_Info__url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    flex-grow: 1;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+  }
+.Application_Header_Info__description {
+    margin-top: 16px;
+    font-size: 1.4rem;
+  }
+.Application_Header_Info__tags {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+    margin-top: 16px;
+  }
+.Application_Header_Info__tags .Tag {
+      margin-right: 8px;
+    }
+.Application_Header_Info__tags .Tag:last-child {
+        margin-right: 0;
+      }
 .Application_Header_Menu {
   display: block;
   padding: 0 18px;
@@ -1696,10 +1777,6 @@ select {
 .Application_Splash__logo {
     width: 72px;
     height: 72px;
-  }
-.Application_Splash__label {
-    margin-top: 16px;
-    text-align: center;
   }
 .Application_Toasts {
   position: absolute;
@@ -3702,10 +3779,9 @@ select {
     display: grid;
     grid-gap: 24px;
     grid-gap: var(--page-components-grid-gap);
-    -ms-grid-columns: (312px)[auto-fill];
-        grid-template-columns: repeat(auto-fill, 312px);
+    -ms-grid-columns: (minmax(312px, auto))[auto-fill];
+        grid-template-columns: repeat(auto-fill, minmax(312px, auto));
     grid-auto-rows: auto;
-    justify-content: center;
   }
 .ComponentsPage .ComponentsPage_Card--columnSpreadSmall {
       -ms-grid-column-span: 1;
@@ -3727,6 +3803,7 @@ select {
     }
 .ComponentsPage_Card {
   display: block;
+  width: 100%;
   background-color: #fff;
   background-color: var(--theme-componentCard-bg);
   border: 1px solid #fff;
@@ -4033,10 +4110,6 @@ select {
     color: #f57177;
     color: var(--color-base-red);
   }
-.ComponentsPage_Card_Table__tableWrapper {
-    /* Safariバグへの対応 */
-    width: 0;
-  }
 .ComponentsPage_Card_Table__table {
   }
 .ComponentsPage_Card_Table__th {
@@ -4056,6 +4129,8 @@ select {
       position: -webkit-sticky;
       position: sticky;
       right: 0;
+      width: 28px;
+      text-align: center;
       background: linear-gradient(to right, #fff, 0%, #fff 50%, #fff 100%);
       background: linear-gradient(to right, var(--theme-componentCardTable-grad-start), 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
     }
@@ -4615,10 +4690,9 @@ select {
     display: -ms-grid;
     display: grid;
     grid-gap: 24px;
-    -ms-grid-columns: (312px)[auto-fill];
-        grid-template-columns: repeat(auto-fill, 312px);
+    -ms-grid-columns: (minmax(312px, auto))[auto-fill];
+        grid-template-columns: repeat(auto-fill, minmax(312px, auto));
     grid-auto-rows: 144px;
-    justify-content: center;
   }
 .EndpointsPage_Endpoint {
   display: flex;
