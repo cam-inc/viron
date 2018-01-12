@@ -22,6 +22,7 @@ export default function() {
   // MIME-type
   this.mimeType = formObject['x-mime-type'];
 
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-13
   // disabled(readOnly)
   this.isDisabled = this.opts.isdisabled;
   if (formObject.readOnly) {
