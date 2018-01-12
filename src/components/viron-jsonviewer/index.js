@@ -1,63 +1,80 @@
+import isArray from 'mout/lang/isArray';
+import isNull from 'mout/lang/isNull';
+import isObject from 'mout/lang/isObject';
+import isUndefined from 'mout/lang/isUndefined';
+import isFunction from 'mout/lang/isFunction';
+import isString from 'mout/lang/isString';
+import forEach from 'mout/array/forEach';
+
 export default function() {
 
-  const createJsonViewer = () => {
-    const tagTemplates = {
-      childItem: '<div class="Jsonviewer__item"><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__%TYPE%">%VALUE%</div></div>',
-      parentItem: '<label class="Jsonviewer__item Jsonviewer__collapsible"><input type="checkbox" %CHECKED% class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value">%VALUE%</div>%CHILDREN%</label>',
-    };
-    const json = this.opts.data;
-    const hasOpenedItems = !!this.opts.hasoepneditems || false;
-    const createItem = (key, value, type) => {
-      let elem = tagTemplates.childItem.replace('%KEY%', key);
-      elem = elem.replace('%TYPE%', type);
-      elem = type === 'string'
-        ? elem.replace('%VALUE%', '"' + value + '"')
-        : elem.replace('%VALUE%', value);
-      return elem;
-    };
+  const createJson = obj => {
 
-    const createCollapsibleItem = (key, value, type, children) => {
-      let elem = tagTemplates.parentItem.replace('%KEY%', key);
-      elem = hasOpenedItems ? elem.replace('%CHECKED%', 'checked') : elem.replace('%CHECKED%', '');
-      elem = elem.replace('%VALUE%', type);
-      elem = elem.replace('%CHILDREN%', children);
-      return elem;
-    };
+    // undefinedの場合
+    if (isUndefined(obj)) {
+      return 'undefined';
+    }
 
-    const handleChildren = (key, value, type) => {
-      let children = '';
-      for (const item in value) {
-        const key = item;
-        const _value = value[key];
-        children += handleItem(key, _value);
+    // nullの場合
+    if (isNull(obj)) {
+      return 'null';
+    }
+
+    // 関数の場合
+    if (isFunction(obj)) {
+      return 'F ()';
+    }
+
+    // 文字列の場合
+    if (isString(obj)) {
+      return `"${obj}"`;
+    }
+
+    // 配列の場合
+    if (isArray(obj)) {
+
+      // 配列が空の場合
+      if (!obj.length) {
+        return '[]';
       }
-      return createCollapsibleItem(key, value, type, children);
-    };
 
-    const handleItem = (key, value) => {
-      const type = typeof value;
-      const hasChildren = value && typeof value === 'object';
-      if (hasChildren) {
-        return handleChildren(key, value, type);
+      const items = [];
+      forEach(obj, item => {
+        // 再帰処理
+        items.push(createJson(item));
+      });
+      return `[<div>${items.join(',')}</dvi>]`;
+    }
+
+    // オブジェクトの場合
+    if (isObject(obj)) {
+      const keys = Object.keys(obj);
+
+      // オブジェクトが空の場合
+      if (!keys.length) {
+        return '{}';
       }
-      return createItem(key, value, type);
-    };
 
-    const createTags = json => {
-      let tags = '<div class="Jsonviewer">';
-      for (const item in json) {
-        const key = item;
-        const value = json[key];
-        tags += handleItem(key, value);
+      let items = '';
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        if (key || !isUndefined(obj[key])|| !isFunction(key) || !isFunction(obj[key])) {
+          const isLast = (i === keys.length -1);
+          // 末尾のアイテムの場合にはテンプレートを切り替える
+          items += isLast
+            ? `<div>${createJson(key)} : ${createJson(obj[key])},</div>`
+            : `<div>${createJson(key)} : ${createJson(obj[key])}</div>`;
+        }
       }
-      tags += '</div>';
-      return tags;
-    };
+      return `{${items}}`;
+    }
 
-    return createTags(json);
+    // Number, Booleanの場合
+    return obj;
   };
 
   this.on('mount', () => {
-    this.refs.target.innerHTML = createJsonViewer();
+    const obj = this.opts.data;
+    this.refs.target.innerHTML = createJson(obj);
   });
 }

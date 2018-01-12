@@ -18,7 +18,7 @@ mout.object.forOwn(mout, (v, k) => {
     namedExports[key] = [];
   }
   mout.object.forOwn(v, (v1, k1) => {
-    if (mout.lang.isFunction(v1)) {
+    if (mout.lang.isFunisFunction(v1)) {
       namedExports[key].push(k1);
     }
   });

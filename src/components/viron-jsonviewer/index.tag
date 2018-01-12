@@ -1,4 +1,4 @@
-viron-jsonviewer
+viron-jsonviewer.Jsonviewer
   div(ref="target")
 
   script.
