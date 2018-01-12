@@ -119,6 +119,7 @@
     &--sticky {
       position: sticky;
       right: 0;
+      width: 28px;
       text-align: center;
       background: linear-gradient(to right, var(--theme-componentCardTable-grad-start), 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
     }
