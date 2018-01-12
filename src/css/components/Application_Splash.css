@@ -16,9 +16,4 @@
     width: 72px;
     height: 72px;
   }
-
-  &__label {
-    margin-top: 16px;
-    text-align: center;
-  }
 }
