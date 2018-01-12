@@ -3,7 +3,7 @@ export default function() {
   const createJsonViewer = () => {
     const tagTemplates = {
       childItem: '<div class="Jsonviewer__item"><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value Jsonviewer__%TYPE%">%VALUE%</div></div>',
-      parentItem: '<label class="Jsonviewer__item Jsonviewer__collapsible"><input type="checkbox" %CHECKED% class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value">%VALUE%</div>%CHILDREN%</label>',
+      parentItem: '<label class="Jsonviewer__item Jsonviewer__item--collapsible Jsonviewer__collapsible"><input type="checkbox" %CHECKED% class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value">%VALUE%</div>%CHILDREN%</label>',
     };
     const json = this.opts.data;
     const hasOpenedItems = !!this.opts.hasoepneditems || false;

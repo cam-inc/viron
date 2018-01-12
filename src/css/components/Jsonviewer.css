@@ -1,8 +1,7 @@
 .Jsonviewer {
-  & >  {
-    .Jsonviewer__item {
-      display: block;
-    }
+
+  & > &__item {
+    display: block;
   }
 
   &__item {
@@ -12,7 +11,7 @@
     user-select: none;
   }
 
-  &__collapsible {
+  &__item--collapsible {
     position: relative;
     overflow: hidden;
     cursor: pointer;
@@ -26,7 +25,7 @@
     &::after {
       position: absolute;
       top: 26px;
-      left: 9px;
+      left: 7px;
       width: 1px;
       height: 100%;
       content: "";
