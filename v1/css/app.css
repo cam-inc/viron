@@ -2622,7 +2622,16 @@ select {
     margin-bottom: 8px;
   }
 .Parameters_Form__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
     font-size: 1.2rem;
+  }
+.Parameters_Form__description {
+    flex-shrink: 0;
+    margin-left: 8px;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
   }
 .Parameters_Form__body {
     position: relative;
