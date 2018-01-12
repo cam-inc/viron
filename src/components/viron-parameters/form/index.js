@@ -22,11 +22,18 @@ export default function() {
   // MIME-type
   this.mimeType = formObject['x-mime-type'];
 
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-13
+  // disabled(readOnly)
+  this.isDisabled = this.opts.isdisabled;
+  if (formObject.readOnly) {
+    this.isDisabled = true;
+  }
+
   // 入力に使用するUIコンポーネント名。
   // opts.formObjectの値から適切なUIコンポーネントを推測します。
-  // 文字列 & previewモード & 拡張子imageの場合のみ強制的に画像を表示します。
+  // 文字列 & (previewモード || readOnly) & 拡張子imageの場合のみ強制的に画像を表示します。
   this.uiType = (() => {
-    if (!this.opts.ispreview || formObject.type !== 'string' || !this.opts.val) {
+    if ((!this.opts.ispreview && !formObject.readOnly) || formObject.type !== 'string' || !this.opts.val) {
       return util.getUIType(formObject);
     }
     // 拡張子から最適な表示方法を推測します。
