@@ -1,6 +1,7 @@
 viron-mediapreview.Mediapreview(class="{ isVisible ? 'Mediapreview--visible' : '' } Mediapreview--{ opts.mediapreviewopts.theme }" onTap="{ handleTap }")
   .Mediapreview__frame(onTap="{ handleFrameTap }")
     .Mediapreview__image(style="background-image: url({ path })")
+    .Mediapreview__path { path }
     .Mediapreview__closeButton(onTap="{ handleCloseButtonTap }")
       viron-icon-close
 
