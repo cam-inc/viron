@@ -157,6 +157,8 @@
     --theme-pagination-bg: var(--theme-standard-pagination-bg);
     --theme-pagination-bg-disabled: var(--theme-standard-pagination-bg-disabled);
     --theme-pagination-border: var(--theme-standard-pagination-border);
+    --theme-logo-left: var(--theme-standard-logo-left);
+    --theme-logo-right: var(--theme-standard-logo-right);
   }
 
   &--midnight {
@@ -184,6 +186,8 @@
     --theme-pagination-bg: var(--theme-midnight-pagination-bg);
     --theme-pagination-bg-disabled: var(--theme-midnight-pagination-bg-disabled);
     --theme-pagination-border: var(--theme-midnight-pagination-border);
+    --theme-logo-left: var(--theme-midnight-logo-left);
+    --theme-logo-right: var(--theme-midnight-logo-right);
   }
 
   &--terminal {
@@ -211,5 +215,7 @@
     --theme-pagination-bg: var(--theme-terminal-pagination-bg);
     --theme-pagination-bg-disabled: var(--theme-terminal-pagination-bg-disabled);
     --theme-pagination-border: var(--theme-terminal-pagination-border);
+    --theme-logo-left: var(--theme-terminal-logo-left);
+    --theme-logo-right: var(--theme-terminal-logo-right);
   }
 }

@@ -1,4 +1,5 @@
 viron-icon-logo.icon.Icon.IconLogo(class="{ opts.class }")
-  svg(viewBox="-3675 13992 24 24")
-    path(d="M13.333,0H0V24H24V0Zm0,2.667h8V5.333h-8Zm-10.667,0h8v8h-8ZM21.333,21.333H2.667v-8H21.333Zm0-10.667h-8V8h8Z" transform="translate(-3675 13992)")
+  svg(viewBox="0 0 200 184.62")
+    path.IconLogo__right(d="M200,43a43,43,0,0,0-80.28-21.5L63.87,118.26a43,43,0,1,0,73.38,44.85l.06,0,56.93-98.61h0A42.77,42.77,0,0,0,200,43Z")
+    path.IconLogo__left(d="M100,55.63l0,.06L80.28,21.53a43,43,0,1,0-74.5,43h0L62.7,163.16l.06,0a43,43,0,0,0,74.49,0l.06,0,12.4-21.48Z")
   .Icon__catcher(if="{ !opts.nocatcher }")

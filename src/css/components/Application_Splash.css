@@ -13,12 +13,12 @@
   }
 
   &__logo {
-    width: 36px;
-    height: 36px;
+    width: 72px;
+    height: 72px;
   }
 
   &__label {
-    margin-top: 4px;
+    margin-top: 16px;
     text-align: center;
   }
 }

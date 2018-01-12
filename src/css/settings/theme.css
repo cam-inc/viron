@@ -24,6 +24,8 @@
   --theme-pagination-bg: #fff;
   --theme-pagination-bg-disabled: #fff;
   --theme-pagination-border: #fff;
+  --theme-logo-left: #fff;
+  --theme-logo-right: #fff;
 
   /* --theme-fooを上書きするため。 */
   /* standard */
@@ -51,6 +53,8 @@
   --theme-standard-pagination-bg: #fff;
   --theme-standard-pagination-bg-disabled: #f9f9f9;
   --theme-standard-pagination-border: #d1d1d1;
+  --theme-standard-logo-left: #e5797a;
+  --theme-standard-logo-right: #cb6b6c;
 
   /* midnight */
   --theme-midnight-app-text: #00c8ff;
@@ -77,6 +81,8 @@
   --theme-midnight-pagination-bg: #001217;
   --theme-midnight-pagination-bg-disabled: #004051;
   --theme-midnight-pagination-border: #004051;
+  --theme-midnight-logo-left: #6ed9bb;
+  --theme-midnight-logo-right: #62c0a6;
 
   /* terminal */
   --theme-terminal-app-text: #35dcba;
@@ -103,4 +109,6 @@
   --theme-terminal-pagination-bg: #000;
   --theme-terminal-pagination-bg-disabled: #0d372f;
   --theme-terminal-pagination-border: #0d372f;
+  --theme-terminal-logo-left: #6ed9bb;
+  --theme-terminal-logo-right: #62c0a6;
 }

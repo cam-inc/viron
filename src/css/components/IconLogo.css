@@ -1,0 +1,9 @@
+.IconLogo {
+  &__left {
+    fill: var(--theme-logo-left);
+  }
+
+  &__right {
+    fill: var(--theme-logo-right);
+  }
+}
