@@ -1,4 +1,5 @@
 export default function() {
+  // TODO: 削除
   this.data = {
     size: 3,
     limit: 10,

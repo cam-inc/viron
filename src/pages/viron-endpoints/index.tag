@@ -4,7 +4,7 @@ viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
     .EndpointsPage__orderButton(if="{ isDesktop }" class="{ 'EndpointsPage__orderButton--active': isDraggable }" onTap="{ handleOrderButtonTap }")
       viron-icon-move
   .EndpointsPage__container
-    viron-jsonviewer(if="{ data }" data="{ data }" hasOepnedItem="{ false }")
+    viron-jsonviewer(if="{ data }" data="{ data }" hasOepnedItems="{ false }")
     //- viron-endpoints-page-endpoint(each="{ endpoint in endpoints }" endpoint="{ endpoint }" isDraggable="{ parent.isDraggable }")
 
   script.

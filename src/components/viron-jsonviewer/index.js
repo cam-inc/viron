@@ -6,7 +6,7 @@ export default function() {
       parentItem: '<label class="Jsonviewer__item Jsonviewer__collapsible"><input type="checkbox" %CHECKED% class="Jsonviewer__toggle"/><div class="Jsonviewer__key">%KEY%</div><div class="Jsonviewer__value">%VALUE%</div>%CHILDREN%</label>',
     };
     const json = this.opts.data;
-    const hasOpenedItems = !!this.opts.hasoepneditem || false;
+    const hasOpenedItems = !!this.opts.hasoepneditems || false;
     const createItem = (key, value, type) => {
       let elem = tagTemplates.childItem.replace('%KEY%', key);
       elem = elem.replace('%TYPE%', type);
