@@ -2368,13 +2368,25 @@ select {
     background-position: center center;
     background-size: contain;
   }
+.Mediapreview__path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    position: absolute;
+    right: 0;
+    bottom: -16px;
+    width: 100%;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+    text-align: right;
+  }
 .Mediapreview__closeButton {
   display: flex;
   align-items: center;
   justify-content: center;
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: -24px;
+    left: -24px;
     width: 24px;
     height: 24px;
     color: #fff;
