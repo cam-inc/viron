@@ -1,6 +1,7 @@
 viron-parameters-form.Parameters_Form
   .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
     .Parameters_Form__title { title }
+    .Parameters_Form__description(if="{ !!description }") { description }
   .Parameters_Form__body
     .Parameters_Form__error(if="{ hasError && isFocus }")
       viron-parameters-popover(theme="{ opts.theme }" isPreview="{ opts.ispreview }" message="{ errors[0] }")

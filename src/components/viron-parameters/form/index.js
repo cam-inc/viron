@@ -11,10 +11,11 @@ export default function() {
   const formObject = this.opts.formobject;
   // 入力フォームのタイトル。
   // 入力必須ならば米印を付ける。
-  this.title = formObject.description || formObject.name;
+  this.title = formObject.name;
   if (formObject.required) {
     this.title = `${this.title} *`;
   }
+  this.description = formObject.description;
   // autocomplete設定。
   this.autocompleteConfig = formObject['x-autocomplete'];
   // uploaderのaccept値。
