@@ -16,6 +16,120 @@
   --color-base-blue-secondary: #c0cbf2;
   --color-base-blue-tertiary: #e9eefb;
 }
+:root {
+  /* 各cssファイルから参照される変数群。値は適当。 */
+  --theme-app-text: #fff;
+  --theme-app-bg: #fff;
+  --theme-poster-overlay: #fff;
+  --theme-menu-logo: #fff;
+  --theme-menu-text: #fff;
+  --theme-menu-arrow: #fff;
+  --theme-menu-overlay: #fff;
+  --theme-header-bg: #fff;
+  --theme-orderButton-bg: #fff;
+  --theme-endpointCard-bg: #fff;
+  --theme-endpointCard-border: #fff;
+  --theme-popover-bg: #fff;
+  --theme-tag-text: #fff;
+  --theme-tag-bg: #fff;
+  --theme-componentCard-bg: #fff;
+  --theme-componentCard-border: #fff;
+  --theme-componentCardTable-bg: #fff;
+  --theme-componentCardTable-grad-start: #fff;
+  --theme-componentCardTable-grad-end: #fff;
+  --theme-componentCardTable-row-border: #fff;
+  --theme-componentCardTable-cell-hover: #fff;
+  --theme-pagination-bg: #fff;
+  --theme-pagination-bg-disabled: #fff;
+  --theme-pagination-border: #fff;
+  --theme-logo-left: #fff;
+  --theme-logo-right: #fff;
+
+  /* --theme-fooを上書きするため。 */
+  /* standard */
+  --theme-standard-app-text: #484848;
+  --theme-standard-app-bg: #f0f0ef;
+  --theme-standard-poster-overlay: transparent;
+  --theme-standard-menu-logo: #f57177;
+  --theme-standard-menu-text: #fff;
+  --theme-standard-menu-arrow: #f57177;
+  --theme-standard-menu-overlay: transparent;
+  --theme-standard-header-bg: #f9f9f9;
+  --theme-standard-orderButton-bg: #d1d1d1;
+  --theme-standard-endpointCard-bg: #fff;
+  --theme-standard-endpointCard-border: #c6c6c5;
+  --theme-standard-popover-bg: #fff;
+  --theme-standard-tag-text: #d1d1d1;
+  --theme-standard-tag-bg: #f9f9f9;
+  --theme-standard-componentCard-bg: #fff;
+  --theme-standard-componentCard-border: #c6c6c5;
+  --theme-standard-componentCardTable-bg: #fff;
+  --theme-standard-componentCardTable-grad-start: rgba(255, 255, 255, 0);
+  --theme-standard-componentCardTable-grad-end: rgba(255, 255, 255, 1);
+  --theme-standard-componentCardTable-row-border: #f9f9f9;
+  --theme-standard-componentCardTable-cell-hover: #f9f9f9;
+  --theme-standard-pagination-bg: #fff;
+  --theme-standard-pagination-bg-disabled: #f9f9f9;
+  --theme-standard-pagination-border: #d1d1d1;
+  --theme-standard-logo-left: #e5797a;
+  --theme-standard-logo-right: #cb6b6c;
+
+  /* midnight */
+  --theme-midnight-app-text: #00c8ff;
+  --theme-midnight-app-bg: #001217;
+  --theme-midnight-poster-overlay: #001d26;
+  --theme-midnight-menu-logo: #00c8ff;
+  --theme-midnight-menu-text: #00c8ff;
+  --theme-midnight-menu-arrow: #00c8ff;
+  --theme-midnight-menu-overlay: #001d26;
+  --theme-midnight-header-bg: #001820;
+  --theme-midnight-orderButton-bg: #001d26;
+  --theme-midnight-endpointCard-bg: #001217;
+  --theme-midnight-endpointCard-border: #004051;
+  --theme-midnight-popover-bg: #001d26;
+  --theme-midnight-tag-text: #00c8ff;
+  --theme-midnight-tag-bg: #001d26;
+  --theme-midnight-componentCard-bg: #001217;
+  --theme-midnight-componentCard-border: #004051;
+  --theme-midnight-componentCardTable-bg: #001217;
+  --theme-midnight-componentCardTable-grad-start: rgba(0, 18, 23, 0);
+  --theme-midnight-componentCardTable-grad-end: rgba(0, 18, 23, 1);
+  --theme-midnight-componentCardTable-row-border: #001d26;
+  --theme-midnight-componentCardTable-cell-hover: #001d26;
+  --theme-midnight-pagination-bg: #001217;
+  --theme-midnight-pagination-bg-disabled: #004051;
+  --theme-midnight-pagination-border: #004051;
+  --theme-midnight-logo-left: #6ed9bb;
+  --theme-midnight-logo-right: #62c0a6;
+
+  /* terminal */
+  --theme-terminal-app-text: #35dcba;
+  --theme-terminal-app-bg: #000;
+  --theme-terminal-poster-overlay: #091714;
+  --theme-terminal-menu-logo: #35dcba;
+  --theme-terminal-menu-text: #35dcba;
+  --theme-terminal-menu-arrow: #35dcba;
+  --theme-terminal-menu-overlay: #091714;
+  --theme-terminal-header-bg: #050d0c;
+  --theme-terminal-orderButton-bg: #091714;
+  --theme-terminal-endpointCard-bg: #000;
+  --theme-terminal-endpointCard-border: #0d372f;
+  --theme-terminal-popover-bg: #091714;
+  --theme-terminal-tag-text: #35dcba;
+  --theme-terminal-tag-bg: #091714;
+  --theme-terminal-componentCard-bg: #000;
+  --theme-terminal-componentCard-border: #0d372f;
+  --theme-terminal-componentCardTable-bg: #000;
+  --theme-terminal-componentCardTable-grad-start: rgba(0, 0, 0, 0);
+  --theme-terminal-componentCardTable-grad-end: rgba(0, 0, 0, 1);
+  --theme-terminal-componentCardTable-row-border: #091714;
+  --theme-terminal-componentCardTable-cell-hover: #091714;
+  --theme-terminal-pagination-bg: #000;
+  --theme-terminal-pagination-bg-disabled: #0d372f;
+  --theme-terminal-pagination-border: #0d372f;
+  --theme-terminal-logo-left: #fff;
+  --theme-terminal-logo-right: #dedede;
+}
 /* ITCSS: Tools */
 /* Default mixins and functions. */
 @keyframes spin {
@@ -607,11 +721,7 @@ body {
   /* 320px = iPhoneSEの横幅。これを最小値とする。 */
   min-width: 320px;
   font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
-  font-size: 12px;
   line-height: 1.5;
-  color: #484848;
-  color: var(--color-base-black);
-  background-color: #f0f0ef;
 }
 input,
 button,
@@ -661,6 +771,10 @@ select {
   position: relative;
   display: block;
   height: 100%;
+  color: #fff;
+  color: var(--theme-app-text);
+  background-color: #fff;
+  background-color: var(--theme-app-bg);
 }
 .Application__container {
     display: -ms-grid;
@@ -769,6 +883,169 @@ select {
 .Application--mobile .Application__main {
       padding: 0 4px 24px;
     }
+/* theme関連 */
+.Application--standard {
+    --theme-app-text: #484848;
+    --theme-app-text: var(--theme-standard-app-text);
+    --theme-app-bg: #f0f0ef;
+    --theme-app-bg: var(--theme-standard-app-bg);
+    --theme-poster-overlay: transparent;
+    --theme-poster-overlay: var(--theme-standard-poster-overlay);
+    --theme-menu-logo: #f57177;
+    --theme-menu-logo: var(--theme-standard-menu-logo);
+    --theme-menu-text: #fff;
+    --theme-menu-text: var(--theme-standard-menu-text);
+    --theme-menu-arrow: #f57177;
+    --theme-menu-arrow: var(--theme-standard-menu-arrow);
+    --theme-menu-overlay: transparent;
+    --theme-menu-overlay: var(--theme-standard-menu-overlay);
+    --theme-header-bg: #f9f9f9;
+    --theme-header-bg: var(--theme-standard-header-bg);
+    --theme-orderButton-bg: #d1d1d1;
+    --theme-orderButton-bg: var(--theme-standard-orderButton-bg);
+    --theme-endpointCard-bg: #fff;
+    --theme-endpointCard-bg: var(--theme-standard-endpointCard-bg);
+    --theme-endpointCard-border: #c6c6c5;
+    --theme-endpointCard-border: var(--theme-standard-endpointCard-border);
+    --theme-popover-bg: #fff;
+    --theme-popover-bg: var(--theme-standard-popover-bg);
+    --theme-tag-text: #d1d1d1;
+    --theme-tag-text: var(--theme-standard-tag-text);
+    --theme-tag-bg: #f9f9f9;
+    --theme-tag-bg: var(--theme-standard-tag-bg);
+    --theme-componentCard-bg: #fff;
+    --theme-componentCard-bg: var(--theme-standard-componentCard-bg);
+    --theme-componentCard-border: #c6c6c5;
+    --theme-componentCard-border: var(--theme-standard-componentCard-border);
+    --theme-componentCardTable-bg: #fff;
+    --theme-componentCardTable-bg: var(--theme-standard-componentCardTable-bg);
+    --theme-componentCardTable-grad-start: rgba(255, 255, 255, 0);
+    --theme-componentCardTable-grad-start: var(--theme-standard-componentCardTable-grad-start);
+    --theme-componentCardTable-grad-end: rgba(255, 255, 255, 1);
+    --theme-componentCardTable-grad-end: var(--theme-standard-componentCardTable-grad-end);
+    --theme-componentCardTable-row-border: #f9f9f9;
+    --theme-componentCardTable-row-border: var(--theme-standard-componentCardTable-row-border);
+    --theme-componentCardTable-cell-hover: #f9f9f9;
+    --theme-componentCardTable-cell-hover: var(--theme-standard-componentCardTable-cell-hover);
+    --theme-pagination-bg: #fff;
+    --theme-pagination-bg: var(--theme-standard-pagination-bg);
+    --theme-pagination-bg-disabled: #f9f9f9;
+    --theme-pagination-bg-disabled: var(--theme-standard-pagination-bg-disabled);
+    --theme-pagination-border: #d1d1d1;
+    --theme-pagination-border: var(--theme-standard-pagination-border);
+    --theme-logo-left: #e5797a;
+    --theme-logo-left: var(--theme-standard-logo-left);
+    --theme-logo-right: #cb6b6c;
+    --theme-logo-right: var(--theme-standard-logo-right);
+  }
+.Application--midnight {
+    --theme-app-text: #00c8ff;
+    --theme-app-text: var(--theme-midnight-app-text);
+    --theme-app-bg: #001217;
+    --theme-app-bg: var(--theme-midnight-app-bg);
+    --theme-poster-overlay: #001d26;
+    --theme-poster-overlay: var(--theme-midnight-poster-overlay);
+    --theme-menu-logo: #00c8ff;
+    --theme-menu-logo: var(--theme-midnight-menu-logo);
+    --theme-menu-text: #00c8ff;
+    --theme-menu-text: var(--theme-midnight-menu-text);
+    --theme-menu-arrow: #00c8ff;
+    --theme-menu-arrow: var(--theme-midnight-menu-arrow);
+    --theme-menu-overlay: #001d26;
+    --theme-menu-overlay: var(--theme-midnight-menu-overlay);
+    --theme-header-bg: #001820;
+    --theme-header-bg: var(--theme-midnight-header-bg);
+    --theme-orderButton-bg: #001d26;
+    --theme-orderButton-bg: var(--theme-midnight-orderButton-bg);
+    --theme-endpointCard-bg: #001217;
+    --theme-endpointCard-bg: var(--theme-midnight-endpointCard-bg);
+    --theme-endpointCard-border: #004051;
+    --theme-endpointCard-border: var(--theme-midnight-endpointCard-border);
+    --theme-popover-bg: #001d26;
+    --theme-popover-bg: var(--theme-midnight-popover-bg);
+    --theme-tag-text: #00c8ff;
+    --theme-tag-text: var(--theme-midnight-tag-text);
+    --theme-tag-bg: #001d26;
+    --theme-tag-bg: var(--theme-midnight-tag-bg);
+    --theme-componentCard-bg: #001217;
+    --theme-componentCard-bg: var(--theme-midnight-componentCard-bg);
+    --theme-componentCard-border: #004051;
+    --theme-componentCard-border: var(--theme-midnight-componentCard-border);
+    --theme-componentCardTable-bg: #001217;
+    --theme-componentCardTable-bg: var(--theme-midnight-componentCardTable-bg);
+    --theme-componentCardTable-grad-start: rgba(0, 18, 23, 0);
+    --theme-componentCardTable-grad-start: var(--theme-midnight-componentCardTable-grad-start);
+    --theme-componentCardTable-grad-end: rgba(0, 18, 23, 1);
+    --theme-componentCardTable-grad-end: var(--theme-midnight-componentCardTable-grad-end);
+    --theme-componentCardTable-row-border: #001d26;
+    --theme-componentCardTable-row-border: var(--theme-midnight-componentCardTable-row-border);
+    --theme-componentCardTable-cell-hover: #001d26;
+    --theme-componentCardTable-cell-hover: var(--theme-midnight-componentCardTable-cell-hover);
+    --theme-pagination-bg: #001217;
+    --theme-pagination-bg: var(--theme-midnight-pagination-bg);
+    --theme-pagination-bg-disabled: #004051;
+    --theme-pagination-bg-disabled: var(--theme-midnight-pagination-bg-disabled);
+    --theme-pagination-border: #004051;
+    --theme-pagination-border: var(--theme-midnight-pagination-border);
+    --theme-logo-left: #6ed9bb;
+    --theme-logo-left: var(--theme-midnight-logo-left);
+    --theme-logo-right: #62c0a6;
+    --theme-logo-right: var(--theme-midnight-logo-right);
+  }
+.Application--terminal {
+    --theme-app-text: #35dcba;
+    --theme-app-text: var(--theme-terminal-app-text);
+    --theme-app-bg: #000;
+    --theme-app-bg: var(--theme-terminal-app-bg);
+    --theme-poster-overlay: #091714;
+    --theme-poster-overlay: var(--theme-terminal-poster-overlay);
+    --theme-menu-logo: #35dcba;
+    --theme-menu-logo: var(--theme-terminal-menu-logo);
+    --theme-menu-text: #35dcba;
+    --theme-menu-text: var(--theme-terminal-menu-text);
+    --theme-menu-arrow: #35dcba;
+    --theme-menu-arrow: var(--theme-terminal-menu-arrow);
+    --theme-menu-overlay: #091714;
+    --theme-menu-overlay: var(--theme-terminal-menu-overlay);
+    --theme-header-bg: #050d0c;
+    --theme-header-bg: var(--theme-terminal-header-bg);
+    --theme-orderButton-bg: #091714;
+    --theme-orderButton-bg: var(--theme-terminal-orderButton-bg);
+    --theme-endpointCard-bg: #000;
+    --theme-endpointCard-bg: var(--theme-terminal-endpointCard-bg);
+    --theme-endpointCard-border: #0d372f;
+    --theme-endpointCard-border: var(--theme-terminal-endpointCard-border);
+    --theme-popover-bg: #091714;
+    --theme-popover-bg: var(--theme-terminal-popover-bg);
+    --theme-tag-text: #35dcba;
+    --theme-tag-text: var(--theme-terminal-tag-text);
+    --theme-tag-bg: #091714;
+    --theme-tag-bg: var(--theme-terminal-tag-bg);
+    --theme-componentCard-bg: #000;
+    --theme-componentCard-bg: var(--theme-terminal-componentCard-bg);
+    --theme-componentCard-border: #0d372f;
+    --theme-componentCard-border: var(--theme-terminal-componentCard-border);
+    --theme-componentCardTable-bg: #000;
+    --theme-componentCardTable-bg: var(--theme-terminal-componentCardTable-bg);
+    --theme-componentCardTable-grad-start: rgba(0, 0, 0, 0);
+    --theme-componentCardTable-grad-start: var(--theme-terminal-componentCardTable-grad-start);
+    --theme-componentCardTable-grad-end: rgba(0, 0, 0, 1);
+    --theme-componentCardTable-grad-end: var(--theme-terminal-componentCardTable-grad-end);
+    --theme-componentCardTable-row-border: #091714;
+    --theme-componentCardTable-row-border: var(--theme-terminal-componentCardTable-row-border);
+    --theme-componentCardTable-cell-hover: #091714;
+    --theme-componentCardTable-cell-hover: var(--theme-terminal-componentCardTable-cell-hover);
+    --theme-pagination-bg: #000;
+    --theme-pagination-bg: var(--theme-terminal-pagination-bg);
+    --theme-pagination-bg-disabled: #0d372f;
+    --theme-pagination-bg-disabled: var(--theme-terminal-pagination-bg-disabled);
+    --theme-pagination-border: #0d372f;
+    --theme-pagination-border: var(--theme-terminal-pagination-border);
+    --theme-logo-left: #fff;
+    --theme-logo-left: var(--theme-terminal-logo-left);
+    --theme-logo-right: #dedede;
+    --theme-logo-right: var(--theme-terminal-logo-right);
+  }
 .Application_Blocker {
   position: absolute;
   top: 0;
@@ -810,8 +1087,8 @@ select {
   display: flex;
   align-items: stretch;
   justify-content: space-between;
-  background-color: #f6f6f6;
-  border-bottom: 1px solid #e8e8e7;
+  background-color: #fff;
+  background-color: var(--theme-header-bg);
 }
 .Application_Header__item {
   display: flex;
@@ -1106,6 +1383,15 @@ select {
     background-position: center center;
     background-size: cover;
   }
+.Application_Menu__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    background-color: var(--theme-menu-overlay);
+  }
 .Application_Menu__content {
   display: flex;
   flex-direction: column;
@@ -1126,14 +1412,14 @@ select {
     width: 8px;
     height: 8px;
     margin-right: 16px;
-    color: #f57177;
-    color: var(--color-base-red);
+    color: #fff;
+    color: var(--theme-menu-arrow);
   }
 .Application_Menu__logo {
     width: 24px;
     height: 24px;
-    color: #f57177;
-    color: var(--color-base-red);
+    color: #fff;
+    color: var(--theme-menu-logo);
     cursor: pointer;
   }
 @media (hover: hover) {
@@ -1163,7 +1449,7 @@ select {
     }
 .Application_Menu--desktop .Application_Menu_Group {
       color: #fff;
-      color: var(--color-base-white);
+      color: var(--theme-menu-text);
     }
 .Application_Menu--mobile {
     padding-top: 44px;
@@ -1289,6 +1575,15 @@ select {
     background-position: center center;
     background-size: cover;
   }
+.Application_Poster__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    background-color: var(--theme-poster-overlay);
+  }
 .Application_Poster__content {
     position: relative;
     padding: 24px;
@@ -1390,24 +1685,21 @@ select {
   background-color: #484848;
   background-color: var(--color-base-black);
 }
-.Application_Splash__logo {
+.Application_Splash__container {
   animation-name: flash;
   animation-duration: 1s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
-    width: 36px;
-    height: 36px;
     color: #fff;
     color: var(--color-base-white);
   }
-.Application_Splash__todo {
-  animation-name: flash;
-  animation-duration: 1s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-    margin: 0 12px;
-    color: #fff;
-    color: var(--color-base-white);
+.Application_Splash__logo {
+    width: 72px;
+    height: 72px;
+  }
+.Application_Splash__label {
+    margin-top: 16px;
+    text-align: center;
   }
 .Application_Toasts {
   position: absolute;
@@ -1756,6 +2048,8 @@ select {
       }
 .Drawer {
   display: block;
+  color: #484848;
+  color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
   transition-duration: 300ms;
@@ -1879,6 +2173,14 @@ select {
     right: -8px;
     bottom: -8px;
     left: -8px;
+  }
+.IconLogo__left {
+    fill: #fff;
+    fill: var(--theme-logo-left);
+  }
+.IconLogo__right {
+    fill: #fff;
+    fill: var(--theme-logo-right);
   }
 .Image {
   position: relative;
@@ -2028,6 +2330,8 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #484848;
+  color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
   transition-duration: 300ms;
@@ -2215,9 +2519,9 @@ select {
     padding: 0 4px;
     cursor: pointer;
     background-color: #fff;
-    background-color: var(--color-base-white);
-    border: 1px solid #d1d1d1;
-    border: 1px solid var(--color-base-gray);
+    background-color: var(--theme-pagination-bg);
+    border: 1px solid #fff;
+    border: 1px solid var(--theme-pagination-border);
     border-radius: 2px;
   }
 @media (hover: hover) {
@@ -2254,10 +2558,10 @@ select {
       color: #d1d1d1;
       color: var(--color-base-gray);
       cursor: not-allowed;
-      background-color: #f9f9f9;
-      background-color: var(--color-base-gray-tertiary);
-      border-color: #d1d1d1;
-      border-color: var(--color-base-gray);
+      background-color: #fff;
+      background-color: var(--theme-pagination-bg-disabled);
+      border-color: #fff;
+      border-color: var(--theme-pagination-bg-disabled);
     }
 .Pagination__button--moderate {
       background-color: transparent;
@@ -2638,7 +2942,7 @@ select {
     position: relative;
     overflow-y: scroll;
     background-color: #fff;
-    background-color: var(--color-base-white);
+    background-color: var(--theme-popover-bg);
     border-radius: 2px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   }
@@ -2682,7 +2986,7 @@ select {
       left: calc(-1 * 10px / 2);
       left: calc(-1 * var(--component-popover-arrow-size) / 2);
       border-color: transparent transparent #fff transparent;
-      border-color: transparent transparent var(--color-base-white) transparent;
+      border-color: transparent transparent var(--theme-popover-bg) transparent;
       border-width: 0 calc(10px / 2) 10px calc(10px / 2);
       border-width: 0 calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2);
     }
@@ -2719,7 +3023,7 @@ select {
       left: calc(-1 * 10px);
       left: calc(-1 * var(--component-popover-arrow-size));
       border-color: transparent transparent transparent #fff;
-      border-color: transparent transparent transparent var(--color-base-white);
+      border-color: transparent transparent transparent var(--theme-popover-bg);
       border-width: calc(10px / 2) 0 calc(10px / 2) 10px;
       border-width: calc(var(--component-popover-arrow-size) / 2) 0 calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size);
     }
@@ -2752,7 +3056,7 @@ select {
       left: calc(-1 * 10px / 2);
       left: calc(-1 * var(--component-popover-arrow-size) / 2);
       border-color: #fff transparent transparent transparent;
-      border-color: var(--color-base-white) transparent transparent transparent;
+      border-color: var(--theme-popover-bg) transparent transparent transparent;
       border-width: 10px calc(10px / 2) 0 calc(10px / 2);
       border-width: var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0 calc(var(--component-popover-arrow-size) / 2);
     }
@@ -2788,7 +3092,7 @@ select {
       right: calc(-1 * 10px);
       right: calc(-1 * var(--component-popover-arrow-size));
       border-color: transparent #fff transparent transparent;
-      border-color: transparent var(--color-base-white) transparent transparent;
+      border-color: transparent var(--theme-popover-bg) transparent transparent;
       border-width: calc(10px / 2) 10px calc(10px / 2) 0;
       border-width: calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0;
     }
@@ -2807,7 +3111,7 @@ select {
     max-height: 80%;
     overflow-y: scroll;
     background-color: #fff;
-    background-color: var(--color-base-white);
+    background-color: var(--theme-popover-bg);
     border-radius: 8px;
     opacity: 0;
     transition-duration: 300ms;
@@ -2986,10 +3290,10 @@ select {
   display: inline-block;
   padding: 1px 4px 2px;
   font-size: 1.2rem;
-  color: #d1d1d1;
-  color: var(--color-base-gray);
-  background-color: #f9f9f9;
-  background-color: var(--color-base-gray-tertiary);
+  color: #fff;
+  color: var(--theme-tag-text);
+  background-color: #fff;
+  background-color: var(--theme-tag-bg);
   border-radius: 2px;
 }
 .Textarea {
@@ -3415,9 +3719,9 @@ select {
 .ComponentsPage_Card {
   display: block;
   background-color: #fff;
-  background-color: var(--color-base-white);
-  border: 1px solid #d1d1d1;
-  border: 1px solid var(--color-base-gray);
+  background-color: var(--theme-componentCard-bg);
+  border: 1px solid #fff;
+  border: 1px solid var(--theme-componentCard-border);
   border-radius: 4px;
 }
 .ComponentsPage_Card_Chart {
@@ -3606,7 +3910,7 @@ select {
     flex-shrink: 0;
     padding: 24px;
     background-color: #fff;
-    background-color: var(--color-base-white);
+    background-color: var(--theme-componentCardTable-bg);
   }
 .ComponentsPage_Card_Table__headAside {
   display: flex;
@@ -3730,36 +4034,40 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-    padding: 0 24px;
+    padding: 8px 24px;
     font-size: 1.2rem;
     font-weight: normal;
     color: #d1d1d1;
     color: var(--color-base-gray);
     text-align: left;
-    border-bottom: 1px solid #f9f9f9;
-    border-bottom: 1px solid var(--color-base-gray-tertiary);
+    border-bottom: 1px solid #fff;
+    border-bottom: 1px solid var(--theme-componentCardTable-row-border);
   }
 .ComponentsPage_Card_Table__th--sticky {
       position: -webkit-sticky;
       position: sticky;
       right: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
+      background: linear-gradient(to right, #fff, 0%, #fff 50%, #fff 100%);
+      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start), 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
     }
 .ComponentsPage_Card_Table__tbodyRow {
     cursor: pointer;
-    border-bottom: 1px solid #f9f9f9;
-    border-bottom: 1px solid var(--color-base-gray-tertiary);
+    border-bottom: 1px solid #fff;
+    border-bottom: 1px solid var(--theme-componentCardTable-row-border);
   }
 @media (hover: hover) {
     .ComponentsPage_Card_Table__tbodyRow:hover {
-      background-color: #f9f9f9;
-      background-color: var(--color-base-gray-tertiary);
+      background-color: #fff;
+      background-color: var(--theme-componentCardTable-cell-hover);
     }
   }
 .ComponentsPage_Card_Table__tbodyRow.hold {
-      background-color: #f9f9f9;
-      background-color: var(--color-base-gray-tertiary);
+      background-color: #fff;
+      background-color: var(--theme-componentCardTable-cell-hover);
   }
+.ComponentsPage_Card_Table__tbody .ComponentsPage_Card_Table__tbodyRow:last-child {
+      border-bottom: none;
+    }
 .ComponentsPage_Card_Table__td .Icon {
       width: 16px;
       height: 16px;
@@ -3780,7 +4088,8 @@ select {
       position: -webkit-sticky;
       position: sticky;
       right: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 1) 100%);
+      background: linear-gradient(to right, #fff 0%, #fff 50%, #fff 100%);
+      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
     }
 .ComponentsPage_Card_Table__tbody tr td:first-child {
     font-weight: bold;
@@ -4258,8 +4567,8 @@ select {
     width: 32px;
     height: 32px;
     cursor: pointer;
-    background-color: #d1d1d1;
-    background-color: var(--color-base-gray);
+    background-color: #fff;
+    background-color: var(--theme-orderButton-bg);
     border-radius: 50%;
   }
 @media (hover: hover) {
@@ -4316,9 +4625,9 @@ select {
     overflow: hidden;
     cursor: pointer;
     background-color: #fff;
-    background-color: var(--color-base-white);
-    border: 1px solid #d1d1d1;
-    border: 1px solid var(--color-base-gray);
+    background-color: var(--theme-endpointCard-bg);
+    border: 1px solid #fff;
+    border: 1px solid var(--theme-endpointCard-border);
     border-radius: 6px;
   }
 @media (hover: hover) {
@@ -4540,7 +4849,7 @@ select {
   }
 .EndpointsPage_Endpoint_Signin__thumbnailDefault .Icon {
       width: 32px;
-      height: 326px;
+      height: 32px;
       color: #fff;
       color: var(--color-base-white);
     }

@@ -12851,7 +12851,8 @@ var endpoints = exporter('endpoints', {
           version: '',
           color: '',
           thumbnail: null,
-          tags: []
+          tags: [],
+          theme: 'standard'
         };
         context.commit('endpoints.add', key, newEndpoint);
       });
@@ -15530,6 +15531,22 @@ var viron$1 = exporter$1('viron', {
   },
 
   /**
+   * themeを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  theme: state => {
+    const defaultTheme = 'standard';
+    if (!state.viron) {
+      return defaultTheme;
+    }
+    if (!contains_1$2(['standard', 'midnight', 'terminal'], state.viron.theme)) {
+      return defaultTheme;
+    }
+    return state.viron.theme;
+  },
+
+  /**
    * ダッシュボードメニュー群を返します。
    * @param {Object} state
    * @return {Array}
@@ -17929,7 +17946,8 @@ highcharts.setOptions({
   },
   chart: {
     defaultSeriesType: 'bar',
-    zoomType: 'x'
+    zoomType: 'x',
+    backgroundColor: 'transparent'
   },
   credits: { enabled: false },
   exporting: { enabled: false },
@@ -25211,7 +25229,7 @@ riot$1.tag2('viron-icon-file-csv', '<svg viewbox="3040.477 22887.934 49.316 60.5
 });
 
 var script$20 = function() {
-  this.inputId = `Uploader__input${this.__riot_id}`;
+  this.inputId = `Uploader__input${this._riot_id}`;
   this.file = null;
   this.fileName = null;
   this.isTypeOfImage = false;
@@ -101830,7 +101848,7 @@ riot$1.tag2('viron-icon-edit', '<svg viewbox="-3404.002 14060.125 15.979 15.873"
 riot$1.tag2('viron-icon-exclamation-circle', '<svg viewbox="-2882 10816 16 16"> <g transform="translate(-3247 10632.5)"> <g transform="translate(365 183.5)"> <circle cx="8" cy="8" r="8"></circle> <circle cx="8" cy="8" r="7.25"></circle> </g> <g transform="translate(9.621 -0.445)"> <rect width="5" height="2" rx="0.4" transform="translate(362.379 192.945) rotate(-90)"></rect> <rect width="2" height="2" rx="0.4" transform="translate(362.379 195.945) rotate(-90)"></rect> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconExclamationCircle {opts.class}"', function(opts) {
 });
 
-riot$1.tag2('viron-icon-logo', '<svg viewbox="-3675 13992 24 24"> <path d="M13.333,0H0V24H24V0Zm0,2.667h8V5.333h-8Zm-10.667,0h8v8h-8ZM21.333,21.333H2.667v-8H21.333Zm0-10.667h-8V8h8Z" transform="translate(-3675 13992)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconLogo {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-logo', '<svg viewbox="0 0 200 184.62"> <path class="IconLogo__right" d="M200,43a43,43,0,0,0-80.28-21.5L63.87,118.26a43,43,0,1,0,73.38,44.85l.06,0,56.93-98.61h0A42.77,42.77,0,0,0,200,43Z"></path> <path class="IconLogo__left" d="M100,55.63l0,.06L80.28,21.53a43,43,0,1,0-74.5,43h0L62.7,163.16l.06,0a43,43,0,0,0,74.49,0l.06,0,12.4-21.48Z"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconLogo {opts.class}"', function(opts) {
 });
 
 riot$1.tag2('viron-icon-menu', '<svg viewbox="-3635 13999.001 24 9.4"> <g transform="translate(-3357.6 14031.401) rotate(180)"> <rect width="16" height="3" rx="0.4" transform="translate(261.4 29.4)"></rect> <rect width="16" height="3" rx="0.4" transform="translate(253.4 23)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconMenu {opts.class}"', function(opts) {
@@ -105116,7 +105134,7 @@ var script$42 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<div class="EndpointsPage_Endpoint_Signin_Email__error" if="{errorMessage}">{errorMessage}</div> <viron-textinput placeholder="mail address" val="{mailAddress}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="password" type="password" val="{password}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button label="ログイン" theme="secondary" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<div class="EndpointsPage_Endpoint_Signin_Email__error" if="{errorMessage}">{errorMessage}</div> <viron-textinput placeholder="IDまたはメールアドレス" val="{mailAddress}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="パスワード" type="password" val="{password}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button label="ログイン" theme="secondary" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
     this.external(script$42);
 });
 
@@ -105677,7 +105695,7 @@ var script$55 = function() {
   };
 };
 
-riot$1.tag2('viron-application-menu', '<div class="Application_Menu__bg"></div> <div class="Application_Menu__content"> <div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div> </div>', '', 'class="Application_Menu Application_Menu--{layoutType}"', function(opts) {
+riot$1.tag2('viron-application-menu', '<div class="Application_Menu__bg"></div> <div class="Application_Menu__overlay"></div> <div class="Application_Menu__content"> <div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div> </div>', '', 'class="Application_Menu Application_Menu--{layoutType}"', function(opts) {
     this.external(script$55);
 });
 
@@ -106575,7 +106593,7 @@ riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <virtual 
 
 var script$69 = function() {};
 
-riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
+riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
     this.external(script$69);
 });
 
@@ -106600,7 +106618,7 @@ riot$1.tag2('viron-application-progress-linear', '<div class="Application_Progre
 
 var script$71 = function() {};
 
-riot$1.tag2('viron-application-splash', '<div class="Application_Splash__todo">TODO</div> <viron-icon-logo class="Application_Splash__logo"></viron-icon-logo> <div class="Application_Splash__todo">Viron</div>', '', 'class="Application_Splash"', function(opts) {
+riot$1.tag2('viron-application-splash', '<div class="Application_Splash__container"> <viron-icon-logo class="Application_Splash__logo"></viron-icon-logo> <div class="Application_Splash__label">Viron</div> </div>', '', 'class="Application_Splash"', function(opts) {
     this.external(script$71);
 });
 
@@ -106670,6 +106688,7 @@ var script$74 = function() {
   this.isLaunched = store.getter('application.isLaunched');
   this.isNavigating = store.getter('application.isNavigating');
   this.isNetworking = store.getter('application.isNetworking');
+  this.theme = store.getter('viron.theme');
   // 表示すべきページの名前。
   this.pageName = store.getter('location.name');
   // TOPページか否か。
@@ -106699,6 +106718,10 @@ var script$74 = function() {
     this.isNetworking = store.getter('application.isNetworking');
     this.endpointFilterText = store.getter('application.endpointFilterText');
     this.isAsideClosed = (!store.getter('location.isTop') && !store.getter('application.isMenuOpened'));
+    this.update();
+  });
+  this.listen('viron', () => {
+    this.theme = store.getter('viron.theme');
     this.update();
   });
   this.listen('location', () => {
@@ -106737,7 +106760,7 @@ var script$74 = function() {
   });
 };
 
-riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main" ref="main"> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-mediapreviews></viron-application-mediapreviews> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-application-progress-linear isactive="{isNavigating || isNetworking}"></viron-application-progress-linear> <viron-application-dimmer if="{isNavigating}"></viron-application-dimmer> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
+riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main" ref="main"> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-mediapreviews></viron-application-mediapreviews> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-application-progress-linear isactive="{isNavigating || isNetworking}"></viron-application-progress-linear> <viron-application-dimmer if="{isNavigating}"></viron-application-dimmer> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} Application--{theme} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
     this.external(script$74);
 });
 
