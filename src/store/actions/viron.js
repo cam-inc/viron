@@ -8,9 +8,10 @@ export default exporter('viron', {
   /**
    * viron情報(各管理画面の基本情報)を取得します。
    * @param {riotx.Context} context
+   * @param {String} endpointKey
    * @return {Promise}
    */
-  get: context => {
+  get: (context, endpointKey) => {
     const operationObject = context.getter('oas.operationObject', VIRON_URI, 'get');
     const api = context.getter('oas.api', operationObject.operationId);
     const currentEndpointKey = context.getter('current.all');
@@ -40,7 +41,9 @@ export default exporter('viron', {
         if (!!token) {
           context.commit('endpoints.updateToken', currentEndpointKey, token);
         }
-        context.commit('viron.all', res.obj);
+        context.commit('viron.all', ObjectAssign({
+          endpointKey
+        }, res.obj));
         const endpoint = ObjectAssign({}, res.obj);
         // pagesは不要なので削除。
         delete endpoint.pages;

@@ -25,8 +25,12 @@
   }
 
   &__thumbnail {
+    @mixin hover {
+      opacity: 0.5;
+    }
     width: 32px;
     height: 32px;
+    cursor: pointer;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;

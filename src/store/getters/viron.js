@@ -62,6 +62,18 @@ export default exporter('viron', {
   },
 
   /**
+   * エンドポイントkeyを返します。
+   * @param {Object} state
+   * @return {String}
+   */
+  endpointKey: state => {
+    if (!state.viron) {
+      return null;
+    }
+    return state.viron.endpointKey;
+  },
+
+  /**
    * サムネイルを返します。
    * @param {Object} state
    * @return {String|null}

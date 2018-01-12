@@ -18,7 +18,7 @@ viron-application-header.Application_Header
           .Application_Header__color(class="Application_Header__color--{ color }")
           .Application_Header__name { name }
           viron-icon-arrow-right.Application_Header__arrow
-          .Application_Header__thumbnail(style="background-image:url({ thumbnail })")
+          .Application_Header__thumbnail(ref="thumbnail" onTap="{ handleThumbnailTap }" style="background-image:url({ thumbnail })")
     viron-icon-dots.Application_Header__dotsIcon(ref="dotsIcon" onTap="{ handleDotsIconTap }")
 
   script.

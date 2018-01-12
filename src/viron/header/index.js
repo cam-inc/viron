@@ -1,4 +1,5 @@
 import '../menu/index.tag';
+import './info/index.tag';
 import './menu/index.tag';
 
 export default function() {
@@ -58,6 +59,17 @@ export default function() {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
       width: 228,
+      direction: 'TR'
+    });
+  };
+
+  this.handleThumbnailTap = () => {
+    // エンドポイント情報を吹き出し表示します。
+    const rect = this.refs.thumbnail.getBoundingClientRect();
+    store.action('popovers.add', 'viron-application-header-info', null, {
+      x: rect.left + (rect.width / 2),
+      y: rect.bottom,
+      width: 312,
       direction: 'TR'
     });
   };
