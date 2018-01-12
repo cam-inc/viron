@@ -30,10 +30,9 @@ viron-parameters-form.Parameters_Form
     virtual(if="{ uiType === 'image' }")
       viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview || isDisabled }")
     virtual(if="{ uiType === 'null' }")
-      div TODO
+      div NULL
 
   script.
-    // TODO: 全てのフォーム動作確認。
     import '../../../components/viron-autocomplete/index.tag';
     import '../../../components/viron-base64/index.tag';
     import '../../../components/viron-checkbox/index.tag';
