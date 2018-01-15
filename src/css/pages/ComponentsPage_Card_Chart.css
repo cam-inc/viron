@@ -62,4 +62,9 @@
     bottom: 0;
     left: 0;
   }
+
+  & .highcharts-pane {
+    fill: transparent;
+    stroke-width: 0;
+  }
 }
