@@ -47,7 +47,7 @@ module.exports = helper => {
           // native: false, // A flag that defines if native library shall be used or not. Currently only has an effect for
           replication: { // Use read / write replication. To enable replication, pass an object, with two properties, read and write. Write should be an object (a single server for handling writes), and read an array of object (several servers to handle reads). Each read/write server can have the following properties: `host`, `port`, `username`, `password`, `database`
             write: {
-              host: 'local-viron-mysql.in.viron.biz', // The host of the relational database.
+              host: 'viron.dev', // The host of the relational database.
               port: 3306, // The port of the relational database.
               username: process.env.MYSQL_USER_NAME, // The username which is used to authenticate against the database.
               password: process.env.MYSQL_USER_PASSWORD, // The password which is used to authenticate against the database.
@@ -60,7 +60,7 @@ module.exports = helper => {
               },
             },
             read: [{
-              host: 'local-viron-mysql.in.viron.biz', // The host of the relational database.
+              host: 'viron.dev', // The host of the relational database.
               port: 3306, // The port of the relational database.
               username: process.env.MYSQL_USER_NAME, // The username which is used to authenticate against the database.
               password: process.env.MYSQL_USER_PASSWORD, // The password which is used to authenticate against the database.
