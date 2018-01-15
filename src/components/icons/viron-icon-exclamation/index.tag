@@ -1,0 +1,6 @@
+viron-icon-exclamation.icon.Icon.IconExclamation(class="{ opts.class }")
+  svg(viewBox="-8007 1982 2 8")
+    g(transform="translate(-8379 1794.5)")
+      rect(width="5" height="2" rx="0.4" transform="translate(372 192.5) rotate(-90)")
+      rect(width="2" height="2" rx="0.4" transform="translate(372 195.5) rotate(-90)")
+  .Icon__catcher(if="{ !opts.nocatcher }")
