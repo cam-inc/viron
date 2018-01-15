@@ -1,4 +1,32 @@
 .Jsonviewer {
+  &__item {
+    color: navy;
+  }
+
+  &__key {
+  }
+
+  &__value {
+  }
+
+  &__string {
+    color: green;
+  }
+
+  &__number {
+    color: blue;
+  }
+
+  &__boolean {
+    color: blueviolet;
+  }
+
+  &__object {
+    color: red;
+  }
+}
+
+/* .Jsonviewer {
 
   & > &__item {
     display: block;
@@ -77,4 +105,4 @@
     color: red;
   }
 }
-
+ */
