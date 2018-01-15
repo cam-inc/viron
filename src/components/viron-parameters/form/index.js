@@ -1,10 +1,23 @@
 import contains from 'mout/array/contains';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
-import isNumber from 'mout/lang/isNumber';
+import isNaN from 'mout/lang/isNaN';
+import _isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
 import util from '../util';
 import validator from '../validator';
+
+/**
+ * moutの`isNumber`のラッパー関数。
+ * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
+ * @param {*} num
+ */
+const isNumber = num => {// eslint-disable-line no-unused-vars
+  if (isNaN(num)) {
+    return false;
+  }
+  return _isNumber(num);
+};
 
 export default function() {
   // ショートカット。
@@ -255,10 +268,15 @@ export default function() {
       break;
     case 'number':
     case 'integer':
-      // 数値 or undefinedに強制変換。
-      newText = Number(newText);
-      if (!isNumber(newText)) {
+      // 空文字の場合。
+      if (!newText) {
         newText = undefined;
+      } else {
+        // 数値 or undefinedに強制変換。
+        newText = Number(newText);
+        if (!isNumber(newText)) {
+          newText = undefined;
+        }
       }
       break;
     }

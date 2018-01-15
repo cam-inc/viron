@@ -8,7 +8,7 @@ import '../../components/viron-error/index.tag';
 export default function() {
   const store = this.riotx.get();
 
-  // クリップっボードコピーをサポートしているか否か。
+  // クリップボードコピーをサポートしているか否か。
   let isClipboardCopySupported = true;
   // モバイル用レイアウトか否か。
   this.isMobile = store.getter('layout.isMobile');
@@ -40,7 +40,7 @@ export default function() {
 
   /**
    * undefined等の値を考慮した最適な値を返します。
-   * @param {String|null} value
+   * @param {String|Number|null} value
    * @return {String|null}
    */
   this.normalizeValue = value => {
