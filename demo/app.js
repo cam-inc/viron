@@ -50,7 +50,7 @@ context.init()
       })
       .then(swaggerExpress => {
         // add middlewares here.
-        // - JWT認証後のmiddlewareを追加したい場合は api/controllers/middlewares に追加
+        // - JWT認証後のmiddlewareを追加したい場合は fittings/middlewares に追加
 
         // ignore if-none-match header
         app.disable('etag');

@@ -15,7 +15,7 @@ host: localhost:3000
 # - API全般のメタ情報を記載
 #################################################
 info:
-  title: Viron example for Node.js
+  title: Viron Demo
   description: Design-based Management Console.
   version: 0.0.1
 
@@ -256,7 +256,7 @@ definitions:
   Viron:
     example:
       color: white
-      name: Viron Example Project for Node.js
+      name: Viron Demo
       pages:
       - components:
         - api:
@@ -320,20 +320,9 @@ definitions:
         type: string
     type: object
 
-  Statsdau:
+  StatsNumber:
     example:
       value: 12345678
-    properties:
-      value:
-        format: int64
-        type: integer
-    required:
-    - value
-    type: object
-
-  Statsmau:
-    example:
-      value: 98765432
     properties:
       value:
         format: int64
@@ -2002,7 +1991,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsdau'
+            $ref: '#/definitions/StatsNumber'
         "400":
           description: Bad Request
           schema:
@@ -2024,7 +2013,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Statsmau'
+            $ref: '#/definitions/StatsNumber'
         "400":
           description: Bad Request
           schema:

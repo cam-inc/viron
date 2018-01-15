@@ -118,7 +118,6 @@ class Context {
             helper: store.helper,
           };
 
-          // TODO: logger
           console.log(`Connection has been established successfully to the '${name}' store.`, JSON.stringify(store.functions.getOptions(instance)));
         })
       ;

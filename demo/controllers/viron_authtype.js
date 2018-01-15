@@ -7,7 +7,7 @@ const list = (req, res) => {
     // - emailとgoogleOAuthはVironがデフォルトで提供
     {
       type: 'email',
-      provider: 'example-node',
+      provider: 'viron-demo',
       url: '/signin',
       method: 'POST',
     },

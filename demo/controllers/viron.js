@@ -83,8 +83,8 @@ const show = (req, res) => {
   const result = {
     name: `${title} - ${env}`,
     color: 'white',
-    thumbnail: 'https://avatars3.githubusercontent.com/u/23251378?v=3&s=200',
-    tags: [env, 'viron', 'example'],
+    thumbnail: 'https://cam-inc.github.io/viron/v1/img/favicon-32x32.png', // サービスのアイコン等を指定
+    tags: [env, 'viron', 'demo'],
     pages: [].concat(
       // QuickView
       genSection(constant.VIRON_SECTION_DASHBOARD, {

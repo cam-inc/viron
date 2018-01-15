@@ -1,8 +1,8 @@
 {
-  "name": "example-node",
+  "name": "viron-demo",
   "version": "0.0.1",
   "private": true,
-  "description": "Viron Server Example Project for Node.js",
+  "description": "Viron Demo Server",
   "keywords": [],
   "author": "",
   "license": "",
