@@ -2167,7 +2167,40 @@ select {
     }
 .Error {
   display: block;
+  min-width: 240px;
 }
+.Error__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 32px;
+    color: #f57177;
+    color: var(--color-base-red);
+    border: 4px solid #f57177;
+    border: 4px solid var(--color-base-red);
+    border-radius: 50%;
+  }
+.Error__icon .Icon {
+      width: 42px;
+      height: 42px;
+    }
+.Error__title {
+    margin-bottom: 8px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.Error__message {
+    margin-bottom: 24px;
+    font-size: 1.6rem;
+  }
+.Error > .Prettyprint {
+    padding: 8px;
+    border: 1px solid #d1d1d1;
+    border: 1px solid var(--color-base-gray);
+    border-radius: 4px;
+  }
 .HorizontalRule {
   display: flex;
   align-items: center;
@@ -2368,13 +2401,25 @@ select {
     background-position: center center;
     background-size: contain;
   }
+.Mediapreview__path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    position: absolute;
+    right: 0;
+    bottom: -16px;
+    width: 100%;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+    text-align: right;
+  }
 .Mediapreview__closeButton {
   display: flex;
   align-items: center;
   justify-content: center;
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: -24px;
+    left: -24px;
     width: 24px;
     height: 24px;
     color: #fff;
@@ -4129,6 +4174,7 @@ select {
       position: -webkit-sticky;
       position: sticky;
       right: 0;
+      width: 28px;
       text-align: center;
       background: linear-gradient(to right, #fff, 0%, #fff 50%, #fff 100%);
       background: linear-gradient(to right, var(--theme-componentCardTable-grad-start), 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
