@@ -1,36 +1,12 @@
-#################################################
-# OpenAPI Specification Version2.0.0
-# @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
-#################################################
 swagger: "2.0"
-
-#################################################
-# host
-# - APIを提供するホスト
-#################################################
 host: localhost:3000
-
-#################################################
-# info
-# - API全般のメタ情報を記載
-#################################################
 info:
   title: Viron example for EMail Auth
   description: Design-based Management Console.
   version: 0.0.1
-
-#################################################
-# schemes
-# - APIを提供する通信プロトコルのリスト
-#################################################
 schemes:
 - https
 
-#################################################
-# definitions
-# - リクエストやレスポンスのレイアウトの定義
-# - paths内から $ref で参照できる
-#################################################
 definitions:
   AdminRole:
     example:
@@ -49,35 +25,25 @@ definitions:
     type: object
 
   AdminRoleCollection:
-    description: AdminRoleCollection is the media type for an array of AdminRole
-    example:
-    - paths:
-      - allow: true
-        path: GET:/user
-      role_id: operator
     items:
       $ref: '#/definitions/AdminRole'
     type: array
 
   AdminUser:
-    description: A Admin User
     example:
       email: test@viron.com
       id: 1
       role_id: operator
     properties:
       email:
-        description: login id
-        example: test@viron.com
+        description: E-Mail
         type: string
       id:
-        description: unique id
-        example: 1
+        description: ユニークID
         format: int64
         type: integer
       role_id:
-        description: role id
-        example: operator
+        description: ユーザ権限ID
         type: string
     required:
     - id
@@ -85,17 +51,11 @@ definitions:
     type: object
 
   AdminUserCollection:
-    description: AdminUserCollection is the media type for an array of AdminUser
-    example:
-    - email: test@viron.com
-      id: 1
-      role_id: operator
     items:
       $ref: '#/definitions/AdminUser'
     type: array
 
   AuditLog:
-    description: A Audit Log
     example:
       createdAt: 2006-02-12T07:09:13+09:00
       request_body: '{"name":"test", "id":1}'
@@ -106,73 +66,52 @@ definitions:
       user_id: test@viron.com
     properties:
       createdAt:
-        description: created time
-        example: 2006-02-12T07:09:13+09:00
+        description: 日時
         format: date-time
         type: string
       request_body:
-        description: request body
-        example: '{"name":"test", "id":1}'
+        description: リクエストボディ
         type: string
       request_method:
-        description: http request method
-        example: GET
+        description: リクエストメソッド
         type: string
       request_uri:
-        description: request uri
-        example: /user
+        description: リクエストURI
         type: string
       source_ip:
-        description: source ip address
-        example: 200.200.200.200
+        description: ソースIP
         type: string
       status_code:
-        description: http status code
-        example: 200
+        description: ステータスコード
         type: integer
       user_id:
-        description: user id
-        example: Et saepe nihil in earum sint.
+        description: ユーザ
         type: string
     type: object
 
   AuditLogCollection:
-    description: AuditLogCollection is the media type for an array of AuditLog
-    example:
-    - createdAt: 2006-02-12T07:09:13+09:00
-      request_body: '{"name":"test", "id":1}'
-      request_method: GET
-      request_uri: '/user'
-      source_ip: 200.200.200.200
-      status_code: 200
-      user_id: test@viron.com
     items:
       $ref: '#/definitions/AuditLog'
     type: array
 
   AuthType:
-    description: A Auth Type
     example:
       method: POST
-      provider: google
-      type: oauth
-      url: '/googlesignin'
+      provider: viron-example-email
+      type: email
+      url: '/signin'
     properties:
       method:
-        description: request method
-        example: POST
+        description: リクエストメソッド
         type: string
       provider:
-        description: auth provider
-        example: google
+        description: 認証プロバイダ
         type: string
       type:
-        description: auth type
-        example: oauth
+        description: 認証方式
         type: string
       url:
-        description: request url
-        example: '/googlesignin'
+        description: リクエストURL
         type: string
     required:
     - type
@@ -182,61 +121,9 @@ definitions:
     type: object
 
   AuthTypeCollection:
-    description: AuthTypeCollection is the media type for an array of AuthType
-    example:
-    - method: POST
-      provider: google
-      type: oauth
-      url: '/googlesignin'
     items:
       $ref: '#/definitions/AuthType'
     type: array
-
-  BlogDesign:
-    description: A BlogDesign Master
-    example:
-      background_image: http://hoge.com/a.png
-      base_color: blue
-      createdAt: 1990-04-23T00:18:19+09:00
-      deletedAt: 1999-04-23T00:18:19+09:00
-      id: des_001
-      name: design name
-      updatedAt: 1971-03-24T08:40:07+09:00
-    properties:
-      background_image:
-        description: 背景画像
-        example: http://hoge.com/a.png
-        type: string
-      base_color:
-        description: ベースカラー
-        example: blue
-        type: string
-      createdAt:
-        description: 作成日時
-        example: 1990-04-23T00:18:19+09:00
-        format: date-time
-        type: string
-      deletedAt:
-        description: 削除日時
-        example: 1999-04-23T00:18:19+09:00
-        format: date-time
-        type: string
-      id:
-        description: デザインID
-        example: des_001
-        type: string
-      name:
-        description: 名前
-        example: design name
-        type: string
-      updatedAt:
-        description: 更新日時
-        example: 1971-03-24T08:40:07+09:00
-        format: date-time
-        type: string
-    required:
-    - name
-    type: object
 
   CreateAdminRolePayload:
     example:
@@ -261,29 +148,29 @@ definitions:
       role_id: viewer
     properties:
       email:
-        description: login user mail address
-        example: user@sample.com
+        description: E-Mail
         type: string
       password:
-        description: password for email auth
-        example: XXXXXXXXXXXXXXXX
+        description: パスワード
         type: string
       role_id:
-        description: admin role id
-        example: viewer
+        description: ユーザ権限ID
         type: string
-        enum:
-        - AutoGenerate
+        x-autogen-enum:
+          model: admin_roles
+          field: role_id
+          defaults:
+          - super
+          - viewer
     required:
     - email
     - password
     type: object
 
   Viron:
-    description: A Viron settings data
     example:
       color: white
-      name: Viron Example Project for Node.js
+      name: Viron Example for EMail Auth
       pages:
       - components:
         - api:
@@ -307,7 +194,7 @@ definitions:
       tags:
       - viron
       - example
-      thumbnail: Iure nisi.
+      thumbnail: https://image.com/thumb.png
     properties:
       color:
         default: white
@@ -315,48 +202,18 @@ definitions:
         - white
         - black
         - perple
-        example: white
         type: string
       name:
-        description: Name pattern
-        example: Viron Example Project for Node.js
         type: string
       pages:
-        description: A Pages format
-        example:
-        - components:
-          - api:
-              method: get
-              path: /stats/dau
-            name: DAU
-            options:
-            - key: key
-              value: value
-            pagination: true
-            query:
-            - key: key
-              type: string
-            style: number
-            table_labels:
-            - name
-          group: empty
-          id: quickview
-          name: クイックビュー
-          section: dashboard
         items:
-          $ref: '#/definitions/page'
+          $ref: '#/definitions/Page'
         type: array
       tags:
-        description: tags
-        example:
-        - viron
         items:
-          example: viron
           type: string
         type: array
       thumbnail:
-        description: thumbnail of endpoint
-        example: https://viron.com/thumbnail.png
         type: string
     required:
     - name
@@ -381,13 +238,17 @@ definitions:
       role_id: viewer
     properties:
       password:
-        description: password for email auth
-        example: XXXXXXXXXXXXXXXX
+        description: パスワード
         type: string
       role_id:
-        description: admin role id
-        example: viewer
+        description: ユーザ権限ID
         type: string
+        x-autogen-enum:
+          model: admin_roles
+          field: role_id
+          defaults:
+          - super
+          - viewer
     required:
     - role_id
     type: object
@@ -397,8 +258,7 @@ definitions:
       password: XXXXXXXXXXXXXXXX
     properties:
       password:
-        description: password for email auth
-        example: XXXXXXXXXXXXXXXX
+        description: パスワード
         type: string
     required:
     - password
@@ -413,27 +273,7 @@ definitions:
         type: boolean
     type: object
 
-  api:
-    description: Accessing api information type
-    example:
-      method: get
-      path: /quickview
-    properties:
-      method:
-        description: Access paths[path][method] of swagger.json
-        example: get
-        type: string
-      path:
-        description: Access paths[path] of swagger.json
-        example: /quickview
-        type: string
-    required:
-    - path
-    - method
-    type: object
-
-  component:
-    description: A Component type
+  Component:
     example:
       api:
         method: get
@@ -446,36 +286,67 @@ definitions:
       query:
       - key: key
         type: string
-      style: Style of Web Component
+      style: table
       table_labels:
-      - Aut et.
-      - Aut et.
+      - id
+      - name
     properties:
       api:
-        $ref: '#/definitions/api'
+        properties:
+          method:
+            description: Access paths[path][method] of swagger.json
+            type: string
+          path:
+            description: Access paths[path] of swagger.json
+            type: string
+        required:
+        - path
+        - method
+        type: object
       name:
         description: Title of page
-        example: ユーザー
         type: string
       options:
         description: style options
-        example:
-        - key: key
-          value: value
         items:
-          $ref: '#/definitions/option'
+          properties:
+            key:
+              description: Key
+              type: string
+            value:
+              description: Value
+              type: string
+          required:
+          - key
+          - value
+          type: object
         type: array
       pagination:
         description: allow pagination
-        example: true
         type: boolean
       query:
         description: query for request
-        example:
-        - key: key
-          type: string
         items:
-          $ref: '#/definitions/query'
+          properties:
+            key:
+              description: Key
+              type: string
+            type:
+              default: string
+              description: Type
+              enum:
+              - string
+              - integer
+              - number
+              - boolean
+              - date
+              - datetime
+              - time
+              type: string
+          required:
+          - key
+          - type
+          type: object
         type: array
       style:
         default: number
@@ -483,21 +354,11 @@ definitions:
         - number
         - list
         - table
-        - graph-scatterplot
-        - graph-line
-        - graph-bar
-        - graph-horizontal-bar
-        - graph-stacked-bar
-        - graph-horizontal-stacked-bar
-        - graph-stacked-area
-        example: Style of Web Component
+        - chart
         type: string
       table_labels:
         description: keys of table row
-        example:
-        - name
         items:
-          example: name
           type: string
         type: array
     required:
@@ -508,7 +369,6 @@ definitions:
     type: object
 
   Error:
-    description: Error response media type
     example:
       code: invalid_value
       detail: Value of ID must be an integer
@@ -518,52 +378,24 @@ definitions:
       status: "400"
     properties:
       code:
-        description: an application-specific Error code, expressed as a string value.
-        example: invalid_value
+        description: エラーコード
         type: string
       detail:
-        description: a human-readable explanation specific to this occurrence of the
-          problem.
-        example: Value of ID must be an integer
+        description: 詳細
         type: string
       id:
-        description: a unique identifier for this particular occurrence of the problem.
-        example: 3F1FKVRR
+        description: ID
         type: string
       meta:
         additionalProperties: true
-        description: a meta object containing non-standard meta-information about
-          the Error.
-        example:
-          timestamp: 1502172152
+        description: メタ情報
         type: object
       status:
-        description: the HTTP status code applicable to this problem, expressed as
-          a string value.
-        example: "400"
+        description: ステータスコード
         type: string
     type: object
 
-  option:
-    example:
-      key: key
-      value: value
-    properties:
-      key:
-        description: Key
-        example: key
-        type: string
-      value:
-        description: Value
-        example: value
-        type: string
-    required:
-    - key
-    - value
-    type: object
-
-  page:
-    description: A page type
+  Page:
     example:
       components:
       - api:
@@ -577,57 +409,31 @@ definitions:
         query:
         - key: key
           type: string
-        style: Style of Web Component
+        style: table
         table_labels:
         - name
-      group: Group of page
-      id: Repellat iure non.
-      name: Maxime consequuntur quia aliquid omnis aut.
-      section: Section of page
+      group: UserGroup
+      id: user
+      name: ユーザー
+      section: admin
     properties:
       components:
-        description: A components format
-        example:
-        - api:
-            method: get
-            path: /user
-          name: ユーザー
-          options:
-          - key: key
-            value: value
-          pagination: true
-          query:
-          - key: key
-            type: string
-          style: Style of Web Component
-          table_labels:
-          - name
         items:
-          $ref: '#/definitions/component'
+          $ref: '#/definitions/Component'
         type: array
       group:
-        enum:
-        - ""
-        - kpi
-        - user
-        - blog
-        - admin
-        example: Group of page
         type: string
       id:
-        description: id of page
-        example: quickview
+        description: ページID
         type: string
       name:
-        description: Title of page
-        example: クイックビュー
+        description: 名称
         type: string
       section:
         default: manage
         enum:
         - manage
         - dashboard
-        example: Section of page
         type: string
     required:
     - id
@@ -635,33 +441,6 @@ definitions:
     - section
     - group
     - components
-    type: object
-
-  query:
-    example:
-      key: key
-      type: string
-    properties:
-      key:
-        description: Key
-        example: key
-        type: string
-      type:
-        default: string
-        description: Type
-        enum:
-        - string
-        - integer
-        - number
-        - boolean
-        - date
-        - datetime
-        - time
-        example: string
-        type: string
-    required:
-    - key
-    - type
     type: object
 
   SigninAuthPayload:
@@ -754,7 +533,6 @@ definitions:
         - female
         - other
         type: string
-        readOnly: true
       thumbnail:
         description: サムネイル画像
         type: string
@@ -769,10 +547,6 @@ definitions:
     - name
     type: object
 
-#################################################
-# paths
-# - APIの一覧
-#################################################
 paths:
   /:
     get:
@@ -784,25 +558,20 @@ paths:
           description: Moved Permanently
       summary: ルート
       tags:
-      - root
+      - swagger
 
   /adminrole:
     get:
       x-swagger-router-controller: viron_admin_role
-      description: get admin roles
+      description: ユーザ権限の一覧
       operationId: admin_role#list
-      parameters: []
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/AdminRoleCollection'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/Error'
       security:
@@ -814,7 +583,7 @@ paths:
 
     post:
       x-swagger-router-controller: viron_admin_role
-      description: create a admin role
+      description: ユーザ権限の作成
       operationId: admin_role#create
       parameters:
       - in: body
@@ -831,10 +600,6 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
@@ -849,7 +614,7 @@ paths:
   /adminrole/{role_id}:
     delete:
       x-swagger-router-controller: viron_admin_role
-      description: delete the user
+      description: ユーザ権限の削除
       operationId: admin_role#remove
       parameters:
       - description: role id
@@ -881,7 +646,7 @@ paths:
 
     put:
       x-swagger-router-controller: viron_admin_role
-      description: update the admin user
+      description: ユーザ権限の更新
       operationId: admin_role#update
       parameters:
       - description: role id
@@ -921,21 +686,13 @@ paths:
   /adminuser:
     get:
       x-swagger-router-controller: viron_admin_user
-      description: get admin users
+      description: 管理ユーザの一覧
       operationId: admin_user#list
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/AdminUserCollection'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
@@ -949,7 +706,7 @@ paths:
 
     post:
       x-swagger-router-controller: viron_admin_user
-      description: create a admin user
+      description: 管理ユーザの作成
       operationId: admin_user#create
       parameters:
       - in: body
@@ -984,7 +741,7 @@ paths:
   /adminuser/{id}:
     delete:
       x-swagger-router-controller: viron_admin_user
-      description: delete the user
+      description: 管理ユーザの削除
       operationId: admin_user#remove
       parameters:
       - description: id
@@ -1016,7 +773,7 @@ paths:
 
     put:
       x-swagger-router-controller: viron_admin_user
-      description: update the admin user
+      description: 管理ユーザ情報の更新
       operationId: admin_user#update
       parameters:
       - description: id
@@ -1069,6 +826,41 @@ paths:
         name: offset
         required: false
         type: integer
+      - description: リクエストメソッド
+        in: query
+        name: request_method
+        required: false
+        type: string
+        enum:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      - description: ユーザ
+        in: query
+        name: user_id
+        required: false
+        type: string
+      - description: リクエストURI
+        in: query
+        name: request_uri
+        required: false
+        type: string
+      - description: 日時
+        in: query
+        name: createdAt
+        required: false
+        type: string
+      - description: ソースIP
+        in: query
+        name: source_ip
+        required: false
+        type: string
+      - description: ステータスコード
+        in: query
+        name: status_code
+        required: false
+        type: integer
       responses:
         "200":
           description: OK
@@ -1076,10 +868,6 @@ paths:
             $ref: '#/definitions/AuditLogCollection'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
           schema:
             $ref: '#/definitions/Error'
       security:
@@ -1099,14 +887,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Viron'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -1179,21 +959,13 @@ paths:
   /swagger.json:
     get:
       x-swagger-router-controller: swagger
-      description: get swagger.json
+      description: swagger.jsonの取得
       operationId: swagger#show
       responses:
         "200":
           description: OK
           schema:
             type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
@@ -1215,14 +987,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/AdminUserCollection'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
@@ -1284,14 +1048,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsNumber'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: DAU取得
       tags:
       - stats
@@ -1306,14 +1062,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsNumber'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: MAU取得
       tags:
       - stats
@@ -1328,14 +1076,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(area)
       tags:
       - stats
@@ -1546,10 +1286,6 @@ paths:
       tags:
       - user
 
-#################################################
-# securityDefinitions
-# - API全体で利用できる認証スキーム
-#################################################
 securityDefinitions:
   jwt:
     type: oauth2
@@ -1557,19 +1293,9 @@ securityDefinitions:
     flow: implicit
     scopes:
       api:access: API access
-
-#################################################
-# produces
-# - APIが提供するMIMEタイプの一覧
-#################################################
 produces:
   - application/json
   - text/plain
-
-#################################################
-# consumes
-# - APIが受け付けるMIMEタイプの一覧
-#################################################
 consumes:
   - application/json
   - text/plain

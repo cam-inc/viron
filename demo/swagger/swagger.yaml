@@ -435,7 +435,6 @@ definitions:
         - female
         - other
         type: string
-        readOnly: true
       thumbnail:
         description: サムネイル画像
         type: string
@@ -698,24 +697,6 @@ definitions:
         type: boolean
     type: object
 
-  Api:
-    example:
-      method: get
-      path: /quickview
-    properties:
-      method:
-        description: Access paths[path][method] of swagger.json
-        example: get
-        type: string
-      path:
-        description: Access paths[path] of swagger.json
-        example: /quickview
-        type: string
-    required:
-    - path
-    - method
-    type: object
-
   Component:
     example:
       api:
@@ -729,20 +710,40 @@ definitions:
       query:
       - key: key
         type: string
-      style: Style of Component
+      style: table
       table_labels:
       - id
       - name
     properties:
       api:
-        $ref: '#/definitions/Api'
+        properties:
+          method:
+            description: Access paths[path][method] of swagger.json
+            type: string
+          path:
+            description: Access paths[path] of swagger.json
+            type: string
+        required:
+        - path
+        - method
+        type: object
       name:
         description: Title of page
         type: string
       options:
         description: style options
         items:
-          $ref: '#/definitions/Option'
+          properties:
+            key:
+              description: Key
+              type: string
+            value:
+              description: Value
+              type: string
+          required:
+          - key
+          - value
+          type: object
         type: array
       pagination:
         description: allow pagination
@@ -750,7 +751,26 @@ definitions:
       query:
         description: query for request
         items:
-          $ref: '#/definitions/Query'
+          properties:
+            key:
+              description: Key
+              type: string
+            type:
+              default: string
+              description: Type
+              enum:
+              - string
+              - integer
+              - number
+              - boolean
+              - date
+              - datetime
+              - time
+              type: string
+          required:
+          - key
+          - type
+          type: object
         type: array
       style:
         default: number
@@ -799,22 +819,6 @@ definitions:
         type: string
     type: object
 
-  Option:
-    example:
-      key: key
-      value: value
-    properties:
-      key:
-        description: Key
-        type: string
-      value:
-        description: Value
-        type: string
-    required:
-    - key
-    - value
-    type: object
-
   Page:
     example:
       components:
@@ -829,25 +833,19 @@ definitions:
         query:
         - key: key
           type: string
-        style: Style of Component
+        style: table
         table_labels:
         - name
-      group: kpi
-      id: quickview
-      name: クイックビュー
-      section: dashboard
+      group: UserGroup
+      id: user
+      name: ユーザー
+      section: admin
     properties:
       components:
         items:
           $ref: '#/definitions/Component'
         type: array
       group:
-        enum:
-        - ""
-        - kpi
-        - user
-        - blog
-        - admin
         type: string
       id:
         description: ページID
@@ -867,33 +865,6 @@ definitions:
     - section
     - group
     - components
-    type: object
-
-  Query:
-    example:
-      key: key
-      type: string
-    properties:
-      key:
-        description: Key
-        example: key
-        type: string
-      type:
-        default: string
-        description: Type
-        enum:
-        - string
-        - integer
-        - number
-        - boolean
-        - date
-        - datetime
-        - time
-        example: string
-        type: string
-    required:
-    - key
-    - type
     type: object
 
   ValidatorCollection:
@@ -1332,18 +1303,13 @@ paths:
       x-swagger-router-controller: viron_admin_role
       description: ユーザ権限の一覧
       operationId: admin_role#list
-      parameters: []
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/AdminRoleCollection'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/Error'
       security:
@@ -1370,10 +1336,6 @@ paths:
             $ref: '#/definitions/AdminRole'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
           schema:
             $ref: '#/definitions/Error'
         "500":
@@ -1469,14 +1431,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/AdminUserCollection'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
@@ -1654,10 +1608,6 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -1831,14 +1781,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Viron'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       security:
       - jwt:
         - api:access
@@ -1992,14 +1934,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsNumber'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: DAU取得
       tags:
       - stats
@@ -2014,14 +1948,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsNumber'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: MAU取得
       tags:
       - stats
@@ -2036,14 +1962,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(area)
       tags:
       - stats
@@ -2058,14 +1976,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(areaarange)
       tags:
       - stats
@@ -2080,14 +1990,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(areaspline)
       tags:
       - stats
@@ -2102,14 +2004,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(areasplinerange)
       tags:
       - stats
@@ -2124,14 +2018,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(bar)
       tags:
       - stats
@@ -2146,14 +2032,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(bellcurve)
       tags:
       - stats
@@ -2168,14 +2046,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(boxplot)
       tags:
       - stats
@@ -2190,14 +2060,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(bubble)
       tags:
       - stats
@@ -2212,14 +2074,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(bullet)
       tags:
       - stats
@@ -2234,14 +2088,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(column)
       tags:
       - stats
@@ -2256,14 +2102,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(columnrange)
       tags:
       - stats
@@ -2278,14 +2116,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(errorbar)
       tags:
       - stats
@@ -2300,14 +2130,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(funnel)
       tags:
       - stats
@@ -2322,14 +2144,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(gauge)
       tags:
       - stats
@@ -2344,14 +2158,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(heatmap)
       tags:
       - stats
@@ -2366,14 +2172,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(histogram)
       tags:
       - stats
@@ -2388,14 +2186,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(line)
       tags:
       - stats
@@ -2410,14 +2200,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(pareto)
       tags:
       - stats
@@ -2432,14 +2214,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(pie)
       tags:
       - stats
@@ -2454,14 +2228,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(polygon)
       tags:
       - stats
@@ -2476,14 +2242,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(pyramid)
       tags:
       - stats
@@ -2498,14 +2256,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(sankey)
       tags:
       - stats
@@ -2520,14 +2270,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(scatter)
       tags:
       - stats
@@ -2542,14 +2284,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(solidGauge)
       tags:
       - stats
@@ -2564,14 +2298,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(spline)
       tags:
       - stats
@@ -2586,14 +2312,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(streamgraph)
       tags:
       - stats
@@ -2608,14 +2326,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(sunburst)
       tags:
       - stats
@@ -2630,14 +2340,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(tilemap)
       tags:
       - stats
@@ -2652,14 +2354,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(variablePie)
       tags:
       - stats
@@ -2674,14 +2368,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(variwide)
       tags:
       - stats
@@ -2696,14 +2382,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(vector)
       tags:
       - stats
@@ -2718,14 +2396,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(waterfall)
       tags:
       - stats
@@ -2740,14 +2410,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(windbarb)
       tags:
       - stats
@@ -2762,14 +2424,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(wordcloud)
       tags:
       - stats
@@ -2784,14 +2438,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
       summary: chart(xrange)
       tags:
       - stats
@@ -2806,14 +2452,6 @@ paths:
           description: OK
           schema:
             type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
@@ -4447,14 +4085,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/AdminUserCollection'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
         "500":
           description: Internal Server Error
           schema:
