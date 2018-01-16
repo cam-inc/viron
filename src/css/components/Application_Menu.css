@@ -49,8 +49,8 @@
     @mixin hover {
       color: var(--color-base-blue);
     }
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     color: var(--theme-menu-logo);
     cursor: pointer;
   }
