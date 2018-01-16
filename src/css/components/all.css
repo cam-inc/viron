@@ -33,6 +33,7 @@
 @import "Html";
 @import "Icon";
 @import "Image";
+@import "Jsonviewer";
 @import "List";
 @import "Mediapreview";
 @import "Modal";
@@ -57,4 +58,3 @@
 @import "Toast";
 @import "Uploader";
 @import "Wyswyg";
-@import "Jsonviewer";

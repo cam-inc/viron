@@ -4,6 +4,8 @@ import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import isFunction from 'mout/lang/isFunction';
 import isString from 'mout/lang/isString';
+import isNumber from 'mout/lang/isNumber';
+import isBoolean from 'mout/lang/isBoolean';
 import forEach from 'mout/array/forEach';
 
 export default function() {
@@ -22,7 +24,7 @@ export default function() {
 
     // 関数の場合
     if (isFunction(obj)) {
-      return 'F ()';
+      return 'f ()';
     }
 
     // 文字列の場合
@@ -33,17 +35,14 @@ export default function() {
     // 配列の場合
     if (isArray(obj)) {
 
-      // 配列が空の場合
-      if (!obj.length) {
-        return '[]';
-      }
-
       const items = [];
-      forEach(obj, item => {
-        // 再帰処理
-        items.push(createJson(item));
-      });
-      return `[<div>${items.join(',')}</dvi>]`;
+      if (obj.length) {
+        forEach(obj, (item, idx ) => {
+          // 再帰処理
+          items.push(createJson(item));
+        });
+      }
+      return `<div class="Jsonviewer__array">[${items}]</div>`;
     }
 
     // オブジェクトの場合
@@ -56,20 +55,21 @@ export default function() {
       }
 
       let items = '';
+      // TODO: moutで書き直す
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         if (key || !isUndefined(obj[key])|| !isFunction(key) || !isFunction(obj[key])) {
           const isLast = (i === keys.length -1);
-          // 末尾のアイテムの場合にはテンプレートを切り替える
-          items += isLast
-            ? `<div>${createJson(key)} : ${createJson(obj[key])},</div>`
-            : `<div>${createJson(key)} : ${createJson(obj[key])}</div>`;
+          const arrayble = isArray(obj[key]);
+          const comma = !isLast ? ',' : '';
+          const collapsible = arrayble ? 'Jsonviewer__item--collapsible' : ''
+          items += `<div class="Jsonviewer__item ${collapsible}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
         }
       }
-      return `{${items}}`;
+      return `<div class="Jsonviewer__objects"> + {${items}}</div>`;
     }
 
-    // Number, Booleanの場合
+    // Number, Boolean
     return obj;
   };
 

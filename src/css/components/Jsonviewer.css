@@ -1,108 +1,27 @@
 .Jsonviewer {
-  &__item {
-    color: navy;
-  }
-
-  &__key {
-  }
-
-  &__value {
-  }
-
-  &__string {
-    color: green;
-  }
-
-  &__number {
-    color: blue;
-  }
-
-  &__boolean {
-    color: blueviolet;
-  }
-
-  &__object {
-    color: red;
-  }
-}
-
-/* .Jsonviewer {
 
   & > &__item {
-    display: block;
+    display: block
   }
 
   &__item {
-    display: none;
+    // display: none;
     padding-left: 20px;
     margin-top: 10px;
     user-select: none;
-  }
 
-  &__item--collapsible {
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
+    &--collapsible {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: inline;
 
-    &::before {
-      position: absolute;
-      left: 5px;
-      content: "+";
-    }
-
-    &::after {
-      position: absolute;
-      top: 26px;
-      left: 7px;
-      width: 1px;
-      height: 100%;
-      content: "";
-      background-color: lightgrey;
-    }
-
-    &:hover {
-      & > .Jsonviewer__key,
-      & > .Jsonviewer__value {
-        text-decoration: underline;
+      &::before {
+        position: absolute;
+        left: 5px;
+        content: "+";
+        color: black;
       }
     }
   }
-
-  &__toggle {
-    display: none;
-
-    &:checked ~ .Jsonviewer__item {
-      display: block;
-    }
-  }
-
-  &__key {
-    display: inline;
-    color: darkblue;
-
-    &::after {
-      content: ": ";
-    }
-  }
-
-  &__value {
-    display: inline;
-  }
-
-  &__string {
-    color: green;
-  }
-
-  &__number {
-    color: blue;
-  }
-
-  &__boolean {
-    color: blueviolet;
-  }
-
-  &__object {
-    color: red;
-  }
 }
- */
