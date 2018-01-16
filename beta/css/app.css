@@ -4679,6 +4679,49 @@ select {
         grid-template-columns: repeat(auto-fill, minmax(312px, auto));
     grid-auto-rows: 144px;
   }
+.EndpointsPage_Add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: #fff;
+  color: var(--theme-endpointCard-border);
+  cursor: pointer;
+  border: 1px dashed #fff;
+  border: 1px dashed var(--theme-endpointCard-border);
+  border-radius: 6px;
+}
+@media (hover: hover) {
+    .EndpointsPage_Add:hover {
+    color: #627edf;
+    color: var(--color-base-blue);
+    border-color: #627edf;
+    border-color: var(--color-base-blue);
+    }
+  }
+.EndpointsPage_Add.hold {
+    color: #627edf;
+    color: var(--color-base-blue);
+    border-color: #627edf;
+    border-color: var(--color-base-blue);
+  }
+.EndpointsPage_Add__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    border: 2px solid currentcolor;
+    border-radius: 50%;
+  }
+.EndpointsPage_Add__icon .Icon {
+      width: 16px;
+      height: 16px;
+    }
+.EndpointsPage_Add__label {
+    font-size: 1.6rem;
+  }
 .EndpointsPage_Endpoint {
   display: flex;
   align-items: stretch;
