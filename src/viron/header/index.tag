@@ -10,8 +10,6 @@ viron-application-header.Application_Header
   .Application_Header__item(if="{ isMobile }")
     .Application_Header__thumbnail(style="background-image:url({ thumbnail })")
   .Application_Header__item.Application_Header__item--tail
-    virtual(if="{ isTopPage }")
-      viron-icon-square.Application_Header__squareIcon(ref="squareIcon" onTap="{ handleSquareIconTap }")
     virtual(if="{ !isTopPage }")
       virtual(if="{ !isMobile }")
         .Application_Header__info

@@ -50,19 +50,6 @@ export default function() {
     });
   };
 
-  this.handleSquareIconTap = () => {
-    // menu(エンドポイント関連のやつ)をpopoverで開きます。
-    const rect = this.refs.squareIcon.root.getBoundingClientRect();
-    store.action('popovers.add', 'viron-application-header-menu', {
-      type: 'endpoint'
-    }, {
-      x: rect.left + (rect.width / 2),
-      y: rect.bottom,
-      width: 228,
-      direction: 'TR'
-    });
-  };
-
   this.handleThumbnailTap = () => {
     // エンドポイント情報を吹き出し表示します。
     const rect = this.refs.thumbnail.getBoundingClientRect();
@@ -75,11 +62,8 @@ export default function() {
   };
 
   this.handleDotsIconTap = () => {
-    // menu(一般的なやつ)をpopoverで開きます。
     const rect = this.refs.dotsIcon.root.getBoundingClientRect();
-    store.action('popovers.add', 'viron-application-header-menu', {
-      type: 'general'
-    }, {
+    store.action('popovers.add', 'viron-application-header-menu', null, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
       width: 228,
