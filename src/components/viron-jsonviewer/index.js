@@ -4,8 +4,6 @@ import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import isFunction from 'mout/lang/isFunction';
 import isString from 'mout/lang/isString';
-import isNumber from 'mout/lang/isNumber';
-import isBoolean from 'mout/lang/isBoolean';
 import forEach from 'mout/array/forEach';
 
 export default function() {
@@ -37,7 +35,7 @@ export default function() {
 
       const items = [];
       if (obj.length) {
-        forEach(obj, (item, idx ) => {
+        forEach(obj, item => {
           // 再帰処理
           items.push(createJson(item));
         });
@@ -62,7 +60,7 @@ export default function() {
           const isLast = (i === keys.length -1);
           const arrayble = isArray(obj[key]);
           const comma = !isLast ? ',' : '';
-          const collapsible = arrayble ? 'Jsonviewer__item--collapsible' : ''
+          const collapsible = arrayble ? 'Jsonviewer__item--collapsible' : '';
           items += `<div class="Jsonviewer__item ${collapsible}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
         }
       }
