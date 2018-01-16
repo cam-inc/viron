@@ -31,10 +31,6 @@
   }
 
   &__blocker {
-    @mixin hover {
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-    }
     position: absolute;
     top: 0;
     right: 0;

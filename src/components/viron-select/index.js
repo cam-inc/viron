@@ -1,7 +1,15 @@
+import clipboard from 'clipboard-js';
 import forEach from 'mout/array/forEach';
 import ObjectAssign from 'object-assign';
 
 export default function() {
+  const store = this.riotx.get();
+
+  // クリップボードコピーをサポートしているか否か。
+  let isClipboardCopySupported = true;
+  // モバイル用レイアウトか否か。
+  this.isMobile = store.getter('layout.isMobile');
+
   const getNewOptions = () => {
     const selectedIndex = this.refs.select.selectedIndex;
     const newOptions = [];
@@ -44,5 +52,23 @@ export default function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
+    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+      return;
+    }
+    Promise
+      .resolve()
+      .then(() => {
+        return clipboard.copy(String(this.opts.val));
+      })
+      .then(() => store.action('toasts.add', {
+        message: 'クリップボードへコピーしました。'
+      }))
+      .catch(() => {
+        isClipboardCopySupported = false;
+        store.action('toasts.add', {
+          type: 'error',
+          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+        });
+      });
   };
 }
