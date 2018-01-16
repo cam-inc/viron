@@ -22,4 +22,17 @@
       }
     }
   }
+
+  &__objects {
+    padding-left: 20px;
+    margin-top: 10px;
+    user-select: none;
+
+    &::before {
+      position: absolute;
+      left: 5px;
+      color: black;
+      content: "+";
+    }
+  }
 }

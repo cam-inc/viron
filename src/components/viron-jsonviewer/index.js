@@ -40,7 +40,7 @@ export default function() {
           items.push(createJson(item));
         });
       }
-      return `<div class="Jsonviewer__array">[${items}]</div>`;
+      return `[${items}]`;
     }
 
     // オブジェクトの場合
@@ -58,13 +58,12 @@ export default function() {
         const key = keys[i];
         if (key || !isUndefined(obj[key])|| !isFunction(key) || !isFunction(obj[key])) {
           const isLast = (i === keys.length -1);
-          const arrayble = isArray(obj[key]);
           const comma = !isLast ? ',' : '';
-          const collapsible = arrayble ? 'Jsonviewer__item--collapsible' : '';
+          const collapsible = isArray(obj[key]) ? 'Jsonviewer__item--collapsible' : '';
           items += `<div class="Jsonviewer__item ${collapsible}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
         }
       }
-      return `<div class="Jsonviewer__objects"> + {${items}}</div>`;
+      return `<div class="Jsonviewer__objects">{${items}}</div>`;
     }
 
     // Number, Boolean
