@@ -1497,8 +1497,8 @@ select {
     color: var(--theme-menu-arrow);
   }
 .Application_Menu__logo {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     color: #fff;
     color: var(--theme-menu-logo);
     cursor: pointer;
@@ -1673,8 +1673,8 @@ select {
     color: var(--color-base-red);
   }
 .Application_Poster__logo {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     margin-bottom: 24px;
   }
 @keyframes Application_ProgressLinear-indeterminate1 {
@@ -1840,18 +1840,6 @@ select {
     bottom: 0;
     left: 0;
     cursor: pointer;
-  }
-@media (hover: hover) {
-    .Autocomplete__blocker:hover {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-    }
-  }
-.Autocomplete__blocker.hold {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
   }
 .Autocomplete--error .Autocomplete__input {
       background-color: #f9efee;
@@ -2167,7 +2155,40 @@ select {
     }
 .Error {
   display: block;
+  min-width: 240px;
 }
+.Error__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 32px;
+    color: #f57177;
+    color: var(--color-base-red);
+    border: 4px solid #f57177;
+    border: 4px solid var(--color-base-red);
+    border-radius: 50%;
+  }
+.Error__icon .Icon {
+      width: 42px;
+      height: 42px;
+    }
+.Error__title {
+    margin-bottom: 8px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+.Error__message {
+    margin-bottom: 24px;
+    font-size: 1.6rem;
+  }
+.Error > .Prettyprint {
+    padding: 8px;
+    border: 1px solid #d1d1d1;
+    border: 1px solid var(--color-base-gray);
+    border-radius: 4px;
+  }
 .HorizontalRule {
   display: flex;
   align-items: center;
@@ -2228,18 +2249,6 @@ select {
     bottom: 0;
     left: 0;
     cursor: pointer;
-  }
-@media (hover: hover) {
-    .Html__blocker:hover {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-    }
-  }
-.Html__blocker.hold {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
   }
 .Icon {
   position: relative;
@@ -2475,7 +2484,7 @@ select {
       transform: scale(1);
     }
 .Modal--desktop .Modal__frame {
-      min-width: 300px;
+      min-width: 40%;
       max-width: 80%;
       min-height: 100px;
       max-height: 80%;
@@ -2550,18 +2559,6 @@ select {
     bottom: 0;
     left: 0;
     cursor: pointer;
-  }
-@media (hover: hover) {
-    .Numberinput__blocker:hover {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-    }
-  }
-.Numberinput__blocker.hold {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
   }
 .Numberinput--error .Numberinput__input {
       background-color: #f9efee;
@@ -3297,18 +3294,6 @@ select {
     left: 0;
     cursor: pointer;
   }
-@media (hover: hover) {
-    .Pug__blocker:hover {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-    }
-  }
-.Pug__blocker.hold {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-  }
 .Qrcode {
   display: block;
 }
@@ -3368,6 +3353,7 @@ select {
     right: 0;
     bottom: 0;
     left: 0;
+    cursor: pointer;
   }
 .Select--error .Select__form {
       background-color: #f9efee;
@@ -3441,18 +3427,6 @@ select {
     left: 0;
     cursor: pointer;
   }
-@media (hover: hover) {
-    .Textarea__blocker:hover {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-    }
-  }
-.Textarea__blocker.hold {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-  }
 .Textarea--error .Textarea__input {
       background-color: #f9efee;
       background-color: var(--color-base-red-tertiary);
@@ -3508,18 +3482,6 @@ select {
     bottom: 0;
     left: 0;
     cursor: pointer;
-  }
-@media (hover: hover) {
-    .Textinput__blocker:hover {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
-    }
-  }
-.Textinput__blocker.hold {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-      opacity: 0.1;
   }
 .Textinput--error .Textinput__input {
       background-color: #f9efee;
@@ -3899,6 +3861,10 @@ select {
     bottom: 0;
     left: 0;
   }
+.ComponentsPage_Card_Chart .highcharts-pane {
+    fill: transparent;
+    stroke-width: 0;
+  }
 .ComponentsPage_Card_Number {
   display: flex;
   flex-direction: column;
@@ -4212,6 +4178,13 @@ select {
     display: inline-block;
     font-size: 1.4rem;
   }
+.ComponentsPage_Card_Table_Cell__string--emphasised {
+      font-style: italic;
+      font-weight: bold;
+      color: #f57177;
+      color: var(--color-base-red);
+      text-shadow: 0 0 4px rgba(255, 0, 0, 0.25);
+    }
 .ComponentsPage_Card_Table_Cell__image {
     width: 64px;
     height: 64px;
