@@ -1,5 +1,8 @@
 import clipboard from 'clipboard-js';
+import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
+import isNull from 'mout/lang/isNull';
+import isUndefined from 'mout/lang/isUndefined';
 import ObjectAssign from 'object-assign';
 
 export default function() {
@@ -52,13 +55,18 @@ export default function() {
 
   this.handleBlockerTap = e => {
     e.stopPropagation();
-    if (this.isMobile || !isClipboardCopySupported || !this.opts.val) {
+    if (this.isMobile || !isClipboardCopySupported) {
+      return;
+    }
+    const target = find(this.opts.options || [], { isSelected: true });
+    const val = target && target.value;
+    if (isUndefined(val) || isNull(val)) {
       return;
     }
     Promise
       .resolve()
       .then(() => {
-        return clipboard.copy(String(this.opts.val));
+        return clipboard.copy(String(val));
       })
       .then(() => store.action('toasts.add', {
         message: 'クリップボードへコピーしました。'
