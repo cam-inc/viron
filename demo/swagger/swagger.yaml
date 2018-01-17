@@ -1,0 +1,4185 @@
+#################################################
+# OpenAPI Specification Version2.0.0
+# @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
+#################################################
+swagger: "2.0"
+
+#################################################
+# host
+# - APIを提供するホスト
+#################################################
+host: localhost:3000
+
+#################################################
+# info
+# - API全般のメタ情報を記載
+#################################################
+info:
+  title: Viron Demo
+  description: Design-based Management Console.
+  version: 0.0.1
+
+#################################################
+# schemes
+# - APIを提供する通信プロトコルのリスト
+#################################################
+schemes:
+- https
+
+#################################################
+# definitions
+# - リクエストやレスポンスのレイアウトの定義
+# - paths内から $ref で参照できる
+#################################################
+definitions:
+  AdminRole:
+    example:
+      paths:
+        "GET:/user": true
+      role_id: operator
+    properties:
+      paths:
+        $ref: '#/definitions/AdminRolePath'
+      role_id:
+        description: ユーザ権限ID
+        type: string
+    required:
+    - role_id
+    - paths
+    type: object
+
+  AdminRoleCollection:
+    items:
+      $ref: '#/definitions/AdminRole'
+    type: array
+
+  AdminUser:
+    example:
+      email: test@viron.com
+      id: 1
+      role_id: operator
+    properties:
+      email:
+        description: E-Mail
+        type: string
+      id:
+        description: ユニークID
+        format: int64
+        type: integer
+      role_id:
+        description: ユーザ権限ID
+        type: string
+    required:
+    - id
+    - email
+    type: object
+
+  AdminUserCollection:
+    items:
+      $ref: '#/definitions/AdminUser'
+    type: array
+
+  AuditLog:
+    example:
+      createdAt: 2006-02-12T07:09:13+09:00
+      request_body: '{"name":"test", "id":1}'
+      request_method: GET
+      request_uri: '/user'
+      source_ip: 200.200.200.200
+      status_code: 200
+      user_id: test@viron.com
+    properties:
+      createdAt:
+        description: 日時
+        format: date-time
+        type: string
+      request_body:
+        description: リクエストボディ
+        type: string
+      request_method:
+        description: リクエストメソッド
+        type: string
+      request_uri:
+        description: リクエストURI
+        type: string
+      source_ip:
+        description: ソースIP
+        type: string
+      status_code:
+        description: ステータスコード
+        type: integer
+      user_id:
+        description: ユーザ
+        type: string
+    type: object
+
+  AuditLogCollection:
+    items:
+      $ref: '#/definitions/AuditLog'
+    type: array
+
+  AuthType:
+    example:
+      method: POST
+      provider: google
+      type: oauth
+      url: '/googlesignin'
+    properties:
+      method:
+        description: リクエストメソッド
+        type: string
+      provider:
+        description: 認証プロバイダ
+        type: string
+      type:
+        description: 認証方式
+        type: string
+      url:
+        description: リクエストURL
+        type: string
+    required:
+    - type
+    - url
+    - method
+    - provider
+    type: object
+
+  AuthTypeCollection:
+    items:
+      $ref: '#/definitions/AuthType'
+    type: array
+
+  BlogDesign:
+    example:
+      background_image: http://hoge.com/a.png
+      base_color: blue
+      createdAt: 1990-04-23T00:18:19+09:00
+      id: des_001
+      name: design name
+      updatedAt: 1971-03-24T08:40:07+09:00
+    properties:
+      background_image:
+        description: 背景画像
+        type: string
+      base_color:
+        description: ベースカラー
+        type: string
+      createdAt:
+        description: 作成日時
+        format: date-time
+        type: string
+      id:
+        description: デザインID
+        type: string
+      name:
+        description: 名前
+        type: string
+      updatedAt:
+        description: 更新日時
+        format: date-time
+        type: string
+    required:
+    - name
+    type: object
+
+  BlogDesignCollection:
+    items:
+      $ref: '#/definitions/BlogDesign'
+    type: array
+
+  BlogDesignPayload:
+    example:
+      background_image: http://hoge.com/a.png
+      base_color: blue
+      id: pop1
+      name: design name
+    properties:
+      background_image:
+        description: 背景画像
+        type: string
+      base_color:
+        description: ベースカラー
+        type: string
+      id:
+        description: デザインID
+        type: string
+      name:
+        description: 名前
+        type: string
+    required:
+    - id
+    - name
+    type: object
+
+  CreateAdminRolePayload:
+    example:
+      paths:
+      - "GET:/user": true
+      role_id: operator
+    properties:
+      paths:
+        $ref: '#/definitions/AdminRolePath'
+      role_id:
+        description: role id
+        type: string
+    type: object
+    required:
+    - role_id
+    - paths
+
+  CreateAdminUserPayload:
+    example:
+      email: user@sample.com
+      password: XXXXXXXXXXXXXXXX
+      role_id: viewer
+    properties:
+      email:
+        description: E-Mail
+        type: string
+      password:
+        description: パスワード
+        type: string
+      role_id:
+        description: ユーザ権限ID
+        type: string
+        x-autogen-enum:
+          model: admin_roles
+          field: role_id
+          defaults:
+          - super
+          - viewer
+    required:
+    - email
+    - password
+    type: object
+
+  Viron:
+    example:
+      color: white
+      name: Viron Demo
+      pages:
+      - components:
+        - api:
+            method: get
+            path: /stats/dau
+          name: DAU
+          options:
+          - key: key
+            value: value
+          pagination: true
+          query:
+          - key: key
+            type: string
+          style: number
+          table_labels:
+          - name
+        group: empty
+        id: quickview
+        name: クイックビュー
+        section: dashboard
+      tags:
+      - viron
+      - example
+      thumbnail: https://image.com/thumb.png
+    properties:
+      color:
+        default: white
+        enum:
+        - white
+        - black
+        - perple
+        type: string
+      name:
+        type: string
+      pages:
+        items:
+          $ref: '#/definitions/Page'
+        type: array
+      tags:
+        items:
+          type: string
+        type: array
+      thumbnail:
+        type: string
+    required:
+    - name
+    - color
+    - thumbnail
+    - tags
+    - pages
+    type: object
+
+  SigninAuthPayload:
+    example:
+      email: user1@viron.com
+      password: XXXXXXXXXXXX
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+
+  StatsNumber:
+    example:
+      value: 12345678
+    properties:
+      value:
+        format: int64
+        type: integer
+    required:
+    - value
+    type: object
+
+  StatsChart:
+    example:
+      chart:
+        type: area
+      series:
+      - name: One
+        data:
+        - 10
+    properties:
+      series:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          properties:
+            data:
+              type: array
+              items: {}
+
+  UpdateAdminRolePayload:
+    example:
+      paths:
+      - "GET:/user": true
+    properties:
+      paths:
+        $ref: '#/definitions/AdminRolePath'
+    type: object
+
+  UpdateAdminUserPayload:
+    example:
+      password: XXXXXXXXXXXXXXXX
+      role_id: viewer
+    properties:
+      password:
+        description: パスワード
+        type: string
+      role_id:
+        description: ユーザ権限ID
+        type: string
+        x-autogen-enum:
+          model: admin_roles
+          field: role_id
+          defaults:
+          - super
+          - viewer
+    required:
+    - role_id
+    type: object
+
+  UpdateAccountPayload:
+    example:
+      password: XXXXXXXXXXXXXXXX
+    properties:
+      password:
+        description: パスワード
+        type: string
+    required:
+    - password
+    type: object
+
+  User:
+    example:
+      birthday: 1995-05-12T09:45:56Z
+      blood_type: A
+      createdAt: 2010-04-14T11:16:32+09:00
+      id: 1
+      job: 大学生
+      name: 山田 太郎
+      sex: male
+      updatedAt: 1994-04-27T12:25:11+09:00
+    properties:
+      birthday:
+        description: 誕生日
+        format: date-time
+        type: string
+      blood_type:
+        description: 血液型
+        enum:
+        - A
+        - B
+        - O
+        - AB
+        type: string
+      createdAt:
+        description: 作成日時
+        format: date-time
+        type: string
+      id:
+        description: ユーザーID
+        format: int64
+        type: integer
+      job:
+        description: 職業
+        type: string
+      name:
+        description: 名前
+        type: string
+      sex:
+        description: 性別
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      thumbnail:
+        description: サムネイル画像
+        type: string
+        format: base64
+        x-mime-type: image/png
+      updatedAt:
+        description: 更新日時
+        format: date-time
+        type: string
+    required:
+    - id
+    - name
+    type: object
+
+  UserBlog:
+    example:
+      created_at: 1993-07-26T02:54:17+09:00
+      design_id: simple
+      genre: game
+      id: 11
+      sub_title: diary
+      title: user's blog
+      updated_at: 1979-11-12T02:46:55+09:00
+      user_id: 1
+    properties:
+      createdAt:
+        description: 作成日時
+        format: date-time
+        type: string
+      design_id:
+        description: デザインID
+        enum:
+        - simple
+        - tile
+        - 2column
+        - 3column
+        type: string
+      genre:
+        description: ジャンル
+        type: string
+      id:
+        description: ユーザーブログID
+        format: int64
+        type: integer
+      sub_title:
+        description: サブタイトル
+        type: string
+      title:
+        description: タイトル
+        type: string
+      updatedAt:
+        description: 更新日時
+        format: date-time
+        type: string
+      user_id:
+        description: ユーザーID
+        format: int64
+        type: integer
+    required:
+    - id
+    - user_id
+    - title
+    - design_id
+    type: object
+
+  UserBlogEntry:
+    example:
+      content: <h1>diary 1/4</h1><div>text....</div>
+      createdAt: 1991-02-16T10:17:41+09:00
+      id: 111
+      theme: diary
+      title: 今日の日記
+      updatedAt: 2003-10-21T03:42:51+09:00
+      user_blog_id: 11
+    properties:
+      content:
+        description: 内容
+        type: string
+        format: wyswyg
+      createdAt:
+        description: 作成日時
+        format: date-time
+        type: string
+      id:
+        description: ユーザーブログ記事ID
+        format: int64
+        type: integer
+      theme:
+        description: テーマ
+        type: string
+      title:
+        description: タイトル
+        type: string
+      updatedAt:
+        description: 更新日時
+        format: date-time
+        type: string
+      user_blog_id:
+        description: ユーザーブログID
+        format: int64
+        type: integer
+    required:
+    - id
+    - user_blog_id
+    - title
+    - content
+    type: object
+
+  UserBlogEntryCollection:
+    items:
+      $ref: '#/definitions/UserBlogEntry'
+    type: array
+
+  UserFavorite:
+    example:
+      user_id: 1
+      user_blog_id: 11
+    properties:
+      user_id:
+        description: ユーザーID
+        format: int64
+        type: integer
+      user_blog_ids:
+        description: お気に入り一覧
+        x-autogen-checklist:
+          field: id
+          model: user_blogs
+          default: false
+    required:
+    - user_id
+    type: object
+
+  UserFavoriteCollection:
+    items:
+      $ref: '#/definitions/UserFavorite'
+    type: array
+
+  UserFavoriteCreatePayload:
+    properties:
+      user_id:
+        description: ユーザーID
+        example: 11
+        format: int64
+        type: integer
+        x-autocomplete:
+          field: name
+          path: /viron_autocomplete
+          query:
+            model: users
+            value: id
+      user_blog_ids:
+        description: ブログ選択
+        x-autogen-checklist:
+          field: id
+          model: user_blogs
+          default: false
+    required:
+    - user_id
+    - user_blog_ids
+    type: object
+
+  UserFavoriteUpdatePayload:
+    properties:
+      user_blog_ids:
+        description: ブログ選択
+        x-autogen-checklist:
+          field: id
+          model: user_blogs
+          default: false
+    required:
+    - user_blog_ids
+    type: object
+
+  UserBlogCollection:
+    items:
+      $ref: '#/definitions/UserBlog'
+    type: array
+
+  UserBlogEntryPayload:
+    example:
+      content: <h1>diary 1/4</h1><div>text....</div>
+      theme: diary
+      title: 今日の日記
+      user_blog_id: 11
+    properties:
+      content:
+        description: 内容
+        type: string
+        format: wyswyg
+      theme:
+        description: テーマ
+        type: string
+      title:
+        description: タイトル
+        type: string
+      user_blog_id:
+        description: ユーザーブログID
+        format: int64
+        type: integer
+        x-autocomplete:
+          field: title
+          path: /viron_autocomplete
+          query:
+            model: user_blogs
+            value: id
+    required:
+    - user_blog_id
+    type: object
+
+  UserBlogPayload:
+    example:
+      design_id: simple
+      genre: game
+      sub_title: diary
+      title: user's blog
+      user_id: 1
+    properties:
+      design_id:
+        description: デザインID
+        enum:
+        - simple
+        - tile
+        - 2column
+        - 3column
+        type: string
+      genre:
+        description: ジャンル
+        type: string
+      sub_title:
+        description: サブタイトル
+        type: string
+      title:
+        description: タイトル
+        type: string
+      user_id:
+        description: ユーザーID
+        format: int64
+        type: integer
+        x-autocomplete:
+          field: name
+          path: /viron_autocomplete
+          query:
+            model: users
+            value: id
+    required:
+    - user_id
+    type: object
+
+  UserCollection:
+    items:
+      $ref: '#/definitions/User'
+    type: array
+
+  AdminRolePath:
+    description: 許可リクエスト
+    example:
+      "GET:/user": true
+    properties:
+      path: # AutoGenerate
+        type: boolean
+    type: object
+
+  Component:
+    example:
+      api:
+        method: get
+        path: /user
+      name: ユーザー
+      options:
+      - key: key
+        value: value
+      pagination: true
+      query:
+      - key: key
+        type: string
+      style: table
+      table_labels:
+      - id
+      - name
+    properties:
+      api:
+        properties:
+          method:
+            description: Access paths[path][method] of swagger.json
+            type: string
+          path:
+            description: Access paths[path] of swagger.json
+            type: string
+        required:
+        - path
+        - method
+        type: object
+      name:
+        description: Title of page
+        type: string
+      options:
+        description: style options
+        items:
+          properties:
+            key:
+              description: Key
+              type: string
+            value:
+              description: Value
+              type: string
+          required:
+          - key
+          - value
+          type: object
+        type: array
+      pagination:
+        description: allow pagination
+        type: boolean
+      query:
+        description: query for request
+        items:
+          properties:
+            key:
+              description: Key
+              type: string
+            type:
+              default: string
+              description: Type
+              enum:
+              - string
+              - integer
+              - number
+              - boolean
+              - date
+              - datetime
+              - time
+              type: string
+          required:
+          - key
+          - type
+          type: object
+        type: array
+      style:
+        default: number
+        enum:
+        - number
+        - list
+        - table
+        - chart
+        type: string
+      table_labels:
+        description: keys of table row
+        items:
+          type: string
+        type: array
+    required:
+    - api
+    - name
+    - style
+    - pagination
+    type: object
+
+  Error:
+    example:
+      code: invalid_value
+      detail: Value of ID must be an integer
+      id: #F-0000-0001
+      meta:
+        timestamp: 1502172152
+      status: "400"
+    properties:
+      code:
+        description: エラーコード
+        type: string
+      detail:
+        description: 詳細
+        type: string
+      id:
+        description: ID
+        type: string
+      meta:
+        additionalProperties: true
+        description: メタ情報
+        type: object
+      status:
+        description: ステータスコード
+        type: string
+    type: object
+
+  Page:
+    example:
+      components:
+      - api:
+          method: get
+          path: /user
+        name: ユーザー
+        options:
+        - key: key
+          value: value
+        pagination: true
+        query:
+        - key: key
+          type: string
+        style: table
+        table_labels:
+        - name
+      group: UserGroup
+      id: user
+      name: ユーザー
+      section: admin
+    properties:
+      components:
+        items:
+          $ref: '#/definitions/Component'
+        type: array
+      group:
+        type: string
+      id:
+        description: ページID
+        type: string
+      name:
+        description: 名称
+        type: string
+      section:
+        default: manage
+        enum:
+        - manage
+        - dashboard
+        type: string
+    required:
+    - id
+    - name
+    - section
+    - group
+    - components
+    type: object
+
+  ValidatorCollection:
+    items:
+      $ref: '#/definitions/Validator'
+    type: array
+
+  Validator:
+    type: object
+    properties:
+      id:
+        description: id of validator
+        example: 1
+        type: number
+      validation_type:
+        type: string
+      multiple_of:
+        description: multipleOfの3倍であること
+        example: 9
+        type: number
+        multipleOf: 3
+      maximum:
+        description: 10以下であること
+        example: 10
+        type: number
+        maximum: 10
+        exclusiveMaximum: false
+      exclusive_maximum:
+        description: 10未満であること
+        example: 9
+        type: number
+        maximum: 10
+        exclusiveMaximum: true
+      minimum:
+        description: 1以上であること
+        example: 1
+        type: number
+        minimum: 1
+        exclusiveMinimum: false
+      exclusive_minimum:
+        description: 1を超過していること
+        example: 2
+        type: number
+        minimum: 1
+        exclusiveMinimum: true
+      min_max:
+        description: 1以上10未満であること
+        example: 5
+        type: number
+        minimum: 1
+        exclusiveMinimum: false
+        maximum: 10
+        exclusiveMaximum: true
+      max_length:
+        description: 20文字以下であること
+        example: abcdefghijklmnopqrst
+        type: string
+        maxLength: 20
+      min_length:
+        description: 5文字以上であること
+        example: abcde
+        type: string
+        minLength: 5
+      min_max_length:
+        description: 5文字以上20文字以下であること
+        example: abcdefghij
+        type: string
+        minLength: 5
+        maxLength: 20
+      pattern:
+        description: 英小文字であること
+        example: abcde
+        type: string
+        pattern: "[a-z]"
+      max_items:
+        description: 3要素以下であること
+        example:
+        - value: a
+        - value: b
+        - value: c
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              type: string
+        maxItems: 3
+      min_items:
+        description: 2要素以上であること
+        example:
+        - value: a
+        - value: b
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              type: string
+        minItems: 2
+      unique_items:
+        description: 要素が重複しないこと
+        example:
+        - value: a
+        - value: b
+        type: array
+        items:
+          type: object
+          properties:
+            value:
+              type: string
+        uniqueItems: true
+      max_properties:
+        description: 3要素以下であること
+        example:
+          key1: aaa
+          key2: 2
+          key3: true
+        type: object
+        properties:
+          key1:
+            type: string
+          key2:
+            type: number
+          key3:
+            type: boolean
+          key4:
+            type: integer
+        maxProperties: 3
+      min_properties:
+        description: 2要素以上であること
+        example:
+          key1: aaa
+          key2: 2
+        type: object
+        properties:
+          key1:
+            type: string
+          key2:
+            type: number
+          key3:
+            type: boolean
+          key4:
+            type: integer
+        minProperties: 2
+      all_of:
+        description: 5文字以上10文字以下
+        example: aaaaaaaaaa
+        type: string
+        allOf:
+        - type: string
+        - maxLength: 10
+        - minLength: 5
+
+  NestedArrayCollection:
+    items:
+      $ref: '#/definitions/NestedArray'
+    type: array
+
+  NestedArray:
+    type: object
+    properties:
+      id:
+        description: id of nested array
+        example: 1
+        type: number
+      values:
+        type: array
+        items:
+          type: array
+          items:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                age:
+                  type: number
+      string_array:
+        type: array
+        items:
+          type: string
+      number_array:
+        type: array
+        items:
+          type: number
+      bool_array:
+        type: array
+        items:
+          type: boolean
+
+  FormatCollection:
+    items:
+      $ref: '#/definitions/Format'
+    type: array
+
+  Format:
+    type: object
+    properties:
+      id:
+        description: id of format
+        example: 1
+        type: number
+      date_time:
+        example: 2006-02-12T07:09:13+09:00
+        type: string
+        format: date-time
+      email:
+        example: user@viron.com
+        type: string
+        format: email
+      hostname:
+        example: viron.com
+        type: string
+        format: hostname
+      ipv4:
+        example: 127.0.0.1
+        type: string
+        format: ipv4
+      ipv6:
+        example: FEDC:BA98:7654:3210:FEDC:BA98:7654:3210
+        type: string
+        format: ipv6
+      uri:
+        example: https://viron.com/swagger.json
+        type: string
+        format: uri
+      multiline:
+        example: |-
+          aaaaaaaaaaaaaa
+          bbbbbbbbbbbbbb
+          cccccccccccccc
+        type: string
+        format: multiline
+      wyswyg:
+        example: |-
+          <html>
+            <body>
+              <div>hoge</div>
+            </body>
+          </html>
+        type: string
+        format: wyswyg
+        x-wyswyg-options:
+          key1:
+            key2: value
+            key3:
+              - a
+              - b
+              - c
+      hex:
+        example: "#95989A"
+        type: string
+        format: hex
+      rgba:
+        example: 171,205,239,1
+        type: string
+        format: rgba
+        x-format: "%d,%d,%d,%d" # クライアントでカラーパレットを文字列に変換する際のフォーマット
+      cmyk:
+        example: 100,100,100,100
+        type: string
+        format: cmyk
+        x-format: "%d,%d,%d,%d" # クライアントでカラーパレットを文字列に変換する際のフォーマット
+      date_fullyear:
+        example: 1970
+        type: string
+        format: date-fullyear
+      date_month:
+        example: 01
+        type: string
+        format: date-month
+      date_mday:
+        example: 31
+        type: string
+        format: date-mday
+      time_hour:
+        example: 23
+        type: string
+        format: time-hour
+      time_minute:
+        example: 59
+        type: string
+        format: time-minute
+      time_second:
+        example: 59
+        type: string
+        format: time-second
+      time_secfrac:
+        example: .999
+        type: string
+        format: time-secfrac
+      time_numoffset:
+        example: +09:00
+        type: string
+        format: time-numoffset
+      time_offset:
+        example: Z
+        type: string
+        format: time-offset
+      partial_time:
+        example: "23:59:59.999"
+        type: string
+        format: partial-time
+      full_date:
+        example: 1970-12-31
+        type: string
+        format: full-date
+      full_time:
+        example: 23:59:59.999Z
+        type: string
+        format: full-time
+
+  MultiQueryCollection:
+    items:
+      $ref: '#/definitions/MultiQuery'
+    type: array
+
+  MultiQuery:
+    type: object
+    properties:
+      id:
+        description: id of multiquery
+        example: m1
+        type: string
+      name:
+        description: name of multiquery
+        example: m-name
+        type: string
+      age:
+        description: age of multiquery
+        example: 22
+        type: integer
+      address:
+        description: address of multiquery
+        example: 'shibuya-ku dogenzaka'
+        type: string
+      job:
+        description: job of multiquery
+        example: 学生
+        type: string
+      detail:
+        description: detail of multiquery
+        example: 詳細詳細詳細詳細
+        type: string
+
+  DefaultFormCollection:
+    items:
+      $ref: '#/definitions/DefaultForm'
+    type: array
+
+  DefaultForm:
+    type: object
+    required:
+    - obj
+    - arr
+    properties:
+      id:
+        description: id of default
+        example: d1
+        type: string
+      str:
+        description: string
+        example: strrrrr
+        type: string
+        default: default-str
+      bool:
+        description: boolean
+        example: true
+        type: boolean
+        default: true
+      num:
+        description: number
+        example: 99
+        type: number
+        default: 10
+      arr:
+        type: array
+        minItems: 3
+        items:
+          type: object
+          properties:
+            str:
+              description: string
+              example: strrrrr
+              type: string
+              default: default-arr-str
+            bool:
+              description: boolean
+              example: true
+              type: boolean
+              default: false
+            num:
+              description: number
+              example: 99
+              type: number
+              default: 100
+      obj:
+        type: object
+        properties:
+          str:
+            description: string
+            example: strrrrr
+            type: string
+            default: default-obj-str
+          bool:
+            description: boolean
+            example: true
+            type: boolean
+            default: true
+          num:
+            description: number
+            example: 99
+            type: number
+            default: 1000
+
+#################################################
+# paths
+# - APIの一覧
+#################################################
+paths:
+  /:
+    get:
+      x-swagger-router-controller: root
+      description: get root
+      operationId: root#show
+      responses:
+        "301":
+          description: Moved Permanently
+      summary: ルート
+      tags:
+      - swagger
+
+  /adminrole:
+    get:
+      x-swagger-router-controller: viron_admin_role
+      description: ユーザ権限の一覧
+      operationId: admin_role#list
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminRoleCollection'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ権限一覧
+      tags:
+      - admin_role
+
+    post:
+      x-swagger-router-controller: viron_admin_role
+      description: ユーザ権限の作成
+      operationId: admin_role#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateAdminRolePayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminRole'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ権限作成
+      tags:
+      - admin_role
+
+  /adminrole/{role_id}:
+    delete:
+      x-swagger-router-controller: viron_admin_role
+      description: ユーザ権限の削除
+      operationId: admin_role#remove
+      parameters:
+      - description: role id
+        in: path
+        name: role_id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ権限削除
+      tags:
+      - admin_role
+
+    put:
+      x-swagger-router-controller: viron_admin_role
+      description: ユーザ権限の更新
+      operationId: admin_role#update
+      parameters:
+      - description: role id
+        in: path
+        name: role_id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAdminRolePayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminRole'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ権限更新
+      tags:
+      - admin_role
+
+  /adminuser:
+    get:
+      x-swagger-router-controller: viron_admin_user
+      description: 管理ユーザの一覧
+      operationId: admin_user#list
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUserCollection'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 管理ユーザ一覧
+      tags:
+      - admin_user
+
+    post:
+      x-swagger-router-controller: viron_admin_user
+      description: 管理ユーザの作成
+      operationId: admin_user#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateAdminUserPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 管理ユーザ作成
+      tags:
+      - admin_user
+
+  /adminuser/{id}:
+    delete:
+      x-swagger-router-controller: viron_admin_user
+      description: 管理ユーザの削除
+      operationId: admin_user#remove
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 管理ユーザ削除
+      tags:
+      - admin_user
+
+    put:
+      x-swagger-router-controller: viron_admin_user
+      description: 管理ユーザ情報の更新
+      operationId: admin_user#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAdminUserPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 管理ユーザ更新
+      tags:
+      - admin_user
+
+  /auditlog:
+    get:
+      x-swagger-router-controller: viron_audit_log
+      description: 監査ログの一覧
+      operationId: audit_log#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: リクエストメソッド
+        in: query
+        name: request_method
+        required: false
+        type: string
+        enum:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      - description: ユーザ
+        in: query
+        name: user_id
+        required: false
+        type: string
+      - description: リクエストURI
+        in: query
+        name: request_uri
+        required: false
+        type: string
+      - description: 日時
+        in: query
+        name: createdAt
+        required: false
+        type: string
+      - description: ソースIP
+        in: query
+        name: source_ip
+        required: false
+        type: string
+      - description: ステータスコード
+        in: query
+        name: status_code
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AuditLogCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 監査ログ一覧
+      tags:
+      - audit_log
+
+  /blogdesign:
+    get:
+      x-swagger-router-controller: blog_design
+      description: ブログデザインの一覧
+      operationId: blog_design#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: デザインID
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: 名前
+        in: query
+        name: name
+        required: false
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/BlogDesignCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ブログデザイン一覧
+      tags:
+      - blog_design
+
+    post:
+      x-swagger-router-controller: blog_design
+      description: ブログデザインの作成
+      operationId: blog_design#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/BlogDesignPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/BlogDesign'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ブログデザイン作成
+      tags:
+      - blog_design
+
+  /blogdesign/{id}:
+    delete:
+      x-swagger-router-controller: blog_design
+      description: ブログデザインの削除
+      operationId: blog_design#remove
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ブログデザイン削除
+      tags:
+      - blog_design
+
+    put:
+      x-swagger-router-controller: blog_design
+      description: ブログデザイン情報の更新
+      operationId: blog_design#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/BlogDesignPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/BlogDesign'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ブログデザイン更新
+      tags:
+      - blog_design
+
+  /viron:
+    get:
+      x-swagger-router-controller: viron
+      description: viron settings
+      operationId: viron#show
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Viron'
+      security:
+      - jwt:
+        - api:access
+      summary: エンドポイント全体情報 取得
+      tags:
+      - viron
+
+  /viron_authtype:
+    get:
+      x-swagger-router-controller: viron_authtype
+      description: get auth types
+      operationId: auth_type#list
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AuthTypeCollection'
+      summary: 認証方式一覧
+      tags:
+      - auth
+
+  /googleoauth2callback:
+    get:
+      x-swagger-router-controller: viron_auth
+      description: callback function from google oauth2
+      operationId: viron_auth#googleoauth2callback
+      parameters:
+      - description: authorization code
+        in: query
+        name: code
+        required: false
+        type: string
+      - description: check state for CSRF
+        in: query
+        name: state
+        required: false
+        type: string
+      responses:
+        "301":
+          description: Moved Permanently
+          headers:
+            Authorization:
+              description: Generated JWT
+              type: string
+            Content-Type:
+              description: content type
+              type: string
+            Location:
+              description: redirect url
+              type: string
+        "307":
+          description: Temporary Redirect
+      summary: GoogleOAuth2 リダイレクトパス
+      tags:
+      - auth
+
+  /googlesignin:
+    get:
+      x-swagger-router-controller: viron_auth
+      description: signin with google
+      operationId: viron_auth#googlesignin
+      parameters:
+      - description: redirect url
+        in: query
+        name: redirect_url
+        required: false
+        type: string
+      responses:
+        "301":
+          description: Moved Permanently
+          headers:
+            Content-Type:
+              description: content type
+              type: string
+            Location:
+              description: redirect url
+              type: string
+      summary: GoogleOAuth2 認証
+      tags:
+      - auth
+
+  /ping:
+    get:
+      x-swagger-router-controller: ping
+      description: check alive
+      operationId: ping#show
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping
+      tags:
+      - system
+
+  /signin:
+    post:
+      x-swagger-router-controller: viron_auth
+      description: サインイン
+      operationId: viron_auth#signin
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/SigninAuthPayload'
+      responses:
+        "204":
+          description: No Content
+          headers:
+            Authorization:
+              description: Generated JWT
+              type: string
+        "307":
+          description: Temporary Redirect
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: サインイン
+      tags:
+      - auth
+
+  /signout:
+    post:
+      x-swagger-router-controller: viron_auth
+      description: サインアウト
+      operationId: viron_auth#signout
+      responses:
+        "204":
+          description: No Content
+      summary: サインアウト
+      tags:
+      - auth
+
+  /stats/dau:
+    get:
+      x-swagger-router-controller: stats
+      description: Service Daily Activity User
+      operationId: stats#dau
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsNumber'
+      summary: DAU取得
+      tags:
+      - stats
+
+  /stats/mau:
+    get:
+      x-swagger-router-controller: stats
+      description: Service Monthly Activity User
+      operationId: stats#mau
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsNumber'
+      summary: MAU取得
+      tags:
+      - stats
+
+  /stats/chart/area:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Area Chart Data
+      operationId: stats_chart#area
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(area)
+      tags:
+      - stats
+
+  /stats/chart/arearange:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Arearange Chart Data
+      operationId: stats_chart#arearange
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(areaarange)
+      tags:
+      - stats
+
+  /stats/chart/areaspline:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Areaspline Chart Data
+      operationId: stats_chart#areaspline
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(areaspline)
+      tags:
+      - stats
+
+  /stats/chart/areasplinerange:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Areasplinerange Chart Data
+      operationId: stats_chart#areasplinerange
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(areasplinerange)
+      tags:
+      - stats
+
+  /stats/chart/bar:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Bar Chart Data
+      operationId: stats_chart#bar
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(bar)
+      tags:
+      - stats
+
+  /stats/chart/bellcurve:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Bellcurve Chart Data
+      operationId: stats_chart#bellcurve
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(bellcurve)
+      tags:
+      - stats
+
+  /stats/chart/boxplot:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Boxplot Chart Data
+      operationId: stats_chart#boxplot
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(boxplot)
+      tags:
+      - stats
+
+  /stats/chart/bubble:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Bubble Chart Data
+      operationId: stats_chart#bubble
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(bubble)
+      tags:
+      - stats
+
+  /stats/chart/bullet:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Bullet Chart Data
+      operationId: stats_chart#bullet
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(bullet)
+      tags:
+      - stats
+
+  /stats/chart/column:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Column Chart Data
+      operationId: stats_chart#column
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(column)
+      tags:
+      - stats
+
+  /stats/chart/columnrange:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Columnrange Chart Data
+      operationId: stats_chart#columnrange
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(columnrange)
+      tags:
+      - stats
+
+  /stats/chart/errorbar:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Errorbar Chart Data
+      operationId: stats_chart#errorbar
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(errorbar)
+      tags:
+      - stats
+
+  /stats/chart/funnel:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Funnel Chart Data
+      operationId: stats_chart#funnel
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(funnel)
+      tags:
+      - stats
+
+  /stats/chart/gauge:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Gauge Chart Data
+      operationId: stats_chart#gauge
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(gauge)
+      tags:
+      - stats
+
+  /stats/chart/heatmap:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Heatmap Chart Data
+      operationId: stats_chart#heatmap
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(heatmap)
+      tags:
+      - stats
+
+  /stats/chart/histogram:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Histogram Chart Data
+      operationId: stats_chart#histogram
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(histogram)
+      tags:
+      - stats
+
+  /stats/chart/line:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Line Chart Data
+      operationId: stats_chart#line
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(line)
+      tags:
+      - stats
+
+  /stats/chart/pareto:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Pareto Chart Data
+      operationId: stats_chart#pareto
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(pareto)
+      tags:
+      - stats
+
+  /stats/chart/pie:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Pie Chart Data
+      operationId: stats_chart#pie
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(pie)
+      tags:
+      - stats
+
+  /stats/chart/polygon:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Polygon Chart Data
+      operationId: stats_chart#polygon
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(polygon)
+      tags:
+      - stats
+
+  /stats/chart/pyramid:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Pyramid Chart Data
+      operationId: stats_chart#pyramid
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(pyramid)
+      tags:
+      - stats
+
+  /stats/chart/sankey:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Sankey Chart Data
+      operationId: stats_chart#sankey
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(sankey)
+      tags:
+      - stats
+
+  /stats/chart/scatter:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Scatter Chart Data
+      operationId: stats_chart#scatter
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(scatter)
+      tags:
+      - stats
+
+  /stats/chart/solidGauge:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: SolidGauge Chart Data
+      operationId: stats_chart#solidGauge
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(solidGauge)
+      tags:
+      - stats
+
+  /stats/chart/spline:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Spline Chart Data
+      operationId: stats_chart#spline
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(spline)
+      tags:
+      - stats
+
+  /stats/chart/streamgraph:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Streamgraph Chart Data
+      operationId: stats_chart#streamgraph
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(streamgraph)
+      tags:
+      - stats
+
+  /stats/chart/sunburst:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Sunburst Chart Data
+      operationId: stats_chart#sunburst
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(sunburst)
+      tags:
+      - stats
+
+  /stats/chart/tilemap:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Tilemap Chart Data
+      operationId: stats_chart#tilemap
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(tilemap)
+      tags:
+      - stats
+
+  /stats/chart/variablePie:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: VariablePie Chart Data
+      operationId: stats_chart#variablePie
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(variablePie)
+      tags:
+      - stats
+
+  /stats/chart/variwide:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Variwide Chart Data
+      operationId: stats_chart#variwide
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(variwide)
+      tags:
+      - stats
+
+  /stats/chart/vector:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Vector Chart Data
+      operationId: stats_chart#vector
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(vector)
+      tags:
+      - stats
+
+  /stats/chart/waterfall:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Waterfall Chart Data
+      operationId: stats_chart#waterfall
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(waterfall)
+      tags:
+      - stats
+
+  /stats/chart/windbarb:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Windbarb Chart Data
+      operationId: stats_chart#windbarb
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(windbarb)
+      tags:
+      - stats
+
+  /stats/chart/wordcloud:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Wordcloud Chart Data
+      operationId: stats_chart#wordcloud
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(wordcloud)
+      tags:
+      - stats
+
+  /stats/chart/xrange:
+    get:
+      x-swagger-router-controller: stats_chart
+      description: Xrange Chart Data
+      operationId: stats_chart#xrange
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/StatsChart'
+      summary: chart(xrange)
+      tags:
+      - stats
+
+  /swagger.json:
+    get:
+      x-swagger-router-controller: swagger
+      description: swagger.jsonの取得
+      operationId: swagger#show
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: swagger.json取得
+      tags:
+      - swagger
+
+  /user:
+    get:
+      x-swagger-router-controller: user
+      description: ユーザの一覧
+      operationId: user#list
+      parameters:
+      - description: 名前
+        in: query
+        name: name
+        required: false
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ一覧
+      tags:
+      - user
+
+    post:
+      x-swagger-router-controller: user
+      description: ユーザの作成
+      operationId: user#create
+      parameters:
+      - in: formData
+        name: birthday
+        description: 誕生日
+        format: date-time
+        type: string
+      - in: formData
+        name: blood_type
+        description: 血液型
+        enum:
+        - A
+        - B
+        - O
+        - AB
+        type: string
+      - in: formData
+        name: job
+        description: 職業
+        type: string
+      - in: formData
+        name: name
+        description: 名前
+        type: string
+        required: true
+      - in: formData
+        name: sex
+        description: 性別
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      - in: formData
+        name: image
+        type: file
+        description: サムネイル
+        x-accept: image/*
+      consumes:
+      - multipart/form-data
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ作成
+      tags:
+      - user
+
+  /user/download/csv:
+    get:
+      x-swagger-router-controller: user
+      description: ユーザ一覧をcsvファイルでダウンロード
+      operationId: user#download
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ一覧ダウンロード
+      tags:
+      - user
+
+  /user/upload/csv:
+    post:
+      x-swagger-router-controller: user
+      description: ユーザをcsvファイルでアップロード
+      operationId: user#upload
+      parameters:
+      - in: formData
+        name: image
+        required: true
+        type: file
+      - in: formData
+        name: text
+        type: string
+      consumes:
+      - multipart/form-data
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザアップロード
+      tags:
+      - user
+
+  /user/{id}:
+    delete:
+      x-swagger-router-controller: user
+      description: ユーザの削除
+      operationId: user#remove
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ削除
+      tags:
+      - user
+
+    put:
+      x-swagger-router-controller: user
+      description: ユーザ情報の更新
+      operationId: user#update
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: formData
+        name: birthday
+        description: 誕生日
+        format: date-time
+        type: string
+      - in: formData
+        name: blood_type
+        description: 血液型
+        enum:
+        - A
+        - B
+        - O
+        - AB
+        type: string
+      - in: formData
+        name: job
+        description: 職業
+        type: string
+      - in: formData
+        name: name
+        description: 名前
+        type: string
+        required: true
+      - in: formData
+        name: sex
+        description: 性別
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      - in: formData
+        name: image
+        type: file
+        description: サムネイル
+      consumes:
+      - multipart/form-data
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザ更新
+      tags:
+      - user
+
+  /userblog:
+    get:
+      x-swagger-router-controller: user_blog
+      description: ユーザブログの一覧
+      operationId: user_blog#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: ユーザID
+        in: query
+        name: user_id
+        required: false
+        type: integer
+      - description: ジャンル
+        in: query
+        name: genre
+        required: false
+        type: string
+      - description: タイトル
+        in: query
+        name: title
+        required: false
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserBlogCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザブログ一覧
+      tags:
+      - user_blog
+
+    post:
+      x-swagger-router-controller: user_blog
+      description: ユーザブログの作成
+      operationId: user_blog#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserBlogPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserBlog'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザブログ作成
+      tags:
+      - user_blog
+
+  /userblog/{id}:
+    delete:
+      x-swagger-router-controller: user_blog
+      description: ユーザブログの削除
+      operationId: user_blog#remove
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザブログ削除
+      tags:
+      - user_blog
+
+    put:
+      x-swagger-router-controller: user_blog
+      description: ユーザブログ情報の更新
+      operationId: user_blog#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserBlogPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserBlog'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザブログ更新
+      tags:
+      - user_blog
+
+  /userblogentry:
+    get:
+      x-swagger-router-controller: user_blog_entry
+      description: ユーザブログ記事の一覧
+      operationId: user_blog_entry#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: ユーザブログID
+        in: query
+        name: user_blog_id
+        required: false
+        type: integer
+      - description: タイトル
+        in: query
+        name: title
+        required: false
+        type: string
+      - description: テーマ
+        in: query
+        name: theme
+        required: false
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserBlogEntryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザブログ記事一覧
+      tags:
+      - user_blog_entry
+
+    post:
+      x-swagger-router-controller: user_blog_entry
+      description: ユーザブログ記事の作成
+      operationId: user_blog_entry#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserBlogEntryPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserBlogEntry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザブログ記事作成
+      tags:
+      - user_blog_entry
+
+  /userblogentry/{id}:
+    delete:
+      x-swagger-router-controller: user_blog_entry
+      description: ユーザブログ記事の削除
+      operationId: user_blog_entry#remove
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザブログ記事削除
+      tags:
+      - user_blog_entry
+
+    put:
+      x-swagger-router-controller: user_blog_entry
+      description: ユーザブログ記事情報の更新
+      operationId: user_blog_entry#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserBlogEntryPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserBlogEntry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ユーザブログ記事更新
+      tags:
+      - user_blog_entry
+
+  /userfavorite:
+    get:
+      x-swagger-router-controller: user_favorite
+      description: お気に入りの一覧
+      operationId: user_favorite#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserFavoriteCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: お気に入り一覧
+      tags:
+      - user_favorite
+
+    post:
+      x-swagger-router-controller: user_favorite
+      description: お気に入りの作成
+      operationId: user_favorite#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserFavoriteCreatePayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserFavorite'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: お気に入り作成
+      tags:
+      - user_favorite
+
+  /userfavorite/{user_id}:
+    put:
+      x-swagger-router-controller: user_favorite
+      description: お気に入りの更新
+      operationId: user_favorite#update
+      parameters:
+      - description: ユーザID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserFavoriteUpdatePayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserFavorite'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: お気に入り更新
+      tags:
+      - user_favorite
+
+    delete:
+      x-swagger-router-controller: user_favorite
+      description: お気に入りの削除
+      operationId: user_favorite#remove
+      parameters:
+      - description: user_id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: お気に入り削除
+      tags:
+      - user_favorite
+
+  /validator:
+    get:
+      x-swagger-router-controller: validator
+      description: バリデータの一覧
+      operationId: validator#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ValidatorCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: バリデータ
+      tags:
+      - sample
+
+    post:
+      x-swagger-router-controller: validator
+      description: バリデータの作成
+      operationId: validator#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/Validator'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Validator'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: バリデータ作成
+      tags:
+      - sample
+
+  /validator/{id}:
+    put:
+      x-swagger-router-controller: validator
+      description: バリデータ情報の更新
+      operationId: validator#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/Validator'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Validator'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: バリデータ更新
+      tags:
+      - sample
+
+  /nestedarray:
+    get:
+      x-swagger-router-controller: nested_array
+      description: ネスト配列の一覧
+      operationId: nested_array#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/NestedArrayCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ネスト配列一覧
+      tags:
+      - sample
+
+    post:
+      x-swagger-router-controller: nested_array
+      description: ネスト配列の作成
+      operationId: nested_array#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/NestedArray'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/NestedArray'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ネスト配列作成
+      tags:
+      - sample
+
+  /nestedarray/{id}:
+    put:
+      x-swagger-router-controller: nested_array
+      description: ネスト配列情報の更新
+      operationId: nested_array#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/NestedArray'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/NestedArray'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: ネスト配列更新
+      tags:
+      - sample
+
+  /format:
+    get:
+      x-swagger-router-controller: format
+      description: フォーマットの一覧
+      operationId: format#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FormatCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: フォーマット一覧
+      tags:
+      - sample
+
+    post:
+      x-swagger-router-controller: format
+      description: フォーマットの作成
+      operationId: format#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/Format'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Format'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: フォーマット作成
+      tags:
+      - sample
+
+  /format/{id}:
+    put:
+      x-swagger-router-controller: format
+      description: フォーマット情報の更新
+      operationId: format#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/Format'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Format'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: フォーマット更新
+      tags:
+      - sample
+
+  /default:
+    get:
+      x-swagger-router-controller: default
+      description: デフォルト 一覧
+      operationId: default#list
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DefaultFormCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: デフォルト 一覧
+      tags:
+      - sample
+
+    post:
+      x-swagger-router-controller: default
+      description: デフォルト 作成
+      operationId: default#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/DefaultForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DefaultForm'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: デフォルト 作成
+      tags:
+      - sample
+
+  /default/{id}:
+    put:
+      x-swagger-router-controller: default
+      description: デフォルト 更新
+      operationId: default#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/DefaultForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/DefaultForm'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: デフォルト 更新
+      tags:
+      - sample
+
+  /multiquery/a:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索A
+      operationId: multiquery#a
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: name of multiquery
+        in: query
+        name: name
+        required: false
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - sample
+
+  /multiquery/b:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索B
+      operationId: multiquery#b
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: name of multiquery
+        in: query
+        name: name
+        required: false
+        type: string
+      - description: age of multiquery
+        in: query
+        name: age
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - sample
+
+  /multiquery/c:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索C
+      operationId: multiquery#c
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: age of multiquery
+        in: query
+        name: age
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - sample
+
+  /multiquery/d:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索D
+      operationId: multiquery#d
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: address of multiquery
+        in: query
+        name: address
+        required: false
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - sample
+
+  /multiquery/e:
+    get:
+      x-swagger-router-controller: multiquery
+      description: 横断検索E
+      operationId: multiquery#e
+      parameters:
+      - description: number of items per page
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: offset number of page
+        in: query
+        name: offset
+        required: false
+        type: integer
+      - description: id of multiquery
+        in: query
+        name: id
+        required: false
+        type: string
+      - description: job of multiquery
+        in: query
+        name: job
+        required: false
+        type: string
+      - description: name of multiquery
+        in: query
+        name: name
+        required: false
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/MultiQueryCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - sample
+
+  /formdata/string:
+    get:
+      x-swagger-router-controller: formdata
+      description: フォームデータ
+      operationId: formdata#string#show
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+      security:
+      - jwt:
+        - api:access
+      summary: フォームデータ
+      tags:
+      - sample
+    post:
+      x-swagger-router-controller: formdata
+      description: フォームデータ
+      operationId: formdata#string#create
+      parameters:
+      - in: formData
+        name: form
+        required: true
+        type: array
+        items:
+          type: string
+      consumes:
+      - multipart/form-data
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+      security:
+      - jwt:
+        - api:access
+      summary: フォーム作成
+      tags:
+      - sample
+
+  /formdata/number:
+    get:
+      x-swagger-router-controller: formdata
+      description: フォームデータ
+      operationId: formdata#number#show
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: number
+      security:
+      - jwt:
+        - api:access
+      summary: フォームデータ
+      tags:
+      - sample
+    post:
+      x-swagger-router-controller: formdata
+      description: フォームデータ
+      operationId: formdata#number#create
+      parameters:
+      - in: formData
+        name: form
+        required: true
+        type: array
+        items:
+          type: number
+      consumes:
+      - multipart/form-data
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: number
+      security:
+      - jwt:
+        - api:access
+      summary: フォーム作成
+      tags:
+      - sample
+
+  /formdata/boolean:
+    get:
+      x-swagger-router-controller: formdata
+      description: フォームデータ
+      operationId: formdata#boolean#show
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: boolean
+      security:
+      - jwt:
+        - api:access
+      summary: フォームデータ
+      tags:
+      - sample
+
+    post:
+      x-swagger-router-controller: formdata
+      description: フォームデータ
+      operationId: formdata#boolean#create
+      parameters:
+      - in: formData
+        name: form
+        required: true
+        type: array
+        items:
+          type: boolean
+      consumes:
+      - multipart/form-data
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: boolean
+      security:
+      - jwt:
+        - api:access
+      summary: フォーム作成
+      tags:
+      - sample
+
+  /viron_autocomplete:
+    get:
+      x-swagger-router-controller: viron_autocomplete
+      description: オートコンプリート
+      operationId: viron_autocomplete#list
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 横断検索
+      tags:
+      - sample
+
+  /account:
+    get:
+      x-swagger-router-controller: viron_account
+      description: アカウント情報取得
+      operationId: account#list
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUserCollection'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: アカウント設定
+      tags:
+      - account
+
+  /account/{id}:
+    put:
+      x-swagger-router-controller: viron_account
+      description: アカウント情報の更新
+      operationId: account#update
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAccountPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AdminUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: アカウント情報の更新
+      tags:
+      - account
+
+#################################################
+# tags
+#################################################
+tags:
+  - name: viron
+  - name: swagger
+  - name: auth
+  - name: admin_role
+  - name: admin_user
+  - name: audit_log
+  - name: account
+  - name: user
+  - name: user_blog
+  - name: user_blog_entry
+  - name: user_favorite
+  - name: blog_design
+  - name: stats
+  - name: sample
+  - name: system
+
+#################################################
+# securityDefinitions
+# - API全体で利用できる認証スキーム
+#################################################
+securityDefinitions:
+  jwt:
+    type: oauth2
+    authorizationUrl: https://localhost:3000/signin
+    flow: implicit
+    scopes:
+      api:access: API access
+
+#################################################
+# produces
+# - APIが提供するMIMEタイプの一覧
+#################################################
+produces:
+  - application/json
+  - text/plain
+
+#################################################
+# consumes
+# - APIが受け付けるMIMEタイプの一覧
+#################################################
+consumes:
+  - application/json
+  - text/plain

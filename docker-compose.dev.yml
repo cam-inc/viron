@@ -26,8 +26,8 @@ services:
     command: npm run start
 
   api:
-    build: ./example-node
-    working_dir: /example-node
+    build: ./demo
+    working_dir: /demo
     depends_on:
       - mysql
     ports:
@@ -38,15 +38,15 @@ services:
       - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
       - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
     volumes:
-      - ./example-node/package.json:/example-node/package.json
-      - ./example-node/shared:/example-node/shared
-      - ./example-node/config:/example-node/config
-      - ./example-node/app.js:/example-node/app.js
-      - ./example-node/controllers:/example-node/controllers
-      - ./example-node/fittings:/example-node/fittings
-      - ./example-node/swagger:/example-node/swagger
-      - ./example-node/test:/example-node/test
-      - ./example-node/.env.template:/example-node/.env
+      - ./demo/package.json:/demo/package.json
+      - ./demo/shared:/demo/shared
+      - ./demo/config:/demo/config
+      - ./demo/app.js:/demo/app.js
+      - ./demo/controllers:/demo/controllers
+      - ./demo/fittings:/demo/fittings
+      - ./demo/swagger:/demo/swagger
+      - ./demo/test:/demo/test
+      - ./demo/.env.template:/demo/.env
     command: npm run debug
 
   mysql:
@@ -56,7 +56,7 @@ services:
     volumes:
       - $PWD/.docker/mysql/data:/var/lib/mysql
     env_file:
-        - ./mysql.env
+      - ./mysql.env
     command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
     networks:
       default:
