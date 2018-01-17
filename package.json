@@ -1,6 +1,6 @@
 {
   "name": "viron",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Design-based Management Console.",
   "main": "index.js",
   "repository": {
@@ -53,9 +53,9 @@
     "lint:css": "stylelint src/css/**/*.css",
     "spec": "mocha",
     "deploy:beta": "node task/deploy.js -b",
-    "deploy:prd": "node task/deploy.js",
+    "deploy:latest": "node task/deploy.js",
     "release:beta": "run-s build deploy:beta",
-    "release:prd": "run-s build deploy:prd",
+    "release:latest": "run-s build deploy:latest",
     "ncu": "ncu"
   },
   "dependencies": {
