@@ -17,7 +17,7 @@ definitions:
       paths:
         $ref: '#/definitions/AdminRolePath'
       role_id:
-        description: ユーザ権限ID
+        description: ユーザー権限ID
         type: string
     required:
     - role_id
@@ -43,7 +43,7 @@ definitions:
         format: int64
         type: integer
       role_id:
-        description: ユーザ権限ID
+        description: ユーザー権限ID
         type: string
     required:
     - id
@@ -85,7 +85,7 @@ definitions:
         description: ステータスコード
         type: integer
       user_id:
-        description: ユーザ
+        description: ユーザー
         type: string
     type: object
 
@@ -134,7 +134,7 @@ definitions:
       paths:
         $ref: '#/definitions/AdminRolePath'
       role_id:
-        description: role id
+        description: ユーザー権限ID
         type: string
     type: object
     required:
@@ -154,7 +154,7 @@ definitions:
         description: パスワード
         type: string
       role_id:
-        description: ユーザ権限ID
+        description: ユーザー権限ID
         type: string
         x-autogen-enum:
           model: admin_roles
@@ -241,7 +241,7 @@ definitions:
         description: パスワード
         type: string
       role_id:
-        description: ユーザ権限ID
+        description: ユーザー権限ID
         type: string
         x-autogen-enum:
           model: admin_roles
@@ -294,27 +294,27 @@ definitions:
       api:
         properties:
           method:
-            description: Access paths[path][method] of swagger.json
+            description: リクエストメソッド
             type: string
           path:
-            description: Access paths[path] of swagger.json
+            description: リクエストパス
             type: string
         required:
         - path
         - method
         type: object
       name:
-        description: Title of page
+        description: ページタイトル
         type: string
       options:
-        description: style options
+        description: オプション
         items:
           properties:
             key:
-              description: Key
+              description: オプション キー名
               type: string
             value:
-              description: Value
+              description: オプション 値
               type: string
           required:
           - key
@@ -322,18 +322,18 @@ definitions:
           type: object
         type: array
       pagination:
-        description: allow pagination
+        description: ページネーション
         type: boolean
       query:
-        description: query for request
+        description: クエリパラメータ
         items:
           properties:
             key:
-              description: Key
+              description: クエリパラメータ キー名
               type: string
             type:
               default: string
-              description: Type
+              description: クエリパラメータ 型
               enum:
               - string
               - integer
@@ -349,6 +349,7 @@ definitions:
           type: object
         type: array
       style:
+        description: コンポーネントスタイル
         default: number
         enum:
         - number
@@ -357,7 +358,7 @@ definitions:
         - chart
         type: string
       table_labels:
-        description: keys of table row
+        description: テーブル列 表示順
         items:
           type: string
         type: array
@@ -430,6 +431,7 @@ definitions:
         description: 名称
         type: string
       section:
+        description: セクション名
         default: manage
         enum:
         - manage
@@ -540,7 +542,7 @@ paths:
   /:
     get:
       x-swagger-router-controller: root
-      description: get root
+      description: ルート取得
       operationId: root#show
       responses:
         "301":
@@ -552,7 +554,7 @@ paths:
   /adminrole:
     get:
       x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の一覧
+      description: ユーザー権限一覧
       operationId: admin_role#list
       responses:
         "200":
@@ -566,13 +568,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ権限一覧
+      summary: ユーザー権限一覧
       tags:
       - admin_role
 
     post:
       x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の作成
+      description: ユーザー権限作成
       operationId: admin_role#create
       parameters:
       - in: body
@@ -596,17 +598,17 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ権限作成
+      summary: ユーザー権限作成
       tags:
       - admin_role
 
   /adminrole/{role_id}:
     delete:
       x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の削除
+      description: ユーザー権限削除
       operationId: admin_role#remove
       parameters:
-      - description: role id
+      - description: ユーザー権限ID
         in: path
         name: role_id
         required: true
@@ -629,16 +631,16 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ権限削除
+      summary: ユーザー権限削除
       tags:
       - admin_role
 
     put:
       x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の更新
+      description: ユーザー権限更新
       operationId: admin_role#update
       parameters:
-      - description: role id
+      - description: ユーザー権限ID
         in: path
         name: role_id
         required: true
@@ -668,14 +670,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ権限更新
+      summary: ユーザー権限更新
       tags:
       - admin_role
 
   /adminuser:
     get:
       x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザの一覧
+      description: 管理ユーザー一覧
       operationId: admin_user#list
       responses:
         "200":
@@ -689,13 +691,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: 管理ユーザ一覧
+      summary: 管理ユーザー一覧
       tags:
       - admin_user
 
     post:
       x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザの作成
+      description: 管理ユーザー作成
       operationId: admin_user#create
       parameters:
       - in: body
@@ -723,17 +725,17 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: 管理ユーザ作成
+      summary: 管理ユーザー作成
       tags:
       - admin_user
 
   /adminuser/{id}:
     delete:
       x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザの削除
+      description: 管理ユーザー削除
       operationId: admin_user#remove
       parameters:
-      - description: id
+      - description: 管理ユーザーID
         in: path
         name: id
         required: true
@@ -756,16 +758,16 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: 管理ユーザ削除
+      summary: 管理ユーザー削除
       tags:
       - admin_user
 
     put:
       x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザ情報の更新
+      description: 管理ユーザー情報更新
       operationId: admin_user#update
       parameters:
-      - description: id
+      - description: 管理ユーザーID
         in: path
         name: id
         required: true
@@ -795,22 +797,22 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: 管理ユーザ更新
+      summary: 管理ユーザー更新
       tags:
       - admin_user
 
   /auditlog:
     get:
       x-swagger-router-controller: viron_audit_log
-      description: get admin roles
+      description: 監査ログ一覧
       operationId: audit_log#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
@@ -825,7 +827,7 @@ paths:
         - POST
         - PUT
         - DELETE
-      - description: ユーザ
+      - description: ユーザー
         in: query
         name: user_id
         required: false
@@ -869,7 +871,7 @@ paths:
   /viron:
     get:
       x-swagger-router-controller: viron
-      description: viron settings
+      description: エンドポイント全体情報取得
       operationId: viron#show
       responses:
         "200":
@@ -879,14 +881,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: エンドポイント全体情報 取得
+      summary: エンドポイント全体情報取得
       tags:
       - viron
 
   /viron_authtype:
     get:
       x-swagger-router-controller: viron_authtype
-      description: get auth types
+      description: 認証方式一覧
       operationId: auth_type#list
       responses:
         "200":
@@ -900,15 +902,15 @@ paths:
   /googleoauth2callback:
     get:
       x-swagger-router-controller: viron_auth
-      description: callback function from google oauth2
+      description: GoogleOAuth2コールバックパス
       operationId: viron_auth#googleoauth2callback
       parameters:
-      - description: authorization code
+      - description: 認証コード
         in: query
         name: code
         required: false
         type: string
-      - description: check state for CSRF
+      - description: ステータスチェック
         in: query
         name: state
         required: false
@@ -935,10 +937,10 @@ paths:
   /googlesignin:
     get:
       x-swagger-router-controller: viron_auth
-      description: signin with google
+      description: GoogleOAuth2認証
       operationId: viron_auth#googlesignin
       parameters:
-      - description: redirect url
+      - description: リダイレクトURL
         in: query
         name: redirect_url
         required: false
@@ -960,7 +962,7 @@ paths:
   /signout:
     post:
       x-swagger-router-controller: viron_auth
-      description: signout
+      description: サインアウト
       operationId: viron_auth#signout
       responses:
         "204":
@@ -972,7 +974,7 @@ paths:
   /swagger.json:
     get:
       x-swagger-router-controller: swagger
-      description: swagger.jsonの取得
+      description: swagger.json取得
       operationId: swagger#show
       responses:
         "200":
@@ -1014,10 +1016,10 @@ paths:
   /account/{id}:
     put:
       x-swagger-router-controller: viron_account
-      description: アカウント情報の更新
+      description: アカウント情報更新
       operationId: account#update
       parameters:
-      - description: id
+      - description: 管理ユーザーID
         in: path
         name: id
         required: true
@@ -1047,7 +1049,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: アカウント情報の更新
+      summary: アカウント情報 更新
       tags:
       - account
 
@@ -1096,7 +1098,7 @@ paths:
   /user:
     get:
       x-swagger-router-controller: user
-      description: ユーザの一覧
+      description: ユーザー一覧
       operationId: user#list
       parameters:
       - description: 名前
@@ -1124,13 +1126,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ一覧
+      summary: ユーザー一覧
       tags:
       - user
 
     post:
       x-swagger-router-controller: user
-      description: ユーザの作成
+      description: ユーザー作成
       operationId: user#create
       parameters:
       - in: formData
@@ -1191,17 +1193,17 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ作成
+      summary: ユーザー作成
       tags:
       - user
 
   /user/{id}:
     delete:
       x-swagger-router-controller: user
-      description: ユーザの削除
+      description: ユーザー削除
       operationId: user#remove
       parameters:
-      - description: id
+      - description: ユーザーID
         in: path
         name: id
         required: true
@@ -1224,16 +1226,16 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ削除
+      summary: ユーザー削除
       tags:
       - user
 
     put:
       x-swagger-router-controller: user
-      description: ユーザ情報の更新
+      description: ユーザー情報更新
       operationId: user#update
       parameters:
-      - description: ID
+      - description: ユーザーID
         in: path
         name: id
         required: true
@@ -1295,7 +1297,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ更新
+      summary: ユーザー更新
       tags:
       - user
 
