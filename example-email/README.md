@@ -1,5 +1,8 @@
 # example-email
 
+An Example for Viron API Server.  
+This project most simply start to development.
+
 # QuickStart
 
 ## Requirements
@@ -18,10 +21,12 @@ $ npm run dressup
 
 ## Add to Viron
 
-1. [Viron(v1)](https://cam-inc.github.io/viron/v1) を開く
+1. [Viron](https://cam-inc.github.io/viron/latest) を開く
 1. 管理画面の追加フォームに [https://localhost:3000/swagger.json](https://localhost:3000/swagger.json) を入力
 
-> 初回アクセス時はSSL自己証明書の警告が出るため、別タブでアクセスし警告を無視しておく必要がある。
+  > 初回アクセス時はSSL自己証明書の警告が出るため、別タブでアクセスし警告を無視しておく必要がある。
+
+1. ログインフォームでID/Passwordの入力を求められるが、1人目のユーザーは自由なID/Passwordでログインできる
 
 # Structure
 
