@@ -1,23 +1,17 @@
 .Jsonviewer {
-  & > &__item {
-    display: block;
-  }
-
   &__item {
     padding-left: 20px;
     margin-top: 10px;
     user-select: none;
+    background: lightslategray;
 
-    &--collapsible {
+    &--colasable {
       position: relative;
-      display: inline;
-      overflow: hidden;
-      cursor: pointer;
 
       &::before {
         position: absolute;
         left: 5px;
-        color: black;
+        color: palevioletred;
         content: "+";
       }
     }
@@ -26,13 +20,24 @@
   &__objects {
     padding-left: 20px;
     margin-top: 10px;
-    user-select: none;
+    background: lightsteelblue;
 
-    &::before {
-      position: absolute;
-      left: 5px;
-      color: black;
-      content: "+";
+    &--colasable {
+      &::before {
+        position: absolute;
+        left: 26px;
+        color: olivedrab;
+        content: "+";
+      }
+    }
+
+    &--discolasable {
+      &::before {
+        position: absolute;
+        left: 26px;
+        color: red;
+        content: "+";
+      }
     }
   }
 }

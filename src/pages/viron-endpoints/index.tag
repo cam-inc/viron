@@ -1,11 +1,11 @@
 viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
+  viron-jsonviewer(if="{ data }" data="{ data }" hasOepnedItems="{ false }")
   .EndpointsPage__head
     .EndpointsPage__title ホーム
     .EndpointsPage__orderButton(if="{ isDesktop }" class="{ 'EndpointsPage__orderButton--active': isDraggable }" onTap="{ handleOrderButtonTap }")
       viron-icon-move
   .EndpointsPage__container
-    viron-jsonviewer(if="{ data }" data="{ data }" hasOepnedItems="{ false }")
-    //- viron-endpoints-page-endpoint(each="{ endpoint in endpoints }" endpoint="{ endpoint }" isDraggable="{ parent.isDraggable }")
+    viron-endpoints-page-endpoint(each="{ endpoint in endpoints }" endpoint="{ endpoint }" isDraggable="{ parent.isDraggable }")
 
   script.
     import '../../components/icons/viron-icon-move/index.tag';

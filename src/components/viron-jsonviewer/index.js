@@ -4,12 +4,14 @@ import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import isFunction from 'mout/lang/isFunction';
 import isString from 'mout/lang/isString';
+import isEmpty from 'mout/lang/isEmpty';
 import forEach from 'mout/array/forEach';
 
 export default function() {
+  // 第一階層かどうか
+  let isRoot = true;
 
   const createJson = obj => {
-
     // undefinedの場合
     if (isUndefined(obj)) {
       return 'undefined';
@@ -32,45 +34,47 @@ export default function() {
 
     // 配列の場合
     if (isArray(obj)) {
-
       const items = [];
-      if (obj.length) {
-        forEach(obj, item => {
-          // 再帰処理
-          items.push(createJson(item));
-        });
+      // 空の場合
+      if (!obj.length) {
+        return `[${items}]`;
       }
+      forEach(obj, item => {
+        // 再帰処理
+        items.push(createJson(item));
+      });
       return `[${items}]`;
     }
 
     // オブジェクトの場合
     if (isObject(obj)) {
       const keys = Object.keys(obj);
-
-      // オブジェクトが空の場合
+      // 空の場合
       if (!keys.length) {
         return '{}';
       }
-
-      let items = '';
       // TODO: moutで書き直す
+      let items = '';
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         if (key || !isUndefined(obj[key])|| !isFunction(key) || !isFunction(obj[key])) {
           const isLast = (i === keys.length -1);
           const comma = !isLast ? ',' : '';
-          const collapsible = isArray(obj[key]) ? 'Jsonviewer__item--collapsible' : '';
-          items += `<div class="Jsonviewer__item ${collapsible}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
+          const colasable = isArray(obj[key]) ? '--colasable' : '';
+          items += `<div class="Jsonviewer__item Jsonviewer__item${colasable}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
         }
       }
-      return `<div class="Jsonviewer__objects">{${items}}</div>`;
+      const colasable = isRoot ? `--discolasable` : `--colasable`;
+      isRoot = false;
+      console.log("KOJIMATION -> " + colasable);
+      return `<div class="Jsonviewer__objects Jsonviewer__objects${colasable}">{${items}}</div>`;
     }
-
-    // Number, Boolean
+    // その他の場合 eg. Boolean, Number
     return obj;
   };
 
   this.on('mount', () => {
+    isRoot = true;
     const obj = this.opts.data;
     this.refs.target.innerHTML = createJson(obj);
   });
