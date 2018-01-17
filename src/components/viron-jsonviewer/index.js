@@ -4,14 +4,11 @@ import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import isFunction from 'mout/lang/isFunction';
 import isString from 'mout/lang/isString';
-import isEmpty from 'mout/lang/isEmpty';
 import forEach from 'mout/array/forEach';
 
 export default function() {
-  // 第一階層かどうか
-  let isRoot = true;
+  const createJson = (obj, opts = {}) => {
 
-  const createJson = obj => {
     // undefinedの場合
     if (isUndefined(obj)) {
       return 'undefined';
@@ -64,18 +61,17 @@ export default function() {
           items += `<div class="Jsonviewer__item Jsonviewer__item${colasable}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
         }
       }
-      const colasable = isRoot ? `--discolasable` : `--colasable`;
-      isRoot = false;
-      console.log("KOJIMATION -> " + colasable);
-      return `<div class="Jsonviewer__objects Jsonviewer__objects${colasable}">{${items}}</div>`;
+
+      return `<div class="Jsonviewer__objects ${opts.isRoot ? 'Jsonviewer__objects--discolasable': ''} Jsonviewer__objects--colasable">{${items}}</div>`;
     }
     // その他の場合 eg. Boolean, Number
     return obj;
   };
 
   this.on('mount', () => {
-    isRoot = true;
     const obj = this.opts.data;
-    this.refs.target.innerHTML = createJson(obj);
+    this.refs.target.innerHTML = createJson(obj, {
+      isRoot: true
+    });
   });
 }

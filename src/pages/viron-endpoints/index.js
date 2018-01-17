@@ -6,17 +6,17 @@ export default function() {
       {
         a: [
           {
-            undefined: "aaa"
+            undefined: 'aaa'
           }
         ],
         b: [
           {
-            null: "aaa"
+            null: 'aaa'
           }
         ],
         c: [
           {
-            a1: "aaa"
+            a1: 'aaa'
           }
         ],
         d: []
