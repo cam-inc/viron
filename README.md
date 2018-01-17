@@ -7,7 +7,7 @@ Automatically generate a management console based on swagger data.
 
 # Site
 
-> access : [Viron(v1)](https://cam-inc.github.io/viron/v1)
+> access : [Viron](https://cam-inc.github.io/viron/latest)
 
 # QuickStart
 
