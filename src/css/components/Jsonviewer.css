@@ -15,6 +15,17 @@
         content: "-";
       }
     }
+
+    &--foldable {
+      position: relative;
+
+      &::before {
+        position: absolute;
+        left: 5px;
+        color: palevioletred;
+        content: "+";
+      }
+    }
   }
 
   &__objects {
