@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:9
 
 RUN mkdir -p /example-email
 RUN chown -R node:node /example-email

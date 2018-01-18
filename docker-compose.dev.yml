@@ -49,7 +49,7 @@ services:
       - ./demo/swagger:/demo/swagger
       - ./demo/test:/demo/test
       - ./demo/.env.template:/demo/.env
-    command: npm run debug
+    command: npm run inspect
 
   mysql:
     image: mysql:5.6

@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:9
 
 RUN mkdir -p /demo
 RUN chown -R node:node /demo
