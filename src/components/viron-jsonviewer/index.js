@@ -57,12 +57,12 @@ export default function() {
         if (key || !isUndefined(obj[key])|| !isFunction(key) || !isFunction(obj[key])) {
           const isLast = (i === keys.length -1);
           const comma = !isLast ? ',' : '';
-          const colasable = isArray(obj[key]) ? '--colasable' : '';
-          items += `<div class="Jsonviewer__item Jsonviewer__item${colasable}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
+          const unfoldable = isArray(obj[key]) ? '--unfoldable' : '';
+          items += `<div class="Jsonviewer__item Jsonviewer__item${unfoldable}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
         }
       }
 
-      return `<div class="Jsonviewer__objects ${opts.isRoot ? 'Jsonviewer__objects--discolasable': ''} Jsonviewer__objects--colasable">{${items}}</div>`;
+      return `<div class="Jsonviewer__objects ${opts.isRoot ? 'Jsonviewer__objects--rootable': 'Jsonviewer__objects--unfoldable'}">{${items}}</div>`;
     }
     // その他の場合 eg. Boolean, Number
     return obj;

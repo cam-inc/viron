@@ -5,7 +5,7 @@
     user-select: none;
     background: lightslategray;
 
-    &--colasable {
+    &--unfoldable {
       position: relative;
 
       &::before {
@@ -22,7 +22,7 @@
     margin-top: 10px;
     background: lightsteelblue;
 
-    &--colasable {
+    &--foldable {
       &::before {
         position: absolute;
         left: 26px;
@@ -31,10 +31,27 @@
       }
     }
 
-    &--discolasable {
+    &--unfoldable {
+      &::before {
+        position: absolute;
+        left: 26px;
+        color: olivedrab;
+        content: "-";
+      }
+    }
+
+    &--rootable {
       &::before {
         content: none;
       }
     }
   }
+
+  /* &__toggle {
+    display: none;
+
+    &:checked ~ .Jsonviewer__objects {
+      display: block;
+    }
+  } */
 }
