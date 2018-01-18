@@ -25,7 +25,7 @@ services:
       - $PWD/swagger:/demo/swagger
       - $PWD/test:/demo/test
       - $PWD/.env:/demo/.env
-    command: npm run debug
+    command: npm run inspect
     #command: tail -f /var/log/bootstrap.log
 
   mysql:

@@ -41,7 +41,7 @@ definitions:
       paths:
         $ref: '#/definitions/AdminRolePath'
       role_id:
-        description: ユーザ権限ID
+        description: ユーザー権限ID
         type: string
     required:
     - role_id
@@ -67,7 +67,7 @@ definitions:
         format: int64
         type: integer
       role_id:
-        description: ユーザ権限ID
+        description: ユーザー権限ID
         type: string
     required:
     - id
@@ -109,7 +109,7 @@ definitions:
         description: ステータスコード
         type: integer
       user_id:
-        description: ユーザ
+        description: ユーザー
         type: string
     type: object
 
@@ -220,7 +220,7 @@ definitions:
       paths:
         $ref: '#/definitions/AdminRolePath'
       role_id:
-        description: role id
+        description: ユーザー権限ID
         type: string
     type: object
     required:
@@ -240,7 +240,7 @@ definitions:
         description: パスワード
         type: string
       role_id:
-        description: ユーザ権限ID
+        description: ユーザー権限ID
         type: string
         x-autogen-enum:
           model: admin_roles
@@ -368,7 +368,7 @@ definitions:
         description: パスワード
         type: string
       role_id:
-        description: ユーザ権限ID
+        description: ユーザー権限ID
         type: string
         x-autogen-enum:
           model: admin_roles
@@ -718,27 +718,27 @@ definitions:
       api:
         properties:
           method:
-            description: Access paths[path][method] of swagger.json
+            description: リクエストメソッド
             type: string
           path:
-            description: Access paths[path] of swagger.json
+            description: リクエストパス
             type: string
         required:
         - path
         - method
         type: object
       name:
-        description: Title of page
+        description: ページタイトル
         type: string
       options:
-        description: style options
+        description: オプション
         items:
           properties:
             key:
-              description: Key
+              description: オプション キー名
               type: string
             value:
-              description: Value
+              description: オプション 値
               type: string
           required:
           - key
@@ -746,18 +746,18 @@ definitions:
           type: object
         type: array
       pagination:
-        description: allow pagination
+        description: ページネーション
         type: boolean
       query:
-        description: query for request
+        description: クエリパラメータ
         items:
           properties:
             key:
-              description: Key
+              description: クエリパラメータ キー名
               type: string
             type:
               default: string
-              description: Type
+              description: クエリパラメータ 型
               enum:
               - string
               - integer
@@ -773,6 +773,7 @@ definitions:
           type: object
         type: array
       style:
+        description: コンポーネントスタイル
         default: number
         enum:
         - number
@@ -781,7 +782,7 @@ definitions:
         - chart
         type: string
       table_labels:
-        description: keys of table row
+        description: テーブル列 表示順
         items:
           type: string
         type: array
@@ -854,6 +855,7 @@ definitions:
         description: 名称
         type: string
       section:
+        description: セクション名
         default: manage
         enum:
         - manage
@@ -876,7 +878,7 @@ definitions:
     type: object
     properties:
       id:
-        description: id of validator
+        description: validator ID
         example: 1
         type: number
       validation_type:
@@ -1027,7 +1029,7 @@ definitions:
     type: object
     properties:
       id:
-        description: id of nested array
+        description: nested array ID
         example: 1
         type: number
       values:
@@ -1065,7 +1067,7 @@ definitions:
     type: object
     properties:
       id:
-        description: id of format
+        description: format ID
         example: 1
         type: number
       date_time:
@@ -1187,27 +1189,27 @@ definitions:
     type: object
     properties:
       id:
-        description: id of multiquery
+        description: multiquery ID
         example: m1
         type: string
       name:
-        description: name of multiquery
+        description: 名前
         example: m-name
         type: string
       age:
-        description: age of multiquery
+        description: 年齢
         example: 22
         type: integer
       address:
-        description: address of multiquery
+        description: 住所
         example: 'shibuya-ku dogenzaka'
         type: string
       job:
-        description: job of multiquery
+        description: 職業
         example: 学生
         type: string
       detail:
-        description: detail of multiquery
+        description: 詳細
         example: 詳細詳細詳細詳細
         type: string
 
@@ -1223,21 +1225,21 @@ definitions:
     - arr
     properties:
       id:
-        description: id of default
+        description: default ID
         example: d1
         type: string
       str:
-        description: string
+        description: 文字列
         example: strrrrr
         type: string
         default: default-str
       bool:
-        description: boolean
+        description: ブール値
         example: true
         type: boolean
         default: true
       num:
-        description: number
+        description: 数値
         example: 99
         type: number
         default: 10
@@ -1248,17 +1250,17 @@ definitions:
           type: object
           properties:
             str:
-              description: string
+              description: 文字列
               example: strrrrr
               type: string
               default: default-arr-str
             bool:
-              description: boolean
+              description: ブール値
               example: true
               type: boolean
               default: false
             num:
-              description: number
+              description: 数値
               example: 99
               type: number
               default: 100
@@ -1266,17 +1268,17 @@ definitions:
         type: object
         properties:
           str:
-            description: string
+            description: 文字列
             example: strrrrr
             type: string
             default: default-obj-str
           bool:
-            description: boolean
+            description: ブール値
             example: true
             type: boolean
             default: true
           num:
-            description: number
+            description: 数値
             example: 99
             type: number
             default: 1000
@@ -1289,7 +1291,7 @@ paths:
   /:
     get:
       x-swagger-router-controller: root
-      description: get root
+      description: ルート取得
       operationId: root#show
       responses:
         "301":
@@ -1301,7 +1303,7 @@ paths:
   /adminrole:
     get:
       x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の一覧
+      description: ユーザー権限一覧
       operationId: admin_role#list
       responses:
         "200":
@@ -1315,13 +1317,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ権限一覧
+      summary: ユーザー権限一覧
       tags:
       - admin_role
 
     post:
       x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の作成
+      description: ユーザー権限作成
       operationId: admin_role#create
       parameters:
       - in: body
@@ -1345,17 +1347,17 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ権限作成
+      summary: ユーザー権限作成
       tags:
       - admin_role
 
   /adminrole/{role_id}:
     delete:
       x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の削除
+      description: ユーザー権限削除
       operationId: admin_role#remove
       parameters:
-      - description: role id
+      - description: ユーザー権限ID
         in: path
         name: role_id
         required: true
@@ -1378,16 +1380,16 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ権限削除
+      summary: ユーザー権限削除
       tags:
       - admin_role
 
     put:
       x-swagger-router-controller: viron_admin_role
-      description: ユーザ権限の更新
+      description: ユーザー権限更新
       operationId: admin_role#update
       parameters:
-      - description: role id
+      - description: ユーザー権限ID
         in: path
         name: role_id
         required: true
@@ -1417,14 +1419,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ権限更新
+      summary: ユーザー権限更新
       tags:
       - admin_role
 
   /adminuser:
     get:
       x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザの一覧
+      description: 管理ユーザー一覧
       operationId: admin_user#list
       responses:
         "200":
@@ -1438,13 +1440,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: 管理ユーザ一覧
+      summary: 管理ユーザー一覧
       tags:
       - admin_user
 
     post:
       x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザの作成
+      description: 管理ユーザー作成
       operationId: admin_user#create
       parameters:
       - in: body
@@ -1472,17 +1474,17 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: 管理ユーザ作成
+      summary: 管理ユーザー作成
       tags:
       - admin_user
 
   /adminuser/{id}:
     delete:
       x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザの削除
+      description: 管理ユーザー削除
       operationId: admin_user#remove
       parameters:
-      - description: id
+      - description: 管理ユーザーID
         in: path
         name: id
         required: true
@@ -1505,16 +1507,16 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: 管理ユーザ削除
+      summary: 管理ユーザー削除
       tags:
       - admin_user
 
     put:
       x-swagger-router-controller: viron_admin_user
-      description: 管理ユーザ情報の更新
+      description: 管理ユーザー情報更新
       operationId: admin_user#update
       parameters:
-      - description: id
+      - description: 管理ユーザーID
         in: path
         name: id
         required: true
@@ -1544,22 +1546,22 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: 管理ユーザ更新
+      summary: 管理ユーザー更新
       tags:
       - admin_user
 
   /auditlog:
     get:
       x-swagger-router-controller: viron_audit_log
-      description: 監査ログの一覧
+      description: 監査ログ一覧
       operationId: audit_log#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
@@ -1574,7 +1576,7 @@ paths:
         - POST
         - PUT
         - DELETE
-      - description: ユーザ
+      - description: ユーザー
         in: query
         name: user_id
         required: false
@@ -1618,15 +1620,15 @@ paths:
   /blogdesign:
     get:
       x-swagger-router-controller: blog_design
-      description: ブログデザインの一覧
+      description: ブログデザイン一覧
       operationId: blog_design#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
@@ -1667,7 +1669,7 @@ paths:
 
     post:
       x-swagger-router-controller: blog_design
-      description: ブログデザインの作成
+      description: ブログデザイン作成
       operationId: blog_design#create
       parameters:
       - in: body
@@ -1702,10 +1704,10 @@ paths:
   /blogdesign/{id}:
     delete:
       x-swagger-router-controller: blog_design
-      description: ブログデザインの削除
+      description: ブログデザイン削除
       operationId: blog_design#remove
       parameters:
-      - description: id
+      - description: ブログデザインID
         in: path
         name: id
         required: true
@@ -1734,10 +1736,10 @@ paths:
 
     put:
       x-swagger-router-controller: blog_design
-      description: ブログデザイン情報の更新
+      description: ブログデザイン情報更新
       operationId: blog_design#update
       parameters:
-      - description: id
+      - description: ブログデザインID
         in: path
         name: id
         required: true
@@ -1774,7 +1776,7 @@ paths:
   /viron:
     get:
       x-swagger-router-controller: viron
-      description: viron settings
+      description: エンドポイント全体情報取得
       operationId: viron#show
       responses:
         "200":
@@ -1784,14 +1786,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: エンドポイント全体情報 取得
+      summary: エンドポイント全体情報取得
       tags:
       - viron
 
   /viron_authtype:
     get:
       x-swagger-router-controller: viron_authtype
-      description: get auth types
+      description: 認証方式一覧
       operationId: auth_type#list
       responses:
         "200":
@@ -1805,15 +1807,15 @@ paths:
   /googleoauth2callback:
     get:
       x-swagger-router-controller: viron_auth
-      description: callback function from google oauth2
+      description: GoogleOAuth2コールバックパス
       operationId: viron_auth#googleoauth2callback
       parameters:
-      - description: authorization code
+      - description: 認証コード
         in: query
         name: code
         required: false
         type: string
-      - description: check state for CSRF
+      - description: ステータスチェック
         in: query
         name: state
         required: false
@@ -1833,17 +1835,17 @@ paths:
               type: string
         "307":
           description: Temporary Redirect
-      summary: GoogleOAuth2 リダイレクトパス
+      summary: GoogleOAuth2コールバックパス
       tags:
       - auth
 
   /googlesignin:
     get:
       x-swagger-router-controller: viron_auth
-      description: signin with google
+      description: GoogleOAuth2認証
       operationId: viron_auth#googlesignin
       parameters:
-      - description: redirect url
+      - description: リダイレクトURL
         in: query
         name: redirect_url
         required: false
@@ -1858,7 +1860,7 @@ paths:
             Location:
               description: redirect url
               type: string
-      summary: GoogleOAuth2 認証
+      summary: GoogleOAuth2認証
       tags:
       - auth
 
@@ -2445,7 +2447,7 @@ paths:
   /swagger.json:
     get:
       x-swagger-router-controller: swagger
-      description: swagger.jsonの取得
+      description: swagger.json取得
       operationId: swagger#show
       responses:
         "200":
@@ -2466,7 +2468,7 @@ paths:
   /user:
     get:
       x-swagger-router-controller: user
-      description: ユーザの一覧
+      description: ユーザー一覧
       operationId: user#list
       parameters:
       - description: 名前
@@ -2494,13 +2496,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ一覧
+      summary: ユーザー一覧
       tags:
       - user
 
     post:
       x-swagger-router-controller: user
-      description: ユーザの作成
+      description: ユーザー作成
       operationId: user#create
       parameters:
       - in: formData
@@ -2561,14 +2563,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ作成
+      summary: ユーザー作成
       tags:
       - user
 
   /user/download/csv:
     get:
       x-swagger-router-controller: user
-      description: ユーザ一覧をcsvファイルでダウンロード
+      description: ユーザー一覧をcsvファイルでダウンロード
       operationId: user#download
       responses:
         "200":
@@ -2588,14 +2590,14 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ一覧ダウンロード
+      summary: ユーザー一覧ダウンロード
       tags:
       - user
 
   /user/upload/csv:
     post:
       x-swagger-router-controller: user
-      description: ユーザをcsvファイルでアップロード
+      description: ユーザーをcsvファイルでアップロード
       operationId: user#upload
       parameters:
       - in: formData
@@ -2617,17 +2619,17 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザアップロード
+      summary: ユーザーアップロード
       tags:
       - user
 
   /user/{id}:
     delete:
       x-swagger-router-controller: user
-      description: ユーザの削除
+      description: ユーザー削除
       operationId: user#remove
       parameters:
-      - description: id
+      - description: ユーザーID
         in: path
         name: id
         required: true
@@ -2650,16 +2652,16 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ削除
+      summary: ユーザー削除
       tags:
       - user
 
     put:
       x-swagger-router-controller: user
-      description: ユーザ情報の更新
+      description: ユーザー情報更新
       operationId: user#update
       parameters:
-      - description: ID
+      - description: ユーザーID
         in: path
         name: id
         required: true
@@ -2721,27 +2723,27 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザ更新
+      summary: ユーザー更新
       tags:
       - user
 
   /userblog:
     get:
       x-swagger-router-controller: user_blog
-      description: ユーザブログの一覧
+      description: ユーザーブログ一覧
       operationId: user_blog#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
         type: integer
-      - description: ユーザID
+      - description: ユーザーID
         in: query
         name: user_id
         required: false
@@ -2776,13 +2778,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザブログ一覧
+      summary: ユーザーブログ一覧
       tags:
       - user_blog
 
     post:
       x-swagger-router-controller: user_blog
-      description: ユーザブログの作成
+      description: ユーザーブログ作成
       operationId: user_blog#create
       parameters:
       - in: body
@@ -2810,17 +2812,17 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザブログ作成
+      summary: ユーザーブログ作成
       tags:
       - user_blog
 
   /userblog/{id}:
     delete:
       x-swagger-router-controller: user_blog
-      description: ユーザブログの削除
+      description: ユーザーブログ削除
       operationId: user_blog#remove
       parameters:
-      - description: id
+      - description: ユーザーID
         in: path
         name: id
         required: true
@@ -2843,16 +2845,16 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザブログ削除
+      summary: ユーザーブログ削除
       tags:
       - user_blog
 
     put:
       x-swagger-router-controller: user_blog
-      description: ユーザブログ情報の更新
+      description: ユーザーブログ情報更新
       operationId: user_blog#update
       parameters:
-      - description: id
+      - description: ユーザーID
         in: path
         name: id
         required: true
@@ -2882,27 +2884,27 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザブログ更新
+      summary: ユーザーブログ更新
       tags:
       - user_blog
 
   /userblogentry:
     get:
       x-swagger-router-controller: user_blog_entry
-      description: ユーザブログ記事の一覧
+      description: ユーザーブログ記事一覧
       operationId: user_blog_entry#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
         type: integer
-      - description: ユーザブログID
+      - description: ユーザーブログID
         in: query
         name: user_blog_id
         required: false
@@ -2937,13 +2939,13 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザブログ記事一覧
+      summary: ユーザーブログ記事一覧
       tags:
       - user_blog_entry
 
     post:
       x-swagger-router-controller: user_blog_entry
-      description: ユーザブログ記事の作成
+      description: ユーザーブログ記事作成
       operationId: user_blog_entry#create
       parameters:
       - in: body
@@ -2971,17 +2973,17 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザブログ記事作成
+      summary: ユーザーブログ記事作成
       tags:
       - user_blog_entry
 
   /userblogentry/{id}:
     delete:
       x-swagger-router-controller: user_blog_entry
-      description: ユーザブログ記事の削除
+      description: ユーザーブログ記事削除
       operationId: user_blog_entry#remove
       parameters:
-      - description: id
+      - description: ユーザーID
         in: path
         name: id
         required: true
@@ -3004,16 +3006,16 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザブログ記事削除
+      summary: ユーザーブログ記事削除
       tags:
       - user_blog_entry
 
     put:
       x-swagger-router-controller: user_blog_entry
-      description: ユーザブログ記事情報の更新
+      description: ユーザーブログ記事情報更新
       operationId: user_blog_entry#update
       parameters:
-      - description: id
+      - description: ユーザーID
         in: path
         name: id
         required: true
@@ -3043,22 +3045,22 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: ユーザブログ記事更新
+      summary: ユーザーブログ記事更新
       tags:
       - user_blog_entry
 
   /userfavorite:
     get:
       x-swagger-router-controller: user_favorite
-      description: お気に入りの一覧
+      description: お気に入り一覧
       operationId: user_favorite#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
@@ -3089,7 +3091,7 @@ paths:
 
     post:
       x-swagger-router-controller: user_favorite
-      description: お気に入りの作成
+      description: お気に入り作成
       operationId: user_favorite#create
       parameters:
       - in: body
@@ -3124,10 +3126,10 @@ paths:
   /userfavorite/{user_id}:
     put:
       x-swagger-router-controller: user_favorite
-      description: お気に入りの更新
+      description: お気に入り更新
       operationId: user_favorite#update
       parameters:
-      - description: ユーザID
+      - description: ユーザーID
         in: path
         name: user_id
         required: true
@@ -3163,7 +3165,7 @@ paths:
 
     delete:
       x-swagger-router-controller: user_favorite
-      description: お気に入りの削除
+      description: お気に入り削除
       operationId: user_favorite#remove
       parameters:
       - description: user_id
@@ -3196,15 +3198,15 @@ paths:
   /validator:
     get:
       x-swagger-router-controller: validator
-      description: バリデータの一覧
+      description: バリデータ一覧
       operationId: validator#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
@@ -3235,7 +3237,7 @@ paths:
 
     post:
       x-swagger-router-controller: validator
-      description: バリデータの作成
+      description: バリデータ作成
       operationId: validator#create
       parameters:
       - in: body
@@ -3270,10 +3272,10 @@ paths:
   /validator/{id}:
     put:
       x-swagger-router-controller: validator
-      description: バリデータ情報の更新
+      description: バリデータ更新
       operationId: validator#update
       parameters:
-      - description: id
+      - description: validator ID
         in: path
         name: id
         required: true
@@ -3310,15 +3312,15 @@ paths:
   /nestedarray:
     get:
       x-swagger-router-controller: nested_array
-      description: ネスト配列の一覧
+      description: ネスト配列一覧
       operationId: nested_array#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
@@ -3349,7 +3351,7 @@ paths:
 
     post:
       x-swagger-router-controller: nested_array
-      description: ネスト配列の作成
+      description: ネスト配列作成
       operationId: nested_array#create
       parameters:
       - in: body
@@ -3384,10 +3386,10 @@ paths:
   /nestedarray/{id}:
     put:
       x-swagger-router-controller: nested_array
-      description: ネスト配列情報の更新
+      description: ネスト配列更新
       operationId: nested_array#update
       parameters:
-      - description: id
+      - description: nested array ID
         in: path
         name: id
         required: true
@@ -3424,15 +3426,15 @@ paths:
   /format:
     get:
       x-swagger-router-controller: format
-      description: フォーマットの一覧
+      description: フォーマット一覧
       operationId: format#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
@@ -3463,7 +3465,7 @@ paths:
 
     post:
       x-swagger-router-controller: format
-      description: フォーマットの作成
+      description: フォーマット作成
       operationId: format#create
       parameters:
       - in: body
@@ -3498,10 +3500,10 @@ paths:
   /format/{id}:
     put:
       x-swagger-router-controller: format
-      description: フォーマット情報の更新
+      description: フォーマット情報更新
       operationId: format#update
       parameters:
-      - description: id
+      - description: format ID
         in: path
         name: id
         required: true
@@ -3538,15 +3540,15 @@ paths:
   /default:
     get:
       x-swagger-router-controller: default
-      description: デフォルト 一覧
+      description: デフォルト一覧
       operationId: default#list
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
@@ -3577,7 +3579,7 @@ paths:
 
     post:
       x-swagger-router-controller: default
-      description: デフォルト 作成
+      description: デフォルト作成
       operationId: default#create
       parameters:
       - in: body
@@ -3612,10 +3614,10 @@ paths:
   /default/{id}:
     put:
       x-swagger-router-controller: default
-      description: デフォルト 更新
+      description: デフォルト更新
       operationId: default#update
       parameters:
-      - description: id
+      - description: default ID
         in: path
         name: id
         required: true
@@ -3655,22 +3657,22 @@ paths:
       description: 横断検索A
       operationId: multiquery#a
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
         type: integer
-      - description: id of multiquery
+      - description: ID検索
         in: query
         name: id
         required: false
         type: string
-      - description: name of multiquery
+      - description: 名前検索
         in: query
         name: name
         required: false
@@ -3705,27 +3707,27 @@ paths:
       description: 横断検索B
       operationId: multiquery#b
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
         type: integer
-      - description: id of multiquery
+      - description: ID検索
         in: query
         name: id
         required: false
         type: string
-      - description: name of multiquery
+      - description: 名前検索
         in: query
         name: name
         required: false
         type: string
-      - description: age of multiquery
+      - description: 年齢検索
         in: query
         name: age
         required: false
@@ -3760,22 +3762,22 @@ paths:
       description: 横断検索C
       operationId: multiquery#c
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
         type: integer
-      - description: id of multiquery
+      - description: ID検索
         in: query
         name: id
         required: false
         type: string
-      - description: age of multiquery
+      - description: 年齢検索
         in: query
         name: age
         required: false
@@ -3810,22 +3812,22 @@ paths:
       description: 横断検索D
       operationId: multiquery#d
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
         type: integer
-      - description: id of multiquery
+      - description: ID検索
         in: query
         name: id
         required: false
         type: string
-      - description: address of multiquery
+      - description: 住所検索
         in: query
         name: address
         required: false
@@ -3860,27 +3862,27 @@ paths:
       description: 横断検索E
       operationId: multiquery#e
       parameters:
-      - description: number of items per page
+      - description: 1ページあたりの件数
         in: query
         name: limit
         required: false
         type: integer
-      - description: offset number of page
+      - description: ページの開始位置
         in: query
         name: offset
         required: false
         type: integer
-      - description: id of multiquery
+      - description: ID検索
         in: query
         name: id
         required: false
         type: string
-      - description: job of multiquery
+      - description: 職業検索
         in: query
         name: job
         required: false
         type: string
-      - description: name of multiquery
+      - description: 名前検索
         in: query
         name: name
         required: false
@@ -4099,10 +4101,10 @@ paths:
   /account/{id}:
     put:
       x-swagger-router-controller: viron_account
-      description: アカウント情報の更新
+      description: アカウント情報更新
       operationId: account#update
       parameters:
-      - description: id
+      - description: 管理ユーザーID
         in: path
         name: id
         required: true
@@ -4132,7 +4134,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: アカウント情報の更新
+      summary: アカウント情報更新
       tags:
       - account
 

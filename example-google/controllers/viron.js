@@ -83,7 +83,7 @@ const show = (req, res) => {
   const result = {
     name: title,
     color: 'white',
-    thumbnail: 'https://cam-inc.github.io/viron/v1/img/favicon-32x32.png', // サービスのアイコン等を指定
+    thumbnail: 'https://cam-inc.github.io/viron/latest/img/favicon-32x32.png', // サービスのアイコン等を指定
     tags: [env, 'viron', 'example-google'],
     pages: [].concat(
       // QuickView

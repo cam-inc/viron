@@ -1,11 +1,17 @@
 # example-google
 
+An Example for Viron API Server.  
+This project will provide a server that supports GoogleOAuth.  
+
+
 # QuickStart
 
 ## Requirements
 
 - [Docker for Mac](https://docs.docker.com/docker-for-mac/)
 - [GCP](https://cloud.google.com) でOAuth2.0クライアントIDを払い出してください
+
+  > [GoogleOAuth ドキュメント](https://cloud.google.com/docs/authentication)
 
 ## Start on Docker
 
@@ -20,10 +26,12 @@ $ npm run dressup
 
 ## Add to Viron
 
-1. [Viron(v1)](https://cam-inc.github.io/viron/v1) を開く
+1. [Viron](https://cam-inc.github.io/viron/latest) を開く
 1. 管理画面の追加フォームに [https://localhost:3000/swagger.json](https://localhost:3000/swagger.json) を入力
 
-> 初回アクセス時はSSL自己証明書の警告が出るため、別タブでアクセスし警告を無視しておく必要がある。
+  > 初回アクセス時はSSL自己証明書の警告が出るため、別タブでアクセスし警告を無視しておく必要がある。
+  
+1. Gmailアドレスで認証すればログインできる
 
 # Structure
 

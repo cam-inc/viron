@@ -25,7 +25,7 @@ services:
       - $PWD/swagger:/example-email/swagger
       - $PWD/test:/example-email/test
       - $PWD/.env:/example-email/.env
-    command: npm run debug
+    command: npm run inspect
 
   mysql:
     # 512*1024*1024 = 536870912 Byte = 512 MB

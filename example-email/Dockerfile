@@ -1,4 +1,4 @@
-FROM cam-inc/amzn.2017.03/node.7.10:1.0.0
+FROM node:8
 
 RUN mkdir -p /example-email
 RUN chown -R node:node /example-email
@@ -8,8 +8,8 @@ WORKDIR $HOME
 
 # Setup project
 ADD package.json /example-email/package.json
-#RUN npm install --production --no-progress && npm cache clean
-RUN npm install --no-progress && npm cache clean
+#RUN npm install --production --no-progress && npm cache verify
+RUN npm install --no-progress && npm cache verify
 
 # Copy source files
 ADD shared /example-email/shared
