@@ -201,7 +201,12 @@ definitions:
         enum:
         - white
         - black
-        - perple
+        - purple
+        - blue
+        - green
+        - yellow
+        - red
+        - gray
         type: string
       name:
         type: string
