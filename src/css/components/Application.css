@@ -97,6 +97,7 @@
   }
 
   &__main {
+    padding: 0 24px 24px;
     overflow-y: scroll;
     grid-area: main;
   }
@@ -114,20 +115,10 @@
     }
   }
 
-  &--desktop {
-    & .Application__main {
-      padding: 0 24px 24px;
-    }
-  }
-
   &--mobile {
     & .Application__container {
       grid-template-areas: "header" "main";
       grid-template-columns: minmax(0, 1fr);
-    }
-
-    & .Application__main {
-      padding: 0 4px 24px;
     }
   }
 

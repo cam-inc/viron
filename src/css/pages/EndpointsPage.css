@@ -61,7 +61,7 @@
   &__container {
     display: grid;
     grid-gap: 24px;
-    grid-template-columns: repeat(auto-fill, minmax(312px, auto));
+    grid-template-columns: repeat(auto-fill, minmax(272px, auto));
     grid-auto-rows: 144px;
   }
 }
