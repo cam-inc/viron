@@ -859,6 +859,7 @@ select {
       flex-grow: 1;
     }
 .Application__main {
+    padding: 0 24px 24px;
     overflow-y: scroll;
     grid-area: main;
   }
@@ -872,16 +873,10 @@ select {
       -ms-grid-columns: 0 minmax(0, 1fr);
           grid-template-columns: 0 minmax(0, 1fr);
     }
-.Application--desktop .Application__main {
-      padding: 0 24px 24px;
-    }
 .Application--mobile .Application__container {
       grid-template-areas: "header" "main";
       -ms-grid-columns: minmax(0, 1fr);
           grid-template-columns: minmax(0, 1fr);
-    }
-.Application--mobile .Application__main {
-      padding: 0 4px 24px;
     }
 /* theme関連 */
 .Application--standard {
@@ -1110,12 +1105,18 @@ select {
         color: #627edf;
         color: var(--color-base-blue);
   }
+.Application_Header__item > .IconLogo {
+      width: 32px;
+      height: 32px;
+      margin-left: 24px;
+    }
 .Application_Header__item--tail {
       padding-right: 24px;
     }
 .Application_Header__menuIcon.Icon {
-    width: 40px;
-    padding-left: 24px;
+    width: 24px;
+    height: 24px;
+    margin-left: 24px;
   }
 .Application_Header__thumbnail {
     width: 32px;
@@ -1520,33 +1521,21 @@ select {
 .Application_Menu__sectionName {
     padding: 8px 16px;
     color: rgba(255, 255, 255, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.5);
   }
 .Application_Menu__groups .Application_Menu_Group {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.5);
   }
 .Application_Menu__groups .Application_Menu_Group:last-child {
       border-bottom: none;
     }
-.Application_Menu--desktop .Application_Menu_Group {
-      color: #fff;
-      color: var(--theme-menu-text);
-    }
 .Application_Menu--mobile {
     padding-top: 44px;
   }
-.Application_Menu--mobile .Application_Menu__bg {
-      display: none;
-    }
-.Application_Menu--mobile .Application_Menu__sectionName {
-      color: rgba(72, 72, 4, 0.4);
-      border-bottom-color: rgba(72, 72, 4, 0.2);
-    }
-.Application_Menu--mobile .Application_Menu__groups .Application_Menu_Group {
-      border-bottom-color: rgba(72, 72, 4, 0.2);
-    }
 .Application_Menu_Group {
   display: block;
+  color: #fff;
+  color: var(--theme-menu-text);
 }
 .Application_Menu_Group__head {
   display: flex;
@@ -3697,25 +3686,15 @@ select {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  }
-.ComponentsPage--desktop .ComponentsPage__head {
     margin-bottom: 24px;
-  }
-.ComponentsPage--mobile .ComponentsPage__head {
-    margin-bottom: 8px;
   }
 .ComponentsPage__name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
     flex-grow: 1;
-    font-weight: bold;
-  }
-.ComponentsPage--desktop .ComponentsPage__name {
     font-size: 2.8rem;
-  }
-.ComponentsPage--mobile .ComponentsPage__name {
-    font-size: 1.4rem;
+    font-weight: bold;
   }
 .ComponentsPage__control {
   display: flex;
@@ -3723,38 +3702,60 @@ select {
   justify-content: center;
     flex-shrink: 0;
   }
-.ComponentsPage__crossSearch {
+.ComponentsPage__refresh,
+  .ComponentsPage__crossSearch {
   display: flex;
   align-items: center;
   justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
+    background-color: #fff;
+    background-color: var(--theme-orderButton-bg);
+    border-radius: 50%;
   }
 @media (hover: hover) {
-    .ComponentsPage__crossSearch:hover {
-      color: #627edf;
-      color: var(--color-base-blue);
+    .ComponentsPage__refresh:hover, .ComponentsPage__crossSearch:hover {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
     }
+
+      .ComponentsPage__refresh:hover .Icon, .ComponentsPage__crossSearch:hover .Icon {
+        color: #fff;
+        color: var(--color-base-white);
+      }
   }
-.ComponentsPage__crossSearch.hold {
-      color: #627edf;
-      color: var(--color-base-blue);
+.ComponentsPage__refresh.hold, .ComponentsPage__crossSearch.hold {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
   }
-.ComponentsPage__crossSearch--active {
-      color: #627edf;
-      color: var(--color-base-blue);
+.ComponentsPage__refresh.hold .Icon, .ComponentsPage__crossSearch.hold .Icon {
+        color: #fff;
+        color: var(--color-base-white);
+      }
+.ComponentsPage__refresh--active, .ComponentsPage__crossSearch--active {
+      background-color: #627edf;
+      background-color: var(--color-base-blue);
     }
-.ComponentsPage__crossSearch .Icon {
+.ComponentsPage__refresh--active .Icon, .ComponentsPage__crossSearch--active .Icon {
+        color: #fff;
+        color: var(--color-base-white);
+      }
+.ComponentsPage__refresh .Icon, .ComponentsPage__crossSearch .Icon {
       width: 16px;
       height: 16px;
-      margin-right: 4px;
     }
+.ComponentsPage__crossSearch {
+    margin-left: 8px;
+  }
 .ComponentsPage__container {
     display: -ms-grid;
     display: grid;
     grid-gap: 24px;
     grid-gap: var(--page-components-grid-gap);
-    -ms-grid-columns: (minmax(312px, auto))[auto-fill];
-        grid-template-columns: repeat(auto-fill, minmax(312px, auto));
+    -ms-grid-columns: (minmax(272px, auto))[auto-fill];
+        grid-template-columns: repeat(auto-fill, minmax(272px, auto));
     grid-auto-rows: auto;
   }
 .ComponentsPage .ComponentsPage_Card--columnSpreadSmall {
@@ -3807,26 +3808,6 @@ select {
     flex-grow: 1;
     font-size: 1.6rem;
   }
-.ComponentsPage_Card_Chart__control {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  }
-.ComponentsPage_Card_Chart__control .Icon {
-      width: 10px;
-      height: 10px;
-      cursor: pointer;
-    }
-@media (hover: hover) {
-    .ComponentsPage_Card_Chart__control .Icon:hover {
-        color: #627edf;
-        color: var(--color-base-blue);
-    }
-  }
-.ComponentsPage_Card_Chart__control .Icon.hold {
-        color: #627edf;
-        color: var(--color-base-blue);
-  }
 .ComponentsPage_Card_Chart__body {
   display: flex;
   align-items: center;
@@ -3851,8 +3832,8 @@ select {
     height: 100%;
   }
 .ComponentsPage_Card_Chart__error {
-    color: #f57177;
-    color: var(--color-base-red);
+    color: #d1d1d1;
+    color: var(--color-base-gray);
   }
 .ComponentsPage_Card_Chart__blocker {
     position: absolute;
@@ -3887,26 +3868,6 @@ select {
   white-space: nowrap;
     flex-grow: 1;
     font-size: 1.6rem;
-  }
-.ComponentsPage_Card_Number__control {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  }
-.ComponentsPage_Card_Number__control .Icon {
-      width: 10px;
-      height: 10px;
-      cursor: pointer;
-    }
-@media (hover: hover) {
-    .ComponentsPage_Card_Number__control .Icon:hover {
-        color: #627edf;
-        color: var(--color-base-blue);
-    }
-  }
-.ComponentsPage_Card_Number__control .Icon.hold {
-        color: #627edf;
-        color: var(--color-base-blue);
   }
 .ComponentsPage_Card_Number__body {
   display: flex;
@@ -3946,8 +3907,8 @@ select {
     font-weight: bold;
   }
 .ComponentsPage_Card_Number__error {
-    color: #f57177;
-    color: var(--color-base-red);
+    color: #d1d1d1;
+    color: var(--color-base-gray);
   }
 .ComponentsPage_Card_Number__blocker {
     position: absolute;
@@ -4085,8 +4046,8 @@ select {
     padding: 24px;
   }
 .ComponentsPage_Card_Table__error {
-    color: #f57177;
-    color: var(--color-base-red);
+    color: #d1d1d1;
+    color: var(--color-base-gray);
   }
 .ComponentsPage_Card_Table__table {
   }
@@ -4419,6 +4380,37 @@ select {
 .ComponentsPage_Preview--mobile .ComponentsPage_Preview__title {
     font-size: 1.6rem;
   }
+.ComponentsPage_Preview__operations {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+    position: absolute;
+    top: 24px;
+    right: 24px;
+  }
+.ComponentsPage_Preview__operation {
+    margin-right: 16px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .ComponentsPage_Preview__operation:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.ComponentsPage_Preview__operation.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
+.ComponentsPage_Preview__operation:last-child {
+      margin-right: 0;
+    }
+.ComponentsPage_Preview__operation--delete {
+      color: #f57177;
+      color: var(--color-base-red);
+    }
 .ComponentsPage_Preview__operationsButton {
     position: absolute;
     top: 24px;
@@ -4608,25 +4600,15 @@ select {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  }
-.EndpointsPage--desktop .EndpointsPage__head {
-    margin-bottom: 32px;
-  }
-.EndpointsPage--mobile .EndpointsPage__head {
-    margin-bottom: 8px;
+    margin-bottom: 24px;
   }
 .EndpointsPage__title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
     flex-grow: 1;
-    font-weight: bold;
-  }
-.EndpointsPage--desktop .EndpointsPage__title {
     font-size: 2.8rem;
-  }
-.EndpointsPage--mobile .EndpointsPage__title {
-    font-size: 1.4rem;
+    font-weight: bold;
   }
 .EndpointsPage__orderButton {
   display: flex;
@@ -4675,8 +4657,8 @@ select {
     display: -ms-grid;
     display: grid;
     grid-gap: 24px;
-    -ms-grid-columns: (minmax(312px, auto))[auto-fill];
-        grid-template-columns: repeat(auto-fill, minmax(312px, auto));
+    -ms-grid-columns: (minmax(272px, auto))[auto-fill];
+        grid-template-columns: repeat(auto-fill, minmax(272px, auto));
     grid-auto-rows: 144px;
   }
 .EndpointsPage_Add {
