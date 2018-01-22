@@ -104,7 +104,7 @@ export default function() {
       return ret;
     }
 
-    // レンダリングされたhtmlを返す
+    debugger
     return ret;
   };
 

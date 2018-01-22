@@ -1,68 +1,80 @@
 .Jsonviewer {
-  /* &__item {
-    padding-left: 20px;
-    margin-top: 10px;
-    user-select: none;
-    background: lightslategray;
+  display: block;
 
-    &--unfoldable {
-      position: relative;
+  &__container {
+    padding-left: 4px;
+  }
 
-      &::before {
-        position: absolute;
-        left: 5px;
-        color: palevioletred;
-        content: "-";
-      }
+  &__toggle {
+    @apply --layout-center-center;
+    position: absolute;
+    top: 0;
+    left: -14px;
+    width: 10px;
+    height: 10px;
+
+    & ~ .Jsonviewer__value {
+      display: none;
     }
 
-    &--foldable {
-      position: relative;
+    & ~ .Jsonviewer__dots {
+      display: block;
+    }
 
-      &::before {
-        position: absolute;
-        left: 5px;
-        color: palevioletred;
-        content: "+";
-      }
+    &::after {
+      display: block;
+      content: "▸";
     }
   }
 
-  &__objects {
-    padding-left: 20px;
-    margin-top: 10px;
-    background: lightsteelblue;
-
-    &--foldable {
-      &::before {
-        position: absolute;
-        left: 26px;
-        color: olivedrab;
-        content: "+";
-      }
+  &__toggle:checked {
+    &::after {
+      content: "▾";
     }
 
-    &--unfoldable {
-      &::before {
-        position: absolute;
-        left: 26px;
-        color: olivedrab;
-        content: "-";
-      }
-    }
-
-    &--rootable {
-      &::before {
-        content: none;
-      }
-    }
-  } */
-
-  /* &__toggle {
-    display: none;
-
-    &:checked ~ .Jsonviewer__objects {
+    & ~ .Jsonviewer__value {
       display: block;
     }
-  } */
+
+    & ~ .Jsonviewer__dots {
+      display: none;
+    }
+  }
+
+  &__key,
+  &__idx {
+    margin-right: 4px;
+  }
+
+  &__pair {
+    @apply --layout-start-start;
+    position: relative;
+  }
+
+  &__key {
+    flex-shrink: 0;
+  }
+
+  &__value {
+    flex-grow: 1;
+  }
+
+  &__number {
+    color: blue;
+  }
+
+  &__string {
+    color: green;
+  }
+
+  &__boolean {
+    color: red;
+  }
+
+  &__null,
+  &__undefined,
+  &__function {
+    color: gray;
+  }
 }
+
