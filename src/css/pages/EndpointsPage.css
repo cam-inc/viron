@@ -3,28 +3,14 @@
 
   &__head {
     @apply --layout-center-start;
-  }
-
-  &--desktop &__head {
-    margin-bottom: 32px;
-  }
-
-  &--mobile &__head {
-    margin-bottom: 8px;
+    margin-bottom: 24px;
   }
 
   &__title {
     @apply --text-truncate;
     flex-grow: 1;
-    font-weight: bold;
-  }
-
-  &--desktop &__title {
     font-size: 2.8rem;
-  }
-
-  &--mobile &__title {
-    font-size: 1.4rem;
+    font-weight: bold;
   }
 
   &__orderButton {
