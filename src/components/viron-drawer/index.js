@@ -1,6 +1,10 @@
 import ObjectAssign from 'object-assign';
 import riot from 'riot';
 
+const timeout = (ms = 100) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 export default function() {
   const store = this.riotx.get();
 
@@ -8,10 +12,18 @@ export default function() {
   let tag;
 
   const fadeIn = () => {
-    setTimeout(() => {
-      this.isVisible = true;
-      this.update();
-    }, 100);
+    Promise
+      .resolve()
+      .then(() => timeout())
+      .then(() => {
+        this.isVisible = true;
+        this.update();
+      })
+      .then(() => timeout())
+      .then(() => {
+        this.isSettled = true;
+        this.update();
+      });
   };
 
   const fadeOut = () => {

@@ -1,4 +1,4 @@
-viron-modal.Modal(class="{ isVisible ? 'Modal--visible' : '' } Modal--{ opts.modalopts.theme } Modal--{ layoutType } { opts.modalopts.isSpread ? 'Modal--spread': '' }" onTap="{ handleTap }")
+viron-modal.Modal(class="{ 'Modal--visible': isVisible, 'Modal--settled': isSettled } Modal--{ opts.modalopts.theme } Modal--{ layoutType } { opts.modalopts.isSpread ? 'Modal--spread': '' }" onTap="{ handleTap }")
   .Modal__frame(onTap="{ handleFrameTap }")
     .Modal__closeButton(onTap="{ handleCloseButtonTap }")
       viron-icon-close

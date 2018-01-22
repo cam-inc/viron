@@ -3,7 +3,6 @@
   color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
-  transition-duration: 300ms;
   transition-property: background-color;
 
   &__frame {
@@ -12,7 +11,6 @@
     overflow-y: scroll;
     background-color: var(--color-base-white);
     opacity: 0;
-    transition-duration: 300ms;
     transition-property: transform, opacity;
     transform: scale(0.8);
   }
@@ -46,6 +44,14 @@
     & .Modal__frame {
       opacity: 1;
       transform: scale(1);
+    }
+  }
+
+  &--settled {
+    transition-duration: 200ms;
+
+    & .Modal__frame {
+      transition-duration: 200ms;
     }
   }
 
