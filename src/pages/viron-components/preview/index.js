@@ -31,6 +31,23 @@ export default function() {
     this.update();
   });
 
+  // operationボタンをアイコンで隠すか否か。
+  this.isOperationsHidden = () => {
+    const isMobile = store.getter('layout.isMobile');
+    if (isMobile) {
+      return true;
+    }
+    if (this.operations.length >= 5) {
+      return true;
+    }
+    return false;
+  };
+
+  this.handleOperationTap = e => {
+    this.opts.onOperationSelect(e.item.operation, this.selectedIdx);
+    this.close();
+  };
+
   this.handleOperationsButtonTap = e => {
     const rect = e.currentTarget.getBoundingClientRect();
     store.action('popovers.add', 'viron-components-page-table-operations', {
