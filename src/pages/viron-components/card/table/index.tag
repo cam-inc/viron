@@ -2,7 +2,7 @@ viron-components-page-table.ComponentsPage_Card_Table
   .ComponentsPage_Card_Table__head
     .ComponentsPage_Card_Table__headAside
       .ComponentsPage_Card_Table__postOperation(if="{ postOperation }" onTap="{ handlePostButtonTap }")
-        viron-icon-plus
+        viron-icon-plus-thin
       .ComponentsPage_Card_Table__title { opts.def.name }
     .ComponentsPage_Card_Table__headAside
       .ComponentsPage_Card_Table__control
@@ -38,7 +38,7 @@ viron-components-page-table.ComponentsPage_Card_Table
 
   script.
     import '../../../../components/icons/viron-icon-filter/index.tag';
-    import '../../../../components/icons/viron-icon-plus/index.tag';
+    import '../../../../components/icons/viron-icon-plus-thin/index.tag';
     import '../../../../components/icons/viron-icon-reload/index.tag';
     import '../../../../components/icons/viron-icon-search/index.tag';
     import '../../../../components/icons/viron-icon-setting/index.tag';
