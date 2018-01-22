@@ -8,7 +8,6 @@ import isNumber from 'mout/lang/isNumber';
 import isBoolean from 'mout/lang/isBoolean';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
-import { isatty } from 'tty';
 
 const BlockName = 'Jsonviewer';
 
@@ -48,7 +47,7 @@ export default function() {
 
     // Booleanの場合
     if (isBoolean(data)) {
-      ret = `<div class="${BlockName}__boolean">${data}</div>`
+      ret = `<div class="${BlockName}__boolean">${data}</div>`;
       return ret;
     }
 
@@ -65,16 +64,16 @@ export default function() {
         ret += `<div class="${BlockName}__idx">${idx}:</div>`;
         ret += `<div class="${BlockName}__value">${renderHtml(val)}</div>`;
         if (isObject(val)) {
-          ret += `<div class="${BlockName}__dots">{...}</div>`
+          ret += `<div class="${BlockName}__dots">{...}</div>`;
         }
         if (isArray(val)) {
-          ret += `<div class="${BlockName}__dots">[...]</div>`
+          ret += `<div class="${BlockName}__dots">[...]</div>`;
         }
-        ret += `</label>`;
+        ret += '</label>';
       });
       ret += '</div>';
       ret += `<div class="${BlockName}__arraySuffix">]</div>`;
-      ret += `</div>`;
+      ret += '</div>';
       return ret;
     }
 
@@ -91,20 +90,19 @@ export default function() {
         ret += `<div class="${BlockName}__key">${key}:</div>`;
         ret += `<div class="${BlockName}__value">${renderHtml(val)}</div>`;
         if (isObject(val)) {
-          ret += `<div class="${BlockName}__dots">{...}</div>`
+          ret += `<div class="${BlockName}__dots">{...}</div>`;
         }
         if (isArray(val)) {
-          ret += `<div class="${BlockName}__dots">[...]</div>`
+          ret += `<div class="${BlockName}__dots">[...]</div>`;
         }
-        ret += `</label>`;
+        ret += '</label>';
       });
       ret += '</div>';
       ret += `<div class="${BlockName}__objectSuffix">}</div>`;
-      ret += `</div>`;
+      ret += '</div>';
       return ret;
     }
 
-    debugger
     return ret;
   };
 
