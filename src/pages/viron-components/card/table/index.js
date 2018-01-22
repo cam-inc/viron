@@ -271,10 +271,6 @@ export default function() {
     }, { isNarrow: true });
   };
 
-  this.handleReloadButtonTap = () => {
-    getData();
-  };
-
   this.handleSettingButtonTap = () => {
     const rect = this.refs.settingIcon.root.getBoundingClientRect();
     store.action('popovers.add', 'viron-components-page-table-operations', {

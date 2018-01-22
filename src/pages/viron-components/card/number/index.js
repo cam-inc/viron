@@ -94,8 +94,4 @@ export default function() {
     inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
   });
-
-  this.handleRefreshButtonTap = () => {
-    getData();
-  };
 }

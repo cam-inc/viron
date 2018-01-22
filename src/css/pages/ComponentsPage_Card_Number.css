@@ -16,19 +16,6 @@
     font-size: 1.6rem;
   }
 
-  &__control {
-    @apply --layout-center-center;
-
-    & .Icon {
-      @mixin hover {
-        color: var(--color-base-blue);
-      }
-      width: 10px;
-      height: 10px;
-      cursor: pointer;
-    }
-  }
-
   &__body {
     @apply --layout-center-center;
     flex-grow: 1;

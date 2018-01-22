@@ -8,7 +8,6 @@ viron-components-page-table.ComponentsPage_Card_Table
       .ComponentsPage_Card_Table__control
         viron-icon-search.ComponentsPage_Card_Table__searchIcon(if="{ searchParameters.length }" class="{ 'ComponentsPage_Card_Table__searchIcon--active': hasSearchQueries }" onTap="{ handleSearchButtonTap }")
         viron-icon-filter.ComponentsPage_Card_Table__filterIcon(class="{ 'ComponentsPage_Card_Table__filterIcon--active': !!visibleColumnKeys }" onTap="{ handleFilterButtonTap }")
-        viron-icon-reload(onTap="{ handleReloadButtonTap }")
         viron-icon-setting(if="{ tableOperations.length }" ref="settingIcon" onTap="{ handleSettingButtonTap }")
   .ComponentsPage_Card_Table__body
     virtual(if="{ isLoading }")
