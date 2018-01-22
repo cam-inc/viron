@@ -8,6 +8,7 @@ import isNumber from 'mout/lang/isNumber';
 import isBoolean from 'mout/lang/isBoolean';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
+import { isatty } from 'tty';
 
 const BlockName = 'Jsonviewer';
 
@@ -15,15 +16,15 @@ export default function() {
   const renderHtml = data => {
     let ret = '';
 
-    // undefinedの場合
-    if (isUndefined(data)) {
-      ret = `<div class="${BlockName}__undefined">undefined</div>`;
-      return ret;
-    }
-
     // nullの場合
     if (isNull(data)) {
       ret = `<div class="${BlockName}__null">null</div>`;
+      return ret;
+    }
+
+    // undefinedの場合
+    if (isUndefined(data)) {
+      ret = `<div class="${BlockName}__undefined">undefined</div>`;
       return ret;
     }
 
@@ -55,11 +56,24 @@ export default function() {
     if (isArray(data)) {
       ret += `<div class="${BlockName}__array">`;
       ret += `<div class="${BlockName}__arrayPrefix">[</div>`;
+      ret += `<div class="${BlockName}__container">`;
       forEach(data, (val, idx) => {
+        ret += `<label class="${BlockName}__pair">`;
+        if (isObject(val) || isArray(val)) {
+          ret += `<input class="${BlockName}__toggle" type="checkbox" />`;
+        }
         ret += `<div class="${BlockName}__idx">${idx}:</div>`;
         ret += `<div class="${BlockName}__value">${renderHtml(val)}</div>`;
+        if (isObject(val)) {
+          ret += `<div class="${BlockName}__dots">{...}</div>`
+        }
+        if (isArray(val)) {
+          ret += `<div class="${BlockName}__dots">[...]</div>`
+        }
+        ret += `</label>`;
       });
-      ret += `<div class="${BlockName}__arrayPrefix">]</div>`;
+      ret += '</div>';
+      ret += `<div class="${BlockName}__arraySuffix">]</div>`;
       ret += `</div>`;
       return ret;
     }
@@ -68,11 +82,24 @@ export default function() {
     if (isObject(data)) {
       ret += `<div class="${BlockName}__object">`;
       ret += `<div class="${BlockName}__objectPrefix">{</div>`;
+      ret += `<div class="${BlockName}__container">`;
       forOwn(data, (val, key) => {
+        ret += `<label class="${BlockName}__pair">`;
+        if (isObject(val) || isArray(val)) {
+          ret += `<input class="${BlockName}__toggle" type="checkbox" />`;
+        }
         ret += `<div class="${BlockName}__key">${key}:</div>`;
         ret += `<div class="${BlockName}__value">${renderHtml(val)}</div>`;
+        if (isObject(val)) {
+          ret += `<div class="${BlockName}__dots">{...}</div>`
+        }
+        if (isArray(val)) {
+          ret += `<div class="${BlockName}__dots">[...]</div>`
+        }
+        ret += `</label>`;
       });
-      ret += `<div class="${BlockName}__objectPrefix">{</div>`;
+      ret += '</div>';
+      ret += `<div class="${BlockName}__objectSuffix">}</div>`;
       ret += `</div>`;
       return ret;
     }
