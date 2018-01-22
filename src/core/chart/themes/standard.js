@@ -5,7 +5,7 @@ export default {
       fontFamily: 'NotoSansCJKjp-Jxck serif'
     }
   },
-  colors: ['#C092F5', '#61C8FF', '#7CD6AB', '#FFC96B', '#F57177', '#CBCFD4', '#484848'],
+  colors: ['#627EDF', '#C4BB6D', '#CBCFD4', '#588988', '#9FC8C1', '#E69EA2', '#828282'],
   legend: {
     itemStyle: {
       color: '#484848',
