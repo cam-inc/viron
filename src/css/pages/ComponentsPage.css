@@ -59,7 +59,7 @@
   &__container {
     display: grid;
     grid-gap: var(--page-components-grid-gap);
-    grid-template-columns: repeat(auto-fill, minmax(312px, auto));
+    grid-template-columns: repeat(auto-fill, minmax(272px, auto));
     grid-auto-rows: auto;
   }
 
