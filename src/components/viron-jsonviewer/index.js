@@ -4,12 +4,19 @@ import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import isFunction from 'mout/lang/isFunction';
 import isString from 'mout/lang/isString';
-import isNumber from 'mout/lang/isNumber';
+import _isNumber from 'mout/lang/isNumber';
 import isBoolean from 'mout/lang/isBoolean';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
 
 const BlockName = 'Jsonviewer';
+
+const isNumber = num => {
+  if (isNaN(num)) {
+    return false;
+  }
+  return _isNumber(num);
+};
 
 export default function() {
   const renderHtml = data => {
@@ -33,12 +40,6 @@ export default function() {
       return ret;
     }
 
-    // 文字列の場合
-    if (isString(data)) {
-      ret = `<div class="${BlockName}__string">"${data}"</div>`;
-      return ret;
-    }
-
     // Numberの場合
     if (isNumber(data)) {
       ret = `<div class="${BlockName}__number">${data}</div>`;
@@ -48,6 +49,12 @@ export default function() {
     // Booleanの場合
     if (isBoolean(data)) {
       ret = `<div class="${BlockName}__boolean">${data}</div>`;
+      return ret;
+    }
+
+    // 文字列の場合
+    if (isString(data)) {
+      ret = `<div class="${BlockName}__string">"${data}"</div>`;
       return ret;
     }
 
@@ -100,6 +107,12 @@ export default function() {
       ret += '</div>';
       ret += `<div class="${BlockName}__objectSuffix">}</div>`;
       ret += '</div>';
+      return ret;
+    }
+
+    // NaNの場合
+    if (isNaN(data)) {
+      ret = `<div class="${BlockName}__nan">NaN</div>`;
       return ret;
     }
 

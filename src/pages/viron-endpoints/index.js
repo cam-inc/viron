@@ -6,6 +6,8 @@ export default function() {
       {
         a: [
           {
+            num: '777',
+            nan: NaN,
             undefined: 'aaa'
           }
         ],

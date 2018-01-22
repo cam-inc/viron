@@ -73,6 +73,7 @@
 
   &__null,
   &__undefined,
+  &__NaN,
   &__function {
     color: gray;
   }
