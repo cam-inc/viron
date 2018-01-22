@@ -23,23 +23,40 @@
     flex-shrink: 0;
   }
 
+  &__refresh,
   &__crossSearch {
     @apply --layout-center-center;
 
     @mixin hover {
-      color: var(--color-base-blue);
+      background-color: var(--color-base-blue);
+
+      & .Icon {
+        color: var(--color-base-white);
+      }
     }
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
+    background-color: var(--theme-orderButton-bg);
+    border-radius: 50%;
 
     &--active {
-      color: var(--color-base-blue);
+      background-color: var(--color-base-blue);
+
+      & .Icon {
+        color: var(--color-base-white);
+      }
     }
 
     & .Icon {
       width: 16px;
       height: 16px;
-      margin-right: 4px;
     }
+  }
+
+  &__crossSearch {
+    margin-left: 8px;
   }
 
   &__container {

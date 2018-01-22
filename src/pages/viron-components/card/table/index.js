@@ -194,6 +194,14 @@ export default function() {
     activateAutoRefresh();
     this.update();
   });
+  this.refreshId = store.getter('util.components_refresh');
+  this.listen('util', () => {
+    const refreshId = store.getter('util.components_refresh');
+    if (this.refreshId !== refreshId) {
+      this.refreshId = refreshId;
+      getData();
+    }
+  });
 
   /**
    * 表示対象カラムのみを返します。
