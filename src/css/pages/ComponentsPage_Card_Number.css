@@ -64,7 +64,7 @@
   }
 
   &__error {
-    color: var(--color-base-red);
+    color: var(--color-base-gray);
   }
 
   &__blocker {

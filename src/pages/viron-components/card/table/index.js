@@ -65,17 +65,14 @@ export default function() {
    * @return {String|null}
    */
   const validate = data => {
-    if (!data) {
-      return 'TODO: エラーメッセージ';
-    }
     if (!isArray(data)) {
-      return 'TODO: エラーメッセージ';
+      return 'レスポンスデータが配列ではありません。';
     }
     if (!data.length) {
-      return '0件';
+      return '0件です。';
     }
     if (!isObject(data[0])) {
-      return 'TODO: エラーメッセージ';
+      return '行データがオブジェクトではありません。';
     }
     return null;
   };
@@ -88,7 +85,6 @@ export default function() {
   const createInitialValueAndOpenOperationDrawer = (operationObject, rowData) => {
     const initialVal = {};
     // ParameterObjectから初期値を推測します。
-    // TODO: 精度up可能か?
     forEach(operationObject.parameters || [], parameterObject => {
       const name = parameterObject.name;
       const _in = parameterObject.in;

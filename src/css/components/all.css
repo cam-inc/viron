@@ -7,6 +7,7 @@
 @import "Application_Header";
 @import "Application_Header_Filter";
 @import "Application_Header_Filter_Autocomplete";
+@import "Application_Header_Info";
 @import "Application_Header_Menu";
 @import "Application_Header_Menu_Clear";
 @import "Application_Header_Menu_Credit";
@@ -32,6 +33,7 @@
 @import "HorizontalRule";
 @import "Html";
 @import "Icon";
+@import "IconLogo";
 @import "Image";
 @import "Jsonviewer";
 @import "List";

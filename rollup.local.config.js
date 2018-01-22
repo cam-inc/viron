@@ -2,7 +2,13 @@ import ObjectAssign from 'object-assign';
 import server from 'rollup-plugin-server';
 import baseConfig from './rollup.base.config.js';
 
-const config = ObjectAssign({}, baseConfig);
+const config = ObjectAssign({
+  watch: {
+    chokidar: true,
+    include: 'src/**',
+    exclude: 'src/css/**'
+  }
+}, baseConfig);
 
 config.plugins.push(server({
   contentBase: 'dist', // Folder to serve files from,

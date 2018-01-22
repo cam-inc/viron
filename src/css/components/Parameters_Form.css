@@ -7,7 +7,14 @@
   }
 
   &__title {
+    @apply --text-truncate;
     font-size: 1.2rem;
+  }
+
+  &__description {
+    flex-shrink: 0;
+    margin-left: 8px;
+    color: var(--color-base-gray);
   }
 
   &__body {

@@ -58,7 +58,7 @@ export default function() {
    */
   const validate = data => {
     if (!isObject(data)) {
-      return 'TODO: エラーメッセージ';
+      return 'レスポンスデータに誤りがあります。';
     }
     return null;
   };

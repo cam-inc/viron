@@ -1,12 +1,20 @@
-import whiteTheme from './white';
+import midnightTheme from './midnight';
+import standardTheme from './standard';
+import terminalTheme from './terminal';
 import Highcharts from '../index';
 
 export default {
-  applyTheme: (name = 'white') => {
+  applyTheme: (name = 'standard') => {
     let theme;
     switch (name) {
-    case 'white':
-      theme = whiteTheme;
+    case 'standard':
+      theme = standardTheme;
+      break;
+    case 'midnight':
+      theme = midnightTheme;
+      break;
+    case 'terminal':
+      theme = terminalTheme;
       break;
     default:
       break;

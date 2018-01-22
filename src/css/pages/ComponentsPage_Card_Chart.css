@@ -52,7 +52,7 @@
   }
 
   &__error {
-    color: var(--color-base-red);
+    color: var(--color-base-gray);
   }
 
   &__blocker {
@@ -61,5 +61,10 @@
     right: 0;
     bottom: 0;
     left: 0;
+  }
+
+  & .highcharts-pane {
+    fill: transparent;
+    stroke-width: 0;
   }
 }

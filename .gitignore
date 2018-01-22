@@ -41,3 +41,6 @@ dist
 .DS_Store
 *.iml
 .idea
+
+# docker
+.docker

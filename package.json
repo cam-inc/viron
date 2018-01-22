@@ -1,6 +1,6 @@
 {
   "name": "viron",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Design-based Management Console.",
   "main": "index.js",
   "repository": {
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/cam-inc/viron#readme",
   "scripts": {
+    "dev": "docker-compose -f docker-compose.dev.yml up --build",
     "prepush": "npm run test",
     "start": "run-s build:clean build:prepare build:html build:swagger build:img build:font build:tinymce build:css watch",
     "build": "run-s build:clean build:prepare build:html build:swagger build:img build:font build:tinymce build:js build:css",
@@ -52,9 +53,9 @@
     "lint:css": "stylelint src/css/**/*.css",
     "spec": "mocha",
     "deploy:beta": "node task/deploy.js -b",
-    "deploy:prd": "node task/deploy.js",
+    "deploy:latest": "node task/deploy.js",
     "release:beta": "run-s build deploy:beta",
-    "release:prd": "run-s build deploy:prd",
+    "release:latest": "run-s build deploy:latest",
     "ncu": "ncu"
   },
   "dependencies": {
@@ -88,6 +89,7 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "chokidar": "^2.0.0",
     "chokidar-cli": "^1.2.0",
     "commander": "^2.12.2",
     "csswring": "^6.0.1",
@@ -120,7 +122,6 @@
     "rollup-plugin-re": "^1.0.6",
     "rollup-plugin-riot": "^1.1.0",
     "rollup-plugin-server": "^0.7.0",
-    "rollup-watch": "^4.3.1",
     "stylefmt": "^6.0.0",
     "stylelint": "^8.2.0",
     "stylelint-suitcss": "^1.0.0",

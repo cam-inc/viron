@@ -6,6 +6,7 @@ import './import/index.tag';
 
 export default function() {
   const store = this.riotx.get();
+  const isTopPage = store.getter('location.isTop');
   const isDesktop = store.getter('layout.isDesktop');
   const generalActions = [
     { label: 'クレジット', id: 'show_credit' },
@@ -19,17 +20,11 @@ export default function() {
   }
   endpointActions.push({ label: '全てのカードを削除', id: 'remove_all_endpoints' });
 
-  // メニュー項目群。
-  this.actions = [];
-  switch (this.opts.type) {
-  case 'general':
-    this.actions = generalActions;
-    break;
-  case 'endpoint':
-    this.actions = endpointActions;
-    break;
-  default:
-    break;
+  // TOPページではエンドポイント操作も可能にする。
+  if (isTopPage) {
+    this.actions = [].concat(endpointActions).concat(generalActions);
+  } else {
+    this.actions = [].concat(generalActions);
   }
 
   /**

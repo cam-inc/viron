@@ -6,11 +6,13 @@ viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
       viron-icon-move
   .EndpointsPage__container
     viron-endpoints-page-endpoint(each="{ endpoint in endpoints }" endpoint="{ endpoint }" isDraggable="{ parent.isDraggable }")
+    viron-endpoints-page-add
 
   script.
     import '../../components/icons/viron-icon-move/index.tag';
     import '../../components/viron-jsonviewer/index.tag';
     import '../../components/viron-image/index.tag';
+    import './add/index.tag';
     import './endpoint/index.tag';
     import script from './index';
     this.external(script);

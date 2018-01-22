@@ -12,6 +12,7 @@
 @import "ComponentsPage_Preview";
 @import "ComponentsPage_Search";
 @import "EndpointsPage";
+@import "EndpointsPage_Add";
 @import "EndpointsPage_Endpoint";
 @import "EndpointsPage_Endpoint_Menu";
 @import "EndpointsPage_Endpoint_Menu_QRCode";

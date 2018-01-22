@@ -1,38 +1,38 @@
 viron-parameters-form.Parameters_Form
   .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
     .Parameters_Form__title { title }
+    .Parameters_Form__description(if="{ !!description }") { description }
   .Parameters_Form__body
     .Parameters_Form__error(if="{ hasError && isFocus }")
       viron-parameters-popover(theme="{ opts.theme }" isPreview="{ opts.ispreview }" message="{ errors[0] }")
     virtual(if="{ uiType === 'textinput' }")
-      viron-textinput(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleTextinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      viron-textinput(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'textarea' }")
-      viron-textarea(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleTextareaChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      viron-textarea(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextareaChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'numberinput' }")
-      viron-numberinput(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleNumberinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      viron-numberinput(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleNumberinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'checkbox' }")
-      viron-checkbox(isChecked="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" label="{ title }" onChange="{ handleCheckboxChange }")
+      viron-checkbox(isChecked="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" label="{ title }" onChange="{ handleCheckboxChange }")
     virtual(if="{ uiType === 'select' }")
-      viron-select(options="{ getSelectOptions() }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleSelectChange }")
+      viron-select(options="{ getSelectOptions() }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleSelectChange }")
     virtual(if="{ uiType === 'uploader' }")
-      viron-uploader(accept="{ accept }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleUploaderChange }")
+      viron-uploader(accept="{ accept }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleUploaderChange }")
     virtual(if="{ uiType === 'base64' }")
       viron-base64(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" mimeType="{ mimeType }" onChange="{ handleBase64Change }")
     virtual(if="{ uiType === 'html' }")
-      viron-html(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleHtmlChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      viron-html(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleHtmlChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'pug' }")
-      viron-pug(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handlePugChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      viron-pug(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handlePugChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'autocomplete' }")
-      viron-autocomplete(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" config="{ autocompleteConfig }" onChange="{ handleAutocompleteChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      viron-autocomplete(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" config="{ autocompleteConfig }" onChange="{ handleAutocompleteChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'wyswyg' }")
-      viron-wyswyg(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ opts.isdisabled }" isError="{ hasError }" onChange="{ handleWyswygChange }")
+      viron-wyswyg(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleWyswygChange }")
     virtual(if="{ uiType === 'image' }")
-      viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }")
+      viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview || isDisabled }")
     virtual(if="{ uiType === 'null' }")
-      div TODO
+      div NULL
 
   script.
-    // TODO: 全てのフォーム動作確認。
     import '../../../components/viron-autocomplete/index.tag';
     import '../../../components/viron-base64/index.tag';
     import '../../../components/viron-checkbox/index.tag';

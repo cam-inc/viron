@@ -1,4 +1,3 @@
-// TODO: froalaのCodeMirrowプラグインが使えるかも。
 import clipboard from 'clipboard-js';
 
 export default function() {

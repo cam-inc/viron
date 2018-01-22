@@ -1,4 +1,5 @@
 import throttle from 'mout/function/throttle';
+import { applyTheme } from '../core/chart';
 
 export default function() {
   const store = this.riotx.get();
@@ -40,6 +41,7 @@ export default function() {
   });
   this.listen('viron', () => {
     this.theme = store.getter('viron.theme');
+    applyTheme(this.theme);
     this.update();
   });
   this.listen('location', () => {

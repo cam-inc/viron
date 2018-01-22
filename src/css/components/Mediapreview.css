@@ -25,6 +25,16 @@
     background-size: contain;
   }
 
+  &__path {
+    @apply --text-truncate;
+    position: absolute;
+    right: 0;
+    bottom: -16px;
+    width: 100%;
+    color: var(--color-base-gray);
+    text-align: right;
+  }
+
   &__closeButton {
     @apply --layout-center-center;
 
@@ -32,8 +42,8 @@
       color: var(--color-base-gray);
     }
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: -24px;
+    left: -24px;
     width: 24px;
     height: 24px;
     color: var(--color-base-white);
