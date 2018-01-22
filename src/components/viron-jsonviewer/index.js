@@ -9,6 +9,7 @@ import isBoolean from 'mout/lang/isBoolean';
 import forEach from 'mout/array/forEach';
 import forOwn from 'mout/object/forOwn';
 
+const BlockName = 'Jsonviewer';
 
 export default function() {
   const renderHtml = data => {
@@ -16,58 +17,63 @@ export default function() {
 
     // undefinedの場合
     if (isUndefined(data)) {
-      ret = 'undefined';
+      ret = `<div class="${BlockName}__undefined">undefined</div>`;
       return ret;
     }
 
     // nullの場合
     if (isNull(data)) {
-      ret = 'null';
+      ret = `<div class="${BlockName}__null">null</div>`;
       return ret;
     }
 
     // 関数の場合
     if (isFunction(data)) {
-      ret = 'f()';
+      ret = `<div class="${BlockName}__function">f()</div>`;
       return ret;
     }
 
     // 文字列の場合
     if (isString(data)) {
-      ret = `"${data}"`;
+      ret = `<div class="${BlockName}__string">"${data}"</div>`;
       return ret;
     }
 
     // Numberの場合
     if (isNumber(data)) {
-      ret = `${data}`;
+      ret = `<div class="${BlockName}__number">${data}</div>`;
       return ret;
     }
 
     // Booleanの場合
     if (isBoolean(data)) {
-      ret = `${data}`;
+      ret = `<div class="${BlockName}__boolean">${data}</div>`
       return ret;
     }
 
     // 配列の場合
     if (isArray(data)) {
-      ret += '<div>[</div>';
+      ret += `<div class="${BlockName}__array">`;
+      ret += `<div class="${BlockName}__arrayPrefix">[</div>`;
       forEach(data, (val, idx) => {
-        ret += `<div>${idx}:</div>`;
-        ret += `<div>${renderHtml(val)}</div>`;
+        ret += `<div class="${BlockName}__idx">${idx}:</div>`;
+        ret += `<div class="${BlockName}__value">${renderHtml(val)}</div>`;
       });
-      ret += '<div>]</div>';
+      ret += `<div class="${BlockName}__arrayPrefix">]</div>`;
+      ret += `</div>`;
       return ret;
     }
 
     // オブジェクトの場合
     if (isObject(data)) {
-      ret += '<div>';
+      ret += `<div class="${BlockName}__object">`;
+      ret += `<div class="${BlockName}__objectPrefix">{</div>`;
       forOwn(data, (val, key) => {
-        ret += `<div>${key} : ${renderHtml(val)}</div>`;
+        ret += `<div class="${BlockName}__key">${key}:</div>`;
+        ret += `<div class="${BlockName}__value">${renderHtml(val)}</div>`;
       });
-      ret += '</div>';
+      ret += `<div class="${BlockName}__objectPrefix">{</div>`;
+      ret += `</div>`;
       return ret;
     }
 
