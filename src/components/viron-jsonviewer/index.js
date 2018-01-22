@@ -4,74 +4,89 @@ import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import isFunction from 'mout/lang/isFunction';
 import isString from 'mout/lang/isString';
+import isNumber from 'mout/lang/isNumber';
+import isBoolean from 'mout/lang/isBoolean';
 import forEach from 'mout/array/forEach';
+import forOwn from 'mout/object/forOwn';
+
 
 export default function() {
-  const createJson = (obj, opts = {}) => {
+  const renderHtml = data => {
+    let ret = '';
 
     // undefinedの場合
-    if (isUndefined(obj)) {
-      return 'undefined';
+    if (isUndefined(data)) {
+      ret = 'undefined';
+      return ret;
     }
 
     // nullの場合
-    if (isNull(obj)) {
-      return 'null';
+    if (isNull(data)) {
+      ret = 'null';
+      return ret;
     }
 
     // 関数の場合
-    if (isFunction(obj)) {
-      return 'f ()';
+    if (isFunction(data)) {
+      ret = 'f()';
+      return ret;
     }
 
     // 文字列の場合
-    if (isString(obj)) {
-      return `"${obj}"`;
+    if (isString(data)) {
+      ret = `"${data}"`;
+      return ret;
+    }
+
+    // Numberの場合
+    if (isNumber(data)) {
+      ret = `${data}`;
+      return ret;
+    }
+
+    // Booleanの場合
+    if (isBoolean(data)) {
+      ret = `${data}`;
+      return ret;
     }
 
     // 配列の場合
-    if (isArray(obj)) {
-      const items = [];
-      // 空の場合
-      if (!obj.length) {
-        return `[${items}]`;
-      }
-      forEach(obj, item => {
-        // 再帰処理
-        items.push(createJson(item));
+    if (isArray(data)) {
+      ret += '<div>[</div>';
+      forEach(data, (val, idx) => {
+        ret += `<div>${idx}:</div>`;
+        ret += `<div>${renderHtml(val)}</div>`;
       });
-      return `[${items}]`;
+      ret += '<div>]</div>';
+      return ret;
     }
 
     // オブジェクトの場合
-    if (isObject(obj)) {
-      const keys = Object.keys(obj);
-      // 空の場合
-      if (!keys.length) {
-        return '{}';
-      }
-      // TODO: moutで書き直す
-      let items = '';
-      for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        if (key || !isUndefined(obj[key])|| !isFunction(key) || !isFunction(obj[key])) {
-          const isLast = (i === keys.length -1);
-          const comma = !isLast ? ',' : '';
-          const unfoldable = isArray(obj[key]) ? '--unfoldable' : '';
-          items += `<div class="Jsonviewer__item Jsonviewer__item${unfoldable}">${createJson(key)} : ${createJson(obj[key])}${comma}</div>`;
-        }
-      }
-
-      return `<div class="Jsonviewer__objects ${opts.isRoot ? 'Jsonviewer__objects--rootable': 'Jsonviewer__objects--unfoldable'}">{${items}}</div>`;
+    if (isObject(data)) {
+      ret += '<div>';
+      forOwn(data, (val, key) => {
+        ret += `<div>${key} : ${renderHtml(val)}</div>`;
+      });
+      ret += '</div>';
+      return ret;
     }
-    // その他の場合 eg. Boolean, Number
-    return obj;
+
+    // レンダリングされたhtmlを返す
+    return ret;
+  };
+
+  const update = () => {
+    const canvasElm = this.refs.canvas;
+    if (!canvasElm) {
+      return;
+    }
+    const html = renderHtml(this.opts.data || {});
+    canvasElm.innerHTML = html;
   };
 
   this.on('mount', () => {
-    const obj = this.opts.data;
-    this.refs.target.innerHTML = createJson(obj, {
-      isRoot: true
-    });
+    update();
+  }).on('updated', () => {
+    update();
   });
 }

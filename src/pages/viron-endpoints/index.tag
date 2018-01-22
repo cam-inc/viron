@@ -1,5 +1,5 @@
 viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
-  viron-jsonviewer(if="{ data }" data="{ data }" hasOepnedItems="{ false }")
+  viron-jsonviewer(if="{ data }" data="{ data }")
   .EndpointsPage__head
     .EndpointsPage__title ホーム
     .EndpointsPage__orderButton(if="{ isDesktop }" class="{ 'EndpointsPage__orderButton--active': isDraggable }" onTap="{ handleOrderButtonTap }")
