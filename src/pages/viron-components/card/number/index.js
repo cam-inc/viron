@@ -43,10 +43,10 @@ export default function() {
    */
   const validate = data => {
     if (!data) {
-      return 'TODO: エラーメッセージ';
+      return 'レスポンスデータに誤りがあります。';
     }
     if (!isNumber(data.value)) {
-      return 'TODO: エラーメッセージ';
+      return 'value値が数値ではありません。';
     }
     return null;
   };

@@ -1,20 +1,34 @@
 import contains from 'mout/array/contains';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
-import isNumber from 'mout/lang/isNumber';
+import isNaN from 'mout/lang/isNaN';
+import _isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
 import util from '../util';
 import validator from '../validator';
+
+/**
+ * moutの`isNumber`のラッパー関数。
+ * moutの`isNumber`にNaNを渡すと`true`が返却される(想定外)ので、NaNでも`false`を返すように調整しています。
+ * @param {*} num
+ */
+const isNumber = num => {// eslint-disable-line no-unused-vars
+  if (isNaN(num)) {
+    return false;
+  }
+  return _isNumber(num);
+};
 
 export default function() {
   // ショートカット。
   const formObject = this.opts.formobject;
   // 入力フォームのタイトル。
   // 入力必須ならば米印を付ける。
-  this.title = formObject.description || formObject.name;
+  this.title = formObject.name;
   if (formObject.required) {
     this.title = `${this.title} *`;
   }
+  this.description = formObject.description;
   // autocomplete設定。
   this.autocompleteConfig = formObject['x-autocomplete'];
   // uploaderのaccept値。
@@ -22,11 +36,18 @@ export default function() {
   // MIME-type
   this.mimeType = formObject['x-mime-type'];
 
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-13
+  // disabled(readOnly)
+  this.isDisabled = this.opts.isdisabled;
+  if (formObject.readOnly) {
+    this.isDisabled = true;
+  }
+
   // 入力に使用するUIコンポーネント名。
   // opts.formObjectの値から適切なUIコンポーネントを推測します。
-  // 文字列 & previewモード & 拡張子imageの場合のみ強制的に画像を表示します。
+  // 文字列 & (previewモード || readOnly) & 拡張子imageの場合のみ強制的に画像を表示します。
   this.uiType = (() => {
-    if (!this.opts.ispreview || formObject.type !== 'string' || !this.opts.val) {
+    if ((!this.opts.ispreview && !formObject.readOnly) || formObject.type !== 'string' || !this.opts.val) {
       return util.getUIType(formObject);
     }
     // 拡張子から最適な表示方法を推測します。
@@ -247,10 +268,15 @@ export default function() {
       break;
     case 'number':
     case 'integer':
-      // 数値 or undefinedに強制変換。
-      newText = Number(newText);
-      if (!isNumber(newText)) {
+      // 空文字の場合。
+      if (!newText) {
         newText = undefined;
+      } else {
+        // 数値 or undefinedに強制変換。
+        newText = Number(newText);
+        if (!isNumber(newText)) {
+          newText = undefined;
+        }
       }
       break;
     }

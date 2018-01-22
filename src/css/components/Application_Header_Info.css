@@ -1,0 +1,80 @@
+.Application_Header_Info {
+  display: block;
+  padding: 32px;
+
+  &__name {
+    margin-bottom: 8px;
+    font-size: 1.6rem;
+    font-weight: bold;
+  }
+
+  &__urlWrapper {
+    @apply --layout-center-start;
+  }
+
+  &__color {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    background-color: #c092f5;
+    border-radius: 50%;
+
+    &--purple {
+      background-color: #c092f5;
+    }
+
+    &--blue {
+      background-color: #61c8ff;
+    }
+
+    &--green {
+      background-color: #7cd6ab;
+    }
+
+    &--yellow {
+      background-color: #ffc96b;
+    }
+
+    &--red {
+      background-color: #f57177;
+    }
+
+    &--gray {
+      background-color: #cbcfd4;
+    }
+
+    &--black {
+      background-color: #484848;
+    }
+
+    &--white {
+      background-color: #fff;
+      border: 2px solid var(--color-base-gray);
+    }
+  }
+
+  &__url {
+    @apply --text-truncate;
+    flex-grow: 1;
+    color: var(--color-base-gray);
+  }
+
+  &__description {
+    margin-top: 16px;
+    font-size: 1.4rem;
+  }
+
+  &__tags {
+    @apply --layout-center-start;
+    margin-top: 16px;
+
+    & .Tag {
+      margin-right: 8px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}

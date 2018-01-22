@@ -59,9 +59,8 @@
   &__container {
     display: grid;
     grid-gap: var(--page-components-grid-gap);
-    grid-template-columns: repeat(auto-fill, 312px);
+    grid-template-columns: repeat(auto-fill, minmax(312px, auto));
     grid-auto-rows: auto;
-    justify-content: center;
   }
 
   & .ComponentsPage_Card {

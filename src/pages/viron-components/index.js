@@ -10,7 +10,7 @@ export default function() {
   this.layoutType = store.getter('layout.type');
   this.isDesktop = store.getter('layout.isDesktop');
   this.parameterObjectsForCrossSearch = store.getter('components.parameterObjectsForCrossSearch');
-  this.isCrossSearchEnabled = (this.parameterObjectsForCrossSearch.length >= 2);
+  this.isCrossSearchEnabled = (!!this.parameterObjectsForCrossSearch.length && this.components.length >= 2);
   this.crossSearchQueries = {};
   this.hasCrossSearchQueries = false;
   this.listen('page', () => {
@@ -28,7 +28,7 @@ export default function() {
   });
   this.listen('components', () => {
     this.parameterObjectsForCrossSearch = store.getter('components.parameterObjectsForCrossSearch');
-    this.isCrossSearchEnabled = (this.parameterObjectsForCrossSearch.length >= 2);
+    this.isCrossSearchEnabled = (!!this.parameterObjectsForCrossSearch.length && this.components.length >= 2);
     this.update();
   });
 

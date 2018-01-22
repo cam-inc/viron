@@ -36,7 +36,7 @@ export default {
         return Promise
           .resolve()
           .then(() => store.action('oas.setup', endpointKey, endpoint.url, endpoint.token))
-          .then(() => store.action('viron.get'));
+          .then(() => store.action('viron.get', endpointKey));
       })
       .then(() => {
         // pageが指定されていない場合は`viron`のpageリストの先頭項目を自動選択する。

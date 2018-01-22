@@ -281,7 +281,8 @@ const required = (value, constraints) => {
   forEach(required, key => {
     if (!hasOwn(value, key)) {
       result.isValid = false;
-      result.message = `要素に${key}を含めて下さい。`;
+      const description = constraints.properties[key].description ? `(${constraints.properties[key].description})` : '';
+      result.message = `要素に${key}${description}を含めて下さい。`;
     }
   });
   return result;

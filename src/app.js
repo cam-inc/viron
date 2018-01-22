@@ -30,7 +30,6 @@ window.addEventListener('load', () => {
     ]))
     .then(() => router.init(mainStore))
     .catch(err => mainStore.action('modals.add', 'viron-error', {
-      message: 'Viron起動に失敗しました。Viron担当者にお問い合わせ下さい。',
       error: err
     }));
 });

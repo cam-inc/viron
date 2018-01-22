@@ -8,16 +8,27 @@ commander
   .option('-b, --beta', 'On/Off flag of beta release.')
   .parse(process.argv);
 
-new Promise((resolve, reject) => {
-  const options = {
-    dest: (commander.beta ? 'beta' : `v${major}`),
+const publish = options => {
+  return new Promise((resolve, reject) => {
+    ghpages.publish('dist', options, err => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
+};
+
+Promise.resolve().then(() => publish({
+  dest: (commander.beta ? 'beta' : `v${major}`),
+  add: true
+})).then(() => {
+  if (commander.beta) {
+    return Promise.resolve();
+  }
+  return publish({
+    dest: 'latest',
     add: true
-  };
-  ghpages.publish('dist', options, err => {
-    if (err) {
-      reject(err);
-      return;
-    }
-    resolve();
   });
 }).catch(err => console.error(err));

@@ -1,4 +1,5 @@
 import '../menu/index.tag';
+import './info/index.tag';
 import './menu/index.tag';
 
 export default function() {
@@ -49,25 +50,20 @@ export default function() {
     });
   };
 
-  this.handleSquareIconTap = () => {
-    // menu(エンドポイント関連のやつ)をpopoverで開きます。
-    const rect = this.refs.squareIcon.root.getBoundingClientRect();
-    store.action('popovers.add', 'viron-application-header-menu', {
-      type: 'endpoint'
-    }, {
+  this.handleThumbnailTap = () => {
+    // エンドポイント情報を吹き出し表示します。
+    const rect = this.refs.thumbnail.getBoundingClientRect();
+    store.action('popovers.add', 'viron-application-header-info', null, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
-      width: 228,
+      width: 312,
       direction: 'TR'
     });
   };
 
   this.handleDotsIconTap = () => {
-    // menu(一般的なやつ)をpopoverで開きます。
     const rect = this.refs.dotsIcon.root.getBoundingClientRect();
-    store.action('popovers.add', 'viron-application-header-menu', {
-      type: 'general'
-    }, {
+    store.action('popovers.add', 'viron-application-header-menu', null, {
       x: rect.left + (rect.width / 2),
       y: rect.bottom,
       width: 228,

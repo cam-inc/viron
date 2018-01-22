@@ -25,8 +25,6 @@ import wordcloud from 'highcharts/modules/wordcloud';
 import xrange from 'highcharts/modules/xrange';
 import themes from './themes';
 
-themes.applyTheme('white');
-
 HighchartsMore(Highcharts);
 annotations(Highcharts);
 boost(Highcharts);
@@ -63,15 +61,25 @@ Highcharts.setOptions({
   chart: {
     defaultSeriesType: 'bar',
     zoomType: 'x',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    spacing: 8,
+    style: {
+      fontFamily: 'NotoSansCJKjp-Jxck serif'
+    }
   },
   credits: { enabled: false },
   exporting: { enabled: false },
   legend: {
     enabled: true,
+    floating: false,
     navigation: {
       enabled: true
-    }
+    },
+    itemStyle: {
+      fontWeight: 'bold'
+    },
+    margin: 8,
+    padding: 0
   },
   plotOptions: {
     // 全てのchartタイプ共通の設定。
@@ -79,6 +87,11 @@ Highcharts.setOptions({
       animation: { duration: 300 },
       boostThreshold: 2000,
       cursor: 'pointer',
+      marker: {
+        fillColor: 'white',
+        lineWidth: 2,
+        lineColor: null // inherit from series
+      },
       label: { enabled: false }
     },
     heatmap: {
@@ -87,20 +100,35 @@ Highcharts.setOptions({
   },
   tooltip: {
     crosshairs: true,
-    enabled: true
+    enabled: true,
+    padding: 16,
+    backgroundColor: 'rgb(72,72,72)',
+    borderRadius: 6,
+    borderWidth: 0,
+    style: {
+      color: 'white'
+    }
   },
   xAxis: {
     title: null,
     labels: {
       style: { fontSize: '8px' }
-    }
+    },
+    gridLineWidth: 0
   },
   yAxis: {
     title: null,
     labels: {
       style: { fontSize: '8px' }
-    }
+    },
+    gridLineColor: '#EFEFEF',
+    gridLineWidth: 1,
+    lineWidth: 0
   }
 });
 
 export default Highcharts;
+const applyTheme = themes.applyTheme;
+export {
+  applyTheme
+};

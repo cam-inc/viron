@@ -1,5 +1,6 @@
 .ComponentsPage_Card {
   display: block;
+  width: 100%;
   background-color: var(--theme-componentCard-bg);
   border: 1px solid var(--theme-componentCard-border);
   border-radius: 4px;

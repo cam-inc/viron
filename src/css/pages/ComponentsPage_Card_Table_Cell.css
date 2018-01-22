@@ -6,6 +6,13 @@
   &__string {
     display: inline-block;
     font-size: 1.4rem;
+
+    &--emphasised {
+      font-style: italic;
+      font-weight: bold;
+      color: var(--color-base-red);
+      text-shadow: 0 0 4px rgba(255, 0, 0, 0.25);
+    }
   }
 
   &__image {

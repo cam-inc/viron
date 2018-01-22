@@ -14,6 +14,12 @@
       cursor: pointer;
     }
 
+    & > .IconLogo {
+      width: 32px;
+      height: 32px;
+      margin-left: 24px;
+    }
+
     &--tail {
       padding-right: 24px;
     }
@@ -25,8 +31,12 @@
   }
 
   &__thumbnail {
+    @mixin hover {
+      opacity: 0.5;
+    }
     width: 32px;
     height: 32px;
+    cursor: pointer;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;

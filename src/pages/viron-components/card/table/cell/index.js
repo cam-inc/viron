@@ -89,4 +89,13 @@ export default function() {
     this.isText = true;
     return String(data);
   })();
+
+  // 強調表示するか否か。
+  this.isEmphasised = (() => {
+    const list = this.opts.column['x-emphasis'] || [];
+    if (!list.length) {
+      return false;
+    }
+    return contains(list, this.value);
+  })();
 }

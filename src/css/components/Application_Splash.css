@@ -13,12 +13,7 @@
   }
 
   &__logo {
-    width: 36px;
-    height: 36px;
-  }
-
-  &__label {
-    margin-top: 4px;
-    text-align: center;
+    width: 72px;
+    height: 72px;
   }
 }

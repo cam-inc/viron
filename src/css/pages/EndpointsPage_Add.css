@@ -1,0 +1,31 @@
+.EndpointsPage_Add {
+  @mixin hover {
+    color: var(--color-base-blue);
+    border-color: var(--color-base-blue);
+  }
+
+  @apply --layout-center-center;
+  width: 100%;
+  color: var(--theme-endpointCard-border);
+  cursor: pointer;
+  border: 1px dashed var(--theme-endpointCard-border);
+  border-radius: 6px;
+
+  &__icon {
+    @apply --layout-center-center;
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    border: 2px solid currentcolor;
+    border-radius: 50%;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__label {
+    font-size: 1.6rem;
+  }
+}

@@ -144,7 +144,6 @@ export default function() {
         delete ret[key];
       }
     });
-    // TODO: オブジェクトが空の場合はどーする？
     if (!size(ret)) {
       ret = undefined;
     }
