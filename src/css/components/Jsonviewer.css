@@ -1,0 +1,89 @@
+.Jsonviewer {
+  display: block;
+
+  &__container {
+    padding-left: 4px;
+  }
+
+  &__toggle {
+    @apply --layout-center-center;
+    position: absolute;
+    top: 0;
+    left: -14px;
+    width: 10px;
+    height: 10px;
+
+    & ~ .Jsonviewer__value {
+      display: none;
+    }
+
+    & ~ .Jsonviewer__commma {
+      display: none;
+    }
+
+    & ~ .Jsonviewer__dots {
+      display: block;
+    }
+
+    &::after {
+      display: block;
+      content: "▸";
+    }
+  }
+
+  &__toggle:checked {
+    &::after {
+      content: "▾";
+    }
+
+    & ~ .Jsonviewer__value {
+      display: block;
+    }
+
+    & ~ .Jsonviewer__commma {
+      display: block;
+    }
+
+    & ~ .Jsonviewer__dots {
+      display: none;
+    }
+  }
+
+  &__key,
+  &__idx {
+    margin-right: 4px;
+  }
+
+  &__pair {
+    @apply --layout-start-start;
+    position: relative;
+  }
+
+  &__key {
+    flex-shrink: 0;
+  }
+
+  &__value {
+    flex-grow: 1;
+  }
+
+  &__number {
+    color: blue;
+  }
+
+  &__string {
+    color: green;
+  }
+
+  &__boolean {
+    color: red;
+  }
+
+  &__null,
+  &__undefined,
+  &__NaN,
+  &__function {
+    color: gray;
+  }
+}
+
