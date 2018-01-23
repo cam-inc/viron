@@ -21,6 +21,7 @@
   --theme-app-text: #fff;
   --theme-app-bg: #fff;
   --theme-poster-overlay: #fff;
+  --theme-poster-label: #fff;
   --theme-menu-logo: #fff;
   --theme-menu-text: #fff;
   --theme-menu-arrow: #fff;
@@ -50,6 +51,7 @@
   --theme-standard-app-text: #484848;
   --theme-standard-app-bg: #f0f0ef;
   --theme-standard-poster-overlay: transparent;
+  --theme-standard-poster-label: #fff;
   --theme-standard-menu-logo: #f57177;
   --theme-standard-menu-text: #fff;
   --theme-standard-menu-arrow: #f57177;
@@ -78,6 +80,7 @@
   --theme-midnight-app-text: #00c8ff;
   --theme-midnight-app-bg: #001217;
   --theme-midnight-poster-overlay: #001d26;
+  --theme-midnight-poster-label: #00c8ff;
   --theme-midnight-menu-logo: #00c8ff;
   --theme-midnight-menu-text: #00c8ff;
   --theme-midnight-menu-arrow: #00c8ff;
@@ -106,6 +109,7 @@
   --theme-terminal-app-text: #35dcba;
   --theme-terminal-app-bg: #000;
   --theme-terminal-poster-overlay: #091714;
+  --theme-terminal-poster-label: #35dcba;
   --theme-terminal-menu-logo: #35dcba;
   --theme-terminal-menu-text: #35dcba;
   --theme-terminal-menu-arrow: #35dcba;
@@ -886,6 +890,8 @@ select {
     --theme-app-bg: var(--theme-standard-app-bg);
     --theme-poster-overlay: transparent;
     --theme-poster-overlay: var(--theme-standard-poster-overlay);
+    --theme-poster-label: #fff;
+    --theme-poster-label: var(--theme-standard-poster-label);
     --theme-menu-logo: #f57177;
     --theme-menu-logo: var(--theme-standard-menu-logo);
     --theme-menu-text: #fff;
@@ -940,6 +946,8 @@ select {
     --theme-app-bg: var(--theme-midnight-app-bg);
     --theme-poster-overlay: #001d26;
     --theme-poster-overlay: var(--theme-midnight-poster-overlay);
+    --theme-poster-label: #00c8ff;
+    --theme-poster-label: var(--theme-midnight-poster-label);
     --theme-menu-logo: #00c8ff;
     --theme-menu-logo: var(--theme-midnight-menu-logo);
     --theme-menu-text: #00c8ff;
@@ -994,6 +1002,8 @@ select {
     --theme-app-bg: var(--theme-terminal-app-bg);
     --theme-poster-overlay: #091714;
     --theme-poster-overlay: var(--theme-terminal-poster-overlay);
+    --theme-poster-label: #35dcba;
+    --theme-poster-label: var(--theme-terminal-poster-label);
     --theme-menu-logo: #35dcba;
     --theme-menu-logo: var(--theme-terminal-menu-logo);
     --theme-menu-text: #35dcba;
@@ -1121,19 +1131,10 @@ select {
 .Application_Header__thumbnail {
     width: 32px;
     height: 32px;
-    cursor: pointer;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     border-radius: 50%;
-  }
-@media (hover: hover) {
-    .Application_Header__thumbnail:hover {
-      opacity: 0.5;
-    }
-  }
-.Application_Header__thumbnail.hold {
-      opacity: 0.5;
   }
 .Application_Header__info,
   .Application_Header__squareIcon {
@@ -1143,6 +1144,15 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Application_Header__info:hover {
+      opacity: 0.5;
+    }
+  }
+.Application_Header__info.hold {
+      opacity: 0.5;
   }
 .Application_Header__color {
     flex-shrink: 0;
@@ -1231,6 +1241,7 @@ select {
 .Application_Header_Filter__input {
     display: block;
     width: 100%;
+    font-size: 1.6rem;
   }
 .Application_Header_Filter__text {
   overflow: hidden;
@@ -1666,6 +1677,10 @@ select {
     height: 32px;
     margin-bottom: 24px;
   }
+.Application_Poster__label {
+    color: #fff;
+    color: var(--theme-poster-label);
+  }
 @keyframes Application_ProgressLinear-indeterminate1 {
   /* |-----|---x-||-----||-----| */
   0% {
@@ -1783,7 +1798,7 @@ select {
     width: 100%;
     height: 64px;
     pointer-events: auto;
-    transition-duration: 300ms;
+    transition-duration: 150ms;
     transition-property: top, opacity;
   }
 .Application_Toasts .Toast--visible {
@@ -1800,8 +1815,8 @@ select {
 .Autocomplete__input {
     display: block;
     width: 100%;
-    padding: 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 18px;
+    font-size: 1.8rem;
     background-color: #fff;
     background-color: var(--color-base-white);
     border: 1px solid #d1d1d1;
@@ -2106,7 +2121,7 @@ select {
   color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
-  transition-duration: 300ms;
+  transition-duration: 200ms;
   transition-property: background-color;
 }
 .Drawer__frame {
@@ -2119,7 +2134,7 @@ select {
     background-color: #fff;
     background-color: var(--color-base-white);
     opacity: 0;
-    transition-duration: 300ms;
+    transition-duration: 200ms;
     transition-property: transform, opacity;
     transform: translateX(100px);
   }
@@ -2135,6 +2150,12 @@ select {
 .Drawer--visible .Drawer__frame {
       opacity: 1;
       transform: translateX(0);
+    }
+.Drawer--hidden {
+    background-color: rgba(0, 0, 0, 0);
+  }
+.Drawer--hidden .Drawer__frame {
+      opacity: 0;
     }
 .Drawer--narrow .Drawer__frame {
       width: 384px;
@@ -2292,6 +2313,78 @@ select {
       background-color: var(--color-base-blue);
       opacity: 0.1;
   }
+.Jsonviewer {
+  display: block;
+}
+.Jsonviewer__container {
+    padding-left: 4px;
+  }
+.Jsonviewer__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    position: absolute;
+    top: 0;
+    left: -14px;
+    width: 10px;
+    height: 10px;
+  }
+.Jsonviewer__toggle ~ .Jsonviewer__value {
+      display: none;
+    }
+.Jsonviewer__toggle ~ .Jsonviewer__commma {
+      display: none;
+    }
+.Jsonviewer__toggle ~ .Jsonviewer__dots {
+      display: block;
+    }
+.Jsonviewer__toggle::after {
+      display: block;
+      content: "▸";
+    }
+.Jsonviewer__toggle:checked::after {
+      content: "▾";
+    }
+.Jsonviewer__toggle:checked ~ .Jsonviewer__value {
+      display: block;
+    }
+.Jsonviewer__toggle:checked ~ .Jsonviewer__commma {
+      display: block;
+    }
+.Jsonviewer__toggle:checked ~ .Jsonviewer__dots {
+      display: none;
+    }
+.Jsonviewer__key,
+  .Jsonviewer__idx {
+    margin-right: 4px;
+  }
+.Jsonviewer__pair {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+    position: relative;
+  }
+.Jsonviewer__key {
+    flex-shrink: 0;
+  }
+.Jsonviewer__value {
+    flex-grow: 1;
+  }
+.Jsonviewer__number {
+    color: blue;
+  }
+.Jsonviewer__string {
+    color: green;
+  }
+.Jsonviewer__boolean {
+    color: red;
+  }
+.Jsonviewer__null,
+  .Jsonviewer__undefined,
+  .Jsonviewer__NaN,
+  .Jsonviewer__function {
+    color: gray;
+  }
 .List {
   display: block;
 }
@@ -2344,7 +2437,7 @@ select {
   justify-content: center;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
-  transition-duration: 300ms;
+  transition-duration: 200ms;
   transition-property: background-color;
 }
 .Mediapreview__frame {
@@ -2354,9 +2447,7 @@ select {
     background-color: #fff;
     background-color: var(--color-base-white);
     opacity: 0;
-    transition-duration: 300ms;
-    transition-property: transform, opacity;
-    transform: scale(0.8);
+    transition-property: opacity;
   }
 .Mediapreview__image {
     width: 100%;
@@ -2402,8 +2493,8 @@ select {
       color: var(--color-base-gray);
   }
 .Mediapreview__closeButton .Icon {
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
 .Mediapreview--visible {
     pointer-events: auto;
@@ -2411,7 +2502,13 @@ select {
   }
 .Mediapreview--visible .Mediapreview__frame {
       opacity: 1;
-      transform: scale(1);
+    }
+.Mediapreview--hidden {
+    background-color: rgba(0, 0, 0, 0);
+  }
+.Mediapreview--hidden .Mediapreview__frame {
+      opacity: 0;
+      transition-duration: 200ms;
     }
 .Modal {
   display: flex;
@@ -2421,7 +2518,7 @@ select {
   color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
-  transition-duration: 300ms;
+  transition-duration: 200ms;
   transition-property: background-color;
 }
 .Modal__frame {
@@ -2431,9 +2528,7 @@ select {
     background-color: #fff;
     background-color: var(--color-base-white);
     opacity: 0;
-    transition-duration: 300ms;
     transition-property: transform, opacity;
-    transform: scale(0.8);
   }
 .Modal__closeButton {
   display: flex;
@@ -2445,7 +2540,7 @@ select {
     left: 0;
     /* z-index使いたくないけど仕方なく */
     z-index: 1;
-    width: 16px;
+    width: 13px;
     height: 0;
     cursor: pointer;
   }
@@ -2461,8 +2556,8 @@ select {
   }
 .Modal__closeButton .Icon {
       position: absolute;
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
 .Modal--visible {
     pointer-events: auto;
@@ -2470,11 +2565,16 @@ select {
   }
 .Modal--visible .Modal__frame {
       opacity: 1;
-      transform: scale(1);
+    }
+.Modal--hidden {
+    background-color: rgba(0, 0, 0, 0);
+  }
+.Modal--hidden .Modal__frame {
+      opacity: 0;
+      transition-duration: 200ms;
     }
 .Modal--desktop .Modal__frame {
-      min-width: 40%;
-      max-width: 80%;
+      width: 450px;
       min-height: 100px;
       max-height: 80%;
       border-radius: 8px;
@@ -2519,8 +2619,8 @@ select {
 .Numberinput__input {
     display: block;
     width: 100%;
-    padding: 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 18px;
+    font-size: 1.8rem;
     background-color: #fff;
     background-color: var(--color-base-white);
     border: 1px solid #d1d1d1;
@@ -3015,9 +3115,7 @@ select {
   height: 0;
   pointer-events: none;
   opacity: 0;
-  transition-duration: 300ms;
-  transition-property: transform, opacity;
-  transform: scale(0.8);
+  transition-property: opacity;
 }
 .Popover__frameOuter {
     position: absolute;
@@ -3038,11 +3136,14 @@ select {
   }
 .Popover--visible {
     opacity: 1;
-    transform: scale(1);
   }
 .Popover--visible .Popover__frameInner {
       pointer-events: auto;
     }
+.Popover--hidden {
+    opacity: 0;
+    transition-duration: 200ms;
+  }
 /* arrow配置: Top */
 .Popover--T .Popover__frameOuter {
       top: 10px;
@@ -3186,7 +3287,7 @@ select {
   justify-content: center;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
-  transition-duration: 300ms;
+  transition-duration: 200ms;
   transition-property: background-color;
 }
 .PopoverSpread__frame {
@@ -3198,9 +3299,7 @@ select {
     background-color: var(--theme-popover-bg);
     border-radius: 8px;
     opacity: 0;
-    transition-duration: 300ms;
-    transition-property: transform, opacity;
-    transform: scale(0.8);
+    transition-property: opacity;
   }
 .PopoverSpread--visible {
     pointer-events: auto;
@@ -3208,7 +3307,13 @@ select {
   }
 .PopoverSpread--visible .PopoverSpread__frame {
       opacity: 1;
-      transform: scale(1);
+    }
+.PopoverSpread--hidden {
+    background-color: rgba(0, 0, 0, 0);
+  }
+.PopoverSpread--hidden .PopoverSpread__frame {
+      opacity: 0;
+      transition-duration: 200ms;
     }
 .Prettyhtml {
   display: block;
@@ -3322,8 +3427,8 @@ select {
   justify-content: center;
     width: 100%;
     height: 100%;
-    padding: 14px 34px 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 34px 8px 18px;
+    font-size: 1.8rem;
     cursor: pointer;
   }
 .Select__icon {
@@ -3442,8 +3547,8 @@ select {
 .Textinput__input {
     display: block;
     width: 100%;
-    padding: 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 18px;
+    font-size: 1.8rem;
     background-color: #fff;
     background-color: var(--color-base-white);
     border: 1px solid #d1d1d1;
@@ -3505,7 +3610,7 @@ select {
   background-color: var(--color-base-blue);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
-  transition-duration: 300ms;
+  transition-duration: 150ms;
   transition-property: opacity;
 }
 .Toast__message {
@@ -4188,8 +4293,8 @@ select {
       color: var(--color-base-blue);
   }
 .ComponentsPage_Filter__closeButton .Icon {
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
 .ComponentsPage_Filter--desktop .ComponentsPage_Filter__closeButton {
     margin: 0 0 56px 24px;
@@ -4389,8 +4494,8 @@ select {
     right: 24px;
   }
 .ComponentsPage_Preview__operation {
-    margin-right: 16px;
-    font-size: 1.6rem;
+    margin-right: 32px;
+    font-size: 1.4rem;
     font-weight: bold;
     cursor: pointer;
   }
@@ -4544,8 +4649,8 @@ select {
       color: var(--color-base-blue);
   }
 .ComponentsPage_Search__closeButton .Icon {
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
 .ComponentsPage_Search--desktop .ComponentsPage_Search__closeButton {
     margin: 0 0 56px 24px;
@@ -4610,49 +4715,6 @@ select {
     font-size: 2.8rem;
     font-weight: bold;
   }
-.EndpointsPage__orderButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    background-color: #fff;
-    background-color: var(--theme-orderButton-bg);
-    border-radius: 50%;
-  }
-@media (hover: hover) {
-    .EndpointsPage__orderButton:hover {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-    }
-
-      .EndpointsPage__orderButton:hover .Icon {
-        color: #fff;
-        color: var(--color-base-white);
-      }
-  }
-.EndpointsPage__orderButton.hold {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-  }
-.EndpointsPage__orderButton.hold .Icon {
-        color: #fff;
-        color: var(--color-base-white);
-      }
-.EndpointsPage__orderButton .Icon {
-      width: 16px;
-      height: 16px;
-    }
-.EndpointsPage__orderButton--active {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-    }
-.EndpointsPage__orderButton--active .Icon {
-        color: #fff;
-        color: var(--color-base-white);
-      }
 .EndpointsPage__container {
     display: -ms-grid;
     display: grid;
@@ -4947,12 +5009,12 @@ select {
       color: var(--color-base-white);
     }
 .EndpointsPage_Endpoint_Signin__name {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
     font-size: 1.4rem;
     text-align: center;
   }
 .EndpointsPage_Endpoint_Signin__emails .EndpointsPage_Endpoint_Signin_Email {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 .EndpointsPage_Endpoint_Signin__emails .EndpointsPage_Endpoint_Signin_Email:last-child {
       margin-bottom: 0;
@@ -4991,9 +5053,46 @@ select {
 .EndpointsPage_Endpoint_Signin_Email .Textinput {
     margin-bottom: 12px;
   }
+.EndpointsPage_Endpoint_Signin_Email__button {
+    margin-top: 32px;
+  }
 .EndpointsPage_Endpoint_Signin_Oauth {
   display: block;
 }
+.EndpointsPage_Endpoint_Signin_Oauth__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    height: 48px;
+    color: #fff;
+    color: var(--color-base-white);
+    cursor: pointer;
+    border: 2px solid #fff;
+    border: 2px solid var(--color-base-white);
+    border-radius: 24px;
+  }
+@media (hover: hover) {
+    .EndpointsPage_Endpoint_Signin_Oauth__button:hover {
+      opacity: 0.5;
+    }
+  }
+.EndpointsPage_Endpoint_Signin_Oauth__button.hold {
+      opacity: 0.5;
+  }
+.EndpointsPage_Endpoint_Signin_Oauth__google {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background-image: url("../img/icon_google.png");
+    background-position: center center;
+    background-size: contain;
+  }
+.EndpointsPage_Endpoint_Signin_Oauth__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    font-size: 1.6rem;
+  }
 .NotfoundPage {
   display: block;
 }
