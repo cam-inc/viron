@@ -9,4 +9,8 @@
   & .Textinput {
     margin-bottom: 12px;
   }
+
+  &__button {
+    margin-top: 32px;
+  }
 }

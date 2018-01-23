@@ -1,3 +1,30 @@
 .EndpointsPage_Endpoint_Signin_Oauth {
   display: block;
+
+  &__button {
+    @apply --layout-center-center;
+
+    @mixin hover {
+      opacity: 0.5;
+    }
+    height: 48px;
+    color: var(--color-base-white);
+    cursor: pointer;
+    border: 2px solid var(--color-base-white);
+    border-radius: 24px;
+  }
+
+  &__google {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background-image: url("../img/icon_google.png");
+    background-position: center center;
+    background-size: contain;
+  }
+
+  &__label {
+    @apply --text-truncate;
+    font-size: 1.6rem;
+  }
 }

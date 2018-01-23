@@ -20,8 +20,8 @@
     @apply --layout-center-center;
     width: 100%;
     height: 100%;
-    padding: 14px 34px 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 34px 8px 18px;
+    font-size: 1.8rem;
     cursor: pointer;
   }
 

@@ -36,13 +36,13 @@
   }
 
   &__name {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
     font-size: 1.4rem;
     text-align: center;
   }
 
   &__emails .EndpointsPage_Endpoint_Signin_Email {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 
     &:last-child {
       margin-bottom: 0;

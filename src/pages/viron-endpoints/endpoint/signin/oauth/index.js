@@ -1,9 +1,13 @@
+import pascalCase from 'mout/string/pascalCase';
 import '../../../../../components/viron-error/index.tag';
 
 export default function() {
   const store = this.riotx.get();
 
-  this.handleButtonSelect = () => {
+  this.isGoogle = (this.opts.authtype.provider === 'google');
+  this.label = pascalCase(this.opts.authtype.provider);
+
+  this.handleButtonTap = () => {
     this.opts.closer();
     Promise
       .resolve()
