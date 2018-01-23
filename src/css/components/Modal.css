@@ -26,14 +26,14 @@
     left: 0;
     /* z-index使いたくないけど仕方なく */
     z-index: 1;
-    width: 16px;
+    width: 13px;
     height: 0;
     cursor: pointer;
 
     & .Icon {
       position: absolute;
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
   }
 
