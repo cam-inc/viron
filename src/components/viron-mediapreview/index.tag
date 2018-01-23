@@ -1,4 +1,4 @@
-viron-mediapreview.Mediapreview(class="{ isVisible ? 'Mediapreview--visible' : '' } Mediapreview--{ opts.mediapreviewopts.theme }" onTap="{ handleTap }")
+viron-mediapreview.Mediapreview(class="{ 'Mediapreview--visible': isVisible, 'Mediapreview--hidden': isHidden } Mediapreview--{ opts.mediapreviewopts.theme }" onTap="{ handleTap }")
   .Mediapreview__frame(onTap="{ handleFrameTap }")
     .Mediapreview__image(style="background-image: url({ path })")
     .Mediapreview__path { path }

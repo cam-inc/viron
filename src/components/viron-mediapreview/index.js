@@ -1,17 +1,24 @@
+const timeout = (ms = 100) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 export default function() {
   const store = this.riotx.get();
 
   this.path = this.opts.tagopts.path;
 
   const fadeIn = () => {
-    setTimeout(() => {
-      this.isVisible = true;
-      this.update();
-    }, 100);
+    Promise
+      .resolve()
+      .then(() => timeout())
+      .then(() => {
+        this.isVisible = true;
+        this.update();
+      });
   };
 
   const fadeOut = () => {
-    this.isVisible = false;
+    this.isHidden = true;
     this.update();
     setTimeout(() => {
       store.action('mediapreviews.remove', this.opts.id);

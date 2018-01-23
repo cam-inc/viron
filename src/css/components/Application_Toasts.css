@@ -14,7 +14,7 @@
     width: 100%;
     height: 64px;
     pointer-events: auto;
-    transition-duration: 300ms;
+    transition-duration: 150ms;
     transition-property: top, opacity;
 
     &--visible {
