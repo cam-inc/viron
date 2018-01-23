@@ -118,7 +118,7 @@ export default function() {
           .then(authtypes => store.action('modals.add', 'viron-endpoints-page-endpoint-signin', {
             endpoint: this.opts.endpoint,
             authtypes
-          }, { isSpread: true }));
+          }, { isSpread: true, width: 648 }));
       })
       .catch(err => store.action('modals.add', 'viron-error', {
         error: err

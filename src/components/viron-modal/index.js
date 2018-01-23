@@ -29,8 +29,10 @@ export default function() {
   };
 
   this.layoutType = store.getter('layout.type');
+  this.isDesktop = store.getter('layout.isDesktop');
   this.listen('layout', () => {
     this.layoutType = store.getter('layout.type');
+    this.isDesktop = store.getter('layout.isDesktop');
     this.update();
   });
 

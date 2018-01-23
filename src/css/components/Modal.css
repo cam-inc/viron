@@ -57,8 +57,7 @@
 
   &--desktop {
     & .Modal__frame {
-      min-width: 40%;
-      max-width: 80%;
+      width: 450px;
       min-height: 100px;
       max-height: 80%;
       border-radius: 8px;
