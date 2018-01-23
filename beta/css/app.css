@@ -1789,7 +1789,6 @@ select {
       top: 0;
     }
 .Application_Toasts .Toast--settled {
-      transition-duration: 200ms;
     }
 .Autocomplete {
   position: relative;
@@ -2136,11 +2135,7 @@ select {
       opacity: 1;
       transform: translateX(0);
     }
-.Drawer--settled {
-    transition-duration: 200ms;
-  }
 .Drawer--settled .Drawer__frame {
-      transition-duration: 200ms;
     }
 .Drawer--narrow .Drawer__frame {
       width: 384px;
@@ -2417,11 +2412,7 @@ select {
       opacity: 1;
       transform: scale(1);
     }
-.Mediapreview--settled {
-    transition-duration: 200ms;
-  }
 .Mediapreview--settled .Mediapreview__frame {
-      transition-duration: 200ms;
     }
 .Modal {
   display: flex;
@@ -2480,11 +2471,7 @@ select {
       opacity: 1;
       transform: scale(1);
     }
-.Modal--settled {
-    transition-duration: 200ms;
-  }
 .Modal--settled .Modal__frame {
-      transition-duration: 200ms;
     }
 .Modal--desktop .Modal__frame {
       min-width: 40%;
@@ -3057,7 +3044,6 @@ select {
       pointer-events: auto;
     }
 .Popover--settled {
-    transition-duration: 200ms;
   }
 /* arrow配置: Top */
 .Popover--T .Popover__frameOuter {
@@ -3224,11 +3210,7 @@ select {
       opacity: 1;
       transform: scale(1);
     }
-.PopoverSpread--settled {
-    transition-duration: 200ms;
-  }
 .PopoverSpread--settled .PopoverSpread__frame {
-      transition-duration: 200ms;
     }
 .Prettyhtml {
   display: block;
@@ -3539,7 +3521,6 @@ select {
     opacity: 1;
   }
 .Toast--settled {
-    transition-duration: 200ms;
   }
 .Toast--error {
     background-color: #f57177;
