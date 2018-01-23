@@ -50,7 +50,7 @@ export default function() {
     });
   };
 
-  this.handleThumbnailTap = () => {
+  this.handleInfoTap = () => {
     // エンドポイント情報を吹き出し表示します。
     const rect = this.refs.thumbnail.getBoundingClientRect();
     store.action('popovers.add', 'viron-application-header-info', null, {
