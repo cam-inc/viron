@@ -105787,8 +105787,6 @@ var script$47 = function() {
   this.isMobile = store.getter('layout.isMobile');
   this.layoutType = store.getter('layout.type');
   this.endpoints = store.getter('endpoints.allByOrderFiltered');
-  // エンドポイントカードがDnD可能な状態か否か。
-  this.isDraggable = false;
 
   this.listen('application', () => {
     this.endpoints = store.getter('endpoints.allByOrderFiltered');
@@ -105802,22 +105800,11 @@ var script$47 = function() {
     this.isDesktop = store.getter('layout.isDesktop');
     this.isMobile = store.getter('layout.isMobile');
     this.layoutType = store.getter('layout.type');
-    if (!this.isDesktop) {
-      this.isDraggable = false;
-    }
     this.update();
   });
-
-  this.handleOrderButtonTap = () => {
-    if (!this.isDesktop) {
-      return;
-    }
-    this.isDraggable = !this.isDraggable;
-    this.update();
-  };
 };
 
-riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> <div class="EndpointsPage__orderButton {\'EndpointsPage__orderButton--active\': isDraggable}" if="{isDesktop}" onclick="{getClickHandler(\'handleOrderButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOrderButtonTap\')}"> <viron-icon-move></viron-icon-move> </div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}" isdraggable="{parent.isDraggable}"></viron-endpoints-page-endpoint> <viron-endpoints-page-add></viron-endpoints-page-add> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
+riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}" isdraggable="{true}"></viron-endpoints-page-endpoint> <viron-endpoints-page-add></viron-endpoints-page-add> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
     this.external(script$47);
 });
 
@@ -105848,6 +105835,12 @@ riot$1.tag2('viron-application-dimmer', '', '', 'class="Application_Dimmer {\'Ap
     this.external(script$50);
 });
 
+const timeout = (ms) => {
+  if ( ms === void 0 ) ms = 100;
+
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 var script$51 = function() {
   const store = this.riotx.get();
 
@@ -105855,14 +105848,17 @@ var script$51 = function() {
   let tag;
 
   const fadeIn = () => {
-    setTimeout(() => {
-      this.isVisible = true;
-      this.update();
-    }, 100);
+    Promise
+      .resolve()
+      .then(() => timeout())
+      .then(() => {
+        this.isVisible = true;
+        this.update();
+      });
   };
 
   const fadeOut = () => {
-    this.isVisible = false;
+    this.isHidden = true;
     this.update();
 
     setTimeout(() => {
@@ -105909,7 +105905,7 @@ var script$51 = function() {
   };
 };
 
-riot$1.tag2('viron-drawer', '<div class="Drawer__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Drawer__contentWrapper"> <div class="Drawer__content" ref="content"></div> </div> </div>', '', 'class="Drawer Drawer--{opts.theme} {isVisible ? \'Drawer--visible\' : \'\'} Drawer--{layoutType} {opts.isnarrow ? \'Drawer--narrow\' : \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-drawer', '<div class="Drawer__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Drawer__contentWrapper"> <div class="Drawer__content" ref="content"></div> </div> </div>', '', 'class="Drawer Drawer--{opts.theme} {\'Drawer--visible\' : isVisible, \'Drawer--hidden\': isHidden} Drawer--{layoutType} {opts.isnarrow ? \'Drawer--narrow\' : \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$51);
 });
 
@@ -106498,20 +106494,29 @@ riot$1.tag2('viron-application-header', '<div class="Application_Header__item"> 
     this.external(script$55);
 });
 
+const timeout$1 = (ms) => {
+  if ( ms === void 0 ) ms = 100;
+
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 var script$64 = function() {
   const store = this.riotx.get();
 
   this.path = this.opts.tagopts.path;
 
   const fadeIn = () => {
-    setTimeout(() => {
-      this.isVisible = true;
-      this.update();
-    }, 100);
+    Promise
+      .resolve()
+      .then(() => timeout$1())
+      .then(() => {
+        this.isVisible = true;
+        this.update();
+      });
   };
 
   const fadeOut = () => {
-    this.isVisible = false;
+    this.isHidden = true;
     this.update();
     setTimeout(() => {
       store.action('mediapreviews.remove', this.opts.id);
@@ -106549,7 +106554,7 @@ var script$64 = function() {
   };
 };
 
-riot$1.tag2('viron-mediapreview', '<div class="Mediapreview__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Mediapreview__image" riot-style="background-image: url({path});"></div> <div class="Mediapreview__path">{path}</div> <div class="Mediapreview__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> </div>', '', 'class="Mediapreview {isVisible ? \'Mediapreview--visible\' : \'\'} Mediapreview--{opts.mediapreviewopts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-mediapreview', '<div class="Mediapreview__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Mediapreview__image" riot-style="background-image: url({path});"></div> <div class="Mediapreview__path">{path}</div> <div class="Mediapreview__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> </div>', '', 'class="Mediapreview {\'Mediapreview--visible\': isVisible, \'Mediapreview--hidden\': isHidden} Mediapreview--{opts.mediapreviewopts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$64);
 });
 
@@ -106567,20 +106572,29 @@ riot$1.tag2('viron-application-mediapreviews', '<virtual each="{mediapreviews}">
     this.external(script$65);
 });
 
+const timeout$2 = (ms) => {
+  if ( ms === void 0 ) ms = 100;
+
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 var script$66 = function() {
   const store = this.riotx.get();
 
   let tag;
 
   const fadeIn = () => {
-    setTimeout(() => {
-      this.isVisible = true;
-      this.update();
-    }, 100);
+    Promise
+      .resolve()
+      .then(() => timeout$2())
+      .then(() => {
+        this.isVisible = true;
+        this.update();
+      });
   };
 
   const fadeOut = () => {
-    this.isVisible = false;
+    this.isHidden = true;
     this.update();
     setTimeout(() => {
       store.action('modals.remove', this.opts.id);
@@ -106630,7 +106644,7 @@ var script$66 = function() {
   };
 };
 
-riot$1.tag2('viron-modal', '<div class="Modal__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {isVisible ? \'Modal--visible\' : \'\'} Modal--{opts.modalopts.theme} Modal--{layoutType} {opts.modalopts.isSpread ? \'Modal--spread\': \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-modal', '<div class="Modal__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {\'Modal--visible\': isVisible, \'Modal--hidden\': isHidden} Modal--{opts.modalopts.theme} Modal--{layoutType} {opts.modalopts.isSpread ? \'Modal--spread\': \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$66);
 });
 
@@ -106651,20 +106665,29 @@ riot$1.tag2('viron-application-modals', '<virtual each="{modals}"> <viron-modal 
 // Mouse系かTouch系か。
 const isTouchEventSupported$1 = 'ontouchstart' in document;
 
+const timeout$3 = (ms) => {
+  if ( ms === void 0 ) ms = 100;
+
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 var script$68 = function() {
   const store = this.riotx.get();
 
   let tag;
 
   const fadeIn = () => {
-    setTimeout(() => {
-      this.isVisible = true;
-      this.update();
-    }, 100);
+    Promise
+      .resolve()
+      .then(() => timeout$3())
+      .then(() => {
+        this.isVisible = true;
+        this.update();
+      });
   };
 
   const fadeOut = () => {
-    this.isVisible = false;
+    this.isHidden = true;
     this.update();
     setTimeout(() => {
       store.action('popovers.remove', this.opts.id);
@@ -106750,9 +106773,15 @@ var script$68 = function() {
   };
 };
 
-riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover {isVisible ? \'Popover--visible\' : \'\'} Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
+riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover {\'Popover--visible\': isVisible, \'Popover--hidden\': isHidden} Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
     this.external(script$68);
 });
+
+const timeout$4 = (ms) => {
+  if ( ms === void 0 ) ms = 100;
+
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
 
 var script$69 = function() {
   const store = this.riotx.get();
@@ -106760,14 +106789,17 @@ var script$69 = function() {
   let tag;
 
   const fadeIn = () => {
-    setTimeout(() => {
-      this.isVisible = true;
-      this.update();
-    }, 100);
+    Promise
+      .resolve()
+      .then(() => timeout$4())
+      .then(() => {
+        this.isVisible = true;
+        this.update();
+      });
   };
 
   const fadeOut = () => {
-    this.isVisible = false;
+    this.isHidden = true;
     this.update();
     setTimeout(() => {
       store.action('popovers.remove', this.opts.id);
@@ -106813,7 +106845,7 @@ var script$69 = function() {
   };
 };
 
-riot$1.tag2('viron-popover-spread', '<div class="PopoverSpread__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="PopoverSpread__content" ref="content"></div> </div>', '', 'class="PopoverSpread {isVisible ? \'PopoverSpread--visible\' : \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-popover-spread', '<div class="PopoverSpread__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="PopoverSpread__content" ref="content"></div> </div>', '', 'class="PopoverSpread {\'PopoverSpread--visible\': isVisible, \'PopoverSpread--hidden\': isHidden}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$69);
 });
 
@@ -106840,7 +106872,7 @@ riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <virtual 
 
 var script$71 = function() {};
 
-riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div>ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
+riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div class="Application_Poster__label">ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
     this.external(script$71);
 });
 
@@ -106869,6 +106901,12 @@ riot$1.tag2('viron-application-splash', '<div class="Application_Splash__contain
     this.external(script$73);
 });
 
+const timeout$5 = (ms) => {
+  if ( ms === void 0 ) ms = 100;
+
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 var script$74 = function() {
   const store = this.riotx.get();
 
@@ -106877,11 +106915,13 @@ var script$74 = function() {
   this.isVisible = false;
 
   const show = () => {
-    // need to set delay after dom mountation.
-    setTimeout(() => {
-      this.isVisible = true;
-      this.update();
-    }, 100);
+    Promise
+      .resolve()
+      .then(() => timeout$5())
+      .then(() => {
+        this.isVisible = true;
+        this.update();
+      });
   };
 
   const hide = () => {
