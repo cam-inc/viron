@@ -49,3 +49,11 @@ $ npm version [major|minor|patch]
 $ git push origin develop
 $ npm run release
 ```
+
+## Copyright
+
+CA Mobile, Inc. All rights reserved.
+
+## LICENSE
+
+@see : [LICENSE](LICENSE)
