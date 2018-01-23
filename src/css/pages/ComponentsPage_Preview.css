@@ -39,8 +39,8 @@
     @mixin hover {
       color: var(--color-base-blue);
     }
-    margin-right: 16px;
-    font-size: 1.6rem;
+    margin-right: 32px;
+    font-size: 1.4rem;
     font-weight: bold;
     cursor: pointer;
 
