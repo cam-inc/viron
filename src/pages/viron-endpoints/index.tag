@@ -1,5 +1,4 @@
 viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
-  viron-jsonviewer(if="{ data }" data="{ data }")
   .EndpointsPage__head
     .EndpointsPage__title ホーム
     .EndpointsPage__orderButton(if="{ isDesktop }" class="{ 'EndpointsPage__orderButton--active': isDraggable }" onTap="{ handleOrderButtonTap }")
@@ -10,7 +9,6 @@ viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
 
   script.
     import '../../components/icons/viron-icon-move/index.tag';
-    import '../../components/viron-jsonviewer/index.tag';
     import './add/index.tag';
     import './endpoint/index.tag';
     import script from './index';

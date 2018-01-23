@@ -1,6 +1,6 @@
 viron-endpoints-page-endpoint-signin-email.EndpointsPage_Endpoint_Signin_Email
   .EndpointsPage_Endpoint_Signin_Email__error(if="{ errorMessage }") { errorMessage }
-  viron-textinput(placeholder="mail address" val="{ IDまたはメールアドレス }" onChange="{ handleMailAddressChange }")
+  viron-textinput(placeholder="IDまたはメールアドレス" val="{ mailAddress }" onChange="{ handleMailAddressChange }")
   viron-textinput(placeholder="パスワード" type="password" val="{ password }" onChange="{ handlePasswordChange }")
   viron-button(label="ログイン" theme="secondary" onSelect="{ handleSigninButtonSelect }")
 
