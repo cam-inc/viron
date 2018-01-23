@@ -6,6 +6,7 @@
   background-color: var(--color-base-blue);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
+  transition-duration: 150ms;
   transition-property: opacity;
 
   &__message {
@@ -16,10 +17,6 @@
 
   &--visible {
     opacity: 1;
-  }
-
-  &--settled {
-    transition-duration: 200ms;
   }
 
   &--error {

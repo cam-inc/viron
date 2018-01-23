@@ -1,4 +1,4 @@
-viron-toast.Toast(class="{ 'Toast--visible' : isVisible, 'Toast--settled': isSettled, 'Toast--error' : opts.iserror }" onTap="{ handleTap }")
+viron-toast.Toast(class="{ 'Toast--visible' : isVisible, 'Toast--error' : opts.iserror }" onTap="{ handleTap }")
   .Toast__message { opts.message }
 
   script.
