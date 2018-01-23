@@ -26,8 +26,9 @@
   }
 
   &__menuIcon.Icon {
-    width: 40px;
-    padding-left: 24px;
+    width: 24px;
+    height: 24px;
+    margin-left: 24px;
   }
 
   &__thumbnail {

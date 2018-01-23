@@ -1,8 +1,6 @@
 viron-components-page-number.ComponentsPage_Card_Number
   .ComponentsPage_Card_Number__head
     .ComponentsPage_Card_Number__title { opts.def.name }
-    .ComponentsPage_Card_Number__control
-      viron-icon-reload(onTap="{ handleRefreshButtonTap }")
   .ComponentsPage_Card_Number__body
     virtual(if="{ isLoading }")
       .ComponentsPage_Card_Number__progress

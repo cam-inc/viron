@@ -8,28 +8,14 @@
 
   &__head {
     @apply --layout-center-start;
-  }
-
-  &--desktop &__head {
     margin-bottom: 24px;
-  }
-
-  &--mobile &__head {
-    margin-bottom: 8px;
   }
 
   &__name {
     @apply --text-truncate;
     flex-grow: 1;
-    font-weight: bold;
-  }
-
-  &--desktop &__name {
     font-size: 2.8rem;
-  }
-
-  &--mobile &__name {
-    font-size: 1.4rem;
+    font-weight: bold;
   }
 
   &__control {
@@ -37,29 +23,46 @@
     flex-shrink: 0;
   }
 
+  &__refresh,
   &__crossSearch {
     @apply --layout-center-center;
 
     @mixin hover {
-      color: var(--color-base-blue);
+      background-color: var(--color-base-blue);
+
+      & .Icon {
+        color: var(--color-base-white);
+      }
     }
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
+    background-color: var(--theme-orderButton-bg);
+    border-radius: 50%;
 
     &--active {
-      color: var(--color-base-blue);
+      background-color: var(--color-base-blue);
+
+      & .Icon {
+        color: var(--color-base-white);
+      }
     }
 
     & .Icon {
       width: 16px;
       height: 16px;
-      margin-right: 4px;
     }
+  }
+
+  &__crossSearch {
+    margin-left: 8px;
   }
 
   &__container {
     display: grid;
     grid-gap: var(--page-components-grid-gap);
-    grid-template-columns: repeat(auto-fill, minmax(312px, auto));
+    grid-template-columns: repeat(auto-fill, minmax(272px, auto));
     grid-auto-rows: auto;
   }
 

@@ -14,6 +14,7 @@ import popovers from './popovers';
 import signinShowKey from './signinShowKey';
 import toasts from './toasts';
 import ua from './ua';
+import util from './util';
 import viron from './viron';
 
 export default ObjectAssign(
@@ -33,6 +34,7 @@ export default ObjectAssign(
   signinShowKey,
   toasts,
   ua,
+  util,
   viron
 );
 

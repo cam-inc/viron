@@ -13,6 +13,7 @@ import page from './page';
 import popovers from './popovers';
 import toasts from './toasts';
 import ua from './ua';
+import util from './util';
 import viron from './viron';
 
 export default ObjectAssign(
@@ -31,5 +32,6 @@ export default ObjectAssign(
   popovers,
   toasts,
   ua,
+  util,
   viron
 );

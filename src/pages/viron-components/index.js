@@ -45,6 +45,10 @@ export default function() {
     return ret;
   };
 
+  this.handleRefreshTap = () => {
+    store.action('util.refreshAllComponents');
+  };
+
   this.handleCrossSearchTap = () => {
     store.action('drawers.add', 'viron-components-page-search', {
       parameterObjects: this.parameterObjectsForCrossSearch,

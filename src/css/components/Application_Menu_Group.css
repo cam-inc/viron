@@ -1,5 +1,6 @@
 .Application_Menu_Group {
   display: block;
+  color: var(--theme-menu-text);
 
   &__head {
     @apply --layout-center-center;

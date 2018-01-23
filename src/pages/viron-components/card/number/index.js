@@ -88,14 +88,19 @@ export default function() {
     this.update();
   });
 
+  this.refreshId = store.getter('util.components_refresh');
+  this.listen('util', () => {
+    const refreshId = store.getter('util.components_refresh');
+    if (this.refreshId !== refreshId) {
+      this.refreshId = refreshId;
+      getData();
+    }
+  });
+
   this.on('mount', () => {
     getData();
   }).on('unmount', () => {
     inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
   });
-
-  this.handleRefreshButtonTap = () => {
-    getData();
-  };
 }
