@@ -3,6 +3,7 @@
   color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
+  transition-duration: 200ms;
   transition-property: background-color;
 
   &__frame {
@@ -13,6 +14,7 @@
     height: 100%;
     background-color: var(--color-base-white);
     opacity: 0;
+    transition-duration: 200ms;
     transition-property: transform, opacity;
     transform: translateX(100px);
   }
@@ -33,11 +35,11 @@
     }
   }
 
-  &--settled {
-    transition-duration: 200ms;
+  &--hidden {
+    background-color: rgba(0, 0, 0, 0);
 
     & .Drawer__frame {
-      transition-duration: 200ms;
+      opacity: 0;
     }
   }
 
