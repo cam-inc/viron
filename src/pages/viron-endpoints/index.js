@@ -9,6 +9,11 @@ export default function() {
             num: '777',
             nan: NaN,
             undefined: 'aaa'
+          },
+          {
+            num: '777',
+            nan: NaN,
+            undefined: 'aaa'
           }
         ],
         b: [

@@ -17,6 +17,10 @@
       display: none;
     }
 
+    & ~ .Jsonviewer__commma {
+      display: none;
+    }
+
     & ~ .Jsonviewer__dots {
       display: block;
     }
@@ -33,6 +37,10 @@
     }
 
     & ~ .Jsonviewer__value {
+      display: block;
+    }
+
+    & ~ .Jsonviewer__commma {
       display: block;
     }
 

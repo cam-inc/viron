@@ -11,7 +11,6 @@ viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
   script.
     import '../../components/icons/viron-icon-move/index.tag';
     import '../../components/viron-jsonviewer/index.tag';
-    import '../../components/viron-image/index.tag';
     import './add/index.tag';
     import './endpoint/index.tag';
     import script from './index';
