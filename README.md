@@ -56,4 +56,4 @@ CA Mobile, Inc. All rights reserved.
 
 ## LICENSE
 
-@see : [LICENSE](blob/develop/LICENSE)
+@see : [LICENSE](LICENSE)
