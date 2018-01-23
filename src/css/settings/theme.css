@@ -3,6 +3,7 @@
   --theme-app-text: #fff;
   --theme-app-bg: #fff;
   --theme-poster-overlay: #fff;
+  --theme-poster-label: #fff;
   --theme-menu-logo: #fff;
   --theme-menu-text: #fff;
   --theme-menu-arrow: #fff;
@@ -32,6 +33,7 @@
   --theme-standard-app-text: #484848;
   --theme-standard-app-bg: #f0f0ef;
   --theme-standard-poster-overlay: transparent;
+  --theme-standard-poster-label: #fff;
   --theme-standard-menu-logo: #f57177;
   --theme-standard-menu-text: #fff;
   --theme-standard-menu-arrow: #f57177;
@@ -60,6 +62,7 @@
   --theme-midnight-app-text: #00c8ff;
   --theme-midnight-app-bg: #001217;
   --theme-midnight-poster-overlay: #001d26;
+  --theme-midnight-poster-label: #00c8ff;
   --theme-midnight-menu-logo: #00c8ff;
   --theme-midnight-menu-text: #00c8ff;
   --theme-midnight-menu-arrow: #00c8ff;
@@ -88,6 +91,7 @@
   --theme-terminal-app-text: #35dcba;
   --theme-terminal-app-bg: #000;
   --theme-terminal-poster-overlay: #091714;
+  --theme-terminal-poster-label: #35dcba;
   --theme-terminal-menu-logo: #35dcba;
   --theme-terminal-menu-text: #35dcba;
   --theme-terminal-menu-arrow: #35dcba;

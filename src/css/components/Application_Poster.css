@@ -35,4 +35,8 @@
     height: 32px;
     margin-bottom: 24px;
   }
+
+  &__label {
+    color: var(--theme-poster-label);
+  }
 }

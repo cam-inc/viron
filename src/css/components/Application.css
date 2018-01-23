@@ -127,6 +127,7 @@
     --theme-app-text: var(--theme-standard-app-text);
     --theme-app-bg: var(--theme-standard-app-bg);
     --theme-poster-overlay: var(--theme-standard-poster-overlay);
+    --theme-poster-label: var(--theme-standard-poster-label);
     --theme-menu-logo: var(--theme-standard-menu-logo);
     --theme-menu-text: var(--theme-standard-menu-text);
     --theme-menu-arrow: var(--theme-standard-menu-arrow);
@@ -156,6 +157,7 @@
     --theme-app-text: var(--theme-midnight-app-text);
     --theme-app-bg: var(--theme-midnight-app-bg);
     --theme-poster-overlay: var(--theme-midnight-poster-overlay);
+    --theme-poster-label: var(--theme-midnight-poster-label);
     --theme-menu-logo: var(--theme-midnight-menu-logo);
     --theme-menu-text: var(--theme-midnight-menu-text);
     --theme-menu-arrow: var(--theme-midnight-menu-arrow);
@@ -185,6 +187,7 @@
     --theme-app-text: var(--theme-terminal-app-text);
     --theme-app-bg: var(--theme-terminal-app-bg);
     --theme-poster-overlay: var(--theme-terminal-poster-overlay);
+    --theme-poster-label: var(--theme-terminal-poster-label);
     --theme-menu-logo: var(--theme-terminal-menu-logo);
     --theme-menu-text: var(--theme-terminal-menu-text);
     --theme-menu-arrow: var(--theme-terminal-menu-arrow);
