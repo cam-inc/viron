@@ -13,37 +13,6 @@
     font-weight: bold;
   }
 
-  &__orderButton {
-    @apply --layout-center-center;
-
-    @mixin hover {
-      background-color: var(--color-base-blue);
-
-      & .Icon {
-        color: var(--color-base-white);
-      }
-    }
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    background-color: var(--theme-orderButton-bg);
-    border-radius: 50%;
-
-    & .Icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    &--active {
-      background-color: var(--color-base-blue);
-
-      & .Icon {
-        color: var(--color-base-white);
-      }
-    }
-  }
-
   &__container {
     display: grid;
     grid-gap: 24px;
