@@ -1,4 +1,4 @@
-viron-popover-spread.PopoverSpread(class="{ 'PopoverSpread--visible': isVisible, 'PopoverSpread--settled': isSettled }" onTap="{ handleTap }")
+viron-popover-spread.PopoverSpread(class="{ 'PopoverSpread--visible': isVisible, 'PopoverSpread--hidden': isHidden }" onTap="{ handleTap }")
   .PopoverSpread__frame(onTap="{ handleFrameTap }")
     .PopoverSpread__content(ref="content")
 

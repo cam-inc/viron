@@ -9,8 +9,7 @@
   height: 0;
   pointer-events: none;
   opacity: 0;
-  transition-property: transform, opacity;
-  transform: scale(0.8);
+  transition-property: opacity;
 
   &__frameOuter {
     position: absolute;
@@ -33,14 +32,14 @@
 
   &--visible {
     opacity: 1;
-    transform: scale(1);
 
     & .Popover__frameInner {
       pointer-events: auto;
     }
   }
 
-  &--settled {
+  &--hidden {
+    opacity: 0;
     transition-duration: 200ms;
   }
 

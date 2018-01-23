@@ -2,6 +2,7 @@
   @apply --layout-center-center;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
+  transition-duration: 200ms;
   transition-property: background-color;
 
   &__frame {
@@ -12,8 +13,7 @@
     background-color: var(--theme-popover-bg);
     border-radius: 8px;
     opacity: 0;
-    transition-property: transform, opacity;
-    transform: scale(0.8);
+    transition-property: opacity;
   }
 
   &--visible {
@@ -22,14 +22,14 @@
 
     & .PopoverSpread__frame {
       opacity: 1;
-      transform: scale(1);
     }
   }
 
-  &--settled {
-    transition-duration: 200ms;
+  &--hidden {
+    background-color: rgba(0, 0, 0, 0);
 
     & .PopoverSpread__frame {
+      opacity: 0;
       transition-duration: 200ms;
     }
   }
