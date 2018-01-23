@@ -1241,6 +1241,7 @@ select {
 .Application_Header_Filter__input {
     display: block;
     width: 100%;
+    font-size: 1.6rem;
   }
 .Application_Header_Filter__text {
   overflow: hidden;
