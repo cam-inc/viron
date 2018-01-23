@@ -14,16 +14,11 @@ export default function() {
       .then(() => {
         this.isVisible = true;
         this.update();
-      })
-      .then(() => timeout())
-      .then(() => {
-        this.isSettled = true;
-        this.update();
       });
   };
 
   const fadeOut = () => {
-    this.isVisible = false;
+    this.isHidden = true;
     this.update();
     setTimeout(() => {
       store.action('mediapreviews.remove', this.opts.id);
