@@ -28,6 +28,31 @@
     font-size: 1.6rem;
   }
 
+  &__operations {
+    @apply --layout-center-start;
+    position: absolute;
+    top: 24px;
+    right: 24px;
+  }
+
+  &__operation {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    margin-right: 16px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    cursor: pointer;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &--delete {
+      color: var(--color-base-red);
+    }
+  }
+
   &__operationsButton {
     @mixin hover {
       color: var(--color-base-blue);

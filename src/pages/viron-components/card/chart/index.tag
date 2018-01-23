@@ -1,8 +1,6 @@
 viron-components-page-chart.ComponentsPage_Card_Chart
   .ComponentsPage_Card_Chart__head
     .ComponentsPage_Card_Chart__title { opts.def.name }
-    .ComponentsPage_Card_Chart__control
-      viron-icon-reload(onTap="{ handleRefreshButtonTap }")
   .ComponentsPage_Card_Chart__body
     virtual(if="{ isLoading }")
       .ComponentsPage_Card_Chart__progress
