@@ -21,6 +21,7 @@
   --theme-app-text: #fff;
   --theme-app-bg: #fff;
   --theme-poster-overlay: #fff;
+  --theme-poster-label: #fff;
   --theme-menu-logo: #fff;
   --theme-menu-text: #fff;
   --theme-menu-arrow: #fff;
@@ -50,6 +51,7 @@
   --theme-standard-app-text: #484848;
   --theme-standard-app-bg: #f0f0ef;
   --theme-standard-poster-overlay: transparent;
+  --theme-standard-poster-label: #fff;
   --theme-standard-menu-logo: #f57177;
   --theme-standard-menu-text: #fff;
   --theme-standard-menu-arrow: #f57177;
@@ -78,6 +80,7 @@
   --theme-midnight-app-text: #00c8ff;
   --theme-midnight-app-bg: #001217;
   --theme-midnight-poster-overlay: #001d26;
+  --theme-midnight-poster-label: #00c8ff;
   --theme-midnight-menu-logo: #00c8ff;
   --theme-midnight-menu-text: #00c8ff;
   --theme-midnight-menu-arrow: #00c8ff;
@@ -106,6 +109,7 @@
   --theme-terminal-app-text: #35dcba;
   --theme-terminal-app-bg: #000;
   --theme-terminal-poster-overlay: #091714;
+  --theme-terminal-poster-label: #35dcba;
   --theme-terminal-menu-logo: #35dcba;
   --theme-terminal-menu-text: #35dcba;
   --theme-terminal-menu-arrow: #35dcba;
@@ -886,6 +890,8 @@ select {
     --theme-app-bg: var(--theme-standard-app-bg);
     --theme-poster-overlay: transparent;
     --theme-poster-overlay: var(--theme-standard-poster-overlay);
+    --theme-poster-label: #fff;
+    --theme-poster-label: var(--theme-standard-poster-label);
     --theme-menu-logo: #f57177;
     --theme-menu-logo: var(--theme-standard-menu-logo);
     --theme-menu-text: #fff;
@@ -940,6 +946,8 @@ select {
     --theme-app-bg: var(--theme-midnight-app-bg);
     --theme-poster-overlay: #001d26;
     --theme-poster-overlay: var(--theme-midnight-poster-overlay);
+    --theme-poster-label: #00c8ff;
+    --theme-poster-label: var(--theme-midnight-poster-label);
     --theme-menu-logo: #00c8ff;
     --theme-menu-logo: var(--theme-midnight-menu-logo);
     --theme-menu-text: #00c8ff;
@@ -994,6 +1002,8 @@ select {
     --theme-app-bg: var(--theme-terminal-app-bg);
     --theme-poster-overlay: #091714;
     --theme-poster-overlay: var(--theme-terminal-poster-overlay);
+    --theme-poster-label: #35dcba;
+    --theme-poster-label: var(--theme-terminal-poster-label);
     --theme-menu-logo: #35dcba;
     --theme-menu-logo: var(--theme-terminal-menu-logo);
     --theme-menu-text: #35dcba;
@@ -1666,6 +1676,10 @@ select {
     height: 32px;
     margin-bottom: 24px;
   }
+.Application_Poster__label {
+    color: #fff;
+    color: var(--theme-poster-label);
+  }
 @keyframes Application_ProgressLinear-indeterminate1 {
   /* |-----|---x-||-----||-----| */
   0% {
@@ -1783,12 +1797,11 @@ select {
     width: 100%;
     height: 64px;
     pointer-events: auto;
+    transition-duration: 150ms;
     transition-property: top, opacity;
   }
 .Application_Toasts .Toast--visible {
       top: 0;
-    }
-.Application_Toasts .Toast--settled {
     }
 .Autocomplete {
   position: relative;
@@ -2107,6 +2120,7 @@ select {
   color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
+  transition-duration: 200ms;
   transition-property: background-color;
 }
 .Drawer__frame {
@@ -2119,6 +2133,7 @@ select {
     background-color: #fff;
     background-color: var(--color-base-white);
     opacity: 0;
+    transition-duration: 200ms;
     transition-property: transform, opacity;
     transform: translateX(100px);
   }
@@ -2135,7 +2150,11 @@ select {
       opacity: 1;
       transform: translateX(0);
     }
-.Drawer--settled .Drawer__frame {
+.Drawer--hidden {
+    background-color: rgba(0, 0, 0, 0);
+  }
+.Drawer--hidden .Drawer__frame {
+      opacity: 0;
     }
 .Drawer--narrow .Drawer__frame {
       width: 384px;
@@ -2345,6 +2364,7 @@ select {
   justify-content: center;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
+  transition-duration: 200ms;
   transition-property: background-color;
 }
 .Mediapreview__frame {
@@ -2354,8 +2374,7 @@ select {
     background-color: #fff;
     background-color: var(--color-base-white);
     opacity: 0;
-    transition-property: transform, opacity;
-    transform: scale(0.8);
+    transition-property: opacity;
   }
 .Mediapreview__image {
     width: 100%;
@@ -2410,9 +2429,13 @@ select {
   }
 .Mediapreview--visible .Mediapreview__frame {
       opacity: 1;
-      transform: scale(1);
     }
-.Mediapreview--settled .Mediapreview__frame {
+.Mediapreview--hidden {
+    background-color: rgba(0, 0, 0, 0);
+  }
+.Mediapreview--hidden .Mediapreview__frame {
+      opacity: 0;
+      transition-duration: 200ms;
     }
 .Modal {
   display: flex;
@@ -2422,6 +2445,7 @@ select {
   color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
+  transition-duration: 200ms;
   transition-property: background-color;
 }
 .Modal__frame {
@@ -2432,7 +2456,6 @@ select {
     background-color: var(--color-base-white);
     opacity: 0;
     transition-property: transform, opacity;
-    transform: scale(0.8);
   }
 .Modal__closeButton {
   display: flex;
@@ -2469,9 +2492,13 @@ select {
   }
 .Modal--visible .Modal__frame {
       opacity: 1;
-      transform: scale(1);
     }
-.Modal--settled .Modal__frame {
+.Modal--hidden {
+    background-color: rgba(0, 0, 0, 0);
+  }
+.Modal--hidden .Modal__frame {
+      opacity: 0;
+      transition-duration: 200ms;
     }
 .Modal--desktop .Modal__frame {
       min-width: 40%;
@@ -3016,8 +3043,7 @@ select {
   height: 0;
   pointer-events: none;
   opacity: 0;
-  transition-property: transform, opacity;
-  transform: scale(0.8);
+  transition-property: opacity;
 }
 .Popover__frameOuter {
     position: absolute;
@@ -3038,12 +3064,13 @@ select {
   }
 .Popover--visible {
     opacity: 1;
-    transform: scale(1);
   }
 .Popover--visible .Popover__frameInner {
       pointer-events: auto;
     }
-.Popover--settled {
+.Popover--hidden {
+    opacity: 0;
+    transition-duration: 200ms;
   }
 /* arrow配置: Top */
 .Popover--T .Popover__frameOuter {
@@ -3188,6 +3215,7 @@ select {
   justify-content: center;
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
+  transition-duration: 200ms;
   transition-property: background-color;
 }
 .PopoverSpread__frame {
@@ -3199,8 +3227,7 @@ select {
     background-color: var(--theme-popover-bg);
     border-radius: 8px;
     opacity: 0;
-    transition-property: transform, opacity;
-    transform: scale(0.8);
+    transition-property: opacity;
   }
 .PopoverSpread--visible {
     pointer-events: auto;
@@ -3208,9 +3235,13 @@ select {
   }
 .PopoverSpread--visible .PopoverSpread__frame {
       opacity: 1;
-      transform: scale(1);
     }
-.PopoverSpread--settled .PopoverSpread__frame {
+.PopoverSpread--hidden {
+    background-color: rgba(0, 0, 0, 0);
+  }
+.PopoverSpread--hidden .PopoverSpread__frame {
+      opacity: 0;
+      transition-duration: 200ms;
     }
 .Prettyhtml {
   display: block;
@@ -3507,6 +3538,7 @@ select {
   background-color: var(--color-base-blue);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
+  transition-duration: 150ms;
   transition-property: opacity;
 }
 .Toast__message {
@@ -3519,8 +3551,6 @@ select {
   }
 .Toast--visible {
     opacity: 1;
-  }
-.Toast--settled {
   }
 .Toast--error {
     background-color: #f57177;
@@ -4613,49 +4643,6 @@ select {
     font-size: 2.8rem;
     font-weight: bold;
   }
-.EndpointsPage__orderButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    background-color: #fff;
-    background-color: var(--theme-orderButton-bg);
-    border-radius: 50%;
-  }
-@media (hover: hover) {
-    .EndpointsPage__orderButton:hover {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-    }
-
-      .EndpointsPage__orderButton:hover .Icon {
-        color: #fff;
-        color: var(--color-base-white);
-      }
-  }
-.EndpointsPage__orderButton.hold {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-  }
-.EndpointsPage__orderButton.hold .Icon {
-        color: #fff;
-        color: var(--color-base-white);
-      }
-.EndpointsPage__orderButton .Icon {
-      width: 16px;
-      height: 16px;
-    }
-.EndpointsPage__orderButton--active {
-      background-color: #627edf;
-      background-color: var(--color-base-blue);
-    }
-.EndpointsPage__orderButton--active .Icon {
-        color: #fff;
-        color: var(--color-base-white);
-      }
 .EndpointsPage__container {
     display: -ms-grid;
     display: grid;
