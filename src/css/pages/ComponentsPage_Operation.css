@@ -74,6 +74,7 @@
       cursor: not-allowed;
       background-color: var(--color-base-blue-secondary);
     }
+
     &--disabled.&--emphasised {
       background-color: var(--color-base-red-secondary);
     }

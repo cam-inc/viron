@@ -82,4 +82,16 @@ export default function() {
     // keyはopts.parameterObject.nameと同じ。
     this.opts.onchange(key, newVal);
   };
+
+  /**
+   * バリデートされた時の処理。
+   * @param {String} formId
+   * @param {Boolean} isValid
+   */
+  this.handleValValidate = (formId, isValid) => {
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(formId, isValid);
+  };
 }

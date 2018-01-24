@@ -1,4 +1,5 @@
 import isUndefined from 'mout/lang/isUndefined';
+import contains from 'mout/object/contains';
 import forOwn from 'mout/object/forOwn';
 
 export default function() {
@@ -21,5 +22,23 @@ export default function() {
       }
     });
     this.opts.onchange(ret);
+  };
+
+  /**
+   * バリデートされた時の処理。
+   * @param {String} formId
+   * @param {Boolean} isValid
+   */
+  const validateResults = {};
+  this.handleValValidate = (formId, isValid) => {
+    validateResults[formId] = isValid;
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    if (contains(validateResults, false)) {
+      this.opts.onvalidate(false);
+    } else {
+      this.opts.onvalidate(true);
+    }
   };
 }

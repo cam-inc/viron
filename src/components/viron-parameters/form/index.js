@@ -69,6 +69,10 @@ export default function() {
   const validate = () => {
     this.errors = validator.errors(this.opts.val, formObject);
     this.hasError = !!this.errors.length;
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(this._riot_id, !this.hasError);
   };
 
   // フォーム選択状態。

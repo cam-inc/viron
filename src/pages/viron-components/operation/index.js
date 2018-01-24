@@ -70,9 +70,28 @@ export default function() {
       });
   };
 
+  const updateSubmitButton = () => {
+    // 諸々の都合でthis.update()を使えない & 使いたくない。
+    // ので、DOMを直接操作する。
+    const submitButton = this.refs.submit;
+    if (!submitButton) {
+      return;
+    }
+    const className = 'ComponentsPage_Operation__submit--disabled';
+    if (this.isValid) {
+      submitButton.classList.remove(className);
+    } else {
+      submitButton.classList.add(className);
+    }
+  };
+
   this.listen('layout', () => {
     this.layoutType = store.getter('layout.type');
     this.update();
+  });
+
+  this.on('mount', () => {
+    updateSubmitButton();
   });
 
   this.handleCancelTap = () => {
@@ -86,7 +105,7 @@ export default function() {
 
   this.handleParametersValidate = isValid => {
     this.isValid = isValid;
-    this.update();
+    updateSubmitButton();
   };
 
   this.handleSubmitTap = () => {
