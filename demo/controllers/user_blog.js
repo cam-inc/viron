@@ -15,8 +15,8 @@ const list = (req, res, next) => {
   const store = context.getStoreMain();
   const UserBlogs = store.models.UserBlogs;
   const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-  const limit = req.query.limit;
-  const offset = req.query.offset;
+  const limit = Number(req.query.limit);
+  const offset = Number(req.query.offset);
   const options = {
     attributes,
     limit,

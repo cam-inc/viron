@@ -1111,6 +1111,16 @@ paths:
         name: name
         required: false
         type: string
+      - description: 1ページあたりの件数
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: ページの開始位置
+        in: query
+        name: offset
+        required: false
+        type: integer
       responses:
         "200":
           description: OK

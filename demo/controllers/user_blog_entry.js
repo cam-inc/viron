@@ -14,8 +14,8 @@ const list = (req, res, next) => {
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const UserBlogEntries = store.models.UserBlogEntries;
-  const limit = req.query.limit;
-  const offset = req.query.offset;
+  const limit = Number(req.query.limit);
+  const offset = Number(req.query.offset);
   const options = {
     attributes: Object.keys(req.swagger.operation.responses['200'].schema.items.properties),
     limit,
