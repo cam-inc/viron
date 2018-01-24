@@ -1,13 +1,13 @@
-# viron
+# VIRON
 Automatically generate a management console based on swagger data.
 
 # Document
 
-> access : [Viron Documentation](https://cam-inc.github.io/viron-doc/)
+> access : [VIRON Documentation](https://cam-inc.github.io/viron-doc/)
 
 # Site
 
-> access : [Viron](https://cam-inc.github.io/viron/latest)
+> access : [VIRON](https://cam-inc.github.io/viron/latest)
 
 # QuickStart
 

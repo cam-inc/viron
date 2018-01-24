@@ -1,7 +1,7 @@
 # viron-demo
 
-This Project provides Viron Demonstration API Server.  
-If you want to try this server, visit to [Viron](https://cam-inc.github.io/viron/latest),  
+This Project provides VIRON Demonstration API Server.
+If you want to try this server, visit to [VIRON](https://cam-inc.github.io/viron/latest),
 And add EndPoint `https://viron.camplat.com/swagger.json` .
 
 If you want to start development quickly, see [example-email](../example-email)
@@ -20,12 +20,12 @@ $ # 必要に応じて.envを編集してください
 $ npm run dressup
 ```
 
-> 初回起動時はMySQLの初期化が必要なため数十秒〜数分かかる。  
+> 初回起動時はMySQLの初期化が必要なため数十秒〜数分かかる。
 > その間DB接続エラーが出続けるが、初期化完了後、正常に起動する。
 
-## Add to Viron
+## Add to VIRON
 
-1. [Viron](https://cam-inc.github.io/viron/latest) を開く
+1. [VIRON](https://cam-inc.github.io/viron/latest) を開く
 1. 管理画面の追加フォームに [https://localhost:3000/swagger.json](https://localhost:3000/swagger.json) を入力
 
 > 初回アクセス時はSSL自己証明書の警告が出るため、別タブでアクセスし警告を無視しておく必要がある。
