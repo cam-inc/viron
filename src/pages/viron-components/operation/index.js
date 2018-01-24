@@ -6,6 +6,7 @@ export default function() {
   const store = this.riotx.get();
   const operationObject = this.opts.operationObject;
 
+  this.isValid = true;
   this.layoutType = store.getter('layout.type');
   // 入力値。
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
@@ -69,9 +70,28 @@ export default function() {
       });
   };
 
+  const updateSubmitButton = () => {
+    // 諸々の都合でthis.update()を使えない & 使いたくない。
+    // ので、DOMを直接操作する。
+    const submitButton = this.refs.submit;
+    if (!submitButton) {
+      return;
+    }
+    const className = 'ComponentsPage_Operation__submit--disabled';
+    if (this.isValid) {
+      submitButton.classList.remove(className);
+    } else {
+      submitButton.classList.add(className);
+    }
+  };
+
   this.listen('layout', () => {
     this.layoutType = store.getter('layout.type');
     this.update();
+  });
+
+  this.on('mount', () => {
+    updateSubmitButton();
   });
 
   this.handleCancelTap = () => {
@@ -83,7 +103,16 @@ export default function() {
     this.update();
   };
 
+  this.handleParametersValidate = isValid => {
+    this.isValid = isValid;
+    updateSubmitButton();
+  };
+
   this.handleSubmitTap = () => {
+    if (!this.isValid) {
+      return;
+    }
+
     Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
       title: this.title,
       message: '本当に実行しますか？',

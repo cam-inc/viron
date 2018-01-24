@@ -13,11 +13,11 @@ viron-parameters-items.Parameters_Items
           .Parameters_Items__removeButton(if="{ !parent.opts.ispreview }" onTap="{ handleRemoveButtonTap }") この項目を削除
         .Parameters_Items__itemBody
           virtual(if="{ parent.isFormMode }")
-            viron-parameters-form(no-reorder identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" formObject="{ parent.formObject }"  onChange="{ parent.handleItemChange }")
+            viron-parameters-form(no-reorder identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" formObject="{ parent.formObject }"  onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
           virtual(if="{ parent.isPropertiesMode }")
-            viron-parameters-properties(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" propertiesObject="{ parent.propertiesObject }" onChange="{ parent.handleItemChange }")
+            viron-parameters-properties(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" propertiesObject="{ parent.propertiesObject }" onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
           virtual(if="{ parent.isItemsMode }")
-            viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" schemaObject="{ parent.schemaObject.items }" onChange="{ parent.handleItemChange }")
+            viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" schemaObject="{ parent.schemaObject.items }" onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
         .Parameters_Items__itemTail
           .Parameters_Items__removeButton(if="{ !parent.opts.ispreview }" onTap="{ handleRemoveButtonTap }") この項目を削除
           .Parameters_Items__closeButton(onTap="{ handleCloseButtonTap }")

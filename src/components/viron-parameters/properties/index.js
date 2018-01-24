@@ -20,6 +20,10 @@ export default function() {
       required: this.opts.required
     }, propertiesObject));
     this.hasError = !!this.errors.length;
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(this._riot_id, !this.hasError);
   };
 
   validate();
@@ -148,5 +152,17 @@ export default function() {
       ret = undefined;
     }
     this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * バリデートされた時の処理。
+   * @param {String} formId
+   * @param {Boolean} isValid
+   */
+  this.handlePropertyValidate = (formId, isValid) => {
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(formId, isValid);
   };
 }

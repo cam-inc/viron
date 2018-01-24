@@ -70,7 +70,16 @@
     cursor: pointer;
     background-color: var(--color-base-blue);
 
-    &--emphasised {
+    &--disabled {
+      cursor: not-allowed;
+      background-color: var(--color-base-blue-secondary);
+    }
+
+    &--disabled.&--emphasised {
+      background-color: var(--color-base-red-secondary);
+    }
+
+    &--emphasised:not(&--disabled) {
       @mixin hover {
         background-color: var(--color-base-red-secondary);
       }

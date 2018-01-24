@@ -44,6 +44,10 @@ export default function() {
       required: this.opts.required
     }, schemaObject));
     this.hasError = !!this.errors.length;
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(this._riot_id, !this.hasError);
   };
 
   // itemの開閉状態。
@@ -244,5 +248,17 @@ export default function() {
     const ret = this.opts.val;
     ret[idx] = newVal;
     this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * バリデートされた時の処理。
+   * @param {String} formId
+   * @param {Boolean} isValid
+   */
+  this.handleItemValidate = (formId, isValid) => {
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(formId, isValid);
   };
 }
