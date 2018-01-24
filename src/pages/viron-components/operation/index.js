@@ -6,6 +6,7 @@ export default function() {
   const store = this.riotx.get();
   const operationObject = this.opts.operationObject;
 
+  this.isValid = true;
   this.layoutType = store.getter('layout.type');
   // 入力値。
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
@@ -83,7 +84,16 @@ export default function() {
     this.update();
   };
 
+  this.handleParametersValidate = isValid => {
+    this.isValid = isValid;
+    this.update();
+  };
+
   this.handleSubmitTap = () => {
+    if (!this.isValid) {
+      return;
+    }
+
     Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
       title: this.title,
       message: '本当に実行しますか？',
