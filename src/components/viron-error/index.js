@@ -3,14 +3,19 @@ export default function() {
   this.title = this.opts.title;
   // メッセージ。
   this.message = this.opts.message;
-  // errorが渡された場合は最適化処理を行う。
-  if (!!this.opts.error) {
-    this.title = this.title || this.opts.error.name || this.opts.error.statusText || 'Error';
-    this.message = this.message || this.opts.error.message;
-  }
-
   // prettyprintで表示させる内容。
   this.detail = null;
+  // errorが渡された場合は最適化処理を行う。
+  const error = this.opts.error;
+  if (!!error) {
+    this.title = this.title || error.name || error.statusText || 'Error';
+    this.message = this.message || error.message;
+  }
+  if (!!error && !!error.response && !!error.response.obj && !!error.response.obj.error && !!error.response.obj.error.data ) {
+    const data = error.response.obj.error.data;
+    this.title = data.name || this.title;
+    this.message = data.message || this.message;
+  }
 
   this.on('mount', () => {
     // エラーがPromiseであれば解析する。
