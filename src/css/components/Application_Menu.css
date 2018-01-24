@@ -38,6 +38,15 @@
     padding: 0 16px;
   }
 
+  &__homeButton {
+    @apply --layout-center-center;
+
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    cursor: pointer;
+  }
+
   &__arrow {
     width: 8px;
     height: 8px;
@@ -46,13 +55,9 @@
   }
 
   &__logo {
-    @mixin hover {
-      color: var(--color-base-blue);
-    }
     width: 32px;
     height: 32px;
     color: var(--theme-menu-logo);
-    cursor: pointer;
   }
 
   &__body {

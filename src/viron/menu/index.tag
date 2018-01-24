@@ -3,8 +3,9 @@ viron-application-menu.Application_Menu(class="Application_Menu--{ layoutType }"
   .Application_Menu__overlay
   .Application_Menu__content
     .Application_Menu__head
-      viron-icon-arrow-left.Application_Menu__arrow
-      viron-icon-logo.Application_Menu__logo(onTap="{ handleLogoTap }")
+      .Application_Menu__homeButton(onTap="{ handleHomeButtonTap }")
+        viron-icon-arrow-left.Application_Menu__arrow
+        viron-icon-logo.Application_Menu__logo
     .Application_Menu__body
       .Application_Menu__section(each="{ section in menu }")
         .Application_Menu__sectionName { section.name }

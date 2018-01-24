@@ -25,7 +25,7 @@ export default function() {
     this.update();
   });
 
-  this.handleLogoTap = () => {
+  this.handleHomeButtonTap = () => {
     this.close();
     this.getRouter().navigateTo('/');
   };
