@@ -35,6 +35,8 @@ export default function() {
   this.accept = formObject['x-accept'] || '*';
   // MIME-type
   this.mimeType = formObject['x-mime-type'];
+  // 入力フォームのplaceholder値。
+  this.placeholder = formObject.example;
 
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-13
   // disabled(readOnly)
