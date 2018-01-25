@@ -1,5 +1,4 @@
 import './clear/index.tag';
-import './credit/index.tag';
 import './entry/index.tag';
 import './export/index.tag';
 import './import/index.tag';
