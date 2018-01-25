@@ -115,23 +115,23 @@ const show = (req, res) => {
         [constant.GROUP_ADMIN]: [
           {
             id: 'adminrole',
-            name: 'Viron ユーザ権限',
+            name: 'VIRON ユーザ権限',
             components: [
-              genTableComponent('Viron ユーザ権限', 'get', '/adminrole', 'role_id', null, ['role_id']),
+              genTableComponent('VIRON ユーザ権限', 'get', '/adminrole', 'role_id', null, ['role_id']),
             ],
           },
           {
             id: 'adminuser',
-            name: 'Viron 管理ユーザ',
+            name: 'VIRON 管理ユーザ',
             components: [
-              genTableComponent('Viron 管理ユーザ', 'get', '/adminuser', 'id', null, ['id', 'email', 'role_id']),
+              genTableComponent('VIRON 管理ユーザ', 'get', '/adminuser', 'id', null, ['id', 'email', 'role_id']),
             ],
           },
           {
             id: 'auditlog',
-            name: 'Viron 監査ログ',
+            name: 'VIRON 監査ログ',
             components: [
-              genTableComponent('Viron 監査ログ', 'get', '/auditlog', null, [
+              genTableComponent('VIRON 監査ログ', 'get', '/auditlog', null, [
                 {key: 'createdAt', type: 'string'},
                 {key: 'request_uri', type: 'string'},
                 {key: 'request_method', type: 'string'},
