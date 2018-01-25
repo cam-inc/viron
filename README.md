@@ -1,20 +1,30 @@
-# VIRON
-
 ![VIRON](./art/banner.png)
 
-[VIRON](https://cam-inc.github.io/viron/latest) is a Design-based Management Console hosted on GitHub Page.
+<h2 align="center">Design-based Management Console</h2>
 
 All you do is just create a API server and a OAS2.0 json file. Then viron admin tool is ready to use.
 You don't need to write frontend code!
 
----
+<p align="center">
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![Read the Docs](https://img.shields.io/readthedocs/pip.svg)](https://cam-inc.github.io/viron-doc/)
+[![GitHub release](https://img.shields.io/github/release/cam-inc/viron.svg)]()
+[![GitHub last commit](https://img.shields.io/github/last-commit/cam-inc/viron.svg)]()
+</p>
 
-**[Documentation](https://cam-inc.github.io/viron-doc/)**
+### Get Started
 
-## Copyright
+@see : [Documentation](https://cam-inc.github.io/viron-doc/)
+
+### Development
+
+@see : [Wiki](https://github.com/cam-inc/viron/wiki)
+
+
+### Copyright
 
 CA Mobile, Inc. All rights reserved.
 
-## LICENSE
+### LICENSE
 
 @see : [LICENSE](LICENSE)
