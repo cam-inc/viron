@@ -5,26 +5,24 @@
 All you do is just create a API server and a OAS2.0 json file. Then viron admin tool is ready to use.
 You don't need to write frontend code!
 
-<p align="center">
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![Read the Docs](https://img.shields.io/readthedocs/pip.svg)](https://cam-inc.github.io/viron-doc/)
 [![GitHub release](https://img.shields.io/github/release/cam-inc/viron.svg)]()
 [![GitHub last commit](https://img.shields.io/github/last-commit/cam-inc/viron.svg)]()
-</p>
 
-### Get Started
+## Get Started
 
 @see : [Documentation](https://cam-inc.github.io/viron-doc/)
 
-### Development
+## Development
 
 @see : [Wiki](https://github.com/cam-inc/viron/wiki)
 
 
-### Copyright
+## Copyright
 
 CA Mobile, Inc. All rights reserved.
 
-### LICENSE
+## LICENSE
 
 @see : [LICENSE](LICENSE)
