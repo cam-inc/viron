@@ -11,6 +11,10 @@
     font-size: 1.2rem;
   }
 
+  &--preview &__title {
+    color: var(--color-base-black-secondary);
+  }
+
   &__description {
     flex-shrink: 0;
     margin-left: 8px;

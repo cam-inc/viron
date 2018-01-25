@@ -1,4 +1,4 @@
-viron-textarea.Textarea(class="{ 'Textarea--disabled': opts.isdisabled, 'Textarea--error': opts.iserror }" onTap="{ handleTap }")
+viron-textarea.Textarea(class="{ 'Textarea--disabled': opts.isdisabled, 'Textarea--preview': opts.ispreview, 'Textarea--error': opts.iserror }" onTap="{ handleTap }")
   .Textarea__label(if="{ !!opts.label }") { opts.label }
   form.Textarea__form(ref="form" onSubmit="{ handleFormSubmit }")
     virtual(if="{ !opts.ispreview }")

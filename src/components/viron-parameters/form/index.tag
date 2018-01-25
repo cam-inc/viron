@@ -1,4 +1,4 @@
-viron-parameters-form.Parameters_Form
+viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.ispreview }")
   .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
     .Parameters_Form__title { title }
     .Parameters_Form__description(if="{ !!description }") { description }

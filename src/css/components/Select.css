@@ -52,6 +52,17 @@
     }
   }
 
+  &--preview {
+    & .Select__form {
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
+    }
+
+    & .Select__select {
+      color: var(--color-base-gray-secondary);
+    }
+  }
+
   &--disabled {
     & .Select__form {
       background-color: var(--color-base-gray-tertiary);

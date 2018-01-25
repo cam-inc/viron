@@ -53,6 +53,21 @@
     }
   }
 
+  &--preview {
+    & .Checkbox__mark {
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
+
+      & .Icon {
+        color: var(--color-base-gray-secondary);
+      }
+    }
+
+    & .Checkbox__label {
+      color: var(--color-base-gray-secondary);
+    }
+  }
+
   &--error {
     & .Checkbox__mark {
       background-color: var(--color-base-red-tertiary);

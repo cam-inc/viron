@@ -41,6 +41,14 @@
     }
   }
 
+  &--preview {
+    & .Textinput__input {
+      color: var(--color-base-gray-secondary);
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
+    }
+  }
+
   &--disabled {
     & .Textinput__input {
       cursor: not-allowed;
