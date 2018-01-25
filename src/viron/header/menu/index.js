@@ -9,7 +9,6 @@ export default function() {
   const isTopPage = store.getter('location.isTop');
   const isDesktop = store.getter('layout.isDesktop');
   const generalActions = [
-    { label: 'クレジット', id: 'show_credit' },
     { label: 'ヘルプ', id: 'navigate_to_doc' }
   ];
   const endpointActions = [];
@@ -56,22 +55,11 @@ export default function() {
   };
 
   /**
-   * クレジット表示用のモーダルを表示します。
-   */
-  this.showCreditModal = () => {
-    store.action('modals.add', 'viron-application-header-menu-credit');
-  };
-
-  /**
    * メニュー項目がクリック/タップされた時の処理。
    * @param {String} id
    */
   this.handleActionSelect = id => {
     switch (id) {
-    case 'show_credit':
-      this.showCreditModal();
-      this.close();
-      break;
     case 'navigate_to_doc':
       window.open('https://cam-inc.github.io/viron-doc/', '_blank');
       this.close();
