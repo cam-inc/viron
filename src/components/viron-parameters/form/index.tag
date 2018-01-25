@@ -6,7 +6,7 @@ viron-parameters-form.Parameters_Form
     .Parameters_Form__error(if="{ hasError && isFocus }")
       viron-parameters-popover(theme="{ opts.theme }" isPreview="{ opts.ispreview }" message="{ errors[0] }")
     virtual(if="{ uiType === 'textinput' }")
-      viron-textinput(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      viron-textinput(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }" placeholder="{ placeholder }")
     virtual(if="{ uiType === 'textarea' }")
       viron-textarea(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextareaChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'numberinput' }")
