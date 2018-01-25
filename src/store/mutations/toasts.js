@@ -6,7 +6,7 @@ const generateId = () => {
   return `toast_${Date.now()}`;
 };
 
-const TOAST_TIMEOUT = 3 * 1000;
+const TOAST_TIMEOUT = 1000;
 
 export default exporter('toasts', {
   /**
