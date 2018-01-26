@@ -41,6 +41,10 @@
     font-size: 16px;
   }
 
+  &--preview &__label {
+    color: var(--color-base-black-secondary);
+  }
+
   &__error {
     @apply --text-truncate;
     margin-top: 4px;
@@ -61,7 +65,7 @@
   }
 
   &__item {
-    padding: 24px;
+    padding: 12px 24px;
     background-color: var(--color-base-gray-tertiary);
     border: 1px solid var(--color-base-gray);
     border-radius: 2px;
@@ -95,6 +99,7 @@
     @mixin hover {
       color: var(--color-base-blue);
     }
+    position: relative;
     cursor: pointer;
   }
 
@@ -104,15 +109,37 @@
     font-weight: bold;
   }
 
+  &--preview &__itemBriefTitle {
+    color: var(--color-base-black-secondary);
+  }
+
   &__itemBriefDescription {
     @apply --text-truncate;
-    margin-top: 8px;
     font-size: 1.4rem;
     color: var(--color-base-gray);
   }
 
+  &__itemBriefOpenButton {
+    @apply --layout-center-center;
+
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
   &__itemHead {
-    @apply --layout-center-start;
+    @apply --layout-center-between;
+    flex-direction: row-reverse;
     margin-bottom: 24px;
   }
 
@@ -135,16 +162,11 @@
     @mixin hover {
       color: var(--color-base-blue);
     }
-    font-size: 1.4rem;
     cursor: pointer;
 
     & .Icon {
       width: 16px;
       height: 16px;
     }
-  }
-
-  &__closeButtonLabel {
-    margin-right: 8px;
   }
 }
