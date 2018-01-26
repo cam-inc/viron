@@ -55,7 +55,7 @@ definitions:
 
   AdminUser:
     example:
-      email: test@viron.com
+      email: test@example.com
       id: 1
       role_id: operator
     properties:
@@ -87,7 +87,7 @@ definitions:
       request_uri: '/user'
       source_ip: 200.200.200.200
       status_code: 200
-      user_id: test@viron.com
+      user_id: test@example.com
     properties:
       createdAt:
         description: 日時
@@ -328,7 +328,7 @@ definitions:
 
   SigninAuthPayload:
     example:
-      email: user1@viron.com
+      email: user1@example.com
       password: XXXXXXXXXXXX
     properties:
       email:
@@ -1092,11 +1092,11 @@ definitions:
         type: string
         format: date-time
       email:
-        example: user@viron.com
+        example: user@example.com
         type: string
         format: email
       hostname:
-        example: viron.com
+        example: example.com
         type: string
         format: hostname
       ipv4:
@@ -1108,7 +1108,7 @@ definitions:
         type: string
         format: ipv6
       uri:
-        example: https://viron.com/swagger.json
+        example: https://example.com/swagger.json
         type: string
         format: uri
       multiline:

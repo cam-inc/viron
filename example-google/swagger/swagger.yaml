@@ -31,7 +31,7 @@ definitions:
 
   AdminUser:
     example:
-      email: test@viron.com
+      email: test@example.com
       id: 1
       role_id: operator
     properties:
@@ -63,7 +63,7 @@ definitions:
       request_uri: '/user'
       source_ip: 200.200.200.200
       status_code: 200
-      user_id: test@viron.com
+      user_id: test@example.com
     properties:
       createdAt:
         description: 日時
