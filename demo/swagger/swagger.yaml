@@ -260,6 +260,7 @@ definitions:
   Viron:
     example:
       color: white
+      theme: standard
       name: Viron Demo
       pages:
       - components:
@@ -297,6 +298,13 @@ definitions:
         - yellow
         - red
         - gray
+        type: string
+      theme:
+        default: standard
+        enum:
+        - standard
+        - midnight
+        - terminal
         type: string
       name:
         type: string
