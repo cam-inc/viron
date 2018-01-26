@@ -42,6 +42,8 @@ body {
   /* 320px = iPhoneSEの横幅。これを最小値とする。 */
   min-width: 320px;
   font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
+  /* Safariで異様にサイズが小さくなるバグへの対応 */
+  font-size: 1rem;
   line-height: 1.5;
 }
 
