@@ -1,6 +1,6 @@
 ![VIRON](./art/banner.png)
 
-<h2 align="center">Design-based Management Console</h2>
+<h2 align="center">Automated Design-based Management Console</h2>
 
 All you do is just create a API server and a OAS2.0 json file. Then viron admin tool is ready to use.
 You don't need to write frontend code!
@@ -14,10 +14,9 @@ You don't need to write frontend code!
 
 @see : [Documentation](https://cam-inc.github.io/viron-doc/)
 
-## Development
+## Development Guide for Contributors
 
-@see : [Wiki](https://github.com/cam-inc/viron/wiki)
-
+@see : [Wiki](https://github.com/cam-inc/viron/wiki/BASIC)
 
 ## Copyright
 
