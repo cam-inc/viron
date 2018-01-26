@@ -725,6 +725,8 @@ body {
   /* 320px = iPhoneSEの横幅。これを最小値とする。 */
   min-width: 320px;
   font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
+  /* Safariで異様にサイズが小さくなるバグへの対応 */
+  font-size: 1rem;
   line-height: 1.5;
 }
 input,
@@ -1131,19 +1133,10 @@ select {
 .Application_Header__thumbnail {
     width: 32px;
     height: 32px;
-    cursor: pointer;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     border-radius: 50%;
-  }
-@media (hover: hover) {
-    .Application_Header__thumbnail:hover {
-      opacity: 0.5;
-    }
-  }
-.Application_Header__thumbnail.hold {
-      opacity: 0.5;
   }
 .Application_Header__info,
   .Application_Header__squareIcon {
@@ -1153,6 +1146,15 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Application_Header__info:hover {
+      opacity: 0.5;
+    }
+  }
+.Application_Header__info.hold {
+      opacity: 0.5;
   }
 .Application_Header__color {
     flex-shrink: 0;
@@ -1501,6 +1503,22 @@ select {
     height: 64px;
     padding: 0 16px;
   }
+.Application_Menu__homeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Application_Menu__homeButton:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.Application_Menu__homeButton.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
 .Application_Menu__arrow {
     width: 8px;
     height: 8px;
@@ -1513,17 +1531,6 @@ select {
     height: 32px;
     color: #fff;
     color: var(--theme-menu-logo);
-    cursor: pointer;
-  }
-@media (hover: hover) {
-    .Application_Menu__logo:hover {
-      color: #627edf;
-      color: var(--color-base-blue);
-    }
-  }
-.Application_Menu__logo.hold {
-      color: #627edf;
-      color: var(--color-base-blue);
   }
 .Application_Menu__body {
     flex-grow: 1;
@@ -1798,7 +1805,7 @@ select {
     width: 100%;
     height: 64px;
     pointer-events: auto;
-    transition-duration: 150ms;
+    transition-duration: 500ms;
     transition-property: top, opacity;
   }
 .Application_Toasts .Toast--visible {
@@ -1815,8 +1822,8 @@ select {
 .Autocomplete__input {
     display: block;
     width: 100%;
-    padding: 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 18px;
+    font-size: 1.8rem;
     background-color: #fff;
     background-color: var(--color-base-white);
     border: 1px solid #d1d1d1;
@@ -1850,6 +1857,12 @@ select {
       background-color: var(--color-base-red-tertiary);
       border-color: #f57177;
       border-color: var(--color-base-red);
+    }
+.Autocomplete--preview .Autocomplete__input {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
     }
 .Autocomplete--disabled .Autocomplete__input {
       cursor: not-allowed;
@@ -2037,6 +2050,18 @@ select {
         opacity: 1;
         transform: scale(1);
       }
+.Checkbox--preview .Checkbox__mark {
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
+    }
+.Checkbox--preview .Checkbox__mark .Icon {
+        color: #cecece;
+        color: var(--color-base-gray-secondary);
+      }
+.Checkbox--preview .Checkbox__label {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
+    }
 .Checkbox--error .Checkbox__mark {
       background-color: #f9efee;
       background-color: var(--color-base-red-tertiary);
@@ -2313,6 +2338,78 @@ select {
       background-color: var(--color-base-blue);
       opacity: 0.1;
   }
+.Jsonviewer {
+  display: block;
+}
+.Jsonviewer__container {
+    padding-left: 4px;
+  }
+.Jsonviewer__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    position: absolute;
+    top: 0;
+    left: -14px;
+    width: 10px;
+    height: 10px;
+  }
+.Jsonviewer__toggle ~ .Jsonviewer__value {
+      display: none;
+    }
+.Jsonviewer__toggle ~ .Jsonviewer__commma {
+      display: none;
+    }
+.Jsonviewer__toggle ~ .Jsonviewer__dots {
+      display: block;
+    }
+.Jsonviewer__toggle::after {
+      display: block;
+      content: "▸";
+    }
+.Jsonviewer__toggle:checked::after {
+      content: "▾";
+    }
+.Jsonviewer__toggle:checked ~ .Jsonviewer__value {
+      display: block;
+    }
+.Jsonviewer__toggle:checked ~ .Jsonviewer__commma {
+      display: block;
+    }
+.Jsonviewer__toggle:checked ~ .Jsonviewer__dots {
+      display: none;
+    }
+.Jsonviewer__key,
+  .Jsonviewer__idx {
+    margin-right: 4px;
+  }
+.Jsonviewer__pair {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+    position: relative;
+  }
+.Jsonviewer__key {
+    flex-shrink: 0;
+  }
+.Jsonviewer__value {
+    flex-grow: 1;
+  }
+.Jsonviewer__number {
+    color: blue;
+  }
+.Jsonviewer__string {
+    color: green;
+  }
+.Jsonviewer__boolean {
+    color: red;
+  }
+.Jsonviewer__null,
+  .Jsonviewer__undefined,
+  .Jsonviewer__NaN,
+  .Jsonviewer__function {
+    color: gray;
+  }
 .List {
   display: block;
 }
@@ -2421,8 +2518,8 @@ select {
       color: var(--color-base-gray);
   }
 .Mediapreview__closeButton .Icon {
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
 .Mediapreview--visible {
     pointer-events: auto;
@@ -2468,7 +2565,7 @@ select {
     left: 0;
     /* z-index使いたくないけど仕方なく */
     z-index: 1;
-    width: 16px;
+    width: 13px;
     height: 0;
     cursor: pointer;
   }
@@ -2484,8 +2581,8 @@ select {
   }
 .Modal__closeButton .Icon {
       position: absolute;
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
 .Modal--visible {
     pointer-events: auto;
@@ -2502,8 +2599,7 @@ select {
       transition-duration: 200ms;
     }
 .Modal--desktop .Modal__frame {
-      min-width: 40%;
-      max-width: 80%;
+      width: 450px;
       min-height: 100px;
       max-height: 80%;
       border-radius: 8px;
@@ -2548,8 +2644,8 @@ select {
 .Numberinput__input {
     display: block;
     width: 100%;
-    padding: 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 18px;
+    font-size: 1.8rem;
     background-color: #fff;
     background-color: var(--color-base-white);
     border: 1px solid #d1d1d1;
@@ -2590,6 +2686,12 @@ select {
       background-color: var(--color-base-gray-tertiary);
       border-color: #d1d1d1;
       border-color: var(--color-base-gray);
+    }
+.Numberinput--preview .Numberinput__input {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
     }
 .Numberinput--ghost {
     color: #fff;
@@ -2731,6 +2833,10 @@ select {
   white-space: nowrap;
     font-size: 1.2rem;
   }
+.Parameters_Form--preview .Parameters_Form__title {
+    color: #a3a3a3;
+    color: var(--color-base-black-secondary);
+  }
 .Parameters_Form__description {
     flex-shrink: 0;
     margin-left: 8px;
@@ -2806,6 +2912,10 @@ select {
   white-space: nowrap;
     font-size: 16px;
   }
+.Parameters_Items--preview .Parameters_Items__label {
+    color: #a3a3a3;
+    color: var(--color-base-black-secondary);
+  }
 .Parameters_Items__error {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2833,7 +2943,7 @@ select {
     margin-top: 24px;
   }
 .Parameters_Items__item {
-    padding: 24px;
+    padding: 12px 24px;
     background-color: #f9f9f9;
     background-color: var(--color-base-gray-tertiary);
     border: 1px solid #d1d1d1;
@@ -2859,6 +2969,7 @@ select {
       margin-bottom: 0;
     }
 .Parameters_Items__itemBrief {
+    position: relative;
     cursor: pointer;
   }
 @media (hover: hover) {
@@ -2878,19 +2989,47 @@ select {
     font-size: 1.4rem;
     font-weight: bold;
   }
+.Parameters_Items--preview .Parameters_Items__itemBriefTitle {
+    color: #a3a3a3;
+    color: var(--color-base-black-secondary);
+  }
 .Parameters_Items__itemBriefDescription {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-    margin-top: 8px;
     font-size: 1.4rem;
     color: #d1d1d1;
     color: var(--color-base-gray);
   }
+.Parameters_Items__itemBriefOpenButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Parameters_Items__itemBriefOpenButton:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.Parameters_Items__itemBriefOpenButton.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
+.Parameters_Items__itemBriefOpenButton .Icon {
+      width: 16px;
+      height: 16px;
+    }
 .Parameters_Items__itemHead {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+    flex-direction: row-reverse;
     margin-bottom: 24px;
   }
 .Parameters_Items__itemTail {
@@ -2917,7 +3056,6 @@ select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-    font-size: 1.4rem;
     cursor: pointer;
   }
 @media (hover: hover) {
@@ -2934,9 +3072,6 @@ select {
       width: 16px;
       height: 16px;
     }
-.Parameters_Items__closeButtonLabel {
-    margin-right: 8px;
-  }
 .Parameters_Parameter {
   display: block;
 }
@@ -3356,8 +3491,8 @@ select {
   justify-content: center;
     width: 100%;
     height: 100%;
-    padding: 14px 34px 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 34px 8px 18px;
+    font-size: 1.8rem;
     cursor: pointer;
   }
 .Select__icon {
@@ -3383,6 +3518,14 @@ select {
       background-color: var(--color-base-red-tertiary);
       border-color: #f57177;
       border-color: var(--color-base-red);
+    }
+.Select--preview .Select__form {
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
+    }
+.Select--preview .Select__select {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
     }
 .Select--disabled .Select__form {
       background-color: #f9f9f9;
@@ -3456,6 +3599,12 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Textarea--preview .Textarea__input {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
+    }
 .Textarea--disabled .Textarea__input {
       cursor: not-allowed;
       background-color: #f9f9f9;
@@ -3476,8 +3625,8 @@ select {
 .Textinput__input {
     display: block;
     width: 100%;
-    padding: 14px 18px;
-    font-size: 1.6rem;
+    padding: 8px 18px;
+    font-size: 1.8rem;
     background-color: #fff;
     background-color: var(--color-base-white);
     border: 1px solid #d1d1d1;
@@ -3512,6 +3661,12 @@ select {
       border-color: #f57177;
       border-color: var(--color-base-red);
     }
+.Textinput--preview .Textinput__input {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
+      background-color: #f4f4f4;
+      border-color: #f4f4f4;
+    }
 .Textinput--disabled .Textinput__input {
       cursor: not-allowed;
       background-color: #f9f9f9;
@@ -3539,7 +3694,7 @@ select {
   background-color: var(--color-base-blue);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
-  transition-duration: 150ms;
+  transition-duration: 500ms;
   transition-property: opacity;
 }
 .Toast__message {
@@ -4222,8 +4377,8 @@ select {
       color: var(--color-base-blue);
   }
 .ComponentsPage_Filter__closeButton .Icon {
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
 .ComponentsPage_Filter--desktop .ComponentsPage_Filter__closeButton {
     margin: 0 0 56px 24px;
@@ -4371,17 +4526,26 @@ select {
       background-color: #c0cbf2;
       background-color: var(--color-base-blue-secondary);
   }
-.ComponentsPage_Operation__submit--emphasised {
+.ComponentsPage_Operation__submit--disabled {
+      cursor: not-allowed;
+      background-color: #c0cbf2;
+      background-color: var(--color-base-blue-secondary);
+    }
+.ComponentsPage_Operation__submit--disabled..ComponentsPage_Operation__submit--emphasised {
+      background-color: #fab7ba;
+      background-color: var(--color-base-red-secondary);
+    }
+.ComponentsPage_Operation__submit--emphasised:not(.ComponentsPage_Operation__submit--disabled) {
       background-color: #f57177;
       background-color: var(--color-base-red);
     }
 @media (hover: hover) {
-    .ComponentsPage_Operation__submit--emphasised:hover {
+    .ComponentsPage_Operation__submit--emphasised:not(.ComponentsPage_Operation__submit--disabled):hover {
         background-color: #fab7ba;
         background-color: var(--color-base-red-secondary);
     }
   }
-.ComponentsPage_Operation__submit--emphasised.hold {
+.ComponentsPage_Operation__submit--emphasised:not(.ComponentsPage_Operation__submit--disabled).hold {
         background-color: #fab7ba;
         background-color: var(--color-base-red-secondary);
   }
@@ -4423,8 +4587,8 @@ select {
     right: 24px;
   }
 .ComponentsPage_Preview__operation {
-    margin-right: 16px;
-    font-size: 1.6rem;
+    margin-right: 32px;
+    font-size: 1.4rem;
     font-weight: bold;
     cursor: pointer;
   }
@@ -4578,8 +4742,8 @@ select {
       color: var(--color-base-blue);
   }
 .ComponentsPage_Search__closeButton .Icon {
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
     }
 .ComponentsPage_Search--desktop .ComponentsPage_Search__closeButton {
     margin: 0 0 56px 24px;
@@ -4938,12 +5102,12 @@ select {
       color: var(--color-base-white);
     }
 .EndpointsPage_Endpoint_Signin__name {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
     font-size: 1.4rem;
     text-align: center;
   }
 .EndpointsPage_Endpoint_Signin__emails .EndpointsPage_Endpoint_Signin_Email {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 .EndpointsPage_Endpoint_Signin__emails .EndpointsPage_Endpoint_Signin_Email:last-child {
       margin-bottom: 0;
@@ -4982,9 +5146,46 @@ select {
 .EndpointsPage_Endpoint_Signin_Email .Textinput {
     margin-bottom: 12px;
   }
+.EndpointsPage_Endpoint_Signin_Email__button {
+    margin-top: 32px;
+  }
 .EndpointsPage_Endpoint_Signin_Oauth {
   display: block;
 }
+.EndpointsPage_Endpoint_Signin_Oauth__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    height: 48px;
+    color: #fff;
+    color: var(--color-base-white);
+    cursor: pointer;
+    border: 2px solid #fff;
+    border: 2px solid var(--color-base-white);
+    border-radius: 24px;
+  }
+@media (hover: hover) {
+    .EndpointsPage_Endpoint_Signin_Oauth__button:hover {
+      opacity: 0.5;
+    }
+  }
+.EndpointsPage_Endpoint_Signin_Oauth__button.hold {
+      opacity: 0.5;
+  }
+.EndpointsPage_Endpoint_Signin_Oauth__google {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background-image: url("../img/icon_google.png");
+    background-position: center center;
+    background-size: contain;
+  }
+.EndpointsPage_Endpoint_Signin_Oauth__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+    font-size: 1.6rem;
+  }
 .NotfoundPage {
   display: block;
 }
