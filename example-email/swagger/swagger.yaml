@@ -170,6 +170,7 @@ definitions:
   Viron:
     example:
       color: white
+      theme: standard
       name: Viron Example for EMail Auth
       pages:
       - components:
@@ -207,6 +208,13 @@ definitions:
         - yellow
         - red
         - gray
+        type: string
+      theme:
+        default: standard
+        enum:
+        - standard
+        - midnight
+        - terminal
         type: string
       name:
         type: string

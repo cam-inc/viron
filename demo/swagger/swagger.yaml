@@ -197,15 +197,19 @@ definitions:
       background_image:
         description: 背景画像
         type: string
+        example: http://hoge.com/a.png
       base_color:
         description: ベースカラー
         type: string
+        example: blue
       id:
         description: デザインID
         type: string
+        example: pop1
       name:
         description: 名前
         type: string
+        example: design name
     required:
     - id
     - name
@@ -256,6 +260,7 @@ definitions:
   Viron:
     example:
       color: white
+      theme: standard
       name: Viron Demo
       pages:
       - components:
@@ -293,6 +298,13 @@ definitions:
         - yellow
         - red
         - gray
+        type: string
+      theme:
+        default: standard
+        enum:
+        - standard
+        - midnight
+        - terminal
         type: string
       name:
         type: string
