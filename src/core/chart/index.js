@@ -64,7 +64,7 @@ Highcharts.setOptions({
     backgroundColor: 'transparent',
     spacing: 8,
     style: {
-      fontFamily: 'NotoSansCJKjp-Jxck serif'
+      fontFamily: '"Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif'
     }
   },
   credits: { enabled: false },

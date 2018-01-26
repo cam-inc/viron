@@ -2,7 +2,7 @@ export default {
   chart: {
     spacing: 8,
     style: {
-      fontFamily: 'NotoSansCJKjp-Jxck serif'
+      fontFamily: '"Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif'
     }
   },
   colors: ['#627EDF', '#C4BB6D', '#CBCFD4', '#588988', '#9FC8C1', '#E69EA2', '#828282'],
