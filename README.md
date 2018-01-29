@@ -12,11 +12,11 @@ You don't need to write frontend code!
 
 ## Get Started
 
-@see : [Documentation](https://cam-inc.github.io/viron-doc/)
+[Documentation](https://cam-inc.github.io/viron-doc/)
 
 ## Development Guide for Contributors
 
-@see : [Wiki](https://github.com/cam-inc/viron/wiki/BASIC)
+[Wiki](https://github.com/cam-inc/viron/wiki/BASIC)
 
 ## Copyright
 
@@ -24,4 +24,4 @@ CA Mobile, Inc. All rights reserved.
 
 ## LICENSE
 
-@see : [LICENSE](LICENSE)
+[LICENSE](LICENSE)
