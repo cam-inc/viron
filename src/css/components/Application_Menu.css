@@ -29,6 +29,7 @@
     @apply --layout-column-center-stretch;
     position: relative;
     height: 100%;
+    padding-top: 16px;
   }
 
   &__head {
@@ -36,7 +37,6 @@
     flex-shrink: 0;
     height: 64px;
     padding: 0 16px;
-    margin-top: 16px;
   }
 
   &__homeButton {

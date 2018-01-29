@@ -34,10 +34,13 @@
   }
 
   &__page {
+    @apply --layout-center-start;
+
     @mixin hover {
       color: var(--color-base-blue);
     }
-    padding: 12px 12px 16px 32px;
+    height: 50px;
+    padding-left: 32px;
     font-size: 1.4rem;
     cursor: pointer;
   }
