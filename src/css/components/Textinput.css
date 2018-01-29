@@ -23,6 +23,11 @@
     &:focus {
       border-color: var(--color-base-blue);
     }
+
+    &::placeholder,
+    &:placeholder-shown {
+      color: var(--color-base-gray);
+    }
   }
 
   &__blocker {
