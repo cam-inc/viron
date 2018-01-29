@@ -10,24 +10,25 @@ You don't need to write frontend code!
 [![GitHub release](https://img.shields.io/github/release/cam-inc/viron.svg)]()
 [![GitHub last commit](https://img.shields.io/github/last-commit/cam-inc/viron.svg)]()
 
-## 🔎 Official Website
-
-📙 Document, Quick Start, Demo Site 
+## 🔎 Official Website(📙 Documentation, Quick Start, Demo Site)
 
 [https://cam-inc.github.io/viron-doc/](https://cam-inc.github.io/viron-doc/) 
 
+## 🚅 Ecosystem
 
+### Libraries / Frameworks
 
-## 🚅 Libraries / Frameworks
-
-- API Server
-  - NodeJS Helper Library
-    - [node-vironlib](https://github.com/cam-inc/node-vironlib)
-
+| Project | Type | Description |
+|---------|--------|-------------|
+| [node-vironlib](https://github.com/cam-inc/node-vironlib) | API Server Helper (NodeJS) | node-vironlib is a helper library that makes it easy to implement functions that would normally be needed with Viron API Server. |
 
 ## Development Guide for "Viron" Contributors
 
-["Viron" Contributors Document](https://github.com/cam-inc/viron/wiki/BASIC)
+["Viron" Contributors Documentation](https://github.com/cam-inc/viron/wiki/BASIC)
+
+## Changelog
+
+Detailed changes for each release are documented in the [release notes](https://github.com/cam-inc/viron/releases).
 
 ## Copyright
 
