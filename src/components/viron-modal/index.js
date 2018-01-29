@@ -56,6 +56,7 @@ export default function() {
   this.handleFrameTap = e => {
     // 内部イベントを外部に伝播させない。
     e.stopPropagation();
+    this.closeAllFloats();
   };
 
   this.handleCloseButtonTap = () => {

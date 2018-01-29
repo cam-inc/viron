@@ -49,6 +49,11 @@ export default {
               this.opts.popoverCloser();
             }
           },
+          // `modal`等を全て消します。
+          closeAllFloats: function() {
+            const store = this.riotx.get();
+            store.action('popovers.removeAll');
+          },
           getRouter: () => {
             return router.getInstance();
           },

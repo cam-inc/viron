@@ -127,14 +127,21 @@ export default function() {
 
   this.handleMenuTap = e => {
     e.stopPropagation();
-    const rect = this.refs.menu.root.getBoundingClientRect();
-    store.action('popovers.add', 'viron-endpoints-page-endpoint-menu', {
-      endpoint: this.opts.endpoint
-    }, {
-      x: rect.left + (rect.width / 2),
-      y: rect.bottom,
-      width: 228,
-      direction: 'TR'
-    });
+    Promise
+      .resolve()
+      .then(() => {
+        this.closeAllFloats();
+      })
+      .then(() => {
+        const rect = this.refs.menu.root.getBoundingClientRect();
+        store.action('popovers.add', 'viron-endpoints-page-endpoint-menu', {
+          endpoint: this.opts.endpoint
+        }, {
+          x: rect.left + (rect.width / 2),
+          y: rect.bottom,
+          width: 228,
+          direction: 'TR'
+        });
+      });
   };
 }

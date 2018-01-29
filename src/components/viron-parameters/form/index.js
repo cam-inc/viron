@@ -150,6 +150,10 @@ export default function() {
     });
   };
 
+  this.handleBodyTap = e => {
+    e.stopPropagation();
+  };
+
   /**
    * フォーカスされた時の処理。
    */

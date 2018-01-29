@@ -334,17 +334,24 @@ export default function() {
     e.stopPropagation();
     const rowData = e.item.row;
     const rect = e.currentTarget.getBoundingClientRect();
-    store.action('popovers.add', 'viron-components-page-table-operations', {
-      operations: this.rowOperations,
-      onSelect: operationObject => {
-        createInitialValueAndOpenOperationDrawer(operationObject, rowData);
-      }
-    }, {
-      x: rect.left + (rect.width / 2),
-      y: rect.bottom,
-      width: 240,
-      direction: 'TR'
-    });
+    Promise
+      .resolve()
+      .then(() => {
+        this.closeAllFloats();
+      })
+      .then(() => {
+        store.action('popovers.add', 'viron-components-page-table-operations', {
+          operations: this.rowOperations,
+          onSelect: operationObject => {
+            createInitialValueAndOpenOperationDrawer(operationObject, rowData);
+          }
+        }, {
+          x: rect.left + (rect.width / 2),
+          y: rect.bottom,
+          width: 240,
+          direction: 'TR'
+        });
+      });
   };
 
   this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
