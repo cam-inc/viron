@@ -24,4 +24,4 @@ CA Mobile, Inc. All rights reserved.
 
 ## LICENSE
 
-[LICENSE](LICENSE)
+MIT LICENSE [LICENSE](LICENSE)
