@@ -133,14 +133,16 @@ export default function() {
         this.closeAllFloats();
       })
       .then(() => {
-        const rect = this.refs.menu.root.getBoundingClientRect();
+        const menuElm = this.refs.menu.root;
+        const rect = menuElm.getBoundingClientRect();
         store.action('popovers.add', 'viron-endpoints-page-endpoint-menu', {
           endpoint: this.opts.endpoint
         }, {
           x: rect.left + (rect.width / 2),
           y: rect.bottom,
           width: 228,
-          direction: 'TR'
+          direction: 'TR',
+          watchElm: menuElm
         });
       });
   };

@@ -31,6 +31,27 @@ export default function() {
     }, 1000);
   };
 
+  const watchElm = this.opts.popoveropts.watchElm;
+  let intervalId = null;
+  if (!!watchElm) {
+    const rect = watchElm.getBoundingClientRect();
+    const initPosX = rect.left;
+    const initPosY = rect.top;
+    intervalId = window.setInterval(() => {
+      if (!watchElm) {
+        fadeOut();
+        window.clearInterval(intervalId);
+      }
+      const rect = watchElm.getBoundingClientRect();
+      const posX = rect.left;
+      const posY = rect.top;
+      if (posX !== initPosX || posY !== initPosY) {
+        fadeOut();
+        window.clearInterval(intervalId);
+      }
+    }, 100);
+  }
+
   this.isVisible = false;
 
   this.on('mount', () => {
@@ -45,6 +66,7 @@ export default function() {
     window.addEventListener('touchend', this.handleWindowTouchEnd);
   }).on('before-unmount', () => {
     tag.unmount(true);
+    window.clearInterval(intervalId);
   }).on('unmount', () => {
     window.removeEventListener('resize', this.handleWindowResize);
     window.removeEventListener('scroll', this.handleWindowScroll);

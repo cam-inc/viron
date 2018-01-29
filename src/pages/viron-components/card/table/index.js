@@ -333,7 +333,8 @@ export default function() {
   this.handleRowSettingButtonTap = e => {
     e.stopPropagation();
     const rowData = e.item.row;
-    const rect = e.currentTarget.getBoundingClientRect();
+    const elm = e.currentTarget;
+    const rect = elm.getBoundingClientRect();
     Promise
       .resolve()
       .then(() => {
@@ -349,7 +350,8 @@ export default function() {
           x: rect.left + (rect.width / 2),
           y: rect.bottom,
           width: 240,
-          direction: 'TR'
+          direction: 'TR',
+          watchElm: elm
         });
       });
   };

@@ -146,7 +146,8 @@ export default function() {
       y: rect.top,
       width: rect.width,
       direction: 'B',
-      isError: true
+      isError: true,
+      watchElm: bodyElm
     });
   };
 
