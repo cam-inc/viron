@@ -2,9 +2,7 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
   .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
     .Parameters_Form__title { title }
     .Parameters_Form__description(if="{ !!description }") { description }
-  .Parameters_Form__body
-    .Parameters_Form__error(if="{ hasError && isFocus }")
-      viron-parameters-popover(theme="{ opts.theme }" isPreview="{ opts.ispreview }" message="{ errors[0] }")
+  .Parameters_Form__body(ref="body")
     virtual(if="{ uiType === 'textinput' }")
       viron-textinput(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'textarea' }")
@@ -45,6 +43,5 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
     import '../../../components/viron-textinput/index.tag';
     import '../../../components/viron-uploader/index.tag';
     import '../../../components/viron-wyswyg/index.tag';
-    import '../popover/index.tag';
     import script from './index';
     this.external(script);

@@ -4,6 +4,7 @@ import forEach from 'mout/array/forEach';
 import isNaN from 'mout/lang/isNaN';
 import _isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
+import '../error/index.tag';
 import util from '../util';
 import validator from '../validator';
 
@@ -20,6 +21,8 @@ const isNumber = num => {// eslint-disable-line no-unused-vars
 };
 
 export default function() {
+  const store = this.riotx.get();
+
   // ショートカット。
   const formObject = this.opts.formobject;
   // 入力フォームのタイトル。
@@ -122,11 +125,38 @@ export default function() {
   };
 
   /**
+   * エラーPopoverを表示します。
+   */
+  const showError = () => {
+    if (!this.isFocus) {
+      return;
+    }
+    if (!this.hasError) {
+      return;
+    }
+    if (this.opts.ispreview) {
+      return;
+    }
+    const bodyElm = this.refs.body;
+    const rect = bodyElm.getBoundingClientRect();
+    store.action('popovers.add', 'viron-parameters-error', {
+      message: this.errors[0]
+    }, {
+      x: rect.left + (rect.width / 2),
+      y: rect.top,
+      width: rect.width,
+      direction: 'B',
+      isError: true
+    });
+  };
+
+  /**
    * フォーカスされた時の処理。
    */
   this.handleFormFocus = () => {
     this.isFocus = true;
     this.update();
+    showError();
   };
 
   /**

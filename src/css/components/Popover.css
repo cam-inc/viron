@@ -1,5 +1,7 @@
 :root {
   --component-popover-arrow-size: 10px;
+  --component-popover-text-error: #fff;
+  --component-popover-bg-error: #900b0b;
 }
 
 .Popover {
@@ -21,6 +23,14 @@
     background-color: var(--theme-popover-bg);
     border-radius: 2px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &--error {
+    color: var(--component-popover-text-error);
+
+    .Popover__frameInner {
+      background-color: var(--component-popover-bg-error);
+    }
   }
 
   &__arrow {
@@ -202,6 +212,47 @@
       right: calc(-1 * var(--component-popover-arrow-size));
       border-color: transparent var(--theme-popover-bg) transparent transparent;
       border-width: calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0;
+    }
+  }
+
+  /* Error */
+  &--error {
+    color: var(--component-popover-text-error);
+
+    .Popover__frameInner {
+      background-color: var(--component-popover-bg-error);
+    }
+  }
+
+  &--error&--T,
+  &--error&--TL,
+  &-error&--TR {
+    & .Popover__arrow {
+      border-color: transparent transparent var(--component-popover-bg-error) transparent;
+    }
+  }
+
+  &--error&--R,
+  &--error&--RT,
+  &--error&--RB {
+    & .Popover__arrow {
+      border-color: transparent transparent transparent var(--component-popover-bg-error);
+    }
+  }
+
+  &--error&--B,
+  &--error&--BL,
+  &--error&--BR {
+    & .Popover__arrow {
+      border-color: var(--component-popover-bg-error) transparent transparent transparent;
+    }
+  }
+
+  &--error&--L,
+  &--error&--LT,
+  &--error&--LB {
+    & .Popover__arrow {
+      border-color: transparent var(--component-popover-bg-error) transparent transparent;
     }
   }
 }

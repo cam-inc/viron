@@ -1,4 +1,4 @@
-viron-popover.Popover(class="{ 'Popover--visible': isVisible, 'Popover--hidden': isHidden } Popover--{ opts.popoveropts.direction }" style="{ getPosition() }")
+viron-popover.Popover(class="{ 'Popover--visible': isVisible, 'Popover--hidden': isHidden } Popover--{ opts.popoveropts.direction } { 'Popover--error': opts.popoveropts.isError }" style="{ getPosition() }")
   .Popover__frameOuter
     .Popover__frameInner(style="{ getSize() }" onTap="{ handleFrameInnerTap }" onScroll="{ handleFrameInnerScroll }")
       .Popover__content(ref="content")

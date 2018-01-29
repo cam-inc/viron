@@ -42,10 +42,10 @@
 @import "Numberinput";
 @import "Pagination";
 @import "Parameters";
+@import "Parameters_Error";
 @import "Parameters_Form";
 @import "Parameters_Items";
 @import "Parameters_Parameter";
-@import "Parameters_Popover";
 @import "Parameters_Properties";
 @import "Popover";
 @import "PopoverSpread";
