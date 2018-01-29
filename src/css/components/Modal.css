@@ -1,6 +1,6 @@
 .Modal {
   @apply --layout-center-center;
-  color: var(--color-base-white);
+  color: var(--color-base-black);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
   transition-duration: 200ms;
@@ -28,6 +28,7 @@
     z-index: 1;
     width: 13px;
     height: 0;
+    color: var(--color-base-white);
     cursor: pointer;
 
     & .Icon {
