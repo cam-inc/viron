@@ -1,6 +1,6 @@
 .Modal {
   @apply --layout-center-center;
-  color: var(--color-base-black);
+  color: var(--color-base-white);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0);
   transition-duration: 200ms;
@@ -19,7 +19,7 @@
     @apply --layout-center-center;
 
     @mixin hover {
-      color: var(--color-base-gray);
+      color: var(--color-base-blue);
     }
     position: sticky;
     top: 0;
