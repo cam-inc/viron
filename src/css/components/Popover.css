@@ -33,6 +33,15 @@
     }
   }
 
+  &__blocker {
+    position: absolute;
+    top: -24px;
+    left: -24px;
+    width: 48px;
+    height: 48px;
+    pointer-events: auto;
+  }
+
   &__arrow {
     position: absolute;
     width: 0;
