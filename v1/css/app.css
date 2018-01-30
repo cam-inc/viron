@@ -59,12 +59,12 @@
   --theme-standard-header-bg: #f9f9f9;
   --theme-standard-orderButton-bg: #d1d1d1;
   --theme-standard-endpointCard-bg: #fff;
-  --theme-standard-endpointCard-border: #c6c6c5;
+  --theme-standard-endpointCard-border: #e4e4e2;
   --theme-standard-popover-bg: #fff;
   --theme-standard-tag-text: #d1d1d1;
   --theme-standard-tag-bg: #f9f9f9;
   --theme-standard-componentCard-bg: #fff;
-  --theme-standard-componentCard-border: #c6c6c5;
+  --theme-standard-componentCard-border: #e4e4e2;
   --theme-standard-componentCardTable-bg: #fff;
   --theme-standard-componentCardTable-grad-start: rgba(255, 255, 255, 0);
   --theme-standard-componentCardTable-grad-end: rgba(255, 255, 255, 1);
@@ -908,7 +908,7 @@ select {
     --theme-orderButton-bg: var(--theme-standard-orderButton-bg);
     --theme-endpointCard-bg: #fff;
     --theme-endpointCard-bg: var(--theme-standard-endpointCard-bg);
-    --theme-endpointCard-border: #c6c6c5;
+    --theme-endpointCard-border: #e4e4e2;
     --theme-endpointCard-border: var(--theme-standard-endpointCard-border);
     --theme-popover-bg: #fff;
     --theme-popover-bg: var(--theme-standard-popover-bg);
@@ -918,7 +918,7 @@ select {
     --theme-tag-bg: var(--theme-standard-tag-bg);
     --theme-componentCard-bg: #fff;
     --theme-componentCard-bg: var(--theme-standard-componentCard-bg);
-    --theme-componentCard-border: #c6c6c5;
+    --theme-componentCard-border: #e4e4e2;
     --theme-componentCard-border: var(--theme-standard-componentCard-border);
     --theme-componentCardTable-bg: #fff;
     --theme-componentCardTable-bg: var(--theme-standard-componentCardTable-bg);
@@ -1494,6 +1494,7 @@ select {
   justify-content: center;
     position: relative;
     height: 100%;
+    padding-top: 16px;
   }
 .Application_Menu__head {
   display: flex;
@@ -1593,7 +1594,11 @@ select {
     transition-property: height, opacity;
   }
 .Application_Menu_Group__page {
-    padding: 16px 16px 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+    height: 50px;
+    padding-left: 32px;
     font-size: 1.4rem;
     cursor: pointer;
   }
@@ -1611,6 +1616,7 @@ select {
       transform: rotate(180deg);
     }
 .Application_Menu_Group--open .Application_Menu_Group__pages {
+      margin-bottom: 16px;
       opacity: 1;
     }
 .Application_Modals {
@@ -2666,6 +2672,16 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
+.Numberinput__input:-ms-input-placeholder,
+    .Numberinput__input:placeholder-shown {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+    }
+.Numberinput__input::placeholder,
+    .Numberinput__input:placeholder-shown {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+    }
 .Numberinput__blocker {
     position: absolute;
     top: 0;
@@ -2815,9 +2831,17 @@ select {
     -ms-grid-column-span: 3;
         grid-column-end: span 3;
   }
+.Parameters--narrow .Parameters_Parameter--spreadLarge {
+    -ms-grid-column-span: 2;
+        grid-column-end: span 2;
+  }
 .Parameters .Parameters_Parameter--spreadFull {
     grid-column: 1 / -1;
   }
+.Parameters_Error {
+  padding: 18px;
+  font-size: 1.2rem;
+}
 .Parameters_Form {
   display: block;
 }
@@ -2845,15 +2869,6 @@ select {
   }
 .Parameters_Form__body {
     position: relative;
-  }
-.Parameters_Form__error {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    width: 0;
-    height: 0;
-    margin: auto;
   }
 .Parameters_Items {
   display: block;
@@ -3075,56 +3090,6 @@ select {
 .Parameters_Parameter {
   display: block;
 }
-:root {
-  --component-parameters-popover-width: 200px;
-  --component-parameters-popover-arrow-size: 10px;
-  --component-parameters-popover-arrow-color: #900b0b;
-}
-.Parameters_Popover {
-  position: relative;
-  display: block;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  transition-duration: 300ms;
-  transition-property: transform, opacity;
-  transform: scale(0.8);
-}
-.Parameters_Popover__message {
-    position: absolute;
-    bottom: 10px;
-    bottom: var(--component-parameters-popover-arrow-size);
-    left: calc(-1 * 200px / 2);
-    left: calc(-1 * var(--component-parameters-popover-width) / 2);
-    width: 200px;
-    width: var(--component-parameters-popover-width);
-    padding: 18px;
-    font-size: 1.2rem;
-    color: #fff;
-    color: var(--color-base-white);
-    background-color: #900b0b;
-    background-color: var(--component-parameters-popover-arrow-color);
-    border-radius: 2px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-  }
-.Parameters_Popover__arrow {
-    position: absolute;
-    top: calc(-1 * 10px);
-    top: calc(-1 * var(--component-parameters-popover-arrow-size));
-    left: calc(-1 * 10px / 2);
-    left: calc(-1 * var(--component-parameters-popover-arrow-size) / 2);
-    width: 0;
-    height: 0;
-    border-color: #900b0b transparent transparent transparent;
-    border-color: var(--component-parameters-popover-arrow-color) transparent transparent transparent;
-    border-style: solid;
-    border-width: 10px calc(10px / 2) 0 calc(10px / 2);
-    border-width: var(--component-parameters-popover-arrow-size) calc(var(--component-parameters-popover-arrow-size) / 2) 0 calc(var(--component-parameters-popover-arrow-size) / 2);
-  }
-.Parameters_Popover--visible {
-    opacity: 1;
-    transform: scale(1);
-  }
 .Parameters_Properties {
   position: relative;
   display: block;
@@ -3171,6 +3136,8 @@ select {
     }
 :root {
   --component-popover-arrow-size: 10px;
+  --component-popover-text-error: #fff;
+  --component-popover-bg-error: #900b0b;
 }
 .Popover {
   position: relative;
@@ -3191,6 +3158,22 @@ select {
     background-color: var(--theme-popover-bg);
     border-radius: 2px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  }
+.Popover--error {
+    color: #fff;
+    color: var(--component-popover-text-error);
+  }
+.Popover--error .Popover__frameInner {
+      background-color: #900b0b;
+      background-color: var(--component-popover-bg-error);
+    }
+.Popover__blocker {
+    position: absolute;
+    top: -24px;
+    left: -24px;
+    width: 48px;
+    height: 48px;
+    pointer-events: auto;
   }
 .Popover__arrow {
     position: absolute;
@@ -3344,6 +3327,31 @@ select {
       border-color: transparent var(--theme-popover-bg) transparent transparent;
       border-width: calc(10px / 2) 10px calc(10px / 2) 0;
       border-width: calc(var(--component-popover-arrow-size) / 2) var(--component-popover-arrow-size) calc(var(--component-popover-arrow-size) / 2) 0;
+    }
+/* Error */
+.Popover--error {
+    color: #fff;
+    color: var(--component-popover-text-error);
+  }
+.Popover--error .Popover__frameInner {
+      background-color: #900b0b;
+      background-color: var(--component-popover-bg-error);
+    }
+.Popover--error.Popover--T .Popover__arrow, .Popover--error.Popover--TL .Popover__arrow, .Popover-error.Popover--TR .Popover__arrow {
+      border-color: transparent transparent #900b0b transparent;
+      border-color: transparent transparent var(--component-popover-bg-error) transparent;
+    }
+.Popover--error.Popover--R .Popover__arrow, .Popover--error.Popover--RT .Popover__arrow, .Popover--error.Popover--RB .Popover__arrow {
+      border-color: transparent transparent transparent #900b0b;
+      border-color: transparent transparent transparent var(--component-popover-bg-error);
+    }
+.Popover--error.Popover--B .Popover__arrow, .Popover--error.Popover--BL .Popover__arrow, .Popover--error.Popover--BR .Popover__arrow {
+      border-color: #900b0b transparent transparent transparent;
+      border-color: var(--component-popover-bg-error) transparent transparent transparent;
+    }
+.Popover--error.Popover--L .Popover__arrow, .Popover--error.Popover--LT .Popover__arrow, .Popover--error.Popover--LB .Popover__arrow {
+      border-color: transparent #900b0b transparent transparent;
+      border-color: transparent var(--component-popover-bg-error) transparent transparent;
     }
 .PopoverSpread {
   display: flex;
@@ -3579,6 +3587,16 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
+.Textarea__input:-ms-input-placeholder,
+    .Textarea__input:placeholder-shown {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+    }
+.Textarea__input::placeholder,
+    .Textarea__input:placeholder-shown {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+    }
 .Textarea__input--break {
       word-break: break-word;
       word-wrap: break-word;
@@ -3646,6 +3664,16 @@ select {
 .Textinput__input:focus {
       border-color: #627edf;
       border-color: var(--color-base-blue);
+    }
+.Textinput__input:-ms-input-placeholder,
+    .Textinput__input:placeholder-shown {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
+    }
+.Textinput__input::placeholder,
+    .Textinput__input:placeholder-shown {
+      color: #d1d1d1;
+      color: var(--color-base-gray);
     }
 .Textinput__blocker {
     position: absolute;
@@ -3968,11 +3996,12 @@ select {
 .ComponentsPage_Card {
   display: block;
   width: 100%;
+  overflow: hidden;
   background-color: #fff;
   background-color: var(--theme-componentCard-bg);
   border: 1px solid #fff;
   border: 1px solid var(--theme-componentCard-border);
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .ComponentsPage_Card_Chart {
   display: flex;
