@@ -6,16 +6,6 @@
   transition-duration: 200ms;
   transition-property: background-color;
 
-  &__menuDrawer {
-    color: var(--color-base-white);
-
-    & .Modal__closeButton {
-      @mixin hover {
-        color: var(--color-base-blue);
-      }
-    }
-  }
-
   &__frame {
     position: relative;
     padding: 64px;

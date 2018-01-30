@@ -47,7 +47,7 @@ export default function() {
     }
     store.action('modals.add', 'viron-application-menu', null, {
       isSpread: true,
-      class: 'Modal__menuDrawer'
+      class: 'Application_Menu_Modal'
     });
   };
 
