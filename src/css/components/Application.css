@@ -136,6 +136,7 @@
     --theme-orderButton-bg: var(--theme-standard-orderButton-bg);
     --theme-endpointCard-bg: var(--theme-standard-endpointCard-bg);
     --theme-endpointCard-border: var(--theme-standard-endpointCard-border);
+    --theme-endpointPlus-border: var(--theme-standard-endpointPlus-border);
     --theme-popover-bg: var(--theme-standard-popover-bg);
     --theme-tag-text: var(--theme-standard-tag-text);
     --theme-tag-bg: var(--theme-standard-tag-bg);
@@ -166,6 +167,7 @@
     --theme-orderButton-bg: var(--theme-midnight-orderButton-bg);
     --theme-endpointCard-bg: var(--theme-midnight-endpointCard-bg);
     --theme-endpointCard-border: var(--theme-midnight-endpointCard-border);
+    --theme-endpointPlus-border: var(--theme-standard-endpointPlus-border);
     --theme-popover-bg: var(--theme-midnight-popover-bg);
     --theme-tag-text: var(--theme-midnight-tag-text);
     --theme-tag-bg: var(--theme-midnight-tag-bg);
@@ -196,6 +198,7 @@
     --theme-orderButton-bg: var(--theme-terminal-orderButton-bg);
     --theme-endpointCard-bg: var(--theme-terminal-endpointCard-bg);
     --theme-endpointCard-border: var(--theme-terminal-endpointCard-border);
+    --theme-endpointPlus-border: var(--theme-standard-endpointPlus-border);
     --theme-popover-bg: var(--theme-terminal-popover-bg);
     --theme-tag-text: var(--theme-terminal-tag-text);
     --theme-tag-bg: var(--theme-terminal-tag-bg);

@@ -6,9 +6,9 @@
 
   @apply --layout-center-center;
   width: 100%;
-  color: var(--theme-endpointCard-border);
+  color: var(--theme-endpointPlus-border);
   cursor: pointer;
-  border: 1px dashed var(--theme-endpointCard-border);
+  border: 1px dashed var(--theme-endpointPlus-border);
   border-radius: 6px;
 
   &__icon {
