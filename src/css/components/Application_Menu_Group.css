@@ -34,10 +34,13 @@
   }
 
   &__page {
+    @apply --layout-center-start;
+
     @mixin hover {
       color: var(--color-base-blue);
     }
-    padding: 16px 16px 16px 32px;
+    height: 50px;
+    padding-left: 32px;
     font-size: 1.4rem;
     cursor: pointer;
   }
@@ -48,6 +51,7 @@
     }
 
     .Application_Menu_Group__pages {
+      margin-bottom: 16px;
       opacity: 1;
     }
   }
