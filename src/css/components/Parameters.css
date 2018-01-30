@@ -17,6 +17,10 @@
     grid-column-end: span 3;
   }
 
+  &--narrow .Parameters_Parameter--spreadLarge {
+    grid-column-end: span 2;
+  }
+
   & .Parameters_Parameter--spreadFull {
     grid-column: 1 / -1;
   }

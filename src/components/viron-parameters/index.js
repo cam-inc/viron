@@ -1,8 +1,34 @@
+import throttle from 'mout/function/throttle';
 import isUndefined from 'mout/lang/isUndefined';
 import contains from 'mout/object/contains';
 import forOwn from 'mout/object/forOwn';
 
 export default function() {
+  // 横幅が狭いか否か。
+  this.isNarrow = false;
+  const checkNarrow = () => {
+    const rootElm = this.root;
+    const rect = rootElm.getBoundingClientRect();
+    const width = rect.width;
+    if (width > 450) {
+      this.isNarrow = false;
+    } else {
+      this.isNarrow = true;
+    }
+    this.update();
+  };
+
+  // resize時にvironアプリケーションの表示サイズを更新します。
+  // resizeイベントハンドラーの発火回数を減らす。
+  const handleResize = throttle(() => {
+    checkNarrow();
+  }, 1000);
+  this.on('mount', () => {
+    window.addEventListener('resize', handleResize);
+    checkNarrow();
+  }).on('unmount', () => {
+    window.removeEventListener('resize', handleResize);
+  });
 
   /**
    * 入力値が変更された時の処理。
