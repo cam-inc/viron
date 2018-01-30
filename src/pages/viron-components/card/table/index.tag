@@ -30,15 +30,19 @@ viron-components-page-table.ComponentsPage_Card_Table
             tr.ComponentsPage_Card_Table__tbodyRow(each="{ row, idx in data }" onTap="{ handleRowTap }")
               td(each="{ column in parent.getFilteredColumns() }" data-is="viron-components-page-table-cell" data="{ row[column.key] }" column="{ column }")
               td.ComponentsPage_Card_Table__td.ComponentsPage_Card_Table__td--sticky(if="{ rowOperations.length }")
-                viron-icon-setting(ref="rowSettingIcon" onTap="{ handleRowSettingButtonTap }")
+                span(data-is="viron-icon-{ rowOperationsIcon }" ref="rowSettingIcon" onTap="{ handleRowSettingButtonTap }")
   .ComponentsPage_Card_Table__tail(if="{ hasPagination }")
     viron-pagination(max="{ pagination.max }" size="{ paginationSize }" current="{ pagination.current }" onChange="{ handlePaginationChange }")
   .ComponentsPage_Card_Table__blocker(if="{ isLoading }")
 
   script.
+    import '../../../../components/icons/viron-icon-edit/index.tag';
+    import '../../../../components/icons/viron-icon-file/index.tag';
     import '../../../../components/icons/viron-icon-filter/index.tag';
+    import '../../../../components/icons/viron-icon-plus/index.tag';
     import '../../../../components/icons/viron-icon-plus-thin/index.tag';
     import '../../../../components/icons/viron-icon-reload/index.tag';
+    import '../../../../components/icons/viron-icon-remove/index.tag';
     import '../../../../components/icons/viron-icon-search/index.tag';
     import '../../../../components/icons/viron-icon-setting/index.tag';
     import '../../../../components/viron-pagination/index.tag';

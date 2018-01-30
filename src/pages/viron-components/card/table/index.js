@@ -122,6 +122,26 @@ export default function() {
     });
   };
 
+  // operation数やメソッドに応じてアイコンを切り替えます。
+  const getRowOperationsIcon = () => {
+    const operations = this.rowOperations;
+    if (!operations || operations.length !== 1) {
+      return 'setting';
+    }
+    switch (operations[0].method) {
+    case 'get':
+      return 'file';
+    case 'put':
+      return 'edit';
+    case 'post':
+      return 'plus';
+    case 'delete':
+      return 'remove';
+    default:
+      return 'setting';
+    }
+  };
+
   // 通信レスポンス内容。
   this.data = null;
   // テーブルカラム定義。
@@ -132,6 +152,8 @@ export default function() {
   this.tableOperations = [];
   // テーブル行に対するoperation群。
   this.rowOperations = [];
+  // オペレーションアイコン。
+  this.rowOperationsIcon = getRowOperationsIcon();
   // 行追加operation。
   this.postOperation = null;
   // 検索用パラメータ群。
@@ -184,6 +206,7 @@ export default function() {
     this.columns = store.getter('components.columns', this.opts.id);
     this.tableOperations = store.getter('components.operations', this.opts.id, 'table');
     this.rowOperations = store.getter('components.operations', this.opts.id, 'row');
+    this.rowOperationsIcon = getRowOperationsIcon();
     this.postOperation = store.getter('components.postOperation', this.opts.id, 'table');
     this.searchParameters = store.getter('components.searchParameters', this.opts.id);
     this.primary = store.getter('components.primary', this.opts.id);
@@ -333,6 +356,13 @@ export default function() {
   this.handleRowSettingButtonTap = e => {
     e.stopPropagation();
     const rowData = e.item.row;
+
+    // operationが一件の場合は直接Operationドローワーを開く。
+    if (this.rowOperations.length === 1) {
+      createInitialValueAndOpenOperationDrawer(this.rowOperations[0], rowData);
+      return;
+    }
+
     const elm = e.currentTarget;
     const rect = elm.getBoundingClientRect();
     Promise
