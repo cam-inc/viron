@@ -6,6 +6,16 @@
   transition-duration: 200ms;
   transition-property: background-color;
 
+  &__menuDrawer {
+    color: var(--color-base-white);
+
+    & .Modal__closeButton {
+      @mixin hover {
+        color: var(--color-base-blue);
+      }
+    }
+  }
+
   &__frame {
     position: relative;
     padding: 64px;
@@ -19,7 +29,7 @@
     @apply --layout-center-center;
 
     @mixin hover {
-      color: var(--color-base-blue);
+      color: var(--color-base-gray);
     }
     position: sticky;
     top: 0;
@@ -28,7 +38,6 @@
     z-index: 1;
     width: 13px;
     height: 0;
-    color: var(--color-base-white);
     cursor: pointer;
 
     & .Icon {
