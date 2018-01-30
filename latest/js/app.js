@@ -102461,6 +102461,7 @@ var script$30 = function() {
   };
 
   this.handleOperationsButtonTap = e => {
+    e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     store.action('popovers.add', 'viron-components-page-table-operations', {
       operations: this.operations,
