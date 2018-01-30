@@ -8964,14 +8964,19 @@ var script$1 = function() {
   this.title = this.opts.title;
   // メッセージ。
   this.message = this.opts.message;
-  // errorが渡された場合は最適化処理を行う。
-  if (!!this.opts.error) {
-    this.title = this.title || this.opts.error.name || this.opts.error.statusText || 'Error';
-    this.message = this.message || this.opts.error.message;
-  }
-
   // prettyprintで表示させる内容。
   this.detail = null;
+  // errorが渡された場合は最適化処理を行う。
+  const error = this.opts.error;
+  if (!!error) {
+    this.title = this.title || error.name || error.statusText || 'Error';
+    this.message = this.message || error.message;
+  }
+  if (!!error && !!error.response && !!error.response.obj && !!error.response.obj.error && !!error.response.obj.error.data ) {
+    const data = error.response.obj.error.data;
+    this.title = data.name || this.title;
+    this.message = data.message || this.message;
+  }
 
   this.on('mount', () => {
     // エラーがPromiseであれば解析する。
@@ -9314,6 +9319,11 @@ var mixin = {
             if (this.opts.isPopover) {
               this.opts.popoverCloser();
             }
+          },
+          // `modal`等を全て消します。
+          closeAllFloats: function() {
+            const store = this.riotx.get();
+            store.action('popovers.removeAll');
           },
           getRouter: () => {
             return router.getInstance();
@@ -16624,7 +16634,7 @@ const generateId = () => {
   return `toast_${Date.now()}`;
 };
 
-const TOAST_TIMEOUT = 3 * 1000;
+const TOAST_TIMEOUT = 1000;
 
 var toasts$2 = exporter$2('toasts', {
   /**
@@ -17918,7 +17928,7 @@ var standardTheme = {
   chart: {
     spacing: 8,
     style: {
-      fontFamily: 'NotoSansCJKjp-Jxck serif'
+      fontFamily: '"Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif'
     }
   },
   colors: ['#627EDF', '#C4BB6D', '#CBCFD4', '#588988', '#9FC8C1', '#E69EA2', '#828282'],
@@ -18035,7 +18045,7 @@ highcharts.setOptions({
     backgroundColor: 'transparent',
     spacing: 8,
     style: {
-      fontFamily: 'NotoSansCJKjp-Jxck serif'
+      fontFamily: '"Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif'
     }
   },
   credits: { enabled: false },
@@ -18365,10 +18375,22 @@ riot$1.tag2('viron-components-page-number', '<div class="ComponentsPage_Card_Num
     this.external(script$3);
 });
 
+riot$1.tag2('viron-icon-edit', '<svg viewbox="-3404.002 14060.125 15.979 15.873"> <path d="M1816-16708.127a.946.946,0,0,1-1-1v-12a.946.946,0,0,1,1-1h9.5l-2.6,2.6h-5.3v8.8h8.8v-5.2l2.6-2.6v9.4a.942.942,0,0,1-1,1Zm5.3-5.9c-.1,0-.1,0-.1-.1-.2,0-.2-.1-.2-.1v-1.9c0-.1.1-.2.3-.2a.1.1,0,0,1,.1.1l1.8,1.795c.1.1,0,.2,0,.3l-.1.1Zm2.5-1-1.8-1.9a.189.189,0,0,1,0-.3l4.7-4.7a.2.2,0,0,1,.3,0l1.8,1.8a.189.189,0,0,1,0,.3l-4.7,4.8Zm5.7-5.7-1.8-1.8a.194.194,0,0,1,0-.3l1.1-1.1a.19.19,0,0,1,.3,0l1.8,1.8a.189.189,0,0,1,0,.3l-1.1,1.1a.219.219,0,0,1-.151.072A.219.219,0,0,1,1829.5-16720.723Z" transform="translate(-5219 30784.125)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconEdit {opts.class}"', function(opts) {
+});
+
+riot$1.tag2('viron-icon-file', '<svg viewbox="3093.704 22727.934 46.089 60.576"> <path d="M78.81,0H54.481a6.457,6.457,0,0,0-6.447,6.447V54.128a6.454,6.454,0,0,0,6.447,6.447h33.2a6.454,6.454,0,0,0,6.445-6.447V15.259Zm8.867,56.627h-33.2a2.5,2.5,0,0,1-2.5-2.5V51.239s0-20.952,0-44.792a2.5,2.5,0,0,1,2.5-2.495l22.852-.024v8.447A4.473,4.473,0,0,0,81.8,16.847l8.275-.024.093,37.305A2.5,2.5,0,0,1,87.678,56.627Z" transform="translate(3045.671 22727.934)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFile {opts.class}"', function(opts) {
+});
+
 riot$1.tag2('viron-icon-filter', '<svg viewbox="-1832 11377 16.002 16"> <g transform="translate(-2104 11230)"> <rect width="12" height="1.5" rx="0.4" transform="translate(276 154.25)"></rect> <rect width="6" height="1.5" rx="0.4" transform="translate(282 148.75)"></rect> <rect width="12" height="1.5" rx="0.4" transform="translate(284 161.25) rotate(180)"></rect> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4426 19745.5)"></path> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4415 19751)"></path> <path d="M4700.5-19588a2.5,2.5,0,0,1-2.5-2.5,2.5,2.5,0,0,1,2.5-2.5,2.506,2.506,0,0,1,2.5,2.5A2.5,2.5,0,0,1,4700.5-19588Zm0-3a.5.5,0,0,0-.5.5.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5A.5.5,0,0,0,4700.5-19591Z" transform="translate(-4420.501 19740)"></path> <rect width="7" height="1.5" rx="0.4" transform="translate(272 148.75)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFilter {opts.class}"', function(opts) {
 });
 
+riot$1.tag2('viron-icon-plus', '<svg viewbox="-2612 10790 16 16"> <g transform="translate(-3874 10766)"> <rect width="16" height="3" rx="0.2" transform="translate(1262 30.5)"></rect> <rect width="16" height="3" rx="0.2" transform="translate(1271.5 24) rotate(90)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconPlus {opts.class}"', function(opts) {
+});
+
 riot$1.tag2('viron-icon-plus-thin', '<svg viewbox="-7753.249 2039.999 15.999 16.002"> <path d="M11622.45-705a.2.2,0,0,1-.2-.2v-7.049h-7.05a.2.2,0,0,1-.2-.2v-1.1a.2.2,0,0,1,.2-.2h7.05V-720.8a.2.2,0,0,1,.2-.2h1.1a.2.2,0,0,1,.2.2v7.049h7.05a.2.2,0,0,1,.2.2v1.1a.2.2,0,0,1-.2.2h-7.05v7.049a.2.2,0,0,1-.2.2Z" transform="translate(-19368.25 2761)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconPlusThin {opts.class}"', function(opts) {
+});
+
+riot$1.tag2('viron-icon-remove', '<svg viewbox="-7714 1990 16 16"> <g transform="translate(-8037 1850)"> <rect width="16" height="2" rx="0.2" transform="translate(323 142)"></rect> <rect width="4" height="2.5" rx="0.2" transform="translate(329 140)"></rect> <path d="M2945.8-10677h-9.6a.2.2,0,0,1-.2-.2l-1-10.6a.2.2,0,0,1,.2-.2h11.6a.2.2,0,0,1,.2.2l-1,10.6A.2.2,0,0,1,2945.8-10677Zm-4.852-9.661a.2.2,0,0,0-.2.2v7.824a.2.2,0,0,0,.2.2h.351a.2.2,0,0,0,.2-.2v-7.824a.2.2,0,0,0-.2-.2Zm2.5,0a.2.2,0,0,0-.2.2v7.1a.2.2,0,0,0,.2.2h.351a.2.2,0,0,0,.2-.2v-7.1a.2.2,0,0,0-.2-.2Zm-5.25,0a.189.189,0,0,0-.2.182v7.136a.191.191,0,0,0,.2.182h.352a.191.191,0,0,0,.2-.182v-7.136a.189.189,0,0,0-.2-.182Z" transform="translate(-2610 10833)"></path> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconRemove {opts.class}"', function(opts) {
 });
 
 riot$1.tag2('viron-icon-setting', '<svg viewbox="-3464 14060 16 16.001"> <path d="M15.953,7.112a.521.521,0,0,0-.514-.394,1.767,1.767,0,0,1-1.209-3.075.444.444,0,0,0,.049-.6A7.916,7.916,0,0,0,13.01,1.76a.445.445,0,0,0-.608.049,1.844,1.844,0,0,1-2,.448A1.777,1.777,0,0,1,9.327.521.444.444,0,0,0,8.934.053a7.987,7.987,0,0,0-1.8,0,.445.445,0,0,0-.4.458,1.78,1.78,0,0,1-1.1,1.707,1.849,1.849,0,0,1-1.98-.451.446.446,0,0,0-.6-.051,7.946,7.946,0,0,0-1.294,1.28.445.445,0,0,0,.048.608,1.773,1.773,0,0,1,.447,2A1.85,1.85,0,0,1,.518,6.677a.435.435,0,0,0-.462.393,8.014,8.014,0,0,0,0,1.819.529.529,0,0,0,.525.393,1.755,1.755,0,0,1,1.646,1.1,1.779,1.779,0,0,1-.447,1.978.445.445,0,0,0-.049.6,7.945,7.945,0,0,0,1.266,1.28.445.445,0,0,0,.609-.048A1.841,1.841,0,0,1,5.6,13.743,1.774,1.774,0,0,1,6.679,15.48a.444.444,0,0,0,.393.467,7.962,7.962,0,0,0,1.8,0,.445.445,0,0,0,.4-.458,1.778,1.778,0,0,1,1.095-1.706,1.846,1.846,0,0,1,1.981.451.447.447,0,0,0,.6.05,7.965,7.965,0,0,0,1.294-1.28.444.444,0,0,0-.048-.608,1.773,1.773,0,0,1-.448-2,1.791,1.791,0,0,1,1.637-1.085l.1,0a.445.445,0,0,0,.468-.392A8.007,8.007,0,0,0,15.953,7.112ZM8.015,10.686a2.669,2.669,0,1,1,2.668-2.669A2.671,2.671,0,0,1,8.015,10.686Z" transform="translate(-3464.003 14060)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconSetting {opts.class}"', function(opts) {
@@ -18681,7 +18703,7 @@ var script$8 = function() {
   };
 };
 
-riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon-check></viron-icon-check> </div> <div class="Checkbox__label" if="{!!opts.label}">{opts.label}</div> </div> <div class="Checkbox__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Checkbox {\'Checkbox--checked\': opts.ischecked, \'Checkbox--error\': opts.iserror, \'Checkbox--disabled\': opts.isdisabled} Checkbox--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-checkbox', '<div class="Checkbox__content"> <div class="Checkbox__mark"> <viron-icon-check></viron-icon-check> </div> <div class="Checkbox__label" if="{!!opts.label}">{opts.label}</div> </div> <div class="Checkbox__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Checkbox {\'Checkbox--checked\': opts.ischecked, \'Checkbox--preview\': opts.ispreview, \'Checkbox--error\': opts.iserror, \'Checkbox--disabled\': opts.isdisabled} Checkbox--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$8);
 });
 
@@ -19081,7 +19103,7 @@ var script$10 = function() {
   };
 };
 
-riot$1.tag2('viron-autocomplete', '<div class="Autocomplete__label" if="{!!opts.label}">{opts.label}</div> <form onsubmit="{handleFormSubmit}"> <input class="Autocomplete__input" type="text" riot-value="{opts.val}" ref="input" list="{_riot_id}" disabled="{opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <datalist id="{_riot_id}"> <option each="{opt in options}" riot-value="{opt.value}">{opt.name}</option> </datalist> <div class="Autocomplete__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Autocomplete {\'Autocomplete--disabled\': opts.isdisabled, \'Autocomplete--error\': opts.iserror}"', function(opts) {
+riot$1.tag2('viron-autocomplete', '<div class="Autocomplete__label" if="{!!opts.label}">{opts.label}</div> <form onsubmit="{handleFormSubmit}"> <input class="Autocomplete__input" type="text" riot-value="{opts.val}" ref="input" list="{_riot_id}" disabled="{opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <datalist id="{_riot_id}"> <option each="{opt in options}" riot-value="{opt.value}">{opt.name}</option> </datalist> <div class="Autocomplete__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Autocomplete {\'Autocomplete--disabled\': opts.isdisabled, \'Autocomplete--preview\': opts.ispreview, \'Autocomplete--error\': opts.iserror}"', function(opts) {
     this.external(script$10);
 });
 
@@ -24859,7 +24881,7 @@ var script$13 = function() {
   };
 };
 
-riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__form" ref="form" onsubmit="{handleFormSubmit}"> <virtual if="{!opts.ispreview}"> <textarea class="Textarea__input" ref="input" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}" onfocus="{handleTextareaFocus}" onblur="{handleTextareaBlur}"></textarea> </virtual> <virtual if="{opts.ispreview}"> <pre class="Textarea__input Textarea__input--break">{normalizeValue(opts.val)}</pre> </virtual> </form> <div class="Textarea__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Textarea {\'Textarea--disabled\': opts.isdisabled, \'Textarea--error\': opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-textarea', '<div class="Textarea__label" if="{!!opts.label}">{opts.label}</div> <form class="Textarea__form" ref="form" onsubmit="{handleFormSubmit}"> <virtual if="{!opts.ispreview}"> <textarea class="Textarea__input" ref="input" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleTextareaInput}" onchange="{handleTextareaChange}" onfocus="{handleTextareaFocus}" onblur="{handleTextareaBlur}"></textarea> </virtual> <virtual if="{opts.ispreview}"> <pre class="Textarea__input Textarea__input--break">{normalizeValue(opts.val)}</pre> </virtual> </form> <div class="Textarea__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Textarea {\'Textarea--disabled\': opts.isdisabled, \'Textarea--preview\': opts.ispreview, \'Textarea--error\': opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$13);
 });
 
@@ -25113,7 +25135,7 @@ var script$16 = function() {
   };
 };
 
-riot$1.tag2('viron-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Numberinput__input" ref="input" type="text" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <div class="Numberinput__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Numberinput {\'Numberinput--disabled\': opts.isdisabled, \'Numberinput--error\': opts.iserror} Numberinput--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-numberinput', '<div class="Numberinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Numberinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Numberinput__input" ref="input" type="text" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <div class="Numberinput__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Numberinput {\'Numberinput--disabled\': opts.isdisabled, \'Numberinput--preview\': opts.ispreview, \'Numberinput--error\': opts.iserror} Numberinput--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$16);
 });
 
@@ -25282,7 +25304,7 @@ var script$18 = function() {
   };
 };
 
-riot$1.tag2('viron-select', '<form class="Select__form" onsubmit="{handleFormSubmit}"> <select class="Select__select" ref="select" disabled="{opts.isdisabled}" oninput="{handleSelectInput}" onchange="{handleSelectChange}"> <option class="Select__option" each="{option in opts.options}" selected="{option.isSelected}">{option.label}</option> </select> <viron-icon-arrow-down class="Select__icon" if="{!opts.ispreview}"></viron-icon-arrow-down> </form> <div class="Select__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Select {\'Select--disabled\': opts.isdisabled, \'Select--error\': opts.iserror}"', function(opts) {
+riot$1.tag2('viron-select', '<form class="Select__form" onsubmit="{handleFormSubmit}"> <select class="Select__select" ref="select" disabled="{opts.isdisabled}" oninput="{handleSelectInput}" onchange="{handleSelectChange}"> <option class="Select__option" each="{option in opts.options}" selected="{option.isSelected}">{option.label}</option> </select> <viron-icon-arrow-down class="Select__icon" if="{!opts.ispreview}"></viron-icon-arrow-down> </form> <div class="Select__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Select {\'Select--disabled\': opts.isdisabled, \'Select--preview\': opts.ispreview, \'Select--error\': opts.iserror}"', function(opts) {
     this.external(script$18);
 });
 
@@ -25376,11 +25398,8 @@ var script$19 = function() {
   };
 };
 
-riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <div class="Textinput__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled, \'Textinput--error\': opts.iserror} Textinput--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <div class="Textinput__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled, \'Textinput--preview\': opts.ispreview, \'Textinput--error\': opts.iserror} Textinput--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$19);
-});
-
-riot$1.tag2('viron-icon-file', '<svg viewbox="3093.704 22727.934 46.089 60.576"> <path d="M78.81,0H54.481a6.457,6.457,0,0,0-6.447,6.447V54.128a6.454,6.454,0,0,0,6.447,6.447h33.2a6.454,6.454,0,0,0,6.445-6.447V15.259Zm8.867,56.627h-33.2a2.5,2.5,0,0,1-2.5-2.5V51.239s0-20.952,0-44.792a2.5,2.5,0,0,1,2.5-2.495l22.852-.024v8.447A4.473,4.473,0,0,0,81.8,16.847l8.275-.024.093,37.305A2.5,2.5,0,0,1,87.678,56.627Z" transform="translate(3045.671 22727.934)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFile {opts.class}"', function(opts) {
 });
 
 riot$1.tag2('viron-icon-file-add', '<svg viewbox="2937 22889 57.219 64.002"> <g transform="translate(2863 22751)"> <g transform="translate(-347 -90)"> <g transform="translate(421 228)"> <path d="M6.449,56.554a2.5,2.5,0,0,1-2.5-2.5V6.449a2.5,2.5,0,0,1,2.5-2.482l22.825-.02v8.442a4.476,4.476,0,0,0,4.476,4.476l8.259-.02.041,19.509a13.014,13.014,0,0,1,1.79-.122,15.508,15.508,0,0,1,2.2.163V15.237L30.739,0H6.449A6.451,6.451,0,0,0,0,6.449V54.072a6.451,6.451,0,0,0,6.449,6.449H33.363a14.909,14.909,0,0,1-2.645-3.947H6.449Z"></path> </g> <g transform="translate(169.449 90.915)"> <g transform="translate(282 174.316)"> <path d="M-4190.615-7823.229A13.4,13.4,0,0,1-4204-7836.616,13.4,13.4,0,0,1-4190.615-7850a13.4,13.4,0,0,1,13.385,13.385A13.4,13.4,0,0,1-4190.615-7823.229Zm-6.292-14.64a.4.4,0,0,0-.4.4v1.71a.4.4,0,0,0,.4.4h5.038v5.038a.4.4,0,0,0,.4.4h1.71a.4.4,0,0,0,.4-.4v-5.038h5.038a.4.4,0,0,0,.4-.4v-1.71a.4.4,0,0,0-.4-.4h-5.038v-5.04a.4.4,0,0,0-.4-.4h-1.71a.4.4,0,0,0-.4.4v5.04Z" transform="translate(4204 7850)"></path> </g> </g> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconFileAdd {opts.class}"', function(opts) {
@@ -95461,31 +95480,15 @@ var script$21 = function() {
   };
 };
 
-riot$1.tag2('viron-wyswyg', '<form class="Wyswyg__form"> <textarea class="Wyswyg__editor{_riot_id}"></textarea> </form> <div class="Wyswyg__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Wyswyg {\'Wyswyg--disabled\': opts.isdisabled, \'Wyswyg--error\': opts.haserror}"', function(opts) {
+riot$1.tag2('viron-wyswyg', '<form class="Wyswyg__form"> <textarea class="Wyswyg__editor{_riot_id}"></textarea> </form> <div class="Wyswyg__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Wyswyg {\'Wyswyg--disabled\': opts.isdisabled, \'Wyswyg--preview\': opts.ispreview, \'Wyswyg--error\': opts.haserror}"', function(opts) {
     this.external(script$21);
 });
 
-var script$22 = function() {
-  // 表示状態
-  this.isVisible = false;
-
-  this.on('mount', () => {
-    // プレビューモードでは何も表示しない。
-    if (this.opts.ispreview) {
-      return;
-    }
-    setTimeout(() => {
-      if (!this.isMounted) {
-        return;
-      }
-      this.isVisible = true;
-      this.update();
-    }, 100);
-  });
+var script$23 = function() {
 };
 
-riot$1.tag2('viron-parameters-popover', '<div class="Parameters_Popover__message">{opts.message}</div> <div class="Parameters_Popover__arrow"></div>', '', 'class="Parameters_Popover {\'Parameters_Popover--visible\': isVisible}"', function(opts) {
-    this.external(script$22);
+riot$1.tag2('viron-parameters-error', '<div class="Parameters_Error__message">{opts.message} </div>', '', 'class="Parameters_Error"', function(opts) {
+      this.external(script$23);
 });
 
 /**
@@ -101208,7 +101211,9 @@ const isNumber$3 = num => {// eslint-disable-line no-unused-vars
   return isNumber_1(num);
 };
 
-var script$23 = function() {
+var script$22 = function() {
+  const store = this.riotx.get();
+
   // ショートカット。
   const formObject = this.opts.formobject;
   // 入力フォームのタイトル。
@@ -101224,6 +101229,8 @@ var script$23 = function() {
   this.accept = formObject['x-accept'] || '*';
   // MIME-type
   this.mimeType = formObject['x-mime-type'];
+  // 入力フォームのplaceholder値。
+  this.placeholder = formObject.example;
 
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-13
   // disabled(readOnly)
@@ -101258,6 +101265,10 @@ var script$23 = function() {
   const validate = () => {
     this.errors = validator.errors(this.opts.val, formObject);
     this.hasError = !!this.errors.length;
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(this._riot_id, !this.hasError);
   };
 
   // フォーム選択状態。
@@ -101305,11 +101316,43 @@ var script$23 = function() {
   };
 
   /**
+   * エラーPopoverを表示します。
+   */
+  const showError = () => {
+    if (!this.isFocus) {
+      return;
+    }
+    if (!this.hasError) {
+      return;
+    }
+    if (this.opts.ispreview) {
+      return;
+    }
+    const bodyElm = this.refs.body;
+    const rect = bodyElm.getBoundingClientRect();
+    store.action('popovers.add', 'viron-parameters-error', {
+      message: this.errors[0]
+    }, {
+      x: rect.left + (rect.width / 2),
+      y: rect.top,
+      width: rect.width,
+      direction: 'B',
+      isError: true,
+      watchElm: bodyElm
+    });
+  };
+
+  this.handleBodyTap = e => {
+    e.stopPropagation();
+  };
+
+  /**
    * フォーカスされた時の処理。
    */
   this.handleFormFocus = () => {
     this.isFocus = true;
     this.update();
+    showError();
   };
 
   /**
@@ -101489,11 +101532,11 @@ var script$23 = function() {
 
 };
 
-riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> <div class="Parameters_Form__description" if="{!!description}">{description}</div> </div> <div class="Parameters_Form__body"> <div class="Parameters_Form__error" if="{hasError &amp;&amp; isFocus}"> <viron-parameters-popover theme="{opts.theme}" ispreview="{opts.ispreview}" message="{errors[0]}"></viron-parameters-popover> </div> <virtual if="{uiType === \'textinput\'}"> <viron-textinput val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextareaChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleNumberinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="{accept}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'base64\'}"> <viron-base64 val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" mimetype="{mimeType}" onchange="{handleBase64Change}"></viron-base64> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleHtmlChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handlePugChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" config="{autocompleteConfig}" onchange="{handleAutocompleteChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'image\'}"> <viron-image val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview || isDisabled}"></viron-image> </virtual> <virtual if="{uiType === \'null\'}"> <div>NULL</div> </virtual> </div>', '', 'class="Parameters_Form"', function(opts) {
-    this.external(script$23);
+riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> <div class="Parameters_Form__description" if="{!!description}">{description}</div> </div> <div class="Parameters_Form__body" ref="body" onclick="{getClickHandler(\'handleBodyTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBodyTap\')}"> <virtual if="{uiType === \'textinput\'}"> <viron-textinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextareaChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleNumberinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="{accept}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'base64\'}"> <viron-base64 val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" mimetype="{mimeType}" onchange="{handleBase64Change}"></viron-base64> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleHtmlChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handlePugChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" config="{autocompleteConfig}" onchange="{handleAutocompleteChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'image\'}"> <viron-image val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview || isDisabled}"></viron-image> </virtual> <virtual if="{uiType === \'null\'}"> <div>NULL</div> </virtual> </div>', '', 'class="Parameters_Form {\'Parameters_Form--preview\': opts.ispreview}"', function(opts) {
+    this.external(script$22);
 });
 
-riot$1.tag2('viron-icon-plus', '<svg viewbox="-2612 10790 16 16"> <g transform="translate(-3874 10766)"> <rect width="16" height="3" rx="0.2" transform="translate(1262 30.5)"></rect> <rect width="16" height="3" rx="0.2" transform="translate(1271.5 24) rotate(90)"></rect> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconPlus {opts.class}"', function(opts) {
+riot$1.tag2('viron-icon-arrow-up', '<svg viewbox="-3494.002 14063 16.002 10.037"> <path d="M1706.943-16726.971l-5.963-5.963-1.433-1.434a.122.122,0,0,1-.019-.021l-.384-.385a.2.2,0,0,1,0-.283l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.842a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.818a.2.2,0,0,1,0,.281l-1.84,1.842a.2.2,0,0,1-.141.059A.2.2,0,0,1,1706.943-16726.971Z" transform="translate(-20220.914 12363.916) rotate(90)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconArrowUp {opts.class}"', function(opts) {
 });
 
 var script$24 = function() {
@@ -101508,6 +101551,10 @@ var script$24 = function() {
       required: this.opts.required
     }, propertiesObject));
     this.hasError = !!this.errors.length;
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(this._riot_id, !this.hasError);
   };
 
   validate();
@@ -101637,9 +101684,21 @@ var script$24 = function() {
     }
     this.opts.onchange(this.opts.identifier, ret);
   };
+
+  /**
+   * バリデートされた時の処理。
+   * @param {String} formId
+   * @param {Boolean} isValid
+   */
+  this.handlePropertyValidate = (formId, isValid) => {
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(formId, isValid);
+  };
 };
 
-riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__head"> <div class="Parameters_Properties__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> </div> <div class="Parameters_Properties__error" if="{hasError}">{errors[0]}</div> <div class="Parameters_Properties__body"> <div class="Parameters_Properties__item {\'Parameters_Properties__item--\' + parent.getSpreadStyle(key, property)}" each="{property, key in propertiesObject.properties}"> <virtual if="{isFormMode(property)}"> <viron-parameters-form no-reorder identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.getFormObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode(property)}"> <viron-parameters-properties no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" required="{parent.getRequired(key)}" propertiesobject="{parent.getPropertiesObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode(property)}"> <viron-parameters-items no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" required="{parent.getRequired(key)}" schemaobject="{parent.getSchemaObject(key, property)}" onchange="{parent.handlePropertyChange}"></viron-parameters-items> </virtual> </div> </div>', '', 'class="Parameters_Properties"', function(opts) {
+riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__head"> <div class="Parameters_Properties__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> </div> <div class="Parameters_Properties__error" if="{hasError}">{errors[0]}</div> <div class="Parameters_Properties__body"> <div class="Parameters_Properties__item {\'Parameters_Properties__item--\' + parent.getSpreadStyle(key, property)}" each="{property, key in propertiesObject.properties}"> <virtual if="{isFormMode(property)}"> <viron-parameters-form no-reorder identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.getFormObject(key, property)}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode(property)}"> <viron-parameters-properties no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" required="{parent.getRequired(key)}" propertiesobject="{parent.getPropertiesObject(key, property)}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode(property)}"> <viron-parameters-items no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" required="{parent.getRequired(key)}" schemaobject="{parent.getSchemaObject(key, property)}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-items> </virtual> </div> </div>', '', 'class="Parameters_Properties"', function(opts) {
     this.external(script$24);
 });
 
@@ -101705,6 +101764,10 @@ var script$25 = function() {
       required: this.opts.required
     }, schemaObject));
     this.hasError = !!this.errors.length;
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(this._riot_id, !this.hasError);
   };
 
   // itemの開閉状態。
@@ -101906,9 +101969,21 @@ var script$25 = function() {
     ret[idx] = newVal;
     this.opts.onchange(this.opts.identifier, ret);
   };
+
+  /**
+   * バリデートされた時の処理。
+   * @param {String} formId
+   * @param {Boolean} isValid
+   */
+  this.handleItemValidate = (formId, isValid) => {
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(formId, isValid);
+  };
 };
 
-riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__addButton" if="{!opts.ispreview}" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__headContent"> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__error" if="{hasError}">{errors[0]}</div> </div> <div class="Parameters_Items__openButton" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">項目をすべて開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__removeButton" if="{!parent.opts.ispreview}" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.formObject}" onchange="{parent.handleItemChange}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" propertiesobject="{parent.propertiesObject}" onchange="{parent.handleItemChange}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" schemaobject="{parent.schemaObject.items}" onchange="{parent.handleItemChange}"></viron-parameters-items> </virtual> </div> <div class="Parameters_Items__itemTail"> <div class="Parameters_Items__removeButton" if="{!parent.opts.ispreview}" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <div class="Parameters_Items__closeButtonLabel">とじる</div> <viron-icon-check></viron-icon-check> </div> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div class="Parameters_Items__itemBriefTitle">{parent.getBriefItemTitle(val, idx)}</div> <div class="Parameters_Items__itemBriefDescription" if="{parent.isPropertiesMode}">{parent.getBriefItemDescription(val)}</div> </div> </div> </div>', '', 'class="Parameters_Items"', function(opts) {
+riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__addButton" if="{!opts.ispreview}" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__headContent"> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__error" if="{hasError}">{errors[0]}</div> </div> <div class="Parameters_Items__openButton" if="{!!opts.val &amp;&amp; !!opts.val.length}" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">項目をすべて開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="Parameters_Items__removeButton" if="{!parent.opts.ispreview}" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.formObject}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" propertiesobject="{parent.propertiesObject}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" schemaobject="{parent.schemaObject.items}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-items> </virtual> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div class="Parameters_Items__itemBriefTitle">{parent.getBriefItemTitle(val, idx)}</div> <div class="Parameters_Items__itemBriefDescription" if="{parent.isPropertiesMode}">{parent.getBriefItemDescription(val)}</div> <div class="Parameters_Items__itemBriefOpenButton"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div> </div> </div>', '', 'class="Parameters_Items {\'Parameters_Items--preview\': opts.ispreview}"', function(opts) {
     this.external(script$25);
 });
 
@@ -101992,13 +102067,60 @@ var script$26 = function() {
     // keyはopts.parameterObject.nameと同じ。
     this.opts.onchange(key, newVal);
   };
+
+  /**
+   * バリデートされた時の処理。
+   * @param {String} formId
+   * @param {Boolean} isValid
+   */
+  this.handleValValidate = (formId, isValid) => {
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    this.opts.onvalidate(formId, isValid);
+  };
 };
 
-riot$1.tag2('viron-parameters-parameter', '<virtual if="{isFormMode}"> <viron-parameters-form formobject="{formObject}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isFormDisabled}" onchange="{handleValChange}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameters-properties label="{propertiesLabel}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" required="{parameterObject.required}" propertiesobject="{propertiesObject}" onchange="{handleValChange}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode}"> <viron-parameters-items label="{itemsLabel}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" required="{parameterObject.required}" schemaobject="{schemaObject}" onchange="{handleValChange}"></viron-parameters-items> </virtual>', '', 'class="Parameters_Parameter {\'Parameters_Parameter--\' + spreadStyle}"', function(opts) {
+riot$1.tag2('viron-parameters-parameter', '<virtual if="{isFormMode}"> <viron-parameters-form formobject="{formObject}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isFormDisabled}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameters-properties label="{propertiesLabel}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" required="{parameterObject.required}" propertiesobject="{propertiesObject}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode}"> <viron-parameters-items label="{itemsLabel}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" required="{parameterObject.required}" schemaobject="{schemaObject}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-items> </virtual>', '', 'class="Parameters_Parameter {\'Parameters_Parameter--\' + spreadStyle}"', function(opts) {
     this.external(script$26);
 });
 
+/**
+     * Check if object contains value
+     */
+    function contains$5(obj, needle) {
+        return some_1$1(obj, function(val) {
+            return (val === needle);
+        });
+    }
+    var contains_1$3 = contains$5;
+
 var script$27 = function() {
+  // 横幅が狭いか否か。
+  this.isNarrow = false;
+  const checkNarrow = () => {
+    const rootElm = this.root;
+    const rect = rootElm.getBoundingClientRect();
+    const width = rect.width;
+    if (width > 450) {
+      this.isNarrow = false;
+    } else {
+      this.isNarrow = true;
+    }
+    this.update();
+  };
+
+  // resize時にvironアプリケーションの表示サイズを更新します。
+  // resizeイベントハンドラーの発火回数を減らす。
+  const handleResize = throttle_1(() => {
+    checkNarrow();
+  }, 1000);
+  this.on('mount', () => {
+    window.addEventListener('resize', handleResize);
+    checkNarrow();
+  }).on('unmount', () => {
+    window.removeEventListener('resize', handleResize);
+  });
 
   /**
    * 入力値が変更された時の処理。
@@ -102019,19 +102141,31 @@ var script$27 = function() {
     });
     this.opts.onchange(ret);
   };
+
+  /**
+   * バリデートされた時の処理。
+   * @param {String} formId
+   * @param {Boolean} isValid
+   */
+  const validateResults = {};
+  this.handleValValidate = (formId, isValid) => {
+    validateResults[formId] = isValid;
+    if (!this.opts.onvalidate) {
+      return;
+    }
+    if (contains_1$3(validateResults, false)) {
+      this.opts.onvalidate(false);
+    } else {
+      this.opts.onvalidate(true);
+    }
+  };
 };
 
-riot$1.tag2('viron-parameters', '<viron-parameters-parameter each="{parameterObject in opts.parameterobjects}" val="{parent.opts.val[parameterObject.name]}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" parameterobject="{parameterObject}" primary="{parent.opts.primary}" onchange="{parent.handleValChange}"></viron-parameters-parameter>', '', 'class="Parameters"', function(opts) {
+riot$1.tag2('viron-parameters', '<viron-parameters-parameter each="{parameterObject in opts.parameterobjects}" val="{parent.opts.val[parameterObject.name]}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" parameterobject="{parameterObject}" primary="{parent.opts.primary}" onchange="{parent.handleValChange}" onvalidate="{parent.handleValValidate}"></viron-parameters-parameter>', '', 'class="Parameters {\'Parameters--narrow\': isNarrow}"', function(opts) {
     this.external(script$27);
 });
 
-riot$1.tag2('viron-icon-arrow-up', '<svg viewbox="-3494.002 14063 16.002 10.037"> <path d="M1706.943-16726.971l-5.963-5.963-1.433-1.434a.122.122,0,0,1-.019-.021l-.384-.385a.2.2,0,0,1,0-.283l7.8-7.8a.2.2,0,0,1,.281,0l1.84,1.842a.2.2,0,0,1,0,.281l-5.82,5.82,5.82,5.818a.2.2,0,0,1,0,.281l-1.84,1.842a.2.2,0,0,1-.141.059A.2.2,0,0,1,1706.943-16726.971Z" transform="translate(-20220.914 12363.916) rotate(90)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconArrowUp {opts.class}"', function(opts) {
-});
-
 riot$1.tag2('viron-icon-down', '<svg viewbox="-9481.5 13487.999 7.4 4.2"> <path d="M.8,5.6a.553.553,0,0,0-.4.9L3.6,9.7a.6.6,0,0,0,.4.1.6.6,0,0,0,.4-.1L7.6,6.5c.2-.3,0-.9-.4-.9Z" transform="translate(-9481.778 13482.399)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconDown {opts.class}"', function(opts) {
-});
-
-riot$1.tag2('viron-icon-edit', '<svg viewbox="-3404.002 14060.125 15.979 15.873"> <path d="M1816-16708.127a.946.946,0,0,1-1-1v-12a.946.946,0,0,1,1-1h9.5l-2.6,2.6h-5.3v8.8h8.8v-5.2l2.6-2.6v9.4a.942.942,0,0,1-1,1Zm5.3-5.9c-.1,0-.1,0-.1-.1-.2,0-.2-.1-.2-.1v-1.9c0-.1.1-.2.3-.2a.1.1,0,0,1,.1.1l1.8,1.795c.1.1,0,.2,0,.3l-.1.1Zm2.5-1-1.8-1.9a.189.189,0,0,1,0-.3l4.7-4.7a.2.2,0,0,1,.3,0l1.8,1.8a.189.189,0,0,1,0,.3l-4.7,4.8Zm5.7-5.7-1.8-1.8a.194.194,0,0,1,0-.3l1.1-1.1a.19.19,0,0,1,.3,0l1.8,1.8a.189.189,0,0,1,0,.3l-1.1,1.1a.219.219,0,0,1-.151.072A.219.219,0,0,1,1829.5-16720.723Z" transform="translate(-5219 30784.125)"></path> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconEdit {opts.class}"', function(opts) {
 });
 
 riot$1.tag2('viron-icon-exclamation-circle', '<svg viewbox="-2882 10816 16 16"> <g transform="translate(-3247 10632.5)"> <g transform="translate(365 183.5)"> <circle cx="8" cy="8" r="8"></circle> <circle cx="8" cy="8" r="7.25"></circle> </g> <g transform="translate(9.621 -0.445)"> <rect width="5" height="2" rx="0.4" transform="translate(362.379 192.945) rotate(-90)"></rect> <rect width="2" height="2" rx="0.4" transform="translate(362.379 195.945) rotate(-90)"></rect> </g> </g> </svg> <div class="Icon__catcher" if="{!opts.nocatcher}"></div>', '', 'class="icon Icon IconExclamationCircle {opts.class}"', function(opts) {
@@ -102087,6 +102221,7 @@ var script$28 = function() {
   const store = this.riotx.get();
   const operationObject = this.opts.operationObject;
 
+  this.isValid = true;
   this.layoutType = store.getter('layout.type');
   // 入力値。
   // viron-parameterは参照元を弄る。ので予めdeepCloneしておく。
@@ -102150,9 +102285,28 @@ var script$28 = function() {
       });
   };
 
+  const updateSubmitButton = () => {
+    // 諸々の都合でthis.update()を使えない & 使いたくない。
+    // ので、DOMを直接操作する。
+    const submitButton = this.refs.submit;
+    if (!submitButton) {
+      return;
+    }
+    const className = 'ComponentsPage_Operation__submit--disabled';
+    if (this.isValid) {
+      submitButton.classList.remove(className);
+    } else {
+      submitButton.classList.add(className);
+    }
+  };
+
   this.listen('layout', () => {
     this.layoutType = store.getter('layout.type');
     this.update();
+  });
+
+  this.on('mount', () => {
+    updateSubmitButton();
   });
 
   this.handleCancelTap = () => {
@@ -102164,7 +102318,16 @@ var script$28 = function() {
     this.update();
   };
 
+  this.handleParametersValidate = isValid => {
+    this.isValid = isValid;
+    updateSubmitButton();
+  };
+
   this.handleSubmitTap = () => {
+    if (!this.isValid) {
+      return;
+    }
+
     Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
       title: this.title,
       message: '本当に実行しますか？',
@@ -102176,7 +102339,7 @@ var script$28 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">キャンセル</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" parameterobjects="{opts.operationObject.parameters}" primary="{opts.primary}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation ComponentsPage_Operation--{layoutType}"', function(opts) {
+riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">キャンセル</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" parameterobjects="{opts.operationObject.parameters}" primary="{opts.primary}" onchange="{handleParametersChange}" onvalidate="{handleParametersValidate}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" ref="submit" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation ComponentsPage_Operation--{layoutType}"', function(opts) {
     this.external(script$28);
 });
 
@@ -102481,6 +102644,26 @@ var script$6 = function() {
     });
   };
 
+  // operation数やメソッドに応じてアイコンを切り替えます。
+  const getRowOperationsIcon = () => {
+    const operations = this.rowOperations;
+    if (!operations || operations.length !== 1) {
+      return 'setting';
+    }
+    switch (operations[0].method) {
+    case 'get':
+      return 'file';
+    case 'put':
+      return 'edit';
+    case 'post':
+      return 'plus';
+    case 'delete':
+      return 'remove';
+    default:
+      return 'setting';
+    }
+  };
+
   // 通信レスポンス内容。
   this.data = null;
   // テーブルカラム定義。
@@ -102491,6 +102674,8 @@ var script$6 = function() {
   this.tableOperations = [];
   // テーブル行に対するoperation群。
   this.rowOperations = [];
+  // オペレーションアイコン。
+  this.rowOperationsIcon = getRowOperationsIcon();
   // 行追加operation。
   this.postOperation = null;
   // 検索用パラメータ群。
@@ -102543,6 +102728,7 @@ var script$6 = function() {
     this.columns = store.getter('components.columns', this.opts.id);
     this.tableOperations = store.getter('components.operations', this.opts.id, 'table');
     this.rowOperations = store.getter('components.operations', this.opts.id, 'row');
+    this.rowOperationsIcon = getRowOperationsIcon();
     this.postOperation = store.getter('components.postOperation', this.opts.id, 'table');
     this.searchParameters = store.getter('components.searchParameters', this.opts.id);
     this.primary = store.getter('components.primary', this.opts.id);
@@ -102692,18 +102878,34 @@ var script$6 = function() {
   this.handleRowSettingButtonTap = e => {
     e.stopPropagation();
     const rowData = e.item.row;
-    const rect = e.currentTarget.getBoundingClientRect();
-    store.action('popovers.add', 'viron-components-page-table-operations', {
-      operations: this.rowOperations,
-      onSelect: operationObject => {
-        createInitialValueAndOpenOperationDrawer(operationObject, rowData);
-      }
-    }, {
-      x: rect.left + (rect.width / 2),
-      y: rect.bottom,
-      width: 240,
-      direction: 'TR'
-    });
+
+    // operationが一件の場合は直接Operationドローワーを開く。
+    if (this.rowOperations.length === 1) {
+      createInitialValueAndOpenOperationDrawer(this.rowOperations[0], rowData);
+      return;
+    }
+
+    const elm = e.currentTarget;
+    const rect = elm.getBoundingClientRect();
+    Promise
+      .resolve()
+      .then(() => {
+        this.closeAllFloats();
+      })
+      .then(() => {
+        store.action('popovers.add', 'viron-components-page-table-operations', {
+          operations: this.rowOperations,
+          onSelect: operationObject => {
+            createInitialValueAndOpenOperationDrawer(operationObject, rowData);
+          }
+        }, {
+          x: rect.left + (rect.width / 2),
+          y: rect.bottom,
+          width: 240,
+          direction: 'TR',
+          watchElm: elm
+        });
+      });
   };
 
   this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
@@ -102715,7 +102917,7 @@ var script$6 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-table', '<div class="ComponentsPage_Card_Table__head"> <div class="ComponentsPage_Card_Table__headAside"> <div class="ComponentsPage_Card_Table__postOperation" if="{postOperation}" onclick="{getClickHandler(\'handlePostButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePostButtonTap\')}"> <viron-icon-plus-thin></viron-icon-plus-thin> </div> <div class="ComponentsPage_Card_Table__title">{opts.def.name}</div> </div> <div class="ComponentsPage_Card_Table__headAside"> <div class="ComponentsPage_Card_Table__control"> <viron-icon-search class="ComponentsPage_Card_Table__searchIcon {\'ComponentsPage_Card_Table__searchIcon--active\': hasSearchQueries}" if="{searchParameters.length}" onclick="{getClickHandler(\'handleSearchButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchButtonTap\')}"></viron-icon-search> <viron-icon-filter class="ComponentsPage_Card_Table__filterIcon {\'ComponentsPage_Card_Table__filterIcon--active\': !!visibleColumnKeys}" onclick="{getClickHandler(\'handleFilterButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFilterButtonTap\')}"></viron-icon-filter> <viron-icon-setting if="{tableOperations.length}" ref="settingIcon" onclick="{getClickHandler(\'handleSettingButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSettingButtonTap\')}"></viron-icon-setting> </div> </div> </div> <div class="ComponentsPage_Card_Table__body"> <virtual if="{isLoading}"> <div class="ComponentsPage_Card_Table__progressWrapper"> <div class="ComponentsPage_Card_Table__progress"> <viron-icon-reload></viron-icon-reload> </div> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="ComponentsPage_Card_Table__errorWrapper"> <div class="ComponentsPage_Card_Table__error">{error}</div> </div> </virtual> <virtual if="{!error}"> <table class="ComponentsPage_Card_Table__table"> <thead class="ComponentsPage_Card_Table__thead"> <tr class="ComponentsPage_Card_Table__theadRow"> <th class="ComponentsPage_Card_Table__th" each="{column in getFilteredColumns()}">{column.description || column.key}</th> <th class="ComponentsPage_Card_Table__th ComponentsPage_Card_Table__th--sticky" if="{rowOperations.length}">操作</th> </tr> </thead> <tbody class="ComponentsPage_Card_Table__tbody"> <tr class="ComponentsPage_Card_Table__tbodyRow" each="{row, idx in data}" onclick="{getClickHandler(\'handleRowTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRowTap\')}"> <td each="{column in parent.getFilteredColumns()}" data-is="viron-components-page-table-cell" data="{row[column.key]}" column="{column}"></td> <td class="ComponentsPage_Card_Table__td ComponentsPage_Card_Table__td--sticky" if="{rowOperations.length}"> <viron-icon-setting ref="rowSettingIcon" onclick="{getClickHandler(\'handleRowSettingButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRowSettingButtonTap\')}"></viron-icon-setting> </td> </tr> </tbody> </table> </virtual> </virtual> </div> <div class="ComponentsPage_Card_Table__tail" if="{hasPagination}"> <viron-pagination max="{pagination.max}" size="{paginationSize}" current="{pagination.current}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="ComponentsPage_Card_Table__blocker" if="{isLoading}"></div>', '', 'class="ComponentsPage_Card_Table"', function(opts) {
+riot$1.tag2('viron-components-page-table', '<div class="ComponentsPage_Card_Table__head"> <div class="ComponentsPage_Card_Table__headAside"> <div class="ComponentsPage_Card_Table__postOperation" if="{postOperation}" onclick="{getClickHandler(\'handlePostButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePostButtonTap\')}"> <viron-icon-plus-thin></viron-icon-plus-thin> </div> <div class="ComponentsPage_Card_Table__title">{opts.def.name}</div> </div> <div class="ComponentsPage_Card_Table__headAside"> <div class="ComponentsPage_Card_Table__control"> <viron-icon-search class="ComponentsPage_Card_Table__searchIcon {\'ComponentsPage_Card_Table__searchIcon--active\': hasSearchQueries}" if="{searchParameters.length}" onclick="{getClickHandler(\'handleSearchButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchButtonTap\')}"></viron-icon-search> <viron-icon-filter class="ComponentsPage_Card_Table__filterIcon {\'ComponentsPage_Card_Table__filterIcon--active\': !!visibleColumnKeys}" onclick="{getClickHandler(\'handleFilterButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFilterButtonTap\')}"></viron-icon-filter> <viron-icon-setting if="{tableOperations.length}" ref="settingIcon" onclick="{getClickHandler(\'handleSettingButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSettingButtonTap\')}"></viron-icon-setting> </div> </div> </div> <div class="ComponentsPage_Card_Table__body"> <virtual if="{isLoading}"> <div class="ComponentsPage_Card_Table__progressWrapper"> <div class="ComponentsPage_Card_Table__progress"> <viron-icon-reload></viron-icon-reload> </div> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="ComponentsPage_Card_Table__errorWrapper"> <div class="ComponentsPage_Card_Table__error">{error}</div> </div> </virtual> <virtual if="{!error}"> <table class="ComponentsPage_Card_Table__table"> <thead class="ComponentsPage_Card_Table__thead"> <tr class="ComponentsPage_Card_Table__theadRow"> <th class="ComponentsPage_Card_Table__th" each="{column in getFilteredColumns()}">{column.description || column.key}</th> <th class="ComponentsPage_Card_Table__th ComponentsPage_Card_Table__th--sticky" if="{rowOperations.length}">操作</th> </tr> </thead> <tbody class="ComponentsPage_Card_Table__tbody"> <tr class="ComponentsPage_Card_Table__tbodyRow" each="{row, idx in data}" onclick="{getClickHandler(\'handleRowTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRowTap\')}"> <td each="{column in parent.getFilteredColumns()}" data-is="viron-components-page-table-cell" data="{row[column.key]}" column="{column}"></td> <td class="ComponentsPage_Card_Table__td ComponentsPage_Card_Table__td--sticky" if="{rowOperations.length}"><span data-is="viron-icon-{rowOperationsIcon}" ref="rowSettingIcon" onclick="{getClickHandler(\'handleRowSettingButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRowSettingButtonTap\')}"></span></td> </tr> </tbody> </table> </virtual> </virtual> </div> <div class="ComponentsPage_Card_Table__tail" if="{hasPagination}"> <viron-pagination max="{pagination.max}" size="{paginationSize}" current="{pagination.current}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="ComponentsPage_Card_Table__blocker" if="{isLoading}"></div>', '', 'class="ComponentsPage_Card_Table"', function(opts) {
     this.external(script$6);
 });
 
@@ -105873,19 +106075,28 @@ var script$39 = function() {
 
   this.handleMenuTap = e => {
     e.stopPropagation();
-    const rect = this.refs.menu.root.getBoundingClientRect();
-    store.action('popovers.add', 'viron-endpoints-page-endpoint-menu', {
-      endpoint: this.opts.endpoint
-    }, {
-      x: rect.left + (rect.width / 2),
-      y: rect.bottom,
-      width: 228,
-      direction: 'TR'
-    });
+    Promise
+      .resolve()
+      .then(() => {
+        this.closeAllFloats();
+      })
+      .then(() => {
+        const menuElm = this.refs.menu.root;
+        const rect = menuElm.getBoundingClientRect();
+        store.action('popovers.add', 'viron-endpoints-page-endpoint-menu', {
+          endpoint: this.opts.endpoint
+        }, {
+          x: rect.left + (rect.width / 2),
+          y: rect.bottom,
+          width: 228,
+          direction: 'TR',
+          watchElm: menuElm
+        });
+      });
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--prev {\'EndpointsPage_Endpoint__dropareaMarker--active\': isPrevDroppable}"></div> <div class="EndpointsPage_Endpoint__content"> <div class="EndpointsPage_Endpoint__head"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint__headContent"> <div class="EndpointsPage_Endpoint__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint__urlWrapper"> <div class="EndpointsPage_Endpoint__color EndpointsPage_Endpoint__color--{opts.endpoint.color || \'purple\'}"></div> <div class="EndpointsPage_Endpoint__url">{opts.endpoint.url}</div> </div> </div> <viron-icon-setting class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-setting> </div> <div class="EndpointsPage_Endpoint__body"> <div class="EndpointsPage_Endpoint__description">{!!opts.endpoint.thumbnail ? (opts.endpoint.description || \'-\') : \'ログインで管理画面情報を取得できます\'}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div> </div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--prev" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handlePrevDragEnter}" ondragover="{handlePrevDragOver}" ondragleave="{handlePrevDragLeave}" ondrop="{handlePrevDrop}"></div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--next" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handleNextDragEnter}" ondragover="{handleNextDragOver}" ondragleave="{handleNextDragLeave}" ondrop="{handleNextDrop}"></div> </div> <div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--next {\'EndpointsPage_Endpoint__dropareaMarker--active\': isNextDroppable}"></div>', '', 'class="EndpointsPage_Endpoint" draggable="{opts.isdraggable}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--prev {\'EndpointsPage_Endpoint__dropareaMarker--active\': isPrevDroppable}"></div> <div class="EndpointsPage_Endpoint__content"> <div class="EndpointsPage_Endpoint__head"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint__headContent"> <div class="EndpointsPage_Endpoint__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint__urlWrapper"> <div class="EndpointsPage_Endpoint__color EndpointsPage_Endpoint__color--{opts.endpoint.color || \'blue\'}"></div> <div class="EndpointsPage_Endpoint__url">{opts.endpoint.url}</div> </div> </div> <viron-icon-setting class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-setting> </div> <div class="EndpointsPage_Endpoint__body"> <div class="EndpointsPage_Endpoint__description">{!!opts.endpoint.thumbnail ? (opts.endpoint.description || \'-\') : \'ログインで管理画面情報を取得できます\'}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div> </div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--prev" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handlePrevDragEnter}" ondragover="{handlePrevDragOver}" ondragleave="{handlePrevDragLeave}" ondrop="{handlePrevDrop}"></div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--next" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handleNextDragEnter}" ondragover="{handleNextDragOver}" ondragleave="{handleNextDragLeave}" ondrop="{handleNextDrop}"></div> </div> <div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--next {\'EndpointsPage_Endpoint__dropareaMarker--active\': isNextDroppable}"></div>', '', 'class="EndpointsPage_Endpoint" draggable="{opts.isdraggable}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$39);
 });
 
@@ -106001,6 +106212,7 @@ var script$51 = function() {
   this.handleFrameTap = e => {
     // 内部イベントを外部に伝播させない。
     e.stopPropagation();
+    this.closeAllFloats();
   };
 
   this.handleKeyDown = e => {
@@ -106251,13 +106463,13 @@ var script$57 = function() {
     this.update();
   });
 
-  this.handleLogoTap = () => {
+  this.handleHomeButtonTap = () => {
     this.close();
     this.getRouter().navigateTo('/');
   };
 };
 
-riot$1.tag2('viron-application-menu', '<div class="Application_Menu__bg"></div> <div class="Application_Menu__overlay"></div> <div class="Application_Menu__content"> <div class="Application_Menu__head"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo" onclick="{getClickHandler(\'handleLogoTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLogoTap\')}"></viron-icon-logo> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div> </div>', '', 'class="Application_Menu Application_Menu--{layoutType}"', function(opts) {
+riot$1.tag2('viron-application-menu', '<div class="Application_Menu__bg"></div> <div class="Application_Menu__overlay"></div> <div class="Application_Menu__content"> <div class="Application_Menu__head"> <div class="Application_Menu__homeButton" onclick="{getClickHandler(\'handleHomeButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleHomeButtonTap\')}"> <viron-icon-arrow-left class="Application_Menu__arrow"></viron-icon-arrow-left> <viron-icon-logo class="Application_Menu__logo"></viron-icon-logo> </div> </div> <div class="Application_Menu__body"> <div class="Application_Menu__section" each="{section in menu}"> <div class="Application_Menu__sectionName">{section.name}</div> <div class="Application_Menu__groups"> <viron-application-menu-group each="{group in section.groups}" group="{group}" closer="{parent.closer}"></viron-application-menu-group> </div> </div> </div> </div>', '', 'class="Application_Menu Application_Menu--{layoutType}"', function(opts) {
     this.external(script$57);
 });
 
@@ -106291,7 +106503,7 @@ var script$58 = function() {
   });
 };
 
-riot$1.tag2('viron-application-header-info', '<div class="Application_Header_Info__name">{name}</div> <div class="Application_Header_Info__urlWrapper"> <div class="Application_Header_Info__color Application_Header_Info__color--{color || \'purple\'}"></div> <div class="Application_Header_Info__url">{url}</div> </div> <div class="Application_Header_Info__description" if="{description}">{description}</div> <div class="Application_Header_Info__tags" if="{_tags &amp;&amp; !!_tags.length}"> <viron-tag each="{tag in _tags}" label="{tag}"></viron-tag> </div>', '', 'class="Application_Header_Info"', function(opts) {
+riot$1.tag2('viron-application-header-info', '<div class="Application_Header_Info__name">{name}</div> <div class="Application_Header_Info__urlWrapper"> <div class="Application_Header_Info__color Application_Header_Info__color--{color || \'blue\'}"></div> <div class="Application_Header_Info__url">{url}</div> </div> <div class="Application_Header_Info__description" if="{description}">{description}</div> <div class="Application_Header_Info__tags" if="{_tags &amp;&amp; !!_tags.length}"> <viron-tag each="{tag in _tags}" label="{tag}"></viron-tag> </div>', '', 'class="Application_Header_Info"', function(opts) {
     this.external(script$58);
 });
 
@@ -106321,13 +106533,7 @@ riot$1.tag2('viron-application-header-menu-clear', '<div class="Application_Head
     this.external(script$60);
 });
 
-var script$61 = function() {};
-
-riot$1.tag2('viron-application-header-menu-credit', '<div>TODO</div>', '', 'class="Application_Header_Menu_Credit"', function(opts) {
-    this.external(script$61);
-});
-
-var script$62 = function() {
+var script$61 = function() {
   const store = this.riotx.get();
 
   const endpoints = store.getter('endpoints.allWithoutToken');
@@ -106354,10 +106560,10 @@ var script$62 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu-export', '<div class="Application_Header_Menu_Export__title">ホームを保存</div> <div class="Application_Header_Menu_Export__description">ホームのエンドポイント一覧をjsonファイルとして書き出します。</div> <div class="Application_Header_Menu_Export__control"> <viron-button label="保存する" onselect="{handleExportButtonTap}"></viron-button> </div>', '', 'class="Application_Header_Menu_Export"', function(opts) {
-    this.external(script$62);
+    this.external(script$61);
 });
 
-var script$63 = function() {
+var script$62 = function() {
   const store = this.riotx.get();
 
   this.errorMessage = null;
@@ -106427,7 +106633,7 @@ var script$63 = function() {
 };
 
 riot$1.tag2('viron-application-header-menu-import', '<div class="Application_Header_Menu_Import__title">ホームを読み込み</div> <div class="Application_Header_Menu_Import__description">エンドポイント一覧をホームに反映します。</div> <div class="Application_Header_Menu_Import__error" if="{errorMessage}">{errorMessage}</div> <div class="Application_Header_Menu_Import__control"> <viron-uploader accept="application/json" onchange="{handleFileChange}"></viron-uploader> <viron-button label="読み込む" isdisabled="{!endpoints}" onselect="{handleImportButtonTap}"></viron-button> </div>', '', 'class="Application_Header_Menu_Import"', function(opts) {
-    this.external(script$63);
+    this.external(script$62);
 });
 
 var script$59 = function() {
@@ -106435,7 +106641,6 @@ var script$59 = function() {
   const isTopPage = store.getter('location.isTop');
   const isDesktop = store.getter('layout.isDesktop');
   const generalActions = [
-    { label: 'クレジット', id: 'show_credit' },
     { label: 'ヘルプ', id: 'navigate_to_doc' }
   ];
   const endpointActions = [];
@@ -106482,22 +106687,11 @@ var script$59 = function() {
   };
 
   /**
-   * クレジット表示用のモーダルを表示します。
-   */
-  this.showCreditModal = () => {
-    store.action('modals.add', 'viron-application-header-menu-credit');
-  };
-
-  /**
    * メニュー項目がクリック/タップされた時の処理。
    * @param {String} id
    */
   this.handleActionSelect = id => {
     switch (id) {
-    case 'show_credit':
-      this.showCreditModal();
-      this.close();
-      break;
     case 'navigate_to_doc':
       window.open('https://cam-inc.github.io/viron-doc/', '_blank');
       this.close();
@@ -106609,7 +106803,7 @@ const timeout$1 = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-var script$64 = function() {
+var script$63 = function() {
   const store = this.riotx.get();
 
   this.path = this.opts.tagopts.path;
@@ -106646,6 +106840,7 @@ var script$64 = function() {
   this.handleFrameTap = e => {
     // 内部イベントを外部に伝播させない。
     e.stopPropagation();
+    this.closeAllFloats();
   };
 
   this.handleCloseButtonTap = () => {
@@ -106664,10 +106859,10 @@ var script$64 = function() {
 };
 
 riot$1.tag2('viron-mediapreview', '<div class="Mediapreview__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Mediapreview__image" riot-style="background-image: url({path});"></div> <div class="Mediapreview__path">{path}</div> <div class="Mediapreview__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> </div>', '', 'class="Mediapreview {\'Mediapreview--visible\': isVisible, \'Mediapreview--hidden\': isHidden} Mediapreview--{opts.mediapreviewopts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$64);
+    this.external(script$63);
 });
 
-var script$65 = function() {
+var script$64 = function() {
   const store = this.riotx.get();
 
   this.mediapreviews = store.getter('mediapreviews.all');
@@ -106678,7 +106873,7 @@ var script$65 = function() {
 };
 
 riot$1.tag2('viron-application-mediapreviews', '<virtual each="{mediapreviews}"> <viron-mediapreview id="{id}" tagopts="{tagOpts}" mediapreviewopts="{mediapreviewOpts}"></viron-mediapreview> </virtual>', '', 'class="Application_Mediapreviews"', function(opts) {
-    this.external(script$65);
+    this.external(script$64);
 });
 
 const timeout$2 = (ms) => {
@@ -106687,7 +106882,7 @@ const timeout$2 = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-var script$66 = function() {
+var script$65 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -106738,6 +106933,7 @@ var script$66 = function() {
   this.handleFrameTap = e => {
     // 内部イベントを外部に伝播させない。
     e.stopPropagation();
+    this.closeAllFloats();
   };
 
   this.handleCloseButtonTap = () => {
@@ -106756,10 +106952,10 @@ var script$66 = function() {
 };
 
 riot$1.tag2('viron-modal', '<div class="Modal__frame" riot-style="{(isDesktop &amp;&amp; !!opts.modalopts.width) ? \'width:\' +opts.modalopts.width + \'px\' : \'\'};" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {\'Modal--visible\': isVisible, \'Modal--hidden\': isHidden} Modal--{opts.modalopts.theme} Modal--{layoutType} {opts.modalopts.isSpread ? \'Modal--spread\': \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$66);
+    this.external(script$65);
 });
 
-var script$67 = function() {
+var script$66 = function() {
   const store = this.riotx.get();
 
   this.modals = store.getter('modals.all');
@@ -106770,7 +106966,7 @@ var script$67 = function() {
 };
 
 riot$1.tag2('viron-application-modals', '<virtual each="{modals}"> <viron-modal id="{id}" tagname="{tagName}" tagopts="{tagOpts}" modalopts="{modalOpts}"></viron-modal> </virtual>', '', 'class="Application_Modals"', function(opts) {
-    this.external(script$67);
+    this.external(script$66);
 });
 
 // Mouse系かTouch系か。
@@ -106782,7 +106978,7 @@ const timeout$3 = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-var script$68 = function() {
+var script$67 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -106805,6 +107001,27 @@ var script$68 = function() {
     }, 1000);
   };
 
+  const watchElm = this.opts.popoveropts.watchElm;
+  let intervalId = null;
+  if (!!watchElm) {
+    const rect = watchElm.getBoundingClientRect();
+    const initPosX = rect.left;
+    const initPosY = rect.top;
+    intervalId = window.setInterval(() => {
+      if (!watchElm) {
+        fadeOut();
+        window.clearInterval(intervalId);
+      }
+      const rect = watchElm.getBoundingClientRect();
+      const posX = rect.left;
+      const posY = rect.top;
+      if (posX !== initPosX || posY !== initPosY) {
+        fadeOut();
+        window.clearInterval(intervalId);
+      }
+    }, 100);
+  }
+
   this.isVisible = false;
 
   this.on('mount', () => {
@@ -106819,6 +107036,7 @@ var script$68 = function() {
     window.addEventListener('touchend', this.handleWindowTouchEnd);
   }).on('before-unmount', () => {
     tag.unmount(true);
+    window.clearInterval(intervalId);
   }).on('unmount', () => {
     window.removeEventListener('resize', this.handleWindowResize);
     window.removeEventListener('scroll', this.handleWindowScroll);
@@ -106884,8 +107102,8 @@ var script$68 = function() {
   };
 };
 
-riot$1.tag2('viron-popover', '<div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover {\'Popover--visible\': isVisible, \'Popover--hidden\': isHidden} Popover--{opts.popoveropts.direction}" riot-style="{getPosition()};"', function(opts) {
-    this.external(script$68);
+riot$1.tag2('viron-popover', '<div class="Popover__blocker"></div> <div class="Popover__frameOuter"> <div class="Popover__frameInner" riot-style="{getSize()};" onclick="{getClickHandler(\'handleFrameInnerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameInnerTap\')}" onscroll="{handleFrameInnerScroll}"> <div class="Popover__content" ref="content"></div> </div> </div> <div class="Popover__arrow"></div>', '', 'class="Popover {\'Popover--visible\': isVisible, \'Popover--hidden\': isHidden} Popover--{opts.popoveropts.direction} {\'Popover--error\': opts.popoveropts.isError}" riot-style="{getPosition()};"', function(opts) {
+    this.external(script$67);
 });
 
 const timeout$4 = (ms) => {
@@ -106894,7 +107112,7 @@ const timeout$4 = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-var script$69 = function() {
+var script$68 = function() {
   const store = this.riotx.get();
 
   let tag;
@@ -106957,10 +107175,10 @@ var script$69 = function() {
 };
 
 riot$1.tag2('viron-popover-spread', '<div class="PopoverSpread__frame" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="PopoverSpread__content" ref="content"></div> </div>', '', 'class="PopoverSpread {\'PopoverSpread--visible\': isVisible, \'PopoverSpread--hidden\': isHidden}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$69);
+    this.external(script$68);
 });
 
-var script$70 = function() {
+var script$69 = function() {
   const store = this.riotx.get();
 
   this.popovers = store.getter('popovers.all');
@@ -106978,16 +107196,16 @@ var script$70 = function() {
 };
 
 riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <virtual if="{isDesktop}"> <viron-popover id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover> </virtual> <virtual if="{isMobile}"> <viron-popover-spread id="{id}" tagname="{tagName}" tagopts="{tagOpts}" popoveropts="{popoverOpts}"></viron-popover-spread> </virtual> </virtual>', '', 'class="Application_Popovers"', function(opts) {
+    this.external(script$69);
+});
+
+var script$70 = function() {};
+
+riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div class="Application_Poster__label">ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
     this.external(script$70);
 });
 
-var script$71 = function() {};
-
-riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div class="Application_Poster__label">ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
-    this.external(script$71);
-});
-
-var script$72 = function() {
+var script$71 = function() {
   this.isAnimating = this.opts.isactive;
 
   this.on('update', () => {
@@ -107003,13 +107221,13 @@ var script$72 = function() {
 };
 
 riot$1.tag2('viron-application-progress-linear', '<div class="Application_ProgressLinear__bar"> <div class="Application_ProgressLinear__particle"></div> <div class="Application_ProgressLinear__particle"></div> </div>', '', 'class="Application_ProgressLinear {\'Application_ProgressLinear--visible\' : opts.isactive, \'Application_ProgressLinear--animating\' : isAnimating}"', function(opts) {
-    this.external(script$72);
+    this.external(script$71);
 });
 
-var script$73 = function() {};
+var script$72 = function() {};
 
 riot$1.tag2('viron-application-splash', '<div class="Application_Splash__container"> <viron-icon-logo class="Application_Splash__logo"></viron-icon-logo> </div>', '', 'class="Application_Splash"', function(opts) {
-    this.external(script$73);
+    this.external(script$72);
 });
 
 const timeout$5 = (ms) => {
@@ -107018,7 +107236,7 @@ const timeout$5 = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-var script$74 = function() {
+var script$73 = function() {
   const store = this.riotx.get();
 
   let autoHideTimerID;
@@ -107062,10 +107280,10 @@ var script$74 = function() {
 };
 
 riot$1.tag2('viron-toast', '<div class="Toast__message">{opts.message}</div>', '', 'class="Toast {\'Toast--visible\' : isVisible, \'Toast--error\' : opts.iserror}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
-    this.external(script$74);
+    this.external(script$73);
 });
 
-var script$75 = function() {
+var script$74 = function() {
   const store = this.riotx.get();
 
   this.toasts = store.getter('toasts.all');
@@ -107077,10 +107295,10 @@ var script$75 = function() {
 };
 
 riot$1.tag2('viron-application-toasts', '<virtual each="{toasts}"> <viron-toast id="{id}" message="{message}" autohide="{autoHide}" timeout="{timeout}" iserror="{isError}"></viron-toast> </virtual>', '', 'class="Application_Toasts"', function(opts) {
-    this.external(script$75);
+    this.external(script$74);
 });
 
-var script$76 = function() {
+var script$75 = function() {
   const store = this.riotx.get();
 
   this.isLaunched = store.getter('application.isLaunched');
@@ -107160,7 +107378,7 @@ var script$76 = function() {
 };
 
 riot$1.tag2('viron', '<div class="Application__container"> <div class="Application__aside" if="{isDesktop}"> <div class="Application__asideAdjuster"> <div class="Application__asideContent"> <viron-application-poster if="{isTopPage}"></viron-application-poster> <viron-application-menu if="{!isTopPage}"></viron-application-menu> </div> </div> </div> <div class="Application__header"> <viron-application-header></viron-application-header> </div> <div class="Application__main" ref="main"> <div class="Application__page"> <div data-is="viron-{pageName}-page" route="{pageRoute}"></div> </div> </div> </div> <viron-application-drawers></viron-application-drawers> <viron-application-mediapreviews></viron-application-mediapreviews> <viron-application-modals></viron-application-modals> <viron-application-popovers></viron-application-popovers> <viron-application-toasts></viron-application-toasts> <viron-application-progress-linear isactive="{isNavigating || isNetworking}"></viron-application-progress-linear> <viron-application-dimmer if="{isNavigating}"></viron-application-dimmer> <viron-application-blocker if="{isNavigating}"></viron-application-blocker> <viron-application-splash if="{!isLaunched}"></viron-application-splash>', '', 'class="Application Application--{usingBrowser} Application--{layoutType} Application--{theme} {isAsideClosed ? \'Application--asideClosed\' : \'\'}"', function(opts) {
-    this.external(script$76);
+    this.external(script$75);
 });
 
 // エントリーポイント。
