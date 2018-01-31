@@ -35,6 +35,7 @@
   --theme-tag-bg: #fff;
   --theme-componentCard-bg: #fff;
   --theme-componentCard-border: #fff;
+  --theme-componentPlus-border: #fff;
   --theme-componentCardTable-bg: #fff;
   --theme-componentCardTable-grad-start: #fff;
   --theme-componentCardTable-grad-end: #fff;
@@ -60,6 +61,7 @@
   --theme-standard-orderButton-bg: #d1d1d1;
   --theme-standard-endpointCard-bg: #fff;
   --theme-standard-endpointCard-border: #e4e4e2;
+  --theme-standard-endpointPlus-border: #c6c5c5;
   --theme-standard-popover-bg: #fff;
   --theme-standard-tag-text: #d1d1d1;
   --theme-standard-tag-bg: #f9f9f9;
@@ -89,6 +91,7 @@
   --theme-midnight-orderButton-bg: #001d26;
   --theme-midnight-endpointCard-bg: #001217;
   --theme-midnight-endpointCard-border: #004051;
+  --theme-midnight-endpointPlus-border: #004051;
   --theme-midnight-popover-bg: #001d26;
   --theme-midnight-tag-text: #00c8ff;
   --theme-midnight-tag-bg: #001d26;
@@ -118,6 +121,7 @@
   --theme-terminal-orderButton-bg: #091714;
   --theme-terminal-endpointCard-bg: #000;
   --theme-terminal-endpointCard-border: #0d372f;
+  --theme-terminal-endpointPlus-border: #0d372f;
   --theme-terminal-popover-bg: #091714;
   --theme-terminal-tag-text: #35dcba;
   --theme-terminal-tag-bg: #091714;
@@ -910,6 +914,8 @@ select {
     --theme-endpointCard-bg: var(--theme-standard-endpointCard-bg);
     --theme-endpointCard-border: #e4e4e2;
     --theme-endpointCard-border: var(--theme-standard-endpointCard-border);
+    --theme-endpointPlus-border: #c6c5c5;
+    --theme-endpointPlus-border: var(--theme-standard-endpointPlus-border);
     --theme-popover-bg: #fff;
     --theme-popover-bg: var(--theme-standard-popover-bg);
     --theme-tag-text: #d1d1d1;
@@ -966,6 +972,8 @@ select {
     --theme-endpointCard-bg: var(--theme-midnight-endpointCard-bg);
     --theme-endpointCard-border: #004051;
     --theme-endpointCard-border: var(--theme-midnight-endpointCard-border);
+    --theme-endpointPlus-border: #004051;
+    --theme-endpointPlus-border: var(--theme-midnight-endpointPlus-border);
     --theme-popover-bg: #001d26;
     --theme-popover-bg: var(--theme-midnight-popover-bg);
     --theme-tag-text: #00c8ff;
@@ -1022,6 +1030,8 @@ select {
     --theme-endpointCard-bg: var(--theme-terminal-endpointCard-bg);
     --theme-endpointCard-border: #0d372f;
     --theme-endpointCard-border: var(--theme-terminal-endpointCard-border);
+    --theme-endpointPlus-border: #0d372f;
+    --theme-endpointPlus-border: var(--theme-terminal-endpointPlus-border);
     --theme-popover-bg: #091714;
     --theme-popover-bg: var(--theme-terminal-popover-bg);
     --theme-tag-text: #35dcba;
@@ -1550,6 +1560,20 @@ select {
     }
 .Application_Menu--mobile {
     padding-top: 44px;
+  }
+.Application_Menu_Modal .Modal__closeButton {
+    color: #fff;
+    color: var(--color-base-white);
+  }
+@media (hover: hover) {
+    .Application_Menu_Modal .Modal__closeButton:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.Application_Menu_Modal .Modal__closeButton.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
   }
 .Application_Menu_Group {
   display: block;
@@ -2433,8 +2457,7 @@ select {
   justify-content: flex-start;
     height: 50px;
     cursor: pointer;
-    border-bottom: 1px solid #d1d1d1;
-    border-bottom: 1px solid var(--color-base-gray);
+    border-bottom: 1px solid #f0f0f0;
   }
 @media (hover: hover) {
     .List__item:hover {
@@ -4287,9 +4310,10 @@ select {
       position: sticky;
       right: 0;
       width: 28px;
+      padding-left: 32px;
       text-align: center;
-      background: linear-gradient(to right, #fff, 0%, #fff 50%, #fff 100%);
-      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start), 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
+      background: linear-gradient(to right, #fff 0%, #fff 20%, #fff 100%);
+      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 20%, var(--theme-componentCardTable-grad-end) 100%);
     }
 .ComponentsPage_Card_Table__tbodyRow {
     cursor: pointer;
@@ -4312,7 +4336,8 @@ select {
 .ComponentsPage_Card_Table__td .Icon {
       width: 16px;
       height: 16px;
-      margin: 0 auto;
+      margin-right: 26px;
+      margin-left: auto;
       cursor: pointer;
     }
 @media (hover: hover) {
@@ -4329,8 +4354,8 @@ select {
       position: -webkit-sticky;
       position: sticky;
       right: 0;
-      background: linear-gradient(to right, #fff 0%, #fff 50%, #fff 100%);
-      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
+      background: linear-gradient(to right, #fff 0%, #fff 20%, #fff 100%);
+      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 20%, var(--theme-componentCardTable-grad-end) 100%);
     }
 .ComponentsPage_Card_Table__tbody tr td:first-child {
     font-weight: bold;
@@ -4850,11 +4875,11 @@ select {
   align-items: center;
   justify-content: center;
   width: 100%;
-  color: #fff;
-  color: var(--theme-endpointCard-border);
+  color: var(--theme-endpointPlus-border);
+  color: var(--theme-endpointPlus-border);
   cursor: pointer;
-  border: 1px dashed #fff;
-  border: 1px dashed var(--theme-endpointCard-border);
+  border: 1px dashed var(--theme-endpointPlus-border);
+  border: 1px dashed var(--theme-endpointPlus-border);
   border-radius: 6px;
 }
 @media (hover: hover) {
