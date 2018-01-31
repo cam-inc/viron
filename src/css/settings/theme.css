@@ -17,6 +17,7 @@
   --theme-tag-bg: #fff;
   --theme-componentCard-bg: #fff;
   --theme-componentCard-border: #fff;
+  --theme-componentPlus-border: #fff;
   --theme-componentCardTable-bg: #fff;
   --theme-componentCardTable-grad-start: #fff;
   --theme-componentCardTable-grad-end: #fff;
@@ -42,6 +43,7 @@
   --theme-standard-orderButton-bg: #d1d1d1;
   --theme-standard-endpointCard-bg: #fff;
   --theme-standard-endpointCard-border: #e4e4e2;
+  --theme-standard-endpointPlus-border: #c6c5c5;
   --theme-standard-popover-bg: #fff;
   --theme-standard-tag-text: #d1d1d1;
   --theme-standard-tag-bg: #f9f9f9;
@@ -71,6 +73,7 @@
   --theme-midnight-orderButton-bg: #001d26;
   --theme-midnight-endpointCard-bg: #001217;
   --theme-midnight-endpointCard-border: #004051;
+  --theme-midnight-endpointPlus-border: #004051;
   --theme-midnight-popover-bg: #001d26;
   --theme-midnight-tag-text: #00c8ff;
   --theme-midnight-tag-bg: #001d26;
@@ -100,6 +103,7 @@
   --theme-terminal-orderButton-bg: #091714;
   --theme-terminal-endpointCard-bg: #000;
   --theme-terminal-endpointCard-border: #0d372f;
+  --theme-terminal-endpointPlus-border: #0d372f;
   --theme-terminal-popover-bg: #091714;
   --theme-terminal-tag-text: #35dcba;
   --theme-terminal-tag-bg: #091714;
