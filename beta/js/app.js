@@ -106768,7 +106768,8 @@ var script$55 = function() {
       return;
     }
     store.action('modals.add', 'viron-application-menu', null, {
-      isSpread: true
+      isSpread: true,
+      class: 'Application_Menu_Modal'
     });
   };
 
@@ -106952,7 +106953,7 @@ var script$65 = function() {
   };
 };
 
-riot$1.tag2('viron-modal', '<div class="Modal__frame" riot-style="{(isDesktop &amp;&amp; !!opts.modalopts.width) ? \'width:\' +opts.modalopts.width + \'px\' : \'\'};" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {\'Modal--visible\': isVisible, \'Modal--hidden\': isHidden} Modal--{opts.modalopts.theme} Modal--{layoutType} {opts.modalopts.isSpread ? \'Modal--spread\': \'\'}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-modal', '<div class="Modal__frame" riot-style="{(isDesktop &amp;&amp; !!opts.modalopts.width) ? \'width:\' +opts.modalopts.width + \'px\' : \'\'};" onclick="{getClickHandler(\'handleFrameTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleFrameTap\')}"> <div class="Modal__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Modal__content" ref="content"></div> </div>', '', 'class="Modal {\'Modal--visible\': isVisible, \'Modal--hidden\': isHidden} Modal--{opts.modalopts.theme} Modal--{layoutType} {opts.modalopts.isSpread ? \'Modal--spread\': \'\'} {opts.modalopts.class}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$65);
 });
 
