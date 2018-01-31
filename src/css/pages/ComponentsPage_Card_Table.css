@@ -120,8 +120,9 @@
       position: sticky;
       right: 0;
       width: 28px;
+      padding-left: 32px;
       text-align: center;
-      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start), 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
+      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 20%, var(--theme-componentCardTable-grad-end) 100%);
     }
   }
 
@@ -146,14 +147,15 @@
       }
       width: 16px;
       height: 16px;
-      margin: 0 auto;
+      margin-right: 26px;
+      margin-left: auto;
       cursor: pointer;
     }
 
     &--sticky {
       position: sticky;
       right: 0;
-      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 50%, var(--theme-componentCardTable-grad-end) 100%);
+      background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 20%, var(--theme-componentCardTable-grad-end) 100%);
     }
   }
 
