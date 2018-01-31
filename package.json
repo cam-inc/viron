@@ -67,7 +67,6 @@
     "highcharts": "^6.0.3",
     "i18next": "^10.0.7",
     "i18next-browser-languagedetector": "^2.1.0",
-    "marked": "^0.3.6",
     "moment": "^2.19.1",
     "mout": "^1.1.0",
     "object-assign": "^4.1.1",
