@@ -2890,6 +2890,11 @@ select {
     color: #d1d1d1;
     color: var(--color-base-gray);
   }
+.Parameters_Form__error {
+    margin-bottom: 4px;
+    color: #f57177;
+    color: var(--color-base-red);
+  }
 .Parameters_Form__body {
     position: relative;
   }
