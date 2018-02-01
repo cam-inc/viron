@@ -108,6 +108,12 @@ export default function() {
     return options;
   };
 
+  this.isMobile = store.getter('layout.isMobile');
+  this.listen('layout', () => {
+    this.isMobile = store.getter('layout.isMobile');
+    this.update();
+  });
+
   validate();
   this.on('update', () => {
     validate();
@@ -137,6 +143,9 @@ export default function() {
     if (this.opts.ispreview) {
       return;
     }
+    if (this.isMobile) {
+      return;
+    }
     const bodyElm = this.refs.body;
     const rect = bodyElm.getBoundingClientRect();
     store.action('popovers.add', 'viron-parameters-error', {
@@ -161,6 +170,7 @@ export default function() {
   this.handleFormFocus = () => {
     this.isFocus = true;
     this.update();
+    this.closeAllFloats();
     showError();
   };
 

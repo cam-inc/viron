@@ -21,6 +21,11 @@
     color: var(--color-base-gray);
   }
 
+  &__error {
+    margin-bottom: 4px;
+    color: var(--color-base-red);
+  }
+
   &__body {
     position: relative;
   }
