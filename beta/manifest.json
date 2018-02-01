@@ -16,12 +16,12 @@
       "sizes": "32x32"
     },
     {
-      "src": "./img/favicon-64x64.png",
+      "src": "./img/favicon-96x96.png",
       "type": "image/png",
-      "sizes": "64x64"
+      "sizes": "96x96"
     },
     {
-      "src": "./img/apple-touch-icon180x180.png",
+      "src": "./img/apple-icon-180x180.png",
       "type": "image/png",
       "sizes": "180x180"
     },
