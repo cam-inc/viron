@@ -24,8 +24,7 @@
       border-color: var(--color-base-blue);
     }
 
-    &::placeholder,
-    &:placeholder-shown {
+    &::placeholder {
       color: var(--color-base-gray);
     }
   }
