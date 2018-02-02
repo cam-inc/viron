@@ -17,8 +17,8 @@ const baseConfig = {
   menu: {
     edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
     insert: { title: 'Insert', items: 'image link | inserttable hr' },
-    format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat'},
-    tools: {title: 'Tools', items: 'code fullscreen'}
+    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
+    tools: { title: 'Tools', items: 'code fullscreen' }
   },
   toolbar: [
     'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image link unlink',
@@ -44,17 +44,42 @@ const baseConfig = {
 export default function() {
   this.editor = null;
 
+  const customConfig = {
+    selector: `.Wyswyg__editor${this._riot_id}`,
+    init_instance_callback: editor => {
+      this.editor = editor;
+      !!this.opts.val && this.editor.setContent(this.opts.val);
+      this.editor.on('Change', this.handleEditorChange);
+      this.editor.on('focus', this.handleEditorFocus);
+      this.editor.on('blur', this.handleEditorBlur);
+    }
+  };
+  // 画像ファイルアップロード設定。
+  // @see: https://www.tinymce.com/docs/configure/file-image-upload/
+  // TODO
+  if (true) {
+    // 現時点では、`Insert/edit image`ダイアログ等画像アップロードのみを対象とする。
+    //customConfig['automatic_uploads'] = true;
+    customConfig['file_picker_types'] = 'image';
+    customConfig['file_picker_callback'] = (callback, value, meta) => {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.setAttribute('accept', 'image/*');
+      input.onchange = () => {
+        const file = input.files[0];
+        console.log(input);
+        debugger
+      };
+      input.click();
+    };
+    // サーバーサイドのuploadハンドラのレスポンス形式は仕様通りに。
+    // @see: https://www.tinymce.com/docs/configure/file-image-upload/#images_upload_url
+    customConfig['images_upload_credentials'] = true;
+    customConfig['images_reuse_filename'] = true;
+  }
+
   this.on('mount', () => {
-    TinyMCE.init(ObjectAssign({}, baseConfig, {
-      selector: `.Wyswyg__editor${this._riot_id}`,
-      init_instance_callback: editor => {
-        this.editor = editor;
-        !!this.opts.val && this.editor.setContent(this.opts.val);
-        this.editor.on('Change', this.handleEditorChange);
-        this.editor.on('focus', this.handleEditorFocus);
-        this.editor.on('blur', this.handleEditorBlur);
-      }
-    }));
+    TinyMCE.init(ObjectAssign({}, baseConfig, customConfig));
   }).on('before-unmount', () => {
     TinyMCE.remove(`.Wyswyg__editor${this._riot_id}`);
     this.editor.off('Change', this.handleEditorChange);
