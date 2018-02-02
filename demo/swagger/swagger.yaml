@@ -1895,6 +1895,20 @@ paths:
       tags:
       - system
 
+  /ping/deep:
+    get:
+      x-swagger-router-controller: ping
+      description: check alive
+      operationId: ping#deep
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping with stores
+      tags:
+      - system
+
   /signin:
     post:
       x-swagger-router-controller: viron_auth
