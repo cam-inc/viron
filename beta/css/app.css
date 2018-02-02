@@ -2695,13 +2695,11 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
-.Numberinput__input:-ms-input-placeholder,
-    .Numberinput__input:placeholder-shown {
+.Numberinput__input:-ms-input-placeholder {
       color: #d1d1d1;
       color: var(--color-base-gray);
     }
-.Numberinput__input::placeholder,
-    .Numberinput__input:placeholder-shown {
+.Numberinput__input::placeholder {
       color: #d1d1d1;
       color: var(--color-base-gray);
     }
@@ -3615,13 +3613,11 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
-.Textarea__input:-ms-input-placeholder,
-    .Textarea__input:placeholder-shown {
+.Textarea__input:-ms-input-placeholder {
       color: #d1d1d1;
       color: var(--color-base-gray);
     }
-.Textarea__input::placeholder,
-    .Textarea__input:placeholder-shown {
+.Textarea__input::placeholder {
       color: #d1d1d1;
       color: var(--color-base-gray);
     }
@@ -3693,13 +3689,11 @@ select {
       border-color: #627edf;
       border-color: var(--color-base-blue);
     }
-.Textinput__input:-ms-input-placeholder,
-    .Textinput__input:placeholder-shown {
+.Textinput__input:-ms-input-placeholder {
       color: #d1d1d1;
       color: var(--color-base-gray);
     }
-.Textinput__input::placeholder,
-    .Textinput__input:placeholder-shown {
+.Textinput__input::placeholder {
       color: #d1d1d1;
       color: var(--color-base-gray);
     }
