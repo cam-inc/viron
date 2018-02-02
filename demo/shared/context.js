@@ -56,10 +56,16 @@ class Context {
           audit_log: {
             audit_logs: store.models.AuditLogs,
             unless: {
-              path: [{
-                url: new RegExp('/stats/*'),
-                methods: ['GET'],
-              }],
+              path: [
+                {
+                  url: new RegExp('/stats/*'),
+                  methods: ['GET'],
+                },
+                {
+                  url: '/ping/deep',
+                  methods: ['GET'],
+                }
+              ],
             },
           },
           admin_user: {
