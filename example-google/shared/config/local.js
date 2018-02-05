@@ -13,7 +13,7 @@ module.exports = helper => {
       redirect_url: `https://${process.env.VIRON_HOSTNAME}:3000/googleoauth2callback`,
       allow_email_domains: [
         // ここに書いたドメインが利用可能
-        'google.com',
+        'gmail.com',
         'camobile.com',
       ],
     },

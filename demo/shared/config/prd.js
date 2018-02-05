@@ -14,7 +14,7 @@ module.exports = helper => {
       //state_url: 'https://cam-inc.github.io/viron/#/',
       allow_email_domains: [
         // ここに書いたドメインが利用可能
-        'google.com',
+        'gmail.com',
         'camobile.com',
       ],
     },
