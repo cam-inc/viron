@@ -349,23 +349,80 @@ definitions:
     type: object
 
   StatsChart:
+    description: chart data
     example:
-      chart:
-        type: area
-      series:
-      - name: One
-        data:
-        - 10
+      color: blue
+      data:
+      - name: example-name
+        distance: 11111
+      guide:
+        x:
+          label: distance
+        y:
+          label: name
+      size: temperature
+      x: name
+      y: distance
     properties:
-      series:
-        type: array
+      color:
+        description: ドットの色分けに使用するkey
+        example: blue
+        type: string
+      data:
+        description: グラフデータ
+        example:
+        - name: example-name
+          distance: 11111
         items:
-          type: object
           additionalProperties: true
-          properties:
-            data:
-              type: array
-              items: {}
+          example:
+            name: example-name
+            distance: 11111
+          type: object
+        type: array
+      guide:
+        $ref: '#/definitions/StatsGuideType'
+      size:
+        description: ドットの大きさに使用するkey
+        example: temperature
+        type: string
+      x:
+        description: X軸に使用するkey
+        example: name
+        type: string
+      y:
+        description: Y軸に使用するkey
+        example: distance
+        type: string
+    required:
+    - data
+    - x
+    - y
+    type: object
+
+  StatsGuideType:
+    example:
+      x:
+        label: x-label
+      y:
+        label: y-label
+    properties:
+      x:
+        $ref: '#/definitions/StatsLabelType'
+      y:
+        $ref: '#/definitions/StatsLabelType'
+    type: object
+
+  StatsLabelType:
+    example:
+      label: yyyymmdd
+    properties:
+      label:
+        example: yyyymmdd
+        type: string
+    required:
+    - label
+    type: object
 
   UpdateAdminRolePayload:
     example:
@@ -1985,66 +2042,10 @@ paths:
       tags:
       - stats
 
-  /stats/chart/area:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Area Chart Data
-      operationId: stats_chart#area
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(area)
-      tags:
-      - stats
-
-  /stats/chart/arearange:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Arearange Chart Data
-      operationId: stats_chart#arearange
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(areaarange)
-      tags:
-      - stats
-
-  /stats/chart/areaspline:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Areaspline Chart Data
-      operationId: stats_chart#areaspline
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(areaspline)
-      tags:
-      - stats
-
-  /stats/chart/areasplinerange:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Areasplinerange Chart Data
-      operationId: stats_chart#areasplinerange
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(areasplinerange)
-      tags:
-      - stats
-
   /stats/chart/bar:
     get:
       x-swagger-router-controller: stats_chart
-      description: Bar Chart Data
+      description: Area Chart Data
       operationId: stats_chart#bar
       responses:
         "200":
@@ -2055,164 +2056,24 @@ paths:
       tags:
       - stats
 
-  /stats/chart/bellcurve:
+  /stats/chart/scatterplot:
     get:
       x-swagger-router-controller: stats_chart
-      description: Bellcurve Chart Data
-      operationId: stats_chart#bellcurve
+      description: Arearange Chart Data
+      operationId: stats_chart#scatterplot
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-      summary: chart(bellcurve)
-      tags:
-      - stats
-
-  /stats/chart/boxplot:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Boxplot Chart Data
-      operationId: stats_chart#boxplot
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(boxplot)
-      tags:
-      - stats
-
-  /stats/chart/bubble:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Bubble Chart Data
-      operationId: stats_chart#bubble
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(bubble)
-      tags:
-      - stats
-
-  /stats/chart/bullet:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Bullet Chart Data
-      operationId: stats_chart#bullet
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(bullet)
-      tags:
-      - stats
-
-  /stats/chart/column:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Column Chart Data
-      operationId: stats_chart#column
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(column)
-      tags:
-      - stats
-
-  /stats/chart/columnrange:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Columnrange Chart Data
-      operationId: stats_chart#columnrange
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(columnrange)
-      tags:
-      - stats
-
-  /stats/chart/errorbar:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Errorbar Chart Data
-      operationId: stats_chart#errorbar
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(errorbar)
-      tags:
-      - stats
-
-  /stats/chart/funnel:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Funnel Chart Data
-      operationId: stats_chart#funnel
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(funnel)
-      tags:
-      - stats
-
-  /stats/chart/gauge:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Gauge Chart Data
-      operationId: stats_chart#gauge
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(gauge)
-      tags:
-      - stats
-
-  /stats/chart/heatmap:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Heatmap Chart Data
-      operationId: stats_chart#heatmap
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(heatmap)
-      tags:
-      - stats
-
-  /stats/chart/histogram:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Histogram Chart Data
-      operationId: stats_chart#histogram
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(histogram)
+      summary: chart(scatterplot)
       tags:
       - stats
 
   /stats/chart/line:
     get:
       x-swagger-router-controller: stats_chart
-      description: Line Chart Data
+      description: Areaspline Chart Data
       operationId: stats_chart#line
       responses:
         "200":
@@ -2223,255 +2084,59 @@ paths:
       tags:
       - stats
 
-  /stats/chart/pareto:
+  /stats/chart/horizontal-bar:
     get:
       x-swagger-router-controller: stats_chart
-      description: Pareto Chart Data
-      operationId: stats_chart#pareto
+      description: Areasplinerange Chart Data
+      operationId: stats_chart#horizontal-bar
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-      summary: chart(pareto)
+      summary: chart(horizontal-bar)
       tags:
       - stats
 
-  /stats/chart/pie:
+  /stats/chart/stacked-bar:
     get:
       x-swagger-router-controller: stats_chart
-      description: Pie Chart Data
-      operationId: stats_chart#pie
+      description: Bar Chart Data
+      operationId: stats_chart#stacked-bar
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-      summary: chart(pie)
+      summary: chart(stacked-bar)
       tags:
       - stats
 
-  /stats/chart/polygon:
+  /stats/chart/horizontal-stacked-bar:
     get:
       x-swagger-router-controller: stats_chart
-      description: Polygon Chart Data
-      operationId: stats_chart#polygon
+      description: Bellcurve Chart Data
+      operationId: stats_chart#horizontal-stacked-bar
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-      summary: chart(polygon)
+      summary: chart(horizontal-stacked-bar)
       tags:
       - stats
 
-  /stats/chart/pyramid:
+  /stats/chart/stacked-area:
     get:
       x-swagger-router-controller: stats_chart
-      description: Pyramid Chart Data
-      operationId: stats_chart#pyramid
+      description: Boxplot Chart Data
+      operationId: stats_chart#stacked-area
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/StatsChart'
-      summary: chart(pyramid)
-      tags:
-      - stats
-
-  /stats/chart/sankey:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Sankey Chart Data
-      operationId: stats_chart#sankey
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(sankey)
-      tags:
-      - stats
-
-  /stats/chart/scatter:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Scatter Chart Data
-      operationId: stats_chart#scatter
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(scatter)
-      tags:
-      - stats
-
-  /stats/chart/solidGauge:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: SolidGauge Chart Data
-      operationId: stats_chart#solidGauge
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(solidGauge)
-      tags:
-      - stats
-
-  /stats/chart/spline:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Spline Chart Data
-      operationId: stats_chart#spline
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(spline)
-      tags:
-      - stats
-
-  /stats/chart/streamgraph:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Streamgraph Chart Data
-      operationId: stats_chart#streamgraph
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(streamgraph)
-      tags:
-      - stats
-
-  /stats/chart/sunburst:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Sunburst Chart Data
-      operationId: stats_chart#sunburst
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(sunburst)
-      tags:
-      - stats
-
-  /stats/chart/tilemap:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Tilemap Chart Data
-      operationId: stats_chart#tilemap
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(tilemap)
-      tags:
-      - stats
-
-  /stats/chart/variablePie:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: VariablePie Chart Data
-      operationId: stats_chart#variablePie
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(variablePie)
-      tags:
-      - stats
-
-  /stats/chart/variwide:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Variwide Chart Data
-      operationId: stats_chart#variwide
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(variwide)
-      tags:
-      - stats
-
-  /stats/chart/vector:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Vector Chart Data
-      operationId: stats_chart#vector
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(vector)
-      tags:
-      - stats
-
-  /stats/chart/waterfall:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Waterfall Chart Data
-      operationId: stats_chart#waterfall
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(waterfall)
-      tags:
-      - stats
-
-  /stats/chart/windbarb:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Windbarb Chart Data
-      operationId: stats_chart#windbarb
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(windbarb)
-      tags:
-      - stats
-
-  /stats/chart/wordcloud:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Wordcloud Chart Data
-      operationId: stats_chart#wordcloud
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(wordcloud)
-      tags:
-      - stats
-
-  /stats/chart/xrange:
-    get:
-      x-swagger-router-controller: stats_chart
-      description: Xrange Chart Data
-      operationId: stats_chart#xrange
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/StatsChart'
-      summary: chart(xrange)
+      summary: chart(stacked-area)
       tags:
       - stats
 
