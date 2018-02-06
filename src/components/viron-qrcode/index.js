@@ -1,4 +1,3 @@
-import ObjectAssign from 'object-assign';
 import QRCode from 'qrcode';
 
 export default function() {
@@ -7,7 +6,7 @@ export default function() {
       width: this.opts.data.size,
     }, error => {
       if (error) {
-        console.error(error);
+        console.error(error); // eslint-disable-line no-console
       }
     });
   });
