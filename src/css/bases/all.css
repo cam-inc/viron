@@ -1,5 +1,7 @@
 /* ITCSS: Base */
 /* Unclassed HTML elements(type selectors). */
+@import "taucharts/build/production/tauCharts.min";
+
 @font-face {
   font-family: "NotoSansCJKjp-Jxck";
   font-style: normal;

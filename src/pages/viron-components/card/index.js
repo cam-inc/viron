@@ -8,6 +8,19 @@ export default function() {
   this.rowSize = 'rowSpreadSmall';
   switch (this.opts.def.style) {
   case 'chart':
+    // v1ではHighchartが使用されていたがライセンス上の問題で使用しないことに。
+    // `chart` = highchart使用なのでサポート外である旨を示す。
+    this.cardType = 'unsupported';
+    this.columnSize = 'columnSpreadSmall';
+    this.rowSize = 'rowSpreadMedium';
+    break;
+  case 'graph-scatterplot':
+  case 'graph-line':
+  case 'graph-bar':
+  case 'graph-horizontal-bar':
+  case 'graph-stacked-bar':
+  case 'graph-horizontal-stacked-bar':
+  case 'graph-stacked-area':
     this.cardType = 'chart';
     this.columnSize = 'columnSpreadSmall';
     this.rowSize = 'rowSpreadMedium';

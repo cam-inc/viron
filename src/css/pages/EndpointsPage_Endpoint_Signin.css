@@ -74,4 +74,9 @@
       margin-bottom: 0;
     }
   }
+
+  &__oauths--centered .EndpointsPage_Endpoint_Signin_Oauth__googleButton,
+  &__oauths--centered .EndpointsPage_Endpoint_Signin_Oauth__facebookButton {
+    margin: 0 auto;
+  }
 }

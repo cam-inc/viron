@@ -6,6 +6,11 @@ export default function() {
 
   this.isGoogle = (this.opts.authtype.provider === 'google');
   this.label = pascalCase(this.opts.authtype.provider);
+  this.isMobile = store.getter('layout.isMobile');
+  this.listen('layout', () => {
+    this.isMobile = store.getter('layout.isMobile');
+    this.update();
+  });
 
   this.handleButtonTap = () => {
     this.opts.closer();

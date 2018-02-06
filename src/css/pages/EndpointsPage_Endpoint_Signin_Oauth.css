@@ -14,13 +14,37 @@
     border-radius: 24px;
   }
 
-  &__google {
-    width: 16px;
-    height: 16px;
+  &__googleButton,
+  &__facebookButton {
+    @mixin hover {
+      opacity: 0.5;
+    }
+    width: 133px;
+    height: 44px;
     margin-right: 4px;
-    background-image: url("../img/icon_google.png");
+    cursor: pointer;
     background-position: center center;
     background-size: contain;
+
+    &--large {
+      width: 292px;
+    }
+  }
+
+  &__googleButton {
+    background-image: url("../img/oauth_google_small.png");
+
+    &--large {
+      background-image: url("../img/oauth_google_large.png");
+    }
+  }
+
+  &__facebookButton {
+    background-image: url("../img/oauth_facebook_small.png");
+
+    &--large {
+      background-image: url("../img/oauth_facebook_large.png");
+    }
   }
 
   &__label {

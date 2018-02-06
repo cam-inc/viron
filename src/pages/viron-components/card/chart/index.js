@@ -1,8 +1,52 @@
 import isObject from 'mout/lang/isObject';
+import ObjectAssign from 'object-assign';
 import chart from '../../../../core/chart';
 
 export default function() {
   const store = this.riotx.get();
+
+  /**
+   * チャートタイプに応じて最適なチャート設定を返します。
+   * チャート間の差異を吸収する目的です。
+   * @return {Object}
+   */
+  const getBaseChartSetting = () => {
+    const setting = {};
+    switch (this.opts.def.style) {
+    case 'graph-scatterplot':
+      setting.type = 'scatterplot';
+      break;
+    case 'graph-line':
+      setting.type = 'line';
+      setting.guide = {
+        interpolate: 'smooth'
+      };
+      break;
+    case 'graph-bar':
+      setting.type = 'bar';
+      break;
+    case 'graph-horizontal-bar':
+      setting.type = 'horizontalBar';
+      break;
+    case 'graph-stacked-bar':
+      setting.type = 'stacked-bar';
+      break;
+    case 'graph-horizontal-stacked-bar':
+      setting.type = 'horizontal-stacked-bar';
+      break;
+    case 'graph-stacked-area':
+      setting.type = 'stacked-area';
+      break;
+    default:
+      setting.type = 'scatterplot';
+      break;
+    }
+    return ObjectAssign({
+      plugins: [
+        chart.api.plugins.get('tooltip')()
+      ]
+    }, setting);
+  };
 
   /**
    * Chartを更新します。
@@ -13,7 +57,7 @@ export default function() {
       return;
     }
     const data = this.data;
-    chart.chart(canvasElm, data);
+    new chart.Chart(ObjectAssign(getBaseChartSetting(), data)).renderTo(canvasElm);
   };
 
   /**

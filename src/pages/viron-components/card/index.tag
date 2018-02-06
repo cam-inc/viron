@@ -6,5 +6,6 @@ viron-components-page-card.ComponentsPage_Card(class="ComponentsPage_Card--{ col
     import './chart/index.tag';
     import './number/index.tag';
     import './table/index.tag';
+    import './unsupported/index.tag';
     import script from './index';
     this.external(script);
