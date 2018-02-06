@@ -470,23 +470,80 @@ definitions:
     type: object
 
   StatsChart:
+    description: chart data
     example:
-      chart:
-        type: area
-      series:
-      - name: One
-        data:
-        - 10
+      color: blue
+      data:
+      - name: example-name
+        distance: 11111
+      guide:
+        x:
+          label: distance
+        y:
+          label: name
+      size: temperature
+      x: name
+      y: distance
     properties:
-      series:
-        type: array
+      color:
+        description: ドットの色分けに使用するkey
+        example: blue
+        type: string
+      data:
+        description: グラフデータ
+        example:
+        - name: example-name
+          distance: 11111
         items:
-          type: object
           additionalProperties: true
-          properties:
-            data:
-              type: array
-              items: {}
+          example:
+            name: example-name
+            distance: 11111
+          type: object
+        type: array
+      guide:
+        $ref: '#/definitions/StatsGuideType'
+      size:
+        description: ドットの大きさに使用するkey
+        example: temperature
+        type: string
+      x:
+        description: X軸に使用するkey
+        example: name
+        type: string
+      y:
+        description: Y軸に使用するkey
+        example: distance
+        type: string
+    required:
+    - data
+    - x
+    - y
+    type: object
+
+  StatsGuideType:
+    example:
+      x:
+        label: x-label
+      y:
+        label: y-label
+    properties:
+      x:
+        $ref: '#/definitions/StatsLabelType'
+      y:
+        $ref: '#/definitions/StatsLabelType'
+    type: object
+
+  StatsLabelType:
+    example:
+      label: yyyymmdd
+    properties:
+      label:
+        example: yyyymmdd
+        type: string
+    required:
+    - label
+    type: object
 
   UserCollection:
     items:

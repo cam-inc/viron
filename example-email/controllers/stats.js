@@ -23,36 +23,23 @@ const mau = (req, res) => {
  */
 const area = (req, res) => {
   res.json({
-    chart: {
-      type: 'area',
-    },
-    xAxis: {
-      title: {
-        text: '日時',
-      },
-      type: 'category',
-    },
-    yAxis: {
-      title: {
-        text: '会員数',
-      },
-    },
-    series: [{
-      name: 'siteX',
-      data: [
-        ['2017-12-15', 235], ['2017-12-16', 123], ['2017-12-17', 257], ['2017-12-18', 263], ['2017-12-19', 270], ['2017-12-20', 1070]
-      ],
-    }, {
-      name: 'siteY',
-      data: [
-        ['2017-12-15', 50], ['2017-12-16', 10], ['2017-12-17', 145], ['2017-12-18', 350], ['2017-12-19', 90], ['2017-12-20', 910]
-      ],
-    }, {
-      name: 'siteZ',
-      data: [
-        ['2017-12-15', 123], ['2017-12-16', 45], ['2017-12-17', 100], ['2017-12-18', 250], ['2017-12-19', 50], ['2017-12-20', 50]
-      ],
-    }],
+    x: 'date',
+    y: 'effort',
+    color: 'team',
+    data: [
+      {team: 'Alpha', date: '2015-07-15', effort: 400},
+      {team: 'Alpha', date: '2015-07-16', effort: 200},
+      {team: 'Alpha', date: '2015-07-17', effort: 300},
+      {team: 'Alpha', date: '2015-07-18', effort: 500},
+      {team: 'Beta', date: '2015-07-15', effort: 100},
+      {team: 'Beta', date: '2015-07-16', effort: 200},
+      {team: 'Beta', date: '2015-07-17', effort: 300},
+      {team: 'Beta', date: '2015-07-18', effort: 100},
+      {team: 'Gamma', date: '2015-07-15', effort: 300},
+      {team: 'Gamma', date: '2015-07-16', effort: 100},
+      {team: 'Gamma', date: '2015-07-17', effort: 100},
+      {team: 'Gamma', date: '2015-07-18', effort: 200}
+    ]
   });
 };
 

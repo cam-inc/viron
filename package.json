@@ -71,7 +71,7 @@
     "object-assign": "^4.1.1",
     "pretty": "^2.0.0",
     "promise-polyfill": "^6.0.2",
-    "qrious": "^4.0.2",
+    "qrcode": "^1.2.0",
     "rfc-3986": "^1.0.1",
     "riot": ">=3.7.4",
     "riotx": "^0.9.4",

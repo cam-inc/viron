@@ -1,12 +1,24 @@
 /* ITCSS: Base */
 /* Unclassed HTML elements(type selectors). */
-@import "taucharts/build/production/tauCharts.min";
+@font-face {
+  font-family: "NotoSansCJKjp-Jxck";
+  font-style: normal;
+  font-weight: light;
+  src: url("../font/NotoSansCJKjp-Jxck-Regular.woff2") format("woff2"), url("../font/NotoSansCJKjp-Jxck-Regular.woff") format("woff"), url("../font/NotoSansCJKjp-Jxck-Regular.ttf") format("truetype");
+}
 
 @font-face {
-  font-family: "Noto Sans JP";
+  font-family: "NotoSansCJKjp-Jxck";
   font-style: normal;
-  font-weight: 400;
-  src: local("Noto Sans CJK JP"), url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff2) format("woff2"), url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff) format("woff"), url(//fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.otf) format("opentype");
+  font-weight: normal;
+  src: url("../font/NotoSansCJKjp-Jxck-Medium.woff2") format("woff2"), url("../font/NotoSansCJKjp-Jxck-Medium.woff") format("woff"), url("../font/NotoSansCJKjp-Jxck-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NotoSansCJKjp-Jxck";
+  font-style: normal;
+  font-weight: bold;
+  src: url("../font/NotoSansCJKjp-Jxck-Bold.woff2") format("woff2"), url("../font/NotoSansCJKjp-Jxck-Bold.woff") format("woff"), url("../font/NotoSansCJKjp-Jxck-Bold.ttf") format("truetype");
 }
 
 *,
@@ -29,7 +41,7 @@ body {
   position: relative;
   /* 320px = iPhoneSEの横幅。これを最小値とする。 */
   min-width: 320px;
-  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans JP", sans-serif;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
   /* Safariで異様にサイズが小さくなるバグへの対応 */
   font-size: 1rem;
   line-height: 1.5;
@@ -39,5 +51,5 @@ input,
 button,
 textarea,
 select {
-  font-family: "Noto Sans", "Noto Sans CJK JP", "Noto Sans JP", sans-serif;
+  font-family: "Noto Sans", "Noto Sans CJK JP", "NotoSansCJKjp-Jxck", sans-serif;
 }
