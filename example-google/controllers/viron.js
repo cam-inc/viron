@@ -96,7 +96,7 @@ const show = (req, res) => {
             components: [
               genComponent('DAU', 'get', '/stats/dau', constant.VIRON_STYLE_NUMBER, 5),
               genComponent('MAU', 'get', '/stats/mau', constant.VIRON_STYLE_NUMBER, 30),
-              genComponent('Chart(area)', 'get', '/stats/area', constant.VIRON_STYLE_CHART),
+              genComponent('Chart(area)', 'get', '/stats/area', constant.VIRON_STYLE_GRAPH_STACKED_AREA),
             ],
           }
         ],
