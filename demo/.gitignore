@@ -36,3 +36,5 @@ config/runtime.yaml
 
 # Docker mysql data
 docker
+
+package-lock.json
