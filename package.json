@@ -36,7 +36,7 @@
     "build:tinymce": "cp -r node_modules/tinymce/skins dist/tinymce/skins && cp -r node_modules/tinymce/themes dist/tinymce/themes",
     "build:js": "run-s build:js:bundle build:js:minify",
     "build:js:bundle": "rollup -c rollup.config.js",
-    "build:js:minify": "uglifyjs dist/js/app.js -o dist/js/app.min.js --source-map url=app.min.js.map",
+    "build:js:minify": "uglifyjs dist/js/app.js --comments --mangle -o dist/js/app.min.js --source-map url=app.min.js.map",
     "build:css": "run-s build:css:bundle build:css:minify",
     "build:css:bundle": "postcss src/css/app.css -o dist/css/app.css",
     "build:css:minify": "csswring dist/css/app.css dist/css/app.min.css",
