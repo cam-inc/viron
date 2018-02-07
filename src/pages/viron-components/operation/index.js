@@ -23,19 +23,19 @@ export default function() {
   const method = store.getter('oas.pathItemObjectMethodNameByOperationId', operationObject.operationId);
   switch (method) {
   case 'get':
-    this.submitLabel = '取得する';
+    this.submitLabel = operationObject['x-submit-label'] || '取得する';
     this.successMessage = '取得しました。';
     break;
   case 'post':
-    this.submitLabel = '新規作成する';
+    this.submitLabel = operationObject['x-submit-label'] || '新規作成する';
     successMessage = '新規作成しました。';
     break;
   case 'put':
-    this.submitLabel = '保存する';
+    this.submitLabel = operationObject['x-submit-label'] || '保存する';
     successMessage = '保存しました。';
     break;
   case 'delete':
-    this.submitLabel = '削除する';
+    this.submitLabel = operationObject['x-submit-label'] || '削除する';
     this.submitModifier = 'emphasised';
     successMessage = '削除しました。';
     break;
