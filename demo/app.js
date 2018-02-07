@@ -4,7 +4,8 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 
-const app = require('express')();
+const express = require('express');
+const app = express();
 const multer = require('multer')();
 const yaml = require('js-yaml');
 const SwaggerExpress = require('swagger-express-mw');
@@ -54,6 +55,9 @@ context.init()
 
         // ignore if-none-match header
         app.disable('etag');
+
+        // serve static files
+        app.use(express.static('public'));
 
         // add acl response headers
         app.use(vironlib.acl.middleware());
