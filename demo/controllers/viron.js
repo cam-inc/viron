@@ -3,9 +3,7 @@ const isEmpty = require('mout/lang/isEmpty');
 const forOwn = require('mout/object/forOwn');
 const some = require('mout/array/some');
 
-const shared = require('../shared');
-const context = shared.context;
-const constant = shared.constant;
+const {context, constant} = require('../shared');
 
 const genComponent = (name, method, path, style, autoRefreshSec, pagination, options) => {
   const cmp = {
@@ -84,7 +82,7 @@ const show = (req, res) => {
     name: `${title} - ${env}`,
     color: 'white',
     theme: 'standard',
-    thumbnail: 'https://cam-inc.github.io/viron/latest/img/favicon-32x32.png', // サービスのアイコン等を指定
+    thumbnail: `https://${context.getConfigHost()}/img/icon_terminal.png`, // サービスのアイコン等を指定
     tags: [env, 'viron', 'demo'],
     pages: [].concat(
       // QuickView

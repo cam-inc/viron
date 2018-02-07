@@ -23,6 +23,7 @@ services:
       - $PWD/controllers:/demo/controllers
       - $PWD/fittings:/demo/fittings
       - $PWD/swagger:/demo/swagger
+      - $PWD/public:/demo/public
       - $PWD/test:/demo/test
       - $PWD/.env:/demo/.env
     command: npm run inspect

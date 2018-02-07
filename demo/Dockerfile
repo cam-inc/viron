@@ -18,6 +18,7 @@ ADD app.js /demo/app.js
 ADD controllers /demo/controllers
 ADD fittings /demo/fittings
 ADD swagger /demo/swagger
+ADD public /demo/public
 ADD test /demo/test
 
 EXPOSE 3000
