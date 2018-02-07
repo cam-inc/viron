@@ -52,9 +52,14 @@ export default {
         // 401 = 認証エラー
         // 通常エラーと認証エラーで処理を振り分ける。
         if (err.status !== 401) {
-          return store.action('modals.add', 'viron-error', {
-            error: err
-          });
+          return Promise
+            .resolve()
+            .then(() => store.action('modals.add', 'viron-error', {
+              error: err
+            }))
+            .then(() => {
+              replace('/');
+            });
         }
         return Promise
           .resolve()

@@ -1,3 +1,4 @@
+import ObjectAssign from 'object-assign';
 import shortid from 'shortid';
 import { fetch } from '../../core/fetch';
 import exporter from './exporter';
@@ -10,9 +11,30 @@ export default exporter('endpoints', {
    * @return {Promise}
    */
   add: (context, url) => {
+    const baseNewEndpoint = {
+      url: url,
+      token: null,
+      title: '',
+      name: '',
+      description: '',
+      version: '',
+      color: '',
+      thumbnail: null,
+      tags: [],
+      theme: 'standard'
+    };
+
     return Promise
       .resolve()
       .then(() => fetch(context, url))
+      .then(() => {
+        // 誰でもアクセス可能なエンドポイントの場合はここに来る。
+        const key = shortid.generate();
+        const newEndpoint = ObjectAssign({}, baseNewEndpoint, {
+          key
+        });
+        context.commit('endpoints.add', key, newEndpoint);
+      })
       .catch(err => {
         // 401エラーは想定内。
         // 401 = endpointが存在しているので認証エラーになる。
@@ -21,19 +43,9 @@ export default exporter('endpoints', {
         }
         // 401以外 = endpointが存在しない。
         const key = shortid.generate();
-        const newEndpoint = {
-          key,
-          url: url,
-          token: null,
-          title: '',
-          name: '',
-          description: '',
-          version: '',
-          color: '',
-          thumbnail: null,
-          tags: [],
-          theme: 'standard'
-        };
+        const newEndpoint = ObjectAssign({}, baseNewEndpoint, {
+          key
+        });
         context.commit('endpoints.add', key, newEndpoint);
       });
   },
