@@ -36,7 +36,7 @@ export default exporter('oas', {
         const body = res.body;
         // レスポンスがOAS2.0か否か確認。
         // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object
-        if (!isObject(body) || body.swagger === '2.0') {
+        if (!isObject(body) || body.swagger !== '2.0') {
           return Promise.reject({
             name: url,
             message: 'レスポンスがOAS2.0に準拠していません。'
