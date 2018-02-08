@@ -35,6 +35,11 @@ export default function() {
     this.columnSize = 'columnSpreadSmall';
     this.rowSize = 'rowSpreadSmall';
     break;
+  case 'gallery':
+    this.cardType = 'gallery';
+    this.columnSize = 'columnSpreadFull';
+    this.rowSize = 'rowSpreadLarge';
+    break;
   default:
     break;
   }

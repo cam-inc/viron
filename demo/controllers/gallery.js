@@ -16,7 +16,7 @@ const imgUrl = `https://${context.getConfigHost()}/img/gallery/`;
 const list = (req, res) => {
   const vironlib = context.getVironLib();
   const {pager} = vironlib;
-  const limit = Number(req.query.limit) || constant.DEFAULT_PAGER_LIMIT;
+  const limit = Number(req.query.limit) || 3;
   const offset = Number(req.query.offset) || 0;
 
   const all = fs.readdirSync(dir).sort();

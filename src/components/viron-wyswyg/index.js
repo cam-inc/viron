@@ -57,18 +57,17 @@ export default function() {
   // 画像ファイルアップロード設定。
   // @see: https://www.tinymce.com/docs/configure/file-image-upload/
   // TODO
-  if (true) {
+  if (true) {// eslint-disable-line no-constant-condition
     // 現時点では、`Insert/edit image`ダイアログ等画像アップロードのみを対象とする。
     //customConfig['automatic_uploads'] = true;
     customConfig['file_picker_types'] = 'image';
-    customConfig['file_picker_callback'] = (callback, value, meta) => {
+    customConfig['file_picker_callback'] = (callback, value, meta) => {// eslint-disable-line no-unused-vars
       const input = document.createElement('input');
       input.setAttribute('type', 'file');
       input.setAttribute('accept', 'image/*');
       input.onchange = () => {
-        const file = input.files[0];
-        console.log(input);
-        debugger
+        const file = input.files[0];// eslint-disable-line no-unused-vars
+        console.log(input);// eslint-disable-line no-console
       };
       input.click();
     };

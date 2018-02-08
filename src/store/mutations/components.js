@@ -116,6 +116,20 @@ export default exporter('components', {
       state.components[componentId]['tableOperations'] = tableOperations;
       state.components[componentId]['rowOperations'] = rowOperations;
     }
+    // styleがギャラリーの場合。
+    if (componentDef.style === 'gallery') {
+      const galleryOperations = [];
+      // 同じpath & post methodのoperationObjectは関連有りとみなす。
+      !!state.oas.client.spec.paths[path] && state.oas.client.spec.paths[path]['post'] && (galleryOperations.push(ObjectAssign({
+        method: 'post',
+        path
+      }, state.oas.client.spec.paths[path]['post'])));
+      !!state.oas.client.spec.paths[`${path}/{id}`] && state.oas.client.spec.paths[`${path}/{id}`]['delete'] && (galleryOperations.push(ObjectAssign({
+        method: 'delete',
+        path
+      }, state.oas.client.spec.paths[`${path}/{id}`]['delete'])));
+      state.components[componentId]['galleryOperations'] = galleryOperations;
+    }
     return ['components', componentId];
   },
 
