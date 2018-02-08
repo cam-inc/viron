@@ -3,9 +3,7 @@ const isEmpty = require('mout/lang/isEmpty');
 const forOwn = require('mout/object/forOwn');
 const some = require('mout/array/some');
 
-const shared = require('../shared');
-const context = shared.context;
-const constant = shared.constant;
+const {context, constant} = require('../shared');
 
 const genComponent = (name, method, path, style, autoRefreshSec, pagination, options) => {
   const cmp = {
@@ -84,7 +82,7 @@ const show = (req, res) => {
     name: `${title} - ${env}`,
     color: 'white',
     theme: 'standard',
-    thumbnail: 'https://cam-inc.github.io/viron/latest/img/favicon-32x32.png', // サービスのアイコン等を指定
+    thumbnail: `https://${context.getConfigHost()}/img/icon_terminal.png`, // サービスのアイコン等を指定
     tags: [env, 'viron', 'demo'],
     pages: [].concat(
       // QuickView
@@ -96,41 +94,13 @@ const show = (req, res) => {
             components: [
               genComponent('DAU', 'get', '/stats/dau', constant.VIRON_STYLE_NUMBER, 5),
               genComponent('MAU', 'get', '/stats/mau', constant.VIRON_STYLE_NUMBER, 30),
-              genComponent('Chart(area)', 'get', '/stats/chart/area', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(areaspline)', 'get', '/stats/chart/areaspline', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(arearange)', 'get', '/stats/chart/arearange', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(areasplinerange)', 'get', '/stats/chart/areasplinerange', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(bar)', 'get', '/stats/chart/bar', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(bellcurve)', 'get', '/stats/chart/bellcurve', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(boxplot)', 'get', '/stats/chart/boxplot', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(bubble)', 'get', '/stats/chart/bubble', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(bullet)', 'get', '/stats/chart/bullet', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(column)', 'get', '/stats/chart/column', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(columnrange)', 'get', '/stats/chart/columnrange', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(errorbar)', 'get', '/stats/chart/errorbar', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(funnel)', 'get', '/stats/chart/funnel', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(gauge)', 'get', '/stats/chart/gauge', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(heatmap)', 'get', '/stats/chart/heatmap', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(histogram)', 'get', '/stats/chart/histogram', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(line)', 'get', '/stats/chart/line', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(pareto)', 'get', '/stats/chart/pareto', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(pie)', 'get', '/stats/chart/pie', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(polygon)', 'get', '/stats/chart/polygon', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(pyramid)', 'get', '/stats/chart/pyramid', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(sankey)', 'get', '/stats/chart/sankey', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(scatter)', 'get', '/stats/chart/scatter', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(solidGauge)', 'get', '/stats/chart/solidGauge', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(spline)', 'get', '/stats/chart/spline', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(streamgraph)', 'get', '/stats/chart/streamgraph', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(sunburst)', 'get', '/stats/chart/sunburst', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(tilemap)', 'get', '/stats/chart/tilemap', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(variablePie)', 'get', '/stats/chart/variablePie', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(variwide)', 'get', '/stats/chart/variwide', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(vector)', 'get', '/stats/chart/vector', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(waterfall)', 'get', '/stats/chart/waterfall', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(windbarb)', 'get', '/stats/chart/windbarb', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(wordcloud)', 'get', '/stats/chart/wordcloud', constant.VIRON_STYLE_CHART),
-              genComponent('Chart(xrange)', 'get', '/stats/chart/xrange', constant.VIRON_STYLE_CHART),
+              genComponent('Chart(bar)', 'get', '/stats/chart/bar', constant.VIRON_STYLE_GRAPH_BAR),
+              genComponent('Chart(scatterplot)', 'get', '/stats/chart/scatterplot', constant.VIRON_STYLE_GRAPH_SCATTERPLOT),
+              genComponent('Chart(line)', 'get', '/stats/chart/line', constant.VIRON_STYLE_GRAPH_LINE),
+              genComponent('Chart(horizontal-bar)', 'get', '/stats/chart/horizontal-bar', constant.VIRON_STYLE_GRAPH_HORIZONTAL_BAR),
+              genComponent('Chart(stacked-bar)', 'get', '/stats/chart/stacked-bar', constant.VIRON_STYLE_GRAPH_STACKED_BAR),
+              genComponent('Chart(horizontal-stacked-bar)', 'get', '/stats/chart/horizontal-stacked-bar', constant.VIRON_STYLE_GRAPH_HORIZONTAL_STACKED_BAR),
+              genComponent('Chart(stacked-area)', 'get', '/stats/chart/stacked-area', constant.VIRON_STYLE_GRAPH_STACKED_AREA),
             ],
           }
         ],

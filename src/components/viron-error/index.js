@@ -16,6 +16,9 @@ export default function() {
     this.title = data.name || this.title;
     this.message = data.message || this.message;
   }
+  if (!!error) {
+    console.error(error);// eslint-disable-line no-console
+  }
 
   this.on('mount', () => {
     // エラーがPromiseであれば解析する。

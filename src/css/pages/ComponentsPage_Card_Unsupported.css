@@ -1,0 +1,27 @@
+.ComponentsPage_Card_Unsupported {
+  @apply --layout-column-center-stretch;
+  position: relative;
+  height: 100%;
+  padding: 24px;
+
+  &__head {
+    @apply --layout-center-center;
+    flex-shrink: 0;
+    margin-bottom: 4px;
+  }
+
+  &__title {
+    @apply --text-truncate;
+    flex-grow: 1;
+    font-size: 1.6rem;
+  }
+
+  &__body {
+    @apply --layout-center-center;
+    flex-grow: 1;
+  }
+
+  &__error {
+    color: var(--color-base-gray);
+  }
+}
