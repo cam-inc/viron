@@ -140,6 +140,8 @@ const show = (req, res) => {
                 {key: 'title', type: 'string'},
                 {key: 'theme', type: 'string'},
               ], ['id', 'user_blog_id', 'title', 'theme']),
+              genComponent('ギャラリー', 'get', '/gallery', constant.VIRON_STYLE_GALLERY, null, true),
+              //genTableComponent('ギャラリー', 'get', '/gallery', 'id'),
             ],
           },
           {

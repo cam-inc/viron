@@ -29,6 +29,7 @@ module.exports = {
   //VIRON_STYLE_TABLE: vironlib.constants.VIRON_STYLE_TABLE,
   //VIRON_STYLE_NUMBER: vironlib.constants.VIRON_STYLE_NUMBER,
   //VIRON_STYLE_CHART: vironlib.constants.VIRON_STYLE_CHART,
+  VIRON_STYLE_GALLERY: 'gallery',
   //VIRON_SECTION_DASHBOARD: vironlib.constants.VIRON_SECTION_DASHBOARD,
   //VIRON_SECTION_MANAGE: vironlib.constants.VIRON_SECTION_MANAGE,
 };
