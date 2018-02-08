@@ -266,7 +266,17 @@ export default function() {
         }
       });
       this.hasSearchQueries = !!size(this.searchQueries);
-      getData();
+      // 検索クエリ変更時は強制的にページ番号を1に戻す。
+      if (!this.hasPagination) {
+        getData();
+      } else {
+        const pagination = {};
+        const size = this.pagination.size;
+        const current = 1;
+        pagination.limit = size;
+        pagination.offset = (current - 1) * size;
+        getData(pagination);
+      }
     }
     // 次回更新用にストック。
     prevCrossSearchQueries = ObjectAssign({}, this.opts.crosssearchqueries);
@@ -286,7 +296,17 @@ export default function() {
       onSearch: newSearchQueries => {
         this.searchQueries = newSearchQueries;
         this.hasSearchQueries = !!size(newSearchQueries);
-        getData();
+        // 検索クエリ変更時は強制的にページ番号を1に戻す。
+        if (!this.hasPagination) {
+          getData();
+        } else {
+          const pagination = {};
+          const size = this.pagination.size;
+          const current = 1;
+          pagination.limit = size;
+          pagination.offset = (current - 1) * size;
+          getData(pagination);
+        }
       }
     }, { isNarrow: true });
   };
