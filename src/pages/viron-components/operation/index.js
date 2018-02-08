@@ -24,7 +24,7 @@ export default function() {
   const customSubmitLabel = operationObject['x-submit-label'];
   switch (method) {
   case 'get':
-    this.submitLabel = '取得する';
+    this.submitLabel = customSubmitLabel || '取得する';
     this.successMessage = '取得しました。';
     break;
   case 'post':
