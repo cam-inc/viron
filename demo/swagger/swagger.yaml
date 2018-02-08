@@ -1357,6 +1357,26 @@ definitions:
             type: number
             default: 1000
 
+  GalleryCollection:
+    items:
+      $ref: '#/definitions/Gallery'
+    type: array
+
+  Gallery:
+    type: object
+    properties:
+      id:
+        description: 画像ID
+        type: string
+        example: test
+      url:
+        description: 画像URL
+        type: string
+        example: https://img.example.com/test.png
+    required:
+    - id
+    - url
+
 #################################################
 # paths
 # - APIの一覧
@@ -3844,6 +3864,98 @@ paths:
       tags:
       - account
 
+  /gallery:
+    get:
+      x-swagger-router-controller: gallery
+      description: 画像一覧
+      operationId: gallery#list
+      parameters:
+      - description: 1ページあたりの件数
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: ページの開始位置
+        in: query
+        name: offset
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/GalleryCollection'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 画像一覧
+      tags:
+      - gallery
+
+    post:
+      x-swagger-router-controller: gallery
+      description: 画像アップロード
+      operationId: gallery#upload
+      parameters:
+      - in: formData
+        name: image
+        type: file
+        description: 画像ファイル
+        x-accept: image/*
+      consumes:
+      - multipart/form-data
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 画像アップロード
+      tags:
+      - gallery
+
+  /gallery/{id}:
+    delete:
+      x-swagger-router-controller: gallery
+      description: 画像削除
+      operationId: gallery#remove
+      parameters:
+      - description: 画像ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: 画像削除
+      tags:
+      - gallery
+
+
 #################################################
 # tags
 #################################################
@@ -3860,6 +3972,7 @@ tags:
   - name: user_blog_entry
   - name: user_favorite
   - name: blog_design
+  - name: gallery
   - name: stats
   - name: sample
   - name: system
