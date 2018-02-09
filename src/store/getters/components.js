@@ -90,8 +90,8 @@ export default exporter('components', {
     case 'row':
       operations = component.rowOperations;
       break;
-    case 'gallery':
-      operations = component.galleryOperations;
+    case 'explorer':
+      operations = component.explorerOperations;
       break;
     default:
       operations = component.operations || [];
@@ -117,8 +117,8 @@ export default exporter('components', {
     case 'row':
       operations = component.rowOperations;
       break;
-    case 'gallery':
-      operations = component.galleryOperations;
+    case 'explorer':
+      operations = component.explorerOperations;
       break;
     default:
       operations = component.operations || [];
@@ -151,8 +151,8 @@ export default exporter('components', {
     case 'row':
       operations = component.rowOperations;
       break;
-    case 'gallery':
-      operations = component.galleryOperations;
+    case 'explorer':
+      operations = component.explorerOperations;
       break;
     default:
       operations = component.operations || [];

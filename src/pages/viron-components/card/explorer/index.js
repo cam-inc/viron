@@ -104,8 +104,8 @@ export default function() {
   });
   this.listen(this.opts.id, () => {
     this.data = store.getter('components.response', this.opts.id);
-    this.postOperation = store.getter('components.postOperation', this.opts.id, 'gallery');
-    this.deleteOperation = store.getter('components.deleteOperation', this.opts.id, 'gallery');
+    this.postOperation = store.getter('components.postOperation', this.opts.id, 'explorer');
+    this.deleteOperation = store.getter('components.deleteOperation', this.opts.id, 'explorer');
     this.error = validate(this.data);
     this.hasPagination = store.getter('components.hasPagination', this.opts.id);
     this.pagination = store.getter('components.pagination', this.opts.id);
