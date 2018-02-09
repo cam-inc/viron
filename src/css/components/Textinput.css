@@ -17,7 +17,7 @@
     padding: 8px 18px;
     font-size: 1.8rem;
     background-color: var(--color-base-white);
-    border: 1px solid rgba(149,152,154,.3);
+    border: 1px solid rgba(149, 152, 154, 0.3);
     border-radius: 2px;
 
     &:focus {
@@ -55,10 +55,10 @@
 
   &--disabled {
     & .Textinput__input {
+      color: var(--color-base-gray-secondary);
       cursor: not-allowed;
       background-color: var(--color-base-gray-tertiary);
       border-color: var(--color-base-gray);
-      color: var(--color-base-gray-secondary);
     }
   }
 

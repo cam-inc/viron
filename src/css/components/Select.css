@@ -65,9 +65,9 @@
 
   &--disabled {
     & .Select__form {
+      color: var(--color-base-gray-secondary);
       background-color: var(--color-base-gray-tertiary);
       border-color: var(--color-base-gray);
-      color: var(--color-base-gray-secondary);
     }
 
     & .Select__select {
