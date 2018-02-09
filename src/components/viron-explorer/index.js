@@ -247,6 +247,7 @@ export default function() {
 
   this.handleItemImageTap = e => {
     this.selectedItem = e.item.item;
+    this.opts.onselect && this.opts.onselect(this.selectedItem);
     this.update();
   };
 
