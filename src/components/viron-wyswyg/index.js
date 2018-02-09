@@ -11,6 +11,7 @@ import 'tinymce/plugins/paste/plugin';
 import 'tinymce/plugins/searchreplace/plugin';
 import 'tinymce/plugins/table/plugin';
 import 'tinymce/plugins/textcolor/plugin';
+import './explorer/index.tag';
 
 const url = new URL(window.location.href);
 const baseConfig = {
@@ -21,7 +22,7 @@ const baseConfig = {
     tools: { title: 'Tools', items: 'code fullscreen' }
   },
   toolbar: [
-    'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image link unlink',
+    'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image explorer link unlink',
     'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
   ],
   plugins: ['code', 'hr', 'lists', 'link', 'image', 'paste', 'searchreplace', 'fullscreen', 'table', 'textcolor'],
@@ -42,7 +43,16 @@ const baseConfig = {
 };
 
 export default function() {
+  const store = this.riotx.get();
+
   this.editor = null;
+
+  const openExplorer = () => {
+    const explorerDef = this.opts.explorer;
+    store.action('modals.add', 'viron-wyswyg-explorer', {
+      def: explorerDef
+    });
+  };
 
   const customConfig = {
     selector: `.Wyswyg__editor${this._riot_id}`,
@@ -52,33 +62,25 @@ export default function() {
       this.editor.on('Change', this.handleEditorChange);
       this.editor.on('focus', this.handleEditorFocus);
       this.editor.on('blur', this.handleEditorBlur);
+    },
+    setup: editor => {
+      // explorer機能と連携。
+      if (!!this.opts.explorer || true) {// TODO:
+        editor.addButton('explorer', {
+          icon: 'browse',
+          tooltip: 'Explorer',
+          onclick: () => {
+            openExplorer();
+          }
+        });
+      }
     }
   };
-  // 画像ファイルアップロード設定。
-  // @see: https://www.tinymce.com/docs/configure/file-image-upload/
-  // TODO
-  if (true) {// eslint-disable-line no-constant-condition
-    // 現時点では、`Insert/edit image`ダイアログ等画像アップロードのみを対象とする。
-    //customConfig['automatic_uploads'] = true;
-    customConfig['file_picker_types'] = 'image';
-    customConfig['file_picker_callback'] = (callback, value, meta) => {// eslint-disable-line no-unused-vars
-      const input = document.createElement('input');
-      input.setAttribute('type', 'file');
-      input.setAttribute('accept', 'image/*');
-      input.onchange = () => {
-        const file = input.files[0];// eslint-disable-line no-unused-vars
-        console.log(input);// eslint-disable-line no-console
-      };
-      input.click();
-    };
-    // サーバーサイドのuploadハンドラのレスポンス形式は仕様通りに。
-    // @see: https://www.tinymce.com/docs/configure/file-image-upload/#images_upload_url
-    customConfig['images_upload_credentials'] = true;
-    customConfig['images_reuse_filename'] = true;
-  }
+
 
   this.on('mount', () => {
     TinyMCE.init(ObjectAssign({}, baseConfig, customConfig));
+    console.log(this.editor);
   }).on('before-unmount', () => {
     TinyMCE.remove(`.Wyswyg__editor${this._riot_id}`);
     this.editor.off('Change', this.handleEditorChange);

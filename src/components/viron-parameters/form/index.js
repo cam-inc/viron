@@ -4,6 +4,7 @@ import forEach from 'mout/array/forEach';
 import isNaN from 'mout/lang/isNaN';
 import _isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
+import ObjectAssign from 'object-assign';
 import '../error/index.tag';
 import util from '../util';
 import validator from '../validator';
@@ -40,6 +41,19 @@ export default function() {
   this.mimeType = formObject['x-mime-type'];
   // 入力フォームのplaceholder値。
   this.placeholder = formObject.example;
+  // wyswygエディターのexplorer機能設定。
+  this.explorerConfig = formObject['x-explorer-component'];
+  // GET /vironの各componentと同じ形式である必要があるが、全部記述するのは負荷が大きいので、
+  // vironフロントエンド側でデフォルトをセットする。
+  if (!!this.explorerConfig) {
+    this.explorerConfig = ObjectAssign({
+      api: ObjectAssign({
+        method: 'get'
+      }, this.explorerConfig.api),
+      pagination: true,
+      style: 'explorer'
+    }, this.explorerConfig);
+  }
 
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields-13
   // disabled(readOnly)

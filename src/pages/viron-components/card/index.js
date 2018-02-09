@@ -10,7 +10,7 @@ export default function() {
   case 'chart':
     // v1ではHighchartが使用されていたがライセンス上の問題で使用しないことに。
     // `chart` = highchart使用なのでサポート外である旨を示す。
-    this.cardType = 'unsupported';
+    this.cardType = 'components-page-unsupported';
     this.columnSize = 'columnSpreadSmall';
     this.rowSize = 'rowSpreadMedium';
     break;
@@ -21,21 +21,22 @@ export default function() {
   case 'graph-stacked-bar':
   case 'graph-horizontal-stacked-bar':
   case 'graph-stacked-area':
-    this.cardType = 'chart';
+    this.cardType = 'components-page-chart';
     this.columnSize = 'columnSpreadSmall';
     this.rowSize = 'rowSpreadMedium';
     break;
   case 'table':
-    this.cardType = 'table';
+    this.cardType = 'components-page-table';
     this.columnSize = 'columnSpreadFull';
     this.rowSize = 'rowSpreadLarge';
     break;
   case 'number':
-    this.cardType = 'number';
+    this.cardType = 'components-page-number';
     this.columnSize = 'columnSpreadSmall';
     this.rowSize = 'rowSpreadSmall';
     break;
   case 'explorer':
+    // explorerはwyswyg等から使用されるのでsrc/components配下にソースを置いている。
     this.cardType = 'explorer';
     this.columnSize = 'columnSpreadFull';
     this.rowSize = 'rowSpreadLarge';

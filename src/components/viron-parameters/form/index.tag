@@ -25,7 +25,7 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
     virtual(if="{ uiType === 'autocomplete' }")
       viron-autocomplete(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" config="{ autocompleteConfig }" onChange="{ handleAutocompleteChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'wyswyg' }")
-      viron-wyswyg(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleWyswygChange }")
+      viron-wyswyg(val="{ opts.val }" theme="{ opts.theme }" explorer="{ explorerConfig }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleWyswygChange }")
     virtual(if="{ uiType === 'image' }")
       viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview || isDisabled }")
     virtual(if="{ uiType === 'null' }")

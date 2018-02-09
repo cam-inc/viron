@@ -1,7 +1,7 @@
 import find from 'mout/array/find';
 import ObjectAssign from 'object-assign';
-import '../../../../components/viron-dialog/index.tag';
-import '../../../../components/viron-error/index.tag';
+import '../../components/viron-dialog/index.tag';
+import '../../components/viron-error/index.tag';
 
 export default function() {
   const store = this.riotx.get();
