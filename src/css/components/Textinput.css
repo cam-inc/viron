@@ -47,7 +47,7 @@
 
   &--preview {
     & .Textinput__input {
-      color: var(--color-base-gray-secondary);
+      color: var(--color-base-black-secondary);
       background-color: #f4f4f4;
       border-color: #f4f4f4;
     }

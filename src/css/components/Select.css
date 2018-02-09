@@ -59,7 +59,7 @@
     }
 
     & .Select__select {
-      color: var(--color-base-gray-secondary);
+      color: var(--color-base-black-secondary);
     }
   }
 
