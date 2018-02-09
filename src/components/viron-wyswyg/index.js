@@ -65,7 +65,7 @@ export default function() {
     },
     setup: editor => {
       // explorer機能と連携。
-      if (!!this.opts.explorer || true) {// TODO:
+      if (!!this.opts.explorer) {
         editor.addButton('explorer', {
           icon: 'browse',
           tooltip: 'Explorer',
@@ -80,7 +80,6 @@ export default function() {
 
   this.on('mount', () => {
     TinyMCE.init(ObjectAssign({}, baseConfig, customConfig));
-    console.log(this.editor);
   }).on('before-unmount', () => {
     TinyMCE.remove(`.Wyswyg__editor${this._riot_id}`);
     this.editor.off('Change', this.handleEditorChange);
