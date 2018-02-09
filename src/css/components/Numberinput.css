@@ -50,6 +50,7 @@
       cursor: not-allowed;
       background-color: var(--color-base-gray-tertiary);
       border-color: var(--color-base-gray);
+      color: var(--color-base-gray-secondary);
     }
   }
 
