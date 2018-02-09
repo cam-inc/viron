@@ -3,7 +3,7 @@ const path = require('path');
 
 const uuid = require('uuid');
 
-const {constant, context} = require('../shared');
+const {context} = require('../shared');
 
 const dir = path.join(__dirname, '../public/img/gallery');
 const imgUrl = `https://${context.getConfigHost()}/img/gallery/`;
@@ -20,14 +20,18 @@ const list = (req, res) => {
   const offset = Number(req.query.offset) || 0;
 
   const all = fs.readdirSync(dir).sort();
-  const list = all.slice(offset, limit + offset).map(name => {
+  let filtered = all;
+  if (req.query.id) {
+    filtered = all.filter(id => id.includes(req.query.id));
+  }
+  const list = filtered.slice(offset, limit + offset).map(name => {
     return {
       id: name,
       url: `${imgUrl}${name}`,
     };
   });
 
-  pager.setResHeader(res, limit, offset, all.length);
+  pager.setResHeader(res, limit, offset, filtered.length);
   res.json(list);
 };
 
@@ -38,7 +42,8 @@ const list = (req, res) => {
  */
 const upload = (req, res, next) => {
   const file = req.files.image[0];
-  const filepath = path.join(dir, `${uuid.v4()}${path.extname(file.originalname)}`);
+  const name = `${uuid.v4()}${path.extname(file.originalname)}`;
+  const filepath = path.join(dir, name);
 
   return new Promise((resolve, reject) => {
     fs.writeFile(filepath, file.buffer, err => {
@@ -49,7 +54,10 @@ const upload = (req, res, next) => {
     });
   })
     .then(() => {
-      res.status(204).end();
+      res.json({
+        id: name,
+        url: `${imgUrl}${name}`,
+      });
     })
     .catch(next)
   ;

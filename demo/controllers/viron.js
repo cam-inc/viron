@@ -44,6 +44,17 @@ const genTableComponent = (name, method, path, primary, query, labels, actions) 
   return component;
 };
 
+const genExplorerComponent = (name, method, path, primary, query) => {
+  const component = genComponent(name, method, path, constant.VIRON_STYLE_EXPLORER, null, true);
+  if (primary) {
+    component.primary = primary;
+  }
+  if (query) {
+    component.query = query;
+  }
+  return component;
+};
+
 const genPage = (section, group, id, name, components) => {
   return {
     id,
@@ -140,8 +151,9 @@ const show = (req, res) => {
                 {key: 'title', type: 'string'},
                 {key: 'theme', type: 'string'},
               ], ['id', 'user_blog_id', 'title', 'theme']),
-              genComponent('ギャラリー', 'get', '/gallery', constant.VIRON_STYLE_EXPLORER, null, true),
-              //genTableComponent('ギャラリー', 'get', '/gallery', 'id'),
+              genExplorerComponent('ギャラリー', 'get', '/gallery', 'id', [
+                {key: 'id', type: 'string'}
+              ]),
             ],
           },
           {

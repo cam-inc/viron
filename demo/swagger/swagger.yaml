@@ -698,6 +698,14 @@ definitions:
         description: 内容
         type: string
         format: wyswyg
+        x-explorer-component:
+          api:
+            path: /gallery
+            method: get
+          pagination: true
+          query:
+          - key: id
+            type: string
       theme:
         description: テーマ
         type: string
@@ -3880,6 +3888,11 @@ paths:
         name: offset
         required: false
         type: integer
+      - description: ID検索
+        in: query
+        name: id
+        required: false
+        type: string
       responses:
         "200":
           description: OK
@@ -3909,8 +3922,10 @@ paths:
       consumes:
       - multipart/form-data
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Gallery'
         "400":
           description: Bad Request
           schema:
