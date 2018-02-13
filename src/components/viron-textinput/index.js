@@ -35,6 +35,10 @@ export default function() {
     }
     const newVal = this.normalizeValue(this.opts.val);
     this.opts.onchange(newVal, this.opts.id);
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    this.opts.onsubmit();
   };
 
   // `blur`時にも`change`イベントが発火する。
