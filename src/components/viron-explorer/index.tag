@@ -12,6 +12,8 @@ viron-explorer.Explorer
       // 正常時
       virtual(if="{ !error }")
         .Explorer__content
+          .Explorer__id(if="{ !!selectedItem }") { selectedItem.id }
+          .Explorer__url(if="{ !!selectedItem }") { selectedItem.url }
           .Explorer__upload(if="{ !!postOperation }")
             viron-uploader(accept="image/*" onChange="{ handleUploaderChange }")
             viron-button(label="追加する" isDisabled="{ !file }" onSelect="{ handleAddButtonTap }")

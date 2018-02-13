@@ -1,4 +1,5 @@
 import find from 'mout/array/find';
+import isString from 'mout/lang/isString';
 import ObjectAssign from 'object-assign';
 import '../../components/viron-dialog/index.tag';
 import '../../components/viron-error/index.tag';
@@ -24,7 +25,6 @@ export default function() {
       .resolve()
       .then(() => {
         this.isLoading = true;
-        this.selectedItem = null;
         this.update();
       })
       .then(() => Promise.all([
@@ -34,6 +34,13 @@ export default function() {
       ]))
       .then(() => {
         this.isLoading = false;
+        // 現在表示リストに新規追加項目は含まれていなければ未選択とする。
+        if (!this.selectedItem || !find(this.data, obj => {
+          return obj.id = this.selectedItem.id;
+        })) {
+          this.selectedItem = null;
+        }
+        this.opts.onselect && this.opts.onselect(this.selectedItem);
         this.update();
       })
       .catch(err => {
@@ -155,14 +162,20 @@ export default function() {
     Promise
       .resolve()
       .then(() => store.action('components.operate', this.postOperation, parameters))
+      .then(res => {
+        this.file = null;
+        if (res && res.obj && isString(res.obj.id) && isString(res.obj.url)) {
+          this.selectedItem = res.obj;
+        } else {
+          this.selectedItem = null;
+        }
+      })
       .then(() => {
         return store.action('toasts.add', {
           message: '画像を追加しました。'
         });
       })
       .then(() => {
-        this.file = null;
-        this.selectedItem = null;
         if (!this.hasPagination) {
           getData();
         } else {
@@ -267,6 +280,7 @@ export default function() {
   };
 
   this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
+    this.selectedItem = null;
     const size = this.pagination.size;
     getData({
       limit: size,
