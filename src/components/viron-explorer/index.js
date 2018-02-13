@@ -160,6 +160,7 @@ export default function() {
         });
       })
       .then(() => {
+        this.file = null;
         if (!this.hasPagination) {
           getData();
         } else {
