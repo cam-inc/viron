@@ -24,6 +24,7 @@ export default function() {
       .resolve()
       .then(() => {
         this.isLoading = true;
+        this.selectedItem = null;
         this.update();
       })
       .then(() => Promise.all([
@@ -161,6 +162,7 @@ export default function() {
       })
       .then(() => {
         this.file = null;
+        this.selectedItem = null;
         if (!this.hasPagination) {
           getData();
         } else {
@@ -211,6 +213,7 @@ export default function() {
         });
       })
       .then(() => {
+        this.selectedItem = null;
         if (!this.hasPagination) {
           getData();
         } else {
