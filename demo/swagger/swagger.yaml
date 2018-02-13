@@ -2298,6 +2298,7 @@ paths:
       - jwt:
         - api:access
       summary: ユーザー作成
+      x-submit-label: ユーザーを作成する
       tags:
       - user
 
@@ -2325,6 +2326,7 @@ paths:
       - jwt:
         - api:access
       summary: ユーザー一覧ダウンロード
+      x-submit-label: ユーザー一覧をダウンロードする
       tags:
       - user
 
@@ -2387,6 +2389,7 @@ paths:
       - jwt:
         - api:access
       summary: ユーザー削除
+      x-submit-label: ユーザーを削除する
       tags:
       - user
 
@@ -2458,6 +2461,7 @@ paths:
       - jwt:
         - api:access
       summary: ユーザー更新
+      x-submit-label: ユーザーを更新する
       tags:
       - user
 
