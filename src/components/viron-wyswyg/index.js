@@ -14,6 +14,13 @@ import 'tinymce/plugins/textcolor/plugin';
 import './explorer/index.tag';
 
 const url = new URL(window.location.href);
+const toolbarDesktop = [
+  'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image explorer link unlink',
+  'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
+];
+const toolbarMobile = [
+  'alignleft aligncenter alignright'
+];
 const baseConfig = {
   menu: {
     edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
@@ -21,10 +28,6 @@ const baseConfig = {
     format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
     tools: { title: 'Tools', items: 'code fullscreen' }
   },
-  toolbar: [
-    'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image explorer link unlink',
-    'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
-  ],
   plugins: ['code', 'hr', 'lists', 'link', 'image', 'paste', 'searchreplace', 'fullscreen', 'table', 'textcolor'],
   min_height: 300,
   branding: false,
@@ -35,11 +38,7 @@ const baseConfig = {
   skin_url: 'skins/lightgray',
   theme: 'modern',
   theme_url: 'themes/modern/theme.js',
-  body_class: 'Wyswyg__body',
-  mobile: {
-    theme: 'mobile',
-    theme_url: 'themes/mobile/theme.js'
-  }
+  body_class: 'Wyswyg__body'
 };
 
 export default function() {
@@ -77,7 +76,13 @@ export default function() {
           }
         });
       }
-    }
+    },
+    toolbar: (() => {
+      if (store.getter('layout.isMobile')) {
+        return toolbarMobile;
+      }
+      return toolbarDesktop;
+    })()
   };
 
 
