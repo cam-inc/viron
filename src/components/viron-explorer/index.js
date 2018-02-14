@@ -4,9 +4,6 @@ import ObjectAssign from 'object-assign';
 import '../../components/viron-dialog/index.tag';
 import '../../components/viron-error/index.tag';
 
-
-aaaaaaaaaaaaaaaaaaaaaaaaaa
-
 export default function() {
   const store = this.riotx.get();
 
