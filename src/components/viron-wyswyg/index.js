@@ -19,7 +19,10 @@ const toolbarDesktop = [
   'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
 ];
 const toolbarMobile = [
-  'alignleft aligncenter alignright'
+  'bold italic underline forecolor backcolor',
+  'image explorer link unlink',
+  'alignleft aligncenter alignright alignjustify alignnone',
+  'bullist numlist | outdent indent blockquote'
 ];
 const baseConfig = {
   menu: {
