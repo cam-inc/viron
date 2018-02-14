@@ -38,7 +38,7 @@ export default function() {
     if (!this.opts.onsubmit) {
       return;
     }
-    this.opts.onsubmit();
+    this.opts.onsubmit(newVal, this.opts.id);
   };
 
   // `blur`時にも`change`イベントが発火する。
