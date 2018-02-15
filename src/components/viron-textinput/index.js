@@ -30,15 +30,15 @@ export default function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
-    if (!this.opts.onchange) {
-      return;
-    }
+    e.stopPropagation();
     const newVal = this.normalizeValue(this.opts.val);
-    this.opts.onchange(newVal, this.opts.id);
-    if (!this.opts.onsubmit) {
-      return;
+    const id = this.opts.id;
+    if (this.opts.onchange) {
+      this.opts.onchange(newVal, id);
     }
-    this.opts.onsubmit(newVal, this.opts.id);
+    if (this.opts.onsubmit) {
+      this.opts.onsubmit(newVal, id);
+    }
   };
 
   // `blur`時にも`change`イベントが発火する。
