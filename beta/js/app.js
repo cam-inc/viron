@@ -94631,7 +94631,7 @@ var script$23 = function() {
     store.action('modals.add', 'viron-wyswyg-explorer', {
       def: explorerDef,
       onInsert: item => {
-        this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" />`);
+        this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" width="100" />`);
       }
     });
   };
