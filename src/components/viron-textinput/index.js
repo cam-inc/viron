@@ -30,13 +30,14 @@ export default function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
-    e.stopPropagation();
     const newVal = this.normalizeValue(this.opts.val);
     const id = this.opts.id;
     if (this.opts.onchange) {
       this.opts.onchange(newVal, id);
     }
     if (this.opts.onsubmit) {
+      // Stop evnet propagation becasuse "onSubmit" is maybe reserved word for component usage side.
+      e.stopPropagation();
       this.opts.onsubmit(newVal, id);
     }
   };
