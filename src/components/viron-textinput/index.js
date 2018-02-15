@@ -30,11 +30,16 @@ export default function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
-    if (!this.opts.onchange) {
-      return;
-    }
     const newVal = this.normalizeValue(this.opts.val);
-    this.opts.onchange(newVal, this.opts.id);
+    const id = this.opts.id;
+    if (this.opts.onchange) {
+      this.opts.onchange(newVal, id);
+    }
+    if (this.opts.onsubmit) {
+      // Stop evnet propagation becasuse "onSubmit" is maybe reserved word for component usage side.
+      e.stopPropagation();
+      this.opts.onsubmit(newVal, id);
+    }
   };
 
   // `blur`時にも`change`イベントが発火する。

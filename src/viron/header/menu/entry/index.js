@@ -35,9 +35,17 @@ export default function() {
     window.open(this.endpointURL, '_blank');
   };
 
+  this.handleFormSubmit = newEndpointURL => {
+    this.registerEndpoint(newEndpointURL);
+  };
+
   this.handleAddButtonSelect = () => {
+    this.registerEndpoint();
+  };
+
+  this.registerEndpoint = newEndpointURL => {
     // エラーチェック。
-    const errorMessage = validate(this.endpointURL);
+    const errorMessage = validate(newEndpointURL || this.endpointURL);
     if (!!errorMessage) {
       this.errorMessage = errorMessage;
       this.isLikelyToBeSelfSignedCertificate = false;
