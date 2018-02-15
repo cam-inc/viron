@@ -37,7 +37,7 @@ Detailed changes for each release are documented in the [release notes](https://
     <tr>
       <td align="center">
         <a href="https://github.com/fkei">
-          <img width="100" height="100" src="https://avatars1.githubusercontent.com/u/381941?s=460&v=4">
+          <img width="100" height="100" src="https://avatars1.githubusercontent.com/u/381941?s=400&v=4">
           </br>
           Kei Funagayama
           </br>
@@ -46,7 +46,7 @@ Detailed changes for each release are documented in the [release notes](https://
       </td>
       <td align="center">
         <a href="https://github.com/cathcheeno">
-          <img width="100" height="100" src="https://avatars0.githubusercontent.com/u/10769038?s=460&v=4">
+          <img width="100" height="100" src="https://avatars0.githubusercontent.com/u/10769038?s=400&v=4">
           </br>
           Go Ohtani
           </br>
@@ -55,7 +55,7 @@ Detailed changes for each release are documented in the [release notes](https://
       </td>
       <td align="center">
         <a href="https://github.com/noritama">
-          <img width="100" height="100" src="https://avatars2.githubusercontent.com/u/2404059?s=460&v=4">
+          <img width="100" height="100" src="https://avatars2.githubusercontent.com/u/2404059?s=400&v=4">
           </br>
           Okada Noritaka
           </br>
@@ -64,11 +64,56 @@ Detailed changes for each release are documented in the [release notes](https://
       </td>
       <td align="center">
         <a href="https://github.com/babarl">
-          <img width="100" height="100" src="https://avatars1.githubusercontent.com/u/35751869?s=460&v=4">
+          <img width="100" height="100" src="https://avatars1.githubusercontent.com/u/35751869?s=400&v=4">
           </br>
           Emi Baba
           </br>
           🎨
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/MuuKojima/">
+          <img width="100" height="100" src="https://avatars2.githubusercontent.com/u/3895795?s=400&v=4">
+          </br>
+          Muu Kojima
+          </br>
+          💻
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/tosaka07">
+          <img width="100" height="100" src="https://avatars2.githubusercontent.com/u/12236042?s=400&v=4">
+          </br>
+          sakaue
+          </br>
+          💻
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/Jung0">
+          <img width="100" height="100" src="https://avatars0.githubusercontent.com/u/11499282?s=400&v=4">
+          </br>
+          Jungo Takagi
+          </br>
+          💻
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/goOmura">
+          <img width="100" height="100" src="https://avatars3.githubusercontent.com/u/26868535?s=400&v=4">
+          </br>
+          Silent05
+          </br>
+          💻
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/TakahisaKodama">
+          <img width="100" height="100" src="https://avatars1.githubusercontent.com/u/26865061?s=400&v=4">
+          </br>
+          Takahisa Kodama
+          </br>
+          💻
         </a>
       </td>
     </tr>
