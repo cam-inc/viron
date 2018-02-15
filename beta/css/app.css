@@ -4946,6 +4946,10 @@ select {
 .Parameters .Parameters_Parameter--spreadFull {
     grid-column: 1 / -1;
   }
+.Parameters--narrow .Parameters_Parameter--spreadFull {
+    -ms-grid-column-span: 2;
+        grid-column-end: span 2;
+  }
 .Parameters_Error {
   padding: 18px;
   font-size: 1.2rem;
