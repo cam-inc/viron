@@ -245,12 +245,12 @@ export default {
       case 'base64':
         return 'spreadSmall';
       case 'multiline':
-      case 'wyswyg':
       case 'pug':
       case 'html':
         return 'spreadFull';
       case 'date-time':
         return 'spreadMedium';
+      case 'wyswyg':
       default:
         return 'spreadLarge';
       }
