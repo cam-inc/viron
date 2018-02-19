@@ -30,15 +30,20 @@ export default function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
+    // Stop evnet propagation becasuse some methods are maybe reserved word for component usage side.
+    e.stopPropagation();
     const newVal = this.normalizeValue(this.opts.val);
     const id = this.opts.id;
     if (this.opts.onchange) {
       this.opts.onchange(newVal, id);
     }
     if (this.opts.onsubmit) {
-      // Stop evnet propagation becasuse "onSubmit" is maybe reserved word for component usage side.
-      e.stopPropagation();
       this.opts.onsubmit(newVal, id);
+    }
+    const input = this.refs.input;
+    if (this.refs.input) {
+      // Unforcus on input.
+      input.blur();
     }
   };
 

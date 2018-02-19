@@ -183,6 +183,24 @@ export default function() {
   };
 
   /**
+   * Textinput: input value when it's submitted.
+   * @param {String|null} newValue
+   */
+  this.handleTextInputSubmit = newValue => {
+    // force to convert string or undefined.
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    this.opts.onsubmit(this.opts.identifier, ret);
+  };
+
+  /**
    * Textinput: 入力値が変更された時の処理。
    * @param {String|null} newValue
    */
