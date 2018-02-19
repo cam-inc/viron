@@ -120,6 +120,17 @@ export default function() {
   });
 
   /**
+   * Fire the submit event.
+   * @param {*} value
+   */
+  const submit = value => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    this.opts.onsubmit(this.opts.identifier, value);
+  };
+
+  /**
    * changeイベントを発火します。
    * @param {*} value
    */
@@ -197,7 +208,7 @@ export default function() {
     if (!this.opts.onsubmit) {
       return;
     }
-    this.opts.onsubmit(this.opts.identifier, ret);
+    submit(ret);
   };
 
   /**
@@ -322,6 +333,33 @@ export default function() {
       ret = newValue;
     }
     change(ret);
+  };
+
+  /**
+   * Autocomplete: When input value is submitted.
+   * @param {String} newText
+   */
+  this.handleAutocompleteSubmit = newText => {
+    switch (formObject.type) {
+    case 'string':
+      if (!newText) {
+        newText = undefined;
+      }
+      break;
+    case 'number':
+    case 'integer':
+      if (!newText) {
+        newText = undefined;
+      } else {
+        // Force to convert number or undefined.
+        newText = Number(newText);
+        if (!isNumber(newText)) {
+          newText = undefined;
+        }
+      }
+      break;
+    }
+    submit(newText);
   };
 
   /**
