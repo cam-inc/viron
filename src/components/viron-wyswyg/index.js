@@ -75,7 +75,12 @@ export default function() {
           icon: 'browse',
           tooltip: 'Explorer',
           onclick: () => {
-            openExplorer();
+            editor.iframeElement.blur();
+            // blur完了を保証するため。
+            setTimeout(() => {
+              openExplorer();
+            }, 500);
+
           }
         });
       }
