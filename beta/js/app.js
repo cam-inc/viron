@@ -52912,11 +52912,16 @@ var script$22 = function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
-    if (!this.opts.onchange) {
-      return;
-    }
     const newVal = this.normalizeValue(this.opts.val);
-    this.opts.onchange(newVal, this.opts.id);
+    const id = this.opts.id;
+    if (this.opts.onchange) {
+      this.opts.onchange(newVal, id);
+    }
+    if (this.opts.onsubmit) {
+      // Stop evnet propagation becasuse "onSubmit" is maybe reserved word for component usage side.
+      e.stopPropagation();
+      this.opts.onsubmit(newVal, id);
+    }
   };
 
   // `blur`時にも`change`イベントが発火する。
@@ -94652,6 +94657,8 @@ var script$23 = function() {
           icon: 'browse',
           tooltip: 'Explorer',
           onclick: () => {
+            console.log('sss', editor);
+            editor.fire('blur');
             openExplorer();
           }
         });
@@ -102469,9 +102476,17 @@ var script$40 = function() {
     window.open(this.endpointURL, '_blank');
   };
 
+  this.handleFormSubmit = newEndpointURL => {
+    this.registerEndpoint(newEndpointURL);
+  };
+
   this.handleAddButtonSelect = () => {
+    this.registerEndpoint();
+  };
+
+  this.registerEndpoint = newEndpointURL => {
     // エラーチェック。
-    const errorMessage = validate(this.endpointURL);
+    const errorMessage = validate(newEndpointURL || this.endpointURL);
     if (!!errorMessage) {
       this.errorMessage = errorMessage;
       this.isLikelyToBeSelfSignedCertificate = false;
@@ -102508,7 +102523,7 @@ var script$40 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header-menu-entry', '<div class="Application_Header_Menu_Entry__title">管理画面を追加</div> <div class="Application_Header_Menu_Entry__message" if="{!!errorMessage}">{errorMessage}</div> <div class="Application_Header_Menu_Entry__selfSignedCertificate" if="{!!isLikelyToBeSelfSignedCertificate}" onclick="{getClickHandler(\'handleSelfSignedCertificateButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSelfSignedCertificateButtonTap\')}">Self-Signed Certificate?</div> <div class="Application_Header_Menu_Entry__inputs"> <viron-textinput placeholder="URLの入力" val="{endpointURL}" onchange="{handleEndpointURLChange}"></viron-textinput> </div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="追加" onselect="{handleAddButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
+riot$1.tag2('viron-application-header-menu-entry', '<div class="Application_Header_Menu_Entry__title">管理画面を追加</div> <div class="Application_Header_Menu_Entry__message" if="{!!errorMessage}">{errorMessage}</div> <div class="Application_Header_Menu_Entry__selfSignedCertificate" if="{!!isLikelyToBeSelfSignedCertificate}" onclick="{getClickHandler(\'handleSelfSignedCertificateButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSelfSignedCertificateButtonTap\')}">Self-Signed Certificate?</div> <div class="Application_Header_Menu_Entry__inputs"> <viron-textinput placeholder="URLの入力" val="{endpointURL}" onsubmit="{handleFormSubmit}" onchange="{handleEndpointURLChange}"></viron-textinput> </div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="追加" onselect="{handleAddButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
     this.external(script$40);
 });
 
