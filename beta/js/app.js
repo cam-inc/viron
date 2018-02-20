@@ -94597,7 +94597,8 @@ riot$1.tag2('viron-wyswyg-explorer', '<div class="Wyswyg_Explorer__container"> <
 
 const url = new URL(window.location.href);
 const toolbarDesktop = [
-  'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image explorer link unlink',
+  'bold italic underline | forecolor backcolor | image explorer link unlink',
+  'formatselect fontselect fontsizeselect',
   'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
 ];
 const toolbarMobile = [
@@ -94606,13 +94607,14 @@ const toolbarMobile = [
   'alignleft aligncenter alignright alignjustify alignnone',
   'bullist numlist | outdent indent blockquote'
 ];
+const menuDesktop = {
+  edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+  insert: { title: 'Insert', items: 'image link | inserttable hr' },
+  format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
+  tools: { title: 'Tools', items: 'code fullscreen' }
+};
+const menuMobile = {};
 const baseConfig = {
-  menu: {
-    edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
-    insert: { title: 'Insert', items: 'image link | inserttable hr' },
-    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
-    tools: { title: 'Tools', items: 'code fullscreen' }
-  },
   plugins: ['code', 'hr', 'lists', 'link', 'image', 'paste', 'searchreplace', 'fullscreen', 'table', 'textcolor'],
   min_height: 300,
   branding: false,
@@ -94628,6 +94630,7 @@ const baseConfig = {
 
 var script$23 = function() {
   const store = this.riotx.get();
+  const isMobile = store.getter('layout.isMobile');
 
   this.editor = null;
 
@@ -94641,6 +94644,25 @@ var script$23 = function() {
     });
   };
 
+  const setDialogHook = editor => {
+    if (!isMobile) {
+      return;
+    }
+    const openFunc = editor.windowManager.open;
+    const myOpenFunc = (...args) => {
+      editor.iframeElement.blur();
+      args[0] = args[0] || {};
+      args[0].onClose = () => {
+        editor.iframeElement.blur();
+      };
+      // blur完了を保証するため。
+      setTimeout(() => {
+        openFunc.apply(null, args);
+      }, 500);
+    };
+    editor.windowManager.open = myOpenFunc;
+  };
+
   const customConfig = {
     selector: `.Wyswyg__editor${this._riot_id}`,
     init_instance_callback: editor => {
@@ -94649,6 +94671,7 @@ var script$23 = function() {
       this.editor.on('Change', this.handleEditorChange);
       this.editor.on('focus', this.handleEditorFocus);
       this.editor.on('blur', this.handleEditorBlur);
+      setDialogHook(this.editor);
     },
     setup: editor => {
       // explorer機能と連携。
@@ -94667,8 +94690,14 @@ var script$23 = function() {
         });
       }
     },
+    menu: (() => {
+      if (isMobile) {
+        return menuMobile;
+      }
+      return menuDesktop;
+    })(),
     toolbar: (() => {
-      if (store.getter('layout.isMobile')) {
+      if (isMobile) {
         return toolbarMobile;
       }
       return toolbarDesktop;
