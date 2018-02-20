@@ -15,7 +15,8 @@ import './explorer/index.tag';
 
 const url = new URL(window.location.href);
 const toolbarDesktop = [
-  'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image explorer link unlink',
+  'bold italic underline | forecolor backcolor | image explorer link unlink',
+  'formatselect fontselect fontsizeselect',
   'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
 ];
 const toolbarMobile = [
@@ -24,13 +25,14 @@ const toolbarMobile = [
   'alignleft aligncenter alignright alignjustify alignnone',
   'bullist numlist | outdent indent blockquote'
 ];
+const menuDesktop = {
+  edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+  insert: { title: 'Insert', items: 'image link | inserttable hr' },
+  format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
+  tools: { title: 'Tools', items: 'code fullscreen' }
+};
+const menuMobile = {};
 const baseConfig = {
-  menu: {
-    edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
-    insert: { title: 'Insert', items: 'image link | inserttable hr' },
-    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
-    tools: { title: 'Tools', items: 'code fullscreen' }
-  },
   plugins: ['code', 'hr', 'lists', 'link', 'image', 'paste', 'searchreplace', 'fullscreen', 'table', 'textcolor'],
   min_height: 300,
   branding: false,
@@ -85,6 +87,12 @@ export default function() {
         });
       }
     },
+    menu: (() => {
+      if (store.getter('layout.isMobile')) {
+        return menuMobile;
+      }
+      return menuDesktop;
+    })(),
     toolbar: (() => {
       if (store.getter('layout.isMobile')) {
         return toolbarMobile;
