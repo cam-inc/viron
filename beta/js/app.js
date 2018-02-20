@@ -94657,9 +94657,12 @@ var script$23 = function() {
           icon: 'browse',
           tooltip: 'Explorer',
           onclick: () => {
-            console.log('sss', editor);
-            editor.fire('blur');
-            openExplorer();
+            editor.iframeElement.blur();
+            // blur完了を保証するため。
+            setTimeout(() => {
+              openExplorer();
+            }, 500);
+
           }
         });
       }
