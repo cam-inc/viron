@@ -9,7 +9,7 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
     virtual(if="{ uiType === 'textarea' }")
       viron-textarea(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextareaChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'numberinput' }")
-      viron-numberinput(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleNumberinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      viron-numberinput(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onSubmit="{ handleNumberInputSubmit }" onChange="{ handleNumberinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'checkbox' }")
       viron-checkbox(isChecked="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" label="{ title }" onChange="{ handleCheckboxChange }")
     virtual(if="{ uiType === 'select' }")

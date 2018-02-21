@@ -272,6 +272,21 @@ export default function() {
   };
 
   /**
+   * Numberinput: When input value is submitted.
+   * @param {Number|null} newValue
+   */
+  this.handleNumberInputSubmit = newValue => {
+    // Force to convert Number or undefined
+    let ret;
+    if (!isNumber(newValue)) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    submit(ret);
+  };
+
+  /**
    * Numberinput: 入力値が変更された時の処理。
    * @param {Number|null} newValue
    */
