@@ -4,7 +4,7 @@ viron-parameters-parameter.Parameters_Parameter(class="{ 'Parameters_Parameter--
   virtual(if="{ isPropertiesMode }")
     viron-parameters-properties(label="{ propertiesLabel }" identifier="{ parameterObject.name }" val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" required="{ parameterObject.required }" propertiesObject="{ propertiesObject }" onSubmit="{ handleValSubmit }" onChange="{ handleValChange }" onValidate="{ handleValValidate }")
   virtual(if="{ isItemsMode }")
-    viron-parameters-items(label="{ itemsLabel }" identifier="{ parameterObject.name }" val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" required="{ parameterObject.required }" schemaObject="{ schemaObject }" onChange="{ handleValChange }" onValidate="{ handleValValidate }")
+    viron-parameters-items(label="{ itemsLabel }" identifier="{ parameterObject.name }" val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" required="{ parameterObject.required }" schemaObject="{ schemaObject }" onSubmit="{ handleValSubmit }" onChange="{ handleValChange }" onValidate="{ handleValValidate }")
 
   script.
     import '../form/index.tag';

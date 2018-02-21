@@ -15,11 +15,11 @@ viron-parameters-items.Parameters_Items(class="{ 'Parameters_Items--preview': op
           .Parameters_Items__removeButton(if="{ !parent.opts.ispreview }" onTap="{ handleRemoveButtonTap }") この項目を削除
         .Parameters_Items__itemBody
           virtual(if="{ parent.isFormMode }")
-            viron-parameters-form(no-reorder identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" formObject="{ parent.formObject }"  onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
+            viron-parameters-form(no-reorder identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" formObject="{ parent.formObject }" onSubmit="{ parent.handleItemSubmit }"  onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
           virtual(if="{ parent.isPropertiesMode }")
-            viron-parameters-properties(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" propertiesObject="{ parent.propertiesObject }" onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
+            viron-parameters-properties(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" propertiesObject="{ parent.propertiesObject }" onSubmit="{ parent.handleItemSubmit }"  onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
           virtual(if="{ parent.isItemsMode }")
-            viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" schemaObject="{ parent.schemaObject.items }" onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
+            viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" schemaObject="{ parent.schemaObject.items }" onSubmit="{ parent.handleItemSubmit }" onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
       .Parameters_Items__itemBrief(onTap="{ handleItemBriefTap }")
         .Parameters_Items__itemBriefTitle { parent.getBriefItemTitle(val, idx) }
         .Parameters_Items__itemBriefDescription(if="{ parent.isPropertiesMode }") { parent.getBriefItemDescription(val) }

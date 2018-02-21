@@ -235,6 +235,19 @@ export default function() {
     this.update();
   };
 
+  /**
+   * When each item is submitted.
+   * @param {Number} idx
+   * @param {*} newVal
+   */
+  this.handleItemSubmit = (idx, newVal) => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    const ret = this.opts.val;
+    ret[idx] = newVal;
+    this.opts.onsubmit(this.opts.identifier, ret);
+  };
 
   /**
    * 各itemが変更された時の処理。
