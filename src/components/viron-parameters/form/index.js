@@ -205,9 +205,6 @@ export default function() {
     } else {
       ret = newValue;
     }
-    if (!this.opts.onsubmit) {
-      return;
-    }
     submit(ret);
   };
 
