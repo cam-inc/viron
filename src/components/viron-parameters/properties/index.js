@@ -132,6 +132,29 @@ export default function() {
   };
 
   /**
+   * When each property is submitted.
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handlePropertySubmit = (key, newVal) => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    let ret = this.opts.val || {};
+    ret[key] = newVal;
+    // Delete the key if it's undefined.
+    forOwn(ret, (val, key) => {
+      if (isUndefined(val)) {
+        delete ret[key];
+      }
+    });
+    if (!size(ret)) {
+      ret = undefined;
+    }
+    this.opts.onsubmit(this.opts.identifier, ret);
+  };
+
+  /**
    * 各propertyが変更された時の処理。
    * @param {String} key
    * @param {*} newVal

@@ -71,6 +71,19 @@ export default function() {
   }
 
   /**
+   * Parameter when submit
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handleValSubmit = (key, newVal) => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    // Key is the same as opts.parameterObject.name.
+    this.opts.onsubmit(key, newVal);
+  };
+
+  /**
    * Parameterが変更された時の処理。
    * @param {String} key
    * @param {*} newVal
