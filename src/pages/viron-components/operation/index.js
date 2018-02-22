@@ -71,7 +71,7 @@ export default function() {
       });
   };
 
-  const registerUser = () => {
+  const confirmSubmit = () => {
     if (!this.isValid) {
       return;
     }
@@ -124,10 +124,10 @@ export default function() {
   };
 
   this.handleFormSubmit = () => {
-    registerUser();
+    confirmSubmit();
   };
 
   this.handleSubmitTap = () => {
-    registerUser();
+    confirmSubmit();
   };
 }
