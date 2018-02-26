@@ -16,13 +16,14 @@ viron-explorer.Explorer
       virtual(if="{ !error }")
         .Explorer__content
           .Explorer__label ライブラリ
-          .Explorer__droparea(if="{ !!postOperation }")
+          form.Explorer__droparea(if="{ !!postOperation }" ref="form")
+            input.Explorer__input(type="file" id="{ inputId }" accept="image/*" onChange="{ handleFileChange }")
             .Explorer__dropareaLabel ここにファイルをドロップして追加できます
-            .Explorer__dropareaButton ファイルを選択
+            label.Explorer__dropareaButton(for="{ inputId }") ファイルを選択
           .Explorer__id(if="{ !!selectedItem }") { selectedItem.id }
           .Explorer__url(if="{ !!selectedItem }") { selectedItem.url }
           .Explorer__list(if="{ !!data && !!data.length }" ref="list")
-            .Explorer__item(each="{ item, idx in data }" ref="item_{ idx }" style="background-image:url({ item.url })")
+            .Explorer__item(each="{ item, idx in data }" ref="item_{ idx }" style="background-image:url({ item.url })" onTap="{ handleItemTap }")
   .Explorer__tail(if="{ hasPagination }")
     viron-pagination(max="{ pagination.max }" size="{ paginationSize }" current="{ pagination.current }" onChange="{ handlePaginationChange }")
   .Explorer__blocker(if="{ isLoading }")

@@ -60,13 +60,6 @@ export default function() {
       ]))
       .then(() => {
         this.isLoading = false;
-        // 現在表示リストに新規追加項目は含まれていなければ未選択とする。
-        if (!this.selectedItem || !find(this.data, obj => {
-          return obj.id = this.selectedItem.id;
-        })) {
-          this.selectedItem = null;
-        }
-        this.opts.onselect && this.opts.onselect(this.selectedItem);
         this.update();
       })
       .then(() => {
@@ -96,6 +89,7 @@ export default function() {
     return null;
   };
 
+  this.inputId = `Explorer__input${this._riot_id}`;
   // 通信レスポンス内容。
   this.data = null;
   // item追加operation。
@@ -112,10 +106,6 @@ export default function() {
   this.pagination = null;
   // ページネーションコンポーネントのボタン数。
   this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
-  // 選択されているitem。
-  this.selectedItem = null;
-  // 追加itemのFileオブジェクト。
-  this.file = null;
   // 自動更新間隔。
   this.autoRefreshSec = null;
   let autoRefreshIntervalId = null;
@@ -175,17 +165,28 @@ export default function() {
   });
 
   /**
-   * @param {File} newFile
+   * fileが変更された時の処理。
+   * DnD経由でも実行されます。
+   * @param {Object} e
+   * @param {Boolean} fromDnD Dnd経由か否か。
    */
-  this.handleUploaderChange = newFile => {
-    this.file = newFile;
-    this.update();
-  };
-
-  const postImage = () => {
-    if (!this.file) {
+  this.handleFileChange = (e, fromDnD) => {
+    let files;
+    if (fromDnD) {
+      files = e.dataTransfer.files;
+    } else {
+      files = e.target.files;
+    }
+    if (!files.length) {
+      this.refs.form.reset();
       return;
     }
+
+    const file = files[0];
+    postImage(file);
+  };
+
+  const postImage = file => {
     const parameterObject = find(this.postOperation.parameters, parameter => {
       return parameter.type === 'file';
     });
@@ -194,17 +195,12 @@ export default function() {
     }
     const key = parameterObject.name;
     const parameters = {};
-    parameters[key] = this.file;
+    parameters[key] = file;
     Promise
       .resolve()
       .then(() => store.action('components.operate', this.postOperation, parameters))
       .then(res => {
-        this.file = null;
-        if (res && res.obj && isString(res.obj.id) && isString(res.obj.url)) {
-          this.selectedItem = res.obj;
-        } else {
-          this.selectedItem = null;
-        }
+        this.refs.form.reset();
       })
       .then(() => {
         return store.action('toasts.add', {
@@ -288,22 +284,12 @@ export default function() {
       });
   };
 
-  this.handleAddButtonTap = () => {
-    Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
-      title: '画像を追加する',
-      message: '本当に実行しますか？',
-      onPositiveSelect: () => {
-        postImage();
-      }
-    }));
-  };
-
-  this.handleItemImageTap = e => {
-    this.selectedItem = e.item.item;
-    this.opts.onselect && this.opts.onselect(this.selectedItem);
+  this.handleItemTap = e => {
+    console.log(e.item.item);
     this.update();
   };
 
+  // TODO
   this.handleItemDeleteTap = e => {
     const id = e.item.item.id;
     Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {

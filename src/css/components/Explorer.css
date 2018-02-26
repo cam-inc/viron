@@ -71,6 +71,10 @@
     border-radius: 6px;
   }
 
+  &__input {
+    display: none;
+  }
+
   &__dropareaLabel {
     margin-bottom: 24px;
     font-size: 1.6rem;
