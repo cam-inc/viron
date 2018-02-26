@@ -115,6 +115,15 @@
   }
 
   /* 縦方向*/
+  /* 天地左右中央 */
+  --layout-column-center-center: {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 縦方向*/
   /* 天地中央 & 左右いっぱいまで広がる */
   --layout-column-center-stretch: {
     display: flex;

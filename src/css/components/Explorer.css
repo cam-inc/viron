@@ -1,13 +1,15 @@
+:root {
+  --component-explorer-column-min-count: 1;
+  --component-explorer-row-height: 100px;
+}
+
 .Explorer {
-  @apply --layout-column-center-stretch;
   position: relative;
-  height: 100%;
-  padding: 24px;
+  display: block;
 
   &__head {
     @apply --layout-center-center;
-    flex-shrink: 0;
-    margin-bottom: 4px;
+    padding: 24px;
   }
 
   &__title {
@@ -16,9 +18,30 @@
     font-size: 1.6rem;
   }
 
+  &__control {
+    @apply --layout-center-start;
+
+    & .Icon {
+      @mixin hover {
+        color: var(--color-base-blue);
+      }
+      width: 16px;
+      height: 16px;
+      margin-right: 24px;
+      cursor: pointer;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
   &__body {
+  }
+
+  &__progressWrapper {
     @apply --layout-center-center;
-    flex-grow: 1;
+    height: 48px;
   }
 
   &__progress {
@@ -31,47 +54,55 @@
     }
   }
 
+  &__label {
+    padding: 0 24px 4px;
+    margin-bottom: 24px;
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--color-base-gray-tertiary);
+  }
+
+  &__droparea {
+    @apply --layout-column-center-center;
+    height: 192px;
+    padding: 12px;
+    margin: 0 24px 24px;
+    background-color: var(--color-base-gray-tertiary);
+    border: 2px dashed var(--color-base-gray-secondary);
+    border-radius: 6px;
+  }
+
+  &__dropareaLabel {
+    margin-bottom: 24px;
+    font-size: 1.6rem;
+    color: var(--color-base-gray-secondary);
+  }
+
+  &__dropareaButton {
+    @mixin hover {
+      opacity: 0.5;
+    }
+    color: var(--color-base-blue);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
   &__list {
-    @apply --layout-center-center;
+    display: grid;
+    margin-bottom: 24px;
+    grid-gap: 2px;
+    grid-template-columns: repeat(var(--component-explorer-column-min-count), minmax(100px, auto)) repeat(auto-fit, minmax(100px, auto));
+    grid-auto-rows: var(--component-explorer-row-height);
   }
 
   &__item {
-    position: relative;
-    width: 50px;
-    height: 50px;
-  }
-
-  &__itemImage {
     @mixin hover {
       opacity: 0.5;
     }
-    position: relative;
-    width: 100%;
-    height: 100%;
     cursor: pointer;
-    background-color: var(--color-base-black);
+    background-color: red;
     background-repeat: no-repeat;
     background-position: center center;
-    background-size: contain;
-    border-radius: 4px;
-
-    &--selected {
-      border: 2px solid var(--color-base-blue);
-    }
-  }
-
-  &__itemDelete {
-    @mixin hover {
-      opacity: 0.5;
-    }
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    background-color: var(--color-base-red);
-    border-radius: 50%;
+    background-size: cover;
   }
 
   &__error {
@@ -80,7 +111,7 @@
 
   &__tail {
     flex-shrink: 0;
-    padding: 24px;
+    margin: 24px;
   }
 
   &__blocker {

@@ -1,10 +1,13 @@
 viron-explorer.Explorer
   .Explorer__head
     .Explorer__title { opts.def.name }
+    .Explorer__control
+      viron-icon-search.Explorer__searchIcon
   .Explorer__body
     virtual(if="{ isLoading }")
-      .Explorer__progress
-        viron-icon-reload
+      .Explorer__progressWrapper
+        .Explorer__progress
+          viron-icon-reload
     virtual(if="{ !isLoading }")
       // エラー時
       virtual(if="{ !!error }")
@@ -12,23 +15,22 @@ viron-explorer.Explorer
       // 正常時
       virtual(if="{ !error }")
         .Explorer__content
+          .Explorer__label ライブラリ
+          .Explorer__droparea(if="{ !!postOperation }")
+            .Explorer__dropareaLabel ここにファイルをドロップして追加できます
+            .Explorer__dropareaButton ファイルを選択
           .Explorer__id(if="{ !!selectedItem }") { selectedItem.id }
           .Explorer__url(if="{ !!selectedItem }") { selectedItem.url }
-          .Explorer__upload(if="{ !!postOperation }")
-            viron-uploader(accept="image/*" onChange="{ handleUploaderChange }")
-            viron-button(label="追加する" isDisabled="{ !file }" onSelect="{ handleAddButtonTap }")
-          .Explorer__list
-            .Explorer__item(each="{ item in data }")
-              .Explorer__itemImage(class="{ 'Explorer__itemImage--selected': (selectedItem && selectedItem.id === item.id ) }" style="background-image:url({ item.url })" onTap="{ handleItemImageTap }")
-              .Explorer__itemDelete(if="{ deleteOperation }" onTap="{ handleItemDeleteTap }")
+          .Explorer__list(if="{ !!data && !!data.length }" ref="list")
+            .Explorer__item(each="{ item, idx in data }" ref="item_{ idx }" style="background-image:url({ item.url })")
   .Explorer__tail(if="{ hasPagination }")
     viron-pagination(max="{ pagination.max }" size="{ paginationSize }" current="{ pagination.current }" onChange="{ handlePaginationChange }")
   .Explorer__blocker(if="{ isLoading }")
 
   script.
     import '../../components/icons/viron-icon-reload/index.tag';
+    import '../../components/icons/viron-icon-search/index.tag';
     import '../../components/viron-button/index.tag';
     import '../../components/viron-pagination/index.tag';
-    import '../../components/viron-uploader/index.tag';
     import script from './index';
     this.external(script);

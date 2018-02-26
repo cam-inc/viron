@@ -1,4 +1,5 @@
 import find from 'mout/array/find';
+import throttle from 'mout/function/throttle';
 import isString from 'mout/lang/isString';
 import ObjectAssign from 'object-assign';
 import '../../components/viron-dialog/index.tag';
@@ -6,6 +7,31 @@ import '../../components/viron-error/index.tag';
 
 export default function() {
   const store = this.riotx.get();
+
+  /**
+   * GridLayoutを調整します。
+   */
+  const _adjustGridLayout = () => {
+    // row高さ調整。
+    const itemElm = this.refs.item_0;
+    if (!!itemElm) {
+      const rect = itemElm.getBoundingClientRect();
+      document.documentElement.style.setProperty('--component-explorer-row-height', `${rect.width}px`);
+    }
+
+    // column数調整。
+    const listElm = this.refs.list;
+    if (!!listElm) {
+      const rect = listElm.getBoundingClientRect();
+      const columnMinCount = (Math.floor(rect.width / 100) - 1) || 1;
+      document.documentElement.style.setProperty('--component-explorer-column-min-count', columnMinCount);
+    }
+  };
+  const adjustGridLayout = () => {
+    setTimeout(() => {
+      _adjustGridLayout();
+    }, 500);
+  };
 
   /**
    * OASに従いGETリクエストを送信します。
@@ -42,6 +68,9 @@ export default function() {
         }
         this.opts.onselect && this.opts.onselect(this.selectedItem);
         this.update();
+      })
+      .then(() => {
+        adjustGridLayout();
       })
       .catch(err => {
         this.isLoading = false;
@@ -131,11 +160,18 @@ export default function() {
     }
   });
 
+  // resize時にvironアプリケーションの表示サイズを更新します。
+  // resizeイベントハンドラーの発火回数を減らす。
+  const handleResize = throttle(() => {
+    adjustGridLayout();
+  }, 1000);
   this.on('mount', () => {
     getData();
+    window.addEventListener('resize', handleResize);
   }).on('unmount', () => {
     inactivateAutoRefresh();
     store.action('components.remove', this.opts.id);
+    window.addEventListener('resize', handleResize);
   });
 
   /**
