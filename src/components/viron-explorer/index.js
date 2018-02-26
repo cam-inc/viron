@@ -1,6 +1,5 @@
 import find from 'mout/array/find';
 import throttle from 'mout/function/throttle';
-import isString from 'mout/lang/isString';
 import ObjectAssign from 'object-assign';
 import '../../components/viron-dialog/index.tag';
 import '../../components/viron-error/index.tag';
@@ -203,7 +202,7 @@ export default function() {
     Promise
       .resolve()
       .then(() => store.action('components.operate', this.postOperation, parameters))
-      .then(res => {
+      .then(() => {
         this.refs.form.reset();
       })
       .then(() => {
@@ -310,8 +309,9 @@ export default function() {
     this.handleFileChange(e, true);
   };
 
-  this.handleItemTap = e => {
-    console.log(e.item.item);
+  this.handleItemTap = e => {// eslint-disable-line no-unused-vars
+    // TODO:
+    //console.log(e.item.item);
     this.update();
   };
 
