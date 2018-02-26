@@ -90,6 +90,7 @@ export default function() {
   };
 
   this.inputId = `Explorer__input${this._riot_id}`;
+  this.isDragWatching = false;
   // 通信レスポンス内容。
   this.data = null;
   // item追加operation。
@@ -183,6 +184,9 @@ export default function() {
     }
 
     const file = files[0];
+    if (file.type.indexOf('image/') !== 0) {
+      return;
+    }
     postImage(file);
   };
 
@@ -282,6 +286,28 @@ export default function() {
           error: err
         });
       });
+  };
+
+  this.handleHandlerDragEnter = e => {
+    e.preventDefault();
+    this.isDragWatching = true;
+    this.update();
+  };
+
+  this.handleHandlerDragOver = e => {
+    e.preventDefault();
+  };
+
+  this.handleHandlerDragLeave = () => {
+    this.isDragWatching = false;
+    this.update();
+  };
+
+  this.handleHandlerDrop = e => {
+    e.preventDefault();
+    this.isDragWatching = false;
+    this.update();
+    this.handleFileChange(e, true);
   };
 
   this.handleItemTap = e => {

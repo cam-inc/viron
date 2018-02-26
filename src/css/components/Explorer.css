@@ -62,6 +62,7 @@
   }
 
   &__droparea {
+    position: relative;
     @apply --layout-column-center-center;
     height: 192px;
     padding: 12px;
@@ -69,6 +70,17 @@
     background-color: rgba(72,72,72,0.03);
     border: 2px dashed  var(--color-base-gray-secondary);
     border-radius: 6px;
+    &--active {
+      border-color: var(--color-base-blue);
+    }
+  }
+
+  &__dragHandler {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 
   &__input {
@@ -76,6 +88,7 @@
   }
 
   &__dropareaLabel {
+    position: relative;
     margin-bottom: 24px;
     font-size: 1.6rem;
     color: var(--color-base-gray-secondary);
@@ -85,6 +98,7 @@
     @mixin hover {
       opacity: 0.5;
     }
+    position: relative;
     color: var(--color-base-blue);
     text-decoration: underline;
     cursor: pointer;
