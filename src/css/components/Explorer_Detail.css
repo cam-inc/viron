@@ -1,0 +1,109 @@
+.Explorer_Detail {
+  @apply --layout-column-center-stretch;
+  height: 100%;
+  color: var(--color-base-white);
+  background-color: #292929;
+
+  &__head {
+    @apply --layout-center-between;
+    height: 64px;
+    padding: 0 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  &__close {
+    @apply --layout-center-center;
+
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    cursor: pointer;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__delete {
+    @mixin hover {
+      color: var(--color-base-red-secondary);
+    }
+    font-size: 1.4rem;
+    color: var(--color-base-red);
+    cursor: pointer;
+  }
+
+  &__body {
+    flex-grow: 1;
+    padding: 0 58px 32px;
+    overflow-y: scroll;
+  }
+
+  &__image {
+    height: 410px;
+    margin-bottom: 12px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+
+    &--small {
+      height: 176px;
+    }
+  }
+
+  &__infos {
+    margin-bottom: 32px;
+  }
+
+  &__info {
+    margin-bottom: 12px;
+  }
+
+  &__infoLabel {
+    margin-bottom: 4px;
+    font-size: 1.2rem;
+  }
+
+  &__infoValue {
+    @mixin hover {
+      border-color: var(--color-base-blue);
+    }
+    padding: 14px;
+    overflow-x: scroll;
+    font-size: 1.6rem;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+  }
+
+  &__tail {
+    @apply --layout-center-center;
+    height: 64px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  &__pageButton {
+    @apply --layout-center-center;
+
+    @mixin hover &: not (&--disabled) {
+      color: var(--color-base-blue);
+    }
+    cursor: pointer;
+
+    &:first-child {
+      margin-right: 82px;
+    }
+
+    &--disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

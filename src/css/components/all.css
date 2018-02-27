@@ -32,6 +32,7 @@
 @import "Drawer";
 @import "Error";
 @import "Explorer";
+@import "Explorer_Detail";
 @import "HorizontalRule";
 @import "Html";
 @import "Icon";

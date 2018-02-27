@@ -3,6 +3,7 @@ import throttle from 'mout/function/throttle';
 import ObjectAssign from 'object-assign';
 import '../../components/viron-dialog/index.tag';
 import '../../components/viron-error/index.tag';
+import './detail/index.tag';
 
 export default function() {
   const store = this.riotx.get();
@@ -309,22 +310,27 @@ export default function() {
     this.handleFileChange(e, true);
   };
 
-  this.handleItemTap = e => {// eslint-disable-line no-unused-vars
-    // TODO:
-    //console.log(e.item.item);
-    this.update();
-  };
-
-  // TODO
-  this.handleItemDeleteTap = e => {
-    const id = e.item.item.id;
-    Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
-      title: '画像を削除する',
-      message: '本当に実行しますか？',
-      onPositiveSelect: () => {
-        deleteImage(id);
+  this.handleItemTap = e => {
+    store.action('drawers.add', 'viron-explorer-detail', {
+      initialSelectedId: e.item.item.id,
+      list: this.data,
+      isDeletable: !!this.deleteOperation,
+      onDelete: (id, closer) => {
+        Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
+          title: '画像を完全に削除しますか？',
+          message: '画像を削除した後は元に戻す事ができません。この画像を完全に削除してもよろしいですか？',
+          onPositiveSelect: () => {
+            closer();
+            deleteImage(id);
+          }
+        }));
+      },
+      // TODO
+      isInsertable: true,
+      onInsert: id => {
+        this.opts.onselect && this.opts.onselect(id);
       }
-    }));
+    }, { isNarrow: true });
   };
 
   this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
