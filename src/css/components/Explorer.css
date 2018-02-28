@@ -129,7 +129,8 @@
 
   &__tail {
     flex-shrink: 0;
-    margin: 24px;
+    padding-bottom: 24px;
+    margin: 24px 24px 0;
   }
 
   &__blocker {
