@@ -47,7 +47,7 @@
     "test": "run-s format lint spec",
     "format": "run-p format:js format:css",
     "format:js": "echo format:js",
-    "format:css": "stylefmt -c .stylefmtrc  -r 'src/css/**/!(Pagination).css'",
+    "format:css": "stylefmt -c .stylefmtrc  -r 'src/css/**/!(Pagination|Explorer_Detail).css'",
     "lint": "run-p lint:js lint:css",
     "lint:js": "eslint src",
     "lint:css": "stylelint src/css/**/*.css",

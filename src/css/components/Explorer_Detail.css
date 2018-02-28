@@ -87,7 +87,7 @@
   &__pageButton {
     @apply --layout-center-center;
 
-    @mixin hover &: not (&--disabled) {
+    @mixin hover &:not (&--disabled) {
       color: var(--color-base-blue);
     }
     cursor: pointer;

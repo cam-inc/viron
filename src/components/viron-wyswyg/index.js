@@ -54,12 +54,12 @@ export default function() {
 
   const openExplorer = () => {
     const explorerDef = this.opts.explorer;
-    store.action('modals.add', 'viron-wyswyg-explorer', {
+    store.action('drawers.add', 'viron-wyswyg-explorer', {
       def: explorerDef,
       onInsert: item => {
         this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" width="100" />`);
       }
-    });
+    }, { isWide: true, forceFront: true });
   };
 
   const setDialogHook = editor => {

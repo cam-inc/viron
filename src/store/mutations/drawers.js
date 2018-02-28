@@ -8,10 +8,9 @@ export default exporter('drawers', {
    * @param {String} tagName
    * @param {Object} tagOpts
    * @param {Object} drawerOpts
-   * @param {Object} opts
    * @return {Array}
    */
-  add: (state, tagName, tagOpts = {}, drawerOpts = {}, opts = {}) => {
+  add: (state, tagName, tagOpts = {}, drawerOpts = {}) => {
     const obj = {
       id: `drawer_${Date.now()}`,
       tagName,
@@ -20,7 +19,7 @@ export default exporter('drawers', {
     };
     // 意図的に配列の先頭に追加している。
     // TinyMCEのdom監視が強いため。
-    if (opts.forceFront) {
+    if (drawerOpts.forceFront) {
       state.drawers.push(obj);
     } else {
       state.drawers.unshift(obj);

@@ -7,14 +7,13 @@ export default exporter('drawers', {
    * @param {String} tagName
    * @param {Object} tagOpts
    * @param {Object} drawerOpts
-   * @param {Object} opts
    * @return {Promise}
    */
-  add: (context, tagName, tagOpts, drawerOpts, opts) => {
+  add: (context, tagName, tagOpts, drawerOpts) => {
     return Promise
       .resolve()
       .then(() => {
-        context.commit('drawers.add', tagName, tagOpts, drawerOpts, opts);
+        context.commit('drawers.add', tagName, tagOpts, drawerOpts);
       });
   },
 
