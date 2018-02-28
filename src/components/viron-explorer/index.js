@@ -330,7 +330,7 @@ export default function() {
       onInsert: id => {
         this.opts.onselect && this.opts.onselect(id);
       }
-    }, { isNarrow: true });
+    }, { isNarrow: true }, { forceFront: true });
   };
 
   this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
