@@ -325,10 +325,12 @@ export default function() {
           }
         }));
       },
-      // TODO
-      isInsertable: true,
+      isInsertable: !!this.opts.oninsert,
       onInsert: id => {
-        this.opts.onselect && this.opts.onselect(id);
+        this.opts.oninsert && this.opts.oninsert(find(this.data, item => {
+          return (item.id === id);
+        }));
+        this.close();
       }
     }, { isNarrow: true }, { forceFront: true });
   };
