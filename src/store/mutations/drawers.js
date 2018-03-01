@@ -1,6 +1,8 @@
 import reject from 'mout/array/reject';
 import exporter from './exporter';
 
+let depth = 0;
+
 export default exporter('drawers', {
   /**
    * ドローワーを追加します。
@@ -11,6 +13,7 @@ export default exporter('drawers', {
    * @return {Array}
    */
   add: (state, tagName, tagOpts = {}, drawerOpts = {}) => {
+    drawerOpts.depth = depth++;
     const obj = {
       id: `drawer_${Date.now()}`,
       tagName,
@@ -19,11 +22,7 @@ export default exporter('drawers', {
     };
     // 意図的に配列の先頭に追加している。
     // TinyMCEのdom監視が強いため。
-    if (drawerOpts.forceFront) {
-      state.drawers.push(obj);
-    } else {
-      state.drawers.unshift(obj);
-    }
+    state.drawers.unshift(obj);
     return ['drawers'];
   },
 

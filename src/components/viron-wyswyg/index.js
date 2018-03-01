@@ -59,7 +59,7 @@ export default function() {
       onInsert: item => {
         this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" width="100" />`);
       }
-    }, { isWide: true, forceFront: true });
+    }, { isWide: true });
   };
 
   const setDialogHook = editor => {

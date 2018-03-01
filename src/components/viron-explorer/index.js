@@ -335,7 +335,7 @@ export default function() {
         }));
         this.close();
       }
-    }, { isNarrow: true, forceFront: true });
+    }, { isNarrow: true });
   };
 
   this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
