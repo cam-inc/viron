@@ -1,8 +1,7 @@
 viron-explorer.Explorer
   .Explorer__head
-    .Explorer__title { opts.def.name }
+    .Explorer__title { opts.def.name || '画像アップロード' }
     .Explorer__control
-      viron-icon-search.Explorer__searchIcon
   .Explorer__body
     .Explorer__label ライブラリ
     virtual(if="{ isLoading }")
@@ -29,7 +28,6 @@ viron-explorer.Explorer
 
   script.
     import '../../components/icons/viron-icon-reload/index.tag';
-    import '../../components/icons/viron-icon-search/index.tag';
     import '../../components/viron-button/index.tag';
     import '../../components/viron-pagination/index.tag';
     import script from './index';
