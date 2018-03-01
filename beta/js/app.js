@@ -18015,7 +18015,7 @@ var script$4 = function() {
   };
 };
 
-riot$1.tag2('viron-explorer', '<div class="Explorer__head"> <div class="Explorer__title">{opts.def.name}</div> <div class="Explorer__control"> <viron-icon-search class="Explorer__searchIcon"></viron-icon-search> </div> </div> <div class="Explorer__body"> <virtual if="{isLoading}"> <div class="Explorer__progressWrapper"> <div class="Explorer__progress"> <viron-icon-reload></viron-icon-reload> </div> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="Explorer__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="Explorer__content"> <div class="Explorer__label">ライブラリ</div> <form class="Explorer__droparea {\'Explorer__droparea--active\': isDragWatching, \'Explorer__droparea--mini\': isMobile}" if="{!!postOperation}" ref="form" onclick="{getClickHandler(\'handleDropareaTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDropareaTap\')}"> <input class="Explorer__input" type="file" id="{inputId}" accept="image/*" onchange="{handleFileChange}"> <div class="Explorer__dropareaLabel" if="{!isMobile}">ここにファイルをドロップして追加できます</div> <div class="Explorer__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> <label class="Explorer__dropareaButton" ref="label" for="{inputId}" onclick="{getClickHandler(\'handleLabelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLabelTap\')}">ファイルを選択</label> </form> <div class="Explorer__list" if="{!!data &amp;&amp; !!data.length}" ref="list"> <div class="Explorer__item" each="{item, idx in data}" riot-style="background-image:url({item.url});" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}"></div> </div> </div> </virtual> </virtual> </div> <div class="Explorer__tail" if="{hasPagination}"> <viron-pagination max="{pagination.max}" size="{paginationSize}" current="{pagination.current}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="Explorer__blocker" if="{isLoading}"></div>', '', 'class="Explorer"', function(opts) {
+riot$1.tag2('viron-explorer', '<div class="Explorer__head"> <div class="Explorer__title">{opts.def.name || \'画像アップロード\'}</div> <div class="Explorer__control"></div> </div> <div class="Explorer__body"> <div class="Explorer__label">ライブラリ</div> <virtual if="{isLoading}"> <div class="Explorer__progressWrapper"> <div class="Explorer__progress"> <viron-icon-reload></viron-icon-reload> </div> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="Explorer__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="Explorer__content"> <form class="Explorer__droparea {\'Explorer__droparea--active\': isDragWatching, \'Explorer__droparea--mini\': isMobile}" if="{!!postOperation}" ref="form" onclick="{getClickHandler(\'handleDropareaTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDropareaTap\')}"> <input class="Explorer__input" type="file" id="{inputId}" accept="image/*" onchange="{handleFileChange}"> <div class="Explorer__dropareaLabel" if="{!isMobile}">ここにファイルをドロップして追加できます</div> <div class="Explorer__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> <label class="Explorer__dropareaButton" ref="label" for="{inputId}" onclick="{getClickHandler(\'handleLabelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLabelTap\')}">ファイルを選択</label> </form> <div class="Explorer__list" if="{!!data &amp;&amp; !!data.length}" ref="list"> <div class="Explorer__item" each="{item, idx in data}" riot-style="background-image:url({item.url});" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}"></div> </div> </div> </virtual> </virtual> </div> <div class="Explorer__tail" if="{hasPagination}"> <viron-pagination max="{pagination.max}" size="{paginationSize}" current="{pagination.current}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="Explorer__blocker" if="{isLoading}"></div>', '', 'class="Explorer"', function(opts) {
     this.external(script$4);
 });
 
@@ -95532,25 +95532,6 @@ var script$24 = function() {
     }, { isWide: true });
   };
 
-  const setDialogHook = editor => {
-    if (!isMobile) {
-      return;
-    }
-    const openFunc = editor.windowManager.open;
-    const myOpenFunc = (...args) => {
-      editor.iframeElement.blur();
-      args[0] = args[0] || {};
-      args[0].onClose = () => {
-        editor.iframeElement.blur();
-      };
-      // blur完了を保証するため。
-      setTimeout(() => {
-        openFunc.apply(null, args);
-      }, 500);
-    };
-    editor.windowManager.open = myOpenFunc;
-  };
-
   const customConfig = {
     selector: `.Wyswyg__editor${this._riot_id}`,
     init_instance_callback: editor => {
@@ -95559,7 +95540,6 @@ var script$24 = function() {
       this.editor.on('Change', this.handleEditorChange);
       this.editor.on('focus', this.handleEditorFocus);
       this.editor.on('blur', this.handleEditorBlur);
-      setDialogHook(this.editor);
     },
     setup: editor => {
       // explorer機能と連携。
