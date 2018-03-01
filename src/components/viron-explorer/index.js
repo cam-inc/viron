@@ -16,7 +16,7 @@ export default function() {
     const listElm = this.refs.list;
     if (!!listElm) {
       const rect = listElm.getBoundingClientRect();
-      const columnMinCount = (Math.floor(rect.width / 100) - 1) || 1;
+      const columnMinCount = (Math.floor(rect.width / 100)) || 1;
       document.documentElement.style.setProperty('--component-explorer-column-min-count', columnMinCount);
     }
   };
