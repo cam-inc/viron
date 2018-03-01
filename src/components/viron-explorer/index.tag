@@ -4,6 +4,7 @@ viron-explorer.Explorer
     .Explorer__control
       viron-icon-search.Explorer__searchIcon
   .Explorer__body
+    .Explorer__label ライブラリ
     virtual(if="{ isLoading }")
       .Explorer__progressWrapper
         .Explorer__progress
@@ -15,7 +16,6 @@ viron-explorer.Explorer
       // 正常時
       virtual(if="{ !error }")
         .Explorer__content
-          .Explorer__label ライブラリ
           form.Explorer__droparea(if="{ !!postOperation }" ref="form" class="{ 'Explorer__droparea--active': isDragWatching, 'Explorer__droparea--mini': isMobile }" onTap="{ handleDropareaTap }")
             input.Explorer__input(type="file" id="{ inputId }" accept="image/*" onChange="{ handleFileChange }")
             .Explorer__dropareaLabel(if="{ !isMobile }") ここにファイルをドロップして追加できます

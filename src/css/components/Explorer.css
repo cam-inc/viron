@@ -40,7 +40,7 @@
 
   &__progressWrapper {
     @apply --layout-center-center;
-    height: 48px;
+    height: 100px;
   }
 
   &__progress {
