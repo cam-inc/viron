@@ -1,4 +1,4 @@
-viron-drawer.Drawer(class="Drawer--{ opts.theme } { 'Drawer--visible' : isVisible, 'Drawer--hidden': isHidden }  Drawer--{ layoutType } { 'Drawer--narrow' : opts.isnarrow} { 'Drawer--wide': opts.iswide }" style="z-index:{ opts.depth }" onTap="{ handleTap }")
+viron-drawer.Drawer(class="Drawer--{ opts.theme } { 'Drawer--visible' : isVisible, 'Drawer--hidden': isHidden }  Drawer--{ layoutType } { 'Drawer--narrow' : opts.isnarrow} { 'Drawer--wide': opts.iswide }" onTap="{ handleTap }")
   .Drawer__frame(onTap="{ handleFrameTap }")
     .Drawer__contentWrapper
       .Drawer__content(ref="content")

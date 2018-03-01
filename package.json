@@ -47,7 +47,7 @@
     "test": "run-s format lint spec",
     "format": "run-p format:js format:css",
     "format:js": "echo format:js",
-    "format:css": "stylefmt -c .stylefmtrc  -r 'src/css/**/!(Pagination|Explorer_Detail).css'",
+    "format:css": "stylefmt -c .stylefmtrc  -r 'src/css/**/!(Pagination).css'",
     "lint": "run-p lint:js lint:css",
     "lint:js": "eslint src",
     "lint:css": "stylelint src/css/**/*.css",
@@ -80,7 +80,7 @@
     "sua.js": "^2.1.0",
     "taucharts": "^1.2.2",
     "tinycolor2": "^1.4.1",
-    "tinymce": "^4.7.4",
+    "tinymce": "^4.7.9",
     "valid-url": "^1.0.9",
     "whatwg-fetch": "^2.0.3"
   },

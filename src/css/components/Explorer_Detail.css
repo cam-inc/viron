@@ -6,6 +6,7 @@
 
   &__head {
     @apply --layout-center-between;
+    flex-shrink: 0;
     height: 64px;
     padding: 0 24px;
   }
@@ -79,6 +80,7 @@
 
   &__tail {
     @apply --layout-center-center;
+    flex-shrink: 0;
     height: 64px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
@@ -86,7 +88,7 @@
   &__pageButton {
     @apply --layout-center-center;
 
-    @mixin hover &:not (&--disabled) {
+    @mixin hover {
       color: var(--color-base-blue);
     }
     cursor: pointer;
@@ -96,6 +98,7 @@
     }
 
     &--disabled {
+      color: currntcolor;
       cursor: not-allowed;
       opacity: 0.5;
     }

@@ -15,6 +15,17 @@ export default function() {
   this.isPrevEnabled = false;
   this.isNextEnabled = false;
 
+  // Safariのbug対策。
+  // body内でスクロールするとdrawerが消えるバグ。
+  this.isReady = !this.isMobile;
+  this.on('mount', () => {
+    setTimeout(() => {
+      this.isReady = true;
+      this.update();
+    }, 1000);
+
+  });
+
   /**
    * ページング情報を更新します。
    */
