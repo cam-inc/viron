@@ -16,7 +16,7 @@ import './explorer/index.tag';
 const url = new URL(window.location.href);
 const toolbarDesktop = [
   'bold italic underline | forecolor backcolor | image explorer link unlink',
-  'formatselect fontselect fontsizeselect',
+  'formatselect fontsizeselect',
   'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
 ];
 const toolbarMobile = [
