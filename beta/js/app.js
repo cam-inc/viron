@@ -17669,25 +17669,18 @@ var script$4 = function() {
    * GridLayoutを調整します。
    */
   const _adjustGridLayout = () => {
-    // row高さ調整。
-    const itemElm = this.refs.item_0;
-    if (!!itemElm) {
-      const rect = itemElm.getBoundingClientRect();
-      document.documentElement.style.setProperty('--component-explorer-row-height', `${rect.width}px`);
-    }
-
     // column数調整。
     const listElm = this.refs.list;
     if (!!listElm) {
       const rect = listElm.getBoundingClientRect();
-      const columnMinCount = (Math.floor(rect.width / 100) - 1) || 1;
+      const columnMinCount = (Math.floor(rect.width / 100)) || 1;
       document.documentElement.style.setProperty('--component-explorer-column-min-count', columnMinCount);
     }
   };
   const adjustGridLayout = () => {
     setTimeout(() => {
       _adjustGridLayout();
-    }, 500);
+    }, 100);
   };
 
   /**
@@ -17782,9 +17775,11 @@ var script$4 = function() {
     window.clearInterval(autoRefreshIntervalId);
     autoRefreshIntervalId = null;
   };
+  this.isMobile = store.getter('layout.isMobile');
 
   this.listen('layout', () => {
     this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
+    this.isMobile = store.getter('layout.isMobile');
     this.update();
   });
   this.listen(this.opts.id, () => {
@@ -17945,6 +17940,10 @@ var script$4 = function() {
       });
   };
 
+  this.handleDropareaTap = () => {
+    this.refs.label.click();
+  };
+
   this.handleHandlerDragEnter = e => {
     e.preventDefault();
     this.isDragWatching = true;
@@ -17965,6 +17964,10 @@ var script$4 = function() {
     this.isDragWatching = false;
     this.update();
     this.handleFileChange(e, true);
+  };
+
+  this.handleLabelTap = e => {
+    e.stopPropagation();
   };
 
   this.handleItemTap = e => {
@@ -18002,7 +18005,7 @@ var script$4 = function() {
   };
 };
 
-riot$1.tag2('viron-explorer', '<div class="Explorer__head"> <div class="Explorer__title">{opts.def.name}</div> <div class="Explorer__control"> <viron-icon-search class="Explorer__searchIcon"></viron-icon-search> </div> </div> <div class="Explorer__body"> <virtual if="{isLoading}"> <div class="Explorer__progressWrapper"> <div class="Explorer__progress"> <viron-icon-reload></viron-icon-reload> </div> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="Explorer__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="Explorer__content"> <div class="Explorer__label">ライブラリ</div> <form class="Explorer__droparea {\'Explorer__droparea--active\': isDragWatching}" if="{!!postOperation}" ref="form"> <input class="Explorer__input" type="file" id="{inputId}" accept="image/*" onchange="{handleFileChange}"> <div class="Explorer__dropareaLabel">ここにファイルをドロップして追加できます</div> <div class="Explorer__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> <label class="Explorer__dropareaButton" for="{inputId}">ファイルを選択</label> </form> <div class="Explorer__list" if="{!!data &amp;&amp; !!data.length}" ref="list"> <div class="Explorer__item" each="{item, idx in data}" ref="item_{idx}" riot-style="background-image:url({item.url});" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}"></div> </div> </div> </virtual> </virtual> </div> <div class="Explorer__tail" if="{hasPagination}"> <viron-pagination max="{pagination.max}" size="{paginationSize}" current="{pagination.current}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="Explorer__blocker" if="{isLoading}"></div>', '', 'class="Explorer"', function(opts) {
+riot$1.tag2('viron-explorer', '<div class="Explorer__head"> <div class="Explorer__title">{opts.def.name}</div> <div class="Explorer__control"> <viron-icon-search class="Explorer__searchIcon"></viron-icon-search> </div> </div> <div class="Explorer__body"> <virtual if="{isLoading}"> <div class="Explorer__progressWrapper"> <div class="Explorer__progress"> <viron-icon-reload></viron-icon-reload> </div> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="Explorer__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="Explorer__content"> <div class="Explorer__label">ライブラリ</div> <form class="Explorer__droparea {\'Explorer__droparea--active\': isDragWatching, \'Explorer__droparea--mini\': isMobile}" if="{!!postOperation}" ref="form" onclick="{getClickHandler(\'handleDropareaTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDropareaTap\')}"> <input class="Explorer__input" type="file" id="{inputId}" accept="image/*" onchange="{handleFileChange}"> <div class="Explorer__dropareaLabel" if="{!isMobile}">ここにファイルをドロップして追加できます</div> <div class="Explorer__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> <label class="Explorer__dropareaButton" ref="label" for="{inputId}" onclick="{getClickHandler(\'handleLabelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLabelTap\')}">ファイルを選択</label> </form> <div class="Explorer__list" if="{!!data &amp;&amp; !!data.length}" ref="list"> <div class="Explorer__item" each="{item, idx in data}" riot-style="background-image:url({item.url});" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}"></div> </div> </div> </virtual> </virtual> </div> <div class="Explorer__tail" if="{hasPagination}"> <viron-pagination max="{pagination.max}" size="{paginationSize}" current="{pagination.current}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="Explorer__blocker" if="{isLoading}"></div>', '', 'class="Explorer"', function(opts) {
     this.external(script$4);
 });
 

@@ -4238,7 +4238,6 @@ select {
   }
 :root {
   --component-explorer-column-min-count: 1;
-  --component-explorer-row-height: 100px;
 }
 .Explorer {
   position: relative;
@@ -4316,14 +4315,28 @@ select {
     height: 192px;
     padding: 12px;
     margin: 0 24px 24px;
+    cursor: pointer;
     background-color: rgba(72, 72, 72, 0.03);
     border: 2px dashed #cecece;
     border: 2px dashed var(--color-base-gray-secondary);
     border-radius: 6px;
   }
+@media (hover: hover) {
+    .Explorer__droparea:hover {
+      border-color: #627edf;
+      border-color: var(--color-base-blue);
+    }
+  }
+.Explorer__droparea.hold {
+      border-color: #627edf;
+      border-color: var(--color-base-blue);
+  }
 .Explorer__droparea--active {
       border-color: #627edf;
       border-color: var(--color-base-blue);
+    }
+.Explorer__droparea--mini {
+      height: 80px;
     }
 .Explorer__dragHandler {
     position: absolute;
@@ -4360,16 +4373,15 @@ select {
 .Explorer__list {
     display: -ms-grid;
     display: grid;
-    margin-bottom: 24px;
     grid-gap: 2px;
-    -ms-grid-columns: (minmax(100px, auto))[1] (minmax(100px, auto))[auto-fit];
-        grid-template-columns: repeat(1, minmax(100px, auto)) repeat(auto-fit, minmax(100px, auto));
-    -ms-grid-columns: (minmax(100px, auto))[var] (minmax(100px, auto))[auto-fit];
-        grid-template-columns: repeat(var(--component-explorer-column-min-count), minmax(100px, auto)) repeat(auto-fit, minmax(100px, auto));
-    grid-auto-rows: 100px;
-    grid-auto-rows: var(--component-explorer-row-height);
+    -ms-grid-columns: (1fr)[1];
+        grid-template-columns: repeat(1, 1fr);
+    -ms-grid-columns: (1fr)[var];
+        grid-template-columns: repeat(var(--component-explorer-column-min-count), 1fr);
+    grid-auto-rows: auto;
   }
 .Explorer__item {
+    position: relative;
     cursor: pointer;
     background-repeat: no-repeat;
     background-position: center center;
@@ -4383,6 +4395,12 @@ select {
 .Explorer__item.hold {
       opacity: 0.8;
   }
+.Explorer__item::before {
+      position: relative;
+      display: block;
+      padding-top: 100%;
+      content: "";
+    }
 .Explorer__error {
     color: #d1d1d1;
     color: var(--color-base-gray);
