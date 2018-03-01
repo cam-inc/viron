@@ -16,13 +16,13 @@ viron-explorer.Explorer
       virtual(if="{ !error }")
         .Explorer__content
           .Explorer__label ライブラリ
-          form.Explorer__droparea(if="{ !!postOperation }" ref="form" class="{ 'Explorer__droparea--active': isDragWatching }")
+          form.Explorer__droparea(if="{ !!postOperation }" ref="form" class="{ 'Explorer__droparea--active': isDragWatching, 'Explorer__droparea--mini': isMobile }" onTap="{ handleDropareaTap }")
             input.Explorer__input(type="file" id="{ inputId }" accept="image/*" onChange="{ handleFileChange }")
-            .Explorer__dropareaLabel ここにファイルをドロップして追加できます
+            .Explorer__dropareaLabel(if="{ !isMobile }") ここにファイルをドロップして追加できます
             .Explorer__dragHandler(onDragEnter="{ handleHandlerDragEnter }" onDragOver="{ handleHandlerDragOver }" onDragLeave="{ handleHandlerDragLeave }" onDrop="{ handleHandlerDrop }")
-            label.Explorer__dropareaButton(for="{ inputId }") ファイルを選択
+            label.Explorer__dropareaButton(ref="label" for="{ inputId }" onTap="{ handleLabelTap }") ファイルを選択
           .Explorer__list(if="{ !!data && !!data.length }" ref="list")
-            .Explorer__item(each="{ item, idx in data }" ref="item_{ idx }" style="background-image:url({ item.url })" onTap="{ handleItemTap }")
+            .Explorer__item(each="{ item, idx in data }" style="background-image:url({ item.url })" onTap="{ handleItemTap }")
   .Explorer__tail(if="{ hasPagination }")
     viron-pagination(max="{ pagination.max }" size="{ paginationSize }" current="{ pagination.current }" onChange="{ handlePaginationChange }")
   .Explorer__blocker(if="{ isLoading }")

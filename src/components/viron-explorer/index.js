@@ -12,13 +12,6 @@ export default function() {
    * GridLayoutを調整します。
    */
   const _adjustGridLayout = () => {
-    // row高さ調整。
-    const itemElm = this.refs.item_0;
-    if (!!itemElm) {
-      const rect = itemElm.getBoundingClientRect();
-      document.documentElement.style.setProperty('--component-explorer-row-height', `${rect.width}px`);
-    }
-
     // column数調整。
     const listElm = this.refs.list;
     if (!!listElm) {
@@ -30,7 +23,7 @@ export default function() {
   const adjustGridLayout = () => {
     setTimeout(() => {
       _adjustGridLayout();
-    }, 500);
+    }, 100);
   };
 
   /**
@@ -125,9 +118,11 @@ export default function() {
     window.clearInterval(autoRefreshIntervalId);
     autoRefreshIntervalId = null;
   };
+  this.isMobile = store.getter('layout.isMobile');
 
   this.listen('layout', () => {
     this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
+    this.isMobile = store.getter('layout.isMobile');
     this.update();
   });
   this.listen(this.opts.id, () => {
@@ -288,6 +283,10 @@ export default function() {
       });
   };
 
+  this.handleDropareaTap = () => {
+    this.refs.label.click();
+  };
+
   this.handleHandlerDragEnter = e => {
     e.preventDefault();
     this.isDragWatching = true;
@@ -308,6 +307,10 @@ export default function() {
     this.isDragWatching = false;
     this.update();
     this.handleFileChange(e, true);
+  };
+
+  this.handleLabelTap = e => {
+    e.stopPropagation();
   };
 
   this.handleItemTap = e => {

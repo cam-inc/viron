@@ -1,6 +1,5 @@
 :root {
   --component-explorer-column-min-count: 1;
-  --component-explorer-row-height: 100px;
 }
 
 .Explorer {
@@ -62,17 +61,26 @@
   }
 
   &__droparea {
+    @mixin hover {
+      border-color: var(--color-base-blue);
+    }
+
     @apply --layout-column-center-center;
     position: relative;
     height: 192px;
     padding: 12px;
     margin: 0 24px 24px;
+    cursor: pointer;
     background-color: rgba(72, 72, 72, 0.03);
     border: 2px dashed var(--color-base-gray-secondary);
     border-radius: 6px;
 
     &--active {
       border-color: var(--color-base-blue);
+    }
+
+    &--mini {
+      height: 80px;
     }
   }
 
@@ -107,20 +115,27 @@
 
   &__list {
     display: grid;
-    margin-bottom: 24px;
+    padding-bottom: 24px;
     grid-gap: 2px;
     grid-template-columns: repeat(var(--component-explorer-column-min-count), minmax(100px, auto)) repeat(auto-fit, minmax(100px, auto));
-    grid-auto-rows: var(--component-explorer-row-height);
+    grid-auto-rows: auto;
   }
 
   &__item {
     @mixin hover {
       opacity: 0.8;
     }
+    position: relative;
     cursor: pointer;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
+
+    &::before {
+      display: block;
+      padding-top: 100%;
+      content: "";
+    }
   }
 
   &__error {
