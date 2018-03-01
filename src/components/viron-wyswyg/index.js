@@ -62,25 +62,6 @@ export default function() {
     }, { isWide: true });
   };
 
-  const setDialogHook = editor => {
-    if (!isMobile) {
-      return;
-    }
-    const openFunc = editor.windowManager.open;
-    const myOpenFunc = (...args) => {
-      editor.iframeElement.blur();
-      args[0] = args[0] || {};
-      args[0].onClose = () => {
-        editor.iframeElement.blur();
-      };
-      // blur完了を保証するため。
-      setTimeout(() => {
-        openFunc.apply(null, args);
-      }, 500);
-    };
-    editor.windowManager.open = myOpenFunc;
-  };
-
   const customConfig = {
     selector: `.Wyswyg__editor${this._riot_id}`,
     init_instance_callback: editor => {
@@ -89,7 +70,6 @@ export default function() {
       this.editor.on('Change', this.handleEditorChange);
       this.editor.on('focus', this.handleEditorFocus);
       this.editor.on('blur', this.handleEditorBlur);
-      setDialogHook(this.editor);
     },
     setup: editor => {
       // explorer機能と連携。
