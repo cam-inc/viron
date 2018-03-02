@@ -1,5 +1,5 @@
 viron-select.Select(class="{ 'Select--disabled': opts.isdisabled, 'Select--preview': opts.ispreview, 'Select--error': opts.iserror }")
-  form.Select__form(onSubmit="{ handleFormSubmit }")
+  form.Select__form(class="Select--{ opts.theme }" onSubmit="{ handleFormSubmit }")
     select.Select__select(ref="select" disabled="{ opts.isdisabled }" onInput="{ handleSelectInput }" onChange="{ handleSelectChange }")
       option.Select__option(each="{ option in opts.options }" selected="{ option.isSelected }") { option.label }
     viron-icon-arrow-down.Select__icon(if="{ !opts.ispreview }")

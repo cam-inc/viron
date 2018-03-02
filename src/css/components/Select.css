@@ -7,8 +7,8 @@
       border-color: var(--color-base-blue);
     }
     position: relative;
-    background-color: transparent;
-    border: 1px solid rgba(149, 152, 154, 0.3);
+    background-color: var(--color-base-white);
+    border: 1px solid var(--color-base-gray);
     border-radius: 2px;
 
     &:focus {
@@ -22,8 +22,8 @@
     height: 100%;
     padding: 8px 34px 8px 18px;
     font-size: 1.8rem;
-    cursor: pointer;
     color: currentColor;
+    cursor: pointer;
   }
 
   &__icon {
@@ -60,13 +60,12 @@
     }
 
     & .Select__select {
-      color: var(--color-base-black-secondary);
+      color: var(--color-base-gray-secondary);
     }
   }
 
   &--disabled {
     & .Select__form {
-      color: var(--color-base-gray-secondary);
       background-color: var(--color-base-gray-tertiary);
       border-color: var(--color-base-gray);
     }
@@ -74,5 +73,10 @@
     & .Select__select {
       cursor: not-allowed;
     }
+  }
+
+  &--ghost {
+    background-color: transparent;
+    border: 1px solid rgba(149, 152, 154, 0.3);
   }
 }
