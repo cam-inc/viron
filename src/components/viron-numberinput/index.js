@@ -71,11 +71,21 @@ export default function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
-    if (!this.opts.onchange) {
-      return;
-    }
+    // Stop evnet propagation becasuse some methods are maybe reserved word for component usage side.
+    e.stopPropagation();
     const newVal = this.normalizeValue(this.opts.val);
-    this.opts.onchange(newVal, this.opts.id);
+    const id = this.opts.id;
+    if (this.opts.onchange) {
+      this.opts.onchange(newVal, id);
+    }
+    if (this.opts.onsubmit) {
+      this.opts.onsubmit(newVal, id);
+    }
+    const input = this.refs.input;
+    if (this.refs.input) {
+      // Unforcus on input.
+      input.blur();
+    }
   };
 
   // `blur`時にも`change`イベントが発火する。

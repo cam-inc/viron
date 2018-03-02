@@ -15,7 +15,15 @@ export default function() {
     this.update();
   };
 
+  this.handleFromSubmit = () => {
+    signin();
+  };
+
   this.handleSigninButtonSelect = () => {
+    signin();
+  };
+
+  const signin = () => {
     Promise
       .resolve()
       .then(() => store.action('auth.signinEmail', this.opts.endpointkey, this.opts.authtype, this.mailAddress, this.password))

@@ -134,6 +134,17 @@ export default function() {
   });
 
   /**
+   * Fire the submit event.
+   * @param {*} value
+   */
+  const submit = value => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    this.opts.onsubmit(this.opts.identifier, value);
+  };
+
+  /**
    * changeイベントを発火します。
    * @param {*} value
    */
@@ -197,6 +208,21 @@ export default function() {
   };
 
   /**
+   * Textinput: input value when it's submitted.
+   * @param {String|null} newValue
+   */
+  this.handleTextInputSubmit = newValue => {
+    // force to convert string or undefined.
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    submit(ret);
+  };
+
+  /**
    * Textinput: 入力値が変更された時の処理。
    * @param {String|null} newValue
    */
@@ -254,6 +280,21 @@ export default function() {
       ret = newValue;
     }
     change(ret);
+  };
+
+  /**
+   * Numberinput: When input value is submitted.
+   * @param {Number|null} newValue
+   */
+  this.handleNumberInputSubmit = newValue => {
+    // Force to convert Number or undefined
+    let ret;
+    if (!isNumber(newValue)) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    submit(ret);
   };
 
   /**
@@ -318,6 +359,33 @@ export default function() {
       ret = newValue;
     }
     change(ret);
+  };
+
+  /**
+   * Autocomplete: When input value is submitted.
+   * @param {String} newText
+   */
+  this.handleAutocompleteSubmit = newText => {
+    switch (formObject.type) {
+    case 'string':
+      if (!newText) {
+        newText = undefined;
+      }
+      break;
+    case 'number':
+    case 'integer':
+      if (!newText) {
+        newText = undefined;
+      } else {
+        // Force to convert number or undefined.
+        newText = Number(newText);
+        if (!isNumber(newText)) {
+          newText = undefined;
+        }
+      }
+      break;
+    }
+    submit(newText);
   };
 
   /**

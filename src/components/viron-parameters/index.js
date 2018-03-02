@@ -31,6 +31,26 @@ export default function() {
   });
 
   /**
+   * Input when submitted
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handleValSubmit = (key, newVal) => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    const ret = this.opts.val;
+    ret[key] = newVal;
+    // Delete the key if it's undefined.
+    forOwn(ret, (val, key) => {
+      if (isUndefined(val)) {
+        delete ret[key];
+      }
+    });
+    this.opts.onsubmit(ret);
+  };
+
+  /**
    * 入力値が変更された時の処理。
    * @param {String} key
    * @param {*} newVal

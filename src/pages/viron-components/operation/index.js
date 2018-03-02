@@ -71,6 +71,20 @@ export default function() {
       });
   };
 
+  const confirmSubmit = () => {
+    if (!this.isValid) {
+      return;
+    }
+    Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
+      title: this.title,
+      message: '本当に実行しますか？',
+      labelPositive: this.submitLabel,
+      onPositiveSelect: () => {
+        operate();
+      }
+    }));
+  };
+
   const updateSubmitButton = () => {
     // 諸々の都合でthis.update()を使えない & 使いたくない。
     // ので、DOMを直接操作する。
@@ -109,18 +123,11 @@ export default function() {
     updateSubmitButton();
   };
 
-  this.handleSubmitTap = () => {
-    if (!this.isValid) {
-      return;
-    }
+  this.handleFormSubmit = () => {
+    confirmSubmit();
+  };
 
-    Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
-      title: this.title,
-      message: '本当に実行しますか？',
-      labelPositive: this.submitLabel,
-      onPositiveSelect: () => {
-        operate();
-      }
-    }));
+  this.handleSubmitTap = () => {
+    confirmSubmit();
   };
 }
