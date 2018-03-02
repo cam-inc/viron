@@ -46741,13 +46741,21 @@ var script$13 = function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
-    if (!this.opts.onchange) {
-      return;
+    // Stop evnet propagation becasuse some methods are maybe reserved word for component usage side.
+    e.stopPropagation();
+    const newVal = this.normalizeValue(this.opts.val);
+    const id = this.opts.id;
+    if (this.opts.onchange) {
+      this.opts.onchange(newVal, id);
     }
-    if (this.opts.isdisabled) {
-      return;
+    if (this.opts.onsubmit) {
+      this.opts.onsubmit(newVal, id);
     }
-    this.opts.onchange(this.normalizeValue(this.opts.val), this.opts.id);
+    const input = this.refs.input;
+    if (this.refs.input) {
+      // Unforcus on input.
+      input.blur();
+    }
   };
 
   // `blur`時に`change`イベントが発火する等、`change`イベントでは不都合が多い。
@@ -52789,11 +52797,21 @@ var script$19 = function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
-    if (!this.opts.onchange) {
-      return;
-    }
+    // Stop evnet propagation becasuse some methods are maybe reserved word for component usage side.
+    e.stopPropagation();
     const newVal = this.normalizeValue(this.opts.val);
-    this.opts.onchange(newVal, this.opts.id);
+    const id = this.opts.id;
+    if (this.opts.onchange) {
+      this.opts.onchange(newVal, id);
+    }
+    if (this.opts.onsubmit) {
+      this.opts.onsubmit(newVal, id);
+    }
+    const input = this.refs.input;
+    if (this.refs.input) {
+      // Unforcus on input.
+      input.blur();
+    }
   };
 
   // `blur`時にも`change`イベントが発火する。
@@ -53046,15 +53064,20 @@ var script$22 = function() {
 
   this.handleFormSubmit = e => {
     e.preventDefault();
+    // Stop evnet propagation becasuse some methods are maybe reserved word for component usage side.
+    e.stopPropagation();
     const newVal = this.normalizeValue(this.opts.val);
     const id = this.opts.id;
     if (this.opts.onchange) {
       this.opts.onchange(newVal, id);
     }
     if (this.opts.onsubmit) {
-      // Stop evnet propagation becasuse "onSubmit" is maybe reserved word for component usage side.
-      e.stopPropagation();
       this.opts.onsubmit(newVal, id);
+    }
+    const input = this.refs.input;
+    if (this.refs.input) {
+      // Unforcus on input.
+      input.blur();
     }
   };
 
@@ -53112,7 +53135,7 @@ var script$22 = function() {
   };
 };
 
-riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <div class="Textinput__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled, \'Textinput--preview\': opts.ispreview, \'Textinput--error\': opts.iserror} Textinput--{opts.theme}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-textinput', '<div class="Textinput__label" if="{!!opts.label}">{opts.label}</div> <form class="Textinput__form" ref="form" onsubmit="{handleFormSubmit}"> <input class="Textinput__input" ref="input" type="{opts.type || \'text\'}" riot-value="{normalizeValue(opts.val)}" placeholder="{opts.placeholder}" disabled="{!!opts.isdisabled}" oninput="{handleInputInput}" onsubmit="{handleInputSubmit}" onchange="{handleInputChange}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}"> </form> <div class="Textinput__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Textinput {\'Textinput--disabled\': opts.isdisabled, \'Textinput--preview\': opts.ispreview, \'Textinput--error\': opts.iserror} Textinput--{opts.theme}" ref="textinput" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$22);
 });
 
@@ -101478,6 +101501,17 @@ var script$26 = function() {
   });
 
   /**
+   * Fire the submit event.
+   * @param {*} value
+   */
+  const submit = value => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    this.opts.onsubmit(this.opts.identifier, value);
+  };
+
+  /**
    * changeイベントを発火します。
    * @param {*} value
    */
@@ -101541,6 +101575,21 @@ var script$26 = function() {
   };
 
   /**
+   * Textinput: input value when it's submitted.
+   * @param {String|null} newValue
+   */
+  this.handleTextInputSubmit = newValue => {
+    // force to convert string or undefined.
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    submit(ret);
+  };
+
+  /**
    * Textinput: 入力値が変更された時の処理。
    * @param {String|null} newValue
    */
@@ -101598,6 +101647,21 @@ var script$26 = function() {
       ret = newValue;
     }
     change(ret);
+  };
+
+  /**
+   * Numberinput: When input value is submitted.
+   * @param {Number|null} newValue
+   */
+  this.handleNumberInputSubmit = newValue => {
+    // Force to convert Number or undefined
+    let ret;
+    if (!isNumber$3(newValue)) {
+      ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    submit(ret);
   };
 
   /**
@@ -101665,6 +101729,33 @@ var script$26 = function() {
   };
 
   /**
+   * Autocomplete: When input value is submitted.
+   * @param {String} newText
+   */
+  this.handleAutocompleteSubmit = newText => {
+    switch (formObject.type) {
+    case 'string':
+      if (!newText) {
+        newText = undefined;
+      }
+      break;
+    case 'number':
+    case 'integer':
+      if (!newText) {
+        newText = undefined;
+      } else {
+        // Force to convert number or undefined.
+        newText = Number(newText);
+        if (!isNumber$3(newText)) {
+          newText = undefined;
+        }
+      }
+      break;
+    }
+    submit(newText);
+  };
+
+  /**
    * Autocomplete: 入力値が変更された時の処理。
    * @param {String} newText
    */
@@ -101709,7 +101800,7 @@ var script$26 = function() {
 
 };
 
-riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> <div class="Parameters_Form__description" if="{!!description}">{description}</div> </div> <div class="Parameters_Form__error" if="{isMobile &amp;&amp; isFocus &amp;&amp; hasError &amp;&amp; !opts.ispreview}">{errors[0]}</div> <div class="Parameters_Form__body" ref="body" onclick="{getClickHandler(\'handleBodyTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBodyTap\')}"> <virtual if="{uiType === \'textinput\'}"> <viron-textinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextareaChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleNumberinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="{accept}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'base64\'}"> <viron-base64 val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" mimetype="{mimeType}" onchange="{handleBase64Change}"></viron-base64> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleHtmlChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handlePugChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" config="{autocompleteConfig}" onchange="{handleAutocompleteChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" theme="{opts.theme}" explorer="{explorerConfig}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'image\'}"> <viron-image val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview || isDisabled}"></viron-image> </virtual> <virtual if="{uiType === \'null\'}"> <div>NULL</div> </virtual> </div>', '', 'class="Parameters_Form {\'Parameters_Form--preview\': opts.ispreview}"', function(opts) {
+riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> <div class="Parameters_Form__description" if="{!!description}">{description}</div> </div> <div class="Parameters_Form__error" if="{isMobile &amp;&amp; isFocus &amp;&amp; hasError &amp;&amp; !opts.ispreview}">{errors[0]}</div> <div class="Parameters_Form__body" ref="body" onclick="{getClickHandler(\'handleBodyTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBodyTap\')}"> <virtual if="{uiType === \'textinput\'}"> <viron-textinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onsubmit="{handleTextInputSubmit}" onchange="{handleTextinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextareaChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onsubmit="{handleNumberInputSubmit}" onchange="{handleNumberinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="{accept}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'base64\'}"> <viron-base64 val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" mimetype="{mimeType}" onchange="{handleBase64Change}"></viron-base64> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleHtmlChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handlePugChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" config="{autocompleteConfig}" onsubmit="{handleAutocompleteSubmit}" onchange="{handleAutocompleteChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" theme="{opts.theme}" explorer="{explorerConfig}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'image\'}"> <viron-image val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview || isDisabled}"></viron-image> </virtual> <virtual if="{uiType === \'null\'}"> <div>NULL</div> </virtual> </div>', '', 'class="Parameters_Form {\'Parameters_Form--preview\': opts.ispreview}"', function(opts) {
     this.external(script$26);
 });
 
@@ -101837,6 +101928,29 @@ var script$28 = function() {
   };
 
   /**
+   * When each property is submitted.
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handlePropertySubmit = (key, newVal) => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    let ret = this.opts.val || {};
+    ret[key] = newVal;
+    // Delete the key if it's undefined.
+    forOwn_1$2(ret, (val, key) => {
+      if (isUndefined(val)) {
+        delete ret[key];
+      }
+    });
+    if (!size_1(ret)) {
+      ret = undefined;
+    }
+    this.opts.onsubmit(this.opts.identifier, ret);
+  };
+
+  /**
    * 各propertyが変更された時の処理。
    * @param {String} key
    * @param {*} newVal
@@ -101872,7 +101986,7 @@ var script$28 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__head"> <div class="Parameters_Properties__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> </div> <div class="Parameters_Properties__error" if="{hasError}">{errors[0]}</div> <div class="Parameters_Properties__body"> <div class="Parameters_Properties__item {\'Parameters_Properties__item--\' + parent.getSpreadStyle(key, property)}" each="{property, key in propertiesObject.properties}"> <virtual if="{isFormMode(property)}"> <viron-parameters-form no-reorder identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.getFormObject(key, property)}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode(property)}"> <viron-parameters-properties no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" required="{parent.getRequired(key)}" propertiesobject="{parent.getPropertiesObject(key, property)}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode(property)}"> <viron-parameters-items no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" required="{parent.getRequired(key)}" schemaobject="{parent.getSchemaObject(key, property)}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-items> </virtual> </div> </div>', '', 'class="Parameters_Properties"', function(opts) {
+riot$1.tag2('viron-parameters-properties', '<div class="Parameters_Properties__head"> <div class="Parameters_Properties__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> </div> <div class="Parameters_Properties__error" if="{hasError}">{errors[0]}</div> <div class="Parameters_Properties__body"> <div class="Parameters_Properties__item {\'Parameters_Properties__item--\' + parent.getSpreadStyle(key, property)}" each="{property, key in propertiesObject.properties}"> <virtual if="{isFormMode(property)}"> <viron-parameters-form no-reorder identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.getFormObject(key, property)}" onsubmit="{parent.handlePropertySubmit}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode(property)}"> <viron-parameters-properties no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" required="{parent.getRequired(key)}" propertiesobject="{parent.getPropertiesObject(key, property)}" onsubmit="{parent.handlePropertySubmit}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode(property)}"> <viron-parameters-items no-reorder label="{key}" identifier="{key}" val="{parent.getVal(key)}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" required="{parent.getRequired(key)}" schemaobject="{parent.getSchemaObject(key, property)}" onsubmit="{parent.handlePropertySubmit}" onchange="{parent.handlePropertyChange}" onvalidate="{parent.handlePropertyValidate}"></viron-parameters-items> </virtual> </div> </div>', '', 'class="Parameters_Properties"', function(opts) {
     this.external(script$28);
 });
 
@@ -102129,6 +102243,19 @@ var script$29 = function() {
     this.update();
   };
 
+  /**
+   * When each item is submitted.
+   * @param {Number} idx
+   * @param {*} newVal
+   */
+  this.handleItemSubmit = (idx, newVal) => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    const ret = this.opts.val;
+    ret[idx] = newVal;
+    this.opts.onsubmit(this.opts.identifier, ret);
+  };
 
   /**
    * 各itemが変更された時の処理。
@@ -102157,7 +102284,7 @@ var script$29 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__addButton" if="{!opts.ispreview}" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__headContent"> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__error" if="{hasError}">{errors[0]}</div> </div> <div class="Parameters_Items__openButton" if="{!!opts.val &amp;&amp; !!opts.val.length}" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">項目をすべて開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="Parameters_Items__removeButton" if="{!parent.opts.ispreview}" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.formObject}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" propertiesobject="{parent.propertiesObject}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" schemaobject="{parent.schemaObject.items}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-items> </virtual> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div class="Parameters_Items__itemBriefTitle">{parent.getBriefItemTitle(val, idx)}</div> <div class="Parameters_Items__itemBriefDescription" if="{parent.isPropertiesMode}">{parent.getBriefItemDescription(val)}</div> <div class="Parameters_Items__itemBriefOpenButton"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div> </div> </div>', '', 'class="Parameters_Items {\'Parameters_Items--preview\': opts.ispreview}"', function(opts) {
+riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__addButton" if="{!opts.ispreview}" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__headContent"> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__error" if="{hasError}">{errors[0]}</div> </div> <div class="Parameters_Items__openButton" if="{!!opts.val &amp;&amp; !!opts.val.length}" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">項目をすべて開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="Parameters_Items__removeButton" if="{!parent.opts.ispreview}" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.formObject}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" propertiesobject="{parent.propertiesObject}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" schemaobject="{parent.schemaObject.items}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-items> </virtual> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div class="Parameters_Items__itemBriefTitle">{parent.getBriefItemTitle(val, idx)}</div> <div class="Parameters_Items__itemBriefDescription" if="{parent.isPropertiesMode}">{parent.getBriefItemDescription(val)}</div> <div class="Parameters_Items__itemBriefOpenButton"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div> </div> </div>', '', 'class="Parameters_Items {\'Parameters_Items--preview\': opts.ispreview}"', function(opts) {
     this.external(script$29);
 });
 
@@ -102230,6 +102357,19 @@ var script$30 = function() {
   }
 
   /**
+   * Parameter when submit
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handleValSubmit = (key, newVal) => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    // Key is the same as opts.parameterObject.name.
+    this.opts.onsubmit(key, newVal);
+  };
+
+  /**
    * Parameterが変更された時の処理。
    * @param {String} key
    * @param {*} newVal
@@ -102255,7 +102395,7 @@ var script$30 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters-parameter', '<virtual if="{isFormMode}"> <viron-parameters-form formobject="{formObject}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isFormDisabled}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameters-properties label="{propertiesLabel}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" required="{parameterObject.required}" propertiesobject="{propertiesObject}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode}"> <viron-parameters-items label="{itemsLabel}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" required="{parameterObject.required}" schemaobject="{schemaObject}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-items> </virtual>', '', 'class="Parameters_Parameter {\'Parameters_Parameter--\' + spreadStyle}"', function(opts) {
+riot$1.tag2('viron-parameters-parameter', '<virtual if="{isFormMode}"> <viron-parameters-form formobject="{formObject}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isFormDisabled}" onsubmit="{handleValSubmit}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-form> </virtual> <virtual if="{isPropertiesMode}"> <viron-parameters-properties label="{propertiesLabel}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" required="{parameterObject.required}" propertiesobject="{propertiesObject}" onsubmit="{handleValSubmit}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-properties> </virtual> <virtual if="{isItemsMode}"> <viron-parameters-items label="{itemsLabel}" identifier="{parameterObject.name}" val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" required="{parameterObject.required}" schemaobject="{schemaObject}" onsubmit="{handleValSubmit}" onchange="{handleValChange}" onvalidate="{handleValValidate}"></viron-parameters-items> </virtual>', '', 'class="Parameters_Parameter {\'Parameters_Parameter--\' + spreadStyle}"', function(opts) {
     this.external(script$30);
 });
 
@@ -102297,6 +102437,26 @@ var script$31 = function() {
   });
 
   /**
+   * Input when submitted
+   * @param {String} key
+   * @param {*} newVal
+   */
+  this.handleValSubmit = (key, newVal) => {
+    if (!this.opts.onsubmit) {
+      return;
+    }
+    const ret = this.opts.val;
+    ret[key] = newVal;
+    // Delete the key if it's undefined.
+    forOwn_1$2(ret, (val, key) => {
+      if (isUndefined(val)) {
+        delete ret[key];
+      }
+    });
+    this.opts.onsubmit(ret);
+  };
+
+  /**
    * 入力値が変更された時の処理。
    * @param {String} key
    * @param {*} newVal
@@ -102335,7 +102495,7 @@ var script$31 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters', '<viron-parameters-parameter each="{parameterObject in opts.parameterobjects}" val="{parent.opts.val[parameterObject.name]}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" parameterobject="{parameterObject}" primary="{parent.opts.primary}" onchange="{parent.handleValChange}" onvalidate="{parent.handleValValidate}"></viron-parameters-parameter>', '', 'class="Parameters {\'Parameters--narrow\': isNarrow}"', function(opts) {
+riot$1.tag2('viron-parameters', '<viron-parameters-parameter each="{parameterObject in opts.parameterobjects}" val="{parent.opts.val[parameterObject.name]}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" parameterobject="{parameterObject}" primary="{parent.opts.primary}" onsubmit="{parent.handleValSubmit}" onchange="{parent.handleValChange}" onvalidate="{parent.handleValValidate}"></viron-parameters-parameter>', '', 'class="Parameters {\'Parameters--narrow\': isNarrow}"', function(opts) {
     this.external(script$31);
 });
 
@@ -102408,6 +102568,20 @@ var script$32 = function() {
       });
   };
 
+  const confirmSubmit = () => {
+    if (!this.isValid) {
+      return;
+    }
+    Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
+      title: this.title,
+      message: '本当に実行しますか？',
+      labelPositive: this.submitLabel,
+      onPositiveSelect: () => {
+        operate();
+      }
+    }));
+  };
+
   const updateSubmitButton = () => {
     // 諸々の都合でthis.update()を使えない & 使いたくない。
     // ので、DOMを直接操作する。
@@ -102446,23 +102620,16 @@ var script$32 = function() {
     updateSubmitButton();
   };
 
-  this.handleSubmitTap = () => {
-    if (!this.isValid) {
-      return;
-    }
+  this.handleFormSubmit = () => {
+    confirmSubmit();
+  };
 
-    Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
-      title: this.title,
-      message: '本当に実行しますか？',
-      labelPositive: this.submitLabel,
-      onPositiveSelect: () => {
-        operate();
-      }
-    }));
+  this.handleSubmitTap = () => {
+    confirmSubmit();
   };
 };
 
-riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">キャンセル</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" parameterobjects="{opts.operationObject.parameters}" primary="{opts.primary}" onchange="{handleParametersChange}" onvalidate="{handleParametersValidate}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" ref="submit" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation ComponentsPage_Operation--{layoutType}"', function(opts) {
+riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">キャンセル</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" parameterobjects="{opts.operationObject.parameters}" primary="{opts.primary}" onsubmit="{handleFormSubmit}" onchange="{handleParametersChange}" onvalidate="{handleParametersValidate}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" ref="submit" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation ComponentsPage_Operation--{layoutType}"', function(opts) {
     this.external(script$32);
 });
 
@@ -106931,7 +107098,15 @@ var script$48 = function() {
     this.update();
   };
 
+  this.handleFromSubmit = () => {
+    signin();
+  };
+
   this.handleSigninButtonSelect = () => {
+    signin();
+  };
+
+  const signin = () => {
     Promise
       .resolve()
       .then(() => store.action('auth.signinEmail', this.opts.endpointkey, this.opts.authtype, this.mailAddress, this.password))
@@ -106946,7 +107121,7 @@ var script$48 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<div class="EndpointsPage_Endpoint_Signin_Email__error" if="{errorMessage}">{errorMessage}</div> <viron-textinput placeholder="IDまたはメールアドレス" val="{mailAddress}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="パスワード" type="password" val="{password}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button class="EndpointsPage_Endpoint_Signin_Email__button" label="ログイン" theme="secondary" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<div class="EndpointsPage_Endpoint_Signin_Email__error" if="{errorMessage}">{errorMessage}</div> <viron-textinput placeholder="IDまたはメールアドレス" val="{mailAddress}" onsubmit="{handleFromSubmit}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="パスワード" type="password" val="{password}" onsubmit="{handleFromSubmit}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button class="EndpointsPage_Endpoint_Signin_Email__button" label="ログイン" theme="secondary" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
     this.external(script$48);
 });
 
