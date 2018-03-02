@@ -75,7 +75,7 @@
     }
   }
 
-  &--ghost  {
+  &--ghost {
     & .Select__form {
       background-color: transparent;
       border: 1px solid rgba(149, 152, 154, 0.3);
