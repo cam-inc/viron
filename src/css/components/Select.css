@@ -22,6 +22,7 @@
     height: 100%;
     padding: 8px 34px 8px 18px;
     font-size: 1.8rem;
+    color: currentColor;
     cursor: pointer;
   }
 
@@ -71,6 +72,13 @@
 
     & .Select__select {
       cursor: not-allowed;
+    }
+  }
+
+  &--ghost {
+    & .Select__form {
+      background-color: transparent;
+      border: 1px solid rgba(149, 152, 154, 0.3);
     }
   }
 }
