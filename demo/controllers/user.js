@@ -1,8 +1,15 @@
+const fs = require('fs');
+const path = require('path');
 const csv = require('csv');
 const moment = require('moment-timezone');
+const {find} = require('mout/array');
+const {omit} = require('mout/object');
 
 const shared = require('../shared');
 const context = shared.context;
+
+const dir = path.join(__dirname, '../public/img/user_video');
+const imgUrl = `https://${context.getConfigHost()}/img/user_video/`;
 
 /**
  * Controller : List  User
@@ -17,7 +24,8 @@ const list = (req, res) => {
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const Users = store.models.Users;
-  const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
+  const props = omit(req.swagger.operation.responses['200'].schema.items.properties, 'video');
+  const attributes = Object.keys(props);
   const limit = Number(req.query.limit);
   const offset = Number(req.query.offset);
   const options = {
@@ -32,7 +40,21 @@ const list = (req, res) => {
   return storeHelper.list(store, Users, query, options)
     .then(data => {
       pager.setResHeader(res, limit, offset, data.count);
-      res.json(data.list);
+
+      const filenames = fs.readdirSync(dir);
+
+      return data.list.map(user => {
+        const data = user.dataValues;
+        // ファイルがあればURLを返す
+        const name = find(filenames, name => `${user.id}` === (path.basename(name, path.extname(name))));
+        if (name) {
+          data.video = `${imgUrl}${name}`;
+        }
+        return data;
+      });
+    })
+    .then(list => {
+      res.json(list);
     })
   ;
 };
@@ -49,12 +71,30 @@ const create = (req, res, next) => {
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const Users = store.models.Users;
-  const file = req.files.image && req.files.image[0];
+  const image = req.files.image && req.files.image[0];
+  const video = req.files.video && req.files.video[0];
   const user = Object.assign({}, req.body);
-  if (file) {
-    user.thumbnail = file.buffer.toString('base64');
+  if (image) {
+    user.thumbnail = image.buffer.toString('base64');
   }
   return storeHelper.create(store, Users, user)
+    .then(data => {
+      if (!video) {
+        return data;
+      }
+
+      return new Promise((resolve, reject) => {
+        const filename = `${data.id}${path.extname(video.originalname)}`;
+        const filepath = path.join(dir, filename);
+        fs.writeFile(filepath, video.buffer, err => {
+          if (err) {
+            return reject(err);
+          }
+          data.video = `${imgUrl}${filename}`;
+          resolve(data);
+        });
+      });
+    })
     .then(data => {
       res.json(data);
     })
@@ -74,13 +114,22 @@ const remove = (req, res, next) => {
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const Users = store.models.Users;
-  const query = {
-    id: req.swagger.params.id.value,
-  };
+  const userId = req.swagger.params.id.value;
+  const query = {id: userId};
   const options = {
     force: true, // physical delete
   };
   return storeHelper.remove(store, Users, query, options)
+    .then(() => {
+      const filenames = fs.readdirSync(dir);
+
+      // ファイルがあれば削除する
+      const name = find(filenames, name => `${userId}` === (path.basename(name, path.extname(name))));
+      if (!name) {
+        return;
+      }
+      return new Promise(resolve => fs.unlink(path.join(dir, name), resolve));
+    })
     .then(() => {
       res.status(204).end();
     })
@@ -100,15 +149,31 @@ const update = (req, res, next) => {
   const storeHelper = vironlib.stores.helper;
   const store = context.getStoreMain();
   const Users = store.models.Users;
-  const query = {
-    id: req.swagger.params.id.value,
-  };
-  const file = req.files.image && req.files.image[0];
+  const userId = req.swagger.params.id.value;
+  const query = {id: userId};
+  const image = req.files.image && req.files.image[0];
+  const video = req.files.video && req.files.video[0];
   const user = Object.assign({}, req.body);
-  if (file) {
-    user.thumbnail = file.buffer.toString('base64');
+  if (image) {
+    user.thumbnail = image.buffer.toString('base64');
   }
   return storeHelper.update(store, Users, query, user)
+    .then(data => {
+      if (!video) {
+        return data;
+      }
+
+      return new Promise((resolve, reject) => {
+        const filename = `${userId}${path.extname(video.originalname)}`;
+        const filepath = path.join(dir, filename);
+        fs.writeFile(filepath, video.buffer, err => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(data);
+        });
+      });
+    })
     .then(data => {
       res.json(data);
     })

@@ -69,7 +69,7 @@ context.init()
           next();
         });
 
-        app.use(multer.fields([{name: 'image'}]));
+        app.use(multer.fields([{name: 'image'}, {name: 'video'}]));
 
         // add routing
         swaggerExpress.register(app);

@@ -514,6 +514,10 @@ definitions:
         type: string
         format: base64
         x-mime-type: image/png
+      video:
+        description: PV
+        type: string
+        x-mime-type: video/mp4
       updatedAt:
         description: 更新日時
         format: date-time
@@ -2247,6 +2251,11 @@ paths:
         type: file
         description: サムネイル
         x-accept: image/*
+      - in: formData
+        name: video
+        type: file
+        description: PV
+        x-accept: video/*
       consumes:
       - multipart/form-data
       responses:
@@ -2410,6 +2419,11 @@ paths:
         name: image
         type: file
         description: サムネイル
+      - in: formData
+        name: video
+        type: file
+        description: PV
+        x-accept: video/*
       consumes:
       - multipart/form-data
       responses:
