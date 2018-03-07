@@ -22,6 +22,7 @@ const UI_PUG = 'pug';
 const UI_NULL = 'null';
 const UI_AUTOCOMPLETE = 'autocomplete';
 const UI_BASE64 = 'base64';
+const UI_VIDEO = 'video';
 
 /**
  * 値がnullの場合は強制的にundefinedに変換します。
@@ -212,6 +213,8 @@ export default {
         return UI_HTML;
       case 'base64':
         return UI_BASE64;
+      case 'video':
+        return UI_VIDEO;
       default:
         return UI_TEXTINPUT;
       }
@@ -243,6 +246,7 @@ export default {
     case 'string':
       switch (formObject.format) {
       case 'base64':
+      case 'video':
         return 'spreadSmall';
       case 'multiline':
       case 'wyswyg':

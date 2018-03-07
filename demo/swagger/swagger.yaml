@@ -517,6 +517,7 @@ definitions:
       video:
         description: PV
         type: string
+        format: video
         x-mime-type: video/mp4
       updatedAt:
         description: 更新日時
