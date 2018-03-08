@@ -1892,7 +1892,7 @@ paths:
       tags:
       - viron
 
-  /viron_authtype:
+  /viron/authtype:
     get:
       x-swagger-router-controller: viron_authtype
       description: 認証方式一覧
