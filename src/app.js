@@ -3,6 +3,7 @@ import i18n from './core/i18n';
 import mixin from './core/mixin';
 import './core/polyfill';
 import router from './core/router';
+import './gen/components';
 import store from './store';
 import './viron/index.tag';
 import './components/viron-error/index.tag';

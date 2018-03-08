@@ -1,0 +1,11 @@
+.Mycomps_Foo {
+  display: block;
+
+  &__label {
+    font-weight: bold;
+  }
+
+  &__description {
+    color: red;
+  }
+}
