@@ -4974,8 +4974,7 @@ select {
     font-size: 1.8rem;
     background-color: #fff;
     background-color: var(--color-base-white);
-    border: 1px solid #d1d1d1;
-    border: 1px solid var(--color-base-gray);
+    border: 1px solid rgba(149, 152, 154, 0.3);
     border-radius: 2px;
   }
 @media (hover: hover) {
@@ -5015,6 +5014,8 @@ select {
       border-color: var(--color-base-red);
     }
 .Numberinput--disabled .Numberinput__input {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
       cursor: not-allowed;
       background-color: #f9f9f9;
       background-color: var(--color-base-gray-tertiary);
@@ -5022,8 +5023,8 @@ select {
       border-color: var(--color-base-gray);
     }
 .Numberinput--preview .Numberinput__input {
-      color: #cecece;
-      color: var(--color-base-gray-secondary);
+      color: #a3a3a3;
+      color: var(--color-base-black-secondary);
       background-color: #f4f4f4;
       border-color: #f4f4f4;
     }
@@ -5830,6 +5831,7 @@ select {
     height: 100%;
     padding: 8px 34px 8px 18px;
     font-size: 1.8rem;
+    color: currentColor;
     cursor: pointer;
   }
 .Select__icon {
@@ -5872,6 +5874,10 @@ select {
     }
 .Select--disabled .Select__select {
       cursor: not-allowed;
+    }
+.Select--ghost .Select__form {
+      background-color: transparent;
+      border: 1px solid rgba(149, 152, 154, 0.3);
     }
 .Tag {
   display: inline-block;
@@ -5945,12 +5951,14 @@ select {
       border-color: var(--color-base-red);
     }
 .Textarea--preview .Textarea__input {
-      color: #cecece;
-      color: var(--color-base-gray-secondary);
+      color: #a3a3a3;
+      color: var(--color-base-black-secondary);
       background-color: #f4f4f4;
       border-color: #f4f4f4;
     }
 .Textarea--disabled .Textarea__input {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
       cursor: not-allowed;
       background-color: #f9f9f9;
       background-color: var(--color-base-gray-tertiary);
@@ -5974,8 +5982,7 @@ select {
     font-size: 1.8rem;
     background-color: #fff;
     background-color: var(--color-base-white);
-    border: 1px solid #d1d1d1;
-    border: 1px solid var(--color-base-gray);
+    border: 1px solid rgba(149, 152, 154, 0.3);
     border-radius: 2px;
   }
 @media (hover: hover) {
@@ -6015,12 +6022,14 @@ select {
       border-color: var(--color-base-red);
     }
 .Textinput--preview .Textinput__input {
-      color: #cecece;
-      color: var(--color-base-gray-secondary);
+      color: #a3a3a3;
+      color: var(--color-base-black-secondary);
       background-color: #f4f4f4;
       border-color: #f4f4f4;
     }
 .Textinput--disabled .Textinput__input {
+      color: #cecece;
+      color: var(--color-base-gray-secondary);
       cursor: not-allowed;
       background-color: #f9f9f9;
       background-color: var(--color-base-gray-tertiary);
