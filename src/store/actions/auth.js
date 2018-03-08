@@ -89,7 +89,7 @@ export default exporter('auth', {
           .resolve()
           .then(() => fetch(context, oldFetchUrl))
           .then(response => {
-            console.warn('Deprecated: use [GET /viron/authtype] instead of [GET /viron_authtype].');
+            console.warn('Deprecated: use [GET /viron/authtype] instead of [GET /viron_authtype].');// eslint-disable-line no-console
             return response.json();
           });
       });
