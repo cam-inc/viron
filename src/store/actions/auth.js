@@ -70,12 +70,29 @@ export default exporter('auth', {
    */
   getTypes: (context, endpointKey) => {
     const endpoint = context.getter('endpoints.one', endpointKey);
-    const fetchUrl = `${new URL(endpoint.url).origin}/viron_authtype`;
+    // 下位互換性を保つため。
+    // v1以降は削除して良いかも。
+    // 新しいurlと古いurl両方にfetchする。
+    const oldFetchUrl = `${new URL(endpoint.url).origin}/viron_authtype`;
+    const fetchUrl = `${new URL(endpoint.url).origin}/viron/authtype`;
 
     return Promise
       .resolve()
       .then(() => fetch(context, fetchUrl))
-      .then(response => response.json());
+      .then(response => response.json())
+      .catch(err => {
+        // 新しいurlが404ならば古いurlで再トライ。
+        if (err.status !== 404) {
+          return Promise.reject(err);
+        }
+        return Promise
+          .resolve()
+          .then(() => fetch(context, oldFetchUrl))
+          .then(response => {
+            console.warn('Deprecated: use [GET /viron/authtype] instead of [GET /viron_authtype].');
+            return response.json();
+          });
+      });
   },
 
   /**
