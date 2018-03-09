@@ -29,7 +29,7 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
     virtual(if="{ uiType === 'image' }")
       viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview || isDisabled }")
     virtual(if="{ uiType === 'video' }")
-      viron-video(val="{ opts.val }" theme="{ opts.theme }" mimeType="{ mimeType }")
+      video.Parameters_Form__video(src="{ opts.val }" controls)
     virtual(if="{ uiType === 'null' }")
       div NULL
 
@@ -45,7 +45,6 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
     import '../../../components/viron-textarea/index.tag';
     import '../../../components/viron-textinput/index.tag';
     import '../../../components/viron-uploader/index.tag';
-    import '../../../components/viron-video/index.tag';
     import '../../../components/viron-wyswyg/index.tag';
     import script from './index';
     this.external(script);

@@ -9,8 +9,7 @@ viron-components-page-table-cell.ComponentsPage_Card_Table_Cell
       // @see: https://ja.wikipedia.org/wiki/Data_URI_scheme
       .ComponentsPage_Card_Table_Cell__image(style="background-image:url(data:{ mimeType };base64,{ value })")
   virtual(if="{ isVideo }")
-    video.ComponentsPage_Card_Table_Cell__video(controls)
-      source(src="{ value }" type="video/{ videoType }")
+    video.ComponentsPage_Card_Table_Cell__video(src="{ value }" controls)
 
   script.
     import script from './index';

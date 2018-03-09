@@ -17,7 +17,6 @@ export default function() {
   this.mimeType = null;
   // 動画系か否か。
   this.isVideo = false;
-  this.videoType = null;
   // typeに応じて表示を切り替えます。
   this.value = (() => {
     const data = this.opts.data;
@@ -74,7 +73,6 @@ export default function() {
       // 動画系チェック。
       if (contains(['mp4', 'ogv', 'webm'], suffix)) {
         this.isVideo = true;
-        this.videoType = suffix;
         return data;
       }
       // 推測できない場合はそのまま表示。

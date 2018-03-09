@@ -3,6 +3,7 @@ export default function() {
   this.file = null;
   this.fileName = null;
   this.isTypeOfImage = false;
+  this.isTypeOfVideo = false;
   this.isTypeOfCsv = false;
   this.isTypeOfOther = false;
   this.blobURL = this.opts.initialbloburl || null;
@@ -15,6 +16,7 @@ export default function() {
     this.file = null;
     this.fileName = null;
     this.isTypeOfImage = false;
+    this.isTypeOfVideo = false;
     this.isTypeOfCsv = false;
     this.isTypeOfOther = false;
     this.blobURL = this.opts.initialbloburl || null;
@@ -54,14 +56,22 @@ export default function() {
     this.fileName = file.name;
     if (file.type.indexOf('image/') === 0) {
       this.isTypeOfImage = true;
+      this.isTypeOfVideo = false;
+      this.isTypeOfCsv = false;
+      this.isTypeOfOther = false;
+    } else if (file.type.indexOf('video/') === 0) {
+      this.isTypeOfImage = false;
+      this.isTypeOfVideo = true;
       this.isTypeOfCsv = false;
       this.isTypeOfOther = false;
     } else if (file.type.indexOf('text/csv') === 0) {
       this.isTypeOfImage = false;
+      this.isTypeOfVideo = false;
       this.isTypeOfCsv = true;
       this.isTypeOfOther = false;
     } else {
       this.isTypeOfImage = false;
+      this.isTypeOfVideo = false;
       this.isTypeOfCsv = false;
       this.isTypeOfOther = true;
     }
