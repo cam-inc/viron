@@ -11,19 +11,28 @@ import 'tinymce/plugins/paste/plugin';
 import 'tinymce/plugins/searchreplace/plugin';
 import 'tinymce/plugins/table/plugin';
 import 'tinymce/plugins/textcolor/plugin';
+import './explorer/index.tag';
 
 const url = new URL(window.location.href);
+const toolbarDesktop = [
+  'bold italic underline | forecolor backcolor | image explorer link unlink',
+  'formatselect fontsizeselect',
+  'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
+];
+const toolbarMobile = [
+  'bold italic underline forecolor backcolor',
+  'image explorer link unlink',
+  'alignleft aligncenter alignright alignjustify alignnone',
+  'bullist numlist | outdent indent blockquote'
+];
+const menuDesktop = {
+  edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+  insert: { title: 'Insert', items: 'image link | inserttable hr' },
+  format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
+  tools: { title: 'Tools', items: 'code fullscreen' }
+};
+const menuMobile = {};
 const baseConfig = {
-  menu: {
-    edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
-    insert: { title: 'Insert', items: 'image link | inserttable hr' },
-    format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat'},
-    tools: {title: 'Tools', items: 'code fullscreen'}
-  },
-  toolbar: [
-    'bold italic underline | forecolor backcolor styleselect formatselect fontselect fontsizeselect | image link unlink',
-    'alignleft aligncenter alignright alignjustify alignnone | bullist numlist | outdent indent blockquote'
-  ],
   plugins: ['code', 'hr', 'lists', 'link', 'image', 'paste', 'searchreplace', 'fullscreen', 'table', 'textcolor'],
   min_height: 300,
   branding: false,
@@ -34,27 +43,68 @@ const baseConfig = {
   skin_url: 'skins/lightgray',
   theme: 'modern',
   theme_url: 'themes/modern/theme.js',
-  body_class: 'Wyswyg__body',
-  mobile: {
-    theme: 'mobile',
-    theme_url: 'themes/mobile/theme.js'
-  }
+  body_class: 'Wyswyg__body'
 };
 
 export default function() {
+  const store = this.riotx.get();
+  const isMobile = store.getter('layout.isMobile');
+
   this.editor = null;
 
-  this.on('mount', () => {
-    TinyMCE.init(ObjectAssign({}, baseConfig, {
-      selector: `.Wyswyg__editor${this._riot_id}`,
-      init_instance_callback: editor => {
-        this.editor = editor;
-        !!this.opts.val && this.editor.setContent(this.opts.val);
-        this.editor.on('Change', this.handleEditorChange);
-        this.editor.on('focus', this.handleEditorFocus);
-        this.editor.on('blur', this.handleEditorBlur);
+  const openExplorer = () => {
+    const explorerDef = this.opts.explorer;
+    store.action('drawers.add', 'viron-wyswyg-explorer', {
+      def: explorerDef,
+      onInsert: item => {
+        this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" width="100" />`);
       }
-    }));
+    }, { isWide: true });
+  };
+
+  const customConfig = {
+    selector: `.Wyswyg__editor${this._riot_id}`,
+    init_instance_callback: editor => {
+      this.editor = editor;
+      !!this.opts.val && this.editor.setContent(this.opts.val);
+      this.editor.on('Change', this.handleEditorChange);
+      this.editor.on('focus', this.handleEditorFocus);
+      this.editor.on('blur', this.handleEditorBlur);
+    },
+    setup: editor => {
+      // explorer機能と連携。
+      if (!!this.opts.explorer) {
+        editor.addButton('explorer', {
+          icon: 'browse',
+          tooltip: 'Explorer',
+          onclick: () => {
+            editor.iframeElement.blur();
+            // blur完了を保証するため。
+            setTimeout(() => {
+              openExplorer();
+            }, 500);
+
+          }
+        });
+      }
+    },
+    menu: (() => {
+      if (isMobile) {
+        return menuMobile;
+      }
+      return menuDesktop;
+    })(),
+    toolbar: (() => {
+      if (isMobile) {
+        return toolbarMobile;
+      }
+      return toolbarDesktop;
+    })()
+  };
+
+
+  this.on('mount', () => {
+    TinyMCE.init(ObjectAssign({}, baseConfig, customConfig));
   }).on('before-unmount', () => {
     TinyMCE.remove(`.Wyswyg__editor${this._riot_id}`);
     this.editor.off('Change', this.handleEditorChange);

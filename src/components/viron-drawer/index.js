@@ -27,7 +27,7 @@ export default function() {
 
     setTimeout(() => {
       store.action('drawers.remove', this.opts.id);
-    }, 1000);
+    }, 300);
   };
 
   this.layoutType = store.getter('layout.type');

@@ -49,6 +49,7 @@
     }
   }
 
+  &--wide,
   &--mobile {
     & .Drawer__frame {
       width: 100%;

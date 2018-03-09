@@ -1,5 +1,6 @@
 .Pagination {
   display: block;
+  color: var(--theme-app-text);
 
   &__control {
     @apply --layout-center-center;

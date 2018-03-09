@@ -1,0 +1,51 @@
+.Wyswyg_Explorer {
+  min-height: 100%;
+  padding: 24px 24px 0;
+  color: #fff;
+  background-color: #292929;
+
+  &__head {
+    margin-bottom: 24px;
+  }
+
+  &__back {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    display: inline-block;
+    margin-bottom: 24px;
+    cursor: pointer;
+
+    & .Icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__title {
+    font-size: 2.8rem;
+  }
+
+  & .Explorer {
+    &__label {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &__droparea {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  & .Pagination {
+    color: #fff;
+
+    & .Pagination__button {
+      background-color: transparent;
+
+      &--selected {
+        background-color: var(--color-base-blue);
+      }
+    }
+  }
+}

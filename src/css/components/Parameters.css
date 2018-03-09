@@ -24,4 +24,8 @@
   & .Parameters_Parameter--spreadFull {
     grid-column: 1 / -1;
   }
+
+  &--narrow .Parameters_Parameter--spreadFull {
+    grid-column-end: span 2;
+  }
 }

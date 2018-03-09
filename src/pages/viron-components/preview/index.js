@@ -44,8 +44,18 @@ export default function() {
   };
 
   this.handleOperationTap = e => {
-    this.opts.onOperationSelect(e.item.operation, this.selectedIdx);
-    this.close();
+    const operation = e.item.operation;
+    Promise
+      .resolve()
+      .then(() => {
+        this.close();
+      })
+      .then(() => {
+        // TinyMCE問題への対策。
+        setTimeout(() => {
+          this.opts.onOperationSelect(operation, this.selectedIdx);
+        }, 500);
+      });
   };
 
   this.handleOperationsButtonTap = e => {
@@ -54,8 +64,10 @@ export default function() {
     store.action('popovers.add', 'viron-components-page-table-operations', {
       operations: this.operations,
       onSelect: operationObject => {
-        this.opts.onOperationSelect(operationObject, this.selectedIdx);
         this.close();
+        setTimeout(() => {
+          this.opts.onOperationSelect(operationObject, this.selectedIdx);
+        }, 500);
       }
     }, {
       x: rect.left + (rect.width / 2),

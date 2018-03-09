@@ -90,6 +90,9 @@ export default exporter('components', {
     case 'row':
       operations = component.rowOperations;
       break;
+    case 'explorer':
+      operations = component.explorerOperations;
+      break;
     default:
       operations = component.operations || [];
       break;
@@ -114,6 +117,9 @@ export default exporter('components', {
     case 'row':
       operations = component.rowOperations;
       break;
+    case 'explorer':
+      operations = component.explorerOperations;
+      break;
     default:
       operations = component.operations || [];
       break;
@@ -121,6 +127,40 @@ export default exporter('components', {
     const path = component.def.api.path;
     const operationObject = find(operations, operation => {
       return (operation.path === path && operation.method === 'post');
+    });
+    if (!operationObject) {
+      return null;
+    }
+    return operationObject;
+  },
+
+  /**
+   * 指定componentIDに対する要素のdeleteメソッドOperationObjectを返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @param {String} category
+   * @return {Object|null}
+   */
+  deleteOperation: (state, componentId, category) => {
+    const component = state.components[componentId];
+    let operations;
+    switch (category) {
+    case 'table':
+      operations = component.tableOperations;
+      break;
+    case 'row':
+      operations = component.rowOperations;
+      break;
+    case 'explorer':
+      operations = component.explorerOperations;
+      break;
+    default:
+      operations = component.operations || [];
+      break;
+    }
+    const path = component.def.api.path;
+    const operationObject = find(operations, operation => {
+      return (operation.path === path && operation.method === 'delete');
     });
     if (!operationObject) {
       return null;

@@ -1,6 +1,6 @@
 {
   "name": "viron",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Design-based Management Console.",
   "main": "index.js",
   "repository": {
@@ -80,7 +80,7 @@
     "sua.js": "^2.1.0",
     "taucharts": "^1.2.2",
     "tinycolor2": "^1.4.1",
-    "tinymce": "^4.7.4",
+    "tinymce": "^4.7.9",
     "valid-url": "^1.0.9",
     "whatwg-fetch": "^2.0.3"
   },
