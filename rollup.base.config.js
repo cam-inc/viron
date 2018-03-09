@@ -70,7 +70,7 @@ export default {
       browser: true
     }),
     commonjs({
-      include: 'node_modules/**',
+      include: ['viron.js', 'node_modules/**'],
       namedExports: namedExports
     }),
     buble({
