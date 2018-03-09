@@ -1,5 +1,5 @@
 viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
-  mycomps-foo
+  my-topic
   .EndpointsPage__head
     .EndpointsPage__title ホーム
   .EndpointsPage__container

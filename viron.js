@@ -4,15 +4,15 @@ module.exports = {
     {
       // Required
       // Tag name.
-      name: 'mycomps-foo',
+      name: 'my-topic',
 
       // Required
       // Relative path to the riot tag file from your local viron repository root.
-      path: './mycomps/foo/index.tag',
+      path: './example-component/my-topic/index.tag',
 
       // Required
       // Relative path to the css file from your local viron repository root.
-      css: './mycomps/foo/index.css'
+      css: './example-component/my-topic/index.css'
     }
   ]
 };
