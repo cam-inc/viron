@@ -770,6 +770,39 @@ definitions:
       $ref: '#/definitions/User'
     type: array
 
+  Topic:
+    example:
+      id: 1
+      content: トピック
+    properties:
+      id:
+        description: トピックID
+        format: int64
+        type: integer
+      content:
+        description: トピック内容
+        type: string
+    required:
+    - id
+    - content
+    type: object
+
+  TopicPayload:
+    example:
+      content: トピック
+    properties:
+      content:
+        description: トピック内容
+        type: string
+    required:
+    - content
+    type: object
+
+  TopicCollection:
+    items:
+      $ref: '#/definitions/Topic'
+    type: array
+
   AdminRolePath:
     description: 許可リクエスト
     example:
@@ -2932,6 +2965,157 @@ paths:
       summary: お気に入り削除
       tags:
       - user_favorite
+
+  /topic:
+    get:
+      x-swagger-router-controller: topic
+      description: トピック一覧
+      operationId: topic#list
+      parameters:
+      - description: 名前
+        in: query
+        name: name
+        required: false
+        type: string
+      - description: 1ページあたりの件数
+        in: query
+        name: limit
+        required: false
+        type: integer
+      - description: ページの開始位置
+        in: query
+        name: offset
+        required: false
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TopicCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: トピック一覧
+      tags:
+      - topic
+
+    post:
+      x-swagger-router-controller: topic
+      description: トピック作成
+      operationId: topic#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/TopicPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Topic'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: トピック作成
+      tags:
+      - topic
+
+  /topic/{id}:
+    delete:
+      x-swagger-router-controller: topic
+      description: トピック削除
+      operationId: topic#remove
+      parameters:
+      - description: トピックID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: トピック削除
+      tags:
+      - topic
+
+    put:
+      x-swagger-router-controller: topic
+      description: トピック情報更新
+      operationId: topic#update
+      parameters:
+      - description: トピックID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/TopicPayload'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Topic'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: トピック更新
+      tags:
+      - topic
 
   /validator:
     get:

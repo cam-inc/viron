@@ -4,6 +4,7 @@ module.exports = {
   UserBlogEntries: require('./user_blog_entries'),
   UserFavorites: require('./user_favorites'),
   BlogDesigns: require('./blog_design'),
+  Topics: require('./topics'),
 
   associations: require('./associations'),
 };
