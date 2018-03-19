@@ -130,6 +130,20 @@ export default exporter('components', {
       }, state.oas.client.spec.paths[`${path}/{id}`]['delete'])));
       state.components[componentId]['explorerOperations'] = explorerOperations;
     }
+
+    const operations = [];
+    forEach(['get', 'put', 'post', 'delete'], method => {
+      const operationObject = !!state.oas.client.spec.paths[`${path}`] && state.oas.client.spec.paths[`${path}`][method];
+      if (!operationObject) {
+        return;
+      }
+      operations.push(ObjectAssign({
+        method,
+        path
+      }, operationObject));
+    });
+    state.components[componentId]['operations'] = operations;
+
     return ['components', componentId];
   },
 
