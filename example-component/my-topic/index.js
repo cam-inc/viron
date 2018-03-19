@@ -4,6 +4,9 @@ export default function() {
   this.error = null;
   this.topics = [];
   this.postOperation = null;
+  this.putOperation = null;
+  this.deleteOperation = null;
+  this.primary = null;
 
   /**
    * OASに従いGETリクエストを送信します。
@@ -37,6 +40,7 @@ export default function() {
     store.action('drawers.add', 'viron-components-page-operation', {
       operationObject,
       initialVal,
+      primary: this.primary,
       onSuccess: () => {
         getData();
       }
@@ -46,6 +50,9 @@ export default function() {
   this.listen(this.opts.id, () => {
     this.topics = store.getter('components.response', this.opts.id);
     this.postOperation = store.getter('components.postOperation', this.opts.id);
+    this.putOperation = store.getter('components.putOperation', this.opts.id, 'item');
+    this.deleteOperation = store.getter('components.deleteOperation', this.opts.id, 'item');
+    this.primary = store.getter('components.primary', this.opts.id);
     this.update();
   });
 
@@ -57,5 +64,22 @@ export default function() {
 
   this.handlePostButtonTap = () => {
     openOperationDrawer(this.postOperation);
+  };
+
+  this.handlePutButtonTap = e => {
+    const data = e.item.topic;
+    openOperationDrawer(this.putOperation, {
+      id: data.id,
+      payload: {
+        content: data.content
+      }
+    });
+  };
+
+  this.handleDeleteButtonTap = e => {
+    const data = e.item.topic;
+    openOperationDrawer(this.deleteOperation, {
+      id: data.id
+    });
   };
 }

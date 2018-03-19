@@ -93,6 +93,9 @@ export default exporter('components', {
     case 'explorer':
       operations = component.explorerOperations;
       break;
+    case 'item':
+      operations = component.itemOperations;
+      break;
     default:
       operations = component.operations || [];
       break;
@@ -120,13 +123,51 @@ export default exporter('components', {
     case 'explorer':
       operations = component.explorerOperations;
       break;
+    case 'item':
+      operations = component.itemOperations;
+      break;
     default:
       operations = component.operations || [];
       break;
     }
-    const path = component.def.api.path;
     const operationObject = find(operations, operation => {
-      return (operation.path === path && operation.method === 'post');
+      return (operation.method === 'post');
+    });
+    if (!operationObject) {
+      return null;
+    }
+    return operationObject;
+  },
+
+  /**
+   * 指定componentIDに対する要素のputメソッドOperationObjectを返します。
+   * @param {Object} state
+   * @param {String} componentId
+   * @param {String} category
+   * @return {Object|null}
+   */
+  putOperation: (state, componentId, category) => {
+    const component = state.components[componentId];
+    let operations;
+    switch (category) {
+    case 'table':
+      operations = component.tableOperations;
+      break;
+    case 'row':
+      operations = component.rowOperations;
+      break;
+    case 'explorer':
+      operations = component.explorerOperations;
+      break;
+    case 'item':
+      operations = component.itemOperations;
+      break;
+    default:
+      operations = component.operations || [];
+      break;
+    }
+    const operationObject = find(operations, operation => {
+      return (operation.method === 'put');
     });
     if (!operationObject) {
       return null;
@@ -154,13 +195,15 @@ export default exporter('components', {
     case 'explorer':
       operations = component.explorerOperations;
       break;
+    case 'item':
+      operations = component.itemOperations;
+      break;
     default:
       operations = component.operations || [];
       break;
     }
-    const path = component.def.api.path;
     const operationObject = find(operations, operation => {
-      return (operation.path === path && operation.method === 'delete');
+      return (operation.method === 'delete');
     });
     if (!operationObject) {
       return null;
