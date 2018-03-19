@@ -8,7 +8,10 @@ my-topic.MyTopic
       .MyTopic__content { topic.content }
       .MyTopic__putButton(onTap="{ handlePutButtonTap }") PUT
       .MyTopic__deleteButton(onTap="{ handleDeleteButtonTap }") DELETE
+  .MyTopic__tail(if="{ hasPagination }")
+    viron-pagination(max="{ pagination.max }" size="{ paginationSize }" current="{ pagination.current }" onChange="{ handlePaginationChange }")
 
   script.
     import script from './index';
+    import '../../src/components/viron-pagination/index.tag';
     this.external(script);

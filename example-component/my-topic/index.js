@@ -1,3 +1,5 @@
+import ObjectAssign from 'object-assign';
+
 export default function() {
   const store = this.riotx.get();
 
@@ -7,15 +9,27 @@ export default function() {
   this.putOperation = null;
   this.deleteOperation = null;
   this.primary = null;
+  this.hasPagination = false;
+  this.pagination = null;
+  this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
 
   /**
    * OASに従いGETリクエストを送信します。
+   * @param {Object} pagination
    * @return {Promise}
    */
-  const getData = () => {
+  const getData = pagination => {
+    if (!pagination && this.hasPagination) {
+      pagination = {};
+      const size = this.pagination.size;
+      const current = this.pagination.current;
+      pagination.limit = size;
+      pagination.offset = (current - 1) * size;
+    }
+    const queries = ObjectAssign({}, pagination);
     return Promise
       .resolve()
-      .then(() => store.action('components.get', this.opts.id, this.opts.def))
+      .then(() => store.action('components.get', this.opts.id, this.opts.def, queries))
       .then(() => {
         this.error = null;
         this.update();
@@ -53,6 +67,12 @@ export default function() {
     this.putOperation = store.getter('components.putOperation', this.opts.id, 'item');
     this.deleteOperation = store.getter('components.deleteOperation', this.opts.id, 'item');
     this.primary = store.getter('components.primary', this.opts.id);
+    this.hasPagination = store.getter('components.hasPagination', this.opts.id);
+    this.pagination = store.getter('components.pagination', this.opts.id);
+    this.update();
+  });
+  this.listen('layout', () => {
+    this.paginationSize = store.getter('layout.isDesktop') ? 5 : 3;
     this.update();
   });
 
@@ -80,6 +100,14 @@ export default function() {
     const data = e.item.topic;
     openOperationDrawer(this.deleteOperation, {
       id: data.id
+    });
+  };
+
+  this.handlePaginationChange = newPage => {// eslint-disable-line no-unused-vars
+    const size = this.pagination.size;
+    getData({
+      limit: size,
+      offset: (newPage - 1) * size
     });
   };
 }
