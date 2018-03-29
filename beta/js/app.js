@@ -95616,7 +95616,7 @@ var script$24 = function() {
     }
     const html = this.editor.getContent();
     this.opts.onchange(html);
-  }, 1000);
+  }, 500);
 
   this.handleEditorFocus = () => {
     if (!this.opts.onfocus) {
@@ -95626,6 +95626,10 @@ var script$24 = function() {
   };
 
   this.handleEditorBlur = () => {
+    if (!!this.opts.onchange) {
+      const html = this.editor.getContent();
+      this.opts.onchange(html);
+    }
     if (!this.opts.onblur) {
       return;
     }
