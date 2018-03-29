@@ -95561,6 +95561,7 @@ var script$24 = function() {
       this.editor = editor;
       !!this.opts.val && this.editor.setContent(this.opts.val);
       this.editor.on('Change', this.handleEditorChange);
+      this.editor.on('NodeChange', this.handleEditorChange);
       this.editor.on('focus', this.handleEditorFocus);
       this.editor.on('blur', this.handleEditorBlur);
     },
@@ -95601,6 +95602,7 @@ var script$24 = function() {
   }).on('before-unmount', () => {
     tinymce$1.remove(`.Wyswyg__editor${this._riot_id}`);
     this.editor.off('Change', this.handleEditorChange);
+    this.editor.off('NodeChange', this.handleEditorChange);
     this.editor.off('focus', this.handleEditorFocus);
     this.editor.off('blur', this.handleEditorBlur);
     // destroy時にエラーが発生する。TinyMCEの対応待ち。
