@@ -5,4 +5,11 @@
   &__form {
     display: block;
   }
+
+  &--preview &__form {
+    padding: 10px;
+    overflow: scroll;
+    background-color: #f4f4f4;
+    border-color: #f4f4f4;
+  }
 }
