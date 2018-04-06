@@ -5797,6 +5797,9 @@ select {
     display: block;
     margin: 0 auto;
   }
+.Raw {
+  display: block;
+}
 .Select {
   position: relative;
   display: block;
@@ -6217,12 +6220,11 @@ select {
 .Wyswyg__form {
     display: block;
   }
-.Wyswyg__blocker {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+.Wyswyg--preview .Wyswyg__form {
+    padding: 10px;
+    overflow: scroll;
+    background-color: #f4f4f4;
+    border-color: #f4f4f4;
   }
 .Wyswyg_Explorer {
   min-height: 100%;
