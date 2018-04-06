@@ -100,9 +100,9 @@ export default function() {
         return toolbarMobile;
       }
       return toolbarDesktop;
-    })()
+    })(),
+    readonly: this.opts.ispreview
   };
-
 
   this.on('mount', () => {
     TinyMCE.init(ObjectAssign({}, baseConfig, customConfig));
