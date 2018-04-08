@@ -2,7 +2,6 @@ import contains from 'mout/array/contains';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import deepClone from 'mout/lang/deepClone';
-import isArray from 'mout/lang/isArray';
 import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import forOwn from 'mout/object/forOwn';
