@@ -103,10 +103,15 @@ export default function() {
     })()
   };
 
-
   this.on('mount', () => {
+    if (this.opts.ispreview) {
+      return;
+    }
     TinyMCE.init(ObjectAssign({}, baseConfig, customConfig));
   }).on('before-unmount', () => {
+    if (this.opts.ispreview) {
+      return;
+    }
     TinyMCE.remove(`.Wyswyg__editor${this._riot_id}`);
     this.editor.off('Change', this.handleEditorChange);
     this.editor.off('NodeChange', this.handleEditorChange);
