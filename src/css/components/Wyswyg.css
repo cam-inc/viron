@@ -6,11 +6,10 @@
     display: block;
   }
 
-  &__blocker {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+  &--preview &__form {
+    padding: 10px;
+    overflow: scroll;
+    background-color: #f4f4f4;
+    border-color: #f4f4f4;
   }
 }

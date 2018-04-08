@@ -130,6 +130,37 @@ export default exporter('components', {
       }, state.oas.client.spec.paths[`${path}/{id}`]['delete'])));
       state.components[componentId]['explorerOperations'] = explorerOperations;
     }
+
+    const operations = [];
+    forEach(['get', 'put', 'post', 'delete'], method => {
+      const operationObject = !!state.oas.client.spec.paths[`${path}`] && state.oas.client.spec.paths[`${path}`][method];
+      if (!operationObject) {
+        return;
+      }
+      operations.push(ObjectAssign({
+        method,
+        path
+      }, operationObject));
+    });
+    state.components[componentId]['operations'] = operations;
+    // primaryキーが存在する場合、`basePath/primaryKey`の各operationObjectは関連有りとみなす。
+    const itemOperations = [];
+    const primary = componentDef.primary;
+    if (!!primary) {
+      state.components[componentId]['primary'] = primary;
+      forEach(['get', 'put', 'post', 'delete'], method => {
+        const operationObject = !!state.oas.client.spec.paths[`${path}/{${primary}}`] && state.oas.client.spec.paths[`${path}/{${primary}}`][method];
+        if (!operationObject) {
+          return;
+        }
+        itemOperations.push(ObjectAssign({
+          method,
+          path: `${path}/{${primary}}`
+        }, operationObject));
+      });
+    }
+    state.components[componentId]['itemOperations'] = itemOperations;
+
     return ['components', componentId];
   },
 

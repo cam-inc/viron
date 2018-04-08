@@ -1,5 +1,5 @@
 viron-components-page-card.ComponentsPage_Card(class="ComponentsPage_Card--{ columnSize } ComponentsPage_Card--{ rowSize }")
-  div(data-is="viron-{ cardType }" id="{ componentId }" def="{ opts.def }" crossSearchQueries="{ opts.crosssearchqueries }")
+  div(data-is="{ cardType }" id="{ componentId }" def="{ opts.def }" crossSearchQueries="{ opts.crosssearchqueries }")
 
 
   script.

@@ -7,6 +7,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import progress from 'rollup-plugin-progress';
 import replace from 'rollup-plugin-re';
 import riot from 'rollup-plugin-riot';
+const vironConfig = require('./viron');
 
 const namedExports = {};
 mout.object.forOwn(mout, (v, k) => {
@@ -38,13 +39,26 @@ export default {
   plugins: [
     builtins(),
     replace({
-      patterns: [{
-        test: /onTap="{.+?}"/g,
-        replace: str => {
-          const handlerName = str.replace('onTap="{', '').replace('}"', '').replace(/ /g, '');
-          return `onClick="{ getClickHandler('${handlerName}') }" onTouchStart="{ getTouchStartHandler() }" onTouchMove="{ getTouchMoveHandler() }" onTouchEnd="{ getTouchEndHandler('${handlerName}') }"`;
+      patterns: [
+        {
+          test: /onTap="{.+?}"/g,
+          replace: str => {
+            const handlerName = str.replace('onTap="{', '').replace('}"', '').replace(/ /g, '');
+            return `onClick="{ getClickHandler('${handlerName}') }" onTouchStart="{ getTouchStartHandler() }" onTouchMove="{ getTouchMoveHandler() }" onTouchEnd="{ getTouchEndHandler('${handlerName}') }"`;
+          }
+        },
+        {
+          test: /\/\/__VIRON_COMPONENTS_TAG__/g,
+          replace: () => {
+            let str = '';
+            const components = vironConfig.components || [];
+            mout.array.forEach(components, component => {
+              str += `import '../../${component.path}';`;
+            });
+            return str;
+          }
         }
-      }]
+      ]
     }),
     json(),
     riot({
@@ -56,7 +70,7 @@ export default {
       browser: true
     }),
     commonjs({
-      include: 'node_modules/**',
+      include: ['viron.js', 'node_modules/**'],
       namedExports: namedExports
     }),
     buble({

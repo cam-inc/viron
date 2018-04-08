@@ -5,4 +5,6 @@
 @import "objects/all.css";
 @import "components/all.css";
 @import "pages/all.css";
+/* 以下の行は削除NG */
+/*__VIRON_COMPONENTS_CSS__*/
 @import "trumps/all.css";
