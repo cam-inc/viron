@@ -1,9 +1,10 @@
 viron-parameters-properties.Parameters_Properties
   .Parameters_Properties__head
     .Parameters_Properties__label { opts.label }{ opts.required ? ' *' : '' }
+    div(each="{ item in anyOf }" onTap="{ handleAnyOfTap }") { item.name }
   .Parameters_Properties__error(if="{ hasError }") { errors[0] }
-  .Parameters_Properties__body
-    .Parameters_Properties__item(each="{ property, key in propertiesObject.properties }" class="{ 'Parameters_Properties__item--' + parent.getSpreadStyle(key, property) }")
+  .Parameters_Properties__body(if="{ !tmpHidden }")
+    .Parameters_Properties__item(each="{ property, key in properties }" class="{ 'Parameters_Properties__item--' + parent.getSpreadStyle(key, property) }")
       virtual(if="{ isFormMode(property) }")
         viron-parameters-form(no-reorder identifier="{ key }" val="{ parent.getVal(key) }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" formObject="{ parent.getFormObject(key, property) }" onSubmit="{ parent.handlePropertySubmit }" onChange="{ parent.handlePropertyChange }" onValidate="{ parent.handlePropertyValidate }")
       virtual(if="{ isPropertiesMode(property) }")

@@ -1147,6 +1147,15 @@ definitions:
 
   Format:
     type: object
+    x-anyOf:
+    - name: AAA
+      keys:
+      - id
+      - date_time
+    - name: BBB
+      keys:
+      - email
+      - hostname
     properties:
       id:
         description: format ID
@@ -1330,6 +1339,15 @@ definitions:
         minItems: 3
         items:
           type: object
+          x-anyOf:
+          - name: AAA
+            keys:
+            - str
+            - bool
+          - name: BBB
+            keys:
+            - bool
+            - num
           properties:
             str:
               description: 文字列

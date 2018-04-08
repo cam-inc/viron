@@ -1,5 +1,8 @@
 import contains from 'mout/array/contains';
+import find from 'mout/array/find';
+import forEach from 'mout/array/forEach';
 import deepClone from 'mout/lang/deepClone';
+import isArray from 'mout/lang/isArray';
 import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
 import forOwn from 'mout/object/forOwn';
@@ -11,6 +14,43 @@ import validator from '../validator';
 export default function() {
   // PropertiesObject = typeがobjectであるSchemaObject。
   const propertiesObject = this.propertiesObject = this.opts.propertiesobject;
+
+  this.tmpHidden = false;
+  this.properties = {};
+  this.anyOf = propertiesObject['x-anyOf'] || [];
+  const updateProperties = name => {
+    if (!name) {
+      this.properties = propertiesObject.properties;
+      return;
+    }
+    const keys = find(this.anyOf, item => {
+      return item.name === name;
+    }).keys;
+    this.properties = {};
+    forEach(keys, key => {
+      this.properties[key] = propertiesObject.properties[key];
+    });
+  };
+  if (!!this.anyOf.length) {
+    updateProperties(this.anyOf[0].name);
+  } else {
+    updateProperties();
+  }
+
+  this.handleAnyOfTap = e => {
+    const item = e.item.item;
+    updateProperties(item.name);
+    Promise
+      .resolve()
+      .then(() => {
+        this.tmpHidden = true;
+        this.update();
+      })
+      .then(() => {
+        this.tmpHidden = false;
+        this.update();
+      });
+  };
 
   // エラー関連。
   this.errors = [];
