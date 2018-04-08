@@ -68,6 +68,7 @@ export default function() {
       this.editor = editor;
       !!this.opts.val && this.editor.setContent(this.opts.val);
       this.editor.on('Change', this.handleEditorChange);
+      this.editor.on('NodeChange', this.handleEditorChange);
       this.editor.on('focus', this.handleEditorFocus);
       this.editor.on('blur', this.handleEditorBlur);
     },
@@ -108,6 +109,7 @@ export default function() {
   }).on('before-unmount', () => {
     TinyMCE.remove(`.Wyswyg__editor${this._riot_id}`);
     this.editor.off('Change', this.handleEditorChange);
+    this.editor.off('NodeChange', this.handleEditorChange);
     this.editor.off('focus', this.handleEditorFocus);
     this.editor.off('blur', this.handleEditorBlur);
     // destroy時にエラーが発生する。TinyMCEの対応待ち。
@@ -123,7 +125,7 @@ export default function() {
     }
     const html = this.editor.getContent();
     this.opts.onchange(html);
-  }, 1000);
+  }, 500);
 
   this.handleEditorFocus = () => {
     if (!this.opts.onfocus) {
@@ -133,6 +135,10 @@ export default function() {
   };
 
   this.handleEditorBlur = () => {
+    if (!!this.opts.onchange) {
+      const html = this.editor.getContent();
+      this.opts.onchange(html);
+    }
     if (!this.opts.onblur) {
       return;
     }
