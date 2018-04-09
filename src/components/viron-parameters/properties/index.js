@@ -71,6 +71,7 @@ export default function() {
     return properties;
   };
 
+  this.isReady = true;
   this.handleSelectChange = newOptions => {
     const item = find(newOptions, option => {
       return option.isSelected;
@@ -90,7 +91,24 @@ export default function() {
     if (!size(ret)) {
       ret = undefined;
     }
-    this.opts.onchange(this.opts.identifier, ret);
+
+    Promise
+      .resolve()
+      .then(() => {
+        this.opts.onchange(this.opts.identifier, ret);
+      })
+    // 以下、updateがうまく動作しない問題への対応。
+      .then(() => new Promise(resolve => {
+        setTimeout(resolve, 100);
+      }))
+      .then(() => {
+        this.isReady = false;
+        this.update();
+      })
+      .then(() => {
+        this.isReady = true;
+        this.update();
+      });
   };
 
   // エラー関連。

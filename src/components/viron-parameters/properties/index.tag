@@ -5,7 +5,7 @@ viron-parameters-properties.Parameters_Properties
       .Parameters_Properties__selectLabel 形式:
       viron-select(isSmall="{ true }" options="{ getPropertiesOptions() }" onChange="{ handleSelectChange }" isPreview="{ opts.ispreview || !opts.isswitchable }")
   .Parameters_Properties__error(if="{ hasError }") { errors[0] }
-  .Parameters_Properties__body
+  .Parameters_Properties__body(if="{ isReady }")
     .Parameters_Properties__item(each="{ property, key in getProperties() }" class="{ 'Parameters_Properties__item--' + parent.getSpreadStyle(key, property) }")
       virtual(if="{ isFormMode(property) }")
         viron-parameters-form(no-reorder identifier="{ key }" val="{ parent.getVal(key) }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" formObject="{ parent.getFormObject(key, property) }" onSubmit="{ parent.handlePropertySubmit }" onChange="{ parent.handlePropertyChange }" onValidate="{ parent.handlePropertyValidate }")
