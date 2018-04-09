@@ -4,6 +4,7 @@ import forEach from 'mout/array/forEach';
 import deepClone from 'mout/lang/deepClone';
 import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
+import findObject from 'mout/object/find';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
 import ObjectAssign from 'object-assign';
@@ -14,55 +15,81 @@ export default function() {
   // PropertiesObject = typeがobjectであるSchemaObject。
   const propertiesObject = this.propertiesObject = this.opts.propertiesobject;
 
-  this.tmpHidden = false;
   this.properties = {};
-  this.isPropertiesChangable = !!propertiesObject['x-anyOf'];
-  this.anyOf = propertiesObject['x-anyOf'];
-  this.propertiesOptions = [];
-  const updateProperties = name => {
-    if (!this.isPropertiesChangable) {
-      this.properties = propertiesObject.properties;
-      return;
-    }
-    this.propertiesOptions = [];
-    forEach(this.anyOf, item => {
-      this.propertiesOptions.push({
-        id: `select_${item.name}`,
-        label: item.name,
-        value: item.name,
-        isSelected: (item.name === name)
-      });
+  this.isPropertiesSwitchable = !!findObject(propertiesObject.properties, property => {
+    return (!!property['x-anyOf-def']);
+  });
+  let anyOfDef;
+  let anyOfKey;
+  if (this.isPropertiesSwitchable) {
+    forOwn(propertiesObject.properties, (property, key) => {
+      if (!!anyOfDef) {
+        return;
+      }
+      if (!!property['x-anyOf-def']) {
+        anyOfDef = property['x-anyOf-def'];
+        anyOfKey = key;
+      }
     });
-    const keys = find(this.anyOf, item => {
-      return item.name === name;
-    }).keys;
-    this.properties = {};
-    forEach(keys, key => {
-      this.properties[key] = propertiesObject.properties[key];
-    });
-  };
-  if (this.isPropertiesChangable) {
-    updateProperties(this.anyOf[0].name);
-  } else {
-    updateProperties();
   }
 
+  this.getPropertiesOptions = () => {
+    const id = this.opts.val[anyOfKey];
+    const propertiesOptions = [];
+    propertiesOptions.push({
+      id: 'select_def',
+      label: '選択して下さい',
+      value: undefined,
+      isSelected: !id
+    });
+    forEach(anyOfDef, item => {
+      propertiesOptions.push({
+        id: `select_${item.id}`,
+        label: item.label,
+        value: item.id,
+        isSelected: (item.id === id)
+      });
+    });
+    return propertiesOptions;
+  };
+
+  this.getProperties = () => {
+    if (!this.isPropertiesSwitchable) {
+      return propertiesObject.properties;
+    }
+    const properties = {};
+    forOwn(propertiesObject.properties, (property, key) => {
+      if (!!property['x-anyOf-def']) {
+        return;
+      }
+      if (!property['x-anyOf-target']) {
+        properties[key] = property;
+      } else if (contains(property['x-anyOf-target'], this.opts.val[anyOfKey])) {
+        properties[key] = property;
+      }
+    });
+    return properties;
+  };
+
   this.handleSelectChange = newOptions => {
-    this.propertiesOptions = newOptions;
     const item = find(newOptions, option => {
       return option.isSelected;
     });
-    updateProperties(item.value);
-    Promise
-      .resolve()
-      .then(() => {
-        this.tmpHidden = true;
-        this.update();
-      })
-      .then(() => {
-        this.tmpHidden = false;
-        this.update();
-      });
+    if (!this.opts.onchange) {
+      return;
+    }
+    let ret = this.opts.val || {};
+    ret['category'] = item.value;
+    // 値がundefinedのkeyを削除する。
+    forOwn(ret, (val, key) => {
+      if (isUndefined(val)) {
+        delete ret[key];
+      }
+    });
+    if (!size(ret)) {
+      ret = undefined;
+    }
+    this.opts.onchange(this.opts.identifier, ret);
   };
 
   // エラー関連。
