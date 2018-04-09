@@ -13,6 +13,8 @@ export default function() {
   this.val = util.generateInitialVal(operationObject.parameters, this.opts.initialVal);
   // タイトル
   this.title = operationObject.summary || operationObject.operationId;
+  // x-anyof変更可能か否か。
+  this.isSwitchable = true;
   // submitボタンのラベリング。
   this.submitLabel = null;
   // submitボタンのmodifier。
@@ -33,6 +35,7 @@ export default function() {
     break;
   case 'put':
     this.submitLabel = customSubmitLabel || '保存する';
+    this.isSwitchable = false;
     successMessage = '保存しました。';
     break;
   case 'delete':
