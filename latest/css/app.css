@@ -5797,6 +5797,9 @@ select {
     display: block;
     margin: 0 auto;
   }
+.Raw {
+  display: block;
+}
 .Select {
   position: relative;
   display: block;
@@ -6217,12 +6220,11 @@ select {
 .Wyswyg__form {
     display: block;
   }
-.Wyswyg__blocker {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+.Wyswyg--preview .Wyswyg__form {
+    padding: 10px;
+    overflow: scroll;
+    background-color: #f4f4f4;
+    border-color: #f4f4f4;
   }
 .Wyswyg_Explorer {
   min-height: 100%;
@@ -7663,5 +7665,87 @@ select {
 .NotfoundPage {
   display: block;
 }
+/* 以下の行は削除NG */
+.MyTopic {
+  display: block;
+  padding: 24px;
+}
+.MyTopic__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px dotted #ccc;
+  }
+.MyTopic__label {
+    flex-grow: 1;
+    margin-right: 12px;
+    font-weight: bold;
+  }
+.MyTopic__postButton {
+    flex-shrink: 0;
+    border-radius: 4px;
+    background-color: orange;
+    padding: 12px;
+    color: #fff;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .MyTopic__postButton:hover {
+      opacity: 0.5;
+    }
+  }
+.MyTopic__postButton.hold {
+      opacity: 0.5;
+  }
+.MyTopic__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
+.MyTopic__id {
+    margin-right: 8px;
+  }
+.MyTopic__content {
+    flex-grow: 1;
+    margin-right: 8px;
+  }
+.MyTopic__putButton {
+    margin-right: 8px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .MyTopic__putButton:hover {
+      opacity: 0.5;
+    }
+  }
+.MyTopic__putButton.hold {
+      opacity: 0.5;
+  }
+.MyTopic__deleteButton {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .MyTopic__deleteButton:hover {
+      opacity: 0.5;
+    }
+  }
+.MyTopic__deleteButton.hold {
+      opacity: 0.5;
+  }
+.MyTopic__list .MyTopic__item {
+    margin-bottom: 12px;
+  }
+.MyTopic__list .MyTopic__item:last-child {
+      margin-bottom: 0;
+    }
+.MyTopic__tail {
+    padding-top: 12px;
+    margin-top: 12px;
+    border-top: 1px dotted #ccc;
+  }
 /* ITCSS: Trumps */
 /* Helpers and overrides. */
