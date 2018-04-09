@@ -251,6 +251,13 @@ const show = (req, res) => {
               genTableComponent('デフォルト', 'get', '/default', 'id', null, ['id']),
             ],
           },
+          {
+            id: 'switchform',
+            name: 'フォーム切り替え',
+            components: [
+              genTableComponent('フォーム切り替え', 'get', '/switch_form', 'id', null, ['id']),
+            ]
+          },
         ],
         // Admin
         [constant.GROUP_ADMIN]: [
