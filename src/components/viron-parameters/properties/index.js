@@ -78,7 +78,8 @@ export default function() {
     if (!this.opts.onchange) {
       return;
     }
-    let ret = this.opts.val || {};
+    // this.opts.valを空にする。
+    let ret = {};
     ret['category'] = item.value;
     // 値がundefinedのkeyを削除する。
     forOwn(ret, (val, key) => {
