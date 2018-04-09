@@ -16,12 +16,23 @@ export default function() {
 
   this.tmpHidden = false;
   this.properties = {};
-  this.anyOf = propertiesObject['x-anyOf'] || [];
+  this.isPropertiesChangable = !!propertiesObject['x-anyOf'];
+  this.anyOf = propertiesObject['x-anyOf'];
+  this.propertiesOptions = [];
   const updateProperties = name => {
-    if (!name) {
+    if (!this.isPropertiesChangable) {
       this.properties = propertiesObject.properties;
       return;
     }
+    this.propertiesOptions = [];
+    forEach(this.anyOf, item => {
+      this.propertiesOptions.push({
+        id: `select_${item.name}`,
+        label: item.name,
+        value: item.name,
+        isSelected: (item.name === name)
+      });
+    });
     const keys = find(this.anyOf, item => {
       return item.name === name;
     }).keys;
@@ -30,15 +41,18 @@ export default function() {
       this.properties[key] = propertiesObject.properties[key];
     });
   };
-  if (!!this.anyOf.length) {
+  if (this.isPropertiesChangable) {
     updateProperties(this.anyOf[0].name);
   } else {
     updateProperties();
   }
 
-  this.handleAnyOfTap = e => {
-    const item = e.item.item;
-    updateProperties(item.name);
+  this.handleSelectChange = newOptions => {
+    this.propertiesOptions = newOptions;
+    const item = find(newOptions, option => {
+      return option.isSelected;
+    });
+    updateProperties(item.value);
     Promise
       .resolve()
       .then(() => {

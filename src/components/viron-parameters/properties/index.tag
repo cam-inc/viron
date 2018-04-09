@@ -1,7 +1,9 @@
 viron-parameters-properties.Parameters_Properties
   .Parameters_Properties__head
     .Parameters_Properties__label { opts.label }{ opts.required ? ' *' : '' }
-    div(each="{ item in anyOf }" onTap="{ handleAnyOfTap }") { item.name }
+    .Parameters_Properties__select(if="{ isPropertiesChangable }")
+      .Parameters_Properties__selectLabel 形式:
+      viron-select(isSmall="{ true }" options="{ propertiesOptions }" onChange="{ handleSelectChange }")
   .Parameters_Properties__error(if="{ hasError }") { errors[0] }
   .Parameters_Properties__body(if="{ !tmpHidden }")
     .Parameters_Properties__item(each="{ property, key in properties }" class="{ 'Parameters_Properties__item--' + parent.getSpreadStyle(key, property) }")
@@ -14,6 +16,7 @@ viron-parameters-properties.Parameters_Properties
 
 
   script.
+    import '../../../components/viron-select/index.tag';
     import '../form/index.tag';
     import '../items/index.tag';
     import script from './index';
