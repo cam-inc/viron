@@ -72,6 +72,7 @@ export default function() {
   };
 
   const confirmSubmit = () => {
+    let isOperating = false;
     if (!this.isValid) {
       return;
     }
@@ -80,6 +81,8 @@ export default function() {
       message: '本当に実行しますか？',
       labelPositive: this.submitLabel,
       onPositiveSelect: () => {
+        if (isOperating) return;
+        isOperating = true;
         operate();
       }
     }));
