@@ -102784,6 +102784,7 @@ var script$34 = function() {
   };
 
   const confirmSubmit = () => {
+    let isOperating = false;
     if (!this.isValid) {
       return;
     }
@@ -102792,6 +102793,8 @@ var script$34 = function() {
       message: '本当に実行しますか？',
       labelPositive: this.submitLabel,
       onPositiveSelect: () => {
+        if (isOperating) { return; }
+        isOperating = true;
         operate();
       }
     }));
