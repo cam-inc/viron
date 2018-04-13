@@ -6,6 +6,7 @@ const [major, minor, patch] = version.split('.');
 
 commander
   .option('-b, --beta', 'On/Off flag of beta release.')
+  .option('-c, --rc', 'On/Off flag of release candidate.')
   .parse(process.argv);
 
 const publish = options => {
@@ -20,11 +21,21 @@ const publish = options => {
   });
 };
 
-Promise.resolve().then(() => publish({
-  dest: (commander.beta ? 'beta' : `v${major}`),
-  add: true
-})).then(() => {
+Promise.resolve().then(() => {
+  let dest;
   if (commander.beta) {
+    dest = 'beta';
+  } else if (commander.rc) {
+    dest = 'rc';
+  } else {
+    dest = `v${major}`;
+  }
+  return publish({
+    dest,
+    add: true
+  });
+}).then(() => {
+  if (commander.beta || commander.rc) {
     return Promise.resolve();
   }
   return publish({
