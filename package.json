@@ -54,8 +54,10 @@
     "lint:css": "stylelint src/css/**/*.css",
     "spec": "mocha",
     "deploy:beta": "node task/deploy.js -b",
+    "deploy:rc": "node task/deploy.js -c",
     "deploy:latest": "node task/deploy.js",
     "release:beta": "run-s build deploy:beta",
+    "release:rc": "run-s build deploy:rc",
     "release:latest": "run-s build deploy:latest",
     "ncu": "ncu"
   },
