@@ -81,7 +81,7 @@ export default function() {
     }
     // this.opts.valを空にする。
     let ret = {};
-    ret['category'] = item.value;
+    ret[anyOfKey] = item.value;
     // 値がundefinedのkeyを削除する。
     forOwn(ret, (val, key) => {
       if (isUndefined(val)) {
@@ -92,6 +92,9 @@ export default function() {
       ret = undefined;
     }
 
+    this.opts.onchange(this.opts.identifier, ret);
+
+    /*
     Promise
       .resolve()
       .then(() => {
@@ -109,6 +112,7 @@ export default function() {
         this.isReady = true;
         this.update();
       });
+      */
   };
 
   // エラー関連。
