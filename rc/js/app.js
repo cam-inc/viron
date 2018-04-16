@@ -102091,7 +102091,7 @@ var script$30 = function() {
     }
     // this.opts.valを空にする。
     let ret = {};
-    ret['category'] = item.value;
+    ret[anyOfKey] = item.value;
     // 値がundefinedのkeyを削除する。
     forOwn_1$2(ret, (val, key) => {
       if (isUndefined(val)) {
@@ -102102,6 +102102,9 @@ var script$30 = function() {
       ret = undefined;
     }
 
+    this.opts.onchange(this.opts.identifier, ret);
+
+    /*
     Promise
       .resolve()
       .then(() => {
@@ -102119,6 +102122,7 @@ var script$30 = function() {
         this.isReady = true;
         this.update();
       });
+      */
   };
 
   // エラー関連。
