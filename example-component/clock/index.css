@@ -1,0 +1,16 @@
+.Clock{
+	position: relative;
+	top: 0px;
+	left: 0px;
+	height:300px;
+	&__hand{
+		width: 250px;
+    height: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+	}
+}
