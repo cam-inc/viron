@@ -101715,6 +101715,10 @@ var script$28 = function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    //debugger
+    this.opts.onvalidate(this._riot_id, true);
+    //validate();
   });
 
   /**
@@ -102142,6 +102146,8 @@ var script$30 = function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    this.opts.onvalidate(this._riot_id, true);
   });
 
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2
@@ -102384,6 +102390,8 @@ var script$31 = function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    this.opts.onvalidate(this._riot_id, true);
   });
 
   /**
@@ -102494,7 +102502,7 @@ var script$31 = function() {
     // type値によって作成する要素を分ける。
     // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object
     // typeは"string", "number", "integer", "boolean", or "array"のいずれかと書いてあるが、"null"と"object"もプラスで想定する。
-    // 追加分は先頭に。
+    // 追加分は末尾に。
     if (this.isFormMode) {
       newItem = this.formObject.default;
     } else if (this.isPropertiesMode) {
@@ -102502,8 +102510,8 @@ var script$31 = function() {
     } else if (this.isItemsMode) {
       newItem = [];
     }
-    ret = append_1$1([newItem], ret);
-    this.itemsOpened = append_1$1([false], this.itemsOpened);
+    ret = append_1$1(ret, [newItem]);
+    this.itemsOpened = append_1$1(this.itemsOpened, [false]);
     this.update();
     this.opts.onchange(this.opts.identifier, ret);
   };
