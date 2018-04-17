@@ -132,6 +132,8 @@ export default function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    this.opts.onvalidate(this._riot_id, true);
   });
 
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2

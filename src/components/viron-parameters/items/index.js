@@ -59,6 +59,8 @@ export default function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    this.opts.onvalidate(this._riot_id, true);
   });
 
   /**
@@ -169,7 +171,7 @@ export default function() {
     // type値によって作成する要素を分ける。
     // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object
     // typeは"string", "number", "integer", "boolean", or "array"のいずれかと書いてあるが、"null"と"object"もプラスで想定する。
-    // 追加分は先頭に。
+    // 追加分は末尾に。
     if (this.isFormMode) {
       newItem = this.formObject.default;
     } else if (this.isPropertiesMode) {
@@ -177,8 +179,8 @@ export default function() {
     } else if (this.isItemsMode) {
       newItem = [];
     }
-    ret = append([newItem], ret);
-    this.itemsOpened = append([false], this.itemsOpened);
+    ret = append(ret, [newItem]);
+    this.itemsOpened = append(this.itemsOpened, [false]);
     this.update();
     this.opts.onchange(this.opts.identifier, ret);
   };

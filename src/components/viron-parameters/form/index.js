@@ -131,6 +131,10 @@ export default function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    //debugger
+    this.opts.onvalidate(this._riot_id, true);
+    //validate();
   });
 
   /**
