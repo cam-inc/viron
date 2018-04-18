@@ -1,6 +1,5 @@
 import ObjectAssign from 'object-assign';
 
-
 export default function() {
 
   //サイト進入時の最初の時間を格納
@@ -34,20 +33,22 @@ export default function() {
       //var second = document.getElementsByClassName("second");
         //second[0].style.transform = "rotate("+(this.second*6)+"deg)";
 
-      //背景画像を参照
-      //一秒毎に確認しちゃうのでまた確認し直す
+      //背景画像を確認しておく
       var back_image = document.getElementsByClassName("Clock");
 
-      if(Number(this.hour) > 6 && Number(this.hour) < 18){
+      //18時以降〜翌朝6時まで夜の背景
+      if(Number(this.hour) > 6 && Number(this.hour) < 18 && back_image[0].style.backgroundImage != 'url("./img/wallpaper_AM.png")'){
         back_image[0].style.backgroundImage = 'url("./img/wallpaper_AM.png")';
-      }else{
+
+      //6時以降〜18時まで昼の背景
+      }else if(Number(this.hour) > 18 && Number(this.hour) < 6 && back_image[0].style.backgroundImage != 'url("./img/wallpaper_PM.png")'){
         back_image[0].style.backgroundImage = 'url("./img/wallpaper_PM.png")';
+
       }
 
       //最後に情報をアップデート
       this.update();
+
     },1000
-
   );
-
 }

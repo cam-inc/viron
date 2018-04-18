@@ -1,3 +1,4 @@
+/*Clockのdivを調整*/
 .Clock{
 	position: relative;
 	top: 0px;
@@ -5,6 +6,8 @@
 	height:100%;
 	background:no-repeat center center;
 	background-size:cover;
+
+	/*時計のsvgの位置情報を微調整*/
 	&__hand{
 		width: 250px;
     height: 250px;
@@ -15,6 +18,8 @@
     bottom: 0;
     margin: 0 auto auto auto;
 	}
+
+	/*「東京の時間」の表示の調整*/
   &__timeZone{
 		text-shadow: 2px 2px 2px #aaaaaa;
 		text-align: center;
@@ -27,6 +32,9 @@
 		right: 0;
 	}
 }
+
+/*時計盤の位置を微調整*/
 .dial{
 	padding-top: 4px;
+	padding-left: 1px;
 }
