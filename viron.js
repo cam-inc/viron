@@ -36,11 +36,11 @@ module.exports = {
 
         // Optional
         // Size of column. `columnSpreadSmall`(default) or `columnSpreadFull`.
-        columnSize: 'columnSpreadFull',
+        columnSize: 'columnSpreadSmall',
 
         // Optional
         // Size of row. `rowSpreadSmall`(default), `rowSpreadMedium` or `rowSpreadLarge`.
-        rowSize: 'rowSpreadLarge',
+        rowSize: 'rowSpreadMedium',
 
         // Required
         // Relative path to the riot tag file from your local viron repository root.

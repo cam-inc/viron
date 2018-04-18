@@ -2,7 +2,9 @@
 	position: relative;
 	top: 0px;
 	left: 0px;
-	height:300px;
+	height:100%;
+	background:no-repeat center center;
+	background-size:cover;
 	&__hand{
 		width: 250px;
     height: auto;
@@ -11,6 +13,16 @@
     left: 0;
     right: 0;
     bottom: 0;
-    margin: auto;
+    margin: 0 auto auto auto;
+	}
+  &__timeZone{
+		text-align: center;
+    bottom: 30px;
+    color: #FFFFFF;
+    font-size: 25px;
+    font-family: serif;
+    position: absolute;
+    left: 0;
+    right: 0;
 	}
 }
