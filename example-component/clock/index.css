@@ -7,22 +7,23 @@
 	background-size:cover;
 	&__hand{
 		width: 250px;
-    height: auto;
+    height: 250px;
     position: absolute;
-    top: 0;
+    top: 5px;
     left: 0;
     right: 0;
     bottom: 0;
     margin: 0 auto auto auto;
 	}
   &__timeZone{
+		text-shadow: 2px 2px 2px #aaaaaa;
 		text-align: center;
-    bottom: 30px;
-    color: #FFFFFF;
-    font-size: 25px;
-    font-family: serif;
-    position: absolute;
-    left: 0;
-    right: 0;
+		bottom: 20px;
+		color: #fff;
+		font-size: 20px;
+		font-family: system-ui;
+		position: absolute;
+		left: 0;
+		right: 0;
 	}
 }

@@ -1,5 +1,6 @@
 import ObjectAssign from 'object-assign';
 
+
 export default function() {
 
   //サイト進入時の最初の時間を格納
