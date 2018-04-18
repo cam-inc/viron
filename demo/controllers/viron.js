@@ -114,6 +114,7 @@ const show = (req, res) => {
               genComponent('DAU', 'get', '/stats/dau', constant.VIRON_STYLE_NUMBER, 5),
               genComponent('MAU', 'get', '/stats/mau', constant.VIRON_STYLE_NUMBER, 30),
               genCustomComponent('Topic', 'get', '/topic', 'id', 'topic', null, true),
+              genCustomComponent('clock', 'get', '', 'id', 'clock', null, true),
               genComponent('Chart(bar)', 'get', '/stats/chart/bar', constant.VIRON_STYLE_GRAPH_BAR),
               genComponent('Chart(scatterplot)', 'get', '/stats/chart/scatterplot', constant.VIRON_STYLE_GRAPH_SCATTERPLOT),
               genComponent('Chart(line)', 'get', '/stats/chart/line', constant.VIRON_STYLE_GRAPH_LINE),
