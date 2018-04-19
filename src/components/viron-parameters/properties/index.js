@@ -34,7 +34,7 @@ export default function() {
   }
 
   this.getPropertiesOptions = () => {
-    const id = this.opts.val[anyOfKey];
+    const id = (this.opts.val || {})[anyOfKey];
     const propertiesOptions = [];
     propertiesOptions.push({
       id: 'select_def',
@@ -93,26 +93,6 @@ export default function() {
     }
 
     this.opts.onchange(this.opts.identifier, ret);
-
-    /*
-    Promise
-      .resolve()
-      .then(() => {
-        this.opts.onchange(this.opts.identifier, ret);
-      })
-    // 以下、updateがうまく動作しない問題への対応。
-      .then(() => new Promise(resolve => {
-        setTimeout(resolve, 100);
-      }))
-      .then(() => {
-        this.isReady = false;
-        this.update();
-      })
-      .then(() => {
-        this.isReady = true;
-        this.update();
-      });
-      */
   };
 
   // エラー関連。
