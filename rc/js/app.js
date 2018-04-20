@@ -101828,7 +101828,7 @@ var script$28 = function() {
     const date = new Date();
     const yyyy = date.getFullYear();
     const mm = lpad_1(date.getMonth() + 1, 2, '0');
-    const dd = lpad_1(date.getDate() + 1, 2, '0');
+    const dd = lpad_1(date.getDate(), 2, '0');
     change(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
   };
 
