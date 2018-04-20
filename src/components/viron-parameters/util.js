@@ -200,8 +200,7 @@ export default {
     case 'string':
       switch (format) {
       case 'date-time':
-        //return UI_DATEPICKER;
-        return UI_TEXTINPUT;
+        return UI_DATEPICKER;
       case 'multiline':
         return UI_TEXTAREA;
       case 'wyswyg':

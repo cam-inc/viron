@@ -4,6 +4,7 @@ import forEach from 'mout/array/forEach';
 import isNaN from 'mout/lang/isNaN';
 import _isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
+import lpad from 'mout/string/lpad';
 import ObjectAssign from 'object-assign';
 import '../error/index.tag';
 import util from '../util';
@@ -132,9 +133,7 @@ export default function() {
   this.on('update', () => {
     validate();
   }).on('before-unmount', () => {
-    //debugger
     this.opts.onvalidate(this._riot_id, true);
-    //validate();
   });
 
   /**
@@ -187,6 +186,18 @@ export default function() {
       isError: true,
       watchElm: bodyElm
     });
+  };
+
+  this.handleDatepickerTap = e => {
+    // 一旦date-timeだけ対応。
+    if (formObject.format !== 'date-time') {
+      return;
+    }
+    const date = new Date();
+    const yyyy = date.getFullYear();
+    const mm = lpad(date.getMonth() + 1, 2, '0');
+    const dd = lpad(date.getDate() + 1, 2, '0');
+    change(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
   };
 
   this.handleBodyTap = e => {

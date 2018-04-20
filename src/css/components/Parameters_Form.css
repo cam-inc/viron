@@ -21,6 +21,17 @@
     color: var(--color-base-gray);
   }
 
+  &__datepicker {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    flex-shrink: 0;
+    margin-left: 8px;
+    color: var(--color-base-gray);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
   &__error {
     margin-bottom: 4px;
     color: var(--color-base-red);

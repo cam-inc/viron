@@ -2,9 +2,10 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
   .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
     .Parameters_Form__title { title }
     .Parameters_Form__description(if="{ !!description }") { description }
+    .Parameters_Form__datepicker(if="{ !opts.ispreview && uiType === 'datepicker' }" onTap="{ handleDatepickerTap }") today
   .Parameters_Form__error(if="{ isMobile && isFocus && hasError && !opts.ispreview}") { errors[0] }
   .Parameters_Form__body(ref="body" onTap="{ handleBodyTap }")
-    virtual(if="{ uiType === 'textinput' }")
+    virtual(if="{ uiType === 'textinput' || uiType === 'datepicker' }")
       viron-textinput(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onSubmit="{ handleTextInputSubmit }" onChange="{ handleTextinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'textarea' }")
       viron-textarea(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextareaChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
