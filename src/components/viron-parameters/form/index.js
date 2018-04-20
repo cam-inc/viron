@@ -188,7 +188,7 @@ export default function() {
     });
   };
 
-  this.handleDatepickerTap = e => {
+  this.handleDatepickerTap = () => {
     // 一旦date-timeだけ対応。
     if (formObject.format !== 'date-time') {
       return;
