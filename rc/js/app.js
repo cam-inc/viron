@@ -95858,6 +95858,55 @@ riot$1.tag2('viron-wyswyg', '<virtual if="{!opts.ispreview}"> <form class="Wyswy
     this.external(script$26);
 });
 
+/**
+     * "Convert" value into an 32-bit integer.
+     * Works like `Math.floor` if val > 0 and `Math.ceil` if val < 0.
+     * IMPORTANT: val will wrap at 2^31 and -2^31.
+     * Perf tests: http://jsperf.com/vs-vs-parseint-bitwise-operators/7
+     */
+    function toInt(val){
+        // we do not use lang/toNumber because of perf and also because it
+        // doesn't break the functionality
+        return ~~val;
+    }
+
+    var toInt_1 = toInt;
+
+/**
+     * Repeat string n times
+     */
+     function repeat(str, n){
+         var result = '';
+         str = toString_1(str);
+         n = toInt_1(n);
+        if (n < 1) {
+            return '';
+        }
+        while (n > 0) {
+            if (n % 2) {
+                result += str;
+            }
+            n = Math.floor(n / 2);
+            str += str;
+        }
+        return result;
+     }
+
+     var repeat_1 = repeat;
+
+/**
+     * Pad string with `char` if its' length is smaller than `minLen`
+     */
+    function lpad(str, minLen, ch) {
+        str = toString_1(str);
+        ch = ch || ' ';
+
+        return (str.length < minLen) ?
+            repeat_1(ch, minLen - str.length) + str : str;
+    }
+
+    var lpad_1 = lpad;
+
 var script$29 = function() {
 };
 
@@ -95880,6 +95929,7 @@ const UI_HTML = 'html';
 const UI_NUMBERINPUT = 'numberinput';
 const UI_CHECKBOX = 'checkbox';
 const UI_SELECT = 'select';
+const UI_DATEPICKER = 'datepicker';// eslint-disable-line no-unused-vars
 const UI_UPLOADER = 'uploader';
 const UI_WYSWYG = 'wyswyg';
 const UI_PUG = 'pug';
@@ -96066,8 +96116,7 @@ var util$4 = {
     case 'string':
       switch (format) {
       case 'date-time':
-        //return UI_DATEPICKER;
-        return UI_TEXTINPUT;
+        return UI_DATEPICKER;
       case 'multiline':
         return UI_TEXTAREA;
       case 'wyswyg':
@@ -96419,7 +96468,7 @@ function absFloor (number) {
     }
 }
 
-function toInt(argumentForCoercion) {
+function toInt$2(argumentForCoercion) {
     var coercedNumber = +argumentForCoercion,
         value = 0;
 
@@ -96438,7 +96487,7 @@ function compareArrays(array1, array2, dontConvert) {
         i;
     for (i = 0; i < len; i++) {
         if ((dontConvert && array1[i] !== array2[i]) ||
-            (!dontConvert && toInt(array1[i]) !== toInt(array2[i]))) {
+            (!dontConvert && toInt$2(array1[i]) !== toInt$2(array2[i]))) {
             diffs++;
         }
     }
@@ -96852,7 +96901,7 @@ function addParseToken (token, callback) {
     }
     if (isNumber$4(callback)) {
         func = function (input, array) {
-            array[callback] = toInt(input);
+            array[callback] = toInt$2(input);
         };
     }
     for (i = 0; i < token.length; i++) {
@@ -96916,7 +96965,7 @@ addRegexToken('YYYYYY', match1to6, match6);
 
 addParseToken(['YYYYY', 'YYYYYY'], YEAR);
 addParseToken('YYYY', function (input, array) {
-    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt$2(input);
 });
 addParseToken('YY', function (input, array) {
     array[YEAR] = hooks.parseTwoDigitYear(input);
@@ -96938,7 +96987,7 @@ function isLeapYear(year) {
 // HOOKS
 
 hooks.parseTwoDigitYear = function (input) {
-    return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
+    return toInt$2(input) + (toInt$2(input) > 68 ? 1900 : 2000);
 };
 
 // MOMENTS
@@ -97068,7 +97117,7 @@ addRegexToken('MMMM', function (isStrict, locale) {
 });
 
 addParseToken(['M', 'MM'], function (input, array) {
-    array[MONTH] = toInt(input) - 1;
+    array[MONTH] = toInt$2(input) - 1;
 });
 
 addParseToken(['MMM', 'MMMM'], function (input, array, config, token) {
@@ -97195,7 +97244,7 @@ function setMonth (mom, value) {
 
     if (typeof value === 'string') {
         if (/^\d+$/.test(value)) {
-            value = toInt(value);
+            value = toInt$2(value);
         } else {
             value = mom.localeData().monthsParse(value);
             // TODO: Another silent failure?
@@ -97405,7 +97454,7 @@ addRegexToken('W',  match1to2);
 addRegexToken('WW', match1to2, match2);
 
 addWeekParseToken(['w', 'ww', 'W', 'WW'], function (input, week, config, token) {
-    week[token.substr(0, 1)] = toInt(input);
+    week[token.substr(0, 1)] = toInt$2(input);
 });
 
 // HELPERS
@@ -97497,7 +97546,7 @@ addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
 });
 
 addWeekParseToken(['d', 'e', 'E'], function (input, week, config, token) {
-    week[token] = toInt(input);
+    week[token] = toInt$2(input);
 });
 
 // HELPERS
@@ -97864,7 +97913,7 @@ addRegexToken('Hmmss', match5to6);
 
 addParseToken(['H', 'HH'], HOUR);
 addParseToken(['k', 'kk'], function (input, array, config) {
-    var kInput = toInt(input);
+    var kInput = toInt$2(input);
     array[HOUR] = kInput === 24 ? 0 : kInput;
 });
 addParseToken(['a', 'A'], function (input, array, config) {
@@ -97872,34 +97921,34 @@ addParseToken(['a', 'A'], function (input, array, config) {
     config._meridiem = input;
 });
 addParseToken(['h', 'hh'], function (input, array, config) {
-    array[HOUR] = toInt(input);
+    array[HOUR] = toInt$2(input);
     getParsingFlags(config).bigHour = true;
 });
 addParseToken('hmm', function (input, array, config) {
     var pos = input.length - 2;
-    array[HOUR] = toInt(input.substr(0, pos));
-    array[MINUTE] = toInt(input.substr(pos));
+    array[HOUR] = toInt$2(input.substr(0, pos));
+    array[MINUTE] = toInt$2(input.substr(pos));
     getParsingFlags(config).bigHour = true;
 });
 addParseToken('hmmss', function (input, array, config) {
     var pos1 = input.length - 4;
     var pos2 = input.length - 2;
-    array[HOUR] = toInt(input.substr(0, pos1));
-    array[MINUTE] = toInt(input.substr(pos1, 2));
-    array[SECOND] = toInt(input.substr(pos2));
+    array[HOUR] = toInt$2(input.substr(0, pos1));
+    array[MINUTE] = toInt$2(input.substr(pos1, 2));
+    array[SECOND] = toInt$2(input.substr(pos2));
     getParsingFlags(config).bigHour = true;
 });
 addParseToken('Hmm', function (input, array, config) {
     var pos = input.length - 2;
-    array[HOUR] = toInt(input.substr(0, pos));
-    array[MINUTE] = toInt(input.substr(pos));
+    array[HOUR] = toInt$2(input.substr(0, pos));
+    array[MINUTE] = toInt$2(input.substr(pos));
 });
 addParseToken('Hmmss', function (input, array, config) {
     var pos1 = input.length - 4;
     var pos2 = input.length - 2;
-    array[HOUR] = toInt(input.substr(0, pos1));
-    array[MINUTE] = toInt(input.substr(pos1, 2));
-    array[SECOND] = toInt(input.substr(pos2));
+    array[HOUR] = toInt$2(input.substr(0, pos1));
+    array[MINUTE] = toInt$2(input.substr(pos1, 2));
+    array[SECOND] = toInt$2(input.substr(pos2));
 });
 
 // LOCALES
@@ -98865,7 +98914,7 @@ function isDurationValid(m) {
             if (unitHasDecimal) {
                 return false; // only allow non-integers for smallest unit
             }
-            if (parseFloat(m[ordering[i]]) !== toInt(m[ordering[i]])) {
+            if (parseFloat(m[ordering[i]]) !== toInt$2(m[ordering[i]])) {
                 unitHasDecimal = true;
             }
         }
@@ -98973,7 +99022,7 @@ function offsetFromString(matcher, string) {
 
     var chunk   = matches[matches.length - 1] || [];
     var parts   = (chunk + '').match(chunkOffset) || ['-', 0, 0];
-    var minutes = +(parts[1] * 60) + toInt(parts[2]);
+    var minutes = +(parts[1] * 60) + toInt$2(parts[2]);
 
     return minutes === 0 ?
       0 :
@@ -99184,11 +99233,11 @@ function createDuration (input, key) {
         sign = (match[1] === '-') ? -1 : 1;
         duration = {
             y  : 0,
-            d  : toInt(match[DATE])                         * sign,
-            h  : toInt(match[HOUR])                         * sign,
-            m  : toInt(match[MINUTE])                       * sign,
-            s  : toInt(match[SECOND])                       * sign,
-            ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
+            d  : toInt$2(match[DATE])                         * sign,
+            h  : toInt$2(match[HOUR])                         * sign,
+            m  : toInt$2(match[MINUTE])                       * sign,
+            s  : toInt$2(match[SECOND])                       * sign,
+            ms : toInt$2(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
         };
     } else if (!!(match = isoRegex.exec(input))) {
         sign = (match[1] === '-') ? -1 : (match[1] === '+') ? 1 : 1;
@@ -99723,7 +99772,7 @@ addRegexToken('GGGGG',  match1to6, match6);
 addRegexToken('ggggg',  match1to6, match6);
 
 addWeekParseToken(['gggg', 'ggggg', 'GGGG', 'GGGGG'], function (input, week, config, token) {
-    week[token.substr(0, 2)] = toInt(input);
+    week[token.substr(0, 2)] = toInt$2(input);
 });
 
 addWeekParseToken(['gg', 'GG'], function (input, week, config, token) {
@@ -99794,7 +99843,7 @@ addUnitPriority('quarter', 7);
 
 addRegexToken('Q', match1);
 addParseToken('Q', function (input, array) {
-    array[MONTH] = (toInt(input) - 1) * 3;
+    array[MONTH] = (toInt$2(input) - 1) * 3;
 });
 
 // MOMENTS
@@ -99827,7 +99876,7 @@ addRegexToken('Do', function (isStrict, locale) {
 
 addParseToken(['D', 'DD'], DATE);
 addParseToken('Do', function (input, array) {
-    array[DATE] = toInt(input.match(match1to2)[0]);
+    array[DATE] = toInt$2(input.match(match1to2)[0]);
 });
 
 // MOMENTS
@@ -99850,7 +99899,7 @@ addUnitPriority('dayOfYear', 4);
 addRegexToken('DDD',  match1to3);
 addRegexToken('DDDD', match3);
 addParseToken(['DDD', 'DDDD'], function (input, array, config) {
-    config._dayOfYear = toInt(input);
+    config._dayOfYear = toInt$2(input);
 });
 
 // HELPERS
@@ -99957,7 +100006,7 @@ for (token = 'SSSS'; token.length <= 9; token += 'S') {
 }
 
 function parseMs(input, array) {
-    array[MILLISECOND] = toInt(('0.' + input) * 1000);
+    array[MILLISECOND] = toInt$2(('0.' + input) * 1000);
 }
 
 for (token = 'S'; token.length <= 9; token += 'S') {
@@ -100230,7 +100279,7 @@ getSetGlobalLocale('en', {
     dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
     ordinal : function (number) {
         var b = number % 10,
-            output = (toInt(number % 100 / 10) === 1) ? 'th' :
+            output = (toInt$2(number % 100 / 10) === 1) ? 'th' :
             (b === 1) ? 'st' :
             (b === 2) ? 'nd' :
             (b === 3) ? 'rd' : 'th';
@@ -100386,7 +100435,7 @@ function valueOf$1 () {
         this._milliseconds +
         this._days * 864e5 +
         (this._months % 12) * 2592e6 +
-        toInt(this._months / 12) * 31536e6
+        toInt$2(this._months / 12) * 31536e6
     );
 }
 
@@ -100633,7 +100682,7 @@ addParseToken('X', function (input, array, config) {
     config._d = new Date(parseFloat(input, 10) * 1000);
 });
 addParseToken('x', function (input, array, config) {
-    config._d = new Date(toInt(input));
+    config._d = new Date(toInt$2(input));
 });
 
 // Side effect imports
@@ -101716,9 +101765,7 @@ var script$28 = function() {
   this.on('update', () => {
     validate();
   }).on('before-unmount', () => {
-    //debugger
     this.opts.onvalidate(this._riot_id, true);
-    //validate();
   });
 
   /**
@@ -101771,6 +101818,18 @@ var script$28 = function() {
       isError: true,
       watchElm: bodyElm
     });
+  };
+
+  this.handleDatepickerTap = () => {
+    // 一旦date-timeだけ対応。
+    if (formObject.format !== 'date-time') {
+      return;
+    }
+    const date = new Date();
+    const yyyy = date.getFullYear();
+    const mm = lpad_1(date.getMonth() + 1, 2, '0');
+    const dd = lpad_1(date.getDate() + 1, 2, '0');
+    change(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
   };
 
   this.handleBodyTap = e => {
@@ -102021,7 +102080,7 @@ var script$28 = function() {
 
 };
 
-riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> <div class="Parameters_Form__description" if="{!!description}">{description}</div> </div> <div class="Parameters_Form__error" if="{isMobile &amp;&amp; isFocus &amp;&amp; hasError &amp;&amp; !opts.ispreview}">{errors[0]}</div> <div class="Parameters_Form__body" ref="body" onclick="{getClickHandler(\'handleBodyTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBodyTap\')}"> <virtual if="{uiType === \'textinput\'}"> <viron-textinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onsubmit="{handleTextInputSubmit}" onchange="{handleTextinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextareaChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onsubmit="{handleNumberInputSubmit}" onchange="{handleNumberinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="{accept}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'base64\'}"> <viron-base64 val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" mimetype="{mimeType}" onchange="{handleBase64Change}"></viron-base64> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleHtmlChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handlePugChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" config="{autocompleteConfig}" onsubmit="{handleAutocompleteSubmit}" onchange="{handleAutocompleteChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" theme="{opts.theme}" explorer="{explorerConfig}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'image\'}"> <viron-image val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview || isDisabled}"></viron-image> </virtual> <virtual if="{uiType === \'null\'}"> <div>NULL</div> </virtual> </div>', '', 'class="Parameters_Form {\'Parameters_Form--preview\': opts.ispreview}"', function(opts) {
+riot$1.tag2('viron-parameters-form', '<div class="Parameters_Form__head" if="{uiType !== \'checkbox\'}"> <div class="Parameters_Form__title">{title}</div> <div class="Parameters_Form__description" if="{!!description}">{description}</div> <div class="Parameters_Form__datepicker" if="{!opts.ispreview &amp;&amp; uiType === \'datepicker\'}" onclick="{getClickHandler(\'handleDatepickerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDatepickerTap\')}">today</div> </div> <div class="Parameters_Form__error" if="{isMobile &amp;&amp; isFocus &amp;&amp; hasError &amp;&amp; !opts.ispreview}">{errors[0]}</div> <div class="Parameters_Form__body" ref="body" onclick="{getClickHandler(\'handleBodyTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBodyTap\')}"> <virtual if="{uiType === \'textinput\' || uiType === \'datepicker\'}"> <viron-textinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onsubmit="{handleTextInputSubmit}" onchange="{handleTextinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textinput> </virtual> <virtual if="{uiType === \'textarea\'}"> <viron-textarea val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleTextareaChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-textarea> </virtual> <virtual if="{uiType === \'numberinput\'}"> <viron-numberinput val="{opts.val}" theme="{opts.theme}" placeholder="{placeholder}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onsubmit="{handleNumberInputSubmit}" onchange="{handleNumberinputChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-numberinput> </virtual> <virtual if="{uiType === \'checkbox\'}"> <viron-checkbox ischecked="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" label="{title}" onchange="{handleCheckboxChange}"></viron-checkbox> </virtual> <virtual if="{uiType === \'select\'}"> <viron-select options="{getSelectOptions()}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleSelectChange}"></viron-select> </virtual> <virtual if="{uiType === \'uploader\'}"> <viron-uploader accept="{accept}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleUploaderChange}"></viron-uploader> </virtual> <virtual if="{uiType === \'base64\'}"> <viron-base64 val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" mimetype="{mimeType}" onchange="{handleBase64Change}"></viron-base64> </virtual> <virtual if="{uiType === \'html\'}"> <viron-html val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleHtmlChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-html> </virtual> <virtual if="{uiType === \'pug\'}"> <viron-pug val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handlePugChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-pug> </virtual> <virtual if="{uiType === \'autocomplete\'}"> <viron-autocomplete val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" config="{autocompleteConfig}" onsubmit="{handleAutocompleteSubmit}" onchange="{handleAutocompleteChange}" onfocus="{handleFormFocus}" onblur="{handleFormBlur}"></viron-autocomplete> </virtual> <virtual if="{uiType === \'wyswyg\'}"> <viron-wyswyg val="{opts.val}" theme="{opts.theme}" explorer="{explorerConfig}" ispreview="{opts.ispreview}" isdisabled="{isDisabled}" iserror="{hasError}" onchange="{handleWyswygChange}"></viron-wyswyg> </virtual> <virtual if="{uiType === \'image\'}"> <viron-image val="{opts.val}" theme="{opts.theme}" ispreview="{opts.ispreview || isDisabled}"></viron-image> </virtual> <virtual if="{uiType === \'null\'}"> <div>NULL</div> </virtual> </div>', '', 'class="Parameters_Form {\'Parameters_Form--preview\': opts.ispreview}"', function(opts) {
     this.external(script$28);
 });
 

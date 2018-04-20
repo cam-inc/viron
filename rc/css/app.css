@@ -5192,6 +5192,24 @@ select {
     color: #d1d1d1;
     color: var(--color-base-gray);
   }
+.Parameters_Form__datepicker {
+    flex-shrink: 0;
+    margin-left: 8px;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Parameters_Form__datepicker:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.Parameters_Form__datepicker.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
 .Parameters_Form__error {
     margin-bottom: 4px;
     color: #f57177;
