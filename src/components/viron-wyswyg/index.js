@@ -57,7 +57,7 @@ export default function() {
     store.action('drawers.add', 'viron-wyswyg-explorer', {
       def: explorerDef,
       onInsert: item => {
-        this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" width="100" />`);
+        this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" width="100%" />`);
       }
     }, { isWide: true });
   };

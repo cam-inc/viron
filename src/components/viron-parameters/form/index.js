@@ -197,7 +197,7 @@ export default function() {
     const yyyy = date.getFullYear();
     const mm = lpad(date.getMonth() + 1, 2, '0');
     const dd = lpad(date.getDate(), 2, '0');
-    change(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
+    change(`${yyyy}-${mm}-${dd}T00:00:00+09:00`);
   };
 
   this.handleBodyTap = e => {
