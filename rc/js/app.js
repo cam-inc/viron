@@ -101829,7 +101829,7 @@ var script$28 = function() {
     const yyyy = date.getFullYear();
     const mm = lpad_1(date.getMonth() + 1, 2, '0');
     const dd = lpad_1(date.getDate(), 2, '0');
-    change(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
+    change(`${yyyy}-${mm}-${dd}T00:00:00+09:00`);
   };
 
   this.handleBodyTap = e => {
