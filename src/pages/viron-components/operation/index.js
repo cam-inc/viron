@@ -35,7 +35,6 @@ export default function() {
     break;
   case 'put':
     this.submitLabel = customSubmitLabel || '保存する';
-    this.isSwitchable = false;
     successMessage = '保存しました。';
     break;
   case 'delete':
