@@ -5306,6 +5306,7 @@ select {
     margin-top: 24px;
   }
 .Parameters_Items__item {
+    position: relative;
     padding: 12px 24px;
     background-color: #f9f9f9;
     background-color: var(--color-base-gray-tertiary);
@@ -5435,6 +5436,36 @@ select {
       width: 16px;
       height: 16px;
     }
+.Parameters_Items__itemMoveUp,
+  .Parameters_Items__itemMoveDown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    position: absolute;
+    left: -5px;
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    opacity: 0.5;
+  }
+@media (hover: hover) {
+    .Parameters_Items__itemMoveUp:hover, .Parameters_Items__itemMoveDown:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+      opacity: 1;
+    }
+  }
+.Parameters_Items__itemMoveUp.hold, .Parameters_Items__itemMoveDown.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+      opacity: 1;
+  }
+.Parameters_Items__itemMoveUp {
+    top: 5px;
+  }
+.Parameters_Items__itemMoveDown {
+    bottom: 5px;
+  }
 .Parameters_Parameter {
   display: block;
 }
