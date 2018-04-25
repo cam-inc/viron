@@ -16,7 +16,7 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
     virtual(if="{ uiType === 'select' }")
       viron-select(options="{ getSelectOptions() }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleSelectChange }")
     virtual(if="{ uiType === 'uploader' }")
-      viron-uploader(accept="{ accept }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleUploaderChange }")
+      viron-uploader(accept="{ accept }" initialBlobUrl="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleUploaderChange }")
     virtual(if="{ uiType === 'base64' }")
       viron-base64(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" mimeType="{ mimeType }" onChange="{ handleBase64Change }")
     virtual(if="{ uiType === 'html' }")

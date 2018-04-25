@@ -3,6 +3,7 @@ import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import isNaN from 'mout/lang/isNaN';
 import _isNumber from 'mout/lang/isNumber';
+import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 import lpad from 'mout/string/lpad';
 import ObjectAssign from 'object-assign';
@@ -89,6 +90,10 @@ export default function() {
   const validate = () => {
     this.errors = validator.errors(this.opts.val, formObject);
     this.hasError = !!this.errors.length;
+    // 例外的にバリデージョンをスルーする。
+    if (formObject.type === 'file' && isString(this.opts.val)) {
+      this.hasError = false;
+    }
     if (!this.opts.onvalidate) {
       return;
     }
