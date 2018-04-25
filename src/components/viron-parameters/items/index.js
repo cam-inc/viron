@@ -186,6 +186,38 @@ export default function() {
   };
 
   /**
+   * 上に移動ボタンがタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleMoveUpTap = e => {
+    e.stopPropagation();
+    const idx = e.item.idx;
+    let ret = this.opts.val;
+    const item = ret.splice(idx, 1)[0];
+    const opened = this.itemsOpened.splice(idx, 1)[0];
+    ret.splice(idx - 1, 0, item);
+    this.itemsOpened.splice(idx - 1, 0, opened);
+    this.update();
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * 下に移動ボタンがタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleMoveDownTap = e => {
+    e.stopPropagation();
+    const idx = e.item.idx;
+    let ret = this.opts.val;
+    const item = ret.splice(idx, 1)[0];
+    const opened = this.itemsOpened.splice(idx, 1)[0];
+    ret.splice(idx + 1, 0, item);
+    this.itemsOpened.splice(idx + 1, 0, opened);
+    this.update();
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
    * 全てのアイテムを開くボタンがタップされた時の処理。
    */
   this.handleOpenAllButtonTap = () => {

@@ -25,6 +25,10 @@ viron-parameters-items.Parameters_Items(class="{ 'Parameters_Items--preview': op
         .Parameters_Items__itemBriefDescription(if="{ parent.isPropertiesMode }") { parent.getBriefItemDescription(val) }
         .Parameters_Items__itemBriefOpenButton
           viron-icon-arrow-down
+      .Parameters_Items__itemMoveUp(if="{ opts.val.length >= 2 }" onTap="{ handleMoveUpTap }")
+        viron-icon-arrow-up
+      .Parameters_Items__itemMoveDown(if="{ opts.val.length >= 2 }" onTap="{ handleMoveDownTap }")
+        viron-icon-arrow-down
 
   script.
     import '../../../components/icons/viron-icon-arrow-down/index.tag';
