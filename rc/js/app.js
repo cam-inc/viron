@@ -101740,6 +101740,7 @@ var script$28 = function() {
    */
   this.getSelectOptions = () => {
     const options = [];
+    const enumDescriptions = formObject['x-enum-descriptions'] || {};
     if (isUndefined(this.opts.val)) {
       options.push({
         label: '-- select an option --',
@@ -101751,7 +101752,7 @@ var script$28 = function() {
     forEach_1$2(formObject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
-        label: v,
+        label: enumDescriptions[v] || v,
         value: v,
         isSelected: (v === this.opts.val)
       });
@@ -101979,7 +101980,7 @@ var script$28 = function() {
     const option = find_1$2(newOptions, option => {
       return option.isSelected;
     });
-    const value = (option ? option.label : undefined);
+    const value = (option ? option.value : undefined);
     change(value);
   };
 
