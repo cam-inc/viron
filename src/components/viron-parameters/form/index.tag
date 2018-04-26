@@ -12,7 +12,7 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
     virtual(if="{ uiType === 'numberinput' }")
       viron-numberinput(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onSubmit="{ handleNumberInputSubmit }" onChange="{ handleNumberinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'checkbox' }")
-      viron-checkbox(isChecked="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" label="{ title }" onChange="{ handleCheckboxChange }")
+      viron-checkbox(isChecked="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" label="{ title }" description="{ description }" onChange="{ handleCheckboxChange }")
     virtual(if="{ uiType === 'select' }")
       viron-select(options="{ getSelectOptions() }" theme="{ opts.theme }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleSelectChange }")
     virtual(if="{ uiType === 'uploader' }")
