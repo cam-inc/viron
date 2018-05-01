@@ -99,6 +99,7 @@ export default function() {
     if (this.isPropertiesMode) {
       // 最初にundefinedではない要素値を使用します。
       let ret;
+      val = val || {};
       const properties = this.propertiesObject.properties;
       const _keys = keys(properties);
       forEach(_keys, key => {
@@ -137,6 +138,7 @@ export default function() {
       return '-';
     }
     let ret = '';
+    val = val || {};
     const properties = this.propertiesObject.properties;
     const _keys = keys(properties);
     forEach(_keys, key => {
@@ -293,7 +295,17 @@ export default function() {
       return;
     }
     const ret = this.opts.val;
-    ret[idx] = newVal;
+    if (isUndefined(newVal)) {
+      if (this.isFormMode) {
+        ret[idx] = newVal;
+      } else if (this.isPropertiesMode) {
+        // Do nothing.
+      } else if (this.isItemsMode) {
+        ret[idx] = [];
+      }
+    } else {
+      ret[idx] = newVal;
+    }
     this.opts.onchange(this.opts.identifier, ret);
   };
 
