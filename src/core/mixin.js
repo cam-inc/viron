@@ -2,8 +2,6 @@ import riot from 'riot';
 import i18n from './i18n';
 import router from './router';
 
-// Mouse系かTouch系か。
-const isTouchEventSupported = 'ontouchstart' in document;
 // 指(or pointer)のstartからendまでの座標移動距離。tapと見なすかの閾値となります。
 const TAP_ALLOW_RANGE = 10;
 // 指(or pointer)が押されている時にDOM要素に付与されるclass属性値。
@@ -58,24 +56,25 @@ export default {
             return router.getInstance();
           },
           getClickHandler: function(handlerName) {
-            // touch環境は扱わない。
-            if (isTouchEventSupported) {
-              return false;
-            }
             // `parent.parent.handleFoo`な形式への対応。
             let context = this;
             while (handlerName.indexOf('parent.') === 0) {
               handlerName = handlerName.replace('parent.', '');
               context = context.parent;
             }
-            return context[handlerName];
+            return e => {
+              // Do nothing if touchstart has already been fired.
+              if (!!e.currentTarget.getAttribute('touch_mode')) {
+                e.currentTarget.removeAttribute('touch_mode');
+                this._isTouchMode = false;
+                return;
+              }
+              context[handlerName](e);
+            };
           },
           getTouchStartHandler: function() {
-            // mouse環境は扱わない。
-            if (!isTouchEventSupported) {
-              return false;
-            }
             return e => {
+              e.currentTarget.setAttribute('touch_mode', 'true');
               const initX = e.touches[0].pageX;
               const initY = e.touches[0].pageY;
               e.currentTarget.setAttribute('touch_start_x', initX);
@@ -84,10 +83,6 @@ export default {
             };
           },
           getTouchMoveHandler: function() {
-            // mouse環境は扱わない。
-            if (!isTouchEventSupported) {
-              return false;
-            }
             return e => {
               const isPressed = e.currentTarget.classList.contains(TAP_HOLD_CLASSNAME);
               if (!isPressed) {
@@ -106,10 +101,6 @@ export default {
             };
           },
           getTouchEndHandler: function(handlerName) {
-            // mouse環境は扱わない。
-            if (!isTouchEventSupported) {
-              return false;
-            }
             // `parent.parent.handleFoo`な形式への対応。
             let context = this;
             while (handlerName.indexOf('parent.') === 0) {
