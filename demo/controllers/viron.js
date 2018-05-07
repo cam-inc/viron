@@ -258,6 +258,13 @@ const show = (req, res) => {
               genTableComponent('フォーム切り替え', 'get', '/switch_form', 'id', null, ['id']),
             ]
           },
+          {
+            id: 'dateformat',
+            name: '日付フォーマット',
+            components: [
+              genTableComponent('日付フォーマット', 'get', '/date_format', 'id', null, ['id']),
+            ]
+          },
         ],
         // Admin
         [constant.GROUP_ADMIN]: [

@@ -84,6 +84,12 @@
     }
   }
 
+  &--desktop&--wide {
+    & .Modal__frame {
+      width: auto;
+    }
+  }
+
   &--mobile {
     & .Modal__frame {
       width: 100%;

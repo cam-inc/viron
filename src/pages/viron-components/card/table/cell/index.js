@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import contains from 'mout/array/contains';
 import isArray from 'mout/lang/isArray';
 import isBoolean from 'mout/lang/isBoolean';
@@ -43,6 +44,10 @@ export default function() {
       return '{...}';
     }
     if (isString(data)) {
+      if (column.format === 'date-time') {
+        this.isText = true;
+        return dayjs(data).format();
+      }
       if (column.format === 'base64') {
         this.isBase64 = true;
         // MIME-type設定。指定無しであればpng画像とする。

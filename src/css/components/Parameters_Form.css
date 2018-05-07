@@ -21,11 +21,13 @@
     color: var(--color-base-gray);
   }
 
-  &__datepicker {
+  &__timepicker {
     @mixin hover {
       color: var(--color-base-blue);
     }
     flex-shrink: 0;
+    width: 12px;
+    height: 12px;
     margin-left: 8px;
     color: var(--color-base-gray);
     text-decoration: underline;
