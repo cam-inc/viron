@@ -32,14 +32,7 @@ export default function() {
       pagination.limit = size;
       pagination.offset = (current - 1) * size;
     }
-    const sorts = [];
-    forEach(this.sortAsc || [], key => {
-      sorts.push(`${key}:asc`);
-    });
-    forEach(this.sortDesc || [], key => {
-      sorts.push(`${key}:desc`);
-    });
-    const queries = ObjectAssign({}, this.searchQueries, pagination, { sort: sorts.join(',') });
+    const queries = ObjectAssign({}, this.searchQueries, pagination, { sort: this.sort.join(',') });
     return Promise
       .resolve()
       .then(() => {
@@ -187,8 +180,7 @@ export default function() {
   });
   this.hasSearchQueries = !!size(this.searchQueries);
   // ソート群。
-  this.sortAsc = [];
-  this.sortDesc = [];
+  this.sort = [];
   // 自動更新間隔。
   this.autoRefreshSec = null;
   let autoRefreshIntervalId = null;
@@ -257,7 +249,7 @@ export default function() {
    * @return {Boolean}
    */
   this.isAsc = key => {
-    return contains(this.sortAsc, key);
+    return contains(this.sort, `${key}:asc`);
   };
 
   /**
@@ -266,7 +258,7 @@ export default function() {
    * @return {Boolean}
    */
   this.isDesc = key => {
-    return contains(this.sortDesc, key);
+    return contains(this.sort, `${key}:desc`);
   };
 
   let prevCrossSearchQueries = ObjectAssign(this.opts.crosssearchqueries);
@@ -358,12 +350,12 @@ export default function() {
     // 既に昇順ソートされていれば、降順ソートにする。
     // 降順ソートされていれば、ソートOFFにする。
     if (this.isAsc(key)) {
-      this.sortAsc = reject(this.sortAsc, item => (item === key));
-      this.sortDesc.push(key);
+      this.sort = reject(this.sort, item => (item === `${key}:asc`));
+      this.sort.push(`${key}:desc`);
     } else if (this.isDesc(key)) {
-      this.sortDesc = reject(this.sortDesc, item => (item === key));
+      this.sort = reject(this.sort, item => (item === `${key}:desc`));
     } else {
-      this.sortAsc.push(key);
+      this.sort.push(`${key}:asc`);
     }
     // ソート更新時は強制的にページを最初に戻す。
     if (!this.hasPagination) {
