@@ -197,7 +197,7 @@ export default function() {
   };
 
   this.getTimeOffsetValue = val => {
-    if (!dayjs(val).isValid()) {
+    if (!val || !dayjs(val).isValid()) {
       return val;
     }
     return dayjs(val).format('YYYY-MM-DDTHH:mm:ssZZ');
