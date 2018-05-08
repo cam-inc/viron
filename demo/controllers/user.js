@@ -29,6 +29,9 @@ const list = (req, res) => {
   if (req.query.name) {
     query.name = {$like: `${req.query.name}%`};
   }
+  if (req.query.sort) {
+    options.order = req.query.sort.split(',').map(v => v.split(':'));
+  }
   return storeHelper.list(store, Users, query, options)
     .then(data => {
       pager.setResHeader(res, limit, offset, data.count);
