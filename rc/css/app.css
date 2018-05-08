@@ -6923,8 +6923,8 @@ select {
     height: 8px;
   }
 .ComponentsPage_Card_Table__thIcon--active {
-      color: #484848;
-      color: var(--color-base-black);
+      color: #627edf;
+      color: var(--color-base-blue);
     }
 .ComponentsPage_Card_Table__thInnerLabel {
   overflow: hidden;
