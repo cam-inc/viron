@@ -22,7 +22,7 @@ module.exports = {
   BLOG_DESIGN_2COLUMN: '2column',
   BLOG_DESIGN_3COLUMN: '3column',
 
-  DEFAULT_PAGER_LIMIT: 50,
+  DEFAULT_PAGER_LIMIT: 10,
 
   // @see shared/context.js#initConstant
   //VIRON_STYLE_LIST: vironlib.constants.VIRON_STYLE_LIST,

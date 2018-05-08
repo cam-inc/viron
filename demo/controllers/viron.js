@@ -27,7 +27,7 @@ const genComponent = (name, method, path, style, autoRefreshSec, pagination, opt
   return cmp;
 };
 
-const genTableComponent = (name, method, path, primary, query, labels, actions) => {
+const genTableComponent = (name, method, path, primary, query, labels, actions, sort) => {
   const component = genComponent(name, method, path, constant.VIRON_STYLE_TABLE, null, true);
   if (primary) {
     component.primary = primary;
@@ -40,6 +40,9 @@ const genTableComponent = (name, method, path, primary, query, labels, actions) 
   }
   if (actions) {
     component.actions = actions;
+  }
+  if (sort) {
+    component.sort = sort;
   }
   return component;
 };
@@ -137,7 +140,7 @@ const show = (req, res) => {
               ], ['id', 'name', 'job', 'sex'], [
                 '/user/upload/csv',
                 '/user/download/csv',
-              ]),
+              ], ['id', 'name', 'job']),
             ],
           },
           {

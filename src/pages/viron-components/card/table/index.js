@@ -1,6 +1,7 @@
 import contains from 'mout/array/contains';
 import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
+import reject from 'mout/array/reject';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
 import deepClone from 'mout/lang/deepClone';
@@ -31,7 +32,7 @@ export default function() {
       pagination.limit = size;
       pagination.offset = (current - 1) * size;
     }
-    const queries = ObjectAssign({}, this.searchQueries, pagination);
+    const queries = ObjectAssign({}, this.searchQueries, pagination, { sort: this.sort.join(',') });
     return Promise
       .resolve()
       .then(() => {
@@ -178,6 +179,8 @@ export default function() {
     }
   });
   this.hasSearchQueries = !!size(this.searchQueries);
+  // ソート群。
+  this.sort = [];
   // 自動更新間隔。
   this.autoRefreshSec = null;
   let autoRefreshIntervalId = null;
@@ -238,6 +241,24 @@ export default function() {
     return filter(this.columns, column => {
       return contains(this.visibleColumnKeys, column.key);
     });
+  };
+
+  /**
+   * 指定されたカラムの昇順ソートがONか否か。
+   * @param {String} key
+   * @return {Boolean}
+   */
+  this.isAsc = key => {
+    return contains(this.sort, `${key}:asc`);
+  };
+
+  /**
+   * 指定されたカラムの降順ソートがONか否か。
+   * @param {String} key
+   * @return {Boolean}
+   */
+  this.isDesc = key => {
+    return contains(this.sort, `${key}:desc`);
   };
 
   let prevCrossSearchQueries = ObjectAssign(this.opts.crosssearchqueries);
@@ -320,6 +341,34 @@ export default function() {
         getData();
       }
     }, { isNarrow: true });
+  };
+
+  this.handleSortThTap = e => {
+    const item = e.item.column;
+    const key = item.key;
+    // 未ソート状態であれば昇順ソートにする。
+    // 既に昇順ソートされていれば、降順ソートにする。
+    // 降順ソートされていれば、ソートOFFにする。
+    if (this.isAsc(key)) {
+      this.sort = reject(this.sort, item => (item === `${key}:asc`));
+      this.sort.push(`${key}:desc`);
+    } else if (this.isDesc(key)) {
+      this.sort = reject(this.sort, item => (item === `${key}:desc`));
+    } else {
+      this.sort.push(`${key}:asc`);
+    }
+    // ソート更新時は強制的にページを最初に戻す。
+    if (!this.hasPagination) {
+      getData();
+    } else {
+      const pagination = {};
+      const size = this.pagination.size;
+      const current = 1;
+      pagination.limit = size;
+      pagination.offset = (current - 1) * size;
+      getData(pagination);
+    }
+
   };
 
   this.handleSettingButtonTap = () => {

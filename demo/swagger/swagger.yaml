@@ -2293,6 +2293,11 @@ paths:
         name: offset
         required: false
         type: integer
+      - description: ソート
+        in: query
+        name: sort
+        required: false
+        type: string
       responses:
         "200":
           description: OK
