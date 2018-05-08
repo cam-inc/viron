@@ -1,6 +1,7 @@
 import contains from 'mout/array/contains';
 import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
+import reject from 'mout/array/reject';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
 import deepClone from 'mout/lang/deepClone';
@@ -31,7 +32,14 @@ export default function() {
       pagination.limit = size;
       pagination.offset = (current - 1) * size;
     }
-    const queries = ObjectAssign({}, this.searchQueries, pagination);
+    const sorts = [];
+    forEach(this.sortAsc || [], key => {
+      sorts.push(`${key}:asc`);
+    });
+    forEach(this.sortDesc || [], key => {
+      sorts.push(`${key}:desc`);
+    });
+    const queries = ObjectAssign({}, this.searchQueries, pagination, { sort: sorts.join(',') });
     return Promise
       .resolve()
       .then(() => {
@@ -178,6 +186,9 @@ export default function() {
     }
   });
   this.hasSearchQueries = !!size(this.searchQueries);
+  // ソート群。
+  this.sortAsc = [];
+  this.sortDesc = [];
   // 自動更新間隔。
   this.autoRefreshSec = null;
   let autoRefreshIntervalId = null;
@@ -238,6 +249,24 @@ export default function() {
     return filter(this.columns, column => {
       return contains(this.visibleColumnKeys, column.key);
     });
+  };
+
+  /**
+   * 指定されたカラムの昇順ソートがONか否か。
+   * @param {String} key
+   * @return {Boolean}
+   */
+  this.isAsc = key => {
+    return contains(this.sortAsc, key);
+  };
+
+  /**
+   * 指定されたカラムの降順ソートがONか否か。
+   * @param {String} key
+   * @return {Boolean}
+   */
+  this.isDesc = key => {
+    return contains(this.sortDesc, key);
   };
 
   let prevCrossSearchQueries = ObjectAssign(this.opts.crosssearchqueries);
@@ -320,6 +349,34 @@ export default function() {
         getData();
       }
     }, { isNarrow: true });
+  };
+
+  this.handleSortThTap = e => {
+    const item = e.item.column;
+    const key = item.key;
+    // 未ソート状態であれば昇順ソートにする。
+    // 既に昇順ソートされていれば、降順ソートにする。
+    // 降順ソートされていれば、ソートOFFにする。
+    if (this.isAsc(key)) {
+      this.sortAsc = reject(this.sortAsc, item => (item === key));
+      this.sortDesc.push(key);
+    } else if (this.isDesc(key)) {
+      this.sortDesc = reject(this.sortDesc, item => (item === key));
+    } else {
+      this.sortAsc.push(key);
+    }
+    // ソート更新時は強制的にページを最初に戻す。
+    if (!this.hasPagination) {
+      getData();
+    } else {
+      const pagination = {};
+      const size = this.pagination.size;
+      const current = 1;
+      pagination.limit = size;
+      pagination.offset = (current - 1) * size;
+      getData(pagination);
+    }
+
   };
 
   this.handleSettingButtonTap = () => {
