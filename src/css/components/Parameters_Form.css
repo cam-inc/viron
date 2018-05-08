@@ -31,7 +31,6 @@
   }
 
   &__timepicker {
-
     @mixin hover {
       color: var(--color-base-blue);
     }
