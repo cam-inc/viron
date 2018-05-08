@@ -1,12 +1,15 @@
 viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.ispreview }")
   .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
-    .Parameters_Form__title { title }
+    .Parameters_Form__title(class="{ 'Parameters_Form__title--required':isRequired }") { title }
     .Parameters_Form__description(if="{ !!description }") { description }
-    .Parameters_Form__datepicker(if="{ !opts.ispreview && uiType === 'datepicker' }" onTap="{ handleDatepickerTap }") today
   .Parameters_Form__error(if="{ isMobile && isFocus && hasError && !opts.ispreview}") { errors[0] }
   .Parameters_Form__body(ref="body" onTap="{ handleBodyTap }")
-    virtual(if="{ uiType === 'textinput' || uiType === 'datepicker' }")
+    virtual(if="{ uiType === 'textinput' }")
       viron-textinput(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onSubmit="{ handleTextInputSubmit }" onChange="{ handleTextinputChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+    virtual(if="{ uiType === 'timepicker' }")
+      viron-textinput(class="Parameters_Form__timepickerTextinput" val="{ getTimeOffsetValue(opts.val) }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onSubmit="{ handleTimepickerSubmit }" onChange="{ handleTimepickerChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
+      .Parameters_Form__timepicker(if="{ !opts.ispreview }" onTap="{ handleTimepickerTap }")
+        viron-icon-star
     virtual(if="{ uiType === 'textarea' }")
       viron-textarea(val="{ opts.val }" theme="{ opts.theme }" placeholder="{ placeholder }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleTextareaChange }" onFocus="{ handleFormFocus }" onBlur="{ handleFormBlur }")
     virtual(if="{ uiType === 'numberinput' }")
@@ -33,6 +36,7 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
       div NULL
 
   script.
+    import '../../../components/icons/viron-icon-star/index.tag';
     import '../../../components/viron-autocomplete/index.tag';
     import '../../../components/viron-base64/index.tag';
     import '../../../components/viron-checkbox/index.tag';

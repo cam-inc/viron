@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import contains from 'mout/array/contains';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
@@ -5,9 +6,9 @@ import isNaN from 'mout/lang/isNaN';
 import _isNumber from 'mout/lang/isNumber';
 import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
-import lpad from 'mout/string/lpad';
 import ObjectAssign from 'object-assign';
 import '../error/index.tag';
+import '../timepicker/index.tag';
 import util from '../util';
 import validator from '../validator';
 
@@ -32,8 +33,9 @@ export default function() {
   // 入力必須ならば米印を付ける。
   this.title = formObject.name;
   if (formObject.required) {
-    this.title = `${this.title} *`;
+    this.title = `${this.title} (必須)`;
   }
+  this.isRequired = formObject.required;
   this.description = formObject.description;
   // autocomplete設定。
   this.autocompleteConfig = formObject['x-autocomplete'];
@@ -194,16 +196,22 @@ export default function() {
     });
   };
 
-  this.handleDatepickerTap = () => {
-    // 一旦date-timeだけ対応。
-    if (formObject.format !== 'date-time') {
-      return;
+  this.getTimeOffsetValue = val => {
+    if (!val || !dayjs(val).isValid()) {
+      return val;
     }
-    const date = new Date();
-    const yyyy = date.getFullYear();
-    const mm = lpad(date.getMonth() + 1, 2, '0');
-    const dd = lpad(date.getDate(), 2, '0');
-    change(`${yyyy}-${mm}-${dd}T00:00:00+09:00`);
+    return dayjs(val).format('YYYY-MM-DDTHH:mm:ssZZ');
+  };
+
+  this.handleTimepickerTap = () => {
+    store.action('modals.add', 'viron-parameters-timepicker', {
+      isoString: this.opts.val,
+      onSubmit: str => {
+        change(dayjs(str).toISOString());
+      }
+    }, {
+      isWide: true
+    });
   };
 
   this.handleBodyTap = e => {
@@ -252,6 +260,40 @@ export default function() {
     let ret;
     if (!newValue) {
       ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Textinput(Timepicker): input value when it's submitted.
+   * @param {String|null} newValue
+   */
+  this.handleTimepickerSubmit = newValue => {
+    // force to convert string or undefined.
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else if (dayjs(newValue).isValid()) {
+      ret = dayjs(newValue).toISOString();
+    } else {
+      ret = newValue;
+    }
+    submit(ret);
+  };
+
+  /**
+   * Textinput(Timepicker): 入力値が変更された時の処理。
+   * @param {String|null} newValue
+   */
+  this.handleTimepickerChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else if (dayjs(newValue).isValid()) {
+      ret = dayjs(newValue).toISOString();
     } else {
       ret = newValue;
     }
