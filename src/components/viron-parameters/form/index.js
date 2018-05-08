@@ -33,8 +33,9 @@ export default function() {
   // 入力必須ならば米印を付ける。
   this.title = formObject.name;
   if (formObject.required) {
-    this.title = `${this.title} *`;
+    this.title = `${this.title} (必須)`;
   }
+  this.isRequired = formObject.required;
   this.description = formObject.description;
   // autocomplete設定。
   this.autocompleteConfig = formObject['x-autocomplete'];
