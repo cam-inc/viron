@@ -2,8 +2,8 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
   .Parameters_Form__head(if="{ uiType !== 'checkbox' }")
     .Parameters_Form__title(class="{ 'Parameters_Form__title--required':isRequired }") { title }
     .Parameters_Form__description(if="{ !!description }") { description }
-    .Parameters_Form__now(if="{ uiType === 'timepicker' }" onTap="{ handleNowTap }") Now
-    .Parameters_Form__today(if="{ uiType === 'timepicker' }" onTap="{ handleTodayTap }") Today
+    .Parameters_Form__now(if="{ !opts.ispreview && uiType === 'timepicker' }" onTap="{ handleNowTap }") Now
+    .Parameters_Form__today(if="{ !opts.ispreview && uiType === 'timepicker' }" onTap="{ handleTodayTap }") Today
   .Parameters_Form__error(if="{ isMobile && isFocus && hasError && !opts.ispreview}") { errors[0] }
   .Parameters_Form__body(ref="body" onTap="{ handleBodyTap }")
     virtual(if="{ uiType === 'textinput' }")
