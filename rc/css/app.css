@@ -5206,6 +5206,23 @@ select {
     color: #d1d1d1;
     color: var(--color-base-gray);
   }
+.Parameters_Form__now,
+  .Parameters_Form__today {
+    margin-left: 8px;
+    color: #d1d1d1;
+    color: var(--color-base-gray);
+    cursor: pointer;
+  }
+@media (hover: hover) {
+    .Parameters_Form__now:hover, .Parameters_Form__today:hover {
+      color: #627edf;
+      color: var(--color-base-blue);
+    }
+  }
+.Parameters_Form__now.hold, .Parameters_Form__today.hold {
+      color: #627edf;
+      color: var(--color-base-blue);
+  }
 .Parameters_Form__timepickerTextinput .Textinput__input {
     /* TODO: 一時的に非公開にしているだけ*/
     /*padding-right: 36px;*/
