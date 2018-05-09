@@ -203,6 +203,16 @@ export default function() {
     return dayjs(val).format('YYYY-MM-DDTHH:mm:ssZZ');
   };
 
+  this.handleNowTap = () => {
+    const now = dayjs();
+    change(now.toISOString());
+  };
+
+  this.handleTodayTap = () => {
+    const today = dayjs().set('hour', 0).set('minute', 0).set('second', 0);
+    change(today.toISOString());
+  };
+
   this.handleTimepickerTap = () => {
     store.action('modals.add', 'viron-parameters-timepicker', {
       isoString: this.opts.val,

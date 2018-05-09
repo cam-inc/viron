@@ -25,6 +25,16 @@
     color: var(--color-base-gray);
   }
 
+  &__now,
+  &__today {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    margin-left: 8px;
+    color: var(--color-base-gray);
+    cursor: pointer;
+  }
+
   &__timepickerTextinput .Textinput__input {
     /* TODO: 一時的に非公開にしているだけ*/
     /*padding-right: 36px;*/
