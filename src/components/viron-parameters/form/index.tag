@@ -28,6 +28,8 @@ viron-parameters-form.Parameters_Form(class="{ 'Parameters_Form--preview': opts.
       viron-wyswyg(val="{ opts.val }" theme="{ opts.theme }" explorer="{ explorerConfig }" isPreview="{ opts.ispreview }" isDisabled="{ isDisabled }" isError="{ hasError }" onChange="{ handleWyswygChange }")
     virtual(if="{ uiType === 'image' }")
       viron-image(val="{ opts.val }" theme="{ opts.theme }" isPreview="{ opts.ispreview || isDisabled }")
+    virtual(if="{ uiType === 'video' }")
+      video.Parameters_Form__video(src="{ opts.val }" controls)
     virtual(if="{ uiType === 'null' }")
       div NULL
 

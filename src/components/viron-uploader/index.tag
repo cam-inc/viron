@@ -2,19 +2,22 @@ viron-uploader.Uploader(class="{ 'Uploader--dragWatching' : isDragWatching, 'Upl
   form.Uploader__form(ref="form")
     input.Uploader__input(type="file" id="{ inputId }" accept="{ opts.accept || '*' }" disabled="{ opts.isdisabled }" onChange="{ handleFileChange }")
     label.Uploader__label(for="{ inputId }")
+      .Uploader__dragHandler(onDragEnter="{ handleHandlerDragEnter }" onDragOver="{ handleHandlerDragOver }" onDragLeave="{ handleHandlerDragLeave }" onDrop="{ handleHandlerDrop }")
       virtual(if="{ !file || !blobURL }")
         .Uploader__icon
           viron-icon-file-add
       virtual(if="{ !!file && !!blobURL }")
         virtual(if="{ isTypeOfImage }")
           .Uploader__image(style="background-image:url({ blobURL });")
+        virtual(if="{ isTypeOfVideo }")
+          .Uploader__blocker(if="{ opts.ispreview }" onTap="{ handleBlockerTap }")
+          video.Uploader__video(src="{ blobURL }" controls)
         virtual(if="{ isTypeOfCsv }")
           .Uploader__icon
             viron-icon-file-csv
         virtual(if="{ isTypeOfOther }")
           .Uploader__icon
             viron-icon-file
-      .Uploader__dragHandler(onDragEnter="{ handleHandlerDragEnter }" onDragOver="{ handleHandlerDragOver }" onDragLeave="{ handleHandlerDragLeave }" onDrop="{ handleHandlerDrop }")
   .Uploader__reset(if="{ !!file }" onTap="{ handleResetButtonTap }")
     viron-icon-close
   .Uploader__fileName(if="{ !!fileName }") { fileName }

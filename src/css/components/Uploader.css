@@ -56,6 +56,13 @@
     background-size: contain;
   }
 
+  &__video {
+    width: 126px;
+    height: 126px;
+    cursor: default;
+    background-color: var(--color-base-black);
+  }
+
   &__dragHandler {
     position: absolute;
     top: 0;

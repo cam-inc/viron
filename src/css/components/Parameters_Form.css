@@ -21,6 +21,12 @@
     color: var(--color-base-gray);
   }
 
+  &__video {
+    width: 128px;
+    height: 128px;
+    background-color: var(--color-base-black);
+  }
+
   &__error {
     margin-bottom: 4px;
     color: var(--color-base-red);
