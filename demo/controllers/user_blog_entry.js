@@ -107,7 +107,7 @@ const update = (req, res, next) => {
  * @returns {Promise.<TResult>}
  */
 const preview = (req, res) => {
-  res.send(`https://localhost:3000/page/userblogentry${req.params.id}?token=xxxxx`);
+  res.send(`https://${context.getConfigHost()}/page/userblogentry${req.params.id}?token=xxxxx`);
 };
 
 module.exports = {
