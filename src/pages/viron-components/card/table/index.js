@@ -107,6 +107,7 @@ export default function() {
     });
     if (operationObject.isPreview) {
       openPreview(operationObject, deepClone(initialVal));
+      return;
     }
     openOperationDrawer(operationObject, deepClone(initialVal));
   };
@@ -121,14 +122,15 @@ export default function() {
       .resolve()
       .then(() => store.action('components.operate', operationObject, params))
       .then(res => {
-        if (!isString(res)) {
+        const url = res.body;
+        if (!isString(url)) {
           return;
         }
         if (!!operationObject.target) {
-          window.open(res, operationObject.target);
+          window.open(url, operationObject.target);
           return;
         }
-        window.location.href = res;
+        window.location.href = url;
       })
       .catch(err => store.action('modals.add', 'viron-error', {
         error: err
