@@ -8,6 +8,7 @@ import deepClone from 'mout/lang/deepClone';
 import isArray from 'mout/lang/isArray';
 import isNull from 'mout/lang/isNull';
 import isObject from 'mout/lang/isObject';
+import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 import ObjectAssign from 'object-assign';
 import '../../filter/index.tag';
@@ -79,11 +80,11 @@ export default function() {
   };
 
   /**
-   * 初期値を生成した上で入力フォームを開きます。
+   * 初期値を生成し、必要なoperationを行います。
    * @param {Object} operationObject
    * @param {Object} rowData
    */
-  const createInitialValueAndOpenOperationDrawer = (operationObject, rowData) => {
+  const createInitialValueAndOperate = (operationObject, rowData) => {
     const initialVal = {};
     // ParameterObjectから初期値を推測します。
     forEach(operationObject.parameters || [], parameterObject => {
@@ -104,7 +105,34 @@ export default function() {
         }
       }
     });
+    if (operationObject.isPreview) {
+      openPreview(operationObject, deepClone(initialVal));
+    }
     openOperationDrawer(operationObject, deepClone(initialVal));
+  };
+
+  /**
+   * プレビュー画面を開きます。
+   * @param {Object} operationObjct
+   * @param {Object} params
+   */
+  const openPreview = (operationObject, params) => {
+    Promise
+      .resolve()
+      .then(() => store.action('components.operate', operationObject, params))
+      .then(res => {
+        if (!isString(res)) {
+          return;
+        }
+        if (!!operationObject.target) {
+          window.open(res, operationObject.target);
+          return;
+        }
+        window.location.href = res;
+      })
+      .catch(err => store.action('modals.add', 'viron-error', {
+        error: err
+      }));
   };
 
   /**
@@ -131,6 +159,9 @@ export default function() {
     }
     switch (operations[0].method) {
     case 'get':
+      if (operations[0].isPreview) {
+        return 'square';
+      }
       return 'file';
     case 'put':
       return 'edit';
@@ -417,7 +448,7 @@ export default function() {
       selectedIdx: e.item.idx,
       operations: this.rowOperations,
       onOperationSelect: (operationObject, dataListIdx) => {
-        createInitialValueAndOpenOperationDrawer(operationObject, this.data[dataListIdx]);
+        createInitialValueAndOperate(operationObject, this.data[dataListIdx]);
       }
     });
   };
@@ -428,7 +459,7 @@ export default function() {
 
     // operationが一件の場合は直接Operationドローワーを開く。
     if (this.rowOperations.length === 1) {
-      createInitialValueAndOpenOperationDrawer(this.rowOperations[0], rowData);
+      createInitialValueAndOperate(this.rowOperations[0], rowData);
       return;
     }
 
@@ -443,7 +474,7 @@ export default function() {
         store.action('popovers.add', 'viron-components-page-table-operations', {
           operations: this.rowOperations,
           onSelect: operationObject => {
-            createInitialValueAndOpenOperationDrawer(operationObject, rowData);
+            createInitialValueAndOperate(operationObject, rowData);
           }
         }, {
           x: rect.left + (rect.width / 2),

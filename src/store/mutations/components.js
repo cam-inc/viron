@@ -113,6 +113,26 @@ export default exporter('components', {
           }, operationObject));
         });
       });
+      // プレビューも関連有りとみなす。
+      if (!!componentDef.preview) {
+        (() => {
+          const path = componentDef.preview.path;
+          const method = componentDef.preview.method;
+          if (!path || !method) {
+            return;
+          }
+          const operationObject = !!state.oas.client.spec.paths[path] && state.oas.client.spec.paths[path][method];
+          if (!operationObject) {
+            return;
+          }
+          rowOperations.push(ObjectAssign({
+            method,
+            path,
+            isPreview: true,
+            target: componentDef.preview.target
+          }, operationObject));
+        })();
+      }
       state.components[componentId]['tableOperations'] = tableOperations;
       state.components[componentId]['rowOperations'] = rowOperations;
     }
