@@ -2875,6 +2875,42 @@ paths:
       tags:
       - user_blog_entry
 
+  /userblogentry/{id}/preview:
+    get:
+      x-swagger-router-controller: user_blog_entry
+      description: プレビュー
+      operationId: user_blog_entry#preview
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: 'string'
+            example: 'https://viron.complat.com/page/userblogentry/1?token=xxxxx'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: プレビュー
+      tags:
+      - user_blog_entry
+
   /userfavorite:
     get:
       x-swagger-router-controller: user_favorite
