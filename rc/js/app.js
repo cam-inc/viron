@@ -16362,6 +16362,26 @@ var components$2 = exporter$2('components', {
           }, operationObject));
         });
       });
+      // プレビューも関連有りとみなす。
+      if (!!componentDef.preview) {
+        (() => {
+          const path = componentDef.preview.path;
+          const method = componentDef.preview.method;
+          if (!path || !method) {
+            return;
+          }
+          const operationObject = !!state.oas.client.spec.paths[path] && state.oas.client.spec.paths[path][method];
+          if (!operationObject) {
+            return;
+          }
+          rowOperations.push(objectAssign({
+            method,
+            path,
+            isPreview: true,
+            target: componentDef.preview.target
+          }, operationObject));
+        })();
+      }
       state.components[componentId]['tableOperations'] = tableOperations;
       state.components[componentId]['rowOperations'] = rowOperations;
     }
@@ -99110,11 +99130,11 @@ var script$11 = function() {
   };
 
   /**
-   * 初期値を生成した上で入力フォームを開きます。
+   * 初期値を生成し、必要なoperationを行います。
    * @param {Object} operationObject
    * @param {Object} rowData
    */
-  const createInitialValueAndOpenOperationDrawer = (operationObject, rowData) => {
+  const createInitialValueAndOperate = (operationObject, rowData) => {
     const initialVal = {};
     // ParameterObjectから初期値を推測します。
     forEach_1$2(operationObject.parameters || [], parameterObject => {
@@ -99135,7 +99155,36 @@ var script$11 = function() {
         }
       }
     });
+    if (operationObject.isPreview) {
+      openPreview(operationObject, deepClone_1(initialVal));
+      return;
+    }
     openOperationDrawer(operationObject, deepClone_1(initialVal));
+  };
+
+  /**
+   * プレビュー画面を開きます。
+   * @param {Object} operationObjct
+   * @param {Object} params
+   */
+  const openPreview = (operationObject, params) => {
+    Promise
+      .resolve()
+      .then(() => store.action('components.operate', operationObject, params))
+      .then(res => {
+        const url = res.body;
+        if (!isString_1(url)) {
+          return;
+        }
+        if (!!operationObject.target) {
+          window.open(url, operationObject.target);
+          return;
+        }
+        window.location.href = url;
+      })
+      .catch(err => store.action('modals.add', 'viron-error', {
+        error: err
+      }));
   };
 
   /**
@@ -99162,6 +99211,9 @@ var script$11 = function() {
     }
     switch (operations[0].method) {
     case 'get':
+      if (operations[0].isPreview) {
+        return 'square';
+      }
       return 'file';
     case 'put':
       return 'edit';
@@ -99448,7 +99500,7 @@ var script$11 = function() {
       selectedIdx: e.item.idx,
       operations: this.rowOperations,
       onOperationSelect: (operationObject, dataListIdx) => {
-        createInitialValueAndOpenOperationDrawer(operationObject, this.data[dataListIdx]);
+        createInitialValueAndOperate(operationObject, this.data[dataListIdx]);
       }
     });
   };
@@ -99459,7 +99511,7 @@ var script$11 = function() {
 
     // operationが一件の場合は直接Operationドローワーを開く。
     if (this.rowOperations.length === 1) {
-      createInitialValueAndOpenOperationDrawer(this.rowOperations[0], rowData);
+      createInitialValueAndOperate(this.rowOperations[0], rowData);
       return;
     }
 
@@ -99474,7 +99526,7 @@ var script$11 = function() {
         store.action('popovers.add', 'viron-components-page-table-operations', {
           operations: this.rowOperations,
           onSelect: operationObject => {
-            createInitialValueAndOpenOperationDrawer(operationObject, rowData);
+            createInitialValueAndOperate(operationObject, rowData);
           }
         }, {
           x: rect.left + (rect.width / 2),
