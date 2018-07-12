@@ -74,7 +74,7 @@ export default function() {
       return util.getUIType(formObject);
     }
     // 拡張子から最適な表示方法を推測します。
-    const split = this.opts.val.split('.');
+    const split = this.opts.val.split('?')[0].split('.');
     if (split.length < 2) {
       return util.getUIType(formObject);
     }

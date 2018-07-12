@@ -64,7 +64,7 @@ export default function() {
         return data;
       }
       // 拡張子から最適な表示方法を推測します。
-      const split = data.split('.');
+      const split = data.split('?')[0].split('.');
       if (split.length < 2) {
         // 拡張子がなければそのまま表示する。
         this.isText = true;
