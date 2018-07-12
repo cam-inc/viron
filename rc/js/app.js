@@ -46741,7 +46741,7 @@ var script$10 = function() {
         return data;
       }
       // 拡張子から最適な表示方法を推測します。
-      const split = data.split('.');
+      const split = data.split('?')[0].split('.');
       if (split.length < 2) {
         // 拡張子がなければそのまま表示する。
         this.isText = true;
@@ -97462,7 +97462,7 @@ var script$28 = function() {
       return util$4.getUIType(formObject);
     }
     // 拡張子から最適な表示方法を推測します。
-    const split = this.opts.val.split('.');
+    const split = this.opts.val.split('?')[0].split('.');
     if (split.length < 2) {
       return util$4.getUIType(formObject);
     }
