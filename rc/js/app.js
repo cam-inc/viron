@@ -9023,8 +9023,8 @@ var script$1 = function() {
     this.title = this.title || error.name || error.statusText || 'Error';
     this.message = this.message || error.message;
   }
-  if (!!error && !!error.response && !!error.response.obj && !!error.response.obj.error && !!error.response.obj.error.data ) {
-    const data = error.response.obj.error.data;
+  if (!!error && !!error.response && !!error.response.obj && !!error.response.obj.response ) {
+    const data = error.response.obj.response;
     this.title = data.name || this.title;
     this.message = data.message || this.message;
   }
