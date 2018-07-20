@@ -4236,6 +4236,7 @@ select {
 .Error__message {
     margin-bottom: 24px;
     font-size: 1.6rem;
+    white-space: pre-wrap;
   }
 .Error > .Prettyprint {
     padding: 8px;
