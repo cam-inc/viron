@@ -1,7 +1,10 @@
 import contains from 'mout/array/contains';
+import find from 'mout/array/find';
+import forEach from 'mout/array/forEach';
 import deepClone from 'mout/lang/deepClone';
 import isObject from 'mout/lang/isObject';
 import isUndefined from 'mout/lang/isUndefined';
+import findObject from 'mout/object/find';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
 import ObjectAssign from 'object-assign';
@@ -11,6 +14,86 @@ import validator from '../validator';
 export default function() {
   // PropertiesObject = typeがobjectであるSchemaObject。
   const propertiesObject = this.propertiesObject = this.opts.propertiesobject;
+
+  this.properties = {};
+  this.isPropertiesSwitchable = !!findObject(propertiesObject.properties, property => {
+    return (!!property['x-anyOf-def']);
+  });
+  let anyOfDef;
+  let anyOfKey;
+  if (this.isPropertiesSwitchable) {
+    forOwn(propertiesObject.properties, (property, key) => {
+      if (!!anyOfDef) {
+        return;
+      }
+      if (!!property['x-anyOf-def']) {
+        anyOfDef = property['x-anyOf-def'];
+        anyOfKey = key;
+      }
+    });
+  }
+
+  this.getPropertiesOptions = () => {
+    const id = (this.opts.val || {})[anyOfKey];
+    const propertiesOptions = [];
+    propertiesOptions.push({
+      id: 'select_def',
+      label: '選択して下さい',
+      value: undefined,
+      isSelected: !id
+    });
+    forEach(anyOfDef, item => {
+      propertiesOptions.push({
+        id: `select_${item.id}`,
+        label: item.label,
+        value: item.id,
+        isSelected: (item.id === id)
+      });
+    });
+    return propertiesOptions;
+  };
+
+  this.getProperties = () => {
+    if (!this.isPropertiesSwitchable) {
+      return propertiesObject.properties;
+    }
+    const properties = {};
+    forOwn(propertiesObject.properties, (property, key) => {
+      if (!!property['x-anyOf-def']) {
+        return;
+      }
+      if (!property['x-anyOf-target']) {
+        properties[key] = property;
+      } else if (contains(property['x-anyOf-target'], this.opts.val[anyOfKey])) {
+        properties[key] = property;
+      }
+    });
+    return properties;
+  };
+
+  this.isReady = true;
+  this.handleSelectChange = newOptions => {
+    const item = find(newOptions, option => {
+      return option.isSelected;
+    });
+    if (!this.opts.onchange) {
+      return;
+    }
+    // this.opts.valを空にする。
+    let ret = {};
+    ret[anyOfKey] = item.value;
+    // 値がundefinedのkeyを削除する。
+    forOwn(ret, (val, key) => {
+      if (isUndefined(val)) {
+        delete ret[key];
+      }
+    });
+    if (!size(ret)) {
+      ret = undefined;
+    }
+
+    this.opts.onchange(this.opts.identifier, ret);
+  };
 
   // エラー関連。
   this.errors = [];
@@ -29,6 +112,8 @@ export default function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    this.opts.onvalidate(this._riot_id, true);
   });
 
   // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.2

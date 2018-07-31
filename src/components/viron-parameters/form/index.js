@@ -1,11 +1,14 @@
+import dayjs from 'dayjs';
 import contains from 'mout/array/contains';
 import find from 'mout/array/find';
 import forEach from 'mout/array/forEach';
 import isNaN from 'mout/lang/isNaN';
 import _isNumber from 'mout/lang/isNumber';
+import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 import ObjectAssign from 'object-assign';
 import '../error/index.tag';
+import '../timepicker/index.tag';
 import util from '../util';
 import validator from '../validator';
 
@@ -30,8 +33,9 @@ export default function() {
   // 入力必須ならば米印を付ける。
   this.title = formObject.name;
   if (formObject.required) {
-    this.title = `${this.title} *`;
+    this.title = `${this.title} (必須)`;
   }
+  this.isRequired = formObject.required;
   this.description = formObject.description;
   // autocomplete設定。
   this.autocompleteConfig = formObject['x-autocomplete'];
@@ -70,7 +74,7 @@ export default function() {
       return util.getUIType(formObject);
     }
     // 拡張子から最適な表示方法を推測します。
-    const split = this.opts.val.split('.');
+    const split = this.opts.val.split('?')[0].split('.');
     if (split.length < 2) {
       return util.getUIType(formObject);
     }
@@ -88,6 +92,10 @@ export default function() {
   const validate = () => {
     this.errors = validator.errors(this.opts.val, formObject);
     this.hasError = !!this.errors.length;
+    // 例外的にバリデージョンをスルーする。
+    if (formObject.type === 'file' && isString(this.opts.val)) {
+      this.hasError = false;
+    }
     if (!this.opts.onvalidate) {
       return;
     }
@@ -103,6 +111,7 @@ export default function() {
    */
   this.getSelectOptions = () => {
     const options = [];
+    const enumDescriptions = formObject['x-enum-descriptions'] || {};
     if (isUndefined(this.opts.val)) {
       options.push({
         label: '-- select an option --',
@@ -114,7 +123,7 @@ export default function() {
     forEach(formObject.enum, (v, idx) => {
       options.push({
         id: `select_${idx}`,
-        label: v,
+        label: enumDescriptions[v] || v,
         value: v,
         isSelected: (v === this.opts.val)
       });
@@ -131,6 +140,8 @@ export default function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    this.opts.onvalidate(this._riot_id, true);
   });
 
   /**
@@ -185,6 +196,34 @@ export default function() {
     });
   };
 
+  this.getTimeOffsetValue = val => {
+    if (!val || !dayjs(val).isValid()) {
+      return val;
+    }
+    return dayjs(val).format('YYYY-MM-DDTHH:mm:ssZZ');
+  };
+
+  this.handleNowTap = () => {
+    const now = dayjs();
+    change(now.toISOString());
+  };
+
+  this.handleTodayTap = () => {
+    const today = dayjs().set('hour', 0).set('minute', 0).set('second', 0);
+    change(today.toISOString());
+  };
+
+  this.handleTimepickerTap = () => {
+    store.action('modals.add', 'viron-parameters-timepicker', {
+      isoString: this.opts.val,
+      onSubmit: str => {
+        change(dayjs(str).toISOString());
+      }
+    }, {
+      isWide: true
+    });
+  };
+
   this.handleBodyTap = e => {
     e.stopPropagation();
   };
@@ -231,6 +270,40 @@ export default function() {
     let ret;
     if (!newValue) {
       ret = undefined;
+    } else {
+      ret = newValue;
+    }
+    change(ret);
+  };
+
+  /**
+   * Textinput(Timepicker): input value when it's submitted.
+   * @param {String|null} newValue
+   */
+  this.handleTimepickerSubmit = newValue => {
+    // force to convert string or undefined.
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else if (dayjs(newValue).isValid()) {
+      ret = dayjs(newValue).toISOString();
+    } else {
+      ret = newValue;
+    }
+    submit(ret);
+  };
+
+  /**
+   * Textinput(Timepicker): 入力値が変更された時の処理。
+   * @param {String|null} newValue
+   */
+  this.handleTimepickerChange = newValue => {
+    // 文字列 or undefinedに強制変換。
+    let ret;
+    if (!newValue) {
+      ret = undefined;
+    } else if (dayjs(newValue).isValid()) {
+      ret = dayjs(newValue).toISOString();
     } else {
       ret = newValue;
     }
@@ -328,7 +401,7 @@ export default function() {
     const option = find(newOptions, option => {
       return option.isSelected;
     });
-    const value = (option ? option.label : undefined);
+    const value = (option ? option.value : undefined);
     change(value);
   };
 

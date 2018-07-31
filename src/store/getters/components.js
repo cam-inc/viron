@@ -1,4 +1,6 @@
+import contains from 'mout/array/contains';
 import find from 'mout/array/find';
+import forEach from 'mout/array/forEach';
 import indexOf from 'mout/array/indexOf';
 import map from 'mout/array/map';
 import sort from 'mout/array/sort';
@@ -57,9 +59,16 @@ export default exporter('components', {
    */
   columns: (state, componentId) => {
     const component = state.components[componentId];
-    const columns = component.columns;
     // `table_labels` = 優先度が高いカラムkey群。
     const tableLabels = component.def.table_labels || [];
+    // `sort` = ソート可能なkey群。
+    const sortableKeys = component.def.sort || [];
+    const columns = [];
+    forEach(component.columns, column => {
+      columns.push(ObjectAssign({}, column, {
+        isSortable: contains(sortableKeys, column.key)
+      }));
+    });
     return sort(columns, (a, b) => {
       let idxA = indexOf(tableLabels, a.key);
       let idxB = indexOf(tableLabels, b.key);

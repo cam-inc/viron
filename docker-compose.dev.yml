@@ -25,6 +25,8 @@ services:
       - ./src:/viron/src
       - ./task:/viron/task
       - ./test:/viron/test
+      - ./viron.js:/viron/viron.js
+      - ./example-component:/viron/example-component
     command: npm run start
 
   api:

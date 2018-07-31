@@ -1418,6 +1418,56 @@ definitions:
     - id
     - url
 
+  SwitchFormCollection:
+    items:
+      $ref: '#/definitions/SwitchForm'
+    type: array
+
+  SwitchForm:
+    type: object
+    properties:
+      category:
+        type: string
+        enum:
+          - A
+          - B
+          - C
+          - D
+        x-anyOf-def:
+          - label: 全部入り
+            id: A
+          - label: 画像なし
+            id: B
+          - label: タイトルと内容のみ
+            id: C
+          - label: タイトルと画像とタグ
+            id: D
+      id:
+        type: string
+        x-anyOf-target: ["A", "B", "C", "D"]
+      title:
+        type: string
+        x-anyOf-target: ["A", "B", "C", "D"]
+      date:
+        type: string
+        format: date-time
+        x-anyOf-target: ["A", "B"]
+      img:
+        type: string
+        x-anyOf-target: ["A", "D"]
+      content:
+        type: string
+        format: wyswyg
+        x-anyOf-target: ["A", "B", "C"]
+      tags:
+        type: array
+        x-anyOf-target: ["A", "B", "D"]
+        items:
+          type: string
+    required:
+    - id
+    - category
+
 #################################################
 # paths
 # - APIの一覧
@@ -2243,6 +2293,11 @@ paths:
         name: offset
         required: false
         type: integer
+      - description: ソート
+        in: query
+        name: sort
+        required: false
+        type: string
       responses:
         "200":
           description: OK
@@ -2817,6 +2872,42 @@ paths:
       - jwt:
         - api:access
       summary: ユーザーブログ記事更新
+      tags:
+      - user_blog_entry
+
+  /userblogentry/{id}/preview:
+    get:
+      x-swagger-router-controller: user_blog_entry
+      description: プレビュー
+      operationId: user_blog_entry#preview
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: 'string'
+            example: 'https://viron.complat.com/page/userblogentry/1?token=xxxxx'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: プレビュー
       tags:
       - user_blog_entry
 
@@ -3960,6 +4051,84 @@ paths:
       - jwt:
         - api:access
       summary: フォーム作成
+      tags:
+      - sample
+
+  /switch_form:
+    get:
+      x-swagger-router-controller: switch_form
+      description: フォーム切り替え 一覧
+      operationId: switch_form#list
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SwitchFormCollection'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: フォーム切り替え 一覧
+      tags:
+      - sample
+
+    post:
+      x-swagger-router-controller: switch_form
+      description: フォーム切り替え 作成
+      operationId: switch_form#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/SwitchForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SwitchForm'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: フォーム切り替え 作成
+      tags:
+      - sample
+
+  /switch_form/{id}:
+    put:
+      x-swagger-router-controller: switch_form
+      description: フォーム切り替え 更新
+      operationId: switch_form#update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/SwitchForm'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SwitchForm'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+      - jwt:
+        - api:access
+      summary: フォーム切り替え 更新
       tags:
       - sample
 

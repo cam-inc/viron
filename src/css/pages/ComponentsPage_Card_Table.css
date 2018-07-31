@@ -108,12 +108,7 @@
   }
 
   &__th {
-    @apply --text-truncate;
-    padding: 8px 24px;
-    font-size: 1.2rem;
-    font-weight: normal;
     color: var(--color-base-gray);
-    text-align: left;
     border-bottom: 1px solid var(--theme-componentCardTable-row-border);
 
     &--sticky {
@@ -124,6 +119,40 @@
       text-align: center;
       background: linear-gradient(to right, var(--theme-componentCardTable-grad-start) 0%, var(--theme-componentCardTable-grad-end) 20%, var(--theme-componentCardTable-grad-end) 100%);
     }
+  }
+
+  &__th--sortable {
+    @mixin hover {
+      color: var(--color-base-blue);
+    }
+    cursor: pointer;
+  }
+
+  &__thInner {
+    @apply --layout-center-start;
+    padding: 8px 24px;
+  }
+
+  &__thInnerCtrl {
+    @apply --layout-column-center-center;
+    margin-right: 4px;
+  }
+
+  &__thIcon {
+    width: 8px;
+    height: 8px;
+
+    &--active {
+      color: var(--color-base-blue);
+    }
+  }
+
+  &__thInnerLabel {
+    @apply --text-truncate;
+    flex: 1 0 0;
+    font-size: 1.2rem;
+    font-weight: normal;
+    text-align: left;
   }
 
   &__tbodyRow {

@@ -1,12 +1,14 @@
 import contains from 'mout/array/contains';
 import filter from 'mout/array/filter';
 import forEach from 'mout/array/forEach';
+import reject from 'mout/array/reject';
 import forOwn from 'mout/object/forOwn';
 import size from 'mout/object/size';
 import deepClone from 'mout/lang/deepClone';
 import isArray from 'mout/lang/isArray';
 import isNull from 'mout/lang/isNull';
 import isObject from 'mout/lang/isObject';
+import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 import ObjectAssign from 'object-assign';
 import '../../filter/index.tag';
@@ -31,7 +33,7 @@ export default function() {
       pagination.limit = size;
       pagination.offset = (current - 1) * size;
     }
-    const queries = ObjectAssign({}, this.searchQueries, pagination);
+    const queries = ObjectAssign({}, this.searchQueries, pagination, { sort: this.sort.join(',') });
     return Promise
       .resolve()
       .then(() => {
@@ -78,11 +80,11 @@ export default function() {
   };
 
   /**
-   * 初期値を生成した上で入力フォームを開きます。
+   * 初期値を生成し、必要なoperationを行います。
    * @param {Object} operationObject
    * @param {Object} rowData
    */
-  const createInitialValueAndOpenOperationDrawer = (operationObject, rowData) => {
+  const createInitialValueAndOperate = (operationObject, rowData) => {
     const initialVal = {};
     // ParameterObjectから初期値を推測します。
     forEach(operationObject.parameters || [], parameterObject => {
@@ -103,7 +105,36 @@ export default function() {
         }
       }
     });
+    if (operationObject.isPreview) {
+      openPreview(operationObject, deepClone(initialVal));
+      return;
+    }
     openOperationDrawer(operationObject, deepClone(initialVal));
+  };
+
+  /**
+   * プレビュー画面を開きます。
+   * @param {Object} operationObjct
+   * @param {Object} params
+   */
+  const openPreview = (operationObject, params) => {
+    Promise
+      .resolve()
+      .then(() => store.action('components.operate', operationObject, params))
+      .then(res => {
+        const url = res.body;
+        if (!isString(url)) {
+          return;
+        }
+        if (!!operationObject.target) {
+          window.open(url, operationObject.target);
+          return;
+        }
+        window.location.href = url;
+      })
+      .catch(err => store.action('modals.add', 'viron-error', {
+        error: err
+      }));
   };
 
   /**
@@ -130,6 +161,9 @@ export default function() {
     }
     switch (operations[0].method) {
     case 'get':
+      if (operations[0].isPreview) {
+        return 'square';
+      }
       return 'file';
     case 'put':
       return 'edit';
@@ -178,6 +212,8 @@ export default function() {
     }
   });
   this.hasSearchQueries = !!size(this.searchQueries);
+  // ソート群。
+  this.sort = [];
   // 自動更新間隔。
   this.autoRefreshSec = null;
   let autoRefreshIntervalId = null;
@@ -238,6 +274,24 @@ export default function() {
     return filter(this.columns, column => {
       return contains(this.visibleColumnKeys, column.key);
     });
+  };
+
+  /**
+   * 指定されたカラムの昇順ソートがONか否か。
+   * @param {String} key
+   * @return {Boolean}
+   */
+  this.isAsc = key => {
+    return contains(this.sort, `${key}:asc`);
+  };
+
+  /**
+   * 指定されたカラムの降順ソートがONか否か。
+   * @param {String} key
+   * @return {Boolean}
+   */
+  this.isDesc = key => {
+    return contains(this.sort, `${key}:desc`);
   };
 
   let prevCrossSearchQueries = ObjectAssign(this.opts.crosssearchqueries);
@@ -322,6 +376,34 @@ export default function() {
     }, { isNarrow: true });
   };
 
+  this.handleSortThTap = e => {
+    const item = e.item.column;
+    const key = item.key;
+    // 未ソート状態であれば昇順ソートにする。
+    // 既に昇順ソートされていれば、降順ソートにする。
+    // 降順ソートされていれば、ソートOFFにする。
+    if (this.isAsc(key)) {
+      this.sort = reject(this.sort, item => (item === `${key}:asc`));
+      this.sort.push(`${key}:desc`);
+    } else if (this.isDesc(key)) {
+      this.sort = reject(this.sort, item => (item === `${key}:desc`));
+    } else {
+      this.sort.push(`${key}:asc`);
+    }
+    // ソート更新時は強制的にページを最初に戻す。
+    if (!this.hasPagination) {
+      getData();
+    } else {
+      const pagination = {};
+      const size = this.pagination.size;
+      const current = 1;
+      pagination.limit = size;
+      pagination.offset = (current - 1) * size;
+      getData(pagination);
+    }
+
+  };
+
   this.handleSettingButtonTap = () => {
     const rect = this.refs.settingIcon.root.getBoundingClientRect();
     store.action('popovers.add', 'viron-components-page-table-operations', {
@@ -368,7 +450,7 @@ export default function() {
       selectedIdx: e.item.idx,
       operations: this.rowOperations,
       onOperationSelect: (operationObject, dataListIdx) => {
-        createInitialValueAndOpenOperationDrawer(operationObject, this.data[dataListIdx]);
+        createInitialValueAndOperate(operationObject, this.data[dataListIdx]);
       }
     });
   };
@@ -379,7 +461,7 @@ export default function() {
 
     // operationが一件の場合は直接Operationドローワーを開く。
     if (this.rowOperations.length === 1) {
-      createInitialValueAndOpenOperationDrawer(this.rowOperations[0], rowData);
+      createInitialValueAndOperate(this.rowOperations[0], rowData);
       return;
     }
 
@@ -394,7 +476,7 @@ export default function() {
         store.action('popovers.add', 'viron-components-page-table-operations', {
           operations: this.rowOperations,
           onSelect: operationObject => {
-            createInitialValueAndOpenOperationDrawer(operationObject, rowData);
+            createInitialValueAndOperate(operationObject, rowData);
           }
         }, {
           x: rect.left + (rect.width / 2),

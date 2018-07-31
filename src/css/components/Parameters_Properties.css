@@ -8,6 +8,17 @@
   }
 
   &__label {
+    flex: 1 0 0;
+    color: var(--color-base-gray);
+  }
+
+  &__select {
+    @apply --layout-center-start;
+    margin-left: 8px;
+  }
+
+  &__selectLabel {
+    margin-right: 4px;
     color: var(--color-base-gray);
   }
 

@@ -2,11 +2,11 @@ viron-uploader.Uploader(class="{ 'Uploader--dragWatching' : isDragWatching, 'Upl
   form.Uploader__form(ref="form")
     input.Uploader__input(type="file" id="{ inputId }" accept="{ opts.accept || '*' }" disabled="{ opts.isdisabled }" onChange="{ handleFileChange }")
     label.Uploader__label(for="{ inputId }")
-      virtual(if="{ !file || !blobURL }")
+      virtual(if="{ !file && !blobURL }")
         .Uploader__icon
           viron-icon-file-add
-      virtual(if="{ !!file && !!blobURL }")
-        virtual(if="{ isTypeOfImage }")
+      virtual(if="{ !!file || !!blobURL }")
+        virtual(if="{ isTypeOfImage || !!blobURL }")
           .Uploader__image(style="background-image:url({ blobURL });")
         virtual(if="{ isTypeOfCsv }")
           .Uploader__icon
