@@ -25,6 +25,8 @@ ADD public /viron/public
 ADD rollup.base.config.js /viron/rollup.base.config.js
 ADD rollup.config.js /viron/rollup.config.js
 ADD rollup.local.config.js /viron/rollup.local.config.js
+ADD viron.js /viron/viron.js
+ADD example-component /viron/example-component
 ADD src /viron/src
 ADD task /viron/task
 ADD test /viron/test

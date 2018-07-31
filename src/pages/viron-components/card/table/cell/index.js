@@ -63,6 +63,11 @@ export default function() {
         }
         return data;
       }
+      // formatがimage-urlであれば画像とする
+      if (column.format === 'image-url') {
+        this.isImage = true;
+        return data;
+      }
       // 拡張子から最適な表示方法を推測します。
       const split = data.split('?')[0].split('.');
       if (split.length < 2) {
