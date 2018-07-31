@@ -57,7 +57,7 @@ export default function() {
     store.action('drawers.add', 'viron-wyswyg-explorer', {
       def: explorerDef,
       onInsert: item => {
-        this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" width="100" />`);
+        this.editor.execCommand('mceInsertContent', false, `<img src="${item.url}" width="100%" />`);
       }
     }, { isWide: true });
   };
@@ -113,14 +113,16 @@ export default function() {
       return;
     }
     TinyMCE.remove(`.Wyswyg__editor${this._riot_id}`);
-    this.editor.off('Change', this.handleEditorChange);
-    this.editor.off('NodeChange', this.handleEditorChange);
-    this.editor.off('focus', this.handleEditorFocus);
-    this.editor.off('blur', this.handleEditorBlur);
-    // destroy時にエラーが発生する。TinyMCEの対応待ち。
-    // @see: https://github.com/tinymce/tinymce/issues/3765
-    this.editor.destroy();
-    this.editor = null;
+    if (!!this.editor) {
+      this.editor.off('Change', this.handleEditorChange);
+      this.editor.off('NodeChange', this.handleEditorChange);
+      this.editor.off('focus', this.handleEditorFocus);
+      this.editor.off('blur', this.handleEditorBlur);
+      // destroy時にエラーが発生する。TinyMCEの対応待ち。
+      // @see: https://github.com/tinymce/tinymce/issues/3765
+      this.editor.destroy();
+      this.editor = null;
+    }
   });
 
   // 発火回数を間引く。

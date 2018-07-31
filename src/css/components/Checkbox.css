@@ -34,6 +34,13 @@
     font-size: 1.4rem;
   }
 
+  &__description {
+    display: inline;
+    margin-left: 8px;
+    font-size: 1rem;
+    color: var(--color-base-gray);
+  }
+
   &__blocker {
     position: absolute;
     top: 0;

@@ -1,6 +1,6 @@
 // @see: https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.1.2
 // OAS2.0はJSON Schema SpecのDraft4を使用している。誤って最新Draftを参照しないように注意すること。
-import moment from 'moment';
+import dayjs from 'dayjs';
 import forEach from 'mout/array/forEach';
 import map from 'mout/array/map';
 import reject from 'mout/array/reject';
@@ -513,7 +513,7 @@ const format = (value, constraints) => {
       return result;
     }
     // 存在する日付かチェックする(e.g. うるう年)
-    const isValid = moment(value).isValid();
+    const isValid = dayjs(value).isValid();
     if (!isValid) {
       result.isValid = false;
       result.message = '存在する日付を入力してください。';

@@ -59,6 +59,8 @@ export default function() {
   validate();
   this.on('update', () => {
     validate();
+  }).on('before-unmount', () => {
+    this.opts.onvalidate(this._riot_id, true);
   });
 
   /**
@@ -97,6 +99,7 @@ export default function() {
     if (this.isPropertiesMode) {
       // 最初にundefinedではない要素値を使用します。
       let ret;
+      val = val || {};
       const properties = this.propertiesObject.properties;
       const _keys = keys(properties);
       forEach(_keys, key => {
@@ -135,6 +138,7 @@ export default function() {
       return '-';
     }
     let ret = '';
+    val = val || {};
     const properties = this.propertiesObject.properties;
     const _keys = keys(properties);
     forEach(_keys, key => {
@@ -169,7 +173,7 @@ export default function() {
     // type値によって作成する要素を分ける。
     // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object
     // typeは"string", "number", "integer", "boolean", or "array"のいずれかと書いてあるが、"null"と"object"もプラスで想定する。
-    // 追加分は先頭に。
+    // 追加分は末尾に。
     if (this.isFormMode) {
       newItem = this.formObject.default;
     } else if (this.isPropertiesMode) {
@@ -177,8 +181,40 @@ export default function() {
     } else if (this.isItemsMode) {
       newItem = [];
     }
-    ret = append([newItem], ret);
-    this.itemsOpened = append([false], this.itemsOpened);
+    ret = append(ret, [newItem]);
+    this.itemsOpened = append(this.itemsOpened, [false]);
+    this.update();
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * 上に移動ボタンがタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleMoveUpTap = e => {
+    e.stopPropagation();
+    const idx = e.item.idx;
+    let ret = this.opts.val;
+    const item = ret.splice(idx, 1)[0];
+    const opened = this.itemsOpened.splice(idx, 1)[0];
+    ret.splice(idx - 1, 0, item);
+    this.itemsOpened.splice(idx - 1, 0, opened);
+    this.update();
+    this.opts.onchange(this.opts.identifier, ret);
+  };
+
+  /**
+   * 下に移動ボタンがタップされた時の処理。
+   * @param {Object} e
+   */
+  this.handleMoveDownTap = e => {
+    e.stopPropagation();
+    const idx = e.item.idx;
+    let ret = this.opts.val;
+    const item = ret.splice(idx, 1)[0];
+    const opened = this.itemsOpened.splice(idx, 1)[0];
+    ret.splice(idx + 1, 0, item);
+    this.itemsOpened.splice(idx + 1, 0, opened);
     this.update();
     this.opts.onchange(this.opts.identifier, ret);
   };
@@ -259,7 +295,17 @@ export default function() {
       return;
     }
     const ret = this.opts.val;
-    ret[idx] = newVal;
+    if (isUndefined(newVal)) {
+      if (this.isFormMode) {
+        ret[idx] = newVal;
+      } else if (this.isPropertiesMode) {
+        // Do nothing.
+      } else if (this.isItemsMode) {
+        ret[idx] = [];
+      }
+    } else {
+      ret[idx] = newVal;
+    }
     this.opts.onchange(this.opts.identifier, ret);
   };
 

@@ -99,9 +99,21 @@ const update = (req, res, next) => {
   ;
 };
 
+/**
+ * Controller : get Preview URL
+ * HTTP Method : GET
+ * PATH : /userblogentry/:id/preview
+ *
+ * @returns {Promise.<TResult>}
+ */
+const preview = (req, res) => {
+  res.send(`https://${context.getConfigHost()}/page/userblogentry${req.params.id}?token=xxxxx`);
+};
+
 module.exports = {
   'user_blog_entry#list': list,
   'user_blog_entry#create': create,
   'user_blog_entry#remove': remove,
   'user_blog_entry#update': update,
+  'user_blog_entry#preview': preview,
 };

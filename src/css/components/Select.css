@@ -26,6 +26,11 @@
     cursor: pointer;
   }
 
+  &--small &__select {
+    padding: 4px 16px 4px 4px;
+    font-size: 1rem;
+  }
+
   &__icon {
     position: absolute;
     top: 0;
@@ -35,6 +40,12 @@
     height: 16px;
     margin: auto;
     pointer-events: none;
+  }
+
+  &--small &__icon {
+    right: 4px;
+    width: 8px;
+    height: 8px;
   }
 
   &__blocker {

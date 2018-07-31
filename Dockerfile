@@ -30,6 +30,8 @@ ADD example-component /viron/example-component
 ADD src /viron/src
 ADD task /viron/task
 ADD test /viron/test
+Add viron.js /viron/viron.js
+add example-component /viron/example-component
 
 EXPOSE 8080
 USER root

@@ -27,7 +27,7 @@ const genComponent = (name, method, path, style, autoRefreshSec, pagination, opt
   return cmp;
 };
 
-const genTableComponent = (name, method, path, primary, query, labels, actions) => {
+const genTableComponent = (name, method, path, primary, query, labels, actions, sort, preview) => {
   const component = genComponent(name, method, path, constant.VIRON_STYLE_TABLE, null, true);
   if (primary) {
     component.primary = primary;
@@ -40,6 +40,12 @@ const genTableComponent = (name, method, path, primary, query, labels, actions) 
   }
   if (actions) {
     component.actions = actions;
+  }
+  if (sort) {
+    component.sort = sort;
+  }
+  if (preview) {
+    component.preview = preview;
   }
   return component;
 };
@@ -137,7 +143,7 @@ const show = (req, res) => {
               ], ['id', 'name', 'job', 'sex'], [
                 '/user/upload/csv',
                 '/user/download/csv',
-              ]),
+              ], ['id', 'name', 'job']),
             ],
           },
           {
@@ -159,7 +165,12 @@ const show = (req, res) => {
                 {key: 'user_blog_id', type: 'integer'},
                 {key: 'title', type: 'string'},
                 {key: 'theme', type: 'string'},
-              ], ['id', 'user_blog_id', 'title', 'theme']),
+              ], ['id', 'user_blog_id', 'title', 'theme'], null, null, {
+                // preview
+                path: '/userblogentry/{id}/preview',
+                method: 'get',
+                target: '_blank',
+              }),
               genExplorerComponent('ギャラリー', 'get', '/gallery', 'id', [
                 {key: 'id', type: 'string'}
               ]),
@@ -250,6 +261,13 @@ const show = (req, res) => {
             components: [
               genTableComponent('デフォルト', 'get', '/default', 'id', null, ['id']),
             ],
+          },
+          {
+            id: 'switchform',
+            name: 'フォーム切り替え',
+            components: [
+              genTableComponent('フォーム切り替え', 'get', '/switch_form', 'id', null, ['id']),
+            ]
           },
         ],
         // Admin

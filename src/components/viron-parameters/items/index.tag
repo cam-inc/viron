@@ -17,14 +17,18 @@ viron-parameters-items.Parameters_Items(class="{ 'Parameters_Items--preview': op
           virtual(if="{ parent.isFormMode }")
             viron-parameters-form(no-reorder identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" formObject="{ parent.formObject }" onSubmit="{ parent.handleItemSubmit }"  onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
           virtual(if="{ parent.isPropertiesMode }")
-            viron-parameters-properties(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" propertiesObject="{ parent.propertiesObject }" onSubmit="{ parent.handleItemSubmit }"  onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
+            viron-parameters-properties(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" isSwitchable="{ parent.opts.isswitchable }" propertiesObject="{ parent.propertiesObject }" onSubmit="{ parent.handleItemSubmit }"  onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
           virtual(if="{ parent.isItemsMode }")
-            viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" schemaObject="{ parent.schemaObject.items }" onSubmit="{ parent.handleItemSubmit }" onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
+            viron-parameters-items(no-reorder label="{ parent.opts.label }[{ idx }]" identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" isSwitchable="{ parent.opts.isswitchable }" schemaObject="{ parent.schemaObject.items }" onSubmit="{ parent.handleItemSubmit }" onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")
       .Parameters_Items__itemBrief(onTap="{ handleItemBriefTap }")
         .Parameters_Items__itemBriefTitle { parent.getBriefItemTitle(val, idx) }
         .Parameters_Items__itemBriefDescription(if="{ parent.isPropertiesMode }") { parent.getBriefItemDescription(val) }
         .Parameters_Items__itemBriefOpenButton
           viron-icon-arrow-down
+      .Parameters_Items__itemMoveUp(if="{ opts.val.length >= 2 }" onTap="{ handleMoveUpTap }")
+        viron-icon-arrow-up
+      .Parameters_Items__itemMoveDown(if="{ opts.val.length >= 2 }" onTap="{ handleMoveDownTap }")
+        viron-icon-arrow-down
 
   script.
     import '../../../components/icons/viron-icon-arrow-down/index.tag';

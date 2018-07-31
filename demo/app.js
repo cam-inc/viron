@@ -72,6 +72,7 @@ context.init()
         app.use(multer.fields([{name: 'image'}]));
 
         // add routing
+        app.get('/page/*', require('./controllers/page')['page#get']);
         swaggerExpress.register(app);
 
         const port = process.env.PORT || helperSwagger.getPort(swaggerExpress, 3000);

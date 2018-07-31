@@ -7,8 +7,8 @@ my-topic.MyTopic
     .MyTopic__item(each="{ topic in topics }")
       .MyTopic__id { topic.id }
       .MyTopic__content { topic.content }
-      .MyTopic__putButton(onTap="{ handlePutButtonTap }") 変更
-      .MyTopic__deleteButton(onTap="{ handleDeleteButtonTap }") 削除
+      .MyTopic__putButton(if="{ !!putOperation }" onTap="{ handlePutButtonTap }") 変更
+      .MyTopic__deleteButton(if="{ !!deleteOperation }" onTap="{ handleDeleteButtonTap }") 削除
   .MyTopic__tail(if="{ hasPagination }")
     viron-pagination(max="{ pagination.max }" size="{ paginationSize }" current="{ pagination.current }" onChange="{ handlePaginationChange }")
 

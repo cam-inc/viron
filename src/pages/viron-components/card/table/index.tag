@@ -24,8 +24,15 @@ viron-components-page-table.ComponentsPage_Card_Table
         table.ComponentsPage_Card_Table__table
           thead.ComponentsPage_Card_Table__thead
             tr.ComponentsPage_Card_Table__theadRow
-              th.ComponentsPage_Card_Table__th(each="{ column in getFilteredColumns() }") { column.description || column.key }
-              th.ComponentsPage_Card_Table__th.ComponentsPage_Card_Table__th--sticky(if="{ rowOperations.length }") 操作
+              th.ComponentsPage_Card_Table__th(each="{ column in getFilteredColumns() }" class="{ 'ComponentsPage_Card_Table__th--sortable': column.isSortable }" onTap="{ handleSortThTap }")
+                .ComponentsPage_Card_Table__thInner
+                  .ComponentsPage_Card_Table__thInnerCtrl(if="{ column.isSortable }")
+                    viron-icon-arrow-up.ComponentsPage_Card_Table__thIcon(class="{ 'ComponentsPage_Card_Table__thIcon--active' : isAsc(column.key) }")
+                    viron-icon-arrow-down.ComponentsPage_Card_Table__thIcon(class="{ 'ComponentsPage_Card_Table__thIcon--active' : isDesc(column.key) }")
+                  .ComponentsPage_Card_Table__thInnerLabel { column.description || column.key }
+              th.ComponentsPage_Card_Table__th.ComponentsPage_Card_Table__th--sticky(if="{ rowOperations.length }")
+                .ComponentsPage_Card_Table__thInner
+                  .ComponentsPage_Card_Table__thInnerLabel 操作
           tbody.ComponentsPage_Card_Table__tbody
             tr.ComponentsPage_Card_Table__tbodyRow(each="{ row, idx in data }" onTap="{ handleRowTap }")
               td(each="{ column in parent.getFilteredColumns() }" data-is="viron-components-page-table-cell" data="{ row[column.key] }" column="{ column }")
@@ -36,6 +43,8 @@ viron-components-page-table.ComponentsPage_Card_Table
   .ComponentsPage_Card_Table__blocker(if="{ isLoading }")
 
   script.
+    import '../../../../components/icons/viron-icon-arrow-down/index.tag';
+    import '../../../../components/icons/viron-icon-arrow-up/index.tag';
     import '../../../../components/icons/viron-icon-edit/index.tag';
     import '../../../../components/icons/viron-icon-file/index.tag';
     import '../../../../components/icons/viron-icon-filter/index.tag';
