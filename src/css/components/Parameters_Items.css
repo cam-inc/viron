@@ -88,6 +88,10 @@
     }
   }
 
+  &--ghost &__item {
+    background-color: transparent;
+  }
+
   &__body > .Parameters_Items__item {
     margin-bottom: 8px;
 
