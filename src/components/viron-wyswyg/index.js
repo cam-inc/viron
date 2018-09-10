@@ -34,6 +34,7 @@ const menuDesktop = {
 const menuMobile = {};
 const baseConfig = {
   plugins: ['code', 'hr', 'lists', 'link', 'image', 'paste', 'searchreplace', 'fullscreen', 'table', 'textcolor'],
+  fontsize_formats: '8pt 10pt 11pt 12pt 14pt 18pt 24pt 36pt',
   min_height: 300,
   branding: false,
   relative_urls: false,
