@@ -15,7 +15,7 @@ const UI_HTML = 'html';
 const UI_NUMBERINPUT = 'numberinput';
 const UI_CHECKBOX = 'checkbox';
 const UI_SELECT = 'select';
-const UI_TIMEPICKER = 'timepicker';// eslint-disable-line no-unused-vars
+const UI_TIMEPICKER = 'timepicker';
 const UI_UPLOADER = 'uploader';
 const UI_WYSWYG = 'wyswyg';
 const UI_PUG = 'pug';
@@ -200,8 +200,7 @@ export default {
     case 'string':
       switch (format) {
       case 'date-time':
-        //return UI_TIMEPICKER;
-        return UI_TEXTINPUT;
+        return UI_TIMEPICKER;
       case 'multiline':
         return UI_TEXTAREA;
       case 'wyswyg':
