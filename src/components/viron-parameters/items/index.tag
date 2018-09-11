@@ -1,4 +1,4 @@
-viron-parameters-items.Parameters_Items(class="{ 'Parameters_Items--preview': opts.ispreview }")
+viron-parameters-items.Parameters_Items(class="{ 'Parameters_Items--preview': opts.ispreview } Parameters_Items--{ opts.theme }")
   .Parameters_Items__head
     .Parameters_Items__addButton(if="{ !opts.ispreview }" onTap="{ handleAddButtonTap }")
       viron-icon-plus
