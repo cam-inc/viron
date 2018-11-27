@@ -1,6 +1,6 @@
 viron-endpoints-page.EndpointsPage(class="EndpointsPage--{ layoutType }")
   .EndpointsPage__head
-    .EndpointsPage__title { this.i18n('home') }
+    .EndpointsPage__title { i18n('home') }
   .EndpointsPage__container
     viron-endpoints-page-endpoint(each="{ endpoint in endpoints }" endpoint="{ endpoint }" isDraggable="{ true }")
     viron-endpoints-page-add
