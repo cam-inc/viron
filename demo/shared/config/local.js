@@ -21,7 +21,8 @@ module.exports = helper => {
 
     // vironlibのCORS対応
     acl: {
-      //allow_origin: 'https://cam-inc.github.io',
+
+      allow_origin: 'https://localhost:8080',
       allow_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
       expose_headers: 'X-Requested-With, Origin, Content-Type, Content-Disposition, Accept, Authorization, X-Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
     },

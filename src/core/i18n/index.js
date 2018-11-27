@@ -1,47 +1,26 @@
-// i18n対応
-// @see: https://www.i18next.com
-// API経由で定義ファイルを取得する場合は、
-// https://github.com/i18next/i18next-xhr-backend
-// 等を使うこと。
-
-
-
-import i18next from 'i18next';
-import LngDetector from 'i18next-browser-languagedetector';
+import riotI18nlet from 'riot-i18nlet';
 import ja from './ja';
 import en from './en';
+const data = {
+  ja,
+  en
+};
 
 export default {
   init: () => {
-    return new Promise((resolve, reject) => {
-      i18next
-        .use(LngDetector)
-        .init({
-          // @see: https://www.i18next.com/configuration-options.html
-          fallbackLng: 'ja',
-          resources: {
-            ja: { translation: ja },
-            en: { translation: en }
-          }
-        }, err => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve();
-        });
+    return Promise.resolve().then(() => {
+      // TODO: 言語設定取得
+      return 'ja';
+    }).then(lang => {
+      riotI18nlet.init({
+        getMessageFunctionName: 'i18n'
+      });
+      riotI18nlet.changeLangage(lang);
+      riotI18nlet.loads(data);
     });
   },
 
-  /**
-   * @return {i18next}
-   */
-  get: () => {
-    return i18next;
+  get: str => {
+    return riotI18nlet.i18n(str);
   }
-};
-
-const i18n = i18next;
-export {
-  i18n
 };

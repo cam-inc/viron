@@ -1,6 +1,6 @@
 import combine from 'mout/array/combine';
 import find from 'mout/array/find';
-import { i18n } from '../../core/i18n';
+import i18n from '../../core/i18n';
 import exporter from './exporter';
 
 export default exporter('viron', {
@@ -16,12 +16,12 @@ export default exporter('viron', {
       if (!find(viron.sections, section => {
         return (section.id === 'manage');
       })) {
-        viron.sections = combine([{ id: 'manage', label: i18n.t('word.manage') }], viron.sections);
+        viron.sections = combine([{ id: 'manage', label: i18n.get('word.manage') }], viron.sections);
       }
       if (!find(viron.sections, section => {
         return (section.id === 'dashboard');
       })) {
-        viron.sections = combine([{ id: 'dashboard', label: i18n.t('word.dashboard') }], viron.sections);
+        viron.sections = combine([{ id: 'dashboard', label: i18n.get('word.dashboard') }], viron.sections);
       }
     }
     state.viron = viron;
