@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: viron
+spec:
+  selector:
+    matchLabels:
+      app: viron
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: viron
+        deployment: viron
+    spec:
+      containers:
+      - name: viron
+        image: index.docker.io/soushin/viron:latest
+        ports:
+        - containerPort: 8080
+          name: http-public
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 60

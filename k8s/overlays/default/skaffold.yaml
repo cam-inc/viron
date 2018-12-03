@@ -1,0 +1,12 @@
+apiVersion: skaffold/v1beta1
+kind: Config
+build:
+  artifacts:
+  - image: soushin/viron
+    context: ../../../
+    docker:
+      dockerfile: Dockerfile
+  local:
+    push: true
+deploy:
+  kustomize: {}

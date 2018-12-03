@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: viron
+spec:
+  template:
+    spec:
+      containers:
+      - name: viron
+        image: soushin/viron
+        env:
+        - name: VIRON_ENV
+          value: local

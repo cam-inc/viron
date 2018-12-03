@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: viron
+spec:
+  selector:
+    deployment: viron
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: http-public
+    name: http-public
