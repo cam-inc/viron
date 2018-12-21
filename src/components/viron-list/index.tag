@@ -1,14 +1,14 @@
 viron-list.List
   .List__item(if="{ hasControlButtons }" onTap="{ handlePrevItemTap }")
     viron-icon-up.List__icon
-    .List__label 戻る
+    .List__label { i18n('compornents_viron_list_back') }
   .List__body(style="height:{ bodyHeight }px")
     .List__itemsWrapper(style="top:-{ bodyTop }px")
       .List__item(each="{ item in list }" onTap="{ handleItemTap }")
         .List__label { item.label }
   .List__item(if="{ hasControlButtons }" onTap="{ handleNextItemTap }")
     viron-icon-down.List__icon
-    .List__label さらに表示
+    .List__label { i18n('compornents_viron_list_view') }
 
   script.
     import '../../components/icons/viron-icon-down/index.tag';

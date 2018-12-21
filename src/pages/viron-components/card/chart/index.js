@@ -1,6 +1,7 @@
 import isObject from 'mout/lang/isObject';
 import ObjectAssign from 'object-assign';
 import chart from '../../../../core/chart';
+import i18n from '../../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -86,10 +87,10 @@ export default function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = '認証エラー。';
+          this.error = i18n.get('viron_components_card_chart_error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('viron_components_card_chart_error_network')}`;
         }
         this.update();
       });

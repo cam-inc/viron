@@ -1,4 +1,5 @@
 import '../../../../components/viron-error/index.tag';
+import i18n from '../../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -17,7 +18,7 @@ export default function() {
     // ファイルがjsonであるか
     // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
     if (!store.getter('ua.isEdge') && jsonFile.type !== 'application/json') {
-      this.errorMessage = 'JSON形式のファイルを選択して下さい。';
+      this.errorMessage = i18n.get('header_menu_import_error_json_type');
       this.endpoints = null;
       this.update();
       return;
@@ -29,7 +30,7 @@ export default function() {
     // 読み込みが失敗した。
     reader.onerror = err => {
       this.endpoints = null;
-      this.errorMessage = err.message || 'ファイルの読み込みに失敗しました。';
+      this.errorMessage = err.message || i18n.get('header_menu_import_error_file_read');
       this.update();
     };
     // 読み込みが成功し、完了した。
@@ -40,7 +41,7 @@ export default function() {
         this.errorMessage = '';
       } catch (e) {
         this.endpoints = null;
-        this.errorMessage = e.message || 'JSON形式のファイルを選択して下さい。';
+        this.errorMessage = e.message || i18n.get('header_menu_import_error_json_type');
       } finally {
         this.update();
       }
@@ -57,7 +58,7 @@ export default function() {
       .then(() => {
         this.close();
         return store.action('toasts.add', {
-          message: 'エンドポイント一覧を読み込みました。'
+          message: i18n.get('header_menu_import_error_endpoint_read')
         });
       })
       .catch(err => {

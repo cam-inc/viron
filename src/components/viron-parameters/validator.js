@@ -18,6 +18,7 @@ import hasOwn from 'mout/object/hasOwn';
 import size from 'mout/object/size';
 import ObjectAssign from 'object-assign';
 import rfc3986 from 'rfc-3986';
+import i18n from '../../core/i18n';
 
 const resultTemplate = {
   isValid: true,
@@ -36,7 +37,7 @@ const multipleOf = (value, constraints) => {
   }
   if ((value % multipleOf) !== 0) {
     result.isValid = false;
-    result.message = `${multipleOf}で割り切れる数値にして下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_multiple_of',{multipleOf:multipleOf});
   }
   return result;
 };
@@ -56,13 +57,13 @@ const maximumAndExclusiveMaximum = (value, constraints) => {
   if (exclusiveMaximum) {
     if (value >= maximum) {
       result.isValid = false;
-      result.message = `${maximum}より小さい数値にして下さい。`;
+      result.message = i18n.get('compornents_viron_parameters_maximum1',{maximum:maximum});
       return result;
     }
   } else {
     if (value > maximum) {
       result.isValid = false;
-      result.message = `${maximum}以下の数値にして下さい。`;
+      result.message = i18n.get('compornents_viron_parameters_maximum2',{maximum:maximum});
       return result;
     }
   }
@@ -84,13 +85,13 @@ const minimumAndExclusiveMinimum = (value, constraints) => {
   if (exclusiveMinimum) {
     if (value <= minimum) {
       result.isValid = false;
-      result.message = `${minimum}より大きい数値にして下さい。`;
+      result.message = i18n.get('compornents_viron_parameters_minimum1',{minimum:minimum});
       return result;
     }
   } else {
     if (value < minimum) {
       result.isValid = false;
-      result.message = `${minimum}以上の数値にして下さい。`;
+      result.message = i18n.get('compornents_viron_parameters_minimum2',{minimum:minimum});
       return result;
     }
   }
@@ -109,7 +110,7 @@ const maxLength = (value, constraints) => {
   }
   if (value.length > maxLength) {
     result.isValid = false;
-    result.message = `文字数を${maxLength}以下にして下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_max_length',{maxLength:maxLength});
     return result;
   }
   return result;
@@ -122,7 +123,7 @@ const minLength = (value, constraints) => {
   const minLength = constraints.minLength || 0;
   if (value.length < minLength) {
     result.isValid = false;
-    result.message = `文字数を${minLength}以上にして下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_min_length',{minLength:minLength});
     return result;
   }
   return result;
@@ -139,7 +140,7 @@ const pattern = (value, constraints) => {
   const pattern = constraints.pattern;
   if (!value.match(pattern)) {
     result.isValid = false;
-    result.message = `${pattern}にマッチさせて下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_pattern',{pattern:pattern});
     return result;
   }
   return result;
@@ -182,7 +183,7 @@ const additionalItemsAndItems = (value, constraints) => {
     }
   }
   result.isValid = false;
-  result.message = `要素数を${items.length}以下にして下さい。`;
+  result.message = i18n.get('compornents_viron_parameters_additional_items',{length:items.length});
   return result;
 };
 
@@ -198,7 +199,7 @@ const maxItems = (value, constraints) => {
   }
   if (value.length > maxItems) {
     result.isValid = false;
-    result.message = `要素数を${maxItems}以下にして下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_max_items',{maxItems:maxItems});
     return result;
   }
   return result;
@@ -211,7 +212,7 @@ const minItems = (value, constraints) => {
   const minItems = constraints.minItems || 0;
   if (value.length < minItems) {
     result.isValid = false;
-    result.message = `要素数を${minItems}以上にして下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_min_items',{minItems:minItems});
     return result;
   }
   return result;
@@ -231,7 +232,7 @@ const uniqueItems = (value, constraints) => {
     return (a === b);
   }).length) {
     result.isValid = false;
-    result.message = '内容が重複しない要素で構成して下さい。';
+    result.message = i18n.get('compornents_viron_parameters_unique_items');
     return result;
   }
   return result;
@@ -249,7 +250,7 @@ const maxProperties = (value, constraints) => {
   }
   if (size(value) > maxProperties) {
     result.isValid = false;
-    result.message = `要素数を${maxProperties}以下にして下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_max_properties',{maxProperties:maxProperties});
     return result;
   }
   return result;
@@ -262,7 +263,7 @@ const minProperties = (value, constraints) => {
   const minProperties = constraints.minProperties || 0;
   if (size(value) < minProperties) {
     result.isValid = false;
-    result.message = `要素数を${minProperties}以上にして下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_min_properties',{minProperties:minProperties});
     return result;
   }
   return result;
@@ -282,7 +283,7 @@ const required = (value, constraints) => {
     if (!hasOwn(value, key)) {
       result.isValid = false;
       const description = constraints.properties[key].description ? `(${constraints.properties[key].description})` : '';
-      result.message = `要素に${key}${description}を含めて下さい。`;
+      result.message = i18n.get('compornents_viron_parameters_required',{key: key ,description: description});
     }
   });
   return result;
@@ -348,7 +349,7 @@ const _enum = (value, constraints) => {
   });
   if (!isFound) {
     result.isValid = false;
-    result.message = `${JSON.stringify(_enum)}のいずれかの値を設定して下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_enum',{enum:JSON.stringify(_enum)});
   }
   return result;
 };
@@ -412,7 +413,7 @@ const _type = (value, constraints) => {
   });
   if (!isValid) {
     result.isValid = false;
-    result.message = `型を${JSON.stringify(types)}のいずれかにして下さい。`;
+    result.message = i18n.get('compornents_viron_parameters_type',{types:JSON.stringify(types)});
   }
   return result;
 };
@@ -509,14 +510,14 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = '"date-time"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('compornents_viron_parameters_format_date_time');
       return result;
     }
     // 存在する日付かチェックする(e.g. うるう年)
     const isValid = dayjs(value).isValid();
     if (!isValid) {
       result.isValid = false;
-      result.message = '存在する日付を入力してください。';
+      result.message = i18n.get('compornents_viron_parameters_format_date_time_notfound');
       return result;
     }
     break;
@@ -532,7 +533,7 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = '"email"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('compornents_viron_parameters_format_email');
       return result;
     }
     break;
@@ -546,7 +547,7 @@ const format = (value, constraints) => {
     // hostnameが255文字を超えていたらエラー
     if (value.length > 255) {
       result.isValid = false;
-      result.message = '"hostname"は255文字以内で入力してください。';
+      result.message = i18n.get('compornents_viron_parameters_format_hostname');
       return result;
     }
     // RFC 1034に則った書き方かバリデートする
@@ -554,7 +555,7 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = '"hostname"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('compornents_viron_parameters_format_hostname_notmatch');
       return result;
     }
     break;
@@ -570,7 +571,7 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = '"ipv4"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('compornents_viron_parameters_format_ipv4');
       return result;
     }
     break;
@@ -614,7 +615,7 @@ const format = (value, constraints) => {
     });
     if (!matchResult) {
       result.isValid = false;
-      result.message = '"ipv6"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('compornents_viron_parameters_format_ipv6');
       return result;
     }
     break;
@@ -630,7 +631,7 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = '"uri"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('compornents_viron_parameters_format_uri');
       return result;
     }
     break;
@@ -659,7 +660,7 @@ export default {
     // ただし、required(self)がtrueの場合はエラー。
     if (isUndefined(value)) {
       if (schemaObject.required) {
-        return ['必須項目です。'];
+        return [i18n.get('compornents_viron_parameters_error_undefined')];
       }
       return results;
     }

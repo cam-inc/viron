@@ -3,6 +3,7 @@ import isNull from 'mout/lang/isNull';
 import isNumber from 'mout/lang/isNumber';
 import isUndefined from 'mout/lang/isUndefined';
 import ObjectAssign from 'object-assign';
+import i18n from '../../core/i18n';
 import '../../components/viron-error/index.tag';
 
 export default function() {
@@ -120,13 +121,13 @@ export default function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('compornents_viron_autocomplete_copy')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('compornents_viron_autocomplete_error_copy')
         });
       });
   };

@@ -1,4 +1,5 @@
 import '../../components/viron-error/index.tag';
+import i18n from '../../core/i18n';
 
 export default {
   /**
@@ -22,8 +23,8 @@ export default {
       to = '/';
       tasks.push(store.action('auth.remove', endpointKey));
       tasks.push(store.action('modals.add', 'viron-error', {
-        title: '認証失敗',
-        message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
+        title: i18n.get('viron_oauthredirect_error_title'),
+        message: i18n.get('viron_oauthredirect_error_message')
       }));
     }
 

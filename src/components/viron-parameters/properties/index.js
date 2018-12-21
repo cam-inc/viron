@@ -10,6 +10,7 @@ import size from 'mout/object/size';
 import ObjectAssign from 'object-assign';
 import util from '../util';
 import validator from '../validator';
+import i18n from '../../../core/i18n';
 
 export default function() {
   // PropertiesObject = typeがobjectであるSchemaObject。
@@ -38,7 +39,7 @@ export default function() {
     const propertiesOptions = [];
     propertiesOptions.push({
       id: 'select_def',
-      label: '選択して下さい',
+      label: i18n.get('compornents_viron_parameters_properties_label'),
       value: undefined,
       isSelected: !id
     });

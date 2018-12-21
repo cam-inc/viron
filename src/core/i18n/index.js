@@ -1,16 +1,21 @@
 import riotI18nlet from 'riot-i18nlet';
 import ja from './ja';
 import en from './en';
+import ko from './ko';
 const data = {
   ja,
+  ko,
   en
 };
 
 export default {
   init: () => {
     return Promise.resolve().then(() => {
-      // TODO: 言語設定取得
-      return 'ja';
+      let lang = (navigator.browserLanguage || navigator.language || navigator.userLanguage).substr(0,2);
+      if (!lang || !data[lang]) {
+        lang = 'ja';
+      }
+      return lang;
     }).then(lang => {
       riotI18nlet.init({
         getMessageFunctionName: 'i18n'
@@ -20,7 +25,8 @@ export default {
     });
   },
 
-  get: str => {
-    return riotI18nlet.i18n(str);
+  get: ( str ,opt = {} ) => {
+    return riotI18nlet.i18n(str,opt);
   }
+
 };

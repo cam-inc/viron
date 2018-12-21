@@ -1,4 +1,5 @@
 import '../../components/viron-error/index.tag';
+import i18n from '../../core/i18n';
 
 export default {
   /**
@@ -64,8 +65,8 @@ export default {
         return Promise
           .resolve()
           .then(() => store.action('modals.add', 'viron-error', {
-            title: '認証切れ',
-            message: '認証が切れました。再度ログインして下さい。'
+            title: i18n.get('viron_components_error_auth_title'),
+            message: i18n.get('viron_components_error_auth_message')
           }))
           .then(() => {
             replace('/');

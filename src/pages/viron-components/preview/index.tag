@@ -1,6 +1,6 @@
 viron-components-page-preview.ComponentsPage_Preview(class="ComponentsPage_Preview--{ layoutType }")
   .ComponentsPage_Preview__head
-    .ComponentsPage_Preview__title プレビュー
+    .ComponentsPage_Preview__title { i18n('viron_components_preview_title') }
     .ComponentsPage_Preview__operations(if="{ !!this.operations.length && !isOperationsHidden() }")
       .ComponentsPage_Preview__operation(each="{ operation in this.operations }" class="ComponentsPage_Preview__operation--{ operation.method }" onTap="{ handleOperationTap }") { operation.summary || operation.operationId }
     .ComponentsPage_Preview__operationsButton(if="{ !!this.operations.length && isOperationsHidden() }" onTap="{ handleOperationsButtonTap }")

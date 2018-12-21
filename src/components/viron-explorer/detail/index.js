@@ -1,6 +1,7 @@
 import clipboard from 'clipboard-js';
 import find from 'mout/array/find';
 import findIndex from 'mout/array/findIndex';
+import i18n from '../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -77,13 +78,13 @@ export default function() {
         return clipboard.copy(val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('compornents_viron_explorer_detail_copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('compornents_viron_explorer_detail_error_copy_message')
         });
       });
   };

@@ -4,6 +4,7 @@ import isNull from 'mout/lang/isNull';
 import _isNumber from 'mout/lang/isNumber';
 import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
+import i18n from '../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -127,13 +128,13 @@ export default function() {
         return clipboard.copy(String(this.opts.val));
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('compornents_viron_numberinput_copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('compornents_viron_numberinput_error_copy_message')
         });
       });
   };

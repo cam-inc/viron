@@ -4,6 +4,7 @@ import forEach from 'mout/array/forEach';
 import isNull from 'mout/lang/isNull';
 import isUndefined from 'mout/lang/isUndefined';
 import ObjectAssign from 'object-assign';
+import i18n from '../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -69,13 +70,13 @@ export default function() {
         return clipboard.copy(String(val));
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('compornents_viron_select_copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('compornents_viron_select_copy_error_copy_message')
         });
       });
   };

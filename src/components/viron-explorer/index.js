@@ -1,6 +1,7 @@
 import find from 'mout/array/find';
 import throttle from 'mout/function/throttle';
 import ObjectAssign from 'object-assign';
+import i18n from '../../core/i18n';
 import '../../components/viron-dialog/index.tag';
 import '../../components/viron-error/index.tag';
 import './detail/index.tag';
@@ -61,10 +62,10 @@ export default function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = '認証エラー。';
+          this.error = i18n.get('compornents_viron_explorer_error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('compornents_viron_explorer_error_network')}。`;
         }
         this.update();
       });
@@ -203,7 +204,7 @@ export default function() {
       })
       .then(() => {
         return store.action('toasts.add', {
-          message: '画像を追加しました。'
+          message: i18n.get('compornents_viron_explorer_image_add_info')
         });
       })
       .then(() => {
@@ -221,7 +222,7 @@ export default function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: '認証切れ'
+            title: i18n.get('compornents_viron_explorer_error_401_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -253,7 +254,7 @@ export default function() {
       .then(() => store.action('components.operate', this.deleteOperation, parameters))
       .then(() => {
         return store.action('toasts.add', {
-          message: '画像を削除しました。'
+          message: i18n.get('compornents_viron_explorer_image_delete_info')
         });
       })
       .then(() => {
@@ -272,7 +273,7 @@ export default function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: '認証切れ'
+            title: i18n.get('compornents_viron_explorer_error_401_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -320,8 +321,8 @@ export default function() {
       isDeletable: !!this.deleteOperation,
       onDelete: (id, closer) => {
         Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
-          title: '画像を完全に削除しますか？',
-          message: '画像を削除した後は元に戻す事ができません。この画像を完全に削除してもよろしいですか？',
+          title: i18n.get('compornents_viron_explorer_delete_info_title'),
+          message: i18n.get('compornents_viron_explorer_delete_info_message'),
           onPositiveSelect: () => {
             closer();
             deleteImage(id);

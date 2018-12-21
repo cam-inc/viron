@@ -11,6 +11,7 @@ import '../error/index.tag';
 import '../timepicker/index.tag';
 import util from '../util';
 import validator from '../validator';
+import i18n from '../../../core/i18n';
 
 /**
  * moutの`isNumber`のラッパー関数。
@@ -33,7 +34,7 @@ export default function() {
   // 入力必須ならば米印を付ける。
   this.title = formObject.name;
   if (formObject.required) {
-    this.title = `${this.title} (必須)`;
+    this.title = `${this.title} ${i18n.get('compornents_viron_parameters_form_required_label')}`;
   }
   this.isRequired = formObject.required;
   this.description = formObject.description;

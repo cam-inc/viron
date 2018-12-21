@@ -1,3 +1,5 @@
+import i18n from '../../../../../core/i18n';
+
 export default function() {
   const store = this.riotx.get();
 
@@ -32,7 +34,7 @@ export default function() {
         this.getRouter().navigateTo(`/${this.opts.endpointkey}`);
       })
       .catch(() => {
-        this.errorMessage = 'ログイン出来ませんでした。正しいメールアドレスとパスワードを使用しているか確認して下さい。使用したメールアドレスが予め管理者として登録されているか確認して下さい。';
+        this.errorMessage = i18n.get('login_error');
         this.update();
       });
   };
