@@ -18,11 +18,11 @@ export default function() {
   const validate = endpointURL => {
     // URL値が不正。
     if (!urlValidator.isUri(endpointURL)) {
-      return i18n.get('header_menu_entry_error_url');
+      return i18n.get('vrn.header.menu.entry.error_url');
     }
     // 重複チェック。
     if (!!store.getter('endpoints.oneByURL', endpointURL)) {
-      return i18n.get('header_menu_entry_error_overlapping');
+      return i18n.get('vrn.header.menu.entry.error_overlapping');
     }
     return null;
   };
@@ -58,7 +58,7 @@ export default function() {
       .resolve()
       .then(() => store.action('endpoints.add', this.endpointURL))
       .then(() => store.action('toasts.add', {
-        message: i18n.get('header_menu_entry_info')
+        message: i18n.get('vrn.header.menu.entry.info')
       }))
       .then(() => {
         this.close();
@@ -66,10 +66,10 @@ export default function() {
       .catch(err => {
         switch (err.status) {
         case 404:
-          this.errorMessage = i18n.get('header_menu_entry_error_notfound');
+          this.errorMessage = i18n.get('vrn.header.menu.entry.error_notfound');
           break;
         default:
-          this.errorMessage = i18n.get('header_menu_entry_error');
+          this.errorMessage = i18n.get('vrn.header.menu.entry.error');
           break;
         }
         // サーバが自己証明書を使用している場合にページ遷移を促す。

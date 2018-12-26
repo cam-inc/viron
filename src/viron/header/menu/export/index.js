@@ -16,7 +16,7 @@ export default function() {
       .then(() => {
         this.close();
         return store.action('toasts.add', {
-          message: i18n.get('header_menu_export_info')
+          message: i18n.get('vrn.header.menu.export.info')
         });
       })
       .catch(err => {

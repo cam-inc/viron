@@ -9,15 +9,15 @@ export default function() {
   const isTopPage = store.getter('location.isTop');
   const isDesktop = store.getter('layout.isDesktop');
   const generalActions = [
-    { label: i18n.get('header_menu_help'), id: 'navigate_to_doc' }
+    { label: i18n.get('vrn.header.menu.help'), id: 'navigate_to_doc' }
   ];
   const endpointActions = [];
-  endpointActions.push({ label: i18n.get('header_menu_entry'), id: 'add_endpoint' });
+  endpointActions.push({ label: i18n.get('vrn.header.menu.entry'), id: 'add_endpoint' });
   if (isDesktop) {
-    endpointActions.push({ label: i18n.get('header_menu_export'), id: 'export_endpoints' });
-    endpointActions.push({ label: i18n.get('header_menu_import'), id: 'import_endpoints' });
+    endpointActions.push({ label: i18n.get('vrn.header.menu.export'), id: 'export_endpoints' });
+    endpointActions.push({ label: i18n.get('vrn.header.menu.import'), id: 'import_endpoints' });
   }
-  endpointActions.push({ label: i18n.get('header_menu_clear'), id: 'remove_all_endpoints' });
+  endpointActions.push({ label: i18n.get('vrn.header.menu.clear'), id: 'remove_all_endpoints' });
 
   // TOPページではエンドポイント操作も可能にする。
   if (isTopPage) {

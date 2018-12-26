@@ -53,10 +53,10 @@ export default function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = i18n.get('viron_components_card_table_error_401');
+          this.error = i18n.get('pg.components.card.table.error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('viron_components_card_table_error_network')}`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('pg.components.card.table.error_network')}`;
         }
         this.update();
       });
@@ -69,13 +69,13 @@ export default function() {
    */
   const validate = data => {
     if (!isArray(data)) {
-      return i18n.get('viron_components_card_table_error_response_array');
+      return i18n.get('pg.components.card.table.error_response_array');
     }
     if (!data.length) {
-      return i18n.get('viron_components_card_table_error_empty');
+      return i18n.get('pg.components.card.table.error_empty');
     }
     if (!isObject(data[0])) {
-      return i18n.get('viron_components_card_table_error_object');
+      return i18n.get('pg.components.card.table.error_object');
     }
     return null;
   };

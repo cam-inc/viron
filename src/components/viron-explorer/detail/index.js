@@ -78,13 +78,13 @@ export default function() {
         return clipboard.copy(val);
       })
       .then(() => store.action('toasts.add', {
-        message: i18n.get('compornents_viron_explorer_detail_copy_message')
+        message: i18n.get('cmp.explorer.detail.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: i18n.get('compornents_viron_explorer_detail_error_copy_message')
+          message: i18n.get('cmp.explorer.detail.error_copy_message')
         });
       });
   };

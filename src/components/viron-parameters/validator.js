@@ -37,7 +37,7 @@ const multipleOf = (value, constraints) => {
   }
   if ((value % multipleOf) !== 0) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_multiple_of',{multipleOf:multipleOf});
+    result.message = i18n.get('cmp.parameters.multiple_of',{multipleOf:multipleOf});
   }
   return result;
 };
@@ -57,13 +57,13 @@ const maximumAndExclusiveMaximum = (value, constraints) => {
   if (exclusiveMaximum) {
     if (value >= maximum) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_maximum1',{maximum:maximum});
+      result.message = i18n.get('cmp.parameters.maximum1',{maximum:maximum});
       return result;
     }
   } else {
     if (value > maximum) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_maximum2',{maximum:maximum});
+      result.message = i18n.get('cmp.parameters.maximum2',{maximum:maximum});
       return result;
     }
   }
@@ -85,13 +85,13 @@ const minimumAndExclusiveMinimum = (value, constraints) => {
   if (exclusiveMinimum) {
     if (value <= minimum) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_minimum1',{minimum:minimum});
+      result.message = i18n.get('cmp.parameters.minimum1',{minimum:minimum});
       return result;
     }
   } else {
     if (value < minimum) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_minimum2',{minimum:minimum});
+      result.message = i18n.get('cmp.parameters.minimum2',{minimum:minimum});
       return result;
     }
   }
@@ -110,7 +110,7 @@ const maxLength = (value, constraints) => {
   }
   if (value.length > maxLength) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_max_length',{maxLength:maxLength});
+    result.message = i18n.get('cmp.parameters.max_length',{maxLength:maxLength});
     return result;
   }
   return result;
@@ -123,7 +123,7 @@ const minLength = (value, constraints) => {
   const minLength = constraints.minLength || 0;
   if (value.length < minLength) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_min_length',{minLength:minLength});
+    result.message = i18n.get('cmp.parameters.min_length',{minLength:minLength});
     return result;
   }
   return result;
@@ -140,7 +140,7 @@ const pattern = (value, constraints) => {
   const pattern = constraints.pattern;
   if (!value.match(pattern)) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_pattern',{pattern:pattern});
+    result.message = i18n.get('cmp.parameters.pattern',{pattern:pattern});
     return result;
   }
   return result;
@@ -183,7 +183,7 @@ const additionalItemsAndItems = (value, constraints) => {
     }
   }
   result.isValid = false;
-  result.message = i18n.get('compornents_viron_parameters_additional_items',{length:items.length});
+  result.message = i18n.get('cmp.parameters.additional_items',{length:items.length});
   return result;
 };
 
@@ -199,7 +199,7 @@ const maxItems = (value, constraints) => {
   }
   if (value.length > maxItems) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_max_items',{maxItems:maxItems});
+    result.message = i18n.get('cmp.parameters.max_items',{maxItems:maxItems});
     return result;
   }
   return result;
@@ -212,7 +212,7 @@ const minItems = (value, constraints) => {
   const minItems = constraints.minItems || 0;
   if (value.length < minItems) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_min_items',{minItems:minItems});
+    result.message = i18n.get('cmp.parameters.min_items',{minItems:minItems});
     return result;
   }
   return result;
@@ -232,7 +232,7 @@ const uniqueItems = (value, constraints) => {
     return (a === b);
   }).length) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_unique_items');
+    result.message = i18n.get('cmp.parameters.unique_items');
     return result;
   }
   return result;
@@ -250,7 +250,7 @@ const maxProperties = (value, constraints) => {
   }
   if (size(value) > maxProperties) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_max_properties',{maxProperties:maxProperties});
+    result.message = i18n.get('cmp.parameters.max_properties',{maxProperties:maxProperties});
     return result;
   }
   return result;
@@ -263,7 +263,7 @@ const minProperties = (value, constraints) => {
   const minProperties = constraints.minProperties || 0;
   if (size(value) < minProperties) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_min_properties',{minProperties:minProperties});
+    result.message = i18n.get('cmp.parameters.min_properties',{minProperties:minProperties});
     return result;
   }
   return result;
@@ -283,7 +283,7 @@ const required = (value, constraints) => {
     if (!hasOwn(value, key)) {
       result.isValid = false;
       const description = constraints.properties[key].description ? `(${constraints.properties[key].description})` : '';
-      result.message = i18n.get('compornents_viron_parameters_required',{key: key ,description: description});
+      result.message = i18n.get('cmp.parameters.required',{key: key ,description: description});
     }
   });
   return result;
@@ -349,7 +349,7 @@ const _enum = (value, constraints) => {
   });
   if (!isFound) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_enum',{enum:JSON.stringify(_enum)});
+    result.message = i18n.get('cmp.parameters.enum',{enum:JSON.stringify(_enum)});
   }
   return result;
 };
@@ -413,7 +413,7 @@ const _type = (value, constraints) => {
   });
   if (!isValid) {
     result.isValid = false;
-    result.message = i18n.get('compornents_viron_parameters_type',{types:JSON.stringify(types)});
+    result.message = i18n.get('cmp.parameters.type',{types:JSON.stringify(types)});
   }
   return result;
 };
@@ -510,14 +510,14 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_format_date_time');
+      result.message = i18n.get('cmp.parameters.format_date_time');
       return result;
     }
     // 存在する日付かチェックする(e.g. うるう年)
     const isValid = dayjs(value).isValid();
     if (!isValid) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_format_date_time_notfound');
+      result.message = i18n.get('cmp.parameters.format_date_time_notfound');
       return result;
     }
     break;
@@ -533,7 +533,7 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_format_email');
+      result.message = i18n.get('cmp.parameters.format_email');
       return result;
     }
     break;
@@ -547,7 +547,7 @@ const format = (value, constraints) => {
     // hostnameが255文字を超えていたらエラー
     if (value.length > 255) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_format_hostname');
+      result.message = i18n.get('cmp.parameters.format_hostname');
       return result;
     }
     // RFC 1034に則った書き方かバリデートする
@@ -555,7 +555,7 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_format_hostname_notmatch');
+      result.message = i18n.get('cmp.parameters.format_hostname_notmatch');
       return result;
     }
     break;
@@ -571,7 +571,7 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_format_ipv4');
+      result.message = i18n.get('cmp.parameters.format_ipv4');
       return result;
     }
     break;
@@ -615,7 +615,7 @@ const format = (value, constraints) => {
     });
     if (!matchResult) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_format_ipv6');
+      result.message = i18n.get('cmp.parameters.format_ipv6');
       return result;
     }
     break;
@@ -631,7 +631,7 @@ const format = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull(isMatch)) {
       result.isValid = false;
-      result.message = i18n.get('compornents_viron_parameters_format_uri');
+      result.message = i18n.get('cmp.parameters.format_uri');
       return result;
     }
     break;
@@ -660,7 +660,7 @@ export default {
     // ただし、required(self)がtrueの場合はエラー。
     if (isUndefined(value)) {
       if (schemaObject.required) {
-        return [i18n.get('compornents_viron_parameters_error_undefined')];
+        return [i18n.get('cmp.parameters.error_undefined')];
       }
       return results;
     }

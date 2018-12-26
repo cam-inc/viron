@@ -11,11 +11,11 @@ export default function() {
 
   this.list = [];
   if (isDesktop) {
-    this.list.push({ id: 'qrcode', label: i18n.get('qrcode') });
+    this.list.push({ id: 'qrcode', label: i18n.get('pg.endpoints.endpoint.menu.qrcode.title') });
   }
-  this.list.push({ id: 'remove', label: i18n.get('endpoint_delete') });
+  this.list.push({ id: 'remove', label: i18n.get('pg.endpoints.endpoint.menu.endpoint_delete') });
   if (isSignined) {
-    this.list.push({ id: 'signout', label: i18n.get('logout') });
+    this.list.push({ id: 'signout', label: i18n.get('pg.endpoints.endpoint.menu.logout') });
   }
 
   const showQRCode = () => {
@@ -37,7 +37,7 @@ export default function() {
       .resolve()
       .then(() => store.action('endpoints.remove', this.opts.endpoint.key))
       .then(() => store.action('toasts.add', {
-        message: i18n.get('endpoint_delete_info')
+        message: i18n.get('pg.endpoints.endpoint.menu.endpoint_delete_info')
       }))
       .then(() => {
         this.close();
@@ -52,7 +52,7 @@ export default function() {
       .resolve()
       .then(() => store.action('auth.remove', this.opts.endpoint.key))
       .then(() => store.action('toasts.add', {
-        message: i18n.get('logout_info')
+        message: i18n.get('pg.endpoints.endpoint.menu.logout_info')
       }))
       .then(() => {
         this.close();

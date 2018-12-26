@@ -128,13 +128,13 @@ export default function() {
         return clipboard.copy(String(this.opts.val));
       })
       .then(() => store.action('toasts.add', {
-        message: i18n.get('compornents_viron_numberinput_copy_message')
+        message: i18n.get('cmp.numberinput.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: i18n.get('compornents_viron_numberinput_error_copy_message')
+          message: i18n.get('cmp.numberinput.error_copy_message')
         });
       });
   };

@@ -23,8 +23,8 @@ export default {
       to = '/';
       tasks.push(store.action('auth.remove', endpointKey));
       tasks.push(store.action('modals.add', 'viron-error', {
-        title: i18n.get('viron_oauthredirect_error_title'),
-        message: i18n.get('viron_oauthredirect_error_message')
+        title: i18n.get('pg.oauthredirect.error_title'),
+        message: i18n.get('pg.oauthredirect.error_message')
       }));
     }
 

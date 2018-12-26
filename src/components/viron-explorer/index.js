@@ -62,10 +62,10 @@ export default function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = i18n.get('compornents_viron_explorer_error_401');
+          this.error = i18n.get('cmp.explorer.error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('compornents_viron_explorer_error_network')}。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('cmp.explorer.error_network')}。`;
         }
         this.update();
       });
@@ -204,7 +204,7 @@ export default function() {
       })
       .then(() => {
         return store.action('toasts.add', {
-          message: i18n.get('compornents_viron_explorer_image_add_info')
+          message: i18n.get('cmp.explorer.image_add_info')
         });
       })
       .then(() => {
@@ -222,7 +222,7 @@ export default function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: i18n.get('compornents_viron_explorer_error_401_auth')
+            title: i18n.get('cmp.explorer.error_401_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -254,7 +254,7 @@ export default function() {
       .then(() => store.action('components.operate', this.deleteOperation, parameters))
       .then(() => {
         return store.action('toasts.add', {
-          message: i18n.get('compornents_viron_explorer_image_delete_info')
+          message: i18n.get('cmp.explorer.image_delete_info')
         });
       })
       .then(() => {
@@ -273,7 +273,7 @@ export default function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: i18n.get('compornents_viron_explorer_error_401_auth')
+            title: i18n.get('cmp.explorer.error_401_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -321,8 +321,8 @@ export default function() {
       isDeletable: !!this.deleteOperation,
       onDelete: (id, closer) => {
         Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
-          title: i18n.get('compornents_viron_explorer_delete_info_title'),
-          message: i18n.get('compornents_viron_explorer_delete_info_message'),
+          title: i18n.get('cmp.explorer.delete_info_title'),
+          message: i18n.get('cmp.explorer.delete_info_message'),
           onPositiveSelect: () => {
             closer();
             deleteImage(id);

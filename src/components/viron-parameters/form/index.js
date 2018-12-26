@@ -34,7 +34,7 @@ export default function() {
   // 入力必須ならば米印を付ける。
   this.title = formObject.name;
   if (formObject.required) {
-    this.title = `${this.title} ${i18n.get('compornents_viron_parameters_form_required_label')}`;
+    this.title = `${this.title} ${i18n.get('cmp.parameters.form.required_label')}`;
   }
   this.isRequired = formObject.required;
   this.description = formObject.description;

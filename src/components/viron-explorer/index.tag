@@ -1,9 +1,9 @@
 viron-explorer.Explorer
   .Explorer__head
-    .Explorer__title { opts.def.name || i18n('compornents_viron_explorer_droparea_title') }
+    .Explorer__title { opts.def.name || i18n('cmp.explorer.droparea_title') }
     .Explorer__control
   .Explorer__body
-    .Explorer__label { i18n('compornents_viron_explorer_droparea_label') }
+    .Explorer__label { i18n('cmp.explorer.droparea_label') }
     virtual(if="{ isLoading }")
       .Explorer__progressWrapper
         .Explorer__progress
@@ -17,9 +17,9 @@ viron-explorer.Explorer
         .Explorer__content
           form.Explorer__droparea(if="{ !!postOperation }" ref="form" class="{ 'Explorer__droparea--active': isDragWatching, 'Explorer__droparea--mini': isMobile }" onTap="{ handleDropareaTap }")
             input.Explorer__input(type="file" id="{ inputId }" accept="image/*" onChange="{ handleFileChange }")
-            .Explorer__dropareaLabel(if="{ !isMobile }") { i18n('compornents_viron_explorer_droparea_info') }
+            .Explorer__dropareaLabel(if="{ !isMobile }") { i18n('cmp.explorer.droparea_info') }
             .Explorer__dragHandler(onDragEnter="{ handleHandlerDragEnter }" onDragOver="{ handleHandlerDragOver }" onDragLeave="{ handleHandlerDragLeave }" onDrop="{ handleHandlerDrop }")
-            label.Explorer__dropareaButton(ref="label" for="{ inputId }" onTap="{ handleLabelTap }") { i18n('compornents_viron_explorer_droparea_button') }
+            label.Explorer__dropareaButton(ref="label" for="{ inputId }" onTap="{ handleLabelTap }") { i18n('cmp.explorer.droparea_button') }
           .Explorer__list(if="{ !!data && !!data.length }" ref="list")
             .Explorer__item(each="{ item, idx in data }" style="background-image:url({ item.url })" onTap="{ handleItemTap }")
   .Explorer__tail(if="{ hasPagination }")

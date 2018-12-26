@@ -65,8 +65,8 @@ export default {
         return Promise
           .resolve()
           .then(() => store.action('modals.add', 'viron-error', {
-            title: i18n.get('viron_components_error_auth_title'),
-            message: i18n.get('viron_components_error_auth_message')
+            title: i18n.get('pg.components.error_auth_title'),
+            message: i18n.get('pg.components.error_auth_message')
           }))
           .then(() => {
             replace('/');

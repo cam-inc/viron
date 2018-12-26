@@ -34,7 +34,7 @@ export default function() {
         this.getRouter().navigateTo(`/${this.opts.endpointkey}`);
       })
       .catch(() => {
-        this.errorMessage = i18n.get('login_error');
+        this.errorMessage = i18n.get('pg.endpoints.endpoint.signin.email.login_error');
         this.update();
       });
   };

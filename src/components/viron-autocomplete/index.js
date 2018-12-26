@@ -121,13 +121,13 @@ export default function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: i18n.get('compornents_viron_autocomplete_copy')
+        message: i18n.get('cmp.autocomplete.copy')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: i18n.get('compornents_viron_autocomplete_error_copy')
+          message: i18n.get('cmp.autocomplete.error_copy')
         });
       });
   };

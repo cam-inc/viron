@@ -16,12 +16,12 @@ export default exporter('viron', {
       if (!find(viron.sections, section => {
         return (section.id === 'manage');
       })) {
-        viron.sections = combine([{ id: 'manage', label: i18n.get('word.manage') }], viron.sections);
+        viron.sections = combine([{ id: 'manage', label: i18n.get('st.mutations.manage') }], viron.sections);
       }
       if (!find(viron.sections, section => {
         return (section.id === 'dashboard');
       })) {
-        viron.sections = combine([{ id: 'dashboard', label: i18n.get('word.dashboard') }], viron.sections);
+        viron.sections = combine([{ id: 'dashboard', label: i18n.get('st.mutations.dashboard') }], viron.sections);
       }
     }
     state.viron = viron;

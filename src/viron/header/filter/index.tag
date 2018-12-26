@@ -1,7 +1,7 @@
 viron-application-header-filter.Application_Header_Filter(class="{ 'Application_Header_Filter--opened': isOpened }")
   viron-icon-close.Application_Header_Filter__closeIcon(if="{ isOpened }" onMouseDown="{ handleCloseIconMouseDown }" onTap="{ handleCloseIconTap }")
   form.Application_Header_Filter__form(if="{ isOpened }" onSubmit="{ handleFormSubmit }")
-    input.Application_Header_Filter__input(ref="input" placeholder="{ i18n('header_filter_placeholder') }" onFocus="{ handleInputFocus }" onBlur="{ handleInputBlur }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
+    input.Application_Header_Filter__input(ref="input" placeholder="{ i18n('vrn.header.filter.placeholder') }" onFocus="{ handleInputFocus }" onBlur="{ handleInputBlur }" onInput="{ handleInputInput }" onChange="{ handleInputChange }")
   viron-icon-search.Application_Header_Filter__searchIcon(onMouseDown="{ handleSearchIconMouseDown }" onTap="{ handleSearchIconTap }")
   .Application_Header_Filter__text(if="{ !isOpened && !!filterText }") filtered by: { filterText }
 

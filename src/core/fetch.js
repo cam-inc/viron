@@ -100,7 +100,7 @@ const commonFetch = (context, url, options) => {
       fetch(url, options),
       new Promise((resolve, reject) => {
         setTimeout(() => {
-          reject(new Error(i18n.get('core_fetch_error_network_timeout')));
+          reject(new Error(i18n.get('core.fetch.error_network_timeout')));
         }, 1000 * 10);
       })
     ]))

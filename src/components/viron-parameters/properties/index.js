@@ -39,7 +39,7 @@ export default function() {
     const propertiesOptions = [];
     propertiesOptions.push({
       id: 'select_def',
-      label: i18n.get('compornents_viron_parameters_properties_label'),
+      label: i18n.get('cmp.parameters.properties.label'),
       value: undefined,
       isSelected: !id
     });

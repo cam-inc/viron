@@ -27,25 +27,25 @@ export default function() {
   const customSubmitLabel = operationObject['x-submit-label'];
   switch (method) {
   case 'get':
-    this.submitLabel = customSubmitLabel || i18n.get('viron_components_operation_label_get');
-    this.successMessage = i18n.get('viron_components_operation_label_get_info');
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_get');
+    this.successMessage = i18n.get('pg.components.operation.label_get_info');
     break;
   case 'post':
-    this.submitLabel = customSubmitLabel || i18n.get('viron_components_operation_label_post');
-    successMessage = i18n.get('viron_components_operation_label_post_info');
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_post');
+    successMessage = i18n.get('pg.components.operation.label_post_info');
     break;
   case 'put':
-    this.submitLabel = customSubmitLabel || i18n.get('viron_components_operation_label_put');
-    successMessage = i18n.get('viron_components_operation_label_put_info');
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_put');
+    successMessage = i18n.get('pg.components.operation.label_put_info');
     break;
   case 'delete':
-    this.submitLabel = customSubmitLabel || i18n.get('viron_components_operation_label_delete');
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_delete');
     this.submitModifier = 'emphasised';
-    successMessage = i18n.get('viron_components_operation_label_delete_info');
+    successMessage = i18n.get('pg.components.operation.label_delete_info');
     break;
   default:
-    this.submitLabel = i18n.get('viron_components_operation_label_default');
-    successMessage = i18n.get('viron_components_operation_label_default_info');
+    this.submitLabel = i18n.get('pg.components.operation.label_default');
+    successMessage = i18n.get('pg.components.operation.label_default_info');
     break;
   }
 
@@ -63,7 +63,7 @@ export default function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: i18n.get('viron_components_operation_error_auth')
+            title: i18n.get('pg.components.operation.error_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -81,7 +81,7 @@ export default function() {
     }
     Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
       title: this.title,
-      message: i18n.get('viron_components_operation_comfirm'),
+      message: i18n.get('pg.components.operation.comfirm'),
       labelPositive: this.submitLabel,
       onPositiveSelect: () => {
         if (isOperating) return;

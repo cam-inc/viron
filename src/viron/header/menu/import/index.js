@@ -18,7 +18,7 @@ export default function() {
     // ファイルがjsonであるか
     // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
     if (!store.getter('ua.isEdge') && jsonFile.type !== 'application/json') {
-      this.errorMessage = i18n.get('header_menu_import_error_json_type');
+      this.errorMessage = i18n.get('vrn.header.menu.import.error_json_type');
       this.endpoints = null;
       this.update();
       return;
@@ -30,7 +30,7 @@ export default function() {
     // 読み込みが失敗した。
     reader.onerror = err => {
       this.endpoints = null;
-      this.errorMessage = err.message || i18n.get('header_menu_import_error_file_read');
+      this.errorMessage = err.message || i18n.get('vrn.header.menu.import.error_file_read');
       this.update();
     };
     // 読み込みが成功し、完了した。
@@ -41,7 +41,7 @@ export default function() {
         this.errorMessage = '';
       } catch (e) {
         this.endpoints = null;
-        this.errorMessage = e.message || i18n.get('header_menu_import_error_json_type');
+        this.errorMessage = e.message || i18n.get('vrn.header.menu.import.error_json_type');
       } finally {
         this.update();
       }
@@ -58,7 +58,7 @@ export default function() {
       .then(() => {
         this.close();
         return store.action('toasts.add', {
-          message: i18n.get('header_menu_import_error_endpoint_read')
+          message: i18n.get('vrn.header.menu.import.error_endpoint_read')
         });
       })
       .catch(err => {

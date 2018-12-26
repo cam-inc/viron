@@ -15,7 +15,7 @@ viron-endpoints-page-endpoint.EndpointsPage_Endpoint(draggable="{ opts.isdraggab
       viron-icon-setting.EndpointsPage_Endpoint__menu(ref="menu" onTap="{ handleMenuTap }")
     .EndpointsPage_Endpoint__body
       // thumbnailが存在したら過去に一度でもサインインしたと判断。
-      .EndpointsPage_Endpoint__description { !!opts.endpoint.thumbnail ? (opts.endpoint.description || '-') : i18n('viron_endpoints_endpoint_description') }
+      .EndpointsPage_Endpoint__description { !!opts.endpoint.thumbnail ? (opts.endpoint.description || '-') : i18n('pg.endpoints.endpoint.description') }
       .EndpointsPage_Endpoint__tags
         viron-tag(each="{ tag in opts.endpoint.tags }" label="{ tag }")
     .EndpointsPage_Endpoint__droparea.EndpointsPage_Endpoint__droparea--prev(if="{ isDragging && !isSelfDragged }" onDragEnter="{ handlePrevDragEnter }" onDragOver="{ handlePrevDragOver }" onDragLeave="{ handlePrevDragLeave }" onDrop="{ handlePrevDrop }")

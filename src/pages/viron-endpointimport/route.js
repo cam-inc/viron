@@ -20,7 +20,7 @@ export default {
         .then(() => {
           replace('/');
           store.action('toasts.add', {
-            message: i18n.get('viron_endpointimport_error_overlapping',{url:url}),
+            message: i18n.get('pg.endpointimport.error_overlapping',{url:url}),
           });
         });
     }
@@ -29,8 +29,8 @@ export default {
       .resolve()
       .then(() => store.action('endpoints.mergeOneWithKey', endpoint))
       .then(() => store.action('modals.add', 'viron-error', {
-        title: i18n.get('viron_endpointimport_title'),
-        message: i18n.get('viron_endpointimport_message',{url:url})
+        title: i18n.get('pg.endpointimport.title'),
+        message: i18n.get('pg.endpointimport.message',{url:url})
       }))
       .then(() => {
         replace('/');
@@ -38,8 +38,8 @@ export default {
       .catch(err => {
         replace('/');
         store.action('modals.add', 'viron-error', {
-          title: i18n.get('viron_endpointimport_error_add'),
-          message: i18n.get('viron_endpointimport_error_add_message',{url:url}),
+          title: i18n.get('pg.endpointimport.error_add'),
+          message: i18n.get('pg.endpointimport.error_add_message',{url:url}),
           error: err
         });
       });
