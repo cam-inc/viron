@@ -173,5 +173,5 @@ export default {
   'cmp.textarea.copy_error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
   'cmp.textinput.copy_message': '클립 보드에 복사했습니다.',
   'cmp.textinput.copy_error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
-  'cmp.wyswyg.explorer_title': '画像アップロード',
+  'cmp.wyswyg.explorer_title': '이미지 업로드',
 };
