@@ -2979,2341 +2979,847 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var riot$1 = unwrapExports(riot_1);
 
-var _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+/* riot-i18nlet version 0.2.5 */
+var VERSION = "0.2.5";
 
-function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+/* i18nlet version 0.0.5 */
+var VERSION$1 = "0.0.5";
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+/*global VERSION*/
 
-var consoleLogger = {
-  type: 'logger',
+var debug = false;
+var defaultLangage = 'en';
+var variableKeyPrefix = '{{';
+var variableKeySuffix = '}}';
+var defaultNoConvertVariable = null;
+var defaultText = '';
+var defaultGetMessageFunctionName = 'i';
+var defaultReference = true;
 
-  log: function log(args) {
-    this.output('log', args);
-  },
-  warn: function warn(args) {
-    this.output('warn', args);
-  },
-  error: function error(args) {
-    this.output('error', args);
-  },
-  output: function output(type, args) {
-    var _console;
+/**
+ * console output
+ *
+ * @param {String} type level
+ * @param {*} args output messages
+ */
+var _output = function (type) {
+  var arguments$1 = arguments;
 
-    /* eslint no-console: 0 */
-    if (console && console[type]) { (_console = console)[type].apply(_console, _toConsumableArray(args)); }
+  var args = [], len = arguments.length - 1;
+  while ( len-- > 0 ) { args[ len ] = arguments$1[ len + 1 ]; }
+
+  args.unshift(("[" + (type.toUpperCase()) + "]"));
+  args.unshift('[i18nlet]');
+
+  try {
+    console.log.apply(console, args); // eslint-disable-line
+  } catch (e) {
+    console.log(args); // eslint-disable-line
   }
 };
 
-var Logger = function () {
-  function Logger(concreteLogger) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+var defaultLoad = function (langage, terms) {
+  var this$1 = this;
 
-    _classCallCheck$1(this, Logger);
+  if (!this.store[langage]) {
+    this.store[langage] = {};
+  }
+  Object.keys(terms).forEach(function (context) {
+    this$1.store[langage][context] = terms[context];
+  });
+};
 
-    this.init(concreteLogger, options);
+var defaultLoads = function (data) {
+  var this$1 = this;
+
+  Object.keys(data).forEach(function (v) {
+    this$1.load(v, data[v]);
+  });
+};
+
+
+/**
+ * @class I18nlet
+ */
+var I18nlet = function I18nlet () {};
+
+I18nlet.prototype.init = function init (settings) {
+    var this$1 = this;
+    if ( settings === void 0 ) { settings = {}; }
+
+  this.version = VERSION$1 || '';
+  this.store = {};
+
+  ///
+  this.settings = {};
+  this.settings.currentLangage = this.settings.defaultLangage = settings.defaultLangage || defaultLangage;
+  this.settings.debug = settings.debug || debug;
+
+  this.settings.variableKeyPrefix = settings.variableKeyPrefix || variableKeyPrefix;
+  this.settings.variableKeySuffix = settings.variableKeySuffix || variableKeySuffix;
+  this.settings.noConvertVariable = settings.noConvertVariable || defaultNoConvertVariable;
+
+  this.settings.reference = defaultReference;
+  if ((typeof settings.reference) === 'boolean') {
+    this.settings.reference = settings.reference;
   }
 
-  Logger.prototype.init = function init(concreteLogger) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    this.prefix = options.prefix || 'i18next:';
-    this.logger = concreteLogger || consoleLogger;
-    this.options = options;
-    this.debug = options.debug;
-  };
-
-  Logger.prototype.setDebug = function setDebug(bool) {
-    this.debug = bool;
-  };
-
-  Logger.prototype.log = function log() {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return this.forward(args, 'log', '', true);
-  };
-
-  Logger.prototype.warn = function warn() {
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
-    }
-
-    return this.forward(args, 'warn', '', true);
-  };
-
-  Logger.prototype.error = function error() {
-    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      args[_key3] = arguments[_key3];
-    }
-
-    return this.forward(args, 'error', '');
-  };
-
-  Logger.prototype.deprecate = function deprecate() {
-    for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      args[_key4] = arguments[_key4];
-    }
-
-    return this.forward(args, 'warn', 'WARNING DEPRECATED: ', true);
-  };
-
-  Logger.prototype.forward = function forward(args, lvl, prefix, debugOnly) {
-    if (debugOnly && !this.debug) { return null; }
-    if (typeof args[0] === 'string') { args[0] = '' + prefix + this.prefix + ' ' + args[0]; }
-    return this.logger[lvl](args);
-  };
-
-  Logger.prototype.create = function create(moduleName) {
-    return new Logger(this.logger, _extends$1({ prefix: this.prefix + ':' + moduleName + ':' }, this.options));
-  };
-
-  return Logger;
-}();
-
-var baseLogger = new Logger();
-
-function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var EventEmitter = function () {
-  function EventEmitter() {
-    _classCallCheck$2(this, EventEmitter);
-
-    this.observers = {};
+  this.settings.defaultText = defaultText;
+  if ((typeof settings.defaultText) === 'string') {
+    this.settings.defaultText = settings.defaultText;
   }
 
-  EventEmitter.prototype.on = function on(events, listener) {
-    var _this = this;
+  this.settings.getMessageFunctionName = settings.getMessageFunctionName || defaultGetMessageFunctionName;
+  this[this.settings.getMessageFunctionName] = this._i18nlet_get_message;
 
-    events.split(' ').forEach(function (event) {
-      _this.observers[event] = _this.observers[event] || [];
-      _this.observers[event].push(listener);
-    });
-  };
+  this.regexpStr = (this.settings.variableKeyPrefix) + "(.+?)" + (this.settings.variableKeySuffix);
+  this.regexp = new RegExp(this.regexpStr, 'g');
 
-  EventEmitter.prototype.off = function off(event, listener) {
-    var _this2 = this;
+  this.logger = {};
+  this.logger.output = settings.output || _output;
+  /**
+   * console debug output
+   * @param {*} args
+   */
+  this.logger.debug = function () {
+      var arguments$1 = arguments;
 
-    if (!this.observers[event]) {
+      var args = [], len = arguments.length;
+      while ( len-- ) { args[ len ] = arguments$1[ len ]; }
+
+    if (!this$1.settings.debug) {
       return;
     }
-
-    this.observers[event].forEach(function () {
-      if (!listener) {
-        delete _this2.observers[event];
-      } else {
-        var index = _this2.observers[event].indexOf(listener);
-        if (index > -1) {
-          _this2.observers[event].splice(index, 1);
-        }
-      }
-    });
+    args.unshift('DEBUG');
+    this$1.logger.output.apply(null, args);
   };
 
-  EventEmitter.prototype.emit = function emit(event) {
-    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    if (this.observers[event]) {
-      var cloned = [].concat(this.observers[event]);
-      cloned.forEach(function (observer) {
-        observer.apply(undefined, args);
-      });
-    }
-
-    if (this.observers['*']) {
-      var _cloned = [].concat(this.observers['*']);
-      _cloned.forEach(function (observer) {
-        var _ref;
-
-        observer.apply(observer, (_ref = [event]).concat.apply(_ref, args));
-      });
-    }
+  /**
+   * console error output
+   * @param {*} message
+   */
+  this.logger.error = function (message) {
+    var err = new Error(("[i18nlet] " + message));
+    this$1.logger.output.apply(null, ['ERROR', err]);
   };
 
-  return EventEmitter;
-}();
-
-function makeString(object) {
-  if (object == null) { return ''; }
-  /* eslint prefer-template: 0 */
-  return '' + object;
-}
-
-function copy(a, s, t) {
-  a.forEach(function (m) {
-    if (s[m]) { t[m] = s[m]; }
-  });
-}
-
-function getLastOfPath(object, path, Empty) {
-  function cleanKey(key) {
-    return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
+  this.hook = {
+    load: defaultLoad,
+    loads: defaultLoads,
+  };
+  if (settings.hook && settings.hook.load) {
+    this.logger.debug('hook load()');
+    this.hook.load = settings.hook.load;
+  }
+  if (settings.hook && settings.hook.loads) {
+    this.logger.debug('hook loads()');
+    this.hook.loads = settings.hook.loads;
   }
 
-  function canNotTraverseDeeper() {
-    return !object || typeof object === 'string';
-  }
+  ///
 
-  var stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
-  while (stack.length > 1) {
-    if (canNotTraverseDeeper()) { return {}; }
-
-    var key = cleanKey(stack.shift());
-    if (!object[key] && Empty) { object[key] = new Empty(); }
-    object = object[key];
-  }
-
-  if (canNotTraverseDeeper()) { return {}; }
-  return {
-    obj: object,
-    k: cleanKey(stack.shift())
-  };
-}
-
-function setPath(object, path, newValue) {
-  var _getLastOfPath = getLastOfPath(object, path, Object),
-      obj = _getLastOfPath.obj,
-      k = _getLastOfPath.k;
-
-  obj[k] = newValue;
-}
-
-function pushPath(object, path, newValue, concat) {
-  var _getLastOfPath2 = getLastOfPath(object, path, Object),
-      obj = _getLastOfPath2.obj,
-      k = _getLastOfPath2.k;
-
-  obj[k] = obj[k] || [];
-  if (concat) { obj[k] = obj[k].concat(newValue); }
-  if (!concat) { obj[k].push(newValue); }
-}
-
-function getPath(object, path) {
-  var _getLastOfPath3 = getLastOfPath(object, path),
-      obj = _getLastOfPath3.obj,
-      k = _getLastOfPath3.k;
-
-  if (!obj) { return undefined; }
-  return obj[k];
-}
-
-function deepExtend(target, source, overwrite) {
-  /* eslint no-restricted-syntax: 0 */
-  for (var prop in source) {
-    if (prop in target) {
-      // If we reached a leaf string in target or source then replace with source or skip depending on the 'overwrite' switch
-      if (typeof target[prop] === 'string' || target[prop] instanceof String || typeof source[prop] === 'string' || source[prop] instanceof String) {
-        if (overwrite) { target[prop] = source[prop]; }
-      } else {
-        deepExtend(target[prop], source[prop], overwrite);
-      }
-    } else {
-      target[prop] = source[prop];
-    }
-  }
-  return target;
-}
-
-function regexEscape(str) {
-  /* eslint no-useless-escape: 0 */
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-}
-
-/* eslint-disable */
-var _entityMap = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': '&quot;',
-  "'": '&#39;',
-  "/": '&#x2F;'
-};
-/* eslint-enable */
-
-function escape$1(data) {
-  if (typeof data === 'string') {
-    return data.replace(/[&<>"'\/]/g, function (s) {
-      return _entityMap[s];
-    });
-  }
-
-  return data;
-}
-
-var _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _defaults$1(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
-
-function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$1(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$1(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults$1(subClass, superClass); } }
-
-var ResourceStore = function (_EventEmitter) {
-  _inherits$1(ResourceStore, _EventEmitter);
-
-  function ResourceStore(data) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { ns: ['translation'], defaultNS: 'translation' };
-
-    _classCallCheck$3(this, ResourceStore);
-
-    var _this = _possibleConstructorReturn$1(this, _EventEmitter.call(this));
-
-    _this.data = data || {};
-    _this.options = options;
-    return _this;
-  }
-
-  ResourceStore.prototype.addNamespaces = function addNamespaces(ns) {
-    if (this.options.ns.indexOf(ns) < 0) {
-      this.options.ns.push(ns);
-    }
-  };
-
-  ResourceStore.prototype.removeNamespaces = function removeNamespaces(ns) {
-    var index = this.options.ns.indexOf(ns);
-    if (index > -1) {
-      this.options.ns.splice(index, 1);
-    }
-  };
-
-  ResourceStore.prototype.getResource = function getResource(lng, ns, key) {
-    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-
-    var keySeparator = options.keySeparator || this.options.keySeparator;
-    if (keySeparator === undefined) { keySeparator = '.'; }
-
-    var path = [lng, ns];
-    if (key && typeof key !== 'string') { path = path.concat(key); }
-    if (key && typeof key === 'string') { path = path.concat(keySeparator ? key.split(keySeparator) : key); }
-
-    if (lng.indexOf('.') > -1) {
-      path = lng.split('.');
-    }
-
-    return getPath(this.data, path);
-  };
-
-  ResourceStore.prototype.addResource = function addResource(lng, ns, key, value) {
-    var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : { silent: false };
-
-    var keySeparator = this.options.keySeparator;
-    if (keySeparator === undefined) { keySeparator = '.'; }
-
-    var path = [lng, ns];
-    if (key) { path = path.concat(keySeparator ? key.split(keySeparator) : key); }
-
-    if (lng.indexOf('.') > -1) {
-      path = lng.split('.');
-      value = ns;
-      ns = path[1];
-    }
-
-    this.addNamespaces(ns);
-
-    setPath(this.data, path, value);
-
-    if (!options.silent) { this.emit('added', lng, ns, key, value); }
-  };
-
-  ResourceStore.prototype.addResources = function addResources(lng, ns, resources) {
-    /* eslint no-restricted-syntax: 0 */
-    for (var m in resources) {
-      if (typeof resources[m] === 'string') { this.addResource(lng, ns, m, resources[m], { silent: true }); }
-    }
-    this.emit('added', lng, ns, resources);
-  };
-
-  ResourceStore.prototype.addResourceBundle = function addResourceBundle(lng, ns, resources, deep, overwrite) {
-    var path = [lng, ns];
-    if (lng.indexOf('.') > -1) {
-      path = lng.split('.');
-      deep = resources;
-      resources = ns;
-      ns = path[1];
-    }
-
-    this.addNamespaces(ns);
-
-    var pack = getPath(this.data, path) || {};
-
-    if (deep) {
-      deepExtend(pack, resources, overwrite);
-    } else {
-      pack = _extends$2({}, pack, resources);
-    }
-
-    setPath(this.data, path, pack);
-
-    this.emit('added', lng, ns, resources);
-  };
-
-  ResourceStore.prototype.removeResourceBundle = function removeResourceBundle(lng, ns) {
-    if (this.hasResourceBundle(lng, ns)) {
-      delete this.data[lng][ns];
-    }
-    this.removeNamespaces(ns);
-
-    this.emit('removed', lng, ns);
-  };
-
-  ResourceStore.prototype.hasResourceBundle = function hasResourceBundle(lng, ns) {
-    return this.getResource(lng, ns) !== undefined;
-  };
-
-  ResourceStore.prototype.getResourceBundle = function getResourceBundle(lng, ns) {
-    if (!ns) { ns = this.options.defaultNS; }
-
-    // COMPATIBILITY: remove extend in v2.1.0
-    if (this.options.compatibilityAPI === 'v1') { return _extends$2({}, this.getResource(lng, ns)); }
-
-    return this.getResource(lng, ns);
-  };
-
-  ResourceStore.prototype.toJSON = function toJSON() {
-    return this.data;
-  };
-
-  return ResourceStore;
-}(EventEmitter);
-
-var postProcessor = {
-
-  processors: {},
-
-  addPostProcessor: function addPostProcessor(module) {
-    this.processors[module.name] = module;
-  },
-  handle: function handle(processors, value, key, options, translator) {
-    var _this = this;
-
-    processors.forEach(function (processor) {
-      if (_this.processors[processor]) { value = _this.processors[processor].process(value, key, options, translator); }
-    });
-
-    return value;
-  }
+  return this;
 };
 
-var _extends$3 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _defaults$2(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
-
-function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$2(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$2(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults$2(subClass, superClass); } }
-
-var Translator = function (_EventEmitter) {
-  _inherits$2(Translator, _EventEmitter);
-
-  function Translator(services) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    _classCallCheck$4(this, Translator);
-
-    var _this = _possibleConstructorReturn$2(this, _EventEmitter.call(this));
-
-    copy(['resourceStore', 'languageUtils', 'pluralResolver', 'interpolator', 'backendConnector'], services, _this);
-
-    _this.options = options;
-    _this.logger = baseLogger.create('translator');
-    return _this;
-  }
-
-  Translator.prototype.changeLanguage = function changeLanguage(lng) {
-    if (lng) { this.language = lng; }
-  };
-
-  Translator.prototype.exists = function exists(key) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { interpolation: {} };
-
-    var resolved = this.resolve(key, options);
-    return resolved && resolved.res !== undefined;
-  };
-
-  Translator.prototype.extractFromKey = function extractFromKey(key, options) {
-    var nsSeparator = options.nsSeparator || this.options.nsSeparator;
-    if (nsSeparator === undefined) { nsSeparator = ':'; }
-    var keySeparator = options.keySeparator || this.options.keySeparator || '.';
-
-    var namespaces = options.ns || this.options.defaultNS;
-    if (nsSeparator && key.indexOf(nsSeparator) > -1) {
-      var parts = key.split(nsSeparator);
-      if (nsSeparator !== keySeparator || nsSeparator === keySeparator && this.options.ns.indexOf(parts[0]) > -1) { namespaces = parts.shift(); }
-      key = parts.join(keySeparator);
-    }
-    if (typeof namespaces === 'string') { namespaces = [namespaces]; }
-
-    return {
-      key: key,
-      namespaces: namespaces
-    };
-  };
-
-  Translator.prototype.translate = function translate(keys) {
-    var _this2 = this;
-
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    if ((typeof options === 'undefined' ? 'undefined' : _typeof$1(options)) !== 'object') {
-      /* eslint prefer-rest-params: 0 */
-      options = this.options.overloadTranslationOptionHandler(arguments);
-    }
-
-    // non valid keys handling
-    if (keys === undefined || keys === null || keys === '') { return ''; }
-    if (typeof keys === 'number') { keys = String(keys); }
-    if (typeof keys === 'string') { keys = [keys]; }
-
-    // separators
-    var keySeparator = options.keySeparator || this.options.keySeparator || '.';
-
-    // get namespace(s)
-
-    var _extractFromKey = this.extractFromKey(keys[keys.length - 1], options),
-        key = _extractFromKey.key,
-        namespaces = _extractFromKey.namespaces;
-
-    var namespace = namespaces[namespaces.length - 1];
-
-    // return key on CIMode
-    var lng = options.lng || this.language;
-    var appendNamespaceToCIMode = options.appendNamespaceToCIMode || this.options.appendNamespaceToCIMode;
-    if (lng && lng.toLowerCase() === 'cimode') {
-      if (appendNamespaceToCIMode) {
-        var nsSeparator = options.nsSeparator || this.options.nsSeparator;
-        return namespace + nsSeparator + key;
-      }
-
-      return key;
-    }
-
-    // resolve from store
-    var resolved = this.resolve(keys, options);
-    var res = resolved && resolved.res;
-    var usedKey = resolved && resolved.usedKey || key;
-
-    var resType = Object.prototype.toString.apply(res);
-    var noObject = ['[object Number]', '[object Function]', '[object RegExp]'];
-    var joinArrays = options.joinArrays !== undefined ? options.joinArrays : this.options.joinArrays;
-
-    // object
-    var handleAsObject = typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
-    if (res && handleAsObject && noObject.indexOf(resType) < 0 && !(joinArrays && resType === '[object Array]')) {
-      if (!options.returnObjects && !this.options.returnObjects) {
-        this.logger.warn('accessing an object - but returnObjects options is not enabled!');
-        return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(usedKey, res, options) : 'key \'' + key + ' (' + this.language + ')\' returned an object instead of string.';
-      }
-
-      // if we got a separator we loop over children - else we just return object as is
-      // as having it set to false means no hierarchy so no lookup for nested values
-      if (options.keySeparator || this.options.keySeparator) {
-        var copy$$1 = resType === '[object Array]' ? [] : {}; // apply child translation on a copy
-
-        /* eslint no-restricted-syntax: 0 */
-        for (var m in res) {
-          if (Object.prototype.hasOwnProperty.call(res, m)) {
-            copy$$1[m] = this.translate('' + usedKey + keySeparator + m, _extends$3({}, options, { joinArrays: false, ns: namespaces }));
-          }
-        }
-        res = copy$$1;
-      }
-    } else if (joinArrays && resType === '[object Array]') {
-      // array special treatment
-      res = res.join(joinArrays);
-      if (res) { res = this.extendTranslation(res, keys, options); }
-    } else {
-      // string, empty or null
-      var usedDefault = false;
-      var _usedKey = false;
-
-      // fallback value
-      if (!this.isValidLookup(res) && options.defaultValue !== undefined) {
-        usedDefault = true;
-        res = options.defaultValue;
-      }
-      if (!this.isValidLookup(res)) {
-        _usedKey = true;
-        res = key;
-      }
-
-      // save missing
-      var updateMissing = options.defaultValue && options.defaultValue !== res && this.options.updateMissing;
-      if (_usedKey || usedDefault || updateMissing) {
-        this.logger.log(updateMissing ? 'updateKey' : 'missingKey', lng, namespace, key, updateMissing ? options.defaultValue : res);
-
-        var lngs = [];
-        var fallbackLngs = this.languageUtils.getFallbackCodes(this.options.fallbackLng, options.lng || this.language);
-        if (this.options.saveMissingTo === 'fallback' && fallbackLngs && fallbackLngs[0]) {
-          for (var i = 0; i < fallbackLngs.length; i++) {
-            lngs.push(fallbackLngs[i]);
-          }
-        } else if (this.options.saveMissingTo === 'all') {
-          lngs = this.languageUtils.toResolveHierarchy(options.lng || this.language);
-        } else {
-          lngs.push(options.lng || this.language);
-        }
-
-        var send = function send(l, k) {
-          if (_this2.options.missingKeyHandler) {
-            _this2.options.missingKeyHandler(l, namespace, k, updateMissing ? options.defaultValue : res, updateMissing);
-          } else if (_this2.backendConnector && _this2.backendConnector.saveMissing) {
-            _this2.backendConnector.saveMissing(l, namespace, k, updateMissing ? options.defaultValue : res, updateMissing);
-          }
-          _this2.emit('missingKey', l, namespace, k, res);
-        };
-
-        if (this.options.saveMissing) {
-          if (this.options.saveMissingPlurals && options.count) {
-            lngs.forEach(function (l) {
-              var plurals = _this2.pluralResolver.getPluralFormsOfKey(l, key);
-
-              plurals.forEach(function (p) {
-                return send([l], p);
-              });
-            });
-          } else {
-            send(lngs, key);
-          }
-        }
-      }
-
-      // extend
-      res = this.extendTranslation(res, keys, options);
-
-      // append namespace if still key
-      if (_usedKey && res === key && this.options.appendNamespaceToMissingKey) { res = namespace + ':' + key; }
-
-      // parseMissingKeyHandler
-      if (_usedKey && this.options.parseMissingKeyHandler) { res = this.options.parseMissingKeyHandler(res); }
-    }
-
-    // return
-    return res;
-  };
-
-  Translator.prototype.extendTranslation = function extendTranslation(res, key, options) {
-    var _this3 = this;
-
-    if (options.interpolation) { this.interpolator.init(_extends$3({}, options, { interpolation: _extends$3({}, this.options.interpolation, options.interpolation) })); }
-
-    // interpolate
-    var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
-    if (this.options.interpolation.defaultVariables) { data = _extends$3({}, this.options.interpolation.defaultVariables, data); }
-    res = this.interpolator.interpolate(res, data, options.lng || this.language);
-
-    // nesting
-    if (options.nest !== false) { res = this.interpolator.nest(res, function () {
-      return _this3.translate.apply(_this3, arguments);
-    }, options); }
-
-    if (options.interpolation) { this.interpolator.reset(); }
-
-    // post process
-    var postProcess = options.postProcess || this.options.postProcess;
-    var postProcessorNames = typeof postProcess === 'string' ? [postProcess] : postProcess;
-
-    if (res !== undefined && postProcessorNames && postProcessorNames.length && options.applyPostProcessor !== false) {
-      res = postProcessor.handle(postProcessorNames, res, key, options, this);
-    }
-
-    return res;
-  };
-
-  Translator.prototype.resolve = function resolve(keys) {
-    var _this4 = this;
-
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    var found = void 0;
-    var usedKey = void 0;
-
-    if (typeof keys === 'string') { keys = [keys]; }
-
-    // forEach possible key
-    keys.forEach(function (k) {
-      if (_this4.isValidLookup(found)) { return; }
-      var extracted = _this4.extractFromKey(k, options);
-      var key = extracted.key;
-      usedKey = key;
-      var namespaces = extracted.namespaces;
-      if (_this4.options.fallbackNS) { namespaces = namespaces.concat(_this4.options.fallbackNS); }
-
-      var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
-      var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
-
-      var codes = options.lngs ? options.lngs : _this4.languageUtils.toResolveHierarchy(options.lng || _this4.language);
-
-      namespaces.forEach(function (ns) {
-        if (_this4.isValidLookup(found)) { return; }
-
-        codes.forEach(function (code) {
-          if (_this4.isValidLookup(found)) { return; }
-
-          var finalKey = key;
-          var finalKeys = [finalKey];
-
-          var pluralSuffix = void 0;
-          if (needsPluralHandling) { pluralSuffix = _this4.pluralResolver.getSuffix(code, options.count); }
-
-          // fallback for plural if context not found
-          if (needsPluralHandling && needsContextHandling) { finalKeys.push(finalKey + pluralSuffix); }
-
-          // get key for context if needed
-          if (needsContextHandling) { finalKeys.push(finalKey += '' + _this4.options.contextSeparator + options.context); }
-
-          // get key for plural if needed
-          if (needsPluralHandling) { finalKeys.push(finalKey += pluralSuffix); }
-
-          // iterate over finalKeys starting with most specific pluralkey (-> contextkey only) -> singularkey only
-          var possibleKey = void 0;
-          /* eslint no-cond-assign: 0 */
-          while (possibleKey = finalKeys.pop()) {
-            if (!_this4.isValidLookup(found)) {
-              found = _this4.getResource(code, ns, possibleKey, options);
-            }
-          }
-        });
-      });
-    });
-
-    return { res: found, usedKey: usedKey };
-  };
-
-  Translator.prototype.isValidLookup = function isValidLookup(res) {
-    return res !== undefined && !(!this.options.returnNull && res === null) && !(!this.options.returnEmptyString && res === '');
-  };
-
-  Translator.prototype.getResource = function getResource(code, ns, key) {
-    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-
-    return this.resourceStore.getResource(code, ns, key, options);
-  };
-
-  return Translator;
-}(EventEmitter);
-
-function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-var LanguageUtil = function () {
-  function LanguageUtil(options) {
-    _classCallCheck$5(this, LanguageUtil);
-
-    this.options = options;
-
-    this.whitelist = this.options.whitelist || false;
-    this.logger = baseLogger.create('languageUtils');
-  }
-
-  LanguageUtil.prototype.getScriptPartFromCode = function getScriptPartFromCode(code) {
-    if (!code || code.indexOf('-') < 0) { return null; }
-
-    var p = code.split('-');
-    if (p.length === 2) { return null; }
-    p.pop();
-    return this.formatLanguageCode(p.join('-'));
-  };
-
-  LanguageUtil.prototype.getLanguagePartFromCode = function getLanguagePartFromCode(code) {
-    if (!code || code.indexOf('-') < 0) { return code; }
-
-    var p = code.split('-');
-    return this.formatLanguageCode(p[0]);
-  };
-
-  LanguageUtil.prototype.formatLanguageCode = function formatLanguageCode(code) {
-    // http://www.iana.org/assignments/language-tags/language-tags.xhtml
-    if (typeof code === 'string' && code.indexOf('-') > -1) {
-      var specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
-      var p = code.split('-');
-
-      if (this.options.lowerCaseLng) {
-        p = p.map(function (part) {
-          return part.toLowerCase();
-        });
-      } else if (p.length === 2) {
-        p[0] = p[0].toLowerCase();
-        p[1] = p[1].toUpperCase();
-
-        if (specialCases.indexOf(p[1].toLowerCase()) > -1) { p[1] = capitalize(p[1].toLowerCase()); }
-      } else if (p.length === 3) {
-        p[0] = p[0].toLowerCase();
-
-        // if lenght 2 guess it's a country
-        if (p[1].length === 2) { p[1] = p[1].toUpperCase(); }
-        if (p[0] !== 'sgn' && p[2].length === 2) { p[2] = p[2].toUpperCase(); }
-
-        if (specialCases.indexOf(p[1].toLowerCase()) > -1) { p[1] = capitalize(p[1].toLowerCase()); }
-        if (specialCases.indexOf(p[2].toLowerCase()) > -1) { p[2] = capitalize(p[2].toLowerCase()); }
-      }
-
-      return p.join('-');
-    }
-
-    return this.options.cleanCode || this.options.lowerCaseLng ? code.toLowerCase() : code;
-  };
-
-  LanguageUtil.prototype.isWhitelisted = function isWhitelisted(code) {
-    if (this.options.load === 'languageOnly' || this.options.nonExplicitWhitelist) {
-      code = this.getLanguagePartFromCode(code);
-    }
-    return !this.whitelist || !this.whitelist.length || this.whitelist.indexOf(code) > -1;
-  };
-
-  LanguageUtil.prototype.getFallbackCodes = function getFallbackCodes(fallbacks, code) {
-    if (!fallbacks) { return []; }
-    if (typeof fallbacks === 'string') { fallbacks = [fallbacks]; }
-    if (Object.prototype.toString.apply(fallbacks) === '[object Array]') { return fallbacks; }
-
-    if (!code) { return fallbacks.default || []; }
-
-    // asume we have an object defining fallbacks
-    var found = fallbacks[code];
-    if (!found) { found = fallbacks[this.getScriptPartFromCode(code)]; }
-    if (!found) { found = fallbacks[this.formatLanguageCode(code)]; }
-    if (!found) { found = fallbacks.default; }
-
-    return found || [];
-  };
-
-  LanguageUtil.prototype.toResolveHierarchy = function toResolveHierarchy(code, fallbackCode) {
-    var _this = this;
-
-    var fallbackCodes = this.getFallbackCodes(fallbackCode || this.options.fallbackLng || [], code);
-
-    var codes = [];
-    var addCode = function addCode(c) {
-      if (!c) { return; }
-      if (_this.isWhitelisted(c)) {
-        codes.push(c);
-      } else {
-        _this.logger.warn('rejecting non-whitelisted language code: ' + c);
-      }
-    };
-
-    if (typeof code === 'string' && code.indexOf('-') > -1) {
-      if (this.options.load !== 'languageOnly') { addCode(this.formatLanguageCode(code)); }
-      if (this.options.load !== 'languageOnly' && this.options.load !== 'currentOnly') { addCode(this.getScriptPartFromCode(code)); }
-      if (this.options.load !== 'currentOnly') { addCode(this.getLanguagePartFromCode(code)); }
-    } else if (typeof code === 'string') {
-      addCode(this.formatLanguageCode(code));
-    }
-
-    fallbackCodes.forEach(function (fc) {
-      if (codes.indexOf(fc) < 0) { addCode(_this.formatLanguageCode(fc)); }
-    });
-
-    return codes;
-  };
-
-  return LanguageUtil;
-}();
-
-function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// definition http://translate.sourceforge.net/wiki/l10n/pluralforms
-/* eslint-disable */
-var sets = [{ lngs: ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'gun', 'ln', 'mfe', 'mg', 'mi', 'oc', 'pt', 'pt-BR', 'tg', 'ti', 'tr', 'uz', 'wa'], nr: [1, 2], fc: 1 }, { lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'he', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'], nr: [1, 2], fc: 2 }, { lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'], nr: [1], fc: 3 }, { lngs: ['be', 'bs', 'dz', 'hr', 'ru', 'sr', 'uk'], nr: [1, 2, 5], fc: 4 }, { lngs: ['ar'], nr: [0, 1, 2, 3, 11, 100], fc: 5 }, { lngs: ['cs', 'sk'], nr: [1, 2, 5], fc: 6 }, { lngs: ['csb', 'pl'], nr: [1, 2, 5], fc: 7 }, { lngs: ['cy'], nr: [1, 2, 3, 8], fc: 8 }, { lngs: ['fr'], nr: [1, 2], fc: 9 }, { lngs: ['ga'], nr: [1, 2, 3, 7, 11], fc: 10 }, { lngs: ['gd'], nr: [1, 2, 3, 20], fc: 11 }, { lngs: ['is'], nr: [1, 2], fc: 12 }, { lngs: ['jv'], nr: [0, 1], fc: 13 }, { lngs: ['kw'], nr: [1, 2, 3, 4], fc: 14 }, { lngs: ['lt'], nr: [1, 2, 10], fc: 15 }, { lngs: ['lv'], nr: [1, 2, 0], fc: 16 }, { lngs: ['mk'], nr: [1, 2], fc: 17 }, { lngs: ['mnk'], nr: [0, 1, 2], fc: 18 }, { lngs: ['mt'], nr: [1, 2, 11, 20], fc: 19 }, { lngs: ['or'], nr: [2, 1], fc: 2 }, { lngs: ['ro'], nr: [1, 2, 20], fc: 20 }, { lngs: ['sl'], nr: [5, 1, 2, 3], fc: 21 }];
-
-var _rulesPluralsTypes = {
-  1: function _(n) {
-    return Number(n > 1);
-  },
-  2: function _(n) {
-    return Number(n != 1);
-  },
-  3: function _(n) {
-    return 0;
-  },
-  4: function _(n) {
-    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
-  },
-  5: function _(n) {
-    return Number(n === 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 ? 4 : 5);
-  },
-  6: function _(n) {
-    return Number(n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2);
-  },
-  7: function _(n) {
-    return Number(n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
-  },
-  8: function _(n) {
-    return Number(n == 1 ? 0 : n == 2 ? 1 : n != 8 && n != 11 ? 2 : 3);
-  },
-  9: function _(n) {
-    return Number(n >= 2);
-  },
-  10: function _(n) {
-    return Number(n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4);
-  },
-  11: function _(n) {
-    return Number(n == 1 || n == 11 ? 0 : n == 2 || n == 12 ? 1 : n > 2 && n < 20 ? 2 : 3);
-  },
-  12: function _(n) {
-    return Number(n % 10 != 1 || n % 100 == 11);
-  },
-  13: function _(n) {
-    return Number(n !== 0);
-  },
-  14: function _(n) {
-    return Number(n == 1 ? 0 : n == 2 ? 1 : n == 3 ? 2 : 3);
-  },
-  15: function _(n) {
-    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
-  },
-  16: function _(n) {
-    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n !== 0 ? 1 : 2);
-  },
-  17: function _(n) {
-    return Number(n == 1 || n % 10 == 1 ? 0 : 1);
-  },
-  18: function _(n) {
-    return Number(n == 0 ? 0 : n == 1 ? 1 : 2);
-  },
-  19: function _(n) {
-    return Number(n == 1 ? 0 : n === 0 || n % 100 > 1 && n % 100 < 11 ? 1 : n % 100 > 10 && n % 100 < 20 ? 2 : 3);
-  },
-  20: function _(n) {
-    return Number(n == 1 ? 0 : n === 0 || n % 100 > 0 && n % 100 < 20 ? 1 : 2);
-  },
-  21: function _(n) {
-    return Number(n % 100 == 1 ? 1 : n % 100 == 2 ? 2 : n % 100 == 3 || n % 100 == 4 ? 3 : 0);
-  }
+I18nlet.prototype.load = function load (/*langage, terms*/) {
+  this.hook.load.apply(this, arguments);
+  return this;
 };
-/* eslint-enable */
 
-function createRules() {
-  var rules = {};
-  sets.forEach(function (set) {
-    set.lngs.forEach(function (l) {
-      rules[l] = {
-        numbers: set.nr,
-        plurals: _rulesPluralsTypes[set.fc]
-      };
-    });
-  });
-  return rules;
-}
+I18nlet.prototype.loads = function loads (/*data*/) {
+  this.hook.loads.apply(this, arguments);
+  return this;
+};
 
-var PluralResolver = function () {
-  function PluralResolver(languageUtils) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+I18nlet.prototype.changeLangage = function changeLangage (langage) {
+  this.settings.currentLangage = langage || this.settings.defaultLangage;
+};
 
-    _classCallCheck$6(this, PluralResolver);
+I18nlet.prototype.currentLangage = function currentLangage () {
+  return this.settings.currentLangage;
+};
 
-    this.languageUtils = languageUtils;
-    this.options = options;
+I18nlet.prototype._getDefaultText = function _getDefaultText (context, text, defaultText) {
+  if ((typeof text) !== 'undefined' && text !== null) {
+    return text;
+  }
+  this.logger.debug(("context not found. context:'" + context + "'"));
 
-    this.logger = baseLogger.create('pluralResolver');
+  if ((typeof defaultText) === 'string') {
+    return defaultText;
+  }
+  return this.settings.defaultText;
+};
 
-    this.rules = createRules();
+I18nlet.prototype._i18nlet_get_message = function _i18nlet_get_message (context, vals, options) {
+    var this$1 = this;
+ // eslint-disable-line
+  vals = vals || {};
+  options = options || {};
+
+  if ((typeof options.ref) === 'boolean') {
+    options.ref = !!options.ref;
+  } else {
+    options.ref = this.settings.reference;
+  }
+  options.langage = options.langage ? options.langage : this.currentLangage();
+
+  var langageStore = this.store[options.langage];
+  if (!langageStore || !langageStore[context]) {
+    return this._getDefaultText(context, null, options.defaultText);
   }
 
-  PluralResolver.prototype.addRule = function addRule(lng, obj) {
-    this.rules[lng] = obj;
-  };
+  var value = langageStore[context];
 
-  PluralResolver.prototype.getRule = function getRule(code) {
-    return this.rules[code] || this.rules[this.languageUtils.getLanguagePartFromCode(code)];
-  };
+  if (!value) {
+    this.logger.debug(("Context not found. '" + context + "'"));
+  }
 
-  PluralResolver.prototype.needsPlural = function needsPlural(code) {
-    var rule = this.getRule(code);
+  var ret = value;
+  var match;
+  while (match = this.regexp.exec(ret)) { // eslint-disable-line
+    var val = vals[match[1].trim()];
+    if (!val) {
+      this$1.logger.debug(("It can not convert the variable part. '" + (match[0]) + "' for '" + ret + "'"));
+      ret = (typeof this$1.settings.noConvertVariable === 'string') ? ret.replace(match[0], this$1.settings.noConvertVariable) : ret;
+      continue;
+    }
 
-    return rule && rule.numbers.length > 1;
-  };
+    ret = ret.replace(match[0], val);
+    this$1.regexp.lastIndex = 0;
+  }
 
-  PluralResolver.prototype.getPluralFormsOfKey = function getPluralFormsOfKey(code, key) {
-    var _this = this;
-
-    var ret = [];
-
-    var rule = this.getRule(code);
-
-    rule.numbers.forEach(function (n) {
-      var suffix = _this.getSuffix(code, n);
-      ret.push('' + key + suffix);
-    });
-
+  if (!options.ref) {
     return ret;
-  };
-
-  PluralResolver.prototype.getSuffix = function getSuffix(code, count) {
-    var _this2 = this;
-
-    var rule = this.getRule(code);
-
-    if (rule) {
-      // if (rule.numbers.length === 1) return ''; // only singular
-
-      var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
-      var suffix = rule.numbers[idx];
-
-      // special treatment for lngs only having singular and plural
-      if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
-        if (suffix === 2) {
-          suffix = 'plural';
-        } else if (suffix === 1) {
-          suffix = '';
-        }
-      }
-
-      var returnSuffix = function returnSuffix() {
-        return _this2.options.prepend && suffix.toString() ? _this2.options.prepend + suffix.toString() : suffix.toString();
-      };
-
-      // COMPATIBILITY JSON
-      // v1
-      if (this.options.compatibilityJSON === 'v1') {
-        if (suffix === 1) { return ''; }
-        if (typeof suffix === 'number') { return '_plural_' + suffix.toString(); }
-        return returnSuffix();
-      } else if ( /* v2 */this.options.compatibilityJSON === 'v2' || rule.numbers.length === 2 && rule.numbers[0] === 1) {
-        return returnSuffix();
-      } else if ( /* v3 - gettext index */rule.numbers.length === 2 && rule.numbers[0] === 1) {
-        return returnSuffix();
-      }
-      return this.options.prepend && idx.toString() ? this.options.prepend + idx.toString() : idx.toString();
-    }
-
-    this.logger.warn('no plural rule found for: ' + code);
-    return '';
-  };
-
-  return PluralResolver;
-}();
-
-var _extends$4 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Interpolator = function () {
-  function Interpolator() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck$7(this, Interpolator);
-
-    this.logger = baseLogger.create('interpolator');
-
-    this.init(options, true);
   }
 
-  /* eslint no-param-reassign: 0 */
-
-
-  Interpolator.prototype.init = function init() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var reset = arguments[1];
-
-    if (reset) {
-      this.options = options;
-      this.format = options.interpolation && options.interpolation.format || function (value) {
-        return value;
-      };
-      this.escape = options.interpolation && options.interpolation.escape || escape$1;
-    }
-    if (!options.interpolation) { options.interpolation = { escapeValue: true }; }
-
-    var iOpts = options.interpolation;
-
-    this.escapeValue = iOpts.escapeValue !== undefined ? iOpts.escapeValue : true;
-
-    this.prefix = iOpts.prefix ? regexEscape(iOpts.prefix) : iOpts.prefixEscaped || '{{';
-    this.suffix = iOpts.suffix ? regexEscape(iOpts.suffix) : iOpts.suffixEscaped || '}}';
-
-    this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ',';
-
-    this.unescapePrefix = iOpts.unescapeSuffix ? '' : iOpts.unescapePrefix || '-';
-    this.unescapeSuffix = this.unescapePrefix ? '' : iOpts.unescapeSuffix || '';
-
-    this.nestingPrefix = iOpts.nestingPrefix ? regexEscape(iOpts.nestingPrefix) : iOpts.nestingPrefixEscaped || regexEscape('$t(');
-    this.nestingSuffix = iOpts.nestingSuffix ? regexEscape(iOpts.nestingSuffix) : iOpts.nestingSuffixEscaped || regexEscape(')');
-
-    this.maxReplaces = iOpts.maxReplaces ? iOpts.maxReplaces : 1000;
-
-    // the regexp
-    this.resetRegExp();
-  };
-
-  Interpolator.prototype.reset = function reset() {
-    if (this.options) { this.init(this.options); }
-  };
-
-  Interpolator.prototype.resetRegExp = function resetRegExp() {
-    // the regexp
-    var regexpStr = this.prefix + '(.+?)' + this.suffix;
-    this.regexp = new RegExp(regexpStr, 'g');
-
-    var regexpUnescapeStr = '' + this.prefix + this.unescapePrefix + '(.+?)' + this.unescapeSuffix + this.suffix;
-    this.regexpUnescape = new RegExp(regexpUnescapeStr, 'g');
-
-    var nestingRegexpStr = this.nestingPrefix + '(.+?)' + this.nestingSuffix;
-    this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
-  };
-
-  Interpolator.prototype.interpolate = function interpolate(str, data, lng) {
-    var _this = this;
-
-    var match = void 0;
-    var value = void 0;
-    var replaces = void 0;
-
-    function regexSafe(val) {
-      return val.replace(/\$/g, '$$$$');
+  var matchRef;
+  while (matchRef = this.regexp.exec(ret)) { // eslint-disable-line
+    var ctxRef = matchRef[1].trim();
+    var valRef = langageStore[ctxRef];
+    if (!valRef) {
+      this$1.logger.debug(("It can not convert the constant part. '" + (matchRef[0]) + "' for '" + ret + "'"));
+      ret = (typeof this$1.settings.noConvertVariable === 'string') ? ret.replace(matchRef[0], this$1.settings.noConvertVariable) : ret;
+      continue;
     }
 
-    var handleFormat = function handleFormat(key) {
-      if (key.indexOf(_this.formatSeparator) < 0) { return getPath(data, key); }
+    ret = ret.replace(matchRef[0], valRef);
+    this$1.regexp.lastIndex = 0;
 
-      var p = key.split(_this.formatSeparator);
-      var k = p.shift().trim();
-      var f = p.join(_this.formatSeparator).trim();
+  }
 
-      return _this.format(getPath(data, k), f, lng);
+  return ret;
+
+};
+
+riot$1.tag2('riot-i18nlet', '<span>{message}</span>', '', 'class="{opts.class}" riot-style="{opts.style}"', function(opts) {
+    this.message = this[this.riotI18nlet.settings.getMessageFunctionName](opts.context, opts.vals, opts.options);
+
+    this.on('update', function () {
+      this.message = this[this.riotI18nlet.settings.getMessageFunctionName](opts.context, opts.vals, opts.options);
+    });
+});
+
+/*global VERSION*/
+
+/**
+ * @class RiotI18nlet
+ */
+var RiotI18nlet = (function (I18nlet$$1) {
+  function RiotI18nlet () {
+    I18nlet$$1.apply(this, arguments);
+  }
+
+  if ( I18nlet$$1 ) { RiotI18nlet.__proto__ = I18nlet$$1; }
+  RiotI18nlet.prototype = Object.create( I18nlet$$1 && I18nlet$$1.prototype );
+  RiotI18nlet.prototype.constructor = RiotI18nlet;
+
+  RiotI18nlet.prototype.init = function init (settings) {
+    I18nlet$$1.prototype.init.call(this, settings);
+    this.version = "riot-i18nlet: " + VERSION + ", i18nlet: " + (this.version);
+
+    // register a mixin globally.
+    var mixinOptions = {};
+    var self = this;
+    mixinOptions[this.settings.getMessageFunctionName] = function () {
+      return self[self.settings.getMessageFunctionName].apply(self, arguments);
     };
+    mixinOptions.riotI18nlet = this;
 
-    this.resetRegExp();
-
-    replaces = 0;
-    // unescape if has unescapePrefix/Suffix
-    /* eslint no-cond-assign: 0 */
-    while (match = this.regexpUnescape.exec(str)) {
-      value = handleFormat(match[1].trim());
-      str = str.replace(match[0], value);
-      this.regexpUnescape.lastIndex = 0;
-      replaces++;
-      if (replaces >= this.maxReplaces) {
-        break;
-      }
-    }
-
-    replaces = 0;
-    // regular escape on demand
-    while (match = this.regexp.exec(str)) {
-      value = handleFormat(match[1].trim());
-      if (typeof value !== 'string') { value = makeString(value); }
-      if (!value) {
-        this.logger.warn('missed to pass in variable ' + match[1] + ' for interpolating ' + str);
-        value = '';
-      }
-      value = this.escapeValue ? regexSafe(this.escape(value)) : regexSafe(value);
-      str = str.replace(match[0], value);
-      this.regexp.lastIndex = 0;
-      replaces++;
-      if (replaces >= this.maxReplaces) {
-        break;
-      }
-    }
-    return str;
-  };
-
-  Interpolator.prototype.nest = function nest(str, fc) {
-    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-    var match = void 0;
-    var value = void 0;
-
-    var clonedOptions = _extends$4({}, options);
-    clonedOptions.applyPostProcessor = false; // avoid post processing on nested lookup
-
-    // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
-    function handleHasOptions(key, inheritedOptions) {
-      if (key.indexOf(',') < 0) { return key; }
-
-      var p = key.split(',');
-      key = p.shift();
-      var optionsString = p.join(',');
-      optionsString = this.interpolate(optionsString, clonedOptions);
-      optionsString = optionsString.replace(/'/g, '"');
-
-      try {
-        clonedOptions = JSON.parse(optionsString);
-
-        if (inheritedOptions) { clonedOptions = _extends$4({}, inheritedOptions, clonedOptions); }
-      } catch (e) {
-        this.logger.error('failed parsing options string in nesting for key ' + key, e);
-      }
-
-      return key;
-    }
-
-    // regular escape on demand
-    while (match = this.nestingRegexp.exec(str)) {
-      value = fc(handleHasOptions.call(this, match[1].trim(), clonedOptions), clonedOptions);
-
-      // is only the nesting key (key1 = '$(key2)') return the value without stringify
-      if (value && match[0] === str && typeof value !== 'string') { return value; }
-
-      // no string to include or empty
-      if (typeof value !== 'string') { value = makeString(value); }
-      if (!value) {
-        this.logger.warn('missed to resolve ' + match[1] + ' for nesting ' + str);
-        value = '';
-      }
-      // Nested keys should not be escaped by default #854
-      // value = this.escapeValue ? regexSafe(utils.escape(value)) : regexSafe(value);
-      str = str.replace(match[0], value);
-      this.regexp.lastIndex = 0;
-    }
-    return str;
-  };
-
-  return Interpolator;
-}();
-
-var _extends$5 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) { break; } } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) { _i["return"](); } } finally { if (_d) { throw _e; } } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-function _defaults$3(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
-
-function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$3(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$3(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults$3(subClass, superClass); } }
-
-function remove(arr, what) {
-  var found = arr.indexOf(what);
-
-  while (found !== -1) {
-    arr.splice(found, 1);
-    found = arr.indexOf(what);
-  }
-}
-
-var Connector = function (_EventEmitter) {
-  _inherits$3(Connector, _EventEmitter);
-
-  function Connector(backend, store, services) {
-    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-
-    _classCallCheck$8(this, Connector);
-
-    var _this = _possibleConstructorReturn$3(this, _EventEmitter.call(this));
-
-    _this.backend = backend;
-    _this.store = store;
-    _this.languageUtils = services.languageUtils;
-    _this.options = options;
-    _this.logger = baseLogger.create('backendConnector');
-
-    _this.state = {};
-    _this.queue = [];
-
-    if (_this.backend && _this.backend.init) {
-      _this.backend.init(services, options.backend, options);
-    }
-    return _this;
-  }
-
-  Connector.prototype.queueLoad = function queueLoad(languages, namespaces, callback) {
-    var _this2 = this;
-
-    // find what needs to be loaded
-    var toLoad = [];
-    var pending = [];
-    var toLoadLanguages = [];
-    var toLoadNamespaces = [];
-
-    languages.forEach(function (lng) {
-      var hasAllNamespaces = true;
-
-      namespaces.forEach(function (ns) {
-        var name = lng + '|' + ns;
-
-        if (_this2.store.hasResourceBundle(lng, ns)) {
-          _this2.state[name] = 2; // loaded
-        } else if (_this2.state[name] < 0) {
-          // nothing to do for err
-        } else if (_this2.state[name] === 1) {
-          if (pending.indexOf(name) < 0) { pending.push(name); }
-        } else {
-          _this2.state[name] = 1; // pending
-
-          hasAllNamespaces = false;
-
-          if (pending.indexOf(name) < 0) { pending.push(name); }
-          if (toLoad.indexOf(name) < 0) { toLoad.push(name); }
-          if (toLoadNamespaces.indexOf(ns) < 0) { toLoadNamespaces.push(ns); }
-        }
-      });
-
-      if (!hasAllNamespaces) { toLoadLanguages.push(lng); }
-    });
-
-    if (toLoad.length || pending.length) {
-      this.queue.push({
-        pending: pending,
-        loaded: {},
-        errors: [],
-        callback: callback
-      });
-    }
-
-    return {
-      toLoad: toLoad,
-      pending: pending,
-      toLoadLanguages: toLoadLanguages,
-      toLoadNamespaces: toLoadNamespaces
-    };
-  };
-
-  Connector.prototype.loaded = function loaded(name, err, data) {
-    var _this3 = this;
-
-    var _name$split = name.split('|'),
-        _name$split2 = _slicedToArray(_name$split, 2),
-        lng = _name$split2[0],
-        ns = _name$split2[1];
-
-    if (err) { this.emit('failedLoading', lng, ns, err); }
-
-    if (data) {
-      this.store.addResourceBundle(lng, ns, data);
-    }
-
-    // set loaded
-    this.state[name] = err ? -1 : 2;
-
-    // callback if ready
-    this.queue.forEach(function (q) {
-      pushPath(q.loaded, [lng], ns);
-      remove(q.pending, name);
-
-      if (err) { q.errors.push(err); }
-
-      if (q.pending.length === 0 && !q.done) {
-        _this3.emit('loaded', q.loaded);
-        /* eslint no-param-reassign: 0 */
-        q.done = true;
-        if (q.errors.length) {
-          q.callback(q.errors);
-        } else {
-          q.callback();
-        }
-      }
-    });
-
-    // remove done load requests
-    this.queue = this.queue.filter(function (q) {
-      return !q.done;
-    });
-  };
-
-  Connector.prototype.read = function read(lng, ns, fcName) {
-    var tried = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-
-    var _this4 = this;
-
-    var wait = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 250;
-    var callback = arguments[5];
-
-    if (!lng.length) { return callback(null, {}); } // noting to load
-
-    return this.backend[fcName](lng, ns, function (err, data) {
-      if (err && data /* = retryFlag */ && tried < 5) {
-        setTimeout(function () {
-          _this4.read.call(_this4, lng, ns, fcName, tried + 1, wait * 2, callback);
-        }, wait);
-        return;
-      }
-      callback(err, data);
-    });
-  };
-
-  /* eslint consistent-return: 0 */
-
-
-  Connector.prototype.load = function load(languages, namespaces, callback) {
-    var _this5 = this;
-
-    if (!this.backend) {
-      this.logger.warn('No backend was added via i18next.use. Will not load resources.');
-      return callback && callback();
-    }
-    var options = _extends$5({}, this.backend.options, this.options.backend);
-
-    if (typeof languages === 'string') { languages = this.languageUtils.toResolveHierarchy(languages); }
-    if (typeof namespaces === 'string') { namespaces = [namespaces]; }
-
-    var toLoad = this.queueLoad(languages, namespaces, callback);
-    if (!toLoad.toLoad.length) {
-      if (!toLoad.pending.length) { callback(); } // nothing to load and no pendings...callback now
-      return null; // pendings will trigger callback
-    }
-
-    // load with multi-load
-    if (options.allowMultiLoading && this.backend.readMulti) {
-      this.read(toLoad.toLoadLanguages, toLoad.toLoadNamespaces, 'readMulti', null, null, function (err, data) {
-        if (err) { _this5.logger.warn('loading namespaces ' + toLoad.toLoadNamespaces.join(', ') + ' for languages ' + toLoad.toLoadLanguages.join(', ') + ' via multiloading failed', err); }
-        if (!err && data) { _this5.logger.log('successfully loaded namespaces ' + toLoad.toLoadNamespaces.join(', ') + ' for languages ' + toLoad.toLoadLanguages.join(', ') + ' via multiloading', data); }
-
-        toLoad.toLoad.forEach(function (name) {
-          var _name$split3 = name.split('|'),
-              _name$split4 = _slicedToArray(_name$split3, 2),
-              l = _name$split4[0],
-              n = _name$split4[1];
-
-          var bundle = getPath(data, [l, n]);
-          if (bundle) {
-            _this5.loaded(name, err, bundle);
-          } else {
-            var error = 'loading namespace ' + n + ' for language ' + l + ' via multiloading failed';
-            _this5.loaded(name, error);
-            _this5.logger.error(error);
-          }
-        });
-      });
-    } else {
-      toLoad.toLoad.forEach(function (name) {
-        _this5.loadOne(name);
-      });
-    }
-  };
-
-  Connector.prototype.reload = function reload(languages, namespaces) {
-    var _this6 = this;
-
-    if (!this.backend) {
-      this.logger.warn('No backend was added via i18next.use. Will not load resources.');
-    }
-    var options = _extends$5({}, this.backend.options, this.options.backend);
-
-    if (typeof languages === 'string') { languages = this.languageUtils.toResolveHierarchy(languages); }
-    if (typeof namespaces === 'string') { namespaces = [namespaces]; }
-
-    // load with multi-load
-    if (options.allowMultiLoading && this.backend.readMulti) {
-      this.read(languages, namespaces, 'readMulti', null, null, function (err, data) {
-        if (err) { _this6.logger.warn('reloading namespaces ' + namespaces.join(', ') + ' for languages ' + languages.join(', ') + ' via multiloading failed', err); }
-        if (!err && data) { _this6.logger.log('successfully reloaded namespaces ' + namespaces.join(', ') + ' for languages ' + languages.join(', ') + ' via multiloading', data); }
-
-        languages.forEach(function (l) {
-          namespaces.forEach(function (n) {
-            var bundle = getPath(data, [l, n]);
-            if (bundle) {
-              _this6.loaded(l + '|' + n, err, bundle);
-            } else {
-              var error = 'reloading namespace ' + n + ' for language ' + l + ' via multiloading failed';
-              _this6.loaded(l + '|' + n, error);
-              _this6.logger.error(error);
-            }
-          });
-        });
-      });
-    } else {
-      languages.forEach(function (l) {
-        namespaces.forEach(function (n) {
-          _this6.loadOne(l + '|' + n, 're');
-        });
-      });
-    }
-  };
-
-  Connector.prototype.loadOne = function loadOne(name) {
-    var _this7 = this;
-
-    var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-    var _name$split5 = name.split('|'),
-        _name$split6 = _slicedToArray(_name$split5, 2),
-        lng = _name$split6[0],
-        ns = _name$split6[1];
-
-    this.read(lng, ns, 'read', null, null, function (err, data) {
-      if (err) { _this7.logger.warn(prefix + 'loading namespace ' + ns + ' for language ' + lng + ' failed', err); }
-      if (!err && data) { _this7.logger.log(prefix + 'loaded namespace ' + ns + ' for language ' + lng, data); }
-
-      _this7.loaded(name, err, data);
-    });
-  };
-
-  Connector.prototype.saveMissing = function saveMissing(languages, namespace, key, fallbackValue, isUpdate) {
-    if (this.backend && this.backend.create) { this.backend.create(languages, namespace, key, fallbackValue, null /* unused callback */, { isUpdate: isUpdate }); }
-
-    // write to store to avoid resending
-    if (!languages || !languages[0]) { return; }
-    this.store.addResource(languages[0], namespace, key, fallbackValue);
-  };
-
-  return Connector;
-}(EventEmitter);
-
-var _extends$6 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _defaults$4(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
-
-function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$4(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$4(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults$4(subClass, superClass); } }
-
-var Connector$1 = function (_EventEmitter) {
-  _inherits$4(Connector, _EventEmitter);
-
-  function Connector(cache, store, services) {
-    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-
-    _classCallCheck$9(this, Connector);
-
-    var _this = _possibleConstructorReturn$4(this, _EventEmitter.call(this));
-
-    _this.cache = cache;
-    _this.store = store;
-    _this.services = services;
-    _this.options = options;
-    _this.logger = baseLogger.create('cacheConnector');
-
-    if (_this.cache && _this.cache.init) { _this.cache.init(services, options.cache, options); }
-    return _this;
-  }
-
-  /* eslint consistent-return: 0 */
-
-
-  Connector.prototype.load = function load(languages, namespaces, callback) {
-    var _this2 = this;
-
-    if (!this.cache) { return callback && callback(); }
-    var options = _extends$6({}, this.cache.options, this.options.cache);
-
-    var loadLngs = typeof languages === 'string' ? this.services.languageUtils.toResolveHierarchy(languages) : languages;
-
-    if (options.enabled) {
-      this.cache.load(loadLngs, function (err, data) {
-        if (err) { _this2.logger.error('loading languages ' + loadLngs.join(', ') + ' from cache failed', err); }
-        if (data) {
-          /* eslint no-restricted-syntax: 0 */
-          for (var l in data) {
-            if (Object.prototype.hasOwnProperty.call(data, l)) {
-              for (var n in data[l]) {
-                if (Object.prototype.hasOwnProperty.call(data[l], n)) {
-                  if (n !== 'i18nStamp') {
-                    var bundle = data[l][n];
-                    if (bundle) { _this2.store.addResourceBundle(l, n, bundle); }
-                  }
-                }
-              }
-            }
-          }
-        }
-        if (callback) { callback(); }
-      });
-    } else if (callback) {
-      callback();
-    }
-  };
-
-  Connector.prototype.save = function save() {
-    if (this.cache && this.options.cache && this.options.cache.enabled) { this.cache.save(this.store.data); }
-  };
-
-  return Connector;
-}(EventEmitter);
-
-function get() {
-  return {
-    debug: false,
-    initImmediate: true,
-
-    ns: ['translation'],
-    defaultNS: ['translation'],
-    fallbackLng: ['dev'],
-    fallbackNS: false, // string or array of namespaces
-
-    whitelist: false, // array with whitelisted languages
-    nonExplicitWhitelist: false,
-    load: 'all', // | currentOnly | languageOnly
-    preload: false, // array with preload languages
-
-    simplifyPluralSuffix: true,
-    keySeparator: '.',
-    nsSeparator: ':',
-    pluralSeparator: '_',
-    contextSeparator: '_',
-
-    saveMissing: false, // enable to send missing values
-    updateMissing: false, // enable to update default values if different from translated value (only useful on initial development, or when keeping code as source of truth)
-    saveMissingTo: 'fallback', // 'current' || 'all'
-    saveMissingPlurals: true, // will save all forms not only singular key
-    missingKeyHandler: false, // function(lng, ns, key, fallbackValue) -> override if prefer on handling
-
-    postProcess: false, // string or array of postProcessor names
-    returnNull: true, // allows null value as valid translation
-    returnEmptyString: true, // allows empty string value as valid translation
-    returnObjects: false,
-    joinArrays: false, // or string to join array
-    returnedObjectHandler: function returnedObjectHandler() {}, // function(key, value, options) triggered if key returns object but returnObjects is set to false
-    parseMissingKeyHandler: false, // function(key) parsed a key that was not found in t() before returning
-    appendNamespaceToMissingKey: false,
-    appendNamespaceToCIMode: false,
-    overloadTranslationOptionHandler: function handle(args) {
-      return { defaultValue: args[1] };
-    },
-
-    interpolation: {
-      escapeValue: true,
-      format: function format(value, _format, lng) {
-        return value;
-      },
-      prefix: '{{',
-      suffix: '}}',
-      formatSeparator: ',',
-      // prefixEscaped: '{{',
-      // suffixEscaped: '}}',
-      // unescapeSuffix: '',
-      unescapePrefix: '-',
-
-      nestingPrefix: '$t(',
-      nestingSuffix: ')',
-      // nestingPrefixEscaped: '$t(',
-      // nestingSuffixEscaped: ')',
-      // defaultVariables: undefined // object that can have values to interpolate on - extends passed in interpolation data
-      maxReplaces: 1000 // max replaces to prevent endless loop
-    }
-  };
-}
-
-/* eslint no-param-reassign: 0 */
-function transformOptions(options) {
-  // create namespace object if namespace is passed in as string
-  if (typeof options.ns === 'string') { options.ns = [options.ns]; }
-  if (typeof options.fallbackLng === 'string') { options.fallbackLng = [options.fallbackLng]; }
-  if (typeof options.fallbackNS === 'string') { options.fallbackNS = [options.fallbackNS]; }
-
-  // extend whitelist with cimode
-  if (options.whitelist && options.whitelist.indexOf('cimode') < 0) { options.whitelist.push('cimode'); }
-
-  return options;
-}
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) { Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); } }
-
-function noop() {}
-
-var I18n = function (_EventEmitter) {
-  _inherits(I18n, _EventEmitter);
-
-  function I18n() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var callback = arguments[1];
-
-    _classCallCheck(this, I18n);
-
-    var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
-
-    _this.options = transformOptions(options);
-    _this.services = {};
-    _this.logger = baseLogger;
-    _this.modules = { external: [] };
-
-    if (callback && !_this.isInitialized && !options.isClone) {
-      var _ret;
-
-      // https://github.com/i18next/i18next/issues/879
-      if (!_this.options.initImmediate) { return _ret = _this.init(options, callback), _possibleConstructorReturn(_this, _ret); }
-      setTimeout(function () {
-        _this.init(options, callback);
-      }, 0);
-    }
-    return _this;
-  }
-
-  I18n.prototype.init = function init() {
-    var _this2 = this;
-
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var callback = arguments[1];
-
-    if (typeof options === 'function') {
-      callback = options;
-      options = {};
-    }
-    this.options = _extends({}, get(), this.options, transformOptions(options));
-
-    this.format = this.options.interpolation.format;
-    if (!callback) { callback = noop; }
-
-    function createClassOnDemand(ClassOrObject) {
-      if (!ClassOrObject) { return null; }
-      if (typeof ClassOrObject === 'function') { return new ClassOrObject(); }
-      return ClassOrObject;
-    }
-
-    // init services
-    if (!this.options.isClone) {
-      if (this.modules.logger) {
-        baseLogger.init(createClassOnDemand(this.modules.logger), this.options);
-      } else {
-        baseLogger.init(null, this.options);
-      }
-
-      var lu = new LanguageUtil(this.options);
-      this.store = new ResourceStore(this.options.resources, this.options);
-
-      var s = this.services;
-      s.logger = baseLogger;
-      s.resourceStore = this.store;
-      s.resourceStore.on('added removed', function (lng, ns) {
-        s.cacheConnector.save();
-      });
-      s.languageUtils = lu;
-      s.pluralResolver = new PluralResolver(lu, { prepend: this.options.pluralSeparator, compatibilityJSON: this.options.compatibilityJSON, simplifyPluralSuffix: this.options.simplifyPluralSuffix });
-      s.interpolator = new Interpolator(this.options);
-
-      s.backendConnector = new Connector(createClassOnDemand(this.modules.backend), s.resourceStore, s, this.options);
-      // pipe events from backendConnector
-      s.backendConnector.on('*', function (event) {
-        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        _this2.emit.apply(_this2, [event].concat(args));
-      });
-
-      s.backendConnector.on('loaded', function (loaded) {
-        s.cacheConnector.save();
-      });
-
-      s.cacheConnector = new Connector$1(createClassOnDemand(this.modules.cache), s.resourceStore, s, this.options);
-      // pipe events from backendConnector
-      s.cacheConnector.on('*', function (event) {
-        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-          args[_key2 - 1] = arguments[_key2];
-        }
-
-        _this2.emit.apply(_this2, [event].concat(args));
-      });
-
-      if (this.modules.languageDetector) {
-        s.languageDetector = createClassOnDemand(this.modules.languageDetector);
-        s.languageDetector.init(s, this.options.detection, this.options);
-      }
-
-      this.translator = new Translator(this.services, this.options);
-      // pipe events from translator
-      this.translator.on('*', function (event) {
-        for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-          args[_key3 - 1] = arguments[_key3];
-        }
-
-        _this2.emit.apply(_this2, [event].concat(args));
-      });
-
-      this.modules.external.forEach(function (m) {
-        if (m.init) { m.init(_this2); }
-      });
-    }
-
-    // append api
-    var storeApi = ['getResource', 'addResource', 'addResources', 'addResourceBundle', 'removeResourceBundle', 'hasResourceBundle', 'getResourceBundle'];
-    storeApi.forEach(function (fcName) {
-      _this2[fcName] = function () {
-        var _store;
-
-        return (_store = _this2.store)[fcName].apply(_store, arguments);
-      };
-    });
-
-    var load = function load() {
-      _this2.changeLanguage(_this2.options.lng, function (err, t) {
-        _this2.isInitialized = true;
-        _this2.logger.log('initialized', _this2.options);
-        _this2.emit('initialized', _this2.options);
-
-        callback(err, t);
-      });
-    };
-
-    if (this.options.resources || !this.options.initImmediate) {
-      load();
-    } else {
-      setTimeout(load, 0);
-    }
-
+    riot$1.mixin(mixinOptions);
     return this;
   };
 
-  /* eslint consistent-return: 0 */
-
-
-  I18n.prototype.loadResources = function loadResources() {
-    var _this3 = this;
-
-    var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
-
-    if (!this.options.resources) {
-      if (this.language && this.language.toLowerCase() === 'cimode') { return callback(); } // avoid loading resources for cimode
-
-      var toLoad = [];
-
-      var append = function append(lng) {
-        if (!lng) { return; }
-        var lngs = _this3.services.languageUtils.toResolveHierarchy(lng);
-        lngs.forEach(function (l) {
-          if (toLoad.indexOf(l) < 0) { toLoad.push(l); }
-        });
-      };
-
-      if (!this.language) {
-        // at least load fallbacks in this case
-        var fallbacks = this.services.languageUtils.getFallbackCodes(this.options.fallbackLng);
-        fallbacks.forEach(function (l) {
-          return append(l);
-        });
-      } else {
-        append(this.language);
-      }
-
-      if (this.options.preload) {
-        this.options.preload.forEach(function (l) {
-          return append(l);
-        });
-      }
-
-      this.services.cacheConnector.load(toLoad, this.options.ns, function () {
-        _this3.services.backendConnector.load(toLoad, _this3.options.ns, callback);
-      });
-    } else {
-      callback(null);
-    }
-  };
-
-  I18n.prototype.reloadResources = function reloadResources(lngs, ns) {
-    if (!lngs) { lngs = this.languages; }
-    if (!ns) { ns = this.options.ns; }
-    this.services.backendConnector.reload(lngs, ns);
-  };
-
-  I18n.prototype.use = function use(module) {
-    if (module.type === 'backend') {
-      this.modules.backend = module;
-    }
-
-    if (module.type === 'cache') {
-      this.modules.cache = module;
-    }
-
-    if (module.type === 'logger' || module.log && module.warn && module.error) {
-      this.modules.logger = module;
-    }
-
-    if (module.type === 'languageDetector') {
-      this.modules.languageDetector = module;
-    }
-
-    if (module.type === 'postProcessor') {
-      postProcessor.addPostProcessor(module);
-    }
-
-    if (module.type === '3rdParty') {
-      this.modules.external.push(module);
-    }
-
-    return this;
-  };
-
-  I18n.prototype.changeLanguage = function changeLanguage(lng, callback) {
-    var _this4 = this;
-
-    var done = function done(err, l) {
-      _this4.translator.changeLanguage(l);
-
-      if (l) {
-        _this4.emit('languageChanged', l);
-        _this4.logger.log('languageChanged', l);
-      }
-
-      if (callback) { callback(err, function () {
-        return _this4.t.apply(_this4, arguments);
-      }); }
-    };
-
-    var setLng = function setLng(l) {
-      if (l) {
-        _this4.language = l;
-        _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l);
-        if (!_this4.translator.language) { _this4.translator.changeLanguage(l); }
-
-        if (_this4.services.languageDetector) { _this4.services.languageDetector.cacheUserLanguage(l); }
-      }
-
-      _this4.loadResources(function (err) {
-        done(err, l);
-      });
-    };
-
-    if (!lng && this.services.languageDetector && !this.services.languageDetector.async) {
-      setLng(this.services.languageDetector.detect());
-    } else if (!lng && this.services.languageDetector && this.services.languageDetector.async) {
-      this.services.languageDetector.detect(setLng);
-    } else {
-      setLng(lng);
-    }
-  };
-
-  I18n.prototype.getFixedT = function getFixedT(lng, ns) {
-    var _this5 = this;
-
-    var fixedT = function fixedT(key, opts) {
-      for (var _len4 = arguments.length, rest = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
-        rest[_key4 - 2] = arguments[_key4];
-      }
-
-      var options = _extends({}, opts);
-      if ((typeof opts === 'undefined' ? 'undefined' : _typeof(opts)) !== 'object') {
-        options = _this5.options.overloadTranslationOptionHandler([key, opts].concat(rest));
-      }
-
-      options.lng = options.lng || fixedT.lng;
-      options.lngs = options.lngs || fixedT.lngs;
-      options.ns = options.ns || fixedT.ns;
-      return _this5.t(key, options);
-    };
-    if (typeof lng === 'string') {
-      fixedT.lng = lng;
-    } else {
-      fixedT.lngs = lng;
-    }
-    fixedT.ns = ns;
-    return fixedT;
-  };
-
-  I18n.prototype.t = function t() {
-    var _translator;
-
-    return this.translator && (_translator = this.translator).translate.apply(_translator, arguments);
-  };
-
-  I18n.prototype.exists = function exists() {
-    var _translator2;
-
-    return this.translator && (_translator2 = this.translator).exists.apply(_translator2, arguments);
-  };
-
-  I18n.prototype.setDefaultNamespace = function setDefaultNamespace(ns) {
-    this.options.defaultNS = ns;
-  };
-
-  I18n.prototype.loadNamespaces = function loadNamespaces(ns, callback) {
-    var _this6 = this;
-
-    if (!this.options.ns) { return callback && callback(); }
-    if (typeof ns === 'string') { ns = [ns]; }
-
-    ns.forEach(function (n) {
-      if (_this6.options.ns.indexOf(n) < 0) { _this6.options.ns.push(n); }
-    });
-
-    this.loadResources(callback);
-  };
-
-  I18n.prototype.loadLanguages = function loadLanguages(lngs, callback) {
-    if (typeof lngs === 'string') { lngs = [lngs]; }
-    var preloaded = this.options.preload || [];
-
-    var newLngs = lngs.filter(function (lng) {
-      return preloaded.indexOf(lng) < 0;
-    });
-    // Exit early if all given languages are already preloaded
-    if (!newLngs.length) { return callback(); }
-
-    this.options.preload = preloaded.concat(newLngs);
-    this.loadResources(callback);
-  };
-
-  I18n.prototype.dir = function dir(lng) {
-    if (!lng) { lng = this.languages && this.languages.length > 0 ? this.languages[0] : this.language; }
-    if (!lng) { return 'rtl'; }
-
-    var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
-
-    return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
-  };
-
-  /* eslint class-methods-use-this: 0 */
-
-
-  I18n.prototype.createInstance = function createInstance() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var callback = arguments[1];
-
-    return new I18n(options, callback);
-  };
-
-  I18n.prototype.cloneInstance = function cloneInstance() {
-    var _this7 = this;
-
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
-
-    var mergedOptions = _extends({}, this.options, options, { isClone: true });
-    var clone = new I18n(mergedOptions);
-    var membersToCopy = ['store', 'services', 'language'];
-    membersToCopy.forEach(function (m) {
-      clone[m] = _this7[m];
-    });
-    clone.translator = new Translator(clone.services, clone.options);
-    clone.translator.on('*', function (event) {
-      for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-        args[_key5 - 1] = arguments[_key5];
-      }
-
-      clone.emit.apply(clone, [event].concat(args));
-    });
-    clone.init(mergedOptions, callback);
-    clone.translator.options = clone.options; // sync options
-
-    return clone;
-  };
-
-  return I18n;
-}(EventEmitter);
-
-var i18next$1 = new I18n();
-
-var changeLanguage = i18next$1.changeLanguage.bind(i18next$1);
-var cloneInstance = i18next$1.cloneInstance.bind(i18next$1);
-var createInstance = i18next$1.createInstance.bind(i18next$1);
-var dir = i18next$1.dir.bind(i18next$1);
-var exists = i18next$1.exists.bind(i18next$1);
-var getFixedT = i18next$1.getFixedT.bind(i18next$1);
-var init = i18next$1.init.bind(i18next$1);
-var loadLanguages = i18next$1.loadLanguages.bind(i18next$1);
-var loadNamespaces = i18next$1.loadNamespaces.bind(i18next$1);
-var loadResources = i18next$1.loadResources.bind(i18next$1);
-var off = i18next$1.off.bind(i18next$1);
-var on = i18next$1.on.bind(i18next$1);
-var setDefaultNamespace = i18next$1.setDefaultNamespace.bind(i18next$1);
-var t = i18next$1.t.bind(i18next$1);
-var use = i18next$1.use.bind(i18next$1);
-
-var arr = [];
-var each = arr.forEach;
-var slice = arr.slice;
-
-function defaults(obj) {
-  each.call(slice.call(arguments, 1), function (source) {
-    if (source) {
-      for (var prop in source) {
-        if (obj[prop] === undefined) { obj[prop] = source[prop]; }
-      }
-    }
-  });
-  return obj;
-}
-
-var cookie = {
-  create: function create(name, value, minutes, domain) {
-    var expires = void 0;
-    if (minutes) {
-      var date = new Date();
-      date.setTime(date.getTime() + minutes * 60 * 1000);
-      expires = '; expires=' + date.toGMTString();
-    } else { expires = ''; }
-    domain = domain ? 'domain=' + domain + ';' : '';
-    document.cookie = name + '=' + value + expires + ';' + domain + 'path=/';
-  },
-
-  read: function read(name) {
-    var nameEQ = name + '=';
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) === ' ') {
-        c = c.substring(1, c.length);
-      }if (c.indexOf(nameEQ) === 0) { return c.substring(nameEQ.length, c.length); }
-    }
-    return null;
-  },
-
-  remove: function remove(name) {
-    this.create(name, '', -1);
-  }
-};
-
-var cookie$1 = {
-  name: 'cookie',
-
-  lookup: function lookup(options) {
-    var found = void 0;
-
-    if (options.lookupCookie && typeof document !== 'undefined') {
-      var c = cookie.read(options.lookupCookie);
-      if (c) { found = c; }
-    }
-
-    return found;
-  },
-  cacheUserLanguage: function cacheUserLanguage(lng, options) {
-    if (options.lookupCookie && typeof document !== 'undefined') {
-      cookie.create(options.lookupCookie, lng, options.cookieMinutes, options.cookieDomain);
-    }
-  }
-};
-
-var querystring = {
-  name: 'querystring',
-
-  lookup: function lookup(options) {
-    var found = void 0;
-
-    if (typeof window !== 'undefined') {
-      var query = window.location.search.substring(1);
-      var params = query.split('&');
-      for (var i = 0; i < params.length; i++) {
-        var pos = params[i].indexOf('=');
-        if (pos > 0) {
-          var key = params[i].substring(0, pos);
-          if (key === options.lookupQuerystring) {
-            found = params[i].substring(pos + 1);
-          }
-        }
-      }
-    }
-
-    return found;
-  }
-};
-
-var hasLocalStorageSupport = void 0;
-try {
-  hasLocalStorageSupport = window !== 'undefined' && window.localStorage !== null;
-  var testKey = 'i18next.translate.boo';
-  window.localStorage.setItem(testKey, 'foo');
-  window.localStorage.removeItem(testKey);
-} catch (e) {
-  hasLocalStorageSupport = false;
-}
-
-var localStorage = {
-  name: 'localStorage',
-
-  lookup: function lookup(options) {
-    var found = void 0;
-
-    if (options.lookupLocalStorage && hasLocalStorageSupport) {
-      var lng = window.localStorage.getItem(options.lookupLocalStorage);
-      if (lng) { found = lng; }
-    }
-
-    return found;
-  },
-  cacheUserLanguage: function cacheUserLanguage(lng, options) {
-    if (options.lookupLocalStorage && hasLocalStorageSupport) {
-      window.localStorage.setItem(options.lookupLocalStorage, lng);
-    }
-  }
-};
-
-var navigator$1 = {
-  name: 'navigator',
-
-  lookup: function lookup(options) {
-    var found = [];
-
-    if (typeof navigator !== 'undefined') {
-      if (navigator.languages) {
-        // chrome only; not an array, so can't use .push.apply instead of iterating
-        for (var i = 0; i < navigator.languages.length; i++) {
-          found.push(navigator.languages[i]);
-        }
-      }
-      if (navigator.userLanguage) {
-        found.push(navigator.userLanguage);
-      }
-      if (navigator.language) {
-        found.push(navigator.language);
-      }
-    }
-
-    return found.length > 0 ? found : undefined;
-  }
-};
-
-var htmlTag = {
-  name: 'htmlTag',
-
-  lookup: function lookup(options) {
-    var found = void 0;
-    var htmlTag = options.htmlTag || (typeof document !== 'undefined' ? document.documentElement : null);
-
-    if (htmlTag && typeof htmlTag.getAttribute === 'function') {
-      found = htmlTag.getAttribute('lang');
-    }
-
-    return found;
-  }
-};
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) { descriptor.writable = true; } Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) { defineProperties(Constructor.prototype, protoProps); } if (staticProps) { defineProperties(Constructor, staticProps); } return Constructor; }; }();
-
-function _classCallCheck$10(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function getDefaults() {
-  return {
-    order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag'],
-    lookupQuerystring: 'lng',
-    lookupCookie: 'i18next',
-    lookupLocalStorage: 'i18nextLng',
-
-    // cache user language
-    caches: ['localStorage'],
-    excludeCacheFor: ['cimode']
-    //cookieMinutes: 10,
-    //cookieDomain: 'myDomain'
-  };
-}
-
-var Browser = function () {
-  function Browser(services) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    _classCallCheck$10(this, Browser);
-
-    this.type = 'languageDetector';
-    this.detectors = {};
-
-    this.init(services, options);
-  }
-
-  _createClass(Browser, [{
-    key: 'init',
-    value: function init(services) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var i18nOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      this.services = services;
-      this.options = defaults(options, this.options || {}, getDefaults());
-      this.i18nOptions = i18nOptions;
-
-      this.addDetector(cookie$1);
-      this.addDetector(querystring);
-      this.addDetector(localStorage);
-      this.addDetector(navigator$1);
-      this.addDetector(htmlTag);
-    }
-  }, {
-    key: 'addDetector',
-    value: function addDetector(detector) {
-      this.detectors[detector.name] = detector;
-    }
-  }, {
-    key: 'detect',
-    value: function detect(detectionOrder) {
-      var _this = this;
-
-      if (!detectionOrder) { detectionOrder = this.options.order; }
-
-      var detected = [];
-      detectionOrder.forEach(function (detectorName) {
-        if (_this.detectors[detectorName]) {
-          var lookup = _this.detectors[detectorName].lookup(_this.options);
-          if (lookup && typeof lookup === 'string') { lookup = [lookup]; }
-          if (lookup) { detected = detected.concat(lookup); }
-        }
-      });
-
-      var found = void 0;
-      detected.forEach(function (lng) {
-        if (found) { return; }
-        var cleanedLng = _this.services.languageUtils.formatLanguageCode(lng);
-        if (_this.services.languageUtils.isWhitelisted(cleanedLng)) { found = cleanedLng; }
-      });
-
-      return found || this.i18nOptions.fallbackLng[0];
-    }
-  }, {
-    key: 'cacheUserLanguage',
-    value: function cacheUserLanguage(lng, caches) {
-      var _this2 = this;
-
-      if (!caches) { caches = this.options.caches; }
-      if (!caches) { return; }
-      if (this.options.excludeCacheFor && this.options.excludeCacheFor.indexOf(lng) > -1) { return; }
-      caches.forEach(function (cacheName) {
-        if (_this2.detectors[cacheName]) { _this2.detectors[cacheName].cacheUserLanguage(lng, _this2.options); }
-      });
-    }
-  }]);
-
-  return Browser;
-}();
-
-Browser.type = 'languageDetector';
-
+  return RiotI18nlet;
+}(I18nlet));
+
+var index = new RiotI18nlet();
+
+/**
+ * You need to edit all lang files!!
+ * Naming Rule:
+ * [category].[sub category].[optional].[optional]
+ * category:
+ *   - `vrn` for `viron`.
+ *   - `cmp` for `component`.
+ *   - `core` for `core`.
+ *   - `pg` for `pages`.
+ *   - `st` for `store`.
+ * sub category:
+ *   - Use `riot tag name` when category is one of type of `cmp` or `page`.
+ */
 var ja = {
-  word: {
-    manage: '管理画面',
-    dashboard: 'ダッシュボード'
-  }
+  'st.mutations.manage': '管理画面',
+  'st.mutations.dashboard': 'ダッシュボード',
+  'vrn.poster.home': 'ホーム',
+  'vrn.header.menu.entry': '追加',
+  'vrn.header.menu.entry.title': '管理画面を追加',
+  'vrn.header.menu.entry.button': '追加',
+  'vrn.header.menu.entry.placeholder': 'URLの入力',
+  'vrn.header.menu.entry.error_url': 'URLに誤りがあります。',
+  'vrn.header.menu.entry.error_overlapping': '既に存在するエンドポイントです。',
+  'vrn.header.menu.entry.info': 'エンドポイントを追加しました。',
+  'vrn.header.menu.entry.error_notfound': 'エンドポイントが見つかりませんでした。',
+  'vrn.header.menu.entry.error': 'エンドポイントを追加出来ませんでした。',
+  'vrn.header.menu.export': 'ホームを保存',
+  'vrn.header.menu.export.title': 'ホームを保存',
+  'vrn.header.menu.export.description': 'ホームのエンドポイント一覧をjsonファイルとして書き出します。',
+  'vrn.header.menu.export.button': '保存する。',
+  'vrn.header.menu.export.info': 'エンドポイント一覧を書き出しました。',
+  'vrn.header.menu.import': 'ホームを読み込み',
+  'vrn.header.menu.import.title': 'ホームを読み込み',
+  'vrn.header.menu.import.description': 'エンドポイント一覧をホームに反映します。',
+  'vrn.header.menu.import.button': '読み込む',
+  'vrn.header.menu.import.error_json_type': 'JSON形式のファイルを選択して下さい。',
+  'vrn.header.menu.import.error_file_read': 'ファイルの読み込みに失敗しました。',
+  'vrn.header.menu.import.error_endpoint_read': 'エンドポイント一覧を読み込みました。',
+  'vrn.header.menu.clear': '全てのカードを削除',
+  'vrn.header.menu.clear.title': '全てのカードを削除',
+  'vrn.header.menu.clear.description': 'ホームのエンドポイント一覧を空にします。この操作は取り消せません。',
+  'vrn.header.menu.clear.button': '削除する',
+  'vrn.header.menu.clear.info': 'エンドポイント一覧を削除しました。',
+  'vrn.header.menu.help': 'ヘルプ',
+  'vrn.header.filter.placeholder': 'カードを検索',
+  'vrn.header.filter.autocomplete.emprty': '候補無し',
+  'vrn.header.filter.autocomplete.card': 'カード',
+  'vrn.header.filter.autocomplete.tag': 'タグ',
+  'pg.endpoints.add': '追加',
+  'pg.endpoints.endpoint.menu.qrcode.title': 'QRコード',
+  'pg.endpoints.endpoint.menu.qrcode.qrcode_info1': 'モバイル端末にエンドポイントを追加できます。',
+  'pg.endpoints.endpoint.menu.qrcode.qrcode_info2': 'お好きなQRコードリーダーで読み込んで下さい。',
+  'pg.endpoints.endpoint.menu.endpoint_delete': 'エンドポイントを削除',
+  'pg.endpoints.endpoint.menu.endpoint_delete_info': 'エンドポイントを削除しました。',
+  'pg.endpoints.endpoint.menu.logout': 'ログアウト',
+  'pg.endpoints.endpoint.menu.logout_info': 'ログアウトしました。',
+  'pg.endpoints.endpoint.signin.email.login_error': 'ログイン出来ませんでした。正しいメールアドレスとパスワードを使用しているか確認して下さい。使用したメールアドレスが予め管理者として登録されているか確認して下さい。',
+  'pg.endpoints.endpoint.description': 'ログインで管理画面情報を取得できます',
+  'pg.endpoints.endpoint.signin.label': 'または',
+  'pg.endpoints.endpoint.signin.oauth_message1': 'または、こちらを',
+  'pg.endpoints.endpoint.signin.oauth_message2': '利用してログイン',
+  'pg.endpoints.endpoint.signin.email.mail_placeholder': 'IDまたはメールアドレス',
+  'pg.endpoints.endpoint.signin.email.password_placeholder': 'パスワード',
+  'pg.endpoints.endpoint.signin.email.login_label': 'ログイン',
+  'pg.components.card.chart.error_401': '認証エラー。',
+  'pg.components.card.chart.error_network': '通信に失敗しました。',
+  'pg.components.card.number.error_401': '認証エラー。',
+  'pg.components.card.number.error_network': '通信に失敗しました。',
+  'pg.components.card.number.error_response': 'レスポンスデータに誤りがあります。',
+  'pg.components.card.number.error_number': 'value値が数値ではありません。',
+  'pg.components.card.table.error_401': '認証エラー。',
+  'pg.components.card.table.error_network': '通信に失敗しました。',
+  'pg.components.card.table.error_response_array': 'レスポンスデータが配列ではありません。',
+  'pg.components.card.table.error_empty': '0件です。',
+  'pg.components.card.table.error_object': '行データがオブジェクトではありません。',
+  'pg.components.card.unsupported': 'コンポーネントタイプ「{{style}}」は現在サポートされていません。',
+  'pg.components.filter.title': '表示項目フィルター',
+  'pg.components.filter.description': 'テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。',
+  'pg.components.filter.label': '全て選択する',
+  'pg.components.filter.button': '適用する',
+  'pg.components.operation.label_get': '取得する',
+  'pg.components.operation.label_get_info': '取得しました。',
+  'pg.components.operation.label_post': '新規作成する',
+  'pg.components.operation.label_post_info': '新規作成しました。',
+  'pg.components.operation.label_put': '保存する',
+  'pg.components.operation.label_put_info': '保存しました。',
+  'pg.components.operation.label_delete': '削除する',
+  'pg.components.operation.label_delete_info': '削除しました。',
+  'pg.components.operation.label_default': '実行する',
+  'pg.components.operation.label_default_info': '完了しました。',
+  'pg.components.operation.error_auth': '認証切れ',
+  'pg.components.operation.comfirm': '本当に実行しますか？',
+  'pg.components.operation.cancel': 'キャンセル',
+  'pg.components.preview': 'プレビュー',
+  'pg.components.search.title': '検索',
+  'pg.components.search.description': 'クエリパラメータを指定して下さい。',
+  'pg.components.search.button': '検索する',
+  'pg.components.error_auth_title': '認証切れ',
+  'pg.components.error_auth_message': '認証が切れました。再度ログインして下さい。',
+  'pg.endpointimport.error_overlapping': '既にエンドポイント({url})が存在します。',
+  'pg.endpointimport.title': 'エンドポイント追加',
+  'pg.endpointimport.message': 'エンドポイント({url})が一覧に追加されました。',
+  'pg.endpointimport.error_add': 'エンドポイント追加 失敗',
+  'pg.endpointimport.error_add_message': 'エンドポイント({url})を追加出来ませんでした。',
+  'pg.oauthredirect.error_title': '認証失敗',
+  'pg.oauthredirect.error_message': 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。',
+  'core.fetch.error_network_timeout': '時間がかかり過ぎたため通信を中断しました。',
+  'cmp.parameters.multiple_of': '{{multipleOf}}で割り切れる数値にして下さい。',
+  'cmp.parameters.maximum1': '{{maximum}}より小さい数値にして下さい。',
+  'cmp.parameters.maximum2': '{{maximum}}以下の数値にして下さい。',
+  'cmp.parameters.minimum1': '{{minimum}}より大きい数値にして下さい。',
+  'cmp.parameters.minimum2': '{{minimum}}以上の数値にして下さい。',
+  'cmp.parameters.max_length': '文字数を{{maxLength}}以下にして下さい。',
+  'cmp.parameters.min_length': '文字数を{{minLength}}以上にして下さい。',
+  'cmp.parameters.pattern': '{{pattern}}にマッチさせて下さい',
+  'cmp.parameters.additional_items': '要素数を{{length}}以下にして下さい。',
+  'cmp.parameters.max_items': '要素数を{{maxItems}}以下にして下さい。',
+  'cmp.parameters.min_items': '要素数を{{minItems}}以上にして下さい。',
+  'cmp.parameters.unique_items': '内容が重複しない要素で構成して下さい。',
+  'cmp.parameters.max_properties': '要素数を{{maxProperties}}以下にして下さい。',
+  'cmp.parameters.min_properties': '要素数を{{minProperties}}以上にして下さい。',
+  'cmp.parameters.required': 'e要素に{{key}}{{description}}を含めて下さい。',
+  'cmp.parameters.enum': '{{enum}}のいずれかの値を設定して下さい。',
+  'cmp.parameters.type': '型を{{types}}のいずれかにして下さい。',
+  'cmp.parameters.format_date_time': '"date-time"に則ったフォーマットで入力してください。',
+  'cmp.parameters.format_date_time_notfound': '存在する日付を入力してください。',
+  'cmp.parameters.format_email': '"email"に則ったフォーマットで入力してください。',
+  'cmp.parameters.format_hostname': '"hostname"は255文字以内で入力してください。',
+  'cmp.parameters.format_hostname_notmatch': '"hostname"に則ったフォーマットで入力してください。',
+  'cmp.parameters.format_ipv4': '"ipv4"に則ったフォーマットで入力してください。',
+  'cmp.parameters.format_ipv6': '"ipv6"に則ったフォーマットで入力してください。',
+  'cmp.parameters.format_uri': '"uri"に則ったフォーマットで入力してください。',
+  'cmp.parameters.error_undefined': '必須項目です。',
+  'cmp.parameters.form.required_label': '(必須)',
+  'cmp.parameters.items.button': '項目をすべて開く',
+  'cmp.parameters.items.button_remove': 'この項目を削除',
+  'cmp.parameters.properties.label': '選択して下さい',
+  'cmp.autocomplete.copy': 'クリップボードへコピーしました。',
+  'cmp.autocomplete.error_copy': 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。',
+  'cmp.dialog.ok': 'OK',
+  'cmp.dialog.cancel': 'キャンセル',
+  'cmp.explorer.droparea_title': '画像アップロード',
+  'cmp.explorer.droparea_info': 'ここにファイルをドロップして追加できます',
+  'cmp.explorer.droparea_label': 'ライブラリ',
+  'cmp.explorer.droparea_button': 'ファイルを選択',
+  'cmp.explorer.error_401': '認証エラー。',
+  'cmp.explorer.error_network': '通信に失敗しました。',
+  'cmp.explorer.image_add_info': '画像を追加しました。',
+  'cmp.explorer.error_401_auth': '認証切れ',
+  'cmp.explorer.image_delete_info': '画像を削除しました。',
+  'cmp.explorer.delete_info_title': '画像を完全に削除しますか？',
+  'cmp.explorer.delete_info_message': '画像を削除した後は元に戻す事ができません。この画像を完全に削除してもよろしいですか？',
+  'cmp.explorer.detail.title': '削除',
+  'cmp.explorer.detail.info': 'この画像のアドレス',
+  'cmp.explorer.detail.button': 'この画像を挿入',
+  'cmp.explorer.detail.copy_message': 'クリップボードへコピーしました。',
+  'cmp.explorer.detail.error_copy_message': 'ご使用中のブラウザではクリップボードへコピー出来ませんでした',
+  'cmp.html.copy_edit': 'エディタ',
+  'cmp.html.copy_preview': 'プレビュー',
+  'cmp.html.copy_message': 'クリップボードへコピーしました。',
+  'cmp.html.error_copy_message': 'ご使用中のブラウザではクリップボードへコピー出来ませんでした',
+  'cmp.list.back': '戻る',
+  'cmp.list.view': 'さらに表示',
+  'cmp.numberinput.copy_message': 'クリップボードへコピーしました。',
+  'cmp.numberinput.error_copy_message': 'ご使用中のブラウザではクリップボードへコピー出来ませんでした',
+  'cmp.pug.copy_message': 'クリップボードへコピーしました。',
+  'cmp.pug.copy_error_copy_message': 'ご使用中のブラウザではクリップボードへコピー出来ませんでした',
+  'cmp.pug.editor_label': 'エディタ',
+  'cmp.pug.preview_label': 'プレビュー',
+  'cmp.select.copy_message': 'クリップボードへコピーしました。',
+  'cmp.select.copy_error_copy_message': 'ご使用中のブラウザではクリップボードへコピー出来ませんでした',
+  'cmp.textarea.copy_message': 'クリップボードへコピーしました。',
+  'cmp.textarea.copy_error_copy_message': 'ご使用中のブラウザではクリップボードへコピー出来ませんでした',
+  'cmp.textinput.copy_message': 'クリップボードへコピーしました。',
+  'cmp.textinput.copy_error_copy_message': 'ご使用中のブラウザではクリップボードへコピー出来ませんでした',
+  'cmp.wyswyg.explorer_title': '画像アップロード',
 };
 
-var en = {};
+/**
+ * You need to edit all lang files!!
+ * Naming Rule:
+ * [category].[sub category].[optional].[optional]
+ * category:
+ *   - `vrn` for `viron`.
+ *   - `cmp` for `component`.
+ *   - `core` for `core`.
+ *   - `pg` for `pages`.
+ *   - `st` for `store`.
+ * sub category:
+ *   - Use `riot tag name` when category is one of type of `cmp` or `page`.
+ */
+var en = {
+  'st.mutations.manage': 'admin',
+  'st.mutations.dashboard': 'dashboard',
+  'vrn.poster.home': 'home',
+  'vrn.header.menu.entry': 'add',
+  'vrn.header.menu.entry.title': 'add dashboard',
+  'vrn.header.menu.entry.button': 'add',
+  'vrn.header.menu.entry.placeholder': 'input URL',
+  'vrn.header.menu.entry.error_url': 'incorrect URL',
+  'vrn.header.menu.entry.error_overlapping': 'this endpoint has been already registered',
+  'vrn.header.menu.entry.info': 'added endpoiny',
+  'vrn.header.menu.entry.error_notfound': 'unable to find endpoint',
+  'vrn.header.menu.entry.error': 'unable to add endpoint',
+  'vrn.header.menu.export': 'save home',
+  'vrn.header.menu.export.title': 'save home',
+  'vrn.header.menu.export.description': 'write oupput all endpoins on home as json file',
+  'vrn.header.menu.export.button': 'save ',
+  'vrn.header.menu.export.info': 'write output all endpoints',
+  'vrn.header.menu.import': 'load home',
+  'vrn.header.menu.import.title': 'load home',
+  'vrn.header.menu.import.description': 'reflect all endpoints on home',
+  'vrn.header.menu.import.button': 'load',
+  'vrn.header.menu.import.error_json_type': 'select the json file',
+  'vrn.header.menu.import.error_file_read': 'failed to load the file',
+  'vrn.header.menu.import.error_endpoint_read': 'loaded all endpoints',
+  'vrn.header.menu.clear': 'delete all cards',
+  'vrn.header.menu.clear.title': 'delete all cards',
+  'vrn.header.menu.clear.description': 'clear all endpoints on home. Unable to cancel this operation',
+  'vrn.header.menu.clear.button': 'delete',
+  'vrn.header.menu.clear.info': 'deleted all endpoints',
+  'vrn.header.menu.help': 'help',
+  'vrn.header.filter.placeholder': 'search cards',
+  'vrn.header.filter.autocomplete.emprty': 'no candidates',
+  'vrn.header.filter.autocomplete.card': 'card',
+  'vrn.header.filter.autocomplete.tag': 'tag',
+  'pg.endpoints.add': 'add',
+  'pg.endpoints.endpoint.menu.qrcode.title': 'QR code',
+  'pg.endpoints.endpoint.menu.qrcode.qrcode_info1': 'able to add endpoint on your mobile phone',
+  'pg.endpoints.endpoint.menu.qrcode.qrcode_info2': 'scan QR code ',
+  'pg.endpoints.endpoint.menu.endpoint_delete': 'delete endpoint',
+  'pg.endpoints.endpoint.menu.endpoint_delete_info': 'deleted endpoint',
+  'pg.endpoints.endpoint.menu.logout': 'log out',
+  'pg.endpoints.endpoint.menu.logout_info': 'logged out',
+  'pg.endpoints.endpoint.signin.email.login_error': 'unable to log out. Please confirm your Email address and Password. Please confirm Email address that you used is registered as a admin user.',
+  'pg.endpoints.endpoint.description': 'able to acquire admin info when you log in',
+  'pg.endpoints.endpoint.signin.label': 'or',
+  'pg.endpoints.endpoint.signin.oauth_message1': 'or',
+  'pg.endpoints.endpoint.signin.oauth_message2': 'log in',
+  'pg.endpoints.endpoint.signin.email.mail_placeholder': 'ID or Email address',
+  'pg.endpoints.endpoint.signin.email.password_placeholder': 'password',
+  'pg.endpoints.endpoint.signin.email.login_label': 'log in',
+  'pg.components.card.chart.error_401': 'authentication error',
+  'pg.components.card.chart.error_network': 'failed to load ',
+  'pg.components.card.number.error_401': 'authentication error',
+  'pg.components.card.number.error_network': 'failed to load ',
+  'pg.components.card.number.error_response': 'there is incorrect resonse data',
+  'pg.components.card.number.error_number': 'incorrect value data',
+  'pg.components.card.table.error_401': 'authentication error',
+  'pg.components.card.table.error_network': 'failed to load',
+  'pg.components.card.table.error_response_array': 'response data is not arranged',
+  'pg.components.card.table.error_empty': 'no data',
+  'pg.components.card.table.error_object': 'line data is not an object',
+  'pg.components.card.unsupported': 'component type 「{{style}}」is not supported',
+  'pg.components.filter.title': 'display item filter',
+  'pg.components.filter.description': 'able to select items that is shown on the table. Make tha status ON to show what you want to see.',
+  'pg.components.filter.label': 'select all',
+  'pg.components.filter.button': 'apply ',
+  'pg.components.operation.label_get': 'acquire',
+  'pg.components.operation.label_get_info': 'acquired',
+  'pg.components.operation.label_post': 'create new data',
+  'pg.components.operation.label_post_info': 'created new data',
+  'pg.components.operation.label_put': 'save',
+  'pg.components.operation.label_put_info': 'saved',
+  'pg.components.operation.label_delete': 'delete',
+  'pg.components.operation.label_delete_info': 'deleted',
+  'pg.components.operation.label_default': 'execute',
+  'pg.components.operation.label_default_info': 'executed',
+  'pg.components.operation.error_auth': 'authentication has been expired',
+  'pg.components.operation.comfirm': 'Do you really execute?',
+  'pg.components.operation.cancel': 'cancel',
+  'pg.components.preview': 'preview',
+  'pg.components.search.title': 'search',
+  'pg.components.search.description': 'decide query parameter',
+  'pg.components.search.button': 'search',
+  'pg.components.error_auth_title': 'authentication has been expired',
+  'pg.components.error_auth_message': 'authentication has expired. Please login again',
+  'pg.endpointimport.error_overlapping': 'an endpoint ({url}) already exists',
+  'pg.endpointimport.title': 'add endpoint',
+  'pg.endpointimport.message': 'the endpoint ({url}) has been added to the listn',
+  'pg.endpointimport.error_add': 'endpoint addition failure',
+  'pg.endpointimport.error_add_message': 'We could not add the endpoint ({url})',
+  'pg.oauthredirect.error_title': 'failed to add endpoint',
+  'pg.oauthredirect.error_message': 'failed to get OAuth authentication.Please ask the reason of eror to the admin user.',
+  'core.fetch.error_network_timeout': 'interrupted load data because it takes long time',
+  'cmp.parameters.multiple_of': 'number has to be dividedby {{multipleOf}}',
+  'cmp.parameters.maximum1': 'number has to be lower than {{maximum}}',
+  'cmp.parameters.maximum2': 'number has to be lower tha {{maximum}}',
+  'cmp.parameters.minimum1': 'number has to be higher tha {{minimum}}',
+  'cmp.parameters.minimum2': 'number has to be higher tha {{minimum}}',
+  'cmp.parameters.max_length': 'number of letters has to be lower than {{maxLength}}',
+  'cmp.parameters.min_length': 'number of letters has to be higher than {{minLength}}',
+  'cmp.parameters.pattern': 'match the {{pattern}',
+  'cmp.parameters.additional_items': 'number of element has to be more than [[length]]',
+  'cmp.parameters.max_items': 'number of element has to be lower than [[maxItems]]',
+  'cmp.parameters.min_items': 'number of element has to be more than [[minItems]]',
+  'cmp.parameters.unique_items': 'compose with elements which are not duplicated',
+  'cmp.parameters.max_properties': 'number of element has to be lower than {{maxProperties}}',
+  'cmp.parameters.min_properties': 'number of element has to be more than {{minProperties}}',
+  'cmp.parameters.required': 'include {{key}}{{description}} to e element',
+  'cmp.parameters.enum': 'set the data from {{enum}}',
+  'cmp.parameters.type': 'type has to be any of [[types]]',
+  'cmp.parameters.format_date_time': 'format has to be in accordance with "date-time"',
+  'cmp.parameters.format_date_time_notfound': 'input date that exsits',
+  'cmp.parameters.format_email': 'format has to be in accordance with "email"',
+  'cmp.parameters.format_hostname': 'number of letters of host name has be lower than 255',
+  'cmp.parameters.format_hostname_notmatch': 'format has to be in accordance with "hostname"',
+  'cmp.parameters.format_ipv4': 'format has to be in accordance with "ipv4l"',
+  'cmp.parameters.format_ipv6': 'format has to be in accordance with "ipv6"',
+  'cmp.parameters.format_uri': 'format has to be in accordance with "url"',
+  'cmp.parameters.error_undefined': 'Required field',
+  'cmp.parameters.form.required_label': '(Required)',
+  'cmp.parameters.items.button': 'open all items',
+  'cmp.parameters.items.button_remove': 'delete this item',
+  'cmp.parameters.properties.label': 'please select',
+  'cmp.autocomplete.copy': 'copied to the clip board',
+  'cmp.autocomplete.error_copy': 'failed to copy to the clip board with your device ',
+  'cmp.dialog.ok': 'OK',
+  'cmp.dialog.cancel': 'cancel',
+  'cmp.explorer.droparea_title': 'upload image',
+  'cmp.explorer.droparea_info': 'able to add files by dropping it ',
+  'cmp.explorer.droparea_label': 'library"',
+  'cmp.explorer.droparea_button': 'select file',
+  'cmp.explorer.error_401': 'authentication error',
+  'cmp.explorer.error_network': 'failed to load',
+  'cmp.explorer.image_add_info': 'added images',
+  'cmp.explorer.error_401_auth': 'authentication error',
+  'cmp.explorer.image_delete_info': 'delete the image',
+  'cmp.explorer.delete_info_title': 'Do you really delete the image?',
+  'cmp.explorer.delete_info_message': 'unable to restore once you delete. Do you delete the image?',
+  'cmp.explorer.detail.title': 'delete',
+  'cmp.explorer.detail.info': 'address of this image',
+  'cmp.explorer.detail.button': 'insert the image',
+  'cmp.explorer.detail.copy_message': 'copied to the clip board',
+  'cmp.explorer.detail.error_copy_message': 'failed to copy to the clip board with your device ',
+  'cmp.html.copy_edit': 'editor',
+  'cmp.html.copy_preview': 'preview',
+  'cmp.html.copy_message': 'copied to the clip board',
+  'cmp.html.error_copy_message': 'failed to copy to the clip board with your device ',
+  'cmp.list.back': 'back',
+  'cmp.list.view': 'show more',
+  'cmp.numberinput.copy_message': 'copied to the clip board',
+  'cmp.numberinput.error_copy_message': 'failed to copy to the clip board with your device ',
+  'cmp.pug.copy_message': 'copied to the clip board',
+  'cmp.pug.copy_error_copy_message': 'failed to copy to the clip board with your device ',
+  'cmp.pug.editor_label': 'editor',
+  'cmp.pug.preview_label': 'preview',
+  'cmp.select.copy_message': 'copied to the clip board',
+  'cmp.select.copy_error_copy_message': 'failed to copy to the clip board with your device ',
+  'cmp.textarea.copy_message': 'copied to the clip board',
+  'cmp.textarea.copy_error_copy_message': 'failed to copy to the clip board with your device ',
+  'cmp.textinput.copy_message': 'copied to the clip board',
+  'cmp.textinput.copy_error_copy_message': 'failed to copy to the clip board with your device ',
+  'cmp.wyswyg.explorer_title': 'upload image',
+};
 
-// i18n対応
-// @see: https://www.i18next.com
-// API経由で定義ファイルを取得する場合は、
-// https://github.com/i18next/i18next-xhr-backend
-// 等を使うこと。
+/**
+ * You need to edit all lang files!!
+ * Naming Rule:
+ * [category].[sub category].[optional].[optional]
+ * category:
+ *   - `vrn` for `viron`.
+ *   - `cmp` for `component`.
+ *   - `core` for `core`.
+ *   - `pg` for `pages`.
+ *   - `st` for `store`.
+ * sub category:
+ *   - Use `riot tag name` when category is one of type of `cmp` or `page`.
+ */
+var ko = {
+  'st.mutations.manage': '관리화면',
+  'st.mutations.dashboard': '대시보드',
+  'vrn.poster.home': '홈',
+  'vrn.header.menu.entry': '추가',
+  'vrn.header.menu.entry.title': '관리화면 추가',
+  'vrn.header.menu.entry.button': '추가',
+  'vrn.header.menu.entry.placeholder': 'URL주소입력',
+  'vrn.header.menu.entry.error_url': 'URL주소가 잘못되었습니다.',
+  'vrn.header.menu.entry.error_overlapping': '이미 존재하는 엔드포인트입니다',
+  'vrn.header.menu.entry.info': '엔드포인트를 추가하였습니다.',
+  'vrn.header.menu.entry.error_notfound': '엔드포인트를 찾을 수 없습니다.',
+  'vrn.header.menu.entry.error': '엔드포인트를 추가할 수 없습니다.',
+  'vrn.header.menu.export': '홈 저장',
+  'vrn.header.menu.export.title': '홈 저장',
+  'vrn.header.menu.export.description': '홈의 엔드포인트목록을 json 파일로 내보냅니다.',
+  'vrn.header.menu.export.button': '저장하기',
+  'vrn.header.menu.export.info': '엔드포인트목록을 내보냈습니다',
+  'vrn.header.menu.import': '홈 읽기',
+  'vrn.header.menu.import.title': '홈 읽기',
+  'vrn.header.menu.import.description': '엔드포인트목록을 홈에 반영합니다',
+  'vrn.header.menu.import.button': '읽기',
+  'vrn.header.menu.import.error_json_type': 'JSON형식의 파일을 선택하여 주십시오',
+  'vrn.header.menu.import.error_file_read': '파일 읽기에 실패하였습니다',
+  'vrn.header.menu.import.error_endpoint_read': '엔드포인트목록 읽기가 완료되었습니다',
+  'vrn.header.menu.clear': '모든 카드 삭제',
+  'vrn.header.menu.clear.title': '모든 카드 삭제',
+  'vrn.header.menu.clear.description': '홈의 엔드포인트목록을 모두 삭제합니다. 이 작업은 취소 할 수 없습니다.',
+  'vrn.header.menu.clear.button': '삭제하기',
+  'vrn.header.menu.clear.info': '엔드포인트목록을 삭제하였습니다',
+  'vrn.header.menu.help': '도움말',
+  'vrn.header.filter.placeholder': '카드 검색',
+  'vrn.header.filter.autocomplete.emprty': '후보 없음',
+  'vrn.header.filter.autocomplete.card': '카드',
+  'vrn.header.filter.autocomplete.tag': '태그',
+  'pg.endpoints.add': '추가',
+  'pg.endpoints.endpoint.menu.qrcode.title': 'QR코드',
+  'pg.endpoints.endpoint.menu.qrcode.qrcode_info1': '모바일 단말기에 엔드포인트를 추가할 수 있습니다.',
+  'pg.endpoints.endpoint.menu.qrcode.qrcode_info2': '사용하는 QR코드리더로 스캔하십시오.',
+  'pg.endpoints.endpoint.menu.endpoint_delete': '엔드포인트 삭제',
+  'pg.endpoints.endpoint.menu.endpoint_delete_info': '엔드포인트를 삭제하였습니다.',
+  'pg.endpoints.endpoint.menu.logout': '로그아웃',
+  'pg.endpoints.endpoint.menu.logout_info': '로그아웃이 완료되었습니다.',
+  'pg.endpoints.endpoint.signin.email.login_error': '로그인할 수 없습니다.계정에 등록된 이메일 주소와 비밀번호를 사용하여 주십시오. 사용한 이메일 주소가 관리자로 등록되어 있는지 확인하여 주십시오.',
+  'pg.endpoints.endpoint.description': '로그인으로 관리화면정보를 얻을 수 있습니다',
+  'pg.endpoints.endpoint.signin.label': '또는',
+  'pg.endpoints.endpoint.signin.oauth_message1': '또는 이쪽을',
+  'pg.endpoints.endpoint.signin.oauth_message2': '이용하여 로그인',
+  'pg.endpoints.endpoint.signin.email.mail_placeholder': '아이디 또는 이메일 주소',
+  'pg.endpoints.endpoint.signin.email.password_placeholder': '비밀번호',
+  'pg.endpoints.endpoint.signin.email.login_label': '로그인',
+  'pg.components.card.chart.error_401': '인증 에러',
+  'pg.components.card.chart.error_network': '통신에 실패하였습니다.',
+  'pg.components.card.number.error_401': '인증 에러',
+  'pg.components.card.number.error_network': '통신에 실패하였습니다.',
+  'pg.components.card.number.error_response': '응답 데이터에 오류가 있습니다.',
+  'pg.components.card.number.error_number': 'value 값이 숫자가 아닙니다.',
+  'pg.components.card.table.error_401': '인증 에러',
+  'pg.components.card.table.error_network': '통신에 실패하였습니다.',
+  'pg.components.card.table.error_response_array': '응답 데이터가 배열이 아닙니다.',
+  'pg.components.card.table.error_empty': '0개 있습니다',
+  'pg.components.card.table.error_object': '행 데이터 개체가 없습니다.',
+  'pg.components.card.unsupported': '구성 요소 유형 "{{style}}"는 현재 지원되지 않습니다.',
+  'pg.components.filter.title': '표시 항목 필터',
+  'pg.components.filter.description': '테이블에 표시 할 항목을 선택할 수 있습니다. 표시 할 항목을 ON으로 하십시오.',
+  'pg.components.filter.label': '모두 선택',
+  'pg.components.filter.button': '적용',
+  'pg.components.operation.label_get': '취득하기',
+  'pg.components.operation.label_get_info': '취득했습니다.',
+  'pg.components.operation.label_post': '새로 만들기',
+  'pg.components.operation.label_post_info': '새로 만들었습니다.',
+  'pg.components.operation.label_put': '저장',
+  'pg.components.operation.label_put_info': '저장했습니다.',
+  'pg.components.operation.label_delete': '삭제하기',
+  'pg.components.operation.label_delete_info': '삭제했습니다.',
+  'pg.components.operation.label_default': '실행',
+  'pg.components.operation.label_default_info': '완료했습니다.',
+  'pg.components.operation.error_auth': '인증 없음',
+  'pg.components.operation.comfirm': '정말 실행 하시겠습니까?',
+  'pg.components.operation.cancel': '취소',
+  'pg.components.preview': '미리보기',
+  'pg.components.search.title': '검색',
+  'pg.components.search.description': '쿼리 매개 변수를 지정하십시오.',
+  'pg.components.search.button': '검색하기',
+  'pg.components.error_auth_title': '인증 없음',
+  'pg.components.error_auth_message': '인증이 만료되었습니다. 다시 로그인 해주십시오.',
+  'pg.endpointimport.error_overlapping': '이미 엔드 포인트 ({url})이 존재합니다.',
+  'pg.endpointimport.title': '엔드 포인트 추가',
+  'pg.endpointimport.message': '엔드 포인트 ({url})가 목록에 추가되었습니다.',
+  'pg.endpointimport.error_add': '엔드 포인트 추가 실패',
+  'pg.endpointimport.error_add_message': '엔드 포인트 ({url})를 추가 할 수 없습니다.',
+  'pg.oauthredirect.error_title': '인증 실패',
+  'pg.oauthredirect.error_message': 'OAuth 인증에 실패했습니다. 등록된 계정으로 다시 시도해주십시오. 전체 오류 원인에 대해서는 관리자에게 문의하십시오.',
+  'core.fetch.error_network_timeout': '시간이 너무 오래 소요되어 통신을 중단했습니다.',
+  'cmp.parameters.multiple_of': '{{multipleOf}}로 나누어 떨어지는 수치로 하십시오.',
+  'cmp.parameters.maximum1': '{{maximum}}보다 작은 수치로 하십시오.',
+  'cmp.parameters.maximum2': '{{maximum}} 이하의 수치로 하십시오.',
+  'cmp.parameters.minimum1': '{{minimum}}보다 큰 수치로 하십시오.',
+  'cmp.parameters.minimum2': '{{minimum}} 이상의 수치로 하십시오.',
+  'cmp.parameters.max_length': '문자수를 {{maxLength}} 이하로 하십시오.',
+  'cmp.parameters.min_length': '문자수를 {{minLength}} 이상으로하십시오.',
+  'cmp.parameters.pattern': '{{pattern}}에 매치시켜주세요',
+  'cmp.parameters.additional_items': '요소 수를 {{length}} 이하로 하십시오.',
+  'cmp.parameters.max_items': '요소 수를 {{maxItems}} 이하로 하십시오.',
+  'cmp.parameters.min_items': '요소 수를 {{minItems}} 이상으로 하십시오.',
+  'cmp.parameters.unique_items': '내용이 중복되지 않는 요소로 구성하십시오.',
+  'cmp.parameters.max_properties': '요소 수를 {{maxProperties}} 이하로 하십시오.',
+  'cmp.parameters.min_properties': '요소 수를 {{minProperties}} 이상으로 하십시오.',
+  'cmp.parameters.required': 'e 요소에 {{key}} {{description}}를 포함하십시오.',
+  'cmp.parameters.enum': '{{enum}} 중 하나를 설정하십시오.',
+  'cmp.parameters.type': '형태를 {{types}} 중 하나로 하십시오.',
+  'cmp.parameters.format_date_time': 'date-time에 맞는 형식으로 입력하십시오.',
+  'cmp.parameters.format_date_time_notfound': '존재하는 날짜를 입력하십시오.',
+  'cmp.parameters.format_email': 'email에 맞는 형식으로 입력하십시오.',
+  'cmp.parameters.format_hostname': 'hostname은 255 자 이내로 입력하십시오.',
+  'cmp.parameters.format_hostname_notmatch': 'hostname에 맞는 형식으로 입력하십시오.',
+  'cmp.parameters.format_ipv4': 'ipv4에 맞는 형식으로 입력하십시오.',
+  'cmp.parameters.format_ipv6': 'ipv6에 맞는 형식으로 입력하십시오.',
+  'cmp.parameters.format_uri': 'uri에 맞는 형식으로 입력하십시오.',
+  'cmp.parameters.error_undefined': '필수 항목입니다.',
+  'cmp.parameters.form.required_label': '(필수)',
+  'cmp.parameters.items.button': '항목을 모두 열기',
+  'cmp.parameters.items.button_remove': '이 항목을 삭제',
+  'cmp.parameters.properties.label': '선택하세요',
+  'cmp.autocomplete.copy': '클립 보드에 복사했습니다.',
+  'cmp.autocomplete.error_copy': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다.',
+  'cmp.dialog.ok': 'OK',
+  'cmp.dialog.cancel': '취소',
+  'cmp.explorer.droparea_title': '이미지 업로드',
+  'cmp.explorer.droparea_info': '여기에 파일을 끌어다 놓으면 추가 할 수 있습니다',
+  'cmp.explorer.droparea_label': '라이브러리',
+  'cmp.explorer.droparea_button': '파일을 선택',
+  'cmp.explorer.error_401': '인증 오류.',
+  'cmp.explorer.error_network': '통신에 실패했습니다.',
+  'cmp.explorer.image_add_info': '이미지를 추가했습니다.',
+  'cmp.explorer.error_401_auth': '인증 없음',
+  'cmp.explorer.image_delete_info': '이미지를 삭제했습니다.',
+  'cmp.explorer.delete_info_title': '이미지를 완전히 삭제 하시겠습니까?',
+  'cmp.explorer.delete_info_message': '이미지를 삭제 한 후 원래대로 되돌릴 수 없습니다. 이 이미지를 완전히 삭제 하시겠습니까?',
+  'cmp.explorer.detail.title': '삭제',
+  'cmp.explorer.detail.info': '이 이미지의 주소',
+  'cmp.explorer.detail.button': '이 이미지를 삽입',
+  'cmp.explorer.detail.copy_message': '클립 보드에 복사했습니다.',
+  'cmp.explorer.detail.error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
+  'cmp.html.copy_edit': '에디터',
+  'cmp.html.copy_preview': '미리보기',
+  'cmp.html.copy_message': '클립 보드에 복사했습니다.',
+  'cmp.html.error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
+  'cmp.list.back': '돌아 가기',
+  'cmp.list.view': '더보기',
+  'cmp.numberinput.copy_message': '클립 보드에 복사했습니다.',
+  'cmp.numberinput.error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
+  'cmp.pug.copy_message': '클립 보드에 복사했습니다.',
+  'cmp.pug.copy_error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
+  'cmp.pug.editor_label': '에디터',
+  'cmp.pug.preview_label': '미리보기',
+  'cmp.select.copy_message': '클립 보드에 복사했습니다.',
+  'cmp.select.copy_error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
+  'cmp.textarea.copy_message': '클립 보드에 복사했습니다.',
+  'cmp.textarea.copy_error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
+  'cmp.textinput.copy_message': '클립 보드에 복사했습니다.',
+  'cmp.textinput.copy_error_copy_message': '사용중인 브라우저에서 클립 보드에 복사 할 수 없습니다',
+  'cmp.wyswyg.explorer_title': '이미지 업로드',
+};
 
-
+const data = {
+  ja,
+  ko,
+  en
+};
 
 var i18n = {
   init: () => {
-    return new Promise((resolve, reject) => {
-      i18next$1
-        .use(Browser)
-        .init({
-          // @see: https://www.i18next.com/configuration-options.html
-          fallbackLng: 'ja',
-          resources: {
-            ja: { translation: ja },
-            en: { translation: en }
-          }
-        }, err => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve();
-        });
+    return Promise.resolve().then(() => {
+      let lang = (navigator.browserLanguage || navigator.language || navigator.userLanguage).substr(0,2);
+      if (!lang || !data[lang]) {
+        lang = 'ja';
+      }
+      return lang;
+    }).then(lang => {
+      index.init({
+        getMessageFunctionName: 'i18n'
+      });
+      index.changeLangage(lang);
+      index.loads(data);
     });
   },
 
-  /**
-   * @return {i18next}
-   */
-  get: () => {
-    return i18next$1;
-  }
-};
+  get: ( str ,opt ) => {
+    if ( opt === void 0 ) opt = {};
 
-const i18n$1 = i18next$1;
+    return index.i18n(str,opt);
+  }
+
+};
 
 /* esr version 0.9.3 */
 /**
@@ -5727,7 +4233,7 @@ function containsMatch(array, pattern) {
 /**
      * Create slice of source array or array-like object
      */
-    function slice$1(arr, start, end){
+    function slice(arr, start, end){
         var len = arr.length;
 
         if (start == null) {
@@ -5754,7 +4260,7 @@ function containsMatch(array, pattern) {
         return result;
     }
 
-    var slice_1 = slice$1;
+    var slice_1 = slice;
 
 /**
      * Return a new Array with elements that aren't present in the other Arrays.
@@ -6403,12 +4909,12 @@ function isValidString(val) {
      * Remove a single item from the array.
      * (it won't remove duplicates, just a single item)
      */
-    function remove$1(arr, item){
+    function remove(arr, item){
         var idx = indexOf_1(arr, item);
         if (idx !== -1) { arr.splice(idx, 1); }
     }
 
-    var remove_1 = remove$1;
+    var remove_1 = remove;
 
 /**
      * Remove all instances of an item from array.
@@ -6740,7 +5246,7 @@ var index$1 = Array.isArray || function (arr) {
 /**
  * Expose `pathToRegexp`.
  */
-var index = pathToRegexp;
+var index$1$1 = pathToRegexp;
 var parse_1 = parse;
 var compile_1 = compile;
 var tokensToFunction_1 = tokensToFunction;
@@ -7162,10 +5668,10 @@ function pathToRegexp (path, keys, options) {
   return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
 
-index.parse = parse_1;
-index.compile = compile_1;
-index.tokensToFunction = tokensToFunction_1;
-index.tokensToRegExp = tokensToRegExp_1;
+index$1$1.parse = parse_1;
+index$1$1.compile = compile_1;
+index$1$1.tokensToFunction = tokensToFunction_1;
+index$1$1.tokensToRegExp = tokensToRegExp_1;
 
 var commonjsGlobal$1 = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -7699,7 +6205,7 @@ var createPath = function createPath(location) {
   return path;
 };
 
-var _extends$1$1 = Object.assign || function (target) {
+var _extends$1 = Object.assign || function (target) {
 var arguments$1 = arguments;
  for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -7711,7 +6217,7 @@ var createLocation = function createLocation(path, state, key, currentLocation) 
     location.state = state;
   } else {
     // One-arg form: push(location)
-    location = _extends$1$1({}, path);
+    location = _extends$1({}, path);
 
     if (location.pathname === undefined) { location.pathname = ''; }
 
@@ -7892,9 +6398,9 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
   return event.state === undefined && navigator.userAgent.indexOf('CriOS') === -1;
 };
 
-var _typeof$2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _extends$7 = Object.assign || function (target) {
+var _extends = Object.assign || function (target) {
 var arguments$1 = arguments;
  for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -7960,7 +6466,7 @@ var createBrowserHistory = function createBrowserHistory() {
   var transitionManager = createTransitionManager();
 
   var setState = function setState(nextState) {
-    _extends$7(history, nextState);
+    _extends(history, nextState);
 
     history.length = globalHistory.length;
 
@@ -8030,7 +6536,7 @@ var createBrowserHistory = function createBrowserHistory() {
   };
 
   var push = function push(path, state) {
-    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$2(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
 
     var action = 'PUSH';
     var location = createLocation(path, state, createKey(), history.location);
@@ -8066,7 +6572,7 @@ var createBrowserHistory = function createBrowserHistory() {
   };
 
   var replace = function replace(path, state) {
-    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$2(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
 
     var action = 'REPLACE';
     var location = createLocation(path, state, createKey(), history.location);
@@ -8176,7 +6682,7 @@ var createBrowserHistory = function createBrowserHistory() {
   return history;
 };
 
-var _extends$2$1 = Object.assign || function (target) {
+var _extends$2 = Object.assign || function (target) {
 var arguments$1 = arguments;
  for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -8252,7 +6758,7 @@ var createHashHistory = function createHashHistory() {
   var transitionManager = createTransitionManager();
 
   var setState = function setState(nextState) {
-    _extends$2$1(history, nextState);
+    _extends$2(history, nextState);
 
     history.length = globalHistory.length;
 
@@ -8477,9 +6983,9 @@ var createHashHistory = function createHashHistory() {
   return history;
 };
 
-var _typeof$1$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _extends$3$1 = Object.assign || function (target) {
+var _extends$3 = Object.assign || function (target) {
 var arguments$1 = arguments;
  for (var i = 1; i < arguments.length; i++) { var source = arguments$1[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -8504,7 +7010,7 @@ var createMemoryHistory = function createMemoryHistory() {
   var transitionManager = createTransitionManager();
 
   var setState = function setState(nextState) {
-    _extends$3$1(history, nextState);
+    _extends$3(history, nextState);
 
     history.length = history.entries.length;
 
@@ -8525,7 +7031,7 @@ var createMemoryHistory = function createMemoryHistory() {
   var createHref = createPath;
 
   var push = function push(path, state) {
-    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
 
     var action = 'PUSH';
     var location = createLocation(path, state, createKey(), history.location);
@@ -8553,7 +7059,7 @@ var createMemoryHistory = function createMemoryHistory() {
   };
 
   var replace = function replace(path, state) {
-    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
+    browser(!((typeof path === 'undefined' ? 'undefined' : _typeof$1(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
 
     var action = 'REPLACE';
     var location = createLocation(path, state, createKey(), history.location);
@@ -8736,7 +7242,7 @@ Router.prototype.stop = function stop () {
  */
 Router.prototype.on = function on (pattern, onEnter, onBefore, onAfter) {
   var keys = [];
-  var regexp = index(pattern, keys);
+  var regexp = index$1$1(pattern, keys);
   this._routes.push({
     pattern: pattern,
     regexp: regexp,
@@ -9131,8 +7637,8 @@ var ComponentsRoute = {
         return Promise
           .resolve()
           .then(() => store.action('modals.add', 'viron-error', {
-            title: '認証切れ',
-            message: '認証が切れました。再度ログインして下さい。'
+            title: i18n.get('pg.components.error_auth_title'),
+            message: i18n.get('pg.components.error_auth_message')
           }))
           .then(() => {
             replace('/');
@@ -9209,7 +7715,7 @@ var EndpointimportRoute = {
         .then(() => {
           replace('/');
           store.action('toasts.add', {
-            message: `既にエンドポイント(${url})が存在します。`,
+            message: i18n.get('pg.endpointimport.error_overlapping',{url:url}),
           });
         });
     }
@@ -9218,8 +7724,8 @@ var EndpointimportRoute = {
       .resolve()
       .then(() => store.action('endpoints.mergeOneWithKey', endpoint))
       .then(() => store.action('modals.add', 'viron-error', {
-        title: 'エンドポイント追加',
-        message: `エンドポイント(${url})が一覧に追加されました。`
+        title: i18n.get('pg.endpointimport.title'),
+        message: i18n.get('pg.endpointimport.message',{url:url})
       }))
       .then(() => {
         replace('/');
@@ -9227,8 +7733,8 @@ var EndpointimportRoute = {
       .catch(err => {
         replace('/');
         store.action('modals.add', 'viron-error', {
-          title: 'エンドポイント追加 失敗',
-          message: `エンドポイント(${url})を追加出来ませんでした。`,
+          title: i18n.get('pg.endpointimport.error_add'),
+          message: i18n.get('pg.endpointimport.error_add_message',{url:url}),
           error: err
         });
       });
@@ -9272,8 +7778,8 @@ var OauthredirectRoute = {
       to = '/';
       tasks.push(store.action('auth.remove', endpointKey));
       tasks.push(store.action('modals.add', 'viron-error', {
-        title: '認証失敗',
-        message: 'OAuth認証に失敗しました。正しいアカウントで再度お試し下さい。詳しいエラー原因については管理者に問い合わせて下さい。'
+        title: i18n.get('pg.oauthredirect.error_title'),
+        message: i18n.get('pg.oauthredirect.error_message')
       }));
     }
 
@@ -9348,10 +7854,6 @@ var mixin = {
       .then(() => {
         riot$1.settings.autoUpdate = false;
         riot$1.mixin({
-          init: function() {
-            // 各riotタグインスタンスから簡単にi18n機能を使用可能にする。
-            this.i18n = i18n.get();
-          },
           // riotx.riotxChange(store, evtName, func)のショートカット。
           listen: function(...args) {
             const store = this.riotx.get();
@@ -10503,7 +9005,7 @@ riot$1.tag2('my-topic', '<div class="MyTopic__head"> <div class="MyTopic__label"
 /* 以下コメント行は削除NG */
 
 /* riotx version 0.9.4 */
-var VERSION$1 = "0.9.4";
+var VERSION$2 = "0.9.4";
 
 /**
      * Array forEach
@@ -10698,7 +9200,7 @@ function shouldUseNative$1() {
 	}
 }
 
-var index$1$1 = shouldUseNative$1() ? Object.assign : function (target, source) {
+var index$1$2 = shouldUseNative$1() ? Object.assign : function (target, source) {
 	var arguments$1 = arguments;
 
 	var from;
@@ -11018,13 +9520,13 @@ var Store = function Store(_store) {
    * a object that represents full application state.
    * @type {Object}
    */
-  this.state = index$1$1({}, _store.state);
+  this.state = index$1$2({}, _store.state);
 
   /**
    * functions to mutate application state.
    * @type {Object}
    */
-  this._actions = index$1$1({}, _store.actions);
+  this._actions = index$1$2({}, _store.actions);
 
   /**
    * mutaions.
@@ -11034,13 +9536,13 @@ var Store = function Store(_store) {
    * `obj` will be TODO.
    * @type {Object}
    */
-  this._mutations = index$1$1({}, _store.mutations);
+  this._mutations = index$1$2({}, _store.mutations);
 
   /**
    * functions to get data from states.
    * @type {Object}
    */
-  this._getters = index$1$1({}, _store.getters);
+  this._getters = index$1$2({}, _store.getters);
 
   riot$1.observable(this);
 };
@@ -11056,7 +9558,7 @@ Store.prototype.getter = function getter (name) {
 
   log('[getter]', name, args);
   var context = {
-    state : index$1$1({}, this.state)
+    state : index$1$2({}, this.state)
   };
   return this._getters[name].apply(null, [context ].concat( args));
 };
@@ -11072,7 +9574,7 @@ Store.prototype.commit = function commit (name) {
     var args = [], len = arguments.length - 1;
     while ( len-- > 0 ) { args[ len ] = arguments[ len + 1 ]; }
 
-  var _state = index$1$1({}, this.state);
+  var _state = index$1$2({}, this.state);
   log.apply(void 0, [ '[commit(before)]', name, _state ].concat( args ));
   var context = {
     getter: function (name) {
@@ -11085,7 +9587,7 @@ Store.prototype.commit = function commit (name) {
   };
   var triggers = this._mutations[name].apply(null, [context ].concat( args));
   log.apply(void 0, [ '[commit(after)]', name, _state ].concat( args ));
-  index$1$1(this.state, _state);
+  index$1$2(this.state, _state);
 
   forEach_1$1(triggers, function (v) {
     // this.trigger(v, null, this.state, this);
@@ -11114,7 +9616,7 @@ Store.prototype.action = function action (name) {
 
       return this$1.getter.apply(this$1, [name ].concat( args));
     },
-    state: index$1$1({}, this.state),
+    state: index$1$2({}, this.state),
     commit: function () {
         var args = [], len = arguments.length;
         while ( len-- ) { args[ len ] = arguments[ len ]; }
@@ -11141,7 +9643,7 @@ Store.prototype.change = function change () {
 };
 
 var RiotX = function RiotX() {
-  this.version = VERSION$1 || '';
+  this.version = VERSION$2 || '';
 
   /**
    * constructor of RiotX.Store.
@@ -11266,7 +9768,7 @@ RiotX.prototype.size = function size () {
   return keys_1(this.stores).length;
 };
 
-var index$1$2 = new RiotX();
+var index$2 = new RiotX();
 
 /**
      * Safer Object.hasOwnProperty
@@ -11617,7 +10119,7 @@ const commonFetch = (context, url, options) => {
       fetch(url, options),
       new Promise((resolve, reject) => {
         setTimeout(() => {
-          reject(new Error('時間がかかり過ぎたため通信を中断しました。'));
+          reject(new Error(i18n.get('core.fetch.error_network_timeout')));
         }, 1000 * 10);
       })
     ]))
@@ -14838,7 +13340,7 @@ var drawers$1 = exporter$1('drawers', {
 /**
      * Create slice of source array or array-like object
      */
-    function slice$2(arr, start, end){
+    function slice$1(arr, start, end){
         var len = arr.length;
 
         if (start == null) {
@@ -14865,7 +13367,7 @@ var drawers$1 = exporter$1('drawers', {
         return result;
     }
 
-    var slice_1$1 = slice$2;
+    var slice_1$1 = slice$1;
 
 /**
      * Checks if the value is created by the `Object` constructor.
@@ -17217,12 +15719,12 @@ var viron$2 = exporter$2('viron', {
       if (!find_1$2(viron.sections, section => {
         return (section.id === 'manage');
       })) {
-        viron.sections = combine_1$1([{ id: 'manage', label: i18n$1.t('word.manage') }], viron.sections);
+        viron.sections = combine_1$1([{ id: 'manage', label: i18n.get('st.mutations.manage') }], viron.sections);
       }
       if (!find_1$2(viron.sections, section => {
         return (section.id === 'dashboard');
       })) {
-        viron.sections = combine_1$1([{ id: 'dashboard', label: i18n$1.t('word.dashboard') }], viron.sections);
+        viron.sections = combine_1$1([{ id: 'dashboard', label: i18n.get('st.mutations.dashboard') }], viron.sections);
       }
     }
     state.viron = viron;
@@ -17398,13 +15900,13 @@ var store = {
     return Promise
       .resolve()
       .then(() => {
-        const store = new index$1$2.Store({
+        const store = new index$2.Store({
           state: states,
           actions,
           mutations,
           getters
         });
-        index$1$2.add(store);
+        index$2.add(store);
         return store;
       });
   }
@@ -17549,7 +16051,7 @@ var script$6 = function() {
   };
 };
 
-riot$1.tag2('viron-dialog', '<div class="Dialog__icon" if="{!!opts.icon}"> <div data-is="viron-icon-{opts.icon}"></div> </div> <div class="Dialog__title" if="{!!opts.title}">{opts.title}</div> <div class="Dialog__message" if="{!!opts.message}">{opts.message}</div> <div class="Dialog__control"> <viron-button label="{opts.labelPositive || \'OK\'}" onselect="{handlePositiveSelect}"></viron-button> <viron-button label="{opts.labelNegative || \'キャンセル\'}" theme="ghost" onselect="{handleNegativeSelect}"></viron-button> </div>', '', 'class="Dialog"', function(opts) {
+riot$1.tag2('viron-dialog', '<div class="Dialog__icon" if="{!!opts.icon}"> <div data-is="viron-icon-{opts.icon}"></div> </div> <div class="Dialog__title" if="{!!opts.title}">{opts.title}</div> <div class="Dialog__message" if="{!!opts.message}">{opts.message}</div> <div class="Dialog__control"> <viron-button label="{opts.labelPositive || i18n(\'cmp.dialog.ok\')}" onselect="{handlePositiveSelect}"></viron-button> <viron-button label="{opts.labelNegative || i18n(\'cmp.dialog.cancel\')}" theme="ghost" onselect="{handleNegativeSelect}"></viron-button> </div>', '', 'class="Dialog"', function(opts) {
     this.external(script$6);
 });
 
@@ -17806,13 +16308,13 @@ var script$7 = function() {
         return clipboard.copy(val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.explorer.detail.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.explorer.detail.error_copy_message')
         });
       });
   };
@@ -17878,7 +16380,7 @@ var script$7 = function() {
   };
 };
 
-riot$1.tag2('viron-explorer-detail', '<div class="Explorer_Detail__head"> <div class="Explorer_Detail__close" onclick="{getClickHandler(\'handleCloseTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Explorer_Detail__delete" if="{opts.isDeletable}" onclick="{getClickHandler(\'handleDeleteTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDeleteTap\')}">削除</div> </div> <div class="Explorer_Detail__body"> <div class="Explorer_Detail__inner" if="{isReady}"> <div class="Explorer_Detail__image {\'Explorer_Detail__image--small\': isMobile}" riot-style="background-image:url({selectedPath});"></div> <div class="Explorer_Detail__infos"> <div class="Explorer_Detail__info"> <div class="Explorer_Detail__infoLabel">ID</div> <div class="Explorer_Detail__infoValue" onclick="{getClickHandler(\'handleIdTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleIdTap\')}">{selectedId}</div> </div> <div class="Explorer_Detail__info"> <div class="Explorer_Detail__infoLabel">この画像のアドレス</div> <div class="Explorer_Detail__infoValue" onclick="{getClickHandler(\'handlePathTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePathTap\')}">{selectedPath}</div> </div> </div> <viron-button if="{opts.isInsertable}" label="この画像を挿入" onselect="{handleInsertTap}"></viron-button> </div> </div> <div class="Explorer_Detail__tail" if="{hasPagination}"> <div class="Explorer_Detail__pageButton {\'Explorer_Detail__pageButton--disabled\': !isPrevEnabled}" onclick="{getClickHandler(\'handlePrevTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePrevTap\')}"> <viron-icon-arrow-left></viron-icon-arrow-left> </div> <div class="Explorer_Detail__pageButton {\'Explorer_Detail__pageButton--disabled\': !isNextEnabled}" onclick="{getClickHandler(\'handleNextTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleNextTap\')}"> <viron-icon-arrow-right></viron-icon-arrow-right> </div> </div>', '', 'class="Explorer_Detail"', function(opts) {
+riot$1.tag2('viron-explorer-detail', '<div class="Explorer_Detail__head"> <div class="Explorer_Detail__close" onclick="{getClickHandler(\'handleCloseTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="Explorer_Detail__delete" if="{opts.isDeletable}" onclick="{getClickHandler(\'handleDeleteTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDeleteTap\')}">{i18n(\'cmp.explorer.detail.title\')}</div> </div> <div class="Explorer_Detail__body"> <div class="Explorer_Detail__inner" if="{isReady}"> <div class="Explorer_Detail__image {\'Explorer_Detail__image--small\': isMobile}" riot-style="background-image:url({selectedPath});"></div> <div class="Explorer_Detail__infos"> <div class="Explorer_Detail__info"> <div class="Explorer_Detail__infoLabel">ID</div> <div class="Explorer_Detail__infoValue" onclick="{getClickHandler(\'handleIdTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleIdTap\')}">{selectedId}</div> </div> <div class="Explorer_Detail__info"> <div class="Explorer_Detail__infoLabel">{i18n(\'cmp.explorer.detail.info\')}</div> <div class="Explorer_Detail__infoValue" onclick="{getClickHandler(\'handlePathTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePathTap\')}">{selectedPath}</div> </div> </div> <viron-button if="{opts.isInsertable}" label="{i18n(\'cmp.explorer.detail.button\')}" onselect="{handleInsertTap}"></viron-button> </div> </div> <div class="Explorer_Detail__tail" if="{hasPagination}"> <div class="Explorer_Detail__pageButton {\'Explorer_Detail__pageButton--disabled\': !isPrevEnabled}" onclick="{getClickHandler(\'handlePrevTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePrevTap\')}"> <viron-icon-arrow-left></viron-icon-arrow-left> </div> <div class="Explorer_Detail__pageButton {\'Explorer_Detail__pageButton--disabled\': !isNextEnabled}" onclick="{getClickHandler(\'handleNextTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleNextTap\')}"> <viron-icon-arrow-right></viron-icon-arrow-right> </div> </div>', '', 'class="Explorer_Detail"', function(opts) {
     this.external(script$7);
 });
 
@@ -17938,10 +16440,10 @@ var script$5 = function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = '認証エラー。';
+          this.error = i18n.get('cmp.explorer.error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('cmp.explorer.error_network')}。`;
         }
         this.update();
       });
@@ -18080,7 +16582,7 @@ var script$5 = function() {
       })
       .then(() => {
         return store.action('toasts.add', {
-          message: '画像を追加しました。'
+          message: i18n.get('cmp.explorer.image_add_info')
         });
       })
       .then(() => {
@@ -18098,7 +16600,7 @@ var script$5 = function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: '認証切れ'
+            title: i18n.get('cmp.explorer.error_401_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -18130,7 +16632,7 @@ var script$5 = function() {
       .then(() => store.action('components.operate', this.deleteOperation, parameters))
       .then(() => {
         return store.action('toasts.add', {
-          message: '画像を削除しました。'
+          message: i18n.get('cmp.explorer.image_delete_info')
         });
       })
       .then(() => {
@@ -18149,7 +16651,7 @@ var script$5 = function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: '認証切れ'
+            title: i18n.get('cmp.explorer.error_401_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -18197,8 +16699,8 @@ var script$5 = function() {
       isDeletable: !!this.deleteOperation,
       onDelete: (id, closer) => {
         Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
-          title: '画像を完全に削除しますか？',
-          message: '画像を削除した後は元に戻す事ができません。この画像を完全に削除してもよろしいですか？',
+          title: i18n.get('cmp.explorer.delete_info_title'),
+          message: i18n.get('cmp.explorer.delete_info_message'),
           onPositiveSelect: () => {
             closer();
             deleteImage(id);
@@ -18225,7 +16727,7 @@ var script$5 = function() {
   };
 };
 
-riot$1.tag2('viron-explorer', '<div class="Explorer__head"> <div class="Explorer__title">{opts.def.name || \'画像アップロード\'}</div> <div class="Explorer__control"></div> </div> <div class="Explorer__body"> <div class="Explorer__label">ライブラリ</div> <virtual if="{isLoading}"> <div class="Explorer__progressWrapper"> <div class="Explorer__progress"> <viron-icon-reload></viron-icon-reload> </div> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="Explorer__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="Explorer__content"> <form class="Explorer__droparea {\'Explorer__droparea--active\': isDragWatching, \'Explorer__droparea--mini\': isMobile}" if="{!!postOperation}" ref="form" onclick="{getClickHandler(\'handleDropareaTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDropareaTap\')}"> <input class="Explorer__input" type="file" id="{inputId}" accept="image/*" onchange="{handleFileChange}"> <div class="Explorer__dropareaLabel" if="{!isMobile}">ここにファイルをドロップして追加できます</div> <div class="Explorer__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> <label class="Explorer__dropareaButton" ref="label" for="{inputId}" onclick="{getClickHandler(\'handleLabelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLabelTap\')}">ファイルを選択</label> </form> <div class="Explorer__list" if="{!!data &amp;&amp; !!data.length}" ref="list"> <div class="Explorer__item" each="{item, idx in data}" riot-style="background-image:url({item.url});" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}"></div> </div> </div> </virtual> </virtual> </div> <div class="Explorer__tail" if="{hasPagination}"> <viron-pagination max="{pagination.max}" size="{paginationSize}" current="{pagination.current}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="Explorer__blocker" if="{isLoading}"></div>', '', 'class="Explorer"', function(opts) {
+riot$1.tag2('viron-explorer', '<div class="Explorer__head"> <div class="Explorer__title">{opts.def.name || i18n(\'cmp.explorer.droparea_title\')}</div> <div class="Explorer__control"></div> </div> <div class="Explorer__body"> <div class="Explorer__label">{i18n(\'cmp.explorer.droparea_label\')}</div> <virtual if="{isLoading}"> <div class="Explorer__progressWrapper"> <div class="Explorer__progress"> <viron-icon-reload></viron-icon-reload> </div> </div> </virtual> <virtual if="{!isLoading}"> <virtual if="{!!error}"> <div class="Explorer__error">{error}</div> </virtual> <virtual if="{!error}"> <div class="Explorer__content"> <form class="Explorer__droparea {\'Explorer__droparea--active\': isDragWatching, \'Explorer__droparea--mini\': isMobile}" if="{!!postOperation}" ref="form" onclick="{getClickHandler(\'handleDropareaTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleDropareaTap\')}"> <input class="Explorer__input" type="file" id="{inputId}" accept="image/*" onchange="{handleFileChange}"> <div class="Explorer__dropareaLabel" if="{!isMobile}">{i18n(\'cmp.explorer.droparea_info\')}</div> <div class="Explorer__dragHandler" ondragenter="{handleHandlerDragEnter}" ondragover="{handleHandlerDragOver}" ondragleave="{handleHandlerDragLeave}" ondrop="{handleHandlerDrop}"></div> <label class="Explorer__dropareaButton" ref="label" for="{inputId}" onclick="{getClickHandler(\'handleLabelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleLabelTap\')}">{i18n(\'cmp.explorer.droparea_button\')}</label> </form> <div class="Explorer__list" if="{!!data &amp;&amp; !!data.length}" ref="list"> <div class="Explorer__item" each="{item, idx in data}" riot-style="background-image:url({item.url});" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}"></div> </div> </div> </virtual> </virtual> </div> <div class="Explorer__tail" if="{hasPagination}"> <viron-pagination max="{pagination.max}" size="{paginationSize}" current="{pagination.current}" onchange="{handlePaginationChange}"></viron-pagination> </div> <div class="Explorer__blocker" if="{isLoading}"></div>', '', 'class="Explorer"', function(opts) {
     this.external(script$5);
 });
 
@@ -46418,10 +44920,10 @@ var script$8 = function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = '認証エラー。';
+          this.error = i18n.get('pg.components.card.chart.error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('pg.components.card.chart.error_network')}`;
         }
         this.update();
       });
@@ -46560,10 +45062,10 @@ var script$9 = function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = '認証エラー。';
+          this.error = i18n.get('pg.components.card.number.error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('pg.components.card.number.error_network')}`;
         }
         this.update();
       });
@@ -46576,10 +45078,10 @@ var script$9 = function() {
    */
   const validate = data => {
     if (!data) {
-      return 'レスポンスデータに誤りがあります。';
+      return i18n.get('pg.components.card.number.error_response');
     }
     if (!isNumber_1(data.value)) {
-      return 'value値が数値ではありません。';
+      return i18n.get('pg.components.card.number.error_number');
     }
     return null;
   };
@@ -46906,7 +45408,7 @@ var script$13 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__head"> <div class="ComponentsPage_Filter__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Filter__title">表示項目フィルター</div> <div class="ComponentsPage_Filter__description">テーブルに表示する項目を選択できます。表示させたい項目をONにしてください。</div> <div class="ComponentsPage_Filter__control"> <div class="ComponentsPage_Filter__item"> <viron-checkbox label="全て選択する" ischecked="{isAllSelected}" theme="ghost" onchange="{handleAllSelectChange}"></viron-checkbox> </div> </div> </div> <div class="ComponentsPage_Filter__body"> <div class="ComponentsPage_Filter__item" each="{column in columns}"> <viron-checkbox id="{column.key}" label="{column.description || column.key}" ischecked="{column.isSelected}" theme="ghost" onchange="{handleItemChange}"></viron-checkbox> </div> </div> <div class="ComponentsPage_Filter__tail"> <viron-button label="適用する" isdisabled="{isApplyButtonDisabled}" onselect="{handleApplyButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Filter ComponentsPage_Filter--{layoutType}"', function(opts) {
+riot$1.tag2('viron-components-page-filter', '<div class="ComponentsPage_Filter__head"> <div class="ComponentsPage_Filter__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Filter__title">{i18n(\'pg.components.filter.title\')}</div> <div class="ComponentsPage_Filter__description">{i18n(\'pg.components.filter.description\')}</div> <div class="ComponentsPage_Filter__control"> <div class="ComponentsPage_Filter__item"> <viron-checkbox label="{i18n(\'pg.components.filter.label\')}" ischecked="{isAllSelected}" theme="ghost" onchange="{handleAllSelectChange}"></viron-checkbox> </div> </div> </div> <div class="ComponentsPage_Filter__body"> <div class="ComponentsPage_Filter__item" each="{column in columns}"> <viron-checkbox id="{column.key}" label="{column.description || column.key}" ischecked="{column.isSelected}" theme="ghost" onchange="{handleItemChange}"></viron-checkbox> </div> </div> <div class="ComponentsPage_Filter__tail"> <viron-button label="{i18n(\'pg.components.filter.button\')}" isdisabled="{isApplyButtonDisabled}" onselect="{handleApplyButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Filter ComponentsPage_Filter--{layoutType}"', function(opts) {
     this.external(script$13);
 });
 
@@ -47025,13 +45527,13 @@ var script$14 = function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.autocomplete.copy')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.autocomplete.error_copy')
         });
       });
   };
@@ -52683,7 +51185,7 @@ function trailingNewline(str, options) {
 
 
 
-var defaults$1 = {
+var defaults = {
   unformatted: ['code', 'pre', 'em', 'strong', 'span'],
   indent_inner_html: true,
   indent_char: ' ',
@@ -52692,7 +51194,7 @@ var defaults$1 = {
 };
 
 var pretty = function pretty(str, options) {
-  var opts = extendShallow({}, defaults$1, options);
+  var opts = extendShallow({}, defaults, options);
   str = js.html(str, opts);
 
   if (opts.ocd === true) {
@@ -52812,13 +51314,13 @@ var script$17 = function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.textarea.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.textarea.copy_error_copy_message')
         });
       });
   };
@@ -52897,19 +51399,19 @@ var script$18 = function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.html.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.html.error_copy_message')
         });
       });
   };
 };
 
-riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\': isEditorMode}" onclick="{getClickHandler(\'handleEditorTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditorTabTap\')}">エディタ</div> <div class="Html__tab {\'Html__tab--selected\': isPreviewMode}" onclick="{getClickHandler(\'handlePreviewTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePreviewTabTap\')}">プレビュー</div> </div> <div class="Html__body"> <div class="Html__editor" if="{isEditorMode}"> <viron-textarea val="{opts.val}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}" onfocus="{handleEditorFocus}" onblur="{handleEditorBlur}"></viron-textarea> </div> <div class="Html__preview" if="{isPreviewMode}"> <viron-prettyhtml data="{opts.val}"></viron-prettyhtml> </div> </div> <div class="Html__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Html {\'Html--disabled\': opts.isdisabled, \'Html--error\': opts.haserror}"', function(opts) {
+riot$1.tag2('viron-html', '<div class="Html__tabs"> <div class="Html__tab {\'Html__tab--selected\': isEditorMode}" onclick="{getClickHandler(\'handleEditorTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditorTabTap\')}">{i18n(\'cmp.html.copy_edit\')}</div> <div class="Html__tab {\'Html__tab--selected\': isPreviewMode}" onclick="{getClickHandler(\'handlePreviewTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePreviewTabTap\')}">{i18n(\'cmp.html.copy_preview\')}</div> </div> <div class="Html__body"> <div class="Html__editor" if="{isEditorMode}"> <viron-textarea val="{opts.val}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}" onfocus="{handleEditorFocus}" onblur="{handleEditorBlur}"></viron-textarea> </div> <div class="Html__preview" if="{isPreviewMode}"> <viron-prettyhtml data="{opts.val}"></viron-prettyhtml> </div> </div> <div class="Html__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Html {\'Html--disabled\': opts.isdisabled, \'Html--error\': opts.haserror}"', function(opts) {
     this.external(script$18);
 });
 
@@ -53076,13 +51578,13 @@ var script$20 = function() {
         return clipboard.copy(String(this.opts.val));
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.numberinput.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.numberinput.error_copy_message')
         });
       });
   };
@@ -53162,19 +51664,19 @@ var script$21 = function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.pug.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.pug.copy_error_copy_message')
         });
       });
   };
 };
 
-riot$1.tag2('viron-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\': isEditorMode}" onclick="{getClickHandler(\'handleEditorTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditorTabTap\')}">エディタ</div> <div class="Pug__tab {\'Pug__tab--selected\': isPreviewMode}" onclick="{getClickHandler(\'handlePreviewTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePreviewTabTap\')}">プレビュー</div> </div> <div class="Pug__body"> <div class="Pug__editor" if="{isEditorMode}"> <viron-textarea val="{opts.val}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}" onfocus="{handleEditorFocus}" onblur="{handleEditorBlur}"></viron-textarea> </div> <div class="Pug__preview" if="{isPreviewMode}"> <viron-prettyhtml data="{opts.val}"></viron-prettyhtml> </div> </div> <div class="Pug__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Pug {\'Pug--disabled\': opts.isdisabled, \'Pug--error\': opts.haserror}"', function(opts) {
+riot$1.tag2('viron-pug', '<div class="Pug__tabs"> <div class="Pug__tab {\'Pug__tab--selected\': isEditorMode}" onclick="{getClickHandler(\'handleEditorTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleEditorTabTap\')}">{i18n(\'cmp.pug.editor_label\')}</div> <div class="Pug__tab {\'Pug__tab--selected\': isPreviewMode}" onclick="{getClickHandler(\'handlePreviewTabTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePreviewTabTap\')}">{i18n(\'cmp.pug.preview_label\')}</div> </div> <div class="Pug__body"> <div class="Pug__editor" if="{isEditorMode}"> <viron-textarea val="{opts.val}" isdisabled="{opts.isdisabled}" onchange="{handleEditorChange}" onfocus="{handleEditorFocus}" onblur="{handleEditorBlur}"></viron-textarea> </div> <div class="Pug__preview" if="{isPreviewMode}"> <viron-prettyhtml data="{opts.val}"></viron-prettyhtml> </div> </div> <div class="Pug__blocker" if="{opts.ispreview}" onclick="{getClickHandler(\'handleBlockerTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBlockerTap\')}"></div>', '', 'class="Pug {\'Pug--disabled\': opts.isdisabled, \'Pug--error\': opts.haserror}"', function(opts) {
     this.external(script$21);
 });
 
@@ -53242,13 +51744,13 @@ var script$22 = function() {
         return clipboard.copy(String(val));
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.select.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.select.copy_error_copy_message')
         });
       });
   };
@@ -53346,13 +51848,13 @@ var script$23 = function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.textinput.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.textinput.copy_error_copy_message')
         });
       });
   };
@@ -95737,7 +94239,7 @@ var script$27 = function() {
   };
 };
 
-riot$1.tag2('viron-wyswyg-explorer', '<div class="Wyswyg_Explorer__head"> <div class="Wyswyg_Explorer__back" onclick="{getClickHandler(\'handleBackTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBackTap\')}"> <viron-icon-arrow-left></viron-icon-arrow-left> </div> <div class="Wyswyg_Explorer__title">画像アップロード</div> </div> <div class="Wyswyg_Explorer__body"> <viron-explorer id="{explorerId}" def="{opts.def}" oninsert="{handleExplorerInsert}"></viron-explorer> </div>', '', 'class="Wyswyg_Explorer"', function(opts) {
+riot$1.tag2('viron-wyswyg-explorer', '<div class="Wyswyg_Explorer__head"> <div class="Wyswyg_Explorer__back" onclick="{getClickHandler(\'handleBackTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBackTap\')}"> <viron-icon-arrow-left></viron-icon-arrow-left> </div> <div class="Wyswyg_Explorer__title">{i18n(\'cmp.wyswyg.explorer_title\')}</div> </div> <div class="Wyswyg_Explorer__body"> <viron-explorer id="{explorerId}" def="{opts.def}" oninsert="{handleExplorerInsert}"></viron-explorer> </div>', '', 'class="Wyswyg_Explorer"', function(opts) {
     this.external(script$27);
 });
 
@@ -96716,7 +95218,7 @@ const multipleOf = (value, constraints) => {
   }
   if ((value % multipleOf) !== 0) {
     result.isValid = false;
-    result.message = `${multipleOf}で割り切れる数値にして下さい。`;
+    result.message = i18n.get('cmp.parameters.multiple_of',{multipleOf:multipleOf});
   }
   return result;
 };
@@ -96736,13 +95238,13 @@ const maximumAndExclusiveMaximum = (value, constraints) => {
   if (exclusiveMaximum) {
     if (value >= maximum) {
       result.isValid = false;
-      result.message = `${maximum}より小さい数値にして下さい。`;
+      result.message = i18n.get('cmp.parameters.maximum1',{maximum:maximum});
       return result;
     }
   } else {
     if (value > maximum) {
       result.isValid = false;
-      result.message = `${maximum}以下の数値にして下さい。`;
+      result.message = i18n.get('cmp.parameters.maximum2',{maximum:maximum});
       return result;
     }
   }
@@ -96764,13 +95266,13 @@ const minimumAndExclusiveMinimum = (value, constraints) => {
   if (exclusiveMinimum) {
     if (value <= minimum) {
       result.isValid = false;
-      result.message = `${minimum}より大きい数値にして下さい。`;
+      result.message = i18n.get('cmp.parameters.minimum1',{minimum:minimum});
       return result;
     }
   } else {
     if (value < minimum) {
       result.isValid = false;
-      result.message = `${minimum}以上の数値にして下さい。`;
+      result.message = i18n.get('cmp.parameters.minimum2',{minimum:minimum});
       return result;
     }
   }
@@ -96789,7 +95291,7 @@ const maxLength = (value, constraints) => {
   }
   if (value.length > maxLength) {
     result.isValid = false;
-    result.message = `文字数を${maxLength}以下にして下さい。`;
+    result.message = i18n.get('cmp.parameters.max_length',{maxLength:maxLength});
     return result;
   }
   return result;
@@ -96802,7 +95304,7 @@ const minLength = (value, constraints) => {
   const minLength = constraints.minLength || 0;
   if (value.length < minLength) {
     result.isValid = false;
-    result.message = `文字数を${minLength}以上にして下さい。`;
+    result.message = i18n.get('cmp.parameters.min_length',{minLength:minLength});
     return result;
   }
   return result;
@@ -96819,7 +95321,7 @@ const pattern = (value, constraints) => {
   const pattern = constraints.pattern;
   if (!value.match(pattern)) {
     result.isValid = false;
-    result.message = `${pattern}にマッチさせて下さい。`;
+    result.message = i18n.get('cmp.parameters.pattern',{pattern:pattern});
     return result;
   }
   return result;
@@ -96862,7 +95364,7 @@ const additionalItemsAndItems = (value, constraints) => {
     }
   }
   result.isValid = false;
-  result.message = `要素数を${items.length}以下にして下さい。`;
+  result.message = i18n.get('cmp.parameters.additional_items',{length:items.length});
   return result;
 };
 
@@ -96878,7 +95380,7 @@ const maxItems = (value, constraints) => {
   }
   if (value.length > maxItems) {
     result.isValid = false;
-    result.message = `要素数を${maxItems}以下にして下さい。`;
+    result.message = i18n.get('cmp.parameters.max_items',{maxItems:maxItems});
     return result;
   }
   return result;
@@ -96891,7 +95393,7 @@ const minItems = (value, constraints) => {
   const minItems = constraints.minItems || 0;
   if (value.length < minItems) {
     result.isValid = false;
-    result.message = `要素数を${minItems}以上にして下さい。`;
+    result.message = i18n.get('cmp.parameters.min_items',{minItems:minItems});
     return result;
   }
   return result;
@@ -96911,7 +95413,7 @@ const uniqueItems = (value, constraints) => {
     return (a === b);
   }).length) {
     result.isValid = false;
-    result.message = '内容が重複しない要素で構成して下さい。';
+    result.message = i18n.get('cmp.parameters.unique_items');
     return result;
   }
   return result;
@@ -96929,7 +95431,7 @@ const maxProperties = (value, constraints) => {
   }
   if (size_1(value) > maxProperties) {
     result.isValid = false;
-    result.message = `要素数を${maxProperties}以下にして下さい。`;
+    result.message = i18n.get('cmp.parameters.max_properties',{maxProperties:maxProperties});
     return result;
   }
   return result;
@@ -96942,7 +95444,7 @@ const minProperties = (value, constraints) => {
   const minProperties = constraints.minProperties || 0;
   if (size_1(value) < minProperties) {
     result.isValid = false;
-    result.message = `要素数を${minProperties}以上にして下さい。`;
+    result.message = i18n.get('cmp.parameters.min_properties',{minProperties:minProperties});
     return result;
   }
   return result;
@@ -96962,7 +95464,7 @@ const required = (value, constraints) => {
     if (!hasOwn_1$2(value, key)) {
       result.isValid = false;
       const description = constraints.properties[key].description ? `(${constraints.properties[key].description})` : '';
-      result.message = `要素に${key}${description}を含めて下さい。`;
+      result.message = i18n.get('cmp.parameters.required',{key: key ,description: description});
     }
   });
   return result;
@@ -97024,7 +95526,7 @@ const _enum = (value, constraints) => {
   });
   if (!isFound) {
     result.isValid = false;
-    result.message = `${JSON.stringify(_enum)}のいずれかの値を設定して下さい。`;
+    result.message = i18n.get('cmp.parameters.enum',{enum:JSON.stringify(_enum)});
   }
   return result;
 };
@@ -97088,7 +95590,7 @@ const _type = (value, constraints) => {
   });
   if (!isValid) {
     result.isValid = false;
-    result.message = `型を${JSON.stringify(types)}のいずれかにして下さい。`;
+    result.message = i18n.get('cmp.parameters.type',{types:JSON.stringify(types)});
   }
   return result;
 };
@@ -97185,14 +95687,14 @@ const format$1 = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull_1(isMatch)) {
       result.isValid = false;
-      result.message = '"date-time"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('cmp.parameters.format_date_time');
       return result;
     }
     // 存在する日付かチェックする(e.g. うるう年)
     const isValid = dayjs_min(value).isValid();
     if (!isValid) {
       result.isValid = false;
-      result.message = '存在する日付を入力してください。';
+      result.message = i18n.get('cmp.parameters.format_date_time_notfound');
       return result;
     }
     break;
@@ -97208,7 +95710,7 @@ const format$1 = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull_1(isMatch)) {
       result.isValid = false;
-      result.message = '"email"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('cmp.parameters.format_email');
       return result;
     }
     break;
@@ -97222,7 +95724,7 @@ const format$1 = (value, constraints) => {
     // hostnameが255文字を超えていたらエラー
     if (value.length > 255) {
       result.isValid = false;
-      result.message = '"hostname"は255文字以内で入力してください。';
+      result.message = i18n.get('cmp.parameters.format_hostname');
       return result;
     }
     // RFC 1034に則った書き方かバリデートする
@@ -97230,7 +95732,7 @@ const format$1 = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull_1(isMatch)) {
       result.isValid = false;
-      result.message = '"hostname"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('cmp.parameters.format_hostname_notmatch');
       return result;
     }
     break;
@@ -97246,7 +95748,7 @@ const format$1 = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull_1(isMatch)) {
       result.isValid = false;
-      result.message = '"ipv4"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('cmp.parameters.format_ipv4');
       return result;
     }
     break;
@@ -97290,7 +95792,7 @@ const format$1 = (value, constraints) => {
     });
     if (!matchResult) {
       result.isValid = false;
-      result.message = '"ipv6"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('cmp.parameters.format_ipv6');
       return result;
     }
     break;
@@ -97306,7 +95808,7 @@ const format$1 = (value, constraints) => {
     const isMatch = value.match(pattern);
     if (isNull_1(isMatch)) {
       result.isValid = false;
-      result.message = '"uri"に則ったフォーマットで入力してください。';
+      result.message = i18n.get('cmp.parameters.format_uri');
       return result;
     }
     break;
@@ -97335,7 +95837,7 @@ var validator = {
     // ただし、required(self)がtrueの場合はエラー。
     if (isUndefined(value)) {
       if (schemaObject.required) {
-        return ['必須項目です。'];
+        return [i18n.get('cmp.parameters.error_undefined')];
       }
       return results;
     }
@@ -97427,7 +95929,7 @@ var script$28 = function() {
   // 入力必須ならば米印を付ける。
   this.title = formObject.name;
   if (formObject.required) {
-    this.title = `${this.title} (必須)`;
+    this.title = `${this.title} ${i18n.get('cmp.parameters.form.required_label')}`;
   }
   this.isRequired = formObject.required;
   this.description = formObject.description;
@@ -97931,7 +96433,7 @@ var script$32 = function() {
     const propertiesOptions = [];
     propertiesOptions.push({
       id: 'select_def',
-      label: '選択して下さい',
+      label: i18n.get('cmp.parameters.properties.label'),
       value: undefined,
       isSelected: !id
     });
@@ -98512,7 +97014,7 @@ var script$33 = function() {
   };
 };
 
-riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__addButton" if="{!opts.ispreview}" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__headContent"> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__error" if="{hasError}">{errors[0]}</div> </div> <div class="Parameters_Items__openButton" if="{!!opts.val &amp;&amp; !!opts.val.length}" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">項目をすべて開く</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="Parameters_Items__removeButton" if="{!parent.opts.ispreview}" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">この項目を削除</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.formObject}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" isswitchable="{parent.opts.isswitchable}" propertiesobject="{parent.propertiesObject}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" isswitchable="{parent.opts.isswitchable}" schemaobject="{parent.schemaObject.items}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-items> </virtual> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div class="Parameters_Items__itemBriefTitle">{parent.getBriefItemTitle(val, idx)}</div> <div class="Parameters_Items__itemBriefDescription" if="{parent.isPropertiesMode}">{parent.getBriefItemDescription(val)}</div> <div class="Parameters_Items__itemBriefOpenButton"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div> <div class="Parameters_Items__itemMoveUp" if="{opts.val.length &gt;= 2}" onclick="{getClickHandler(\'handleMoveUpTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMoveUpTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="Parameters_Items__itemMoveDown" if="{opts.val.length &gt;= 2}" onclick="{getClickHandler(\'handleMoveDownTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMoveDownTap\')}"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div> </div>', '', 'class="Parameters_Items {\'Parameters_Items--preview\': opts.ispreview} Parameters_Items--{opts.theme}"', function(opts) {
+riot$1.tag2('viron-parameters-items', '<div class="Parameters_Items__head"> <div class="Parameters_Items__addButton" if="{!opts.ispreview}" onclick="{getClickHandler(\'handleAddButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleAddButtonTap\')}"> <viron-icon-plus></viron-icon-plus> </div> <div class="Parameters_Items__headContent"> <div class="Parameters_Items__label">{opts.label}{opts.required ? \' *\' : \'\'}</div> <div class="Parameters_Items__error" if="{hasError}">{errors[0]}</div> </div> <div class="Parameters_Items__openButton" if="{!!opts.val &amp;&amp; !!opts.val.length}" onclick="{getClickHandler(\'handleOpenAllButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOpenAllButtonTap\')}">{i18n(\'cmp.parameters.items.button\')}</div> </div> <div class="Parameters_Items__body" if="{!!opts.val &amp;&amp; !!opts.val.length}"> <div class="Parameters_Items__item {\'Parameters_Items__item--opened\': parent.isItemOpened(idx)}" each="{val, idx in opts.val}"> <div class="Parameters_Items__itemDetail"> <div class="Parameters_Items__itemHead"> <div class="Parameters_Items__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="Parameters_Items__removeButton" if="{!parent.opts.ispreview}" onclick="{getClickHandler(\'handleRemoveButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleRemoveButtonTap\')}">{i18n(\'cmp.parameters.items.button_remove\')}</div> </div> <div class="Parameters_Items__itemBody"> <virtual if="{parent.isFormMode}"> <viron-parameters-form no-reorder identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" formobject="{parent.formObject}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-form> </virtual> <virtual if="{parent.isPropertiesMode}"> <viron-parameters-properties no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" isswitchable="{parent.opts.isswitchable}" propertiesobject="{parent.propertiesObject}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-properties> </virtual> <virtual if="{parent.isItemsMode}"> <viron-parameters-items no-reorder label="{parent.opts.label}[{idx}]" identifier="{idx}" val="{val}" theme="{parent.opts.theme}" ispreview="{parent.opts.ispreview}" isswitchable="{parent.opts.isswitchable}" schemaobject="{parent.schemaObject.items}" onsubmit="{parent.handleItemSubmit}" onchange="{parent.handleItemChange}" onvalidate="{parent.handleItemValidate}"></viron-parameters-items> </virtual> </div> </div> <div class="Parameters_Items__itemBrief" onclick="{getClickHandler(\'handleItemBriefTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemBriefTap\')}"> <div class="Parameters_Items__itemBriefTitle">{parent.getBriefItemTitle(val, idx)}</div> <div class="Parameters_Items__itemBriefDescription" if="{parent.isPropertiesMode}">{parent.getBriefItemDescription(val)}</div> <div class="Parameters_Items__itemBriefOpenButton"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div> <div class="Parameters_Items__itemMoveUp" if="{opts.val.length &gt;= 2}" onclick="{getClickHandler(\'handleMoveUpTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMoveUpTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="Parameters_Items__itemMoveDown" if="{opts.val.length &gt;= 2}" onclick="{getClickHandler(\'handleMoveDownTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMoveDownTap\')}"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div> </div>', '', 'class="Parameters_Items {\'Parameters_Items--preview\': opts.ispreview} Parameters_Items--{opts.theme}"', function(opts) {
     this.external(script$33);
 });
 
@@ -98751,25 +97253,25 @@ var script$36 = function() {
   const customSubmitLabel = operationObject['x-submit-label'];
   switch (method) {
   case 'get':
-    this.submitLabel = customSubmitLabel || '取得する';
-    this.successMessage = '取得しました。';
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_get');
+    this.successMessage = i18n.get('pg.components.operation.label_get_info');
     break;
   case 'post':
-    this.submitLabel = customSubmitLabel || '新規作成する';
-    successMessage = '新規作成しました。';
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_post');
+    successMessage = i18n.get('pg.components.operation.label_post_info');
     break;
   case 'put':
-    this.submitLabel = customSubmitLabel || '保存する';
-    successMessage = '保存しました。';
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_put');
+    successMessage = i18n.get('pg.components.operation.label_put_info');
     break;
   case 'delete':
-    this.submitLabel = customSubmitLabel || '削除する';
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_delete');
     this.submitModifier = 'emphasised';
-    successMessage = '削除しました。';
+    successMessage = i18n.get('pg.components.operation.label_delete_info');
     break;
   default:
-    this.submitLabel = '実行する';
-    successMessage = '完了しました。';
+    this.submitLabel = i18n.get('pg.components.operation.label_default');
+    successMessage = i18n.get('pg.components.operation.label_default_info');
     break;
   }
 
@@ -98787,7 +97289,7 @@ var script$36 = function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: '認証切れ'
+            title: i18n.get('pg.components.operation.error_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -98805,7 +97307,7 @@ var script$36 = function() {
     }
     Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
       title: this.title,
-      message: '本当に実行しますか？',
+      message: i18n.get('pg.components.operation.comfirm'),
       labelPositive: this.submitLabel,
       onPositiveSelect: () => {
         if (isOperating) { return; }
@@ -98862,7 +97364,7 @@ var script$36 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">キャンセル</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" isswitchable="{isSwitchable}" parameterobjects="{opts.operationObject.parameters}" primary="{opts.primary}" onsubmit="{handleFormSubmit}" onchange="{handleParametersChange}" onvalidate="{handleParametersValidate}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" ref="submit" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation ComponentsPage_Operation--{layoutType}"', function(opts) {
+riot$1.tag2('viron-components-page-operation', '<div class="ComponentsPage_Operation__head"> <div class="ComponentsPage_Operation__title">{title}</div> <div class="ComponentsPage_Operation__cancel" onclick="{getClickHandler(\'handleCancelTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCancelTap\')}">{i18n(\'pg.components.operation.cancel\')}</div> </div> <div class="ComponentsPage_Operation__body"> <viron-parameters val="{val}" isswitchable="{isSwitchable}" parameterobjects="{opts.operationObject.parameters}" primary="{opts.primary}" onsubmit="{handleFormSubmit}" onchange="{handleParametersChange}" onvalidate="{handleParametersValidate}"></viron-parameters> </div> <div class="ComponentsPage_Operation__tail"> <div class="ComponentsPage_Operation__submit ComponentsPage_Operation__submit--{submitModifier}" ref="submit" onclick="{getClickHandler(\'handleSubmitTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSubmitTap\')}">{submitLabel}</div> </div>', '', 'class="ComponentsPage_Operation ComponentsPage_Operation--{layoutType}"', function(opts) {
     this.external(script$36);
 });
 
@@ -98911,7 +97413,7 @@ var script$38 = function() {
   };
 };
 
-riot$1.tag2('viron-list', '<div class="List__item" if="{hasControlButtons}" onclick="{getClickHandler(\'handlePrevItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePrevItemTap\')}"> <viron-icon-up class="List__icon"></viron-icon-up> <div class="List__label">戻る</div> </div> <div class="List__body" riot-style="height:{bodyHeight}px;"> <div class="List__itemsWrapper" riot-style="top:-{bodyTop}px;"> <div class="List__item" each="{item in list}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}"> <div class="List__label">{item.label}</div> </div> </div> </div> <div class="List__item" if="{hasControlButtons}" onclick="{getClickHandler(\'handleNextItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleNextItemTap\')}"> <viron-icon-down class="List__icon"></viron-icon-down> <div class="List__label">さらに表示</div> </div>', '', 'class="List"', function(opts) {
+riot$1.tag2('viron-list', '<div class="List__item" if="{hasControlButtons}" onclick="{getClickHandler(\'handlePrevItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePrevItemTap\')}"> <viron-icon-up class="List__icon"></viron-icon-up> <div class="List__label">{i18n(\'cmp.list.back\')}</div> </div> <div class="List__body" riot-style="height:{bodyHeight}px;"> <div class="List__itemsWrapper" riot-style="top:-{bodyTop}px;"> <div class="List__item" each="{item in list}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}"> <div class="List__label">{item.label}</div> </div> </div> </div> <div class="List__item" if="{hasControlButtons}" onclick="{getClickHandler(\'handleNextItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleNextItemTap\')}"> <viron-icon-down class="List__icon"></viron-icon-down> <div class="List__label">{i18n(\'cmp.list.view\')}</div> </div>', '', 'class="List"', function(opts) {
     this.external(script$38);
 });
 
@@ -99033,7 +97535,7 @@ var script$37 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-preview', '<div class="ComponentsPage_Preview__head"> <div class="ComponentsPage_Preview__title">プレビュー</div> <div class="ComponentsPage_Preview__operations" if="{!!this.operations.length &amp;&amp; !isOperationsHidden()}"> <div class="ComponentsPage_Preview__operation ComponentsPage_Preview__operation--{operation.method}" each="{operation in this.operations}" onclick="{getClickHandler(\'handleOperationTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOperationTap\')}">{operation.summary || operation.operationId}</div> </div> <div class="ComponentsPage_Preview__operationsButton" if="{!!this.operations.length &amp;&amp; isOperationsHidden()}" onclick="{getClickHandler(\'handleOperationsButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOperationsButtonTap\')}"> <viron-icon-setting></viron-icon-setting> </div> <div class="ComponentsPage_Preview__backButton" onclick="{getClickHandler(\'handleBackButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBackButtonTap\')}"> <viron-icon-arrow-left></viron-icon-arrow-left> </div> </div> <div class="ComponentsPage_Preview__body"> <viron-parameters val="{val}" ispreview="{true}" parameterobjects="{parameterObjects}"></viron-parameters> </div> <div class="ComponentsPage_Preview__tail"> <div class="ComponentsPage_Preview__prevButton {\'ComponentsPage_Preview__prevButton--disabled\': isPrevButtonDisabled}" onclick="{getClickHandler(\'handlePrevButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePrevButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="ComponentsPage_Preview__nextButton {\'ComponentsPage_Preview__prevButton--disabled\': isNextButtonDisabled}" onclick="{getClickHandler(\'handleNextButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleNextButtonTap\')}"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div>', '', 'class="ComponentsPage_Preview ComponentsPage_Preview--{layoutType}"', function(opts) {
+riot$1.tag2('viron-components-page-preview', '<div class="ComponentsPage_Preview__head"> <div class="ComponentsPage_Preview__title">{i18n(\'pg.components.preview\')}</div> <div class="ComponentsPage_Preview__operations" if="{!!this.operations.length &amp;&amp; !isOperationsHidden()}"> <div class="ComponentsPage_Preview__operation ComponentsPage_Preview__operation--{operation.method}" each="{operation in this.operations}" onclick="{getClickHandler(\'handleOperationTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOperationTap\')}">{operation.summary || operation.operationId}</div> </div> <div class="ComponentsPage_Preview__operationsButton" if="{!!this.operations.length &amp;&amp; isOperationsHidden()}" onclick="{getClickHandler(\'handleOperationsButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleOperationsButtonTap\')}"> <viron-icon-setting></viron-icon-setting> </div> <div class="ComponentsPage_Preview__backButton" onclick="{getClickHandler(\'handleBackButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleBackButtonTap\')}"> <viron-icon-arrow-left></viron-icon-arrow-left> </div> </div> <div class="ComponentsPage_Preview__body"> <viron-parameters val="{val}" ispreview="{true}" parameterobjects="{parameterObjects}"></viron-parameters> </div> <div class="ComponentsPage_Preview__tail"> <div class="ComponentsPage_Preview__prevButton {\'ComponentsPage_Preview__prevButton--disabled\': isPrevButtonDisabled}" onclick="{getClickHandler(\'handlePrevButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handlePrevButtonTap\')}"> <viron-icon-arrow-up></viron-icon-arrow-up> </div> <div class="ComponentsPage_Preview__nextButton {\'ComponentsPage_Preview__prevButton--disabled\': isNextButtonDisabled}" onclick="{getClickHandler(\'handleNextButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleNextButtonTap\')}"> <viron-icon-arrow-down></viron-icon-arrow-down> </div> </div>', '', 'class="ComponentsPage_Preview ComponentsPage_Preview--{layoutType}"', function(opts) {
     this.external(script$37);
 });
 
@@ -99069,7 +97571,7 @@ var script$40 = function() {
   };
 };
 
-riot$1.tag2('viron-components-page-search', '<div class="ComponentsPage_Search__head"> <div class="ComponentsPage_Search__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Search__title">検索</div> <div class="ComponentsPage_Search__description">クエリパラメータを指定して下さい。</div> </div> <div class="ComponentsPage_Search__body"> <viron-parameters val="{val}" theme="ghost" parameterobjects="{opts.parameterObjects}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Search__tail"> <viron-button label="検索する" onselect="{handleSearchButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Search ComponentsPage_Search--{layoutType}"', function(opts) {
+riot$1.tag2('viron-components-page-search', '<div class="ComponentsPage_Search__head"> <div class="ComponentsPage_Search__closeButton" onclick="{getClickHandler(\'handleCloseButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseButtonTap\')}"> <viron-icon-close></viron-icon-close> </div> <div class="ComponentsPage_Search__title">{i18n(\'pg.components.search.title\')}</div> <div class="ComponentsPage_Search__description">{i18n(\'pg.components.search.description\')}。</div> </div> <div class="ComponentsPage_Search__body"> <viron-parameters val="{val}" theme="ghost" parameterobjects="{opts.parameterObjects}" onchange="{handleParametersChange}"></viron-parameters> </div> <div class="ComponentsPage_Search__tail"> <viron-button label="{i18n(\'pg.components.search.button\')}" onselect="{handleSearchButtonTap}"></viron-button> </div>', '', 'class="ComponentsPage_Search ComponentsPage_Search--{layoutType}"', function(opts) {
     this.external(script$40);
 });
 
@@ -99108,10 +97610,10 @@ var script$11 = function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = '認証エラー。';
+          this.error = i18n.get('pg.components.card.table.error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('pg.components.card.table.error_network')}`;
         }
         this.update();
       });
@@ -99124,13 +97626,13 @@ var script$11 = function() {
    */
   const validate = data => {
     if (!isArray_1$1(data)) {
-      return 'レスポンスデータが配列ではありません。';
+      return i18n.get('pg.components.card.table.error_response_array');
     }
     if (!data.length) {
-      return '0件です。';
+      return i18n.get('pg.components.card.table.error_empty');
     }
     if (!isObject_1(data[0])) {
-      return '行データがオブジェクトではありません。';
+      return i18n.get('pg.components.card.table.error_object');
     }
     return null;
   };
@@ -99559,7 +98061,7 @@ riot$1.tag2('viron-components-page-table', '<div class="ComponentsPage_Card_Tabl
 
 var script$41 = function() {};
 
-riot$1.tag2('viron-components-page-unsupported', '<div class="ComponentsPage_Card_Unsupported__head"> <div class="ComponentsPage_Card_Unsupported__title">{opts.def.name}</div> </div> <div class="ComponentsPage_Card_Unsupported__body"> <div class="ComponentsPage_Card_Unsupported__error">コンポーネントタイプ「{opts.def.style}」は現在サポートされていません。</div> </div>', '', 'class="ComponentsPage_Card_Unsupported"', function(opts) {
+riot$1.tag2('viron-components-page-unsupported', '<div class="ComponentsPage_Card_Unsupported__head"> <div class="ComponentsPage_Card_Unsupported__title">{opts.def.name}</div> </div> <div class="ComponentsPage_Card_Unsupported__body"> <div class="ComponentsPage_Card_Unsupported__error">{i18n(\'pg.components.card.unsupported\',{style:opts.def.style})}」</div> </div>', '', 'class="ComponentsPage_Card_Unsupported"', function(opts) {
     this.external(script$41);
 });
 
@@ -99890,11 +98392,11 @@ var script$45 = function() {
   const validate = endpointURL => {
     // URL値が不正。
     if (!validUrl.isUri(endpointURL)) {
-      return 'URLに誤りがあります。';
+      return i18n.get('vrn.header.menu.entry.error_url');
     }
     // 重複チェック。
     if (!!store.getter('endpoints.oneByURL', endpointURL)) {
-      return '既に存在するエンドポイントです。';
+      return i18n.get('vrn.header.menu.entry.error_overlapping');
     }
     return null;
   };
@@ -99930,7 +98432,7 @@ var script$45 = function() {
       .resolve()
       .then(() => store.action('endpoints.add', this.endpointURL))
       .then(() => store.action('toasts.add', {
-        message: 'エンドポイントを追加しました。'
+        message: i18n.get('vrn.header.menu.entry.info')
       }))
       .then(() => {
         this.close();
@@ -99938,10 +98440,10 @@ var script$45 = function() {
       .catch(err => {
         switch (err.status) {
         case 404:
-          this.errorMessage = 'エンドポイントが見つかりませんでした。';
+          this.errorMessage = i18n.get('vrn.header.menu.entry.error_notfound');
           break;
         default:
-          this.errorMessage = 'エンドポイントを追加出来ませんでした。';
+          this.errorMessage = i18n.get('vrn.header.menu.entry.error');
           break;
         }
         // サーバが自己証明書を使用している場合にページ遷移を促す。
@@ -99955,7 +98457,7 @@ var script$45 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header-menu-entry', '<div class="Application_Header_Menu_Entry__title">管理画面を追加</div> <div class="Application_Header_Menu_Entry__message" if="{!!errorMessage}">{errorMessage}</div> <div class="Application_Header_Menu_Entry__selfSignedCertificate" if="{!!isLikelyToBeSelfSignedCertificate}" onclick="{getClickHandler(\'handleSelfSignedCertificateButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSelfSignedCertificateButtonTap\')}">Self-Signed Certificate?</div> <div class="Application_Header_Menu_Entry__inputs"> <viron-textinput placeholder="URLの入力" val="{endpointURL}" onsubmit="{handleFormSubmit}" onchange="{handleEndpointURLChange}"></viron-textinput> </div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="追加" onselect="{handleAddButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
+riot$1.tag2('viron-application-header-menu-entry', '<div class="Application_Header_Menu_Entry__title">{i18n(\'vrn.header.menu.entry.title\')}</div> <div class="Application_Header_Menu_Entry__message" if="{!!errorMessage}">{errorMessage}</div> <div class="Application_Header_Menu_Entry__selfSignedCertificate" if="{!!isLikelyToBeSelfSignedCertificate}" onclick="{getClickHandler(\'handleSelfSignedCertificateButtonTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSelfSignedCertificateButtonTap\')}">Self-Signed Certificate?</div> <div class="Application_Header_Menu_Entry__inputs"> <viron-textinput placeholder="{i18n(\'vrn.header.menu.entry.placeholder\')}" val="{endpointURL}" onsubmit="{handleFormSubmit}" onchange="{handleEndpointURLChange}"></viron-textinput> </div> <div class="Application_Header_Menu_Entry__control"> <viron-button label="{i18n(\'vrn.header.menu.entry.button\')}" onselect="{handleAddButtonSelect}"></viron-button> </div>', '', 'class="Application_Header_Menu_Entry"', function(opts) {
     this.external(script$45);
 });
 
@@ -99968,7 +98470,7 @@ var script$44 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page-add', '<div class="EndpointsPage_Add__content"> <div class="EndpointsPage_Add__icon"> <viron-icon-plus></viron-icon-plus> </div> <div class="EndpointsPage_Add__label">追加</div> </div>', '', 'class="EndpointsPage_Add" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-endpoints-page-add', '<div class="EndpointsPage_Add__content"> <div class="EndpointsPage_Add__icon"> <viron-icon-plus></viron-icon-plus> </div> <div class="EndpointsPage_Add__label">{i18n(\'pg.endpoints.add\')}</div> </div>', '', 'class="EndpointsPage_Add" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$44);
 });
 
@@ -103343,7 +101845,7 @@ var script$50 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint-menu-qrcode', '<div class="EndpointsPage_Endpoint_Menu_QRCode__title">QRコード</div> <div class="EndpointsPage_Endpoint_Menu_QRCode__message">モバイル端末にエンドポイントを追加できます。<br>お好きなQRコードリーダーで読み込んで下さい。</div> <div class="EndpointsPage_Endpoint_Menu_QRCode__canvas"> <viron-qrcode data="{data}"></viron-qrcode> </div>', '', 'class="EndpointsPage_Endpoint_Menu_QRCode"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint-menu-qrcode', '<div class="EndpointsPage_Endpoint_Menu_QRCode__title">{i18n(\'pg.endpoints.endpoint.menu.qrcode.title\')}</div> <div class="EndpointsPage_Endpoint_Menu_QRCode__message">{i18n(\'pg.endpoints.endpoint.menu.qrcode.qrcode_info1\')}<br>{i18n(\'pg.endpoints.endpoint.menu.qrcode.qrcode_info2\')}</div> <div class="EndpointsPage_Endpoint_Menu_QRCode__canvas"> <viron-qrcode data="{data}"></viron-qrcode> </div>', '', 'class="EndpointsPage_Endpoint_Menu_QRCode"', function(opts) {
     this.external(script$50);
 });
 
@@ -103356,11 +101858,11 @@ var script$48 = function() {
 
   this.list = [];
   if (isDesktop) {
-    this.list.push({ id: 'qrcode', label: 'QRコード' });
+    this.list.push({ id: 'qrcode', label: i18n.get('pg.endpoints.endpoint.menu.qrcode.title') });
   }
-  this.list.push({ id: 'remove', label: 'エンドポイントを削除' });
+  this.list.push({ id: 'remove', label: i18n.get('pg.endpoints.endpoint.menu.endpoint_delete') });
   if (isSignined) {
-    this.list.push({ id: 'signout', label: 'ログアウト' });
+    this.list.push({ id: 'signout', label: i18n.get('pg.endpoints.endpoint.menu.logout') });
   }
 
   const showQRCode = () => {
@@ -103382,7 +101884,7 @@ var script$48 = function() {
       .resolve()
       .then(() => store.action('endpoints.remove', this.opts.endpoint.key))
       .then(() => store.action('toasts.add', {
-        message: 'エンドポイントを削除しました。'
+        message: i18n.get('pg.endpoints.endpoint.menu.endpoint_delete_info')
       }))
       .then(() => {
         this.close();
@@ -103397,7 +101899,7 @@ var script$48 = function() {
       .resolve()
       .then(() => store.action('auth.remove', this.opts.endpoint.key))
       .then(() => store.action('toasts.add', {
-        message: 'ログアウトしました。'
+        message: i18n.get('pg.endpoints.endpoint.menu.logout_info')
       }))
       .then(() => {
         this.close();
@@ -103468,13 +101970,13 @@ var script$52 = function() {
         this.getRouter().navigateTo(`/${this.opts.endpointkey}`);
       })
       .catch(() => {
-        this.errorMessage = 'ログイン出来ませんでした。正しいメールアドレスとパスワードを使用しているか確認して下さい。使用したメールアドレスが予め管理者として登録されているか確認して下さい。';
+        this.errorMessage = i18n.get('pg.endpoints.endpoint.signin.email.login_error');
         this.update();
       });
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<div class="EndpointsPage_Endpoint_Signin_Email__error" if="{errorMessage}">{errorMessage}</div> <viron-textinput placeholder="IDまたはメールアドレス" val="{mailAddress}" onsubmit="{handleFromSubmit}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="パスワード" type="password" val="{password}" onsubmit="{handleFromSubmit}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button class="EndpointsPage_Endpoint_Signin_Email__button" label="ログイン" theme="secondary" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint-signin-email', '<div class="EndpointsPage_Endpoint_Signin_Email__error" if="{errorMessage}">{errorMessage}</div> <viron-textinput placeholder="{i18n(\'pg.endpoints.endpoint.signin.email.mail_placeholder\')}" val="{mailAddress}" onsubmit="{handleFromSubmit}" onchange="{handleMailAddressChange}"></viron-textinput> <viron-textinput placeholder="{i18n(\'pg.endpoints.endpoint.signin.email.password_placeholder\')}" type="password" val="{password}" onsubmit="{handleFromSubmit}" onchange="{handlePasswordChange}"></viron-textinput> <viron-button class="EndpointsPage_Endpoint_Signin_Email__button" label="{i18n(\'pg.endpoints.endpoint.signin.email.login_label\')}" theme="secondary" onselect="{handleSigninButtonSelect}"></viron-button>', '', 'class="EndpointsPage_Endpoint_Signin_Email"', function(opts) {
     this.external(script$52);
 });
 
@@ -103632,7 +102134,7 @@ var script$54 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint-signin', '<div class="EndpointsPage_Endpoint_Signin__main"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint_Signin__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint_Signin__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint_Signin__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint_Signin__emails" if="{!!emails.length}"> <viron-endpoints-page-endpoint-signin-email each="{authtype in emails}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-email> </div> <virtual if="{!isDesktop &amp;&amp; !!oauths.length}"> <viron-horizontal-rule label="または"></viron-horizontal-rule> <div class="EndpointsPage_Endpoint_Signin__oauths EndpointsPage_Endpoint_Signin__oauths--centered"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </virtual> </div> <div class="EndpointsPage_Endpoint_Signin__aside" if="{isDesktop &amp;&amp; !!oauths.length}"> <div class="EndpointsPage_Endpoint_Signin__oauthMessage">または、こちらを<br>利用してログイン</div> <div class="EndpointsPage_Endpoint_Signin__oauths"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </div>', '', 'class="EndpointsPage_Endpoint_Signin"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint-signin', '<div class="EndpointsPage_Endpoint_Signin__main"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint_Signin__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint_Signin__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint_Signin__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint_Signin__emails" if="{!!emails.length}"> <viron-endpoints-page-endpoint-signin-email each="{authtype in emails}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-email> </div> <virtual if="{!isDesktop &amp;&amp; !!oauths.length}"> <viron-horizontal-rule label="{i18n(\'pg.endpoints.endpoint.signin.label\')}"></viron-horizontal-rule> <div class="EndpointsPage_Endpoint_Signin__oauths EndpointsPage_Endpoint_Signin__oauths--centered"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </virtual> </div> <div class="EndpointsPage_Endpoint_Signin__aside" if="{isDesktop &amp;&amp; !!oauths.length}"> <div class="EndpointsPage_Endpoint_Signin__oauthMessage">{i18n(\'pg.endpoints.endpoint.signin.oauth_message1\')}<br>{i18n(\'pg.endpoints.endpoint.signin.oauth_message2\')}</div> <div class="EndpointsPage_Endpoint_Signin__oauths"> <viron-endpoints-page-endpoint-signin-oauth each="{authtype in oauths}" authtype="{authtype}" endpointkey="{parent.opts.endpoint.key}" closer="{closer}"></viron-endpoints-page-endpoint-signin-oauth> </div> </div>', '', 'class="EndpointsPage_Endpoint_Signin"', function(opts) {
     this.external(script$54);
 });
 
@@ -103782,7 +102284,7 @@ var script$47 = function() {
   };
 };
 
-riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--prev {\'EndpointsPage_Endpoint__dropareaMarker--active\': isPrevDroppable}"></div> <div class="EndpointsPage_Endpoint__content"> <div class="EndpointsPage_Endpoint__head"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint__headContent"> <div class="EndpointsPage_Endpoint__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint__urlWrapper"> <div class="EndpointsPage_Endpoint__color EndpointsPage_Endpoint__color--{opts.endpoint.color || \'blue\'}"></div> <div class="EndpointsPage_Endpoint__url">{opts.endpoint.url}</div> </div> </div> <viron-icon-setting class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-setting> </div> <div class="EndpointsPage_Endpoint__body"> <div class="EndpointsPage_Endpoint__description">{!!opts.endpoint.thumbnail ? (opts.endpoint.description || \'-\') : \'ログインで管理画面情報を取得できます\'}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div> </div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--prev" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handlePrevDragEnter}" ondragover="{handlePrevDragOver}" ondragleave="{handlePrevDragLeave}" ondrop="{handlePrevDrop}"></div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--next" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handleNextDragEnter}" ondragover="{handleNextDragOver}" ondragleave="{handleNextDragLeave}" ondrop="{handleNextDrop}"></div> </div> <div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--next {\'EndpointsPage_Endpoint__dropareaMarker--active\': isNextDroppable}"></div>', '', 'class="EndpointsPage_Endpoint" draggable="{opts.isdraggable}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
+riot$1.tag2('viron-endpoints-page-endpoint', '<div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--prev {\'EndpointsPage_Endpoint__dropareaMarker--active\': isPrevDroppable}"></div> <div class="EndpointsPage_Endpoint__content"> <div class="EndpointsPage_Endpoint__head"> <virtual if="{!!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnail" riot-style="background-image:url({opts.endpoint.thumbnail});"></div> </virtual> <virtual if="{!opts.endpoint.thumbnail}"> <div class="EndpointsPage_Endpoint__thumbnailDefault"> <viron-icon-star></viron-icon-star> </div> </virtual> <div class="EndpointsPage_Endpoint__headContent"> <div class="EndpointsPage_Endpoint__name">{opts.endpoint.name || \'- - -\'}</div> <div class="EndpointsPage_Endpoint__urlWrapper"> <div class="EndpointsPage_Endpoint__color EndpointsPage_Endpoint__color--{opts.endpoint.color || \'blue\'}"></div> <div class="EndpointsPage_Endpoint__url">{opts.endpoint.url}</div> </div> </div> <viron-icon-setting class="EndpointsPage_Endpoint__menu" ref="menu" onclick="{getClickHandler(\'handleMenuTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleMenuTap\')}"></viron-icon-setting> </div> <div class="EndpointsPage_Endpoint__body"> <div class="EndpointsPage_Endpoint__description">{!!opts.endpoint.thumbnail ? (opts.endpoint.description || \'-\') : i18n(\'pg.endpoints.endpoint.description\')}</div> <div class="EndpointsPage_Endpoint__tags"> <viron-tag each="{tag in opts.endpoint.tags}" label="{tag}"></viron-tag> </div> </div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--prev" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handlePrevDragEnter}" ondragover="{handlePrevDragOver}" ondragleave="{handlePrevDragLeave}" ondrop="{handlePrevDrop}"></div> <div class="EndpointsPage_Endpoint__droparea EndpointsPage_Endpoint__droparea--next" if="{isDragging &amp;&amp; !isSelfDragged}" ondragenter="{handleNextDragEnter}" ondragover="{handleNextDragOver}" ondragleave="{handleNextDragLeave}" ondrop="{handleNextDrop}"></div> </div> <div class="EndpointsPage_Endpoint__dropareaMarker EndpointsPage_Endpoint__dropareaMarker--next {\'EndpointsPage_Endpoint__dropareaMarker--active\': isNextDroppable}"></div>', '', 'class="EndpointsPage_Endpoint" draggable="{opts.isdraggable}" ondragstart="{handleDragStart}" ondrag="{handleDrag}" ondragend="{handleDragEnd}" onclick="{getClickHandler(\'handleTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleTap\')}"', function(opts) {
     this.external(script$47);
 });
 
@@ -103810,7 +102312,7 @@ var script$55 = function() {
   });
 };
 
-riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">ホーム</div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}" isdraggable="{true}"></viron-endpoints-page-endpoint> <viron-endpoints-page-add></viron-endpoints-page-add> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
+riot$1.tag2('viron-endpoints-page', '<div class="EndpointsPage__head"> <div class="EndpointsPage__title">{i18n(\'home\')}</div> </div> <div class="EndpointsPage__container"> <viron-endpoints-page-endpoint each="{endpoint in endpoints}" endpoint="{endpoint}" isdraggable="{true}"></viron-endpoints-page-endpoint> <viron-endpoints-page-add></viron-endpoints-page-add> </div>', '', 'class="EndpointsPage EndpointsPage--{layoutType}"', function(opts) {
     this.external(script$55);
 });
 
@@ -103964,7 +102466,7 @@ var script$62 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header-filter-autocomplete', '<virtual if="{isEmpty}"> <div class="Application_Header_Filter_Autocomplete__empty">候補無し</div> </virtual> <virtual if="{!isEmpty}"> <virtual if="{!!names.length}"> <div class="Application_Header_Filter_Autocomplete__list"> <div class="Application_Header_Filter_Autocomplete__label">カード</div> <div class="Application_Header_Filter_Autocomplete__item" each="{value in names}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}">{value}</div> </div> </virtual> <virtual if="{!!_tags.length}"> <div class="Application_Header_Filter_Autocomplete__list"> <div class="Application_Header_Filter_Autocomplete__label">タグ</div> <div class="Application_Header_Filter_Autocomplete__item" each="{value in _tags}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}">{value}</div> </div> </virtual> </virtual>', '', 'class="Application_Header_Filter_Autocomplete" onmousedown="{handleMouseDown}"', function(opts) {
+riot$1.tag2('viron-application-header-filter-autocomplete', '<virtual if="{isEmpty}"> <div class="Application_Header_Filter_Autocomplete__empty">{i18n(\'vrn.header.filter.autocomplete.emprty\')}</div> </virtual> <virtual if="{!isEmpty}"> <virtual if="{!!names.length}"> <div class="Application_Header_Filter_Autocomplete__list"> <div class="Application_Header_Filter_Autocomplete__label">{i18n(\'vrn.header.filter.autocomplete.card\')}</div> <div class="Application_Header_Filter_Autocomplete__item" each="{value in names}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}">{value}</div> </div> </virtual> <virtual if="{!!_tags.length}"> <div class="Application_Header_Filter_Autocomplete__list"> <div class="Application_Header_Filter_Autocomplete__label">{i18n(\'vrn.header.filter.autocomplete.tag\')}</div> <div class="Application_Header_Filter_Autocomplete__item" each="{value in _tags}" onclick="{getClickHandler(\'handleItemTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleItemTap\')}">{value}</div> </div> </virtual> </virtual>', '', 'class="Application_Header_Filter_Autocomplete" onmousedown="{handleMouseDown}"', function(opts) {
     this.external(script$62);
 });
 
@@ -104079,7 +102581,7 @@ var script$61 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header-filter', '<viron-icon-close class="Application_Header_Filter__closeIcon" if="{isOpened}" onmousedown="{handleCloseIconMouseDown}" onclick="{getClickHandler(\'handleCloseIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseIconTap\')}"></viron-icon-close> <form class="Application_Header_Filter__form" if="{isOpened}" onsubmit="{handleFormSubmit}"> <input class="Application_Header_Filter__input" ref="input" placeholder="カードを検索" onfocus="{handleInputFocus}" onblur="{handleInputBlur}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form> <viron-icon-search class="Application_Header_Filter__searchIcon" onmousedown="{handleSearchIconMouseDown}" onclick="{getClickHandler(\'handleSearchIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchIconTap\')}"></viron-icon-search> <div class="Application_Header_Filter__text" if="{!isOpened &amp;&amp; !!filterText}">filtered by: {filterText}</div>', '', 'class="Application_Header_Filter {\'Application_Header_Filter--opened\': isOpened}"', function(opts) {
+riot$1.tag2('viron-application-header-filter', '<viron-icon-close class="Application_Header_Filter__closeIcon" if="{isOpened}" onmousedown="{handleCloseIconMouseDown}" onclick="{getClickHandler(\'handleCloseIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleCloseIconTap\')}"></viron-icon-close> <form class="Application_Header_Filter__form" if="{isOpened}" onsubmit="{handleFormSubmit}"> <input class="Application_Header_Filter__input" ref="input" placeholder="{i18n(\'vrn.header.filter.placeholder\')}" onfocus="{handleInputFocus}" onblur="{handleInputBlur}" oninput="{handleInputInput}" onchange="{handleInputChange}"> </form> <viron-icon-search class="Application_Header_Filter__searchIcon" onmousedown="{handleSearchIconMouseDown}" onclick="{getClickHandler(\'handleSearchIconTap\')}" ontouchstart="{getTouchStartHandler()}" ontouchmove="{getTouchMoveHandler()}" ontouchend="{getTouchEndHandler(\'handleSearchIconTap\')}"></viron-icon-search> <div class="Application_Header_Filter__text" if="{!isOpened &amp;&amp; !!filterText}">filtered by: {filterText}</div>', '', 'class="Application_Header_Filter {\'Application_Header_Filter--opened\': isOpened}"', function(opts) {
     this.external(script$61);
 });
 
@@ -104203,7 +102705,7 @@ var script$68 = function() {
       .then(() => {
         this.close();
         return store.action('toasts.add', {
-          message: 'エンドポイント一覧を削除しました。'
+          message: i18n.get('vrn.header.menu.clear.info')
         });
       })
       .catch(err => {
@@ -104215,7 +102717,7 @@ var script$68 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header-menu-clear', '<div class="Application_Header_Menu_Clear__title">全てのカードを削除</div> <div class="Application_Header_Menu_Clear__description">ホームのエンドポイント一覧を空にします。この操作は取り消せません。</div> <div class="Application_Header_Menu_Clear__control"> <viron-button label="削除する" theme="secondary" onselect="{handleClearButtonTap}"></viron-button> </div>', '', 'class="Application_Header_Menu_Clear"', function(opts) {
+riot$1.tag2('viron-application-header-menu-clear', '<div class="Application_Header_Menu_Clear__title">{i18n(\'vrn.header.menu.clear.title\')}</div> <div class="Application_Header_Menu_Clear__description">{i18n(\'vrn.header.menu.clear.description\')}</div> <div class="Application_Header_Menu_Clear__control"> <viron-button label="{i18n(\'vrn.header.menu.clear.button\')}" theme="secondary" onselect="{handleClearButtonTap}"></viron-button> </div>', '', 'class="Application_Header_Menu_Clear"', function(opts) {
     this.external(script$68);
 });
 
@@ -104233,7 +102735,7 @@ var script$69 = function() {
       .then(() => {
         this.close();
         return store.action('toasts.add', {
-          message: 'エンドポイント一覧を書き出しました。'
+          message: i18n.get('vrn.header.menu.export.info')
         });
       })
       .catch(err => {
@@ -104245,7 +102747,7 @@ var script$69 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header-menu-export', '<div class="Application_Header_Menu_Export__title">ホームを保存</div> <div class="Application_Header_Menu_Export__description">ホームのエンドポイント一覧をjsonファイルとして書き出します。</div> <div class="Application_Header_Menu_Export__control"> <viron-button label="保存する" onselect="{handleExportButtonTap}"></viron-button> </div>', '', 'class="Application_Header_Menu_Export"', function(opts) {
+riot$1.tag2('viron-application-header-menu-export', '<div class="Application_Header_Menu_Export__title">{i18n(\'vrn.header.menu.export.title\')}</div> <div class="Application_Header_Menu_Export__description">{i18n(\'vrn.header.menu.export.description\')}</div> <div class="Application_Header_Menu_Export__control"> <viron-button label="{i18n(\'vrn.header.menu.export.button\')}" onselect="{handleExportButtonTap}"></viron-button> </div>', '', 'class="Application_Header_Menu_Export"', function(opts) {
     this.external(script$69);
 });
 
@@ -104266,7 +102768,7 @@ var script$70 = function() {
     // ファイルがjsonであるか
     // Edge v.15環境で`file/type`値が空文字になるため、Edge以外の環境のみtypeチェックを行う。
     if (!store.getter('ua.isEdge') && jsonFile.type !== 'application/json') {
-      this.errorMessage = 'JSON形式のファイルを選択して下さい。';
+      this.errorMessage = i18n.get('vrn.header.menu.import.error_json_type');
       this.endpoints = null;
       this.update();
       return;
@@ -104278,7 +102780,7 @@ var script$70 = function() {
     // 読み込みが失敗した。
     reader.onerror = err => {
       this.endpoints = null;
-      this.errorMessage = err.message || 'ファイルの読み込みに失敗しました。';
+      this.errorMessage = err.message || i18n.get('vrn.header.menu.import.error_file_read');
       this.update();
     };
     // 読み込みが成功し、完了した。
@@ -104289,7 +102791,7 @@ var script$70 = function() {
         this.errorMessage = '';
       } catch (e) {
         this.endpoints = null;
-        this.errorMessage = e.message || 'JSON形式のファイルを選択して下さい。';
+        this.errorMessage = e.message || i18n.get('vrn.header.menu.import.error_json_type');
       } finally {
         this.update();
       }
@@ -104306,7 +102808,7 @@ var script$70 = function() {
       .then(() => {
         this.close();
         return store.action('toasts.add', {
-          message: 'エンドポイント一覧を読み込みました。'
+          message: i18n.get('vrn.header.menu.import.error_endpoint_read')
         });
       })
       .catch(err => {
@@ -104318,7 +102820,7 @@ var script$70 = function() {
   };
 };
 
-riot$1.tag2('viron-application-header-menu-import', '<div class="Application_Header_Menu_Import__title">ホームを読み込み</div> <div class="Application_Header_Menu_Import__description">エンドポイント一覧をホームに反映します。</div> <div class="Application_Header_Menu_Import__error" if="{errorMessage}">{errorMessage}</div> <div class="Application_Header_Menu_Import__control"> <viron-uploader accept="application/json" onchange="{handleFileChange}"></viron-uploader> <viron-button label="読み込む" isdisabled="{!endpoints}" onselect="{handleImportButtonTap}"></viron-button> </div>', '', 'class="Application_Header_Menu_Import"', function(opts) {
+riot$1.tag2('viron-application-header-menu-import', '<div class="Application_Header_Menu_Import__title">{i18n(\'vrn.header.menu.import.title\')}</div> <div class="Application_Header_Menu_Import__description">{i18n(\'vrn.header.menu.import.description\')}</div> <div class="Application_Header_Menu_Import__error" if="{errorMessage}">{errorMessage}</div> <div class="Application_Header_Menu_Import__control"> <viron-uploader accept="application/json" onchange="{handleFileChange}"></viron-uploader> <viron-button label="{i18n(\'vrn.header.menu.import.button\')}" isdisabled="{!endpoints}" onselect="{handleImportButtonTap}"></viron-button> </div>', '', 'class="Application_Header_Menu_Import"', function(opts) {
     this.external(script$70);
 });
 
@@ -104327,15 +102829,15 @@ var script$67 = function() {
   const isTopPage = store.getter('location.isTop');
   const isDesktop = store.getter('layout.isDesktop');
   const generalActions = [
-    { label: 'ヘルプ', id: 'navigate_to_doc' }
+    { label: i18n.get('vrn.header.menu.help'), id: 'navigate_to_doc' }
   ];
   const endpointActions = [];
-  endpointActions.push({ label: '追加', id: 'add_endpoint' });
+  endpointActions.push({ label: i18n.get('vrn.header.menu.entry'), id: 'add_endpoint' });
   if (isDesktop) {
-    endpointActions.push({ label: 'ホームを保存', id: 'export_endpoints' });
-    endpointActions.push({ label: 'ホームを読み込み', id: 'import_endpoints' });
+    endpointActions.push({ label: i18n.get('vrn.header.menu.export'), id: 'export_endpoints' });
+    endpointActions.push({ label: i18n.get('vrn.header.menu.import'), id: 'import_endpoints' });
   }
-  endpointActions.push({ label: '全てのカードを削除', id: 'remove_all_endpoints' });
+  endpointActions.push({ label: i18n.get('vrn.header.menu.clear'), id: 'remove_all_endpoints' });
 
   // TOPページではエンドポイント操作も可能にする。
   if (isTopPage) {
@@ -104888,7 +103390,7 @@ riot$1.tag2('viron-application-popovers', '<virtual each="{popovers}"> <virtual 
 
 var script$78 = function() {};
 
-riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div class="Application_Poster__label">ホーム</div> </div>', '', 'class="Application_Poster"', function(opts) {
+riot$1.tag2('viron-application-poster', '<div class="Application_Poster__bg"></div> <div class="Application_Poster__overlay"></div> <div class="Application_Poster__content"> <viron-icon-logo class="Application_Poster__logo"></viron-icon-logo> <div class="Application_Poster__label">{i18n(\'vrn.poster.home\')}</div> </div>', '', 'class="Application_Poster"', function(opts) {
     this.external(script$78);
 });
 
