@@ -1,11 +1,11 @@
 viron-application-header-menu-entry.Application_Header_Menu_Entry
-  .Application_Header_Menu_Entry__title 管理画面を追加
+  .Application_Header_Menu_Entry__title { i18n('vrn.header.menu.entry.title') }
   .Application_Header_Menu_Entry__message(if="{ !!errorMessage }") { errorMessage }
   .Application_Header_Menu_Entry__selfSignedCertificate(if="{ !!isLikelyToBeSelfSignedCertificate }" onTap="{ handleSelfSignedCertificateButtonTap }") Self-Signed Certificate?
   .Application_Header_Menu_Entry__inputs
-    viron-textinput(placeholder="URLの入力" val="{ endpointURL }" onSubmit="{ handleFormSubmit }" onChange="{ handleEndpointURLChange }")
+    viron-textinput(placeholder="{ i18n('vrn.header.menu.entry.placeholder') }" val="{ endpointURL }" onSubmit="{ handleFormSubmit }" onChange="{ handleEndpointURLChange }")
   .Application_Header_Menu_Entry__control
-    viron-button(label="追加" onSelect="{ handleAddButtonSelect }")
+    viron-button(label="{ i18n('vrn.header.menu.entry.button') }" onSelect="{ handleAddButtonSelect }")
 
   script.
     import '../../../../components/viron-button/index.tag';

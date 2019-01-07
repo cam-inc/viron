@@ -5,14 +5,14 @@ viron-parameters-items.Parameters_Items(class="{ 'Parameters_Items--preview': op
     .Parameters_Items__headContent
       .Parameters_Items__label { opts.label }{ opts.required ? ' *' : '' }
       .Parameters_Items__error(if="{ hasError }") { errors[0] }
-    .Parameters_Items__openButton(if="{ !!opts.val && !!opts.val.length }" onTap="{ handleOpenAllButtonTap }") 項目をすべて開く
+    .Parameters_Items__openButton(if="{ !!opts.val && !!opts.val.length }" onTap="{ handleOpenAllButtonTap }") { i18n('cmp.parameters.items.button') }
   .Parameters_Items__body(if="{ !!opts.val && !!opts.val.length }")
     .Parameters_Items__item(each="{ val, idx in opts.val }" class="{ 'Parameters_Items__item--opened': parent.isItemOpened(idx) }")
       .Parameters_Items__itemDetail
         .Parameters_Items__itemHead
           .Parameters_Items__closeButton(onTap="{ handleCloseButtonTap }")
             viron-icon-arrow-up
-          .Parameters_Items__removeButton(if="{ !parent.opts.ispreview }" onTap="{ handleRemoveButtonTap }") この項目を削除
+          .Parameters_Items__removeButton(if="{ !parent.opts.ispreview }" onTap="{ handleRemoveButtonTap }") { i18n('cmp.parameters.items.button_remove') }
         .Parameters_Items__itemBody
           virtual(if="{ parent.isFormMode }")
             viron-parameters-form(no-reorder identifier="{ idx }" val="{ val }" theme="{ parent.opts.theme }" isPreview="{ parent.opts.ispreview }" formObject="{ parent.formObject }" onSubmit="{ parent.handleItemSubmit }"  onChange="{ parent.handleItemChange }" onValidate="{ parent.handleItemValidate }")

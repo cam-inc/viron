@@ -1,6 +1,7 @@
 import '../../../components/viron-dialog/index.tag';
 import '../../../components/viron-error/index.tag';
 import util from '../../../components/viron-parameters/util';
+import i18n from '../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -26,25 +27,25 @@ export default function() {
   const customSubmitLabel = operationObject['x-submit-label'];
   switch (method) {
   case 'get':
-    this.submitLabel = customSubmitLabel || '取得する';
-    this.successMessage = '取得しました。';
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_get');
+    this.successMessage = i18n.get('pg.components.operation.label_get_info');
     break;
   case 'post':
-    this.submitLabel = customSubmitLabel || '新規作成する';
-    successMessage = '新規作成しました。';
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_post');
+    successMessage = i18n.get('pg.components.operation.label_post_info');
     break;
   case 'put':
-    this.submitLabel = customSubmitLabel || '保存する';
-    successMessage = '保存しました。';
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_put');
+    successMessage = i18n.get('pg.components.operation.label_put_info');
     break;
   case 'delete':
-    this.submitLabel = customSubmitLabel || '削除する';
+    this.submitLabel = customSubmitLabel || i18n.get('pg.components.operation.label_delete');
     this.submitModifier = 'emphasised';
-    successMessage = '削除しました。';
+    successMessage = i18n.get('pg.components.operation.label_delete_info');
     break;
   default:
-    this.submitLabel = '実行する';
-    successMessage = '完了しました。';
+    this.submitLabel = i18n.get('pg.components.operation.label_default');
+    successMessage = i18n.get('pg.components.operation.label_default_info');
     break;
   }
 
@@ -62,7 +63,7 @@ export default function() {
       .catch(err => {
         if (err.status === 401) {
           return store.action('modals.add', 'viron-error', {
-            title: '認証切れ'
+            title: i18n.get('pg.components.operation.error_auth')
           }).then(() => {
             this.getRouter().navigateTo('/');
           });
@@ -80,7 +81,7 @@ export default function() {
     }
     Promise.resolve().then(() => store.action('modals.add', 'viron-dialog', {
       title: this.title,
-      message: '本当に実行しますか？',
+      message: i18n.get('pg.components.operation.comfirm'),
       labelPositive: this.submitLabel,
       onPositiveSelect: () => {
         if (isOperating) return;

@@ -1,5 +1,6 @@
 import isNumber from 'mout/lang/isNumber';
 import currencyFormat from 'mout/number/currencyFormat';
+import i18n from '../../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -27,10 +28,10 @@ export default function() {
       .catch(err => {
         this.isLoading = false;
         if (err.status === 401) {
-          this.error = '認証エラー。';
+          this.error = i18n.get('pg.components.card.number.error_401');
         } else {
           const api = this.opts.def.api;
-          this.error = `[${api.method.toUpperCase()} ${api.path}]通信に失敗しました。`;
+          this.error = `[${api.method.toUpperCase()} ${api.path}]${i18n.get('pg.components.card.number.error_network')}`;
         }
         this.update();
       });
@@ -43,10 +44,10 @@ export default function() {
    */
   const validate = data => {
     if (!data) {
-      return 'レスポンスデータに誤りがあります。';
+      return i18n.get('pg.components.card.number.error_response');
     }
     if (!isNumber(data.value)) {
-      return 'value値が数値ではありません。';
+      return i18n.get('pg.components.card.number.error_number');
     }
     return null;
   };

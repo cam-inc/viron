@@ -1,5 +1,6 @@
 import isObject from 'mout/lang/isObject';
 import ObjectAssign from 'object-assign';
+import i18n from './i18n';
 
 /**
  * body値をContent-Type `application/json`に最適化します。
@@ -99,7 +100,7 @@ const commonFetch = (context, url, options) => {
       fetch(url, options),
       new Promise((resolve, reject) => {
         setTimeout(() => {
-          reject(new Error('時間がかかり過ぎたため通信を中断しました。'));
+          reject(new Error(i18n.get('core.fetch.error_network_timeout')));
         }, 1000 * 10);
       })
     ]))

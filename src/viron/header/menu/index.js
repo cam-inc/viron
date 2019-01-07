@@ -2,21 +2,22 @@ import './clear/index.tag';
 import './entry/index.tag';
 import './export/index.tag';
 import './import/index.tag';
+import i18n from '../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
   const isTopPage = store.getter('location.isTop');
   const isDesktop = store.getter('layout.isDesktop');
   const generalActions = [
-    { label: 'ヘルプ', id: 'navigate_to_doc' }
+    { label: i18n.get('vrn.header.menu.help'), id: 'navigate_to_doc' }
   ];
   const endpointActions = [];
-  endpointActions.push({ label: '追加', id: 'add_endpoint' });
+  endpointActions.push({ label: i18n.get('vrn.header.menu.entry'), id: 'add_endpoint' });
   if (isDesktop) {
-    endpointActions.push({ label: 'ホームを保存', id: 'export_endpoints' });
-    endpointActions.push({ label: 'ホームを読み込み', id: 'import_endpoints' });
+    endpointActions.push({ label: i18n.get('vrn.header.menu.export'), id: 'export_endpoints' });
+    endpointActions.push({ label: i18n.get('vrn.header.menu.import'), id: 'import_endpoints' });
   }
-  endpointActions.push({ label: '全てのカードを削除', id: 'remove_all_endpoints' });
+  endpointActions.push({ label: i18n.get('vrn.header.menu.clear'), id: 'remove_all_endpoints' });
 
   // TOPページではエンドポイント操作も可能にする。
   if (isTopPage) {

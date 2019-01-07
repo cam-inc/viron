@@ -2,7 +2,7 @@ viron-wyswyg-explorer.Wyswyg_Explorer
   .Wyswyg_Explorer__head
     .Wyswyg_Explorer__back(onTap="{ handleBackTap }")
       viron-icon-arrow-left
-    .Wyswyg_Explorer__title 画像アップロード
+    .Wyswyg_Explorer__title { i18n('cmp.wyswyg.explorer_title') }
   .Wyswyg_Explorer__body
     viron-explorer(id="{ explorerId }" def="{ opts.def }" onInsert="{ handleExplorerInsert }")
 
