@@ -9,14 +9,14 @@ viron-endpoints-page-endpoint-signin.EndpointsPage_Endpoint_Signin
     .EndpointsPage_Endpoint_Signin__emails(if="{ !!emails.length }")
       viron-endpoints-page-endpoint-signin-email(each="{ authtype in emails }" authtype="{ authtype }" endpointKey="{ parent.opts.endpoint.key }" closer="{ closer }")
     virtual(if="{ !isDesktop && !!oauths.length }")
-      viron-horizontal-rule(label="または")
+      viron-horizontal-rule(label="{ i18n('pg.endpoints.endpoint.signin.label') }")
       .EndpointsPage_Endpoint_Signin__oauths.EndpointsPage_Endpoint_Signin__oauths--centered
         viron-endpoints-page-endpoint-signin-oauth(each="{ authtype in oauths }" authtype="{ authtype }" endpointKey="{ parent.opts.endpoint.key }" closer="{ closer }")
   .EndpointsPage_Endpoint_Signin__aside(if="{ isDesktop && !!oauths.length }")
     .EndpointsPage_Endpoint_Signin__oauthMessage
-      | または、こちらを
+      | { i18n('pg.endpoints.endpoint.signin.oauth_message1') }
       br
-      | 利用してログイン
+      | { i18n('pg.endpoints.endpoint.signin.oauth_message2') }
     .EndpointsPage_Endpoint_Signin__oauths
       viron-endpoints-page-endpoint-signin-oauth(each="{ authtype in oauths }" authtype="{ authtype }" endpointKey="{ parent.opts.endpoint.key }" closer="{ closer }")
 

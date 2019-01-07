@@ -1,4 +1,5 @@
 import '../../components/viron-error/index.tag';
+import i18n from '../../core/i18n';
 
 export default {
   /**
@@ -19,7 +20,7 @@ export default {
         .then(() => {
           replace('/');
           store.action('toasts.add', {
-            message: `既にエンドポイント(${url})が存在します。`,
+            message: i18n.get('pg.endpointimport.error_overlapping',{url:url}),
           });
         });
     }
@@ -28,8 +29,8 @@ export default {
       .resolve()
       .then(() => store.action('endpoints.mergeOneWithKey', endpoint))
       .then(() => store.action('modals.add', 'viron-error', {
-        title: 'エンドポイント追加',
-        message: `エンドポイント(${url})が一覧に追加されました。`
+        title: i18n.get('pg.endpointimport.title'),
+        message: i18n.get('pg.endpointimport.message',{url:url})
       }))
       .then(() => {
         replace('/');
@@ -37,8 +38,8 @@ export default {
       .catch(err => {
         replace('/');
         store.action('modals.add', 'viron-error', {
-          title: 'エンドポイント追加 失敗',
-          message: `エンドポイント(${url})を追加出来ませんでした。`,
+          title: i18n.get('pg.endpointimport.error_add'),
+          message: i18n.get('pg.endpointimport.error_add_message',{url:url}),
           error: err
         });
       });

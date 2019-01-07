@@ -1,4 +1,5 @@
 import clipboard from 'clipboard-js';
+import i18n from '../../core/i18n';
 
 export default function() {
   /**
@@ -74,13 +75,13 @@ export default function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.html.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.html.error_copy_message')
         });
       });
   };

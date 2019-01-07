@@ -1,9 +1,9 @@
 viron-endpoints-page-endpoint-menu-qrcode.EndpointsPage_Endpoint_Menu_QRCode
-  .EndpointsPage_Endpoint_Menu_QRCode__title QRコード
+  .EndpointsPage_Endpoint_Menu_QRCode__title { i18n('pg.endpoints.endpoint.menu.qrcode.title') }
   .EndpointsPage_Endpoint_Menu_QRCode__message
-    | モバイル端末にエンドポイントを追加できます。
+    | { i18n('pg.endpoints.endpoint.menu.qrcode.qrcode_info1') }
     br
-    | お好きなQRコードリーダーで読み込んで下さい。
+    | { i18n('pg.endpoints.endpoint.menu.qrcode.qrcode_info2') }
   .EndpointsPage_Endpoint_Menu_QRCode__canvas
     viron-qrcode(data="{ data }")
 

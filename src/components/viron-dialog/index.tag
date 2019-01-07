@@ -4,8 +4,8 @@ viron-dialog.Dialog
   .Dialog__title(if="{ !!opts.title }") { opts.title }
   .Dialog__message(if="{ !!opts.message }") { opts.message }
   .Dialog__control
-    viron-button(label="{ opts.labelPositive || 'OK' }" onSelect="{ handlePositiveSelect }")
-    viron-button(label="{ opts.labelNegative || 'キャンセル' }" theme="ghost" onSelect="{ handleNegativeSelect }")
+    viron-button(label="{ opts.labelPositive || i18n('cmp.dialog.ok') }" onSelect="{ handlePositiveSelect }")
+    viron-button(label="{ opts.labelNegative || i18n('cmp.dialog.cancel') }" theme="ghost" onSelect="{ handleNegativeSelect }")
 
   script.
     import '../../components/icons/viron-icon-arrow-down/index.tag';

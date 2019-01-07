@@ -1,5 +1,6 @@
 import clipboard from 'clipboard-js';
 import isString from 'mout/lang/isString';
+import i18n from '../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -82,13 +83,13 @@ export default function() {
         return clipboard.copy(this.opts.val);
       })
       .then(() => store.action('toasts.add', {
-        message: 'クリップボードへコピーしました。'
+        message: i18n.get('cmp.textarea.copy_message')
       }))
       .catch(() => {
         isClipboardCopySupported = false;
         store.action('toasts.add', {
           type: 'error',
-          message: 'ご使用中のブラウザではクリップボードへコピー出来ませんでした。'
+          message: i18n.get('cmp.textarea.copy_error_copy_message')
         });
       });
   };

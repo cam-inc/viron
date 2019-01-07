@@ -1,4 +1,5 @@
 import '../../../../components/viron-error/index.tag';
+import i18n from '../../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -10,7 +11,7 @@ export default function() {
       .then(() => {
         this.close();
         return store.action('toasts.add', {
-          message: 'エンドポイント一覧を削除しました。'
+          message: i18n.get('vrn.header.menu.clear.info')
         });
       })
       .catch(err => {

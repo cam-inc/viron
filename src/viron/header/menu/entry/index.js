@@ -1,4 +1,5 @@
 import urlValidator from 'valid-url';
+import i18n from '../../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -17,11 +18,11 @@ export default function() {
   const validate = endpointURL => {
     // URL値が不正。
     if (!urlValidator.isUri(endpointURL)) {
-      return 'URLに誤りがあります。';
+      return i18n.get('vrn.header.menu.entry.error_url');
     }
     // 重複チェック。
     if (!!store.getter('endpoints.oneByURL', endpointURL)) {
-      return '既に存在するエンドポイントです。';
+      return i18n.get('vrn.header.menu.entry.error_overlapping');
     }
     return null;
   };
@@ -57,7 +58,7 @@ export default function() {
       .resolve()
       .then(() => store.action('endpoints.add', this.endpointURL))
       .then(() => store.action('toasts.add', {
-        message: 'エンドポイントを追加しました。'
+        message: i18n.get('vrn.header.menu.entry.info')
       }))
       .then(() => {
         this.close();
@@ -65,10 +66,10 @@ export default function() {
       .catch(err => {
         switch (err.status) {
         case 404:
-          this.errorMessage = 'エンドポイントが見つかりませんでした。';
+          this.errorMessage = i18n.get('vrn.header.menu.entry.error_notfound');
           break;
         default:
-          this.errorMessage = 'エンドポイントを追加出来ませんでした。';
+          this.errorMessage = i18n.get('vrn.header.menu.entry.error');
           break;
         }
         // サーバが自己証明書を使用している場合にページ遷移を促す。

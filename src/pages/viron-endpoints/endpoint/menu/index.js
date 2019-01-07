@@ -1,5 +1,6 @@
 import '../../../../components/viron-error/index.tag';
 import './qrcode/index.tag';
+import i18n from '../../../../core/i18n';
 
 export default function() {
   const store = this.riotx.get();
@@ -10,11 +11,11 @@ export default function() {
 
   this.list = [];
   if (isDesktop) {
-    this.list.push({ id: 'qrcode', label: 'QRコード' });
+    this.list.push({ id: 'qrcode', label: i18n.get('pg.endpoints.endpoint.menu.qrcode.title') });
   }
-  this.list.push({ id: 'remove', label: 'エンドポイントを削除' });
+  this.list.push({ id: 'remove', label: i18n.get('pg.endpoints.endpoint.menu.endpoint_delete') });
   if (isSignined) {
-    this.list.push({ id: 'signout', label: 'ログアウト' });
+    this.list.push({ id: 'signout', label: i18n.get('pg.endpoints.endpoint.menu.logout') });
   }
 
   const showQRCode = () => {
@@ -36,7 +37,7 @@ export default function() {
       .resolve()
       .then(() => store.action('endpoints.remove', this.opts.endpoint.key))
       .then(() => store.action('toasts.add', {
-        message: 'エンドポイントを削除しました。'
+        message: i18n.get('pg.endpoints.endpoint.menu.endpoint_delete_info')
       }))
       .then(() => {
         this.close();
@@ -51,7 +52,7 @@ export default function() {
       .resolve()
       .then(() => store.action('auth.remove', this.opts.endpoint.key))
       .then(() => store.action('toasts.add', {
-        message: 'ログアウトしました。'
+        message: i18n.get('pg.endpoints.endpoint.menu.logout_info')
       }))
       .then(() => {
         this.close();
