@@ -119,7 +119,7 @@ export default {
   'cmp.parameters.unique_items': 'compose with elements which are not duplicated',
   'cmp.parameters.max_properties': 'number of element has to be lower than {{maxProperties}}',
   'cmp.parameters.min_properties': 'number of element has to be more than {{minProperties}}',
-  'cmp.parameters.required': 'include {{key}}{{description}} to e element',
+  'cmp.parameters.required': 'include {{key}}{{description}} to element',
   'cmp.parameters.enum': 'set the data from {{enum}}',
   'cmp.parameters.type': 'type has to be any of [[types]]',
   'cmp.parameters.format_date_time': 'format has to be in accordance with "date-time"',
