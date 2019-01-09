@@ -119,7 +119,7 @@ export default {
   'cmp.parameters.unique_items': '内容が重複しない要素で構成して下さい。',
   'cmp.parameters.max_properties': '要素数を{{maxProperties}}以下にして下さい。',
   'cmp.parameters.min_properties': '要素数を{{minProperties}}以上にして下さい。',
-  'cmp.parameters.required': 'e要素に{{key}}{{description}}を含めて下さい。',
+  'cmp.parameters.required': '要素に{{key}}{{description}}を含めて下さい。',
   'cmp.parameters.enum': '{{enum}}のいずれかの値を設定して下さい。',
   'cmp.parameters.type': '型を{{types}}のいずれかにして下さい。',
   'cmp.parameters.format_date_time': '"date-time"に則ったフォーマットで入力してください。',
