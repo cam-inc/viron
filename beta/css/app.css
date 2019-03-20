@@ -5370,6 +5370,9 @@ select {
 .Parameters_Items__item--opened > .Parameters_Items__itemBrief {
       display: none;
     }
+.Parameters_Items--ghost .Parameters_Items__item {
+    background-color: transparent;
+  }
 .Parameters_Items__body > .Parameters_Items__item {
     margin-bottom: 8px;
   }
