@@ -6,6 +6,16 @@
     display: block;
   }
 
+  &__form ol {
+    list-style: decimal;
+    padding: 8px 18px;
+  }
+
+  &__form ul {
+    list-style: disc;
+    padding: 8px 18px;
+  }
+
   &--preview &__form {
     padding: 10px;
     overflow: scroll;
