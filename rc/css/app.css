@@ -6464,6 +6464,14 @@ select {
 .Wyswyg__form {
     display: block;
   }
+.Wyswyg__form ol {
+    padding: 8px 18px;
+    list-style: decimal;
+  }
+.Wyswyg__form ul {
+    padding: 8px 18px;
+    list-style: disc;
+  }
 .Wyswyg--preview .Wyswyg__form {
     padding: 10px;
     overflow: scroll;
