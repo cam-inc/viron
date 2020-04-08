@@ -38,7 +38,7 @@ Detailed changes for each release are documented in the [release notes](https://
 
 ## Copyright
 
-CA Mobile, Inc. All rights reserved.
+CAM, Inc. All rights reserved.
 
 ## LICENSE
 
