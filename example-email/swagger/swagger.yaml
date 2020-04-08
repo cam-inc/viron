@@ -153,6 +153,7 @@ definitions:
       password:
         description: パスワード
         type: string
+        format: password
       role_id:
         description: ユーザー権限ID
         type: string
@@ -253,6 +254,7 @@ definitions:
       password:
         description: パスワード
         type: string
+        format: password
       role_id:
         description: ユーザー権限ID
         type: string
@@ -273,6 +275,7 @@ definitions:
       password:
         description: パスワード
         type: string
+        format: password
     required:
     - password
     type: object
@@ -467,6 +470,7 @@ definitions:
         type: string
       password:
         type: string
+        format: password
     type: object
 
   StatsNumber:

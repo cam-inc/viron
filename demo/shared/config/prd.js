@@ -15,7 +15,7 @@ module.exports = helper => {
       allow_email_domains: [
         // ここに書いたドメインが利用可能
         'gmail.com',
-        'camobile.com',
+        'cam-inc.co.jp'
       ],
     },
 
