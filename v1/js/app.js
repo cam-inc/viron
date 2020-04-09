@@ -45223,6 +45223,10 @@ var script$10 = function() {
       return '{...}';
     }
     if (isString_1(data)) {
+      if (column.format === 'password') {
+        this.isText = true;
+        return '*****';
+      }
       if (column.format === 'date-time') {
         this.isText = true;
         return dayjs_min(data).format();
