@@ -58,6 +58,7 @@ definitions:
       email: test@example.com
       id: 1
       role_id: operator
+      password: xxxxxxxxxxxxxxxxxxxxx
     properties:
       email:
         description: E-Mail
@@ -69,9 +70,14 @@ definitions:
       role_id:
         description: ユーザー権限ID
         type: string
+      password:
+        description: パスワード
+        type: string
+        format: password
     required:
     - id
     - email
+    - password
     type: object
 
   AdminUserCollection:
