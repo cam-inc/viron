@@ -41,8 +41,6 @@
   --theme-componentCardTable-grad-end: #fff;
   --theme-componentCardTable-row-border: #fff;
   --theme-componentCardTable-cell-hover: #fff;
-  --theme-select-option-text: #fff;
-  --theme-select-option-bg: #fff;
   --theme-pagination-bg: #fff;
   --theme-pagination-bg-disabled: #fff;
   --theme-pagination-border: #fff;
@@ -74,8 +72,6 @@
   --theme-standard-componentCardTable-grad-end: rgba(255, 255, 255, 1);
   --theme-standard-componentCardTable-row-border: #f9f9f9;
   --theme-standard-componentCardTable-cell-hover: #f9f9f9;
-  --theme-standard-select-option-text: #484848;
-  --theme-standard-select-option-bg: #f0f0ef;
   --theme-standard-pagination-bg: #fff;
   --theme-standard-pagination-bg-disabled: #f9f9f9;
   --theme-standard-pagination-border: #d1d1d1;
@@ -106,8 +102,6 @@
   --theme-midnight-componentCardTable-grad-end: rgba(0, 18, 23, 1);
   --theme-midnight-componentCardTable-row-border: #001d26;
   --theme-midnight-componentCardTable-cell-hover: #001d26;
-  --theme-midnight-select-option-text: #00c8ff;
-  --theme-midnight-select-option-bg: #001217;
   --theme-midnight-pagination-bg: #001217;
   --theme-midnight-pagination-bg-disabled: #004051;
   --theme-midnight-pagination-border: #004051;
@@ -138,8 +132,6 @@
   --theme-terminal-componentCardTable-grad-end: rgba(0, 0, 0, 1);
   --theme-terminal-componentCardTable-row-border: #091714;
   --theme-terminal-componentCardTable-cell-hover: #091714;
-  --theme-terminal-select-option-text: #35dcba;
-  --theme-terminal-select-option-bg: #000;
   --theme-terminal-pagination-bg: #000;
   --theme-terminal-pagination-bg-disabled: #0d372f;
   --theme-terminal-pagination-border: #0d372f;
@@ -2926,10 +2918,6 @@ select {
     --theme-componentCardTable-row-border: var(--theme-standard-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: #f9f9f9;
     --theme-componentCardTable-cell-hover: var(--theme-standard-componentCardTable-cell-hover);
-    --theme-select-option-text: #484848;
-    --theme-select-option-text: var(--theme-standard-select-option-text);
-    --theme-select-option-bg: #f0f0ef;
-    --theme-select-option-bg: var(--theme-standard-select-option-bg);
     --theme-pagination-bg: #fff;
     --theme-pagination-bg: var(--theme-standard-pagination-bg);
     --theme-pagination-bg-disabled: #f9f9f9;
@@ -2988,10 +2976,6 @@ select {
     --theme-componentCardTable-row-border: var(--theme-midnight-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: #001d26;
     --theme-componentCardTable-cell-hover: var(--theme-midnight-componentCardTable-cell-hover);
-    --theme-select-option-text: #00c8ff;
-    --theme-select-option-text: var(--theme-midnight-select-option-text);
-    --theme-select-option-bg: #001217;
-    --theme-select-option-bg: var(--theme-midnight-select-option-bg);
     --theme-pagination-bg: #001217;
     --theme-pagination-bg: var(--theme-midnight-pagination-bg);
     --theme-pagination-bg-disabled: #004051;
@@ -3050,10 +3034,6 @@ select {
     --theme-componentCardTable-row-border: var(--theme-terminal-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: #091714;
     --theme-componentCardTable-cell-hover: var(--theme-terminal-componentCardTable-cell-hover);
-    --theme-select-option-text: #35dcba;
-    --theme-select-option-text: var(--theme-terminal-select-option-text);
-    --theme-select-option-bg: #000;
-    --theme-select-option-bg: var(--theme-terminal-select-option-bg);
     --theme-pagination-bg: #000;
     --theme-pagination-bg: var(--theme-terminal-pagination-bg);
     --theme-pagination-bg-disabled: #0d372f;
@@ -5980,10 +5960,9 @@ select {
     pointer-events: none;
   }
 .Select__option {
-    background-color: #fff;
-    background-color: var(--theme-select-option-bg);
-    color: #fff;
-    color: var(--theme-select-option-text);
+    /* windows x chromeなど環境に応じてoptionのスタイルが違うので、最低でも見える状態にする。*/
+    background-color: white;
+    color: black;
   }
 .Select--small .Select__icon {
     right: 4px;
