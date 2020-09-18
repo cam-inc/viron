@@ -5959,6 +5959,11 @@ select {
     margin: auto;
     pointer-events: none;
   }
+.Select__option {
+    color: black;
+    /* windows x chromeなど環境に応じてoptionのスタイルが違うので、最低でも見える状態にする。*/
+    background-color: white;
+  }
 .Select--small .Select__icon {
     right: 4px;
     width: 8px;
