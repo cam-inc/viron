@@ -42,6 +42,12 @@
     pointer-events: none;
   }
 
+  &__option {
+    color: black;
+    /* windows x chromeなど環境に応じてoptionのスタイルが違うので、最低でも見える状態にする。*/
+    background-color: white;
+  }
+
   &--small &__icon {
     right: 4px;
     width: 8px;
