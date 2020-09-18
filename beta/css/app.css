@@ -2926,6 +2926,10 @@ select {
     --theme-componentCardTable-row-border: var(--theme-standard-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: #f9f9f9;
     --theme-componentCardTable-cell-hover: var(--theme-standard-componentCardTable-cell-hover);
+    --theme-select-option-text: #484848;
+    --theme-select-option-text: var(--theme-standard-select-option-text);
+    --theme-select-option-bg: #f0f0ef;
+    --theme-select-option-bg: var(--theme-standard-select-option-bg);
     --theme-pagination-bg: #fff;
     --theme-pagination-bg: var(--theme-standard-pagination-bg);
     --theme-pagination-bg-disabled: #f9f9f9;
@@ -2984,6 +2988,10 @@ select {
     --theme-componentCardTable-row-border: var(--theme-midnight-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: #001d26;
     --theme-componentCardTable-cell-hover: var(--theme-midnight-componentCardTable-cell-hover);
+    --theme-select-option-text: #00c8ff;
+    --theme-select-option-text: var(--theme-midnight-select-option-text);
+    --theme-select-option-bg: #001217;
+    --theme-select-option-bg: var(--theme-midnight-select-option-bg);
     --theme-pagination-bg: #001217;
     --theme-pagination-bg: var(--theme-midnight-pagination-bg);
     --theme-pagination-bg-disabled: #004051;
@@ -3042,6 +3050,10 @@ select {
     --theme-componentCardTable-row-border: var(--theme-terminal-componentCardTable-row-border);
     --theme-componentCardTable-cell-hover: #091714;
     --theme-componentCardTable-cell-hover: var(--theme-terminal-componentCardTable-cell-hover);
+    --theme-select-option-text: #35dcba;
+    --theme-select-option-text: var(--theme-terminal-select-option-text);
+    --theme-select-option-bg: #000;
+    --theme-select-option-bg: var(--theme-terminal-select-option-bg);
     --theme-pagination-bg: #000;
     --theme-pagination-bg: var(--theme-terminal-pagination-bg);
     --theme-pagination-bg-disabled: #0d372f;
