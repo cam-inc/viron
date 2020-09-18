@@ -42,6 +42,11 @@
     pointer-events: none;
   }
 
+  &__option {
+    background-color: var(--theme-select-option-bg);
+    color: var(--theme-select-option-text);
+  }
+
   &--small &__icon {
     right: 4px;
     width: 8px;
