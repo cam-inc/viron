@@ -1,7 +1,0 @@
-viron-icon-dots.icon.Icon.IconDots(class="{ opts.class }")
-  svg(viewBox="-3614 14066 16 4")
-    g(transform="translate(-3894 14025)")
-      circle(cx="2" cy="2" r="2" transform="translate(280 41)")
-      circle(cx="2" cy="2" r="2" transform="translate(286 41)")
-      circle(cx="2" cy="2" r="2" transform="translate(292 41)")
-  .Icon__catcher(if="{ !opts.nocatcher }")

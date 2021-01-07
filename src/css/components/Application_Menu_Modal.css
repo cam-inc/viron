@@ -1,8 +1,0 @@
-.Application_Menu_Modal {
-  & .Modal__closeButton {
-    @mixin hover {
-      color: var(--color-base-blue);
-    }
-    color: var(--color-base-white);
-  }
-}

@@ -39,10 +39,3 @@ jspm_packages
 dist
 
 .DS_Store
-*.iml
-.idea
-
-# docker
-.docker
-
-src/css/app.tmp.css

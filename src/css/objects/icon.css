@@ -1,9 +1,0 @@
-.icon {
-  @apply --layout-center-center;
-  fill: currentcolor;
-
-  & svg {
-    width: 100%;
-    height: 100%;
-  }
-}
