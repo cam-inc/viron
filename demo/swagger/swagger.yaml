@@ -250,6 +250,8 @@ definitions:
         description: パスワード
         type: string
         format: password
+        minLength: 8
+        pattern: "^(?=.*?[a-zA-Z])(?=.*?\\d)[a-zA-Z\\d!?#$%&@*+/-_<=>]{8,}"
       role_id:
         description: ユーザー権限ID
         type: string
@@ -450,6 +452,8 @@ definitions:
         description: パスワード
         type: string
         format: password
+        minLength: 8
+        pattern: "^(?=.*?[a-zA-Z])(?=.*?\\d)[a-zA-Z\\d!?#$%&@*+/-_<=>]{8,}"
       role_id:
         description: ユーザー権限ID
         type: string
