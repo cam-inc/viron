@@ -6,7 +6,7 @@ module.exports = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'facebook', // Usually your GitHub org/user name.
+  organizationName: 'cam-inc', // Usually your GitHub org/user name.
   projectName: 'viron', // Usually your repo name.
   themeConfig: {
     navbar: {
@@ -27,7 +27,7 @@ module.exports = {
           position: 'left'
         },
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/cam-inc/viron',
           label: 'GitHub',
           position: 'right',
         },
@@ -38,12 +38,12 @@ module.exports = {
       links: [{
           title: 'Docs',
           items: [{
-              label: 'Style Guide',
+              label: 'Documentation',
               to: 'docs/',
             },
             {
-              label: 'Second Doc',
-              to: 'docs/doc2/',
+              label: 'Quick start',
+              to: 'docs/doc1',
             },
           ],
         },
@@ -52,6 +52,10 @@ module.exports = {
           items: [{
               label: 'Stack Overflow',
               href: 'https://stackoverflow.com/questions/tagged/viron',
+            },
+            {
+              label: 'Github Issues',
+              href: 'https://github.com/cam-inc/viron/issues',
             },
           ],
         },
@@ -63,7 +67,7 @@ module.exports = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/cam-inc/viron',
             },
           ],
         },
