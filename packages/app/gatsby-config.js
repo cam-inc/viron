@@ -12,6 +12,16 @@ module.exports = {
           postcssPresetEnv({ stage: 3 })
         ]
       }
+    },
+    {
+      resolve: 'gatsby-plugin-alias-imports',
+      options: {
+        // Edit the paths option in the tsconfig.json file as well.
+        alias: {
+          '@src': 'src',
+          '@components': 'src/components'
+        }
+      }
     }
   ]
 };
