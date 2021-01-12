@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "@viron/app",
   "version": "2.0.0",
   "scripts": {
     "develop": "gatsby develop",
