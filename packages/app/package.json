@@ -9,11 +9,15 @@
   },
   "dependencies": {
     "gatsby": "^2.30.1",
+    "gatsby-plugin-postcss": "^3.5.0",
+    "postcss": "^8.2.3",
+    "postcss-preset-env": "^6.7.0",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-dom": "^16.14.0",
+    "tailwindcss": "^2.0.2"
   },
   "engines": {
-    "node": "~15",
-    "npm": "~7"
+    "node": ">=15.0.0",
+    "npm": ">=7.0.0"
   }
 }
