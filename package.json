@@ -1,5 +1,5 @@
 {
-  "name": "viron",
+  "name": "@viron",
   "version": "2.0.0",
   "description": "Design-based Management Console.",
   "main": "TODO",
@@ -38,11 +38,13 @@
   "devDependencies": {},
   "workspaces": {
     "packages": [
-      "packages/*"
+      "packages/app",
+      "packages/nodejs",
+      "packages/website"
     ]
   },
   "engines": {
-    "node": "14",
-    "npm": "7"
+    "node": ">=15.0.0",
+    "npm": ">=7.0.0"
   }
 }

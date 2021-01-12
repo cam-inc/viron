@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "@viron/app",
   "version": "2.0.0",
   "scripts": {
     "develop": "gatsby develop",
@@ -11,5 +11,9 @@
     "gatsby": "^2.30.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
+  },
+  "engines": {
+    "node": ">=15.0.0",
+    "npm": ">=7.0.0"
   }
 }
