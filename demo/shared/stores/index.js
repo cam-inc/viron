@@ -1,3 +1,3 @@
 module.exports = {
-  mysql: require('./mysql'),
+  mysql: require('./mysql')
 };
