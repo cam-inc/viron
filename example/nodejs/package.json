@@ -1,0 +1,76 @@
+{
+  "name": "@viron/example",
+  "version": "0.0.1",
+  "description": "A toolkit to speedily build a viron api server",
+  "main": "dist/modules.js",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "errorhandler": "^1.5.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.7.0",
+    "@types/errorhandler": "^1.5.0",
+    "@types/jest": "^26.0.20",
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "eslint": "^7.17.0",
+    "eslint-config-cam-recommended": "^0.0.4",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.4.4",
+    "ts-node": "^9.1.1",
+    "ts-node-dev": "^1.1.1",
+    "typescript": "^4.1.3"
+  },
+  "scripts": {
+    "precommit": "npm run lint",
+    "dev": "DEBUG=* ts-node-dev --watch src --debug src/server.ts",
+    "dev:inspect": "DEBUG=* ts-node-dev --watch src --debug --inspect-brk --inspect -- src/server.ts",
+    "dev:inspect-brk": "DEBUG=* ts-node-dev --watch src --debug --inspect -- src/server.ts",
+    "lint": "npm run lint:ts",
+    "lint:ts": "eslint 'src/**/*.ts'",
+    "lint:ts:fix": "eslint --fix 'src/**/*.ts'",
+    "format": "npm run format:prettier",
+    "format:prettier": "prettier --write 'src/**/*.ts'",
+    "clear": "rm -rf dist",
+    "build": "npm run clear && npm run format && npm run lint && tsc",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cam-inc/viron.git"
+  },
+  "keywords": [
+    "viron",
+    "toolkit",
+    "monorepo",
+    "management",
+    "console",
+    "admin",
+    "design",
+    "openapi",
+    "typescript"
+  ],
+  "contributors": [
+    {
+      "name": "cathcheeno"
+    },
+    {
+      "name": "noritama"
+    },
+    {
+      "name": "fkei",
+      "email": "kei.topaz@gmail.com"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cam-inc/viron/issues"
+  },
+  "homepage": "https://github.com/cam-inc/viron#readme",
+  "engines": {
+    "node": ">=15.0.0",
+    "npm": ">=7.0.0"
+  }
+}
