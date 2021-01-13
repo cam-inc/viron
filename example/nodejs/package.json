@@ -2,7 +2,7 @@
   "name": "@viron/example",
   "version": "0.0.1",
   "description": "A toolkit to speedily build a viron api server",
-  "main": "dist/modules.js",
+  "main": "dist/server.js",
   "dependencies": {
     "compression": "^1.7.4",
     "errorhandler": "^1.5.1",
@@ -24,9 +24,8 @@
   },
   "scripts": {
     "precommit": "npm run lint",
-    "dev": "DEBUG=* ts-node-dev --watch src --debug src/server.ts",
-    "dev:inspect": "DEBUG=* ts-node-dev --watch src --debug --inspect-brk --inspect -- src/server.ts",
-    "dev:inspect-brk": "DEBUG=* ts-node-dev --watch src --debug --inspect -- src/server.ts",
+    "dev": "DEBUG=* ts-node-dev --watch src --debug --inspect=0.0.0.0:9229 -- src/server.ts",
+    "dev:inspect-brk": "DEBUG=* ts-node-dev --watch src --debug --inspect=0.0.0.0:9229 --inspect-brk -- src/server.ts",
     "lint": "npm run lint:ts",
     "lint:ts": "eslint 'src/**/*.ts'",
     "lint:ts:fix": "eslint --fix 'src/**/*.ts'",

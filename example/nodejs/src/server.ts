@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'development') {
  */
 export const server = app.listen(app.get('port'), () => {
   console.log(
-    '@viron/demo/node is running at http://localhost:%d in %s mode',
+    '@viron/example/node is running at http://localhost:%d in %s mode',
     app.get('port'),
     app.get('env')
   );
