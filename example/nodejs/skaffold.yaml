@@ -1,0 +1,26 @@
+apiVersion: skaffold/v2beta10
+kind: Config
+metadata:
+  name: example
+build:
+  local:
+    push: false
+  artifacts:
+    - image: viron/example/nodejs
+      docker:
+        dockerfile: Dockerfile
+      # WARN: Unused because it uses ts-node-dev
+      # sync:
+      #   manual:
+      #     - src: '*'
+      #       dest: .
+deploy:
+  kubectl:
+    manifests:
+      - k8s/deployment.yaml
+
+portForward:
+  - resourceType: deployment
+    resourceName: example
+    port: 9229
+    localPort: 9229
