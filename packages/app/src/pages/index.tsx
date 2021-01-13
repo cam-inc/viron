@@ -1,9 +1,13 @@
 import React from 'react';
+import Button from '@components/button';
 
 type Props = {};
 const IndexPage: React.FC<Props> = () => {
   return (
-    <p className="font-bold">hello</p>
+    <div>
+      <p className="font-bold">hello</p>
+      <Button label="button" />
+    </div>
   );
 };
 
