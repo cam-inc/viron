@@ -2,6 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node",
+      "name": "Jest for example/nodejs",
+      "request": "launch",
+      "program": "${workspaceFolder}/example/nodejs/node_modules/jest/bin/jest",
+      "args": [
+        "--runInBand"
+      ],
+      "cwd": "${workspaceFolder}/example/nodejs",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true
+    },
+    {
       "name": "Attach exmaple/nodejs on skaffold",
       "port": 9229,
       "request": "attach",
@@ -9,6 +22,6 @@
         "<node_internals>/**"
       ],
       "type": "node"
-    }
+    },
   ]
 }
