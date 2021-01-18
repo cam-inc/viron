@@ -9,9 +9,7 @@ describe('routes/ping', () => {
   });
 
   it('200', async () => {
-    const response: supertest.Response = await request
-      .get('/ping')
-      .expect(200)
+    const response: supertest.Response = await request.get('/ping').expect(200);
     assert.strictEqual(response.text, 'pong');
   });
 });

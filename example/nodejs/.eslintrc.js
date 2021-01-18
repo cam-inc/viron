@@ -17,12 +17,12 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
-    project: './tsconfig.test.json',
+    project: './tsconfig.json',
     tsconfigRootDir: __dirname,
   },
   rules: {
     'prettier/prettier': 'error',
     "@typescript-eslint/explicit-function-return-type": 2,
-    "jest/expect-expect": off
+    "jest/expect-expect": 0
   },
 };
