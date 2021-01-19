@@ -13,6 +13,7 @@ brew install skaffold
 ```
 
 > Other installation methods. [skaffold document](https://skaffold.dev/docs/install/)
+> 🌟 (Optional) Recommended products for viewing logs: `brew install stern`
 
 #### Install Docker
 
@@ -22,13 +23,47 @@ brew install skaffold
 
 ### Run
 
-```bash
-skaffold dev --port-forward
 ```
+npm run skaffold:dev
+```
+
+### CLI
+
+- Run
+  - `npm run skaffold:dev`
+- Clean
+  - `npm run skaffold:delete`
+- MySQL Access
+  - `npm run skaffold:connect:mysql`
+- Mongo Access
+  - `npm run skaffold:connect:mongo`
+- Print Logs
+  - `npm run skaffold:logs`
+- Other
+  - `npm run`
 
 **Access**
 
-- API Server : `http://localhost:3000`
+- API Server
+  - URL: `http://localhost:3000`
 - NodeJS Debug
   - Host: `127.0.0.1`
   - Port: `9229`
+- MySQL
+  - Host: `127.0.0.1`
+  - Port: `3306`
+- Mongo
+  - Host: `127.0.0.1`
+  - Port: `27017`
+
+### Skaffold structure
+
+- [x] Persistent Volume
+  - [x] mysql
+  - [x] mongo
+- [x] Load Balancer
+  - [x] example/nodejs
+  - [x] mysql
+  - [x] mongo
+- [x] Port Forward
+  - [x] node-inspector example/nodejs

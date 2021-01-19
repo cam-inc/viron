@@ -5,19 +5,17 @@ metadata:
 build:
   local:
     push: false
+    useBuildkit: true
+
   artifacts:
     - image: viron/example/nodejs
       docker:
         dockerfile: Dockerfile
-      # WARN: Unused because it uses ts-node-dev
-      # sync:
-      #   manual:
-      #     - src: '*'
-      #       dest: .
+
 deploy:
   kubectl:
     manifests:
-      - k8s/deployment.yaml
+      - k8s/*
 
 portForward:
   - resourceType: deployment
