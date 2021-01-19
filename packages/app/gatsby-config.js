@@ -1,5 +1,8 @@
-
+//@see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
 module.exports = {
+  siteMetadata: {
+    title: 'Viron'
+  },
   plugins: [
     {
       resolve: 'gatsby-plugin-postcss'
@@ -12,7 +15,9 @@ module.exports = {
           '@src': 'src',
           '@components': 'src/components',
           '@layouts': 'src/layouts',
-          '@state': 'src/state'
+          '@state': 'src/state',
+          '@styles': 'src/styles',
+          '@wrappers': 'src/wrappers'
         }
       }
     }

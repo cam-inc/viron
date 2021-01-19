@@ -2,17 +2,33 @@
 
 ## Development
 
+### Basic Commands
+
+```sh
+# To start development.
+$ npm run develop
+
+# To check production build.
+$ npm run build
+$ npm run serve
+
+# To type check.
+$ npm run typecheck
+```
+
 ### Basic UI Structure
 As we use Gatsby of version 2, we need to do some tricks to architect a UI tree. Below is the basic structure.
 
 ```html
 <RootWrapper>
   <Root>
-    <PageElement>
-      <Layout>
-        {/* page content here */}
-      </Layout>
-    </PageElement>
+    <PageWrapper>
+      <PageElement>
+        <Layout>
+          {/* page content here */}
+        </Layout>
+      </PageElement>
+    </PageWrapper>
   </Root>
 <RootWrapper>
 ```
