@@ -10,7 +10,9 @@ module.exports = {
         // Edit the paths option in the tsconfig.json file as well.
         alias: {
           '@src': 'src',
-          '@components': 'src/components'
+          '@components': 'src/components',
+          '@layouts': 'src/layouts',
+          '@state': 'src/state'
         }
       }
     }

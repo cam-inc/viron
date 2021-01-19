@@ -47,7 +47,9 @@
     "paths": {                             /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
       // Edit the gatsby-plugin-alias-imports alias option in the gatsby-config file as well.
       "@src/*": ["src/*"],
-      "@components/*": ["src/components/*"]
+      "@components/*": ["src/components/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@state/*": ["src/state/*"]
     },
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
