@@ -33,9 +33,15 @@
     "url": "https://github.com/cam-inc/viron/issues"
   },
   "homepage": "https://github.com/cam-inc/viron#readme",
-  "scripts": {},
-  "dependencies": {},
-  "devDependencies": {},
+  "scripts": {
+    "postinstall": "husky install",
+    "prepublishOnly": "pinst --disable",
+    "postpublish": "pinst --enable"
+  },
+  "devDependencies": {
+    "husky": "^5.0.6",
+    "pinst": "^2.1.1"
+  },
   "workspaces": {
     "packages": [
       "packages/app",
