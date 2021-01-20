@@ -36,7 +36,8 @@
     "postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
-    "pre-commit": "lerna run pre-commit"
+    "pre-commit": "lerna run pre-commit",
+    "pre-push": "lerna run pre-push"
   },
   "devDependencies": {
     "husky": "^5.0.6",
