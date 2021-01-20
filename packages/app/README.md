@@ -33,10 +33,10 @@ As we use Gatsby of version 2, we need to do some tricks to architect a UI tree.
 <RootWrapper>
 ```
 
-RootWrapper: This stays at the most outside of the application wrapping Root element which is gatsby's default root element.
-Root: This is Gatsby's default root element.
-Page Element(s): This is equivalent to each element in the `pages` directory. This will be mounted and unmounted as navigations happen.
-Layout(s): This is equivalent to each element in the `layouts` directory. This stays inside a page element, so this will be mounted and unmouted as well like page elements.
+- RootWrapper: This stays at the most outside of the application wrapping Root element which is gatsby's default root element.
+- Root: This is Gatsby's default root element.
+- Page Element(s): This is equivalent to each element in the `pages` directory. This will be mounted and unmounted as navigations happen.
+- Layout(s): This is equivalent to each element in the `layouts` directory. This stays inside a page element, so this will be mounted and unmouted as well like page elements.
 
 ### State Management
 
