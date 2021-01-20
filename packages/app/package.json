@@ -18,6 +18,7 @@
     "postcss-preset-env": "^6.7.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
+    "recoil": "^0.1.2",
     "tailwindcss": "^2.0.2"
   },
   "engines": {

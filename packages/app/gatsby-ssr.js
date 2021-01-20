@@ -3,7 +3,7 @@ import PageWrapper from './src/wrappers/page';
 import RootWrapper from './src/wrappers/root';
 
 // Specify a react component which wraps gatsby root component. No unmounting happens.
-// IMPORTANT: Editing gatsby-ssr file is required.
+// IMPORTANT: Editing gatsby-browser file is required.
 // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-browser/#wrapRootElement
 export const wrapRootElement = ({ element }, pluginOptions) => {
   return (
