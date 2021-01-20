@@ -25,5 +25,11 @@ spec:
       containers:
         - name: example
           image: viron/example/nodejs
+          env:
+            - name: mode
+              value: $${mode}
           ports:
             - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: example-configmap

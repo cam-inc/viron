@@ -30,6 +30,12 @@
   },
   "scripts": {
     "precommit": "npm run lint",
+    "skaffold:dev:mysql": "skaffold dev --port-forward --profile mysql",
+    "skaffold:dev:mongo": "skaffold dev --port-forward --profile mongo",
+    "skaffold:delete": "skaffold delete",
+    "skaffold:connect:mysql": "mysql -u root -p -h 127.0.0.1 -P 3306",
+    "skaffold:connect:mongo": "mongo -u root --authenticationDatabase admin mongodb://127.0.0.1:27017",
+    "skaffold:logs": "stern '.*'",
     "dev": "DEBUG=* ts-node-dev --watch src --debug --inspect=0.0.0.0:9229 -- src/server.ts",
     "dev:inspect-brk": "DEBUG=* ts-node-dev --watch src --debug --inspect=0.0.0.0:9229 --inspect-brk -- src/server.ts",
     "lint": "npm run lint:ts",

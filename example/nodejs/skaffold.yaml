@@ -5,19 +5,32 @@ metadata:
 build:
   local:
     push: false
+    useBuildkit: true
+
   artifacts:
     - image: viron/example/nodejs
       docker:
         dockerfile: Dockerfile
-      # WARN: Unused because it uses ts-node-dev
-      # sync:
-      #   manual:
-      #     - src: '*'
-      #       dest: .
-deploy:
-  kubectl:
-    manifests:
-      - k8s/deployment.yaml
+
+profiles:
+  - name: mysql
+    activation:
+      - env: mode=mysql
+    deploy:
+      kubectl:
+        manifests:
+          - k8s/comfigmap-mysql.yaml
+          - k8s/deployment.yaml
+          - k8s/deployment-mysql.yaml
+  - name: mongo
+    activation:
+      - env: mode=mongo
+    deploy:
+      kubectl:
+        manifests:
+          - k8s/comfigmap-mongo.yaml
+          - k8s/deployment.yaml
+          - k8s/deployment-mongo.yaml
 
 portForward:
   - resourceType: deployment
