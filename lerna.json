@@ -1,0 +1,8 @@
+{
+  "packages": [
+    "packages/app",
+    "packages/nodejs",
+    "packages/website"
+  ],
+  "version": "independent"
+}

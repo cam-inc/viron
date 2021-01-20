@@ -1,5 +1,4 @@
 {
-  "name": "@viron",
   "version": "2.0.0",
   "description": "Design-based Management Console.",
   "main": "TODO",
@@ -36,10 +35,12 @@
   "scripts": {
     "postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
-    "postpublish": "pinst --enable"
+    "postpublish": "pinst --enable",
+    "pre-commit": "lerna run pre-commit"
   },
   "devDependencies": {
     "husky": "^5.0.6",
+    "lerna": "^3.22.1",
     "pinst": "^2.1.1"
   },
   "workspaces": {

@@ -2,6 +2,8 @@
   "name": "@viron/app",
   "version": "2.0.0",
   "scripts": {
+    "pre-commit": "echo pre-commit",
+    "pre-push": "echo pre-push",
     "develop": "gatsby develop",
     "build": "gatsby build",
     "serve": "gatsby serve",
