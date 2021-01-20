@@ -1,4 +1,4 @@
-//@see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
+// @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
 module.exports = {
   siteMetadata: {
     title: 'Viron'
