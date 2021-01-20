@@ -23,14 +23,22 @@ brew install skaffold
 
 ### Run
 
+*Use MySQL*
 ```
-npm run skaffold:dev
+npm run skaffold:dev:mysql
+```
+*Use Mongo*
+```
+npm run skaffold:dev:mongo
 ```
 
 ### CLI
 
 - Run
-  - `npm run skaffold:dev`
+  - MySQL Mode
+    - `npm run skaffold:dev:mysql`
+  - Mongo Mode
+    - `npm run skaffold:dev:mongo`
 - Clean
   - `npm run skaffold:delete`
 - MySQL Access
