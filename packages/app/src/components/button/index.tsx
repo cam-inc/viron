@@ -5,9 +5,7 @@ type Props = {
   onClick?: () => void;
 };
 const Button: React.FC<Props> = ({ label = '', onClick }) => {
-  return (
-    <button onClick={onClick}>{!!label && (<span>{label}</span>)}</button>
-  );
+  return <button onClick={onClick}>{!!label && <span>{label}</span>}</button>;
 };
 
 export default Button;

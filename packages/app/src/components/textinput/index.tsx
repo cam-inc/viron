@@ -10,7 +10,7 @@ const Textinput: React.FC<Props> = ({ label, description, defaultValue }) => {
   return (
     <div>
       {!!label && <label className="font-bold">{label}</label>}
-      {!!description && (<p>{description}</p>)}
+      {!!description && <p>{description}</p>}
       <input type="text" defaultValue={defaultValue} />
     </div>
   );

@@ -4,7 +4,7 @@ import Textinput from './index';
 
 export default {
   title: 'COMPONENTS/Textinput',
-  component: Textinput
+  component: Textinput,
 } as Meta;
 
 const Template: Story<ComponentProps<typeof Textinput>> = (args) => (
@@ -14,5 +14,5 @@ const Template: Story<ComponentProps<typeof Textinput>> = (args) => (
 export const FirstStory = Template.bind({});
 FirstStory.args = {
   label: 'label',
-  defaultValue: 'default value'
+  defaultValue: 'default value',
 };

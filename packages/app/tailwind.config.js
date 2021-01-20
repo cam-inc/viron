@@ -2,7 +2,7 @@ module.exports = {
   purge: {
     // uncomment out to enable purge functionality on development environment.
     // enabled: true,
-    content: ['./src/**/*.{js,jsx,ts,tsx}']
+    content: ['./src/**/*.{js,jsx,ts,tsx}'],
   },
   darkMode: false,
   theme: {
@@ -12,4 +12,4 @@ module.exports = {
     extend: {},
   },
   plugins: [],
-}
+};

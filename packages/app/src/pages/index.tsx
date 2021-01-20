@@ -9,7 +9,7 @@ import { foo as fooState } from '@state/atoms/sample';
 type Props = {} & PageProps;
 const IndexPage: React.FC<Props> = () => {
   const [foo, setFoo] = useState(fooState);
-  const handleClick = function() {
+  const handleClick = function () {
     setFoo(`foo-${Math.random()}`);
   };
   return (

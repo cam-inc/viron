@@ -3,8 +3,5 @@ const tailwindcss = require('tailwindcss');
 const tailwindConfig = require('./tailwind.config.js');
 
 module.exports = {
-  plugins: [
-    tailwindcss(tailwindConfig),
-    postcssPresetEnv({ stage: 3 })
-  ]
+  plugins: [tailwindcss(tailwindConfig), postcssPresetEnv({ stage: 3 })],
 };
