@@ -1,0 +1,6 @@
+package.json
+package-lock.json
+.cache
+public
+gatsby-browser.js
+gatsby-ssr.js

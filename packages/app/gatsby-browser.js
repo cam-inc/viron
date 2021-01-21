@@ -6,11 +6,7 @@ import RootWrapper from './src/wrappers/root';
 // IMPORTANT: Editing gatsby-ssr file is required.
 // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-browser/#wrapRootElement
 export const wrapRootElement = ({ element }, pluginOptions) => {
-  return (
-    <RootWrapper pluginOptions={pluginOptions}>
-      {element}
-    </RootWrapper>
-  );
+  return <RootWrapper pluginOptions={pluginOptions}>{element}</RootWrapper>;
 };
 
 // Specify a react component which wraps page components. No unmounting happens.

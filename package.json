@@ -1,5 +1,4 @@
 {
-  "name": "@viron",
   "version": "2.0.0",
   "description": "Design-based Management Console.",
   "main": "TODO",
@@ -33,9 +32,18 @@
     "url": "https://github.com/cam-inc/viron/issues"
   },
   "homepage": "https://github.com/cam-inc/viron#readme",
-  "scripts": {},
-  "dependencies": {},
-  "devDependencies": {},
+  "scripts": {
+    "postinstall": "husky install",
+    "prepublishOnly": "pinst --disable",
+    "postpublish": "pinst --enable",
+    "pre-commit": "lerna run pre-commit",
+    "pre-push": "lerna run pre-push"
+  },
+  "devDependencies": {
+    "husky": "^5.0.6",
+    "lerna": "^3.22.1",
+    "pinst": "^2.1.1"
+  },
   "workspaces": {
     "packages": [
       "packages/app",
