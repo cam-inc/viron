@@ -1,7 +1,20 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: example-configmap
+  name: mongo
+  namespace: viron-nodejs
+  labels:
+    app: mongo
+data:
+  MONGO_INITDB_ROOT_USERNAME: root
+  MONGO_INITDB_ROOT_PASSWORD: password
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example
+  namespace: viron-nodejs
   labels:
     app: example
 data:

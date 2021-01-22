@@ -3,6 +3,7 @@ kind: PersistentVolume
 apiVersion: v1
 metadata:
   name: mongo-pv-volume
+  namespace: viron-nodejs
   labels:
     type: local
 spec:
@@ -12,12 +13,13 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: '/data/db'
+    path: '/data/mongo'
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongo-pv-claim
+  namespace: viron-nodejs
 spec:
   storageClassName: manual
   accessModes:
@@ -30,6 +32,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongo
+  namespace: viron-nodejs
 spec:
   ports:
     - port: 27017
@@ -42,6 +45,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongo
+  namespace: viron-nodejs
 spec:
   selector:
     matchLabels:
@@ -62,14 +66,12 @@ spec:
               cpu: 100m
             limits:
               memory: 500Mi
-          env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              value: root
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              value: password
           ports:
             - name: mongo
               containerPort: 27017
+          envFrom:
+            - configMapRef:
+                name: mongo
           volumeMounts:
             - name: mongo-persistent-storage
               mountPath: /data/db

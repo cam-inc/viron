@@ -23,12 +23,15 @@ brew install skaffold
 
 ### Run
 
-*Use MySQL*
-```
+#### Use MySQL
+
+```bash
 npm run skaffold:dev:mysql
 ```
-*Use Mongo*
-```
+
+#### Use Mongo
+
+```bash
 npm run skaffold:dev:mongo
 ```
 
@@ -40,7 +43,10 @@ npm run skaffold:dev:mongo
   - Mongo Mode
     - `npm run skaffold:dev:mongo`
 - Clean
-  - `npm run skaffold:delete`
+  - MySQL Mode
+    - `npm run skaffold:delete:mysql`
+  - Mongo Mode
+    - `npm run skaffold:delete:mongo`
 - MySQL Access
   - `npm run skaffold:connect:mysql`
 - Mongo Access
@@ -50,7 +56,7 @@ npm run skaffold:dev:mongo
 - Other
   - `npm run`
 
-**Access**
+#### Access
 
 - API Server
   - URL: `http://localhost:3000`
@@ -66,12 +72,18 @@ npm run skaffold:dev:mongo
 
 ### Skaffold structure
 
-- [x] Persistent Volume
-  - [x] mysql
-  - [x] mongo
-- [x] Load Balancer
-  - [x] example/nodejs
-  - [x] mysql
-  - [x] mongo
-- [x] Port Forward
-  - [x] node-inspector example/nodejs
+- Persistent Volume
+  - `mysql`
+  - `mongo`
+- Load Balancer
+  - `example/nodejs`
+  - `mysql`
+  - `mongo`
+- Port Forward
+  - node-inspector `example/nodejs`
+- Namespace
+  - `viron-nodejs`
+
+### Troubleshooting
+
+TODO
