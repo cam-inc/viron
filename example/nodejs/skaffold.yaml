@@ -19,6 +19,7 @@ profiles:
     deploy:
       kubectl:
         manifests:
+          - k8s/namespace.yaml
           - k8s/comfigmap-mysql.yaml
           - k8s/deployment.yaml
           - k8s/deployment-mysql.yaml
@@ -28,6 +29,7 @@ profiles:
     deploy:
       kubectl:
         manifests:
+          - k8s/namespace.yaml
           - k8s/comfigmap-mongo.yaml
           - k8s/deployment.yaml
           - k8s/deployment-mongo.yaml

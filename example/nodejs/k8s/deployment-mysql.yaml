@@ -3,6 +3,7 @@ kind: PersistentVolume
 apiVersion: v1
 metadata:
   name: mysql-pv-volume
+  namespace: viron-nodejs
   labels:
     type: local
 spec:
@@ -12,11 +13,12 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: '/var/lib/mysql'
+    path: '/data/mysql'
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: viron-nodejs
   name: mysql-pv-claim
 spec:
   storageClassName: manual
@@ -29,6 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: viron-nodejs
   name: mysql
 spec:
   ports:
@@ -41,6 +44,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: viron-nodejs
   name: mysql
 spec:
   selector:
@@ -62,14 +66,12 @@ spec:
               cpu: 100m
             limits:
               memory: 500Mi
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: password
-            - name: MYSQL_DATABASE
-              value: viron
           ports:
             - name: mysql
               containerPort: 3306
+          envFrom:
+            - configMapRef:
+                name: mysql
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql

@@ -1,7 +1,21 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: example-configmap
+  name: mysql
+  namespace: viron-nodejs
+  labels:
+    app: mysql
+data:
+  MYSQL_ROOT_PASSWORD: password
+  MYSQL_USER: viron
+  MYSQL_PASSWORD: password
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example
+  namespace: viron-nodejs
   labels:
     app: example
 data:
