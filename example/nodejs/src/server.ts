@@ -1,5 +1,10 @@
 import errorHandler from 'errorhandler';
+import { ctx, logger } from './context';
 import { createApplication } from './application';
+
+logger.info(`Set mode. mode=${ctx.mode}`);
+
+ctx.preflight();
 
 const app = createApplication();
 
