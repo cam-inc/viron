@@ -5,6 +5,7 @@ services:
 
   example:
     build: .
+    restart: always
     depends_on:
       - mysql
     ports:
@@ -16,12 +17,10 @@ services:
       - $PWD/package.json:/example/nodejs/package.json
       - $PWD/src:/example/nodejs/src
     command: npm run dev
-    networks:
-      default:
-        aliases:
-          - viron.example.nodejs
+
   mysql:
     image: mysql
+    restart: always
     ports:
       - 3306:3306
     volumes:
@@ -30,7 +29,7 @@ services:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_USER=viron
       - MYSQL_PASSWORD=password
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --default-authentication-plugin=mysql_native_password
     networks:
       default:
         aliases:

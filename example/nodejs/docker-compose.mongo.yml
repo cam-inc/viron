@@ -5,6 +5,7 @@ services:
 
   example:
     build: .
+    restart: always
     depends_on:
       - mongo
     ports:
@@ -19,6 +20,7 @@ services:
 
   mongo:
     image: mongo:4.2
+    restart: always
     ports:
       - 27017:27017
     volumes:

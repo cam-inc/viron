@@ -35,11 +35,11 @@ export const createDefinitions = (): Definitions => {
   return definitions;
 };
 
-export const preflight = (
+export const preflight = async (
   openUri: openUri,
   options: ConnectOptions,
   definitions: Definitions
-): Connection => {
+): Promise<Connection> => {
   const c: Connection = createConnection();
 
   c.on('connecting', wrapEvent('connecting'));
@@ -54,7 +54,7 @@ export const preflight = (
   c.on('reconnectFailed', wrapEvent('reconnectFailed'));
   c.on('reconnectTries', wrapEvent('reconnectTries'));
 
-  c.openUri(openUri, options);
+  await c.openUri(openUri, options);
 
   if (!c.db) {
     logger.error('Mongo connection failure. openUri=%s', openUri);

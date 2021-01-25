@@ -1,7 +1,8 @@
 import express, { Express } from 'express';
-import compression from 'compression'; // compresses requests
+import errorHandler from 'errorhandler';
+import compression from 'compression';
 import bodyParser from 'body-parser';
-// Controllers (route handlers)
+//
 import { getPing } from './routes/ping';
 
 export const createApplication = (): Express => {
@@ -18,6 +19,8 @@ export const createApplication = (): Express => {
    * Primary app routes.
    */
   app.get('/ping', getPing);
+
+  app.use(errorHandler());
 
   return app;
 };
