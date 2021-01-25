@@ -6,7 +6,9 @@
   "dependencies": {
     "compression": "^1.7.4",
     "errorhandler": "^1.5.1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongoose": "^5.11.13",
+    "pino": "^6.11.0"
   },
   "devDependencies": {
     "@jest/types": "^26.6.2",
@@ -14,6 +16,7 @@
     "@types/errorhandler": "^1.5.0",
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.21",
+    "@types/pino": "^6.3.5",
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "eslint": "^7.17.0",
@@ -30,15 +33,11 @@
   },
   "scripts": {
     "precommit": "npm run lint",
-    "skaffold:dev:mysql": "skaffold dev --port-forward --profile mysql",
-    "skaffold:dev:mongo": "skaffold dev --port-forward --profile mongo",
-    "skaffold:delete:mysql": "skaffold delete --profile mysql",
-    "skaffold:delete:mongo": "skaffold delete --profile mongo",
-    "skaffold:connect:mysql": "mysql -u root -p -h 127.0.0.1 -P 3306",
-    "skaffold:connect:mongo": "mongo -u root --authenticationDatabase admin mongodb://127.0.0.1:27017",
-    "skaffold:logs": "stern '.*'",
-    "dev": "DEBUG=* ts-node-dev --watch src --debug --inspect=0.0.0.0:9229 -- src/server.ts",
-    "dev:inspect-brk": "DEBUG=* ts-node-dev --watch src --debug --inspect=0.0.0.0:9229 --inspect-brk -- src/server.ts",
+    "docker-compose:connect:mysql": "mysql -u root -p -h 127.0.0.1 -P 3306",
+    "docker-compose:connect:mongo": "mongo -u root --authenticationDatabase admin mongodb://127.0.0.1:27017",
+    "docker-compose:up:mysql": "docker-compose -f ./docker-compose.mysql.yml up",
+    "docker-compose:up:mongo": "docker-compose -f ./docker-compose.mongo.yml up",
+    "dev": "DEBUG=* ts-node-dev --watch src --debug --inspect=0.0.0.0:9229 --poll -- src/server.ts",
     "lint": "npm run lint:ts",
     "lint:ts": "eslint \"{src,__tests__}/**/*.{ts,tsx}\"",
     "lint:ts:fix": "eslint --fix \"{src,__tests__}/**/*.{ts,tsx}\"",

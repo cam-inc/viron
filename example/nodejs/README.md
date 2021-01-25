@@ -1,58 +1,40 @@
 # example api (nodejs)
 
-Provides an Example API environment using Skaffold.
+Provides an Example API environment using `docker-compose`.
 
 ## Quick Start
 
 ### Advance preparation
 
-#### Install Skaffold
-
-```bash
-brew install skaffold
-```
-
-> Other installation methods. [skaffold document](https://skaffold.dev/docs/install/)
-> 🌟 (Optional) Recommended products for viewing logs: `brew install stern`
-
 #### Install Docker
 
 - Docker for Desktop. [Download site](https://www.docker.com/products/docker-desktop)
-- ✅ Enable Kubernetes (Required)
-  > Settings : [Preferences] -> [Kubernetes] -> [Enable Kubernetes]
 
 ### Run
 
 #### Use MySQL
 
 ```bash
-npm run skaffold:dev:mysql
+npm run docker-compose:up:mysql
 ```
 
 #### Use Mongo
 
 ```bash
-npm run skaffold:dev:mongo
+npm run docker-compose:up:mongo
 ```
 
 ### CLI
 
 - Run
   - MySQL Mode
-    - `npm run skaffold:dev:mysql`
+    - `npm run docker-compose:up:mysql`
   - Mongo Mode
-    - `npm run skaffold:dev:mongo`
-- Clean
-  - MySQL Mode
-    - `npm run skaffold:delete:mysql`
-  - Mongo Mode
-    - `npm run skaffold:delete:mongo`
+    - `npm run docker-compose:up:mongo`
 - MySQL Access
-  - `npm run skaffold:connect:mysql`
+  - `npm run docker-compose:connect:mysql`
 - Mongo Access
-  - `npm run skaffold:connect:mongo`
-- Print Logs
-  - `npm run skaffold:logs`
+  - `npm run docker-compose:connect:mongo`
 - Other
   - `npm run`
 
@@ -70,19 +52,13 @@ npm run skaffold:dev:mongo
   - Host: `127.0.0.1`
   - Port: `27017`
 
-### Skaffold structure
+### Temporary directory
 
-- Persistent Volume
-  - `mysql`
-  - `mongo`
-- Load Balancer
-  - `example/nodejs`
-  - `mysql`
-  - `mongo`
-- Port Forward
-  - node-inspector `example/nodejs`
-- Namespace
-  - `viron-nodejs`
+- Data
+  - MySQL
+    - `data/mysql`
+  - MongoDB
+    - `data/mongo`
 
 ### Troubleshooting
 
