@@ -33,8 +33,10 @@
   },
   "scripts": {
     "precommit": "npm run lint",
-    "connect:mysql": "mysql -u root -p -h 127.0.0.1 -P 3306",
-    "connect:mongo": "mongo -u root --authenticationDatabase admin mongodb://127.0.0.1:27017",
+    "docker-compose:connect:mysql": "mysql -u root -p -h 127.0.0.1 -P 3306",
+    "docker-compose:connect:mongo": "mongo -u root --authenticationDatabase admin mongodb://127.0.0.1:27017",
+    "docker-compose:up:mysql": "docker-compose -f ./docker-compose.mysql.yml up",
+    "docker-compose:up:mongo": "docker-compose -f ./docker-compose.mongo.yml up",
     "dev": "DEBUG=* ts-node-dev --watch src --debug --inspect=0.0.0.0:9229 --poll -- src/server.ts",
     "lint": "npm run lint:ts",
     "lint:ts": "eslint \"{src,__tests__}/**/*.{ts,tsx}\"",
