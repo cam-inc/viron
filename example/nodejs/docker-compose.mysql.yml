@@ -1,0 +1,36 @@
+
+version: '3.8'
+
+services:
+
+  example:
+    build: .
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - 3000:3000
+      - 9229:9229 # node-inspector
+    environment:
+      - MODE=mysql
+    volumes:
+      - $PWD/package.json:/example/nodejs/package.json
+      - $PWD/src:/example/nodejs/src
+    command: npm run dev
+
+  mysql:
+    image: mysql
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - $PWD/data/mysql/db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_USER=viron
+      - MYSQL_PASSWORD=password
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --default-authentication-plugin=mysql_native_password
+    networks:
+      default:
+        aliases:
+          - viron.example.nodejs

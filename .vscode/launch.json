@@ -3,7 +3,7 @@
   "configurations": [
     {
       "type": "node",
-      "name": "Jest for example/nodejs",
+      "name": "[viron/example/nodejs] Run Jest on example/nodejs",
       "request": "launch",
       "program": "${workspaceFolder}/example/nodejs/node_modules/jest/bin/jest",
       "args": [
@@ -15,13 +15,17 @@
       "disableOptimisticBPs": true
     },
     {
-      "name": "Attach exmaple/nodejs on skaffold",
-      "port": 9229,
+      "type": "node",
       "request": "attach",
+      "name": "[viron/example/nodejs] Attach node-inspector to example/nodejs",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/example/nodejs",
+      "remoteRoot": "/example/nodejs",
+      "protocol": "inspector",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "type": "node"
     },
   ]
 }

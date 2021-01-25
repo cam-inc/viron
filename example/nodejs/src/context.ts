@@ -28,11 +28,11 @@ export class Context {
         );
     }
   }
-  public preflight(): void {
+
+  public async preflight(): Promise<void> {
     switch (this.mode) {
       case modeMongo:
-        // store
-        preflightMongo(
+        await preflightMongo(
           'mongodb://mongo:27017',
           {
             // MongoDB Options
@@ -46,7 +46,7 @@ export class Context {
             useFindAndModify: false,
             useUnifiedTopology: true,
           },
-          createDefinitionsMongo()
+          Object.assign(createDefinitionsMongo())
         );
         break;
       case modeMysql:
