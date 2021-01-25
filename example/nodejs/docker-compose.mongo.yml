@@ -19,7 +19,7 @@ services:
     command: npm run dev
 
   mongo:
-    image: mongo:4.2
+    image: mongo
     restart: always
     ports:
       - 27017:27017
