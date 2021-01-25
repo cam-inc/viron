@@ -28,10 +28,10 @@ export class Context {
         );
     }
   }
+
   public preflight(): void {
     switch (this.mode) {
       case modeMongo:
-        // store
         preflightMongo(
           'mongodb://mongo:27017',
           {

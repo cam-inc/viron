@@ -19,6 +19,8 @@ type openUriEvenet = (...args: any) => void;
 const wrapEvent = (type: string): openUriEvenet => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (...args: any): void => {
+    console.log(args); // todo
+
     logger.info(`openUri events. type=%s %O`, type, args);
   };
 };
@@ -56,9 +58,9 @@ export const preflight = (
 
   if (!c.db) {
     logger.error('Mongo connection failure. openUri=%s', openUri);
-    // TODO:
-    //throw new Error('Mongodb Connection Failure');
+    throw new Error('Mongodb Connection Failure');
   }
+  logger.info('Mongo connection successfull. openUri=%s', openUri);
 
   Object.keys(definitions).map((v) => {
     console.log(v, definitions[v]);

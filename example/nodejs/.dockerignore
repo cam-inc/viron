@@ -1,0 +1,5 @@
+__tests__
+coverage
+dist
+k8s
+node_modules

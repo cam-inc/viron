@@ -5,8 +5,8 @@ import { createApplication } from './application';
 logger.info(`Set mode. mode=${ctx.mode}`);
 
 ctx.preflight();
-
 const app = createApplication();
+console.log('aaaaaaaa')
 
 /**
  * Error Handler. Provides full stack

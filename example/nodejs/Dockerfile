@@ -1,8 +1,8 @@
 FROM node:15
 
-RUN mkdir -p /example
-RUN chown -R root:root /example
-ENV HOME /example
+RUN mkdir -p /example/nodejs
+RUN chown -R root:root /example/nodejs
+ENV HOME /example/nodejs
 USER root
 WORKDIR $HOME
 
