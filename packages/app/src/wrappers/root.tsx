@@ -7,12 +7,11 @@ type Props = {
   pluginOptions: PluginOptions;
 };
 const RootWrapper: React.FC<Props> = ({ children }) => {
-  console.log('[RootWrapper]: rendered');
   return (
-    <div id="wrapper-root">
-      {/* TODO: 不要なdivなので後で消すこと。 */}
+    <>
+      {/* wrapper-root */}
       <StateProvider>{children}</StateProvider>
-    </div>
+    </>
   );
 };
 

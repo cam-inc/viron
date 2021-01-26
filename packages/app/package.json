@@ -24,6 +24,7 @@
     ]
   },
   "dependencies": {
+    "classnames": "^2.2.6",
     "gatsby": "^2.30.1",
     "gatsby-plugin-alias-imports": "^1.0.5",
     "gatsby-plugin-postcss": "^3.5.0",
