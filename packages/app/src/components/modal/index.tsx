@@ -81,7 +81,7 @@ const Modal: React.FC<Props> = ({
                 <button onClick={handleCloseClick}>close</button>
               </div>
             </div>
-            <div className="min-h-0 flex-grow flex-shrink bg-white p-4 rounded overflow-y-scroll">
+            <div className="min-h-0 flex-grow flex-shrink bg-white p-4 rounded overflow-y-scroll overscroll-y-contain">
               {children}
             </div>
           </div>
