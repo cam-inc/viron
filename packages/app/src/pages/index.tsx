@@ -1,6 +1,5 @@
+import { Link, PageProps } from 'gatsby';
 import React from 'react';
-import { PageProps } from 'gatsby';
-
 import Button from '@components/button';
 import Layout from '@layouts';
 import { useState } from '@state';
@@ -19,6 +18,7 @@ const IndexPage: React.FC<Props> = () => {
         <button onClick={handleClick}>setFoo</button>
         <p className="font-bold">hello</p>
         <Button label="button" />
+        <Link to="/sample">sample</Link>
       </div>
     </Layout>
   );

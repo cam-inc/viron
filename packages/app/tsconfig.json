@@ -48,9 +48,11 @@
       // Edit the gatsby-plugin-alias-imports alias option in the gatsby-config file as well.
       "@src/*": ["src/*"],
       "@components/*": ["src/components/*"],
+      "@hooks/*": ["src/hooks/*"],
       "@layouts/*": ["src/layouts/*"],
       "@state/*": ["src/state/*"],
       "@styles/*": ["src/styles/*"],
+      "@utils/*": ["src/utils/*"],
       "@wrappers/*": ["src/wrappers/*"]
     },
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
