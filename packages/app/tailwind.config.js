@@ -6,7 +6,32 @@ module.exports = {
   },
   darkMode: false,
   theme: {
-    extend: {},
+    screens: {
+      lg: '640px',
+    },
+    // Utilities by a-z order.
+    extend: {
+      maxHeight: {
+        '25%': '25%',
+        '50%': '50%',
+        '75%': '75%',
+      },
+      maxWidth: {
+        '25%': '25%',
+        '50%': '50%',
+        '75%': '75%',
+      },
+      minHeight: {
+        '25%': '25%',
+        '50%': '50%',
+        '75%': '75%',
+      },
+      minWidth: {
+        '25%': '25%',
+        '50%': '50%',
+        '75%': '75%',
+      },
+    },
   },
   variants: {
     extend: {},

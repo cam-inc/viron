@@ -24,6 +24,7 @@
     ]
   },
   "dependencies": {
+    "classnames": "^2.2.6",
     "gatsby": "^2.30.1",
     "gatsby-plugin-alias-imports": "^1.0.5",
     "gatsby-plugin-postcss": "^3.5.0",
@@ -45,6 +46,8 @@
     "@storybook/addon-essentials": "^6.1.14",
     "@storybook/addon-links": "^6.1.14",
     "@storybook/react": "^6.1.14",
+    "@types/classnames": "^2.2.11",
+    "@types/recoil": "^0.0.1",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "babel-loader": "^8.2.2",

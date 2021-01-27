@@ -1,6 +1,6 @@
 import { PluginOptions } from 'gatsby';
 import React from 'react';
-import { Provider as StateProvider } from '@state';
+import { RecoilRoot } from 'recoil';
 import '@styles/global.css';
 
 type Props = {
@@ -8,10 +8,10 @@ type Props = {
 };
 const RootWrapper: React.FC<Props> = ({ children }) => {
   return (
-    <div id="wrapper-root">
-      {/* TODO: 不要なdivなので後で消すこと。 */}
-      <StateProvider>{children}</StateProvider>
-    </div>
+    <>
+      {/* wrapper-root */}
+      <RecoilRoot>{children}</RecoilRoot>
+    </>
   );
 };
 
