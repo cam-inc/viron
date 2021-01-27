@@ -5,7 +5,10 @@ export type Document = {
   info: Info;
   paths: Paths;
   servers?: Server[];
-  components: Components;
+  components?: Components;
+  security?: SecurityRequirement[];
+  tags?: Tag[];
+  externalDocs?: ExternalDocumentation;
 };
 
 // [extendable] Metadata about the API.
@@ -23,6 +26,13 @@ export type Info = {
   contact?: Contact;
   // The license information for the API.
   license?: License;
+};
+
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object
+export type Tag = {
+  name: string;
+  description?: string | CommonMark;
+  externalDocs?: ExternalDocumentation;
 };
 
 // CommonMark markdown used throughout the specification description fields.
@@ -352,6 +362,12 @@ export type RequestBody = {
 // TODO: deal with no.3 above.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#header-object
 export type Header = Omit<Parameter, 'name' | 'in'>;
+
+// Lists the required security schemes to execute this operation.
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#security-requirement-object
+export type SecurityRequirement = {
+  [key: string]: string[];
+};
 
 // [extendable] Defines a security scheme that can be used by the operations.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#security-scheme-object
