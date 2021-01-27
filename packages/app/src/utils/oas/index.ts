@@ -335,7 +335,15 @@ export type Example = {
   externalValue?: URL;
 };
 
-export type RequestBody = {};
+// [Extendable] Describes a single request body.
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#request-body-object
+export type RequestBody = {
+  content: {
+    [key: string]: MediaType;
+  };
+  description?: string | CommonMark;
+  required?: boolean;
+};
 
 // The Header Object follows the structure of the Parameter Object with the following changes:
 // 1. name MUST NOT be specified, it is given in the corresponding headers map.
@@ -345,7 +353,43 @@ export type RequestBody = {};
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#header-object
 export type Header = Omit<Parameter, 'name' | 'in'>;
 
-export type SecurityScheme = {};
+// [extendable] Defines a security scheme that can be used by the operations.
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#security-scheme-object
+export type SecurityScheme = {
+  type: 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
+  description?: string | CommonMark;
+  // Required when the type is apiKey.
+  name?: string;
+  // Required when the type is apiKey.
+  in?: 'query' | 'header' | 'cookie';
+  // Required when the type is http.
+  scheme?: string;
+  bearerFormat?: string;
+  // Required when the type is oauth2.
+  flows?: OAuthFlows;
+  // Required when the type is openIdConnect.
+  openIdConnectUrl?: URL;
+};
+
+// [extendable] Allows configuration of the supported OAuth Flows.
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#oauth-flows-object
+export type OAuthFlows = {
+  implicit?: OAuthFlow;
+  password?: OAuthFlow;
+  clientCredentials?: OAuthFlow;
+  authorizationCode: OAuthFlow;
+};
+
+// [extendable] Configuration details for a supported OAuth Flow.
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#oauth-flow-object
+export type OAuthFlow = {
+  authorizationUrl: URL;
+  tokenUrl: URL;
+  refreshUrl?: URL;
+  scopes: {
+    [key: string]: string;
+  };
+};
 
 // [extendable] Represents a possible design-time link for a response.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#link-object
@@ -360,7 +404,12 @@ export type Link = {
   server?: Server;
 };
 
-export type Callback = {};
+// [extendable] A map of possible out-of band callbacks related to the parent operation.
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#callback-object
+export type Callback = {
+  // key sould be type of RuntimeExpression.
+  [key: string]: PathItem;
+};
 
 // TODO: Type correctly.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#runtime-expressions
