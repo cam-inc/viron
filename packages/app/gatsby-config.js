@@ -16,7 +16,7 @@ module.exports = {
           '@components': 'src/components',
           '@hooks': 'src/hooks',
           '@layouts': 'src/layouts',
-          '@state': 'src/state',
+          '@store': 'src/store',
           '@styles': 'src/styles',
           '@utils': 'src/utils',
           '@wrappers': 'src/wrappers',

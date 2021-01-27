@@ -6,6 +6,9 @@ module.exports = {
   },
   darkMode: false,
   theme: {
+    screens: {
+      lg: '640px',
+    },
     // Utilities by a-z order.
     extend: {
       maxHeight: {
