@@ -16,8 +16,8 @@ const PageWrapper: React.FC<Props> = ({ children }) => {
   return (
     <>
       {/* wrapper-page */}
-      <div className="relative min-h-screen">
-        <div>{children}</div>
+      <div className="relative">
+        <div className="min-h-screen">{children}</div>
         <ModalWrapper className="fixed inset-0" />
         {!isLaunched && <Splash className="fixed inset-0" />}
       </div>
