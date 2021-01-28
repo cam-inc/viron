@@ -83,8 +83,24 @@ export type PathItem = {
   parameters: Array<Parameter | Reference>;
 };
 
-// TODO
-export type Operation = {};
+// [extendable] Describes a single API operation on a path.
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object
+export type Operation = {
+  tags?: string[];
+  summary?: string;
+  description?: string | CommonMark;
+  externalDocs?: ExternalDocumentation;
+  operationId?: string;
+  parameters?: Array<Parameter | Reference>;
+  requestBody?: RequestBody;
+  responses?: Responses;
+  callbacks?: {
+    [key: string]: Callback | Reference;
+  };
+  deprecated?: boolean;
+  security?: SecurityRequirement[];
+  servers?: Server[];
+};
 
 // [extendable] Server representation.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#server-object
@@ -296,6 +312,13 @@ export type XML = {
 export type ExternalDocumentation = {
   url: URL;
   description?: string | CommonMark;
+};
+
+// [extendable] A container for the expected responses of an operation.
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#responses-object
+export type Responses = {
+  // Keys should be a string of 'default' or one of HTTP Status Codes.
+  [key: string]: Response | Reference;
 };
 
 // [extendable] Describes a single response from an API Operation, including design-time, static links to operations based on the response.
