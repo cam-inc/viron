@@ -65,10 +65,26 @@ export type Paths = {
   [key: string]: PathItem;
 };
 
-// TODO
 // [extendable] Describes the operations available on a single path
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#path-item-object
-export type PathItem = {};
+export type PathItem = {
+  $ref?: string;
+  summary?: string;
+  description?: string | CommonMark;
+  get?: Operation;
+  put?: Operation;
+  post?: Operation;
+  delete?: Operation;
+  options?: Operation;
+  head?: Operation;
+  patch?: Operation;
+  trace?: Operation;
+  servers?: Server[];
+  parameters: Array<Parameter | Reference>;
+};
+
+// TODO
+export type Operation = {};
 
 // [extendable] Server representation.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#server-object
