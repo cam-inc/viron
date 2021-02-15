@@ -46,15 +46,16 @@
     "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
     "paths": {                             /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
       // Edit the gatsby-plugin-alias-imports alias option in the gatsby-config file as well.
-      "@src/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@oas/*": ["src/oas/*"],
-      "@store/*": ["src/store/*"],
-      "@styles/*": ["src/styles/*"],
-      "@utils/*": ["src/utils/*"],
-      "@wrappers/*": ["src/wrappers/*"]
+      "$src/*": ["src/*"],
+      "$components/*": ["src/components/*"],
+      "$hooks/*": ["src/hooks/*"],
+      "$layouts/*": ["src/layouts/*"],
+      "$oas/*": ["src/oas/*"],
+      "$store/*": ["src/store/*"],
+      "$styles/*": ["src/styles/*"],
+      "$types/*": ["src/types/*"],
+      "$utils/*": ["src/utils/*"],
+      "$wrappers/*": ["src/wrappers/*"]
     },
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */

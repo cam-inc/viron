@@ -1,12 +1,14 @@
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
-import Portal from '@components/portal';
-import { timeout } from '@utils/index';
-import { id } from '@wrappers/modal';
+import Portal from '$components/portal';
+import { timeout } from '$utils/index';
+import { id } from '$wrappers/modal';
 
 type Props = {
   isOpened: boolean;
-  onRequestClose?: (accept: (handleInvisible: () => void) => void) => void;
+  onRequestClose?: (
+    accept: (handleInvisible: () => void) => Promise<void>
+  ) => void;
   autoClose?: boolean;
 };
 const Modal: React.FC<Props> = ({
@@ -21,13 +23,13 @@ const Modal: React.FC<Props> = ({
   }, [isOpened]);
 
   const requestClose = useCallback(() => {
-    const accept = async (handleInvisible: () => void) => {
+    const accept = async (handleInvisible: () => void): Promise<void> => {
       setIsVisible(false);
       await timeout(300);
       handleInvisible();
     };
     onRequestClose && onRequestClose(accept);
-  }, []);
+  }, [onRequestClose]);
 
   const handleBGClick = useCallback(() => {
     if (!autoClose) {

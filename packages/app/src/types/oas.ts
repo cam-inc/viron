@@ -1,3 +1,5 @@
+import { EMail, URL } from '$types/index';
+
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#openapi-object
 export type Document = {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#versions
@@ -204,6 +206,7 @@ export type Schema = {
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.15
   required?: string[];
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.20
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   enum?: any[];
   /**
    * The following properties are taken from the JSON Schema definition but their definitions were adjusted to the OpenAPI Specification.
@@ -263,6 +266,7 @@ export type Schema = {
     | 'password';
   // The default value represents what would be assumed by the consumer of the input as the value of the schema if one is not provided. Unlike JSON Schema, the value MUST conform to the defined type for the Schema Object defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-6.2
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default?: any;
   /**
    * Other than the JSON Schema subset fields, the following fields MAY be used for further schema documentation.
@@ -281,6 +285,7 @@ export type Schema = {
   // Additional external documentation for this schema.
   externalDocs?: ExternalDocumentation;
   // A free-form property to include an example of an instance for this schema.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   // Default to false.
   deprecated?: boolean;
@@ -355,6 +360,7 @@ export type Parameter = {
   allowReserved?: boolean;
   // The schema defining the type used for the parameter.
   schema?: Schema | Reference;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   examples?: {
     [key: string]: Example | Reference;
@@ -380,6 +386,7 @@ export type Style =
 export type Example = {
   summary?: string;
   description?: string | CommonMark;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value?: any;
   externalValue?: URL;
 };
@@ -452,8 +459,10 @@ export type Link = {
   operationRef?: string;
   operationId?: string;
   parameters?: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any | RuntimeExpression;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requestBody?: any | RuntimeExpression;
   description?: string | CommonMark;
   server?: Server;
@@ -474,6 +483,7 @@ export type RuntimeExpression = string;
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#media-type-object
 export type MediaType = {
   schema?: Schema | Reference;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   examples?: {
     [key: string]: Example | Reference;
@@ -499,12 +509,6 @@ export type Encoding = {
 // @see: https://semver.org/spec/v2.0.0.html
 export type Semver = string;
 
-// A string in the format of a URL.
-export type URL = string;
-
-// A string in the format of an email address.
-export type EMail = string;
-
 // A simple object to allow referencing other components in the specification.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#reference-object
 export type Reference = {
@@ -515,5 +519,6 @@ export type Reference = {
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#specificationExtensions
 export type Extension = {
   // key must begin with "x-".
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };

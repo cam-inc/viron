@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { isBrowser } from '@utils';
+import { isBrowser } from '$utils';
 
 type Props = {
   targetId: string;

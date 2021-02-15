@@ -1,6 +1,6 @@
 // This file is no used bacause of the problem that with the ideal approach below TS Type are not properly distrubuted.
 // [Ideal Approach]
-// import { useState } from '@store';
+// import { useState } from '$store';
 // const Component = () => {
 //   const [isLaunched, setIsLaunched] = useState(isLaunchedStoreState);
 //   return (
@@ -8,7 +8,7 @@
 //   );
 // };
 // So instead, we use the state management like this.
-// import { useRecoilState } from '@recoil';
+// import { useRecoilState } from '$recoil';
 // const Component = () => {
 //   const [isLaunched, setIsLaunched] = useRecoilState(isLaunchedStoreState);
 //   return (
