@@ -1,25 +1,19 @@
-import { selector } from 'recoil';
-import { Endpoint } from '$types/index';
-
-const fetchEndpoints = async function (): Promise<Endpoint[]> {
-  return new Promise(function (resolve) {
-    setTimeout(function () {
-      resolve([
-        {
-          url: 'http://localhost:8000',
-          id: '',
-        },
-      ]);
-    }, 1000 * 5);
-  });
-};
+import { selectorFamily } from 'recoil';
+import { listState } from '$store/atoms/endpoint';
+import { Endpoint, EndpointID } from '$types/index';
 
 const name = 'endpoint';
 
-export const listQueryState = selector({
-  key: `${name}.listQuery`,
-  get: async function () {
-    const resp = await fetchEndpoints();
-    return resp;
+export const oneState = selectorFamily({
+  key: `${name}.list`,
+  get: function (params: { id: EndpointID }) {
+    return function ({ get }): Endpoint | null {
+      const endpointList = get(listState);
+      return (
+        endpointList.find(function (endpoint) {
+          return endpoint.id === params.id;
+        }) || null
+      );
+    };
   },
 });

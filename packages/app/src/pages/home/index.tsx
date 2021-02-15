@@ -14,9 +14,13 @@ const HomePage: React.FC<Props> = () => {
       <ul>
         {endpointList.map(function (endpoint) {
           return (
-            <li>
-              <Endpoint endpoint={endpoint} />
-            </li>
+            <React.Fragment key={endpoint.id}>
+              <Link to={`/endpoints/${endpoint.id}`}>
+                <li>
+                  <Endpoint endpoint={endpoint} />
+                </li>
+              </Link>
+            </React.Fragment>
           );
         })}
       </ul>
