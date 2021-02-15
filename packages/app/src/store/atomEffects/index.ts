@@ -1,18 +1,19 @@
 import { AtomEffect, DefaultValue } from 'recoil';
+import { get, remove, set, Key } from '$storage/index';
 
 export const localStoragePersistenceEffect = function <T>(
-  key: string
+  key: Key
 ): AtomEffect<T> {
   return function ({ setSelf, onSet }): void {
-    const savedValue = localStorage.getItem(key);
+    const savedValue = get<T>(key);
     if (savedValue !== null) {
-      setSelf(JSON.parse(savedValue));
+      setSelf(savedValue);
     }
     onSet((newValue) => {
       if (newValue instanceof DefaultValue) {
-        localStorage.removeItem(key);
+        remove<T>(key);
       } else {
-        localStorage.setItem(key, JSON.stringify(newValue));
+        set<T>(key, newValue);
       }
     });
   };

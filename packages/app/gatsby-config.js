@@ -17,6 +17,7 @@ module.exports = {
           $hooks: 'src/hooks',
           $layouts: 'src/layouts',
           $oas: 'src/oas',
+          $storage: 'src/storage',
           $store: 'src/store',
           $styles: 'src/styles',
           $types: 'src/types',
