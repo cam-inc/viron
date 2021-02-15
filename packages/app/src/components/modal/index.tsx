@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import Portal from '@components/portal';
 import { timeout } from '@utils/index';
-import { id } from '@wrappers/page/modal';
+import { id } from '@wrappers/modal';
 
 type Props = {
   isOpened: boolean;

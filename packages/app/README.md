@@ -29,6 +29,10 @@ As we use Gatsby of version 2, we need to do some tricks to architect a UI tree.
         </Layout>
       </PageElement>
     </PageWrapper>
+    <ModalWrapper>
+      {/* modal contents here */}
+    </ModalWrapper>
+    <Splash />
   </Root>
 <RootWrapper>
 ```
@@ -38,6 +42,8 @@ As we use Gatsby of version 2, we need to do some tricks to architect a UI tree.
 - PageWrapper: This stays at the outside of the page page elements. It get rendered as navigations happen.
 - Page Element(s): This is equivalent to each element in the `pages` directory. This will be mounted and unmounted as navigations happen.
 - Layout(s): This is equivalent to each element in the `layouts` directory. This stays inside a page element, so this will be mounted and unmouted as well like page elements.
+- ModalWrapper: A parent component of every modal component.
+- Splash: This is a component that is similar to native app's splash UI.
 
 ### State Management
 
