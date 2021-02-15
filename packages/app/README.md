@@ -51,3 +51,8 @@ We use the [Recoil](https://recoiljs.org/) as a state management library. Belows
 - It's a product from [Facebook Open Source](https://opensource.facebook.com/). It should work well with React.
 - It has a lot of useful funtionalities like time-travel debugging, routing, undo and etc.
 - It has new generation idea.
+
+### Page Specific Components Naming Rule
+
+Gatsby regards files under the `src/pages` directory as pages. But occasionally you would want to put files that are promised to be used by a single file under the directory and won't let them to be treated as pages. We call those files `Page Specific Components`.
+To accomplish this we created a rule that any files and directories under the `src/pages` directory with prefix of `_` are regarded as a page specific component. Read the [ignore specific files](https://www.gatsbyjs.com/plugins/gatsby-plugin-page-creator/?=#ignoring-specific-files) section of the Gatsby's default plugin `gatsby-plugin-page-creator` and `ignore` option in the `gatsby-config` file for more information.
