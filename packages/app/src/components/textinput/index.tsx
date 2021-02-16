@@ -3,15 +3,15 @@ import React from 'react';
 type Props = {
   label?: string;
   description?: string;
-  defaultValue?: string;
+  render: () => React.ReactElement<JSX.IntrinsicElements['input'], 'input'>;
 };
 
-const Textinput: React.FC<Props> = ({ label, description, defaultValue }) => {
+const Textinput: React.FC<Props> = ({ label, description, render }) => {
   return (
     <div>
       {!!label && <label className="font-bold">{label}</label>}
       {!!description && <p>{description}</p>}
-      <input type="text" defaultValue={defaultValue} />
+      {render()}
     </div>
   );
 };
