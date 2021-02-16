@@ -1,9 +1,12 @@
-import React from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
+import * as yup from 'yup';
 import Textinput from '$components/textinput';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { Endpoint } from '$types/index';
+import { Endpoint, EndpointID, URL } from '$types/index';
+import { endpointId, url } from '$utils/v8n';
 
 type Props = {};
 const Add: React.FC<Props> = () => {
@@ -18,37 +21,38 @@ const Add: React.FC<Props> = () => {
     });
   };
 
-  const { register, handleSubmit, watch, errors } = useForm<{
-    id: string;
-    url: string;
-  }>();
+  const schema = useMemo(function () {
+    return yup.object().shape({
+      endpointId: endpointId.required(),
+      url: url.required(),
+    });
+  }, []);
+  const { register, handleSubmit, errors } = useForm<{
+    endpointId: EndpointID;
+    url: URL;
+  }>({
+    resolver: yupResolver(schema),
+  });
   const _handleSubmit = handleSubmit(function (data) {
     console.log(data);
     handleAddClick();
   });
-  console.log(watch());
 
   return (
     <div>
       <form onSubmit={_handleSubmit}>
-        <input
-          name="id"
-          defaultValue="test"
-          ref={register({ required: true })}
-        />
         <Textinput
+          error={errors.endpointId}
           render={function () {
-            return (
-              <input
-                name="url"
-                defaultValue="test"
-                ref={register({ required: true })}
-              />
-            );
+            return <input name="url" defaultValue="" ref={register} />;
           }}
         />
-        {errors.id && <span>idエラー</span>}
-        {errors.url && <span>urlエラー</span>}
+        <Textinput
+          error={errors.url}
+          render={function () {
+            return <input name="url" defaultValue="" ref={register} />;
+          }}
+        />
         <input type="submit" />
       </form>
     </div>
