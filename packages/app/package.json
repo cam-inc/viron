@@ -4,7 +4,7 @@
   "scripts": {
     "pre-commit": "lint-staged",
     "pre-push": "npm run test",
-    "develop": "gatsby develop",
+    "develop": "gatsby develop --https -p 8000",
     "build": "gatsby build",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^1.3.4",
+    "@react-icons/all-files": "^4.1.0",
     "classnames": "^2.2.6",
     "gatsby": "^2.30.1",
     "gatsby-plugin-alias-imports": "^1.0.5",

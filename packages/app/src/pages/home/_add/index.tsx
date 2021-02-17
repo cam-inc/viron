@@ -47,12 +47,13 @@ const Add: React.FC<Props> = () => {
         const endpoint: Endpoint = {
           id: data.endpointId,
           url: data.url,
+          ping: false,
         };
         return [...currVal, endpoint];
       });
       reset();
     },
-    [endpointList.length]
+    [endpointList.length, setEndpointList, reset, setError]
   );
 
   return (
@@ -61,7 +62,9 @@ const Add: React.FC<Props> = () => {
         <Textinput
           label="Endpoint Id"
           error={errors.endpointId}
-          render={function (className) {
+          render={function (
+            className
+          ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
             return (
               <input
                 className={className}
@@ -75,7 +78,9 @@ const Add: React.FC<Props> = () => {
         <Textinput
           label="URL"
           error={errors.url}
-          render={function (className) {
+          render={function (
+            className
+          ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
             return (
               <input
                 className={className}

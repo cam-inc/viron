@@ -11,6 +11,9 @@ module.exports = {
     },
     // Utilities by a-z order.
     extend: {
+      fontSize: {
+        xxs: ['0.625rem', '1rem'],
+      },
       maxHeight: {
         '25%': '25%',
         '50%': '50%',
@@ -34,7 +37,9 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      margin: ['last'],
+    },
   },
   plugins: [],
 };
