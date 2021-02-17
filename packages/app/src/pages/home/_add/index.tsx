@@ -53,7 +53,7 @@ const Add: React.FC<Props> = () => {
       });
       reset();
     },
-    [endpointList.length, setEndpointList, reset, setError]
+    [endpointList, setEndpointList, reset, setError]
   );
 
   return (

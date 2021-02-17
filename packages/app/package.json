@@ -11,7 +11,7 @@
     "format": "run-p format:*",
     "format:tjs": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "run-p lint:*",
-    "lint:tjs": "eslint .",
+    "lint:tjs": "eslint \"**/*.{js,jsx,ts,tsx}\"",
     "test": "echo TEST",
     "typecheck": "tsc",
     "storybook": "start-storybook -p 6006",

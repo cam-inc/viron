@@ -6,7 +6,7 @@ import { Endpoint } from '$types/index';
 type Props = {
   endpoint: Endpoint;
   onConnectButtonClick?: (endpoint: Endpoint) => void;
-  onRemoveButtonClick?: (endpoint: Endpoint) => void;
+  onDeleteButtonClick?: (endpoint: Endpoint) => void;
 };
 const _Endpoint: React.FC<Props> = ({
   endpoint,
