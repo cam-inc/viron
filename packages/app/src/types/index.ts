@@ -10,3 +10,5 @@ export type Endpoint = {
   url: URL;
   document?: Document;
 };
+
+export type ClassName = string;
