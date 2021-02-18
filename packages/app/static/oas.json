@@ -1,0 +1,8 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Viron Mock",
+    "version": "mock"
+  },
+  "paths": {}
+}

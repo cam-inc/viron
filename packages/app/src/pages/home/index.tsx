@@ -14,13 +14,24 @@ const HomePage: React.FC<Props> = () => {
     const f = async function (): Promise<void> {
       const response = await fetch(endpoint.url, {
         mode: 'cors',
-        redirect: 'follow',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
-      console.log(response);
+      // The endpoint is open when `ok` is true.
+      // The endpoint requires authentication when `status` is 401.(i.e. 401 Unauthorized)
+      // The endpoint is not correctly prepared when not meet above.
+      if (response.ok || response.status === 401) {
+        setEndpointList(function (currVal) {
+          const newVal = [...currVal];
+          const found = newVal.find(function (_endpoint) {
+            return _endpoint.id === endpoint.id;
+          });
+          if (!!found) {
+            found.ping = true;
+          }
+          return newVal;
+        });
+      } else {
+        // TODO: Show some reasons why not be able to connect.
+      }
     };
     f();
   };
