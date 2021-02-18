@@ -15,6 +15,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         <div>
           <p>{endpoint.id}</p>
           <p>{endpoint.url}</p>
+          <p>{JSON.stringify(endpoint.document)}</p>
         </div>
       )}
     </div>

@@ -49,7 +49,6 @@ const Add: React.FC<Props> = () => {
         const endpoint: Endpoint = {
           id: data.endpointId,
           url: data.url,
-          ping: false,
         };
         return [...currVal, endpoint];
       });

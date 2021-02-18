@@ -24,15 +24,10 @@ const _Endpoint: React.FC<Props> = ({
     <div className="p-2 border rounded text-xxs">
       <p>{endpoint.id}</p>
       <p>{endpoint.url}</p>
-      <p>ping: {endpoint.ping.toString()}</p>
-      {!endpoint.ping ? (
-        <button onClick={handleConnectButtonClick}>
-          <AiFillApi className="inline" />
-          <span>connect</span>
-        </button>
-      ) : (
-        <p>connected</p>
-      )}
+      <button onClick={handleConnectButtonClick}>
+        <AiFillApi className="inline" />
+        <span>connect</span>
+      </button>
       <button onClick={handleDeleteButtonClick}>
         <AiFillDelete className="inline" />
         <span>remove</span>

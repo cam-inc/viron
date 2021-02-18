@@ -1,10 +1,10 @@
-import { PageProps } from 'gatsby';
+import { navigate, PageProps } from 'gatsby';
 import React from 'react';
 import { useRecoilState } from 'recoil';
 import Endpoint from '$components/endpoint';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { Endpoint as TypeEndpoint } from '$types/index';
-//import { Document } from '$types/oas';
+import { Document } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import Add from './_add/index';
 
@@ -28,8 +28,19 @@ const HomePage: React.FC<Props> = () => {
         // response.ok is true when response.status is 2xx.
         // Fetch suceeded. The OAS document is open to public.
         // TODO: add document to state.
-        //const document: Document = await response.json();
-        //document;
+        const document: Document = await response.json();
+        setEndpointList(function (currVal) {
+          return currVal.map(function (_endpoint) {
+            if (_endpoint.id !== endpoint.id) {
+              return _endpoint;
+            }
+            return {
+              ..._endpoint,
+              document,
+            };
+          });
+        });
+        navigate(`/endpoints/${endpoint.id}`);
         return;
       }
       if (!response.ok && response.status === 401) {
