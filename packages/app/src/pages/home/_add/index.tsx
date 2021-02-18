@@ -8,7 +8,9 @@ import { listState as endpointListState } from '$store/atoms/endpoint';
 import { Endpoint, EndpointID, URL } from '$types/index';
 import { endpointId, url } from '$utils/v8n';
 
-type Props = {};
+type Props = {
+  className?: string;
+};
 const Add: React.FC<Props> = () => {
   const schema = useMemo(function () {
     return yup.object().shape({

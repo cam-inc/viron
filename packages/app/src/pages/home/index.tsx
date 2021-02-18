@@ -4,33 +4,38 @@ import { useRecoilState } from 'recoil';
 import Endpoint from '$components/endpoint';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { Endpoint as TypeEndpoint } from '$types/index';
+//import { Document } from '$types/oas';
+import { promiseErrorHandler } from '$utils/index';
 import Add from './_add/index';
 
-type Props = {} & PageProps;
+type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
   const [endpointList, setEndpointList] = useRecoilState(endpointListState);
 
   const handleConnectButtonClick = function (endpoint: TypeEndpoint): void {
     const f = async function (): Promise<void> {
-      const response = await fetch(endpoint.url, {
-        mode: 'cors',
-      });
-      // The endpoint is open when `ok` is true.
-      // The endpoint requires authentication when `status` is 401.(i.e. 401 Unauthorized)
-      // The endpoint is not correctly prepared when not meet above.
-      if (response.ok || response.status === 401) {
-        setEndpointList(function (currVal) {
-          const newVal = [...currVal];
-          const found = newVal.find(function (_endpoint) {
-            return _endpoint.id === endpoint.id;
-          });
-          if (!!found) {
-            found.ping = true;
-          }
-          return newVal;
-        });
-      } else {
-        // TODO: Show some reasons why not be able to connect.
+      const [response, responseError] = await promiseErrorHandler(
+        fetch(endpoint.url, {
+          mode: 'cors',
+        })
+      );
+      if (!!responseError) {
+        // Network error.
+        // TODO: show error.
+        return;
+      }
+      if (response.ok) {
+        // response.ok is true when response.status is 2xx.
+        // Fetch suceeded. The OAS document is open to public.
+        // TODO: add document to state.
+        //const document: Document = await response.json();
+        //document;
+        return;
+      }
+      if (!response.ok && response.status === 401) {
+        // Fetch succeeded but the OAS document requires authentication.
+        // TODO: 認証開始
+        return;
       }
     };
     f();

@@ -3,7 +3,7 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { oneState as endpointOneState } from '$store/selectors/endpoint';
 
-type Props = {} & PageProps;
+type Props = PageProps;
 const EndpointOnePage: React.FC<Props> = ({ params }) => {
   const endpoint = useRecoilValue(endpointOneState({ id: params.endpointId }));
 

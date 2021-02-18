@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import Modal from '$components/modal';
 import Layout from '$layouts';
 
-type Props = {} & PageProps;
+type Props = PageProps;
 const SamplePage: React.FC<Props> = () => {
   const [isModalOpened, setIsModalOpened] = useState(false);
   const handleModalToggleClick = useCallback(() => {

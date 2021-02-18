@@ -7,6 +7,5 @@ const name = 'endpoint';
 export const listState = atom<Endpoint[]>({
   key: `${name}.list`,
   default: [],
-  // eslint-disable-next-line @typescript-eslint/camelcase
   effects_UNSTABLE: [localStoragePersistenceEffect<Endpoint[]>('endpointList')],
 });

@@ -8,7 +8,6 @@ export type EndpointID = string;
 export type Endpoint = {
   id: EndpointID;
   url: URL;
-  ping: boolean;
   document?: Document;
 };
 
