@@ -1,6 +1,7 @@
 import { Document } from '$types/oas';
 
 export type URL = string;
+export type Pathname = string;
 export type EMail = string;
 
 export type EndpointID = string;
@@ -12,3 +13,10 @@ export type Endpoint = {
 };
 
 export type ClassName = string;
+
+export type AuthType = {
+  type: 'email' | 'signout' | 'oauth';
+  provider: string;
+  url: Pathname;
+  method: 'POST';
+};

@@ -3,7 +3,7 @@ import React from 'react';
 import { useRecoilState } from 'recoil';
 import Endpoint from '$components/endpoint';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { Endpoint as TypeEndpoint } from '$types/index';
+import { AuthType, Endpoint as TypeEndpoint } from '$types/index';
 import { Document } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import Add from './_add/index';
@@ -24,10 +24,10 @@ const HomePage: React.FC<Props> = () => {
         // TODO: show error.
         return;
       }
+      // TODO: 既にログイン済みの場合への対応。
       if (response.ok) {
         // response.ok is true when response.status is 2xx.
         // Fetch suceeded. The OAS document is open to public.
-        // TODO: add document to state.
         const document: Document = await response.json();
         setEndpointList(function (currVal) {
           return currVal.map(function (_endpoint) {
@@ -46,6 +46,17 @@ const HomePage: React.FC<Props> = () => {
       if (!response.ok && response.status === 401) {
         // Fetch succeeded but the OAS document requires authentication.
         // TODO: 認証開始
+        const [response, responseError] = await promiseErrorHandler(
+          fetch(`${new URL(endpoint.url).origin}/viron_authtype`, {
+            mode: 'cors',
+          })
+        );
+        if (!!responseError) {
+          // TODO
+          return;
+        }
+        const authTypes: AuthType[] = await response.json();
+        console.log(authTypes);
         return;
       }
     };
