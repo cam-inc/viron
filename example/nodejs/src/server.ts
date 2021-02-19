@@ -7,7 +7,6 @@ const main = async (): Promise<void> => {
   await ctx.preflight();
   const app = createApplication();
 
-
   /**
    * Start Express server.
    */
