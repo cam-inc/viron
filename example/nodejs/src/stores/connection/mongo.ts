@@ -1,17 +1,12 @@
-import { Connection, ConnectOptions, createConnection } from 'mongoose';
-import { Schema } from 'mongoose';
 import { logger } from '../../context';
-
-// schemas
-import * as topics from '../definitions/mongo/topics';
-import * as users from '../definitions/mongo/users';
-
-export interface Definitions {
-  [key: string]: Schema;
-}
+import {
+  ConnectOptions,
+  createConnection as _createConnection,
+  Connection,
+} from 'mongoose';
 
 // mongoose.Connection.openUri openUri
-type openUri = string;
+export type openUri = string;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type openUriEvenet = (...args: any) => void;
@@ -25,26 +20,16 @@ const wrapEvent = (type: string): openUriEvenet => {
   };
 };
 
-export const createDefinitions = (): Definitions => {
-  const definitions: Definitions = {};
-  const merge = (name: string, schema: Schema): void => {
-    definitions[name] = schema;
-  };
-  merge(topics.defaultName, topics.create());
-  merge(users.defaultName, users.create());
-  return definitions;
-};
-
-export const preflight = async (
+export const createConnection = async (
   openUri: openUri,
-  options: ConnectOptions,
-  definitions: Definitions
+  options: ConnectOptions
 ): Promise<Connection> => {
-  const c: Connection = createConnection();
+  const c: Connection = _createConnection();
 
   c.on('connecting', wrapEvent('connecting'));
   c.on('connected', wrapEvent('connected'));
   c.on('open', wrapEvent('open'));
+
   c.on('disconnecting', wrapEvent('disconnecting'));
   c.on('disconnected', wrapEvent('disconnected'));
   c.on('close', wrapEvent('close'));
@@ -61,10 +46,6 @@ export const preflight = async (
     throw new Error('Mongodb Connection Failure');
   }
   logger.info('Mongo connection successfull. openUri=%s', openUri);
-
-  Object.keys(definitions).map((v) => {
-    console.log(v, definitions[v]);
-  });
 
   return c;
 };
