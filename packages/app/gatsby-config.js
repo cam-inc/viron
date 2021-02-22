@@ -1,17 +1,28 @@
-const postcssPresetEnv = require('postcss-preset-env');
-const tailwindcss = require('tailwindcss');
-const tailwindConfig = require('./tailwind.config.js');
-
+// @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
 module.exports = {
+  siteMetadata: {
+    title: 'Viron',
+  },
   plugins: [
     {
       resolve: 'gatsby-plugin-postcss',
+    },
+    {
+      resolve: 'gatsby-plugin-alias-imports',
       options: {
-        postCssPlugins: [
-          tailwindcss(tailwindConfig),
-          postcssPresetEnv({ stage: 3 })
-        ]
-      }
-    }
-  ]
+        // Edit the paths option in the tsconfig.json file as well.
+        alias: {
+          '@src': 'src',
+          '@components': 'src/components',
+          '@hooks': 'src/hooks',
+          '@layouts': 'src/layouts',
+          '@oas': 'src/oas',
+          '@store': 'src/store',
+          '@styles': 'src/styles',
+          '@utils': 'src/utils',
+          '@wrappers': 'src/wrappers',
+        },
+      },
+    },
+  ],
 };

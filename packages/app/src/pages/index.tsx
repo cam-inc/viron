@@ -1,9 +1,12 @@
+import { Link, PageProps } from 'gatsby';
 import React from 'react';
 
-type Props = {};
+type Props = {} & PageProps;
 const IndexPage: React.FC<Props> = () => {
   return (
-    <p className="font-bold">hello</p>
+    <div id="page-index">
+      <Link to="/sample">sample</Link>
+    </div>
   );
 };
 
