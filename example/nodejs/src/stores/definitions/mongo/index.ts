@@ -1,20 +1,12 @@
 import * as mongoose from 'mongoose';
 import * as users from './users';
 import * as topics from './topics';
-
-/**
- * Create model class
- */
-export const createModel = <D extends mongoose.Document>(
-  c: mongoose.Connection,
-  name: string,
-  schema: mongoose.Schema<D, mongoose.Model<D>>
-): mongoose.Model<D> => {
-  const Model = c.model<D>(name, schema);
-  return Model;
-};
-
-export type Model = typeof createModel;
+import * as auditLog from '../../../lib/stores/definitions/mongo/auditlog';
+import {
+  createModel,
+  Definitions as LibDefinitions,
+  Models as LibModels,
+} from '../../../lib/stores/definitions/mongo';
 
 /////////////////////////////
 // Definition
@@ -23,7 +15,7 @@ export type Model = typeof createModel;
 /**
  * Definitions by collection (interface)
  */
-export interface Definitions {
+export interface Definitions extends LibDefinitions {
   users: {
     name: string;
     schema: mongoose.Schema<
@@ -56,6 +48,11 @@ export const definitions: Definitions = {
     schema: topics.schema,
     createModel,
   },
+  auditLog: {
+    name: auditLog.name,
+    schema: auditLog.schema,
+    createModel,
+  },
 };
 
 // definition index signature key
@@ -68,7 +65,7 @@ export type DefinitionKeys = keyof Definitions;
 /**
  * Models by collection (interface)
  */
-export interface Models {
+export interface Models extends LibModels {
   users: {
     Model: users.UserModel;
   };
@@ -110,6 +107,13 @@ export const models = async (
         c,
         definitions.topics.name,
         definitions.topics.schema
+      ),
+    },
+    auditLog: {
+      Model: definitions.auditLog.createModel(
+        c,
+        definitions.auditLog.name,
+        definitions.auditLog.schema
       ),
     },
   };
