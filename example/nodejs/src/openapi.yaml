@@ -1,0 +1,37 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: viron example nodejs
+  description: viron example node.js api specifications
+
+servers:
+  - url: /
+
+tags:
+  - name: system
+
+paths:
+  '/ping':
+    get:
+      operationId: 'getPing'
+      tags:
+        - system
+      summary: ping
+      description: 死活監視
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    jwt:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://localhost:3000/signin
+          scopes:
+            api:access: API access
