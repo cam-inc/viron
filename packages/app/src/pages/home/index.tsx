@@ -1,73 +1,13 @@
-import { navigate, PageProps } from 'gatsby';
+import { PageProps } from 'gatsby';
 import React from 'react';
-import { useRecoilState } from 'recoil';
-import Endpoint from '$components/endpoint';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { AuthType, Endpoint as TypeEndpoint } from '$types/index';
-import { Document } from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
 import Add from './_add/index';
+import Endpoint from './_endpoint';
 
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
-  const [endpointList, setEndpointList] = useRecoilState(endpointListState);
-
-  const handleConnectButtonClick = function (endpoint: TypeEndpoint): void {
-    const f = async function (): Promise<void> {
-      const [response, responseError] = await promiseErrorHandler(
-        fetch(endpoint.url, {
-          mode: 'cors',
-        })
-      );
-      if (!!responseError) {
-        // Network error.
-        // TODO: show error.
-        return;
-      }
-      // TODO: 既にログイン済みの場合への対応。
-      if (response.ok) {
-        // response.ok is true when response.status is 2xx.
-        // Fetch suceeded. The OAS document is open to public.
-        const document: Document = await response.json();
-        setEndpointList(function (currVal) {
-          return currVal.map(function (_endpoint) {
-            if (_endpoint.id !== endpoint.id) {
-              return _endpoint;
-            }
-            return {
-              ..._endpoint,
-              document,
-            };
-          });
-        });
-        navigate(`/endpoints/${endpoint.id}`);
-        return;
-      }
-      if (!response.ok && response.status === 401) {
-        // Fetch succeeded but the OAS document requires authentication.
-        // TODO: 認証開始
-        const [response, responseError] = await promiseErrorHandler(
-          fetch(`${new URL(endpoint.url).origin}/viron_authtype`, {
-            mode: 'cors',
-          })
-        );
-        if (!!responseError) {
-          // TODO
-          return;
-        }
-        const authTypes: AuthType[] = await response.json();
-        console.log(authTypes);
-        return;
-      }
-    };
-    f();
-  };
-
-  const handleDeleteButtonClick = function (endpoint: TypeEndpoint): void {
-    setEndpointList(function (currVal) {
-      return currVal.filter((_endpoint) => _endpoint.id !== endpoint.id);
-    });
-  };
+  const endpointList = useRecoilValue(endpointListState);
 
   return (
     <div id="page-home">
@@ -76,11 +16,7 @@ const HomePage: React.FC<Props> = () => {
           return (
             <React.Fragment key={endpoint.id}>
               <li className="mb-1 last:mb-0">
-                <Endpoint
-                  endpoint={endpoint}
-                  onConnectButtonClick={handleConnectButtonClick}
-                  onDeleteButtonClick={handleDeleteButtonClick}
-                />
+                <Endpoint id={endpoint.id} />
               </li>
             </React.Fragment>
           );
