@@ -4,13 +4,16 @@ export type URL = string;
 export type Pathname = string;
 export type EMail = string;
 
+export type Token = string;
+
 export type EndpointID = string;
 
 export type Endpoint = {
   id: EndpointID;
   url: URL;
-  document?: Document;
   authTypes?: AuthType[];
+  token?: Token;
+  document?: Document;
 };
 
 export type ClassName = string;

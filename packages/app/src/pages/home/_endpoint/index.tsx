@@ -9,6 +9,7 @@ import {
   AuthTypeEmailFormData,
   Endpoint as TypeEndpoint,
   EndpointID,
+  Token,
 } from '$types/index';
 import { Document } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
@@ -94,7 +95,25 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
     authType: AuthType,
     data: AuthTypeEmailFormData
   ) {
-    console.log(endpoint, authType, data);
+    const f = async function (): Promise<void> {
+      const [response, responseError] = await promiseErrorHandler(
+        fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
+          method: authType.method,
+          body: JSON.stringify(data),
+        })
+      );
+      if (!!responseError) {
+        // TODO
+        return;
+      }
+      if (!response.ok) {
+        // TODO
+        return;
+      }
+      const token = response.headers.get('Authorization') as Token;
+      setEndpoint({ ...endpoint, token });
+    };
+    f();
   };
 
   const handleSignout = function (endpoint: TypeEndpoint, authType: AuthType) {
