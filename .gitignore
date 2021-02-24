@@ -39,3 +39,5 @@ jspm_packages
 dist
 
 .DS_Store
+
+.npmrc
