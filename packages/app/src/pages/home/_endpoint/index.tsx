@@ -1,9 +1,15 @@
 import { navigate } from 'gatsby';
 import React, { useCallback } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import Endpoint from '$components/endpoint';
+import { listState } from '$store/atoms/endpoint';
 import { oneState } from '$store/selectors/endpoint';
-import { AuthType, Endpoint as TypeEndpoint, EndpointID } from '$types/index';
+import {
+  AuthType,
+  AuthTypeEmailFormData,
+  Endpoint as TypeEndpoint,
+  EndpointID,
+} from '$types/index';
 import { Document } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 
@@ -12,6 +18,7 @@ type Props = {
 };
 const _Endpoint: React.FC<Props> = ({ id }) => {
   const [endpoint, setEndpoint] = useRecoilState(oneState({ id }));
+  const setEndpoints = useSetRecoilState(listState);
 
   if (!endpoint) {
     throw new Error('Endpoint not found.');
@@ -53,7 +60,12 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
             return;
           }
           const authTypes: AuthType[] = await response.json();
-          console.log(authTypes);
+          setEndpoint(function (currVal) {
+            if (!currVal) {
+              return currVal;
+            }
+            return { ...currVal, authTypes };
+          });
           return;
         }
       };
@@ -63,9 +75,30 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
   );
 
   const handleDeleteButtonClick = function (): void {
-    setEndpoint(function (currVal) {
-      return { ...currVal, deleted: true };
+    setEndpoints(function (currVal) {
+      return currVal.filter(function (_endpoint) {
+        return _endpoint.id !== endpoint.id;
+      });
     });
+  };
+
+  const handleOAuthSignin = function (
+    endpoint: TypeEndpoint,
+    authType: AuthType
+  ) {
+    console.log(endpoint, authType);
+  };
+
+  const handleEmailSignin = function (
+    endpoint: TypeEndpoint,
+    authType: AuthType,
+    data: AuthTypeEmailFormData
+  ) {
+    console.log(endpoint, authType, data);
+  };
+
+  const handleSignout = function (endpoint: TypeEndpoint, authType: AuthType) {
+    console.log(endpoint, authType);
   };
 
   return (
@@ -73,6 +106,9 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
       endpoint={endpoint}
       onConnectButtonClick={handleConnectButtonClick}
       onDeleteButtonClick={handleDeleteButtonClick}
+      onOAuthSignin={handleOAuthSignin}
+      onEmailSignin={handleEmailSignin}
+      onSignout={handleSignout}
     />
   );
 };

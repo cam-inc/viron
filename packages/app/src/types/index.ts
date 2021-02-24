@@ -10,13 +10,19 @@ export type Endpoint = {
   id: EndpointID;
   url: URL;
   document?: Document;
+  authTypes?: AuthType[];
 };
 
 export type ClassName = string;
 
 export type AuthType = {
   type: 'email' | 'signout' | 'oauth';
-  provider: string;
+  provider: 'google';
   url: Pathname;
   method: 'POST';
+};
+
+export type AuthTypeEmailFormData = {
+  email: EMail;
+  password: string;
 };
