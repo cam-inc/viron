@@ -82,9 +82,12 @@ const AuthEmail: React.FC<PropsEmail> = ({ authType, onSignin }) => {
   const { register, handleSubmit, errors } = useForm<AuthTypeEmailFormData>({
     resolver: yupResolver(schema),
   });
-  const signin = useCallback(function (data: AuthTypeEmailFormData) {
-    onSignin(authType, data);
-  }, []);
+  const signin = useCallback(
+    function (data: AuthTypeEmailFormData) {
+      onSignin(authType, data);
+    },
+    [authType, onSignin]
+  );
   return (
     <form onSubmit={handleSubmit(signin)}>
       <Textinput

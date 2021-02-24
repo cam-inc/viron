@@ -71,7 +71,7 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
       };
       f();
     },
-    [endpoint]
+    [endpoint, setEndpoint]
   );
 
   const handleDeleteButtonClick = function (): void {

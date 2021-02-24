@@ -11,6 +11,10 @@ import { endpointId, url } from '$utils/v8n';
 type Props = {
   className?: string;
 };
+type FormData = {
+  endpointId: EndpointID;
+  url: URL;
+};
 const Add: React.FC<Props> = () => {
   const schema = useMemo(function () {
     return yup.object().shape({
@@ -19,10 +23,6 @@ const Add: React.FC<Props> = () => {
     });
   }, []);
 
-  type FormData = {
-    endpointId: EndpointID;
-    url: URL;
-  };
   const { register, handleSubmit, errors, setError, reset } = useForm<FormData>(
     {
       resolver: yupResolver(schema),

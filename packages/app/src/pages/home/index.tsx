@@ -1,6 +1,6 @@
 import { PageProps } from 'gatsby';
 import React from 'react';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import Add from './_add/index';
 import Endpoint from './_endpoint';
