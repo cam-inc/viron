@@ -12,7 +12,7 @@ export type Endpoint = {
   id: EndpointID;
   url: URL;
   authTypes?: AuthType[];
-  token?: Token;
+  token?: Token | null;
   document?: Document;
 };
 

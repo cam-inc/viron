@@ -122,6 +122,23 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
   };
 
   const handleSignout = function (endpoint: TypeEndpoint, authType: AuthType) {
+    const f = async function (): Promise<void> {
+      const [response, responseError] = await promiseErrorHandler(
+        fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
+          method: authType.method,
+        })
+      );
+      if (!!responseError) {
+        // TODO
+        return;
+      }
+      if (!response.ok) {
+        // TODO
+        return;
+      }
+      setEndpoint({ ...endpoint, token: null });
+    };
+    f();
     console.log(endpoint, authType);
   };
 
