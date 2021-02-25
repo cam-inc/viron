@@ -87,7 +87,12 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
     endpoint: TypeEndpoint,
     authType: AuthType
   ) {
-    console.log(endpoint, authType);
+    const origin = new URL(endpoint.url).origin;
+    const redirectUrl = encodeURIComponent(
+      `${new URL(location.href).origin}/oauthredirect/${endpoint.id}`
+    );
+    const fetchUrl = `${origin}${authType.url}?redirect_url=${redirectUrl}`;
+    location.href = fetchUrl;
   };
 
   const handleEmailSignin = function (

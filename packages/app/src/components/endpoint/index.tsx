@@ -45,8 +45,9 @@ const _Endpoint: React.FC<Props> = ({
 
   return (
     <div className="p-2 border rounded text-xxs">
-      <p>{endpoint.id}</p>
-      <p>{endpoint.url}</p>
+      <p>ID: {endpoint.id}</p>
+      <p>URL: {endpoint.url}</p>
+      <p>token: {endpoint.token || '-'}</p>
       <button onClick={handleConnectButtonClick}>
         <AiFillApi className="inline" />
         <span>connect</span>
