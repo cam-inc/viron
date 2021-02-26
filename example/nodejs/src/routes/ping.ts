@@ -5,35 +5,28 @@ import { ctx } from '../context';
  * Ping
  * @route GET /ping
  */
-export const getPing = (_req: Request, res: Response): void => {
+export const getPing = async (_req: Request, res: Response): Promise<void> => {
   const now = new Date();
   const name = `fkei_${now}`;
-  ctx.stores.main.models.users.Model.create({
+  const doc1 = await ctx.stores.main.models.users.Model.create({
     name,
     nickName: `nickname_${name}`,
-  }).then((doc) => {
-    console.log(`create ${doc}`);
-    ctx.stores.main.models.users.Model.findById(doc._id)
-      .exec()
-      .then((fdoc) => {
-        res.json(fdoc?.toJSON());
-      });
   });
+  console.log(`create ${doc1}`);
+  const fdoc1 = await ctx.stores.main.models.users.Model.findById(doc1._id);
+  console.log(fdoc1?.toJSON());
 
-  ctx.stores.main.models.auditLog.Model.create({
+  const doc2 = await ctx.stores.main.models.auditLog.Model.create({
     requestMethod: 'GET',
     requestUri: `/ping?now=${now}`,
     sourceIp: '127.0.0.1',
     userId: 'fkei',
     requestBody: 'pong',
     statusCode: 200,
-  }).then((doc) => {
-    console.log(`create ${doc}`);
-    ctx.stores.main.models.auditLog.Model.findById(doc._id)
-      .exec()
-      .then((fdoc) => {
-        res.json(fdoc?.toJSON());
-      });
   });
+  console.log(`create ${doc2}`);
+  const fdoc2 = await ctx.stores.main.models.auditLog.Model.findById(doc2._id);
+  console.log(fdoc2?.toJSON());
+
   res.send('pong');
 };

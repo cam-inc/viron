@@ -14,8 +14,6 @@ type openUriEvenet = (...args: any) => void;
 const wrapEvent = (type: string): openUriEvenet => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (...args: any): void => {
-    console.log(args); // todo
-
     logger.info(`openUri events. type=%s %O`, type, args);
   };
 };

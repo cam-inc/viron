@@ -13,7 +13,12 @@ const config: Config.InitialOptions = {
       tsconfig: 'tsconfig.json',
     },
   },
-  testPathIgnorePatterns: ['node_modules/', 'dist/', 'k8s/', 'coverage/'],
+  testPathIgnorePatterns: [
+    'node_modules/',
+    'dist/',
+    'coverage/',
+    '__tests__/fixtures/',
+  ],
   collectCoverageFrom: [
     '**/*.ts',
     '!jest.config.ts',
@@ -21,6 +26,10 @@ const config: Config.InitialOptions = {
     '!**/node_modules/**',
     '!**/vendor/**',
     '!types/**',
+  ],
+  setupFilesAfterEnv: [
+    './__tests__/fixtures/setup_env.ts',
+    './__tests__/fixtures/setup_context.ts',
   ],
 };
 
