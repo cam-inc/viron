@@ -1,3 +1,5 @@
+import { Document } from '$types/oas';
+
 export type URL = string;
 export type Pathname = string;
 export type EMail = string;
@@ -12,6 +14,7 @@ export type Endpoint = {
   isPrivate: boolean;
   authTypes: AuthType[];
   token: Token | null;
+  document: Document | null;
 };
 
 export type ClassName = string;

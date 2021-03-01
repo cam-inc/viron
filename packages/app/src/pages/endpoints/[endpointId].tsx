@@ -1,21 +1,23 @@
 import { Link, PageProps } from 'gatsby';
 import React, { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import semverGte from 'semver/functions/gte';
-import semverLte from 'semver/functions/lte';
-import semverValid from 'semver/functions/valid';
-import { oneState as endpointOneState } from '$store/selectors/endpoint';
+import { useRecoilState } from 'recoil';
+import { oneState } from '$store/selectors/endpoint';
 import { Token } from '$types/index';
 import { Document } from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
+import { isOASSupported, promiseErrorHandler } from '$utils/index';
 
 type Props = PageProps;
 const EndpointOnePage: React.FC<Props> = ({ params }) => {
-  const endpoint = useRecoilValue(endpointOneState({ id: params.endpointId }));
+  const [endpoint, setEndpoint] = useRecoilState(
+    oneState({ id: params.endpointId })
+  );
   const [isPending, setIsPending] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [document, setDocument] = useState<Document | null>(null);
 
+  // We don't use OAS documents stored in the recoid store on purpose. The reasons are below.
+  // - Unsure that the stored document is up-to-date.
+  // - The token may be expired.
   useEffect(
     function () {
       const f = async function (): Promise<void> {
@@ -45,18 +47,13 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         }
 
         const document: Document = await response.json();
-        if (
-          !(
-            semverValid(document.openapi) &&
-            semverGte(document.openapi, '3.0.0') &&
-            semverLte(document.openapi, '3.0.2')
-          )
-        ) {
+        if (!isOASSupported(document)) {
           setError('The OAS Document is not of version we support.');
           setIsPending(false);
           return;
         }
-
+        // Just update the stored data so that other pages using endpoints data be affected.
+        setEndpoint({ ...endpoint, document });
         setDocument(document);
         setIsPending(false);
       };

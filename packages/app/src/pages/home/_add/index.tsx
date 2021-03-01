@@ -5,9 +5,9 @@ import { useRecoilState } from 'recoil';
 import * as yup from 'yup';
 import Textinput from '$components/textinput';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { AuthType, Endpoint, EndpointID, TypeURL } from '$types/index';
+import { AuthType, Endpoint, EndpointID, URL as TypeURL } from '$types/index';
 import { Document } from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
+import { isOASSupported, promiseErrorHandler } from '$utils/index';
 import { endpointId, url } from '$utils/v8n';
 
 type Props = {
@@ -65,17 +65,26 @@ const Add: React.FC<Props> = () => {
       // The response.ok being true means the response.status is 2xx.
       // The endpoint exists and it's open to public.
       if (response.ok) {
-        setEndpointList(function (currVal) {
-          const endpoint: Endpoint = {
-            id: data.endpointId,
-            url: data.url,
-            isPrivate: false,
-            authTypes: [],
-            token: null,
-          };
-          return [...currVal, endpoint];
-        });
-        reset();
+        const document: Document = await response.json();
+        if (isOASSupported(document)) {
+          setEndpointList(function (currVal) {
+            const endpoint: Endpoint = {
+              id: data.endpointId,
+              url: data.url,
+              isPrivate: false,
+              authTypes: [],
+              token: null,
+              document,
+            };
+            return [...currVal, endpoint];
+          });
+          reset();
+        } else {
+          setError('url', {
+            type: 'manual',
+            message: 'The OAS Document is not of version we support.',
+          });
+        }
         return;
       }
 
@@ -100,6 +109,7 @@ const Add: React.FC<Props> = () => {
             isPrivate: true,
             authTypes,
             token: null,
+            document: null,
           };
           return [...currVal, endpoint];
         });
