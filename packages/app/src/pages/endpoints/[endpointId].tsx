@@ -1,6 +1,9 @@
 import { Link, PageProps } from 'gatsby';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import semverGte from 'semver/functions/gte';
+import semverLte from 'semver/functions/lte';
+import semverValid from 'semver/functions/valid';
 import { oneState as endpointOneState } from '$store/selectors/endpoint';
 import { Token } from '$types/index';
 import { Document } from '$types/oas';
@@ -31,15 +34,29 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         if (!!responseError) {
           // Network error.
           setError(responseError.message);
+          setIsPending(false);
           return;
         }
         if (!response.ok) {
           // The token is not valid.
           setError(`${response.status}: ${response.statusText}`);
+          setIsPending(false);
           return;
         }
 
         const document: Document = await response.json();
+        if (
+          !(
+            semverValid(document.openapi) &&
+            semverGte(document.openapi, '3.0.0') &&
+            semverLte(document.openapi, '3.0.2')
+          )
+        ) {
+          setError('The OAS Document is not of version we support.');
+          setIsPending(false);
+          return;
+        }
+
         setDocument(document);
         setIsPending(false);
       };
