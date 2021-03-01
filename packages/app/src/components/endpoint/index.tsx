@@ -47,16 +47,14 @@ const _Endpoint: React.FC<Props> = ({
     <div className="p-2 border rounded text-xxs">
       <p>ID: {endpoint.id}</p>
       <p>URL: {endpoint.url}</p>
+      <p>isPrivate: {endpoint.isPrivate.toString()}</p>
       <p>token: {endpoint.token || '-'}</p>
-      <button onClick={handleConnectButtonClick}>
-        <AiFillApi className="inline" />
-        <span>connect</span>
-      </button>
-      <button onClick={handleDeleteButtonClick}>
-        <AiFillDelete className="inline" />
-        <span>remove</span>
-      </button>
-      {!!endpoint.authTypes &&
+      {!endpoint.isPrivate || (endpoint.isPrivate && !!endpoint.token) ? (
+        <button onClick={handleConnectButtonClick}>
+          <AiFillApi className="inline" />
+          <span>connect</span>
+        </button>
+      ) : (
         endpoint.authTypes.map((authType) => (
           <React.Fragment key={authType.type}>
             <Auth
@@ -66,7 +64,12 @@ const _Endpoint: React.FC<Props> = ({
               onSignout={handleSignout}
             />
           </React.Fragment>
-        ))}
+        ))
+      )}
+      <button onClick={handleDeleteButtonClick}>
+        <AiFillDelete className="inline" />
+        <span>remove</span>
+      </button>
     </div>
   );
 };

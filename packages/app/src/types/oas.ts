@@ -1,5 +1,6 @@
 import { EMail, URL } from '$types/index';
 
+// [extendable] Root document object.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#openapi-object
 export type Document = {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#versions

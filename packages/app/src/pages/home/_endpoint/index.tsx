@@ -1,5 +1,5 @@
 import { navigate } from 'gatsby';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import Endpoint from '$components/endpoint';
 import { listState } from '$store/atoms/endpoint';
@@ -11,7 +11,6 @@ import {
   EndpointID,
   Token,
 } from '$types/index';
-import { Document } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 
 type Props = {
@@ -25,55 +24,9 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
     throw new Error('Endpoint not found.');
   }
 
-  const handleConnectButtonClick = useCallback(
-    function () {
-      const f = async function (): Promise<void> {
-        const [response, responseError] = await promiseErrorHandler(
-          fetch(endpoint.url, {
-            mode: 'cors',
-          })
-        );
-        if (!!responseError) {
-          // Network error.
-          // TODO: show error.
-          return;
-        }
-        // TODO: 既にログイン済みの場合への対応。
-
-        if (response.ok) {
-          // response.ok is true when response.status is 2xx.
-          // Fetch suceeded. The OAS document is open to public.
-          const document: Document = await response.json();
-          setEndpoint({ ...endpoint, document });
-          navigate(`/endpoints/${endpoint.id}`);
-          return;
-        }
-        if (!response.ok && response.status === 401) {
-          // Fetch succeeded but the OAS document requires authentication.
-          // TODO: 認証開始
-          const [response, responseError] = await promiseErrorHandler(
-            fetch(`${new URL(endpoint.url).origin}/viron_authtype`, {
-              mode: 'cors',
-            })
-          );
-          if (!!responseError) {
-            // TODO
-            return;
-          }
-          const authTypes: AuthType[] = await response.json();
-          setEndpoint(function (currVal) {
-            if (!currVal) {
-              return currVal;
-            }
-            return { ...currVal, authTypes };
-          });
-          return;
-        }
-      };
-      f();
-    },
-    [endpoint, setEndpoint]
-  );
+  const handleConnectButtonClick = function () {
+    navigate(`/endpoints/${endpoint.id}`);
+  };
 
   const handleDeleteButtonClick = function (): void {
     setEndpoints(function (currVal) {
@@ -139,7 +92,6 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
       setEndpoint({ ...endpoint, token: null });
     };
     f();
-    console.log(endpoint, authType);
   };
 
   return (

@@ -5,7 +5,9 @@ import { useRecoilState } from 'recoil';
 import * as yup from 'yup';
 import Textinput from '$components/textinput';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { Endpoint, EndpointID, URL } from '$types/index';
+import { AuthType, Endpoint, EndpointID, TypeURL } from '$types/index';
+import { Document } from '$types/oas';
+import { promiseErrorHandler } from '$utils/index';
 import { endpointId, url } from '$utils/v8n';
 
 type Props = {
@@ -13,7 +15,7 @@ type Props = {
 };
 type FormData = {
   endpointId: EndpointID;
-  url: URL;
+  url: TypeURL;
 };
 const Add: React.FC<Props> = () => {
   const schema = useMemo(function () {
@@ -31,7 +33,7 @@ const Add: React.FC<Props> = () => {
 
   const [endpointList, setEndpointList] = useRecoilState(endpointListState);
   const addEndpoint = useCallback(
-    function (data: FormData) {
+    async function (data: FormData): Promise<void> {
       // Duplication check.
       if (
         !!endpointList.find(function (endpoind) {
@@ -44,15 +46,70 @@ const Add: React.FC<Props> = () => {
         });
         return;
       }
-      // Add an endpoint and reset the form.
-      setEndpointList(function (currVal) {
-        const endpoint: Endpoint = {
-          id: data.endpointId,
-          url: data.url,
-        };
-        return [...currVal, endpoint];
-      });
-      reset();
+
+      // Check whether the endpoint exists or not.
+      const [response, responseError] = await promiseErrorHandler(
+        fetch(data.url, {
+          mode: 'cors',
+        })
+      );
+      if (!!responseError) {
+        // Network error.
+        setError('url', {
+          type: 'manual',
+          message: responseError.message,
+        });
+        return;
+      }
+
+      // The response.ok being true means the response.status is 2xx.
+      // The endpoint exists and it's open to public.
+      if (response.ok) {
+        setEndpointList(function (currVal) {
+          const endpoint: Endpoint = {
+            id: data.endpointId,
+            url: data.url,
+            isPrivate: false,
+            authTypes: [],
+            token: null,
+          };
+          return [...currVal, endpoint];
+        });
+        reset();
+        return;
+      }
+
+      // The OAS document requires authentication.
+      // The endpoint exists and it's not open to public.
+      if (!response.ok && response.status === 401) {
+        const [response, responseError] = await promiseErrorHandler(
+          fetch(`${new URL(data.url).origin}/viron_authtype`, {
+            mode: 'cors',
+          })
+        );
+        if (!!responseError) {
+          // Network error.
+          // TODO: show error.
+          return;
+        }
+        const authTypes: AuthType[] = await response.json();
+        setEndpointList(function (currVal) {
+          const endpoint: Endpoint = {
+            id: data.endpointId,
+            url: data.url,
+            isPrivate: true,
+            authTypes,
+            token: null,
+          };
+          return [...currVal, endpoint];
+        });
+        reset();
+        return;
+      }
+
+      // The endpoint doesn't exist.
+      // TODO: show error.
+      return;
     },
     [endpointList, setEndpointList, reset, setError]
   );
