@@ -29,6 +29,31 @@ export type Info = {
   contact?: Contact;
   // The license information for the API.
   license?: License;
+  // [extended] Be used on endpoint UI cards.
+  'x-thumbnail'?: URL;
+  // [extended] Color theme for the endpoint page. Default to 'light'.
+  // TODO: 4パターンくらいまで増やすこと。
+  'x-theme'?: 'light' | 'dark';
+  // [extended] Be used on endpoint UI cards.
+  'x-tags'?: string[];
+  // [extended] Be used on endpoint UI cards.
+  'x-pages': {
+    // Should be a unique string value. Be used as a part of the URL.
+    id: string;
+    // Be displayed on screen.
+    title: string;
+    // Use slasshed to create levels more than two. e.g. 'Dashboard/Analytics/DAU'.
+    group?: string;
+    //  What to be displayed on the page.
+    contents: {
+      title: string;
+      // TODO: 全部リストアップすること。
+      type: '' | '' | '';
+      // Specify a operation id of method get that are required to fetch data for the content.
+      getOperationId: OperationId;
+      // TODO: 抜け漏れ確認。
+    }[];
+  }[];
 };
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object
@@ -93,7 +118,7 @@ export type Operation = {
   summary?: string;
   description?: string | CommonMark;
   externalDocs?: ExternalDocumentation;
-  operationId?: string;
+  operationId?: OperationId;
   parameters?: Array<Parameter | Reference>;
   requestBody?: RequestBody;
   responses?: Responses;
@@ -104,6 +129,7 @@ export type Operation = {
   security?: SecurityRequirement[];
   servers?: Server[];
 };
+export type OperationId = string;
 
 // [extendable] Server representation.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#server-object
@@ -458,7 +484,7 @@ export type OAuthFlow = {
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#link-object
 export type Link = {
   operationRef?: string;
-  operationId?: string;
+  operationId?: OperationId;
   parameters?: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any | RuntimeExpression;
