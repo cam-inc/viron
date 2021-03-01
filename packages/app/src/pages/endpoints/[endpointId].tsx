@@ -1,4 +1,4 @@
-import { PageProps } from 'gatsby';
+import { Link, PageProps } from 'gatsby';
 import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { oneState as endpointOneState } from '$store/selectors/endpoint';
@@ -9,7 +9,8 @@ import { promiseErrorHandler } from '$utils/index';
 type Props = PageProps;
 const EndpointOnePage: React.FC<Props> = ({ params }) => {
   const endpoint = useRecoilValue(endpointOneState({ id: params.endpointId }));
-  const [isPending, setIsPending] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
   const [document, setDocument] = useState<Document | null>(null);
 
   useEffect(
@@ -29,12 +30,12 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
 
         if (!!responseError) {
           // Network error.
-          // TODO: show error.
+          setError(responseError.message);
           return;
         }
         if (!response.ok) {
-          // Network error.
-          // TODO: show error.
+          // The token is not valid.
+          setError(`${response.status}: ${response.statusText}`);
           return;
         }
 
@@ -50,7 +51,8 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   if (!endpoint) {
     return (
       <div id="page-endpointOne">
-        <p>not found...</p>
+        <p>endpoint not found...</p>
+        <Link to="/home">HOME</Link>
       </div>
     );
   }
@@ -63,11 +65,18 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     );
   }
 
+  if (!!error) {
+    return (
+      <div id="page-endpointOne">
+        <p>error: {error}</p>
+        <Link to="/home">HOME</Link>
+      </div>
+    );
+  }
+
   return (
     <div id="page-endpointOne">
       <div>
-        <p>{endpoint.id}</p>
-        <p>{endpoint.url}</p>
         <p>{JSON.stringify(document)}</p>
       </div>
     </div>

@@ -30,7 +30,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ params, location }) => {
         token,
       };
     });
-    navigate('/home');
+    navigate(`/endpoints/${endpointId}`);
   }, []);
 
   return <p>Processing OAuth redirection...</p>;

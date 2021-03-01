@@ -43,29 +43,47 @@ const _Endpoint: React.FC<Props> = ({
     onSignout?.(endpoint, authType);
   };
 
+  const isConnectable =
+    !endpoint.isPrivate || (endpoint.isPrivate && !!endpoint.token);
   return (
     <div className="p-2 border rounded text-xxs">
       <p>ID: {endpoint.id}</p>
       <p>URL: {endpoint.url}</p>
       <p>isPrivate: {endpoint.isPrivate.toString()}</p>
       <p>token: {endpoint.token || '-'}</p>
-      {!endpoint.isPrivate || (endpoint.isPrivate && !!endpoint.token) ? (
-        <button onClick={handleConnectButtonClick}>
-          <AiFillApi className="inline" />
-          <span>connect</span>
-        </button>
-      ) : (
-        endpoint.authTypes.map((authType) => (
-          <React.Fragment key={authType.type}>
-            <Auth
-              authType={authType}
-              onOAuthSignin={handleOAuthSignin}
-              onEmailSignin={handleEmailSignin}
-              onSignout={handleSignout}
-            />
-          </React.Fragment>
-        ))
+      {isConnectable && (
+        <React.Fragment>
+          <button onClick={handleConnectButtonClick}>
+            <AiFillApi className="inline" />
+            <span>connect</span>
+          </button>
+          {endpoint.authTypes
+            .filter((authType) => authType.type === 'signout')
+            .map((authType, idx) => (
+              <React.Fragment key={idx}>
+                <Auth
+                  authType={authType}
+                  onOAuthSignin={handleOAuthSignin}
+                  onEmailSignin={handleEmailSignin}
+                  onSignout={handleSignout}
+                />
+              </React.Fragment>
+            ))}
+        </React.Fragment>
       )}
+      {!isConnectable &&
+        endpoint.authTypes
+          .filter((authType) => authType.type !== 'signout')
+          .map((authType) => (
+            <React.Fragment key={authType.type}>
+              <Auth
+                authType={authType}
+                onOAuthSignin={handleOAuthSignin}
+                onEmailSignin={handleEmailSignin}
+                onSignout={handleSignout}
+              />
+            </React.Fragment>
+          ))}
       <button onClick={handleDeleteButtonClick}>
         <AiFillDelete className="inline" />
         <span>remove</span>
