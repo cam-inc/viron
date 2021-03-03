@@ -109,7 +109,7 @@
     "postcss-nested": "^2.1.2",
     "postcss-overflow-wrap": "0.0.1",
     "postcss-sorting": "^3.1.0",
-    "pug": "^2.0.0-rc.4",
+    "pug": "^3.0.1",
     "pug-cli": "^1.0.0-alpha6",
     "replace-in-file": "^3.2.0",
     "rollup": "^0.50.0",
