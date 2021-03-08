@@ -48,7 +48,7 @@
     "packages": [
       "packages/app",
       "packages/nodejs",
-      "packages/website"
+      "packages/docs"
     ]
   },
   "engines": {
