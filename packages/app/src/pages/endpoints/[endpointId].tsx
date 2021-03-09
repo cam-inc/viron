@@ -59,7 +59,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       };
       f();
     },
-    [endpoint]
+    [endpoint, setEndpoint]
   );
 
   if (!endpoint) {

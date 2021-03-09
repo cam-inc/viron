@@ -1,7 +1,7 @@
 import { Link, PageProps } from 'gatsby';
 import React, { useCallback, useState } from 'react';
 import Modal from '$components/modal';
-import Layout from '$layouts';
+import Layout from '$layouts/index';
 
 type Props = PageProps;
 const SamplePage: React.FC<Props> = () => {

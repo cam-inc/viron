@@ -8,7 +8,7 @@
 //   );
 // };
 // So instead, we use the state management like this.
-// import { useRecoilState } from '$recoil';
+// import { useRecoilState } from 'recoil';
 // const Component = () => {
 //   const [isLaunched, setIsLaunched] = useRecoilState(isLaunchedStoreState);
 //   return (

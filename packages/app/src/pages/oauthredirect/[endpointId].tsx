@@ -12,26 +12,29 @@ const OAuthRedirectPage: React.FC<Props> = ({ params, location }) => {
     endpointOneState({ id: endpointId })
   );
 
-  useEffect(function () {
-    if (!endpointId || !token) {
-      // TODO: show error.
-      return;
-    }
-    if (!endpoint) {
-      // TODO: show error.
-      return;
-    }
-    setEndpoint(function (currVal) {
-      if (!currVal) {
-        return currVal;
+  useEffect(
+    function () {
+      if (!endpointId || !token) {
+        // TODO: show error.
+        return;
       }
-      return {
-        ...currVal,
-        token,
-      };
-    });
-    navigate(`/endpoints/${endpointId}`);
-  }, []);
+      if (!endpoint) {
+        // TODO: show error.
+        return;
+      }
+      setEndpoint(function (currVal) {
+        if (!currVal) {
+          return currVal;
+        }
+        return {
+          ...currVal,
+          token,
+        };
+      });
+      navigate(`/endpoints/${endpointId}`);
+    },
+    [endpoint, endpointId, setEndpoint, token]
+  );
 
   return <p>Processing OAuth redirection...</p>;
 };
