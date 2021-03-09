@@ -9,10 +9,11 @@ const Portal: React.FC<Props> = ({ targetId, children }) => {
   if (!isBrowser) {
     return null;
   }
-  return ReactDOM.createPortal(
-    children,
-    document.querySelector(`#${targetId}`)
-  );
+  const target = document.querySelector(`#${targetId}`);
+  if (!target) {
+    return null;
+  }
+  return ReactDOM.createPortal(children, target);
 };
 
 export default Portal;
