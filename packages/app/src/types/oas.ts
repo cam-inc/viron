@@ -42,7 +42,9 @@ export type Info = {
     id: string;
     // Be displayed on screen.
     title: string;
-    // Use slasshed to create levels more than two. e.g. 'Dashboard/Analytics/DAU'.
+    // Be displayed on screen.
+    description?: string | CommonMark;
+    // Use slashed string to create levels more than two. e.g. 'Dashboard/Analytics/DAU'.
     group?: string;
     //  What to be displayed on the page.
     contents: {

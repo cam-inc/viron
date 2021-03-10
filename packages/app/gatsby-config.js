@@ -8,6 +8,9 @@ module.exports = {
       resolve: 'gatsby-plugin-postcss',
     },
     {
+      resolve: 'gatsby-plugin-lodash',
+    },
+    {
       resolve: 'gatsby-plugin-alias-imports',
       options: {
         // Edit the paths option in the tsconfig.json file as well.

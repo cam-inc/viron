@@ -2,7 +2,49 @@
   "openapi": "3.0.2",
   "info": {
     "title": "Viron Mock",
-    "version": "mock"
+    "version": "mock",
+    "x-pages": [
+      {
+        "id": "general",
+        "title": "General",
+        "contents": []
+      },
+      {
+        "id": "quickview",
+        "title": "Quick View",
+        "group": "Dashboard",
+        "contents": []
+      },
+      {
+        "id": "simple",
+        "title": "Simple",
+        "group": "Management",
+        "contents": []
+      },
+      {
+        "id": "dau",
+        "title": "DAU",
+        "group": "Management/Analytics",
+        "contents": []
+      },
+      {
+        "id": "ggg",
+        "title": "Ggg",
+        "group": "Management",
+        "contents": []
+      },
+      {
+        "id": "mau",
+        "title": "MAU",
+        "group": "Management/Analytics",
+        "contents": []
+      },
+      {
+        "id": "last",
+        "title": "Last",
+        "contents": []
+      }
+    ]
   },
   "paths": {}
 }
