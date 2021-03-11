@@ -1,6 +1,11 @@
 import React, { useMemo } from 'react';
 import { Info } from '$types/oas';
 
+type Partial = {
+  group: string;
+  children: (string | Partial)[];
+};
+
 type Props = {
   pages: Info['x-pages'];
 };
@@ -24,12 +29,8 @@ const _Pages: React.FC<Props> = ({ pages }) => {
   //    'settings'
   //  ]
   //}
-  const tree = useMemo(
+  const tree = useMemo<Partial>(
     function () {
-      type Partial = {
-        group: string;
-        children: (string | Partial)[];
-      };
       type Tree = {
         [key: string]: Partial;
       };
@@ -68,10 +69,39 @@ const _Pages: React.FC<Props> = ({ pages }) => {
     [pages]
   );
 
-  return <div>{JSON.stringify(tree, null, 2)}</div>;
+  return <GroupOrPage list={tree.children} />;
 };
 export default _Pages;
 
-const Page: React.FC<{ page: Info['x-pages'][number] }> = ({ page }) => {
-  return null;
+const GroupOrPage: React.FC<{ list: Partial['children'] }> = ({ list }) => {
+  return (
+    <ul>
+      {list.map(function (item, idx) {
+        let content: JSX.Element;
+        if (typeof item === 'string') {
+          content = <Page pageId={item} />;
+        } else {
+          content = <Group partial={item} />;
+        }
+        return <li key={idx}>{content}</li>;
+      })}
+    </ul>
+  );
+};
+
+const Group: React.FC<{ partial: Partial }> = ({ partial }) => {
+  return (
+    <div>
+      <p className="font-bold">{partial.group}</p>
+      <div className="ml-2">
+        <GroupOrPage list={partial.children} />
+      </div>
+    </div>
+  );
+};
+
+const Page: React.FC<{ pageId: Info['x-pages'][number]['id'] }> = ({
+  pageId,
+}) => {
+  return <p>{pageId}</p>;
 };

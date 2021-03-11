@@ -43,6 +43,12 @@
         "id": "last",
         "title": "Last",
         "contents": []
+      },
+      {
+        "id": "pv",
+        "title": "PV",
+        "group": "Management/Analytics",
+        "contents": []
       }
     ]
   },
