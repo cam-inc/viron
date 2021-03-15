@@ -4,8 +4,8 @@ import * as topics from './topics';
 import * as auditLog from '../../../lib/stores/definitions/mongo/auditlog';
 import {
   createModel,
-  Definitions as LibDefinitions,
-  Models as LibModels,
+  MongoDefinitions as LibMongoDefinitions,
+  MongoModels as LibMongoModels,
 } from '../../../lib/stores/definitions/mongo';
 
 /////////////////////////////
@@ -15,7 +15,7 @@ import {
 /**
  * Definitions by collection (interface)
  */
-export interface Definitions extends LibDefinitions {
+export interface MongoDefinitions extends LibMongoDefinitions {
   users: {
     name: string;
     schema: mongoose.Schema<
@@ -37,7 +37,7 @@ export interface Definitions extends LibDefinitions {
 /**
  * Definitions by collection (entity)
  */
-export const definitions: Definitions = {
+export const definitions: MongoDefinitions = {
   users: {
     name: users.name,
     schema: users.schema,
@@ -56,7 +56,7 @@ export const definitions: Definitions = {
 };
 
 // definition index signature key
-export type DefinitionKeys = keyof Definitions;
+export type DefinitionKeys = keyof MongoDefinitions;
 
 /////////////////////////////
 // Model
@@ -65,7 +65,7 @@ export type DefinitionKeys = keyof Definitions;
 /**
  * Models by collection (interface)
  */
-export interface Models extends LibModels {
+export interface MongoModels extends LibMongoModels {
   users: {
     Model: users.UserModel;
   };
@@ -77,7 +77,7 @@ export interface Models extends LibModels {
 /**
  * Models by collection (entity)
  */
-let _models: Models;
+let _models: MongoModels;
 
 /**
  * Get models
@@ -87,7 +87,7 @@ let _models: Models;
 export const models = async (
   c: mongoose.Connection,
   reuse = true
-): Promise<Models> => {
+): Promise<MongoModels> => {
   if (_models) {
     if (reuse) {
       return _models;
@@ -123,4 +123,4 @@ export const models = async (
 
 // model index signature key
 // @see same DefinitionKeys
-export type ModelKeys = keyof Models;
+export type ModelKeys = keyof MongoModels;

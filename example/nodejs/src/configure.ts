@@ -1,15 +1,18 @@
 // configure file.
 
-import { ConnectOptions } from 'mongoose';
+import { ConnectOptions as MongoConnectOptions } from 'mongoose';
+import { Options as MysqlConnectOptions } from 'sequelize';
 import { mode, modeMongo, storeType } from './constant';
 import { openUri } from './stores/connection/mongo';
 
 export interface MongoConfigure extends StoreConfigure {
   openUri: openUri;
-  connectOptions: ConnectOptions;
+  connectOptions: MongoConnectOptions;
 }
 
-export type MysqlConfigure = StoreConfigure; // TODO
+export interface MysqlConfigure extends StoreConfigure {
+  connectOptions: MysqlConnectOptions;
+}
 
 export interface StoreConfigure {
   type: storeType;
@@ -44,10 +47,21 @@ export const get = (mode: mode): Configure => {
 
   const mysql: MysqlConfigure = {
     type: 'mysql',
+    connectOptions: {
+      dialect: 'mysql',
+      database: 'viron_example',
+      username: 'root',
+      password: 'password',
+      host: 'mysql',
+      port: 3306,
+      ssl: false,
+      protocol: 'tcp',
+      logging: true,
+    },
   };
   const ret: Configure = {
     store: {
-      main: mode === modeMongo ? mongo : mysql,
+      main: mode == modeMongo ? mongo : mysql,
     },
   };
 
