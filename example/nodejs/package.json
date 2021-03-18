@@ -9,7 +9,9 @@
     "express": "^4.17.1",
     "express-openapi": "^7.3.0",
     "mongoose": "^5.11.13",
-    "pino": "^6.11.0"
+    "mysql2": "^2.2.5",
+    "pino": "^6.11.0",
+    "sequelize": "^6.5.0"
   },
   "devDependencies": {
     "@jest/types": "^26.6.2",

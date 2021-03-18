@@ -1,29 +1,24 @@
 import pino from 'pino';
+import { Sequelize } from 'sequelize';
 import { mode, modeMongo, modeMysql } from './constant';
 import { preflight as preflightMongo } from './stores/mongo';
-import { Definitions } from './stores/definitions/mongo';
-
-import { Configure, get as getConfigure, MongoConfigure } from './configure';
+import { preflight as preflightMysql } from './stores/mysql';
+import {
+  Configure,
+  get as getConfigure,
+  MongoConfigure,
+  MysqlConfigure,
+} from './configure';
 import { Stores } from './stores';
+import { newNoSetEnvMode } from './errors';
+
+///
 
 export const logger = pino({
   name: 'example',
   level: 'debug',
   timestamp: true,
 });
-
-const newNoSetEnvMode = (): Error => {
-  return new Error(
-    `The environment variable is not set. key=MODE, value=${modeMongo} or ${modeMysql}`
-  );
-};
-
-// default merge case
-export const defaultMergeDefinitions = async (
-  fn: () => Definitions
-): Promise<Definitions> => {
-  return Object.assign({}, fn());
-};
 
 export class Context {
   public mode: mode;
@@ -54,20 +49,38 @@ export class Context {
    */
   public async preflightStore(): Promise<void> {
     const mainConfig = this.configure.store.main;
+
     switch (this.mode) {
       case modeMongo:
         // eslint-disable-next-line no-case-declarations
-        const configure = mainConfig as MongoConfigure;
+        const configureMongo = mainConfig as MongoConfigure;
         this.stores = {
-          main: await preflightMongo(configure),
+          main: await preflightMongo(configureMongo),
         };
 
+        // eslint-disable-next-line no-case-declarations
+        //const instanceMongo = this.stores.main.instance as Connection;
         logger.info(
-          `Completed loading the store (main). type=${configure.type}, openUri=${configure.openUri}`
+          `Completed loading the store (main). type=${configureMongo.type}, openUri=${configureMongo.openUri}`
         );
         break;
       case modeMysql:
-        logger.error('TODO not support.');
+        // eslint-disable-next-line no-case-declarations
+        const configureMysql = mainConfig as MysqlConfigure;
+        this.stores = {
+          main: await preflightMysql(configureMysql),
+        };
+        // eslint-disable-next-line no-case-declarations
+        const instanceMysql = this.stores.main.instance as Sequelize;
+        logger.info(
+          'Completed loading the store (main). type=%s "%s://%s:%s/%s". %O',
+          configureMysql.type,
+          instanceMysql.getDialect(),
+          instanceMysql.config.host,
+          instanceMysql.config.port,
+          instanceMysql.config.database,
+          instanceMysql.config
+        );
         break;
       default:
         throw newNoSetEnvMode();

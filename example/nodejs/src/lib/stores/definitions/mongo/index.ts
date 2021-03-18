@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import * as auditLog from './auditlog';
 
-export interface Definitions {
+export interface MongoDefinitions {
   auditLog: {
     name: string;
     schema: mongoose.Schema<
@@ -24,12 +24,12 @@ export const createModel = <D extends mongoose.Document>(
   return Model;
 };
 
-export type Model = typeof createModel;
+export type MongoModel = typeof createModel;
 
 /**
  * Models by collection (interface)
  */
-export interface Models {
+export interface MongoModels {
   auditLog: {
     Model: auditLog.AuditModel;
   };
