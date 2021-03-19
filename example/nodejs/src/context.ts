@@ -1,6 +1,6 @@
 import pino from 'pino';
 import { Sequelize } from 'sequelize';
-import { mode, modeMongo, modeMysql } from './constant';
+import { Mode, modeMongo, modeMysql } from './constant';
 import { preflight as preflightMongo } from './stores/mongo';
 import { preflight as preflightMysql } from './stores/mysql';
 import {
@@ -21,7 +21,7 @@ export const logger = pino({
 });
 
 export class Context {
-  public mode: mode;
+  public mode: Mode;
   public configure: Configure;
   public stores!: Stores;
 

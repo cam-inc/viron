@@ -1,9 +1,10 @@
 {
-  "name": "@viron/example",
+  "name": "@viron/example-nodejs",
   "version": "0.0.1",
   "description": "A toolkit to speedily build a viron api server",
   "main": "dist/server.js",
   "dependencies": {
+    "@viron/nodejs": "^0.0.1",
     "compression": "^1.7.4",
     "errorhandler": "^1.5.1",
     "express": "^4.17.1",
@@ -104,5 +105,6 @@
       "prettier --write",
       "eslint"
     ]
-  }
+  },
+  "private": true
 }

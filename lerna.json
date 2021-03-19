@@ -1,9 +1,4 @@
 {
-  "packages": [
-    "packages/app",
-    "packages/nodejs",
-    "packages/website",
-    "example/nodejs"
-  ],
+  "useWorkspaces": true,
   "version": "independent"
 }

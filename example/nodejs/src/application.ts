@@ -2,7 +2,7 @@ import fs from 'fs';
 import express, { Express } from 'express';
 import errorHandler from 'errorhandler';
 import compression from 'compression';
-import bodyParser from 'body-parser';
+import { json, urlencoded } from 'body-parser';
 import { initialize as initExpressOpenapi } from 'express-openapi';
 import * as openapiOperations from './routes';
 import * as securityHandlers from './security_handlers';
@@ -14,8 +14,8 @@ export const createApplication = (): Express => {
   // Express configuration
   app.set('port', process.env.PORT || 3000);
   app.use(compression());
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(json());
+  app.use(urlencoded({ extended: true }));
 
   /**
    * Primary app routes.

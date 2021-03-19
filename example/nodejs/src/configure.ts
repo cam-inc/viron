@@ -2,7 +2,7 @@
 
 import { ConnectOptions as MongoConnectOptions } from 'mongoose';
 import { Options as MysqlConnectOptions } from 'sequelize';
-import { mode, modeMongo, storeType } from './constant';
+import { Mode, modeMongo, StoreType } from './constant';
 import { openUri } from './stores/connection/mongo';
 
 export interface MongoConfigure extends StoreConfigure {
@@ -15,7 +15,7 @@ export interface MysqlConfigure extends StoreConfigure {
 }
 
 export interface StoreConfigure {
-  type: storeType;
+  type: StoreType;
 }
 
 export interface Configure {
@@ -27,7 +27,7 @@ export interface Configure {
 /**
  * Get configure data.
  */
-export const get = (mode: mode): Configure => {
+export const get = (mode: Mode): Configure => {
   const mongo: MongoConfigure = {
     type: 'mongo',
     openUri: 'mongodb://mongo:27017',
