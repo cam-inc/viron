@@ -1,13 +1,8 @@
-import { SecurityScope } from 'openapi-security-handler';
-import { OpenAPI, OpenAPIV2 } from 'openapi-types';
+import { Context as RequestContext } from 'openapi-backend';
 
-export const jwt = async (
-  _req: OpenAPI.Request,
-  scopes: SecurityScope[],
-  definition: OpenAPIV2.SecuritySchemeObject // https://github.com/kogosoftwarellc/open-api/pull/714
-): Promise<boolean> => {
+export const jwt = async (_context: RequestContext): Promise<boolean> => {
   // TODO: implements
-  console.log(scopes);
-  console.log(definition);
+  console.log(_context.security);
+  console.log(_context.operation);
   return true;
 };
