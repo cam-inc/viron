@@ -1,5 +1,7 @@
 import * as auditLog from './auditlog';
 
+export { auditLog };
+
 export interface MysqlDefinitions {
   auditLog: {
     name: string;
