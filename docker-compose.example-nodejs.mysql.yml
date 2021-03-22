@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+
+  example:
+    build: 
+      context: '.'
+      dockerfile: Dockerfile.example-nodejs
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - 3000:3000
+      - 9229:9229 # node-inspector
+    environment:
+      - MODE=mysql
+    volumes:
+      - $PWD/example/nodejs/package.json:/viron/example/nodejs/package.json
+      - $PWD/example/nodejs/src:/viron/example/nodejs/src
+      - $PWD/packages/nodejs:/viron/packages/nodejs
+    command: npm run dev
+
+  mysql:
+    extends:
+      file: example/nodejs/docker-compose.mysql.yml
+      service: mysql

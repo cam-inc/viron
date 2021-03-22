@@ -1,12 +1,12 @@
 import * as mongoose from 'mongoose';
-import * as users from './users';
-import * as topics from './topics';
-import * as auditLog from '../../../lib/stores/definitions/mongo/auditlog';
+import * as auditLog from '@viron/nodejs/dist/stores/definitions/mongo/auditlog';
 import {
   createModel,
   MongoDefinitions as LibMongoDefinitions,
   MongoModels as LibMongoModels,
-} from '../../../lib/stores/definitions/mongo';
+} from '@viron/nodejs/dist/stores/definitions/mongo';
+import * as users from './users';
+import * as topics from './topics';
 
 /////////////////////////////
 // Definition

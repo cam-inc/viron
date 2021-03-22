@@ -1,11 +1,11 @@
 import { Sequelize } from 'sequelize';
 import * as users from './users';
-import * as auditLog from '../../../lib/stores/definitions/mysql/auditlog';
+import * as auditLog from '@viron/nodejs/dist/stores/definitions/mysql/auditlog';
 
 import {
   MysqlDefinitions as LibMysqlDefinitions,
   MysqlModels as LibMysqlModels,
-} from '../../../lib/stores/definitions/mysql';
+} from '@viron/nodejs/dist/stores/definitions/mysql';
 
 /////////////////////////////
 // Definition

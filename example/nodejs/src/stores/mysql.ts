@@ -1,4 +1,4 @@
-import { modeMysql, storeType } from '../constant';
+import { modeMysql, StoreType } from '../constant';
 import { MysqlConfigure } from '../configure';
 import { createConnection } from './connection/mysql';
 import {
@@ -10,7 +10,7 @@ import {
 import { Sequelize } from 'sequelize';
 
 export interface MysqlStore {
-  type: storeType;
+  type: StoreType;
   definitions: MysqlDefinitions;
   models: MysqlModels;
   instance: Sequelize;

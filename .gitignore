@@ -39,5 +39,9 @@ jspm_packages
 dist
 
 .DS_Store
+data/*/db
 
 .npmrc
+.vscode
+tsconfig.tsbuildinfo
+*/**/package-lock.json

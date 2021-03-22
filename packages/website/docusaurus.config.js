@@ -3,7 +3,7 @@ module.exports = {
   tagline: 'Automated admin tool',
   url: 'https://github.com/cam-inc/viron',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'cam-inc', // Usually your GitHub org/user name.

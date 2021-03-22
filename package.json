@@ -37,22 +37,37 @@
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "pre-commit": "lerna run pre-commit",
-    "pre-push": "lerna run pre-push"
+    "pre-push": "lerna run pre-push",
+    "build": "lerna run build",
+    "format": "lerna run format",
+    "lint": "lerna run lint",
+    "test": "lerna run test",
+    "workspaces": "lerna list --all --json",
+    "example-nodejs:exec": "lerna run --scope=@viron/example-nodejs ",
+    "example-nodejs:list": "npm run --prefix example/nodejs",
+    "example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up",
+    "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up",
+    "app:exec": "lerna run --scope=@viron/app ",
+    "app:list": "npm run --prefix packages/app",
+    "nodejs:exec": "lerna run --scope=@viron/nodejs ",
+    "nodejs:list": "npm run --prefix packages/nodejs",
+    "website:exec": "lerna run --scope=@viron/website ",
+    "website:list": "npm run --prefix packages/website"
   },
   "devDependencies": {
     "husky": "^5.0.6",
     "lerna": "^3.22.1",
     "pinst": "^2.1.1"
   },
-  "workspaces": {
-    "packages": [
-      "packages/app",
-      "packages/nodejs",
-      "packages/website"
-    ]
-  },
+  "workspaces": [
+    "packages/app",
+    "packages/nodejs",
+    "packages/website",
+    "example/nodejs"
+  ],
   "engines": {
     "node": ">=15.0.0",
     "npm": ">=7.0.0"
-  }
+  },
+  "private": true
 }

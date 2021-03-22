@@ -7,14 +7,14 @@
     "allowJs": true /* Allow javascript files to be compiled. */,
     // "checkJs": true /* Report errors in .js files. */,
     // "jsx": "preserve" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
-    // "declaration": true /* Generates corresponding '.d.ts' file. */,
-    // "declarationMap": true /* Generates a sourcemap for each corresponding '.d.ts' file. */,
+    "declaration": true /* Generates corresponding '.d.ts' file. */,
+    "declarationMap": true /* Generates a sourcemap for each corresponding '.d.ts' file. */,
     // "declarationDir": "types",
     "sourceMap": true /* Generates corresponding '.map' file. */,
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
     "outDir": "dist" /* Redirect output structure to the directory. */,
-    // "rootDir": "./",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
-    // "composite": true,                     /* Enable project compilation */
+    "rootDir": "src",                         /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    "composite": true,                        /* Enable project compilation */
     // "incremental": true,                   /* Enable incremental compilation */
     // "tsBuildInfoFile": "./",               /* Specify file to store incremental compilation information */
     // "removeComments": true,                /* Do not emit comments to output. */
@@ -41,16 +41,11 @@
 
     /* Module Resolution Options */
     "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
-    "baseUrl": "." /* Base directory to resolve non-absolute module names. */,
-    "paths": {
-      "*": ["node_modules/*"]
-    } /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,
+    "baseUrl": "./src" /* Base directory to resolve non-absolute module names. */,
+    // "paths": { "*": ["node_modules/*"] } /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
-    // "types": [
-    //   "jest",
-    //   "node"
-    // ] /* Type declaration files to be included in compilation. */,
+    // "types": [] /* Type declaration files to be included in compilation. */,
     // "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
     // "preserveSymlinks": true,              /* Do not resolve the real path of symlinks. */
@@ -65,8 +60,5 @@
     // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
-  "include": ["src/**/*", "__tests__/**/*"],
-  "references": [
-    { "path": "../../packages/nodejs" }
-  ]
+  "include": ["src/**/*"]
 }

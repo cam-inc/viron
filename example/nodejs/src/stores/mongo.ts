@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
 import { MongoConfigure } from '../configure';
-import { storeType, modeMongo } from '../constant';
+import { StoreType, modeMongo } from '../constant';
 import { createConnection } from './connection/mongo';
 import {
   definitions,
@@ -10,7 +10,7 @@ import {
 } from './definitions/mongo';
 
 export interface MongoStore {
-  type: storeType;
+  type: StoreType;
   definitions: MongoDefinitions;
   models: MongoModels;
   instance: Connection;

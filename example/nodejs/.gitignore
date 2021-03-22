@@ -16,4 +16,5 @@ types/**/*
 .DS_Store
 data/*/db
 
+.npmrc
 .vscode
