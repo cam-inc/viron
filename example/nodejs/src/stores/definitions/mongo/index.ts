@@ -1,12 +1,9 @@
 import * as mongoose from 'mongoose';
-import * as auditLog from '@viron/nodejs/dist/stores/definitions/mongo/auditlog';
-import {
-  createModel,
-  MongoDefinitions as LibMongoDefinitions,
-  MongoModels as LibMongoModels,
-} from '@viron/nodejs/dist/stores/definitions/mongo';
+import { stores } from '@viron/nodejs';
 import * as users from './users';
 import * as topics from './topics';
+
+const { auditLog, createModel } = stores.definitions.mongo;
 
 /////////////////////////////
 // Definition
@@ -15,7 +12,8 @@ import * as topics from './topics';
 /**
  * Definitions by collection (interface)
  */
-export interface MongoDefinitions extends LibMongoDefinitions {
+export interface MongoDefinitions
+  extends stores.definitions.mongo.MongoDefinitions {
   users: {
     name: string;
     schema: mongoose.Schema<
@@ -65,7 +63,7 @@ export type DefinitionKeys = keyof MongoDefinitions;
 /**
  * Models by collection (interface)
  */
-export interface MongoModels extends LibMongoModels {
+export interface MongoModels extends stores.definitions.mongo.MongoModels {
   users: {
     Model: users.UserModel;
   };

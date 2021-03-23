@@ -1,6 +1,8 @@
 import * as mongoose from 'mongoose';
 import * as auditLog from './auditlog';
 
+export { auditLog };
+
 export interface MongoDefinitions {
   auditLog: {
     name: string;
