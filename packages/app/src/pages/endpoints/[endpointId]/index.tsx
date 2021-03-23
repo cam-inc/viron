@@ -1,13 +1,16 @@
 import { useLocation } from '@reach/router';
 import { Link, navigate, PageProps } from 'gatsby';
 import { parse } from 'query-string';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { oneState } from '$store/selectors/endpoint';
 import { Token } from '$types/index';
 import { Document, Info } from '$types/oas';
 import { isOASSupported, promiseErrorHandler } from '$utils/index';
 import _Pages from './_pages';
+import _Panels from './_panels';
+
+type PageId = Info['x-pages'][number]['id'];
 
 type Props = PageProps;
 const EndpointOnePage: React.FC<Props> = ({ params }) => {
@@ -60,31 +63,37 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       setIsPending(false);
     };
     f();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const _navigae = useCallback(
+    function (pageIds: PageId[]) {
+      navigate(
+        `/endpoints/${params.endpointId}?selectedPageIds=${pageIds.join(',')}`
+      );
+    },
+    [params.endpointId]
+  );
   const location = useLocation();
   const queries = parse(location.search);
-  let selectedPageIds: Info['x-pages'][number]['id'][] = [];
+  let selectedPageIds: PageId[] = [];
   if (!!queries.selectedPageIds) {
     selectedPageIds = (queries.selectedPageIds as string).split(',');
   }
-  const handlePageSelect = function (
-    pageId: Info['x-pages'][number]['id'],
-    separate: boolean
-  ) {
-    let newSelectedPageIds: Info['x-pages'][number]['id'][] = [
-      ...selectedPageIds,
-    ];
+  const handlePageSelect = function (pageId: PageId, separate: boolean) {
+    let newSelectedPageIds: PageId[] = [...selectedPageIds];
     if (separate) {
       !selectedPageIds.includes(pageId) && newSelectedPageIds.push(pageId);
     } else {
       newSelectedPageIds = [pageId];
     }
-    navigate(
-      `/endpoints/${
-        params.endpointId
-      }?selectedPageIds=${newSelectedPageIds.join(',')}`
+    _navigae(newSelectedPageIds);
+  };
+  const handlePageUnselect = function (pageId: PageId) {
+    const newSelectedPageIds: PageId[] = selectedPageIds.filter(
+      (selectedPageId) => selectedPageId !== pageId
     );
+    _navigae(newSelectedPageIds);
   };
 
   if (!endpoint) {
@@ -130,6 +139,12 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
           pages={document.info['x-pages']}
           selectedPageIds={selectedPageIds}
           onSelect={handlePageSelect}
+        />
+        <_Panels
+          pages={document.info['x-pages'].filter((page) =>
+            selectedPageIds.includes(page.id)
+          )}
+          onUnselect={handlePageUnselect}
         />
       </div>
     </div>
