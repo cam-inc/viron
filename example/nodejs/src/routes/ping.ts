@@ -1,4 +1,5 @@
 import { Response, Request } from 'express';
+import { Context as RequestContext } from 'openapi-backend';
 import { ctx } from '../context';
 import { MysqlStore } from '../stores/mysql';
 import { MongoStore } from '../stores/mongo';
@@ -58,7 +59,11 @@ const mongoPing = async (store: MongoStore): Promise<void> => {
  * Ping
  * @route GET /ping
  */
-export const getPing = async (_req: Request, res: Response): Promise<void> => {
+export const getPing = async (
+  _context: RequestContext,
+  _req: Request,
+  res: Response
+): Promise<void> => {
   switch (ctx.mode) {
     case modeMongo:
       mongoPing(ctx.stores.main as MongoStore);

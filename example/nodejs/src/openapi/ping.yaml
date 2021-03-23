@@ -8,14 +8,14 @@ servers:
   - url: /
 
 tags:
-  - name: system
+  - name: ping
 
 paths:
   '/ping':
     get:
       operationId: 'getPing'
       tags:
-        - system
+        - ping
       summary: ping
       description: 死活監視
       responses:
@@ -25,13 +25,9 @@ paths:
             text/plain:
               schema:
                 type: string
+                example: pong
 
 components:
   securitySchemes:
     jwt:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: https://localhost:3000/signin
-          scopes:
-            api:access: API access
+      $ref: './components.yaml#/components/securitySchemes/jwt'
