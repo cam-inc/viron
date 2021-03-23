@@ -1,4 +1,6 @@
+import { useLocation } from '@reach/router';
 import { Link, navigate, PageProps } from 'gatsby';
+import { parse } from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { oneState } from '$store/selectors/endpoint';
@@ -60,25 +62,29 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     f();
   }, []);
 
-  const [selectedPageIds, setSelectedPageIds] = useState<
-    Info['x-pages'][number]['id'][]
-  >([]);
+  const location = useLocation();
+  const queries = parse(location.search);
+  let selectedPageIds: Info['x-pages'][number]['id'][] = [];
+  if (!!queries.selectedPageIds) {
+    selectedPageIds = (queries.selectedPageIds as string).split(',');
+  }
   const handlePageSelect = function (
     pageId: Info['x-pages'][number]['id'],
     separate: boolean
   ) {
+    let newSelectedPageIds: Info['x-pages'][number]['id'][] = [
+      ...selectedPageIds,
+    ];
     if (separate) {
-      !selectedPageIds.includes(pageId) &&
-        setSelectedPageIds([...selectedPageIds, pageId]);
+      !selectedPageIds.includes(pageId) && newSelectedPageIds.push(pageId);
     } else {
-      setSelectedPageIds([pageId]);
+      newSelectedPageIds = [pageId];
     }
-    navigate(`/endpoints/${params.endpointId}`, {
-      state: {
-        pageId,
-        pageIds: [pageId],
-      },
-    });
+    navigate(
+      `/endpoints/${
+        params.endpointId
+      }?selectedPageIds=${newSelectedPageIds.join(',')}`
+    );
   };
 
   if (!endpoint) {

@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^1.3.5",
+    "@reach/router": "^1.3.4",
     "@react-icons/all-files": "^4.1.0",
     "classnames": "^2.2.6",
     "gatsby": "^3.0.3",
@@ -37,6 +38,7 @@
     "npm-run-all": "^4.1.5",
     "postcss": "^8.2.7",
     "postcss-preset-env": "^6.7.0",
+    "query-string": "^6.14.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-hook-form": "^6.15.4",
