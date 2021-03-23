@@ -1,9 +1,9 @@
-import { Link, PageProps } from 'gatsby';
+import { Link, navigate, PageProps } from 'gatsby';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { oneState } from '$store/selectors/endpoint';
 import { Token } from '$types/index';
-import { Document } from '$types/oas';
+import { Document, Info } from '$types/oas';
 import { isOASSupported, promiseErrorHandler } from '$utils/index';
 import _Pages from './_pages';
 
@@ -60,6 +60,27 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     f();
   }, []);
 
+  const [selectedPageIds, setSelectedPageIds] = useState<
+    Info['x-pages'][number]['id'][]
+  >([]);
+  const handlePageSelect = function (
+    pageId: Info['x-pages'][number]['id'],
+    separate: boolean
+  ) {
+    if (separate) {
+      !selectedPageIds.includes(pageId) &&
+        setSelectedPageIds([...selectedPageIds, pageId]);
+    } else {
+      setSelectedPageIds([pageId]);
+    }
+    navigate(`/endpoints/${params.endpointId}`, {
+      state: {
+        pageId,
+        pageIds: [pageId],
+      },
+    });
+  };
+
   if (!endpoint) {
     return (
       <div id="page-endpointOne">
@@ -99,7 +120,11 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     <div id="page-endpointOne">
       <div>
         <p>{JSON.stringify(document)}</p>
-        <_Pages pages={document.info['x-pages']} />
+        <_Pages
+          pages={document.info['x-pages']}
+          selectedPageIds={selectedPageIds}
+          onSelect={handlePageSelect}
+        />
       </div>
     </div>
   );

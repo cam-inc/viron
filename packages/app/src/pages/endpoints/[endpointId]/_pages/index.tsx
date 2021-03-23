@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import React, { useMemo } from 'react';
 import { Info } from '$types/oas';
 
@@ -8,10 +9,12 @@ type Partial = {
 
 type Props = {
   pages: Info['x-pages'];
+  selectedPageIds: Info['x-pages'][number]['id'][];
+  onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
 };
-const _Pages: React.FC<Props> = ({ pages }) => {
+const _Pages: React.FC<Props> = ({ pages, selectedPageIds, onSelect }) => {
   // Convert data structure like below so we can easily construct the jsx.
-  //const tree = {
+  //{
   //  group: 'root',
   //  children: [
   //    'general',
@@ -69,19 +72,41 @@ const _Pages: React.FC<Props> = ({ pages }) => {
     [pages]
   );
 
-  return <GroupOrPage list={tree.children} />;
+  return (
+    <GroupOrPage
+      list={tree.children}
+      selectedPageIds={selectedPageIds}
+      onSelect={onSelect}
+    />
+  );
 };
 export default _Pages;
 
-const GroupOrPage: React.FC<{ list: Partial['children'] }> = ({ list }) => {
+const GroupOrPage: React.FC<{
+  list: Partial['children'];
+  selectedPageIds: Info['x-pages'][number]['id'][];
+  onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
+}> = ({ list, selectedPageIds, onSelect }) => {
   return (
     <ul>
       {list.map(function (item, idx) {
         let content: JSX.Element;
         if (typeof item === 'string') {
-          content = <Page pageId={item} />;
+          content = (
+            <Page
+              pageId={item}
+              isSelected={selectedPageIds.includes(item)}
+              onSelect={onSelect}
+            />
+          );
         } else {
-          content = <Group partial={item} />;
+          content = (
+            <Group
+              partial={item}
+              selectedPageIds={selectedPageIds}
+              onSelect={onSelect}
+            />
+          );
         }
         return <li key={idx}>{content}</li>;
       })}
@@ -89,19 +114,42 @@ const GroupOrPage: React.FC<{ list: Partial['children'] }> = ({ list }) => {
   );
 };
 
-const Group: React.FC<{ partial: Partial }> = ({ partial }) => {
+const Group: React.FC<{
+  partial: Partial;
+  selectedPageIds: Info['x-pages'][number]['id'][];
+  onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
+}> = ({ partial, selectedPageIds, onSelect }) => {
   return (
     <div>
       <p className="font-bold">{partial.group}</p>
       <div className="ml-2">
-        <GroupOrPage list={partial.children} />
+        <GroupOrPage
+          list={partial.children}
+          selectedPageIds={selectedPageIds}
+          onSelect={onSelect}
+        />
       </div>
     </div>
   );
 };
 
-const Page: React.FC<{ pageId: Info['x-pages'][number]['id'] }> = ({
-  pageId,
-}) => {
-  return <p>{pageId}</p>;
+const Page: React.FC<{
+  pageId: Info['x-pages'][number]['id'];
+  isSelected: boolean;
+  onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
+}> = ({ pageId, isSelected, onSelect }) => {
+  const handleClick = function () {
+    // TODO: Let users choose the option to open a page separately.
+    onSelect(pageId, true);
+  };
+  return (
+    <p
+      className={classnames({
+        underline: isSelected,
+      })}
+      onClick={handleClick}
+    >
+      {pageId}
+    </p>
+  );
 };
