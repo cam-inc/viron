@@ -50,7 +50,7 @@ export type Info = {
     contents: {
       title: string;
       // TODO: 全部リストアップすること。
-      type: '' | '' | '';
+      type: 'number' | 'table' | 'custom';
       // Specify a operation id of method get that are required to fetch data for the content.
       getOperationId: OperationId;
       // TODO: 抜け漏れ確認。
