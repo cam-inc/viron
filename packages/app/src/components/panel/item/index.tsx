@@ -9,8 +9,9 @@ type Props<T> = {
 
 // Generic component in JSX/TS.
 // @see: https://typescript-jp.gitbook.io/deep-dive/tsx/react#react-jsxnohinto-jenerikkukonpnento
-// `extends Record<string, never>` is here so that the TS compiler recognize `<...>` as a generic not a JSX tag.
-export type PanelItemType = <T extends Record<string, never>>(
+// `extends {}` is here so that the TS compiler recognize `<...>` as a generic not a JSX tag.
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type PanelItemType = <T extends {}>(
   props: Props<T>
 ) => React.ReactElement | null;
 
