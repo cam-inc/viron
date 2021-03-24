@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import Portal from '$components/portal';
 import { timeout } from '$utils/index';
-import { id } from '$wrappers/modal';
+import { id } from '$wrappers/drawer';
 
 type Props = {
   isOpened: boolean;
@@ -11,7 +11,7 @@ type Props = {
   ) => void;
   autoClose?: boolean;
 };
-const Modal: React.FC<Props> = ({
+const Drawer: React.FC<Props> = ({
   isOpened = false,
   onRequestClose,
   autoClose = true,
@@ -52,12 +52,11 @@ const Modal: React.FC<Props> = ({
       <div
         className={classnames('absolute inset-0', {
           'pointer-events-none': !isVisible,
-          'pointer-events-auto': isVisible,
         })}
       >
         <div
           className={classnames(
-            'absolute inset-0 bg-black transition-opacity duration-300 ease-in-out',
+            'absolute inset-0 bg-black transition-opacity duration-300 ease-in-out pointer-events-auto',
             {
               'opacity-0': !isVisible,
               'opacity-50': isVisible,
@@ -65,33 +64,44 @@ const Modal: React.FC<Props> = ({
           )}
           onClick={handleBGClick}
         />
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div
+          className={classnames(
+            'absolute inset-0 flex items-stretch justify-end transform transition duration-300 ease-in-out',
+            {
+              'opacity-0': !isVisible,
+              'opacity-100': isVisible,
+              'translate-x-4': !isVisible,
+              'translate-x-0': isVisible,
+            }
+          )}
+        >
+          <div className="relative flex-shrink-0 flex-grow-0 w-24">
+            <div
+              className={classnames(
+                'absolute right-0 top-0 left-0 flex justify-end',
+                {
+                  'pointer-events-none': !isVisible,
+                  'pointer-events-auto': isVisible,
+                }
+              )}
+            >
+              <button onClick={handleCloseClick}>close</button>
+            </div>
+          </div>
           <div
             className={classnames(
-              'min-w-25% max-w-75%  min-h-25% max-h-75% flex flex-col transform transition duration-300 ease-in-out',
+              'min-w-0 flex-grow flex-shrink bg-white p-4 overflow-y-scroll overscroll-y-contain',
               {
                 'pointer-events-none': !isVisible,
                 'pointer-events-auto': isVisible,
-                'opacity-0': !isVisible,
-                'opacity-100': isVisible,
-                'scale-105': !isVisible,
-                'scale-100': isVisible,
               }
             )}
           >
-            <div className="relative flex-shrink-0 flex-grow-0 h-0">
-              <div className="absolute right-0 bottom-0 left-0 flex justify-end">
-                <button onClick={handleCloseClick}>close</button>
-              </div>
-            </div>
-            <div className="min-h-0 flex-grow flex-shrink bg-white p-4 rounded overflow-y-scroll overscroll-y-contain">
-              {children}
-            </div>
+            {children}
           </div>
         </div>
       </div>
     </Portal>
   );
 };
-
-export default Modal;
+export default Drawer;

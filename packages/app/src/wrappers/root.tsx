@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import '$i18n/index';
 import { isLaunchedState } from '$store/atoms/app';
+import DrawerWrapper from '$wrappers/drawer';
 import ModalWrapper from '$wrappers/modal';
 import '$styles/global.css';
 
@@ -38,6 +39,7 @@ const Root: React.FC<Props> = ({ children }) => {
   return (
     <div className="relative">
       <div className="min-h-screen">{children}</div>
+      <DrawerWrapper className="fixed inset-0" />
       <ModalWrapper className="fixed inset-0" />
       {!isLaunched && <Splash className="fixed inset-0" />}
     </div>
