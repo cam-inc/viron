@@ -37,7 +37,13 @@
         "id": "mau",
         "title": "MAU",
         "group": "Management/Analytics",
-        "contents": []
+        "contents": [
+          {
+            "title": "titlee",
+            "type": "number",
+            "getOperationId": "getMau"
+          }
+        ]
       },
       {
         "id": "last",
@@ -52,5 +58,11 @@
       }
     ]
   },
-  "paths": {}
+  "paths": {
+    "/mau.json": {
+      "get": {
+        "operationId": "getMau"
+      }
+    }
+  }
 }

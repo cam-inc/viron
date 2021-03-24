@@ -2,10 +2,15 @@
 import semverGte from 'semver/functions/gte';
 import semverLte from 'semver/functions/lte';
 import semverValid from 'semver/functions/valid';
+import { URL } from '$types/index';
 import { Document } from '$types/oas';
 
 export const isBrowser: boolean = typeof window !== 'undefined';
 export const isSSR: boolean = typeof window === 'undefined';
+
+export const isRelativeURL = function (url: URL): boolean {
+  return url[0] !== 'h';
+};
 
 export const timeout = async (ms: number): Promise<undefined> => {
   return await new Promise((resolve) => setTimeout(resolve, ms));

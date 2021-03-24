@@ -113,6 +113,16 @@ export type PathItem = {
   parameters: Array<Parameter | Reference>;
 };
 
+export type Method =
+  | 'get'
+  | 'put'
+  | 'post'
+  | 'delete'
+  | 'options'
+  | 'head'
+  | 'patch'
+  | 'trace';
+
 // [extendable] Describes a single API operation on a path.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object
 export type Operation = {
@@ -550,4 +560,10 @@ export type Extension = {
   // key must begin with "x-".
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
+};
+
+// All types of content get responses.
+// Type of `number`.
+export type ContentGetResponseOfTypeOfNumber = {
+  value: number;
 };

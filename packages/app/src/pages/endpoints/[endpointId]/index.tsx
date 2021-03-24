@@ -145,9 +145,9 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
           onSelect={handlePageSelect}
         />
         <_Panels
-          pages={document.info['x-pages'].filter((page) =>
-            selectedPageIds.includes(page.id)
-          )}
+          endpoint={endpoint}
+          document={document}
+          selectedPageIds={selectedPageIds}
           onUnselect={handlePageUnselect}
         />
       </div>
