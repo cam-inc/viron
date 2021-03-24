@@ -1,4 +1,4 @@
-import { newNoSetEnvMode } from '../errors';
+import { noSetEnvMode } from '../errors';
 import { ctx } from '../context';
 import { modeMysql, modeMongo } from '../constant';
 import * as mongoRepositories from './mongo';
@@ -21,7 +21,7 @@ const getRepository = (name: Names): any => {
     case modeMysql:
       return mysqlRepositories[name];
     default:
-      throw newNoSetEnvMode();
+      throw noSetEnvMode();
   }
 };
 

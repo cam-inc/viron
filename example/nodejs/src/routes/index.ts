@@ -5,6 +5,7 @@ import OpenAPIBackend, {
   Request as OpenapiRequest,
 } from 'openapi-backend';
 import { logger } from '../context';
+import { unauthorized } from '../errors';
 import * as securityHandlers from '../security_handlers';
 
 import * as routesPing from './ping';
@@ -51,9 +52,10 @@ const notFound = async (
 const unauthorizedHandler = async (
   _context: RequestContext,
   _req: Request,
-  res: Response
+  _res: Response,
+  next: NextFunction
 ): Promise<void> => {
-  res.status(401).json({ err: 'unauthorized' });
+  next(unauthorized());
 };
 
 export function register(app: Express): void {

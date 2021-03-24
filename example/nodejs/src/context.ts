@@ -10,7 +10,7 @@ import {
   MysqlConfigure,
 } from './configure';
 import { Stores } from './stores';
-import { newNoSetEnvMode } from './errors';
+import { noSetEnvMode } from './errors';
 
 ///
 
@@ -34,7 +34,7 @@ export class Context {
         this.mode = modeMysql;
         break;
       default:
-        throw newNoSetEnvMode();
+        throw noSetEnvMode();
     }
 
     this.configure = getConfigure(this.mode);
@@ -83,7 +83,7 @@ export class Context {
         );
         break;
       default:
-        throw newNoSetEnvMode();
+        throw noSetEnvMode();
     }
   }
 }
