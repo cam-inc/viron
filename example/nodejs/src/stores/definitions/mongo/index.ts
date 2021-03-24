@@ -3,7 +3,7 @@ import { stores } from '@viron/nodejs';
 import * as users from './users';
 import * as topics from './topics';
 
-const { auditLog, createModel } = stores.definitions.mongo;
+const { auditLogs, createModel } = stores.definitions.mongo;
 
 /////////////////////////////
 // Definition
@@ -46,9 +46,9 @@ export const definitions: MongoDefinitions = {
     schema: topics.schema,
     createModel,
   },
-  auditLog: {
-    name: auditLog.name,
-    schema: auditLog.schema,
+  auditLogs: {
+    name: auditLogs.name,
+    schema: auditLogs.schema,
     createModel,
   },
 };
@@ -107,11 +107,11 @@ export const models = async (
         definitions.topics.schema
       ),
     },
-    auditLog: {
-      Model: definitions.auditLog.createModel(
+    auditLogs: {
+      Model: definitions.auditLogs.createModel(
         c,
-        definitions.auditLog.name,
-        definitions.auditLog.schema
+        definitions.auditLogs.name,
+        definitions.auditLogs.schema
       ),
     },
   };

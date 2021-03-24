@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import { AuditLog } from '../../../domains/auditlog';
 
 export const name = 'auditlogs';
 
@@ -35,22 +36,19 @@ const schemaDefinition: mongoose.SchemaDefinition = {
   },
 };
 
-export interface AuditLogDocument extends mongoose.Document {
-  requestMethod: string;
-  requestUri: string;
-  sourceIp: string;
-  userId: string;
-  requestBody: string;
-  statusCode: number;
-  createdAt: number;
-  updatedAt: number;
+export interface AuditLogDocument extends AuditLog, mongoose.Document {
+  id: string; // mongoose.Docmentのidがanyなので上書き
 }
 
-export type AuditModel = mongoose.Model<AuditLogDocument>;
+export type AuditLogModel = mongoose.Model<AuditLogDocument>;
 
 export const schema = new mongoose.Schema<AuditLogDocument>(schemaDefinition, {
   autoIndex: true,
   collection: name,
   strict: true,
   timestamps: { currentTime: (): number => Math.floor(Date.now() / 1000) },
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+  id: true,
+  versionKey: false,
 });

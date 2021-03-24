@@ -1,25 +1,12 @@
 import { Model, Sequelize, DataTypes, ModelCtor } from 'sequelize';
+import { User, UserCreationAttributes } from '../../../domains/user';
 
 export const name = 'users';
 
-export interface User {
-  id?: number;
-  name: string | null;
-  nickName: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface UserCreationAttributes {
-  name: string | null;
-  nickName: string | null;
-}
-
 export class UserModel extends Model<User, UserCreationAttributes> {
   id!: number;
-  name!: string | null;
-  nickName!: string | null;
-
+  name!: string;
+  nickName!: string;
   // timestamps!
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
