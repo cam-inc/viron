@@ -18,6 +18,7 @@ module.exports = {
           $src: 'src',
           $components: 'src/components',
           $hooks: 'src/hooks',
+          $i18n: 'src/i18n',
           $layouts: 'src/layouts',
           $oas: 'src/oas',
           $storage: 'src/storage',

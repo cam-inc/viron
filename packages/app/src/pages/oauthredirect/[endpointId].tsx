@@ -7,13 +7,13 @@ import { EndpointID } from '$types/index';
 type Props = PageProps;
 const OAuthRedirectPage: React.FC<Props> = ({ params, location }) => {
   const endpointId = params.endpointId as EndpointID;
-  const token = new URL(location.href).searchParams.get('token');
   const [endpoint, setEndpoint] = useRecoilState(
     endpointOneState({ id: endpointId })
   );
 
   useEffect(
     function () {
+      const token = new URL(location.href).searchParams.get('token');
       if (!endpointId || !token) {
         // TODO: show error.
         return;
@@ -33,7 +33,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ params, location }) => {
       });
       navigate(`/endpoints/${endpointId}`);
     },
-    [endpoint, endpointId, setEndpoint, token]
+    [endpoint, endpointId, setEndpoint]
   );
 
   return <p>Processing OAuth redirection...</p>;

@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import { PluginOptions } from 'gatsby';
 import React, { useEffect } from 'react';
 import { RecoilRoot, useRecoilState } from 'recoil';
+import '$i18n/index';
 import { isLaunchedState } from '$store/atoms/app';
 import ModalWrapper from '$wrappers/modal';
 import '$styles/global.css';
@@ -12,10 +13,8 @@ type Props = {
 const RootWrapper: React.FC<Props> = (props) => {
   return (
     <RecoilRoot>
-      <React.Suspense fallback={<p>loading...</p>}>
-        {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
-        <Root {...props} />
-      </React.Suspense>
+      {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
+      <Root {...props} />
     </RecoilRoot>
   );
 };

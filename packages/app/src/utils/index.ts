@@ -5,6 +5,7 @@ import semverValid from 'semver/functions/valid';
 import { Document } from '$types/oas';
 
 export const isBrowser: boolean = typeof window !== 'undefined';
+export const isSSR: boolean = typeof window === 'undefined';
 
 export const timeout = async (ms: number): Promise<undefined> => {
   return await new Promise((resolve) => setTimeout(resolve, ms));

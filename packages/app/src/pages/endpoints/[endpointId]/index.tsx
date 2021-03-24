@@ -2,6 +2,7 @@ import { useLocation } from '@reach/router';
 import { Link, navigate, PageProps } from 'gatsby';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { oneState } from '$store/selectors/endpoint';
 import { Token } from '$types/index';
@@ -96,10 +97,12 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     _navigae(newSelectedPageIds);
   };
 
+  const { t } = useTranslation();
+
   if (!endpoint) {
     return (
       <div id="page-endpointOne">
-        <p>endpoint not found...</p>
+        <p>{t('endpoint not found...')}</p>
         <Link to="/home">HOME</Link>
       </div>
     );
@@ -135,6 +138,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     <div id="page-endpointOne">
       <div>
         <p>{JSON.stringify(document)}</p>
+        <p>see this?: {t('aa.bb')}</p>
         <_Pages
           pages={document.info['x-pages']}
           selectedPageIds={selectedPageIds}
