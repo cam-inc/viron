@@ -4,7 +4,7 @@ import { modeMysql, modeMongo } from '../constant';
 import * as mongoRepositories from './mongo';
 import * as mysqlRepositories from './mysql';
 import { User, UserCreationAttributes } from '../domains/user';
-import { domains } from '@viron/nodejs';
+import { domains } from '@viron/lib';
 
 interface Repository<D, C> {
   findById: (id: string) => Promise<D | null>;
