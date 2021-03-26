@@ -123,6 +123,14 @@ export type Method =
   | 'patch'
   | 'trace';
 
+// This is not a part of OAS.
+export type Request = {
+  // key must begin with a slash.
+  path: string;
+  method: Method;
+  operation: Operation;
+};
+
 // [extendable] Describes a single API operation on a path.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object
 export type Operation = {

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useFetch } from '$hooks/oas';
 import { Endpoint } from '$types/index';
 import { ContentGetResponseOfTypeOfNumber, Document, Info } from '$types/oas';
-import { fetchContentData } from '$utils/oas';
 
 type Props = {
   endpoint: Endpoint;
@@ -9,34 +9,17 @@ type Props = {
   content: Info['x-pages'][number]['contents'][number];
 };
 const _ContentNumber: React.FC<Props> = ({ endpoint, document, content }) => {
-  const [isPending, setIsPending] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
-  const [data, setData] = useState<ContentGetResponseOfTypeOfNumber>();
+  const {
+    isPending,
+    error,
+    responseJson,
+    fetch,
+  } = useFetch<ContentGetResponseOfTypeOfNumber>(endpoint, document, {
+    operationId: content.getOperationId,
+  });
 
   useEffect(function () {
-    const f = async function (): Promise<void> {
-      const [response, responseError] = await fetchContentData(
-        endpoint,
-        document,
-        content.getOperationId
-      );
-      if (!!responseError) {
-        // Network error.
-        setError(responseError.message);
-        setIsPending(false);
-        return;
-      }
-      if (!response.ok) {
-        // The token is not valid.
-        setError(`${response.status}: ${response.statusText}`);
-        setIsPending(false);
-        return;
-      }
-      const data: ContentGetResponseOfTypeOfNumber = await response.json();
-      setData(data);
-      setIsPending(false);
-    };
-    f();
+    fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -45,12 +28,16 @@ const _ContentNumber: React.FC<Props> = ({ endpoint, document, content }) => {
   }
 
   if (!!error) {
-    return <p>error: {error}</p>;
+    return <p>error: {error.message}</p>;
+  }
+
+  if (!responseJson) {
+    return <p>no response.</p>;
   }
 
   return (
     <div>
-      <p>{JSON.stringify(data)}</p>
+      <p>{JSON.stringify(responseJson)}</p>
     </div>
   );
 };

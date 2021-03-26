@@ -1,29 +1,28 @@
 import _ from 'lodash';
-import { Endpoint, Token, URL } from '$types/index';
-import { Document, Method, Operation, OperationId, Server } from '$types/oas';
-import { isRelativeURL, promiseErrorHandler } from '$utils/index';
+import { Endpoint, URL } from '$types/index';
+import { Document, Method, OperationId, Request, Server } from '$types/oas';
+import { isRelativeURL } from '$utils/index';
 
-export const getOperationByOperationId = function (
+export const getRequestObject = function (
+  document: Document,
+  { operationId }: { operationId?: OperationId }
+): Request | null {
+  if (!!operationId) {
+    return getRequestObjectByOperationId(document, operationId);
+  }
+  return null;
+};
+
+export const getRequestObjectByOperationId = function (
   document: Document,
   operationId: OperationId
-): {
-  // key must begin with a slash.
-  path: string | null;
-  method: Method | null;
-  operation: Operation | null;
-} {
-  const result: {
-    path: string | null;
-    method: Method | null;
-    operation: Operation | null;
-  } = { path: null, method: null, operation: null };
+): Request | null {
   const path = _.findKey(document.paths, function (pathItem) {
     return pathItem.get?.operationId === operationId;
   });
   if (!path) {
-    return result;
+    return null;
   }
-  result.path = path;
 
   const operations = _.pick(document.paths[path], [
     'get',
@@ -39,19 +38,21 @@ export const getOperationByOperationId = function (
     return operation?.operationId === operationId;
   });
   if (!operation) {
-    return result;
+    return null;
   }
-  result.operation = operation;
 
   const method = _.findKey(operations, function (operation) {
     return operation?.operationId === operationId;
   });
   if (!method) {
-    return result;
+    return null;
   }
-  result.method = method as Method;
 
-  return result;
+  return {
+    path,
+    method: method as Method,
+    operation,
+  };
 };
 
 // Returns a URL to the target host.
@@ -74,20 +75,4 @@ export const getURLToTargetHost = function (
     return `${new window.URL(endpoint.url).origin}${url}`;
   }
   return url;
-};
-
-export const fetchContentData = async function (
-  endpoint: Endpoint,
-  document: Document,
-  getOperationId: OperationId
-): Promise<[Response, Error | null]> {
-  const { path } = getOperationByOperationId(document, getOperationId);
-  return await promiseErrorHandler<Response>(
-    fetch(`${getURLToTargetHost(endpoint, document)}${path}`, {
-      mode: 'cors',
-      headers: {
-        Authorization: endpoint.token as Token,
-      },
-    })
-  );
 };
