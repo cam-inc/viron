@@ -1,16 +1,16 @@
-import * as auditLog from './auditlog';
+import * as auditLogs from './auditlogs';
 
-export { auditLog };
+export { auditLogs };
 
 export interface MysqlDefinitions {
-  auditLog: {
+  auditLogs: {
     name: string;
-    createModel: typeof auditLog.createModel;
+    createModel: typeof auditLogs.createModel;
   };
 }
 
 export interface MysqlModels {
-  auditLog: {
-    Model: auditLog.AuditLogModelCtor;
+  auditLogs: {
+    Model: auditLogs.AuditLogModelCtor;
   };
 }

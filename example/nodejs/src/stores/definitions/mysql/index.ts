@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 import * as users from './users';
 import { stores } from '@viron/nodejs';
 
-const { auditLog } = stores.definitions.mysql;
+const { auditLogs } = stores.definitions.mysql;
 
 /////////////////////////////
 // Definition
@@ -27,9 +27,9 @@ export const definitions: MysqlDefinitions = {
     name: users.name,
     createModel: users.createModel,
   },
-  auditLog: {
-    name: auditLog.name,
-    createModel: auditLog.createModel,
+  auditLogs: {
+    name: auditLogs.name,
+    createModel: auditLogs.createModel,
   },
 };
 
@@ -68,8 +68,8 @@ export const models = async (
     users: {
       Model: definitions.users.createModel(s),
     },
-    auditLog: {
-      Model: auditLog.createModel(s),
+    auditLogs: {
+      Model: auditLogs.createModel(s),
     },
   };
 

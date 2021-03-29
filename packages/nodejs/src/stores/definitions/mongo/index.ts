@@ -1,14 +1,14 @@
 import * as mongoose from 'mongoose';
-import * as auditLog from './auditlog';
+import * as auditLogs from './auditlogs';
 
-export { auditLog };
+export { auditLogs };
 
 export interface MongoDefinitions {
-  auditLog: {
+  auditLogs: {
     name: string;
     schema: mongoose.Schema<
-      auditLog.AuditLogDocument,
-      mongoose.Model<auditLog.AuditLogDocument>
+      auditLogs.AuditLogDocument,
+      mongoose.Model<auditLogs.AuditLogDocument>
     >;
     createModel: typeof createModel;
   };
@@ -32,7 +32,7 @@ export type MongoModel = typeof createModel;
  * Models by collection (interface)
  */
 export interface MongoModels {
-  auditLog: {
-    Model: auditLog.AuditModel;
+  auditLogs: {
+    Model: auditLogs.AuditLogModel;
   };
 }
