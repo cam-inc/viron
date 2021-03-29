@@ -3,7 +3,7 @@ import { ctx } from '../context';
 import { modeMysql, modeMongo } from '../constant';
 import * as mongoRepositories from './mongo';
 import * as mysqlRepositories from './mysql';
-import { User, UserCreationAttributes } from '../domains/user';
+import { User, UserCreationAttributes } from '../domains/models/user';
 import { domains } from '@viron/lib';
 
 interface Repository<D, C> {
@@ -29,6 +29,6 @@ export const getUserRepository = (): Repository<User, UserCreationAttributes> =>
   getRepository('users');
 
 export const getAuditLogRepository = (): Repository<
-  domains.auditLog.AuditLog,
-  domains.auditLog.AuditLogCreationAttributes
+  domains.models.auditLog.AuditLog,
+  domains.models.auditLog.AuditLogCreationAttributes
 > => getRepository('auditLogs');

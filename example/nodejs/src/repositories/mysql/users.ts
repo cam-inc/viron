@@ -1,5 +1,5 @@
 import { ctx } from '../../context';
-import { User, UserCreationAttributes } from '../../domains/user';
+import { User, UserCreationAttributes } from '../../domains/models/user';
 import { UserModelCtor } from '../../stores/definitions/mysql/users';
 
 const getModel = (): UserModelCtor =>

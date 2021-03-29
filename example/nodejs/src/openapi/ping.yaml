@@ -1,33 +1,25 @@
-openapi: 3.0.0
+openapi: 3.0.2
 info:
   version: 0.0.1
-  title: viron example nodejs
-  description: viron example node.js api specifications
-
-servers:
-  - url: /
+  title: '@viron/example-nodejs ping'
+  description: ping api specifications
 
 tags:
   - name: ping
 
 paths:
-  '/ping':
+  /ping:
     get:
-      operationId: 'getPing'
+      operationId: get
       tags:
         - ping
       summary: ping
       description: 死活監視
       responses:
-        '200':
+        200:
           description: OK
           content:
             text/plain:
               schema:
                 type: string
                 example: pong
-
-components:
-  securitySchemes:
-    jwt:
-      $ref: './components.yaml#/components/securitySchemes/jwt'

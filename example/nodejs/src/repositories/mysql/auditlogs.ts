@@ -7,16 +7,16 @@ const getModel = (): stores.definitions.mysql.auditLogs.AuditLogModelCtor =>
 
 export const findById = async (
   id: string
-): Promise<domains.auditLog.AuditLog | null> => {
+): Promise<domains.models.auditLog.AuditLog | null> => {
   const model = getModel();
   const doc = await model.findByPk(id);
-  return doc ? (doc.toJSON() as domains.auditLog.AuditLog) : null;
+  return doc ? (doc.toJSON() as domains.models.auditLog.AuditLog) : null;
 };
 
 export const create = async (
-  auditLog: domains.auditLog.AuditLogCreationAttributes
-): Promise<domains.auditLog.AuditLog> => {
+  auditLog: domains.models.auditLog.AuditLogCreationAttributes
+): Promise<domains.models.auditLog.AuditLog> => {
   const model = getModel();
   const doc = await model.create(auditLog);
-  return doc.toJSON() as domains.auditLog.AuditLog;
+  return doc.toJSON() as domains.models.auditLog.AuditLog;
 };

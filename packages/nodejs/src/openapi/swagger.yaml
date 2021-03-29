@@ -1,0 +1,37 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs swagger.json'
+  description: swagger.json api specifications
+
+tags:
+  - name: swagger
+
+paths:
+  /swagger.json:
+    get:
+      operationId: get
+      tags:
+        - swagger
+      summary: get swagger.json
+      description: swagger.jsonの取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+      security:
+        - jwt: []
+
+components:
+  securitySchemes:
+    jwt:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://localhost:3000/signin
+          scopes:
+            api:access: API access

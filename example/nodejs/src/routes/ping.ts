@@ -6,7 +6,7 @@ import { getAuditLogRepository, getUserRepository } from '../repositories';
  * Ping
  * @route GET /ping
  */
-export const getPing = async (
+export const get = async (
   _context: RequestContext,
   _req: Request,
   res: Response

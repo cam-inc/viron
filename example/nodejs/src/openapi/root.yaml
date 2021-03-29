@@ -1,0 +1,23 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs'
+  description: api specifications
+
+servers:
+  - url: /
+
+tags:
+  - name: root
+
+paths:
+  /:
+    get:
+      operationId: get
+      tags:
+        - root
+      summary: redirect to /swagger.json
+      description: /swagger.jsonへリダイレクト
+      responses:
+        301:
+          description: OK
