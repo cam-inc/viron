@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 import * as users from './users';
-import { stores } from '@viron/nodejs';
+import { stores } from '@viron/lib';
 
 const { auditLogs } = stores.definitions.mysql;
 

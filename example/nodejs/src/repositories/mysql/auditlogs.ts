@@ -1,4 +1,4 @@
-import { stores, domains } from '@viron/nodejs';
+import { stores, domains } from '@viron/lib';
 import { ctx } from '../../context';
 
 const getModel = (): stores.definitions.mysql.auditLogs.AuditLogModelCtor =>

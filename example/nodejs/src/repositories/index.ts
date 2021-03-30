@@ -1,10 +1,10 @@
-import { newNoSetEnvMode } from '../errors';
+import { noSetEnvMode } from '../errors';
 import { ctx } from '../context';
 import { modeMysql, modeMongo } from '../constant';
 import * as mongoRepositories from './mongo';
 import * as mysqlRepositories from './mysql';
 import { User, UserCreationAttributes } from '../domains/user';
-import { domains } from '@viron/nodejs';
+import { domains } from '@viron/lib';
 
 interface Repository<D, C> {
   findById: (id: string) => Promise<D | null>;
@@ -21,7 +21,7 @@ const getRepository = (name: Names): any => {
     case modeMysql:
       return mysqlRepositories[name];
     default:
-      throw newNoSetEnvMode();
+      throw noSetEnvMode();
   }
 };
 

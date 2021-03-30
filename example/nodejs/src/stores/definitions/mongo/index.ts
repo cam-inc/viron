@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { stores } from '@viron/nodejs';
+import { stores } from '@viron/lib';
 import * as users from './users';
 import * as topics from './topics';
 

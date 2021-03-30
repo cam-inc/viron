@@ -39,6 +39,7 @@
     "pre-commit": "lerna run pre-commit",
     "pre-push": "lerna run pre-push",
     "build": "lerna run build",
+    "clean": "lerna run clean",
     "format": "lerna run format",
     "lint": "lerna run lint",
     "test": "lerna run test",
@@ -49,7 +50,7 @@
     "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up",
     "app:exec": "lerna run --scope=@viron/app ",
     "app:list": "npm run --prefix packages/app",
-    "nodejs:exec": "lerna run --scope=@viron/nodejs ",
+    "nodejs:exec": "lerna run --scope=@viron/lib ",
     "nodejs:list": "npm run --prefix packages/nodejs",
     "website:exec": "lerna run --scope=@viron/website ",
     "website:list": "npm run --prefix packages/website"
