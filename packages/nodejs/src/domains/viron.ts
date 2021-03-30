@@ -1,10 +1,40 @@
 import {
   ApiMethod,
   API_METHOD,
+  Color,
   QueryType,
-  Style,
+  Section,
   STYLE,
-} from '../../constants';
+  Style,
+  Theme,
+} from '../constants';
+
+export interface Viron {
+  color: Color;
+  theme: Theme;
+  name: string;
+  pages: Pages;
+  thumbnail: string;
+  tags: string[];
+}
+
+export const genViron = (
+  color: Color,
+  theme: Theme,
+  name: string,
+  pages: Pages,
+  thumbnail: string,
+  tags: string[]
+): Viron => {
+  return {
+    color,
+    theme,
+    name,
+    pages,
+    thumbnail,
+    tags,
+  };
+};
 
 export interface Component {
   api: ComponentApi;
@@ -150,4 +180,30 @@ export const genComponentPreview = (
   target = '_blank'
 ): ComponentPreview => {
   return { path, method, target };
+};
+
+export interface Page {
+  id: string;
+  group: string;
+  name: string;
+  section: Section;
+  components: Components;
+}
+
+export type Pages = Page[];
+
+export const genPage = (
+  id: string,
+  group: string,
+  name: string,
+  section: Section,
+  components: Components
+): Page => {
+  return {
+    id,
+    group,
+    name,
+    section,
+    components,
+  };
 };

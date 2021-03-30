@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { User } from '../../../domains/models/user';
+import { User } from '../../../domains/user';
 import { DefinitionKeys } from '.';
 
 export const name: DefinitionKeys = 'users';

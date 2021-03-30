@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
 import { MongoConfigure } from '../configure';
-import { StoreType, modeMongo } from '../constant';
+import { StoreType, MODE_MONGO } from '../constant';
 import { createConnection } from './connection/mongo';
 import {
   definitions,
@@ -22,7 +22,7 @@ export const preflight = async (
   const c = await createConnection(config.openUri, config.connectOptions);
 
   return {
-    type: modeMongo,
+    type: MODE_MONGO,
     definitions: definitions,
     models: await models(c),
     instance: c,

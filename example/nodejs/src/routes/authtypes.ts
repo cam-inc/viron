@@ -3,7 +3,7 @@ import { Context as RequestContext } from 'openapi-backend';
 import { constants, domains } from '@viron/lib';
 
 const { AUTH_METHOD, AUTH_TYPE } = constants;
-const { genAuthType } = domains.structures;
+const { genAuthType } = domains.authType;
 
 /**
  * 認証タイプ一覧

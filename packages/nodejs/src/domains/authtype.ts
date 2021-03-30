@@ -1,4 +1,4 @@
-import { AuthTypeMethod, AuthTypeType } from '../../constants';
+import { AuthTypeMethod, AuthTypeType } from '../constants';
 
 export interface AuthType {
   provider: string;

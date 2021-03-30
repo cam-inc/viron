@@ -64,3 +64,9 @@ export const AUTH_METHOD = {
   PUT: 'PUT',
 };
 export type AuthTypeMethod = typeof AUTH_METHOD[keyof typeof AUTH_METHOD];
+
+export const STORE_TYPE = {
+  MYSQL: 'mysql',
+  MONGO: 'mongo',
+} as const;
+export type StoreType = typeof STORE_TYPE[keyof typeof STORE_TYPE];

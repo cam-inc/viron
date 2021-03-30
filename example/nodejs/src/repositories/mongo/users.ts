@@ -1,4 +1,4 @@
-import { User, UserCreationAttributes } from '../../domains/models/user';
+import { User, UserCreationAttributes } from '../../domains/user';
 import { UserModel } from '../../stores/definitions/mongo/users';
 import { ctx } from '../../context';
 

@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { AuditLog } from '../../../domains/models/auditlog';
+import { AuditLog } from '../../../domains/auditlog';
 
 export const name = 'auditlogs';
 

@@ -13,6 +13,7 @@ import { logger } from '../context';
 import { unauthorized } from '../errors';
 import * as securityHandlers from '../security_handlers';
 
+import * as routesAuditLogs from './auditlogs';
 import * as routesAuthtypes from './authtypes';
 import * as routesPing from './ping';
 import * as routesRoot from './root';
@@ -33,6 +34,7 @@ const libOpenapiPath = (name: string): string =>
 
 const routes: Route[] = [
   { openapiPath: openapiPath('ping'), handlers: routesPing },
+  { openapiPath: libOpenapiPath('auditlogs'), handlers: routesAuditLogs },
   { openapiPath: libOpenapiPath('swagger'), handlers: routesSwagger },
   { openapiPath: libOpenapiPath('viron'), handlers: routesViron },
   { openapiPath: libOpenapiPath('authtypes'), handlers: routesAuthtypes },

@@ -1,5 +1,5 @@
 import { Model, Sequelize, DataTypes, ModelCtor } from 'sequelize';
-import { User, UserCreationAttributes } from '../../../domains/models/user';
+import { User, UserCreationAttributes } from '../../../domains/user';
 
 export const name = 'users';
 

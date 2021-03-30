@@ -10,7 +10,7 @@ const {
   genTableComponent,
   genPage,
   genViron,
-} = domains.structures;
+} = domains.viron;
 
 /**
  * viron全体設定を取得

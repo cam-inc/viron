@@ -1,6 +1,9 @@
 import { Response, Request } from 'express';
 import { Context as RequestContext } from 'openapi-backend';
-import { getAuditLogRepository, getUserRepository } from '../repositories';
+import { repositories } from '@viron/lib';
+import { getUserRepository } from '../repositories';
+
+const repositoryContainer = repositories.container;
 
 /**
  * Ping
@@ -21,7 +24,7 @@ export const get = async (
   const fdoc1 = await getUserRepository().findById(doc1.id);
   console.log(fdoc1);
 
-  const doc2 = await getAuditLogRepository().create({
+  const doc2 = await repositoryContainer.getAuditLogRepository().create({
     requestMethod: 'GET',
     requestUri: `/ping?now=${now}`,
     sourceIp: '127.0.0.1',
@@ -30,7 +33,9 @@ export const get = async (
     statusCode: 200,
   });
   console.log('create', doc2);
-  const fdoc2 = await getAuditLogRepository().findById(doc2.id);
+  const fdoc2 = await repositoryContainer
+    .getAuditLogRepository()
+    .findById(doc2.id);
   console.log(fdoc2);
 
   res.send('pong');

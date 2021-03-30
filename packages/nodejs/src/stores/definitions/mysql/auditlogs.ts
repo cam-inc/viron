@@ -2,7 +2,7 @@ import { Model, Sequelize, DataTypes, ModelCtor } from 'sequelize';
 import {
   AuditLog,
   AuditLogCreationAttributes,
-} from '../../../domains/models/auditlog';
+} from '../../../domains/auditlog';
 
 export const name = 'auditlogs';
 
