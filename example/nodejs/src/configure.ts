@@ -2,7 +2,7 @@
 
 import { ConnectOptions as MongoConnectOptions } from 'mongoose';
 import { Options as MysqlConnectOptions } from 'sequelize';
-import { Mode, modeMongo, StoreType } from './constant';
+import { Mode, MODE_MONGO, StoreType } from './constant';
 import { openUri } from './stores/connection/mongo';
 
 export interface MongoConfigure extends StoreConfigure {
@@ -61,7 +61,7 @@ export const get = (mode: Mode): Configure => {
   };
   const ret: Configure = {
     store: {
-      main: mode == modeMongo ? mongo : mysql,
+      main: mode == MODE_MONGO ? mongo : mysql,
     },
   };
 

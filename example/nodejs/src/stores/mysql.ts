@@ -1,4 +1,4 @@
-import { modeMysql, StoreType } from '../constant';
+import { MODE_MYSQL, StoreType } from '../constant';
 import { MysqlConfigure } from '../configure';
 import { createConnection } from './connection/mysql';
 import {
@@ -27,7 +27,7 @@ export const preflight = async (
   await s.sync({ alter: true });
 
   return {
-    type: modeMysql,
+    type: MODE_MYSQL,
     definitions: definitions,
     models: ms,
     instance: s,

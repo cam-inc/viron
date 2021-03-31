@@ -3,7 +3,8 @@ import errorHandler from 'errorhandler';
 import compression from 'compression';
 import { json, urlencoded } from 'body-parser';
 import { register } from './routes';
-export const createApplication = (): Express => {
+
+export const createApplication = async (): Promise<Express> => {
   // Create Express server
   const app = express();
 
@@ -14,7 +15,7 @@ export const createApplication = (): Express => {
   app.use(urlencoded({ extended: true }));
 
   // Primary app routes.
-  register(app);
+  await register(app);
 
   app.use(errorHandler());
 

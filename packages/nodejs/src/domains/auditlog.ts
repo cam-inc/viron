@@ -1,3 +1,5 @@
+import { repositories } from '../';
+
 export interface AuditLog {
   id: string;
   requestMethod: string | null;
@@ -18,3 +20,8 @@ export interface AuditLogCreationAttributes {
   requestBody: string | null;
   statusCode: number | null;
 }
+
+export const list = async (): Promise<AuditLog[]> => {
+  const repository = repositories.container.getAuditLogRepository();
+  return repository.find();
+};

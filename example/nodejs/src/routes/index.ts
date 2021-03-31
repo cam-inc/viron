@@ -1,78 +1,79 @@
-import { Express, NextFunction, Request, Response } from 'express';
+import { Express } from 'express';
 import OpenAPIBackend, {
   Handler,
-  Context as RequestContext,
+  Document,
   Request as OpenapiRequest,
+  Operation,
 } from 'openapi-backend';
-import { logger } from '../context';
-import { unauthorized } from '../errors';
-import * as securityHandlers from '../security_handlers';
+import merge from 'deepmerge';
 
+import { logger } from '../context';
+import * as securityHandlers from '../security_handlers';
+import { openapiPath, libOpenapiPath } from '../helpers/routes';
+import {
+  notFoundHandler,
+  notImplementedHandler,
+  unauthorizedHandler,
+} from '../handlers';
+
+import * as routesAuditLogs from './auditlogs';
+import * as routesAuthtypes from './authtypes';
 import * as routesPing from './ping';
+import * as routesRoot from './root';
+import * as routesSwagger from './swagger';
+import * as routesViron from './viron';
 
 interface Route {
-  name: string;
+  openapiPath: string;
   handlers: { [operationId: string]: Handler };
 }
+
 const routes: Route[] = [
-  {
-    name: 'ping', // YAML file name.
-    handlers: routesPing,
-  },
+  { openapiPath: openapiPath('ping'), handlers: routesPing },
+  { openapiPath: libOpenapiPath('auditlogs'), handlers: routesAuditLogs },
+  { openapiPath: libOpenapiPath('swagger'), handlers: routesSwagger },
+  { openapiPath: libOpenapiPath('viron'), handlers: routesViron },
+  { openapiPath: libOpenapiPath('authtypes'), handlers: routesAuthtypes },
+  // マージ順の関係で`root`は必ず最後に書く
+  { openapiPath: openapiPath('root'), handlers: routesRoot },
 ];
 
-// oasに定義されているAPIが未実装の場合のハンドラ
-const notImplemented = async (
-  context: RequestContext,
-  _req: Request,
-  res: Response
-): Promise<void> => {
-  logger.warn(`Not implemented. ${context.operation.operationId}`);
-  if (context.operation.operationId) {
-    // モックレスポンス
-    const { status, mock } = context.api.mockResponseForOperation(
-      context.operation.operationId
-    );
-    res.status(status).json(mock);
-  }
-};
+export async function register(app: Express): Promise<void> {
+  const apis = await Promise.all(
+    routes.map(({ openapiPath, handlers }) => {
+      return new OpenAPIBackend({
+        definition: openapiPath,
+        handlers: {
+          ...handlers,
+          notFound: notFoundHandler,
+          notImplemented: notImplementedHandler,
+          unauthorizedHandler: unauthorizedHandler,
+        },
+        securityHandlers,
+      }).init();
+    })
+  );
 
-// oasに定義がないリクエストをハンドリング
-const notFound = async (
-  _context: RequestContext,
-  _req: Request,
-  _res: Response,
-  next: NextFunction
-): Promise<void> => {
-  // 次のhandlerに回すのでnextを呼ぶだけ
-  next();
-};
-
-// securityHandlerでエラーになったリクエストをハンドリング
-const unauthorizedHandler = async (
-  _context: RequestContext,
-  _req: Request,
-  _res: Response,
-  next: NextFunction
-): Promise<void> => {
-  next(unauthorized());
-};
-
-export function register(app: Express): void {
-  routes.forEach(({ name, handlers }) => {
-    const api = new OpenAPIBackend({
-      definition: `${__dirname}/../openapi/${name}.yaml`,
-      handlers: {
-        ...handlers,
-        notFound,
-        notImplemented,
-        unauthorizedHandler,
-      },
-      securityHandlers,
-    });
-
+  let apiDefinition = {};
+  apis.forEach((api) => {
+    apiDefinition = merge(apiDefinition, api.definition);
+    // add handler
     app.use((req, res, next) =>
-      api.handleRequest(req as OpenapiRequest, req, res, next)
+      api.handleRequest(
+        req as OpenapiRequest,
+        req,
+        res,
+        next,
+        apiDefinition as Document
+      )
     );
+    // logging
+    api.router.getOperations().forEach((operation: Operation) => {
+      logger.debug(
+        `Added routes. %s: %s`,
+        operation.method.toUpperCase(),
+        operation.path
+      );
+    });
   });
 }

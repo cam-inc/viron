@@ -1,0 +1,57 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs auditlogs'
+  description: auditlogs api specifications
+
+tags:
+  - name: auditLog
+
+paths:
+  /auditlogs:
+    get:
+      operationId: list
+      tags:
+        - auditLog
+      summary: list audit logs
+      description: 監査ログ一覧
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogList'
+
+components:
+  schemas:
+    AuditLogList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuditLog'
+
+    AuditLog:
+      type: object
+      properties:
+        requestMethod:
+          description: リクエストメソッド
+          type: string
+        requestUri:
+          description: リクエストURI
+          type: string
+        sourceIp:
+          description: ソースIP
+          type: string
+        userId:
+          description: ユーザー
+          type: string
+        requestBody:
+          description: リクエストボディ
+          type: string
+        statusCode:
+          description: ステータスコード
+          type: integer
+        createdAt:
+          description: 日時
+          type: string
+          format: date-time

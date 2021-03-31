@@ -1,6 +1,7 @@
 import pino from 'pino';
 import { Sequelize } from 'sequelize';
-import { Mode, modeMongo, modeMysql } from './constant';
+import { repositories } from '@viron/lib';
+import { Mode, MODE_MONGO, MODE_MYSQL } from './constant';
 import { preflight as preflightMongo } from './stores/mongo';
 import { preflight as preflightMysql } from './stores/mysql';
 import {
@@ -27,11 +28,11 @@ export class Context {
 
   constructor() {
     switch (process.env.MODE) {
-      case modeMongo:
-        this.mode = modeMongo;
+      case MODE_MONGO:
+        this.mode = MODE_MONGO;
         break;
-      case modeMysql:
-        this.mode = modeMysql;
+      case MODE_MYSQL:
+        this.mode = MODE_MYSQL;
         break;
       default:
         throw noSetEnvMode();
@@ -51,7 +52,7 @@ export class Context {
     const mainConfig = this.configure.store.main;
 
     switch (this.mode) {
-      case modeMongo:
+      case MODE_MONGO:
         // eslint-disable-next-line no-case-declarations
         const configureMongo = mainConfig as MongoConfigure;
         this.stores = {
@@ -64,7 +65,7 @@ export class Context {
           `Completed loading the store (main). type=${configureMongo.type}, openUri=${configureMongo.openUri}`
         );
         break;
-      case modeMysql:
+      case MODE_MYSQL:
         // eslint-disable-next-line no-case-declarations
         const configureMysql = mainConfig as MysqlConfigure;
         this.stores = {
@@ -85,6 +86,8 @@ export class Context {
       default:
         throw noSetEnvMode();
     }
+
+    repositories.container.init(this.mode, this.stores.main.instance);
   }
 }
 

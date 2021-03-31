@@ -1,4 +1,4 @@
-import { modeMongo, modeMysql } from './constant';
+import { MODE_MYSQL, MODE_MONGO } from './constant';
 
 class VironError extends Error {
   statusCode: number;
@@ -11,7 +11,7 @@ class VironError extends Error {
 
 export const noSetEnvMode = (): VironError => {
   return new VironError(
-    `The environment variable is not set. key=MODE, value=${modeMongo} or ${modeMysql}`
+    `The environment variable is not set. key=MODE, value=${MODE_MONGO} or ${MODE_MYSQL}`
   );
 };
 
