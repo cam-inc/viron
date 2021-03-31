@@ -58,15 +58,17 @@ export async function register(app: Express): Promise<void> {
   apis.forEach((api) => {
     apiDefinition = merge(apiDefinition, api.definition);
     // add handler
-    app.use((req, res, next) =>
-      api.handleRequest(
-        req as OpenapiRequest,
-        req,
-        res,
-        next,
-        apiDefinition as Document
-      )
-    );
+    app.use((req, res, next) => {
+      api
+        .handleRequest(
+          req as OpenapiRequest,
+          req,
+          res,
+          next,
+          apiDefinition as Document
+        )
+        .catch(next);
+    });
     // logging
     api.router.getOperations().forEach((operation: Operation) => {
       logger.debug(

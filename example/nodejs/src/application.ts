@@ -10,6 +10,7 @@ export const createApplication = async (): Promise<Express> => {
 
   // Express configuration
   app.set('port', process.env.PORT || 3000);
+
   app.use(compression());
   app.use(json());
   app.use(urlencoded({ extended: true }));
