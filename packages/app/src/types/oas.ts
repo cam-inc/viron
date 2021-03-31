@@ -130,6 +130,14 @@ export type Request = {
   method: Method;
   operation: Operation;
 };
+// This is not a part of OAS.
+export type RequestPayloadParameter = Parameter & {
+  value:
+    | number
+    | string
+    | (number | string)[]
+    | { [key in string]: string | number };
+};
 
 // [extendable] Describes a single API operation on a path.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object
@@ -258,17 +266,11 @@ export type Schema = {
   /**
    * The following properties are taken from the JSON Schema definition but their definitions were adjusted to the OpenAPI Specification.
    */
-  // TODO: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#data-types に `null is not supported as a type`って書いてあるから以下unionから外すべきかも。
+  // According to the spec, type of integer is supported and type of null is not supported.
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#data-types
   // Multiple types via an array are not supported.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.21
-  type?:
-    | 'string'
-    | 'number'
-    | 'integer'
-    | 'object'
-    | 'array'
-    | 'boolean'
-    | 'null';
+  type: 'string' | 'number' | 'integer' | 'object' | 'array' | 'boolean';
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.22
   allOf?: Schema[] | Reference[];
@@ -405,18 +407,27 @@ export type Parameter = {
   style?: Style;
   explode?: boolean;
   allowReserved?: boolean;
-  // The schema defining the type used for the parameter.
-  schema?: Schema | Reference;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   examples?: {
     [key: string]: Example | Reference;
   };
-  content?: {
-    // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
-    [key: string]: MediaType;
-  };
-};
+} & (
+  | // A parameter MUST contain either a schema property, or a content property, but not both.
+  {
+      // The schema defining the type used for the parameter.
+      schema: Schema | Reference;
+      content?: never;
+    }
+  | {
+      schema?: never;
+      content: {
+        // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
+        [key: string]: MediaType;
+      };
+    }
+);
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values
 export type Style =
