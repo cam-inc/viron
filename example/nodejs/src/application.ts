@@ -3,6 +3,7 @@ import errorHandler from 'errorhandler';
 import compression from 'compression';
 import { json, urlencoded } from 'body-parser';
 import { register } from './routes';
+import { middlewareI18n } from './middlewares/i18n';
 
 export const createApplication = async (): Promise<Express> => {
   // Create Express server
@@ -13,6 +14,7 @@ export const createApplication = async (): Promise<Express> => {
   app.use(compression());
   app.use(json());
   app.use(urlencoded({ extended: true }));
+  app.use(middlewareI18n());
 
   // Primary app routes.
   await register(app);
