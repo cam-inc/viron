@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Sequelize } from 'Sequelize';
+import { Sequelize } from 'sequelize';
 import { auditLog } from '../domains';
 import { STORE_TYPE, StoreType } from '../constants';
 import { repositoryUninitialized } from '../errors';

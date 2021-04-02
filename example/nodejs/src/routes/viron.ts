@@ -18,21 +18,29 @@ const {
  */
 export const get = async (
   _context: RequestContext,
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<void> => {
   const api = genComponentApi(API_METHOD.GET, '/users');
   const query = [genComponentQuery('userId', QUERY_TYPE.STRING)];
   const components = [
-    genTableComponent(api, 'ユーザー情報', 'userId', true, query, ['userId']),
+    genTableComponent(api, req.i18n.t('userInfo'), 'userId', true, query, [
+      'userId',
+    ]),
   ];
   const pages = [
-    genPage('user', 'ユーザー', 'ユーザー情報', SECTION.MANAGE, components),
+    genPage(
+      'user',
+      req.i18n.t('user'),
+      req.i18n.t('userInfo'),
+      SECTION.MANAGE,
+      components
+    ),
   ];
   const viron = genViron(
     COLOR.BLACK,
     THEME.STANDARD,
-    'Viron Example for Node.js/TypeScript',
+    req.i18n.t('title'),
     pages,
     'https://example.com/thumbnail.png',
     ['example']
