@@ -6,9 +6,14 @@ import {
   OperationId,
   Request,
   RequestPayloadParameter,
+  RequestPayloadRequestBody,
 } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
-import { getRequestObject, getURLToTargetHost } from '$utils/oas';
+import {
+  getRequestObject,
+  getURLToTargetHost,
+  pickContentType,
+} from '$utils/oas';
 import { serialize } from '$utils/style';
 import { parse } from '$utils/uriTemplate';
 
@@ -21,7 +26,10 @@ export const useFetch = function <R>(
   error: Error | null;
   response: Response | null;
   responseJson: R | null;
-  fetch: (parameters: RequestPayloadParameter[]) => Promise<void>;
+  fetch: (
+    parameters?: RequestPayloadParameter[],
+    requestBody?: RequestPayloadRequestBody
+  ) => Promise<void>;
   requestObject: Request | null;
 } {
   const requestObject = useRequestObject(document, { operationId });
@@ -33,7 +41,10 @@ export const useFetch = function <R>(
   const [responseJson, setResponseJson] = useState<R | null>(null);
 
   const fetch = useCallback(
-    async function (parameters: RequestPayloadParameter[] = []) {
+    async function (
+      parameters: RequestPayloadParameter[] = [],
+      requestBody: RequestPayloadRequestBody | undefined
+    ) {
       if (!requestObject) {
         return;
       }
@@ -86,6 +97,7 @@ export const useFetch = function <R>(
             explode
           );
           // TODO: in='cookie'が複数ある場合への対応。
+          // TODO: そもそもfetchでCookieリクエストヘッダーを指定できない説。
         });
       parameters
         .filter((parameter) => parameter.in === 'query')
@@ -125,18 +137,26 @@ export const useFetch = function <R>(
             explode
           );
         });
+      const requestInfo: RequestInfo = `${getURLToTargetHost(
+        endpoint,
+        document
+      )}${parse(requestObject.path, pathParams)}?${_.map(
+        queryParams,
+        (value) => value
+      ).join('&')}`;
+      const requestInit: RequestInit = {
+        method: requestObject.method,
+        mode: 'cors',
+        headers,
+      };
+      // TODO: check the method name
+      if (!!requestBody) {
+        const contentType = pickContentType(requestBody.content);
+        headers['Content-Type'] = contentType;
+        requestInit.body = convert(requestBody.value, contentType);
+      }
       const [response, responseError] = await promiseErrorHandler<Response>(
-        window.fetch(
-          `${getURLToTargetHost(endpoint, document)}/${parse(
-            requestObject.path,
-            pathParams
-          )}?${new URLSearchParams(queryParams)}`,
-          {
-            method: requestObject.method,
-            mode: 'cors',
-            headers,
-          }
-        )
+        window.fetch(requestInfo, requestInit)
       );
 
       if (!!responseError) {
@@ -178,4 +198,19 @@ export const useRequestObject = function (
     return null;
   }
   return requestObject;
+};
+
+const convert = function (
+  value: RequestPayloadRequestBody['value'],
+  contentType: string
+): string {
+  switch (contentType) {
+    case 'application/json':
+      return JSON.stringify(value);
+    case 'application/x-www-form-urlencoded':
+      // TODO
+      return JSON.stringify(value);
+    default:
+      throw new Error(`Media type not supported. ${contentType}`);
+  }
 };

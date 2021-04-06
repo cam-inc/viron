@@ -8,6 +8,7 @@ import {
   Document,
   Info,
   RequestPayloadParameter,
+  RequestPayloadRequestBody,
 } from '$types/oas';
 import _ContentNumber from './_number/index';
 
@@ -59,9 +60,12 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
   };
 
   const handleRequestSubmit = useCallback(
-    function (parameters: RequestPayloadParameter[]) {
+    function (
+      parameters?: RequestPayloadParameter[],
+      requestBody?: RequestPayloadRequestBody
+    ) {
       setIsDrawerOpened(false);
-      fetch(parameters);
+      fetch(parameters, requestBody);
     },
     [fetch]
   );

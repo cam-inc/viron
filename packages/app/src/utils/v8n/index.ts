@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {
   array as yupArray,
   boolean as yupBoolean,
@@ -6,7 +7,8 @@ import {
   object as yupObject,
   string as yupString,
 } from 'yup';
-import { Parameter, Schema } from '$types/oas';
+import { Parameter, RequestBody, Schema } from '$types/oas';
+import { pickContentType } from '$utils/oas';
 
 export const endpointId = yupString().min(1).max(64);
 export const email = yupString().email();
@@ -16,7 +18,7 @@ export const url = yupString();
 
 export const oasSchema = function (
   schema: Schema,
-  { required = false }: { required?: boolean }
+  { required = false }: { required?: boolean } = {}
 ): BaseSchema {
   let s: BaseSchema;
   switch (schema.type) {
@@ -55,5 +57,13 @@ export const oasParameter = function (parameter: Parameter): BaseSchema {
   }
   return oasSchema(parameter.schema as Schema, {
     required: parameter.required,
+  });
+};
+
+export const oasRequestBody = function (requestBody: RequestBody): BaseSchema {
+  const contentType = pickContentType(requestBody.content);
+  const mediaType = requestBody.content[contentType];
+  return oasSchema(mediaType.schema as Schema, {
+    required: requestBody.required,
   });
 };

@@ -138,6 +138,10 @@ export type RequestPayloadParameter = Parameter & {
     | (number | string)[]
     | { [key in string]: string | number };
 };
+// This is not a part of OAS.
+export type RequestPayloadRequestBody = RequestBody & {
+  value: any;
+};
 
 // [extendable] Describes a single API operation on a path.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object

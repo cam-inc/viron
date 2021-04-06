@@ -1,6 +1,14 @@
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
-import { Document, Method, OperationId, Request, Server } from '$types/oas';
+import {
+  Document,
+  Method,
+  OperationId,
+  Request,
+  RequestBody,
+  Schema,
+  Server,
+} from '$types/oas';
 import { isRelativeURL } from '$utils/index';
 
 export const getRequestObject = function (
@@ -75,4 +83,11 @@ export const getURLToTargetHost = function (
     return `${new window.URL(endpoint.url).origin}${url}`;
   }
   return url;
+};
+
+export const pickContentType = function (
+  content: RequestBody['content']
+): string {
+  // TODO: pick the most specific key.
+  return _.keys(content)[0];
 };

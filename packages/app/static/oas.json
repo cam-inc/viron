@@ -93,8 +93,17 @@
             }
           }
         ],
-        "requestBody": [
-        ]
+        "requestBody": {
+          "description": "description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        }
       }
     }
   }

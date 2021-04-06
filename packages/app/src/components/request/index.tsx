@@ -8,13 +8,18 @@ import {
   Parameter,
   Request,
   RequestPayloadParameter,
+  RequestPayloadRequestBody,
   Schema as SchemaType,
 } from '$types/oas';
-import { oasParameter } from '$utils/v8n';
+import { pickContentType } from '$utils/oas';
+import { oasParameter, oasRequestBody } from '$utils/v8n';
 
 type Props = {
   request: Request;
-  onSubmit: (parameters: RequestPayloadParameter[]) => void;
+  onSubmit: (
+    parameters?: RequestPayloadParameter[],
+    requestBody?: RequestPayloadRequestBody
+  ) => void;
 };
 const _Request: React.FC<Props> = ({ request, onSubmit }) => {
   const schema = useMemo(
@@ -29,6 +34,11 @@ const _Request: React.FC<Props> = ({ request, onSubmit }) => {
         });
         schema = schema.shape({
           parameters: schemaParameters,
+        });
+      }
+      if (!!request.operation.requestBody) {
+        schema = schema.shape({
+          requestBody: oasRequestBody(request.operation.requestBody),
         });
       }
       return schema;
@@ -51,7 +61,15 @@ const _Request: React.FC<Props> = ({ request, onSubmit }) => {
           }
           parameters.push({ ...parameter, value });
         });
-        onSubmit(parameters);
+        if (!request.operation.requestBody) {
+          onSubmit(parameters);
+        } else {
+          const requestBody: RequestPayloadRequestBody = {
+            ...request.operation.requestBody,
+            value: data.requestBody,
+          };
+          onSubmit(parameters, requestBody);
+        }
       });
     },
     [handleSubmit, onSubmit, request.operation.parameters]
@@ -84,6 +102,24 @@ const _Request: React.FC<Props> = ({ request, onSubmit }) => {
                 )
               )}
             </ul>
+          </div>
+        )}
+        {!!request.operation.requestBody && (
+          <div>
+            <p>Request Body</p>
+            <div>
+              <p>requestBody</p>
+              <Schema
+                name="requestBody"
+                schema={
+                  request.operation.requestBody.content[
+                    pickContentType(request.operation.requestBody.content)
+                  ].schema as SchemaType
+                }
+                error={formState.errors.requestBody}
+                register={register}
+              />
+            </div>
           </div>
         )}
         <input type="submit" />
