@@ -10,7 +10,7 @@ tags:
 paths:
   /viron:
     get:
-      operationId: get
+      operationId: getViron
       tags:
         - viron
       summary: get viron settings

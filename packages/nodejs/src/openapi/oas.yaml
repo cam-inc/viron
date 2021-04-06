@@ -1,20 +1,20 @@
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/example-nodejs swagger.json'
-  description: swagger.json api specifications
+  title: '@viron/example-nodejs oas'
+  description: oas api specifications
 
 tags:
-  - name: swagger
+  - name: oas
 
 paths:
-  /swagger.json:
+  /oas:
     get:
-      operationId: get
+      operationId: getOas
       tags:
-        - swagger
-      summary: get swagger.json
-      description: swagger.jsonの取得
+        - oas
+      summary: get oas
+      description: OpenAPI Specification の取得
       responses:
         '200':
           description: OK

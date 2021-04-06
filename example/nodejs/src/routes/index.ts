@@ -20,7 +20,7 @@ import * as routesAuditLogs from './auditlogs';
 import * as routesAuthtypes from './authtypes';
 import * as routesPing from './ping';
 import * as routesRoot from './root';
-import * as routesSwagger from './swagger';
+import * as routesOas from './oas';
 import * as routesViron from './viron';
 
 interface Route {
@@ -31,7 +31,7 @@ interface Route {
 const routes: Route[] = [
   { openapiPath: openapiPath('ping'), handlers: routesPing },
   { openapiPath: libOpenapiPath('auditlogs'), handlers: routesAuditLogs },
-  { openapiPath: libOpenapiPath('swagger'), handlers: routesSwagger },
+  { openapiPath: libOpenapiPath('oas'), handlers: routesOas },
   { openapiPath: libOpenapiPath('viron'), handlers: routesViron },
   { openapiPath: libOpenapiPath('authtypes'), handlers: routesAuthtypes },
   // マージ順の関係で`root`は必ず最後に書く

@@ -9,7 +9,7 @@ const { genAuthType } = domains.authType;
  * 認証タイプ一覧
  * @route GET /viron_authtype
  */
-export const list = async (
+export const listAuthtypes = async (
   _context: RequestContext,
   _req: Request,
   res: Response

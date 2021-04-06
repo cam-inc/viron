@@ -16,7 +16,7 @@ const {
  * viron全体設定を取得
  * @route GET /viron
  */
-export const get = async (
+export const getViron = async (
   _context: RequestContext,
   req: Request,
   res: Response

@@ -9,7 +9,7 @@ const repositoryContainer = repositories.container;
  * Ping
  * @route GET /ping
  */
-export const get = async (
+export const getPing = async (
   _context: RequestContext,
   _req: Request,
   res: Response
