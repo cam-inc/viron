@@ -1,14 +1,5 @@
 import _ from 'lodash';
-import {
-  array as yupArray,
-  boolean as yupBoolean,
-  BaseSchema,
-  number as yupNumber,
-  object as yupObject,
-  string as yupString,
-} from 'yup';
-import { Parameter, RequestBody, Schema } from '$types/oas';
-import { pickContentType } from '$utils/oas';
+import { string as yupString } from 'yup';
 
 export const endpointId = yupString().min(1).max(64);
 export const email = yupString().email();
@@ -16,6 +7,7 @@ export const email = yupString().email();
 //export const url = yup.string().url();
 export const url = yupString();
 
+/*
 export const oasSchema = function (
   schema: Schema,
   { required = false }: { required?: boolean } = {}
@@ -33,6 +25,13 @@ export const oasSchema = function (
       break;
     case 'object':
       s = yupObject();
+      _.forEach(schema.properties, function (_schema, _name) {
+        s = s.shape({
+          [_name]: oasSchema(_schema as Schema, {
+            required: (schema.required || []).includes(_name),
+          }),
+        });
+      });
       break;
     case 'array':
       s = yupArray();
@@ -48,7 +47,8 @@ export const oasSchema = function (
   }
   return s;
 };
-
+*/
+/*
 export const oasParameter = function (parameter: Parameter): BaseSchema {
   if (!!parameter.content) {
     throw new Error(
@@ -59,7 +59,8 @@ export const oasParameter = function (parameter: Parameter): BaseSchema {
     required: parameter.required,
   });
 };
-
+*/
+/*
 export const oasRequestBody = function (requestBody: RequestBody): BaseSchema {
   const contentType = pickContentType(requestBody.content);
   const mediaType = requestBody.content[contentType];
@@ -67,3 +68,4 @@ export const oasRequestBody = function (requestBody: RequestBody): BaseSchema {
     required: requestBody.required,
   });
 };
+*/

@@ -140,6 +140,7 @@ export type RequestPayloadParameter = Parameter & {
 };
 // This is not a part of OAS.
 export type RequestPayloadRequestBody = RequestBody & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
 };
 

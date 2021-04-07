@@ -1,8 +1,6 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import _ from 'lodash';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { object as yupObject } from 'yup';
 import Schema from '$components/schema';
 import {
   Parameter,
@@ -12,7 +10,6 @@ import {
   Schema as SchemaType,
 } from '$types/oas';
 import { pickContentType } from '$utils/oas';
-import { oasParameter, oasRequestBody } from '$utils/v8n';
 
 type Props = {
   request: Request;
@@ -22,32 +19,7 @@ type Props = {
   ) => void;
 };
 const _Request: React.FC<Props> = ({ request, onSubmit }) => {
-  const schema = useMemo(
-    function () {
-      let schema = yupObject();
-      if (!!request.operation.parameters) {
-        let schemaParameters = yupObject();
-        (request.operation.parameters as Parameter[]).forEach((parameter) => {
-          schemaParameters = schemaParameters.shape({
-            [parameter.name]: oasParameter(parameter),
-          });
-        });
-        schema = schema.shape({
-          parameters: schemaParameters,
-        });
-      }
-      if (!!request.operation.requestBody) {
-        schema = schema.shape({
-          requestBody: oasRequestBody(request.operation.requestBody),
-        });
-      }
-      return schema;
-    },
-    [request]
-  );
-  const { register, formState, handleSubmit } = useForm({
-    resolver: yupResolver(schema),
-  });
+  const { register, unregister, control, formState, handleSubmit } = useForm();
   const _handleSubmit = useMemo(
     function () {
       return handleSubmit(function (data) {
@@ -72,11 +44,11 @@ const _Request: React.FC<Props> = ({ request, onSubmit }) => {
         }
       });
     },
-    [handleSubmit, onSubmit, request.operation.parameters]
+    [handleSubmit, onSubmit, request.operation]
   );
 
   return (
-    <div>
+    <div className="text-xxs">
       <form onSubmit={_handleSubmit}>
         <p>
           <span className="mr-4">{request.method.toUpperCase()}</span>
@@ -94,8 +66,11 @@ const _Request: React.FC<Props> = ({ request, onSubmit }) => {
                       <Schema
                         name={`parameters.${parameter.name}`}
                         schema={parameter.schema as SchemaType}
-                        error={formState.errors['parameters']?.[parameter.name]}
+                        formState={formState}
                         register={register}
+                        unregister={unregister}
+                        control={control}
+                        required={parameter.required}
                       />
                     </div>
                   </li>
@@ -116,8 +91,11 @@ const _Request: React.FC<Props> = ({ request, onSubmit }) => {
                     pickContentType(request.operation.requestBody.content)
                   ].schema as SchemaType
                 }
-                error={formState.errors.requestBody}
+                formState={formState}
                 register={register}
+                unregister={unregister}
+                control={control}
+                required={request.operation.requestBody.required}
               />
             </div>
           </div>

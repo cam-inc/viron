@@ -25,11 +25,15 @@ const Add: React.FC<Props> = () => {
     });
   }, []);
 
-  const { register, handleSubmit, errors, setError, reset } = useForm<FormData>(
-    {
-      resolver: yupResolver(schema),
-    }
-  );
+  const {
+    register,
+    handleSubmit,
+    formState,
+    setError,
+    reset,
+  } = useForm<FormData>({
+    resolver: yupResolver(schema),
+  });
 
   const [endpointList, setEndpointList] = useRecoilState(endpointListState);
   const addEndpoint = useCallback(
@@ -129,32 +133,30 @@ const Add: React.FC<Props> = () => {
       <form onSubmit={handleSubmit(addEndpoint)}>
         <Textinput
           label="Endpoint Id"
-          error={errors.endpointId}
+          error={formState.errors.endpointId}
           render={function (
             className
           ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
             return (
               <input
                 className={className}
-                name="endpointId"
                 defaultValue=""
-                ref={register}
+                {...register('endpointId')}
               />
             );
           }}
         />
         <Textinput
           label="URL"
-          error={errors.url}
+          error={formState.errors.url}
           render={function (
             className
           ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
             return (
               <input
                 className={className}
-                name="url"
                 defaultValue=""
-                ref={register}
+                {...register('url')}
               />
             );
           }}

@@ -98,7 +98,44 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "string"
+                "type": "object",
+                "properties": {
+                  "propA": {
+                    "type": "string"
+                  },
+                  "propB": {
+                    "type": "string"
+                  },
+                  "propC": {
+                    "type": "object",
+                    "properties": {
+                      "propC-a": {
+                        "type": "string"
+                      },
+                      "propC-b": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["propC-a"]
+                  },
+                  "propD": {
+                    "type": "boolean"
+                  },
+                  "propE": {
+                    "type": "number"
+                  },
+                  "propF": {
+                    "type": "integer"
+                  },
+                  "propG": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": ""
+                  }
+                },
+                "required": ["propA"]
               }
             }
           },

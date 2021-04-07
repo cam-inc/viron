@@ -210,6 +210,16 @@ const convert = function (
     case 'application/x-www-form-urlencoded':
       // TODO
       return JSON.stringify(value);
+    case 'application/octet-stream':
+      // TODO
+      return JSON.stringify(value);
+    case 'multipart/form-data':
+      // TODO
+      return JSON.stringify(value);
+    case 'image/jpeg':
+    case 'image/png':
+      // TODO
+      return JSON.stringify(value);
     default:
       throw new Error(`Media type not supported. ${contentType}`);
   }

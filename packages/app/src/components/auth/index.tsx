@@ -79,7 +79,7 @@ const AuthEmail: React.FC<PropsEmail> = ({ authType, onSignin }) => {
     });
   }, []);
 
-  const { register, handleSubmit, errors } = useForm<AuthTypeEmailFormData>({
+  const { register, handleSubmit, formState } = useForm<AuthTypeEmailFormData>({
     resolver: yupResolver(schema),
   });
   const signin = useCallback(
@@ -92,32 +92,30 @@ const AuthEmail: React.FC<PropsEmail> = ({ authType, onSignin }) => {
     <form onSubmit={handleSubmit(signin)}>
       <Textinput
         label="email"
-        error={errors.email}
+        error={formState.errors.email}
         render={function (
           className
         ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
           return (
             <input
               className={className}
-              name="email"
               defaultValue=""
-              ref={register}
+              {...register('email')}
             />
           );
         }}
       />
       <Textinput
         label="password"
-        error={errors.password}
+        error={formState.errors.password}
         render={function (
           className
         ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
           return (
             <input
               className={className}
-              name="password"
               defaultValue=""
-              ref={register}
+              {...register('password')}
             />
           );
         }}

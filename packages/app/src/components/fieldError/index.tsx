@@ -1,10 +1,16 @@
+import _ from 'lodash';
 import React from 'react';
-import { FieldError as FieldErrorType } from 'react-hook-form';
+import { UseFormReturn } from 'react-hook-form';
 
 type Props = {
-  error: FieldErrorType;
+  name: string;
+  errors: UseFormReturn['formState']['errors'];
 };
-const FieldError: React.FC<Props> = ({ error }) => {
-  return <p>{error.message}</p>;
+const FieldError: React.FC<Props> = ({ name, errors }) => {
+  const error = _.get(errors, name);
+  if (!error) {
+    return null;
+  }
+  return <p className="font-bold text-red-500">{error.message}</p>;
 };
 export default FieldError;

@@ -6,7 +6,6 @@ import {
   OperationId,
   Request,
   RequestBody,
-  Schema,
   Server,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
