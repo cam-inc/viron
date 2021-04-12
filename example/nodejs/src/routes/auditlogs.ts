@@ -6,7 +6,7 @@ import { Context as RequestContext } from 'openapi-backend';
  * 監査ログ一覧
  * @route GET /auditlogs
  */
-export const list = async (
+export const listAuditlogs = async (
   _context: RequestContext,
   _req: Request,
   res: Response

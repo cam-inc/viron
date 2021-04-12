@@ -10,7 +10,7 @@ tags:
 paths:
   /viron_authtype:
     get:
-      operationId: list
+      operationId: listAuthtypes
       tags:
         - authType
       summary: list auth types

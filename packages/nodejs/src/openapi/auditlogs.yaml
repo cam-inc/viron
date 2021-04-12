@@ -10,7 +10,7 @@ tags:
 paths:
   /auditlogs:
     get:
-      operationId: list
+      operationId: listAuditlogs
       tags:
         - auditLog
       summary: list audit logs

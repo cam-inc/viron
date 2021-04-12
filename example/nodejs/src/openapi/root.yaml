@@ -13,11 +13,11 @@ tags:
 paths:
   /:
     get:
-      operationId: get
+      operationId: getRoot
       tags:
         - root
-      summary: redirect to /swagger.json
-      description: /swagger.jsonへリダイレクト
+      summary: redirect to /oas
+      description: /oas へリダイレクト
       responses:
         301:
           description: OK

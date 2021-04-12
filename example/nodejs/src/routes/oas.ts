@@ -2,10 +2,10 @@ import { Response, Request, NextFunction } from 'express';
 import { Context as RequestContext, Document } from 'openapi-backend';
 
 /**
- * swagger.json
- * @route GET /swagger.json
+ * oas取得
+ * @route GET /oas
  */
-export const get = async (
+export const getOas = async (
   _context: RequestContext,
   _req: Request,
   res: Response,
