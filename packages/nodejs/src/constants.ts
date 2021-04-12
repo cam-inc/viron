@@ -70,3 +70,8 @@ export const STORE_TYPE = {
   MONGO: 'mongo',
 } as const;
 export type StoreType = typeof STORE_TYPE[keyof typeof STORE_TYPE];
+
+export const HTTP_HEADER = {
+  X_VIRON_AUTHTYPES_PATH: 'X-Viron-Authtypes-Path',
+} as const;
+export type HttpHeader = typeof HTTP_HEADER[keyof typeof HTTP_HEADER];
