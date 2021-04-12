@@ -1,10 +1,8 @@
-import { constants } from '@viron/lib';
+import { HTTP_HEADER } from '@viron/lib';
 import { NextFunction, Request, Response } from 'express';
 import { Context as RequestContext } from 'openapi-backend';
 import { VIRON_AUTHTYPES_PATH } from '../constant';
 import { unauthorized } from '../errors';
-
-const { HTTP_HEADER } = constants;
 
 // securityHandlerでエラーになったリクエストをハンドリング
 export const unauthorizedHandler = async (

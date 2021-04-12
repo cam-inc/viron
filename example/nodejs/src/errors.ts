@@ -1,4 +1,4 @@
-import { MODE_MYSQL, MODE_MONGO } from './constant';
+import { MODE_MYSQL, MODE_MONGO } from './constants';
 
 class VironError extends Error {
   statusCode: number;

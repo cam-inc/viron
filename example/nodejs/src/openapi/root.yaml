@@ -1,11 +1,8 @@
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/example-nodejs'
-  description: api specifications
-
-servers:
-  - url: /
+  title: '@viron/example-nodejs users'
+  description: users api specifications
 
 tags:
   - name: root

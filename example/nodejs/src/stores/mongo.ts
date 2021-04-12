@@ -1,6 +1,6 @@
-import { Connection } from 'mongoose';
+import mongoose, { Connection } from 'mongoose';
 import { MongoConfigure } from '../configure';
-import { StoreType, MODE_MONGO } from '../constant';
+import { StoreType, MODE_MONGO } from '../constants';
 import { createConnection } from './connection/mongo';
 import {
   definitions,
@@ -19,6 +19,7 @@ export interface MongoStore {
 export const preflight = async (
   config: MongoConfigure
 ): Promise<MongoStore> => {
+  mongoose.set('debug', true);
   const c = await createConnection(config.openUri, config.connectOptions);
 
   return {

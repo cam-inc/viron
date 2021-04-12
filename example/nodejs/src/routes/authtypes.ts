@@ -1,15 +1,14 @@
 import { Response, Request } from 'express';
 import { Context as RequestContext } from 'openapi-backend';
-import { constants, domains } from '@viron/lib';
+import { AUTH_METHOD, AUTH_TYPE, domainsAuthType } from '@viron/lib';
 
-const { AUTH_METHOD, AUTH_TYPE } = constants;
-const { genAuthType } = domains.authType;
+const { genAuthType } = domainsAuthType;
 
 /**
  * 認証タイプ一覧
  * @route GET /viron_authtype
  */
-export const listAuthtypes = async (
+export const listVironAuthtypes = async (
   _context: RequestContext,
   _req: Request,
   res: Response

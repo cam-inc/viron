@@ -1,36 +1,73 @@
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/example-nodejs auditlogs'
+  title: '@viron/lib auditlogs'
   description: auditlogs api specifications
+  x-viron-pages:
+    - id: vironAuditLog
+      group: 管理画面/管理
+      title: Viron 監査ログ
+      description: このVironサーバの監査ログを閲覧できます
+      contents:
+        - getOperationId: listVironAuditlogs
+          style: table
+          pagination: true
+          query:
+            - userId
+            - requestUri
+          sort:
+            - requestMethod
+            - requestUri
+            - sourceIp
+            - userId
+            - statusCode
+            - createdAt
 
 tags:
-  - name: auditLog
+  - name: vironAuditLog
 
 paths:
   /auditlogs:
     get:
-      operationId: listAuditlogs
+      operationId: listVironAuditlogs
       tags:
-        - auditLog
+        - vironAuditLog
       summary: list audit logs
       description: 監査ログ一覧
+      parameters:
+        - $ref: '#/components/parameters/VironUserIdQueryParam'
+        - $ref: '#/components/parameters/VironRequestUriQueryParam'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuditLogList'
+                $ref: '#/components/schemas/VironAuditLogList'
 
 components:
+  parameters:
+    VironUserIdQueryParam:
+      name: userId
+      in: query
+      schema:
+        type: string
+      required: false
+
+    VironRequestUriQueryParam:
+      name: requestUri
+      in: query
+      schema:
+        type: string
+      required: false
+
   schemas:
-    AuditLogList:
+    VironAuditLogList:
       type: array
       items:
-        $ref: '#/components/schemas/AuditLog'
+        $ref: '#/components/schemas/VironAuditLog'
 
-    AuditLog:
+    VironAuditLog:
       type: object
       properties:
         requestMethod:
@@ -43,7 +80,7 @@ components:
           description: ソースIP
           type: string
         userId:
-          description: ユーザー
+          description: ユーザーID
           type: string
         requestBody:
           description: リクエストボディ

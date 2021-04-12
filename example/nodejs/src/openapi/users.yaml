@@ -1,0 +1,147 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs users'
+  description: users api specifications
+  x-viron-pages:
+    - id: user
+      group: 管理画面/ユーザー
+      title: ユーザー情報
+      description: ユーザー情報を閲覧/管理します
+      contents:
+        - getOperationId: listUsers
+          style: table
+          pagination: true
+          query:
+            - id
+
+tags:
+  - name: user
+
+paths:
+  /users:
+    get:
+      operationId: listUsers
+      tags:
+        - user
+      summary: list users
+      description: ユーザー一覧
+      parameters:
+        - $ref: './components.yaml#/components/parameters/PagerLimitQueryParam'
+        - $ref: './components.yaml#/components/parameters/PagerOffsetQueryParam'
+        - $ref: './components.yaml#/components/parameters/IdQueryParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+
+    post:
+      operationId: createUser
+      tags:
+        - user
+      summary: create user
+      description: ユーザー作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreatePayload'
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    put:
+      operationId: updateUser
+      tags:
+        - user
+      summary: update user
+      description: ユーザー更新
+      parameters:
+        - $ref: './components.yaml#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdatePayload'
+      responses:
+        204:
+          description: OK
+
+    delete:
+      operationId: removeUser
+      tags:
+        - user
+      summary: remove user
+      description: ユーザー削除
+      parameters:
+        - $ref: './components.yaml#/components/parameters/IdPathParam'
+      responses:
+        204:
+          description: OK
+
+components:
+  parameters: {}
+
+  schemas:
+    UserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          description: ID
+          type: string
+        name:
+          description: 名前
+          type: string
+        nickName:
+          description: ニックネーム
+          type: string
+        createdAt:
+          description: 作成日時
+          type: string
+          format: date-time
+        updatedAt:
+          description: 更新日時
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+
+    UserCreatePayload:
+      type: object
+      properties:
+        name:
+          description: 名前
+          type: string
+        nickName:
+          description: ニックネーム
+          type: string
+      required:
+        - name
+
+    UserUpdatePayload:
+      type: object
+      properties:
+        name:
+          description: 名前
+          type: string
+        nickName:
+          description: ニックネーム
+          type: string
+      required:
+        - name

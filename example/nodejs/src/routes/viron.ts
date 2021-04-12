@@ -1,8 +1,14 @@
-import { constants, domains } from '@viron/lib';
 import { Response, Request } from 'express';
 import { Context as RequestContext } from 'openapi-backend';
 
-const { COLOR, THEME, SECTION, API_METHOD, QUERY_TYPE } = constants;
+import {
+  COLOR,
+  THEME,
+  SECTION,
+  API_METHOD,
+  QUERY_TYPE,
+  domainsViron,
+} from '@viron/lib';
 
 const {
   genComponentApi,
@@ -10,7 +16,7 @@ const {
   genTableComponent,
   genPage,
   genViron,
-} = domains.viron;
+} = domainsViron;
 
 /**
  * viron全体設定を取得

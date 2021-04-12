@@ -1,7 +1,8 @@
+# あとで消す
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/example-nodejs viron'
+  title: '@viron/lib viron'
   description: viron api specifications
 
 tags:

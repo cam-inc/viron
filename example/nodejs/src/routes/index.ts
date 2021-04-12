@@ -21,6 +21,7 @@ import * as routesAuthtypes from './authtypes';
 import * as routesPing from './ping';
 import * as routesRoot from './root';
 import * as routesOas from './oas';
+import * as routesUsers from './users';
 import * as routesViron from './viron';
 
 interface Route {
@@ -30,6 +31,7 @@ interface Route {
 
 const routes: Route[] = [
   { openapiPath: openapiPath('ping'), handlers: routesPing },
+  { openapiPath: openapiPath('users'), handlers: routesUsers },
   { openapiPath: libOpenapiPath('auditlogs'), handlers: routesAuditLogs },
   { openapiPath: libOpenapiPath('oas'), handlers: routesOas },
   { openapiPath: libOpenapiPath('viron'), handlers: routesViron },
