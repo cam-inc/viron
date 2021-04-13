@@ -1,21 +1,30 @@
 import React, { useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Schema } from '$types/oas';
-import SchemaOfTypeArray from './array';
-import SchemaOfTypeBoolean from './boolean';
-import SchemaOfTypeInteger from './integer';
-import SchemaOfTypeNumber from './number';
-import SchemaOfTypeString from './string';
-import SchemaOfTypeObject from './object';
+import { useActive, UseEliminateReturn } from './hooks/index';
+import Container from './parts/container';
+import SchemaOfTypeArray from './types/array';
+import SchemaOfTypeBoolean from './types/boolean';
+import SchemaOfTypeInteger from './types/integer';
+import SchemaOfTypeNumber from './types/number';
+import SchemaOfTypeString from './types/string';
+import SchemaOfTypeObject from './types/object';
 
-type Props = {
+export type Props = {
   name: string;
   schema: Schema;
   register: UseFormReturn['register'];
   unregister: UseFormReturn['unregister'];
   control: UseFormReturn['control'];
+  watch: UseFormReturn['watch'];
   formState: UseFormReturn['formState'];
-  required?: boolean;
+  getValues: UseFormReturn['getValues'];
+  setValue: UseFormReturn['setValue'];
+  setError: UseFormReturn['setError'];
+  clearErrors: UseFormReturn['clearErrors'];
+  required: boolean;
+  isDeepActive: boolean;
+  activeRef: UseEliminateReturn['ref'];
 };
 const _Schema: React.FC<Props> = ({
   name,
@@ -23,95 +32,80 @@ const _Schema: React.FC<Props> = ({
   register,
   unregister,
   control,
+  watch,
   formState,
-  required = false,
+  getValues,
+  setValue,
+  setError,
+  clearErrors,
+  required,
+  isDeepActive,
+  activeRef,
 }) => {
-  const elm = useMemo<JSX.Element | null>(
+  const Component = useMemo<React.FC<Props>>(
     function () {
       switch (schema.type) {
         case 'string':
-          return (
-            <SchemaOfTypeString
-              name={name}
-              schema={schema}
-              register={register}
-              unregister={unregister}
-              control={control}
-              formState={formState}
-              required={required}
-            />
-          );
+          return SchemaOfTypeString;
         case 'number':
-          return (
-            <SchemaOfTypeNumber
-              name={name}
-              schema={schema}
-              register={register}
-              unregister={unregister}
-              control={control}
-              formState={formState}
-              required={required}
-            />
-          );
+          return SchemaOfTypeNumber;
         case 'integer':
-          return (
-            <SchemaOfTypeInteger
-              name={name}
-              schema={schema}
-              register={register}
-              unregister={unregister}
-              control={control}
-              formState={formState}
-              required={required}
-            />
-          );
+          return SchemaOfTypeInteger;
         case 'object':
-          return (
-            <SchemaOfTypeObject
-              name={name}
-              schema={schema}
-              register={register}
-              unregister={unregister}
-              control={control}
-              formState={formState}
-              required={required}
-            />
-          );
+          return SchemaOfTypeObject;
         case 'array':
-          return (
-            <SchemaOfTypeArray
-              name={name}
-              schema={schema}
-              register={register}
-              unregister={unregister}
-              control={control}
-              formState={formState}
-              required={required}
-            />
-          );
+          return SchemaOfTypeArray;
         case 'boolean':
-          return (
-            <SchemaOfTypeBoolean
-              name={name}
-              schema={schema}
-              register={register}
-              unregister={unregister}
-              control={control}
-              formState={formState}
-              required={required}
-            />
-          );
+          return SchemaOfTypeBoolean;
         default:
-          return null;
+          throw new Error(`Type of "${schema.type}" is not supported.`);
       }
     },
-    [schema, name, register, unregister, control, formState, required]
+    [schema]
   );
 
+  const {
+    isActive,
+    isActiveSwitchable,
+    activate,
+    inactivate,
+    switchActive,
+  } = useActive({
+    name,
+    schema,
+    required,
+    map: activeRef,
+  });
+
   return (
-    <div>
-      <div>{elm}</div>
-    </div>
+    <Container
+      name={name}
+      schema={schema}
+      formState={formState}
+      isActive={isActive}
+      isActiveSwitchable={isActiveSwitchable}
+      activate={activate}
+      inactivate={inactivate}
+      switchActive={switchActive}
+      required={required}
+    >
+      <Component
+        name={name}
+        schema={schema}
+        register={register}
+        unregister={unregister}
+        control={control}
+        watch={watch}
+        formState={formState}
+        getValues={getValues}
+        setValue={setValue}
+        setError={setError}
+        clearErrors={clearErrors}
+        required={required}
+        isDeepActive={isDeepActive && isActive}
+        activeRef={activeRef}
+      />
+    </Container>
   );
 };
 export default _Schema;

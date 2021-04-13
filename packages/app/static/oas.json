@@ -132,7 +132,17 @@
                     "items": {
                       "type": "string"
                     },
-                    "default": ""
+                    "default": ["abc", "def"],
+                    "maxItems": 4,
+                    "minItems": 2
+                  },
+                  "propH": {
+                    "type": "object",
+                    "properties": {
+                      "kekeke": {
+                        "type": "string"
+                      }
+                    }
                   }
                 },
                 "required": ["propA"]

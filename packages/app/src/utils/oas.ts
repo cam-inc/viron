@@ -7,6 +7,7 @@ import {
   Request,
   RequestBody,
   Server,
+  Schema,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
 
@@ -89,4 +90,37 @@ export const pickContentType = function (
 ): string {
   // TODO: pick the most specific key.
   return _.keys(content)[0];
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getDefaultValue = function (schema: Schema): any {
+  if (!_.isUndefined(schema.default)) {
+    return schema.default;
+  }
+  // TODO: format等に合わせてより正確に。
+  switch (schema.type) {
+    case 'string':
+      return '';
+    case 'number':
+      return 0;
+    case 'integer':
+      return 0;
+    case 'boolean':
+      return false;
+    case 'object': {
+      const ret: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key in string]: any;
+      } = {};
+      _.forEach(schema.properties, function (_schema, key) {
+        _schema = _schema as Schema;
+        if ((schema.required || []).includes(key)) {
+          ret[key] = getDefaultValue(_schema);
+        }
+      });
+      return ret;
+    }
+    case 'array':
+      return [];
+  }
 };
