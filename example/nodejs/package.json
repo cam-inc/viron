@@ -101,8 +101,8 @@
   },
   "homepage": "https://github.com/cam-inc/viron#readme",
   "engines": {
-    "node": ">=15.0.0",
-    "npm": ">=7.0.0"
+    "node": ">=15.13.0",
+    "npm": ">=7.9.0"
   },
   "lint-staged": {
     "**/*.{js,ts}": [

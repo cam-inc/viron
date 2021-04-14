@@ -16,7 +16,7 @@ You don't need to write frontend code!
 
 ## 🚅 QuickStart
 
-This repository is building as a monorepo by npm workspaces and lerna.
+This repository is building as a monorepo by npm workspaces.
 
 ### Setup
 
@@ -25,47 +25,26 @@ $ git clone git@github.com:cam-inc/viron.git
 $ cd viron
 $ npm install .
 ```
-**Important: npm version >= 7.0**
+**Important: npm version >= 7.9.0
 
 ### Develop monorepo
 
-See each workspaces README.md for details.
+See each workspace's README.md for details.
 
-If you want to run workspaces-specific npm scripts
-, you need to work from repository root.
-
-There are no modules in each workspace, because as the installed modules are hoisting.
+If you want to run workspace-specific npm scripts, you can do so by executing the npm scripts with `--workspace` option from repository root.
 
 ex.)
 ```
-$ cd example/nodejs/
-$ npm run test
-
-sh: jest: command not found
+$ npm run develop --workspace=@viron/app
+$ npm run build --workspace=@viron/app --workspace=@viron/lib
 ```
 
-If the script exists in some workspaces, we recommend using `lerna run`.
-
-And these commands written in root package.json.
+Use `--workspaces` option to execute a npm script on each workspace.
 
 ex.)
 ```
-$ npm run build
-=> lerna run build
+$ npm run test --workspaces
 ```
-This means are `npm run build` in all workspaces. 
-
-If some workspace doesn't have `build` script, the package will skip the process.
-
-#### Run unique script
-
-You can use `npm run *:exec` script to run a unique script in one workspace.
-
-ex.)
-```
-$ npm run example-nodejs:exec start
-```
-This means `npm run start` on `example/nodejs`.
 
 ## Development Guide for "Viron" Contributors
 
