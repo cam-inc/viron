@@ -1,8 +1,14 @@
-import { Context as RequestContext } from 'openapi-backend';
+import {
+  AuthenticationResult,
+  AuthenticatorInfo,
+  ExegesisPluginContext,
+} from 'exegesis-express';
 
-export const jwt = async (_context: RequestContext): Promise<boolean> => {
+export const jwt = async (
+  _ctx: ExegesisPluginContext,
+  securityScheme: AuthenticatorInfo
+): Promise<AuthenticationResult> => {
   // TODO: implements
-  console.log(_context.security);
-  console.log(_context.operation);
-  return true;
+  console.log(securityScheme);
+  return { type: 'success' };
 };

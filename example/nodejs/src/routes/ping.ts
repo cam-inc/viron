@@ -1,17 +1,12 @@
-import { Response, Request } from 'express';
-import { Context as RequestContext } from 'openapi-backend';
 import { container } from '@viron/lib';
 import { getUserRepository } from '../repositories';
+import { RouteContext } from '.';
 
 /**
  * Ping
  * @route GET /ping
  */
-export const getPing = async (
-  _context: RequestContext,
-  _req: Request,
-  res: Response
-): Promise<void> => {
+export const getPing = async (context: RouteContext): Promise<void> => {
   const now = new Date();
   const name = `fkei_${now}`;
   const doc1 = await getUserRepository().createOne({
@@ -34,5 +29,5 @@ export const getPing = async (
   const fdoc2 = await container.getAuditLogRepository().findOneById(doc2.id);
   console.log(fdoc2);
 
-  res.send('pong');
+  context.res.setBody('pong');
 };

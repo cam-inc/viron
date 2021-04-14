@@ -1,16 +1,9 @@
-import { Response, Request, NextFunction } from 'express';
-import { Context as RequestContext, Document } from 'openapi-backend';
+import { RouteContext } from '.';
 
 /**
  * oas取得
  * @route GET /oas
  */
-export const getOas = async (
-  _context: RequestContext,
-  _req: Request,
-  res: Response,
-  _next: NextFunction,
-  apiDefinition: Document
-): Promise<void> => {
-  res.json(apiDefinition);
+export const getOas = async (context: RouteContext): Promise<void> => {
+  context.res.json(context.apiDefinition);
 };
