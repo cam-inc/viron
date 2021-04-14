@@ -9,7 +9,8 @@
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "serve": "docusaurus serve",
-    "clear": "docusaurus clear"
+    "clear": "docusaurus clear",
+    "test": "echo TEST"
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-alpha.70",
@@ -32,7 +33,7 @@
     ]
   },
   "engines": {
-    "node": ">=15.0.0",
-    "npm": ">=7.0.0"
+    "node": ">=15.13.0",
+    "npm": ">=7.9.0"
   }
 }

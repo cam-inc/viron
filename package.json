@@ -36,39 +36,30 @@
     "postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
-    "pre-commit": "lerna run pre-commit",
-    "pre-push": "lerna run pre-push",
-    "build": "lerna run build",
-    "clean": "lerna run clean",
-    "format": "lerna run format",
-    "lint": "lerna run lint",
-    "test": "lerna run test",
-    "workspaces": "lerna list --all --json",
-    "example-nodejs:exec": "lerna run --scope=@viron/example-nodejs ",
-    "example-nodejs:list": "npm run --prefix example/nodejs",
+    "pre-commit": "npm run pre-commit --workspaces",
+    "pre-push": "npm run pre-push --workspaces",
+    "build": "npm run build --workspaces",
+    "clean": "npm run clean --workspaces",
+    "format": "npm run format --workspaces",
+    "lint": "npm run lint --workspacess",
+    "test": "npm run test --workspaces",
     "example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up",
-    "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up",
-    "app:exec": "lerna run --scope=@viron/app ",
-    "app:list": "npm run --prefix packages/app",
-    "nodejs:exec": "lerna run --scope=@viron/lib ",
-    "nodejs:list": "npm run --prefix packages/nodejs",
-    "website:exec": "lerna run --scope=@viron/website ",
-    "website:list": "npm run --prefix packages/website"
+    "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up"
   },
   "devDependencies": {
     "husky": "^5.0.6",
-    "lerna": "^3.22.1",
     "pinst": "^2.1.1"
   },
   "workspaces": [
     "packages/app",
+    "packages/linter",
     "packages/nodejs",
     "packages/website",
     "example/nodejs"
   ],
   "engines": {
-    "node": ">=15.0.0",
-    "npm": ">=7.0.0"
+    "node": ">=15.13.0",
+    "npm": ">=7.9.0"
   },
   "private": true
 }
