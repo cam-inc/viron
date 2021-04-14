@@ -1,0 +1,157 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Viron Mock",
+    "version": "mock",
+    "x-pages": [
+      {
+        "id": "general",
+        "title": "General",
+        "contents": []
+      },
+      {
+        "id": "quickview",
+        "title": "Quick View",
+        "group": "Dashboard",
+        "contents": []
+      },
+      {
+        "id": "simple",
+        "title": "Simple",
+        "group": "Management",
+        "contents": []
+      },
+      {
+        "id": "dau",
+        "title": "DAU",
+        "group": "Management/Analytics",
+        "contents": []
+      },
+      {
+        "id": "ggg",
+        "title": "Ggg",
+        "group": "Management",
+        "contents": []
+      },
+      {
+        "id": "mau",
+        "title": "MAU",
+        "group": "Management/Analytics",
+        "contents": [
+          {
+            "title": "titlee",
+            "type": "number",
+            "getOperationId": "getMau"
+          }
+        ]
+      },
+      {
+        "id": "last",
+        "title": "Last",
+        "contents": []
+      },
+      {
+        "id": "pv",
+        "title": "PV",
+        "group": "Management/Analytics",
+        "contents": []
+      }
+    ]
+  },
+  "paths": {
+    "/mau.json": {
+      "get": {
+        "operationId": "getMau",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-Header",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "c",
+            "in": "cookie",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "propA": {
+                    "type": "string"
+                  },
+                  "propB": {
+                    "type": "string"
+                  },
+                  "propC": {
+                    "type": "object",
+                    "properties": {
+                      "propC-a": {
+                        "type": "string"
+                      },
+                      "propC-b": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["propC-a"]
+                  },
+                  "propD": {
+                    "type": "boolean"
+                  },
+                  "propE": {
+                    "type": "number"
+                  },
+                  "propF": {
+                    "type": "integer"
+                  },
+                  "propG": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "default": ["abc", "def"],
+                    "maxItems": 4,
+                    "minItems": 2
+                  },
+                  "propH": {
+                    "type": "object",
+                    "properties": {
+                      "kekeke": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": ["propA"]
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    }
+  }
+}
