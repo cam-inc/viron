@@ -6,14 +6,14 @@
 
 ```sh
 # To start development.
-$ npm run develop
+$ npm run app:exec develop
 
 # To check production build.
-$ npm run build
-$ npm run serve
+$ npm run app:exec build
+$ npm run app:exec serve
 
 # To type check.
-$ npm run typecheck
+$ npm run app:exec typecheck
 ```
 
 ### Basic UI Structure

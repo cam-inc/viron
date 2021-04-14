@@ -1,10 +1,19 @@
 import pino from 'pino';
-import { modeMongo, modeMysql } from './constant';
-
+import { Sequelize } from 'sequelize';
+import { repositories } from '@viron/lib';
+import { Mode, MODE_MONGO, MODE_MYSQL } from './constant';
+import { preflight as preflightMongo } from './stores/mongo';
+import { preflight as preflightMysql } from './stores/mysql';
 import {
-  preflight as preflightMongo,
-  createDefinitions as createDefinitionsMongo,
-} from './stores/connection/mongo';
+  Configure,
+  get as getConfigure,
+  MongoConfigure,
+  MysqlConfigure,
+} from './configure';
+import { Stores } from './stores';
+import { noSetEnvMode } from './errors';
+
+///
 
 export const logger = pino({
   name: 'example',
@@ -13,46 +22,72 @@ export const logger = pino({
 });
 
 export class Context {
-  public mode: string;
+  public mode: Mode;
+  public configure: Configure;
+  public stores!: Stores;
+
   constructor() {
     switch (process.env.MODE) {
-      case modeMongo:
-        this.mode = modeMongo;
+      case MODE_MONGO:
+        this.mode = MODE_MONGO;
         break;
-      case modeMysql:
-        this.mode = modeMysql;
+      case MODE_MYSQL:
+        this.mode = MODE_MYSQL;
         break;
       default:
-        throw new Error(
-          'The environment variable is not set. key=MODE, value=`mongo` or `mysql`'
-        );
+        throw noSetEnvMode();
     }
+
+    this.configure = getConfigure(this.mode);
   }
 
   public async preflight(): Promise<void> {
+    await this.preflightStore();
+  }
+
+  /**
+   * Preflight store
+   */
+  public async preflightStore(): Promise<void> {
+    const mainConfig = this.configure.store.main;
+
     switch (this.mode) {
-      case modeMongo:
-        await preflightMongo(
-          'mongodb://mongo:27017',
-          {
-            // MongoDB Options
-            dbName: 'viron_example',
-            autoIndex: true,
-            user: 'root',
-            pass: 'password',
-            useNewUrlParser: true,
-            useCreateIndex: true,
-            authSource: 'admin',
-            useFindAndModify: false,
-            useUnifiedTopology: true,
-          },
-          Object.assign(createDefinitionsMongo())
+      case MODE_MONGO:
+        // eslint-disable-next-line no-case-declarations
+        const configureMongo = mainConfig as MongoConfigure;
+        this.stores = {
+          main: await preflightMongo(configureMongo),
+        };
+
+        // eslint-disable-next-line no-case-declarations
+        //const instanceMongo = this.stores.main.instance as Connection;
+        logger.info(
+          `Completed loading the store (main). type=${configureMongo.type}, openUri=${configureMongo.openUri}`
         );
         break;
-      case modeMysql:
-        logger.error('TODO not support.');
+      case MODE_MYSQL:
+        // eslint-disable-next-line no-case-declarations
+        const configureMysql = mainConfig as MysqlConfigure;
+        this.stores = {
+          main: await preflightMysql(configureMysql),
+        };
+        // eslint-disable-next-line no-case-declarations
+        const instanceMysql = this.stores.main.instance as Sequelize;
+        logger.info(
+          'Completed loading the store (main). type=%s "%s://%s:%s/%s". %O',
+          configureMysql.type,
+          instanceMysql.getDialect(),
+          instanceMysql.config.host,
+          instanceMysql.config.port,
+          instanceMysql.config.database,
+          instanceMysql.config
+        );
         break;
+      default:
+        throw noSetEnvMode();
     }
+
+    repositories.container.init(this.mode, this.stores.main.instance);
   }
 }
 

@@ -5,8 +5,7 @@ logger.info(`Set mode. mode=${ctx.mode}`);
 
 const main = async (): Promise<void> => {
   await ctx.preflight();
-  const app = createApplication();
-
+  const app = await createApplication();
 
   /**
    * Start Express server.

@@ -1,0 +1,64 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs authtypes'
+  description: authtypes api specifications
+
+tags:
+  - name: authType
+
+paths:
+  /viron_authtype:
+    get:
+      operationId: listAuthtypes
+      tags:
+        - authType
+      summary: list auth types
+      description: 認証方式一覧
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTypeList'
+
+components:
+  schemas:
+    AuthTypeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuthType'
+
+    AuthType:
+      type: object
+      properties:
+        provider:
+          description: 認証プロバイダ
+          type: string
+          example: google
+        type:
+          description: 認証方式
+          type: string
+          enum:
+            - email
+            - oauth
+            - signout
+          example: oauth
+        method:
+          description: リクエストメソッド
+          type: string
+          enum:
+            - GET
+            - POST
+            - PUT
+          example: POST
+        url:
+          description: リクエストURL
+          type: string
+          example: '/google/signin'
+      required:
+        - provider
+        - type
+        - method
+        - url

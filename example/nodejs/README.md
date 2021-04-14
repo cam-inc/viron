@@ -31,9 +31,9 @@ npm run docker-compose:up:mongo
     - `npm run docker-compose:up:mysql`
   - Mongo Mode
     - `npm run docker-compose:up:mongo`
-- MySQL Access
+- MySQL Access (CLI)
   - `npm run docker-compose:connect:mysql`
-- Mongo Access
+- Mongo Access (CLI)
   - `npm run docker-compose:connect:mongo`
 - Other
   - `npm run`

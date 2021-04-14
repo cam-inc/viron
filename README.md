@@ -14,13 +14,58 @@ You don't need to write frontend code!
 
 [https://cam-inc.github.io/viron-doc/](https://cam-inc.github.io/viron-doc/)
 
-## 🚅 Ecosystem
+## 🚅 QuickStart
 
-### Libraries / Frameworks
+This repository is building as a monorepo by npm workspaces and lerna.
 
-| Project | Type | Description |
-|---------|--------|-------------|
-| [node-vironlib](https://github.com/cam-inc/node-vironlib) | API Server Helper (NodeJS) | node-vironlib is a helper library that makes it easy to implement functions that would normally be needed with Viron API Server. |
+### Setup
+
+```
+$ git clone git@github.com:cam-inc/viron.git
+$ cd viron
+$ npm install .
+```
+**Important: npm version >= 7.0**
+
+### Develop monorepo
+
+See each workspaces README.md for details.
+
+If you want to run workspaces-specific npm scripts
+, you need to work from repository root.
+
+There are no modules in each workspace, because as the installed modules are hoisting.
+
+ex.)
+```
+$ cd example/nodejs/
+$ npm run test
+
+sh: jest: command not found
+```
+
+If the script exists in some workspaces, we recommend using `lerna run`.
+
+And these commands written in root package.json.
+
+ex.)
+```
+$ npm run build
+=> lerna run build
+```
+This means are `npm run build` in all workspaces. 
+
+If some workspace doesn't have `build` script, the package will skip the process.
+
+#### Run unique script
+
+You can use `npm run *:exec` script to run a unique script in one workspace.
+
+ex.)
+```
+$ npm run example-nodejs:exec start
+```
+This means `npm run start` on `example/nodejs`.
 
 ## Development Guide for "Viron" Contributors
 

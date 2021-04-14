@@ -98,6 +98,7 @@ export const getDefaultValue = function (schema: Schema): any {
     return schema.default;
   }
   // TODO: format等に合わせてより正確に。
+  // TODO: requiredも考慮。
   switch (schema.type) {
     case 'string':
       return '';

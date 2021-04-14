@@ -1,0 +1,37 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs oas'
+  description: oas api specifications
+
+tags:
+  - name: oas
+
+paths:
+  /oas:
+    get:
+      operationId: getOas
+      tags:
+        - oas
+      summary: get oas
+      description: OpenAPI Specification の取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+      security:
+        - jwt: []
+
+components:
+  securitySchemes:
+    jwt:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://localhost:3000/signin
+          scopes:
+            api:access: API access

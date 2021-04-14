@@ -6,7 +6,6 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'plugin:jest/recommended',
-    'prettier/@typescript-eslint',
   ],
   plugins: ['@typescript-eslint', 'jest'],
   env: {
@@ -14,6 +13,7 @@ module.exports = {
     node: true,
     "jest/globals": true
   },
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
@@ -22,7 +22,7 @@ module.exports = {
   },
   rules: {
     'prettier/prettier': 'error',
-    "@typescript-eslint/explicit-function-return-type": 2,
-    "jest/expect-expect": 0
+    '@typescript-eslint/explicit-function-return-type': 'error',
+    'jest/expect-expect': 'off'
   },
 };

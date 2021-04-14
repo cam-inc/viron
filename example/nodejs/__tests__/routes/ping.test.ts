@@ -5,7 +5,7 @@ import { createApplication } from '../../src/application';
 describe('routes/ping', () => {
   let request: supertest.SuperTest<supertest.Test>;
   beforeAll(async () => {
-    request = supertest(createApplication());
+    request = supertest(await createApplication());
   });
 
   it('200', async () => {
