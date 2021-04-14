@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "pre-commit": "echo PRE-COMMIT",
+    "pre-push": "echo PRE-PUSH",
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",

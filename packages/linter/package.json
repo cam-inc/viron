@@ -2,6 +2,8 @@
   "name": "@viron/linter",
   "version": "0.0.1",
   "scripts": {
+    "pre-commit": "echo PRE-COMMIT",
+    "pre-push": "echo PRE-PUSH",
     "test": "echo TEST"
   },
   "engines": {
