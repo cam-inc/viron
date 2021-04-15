@@ -6,13 +6,12 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'plugin:jest/recommended',
-    'prettier/@typescript-eslint',
   ],
   plugins: ['@typescript-eslint', 'jest'],
   env: {
     es6: true,
     node: true,
-    "jest/globals": true
+    'jest/globals': true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -24,6 +23,6 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     '@typescript-eslint/explicit-function-return-type': 'error',
-    'jest/expect-expect': 'off'
+    'jest/expect-expect': 'off',
   },
 };

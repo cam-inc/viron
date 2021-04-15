@@ -1,3 +1,6 @@
+import { EMail, URL } from '$types/index';
+
+// [extendable] Root document object.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#openapi-object
 export type Document = {
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#versions
@@ -26,6 +29,33 @@ export type Info = {
   contact?: Contact;
   // The license information for the API.
   license?: License;
+  // [extended] Be used on endpoint UI cards.
+  'x-thumbnail'?: URL;
+  // [extended] Color theme for the endpoint page. Default to 'light'.
+  // TODO: 4パターンくらいまで増やすこと。
+  'x-theme'?: 'light' | 'dark';
+  // [extended] Be used on endpoint UI cards.
+  'x-tags'?: string[];
+  // [extended] Be used on endpoint UI cards.
+  'x-pages': {
+    // Should be a unique string value. Be used as a part of the URL.
+    id: string;
+    // Be displayed on screen.
+    title: string;
+    // Be displayed on screen.
+    description?: string | CommonMark;
+    // Use slashed string to create levels more than two. e.g. 'Dashboard/Analytics/DAU'.
+    group?: string;
+    //  What to be displayed on the page.
+    contents: {
+      title: string;
+      // TODO: 全部リストアップすること。
+      type: 'number' | 'table' | 'custom';
+      // Specify a operation id of method get that are required to fetch data for the content.
+      getOperationId: OperationId;
+      // TODO: 抜け漏れ確認。
+    }[];
+  }[];
 };
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object
@@ -83,6 +113,37 @@ export type PathItem = {
   parameters: Array<Parameter | Reference>;
 };
 
+export type Method =
+  | 'get'
+  | 'put'
+  | 'post'
+  | 'delete'
+  | 'options'
+  | 'head'
+  | 'patch'
+  | 'trace';
+
+// This is not a part of OAS.
+export type Request = {
+  // key must begin with a slash.
+  path: string;
+  method: Method;
+  operation: Operation;
+};
+// This is not a part of OAS.
+export type RequestPayloadParameter = Parameter & {
+  value:
+    | number
+    | string
+    | (number | string)[]
+    | { [key in string]: string | number };
+};
+// This is not a part of OAS.
+export type RequestPayloadRequestBody = RequestBody & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any;
+};
+
 // [extendable] Describes a single API operation on a path.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object
 export type Operation = {
@@ -90,7 +151,7 @@ export type Operation = {
   summary?: string;
   description?: string | CommonMark;
   externalDocs?: ExternalDocumentation;
-  operationId?: string;
+  operationId?: OperationId;
   parameters?: Array<Parameter | Reference>;
   requestBody?: RequestBody;
   responses?: Responses;
@@ -101,6 +162,7 @@ export type Operation = {
   security?: SecurityRequirement[];
   servers?: Server[];
 };
+export type OperationId = string;
 
 // [extendable] Server representation.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#server-object
@@ -204,21 +266,16 @@ export type Schema = {
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.15
   required?: string[];
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.20
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   enum?: any[];
   /**
    * The following properties are taken from the JSON Schema definition but their definitions were adjusted to the OpenAPI Specification.
    */
-  // TODO: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#data-types に `null is not supported as a type`って書いてあるから以下unionから外すべきかも。
+  // According to the spec, type of integer is supported and type of null is not supported.
+  // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#data-types
   // Multiple types via an array are not supported.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.21
-  type?:
-    | 'string'
-    | 'number'
-    | 'integer'
-    | 'object'
-    | 'array'
-    | 'boolean'
-    | 'null';
+  type: 'string' | 'number' | 'integer' | 'object' | 'array' | 'boolean';
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.22
   allOf?: Schema[] | Reference[];
@@ -263,6 +320,7 @@ export type Schema = {
     | 'password';
   // The default value represents what would be assumed by the consumer of the input as the value of the schema if one is not provided. Unlike JSON Schema, the value MUST conform to the defined type for the Schema Object defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-6.2
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default?: any;
   /**
    * Other than the JSON Schema subset fields, the following fields MAY be used for further schema documentation.
@@ -281,6 +339,7 @@ export type Schema = {
   // Additional external documentation for this schema.
   externalDocs?: ExternalDocumentation;
   // A free-form property to include an example of an instance for this schema.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   // Default to false.
   deprecated?: boolean;
@@ -353,17 +412,27 @@ export type Parameter = {
   style?: Style;
   explode?: boolean;
   allowReserved?: boolean;
-  // The schema defining the type used for the parameter.
-  schema?: Schema | Reference;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   examples?: {
     [key: string]: Example | Reference;
   };
-  content?: {
-    // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
-    [key: string]: MediaType;
-  };
-};
+} & (
+  | // A parameter MUST contain either a schema property, or a content property, but not both.
+  {
+      // The schema defining the type used for the parameter.
+      schema: Schema | Reference;
+      content?: never;
+    }
+  | {
+      schema?: never;
+      content: {
+        // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
+        [key: string]: MediaType;
+      };
+    }
+);
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values
 export type Style =
@@ -380,6 +449,7 @@ export type Style =
 export type Example = {
   summary?: string;
   description?: string | CommonMark;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value?: any;
   externalValue?: URL;
 };
@@ -450,10 +520,12 @@ export type OAuthFlow = {
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#link-object
 export type Link = {
   operationRef?: string;
-  operationId?: string;
+  operationId?: OperationId;
   parameters?: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any | RuntimeExpression;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requestBody?: any | RuntimeExpression;
   description?: string | CommonMark;
   server?: Server;
@@ -474,6 +546,7 @@ export type RuntimeExpression = string;
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#media-type-object
 export type MediaType = {
   schema?: Schema | Reference;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   examples?: {
     [key: string]: Example | Reference;
@@ -499,12 +572,6 @@ export type Encoding = {
 // @see: https://semver.org/spec/v2.0.0.html
 export type Semver = string;
 
-// A string in the format of a URL.
-export type URL = string;
-
-// A string in the format of an email address.
-export type EMail = string;
-
 // A simple object to allow referencing other components in the specification.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#reference-object
 export type Reference = {
@@ -515,5 +582,12 @@ export type Reference = {
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#specificationExtensions
 export type Extension = {
   // key must begin with "x-".
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
+};
+
+// All types of content get responses.
+// Type of `number`.
+export type ContentGetResponseOfTypeOfNumber = {
+  value: number;
 };
