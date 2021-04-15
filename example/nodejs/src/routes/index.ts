@@ -5,11 +5,11 @@ import {
 } from 'exegesis-express';
 import { OpenAPIObject } from 'openapi3-ts';
 import merge from 'deepmerge';
-import { loadResolvedOpenapi } from '@viron/lib';
+import { loadResolvedOas, getOasPath as libOasPath } from '@viron/lib';
 
 import { logger } from '../context';
-import * as securityHandlers from '../security_handlers';
-import { openapiPath, libOpenapiPath } from '../helpers/routes';
+import { jwt } from '../security_handlers/jwt';
+import { getOasPath } from '../helpers/routes';
 
 import * as routesAuditLogs from './auditlogs';
 import * as routesAuthtypes from './authtypes';
@@ -29,18 +29,27 @@ interface Handlers {
 }
 
 interface Route {
-  openapiPath: string;
+  name: string;
+  oasPath: string;
   handlers: Handlers;
 }
 
 const routes: Route[] = [
-  { openapiPath: openapiPath('ping'), handlers: routesPing },
-  { openapiPath: openapiPath('users'), handlers: routesUsers },
-  { openapiPath: libOpenapiPath('auditlogs'), handlers: routesAuditLogs },
-  { openapiPath: libOpenapiPath('authtypes'), handlers: routesAuthtypes },
-  { openapiPath: libOpenapiPath('oas'), handlers: routesOas },
+  { name: 'ping', oasPath: getOasPath('ping'), handlers: routesPing },
+  { name: 'users', oasPath: getOasPath('users'), handlers: routesUsers },
+  {
+    name: 'auditlogs',
+    oasPath: libOasPath('auditlogs'),
+    handlers: routesAuditLogs,
+  },
+  {
+    name: 'authtypes',
+    oasPath: libOasPath('authtypes'),
+    handlers: routesAuthtypes,
+  },
+  { name: 'oas', oasPath: libOasPath('oas'), handlers: routesOas },
   // マージ順の関係で`root`は必ず最後に書く
-  { openapiPath: openapiPath('root'), handlers: routesRoot },
+  { name: 'root', oasPath: getOasPath('root'), handlers: routesRoot },
 ];
 
 export async function register(app: Express): Promise<void> {
@@ -62,19 +71,21 @@ export async function register(app: Express): Promise<void> {
   };
 
   const apis = await Promise.all(
-    routes.map(async ({ openapiPath, handlers }) => {
-      logger.info('Routes registration oas: %s', openapiPath);
-      const apiDoc = await loadResolvedOpenapi(openapiPath);
-      const controllerName = 'example';
-      apiDoc['x-exegesis-controller'] = controllerName;
+    routes.map(async ({ oasPath, handlers, name }) => {
+      logger.info('Routes registration oas: %s', oasPath);
+      const apiDoc = await loadResolvedOas(oasPath);
+      apiDoc['x-exegesis-controller'] = name;
       const middleware = await genExegesisMiddlewares(apiDoc, {
         controllers: {
-          [controllerName]: wrapHandlers(handlers),
+          [name]: wrapHandlers(handlers),
         },
-        authenticators: securityHandlers,
+        authenticators: {
+          jwt,
+        },
         defaultMaxBodySize: 1024 * 1024,
         allErrors: true,
         treatReturnedJsonAsPure: true,
+        autoHandleHttpErrors: false,
       });
       return { middleware, apiDoc };
     })

@@ -18,3 +18,7 @@ export const noSetEnvMode = (): VironError => {
 export const unauthorized = (): VironError => {
   return new VironError('Unauthorized', 401);
 };
+
+export const notFound = (): VironError => {
+  return new VironError('NotFound', 404);
+};
