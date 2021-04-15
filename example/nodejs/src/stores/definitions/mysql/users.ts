@@ -1,9 +1,9 @@
 import { Model, Sequelize, DataTypes, ModelCtor } from 'sequelize';
-import { User, UserCreationAttributes } from '../../../domains/user';
+import { User, UserCreateAttributes } from '../../../domains/user';
 
 export const name = 'users';
 
-export class UserModel extends Model<User, UserCreationAttributes> {
+export class UserModel extends Model<User, UserCreateAttributes> {
   id!: number;
   name!: string;
   nickName!: string;

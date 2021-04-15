@@ -1,14 +1,9 @@
-import { Response, Request } from 'express';
-import { Context as RequestContext } from 'openapi-backend';
+import { ExegesisContext } from 'exegesis-express';
 
 /**
  * root
  * @route GET /
  */
-export const getRoot = async (
-  _context: RequestContext,
-  _req: Request,
-  res: Response
-): Promise<void> => {
-  res.redirect(301, '/oas');
+export const getRoot = async (context: ExegesisContext): Promise<void> => {
+  context.res.set('Location', '/oas').status(301).end();
 };

@@ -1,4 +1,4 @@
-import { repositories } from '../';
+import { repositoryContainer } from '../';
 
 export interface AuditLog {
   id: string;
@@ -22,6 +22,6 @@ export interface AuditLogCreationAttributes {
 }
 
 export const list = async (): Promise<AuditLog[]> => {
-  const repository = repositories.container.getAuditLogRepository();
+  const repository = repositoryContainer.getAuditLogRepository();
   return repository.find();
 };

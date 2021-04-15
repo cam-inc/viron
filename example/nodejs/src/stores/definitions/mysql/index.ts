@@ -1,8 +1,8 @@
 import { Sequelize } from 'sequelize';
 import * as users from './users';
-import { stores } from '@viron/lib';
+import { storeDefinitions } from '@viron/lib';
 
-const { auditLogs } = stores.definitions.mysql;
+const { auditLogs } = storeDefinitions.mysql;
 
 /////////////////////////////
 // Definition
@@ -12,7 +12,7 @@ const { auditLogs } = stores.definitions.mysql;
  * Definitions by collection (interface)
  */
 export interface MysqlDefinitions
-  extends stores.definitions.mysql.MysqlDefinitions {
+  extends storeDefinitions.mysql.MysqlDefinitions {
   users: {
     name: string;
     createModel: typeof users.createModel;
@@ -43,7 +43,7 @@ export type MysqlDefinitionKeys = keyof MysqlDefinitions;
 /**
  * Models by collection (interface)
  */
-export interface MysqlModels extends stores.definitions.mysql.MysqlModels {
+export interface MysqlModels extends storeDefinitions.mysql.MysqlModels {
   users: {
     Model: users.UserModelCtor;
   };
