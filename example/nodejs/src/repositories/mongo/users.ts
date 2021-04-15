@@ -6,7 +6,7 @@ import {
   UserUpdateAttributes,
 } from '../../domains/user';
 import { UserModel } from '../../stores/definitions/mongo/users';
-import { getQueryOptions } from '../../helpers/mongo';
+import { getQueryOptions } from '../../stores/helpers/mongo';
 import { ctx } from '../../context';
 
 const getModel = (): UserModel =>

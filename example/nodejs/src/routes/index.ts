@@ -1,3 +1,4 @@
+import path from 'path';
 import { Express } from 'express';
 import {
   ExegesisContext,
@@ -9,7 +10,6 @@ import { loadResolvedOas, getOasPath as libOasPath } from '@viron/lib';
 
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
-import { getOasPath } from '../helpers/routes';
 
 import * as routesAuditLogs from './auditlogs';
 import * as routesAuthtypes from './authtypes';
@@ -34,9 +34,13 @@ interface Route {
   handlers: Handlers;
 }
 
+// oasのパスを取得
+export const oasPath = (name: string): string =>
+  path.resolve(__dirname, '..', 'openapi', `${name}.yaml`);
+
 const routes: Route[] = [
-  { name: 'ping', oasPath: getOasPath('ping'), handlers: routesPing },
-  { name: 'users', oasPath: getOasPath('users'), handlers: routesUsers },
+  { name: 'ping', oasPath: oasPath('ping'), handlers: routesPing },
+  { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
   {
     name: 'auditlogs',
     oasPath: libOasPath('auditlogs'),
@@ -49,7 +53,7 @@ const routes: Route[] = [
   },
   { name: 'oas', oasPath: libOasPath('oas'), handlers: routesOas },
   // マージ順の関係で`root`は必ず最後に書く
-  { name: 'root', oasPath: getOasPath('root'), handlers: routesRoot },
+  { name: 'root', oasPath: oasPath('root'), handlers: routesRoot },
 ];
 
 export async function register(app: Express): Promise<void> {

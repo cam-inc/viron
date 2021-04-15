@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import { storeDefinitions } from '../../stores';
 import { domainsAuditLog } from '../../domains';
-import { container } from '../';
+import { repositoryContainer } from '../';
 
 const getModel = (): storeDefinitions.mongo.auditLogs.AuditLogModel => {
-  const conn = container.conn as mongoose.Connection;
+  const conn = repositoryContainer.conn as mongoose.Connection;
   return conn.models
     .auditlogs as storeDefinitions.mongo.auditLogs.AuditLogModel;
 };

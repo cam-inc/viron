@@ -7,7 +7,7 @@ import {
   UserUpdateAttributes,
 } from '../../domains/user';
 import { UserModelCtor } from '../../stores/definitions/mysql/users';
-import { getFindOptions } from '../../helpers/mysql';
+import { getFindOptions } from '../../stores/helpers/mysql';
 
 const getModel = (): UserModelCtor =>
   ctx.stores.main.models.users.Model as UserModelCtor;

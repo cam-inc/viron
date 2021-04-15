@@ -14,7 +14,7 @@ export interface Repository<D, C> {
   createOne: (obj: C) => Promise<D>;
 }
 
-class Container {
+class RepositoryContainer {
   storeType?: StoreType;
   conn?: Sequelize | mongoose.Connection;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,7 +25,10 @@ class Container {
     this.initialized = false;
   }
 
-  init(storeType: StoreType, conn: Sequelize | mongoose.Connection): Container {
+  init(
+    storeType: StoreType,
+    conn: Sequelize | mongoose.Connection
+  ): RepositoryContainer {
     if (this.initialized) {
       return this;
     }
@@ -60,4 +63,4 @@ class Container {
   }
 }
 
-export const container = new Container();
+export const repositoryContainer = new RepositoryContainer();

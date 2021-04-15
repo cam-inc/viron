@@ -1,10 +1,10 @@
 import { Sequelize } from 'sequelize';
 import { storeDefinitions } from '../../stores';
 import { domainsAuditLog } from '../../domains';
-import { container } from '../';
+import { repositoryContainer } from '../';
 
 const getModel = (): storeDefinitions.mysql.auditLogs.AuditLogModelCtor => {
-  const conn = container.conn as Sequelize;
+  const conn = repositoryContainer.conn as Sequelize;
   return conn.models
     .auditlogs as storeDefinitions.mysql.auditLogs.AuditLogModelCtor;
 };
