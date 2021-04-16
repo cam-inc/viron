@@ -1,5 +1,5 @@
 import Ajv, { ValidateFunction } from 'ajv';
-import schema from './schema.json';
+import schema from './schemas/3.0.x.json';
 
 export const lint = function(document: object): { isValid: boolean; errors: ValidateFunction['errors'] } {
   const ajv = new Ajv();
