@@ -1,4 +1,5 @@
-export * as stores from './stores';
-export * as domains from './domains';
-export * as constants from './constants';
-export * as repositories from './repositories';
+export * from './stores';
+export * from './domains';
+export * from './constants';
+export * from './repositories';
+export * from './helpers';

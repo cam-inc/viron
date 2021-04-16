@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
-import { auditLog } from '../domains';
+import { domainsAuditLog } from '../domains';
 import { STORE_TYPE, StoreType } from '../constants';
 import { repositoryUninitialized } from '../errors';
 import * as mongoRepositories from './mongo';
@@ -9,12 +9,12 @@ import * as mysqlRepositories from './mysql';
 type Names = keyof typeof mongoRepositories & keyof typeof mysqlRepositories;
 
 export interface Repository<D, C> {
-  findById: (id: string) => Promise<D | null>;
+  findOneById: (id: string) => Promise<D | null>;
   find: (/* TODO: pagerとかconditionはあとで */) => Promise<D[]>;
-  create: (obj: C) => Promise<D>;
+  createOne: (obj: C) => Promise<D>;
 }
 
-class Container {
+class RepositoryContainer {
   storeType?: StoreType;
   conn?: Sequelize | mongoose.Connection;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,7 +25,10 @@ class Container {
     this.initialized = false;
   }
 
-  init(storeType: StoreType, conn: Sequelize | mongoose.Connection): Container {
+  init(
+    storeType: StoreType,
+    conn: Sequelize | mongoose.Connection
+  ): RepositoryContainer {
     if (this.initialized) {
       return this;
     }
@@ -53,11 +56,11 @@ class Container {
   }
 
   getAuditLogRepository(): Repository<
-    auditLog.AuditLog,
-    auditLog.AuditLogCreationAttributes
+    domainsAuditLog.AuditLog,
+    domainsAuditLog.AuditLogCreationAttributes
   > {
     return this.get('auditLogs');
   }
 }
 
-export const container = new Container();
+export const repositoryContainer = new RepositoryContainer();

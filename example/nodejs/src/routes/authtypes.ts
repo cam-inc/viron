@@ -1,23 +1,19 @@
-import { Response, Request } from 'express';
-import { Context as RequestContext } from 'openapi-backend';
-import { constants, domains } from '@viron/lib';
+import { AUTH_METHOD, AUTH_TYPE, domainsAuthType } from '@viron/lib';
+import { RouteContext } from '.';
 
-const { AUTH_METHOD, AUTH_TYPE } = constants;
-const { genAuthType } = domains.authType;
+const { genAuthType } = domainsAuthType;
 
 /**
  * 認証タイプ一覧
  * @route GET /viron_authtype
  */
-export const listAuthtypes = async (
-  _context: RequestContext,
-  _req: Request,
-  res: Response
+export const listVironAuthtypes = async (
+  context: RouteContext
 ): Promise<void> => {
   const authTypes = [
     genAuthType('viron', AUTH_TYPE.EMAIL, AUTH_METHOD.POST, '/signin'),
     genAuthType('viron', AUTH_TYPE.SIGNOUT, AUTH_METHOD.POST, '/signout'),
     genAuthType('google', AUTH_TYPE.OAUTH, AUTH_METHOD.POST, '/google/signin'),
   ];
-  res.json(authTypes);
+  context.res.json(authTypes);
 };

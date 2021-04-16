@@ -4,6 +4,7 @@ import compression from 'compression';
 import { json, urlencoded } from 'body-parser';
 import { register } from './routes';
 import { middlewareI18n } from './middlewares/i18n';
+import { middlewareNotFound } from './middlewares/notfound';
 
 export const createApplication = async (): Promise<Express> => {
   // Create Express server
@@ -20,6 +21,7 @@ export const createApplication = async (): Promise<Express> => {
   // Primary app routes.
   await register(app);
 
+  app.use(middlewareNotFound());
   app.use(errorHandler());
 
   return app;

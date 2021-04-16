@@ -1,9 +1,9 @@
 import * as mongoose from 'mongoose';
-import { stores } from '@viron/lib';
+import { storeDefinitions } from '@viron/lib';
 import * as users from './users';
 import * as topics from './topics';
 
-const { auditLogs, createModel } = stores.definitions.mongo;
+const { auditLogs, createModel } = storeDefinitions.mongo;
 
 /////////////////////////////
 // Definition
@@ -13,7 +13,7 @@ const { auditLogs, createModel } = stores.definitions.mongo;
  * Definitions by collection (interface)
  */
 export interface MongoDefinitions
-  extends stores.definitions.mongo.MongoDefinitions {
+  extends storeDefinitions.mongo.MongoDefinitions {
   users: {
     name: string;
     schema: mongoose.Schema<
@@ -63,7 +63,7 @@ export type DefinitionKeys = keyof MongoDefinitions;
 /**
  * Models by collection (interface)
  */
-export interface MongoModels extends stores.definitions.mongo.MongoModels {
+export interface MongoModels extends storeDefinitions.mongo.MongoModels {
   users: {
     Model: users.UserModel;
   };

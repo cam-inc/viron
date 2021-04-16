@@ -75,3 +75,6 @@ export const HTTP_HEADER = {
   X_VIRON_AUTHTYPES_PATH: 'X-Viron-Authtypes-Path',
 } as const;
 export type HttpHeader = typeof HTTP_HEADER[keyof typeof HTTP_HEADER];
+
+export const DEFAULT_PAGER_LIMIT = 10;
+export const DEFAULT_PAGER_OFFSET = 0;

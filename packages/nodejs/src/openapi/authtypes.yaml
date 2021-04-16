@@ -1,18 +1,18 @@
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/example-nodejs authtypes'
+  title: '@viron/lib authtypes'
   description: authtypes api specifications
 
 tags:
-  - name: authType
+  - name: vironAuthType
 
 paths:
   /viron_authtype:
     get:
-      operationId: listAuthtypes
+      operationId: listVironAuthtypes
       tags:
-        - authType
+        - vironAuthType
       summary: list auth types
       description: 認証方式一覧
       responses:
@@ -21,16 +21,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthTypeList'
+                $ref: '#/components/schemas/VironAuthTypeList'
 
 components:
   schemas:
-    AuthTypeList:
+    VironAuthTypeList:
       type: array
       items:
-        $ref: '#/components/schemas/AuthType'
+        $ref: '#/components/schemas/VironAuthType'
 
-    AuthType:
+    VironAuthType:
       type: object
       properties:
         provider:

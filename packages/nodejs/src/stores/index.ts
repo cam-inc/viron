@@ -1,1 +1,1 @@
-export * as definitions from './definitions';
+export * as storeDefinitions from './definitions';

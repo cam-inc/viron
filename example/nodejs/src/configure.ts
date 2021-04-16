@@ -2,7 +2,7 @@
 
 import { ConnectOptions as MongoConnectOptions } from 'mongoose';
 import { Options as MysqlConnectOptions } from 'sequelize';
-import { Mode, MODE_MONGO, StoreType } from './constant';
+import { Mode, MODE_MONGO, StoreType } from './constants';
 import { openUri } from './stores/connection/mongo';
 
 export interface MongoConfigure extends StoreConfigure {

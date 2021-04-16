@@ -4,6 +4,35 @@ info:
   title: '@viron/example-nodejs components'
 
 components:
+  parameters:
+    IdPathParam:
+      name: id
+      in: path
+      schema:
+        type: string
+      required: true
+
+    PagerLimitQueryParam:
+      name: limit
+      in: query
+      description: Size of list
+      schema:
+        type: integer
+      required: false
+    PagerOffsetQueryParam:
+      name: offset
+      in: query
+      description: First record position of list
+      schema:
+        type: integer
+      required: false
+    IdQueryParam:
+      name: id
+      in: query
+      schema:
+        type: string
+      required: false
+
   securitySchemes:
     jwt:
       type: oauth2

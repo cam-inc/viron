@@ -1,4 +1,4 @@
-import { MODE_MYSQL, StoreType } from '../constant';
+import { MODE_MYSQL, StoreType } from '../constants';
 import { MysqlConfigure } from '../configure';
 import { createConnection } from './connection/mysql';
 import {

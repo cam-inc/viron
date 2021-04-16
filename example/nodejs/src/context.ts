@@ -1,7 +1,7 @@
 import pino from 'pino';
 import { Sequelize } from 'sequelize';
-import { repositories } from '@viron/lib';
-import { Mode, MODE_MONGO, MODE_MYSQL } from './constant';
+import { repositoryContainer } from '@viron/lib';
+import { Mode, MODE_MONGO, MODE_MYSQL } from './constants';
 import { preflight as preflightMongo } from './stores/mongo';
 import { preflight as preflightMysql } from './stores/mysql';
 import {
@@ -87,7 +87,7 @@ export class Context {
         throw noSetEnvMode();
     }
 
-    repositories.container.init(this.mode, this.stores.main.instance);
+    repositoryContainer.init(this.mode, this.stores.main.instance);
   }
 }
 
