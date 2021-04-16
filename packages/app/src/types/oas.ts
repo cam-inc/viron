@@ -36,19 +36,6 @@ export type Info = {
   'x-theme'?: 'light' | 'dark';
   // [extended] Be used on endpoint UI cards.
   'x-tags'?: string[];
-
-  'x-table-pager': {
-    'pager-req-page-key': 'page';
-    'pager-req-size-key': 'size';
-    'pager-resp-maxpage-key': 'maxpage';
-    'pager-resp-page-key': 'page';
-  };
-
-  'x-table-sort': {
-    'sort-req-key': 'sort';
-    'sort-resp-key': 'list';
-  };
-
   // [extended] Be used on endpoint UI cards.
   'x-pages': {
     // Should be a unique string value. Be used as a part of the URL.

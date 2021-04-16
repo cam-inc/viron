@@ -7,7 +7,7 @@ import { useRecoilState } from 'recoil';
 import { oneState } from '$store/selectors/endpoint';
 import { Token } from '$types/index';
 import { Document, Info } from '$types/oas';
-import { isOASSupportedSample, promiseErrorHandler } from '$utils/index';
+import { isOASSupported, promiseErrorHandler } from '$utils/index';
 import _Pages from './_pages';
 import _Panels from './_panels';
 
@@ -53,7 +53,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       }
 
       const document: Document = await response.json();
-      const { isValid, errors } = isOASSupportedSample(document);
+      const { isValid, errors } = isOASSupported(document);
       if (!isValid) {
         setError(
           `The OAS Document is not of version we support. ${errors?.[0]?.message}`
