@@ -53,8 +53,11 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       }
 
       const document: Document = await response.json();
-      if (!isOASSupported(document)) {
-        setError('The OAS Document is not of version we support.');
+      const { isValid, errors } = isOASSupported(document);
+      if (!isValid) {
+        setError(
+          `The OAS Document is not of version we support. ${errors?.[0]?.message}`
+        );
         setIsPending(false);
         return;
       }
