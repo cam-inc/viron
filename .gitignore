@@ -45,3 +45,4 @@ data/*/db
 .vscode
 tsconfig.tsbuildinfo
 */**/package-lock.json
+cert

@@ -5,6 +5,9 @@ import { json, urlencoded } from 'body-parser';
 import { register } from './routes';
 import { middlewareI18n } from './middlewares/i18n';
 import { middlewareNotFound } from './middlewares/notfound';
+import { middlewareAcl } from './middlewares/acl';
+import { middlewarePrefetch } from './middlewares/prefetch';
+import { ctx } from './context';
 
 export const createApplication = async (): Promise<Express> => {
   // Create Express server
@@ -17,6 +20,8 @@ export const createApplication = async (): Promise<Express> => {
   app.use(json());
   app.use(urlencoded({ extended: true }));
   app.use(middlewareI18n());
+  app.use(middlewareAcl(ctx.configure.acl));
+  app.use(middlewarePrefetch());
 
   // Primary app routes.
   await register(app);

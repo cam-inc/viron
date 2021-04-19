@@ -21,6 +21,7 @@ COPY packages/nodejs/src $HOME/packages/nodejs/src
 # Copy source files
 COPY example/nodejs/src $HOME/example/nodejs/src
 COPY example/nodejs/tsconfig.json $HOME/example/nodejs/tsconfig.json
+COPY example/nodejs/cert $HOME/example/nodejs/cert
 
 EXPOSE 3000
 USER root

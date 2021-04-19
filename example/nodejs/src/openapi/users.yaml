@@ -3,7 +3,7 @@ info:
   version: 0.0.1
   title: '@viron/example-nodejs users'
   description: users api specifications
-  x-viron-pages:
+  x-pages:
     - id: user
       group: 管理画面/ユーザー
       title: ユーザー情報
