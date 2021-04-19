@@ -1,10 +1,23 @@
 {
   "name": "@viron/linter",
   "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "pre-commit": "echo PRE-COMMIT",
     "pre-push": "echo PRE-PUSH",
+    "build": "npm run clean && tsc",
+    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "test": "echo TEST"
+  },
+  "dependencies": {
+    "ajv": "^8.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.2.4"
   },
   "engines": {
     "node": ">=15.13.0",

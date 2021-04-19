@@ -70,7 +70,8 @@ const Add: React.FC<Props> = () => {
       // The endpoint exists and it's open to public.
       if (response.ok) {
         const document: Document = await response.json();
-        if (isOASSupported(document)) {
+        const { isValid } = isOASSupported(document);
+        if (isValid) {
           setEndpointList(function (currVal) {
             const endpoint: Endpoint = {
               id: data.endpointId,
