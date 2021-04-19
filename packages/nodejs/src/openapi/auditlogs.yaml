@@ -3,7 +3,7 @@ info:
   version: 0.0.1
   title: '@viron/lib auditlogs'
   description: auditlogs api specifications
-  x-viron-pages:
+  x-pages:
     - id: vironAuditLog
       group: 管理画面/管理
       title: Viron 監査ログ

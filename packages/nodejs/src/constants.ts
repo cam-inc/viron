@@ -73,8 +73,37 @@ export type StoreType = typeof STORE_TYPE[keyof typeof STORE_TYPE];
 
 export const HTTP_HEADER = {
   X_VIRON_AUTHTYPES_PATH: 'X-Viron-Authtypes-Path',
+  ACCESS_CONTROL_ALLOW_ORIGIN: 'Access-Control-Allow-Origin',
+  ACCESS_CONTROL_ALLOW_CREDENTIALS: 'Access-Control-Allow-Credentials',
+  ACCESS_CONTROL_ALLOW_METHODS: 'Access-Control-Allow-Methods',
+  ACCESS_CONTROL_ALLOW_HEADERS: 'Access-Control-Allow-Headers',
+  ACCESS_CONTROL_EXPOSE_HEADERS: 'Access-Control-Expose-Headers',
 } as const;
 export type HttpHeader = typeof HTTP_HEADER[keyof typeof HTTP_HEADER];
 
 export const DEFAULT_PAGER_LIMIT = 10;
 export const DEFAULT_PAGER_OFFSET = 0;
+
+export const ACCESS_CONTROL_ALLOW_HEADERS = [
+  'X-Requested-With',
+  'Origin',
+  'Authorization',
+] as const;
+
+export const ACCESS_CONTROL_EXPOSE_HEADERS = [
+  'Content-Disposition',
+  'X-Requested-With',
+  'Origin',
+  'Authorization',
+] as const;
+
+export const ACCESS_CONTROL_ALLOW_METHODS = [
+  'GET',
+  'PUT',
+  'POST',
+  'DELETE',
+  'HEAD',
+  'OPTIONS',
+] as const;
+
+export const ACCESS_CONTROL_ALLOW_CREDENTIALS = 'true';
