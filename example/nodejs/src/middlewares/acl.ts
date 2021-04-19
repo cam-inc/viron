@@ -7,13 +7,15 @@ import {
 } from '@viron/lib';
 import { RequestHandler, NextFunction, Request, Response } from 'express';
 
+export type AllowOrigins = string[];
+
 export interface AclOptions {
-  allowOrigins: string[];
+  allowOrigins: AllowOrigins;
 }
 
 const getAllowOrigin = (
   req: Request,
-  allowOrigins: AclOptions['allowOrigins']
+  allowOrigins: AllowOrigins
 ): string | null => {
   const origin = req.get('origin');
   if (!origin) {
@@ -30,15 +32,15 @@ export const middlewareAcl = (options: AclOptions): RequestHandler => {
     );
     res.set(
       HTTP_HEADER.ACCESS_CONTROL_ALLOW_METHODS,
-      ACCESS_CONTROL_ALLOW_METHODS
+      ACCESS_CONTROL_ALLOW_METHODS.join(',')
     );
     res.set(
       HTTP_HEADER.ACCESS_CONTROL_ALLOW_HEADERS,
-      ACCESS_CONTROL_ALLOW_HEADERS
+      ACCESS_CONTROL_ALLOW_HEADERS.join(',')
     );
     res.set(
       HTTP_HEADER.ACCESS_CONTROL_EXPOSE_HEADERS,
-      ACCESS_CONTROL_EXPOSE_HEADERS
+      ACCESS_CONTROL_EXPOSE_HEADERS.join(',')
     );
 
     const allowOrigin = getAllowOrigin(req, options.allowOrigins);

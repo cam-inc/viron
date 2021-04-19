@@ -88,14 +88,14 @@ export const ACCESS_CONTROL_ALLOW_HEADERS = [
   'X-Requested-With',
   'Origin',
   'Authorization',
-].join(',');
+] as const;
 
 export const ACCESS_CONTROL_EXPOSE_HEADERS = [
   'Content-Disposition',
   'X-Requested-With',
   'Origin',
   'Authorization',
-].join(',');
+] as const;
 
 export const ACCESS_CONTROL_ALLOW_METHODS = [
   'GET',
@@ -104,6 +104,6 @@ export const ACCESS_CONTROL_ALLOW_METHODS = [
   'DELETE',
   'HEAD',
   'OPTIONS',
-].join(',');
+] as const;
 
 export const ACCESS_CONTROL_ALLOW_CREDENTIALS = 'true';
