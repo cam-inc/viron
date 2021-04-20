@@ -7,6 +7,7 @@ import { middlewareI18n } from './middlewares/i18n';
 import { middlewareNotFound } from './middlewares/notfound';
 import { middlewareAcl } from './middlewares/acl';
 import { middlewarePrefetch } from './middlewares/prefetch';
+import { middlewareAccessLog } from './middlewares/accesslog';
 import { ctx } from './context';
 
 export const createApplication = async (): Promise<Express> => {
@@ -19,6 +20,7 @@ export const createApplication = async (): Promise<Express> => {
   app.use(compression());
   app.use(json());
   app.use(urlencoded({ extended: true }));
+  app.use(middlewareAccessLog());
   app.use(middlewareI18n());
   app.use(middlewareAcl(ctx.configure.acl));
   app.use(middlewarePrefetch());
