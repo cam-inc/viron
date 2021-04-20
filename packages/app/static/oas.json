@@ -114,6 +114,9 @@
                       },
                       "propC-b": {
                         "type": "string"
+                      },
+                      "propC-C": {
+                        "$ref": "#/components/schemas/sampleA"
                       }
                     },
                     "required": ["propC-a"]
@@ -151,6 +154,16 @@
           },
           "required": true
         }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "sampleA": {
+        "type": "string"
+      },
+      "sampleB": {
+        "type": "number"
       }
     }
   }

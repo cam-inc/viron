@@ -14,7 +14,7 @@
     "test": "echo TEST"
   },
   "dependencies": {
-    "ajv": "^8.1.0"
+    "ajv": "^6.12.6"
   },
   "devDependencies": {
     "typescript": "^4.2.4"

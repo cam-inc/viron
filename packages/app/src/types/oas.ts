@@ -98,7 +98,6 @@ export type Paths = {
 // [extendable] Describes the operations available on a single path
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#path-item-object
 export type PathItem = {
-  $ref?: string;
   summary?: string;
   description?: string | CommonMark;
   get?: Operation;
@@ -133,10 +132,10 @@ export type Request = {
 // This is not a part of OAS.
 export type RequestPayloadParameter = Parameter & {
   value:
-    | number
-    | string
-    | (number | string)[]
-    | { [key in string]: string | number };
+  | number
+  | string
+  | (number | string)[]
+  | { [key in string]: string | number };
 };
 // This is not a part of OAS.
 export type RequestPayloadRequestBody = RequestBody & {
@@ -310,14 +309,14 @@ export type Schema = {
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-7.3
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#dataTypeFormat
   format?:
-    | 'date-time'
-    | 'email'
-    | 'hostname'
-    | 'ipv4'
-    | 'ipv6'
-    | 'date'
-    | 'date-time'
-    | 'password';
+  | 'date-time'
+  | 'email'
+  | 'hostname'
+  | 'ipv4'
+  | 'ipv6'
+  | 'date'
+  | 'date-time'
+  | 'password';
   // The default value represents what would be assumed by the consumer of the input as the value of the schema if one is not provided. Unlike JSON Schema, the value MUST conform to the defined type for the Schema Object defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-6.2
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -419,20 +418,20 @@ export type Parameter = {
     [key: string]: Example | Reference;
   };
 } & (
-  | // A parameter MUST contain either a schema property, or a content property, but not both.
-  {
+    | // A parameter MUST contain either a schema property, or a content property, but not both.
+    {
       // The schema defining the type used for the parameter.
       schema: Schema | Reference;
       content?: never;
     }
-  | {
+    | {
       schema?: never;
       content: {
         // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
         [key: string]: MediaType;
       };
     }
-);
+  );
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values
 export type Style =

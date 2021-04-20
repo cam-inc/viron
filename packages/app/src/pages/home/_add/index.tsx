@@ -7,7 +7,8 @@ import Textinput from '$components/textinput';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { AuthType, Endpoint, EndpointID, URL as TypeURL } from '$types/index';
 import { Document } from '$types/oas';
-import { isOASSupported, promiseErrorHandler } from '$utils/index';
+import { promiseErrorHandler } from '$utils/index';
+import { isOASSupported } from '$utils/oas';
 import { endpointId, url } from '$utils/v8n';
 
 type Props = {
@@ -18,7 +19,7 @@ type FormData = {
   url: TypeURL;
 };
 const Add: React.FC<Props> = () => {
-  const schema = useMemo(function () {
+  const schema = useMemo(function() {
     return yup.object().shape({
       endpointId: endpointId.required(),
       url: url.required(),
@@ -37,10 +38,10 @@ const Add: React.FC<Props> = () => {
 
   const [endpointList, setEndpointList] = useRecoilState(endpointListState);
   const addEndpoint = useCallback(
-    async function (data: FormData): Promise<void> {
+    async function(data: FormData): Promise<void> {
       // Duplication check.
       if (
-        !!endpointList.find(function (endpoind) {
+        !!endpointList.find(function(endpoind) {
           return endpoind.id === data.endpointId;
         })
       ) {
@@ -72,7 +73,7 @@ const Add: React.FC<Props> = () => {
         const document: Document = await response.json();
         const { isValid } = isOASSupported(document);
         if (isValid) {
-          setEndpointList(function (currVal) {
+          setEndpointList(function(currVal) {
             const endpoint: Endpoint = {
               id: data.endpointId,
               url: data.url,
@@ -107,7 +108,7 @@ const Add: React.FC<Props> = () => {
           return;
         }
         const authTypes: AuthType[] = await response.json();
-        setEndpointList(function (currVal) {
+        setEndpointList(function(currVal) {
           const endpoint: Endpoint = {
             id: data.endpointId,
             url: data.url,
@@ -135,7 +136,7 @@ const Add: React.FC<Props> = () => {
         <Textinput
           label="Endpoint Id"
           error={formState.errors.endpointId}
-          render={function (
+          render={function(
             className
           ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
             return (
@@ -150,7 +151,7 @@ const Add: React.FC<Props> = () => {
         <Textinput
           label="URL"
           error={formState.errors.url}
-          render={function (
+          render={function(
             className
           ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
             return (
