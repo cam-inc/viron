@@ -26,8 +26,8 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   // We don't use OAS documents stored in the recoid store on purpose. The reasons are below.
   // - Unsure that the stored document is up-to-date.
   // - The token may be expired.
-  useEffect(function() {
-    const f = async function(): Promise<void> {
+  useEffect(function () {
+    const f = async function (): Promise<void> {
       if (!endpoint) {
         return;
       }
@@ -53,7 +53,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return;
       }
 
-      const document: Document = await response.json();
+      const document: Record<string, unknown> = await response.json();
       const { isValid, errors } = isOASSupported(document);
       if (!isValid) {
         setError(
@@ -62,10 +62,10 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         setIsPending(false);
         return;
       }
-      const _document = await resolve(document);
+      const _document = resolve(document);
       // Just update the stored data so that other pages using endpoints data be affected.
       setEndpoint({ ...endpoint, document: _document });
-      setDocument(document);
+      setDocument(_document);
       setIsPending(false);
     };
     f();
@@ -73,7 +73,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   }, []);
 
   const _navigae = useCallback(
-    function(pageIds: PageId[]) {
+    function (pageIds: PageId[]) {
       navigate(
         `/endpoints/${params.endpointId}?selectedPageIds=${pageIds.join(',')}`
       );
@@ -86,7 +86,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   if (!!queries.selectedPageIds) {
     selectedPageIds = (queries.selectedPageIds as string).split(',');
   }
-  const handlePageSelect = function(pageId: PageId, separate: boolean) {
+  const handlePageSelect = function (pageId: PageId, separate: boolean) {
     let newSelectedPageIds: PageId[] = [...selectedPageIds];
     if (separate) {
       !selectedPageIds.includes(pageId) && newSelectedPageIds.push(pageId);
@@ -95,7 +95,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     }
     _navigae(newSelectedPageIds);
   };
-  const handlePageUnselect = function(pageId: PageId) {
+  const handlePageUnselect = function (pageId: PageId) {
     const newSelectedPageIds: PageId[] = selectedPageIds.filter(
       (selectedPageId) => selectedPageId !== pageId
     );

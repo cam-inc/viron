@@ -1,5 +1,6 @@
 //import $RefParser from '@apidevtools/json-schema-ref-parser';
-import { lint } from '@viron/linter';
+import { lint, LintReturn } from '@viron/linter';
+import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
 import {
@@ -14,19 +15,50 @@ import {
 import { isRelativeURL } from '$utils/index';
 
 // Check whether a OAS document is support by us.
-export const isOASSupported = function(document: object) {
-  const res = lint(document);
-  return res;
+export const isOASSupported = function (
+  document: Record<string, unknown>
+): LintReturn {
+  return lint(document);
 };
 
-export const resolve = async function(document: object): Promise<Document> {
-  debugger
+// TODO: To support $ref values not starting with a # letter.
+export const resolve = function (document: Record<string, unknown>): Document {
+  // Look for all reference objects(those that contains a $ref property.) and insert actual referenced data.
+  JSONPath({
+    path: '$..[?(@.$ref)]',
+    json: document,
+    resultType: 'all',
+    callback: function (result) {
+      const split = result.value.$ref.split('/');
+      // Omit # letter.
+      split.shift();
+      const schemaResult = JSONPath({
+        path: `$.${split.join('.')}`,
+        json: document,
+        resultType: 'all',
+      })[0];
+      if (!schemaResult) {
+        return;
+      }
+      result.parent[result.parentProperty] = {
+        ...result.parent[result.parentProperty],
+        ...schemaResult.value,
+      };
+    },
+  });
+  // Clean up all $ref properties.
+  JSONPath({
+    path: '$..[?(@.$ref)]',
+    json: document,
+    resultType: 'all',
+    callback: function (result) {
+      delete result.parent[result.parentProperty].$ref;
+    },
+  });
   return document as Document;
-  //  const schema = await $RefParser.dereference(document);
-  //  return schema as Document;
 };
 
-export const getRequestObject = function(
+export const getRequestObject = function (
   document: Document,
   { operationId }: { operationId?: OperationId }
 ): Request | null {
@@ -36,11 +68,11 @@ export const getRequestObject = function(
   return null;
 };
 
-export const getRequestObjectByOperationId = function(
+export const getRequestObjectByOperationId = function (
   document: Document,
   operationId: OperationId
 ): Request | null {
-  const path = _.findKey(document.paths, function(pathItem) {
+  const path = _.findKey(document.paths, function (pathItem) {
     return pathItem.get?.operationId === operationId;
   });
   if (!path) {
@@ -57,14 +89,14 @@ export const getRequestObjectByOperationId = function(
     'patch',
     'trace',
   ]);
-  const operation = _.find(operations, function(operation) {
+  const operation = _.find(operations, function (operation) {
     return operation?.operationId === operationId;
   });
   if (!operation) {
     return null;
   }
 
-  const method = _.findKey(operations, function(operation) {
+  const method = _.findKey(operations, function (operation) {
     return operation?.operationId === operationId;
   });
   if (!method) {
@@ -80,7 +112,7 @@ export const getRequestObjectByOperationId = function(
 
 // Returns a URL to the target host.
 // TODO: Support Server Variables.
-export const getURLToTargetHost = function(
+export const getURLToTargetHost = function (
   endpoint: Endpoint,
   document: Document
 ): URL {
@@ -100,7 +132,7 @@ export const getURLToTargetHost = function(
   return url;
 };
 
-export const pickContentType = function(
+export const pickContentType = function (
   content: RequestBody['content']
 ): string {
   // TODO: pick the most specific key.
@@ -108,7 +140,7 @@ export const pickContentType = function(
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getDefaultValue = function(schema: Schema): any {
+export const getDefaultValue = function (schema: Schema): any {
   if (!_.isUndefined(schema.default)) {
     return schema.default;
   }
@@ -128,8 +160,7 @@ export const getDefaultValue = function(schema: Schema): any {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key in string]: any;
       } = {};
-      _.forEach(schema.properties, function(_schema, key) {
-        _schema = _schema as Schema;
+      _.forEach(schema.properties, function (_schema, key) {
         if ((schema.required || []).includes(key)) {
           ret[key] = getDefaultValue(_schema);
         }

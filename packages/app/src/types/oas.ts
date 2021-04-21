@@ -109,7 +109,7 @@ export type PathItem = {
   patch?: Operation;
   trace?: Operation;
   servers?: Server[];
-  parameters: Array<Parameter | Reference>;
+  parameters: Parameter[];
 };
 
 export type Method =
@@ -132,10 +132,10 @@ export type Request = {
 // This is not a part of OAS.
 export type RequestPayloadParameter = Parameter & {
   value:
-  | number
-  | string
-  | (number | string)[]
-  | { [key in string]: string | number };
+    | number
+    | string
+    | (number | string)[]
+    | { [key in string]: string | number };
 };
 // This is not a part of OAS.
 export type RequestPayloadRequestBody = RequestBody & {
@@ -151,11 +151,11 @@ export type Operation = {
   description?: string | CommonMark;
   externalDocs?: ExternalDocumentation;
   operationId?: OperationId;
-  parameters?: Array<Parameter | Reference>;
+  parameters?: Parameter[];
   requestBody?: RequestBody;
   responses?: Responses;
   callbacks?: {
-    [key: string]: Callback | Reference;
+    [key: string]: Callback;
   };
   deprecated?: boolean;
   security?: SecurityRequirement[];
@@ -186,31 +186,31 @@ export type ServerVariable = {
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#components-object
 export type Components = {
   schemas?: {
-    [key: string]: Schema | Reference;
+    [key: string]: Schema;
   };
   responses?: {
-    [key: string]: Response | Reference;
+    [key: string]: Response;
   };
   parameters?: {
-    [key: string]: Parameter | Reference;
+    [key: string]: Parameter;
   };
   examples?: {
-    [key: string]: Example | Reference;
+    [key: string]: Example;
   };
   requestBodies?: {
-    [key: string]: RequestBody | Reference;
+    [key: string]: RequestBody;
   };
   headers?: {
-    [key: string]: Header | Reference;
+    [key: string]: Header;
   };
   securitySchemes?: {
-    [key: string]: SecurityScheme | Reference;
+    [key: string]: SecurityScheme;
   };
   links?: {
-    [key: string]: Link | Reference;
+    [key: string]: Link;
   };
   callbacks?: {
-    [key: string]: Callback | Reference;
+    [key: string]: Callback;
   };
 };
 
@@ -277,27 +277,27 @@ export type Schema = {
   type: 'string' | 'number' | 'integer' | 'object' | 'array' | 'boolean';
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.22
-  allOf?: Schema[] | Reference[];
+  allOf?: Schema[];
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.24
-  oneOf?: Schema[] | Reference[];
+  oneOf?: Schema[];
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.23
-  anyOf?: Schema[] | Reference[];
+  anyOf?: Schema[];
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.25
-  not?: Schema | Reference;
+  not?: Schema;
   // Value MUST be an object and not an array. Inline or referenced schema MUST be of a Schema Object and not a standard JSON
   // Items MUST be present if the type is array.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.9
-  items?: Schema | Reference;
+  items?: Schema;
   // Property definitions MUST be a Schema Object and not a standard JSON Schema (inline or referenced).
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.16
   properties?: {
-    [key: string]: Schema | Reference;
+    [key: string]: Schema;
   };
   // Value can be boolean or object. Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema. Consistent with JSON Schema, additionalProperties defaults to true.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.18
-  additionalProperties?: boolean | Schema | Reference;
+  additionalProperties?: boolean | Schema;
   // CommonMark syntax allowed.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-6.1
   description?: string | CommonMark;
@@ -309,14 +309,14 @@ export type Schema = {
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-7.3
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#dataTypeFormat
   format?:
-  | 'date-time'
-  | 'email'
-  | 'hostname'
-  | 'ipv4'
-  | 'ipv6'
-  | 'date'
-  | 'date-time'
-  | 'password';
+    | 'date-time'
+    | 'email'
+    | 'hostname'
+    | 'ipv4'
+    | 'ipv6'
+    | 'date'
+    | 'date-time'
+    | 'password';
   // The default value represents what would be assumed by the consumer of the input as the value of the schema if one is not provided. Unlike JSON Schema, the value MUST conform to the defined type for the Schema Object defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-6.2
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -376,7 +376,7 @@ export type ExternalDocumentation = {
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#responses-object
 export type Responses = {
   // Keys should be a string of 'default' or one of HTTP Status Codes.
-  [key: string]: Response | Reference;
+  [key: string]: Response;
 };
 
 // [extendable] Describes a single response from an API Operation, including design-time, static links to operations based on the response.
@@ -384,14 +384,14 @@ export type Responses = {
 export type Response = {
   description: string | CommonMark;
   headers?: {
-    [key: string]: Header | Reference;
+    [key: string]: Header;
   };
   // A map containing descriptions of potential response payloads.
   content?: {
     [key: string]: MediaType;
   };
   links: {
-    [key: string]: Link | Reference;
+    [key: string]: Link;
   };
 };
 
@@ -415,23 +415,23 @@ export type Parameter = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   examples?: {
-    [key: string]: Example | Reference;
+    [key: string]: Example;
   };
 } & (
-    | // A parameter MUST contain either a schema property, or a content property, but not both.
-    {
+  | // A parameter MUST contain either a schema property, or a content property, but not both.
+  {
       // The schema defining the type used for the parameter.
-      schema: Schema | Reference;
+      schema: Schema;
       content?: never;
     }
-    | {
+  | {
       schema?: never;
       content: {
         // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
         [key: string]: MediaType;
       };
     }
-  );
+);
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#style-values
 export type Style =
@@ -544,11 +544,11 @@ export type RuntimeExpression = string;
 // [extendable] Provides schema and examples for the media type identified by its key.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#media-type-object
 export type MediaType = {
-  schema?: Schema | Reference;
+  schema?: Schema;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   examples?: {
-    [key: string]: Example | Reference;
+    [key: string]: Example;
   };
   encoding: {
     [key: string]: Encoding;
@@ -560,7 +560,7 @@ export type MediaType = {
 export type Encoding = {
   contentType?: string;
   headers?: {
-    [key: string]: Header | Reference;
+    [key: string]: Header;
   };
   style?: Style;
   explode?: boolean;
@@ -570,12 +570,6 @@ export type Encoding = {
 // Semantic version number.
 // @see: https://semver.org/spec/v2.0.0.html
 export type Semver = string;
-
-// A simple object to allow referencing other components in the specification.
-// @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#reference-object
-export type Reference = {
-  $ref: string;
-};
 
 // Additional data to extend the specification.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#specificationExtensions

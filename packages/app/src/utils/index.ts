@@ -3,7 +3,7 @@ import { URL } from '$types/index';
 export const isBrowser: boolean = typeof window !== 'undefined';
 export const isSSR: boolean = typeof window === 'undefined';
 
-export const isRelativeURL = function(url: URL): boolean {
+export const isRelativeURL = function (url: URL): boolean {
   return url[0] !== 'h';
 };
 
