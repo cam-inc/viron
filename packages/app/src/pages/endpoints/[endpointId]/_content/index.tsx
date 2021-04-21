@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Drawer from '$components/drawer';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { useFetch } from '$hooks/oas';
 import { Endpoint } from '$types/index';
@@ -49,14 +49,9 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [isDrawerOpened, setIsDrawerOpened] = useState<boolean>(false);
-  const handleDrawerRequestClose = useCallback((accept) => {
-    accept(() => {
-      setIsDrawerOpened(false);
-    });
-  }, []);
+  const drawer = useDrawer();
   const handlePayloadButtonClick = function () {
-    setIsDrawerOpened(true);
+    drawer.open();
   };
 
   const handleRequestSubmit = useCallback(
@@ -64,10 +59,10 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
       parameters?: RequestPayloadParameter[],
       requestBody?: RequestPayloadRequestBody
     ) {
-      setIsDrawerOpened(false);
+      drawer.requestClose();
       fetch(parameters, requestBody);
     },
-    [fetch]
+    [drawer, drawer.requestClose, fetch]
   );
 
   if (isPending) {
@@ -87,10 +82,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     <div>
       <p>{content.title}</p>
       <button onClick={handlePayloadButtonClick}>payload</button>
-      <Drawer
-        isOpened={isDrawerOpened}
-        onRequestClose={handleDrawerRequestClose}
-      >
+      <Drawer {...drawer.bind}>
         <Request request={requestObject} onSubmit={handleRequestSubmit} />
       </Drawer>
       <div>{elm}</div>
