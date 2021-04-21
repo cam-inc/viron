@@ -11,7 +11,7 @@ import {
   RequestPayloadRequestBody,
   Schema as SchemaType,
 } from '$types/oas';
-import { getDefaultValue, pickContentType } from '$utils/oas';
+import { pickContentType } from '$utils/oas';
 
 type Props = {
   request: Request;
@@ -42,6 +42,10 @@ const _Request: React.FC<Props> = ({
         ret.parameters = {};
         (request.operation.parameters as Parameter[]).forEach((parameter) => {
           if (!_.isUndefined(defaultParametersValues[parameter.name])) {
+            // TODO: Without this below, tsc says "Object is possibly 'undefined'."
+            if (!ret.parameters) {
+              return;
+            }
             ret.parameters[parameter.name] =
               defaultParametersValues[parameter.name];
           }
