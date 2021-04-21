@@ -1,6 +1,4 @@
-import { lint } from '@viron/linter';
 import { URL } from '$types/index';
-import { Document } from '$types/oas';
 
 export const isBrowser: boolean = typeof window !== 'undefined';
 export const isSSR: boolean = typeof window === 'undefined';
@@ -11,11 +9,6 @@ export const isRelativeURL = function (url: URL): boolean {
 
 export const timeout = async (ms: number): Promise<undefined> => {
   return await new Promise((resolve) => setTimeout(resolve, ms));
-};
-
-// Check whether a OAS document is support by us.
-export const isOASSupported = function (document: Document) {
-  return lint(document);
 };
 
 // Promise wrapper for easy async/await error handling.

@@ -7,7 +7,8 @@ import Textinput from '$components/textinput';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { AuthType, Endpoint, EndpointID, URL as TypeURL } from '$types/index';
 import { Document } from '$types/oas';
-import { isOASSupported, promiseErrorHandler } from '$utils/index';
+import { promiseErrorHandler } from '$utils/index';
+import { isOASSupported, resolve } from '$utils/oas';
 import { endpointId, url } from '$utils/v8n';
 
 type Props = {
@@ -69,7 +70,7 @@ const Add: React.FC<Props> = () => {
       // The response.ok being true means the response.status is 2xx.
       // The endpoint exists and it's open to public.
       if (response.ok) {
-        const document: Document = await response.json();
+        const document: Record<string, unknown> = await response.json();
         const { isValid } = isOASSupported(document);
         if (isValid) {
           setEndpointList(function (currVal) {
@@ -79,7 +80,7 @@ const Add: React.FC<Props> = () => {
               isPrivate: false,
               authTypes: [],
               token: null,
-              document,
+              document: resolve(document),
             };
             return [...currVal, endpoint];
           });

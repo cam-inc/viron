@@ -67,7 +67,7 @@
             "name": "q",
             "in": "query",
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/sampleA"
             }
           },
           {
@@ -110,10 +110,13 @@
                     "type": "object",
                     "properties": {
                       "propC-a": {
-                        "type": "string"
+                        "$ref": "#/components/schemas/sampleA"
                       },
                       "propC-b": {
-                        "type": "string"
+                        "$ref": "#/components/schemas/sampleA"
+                      },
+                      "propC-C": {
+                        "$ref": "#/components/schemas/sampleA"
                       }
                     },
                     "required": ["propC-a"]
@@ -150,7 +153,32 @@
             }
           },
           "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "response description.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "sampleA": {
+        "type": "string"
+      },
+      "sampleB": {
+        "type": "number"
+      },
+      "sampleC": {
+        "$ref": "#/components/schemas/sampleA"
       }
     }
   }
