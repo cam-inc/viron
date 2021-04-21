@@ -95,3 +95,23 @@ const Modal: React.FC<Props> = ({
 };
 
 export default Modal;
+
+export const useModal = function ({
+  initialIsOpened = false,
+}: {
+  initialIsOpened?: boolean;
+}): {
+  isOpened: boolean;
+  onRequestClose: Props['onRequestClose'];
+} {
+  const [isOpened, setIsOpened] = useState<boolean>(initialIsOpened);
+  const handleRequestClose = useCallback(function (accept) {
+    accept(() => {
+      setIsOpened(false);
+    });
+  }, []);
+  return {
+    isOpened,
+    onRequestClose: handleRequestClose,
+  };
+};

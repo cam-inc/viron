@@ -1,11 +1,13 @@
 import { Link, PageProps } from 'gatsby';
 import React, { useCallback, useState } from 'react';
 import Drawer from '$components/drawer';
-import Modal from '$components/modal';
+import Modal, { useModal } from '$components/modal';
 import Layout from '$layouts/index';
 
 type Props = PageProps;
 const SamplePage: React.FC<Props> = () => {
+  const ret = useModal({});
+
   const [isModalOpened, setIsModalOpened] = useState(false);
   const handleModalToggleClick = useCallback(() => {
     setIsModalOpened(!isModalOpened);
