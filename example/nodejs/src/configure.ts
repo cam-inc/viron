@@ -22,6 +22,9 @@ export interface Configure {
   store: {
     main: MongoConfigure | MysqlConfigure;
   };
+  acl: {
+    allowOrigins: string[];
+  };
 }
 
 /**
@@ -62,6 +65,10 @@ export const get = (mode: Mode): Configure => {
   const ret: Configure = {
     store: {
       main: mode == MODE_MONGO ? mongo : mysql,
+    },
+    acl: {
+      // TODO: 正規のドメイン取得したら修正
+      allowOrigins: ['https://localhost:8000'],
     },
   };
 
