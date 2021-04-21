@@ -79,11 +79,15 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
   }
 
   return (
-    <div>
-      <p>{content.title}</p>
+    <div className="p-2 bg-gray-100">
       <button onClick={handlePayloadButtonClick}>payload</button>
       <Drawer {...drawer.bind}>
-        <Request request={requestObject} onSubmit={handleRequestSubmit} />
+        <Request
+          request={requestObject}
+          defaultParametersValues={content.parameters}
+          defaultRequestBodyValues={content.requestBody}
+          onSubmit={handleRequestSubmit}
+        />
       </Drawer>
       <div>{elm}</div>
     </div>

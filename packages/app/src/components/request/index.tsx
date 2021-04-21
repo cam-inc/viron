@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
 import {
+  Info,
   Parameter,
   Request,
   RequestPayloadParameter,
@@ -18,8 +19,15 @@ type Props = {
     parameters?: RequestPayloadParameter[],
     requestBody?: RequestPayloadRequestBody
   ) => void;
+  defaultParametersValues?: Info['x-pages'][number]['contents'][number]['parameters'];
+  defaultRequestBodyValues?: Info['x-pages'][number]['contents'][number]['requestBody'];
 };
-const _Request: React.FC<Props> = ({ request, onSubmit }) => {
+const _Request: React.FC<Props> = ({
+  request,
+  onSubmit,
+  defaultParametersValues = {},
+  defaultRequestBodyValues,
+}) => {
   const defaultValues = useMemo(
     function () {
       const ret: {
@@ -33,6 +41,11 @@ const _Request: React.FC<Props> = ({ request, onSubmit }) => {
       if (!!request.operation.parameters) {
         ret.parameters = {};
         (request.operation.parameters as Parameter[]).forEach((parameter) => {
+          if (!_.isUndefined(defaultParametersValues[parameter.name])) {
+            ret.parameters[parameter.name] =
+              defaultParametersValues[parameter.name];
+          }
+          /*
           if (parameter.required) {
             // TODO: Without this below, tsc says "Object is possibly 'undefined'."
             if (!ret.parameters) {
@@ -42,13 +55,19 @@ const _Request: React.FC<Props> = ({ request, onSubmit }) => {
               parameter.schema as SchemaType
             );
           }
+          */
         });
       }
       if (!!request.operation.requestBody) {
+        if (!_.isUndefined(defaultRequestBodyValues)) {
+          ret.requestBody = defaultRequestBodyValues;
+        }
+        /*
         const schema = request.operation.requestBody.content[
           pickContentType(request.operation.requestBody.content)
         ].schema as SchemaType;
         ret.requestBody = getDefaultValue(schema);
+        */
       }
       return ret;
     },

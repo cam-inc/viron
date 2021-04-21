@@ -41,7 +41,20 @@
           {
             "title": "titlee",
             "type": "number",
-            "getOperationId": "getMau"
+            "getOperationId": "getMau",
+            "parameters": {
+              "id": "foo",
+              "q": "qqqqq"
+            },
+            "requestBody": {
+              "propA": "see me",
+              "propC": {
+                "propC-C": "aaa"
+              },
+              "propG": [
+                "one", "two", "three", "four", "five"
+              ]
+            }
           }
         ]
       },

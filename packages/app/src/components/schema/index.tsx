@@ -75,6 +75,7 @@ const _Schema: React.FC<Props> = ({
     schema,
     required,
     map: activeRef,
+    getValues,
   });
 
   return (
