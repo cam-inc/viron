@@ -1,5 +1,7 @@
+import { AiOutlineDown } from '@react-icons/all-files/ai/AiOutlineDown';
+import { AiOutlineRight } from '@react-icons/all-files/ai/AiOutlineRight';
 import classnames from 'classnames';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Info } from '$types/oas';
 
 type Partial = {
@@ -119,10 +121,25 @@ const Group: React.FC<{
   selectedPageIds: Info['x-pages'][number]['id'][];
   onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
 }> = ({ partial, selectedPageIds, onSelect }) => {
+  const [isOpened, setIsOpened] = useState<boolean>(true);
+  const handleClick = function () {
+    setIsOpened(!isOpened);
+  };
   return (
     <div>
-      <p className="font-bold">{partial.group}</p>
-      <div className="ml-2">
+      <p className="font-bold" onClick={handleClick}>
+        {isOpened ? (
+          <AiOutlineDown className="inline mr-1" />
+        ) : (
+          <AiOutlineRight className="inline mr-1" />
+        )}
+        <span>{partial.group}</span>
+      </p>
+      <div
+        className={classnames('ml-2', {
+          hidden: !isOpened,
+        })}
+      >
         <GroupOrPage
           list={partial.children}
           selectedPageIds={selectedPageIds}

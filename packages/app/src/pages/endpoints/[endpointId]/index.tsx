@@ -142,8 +142,6 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   return (
     <div id="page-endpointOne">
       <div>
-        <p>{JSON.stringify(document)}</p>
-        <p>see this?: {t('aa.bb')}</p>
         <_Pages
           pages={document.info['x-pages']}
           selectedPageIds={selectedPageIds}
