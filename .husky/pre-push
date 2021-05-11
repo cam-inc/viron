@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname $0)/_/husky.sh"
 
-~/work/node_modules/.bin/npm run pre-push
+npm run pre-push
