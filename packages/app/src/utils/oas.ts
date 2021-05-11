@@ -1,3 +1,6 @@
+//import $RefParser from '@apidevtools/json-schema-ref-parser';
+import { lint, LintReturn } from '@viron/linter';
+import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
 import {
@@ -10,6 +13,50 @@ import {
   Schema,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
+
+// Check whether a OAS document is support by us.
+export const isOASSupported = function (
+  document: Record<string, unknown>
+): LintReturn {
+  return lint(document);
+};
+
+// TODO: To support $ref values not starting with a # letter.
+export const resolve = function (document: Record<string, unknown>): Document {
+  // Look for all reference objects(those that contains a $ref property.) and insert actual referenced data.
+  JSONPath({
+    path: '$..[?(@.$ref)]',
+    json: document,
+    resultType: 'all',
+    callback: function (result) {
+      const split = result.value.$ref.split('/');
+      // Omit # letter.
+      split.shift();
+      const schemaResult = JSONPath({
+        path: `$.${split.join('.')}`,
+        json: document,
+        resultType: 'all',
+      })[0];
+      if (!schemaResult) {
+        return;
+      }
+      result.parent[result.parentProperty] = {
+        ...result.parent[result.parentProperty],
+        ...schemaResult.value,
+      };
+    },
+  });
+  // Clean up all $ref properties.
+  JSONPath({
+    path: '$..[?(@.$ref)]',
+    json: document,
+    resultType: 'all',
+    callback: function (result) {
+      delete result.parent[result.parentProperty].$ref;
+    },
+  });
+  return document as Document;
+};
 
 export const getRequestObject = function (
   document: Document,
@@ -114,7 +161,6 @@ export const getDefaultValue = function (schema: Schema): any {
         [key in string]: any;
       } = {};
       _.forEach(schema.properties, function (_schema, key) {
-        _schema = _schema as Schema;
         if ((schema.required || []).includes(key)) {
           ret[key] = getDefaultValue(_schema);
         }

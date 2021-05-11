@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
 import _Schema from '$components/schema';
-import { Schema } from '$types/oas';
 import { Props } from '../../index';
 
 const SchemaOfTypeObject: React.FC<Props> = ({
@@ -27,7 +26,7 @@ const SchemaOfTypeObject: React.FC<Props> = ({
             <li key={_name}>
               <_Schema
                 name={`${name}.${_name}`}
-                schema={_schema as Schema}
+                schema={_schema}
                 formState={formState}
                 register={register}
                 unregister={unregister}

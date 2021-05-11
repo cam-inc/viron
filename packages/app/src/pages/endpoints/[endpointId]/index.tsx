@@ -7,7 +7,8 @@ import { useRecoilState } from 'recoil';
 import { oneState } from '$store/selectors/endpoint';
 import { Token } from '$types/index';
 import { Document, Info } from '$types/oas';
-import { isOASSupported, promiseErrorHandler } from '$utils/index';
+import { promiseErrorHandler } from '$utils/index';
+import { isOASSupported, resolve } from '$utils/oas';
 import _Pages from './_pages';
 import _Panels from './_panels';
 
@@ -52,7 +53,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return;
       }
 
-      const document: Document = await response.json();
+      const document: Record<string, unknown> = await response.json();
       const { isValid, errors } = isOASSupported(document);
       if (!isValid) {
         setError(
@@ -61,9 +62,10 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         setIsPending(false);
         return;
       }
+      const _document = resolve(document);
       // Just update the stored data so that other pages using endpoints data be affected.
-      setEndpoint({ ...endpoint, document });
-      setDocument(document);
+      setEndpoint({ ...endpoint, document: _document });
+      setDocument(_document);
       setIsPending(false);
     };
     f();
