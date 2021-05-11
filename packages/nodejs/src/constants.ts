@@ -81,8 +81,8 @@ export const HTTP_HEADER = {
 } as const;
 export type HttpHeader = typeof HTTP_HEADER[keyof typeof HTTP_HEADER];
 
-export const DEFAULT_PAGER_LIMIT = 10;
-export const DEFAULT_PAGER_OFFSET = 0;
+export const DEFAULT_PAGER_SIZE = 10;
+export const DEFAULT_PAGER_PAGE = 1;
 
 export const ACCESS_CONTROL_ALLOW_HEADERS = [
   'X-Requested-With',
@@ -107,3 +107,22 @@ export const ACCESS_CONTROL_ALLOW_METHODS = [
 ] as const;
 
 export const ACCESS_CONTROL_ALLOW_CREDENTIALS = 'true';
+
+export const ADMIN_ROLES = {
+  SUPER: 'super',
+  VIEWER: 'viewer',
+} as const;
+export type AdminRoles = typeof ADMIN_ROLES[keyof typeof ADMIN_ROLES];
+
+export const VIRON_AUTHTYPES_PATH = '/viron/authtypes';
+
+export const PERMISSION = {
+  READ: 'read',
+  WRITE: 'write',
+  DENY: 'deny',
+};
+export type Permission = typeof PERMISSION[keyof typeof PERMISSION];
+
+export const RESOURCE_DELIMITER = ':';
+
+export const OAS_X_PAGES = 'x-pages';

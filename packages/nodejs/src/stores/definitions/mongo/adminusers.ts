@@ -1,32 +1,23 @@
 import { Document, Model, Schema, SchemaDefinition } from 'mongoose';
-import { AuditLog } from '../../../domains/auditlog';
+import { AdminUser } from '../../../domains/adminuser';
 
-export const name = 'auditlogs';
+export const name = 'adminusers';
 
 const schemaDefinition: SchemaDefinition = {
-  requestMethod: {
+  email: {
     type: Schema.Types.String,
-    required: false,
+    required: true,
+    unique: true,
   },
-  requestUri: {
+  authType: {
     type: Schema.Types.String,
-    required: false,
+    required: true,
   },
-  sourceIp: {
+  password: {
     type: Schema.Types.String,
-    required: false,
   },
-  userId: {
+  salt: {
     type: Schema.Types.String,
-    required: false,
-  },
-  requestBody: {
-    type: Schema.Types.String,
-    required: false,
-  },
-  statusCode: {
-    type: Schema.Types.Number,
-    required: false,
   },
   createdAt: {
     type: Schema.Types.Number,
@@ -36,13 +27,13 @@ const schemaDefinition: SchemaDefinition = {
   },
 };
 
-export interface AuditLogDocument extends AuditLog, Document {
+export interface AdminUserDocument extends AdminUser, Document {
   id: string; // mongoose.Docmentのidがanyなので上書き
 }
 
-export type AuditLogModel = Model<AuditLogDocument>;
+export type AdminUserModel = Model<AdminUserDocument>;
 
-export const schema = new Schema<AuditLogDocument>(schemaDefinition, {
+export const schema = new Schema<AdminUserDocument>(schemaDefinition, {
   autoIndex: true,
   collection: name,
   strict: true,

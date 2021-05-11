@@ -12,17 +12,17 @@ components:
         type: string
       required: true
 
-    PagerLimitQueryParam:
-      name: limit
+    PagerSizeQueryParam:
+      name: size
       in: query
       description: Size of list
       schema:
         type: integer
       required: false
-    PagerOffsetQueryParam:
-      name: offset
+    PagerPageQueryParam:
+      name: page
       in: query
-      description: First record position of list
+      description: Page number of list
       schema:
         type: integer
       required: false

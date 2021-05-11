@@ -10,6 +10,7 @@ info:
       description: ユーザー情報を閲覧/管理します
       contents:
         - getOperationId: listUsers
+          resourceId: user
           style: table
           pagination: true
           query:
@@ -27,8 +28,8 @@ paths:
       summary: list users
       description: ユーザー一覧
       parameters:
-        - $ref: './components.yaml#/components/parameters/PagerLimitQueryParam'
-        - $ref: './components.yaml#/components/parameters/PagerOffsetQueryParam'
+        - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
         - $ref: './components.yaml#/components/parameters/IdQueryParam'
       responses:
         200:

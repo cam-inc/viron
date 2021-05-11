@@ -1,9 +1,12 @@
 import { FindOptions } from 'sequelize/types';
-import { DEFAULT_PAGER_LIMIT, DEFAULT_PAGER_OFFSET } from '@viron/lib';
+import { DEFAULT_PAGER_SIZE, DEFAULT_PAGER_PAGE } from '@viron/lib';
 
 export const getFindOptions = (
-  limit: number = DEFAULT_PAGER_LIMIT,
-  offset: number = DEFAULT_PAGER_OFFSET
+  size: number = DEFAULT_PAGER_PAGE,
+  page: number = DEFAULT_PAGER_SIZE
 ): FindOptions => {
-  return { limit, offset };
+  return {
+    limit: size,
+    offset: (page - 1) * size,
+  };
 };
