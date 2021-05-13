@@ -1,9 +1,15 @@
 import { Model, Sequelize, DataTypes, ModelCtor } from 'sequelize';
-import { AuditLog, AuditLogCreateAttributes } from '../../../domains/auditlog';
+import {
+  AdminUser,
+  AdminUserCreateAttributes,
+} from '../../../domains/adminuser';
 
-export const name = 'auditlogs';
+export const name = 'adminusers';
 
-export class AuditLogModel extends Model<AuditLog, AuditLogCreateAttributes> {
+export class AdminUserModel extends Model<
+  AdminUser,
+  AdminUserCreateAttributes
+> {
   id!: number;
 
   // timestamps!
@@ -11,10 +17,10 @@ export class AuditLogModel extends Model<AuditLog, AuditLogCreateAttributes> {
   public readonly updatedAt!: Date;
 }
 
-export type AuditLogModelCtor = ModelCtor<AuditLogModel>;
+export type AdminUserModelCtor = ModelCtor<AdminUserModel>;
 
-export const createModel = (s: Sequelize): ModelCtor<AuditLogModel> => {
-  const Model = s.define<AuditLogModel>(
+export const createModel = (s: Sequelize): ModelCtor<AdminUserModel> => {
+  const Model = s.define<AdminUserModel>(
     name,
     {
       id: {
@@ -23,28 +29,20 @@ export const createModel = (s: Sequelize): ModelCtor<AuditLogModel> => {
         primaryKey: true,
         autoIncrement: true,
       },
-      requestMethod: {
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      authType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      password: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      requestUri: {
-        type: DataTypes.STRING(2048),
-        allowNull: true,
-      },
-      sourceIp: {
+      salt: {
         type: DataTypes.STRING,
-        allowNull: true,
-      },
-      userId: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      requestBody: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      statusCode: {
-        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: true,
       },
       createdAt: {
@@ -60,7 +58,7 @@ export const createModel = (s: Sequelize): ModelCtor<AuditLogModel> => {
       timestamps: true,
       deletedAt: false,
       charset: 'utf8',
-      indexes: [],
+      indexes: [{ unique: true, fields: ['email'] }],
     }
   );
 

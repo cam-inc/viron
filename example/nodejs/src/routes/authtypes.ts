@@ -1,4 +1,4 @@
-import { AUTH_METHOD, AUTH_TYPE, domainsAuthType } from '@viron/lib';
+import { AUTH_METHOD, AUTH_TYPE, domainsAuthType, paging } from '@viron/lib';
 import { RouteContext } from '.';
 
 const { genAuthType } = domainsAuthType;
@@ -15,5 +15,5 @@ export const listVironAuthtypes = async (
     genAuthType('viron', AUTH_TYPE.SIGNOUT, AUTH_METHOD.POST, '/signout'),
     genAuthType('google', AUTH_TYPE.OAUTH, AUTH_METHOD.POST, '/google/signin'),
   ];
-  context.res.json(authTypes);
+  context.res.json(paging(authTypes));
 };

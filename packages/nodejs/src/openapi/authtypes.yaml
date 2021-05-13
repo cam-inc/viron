@@ -8,7 +8,7 @@ tags:
   - name: vironAuthType
 
 paths:
-  /viron_authtype:
+  /viron/authtypes:
     get:
       operationId: listVironAuthtypes
       tags:
@@ -21,10 +21,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VironAuthTypeList'
+                $ref: '#/components/schemas/VironAuthTypeListWithPager'
 
 components:
   schemas:
+    VironAuthTypeListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/Pager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/VironAuthTypeList'
+          required:
+            - list
+
     VironAuthTypeList:
       type: array
       items:

@@ -3,6 +3,15 @@ info:
   version: 0.0.1
   title: '@viron/lib oas'
   description: oas api specifications
+  # pagerとsortの仕様定義
+  x-table-pager:
+    pager-req-page-key: page # ページ番号を指定するクエリパラメータ
+    pager-req-size-key: size # ページサイズを指定するクエリパラメータ
+    pager-resp-maxpage-key: maxPage # 最大ページ数を返すキー
+    pager-resp-page-key: currentPage # 現在のページ番号を返すキー
+  x-table-sort:
+    sort-req-key: sort # ソートを指定するクエリパラメータ
+    sort-resp-key: list # リストデータを返すキー
 
 tags:
   - name: oas

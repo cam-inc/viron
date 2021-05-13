@@ -61,7 +61,6 @@ export const updateOneById = async (
   obj: UserUpdateAttributes
 ): Promise<void> => {
   const model = getModel();
-
   await model.updateOne({ _id: id }, obj);
 };
 

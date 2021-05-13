@@ -1,4 +1,5 @@
-import { repositoryContainer } from '../';
+import { ListWithPager } from '../helpers';
+import { repositoryContainer } from '../repositories';
 
 export interface AuditLog {
   id: string;
@@ -12,7 +13,7 @@ export interface AuditLog {
   updatedAt: Date;
 }
 
-export interface AuditLogCreationAttributes {
+export interface AuditLogCreateAttributes {
   requestMethod: string | null;
   requestUri: string | null;
   sourceIp: string | null;
@@ -21,7 +22,10 @@ export interface AuditLogCreationAttributes {
   statusCode: number | null;
 }
 
-export const list = async (): Promise<AuditLog[]> => {
+export type AuditLogUpdateAttributes = AuditLogCreateAttributes;
+
+// 一覧取得
+export const list = async (): Promise<ListWithPager<AuditLog>> => {
   const repository = repositoryContainer.getAuditLogRepository();
-  return repository.find();
+  return repository.findWithPager();
 };

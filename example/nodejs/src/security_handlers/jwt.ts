@@ -3,9 +3,8 @@ import {
   AuthenticatorInfo,
   ExegesisPluginContext,
 } from 'exegesis-express';
-//import { HTTP_HEADER } from '@viron/lib';
+//import { HTTP_HEADER, VIRON_AUTHTYPES_PATH } from '@viron/lib';
 //import { unauthorized } from '../errors';
-//import { VIRON_AUTHTYPES_PATH } from '../constants';
 
 export const jwt = async (
   //context: ExegesisPluginContext,

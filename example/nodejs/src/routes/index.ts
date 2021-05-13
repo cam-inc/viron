@@ -6,11 +6,13 @@ import {
 } from 'exegesis-express';
 import { OpenAPIObject } from 'openapi3-ts';
 import merge from 'deepmerge';
-import { loadResolvedOas, getOasPath as libOasPath } from '@viron/lib';
+import { loadResolvedOas, domainsOas } from '@viron/lib';
 
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
 
+import * as routesAdminRoles from './adminroles';
+import * as routesAdminUsers from './adminusers';
 import * as routesAuditLogs from './auditlogs';
 import * as routesAuthtypes from './authtypes';
 import * as routesPing from './ping';
@@ -42,16 +44,26 @@ const routes: Route[] = [
   { name: 'ping', oasPath: oasPath('ping'), handlers: routesPing },
   { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
   {
+    name: 'adminroles',
+    oasPath: domainsOas.getPath('adminroles'),
+    handlers: routesAdminRoles,
+  },
+  {
+    name: 'adminusers',
+    oasPath: domainsOas.getPath('adminusers'),
+    handlers: routesAdminUsers,
+  },
+  {
     name: 'auditlogs',
-    oasPath: libOasPath('auditlogs'),
+    oasPath: domainsOas.getPath('auditlogs'),
     handlers: routesAuditLogs,
   },
   {
     name: 'authtypes',
-    oasPath: libOasPath('authtypes'),
+    oasPath: domainsOas.getPath('authtypes'),
     handlers: routesAuthtypes,
   },
-  { name: 'oas', oasPath: libOasPath('oas'), handlers: routesOas },
+  { name: 'oas', oasPath: domainsOas.getPath('oas'), handlers: routesOas },
   // マージ順の関係で`root`は必ず最後に書く
   { name: 'root', oasPath: oasPath('root'), handlers: routesRoot },
 ];

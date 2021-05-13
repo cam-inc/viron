@@ -10,8 +10,8 @@ info:
       description: このVironサーバの監査ログを閲覧できます
       contents:
         - getOperationId: listVironAuditlogs
+          resourceId: vironAuditLog
           style: table
-          pagination: true
           query:
             - userId
             - requestUri
@@ -27,7 +27,7 @@ tags:
   - name: vironAuditLog
 
 paths:
-  /auditlogs:
+  /viron/auditlogs:
     get:
       operationId: listVironAuditlogs
       tags:
@@ -43,7 +43,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VironAuditLogList'
+                $ref: '#/components/schemas/VironAuditLogListWithPager'
 
 components:
   parameters:
@@ -62,6 +62,16 @@ components:
       required: false
 
   schemas:
+    VironAuditLogListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/Pager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/VironAuditLogList'
+          required:
+            - list
+
     VironAuditLogList:
       type: array
       items:

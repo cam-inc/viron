@@ -22,7 +22,7 @@ interface Repository<Entity, CreateAttributes, UpdateAttributes> {
     conditions?: FilterQuery<Entity> | FindOptions<Entity>,
     limit?: number,
     offset?: number
-  ) => Promise<ListWithPager<User>>;
+  ) => Promise<ListWithPager<Entity>>;
   count: (
     conditions?: FilterQuery<Entity> | FindOptions<Entity>
   ) => Promise<number>;

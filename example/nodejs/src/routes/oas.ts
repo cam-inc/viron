@@ -1,3 +1,4 @@
+import { domainsOas } from '@viron/lib';
 import { RouteContext } from '.';
 
 /**
@@ -5,5 +6,6 @@ import { RouteContext } from '.';
  * @route GET /oas
  */
 export const getOas = async (context: RouteContext): Promise<void> => {
-  context.res.json(context.apiDefinition);
+  const oas = await domainsOas.get(context.apiDefinition);
+  context.res.json(oas);
 };
