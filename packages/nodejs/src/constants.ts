@@ -48,15 +48,22 @@ export const STYLE = {
   TABLE: 'table',
   CHART: 'chart',
   EXPLORER: 'explorer',
-};
+} as const;
 export type Style = typeof STYLE[keyof typeof STYLE];
 
-export const AUTH_CONFIG = {
+export const AUTH_CONFIG_TYPE = {
   EMAIL: 'email',
   OAUTH: 'oauth',
   SIGNOUT: 'signout',
-};
-export type AuthConfig = typeof AUTH_CONFIG[keyof typeof AUTH_CONFIG];
+} as const;
+export type AuthConfigType = typeof AUTH_CONFIG_TYPE[keyof typeof AUTH_CONFIG_TYPE];
+
+export const AUTH_CONFIG_PROVIDER = {
+  VIRON: 'viron',
+  GOOGLE: 'google',
+  SIGNOUT: 'signout',
+} as const;
+export type AuthConfigProvider = typeof AUTH_CONFIG_PROVIDER[keyof typeof AUTH_CONFIG_PROVIDER];
 
 export const AUTH_METHOD = {
   GET: 'GET',
@@ -116,6 +123,9 @@ export const ADMIN_ROLE = {
 export type AdminRole = typeof ADMIN_ROLE[keyof typeof ADMIN_ROLE];
 
 export const VIRON_AUTHCONFIGS_PATH = '/viron/authconfigs';
+export const EMAIL_SIGNIN_PATH = '/email/signin';
+export const GOOGLE_SIGNIN_PATH = '/google/signin';
+export const SIGNOUT_PATH = '/signout';
 
 export const PERMISSION = {
   READ: 'read',
@@ -128,11 +138,11 @@ export const RESOURCE_DELIMITER = ':';
 
 export const OAS_X_PAGES = 'x-pages';
 
-export const AUTH_CONFIG_TYPE = {
+export const AUTH_TYPE = {
   EMAIL: 'email',
   GOOGLE: 'google',
 } as const;
-export type AuthConfigType = typeof AUTH_CONFIG_TYPE[keyof typeof AUTH_CONFIG_TYPE];
+export type AuthType = typeof AUTH_TYPE[keyof typeof AUTH_TYPE];
 
 export const AUTH_SCHEME = 'Bearer';
 export const JWT_HASH_ALGORITHM = 'HS512';

@@ -1,7 +1,7 @@
-import { AuthConfigType, AuthMethod } from '../constants';
+import { AuthConfigProvider, AuthConfigType, AuthMethod } from '../constants';
 
 export interface AuthConfig {
-  provider: string;
+  provider: AuthConfigProvider;
   type: AuthConfigType;
   method: AuthMethod;
   url: string;
@@ -10,7 +10,7 @@ export interface AuthConfig {
 export type AuthConfigs = AuthConfig[];
 
 export const genAuthConfig = (
-  provider: string,
+  provider: AuthConfigProvider,
   type: AuthConfigType,
   method: AuthMethod,
   url: string

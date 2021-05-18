@@ -1,8 +1,12 @@
 import {
-  AUTH_METHOD,
-  AUTH_CONFIG,
   domainsAuthConfig,
   paging,
+  AUTH_METHOD,
+  AUTH_CONFIG_TYPE,
+  AUTH_CONFIG_PROVIDER,
+  EMAIL_SIGNIN_PATH,
+  GOOGLE_SIGNIN_PATH,
+  SIGNOUT_PATH,
 } from '@viron/lib';
 import { RouteContext } from '.';
 
@@ -14,18 +18,23 @@ export const listVironAuthconfigs = async (
 ): Promise<void> => {
   const authConfigs = [
     genAuthConfig(
-      'viron',
-      AUTH_CONFIG.EMAIL,
+      AUTH_CONFIG_PROVIDER.VIRON,
+      AUTH_CONFIG_TYPE.EMAIL,
       AUTH_METHOD.POST,
-      '/email/signin'
+      EMAIL_SIGNIN_PATH
     ),
     genAuthConfig(
-      'google',
-      AUTH_CONFIG.OAUTH,
+      AUTH_CONFIG_PROVIDER.GOOGLE,
+      AUTH_CONFIG_TYPE.OAUTH,
       AUTH_METHOD.POST,
-      '/google/signin'
+      GOOGLE_SIGNIN_PATH
     ),
-    genAuthConfig('', AUTH_CONFIG.SIGNOUT, AUTH_METHOD.POST, '/signout'),
+    genAuthConfig(
+      AUTH_CONFIG_PROVIDER.SIGNOUT,
+      AUTH_CONFIG_TYPE.SIGNOUT,
+      AUTH_METHOD.POST,
+      SIGNOUT_PATH
+    ),
   ];
   context.res.json(paging(authConfigs));
 };
