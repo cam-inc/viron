@@ -1,4 +1,4 @@
-import { AUTH_TYPE } from '../constants';
+import { AUTH_TYPE, AuthType } from '../constants';
 import { ListWithPager, genPasswordHash } from '../helpers';
 import { repositoryContainer } from '../repositories';
 import { listRoles, revokeRoleForUser, updateRolesForUser } from './adminrole';
@@ -25,11 +25,7 @@ export interface AdminUserUpdateAttributes {
   salt: string | null;
 }
 
-export interface AdminUserView
-  extends Pick<
-    AdminUser,
-    'id' | 'email' | 'authType' | 'createdAt' | 'updatedAt'
-  > {
+export interface AdminUserView extends AdminUser {
   roleIds: string[];
 }
 
@@ -45,14 +41,7 @@ export interface AdminUserUpdatePayload {
 }
 
 const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
-  return {
-    id: adminUser.id,
-    email: adminUser.email,
-    authType: adminUser.authType,
-    createdAt: adminUser.createdAt,
-    updatedAt: adminUser.updatedAt,
-    roleIds: roleIds ?? [],
-  };
+  return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
 };
 
 // 一覧取得
@@ -71,7 +60,7 @@ export const list = async (): Promise<ListWithPager<AdminUserView>> => {
 // 1件作成
 export const createOne = async (
   payload: AdminUserCreatePayload,
-  authType = AUTH_TYPE.EMAIL
+  authType: AuthType = AUTH_TYPE.EMAIL
 ): Promise<AdminUserView> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const { roleIds, ...adminUser } = payload;
@@ -105,4 +94,36 @@ export const updateOneById = async (
 export const removeOneById = async (id: string): Promise<void> => {
   const repository = repositoryContainer.getAdminUserRepository();
   await Promise.all([repository.removeOneById(id), revokeRoleForUser(id)]);
+};
+
+// IDで1件取得
+export const findOneById = async (
+  id: string
+): Promise<AdminUserView | null> => {
+  const repository = repositoryContainer.getAdminUserRepository();
+  const user = await repository.findOneById(id);
+  if (!user) {
+    return null;
+  }
+  const roleIds = await listRoles(user.id);
+  return format(user, roleIds);
+};
+
+// emailで1件取得
+export const findOneByEmail = async (
+  email: string
+): Promise<AdminUserView | null> => {
+  const repository = repositoryContainer.getAdminUserRepository();
+  const user = await repository.findOne({ email });
+  if (!user) {
+    return null;
+  }
+  const roleIds = await listRoles(user.id);
+  return format(user, roleIds);
+};
+
+// 件数取得
+export const count = async (): Promise<number> => {
+  const repository = repositoryContainer.getAdminUserRepository();
+  return await repository.count();
 };

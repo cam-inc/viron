@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import { WhereOptions } from 'sequelize/types';
 import { storeDefinitions } from '../../stores';
 import { domainsAdminUser } from '../../domains';
 import { getPagerResults, ListWithPager } from '../../helpers';
@@ -32,6 +33,14 @@ export const findWithPager = async (): Promise<
     ...getPagerResults(result.count),
     list: result.rows.map((doc) => doc.toJSON() as domainsAdminUser.AdminUser),
   };
+};
+
+export const findOne = async (
+  conditions: WhereOptions<domainsAdminUser.AdminUser> = {}
+): Promise<domainsAdminUser.AdminUser | null> => {
+  const model = getModel();
+  const doc = await model.findOne({ where: conditions });
+  return doc ? (doc.toJSON() as domainsAdminUser.AdminUser) : null;
 };
 
 export const count = async (/*conditions: WhereOptions<User> = {}*/): Promise<number> => {

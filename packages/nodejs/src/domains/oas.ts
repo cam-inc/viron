@@ -26,7 +26,8 @@ export type OasNames =
   | 'adminroles'
   | 'adminusers'
   | 'auditlogs'
-  | 'authtypes'
+  | 'auth'
+  | 'authconfigs'
   | 'oas';
 
 // oasを取得

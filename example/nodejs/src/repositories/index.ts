@@ -23,6 +23,9 @@ interface Repository<Entity, CreateAttributes, UpdateAttributes> {
     limit?: number,
     offset?: number
   ) => Promise<ListWithPager<Entity>>;
+  findOne: (
+    conditions?: FilterQuery<Entity> | FindOptions<Entity>
+  ) => Promise<Entity>;
   count: (
     conditions?: FilterQuery<Entity> | FindOptions<Entity>
   ) => Promise<number>;

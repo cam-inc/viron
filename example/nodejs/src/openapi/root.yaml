@@ -18,6 +18,10 @@ paths:
         - root
       summary: redirect to /oas
       description: /oas へリダイレクト
+      parameters:
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         301:
           description: OK
+      security:
+        - jwt: []

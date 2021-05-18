@@ -14,7 +14,8 @@ import { jwt } from '../security_handlers/jwt';
 import * as routesAdminRoles from './adminroles';
 import * as routesAdminUsers from './adminusers';
 import * as routesAuditLogs from './auditlogs';
-import * as routesAuthtypes from './authtypes';
+import * as routesAuth from './auth';
+import * as routesAuthconfigs from './authconfigs';
 import * as routesPing from './ping';
 import * as routesRoot from './root';
 import * as routesOas from './oas';
@@ -59,9 +60,14 @@ const routes: Route[] = [
     handlers: routesAuditLogs,
   },
   {
-    name: 'authtypes',
-    oasPath: domainsOas.getPath('authtypes'),
-    handlers: routesAuthtypes,
+    name: 'auth',
+    oasPath: domainsOas.getPath('auth'),
+    handlers: routesAuth,
+  },
+  {
+    name: 'authconfigs',
+    oasPath: domainsOas.getPath('authconfigs'),
+    handlers: routesAuthconfigs,
   },
   { name: 'oas', oasPath: domainsOas.getPath('oas'), handlers: routesOas },
   // マージ順の関係で`root`は必ず最後に書く

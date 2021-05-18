@@ -31,6 +31,7 @@ paths:
         - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
         - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
         - $ref: './components.yaml#/components/parameters/IdQueryParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         200:
           description: OK
@@ -38,6 +39,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserList'
+      security:
+        - jwt: []
 
     post:
       operationId: createUser
@@ -45,6 +48,8 @@ paths:
         - user
       summary: create user
       description: ユーザー作成
+      parameters:
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -58,6 +63,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+      security:
+        - jwt: []
 
   /users/{id}:
     put:
@@ -68,6 +75,7 @@ paths:
       description: ユーザー更新
       parameters:
         - $ref: './components.yaml#/components/parameters/IdPathParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -77,6 +85,8 @@ paths:
       responses:
         204:
           description: OK
+      security:
+        - jwt: []
 
     delete:
       operationId: removeUser
@@ -86,9 +96,12 @@ paths:
       description: ユーザー削除
       parameters:
         - $ref: './components.yaml#/components/parameters/IdPathParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         204:
           description: OK
+      security:
+        - jwt: []
 
 components:
   parameters: {}

@@ -1,46 +1,46 @@
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/lib authtypes'
-  description: authtypes api specifications
+  title: '@viron/lib authconfigs'
+  description: authconfigs api specifications
 
 tags:
-  - name: vironAuthType
+  - name: vironAuthConfig
 
 paths:
-  /viron/authtypes:
+  /viron/authconfigs:
     get:
-      operationId: listVironAuthtypes
+      operationId: listVironAuthconfigs
       tags:
-        - vironAuthType
-      summary: list auth types
-      description: 認証方式一覧
+        - vironAuthConfig
+      summary: list auth configs
+      description: 認証設定を取得する
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VironAuthTypeListWithPager'
+                $ref: '#/components/schemas/VironAuthConfigListWithPager'
 
 components:
   schemas:
-    VironAuthTypeListWithPager:
+    VironAuthConfigListWithPager:
       allOf:
         - $ref: './components.yaml#/components/schemas/Pager'
         - type: object
           properties:
             list:
-              $ref: '#/components/schemas/VironAuthTypeList'
+              $ref: '#/components/schemas/VironAuthConfigList'
           required:
             - list
 
-    VironAuthTypeList:
+    VironAuthConfigList:
       type: array
       items:
-        $ref: '#/components/schemas/VironAuthType'
+        $ref: '#/components/schemas/VironAuthConfig'
 
-    VironAuthType:
+    VironAuthConfig:
       type: object
       properties:
         provider:

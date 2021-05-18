@@ -2,10 +2,7 @@ import { repositoryContainer } from '@viron/lib';
 import { getUserRepository } from '../repositories';
 import { RouteContext } from '.';
 
-/**
- * Ping
- * @route GET /ping
- */
+// Ping
 export const getPing = async (context: RouteContext): Promise<void> => {
   const now = new Date();
   const name = `fkei_${now}`;
