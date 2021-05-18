@@ -12,6 +12,9 @@ components:
           type: integer
         currentPage:
           type: integer
+      required:
+        - maxPage
+        - currentPage
 
   parameters:
     VironIdPathParam:
@@ -31,6 +34,13 @@ components:
     VironRoleIdQueryParam:
       name: roleId
       in: query
+      schema:
+        type: string
+      required: false
+
+    AuthorizationHeaderParam:
+      name: authorization
+      in: header
       schema:
         type: string
       required: false

@@ -24,6 +24,8 @@ paths:
         - vironAdminRole
       summary: list admin roles
       description: 管理ロール一覧
+      parameters:
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         200:
           description: OK
@@ -31,12 +33,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VironAdminRoleListWithPager'
+      security:
+        - jwt: []
     post:
       operationId: createVironAdminRole
       tags:
         - vironAdminRole
       summary: create an admin role
       description: 管理ロール作成
+      parameters:
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -49,6 +55,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VironAdminRole'
+      security:
+        - jwt: []
 
   /viron/adminroles/{id}:
     put:
@@ -59,6 +67,7 @@ paths:
       description: 管理ロール更新
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -67,6 +76,8 @@ paths:
       responses:
         204:
           description: OK
+      security:
+        - jwt: []
     delete:
       operationId: removeVironAdminRole
       tags:
@@ -75,9 +86,12 @@ paths:
       description: 管理ロール削除
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         204:
           description: OK
+      security:
+        - jwt: []
 
 components:
   schemas:

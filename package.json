@@ -43,7 +43,7 @@
     "format": "npm run format --workspaces",
     "lint": "npm run lint --workspacess",
     "test": "npm run test --workspaces",
-    "example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up",
+    "example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up --build --force-recreate",
     "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up"
   },
   "devDependencies": {

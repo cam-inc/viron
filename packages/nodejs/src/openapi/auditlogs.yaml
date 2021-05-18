@@ -37,6 +37,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/VironUserIdQueryParam'
         - $ref: '#/components/parameters/VironRequestUriQueryParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         200:
           description: OK
@@ -44,6 +45,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VironAuditLogListWithPager'
+      security:
+        - jwt: []
 
 components:
   parameters:

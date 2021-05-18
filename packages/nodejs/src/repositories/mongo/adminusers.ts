@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
+import { Connection, FilterQuery } from 'mongoose';
 import { storeDefinitions } from '../../stores';
 import { domainsAdminUser } from '../../domains';
 import { getPagerResults, ListWithPager } from '../../helpers';
 import { repositoryContainer } from '..';
 
 const getModel = (): storeDefinitions.mongo.adminUsers.AdminUserModel => {
-  const conn = repositoryContainer.conn as mongoose.Connection;
+  const conn = repositoryContainer.conn as Connection;
   return conn.models
     .adminusers as storeDefinitions.mongo.adminUsers.AdminUserModel;
 };
@@ -32,6 +32,14 @@ export const findWithPager = async (): Promise<
     ...getPagerResults(totalCount),
     list,
   };
+};
+
+export const findOne = async (
+  conditions: FilterQuery<domainsAdminUser.AdminUser> = {}
+): Promise<domainsAdminUser.AdminUser | null> => {
+  const model = getModel();
+  const doc = await model.findOne(conditions);
+  return doc ? doc.toJSON() : null;
 };
 
 export const count = async (/*conditions: FilterQuery<domainsAuditLog.AuditLog> = {}*/): Promise<number> => {

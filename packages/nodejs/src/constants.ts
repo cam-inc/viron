@@ -51,19 +51,19 @@ export const STYLE = {
 };
 export type Style = typeof STYLE[keyof typeof STYLE];
 
-export const AUTH_TYPE = {
+export const AUTH_CONFIG = {
   EMAIL: 'email',
   OAUTH: 'oauth',
   SIGNOUT: 'signout',
 };
-export type AuthTypeType = typeof AUTH_TYPE[keyof typeof AUTH_TYPE];
+export type AuthConfig = typeof AUTH_CONFIG[keyof typeof AUTH_CONFIG];
 
 export const AUTH_METHOD = {
   GET: 'GET',
   POST: 'POST',
   PUT: 'PUT',
 };
-export type AuthTypeMethod = typeof AUTH_METHOD[keyof typeof AUTH_METHOD];
+export type AuthMethod = typeof AUTH_METHOD[keyof typeof AUTH_METHOD];
 
 export const STORE_TYPE = {
   MYSQL: 'mysql',
@@ -72,12 +72,13 @@ export const STORE_TYPE = {
 export type StoreType = typeof STORE_TYPE[keyof typeof STORE_TYPE];
 
 export const HTTP_HEADER = {
-  X_VIRON_AUTHTYPES_PATH: 'X-Viron-Authtypes-Path',
-  ACCESS_CONTROL_ALLOW_ORIGIN: 'Access-Control-Allow-Origin',
-  ACCESS_CONTROL_ALLOW_CREDENTIALS: 'Access-Control-Allow-Credentials',
-  ACCESS_CONTROL_ALLOW_METHODS: 'Access-Control-Allow-Methods',
-  ACCESS_CONTROL_ALLOW_HEADERS: 'Access-Control-Allow-Headers',
-  ACCESS_CONTROL_EXPOSE_HEADERS: 'Access-Control-Expose-Headers',
+  X_VIRON_AUTHTYPES_PATH: 'x-viron-authtypes-path',
+  ACCESS_CONTROL_ALLOW_ORIGIN: 'access-control-allow-origin',
+  ACCESS_CONTROL_ALLOW_CREDENTIALS: 'access-control-allow-credentials',
+  ACCESS_CONTROL_ALLOW_METHODS: 'access-control-allow-methods',
+  ACCESS_CONTROL_ALLOW_HEADERS: 'access-control-allow-headers',
+  ACCESS_CONTROL_EXPOSE_HEADERS: 'access-control-expose-headers',
+  AUTHORIZATION: 'authorization',
 } as const;
 export type HttpHeader = typeof HTTP_HEADER[keyof typeof HTTP_HEADER];
 
@@ -85,16 +86,16 @@ export const DEFAULT_PAGER_SIZE = 10;
 export const DEFAULT_PAGER_PAGE = 1;
 
 export const ACCESS_CONTROL_ALLOW_HEADERS = [
-  'X-Requested-With',
-  'Origin',
-  'Authorization',
+  'x-requested-with',
+  'origin',
+  'authorization',
 ] as const;
 
 export const ACCESS_CONTROL_EXPOSE_HEADERS = [
-  'Content-Disposition',
-  'X-Requested-With',
-  'Origin',
-  'Authorization',
+  'content-disposition',
+  'x-requested-with',
+  'origin',
+  'authorization',
 ] as const;
 
 export const ACCESS_CONTROL_ALLOW_METHODS = [
@@ -106,23 +107,33 @@ export const ACCESS_CONTROL_ALLOW_METHODS = [
   'OPTIONS',
 ] as const;
 
-export const ACCESS_CONTROL_ALLOW_CREDENTIALS = 'true';
+export const ACCESS_CONTROL_ALLOW_CREDENTIALS = true;
 
-export const ADMIN_ROLES = {
+export const ADMIN_ROLE = {
   SUPER: 'super',
   VIEWER: 'viewer',
 } as const;
-export type AdminRoles = typeof ADMIN_ROLES[keyof typeof ADMIN_ROLES];
+export type AdminRole = typeof ADMIN_ROLE[keyof typeof ADMIN_ROLE];
 
-export const VIRON_AUTHTYPES_PATH = '/viron/authtypes';
+export const VIRON_AUTHCONFIGS_PATH = '/viron/authconfigs';
 
 export const PERMISSION = {
   READ: 'read',
   WRITE: 'write',
   DENY: 'deny',
-};
+} as const;
 export type Permission = typeof PERMISSION[keyof typeof PERMISSION];
 
 export const RESOURCE_DELIMITER = ':';
 
 export const OAS_X_PAGES = 'x-pages';
+
+export const AUTH_TYPE = {
+  EMAIL: 'email',
+  GOOGLE: 'google',
+} as const;
+export type AuthType = typeof AUTH_TYPE[keyof typeof AUTH_TYPE];
+
+export const AUTH_SCHEME = 'Bearer';
+export const JWT_HASH_ALGORITHM = 'HS512';
+export const DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60;

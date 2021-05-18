@@ -1,18 +1,18 @@
-import { AuthTypeMethod, AuthTypeType } from '../constants';
+import { AuthConfig, AuthMethod } from '../constants';
 
 export interface AuthType {
   provider: string;
-  type: AuthTypeType;
-  method: AuthTypeMethod;
+  type: AuthConfig;
+  method: AuthMethod;
   url: string;
 }
 
 export type AuthTypes = AuthType[];
 
-export const genAuthType = (
+export const genAuthConfig = (
   provider: string,
-  type: AuthTypeType,
-  method: AuthTypeMethod,
+  type: AuthConfig,
+  method: AuthMethod,
   url: string
 ): AuthType => {
   return {

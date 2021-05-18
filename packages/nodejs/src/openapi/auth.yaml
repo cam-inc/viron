@@ -1,0 +1,61 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/lib auth'
+  description: auth api specifications
+
+tags:
+  - name: auth
+
+paths:
+  /signout:
+    post:
+      operationId: signout
+      tags:
+        - auth
+      summary: signout of viron
+      description: Vironからログアウトする
+      parameters:
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
+      responses:
+        204:
+          description: OK 
+
+  /email/signin:
+    post:
+      operationId: signinEmail
+      tags:
+        - auth
+      summary: signin to viron with email/password
+      description: Emailアドレスとパスワードを使ってVironにサインインする
+      requestBody:
+        required: true
+        content:
+          application/json:
+            $ref: '#/components/schemas/SigninEmailPayload'
+      responses:
+        204:
+          description: No Content
+          headers:
+            Authorization:
+              description: Generated JWT
+              schema:
+                type: string
+
+components:
+  schemas:
+    SigninEmailPayload:
+      type: object
+      properties:
+        email:
+          description: Eメールアドレス
+          type: string
+          format: email
+        password:
+          description: パスワード
+          type: string
+          format: password
+          pattern: "^(?=.*?[a-zA-Z])(?=.*?\\d)[a-zA-Z\\d!?#$%&@*+/-_<=>]{8,}"
+      required:
+        - email
+        - password

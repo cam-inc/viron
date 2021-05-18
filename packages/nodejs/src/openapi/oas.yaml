@@ -24,6 +24,8 @@ paths:
         - oas
       summary: get oas
       description: OpenAPI Specification の取得
+      parameters:
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         '200':
           description: OK

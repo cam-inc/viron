@@ -1,6 +1,7 @@
 import { Enforcer, newEnforcer } from 'casbin';
-import mongoose from 'mongoose';
+import { Connection as MongooseConnection, FilterQuery } from 'mongoose';
 import { Sequelize, Dialect } from 'sequelize';
+import { WhereOptions } from 'sequelize/types';
 import MongooseAdapter from 'casbin-mongoose-adapter';
 import { SequelizeAdapter } from 'casbin-sequelize-adapter';
 import {
@@ -22,15 +23,19 @@ export interface Repository<Entity, CreateAttributes, UpdateAttributes> {
   findWithPager: (/* TODO: pagerとかconditionはあとで */) => Promise<
     ListWithPager<Entity>
   >;
+  findOne: (
+    conditions?: FilterQuery<Entity> | WhereOptions<Entity>
+  ) => Promise<Entity>;
   createOne: (obj: CreateAttributes) => Promise<Entity>;
   updateOneById: (id: string, obj: UpdateAttributes) => Promise<void>;
   removeOneById: (id: string) => Promise<void>;
+  count: () => Promise<number>;
 }
 
 class RepositoryContainer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   repositories!: any;
-  conn!: Sequelize | mongoose.Connection;
+  conn!: Sequelize | MongooseConnection;
   private initialized: boolean;
   private casbin!: Enforcer;
 
@@ -40,7 +45,7 @@ class RepositoryContainer {
 
   async init(
     storeType: StoreType,
-    conn: Sequelize | mongoose.Connection
+    conn: Sequelize | MongooseConnection
   ): Promise<RepositoryContainer> {
     if (this.initialized) {
       return this;
@@ -48,7 +53,7 @@ class RepositoryContainer {
 
     switch (storeType) {
       case STORE_TYPE.MONGO: {
-        this.conn = conn as mongoose.Connection;
+        this.conn = conn as MongooseConnection;
         this.repositories = mongoRepositories;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

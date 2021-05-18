@@ -31,6 +31,7 @@ paths:
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdQueryParam'
         - $ref: './components.yaml#/components/parameters/VironRoleIdQueryParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         200:
           description: OK
@@ -38,13 +39,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VironAdminUserListWithPager'
-    
+      security:
+        - jwt: []
     post:
       operationId: createVironAdminUser
       tags:
         - vironAdminUser
       summary: create an admin user
       description: メアド/パスワード認証の管理ユーザーを追加する
+      parameters:
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -57,6 +61,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VironAdminUser'
+      security:
+        - jwt: []
 
   /viron/adminusers/{id}:
     put:
@@ -67,6 +73,7 @@ paths:
       description: 管理ユーザーのロール等を更新する
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -75,7 +82,8 @@ paths:
       responses:
         204:
           description: OK
-
+      security:
+        - jwt: []
     delete:
       operationId: removeVironAdminUser
       tags:
@@ -84,9 +92,12 @@ paths:
       description: 管理ユーザー削除
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         204:
           description: OK
+      security:
+        - jwt: []
 
 components:
   schemas:
@@ -116,7 +127,7 @@ components:
           type: string
           format: email
         authType:
-          description: 認証種別
+          description: 認証タイプ
           type: string
         roleIds:
           description: ロール一覧

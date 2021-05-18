@@ -1,7 +1,7 @@
 import { newModel } from 'casbin';
 import { roleIdAlreadyExists } from '../errors';
 import {
-  ADMIN_ROLES,
+  ADMIN_ROLE,
   API_METHOD,
   ApiMethod,
   PERMISSION,
@@ -24,7 +24,7 @@ export interface AdminRole {
   permissions: AdminRolePermissions;
 }
 
-export type Policy = [string, string, string];
+export type Policy = [string, string, Permission];
 
 interface ParsedPolicy {
   roleId: string;
@@ -53,13 +53,13 @@ g = _, _
 e = some(where (p.eft == allow))
 
 [matchers]
-m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || r.sub == "${ADMIN_ROLES.SUPER}"
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || r.sub == "${ADMIN_ROLE.SUPER}"
 `);
 
 const method2Permissions = (method: ApiMethod): Permission[] =>
   permissionMap[method];
 
-const getPermissions = (permissions?: string[]): string[] =>
+const getPermissions = (permissions?: Permission[]): Permission[] =>
   permissions?.length ? permissions : Object.values(PERMISSION);
 
 const genPolicy = (
@@ -138,11 +138,11 @@ export const listPolicies = async (
 export const revokePermissionForRole = async (
   roleId: string,
   resourceId: string,
-  permissions?: string[]
+  permissions?: Permission[]
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
   permissions = getPermissions(permissions);
-  const policies = permissions.map((permission: string) =>
+  const policies = permissions.map((permission: Permission) =>
     genPolicy(roleId, resourceId, permission)
   );
   await Promise.all(policies.map((policy) => casbin.removePolicy(...policy)));
@@ -206,7 +206,7 @@ export const listByOas = async (
 
   const map = policies.reduce(
     (
-      ret: Record<string, Record<string, string>>,
+      ret: Record<string, Record<string, Permission>>,
       { roleId, resourceId, permission }
     ) => {
       ret[roleId] = ret[roleId] || {};
@@ -257,7 +257,7 @@ export const removeOneById = async (roleId: string): Promise<void> => {
 export const createViewer = async (
   apiDefinitions: OpenAPIObject
 ): Promise<boolean> => {
-  const policies = await listPolicies(ADMIN_ROLES.VIEWER);
+  const policies = await listPolicies(ADMIN_ROLE.VIEWER);
   const resourceIds = listResourcesByOas(apiDefinitions);
   if (policies.length === resourceIds.length) {
     // 更新するものがないので何もしない
@@ -265,7 +265,7 @@ export const createViewer = async (
   }
 
   const map = policies.reduce(
-    (ret: Record<string, string>, policy: ParsedPolicy) => {
+    (ret: Record<string, Permission>, policy: ParsedPolicy) => {
       ret[policy.resourceId] = policy.permission;
       return ret;
     },
@@ -277,6 +277,6 @@ export const createViewer = async (
       permission: map[resourceId] ?? PERMISSION.READ,
     };
   });
-  await updatePermissionsForRole(ADMIN_ROLES.VIEWER, permissions);
+  await updatePermissionsForRole(ADMIN_ROLE.VIEWER, permissions);
   return true;
 };
