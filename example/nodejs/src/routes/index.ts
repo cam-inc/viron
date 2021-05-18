@@ -15,7 +15,7 @@ import * as routesAdminRoles from './adminroles';
 import * as routesAdminUsers from './adminusers';
 import * as routesAuditLogs from './auditlogs';
 import * as routesAuth from './auth';
-import * as routesAuthtypes from './authconfigs';
+import * as routesAuthconfigs from './authconfigs';
 import * as routesPing from './ping';
 import * as routesRoot from './root';
 import * as routesOas from './oas';
@@ -67,7 +67,7 @@ const routes: Route[] = [
   {
     name: 'authconfigs',
     oasPath: domainsOas.getPath('authconfigs'),
-    handlers: routesAuthtypes,
+    handlers: routesAuthconfigs,
   },
   { name: 'oas', oasPath: domainsOas.getPath('oas'), handlers: routesOas },
   // マージ順の関係で`root`は必ず最後に書く

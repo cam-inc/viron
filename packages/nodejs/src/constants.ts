@@ -128,12 +128,13 @@ export const RESOURCE_DELIMITER = ':';
 
 export const OAS_X_PAGES = 'x-pages';
 
-export const AUTH_TYPE = {
+export const AUTH_CONFIG_TYPE = {
   EMAIL: 'email',
   GOOGLE: 'google',
 } as const;
-export type AuthType = typeof AUTH_TYPE[keyof typeof AUTH_TYPE];
+export type AuthConfigType = typeof AUTH_CONFIG_TYPE[keyof typeof AUTH_CONFIG_TYPE];
 
 export const AUTH_SCHEME = 'Bearer';
 export const JWT_HASH_ALGORITHM = 'HS512';
 export const DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60;
+export const DEBUG_LOG_PREFIX = '@viron/lib:';
