@@ -6,18 +6,19 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'plugin:jest/recommended',
+    'prettier',
   ],
   plugins: ['@typescript-eslint', 'jest'],
   env: {
-    es6: true,
+    es2020: true,
     node: true,
     'jest/globals': true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2019,
+    ecmaVersion: 2020,
     sourceType: 'module',
-    project: './tsconfig.json',
+    project: './tsconfig.test.json',
     tsconfigRootDir: __dirname,
   },
   rules: {

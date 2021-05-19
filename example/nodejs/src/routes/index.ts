@@ -6,7 +6,7 @@ import {
 } from 'exegesis-express';
 import { OpenAPIObject } from 'openapi3-ts';
 import merge from 'deepmerge';
-import { loadResolvedOas, domainsOas } from '@viron/lib';
+import { domainsOas } from '@viron/lib';
 
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
@@ -95,7 +95,7 @@ export async function register(app: Express): Promise<void> {
   const apis = await Promise.all(
     routes.map(async ({ oasPath, handlers, name }) => {
       logger.info('Routes registration oas: %s', oasPath);
-      const apiDoc = await loadResolvedOas(oasPath);
+      const apiDoc = await domainsOas.loadResolvedOas(oasPath);
       apiDoc['x-exegesis-controller'] = name;
       const middleware = await genExegesisMiddlewares(apiDoc, {
         controllers: {

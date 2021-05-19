@@ -9,16 +9,19 @@ export interface ListWithPager<T> extends PagerResults {
   list: T[];
 }
 
+// 最大ページ数と現在のページ番号を取得
 export const getPagerResults = (
-  count: number,
+  numberOfList: number,
   size = DEFAULT_PAGER_SIZE,
   page = DEFAULT_PAGER_PAGE
 ): PagerResults => {
-  const maxPage = count > 0 ? Math.ceil(count / size) : DEFAULT_PAGER_PAGE;
+  const maxPage =
+    numberOfList > 0 ? Math.ceil(numberOfList / size) : DEFAULT_PAGER_PAGE;
   const currentPage = page;
   return { maxPage, currentPage };
 };
 
+// listをページングする
 export const paging = <T>(
   list: T[],
   size = DEFAULT_PAGER_SIZE,

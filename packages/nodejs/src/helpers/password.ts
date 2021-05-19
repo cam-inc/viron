@@ -25,8 +25,10 @@ export interface HashedPasswordWithSalt {
 }
 
 // パスワードをハッシュ化する
-export const genPasswordHash = (password: string): HashedPasswordWithSalt => {
-  const salt = genSalt();
+export const genPasswordHash = (
+  password: string,
+  salt = genSalt()
+): HashedPasswordWithSalt => {
   return { password: str2hash(password, salt), salt };
 };
 
