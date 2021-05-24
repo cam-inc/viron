@@ -178,11 +178,15 @@ export const hasPermission = async (
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
   const permissions = method2Permissions(apiMethod);
-  return await Promise.any(
-    permissions.map((permission) =>
-      casbin.enforce(userId, resourceId, permission)
-    )
+  const tasks = permissions.map((permission) =>
+    casbin.enforce(userId, resourceId, permission)
   );
+  for await (const allowed of tasks) {
+    if (allowed) {
+      return true;
+    }
+  }
+  return false;
 };
 
 // リソース一覧
