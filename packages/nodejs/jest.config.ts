@@ -26,7 +26,9 @@ const config: Config.InitialOptions = {
     '!**/vendor/**',
     '!types/**',
   ],
-  setupFilesAfterEnv: [],
+  globalSetup: './__tests__/fixtures/global_setup.ts',
+  globalTeardown: './__tests__/fixtures/global_teardown.ts',
+  setupFilesAfterEnv: ['./__tests__/fixtures/setup_repositories.ts'],
 };
 
 export default config;

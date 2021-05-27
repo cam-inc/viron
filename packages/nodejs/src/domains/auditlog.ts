@@ -27,5 +27,14 @@ export type AuditLogUpdateAttributes = AuditLogCreateAttributes;
 // 一覧取得
 export const list = async (): Promise<ListWithPager<AuditLog>> => {
   const repository = repositoryContainer.getAuditLogRepository();
+  // TODO: 検索
   return repository.findWithPager();
+};
+
+// 1件作成
+export const createOne = async (
+  payload: AuditLogCreateAttributes
+): Promise<AuditLog> => {
+  const repository = repositoryContainer.getAuditLogRepository();
+  return await repository.createOne(payload);
 };

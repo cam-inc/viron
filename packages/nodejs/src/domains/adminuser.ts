@@ -1,6 +1,7 @@
 import { AUTH_TYPE, AuthType } from '../constants';
 import { ListWithPager, genPasswordHash } from '../helpers';
 import { repositoryContainer } from '../repositories';
+import { adminUserNotFound } from '../errors';
 import { listRoles, revokeRoleForUser, updateRolesForUser } from './adminrole';
 
 export interface AdminUser {
@@ -47,6 +48,7 @@ const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
 // 一覧取得
 export const list = async (): Promise<ListWithPager<AdminUserView>> => {
   const repository = repositoryContainer.getAdminUserRepository();
+  // TODO: 検索
   const result = await repository.findWithPager();
   const adminRoles = await Promise.all(
     result.list.map((adminUser) => listRoles(adminUser.id))
@@ -81,6 +83,11 @@ export const updateOneById = async (
   payload: AdminUserUpdatePayload
 ): Promise<void> => {
   const repository = repositoryContainer.getAdminUserRepository();
+  const user = await findOneById(id);
+  if (!user) {
+    throw adminUserNotFound();
+  }
+
   const { roleIds, ...adminUser } = payload;
   if (adminUser.password) {
     await repository.updateOneById(id, genPasswordHash(adminUser.password));
@@ -93,6 +100,10 @@ export const updateOneById = async (
 // IDで1件削除
 export const removeOneById = async (id: string): Promise<void> => {
   const repository = repositoryContainer.getAdminUserRepository();
+  const user = await findOneById(id);
+  if (!user) {
+    throw adminUserNotFound();
+  }
   await Promise.all([repository.removeOneById(id), revokeRoleForUser(id)]);
 };
 
