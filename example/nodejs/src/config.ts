@@ -72,7 +72,6 @@ export const get = (mode: Mode): Config => {
       main: mode == MODE_MONGO ? mongo : mysql,
     },
     cors: {
-      // TODO: 正規のドメイン取得したら修正
       allowOrigins: ['https://localhost:8000'],
     },
     auth: {
