@@ -15,6 +15,7 @@ RUN npm install --no-progress && npm cache verify
 # Copy source files
 COPY src ${HOME}/src
 COPY tsconfig.json ${HOME}/tsconfig.json
+COPY cert ${HOME}/cert
 # COPY .eslintignore ${HOME}/.eslintignore
 # COPY .eslintrc.js ${HOME}/.eslintrc.js
 # COPY .prettierrc.yaml ${HOME}/.prettierrc.yaml
