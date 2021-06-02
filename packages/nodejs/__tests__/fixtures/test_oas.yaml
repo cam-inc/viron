@@ -1,0 +1,31 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/lib test'
+  description: oas api specifications
+
+paths:
+  /:
+    get:
+      operationId: get
+      tags:
+        - test
+      summary: get test
+      parameters:
+        - $ref: '#/components/parameters/TestQueryParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+
+components:
+  parameters:
+    TestQueryParam:
+      in: query
+      name: test
+      schema:
+        type: string

@@ -4,4 +4,3 @@ export * as domainsAuditLog from './auditlog';
 export * as domainsAuth from './auth';
 export * as domainsAuthConfig from './authconfig';
 export * as domainsOas from './oas';
-export * as domainsViron from './viron';
