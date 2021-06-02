@@ -43,6 +43,7 @@ export const HTTP_HEADER = {
   ACCESS_CONTROL_EXPOSE_HEADERS: 'access-control-expose-headers',
   AUTHORIZATION: 'authorization',
   CONTENT_DISPOSITION: 'content-disposition',
+  CONTENT_TYPE: 'content-type',
   ORIGIN: 'origin',
   X_REQUESTED_WITH: 'x-requested-with',
   X_VIRON_AUTHTYPES_PATH: 'x-viron-authtypes-path',
@@ -54,6 +55,7 @@ export const DEFAULT_PAGER_PAGE = 1;
 
 export const ACCESS_CONTROL_ALLOW_HEADERS = [
   HTTP_HEADER.AUTHORIZATION,
+  HTTP_HEADER.CONTENT_TYPE,
   HTTP_HEADER.ORIGIN,
   HTTP_HEADER.X_REQUESTED_WITH,
   HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
