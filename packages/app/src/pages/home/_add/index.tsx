@@ -26,15 +26,10 @@ const Add: React.FC<Props> = () => {
     });
   }, []);
 
-  const {
-    register,
-    handleSubmit,
-    formState,
-    setError,
-    reset,
-  } = useForm<FormData>({
-    resolver: yupResolver(schema),
-  });
+  const { register, handleSubmit, formState, setError, reset } =
+    useForm<FormData>({
+      resolver: yupResolver(schema),
+    });
 
   const [endpointList, setEndpointList] = useRecoilState(endpointListState);
   const addEndpoint = useCallback(
@@ -55,7 +50,7 @@ const Add: React.FC<Props> = () => {
       // Check whether the endpoint exists or not.
       const [response, responseError] = await promiseErrorHandler(
         fetch(data.url, {
-          mode: 'cors',
+          //   mode: 'cors',
         })
       );
       if (!!responseError) {
@@ -97,6 +92,7 @@ const Add: React.FC<Props> = () => {
       // The OAS document requires authentication.
       // The endpoint exists and it's not open to public.
       if (!response.ok && response.status === 401) {
+        //debugger
         const [response, responseError] = await promiseErrorHandler(
           fetch(`${new URL(data.url).origin}/viron_authtype`, {
             mode: 'cors',
