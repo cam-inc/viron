@@ -7,6 +7,7 @@ export const genAuthorizationCookie = (
   options: CookieSerializeOptions = {
     httpOnly: true,
     secure: true,
+    sameSite: 'none',
   }
 ): string => {
   return serialize(COOKIE_KEY.VIRON_AUTHORIZATION, token, options);
