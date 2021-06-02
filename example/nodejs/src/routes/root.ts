@@ -1,6 +1,6 @@
-import { ExegesisContext } from 'exegesis-express';
+import { RouteContext } from '../application';
 
 // root
-export const getRoot = async (context: ExegesisContext): Promise<void> => {
+export const getRoot = async (context: RouteContext): Promise<void> => {
   context.res.set('Location', '/oas').status(301).end();
 };

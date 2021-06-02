@@ -33,13 +33,6 @@ components:
         type: string
       required: false
 
-    AuthorizationHeaderParam:
-      name: authorization
-      in: header
-      schema:
-        type: string
-      required: false
-
   securitySchemes:
     jwt:
       type: oauth2

@@ -64,19 +64,14 @@ const _Schema: React.FC<Props> = ({
     [schema]
   );
 
-  const {
-    isActive,
-    isActiveSwitchable,
-    activate,
-    inactivate,
-    switchActive,
-  } = useActive({
-    name,
-    schema,
-    required,
-    map: activeRef,
-    getValues,
-  });
+  const { isActive, isActiveSwitchable, activate, inactivate, switchActive } =
+    useActive({
+      name,
+      schema,
+      required,
+      map: activeRef,
+      getValues,
+    });
 
   return (
     <Container

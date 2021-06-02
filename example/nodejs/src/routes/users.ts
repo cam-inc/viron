@@ -1,4 +1,4 @@
-import { RouteContext } from '.';
+import { RouteContext } from '../application';
 import { list, createOne, updateOneById, removeOneById } from '../domains/user';
 
 // ユーザー一覧
