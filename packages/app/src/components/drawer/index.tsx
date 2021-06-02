@@ -1,20 +1,22 @@
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Portal from '$components/portal';
 import { timeout } from '$utils/index';
 import { id } from '$wrappers/drawer';
 
 type Props = {
   isOpened: boolean;
-  onRequestClose?: (
+  requestCloseRef: React.MutableRefObject<() => void>;
+  onRequestClose: (
     accept: (handleInvisible: () => void) => Promise<void>
   ) => void;
-  autoClose?: boolean;
+  autoClose: boolean;
 };
 const Drawer: React.FC<Props> = ({
-  isOpened = false,
+  isOpened,
+  requestCloseRef,
   onRequestClose,
-  autoClose = true,
+  autoClose,
   children,
 }) => {
   const [isVisible, setIsVisible] = useState(isOpened);
@@ -29,8 +31,17 @@ const Drawer: React.FC<Props> = ({
       await timeout(300);
       handleInvisible();
     };
-    onRequestClose && onRequestClose(accept);
+    onRequestClose(accept);
   }, [onRequestClose]);
+
+  useEffect(
+    function () {
+      requestCloseRef.current = function () {
+        requestClose();
+      };
+    },
+    [requestCloseRef, requestCloseRef.current, requestClose]
+  );
 
   const handleBGClick = useCallback(() => {
     if (!autoClose) {
@@ -105,3 +116,44 @@ const Drawer: React.FC<Props> = ({
   );
 };
 export default Drawer;
+
+export const useDrawer = function ({
+  autoClose = true,
+}: {
+  autoClose?: Props['autoClose'];
+} = {}): {
+  open: () => void;
+  requestClose: () => void;
+  bind: {
+    isOpened: boolean;
+    autoClose: Props['autoClose'];
+    onRequestClose: Props['onRequestClose'];
+    requestCloseRef: Props['requestCloseRef'];
+  };
+} {
+  const [isOpened, setIsOpened] = useState<boolean>(false);
+  const requestCloseRef = useRef<() => void>(function () {
+    console.log('this function will be overwrriten.');
+  });
+  const handleRequestClose = useCallback(function (accept) {
+    accept(() => {
+      setIsOpened(false);
+    });
+  }, []);
+  const open = function () {
+    setIsOpened(true);
+  };
+  const requestClose = function () {
+    requestCloseRef.current();
+  };
+  return {
+    open,
+    requestClose,
+    bind: {
+      isOpened,
+      autoClose,
+      onRequestClose: handleRequestClose,
+      requestCloseRef,
+    },
+  };
+};

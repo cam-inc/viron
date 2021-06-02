@@ -1,5 +1,5 @@
 import { domainsAdminUser } from '@viron/lib';
-import { RouteContext } from '.';
+import { RouteContext } from '../application';
 
 // 管理ユーザー一覧
 export const listVironAdminUsers = async (

@@ -3,6 +3,7 @@ import React from 'react';
 
 type Props<T> = {
   id: T;
+  title: string;
   onCloseClick: (id: T) => void;
   children: React.ReactNode;
 };
@@ -15,18 +16,24 @@ export type PanelItemType = <T extends {}>(
   props: Props<T>
 ) => React.ReactElement | null;
 
-const PanelItem: PanelItemType = function ({ id, onCloseClick, children }) {
+const PanelItem: PanelItemType = function ({
+  id,
+  title,
+  onCloseClick,
+  children,
+}) {
   const handleCloseClick = function () {
     onCloseClick(id);
   };
   return (
-    <div>
-      <div>
+    <div className="border">
+      <div className="flex p-2 bg-gray-300">
+        <p className="flex-1 text-xs">{title}</p>
         <button onClick={handleCloseClick}>
           <AiFillDelete />
         </button>
       </div>
-      <div>{children}</div>
+      <div className="p-2">{children}</div>
     </div>
   );
 };

@@ -8,7 +8,7 @@ import {
   GOOGLE_SIGNIN_PATH,
   SIGNOUT_PATH,
 } from '@viron/lib';
-import { RouteContext } from '.';
+import { RouteContext } from '../application';
 
 const { genAuthConfig } = domainsAuthConfig;
 

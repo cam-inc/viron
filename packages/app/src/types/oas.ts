@@ -53,7 +53,10 @@ export type Info = {
       type: 'number' | 'table' | 'custom';
       // Specify a operation id of method get that are required to fetch data for the content.
       getOperationId: OperationId;
-      // TODO: 抜け漏れ確認。
+      parameters?: {
+        [key in string]: any;
+      };
+      requestBody?: any;
     }[];
   }[];
 };

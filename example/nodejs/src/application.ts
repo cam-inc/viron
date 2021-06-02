@@ -2,6 +2,7 @@ import express, { Express } from 'express';
 import errorHandler from 'errorhandler';
 import compression from 'compression';
 import { json, urlencoded } from 'body-parser';
+import cookieParser from 'cookie-parser';
 import {
   ExegesisContext,
   ExegesisPluginContext,
@@ -24,12 +25,14 @@ declare global {
   namespace Express {
     export interface Request {
       _context: RequestContext;
+      cookies: Record<string, string>;
     }
   }
 }
 
 interface ApiExegesisIncomingMessage extends HttpIncomingMessage {
   path: string;
+  cookies: Record<string, string>;
   _context: RequestContext;
 }
 
@@ -51,6 +54,7 @@ export const createApplication = async (): Promise<Express> => {
   app.use(compression());
   app.use(json());
   app.use(urlencoded({ extended: true }));
+  app.use(cookieParser());
   app.use(middlewareAccessLog());
   app.use(middlewareI18n());
   app.use(middlewareCors(ctx.config.cors));

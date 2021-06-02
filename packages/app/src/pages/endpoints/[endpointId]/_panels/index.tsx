@@ -28,19 +28,21 @@ const _Panels: React.FC<Props> = ({
     <Panel>
       {pages.map((page) => (
         <React.Fragment key={page.id}>
-          <Panel.Item id={page.id} onCloseClick={handlePanelItemCloseClick}>
+          <Panel.Item
+            id={page.id}
+            title={page.title}
+            onCloseClick={handlePanelItemCloseClick}
+          >
             <div>
-              <p>{page.title}</p>
-              <p>{page.description}</p>
               <ul>
                 {page.contents.map((content, idx) => (
-                  <React.Fragment key={idx}>
+                  <li key={idx} className="mb-2 last:mb-0">
                     <_Content
                       endpoint={endpoint}
                       document={document}
                       content={content}
                     />
-                  </React.Fragment>
+                  </li>
                 ))}
               </ul>
             </div>

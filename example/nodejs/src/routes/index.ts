@@ -18,8 +18,6 @@ import * as routesRoot from './root';
 import * as routesOas from './oas';
 import * as routesUsers from './users';
 
-export { RouteContext };
-
 type Handler = (context: RouteContext) => Promise<void>;
 
 interface Handlers {

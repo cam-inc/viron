@@ -42,10 +42,11 @@ export const findOne = async (
   return doc ? doc.toJSON() : null;
 };
 
-export const count = async (/*conditions: FilterQuery<domainsAuditLog.AuditLog> = {}*/): Promise<number> => {
-  const model = getModel();
-  return await model.countDocuments();
-};
+export const count =
+  async (/*conditions: FilterQuery<domainsAuditLog.AuditLog> = {}*/): Promise<number> => {
+    const model = getModel();
+    return await model.countDocuments();
+  };
 
 export const createOne = async (
   obj: domainsAdminUser.AdminUserCreateAttributes

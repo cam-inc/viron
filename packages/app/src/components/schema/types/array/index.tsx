@@ -59,7 +59,6 @@ const SchemaOfTypeArray: React.FC<Props> = ({
     },
     [
       nameForError,
-      data,
       data?.length,
       isDeepActive,
       clearErrors,

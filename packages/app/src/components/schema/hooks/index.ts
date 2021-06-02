@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { UseFormReturn } from 'react-hook-form';
 import { Schema } from '$types/oas';
 
 export type UseActiveReturn = {
@@ -13,14 +14,18 @@ export const useActive = function ({
   name,
   required,
   map,
+  getValues,
 }: {
   name: string;
   schema: Schema;
   required: boolean;
   map: UseEliminateReturn['ref'];
+  getValues: UseFormReturn['getValues'];
 }): UseActiveReturn {
   // The `require` parameter in OAS usually means that a key-value pair exists.
-  const [isActive, setIsActive] = useState<boolean>(required);
+  const [isActive, setIsActive] = useState<boolean>(
+    required || !_.isUndefined(getValues(name))
+  );
   const activate = useCallback(function () {
     setIsActive(true);
   }, []);
@@ -71,6 +76,7 @@ export const useEliminate = function (): UseEliminateReturn {
   const execute = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function (data: { [key in string]: any }) {
+      console.log(ref);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const f = function (prefix: string, data: any) {
         if (_.isObject(data)) {

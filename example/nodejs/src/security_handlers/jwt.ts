@@ -7,6 +7,7 @@ import {
   domainsAdminUser,
   domainsOas,
   ApiMethod,
+  COOKIE_KEY,
 } from '@viron/lib';
 import {
   AUTHENTICATION_RESULT_TYPE_INVALID,
@@ -14,11 +15,17 @@ import {
 } from '../constants';
 import { PluginContext } from '../application';
 
+/**
+ * JWT認証
+ * - cookieからJWTを取り出して検証
+ *   - 検証OKならユーザー情報を取得してロールの検証(TODO)
+ *   - 検証NGならヘッダにauthconfigsのパスをセットして401を返却
+ */
 export const jwt = async (
   context: ExegesisPluginContext
 ): Promise<AuthenticationResult> => {
-  const params = await context.getParams();
-  const token = params.header[HTTP_HEADER.AUTHORIZATION];
+  const req = (context as PluginContext).req;
+  const token = req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
   const claims = token ? await domainsAuth.verifyJwt(token) : false;
   //const def = (context as PluginContext).req._context.apiDefinition;
 

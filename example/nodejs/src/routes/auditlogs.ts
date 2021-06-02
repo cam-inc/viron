@@ -1,5 +1,5 @@
 import { domainsAuditLog } from '@viron/lib';
-import { RouteContext } from '.';
+import { RouteContext } from '../application';
 
 // 監査ログ一覧
 export const listVironAuditlogs = async (

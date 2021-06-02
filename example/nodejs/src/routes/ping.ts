@@ -1,6 +1,6 @@
 import { repositoryContainer } from '@viron/lib';
 import { getUserRepository } from '../repositories';
-import { RouteContext } from '.';
+import { RouteContext } from '../application';
 
 // Ping
 export const getPing = async (context: RouteContext): Promise<void> => {

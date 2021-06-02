@@ -43,10 +43,11 @@ export const findOne = async (
   return doc ? (doc.toJSON() as domainsAdminUser.AdminUser) : null;
 };
 
-export const count = async (/*conditions: WhereOptions<User> = {}*/): Promise<number> => {
-  const model = getModel();
-  return await model.count();
-};
+export const count =
+  async (/*conditions: WhereOptions<User> = {}*/): Promise<number> => {
+    const model = getModel();
+    return await model.count();
+  };
 
 export const createOne = async (
   obj: domainsAdminUser.AdminUserCreateAttributes
