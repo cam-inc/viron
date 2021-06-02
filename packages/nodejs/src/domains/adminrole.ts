@@ -7,6 +7,9 @@ import {
   PERMISSION,
   Permission,
   OAS_X_PAGES,
+  OAS_X_PAGE_CONTENTS,
+  OAS_X_PAGE_CONTENT_RESOURCE_ID,
+  CASBIN_SYNC_INTERVAL_MSEC,
 } from '../constants';
 import { ListWithPager, paging } from '../helpers';
 import { repositoryContainer } from '../repositories';
@@ -76,20 +79,20 @@ const parsePolicy = (policy: Policy): ParsedPolicy => {
   };
 };
 
-// ユーザー一覧を取得
-export const listUsers = async (roleId?: string): Promise<string[]> => {
+// casbinインスタンスとDBの差異を解消するために同期する
+const sync = async (now = Date.now()): Promise<void> => {
   const casbin = repositoryContainer.getCasbin();
-  return roleId
-    ? await casbin.getUsersForRole(roleId)
-    : await casbin.getAllSubjects();
+  if (repositoryContainer.casbinSyncedTime + CASBIN_SYNC_INTERVAL_MSEC > now) {
+    await casbin.loadPolicy();
+    repositoryContainer.casbinSyncedTime = now;
+  }
 };
 
 // ロール一覧を取得
-export const listRoles = async (userId?: string): Promise<string[]> => {
+export const listRoles = async (userId: string): Promise<string[]> => {
   const casbin = repositoryContainer.getCasbin();
-  return userId
-    ? await casbin.getRolesForUser(userId)
-    : await casbin.getAllRoles();
+  await sync();
+  return await casbin.getRolesForUser(userId);
 };
 
 // ユーザーにロールを付与する
@@ -128,6 +131,7 @@ export const listPolicies = async (
   roleId?: string
 ): Promise<ParsedPolicy[]> => {
   const casbin = repositoryContainer.getCasbin();
+  await sync();
   const policies = roleId
     ? await casbin.getFilteredPolicy(0, roleId)
     : await casbin.getPolicy();
@@ -177,6 +181,7 @@ export const hasPermission = async (
   apiMethod: ApiMethod
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
+  await sync();
   const permissions = method2Permissions(apiMethod);
   const tasks = permissions.map((permission) =>
     casbin.enforce(userId, resourceId, permission)
@@ -192,10 +197,15 @@ export const hasPermission = async (
 // リソース一覧
 export const listResourcesByOas = (apiDefinitions: OpenAPIObject): string[] => {
   const pages: OasXPages = apiDefinitions.info[OAS_X_PAGES];
+  if (!pages?.length) {
+    return [];
+  }
   const result = pages
-    .map((page) => {
-      return (page?.contents ?? []).map((content) => content.resourceId);
-    })
+    .map((page) =>
+      (page?.[OAS_X_PAGE_CONTENTS] ?? []).map(
+        (content) => content[OAS_X_PAGE_CONTENT_RESOURCE_ID]
+      )
+    )
     .flat()
     .sort();
   return result;

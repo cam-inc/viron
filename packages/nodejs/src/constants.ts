@@ -1,28 +1,3 @@
-export const COLOR = {
-  WHITE: 'white',
-  BLACK: 'black',
-  PURPLE: 'purple',
-  BLUE: 'blue',
-  GREEN: 'green',
-  YELLOW: 'yellow',
-  RED: 'red',
-  GRAY: 'gray',
-} as const;
-export type Color = typeof COLOR[keyof typeof COLOR];
-
-export const THEME = {
-  STANDARD: 'standard',
-  MIDNIGHT: 'midnight',
-  TERMINAL: 'terminal',
-} as const;
-export type Theme = typeof THEME[keyof typeof THEME];
-
-export const SECTION = {
-  MANAGE: 'manage',
-  DASHBOARD: 'dashboard',
-} as const;
-export type Section = typeof SECTION[keyof typeof SECTION];
-
 export const API_METHOD = {
   GET: 'get',
   POST: 'post',
@@ -30,26 +5,6 @@ export const API_METHOD = {
   DELETE: 'delete',
 } as const;
 export type ApiMethod = typeof API_METHOD[keyof typeof API_METHOD];
-
-export const QUERY_TYPE = {
-  STRING: 'string',
-  INTEGER: 'integer',
-  NUMBER: 'number',
-  BOOLEAN: 'boolean',
-  DATE: 'date',
-  DATETIME: 'datetime',
-  TIME: 'time',
-} as const;
-export type QueryType = typeof QUERY_TYPE[keyof typeof QUERY_TYPE];
-
-export const STYLE = {
-  NUMBER: 'number',
-  LIST: 'list',
-  TABLE: 'table',
-  CHART: 'chart',
-  EXPLORER: 'explorer',
-} as const;
-export type Style = typeof STYLE[keyof typeof STYLE];
 
 export const AUTH_CONFIG_TYPE = {
   EMAIL: 'email',
@@ -137,6 +92,8 @@ export type Permission = typeof PERMISSION[keyof typeof PERMISSION];
 export const RESOURCE_DELIMITER = ':';
 
 export const OAS_X_PAGES = 'x-pages';
+export const OAS_X_PAGE_CONTENTS = 'contents';
+export const OAS_X_PAGE_CONTENT_RESOURCE_ID = 'resourceId';
 
 export const AUTH_TYPE = {
   EMAIL: 'email',
@@ -148,3 +105,4 @@ export const AUTH_SCHEME = 'Bearer';
 export const JWT_HASH_ALGORITHM = 'HS512';
 export const DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60;
 export const DEBUG_LOG_PREFIX = '@viron/lib:';
+export const CASBIN_SYNC_INTERVAL_MSEC = 1 * 60 * 1000;

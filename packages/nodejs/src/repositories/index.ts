@@ -36,11 +36,13 @@ class RepositoryContainer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   repositories!: any;
   conn!: Sequelize | MongooseConnection;
+  casbinSyncedTime: number;
   private initialized: boolean;
   private casbin!: Enforcer;
 
   constructor() {
     this.initialized = false;
+    this.casbinSyncedTime = Date.now();
   }
 
   async init(
@@ -101,6 +103,7 @@ class RepositoryContainer {
     }
 
     this.initialized = true;
+    this.casbinSyncedTime = Date.now();
     return this;
   }
 
