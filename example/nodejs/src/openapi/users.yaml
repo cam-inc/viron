@@ -31,7 +31,6 @@ paths:
         - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
         - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
         - $ref: './components.yaml#/components/parameters/IdQueryParam'
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         200:
           description: OK
@@ -48,8 +47,6 @@ paths:
         - user
       summary: create user
       description: ユーザー作成
-      parameters:
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -75,7 +72,6 @@ paths:
       description: ユーザー更新
       parameters:
         - $ref: './components.yaml#/components/parameters/IdPathParam'
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -96,7 +92,6 @@ paths:
       description: ユーザー削除
       parameters:
         - $ref: './components.yaml#/components/parameters/IdPathParam'
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         204:
           description: OK

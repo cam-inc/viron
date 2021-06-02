@@ -24,8 +24,6 @@ paths:
         - vironAdminRole
       summary: list admin roles
       description: 管理ロール一覧
-      parameters:
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         200:
           description: OK
@@ -41,8 +39,6 @@ paths:
         - vironAdminRole
       summary: create an admin role
       description: 管理ロール作成
-      parameters:
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -67,7 +63,6 @@ paths:
       description: 管理ロール更新
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdPathParam'
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -86,7 +81,6 @@ paths:
       description: 管理ロール削除
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdPathParam'
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         204:
           description: OK

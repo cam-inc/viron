@@ -31,7 +31,6 @@ paths:
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdQueryParam'
         - $ref: './components.yaml#/components/parameters/VironRoleIdQueryParam'
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         200:
           description: OK
@@ -47,8 +46,6 @@ paths:
         - vironAdminUser
       summary: create an admin user
       description: メアド/パスワード認証の管理ユーザーを追加する
-      parameters:
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -73,7 +70,6 @@ paths:
       description: 管理ユーザーのロール等を更新する
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdPathParam'
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       requestBody:
         required: true
         content:
@@ -92,7 +88,6 @@ paths:
       description: 管理ユーザー削除
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdPathParam'
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         204:
           description: OK

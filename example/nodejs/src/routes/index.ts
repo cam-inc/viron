@@ -1,15 +1,13 @@
 import path from 'path';
 import { Express } from 'express';
-import {
-  ExegesisContext,
-  middleware as genExegesisMiddlewares,
-} from 'exegesis-express';
+import { middleware as genExegesisMiddlewares } from 'exegesis-express';
 import { OpenAPIObject } from 'openapi3-ts';
 import merge from 'deepmerge';
 import { domainsOas } from '@viron/lib';
 
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
+import { RouteContext } from '../application';
 
 import * as routesAdminRoles from './adminroles';
 import * as routesAdminUsers from './adminusers';
@@ -20,10 +18,6 @@ import * as routesPing from './ping';
 import * as routesRoot from './root';
 import * as routesOas from './oas';
 import * as routesUsers from './users';
-
-export interface RouteContext extends ExegesisContext {
-  apiDefinition: OpenAPIObject;
-}
 
 type Handler = (context: RouteContext) => Promise<void>;
 

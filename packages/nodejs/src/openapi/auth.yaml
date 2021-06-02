@@ -15,8 +15,6 @@ paths:
         - auth
       summary: signout of viron
       description: Vironからログアウトする
-      parameters:
-        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
       responses:
         204:
           description: OK 
