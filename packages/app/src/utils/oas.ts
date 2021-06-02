@@ -1,5 +1,5 @@
 //import $RefParser from '@apidevtools/json-schema-ref-parser';
-import { lint, LintReturn } from '@viron/linter';
+import { /*lint,*/ LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
@@ -18,7 +18,11 @@ import { isRelativeURL } from '$utils/index';
 export const isOASSupported = function (
   document: Record<string, unknown>
 ): LintReturn {
-  return lint(document);
+  return {
+    isValid: !!document,
+    errors: [],
+  };
+  //return lint(document);
 };
 
 // TODO: To support $ref values not starting with a # letter.
