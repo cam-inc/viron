@@ -58,6 +58,9 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
         fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
           method: authType.method,
           body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
       );
       if (!!responseError) {

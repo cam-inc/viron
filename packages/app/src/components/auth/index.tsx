@@ -113,6 +113,7 @@ const AuthEmail: React.FC<PropsEmail> = ({ authType, onSignin }) => {
         ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
           return (
             <input
+              type="password"
               className={className}
               defaultValue=""
               {...register('password')}
