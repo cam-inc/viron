@@ -50,7 +50,7 @@ const Add: React.FC<Props> = () => {
       // Check whether the endpoint exists or not.
       const [response, responseError] = await promiseErrorHandler(
         fetch(data.url, {
-          //   mode: 'cors',
+          mode: 'cors',
         })
       );
       if (!!responseError) {
@@ -92,24 +92,29 @@ const Add: React.FC<Props> = () => {
       // The OAS document requires authentication.
       // The endpoint exists and it's not open to public.
       if (!response.ok && response.status === 401) {
-        //debugger
-        const [response, responseError] = await promiseErrorHandler(
-          fetch(`${new URL(data.url).origin}/viron_authtype`, {
-            mode: 'cors',
-          })
-        );
-        if (!!responseError) {
+        const authtypesPath = response.headers.get('x-viron-authtypes-path');
+        if (!authtypesPath) {
+          // TODO: error.
+          return;
+        }
+        const [authtypesResponse, authtypesResponseError] =
+          await promiseErrorHandler(
+            fetch(`${new URL(data.url).origin}${authtypesPath}`, {
+              mode: 'cors',
+            })
+          );
+        if (!!authtypesResponseError) {
           // Network error.
           // TODO: show error.
           return;
         }
-        const authTypes: AuthType[] = await response.json();
+        const authTypes: { list: AuthType[] } = await authtypesResponse.json();
         setEndpointList(function (currVal) {
           const endpoint: Endpoint = {
             id: data.endpointId,
             url: data.url,
             isPrivate: true,
-            authTypes,
+            authTypes: authTypes.list,
             token: null,
             document: null,
           };

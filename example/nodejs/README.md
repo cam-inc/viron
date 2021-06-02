@@ -10,6 +10,9 @@ Provides an Example API environment using `docker-compose`.
 
 - Docker for Desktop. [Download site](https://www.docker.com/products/docker-desktop)
 
+#### Cert Files
+Get `viron.crt`, `viron.csr` and `viron.key` files and place them under the `example/[lang]/cert` directory.
+
 ### Run
 
 #### Use MySQL
@@ -41,7 +44,7 @@ npm run docker-compose:up:mongo
 #### Access
 
 - API Server
-  - URL: `http://localhost:3000`
+  - URL: `https://local-api.viron.work:3000`
 - NodeJS Debug
   - Host: `127.0.0.1`
   - Port: `9229`
