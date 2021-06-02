@@ -39,9 +39,9 @@ export const HTTP_HEADER = {
   ACCESS_CONTROL_ALLOW_METHODS: 'access-control-allow-methods',
   ACCESS_CONTROL_ALLOW_HEADERS: 'access-control-allow-headers',
   ACCESS_CONTROL_EXPOSE_HEADERS: 'access-control-expose-headers',
-  AUTHORIZATION: 'authorization',
   CONTENT_DISPOSITION: 'content-disposition',
   ORIGIN: 'origin',
+  SET_COOKIE: 'set-cookie',
   X_REQUESTED_WITH: 'x-requested-with',
   X_VIRON_AUTHTYPES_PATH: 'x-viron-authtypes-path',
 } as const;
@@ -51,14 +51,12 @@ export const DEFAULT_PAGER_SIZE = 10;
 export const DEFAULT_PAGER_PAGE = 1;
 
 export const ACCESS_CONTROL_ALLOW_HEADERS = [
-  HTTP_HEADER.AUTHORIZATION,
   HTTP_HEADER.ORIGIN,
+  HTTP_HEADER.SET_COOKIE,
   HTTP_HEADER.X_REQUESTED_WITH,
-  HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
 ] as const;
 
 export const ACCESS_CONTROL_EXPOSE_HEADERS = [
-  HTTP_HEADER.AUTHORIZATION,
   HTTP_HEADER.CONTENT_DISPOSITION,
   HTTP_HEADER.ORIGIN,
   HTTP_HEADER.X_REQUESTED_WITH,
@@ -111,3 +109,7 @@ export const JWT_HASH_ALGORITHM = 'HS512';
 export const DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60;
 export const DEBUG_LOG_PREFIX = '@viron/lib:';
 export const CASBIN_SYNC_INTERVAL_MSEC = 1 * 60 * 1000;
+
+export const COOKIE_KEY = {
+  VIRON_AUTHORIZATION: 'viron_authorization',
+} as const;
