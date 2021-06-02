@@ -2,18 +2,21 @@
 
 ## Development
 
+Run the example API server refering to the Quick Start section of [this](../../example/nodejs/README.md).
+Then run `npm run develop --workspace=@viron/app` and access to [https://localhost:8000/](https://localhost:8000/).
+
 ### Basic Commands
 
 ```sh
 # To start development.
-$ npm run app:exec develop
+$ npm run develop --workspace=@viron/app
 
 # To check production build.
-$ npm run app:exec build
-$ npm run app:exec serve
+$ npm run build --workspace=@viron/app
+$ npm run serve --workspace=@viron/app
 
 # To type check.
-$ npm run app:exec typecheck
+$ npm run typecheck --workspace=@viron/app
 ```
 
 ### Basic UI Structure
