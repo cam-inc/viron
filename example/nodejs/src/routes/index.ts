@@ -1,13 +1,10 @@
 import path from 'path';
 import { Express } from 'express';
-import {
-  ExegesisContext,
-  middleware as genExegesisMiddlewares,
-} from 'exegesis-express';
-import { OpenAPIObject } from 'openapi3-ts';
+import { middleware as genExegesisMiddlewares } from 'exegesis-express';
 import merge from 'deepmerge';
 import { domainsOas } from '@viron/lib';
 
+import { RouteContext } from '../application';
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
 
@@ -21,9 +18,7 @@ import * as routesRoot from './root';
 import * as routesOas from './oas';
 import * as routesUsers from './users';
 
-export interface RouteContext extends ExegesisContext {
-  apiDefinition: OpenAPIObject;
-}
+export { RouteContext };
 
 type Handler = (context: RouteContext) => Promise<void>;
 
@@ -77,17 +72,17 @@ const routes: Route[] = [
 export async function register(app: Express): Promise<void> {
   let apiDefinition = {};
 
-  // apiDefinitionをroutesで扱えるようにするためコンテキストに追加する
-  const wrap = (fn: Handler): Handler => {
-    return async (context: RouteContext): Promise<void> => {
-      context.apiDefinition = apiDefinition as OpenAPIObject;
-      return fn(context);
+  // apiDefinitionをmiddlewareで扱えるようにするためリクエストに追加する
+  app.use((req, _res, next) => {
+    req._context = {
+      apiDefinition: apiDefinition as domainsOas.VironOpenAPIObject,
     };
-  };
+    next();
+  });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const wrapHandlers = (handlers: Handlers): any => {
     return Object.keys(handlers).reduce((ret: Handlers, name: string) => {
-      ret[name] = wrap(handlers[name]);
+      ret[name] = handlers[name];
       return ret;
     }, {});
   };
@@ -112,6 +107,7 @@ export async function register(app: Express): Promise<void> {
       return { middleware, apiDoc };
     })
   );
+
   apis.forEach(({ middleware, apiDoc }) => {
     app.use(middleware);
     apiDefinition = merge(apiDefinition, apiDoc);

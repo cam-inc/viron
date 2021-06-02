@@ -5,11 +5,14 @@ import {
   HTTP_HEADER,
   VIRON_AUTHCONFIGS_PATH,
   domainsAdminUser,
+  domainsOas,
+  ApiMethod,
 } from '@viron/lib';
 import {
   AUTHENTICATION_RESULT_TYPE_INVALID,
   AUTHENTICATION_RESULT_TYPE_SUCCESS,
 } from '../constants';
+import { PluginContext } from '../application';
 
 export const jwt = async (
   context: ExegesisPluginContext
@@ -17,6 +20,14 @@ export const jwt = async (
   const params = await context.getParams();
   const token = params.header[HTTP_HEADER.AUTHORIZATION];
   const claims = token ? await domainsAuth.verifyJwt(token) : false;
+  //const def = (context as PluginContext).req._context.apiDefinition;
+
+  const ctx = context as PluginContext;
+  domainsOas.uri2ResourceId(
+    ctx.req.path,
+    ctx.req.method?.toLowerCase() as ApiMethod,
+    ctx.req._context.apiDefinition
+  );
   if (claims) {
     const userId = claims.sub;
     const user = await domainsAdminUser.findOneById(userId);
