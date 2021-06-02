@@ -34,13 +34,16 @@ export const STORE_TYPE = {
 export type StoreType = typeof STORE_TYPE[keyof typeof STORE_TYPE];
 
 export const HTTP_HEADER = {
-  X_VIRON_AUTHTYPES_PATH: 'x-viron-authtypes-path',
   ACCESS_CONTROL_ALLOW_ORIGIN: 'access-control-allow-origin',
   ACCESS_CONTROL_ALLOW_CREDENTIALS: 'access-control-allow-credentials',
   ACCESS_CONTROL_ALLOW_METHODS: 'access-control-allow-methods',
   ACCESS_CONTROL_ALLOW_HEADERS: 'access-control-allow-headers',
   ACCESS_CONTROL_EXPOSE_HEADERS: 'access-control-expose-headers',
   AUTHORIZATION: 'authorization',
+  CONTENT_DISPOSITION: 'content-disposition',
+  ORIGIN: 'origin',
+  X_REQUESTED_WITH: 'x-requested-with',
+  X_VIRON_AUTHTYPES_PATH: 'x-viron-authtypes-path',
 } as const;
 export type HttpHeader = typeof HTTP_HEADER[keyof typeof HTTP_HEADER];
 
@@ -48,16 +51,18 @@ export const DEFAULT_PAGER_SIZE = 10;
 export const DEFAULT_PAGER_PAGE = 1;
 
 export const ACCESS_CONTROL_ALLOW_HEADERS = [
-  'x-requested-with',
-  'origin',
-  'authorization',
+  HTTP_HEADER.AUTHORIZATION,
+  HTTP_HEADER.ORIGIN,
+  HTTP_HEADER.X_REQUESTED_WITH,
+  HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
 ] as const;
 
 export const ACCESS_CONTROL_EXPOSE_HEADERS = [
-  'content-disposition',
-  'x-requested-with',
-  'origin',
-  'authorization',
+  HTTP_HEADER.AUTHORIZATION,
+  HTTP_HEADER.CONTENT_DISPOSITION,
+  HTTP_HEADER.ORIGIN,
+  HTTP_HEADER.X_REQUESTED_WITH,
+  HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
 ] as const;
 
 export const ACCESS_CONTROL_ALLOW_METHODS = [
