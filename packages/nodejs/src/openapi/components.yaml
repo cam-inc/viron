@@ -1,0 +1,46 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/lib components'
+
+components:
+  schemas:
+    Pager:
+      type: object
+      properties:
+        maxPage:
+          type: integer
+        currentPage:
+          type: integer
+      required:
+        - maxPage
+        - currentPage
+
+  parameters:
+    VironIdPathParam:
+      name: id
+      in: path
+      schema:
+        type: string
+      required: true
+
+    VironIdQueryParam:
+      name: id
+      in: query
+      schema:
+        type: string
+      required: false
+
+    VironRoleIdQueryParam:
+      name: roleId
+      in: query
+      schema:
+        type: string
+      required: false
+
+    AuthorizationHeaderParam:
+      name: authorization
+      in: header
+      schema:
+        type: string
+      required: false

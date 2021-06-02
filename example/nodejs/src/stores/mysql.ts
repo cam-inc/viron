@@ -1,5 +1,5 @@
 import { MODE_MYSQL, StoreType } from '../constants';
-import { MysqlConfigure } from '../configure';
+import { MysqlConfig } from '../config';
 import { createConnection } from './connection/mysql';
 import {
   MysqlDefinitions,
@@ -15,9 +15,7 @@ export interface MysqlStore {
   models: MysqlModels;
   instance: Sequelize;
 }
-export const preflight = async (
-  config: MysqlConfigure
-): Promise<MysqlStore> => {
+export const preflight = async (config: MysqlConfig): Promise<MysqlStore> => {
   const s = await createConnection(config.connectOptions);
 
   const ms = await models(s);

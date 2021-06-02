@@ -1,19 +1,12 @@
 import pino from 'pino';
 import { Sequelize } from 'sequelize';
-import { repositoryContainer } from '@viron/lib';
+import { repositoryContainer, domainsAuth } from '@viron/lib';
 import { Mode, MODE_MONGO, MODE_MYSQL } from './constants';
 import { preflight as preflightMongo } from './stores/mongo';
 import { preflight as preflightMysql } from './stores/mysql';
-import {
-  Configure,
-  get as getConfigure,
-  MongoConfigure,
-  MysqlConfigure,
-} from './configure';
+import { Config, get as getConfig, MongoConfig, MysqlConfig } from './config';
 import { Stores } from './stores';
 import { noSetEnvMode } from './errors';
-
-///
 
 export const logger = pino({
   name: 'example',
@@ -23,7 +16,7 @@ export const logger = pino({
 
 export class Context {
   public mode: Mode;
-  public configure: Configure;
+  public config: Config;
   public stores!: Stores;
 
   constructor() {
@@ -38,44 +31,45 @@ export class Context {
         throw noSetEnvMode();
     }
 
-    this.configure = getConfigure(this.mode);
+    this.config = getConfig(this.mode);
   }
 
   public async preflight(): Promise<void> {
     await this.preflightStore();
+    domainsAuth.initJwt(this.config.auth.jwt);
   }
 
   /**
    * Preflight store
    */
   public async preflightStore(): Promise<void> {
-    const mainConfig = this.configure.store.main;
+    const mainConfig = this.config.store.main;
 
     switch (this.mode) {
       case MODE_MONGO:
         // eslint-disable-next-line no-case-declarations
-        const configureMongo = mainConfig as MongoConfigure;
+        const configMongo = mainConfig as MongoConfig;
         this.stores = {
-          main: await preflightMongo(configureMongo),
+          main: await preflightMongo(configMongo),
         };
 
         // eslint-disable-next-line no-case-declarations
         //const instanceMongo = this.stores.main.instance as Connection;
         logger.info(
-          `Completed loading the store (main). type=${configureMongo.type}, openUri=${configureMongo.openUri}`
+          `Completed loading the store (main). type=${configMongo.type}, openUri=${configMongo.openUri}`
         );
         break;
       case MODE_MYSQL:
         // eslint-disable-next-line no-case-declarations
-        const configureMysql = mainConfig as MysqlConfigure;
+        const configMysql = mainConfig as MysqlConfig;
         this.stores = {
-          main: await preflightMysql(configureMysql),
+          main: await preflightMysql(configMysql),
         };
         // eslint-disable-next-line no-case-declarations
         const instanceMysql = this.stores.main.instance as Sequelize;
         logger.info(
           'Completed loading the store (main). type=%s "%s://%s:%s/%s". %O',
-          configureMysql.type,
+          configMysql.type,
           instanceMysql.getDialect(),
           instanceMysql.config.host,
           instanceMysql.config.port,

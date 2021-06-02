@@ -3,7 +3,7 @@ import { storeDefinitions } from '@viron/lib';
 import * as users from './users';
 import * as topics from './topics';
 
-const { auditLogs, createModel } = storeDefinitions.mongo;
+const { adminUsers, auditLogs, createModel } = storeDefinitions.mongo;
 
 /////////////////////////////
 // Definition
@@ -44,6 +44,11 @@ export const definitions: MongoDefinitions = {
   topics: {
     name: topics.name,
     schema: topics.schema,
+    createModel,
+  },
+  adminUsers: {
+    name: adminUsers.name,
+    schema: adminUsers.schema,
     createModel,
   },
   auditLogs: {
@@ -92,27 +97,19 @@ export const models = async (
     }
   }
 
+  const { users, topics, adminUsers, auditLogs } = definitions;
   _models = {
     users: {
-      Model: definitions.users.createModel(
-        c,
-        definitions.users.name,
-        definitions.users.schema
-      ),
+      Model: users.createModel(c, users.name, users.schema),
     },
     topics: {
-      Model: definitions.topics.createModel(
-        c,
-        definitions.topics.name,
-        definitions.topics.schema
-      ),
+      Model: topics.createModel(c, topics.name, topics.schema),
+    },
+    adminUsers: {
+      Model: adminUsers.createModel(c, adminUsers.name, adminUsers.schema),
     },
     auditLogs: {
-      Model: definitions.auditLogs.createModel(
-        c,
-        definitions.auditLogs.name,
-        definitions.auditLogs.schema
-      ),
+      Model: auditLogs.createModel(c, auditLogs.name, auditLogs.schema),
     },
   };
 

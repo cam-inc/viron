@@ -1,0 +1,183 @@
+openapi: 3.0.2
+
+info:
+  version: 0.0.1
+  title: '@viron/lib admin users'
+  description: admin users api specifications
+  x-pages:
+    - id: vironAdminUsers
+      group: 管理画面/管理
+      title: Viron 管理ユーザー
+      description: 管理ユーザー一覧を閲覧できます
+      contents:
+        - getOperationId: listVironAdminUsers
+          resourceId: vironAdminUser
+          style: table
+          query:
+            - id
+            - roleId
+
+tags:
+  - name: vironAdminUsers
+
+paths:
+  /viron/adminusers:
+    get:
+      operationId: listVironAdminUsers
+      tags:
+        - vironAdminUser
+      summary: list admin users 
+      description: 管理ユーザー一覧
+      parameters:
+        - $ref: './components.yaml#/components/parameters/VironIdQueryParam'
+        - $ref: './components.yaml#/components/parameters/VironRoleIdQueryParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VironAdminUserListWithPager'
+      security:
+        - jwt: []
+    post:
+      operationId: createVironAdminUser
+      tags:
+        - vironAdminUser
+      summary: create an admin user
+      description: メアド/パスワード認証の管理ユーザーを追加する
+      parameters:
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            $ref: '#/components/schemas/VironAdminUserCreatePayload'
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VironAdminUser'
+      security:
+        - jwt: []
+
+  /viron/adminusers/{id}:
+    put:
+      operationId: updateVironAdminUser
+      tags:
+        - vironAdminUser
+      summary: update an admin user
+      description: 管理ユーザーのロール等を更新する
+      parameters:
+        - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            $ref: '#/components/schemas/VironAdminUserUpdatePayload'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+    delete:
+      operationId: removeVironAdminUser
+      tags:
+        - vironAdminUser
+      summary: remove an admin user
+      description: 管理ユーザー削除
+      parameters:
+        - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+        - $ref: './components.yaml#/components/parameters/AuthorizationHeaderParam'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+components:
+  schemas:
+    VironAdminUserListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/Pager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/VironAdminUserList' 
+          required:
+            - list
+
+    VironAdminUserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VironAdminUser'
+
+    VironAdminUser:
+      type: object
+      properties:
+        id:
+          description: 管理ユーザーID
+          type: string
+        email:
+          description: Eメールアドレス
+          type: string
+          format: email
+        authType:
+          description: 認証タイプ
+          type: string
+        roleIds:
+          description: ロール一覧
+          type: array
+          items:
+            type: string
+        createdAt:
+          description: 作成日時
+          type: integer
+          format: int64
+        updatedAt:
+          description: 更新日時
+          type: integer
+          format: int64
+      required:
+        - id
+        - email
+        - authType
+    
+    VironAdminUserCreatePayload:
+      type: object
+      properties:
+        email:
+          description: Eメールアドレス
+          type: string
+          format: email
+        password:
+          description: パスワード
+          type: string
+          format: password
+          pattern: "^(?=.*?[a-zA-Z])(?=.*?\\d)[a-zA-Z\\d!?#$%&@*+/-_<=>]{8,}"
+        roleIds:
+          description: ロールID
+          type: array
+          items:
+            type: string
+      required:
+        - email
+        - password
+
+    VironAdminUserUpdatePayload:
+      type: object
+      properties:
+        password:
+          description: パスワード
+          type: string
+          format: password
+          pattern: "^(?=.*?[a-zA-Z])(?=.*?\\d)[a-zA-Z\\d!?#$%&@*+/-_<=>]{8,}"
+        roleIds:
+          description: ロールID
+          type: array
+          items:
+            type: string

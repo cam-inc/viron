@@ -1,12 +1,9 @@
 import { Model, Sequelize, DataTypes, ModelCtor } from 'sequelize';
-import {
-  AuditLog,
-  AuditLogCreationAttributes,
-} from '../../../domains/auditlog';
+import { AuditLog, AuditLogCreateAttributes } from '../../../domains/auditlog';
 
 export const name = 'auditlogs';
 
-export class AuditLogModel extends Model<AuditLog, AuditLogCreationAttributes> {
+export class AuditLogModel extends Model<AuditLog, AuditLogCreateAttributes> {
   id!: number;
 
   // timestamps!

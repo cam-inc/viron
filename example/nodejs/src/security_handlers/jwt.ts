@@ -1,24 +1,38 @@
+import { AuthenticationResult, ExegesisPluginContext } from 'exegesis-express';
 import {
-  AuthenticationResult,
-  AuthenticatorInfo,
-  ExegesisPluginContext,
-} from 'exegesis-express';
-//import { HTTP_HEADER } from '@viron/lib';
-//import { unauthorized } from '../errors';
-//import { VIRON_AUTHTYPES_PATH } from '../constants';
+  domainsAuth,
+  unauthorized,
+  HTTP_HEADER,
+  VIRON_AUTHCONFIGS_PATH,
+  domainsAdminUser,
+} from '@viron/lib';
+import {
+  AUTHENTICATION_RESULT_TYPE_INVALID,
+  AUTHENTICATION_RESULT_TYPE_SUCCESS,
+} from '../constants';
 
 export const jwt = async (
-  //context: ExegesisPluginContext,
-  _context: ExegesisPluginContext,
-  securityScheme: AuthenticatorInfo
+  context: ExegesisPluginContext
 ): Promise<AuthenticationResult> => {
-  // TODO: implements
-  console.log(securityScheme);
-  return { type: 'success' };
-  //const e = unauthorized();
-  //context.origRes.setHeader(
-  //  HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
-  //  VIRON_AUTHTYPES_PATH
-  //);
-  //return { type: 'invalid', status: e.statusCode, message: e.message };
+  const params = await context.getParams();
+  const token = params.header[HTTP_HEADER.AUTHORIZATION];
+  const claims = token ? await domainsAuth.verifyJwt(token) : false;
+  if (claims) {
+    const userId = claims.sub;
+    const user = await domainsAdminUser.findOneById(userId);
+    if (user) {
+      return { type: AUTHENTICATION_RESULT_TYPE_SUCCESS, user };
+    }
+  }
+
+  context.origRes.setHeader(
+    HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
+    VIRON_AUTHCONFIGS_PATH
+  );
+  const e = unauthorized();
+  return {
+    type: AUTHENTICATION_RESULT_TYPE_INVALID,
+    status: e.statusCode,
+    message: e.message,
+  };
 };

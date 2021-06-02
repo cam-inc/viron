@@ -6,13 +6,16 @@ import {
 } from 'exegesis-express';
 import { OpenAPIObject } from 'openapi3-ts';
 import merge from 'deepmerge';
-import { loadResolvedOas, getOasPath as libOasPath } from '@viron/lib';
+import { domainsOas } from '@viron/lib';
 
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
 
+import * as routesAdminRoles from './adminroles';
+import * as routesAdminUsers from './adminusers';
 import * as routesAuditLogs from './auditlogs';
-import * as routesAuthtypes from './authtypes';
+import * as routesAuth from './auth';
+import * as routesAuthconfigs from './authconfigs';
 import * as routesPing from './ping';
 import * as routesRoot from './root';
 import * as routesOas from './oas';
@@ -42,16 +45,31 @@ const routes: Route[] = [
   { name: 'ping', oasPath: oasPath('ping'), handlers: routesPing },
   { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
   {
+    name: 'adminroles',
+    oasPath: domainsOas.getPath('adminroles'),
+    handlers: routesAdminRoles,
+  },
+  {
+    name: 'adminusers',
+    oasPath: domainsOas.getPath('adminusers'),
+    handlers: routesAdminUsers,
+  },
+  {
     name: 'auditlogs',
-    oasPath: libOasPath('auditlogs'),
+    oasPath: domainsOas.getPath('auditlogs'),
     handlers: routesAuditLogs,
   },
   {
-    name: 'authtypes',
-    oasPath: libOasPath('authtypes'),
-    handlers: routesAuthtypes,
+    name: 'auth',
+    oasPath: domainsOas.getPath('auth'),
+    handlers: routesAuth,
   },
-  { name: 'oas', oasPath: libOasPath('oas'), handlers: routesOas },
+  {
+    name: 'authconfigs',
+    oasPath: domainsOas.getPath('authconfigs'),
+    handlers: routesAuthconfigs,
+  },
+  { name: 'oas', oasPath: domainsOas.getPath('oas'), handlers: routesOas },
   // マージ順の関係で`root`は必ず最後に書く
   { name: 'root', oasPath: oasPath('root'), handlers: routesRoot },
 ];
@@ -77,7 +95,7 @@ export async function register(app: Express): Promise<void> {
   const apis = await Promise.all(
     routes.map(async ({ oasPath, handlers, name }) => {
       logger.info('Routes registration oas: %s', oasPath);
-      const apiDoc = await loadResolvedOas(oasPath);
+      const apiDoc = await domainsOas.loadResolvedOas(oasPath);
       apiDoc['x-exegesis-controller'] = name;
       const middleware = await genExegesisMiddlewares(apiDoc, {
         controllers: {

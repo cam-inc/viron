@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
+import { Connection } from 'mongoose';
 import { storeDefinitions } from '../../stores';
 import { domainsAuditLog } from '../../domains';
-import { repositoryContainer } from '../';
+import { repositoryContainer } from '..';
+import { getPagerResults, ListWithPager } from '../../helpers';
 
 const getModel = (): storeDefinitions.mongo.auditLogs.AuditLogModel => {
-  const conn = repositoryContainer.conn as mongoose.Connection;
+  const conn = repositoryContainer.conn as Connection;
   return conn.models
     .auditlogs as storeDefinitions.mongo.auditLogs.AuditLogModel;
 };
@@ -23,8 +24,23 @@ export const find = async (): Promise<domainsAuditLog.AuditLog[]> => {
   return docs.map((doc) => doc.toJSON());
 };
 
+export const findWithPager = async (): Promise<
+  ListWithPager<domainsAuditLog.AuditLog>
+> => {
+  const [list, totalCount] = await Promise.all([find(), count()]);
+  return {
+    ...getPagerResults(totalCount),
+    list,
+  };
+};
+
+export const count = async (/*conditions: FilterQuery<domainsAuditLog.AuditLog> = {}*/): Promise<number> => {
+  const model = getModel();
+  return await model.countDocuments();
+};
+
 export const createOne = async (
-  auditLog: domainsAuditLog.AuditLogCreationAttributes
+  auditLog: domainsAuditLog.AuditLogCreateAttributes
 ): Promise<domainsAuditLog.AuditLog> => {
   const model = getModel();
   const doc = await model.create(auditLog);

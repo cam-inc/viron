@@ -1,37 +1,42 @@
-// configure file.
-
+// configuration file.
 import { ConnectOptions as MongoConnectOptions } from 'mongoose';
 import { Options as MysqlConnectOptions } from 'sequelize';
+import { domainsAuth } from '@viron/lib';
 import { Mode, MODE_MONGO, StoreType } from './constants';
 import { openUri } from './stores/connection/mongo';
 
-export interface MongoConfigure extends StoreConfigure {
+export interface MongoConfig extends StoreConfig {
   openUri: openUri;
   connectOptions: MongoConnectOptions;
 }
 
-export interface MysqlConfigure extends StoreConfigure {
+export interface MysqlConfig extends StoreConfig {
   connectOptions: MysqlConnectOptions;
 }
 
-export interface StoreConfigure {
+export interface StoreConfig {
   type: StoreType;
 }
 
-export interface Configure {
+export interface CorsConfig {
+  allowOrigins: string[];
+}
+
+export interface Config {
   store: {
-    main: MongoConfigure | MysqlConfigure;
+    main: MongoConfig | MysqlConfig;
   };
-  acl: {
-    allowOrigins: string[];
+  cors: CorsConfig;
+  auth: {
+    jwt: domainsAuth.JwtConfig;
   };
 }
 
 /**
- * Get configure data.
+ * Get configuration data.
  */
-export const get = (mode: Mode): Configure => {
-  const mongo: MongoConfigure = {
+export const get = (mode: Mode): Config => {
+  const mongo: MongoConfig = {
     type: 'mongo',
     openUri: 'mongodb://mongo:27017',
     connectOptions: {
@@ -48,7 +53,7 @@ export const get = (mode: Mode): Configure => {
     },
   };
 
-  const mysql: MysqlConfigure = {
+  const mysql: MysqlConfig = {
     type: 'mysql',
     connectOptions: {
       dialect: 'mysql',
@@ -62,13 +67,19 @@ export const get = (mode: Mode): Configure => {
       logging: true,
     },
   };
-  const ret: Configure = {
+  const ret: Config = {
     store: {
       main: mode == MODE_MONGO ? mongo : mysql,
     },
-    acl: {
+    cors: {
       // TODO: 正規のドメイン取得したら修正
       allowOrigins: ['https://localhost:8000'],
+    },
+    auth: {
+      jwt: {
+        secret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        provider: 'viron-example-nodejs',
+      },
     },
   };
 

@@ -1,2 +1,2 @@
 export * from './pager';
-export * from './oas';
+export * from './password';

@@ -1,48 +1,48 @@
-import * as mongoose from 'mongoose';
+import { Document, Model, Schema, SchemaDefinition } from 'mongoose';
 import { AuditLog } from '../../../domains/auditlog';
 
 export const name = 'auditlogs';
 
-const schemaDefinition: mongoose.SchemaDefinition = {
+const schemaDefinition: SchemaDefinition = {
   requestMethod: {
-    type: mongoose.Schema.Types.String,
+    type: Schema.Types.String,
     required: false,
   },
   requestUri: {
-    type: mongoose.Schema.Types.String,
+    type: Schema.Types.String,
     required: false,
   },
   sourceIp: {
-    type: mongoose.Schema.Types.String,
+    type: Schema.Types.String,
     required: false,
   },
   userId: {
-    type: mongoose.Schema.Types.String,
+    type: Schema.Types.String,
     required: false,
   },
   requestBody: {
-    type: mongoose.Schema.Types.String,
+    type: Schema.Types.String,
     required: false,
   },
   statusCode: {
-    type: mongoose.Schema.Types.Number,
+    type: Schema.Types.Number,
     required: false,
   },
   createdAt: {
-    type: mongoose.Schema.Types.Number,
+    type: Schema.Types.Number,
   },
   updatedAt: {
-    type: mongoose.Schema.Types.Number,
+    type: Schema.Types.Number,
   },
 };
 
-export interface AuditLogDocument extends AuditLog, mongoose.Document {
+export interface AuditLogDocument extends AuditLog, Document {
   id: string; // mongoose.Docmentのidがanyなので上書き
 }
 
-export type AuditLogModel = mongoose.Model<AuditLogDocument>;
+export type AuditLogModel = Model<AuditLogDocument>;
 
-export const schema = new mongoose.Schema<AuditLogDocument>(schemaDefinition, {
+export const schema = new Schema<AuditLogDocument>(schemaDefinition, {
   autoIndex: true,
   collection: name,
   strict: true,
