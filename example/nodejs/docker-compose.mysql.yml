@@ -16,6 +16,7 @@ services:
     volumes:
       - $PWD/package.json:/example/nodejs/package.json
       - $PWD/src:/example/nodejs/src
+      - $PWD/cert:/example/nodejs/cert
     command: npm run dev
 
   mysql:
