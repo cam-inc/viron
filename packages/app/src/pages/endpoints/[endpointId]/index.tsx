@@ -63,6 +63,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return;
       }
       const _document = resolve(document);
+      console.log('OAS: ', _document);
       // Just update the stored data so that other pages using endpoints data be affected.
       setEndpoint({ ...endpoint, document: _document });
       setDocument(_document);
@@ -141,20 +142,22 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
 
   return (
     <div id="page-endpointOne">
-      <div>
-        <p>{JSON.stringify(document)}</p>
-        <p>see this?: {t('aa.bb')}</p>
-        <_Pages
-          pages={document.info['x-pages']}
-          selectedPageIds={selectedPageIds}
-          onSelect={handlePageSelect}
-        />
-        <_Panels
-          endpoint={endpoint}
-          document={document}
-          selectedPageIds={selectedPageIds}
-          onUnselect={handlePageUnselect}
-        />
+      <div className="p-2">
+        <div className="p-2 border mb-2">
+          <_Pages
+            pages={document.info['x-pages']}
+            selectedPageIds={selectedPageIds}
+            onSelect={handlePageSelect}
+          />
+        </div>
+        <div className="p-2 border">
+          <_Panels
+            endpoint={endpoint}
+            document={document}
+            selectedPageIds={selectedPageIds}
+            onUnselect={handlePageUnselect}
+          />
+        </div>
       </div>
     </div>
   );

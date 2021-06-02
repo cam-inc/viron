@@ -23,7 +23,7 @@ This repository is building as a monorepo by npm workspaces.
 ```
 $ git clone git@github.com:cam-inc/viron.git
 $ cd viron
-$ npm install .
+$ npm install . --legacy-peer-deps
 ```
 **Important: npm version >= 7.9.0
 

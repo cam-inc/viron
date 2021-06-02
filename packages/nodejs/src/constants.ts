@@ -11,14 +11,16 @@ export const AUTH_CONFIG_TYPE = {
   OAUTH: 'oauth',
   SIGNOUT: 'signout',
 } as const;
-export type AuthConfigType = typeof AUTH_CONFIG_TYPE[keyof typeof AUTH_CONFIG_TYPE];
+export type AuthConfigType =
+  typeof AUTH_CONFIG_TYPE[keyof typeof AUTH_CONFIG_TYPE];
 
 export const AUTH_CONFIG_PROVIDER = {
   VIRON: 'viron',
   GOOGLE: 'google',
   SIGNOUT: 'signout',
 } as const;
-export type AuthConfigProvider = typeof AUTH_CONFIG_PROVIDER[keyof typeof AUTH_CONFIG_PROVIDER];
+export type AuthConfigProvider =
+  typeof AUTH_CONFIG_PROVIDER[keyof typeof AUTH_CONFIG_PROVIDER];
 
 export const AUTH_METHOD = {
   GET: 'GET',
@@ -40,6 +42,7 @@ export const HTTP_HEADER = {
   ACCESS_CONTROL_ALLOW_HEADERS: 'access-control-allow-headers',
   ACCESS_CONTROL_EXPOSE_HEADERS: 'access-control-expose-headers',
   CONTENT_DISPOSITION: 'content-disposition',
+  CONTENT_TYPE: 'content-type',
   ORIGIN: 'origin',
   SET_COOKIE: 'set-cookie',
   X_REQUESTED_WITH: 'x-requested-with',
@@ -51,9 +54,8 @@ export const DEFAULT_PAGER_SIZE = 10;
 export const DEFAULT_PAGER_PAGE = 1;
 
 export const ACCESS_CONTROL_ALLOW_HEADERS = [
+  HTTP_HEADER.CONTENT_TYPE,
   HTTP_HEADER.ORIGIN,
-  HTTP_HEADER.SET_COOKIE,
-  HTTP_HEADER.X_REQUESTED_WITH,
 ] as const;
 
 export const ACCESS_CONTROL_EXPOSE_HEADERS = [

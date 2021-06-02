@@ -35,10 +35,11 @@ export const findWithPager = async (): Promise<
   };
 };
 
-export const count = async (/*conditions: WhereOptions<User> = {}*/): Promise<number> => {
-  const model = getModel();
-  return await model.count();
-};
+export const count =
+  async (/*conditions: WhereOptions<User> = {}*/): Promise<number> => {
+    const model = getModel();
+    return await model.count();
+  };
 
 export const createOne = async (
   auditLog: domainsAuditLog.AuditLogCreateAttributes
