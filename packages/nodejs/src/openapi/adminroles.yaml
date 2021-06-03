@@ -95,7 +95,7 @@ components:
         - type: object
           properties:
             list:
-              $ref: '#/components/schemas/VironAdminRoleList' 
+              $ref: '#/components/schemas/VironAdminRoleList'
           required:
             - list
 

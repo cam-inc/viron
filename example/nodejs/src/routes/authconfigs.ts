@@ -1,11 +1,11 @@
 import {
   domainsAuthConfig,
   paging,
-  AUTH_METHOD,
+  API_METHOD,
   AUTH_CONFIG_TYPE,
   AUTH_CONFIG_PROVIDER,
   EMAIL_SIGNIN_PATH,
-  GOOGLE_SIGNIN_PATH,
+  //GOOGLE_SIGNIN_PATH,
   SIGNOUT_PATH,
 } from '@viron/lib';
 import { RouteContext } from '../application';
@@ -20,20 +20,24 @@ export const listVironAuthconfigs = async (
     genAuthConfig(
       AUTH_CONFIG_PROVIDER.VIRON,
       AUTH_CONFIG_TYPE.EMAIL,
-      AUTH_METHOD.POST,
-      EMAIL_SIGNIN_PATH
+      API_METHOD.POST,
+      EMAIL_SIGNIN_PATH,
+      context.apiDefinition
     ),
-    genAuthConfig(
-      AUTH_CONFIG_PROVIDER.GOOGLE,
-      AUTH_CONFIG_TYPE.OAUTH,
-      AUTH_METHOD.POST,
-      GOOGLE_SIGNIN_PATH
-    ),
+    // TODO: Google認証
+    //genAuthConfig(
+    //  AUTH_CONFIG_PROVIDER.GOOGLE,
+    //  AUTH_CONFIG_TYPE.OAUTH,
+    //  API_METHOD.POST,
+    //  GOOGLE_SIGNIN_PATH,
+    //  context.apiDefinition
+    //),
     genAuthConfig(
       AUTH_CONFIG_PROVIDER.SIGNOUT,
       AUTH_CONFIG_TYPE.SIGNOUT,
-      AUTH_METHOD.POST,
-      SIGNOUT_PATH
+      API_METHOD.POST,
+      SIGNOUT_PATH,
+      context.apiDefinition
     ),
   ];
   context.res.json(paging(authConfigs));

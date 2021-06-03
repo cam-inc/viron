@@ -26,7 +26,7 @@ paths:
       operationId: listVironAdminUsers
       tags:
         - vironAdminUser
-      summary: list admin users 
+      summary: list admin users
       description: 管理ユーザー一覧
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdQueryParam'
@@ -102,7 +102,7 @@ components:
         - type: object
           properties:
             list:
-              $ref: '#/components/schemas/VironAdminUserList' 
+              $ref: '#/components/schemas/VironAdminUserList'
           required:
             - list
 
@@ -141,7 +141,7 @@ components:
         - id
         - email
         - authType
-    
+
     VironAdminUserCreatePayload:
       type: object
       properties:

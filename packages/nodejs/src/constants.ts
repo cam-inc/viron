@@ -22,13 +22,6 @@ export const AUTH_CONFIG_PROVIDER = {
 export type AuthConfigProvider =
   typeof AUTH_CONFIG_PROVIDER[keyof typeof AUTH_CONFIG_PROVIDER];
 
-export const AUTH_METHOD = {
-  GET: 'GET',
-  POST: 'POST',
-  PUT: 'PUT',
-};
-export type AuthMethod = typeof AUTH_METHOD[keyof typeof AUTH_METHOD];
-
 export const STORE_TYPE = {
   MYSQL: 'mysql',
   MONGO: 'mongo',
