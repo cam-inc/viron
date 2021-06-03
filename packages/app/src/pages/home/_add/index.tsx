@@ -74,7 +74,6 @@ const Add: React.FC<Props> = () => {
               url: data.url,
               isPrivate: false,
               authTypes: [],
-              token: null,
               document: resolve(document),
             };
             return [...currVal, endpoint];
