@@ -30,3 +30,7 @@ export const unauthorized = (): VironError => {
 export const adminUserNotFound = (): VironError => {
   return new VironError('Admin User not found.', 404);
 };
+
+export const oasUndefined = (): VironError => {
+  return new VironError('OAS is undefined.', 404);
+};
