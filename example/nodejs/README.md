@@ -65,4 +65,10 @@ npm run docker-compose:up:mongo
 
 ### Troubleshooting
 
+#### To build with force recreation
+
+```
+"example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up --build --force-recreate"
+```
+
 TODO

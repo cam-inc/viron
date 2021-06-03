@@ -5,8 +5,7 @@ import { useRecoilState } from 'recoil';
 import * as yup from 'yup';
 import Textinput from '$components/textinput';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { AuthType, Endpoint, EndpointID, URL as TypeURL } from '$types/index';
-import { Document } from '$types/oas';
+import { AuthConfig, Endpoint, EndpointID, URL as TypeURL } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import { isOASSupported, resolve } from '$utils/oas';
 import { endpointId, url } from '$utils/v8n';
@@ -73,8 +72,7 @@ const Add: React.FC<Props> = () => {
               id: data.endpointId,
               url: data.url,
               isPrivate: false,
-              authTypes: [],
-              token: null,
+              authConfigs: [],
               document: resolve(document),
             };
             return [...currVal, endpoint];
@@ -92,30 +90,31 @@ const Add: React.FC<Props> = () => {
       // The OAS document requires authentication.
       // The endpoint exists and it's not open to public.
       if (!response.ok && response.status === 401) {
-        const authtypesPath = response.headers.get('x-viron-authtypes-path');
-        if (!authtypesPath) {
+        const authconfigsPath = response.headers.get('x-viron-authtypes-path');
+        if (!authconfigsPath) {
           // TODO: error.
           return;
         }
-        const [authtypesResponse, authtypesResponseError] =
+        // TODO: ここもPathsObjectが必要そう。
+        const [authconfigsResponse, authconfigsResponseError] =
           await promiseErrorHandler(
-            fetch(`${new URL(data.url).origin}${authtypesPath}`, {
+            fetch(`${new URL(data.url).origin}${authconfigsPath}`, {
               mode: 'cors',
             })
           );
-        if (!!authtypesResponseError) {
+        if (!!authconfigsResponseError) {
           // Network error.
           // TODO: show error.
           return;
         }
-        const authTypes: { list: AuthType[] } = await authtypesResponse.json();
+        const authConfigs: { list: AuthConfig[] } =
+          await authconfigsResponse.json();
         setEndpointList(function (currVal) {
           const endpoint: Endpoint = {
             id: data.endpointId,
             url: data.url,
             isPrivate: true,
-            authTypes: authTypes.list,
-            token: null,
+            authConfigs: authConfigs.list,
             document: null,
           };
           return [...currVal, endpoint];
