@@ -96,16 +96,20 @@ const Endpoint: React.FC<Props> = ({ id }) => {
           )}
           {endpoint.isPrivate && isSigninRequired && (
             <React.Fragment>
-              {endpoint.authTypes
-                .filter((authType) => authType.type !== 'signout')
-                .map((authType, idx) => {
+              {endpoint.authConfigs
+                .filter((authConfig) => authConfig.type !== 'signout')
+                .map((authConfig, idx) => {
                   let elm: JSX.Element | null = null;
-                  switch (authType.type) {
+                  switch (authConfig.type) {
                     case 'oauth':
-                      elm = <OAuth authType={authType} endpoint={endpoint} />;
+                      elm = (
+                        <OAuth authConfig={authConfig} endpoint={endpoint} />
+                      );
                       break;
                     case 'email':
-                      elm = <Email authType={authType} endpoint={endpoint} />;
+                      elm = (
+                        <Email authConfig={authConfig} endpoint={endpoint} />
+                      );
                       break;
                   }
                   return <React.Fragment key={idx}>{elm}</React.Fragment>;
@@ -118,12 +122,12 @@ const Endpoint: React.FC<Props> = ({ id }) => {
                 <AiFillApi className="inline" />
                 <span>connect</span>
               </button>
-              {endpoint.authTypes
-                .filter((authType) => authType.type === 'signout')
-                .map((authType, idx) => (
+              {endpoint.authConfigs
+                .filter((authConfig) => authConfig.type === 'signout')
+                .map((authConfig, idx) => (
                   <React.Fragment key={idx}>
                     <Signout
-                      authType={authType}
+                      authConfig={authConfig}
                       endpoint={endpoint}
                       onSignout={handleSignout}
                     />

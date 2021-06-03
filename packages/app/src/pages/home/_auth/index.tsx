@@ -8,17 +8,17 @@ import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import Textinput from '$components/textinput';
-import { AuthType, AuthTypeEmailFormData, Endpoint } from '$types/index';
+import { AuthConfig, AuthConfigEmailFormData, Endpoint } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import { email } from '$utils/v8n';
 
 type PropsOAuth = {
-  authType: AuthType;
+  authConfig: AuthConfig;
   endpoint: Endpoint;
 };
-export const OAuth: React.FC<PropsOAuth> = ({ authType, endpoint }) => {
+export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
   let Icon: IconType = AiOutlineLogin;
-  if (authType.provider === 'google') {
+  if (authConfig.provider === 'google') {
     Icon = AiFillGoogleCircle;
   }
   const handleClick = function () {
@@ -27,7 +27,7 @@ export const OAuth: React.FC<PropsOAuth> = ({ authType, endpoint }) => {
       `${new URL(location.href).origin}/oauthredirect/${endpoint.id}`
     );
     // @ts-ignore
-    const fetchUrl = `${origin}${authType.url}?redirect_url=${redirectUrl}`;
+    const fetchUrl = `${origin}${authConfig.url}?redirect_url=${redirectUrl}`;
     location.href = fetchUrl;
   };
   return (
@@ -39,10 +39,10 @@ export const OAuth: React.FC<PropsOAuth> = ({ authType, endpoint }) => {
 };
 
 type PropsEmail = {
-  authType: AuthType;
+  authConfig: AuthConfig;
   endpoint: Endpoint;
 };
-export const Email: React.FC<PropsEmail> = ({ authType, endpoint }) => {
+export const Email: React.FC<PropsEmail> = ({ authConfig, endpoint }) => {
   const schema = useMemo(function () {
     return yup.object().shape({
       email: email.required(),
@@ -50,18 +50,19 @@ export const Email: React.FC<PropsEmail> = ({ authType, endpoint }) => {
     });
   }, []);
 
-  const { register, handleSubmit, formState } = useForm<AuthTypeEmailFormData>({
-    resolver: yupResolver(schema),
-  });
+  const { register, handleSubmit, formState } =
+    useForm<AuthConfigEmailFormData>({
+      resolver: yupResolver(schema),
+    });
   const signin = useCallback(
-    function (data: AuthTypeEmailFormData) {
+    function (data: AuthConfigEmailFormData) {
       const f = async function (): Promise<void> {
         const [response, responseError] = await promiseErrorHandler(
           // TODO: path objectを参照すること。
           // @ts-ignore
-          fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
+          fetch(`${new URL(endpoint.url).origin}${authConfig.url}`, {
             // @ts-ignore
-            method: authType.method,
+            method: authConfig.method,
             body: JSON.stringify(data),
             credentials: 'include',
             headers: {
@@ -81,7 +82,7 @@ export const Email: React.FC<PropsEmail> = ({ authType, endpoint }) => {
       };
       f();
     },
-    [authType]
+    [authConfig]
   );
   return (
     <form onSubmit={handleSubmit(signin)}>
@@ -122,12 +123,12 @@ export const Email: React.FC<PropsEmail> = ({ authType, endpoint }) => {
 };
 
 type PropsSignout = {
-  authType: AuthType;
+  authConfig: AuthConfig;
   endpoint: Endpoint;
   onSignout: () => void;
 };
 export const Signout: React.FC<PropsSignout> = ({
-  authType,
+  authConfig,
   endpoint,
   onSignout,
 }) => {
@@ -135,9 +136,9 @@ export const Signout: React.FC<PropsSignout> = ({
     const [response, responseError] = await promiseErrorHandler(
       // TODO: path objectを参照すること。
       // @ts-ignore
-      fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
+      fetch(`${new URL(endpoint.url).origin}${authConfig.url}`, {
         // @ts-ignore
-        method: authType.method,
+        method: authConfig.method,
         credentials: 'include',
       })
     );
