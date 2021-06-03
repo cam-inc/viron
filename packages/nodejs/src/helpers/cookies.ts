@@ -7,7 +7,7 @@ export const genAuthorizationCookie = (
   options?: CookieSerializeOptions
 ): string => {
   const opts = Object.assign({}, options);
-  if (!opts.httpOnly) {
+  if (opts.httpOnly === undefined) {
     opts.httpOnly = true;
   }
   if (!opts.maxAge && !opts.expires) {
