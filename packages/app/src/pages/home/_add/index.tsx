@@ -6,7 +6,6 @@ import * as yup from 'yup';
 import Textinput from '$components/textinput';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { AuthType, Endpoint, EndpointID, URL as TypeURL } from '$types/index';
-import { Document } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import { isOASSupported, resolve } from '$utils/oas';
 import { endpointId, url } from '$utils/v8n';
@@ -96,6 +95,7 @@ const Add: React.FC<Props> = () => {
           // TODO: error.
           return;
         }
+        // TODO: ここもPathsObjectが必要そう。
         const [authtypesResponse, authtypesResponseError] =
           await promiseErrorHandler(
             fetch(`${new URL(data.url).origin}${authtypesPath}`, {
@@ -114,7 +114,6 @@ const Add: React.FC<Props> = () => {
             url: data.url,
             isPrivate: true,
             authTypes: authTypes.list,
-            token: null,
             document: null,
           };
           return [...currVal, endpoint];

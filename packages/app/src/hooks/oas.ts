@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useState, useCallback } from 'react';
-import { Endpoint, Token } from '$types/index';
+import { Endpoint } from '$types/index';
 import {
   Document,
   OperationId,
@@ -53,9 +53,7 @@ export const useFetch = function <R>(
       setResponseJson(null);
       setError(null);
 
-      const headers: HeadersInit = {
-        Authorization: endpoint.token as Token,
-      };
+      const headers: HeadersInit = {};
       const queryParams: { [key in string]: string } = {};
       const pathParams: { [key in string]: string } = {};
       parameters
@@ -147,6 +145,7 @@ export const useFetch = function <R>(
       const requestInit: RequestInit = {
         method: requestObject.method,
         mode: 'cors',
+        credentials: 'include',
         headers,
       };
       // TODO: check the method name
@@ -166,7 +165,7 @@ export const useFetch = function <R>(
         return;
       }
       if (!response.ok) {
-        // The token is not valid or any other reasons.
+        // The authorization cookie is not valid or any other reasons.
         setError(new Error(`${response.status}: ${response.statusText}`));
         setIsPending(false);
         return;
