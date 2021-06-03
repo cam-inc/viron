@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import Textinput from '$components/textinput';
 import { AuthConfig, AuthConfigEmailFormData, Endpoint } from '$types/index';
+import { Method, Operation } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import { email } from '$utils/v8n';
 
@@ -17,6 +18,14 @@ type PropsOAuth = {
   endpoint: Endpoint;
 };
 export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
+  const { pathObject } = authConfig;
+  // TODO: hooks/oasを利用したい。
+  const pathname = Object.keys(pathObject)[0];
+  //const pathItem = pathObject[pathname];
+  //const method = Object.keys(pathItem)[0] as Method;
+  //const operation = pathItem[method];
+
+  // TODO: operation仕様に合わせること。
   let Icon: IconType = AiOutlineLogin;
   if (authConfig.provider === 'google') {
     Icon = AiFillGoogleCircle;
@@ -26,8 +35,7 @@ export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
     const redirectUrl = encodeURIComponent(
       `${new URL(location.href).origin}/oauthredirect/${endpoint.id}`
     );
-    // @ts-ignore
-    const fetchUrl = `${origin}${authConfig.url}?redirect_url=${redirectUrl}`;
+    const fetchUrl = `${origin}${pathname}?redirect_url=${redirectUrl}`;
     location.href = fetchUrl;
   };
   return (
@@ -43,6 +51,14 @@ type PropsEmail = {
   endpoint: Endpoint;
 };
 export const Email: React.FC<PropsEmail> = ({ authConfig, endpoint }) => {
+  const { pathObject } = authConfig;
+  // TODO: hooks/oasを利用したい。
+  const pathname = Object.keys(pathObject)[0];
+  const pathItem = pathObject[pathname];
+  const method = Object.keys(pathItem)[0] as Method;
+  //const operation = pathItem[method];
+
+  // TODO: operation仕様に合わせること。
   const schema = useMemo(function () {
     return yup.object().shape({
       email: email.required(),
@@ -58,11 +74,8 @@ export const Email: React.FC<PropsEmail> = ({ authConfig, endpoint }) => {
     function (data: AuthConfigEmailFormData) {
       const f = async function (): Promise<void> {
         const [response, responseError] = await promiseErrorHandler(
-          // TODO: path objectを参照すること。
-          // @ts-ignore
-          fetch(`${new URL(endpoint.url).origin}${authConfig.url}`, {
-            // @ts-ignore
-            method: authConfig.method,
+          fetch(`${new URL(endpoint.url).origin}${pathname}`, {
+            method,
             body: JSON.stringify(data),
             credentials: 'include',
             headers: {
@@ -133,12 +146,14 @@ export const Signout: React.FC<PropsSignout> = ({
   onSignout,
 }) => {
   const handleClick = async function (): Promise<void> {
+    const { pathObject } = authConfig;
+    // TODO: hooks/oasを利用したい。
+    const pathname = Object.keys(pathObject)[0];
+    const pathItem = pathObject[pathname];
+    const method = Object.keys(pathItem)[0] as Method;
     const [response, responseError] = await promiseErrorHandler(
-      // TODO: path objectを参照すること。
-      // @ts-ignore
-      fetch(`${new URL(endpoint.url).origin}${authConfig.url}`, {
-        // @ts-ignore
-        method: authConfig.method,
+      fetch(`${new URL(endpoint.url).origin}${pathname}`, {
+        method,
         credentials: 'include',
       })
     );
