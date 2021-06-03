@@ -3,11 +3,11 @@ import { AiFillDelete } from '@react-icons/all-files/ai/AiFillDelete';
 import { navigate } from 'gatsby';
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import Auth from '$components/auth';
 import { listState } from '$store/atoms/endpoint';
 import { oneState } from '$store/selectors/endpoint';
-import { AuthType, AuthTypeEmailFormData, EndpointID } from '$types/index';
+import { EndpointID } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
+import { Email, OAuth, Signout } from '../_auth/index';
 
 type Props = {
   id: EndpointID;
@@ -71,69 +71,8 @@ const Endpoint: React.FC<Props> = ({ id }) => {
     navigate(`/endpoints/${endpoint.id}`);
   };
 
-  const handleOAuthSignin = function (authType: AuthType) {
-    const origin = new URL(endpoint.url).origin;
-    const redirectUrl = encodeURIComponent(
-      `${new URL(location.href).origin}/oauthredirect/${endpoint.id}`
-    );
-    // @ts-ignore
-    const fetchUrl = `${origin}${authType.url}?redirect_url=${redirectUrl}`;
-    location.href = fetchUrl;
-  };
-
-  const handleEmailSignin = function (
-    authType: AuthType,
-    data: AuthTypeEmailFormData
-  ) {
-    const f = async function (): Promise<void> {
-      const [response, responseError] = await promiseErrorHandler(
-        // TODO: path objectを参照すること。
-        // @ts-ignore
-        fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
-          // @ts-ignore
-          method: authType.method,
-          body: JSON.stringify(data),
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-      );
-      if (!!responseError) {
-        // TODO
-        return;
-      }
-      if (!response.ok) {
-        // TODO
-        return;
-      }
-      navigate(`/endpoints/${endpoint.id}`);
-    };
-    f();
-  };
-
-  const handleSignout = function (authType: AuthType) {
-    const f = async function (): Promise<void> {
-      const [response, responseError] = await promiseErrorHandler(
-        // TODO: path objectを参照すること。
-        // @ts-ignore
-        fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
-          // @ts-ignore
-          method: authType.method,
-          credentials: 'include',
-        })
-      );
-      if (!!responseError) {
-        // TODO
-        return;
-      }
-      if (!response.ok) {
-        // TODO
-        return;
-      }
-      setIsSigninRequired(true);
-    };
-    f();
+  const handleSignout = function () {
+    setIsSigninRequired(true);
   };
 
   return (
@@ -159,16 +98,18 @@ const Endpoint: React.FC<Props> = ({ id }) => {
             <React.Fragment>
               {endpoint.authTypes
                 .filter((authType) => authType.type !== 'signout')
-                .map((authType) => (
-                  <React.Fragment key={authType.type}>
-                    <Auth
-                      authType={authType}
-                      onOAuthSignin={handleOAuthSignin}
-                      onEmailSignin={handleEmailSignin}
-                      onSignout={handleSignout}
-                    />
-                  </React.Fragment>
-                ))}
+                .map((authType, idx) => {
+                  let elm: JSX.Element | null = null;
+                  switch (authType.type) {
+                    case 'oauth':
+                      elm = <OAuth authType={authType} endpoint={endpoint} />;
+                      break;
+                    case 'email':
+                      elm = <Email authType={authType} endpoint={endpoint} />;
+                      break;
+                  }
+                  return <React.Fragment key={idx}>{elm}</React.Fragment>;
+                })}
             </React.Fragment>
           )}
           {endpoint.isPrivate && !isSigninRequired && (
@@ -181,10 +122,9 @@ const Endpoint: React.FC<Props> = ({ id }) => {
                 .filter((authType) => authType.type === 'signout')
                 .map((authType, idx) => (
                   <React.Fragment key={idx}>
-                    <Auth
+                    <Signout
                       authType={authType}
-                      onOAuthSignin={handleOAuthSignin}
-                      onEmailSignin={handleEmailSignin}
+                      endpoint={endpoint}
                       onSignout={handleSignout}
                     />
                   </React.Fragment>
