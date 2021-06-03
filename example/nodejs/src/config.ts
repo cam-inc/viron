@@ -78,6 +78,7 @@ export const get = (mode: Mode): Config => {
       jwt: {
         secret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
         provider: 'viron-example-nodejs',
+        expirationSec: 24 * 60 * 60,
       },
     },
   };
