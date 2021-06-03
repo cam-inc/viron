@@ -76,6 +76,7 @@ const Endpoint: React.FC<Props> = ({ id }) => {
     const redirectUrl = encodeURIComponent(
       `${new URL(location.href).origin}/oauthredirect/${endpoint.id}`
     );
+    // @ts-ignore
     const fetchUrl = `${origin}${authType.url}?redirect_url=${redirectUrl}`;
     location.href = fetchUrl;
   };
@@ -87,7 +88,9 @@ const Endpoint: React.FC<Props> = ({ id }) => {
     const f = async function (): Promise<void> {
       const [response, responseError] = await promiseErrorHandler(
         // TODO: path objectを参照すること。
+        // @ts-ignore
         fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
+          // @ts-ignore
           method: authType.method,
           body: JSON.stringify(data),
           credentials: 'include',
@@ -113,7 +116,9 @@ const Endpoint: React.FC<Props> = ({ id }) => {
     const f = async function (): Promise<void> {
       const [response, responseError] = await promiseErrorHandler(
         // TODO: path objectを参照すること。
+        // @ts-ignore
         fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
+          // @ts-ignore
           method: authType.method,
           credentials: 'include',
         })
