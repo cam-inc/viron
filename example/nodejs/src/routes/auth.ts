@@ -5,6 +5,7 @@ import {
   HTTP_HEADER,
 } from '@viron/lib';
 import { RouteContext } from '../application';
+import { ctx } from '../context';
 
 // サインアウト
 export const signout = async (context: RouteContext): Promise<void> => {
@@ -17,6 +18,9 @@ export const signout = async (context: RouteContext): Promise<void> => {
 export const signinEmail = async (context: RouteContext): Promise<void> => {
   const { email, password } = context.requestBody;
   const token = await domainsAuth.signinEmail(email, password);
-  context.res.setHeader(HTTP_HEADER.SET_COOKIE, genAuthorizationCookie(token));
+  context.res.setHeader(
+    HTTP_HEADER.SET_COOKIE,
+    genAuthorizationCookie(token, { maxAge: ctx.config.auth.jwt.expirationSec })
+  );
   context.res.status(204).end();
 };
