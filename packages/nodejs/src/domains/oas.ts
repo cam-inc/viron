@@ -57,6 +57,10 @@ export const loadOas = async (path: string): Promise<OpenAPIObject> => {
 
 // oasをロードして$refを解決する
 export const loadResolvedOas = async (path: string): Promise<OpenAPIObject> => {
-  const obj = await jsonSchemaRefParser.dereference(path);
+  const obj = await jsonSchemaRefParser.dereference(path, {
+    dereference: {
+      circular: false, // 循環参照を許容しない
+    },
+  });
   return obj as OpenAPIObject;
 };
