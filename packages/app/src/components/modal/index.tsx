@@ -1,8 +1,8 @@
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Portal from '$components/portal';
-import { timeout } from '$utils/index';
-import { id } from '$wrappers/modal';
+import { wait } from '$utils/index';
+import { ID } from '$wrappers/modal';
 
 type Props = {
   isOpened: boolean;
@@ -29,7 +29,7 @@ const Modal: React.FC<Props> = ({
     const accept = async (handleInvisible: () => void): Promise<void> => {
       setIsVisible(false);
       // TODO: use web animation api.
-      await timeout(300);
+      await wait(300);
       handleInvisible();
     };
     onRequestClose(accept);
@@ -60,7 +60,7 @@ const Modal: React.FC<Props> = ({
   }
 
   return (
-    <Portal targetId={id}>
+    <Portal targetId={ID}>
       <div
         className={classnames('absolute inset-0', {
           'pointer-events-none': !isVisible,

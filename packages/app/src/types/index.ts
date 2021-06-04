@@ -1,5 +1,6 @@
 import { Document, Paths } from '$types/oas';
 
+export type JsonStringifiable = any;
 export type URL = string;
 export type Pathname = string;
 export type EMail = string;

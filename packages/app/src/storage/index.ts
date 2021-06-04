@@ -1,6 +1,9 @@
 import store from 'store2';
 
-export type Key = 'endpointList' | 'foo';
+export const KEY = {
+  ENDPOINT_LIST: 'endpointList',
+} as const;
+export type Key = typeof KEY[keyof typeof KEY];
 
 export const get = function <T>(key: Key): T {
   return store.local.get(key);

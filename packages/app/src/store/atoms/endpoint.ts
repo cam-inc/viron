@@ -1,4 +1,5 @@
 import { atom } from 'recoil';
+import { KEY } from '$storage/index';
 import { localStoragePersistenceEffect } from '$store/atomEffects';
 import { Endpoint } from '$types/index';
 
@@ -7,5 +8,7 @@ const name = 'endpoint';
 export const listState = atom<Endpoint[]>({
   key: `${name}.list`,
   default: [],
-  effects_UNSTABLE: [localStoragePersistenceEffect<Endpoint[]>('endpointList')],
+  effects_UNSTABLE: [
+    localStoragePersistenceEffect<Endpoint[]>(KEY.ENDPOINT_LIST),
+  ],
 });

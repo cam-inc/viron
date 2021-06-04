@@ -1,14 +1,14 @@
 import classnames from 'classnames';
 import React from 'react';
 
-export const id = 'wrapper-modal';
+export const ID = 'wrapper-modal';
 
 type Props = {
   className?: string;
 };
 const ModalWrapper: React.FC<Props> = ({ className = '' }) => {
   return (
-    <div id={id} className={classnames('pointer-events-none', className)} />
+    <div id={ID} className={classnames('pointer-events-none', className)} />
   );
 };
 

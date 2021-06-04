@@ -4,9 +4,9 @@ import React, { useEffect } from 'react';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import '$i18n/index';
 import { isLaunchedState } from '$store/atoms/app';
+import '$styles/global.css';
 import DrawerWrapper from '$wrappers/drawer';
 import ModalWrapper from '$wrappers/modal';
-import '$styles/global.css';
 
 type Props = {
   pluginOptions: PluginOptions;
@@ -19,7 +19,6 @@ const RootWrapper: React.FC<Props> = (props) => {
     </RecoilRoot>
   );
 };
-
 export default RootWrapper;
 
 // the name doesn't matter. It's just a local component.
@@ -47,6 +46,7 @@ const Root: React.FC<Props> = ({ children }) => {
 };
 
 const Splash: React.FC<{ className?: string }> = ({ className = '' }) => {
+  // TODO
   return (
     <div className={classnames('flex justify-center items-center', className)}>
       <div className="w-6 h-6 bg-black" />
