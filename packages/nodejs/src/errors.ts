@@ -27,6 +27,10 @@ export const unauthorized = (): VironError => {
   return new VironError('Unauthorized', 401);
 };
 
+export const forbidden = (): VironError => {
+  return new VironError('Forbidden', 403);
+};
+
 export const adminUserNotFound = (): VironError => {
   return new VironError('Admin User not found.', 404);
 };

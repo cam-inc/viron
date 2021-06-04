@@ -13,7 +13,7 @@ import {
 } from '../constants';
 import { ListWithPager, paging } from '../helpers';
 import { repositoryContainer } from '../repositories';
-import { uri2ResourceId, VironOpenAPIObject } from './oas';
+import { getResourceId, VironOpenAPIObject } from './oas';
 
 export interface AdminRolePermission {
   resourceId: string;
@@ -56,7 +56,7 @@ g = _, _
 e = some(where (p.eft == allow))
 
 [matchers]
-m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || r.sub == "${ADMIN_ROLE.SUPER}"
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || g(r.sub, "${ADMIN_ROLE.SUPER}")
 `);
 
 const method2Permissions = (method: ApiMethod): Permission[] =>
@@ -183,7 +183,7 @@ export const hasPermission = async (
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
   await sync();
-  const resourceId = uri2ResourceId(requestUri, requestMethod, apiDefinition);
+  const resourceId = getResourceId(requestUri, requestMethod, apiDefinition);
   const permissions = method2Permissions(requestMethod);
   const tasks = permissions.map((permission) =>
     casbin.enforce(userId, resourceId, permission)
