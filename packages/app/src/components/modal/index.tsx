@@ -1,7 +1,6 @@
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Portal from '$components/portal';
-import { wait } from '$utils/index';
 import { ID } from '$wrappers/modal';
 
 type Props = {
@@ -20,17 +19,47 @@ const Modal: React.FC<Props> = ({
   autoClose,
   children,
 }) => {
+  const bgRef = useRef<HTMLDivElement>(null);
+  const runAnimation = useCallback(
+    function (reverse: boolean, onFinish?: () => void) {
+      const bgElement = bgRef.current;
+      if (!bgElement) {
+        return;
+      }
+      const keyframes: Keyframe[] = [{ opacity: 0 }, { opacity: 0.5 }];
+      const options: KeyframeEffectOptions = {
+        duration: 300,
+        fill: 'forwards',
+      };
+      bgElement.getAnimations().forEach((anim) => anim.cancel());
+      const ke = new KeyframeEffect(bgElement, keyframes, {
+        ...options,
+        direction: reverse ? 'reverse' : 'normal',
+      });
+      const anim = new Animation(ke, document.timeline);
+      const anims: Animation[] = [anim];
+      Promise.all(anims.map((anim) => anim.ready)).then((anims) => {
+        anims.forEach((anim) => anim.play());
+      });
+      Promise.all(anims.map((anim) => anim.finished)).then(() => {
+        onFinish?.();
+      });
+    },
+    [bgRef.current]
+  );
+
   const [isVisible, setIsVisible] = useState(isOpened);
   useEffect(() => {
     setIsVisible(isOpened);
-  }, [isOpened]);
+    runAnimation(!isOpened);
+  }, [isOpened, runAnimation]);
 
   const requestClose = useCallback(() => {
     const accept = async (handleInvisible: () => void): Promise<void> => {
       setIsVisible(false);
-      // TODO: use web animation api.
-      await wait(300);
-      handleInvisible();
+      runAnimation(true, function () {
+        handleInvisible();
+      });
     };
     onRequestClose(accept);
   }, [onRequestClose]);
@@ -68,13 +97,8 @@ const Modal: React.FC<Props> = ({
         })}
       >
         <div
-          className={classnames(
-            'absolute inset-0 bg-black transition-opacity duration-300 ease-in-out',
-            {
-              'opacity-0': !isVisible,
-              'opacity-50': isVisible,
-            }
-          )}
+          className={classnames('absolute inset-0 bg-black')}
+          ref={bgRef}
           onClick={handleBGClick}
         />
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -124,7 +148,7 @@ export const useModal = function ({
 } {
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const requestCloseRef = useRef<() => void>(function () {
-    console.log('this function will be overwrriten.');
+    // this function will be overwrriten.
   });
   const handleRequestClose = useCallback(function (accept) {
     accept(() => {

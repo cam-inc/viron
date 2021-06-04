@@ -133,7 +133,7 @@ export const useDrawer = function ({
 } {
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const requestCloseRef = useRef<() => void>(function () {
-    console.log('this function will be overwrriten.');
+    // this function will be overwrriten.
   });
   const handleRequestClose = useCallback(function (accept) {
     accept(() => {
