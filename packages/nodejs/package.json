@@ -6,7 +6,7 @@
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "coverage": "jest --coverage",
     "format": "npm run format:prettier",
-    "format:prettier": "prettier --write \"**/*.ts\" --loglevel warn",
+    "format:prettier": "prettier --write \"**/*.{ts,yaml}\" --loglevel warn",
     "lint": "npm run lint:ts",
     "lint:ts": "eslint \"**/*.ts\"",
     "lint:ts:fix": "eslint --fix \"**/*.ts\"",

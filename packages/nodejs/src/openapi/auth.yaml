@@ -17,7 +17,7 @@ paths:
       description: Vironからログアウトする
       responses:
         204:
-          description: OK 
+          description: OK
 
   /email/signin:
     post:
@@ -34,11 +34,6 @@ paths:
       responses:
         204:
           description: No Content
-          headers:
-            Authorization:
-              description: Generated JWT
-              schema:
-                type: string
 
 components:
   schemas:

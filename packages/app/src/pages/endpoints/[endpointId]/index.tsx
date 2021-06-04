@@ -5,7 +5,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { oneState } from '$store/selectors/endpoint';
-import { Token } from '$types/index';
 import { Document, Info } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import { isOASSupported, resolve } from '$utils/oas';
@@ -23,9 +22,8 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   const [error, setError] = useState<string>('');
   const [document, setDocument] = useState<Document | null>(null);
 
-  // We don't use OAS documents stored in the recoid store on purpose. The reasons are below.
+  // We don't use OAS documents stored in the recoil store on purpose. The reasons are below.
   // - Unsure that the stored document is up-to-date.
-  // - The token may be expired.
   useEffect(function () {
     const f = async function (): Promise<void> {
       if (!endpoint) {
@@ -34,9 +32,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       const [response, responseError] = await promiseErrorHandler(
         fetch(endpoint.url, {
           mode: 'cors',
-          headers: {
-            Authorization: endpoint.token as Token,
-          },
+          credentials: 'include',
         })
       );
 
@@ -47,7 +43,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return;
       }
       if (!response.ok) {
-        // The token is not valid.
+        // The authorization cookie is not valid.
         setError(`${response.status}: ${response.statusText}`);
         setIsPending(false);
         return;

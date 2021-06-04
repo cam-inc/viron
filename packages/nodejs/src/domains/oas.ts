@@ -98,8 +98,12 @@ export const loadOas = async (path: string): Promise<VironOpenAPIObject> => {
 export const loadResolvedOas = async (
   path: string
 ): Promise<VironOpenAPIObject> => {
-  const obj = await jsonSchemaRefParser.dereference(path);
-  return obj as VironOpenAPIObject;
+  const obj = await jsonSchemaRefParser.dereference(path, {
+    dereference: {
+      circular: false, // 循環参照を許容しない
+    },
+  });
+  return obj as OpenAPIObject;
 };
 
 // oasのパス定義をexpree形式に書き換える

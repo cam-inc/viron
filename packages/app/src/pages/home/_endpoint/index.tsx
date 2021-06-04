@@ -1,32 +1,63 @@
+import { AiFillApi } from '@react-icons/all-files/ai/AiFillApi';
+import { AiFillDelete } from '@react-icons/all-files/ai/AiFillDelete';
 import { navigate } from 'gatsby';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import Endpoint from '$components/endpoint';
 import { listState } from '$store/atoms/endpoint';
 import { oneState } from '$store/selectors/endpoint';
-import {
-  AuthType,
-  AuthTypeEmailFormData,
-  Endpoint as TypeEndpoint,
-  EndpointID,
-  Token,
-} from '$types/index';
+import { EndpointID } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
+import { Email, OAuth, Signout } from '../_auth/index';
 
 type Props = {
   id: EndpointID;
 };
-const _Endpoint: React.FC<Props> = ({ id }) => {
-  const [endpoint, setEndpoint] = useRecoilState(oneState({ id }));
+const Endpoint: React.FC<Props> = ({ id }) => {
+  const [endpoint] = useRecoilState(oneState({ id }));
   const setEndpoints = useSetRecoilState(listState);
 
   if (!endpoint) {
-    throw new Error('Endpoint not found.');
+    throw new Error('Endoint Not Found.');
   }
 
-  const handleConnectButtonClick = function () {
-    navigate(`/endpoints/${endpoint.id}`);
-  };
+  const [isPending, setIsPending] = useState<boolean>(true);
+  const [isSigninRequired, setIsSigninRequired] = useState<boolean>(false);
+
+  useEffect(
+    function () {
+      if (!endpoint.isPrivate) {
+        setIsSigninRequired(false);
+        setIsPending(false);
+        return;
+      }
+      // Ping to see whether the authorization cookie is valid.
+      const f = async function () {
+        const [response, responseError] = await promiseErrorHandler(
+          fetch(endpoint.url, {
+            mode: 'cors',
+            credentials: 'include',
+          })
+        );
+        if (!!responseError) {
+          throw new Error(responseError.message);
+        }
+        if (response.ok) {
+          setIsSigninRequired(false);
+          setIsPending(false);
+          return;
+        }
+        if (!response.ok && response.status === 401) {
+          setIsSigninRequired(true);
+          setIsPending(false);
+          return;
+        }
+        // TODO: show error.
+        return;
+      };
+      f();
+    },
+    [setIsSigninRequired, setIsPending]
+  );
 
   const handleDeleteButtonClick = function (): void {
     setEndpoints(function (currVal) {
@@ -36,74 +67,78 @@ const _Endpoint: React.FC<Props> = ({ id }) => {
     });
   };
 
-  const handleOAuthSignin = function (
-    endpoint: TypeEndpoint,
-    authType: AuthType
-  ) {
-    const origin = new URL(endpoint.url).origin;
-    const redirectUrl = encodeURIComponent(
-      `${new URL(location.href).origin}/oauthredirect/${endpoint.id}`
-    );
-    const fetchUrl = `${origin}${authType.url}?redirect_url=${redirectUrl}`;
-    location.href = fetchUrl;
+  const handleConnectButtonClick = function () {
+    navigate(`/endpoints/${endpoint.id}`);
   };
 
-  const handleEmailSignin = function (
-    endpoint: TypeEndpoint,
-    authType: AuthType,
-    data: AuthTypeEmailFormData
-  ) {
-    const f = async function (): Promise<void> {
-      const [response, responseError] = await promiseErrorHandler(
-        fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
-          method: authType.method,
-          body: JSON.stringify(data),
-        })
-      );
-      if (!!responseError) {
-        // TODO
-        return;
-      }
-      if (!response.ok) {
-        // TODO
-        return;
-      }
-      const token = response.headers.get('Authorization') as Token;
-      setEndpoint({ ...endpoint, token });
-    };
-    f();
-  };
-
-  const handleSignout = function (endpoint: TypeEndpoint, authType: AuthType) {
-    const f = async function (): Promise<void> {
-      const [response, responseError] = await promiseErrorHandler(
-        fetch(`${new URL(endpoint.url).origin}${authType.url}`, {
-          method: authType.method,
-        })
-      );
-      if (!!responseError) {
-        // TODO
-        return;
-      }
-      if (!response.ok) {
-        // TODO
-        return;
-      }
-      setEndpoint({ ...endpoint, token: null });
-    };
-    f();
+  const handleSignout = function () {
+    setIsSigninRequired(true);
   };
 
   return (
-    <Endpoint
-      endpoint={endpoint}
-      onConnectButtonClick={handleConnectButtonClick}
-      onDeleteButtonClick={handleDeleteButtonClick}
-      onOAuthSignin={handleOAuthSignin}
-      onEmailSignin={handleEmailSignin}
-      onSignout={handleSignout}
-    />
+    <div className="p-2 border rounded text-xxs">
+      <p>ID: {endpoint.id}</p>
+      <p>URL: {endpoint.url}</p>
+      <p>isPrivate: {endpoint.isPrivate.toString()}</p>
+      <button onClick={handleDeleteButtonClick}>
+        <AiFillDelete className="inline" />
+        <span>remove</span>
+      </button>
+      {isPending ? (
+        <p>pending...</p>
+      ) : (
+        <React.Fragment>
+          {!endpoint.isPrivate && (
+            <button onClick={handleConnectButtonClick}>
+              <AiFillApi className="inline" />
+              <span>connect</span>
+            </button>
+          )}
+          {endpoint.isPrivate && isSigninRequired && (
+            <React.Fragment>
+              {endpoint.authConfigs
+                .filter((authConfig) => authConfig.type !== 'signout')
+                .map((authConfig, idx) => {
+                  let elm: JSX.Element | null = null;
+                  switch (authConfig.type) {
+                    case 'oauth':
+                      elm = (
+                        <OAuth authConfig={authConfig} endpoint={endpoint} />
+                      );
+                      break;
+                    case 'email':
+                      elm = (
+                        <Email authConfig={authConfig} endpoint={endpoint} />
+                      );
+                      break;
+                  }
+                  return <React.Fragment key={idx}>{elm}</React.Fragment>;
+                })}
+            </React.Fragment>
+          )}
+          {endpoint.isPrivate && !isSigninRequired && (
+            <React.Fragment>
+              <button onClick={handleConnectButtonClick}>
+                <AiFillApi className="inline" />
+                <span>connect</span>
+              </button>
+              {endpoint.authConfigs
+                .filter((authConfig) => authConfig.type === 'signout')
+                .map((authConfig, idx) => (
+                  <React.Fragment key={idx}>
+                    <Signout
+                      authConfig={authConfig}
+                      endpoint={endpoint}
+                      onSignout={handleSignout}
+                    />
+                  </React.Fragment>
+                ))}
+            </React.Fragment>
+          )}
+        </React.Fragment>
+      )}
+    </div>
   );
 };
 
-export default _Endpoint;
+export default Endpoint;
