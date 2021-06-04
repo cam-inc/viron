@@ -17,7 +17,7 @@ export type Endpoint = {
 export type ClassName = string;
 
 export type AuthConfig = {
-  type: 'email' | 'oauth' | 'signout';
+  type: 'email' | 'oauth' | 'oauthcallback' | 'signout';
   provider: 'viron' | 'google' | 'signout';
   // This object contains only one key-value pair.
   pathObject: Paths;

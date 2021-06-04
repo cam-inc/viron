@@ -30,13 +30,27 @@ export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
   if (authConfig.provider === 'google') {
     Icon = AiFillGoogleCircle;
   }
-  const handleClick = function () {
-    const origin = new URL(endpoint.url).origin;
+  const handleClick = async function () {
+    //const origin = new URL(endpoint.url).origin;
     const redirectUrl = encodeURIComponent(
-      `${new URL(location.href).origin}/oauthredirect/${endpoint.id}`
+      `${new URL(location.href).origin}/oauthredirect?endpointId=${endpoint.id}`
     );
-    const fetchUrl = `${origin}${pathname}?redirect_url=${redirectUrl}`;
-    location.href = fetchUrl;
+    const [response, responseError] = await promiseErrorHandler(
+      fetch(
+        `${new URL(endpoint.url).origin}${pathname}?endpointId=${
+          endpoint.id
+        }&redirect_uri=${redirectUrl}`
+      )
+    );
+    if (!!responseError) {
+      // TODO
+      return;
+    }
+    if (!response.ok) {
+      // TODO
+      return;
+    }
+    location.href = 'TODO: response.body';
   };
   return (
     <div onClick={handleClick}>

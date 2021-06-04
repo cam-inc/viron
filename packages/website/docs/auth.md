@@ -24,3 +24,72 @@ slug: /
     - (レアケースだと思うけど...)stg/prdなど環境別にoasを提供するケースにおいて、pathnameで環境分けをしている場合はpath属性値にそのpathnameを指定する必要がある。(環境をまたいでcookieが送信されてしまうため)
   - Expires属性とMax-Age属性
     - ご自由に。
+- [ ] OAuthについて
+![flow](https://camo.qiitausercontent.com/cbceb0f0e391aeeb9220c484838d0c13e730c75d/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3130363034342f64393131396632312d373336642d643565642d393634642d3330363861663066636465392e706e67)
+① アプリXYZ
+ユーザがブラウザでviron.plusを開いている状態。
+ユーザがエンドポイントを登録する。
+401だったら、GET /authconfigsして[ authconfig(email), authconfig(signout), authconfig(oauth), authconfig(oauthcallback)  ]
+
+
+② 認可エンドポイントへのリクエスト
+authconfigの
+{
+  type: ‘oauth’,
+  provider: ‘google’,
+  pathObject: {
+    get: {
+      ‘/oauth’: { …. }
+    }
+  }
+}
+viron.plusから
+GET /vrn.fensi.plus/oauth….?endpointId=xx&redirect_uri=https://viron.plus/oauthredirect
+Response
+  ここ飛べ: ://oauth.google.com/?response_type=code&client_id={クライアントID} // ※A
+-------
+viron.plusから
+GET ://oauth.google.com/
+  ?response_type=code            // 必須
+  &client_id={クライアントID}      // 必須
+  &redirect_uri={viron.plus/oauthredirect?endpointId=xxx}  // 条件により必須
+  &scope={スコープ群}              // 任意
+  &state={任意文字列}              // 推奨
+  &code_challenge={チャレンジ}     // 任意
+  &code_challege_method={メソッド} // 任意
+  HTTP/1.1
+HOST: {認可サーバー}
+
+(上記の※Aと一緒)
+
+③④⑤ 認可画面で必要事項入力
+
+⑥ アプリXYZにリダイレクトされる
+Location: {viron.plus/oauthredirect?endpointId=xxx}
+  ?code={認可コード}        // 必須
+  &state={任意文字列}       // 認可リクエストに state が含まれていれば必須
+
+⑦ アプリXYZにリダイレクトされる
+URLバーの: {viron.plus/oauthredirect?endpointId=xxx}?code={認可コード}&state={任意文字列}
+を取得して、endpointIdクエリとauthconfig
+authconfigの
+{
+  type: ‘oauthcallback’,
+  provider: ‘google’,
+  pathObject: {
+    [method]: {
+      ‘/oauthcallback’: { …. }
+    }
+  }
+}
+
+{vrn.fensi.plus/oauthcallback}?code={認可コード}&state={任意文字列}
+を生成してリクエストを投げる。
+i.e.
+request先: {vrn.fensi.plus/xxx}?code={認可コード}&state={任意文字列}
+リファラ: viron.plus
+response:
+  set-cookie: xxxxxxxx
+
+vrn.fensi.plusサーバは上記リクエストを受け取ったときに、
+認可コードとアクセストークンの交換をoauth.google.comと行う。取得したアクセストークンを基に、set-cookie値を生成してviron.plusへのレスポンスに含める。
