@@ -13,7 +13,7 @@ import {
 } from '../constants';
 import { ListWithPager, paging } from '../helpers';
 import { repositoryContainer } from '../repositories';
-import { OpenAPIObject, OasXPages } from './oas';
+import { getResourceId, VironOpenAPIObject } from './oas';
 
 export interface AdminRolePermission {
   resourceId: string;
@@ -56,7 +56,7 @@ g = _, _
 e = some(where (p.eft == allow))
 
 [matchers]
-m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || r.sub == "${ADMIN_ROLE.SUPER}"
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || g(r.sub, "${ADMIN_ROLE.SUPER}")
 `);
 
 const method2Permissions = (method: ApiMethod): Permission[] =>
@@ -177,12 +177,14 @@ export const removeRole = async (roleId: string): Promise<boolean> => {
 // ユーザーがリソースを操作する権限を持っているかチェック
 export const hasPermission = async (
   userId: string,
-  resourceId: string,
-  apiMethod: ApiMethod
+  requestUri: string,
+  requestMethod: ApiMethod,
+  apiDefinition: VironOpenAPIObject
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
   await sync();
-  const permissions = method2Permissions(apiMethod);
+  const resourceId = getResourceId(requestUri, requestMethod, apiDefinition);
+  const permissions = method2Permissions(requestMethod);
   const tasks = permissions.map((permission) =>
     casbin.enforce(userId, resourceId, permission)
   );
@@ -195,8 +197,10 @@ export const hasPermission = async (
 };
 
 // リソース一覧
-export const listResourcesByOas = (apiDefinitions: OpenAPIObject): string[] => {
-  const pages: OasXPages = apiDefinitions.info[OAS_X_PAGES];
+export const listResourcesByOas = (
+  apiDefinitions: VironOpenAPIObject
+): string[] => {
+  const pages = apiDefinitions.info[OAS_X_PAGES];
   if (!pages?.length) {
     return [];
   }
@@ -213,7 +217,7 @@ export const listResourcesByOas = (apiDefinitions: OpenAPIObject): string[] => {
 
 // 管理ロール一覧
 export const listByOas = async (
-  apiDefinitions: OpenAPIObject
+  apiDefinitions: VironOpenAPIObject
 ): Promise<ListWithPager<AdminRole>> => {
   const policies = await listPolicies();
   const resourceIds = listResourcesByOas(apiDefinitions);
@@ -269,7 +273,7 @@ export const removeOneById = async (roleId: string): Promise<void> => {
 
 // viewerロールを作成
 export const createViewer = async (
-  apiDefinitions: OpenAPIObject
+  apiDefinitions: VironOpenAPIObject
 ): Promise<boolean> => {
   const policies = await listPolicies(ADMIN_ROLE.VIEWER);
   const resourceIds = listResourcesByOas(apiDefinitions);
