@@ -4,8 +4,14 @@ import React, { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { oneState as endpointOneState } from '$store/selectors/endpoint';
 import { EndpointID } from '$types/index';
-import { Method } from '$types/oas';
+import { Document, Method } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
+import {
+  constructFakeDocument,
+  constructRequestInfo,
+  constructRequestInit,
+  getRequest,
+} from '$utils/oas/index';
 
 type Props = PageProps;
 const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
@@ -26,18 +32,27 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
   }
 
   const { pathObject } = authConfig;
-  // TODO: hooks/oasを利用したい。
-  const pathname = Object.keys(pathObject)[0];
-  const pathItem = pathObject[pathname];
-  const method = Object.keys(pathItem)[0] as Method;
+  const document: Document = constructFakeDocument({ paths: pathObject });
+  const request = getRequest(document);
+
+  if (!request) {
+    throw new Error('TODO');
+  }
 
   useEffect(
     function () {
       const f = async function () {
+        // TODO: requestPayloadParametersを作成。
+        // TODO: requestPayloadRequestBodyを作成。
+        const requestInfo: RequestInfo = constructRequestInfo(
+          endpoint,
+          document,
+          request
+        );
+        const requestInit: RequestInit = constructRequestInit(request);
+
         const [response, responseError] = await promiseErrorHandler(
-          fetch(`${new URL(endpoint.url).origin}${pathname}`, {
-            method,
-          })
+          fetch(requestInfo, requestInit)
         );
         if (!!responseError) {
           // TODO

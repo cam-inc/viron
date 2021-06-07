@@ -6,8 +6,11 @@ import queryString from 'query-string';
 import { Endpoint, URL } from '$types/index';
 import {
   Document,
+  Info,
   Method,
+  Operation,
   OperationId,
+  Paths,
   Request,
   RequestBody,
   RequestPayloadParameter,
@@ -66,14 +69,59 @@ export const resolve = function (document: Record<string, unknown>): Document {
   return document as Document;
 };
 
+export const constructFakeDocument = function ({
+  info,
+  paths,
+}: { info?: Info; paths?: Paths } = {}): Document {
+  info = info || {
+    title: 'fake document',
+    version: '0.0.0',
+    'x-pages': [],
+  };
+  paths = paths || {};
+  const doc: Document = {
+    openapi: '3.0.2',
+    info,
+    paths,
+  };
+  return doc;
+};
+
 export const getRequest = function (
   document: Document,
-  { operationId }: { operationId?: OperationId }
+  { operationId }: { operationId?: OperationId } = {}
 ): Request | null {
   if (!!operationId) {
     return getRequestByOperationId(document, operationId);
   }
-  return null;
+  // Returns first found one.
+  const pathItem = _.find(document.paths, function (value) {
+    return !!value;
+  });
+  if (!pathItem) {
+    return null;
+  }
+  let operation = _.find(pathItem, function (_, key) {
+    // TODO: Methodを参照すること。
+    return [
+      'get',
+      'put',
+      'post',
+      'delete',
+      'options',
+      'head',
+      'patch',
+      'trace',
+    ].includes(key);
+  });
+  if (!operation) {
+    return null;
+  }
+  operation = operation as Operation;
+  if (!operation.operationId) {
+    return null;
+  }
+  return getRequestByOperationId(document, operation.operationId);
 };
 
 export const getRequestByOperationId = function (
