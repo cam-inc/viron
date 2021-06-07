@@ -137,7 +137,7 @@ const Modal: React.FC<Props> = ({
         />
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
-            className="min-w-25% max-w-75%  min-h-25% max-h-75% flex flex-col transform transition duration-300 ease-in-out"
+            className="min-w-25% max-w-75%  min-h-25% max-h-75% flex flex-col"
             ref={frameRef}
           >
             <div className="relative flex-shrink-0 flex-grow-0 h-0">
