@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
-import { useFetch } from '$hooks/oas';
 import { Endpoint } from '$types/index';
 import {
   ContentGetResponseOfTypeOfNumber,
@@ -10,6 +9,7 @@ import {
   RequestPayloadParameter,
   RequestPayloadRequestBody,
 } from '$types/oas';
+import { useFetch } from '$utils/oas/hooks';
 import _ContentNumber from './_number/index';
 
 type Props = {
@@ -64,7 +64,6 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     },
     [drawer, drawer.requestClose, fetch]
   );
-
   if (isPending) {
     return <p>fetching data...</p>;
   }

@@ -118,7 +118,10 @@ export const getRequestObjectByOperationId = function (
 // TODO: Support Server Variables.
 export const getURLToTargetHost = function (
   endpoint: Endpoint,
-  document: Document
+  document: Document,
+  { withTrailingSlash = false }: { withTrailingSlash?: boolean } = {
+    withTrailingSlash: false,
+  }
 ): URL {
   // Default to `{ url: '/' }` when no ServerObject is specified.
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#openapi-object
@@ -129,9 +132,14 @@ export const getURLToTargetHost = function (
     server = { url: '/' };
   }
   // If the url of the server object is relative, prefix with the origin of the server where the OpenAPI document is being served.
-  const { url } = server;
+  let { url } = server;
   if (isRelativeURL(url)) {
-    return `${new window.URL(endpoint.url).origin}${url}`;
+    url = `${new window.URL(endpoint.url).origin}${url}`;
+  }
+  if (withTrailingSlash && !_.endsWith(url, '/')) {
+    url = `/${url}`;
+  } else if (!withTrailingSlash && _.endsWith(url, '/')) {
+    url = _.trimEnd(url, '/');
   }
   return url;
 };

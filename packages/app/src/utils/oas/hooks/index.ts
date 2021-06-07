@@ -20,7 +20,7 @@ import { parse } from '$utils/uriTemplate';
 export const useFetch = function <R>(
   endpoint: Endpoint,
   document: Document,
-  { operationId }: { operationId?: OperationId }
+  { operationId }: { operationId: OperationId }
 ): {
   isPending: boolean;
   error: Error | null;
