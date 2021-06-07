@@ -2,6 +2,7 @@
 import { /*lint,*/ LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
+import queryString from 'query-string';
 import { Endpoint, URL } from '$types/index';
 import {
   Document,
@@ -9,10 +10,13 @@ import {
   OperationId,
   Request,
   RequestBody,
+  RequestPayloadParameter,
+  RequestPayloadRequestBody,
   Server,
   Schema,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
+import { serialize } from '$utils/oas/style';
 
 // Check whether a OAS document is support by us.
 export const isOASSupported = function (
@@ -62,17 +66,17 @@ export const resolve = function (document: Record<string, unknown>): Document {
   return document as Document;
 };
 
-export const getRequestObject = function (
+export const getRequest = function (
   document: Document,
   { operationId }: { operationId?: OperationId }
 ): Request | null {
   if (!!operationId) {
-    return getRequestObjectByOperationId(document, operationId);
+    return getRequestByOperationId(document, operationId);
   }
   return null;
 };
 
-export const getRequestObjectByOperationId = function (
+export const getRequestByOperationId = function (
   document: Document,
   operationId: OperationId
 ): Request | null {
@@ -112,6 +116,189 @@ export const getRequestObjectByOperationId = function (
     method: method as Method,
     operation,
   };
+};
+
+export const parseURITemplate = function (
+  template: string,
+  pathParams: { [key in string]: string }
+): string {
+  _.forEach(pathParams, function (value, key) {
+    template = template.replace(`{${key}}`, value);
+  });
+  return template;
+};
+
+export const constructRequestInfo = function (
+  endpoint: Endpoint,
+  document: Document,
+  request: Request,
+  requestPayloadParameters?: RequestPayloadParameter[]
+): RequestInfo {
+  const urlToTargetHost: URL = getURLToTargetHost(endpoint, document);
+  type PathParams = {
+    [key in string]: string;
+  };
+  const pathParams: PathParams = (function (): PathParams {
+    const pathParams: PathParams = {};
+    if (!requestPayloadParameters) {
+      return pathParams;
+    }
+    requestPayloadParameters
+      .filter(function (p) {
+        return p.in === 'path';
+      })
+      .forEach(function (p) {
+        // The style value in parameter object defaults to `simple` when `in` value is `path`.
+        const style = p.style || 'simple';
+        // The explode value in parameter object defaults to `true` when `style` value is `form`.
+        let explode: boolean;
+        if (_.isUndefined(p.explode)) {
+          if (style === 'form') {
+            explode = true;
+          } else {
+            explode = false;
+          }
+        } else {
+          explode = p.explode;
+        }
+        pathParams[p.name] = serialize(p.name, p.value, style, explode);
+      });
+    return pathParams;
+  })();
+  type QueryParams = {
+    [key in string]: string;
+  };
+  const queryParams: QueryParams = (function (): QueryParams {
+    const queryParams: QueryParams = {};
+    if (!requestPayloadParameters) {
+      return queryParams;
+    }
+    requestPayloadParameters
+      .filter(function (p) {
+        return p.in === 'query';
+      })
+      .forEach(function (p) {
+        // The style value in parameter object defaults to `form` when `in` value is `query`.
+        const style = p.style || 'form';
+        // The explode value in parameter object defaults to `true` when `style` value is `form`.
+        // @see:https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#fixed-fields-10
+        let explode: boolean;
+        if (_.isUndefined(p.explode)) {
+          if (style === 'form') {
+            explode = true;
+          } else {
+            explode = false;
+          }
+        } else {
+          explode = p.explode;
+        }
+        queryParams[p.name] = serialize(p.name, p.value, style, explode);
+      });
+    return queryParams;
+  })();
+  const pathname: string = parseURITemplate(request.path, pathParams);
+  let requestInfo: RequestInfo = `${urlToTargetHost}${pathname}`;
+  const stringifiedQueryParams = queryString.stringify(queryParams);
+  // TODO: 空オブジェクトを渡した時の動作確認。
+  if (!!stringifiedQueryParams) {
+    requestInfo = `${requestInfo}?${stringifiedQueryParams}`;
+  }
+  return requestInfo;
+};
+
+export const constructRequestInit = function (
+  request: Request,
+  requestPayloadParameters?: RequestPayloadParameter[],
+  requestPayloadRequestBody?: RequestPayloadRequestBody
+): RequestInit {
+  const requestInit: RequestInit = {
+    method: request.method,
+    mode: 'cors',
+    credentials: 'include',
+  };
+  const headers: Record<string, string> = (function (): Record<string, string> {
+    const headers: Record<string, string> = {};
+    if (!requestPayloadParameters) {
+      return headers;
+    }
+    requestPayloadParameters
+      .filter(function (p) {
+        return p.in === 'header';
+      })
+      .forEach(function (p) {
+        // The style value in parameter object defaults to `simple` when `in` value is `header`.
+        const style = p.style || 'simple';
+        // The explode value in parameter object defaults to `true` when `style` value is `form`.
+        // @see:https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#fixed-fields-10
+        let explode: boolean;
+        if (_.isUndefined(p.explode)) {
+          if (style === 'form') {
+            explode = true;
+          } else {
+            explode = false;
+          }
+        } else {
+          explode = p.explode;
+        }
+        headers[p.name] = serialize(p.name, p.value, style, explode);
+      });
+    requestPayloadParameters
+      .filter(function (p) {
+        return p.in === 'cookie';
+      })
+      .forEach(function (p) {
+        // The style value in parameter object defaults to `form` when `in` value is `cookie`.
+        const style = p.style || 'form';
+        // The explode value in parameter object defaults to `true` when `style` value is `form`.
+        // @see:https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#fixed-fields-10
+        let explode: boolean;
+        if (_.isUndefined(p.explode)) {
+          if (style === 'form') {
+            explode = true;
+          } else {
+            explode = false;
+          }
+        } else {
+          explode = p.explode;
+        }
+        // TODO: in='cookie'が複数ある場合への対応。
+        // TODO: そもそもfetchでCookieリクエストヘッダーを指定できない説。
+        headers['Cookie'] = serialize(p.name, p.value, style, explode);
+      });
+    return headers;
+  })();
+  requestInit.headers = headers;
+  if (!!requestPayloadRequestBody) {
+    const contentType = pickContentType(requestPayloadRequestBody.content);
+    headers['Content-Type'] = contentType;
+    requestInit.body = convert(requestPayloadRequestBody.value, contentType);
+  }
+  return requestInit;
+};
+
+export const convert = function (
+  value: RequestPayloadRequestBody['value'],
+  contentType: string
+): string {
+  switch (contentType) {
+    case 'application/json':
+      return JSON.stringify(value);
+    case 'application/x-www-form-urlencoded':
+      // TODO
+      return JSON.stringify(value);
+    case 'application/octet-stream':
+      // TODO
+      return JSON.stringify(value);
+    case 'multipart/form-data':
+      // TODO
+      return JSON.stringify(value);
+    case 'image/jpeg':
+    case 'image/png':
+      // TODO
+      return JSON.stringify(value);
+    default:
+      throw new Error(`Media type not supported. ${contentType}`);
+  }
 };
 
 // Returns a URL to the target host.

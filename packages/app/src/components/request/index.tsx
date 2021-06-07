@@ -15,10 +15,10 @@ import { pickContentType } from '$utils/oas';
 
 type Props = {
   request: Request;
-  onSubmit: (
-    parameters?: RequestPayloadParameter[],
-    requestBody?: RequestPayloadRequestBody
-  ) => void;
+  onSubmit: (options?: {
+    requestPayloadParameters?: RequestPayloadParameter[];
+    requestPayloadRequestBody?: RequestPayloadRequestBody;
+  }) => void;
   defaultParametersValues?: Info['x-pages'][number]['contents'][number]['parameters'];
   defaultRequestBodyValues?: Info['x-pages'][number]['contents'][number]['requestBody'];
 };
@@ -97,7 +97,7 @@ const _Request: React.FC<Props> = ({
       return handleSubmit(function (data) {
         execute(data);
         console.log('eliminated data: ', data);
-        const parameters: RequestPayloadParameter[] = [];
+        const requestPayloadParameters: RequestPayloadParameter[] = [];
         _.forEach(data.parameters || {}, function (value, name) {
           const parameter = (request.operation.parameters as Parameter[]).find(
             (parameter) => parameter.name === name
@@ -105,16 +105,16 @@ const _Request: React.FC<Props> = ({
           if (!parameter) {
             return;
           }
-          parameters.push({ ...parameter, value });
+          requestPayloadParameters.push({ ...parameter, value });
         });
         if (!request.operation.requestBody) {
-          onSubmit(parameters);
+          onSubmit({ requestPayloadParameters });
         } else {
-          const requestBody: RequestPayloadRequestBody = {
+          const requestPayloadRequestBody: RequestPayloadRequestBody = {
             ...request.operation.requestBody,
             value: data.requestBody,
           };
-          onSubmit(parameters, requestBody);
+          onSubmit({ requestPayloadParameters, requestPayloadRequestBody });
         }
       });
     },
