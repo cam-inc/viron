@@ -19,25 +19,67 @@ const Modal: React.FC<Props> = ({
   autoClose,
   children,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
   const runAnimation = useCallback(
     function (reverse: boolean, onFinish?: () => void) {
-      const bgElement = bgRef.current;
-      if (!bgElement) {
+      if (!containerRef.current || !bgRef.current || !frameRef.current) {
         return;
       }
-      const keyframes: Keyframe[] = [{ opacity: 0 }, { opacity: 0.5 }];
-      const options: KeyframeEffectOptions = {
-        duration: 300,
-        fill: 'forwards',
-      };
-      bgElement.getAnimations().forEach((anim) => anim.cancel());
-      const ke = new KeyframeEffect(bgElement, keyframes, {
-        ...options,
-        direction: reverse ? 'reverse' : 'normal',
-      });
-      const anim = new Animation(ke, document.timeline);
-      const anims: Animation[] = [anim];
+      // Reset all animations first.
+      containerRef.current.getAnimations().forEach((anim) => anim.cancel());
+      bgRef.current.getAnimations().forEach((anim) => anim.cancel());
+      frameRef.current.getAnimations().forEach((anim) => anim.cancel());
+
+      // Animation settings.
+      const duration = 300;
+      const animContainer = new Animation(
+        new KeyframeEffect(
+          containerRef.current,
+          [{ pointerEvents: 'none' }, { pointerEvents: 'auto' }],
+          {
+            duration,
+            fill: 'forwards',
+            direction: reverse ? 'reverse' : 'normal',
+          }
+        ),
+        document.timeline
+      );
+      const animBg = new Animation(
+        new KeyframeEffect(bgRef.current, [{ opacity: 0 }, { opacity: 0.5 }], {
+          duration,
+          fill: 'forwards',
+          direction: reverse ? 'reverse' : 'normal',
+        }),
+        document.timeline
+      );
+      const animFrame = new Animation(
+        new KeyframeEffect(
+          frameRef.current,
+          [
+            {
+              pointerEvents: 'none',
+              opacity: 0,
+              transform: 'scale(1.05)',
+            },
+            {
+              pointerEvents: 'auto',
+              opacity: 1,
+              transform: 'scale(1)',
+            },
+          ],
+          {
+            duration,
+            fill: 'forwards',
+            direction: reverse ? 'reverse' : 'normal',
+          }
+        ),
+        document.timeline
+      );
+      const anims: Animation[] = [animContainer, animBg, animFrame];
+
+      // Run
       Promise.all(anims.map((anim) => anim.ready)).then((anims) => {
         anims.forEach((anim) => anim.play());
       });
@@ -45,18 +87,15 @@ const Modal: React.FC<Props> = ({
         onFinish?.();
       });
     },
-    [bgRef.current]
+    [containerRef, bgRef, frameRef]
   );
 
-  const [isVisible, setIsVisible] = useState(isOpened);
   useEffect(() => {
-    setIsVisible(isOpened);
     runAnimation(!isOpened);
   }, [isOpened, runAnimation]);
 
   const requestClose = useCallback(() => {
     const accept = async (handleInvisible: () => void): Promise<void> => {
-      setIsVisible(false);
       runAnimation(true, function () {
         handleInvisible();
       });
@@ -90,12 +129,7 @@ const Modal: React.FC<Props> = ({
 
   return (
     <Portal targetId={ID}>
-      <div
-        className={classnames('absolute inset-0', {
-          'pointer-events-none': !isVisible,
-          'pointer-events-auto': isVisible,
-        })}
-      >
+      <div className="absolute inset-0" ref={containerRef}>
         <div
           className={classnames('absolute inset-0 bg-black')}
           ref={bgRef}
@@ -103,17 +137,8 @@ const Modal: React.FC<Props> = ({
         />
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
-            className={classnames(
-              'min-w-25% max-w-75%  min-h-25% max-h-75% flex flex-col transform transition duration-300 ease-in-out',
-              {
-                'pointer-events-none': !isVisible,
-                'pointer-events-auto': isVisible,
-                'opacity-0': !isVisible,
-                'opacity-100': isVisible,
-                'scale-105': !isVisible,
-                'scale-100': isVisible,
-              }
-            )}
+            className="min-w-25% max-w-75%  min-h-25% max-h-75% flex flex-col transform transition duration-300 ease-in-out"
+            ref={frameRef}
           >
             <div className="relative flex-shrink-0 flex-grow-0 h-0">
               <div className="absolute right-0 bottom-0 left-0 flex justify-end">
