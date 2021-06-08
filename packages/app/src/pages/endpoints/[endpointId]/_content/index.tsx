@@ -22,7 +22,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     endpoint,
     document,
     {
-      operationId: content.getOperationId,
+      operationId: content.operationId,
     }
   );
   const elm = useMemo<JSX.Element | null>(
@@ -86,8 +86,8 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
       <Drawer {...drawer.bind}>
         <Request
           request={request}
-          defaultParametersValues={content.parameters}
-          defaultRequestBodyValues={content.requestBody}
+          defaultParametersValues={content.defaultParametersValues}
+          defaultRequestBodyValues={content.defaultRequestBodyValues}
           onSubmit={handleRequestSubmit}
         />
       </Drawer>
