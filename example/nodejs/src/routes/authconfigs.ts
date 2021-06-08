@@ -22,7 +22,7 @@ export const listVironAuthconfigs = async (
       AUTH_CONFIG_TYPE.EMAIL,
       API_METHOD.POST,
       EMAIL_SIGNIN_PATH,
-      context.apiDefinition
+      context.req._context.apiDefinition
     ),
     // TODO: Google認証
     //genAuthConfig(
@@ -30,14 +30,14 @@ export const listVironAuthconfigs = async (
     //  AUTH_CONFIG_TYPE.OAUTH,
     //  API_METHOD.POST,
     //  GOOGLE_SIGNIN_PATH,
-    //  context.apiDefinition
+    //  context.req._context.apiDefinition
     //),
     genAuthConfig(
       AUTH_CONFIG_PROVIDER.SIGNOUT,
       AUTH_CONFIG_TYPE.SIGNOUT,
       API_METHOD.POST,
       SIGNOUT_PATH,
-      context.apiDefinition
+      context.req._context.apiDefinition
     ),
   ];
   context.res.json(paging(authConfigs));

@@ -1,7 +1,6 @@
 import assert from 'assert';
 import { Enforcer } from 'casbin';
 import { CasbinRule } from 'casbin-mongoose-adapter';
-import { OpenAPIObject } from 'openapi3-ts';
 import {
   addRoleForUser,
   createOne,
@@ -17,6 +16,7 @@ import {
   updatePermissionsForRole,
   updateRolesForUser,
 } from '../../src/domains/adminrole';
+import { VironOpenAPIObject } from '../../src/domains/oas';
 import { repositoryContainer } from '../../src/repositories';
 import {
   ADMIN_ROLE,
@@ -28,7 +28,7 @@ import { roleIdAlreadyExists } from '../../src/errors';
 
 describe('domains/adminrole', () => {
   let casbin: Enforcer;
-  let oas: OpenAPIObject;
+  let oas: VironOpenAPIObject;
 
   beforeAll(() => {
     casbin = repositoryContainer.getCasbin();
@@ -40,19 +40,27 @@ describe('domains/adminrole', () => {
         [OAS_X_PAGES]: [
           {
             id: 'blog',
+            group: 'blog',
+            title: 'ブログ',
+            description: 'ブログ',
             contents: [
               {
                 getOperationId: 'getBlog',
                 resourceId: 'blog',
+                style: 'table',
               },
             ],
           },
           {
             id: 'news',
+            group: 'news',
+            title: 'ニュース',
+            description: 'ニュース',
             contents: [
               {
                 getOperationId: 'getNews',
                 resourceId: 'news',
+                style: 'table',
               },
             ],
           },
@@ -224,11 +232,50 @@ describe('domains/adminrole', () => {
   });
 
   describe('hasPermission', () => {
+    const oas: VironOpenAPIObject = {
+      openapi: '3.0.2',
+      info: {
+        title: 'test',
+        version: '1.0.0',
+        description: 'test',
+        'x-pages': [
+          {
+            id: 'blog',
+            group: 'blog',
+            title: 'ブログ',
+            description: 'ブログ',
+            contents: [
+              {
+                getOperationId: 'listBlog',
+                resourceId: 'blog',
+                style: 'table',
+              },
+            ],
+          },
+        ],
+      },
+      paths: {
+        '/blogs': {
+          [API_METHOD.GET]: {
+            operationId: 'listBlog',
+          },
+          [API_METHOD.POST]: {
+            operationId: 'createBlog',
+          },
+        },
+      },
+    };
+
     it('Return true when has pemission.', async () => {
       const userId = '1';
       await addRoleForUser(userId, 'editor');
 
-      const result = await hasPermission(userId, 'blog', API_METHOD.POST);
+      const result = await hasPermission(
+        userId,
+        '/blogs',
+        API_METHOD.POST,
+        oas
+      );
       assert.strictEqual(result, true);
     });
 
@@ -236,7 +283,12 @@ describe('domains/adminrole', () => {
       const userId = '1';
       await addRoleForUser(userId, 'reader');
 
-      const result = await hasPermission(userId, 'blog', API_METHOD.POST);
+      const result = await hasPermission(
+        userId,
+        '/blogs',
+        API_METHOD.POST,
+        oas
+      );
       assert.strictEqual(result, false);
     });
   });

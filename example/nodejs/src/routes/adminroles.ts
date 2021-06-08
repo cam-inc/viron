@@ -5,7 +5,9 @@ import { RouteContext } from '../application';
 export const listVironAdminRoles = async (
   context: RouteContext
 ): Promise<void> => {
-  const result = await domainsAdminRole.listByOas(context.apiDefinition);
+  const result = await domainsAdminRole.listByOas(
+    context.req._context.apiDefinition
+  );
   context.res.json(result);
 };
 
