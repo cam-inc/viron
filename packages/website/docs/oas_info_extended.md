@@ -6,6 +6,11 @@ slug: /
 
 OASのInfoオブジェクトに対する、Viron拡張箇所について。
 
+- [ ] x-thumbnail
+- [ ] x-theme
+ - [ ] Light / Dark Modeについて
+- [ ] x-tags
+
 - [ ] x-pagesについて
  - [ ] id
  - [ ] title

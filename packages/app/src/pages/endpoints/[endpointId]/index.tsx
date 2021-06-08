@@ -4,6 +4,7 @@ import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
+import useTheme from '$hooks/theme';
 import { oneState } from '$store/selectors/endpoint';
 import { Document, Info } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
@@ -21,6 +22,8 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   const [isPending, setIsPending] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [document, setDocument] = useState<Document | null>(null);
+
+  useTheme(document);
 
   // We don't use OAS documents stored in the recoil store on purpose. The reasons are below.
   // - Unsure that the stored document is up-to-date.
@@ -138,6 +141,13 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
 
   return (
     <div id="page-endpointOne">
+      <Link to="/home">HOME</Link>
+      <div>
+        <p>ThemeとDarkModeのテスト</p>
+        <p className="bg-primary-l dark:bg-primary-d">color-primary</p>
+        <p className="bg-secondary-l dark:bg-secondary-d">color-secondary</p>
+        <p className="bg-tertiary-l dark:bg-tertiary-d">color-tertiary</p>
+      </div>
       <div className="p-2">
         <div className="p-2 border mb-2">
           <_Pages
