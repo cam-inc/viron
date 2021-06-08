@@ -50,7 +50,8 @@ paths:
         required: true
         content:
           application/json:
-            $ref: '#/components/schemas/VironAdminUserCreatePayload'
+            schema:
+              $ref: '#/components/schemas/VironAdminUserCreatePayload'
       responses:
         201:
           description: OK
@@ -74,7 +75,8 @@ paths:
         required: true
         content:
           application/json:
-            $ref: '#/components/schemas/VironAdminUserUpdatePayload'
+            schema:
+              $ref: '#/components/schemas/VironAdminUserUpdatePayload'
       responses:
         204:
           description: OK

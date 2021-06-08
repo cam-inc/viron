@@ -43,7 +43,8 @@ paths:
         required: true
         content:
           application/json:
-            $ref: '#/components/schemas/VironAdminRoleCreatePayload'
+            schema:
+              $ref: '#/components/schemas/VironAdminRoleCreatePayload'
       responses:
         201:
           description: OK
@@ -67,7 +68,8 @@ paths:
         required: true
         content:
           application/json:
-            $ref: '#/components/schemas/VironAdminRoleUpdatePayload'
+            schema:
+              $ref: '#/components/schemas/VironAdminRoleUpdatePayload'
       responses:
         204:
           description: OK
