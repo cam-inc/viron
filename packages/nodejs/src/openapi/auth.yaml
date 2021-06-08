@@ -30,7 +30,8 @@ paths:
         required: true
         content:
           application/json:
-            $ref: '#/components/schemas/SigninEmailPayload'
+            schema:
+              $ref: '#/components/schemas/SigninEmailPayload'
       responses:
         204:
           description: No Content
