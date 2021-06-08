@@ -2,9 +2,10 @@ import { navigate, PageProps } from 'gatsby';
 import { parse } from 'query-string';
 import React, { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
+import useTheme from '$hooks/theme';
 import { oneState as endpointOneState } from '$store/selectors/endpoint';
 import { EndpointID } from '$types/index';
-import { Document, Method } from '$types/oas';
+import { Document } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
   constructFakeDocument,
@@ -15,6 +16,7 @@ import {
 
 type Props = PageProps;
 const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
+  useTheme();
   const queries = parse(location.search);
   const endpointId = queries.endpointId as EndpointID;
   const [endpoint] = useRecoilState(endpointOneState({ id: endpointId }));

@@ -5,7 +5,7 @@ type Props = {
 };
 const Layout: React.FC<Props> = ({ children }) => {
   return (
-    <div id="layout-index" className="bg-gray-300">
+    <div id="layout" className="bg-gray-300">
       {children}
     </div>
   );
