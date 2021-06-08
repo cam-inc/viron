@@ -1,6 +1,6 @@
 import { PageProps } from 'gatsby';
 import React from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import useTheme from '$hooks/theme';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { Endpoint as EndpointType } from '$types/index';
@@ -10,7 +10,7 @@ import Endpoint from './_endpoint';
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
   useTheme();
-  const endpointList = useRecoilValue(endpointListState);
+  const [endpointList, setEndpointList] = useRecoilState(endpointListState);
 
   const handleExportClick = function () {
     const data: EndpointType[] = [];
@@ -35,6 +35,57 @@ const HomePage: React.FC<Props> = () => {
     URL.revokeObjectURL(blobURL);
   };
 
+  const handleImportClick = function () {
+    const inputElement = document.createElement('input');
+    inputElement.type = 'file';
+    const handleFileChange = function () {
+      if (!inputElement.files || !inputElement.files.length) {
+        return;
+      }
+      const file = inputElement.files[0];
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function () {
+        if (typeof reader.result !== 'string') {
+          throw new Error('TODO');
+        }
+        try {
+          const endpointList: EndpointType[] = JSON.parse(reader.result);
+          endpointList.forEach(function (endpoint) {
+            setEndpointList(function (currVal) {
+              let { id } = endpoint;
+              if (
+                !!currVal.find(function (endpoint) {
+                  return endpoint.id === id;
+                })
+              ) {
+                id = `${id}-${Math.random()}`;
+              }
+              return [
+                ...currVal,
+                {
+                  ...endpoint,
+                  id,
+                },
+              ];
+            });
+          });
+          inputElement.removeEventListener('change', handleFileChange);
+          document.body.removeChild(inputElement);
+        } catch {
+          throw new Error('TODO');
+        }
+        reader.result;
+      };
+      reader.onerror = function () {
+        throw new Error((reader.error as DOMException).message);
+      };
+    };
+    inputElement.addEventListener('change', handleFileChange);
+    document.body.appendChild(inputElement);
+    inputElement.click();
+  };
+
   return (
     <div id="page-home">
       <div>
@@ -45,6 +96,9 @@ const HomePage: React.FC<Props> = () => {
       </div>
       <button onClick={handleExportClick}>
         エンドポイント一覧をエクスポートする
+      </button>
+      <button onClick={handleImportClick}>
+        エンドポイント一覧をインポートする
       </button>
       <ul>
         {endpointList.map(function (endpoint) {
