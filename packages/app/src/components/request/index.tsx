@@ -23,8 +23,8 @@ type Props = {
     requestPayloadParameters?: RequestPayloadParameter[];
     requestPayloadRequestBody?: RequestPayloadRequestBody;
   }) => void;
-  defaultParametersValues?: Info['x-pages'][number]['contents'][number]['parameters'];
-  defaultRequestBodyValues?: Info['x-pages'][number]['contents'][number]['requestBody'];
+  defaultParametersValues?: Info['x-pages'][number]['contents'][number]['defaultParametersValues'];
+  defaultRequestBodyValues?: Info['x-pages'][number]['contents'][number]['defaultRequestBodyValues'];
 };
 const _Request: React.FC<Props> = ({
   request,
