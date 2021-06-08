@@ -36,7 +36,7 @@ export type Info = {
   'x-theme'?: 'light' | 'dark';
   // [extended] Be used on endpoint UI cards.
   'x-tags'?: string[];
-  // [extended] Be used on endpoint UI cards.
+  // [extended] Be used on endpoints page.
   'x-pages': {
     // Should be a unique string value. Be used as a part of the URL.
     id: string;
@@ -51,14 +51,27 @@ export type Info = {
       title: string;
       // TODO: 全部リストアップすること。
       type: 'number' | 'table' | 'custom';
-      // Specify a operation id of method get that are required to fetch data for the content.
-      getOperationId: OperationId;
-      parameters?: {
+      // Specify the operation id of target method that is required to fetch data for the content.
+      operationId: OperationId;
+      defaultParametersValues?: {
         [key in string]: any;
       };
-      requestBody?: any;
+      defaultRequestBodyValues?: any;
     }[];
   }[];
+  // [extended] Common setting for page contents that are type of table.
+  'x-table'?: {
+    responseListKey: string;
+    pager?: {
+      requestPageKey: string;
+      requestSizeKey: string;
+      responseMaxpageKey: string;
+      responsePageKey: string;
+    };
+    sort?: {
+      requestKey: string;
+    };
+  };
 };
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object

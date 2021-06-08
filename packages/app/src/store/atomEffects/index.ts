@@ -1,5 +1,5 @@
 import { AtomEffect, DefaultValue } from 'recoil';
-import { get, remove, set, Key } from '$storage/index';
+import { get, Key, remove, set } from '$storage/index';
 
 export const localStoragePersistenceEffect = function <T>(
   key: Key

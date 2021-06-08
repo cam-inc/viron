@@ -1,17 +1,24 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import { IconType } from '@react-icons/all-files';
 import { AiFillGoogleCircle } from '@react-icons/all-files/ai/AiFillGoogleCircle';
 import { AiOutlineLogin } from '@react-icons/all-files/ai/AiOutlineLogin';
 import { AiOutlineLogout } from '@react-icons/all-files/ai/AiOutlineLogout';
 import { navigate } from 'gatsby';
-import React, { useCallback, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import React from 'react';
+import Request from '$components/request';
 import Textinput from '$components/textinput';
-import { AuthConfig, AuthConfigEmailFormData, Endpoint } from '$types/index';
-import { Method, Operation } from '$types/oas';
+import { AuthConfig, Endpoint } from '$types/index';
+import {
+  Document,
+  RequestPayloadParameter,
+  RequestPayloadRequestBody,
+} from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
-import { email } from '$utils/v8n';
+import {
+  constructFakeDocument,
+  constructRequestInfo,
+  constructRequestInit,
+  getRequest,
+} from '$utils/oas/index';
 
 type PropsOAuth = {
   authConfig: AuthConfig;
@@ -19,24 +26,50 @@ type PropsOAuth = {
 };
 export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
   const { pathObject } = authConfig;
-  // TODO: hooks/oasを利用したい。
-  const pathname = Object.keys(pathObject)[0];
-  //const pathItem = pathObject[pathname];
-  //const method = Object.keys(pathItem)[0] as Method;
-  //const operation = pathItem[method];
+  const document: Document = constructFakeDocument({ paths: pathObject });
+  const request = getRequest(document);
+
+  if (!request) {
+    throw new Error('TODO');
+  }
 
   // TODO: operation仕様に合わせること。
   let Icon: IconType = AiOutlineLogin;
   if (authConfig.provider === 'google') {
     Icon = AiFillGoogleCircle;
   }
-  const handleClick = function () {
-    const origin = new URL(endpoint.url).origin;
-    const redirectUrl = encodeURIComponent(
-      `${new URL(location.href).origin}/oauthredirect/${endpoint.id}`
+  const handleClick = async function () {
+    // TODO: requestPayloadParametersを作成。
+    // TODO: requestPayloadRequestBodyを作成。
+    const requestInfo: RequestInfo = constructRequestInfo(
+      endpoint,
+      document,
+      request
     );
-    const fetchUrl = `${origin}${pathname}?redirect_url=${redirectUrl}`;
-    location.href = fetchUrl;
+    const requestInit: RequestInit = constructRequestInit(request);
+    const [response, responseError] = await promiseErrorHandler(
+      fetch(requestInfo, requestInit)
+    );
+    /*
+    const redirectUrl = encodeURIComponent(
+      `${new URL(location.href).origin}/oauthredirect?endpointId=${endpoint.id}`
+    );
+    const [response, responseError] = await promiseErrorHandler(
+      fetch(
+        `${new URL(endpoint.url).origin}${pathname}?endpointId=${endpoint.id
+        }&redirect_uri=${redirectUrl}`
+      )
+    );
+    */
+    if (!!responseError) {
+      // TODO
+      return;
+    }
+    if (!response.ok) {
+      // TODO
+      return;
+    }
+    location.href = 'TODO: response.body';
   };
   return (
     <div onClick={handleClick}>
@@ -52,87 +85,47 @@ type PropsEmail = {
 };
 export const Email: React.FC<PropsEmail> = ({ authConfig, endpoint }) => {
   const { pathObject } = authConfig;
-  // TODO: hooks/oasを利用したい。
-  const pathname = Object.keys(pathObject)[0];
-  const pathItem = pathObject[pathname];
-  const method = Object.keys(pathItem)[0] as Method;
-  //const operation = pathItem[method];
+  const document: Document = constructFakeDocument({ paths: pathObject });
+  const request = getRequest(document);
 
-  // TODO: operation仕様に合わせること。
-  const schema = useMemo(function () {
-    return yup.object().shape({
-      email: email.required(),
-      password: yup.string().required(),
-    });
-  }, []);
+  if (!request) {
+    throw new Error('TODO');
+  }
 
-  const { register, handleSubmit, formState } =
-    useForm<AuthConfigEmailFormData>({
-      resolver: yupResolver(schema),
-    });
-  const signin = useCallback(
-    function (data: AuthConfigEmailFormData) {
-      const f = async function (): Promise<void> {
-        const [response, responseError] = await promiseErrorHandler(
-          fetch(`${new URL(endpoint.url).origin}${pathname}`, {
-            method,
-            body: JSON.stringify(data),
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-        );
-        if (!!responseError) {
-          // TODO
-          return;
-        }
-        if (!response.ok) {
-          // TODO
-          return;
-        }
-        navigate(`/endpoints/${endpoint.id}`);
-      };
-      f();
-    },
-    [authConfig]
-  );
-  return (
-    <form onSubmit={handleSubmit(signin)}>
-      <Textinput
-        label="email"
-        error={formState.errors.email}
-        render={function (
-          className
-        ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
-          return (
-            <input
-              className={className}
-              defaultValue=""
-              {...register('email')}
-            />
-          );
-        }}
-      />
-      <Textinput
-        label="password"
-        error={formState.errors.password}
-        render={function (
-          className
-        ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
-          return (
-            <input
-              type="password"
-              className={className}
-              defaultValue=""
-              {...register('password')}
-            />
-          );
-        }}
-      />
-      <input type="submit" />
-    </form>
-  );
+  const handleSubmit = async function ({
+    requestPayloadParameters,
+    requestPayloadRequestBody,
+  }: {
+    requestPayloadParameters?: RequestPayloadParameter[];
+    requestPayloadRequestBody?: RequestPayloadRequestBody;
+  } = {}) {
+    const requestInfo: RequestInfo = constructRequestInfo(
+      endpoint,
+      document,
+      request,
+      requestPayloadParameters
+    );
+    const requestInit: RequestInit = constructRequestInit(
+      request,
+      requestPayloadParameters,
+      requestPayloadRequestBody
+    );
+
+    const [response, responseError] = await promiseErrorHandler(
+      fetch(requestInfo, requestInit)
+    );
+    if (!!responseError) {
+      // TODO
+      return;
+    }
+    if (!response.ok) {
+      // TODO
+      return;
+    }
+    navigate(`/endpoints/${endpoint.id}`);
+  };
+
+  return <Request request={request} onSubmit={handleSubmit} />;
 };
 
 type PropsSignout = {
@@ -147,15 +140,22 @@ export const Signout: React.FC<PropsSignout> = ({
 }) => {
   const handleClick = async function (): Promise<void> {
     const { pathObject } = authConfig;
-    // TODO: hooks/oasを利用したい。
-    const pathname = Object.keys(pathObject)[0];
-    const pathItem = pathObject[pathname];
-    const method = Object.keys(pathItem)[0] as Method;
+    const document: Document = constructFakeDocument({ paths: pathObject });
+    const request = getRequest(document);
+    if (!request) {
+      throw new Error('TODO');
+    }
+    // TODO: requestPayloadParametersを作成。
+    // TODO: requestPayloadRequestBodyを作成。
+    const requestInfo: RequestInfo = constructRequestInfo(
+      endpoint,
+      document,
+      request
+    );
+    const requestInit: RequestInit = constructRequestInit(request);
+
     const [response, responseError] = await promiseErrorHandler(
-      fetch(`${new URL(endpoint.url).origin}${pathname}`, {
-        method,
-        credentials: 'include',
-      })
+      fetch(requestInfo, requestInit)
     );
     if (!!responseError) {
       // TODO

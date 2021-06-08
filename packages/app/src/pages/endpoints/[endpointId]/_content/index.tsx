@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
-import { useFetch } from '$hooks/oas';
 import { Endpoint } from '$types/index';
 import {
   ContentGetResponseOfTypeOfNumber,
@@ -10,6 +9,7 @@ import {
   RequestPayloadParameter,
   RequestPayloadRequestBody,
 } from '$types/oas';
+import { useFetch } from '$utils/oas/hooks';
 import _ContentNumber from './_number/index';
 
 type Props = {
@@ -18,11 +18,11 @@ type Props = {
   content: Info['x-pages'][number]['contents'][number];
 };
 const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
-  const { isPending, error, responseJson, fetch, requestObject } = useFetch(
+  const { isPending, error, responseJson, fetch, request } = useFetch(
     endpoint,
     document,
     {
-      operationId: content.getOperationId,
+      operationId: content.operationId,
     }
   );
   const elm = useMemo<JSX.Element | null>(
@@ -45,7 +45,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
   );
 
   useEffect(function () {
-    fetch([]);
+    fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -55,16 +55,18 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
   };
 
   const handleRequestSubmit = useCallback(
-    function (
-      parameters?: RequestPayloadParameter[],
-      requestBody?: RequestPayloadRequestBody
-    ) {
+    function ({
+      requestPayloadParameters,
+      requestPayloadRequestBody,
+    }: {
+      requestPayloadParameters?: RequestPayloadParameter[];
+      requestPayloadRequestBody?: RequestPayloadRequestBody;
+    } = {}) {
       drawer.requestClose();
-      fetch(parameters, requestBody);
+      fetch({ requestPayloadParameters, requestPayloadRequestBody });
     },
     [drawer, drawer.requestClose, fetch]
   );
-
   if (isPending) {
     return <p>fetching data...</p>;
   }
@@ -74,7 +76,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
   if (!responseJson) {
     return <p>no response.</p>;
   }
-  if (!requestObject) {
+  if (!request) {
     return <p>no request object.</p>;
   }
 
@@ -83,9 +85,9 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
       <button onClick={handlePayloadButtonClick}>payload</button>
       <Drawer {...drawer.bind}>
         <Request
-          request={requestObject}
-          defaultParametersValues={content.parameters}
-          defaultRequestBodyValues={content.requestBody}
+          request={request}
+          defaultParametersValues={content.defaultParametersValues}
+          defaultRequestBodyValues={content.defaultRequestBodyValues}
           onSubmit={handleRequestSubmit}
         />
       </Drawer>

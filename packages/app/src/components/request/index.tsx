@@ -11,16 +11,20 @@ import {
   RequestPayloadRequestBody,
   Schema as SchemaType,
 } from '$types/oas';
-import { pickContentType } from '$utils/oas';
+import {
+  constructRequestPayloadParameters,
+  constructRequestPayloadRequestBody,
+  pickContentType,
+} from '$utils/oas';
 
 type Props = {
   request: Request;
-  onSubmit: (
-    parameters?: RequestPayloadParameter[],
-    requestBody?: RequestPayloadRequestBody
-  ) => void;
-  defaultParametersValues?: Info['x-pages'][number]['contents'][number]['parameters'];
-  defaultRequestBodyValues?: Info['x-pages'][number]['contents'][number]['requestBody'];
+  onSubmit: (options?: {
+    requestPayloadParameters?: RequestPayloadParameter[];
+    requestPayloadRequestBody?: RequestPayloadRequestBody;
+  }) => void;
+  defaultParametersValues?: Info['x-pages'][number]['contents'][number]['defaultParametersValues'];
+  defaultRequestBodyValues?: Info['x-pages'][number]['contents'][number]['defaultRequestBodyValues'];
 };
 const _Request: React.FC<Props> = ({
   request,
@@ -96,26 +100,23 @@ const _Request: React.FC<Props> = ({
     function () {
       return handleSubmit(function (data) {
         execute(data);
-        console.log('eliminated data: ', data);
-        const parameters: RequestPayloadParameter[] = [];
-        _.forEach(data.parameters || {}, function (value, name) {
-          const parameter = (request.operation.parameters as Parameter[]).find(
-            (parameter) => parameter.name === name
+        const payloads: {
+          requestPayloadParameters?: RequestPayloadParameter[];
+          requestPayloadRequestBody?: RequestPayloadRequestBody;
+        } = {};
+        const requestPayloadParameters = constructRequestPayloadParameters(
+          request.operation.parameters || [],
+          data.parameters || {}
+        );
+        payloads.requestPayloadParameters = requestPayloadParameters;
+        if (!!request.operation.requestBody) {
+          const requestPayloadRequestBody = constructRequestPayloadRequestBody(
+            request.operation.requestBody,
+            data.requestBody
           );
-          if (!parameter) {
-            return;
-          }
-          parameters.push({ ...parameter, value });
-        });
-        if (!request.operation.requestBody) {
-          onSubmit(parameters);
-        } else {
-          const requestBody: RequestPayloadRequestBody = {
-            ...request.operation.requestBody,
-            value: data.requestBody,
-          };
-          onSubmit(parameters, requestBody);
+          payloads.requestPayloadRequestBody = requestPayloadRequestBody;
         }
+        onSubmit(payloads);
       });
     },
     [handleSubmit, onSubmit, request.operation, execute]

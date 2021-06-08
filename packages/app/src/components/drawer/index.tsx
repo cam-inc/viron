@@ -1,8 +1,7 @@
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Portal from '$components/portal';
-import { timeout } from '$utils/index';
-import { id } from '$wrappers/drawer';
+import { ID } from '$wrappers/drawer';
 
 type Props = {
   isOpened: boolean;
@@ -19,17 +18,86 @@ const Drawer: React.FC<Props> = ({
   autoClose,
   children,
 }) => {
-  const [isVisible, setIsVisible] = useState(isOpened);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const runAnimation = useCallback(
+    function (reverse: boolean, onFinish?: () => void) {
+      if (!containerRef.current || !bgRef.current || !frameRef.current) {
+        return;
+      }
+      // Reset all animations first.
+      containerRef.current.getAnimations().forEach((anim) => anim.cancel());
+      bgRef.current.getAnimations().forEach((anim) => anim.cancel());
+      frameRef.current.getAnimations().forEach((anim) => anim.cancel());
+
+      // Animation settings.
+      const duration = 300;
+      const animContainer = new Animation(
+        new KeyframeEffect(
+          containerRef.current,
+          [{ pointerEvents: 'none' }, { pointerEvents: 'auto' }],
+          {
+            duration,
+            fill: 'forwards',
+            direction: reverse ? 'reverse' : 'normal',
+          }
+        ),
+        document.timeline
+      );
+      const animBg = new Animation(
+        new KeyframeEffect(bgRef.current, [{ opacity: 0 }, { opacity: 0.5 }], {
+          duration,
+          fill: 'forwards',
+          direction: reverse ? 'reverse' : 'normal',
+        }),
+        document.timeline
+      );
+      const animFrame = new Animation(
+        new KeyframeEffect(
+          frameRef.current,
+          [
+            {
+              pointerEvents: 'none',
+              opacity: 0,
+              transform: 'translateX(1rem)',
+            },
+            {
+              pointerEvents: 'auto',
+              opacity: 1,
+              transform: 'translateX(0)',
+            },
+          ],
+          {
+            duration,
+            fill: 'forwards',
+            direction: reverse ? 'reverse' : 'normal',
+          }
+        ),
+        document.timeline
+      );
+      const anims: Animation[] = [animContainer, animBg, animFrame];
+
+      // Run
+      Promise.all(anims.map((anim) => anim.ready)).then((anims) => {
+        anims.forEach((anim) => anim.play());
+      });
+      Promise.all(anims.map((anim) => anim.finished)).then(() => {
+        onFinish?.();
+      });
+    },
+    [containerRef, bgRef, frameRef]
+  );
+
   useEffect(() => {
-    setIsVisible(isOpened);
-  }, [isOpened]);
+    runAnimation(!isOpened);
+  }, [isOpened, runAnimation]);
 
   const requestClose = useCallback(() => {
     const accept = async (handleInvisible: () => void): Promise<void> => {
-      setIsVisible(false);
-      // TODO: use web animation api.
-      await timeout(300);
-      handleInvisible();
+      runAnimation(true, function () {
+        handleInvisible();
+      });
     };
     onRequestClose(accept);
   }, [onRequestClose]);
@@ -59,55 +127,23 @@ const Drawer: React.FC<Props> = ({
   }
 
   return (
-    <Portal targetId={id}>
-      <div
-        className={classnames('absolute inset-0', {
-          'pointer-events-none': !isVisible,
-        })}
-      >
+    <Portal targetId={ID}>
+      <div className="absolute inset-0" ref={containerRef}>
         <div
-          className={classnames(
-            'absolute inset-0 bg-black transition-opacity duration-300 ease-in-out pointer-events-auto',
-            {
-              'opacity-0': !isVisible,
-              'opacity-50': isVisible,
-            }
-          )}
+          className="absolute inset-0 bg-black"
+          ref={bgRef}
           onClick={handleBGClick}
         />
         <div
-          className={classnames(
-            'absolute inset-0 flex items-stretch justify-end transform transition duration-300 ease-in-out',
-            {
-              'opacity-0': !isVisible,
-              'opacity-100': isVisible,
-              'translate-x-4': !isVisible,
-              'translate-x-0': isVisible,
-            }
-          )}
+          className="absolute inset-0 flex items-stretch justify-end"
+          ref={frameRef}
         >
           <div className="relative flex-shrink-0 flex-grow-0 w-24">
-            <div
-              className={classnames(
-                'absolute right-0 top-0 left-0 flex justify-end',
-                {
-                  'pointer-events-none': !isVisible,
-                  'pointer-events-auto': isVisible,
-                }
-              )}
-            >
+            <div className="absolute right-0 top-0 left-0 flex justify-end">
               <button onClick={handleCloseClick}>close</button>
             </div>
           </div>
-          <div
-            className={classnames(
-              'min-w-0 flex-grow flex-shrink bg-white p-4 overflow-y-scroll overscroll-y-contain',
-              {
-                'pointer-events-none': !isVisible,
-                'pointer-events-auto': isVisible,
-              }
-            )}
-          >
+          <div className="min-w-0 flex-grow flex-shrink bg-white p-4 overflow-y-scroll overscroll-y-contain">
             {children}
           </div>
         </div>
@@ -133,7 +169,7 @@ export const useDrawer = function ({
 } {
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const requestCloseRef = useRef<() => void>(function () {
-    console.log('this function will be overwrriten.');
+    // this function will be overwrriten.
   });
   const handleRequestClose = useCallback(function (accept) {
     accept(() => {
