@@ -10,6 +10,7 @@ import {
   Method,
   Operation,
   OperationId,
+  Parameter,
   Paths,
   Request,
   RequestBody,
@@ -129,7 +130,22 @@ export const getRequestByOperationId = function (
   operationId: OperationId
 ): Request | null {
   const path = _.findKey(document.paths, function (pathItem) {
-    return pathItem.get?.operationId === operationId;
+    const operations = _.pick(pathItem, [
+      'get',
+      'put',
+      'post',
+      'delete',
+      'options',
+      'head',
+      'patch',
+      'trace',
+    ]);
+    return !!_.find(operations, function (value) {
+      if (!value) {
+        return false;
+      }
+      return value.operationId === operationId;
+    });
   });
   if (!path) {
     return null;
@@ -322,6 +338,34 @@ export const constructRequestInit = function (
     requestInit.body = convert(requestPayloadRequestBody.value, contentType);
   }
   return requestInit;
+};
+
+export const constructRequestPayloadParameters = function (
+  parameters: Parameter[],
+  data: { [key in string]: any }
+): RequestPayloadParameter[] {
+  const requestPayloadParameters: RequestPayloadParameter[] = [];
+  _.forEach(data, function (value, name) {
+    const parameter = parameters.find(function (p) {
+      return p.name === name;
+    });
+    if (!parameter) {
+      return;
+    }
+    requestPayloadParameters.push({ ...parameter, value });
+  });
+  return requestPayloadParameters;
+};
+
+export const constructRequestPayloadRequestBody = function (
+  requestBody: RequestBody,
+  data: any
+): RequestPayloadRequestBody {
+  const requestPayloadRequestBody: RequestPayloadRequestBody = {
+    ...requestBody,
+    value: data,
+  };
+  return requestPayloadRequestBody;
 };
 
 export const convert = function (

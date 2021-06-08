@@ -1,15 +1,17 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import { IconType } from '@react-icons/all-files';
 import { AiFillGoogleCircle } from '@react-icons/all-files/ai/AiFillGoogleCircle';
 import { AiOutlineLogin } from '@react-icons/all-files/ai/AiOutlineLogin';
 import { AiOutlineLogout } from '@react-icons/all-files/ai/AiOutlineLogout';
 import { navigate } from 'gatsby';
-import React, { useCallback, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import React from 'react';
+import Request from '$components/request';
 import Textinput from '$components/textinput';
-import { AuthConfig, AuthConfigEmailFormData, Endpoint } from '$types/index';
-import { Document, Method, Operation } from '$types/oas';
+import { AuthConfig, Endpoint } from '$types/index';
+import {
+  Document,
+  RequestPayloadParameter,
+  RequestPayloadRequestBody,
+} from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
   constructFakeDocument,
@@ -17,7 +19,6 @@ import {
   constructRequestInit,
   getRequest,
 } from '$utils/oas/index';
-import { email } from '$utils/v8n';
 
 type PropsOAuth = {
   authConfig: AuthConfig;
@@ -91,96 +92,40 @@ export const Email: React.FC<PropsEmail> = ({ authConfig, endpoint }) => {
     throw new Error('TODO');
   }
 
-  // TODO: operation仕様に合わせること。
-  const schema = useMemo(function () {
-    return yup.object().shape({
-      email: email.required(),
-      password: yup.string().required(),
-    });
-  }, []);
+  const handleSubmit = async function ({
+    requestPayloadParameters,
+    requestPayloadRequestBody,
+  }: {
+    requestPayloadParameters?: RequestPayloadParameter[];
+    requestPayloadRequestBody?: RequestPayloadRequestBody;
+  } = {}) {
+    const requestInfo: RequestInfo = constructRequestInfo(
+      endpoint,
+      document,
+      request,
+      requestPayloadParameters
+    );
+    const requestInit: RequestInit = constructRequestInit(
+      request,
+      requestPayloadParameters,
+      requestPayloadRequestBody
+    );
 
-  const { register, handleSubmit, formState } =
-    useForm<AuthConfigEmailFormData>({
-      resolver: yupResolver(schema),
-    });
-  const signin = useCallback(
-    function (data: AuthConfigEmailFormData) {
-      const f = async function (): Promise<void> {
-        // TODO: requestPayloadParametersを作成。
-        // TODO: requestPayloadRequestBodyを作成。
-        // TODOTODO
-        const requestInfo: RequestInfo = constructRequestInfo(
-          endpoint,
-          document,
-          request
-        );
-        const requestInit: RequestInit = constructRequestInit(request);
+    const [response, responseError] = await promiseErrorHandler(
+      fetch(requestInfo, requestInit)
+    );
+    if (!!responseError) {
+      // TODO
+      return;
+    }
+    if (!response.ok) {
+      // TODO
+      return;
+    }
+    navigate(`/endpoints/${endpoint.id}`);
+  };
 
-        const [response, responseError] = await promiseErrorHandler(
-          fetch(requestInfo, requestInit)
-        );
-        /*
-        const [response, responseError] = await promiseErrorHandler(
-          fetch(`${new URL(endpoint.url).origin}${pathname}`, {
-            method,
-            body: JSON.stringify(data),
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-        );
-        */
-        if (!!responseError) {
-          // TODO
-          return;
-        }
-        if (!response.ok) {
-          // TODO
-          return;
-        }
-        navigate(`/endpoints/${endpoint.id}`);
-      };
-      f();
-    },
-    [authConfig]
-  );
-  return (
-    <form onSubmit={handleSubmit(signin)}>
-      <Textinput
-        label="email"
-        error={formState.errors.email}
-        render={function (
-          className
-        ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
-          return (
-            <input
-              className={className}
-              defaultValue=""
-              {...register('email')}
-            />
-          );
-        }}
-      />
-      <Textinput
-        label="password"
-        error={formState.errors.password}
-        render={function (
-          className
-        ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
-          return (
-            <input
-              type="password"
-              className={className}
-              defaultValue=""
-              {...register('password')}
-            />
-          );
-        }}
-      />
-      <input type="submit" />
-    </form>
-  );
+  return <Request request={request} onSubmit={handleSubmit} />;
 };
 
 type PropsSignout = {

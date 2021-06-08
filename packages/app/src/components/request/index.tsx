@@ -11,7 +11,11 @@ import {
   RequestPayloadRequestBody,
   Schema as SchemaType,
 } from '$types/oas';
-import { pickContentType } from '$utils/oas';
+import {
+  constructRequestPayloadParameters,
+  constructRequestPayloadRequestBody,
+  pickContentType,
+} from '$utils/oas';
 
 type Props = {
   request: Request;
@@ -96,26 +100,23 @@ const _Request: React.FC<Props> = ({
     function () {
       return handleSubmit(function (data) {
         execute(data);
-        console.log('eliminated data: ', data);
-        const requestPayloadParameters: RequestPayloadParameter[] = [];
-        _.forEach(data.parameters || {}, function (value, name) {
-          const parameter = (request.operation.parameters as Parameter[]).find(
-            (parameter) => parameter.name === name
+        const payloads: {
+          requestPayloadParameters?: RequestPayloadParameter[];
+          requestPayloadRequestBody?: RequestPayloadRequestBody;
+        } = {};
+        const requestPayloadParameters = constructRequestPayloadParameters(
+          request.operation.parameters || [],
+          data.parameters || {}
+        );
+        payloads.requestPayloadParameters = requestPayloadParameters;
+        if (!!request.operation.requestBody) {
+          const requestPayloadRequestBody = constructRequestPayloadRequestBody(
+            request.operation.requestBody,
+            data.requestBody
           );
-          if (!parameter) {
-            return;
-          }
-          requestPayloadParameters.push({ ...parameter, value });
-        });
-        if (!request.operation.requestBody) {
-          onSubmit({ requestPayloadParameters });
-        } else {
-          const requestPayloadRequestBody: RequestPayloadRequestBody = {
-            ...request.operation.requestBody,
-            value: data.requestBody,
-          };
-          onSubmit({ requestPayloadParameters, requestPayloadRequestBody });
+          payloads.requestPayloadRequestBody = requestPayloadRequestBody;
         }
+        onSubmit(payloads);
       });
     },
     [handleSubmit, onSubmit, request.operation, execute]
