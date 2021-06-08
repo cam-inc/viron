@@ -1,4 +1,4 @@
-/* Non-themable pages like `/home` will be applied default custom properties. */
+/* Non-themable pages like `/home` will apply default custom properties. */
 :root {
   --color-primary-l: theme('colors.palette.pink.100');
   --color-secondary-l: theme('colors.palette.pink.100');
@@ -8,7 +8,7 @@
   --color-tertiary-d: theme('colors.palette.pink.900');
 }
 
-/* Themable pages like `/endpoints/[endpointId]` will be applied overwritten custom properties. */
+/* Themable pages like `/endpoints/[endpointId]` will apply overwritten custom properties. */
 #root[data-theme="relax"] {
   --color-primary-l: theme('colors.palette.green.100');
   --color-secondary-l: theme('colors.palette.green.100');

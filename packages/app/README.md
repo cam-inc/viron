@@ -67,13 +67,12 @@ We decided to not use [i18next-http-backend](https://github.com/i18next/i18next-
 Ideally it's better to serve a html file per language (i.e. use different URLs for different language versions) like [gatsby-plugin-i18n](https://github.com/angeloocana/gatsby-plugin-i18n) does. We, just for now, stick to the multilingual-page system.
 
 ### Theme
-Viron offers a functionality for users to switch color themes so they can easily recognize which environment they are using, like local, staging or production environment. On the other hand, as many of you probably know, there is a color-related idea in the client-side world, `Light Mode` and `Dark Mode`. This makes it a bit tricky to handle color themes when dealing with it using Light/Dark modes. Here is our strategy for it.
+Viron offers a functionality for users to switch color themes so they can easily recognize which environment they are editing.(e.g. local, staging, production, etc.) On the other hand, as many of you probably know, there is a color-related idea in the client-side world, `Light Mode` and `Dark Mode`. This makes it a bit tricky to handle color themes when dealing with them considering Light/Dark modes. Here is our strategy for it.
 
-- We prepare two sets of color palette per one color theme. One for light mode and the other for dark mode. For example, a color theme named `terminal` will need a color palette for light mode called `terminal-light` and a color palette for dark mode called `terminal-dark`.
-- We use the [tailwind's function](https://tailwindcss.com/docs/dark-mode) to switch light and dark mode.
-- To apply theme colors, we define [the tailwind color config using CSS custom properties](https://tailwindcss.com/docs/customizing-colors#naming-your-colors), and overwrite them leveraging CSS specificity.
-- We try to use the tailwind default color palette for all colors. This is the reason for the color setting on tailwind.config.js.
-
+- One theme consists of two sets of color palette. One for light mode and the other for dark mode. For example, a theme named `terminal` will have a color palette for light mode (terminal-light) and a color palette for dark mode (erminal-dark).
+- We use the [tailwind's function](https://tailwindcss.com/docs/dark-mode) to switch light/dark mode.
+- We define [the tailwind colors configuration using CSS custom properties](https://tailwindcss.com/docs/customizing-colors#naming-your-colors), and overwrite them leveraging CSS specificity. See the global.css file for more detail.
+- We try to stick to the tailwind default color palette for all theme colors. This is the reason for the color setting on tailwind.config.js.
 
 ### Prerequisite Knowledge and Technologies
 - [React](https://reactjs.org/)
