@@ -2,7 +2,6 @@ import {
   domainsAuth,
   genAuthorizationCookie,
   genOAuthStateCookie,
-  genEndpointCookie,
   mismatchState,
   COOKIE_KEY,
   HTTP_HEADER,
@@ -32,7 +31,7 @@ export const signinEmail = async (context: RouteContext): Promise<void> => {
 export const oauth2GoogleAuthorization = async (
   context: RouteContext
 ): Promise<void> => {
-  const { redirectUri, endpointId } = context.params.query;
+  const { redirectUri } = context.params.query;
   const state = domainsAuth.genState();
 
   const authorizationUrl = domainsAuth.getGoogleOAuth2AuthorizationUrl(
@@ -40,10 +39,7 @@ export const oauth2GoogleAuthorization = async (
     state,
     ctx.config.auth.googleOAuth2
   );
-  context.res.setHeader(HTTP_HEADER.SET_COOKIE, [
-    genOAuthStateCookie(state),
-    genEndpointCookie(endpointId),
-  ]);
+  context.res.setHeader(HTTP_HEADER.SET_COOKIE, genOAuthStateCookie(state));
   context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
   context.res.status(301).end();
 };
@@ -69,6 +65,5 @@ export const oauth2GoogleCallback = async (
       maxAge: ctx.config.auth.jwt.expirationSec,
     })
   );
-  const endpointId = context.req.cookies[COOKIE_KEY.VIRON_ENDPOINT_ID];
-  context.res.json({ endpointId });
+  context.res.status(204).end();
 };

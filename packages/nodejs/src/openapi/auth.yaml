@@ -44,7 +44,6 @@ paths:
       summary: redirect to google oauth
       description: GoogleのOAuth認可画面へリダイレクトする
       parameters:
-        - $ref: '#/components/parameters/EndpointIdQueryParam'
         - $ref: '#/components/parameters/RedirectUriQueryParam'
       responses:
         301:
@@ -64,22 +63,11 @@ paths:
             schema:
               $ref: '#/components/schemas/OAuth2GoogleCallbackPayload'
       responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuth2GoogleCallback'
+        204:
+          description: No Content.
 
 components:
   parameters:
-    EndpointIdQueryParam:
-      name: endpointId
-      in: query
-      schema:
-        type: string
-      required: true
-
     RedirectUriQueryParam:
       name: redirectUri
       in: query
@@ -104,15 +92,6 @@ components:
       required:
         - email
         - password
-
-    OAuth2GoogleCallback:
-      type: object
-      properties:
-        endpointId:
-          description: Vironが発行したエンドポイントID
-          type: string
-      required:
-        - endpointId
 
     OAuth2GoogleCallbackPayload:
       type: object

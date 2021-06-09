@@ -111,7 +111,6 @@ export const OAUTH2_STATE_EXPIRATION_SEC = 10 * 60;
 
 export const COOKIE_KEY = {
   VIRON_AUTHORIZATION: 'viron_authorization',
-  VIRON_ENDPOINT_ID: 'viron_endpoint_id',
   OAUTH2_STATE: 'oauth2_state',
 } as const;
 

@@ -50,11 +50,3 @@ export const genOAuthStateCookie = (
   }
   return genCookie(COOKIE_KEY.OAUTH2_STATE, state, opts);
 };
-
-// エンドポイントID用のCookie文字列を生成
-export const genEndpointCookie = (
-  endpoint: string,
-  options?: CookieSerializeOptions
-): string => {
-  return genCookie(COOKIE_KEY.VIRON_ENDPOINT_ID, endpoint, options);
-};
