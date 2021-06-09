@@ -44,15 +44,19 @@ authconfigの
   }
 }
 viron.plusから
-GET /vrn.fensi.plus/oauth….?endpointId=xx&redirect_uri=https://viron.plus/oauthredirect
+GET /vrn.fensi.plus/oauth….redirect_uri=https://viron.plus/oauthredirect
 Response
   ここ飛べ: ://oauth.google.com/?response_type=code&client_id={クライアントID} // ※A
+  header
+    set-cookie: state:xxxx
+飛ぶ直前に、client側でlocalstorageなりにendpointidを保存しておく。
+
 -------
 viron.plusから
 GET ://oauth.google.com/
   ?response_type=code            // 必須
   &client_id={クライアントID}      // 必須
-  &redirect_uri={viron.plus/oauthredirect?endpointId=xxx}  // 条件により必須
+  &redirect_uri={viron.plus/oauthredirect}  // 条件により必須
   &scope={スコープ群}              // 任意
   &state={任意文字列}              // 推奨
   &code_challenge={チャレンジ}     // 任意
@@ -65,13 +69,14 @@ HOST: {認可サーバー}
 ③④⑤ 認可画面で必要事項入力
 
 ⑥ アプリXYZにリダイレクトされる
-Location: {viron.plus/oauthredirect?endpointId=xxx}
+Location: {viron.plus/oauthredirect}
   ?code={認可コード}        // 必須
   &state={任意文字列}       // 認可リクエストに state が含まれていれば必須
 
 ⑦ アプリXYZにリダイレクトされる
-URLバーの: {viron.plus/oauthredirect?endpointId=xxx}?code={認可コード}&state={任意文字列}
-を取得して、endpointIdクエリとauthconfig
+client側で①のタイミングで保存しておいたendpointidを取り出し、
+location.href: {viron.plus/oauthredirect?code={認可コード}&state={任意文字列}
+を取得して、
 authconfigの
 {
   type: ‘oauthcallback’,
@@ -82,14 +87,17 @@ authconfigの
     }
   }
 }
-
+から
 {vrn.fensi.plus/oauthcallback}?code={認可コード}&state={任意文字列}
+request header
+  cookie: state:xxxxx
 を生成してリクエストを投げる。
 i.e.
-request先: {vrn.fensi.plus/xxx}?code={認可コード}&state={任意文字列}
+request先: {vrn.fensi.plus/oauthcallback}?code={認可コード}&state={任意文字列}
 リファラ: viron.plus
 response:
-  set-cookie: xxxxxxxx
+  header
+    set-cookie: authToken=xxxxxxxx
 
 vrn.fensi.plusサーバは上記リクエストを受け取ったときに、
 認可コードとアクセストークンの交換をoauth.google.comと行う。取得したアクセストークンを基に、set-cookie値を生成してviron.plusへのレスポンスに含める。
