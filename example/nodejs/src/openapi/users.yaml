@@ -9,7 +9,7 @@ info:
       title: ユーザー情報
       description: ユーザー情報を閲覧/管理します
       contents:
-        - getOperationId: listUsers
+        - operationId: listUsers
           resourceId: user
           style: table
           pagination: true

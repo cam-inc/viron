@@ -45,7 +45,7 @@ describe('domains/adminrole', () => {
             description: 'ブログ',
             contents: [
               {
-                getOperationId: 'getBlog',
+                operationId: 'getBlog',
                 resourceId: 'blog',
                 style: 'table',
               },
@@ -58,7 +58,7 @@ describe('domains/adminrole', () => {
             description: 'ニュース',
             contents: [
               {
-                getOperationId: 'getNews',
+                operationId: 'getNews',
                 resourceId: 'news',
                 style: 'table',
               },
@@ -246,7 +246,7 @@ describe('domains/adminrole', () => {
             description: 'ブログ',
             contents: [
               {
-                getOperationId: 'listBlog',
+                operationId: 'listBlog',
                 resourceId: 'blog',
                 style: 'table',
               },

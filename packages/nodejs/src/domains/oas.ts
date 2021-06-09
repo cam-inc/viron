@@ -38,7 +38,7 @@ export interface OasXPageContentPreview {
 }
 
 export interface OasXPageContent {
-  getOperationId: string;
+  operationId: string;
   resourceId: string;
   style: string;
   parameters?: OasXPageContentParameters;
@@ -138,14 +138,14 @@ const listContentsByOas = (
   return xPages.map((xPage) => xPage.contents).flat();
 };
 
-// x-pagesからgetOperationIdを取得
+// x-pagesからoperationIdを取得
 const findResourceId = (
   operationId: string,
   apiDefinition: VironOpenAPIObject
 ): string | null => {
   const contents = listContentsByOas(apiDefinition);
   const resourceId = contents.find(
-    (content) => content.getOperationId === operationId
+    (content) => content.operationId === operationId
   )?.resourceId;
   return resourceId ?? null;
 };
