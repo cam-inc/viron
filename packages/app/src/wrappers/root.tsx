@@ -7,6 +7,7 @@ import { isLaunchedState, themeState } from '$store/atoms/app';
 import '$styles/global.css';
 import DrawerWrapper from '$wrappers/drawer';
 import ModalWrapper from '$wrappers/modal';
+import PopoverWrapper from '$wrappers/popover';
 
 type Props = {
   pluginOptions: PluginOptions;
@@ -41,6 +42,7 @@ const Root: React.FC<Props> = ({ children }) => {
       <div className="min-h-screen">{children}</div>
       <DrawerWrapper className="fixed inset-0" />
       <ModalWrapper className="fixed inset-0" />
+      <PopoverWrapper className="fixed inset-0" />
       {!isLaunched && <Splash className="fixed inset-0" />}
     </div>
   );
