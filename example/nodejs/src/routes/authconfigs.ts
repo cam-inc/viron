@@ -6,8 +6,8 @@ import {
   AUTH_CONFIG_PROVIDER,
   EMAIL_SIGNIN_PATH,
   SIGNOUT_PATH,
-  OAUTH_GOOGLE_AUTHORIZATION_PATH,
-  OAUTH_GOOGLE_CALLBACK_PATH,
+  OAUTH2_GOOGLE_AUTHORIZATION_PATH,
+  OAUTH2_GOOGLE_CALLBACK_PATH,
 } from '@viron/lib';
 import { RouteContext } from '../application';
 
@@ -29,14 +29,14 @@ export const listVironAuthconfigs = async (
       AUTH_CONFIG_PROVIDER.GOOGLE,
       AUTH_CONFIG_TYPE.OAUTH,
       API_METHOD.GET,
-      OAUTH_GOOGLE_AUTHORIZATION_PATH,
+      OAUTH2_GOOGLE_AUTHORIZATION_PATH,
       context.req._context.apiDefinition
     ),
     genAuthConfig(
       AUTH_CONFIG_PROVIDER.GOOGLE,
       AUTH_CONFIG_TYPE.OAUTH_CALLBACK,
       API_METHOD.POST,
-      OAUTH_GOOGLE_CALLBACK_PATH,
+      OAUTH2_GOOGLE_CALLBACK_PATH,
       context.req._context.apiDefinition
     ),
     genAuthConfig(

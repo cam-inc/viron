@@ -79,8 +79,8 @@ export type AdminRole = typeof ADMIN_ROLE[keyof typeof ADMIN_ROLE];
 
 export const VIRON_AUTHCONFIGS_PATH = '/viron/authconfigs';
 export const EMAIL_SIGNIN_PATH = '/email/signin';
-export const OAUTH_GOOGLE_AUTHORIZATION_PATH = '/oauth/google/authorization';
-export const OAUTH_GOOGLE_CALLBACK_PATH = '/oauth/google/callback';
+export const OAUTH2_GOOGLE_AUTHORIZATION_PATH = '/oauth2/google/authorization';
+export const OAUTH2_GOOGLE_CALLBACK_PATH = '/oauth2/google/callback';
 export const SIGNOUT_PATH = '/signout';
 
 export const PERMISSION = {
