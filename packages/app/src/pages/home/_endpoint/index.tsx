@@ -1,11 +1,12 @@
 import { AiFillApi } from '@react-icons/all-files/ai/AiFillApi';
 import { AiFillDelete } from '@react-icons/all-files/ai/AiFillDelete';
 import { navigate } from 'gatsby';
-import React, { useEffect, useState } from 'react';
+import QRCode from 'qrcode';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { listState } from '$store/atoms/endpoint';
 import { oneState } from '$store/selectors/endpoint';
-import { EndpointID } from '$types/index';
+import { Endpoint as EndpointType, EndpointID } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import { Email, OAuth, Signout } from '../_auth/index';
 
@@ -59,6 +60,31 @@ const Endpoint: React.FC<Props> = ({ id }) => {
     [setIsSigninRequired, setIsPending]
   );
 
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(
+    function () {
+      const canvasElement = canvasRef.current;
+      if (!canvasElement) {
+        return;
+      }
+      const _endpoint: EndpointType = {
+        ...endpoint,
+        document: null,
+      };
+      const data = `${
+        new URL(location.href).origin
+      }/endpointimport?endpoint=${JSON.stringify(_endpoint)}`;
+      console.log(data);
+      QRCode.toCanvas(canvasElement, data, function (error: Error) {
+        if (!!error) {
+          // TODO
+          console.error(error);
+        }
+      });
+    },
+    [endpoint, canvasRef.current]
+  );
+
   const handleDeleteButtonClick = function (): void {
     setEndpoints(function (currVal) {
       return currVal.filter(function (_endpoint) {
@@ -80,6 +106,9 @@ const Endpoint: React.FC<Props> = ({ id }) => {
       <p>ID: {endpoint.id}</p>
       <p>URL: {endpoint.url}</p>
       <p>isPrivate: {endpoint.isPrivate.toString()}</p>
+      <div>
+        <canvas ref={canvasRef} />
+      </div>
       <button onClick={handleDeleteButtonClick}>
         <AiFillDelete className="inline" />
         <span>remove</span>
