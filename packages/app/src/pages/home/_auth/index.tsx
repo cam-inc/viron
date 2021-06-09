@@ -5,7 +5,7 @@ import { AiOutlineLogout } from '@react-icons/all-files/ai/AiOutlineLogout';
 import { navigate } from 'gatsby';
 import React from 'react';
 import Request from '$components/request';
-import Textinput from '$components/textinput';
+import { KEY, set } from '$storage/index';
 import { AuthConfig, Endpoint } from '$types/index';
 import {
   Document,
@@ -50,17 +50,6 @@ export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
     const [response, responseError] = await promiseErrorHandler(
       fetch(requestInfo, requestInit)
     );
-    /*
-    const redirectUrl = encodeURIComponent(
-      `${new URL(location.href).origin}/oauthredirect?endpointId=${endpoint.id}`
-    );
-    const [response, responseError] = await promiseErrorHandler(
-      fetch(
-        `${new URL(endpoint.url).origin}${pathname}?endpointId=${endpoint.id
-        }&redirect_uri=${redirectUrl}`
-      )
-    );
-    */
     if (!!responseError) {
       // TODO
       return;
@@ -69,6 +58,7 @@ export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
       // TODO
       return;
     }
+    set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
     location.href = 'TODO: response.body';
   };
   return (
