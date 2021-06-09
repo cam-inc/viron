@@ -7,39 +7,115 @@ import { listRoles, revokeRoleForUser, updateRolesForUser } from './adminrole';
 export interface AdminUser {
   id: string;
   email: string;
-  authType: string;
+  authType: AuthType;
   password: string | null;
   salt: string | null;
+  googleOAuth2AccessToken: string | null;
+  googleOAuth2ExpiryDate: number | null;
+  googleOAuth2IdToken: string | null;
+  googleOAuth2RefreshToken: string | null;
+  googleOAuth2TokenType: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface AdminUserCreateAttributes {
+type AdminUserBase = Pick<
+  AdminUser,
+  'id' | 'email' | 'authType' | 'createdAt' | 'updatedAt'
+>;
+
+export interface AdminUserEmail extends AdminUserBase {
+  authType: 'email';
+  password: string;
+  salt: string;
+}
+
+export interface AdminUserGoogle extends AdminUserBase {
+  authType: 'google';
+  googleOAuth2AccessToken: string;
+  googleOAuth2ExpiryDate: number;
+  googleOAuth2IdToken: string;
+  googleOAuth2RefreshToken: string;
+  googleOAuth2TokenType: string;
+}
+
+export interface AdminUserEmailCreateAttributes {
   email: string;
-  authType: string;
   password: string | null;
   salt: string | null;
 }
 
-export interface AdminUserUpdateAttributes {
+export interface AdminUserGoogleCreateAttributes {
+  email: string;
+  googleOAuth2AccessToken: string | null;
+  googleOAuth2ExpiryDate: number | null;
+  googleOAuth2IdToken: string | null;
+  googleOAuth2RefreshToken: string | null;
+  googleOAuth2TokenType: string | null;
+}
+
+export type AdminUserCreateAttributes =
+  | AdminUserEmailCreateAttributes
+  | AdminUserGoogleCreateAttributes;
+
+export interface AdminUserEmailUpdateAttributes {
   password: string | null;
   salt: string | null;
 }
+
+export interface AdminUserGoogleUpdateAttributes {
+  googleOAuth2AccessToken: string | null;
+  googleOAuth2ExpiryDate: number | null;
+  googleOAuth2IdToken: string | null;
+  googleOAuth2RefreshToken: string | null;
+  googleOAuth2TokenType: string | null;
+}
+
+export type AdminUserUpdateAttributes =
+  | AdminUserEmailUpdateAttributes
+  | AdminUserGoogleUpdateAttributes;
 
 export interface AdminUserView extends AdminUser {
   roleIds: string[];
 }
 
-export interface AdminUserCreatePayload {
+export interface AdminUserEmailCreatePayload {
   email: string;
   password: string;
   roleIds?: string[];
 }
 
-export interface AdminUserUpdatePayload {
+export interface AdminUserGoogleCreatePayload {
+  email: string;
+  googleOAuth2AccessToken: string | null;
+  googleOAuth2ExpiryDate: number | null;
+  googleOAuth2IdToken: string | null;
+  googleOAuth2RefreshToken: string | null;
+  googleOAuth2TokenType: string | null;
+  roleIds?: string[];
+}
+
+export type AdminUserCreatePayload =
+  | AdminUserEmailCreatePayload
+  | AdminUserGoogleCreatePayload;
+
+export interface AdminUserEmailUpdatePayload {
   password?: string;
   roleIds?: string[];
 }
+
+export interface AdminUserGoogleUpdatePayload {
+  googleOAuth2AccessToken: string | null;
+  googleOAuth2ExpiryDate: number | null;
+  googleOAuth2IdToken: string | null;
+  googleOAuth2RefreshToken: string | null;
+  googleOAuth2TokenType: string | null;
+  roleIds?: string[];
+}
+
+export type AdminUserUpdatePayload =
+  | AdminUserEmailUpdatePayload
+  | AdminUserGoogleUpdatePayload;
 
 const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
   return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
@@ -66,11 +142,24 @@ export const createOne = async (
 ): Promise<AdminUserView> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const { roleIds, ...adminUser } = payload;
-  const user = await repository.createOne({
-    authType,
-    ...adminUser,
-    ...genPasswordHash(adminUser.password),
-  });
+
+  let obj;
+  if (authType === AUTH_TYPE.EMAIL) {
+    const adminUserEmail = adminUser as AdminUserEmailCreatePayload;
+    obj = {
+      authType: AUTH_TYPE.EMAIL,
+      ...adminUserEmail,
+      ...genPasswordHash(adminUserEmail.password),
+    } as AdminUserEmailCreateAttributes;
+  } else {
+    const adminUserGoogle = adminUser as AdminUserGoogleCreatePayload;
+    obj = {
+      authType: AUTH_TYPE.GOOGLE,
+      ...adminUserGoogle,
+    } as AdminUserGoogleCreateAttributes;
+  }
+  const user = await repository.createOne(obj);
+
   if (roleIds?.length) {
     await updateRolesForUser(user.id, roleIds);
   }
@@ -89,9 +178,19 @@ export const updateOneById = async (
   }
 
   const { roleIds, ...adminUser } = payload;
-  if (adminUser.password) {
-    await repository.updateOneById(id, genPasswordHash(adminUser.password));
+  if (user.authType === AUTH_TYPE.EMAIL) {
+    const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
+    if (adminUserEmail.password) {
+      await repository.updateOneById(
+        id,
+        genPasswordHash(adminUserEmail.password)
+      );
+    }
+  } else {
+    const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
+    await repository.updateOneById(id, adminUserGoogle);
   }
+
   if (roleIds?.length) {
     await updateRolesForUser(id, roleIds);
   }

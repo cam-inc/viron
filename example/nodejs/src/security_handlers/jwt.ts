@@ -53,6 +53,7 @@ export const jwt = async (
 
     const user = await domainsAdminUser.findOneById(userId);
     if (user) {
+      // TODO: Google認証の場合はアクセストークンの検証
       return { type: AUTHENTICATION_RESULT_TYPE_SUCCESS, user };
     }
   }

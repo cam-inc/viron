@@ -13,6 +13,13 @@ Provides an Example API environment using `docker-compose`.
 #### Cert Files
 Get `viron.crt`, `viron.csr` and `viron.key` files and place them under the `example/[lang]/cert` directory.
 
+#### .env
+
+```bash
+cp -ip .env.template .env
+```
+and, put secrets of your project.
+
 ### Run
 
 #### Use MySQL
