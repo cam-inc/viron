@@ -73,8 +73,9 @@ const Endpoint: React.FC<Props> = ({ id }) => {
       };
       const data = `${
         new URL(location.href).origin
-      }/endpointimport?endpoint=${JSON.stringify(_endpoint)}`;
-      console.log(data);
+      }/endpointimport?endpoint=${encodeURIComponent(
+        JSON.stringify(_endpoint)
+      )}`;
       QRCode.toCanvas(canvasElement, data, function (error: Error) {
         if (!!error) {
           // TODO
