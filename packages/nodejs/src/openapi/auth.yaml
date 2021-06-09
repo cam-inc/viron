@@ -36,7 +36,46 @@ paths:
         204:
           description: No Content
 
+  /oauth2/google/authorization:
+    get:
+      operationId: oauth2GoogleAuthorization
+      tags:
+        - auth
+      summary: redirect to google oauth
+      description: GoogleのOAuth認可画面へリダイレクトする
+      parameters:
+        - $ref: '#/components/parameters/RedirectUriQueryParam'
+      responses:
+        301:
+          description: Redirect to Google OAuth URL.
+
+  /oauth2/google/callback:
+    post:
+      operationId: oauth2GoogleCallback
+      tags:
+        - auth
+      summary: callback from google oauth
+      description: Google認可後のコールバックURL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuth2GoogleCallbackPayload'
+      responses:
+        204:
+          description: No Content.
+
 components:
+  parameters:
+    RedirectUriQueryParam:
+      name: redirectUri
+      in: query
+      schema:
+        type: string
+        format: uri
+      required: true
+
   schemas:
     SigninEmailPayload:
       type: object
@@ -53,3 +92,16 @@ components:
       required:
         - email
         - password
+
+    OAuth2GoogleCallbackPayload:
+      type: object
+      properties:
+        code:
+          description: Googleが発行した認可コード
+          type: string
+        state:
+          description: CSRF対策用のステートパラメータ
+          type: string
+      required:
+        - code
+        - state

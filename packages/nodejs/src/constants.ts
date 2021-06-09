@@ -9,6 +9,7 @@ export type ApiMethod = typeof API_METHOD[keyof typeof API_METHOD];
 export const AUTH_CONFIG_TYPE = {
   EMAIL: 'email',
   OAUTH: 'oauth',
+  OAUTH_CALLBACK: 'oauthcallback',
   SIGNOUT: 'signout',
 } as const;
 export type AuthConfigType =
@@ -36,6 +37,7 @@ export const HTTP_HEADER = {
   ACCESS_CONTROL_EXPOSE_HEADERS: 'access-control-expose-headers',
   CONTENT_DISPOSITION: 'content-disposition',
   CONTENT_TYPE: 'content-type',
+  LOCATION: 'location',
   ORIGIN: 'origin',
   SET_COOKIE: 'set-cookie',
   X_REQUESTED_WITH: 'x-requested-with',
@@ -77,7 +79,8 @@ export type AdminRole = typeof ADMIN_ROLE[keyof typeof ADMIN_ROLE];
 
 export const VIRON_AUTHCONFIGS_PATH = '/viron/authconfigs';
 export const EMAIL_SIGNIN_PATH = '/email/signin';
-export const GOOGLE_SIGNIN_PATH = '/google/signin';
+export const OAUTH2_GOOGLE_AUTHORIZATION_PATH = '/oauth2/google/authorization';
+export const OAUTH2_GOOGLE_CALLBACK_PATH = '/oauth2/google/callback';
 export const SIGNOUT_PATH = '/signout';
 
 export const PERMISSION = {
@@ -104,7 +107,13 @@ export const JWT_HASH_ALGORITHM = 'HS512';
 export const DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60;
 export const DEBUG_LOG_PREFIX = '@viron/lib:';
 export const CASBIN_SYNC_INTERVAL_MSEC = 1 * 60 * 1000;
+export const OAUTH2_STATE_EXPIRATION_SEC = 10 * 60;
 
 export const COOKIE_KEY = {
   VIRON_AUTHORIZATION: 'viron_authorization',
+  OAUTH2_STATE: 'oauth2_state',
 } as const;
+
+export const GOOGLE_OAUTH2_DEFAULT_SCOPES = [
+  'https://www.googleapis.com/auth/userinfo.email',
+];

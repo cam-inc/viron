@@ -37,6 +37,7 @@ export const createModel = (s: Sequelize): ModelCtor<AdminUserModel> => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      // for email
       password: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -45,6 +46,28 @@ export const createModel = (s: Sequelize): ModelCtor<AdminUserModel> => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      // for google
+      googleOAuth2AccessToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      googleOAuth2ExpiryDate: {
+        type: DataTypes.NUMBER,
+        allowNull: true,
+      },
+      googleOAuth2IdToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      googleOAuth2RefreshToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      googleOAuth2TokenType: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

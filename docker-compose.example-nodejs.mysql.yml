@@ -14,6 +14,8 @@ services:
       - 9229:9229 # node-inspector
     environment:
       - MODE=mysql
+    env_file:
+      - $PWD/example/nodejs/.env
     volumes:
       - $PWD/example/nodejs/package.json:/viron/example/nodejs/package.json
       - $PWD/example/nodejs/src:/viron/example/nodejs/src

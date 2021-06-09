@@ -13,6 +13,8 @@ services:
       - 9229:9229 # node-inspector
     environment:
       - MODE=mongo
+    env_file:
+      - .env
     volumes:
       - $PWD/package.json:/example/nodejs/package.json
       - $PWD/src:/example/nodejs/src

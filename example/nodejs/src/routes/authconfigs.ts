@@ -5,8 +5,9 @@ import {
   AUTH_CONFIG_TYPE,
   AUTH_CONFIG_PROVIDER,
   EMAIL_SIGNIN_PATH,
-  //GOOGLE_SIGNIN_PATH,
   SIGNOUT_PATH,
+  OAUTH2_GOOGLE_AUTHORIZATION_PATH,
+  OAUTH2_GOOGLE_CALLBACK_PATH,
 } from '@viron/lib';
 import { RouteContext } from '../application';
 
@@ -24,14 +25,20 @@ export const listVironAuthconfigs = async (
       EMAIL_SIGNIN_PATH,
       context.req._context.apiDefinition
     ),
-    // TODO: Google認証
-    //genAuthConfig(
-    //  AUTH_CONFIG_PROVIDER.GOOGLE,
-    //  AUTH_CONFIG_TYPE.OAUTH,
-    //  API_METHOD.POST,
-    //  GOOGLE_SIGNIN_PATH,
-    //  context.req._context.apiDefinition
-    //),
+    genAuthConfig(
+      AUTH_CONFIG_PROVIDER.GOOGLE,
+      AUTH_CONFIG_TYPE.OAUTH,
+      API_METHOD.GET,
+      OAUTH2_GOOGLE_AUTHORIZATION_PATH,
+      context.req._context.apiDefinition
+    ),
+    genAuthConfig(
+      AUTH_CONFIG_PROVIDER.GOOGLE,
+      AUTH_CONFIG_TYPE.OAUTH_CALLBACK,
+      API_METHOD.POST,
+      OAUTH2_GOOGLE_CALLBACK_PATH,
+      context.req._context.apiDefinition
+    ),
     genAuthConfig(
       AUTH_CONFIG_PROVIDER.SIGNOUT,
       AUTH_CONFIG_TYPE.SIGNOUT,

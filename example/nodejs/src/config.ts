@@ -29,6 +29,7 @@ export interface Config {
   cors: CorsConfig;
   auth: {
     jwt: domainsAuth.JwtConfig;
+    googleOAuth2: domainsAuth.GoogleOAuthClientConfig;
   };
 }
 
@@ -67,6 +68,7 @@ export const get = (mode: Mode): Config => {
       logging: true,
     },
   };
+
   const ret: Config = {
     store: {
       main: mode == MODE_MONGO ? mongo : mysql,
@@ -79,6 +81,10 @@ export const get = (mode: Mode): Config => {
         secret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
         provider: 'viron-example-nodejs',
         expirationSec: 24 * 60 * 60,
+      },
+      googleOAuth2: {
+        clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
+        clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
       },
     },
   };

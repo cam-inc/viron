@@ -13,12 +13,30 @@ const schemaDefinition: SchemaDefinition = {
     type: Schema.Types.String,
     required: true,
   },
+  // for email
   password: {
     type: Schema.Types.String,
   },
   salt: {
     type: Schema.Types.String,
   },
+  // for google
+  googleOAuth2AccessToken: {
+    type: Schema.Types.String,
+  },
+  googleOAuth2ExpiryDate: {
+    type: Schema.Types.Number,
+  },
+  googleOAuth2IdToken: {
+    type: Schema.Types.String,
+  },
+  googleOAuth2RefreshToken: {
+    type: Schema.Types.String,
+  },
+  googleOAuth2TokenType: {
+    type: Schema.Types.String,
+  },
+
   createdAt: {
     type: Schema.Types.Number,
   },

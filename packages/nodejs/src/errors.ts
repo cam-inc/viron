@@ -38,3 +38,15 @@ export const adminUserNotFound = (): VironError => {
 export const oasUndefined = (): VironError => {
   return new VironError('OAS is undefined.', 404);
 };
+
+export const invalidGoogleOAuth2Token = (): VironError => {
+  return new VironError('Invalid Google OAuth2 Token.', 400);
+};
+
+export const googleOAuth2Unavailable = (): VironError => {
+  return new VironError('Google OAuth2 is unavailable.', 500);
+};
+
+export const mismatchState = (): VironError => {
+  return new VironError('State is mismatch.', 400);
+};
