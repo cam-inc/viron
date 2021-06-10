@@ -1,16 +1,17 @@
-import { TailwindConfig } from '@types/tailwindcss/tailwind-config';
 import classnames from 'classnames';
 import { PluginOptions } from 'gatsby';
 import _ from 'lodash';
 import React, { useEffect } from 'react';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import resolveConfig from 'tailwindcss/resolveConfig';
+import { TailwindConfig } from 'tailwindcss/tailwind-config';
 import '$i18n/index';
 import { isLaunchedState, screenState, themeState } from '$store/atoms/app';
 import '$styles/global.css';
 import DrawerWrapper from '$wrappers/drawer';
 import ModalWrapper from '$wrappers/modal';
 import PopoverWrapper from '$wrappers/popover';
+// @ts-ignore
 import tailwindConfig from '../../tailwind.config';
 
 type Props = {
