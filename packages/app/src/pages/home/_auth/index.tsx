@@ -5,7 +5,7 @@ import { AiOutlineLogout } from '@react-icons/all-files/ai/AiOutlineLogout';
 import { navigate } from 'gatsby';
 import React from 'react';
 import Request from '$components/request';
-import { KEY, set } from '$storage/index';
+import { remove, KEY, set } from '$storage/index';
 import { AuthConfig, Endpoint } from '$types/index';
 import {
   Document,
@@ -33,38 +33,37 @@ export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
     throw new Error('TODO');
   }
 
-  // TODO: operation仕様に合わせること。
   let Icon: IconType = AiOutlineLogin;
   if (authConfig.provider === 'google') {
     Icon = AiFillGoogleCircle;
   }
-  const handleClick = async function () {
-    // TODO: requestPayloadParametersを作成。
-    // TODO: requestPayloadRequestBodyを作成。
+
+  const handleSubmit = async function ({
+    requestPayloadParameters,
+  }: {
+    requestPayloadParameters?: RequestPayloadParameter[];
+    requestPayloadRequestBody?: RequestPayloadRequestBody;
+  } = {}) {
     const requestInfo: RequestInfo = constructRequestInfo(
       endpoint,
       document,
-      request
+      request,
+      requestPayloadParameters
     );
-    const requestInit: RequestInit = constructRequestInit(request);
-    const [response, responseError] = await promiseErrorHandler(
-      fetch(requestInfo, requestInit)
-    );
-    if (!!responseError) {
-      // TODO
-      return;
+    try {
+      set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
+      location.href = requestInfo.toString();
+    } catch {
+      remove(KEY.OAUTH_ENDPOINT_ID);
     }
-    if (!response.ok) {
-      // TODO
-      return;
-    }
-    set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
-    location.href = 'TODO: response.body';
   };
+
   return (
-    <div onClick={handleClick}>
+    <div>
       <Icon className="inline" />
       <span>OAuth</span>
+      <p>{`https://localhost:8000/oauthredirect`}</p>
+      <Request request={request} onSubmit={handleSubmit} />
     </div>
   );
 };
@@ -115,7 +114,13 @@ export const Email: React.FC<PropsEmail> = ({ authConfig, endpoint }) => {
     navigate(`/endpoints/${endpoint.id}`);
   };
 
-  return <Request request={request} onSubmit={handleSubmit} />;
+  return (
+    <div>
+      <AiOutlineLogin className="inline" />
+      <span>Email</span>
+      <Request request={request} onSubmit={handleSubmit} />
+    </div>
+  );
 };
 
 type PropsSignout = {
@@ -128,21 +133,32 @@ export const Signout: React.FC<PropsSignout> = ({
   endpoint,
   onSignout,
 }) => {
-  const handleClick = async function (): Promise<void> {
-    const { pathObject } = authConfig;
-    const document: Document = constructFakeDocument({ paths: pathObject });
-    const request = getRequest(document);
-    if (!request) {
-      throw new Error('TODO');
-    }
-    // TODO: requestPayloadParametersを作成。
-    // TODO: requestPayloadRequestBodyを作成。
+  const { pathObject } = authConfig;
+  const document: Document = constructFakeDocument({ paths: pathObject });
+  const request = getRequest(document);
+
+  if (!request) {
+    throw new Error('TODO');
+  }
+
+  const handleSubmit = async function ({
+    requestPayloadParameters,
+    requestPayloadRequestBody,
+  }: {
+    requestPayloadParameters?: RequestPayloadParameter[];
+    requestPayloadRequestBody?: RequestPayloadRequestBody;
+  } = {}) {
     const requestInfo: RequestInfo = constructRequestInfo(
       endpoint,
       document,
-      request
+      request,
+      requestPayloadParameters
     );
-    const requestInit: RequestInit = constructRequestInit(request);
+    const requestInit: RequestInit = constructRequestInit(
+      request,
+      requestPayloadParameters,
+      requestPayloadRequestBody
+    );
 
     const [response, responseError] = await promiseErrorHandler(
       fetch(requestInfo, requestInit)
@@ -157,10 +173,12 @@ export const Signout: React.FC<PropsSignout> = ({
     }
     onSignout();
   };
+
   return (
-    <div onClick={handleClick}>
+    <div>
       <AiOutlineLogout className="inline" />
-      <span>signout</span>
+      <span>Signout</span>
+      <Request request={request} onSubmit={handleSubmit} />
     </div>
   );
 };

@@ -1,12 +1,17 @@
 import { navigate, PageProps } from 'gatsby';
-//import { parse } from 'query-string';
+import { parse } from 'query-string';
 import React, { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
+import Request from '$components/request';
 import useTheme from '$hooks/theme';
 import { KEY, get } from '$storage/index';
 import { oneState as endpointOneState } from '$store/selectors/endpoint';
 import { EndpointID } from '$types/index';
-import { Document } from '$types/oas';
+import {
+  Document,
+  RequestPayloadParameter,
+  RequestPayloadRequestBody,
+} from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
   constructFakeDocument,
@@ -16,9 +21,9 @@ import {
 } from '$utils/oas/index';
 
 type Props = PageProps;
-const OAuthRedirectPage: React.FC<Props> = (/*{ location }*/) => {
+const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
   useTheme();
-  //const queries = parse(location.search);
+  const queries = parse(location.search);
   const endpointId = get<EndpointID>(KEY.OAUTH_ENDPOINT_ID);
   const [endpoint] = useRecoilState(endpointOneState({ id: endpointId }));
 
@@ -42,36 +47,48 @@ const OAuthRedirectPage: React.FC<Props> = (/*{ location }*/) => {
     throw new Error('TODO');
   }
 
-  useEffect(
-    function () {
-      const f = async function () {
-        // TODO: requestPayloadParametersを作成。
-        // TODO: requestPayloadRequestBodyを作成。
-        const requestInfo: RequestInfo = constructRequestInfo(
-          endpoint,
-          document,
-          request
-        );
-        const requestInit: RequestInit = constructRequestInit(request);
+  const handleSubmit = async function ({
+    requestPayloadParameters,
+    requestPayloadRequestBody,
+  }: {
+    requestPayloadParameters?: RequestPayloadParameter[];
+    requestPayloadRequestBody?: RequestPayloadRequestBody;
+  } = {}) {
+    const requestInfo: RequestInfo = constructRequestInfo(
+      endpoint,
+      document,
+      request,
+      requestPayloadParameters
+    );
+    const requestInit: RequestInit = constructRequestInit(
+      request,
+      requestPayloadParameters,
+      requestPayloadRequestBody
+    );
+    const [response, responseError] = await promiseErrorHandler(
+      fetch(requestInfo, requestInit)
+    );
+    if (!!responseError) {
+      // TODO
+      return;
+    }
+    if (!response.ok) {
+      // TODO
+      return;
+    }
+    navigate(`/endpoints/${endpoint.id}`);
+  };
 
-        const [response, responseError] = await promiseErrorHandler(
-          fetch(requestInfo, requestInit)
-        );
-        if (!!responseError) {
-          // TODO
-          return;
-        }
-        if (!response.ok) {
-          // TODO
-          return;
-        }
-        navigate(`/endpoints/${endpoint.id}`);
-      };
-      f();
-    },
-    [endpoint, endpointId]
+  return (
+    <div id="page-oauthredirect">
+      <p>Processing OAuth redirection...</p>
+      <Request
+        request={request}
+        defaultParametersValues={queries}
+        defaultRequestBodyValues={queries}
+        onSubmit={handleSubmit}
+      />
+    </div>
   );
-
-  return <p>Processing OAuth redirection...</p>;
 };
 export default OAuthRedirectPage;

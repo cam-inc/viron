@@ -53,29 +53,12 @@ const _Request: React.FC<Props> = ({
             ret.parameters[parameter.name] =
               defaultParametersValues[parameter.name];
           }
-          /*
-          if (parameter.required) {
-            // TODO: Without this below, tsc says "Object is possibly 'undefined'."
-            if (!ret.parameters) {
-              return;
-            }
-            ret.parameters[parameter.name] = getDefaultValue(
-              parameter.schema as SchemaType
-            );
-          }
-          */
         });
       }
       if (!!request.operation.requestBody) {
         if (!_.isUndefined(defaultRequestBodyValues)) {
           ret.requestBody = defaultRequestBodyValues;
         }
-        /*
-        const schema = request.operation.requestBody.content[
-          pickContentType(request.operation.requestBody.content)
-        ].schema as SchemaType;
-        ret.requestBody = getDefaultValue(schema);
-        */
       }
       return ret;
     },
