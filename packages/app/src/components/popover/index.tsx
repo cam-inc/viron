@@ -9,16 +9,15 @@ import React, {
 import Portal from '$components/portal';
 import { ID } from '$wrappers/popover';
 
-// TODO: リファクタしてソースをきれいに。
-
 type Props = {
   isOpened: boolean;
   requestCloseRef: React.MutableRefObject<() => void>;
   onRequestClose: (
     accept: (handleInvisible: () => void) => Promise<void>
   ) => void;
-  autoClose: boolean;
+  // Target element ref for a popover to be placed.
   targetRef: React.RefObject<HTMLElement>;
+  // Which point of a target element a popover should be placed.
   placement:
     | 'TL'
     | 'Top'
@@ -38,16 +37,18 @@ const Popover: React.FC<Props> = ({
   isOpened,
   requestCloseRef,
   onRequestClose,
-  autoClose,
   targetRef,
   placement,
   children,
 }) => {
-  console.log(autoClose, 'TODO');
+  type Position = { x: number; y: number };
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+  const [rect, setRect] = useState<DOMRect>(new DOMRect());
+
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const runAnimation = useCallback(
-    function (reverse: boolean, onFinish?: () => void) {
+    async function (reverse: boolean) {
       if (!targetRef.current) {
         return;
       }
@@ -59,6 +60,7 @@ const Popover: React.FC<Props> = ({
       const position: { x: number; y: number } = { x: 0, y: 0 };
       const targetElement = targetRef.current;
       const rect = targetElement.getBoundingClientRect();
+
       switch (placement) {
         case 'TL':
           position.x = rect.x + space;
@@ -109,10 +111,9 @@ const Popover: React.FC<Props> = ({
           position.y = rect.y + space;
           break;
       }
+      setPosition(position);
+      setRect(rect);
 
-      // Reset all animations first.
-      containerRef.current.getAnimations().forEach((anim) => anim.cancel());
-      innerRef.current.getAnimations().forEach((anim) => anim.cancel());
       // Animation settings.
       const duration = 100;
       const animContainer = new Animation(
@@ -151,13 +152,21 @@ const Popover: React.FC<Props> = ({
         document.timeline
       );
       const anims: Animation[] = [animContainer, animInner];
+
       // Run
-      Promise.all(anims.map((anim) => anim.ready)).then((anims) => {
-        anims.forEach((anim) => anim.play());
+      const animsReady = await Promise.all(
+        anims.map(function (anim) {
+          return anim.ready;
+        })
+      );
+      animsReady.forEach(function (anim) {
+        anim.play();
       });
-      Promise.all(anims.map((anim) => anim.finished)).then(() => {
-        onFinish?.();
-      });
+      await Promise.all(
+        anims.map(function (anim) {
+          return anim.finished;
+        })
+      );
     },
     [targetRef, containerRef, innerRef, placement]
   );
@@ -171,14 +180,16 @@ const Popover: React.FC<Props> = ({
 
   const requestClose = useCallback(
     function () {
+      if (!isOpened) {
+        return;
+      }
       const accept = async (handleInvisible: () => void): Promise<void> => {
-        runAnimation(true, function () {
-          handleInvisible();
-        });
+        await runAnimation(true);
+        handleInvisible();
       };
       onRequestClose(accept);
     },
-    [onRequestClose]
+    [onRequestClose, isOpened]
   );
 
   useEffect(
@@ -192,11 +203,15 @@ const Popover: React.FC<Props> = ({
 
   const content = useMemo<JSX.Element>(
     function () {
-      const triangleW = 8;
-      const triangleH = 6;
+      const triangleW = 40;
+      const triangleH = 30;
+      const Trianle: React.FC<{ style: React.CSSProperties }> = function ({
+        style,
+      }) {
+        return <div className="absolute w-0 h-0 border-solid" style={style} />;
+      };
       const triangleTop = (
-        <div
-          className="absolute w-0 h-0 border-solid"
+        <Trianle
           style={{
             top: '0',
             left: `-${triangleW / 2}px`,
@@ -208,8 +223,7 @@ const Popover: React.FC<Props> = ({
         />
       );
       const triangleRight = (
-        <div
-          className="absolute w-0 h-0 border-solid"
+        <Trianle
           style={{
             right: '0',
             bottom: `-${triangleW / 2}px`,
@@ -221,8 +235,7 @@ const Popover: React.FC<Props> = ({
         />
       );
       const triangleBottom = (
-        <div
-          className="absolute w-0 h-0 border-solid"
+        <Trianle
           style={{
             bottom: '0',
             left: `-${triangleW / 2}px`,
@@ -234,8 +247,7 @@ const Popover: React.FC<Props> = ({
         />
       );
       const triangleLeft = (
-        <div
-          className="absolute w-0 h-0 border-solid"
+        <Trianle
           style={{
             left: '0',
             bottom: `-${triangleW / 2}px`,
@@ -357,7 +369,24 @@ const Popover: React.FC<Props> = ({
           );
       }
     },
-    [placement, children]
+    [placement, position, rect, children]
+  );
+
+  useEffect(
+    function () {
+      const cleanup = function () {
+        window.removeEventListener('click', handler);
+        window.removeEventListener('scroll', handler);
+      };
+      const handler = function () {
+        cleanup();
+        requestClose();
+      };
+      window.addEventListener('click', handler);
+      window.addEventListener('scroll', handler);
+      return cleanup;
+    },
+    [requestClose]
   );
 
   if (!isOpened) {
@@ -367,7 +396,7 @@ const Popover: React.FC<Props> = ({
   return (
     <Portal targetId={ID}>
       <div className="absolute w-0 h-0" ref={containerRef}>
-        <div className="absolute w-0 h-0 origin-center" ref={innerRef}>
+        <div className="relative w-0 h-0 origin-center" ref={innerRef}>
           {content}
         </div>
       </div>
@@ -377,15 +406,13 @@ const Popover: React.FC<Props> = ({
 export default Popover;
 
 export const usePopover = function <T extends HTMLElement>({
-  autoClose = true,
   placement = 'Top',
-}: { autoClose?: Props['autoClose']; placement?: Props['placement'] } = {}): {
+}: { placement?: Props['placement'] } = {}): {
   open: () => void;
   requestClose: () => void;
   targetRef: React.RefObject<T>;
   bind: {
     isOpened: boolean;
-    autoClose: Props['autoClose'];
     onRequestClose: Props['onRequestClose'];
     requestCloseRef: Props['requestCloseRef'];
     targetRef: React.RefObject<T>;
@@ -414,7 +441,6 @@ export const usePopover = function <T extends HTMLElement>({
     targetRef,
     bind: {
       isOpened,
-      autoClose,
       onRequestClose: handleRequestClose,
       requestCloseRef,
       targetRef,

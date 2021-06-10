@@ -14,6 +14,12 @@ const SamplePage: React.FC<Props> = () => {
   const handlePopoverOpenClick = function () {
     popover.open();
   };
+  const handlePopoverOpenPointerOver = function () {
+    popover.open();
+  };
+  const handlePopoverOpenPointerOut = function () {
+    popover.requestClose();
+  };
   const handlePopoverCloseClick = function () {
     popover.requestClose();
   };
@@ -46,6 +52,12 @@ const SamplePage: React.FC<Props> = () => {
       <button ref={popover.targetRef} onClick={handlePopoverOpenClick}>
         [open popover]
       </button>
+      <p
+        onPointerOver={handlePopoverOpenPointerOver}
+        onPointerOut={handlePopoverOpenPointerOut}
+      >
+        hover me to open a popover
+      </p>
       <button onClick={handleDrawerOpenClick}>[drawer drawer]</button>
       <Link to="/">TOP</Link>
       <Popover {...popover.bind}>
@@ -57,6 +69,7 @@ const SamplePage: React.FC<Props> = () => {
       <Drawer {...drawer.bind}>
         <button onClick={handleDrawerCloseClick}>toggle drawer</button>
       </Drawer>
+      <div className="h-screen bg-blue-100" />
     </Layout>
   );
 };
