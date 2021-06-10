@@ -1,14 +1,18 @@
 import { Link, PageProps } from 'gatsby';
 import React from 'react';
+import { useRecoilState } from 'recoil';
 import Drawer, { useDrawer } from '$components/drawer';
 import Modal, { useModal } from '$components/modal';
 import Popover, { usePopover } from '$components/popover';
 import useTheme from '$hooks/theme';
 import Layout from '$layouts/index';
+import { screenState } from '$store/atoms/app';
 
 type Props = PageProps;
 const SamplePage: React.FC<Props> = () => {
   useTheme();
+
+  const [screen] = useRecoilState(screenState);
 
   const popover = usePopover<HTMLButtonElement>({ placement: 'Bottom' });
   const handlePopoverOpenClick = function () {
@@ -42,6 +46,9 @@ const SamplePage: React.FC<Props> = () => {
 
   return (
     <Layout>
+      <div>
+        <p>{JSON.stringify(screen, null, 2)}</p>
+      </div>
       <div>
         <p>ThemeとDarkModeのテスト</p>
         <p className="bg-primary-l dark:bg-primary-d">color-primary</p>
