@@ -90,8 +90,10 @@ export const PERMISSION = {
 } as const;
 export type Permission = typeof PERMISSION[keyof typeof PERMISSION];
 
-export const RESOURCE_DELIMITER = ':';
-
+export const OAS_X_THUMBNAIL = 'x-thumbnail';
+export const OAS_X_THEME = 'x-theme';
+export const OAS_X_TAGS = 'x-tags';
+export const OAS_X_TABLE = 'x-table';
 export const OAS_X_PAGES = 'x-pages';
 export const OAS_X_PAGE_CONTENTS = 'contents';
 export const OAS_X_PAGE_CONTENT_RESOURCE_ID = 'resourceId';
@@ -117,3 +119,10 @@ export const COOKIE_KEY = {
 export const GOOGLE_OAUTH2_DEFAULT_SCOPES = [
   'https://www.googleapis.com/auth/userinfo.email',
 ];
+
+export const THEME = {
+  STANDARD: 'standard',
+  MIDNIGHT: 'midnight',
+  TERMINAL: 'terminal',
+} as const;
+export type Theme = typeof THEME[keyof typeof THEME];

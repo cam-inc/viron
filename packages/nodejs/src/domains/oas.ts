@@ -4,29 +4,46 @@ import { InfoObject, OpenAPIObject, PathItemObject } from 'openapi3-ts';
 import jsonSchemaRefParser from '@apidevtools/json-schema-ref-parser';
 import { load } from 'js-yaml';
 import { Match, match as matchPath } from 'path-to-regexp';
-import { ApiMethod, API_METHOD, OAS_X_PAGES } from '../constants';
-import { createViewer } from './adminrole';
+import { lint } from '@viron/linter';
+import {
+  ApiMethod,
+  API_METHOD,
+  OAS_X_PAGES,
+  OAS_X_TABLE,
+  OAS_X_TAGS,
+  OAS_X_THEME,
+  OAS_X_THUMBNAIL,
+  Theme,
+} from '../constants';
 import { getDebug } from '../logging';
+import { oasValidationFailure } from '../errors';
+import { createViewer } from './adminrole';
 
 const debug = getDebug('domains:oas');
 
-export interface VironInfoObject extends InfoObject {
+export interface VironInfoObjectExtentions {
+  [OAS_X_THUMBNAIL]?: string;
+  [OAS_X_THEME]?: Theme;
+  [OAS_X_TAGS]?: string[];
+  [OAS_X_TABLE]?: OasXTable;
   [OAS_X_PAGES]?: OasXPages;
 }
+
+export interface VironInfoObject
+  extends InfoObject,
+    VironInfoObjectExtentions {}
 
 export interface VironOpenAPIObject extends OpenAPIObject {
   info: VironInfoObject;
 }
 
-export interface OasXPageContentParameters {
-  [key: string]: string | boolean | number;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type OasXPageContentParameters = Record<string, any>;
 
 export interface OasXPageContentAction {
   operationId: string;
-  parameters?: OasXPageContentParameters;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  requestBody?: any;
+  parametersValues?: OasXPageContentParameters;
+  requestBodyValues?: OasXPageContentParameters;
 }
 
 export type OasXPageContentActions = OasXPageContentAction[];
@@ -34,14 +51,16 @@ export type OasXPageContentActions = OasXPageContentAction[];
 export interface OasXPageContentPreview {
   operationId: string;
   target: string;
-  parameters?: OasXPageContentParameters;
+  parametersValues?: OasXPageContentParameters;
+  requestBodyValues?: OasXPageContentParameters;
 }
 
 export interface OasXPageContent {
-  getOperationId: string;
+  operationId: string;
   resourceId: string;
   style: string;
-  parameters?: OasXPageContentParameters;
+  defaultParametersValues?: OasXPageContentParameters;
+  defaultRequestBodyValues?: OasXPageContentParameters;
   primary?: string;
   pagination?: boolean;
   query?: string[];
@@ -64,6 +83,23 @@ export interface OasXPage {
 
 export type OasXPages = OasXPage[];
 
+export interface OasXTablePager {
+  requestPageKey: string;
+  requestSizeKey: string;
+  responseMaxpageKey: string;
+  responsePageKey: string;
+}
+
+export interface OasXTableSort {
+  requestKey: string;
+}
+
+export interface OasXTable {
+  responseListKey: string;
+  pager: OasXTablePager;
+  sort: OasXTableSort;
+}
+
 export type OasNames =
   | 'adminroles'
   | 'adminusers'
@@ -72,14 +108,29 @@ export type OasNames =
   | 'authconfigs'
   | 'oas';
 
+export { lint };
+
 // oasを取得
-// TODO: 権限見て書き換えたりする
 export const get = async (
-  apiDefinition: VironOpenAPIObject
+  apiDefinition: VironOpenAPIObject,
+  infoExtentions?: VironInfoObjectExtentions
 ): Promise<VironOpenAPIObject> => {
   // viewerが未作成の場合は作成する
   await createViewer(apiDefinition);
 
+  if (infoExtentions) {
+    Object.assign(apiDefinition.info, infoExtentions);
+  }
+
+  // TODO: 権限見て書き換えたりする
+
+  // validation
+  const { isValid, errors } = lint(apiDefinition);
+  if (!isValid) {
+    debug('OAS validation failure. errors:');
+    (errors ?? []).forEach((error, i) => debug('%s: %o', i, error));
+    throw oasValidationFailure();
+  }
   return apiDefinition;
 };
 
@@ -138,14 +189,14 @@ const listContentsByOas = (
   return xPages.map((xPage) => xPage.contents).flat();
 };
 
-// x-pagesからgetOperationIdを取得
+// x-pagesからoperationIdを取得
 const findResourceId = (
   operationId: string,
   apiDefinition: VironOpenAPIObject
 ): string | null => {
   const contents = listContentsByOas(apiDefinition);
   const resourceId = contents.find(
-    (content) => content.getOperationId === operationId
+    (content) => content.operationId === operationId
   )?.resourceId;
   return resourceId ?? null;
 };
@@ -222,6 +273,7 @@ export const getResourceId = (
   apiDefinition: VironOpenAPIObject
 ): string | null => {
   // operationIdからresourceIdを取得できれば終了
+  // TODO: x-pages[].contents[].operationIdがGETだけじゃなくなったので修正が必要そう
   const operationId = findOperationId(uri, API_METHOD.GET, apiDefinition);
   const resourceId = operationId
     ? findResourceId(operationId, apiDefinition)

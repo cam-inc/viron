@@ -67,6 +67,7 @@
   },
   "include": ["src/**/*", "__tests__/**/*"],
   "references": [
-    { "path": "../../packages/nodejs" }
+    { "path": "../../packages/nodejs" },
+    { "path": "../../packages/linter" }
   ]
 }

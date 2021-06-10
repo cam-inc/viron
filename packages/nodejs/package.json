@@ -20,6 +20,7 @@
     "dist"
   ],
   "dependencies": {
+    "@viron/linter": "^0.0.1",
     "casbin": "^5.6.1",
     "casbin-mongoose-adapter": "^3.0.1",
     "casbin-sequelize-adapter": "^2.2.0",

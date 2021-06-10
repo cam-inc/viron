@@ -9,7 +9,7 @@ info:
       title: Viron 管理ロール
       description: 管理ロール一覧を閲覧できます
       contents:
-        - getOperationId: listVironAdminRoles
+        - operationId: listVironAdminRoles
           resourceId: vironAdminRole
           style: table
 

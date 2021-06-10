@@ -78,7 +78,7 @@ describe('domains/oas', () => {
             description: 'ブログ',
             contents: [
               {
-                getOperationId: 'listBlog',
+                operationId: 'listBlog',
                 resourceId: 'blog',
                 style: 'table',
               },
@@ -91,7 +91,7 @@ describe('domains/oas', () => {
             description: 'ユーザーブログ',
             contents: [
               {
-                getOperationId: 'listUserBlog',
+                operationId: 'listUserBlog',
                 resourceId: 'userblog',
                 style: 'table',
                 actions: [

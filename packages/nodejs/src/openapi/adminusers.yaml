@@ -10,7 +10,7 @@ info:
       title: Viron 管理ユーザー
       description: 管理ユーザー一覧を閲覧できます
       contents:
-        - getOperationId: listVironAdminUsers
+        - operationId: listVironAdminUsers
           resourceId: vironAdminUser
           style: table
           query:
