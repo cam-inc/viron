@@ -39,6 +39,7 @@ export const oauth2GoogleAuthorization = async (
     state,
     ctx.config.auth.googleOAuth2
   );
+
   context.res.setHeader(HTTP_HEADER.SET_COOKIE, genOAuthStateCookie(state));
   context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
   context.res.status(301).end();

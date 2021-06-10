@@ -50,3 +50,7 @@ export const googleOAuth2Unavailable = (): VironError => {
 export const mismatchState = (): VironError => {
   return new VironError('State is mismatch.', 400);
 };
+
+export const oasValidationFailure = (): VironError => {
+  return new VironError('OAS validation failure.', 500);
+};
