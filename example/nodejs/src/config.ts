@@ -1,7 +1,14 @@
 // configuration file.
 import { ConnectOptions as MongoConnectOptions } from 'mongoose';
 import { Options as MysqlConnectOptions } from 'sequelize';
-import { domainsAuth } from '@viron/lib';
+import {
+  domainsAuth,
+  domainsOas,
+  OAS_X_TAGS,
+  OAS_X_THEME,
+  OAS_X_THUMBNAIL,
+  THEME,
+} from '@viron/lib';
 import { Mode, MODE_MONGO, StoreType } from './constants';
 import { openUri } from './stores/connection/mongo';
 
@@ -22,6 +29,10 @@ export interface CorsConfig {
   allowOrigins: string[];
 }
 
+export interface OasConfig {
+  infoExtentions: domainsOas.VironInfoObjectExtentions;
+}
+
 export interface Config {
   store: {
     main: MongoConfig | MysqlConfig;
@@ -31,6 +42,7 @@ export interface Config {
     jwt: domainsAuth.JwtConfig;
     googleOAuth2: domainsAuth.GoogleOAuthClientConfig;
   };
+  oas: OasConfig;
 }
 
 /**
@@ -85,6 +97,13 @@ export const get = (mode: Mode): Config => {
       googleOAuth2: {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
+      },
+    },
+    oas: {
+      infoExtentions: {
+        [OAS_X_THEME]: THEME.STANDARD,
+        [OAS_X_THUMBNAIL]: 'https://example.com/logo.png',
+        [OAS_X_TAGS]: ['example', 'nodejs'],
       },
     },
   };
