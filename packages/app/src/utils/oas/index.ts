@@ -2,7 +2,6 @@
 import { /*lint,*/ LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
-import queryString from 'query-string';
 import { Endpoint, URL } from '$types/index';
 import {
   Document,
@@ -229,11 +228,9 @@ export const constructRequestInfo = function (
       });
     return pathParams;
   })();
-  type QueryParams = {
-    [key in string]: string;
-  };
+  type QueryParams = string[];
   const queryParams: QueryParams = (function (): QueryParams {
-    const queryParams: QueryParams = {};
+    const queryParams: QueryParams = [];
     if (!requestPayloadParameters) {
       return queryParams;
     }
@@ -256,16 +253,15 @@ export const constructRequestInfo = function (
         } else {
           explode = p.explode;
         }
-        queryParams[p.name] = serialize(p.name, p.value, style, explode);
+        queryParams.push(serialize(p.name, p.value, style, explode));
       });
     return queryParams;
   })();
   const pathname: string = parseURITemplate(request.path, pathParams);
   let requestInfo: RequestInfo = `${urlToTargetHost}${pathname}`;
-  const stringifiedQueryParams = queryString.stringify(queryParams);
-  // TODO: 空オブジェクトを渡した時の動作確認。
-  if (!!stringifiedQueryParams) {
-    requestInfo = `${requestInfo}?${stringifiedQueryParams}`;
+  const joinedQueryParams = queryParams.join('&');
+  if (!!joinedQueryParams) {
+    requestInfo = `${requestInfo}?${joinedQueryParams}`;
   }
   return requestInfo;
 };
@@ -273,12 +269,18 @@ export const constructRequestInfo = function (
 export const constructRequestInit = function (
   request: Request,
   requestPayloadParameters?: RequestPayloadParameter[],
-  requestPayloadRequestBody?: RequestPayloadRequestBody
+  requestPayloadRequestBody?: RequestPayloadRequestBody,
+  options: {
+    mode?: RequestInit['mode'];
+    credentials?: RequestInit['credentials'];
+    redirect?: RequestInit['redirect'];
+  } = {}
 ): RequestInit {
   const requestInit: RequestInit = {
     method: request.method,
     mode: 'cors',
     credentials: 'include',
+    ...options,
   };
   const headers: Record<string, string> = (function (): Record<string, string> {
     const headers: Record<string, string> = {};
