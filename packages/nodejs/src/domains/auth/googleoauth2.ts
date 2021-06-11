@@ -26,7 +26,7 @@ export const isEnabledGoogleOAuth2 = (
 // GoogleOAuth2クライアントを取得
 export const getGoogleOAuth2Client = (
   clientConfig: GoogleOAuthClientConfig,
-  redirectUrl?: string
+  redirectUrl: string
 ): Auth.OAuth2Client => {
   if (!isEnabledGoogleOAuth2(clientConfig)) {
     throw googleOAuth2Unavailable();
@@ -83,10 +83,11 @@ const formatCredentials = (
 // Googleサインイン
 export const signinGoogleOAuth2 = async (
   code: string,
+  redirectUrl: string,
   clientConfig: GoogleOAuthClientConfig
 ): Promise<string> => {
   debug('signinGoogleOAuth2 authentication code: %s', code);
-  const client = getGoogleOAuth2Client(clientConfig);
+  const client = getGoogleOAuth2Client(clientConfig, redirectUrl);
   const { tokens } = await client.getToken(code);
   const credentials = formatCredentials(tokens);
   if (!credentials.googleOAuth2IdToken) {
