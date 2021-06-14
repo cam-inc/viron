@@ -4,30 +4,21 @@ import { useForm } from 'react-hook-form';
 import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
 import {
-  DefaultValues,
   Parameter,
   Request,
-  RequestPayloadParameter,
-  RequestPayloadRequestBody,
+  RequestValue,
   Schema as SchemaType,
 } from '$types/oas';
-import {
-  constructRequestPayloadParameters,
-  constructRequestPayloadRequestBody,
-  pickContentType,
-} from '$utils/oas';
+import { pickContentType } from '$utils/oas';
 
 type Props = {
   request: Request;
-  defaultValues?: DefaultValues;
-  onSubmit: (options?: {
-    requestPayloadParameters?: RequestPayloadParameter[];
-    requestPayloadRequestBody?: RequestPayloadRequestBody;
-  }) => void;
+  defaultValues?: RequestValue;
+  onSubmit: (requestValue: RequestValue) => void;
 };
 const _Request: React.FC<Props> = ({
   request,
-  defaultValues = {} as DefaultValues,
+  defaultValues = {} as RequestValue,
   onSubmit,
 }) => {
   const {
@@ -49,23 +40,7 @@ const _Request: React.FC<Props> = ({
     function () {
       return handleSubmit(function (data) {
         execute(data);
-        const payloads: {
-          requestPayloadParameters?: RequestPayloadParameter[];
-          requestPayloadRequestBody?: RequestPayloadRequestBody;
-        } = {};
-        const requestPayloadParameters = constructRequestPayloadParameters(
-          request.operation.parameters || [],
-          data.parameters || {}
-        );
-        payloads.requestPayloadParameters = requestPayloadParameters;
-        if (!!request.operation.requestBody) {
-          const requestPayloadRequestBody = constructRequestPayloadRequestBody(
-            request.operation.requestBody,
-            data.requestBody
-          );
-          payloads.requestPayloadRequestBody = requestPayloadRequestBody;
-        }
-        onSubmit(payloads);
+        onSubmit(data as RequestValue);
       });
     },
     [handleSubmit, onSubmit, request.operation, execute]

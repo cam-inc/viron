@@ -62,7 +62,6 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return;
       }
       const _document = resolve(document);
-      console.log('OAS: ', _document);
       // Just update the stored data so that other pages using endpoints data be affected.
       setEndpoint({ ...endpoint, document: _document });
       setDocument(_document);
