@@ -23,8 +23,3 @@ export type AuthConfig = {
   // This object contains only one key-value pair.
   pathObject: Paths;
 };
-
-export type AuthConfigEmailFormData = {
-  email: EMail;
-  password: string;
-};
