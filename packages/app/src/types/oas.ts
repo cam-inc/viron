@@ -53,10 +53,8 @@ export type Info = {
       type: 'number' | 'table' | 'custom';
       // Specify the operation id of target method that is required to fetch data for the content.
       operationId: OperationId;
-      defaultParametersValues?: {
-        [key in string]: any;
-      };
-      defaultRequestBodyValues?: any;
+      defaultParametersValues?: DefaultParametersValues;
+      defaultRequestBodyValues?: DefaultRequestBodyValues;
     }[];
   }[];
   // [extended] Common setting for page contents that are type of table.
@@ -72,6 +70,18 @@ export type Info = {
       requestKey: string;
     };
   };
+};
+
+// Not in OAS.
+export type DefaultParametersValues = {
+  [key in string]: any;
+};
+// Not in OAS.
+export type DefaultRequestBodyValues = any;
+// Not in OAS.
+export type DefaultValues = {
+  parameters?: DefaultParametersValues;
+  requestBody?: DefaultRequestBodyValues;
 };
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object

@@ -1,6 +1,6 @@
 import { navigate, PageProps } from 'gatsby';
 import { parse } from 'query-string';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useRecoilState } from 'recoil';
 import Request from '$components/request';
 import useTheme from '$hooks/theme';
@@ -14,6 +14,7 @@ import {
 } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
+  constructDefaultValues,
   constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
@@ -46,6 +47,8 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
   if (!request) {
     throw new Error('TODO');
   }
+
+  const defaultValues = constructDefaultValues(request, queries, queries);
 
   const handleSubmit = async function ({
     requestPayloadParameters,
@@ -82,10 +85,10 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
   return (
     <div id="page-oauthredirect">
       <p>Processing OAuth redirection...</p>
+      <p>{`https://localhost:8000/oauthredirect`}</p>
       <Request
         request={request}
-        defaultParametersValues={queries}
-        defaultRequestBodyValues={queries}
+        defaultValues={defaultValues}
         onSubmit={handleSubmit}
       />
     </div>

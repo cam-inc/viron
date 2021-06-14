@@ -4,6 +4,9 @@ import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
 import {
+  DefaultParametersValues,
+  DefaultRequestBodyValues,
+  DefaultValues,
   Document,
   Info,
   Method,
@@ -189,6 +192,27 @@ export const parseURITemplate = function (
     template = template.replace(`{${key}}`, value);
   });
   return template;
+};
+
+export const constructDefaultValues = function (
+  request: Request,
+  parameters?: { [key in string]: any },
+  requestBody?: any
+): DefaultValues {
+  const defaultValues: DefaultValues = {};
+  if (!!request.operation.parameters && !!parameters) {
+    const defaultParameterValues: DefaultParametersValues = {};
+    request.operation.parameters.forEach(function (parameter) {
+      if (!_.isUndefined(parameters[parameter.name])) {
+        defaultParameterValues[parameter.name] = parameters[parameter.name];
+      }
+    });
+    defaultValues.parameters = defaultParameterValues;
+  }
+  if (!!request.operation.requestBody && !_.isUndefined(requestBody)) {
+    defaultValues.requestBody = requestBody;
+  }
+  return defaultValues;
 };
 
 export const constructRequestInfo = function (

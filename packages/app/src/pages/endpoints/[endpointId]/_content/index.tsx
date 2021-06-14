@@ -10,6 +10,7 @@ import {
   RequestPayloadRequestBody,
 } from '$types/oas';
 import { useFetch } from '$utils/oas/hooks';
+import { constructDefaultValues } from '$utils/oas/index';
 import _ContentNumber from './_number/index';
 
 type Props = {
@@ -80,14 +81,19 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     return <p>no request object.</p>;
   }
 
+  const defaultValues = constructDefaultValues(
+    request,
+    content.defaultParametersValues,
+    content.defaultRequestBodyValues
+  );
+
   return (
     <div className="p-2 bg-gray-100">
       <button onClick={handlePayloadButtonClick}>payload</button>
       <Drawer {...drawer.bind}>
         <Request
           request={request}
-          defaultParametersValues={content.defaultParametersValues}
-          defaultRequestBodyValues={content.defaultRequestBodyValues}
+          defaultValues={defaultValues}
           onSubmit={handleRequestSubmit}
         />
       </Drawer>
