@@ -7,8 +7,9 @@ import { useRecoilState } from 'recoil';
 import useTheme from '$hooks/theme';
 import { oneState } from '$store/selectors/endpoint';
 import { Document, Info } from '$types/oas';
+
 import { promiseErrorHandler } from '$utils/index';
-import { isOASSupported, resolve } from '$utils/oas';
+import { lint, resolve } from '$utils/oas';
 import _Pages from './_pages';
 import _Panels from './_panels';
 
@@ -53,7 +54,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       }
 
       const document: Record<string, unknown> = await response.json();
-      const { isValid, errors } = isOASSupported(document);
+      const { isValid, errors } = lint(document);
       if (!isValid) {
         setError(
           `The OAS Document is not of version we support. ${errors?.[0]?.message}`
@@ -62,7 +63,6 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return;
       }
       const _document = resolve(document);
-      console.log('OAS: ', _document);
       // Just update the stored data so that other pages using endpoints data be affected.
       setEndpoint({ ...endpoint, document: _document });
       setDocument(_document);

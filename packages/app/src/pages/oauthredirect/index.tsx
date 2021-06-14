@@ -1,22 +1,20 @@
 import { navigate, PageProps } from 'gatsby';
 import { parse } from 'query-string';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useRecoilState } from 'recoil';
 import Request from '$components/request';
 import useTheme from '$hooks/theme';
 import { KEY, get } from '$storage/index';
 import { oneState as endpointOneState } from '$store/selectors/endpoint';
 import { EndpointID } from '$types/index';
-import {
-  Document,
-  RequestPayloadParameter,
-  RequestPayloadRequestBody,
-} from '$types/oas';
+import { Document, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
+  constructDefaultValues,
   constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
+  constructRequestPayloads,
   getRequest,
 } from '$utils/oas/index';
 
@@ -47,23 +45,24 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
     throw new Error('TODO');
   }
 
-  const handleSubmit = async function ({
-    requestPayloadParameters,
-    requestPayloadRequestBody,
-  }: {
-    requestPayloadParameters?: RequestPayloadParameter[];
-    requestPayloadRequestBody?: RequestPayloadRequestBody;
-  } = {}) {
+  const defaultValues = constructDefaultValues(request, {
+    parameters: queries,
+  });
+
+  const handleSubmit = async function (requestValue: RequestValue) {
+    const requestPayloads = constructRequestPayloads(
+      request.operation,
+      requestValue
+    );
     const requestInfo: RequestInfo = constructRequestInfo(
       endpoint,
       document,
       request,
-      requestPayloadParameters
+      requestPayloads
     );
     const requestInit: RequestInit = constructRequestInit(
       request,
-      requestPayloadParameters,
-      requestPayloadRequestBody
+      requestPayloads
     );
     const [response, responseError] = await promiseErrorHandler(
       fetch(requestInfo, requestInit)
@@ -82,10 +81,10 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
   return (
     <div id="page-oauthredirect">
       <p>Processing OAuth redirection...</p>
+      <p>{`https://localhost:8000/oauthredirect`}</p>
       <Request
         request={request}
-        defaultParametersValues={queries}
-        defaultRequestBodyValues={queries}
+        defaultValues={defaultValues}
         onSubmit={handleSubmit}
       />
     </div>

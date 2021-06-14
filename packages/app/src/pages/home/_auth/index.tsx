@@ -7,16 +7,13 @@ import React from 'react';
 import Request from '$components/request';
 import { remove, KEY, set } from '$storage/index';
 import { AuthConfig, Endpoint } from '$types/index';
-import {
-  Document,
-  RequestPayloadParameter,
-  RequestPayloadRequestBody,
-} from '$types/oas';
+import { Document, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
   constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
+  constructRequestPayloads,
   getRequest,
 } from '$utils/oas/index';
 
@@ -38,17 +35,16 @@ export const OAuth: React.FC<PropsOAuth> = ({ authConfig, endpoint }) => {
     Icon = AiFillGoogleCircle;
   }
 
-  const handleSubmit = async function ({
-    requestPayloadParameters,
-  }: {
-    requestPayloadParameters?: RequestPayloadParameter[];
-    requestPayloadRequestBody?: RequestPayloadRequestBody;
-  } = {}) {
+  const handleSubmit = async function (requestValue: RequestValue) {
+    const requestPayloads = constructRequestPayloads(
+      request.operation,
+      requestValue
+    );
     const requestInfo: RequestInfo = constructRequestInfo(
       endpoint,
       document,
       request,
-      requestPayloadParameters
+      requestPayloads
     );
     try {
       set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
@@ -81,23 +77,20 @@ export const Email: React.FC<PropsEmail> = ({ authConfig, endpoint }) => {
     throw new Error('TODO');
   }
 
-  const handleSubmit = async function ({
-    requestPayloadParameters,
-    requestPayloadRequestBody,
-  }: {
-    requestPayloadParameters?: RequestPayloadParameter[];
-    requestPayloadRequestBody?: RequestPayloadRequestBody;
-  } = {}) {
+  const handleSubmit = async function (requestValue: RequestValue) {
+    const requestPayloads = constructRequestPayloads(
+      request.operation,
+      requestValue
+    );
     const requestInfo: RequestInfo = constructRequestInfo(
       endpoint,
       document,
       request,
-      requestPayloadParameters
+      requestPayloads
     );
     const requestInit: RequestInit = constructRequestInit(
       request,
-      requestPayloadParameters,
-      requestPayloadRequestBody
+      requestPayloads
     );
 
     const [response, responseError] = await promiseErrorHandler(
@@ -141,23 +134,20 @@ export const Signout: React.FC<PropsSignout> = ({
     throw new Error('TODO');
   }
 
-  const handleSubmit = async function ({
-    requestPayloadParameters,
-    requestPayloadRequestBody,
-  }: {
-    requestPayloadParameters?: RequestPayloadParameter[];
-    requestPayloadRequestBody?: RequestPayloadRequestBody;
-  } = {}) {
+  const handleSubmit = async function (requestValue: RequestValue) {
+    const requestPayloads = constructRequestPayloads(
+      request.operation,
+      requestValue
+    );
     const requestInfo: RequestInfo = constructRequestInfo(
       endpoint,
       document,
       request,
-      requestPayloadParameters
+      requestPayloads
     );
     const requestInit: RequestInit = constructRequestInit(
       request,
-      requestPayloadParameters,
-      requestPayloadRequestBody
+      requestPayloads
     );
 
     const [response, responseError] = await promiseErrorHandler(

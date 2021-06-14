@@ -53,10 +53,8 @@ export type Info = {
       type: 'number' | 'table' | 'custom';
       // Specify the operation id of target method that is required to fetch data for the content.
       operationId: OperationId;
-      defaultParametersValues?: {
-        [key in string]: any;
-      };
-      defaultRequestBodyValues?: any;
+      defaultParametersValue?: RequestParametersValue;
+      defaultRequestBodyValue?: RequestRequestBodyValue;
     }[];
   }[];
   // [extended] Common setting for page contents that are type of table.
@@ -147,16 +145,29 @@ export type Request = {
 };
 // This is not a part of OAS.
 export type RequestPayloadParameter = Parameter & {
-  value:
-    | number
-    | string
-    | (number | string)[]
-    | { [key in string]: string | number };
+  value: RequestParametersValue[string];
 };
 // This is not a part of OAS.
 export type RequestPayloadRequestBody = RequestBody & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any;
+  value: RequestRequestBodyValue;
+};
+// This is not a part of OAS.
+export type RequestPayloads = {
+  parameters?: RequestPayloadParameter[];
+  requestBody?: RequestPayloadRequestBody;
+};
+
+// This is not a part of OAS.
+export type RequestParametersValue = {
+  [key in string]: any;
+};
+// This is not a part of OAS.
+export type RequestRequestBodyValue = any;
+// This is not a part of OAS.
+export type RequestValue = {
+  parameters?: RequestParametersValue;
+  requestBody?: RequestRequestBodyValue;
 };
 
 // [extendable] Describes a single API operation on a path.
