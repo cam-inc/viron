@@ -24,7 +24,17 @@ export type AuthConfig = {
   pathObject: Paths;
 };
 
-export type AuthConfigEmailFormData = {
-  email: EMail;
-  password: string;
+export type __AuthConfig = {
+  type: 'oauthcallback';
+  provider: 'viron' | 'google' | 'signout';
+  // This object contains only one key-value pair.
+  pathObject: {
+    '/xxxx': {
+      [key in string]: any;
+    };
+  };
+  defaultParametersValue: {
+    redirectUri: '__VIRON_CALLBACK__';
+  };
+  defaultRequestBodyValue: any;
 };

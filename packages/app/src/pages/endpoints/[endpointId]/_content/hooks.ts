@@ -1,24 +1,27 @@
 import _ from 'lodash';
-import { useState, useCallback } from 'react';
+import { Dispatch, SetStateAction, useState, useCallback } from 'react';
 import { Endpoint } from '$types/index';
 import {
   Document,
-  OperationId,
+  Info,
   Request,
   RequestPayloadParameter,
   RequestPayloadRequestBody,
+  RequestValue,
 } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
+  constructDefaultValues,
   constructRequestInfo,
   constructRequestInit,
+  constructRequestPayloads,
   getRequest,
 } from '$utils/oas';
 
-export const useFetch = function <R>(
+export const useContent = function <R>(
   endpoint: Endpoint,
   document: Document,
-  { operationId }: { operationId: OperationId }
+  content: Info['x-pages'][number]['contents'][number]
 ): {
   isPending: boolean;
   error: Error | null;
@@ -29,23 +32,27 @@ export const useFetch = function <R>(
     requestPayloadRequestBody?: RequestPayloadRequestBody;
   }) => Promise<void>;
   request: Request | null;
+  requestValue: RequestValue;
+  setRequestValue: Dispatch<SetStateAction<RequestValue>>;
 } {
-  const request = getRequest(document, { operationId });
+  const request = getRequest(document, { operationId: content.operationId });
+  if (!request) {
+    throw new Error('request object not found.');
+  }
   const [isPending, setIsPending] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(
-    !!request ? null : new Error('request object not found.')
-  );
+  const [error, setError] = useState<Error | null>(null);
   const [response, setResponse] = useState<Response | null>(null);
   const [responseJson, setResponseJson] = useState<R | null>(null);
 
+  const [requestValue, setRequestValue] = useState<RequestValue>(
+    constructDefaultValues(request, {
+      parameters: content.defaultParametersValue,
+      requestBody: content.defaultRequestBodyValue,
+    })
+  );
+
   const fetch = useCallback(
-    async function ({
-      requestPayloadParameters,
-      requestPayloadRequestBody,
-    }: {
-      requestPayloadParameters?: RequestPayloadParameter[];
-      requestPayloadRequestBody?: RequestPayloadRequestBody;
-    } = {}) {
+    async function () {
       if (!request) {
         return;
       }
@@ -54,16 +61,19 @@ export const useFetch = function <R>(
       setResponseJson(null);
       setError(null);
 
+      const requestPayloads = constructRequestPayloads(
+        request.operation,
+        requestValue
+      );
       const requestInfo: RequestInfo = constructRequestInfo(
         endpoint,
         document,
         request,
-        requestPayloadParameters
+        requestPayloads
       );
       const requestInit: RequestInit = constructRequestInit(
         request,
-        requestPayloadParameters,
-        requestPayloadRequestBody
+        requestPayloads
       );
       const [response, responseError] = await promiseErrorHandler<Response>(
         window.fetch(requestInfo, requestInit)
@@ -96,5 +106,7 @@ export const useFetch = function <R>(
     responseJson,
     fetch,
     request,
+    requestValue,
+    setRequestValue,
   };
 };

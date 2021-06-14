@@ -1,5 +1,4 @@
-//import $RefParser from '@apidevtools/json-schema-ref-parser';
-import { /*lint,*/ LintReturn } from '@viron/linter';
+import { lint as _lint, LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
@@ -13,8 +12,12 @@ import {
   Paths,
   Request,
   RequestBody,
+  RequestParametersValue,
   RequestPayloadParameter,
   RequestPayloadRequestBody,
+  RequestPayloads,
+  RequestRequestBodyValue,
+  RequestValue,
   Server,
   Schema,
 } from '$types/oas';
@@ -22,14 +25,8 @@ import { isRelativeURL } from '$utils/index';
 import { serialize } from '$utils/oas/style';
 
 // Check whether a OAS document is support by us.
-export const isOASSupported = function (
-  document: Record<string, unknown>
-): LintReturn {
-  return {
-    isValid: !!document,
-    errors: [],
-  };
-  //return lint(document);
+export const lint = function (document: Record<string, unknown>): LintReturn {
+  return _lint(document);
 };
 
 // TODO: To support $ref values not starting with a # letter.
@@ -191,11 +188,35 @@ export const parseURITemplate = function (
   return template;
 };
 
+export const constructDefaultValues = function (
+  request: Request,
+  values: RequestValue = {}
+): RequestValue {
+  const requestValue: RequestValue = {};
+  if (!!request.operation.parameters && !!values.parameters) {
+    const requestParametersValue: RequestParametersValue = {};
+    request.operation.parameters.forEach(function (parameter) {
+      if (!values.parameters) {
+        return;
+      }
+      if (!_.isUndefined(values.parameters[parameter.name])) {
+        requestParametersValue[parameter.name] =
+          values.parameters[parameter.name];
+      }
+    });
+    requestValue.parameters = requestParametersValue;
+  }
+  if (!!request.operation.requestBody && !_.isUndefined(values.requestBody)) {
+    requestValue.requestBody = values.requestBody;
+  }
+  return requestValue;
+};
+
 export const constructRequestInfo = function (
   endpoint: Endpoint,
   document: Document,
   request: Request,
-  requestPayloadParameters?: RequestPayloadParameter[]
+  requestPayloads: RequestPayloads
 ): RequestInfo {
   const urlToTargetHost: URL = getURLToTargetHost(endpoint, document);
   type PathParams = {
@@ -203,10 +224,10 @@ export const constructRequestInfo = function (
   };
   const pathParams: PathParams = (function (): PathParams {
     const pathParams: PathParams = {};
-    if (!requestPayloadParameters) {
+    if (!requestPayloads.parameters) {
       return pathParams;
     }
-    requestPayloadParameters
+    requestPayloads.parameters
       .filter(function (p) {
         return p.in === 'path';
       })
@@ -231,10 +252,10 @@ export const constructRequestInfo = function (
   type QueryParams = string[];
   const queryParams: QueryParams = (function (): QueryParams {
     const queryParams: QueryParams = [];
-    if (!requestPayloadParameters) {
+    if (!requestPayloads.parameters) {
       return queryParams;
     }
-    requestPayloadParameters
+    requestPayloads.parameters
       .filter(function (p) {
         return p.in === 'query';
       })
@@ -268,8 +289,7 @@ export const constructRequestInfo = function (
 
 export const constructRequestInit = function (
   request: Request,
-  requestPayloadParameters?: RequestPayloadParameter[],
-  requestPayloadRequestBody?: RequestPayloadRequestBody,
+  requestPayloads: RequestPayloads,
   options: {
     mode?: RequestInit['mode'];
     credentials?: RequestInit['credentials'];
@@ -284,10 +304,10 @@ export const constructRequestInit = function (
   };
   const headers: Record<string, string> = (function (): Record<string, string> {
     const headers: Record<string, string> = {};
-    if (!requestPayloadParameters) {
+    if (!requestPayloads.parameters) {
       return headers;
     }
-    requestPayloadParameters
+    requestPayloads.parameters
       .filter(function (p) {
         return p.in === 'header';
       })
@@ -308,7 +328,7 @@ export const constructRequestInit = function (
         }
         headers[p.name] = serialize(p.name, p.value, style, explode);
       });
-    requestPayloadParameters
+    requestPayloads.parameters
       .filter(function (p) {
         return p.in === 'cookie';
       })
@@ -334,20 +354,40 @@ export const constructRequestInit = function (
     return headers;
   })();
   requestInit.headers = headers;
-  if (!!requestPayloadRequestBody) {
-    const contentType = pickContentType(requestPayloadRequestBody.content);
+  if (!!requestPayloads.requestBody) {
+    const contentType = pickContentType(requestPayloads.requestBody.content);
     headers['Content-Type'] = contentType;
-    requestInit.body = convert(requestPayloadRequestBody.value, contentType);
+    requestInit.body = convert(requestPayloads.requestBody.value, contentType);
   }
   return requestInit;
 };
 
+export const constructRequestPayloads = function (
+  operation: Operation,
+  requestValue: RequestValue
+): RequestPayloads {
+  const requestPayloads: RequestPayloads = {};
+  if (!!operation.parameters && !_.isUndefined(requestValue.parameters)) {
+    requestPayloads.parameters = constructRequestPayloadParameters(
+      operation.parameters,
+      requestValue.parameters
+    );
+  }
+  if (!!operation.requestBody && !_.isUndefined(requestValue.requestBody)) {
+    requestPayloads.requestBody = constructRequestPayloadRequestBody(
+      operation.requestBody,
+      requestValue.requestBody
+    );
+  }
+  return requestPayloads;
+};
+
 export const constructRequestPayloadParameters = function (
   parameters: Parameter[],
-  data: { [key in string]: any }
+  requestParametersValue: RequestParametersValue
 ): RequestPayloadParameter[] {
   const requestPayloadParameters: RequestPayloadParameter[] = [];
-  _.forEach(data, function (value, name) {
+  _.forEach(requestParametersValue, function (value, name) {
     const parameter = parameters.find(function (p) {
       return p.name === name;
     });
@@ -361,11 +401,11 @@ export const constructRequestPayloadParameters = function (
 
 export const constructRequestPayloadRequestBody = function (
   requestBody: RequestBody,
-  data: any
+  requestRequestBodyValue: RequestRequestBodyValue
 ): RequestPayloadRequestBody {
   const requestPayloadRequestBody: RequestPayloadRequestBody = {
     ...requestBody,
-    value: data,
+    value: requestRequestBodyValue,
   };
   return requestPayloadRequestBody;
 };

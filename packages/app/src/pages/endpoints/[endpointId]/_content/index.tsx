@@ -6,11 +6,17 @@ import {
   ContentGetResponseOfTypeOfNumber,
   Document,
   Info,
-  RequestPayloadParameter,
-  RequestPayloadRequestBody,
+  RequestValue,
 } from '$types/oas';
-import { useFetch } from '$utils/oas/hooks';
+import {
+  constructDefaultValues,
+  constructRequestInfo,
+  constructRequestInit,
+  constructRequestPayloads,
+} from '$utils/oas/index';
+import { useContent } from './hooks';
 import _ContentNumber from './_number/index';
+import _ContentTable from './_table/index';
 
 type Props = {
   endpoint: Endpoint;
@@ -18,22 +24,30 @@ type Props = {
   content: Info['x-pages'][number]['contents'][number];
 };
 const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
-  const { isPending, error, responseJson, fetch, request } = useFetch(
-    endpoint,
-    document,
-    {
-      operationId: content.operationId,
-    }
-  );
+  const {
+    isPending,
+    error,
+    responseJson,
+    fetch: fetchContentData,
+    request,
+  } = useContent(endpoint, document, content);
   const elm = useMemo<JSX.Element | null>(
     function () {
       if (!responseJson) {
         return null;
       }
+      // TODO: key名をtypeに変更
+      // switch (content.style) {
       switch (content.type) {
         case 'number':
           return (
             <_ContentNumber
+              data={responseJson as ContentGetResponseOfTypeOfNumber}
+            />
+          );
+        case 'table':
+          return (
+            <_ContentTable
               data={responseJson as ContentGetResponseOfTypeOfNumber}
             />
           );
@@ -45,7 +59,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
   );
 
   useEffect(function () {
-    fetch();
+    fetchContentData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -55,15 +69,26 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
   };
 
   const handleRequestSubmit = useCallback(
-    function ({
-      requestPayloadParameters,
-      requestPayloadRequestBody,
-    }: {
-      requestPayloadParameters?: RequestPayloadParameter[];
-      requestPayloadRequestBody?: RequestPayloadRequestBody;
-    } = {}) {
+    function (requestValue: RequestValue) {
+      if (!request) {
+        return;
+      }
+      const requestPayloads = constructRequestPayloads(
+        request.operation,
+        requestValue
+      );
+      const requestInfo: RequestInfo = constructRequestInfo(
+        endpoint,
+        document,
+        request,
+        requestPayloads
+      );
+      const requestInit: RequestInit = constructRequestInit(
+        request,
+        requestPayloads
+      );
       drawer.requestClose();
-      fetch({ requestPayloadParameters, requestPayloadRequestBody });
+      fetch(requestInfo, requestInit);
     },
     [drawer, drawer.requestClose, fetch]
   );
@@ -80,14 +105,18 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     return <p>no request object.</p>;
   }
 
+  const defaultValues = constructDefaultValues(request, {
+    parameters: content.defaultParametersValue,
+    requestBody: content.defaultRequestBodyValue,
+  });
+
   return (
     <div className="p-2 bg-gray-100">
       <button onClick={handlePayloadButtonClick}>payload</button>
       <Drawer {...drawer.bind}>
         <Request
           request={request}
-          defaultParametersValues={content.defaultParametersValues}
-          defaultRequestBodyValues={content.defaultRequestBodyValues}
+          defaultValues={defaultValues}
           onSubmit={handleRequestSubmit}
         />
       </Drawer>

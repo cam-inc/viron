@@ -42,6 +42,11 @@ authconfigの
       ‘/oauth’: { …. }
     }
   }
+  defaultParametersValue: {
+    [key in string]: any;
+    redirect_uri: ‘${oauthRedirectURI}’// JSのテンプレーリテラル
+  }
+  defaultRequestBodyValue: any;
 }
 viron.plusから
 GET /vrn.fensi.plus/oauth….redirect_uri=https://viron.plus/oauthredirect
@@ -86,6 +91,11 @@ authconfigの
       ‘/oauthcallback’: { …. }
     }
   }
+  defaultParametersValue: {
+    [key in string]: any;
+    redirect_uri: ‘${oauthRedirectURI}’// JSのテンプレーリテラル
+  }
+  defaultRequestBodyValue: any;
 }
 から
 {vrn.fensi.plus/oauthcallback}?code={認可コード}&state={任意文字列}

@@ -4,66 +4,23 @@ import { useForm } from 'react-hook-form';
 import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
 import {
-  Info,
   Parameter,
   Request,
-  RequestPayloadParameter,
-  RequestPayloadRequestBody,
+  RequestValue,
   Schema as SchemaType,
 } from '$types/oas';
-import {
-  constructRequestPayloadParameters,
-  constructRequestPayloadRequestBody,
-  pickContentType,
-} from '$utils/oas';
+import { pickContentType } from '$utils/oas';
 
 type Props = {
   request: Request;
-  onSubmit: (options?: {
-    requestPayloadParameters?: RequestPayloadParameter[];
-    requestPayloadRequestBody?: RequestPayloadRequestBody;
-  }) => void;
-  defaultParametersValues?: Info['x-pages'][number]['contents'][number]['defaultParametersValues'];
-  defaultRequestBodyValues?: Info['x-pages'][number]['contents'][number]['defaultRequestBodyValues'];
+  defaultValues?: RequestValue;
+  onSubmit: (requestValue: RequestValue) => void;
 };
 const _Request: React.FC<Props> = ({
   request,
+  defaultValues = {} as RequestValue,
   onSubmit,
-  defaultParametersValues = {},
-  defaultRequestBodyValues,
 }) => {
-  const defaultValues = useMemo(
-    function () {
-      const ret: {
-        parameters?: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          [key in string]: any;
-        };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        requestBody?: any;
-      } = {};
-      if (!!request.operation.parameters) {
-        ret.parameters = {};
-        (request.operation.parameters as Parameter[]).forEach((parameter) => {
-          if (!_.isUndefined(defaultParametersValues[parameter.name])) {
-            // TODO: Without this below, tsc says "Object is possibly 'undefined'."
-            if (!ret.parameters) {
-              return;
-            }
-            ret.parameters[parameter.name] =
-              defaultParametersValues[parameter.name];
-          }
-        });
-      }
-      if (!!request.operation.requestBody) {
-        if (!_.isUndefined(defaultRequestBodyValues)) {
-          ret.requestBody = defaultRequestBodyValues;
-        }
-      }
-      return ret;
-    },
-    [request]
-  );
   const {
     register,
     unregister,
@@ -83,23 +40,7 @@ const _Request: React.FC<Props> = ({
     function () {
       return handleSubmit(function (data) {
         execute(data);
-        const payloads: {
-          requestPayloadParameters?: RequestPayloadParameter[];
-          requestPayloadRequestBody?: RequestPayloadRequestBody;
-        } = {};
-        const requestPayloadParameters = constructRequestPayloadParameters(
-          request.operation.parameters || [],
-          data.parameters || {}
-        );
-        payloads.requestPayloadParameters = requestPayloadParameters;
-        if (!!request.operation.requestBody) {
-          const requestPayloadRequestBody = constructRequestPayloadRequestBody(
-            request.operation.requestBody,
-            data.requestBody
-          );
-          payloads.requestPayloadRequestBody = requestPayloadRequestBody;
-        }
-        onSubmit(payloads);
+        onSubmit(data as RequestValue);
       });
     },
     [handleSubmit, onSubmit, request.operation, execute]
