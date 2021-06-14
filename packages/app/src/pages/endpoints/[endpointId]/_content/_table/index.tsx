@@ -1,9 +1,14 @@
 import React from 'react';
+import { ContentGetResponseOfTypeOfNumber } from '$types/oas';
 
 type Props = {
-  data: number;
+  data: ContentGetResponseOfTypeOfNumber;
 };
 const _ContentTable: React.FC<Props> = ({ data }) => {
-  return <div>table data</div>;
+  return (
+    <div>
+      <p>{JSON.stringify(data)}</p>
+    </div>
+  );
 };
 export default _ContentTable;

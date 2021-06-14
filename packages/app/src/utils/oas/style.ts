@@ -87,14 +87,14 @@ export const serializeForm = function (
   }
   if (_.isObject(variable)) {
     if (explode) {
-      return _.map(variable, function (val, key) {
+      return _.map(variable, function (val: any, key) {
         if (_.isNumber(val)) {
           val = val.toString();
         }
         return `${key}=${val}`;
       }).join('&');
     } else {
-      return `${name}=${_.map(variable, function (val, key) {
+      return `${name}=${_.map(variable, function (val: any, key) {
         if (_.isNumber(val)) {
           val = val.toString();
         }
@@ -127,7 +127,7 @@ export const serializeSimple = function (
       .join(',');
   }
   if (_.isObject(variable)) {
-    return _.map(variable, function (val, key) {
+    return _.map(variable, function (val: any, key) {
       if (_.isNumber(val)) {
         val = val.toString();
       }
