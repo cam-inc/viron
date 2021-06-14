@@ -1,5 +1,4 @@
-//import $RefParser from '@apidevtools/json-schema-ref-parser';
-import { /*lint,*/ LintReturn } from '@viron/linter';
+import { lint as _lint, LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
@@ -26,14 +25,8 @@ import { isRelativeURL } from '$utils/index';
 import { serialize } from '$utils/oas/style';
 
 // Check whether a OAS document is support by us.
-export const isOASSupported = function (
-  document: Record<string, unknown>
-): LintReturn {
-  return {
-    isValid: !!document,
-    errors: [],
-  };
-  //return lint(document);
+export const lint = function (document: Record<string, unknown>): LintReturn {
+  return _lint(document);
 };
 
 // TODO: To support $ref values not starting with a # letter.
