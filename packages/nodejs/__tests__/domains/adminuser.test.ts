@@ -52,6 +52,11 @@ describe('domains/adminuser', () => {
             password: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
             createdAt: new Date(),
             updatedAt: new Date(),
+            googleOAuth2AccessToken: null,
+            googleOAuth2ExpiryDate: null,
+            googleOAuth2IdToken: null,
+            googleOAuth2RefreshToken: null,
+            googleOAuth2TokenType: null,
           },
         ],
         maxPage: 1,
@@ -90,6 +95,11 @@ describe('domains/adminuser', () => {
           password,
           createdAt: new Date(),
           updatedAt: new Date(),
+          googleOAuth2AccessToken: null,
+          googleOAuth2ExpiryDate: null,
+          googleOAuth2IdToken: null,
+          googleOAuth2RefreshToken: null,
+          googleOAuth2TokenType: null,
         });
 
       const result = await createOne(data);
@@ -123,6 +133,11 @@ describe('domains/adminuser', () => {
           password,
           createdAt: new Date(),
           updatedAt: new Date(),
+          googleOAuth2AccessToken: null,
+          googleOAuth2ExpiryDate: null,
+          googleOAuth2IdToken: null,
+          googleOAuth2RefreshToken: null,
+          googleOAuth2TokenType: null,
         });
 
       const result = await createOne(data);
@@ -148,6 +163,11 @@ describe('domains/adminuser', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         roleIds: [],
+        googleOAuth2AccessToken: null,
+        googleOAuth2ExpiryDate: null,
+        googleOAuth2IdToken: null,
+        googleOAuth2RefreshToken: null,
+        googleOAuth2TokenType: null,
       });
       sandbox
         .stub(repository, 'updateOneById')
@@ -194,6 +214,11 @@ describe('domains/adminuser', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         roleIds: [],
+        googleOAuth2AccessToken: null,
+        googleOAuth2ExpiryDate: null,
+        googleOAuth2IdToken: null,
+        googleOAuth2RefreshToken: null,
+        googleOAuth2TokenType: null,
       });
       sandbox.stub(repository, 'removeOneById').withArgs(id).resolves();
 
@@ -226,6 +251,11 @@ describe('domains/adminuser', () => {
         salt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
+        googleOAuth2AccessToken: null,
+        googleOAuth2ExpiryDate: null,
+        googleOAuth2IdToken: null,
+        googleOAuth2RefreshToken: null,
+        googleOAuth2TokenType: null,
       });
 
       const user = await findOneById(id);
@@ -260,6 +290,11 @@ describe('domains/adminuser', () => {
           salt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
+          googleOAuth2AccessToken: null,
+          googleOAuth2ExpiryDate: null,
+          googleOAuth2IdToken: null,
+          googleOAuth2RefreshToken: null,
+          googleOAuth2TokenType: null,
         });
 
       const user = await findOneByEmail(email);
