@@ -1,4 +1,9 @@
-import { AuthenticationResult, ExegesisPluginContext } from 'exegesis-express';
+import {
+  AuthenticationFailure,
+  AuthenticationResult,
+  AuthenticationSuccess,
+  ExegesisPluginContext,
+} from 'exegesis-express';
 import {
   domainsAuth,
   domainsAdminRole,
@@ -9,12 +14,26 @@ import {
   ApiMethod,
   COOKIE_KEY,
   forbidden,
+  AUTH_TYPE,
+  VironError,
 } from '@viron/lib';
-import {
-  AUTHENTICATION_RESULT_TYPE_INVALID,
-  AUTHENTICATION_RESULT_TYPE_SUCCESS,
-} from '../constants';
+import { AUTHENTICATION_RESULT_TYPE } from '../constants';
+import { ctx } from '../context';
 import { PluginContext } from '../application';
+
+const authFailure = (err: VironError): AuthenticationFailure => {
+  return {
+    type: AUTHENTICATION_RESULT_TYPE.INVALID,
+    status: err.statusCode,
+    message: err.message,
+  };
+};
+
+const authSuccess = (
+  user: domainsAdminUser.AdminUserView
+): AuthenticationSuccess => {
+  return { type: AUTHENTICATION_RESULT_TYPE.SUCCESS, user };
+};
 
 /**
  * JWT認証
@@ -27,45 +46,50 @@ import { PluginContext } from '../application';
 export const jwt = async (
   context: ExegesisPluginContext
 ): Promise<AuthenticationResult> => {
-  const ctx = context as PluginContext;
-  const token = ctx.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
-  const claims = token ? await domainsAuth.verifyJwt(token) : false;
+  const pContext = context as PluginContext;
+  const token = pContext.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
+  const claims = token ? await domainsAuth.verifyJwt(token) : null;
 
   if (claims) {
     const userId = claims.sub;
 
     if (
-      ctx.req.method &&
       !(await domainsAdminRole.hasPermission(
         userId,
-        ctx.req.path,
-        ctx.req.method.toLowerCase() as ApiMethod,
-        ctx.req._context.apiDefinition
+        pContext.req.path,
+        (pContext.req.method as string).toLowerCase() as ApiMethod,
+        pContext.req._context.apiDefinition
       ))
     ) {
-      const e = forbidden();
-      return {
-        type: AUTHENTICATION_RESULT_TYPE_INVALID,
-        status: e.statusCode,
-        message: e.message,
-      };
+      return authFailure(forbidden());
     }
 
     const user = await domainsAdminUser.findOneById(userId);
     if (user) {
-      // TODO: Google認証の場合はアクセストークンの検証
-      return { type: AUTHENTICATION_RESULT_TYPE_SUCCESS, user };
+      switch (user.authType) {
+        case AUTH_TYPE.GOOGLE: {
+          // Google認証の場合はアクセストークンの検証
+          if (
+            await domainsAuth.verifyGoogleOAuth2AccessToken(
+              userId,
+              user,
+              ctx.config.auth.googleOAuth2
+            )
+          ) {
+            return authSuccess(user);
+          }
+          break;
+        }
+        default:
+          return authSuccess(user);
+      }
     }
   }
 
-  context.origRes.setHeader(
+  pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
+  pContext.origRes.setHeader(
     HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
     VIRON_AUTHCONFIGS_PATH
   );
-  const e = unauthorized();
-  return {
-    type: AUTHENTICATION_RESULT_TYPE_INVALID,
-    status: e.statusCode,
-    message: e.message,
-  };
+  return authFailure(unauthorized());
 };

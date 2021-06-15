@@ -12,6 +12,7 @@ import { ctx } from '../context';
 // サインアウト
 export const signout = async (context: RouteContext): Promise<void> => {
   const token = context.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
+  context.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
   await domainsAuth.signout(token);
   context.res.status(204).end();
 };

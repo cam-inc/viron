@@ -11,7 +11,7 @@ info:
       contents:
         - operationId: listVironAuditlogs
           resourceId: vironAuditLog
-          style: table
+          type: table
           query:
             - userId
             - requestUri

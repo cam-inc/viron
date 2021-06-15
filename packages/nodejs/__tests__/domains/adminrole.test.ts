@@ -47,7 +47,7 @@ describe('domains/adminrole', () => {
               {
                 operationId: 'getBlog',
                 resourceId: 'blog',
-                style: 'table',
+                type: 'table',
               },
             ],
           },
@@ -60,7 +60,7 @@ describe('domains/adminrole', () => {
               {
                 operationId: 'getNews',
                 resourceId: 'news',
-                style: 'table',
+                type: 'table',
               },
             ],
           },
@@ -248,7 +248,7 @@ describe('domains/adminrole', () => {
               {
                 operationId: 'listBlog',
                 resourceId: 'blog',
-                style: 'table',
+                type: 'table',
               },
             ],
           },

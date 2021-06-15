@@ -8,7 +8,7 @@ import {
   signinFailed,
 } from '../../errors';
 import { getDebug } from '../../logging';
-import { findOneByEmail } from '../adminuser';
+import { findOneByEmail, updateOneById } from '../adminuser';
 import { createFirstAdminUser } from './common';
 
 const debug = getDebug('domains:auth:googleoauth2');
@@ -37,6 +37,27 @@ export const getGoogleOAuth2Client = (
     clientConfig.clientSecret,
     redirectUrl
   );
+};
+
+// GoogleOAuth2リフレッシュ用クライアントを取得
+export const getGoogleOAuth2RefreshClient = async (
+  clientConfig: GoogleOAuthClientConfig,
+  credentials: GoogleOAuth2Credentials
+): Promise<Auth.UserRefreshClient> => {
+  const client = new google.auth.GoogleAuth().fromJSON({
+    type: 'authorized_user',
+    client_id: clientConfig.clientId,
+    client_secret: clientConfig.clientSecret,
+    refresh_token: credentials.googleOAuth2RefreshToken ?? undefined,
+  });
+  client.credentials = {
+    expiry_date: credentials.googleOAuth2ExpiryDate,
+    access_token: credentials.googleOAuth2AccessToken,
+    token_type: credentials.googleOAuth2TokenType,
+    refresh_token: credentials.googleOAuth2RefreshToken,
+    scope: GOOGLE_OAUTH2_DEFAULT_SCOPES[0],
+  };
+  return client as Auth.UserRefreshClient;
 };
 
 // GoogleOAuth2認可画面URLを取得
@@ -120,6 +141,40 @@ export const signinGoogleOAuth2 = async (
     }
     adminUser = firstAdminUser;
   }
+  if (adminUser.authType !== AUTH_TYPE.GOOGLE) {
+    throw signinFailed();
+  }
 
   return signJwt(adminUser.id);
+};
+
+// アクセストークンの検証
+export const verifyGoogleOAuth2AccessToken = async (
+  userId: string,
+  credentials: GoogleOAuth2Credentials,
+  clientConfig: GoogleOAuthClientConfig
+): Promise<boolean> => {
+  const client = await getGoogleOAuth2RefreshClient(clientConfig, credentials);
+  const accessToken = await client.getAccessToken().catch((e: Error) => {
+    debug('getAccessToken failure. userId: %s, err: %o', userId, e);
+    return e;
+  });
+
+  // client.getAccessToken内で自動でリフレッシュしてるので、`res`があればリフレッシュ済みとみなす
+  if (accessToken instanceof Error || (accessToken.res?.status ?? 0) >= 400) {
+    debug('AccessToken refresh failure. userId: %s', userId);
+    return false;
+  }
+
+  if (!accessToken.res) {
+    debug('AccessToken is valid. userId: %s', userId);
+    return true;
+  }
+
+  debug('AccessToken refresh success! userId: %s', userId);
+  const newCredentials = formatCredentials(
+    accessToken.res.data as Auth.Credentials
+  );
+  await updateOneById(userId, newCredentials);
+  return true;
 };

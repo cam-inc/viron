@@ -59,6 +59,14 @@ components:
           description: OASのPathsObject
           type: object
           properties: {}
+        defaultParametersValue:
+          description: クライアントからリクエストする際のパラメータ
+          type: object
+          properties: {}
+        defaultRequestBodyValue:
+          description: クライアントからリクエストする際のリクエストボディ
+          type: object
+          properties: {}
       required:
         - provider
         - type

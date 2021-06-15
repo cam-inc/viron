@@ -14,6 +14,9 @@ import {
 import { ListWithPager, paging } from '../helpers';
 import { repositoryContainer } from '../repositories';
 import { getResourceId, VironOpenAPIObject } from './oas';
+import { getDebug } from '../logging';
+
+const debug = getDebug('domains:adminrole');
 
 export interface AdminRolePermission {
   resourceId: string;
@@ -193,6 +196,13 @@ export const hasPermission = async (
       return true;
     }
   }
+  debug(
+    'Don`t have permission to access. userId: %s, requestUri: %s, requestMethod: %s, resourceId: %s',
+    userId,
+    requestUri,
+    requestMethod,
+    resourceId
+  );
   return false;
 };
 

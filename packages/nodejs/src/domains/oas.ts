@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import { InfoObject, OpenAPIObject, PathItemObject } from 'openapi3-ts';
+import {
+  InfoObject,
+  OpenAPIObject,
+  PathsObject,
+  PathItemObject,
+} from 'openapi3-ts';
 import jsonSchemaRefParser from '@apidevtools/json-schema-ref-parser';
 import { load } from 'js-yaml';
 import { Match, match as matchPath } from 'path-to-regexp';
@@ -21,6 +26,11 @@ import { createViewer } from './adminrole';
 
 const debug = getDebug('domains:oas');
 
+export {
+  PathsObject as VironPathsObject,
+  PathItemObject as VironPathItemObject,
+};
+
 export interface VironInfoObjectExtentions {
   [OAS_X_THUMBNAIL]?: string;
   [OAS_X_THEME]?: Theme;
@@ -38,12 +48,15 @@ export interface VironOpenAPIObject extends OpenAPIObject {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type OasXPageContentParameters = Record<string, any>;
+export type OasCustomParameters = Record<string, any>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type OasCustomRequestBody = any;
 
 export interface OasXPageContentAction {
   operationId: string;
-  parametersValues?: OasXPageContentParameters;
-  requestBodyValues?: OasXPageContentParameters;
+  defaultParametersValue?: OasCustomParameters;
+  defaultRequestBodyValue?: OasCustomRequestBody;
 }
 
 export type OasXPageContentActions = OasXPageContentAction[];
@@ -51,17 +64,16 @@ export type OasXPageContentActions = OasXPageContentAction[];
 export interface OasXPageContentPreview {
   operationId: string;
   target: string;
-  parametersValues?: OasXPageContentParameters;
-  requestBodyValues?: OasXPageContentParameters;
+  defaultParametersValue?: OasCustomParameters;
+  defaultRequestBodyValue?: OasCustomRequestBody;
 }
 
 export interface OasXPageContent {
   operationId: string;
   resourceId: string;
-  style: string;
-  defaultParametersValues?: OasXPageContentParameters;
-  defaultRequestBodyValues?: OasXPageContentParameters;
-  primary?: string;
+  type: string;
+  defaultParameterValues?: OasCustomParameters;
+  defaultRequestBodyValues?: OasCustomRequestBody;
   pagination?: boolean;
   query?: string[];
   tableLabels?: string[];
@@ -149,12 +161,11 @@ export const loadOas = async (path: string): Promise<VironOpenAPIObject> => {
 export const loadResolvedOas = async (
   path: string
 ): Promise<VironOpenAPIObject> => {
-  const obj = await jsonSchemaRefParser.dereference(path, {
+  return (await jsonSchemaRefParser.dereference(path, {
     dereference: {
       circular: false, // 循環参照を許容しない
     },
-  });
-  return obj as OpenAPIObject;
+  })) as VironOpenAPIObject;
 };
 
 // oasのパス定義をexpree形式に書き換える
@@ -273,8 +284,7 @@ export const getResourceId = (
   apiDefinition: VironOpenAPIObject
 ): string | null => {
   // operationIdからresourceIdを取得できれば終了
-  // TODO: x-pages[].contents[].operationIdがGETだけじゃなくなったので修正が必要そう
-  const operationId = findOperationId(uri, API_METHOD.GET, apiDefinition);
+  const operationId = findOperationId(uri, method, apiDefinition);
   const resourceId = operationId
     ? findResourceId(operationId, apiDefinition)
     : null;
@@ -290,20 +300,17 @@ export const getResourceId = (
 
   /**
    * リクエストURIが `/foo/{id}/bar` のとき
-   * `/foo/{id}` > `/foo` の順にresourceIdを検索する
+   * `/foo/{id}/bar` > `/foo/{id}` > `/foo` の順にresourceIdを検索する
    */
   let lastIndex, parentResourceId;
   let parentUri = uri;
-  while ((lastIndex = parentUri.lastIndexOf('/')) > 0) {
+  do {
     parentUri = parentUri.slice(0, lastIndex);
-    const parentOperationId = findOperationId(
-      parentUri,
-      API_METHOD.GET,
-      apiDefinition
-    );
-    parentResourceId = parentOperationId
-      ? findResourceId(parentOperationId, apiDefinition)
-      : null;
+    Object.values(API_METHOD).some((method) => {
+      const oid = findOperationId(parentUri, method, apiDefinition);
+      parentResourceId = oid ? findResourceId(oid, apiDefinition) : null;
+      return !!parentResourceId;
+    });
     if (parentResourceId) {
       debug(
         'Hit parent uri. %s:%s, ResourceId: %s',
@@ -313,7 +320,7 @@ export const getResourceId = (
       );
       break;
     }
-  }
+  } while ((lastIndex = parentUri.lastIndexOf('/')) > 0);
   if (parentResourceId) {
     return parentResourceId;
   }

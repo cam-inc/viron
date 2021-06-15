@@ -80,7 +80,7 @@ describe('domains/oas', () => {
               {
                 operationId: 'listBlog',
                 resourceId: 'blog',
-                style: 'table',
+                type: 'table',
               },
             ],
           },
@@ -93,7 +93,7 @@ describe('domains/oas', () => {
               {
                 operationId: 'listUserBlog',
                 resourceId: 'userblog',
-                style: 'table',
+                type: 'table',
                 actions: [
                   {
                     operationId: 'uploadUserBlog',
