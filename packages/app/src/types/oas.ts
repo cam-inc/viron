@@ -55,6 +55,12 @@ export type Info = {
       operationId: OperationId;
       defaultParametersValue?: RequestParametersValue;
       defaultRequestBodyValue?: RequestRequestBodyValue;
+      autoRefreshSec?: number;
+      actions?: {
+        operationId: OperationId;
+        defaultParametersValue?: RequestParametersValue;
+        defaultRequestBodyValue?: RequestRequestBodyValue;
+      }[];
     }[];
   }[];
   // [extended] Common setting for page contents that are type of table.
@@ -69,6 +75,11 @@ export type Info = {
     sort?: {
       requestKey: string;
     };
+  };
+  // [extended] Common setting for autocomplete function.
+  'x-autocomplete'?: {
+    responseLabelKey?: string;
+    responseValueKey: string;
   };
 };
 
@@ -369,6 +380,8 @@ export type Schema = {
   example?: any;
   // Default to false.
   deprecated?: boolean;
+  // [extended] To enable autocomplete functionality.
+  'x-autocomplete'?: OperationId;
 };
 
 // When request bodies or response payloads may be one of a number of different schemas, a discriminator object can be used to aid in serialization, deserialization, and validation.
