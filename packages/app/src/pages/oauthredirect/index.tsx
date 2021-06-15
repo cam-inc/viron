@@ -29,6 +29,10 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
     throw new Error('Endoint Not Found.');
   }
 
+  if (!endpoint.isPrivate || !endpoint.authConfigs) {
+    throw new Error('Endoint Not Found.');
+  }
+
   const authConfig = endpoint.authConfigs.find(function (authConfig) {
     return authConfig.type === 'oauthcallback';
   });

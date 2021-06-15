@@ -96,7 +96,7 @@ const Endpoint: React.FC<Props> = ({ id }) => {
               <span>connect</span>
             </button>
           )}
-          {endpoint.isPrivate && isSigninRequired && (
+          {endpoint.isPrivate && !!endpoint.authConfigs && isSigninRequired && (
             <React.Fragment>
               {endpoint.authConfigs
                 .filter((authConfig) => authConfig.type !== 'signout')
@@ -118,7 +118,7 @@ const Endpoint: React.FC<Props> = ({ id }) => {
                 })}
             </React.Fragment>
           )}
-          {endpoint.isPrivate && !isSigninRequired && (
+          {endpoint.isPrivate && !!endpoint.authConfigs && !isSigninRequired && (
             <React.Fragment>
               <button onClick={handleConnectButtonClick}>
                 <AiFillApi className="inline" />
