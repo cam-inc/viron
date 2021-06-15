@@ -37,7 +37,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
         return null;
       }
       // TODO: key名をtypeに変更
-      // switch (content.style) {
+      //switch (content.style) {
       switch (content.type) {
         case 'number':
           return (
