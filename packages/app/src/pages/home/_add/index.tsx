@@ -24,13 +24,12 @@ const Add: React.FC<Props> = () => {
       url: url.required(),
     });
   }, []);
-
   const { register, handleSubmit, formState, setError, reset } =
     useForm<FormData>({
       resolver: yupResolver(schema),
     });
-
   const [endpointList, setEndpointList] = useRecoilState(endpointListState);
+
   const addEndpoint = useCallback(
     async function (data: FormData): Promise<void> {
       // Duplication check.
@@ -61,29 +60,30 @@ const Add: React.FC<Props> = () => {
         return;
       }
 
-      // The response.ok being true means the response.status is 2xx.
+      // The response.ok being true means that the response.status is 2xx.
       // The endpoint exists and it's open to public.
       if (response.ok) {
-        const document: Record<string, unknown> = await response.json();
+        const document: Record<string, any> = await response.json();
         const { isValid } = lint(document);
-        if (isValid) {
-          setEndpointList(function (currVal) {
-            const endpoint: Endpoint = {
-              id: data.endpointId,
-              url: data.url,
-              isPrivate: false,
-              authConfigs: [],
-              document: resolve(document),
-            };
-            return [...currVal, endpoint];
-          });
-          reset();
-        } else {
+        if (!isValid) {
           setError('url', {
             type: 'manual',
             message: 'The OAS Document is not of version we support.',
           });
+          return;
         }
+        setEndpointList(function (currVal) {
+          const endpoint: Endpoint = {
+            id: data.endpointId,
+            url: data.url,
+            isPrivate: false,
+            authConfigs: null,
+            document: resolve(document),
+          };
+          return [...currVal, endpoint];
+        });
+        // Clear errors and input data.
+        reset();
         return;
       }
 
@@ -91,11 +91,11 @@ const Add: React.FC<Props> = () => {
       // The endpoint exists and it's not open to public.
       if (!response.ok && response.status === 401) {
         const authconfigsPath = response.headers.get('x-viron-authtypes-path');
+        // TODO: 値のundefinedチェックに加えて、値の妥当性もチェックすること。
         if (!authconfigsPath) {
-          // TODO: error.
+          // TODO: エラー表示。Viron仕様上、'x-viron-authtypes-path'レスポンスヘッダーは必須。
           return;
         }
-        // TODO: ここもPathsObjectが必要そう。
         const [authconfigsResponse, authconfigsResponseError] =
           await promiseErrorHandler(
             fetch(`${new URL(data.url).origin}${authconfigsPath}`, {
@@ -107,8 +107,10 @@ const Add: React.FC<Props> = () => {
           // TODO: show error.
           return;
         }
+        // TODO: GET /authconfigsのレスポンスをフラットなAuthConfig[]に変更したい。
         const authConfigs: { list: AuthConfig[] } =
           await authconfigsResponse.json();
+        // TODO: authConfigs.list値の妥当性をチェックする。
         setEndpointList(function (currVal) {
           const endpoint: Endpoint = {
             id: data.endpointId,
@@ -123,7 +125,8 @@ const Add: React.FC<Props> = () => {
         return;
       }
 
-      // The endpoint doesn't exist.
+      // Something went wrong.
+      // response.ok is false and response.status is other than 401.
       // TODO: show error.
       return;
     },
