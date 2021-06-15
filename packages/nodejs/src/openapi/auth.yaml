@@ -48,6 +48,8 @@ paths:
       responses:
         301:
           description: Redirect to Google OAuth URL.
+      x-authconfig-default-parameters:
+        redirectUri: '${oauthRedirectURI}'
 
   /oauth2/google/callback:
     post:
@@ -65,6 +67,8 @@ paths:
       responses:
         204:
           description: No Content.
+      x-authconfig-default-requestBody:
+        redirectUri: '${oauthRedirectURI}'
 
 components:
   parameters:
@@ -102,6 +106,10 @@ components:
         state:
           description: CSRF対策用のステートパラメータ
           type: string
+        redirectUri:
+          description: GoogleOAuth2コールバックURI
+          type: string
       required:
         - code
         - state
+        - redirectUri

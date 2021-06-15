@@ -1,3 +1,4 @@
+import http from 'http';
 import express, { Express } from 'express';
 import errorHandler from 'errorhandler';
 import compression from 'compression';
@@ -30,18 +31,24 @@ declare global {
   }
 }
 
-interface ApiExegesisIncomingMessage extends HttpIncomingMessage {
+interface ExegesisIncomingMessage extends HttpIncomingMessage {
   path: string;
   cookies: Record<string, string>;
   _context: RequestContext;
 }
 
+interface ExegesisServerResponse extends http.ServerResponse {
+  clearCookie: (key: string) => void;
+}
+
 export interface RouteContext extends ExegesisContext {
-  req: ApiExegesisIncomingMessage;
+  req: ExegesisIncomingMessage;
+  origRes: ExegesisServerResponse;
 }
 
 export interface PluginContext extends ExegesisPluginContext {
-  req: ApiExegesisIncomingMessage;
+  req: ExegesisIncomingMessage;
+  origRes: ExegesisServerResponse;
 }
 
 export const createApplication = async (): Promise<Express> => {

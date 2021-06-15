@@ -104,7 +104,7 @@ class RepositoryContainer {
 
     this.initialized = true;
     this.casbinSyncedTime = Date.now();
-    this.casbin.enableLog(true);
+    //this.casbin.enableLog(true);
     return this;
   }
 

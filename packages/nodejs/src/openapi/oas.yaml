@@ -3,7 +3,7 @@ info:
   version: 0.0.1
   title: '@viron/lib oas'
   description: oas api specifications
-  # style=tableの仕様定義
+  # type=tableの仕様定義
   x-table:
     responseListKey: list # リストデータを返すキー
     pager:

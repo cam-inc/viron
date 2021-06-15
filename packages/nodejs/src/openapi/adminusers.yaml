@@ -12,7 +12,7 @@ info:
       contents:
         - operationId: listVironAdminUsers
           resourceId: vironAdminUser
-          style: table
+          type: table
           query:
             - id
             - roleId

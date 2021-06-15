@@ -11,7 +11,7 @@ info:
       contents:
         - operationId: listUsers
           resourceId: user
-          style: table
+          type: table
           pagination: true
           query:
             - id

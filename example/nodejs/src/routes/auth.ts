@@ -12,6 +12,7 @@ import { ctx } from '../context';
 // サインアウト
 export const signout = async (context: RouteContext): Promise<void> => {
   const token = context.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
+  context.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
   await domainsAuth.signout(token);
   context.res.status(204).end();
 };
@@ -50,7 +51,7 @@ export const oauth2GoogleCallback = async (
   context: RouteContext
 ): Promise<void> => {
   const cookieState = context.req.cookies[COOKIE_KEY.OAUTH2_STATE];
-  const { code, state } = context.requestBody;
+  const { code, state, redirectUri } = context.requestBody;
 
   if (!cookieState || !state || cookieState !== state) {
     throw mismatchState();
@@ -58,6 +59,7 @@ export const oauth2GoogleCallback = async (
 
   const token = await domainsAuth.signinGoogleOAuth2(
     code,
+    redirectUri,
     ctx.config.auth.googleOAuth2
   );
   context.res.setHeader(
