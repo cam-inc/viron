@@ -31,6 +31,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     fetch: fetchContentData,
     request,
   } = useContent(endpoint, document, content);
+
   const elm = useMemo<JSX.Element | null>(
     function () {
       if (!responseJson) {

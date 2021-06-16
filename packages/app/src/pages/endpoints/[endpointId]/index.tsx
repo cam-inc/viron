@@ -46,6 +46,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         setIsPending(false);
         return;
       }
+
       if (!response.ok) {
         // The authorization cookie is not valid.
         setError(`${response.status}: ${response.statusText}`);
@@ -53,7 +54,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return;
       }
 
-      const document: Record<string, unknown> = await response.json();
+      const document: Record<string, any> = await response.json();
       const { isValid, errors } = lint(document);
       if (!isValid) {
         setError(

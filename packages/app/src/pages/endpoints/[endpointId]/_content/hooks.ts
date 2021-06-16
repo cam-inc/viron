@@ -1,9 +1,17 @@
 import _ from 'lodash';
-import { Dispatch, SetStateAction, useState, useCallback } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { Endpoint } from '$types/index';
 import {
   Document,
   Info,
+  Method,
+  OperationId,
   Request,
   RequestPayloadParameter,
   RequestPayloadRequestBody,
@@ -15,7 +23,9 @@ import {
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
+  getPathItem,
   getRequest,
+  pickMediaType,
 } from '$utils/oas';
 
 export const useContent = function <R>(
@@ -34,6 +44,7 @@ export const useContent = function <R>(
   request: Request | null;
   requestValue: RequestValue;
   setRequestValue: Dispatch<SetStateAction<RequestValue>>;
+  relatedOperationIds: OperationId[];
 } {
   const request = getRequest(document, { operationId: content.operationId });
   if (!request) {
@@ -99,6 +110,118 @@ export const useContent = function <R>(
     [endpoint, document, request]
   );
 
+  // Related Opeartions are
+  // [1] operations that have same path as base operation.
+  // [2] action operations whose request payload key set doesn't contain one of base operation's response payload keys.
+  const relatedOperationIds = useMemo<OperationId[]>(function () {
+    const _relatedOperationIds: OperationId[] = [];
+    const baseOperatioId = content.operationId;
+
+    const baseRequest = getRequest(document, { operationId: baseOperatioId });
+    if (!baseRequest) {
+      return _relatedOperationIds;
+    }
+
+    const basePathItem = getPathItem(document, baseRequest.path);
+    if (!basePathItem) {
+      return _relatedOperationIds;
+    }
+    // Add operations under the rule of [1] described above.
+    // TODO: method一覧の扱い改善。
+    (
+      [
+        'get',
+        'put',
+        'post',
+        'delete',
+        'options',
+        'head',
+        'patch',
+        'trace',
+      ] as Method[]
+    ).forEach(function (method) {
+      if (method === baseRequest.method) {
+        return;
+      }
+      const operationId = basePathItem[method]?.operationId;
+      if (!operationId) {
+        return;
+      }
+      _relatedOperationIds.push(operationId);
+    });
+
+    // Add operations under the rule of [2] described above.
+    if (content.actions) {
+      const baseOperationResponseKeys = (function (): string[] {
+        const ret: string[] = [];
+        if (!baseRequest.operation.responses) {
+          return ret;
+        }
+        // TODO: defaultや他status codeも考慮すること。
+        const response = baseRequest.operation.responses['200'];
+        if (!response || !response.content) {
+          return ret;
+        }
+        const mediaType = pickMediaType(response.content);
+        if (!mediaType.schema) {
+          return ret;
+        }
+        switch (content.type) {
+          case 'table': {
+            if (!mediaType.schema.properties) {
+              return ret;
+            }
+            const listKey = document.info['x-table']?.responseListKey;
+            if (!listKey) {
+              return ret;
+            }
+            const properties = mediaType.schema.properties[listKey].properties;
+            if (!properties) {
+              return ret;
+            }
+            ret.push(..._.keys(properties));
+            break;
+          }
+          case 'number':
+          case 'custom':
+            break;
+          default:
+            // TODO: どーする？
+            throw new Error('TODO: 考慮忘れしてるよ');
+        }
+        return ret;
+      })();
+      content.actions.forEach(function (action) {
+        const actionOperationRequestKeys = (function (): string[] {
+          const ret: string[] = [];
+          const request = getRequest(document, {
+            operationId: action.operationId,
+          });
+          if (!request) {
+            return ret;
+          }
+          if (!request.operation.parameters) {
+            return ret;
+          }
+          ret.push(
+            ...request.operation.parameters.map(function (parameter) {
+              return parameter.name;
+            })
+          );
+          return ret;
+        })();
+
+        if (
+          _.intersection(baseOperationResponseKeys, actionOperationRequestKeys)
+            .length === 0
+        ) {
+          _relatedOperationIds.push(action.operationId);
+        }
+      });
+    }
+    return _relatedOperationIds;
+  }, []);
+
   return {
     isPending,
     error,
@@ -108,5 +231,6 @@ export const useContent = function <R>(
     request,
     requestValue,
     setRequestValue,
+    relatedOperationIds,
   };
 };

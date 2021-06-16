@@ -3,12 +3,15 @@ import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
 import {
+  Content,
   Document,
   Info,
+  MediaType,
   Method,
   Operation,
   OperationId,
   Parameter,
+  PathItem,
   Paths,
   Request,
   RequestBody,
@@ -82,6 +85,13 @@ export const constructFakeDocument = function ({
     paths,
   };
   return doc;
+};
+
+export const getPathItem = function (
+  document: Document,
+  path: string
+): PathItem | null {
+  return document.paths[path] || null;
 };
 
 export const getRequest = function (
@@ -410,6 +420,7 @@ export const constructRequestPayloadRequestBody = function (
   return requestPayloadRequestBody;
 };
 
+// TODO: renameしたい。
 export const convert = function (
   value: RequestPayloadRequestBody['value'],
   contentType: string
@@ -465,9 +476,12 @@ export const getURLToTargetHost = function (
   return url;
 };
 
-export const pickContentType = function (
-  content: RequestBody['content']
-): string {
+export const pickMediaType = function (content: Content): MediaType {
+  const contentType = pickContentType(content);
+  return content[contentType];
+};
+
+export const pickContentType = function (content: Content): string {
   // TODO: pick the most specific key.
   return _.keys(content)[0];
 };
