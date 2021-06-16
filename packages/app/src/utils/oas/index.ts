@@ -3,12 +3,15 @@ import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
 import { Endpoint, URL } from '$types/index';
 import {
+  Content,
   Document,
   Info,
+  MediaType,
   Method,
   Operation,
   OperationId,
   Parameter,
+  PathItem,
   Paths,
   Request,
   RequestBody,
@@ -82,6 +85,13 @@ export const constructFakeDocument = function ({
     paths,
   };
   return doc;
+};
+
+export const getPathItem = function (
+  document: Document,
+  path: string
+): PathItem | null {
+  return document.paths[path] || null;
 };
 
 export const getRequest = function (
@@ -178,6 +188,76 @@ export const getRequestByOperationId = function (
   };
 };
 
+export const getRequestParameterKeys = function (
+  document: Document,
+  operationId: OperationId
+): string[] {
+  const ret: string[] = [];
+  const request = getRequest(document, {
+    operationId,
+  });
+  if (!request) {
+    return ret;
+  }
+  if (!request.operation.parameters) {
+    return ret;
+  }
+  ret.push(
+    ...request.operation.parameters.map(function (parameter) {
+      return parameter.name;
+    })
+  );
+  return ret;
+};
+
+// This function doesn't return all keys in a response object. It guesses which key to be returned. For example if content.type is `table`, it collects all keys of a property specified by Info['x-table'].responseListKey.
+export const getContentBaseOperationResponseKeys = function (
+  document: Document,
+  content: Info['x-pages'][number]['contents'][number]
+): string[] {
+  const ret: string[] = [];
+  const request = getRequest(document, { operationId: content.operationId });
+  if (!request) {
+    return ret;
+  }
+  if (!request.operation.responses) {
+    return ret;
+  }
+  // TODO: defaultや他status codeも考慮すること。
+  const response = request.operation.responses['200'];
+  if (!response || !response.content) {
+    return ret;
+  }
+  const mediaType = pickMediaType(response.content);
+  if (!mediaType.schema) {
+    return ret;
+  }
+  switch (content.type) {
+    case 'table': {
+      if (!mediaType.schema.properties) {
+        return ret;
+      }
+      const listKey = document.info['x-table']?.responseListKey;
+      if (!listKey) {
+        return ret;
+      }
+      const properties = mediaType.schema.properties[listKey].properties;
+      if (!properties) {
+        return ret;
+      }
+      ret.push(..._.keys(properties));
+      break;
+    }
+    case 'number':
+    case 'custom':
+      break;
+    default:
+      // TODO: どーする？
+      throw new Error('TODO: 考慮忘れしてるよ');
+  }
+  return ret;
+};
+
 export const parseURITemplate = function (
   template: string,
   pathParams: { [key in string]: string }
@@ -188,7 +268,7 @@ export const parseURITemplate = function (
   return template;
 };
 
-export const constructDefaultValues = function (
+export const cleanupRequestValue = function (
   request: Request,
   values: RequestValue = {}
 ): RequestValue {
@@ -410,6 +490,7 @@ export const constructRequestPayloadRequestBody = function (
   return requestPayloadRequestBody;
 };
 
+// TODO: renameしたい。
 export const convert = function (
   value: RequestPayloadRequestBody['value'],
   contentType: string
@@ -465,9 +546,12 @@ export const getURLToTargetHost = function (
   return url;
 };
 
-export const pickContentType = function (
-  content: RequestBody['content']
-): string {
+export const pickMediaType = function (content: Content): MediaType {
+  const contentType = pickContentType(content);
+  return content[contentType];
+};
+
+export const pickContentType = function (content: Content): string {
   // TODO: pick the most specific key.
   return _.keys(content)[0];
 };

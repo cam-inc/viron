@@ -10,7 +10,7 @@ import { EndpointID } from '$types/index';
 import { Document, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
-  constructDefaultValues,
+  cleanupRequestValue,
   constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
@@ -26,6 +26,10 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
   const [endpoint] = useRecoilState(endpointOneState({ id: endpointId }));
 
   if (!endpoint) {
+    throw new Error('Endoint Not Found.');
+  }
+
+  if (!endpoint.isPrivate || !endpoint.authConfigs) {
     throw new Error('Endoint Not Found.');
   }
 
@@ -45,7 +49,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
     throw new Error('TODO');
   }
 
-  const defaultValues = constructDefaultValues(request, {
+  const defaultValues = cleanupRequestValue(request, {
     parameters: queries,
   });
 

@@ -1,8 +1,7 @@
 import React from 'react';
-import { ContentGetResponseOfTypeOfNumber } from '$types/oas';
 
 type Props = {
-  data: ContentGetResponseOfTypeOfNumber;
+  data: any;
 };
 const _ContentTable: React.FC<Props> = ({ data }) => {
   return (

@@ -419,6 +419,11 @@ export type Responses = {
   [key: string]: Response;
 };
 
+// A map containing descriptions of potential response payloads. The key is a media type or media type range and the value describes it. For responses that match multiple keys, only the most specific key is applicable. e.g. text/plain overrides text/*
+export type Content = {
+  [key: string]: MediaType;
+};
+
 // [extendable] Describes a single response from an API Operation, including design-time, static links to operations based on the response.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#response-object
 export type Response = {
@@ -427,9 +432,7 @@ export type Response = {
     [key: string]: Header;
   };
   // A map containing descriptions of potential response payloads.
-  content?: {
-    [key: string]: MediaType;
-  };
+  content?: Content;
   links: {
     [key: string]: Link;
   };
@@ -466,10 +469,8 @@ export type Parameter = {
     }
   | {
       schema?: never;
-      content: {
-        // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
-        [key: string]: MediaType;
-      };
+      // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
+      content: Content;
     }
 );
 
@@ -496,9 +497,7 @@ export type Example = {
 // [Extendable] Describes a single request body.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#request-body-object
 export type RequestBody = {
-  content: {
-    [key: string]: MediaType;
-  };
+  content: Content;
   description?: string | CommonMark;
   required?: boolean;
 };
@@ -617,10 +616,4 @@ export type Extension = {
   // key must begin with "x-".
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
-};
-
-// All types of content get responses.
-// Type of `number`.
-export type ContentGetResponseOfTypeOfNumber = {
-  value: number;
 };

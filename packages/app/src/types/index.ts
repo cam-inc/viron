@@ -6,13 +6,16 @@ export type Pathname = string;
 export type EMail = string;
 
 export type EndpointID = string;
-
 export type Endpoint = {
   id: EndpointID;
   url: URL;
   isPrivate: boolean;
-  authConfigs: AuthConfig[];
+  authConfigs: AuthConfig[] | null;
   document: Document | null;
+};
+export type EndpointForDistribution = Endpoint & {
+  authConfigs: null;
+  document: null;
 };
 
 export type ClassName = string;
