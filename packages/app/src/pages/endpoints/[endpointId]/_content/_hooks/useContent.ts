@@ -17,6 +17,7 @@ import {
   constructRequestPayloads,
   getRequest,
 } from '$utils/oas';
+import useAutoRefresh, { UseAutoRefreshReturn } from './useAutoRefresh';
 import useRelated, { UseRelatedReturn } from './useRelated';
 import useRelatedDescendant, {
   UseRelatedDescendantReturn,
@@ -40,6 +41,7 @@ const useContent = function <R>(
   setRequestValue: Dispatch<SetStateAction<RequestValue>>;
   related: UseRelatedReturn;
   relatedDescendant: UseRelatedDescendantReturn;
+  autoRefresh: UseAutoRefreshReturn;
 } {
   const request = getRequest(document, { operationId: content.operationId });
   if (!request) {
@@ -107,6 +109,7 @@ const useContent = function <R>(
 
   const related = useRelated(document, content);
   const relatedDescendant = useRelatedDescendant(document, content);
+  const autoRefresh = useAutoRefresh(content);
 
   return {
     isPending,
@@ -119,6 +122,7 @@ const useContent = function <R>(
     setRequestValue,
     related,
     relatedDescendant,
+    autoRefresh,
   };
 };
 

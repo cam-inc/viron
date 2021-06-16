@@ -30,12 +30,10 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     responseJson,
     fetch: fetchContentData,
     request,
-    related,
-    relatedDescendant,
+    //related,
+    //relatedDescendant,
+    autoRefresh,
   } = useContent(endpoint, document, content);
-
-  console.log('related: ', related);
-  console.log('relatedDescendant: ', relatedDescendant);
 
   const elm = useMemo<JSX.Element | null>(
     function () {
@@ -66,6 +64,23 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     fetchContentData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto Refresh.
+  useEffect(
+    function () {
+      let intervalId: number;
+      const cleanup = function () {
+        window.clearInterval(intervalId);
+      };
+      if (autoRefresh.enabled) {
+        intervalId = window.setInterval(function () {
+          fetchContentData();
+        }, autoRefresh.intervalSec);
+      }
+      return cleanup;
+    },
+    [fetchContentData, autoRefresh.enabled, autoRefresh.intervalSec]
+  );
 
   const drawer = useDrawer();
   const handlePayloadButtonClick = function () {
