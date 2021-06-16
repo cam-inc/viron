@@ -29,7 +29,14 @@ Autocompleteについて。
                 properties: {
                   userId: {
                     type: 'string',// リスト取得APIレスポンス配列の要素のresponseValueKey値と同一のtypeにすること。
-                    'x-autocomplete': 'getAutocompleteUsers'// リスト取得APIのOperationIDを指定
+                    'x-autocomplete': {
+                      operationId: 'getAutocompleteUsers'// リスト取得APIのOperationIDを指定
+                      defaultParametersValue: {
+                        b: '${autocompleteValue}',
+                        x: 111,
+                      },
+                      defaultRequestBodyValue?: any;
+                    }
                   }
                 }
               }
@@ -42,12 +49,19 @@ Autocompleteについて。
       get: {
         operationId: 'getAutocompleteUsers',
         parameters: [
-          // １件のみ存在する想定。
+          // '${autocompleteValue}'で受け取る用のparameterを必ず含めること。
           {
-            name: 'b',// 値に対して特に縛り無し。
+            name: 'b',
             in: 'query',// なんでもいいけど、普通はqueryでしょ。
             schema: {
               type: 'string',// /followersの'x-autocomplete'を指定しているプロパティと同一のtypeにすること。
+            }
+          },
+          {
+            name: 'x',
+            in: 'query',
+            schema: {
+              type: 'number',
             }
           }
         ],
