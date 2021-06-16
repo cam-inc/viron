@@ -17,7 +17,6 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     base,
     //related,
     //relatedDescendant,
-    autoRefresh,
   } = useContent(endpoint, document, content);
 
   const elm = useMemo<JSX.Element | null>(
@@ -32,28 +31,6 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
       }
     },
     [content.type, base.data]
-  );
-
-  // Auto Refresh.
-  useEffect(
-    function () {
-      let intervalId: number;
-      const cleanup = function () {
-        window.clearInterval(intervalId);
-      };
-      if (autoRefresh.enabled) {
-        intervalId = window.setInterval(function () {
-          base.fetch(base.requestValue);
-        }, autoRefresh.intervalSec);
-      }
-      return cleanup;
-    },
-    [
-      base.fetch,
-      base.requestValue,
-      autoRefresh.enabled,
-      autoRefresh.intervalSec,
-    ]
   );
 
   const drawer = useDrawer();
