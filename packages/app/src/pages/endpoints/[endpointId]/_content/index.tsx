@@ -2,17 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { Endpoint } from '$types/index';
-import {
-  ContentGetResponseOfTypeOfNumber,
-  Document,
-  Info,
-  RequestValue,
-} from '$types/oas';
-import {
-  constructRequestInfo,
-  constructRequestInit,
-  constructRequestPayloads,
-} from '$utils/oas/index';
+import { Document, Info, RequestValue } from '$types/oas';
 import useContent from './_hooks/useContent';
 import _ContentNumber from './_number/index';
 import _ContentTable from './_table/index';
