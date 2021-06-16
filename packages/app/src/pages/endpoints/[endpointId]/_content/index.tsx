@@ -9,7 +9,6 @@ import {
   RequestValue,
 } from '$types/oas';
 import {
-  constructDefaultValues,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
@@ -25,11 +24,7 @@ type Props = {
 };
 const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
   const {
-    isPending,
-    error,
-    responseJson,
-    fetch: fetchContentData,
-    request,
+    base,
     //related,
     //relatedDescendant,
     autoRefresh,
@@ -37,33 +32,17 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
 
   const elm = useMemo<JSX.Element | null>(
     function () {
-      if (!responseJson) {
-        return null;
-      }
       switch (content.type) {
         case 'number':
-          return (
-            <_ContentNumber
-              data={responseJson as ContentGetResponseOfTypeOfNumber}
-            />
-          );
+          return <_ContentNumber data={base.data} />;
         case 'table':
-          return (
-            <_ContentTable
-              data={responseJson as ContentGetResponseOfTypeOfNumber}
-            />
-          );
+          return <_ContentTable data={base.data} />;
         default:
           return null;
       }
     },
-    [responseJson, content]
+    [content.type, base.data]
   );
-
-  useEffect(function () {
-    fetchContentData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Auto Refresh.
   useEffect(
@@ -74,12 +53,17 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
       };
       if (autoRefresh.enabled) {
         intervalId = window.setInterval(function () {
-          fetchContentData();
+          base.fetch(base.requestValue);
         }, autoRefresh.intervalSec);
       }
       return cleanup;
     },
-    [fetchContentData, autoRefresh.enabled, autoRefresh.intervalSec]
+    [
+      base.fetch,
+      base.requestValue,
+      autoRefresh.enabled,
+      autoRefresh.intervalSec,
+    ]
   );
 
   const drawer = useDrawer();
@@ -89,53 +73,29 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
 
   const handleRequestSubmit = useCallback(
     function (requestValue: RequestValue) {
-      if (!request) {
-        return;
-      }
-      const requestPayloads = constructRequestPayloads(
-        request.operation,
-        requestValue
-      );
-      const requestInfo: RequestInfo = constructRequestInfo(
-        endpoint,
-        document,
-        request,
-        requestPayloads
-      );
-      const requestInit: RequestInit = constructRequestInit(
-        request,
-        requestPayloads
-      );
       drawer.requestClose();
-      fetch(requestInfo, requestInit);
+      base.fetch(requestValue);
     },
-    [drawer, drawer.requestClose, fetch]
+    [drawer, drawer.requestClose, base.fetch]
   );
-  if (isPending) {
+
+  if (base.isPending) {
     return <p>fetching data...</p>;
   }
-  if (!!error) {
-    return <p>error: {error.message}</p>;
+  if (base.error) {
+    return <p>error: {base.error.message}</p>;
   }
-  if (!responseJson) {
+  if (!base.data) {
     return <p>no response.</p>;
   }
-  if (!request) {
-    return <p>no request object.</p>;
-  }
-
-  const defaultValues = constructDefaultValues(request, {
-    parameters: content.defaultParametersValue,
-    requestBody: content.defaultRequestBodyValue,
-  });
 
   return (
     <div className="p-2 bg-gray-100">
       <button onClick={handlePayloadButtonClick}>payload</button>
       <Drawer {...drawer.bind}>
         <Request
-          request={request}
-          defaultValues={defaultValues}
+          request={base.request}
+          defaultValues={base.requestValue}
           onSubmit={handleRequestSubmit}
         />
       </Drawer>

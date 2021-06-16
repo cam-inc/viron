@@ -10,7 +10,7 @@ import { EndpointID } from '$types/index';
 import { Document, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
-  constructDefaultValues,
+  cleanupRequestValue,
   constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
@@ -49,7 +49,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
     throw new Error('TODO');
   }
 
-  const defaultValues = constructDefaultValues(request, {
+  const defaultValues = cleanupRequestValue(request, {
     parameters: queries,
   });
 

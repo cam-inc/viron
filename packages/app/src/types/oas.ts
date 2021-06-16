@@ -617,9 +617,3 @@ export type Extension = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
-
-// All types of content get responses.
-// Type of `number`.
-export type ContentGetResponseOfTypeOfNumber = {
-  value: number;
-};

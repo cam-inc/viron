@@ -268,7 +268,7 @@ export const parseURITemplate = function (
   return template;
 };
 
-export const constructDefaultValues = function (
+export const cleanupRequestValue = function (
   request: Request,
   values: RequestValue = {}
 ): RequestValue {
