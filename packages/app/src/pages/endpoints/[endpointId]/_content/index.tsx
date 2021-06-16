@@ -14,7 +14,7 @@ import {
   constructRequestInit,
   constructRequestPayloads,
 } from '$utils/oas/index';
-import { useContent } from './hooks';
+import useContent from './_hooks/useContent';
 import _ContentNumber from './_number/index';
 import _ContentTable from './_table/index';
 
@@ -30,7 +30,12 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     responseJson,
     fetch: fetchContentData,
     request,
+    related,
+    relatedDescendant,
   } = useContent(endpoint, document, content);
+
+  console.log('related: ', related);
+  console.log('relatedDescendant: ', relatedDescendant);
 
   const elm = useMemo<JSX.Element | null>(
     function () {

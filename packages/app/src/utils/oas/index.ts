@@ -188,6 +188,76 @@ export const getRequestByOperationId = function (
   };
 };
 
+export const getRequestParameterKeys = function (
+  document: Document,
+  operationId: OperationId
+): string[] {
+  const ret: string[] = [];
+  const request = getRequest(document, {
+    operationId,
+  });
+  if (!request) {
+    return ret;
+  }
+  if (!request.operation.parameters) {
+    return ret;
+  }
+  ret.push(
+    ...request.operation.parameters.map(function (parameter) {
+      return parameter.name;
+    })
+  );
+  return ret;
+};
+
+// This function doesn't return all keys in a response object. It guesses which key to be returned. For example if content.type is `table`, it collects all keys of a property specified by Info['x-table'].responseListKey.
+export const getContentBaseOperationResponseKeys = function (
+  document: Document,
+  content: Info['x-pages'][number]['contents'][number]
+): string[] {
+  const ret: string[] = [];
+  const request = getRequest(document, { operationId: content.operationId });
+  if (!request) {
+    return ret;
+  }
+  if (!request.operation.responses) {
+    return ret;
+  }
+  // TODO: defaultや他status codeも考慮すること。
+  const response = request.operation.responses['200'];
+  if (!response || !response.content) {
+    return ret;
+  }
+  const mediaType = pickMediaType(response.content);
+  if (!mediaType.schema) {
+    return ret;
+  }
+  switch (content.type) {
+    case 'table': {
+      if (!mediaType.schema.properties) {
+        return ret;
+      }
+      const listKey = document.info['x-table']?.responseListKey;
+      if (!listKey) {
+        return ret;
+      }
+      const properties = mediaType.schema.properties[listKey].properties;
+      if (!properties) {
+        return ret;
+      }
+      ret.push(..._.keys(properties));
+      break;
+    }
+    case 'number':
+    case 'custom':
+      break;
+    default:
+      // TODO: どーする？
+      throw new Error('TODO: 考慮忘れしてるよ');
+  }
+  return ret;
+};
+
 export const parseURITemplate = function (
   template: string,
   pathParams: { [key in string]: string }
