@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { Endpoint } from '$types/index';
@@ -33,6 +33,10 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     [content.type, base.data]
   );
 
+  const handleRefreshButtonClick = function () {
+    base.refresh();
+  };
+
   const drawer = useDrawer();
   const handlePayloadButtonClick = function () {
     drawer.open();
@@ -58,7 +62,15 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
 
   return (
     <div className="p-2 bg-gray-100">
-      <button onClick={handlePayloadButtonClick}>payload</button>
+      <div className="mb-2">
+        <p>ヘッダー</p>
+        <div>
+          <button onClick={handleRefreshButtonClick}>refresh</button>
+        </div>
+        <div>
+          <button onClick={handlePayloadButtonClick}>payload</button>
+        </div>
+      </div>
       <Drawer {...drawer.bind}>
         <Request
           request={base.request}
