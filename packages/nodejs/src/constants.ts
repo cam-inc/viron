@@ -97,6 +97,7 @@ export const OAS_X_TABLE = 'x-table';
 export const OAS_X_PAGES = 'x-pages';
 export const OAS_X_PAGE_CONTENTS = 'contents';
 export const OAS_X_PAGE_CONTENT_RESOURCE_ID = 'resourceId';
+export const OAS_X_AUTOCOMPLETE = 'x-autocomplete';
 export const OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS =
   'x-authconfig-default-parameters';
 export const OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY =
