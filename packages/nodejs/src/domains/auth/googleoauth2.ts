@@ -72,7 +72,6 @@ export const getGoogleOAuth2AuthorizationUrl = (
   state: string,
   config: GoogleOAuthConfig
 ): string => {
-  console.log(config);
   const client = getGoogleOAuth2Client(config, redirectUrl);
   const opts = {
     state,
