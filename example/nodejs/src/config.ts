@@ -40,7 +40,7 @@ export interface Config {
   cors: CorsConfig;
   auth: {
     jwt: domainsAuth.JwtConfig;
-    googleOAuth2: domainsAuth.GoogleOAuthClientConfig;
+    googleOAuth2: domainsAuth.GoogleOAuthConfig;
   };
   oas: OasConfig;
 }
@@ -96,7 +96,10 @@ export const get = (mode: Mode): Config => {
       },
       googleOAuth2: {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
+
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
+        additionalScopes: [],
+        userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
       },
     },
     oas: {
