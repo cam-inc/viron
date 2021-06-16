@@ -87,6 +87,10 @@ export const constructFakeDocument = function ({
   return doc;
 };
 
+export const getTableSetting = function (info: Info): Info['x-table'] | null {
+  return info['x-table'] || null;
+};
+
 export const getPathItem = function (
   document: Document,
   path: string
