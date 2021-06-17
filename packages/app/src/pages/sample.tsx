@@ -1,5 +1,5 @@
 import { Link, PageProps } from 'gatsby';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useRecoilState } from 'recoil';
 import Drawer, { useDrawer } from '$components/drawer';
 import Modal, { useModal } from '$components/modal';
@@ -7,6 +7,16 @@ import Popover, { usePopover } from '$components/popover';
 import useTheme from '$hooks/theme';
 import Layout from '$layouts/index';
 import { screenState } from '$store/atoms/app';
+import { isBrowser } from '$utils/index';
+
+const HeavyLazy = React.lazy(function () {
+  return import('$components/heavy');
+});
+
+const Spinner: React.FC = () => {
+  console.log('render: spinner');
+  return <p>spinning...</p>;
+};
 
 type Props = PageProps;
 const SamplePage: React.FC<Props> = () => {
@@ -48,6 +58,14 @@ const SamplePage: React.FC<Props> = () => {
     <Layout>
       <div>
         <p>{JSON.stringify(screen, null, 2)}</p>
+      </div>
+      <div>
+        <p>React.lazyとReact.Suspenseのテスト</p>
+        {isBrowser && (
+          <Suspense fallback={<Spinner />}>
+            <HeavyLazy />
+          </Suspense>
+        )}
       </div>
       <div>
         <p>ThemeとDarkModeのテスト</p>

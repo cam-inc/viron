@@ -1,9 +1,8 @@
-import { PageProps } from 'gatsby';
+import { Link, PageProps } from 'gatsby';
 import React from 'react';
 import { useRecoilState } from 'recoil';
 import useTheme from '$hooks/theme';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { Endpoint as EndpointType } from '$types/index';
 import Add from './_add/index';
 import Endpoint from './_endpoint';
 import Export from './_export';
@@ -16,6 +15,9 @@ const HomePage: React.FC<Props> = () => {
 
   return (
     <div id="page-home">
+      <div>
+        <Link to="/sample">sample</Link>
+      </div>
       <div>
         <p>ThemeとDarkModeのテスト</p>
         <p className="bg-primary-l dark:bg-primary-d">color-primary</p>
