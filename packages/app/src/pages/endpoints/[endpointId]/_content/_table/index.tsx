@@ -4,13 +4,13 @@ import {
   getContentBaseOperationResponseKeys,
   getTableSetting,
 } from '$utils/oas';
-import { UseRelatedDescendantReturn } from '../_hooks/useRelatedDescendant';
+import { UseDescendantsReturn } from '../_hooks/useRelatedDescendant';
 
 type Props = {
   document: Document;
   content: Info['x-pages'][number]['contents'][number];
   data: any;
-  relatedDescendant: UseRelatedDescendantReturn;
+  descendants: UseDescendantsReturn;
 };
 const _ContentTable: React.FC<Props> = ({ document, content, data }) => {
   return <p>明日のりたまさんに</p>;

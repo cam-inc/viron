@@ -109,15 +109,15 @@ slug: /
 }
 ```
 
-## Related Operations
+## Sibling Operations
 
 ベースOperationに関連するOperationのこと。
 ベースOperationとpathが同じでmethodが違うすべてのOperationが対象。
 - `postUsers`
-actionsに指定したOperationのうち、そのOperationのparametersの中にベースOperationのresponse(typeがtableならresponse[Info['x-table'].responseListKey])内のkeyと同じkeyが一つも存在しない場合、それはRelated Operationの対象となる。
+actionsに指定したOperationのうち、そのOperationのparametersの中にベースOperationのresponse(typeがtableならresponse[Info['x-table'].responseListKey])内のkeyと同じkeyが一つも存在しない場合、それはSibling Operationの対象となる。
  - `getCSVUsers`
 
-## Related Descendants Operations
+## Descendant Operations
 
 ベースOperationの子孫っぽく関連するOperationのこと。
 ベースOperationがtable(content.typeがtable)の場合、tableの各rowに関連するであろうOperation。
@@ -125,16 +125,16 @@ actionsに指定したOperationのうち、そのOperationのparametersの中に
  - `getUser`
  - `putUser`
  - `deleteUser`
-actionsに指定したOperationのうち、そのOperationのparametersの中に一つでもベースOperationのresponse(typeがtableならresponse[Info['x-table'].responseListKey])内のkeyと同じkeyが存在する場合、それはRelated Descendants Operationの対象となる。
+actionsに指定したOperationのうち、そのOperationのparametersの中に一つでもベースOperationのresponse(typeがtableならresponse[Info['x-table'].responseListKey])内のkeyと同じkeyが存在する場合、それはDescendant Operationの対象となる。
  - `getCSVUser`
 
-contentのtypeに応じて対象となるOperationに若干の差異がある。例えば、content.typeがnumberの時はRelated Descendants Operationが存在しないはず。
+contentのtypeに応じて対象となるOperationに若干の差異がある。例えば、content.typeがnumberの時はDescendant Operationが存在しないはず。
 
 ## Operationのpayloadについて
 
 ベースOperationのpayloadは、ユーザ入力値に加えて、defaultParametersValueとdefaultRequestBodyValue(`Info['x-pages'][number]['contents'][number].defaultXXXValue`)も使用される。
 
-Related Operationのpayloadは、ユーザ入力値に加えて、ベースOperationと同じdefaultParametersValueとdefaultRequestBodyValueも使用される。
+Sibling Operationのpayloadは、ユーザ入力値に加えて、ベースOperationと同じdefaultParametersValueとdefaultRequestBodyValueも使用される。
 
-Related Descendants Operationのpayloadは、ユーザ入力値に加えて、ベースOperationと同じdefaultParametersValueとdefaultRequestBodyValue、更にベースOperationレスポンスの一部が用いられる。(content.typeがtableの場合は各rowに該当するデータ)
-Related Descendants Operationのparametersはreadonlyとなり、ユーザ入力を受け付けない。
+Descendant Operationのpayloadは、ユーザ入力値に加えて、ベースOperationと同じdefaultParametersValueとdefaultRequestBodyValue、更にベースOperationレスポンスの一部が用いられる。(content.typeがtableの場合は各rowに該当するデータ)
+Descendant Operationのparametersはreadonlyとなり、ユーザ入力を受け付けない。

@@ -2,10 +2,8 @@ import _ from 'lodash';
 import { Endpoint } from '$types/index';
 import { Document, Info } from '$types/oas';
 import useBase, { UseBaseReturn } from './useBase';
-import useRelated, { UseRelatedReturn } from './useRelated';
-import useRelatedDescendant, {
-  UseRelatedDescendantReturn,
-} from './useRelatedDescendant';
+import useSiblings, { UseSiblingsReturn } from './useSiblings';
+import useDescendants, { UseDescendantsReturn } from './useDescendants';
 
 const useContent = function (
   endpoint: Endpoint,
@@ -13,17 +11,17 @@ const useContent = function (
   content: Info['x-pages'][number]['contents'][number]
 ): {
   base: UseBaseReturn;
-  related: UseRelatedReturn;
-  relatedDescendant: UseRelatedDescendantReturn;
+  siblings: UseSiblingsReturn;
+  descendants: UseDescendantsReturn;
 } {
   const base = useBase(endpoint, document, content);
-  const related = useRelated(document, content);
-  const relatedDescendant = useRelatedDescendant(document, content);
+  const siblings = useSiblings(document, content);
+  const descendants = useDescendants(document, content);
 
   return {
     base,
-    related,
-    relatedDescendant,
+    siblings,
+    descendants,
   };
 };
 

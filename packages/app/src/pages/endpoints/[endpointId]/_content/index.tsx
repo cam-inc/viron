@@ -15,7 +15,7 @@ type Props = {
   content: Info['x-pages'][number]['contents'][number];
 };
 const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
-  const { base, related, relatedDescendant } = useContent(
+  const { base, siblings, descendants } = useContent(
     endpoint,
     document,
     content
@@ -47,7 +47,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
               document={document}
               content={content}
               data={base.data}
-              relatedDescendant={relatedDescendant}
+              descendants={descendants}
             />
           );
         default:

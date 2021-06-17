@@ -3,20 +3,21 @@ import { useMemo } from 'react';
 import { Document, Info, Method, OperationId } from '$types/oas';
 import {
   getContentBaseOperationResponseKeys,
+  getPathItem,
   getRequest,
   getRequestParameterKeys,
 } from '$utils/oas';
 
-export type UseRelatedDescendantReturn = {
+export type UseSiblingsReturn = {
   operationIds: OperationId[];
 };
-// Related Descendant Opeartions are
-// [1] operations whose path includes base operation's one at the head.(i.e. path matches `/${baseOperation's path}/xxx/yyy`)
-// [2] action operations whose request payload key set contains one of base operation's response payload keys.
-const useRelatedDescendant = function (
+// Sibling Opeartions are
+// [1] operations whose path is the same as the base operation's one but method is different.
+// [2] action operations whose request payload key set doesn't contain one of base operation's response payload keys.
+const useSiblings = function (
   document: Document,
   content: Info['x-pages'][number]['contents'][number]
-): UseRelatedDescendantReturn {
+): UseSiblingsReturn {
   const operationIds = useMemo<OperationId[]>(function () {
     const _operationIds: OperationId[] = [];
     const baseRequest = getRequest(document, {
@@ -25,31 +26,33 @@ const useRelatedDescendant = function (
     if (!baseRequest) {
       return _operationIds;
     }
+    const basePathItem = getPathItem(document, baseRequest.path);
+    if (!basePathItem) {
+      return _operationIds;
+    }
 
     // Add operations under the rule of [1] described above.
-    const pathItems = _.filter(document.paths, function (_, path) {
-      return path !== baseRequest.path && path.indexOf(baseRequest.path) === 0;
-    });
-    _.each(pathItems, function (pathItem) {
-      // TODO: method一覧の扱い改善。
-      (
-        [
-          'get',
-          'put',
-          'post',
-          'delete',
-          'options',
-          'head',
-          'patch',
-          'trace',
-        ] as Method[]
-      ).forEach(function (method) {
-        const operationId = pathItem[method]?.operationId;
-        if (!operationId) {
-          return;
-        }
-        _operationIds.push(operationId);
-      });
+    // TODO: method一覧の扱い改善。
+    (
+      [
+        'get',
+        'put',
+        'post',
+        'delete',
+        'options',
+        'head',
+        'patch',
+        'trace',
+      ] as Method[]
+    ).forEach(function (method) {
+      if (method === baseRequest.method) {
+        return;
+      }
+      const operationId = basePathItem[method]?.operationId;
+      if (!operationId) {
+        return;
+      }
+      _operationIds.push(operationId);
     });
 
     // Add operations under the rule of [2] described above.
@@ -65,7 +68,7 @@ const useRelatedDescendant = function (
         );
         if (
           _.intersection(baseOperationResponseKeys, actionOperationRequestKeys)
-            .length
+            .length === 0
         ) {
           _operationIds.push(action.operationId);
         }
@@ -79,4 +82,4 @@ const useRelatedDescendant = function (
     operationIds,
   };
 };
-export default useRelatedDescendant;
+export default useSiblings;
