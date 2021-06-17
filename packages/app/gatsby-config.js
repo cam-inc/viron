@@ -41,4 +41,9 @@ module.exports = {
       },
     },
   ],
+  flags: {
+    // @see: https://github.com/gatsbyjs/gatsby/discussions/28331
+    PRESERVE_FILE_DOWNLOAD_CACHE: true,
+    PRESERVE_WEBPACK_CACHE: true,
+  },
 };
