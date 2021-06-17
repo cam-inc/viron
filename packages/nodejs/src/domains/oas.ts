@@ -13,6 +13,7 @@ import { lint } from '@viron/linter';
 import {
   ApiMethod,
   API_METHOD,
+  OAS_X_AUTOCOMPLETE,
   OAS_X_PAGES,
   OAS_X_TABLE,
   OAS_X_TAGS,
@@ -37,6 +38,7 @@ export interface VironInfoObjectExtentions {
   [OAS_X_TAGS]?: string[];
   [OAS_X_TABLE]?: OasXTable;
   [OAS_X_PAGES]?: OasXPages;
+  [OAS_X_AUTOCOMPLETE]?: OasXAutocomplete;
 }
 
 export interface VironInfoObject
@@ -110,6 +112,11 @@ export interface OasXTable {
   responseListKey: string;
   pager: OasXTablePager;
   sort: OasXTableSort;
+}
+
+export interface OasXAutocomplete {
+  responseLabelKey: string;
+  responseValueKey: string;
 }
 
 export type OasNames =

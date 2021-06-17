@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { signJwt } from '.';
 import { AUTH_TYPE, GOOGLE_OAUTH2_DEFAULT_SCOPES } from '../../constants';
 import {
+  forbidden,
   googleOAuth2Unavailable,
   invalidGoogleOAuth2Token,
   signinFailed,
@@ -18,13 +19,18 @@ export interface GoogleOAuthClientConfig {
   clientSecret: string;
 }
 
+export interface GoogleOAuthConfig extends GoogleOAuthClientConfig {
+  additionalScopes?: string[];
+  userHostedDomains?: string[];
+}
+
 // GoogleOAuth2が有効かどうか
 export const isEnabledGoogleOAuth2 = (
   clientConfig: GoogleOAuthClientConfig
 ): boolean => !!(clientConfig.clientId && clientConfig.clientSecret);
 
 // GoogleOAuth2クライアントを取得
-export const getGoogleOAuth2Client = (
+const getGoogleOAuth2Client = (
   clientConfig: GoogleOAuthClientConfig,
   redirectUrl: string
 ): Auth.OAuth2Client => {
@@ -40,7 +46,7 @@ export const getGoogleOAuth2Client = (
 };
 
 // GoogleOAuth2リフレッシュ用クライアントを取得
-export const getGoogleOAuth2RefreshClient = async (
+const getGoogleOAuth2RefreshClient = async (
   clientConfig: GoogleOAuthClientConfig,
   credentials: GoogleOAuth2Credentials
 ): Promise<Auth.UserRefreshClient> => {
@@ -64,16 +70,19 @@ export const getGoogleOAuth2RefreshClient = async (
 export const getGoogleOAuth2AuthorizationUrl = (
   redirectUrl: string,
   state: string,
-  clientConfig: GoogleOAuthClientConfig,
-  additionalScopes?: string[]
+  config: GoogleOAuthConfig
 ): string => {
-  const client = getGoogleOAuth2Client(clientConfig, redirectUrl);
+  const client = getGoogleOAuth2Client(config, redirectUrl);
   const opts = {
     state,
     access_type: 'offline',
-    scope: additionalScopes
-      ? GOOGLE_OAUTH2_DEFAULT_SCOPES.concat(additionalScopes)
+    scope: config.additionalScopes
+      ? GOOGLE_OAUTH2_DEFAULT_SCOPES.concat(config.additionalScopes)
       : GOOGLE_OAUTH2_DEFAULT_SCOPES,
+    hd:
+      config.userHostedDomains?.length === 1
+        ? config.userHostedDomains[0]
+        : '*', // 複数指定できないので指定された場合は`*`にしておき、認証後にsigninGoogleOAuth2で弾く
   };
   return client.generateAuthUrl(opts);
 };
@@ -105,10 +114,10 @@ const formatCredentials = (
 export const signinGoogleOAuth2 = async (
   code: string,
   redirectUrl: string,
-  clientConfig: GoogleOAuthClientConfig
+  config: GoogleOAuthConfig
 ): Promise<string> => {
   debug('signinGoogleOAuth2 authentication code: %s', code);
-  const client = getGoogleOAuth2Client(clientConfig, redirectUrl);
+  const client = getGoogleOAuth2Client(config, redirectUrl);
   const { tokens } = await client.getToken(code);
   const credentials = formatCredentials(tokens);
   if (!credentials.googleOAuth2IdToken) {
@@ -117,7 +126,7 @@ export const signinGoogleOAuth2 = async (
   }
   const loginTicket = await client.verifyIdToken({
     idToken: credentials.googleOAuth2IdToken,
-    audience: clientConfig.clientId,
+    audience: config.clientId,
   });
   const payload = loginTicket.getPayload();
   const email = payload?.email;
@@ -128,6 +137,15 @@ export const signinGoogleOAuth2 = async (
       credentials.googleOAuth2IdToken
     );
     throw invalidGoogleOAuth2Token();
+  }
+  const emailDomain = email.split('@').pop() as string;
+  if (
+    config.userHostedDomains?.length &&
+    !config.userHostedDomains.includes(emailDomain)
+  ) {
+    // 許可されていないメールドメイン
+    debug('signinGoogleOAuth2 illegal user email: %s', email);
+    throw forbidden();
   }
 
   let adminUser = await findOneByEmail(email);
@@ -152,9 +170,9 @@ export const signinGoogleOAuth2 = async (
 export const verifyGoogleOAuth2AccessToken = async (
   userId: string,
   credentials: GoogleOAuth2Credentials,
-  clientConfig: GoogleOAuthClientConfig
+  config: GoogleOAuthConfig
 ): Promise<boolean> => {
-  const client = await getGoogleOAuth2RefreshClient(clientConfig, credentials);
+  const client = await getGoogleOAuth2RefreshClient(config, credentials);
   const accessToken = await client.getAccessToken().catch((e: Error) => {
     debug('getAccessToken failure. userId: %s, err: %o', userId, e);
     return e;
