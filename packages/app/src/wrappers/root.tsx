@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import resolveConfig from 'tailwindcss/resolveConfig';
 import { TailwindConfig } from 'tailwindcss/tailwind-config';
+import ErrorBoundary from '$components/errorBoundary';
 import '$i18n/index';
 import { isLaunchedState, screenState, themeState } from '$store/atoms/app';
 import '$styles/global.css';
@@ -23,10 +24,12 @@ const RootWrapper: React.FC<Props> = (props) => {
       {/* Use StrictMode to find potential problems. */}
       {/* @see: https://reactjs.org/docs/strict-mode.html*/}
       <React.StrictMode>
-        <RecoilRoot>
-          {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
-          <Root {...props} />
-        </RecoilRoot>
+        <ErrorBoundary>
+          <RecoilRoot>
+            {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
+            <Root {...props} />
+          </RecoilRoot>
+        </ErrorBoundary>
       </React.StrictMode>
     </React.Fragment>
   );

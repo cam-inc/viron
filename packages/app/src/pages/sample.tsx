@@ -1,9 +1,10 @@
 import { Link, PageProps } from 'gatsby';
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Drawer, { useDrawer } from '$components/drawer';
+import ErrorBoundary from '$components/errorBoundary';
 import Modal, { useModal } from '$components/modal';
-import Popover, { usePopover } from '$components/popover';
+//import Popover, { usePopover } from '$components/popover';
 import useTheme from '$hooks/theme';
 import Layout from '$layouts/index';
 import { screenState } from '$store/atoms/app';
@@ -24,19 +25,21 @@ const SamplePage: React.FC<Props> = () => {
 
   const [screen] = useRecoilState(screenState);
 
+  /*
   const popover = usePopover<HTMLButtonElement>({ placement: 'Bottom' });
-  const handlePopoverOpenClick = function () {
+  const handlePopoverOpenClick = function() {
     popover.open();
   };
-  const handlePopoverOpenPointerOver = function () {
+  const handlePopoverOpenPointerOver = function() {
     popover.open();
   };
-  const handlePopoverOpenPointerOut = function () {
+  const handlePopoverOpenPointerOut = function() {
     popover.requestClose();
   };
-  const handlePopoverCloseClick = function () {
+  const handlePopoverCloseClick = function() {
     popover.requestClose();
   };
+  */
 
   const modal = useModal();
   const handleModalOpenClick = function () {
@@ -54,6 +57,11 @@ const SamplePage: React.FC<Props> = () => {
     drawer.requestClose();
   };
 
+  const [count, setCount] = useState(0);
+  const handleCountupClick = function () {
+    setCount(count + 1);
+  };
+
   return (
     <Layout>
       <div>
@@ -68,12 +76,20 @@ const SamplePage: React.FC<Props> = () => {
         )}
       </div>
       <div>
+        <p>ErrorHandlingのテスト</p>
+        <button onClick={handleCountupClick}>count up({count})</button>
+        <ErrorBoundary resetKeys={[count]}>
+          <Count count={count} />
+        </ErrorBoundary>
+      </div>
+      <div>
         <p>ThemeとDarkModeのテスト</p>
         <p className="bg-primary-l dark:bg-primary-d">color-primary</p>
         <p className="bg-secondary-l dark:bg-secondary-d">color-secondary</p>
         <p className="bg-tertiary-l dark:bg-tertiary-d">color-tertiary</p>
       </div>
       <button onClick={handleModalOpenClick}>[open modal]</button>
+      {/*
       <button ref={popover.targetRef} onClick={handlePopoverOpenClick}>
         [open popover]
       </button>
@@ -83,11 +99,14 @@ const SamplePage: React.FC<Props> = () => {
       >
         hover me to open a popover
       </p>
+       */}
       <button onClick={handleDrawerOpenClick}>[drawer drawer]</button>
       <Link to="/">TOP</Link>
+      {/*
       <Popover {...popover.bind}>
         <button onClick={handlePopoverCloseClick}>close</button>
       </Popover>
+       */}
       <Modal {...modal.bind}>
         <button onClick={handleModalCloseClick}>close</button>
       </Modal>
@@ -100,3 +119,10 @@ const SamplePage: React.FC<Props> = () => {
 };
 
 export default SamplePage;
+
+const Count: React.FC<{ count: number }> = ({ count }) => {
+  if (count === 3) {
+    throw new Error('count error!!!');
+  }
+  return <p>count: {count}</p>;
+};

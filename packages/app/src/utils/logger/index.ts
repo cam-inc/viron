@@ -2,16 +2,17 @@ import roarr, { Message, ROARR } from 'roarr';
 import { JsonStringifiable } from '$types/index';
 
 const LEVEL = {
-  TRACE: 10,
-  DEBUG: 20,
-  INFO: 30,
-  WARN: 40,
-  ERROR: 50,
-  FATAL: 60,
+  TRACE: 'trace', // 10
+  DEBUG: 'debug', //20
+  INFO: 'info', //30
+  WARN: 'warn', //40
+  ERROR: 'error', //50
+  FATAL: 'fatal', //60
 } as const;
 type Level = typeof LEVEL[keyof typeof LEVEL];
-const NAMESPACE = {
+export const NAMESPACE = {
   GENERAL: 'general',
+  REACT_COMPONENT: 'reactComponent',
 } as const;
 type Namespace = typeof NAMESPACE[keyof typeof NAMESPACE];
 type Context = {
@@ -33,6 +34,15 @@ const log = function (
     level,
     namespace,
   };
+
+  // There is no function named `fatal` in Console interface so just use error function instead.
+  if (level === LEVEL.FATAL) {
+    console.error(`[${namespace}]: `, message);
+  } else {
+    console[level](`[${namespace}]: `, message);
+  }
+
+  // TODO: roarr消せるな
   // The second argument is there to output some immutable properties.
   roarr(context, JSON.stringify(message, Object.getOwnPropertyNames(message)));
 };
