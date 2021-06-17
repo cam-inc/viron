@@ -41,9 +41,8 @@ module.exports = {
       },
     },
   ],
+  // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/#flags
   flags: {
-    // @see: https://github.com/gatsbyjs/gatsby/discussions/28331
-    PRESERVE_FILE_DOWNLOAD_CACHE: true,
-    PRESERVE_WEBPACK_CACHE: true,
+    FAST_DEV: true,
   },
 };
