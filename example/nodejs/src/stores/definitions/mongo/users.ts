@@ -1,8 +1,7 @@
 import * as mongoose from 'mongoose';
 import { User } from '../../../domains/user';
-import { DefinitionKeys } from '.';
 
-export const name: DefinitionKeys = 'users';
+export const name = 'users';
 
 const schemaDefinition: mongoose.SchemaDefinition = {
   name: {

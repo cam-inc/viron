@@ -1,9 +1,5 @@
 import mongoose, { Connection } from 'mongoose';
-import {
-  adminUsers,
-  auditLogs,
-  createModel,
-} from '../../src/stores/definitions/mongo';
+import { adminUsers, auditLogs } from '../../src/stores/definitions/mongo';
 
 export async function setupMongo(): Promise<Connection> {
   //mongoose.set('debug', true);
@@ -22,8 +18,8 @@ export async function setupMongo(): Promise<Connection> {
     useFindAndModify: false,
     useUnifiedTopology: true,
   });
-  createModel(conn, adminUsers.name, adminUsers.schema);
-  createModel(conn, auditLogs.name, auditLogs.schema);
+  conn.model(adminUsers.name, adminUsers.schema);
+  conn.model(auditLogs.name, auditLogs.schema);
   return conn;
 }
 

@@ -1,24 +1,18 @@
 import { MODE_MYSQL, StoreType } from '../constants';
 import { MysqlConfig } from '../config';
 import { createConnection } from './connection/mysql';
-import {
-  MysqlDefinitions,
-  definitions,
-  MysqlModels,
-  models,
-} from './definitions/mysql';
+import { MysqlModels, models } from './definitions/mysql';
 import { Sequelize } from 'sequelize';
 
 export interface MysqlStore {
   type: StoreType;
-  definitions: MysqlDefinitions;
   models: MysqlModels;
   instance: Sequelize;
 }
 export const preflight = async (config: MysqlConfig): Promise<MysqlStore> => {
   const s = await createConnection(config.connectOptions);
 
-  const ms = await models(s);
+  const ms = models(s);
 
   // create tables
   await s.drop({ cascade: true });
@@ -26,7 +20,6 @@ export const preflight = async (config: MysqlConfig): Promise<MysqlStore> => {
 
   return {
     type: MODE_MYSQL,
-    definitions: definitions,
     models: ms,
     instance: s,
   };
