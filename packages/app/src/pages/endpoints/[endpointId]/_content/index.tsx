@@ -15,11 +15,11 @@ type Props = {
   content: Info['x-pages'][number]['contents'][number];
 };
 const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
-  const {
-    base,
-    //related,
-    relatedDescendant,
-  } = useContent(endpoint, document, content);
+  const { base, related, relatedDescendant } = useContent(
+    endpoint,
+    document,
+    content
+  );
 
   const elm = useMemo<JSX.Element | null>(
     function () {

@@ -19,10 +19,16 @@ type Props = {
 };
 const RootWrapper: React.FC<Props> = (props) => {
   return (
-    <RecoilRoot>
-      {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
-      <Root {...props} />
-    </RecoilRoot>
+    <React.Fragment>
+      {/* Use StrictMode to find potential problems. */}
+      {/* @see: https://reactjs.org/docs/strict-mode.html*/}
+      <React.StrictMode>
+        <RecoilRoot>
+          {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
+          <Root {...props} />
+        </RecoilRoot>
+      </React.StrictMode>
+    </React.Fragment>
   );
 };
 export default RootWrapper;
