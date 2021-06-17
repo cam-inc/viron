@@ -4,7 +4,7 @@ import {
   getContentBaseOperationResponseKeys,
   getTableSetting,
 } from '$utils/oas';
-import { UseDescendantsReturn } from '../_hooks/useRelatedDescendant';
+import { UseDescendantsReturn } from '../_hooks/useDescendants';
 
 type Props = {
   document: Document;
@@ -14,6 +14,7 @@ type Props = {
 };
 const _ContentTable: React.FC<Props> = ({ document, content, data }) => {
   return <p>明日のりたまさんに</p>;
+  /*
   const tableSetting = getTableSetting(document.info);
   if (!tableSetting || !tableSetting.responseListKey) {
     throw new Error(
@@ -34,13 +35,13 @@ const _ContentTable: React.FC<Props> = ({ document, content, data }) => {
   return (
     <div>
       <ul>
-        {list.map(function (item, idx) {
+        {list.map(function(item, idx) {
           return (
             <React.Fragment key={idx}>
               <li>
                 <div>
                   <span>{idx}:</span>
-                  {fields.map(function (field, idx) {
+                  {fields.map(function(field, idx) {
                     return (
                       <React.Fragment key={idx}>
                         <span>
@@ -57,5 +58,6 @@ const _ContentTable: React.FC<Props> = ({ document, content, data }) => {
       </ul>
     </div>
   );
+  */
 };
 export default _ContentTable;
