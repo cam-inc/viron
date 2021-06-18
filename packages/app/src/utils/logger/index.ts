@@ -1,4 +1,3 @@
-import roarr, { Message, ROARR } from 'roarr';
 import { JsonStringifiable } from '$types/index';
 
 const LEVEL = {
@@ -15,94 +14,58 @@ export const NAMESPACE = {
   REACT_COMPONENT: 'reactComponent',
 } as const;
 type Namespace = typeof NAMESPACE[keyof typeof NAMESPACE];
-type Context = {
-  level: Level;
-  namespace: Namespace;
+type Payload = {
+  messages: any[];
+  namespace?: Namespace;
 };
 
-ROARR.write = function (message) {
-  const payload = JSON.parse(message) as Message;
-  console.log(payload);
-};
-
-const log = function (
-  level: Level,
-  namespace: Namespace,
-  message: JsonStringifiable
-) {
-  const context: Context = {
-    level,
-    namespace,
-  };
-
+const log = function (level: Level, namespace: Namespace, messages: any[]) {
   // There is no function named `fatal` in Console interface so just use error function instead.
   if (level === LEVEL.FATAL) {
-    console.error(`[${namespace}]: `, message);
+    console.error(`[${level}][${namespace}]: `, ...messages);
   } else {
-    console[level](`[${namespace}]: `, message);
+    console[level](`[${level}][${namespace}]: `, ...messages);
   }
-
-  // TODO: roarr消せるな
-  // The second argument is there to output some immutable properties.
-  roarr(context, JSON.stringify(message, Object.getOwnPropertyNames(message)));
 };
 
 export const trace = function ({
-  message,
+  messages,
   namespace = NAMESPACE.GENERAL,
-}: {
-  message: JsonStringifiable;
-  namespace?: Namespace;
-}) {
-  log(LEVEL.TRACE, namespace, message);
+}: Payload) {
+  log(LEVEL.TRACE, namespace, messages);
 };
 
 export const debug = function ({
-  message,
+  messages,
   namespace = NAMESPACE.GENERAL,
-}: {
-  message: JsonStringifiable;
-  namespace?: Namespace;
-}) {
-  log(LEVEL.DEBUG, namespace, message);
+}: Payload) {
+  log(LEVEL.DEBUG, namespace, messages);
 };
 
 export const info = function ({
-  message,
+  messages,
   namespace = NAMESPACE.GENERAL,
-}: {
-  message: JsonStringifiable;
-  namespace?: Namespace;
-}) {
-  log(LEVEL.INFO, namespace, message);
+}: Payload) {
+  log(LEVEL.INFO, namespace, messages);
 };
 
 export const warn = function ({
-  message,
+  messages,
   namespace = NAMESPACE.GENERAL,
-}: {
-  message: JsonStringifiable;
-  namespace?: Namespace;
-}) {
-  log(LEVEL.WARN, namespace, message);
+}: Payload) {
+  log(LEVEL.WARN, namespace, messages);
 };
 
 export const error = function ({
-  message,
+  messages,
   namespace = NAMESPACE.GENERAL,
-}: {
-  message: JsonStringifiable;
-  namespace?: Namespace;
-}) {
-  log(LEVEL.ERROR, namespace, message);
+}: Payload) {
+  log(LEVEL.ERROR, namespace, messages);
 };
 
 export const fatal = function ({
-  message,
+  messages,
   namespace = NAMESPACE.GENERAL,
-}: {
-  message: JsonStringifiable;
-  namespace?: Namespace;
-}) {
-  log(LEVEL.FATAL, namespace, message);
+}: Payload) {
+  log(LEVEL.FATAL, namespace, messages);
 };

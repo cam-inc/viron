@@ -59,7 +59,7 @@ class ErrorBoundary extends React.Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.props.onError?.(error, errorInfo);
     logError({
-      message: {},
+      messages: [error, errorInfo],
       namespace: NAMESPACE.REACT_COMPONENT,
     });
   }
