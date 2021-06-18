@@ -9,8 +9,7 @@ import { UserModel } from '../../stores/definitions/mongo/users';
 import { getQueryOptions } from '../../stores/helpers/mongo';
 import { ctx } from '../../context';
 
-const getModel = (): UserModel =>
-  ctx.stores.main.models.users.Model as UserModel;
+const getModel = (): UserModel => ctx.stores.main.models.users as UserModel;
 
 export const findOneById = async (id: string): Promise<User | null> => {
   const model = getModel();

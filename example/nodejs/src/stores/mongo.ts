@@ -2,16 +2,10 @@ import mongoose, { Connection } from 'mongoose';
 import { MongoConfig } from '../config';
 import { StoreType, MODE_MONGO } from '../constants';
 import { createConnection } from './connection/mongo';
-import {
-  definitions,
-  MongoDefinitions,
-  MongoModels,
-  models,
-} from './definitions/mongo';
+import { MongoModels, models } from './definitions/mongo';
 
 export interface MongoStore {
   type: StoreType;
-  definitions: MongoDefinitions;
   models: MongoModels;
   instance: Connection;
 }
@@ -22,8 +16,7 @@ export const preflight = async (config: MongoConfig): Promise<MongoStore> => {
 
   return {
     type: MODE_MONGO,
-    definitions: definitions,
-    models: await models(c),
+    models: models(c),
     instance: c,
   };
 };

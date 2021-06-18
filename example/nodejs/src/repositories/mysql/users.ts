@@ -10,7 +10,7 @@ import { UserModelCtor } from '../../stores/definitions/mysql/users';
 import { getFindOptions } from '../../stores/helpers/mysql';
 
 const getModel = (): UserModelCtor =>
-  ctx.stores.main.models.users.Model as UserModelCtor;
+  ctx.stores.main.models.users as UserModelCtor;
 
 export const findOneById = async (id: string): Promise<User | null> => {
   const model = getModel();
