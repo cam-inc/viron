@@ -13,8 +13,6 @@ info:
           resourceId: user
           type: table
           pagination: true
-          query:
-            - id
 
 tags:
   - name: user
@@ -30,14 +28,14 @@ paths:
       parameters:
         - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
         - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
-        - $ref: './components.yaml#/components/parameters/IdQueryParam'
+        - $ref: '#/components/parameters/UserIdQueryParam'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserList'
+                $ref: '#/components/schemas/UserListWithPager'
       security:
         - jwt: []
 
@@ -63,7 +61,7 @@ paths:
       security:
         - jwt: []
 
-  /users/{id}:
+  /users/{userId}:
     put:
       operationId: updateUser
       tags:
@@ -71,7 +69,7 @@ paths:
       summary: update user
       description: ユーザー更新
       parameters:
-        - $ref: './components.yaml#/components/parameters/IdPathParam'
+        - $ref: '#/components/parameters/UserIdPathParam'
       requestBody:
         required: true
         content:
@@ -91,7 +89,7 @@ paths:
       summary: remove user
       description: ユーザー削除
       parameters:
-        - $ref: './components.yaml#/components/parameters/IdPathParam'
+        - $ref: '#/components/parameters/UserIdPathParam'
       responses:
         204:
           description: OK
@@ -99,9 +97,32 @@ paths:
         - jwt: []
 
 components:
-  parameters: {}
+  parameters: 
+    UserIdPathParam:
+      name: userId
+      in: path
+      schema:
+        type: string
+      required: true
+
+    UserIdQueryParam:
+      name: userId
+      in: query
+      schema:
+        type: string
+      required: false
 
   schemas:
+    UserListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/Pager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/UserList'
+          required:
+            - list
+
     UserList:
       type: array
       items:

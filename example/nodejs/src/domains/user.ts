@@ -9,6 +9,10 @@ export interface User {
   updatedAt: number;
 }
 
+export interface UserView extends User {
+  userId: string; // alias to id
+}
+
 export interface UserCreateAttributes {
   name: string | null;
   nickName: string | null;
@@ -19,20 +23,29 @@ export interface UserUpdateAttributes {
   nickName?: string | null;
 }
 
+const format = (user: User): UserView => {
+  return Object.assign({}, user, { userId: user.id });
+};
+
 export const list = async (
   // TODO: conditions
   limit?: number,
   offset?: number
-): Promise<ListWithPager<User>> => {
+): Promise<ListWithPager<UserView>> => {
   const repository = getUserRepository();
-  return repository.findWithPager({}, limit, offset);
+  const result = await repository.findWithPager({}, limit, offset);
+  return {
+    ...result,
+    list: result.list.map(format),
+  };
 };
 
 export const createOne = async (
   payload: UserCreateAttributes
-): Promise<User> => {
+): Promise<UserView> => {
   const repository = getUserRepository();
-  return await repository.createOne(payload);
+  const user = await repository.createOne(payload);
+  return format(user);
 };
 
 export const updateOneById = async (

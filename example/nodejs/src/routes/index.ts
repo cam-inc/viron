@@ -14,6 +14,7 @@ import * as routesAuditLogs from './auditlogs';
 import * as routesAuth from './auth';
 import * as routesAuthconfigs from './authconfigs';
 import * as routesPing from './ping';
+import * as routesPurchases from './purchases';
 import * as routesRoot from './root';
 import * as routesOas from './oas';
 import * as routesUsers from './users';
@@ -36,6 +37,11 @@ export const oasPath = (name: string): string =>
 
 const routes: Route[] = [
   { name: 'ping', oasPath: oasPath('ping'), handlers: routesPing },
+  {
+    name: 'purchases',
+    oasPath: oasPath('purchases'),
+    handlers: routesPurchases,
+  },
   { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
   {
     name: 'adminroles',
@@ -110,4 +116,6 @@ export async function register(app: Express): Promise<void> {
     app.use(middleware);
     apiDefinition = merge(apiDefinition, apiDoc);
   });
+
+  logger.info('register routes finish. apiDefinition: %o', apiDefinition);
 }
