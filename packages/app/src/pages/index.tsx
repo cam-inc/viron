@@ -1,6 +1,6 @@
 import { Link, PageProps } from 'gatsby';
 import React from 'react';
-import SEO from '$components/seo';
+import Metadata from '$components/metadata';
 import useTheme from '$hooks/theme';
 
 type Props = PageProps;
@@ -9,7 +9,7 @@ const IndexPage: React.FC<Props> = () => {
   // TODO
   return (
     <>
-      <SEO />
+      <Metadata />
       <div id="page-index">
         <Link to="/home">home</Link>
       </div>

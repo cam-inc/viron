@@ -1,7 +1,7 @@
 import { Link, PageProps } from 'gatsby';
 import React from 'react';
 import { useRecoilState } from 'recoil';
-import SEO from '$components/seo';
+import Metadata from '$components/metadata';
 import useTheme from '$hooks/theme';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import Add from './_add/index';
@@ -16,7 +16,7 @@ const HomePage: React.FC<Props> = () => {
 
   return (
     <>
-      <SEO title="Viron | home" />
+      <Metadata title="Viron | home" />
       <div id="page-home">
         <div>
           <Link to="/sample">sample</Link>
