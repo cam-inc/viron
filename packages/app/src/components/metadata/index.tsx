@@ -37,7 +37,7 @@ type Props = {
   // @see: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name#standard_metadata_names_defined_in_the_html_specification
   // @see: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name#other_metadata_names
   // TODO: robots.txtも別途用意すること。
-  robots: (
+  robots?: (
     | 'index'
     | 'noindex'
     | 'follow'
