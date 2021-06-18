@@ -1,7 +1,9 @@
 // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
 module.exports = {
   siteMetadata: {
+    // TODO: 増やす
     title: 'Viron',
+    description: 'TODO: description',
   },
   plugins: [
     {
@@ -9,6 +11,9 @@ module.exports = {
     },
     {
       resolve: 'gatsby-plugin-lodash',
+    },
+    {
+      resolve: 'gatsby-plugin-react-helmet-async',
     },
     {
       resolve: 'gatsby-plugin-alias-imports',

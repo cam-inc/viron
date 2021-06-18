@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import { PluginOptions } from 'gatsby';
 import _ from 'lodash';
 import React, { useEffect } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import resolveConfig from 'tailwindcss/resolveConfig';
 import { TailwindConfig } from 'tailwindcss/tailwind-config';
@@ -24,12 +25,14 @@ const RootWrapper: React.FC<Props> = (props) => {
       {/* Use StrictMode to find potential problems. */}
       {/* @see: https://reactjs.org/docs/strict-mode.html*/}
       <React.StrictMode>
-        <ErrorBoundary>
+        <HelmetProvider>
           <RecoilRoot>
-            {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
-            <Root {...props} />
+            <ErrorBoundary>
+              {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
+              <Root {...props} />
+            </ErrorBoundary>
           </RecoilRoot>
-        </ErrorBoundary>
+        </HelmetProvider>
       </React.StrictMode>
     </React.Fragment>
   );
