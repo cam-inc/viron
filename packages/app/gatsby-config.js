@@ -4,6 +4,14 @@ module.exports = {
     // TODO: 増やす
     title: 'Viron',
     description: 'TODO: description',
+    author: 'TODO',
+    authorURL: 'TODO: readmeのauthorかpackage.jsonのauthorへのurlを使うこと。',
+    helpURL: 'TODO: vironのドキュメントページへのURL。',
+    licenseURL:
+      'TODO: readmeのlicenseかpackage.jsonのlicenseへのurlを使うこと。',
+    keywords: ['TODO'],
+    creator: 'CAM, Inc.',
+    publisher: 'CAM, Inc.',
   },
   plugins: [
     {
