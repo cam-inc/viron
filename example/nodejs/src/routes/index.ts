@@ -15,6 +15,7 @@ import * as routesAuth from './auth';
 import * as routesAuthconfigs from './authconfigs';
 import * as routesPing from './ping';
 import * as routesPurchases from './purchases';
+import * as routesResources from './resources';
 import * as routesRoot from './root';
 import * as routesOas from './oas';
 import * as routesUsers from './users';
@@ -41,6 +42,11 @@ const routes: Route[] = [
     name: 'purchases',
     oasPath: oasPath('purchases'),
     handlers: routesPurchases,
+  },
+  {
+    name: 'resources',
+    oasPath: oasPath('resources'),
+    handlers: routesResources,
   },
   { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
   {
@@ -107,6 +113,12 @@ export async function register(app: Express): Promise<void> {
         allErrors: true,
         treatReturnedJsonAsPure: true,
         autoHandleHttpErrors: false,
+      }).catch((e) => {
+        logger.error(
+          'Generating exegesis middleware failure. oas: %s',
+          oasPath
+        );
+        throw e;
       });
       return { middleware, apiDoc };
     })

@@ -13,6 +13,12 @@ info:
           resourceId: user
           type: table
           pagination: true
+          actions:
+            # CSVダウンロード
+            - operationId: downloadResources
+              defaultParametersValue: 
+                resourceName: users
+                format: csv
 
 tags:
   - name: user

@@ -47,10 +47,11 @@ interface Repository<Entity, CreateAttributes, UpdateAttributes> {
   removeOneById: (id: string) => Promise<void>;
 }
 
-type Names = keyof typeof mongoRepositories & keyof typeof mysqlRepositories;
+export type RepositoryNames = keyof typeof mongoRepositories &
+  keyof typeof mysqlRepositories;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getRepository = (name: Names): any => {
+export const getRepository = (name: RepositoryNames): any => {
   switch (ctx.mode) {
     case MODE_MONGO:
       return mongoRepositories[name];
