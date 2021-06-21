@@ -2,71 +2,73 @@ import { FindOptions, WhereOptions } from 'sequelize/types';
 import { getPagerResults, ListWithPager } from '@viron/lib';
 import { ctx } from '../../context';
 import {
-  User,
-  UserCreateAttributes,
-  UserUpdateAttributes,
-} from '../../domains/user';
-import { UserModelCtor } from '../../stores/definitions/mysql/users';
+  Purchase,
+  PurchaseCreateAttributes,
+  PurchaseUpdateAttributes,
+} from '../../domains/purchase';
+import { PurchaseModelCtor } from '../../stores/definitions/mysql/purchases';
 import { getFindOptions } from '../../stores/helpers/mysql';
 
-const getModel = (): UserModelCtor =>
-  ctx.stores.main.models.users as UserModelCtor;
+const getModel = (): PurchaseModelCtor =>
+  ctx.stores.main.models.purchases as PurchaseModelCtor;
 
-export const findOneById = async (id: string): Promise<User | null> => {
+export const findOneById = async (id: string): Promise<Purchase | null> => {
   const model = getModel();
   const doc = await model.findByPk(id);
-  return doc ? (doc.toJSON() as User) : null;
+  return doc ? (doc.toJSON() as Purchase) : null;
 };
 
 export const find = async (
-  conditions: WhereOptions<User> = {},
-  options: FindOptions<User> = {}
-): Promise<User[]> => {
+  conditions: WhereOptions<Purchase> = {},
+  options: FindOptions<Purchase> = {}
+): Promise<Purchase[]> => {
   const model = getModel();
   options.where = conditions;
   const docs = await model.findAll(options);
-  return docs.map((doc) => doc.toJSON() as User);
+  return docs.map((doc) => doc.toJSON() as Purchase);
 };
 
 export const findWithPager = async (
-  conditions: WhereOptions<User> = {},
+  conditions: WhereOptions<Purchase> = {},
   limit?: number,
   offset?: number
-): Promise<ListWithPager<User>> => {
+): Promise<ListWithPager<Purchase>> => {
   const model = getModel();
   const options = getFindOptions(limit, offset);
   options.where = conditions;
   const result = await model.findAndCountAll(options);
   return {
     ...getPagerResults(result.count),
-    list: result.rows.map((doc) => doc.toJSON() as User),
+    list: result.rows.map((doc) => doc.toJSON() as Purchase),
   };
 };
 
 export const findOne = async (
-  conditions: WhereOptions<User> = {}
-): Promise<User | null> => {
+  conditions: WhereOptions<Purchase> = {}
+): Promise<Purchase | null> => {
   const model = getModel();
   const doc = await model.findOne({ where: conditions });
-  return doc ? (doc.toJSON() as User) : null;
+  return doc ? (doc.toJSON() as Purchase) : null;
 };
 
 export const count = async (
-  conditions: WhereOptions<User> = {}
+  conditions: WhereOptions<Purchase> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.count({ where: conditions });
 };
 
-export const createOne = async (obj: UserCreateAttributes): Promise<User> => {
+export const createOne = async (
+  obj: PurchaseCreateAttributes
+): Promise<Purchase> => {
   const model = getModel();
   const doc = await model.create(obj);
-  return doc.toJSON() as User;
+  return doc.toJSON() as Purchase;
 };
 
 export const updateOneById = async (
   id: string,
-  obj: UserUpdateAttributes
+  obj: PurchaseUpdateAttributes
 ): Promise<void> => {
   const model = getModel();
   await model.update(obj, { where: { id } });

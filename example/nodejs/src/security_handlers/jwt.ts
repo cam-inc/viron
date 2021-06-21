@@ -87,7 +87,7 @@ export const jwt = async (
   }
 
   pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
-  pContext.origRes.setHeader(
+  pContext.res.header(
     HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
     VIRON_AUTHCONFIGS_PATH
   );

@@ -262,10 +262,10 @@ const genOperationIdPathMethodMap = (
 const findPathMethodByOperationId = (
   operationId: string,
   apiDefinition: VironOpenAPIObject
-): PathMethod => {
+): PathMethod | null => {
   const map =
     operationIdPathMethodMap ?? genOperationIdPathMethodMap(apiDefinition);
-  return map[operationId];
+  return map[operationId] ?? null;
 };
 
 // uri,methodをactionsに持つcontentのresourceIdを取得
@@ -278,7 +278,7 @@ const findResourceIdByActions = (
   const content = contents.find((content) =>
     (content.actions ?? []).find((action) => {
       const pm = findPathMethodByOperationId(action.operationId, apiDefinition);
-      return pm.method === method && !!match(uri, pm.path);
+      return pm?.method === method && !!match(uri, pm.path);
     })
   );
   return content?.resourceId ?? null;

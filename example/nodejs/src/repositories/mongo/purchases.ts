@@ -1,36 +1,37 @@
 import { FilterQuery, QueryOptions } from 'mongoose';
 import { ListWithPager, getPagerResults } from '@viron/lib';
 import {
-  User,
-  UserCreateAttributes,
-  UserUpdateAttributes,
-} from '../../domains/user';
-import { UserModel } from '../../stores/definitions/mongo/users';
+  Purchase,
+  PurchaseCreateAttributes,
+  PurchaseUpdateAttributes,
+} from '../../domains/purchase';
+import { PurchaseModel } from '../../stores/definitions/mongo/purchases';
 import { getQueryOptions } from '../../stores/helpers/mongo';
 import { ctx } from '../../context';
 
-const getModel = (): UserModel => ctx.stores.main.models.users as UserModel;
+const getModel = (): PurchaseModel =>
+  ctx.stores.main.models.purchases as PurchaseModel;
 
-export const findOneById = async (id: string): Promise<User | null> => {
+export const findOneById = async (id: string): Promise<Purchase | null> => {
   const model = getModel();
   const doc = await model.findById(id);
   return doc ? doc.toJSON() : null;
 };
 
 export const find = async (
-  conditions: FilterQuery<User> = {},
+  conditions: FilterQuery<Purchase> = {},
   options?: QueryOptions
-): Promise<User[]> => {
+): Promise<Purchase[]> => {
   const model = getModel();
   const docs = await model.find(conditions, null, options);
   return docs.map((doc) => doc.toJSON());
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<User> = {},
+  conditions: FilterQuery<Purchase> = {},
   limit?: number,
   offset?: number
-): Promise<ListWithPager<User>> => {
+): Promise<ListWithPager<Purchase>> => {
   const options = getQueryOptions(limit, offset);
   const [list, totalCount] = await Promise.all([
     find(conditions, options),
@@ -43,21 +44,23 @@ export const findWithPager = async (
 };
 
 export const findOne = async (
-  conditions: FilterQuery<User> = {}
-): Promise<User | null> => {
+  conditions: FilterQuery<Purchase> = {}
+): Promise<Purchase | null> => {
   const model = getModel();
   const doc = await model.findOne(conditions);
   return doc ? doc.toJSON() : null;
 };
 
 export const count = async (
-  conditions: FilterQuery<User> = {}
+  conditions: FilterQuery<Purchase> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(conditions);
 };
 
-export const createOne = async (obj: UserCreateAttributes): Promise<User> => {
+export const createOne = async (
+  obj: PurchaseCreateAttributes
+): Promise<Purchase> => {
   const model = getModel();
   const doc = await model.create(obj);
   return doc.toJSON();
@@ -65,7 +68,7 @@ export const createOne = async (obj: UserCreateAttributes): Promise<User> => {
 
 export const updateOneById = async (
   id: string,
-  obj: UserUpdateAttributes
+  obj: PurchaseUpdateAttributes
 ): Promise<void> => {
   const model = getModel();
   await model.updateOne({ _id: id }, obj);

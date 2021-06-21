@@ -1,5 +1,11 @@
-import { FilterQuery, QueryOptions } from 'mongoose';
-import { FindOptions, WhereOptions } from 'sequelize/types';
+import {
+  FilterQuery as MongoFilterQuery,
+  QueryOptions as MongoQueryOptions,
+} from 'mongoose';
+import {
+  FindOptions as MysqlFindOptions,
+  WhereOptions as MysqlWhereOptions,
+} from 'sequelize/types';
 import { ListWithPager } from '@viron/lib';
 import { noSetEnvMode } from '../errors';
 import { ctx } from '../context';
@@ -10,34 +16,42 @@ import {
   UserCreateAttributes,
   UserUpdateAttributes,
 } from '../domains/user';
+import {
+  Purchase,
+  PurchaseCreateAttributes,
+  PurchaseUpdateAttributes,
+} from '../domains/purchase';
 import { MODE_MONGO, MODE_MYSQL } from '../constants';
+
+export type FindConditions<Entity> =
+  | MongoFilterQuery<Entity>
+  | MysqlWhereOptions<Entity>;
+
+export type FindOptions<Entity> = MongoQueryOptions | MysqlFindOptions<Entity>;
 
 interface Repository<Entity, CreateAttributes, UpdateAttributes> {
   findOneById: (id: string) => Promise<Entity | null>;
   find: (
-    conditions?: FilterQuery<Entity> | WhereOptions<Entity>,
-    options?: QueryOptions | FindOptions<Entity>
+    conditions?: FindConditions<Entity>,
+    options?: FindOptions<Entity>
   ) => Promise<Entity[]>;
   findWithPager: (
-    conditions?: FilterQuery<Entity> | FindOptions<Entity>,
+    conditions?: FindConditions<Entity>,
     limit?: number,
     offset?: number
   ) => Promise<ListWithPager<Entity>>;
-  findOne: (
-    conditions?: FilterQuery<Entity> | FindOptions<Entity>
-  ) => Promise<Entity>;
-  count: (
-    conditions?: FilterQuery<Entity> | FindOptions<Entity>
-  ) => Promise<number>;
+  findOne: (conditions?: FindConditions<Entity>) => Promise<Entity>;
+  count: (conditions?: FindConditions<Entity>) => Promise<number>;
   createOne: (obj: CreateAttributes) => Promise<Entity>;
   updateOneById: (id: string, obj: UpdateAttributes) => Promise<void>;
   removeOneById: (id: string) => Promise<void>;
 }
 
-type Names = keyof typeof mongoRepositories & keyof typeof mysqlRepositories;
+export type RepositoryNames = keyof typeof mongoRepositories &
+  keyof typeof mysqlRepositories;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getRepository = (name: Names): any => {
+export const getRepository = (name: RepositoryNames): any => {
   switch (ctx.mode) {
     case MODE_MONGO:
       return mongoRepositories[name];
@@ -53,3 +67,9 @@ export const getUserRepository = (): Repository<
   UserCreateAttributes,
   UserUpdateAttributes
 > => getRepository('users');
+
+export const getPurchaseRepository = (): Repository<
+  Purchase,
+  PurchaseCreateAttributes,
+  PurchaseUpdateAttributes
+> => getRepository('purchases');

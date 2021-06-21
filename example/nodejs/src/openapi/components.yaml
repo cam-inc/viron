@@ -33,6 +33,18 @@ components:
         type: string
       required: false
 
+  schemas:
+    Pager:
+      type: object
+      properties:
+        maxPage:
+          type: integer
+        currentPage:
+          type: integer
+      required:
+        - maxPage
+        - currentPage
+
   securitySchemes:
     jwt:
       type: oauth2

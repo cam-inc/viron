@@ -7,6 +7,7 @@ import { preflight as preflightMysql } from './stores/mysql';
 import { Config, get as getConfig, MongoConfig, MysqlConfig } from './config';
 import { Stores } from './stores';
 import { noSetEnvMode } from './errors';
+import { load as loadSampleData } from './sampledata';
 
 export const logger = pino({
   name: 'example',
@@ -36,6 +37,7 @@ export class Context {
 
   public async preflight(): Promise<void> {
     await this.preflightStore();
+    await loadSampleData();
     domainsAuth.initJwt(this.config.auth.jwt);
   }
 
