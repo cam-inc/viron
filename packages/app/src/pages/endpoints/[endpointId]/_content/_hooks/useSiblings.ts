@@ -1,7 +1,20 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { Document, Info, Method, OperationId } from '$types/oas';
+import { Endpoint } from '$types/index';
 import {
+  Document,
+  Info,
+  Method,
+  OperationId,
+  Request,
+  RequestValue,
+} from '$types/oas';
+import { promiseErrorHandler } from '$utils/index';
+import {
+  cleanupRequestValue,
+  constructRequestInfo,
+  constructRequestInit,
+  constructRequestPayloads,
   getContentBaseOperationResponseKeys,
   getPathItem,
   getRequest,
@@ -9,12 +22,15 @@ import {
 } from '$utils/oas';
 
 export type UseSiblingsReturn = {
-  operationIds: OperationId[];
-};
+  request: Request;
+  defaultValues: ReturnType<typeof cleanupRequestValue>;
+  fetch: (requestValue: RequestValue) => Promise<{ data?: any; error?: Error }>;
+}[];
 // Sibling Opeartions are
 // [1] operations whose path is the same as the base operation's one but method is different.
 // [2] action operations whose request payload key set doesn't contain one of base operation's response payload keys.
 const useSiblings = function (
+  endpoint: Endpoint,
   document: Document,
   content: Info['x-pages'][number]['contents'][number]
 ): UseSiblingsReturn {
@@ -74,12 +90,55 @@ const useSiblings = function (
         }
       });
     }
-
     return _operationIds;
   }, []);
 
-  return {
-    operationIds,
-  };
+  const siblings = useMemo<UseSiblingsReturn>(function () {
+    const _siblings: UseSiblingsReturn = [];
+    operationIds.forEach(function (operationId) {
+      const request = getRequest(document, { operationId });
+      if (!request) {
+        return;
+      }
+      _siblings.push({
+        request,
+        defaultValues: cleanupRequestValue(request, {
+          parameters: content.defaultParametersValue,
+          requestBody: content.defaultRequestBodyValue,
+        }),
+        fetch: async function (requestValue: RequestValue) {
+          const requestPayloads = constructRequestPayloads(
+            request.operation,
+            requestValue
+          );
+          const requestInfo = constructRequestInfo(
+            endpoint,
+            document,
+            request,
+            requestPayloads
+          );
+          const requestInit = constructRequestInit(request, requestPayloads);
+          const [response, responseError] = await promiseErrorHandler<Response>(
+            window.fetch(requestInfo, requestInit)
+          );
+          if (responseError) {
+            // TODO: Error handling
+            return { error: responseError };
+          }
+          if (!response.ok) {
+            // TODO: Error handling
+            return { error: new Error('response not ok.') };
+          }
+          const data = await response.json();
+          return {
+            data,
+          };
+        },
+      });
+    });
+    return _siblings;
+  }, operationIds);
+
+  return siblings;
 };
 export default useSiblings;

@@ -15,7 +15,7 @@ const useContent = function (
   descendants: UseDescendantsReturn;
 } {
   const base = useBase(endpoint, document, content);
-  const siblings = useSiblings(document, content);
+  const siblings = useSiblings(endpoint, document, content);
   const descendants = useDescendants(document, content);
 
   return {

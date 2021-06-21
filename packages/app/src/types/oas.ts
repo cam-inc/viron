@@ -55,6 +55,7 @@ export type Info = {
       operationId: OperationId;
       defaultParametersValue?: RequestParametersValue;
       defaultRequestBodyValue?: RequestRequestBodyValue;
+      pagination?: boolean;
       autoRefreshSec?: number;
       actions?: {
         operationId: OperationId;
