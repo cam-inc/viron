@@ -20,6 +20,24 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     content
   );
 
+  const handleSiblingOperationSuccess = function (data: any) {
+    console.log(data);
+    base.refresh();
+  };
+  const handleSiblingOperationFail = function (error: Error) {
+    // TODO: error handling
+    console.log(error);
+  };
+
+  const handleDescendantOperationSuccess = function (data: any) {
+    console.log(data);
+    base.refresh();
+  };
+  const handleDescendantOperationFail = function (error: Error) {
+    // TODO: error handling
+    console.log(error);
+  };
+
   const elm = useMemo<JSX.Element | null>(
     function () {
       if (base.isPending) {
@@ -47,6 +65,8 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
               content={content}
               data={base.data}
               descendants={descendants}
+              onDescendantOperationSuccess={handleDescendantOperationSuccess}
+              onDescendantOperationFail={handleDescendantOperationFail}
             />
           );
         default:
@@ -55,15 +75,6 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     },
     [content.type, base.isPending, base.error, base.data]
   );
-
-  const handleSiblingOperationSuccess = function (data: any) {
-    console.log(data);
-    base.refresh();
-  };
-  const handleSiblingOperationFail = function (error: Error) {
-    // TODO: error handling
-    console.log(error);
-  };
 
   return (
     <div className="p-2 bg-gray-100">
