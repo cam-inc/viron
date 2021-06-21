@@ -43,6 +43,14 @@ export const findWithPager = async (
   };
 };
 
+export const findOne = async (
+  conditions: WhereOptions<Purchase> = {}
+): Promise<Purchase | null> => {
+  const model = getModel();
+  const doc = await model.findOne({ where: conditions });
+  return doc ? (doc.toJSON() as Purchase) : null;
+};
+
 export const count = async (
   conditions: WhereOptions<Purchase> = {}
 ): Promise<number> => {

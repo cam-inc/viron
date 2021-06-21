@@ -42,6 +42,14 @@ export const findWithPager = async (
   };
 };
 
+export const findOne = async (
+  conditions: FilterQuery<User> = {}
+): Promise<User | null> => {
+  const model = getModel();
+  const doc = await model.findOne(conditions);
+  return doc ? doc.toJSON() : null;
+};
+
 export const count = async (
   conditions: FilterQuery<User> = {}
 ): Promise<number> => {

@@ -3,7 +3,7 @@ import { contentType } from 'mime-types';
 import { RouteContext } from '../application';
 import { exportResources } from '../domains/resources';
 
-// ユーザー一覧
+// データダウンロード
 export const downloadResources = async (
   context: RouteContext
 ): Promise<void> => {
