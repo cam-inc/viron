@@ -14,6 +14,7 @@ import {
   constructRequestPayloads,
   getRequest,
 } from '$utils/oas';
+import useAutoRefresh from './useAutoRefresh';
 
 export type UseBaseReturn = {
   isPending: boolean;
@@ -22,6 +23,7 @@ export type UseBaseReturn = {
   request: RequestType;
   requestValue: RequestValue;
   fetch: (requestValue: RequestValue) => void;
+  refresh: () => void;
 };
 const useBase = function (
   endpoint: Endpoint,
@@ -48,6 +50,14 @@ const useBase = function (
   const fetch = useCallback(function (requestValue: RequestValue) {
     // This is just a trigger to start fetching.
     setRequestValue(requestValue);
+  }, []);
+  const refresh = useCallback(function () {
+    // This is just a trigger to start fetching.
+    setRequestValue(function (currVal) {
+      return {
+        ...currVal,
+      };
+    });
   }, []);
 
   // Request will be triggered when requet value changes.
@@ -96,6 +106,24 @@ const useBase = function (
     [requestValue]
   );
 
+  // Auto Refresh.
+  const autoRefresh = useAutoRefresh(content);
+  useEffect(
+    function () {
+      let intervalId: number;
+      const cleanup = function () {
+        window.clearInterval(intervalId);
+      };
+      if (autoRefresh.enabled) {
+        intervalId = window.setInterval(function () {
+          refresh();
+        }, autoRefresh.intervalSec);
+      }
+      return cleanup;
+    },
+    [refresh, autoRefresh.enabled, autoRefresh.intervalSec]
+  );
+
   return {
     isPending,
     error,
@@ -103,6 +131,7 @@ const useBase = function (
     request,
     requestValue,
     fetch,
+    refresh,
   };
 };
 export default useBase;

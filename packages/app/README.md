@@ -74,6 +74,10 @@ Viron offers a functionality for users to switch color themes so they can easily
 - We define [the tailwind colors configuration using CSS custom properties](https://tailwindcss.com/docs/customizing-colors#naming-your-colors), and overwrite them leveraging CSS specificity. See the global.css file for more detail.
 - We try to stick to the tailwind default color palette for all theme colors. This is the reason for the color setting on tailwind.config.js.
 
+### Error Handling
+To handle errors that would be fired inside react components, we use [Error Boundaries](https://reactjs.org/docs/error-boundaries.html). Inside the ErrorBoundary react component which follows [this strategy](https://dev.to/dinhhuyams/react-error-boundary-surviving-through-pandemic-2pl9), all errors are propagated to the [logger](./src/utils/logger/index.ts). Then logger will output information on browser's console, and send data to external services if necessary. For errors that would be caught outside of react components, just call the logger. The logger is the final destination of all errors.
+
+
 ### Prerequisite Knowledge and Technologies
 - [React](https://reactjs.org/)
 - [Gatsby](https://www.gatsbyjs.com/)

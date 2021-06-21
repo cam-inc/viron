@@ -1,28 +1,9 @@
 import _ from 'lodash';
-import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { Endpoint } from '$types/index';
-import {
-  Document,
-  Info,
-  Request,
-  RequestPayloadParameter,
-  RequestPayloadRequestBody,
-  RequestValue,
-} from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
-import {
-  cleanupRequestValue,
-  constructRequestInfo,
-  constructRequestInit,
-  constructRequestPayloads,
-  getRequest,
-} from '$utils/oas';
-import useAutoRefresh, { UseAutoRefreshReturn } from './useAutoRefresh';
+import { Document, Info } from '$types/oas';
 import useBase, { UseBaseReturn } from './useBase';
-import useRelated, { UseRelatedReturn } from './useRelated';
-import useRelatedDescendant, {
-  UseRelatedDescendantReturn,
-} from './useRelatedDescendant';
+import useSiblings, { UseSiblingsReturn } from './useSiblings';
+import useDescendants, { UseDescendantsReturn } from './useDescendants';
 
 const useContent = function (
   endpoint: Endpoint,
@@ -30,20 +11,17 @@ const useContent = function (
   content: Info['x-pages'][number]['contents'][number]
 ): {
   base: UseBaseReturn;
-  related: UseRelatedReturn;
-  relatedDescendant: UseRelatedDescendantReturn;
-  autoRefresh: UseAutoRefreshReturn;
+  siblings: UseSiblingsReturn;
+  descendants: UseDescendantsReturn;
 } {
   const base = useBase(endpoint, document, content);
-  const related = useRelated(document, content);
-  const relatedDescendant = useRelatedDescendant(document, content);
-  const autoRefresh = useAutoRefresh(content);
+  const siblings = useSiblings(document, content);
+  const descendants = useDescendants(document, content);
 
   return {
     base,
-    related,
-    relatedDescendant,
-    autoRefresh,
+    siblings,
+    descendants,
   };
 };
 

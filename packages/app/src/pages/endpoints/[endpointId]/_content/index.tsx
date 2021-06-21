@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { AiOutlineReload } from '@react-icons/all-files/ai/AiOutlineReload';
+import { AiOutlineSearch } from '@react-icons/all-files/ai/AiOutlineSearch';
+import React, { useCallback, useMemo } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { Endpoint } from '$types/index';
@@ -13,51 +15,54 @@ type Props = {
   content: Info['x-pages'][number]['contents'][number];
 };
 const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
-  const {
-    base,
-    //related,
-    //relatedDescendant,
-    autoRefresh,
-  } = useContent(endpoint, document, content);
+  const { base, siblings, descendants } = useContent(
+    endpoint,
+    document,
+    content
+  );
 
   const elm = useMemo<JSX.Element | null>(
     function () {
+      if (base.isPending) {
+        return <p>pending...</p>;
+      }
+      if (base.error) {
+        return <p>error: {base.error.message}</p>;
+      }
+      if (!base.data) {
+        return <p>no response.</p>;
+      }
       switch (content.type) {
         case 'number':
-          return <_ContentNumber data={base.data} />;
+          return (
+            <_ContentNumber
+              document={document}
+              content={content}
+              data={base.data}
+            />
+          );
         case 'table':
-          return <_ContentTable data={base.data} />;
+          return (
+            <_ContentTable
+              document={document}
+              content={content}
+              data={base.data}
+              descendants={descendants}
+            />
+          );
         default:
           return null;
       }
     },
-    [content.type, base.data]
+    [content.type, base.isPending, base.error, base.data]
   );
 
-  // Auto Refresh.
-  useEffect(
-    function () {
-      let intervalId: number;
-      const cleanup = function () {
-        window.clearInterval(intervalId);
-      };
-      if (autoRefresh.enabled) {
-        intervalId = window.setInterval(function () {
-          base.fetch(base.requestValue);
-        }, autoRefresh.intervalSec);
-      }
-      return cleanup;
-    },
-    [
-      base.fetch,
-      base.requestValue,
-      autoRefresh.enabled,
-      autoRefresh.intervalSec,
-    ]
-  );
+  const handleRefreshButtonClick = function () {
+    base.refresh();
+  };
 
   const drawer = useDrawer();
-  const handlePayloadButtonClick = function () {
+  const handleSearchButtonClick = function () {
     drawer.open();
   };
 
@@ -69,19 +74,19 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     [drawer, drawer.requestClose, base.fetch]
   );
 
-  if (base.isPending) {
-    return <p>fetching data...</p>;
-  }
-  if (base.error) {
-    return <p>error: {base.error.message}</p>;
-  }
-  if (!base.data) {
-    return <p>no response.</p>;
-  }
-
   return (
     <div className="p-2 bg-gray-100">
-      <button onClick={handlePayloadButtonClick}>payload</button>
+      <div className="mb-2">
+        <p>content.type全体の共通機能</p>
+        <div>
+          <AiOutlineReload className="inline" />
+          <button onClick={handleRefreshButtonClick}>refresh</button>
+        </div>
+        <div>
+          <AiOutlineSearch className="inline" />
+          <button onClick={handleSearchButtonClick}>search</button>
+        </div>
+      </div>
       <Drawer {...drawer.bind}>
         <Request
           request={base.request}

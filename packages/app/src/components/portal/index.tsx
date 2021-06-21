@@ -12,7 +12,7 @@ const Portal: React.FC<Props> = ({ targetId, children }) => {
   }
   const target = document.querySelector(`#${targetId}`);
   if (!target) {
-    error({ message: `Element #${targetId} not found.` });
+    error({ messages: [new Error(`Element #${targetId} not found.`)] });
     return null;
   }
   return ReactDOM.createPortal(children, target);

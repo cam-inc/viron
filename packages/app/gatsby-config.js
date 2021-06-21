@@ -1,7 +1,17 @@
 // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
 module.exports = {
   siteMetadata: {
+    // TODO: 増やす
     title: 'Viron',
+    description: 'TODO: description',
+    author: 'TODO',
+    authorURL: 'TODO: readmeのauthorかpackage.jsonのauthorへのurlを使うこと。',
+    helpURL: 'TODO: vironのドキュメントページへのURL。',
+    licenseURL:
+      'TODO: readmeのlicenseかpackage.jsonのlicenseへのurlを使うこと。',
+    keywords: ['TODO'],
+    creator: 'CAM, Inc.',
+    publisher: 'CAM, Inc.',
   },
   plugins: [
     {
@@ -9,6 +19,9 @@ module.exports = {
     },
     {
       resolve: 'gatsby-plugin-lodash',
+    },
+    {
+      resolve: 'gatsby-plugin-react-helmet-async',
     },
     {
       resolve: 'gatsby-plugin-alias-imports',
@@ -41,4 +54,8 @@ module.exports = {
       },
     },
   ],
+  // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/#flags
+  flags: {
+    FAST_DEV: true,
+  },
 };
