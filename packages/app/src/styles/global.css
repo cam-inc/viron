@@ -1,3 +1,6 @@
+/* TODO: cssルールに重複が無く最適に書き出されているかproductionモードで確認。 */
+/* TODO: クリティカルcssを抽出できるか調べること。 */
+
 /* Non-themable pages like `/home` will apply default custom properties. */
 :root {
   --color-primary-l: theme('colors.palette.pink.100');

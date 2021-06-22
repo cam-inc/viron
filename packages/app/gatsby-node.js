@@ -8,8 +8,7 @@ exports.onCreateWebpackConfig = ({ actions, plugins }) => {
     ],
     resolve: {
       fallback: {
-        // Necesary for roarr npm module.
-        domain: false,
+        fs: false,
       },
     },
   });
