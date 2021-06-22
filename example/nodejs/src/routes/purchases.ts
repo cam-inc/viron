@@ -9,9 +9,9 @@ import {
 
 // 購買情報一覧
 export const listPurchases = async (context: RouteContext): Promise<void> => {
-  const { limit, offset, purchaseId } = context.params.query;
+  const { size, page, purchaseId } = context.params.query;
   const conditions = purchaseId ? { id: purchaseId } : {};
-  const result = await list(conditions, limit, offset);
+  const result = await list(conditions, size, page);
   context.res.json(result);
 };
 

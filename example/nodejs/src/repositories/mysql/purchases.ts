@@ -30,11 +30,11 @@ export const find = async (
 
 export const findWithPager = async (
   conditions: WhereOptions<Purchase> = {},
-  limit?: number,
-  offset?: number
+  size?: number,
+  page?: number
 ): Promise<ListWithPager<Purchase>> => {
   const model = getModel();
-  const options = getFindOptions(limit, offset);
+  const options = getFindOptions(size, page);
   options.where = conditions;
   const result = await model.findAndCountAll(options);
   return {
