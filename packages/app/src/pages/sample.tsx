@@ -4,6 +4,7 @@ import { useRecoilState } from 'recoil';
 import Drawer, { useDrawer } from '$components/drawer';
 import ErrorBoundary from '$components/errorBoundary';
 import Modal, { useModal } from '$components/modal';
+import Notification, { useNotification } from '$components/notification';
 import Progress, { useProgress } from '$components/progress';
 //import Popover, { usePopover } from '$components/popover';
 import useTheme from '$hooks/theme';
@@ -68,6 +69,11 @@ const SamplePage: React.FC<Props> = () => {
     progress.open();
   };
 
+  const notification = useNotification();
+  const handleOpenNotificationClick = function () {
+    notification.open();
+  };
+
   return (
     <Layout>
       <div>
@@ -79,6 +85,13 @@ const SamplePage: React.FC<Props> = () => {
         <Progress {...progress.bind}>
           <p>see mee??</p>
         </Progress>
+      </div>
+      <div>
+        <p>Notificationのテスト</p>
+        <button onClick={handleOpenNotificationClick}>open notification</button>
+        <Notification {...notification.bind}>
+          <p>see mee??</p>
+        </Notification>
       </div>
       <div>
         <p>React.lazyとReact.Suspenseのテスト</p>
