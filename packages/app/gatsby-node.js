@@ -8,6 +8,7 @@ exports.onCreateWebpackConfig = ({ actions, plugins }) => {
     ],
     resolve: {
       fallback: {
+        // Necesary for using Tailwind JIT mode.
         fs: false,
       },
     },
