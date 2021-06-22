@@ -65,23 +65,29 @@ export type Info = {
     }[];
   }[];
   // [extended] Common setting for page contents that are type of table.
-  'x-table'?: {
-    responseListKey: string;
-    pager?: {
-      requestPageKey: string;
-      requestSizeKey: string;
-      responseMaxpageKey: string;
-      responsePageKey: string;
-    };
-    sort?: {
-      requestKey: string;
-    };
-  };
+  'x-table'?: X_Table;
   // [extended] Common setting for autocomplete function.
   'x-autocomplete'?: {
     responseLabelKey?: string;
     responseValueKey: string;
   };
+};
+
+// [extended] Common setting for page contents that are type of table.
+export type X_Table = {
+  responseListKey: string;
+  pager?: Pager;
+  sort?: {
+    requestKey: string;
+  };
+};
+export type Pager = {
+  // Which request parameter to use when fetching.
+  requestPageKey: string;
+  requestSizeKey: string;
+  // Which response key to use when consuming.
+  responseMaxpageKey: string;
+  responsePageKey: string;
 };
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object

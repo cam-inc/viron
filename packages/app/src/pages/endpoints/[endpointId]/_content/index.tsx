@@ -2,9 +2,10 @@ import React, { useMemo } from 'react';
 import { Endpoint } from '$types/index';
 import { Document, Info } from '$types/oas';
 import useContent from './_hooks/useContent';
-import Refresh from './_parts/refresh';
-import Search from './_parts/search';
-import Sibling from './_parts/sibling';
+import Pagination from './_parts/pagination/index';
+import Refresh from './_parts/refresh/index';
+import Search from './_parts/search/index';
+import Sibling from './_parts/sibling/index';
 import _ContentNumber from './_types/_number/index';
 import _ContentTable from './_types/_table/index';
 
@@ -38,7 +39,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     console.log(error);
   };
 
-  const elm = useMemo<JSX.Element | null>(
+  const elmOfContentType = useMemo<JSX.Element | null>(
     function () {
       if (base.isPending) {
         return <p>pending...</p>;
@@ -76,6 +77,25 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     [content.type, base.isPending, base.error, base.data]
   );
 
+  const supplementalElm = useMemo<JSX.Element | null>(
+    function () {
+      if (!base.data) {
+        return null;
+      }
+      if (
+        content.type === 'table' &&
+        content.pagination &&
+        document.info['x-table']?.pager
+      ) {
+        return (
+          <Pagination pager={document.info['x-table'].pager} base={base} />
+        );
+      }
+      return null;
+    },
+    [content, base]
+  );
+
   return (
     <div className="p-2 bg-gray-100">
       <div className="mb-2">
@@ -101,8 +121,8 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
           })}
         </ul>
       </div>
-
-      <div>{elm}</div>
+      <div>{elmOfContentType}</div>
+      <div>{supplementalElm}</div>
     </div>
   );
 };
