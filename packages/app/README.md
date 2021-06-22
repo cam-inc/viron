@@ -77,8 +77,11 @@ Viron offers a functionality for users to switch color themes so they can easily
 ### Error Handling
 To handle errors that would be fired inside react components, we use [Error Boundaries](https://reactjs.org/docs/error-boundaries.html). Inside the ErrorBoundary react component which follows [this strategy](https://dev.to/dinhhuyams/react-error-boundary-surviving-through-pandemic-2pl9), all errors are propagated to the [logger](./src/utils/logger/index.ts). Then logger will output information on browser's console, and send data to external services if necessary. For errors that would be caught outside of react components, just call the logger. The logger is the final destination of all errors.
 
+### Animation
+Try sticking to implementing only fade-in animations. In many cases fade-in animations are meaningful in the point of UX but fade-out animations are not that much important. Fade-out animations tend to make users wait and make source code tricky to read.
 
-### Prerequisite Knowledge and Technologies
+### Main Prerequisite Knowledge and Technologies
+- [TypeScript](https://www.typescriptlang.org/)
 - [React](https://reactjs.org/)
 - [Gatsby](https://www.gatsbyjs.com/)
 - [tailwindcss](https://tailwindcss.com/)
@@ -87,3 +90,4 @@ To handle errors that would be fired inside react components, we use [Error Boun
 - [OpenAPI Specification](https://swagger.io/specification/)
 - [i18next](https://www.i18next.com/)
 - [react-i18next](https://react.i18next.com/)
+- [Storybook](https://storybook.js.org/)

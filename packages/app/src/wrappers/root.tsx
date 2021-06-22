@@ -12,7 +12,9 @@ import { isLaunchedState, screenState, themeState } from '$store/atoms/app';
 import '$styles/global.css';
 import DrawerWrapper from '$wrappers/drawer';
 import ModalWrapper from '$wrappers/modal';
+import NotificationWrapper from '$wrappers/notification';
 import PopoverWrapper from '$wrappers/popover';
+import ProgressWrapper from '$wrappers/progress';
 // @ts-ignore
 import tailwindConfig from '../../tailwind.config';
 
@@ -103,6 +105,8 @@ const Root: React.FC<Props> = ({ children }) => {
       <DrawerWrapper className="fixed inset-0" />
       <ModalWrapper className="fixed inset-0" />
       <PopoverWrapper className="fixed inset-0" />
+      <NotificationWrapper className="fixed inset-0" />
+      <ProgressWrapper className="fixed inset-0" />
       {!isLaunched && <Splash className="fixed inset-0" />}
     </div>
   );

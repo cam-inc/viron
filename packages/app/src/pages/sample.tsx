@@ -4,6 +4,8 @@ import { useRecoilState } from 'recoil';
 import Drawer, { useDrawer } from '$components/drawer';
 import ErrorBoundary from '$components/errorBoundary';
 import Modal, { useModal } from '$components/modal';
+import Notification, { useNotification } from '$components/notification';
+import Progress, { useProgress } from '$components/progress';
 //import Popover, { usePopover } from '$components/popover';
 import useTheme from '$hooks/theme';
 import Layout from '$layouts/index';
@@ -62,10 +64,34 @@ const SamplePage: React.FC<Props> = () => {
     setCount(count + 1);
   };
 
+  const progress = useProgress();
+  const handleOpenProgressClick = function () {
+    progress.open();
+  };
+
+  const notification = useNotification();
+  const handleOpenNotificationClick = function () {
+    notification.open();
+  };
+
   return (
     <Layout>
       <div>
         <p>{JSON.stringify(screen, null, 2)}</p>
+      </div>
+      <div>
+        <p>Progressのテスト</p>
+        <button onClick={handleOpenProgressClick}>open progress</button>
+        <Progress {...progress.bind}>
+          <p>see mee??</p>
+        </Progress>
+      </div>
+      <div>
+        <p>Notificationのテスト</p>
+        <button onClick={handleOpenNotificationClick}>open notification</button>
+        <Notification {...notification.bind}>
+          <p>see mee??</p>
+        </Notification>
       </div>
       <div>
         <p>React.lazyとReact.Suspenseのテスト</p>

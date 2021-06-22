@@ -1,5 +1,12 @@
 import { URL } from '$types/index';
 
+// @ts-ignore
+const nodeEnv: string = __NODE_ENV__;
+
+export const isProduction: boolean = nodeEnv === 'production';
+
+export const isDevelopment: boolean = nodeEnv === 'development';
+
 export const isBrowser: boolean = typeof window !== 'undefined';
 export const isSSR: boolean = typeof window === 'undefined';
 

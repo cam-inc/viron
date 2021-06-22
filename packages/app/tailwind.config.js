@@ -2,6 +2,8 @@ const colors = require('tailwindcss/colors');
 
 /** @type {import("@types/tailwindcss/tailwind-config").TailwindConfig } */
 module.exports = {
+  // @see: https://tailwindcss.com/docs/just-in-time-mode
+  mode: 'jit',
   purge: {
     // uncomment out to enable purge functionality on development environment.
     // enabled: true,
@@ -53,11 +55,6 @@ module.exports = {
         '50%': '50%',
         '75%': '75%',
       },
-    },
-  },
-  variants: {
-    extend: {
-      margin: ['last'],
     },
   },
   plugins: [],
