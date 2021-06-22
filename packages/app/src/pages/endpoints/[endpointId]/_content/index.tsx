@@ -1,13 +1,12 @@
-import { AiOutlineReload } from '@react-icons/all-files/ai/AiOutlineReload';
-import { AiOutlineSearch } from '@react-icons/all-files/ai/AiOutlineSearch';
-import React, { useCallback, useMemo } from 'react';
-import Drawer, { useDrawer } from '$components/drawer';
-import Request from '$components/request';
+import React, { useMemo } from 'react';
 import { Endpoint } from '$types/index';
-import { Document, Info, RequestValue } from '$types/oas';
+import { Document, Info } from '$types/oas';
 import useContent from './_hooks/useContent';
-import _ContentNumber from './_number/index';
-import _ContentTable from './_table/index';
+import Refresh from './_parts/refresh';
+import Search from './_parts/search';
+import Sibling from './_parts/sibling';
+import _ContentNumber from './_types/_number/index';
+import _ContentTable from './_types/_table/index';
 
 type Props = {
   endpoint: Endpoint;
@@ -20,6 +19,24 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     document,
     content
   );
+
+  const handleSiblingOperationSuccess = function (data: any) {
+    console.log(data);
+    base.refresh();
+  };
+  const handleSiblingOperationFail = function (error: Error) {
+    // TODO: error handling
+    console.log(error);
+  };
+
+  const handleDescendantOperationSuccess = function (data: any) {
+    console.log(data);
+    base.refresh();
+  };
+  const handleDescendantOperationFail = function (error: Error) {
+    // TODO: error handling
+    console.log(error);
+  };
 
   const elm = useMemo<JSX.Element | null>(
     function () {
@@ -48,6 +65,8 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
               content={content}
               data={base.data}
               descendants={descendants}
+              onDescendantOperationSuccess={handleDescendantOperationSuccess}
+              onDescendantOperationFail={handleDescendantOperationFail}
             />
           );
         default:
@@ -57,43 +76,32 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     [content.type, base.isPending, base.error, base.data]
   );
 
-  const handleRefreshButtonClick = function () {
-    base.refresh();
-  };
-
-  const drawer = useDrawer();
-  const handleSearchButtonClick = function () {
-    drawer.open();
-  };
-
-  const handleRequestSubmit = useCallback(
-    function (requestValue: RequestValue) {
-      drawer.requestClose();
-      base.fetch(requestValue);
-    },
-    [drawer, drawer.requestClose, base.fetch]
-  );
-
   return (
     <div className="p-2 bg-gray-100">
       <div className="mb-2">
         <p>content.type全体の共通機能</p>
-        <div>
-          <AiOutlineReload className="inline" />
-          <button onClick={handleRefreshButtonClick}>refresh</button>
-        </div>
-        <div>
-          <AiOutlineSearch className="inline" />
-          <button onClick={handleSearchButtonClick}>search</button>
-        </div>
+        <Refresh base={base} />
+        <Search base={base} />
       </div>
-      <Drawer {...drawer.bind}>
-        <Request
-          request={base.request}
-          defaultValues={base.requestValue}
-          onSubmit={handleRequestSubmit}
-        />
-      </Drawer>
+      <div className="mb-2">
+        <p>Siblings</p>
+        <ul>
+          {siblings.map(function (sibling, idx) {
+            return (
+              <React.Fragment key={idx}>
+                <li>
+                  <Sibling
+                    sibling={sibling}
+                    onOperationSuccess={handleSiblingOperationSuccess}
+                    onOperationFail={handleSiblingOperationFail}
+                  />
+                </li>
+              </React.Fragment>
+            );
+          })}
+        </ul>
+      </div>
+
       <div>{elm}</div>
     </div>
   );

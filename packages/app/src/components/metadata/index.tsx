@@ -8,6 +8,13 @@ const query = graphql`
       siteMetadata {
         title
         description
+        author
+        authorURL
+        helpURL
+        licenseURL
+        keywords
+        creator
+        publisher
       }
     }
   }
