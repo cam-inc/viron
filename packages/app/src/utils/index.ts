@@ -1,6 +1,6 @@
 import { URL } from '$types/index';
 
-// eslint-disable-next-line
+// @ts-ignore
 const nodeEnv: string = __NODE_ENV__;
 
 export const isProduction: boolean = nodeEnv === 'production';
