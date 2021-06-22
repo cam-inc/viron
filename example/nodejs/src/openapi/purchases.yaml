@@ -35,7 +35,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PurchaseList'
+                $ref: '#/components/schemas/PurchaseListWithPager'
       security:
         - jwt: []
 
@@ -89,7 +89,7 @@ paths:
       summary: remove purchase
       description: 購買情報削除
       parameters:
-        - $ref: './components.yaml#/components/parameters/IdPathParam'
+        - $ref: '#/components/parameters/PurchaseIdPathParam'
       responses:
         204:
           description: OK
