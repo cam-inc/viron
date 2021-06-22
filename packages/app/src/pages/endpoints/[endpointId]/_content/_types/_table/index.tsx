@@ -7,6 +7,8 @@ import {
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 import Descendant from '../../_parts/descendant';
 
+// TODO: ソート機能とフィルター機能
+
 type Props = {
   document: Document;
   content: Info['x-pages'][number]['contents'][number];

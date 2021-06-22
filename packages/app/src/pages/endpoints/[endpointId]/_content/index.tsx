@@ -39,7 +39,7 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     console.log(error);
   };
 
-  const elmOfContentType = useMemo<JSX.Element | null>(
+  const elm = useMemo<JSX.Element | null>(
     function () {
       if (base.isPending) {
         return <p>pending...</p>;
@@ -77,24 +77,17 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
     [content.type, base.isPending, base.error, base.data]
   );
 
-  const supplementalElm = useMemo<JSX.Element | null>(
-    function () {
-      if (!base.data) {
-        return null;
-      }
-      if (
-        content.type === 'table' &&
-        content.pagination &&
-        document.info['x-table']?.pager
-      ) {
-        return (
-          <Pagination pager={document.info['x-table'].pager} base={base} />
-        );
-      }
-      return null;
-    },
-    [content, base]
-  );
+  let paginationElm: JSX.Element | null = null;
+  if (
+    base.data &&
+    content.type === 'table' &&
+    content.pagination &&
+    document.info['x-table']?.pager
+  ) {
+    paginationElm = (
+      <Pagination pager={document.info['x-table'].pager} base={base} />
+    );
+  }
 
   return (
     <div className="p-2 bg-gray-100">
@@ -121,8 +114,8 @@ const _Content: React.FC<Props> = ({ endpoint, document, content }) => {
           })}
         </ul>
       </div>
-      <div>{elmOfContentType}</div>
-      <div>{supplementalElm}</div>
+      <div>{elm}</div>
+      <div>{paginationElm}</div>
     </div>
   );
 };
