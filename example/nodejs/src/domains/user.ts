@@ -1,5 +1,5 @@
 import { ListWithPager } from '@viron/lib';
-import { getUserRepository } from '../repositories';
+import { FindConditions, getUserRepository } from '../repositories';
 
 export interface User {
   id: string;
@@ -28,12 +28,12 @@ const format = (user: User): UserView => {
 };
 
 export const list = async (
-  // TODO: conditions
-  limit?: number,
-  offset?: number
+  conditions?: FindConditions<User>,
+  size?: number,
+  page?: number
 ): Promise<ListWithPager<UserView>> => {
   const repository = getUserRepository();
-  const result = await repository.findWithPager({}, limit, offset);
+  const result = await repository.findWithPager(conditions, size, page);
   return {
     ...result,
     list: result.list.map(format),

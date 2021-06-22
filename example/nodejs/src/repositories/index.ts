@@ -37,8 +37,8 @@ interface Repository<Entity, CreateAttributes, UpdateAttributes> {
   ) => Promise<Entity[]>;
   findWithPager: (
     conditions?: FindConditions<Entity>,
-    limit?: number,
-    offset?: number
+    size?: number,
+    page?: number
   ) => Promise<ListWithPager<Entity>>;
   findOne: (conditions?: FindConditions<Entity>) => Promise<Entity>;
   count: (conditions?: FindConditions<Entity>) => Promise<number>;

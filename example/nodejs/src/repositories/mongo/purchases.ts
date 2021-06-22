@@ -29,10 +29,10 @@ export const find = async (
 
 export const findWithPager = async (
   conditions: FilterQuery<Purchase> = {},
-  limit?: number,
-  offset?: number
+  size?: number,
+  page?: number
 ): Promise<ListWithPager<Purchase>> => {
-  const options = getQueryOptions(limit, offset);
+  const options = getQueryOptions(size, page);
   const [list, totalCount] = await Promise.all([
     find(conditions, options),
     count(conditions),
