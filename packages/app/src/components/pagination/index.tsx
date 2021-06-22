@@ -18,8 +18,8 @@ const Pagination: React.FC<Props> = ({ current, max, onRequestChange }) => {
         return (
           <React.Fragment key={num}>
             <Page
-              num={num}
-              selected={num === current}
+              num={num + 1}
+              selected={num + 1 === current}
               onClick={handlePageClick}
             />
           </React.Fragment>
