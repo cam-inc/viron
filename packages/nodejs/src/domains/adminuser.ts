@@ -1,8 +1,13 @@
 import { AUTH_TYPE, AuthType } from '../constants';
 import { ListWithPager, genPasswordHash } from '../helpers';
-import { repositoryContainer } from '../repositories';
+import { FindConditions, repositoryContainer } from '../repositories';
 import { adminUserNotFound } from '../errors';
-import { listRoles, revokeRoleForUser, updateRolesForUser } from './adminrole';
+import {
+  listRoles,
+  listUsers,
+  revokeRoleForUser,
+  updateRolesForUser,
+} from './adminrole';
 
 export interface AdminUser {
   id: string;
@@ -122,10 +127,18 @@ const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
 };
 
 // 一覧取得
-export const list = async (): Promise<ListWithPager<AdminUserView>> => {
+export const list = async (
+  conditions: FindConditions<AdminUser> & { roleId?: string } = {},
+  size?: number,
+  page?: number
+): Promise<ListWithPager<AdminUserView>> => {
   const repository = repositoryContainer.getAdminUserRepository();
-  // TODO: 検索
-  const result = await repository.findWithPager();
+  if (conditions.roleId) {
+    const userIds = await listUsers(conditions.roleId);
+    conditions = Object.assign({}, conditions, { userIds });
+    delete conditions.roleId;
+  }
+  const result = await repository.findWithPager(conditions, size, page);
   const adminRoles = await Promise.all(
     result.list.map((adminUser) => listRoles(adminUser.id))
   );

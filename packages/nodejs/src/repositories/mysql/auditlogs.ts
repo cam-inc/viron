@@ -1,8 +1,13 @@
 import { Sequelize } from 'sequelize';
+import { FindOptions, WhereOptions } from 'sequelize/types';
 import { storeDefinitions } from '../../stores';
 import { domainsAuditLog } from '../../domains';
 import { repositoryContainer } from '..';
-import { getPagerResults, ListWithPager } from '../../helpers';
+import {
+  getMysqlFindOptions,
+  getPagerResults,
+  ListWithPager,
+} from '../../helpers';
 
 const getModel = (): storeDefinitions.mysql.auditLogs.AuditLogModelCtor => {
   const conn = repositoryContainer.conn as Sequelize;
@@ -18,28 +23,37 @@ export const findOneById = async (
   return doc ? (doc.toJSON() as domainsAuditLog.AuditLog) : null;
 };
 
-export const find = async (): Promise<domainsAuditLog.AuditLog[]> => {
+export const find = async (
+  conditions: WhereOptions<domainsAuditLog.AuditLog> = {},
+  options: FindOptions<domainsAuditLog.AuditLog> = {}
+): Promise<domainsAuditLog.AuditLog[]> => {
   const model = getModel();
-  const docs = await model.findAll();
+  options.where = conditions;
+  const docs = await model.findAll(options);
   return docs.map((doc) => doc.toJSON() as domainsAuditLog.AuditLog);
 };
 
-export const findWithPager = async (): Promise<
-  ListWithPager<domainsAuditLog.AuditLog>
-> => {
+export const findWithPager = async (
+  conditions: WhereOptions<domainsAuditLog.AuditLog> = {},
+  size?: number,
+  page?: number
+): Promise<ListWithPager<domainsAuditLog.AuditLog>> => {
   const model = getModel();
-  const result = await model.findAndCountAll();
+  const options = getMysqlFindOptions(size, page);
+  options.where = conditions;
+  const result = await model.findAndCountAll(options);
   return {
-    ...getPagerResults(result.count),
+    ...getPagerResults(result.count, size, page),
     list: result.rows.map((doc) => doc.toJSON() as domainsAuditLog.AuditLog),
   };
 };
 
-export const count =
-  async (/*conditions: WhereOptions<User> = {}*/): Promise<number> => {
-    const model = getModel();
-    return await model.count();
-  };
+export const count = async (
+  conditions: WhereOptions<domainsAuditLog.AuditLog> = {}
+): Promise<number> => {
+  const model = getModel();
+  return await model.count({ where: conditions });
+};
 
 export const createOne = async (
   auditLog: domainsAuditLog.AuditLogCreateAttributes

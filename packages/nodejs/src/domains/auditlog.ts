@@ -1,5 +1,5 @@
 import { ListWithPager } from '../helpers';
-import { repositoryContainer } from '../repositories';
+import { FindConditions, repositoryContainer } from '../repositories';
 
 export interface AuditLog {
   id: string;
@@ -25,10 +25,13 @@ export interface AuditLogCreateAttributes {
 export type AuditLogUpdateAttributes = AuditLogCreateAttributes;
 
 // 一覧取得
-export const list = async (): Promise<ListWithPager<AuditLog>> => {
+export const list = async (
+  conditions?: FindConditions<AuditLog>,
+  size?: number,
+  page?: number
+): Promise<ListWithPager<AuditLog>> => {
   const repository = repositoryContainer.getAuditLogRepository();
-  // TODO: 検索
-  return repository.findWithPager();
+  return repository.findWithPager(conditions, size, page);
 };
 
 // 1件作成

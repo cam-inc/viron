@@ -5,6 +5,7 @@ import { RouteContext } from '../application';
 export const listVironAuditlogs = async (
   context: RouteContext
 ): Promise<void> => {
-  const result = await domainsAuditLog.list();
+  const { size, page, ...conditions } = context.params.query;
+  const result = await domainsAuditLog.list(conditions, size, page);
   context.res.json(result);
 };

@@ -30,7 +30,10 @@ paths:
       description: 管理ユーザー一覧
       parameters:
         - $ref: './components.yaml#/components/parameters/VironIdQueryParam'
+        - $ref: './components.yaml#/components/parameters/VironEmailQueryParam'
         - $ref: './components.yaml#/components/parameters/VironRoleIdQueryParam'
+        - $ref: './components.yaml#/components/parameters/VironPagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/VironPagerPageQueryParam'
       responses:
         200:
           description: OK
@@ -100,7 +103,7 @@ components:
   schemas:
     VironAdminUserListWithPager:
       allOf:
-        - $ref: './components.yaml#/components/schemas/Pager'
+        - $ref: './components.yaml#/components/schemas/VironPager'
         - type: object
           properties:
             list:
