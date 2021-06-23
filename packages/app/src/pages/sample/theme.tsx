@@ -33,7 +33,7 @@ const ThemePage: React.FC<Props> = () => {
           primary variant disabled
         </div>
       </div>
-      {/* header  */}
+      {/* header */}
       <div className="bg-primary-l dark:bg-primary-d p-4">
         <div className="text-on-primary-l dark:text-on-primary-d">primary</div>
         <div className="text-on-primary-high-l dark:text-on-primary-high-d">

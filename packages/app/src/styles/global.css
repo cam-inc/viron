@@ -47,6 +47,58 @@ TODO: Tailwind JIT modeが正式リリースになったタイミングで以下
 
 /* Themable pages like `/endpoints/[endpointId]` will apply overwritten custom properties. */
 #root[data-theme="lime"] {
+  /* Light */
+  --color-background-l: #F8F8F8;
+  --color-surface-l: #F0EFE7;
+  --color-surface-00dp-l: #F0EFE7;
+  --color-surface-01dp-l: #EBEADD;
+  --color-surface-02dp-l: #E8E6D7;
+  --color-surface-03dp-l: #E8E6D7;
+  --color-surface-04dp-l: #E6E5D4;
+  --color-surface-06dp-l: #E4E2D0;
+  --color-surface-08dp-l: #E3E1CE;
+  --color-surface-12dp-l: #E0DECA;
+  --color-surface-16dp-l: #DFDDC7;
+  --color-surface-24dp-l: #DFDCC5;
+  --color-primary-l: theme('colors.palette.lime.900');
+  --color-primary-variant-l: theme('colors.palette.lime.800');
+  --color-secondary-l: theme('colors.palette.lime.700');
+  --color-secondary-variant-l: theme('colors.palette.lime.600');
+  --color-error-l: #B00020;
+  --color-on-background-l: #646464;
+  --color-on-background-high-l: #212121;
+  --color-on-background-medium-l: #646464;
+  --color-on-background-disabled-l: #9A9A9A;
+  --color-on-background-variant-l: #B1AB71;
+  --color-on-background-variant-high-l: #918834;
+  --color-on-background-variant-medium-l: #B1AB71;
+  --color-on-background-variant-disabled-l: #CBC7A2;
+  --color-on-surface-l: #61605D;
+  --color-on-surface-high-l: #20201F;
+  --color-on-surface-medium-l: #61605D;
+  --color-on-surface-disabled-l: #95948F;
+  --color-on-primary-l: #C8C49D;
+  --color-on-primary-high-l: #E8E7DA;
+  --color-on-primary-medium-l: #C8C49D;
+  --color-on-primary-disabled-l: #AFA86C;
+  --color-on-primary-variant-l: #D4D3A2;
+  --color-on-primary-variant-high-l: #ECECDC;
+  --color-on-primary-variant-medium-l: #D4D3A2;
+  --color-on-primary-variant-disabled-l: #C0C074;
+  --color-on-secondary-l: #DADCA5;
+  --color-on-secondary-high-l: #EEEFDD;
+  --color-on-secondary-medium-l: #DADCA5;
+  --color-on-secondary-disabled-l: #CBCE79;
+  --color-on-secondary-variant-l: #E1E5A9;
+  --color-on-secondary-variant-high-l: #F1F2DE;
+  --color-on-secondary-variant-medium-l: #E1E5A9;
+  --color-on-secondary-variant-disabled-l: #D5DB7E;
+  --color-on-error-l: #DF98A5;
+  --color-on-error-high-l: #EED7DB;
+  --color-on-error-medium-l: #DB94A1;
+  --color-on-error-disabled-l: #CB5E72;
+
+  /* Dark */
   --color-background-d: #121212;
   --color-surface-d: #202411;
   --color-surface-00dp-d: #202411;
@@ -63,7 +115,7 @@ TODO: Tailwind JIT modeが正式リリースになったタイミングで以下
   --color-primary-variant-d: theme('colors.palette.lime.A700');
   --color-secondary-d: theme('colors.palette.lime.A100');
   --color-secondary-variant-d: theme('colors.palette.lime.A200');
-  --color-error-d: theme('colors.palette.red.A200');
+  --color-error-d: #D06679;
   --color-on-background-d: #9F9F9F;
   --color-on-background-high-d: #DFDFDF;
   --color-on-background-medium-d: #9F9F9F;
