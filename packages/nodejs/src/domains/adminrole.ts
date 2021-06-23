@@ -141,6 +141,13 @@ export const listPolicies = async (
   return policies.map((policy) => parsePolicy(policy as Policy));
 };
 
+// 指定したロールを持つユーザーの一覧を取得
+export const listUsers = async (roleId: string): Promise<string[]> => {
+  const casbin = repositoryContainer.getCasbin();
+  await sync();
+  return await casbin.getUsersForRole(roleId);
+};
+
 // ロールから権限を剥奪する
 export const revokePermissionForRole = async (
   roleId: string,

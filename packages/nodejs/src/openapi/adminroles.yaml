@@ -93,7 +93,7 @@ components:
   schemas:
     VironAdminRoleListWithPager:
       allOf:
-        - $ref: './components.yaml#/components/schemas/Pager'
+        - $ref: './components.yaml#/components/schemas/VironPager'
         - type: object
           properties:
             list:

@@ -10,6 +10,7 @@ import {
   listPolicies,
   listResourcesByOas,
   listRoles,
+  listUsers,
   removeRole,
   revokePermissionForRole,
   revokeRoleForUser,
@@ -169,6 +170,27 @@ describe('domains/adminrole', () => {
     it('Get all policies', async () => {
       const result = await listPolicies();
       assert.strictEqual(result.length, 8);
+    });
+  });
+
+  describe('listUsers', () => {
+    it('Get user list filtered by roleId', async () => {
+      await Promise.all([
+        casbin.addRoleForUser('1', 'editor'),
+        casbin.addRoleForUser('2', 'editor'),
+        casbin.addRoleForUser('3', 'reader'),
+        casbin.addRoleForUser('4', 'director'),
+        casbin.addRoleForUser('5', 'reader'),
+        casbin.addRoleForUser('6', 'editor'),
+      ]);
+      const [editor, reader, director] = await Promise.all([
+        listUsers('editor'),
+        listUsers('reader'),
+        listUsers('director'),
+      ]);
+      assert.deepStrictEqual(editor, ['1', '2', '6']);
+      assert.deepStrictEqual(reader, ['3', '5']);
+      assert.deepStrictEqual(director, ['4']);
     });
   });
 

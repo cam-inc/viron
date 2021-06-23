@@ -26,14 +26,12 @@ paths:
 components:
   schemas:
     VironAuthConfigListWithPager:
-      allOf:
-        - $ref: './components.yaml#/components/schemas/Pager'
-        - type: object
-          properties:
-            list:
-              $ref: '#/components/schemas/VironAuthConfigList'
-          required:
-            - list
+      type: object
+      properties:
+        list:
+          $ref: '#/components/schemas/VironAuthConfigList'
+      required:
+        - list
 
     VironAuthConfigList:
       type: array

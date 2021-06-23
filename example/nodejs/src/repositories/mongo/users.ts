@@ -1,12 +1,15 @@
 import { FilterQuery, QueryOptions } from 'mongoose';
-import { ListWithPager, getPagerResults } from '@viron/lib';
+import {
+  ListWithPager,
+  getPagerResults,
+  getMongoQueryOptions,
+} from '@viron/lib';
 import {
   User,
   UserCreateAttributes,
   UserUpdateAttributes,
 } from '../../domains/user';
 import { UserModel } from '../../stores/definitions/mongo/users';
-import { getQueryOptions } from '../../stores/helpers/mongo';
 import { ctx } from '../../context';
 
 const getModel = (): UserModel => ctx.stores.main.models.users as UserModel;
@@ -31,13 +34,13 @@ export const findWithPager = async (
   size?: number,
   page?: number
 ): Promise<ListWithPager<User>> => {
-  const options = getQueryOptions(size, page);
+  const options = getMongoQueryOptions(size, page);
   const [list, totalCount] = await Promise.all([
     find(conditions, options),
     count(conditions),
   ]);
   return {
-    ...getPagerResults(totalCount),
+    ...getPagerResults(totalCount, size, page),
     list,
   };
 };

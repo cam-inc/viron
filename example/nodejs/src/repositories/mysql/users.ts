@@ -1,5 +1,9 @@
 import { FindOptions, WhereOptions } from 'sequelize/types';
-import { getPagerResults, ListWithPager } from '@viron/lib';
+import {
+  getMysqlFindOptions,
+  getPagerResults,
+  ListWithPager,
+} from '@viron/lib';
 import { ctx } from '../../context';
 import {
   User,
@@ -7,7 +11,6 @@ import {
   UserUpdateAttributes,
 } from '../../domains/user';
 import { UserModelCtor } from '../../stores/definitions/mysql/users';
-import { getFindOptions } from '../../stores/helpers/mysql';
 
 const getModel = (): UserModelCtor =>
   ctx.stores.main.models.users as UserModelCtor;
@@ -34,11 +37,11 @@ export const findWithPager = async (
   page?: number
 ): Promise<ListWithPager<User>> => {
   const model = getModel();
-  const options = getFindOptions(size, page);
+  const options = getMysqlFindOptions(size, page);
   options.where = conditions;
   const result = await model.findAndCountAll(options);
   return {
-    ...getPagerResults(result.count),
+    ...getPagerResults(result.count, size, page),
     list: result.rows.map((doc) => doc.toJSON() as User),
   };
 };

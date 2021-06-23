@@ -37,6 +37,11 @@ paths:
       parameters:
         - $ref: '#/components/parameters/VironUserIdQueryParam'
         - $ref: '#/components/parameters/VironRequestUriQueryParam'
+        - $ref: '#/components/parameters/VironRequestMethodQueryParam'
+        - $ref: '#/components/parameters/VironSourceIpQueryParam'
+        - $ref: '#/components/parameters/VironStatusCodeQueryParam'
+        - $ref: './components.yaml#/components/parameters/VironPagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/VironPagerPageQueryParam'
       responses:
         200:
           description: OK
@@ -63,10 +68,32 @@ components:
         type: string
       required: false
 
+    VironRequestMethodQueryParam:
+      name: requestMethod
+      in: query
+      schema:
+        type: string
+      required: false
+
+    VironSourceIpQueryParam:
+      name: sourceIp
+      in: query
+      schema:
+        type: string
+      required: false
+
+    VironStatusCodeQueryParam:
+      name: statusCode
+      in: query
+      schema:
+        type: integer
+        format: int32
+      required: false
+
   schemas:
     VironAuditLogListWithPager:
       allOf:
-        - $ref: './components.yaml#/components/schemas/Pager'
+        - $ref: './components.yaml#/components/schemas/VironPager'
         - type: object
           properties:
             list:

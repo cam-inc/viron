@@ -1,12 +1,15 @@
 import { FilterQuery, QueryOptions } from 'mongoose';
-import { ListWithPager, getPagerResults } from '@viron/lib';
+import {
+  ListWithPager,
+  getPagerResults,
+  getMongoQueryOptions,
+} from '@viron/lib';
 import {
   Purchase,
   PurchaseCreateAttributes,
   PurchaseUpdateAttributes,
 } from '../../domains/purchase';
 import { PurchaseModel } from '../../stores/definitions/mongo/purchases';
-import { getQueryOptions } from '../../stores/helpers/mongo';
 import { ctx } from '../../context';
 
 const getModel = (): PurchaseModel =>
@@ -32,13 +35,13 @@ export const findWithPager = async (
   size?: number,
   page?: number
 ): Promise<ListWithPager<Purchase>> => {
-  const options = getQueryOptions(size, page);
+  const options = getMongoQueryOptions(size, page);
   const [list, totalCount] = await Promise.all([
     find(conditions, options),
     count(conditions),
   ]);
   return {
-    ...getPagerResults(totalCount),
+    ...getPagerResults(totalCount, size, page),
     list,
   };
 };

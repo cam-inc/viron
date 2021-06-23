@@ -5,7 +5,7 @@ info:
 
 components:
   schemas:
-    Pager:
+    VironPager:
       type: object
       properties:
         maxPage:
@@ -24,6 +24,22 @@ components:
         type: string
       required: true
 
+    VironPagerSizeQueryParam:
+      name: size
+      in: query
+      description: Size of list
+      schema:
+        type: integer
+      required: false
+
+    VironPagerPageQueryParam:
+      name: page
+      in: query
+      description: Page number of list
+      schema:
+        type: integer
+      required: false
+
     VironIdQueryParam:
       name: id
       in: query
@@ -33,6 +49,13 @@ components:
 
     VironRoleIdQueryParam:
       name: roleId
+      in: query
+      schema:
+        type: string
+      required: false
+
+    VironEmailQueryParam:
+      name: email
       in: query
       schema:
         type: string

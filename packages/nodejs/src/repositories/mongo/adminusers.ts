@@ -1,13 +1,32 @@
-import { Connection, FilterQuery } from 'mongoose';
+import { Connection, FilterQuery, QueryOptions } from 'mongoose';
 import { storeDefinitions } from '../../stores';
 import { domainsAdminUser } from '../../domains';
-import { getPagerResults, ListWithPager } from '../../helpers';
+import {
+  getMongoQueryOptions,
+  getPagerResults,
+  ListWithPager,
+} from '../../helpers';
 import { repositoryContainer } from '..';
+
+type FilterQueryWithUserIds = FilterQuery<domainsAdminUser.AdminUser> & {
+  userIds?: string[];
+};
 
 const getModel = (): storeDefinitions.mongo.adminUsers.AdminUserModel => {
   const conn = repositoryContainer.conn as Connection;
   return conn.models
     .adminusers as storeDefinitions.mongo.adminUsers.AdminUserModel;
+};
+
+const convertConditions = (
+  conditions: FilterQueryWithUserIds
+): FilterQuery<domainsAdminUser.AdminUser> => {
+  if (!conditions.userIds) {
+    return conditions;
+  }
+  conditions = Object.assign({}, { id: { $in: conditions.userIds } });
+  delete conditions.userIds;
+  return conditions;
 };
 
 export const findOneById = async (
@@ -18,18 +37,27 @@ export const findOneById = async (
   return doc ? doc.toJSON() : null;
 };
 
-export const find = async (): Promise<domainsAdminUser.AdminUser[]> => {
+export const find = async (
+  conditions: FilterQueryWithUserIds = {},
+  options?: QueryOptions
+): Promise<domainsAdminUser.AdminUser[]> => {
   const model = getModel();
-  const docs = await model.find();
+  const docs = await model.find(convertConditions(conditions), null, options);
   return docs.map((doc) => doc.toJSON());
 };
 
-export const findWithPager = async (): Promise<
-  ListWithPager<domainsAdminUser.AdminUser>
-> => {
-  const [list, totalCount] = await Promise.all([find(), count()]);
+export const findWithPager = async (
+  conditions: FilterQueryWithUserIds = {},
+  size?: number,
+  page?: number
+): Promise<ListWithPager<domainsAdminUser.AdminUser>> => {
+  const options = getMongoQueryOptions(size, page);
+  const [list, totalCount] = await Promise.all([
+    find(conditions, options),
+    count(conditions),
+  ]);
   return {
-    ...getPagerResults(totalCount),
+    ...getPagerResults(totalCount, size, page),
     list,
   };
 };
@@ -42,11 +70,12 @@ export const findOne = async (
   return doc ? doc.toJSON() : null;
 };
 
-export const count =
-  async (/*conditions: FilterQuery<domainsAuditLog.AuditLog> = {}*/): Promise<number> => {
-    const model = getModel();
-    return await model.countDocuments();
-  };
+export const count = async (
+  conditions: FilterQueryWithUserIds = {}
+): Promise<number> => {
+  const model = getModel();
+  return await model.countDocuments(convertConditions(conditions));
+};
 
 export const createOne = async (
   obj: domainsAdminUser.AdminUserCreateAttributes
