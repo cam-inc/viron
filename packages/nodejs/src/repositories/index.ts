@@ -1,7 +1,14 @@
 import { Enforcer, newEnforcer } from 'casbin';
-import { Connection as MongooseConnection, FilterQuery } from 'mongoose';
+import {
+  Connection as MongooseConnection,
+  FilterQuery as MongoFilterQuery,
+  QueryOptions as MongoQueryOptions,
+} from 'mongoose';
 import { Sequelize, Dialect } from 'sequelize';
-import { WhereOptions } from 'sequelize/types';
+import {
+  FindOptions as MysqlFindOptions,
+  WhereOptions as MysqlWhereOptions,
+} from 'sequelize/types';
 import MongooseAdapter from 'casbin-mongoose-adapter';
 import { SequelizeAdapter } from 'casbin-sequelize-adapter';
 import {
@@ -17,19 +24,28 @@ import * as mysqlRepositories from './mysql';
 
 type Names = keyof typeof mongoRepositories & keyof typeof mysqlRepositories;
 
+export type FindConditions<Entity> =
+  | MongoFilterQuery<Entity>
+  | MysqlWhereOptions<Entity>;
+
+export type FindOptions<Entity> = MongoQueryOptions | MysqlFindOptions<Entity>;
+
 export interface Repository<Entity, CreateAttributes, UpdateAttributes> {
   findOneById: (id: string) => Promise<Entity | null>;
-  find: (/* TODO: pagerとかconditionはあとで */) => Promise<Entity[]>;
-  findWithPager: (/* TODO: pagerとかconditionはあとで */) => Promise<
-    ListWithPager<Entity>
-  >;
-  findOne: (
-    conditions?: FilterQuery<Entity> | WhereOptions<Entity>
-  ) => Promise<Entity>;
+  find: (
+    conditions?: FindConditions<Entity>,
+    options?: FindOptions<Entity>
+  ) => Promise<Entity[]>;
+  findWithPager: (
+    conditions?: FindConditions<Entity>,
+    size?: number,
+    page?: number
+  ) => Promise<ListWithPager<Entity>>;
+  findOne: (conditions?: FindConditions<Entity>) => Promise<Entity>;
+  count: (conditions?: FindConditions<Entity>) => Promise<number>;
   createOne: (obj: CreateAttributes) => Promise<Entity>;
   updateOneById: (id: string, obj: UpdateAttributes) => Promise<void>;
   removeOneById: (id: string) => Promise<void>;
-  count: () => Promise<number>;
 }
 
 class RepositoryContainer {

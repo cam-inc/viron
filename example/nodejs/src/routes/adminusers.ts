@@ -5,7 +5,8 @@ import { RouteContext } from '../application';
 export const listVironAdminUsers = async (
   context: RouteContext
 ): Promise<void> => {
-  const result = await domainsAdminUser.list();
+  const { size, page, ...conditions } = context.params.query;
+  const result = await domainsAdminUser.list(conditions, size, page);
   context.res.json(result);
 };
 

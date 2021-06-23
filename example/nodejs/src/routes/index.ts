@@ -100,7 +100,12 @@ export async function register(app: Express): Promise<void> {
   const apis = await Promise.all(
     routes.map(async ({ oasPath, handlers, name }) => {
       logger.info('Routes registration oas: %s', oasPath);
-      const apiDoc = await domainsOas.loadResolvedOas(oasPath);
+
+      const apiDoc = await domainsOas.loadResolvedOas(oasPath).catch((e) => {
+        logger.error('Load Openapi failure. oas: %s', oasPath);
+        throw e;
+      });
+
       apiDoc['x-exegesis-controller'] = name;
       const middleware = await genExegesisMiddlewares(apiDoc, {
         controllers: {
