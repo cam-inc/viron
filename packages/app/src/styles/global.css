@@ -6,6 +6,7 @@
 /*
 Value of "--color-[type]-[elevation]-['l'|'d']" is calcurated by spoiting a color of "--color-[type]-['l'|'d']" covered by white with transparency of one on the list below.
 TODO: なんとかしてプログラムで値を算出したいが方法が見つからないので絶対値を入力している。
+TODO: 値一覧を吐き出すツールを作るんでもok
 
 [Elevation level]: [White overlay transparency]
 00dp: 0%
