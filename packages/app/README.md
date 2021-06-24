@@ -66,13 +66,16 @@ For internationalization, [i18next](https://www.i18next.com/) is used as a provi
 We decided to not use [i18next-http-backend](https://github.com/i18next/i18next-http-backend) because switching languages on client-side(i.e. on Browsers) is not good for SEO. Read [this](https://developers.google.com/search/docs/advanced/crawling/managing-multi-regional-sites?hl=en&ref_topic=2370587&visit_id=637521501660173954-3611086595&rd=1) and [this](https://itnext.io/techniques-approaches-for-multi-language-gatsby-apps-8ba13ff433c5)for your further information.
 Ideally it's better to serve a html file per language (i.e. use different URLs for different language versions) like [gatsby-plugin-i18n](https://github.com/angeloocana/gatsby-plugin-i18n) does. We, just for now, stick to the multilingual-page system.
 
-### Theme
+### Theme and prefers-color-scheme
 Viron offers a functionality for users to switch color themes so they can easily recognize which environment they are editing.(e.g. local, staging, production, etc.) On the other hand, as many of you probably know, there is a color-related idea in the client-side world, `Light Mode` and `Dark Mode`. This makes it a bit tricky to handle color themes when dealing with them considering Light/Dark modes. Here is our strategy for it.
 
 - One theme consists of two sets of color palette. One for light mode and the other for dark mode. For example, a theme named `terminal` will have a color palette for light mode (terminal-light) and a color palette for dark mode (erminal-dark).
 - We use the [tailwind's function](https://tailwindcss.com/docs/dark-mode) to switch light/dark mode.
 - We define [the tailwind colors configuration using CSS custom properties](https://tailwindcss.com/docs/customizing-colors#naming-your-colors), and overwrite them leveraging CSS specificity. See the global.css file for more detail.
-- We try to stick to the tailwind default color palette for all theme colors. This is the reason for the color setting on tailwind.config.js.
+- We use [Goole 2014 Material Design color palettes](https://material.io/design/color/the-color-system.html#tools-for-picking-colors) for all colors because those colors are carefully curated and have some accent colors.
+
+### Color System
+We follow [Google Material Design's principles](https://material.io/design/color/dark-theme.html) to manage our color system and to use them.
 
 ### Error Handling
 To handle errors that would be fired inside react components, we use [Error Boundaries](https://reactjs.org/docs/error-boundaries.html). Inside the ErrorBoundary react component which follows [this strategy](https://dev.to/dinhhuyams/react-error-boundary-surviving-through-pandemic-2pl9), all errors are propagated to the [logger](./src/utils/logger/index.ts). Then logger will output information on browser's console, and send data to external services if necessary. For errors that would be caught outside of react components, just call the logger. The logger is the final destination of all errors.

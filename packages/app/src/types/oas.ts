@@ -33,7 +33,7 @@ export type Info = {
   'x-thumbnail'?: URL;
   // [extended] Color theme for the endpoint page. Default to 'light'.
   // TODO: 4パターンくらいまで増やすこと。
-  'x-theme'?: 'relax' | 'cool';
+  'x-theme'?: 'lime' | 'red' | 'blue' | 'orange';
   // [extended] Be used on endpoint UI cards.
   'x-tags'?: string[];
   // [extended] Be used on endpoints page.
