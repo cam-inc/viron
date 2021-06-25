@@ -25,7 +25,7 @@ type ConfigPalette = Record<
   }
 >;
 // @ts-ignore
-const configPalette: ConfigPalette = config?.theme.colors
+const configPalette: ConfigPalette = config?.theme.colors // @ts-ignore
   .palette as ConfigPalette;
 
 export const PALETTE = {
