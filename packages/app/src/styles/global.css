@@ -3,23 +3,6 @@
 
 /* Follow Google Material Design principles. */
 /* @see: https://material.io/design/color/dark-theme.html */
-/*
-Value of "--color-[type]-[elevation]-['l'|'d']" is calcurated by spoiting a color of "--color-[type]-['l'|'d']" covered by white with transparency of one on the list below.
-TODO: なんとかしてプログラムで値を算出したいが方法が見つからないので絶対値を入力している。
-TODO: 値一覧を吐き出すツールを作るんでもok
-
-[Elevation level]: [White overlay transparency]
-00dp: 0%
-01dp: 5%
-02dp: 7%
-03dp: 8%
-04dp: 9%
-06dp: 11%
-08dp: 12%
-12dp: 14%
-16dp: 15%
-24dp: 16%
-*/
 
 /*
 TODO: Tailwind JIT modeが正式リリースになったタイミングで以下の様に改修できるか調査すること。
@@ -34,6 +17,8 @@ TODO: Tailwind JIT modeが正式リリースになったタイミングで以下
 }
 と定義したい。
 */
+
+/* You can copy and paste the code generated at the `/theme` page.*/
 
 /* Non-themable pages like `/home` will apply default custom properties. */
 :root {
@@ -50,106 +35,106 @@ TODO: Tailwind JIT modeが正式リリースになったタイミングで以下
 #root[data-theme="lime"] {
   /* Light */
   --color-background-l: #F8F8F8;
-  --color-surface-l: #F0EFE7;
-  --color-surface-00dp-l: #F0EFE7;
-  --color-surface-01dp-l: #EBEADD;
-  --color-surface-02dp-l: #E8E6D7;
-  --color-surface-03dp-l: #E8E6D7;
-  --color-surface-04dp-l: #E6E5D4;
-  --color-surface-06dp-l: #E4E2D0;
-  --color-surface-08dp-l: #E3E1CE;
-  --color-surface-12dp-l: #E0DECA;
-  --color-surface-16dp-l: #DFDDC7;
-  --color-surface-24dp-l: #DFDCC5;
-  --color-primary-l: theme('colors.palette.lime.900');
-  --color-primary-variant-l: theme('colors.palette.lime.800');
-  --color-secondary-l: theme('colors.palette.lime.700');
-  --color-secondary-variant-l: theme('colors.palette.lime.600');
+  --color-surface-l: #efeee7;
+  --color-surface-00dp-l: #efeee7;
+  --color-surface-01dp-l: #eae8dc;
+  --color-surface-02dp-l: #e7e5d9;
+  --color-surface-03dp-l: #e6e4d7;
+  --color-surface-04dp-l: #e5e4d4;
+  --color-surface-06dp-l: #e3e1d1;
+  --color-surface-08dp-l: #e2dfce;
+  --color-surface-12dp-l: #dfddc9;
+  --color-surface-16dp-l: #deddc8;
+  --color-surface-24dp-l: #dedbc6;
+  --color-primary-l: #827717;
+  --color-primary-variant-l: #9E9D24;
+  --color-secondary-l: #AFB42B;
+  --color-secondary-variant-l: #C0CA33;
   --color-error-l: #B00020;
-  --color-on-background-l: #646464;
-  --color-on-background-high-l: #212121;
-  --color-on-background-medium-l: #646464;
-  --color-on-background-disabled-l: #9A9A9A;
-  --color-on-background-variant-l: #B1AB71;
+  --color-on-background-l: #636363;
+  --color-on-background-high-l: #202020;
+  --color-on-background-medium-l: #636363;
+  --color-on-background-disabled-l: #9a9a9a;
+  --color-on-background-variant-l: #b1aa71;
   --color-on-background-variant-high-l: #918834;
-  --color-on-background-variant-medium-l: #B1AB71;
-  --color-on-background-variant-disabled-l: #CBC7A2;
-  --color-on-surface-l: #61605D;
-  --color-on-surface-high-l: #20201F;
-  --color-on-surface-medium-l: #61605D;
-  --color-on-surface-disabled-l: #95948F;
-  --color-on-primary-l: #C8C49D;
-  --color-on-primary-high-l: #E8E7DA;
-  --color-on-primary-medium-l: #C8C49D;
-  --color-on-primary-disabled-l: #AFA86C;
-  --color-on-primary-variant-l: #D4D3A2;
-  --color-on-primary-variant-high-l: #ECECDC;
-  --color-on-primary-variant-medium-l: #D4D3A2;
-  --color-on-primary-variant-disabled-l: #C0C074;
-  --color-on-secondary-l: #DADCA5;
-  --color-on-secondary-high-l: #EEEFDD;
-  --color-on-secondary-medium-l: #DADCA5;
-  --color-on-secondary-disabled-l: #CBCE79;
-  --color-on-secondary-variant-l: #E1E5A9;
-  --color-on-secondary-variant-high-l: #F1F2DE;
-  --color-on-secondary-variant-medium-l: #E1E5A9;
-  --color-on-secondary-variant-disabled-l: #D5DB7E;
-  --color-on-error-l: #DF98A5;
-  --color-on-error-high-l: #EED7DB;
-  --color-on-error-medium-l: #DB94A1;
-  --color-on-error-disabled-l: #CB5E72;
+  --color-on-background-variant-medium-l: #b1aa71;
+  --color-on-background-variant-disabled-l: #cbc7a3;
+  --color-on-surface-l: #605f5c;
+  --color-on-surface-high-l: #1f1f1e;
+  --color-on-surface-medium-l: #605f5c;
+  --color-on-surface-disabled-l: #94938f;
+  --color-on-primary-l: #c9c59e;
+  --color-on-primary-high-l: #e9e7db;
+  --color-on-primary-medium-l: #c9c59e;
+  --color-on-primary-disabled-l: #aea86c;
+  --color-on-primary-variant-l: #d4d4a3;
+  --color-on-primary-variant-high-l: #ececdd;
+  --color-on-primary-variant-medium-l: #d4d4a3;
+  --color-on-primary-variant-disabled-l: #c0bf74;
+  --color-on-secondary-l: #dbdda6;
+  --color-on-secondary-high-l: #efefdd;
+  --color-on-secondary-medium-l: #dbdda6;
+  --color-on-secondary-disabled-l: #cacd79;
+  --color-on-secondary-variant-l: #e2e6a9;
+  --color-on-secondary-variant-high-l: #f1f2df;
+  --color-on-secondary-variant-medium-l: #e2e6a9;
+  --color-on-secondary-variant-disabled-l: #d5db7e;
+  --color-on-error-l: #db95a2;
+  --color-on-error-high-l: #efd8dc;
+  --color-on-error-medium-l: #db95a2;
+  --color-on-error-disabled-l: #cb5e72;
 
   /* Dark */
   --color-background-d: #121212;
-  --color-surface-d: #202411;
-  --color-surface-00dp-d: #202411;
-  --color-surface-01dp-d: #2B2E1C;
-  --color-surface-02dp-d: #313423;
-  --color-surface-03dp-d: #313423;
-  --color-surface-04dp-d: #343826;
-  --color-surface-06dp-d: #393C2B;
-  --color-surface-08dp-d: #3A3E2D;
-  --color-surface-12dp-d: #404333;
-  --color-surface-16dp-d: #424635;
-  --color-surface-24dp-d: #444737;
-  --color-primary-d: theme('colors.palette.lime.A400');
-  --color-primary-variant-d: theme('colors.palette.lime.A700');
-  --color-secondary-d: theme('colors.palette.lime.A100');
-  --color-secondary-variant-d: theme('colors.palette.lime.A200');
-  --color-error-d: #D06679;
-  --color-on-background-d: #9F9F9F;
-  --color-on-background-high-d: #DFDFDF;
-  --color-on-background-medium-d: #9F9F9F;
-  --color-on-background-disabled-d: #6C6C6C;
-  --color-on-background-variant-d: #7D9F07;
-  --color-on-background-variant-high-d: #ADDF02;
-  --color-on-background-variant-medium-d: #7D9F07;
-  --color-on-background-variant-disabled-d: #566C0B;
-  --color-on-surface-d: #A5A69F;
-  --color-on-surface-high-d: #E1E2DF;
-  --color-on-surface-medium-d: #A5A69F;
-  --color-on-surface-disabled-d: #75776C;
-  --color-on-primary-d: #5A710A;
-  --color-on-primary-high-d: #29310F;
-  --color-on-primary-medium-d: #5A710A;
-  --color-on-primary-disabled-d: #81A406;
-  --color-on-primary-variant-d: #50680A;
-  --color-on-primary-variant-high-d: #262E0F;
-  --color-on-primary-variant-medium-d: #50680A;
-  --color-on-primary-variant-disabled-d: #729706;
-  --color-on-secondary-d: #6C713E;
-  --color-on-secondary-high-d: #2F3120;
-  --color-on-secondary-medium-d: #6C713E;
-  --color-on-secondary-disabled-d: #9EA456;
-  --color-on-secondary-variant-d: #6A7124;
-  --color-on-secondary-variant-high-d: #2F3118;
-  --color-on-secondary-variant-medium-d: #6A7124;
-  --color-on-secondary-variant-disabled-d: #9AA42E;
-  --color-on-error-d: #BD2944;
-  --color-on-error-high-d: #B40E2B;
-  --color-on-error-medium-d: #BD2944;
-  --color-on-error-disabled-d: #C43F57;
-};
+  --color-surface-d: #212511;
+  --color-surface-00dp-d: #212511;
+  --color-surface-01dp-d: #2c301d;
+  --color-surface-02dp-d: #313422;
+  --color-surface-03dp-d: #323624;
+  --color-surface-04dp-d: #353926;
+  --color-surface-06dp-d: #393d2b;
+  --color-surface-08dp-d: #3c3f2e;
+  --color-surface-12dp-d: #404433;
+  --color-surface-16dp-d: #424534;
+  --color-surface-24dp-d: #454837;
+  --color-primary-d: #C6FF00;
+  --color-primary-variant-d: #AEEA00;
+  --color-secondary-d: #F4FF81;
+  --color-secondary-variant-d: #EEFF41;
+  --color-error-d: #d06679;
+  --color-on-background-d: #a0a0a0;
+  --color-on-background-high-d: #e0e0e0;
+  --color-on-background-medium-d: #a0a0a0;
+  --color-on-background-disabled-d: #6c6c6c;
+  --color-on-background-variant-d: #7ea007;
+  --color-on-background-variant-high-d: #aee002;
+  --color-on-background-variant-medium-d: #7ea007;
+  --color-on-background-variant-disabled-d: #566c0b;
+  --color-on-surface-d: #a6a8a0;
+  --color-on-surface-high-d: #e2e3e0;
+  --color-on-surface-medium-d: #a6a8a0;
+  --color-on-surface-disabled-d: #75786c;
+  --color-on-primary-d: #5a710b;
+  --color-on-primary-high-d: #2a3110;
+  --color-on-primary-medium-d: #5a710b;
+  --color-on-primary-disabled-d: #82a507;
+  --color-on-primary-variant-d: #51690b;
+  --color-on-primary-variant-high-d: #272e10;
+  --color-on-primary-variant-medium-d: #51690b;
+  --color-on-primary-variant-disabled-d: #739807;
+  --color-on-secondary-d: #6d713f;
+  --color-on-secondary-high-d: #303121;
+  --color-on-secondary-medium-d: #6d713f;
+  --color-on-secondary-disabled-d: #9ea557;
+  --color-on-secondary-variant-d: #6a7125;
+  --color-on-secondary-variant-high-d: #2f3118;
+  --color-on-secondary-variant-medium-d: #6a7125;
+  --color-on-secondary-variant-disabled-d: #9aa52f;
+  --color-on-error-d: #bd2943;
+  --color-on-error-high-d: #b40d2c;
+  --color-on-error-medium-d: #bd2943;
+  --color-on-error-disabled-d: #c43f57;
+}
 
 @tailwind base;
 @tailwind components;
