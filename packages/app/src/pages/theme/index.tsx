@@ -712,23 +712,20 @@ const ThemePage: React.FC<Props> = () => {
             <Label value="error" />
             <Chip surface={getError(MODE.LIGHT)} />
             <Label value="on error" />
-            <Chip
-              surface={getError(MODE.LIGHT, palette)}
-              on={getOnError(MODE.LIGHT)}
-            />
+            <Chip surface={getError(MODE.LIGHT)} on={getOnError(MODE.LIGHT)} />
             <Label value="on error high" />
             <Chip
-              surface={getError(MODE.LIGHT, palette)}
+              surface={getError(MODE.LIGHT)}
               on={getOnError(MODE.LIGHT, LEVEL.HIGH)}
             />
             <Label value="on error medium" />
             <Chip
-              surface={getError(MODE.LIGHT, palette)}
+              surface={getError(MODE.LIGHT)}
               on={getOnError(MODE.LIGHT, LEVEL.MEDIUM)}
             />
             <Label value="on error disabled" />
             <Chip
-              surface={getError(MODE.LIGHT, palette)}
+              surface={getError(MODE.LIGHT)}
               on={getOnError(MODE.LIGHT, LEVEL.DISABLED)}
             />
           </div>
@@ -1058,23 +1055,20 @@ const ThemePage: React.FC<Props> = () => {
             <Label value="error" />
             <Chip surface={getError(MODE.DARK)} />
             <Label value="on error" />
-            <Chip
-              surface={getError(MODE.DARK, palette)}
-              on={getOnError(MODE.DARK)}
-            />
+            <Chip surface={getError(MODE.DARK)} on={getOnError(MODE.DARK)} />
             <Label value="on error high" />
             <Chip
-              surface={getError(MODE.DARK, palette)}
+              surface={getError(MODE.DARK)}
               on={getOnError(MODE.DARK, LEVEL.HIGH)}
             />
             <Label value="on error medium" />
             <Chip
-              surface={getError(MODE.DARK, palette)}
+              surface={getError(MODE.DARK)}
               on={getOnError(MODE.DARK, LEVEL.MEDIUM)}
             />
             <Label value="on error disabled" />
             <Chip
-              surface={getError(MODE.DARK, palette)}
+              surface={getError(MODE.DARK)}
               on={getOnError(MODE.DARK, LEVEL.DISABLED)}
             />
           </div>

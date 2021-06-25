@@ -1,5 +1,5 @@
 import React from 'react';
-import { HEX } from '../_types/index';
+import { HEX } from '../../_types/index';
 
 type Props = {
   surface: HEX;
