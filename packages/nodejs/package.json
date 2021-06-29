@@ -26,6 +26,7 @@
     "casbin-sequelize-adapter": "^2.2.0",
     "cookie": "^0.4.1",
     "debug": "^4.3.1",
+    "fast-copy": "^2.1.1",
     "googleapis": "^75.0.0",
     "js-yaml": "^4.0.0",
     "json-schema-ref-parser": "^9.0.7",

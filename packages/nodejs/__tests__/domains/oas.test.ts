@@ -1,7 +1,10 @@
 import assert from 'assert';
 import path from 'path';
-import { API_METHOD } from '../../src/constants';
+import sinon from 'sinon';
+import copy from 'fast-copy';
+import { API_METHOD, PERMISSION } from '../../src/constants';
 import {
+  clearCache,
   get,
   getPath,
   getResourceId,
@@ -9,8 +12,16 @@ import {
   loadResolvedOas,
   VironOpenAPIObject,
 } from '../../src/domains/oas';
+import * as domainsAdminrole from '../../src/domains/adminrole';
 
 describe('domains/oas', () => {
+  const sandbox = sinon.createSandbox();
+
+  afterEach(() => {
+    sandbox.restore();
+    clearCache();
+  });
+
   describe('get', () => {
     it('Get simple.', async () => {
       const oas = {
@@ -18,11 +29,116 @@ describe('domains/oas', () => {
         info: {
           title: 'test',
           version: '0.0.1',
+          'x-pages': [],
         },
         paths: {},
       };
       const result = await get(oas);
       assert.deepStrictEqual(result, oas);
+    });
+
+    it('Get an oas that filtered by roleIds', async () => {
+      sandbox
+        .stub(domainsAdminrole, 'hasPermissionByResourceId')
+        .withArgs(
+          'editor',
+          'user',
+          sinon.match([PERMISSION.READ, PERMISSION.WRITE])
+        )
+        .resolves(false)
+        .withArgs(
+          'editor',
+          'blog',
+          sinon.match([PERMISSION.READ, PERMISSION.WRITE])
+        )
+        .resolves(true);
+
+      const roleIds = ['editor'];
+      const pageUsers = {
+        id: 'users',
+        group: 'test',
+        title: 'User List',
+        description: 'user list for test.',
+        contents: [
+          {
+            resourceId: 'user',
+            operationId: 'listUsers',
+            type: 'table',
+          },
+        ],
+      };
+      const pageBlogs = {
+        id: 'blogs',
+        group: 'test',
+        title: 'Blog List',
+        description: 'blog list for test.',
+        contents: [
+          {
+            resourceId: 'blog',
+            operationId: 'listBlogs',
+            type: 'table',
+          },
+        ],
+      };
+      const pathItemUsers = {
+        get: {
+          operationId: 'listUsers',
+          responses: {
+            '200': {
+              description: 'OK',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    additionalProperties: {},
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+      const pathItemBlogs = {
+        get: {
+          operationId: 'listBlogs',
+          responses: {
+            '200': {
+              description: 'OK',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    additionalProperties: {},
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const oas = {
+        openapi: '3.0.2',
+        info: {
+          title: 'test',
+          version: '0.0.1',
+          'x-pages': [pageUsers, pageBlogs],
+        },
+        paths: {
+          '/users': pathItemUsers,
+          '/blogs': pathItemBlogs,
+        },
+      };
+
+      const expects = Object.assign(copy(oas), {
+        info: {
+          title: 'test',
+          version: '0.0.1',
+          'x-pages': [pageBlogs],
+        },
+      });
+      const result = await get(oas, {}, roleIds);
+      assert.deepStrictEqual(result, expects);
     });
   });
 

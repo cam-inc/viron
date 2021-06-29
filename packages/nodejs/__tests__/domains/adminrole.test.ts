@@ -6,6 +6,7 @@ import {
   createOne,
   createViewer,
   hasPermission,
+  hasPermissionByResourceId,
   listByOas,
   listPolicies,
   listResourcesByOas,
@@ -250,6 +251,22 @@ describe('domains/adminrole', () => {
 
       const actual = await listRoles('editor');
       assert.deepStrictEqual(actual, []);
+    });
+  });
+
+  describe('hasPermissionByResourceId', () => {
+    it('Return true when has pemission.', async () => {
+      const result = await hasPermissionByResourceId('editor', 'blog', [
+        PERMISSION.WRITE,
+      ]);
+      assert.strictEqual(result, true);
+    });
+
+    it('Return false when hasn`t pemission.', async () => {
+      const result = await hasPermissionByResourceId('reader', 'blog', [
+        PERMISSION.WRITE,
+      ]);
+      assert.strictEqual(result, false);
     });
   });
 
