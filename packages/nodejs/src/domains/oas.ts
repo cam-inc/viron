@@ -9,6 +9,7 @@ import {
 import jsonSchemaRefParser from '@apidevtools/json-schema-ref-parser';
 import { load } from 'js-yaml';
 import { Match, match as matchPath } from 'path-to-regexp';
+import copy from 'fast-copy';
 import { lint } from '@viron/linter';
 import {
   ApiMethod,
@@ -23,7 +24,11 @@ import {
 } from '../constants';
 import { getDebug } from '../logging';
 import { oasValidationFailure } from '../errors';
-import { createViewer } from './adminrole';
+import {
+  createViewer,
+  hasPermissionByResourceId,
+  method2Permissions,
+} from './adminrole';
 
 const debug = getDebug('domains:oas');
 
@@ -132,25 +137,62 @@ export { lint };
 // oasを取得
 export const get = async (
   apiDefinition: VironOpenAPIObject,
-  infoExtentions?: VironInfoObjectExtentions
+  infoExtentions: VironInfoObjectExtentions = {},
+  roleIds: string[] = []
 ): Promise<VironOpenAPIObject> => {
   // viewerが未作成の場合は作成する
   await createViewer(apiDefinition);
 
-  if (infoExtentions) {
-    Object.assign(apiDefinition.info, infoExtentions);
-  }
+  // 参照破壊しないようにDeepCopy
+  const clonedApiDefinition = copy(apiDefinition);
+  Object.assign(clonedApiDefinition.info, infoExtentions);
 
-  // TODO: 権限見て書き換えたりする
+  // x-pages[].contents[]を書き換える
+  const rewriteContent = async (
+    content: OasXPageContent
+  ): Promise<OasXPageContent | null> => {
+    const { resourceId, operationId } = content;
+    // 権限のないcontentは削除する(nullを返す)
+    const { method } =
+      findPathMethodByOperationId(operationId, apiDefinition) ?? {};
+    if (!method) {
+      // contentに書かれているoperationIdが不正
+      debug('operation isn`t exists. operationId: %s', operationId);
+      return null;
+    }
+    const tasks = roleIds.map((roleId) =>
+      hasPermissionByResourceId(roleId, resourceId, method2Permissions(method))
+    );
+    for await (const hasPermission of tasks) {
+      if (hasPermission) {
+        return content;
+      }
+    }
+    return null;
+  };
+
+  // x-pages[]を書き換える
+  const rewritePage = async (page: OasXPage): Promise<OasXPage | null> => {
+    const contents = await Promise.all(page.contents.map(rewriteContent));
+    page.contents = contents.filter(Boolean) as OasXPageContents;
+    // contentsが0件になった場合はpageごと消す
+    return page.contents.length ? page : null;
+  };
+
+  // x-pagesを書き換える
+  const pages = await Promise.all(
+    (clonedApiDefinition.info[OAS_X_PAGES] ?? []).map(rewritePage)
+  );
+  clonedApiDefinition.info[OAS_X_PAGES] = pages.filter(Boolean) as OasXPages;
 
   // validation
-  const { isValid, errors } = lint(apiDefinition);
+  const { isValid, errors } = lint(clonedApiDefinition);
   if (!isValid) {
     debug('OAS validation failure. errors:');
     (errors ?? []).forEach((error, i) => debug('%s: %o', i, error));
     throw oasValidationFailure();
   }
-  return apiDefinition;
+  return clonedApiDefinition;
 };
 
 // oasファイルのパスを取得
@@ -238,16 +280,16 @@ interface PathMethod {
 type OperationIdPathMethodMap = Record<string, PathMethod>;
 
 // operationIdからpathとmethodを逆引きするためのマップを生成
-let operationIdPathMethodMap: OperationIdPathMethodMap;
+let operationIdPathMethodMap: OperationIdPathMethodMap | null;
 const genOperationIdPathMethodMap = (
   apiDefinition: VironOpenAPIObject
 ): OperationIdPathMethodMap => {
   const { paths } = apiDefinition;
-  operationIdPathMethodMap = {};
   Object.keys(paths).forEach((path) => {
     Object.keys(paths[path]).forEach((method) => {
       const operationObject = paths[path][method];
       if (operationObject.operationId) {
+        operationIdPathMethodMap = operationIdPathMethodMap ?? {};
         operationIdPathMethodMap[operationObject.operationId] = {
           path: path,
           method: method as ApiMethod,
@@ -255,7 +297,7 @@ const genOperationIdPathMethodMap = (
       }
     });
   });
-  return operationIdPathMethodMap;
+  return operationIdPathMethodMap as OperationIdPathMethodMap;
 };
 
 // operationIdからpathとmethodを逆引き
@@ -282,6 +324,10 @@ const findResourceIdByActions = (
     })
   );
   return content?.resourceId ?? null;
+};
+
+export const clearCache = (): void => {
+  operationIdPathMethodMap = null;
 };
 
 // uriとmethodからリソースIDを取得する

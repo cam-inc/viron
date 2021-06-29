@@ -62,9 +62,6 @@ e = some(where (p.eft == allow))
 m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || g(r.sub, "${ADMIN_ROLE.SUPER}")
 `);
 
-const method2Permissions = (method: ApiMethod): Permission[] =>
-  permissionMap[method];
-
 const getPermissions = (permissions?: Permission[]): Permission[] =>
   permissions?.length ? permissions : Object.values(PERMISSION);
 
@@ -90,6 +87,10 @@ const sync = async (now = Date.now()): Promise<void> => {
     repositoryContainer.casbinSyncedTime = now;
   }
 };
+
+// APIメソッドをPermissionに変換
+export const method2Permissions = (method: ApiMethod): Permission[] =>
+  permissionMap[method];
 
 // ロール一覧を取得
 export const listRoles = async (userId: string): Promise<string[]> => {
@@ -184,19 +185,16 @@ export const removeRole = async (roleId: string): Promise<boolean> => {
   return await casbin.deleteRole(roleId);
 };
 
-// ユーザーがリソースを操作する権限を持っているかチェック
-export const hasPermission = async (
-  userId: string,
-  requestUri: string,
-  requestMethod: ApiMethod,
-  apiDefinition: VironOpenAPIObject
+// idがリソースを操作する権限を持っているかチェック
+export const hasPermissionByResourceId = async (
+  id: string,
+  resourceId: string,
+  permissions: Permission[]
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
   await sync();
-  const resourceId = getResourceId(requestUri, requestMethod, apiDefinition);
-  const permissions = method2Permissions(requestMethod);
   const tasks = permissions.map((permission) =>
-    casbin.enforce(userId, resourceId, permission)
+    casbin.enforce(id, resourceId, permission)
   );
   for await (const allowed of tasks) {
     if (allowed) {
@@ -204,13 +202,30 @@ export const hasPermission = async (
     }
   }
   debug(
-    'Don`t have permission to access. userId: %s, requestUri: %s, requestMethod: %s, resourceId: %s',
-    userId,
-    requestUri,
-    requestMethod,
-    resourceId
+    'Don`t have permission to access. id: %s, resourceId: %s, permissions: %O',
+    id,
+    resourceId,
+    permissions
   );
   return false;
+};
+
+// ユーザーがリソースを操作する権限を持っているかチェック
+export const hasPermission = async (
+  userId: string,
+  requestUri: string,
+  requestMethod: ApiMethod,
+  apiDefinition: VironOpenAPIObject
+): Promise<boolean> => {
+  const resourceId = getResourceId(requestUri, requestMethod, apiDefinition);
+  if (!resourceId) {
+    return false;
+  }
+  return await hasPermissionByResourceId(
+    userId,
+    resourceId,
+    method2Permissions(requestMethod)
+  );
 };
 
 // リソース一覧

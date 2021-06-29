@@ -6,7 +6,8 @@ import { RouteContext } from '../application';
 export const getOas = async (context: RouteContext): Promise<void> => {
   const oas = await domainsOas.get(
     context.req._context.apiDefinition,
-    ctx.config.oas.infoExtentions
+    ctx.config.oas.infoExtentions,
+    context.user?.roleIds
   );
   context.res.json(oas);
 };
