@@ -6,6 +6,7 @@ import {
 } from '../../constants';
 import { jwtUninitialized } from '../../errors';
 import { getDebug } from '../../logging';
+import { isSignedout } from './signout';
 
 const debug = getDebug('domains:auth:jwt');
 
@@ -105,9 +106,18 @@ export const signJwt = (subject: string): string => {
 };
 
 // JWT検証
-export const verifyJwt = async (token: string): Promise<JwtClaims | null> => {
+export const verifyJwt = async (
+  token?: string | null
+): Promise<JwtClaims | null> => {
   if (!jwt) {
     throw jwtUninitialized();
+  }
+  if (!token) {
+    return null;
+  }
+  if (await isSignedout(token)) {
+    debug('Already signed out. token: %s', token);
+    return null;
   }
   return await jwt.verify(token);
 };

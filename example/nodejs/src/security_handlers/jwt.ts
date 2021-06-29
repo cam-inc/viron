@@ -48,7 +48,7 @@ export const jwt = async (
 ): Promise<AuthenticationResult> => {
   const pContext = context as PluginContext;
   const token = pContext.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
-  const claims = token ? await domainsAuth.verifyJwt(token) : null;
+  const claims = await domainsAuth.verifyJwt(token);
 
   if (claims) {
     const userId = claims.sub;

@@ -15,6 +15,7 @@ import {
   domainsAdminRole,
   domainsAdminUser,
   domainsAuditLog,
+  domainsAuth,
 } from '../domains';
 import { STORE_TYPE, StoreType } from '../constants';
 import { repositoryUninitialized } from '../errors';
@@ -41,14 +42,14 @@ export interface Repository<Entity, CreateAttributes, UpdateAttributes> {
     size?: number,
     page?: number
   ) => Promise<ListWithPager<Entity>>;
-  findOne: (conditions?: FindConditions<Entity>) => Promise<Entity>;
+  findOne: (conditions?: FindConditions<Entity>) => Promise<Entity | null>;
   count: (conditions?: FindConditions<Entity>) => Promise<number>;
   createOne: (obj: CreateAttributes) => Promise<Entity>;
   updateOneById: (id: string, obj: UpdateAttributes) => Promise<void>;
   removeOneById: (id: string) => Promise<void>;
 }
 
-class RepositoryContainer {
+export class RepositoryContainer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   repositories!: any;
   conn!: Sequelize | MongooseConnection;
@@ -154,6 +155,14 @@ class RepositoryContainer {
     domainsAdminUser.AdminUserUpdateAttributes
   > {
     return this.get('adminUsers');
+  }
+
+  getRevokedTokenRepository(): Repository<
+    domainsAuth.RevokedToken,
+    domainsAuth.RevokedTokenCreateAttributes,
+    domainsAuth.RevokedTokenUpdateAttributes
+  > {
+    return this.get('revokedTokens');
   }
 }
 
