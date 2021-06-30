@@ -7,13 +7,6 @@ import {
   AdminUserCreatePayload,
   AdminUserUpdateAttributes,
   AdminUserUpdatePayload,
-} from '../../src/domains/adminuser';
-import * as domainsAdminuser from '../../src/domains/adminuser';
-import { genPasswordHash } from '../../src/helpers';
-import { Repository, repositoryContainer } from '../../src/repositories';
-import { adminUserNotFound } from '../../src/errors';
-
-const {
   count,
   createOne,
   findOneById,
@@ -21,7 +14,12 @@ const {
   list,
   removeOneById,
   updateOneById,
-} = domainsAdminuser;
+} from '../../src/domains/adminuser';
+import * as domainsAdminuser from '../../src/domains/adminuser';
+import * as domainsAdminrole from '../../src/domains/adminrole';
+import { genPasswordHash } from '../../src/helpers';
+import { Repository, repositoryContainer } from '../../src/repositories';
+import { adminUserNotFound } from '../../src/errors';
 
 describe('domains/adminuser', () => {
   const sandbox = sinon.createSandbox();
@@ -42,7 +40,7 @@ describe('domains/adminuser', () => {
 
   describe('list', () => {
     it('Get list with pager.', async () => {
-      sinon.stub(repository, 'findWithPager').resolves({
+      sandbox.stub(repository, 'findWithPager').resolves({
         list: [
           {
             id: '1',
@@ -76,6 +74,7 @@ describe('domains/adminuser', () => {
         password: 'pass',
       };
       const { salt, password } = genPasswordHash(data.password);
+      const userId = '1';
 
       sandbox
         .stub(repository, 'createOne')
@@ -88,7 +87,7 @@ describe('domains/adminuser', () => {
           })
         )
         .resolves({
-          id: '1',
+          id: userId,
           email: data.email,
           authType: AUTH_TYPE.EMAIL,
           salt,
@@ -103,7 +102,7 @@ describe('domains/adminuser', () => {
         });
 
       const result = await createOne(data);
-      assert.strictEqual(result.id, '1');
+      assert.strictEqual(result.id, userId);
       assert.strictEqual(result.roleIds.length, 0);
     });
 
@@ -114,6 +113,7 @@ describe('domains/adminuser', () => {
         roleIds: ['editor'],
       };
       const { salt, password } = genPasswordHash(data.password);
+      const userId = '1';
 
       sandbox
         .stub(repository, 'createOne')
@@ -126,7 +126,7 @@ describe('domains/adminuser', () => {
           })
         )
         .resolves({
-          id: '1',
+          id: userId,
           email: data.email,
           authType: AUTH_TYPE.EMAIL,
           salt,
@@ -139,9 +139,13 @@ describe('domains/adminuser', () => {
           googleOAuth2RefreshToken: null,
           googleOAuth2TokenType: null,
         });
+      sandbox
+        .stub(domainsAdminrole, 'updateRolesForUser')
+        .withArgs(userId, sinon.match(['editor']))
+        .resolves();
 
       const result = await createOne(data);
-      assert.strictEqual(result.id, '1');
+      assert.strictEqual(result.id, userId);
       assert.strictEqual(result.roleIds[0], 'editor');
     });
   });
@@ -178,6 +182,10 @@ describe('domains/adminuser', () => {
             salt: sandbox.match.string,
           })
         )
+        .resolves();
+      sandbox
+        .stub(domainsAdminrole, 'updateRolesForUser')
+        .withArgs(id, sinon.match(['editor']))
         .resolves();
 
       await assert.doesNotReject(updateOneById(id, data));
@@ -221,6 +229,10 @@ describe('domains/adminuser', () => {
         googleOAuth2TokenType: null,
       });
       sandbox.stub(repository, 'removeOneById').withArgs(id).resolves();
+      sandbox
+        .stub(domainsAdminrole, 'revokeRoleForUser')
+        .withArgs(id)
+        .resolves();
 
       await assert.doesNotReject(removeOneById(id));
     });
