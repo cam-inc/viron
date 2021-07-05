@@ -34,10 +34,10 @@ const Header: React.FC<Props> = ({ className = '', openNavigation }) => {
         <div className="flex-1 min-w-0" />
         <div className="flex-none">
           <ul className="flex text-xs text-on-primary">
-            <li className="flex justify-center items-center px-2 border-r-2 border-current">
+            <li className="flex justify-center items-center mr-2 last:mr-0">
               <Export />
             </li>
-            <li className="flex justify-center items-center px-2 border-r-2 border-current">
+            <li className="flex justify-center items-center px-2 mr-2 last:mr-0">
               <Import />
             </li>
           </ul>

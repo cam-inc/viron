@@ -18,7 +18,7 @@ const Textinput: React.FC<Props> = ({ label, description, error, render }) => {
       {!!description && <p>{description}</p>}
       {!!error && <p>{error.message}</p>}
       {render(
-        'p-1 bg-background text-on-background border-2 border-on-surface-faint rounded'
+        'p-1 bg-background text-on-background border border-on-background-faint rounded focus:bg-surface focus:text-on-surface focus:outline-none focus:ring-2 focus:ring-on-surface'
       )}
     </div>
   );

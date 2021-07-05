@@ -1,6 +1,7 @@
 import { BiUpload } from '@react-icons/all-files/bi/BiUpload';
 import React from 'react';
 import { useRecoilState } from 'recoil';
+import Button from '$components/button';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { EndpointForDistribution } from '$types/index';
 
@@ -37,12 +38,15 @@ const Export: React.FC<Props> = ({ className = '' }) => {
   };
 
   return (
-    <div className={className}>
-      <button className="flex items-center" onClick={handleClick}>
-        <BiUpload className="mr-1" />
-        <div>Export</div>
-      </button>
-    </div>
+    <Button
+      on="primary"
+      variant="ghost"
+      size="xs"
+      Icon={BiUpload}
+      label="Export"
+      className={className}
+      onClick={handleClick}
+    />
   );
 };
 export default Export;

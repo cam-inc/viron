@@ -5,6 +5,7 @@ import { AiOutlineLogin } from '@react-icons/all-files/ai/AiOutlineLogin';
 import { navigate } from 'gatsby';
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
+import Button from '$components/button';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { remove, KEY, set } from '$storage/index';
@@ -55,13 +56,13 @@ const Signin: React.FC<Props> = ({ endpoint, isSigninRequired }) => {
     function () {
       return (
         <>
-          <button
-            className="p-2 rounded flex items-center bg-complementary text-on-complementary"
+          <Button
+            on="surface"
+            Icon={AiFillApi}
+            label="Signin"
+            size="xs"
             onClick={handleClick}
-          >
-            <AiFillApi className="mr-1" />
-            <div className="text-xs">Signin</div>
-          </button>
+          />
           <Drawer {...drawer.bind}>
             {authconfigOAuth && (
               <OAuth endpoint={endpoint} authConfig={authconfigOAuth} />

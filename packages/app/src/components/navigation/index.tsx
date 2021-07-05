@@ -21,7 +21,7 @@ const Navigation: React.FC<Props> = ({
         {/* body */}
         <div
           className={classnames(
-            'flex-1 m-h-0 overflow-y-scroll overscroll-y-contain',
+            'flex-1 min-h-0 overflow-y-scroll overscroll-y-contain',
             {
               'border-t-2 border-b-2 border-on-surface-faint': renderBody,
             }

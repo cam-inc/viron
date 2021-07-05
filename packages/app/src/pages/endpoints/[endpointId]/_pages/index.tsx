@@ -139,7 +139,7 @@ const Group: React.FC<{
         }}
         onClick={handleClick}
       >
-        <div className="flex-1 m-w-0">{partial.group}</div>
+        <div className="flex-1 min-w-0">{partial.group}</div>
         <div className="flex-0 ml-2 flex items-center text-xxs">
           {isOpened ? <AiOutlineDown /> : <AiOutlineUp />}
         </div>

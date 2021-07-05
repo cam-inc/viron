@@ -1,6 +1,7 @@
 import { ImQrcode } from '@react-icons/all-files/im/ImQrcode';
 import qrcode from 'qrcode';
 import React, { useCallback, useEffect, useRef } from 'react';
+import Button from '$components/button';
 import Modal, { useModal } from '$components/modal';
 import { Endpoint, EndpointForDistribution } from '$types/index';
 
@@ -18,9 +19,12 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
 
   return (
     <>
-      <button className="block" onClick={handleClick}>
-        <ImQrcode className="text-xl" />
-      </button>
+      <Button
+        on="surface"
+        variant="text"
+        Icon={ImQrcode}
+        onClick={handleClick}
+      />
       <Modal {...modal.bind}>
         <_QRCode endpoint={endpoint} />
       </Modal>

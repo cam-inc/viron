@@ -1,6 +1,7 @@
 import { AiFillDelete } from '@react-icons/all-files/ai/AiFillDelete';
 import React, { useCallback } from 'react';
 import { useSetRecoilState } from 'recoil';
+import Button from '$components/button';
 import { listState } from '$store/atoms/endpoint';
 import { Endpoint } from '$types/index';
 
@@ -22,9 +23,12 @@ const Remove: React.FC<Props> = ({ endpoint }) => {
   );
 
   return (
-    <button className="block" onClick={handleClick}>
-      <AiFillDelete className="text-xl" />
-    </button>
+    <Button
+      on="surface"
+      variant="text"
+      Icon={AiFillDelete}
+      onClick={handleClick}
+    />
   );
 };
 export default Remove;

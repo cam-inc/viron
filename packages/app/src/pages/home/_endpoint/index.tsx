@@ -38,7 +38,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint }) => {
           setIsPending(false);
           return;
         }
-        if (!response.ok && response.status === 401) {
+        if (response.status === 401 || response.status === 403) {
           setIsSigninRequired(true);
           setIsPending(false);
           return;
@@ -98,7 +98,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint }) => {
         <div className="flex-none mr-2">
           <Thumbnail className="" endpoint={endpoint} />
         </div>
-        <div className="flex-1 m-w-0 mr-2">
+        <div className="flex-1 min-w-0 mr-2">
           <div className="">{endpoint.document?.info.title || '---'}</div>
           <div className="text-on-surface-low text-xs">{endpoint.url}</div>
         </div>

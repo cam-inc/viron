@@ -1,6 +1,7 @@
 import { BiDownload } from '@react-icons/all-files/bi/BiDownload';
 import React from 'react';
 import { useRecoilState } from 'recoil';
+import Button from '$components/button';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { AuthConfig, Endpoint, EndpointForDistribution } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
@@ -150,12 +151,15 @@ const Import: React.FC<Props> = ({ className = '' }) => {
   };
 
   return (
-    <div className={className}>
-      <button className="flex items-center" onClick={handleClick}>
-        <BiDownload className="mr-1" />
-        <div>Import</div>
-      </button>
-    </div>
+    <Button
+      variant="ghost"
+      size="xs"
+      on="primary"
+      Icon={BiDownload}
+      label="Import"
+      className={className}
+      onClick={handleClick}
+    />
   );
 };
 export default Import;
