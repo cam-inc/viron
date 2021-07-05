@@ -168,7 +168,7 @@ const Add: React.FC<Props> = () => {
             );
           }}
         />
-        <Button type="submit" label="submit" />
+        <Button on="surface" size="xs" type="submit" label="submit" />
       </form>
     </div>
   );

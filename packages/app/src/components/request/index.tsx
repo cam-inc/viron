@@ -119,7 +119,7 @@ const _Request: React.FC<Props> = ({
             />
           </div>
         )}
-        <Button type="submit" label="submit" />
+        <Button on="surface" size="xs" type="submit" label="submit" />
       </form>
     </div>
   );
