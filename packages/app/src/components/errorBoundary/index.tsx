@@ -39,24 +39,24 @@ const changedArray = function (a: Array<unknown> = [], b: Array<unknown> = []) {
 };
 
 class ErrorBoundary extends React.Component<Props, State> {
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError(error: Error): { error: Error } {
     return { error };
   }
 
   state = initialState;
   updatedWithError = false;
 
-  resetErrorBoundary = (...args: Array<unknown>) => {
+  resetErrorBoundary = (...args: Array<unknown>): void => {
     this.props.onReset?.(...args);
     this.reset();
   };
 
-  reset() {
+  reset(): void {
     this.updatedWithError = false;
     this.setState(initialState);
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     this.props.onError?.(error, errorInfo);
     logError({
       messages: [error, errorInfo],
@@ -64,7 +64,7 @@ class ErrorBoundary extends React.Component<Props, State> {
     });
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     const { error } = this.state;
 
     if (error !== null) {
@@ -72,7 +72,7 @@ class ErrorBoundary extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props): void {
     const { error } = this.state;
     const { resetKeys } = this.props;
     if (error !== null && !this.updatedWithError) {
@@ -85,7 +85,7 @@ class ErrorBoundary extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     const { error } = this.state;
 
     if (error === null) {

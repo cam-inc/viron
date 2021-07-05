@@ -1,14 +1,11 @@
 import { Link, PageProps } from 'gatsby';
 import React, { Suspense, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import Drawer, { useDrawer } from '$components/drawer';
 import ErrorBoundary from '$components/errorBoundary';
-import Modal, { useModal } from '$components/modal';
 import Notification, { useNotification } from '$components/notification';
 import Progress, { useProgress } from '$components/progress';
 //import Popover, { usePopover } from '$components/popover';
 import useTheme from '$hooks/theme';
-import Layout from '$layouts/index';
 import { screenState } from '$store/atoms/app';
 import { isBrowser } from '$utils/index';
 
@@ -43,22 +40,6 @@ const SamplePage: React.FC<Props> = () => {
   };
   */
 
-  const modal = useModal();
-  const handleModalOpenClick = function () {
-    modal.open();
-  };
-  const handleModalCloseClick = function () {
-    modal.requestClose();
-  };
-
-  const drawer = useDrawer();
-  const handleDrawerOpenClick = function () {
-    drawer.open();
-  };
-  const handleDrawerCloseClick = function () {
-    drawer.requestClose();
-  };
-
   const [count, setCount] = useState(0);
   const handleCountupClick = function () {
     setCount(count + 1);
@@ -75,7 +56,7 @@ const SamplePage: React.FC<Props> = () => {
   };
 
   return (
-    <Layout>
+    <div>
       <div>
         <p>{JSON.stringify(screen, null, 2)}</p>
       </div>
@@ -114,7 +95,6 @@ const SamplePage: React.FC<Props> = () => {
         <p className="bg-secondary-l dark:bg-secondary-d">color-secondary</p>
         <p className="bg-tertiary-l dark:bg-tertiary-d">color-tertiary</p>
       </div>
-      <button onClick={handleModalOpenClick}>[open modal]</button>
       {/*
       <button ref={popover.targetRef} onClick={handlePopoverOpenClick}>
         [open popover]
@@ -126,21 +106,14 @@ const SamplePage: React.FC<Props> = () => {
         hover me to open a popover
       </p>
        */}
-      <button onClick={handleDrawerOpenClick}>[drawer drawer]</button>
       <Link to="/">TOP</Link>
       {/*
       <Popover {...popover.bind}>
         <button onClick={handlePopoverCloseClick}>close</button>
       </Popover>
        */}
-      <Modal {...modal.bind}>
-        <button onClick={handleModalCloseClick}>close</button>
-      </Modal>
-      <Drawer {...drawer.bind}>
-        <button onClick={handleDrawerCloseClick}>toggle drawer</button>
-      </Drawer>
       <div className="h-screen bg-blue-100" />
-    </Layout>
+    </div>
   );
 };
 

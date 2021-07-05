@@ -15,10 +15,12 @@ import {
   getRequest,
 } from '$utils/oas';
 import useAutoRefresh from './useAutoRefresh';
+import { Props as ContentProps } from '../index';
 
 export type UseBaseReturn = {
   isPending: boolean;
   error: Error | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any | null;
   request: RequestType;
   requestValue: RequestValue;
@@ -28,6 +30,7 @@ export type UseBaseReturn = {
 const useBase = function (
   endpoint: Endpoint,
   document: Document,
+  contentId: ContentProps['contentId'],
   content: Info['x-pages'][number]['contents'][number]
 ): UseBaseReturn {
   const request = getRequest(document, { operationId: content.operationId });
@@ -44,6 +47,7 @@ const useBase = function (
       requestBody: content.defaultRequestBodyValue,
     })
   );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any | null>(null);
 
   // Achieved combining useEffect below.
@@ -103,7 +107,7 @@ const useBase = function (
       };
       f();
     },
-    [requestValue]
+    [request, endpoint, document, requestValue, contentId]
   );
 
   // Auto Refresh.

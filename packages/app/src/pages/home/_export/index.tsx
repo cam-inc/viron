@@ -1,9 +1,13 @@
+import { BiUpload } from '@react-icons/all-files/bi/BiUpload';
 import React from 'react';
 import { useRecoilState } from 'recoil';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { EndpointForDistribution } from '$types/index';
 
-const Export: React.FC = () => {
+type Props = {
+  className?: string;
+};
+const Export: React.FC<Props> = ({ className = '' }) => {
   const [endpointList] = useRecoilState(endpointListState);
 
   const handleClick = function () {
@@ -33,9 +37,10 @@ const Export: React.FC = () => {
   };
 
   return (
-    <div>
-      <button onClick={handleClick}>
-        エンドポイント一覧をエクスポートする
+    <div className={className}>
+      <button className="flex items-center" onClick={handleClick}>
+        <BiUpload className="mr-1" />
+        <div>Export</div>
       </button>
     </div>
   );

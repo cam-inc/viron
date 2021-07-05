@@ -3,6 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState } from 'recoil';
 import * as yup from 'yup';
+import Button from '$components/button';
 import Textinput from '$components/textinput';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { AuthConfig, Endpoint, EndpointID, URL as TypeURL } from '$types/index';
@@ -63,6 +64,7 @@ const Add: React.FC<Props> = () => {
       // The response.ok being true means that the response.status is 2xx.
       // The endpoint exists and it's open to public.
       if (response.ok) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const document: Record<string, any> = await response.json();
         const { isValid } = lint(document);
         if (!isValid) {
@@ -134,7 +136,7 @@ const Add: React.FC<Props> = () => {
   );
 
   return (
-    <div>
+    <div className="p-2">
       <form onSubmit={handleSubmit(addEndpoint)}>
         <Textinput
           label="Endpoint Id"
@@ -166,7 +168,7 @@ const Add: React.FC<Props> = () => {
             );
           }}
         />
-        <input type="submit" />
+        <Button type="submit" label="submit" />
       </form>
     </div>
   );

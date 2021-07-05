@@ -4,136 +4,126 @@
 /* Follow Google Material Design principles. */
 /* @see: https://material.io/design/color/dark-theme.html */
 
-/*
-TODO: Tailwind JIT modeが正式リリースになったタイミングで以下の様に改修できるか調査すること。
-
-<div className="bg-surface-l dark:bg-surface-d" />
-ではなく、
-<div className="bg-surface" />
-@layer components {
-  .bg-surface {
-    @apply bg-surface-l dark:bg-surface-d;
-  }
-}
-と定義したい。
-*/
-
-/* You can copy and paste the code generated at the `/theme` page.*/
-
 /* Non-themable pages like `/home` will apply default custom properties. */
-:root {
-  --color-primary-l: theme('colors.palette.pink.100');
-  --color-secondary-l: theme('colors.palette.pink.100');
-  --color-tertiary-l: theme('colors.palette.pink.100');
-
-  --color-primary-d: theme('colors.palette.pink.900');
-  --color-secondary-d: theme('colors.palette.pink.900');
-  --color-tertiary-d: theme('colors.palette.pink.900');
+body {
+  --color-hue: 0;
 }
 
 /* Themable pages like `/endpoints/[endpointId]` will apply overwritten custom properties. */
-#root[data-theme="lime"] {
-  /* Light */
-  --color-background-l: #F8F8F8;
-  --color-surface-l: #efeee7;
-  --color-surface-00dp-l: #efeee7;
-  --color-surface-01dp-l: #eae8dc;
-  --color-surface-02dp-l: #e7e5d9;
-  --color-surface-03dp-l: #e6e4d7;
-  --color-surface-04dp-l: #e5e4d4;
-  --color-surface-06dp-l: #e3e1d1;
-  --color-surface-08dp-l: #e2dfce;
-  --color-surface-12dp-l: #dfddc9;
-  --color-surface-16dp-l: #deddc8;
-  --color-surface-24dp-l: #dedbc6;
-  --color-primary-l: #827717;
-  --color-primary-variant-l: #9E9D24;
-  --color-secondary-l: #AFB42B;
-  --color-secondary-variant-l: #C0CA33;
-  --color-error-l: #B00020;
-  --color-on-background-l: #636363;
-  --color-on-background-high-l: #202020;
-  --color-on-background-medium-l: #636363;
-  --color-on-background-disabled-l: #9a9a9a;
-  --color-on-background-variant-l: #b1aa71;
-  --color-on-background-variant-high-l: #918834;
-  --color-on-background-variant-medium-l: #b1aa71;
-  --color-on-background-variant-disabled-l: #cbc7a3;
-  --color-on-surface-l: #605f5c;
-  --color-on-surface-high-l: #1f1f1e;
-  --color-on-surface-medium-l: #605f5c;
-  --color-on-surface-disabled-l: #94938f;
-  --color-on-primary-l: #c9c59e;
-  --color-on-primary-high-l: #e9e7db;
-  --color-on-primary-medium-l: #c9c59e;
-  --color-on-primary-disabled-l: #aea86c;
-  --color-on-primary-variant-l: #d4d4a3;
-  --color-on-primary-variant-high-l: #ececdd;
-  --color-on-primary-variant-medium-l: #d4d4a3;
-  --color-on-primary-variant-disabled-l: #c0bf74;
-  --color-on-secondary-l: #dbdda6;
-  --color-on-secondary-high-l: #efefdd;
-  --color-on-secondary-medium-l: #dbdda6;
-  --color-on-secondary-disabled-l: #cacd79;
-  --color-on-secondary-variant-l: #e2e6a9;
-  --color-on-secondary-variant-high-l: #f1f2df;
-  --color-on-secondary-variant-medium-l: #e2e6a9;
-  --color-on-secondary-variant-disabled-l: #d5db7e;
-  --color-on-error-l: #db95a2;
-  --color-on-error-high-l: #efd8dc;
-  --color-on-error-medium-l: #db95a2;
-  --color-on-error-disabled-l: #cb5e72;
+body[data-theme="lime"] {
+  --color-hue: 0;
+}
+body[data-theme="deepOrange"] {
+  --color-hue: 0;
+}
 
-  /* Dark */
-  --color-background-d: #121212;
-  --color-surface-d: #212511;
-  --color-surface-00dp-d: #212511;
-  --color-surface-01dp-d: #2c301d;
-  --color-surface-02dp-d: #313422;
-  --color-surface-03dp-d: #323624;
-  --color-surface-04dp-d: #353926;
-  --color-surface-06dp-d: #393d2b;
-  --color-surface-08dp-d: #3c3f2e;
-  --color-surface-12dp-d: #404433;
-  --color-surface-16dp-d: #424534;
-  --color-surface-24dp-d: #454837;
-  --color-primary-d: #C6FF00;
-  --color-primary-variant-d: #AEEA00;
-  --color-secondary-d: #F4FF81;
-  --color-secondary-variant-d: #EEFF41;
-  --color-error-d: #d06679;
-  --color-on-background-d: #a0a0a0;
-  --color-on-background-high-d: #e0e0e0;
-  --color-on-background-medium-d: #a0a0a0;
-  --color-on-background-disabled-d: #6c6c6c;
-  --color-on-background-variant-d: #7ea007;
-  --color-on-background-variant-high-d: #aee002;
-  --color-on-background-variant-medium-d: #7ea007;
-  --color-on-background-variant-disabled-d: #566c0b;
-  --color-on-surface-d: #a6a8a0;
-  --color-on-surface-high-d: #e2e3e0;
-  --color-on-surface-medium-d: #a6a8a0;
-  --color-on-surface-disabled-d: #75786c;
-  --color-on-primary-d: #5a710b;
-  --color-on-primary-high-d: #2a3110;
-  --color-on-primary-medium-d: #5a710b;
-  --color-on-primary-disabled-d: #82a507;
-  --color-on-primary-variant-d: #51690b;
-  --color-on-primary-variant-high-d: #272e10;
-  --color-on-primary-variant-medium-d: #51690b;
-  --color-on-primary-variant-disabled-d: #739807;
-  --color-on-secondary-d: #6d713f;
-  --color-on-secondary-high-d: #303121;
-  --color-on-secondary-medium-d: #6d713f;
-  --color-on-secondary-disabled-d: #9ea557;
-  --color-on-secondary-variant-d: #6a7125;
-  --color-on-secondary-variant-high-d: #2f3118;
-  --color-on-secondary-variant-medium-d: #6a7125;
-  --color-on-secondary-variant-disabled-d: #9aa52f;
-  --color-on-error-d: #bd2943;
-  --color-on-error-high-d: #b40d2c;
-  --color-on-error-medium-d: #bd2943;
-  --color-on-error-disabled-d: #c43f57;
+/* Light/Dark mode toggle. */
+body {
+  --color-background: hsl(var(--color-hue) 50% 95%);
+  --color-on-background: hsl(var(--color-hue) 50% 40%);
+  --color-on-background-high: hsl(var(--color-hue) 50% 30%);
+  --color-on-background-medium: hsl(var(--color-hue) 50% 40%);
+  --color-on-background-low: hsl(var(--color-hue) 50% 50%);
+  --color-on-background-faint: hsl(var(--color-hue) 50% 90%);
+  --color-surface: hsl(var(--color-hue) 50% 100%);
+  --color-surface-00dp: hsl(var(--color-hue) 50% 100%);
+  --color-surface-01dp: hsl(var(--color-hue) 50% 100%);
+  --color-surface-02dp: hsl(var(--color-hue) 50% 100%);
+  --color-surface-03dp: hsl(var(--color-hue) 50% 100%);
+  --color-surface-04dp: hsl(var(--color-hue) 50% 100%);
+  --color-surface-05dp: hsl(var(--color-hue) 50% 100%);
+  --color-on-surface: hsl(var(--color-hue) 50% 40%);
+  --color-on-surface-high: hsl(var(--color-hue) 50% 30%);
+  --color-on-surface-medium: hsl(var(--color-hue) 50% 40%);
+  --color-on-surface-low: hsl(var(--color-hue) 50% 50%);
+  --color-on-surface-faint: hsl(var(--color-hue) 50% 90%);
+  --color-primary: hsl(var(--color-hue) 100% 70%);
+  --color-on-primary: hsl(var(--color-hue) 100% 20%);
+  --color-on-primary-high: hsl(var(--color-hue) 100% 10%);
+  --color-on-primary-medium: hsl(var(--color-hue) 100% 20%);
+  --color-on-primary-low: hsl(var(--color-hue) 100% 30%);
+  --color-on-primary-faint: hsl(var(--color-hue) 100% 60%);
+  --color-primary-variant: hsl(var(--color-hue) 50% 70%);
+  --color-on-primary-variant: hsl(var(--color-hue) 50% 20%);
+  --color-on-primary-variant-high: hsl(var(--color-hue) 50% 10%);
+  --color-on-primary-variant-medium: hsl(var(--color-hue) 50% 20%);
+  --color-on-primary-variant-low: hsl(var(--color-hue) 50% 30%);
+  --color-on-primary-variant-faint: hsl(var(--color-hue) 50% 60%);
+  --color-complementary: hsl(calc(var(--color-hue) + 180) 100% 70%);
+  --color-on-complementary: hsl(calc(var(--color-hue) + 180) 100% 20%);
+  --color-on-complementary-high: hsl(calc(var(--color-hue) + 180) 100% 10%);
+  --color-on-complementary-medium: hsl(calc(var(--color-hue) + 180) 100% 20%);
+  --color-on-complementary-low: hsl(calc(var(--color-hue) + 180) 100% 30%);
+  --color-on-complementary-faint: hsl(calc(var(--color-hue) + 180) 100% 60%);
+  --color-complementary-variant: hsl(calc(var(--color-hue) + 180) 50% 70%);
+  --color-on-complementary-variant: hsl(calc(var(--color-hue) + 180) 50% 20%);
+  --color-on-complementary-variant-high: hsl(calc(var(--color-hue) + 180) 50% 10%);
+  --color-on-complementary-variant-medium: hsl(calc(var(--color-hue) + 180) 50% 20%);
+  --color-on-complementary-variant-low: hsl(calc(var(--color-hue) + 180) 50% 30%);
+  --color-on-complementary-variant-faint: hsl(calc(var(--color-hue) + 180) 50% 60%);
+  --color-error: hsl(0 50% 70%);
+  --color-on-error: hsl(0 50% 20%);
+  --color-on-error-high: hsl(0 50% 10%);
+  --color-on-error-medium: hsl(0 50% 20%);
+  --color-on-error-low: hsl(0 50% 30%);
+  --color-on-error-faint: hsl(0 50% 60%);
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --color-background: hsl(var(--color-hue) 50% 5%);
+    --color-on-background: hsl(var(--color-hue) 50% 80%);
+    --color-on-background-high: hsl(var(--color-hue) 50% 90%);
+    --color-on-background-medium: hsl(var(--color-hue) 50% 80%);
+    --color-on-background-low: hsl(var(--color-hue) 50% 70%);
+    --color-on-background-faint: hsl(var(--color-hue) 50% 15%);
+    --color-surface: hsl(var(--color-hue) 50% 10%);
+    --color-surface-00dp: hsl(var(--color-hue) 50% 10%);
+    --color-surface-01dp: hsl(var(--color-hue) 50% 11%);
+    --color-surface-02dp: hsl(var(--color-hue) 50% 12%);
+    --color-surface-03dp: hsl(var(--color-hue) 50% 13%);
+    --color-surface-04dp: hsl(var(--color-hue) 50% 14%);
+    --color-surface-05dp: hsl(var(--color-hue) 50% 15%);
+    --color-on-surface: hsl(var(--color-hue) 50% 80%);
+    --color-on-surface-high: hsl(var(--color-hue) 50% 90%);
+    --color-on-surface-medium: hsl(var(--color-hue) 50% 80%);
+    --color-on-surface-low: hsl(var(--color-hue) 100% 70%);
+    --color-on-surface-faint: hsl(var(--color-hue) 50% 20%);
+    --color-primary: hsl(var(--color-hue) 100% 50%);
+    --color-on-primary: hsl(var(--color-hue) 100% 20%);
+    --color-on-primary-high: hsl(var(--color-hue) 100% 10%);
+    --color-on-primary-medium: hsl(var(--color-hue) 100% 20%);
+    --color-on-primary-low: hsl(var(--color-hue) 100% 30%);
+    --color-on-primary-faint: hsl(var(--color-hue) 100% 60%);
+    --color-primary-variant: hsl(var(--color-hue) 50% 50%);
+    --color-on-primary-variant: hsl(var(--color-hue) 50% 20%);
+    --color-on-primary-variant-high: hsl(var(--color-hue) 5% 10%);
+    --color-on-primary-variant-medium: hsl(var(--color-hue) 50% 20%);
+    --color-on-primary-variant-low: hsl(var(--color-hue) 50% 30%);
+    --color-on-primary-variant-faint: hsl(var(--color-hue) 50% 60%);
+    --color-complementary: hsl(calc(var(--color-hue) + 180) 100% 50%);
+    --color-on-complementary: hsl(calc(var(--color-hue) + 180) 100% 20%);
+    --color-on-complementary-high: hsl(calc(var(--color-hue) + 180) 100% 10%);
+    --color-on-complementary-medium: hsl(calc(var(--color-hue) + 180) 100% 20%);
+    --color-on-complementary-low: hsl(calc(var(--color-hue) + 180) 100% 30%);
+    --color-on-complementary-faint: hsl(calc(var(--color-hue) + 180) 100% 30%);
+    --color-complementary-variant: hsl(calc(var(--color-hue) + 180) 50% 50%);
+    --color-on-complementary-variant: hsl(calc(var(--color-hue) + 180) 50% 20%);
+    --color-on-complementary-variant-high: hsl(calc(var(--color-hue) + 180) 50% 10%);
+    --color-on-complementary-variant-medium: hsl(calc(var(--color-hue) + 180) 50% 20%);
+    --color-on-complementary-variant-low: hsl(calc(var(--color-hue) + 180) 50% 30%);
+    --color-on-complementary-variant-faint: hsl(calc(var(--color-hue) + 180) 50% 30%);
+    --color-error: hsl(0 50% 50%);
+    --color-on-error: hsl(0 50% 80%);
+    --color-on-error-high: hsl(0 50% 90%);
+    --color-on-error-medium: hsl(0 50% 80%);
+    --color-on-error-low: hsl(0 50% 70%);
+    --color-on-error-faint: hsl(0 50% 52%);
+  }
+}
+
+body {
+  background-color: var(--color-background);
 }
 
 @tailwind base;
@@ -142,21 +132,39 @@ TODO: Tailwind JIT modeが正式リリースになったタイミングで以下
 
 @layer components {
   .shadow-00dp {
-    @apply shadow-sm;
-  };
+    box-shadow: none;
+  }
   .shadow-01dp {
-    @apply shadow;
-  };
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 3px 0 rgba(0,0,0,0.12);
+  }
   .shadow-02dp {
-    @apply shadow-md;
-  };
+    box-shadow: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+  }
   .shadow-03dp {
-    @apply shadow-lg;
-  };
+    box-shadow: 0 3px 3px -2px rgba(0,0,0,0.2), 0 3px 4px 0 rgba(0,0,0,0.14), 0 1px 8px 0 rgba(0,0,0,0.12);
+  }
   .shadow-04dp {
-    @apply shadow-xl;
-  };
-  .shadow-06dp {
-    @apply shadow-2xl;
-  };
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+  }
+  .shadow-05dp {
+    box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px 0 rgba(0,0,0,0.14), 0 1px 14px 0 rgba(0,0,0,0.12);
+  }
+  .drop-shadow-00dp {
+    filter: none;
+  }
+  .drop-shadow-01dp {
+    filter: drop-shadow(0 1px 0px rgba(0,0,0,0.2)) drop-shadow(0 1px 1px rgba(0,0,0,0.14)) drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+  }
+  .drop-shadow-02dp {
+    filter: drop-shadow(0 1px 0px rgba(0,0,0,0.2)) drop-shadow(0 2px 2px rgba(0,0,0,0.14)) drop-shadow(0 1px 4px rgba(0,0,0,0.12));
+  }
+  .drop-shadow-03dp {
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2)) drop-shadow(0 3px 3px rgba(0,0,0,0.14)) drop-shadow(0 1px 2px rgba(0,0,0,0.12));
+  }
+  .drop-shadow-04dp {
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)) drop-shadow(0 4px 3px rgba(0,0,0,0.14)) drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+  }
+  .drop-shadow-05dp {
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2)) drop-shadow(0 5px 8px rgba(0,0,0,0.14)) drop-shadow(0 1px 6px rgba(0,0,0,0.12));
+  }
 };

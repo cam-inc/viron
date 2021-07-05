@@ -6,6 +6,7 @@ import { UseSiblingsReturn } from '../../_hooks/useSiblings';
 
 type Props = {
   sibling: UseSiblingsReturn[number];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onOperationSuccess: (data: any) => void;
   onOperationFail: (error: Error) => void;
 };
@@ -22,7 +23,7 @@ const Sibling: React.FC<Props> = ({
   };
 
   const handleRequestSubmit = async function (requestValue: RequestValue) {
-    drawer.requestClose();
+    drawer.close();
     setIsPending(true);
     const { data, error } = await sibling.fetch(requestValue);
     setIsPending(false);

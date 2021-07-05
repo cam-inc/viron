@@ -22,9 +22,12 @@ const Notification: React.FC<Props> = ({
     [isOpened]
   );
 
-  const handleCloseButtonClick = useCallback(function () {
-    onRequestClose();
-  }, []);
+  const handleCloseButtonClick = useCallback(
+    function () {
+      onRequestClose();
+    },
+    [onRequestClose]
+  );
 
   // Request to close after some time have passed.
   useEffect(
@@ -43,7 +46,7 @@ const Notification: React.FC<Props> = ({
       }
       return cleanup;
     },
-    [isOpened]
+    [isOpened, onRequestClose, timeoutSec]
   );
 
   if (!isOpened) {

@@ -14,10 +14,12 @@ type Props = {
 const Textinput: React.FC<Props> = ({ label, description, error, render }) => {
   return (
     <div>
-      {!!label && <label className="font-bold">{label}</label>}
+      {!!label && <div className="text-xs font-bold">{label}</div>}
       {!!description && <p>{description}</p>}
       {!!error && <p>{error.message}</p>}
-      {render('border')}
+      {render(
+        'p-1 bg-background text-on-background border-2 border-on-surface-faint rounded'
+      )}
     </div>
   );
 };

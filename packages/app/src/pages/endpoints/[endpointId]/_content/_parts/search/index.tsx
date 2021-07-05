@@ -14,7 +14,7 @@ const Search: React.FC<Props> = ({ base }) => {
     drawer.open();
   };
   const handleRequestSubmit = function (requestValue: RequestValue) {
-    drawer.requestClose();
+    drawer.close();
     base.fetch(requestValue);
   };
 

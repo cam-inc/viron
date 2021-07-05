@@ -1,3 +1,4 @@
+import { BiDownload } from '@react-icons/all-files/bi/BiDownload';
 import React from 'react';
 import { useRecoilState } from 'recoil';
 import { listState as endpointListState } from '$store/atoms/endpoint';
@@ -5,7 +6,10 @@ import { AuthConfig, Endpoint, EndpointForDistribution } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import { lint, resolve } from '$utils/oas';
 
-const Import: React.FC = () => {
+type Props = {
+  className?: string;
+};
+const Import: React.FC<Props> = ({ className = '' }) => {
   const [, setEndpointList] = useRecoilState(endpointListState);
 
   const handleClick = function () {
@@ -44,6 +48,7 @@ const Import: React.FC = () => {
                 return;
               }
               if (response.ok) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const document: Record<string, any> = await response.json();
                 const { isValid } = lint(document);
                 if (!isValid) {
@@ -145,8 +150,11 @@ const Import: React.FC = () => {
   };
 
   return (
-    <div>
-      <button onClick={handleClick}>エンドポイント一覧をインポートする</button>
+    <div className={className}>
+      <button className="flex items-center" onClick={handleClick}>
+        <BiDownload className="mr-1" />
+        <div>Import</div>
+      </button>
     </div>
   );
 };

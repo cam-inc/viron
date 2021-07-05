@@ -1,26 +1,17 @@
-import { AiFillApi } from '@react-icons/all-files/ai/AiFillApi';
-import { AiFillDelete } from '@react-icons/all-files/ai/AiFillDelete';
-import { navigate } from 'gatsby';
-import React, { useEffect, useState } from 'react';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { listState } from '$store/atoms/endpoint';
-import { oneState } from '$store/selectors/endpoint';
-import { EndpointID } from '$types/index';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Endpoint } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
-import { Email, OAuth, Signout } from '../_auth/index';
-import QRCode from '../_qrcode/index';
+import Enter from './_enter';
+import QRCode from './_qrcode/index';
+import Remove from './_remove';
+import Signin from './_signin';
+import Signout from './_signout';
+import Thumbnail from './_thumbnail';
 
 type Props = {
-  id: EndpointID;
+  endpoint: Endpoint;
 };
-const Endpoint: React.FC<Props> = ({ id }) => {
-  const [endpoint] = useRecoilState(oneState({ id }));
-  const setEndpoints = useSetRecoilState(listState);
-
-  if (!endpoint) {
-    throw new Error('Endoint Not Found.');
-  }
-
+const _Endpoint: React.FC<Props> = ({ endpoint }) => {
   const [isPending, setIsPending] = useState<boolean>(true);
   const [isSigninRequired, setIsSigninRequired] = useState<boolean>(false);
 
@@ -57,90 +48,81 @@ const Endpoint: React.FC<Props> = ({ id }) => {
       };
       f();
     },
-    [setIsSigninRequired, setIsPending]
+    [endpoint, setIsSigninRequired, setIsPending]
   );
 
-  const handleDeleteButtonClick = function (): void {
-    setEndpoints(function (currVal) {
-      return currVal.filter(function (_endpoint) {
-        return _endpoint.id !== endpoint.id;
-      });
-    });
-  };
+  const enter = useMemo<JSX.Element>(
+    function () {
+      return <Enter endpoint={endpoint} isSigninRequired={isSigninRequired} />;
+    },
+    [endpoint, isSigninRequired]
+  );
 
-  const handleConnectButtonClick = function () {
-    navigate(`/endpoints/${endpoint.id}`);
-  };
+  const signin = useMemo<JSX.Element>(
+    function () {
+      return <Signin endpoint={endpoint} isSigninRequired={isSigninRequired} />;
+    },
+    [endpoint, isSigninRequired]
+  );
 
-  const handleSignout = function () {
-    setIsSigninRequired(true);
-  };
+  const handleSignout = useCallback(
+    function () {
+      setIsSigninRequired(true);
+    },
+    [setIsSigninRequired]
+  );
+  const signout = useMemo<JSX.Element>(
+    function () {
+      return (
+        <Signout
+          endpoint={endpoint}
+          isSigninRequired={isSigninRequired}
+          onSignout={handleSignout}
+        />
+      );
+    },
+    [endpoint, isSigninRequired, handleSignout]
+  );
+
+  if (isPending) {
+    return (
+      <div className="p-2">
+        <div>Pending...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-2 border rounded text-xxs">
-      <p>ID: {endpoint.id}</p>
-      <p>URL: {endpoint.url}</p>
-      <p>isPrivate: {endpoint.isPrivate.toString()}</p>
-      <QRCode endpoint={endpoint} />
-      <button onClick={handleDeleteButtonClick}>
-        <AiFillDelete className="inline" />
-        <span>remove</span>
-      </button>
-      {isPending ? (
-        <p>pending...</p>
-      ) : (
-        <React.Fragment>
-          {!endpoint.isPrivate && (
-            <button onClick={handleConnectButtonClick}>
-              <AiFillApi className="inline" />
-              <span>connect</span>
-            </button>
-          )}
-          {endpoint.isPrivate && !!endpoint.authConfigs && isSigninRequired && (
-            <React.Fragment>
-              {endpoint.authConfigs
-                .filter((authConfig) => authConfig.type !== 'signout')
-                .map((authConfig, idx) => {
-                  let elm: JSX.Element | null = null;
-                  switch (authConfig.type) {
-                    case 'oauth':
-                      elm = (
-                        <OAuth authConfig={authConfig} endpoint={endpoint} />
-                      );
-                      break;
-                    case 'email':
-                      elm = (
-                        <Email authConfig={authConfig} endpoint={endpoint} />
-                      );
-                      break;
-                  }
-                  return <React.Fragment key={idx}>{elm}</React.Fragment>;
-                })}
-            </React.Fragment>
-          )}
-          {endpoint.isPrivate && !!endpoint.authConfigs && !isSigninRequired && (
-            <React.Fragment>
-              <button onClick={handleConnectButtonClick}>
-                <AiFillApi className="inline" />
-                <span>connect</span>
-              </button>
-              {endpoint.authConfigs
-                .filter((authConfig) => authConfig.type === 'signout')
-                .map((authConfig, idx) => (
-                  <React.Fragment key={idx}>
-                    <Signout
-                      authConfig={authConfig}
-                      endpoint={endpoint}
-                      onSignout={handleSignout}
-                    />
-                  </React.Fragment>
-                ))}
-            </React.Fragment>
-          )}
-        </React.Fragment>
-      )}
+    <div className="p-2">
+      <div className="pb-2 flex items-center">
+        <div className="flex-none mr-2">
+          <Thumbnail className="" endpoint={endpoint} />
+        </div>
+        <div className="flex-1 m-w-0 mr-2">
+          <div className="">{endpoint.document?.info.title || '---'}</div>
+          <div className="text-on-surface-low text-xs">{endpoint.url}</div>
+        </div>
+        <div className="flex-none">
+          <div className="flex items-center">
+            <div className="mr-2 last:mr-0">
+              <QRCode endpoint={endpoint} />
+            </div>
+            <div className="mr-2 last:mr-0">
+              <Remove endpoint={endpoint} />
+            </div>
+            <div className="mr-2 last:mr-0">{enter}</div>
+            <div className="mr-2 last:mr-0">{signin}</div>
+            <div className="mr-2 last:mr-0">{signout}</div>
+          </div>
+        </div>
+      </div>
+      <div className="pt-2 border-t border-on-surface-faint">
+        <div className="text-xxs">
+          {endpoint.document?.info.description || '---'}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Endpoint;
+export default _Endpoint;

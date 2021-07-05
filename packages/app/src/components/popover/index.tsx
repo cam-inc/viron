@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import React, {
   useCallback,
   useEffect,
@@ -42,8 +41,8 @@ const Popover: React.FC<Props> = ({
   children,
 }) => {
   type Position = { x: number; y: number };
-  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
-  const [rect, setRect] = useState<DOMRect>(new DOMRect());
+  const [, /*position*/ setPosition] = useState<Position>({ x: 0, y: 0 });
+  const [, /*rect*/ setRect] = useState<DOMRect>(new DOMRect());
 
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -189,7 +188,7 @@ const Popover: React.FC<Props> = ({
       };
       onRequestClose(accept);
     },
-    [onRequestClose, isOpened]
+    [onRequestClose, isOpened, runAnimation]
   );
 
   useEffect(
@@ -198,7 +197,7 @@ const Popover: React.FC<Props> = ({
         requestClose();
       };
     },
-    [requestCloseRef, requestCloseRef.current, requestClose]
+    [requestCloseRef, requestClose]
   );
 
   const content = useMemo<JSX.Element>(
@@ -369,7 +368,7 @@ const Popover: React.FC<Props> = ({
           );
       }
     },
-    [placement, position, rect, children]
+    [placement, children]
   );
 
   useEffect(
