@@ -26,14 +26,14 @@ declare global {
   namespace Express {
     export interface Request {
       _context: RequestContext;
-      cookies: Record<string, string>;
+      cookies: Record<string, string | null | undefined>;
     }
   }
 }
 
 interface ExegesisIncomingMessage extends HttpIncomingMessage {
   path: string;
-  cookies: Record<string, string>;
+  cookies: Record<string, string | null | undefined>;
   _context: RequestContext;
 }
 

@@ -10,7 +10,7 @@ import {
 import { forbidden, invalidGoogleOAuth2Token } from '../../../src/errors';
 import { domainsAdminUser } from '../../../src/domains';
 
-describe('domains/auditlog', () => {
+describe('domains/auth/googleoauth2', () => {
   const sandbox = sinon.createSandbox();
 
   afterEach(() => {
