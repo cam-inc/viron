@@ -1,26 +1,44 @@
+import classnames from 'classnames';
 import { navigate, PageProps } from 'gatsby';
 import { parse } from 'query-string';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import Error from '$components/error';
+import Metadata from '$components/metadata';
+import { StatusCode } from '$constants/index';
+import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
 import useTheme from '$hooks/theme';
+import Layout, { Props as LayoutProps } from '$layouts/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { AuthConfig, Endpoint, EndpointForDistribution } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import { lint, resolve } from '$utils/oas';
+import Appbar from './_parts/_appbar/index';
+import Navigation from './_parts/_navigation/index';
 
 type Props = PageProps;
 const EndpointImportPagge: React.FC<Props> = ({ location }) => {
   useTheme();
   const [, setEndpointList] = useRecoilState(endpointListState);
 
-  const queries = parse(location.search);
-  const endpoint: EndpointForDistribution = JSON.parse(
-    queries.endpoint as string
-  ) as EndpointForDistribution;
+  const [error, setError] = useState<BaseError | null>(null);
+  const [isPending, setIsPending] = useState<boolean>(true);
 
   // TODO: 良い感じにsrc/pages/home/_add/index.tsxと処理を統一したい。
   useEffect(
     function () {
+      const queries = parse(location.search);
+      let endpoint: EndpointForDistribution;
+      try {
+        endpoint = JSON.parse(
+          queries.endpoint as string
+        ) as EndpointForDistribution;
+      } catch {
+        setError(new BaseError('TODO'));
+        setIsPending(false);
+        return;
+      }
+
       const f = async function (): Promise<void> {
         // Check whether the endpoint exists or not.
         const [response, responseError] = await promiseErrorHandler(
@@ -29,17 +47,17 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
           })
         );
         if (!!responseError) {
-          // 稀なケース。エクスポート後にエンドポイントurlを変更した際などに。
-          // TODO: show error.
+          setError(new NetworkError());
+          setIsPending(false);
           return;
         }
         if (response.ok) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const document: Record<string, any> = await response.json();
-          const { isValid } = lint(document);
+          const { isValid, errors } = lint(document);
           if (!isValid) {
-            // TODO: show error
-            console.error('The OAS Document is not of version we support.');
+            setError(new OASError(errors?.[0]?.message));
+            setIsPending(false);
             return;
           }
           setEndpointList(function (currVal) {
@@ -80,8 +98,8 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
               })
             );
           if (!!authconfigsResponseError) {
-            // Network error.
-            // TODO: show error.
+            setError(new NetworkError());
+            setIsPending(false);
             return;
           }
           // TODO: GET /authconfigsのレスポンスをフラットなAuthConfig[]に変更したい。
@@ -110,15 +128,59 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
           navigate('/home');
           return;
         }
-        // Something went wrong.
-        // response.ok is false and response.status is other than 401.
-        // TODO: show error.
+        if (!response.ok) {
+          const error = getHTTPError(response.status as StatusCode);
+          setError(error);
+          setIsPending(false);
+          return;
+        }
+        setError(new BaseError());
+        setIsPending(false);
       };
       f();
     },
-    [endpoint, setEndpointList]
+    [location, setEndpointList]
   );
 
-  return <div id="page-endpointimport">importing...</div>;
+  const renderAppBar = useCallback<LayoutProps['renderAppBar']>(function (
+    args
+  ) {
+    return <Appbar {...args} />;
+  },
+  []);
+
+  const renderNavigation = useCallback<LayoutProps['renderNavigation']>(
+    function (args) {
+      return <Navigation {...args} />;
+    },
+    []
+  );
+
+  const renderBody = useCallback<LayoutProps['renderBody']>(
+    function ({ className = '' }) {
+      if (isPending) {
+        return (
+          <div className={classnames('p-2', className)}>TODO: pending...</div>
+        );
+      }
+      if (error) {
+        return <Error error={error} />;
+      }
+      // TODO: 自動でnavigateするのでこれが表示されることはないはず。
+      return <div>TODO: import完了</div>;
+    },
+    [isPending, error]
+  );
+
+  return (
+    <>
+      <Metadata title="Import | Viron" />
+      <Layout
+        renderAppBar={renderAppBar}
+        renderNavigation={renderNavigation}
+        renderBody={renderBody}
+      />
+    </>
+  );
 };
 export default EndpointImportPagge;

@@ -58,7 +58,7 @@ const Notification: React.FC<Props> = ({
       <div className="flex justify-end mb-4 last:mb-0">
         <div
           className={classsnames(
-            'relative p-4 rounded shadow-04dp bg-surface-04dp transition duration-300 transform pointer-events-auto',
+            'relative p-4 rounded shadow-04dp bg-surface-04dp text-on-surface transition duration-300 transform pointer-events-auto',
             {
               'opacity-0': !isVisible,
               'translate-x-4': !isVisible,
