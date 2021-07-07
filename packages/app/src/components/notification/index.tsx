@@ -55,17 +55,21 @@ const Notification: React.FC<Props> = ({
 
   return (
     <Portal targetId={ID}>
-      <div
-        className={classsnames(
-          'bg-white transition-opacity pointer-events-auto',
-          {
-            'opacity-0': !isVisible,
-            'opacity-100': isVisible,
-          }
-        )}
-      >
-        <button onClick={handleCloseButtonClick}>close</button>
-        <div>{children}</div>
+      <div className="flex justify-end mb-4 last:mb-0">
+        <div
+          className={classsnames(
+            'relative p-4 rounded shadow-04dp bg-surface-04dp transition duration-300 transform pointer-events-auto',
+            {
+              'opacity-0': !isVisible,
+              'translate-x-4': !isVisible,
+              'opacity-100': isVisible,
+              'translate-x-0': isVisible,
+            }
+          )}
+        >
+          <button onClick={handleCloseButtonClick}>close</button>
+          <div>{children}</div>
+        </div>
       </div>
     </Portal>
   );

@@ -5,10 +5,11 @@ import Button from '$components/button';
 import { listState } from '$store/atoms/endpoint';
 import { Endpoint } from '$types/index';
 
-type Props = {
+export type Props = {
   endpoint: Endpoint;
+  onRemove: (endpoint: Endpoint) => void;
 };
-const Remove: React.FC<Props> = ({ endpoint }) => {
+const Remove: React.FC<Props> = ({ endpoint, onRemove }) => {
   const setEndpoints = useSetRecoilState(listState);
 
   const handleClick = useCallback(
@@ -18,17 +19,20 @@ const Remove: React.FC<Props> = ({ endpoint }) => {
           return _endpoint.id !== endpoint.id;
         });
       });
+      onRemove(endpoint);
     },
     [endpoint, setEndpoints]
   );
 
   return (
-    <Button
-      on="surface"
-      variant="text"
-      Icon={AiFillDelete}
-      onClick={handleClick}
-    />
+    <>
+      <Button
+        on="surface"
+        variant="text"
+        Icon={AiFillDelete}
+        onClick={handleClick}
+      />
+    </>
   );
 };
 export default Remove;

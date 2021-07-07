@@ -12,7 +12,7 @@ const Thumbnail: React.FC<Props> = ({ className = '', endpoint }) => {
     function () {
       if (!endpoint?.document || !endpoint.document.info['x-thumbnail']) {
         return (
-          <div className="p-2">
+          <div className="h-full p-2 flex items-center">
             <Logo left="text-on-background" right="text-on-background-low" />
           </div>
         );
@@ -32,7 +32,7 @@ const Thumbnail: React.FC<Props> = ({ className = '', endpoint }) => {
   return (
     <div
       className={classnames(
-        'w-12 h-12 rounded bg-background border border-on-background-faint overflow-hidden',
+        'w-16 h-16 rounded bg-background border border-on-background-faint overflow-hidden',
         className
       )}
     >

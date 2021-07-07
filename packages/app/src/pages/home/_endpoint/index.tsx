@@ -3,15 +3,16 @@ import { Endpoint } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import Enter from './_enter';
 import QRCode from './_qrcode/index';
-import Remove from './_remove';
+import Remove, { Props as RemoveProps } from './_remove';
 import Signin from './_signin';
 import Signout from './_signout';
 import Thumbnail from './_thumbnail';
 
-type Props = {
+export type Props = {
   endpoint: Endpoint;
+  onRemove: RemoveProps['onRemove'];
 };
-const _Endpoint: React.FC<Props> = ({ endpoint }) => {
+const _Endpoint: React.FC<Props> = ({ endpoint, onRemove }) => {
   const [isPending, setIsPending] = useState<boolean>(true);
   const [isSigninRequired, setIsSigninRequired] = useState<boolean>(false);
 
@@ -99,7 +100,10 @@ const _Endpoint: React.FC<Props> = ({ endpoint }) => {
           <Thumbnail className="" endpoint={endpoint} />
         </div>
         <div className="flex-1 min-w-0 mr-2">
-          <div className="">{endpoint.document?.info.title || '---'}</div>
+          <div className="text-on-surface-low text-xxs">{endpoint.id}</div>
+          <div className="text-on-surface-high">
+            {endpoint.document?.info.title || '---'}
+          </div>
           <div className="text-on-surface-low text-xs">{endpoint.url}</div>
         </div>
         <div className="flex-none">
@@ -108,7 +112,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint }) => {
               <QRCode endpoint={endpoint} />
             </div>
             <div className="mr-2 last:mr-0">
-              <Remove endpoint={endpoint} />
+              <Remove endpoint={endpoint} onRemove={onRemove} />
             </div>
             <div className="mr-2 last:mr-0">{enter}</div>
             <div className="mr-2 last:mr-0">{signin}</div>

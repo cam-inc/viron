@@ -125,7 +125,7 @@ const Root: React.FC<Props> = ({ children }) => {
       <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
       <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
       <PopoverWrapper className="fixed inset-0 z-wrapper-popover" />
-      <NotificationWrapper className="fixed inset-0 z-wrapper-notification" />
+      <NotificationWrapper className="fixed left-0 right-0 bottom-0 pr-4 pb-4 z-wrapper-notification" />
       <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
       {!isLaunched && <Splash className="fixed inset-0 z-splash" />}
     </div>
