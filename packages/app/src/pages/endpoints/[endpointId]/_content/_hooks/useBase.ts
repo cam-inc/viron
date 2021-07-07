@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Endpoint } from '$types/index';
 import {
   Document,
@@ -33,11 +33,19 @@ const useBase = function (
   contentId: ContentProps['contentId'],
   content: Info['x-pages'][number]['contents'][number]
 ): UseBaseReturn {
-  const request = getRequest(document, { operationId: content.operationId });
-  // TODO: linter時にこういう例外を全てケアすべきかな。いちいちnullチェックしたくない。
-  if (!request) {
-    throw new Error('request object not found.');
-  }
+  const request = useMemo<RequestType>(
+    function () {
+      const request = getRequest(document, {
+        operationId: content.operationId,
+      });
+      // TODO: linter時にこういう例外を全てケアすべきかな。いちいちnullチェックしたくない。
+      if (!request) {
+        throw new Error('request object not found.');
+      }
+      return request;
+    },
+    [document, content.operationId]
+  );
 
   const [isPending, setIsPending] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
