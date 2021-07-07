@@ -43,11 +43,12 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
 
   const { pathObject } = authConfig;
   const document: Document = constructFakeDocument({ paths: pathObject });
-  const request = getRequest(document);
+  const getRequestResult = getRequest(document);
 
-  if (!request) {
+  if (getRequestResult.isFailure()) {
     throw new Error('TODO');
   }
+  const request = getRequestResult.value;
 
   const defaultValues = cleanupRequestValue(request, {
     parameters: queries,

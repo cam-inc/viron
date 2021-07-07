@@ -1,11 +1,12 @@
 import React from 'react';
+import Error from '$components/error';
 import { Document, Info } from '$types/oas';
 import {
   getContentBaseOperationResponseKeys,
   getTableSetting,
 } from '$utils/oas';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
-import Descendant from '../../_parts/descendant';
+import Descendant, { Props as DescendantProps } from '../../_parts/descendant';
 
 // TODO: ソート機能とフィルター機能
 
@@ -15,9 +16,8 @@ type Props = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   descendants: UseDescendantsReturn;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onDescendantOperationSuccess: (data: any) => void;
-  onDescendantOperationFail: (error: Error) => void;
+  onDescendantOperationSuccess: DescendantProps['onOperationSuccess'];
+  onDescendantOperationFail: DescendantProps['onOperationFail'];
 };
 const _ContentTable: React.FC<Props> = ({
   document,
@@ -27,17 +27,12 @@ const _ContentTable: React.FC<Props> = ({
   onDescendantOperationSuccess,
   onDescendantOperationFail,
 }) => {
-  const tableSetting = getTableSetting(document.info);
-  if (!tableSetting || !tableSetting.responseListKey) {
-    throw new Error(
-      'TODO: content.type="table"を使うなら必ずInfo[x-table]を定義してね！'
-    );
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return <Error error={getTableSettingResult.value} />;
   }
-  if (!data[tableSetting.responseListKey]) {
-    throw new Error(
-      `TODO: レスポンスに${tableSetting.responseListKey}がないお。。`
-    );
-  }
+  const tableSetting = getTableSettingResult.value;
+
   const fields = getContentBaseOperationResponseKeys(document, content);
   // TODO: OASが修正されるまでの暫定対応
   if (content.operationId === 'listPurchases') {

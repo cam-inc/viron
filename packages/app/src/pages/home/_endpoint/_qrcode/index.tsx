@@ -1,8 +1,10 @@
 import { ImQrcode } from '@react-icons/all-files/im/ImQrcode';
 import qrcode from 'qrcode';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Button from '$components/button';
+import Error from '$components/error';
 import Modal, { useModal } from '$components/modal';
+import { BaseError } from '$errors/index';
 import { Endpoint, EndpointForDistribution } from '$types/index';
 
 type Props = {
@@ -34,6 +36,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
 export default QRCode;
 
 const _QRCode: React.FC<{ endpoint: Endpoint }> = ({ endpoint }) => {
+  const [error, setError] = useState<BaseError | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(
     function () {
@@ -52,14 +55,16 @@ const _QRCode: React.FC<{ endpoint: Endpoint }> = ({ endpoint }) => {
         JSON.stringify(_endpoint)
       )}`;
       qrcode.toCanvas(canvasElement, data, function (error: Error) {
-        if (!!error) {
-          // TODO
-          console.error(error);
+        if (error) {
+          setError(new BaseError(error.message));
         }
       });
     },
     [endpoint, canvasRef]
   );
 
+  if (error) {
+    return <Error error={error} />;
+  }
   return <canvas ref={canvasRef} />;
 };

@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
+import { StatusCode } from '$constants/index';
+import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import { Endpoint } from '$types/index';
 import {
   Document,
@@ -25,7 +27,9 @@ export type UseSiblingsReturn = {
   request: Request;
   defaultValues: ReturnType<typeof cleanupRequestValue>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fetch: (requestValue: RequestValue) => Promise<{ data?: any; error?: Error }>;
+  fetch: (
+    requestValue: RequestValue
+  ) => Promise<{ data?: any; error?: BaseError }>;
 }[];
 // Sibling Opeartions are
 // [1] operations whose path is the same as the base operation's one but method is different.
@@ -38,16 +42,18 @@ const useSiblings = function (
   const operationIds = useMemo<OperationId[]>(
     function () {
       const _operationIds: OperationId[] = [];
-      const baseRequest = getRequest(document, {
+      const getBaseRequestResult = getRequest(document, {
         operationId: content.operationId,
       });
-      if (!baseRequest) {
+      if (getBaseRequestResult.isFailure()) {
         return _operationIds;
       }
-      const basePathItem = getPathItem(document, baseRequest.path);
-      if (!basePathItem) {
+      const baseRequest = getBaseRequestResult.value;
+      const getBasePathItemResult = getPathItem(document, baseRequest.path);
+      if (getBasePathItemResult.isFailure()) {
         return _operationIds;
       }
+      const basePathItem = getBasePathItemResult.value;
 
       // Add operations under the rule of [1] described above.
       // TODO: method一覧の扱い改善。
@@ -103,10 +109,11 @@ const useSiblings = function (
     function () {
       const _siblings: UseSiblingsReturn = [];
       operationIds.forEach(function (operationId) {
-        const request = getRequest(document, { operationId });
-        if (!request) {
+        const getRequestResult = getRequest(document, { operationId });
+        if (getRequestResult.isFailure()) {
           return;
         }
+        const request = getRequestResult.value;
         _siblings.push({
           request,
           defaultValues: cleanupRequestValue(request, {
@@ -130,12 +137,10 @@ const useSiblings = function (
                 window.fetch(requestInfo, requestInit)
               );
             if (responseError) {
-              // TODO: Error handling
-              return { error: responseError };
+              return { error: new NetworkError() };
             }
             if (!response.ok) {
-              // TODO: Error handling
-              return { error: new Error('response not ok.') };
+              return { error: getHTTPError(response.status as StatusCode) };
             }
             const data = await response.json();
             return {

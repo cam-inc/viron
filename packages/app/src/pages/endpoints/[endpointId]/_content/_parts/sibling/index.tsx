@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import RequestComponent from '$components/request';
+import { BaseError } from '$errors/index';
 import { RequestValue } from '$types/oas';
 import { UseSiblingsReturn } from '../../_hooks/useSiblings';
 
-type Props = {
+export type Props = {
   sibling: UseSiblingsReturn[number];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onOperationSuccess: (data: any) => void;
-  onOperationFail: (error: Error) => void;
+  onOperationFail: (error: BaseError) => void;
 };
 const Sibling: React.FC<Props> = ({
   sibling,

@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
+import { StatusCode } from '$constants/index';
+import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import { Endpoint } from '$types/index';
 import {
   Document,
@@ -25,7 +27,9 @@ export type UseDescendantsReturn = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getDefaultValues: (data: any) => ReturnType<typeof cleanupRequestValue>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fetch: (requestValue: RequestValue) => Promise<{ data?: any; error?: Error }>;
+  fetch: (
+    requestValue: RequestValue
+  ) => Promise<{ data?: any; error?: BaseError }>;
 }[];
 // Descendant Opeartions are
 // [1] operations whose path includes base operation's one at the head.(i.e. path matches `/${baseOperation's path}/xxx/yyy`)
@@ -38,12 +42,13 @@ const useDescendants = function (
   const operationIds = useMemo<OperationId[]>(
     function () {
       const _operationIds: OperationId[] = [];
-      const baseRequest = getRequest(document, {
+      const getBaseRequestResult = getRequest(document, {
         operationId: content.operationId,
       });
-      if (!baseRequest) {
+      if (getBaseRequestResult.isFailure()) {
         return _operationIds;
       }
+      const baseRequest = getBaseRequestResult.value;
 
       // Add operations under the rule of [1] described above.
       const pathItems = _.filter(document.paths, function (_, path) {
@@ -103,10 +108,11 @@ const useDescendants = function (
     function () {
       const _descendants: UseDescendantsReturn = [];
       operationIds.forEach(function (operationId) {
-        const request = getRequest(document, { operationId });
-        if (!request) {
+        const getRequestResult = getRequest(document, { operationId });
+        if (getRequestResult.isFailure()) {
           return;
         }
+        const request = getRequestResult.value;
         _descendants.push({
           request,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -140,12 +146,14 @@ const useDescendants = function (
                 window.fetch(requestInfo, requestInit)
               );
             if (responseError) {
-              // TODO: Error handling
-              return { error: responseError };
+              return {
+                error: new NetworkError(),
+              };
             }
             if (!response.ok) {
-              // TODO: Error handling
-              return { error: new Error('response not ok.') };
+              return {
+                error: getHTTPError(response.status as StatusCode),
+              };
             }
             const data = await response.json();
             return {

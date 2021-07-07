@@ -6,6 +6,7 @@ import { navigate } from 'gatsby';
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import Button from '$components/button';
+import Error from '$components/error';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { remove, KEY, set } from '$storage/index';
@@ -99,34 +100,42 @@ const OAuth: React.FC<{
 }> = ({ endpoint, authConfig }) => {
   const { pathObject } = authConfig;
   const document = constructFakeDocument({ paths: pathObject });
-  const request = getRequest(document);
-  if (!request) {
-    throw new Error('TODO');
-  }
+  const getRequestResult = getRequest(document);
 
   let Icon: IconType = AiOutlineLogin;
   if (authConfig.provider === 'google') {
     Icon = AiFillGoogleCircle;
   }
 
-  const handleSubmit = async function (requestValue: RequestValue) {
-    const requestPayloads = constructRequestPayloads(
-      request.operation,
-      requestValue
-    );
-    const requestInfo: RequestInfo = constructRequestInfo(
-      endpoint,
-      document,
-      request,
-      requestPayloads
-    );
-    try {
-      set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
-      location.href = requestInfo.toString();
-    } catch {
-      remove(KEY.OAUTH_ENDPOINT_ID);
-    }
-  };
+  const handleSubmit = useCallback(
+    async function (requestValue: RequestValue) {
+      if (getRequestResult.isFailure()) {
+        return;
+      }
+      const request = getRequestResult.value;
+      const requestPayloads = constructRequestPayloads(
+        request.operation,
+        requestValue
+      );
+      const requestInfo: RequestInfo = constructRequestInfo(
+        endpoint,
+        document,
+        request,
+        requestPayloads
+      );
+      try {
+        set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
+        location.href = requestInfo.toString();
+      } catch {
+        remove(KEY.OAUTH_ENDPOINT_ID);
+      }
+    },
+    [endpoint, document, getRequestResult]
+  );
+
+  if (getRequestResult.isFailure()) {
+    return <Error error={getRequestResult.value} />;
+  }
 
   return (
     <div>
@@ -136,7 +145,7 @@ const OAuth: React.FC<{
           OAuth({`https://localhost:8000/oauthredirect`})
         </div>
       </div>
-      <Request request={request} onSubmit={handleSubmit} />
+      <Request request={getRequestResult.value} onSubmit={handleSubmit} />
     </div>
   );
 };
@@ -147,41 +156,48 @@ const Email: React.FC<{
 }> = ({ endpoint, authConfig }) => {
   const { pathObject } = authConfig;
   const document = constructFakeDocument({ paths: pathObject });
-  const request = getRequest(document);
+  const getRequestResult = getRequest(document);
 
-  if (!request) {
-    throw new Error('TODO');
+  const handleSubmit = useCallback(
+    async function (requestValue: RequestValue) {
+      if (getRequestResult.isFailure()) {
+        return;
+      }
+      const request = getRequestResult.value;
+      const requestPayloads = constructRequestPayloads(
+        request.operation,
+        requestValue
+      );
+      const requestInfo: RequestInfo = constructRequestInfo(
+        endpoint,
+        document,
+        request,
+        requestPayloads
+      );
+      const requestInit: RequestInit = constructRequestInit(
+        request,
+        requestPayloads
+      );
+
+      const [response, responseError] = await promiseErrorHandler(
+        fetch(requestInfo, requestInit)
+      );
+      if (!!responseError) {
+        // TODO
+        return;
+      }
+      if (!response.ok) {
+        // TODO
+        return;
+      }
+      navigate(`/endpoints/${endpoint.id}`);
+    },
+    [endpoint, document, getRequestResult]
+  );
+
+  if (getRequestResult.isFailure()) {
+    return <Error error={getRequestResult.value} />;
   }
-
-  const handleSubmit = async function (requestValue: RequestValue) {
-    const requestPayloads = constructRequestPayloads(
-      request.operation,
-      requestValue
-    );
-    const requestInfo: RequestInfo = constructRequestInfo(
-      endpoint,
-      document,
-      request,
-      requestPayloads
-    );
-    const requestInit: RequestInit = constructRequestInit(
-      request,
-      requestPayloads
-    );
-
-    const [response, responseError] = await promiseErrorHandler(
-      fetch(requestInfo, requestInit)
-    );
-    if (!!responseError) {
-      // TODO
-      return;
-    }
-    if (!response.ok) {
-      // TODO
-      return;
-    }
-    navigate(`/endpoints/${endpoint.id}`);
-  };
 
   return (
     <div>
@@ -189,7 +205,7 @@ const Email: React.FC<{
         <AiOutlineLogin className="mr-1" />
         <div className="text-xs">Email</div>
       </div>
-      <Request request={request} onSubmit={handleSubmit} />
+      <Request request={getRequestResult.value} onSubmit={handleSubmit} />
     </div>
   );
 };

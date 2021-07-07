@@ -3,9 +3,11 @@ import { Link, navigate, PageProps } from 'gatsby';
 import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
+import Error from '$components/error';
 import Metadata from '$components/metadata';
+import { StatusCode } from '$constants/index';
+import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
 import { oneState } from '$store/selectors/endpoint';
@@ -27,9 +29,9 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   const [endpoint, setEndpoint] = useRecoilState(
     oneState({ id: params.endpointId })
   );
-  const [isPending, setIsPending] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
   const [document, setDocument] = useState<Document | null>(null);
+  const [isPending, setIsPending] = useState<boolean>(true);
+  const [error, setError] = useState<BaseError | null>(null);
 
   useTheme(document);
 
@@ -38,6 +40,8 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   useEffect(function () {
     const f = async function (): Promise<void> {
       if (!endpoint) {
+        setError(new BaseError('endpoint not found.'));
+        setIsPending(false);
         return;
       }
       const [response, responseError] = await promiseErrorHandler(
@@ -49,14 +53,15 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
 
       if (!!responseError) {
         // Network error.
-        setError(responseError.message);
+        setError(new NetworkError(responseError.message));
         setIsPending(false);
         return;
       }
 
       if (!response.ok) {
         // The authorization cookie is not valid.
-        setError(`${response.status}: ${response.statusText}`);
+        const error = getHTTPError(response.status as StatusCode);
+        setError(error);
         setIsPending(false);
         return;
       }
@@ -65,12 +70,11 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       const document: Record<string, any> = await response.json();
       const { isValid, errors } = lint(document);
       if (!isValid) {
-        setError(
-          `The OAS Document is not of version we support. ${errors?.[0]?.message}`
-        );
+        setError(new OASError(errors?.[0]?.message));
         setIsPending(false);
         return;
       }
+
       const _document = resolve(document);
       // Just update the stored data so that other pages using endpoints data be affected.
       setEndpoint({ ...endpoint, document: _document });
@@ -159,17 +163,17 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
 
   const renderAppBar = useCallback<LayoutProps['renderAppBar']>(
     function (args) {
-      if (!endpoint || !document) {
+      if (isPending || !endpoint || !document || error) {
         return null;
       }
       return <Appbar {...args} endpoint={endpoint} document={document} />;
     },
-    [endpoint, document]
+    [endpoint, document, isPending, error]
   );
 
   const renderNavigation = useCallback<LayoutProps['renderNavigation']>(
     function (args) {
-      if (!document) {
+      if (isPending || !endpoint || !document || error) {
         return null;
       }
       if (!selectedPageId) {
@@ -184,13 +188,19 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         />
       );
     },
-    [document, selectedPageId, handlePageSelect]
+    [endpoint, document, isPending, error, selectedPageId, handlePageSelect]
   );
 
   const renderBody = useCallback<LayoutProps['renderBody']>(
     function (args) {
       if (!endpoint || !document) {
         return null;
+      }
+      if (isPending) {
+        return <div>TODO: pending...</div>;
+      }
+      if (error) {
+        return <Error error={error} />;
       }
       const page = _.find(document.info['x-pages'], function (page) {
         return page.id === selectedPageId;
@@ -213,6 +223,8 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     [
       endpoint,
       document,
+      isPending,
+      error,
       selectedPageId,
       handleContentPin,
       handleContentUnpin,
@@ -222,7 +234,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
 
   const renderSubBody = useCallback<NonNullable<LayoutProps['renderSubBody']>>(
     function (args) {
-      if (!endpoint || !document) {
+      if (isPending || !endpoint || !document || error) {
         return null;
       }
       const contents = pinnedContentIds.map(function (contentId) {
@@ -247,45 +259,16 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         />
       );
     },
-    [endpoint, document, handleContentPin, handleContentUnpin, pinnedContentIds]
+    [
+      endpoint,
+      document,
+      isPending,
+      error,
+      handleContentPin,
+      handleContentUnpin,
+      pinnedContentIds,
+    ]
   );
-
-  const { t } = useTranslation();
-
-  if (!endpoint) {
-    return (
-      <div id="page-endpointOne">
-        <p>{t('endpoint not found...')}</p>
-        <Link to="/home">HOME</Link>
-      </div>
-    );
-  }
-
-  if (isPending) {
-    return (
-      <div id="page-endpointOne">
-        <p>fetching the OAS document...</p>
-      </div>
-    );
-  }
-
-  if (!!error) {
-    return (
-      <div id="page-endpointOne">
-        <p>error: {error}</p>
-        <Link to="/home">HOME</Link>
-      </div>
-    );
-  }
-
-  if (!document) {
-    return (
-      <div id="page-endpointOne">
-        <p>error: Document is null.</p>
-        <Link to="/home">HOME</Link>
-      </div>
-    );
-  }
 
   return (
     <>

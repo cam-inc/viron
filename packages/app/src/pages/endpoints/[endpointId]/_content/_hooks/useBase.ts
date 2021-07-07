@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { StatusCode } from '$constants/index';
+import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import { Endpoint } from '$types/index';
 import {
   Document,
@@ -19,7 +21,7 @@ import { Props as ContentProps } from '../index';
 
 export type UseBaseReturn = {
   isPending: boolean;
-  error: Error | null;
+  error: BaseError | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any | null;
   request: RequestType;
@@ -33,27 +35,29 @@ const useBase = function (
   contentId: ContentProps['contentId'],
   content: Info['x-pages'][number]['contents'][number]
 ): UseBaseReturn {
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [error, setError] = useState<BaseError | null>(null);
+
   const request = useMemo<RequestType>(
     function () {
-      const request = getRequest(document, {
+      const getRequestResult = getRequest(document, {
         operationId: content.operationId,
       });
-      // TODO: linter時にこういう例外を全てケアすべきかな。いちいちnullチェックしたくない。
-      if (!request) {
-        throw new Error('request object not found.');
+      if (getRequestResult.isFailure()) {
+        throw getRequestResult.value;
       }
-      return request;
+      return getRequestResult.value;
     },
     [document, content.operationId]
   );
 
-  const [isPending, setIsPending] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
   const [requestValue, setRequestValue] = useState<RequestValue>(
-    cleanupRequestValue(request, {
-      parameters: content.defaultParametersValue,
-      requestBody: content.defaultRequestBodyValue,
-    })
+    request
+      ? cleanupRequestValue(request, {
+          parameters: content.defaultParametersValue,
+          requestBody: content.defaultRequestBodyValue,
+        })
+      : {}
   );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any | null>(null);
@@ -75,6 +79,9 @@ const useBase = function (
   // Request will be triggered when requet value changes.
   useEffect(
     function () {
+      if (!request) {
+        return;
+      }
       const f = async function () {
         // Clear all.
         setIsPending(true);
@@ -96,14 +103,14 @@ const useBase = function (
           window.fetch(requestInfo, requestInit)
         );
         if (responseError) {
-          setError(responseError);
+          setError(new NetworkError());
           setData(null);
           setIsPending(false);
           return;
         }
         if (!response.ok) {
           // The authorization cookie is not valid or any other reasons.
-          setError(new Error(`${response.status}: ${response.statusText}`));
+          setError(getHTTPError(response.status as StatusCode));
           setData(null);
           setIsPending(false);
           return;

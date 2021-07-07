@@ -41,8 +41,11 @@ const Signout: React.FC<Props> = ({
       }
       const { pathObject } = authconfig;
       const document = constructFakeDocument({ paths: pathObject });
-      const request = getRequest(document);
-      return request;
+      const getRequestResult = getRequest(document);
+      if (getRequestResult.isFailure()) {
+        return null;
+      }
+      return getRequestResult.value;
     },
     [authconfig]
   );
