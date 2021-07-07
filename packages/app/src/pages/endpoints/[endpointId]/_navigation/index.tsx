@@ -6,6 +6,7 @@ import Navigation, { Props as NavigationProps } from '$components/navigation';
 import NavigationCopyright from '$components/navigation/copyright';
 import NavigationLinks from '$components/navigation/links';
 import NavigationServices from '$components/navigation/services';
+import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
 import Pages, { Props as PagesProps } from '../_pages';
 
@@ -55,13 +56,13 @@ const _Navigation: React.FC<Props> = ({
       return (
         <div className="px-2">
           <div className="flex justify-center py-2">
-            <NavigationLinks className="text-on-surface" />
+            <NavigationLinks on={ON.SURFACE} />
           </div>
           <div className="flex justify-center py-2 border-t-2 border-on-surface-faint">
-            <NavigationServices className="text-on-surface" />
+            <NavigationServices on={ON.SURFACE} />
           </div>
           <div className="flex justify-center py-2 border-t-2 border-on-surface-faint">
-            <NavigationCopyright className="text-on-surface" />
+            <NavigationCopyright on={ON.SURFACE} />
           </div>
         </div>
       );

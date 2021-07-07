@@ -1,19 +1,24 @@
 import { AiFillGithub } from '@react-icons/all-files/ai/AiFillGithub';
 import { AiFillTwitterCircle } from '@react-icons/all-files/ai/AiFillTwitterCircle';
-import classnames from 'classnames';
 import React from 'react';
+import Link from '$components/link';
+import { On, URL } from '$constants/index';
 
 type Props = {
-  className: string;
+  on: On;
 };
-const Services: React.FC<Props> = ({ className }) => {
+const Services: React.FC<Props> = ({ on }) => {
   return (
-    <ul className={classnames('flex justify-center text-2xl', className)}>
+    <ul className="flex justify-center text-2xl">
       <li className="mr-2 last:mr-0">
-        <AiFillGithub />
+        <Link on={on} to={URL.GITHUB} className="block">
+          <AiFillGithub />
+        </Link>
       </li>
       <li className="mr-2 last:mr-0">
-        <AiFillTwitterCircle />
+        <Link on={on} to={URL.TWITTER} className="block">
+          <AiFillTwitterCircle />
+        </Link>
       </li>
     </ul>
   );
