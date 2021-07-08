@@ -1,0 +1,30 @@
+version: 0.2
+run-as: root
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+
+  pre_build:
+    commands:
+      - echo Login to ECR.
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - docker pull $REPOSITORY_URI:latest || true
+
+  build:
+    commands:
+      - echo Building the Docker image...
+      - >
+        docker build
+        --cache-from $REPOSITORY_URI:latest
+        -t $IMAGE_REPO_NAME:latest
+        -f ./example/nodejs/Dockerfile .
+      - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:$COMMIT_ID
+      - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:latest
+
+artifacts:
+  files:
+    - codepipeline/demo-deployspec.yml
+  name: viron-demo-artifact
+  discard-paths: no
