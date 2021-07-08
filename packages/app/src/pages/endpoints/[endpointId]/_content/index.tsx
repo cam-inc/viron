@@ -1,14 +1,10 @@
-import { BiPin } from '@react-icons/all-files/bi/BiPin';
-import classnames from 'classnames';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Paper from '$components/paper/index';
 import { Endpoint } from '$types/index';
 import { Document, Info } from '$types/oas';
 import useContent from './_hooks/useContent';
-import Pagination from './_parts/pagination/index';
-import Refresh from './_parts/refresh/index';
-import Search from './_parts/search/index';
-import Sibling from './_parts/sibling/index';
+import Head, { Props as HeadProps } from './_parts/head/index';
+import Tail from './_parts/tail/index';
 import _ContentNumber from './_types/_number/index';
 import _ContentTable from './_types/_table/index';
 
@@ -16,11 +12,9 @@ export type Props = {
   endpoint: Endpoint;
   document: Document;
   content: Info['x-pages'][number]['contents'][number];
-  isPinned: boolean;
-  onPin: (contentId: Info['x-pages'][number]['contents'][number]['id']) => void;
-  onUnpin: (
-    contentId: Info['x-pages'][number]['contents'][number]['id']
-  ) => void;
+  isPinned: HeadProps['isPinned'];
+  onPin: HeadProps['onPin'];
+  onUnpin: HeadProps['onUnpin'];
 };
 const _Content: React.FC<Props> = ({
   endpoint,
@@ -36,17 +30,12 @@ const _Content: React.FC<Props> = ({
     content
   );
 
-  const handleSiblingOperationSuccess = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function (data: any) {
-      console.log(data);
-      base.refresh();
-    },
-    [base]
-  );
-  const handleSiblingOperationFail = useCallback(function (error: Error) {
-    // TODO: error handling
-    console.log(error);
+  const [isOpened, setIsOpened] = useState<boolean>(false);
+  const handleOpen = useCallback(function () {
+    setIsOpened(true);
+  }, []);
+  const handleClose = useCallback(function () {
+    setIsOpened(false);
   }, []);
 
   const handleDescendantOperationSuccess = useCallback(
@@ -109,71 +98,32 @@ const _Content: React.FC<Props> = ({
     ]
   );
 
-  let paginationElm: JSX.Element | null = null;
-  if (
-    base.data &&
-    content.type === 'table' &&
-    content.pagination &&
-    document.info['x-table']?.pager
-  ) {
-    paginationElm = (
-      <Pagination pager={document.info['x-table'].pager} base={base} />
-    );
-  }
-
-  const handlePinClick = useCallback(
-    function () {
-      if (isPinned) {
-        onUnpin(content.id);
-      } else {
-        onPin(content.id);
-      }
-    },
-    [content, isPinned, onPin, onUnpin]
-  );
-
   return (
     <Paper elevation={0} shadowElevation={0}>
       <div id={content.id}>
-        <div className="p-2 text-on-surface-high border-b border-b-on-surface-low">
-          <div className="p-2 text-on-surface-high">
-            {content.title || content.operationId}
-          </div>
-          <div
-            className={classnames('text-xs', {
-              'text-on-surface': !isPinned,
-              'text-on-surface-high': !isPinned,
-            })}
-            onClick={handlePinClick}
-          >
-            <BiPin />
-          </div>
-        </div>
-        <div className="mb-2">
-          <p>content.type全体の共通機能</p>
-          <Refresh base={base} />
-          <Search base={base} />
-        </div>
-        <div className="mb-2">
-          <p>Siblings</p>
-          <ul>
-            {siblings.map(function (sibling, idx) {
-              return (
-                <React.Fragment key={idx}>
-                  <li>
-                    <Sibling
-                      sibling={sibling}
-                      onOperationSuccess={handleSiblingOperationSuccess}
-                      onOperationFail={handleSiblingOperationFail}
-                    />
-                  </li>
-                </React.Fragment>
-              );
-            })}
-          </ul>
-        </div>
-        <div>{elm}</div>
-        <div>{paginationElm}</div>
+        <Head
+          className="p-2"
+          content={content}
+          base={base}
+          siblings={siblings}
+          isOpened={isOpened}
+          onOpen={handleOpen}
+          onClose={handleClose}
+          isPinned={isPinned}
+          onPin={onPin}
+          onUnpin={onUnpin}
+        />
+        {isOpened && (
+          <>
+            <div>{elm}</div>
+            <Tail
+              className="p-2 border-t border-on-surface-faint"
+              document={document}
+              content={content}
+              base={base}
+            />
+          </>
+        )}
       </div>
     </Paper>
   );

@@ -28,15 +28,14 @@ const Body: React.FC<Props> = ({
     <div className={className}>
       <div className="p-2">
         <Head className="mb-2" page={page} />
-        {page.contents.map(function (content, idx) {
-          const contentId = `${page.id}/${idx}`;
+        {page.contents.map(function (content) {
           return (
-            <div key={idx}>
+            <div key={content.id} className="mb-2 last:mb-0">
               <Content
                 endpoint={endpoint}
                 document={document}
                 content={content}
-                isPinned={pinnedContentIds.includes(contentId)}
+                isPinned={pinnedContentIds.includes(content.id)}
                 onPin={onPin}
                 onUnpin={onUnpin}
               />

@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
+import { IconType } from '@react-icons/all-files';
+import { BiAddToQueue } from '@react-icons/all-files/bi/BiAddToQueue';
+import { BiBandAid } from '@react-icons/all-files/bi/BiBandAid';
+import { BiDownvote } from '@react-icons/all-files/bi/BiDownvote';
+import { BiEdit } from '@react-icons/all-files/bi/BiEdit';
+import { BiHeadphone } from '@react-icons/all-files/bi/BiHeadphone';
+import { BiSticker } from '@react-icons/all-files/bi/BiSticker';
+import { BiTestTube } from '@react-icons/all-files/bi/BiTestTube';
+import { BiTrash } from '@react-icons/all-files/bi/BiTrash';
+import React, { useCallback, useMemo, useState } from 'react';
+import Button from '$components/button';
 import Drawer, { useDrawer } from '$components/drawer';
 import RequestComponent from '$components/request';
+import { ON } from '$constants/index';
 import { BaseError } from '$errors/index';
-import { RequestValue } from '$types/oas';
+import { METHOD, RequestValue } from '$types/oas';
 import { UseSiblingsReturn } from '../../_hooks/useSiblings';
 
 export type Props = {
@@ -19,9 +30,15 @@ const Sibling: React.FC<Props> = ({
   const [isPending, setIsPending] = useState<boolean>(false);
 
   const drawer = useDrawer();
-  const handleClick = function () {
-    drawer.open();
-  };
+  const handleClick = useCallback(
+    function () {
+      if (isPending) {
+        return;
+      }
+      drawer.open();
+    },
+    [drawer, isPending]
+  );
 
   const handleRequestSubmit = async function (requestValue: RequestValue) {
     drawer.close();
@@ -36,12 +53,38 @@ const Sibling: React.FC<Props> = ({
     }
   };
 
+  const Icon = useMemo<IconType>(
+    function () {
+      switch (sibling.request.method) {
+        case METHOD.GET:
+          return BiDownvote;
+        case METHOD.PUT:
+          return BiEdit;
+        case METHOD.POST:
+          return BiAddToQueue;
+        case METHOD.DELETE:
+          return BiTrash;
+        case METHOD.OPTIONS:
+          return BiSticker;
+        case METHOD.HEAD:
+          return BiHeadphone;
+        case METHOD.PATCH:
+          return BiBandAid;
+        case METHOD.TRACE:
+          return BiTestTube;
+      }
+    },
+    [sibling]
+  );
+
   return (
     <>
-      <button onClick={handleClick}>
-        {sibling.request.operation.operationId}
-        {isPending && <span>(pending...)</span>}
-      </button>
+      <Button
+        on={ON.SURFACE}
+        variant="text"
+        Icon={Icon}
+        onClick={handleClick}
+      />
       <Drawer {...drawer.bind}>
         <RequestComponent
           request={sibling.request}

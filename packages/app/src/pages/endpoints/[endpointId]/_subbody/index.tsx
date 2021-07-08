@@ -23,7 +23,7 @@ const Body: React.FC<Props> = ({
       <div className="p-2">
         {contents.map(function (content, idx) {
           return (
-            <div key={idx}>
+            <div key={idx} className="mb-2 last:mb-0">
               <Content
                 endpoint={endpoint}
                 document={document}

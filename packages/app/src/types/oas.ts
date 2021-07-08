@@ -146,15 +146,17 @@ export type PathItem = {
   parameters: Parameter[];
 };
 
-export type Method =
-  | 'get'
-  | 'put'
-  | 'post'
-  | 'delete'
-  | 'options'
-  | 'head'
-  | 'patch'
-  | 'trace';
+export const METHOD = {
+  GET: 'get',
+  PUT: 'put',
+  POST: 'post',
+  DELETE: 'delete',
+  OPTIONS: 'options',
+  HEAD: 'head',
+  PATCH: 'patch',
+  TRACE: 'trace',
+} as const;
+export type Method = typeof METHOD[keyof typeof METHOD];
 
 // This is not a part of OAS.
 export type Request = {
