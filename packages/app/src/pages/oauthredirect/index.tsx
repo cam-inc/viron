@@ -1,13 +1,19 @@
+import classnames from 'classnames';
 import { navigate, PageProps } from 'gatsby';
 import { parse } from 'query-string';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import Error from '$components/error';
+import Metadata from '$components/metadata';
 import Request from '$components/request';
+import { StatusCode } from '$constants/index';
+import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import useTheme from '$hooks/theme';
+import Layout, { Props as LayoutProps } from '$layouts/index';
 import { KEY, get } from '$storage/index';
 import { oneState as endpointOneState } from '$store/selectors/endpoint';
 import { EndpointID } from '$types/index';
-import { Document, RequestValue } from '$types/oas';
+import { Document, Request as TypeRequest, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
   cleanupRequestValue,
@@ -17,44 +23,66 @@ import {
   constructRequestPayloads,
   getRequest,
 } from '$utils/oas/index';
+import Appbar from './_parts/_appbar/index';
+import Navigation from './_parts/_navigation/index';
 
 type Props = PageProps;
 const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
   useTheme();
+
+  const [error, setError] = useState<BaseError | null>(null);
+  const [isPending, setIsPending] = useState<boolean>(true);
   const queries = parse(location.search);
   const endpointId = get<EndpointID>(KEY.OAUTH_ENDPOINT_ID);
   const [endpoint] = useRecoilState(endpointOneState({ id: endpointId }));
+  const [document, setDocument] = useState<Document | null>(null);
+  const [request, setRequest] = useState<TypeRequest | null>(null);
+  const [defaultValues, setDefaultValues] = useState<RequestValue | null>(null);
 
-  if (!endpoint) {
-    throw new Error('Endoint Not Found.');
-  }
-
-  if (!endpoint.isPrivate || !endpoint.authConfigs) {
-    throw new Error('Endoint Not Found.');
-  }
-
-  const authConfig = endpoint.authConfigs.find(function (authConfig) {
-    return authConfig.type === 'oauthcallback';
-  });
-
-  if (!authConfig) {
-    throw new Error('AuthConfig of type oauthcallback not found.');
-  }
-
-  const { pathObject } = authConfig;
-  const document: Document = constructFakeDocument({ paths: pathObject });
-  const getRequestResult = getRequest(document);
-
-  if (getRequestResult.isFailure()) {
-    throw new Error('TODO');
-  }
-  const request = getRequestResult.value;
-
-  const defaultValues = cleanupRequestValue(request, {
-    parameters: queries,
-  });
+  useEffect(function () {
+    if (!endpoint) {
+      setError(new BaseError('TODO: Endpoint Not Found.'));
+      setIsPending(false);
+      return;
+    }
+    if (!endpoint.isPrivate || !endpoint.authConfigs) {
+      setError(new BaseError('TODO: Endpoint Not Found.'));
+      setIsPending(false);
+      return;
+    }
+    const authConfig = endpoint.authConfigs.find(function (authConfig) {
+      return authConfig.type === 'oauthcallback';
+    });
+    if (!authConfig) {
+      setError(
+        new BaseError('TODO: AuthConfig of type oauthcallback not found.')
+      );
+      setIsPending(false);
+      return;
+    }
+    const { pathObject } = authConfig;
+    const document: Document = constructFakeDocument({ paths: pathObject });
+    const getRequestResult = getRequest(document);
+    if (getRequestResult.isFailure()) {
+      setError(new BaseError('TODO'));
+      setIsPending(false);
+      return;
+    }
+    const request = getRequestResult.value;
+    const defaultValues = cleanupRequestValue(request, {
+      parameters: queries,
+    });
+    setDocument(document);
+    setRequest(request);
+    setDefaultValues(defaultValues);
+    setIsPending(false);
+  }, []);
 
   const handleSubmit = async function (requestValue: RequestValue) {
+    if (!endpoint || !document || !request) {
+      return;
+    }
+
     const requestPayloads = constructRequestPayloads(
       request.operation,
       requestValue
@@ -72,27 +100,68 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
     const [response, responseError] = await promiseErrorHandler(
       fetch(requestInfo, requestInit)
     );
-    if (!!responseError) {
-      // TODO
+    if (responseError) {
+      setError(new NetworkError());
       return;
     }
     if (!response.ok) {
-      // TODO
+      setError(getHTTPError(response.status as StatusCode));
       return;
     }
     navigate(`/endpoints/${endpoint.id}`);
   };
 
+  const renderAppBar = useCallback<LayoutProps['renderAppBar']>(function (
+    args
+  ) {
+    return <Appbar {...args} />;
+  },
+  []);
+
+  const renderNavigation = useCallback<LayoutProps['renderNavigation']>(
+    function (args) {
+      return <Navigation {...args} />;
+    },
+    []
+  );
+
+  const renderBody = useCallback<LayoutProps['renderBody']>(
+    function ({ className }) {
+      if (isPending) {
+        return (
+          <div className={classnames('p-2', className)}>TODO: pending...</div>
+        );
+      }
+      if (error) {
+        return <Error error={error} />;
+      }
+      if (!request || !defaultValues) {
+        // TODO: ここにくることはないはず。
+        return null;
+      }
+      return (
+        <div>
+          <p>{`https://localhost:8000/oauthredirect`}</p>
+          <Request
+            request={request}
+            defaultValues={defaultValues}
+            onSubmit={handleSubmit}
+          />
+        </div>
+      );
+    },
+    [error, isPending, request, defaultValues, handleSubmit]
+  );
+
   return (
-    <div id="page-oauthredirect">
-      <p>Processing OAuth redirection...</p>
-      <p>{`https://localhost:8000/oauthredirect`}</p>
-      <Request
-        request={request}
-        defaultValues={defaultValues}
-        onSubmit={handleSubmit}
+    <>
+      <Metadata title="OAuth | Viron" />
+      <Layout
+        renderAppBar={renderAppBar}
+        renderNavigation={renderNavigation}
+        renderBody={renderBody}
       />
-    </div>
+    </>
   );
 };
 export default OAuthRedirectPage;
