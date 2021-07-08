@@ -19,7 +19,7 @@ phases:
         docker build
         --cache-from $REPOSITORY_URI:latest
         -t $IMAGE_REPO_NAME:latest
-        -f ./example/nodejs/Dockerfile .
+        -f ./example/nodejs/Dockerfile ./example/nodejs
       - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:$COMMIT_ID
       - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:latest
 
