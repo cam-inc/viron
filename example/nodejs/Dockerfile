@@ -1,4 +1,5 @@
-FROM node:16
+ARG DOCKER_PROXY_HOST
+FROM ${DOCKER_PROXY_HOST}/node:16
 
 RUN mkdir -p /example/nodejs
 RUN chown -R root:root /example/nodejs
