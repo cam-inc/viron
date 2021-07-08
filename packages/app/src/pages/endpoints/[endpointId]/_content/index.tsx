@@ -15,16 +15,16 @@ import _ContentTable from './_types/_table/index';
 export type Props = {
   endpoint: Endpoint;
   document: Document;
-  contentId: string;
   content: Info['x-pages'][number]['contents'][number];
   isPinned: boolean;
-  onPin: (contentId: Props['contentId']) => void;
-  onUnpin: (contentId: Props['contentId']) => void;
+  onPin: (contentId: Info['x-pages'][number]['contents'][number]['id']) => void;
+  onUnpin: (
+    contentId: Info['x-pages'][number]['contents'][number]['id']
+  ) => void;
 };
 const _Content: React.FC<Props> = ({
   endpoint,
   document,
-  contentId,
   content,
   isPinned,
   onPin,
@@ -33,7 +33,6 @@ const _Content: React.FC<Props> = ({
   const { base, siblings, descendants } = useContent(
     endpoint,
     document,
-    contentId,
     content
   );
 
@@ -125,55 +124,57 @@ const _Content: React.FC<Props> = ({
   const handlePinClick = useCallback(
     function () {
       if (isPinned) {
-        onUnpin(contentId);
+        onUnpin(content.id);
       } else {
-        onPin(contentId);
+        onPin(content.id);
       }
     },
-    [contentId, isPinned, onPin, onUnpin]
+    [content, isPinned, onPin, onUnpin]
   );
 
   return (
     <Paper elevation={0} shadowElevation={0}>
-      <div className="p-2 text-on-surface-high border-b border-b-on-surface-low">
-        <div className="p-2 text-on-surface-high">
-          {content.title || content.operationId}
+      <div id={content.id}>
+        <div className="p-2 text-on-surface-high border-b border-b-on-surface-low">
+          <div className="p-2 text-on-surface-high">
+            {content.title || content.operationId}
+          </div>
+          <div
+            className={classnames('text-xs', {
+              'text-on-surface': !isPinned,
+              'text-on-surface-high': !isPinned,
+            })}
+            onClick={handlePinClick}
+          >
+            <BiPin />
+          </div>
         </div>
-        <div
-          className={classnames('text-xs', {
-            'text-on-surface': !isPinned,
-            'text-on-surface-high': !isPinned,
-          })}
-          onClick={handlePinClick}
-        >
-          <BiPin />
+        <div className="mb-2">
+          <p>content.type全体の共通機能</p>
+          <Refresh base={base} />
+          <Search base={base} />
         </div>
+        <div className="mb-2">
+          <p>Siblings</p>
+          <ul>
+            {siblings.map(function (sibling, idx) {
+              return (
+                <React.Fragment key={idx}>
+                  <li>
+                    <Sibling
+                      sibling={sibling}
+                      onOperationSuccess={handleSiblingOperationSuccess}
+                      onOperationFail={handleSiblingOperationFail}
+                    />
+                  </li>
+                </React.Fragment>
+              );
+            })}
+          </ul>
+        </div>
+        <div>{elm}</div>
+        <div>{paginationElm}</div>
       </div>
-      <div className="mb-2">
-        <p>content.type全体の共通機能</p>
-        <Refresh base={base} />
-        <Search base={base} />
-      </div>
-      <div className="mb-2">
-        <p>Siblings</p>
-        <ul>
-          {siblings.map(function (sibling, idx) {
-            return (
-              <React.Fragment key={idx}>
-                <li>
-                  <Sibling
-                    sibling={sibling}
-                    onOperationSuccess={handleSiblingOperationSuccess}
-                    onOperationFail={handleSiblingOperationFail}
-                  />
-                </li>
-              </React.Fragment>
-            );
-          })}
-        </ul>
-      </div>
-      <div>{elm}</div>
-      <div>{paginationElm}</div>
     </Paper>
   );
 };

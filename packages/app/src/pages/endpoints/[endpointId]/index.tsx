@@ -1,5 +1,5 @@
 import { useLocation } from '@reach/router';
-import { Link, navigate, PageProps } from 'gatsby';
+import { navigate, PageProps } from 'gatsby';
 import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -16,7 +16,6 @@ import { promiseErrorHandler } from '$utils/index';
 import { lint, resolve } from '$utils/oas';
 import Appbar from './_appbar/index';
 import Body, { Props as BodyProps } from './_body';
-import { Props as ContentProps } from './_content';
 import Navigation, { Props as NavigationProps } from './_navigation';
 import Subbody from './_subbody';
 
@@ -86,7 +85,10 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   }, []);
 
   const _navigate = useCallback(
-    function (pageId: PageId, pinnedContentIds: ContentProps['contentId'][]) {
+    function (
+      pageId: PageId,
+      pinnedContentIds: Info['x-pages'][number]['contents'][number]['id'][]
+    ) {
       pinnedContentIds = _.uniq(pinnedContentIds);
       navigate(
         `/endpoints/${
@@ -115,7 +117,9 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     [location.search, document]
   );
 
-  const pinnedContentIds = useMemo<ContentProps['contentId'][]>(
+  const pinnedContentIds = useMemo<
+    Info['x-pages'][number]['contents'][number]['id'][]
+  >(
     function () {
       const queries = parse(location.search);
       const pinnedContentIds = queries.pinnedContentIds;
@@ -237,16 +241,13 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       if (isPending || !endpoint || !document || error) {
         return null;
       }
-      const contents = pinnedContentIds.map(function (contentId) {
-        const [pageId, idx] = contentId.split('/');
-        const page = _.find(document.info['x-pages'], function (page) {
-          return page.id === pageId;
-        }) as Info['x-pages'][number];
-        const content = page.contents[Number(idx)];
-        return {
-          ...content,
-          id: contentId,
-        };
+      const contents: Info['x-pages'][number]['contents'][number][] = [];
+      document.info['x-pages'].forEach(function (page) {
+        page.contents.forEach(function (_content) {
+          if (pinnedContentIds.includes(_content.id)) {
+            contents.push({ ..._content });
+          }
+        });
       });
       return (
         <Subbody

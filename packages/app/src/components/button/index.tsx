@@ -1,9 +1,9 @@
 import { IconType } from '@react-icons/all-files';
 import classnames from 'classnames';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ON, On } from '$constants/index';
 
-type Props = {
+export type Props<T> = {
   on: On;
   variant?: 'paper' | 'text' | 'ghost';
   size?: 'xxs' | 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
@@ -12,9 +12,10 @@ type Props = {
   disabled?: React.ButtonHTMLAttributes<HTMLButtonElement>['disabled'];
   label?: string;
   className?: string;
-  onClick?: () => void;
+  data?: T;
+  onClick?: (data: T) => void;
 };
-const Button: React.FC<Props> = ({
+const Button = function <T = null>({
   on,
   variant = 'paper',
   size = 'base',
@@ -23,8 +24,15 @@ const Button: React.FC<Props> = ({
   disabled,
   label,
   className,
+  data,
   onClick,
-}) => {
+}: React.PropsWithChildren<Props<T>>) {
+  const handleClick = useCallback(
+    function () {
+      onClick?.(data as T);
+    },
+    [data, onClick]
+  );
   return (
     <button
       type={type}
@@ -71,7 +79,7 @@ const Button: React.FC<Props> = ({
             variant === 'ghost' && on === ON.COMPLEMENTARY,
         }
       )}
-      onClick={onClick}
+      onClick={handleClick}
     >
       {Icon && <Icon className={classnames({ 'mr-1': !!label })} />}
       {label && <div className="flex-1 min-w-0">{label}</div>}

@@ -68,6 +68,13 @@ export const resolve = function (document: Record<string, unknown>): Document {
       delete result.parent[result.parentProperty].$ref;
     },
   });
+  // Assign contentIds.
+  (document as Document).info['x-pages'].forEach(function (page) {
+    page.contents.forEach(function (content, idx) {
+      content.id = `${page.id}-${idx}`;
+    });
+  });
+
   return document as Document;
 };
 

@@ -7,9 +7,7 @@ import Content, { Props as ContentProps } from '../_content/index';
 type Props = {
   endpoint: Endpoint;
   document: Document;
-  contents: (Info['x-pages'][number]['contents'][number] & {
-    id: ContentProps['contentId'];
-  })[];
+  contents: Info['x-pages'][number]['contents'][number][];
 } & Parameters<NonNullable<LayoutProps['renderSubBody']>>[0] &
   Pick<ContentProps, 'onPin' | 'onUnpin'>;
 const Body: React.FC<Props> = ({
@@ -29,7 +27,6 @@ const Body: React.FC<Props> = ({
               <Content
                 endpoint={endpoint}
                 document={document}
-                contentId={content.id}
                 content={content}
                 isPinned={true}
                 onPin={onPin}

@@ -17,7 +17,6 @@ import {
   getRequest,
 } from '$utils/oas';
 import useAutoRefresh from './useAutoRefresh';
-import { Props as ContentProps } from '../index';
 
 export type UseBaseReturn = {
   isPending: boolean;
@@ -32,7 +31,6 @@ export type UseBaseReturn = {
 const useBase = function (
   endpoint: Endpoint,
   document: Document,
-  contentId: ContentProps['contentId'],
   content: Info['x-pages'][number]['contents'][number]
 ): UseBaseReturn {
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -122,7 +120,7 @@ const useBase = function (
       };
       f();
     },
-    [request, endpoint, document, requestValue, contentId]
+    [request, endpoint, document, requestValue]
   );
 
   // Auto Refresh.

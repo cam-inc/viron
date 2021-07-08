@@ -48,6 +48,8 @@ export type Info = {
     group?: string;
     //  What to be displayed on the page.
     contents: {
+      // Will be assigned on client side.
+      id: string;
       title: string;
       // TODO: 全部リストアップすること。
       type: 'number' | 'table' | 'custom';
