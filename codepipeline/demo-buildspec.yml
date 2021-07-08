@@ -11,7 +11,7 @@ phases:
       - echo Login to ECR.
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - docker pull $REPOSITORY_URI:latest || true
-
+      - docker login $DOCKER_HOST -u $DOCKER_USER_NAME -p $DOCKER_PASSWORD
   build:
     commands:
       - echo Building the Docker image...
