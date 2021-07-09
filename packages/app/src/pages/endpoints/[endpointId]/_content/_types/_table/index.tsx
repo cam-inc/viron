@@ -1,5 +1,7 @@
 import React from 'react';
 import Error from '$components/error';
+import Table, { Props as TableProps } from '$components/table';
+import { ON } from '$constants/index';
 import { Document, Info } from '$types/oas';
 import {
   getContentBaseOperationResponseKeys,
@@ -34,25 +36,31 @@ const _ContentTable: React.FC<Props> = ({
   const tableSetting = getTableSettingResult.value;
 
   const fields = getContentBaseOperationResponseKeys(document, content);
-  // TODO: OASが修正されるまでの暫定対応
-  if (content.operationId === 'listPurchases') {
-    fields.push(
-      ...[
-        'amount',
-        'createdAt',
-        'id',
-        'itemId',
-        'unitPrice',
-        'updatedAt',
-        'userId',
-      ]
-    );
-  }
+
   // TODO: response['200'].content['application/json'].schema.properties[{responseListKey}].items.typeって、objectかもしれないしnumberかもしれないよ。
   const list: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key in string]: any;
   }[] = data[tableSetting.responseListKey];
+
+  const columns: TableProps['columns'] = [];
+  fields.forEach(function (field) {
+    columns.push({
+      title: field,
+      key: field,
+    });
+  });
+  const dataSource: TableProps['dataSource'] = [];
+  list.forEach(function (item) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: Record<string, any> = {};
+    fields.forEach(function (field) {
+      data[field] = item[field];
+    });
+    dataSource.push(data);
+  });
+
+  return <Table on={ON.SURFACE} columns={columns} dataSource={dataSource} />;
 
   return (
     <div>

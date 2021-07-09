@@ -257,16 +257,20 @@ export const getContentBaseOperationResponseKeys = function (
   if (!mediaType.schema) {
     return ret;
   }
+  let schema = mediaType.schema;
+  if (schema.allOf) {
+    schema = mergeAllOf(schema.allOf);
+  }
   switch (content.type) {
     case 'table': {
-      if (!mediaType.schema.properties) {
+      if (!schema.properties) {
         return ret;
       }
       const listKey = document.info['x-table']?.responseListKey;
       if (!listKey) {
         return ret;
       }
-      const properties = mediaType.schema.properties[listKey].properties;
+      const properties = schema.properties[listKey].items?.properties;
       if (!properties) {
         return ret;
       }
@@ -278,6 +282,12 @@ export const getContentBaseOperationResponseKeys = function (
       break;
   }
   return ret;
+};
+
+export const mergeAllOf = function (
+  schemas: NonNullable<Schema['allOf']>
+): Schema {
+  return _.merge({} as Schema, ...schemas);
 };
 
 export const parseURITemplate = function (
