@@ -24,6 +24,14 @@ phases:
       - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:$COMMIT_ID
       - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:latest
 
+  post_build:
+    commands:
+      - echo push step...
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $REPOSITORY_URI:$COMMIT_ID
+      - docker push $REPOSITORY_URI:latest
+
 artifacts:
   files:
     - codepipeline/demo-deployspec.yml
