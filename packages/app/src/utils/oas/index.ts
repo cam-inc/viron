@@ -1,6 +1,7 @@
 import { lint as _lint, LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
+import { Failure, OASError, Result, Success } from '$errors/index';
 import { Endpoint, URL } from '$types/index';
 import {
   Content,
@@ -23,6 +24,7 @@ import {
   RequestValue,
   Server,
   Schema,
+  X_Table,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
 import { serialize } from '$utils/oas/style';
@@ -66,6 +68,13 @@ export const resolve = function (document: Record<string, unknown>): Document {
       delete result.parent[result.parentProperty].$ref;
     },
   });
+  // Assign contentIds.
+  (document as Document).info['x-pages'].forEach(function (page) {
+    page.contents.forEach(function (content, idx) {
+      content.id = `${page.id}-${idx}`;
+    });
+  });
+
   return document as Document;
 };
 
@@ -87,21 +96,29 @@ export const constructFakeDocument = function ({
   return doc;
 };
 
-export const getTableSetting = function (info: Info): Info['x-table'] | null {
-  return info['x-table'] || null;
+export const getTableSetting = function (
+  info: Info
+): Result<X_Table, OASError> {
+  if (!info['x-table'] || !info['x-table'].responseListKey) {
+    return new Failure(new OASError('TODO'));
+  }
+  return new Success(info['x-table']);
 };
 
 export const getPathItem = function (
   document: Document,
   path: string
-): PathItem | null {
-  return document.paths[path] || null;
+): Result<PathItem, OASError> {
+  if (!document.paths[path]) {
+    return new Failure(new OASError('TODO'));
+  }
+  return new Success(document.paths[path]);
 };
 
 export const getRequest = function (
   document: Document,
   { operationId }: { operationId?: OperationId } = {}
-): Request | null {
+): Result<Request, OASError> {
   if (!!operationId) {
     return getRequestByOperationId(document, operationId);
   }
@@ -110,7 +127,7 @@ export const getRequest = function (
     return !!value;
   });
   if (!pathItem) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
   let operation = _.find(pathItem, function (_, key) {
     // TODO: Methodを参照すること。
@@ -126,11 +143,11 @@ export const getRequest = function (
     ].includes(key);
   });
   if (!operation) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
   operation = operation as Operation;
   if (!operation.operationId) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
   return getRequestByOperationId(document, operation.operationId);
 };
@@ -138,7 +155,7 @@ export const getRequest = function (
 export const getRequestByOperationId = function (
   document: Document,
   operationId: OperationId
-): Request | null {
+): Result<Request, OASError> {
   const path = _.findKey(document.paths, function (pathItem) {
     const operations = _.pick(pathItem, [
       'get',
@@ -158,7 +175,7 @@ export const getRequestByOperationId = function (
     });
   });
   if (!path) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
 
   const operations = _.pick(document.paths[path], [
@@ -175,21 +192,21 @@ export const getRequestByOperationId = function (
     return operation?.operationId === operationId;
   });
   if (!operation) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
 
   const method = _.findKey(operations, function (operation) {
     return operation?.operationId === operationId;
   });
   if (!method) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
 
-  return {
+  return new Success({
     path,
     method: method as Method,
     operation,
-  };
+  });
 };
 
 export const getRequestParameterKeys = function (
@@ -197,12 +214,13 @@ export const getRequestParameterKeys = function (
   operationId: OperationId
 ): string[] {
   const ret: string[] = [];
-  const request = getRequest(document, {
+  const getRequestResult = getRequest(document, {
     operationId,
   });
-  if (!request) {
+  if (getRequestResult.isFailure()) {
     return ret;
   }
+  const request = getRequestResult.value;
   if (!request.operation.parameters) {
     return ret;
   }
@@ -220,10 +238,13 @@ export const getContentBaseOperationResponseKeys = function (
   content: Info['x-pages'][number]['contents'][number]
 ): string[] {
   const ret: string[] = [];
-  const request = getRequest(document, { operationId: content.operationId });
-  if (!request) {
+  const getRequestResult = getRequest(document, {
+    operationId: content.operationId,
+  });
+  if (getRequestResult.isFailure()) {
     return ret;
   }
+  const request = getRequestResult.value;
   if (!request.operation.responses) {
     return ret;
   }
@@ -236,16 +257,20 @@ export const getContentBaseOperationResponseKeys = function (
   if (!mediaType.schema) {
     return ret;
   }
+  let schema = mediaType.schema;
+  if (schema.allOf) {
+    schema = mergeAllOf(schema.allOf);
+  }
   switch (content.type) {
     case 'table': {
-      if (!mediaType.schema.properties) {
+      if (!schema.properties) {
         return ret;
       }
       const listKey = document.info['x-table']?.responseListKey;
       if (!listKey) {
         return ret;
       }
-      const properties = mediaType.schema.properties[listKey].properties;
+      const properties = schema.properties[listKey].items?.properties;
       if (!properties) {
         return ret;
       }
@@ -255,11 +280,14 @@ export const getContentBaseOperationResponseKeys = function (
     case 'number':
     case 'custom':
       break;
-    default:
-      // TODO: どーする？
-      throw new Error('TODO: 考慮忘れしてるよ');
   }
   return ret;
+};
+
+export const mergeAllOf = function (
+  schemas: NonNullable<Schema['allOf']>
+): Schema {
+  return _.merge({} as Schema, ...schemas);
 };
 
 export const parseURITemplate = function (

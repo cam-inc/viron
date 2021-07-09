@@ -1,5 +1,5 @@
 import { AiOutlineDown } from '@react-icons/all-files/ai/AiOutlineDown';
-import { AiOutlineRight } from '@react-icons/all-files/ai/AiOutlineRight';
+import { AiOutlineUp } from '@react-icons/all-files/ai/AiOutlineUp';
 import classnames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { Info } from '$types/oas';
@@ -9,12 +9,12 @@ type Partial = {
   children: (string | Partial)[];
 };
 
-type Props = {
+export type Props = {
   pages: Info['x-pages'];
-  selectedPageIds: Info['x-pages'][number]['id'][];
-  onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
+  selectedPageId: Info['x-pages'][number]['id'];
+  onSelect: (pageId: Info['x-pages'][number]['id']) => void;
 };
-const _Pages: React.FC<Props> = ({ pages, selectedPageIds, onSelect }) => {
+const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
   // Convert data structure like below so we can easily construct the jsx.
   //{
   //  group: 'root',
@@ -76,8 +76,9 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageIds, onSelect }) => {
 
   return (
     <GroupOrPage
+      depth={1}
       list={tree.children}
-      selectedPageIds={selectedPageIds}
+      selectedPageId={selectedPageId}
       onSelect={onSelect}
     />
   );
@@ -85,10 +86,11 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageIds, onSelect }) => {
 export default _Pages;
 
 const GroupOrPage: React.FC<{
+  depth: number;
   list: Partial['children'];
-  selectedPageIds: Info['x-pages'][number]['id'][];
-  onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
-}> = ({ list, selectedPageIds, onSelect }) => {
+  selectedPageId: Info['x-pages'][number]['id'];
+  onSelect: (pageId: Info['x-pages'][number]['id']) => void;
+}> = ({ depth, list, selectedPageId, onSelect }) => {
   return (
     <ul>
       {list.map(function (item, idx) {
@@ -96,16 +98,18 @@ const GroupOrPage: React.FC<{
         if (typeof item === 'string') {
           content = (
             <Page
+              depth={depth}
               pageId={item}
-              isSelected={selectedPageIds.includes(item)}
+              isSelected={item === selectedPageId}
               onSelect={onSelect}
             />
           );
         } else {
           content = (
             <Group
+              depth={depth}
               partial={item}
-              selectedPageIds={selectedPageIds}
+              selectedPageId={selectedPageId}
               onSelect={onSelect}
             />
           );
@@ -117,32 +121,38 @@ const GroupOrPage: React.FC<{
 };
 
 const Group: React.FC<{
+  depth: number;
   partial: Partial;
-  selectedPageIds: Info['x-pages'][number]['id'][];
-  onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
-}> = ({ partial, selectedPageIds, onSelect }) => {
+  selectedPageId: Info['x-pages'][number]['id'];
+  onSelect: (pageId: Info['x-pages'][number]['id']) => void;
+}> = ({ depth, partial, selectedPageId, onSelect }) => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
   const handleClick = function () {
     setIsOpened(!isOpened);
   };
   return (
     <div>
-      <p className="font-bold" onClick={handleClick}>
-        {isOpened ? (
-          <AiOutlineDown className="inline mr-1" />
-        ) : (
-          <AiOutlineRight className="inline mr-1" />
-        )}
-        <span>{partial.group}</span>
-      </p>
       <div
-        className={classnames('ml-2', {
+        className="flex justify-center py-2 pr-2 text-xs text-on-surface"
+        style={{
+          paddingLeft: `${depth * 8}px`,
+        }}
+        onClick={handleClick}
+      >
+        <div className="flex-1 min-w-0">{partial.group}</div>
+        <div className="flex-0 ml-2 flex items-center text-xxs">
+          {isOpened ? <AiOutlineDown /> : <AiOutlineUp />}
+        </div>
+      </div>
+      <div
+        className={classnames({
           hidden: !isOpened,
         })}
       >
         <GroupOrPage
+          depth={depth + 1}
           list={partial.children}
-          selectedPageIds={selectedPageIds}
+          selectedPageId={selectedPageId}
           onSelect={onSelect}
         />
       </div>
@@ -151,22 +161,27 @@ const Group: React.FC<{
 };
 
 const Page: React.FC<{
+  depth: number;
   pageId: Info['x-pages'][number]['id'];
   isSelected: boolean;
-  onSelect: (pageId: Info['x-pages'][number]['id'], separate: boolean) => void;
-}> = ({ pageId, isSelected, onSelect }) => {
+  onSelect: (pageId: Info['x-pages'][number]['id']) => void;
+}> = ({ depth, pageId, isSelected, onSelect }) => {
   const handleClick = function () {
-    // TODO: Let users choose the option to open a page separately.
-    onSelect(pageId, true);
+    onSelect(pageId);
   };
   return (
-    <p
-      className={classnames({
-        underline: isSelected,
+    <div
+      className={classnames('py-1 pr-2 text-xs', {
+        'text-on-surface': !isSelected,
+        'font-bold text-primary bg-on-primary border-r-[4px] border-primary':
+          isSelected,
       })}
+      style={{
+        paddingLeft: `${depth * 8}px`,
+      }}
       onClick={handleClick}
     >
       {pageId}
-    </p>
+    </div>
   );
 };

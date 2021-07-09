@@ -1,6 +1,6 @@
-import _ from 'lodash';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import Button from '$components/button';
 import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
 import {
@@ -43,7 +43,7 @@ const _Request: React.FC<Props> = ({
         onSubmit(data as RequestValue);
       });
     },
-    [handleSubmit, onSubmit, request.operation, execute]
+    [handleSubmit, onSubmit, execute]
   );
 
   return (
@@ -119,7 +119,7 @@ const _Request: React.FC<Props> = ({
             />
           </div>
         )}
-        <input type="submit" />
+        <Button on="surface" size="xs" type="submit" label="submit" />
       </form>
     </div>
   );

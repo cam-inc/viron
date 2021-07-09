@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import PaginationComponent from '$components/pagination';
+import { ON } from '$constants/index';
 import { Pager, RequestValue } from '$types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 
@@ -34,6 +35,7 @@ const Pagination: React.FC<Props> = ({ pager, base }) => {
   return (
     <div>
       <PaginationComponent
+        on={ON.SURFACE}
         current={current}
         max={max}
         onRequestChange={handlePaginationRequestChange}

@@ -1,5 +1,6 @@
 import { Document, Paths } from '$types/oas';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type JsonStringifiable = any;
 export type URL = string;
 export type Pathname = string;
@@ -33,11 +34,13 @@ export type __AuthConfig = {
   // This object contains only one key-value pair.
   pathObject: {
     '/xxxx': {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       [key in string]: any;
     };
   };
   defaultParametersValue: {
     redirectUri: '__VIRON_CALLBACK__';
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultRequestBodyValue: any;
 };

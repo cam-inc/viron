@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import RequestComponent from '$components/request';
+import { BaseError } from '$errors/index';
 import { RequestValue } from '$types/oas';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 
-type Props = {
+export type Props = {
   descendant: UseDescendantsReturn[number];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onOperationSuccess: (data: any) => void;
-  onOperationFail: (error: Error) => void;
+  onOperationFail: (error: BaseError) => void;
 };
 const Descendant: React.FC<Props> = ({
   descendant,
@@ -23,7 +26,7 @@ const Descendant: React.FC<Props> = ({
   };
 
   const handleRequestSubmit = async function (requestValue: RequestValue) {
-    drawer.requestClose();
+    drawer.close();
     setIsPending(true);
     const { data, error } = await descendant.fetch(requestValue);
     setIsPending(false);

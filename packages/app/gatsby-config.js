@@ -30,6 +30,8 @@ module.exports = {
         alias: {
           $src: 'src',
           $components: 'src/components',
+          $constants: 'src/constants',
+          $errors: 'src/errors',
           $hooks: 'src/hooks',
           $i18n: 'src/i18n',
           $layouts: 'src/layouts',

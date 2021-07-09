@@ -72,7 +72,7 @@ Viron offers a functionality for users to switch color themes so they can easily
 - One theme consists of two sets of color palette. One for light mode and the other for dark mode. For example, a theme named `terminal` will have a color palette for light mode (terminal-light) and a color palette for dark mode (erminal-dark).
 - We use the [tailwind's function](https://tailwindcss.com/docs/dark-mode) to switch light/dark mode.
 - We define [the tailwind colors configuration using CSS custom properties](https://tailwindcss.com/docs/customizing-colors#naming-your-colors), and overwrite them leveraging CSS specificity. See the global.css file for more detail.
-- We use [Goole 2014 Material Design color palettes](https://material.io/design/color/the-color-system.html#tools-for-picking-colors) for all colors because those colors are carefully curated and have some accent colors.
+- All colors are generated using the custom property hue color. (i.e. --color-hue)
 
 ### Color System
 We follow [Google Material Design's principles](https://material.io/design/color/dark-theme.html) to manage our color system and to use them.
