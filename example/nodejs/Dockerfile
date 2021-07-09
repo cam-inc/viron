@@ -11,6 +11,7 @@ WORKDIR $HOME
 COPY package.json ${HOME}/package.json
 COPY src ${HOME}/src
 COPY tsconfig.json ${HOME}/tsconfig.json
+COPY tsconfig.production.json ${HOME}/tsconfig.production.json
 COPY cert ${HOME}/cert
 
 # Setup project
