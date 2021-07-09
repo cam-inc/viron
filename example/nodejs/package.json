@@ -25,6 +25,7 @@
   "devDependencies": {
     "@jest/types": "^26.6.2",
     "@types/compression": "^1.7.0",
+    "@types/cookie": "^0.4.1",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.10",
     "@types/errorhandler": "^1.5.0",
