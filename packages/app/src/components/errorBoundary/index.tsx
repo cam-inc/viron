@@ -1,8 +1,9 @@
 import React from 'react';
-import { error as logError, NAMESPACE } from '$utils/logger/index';
+import Error from '$components/error';
+import { BaseError } from '$errors/index';
 
 type FallbackProps = {
-  error: Error;
+  error: BaseError;
   resetErrorBoundary: (...args: Array<unknown>) => void;
 };
 
@@ -20,7 +21,7 @@ type Props = React.PropsWithRef<
     >;
     FallbackComponent?: React.ComponentType<FallbackProps>;
     resetKeys?: Array<unknown>;
-    onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+    onError?: (error: BaseError, errorInfo: React.ErrorInfo) => void;
     onReset?: (...args: Array<unknown>) => void;
     onResetKeysChange?: (
       prevResetKeys: Array<unknown> | undefined,
@@ -29,7 +30,7 @@ type Props = React.PropsWithRef<
   }>
 >;
 type State = {
-  error: Error | null;
+  error: BaseError | null;
 };
 const initialState: State = { error: null };
 const changedArray = function (a: Array<unknown> = [], b: Array<unknown> = []) {
@@ -39,7 +40,7 @@ const changedArray = function (a: Array<unknown> = [], b: Array<unknown> = []) {
 };
 
 class ErrorBoundary extends React.Component<Props, State> {
-  static getDerivedStateFromError(error: Error): { error: Error } {
+  static getDerivedStateFromError(error: BaseError): { error: BaseError } {
     return { error };
   }
 
@@ -56,12 +57,8 @@ class ErrorBoundary extends React.Component<Props, State> {
     this.setState(initialState);
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+  componentDidCatch(error: BaseError, errorInfo: React.ErrorInfo): void {
     this.props.onError?.(error, errorInfo);
-    logError({
-      messages: [error, errorInfo],
-      namespace: NAMESPACE.REACT_COMPONENT,
-    });
   }
 
   componentDidMount(): void {
@@ -107,9 +104,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return <FallbackComponent {...props} />;
     }
 
-    // Default error UI.
-    // TODO: 良い見た目に。
-    return <p>Error!!</p>;
+    return <Error error={error} />;
   }
 }
 

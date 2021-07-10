@@ -1,11 +1,17 @@
 {
   "name": "@viron/app",
   "version": "2.0.0",
+  "engines": {
+    "node": ">=15.13.0",
+    "npm": ">=7.9.0"
+  },
   "scripts": {
     "pre-commit": "lint-staged",
     "pre-push": "npm run test",
     "preflight": "npm install --legacy-peer-deps",
-    "develop": "gatsby develop --https -p 8000",
+    "develop": "run-s develop:app develop:testrunner",
+    "develop:app": "gatsby develop --https -p 8000",
+    "develop:testrunner": "npm run testrunner:open",
     "build": "gatsby build",
     "serve": "gatsby serve --https -p 8000",
     "clean": "gatsby clean",
@@ -13,8 +19,13 @@
     "format:tjs": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "run-p lint:*",
     "lint:tjs": "eslint \"**/*.{js,jsx,ts,tsx}\"",
-    "test": "run-p typecheck",
-    "typecheck": "tsc",
+    "test": "run-s test:typecheck test:cmp",
+    "test:typecheck": "tsc",
+    "test:e2e": "cypress run",
+    "test:cmp": "echo TODO",
+    "__test:cmp": "cypress run-ct",
+    "test:e2e:open": "cypress open",
+    "test:cmp:open": "cypress open-ct",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -56,10 +67,6 @@
     "webpack": "^5.24.4",
     "yup": "^0.32.9"
   },
-  "engines": {
-    "node": ">=15.13.0",
-    "npm": ">=7.9.0"
-  },
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@hookform/devtools": "^3.0.1",
@@ -76,10 +83,12 @@
     "@typescript-eslint/parser": "^4.17.0",
     "babel-loader": "^8.2.2",
     "babel-preset-react-app": "^10.0.0",
+    "cypress": "^7.7.0",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
+    "gatsby-cypress": "^1.9.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
