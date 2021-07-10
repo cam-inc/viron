@@ -3,7 +3,8 @@
 ## Development
 
 Run the example API server refering to the Quick Start section of [this](../../example/nodejs/README.md).
-Then run `npm run develop --workspace=@viron/app` and access to [https://localhost:8000/](https://localhost:8000/). The Cypress test runner will also be launched. Run `npm run develop:app --workspace=@viron/app` to develop without the test runner.
+Then run `npm run develop --workspace=@viron/app` and access to [https://localhost:8000/](https://localhost:8000/).
+It's recommended to launch the Cypress test runner while developing by running `npm run test:e2e:open --workspace=@viron/app`.
 
 ### Basic Commands
 
