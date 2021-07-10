@@ -6,8 +6,8 @@
     "npm": ">=7.9.0"
   },
   "scripts": {
-    "pre-commit": "lint-staged",
-    "pre-push": "npm run test",
+    "pre-commit": "run-s lint:staged test:static",
+    "pre-push": "npm run test:unit",
     "preflight": "npm install --legacy-peer-deps",
     "develop": "run-s develop:app develop:testrunner",
     "develop:app": "gatsby develop --https -p 8000",
@@ -17,8 +17,9 @@
     "clean": "gatsby clean",
     "format": "run-p format:*",
     "format:tjs": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
-    "lint": "run-p lint:*",
+    "lint": "npm run lint:tjs",
     "lint:tjs": "eslint \"**/*.{js,jsx,ts,tsx}\"",
+    "lint:staged": "lint-staged",
     "test": "run-s test:static test:unit",
     "test:e2e": "cypress run",
     "test:e2e:open": "cypress open",
