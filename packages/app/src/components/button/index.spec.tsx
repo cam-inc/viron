@@ -1,9 +1,12 @@
-import { mount } from '@cypress/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { ON } from '$constants/index';
 import Button from './index';
 
-it('Button', function () {
-  mount(<Button on={ON.BACKGROUND} label="button" />);
-  cy.get('button').contains('button').click();
+describe('Button', function () {
+  it('renders correctly', function () {
+    const label = 'lanel';
+    render(<Button on={ON.BACKGROUND} label={label} />);
+    expect(screen.getByText(label)).toBeInTheDocument();
+  });
 });

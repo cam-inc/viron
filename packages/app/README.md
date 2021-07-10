@@ -87,16 +87,16 @@ Try sticking to implementing only fade-in animations. In many cases fade-in anim
 
 ### Test
 
-#### Static Type Check Test
-`npm run test:typecheck --workspace=@viron/app` to type check.
-
-#### E2E Test
+#### E2E and Integration Tests
 `npm run test:e2e --workspace=@viron/app` to run end-to-end testing. Cypress is used under the hood.
 `npm run test:e2e:open --workspace=@viron/app` to test in the interactive GUI.
 
-#### Component Test
-`npm run test:cmp --workspace=@viron/app` to run tests on a component in isolation.
+#### Unit Testig
+`npm run test:unit --workspace=@viron/app` to run unit testing. Jest is used under the hood.
 Hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/component-testing/introduction#What-is-Component-Testing) in the future once it gets in production.
+
+#### Static Type Check Test
+`npm run test:typecheck --workspace=@viron/app` to type check.
 
 ### Main Prerequisite Knowledge and Technologies
 - [TypeScript](https://www.typescriptlang.org/)
@@ -110,3 +110,8 @@ Hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/c
 - [react-i18next](https://react.i18next.com/)
 - [Storybook](https://storybook.js.org/)
 - [Cypress](https://www.cypress.io/)
+- [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
+- [Gatsby Testing React Components ](https://www.gatsbyjs.com/docs/how-to/testing/testing-react-components/)
+- [Jest](https://jestjs.io/)
+- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+= [Learn the smart, efficient way to test any JavaScript application](https://testingjavascript.com/)
