@@ -1,4 +1,4 @@
-# Viron 2
+# Viron
 
 ## Development
 
@@ -114,4 +114,4 @@ Hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/c
 - [Gatsby Testing React Components ](https://www.gatsbyjs.com/docs/how-to/testing/testing-react-components/)
 - [Jest](https://jestjs.io/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
-= [Learn the smart, efficient way to test any JavaScript application](https://testingjavascript.com/)
+- [Learn the smart, efficient way to test any JavaScript application](https://testingjavascript.com/)
