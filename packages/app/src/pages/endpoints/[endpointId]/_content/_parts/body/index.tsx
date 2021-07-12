@@ -57,7 +57,7 @@ const Body: React.FC<Props> = ({
             <TableContent
               document={document}
               content={content}
-              data={base.data}
+              base={base}
               descendants={descendants}
               onDescendantOperationSuccess={handleDescendantOperationSuccess}
               onDescendantOperationFail={handleDescendantOperationFail}

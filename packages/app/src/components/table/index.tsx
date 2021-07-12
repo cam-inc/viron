@@ -1,3 +1,5 @@
+import { BiCaretDown } from '@react-icons/all-files/bi/BiCaretDown';
+import { BiCaretUp } from '@react-icons/all-files/bi/BiCaretUp';
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import { ON, On } from '$constants/index';
@@ -12,7 +14,10 @@ type Column = {
   type: Schema['type'] | 'actions';
   name: string;
   key: Key;
+  isSortable?: boolean;
+  sort?: Sort;
 };
+type Sort = 'asc' | 'desc';
 
 export type Props = {
   on: On;
@@ -21,6 +26,7 @@ export type Props = {
   className?: ClassName;
   renderActions?: (data: Data) => JSX.Element;
   onRowClick: (data: Data) => void;
+  onRequestSortChange?: (key: Column['key'], sort: Column['sort']) => void;
 };
 const Table: React.FC<Props> = ({
   on,
@@ -29,7 +35,27 @@ const Table: React.FC<Props> = ({
   className = '',
   renderActions,
   onRowClick,
+  onRequestSortChange,
 }) => {
+  const handleColumnHeadClick = useCallback<NonNullable<ThProps['onClick']>>(
+    function (column) {
+      let sort: Column['sort'];
+      switch (column.sort) {
+        case 'asc':
+          sort = 'desc';
+          break;
+        case 'desc':
+          sort = undefined;
+          break;
+        case undefined:
+          sort = 'asc';
+          break;
+      }
+      onRequestSortChange?.(column.key, sort);
+    },
+    [onRequestSortChange]
+  );
+
   const handleRowClick = useCallback<NonNullable<TrProps['onClick']>>(
     function (data) {
       onRowClick(data);
@@ -61,7 +87,11 @@ const Table: React.FC<Props> = ({
               {columns.map(function (column) {
                 return (
                   <React.Fragment key={column.key}>
-                    <Th on={on} column={column} />
+                    <Th
+                      on={on}
+                      column={column}
+                      onClick={handleColumnHeadClick}
+                    />
                   </React.Fragment>
                 );
               })}
@@ -122,27 +152,69 @@ const Tr: React.FC<TrProps> = ({ on, data, onClick, children }) => {
   );
 };
 
-const Th: React.FC<{ on: On; column: Column }> = ({ on, column }) => {
+type ThProps = {
+  on: On;
+  column: Column;
+  onClick?: (column: Column) => void;
+};
+const Th: React.FC<ThProps> = ({ on, column, onClick }) => {
+  const handleClick = useCallback(
+    function () {
+      onClick?.(column);
+    },
+    [column, onClick]
+  );
+
   return (
     <th
-      className={classnames('text-xs text-left', {
+      className={classnames('p-2 text-xs text-left', {
         'text-on-surface-high': on === ON.SURFACE,
       })}
+      onClick={handleClick}
     >
       <div className="flex items-center">
+        {column.isSortable && (
+          <div className="flex-none mr-1">
+            <div
+              className={classnames({
+                'text-on-background-faint':
+                  on === ON.BACKGROUND && column.sort !== 'asc',
+                'text-on-background':
+                  on === ON.BACKGROUND && column.sort === 'asc',
+                'text-on-surface-faint':
+                  on === ON.SURFACE && column.sort !== 'asc',
+                'text-on-surface': on === ON.SURFACE && column.sort === 'asc',
+              })}
+            >
+              <BiCaretUp />
+            </div>
+            <div
+              className={classnames({
+                'text-on-background-faint':
+                  on === ON.BACKGROUND && column.sort !== 'desc',
+                'text-on-background':
+                  on === ON.BACKGROUND && column.sort === 'desc',
+                'text-on-surface-faint':
+                  on === ON.SURFACE && column.sort !== 'desc',
+                'text-on-surface': on === ON.SURFACE && column.sort === 'desc',
+              })}
+            >
+              <BiCaretDown />
+            </div>
+          </div>
+        )}
         <div className="flex-1 min-w-0 font-bold">{column.name}</div>
-        <div className="flex-none ml-2">x</div>
       </div>
     </th>
   );
 };
 
-const Td: React.FC<{ on: On }> = ({ on, children }) => {
+const Td: React.FC<{ on: On }> = ({ /*on,*/ children }) => {
   return <td className="p-2">{children}</td>;
 };
 
 const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
-  on,
+  /*on,*/
   column,
   value,
 }) => {

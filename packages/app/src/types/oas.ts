@@ -91,6 +91,8 @@ export type Pager = {
   responseMaxpageKey: string;
   responsePageKey: string;
 };
+// e.g. '${keyA}:asc,${keyB}:desc,${keyC}:desc'
+export type Sort = string;
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object
 export type Tag = {
