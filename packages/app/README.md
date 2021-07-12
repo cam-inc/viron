@@ -97,7 +97,7 @@ Try sticking to implementing only fade-in animations. In many cases fade-in anim
 Hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/component-testing/introduction#What-is-Component-Testing) in the future once it gets in production.
 
 #### Static Type Check Test
-`npm run test:typecheck --workspace=@viron/app` to type check.
+`npm run test:static --workspace=@viron/app` to type check.
 
 ### Main Prerequisite Knowledge and Technologies
 - [TypeScript](https://www.typescriptlang.org/)
