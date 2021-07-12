@@ -22,6 +22,13 @@ const Drawer: React.FC<Props> = ({
     [isOpened]
   );
 
+  const handleClick = useCallback(function (
+    e: React.MouseEvent<HTMLElement, MouseEvent>
+  ) {
+    e.stopPropagation();
+  },
+  []);
+
   const handleBGClick = useCallback(
     function () {
       onRequestClose();
@@ -35,7 +42,10 @@ const Drawer: React.FC<Props> = ({
 
   return (
     <Portal targetId={ID}>
-      <div className="absolute inset-0 pointer-events-auto">
+      <div
+        className="absolute inset-0 pointer-events-auto"
+        onClick={handleClick}
+      >
         <div
           className={classnames('absolute inset-0 transition duration-300', {
             'opacity-75': isVisible,

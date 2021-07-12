@@ -236,8 +236,8 @@ export const getRequestParameterKeys = function (
 export const getContentBaseOperationResponseKeys = function (
   document: Document,
   content: Info['x-pages'][number]['contents'][number]
-): string[] {
-  const ret: string[] = [];
+): { type: Schema['type']; name: string }[] {
+  const ret: { type: Schema['type']; name: string }[] = [];
   const getRequestResult = getRequest(document, {
     operationId: content.operationId,
   });
@@ -274,7 +274,12 @@ export const getContentBaseOperationResponseKeys = function (
       if (!properties) {
         return ret;
       }
-      ret.push(..._.keys(properties));
+      _.keys(properties).forEach(function (key) {
+        ret.push({
+          type: properties[key].type,
+          name: key,
+        });
+      });
       break;
     }
     case 'number':

@@ -92,7 +92,9 @@ const useSiblings = function (
           );
           if (
             _.intersection(
-              baseOperationResponseKeys,
+              baseOperationResponseKeys.map(function (item) {
+                return item.name;
+              }),
               actionOperationRequestKeys
             ).length === 0
           ) {
