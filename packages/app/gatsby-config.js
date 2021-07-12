@@ -1,5 +1,8 @@
+const package = require('./package.json');
+
 // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
 module.exports = {
+  pathPrefix: package.version,
   siteMetadata: {
     // TODO: 増やす
     title: 'Viron',
