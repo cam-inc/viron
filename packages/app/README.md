@@ -1,9 +1,10 @@
-# Viron 2
+# Viron
 
 ## Development
 
 Run the example API server refering to the Quick Start section of [this](../../example/nodejs/README.md).
 Then run `npm run develop --workspace=@viron/app` and access to [https://localhost:8000/](https://localhost:8000/).
+It's recommended to launch the Cypress test runner while developing by running `npm run test:e2e:open --workspace=@viron/app`.
 
 ### Basic Commands
 
@@ -80,8 +81,23 @@ We follow [Google Material Design's principles](https://material.io/design/color
 ### Error Handling
 To handle errors that would be fired inside react components, we use [Error Boundaries](https://reactjs.org/docs/error-boundaries.html). Inside the ErrorBoundary react component which follows [this strategy](https://dev.to/dinhhuyams/react-error-boundary-surviving-through-pandemic-2pl9), all errors are propagated to the [logger](./src/utils/logger/index.ts). Then logger will output information on browser's console, and send data to external services if necessary. For errors that would be caught outside of react components, just call the logger. The logger is the final destination of all errors.
 
+All errors are defined [here](./src/errors/index.ts).
+
 ### Animation
 Try sticking to implementing only fade-in animations. In many cases fade-in animations are meaningful in the point of UX but fade-out animations are not that much important. Fade-out animations tend to make users wait and make source code tricky to read.
+
+### Test
+
+#### E2E and Integration Tests
+`npm run test:e2e --workspace=@viron/app` to run end-to-end testing. Cypress is used under the hood.
+`npm run test:e2e:open --workspace=@viron/app` to test in the interactive GUI.
+
+#### Unit Testig
+`npm run test:unit --workspace=@viron/app` to run unit testing. Jest is used under the hood.
+Hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/component-testing/introduction#What-is-Component-Testing) in the future once it gets in production.
+
+#### Static Type Check Test
+`npm run test:static --workspace=@viron/app` to type check.
 
 ### Main Prerequisite Knowledge and Technologies
 - [TypeScript](https://www.typescriptlang.org/)
@@ -94,3 +110,9 @@ Try sticking to implementing only fade-in animations. In many cases fade-in anim
 - [i18next](https://www.i18next.com/)
 - [react-i18next](https://react.i18next.com/)
 - [Storybook](https://storybook.js.org/)
+- [Cypress](https://www.cypress.io/)
+- [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
+- [Gatsby Testing React Components ](https://www.gatsbyjs.com/docs/how-to/testing/testing-react-components/)
+- [Jest](https://jestjs.io/)
+- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+- [Learn the smart, efficient way to test any JavaScript application](https://testingjavascript.com/)

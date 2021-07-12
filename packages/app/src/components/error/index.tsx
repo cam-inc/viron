@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BaseError, HTTP401Error, HTTP403Error } from '$errors/index';
+import { error as logError, NAMESPACE } from '$utils/logger/index';
 
 type Props = {
   error: BaseError;
 };
 const Error: React.FC<Props> = ({ error }) => {
+  useEffect(
+    function () {
+      logError({
+        messages: [error],
+        // TODO: namespaceを変えること。
+        namespace: NAMESPACE.REACT_COMPONENT,
+      });
+    },
+    [error]
+  );
+
   return (
     <div>
       <div>code: {error.code}</div>
