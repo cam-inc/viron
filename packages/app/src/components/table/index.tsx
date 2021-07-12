@@ -29,8 +29,8 @@ const Table: React.FC<Props> = ({
       <div className="overflow-x-auto overscroll-x-contain">
         <table>
           <thead
-            className={classnames('border-b', {
-              'border-on-surface': on === ON.SURFACE,
+            className={classnames('border-b-2', {
+              'border-on-surface-faint': on === ON.SURFACE,
             })}
           >
             <Tr on={on}>
@@ -46,15 +46,17 @@ const Table: React.FC<Props> = ({
           <tbody>
             {dataSource.map(function (data, idx) {
               return (
-                <tr key={idx}>
-                  {columns.map(function (column) {
-                    return (
-                      <td key={column.key}>
-                        <Cell on={on} value={data[column.key]} />
-                      </td>
-                    );
-                  })}
-                </tr>
+                <React.Fragment key={idx}>
+                  <Tr on={on}>
+                    {columns.map(function (column) {
+                      return (
+                        <td key={column.key}>
+                          <Cell on={on} value={data[column.key]} />
+                        </td>
+                      );
+                    })}
+                  </Tr>
+                </React.Fragment>
               );
             })}
           </tbody>
@@ -68,8 +70,8 @@ export default Table;
 const Tr: React.FC<{ on: On }> = ({ on, children }) => {
   return (
     <tr
-      className={classnames('border-b last:border-b-0', {
-        'border-on-surface': on === ON.SURFACE,
+      className={classnames('py-2 border-b last:border-b-0', {
+        'border-on-surface-faint': on === ON.SURFACE,
       })}
     >
       {children}
@@ -77,8 +79,19 @@ const Tr: React.FC<{ on: On }> = ({ on, children }) => {
   );
 };
 
-const Th: React.FC<{ on: On; column: Column }> = ({ column }) => {
-  return <th>{column.title}</th>;
+const Th: React.FC<{ on: On; column: Column }> = ({ on, column }) => {
+  return (
+    <th
+      className={classnames('text-xs text-left', {
+        'text-on-surface-high': on === ON.SURFACE,
+      })}
+    >
+      <div className="flex items-center">
+        <div className="flex-1 min-w-0 font-bold">{column.title}</div>
+        <div className="flex-none ml-2">x</div>
+      </div>
+    </th>
+  );
 };
 
 const Cell: React.FC<{ on: On; value: Value }> = ({ value }) => {

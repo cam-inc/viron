@@ -26,7 +26,7 @@ const Button = function <T = null>({
   className,
   data,
   onClick,
-}: React.PropsWithChildren<Props<T>>) {
+}: React.PropsWithChildren<Props<T>>): JSX.Element {
   const handleClick = useCallback(
     function () {
       onClick?.(data as T);
