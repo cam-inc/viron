@@ -1,49 +1,6 @@
-// configuration file.
-import { ConnectOptions as MongoConnectOptions } from 'mongoose';
-import { Options as MysqlConnectOptions } from 'sequelize';
-import {
-  domainsAuth,
-  domainsOas,
-  OAS_X_TAGS,
-  OAS_X_THEME,
-  OAS_X_THUMBNAIL,
-  THEME,
-} from '@viron/lib';
-import { Mode, MODE_MONGO, StoreType } from './constants';
-import { openUri } from './stores/connection/mongo';
-
-export interface MongoConfig extends StoreConfig {
-  openUri: openUri;
-  connectOptions: MongoConnectOptions;
-}
-
-export interface MysqlConfig extends StoreConfig {
-  connectOptions: MysqlConnectOptions;
-}
-
-export interface StoreConfig {
-  type: StoreType;
-}
-
-export interface CorsConfig {
-  allowOrigins: string[];
-}
-
-export interface OasConfig {
-  infoExtentions: domainsOas.VironInfoObjectExtentions;
-}
-
-export interface Config {
-  store: {
-    main: MongoConfig | MysqlConfig;
-  };
-  cors: CorsConfig;
-  auth: {
-    jwt: domainsAuth.JwtConfig;
-    googleOAuth2: domainsAuth.GoogleOAuthConfig;
-  };
-  oas: OasConfig;
-}
+import { OAS_X_TAGS, OAS_X_THEME, OAS_X_THUMBNAIL, THEME } from '@viron/lib';
+import { Config, MongoConfig, MysqlConfig } from '.';
+import { Mode, MODE } from '../constants';
 
 /**
  * Get configuration data.
@@ -83,7 +40,7 @@ export const get = (mode: Mode): Config => {
 
   const ret: Config = {
     store: {
-      main: mode == MODE_MONGO ? mongo : mysql,
+      main: mode == MODE.MONGO ? mongo : mysql,
     },
     cors: {
       allowOrigins: ['https://localhost:8000'],
