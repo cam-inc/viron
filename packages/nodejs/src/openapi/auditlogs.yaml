@@ -42,6 +42,7 @@ paths:
         - $ref: '#/components/parameters/VironStatusCodeQueryParam'
         - $ref: './components.yaml#/components/parameters/VironPagerSizeQueryParam'
         - $ref: './components.yaml#/components/parameters/VironPagerPageQueryParam'
+        - $ref: './components.yaml#/components/parameters/VironSortQueryParam'
       responses:
         200:
           description: OK

@@ -35,10 +35,11 @@ const format = (purchase: Purchase): PurchaseView => {
 export const list = async (
   conditions?: FindConditions<Purchase>,
   size?: number,
-  page?: number
+  page?: number,
+  sort?: string[]
 ): Promise<ListWithPager<PurchaseView>> => {
   const repository = getPurchaseRepository();
-  const result = await repository.findWithPager(conditions, size, page);
+  const result = await repository.findWithPager(conditions, size, page, sort);
   return {
     ...result,
     list: result.list.map(format),

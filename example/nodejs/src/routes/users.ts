@@ -3,8 +3,8 @@ import { list, createOne, updateOneById, removeOneById } from '../domains/user';
 
 // ユーザー一覧
 export const listUsers = async (context: RouteContext): Promise<void> => {
-  const { size, page } = context.params.query;
-  const result = await list({}, size, page);
+  const { size, page, sort, ...conditions } = context.params.query;
+  const result = await list(conditions, size, page, sort);
   context.res.json(result);
 };
 

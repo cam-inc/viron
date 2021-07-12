@@ -5,6 +5,7 @@ import { domainsAuth } from '../../domains';
 import { repositoryContainer } from '..';
 import {
   getMysqlFindOptions,
+  getMysqlSortOptions,
   getPagerResults,
   ListWithPager,
 } from '../../helpers';
@@ -26,10 +27,12 @@ export const findOneById = async (
 
 export const find = async (
   conditions: WhereOptions<domainsAuth.RevokedToken> = {},
+  sort: string[] | null = null,
   options: FindOptions<domainsAuth.RevokedToken> = {}
 ): Promise<domainsAuth.RevokedToken[]> => {
   const model = getModel();
   options.where = conditions;
+  options.order = getMysqlSortOptions(sort);
   const docs = await model.findAll(options);
   return docs.map((doc) => doc.toJSON() as domainsAuth.RevokedToken);
 };
@@ -37,11 +40,13 @@ export const find = async (
 export const findWithPager = async (
   conditions: WhereOptions<domainsAuth.RevokedToken> = {},
   size?: number,
-  page?: number
+  page?: number,
+  sort: string[] | null = null
 ): Promise<ListWithPager<domainsAuth.RevokedToken>> => {
   const model = getModel();
   const options = getMysqlFindOptions(size, page);
   options.where = conditions;
+  options.order = getMysqlSortOptions(sort);
   const result = await model.findAndCountAll(options);
   return {
     ...getPagerResults(result.count, size, page),
