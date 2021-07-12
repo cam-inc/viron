@@ -2,7 +2,7 @@
   "name": "@viron/lib",
   "version": "0.0.1",
   "scripts": {
-    "build": "npm run clean && npm run format && npm run lint && tsc --project tsconfig.json && cp -fr src/openapi dist/",
+    "build": "npm run clean && tsc --project tsconfig.json && cp -fr src/openapi dist/",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "coverage": "jest --coverage",
     "format": "npm run format:prettier",
