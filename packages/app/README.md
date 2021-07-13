@@ -1,10 +1,11 @@
 # Viron
 
+[![app](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/s6jfta&style=for-the-badge&logo=cypress)](https://dashboard.cypress.io/projects/s6jfta/runs)
+
 ## Development
 
 Run the example API server refering to the Quick Start section of [this](../../example/nodejs/README.md).
 Then run `npm run develop --workspace=@viron/app` and access to [https://localhost:8000/](https://localhost:8000/).
-It's recommended to launch the Cypress test runner while developing by running `npm run test:e2e:open --workspace=@viron/app`.
 
 ### Basic Commands
 
@@ -89,8 +90,12 @@ Try sticking to implementing only fade-in animations. In many cases fade-in anim
 ### Test
 
 #### E2E and Integration Tests
-`npm run test:e2e --workspace=@viron/app` to run end-to-end testing. Cypress is used under the hood.
-`npm run test:e2e:open --workspace=@viron/app` to test in the interactive GUI.
+Cypress is used under the hood of all E2E and integration tests.
+
+Run `npm run develop --workspace=@viron/app` and then,
+- `START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=https://localhost:8000 npm run test:e2e --workspace=@viron/app` to run end-to-end testing.
+- `START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=https://localhost:8000 npm run test:e2e:open --workspace=@viron/app` to test in the interactive GUI.
+- `START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=https://localhost:8000 CYPRESS_RECORD_KEY=<record key> npm run test:e2e:record --workspace=@viron/app` to record test result and submit it to Cypress Dashboard.
 
 #### Unit Testig
 `npm run test:unit --workspace=@viron/app` to run unit testing. Jest is used under the hood.
@@ -98,6 +103,10 @@ Hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/c
 
 #### Static Type Check Test
 `npm run test:static --workspace=@viron/app` to type check.
+
+### Continuous Integration
+E2E and integration testings are executed and the result will be sent to Cypress Dashboard, which is open to public.
+`npm run ci:local --workspace=@viron/app` to execute CI tasks locally for tesing purpose.
 
 ### Main Prerequisite Knowledge and Technologies
 - [TypeScript](https://www.typescriptlang.org/)
