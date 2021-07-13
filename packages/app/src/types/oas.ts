@@ -83,6 +83,18 @@ export type X_Table = {
     requestKey: string;
   };
 };
+export const TABLE_SORT = {
+  ASC: 'asc',
+  DESC: 'desc',
+  NONE: 'none',
+} as const;
+export type TableSort = typeof TABLE_SORT[keyof typeof TABLE_SORT];
+export type TableColumn = {
+  type: Schema['type'];
+  name: string;
+  key: string;
+  isSortable: boolean;
+};
 export type Pager = {
   // Which request parameter to use when fetching.
   requestPageKey: string;

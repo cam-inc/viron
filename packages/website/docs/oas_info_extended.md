@@ -29,11 +29,12 @@ OASのInfoオブジェクトに対する、Viron拡張箇所について。
  - [ ] responseListKey
  - [ ] pager
    - [ ] requestPageKey
-   - [ ] requestPageKey
+   - [ ] requestSizeKey
    - [ ] responseMaxpageKey
    - [ ] responsePageKey
  - [ ] sort
   - [ ] requestKey
+  - [ ] schema.typeがarrayであること。
   - [ ] 値が'${keyA}:asc,${keyB}:desc,${keyC}:desc'の固定形式であること
 
 
@@ -49,7 +50,7 @@ info: {
       'responsePageKey': 'page';
     },
     sort; {// 'sortXxx' ソート機能について
-      'requestKey': 'sort'; // 「'sort': '${keyA}:asc,${keyB}:desc,${keyC}:desc'」の値の構造はキメ。v
+      'requestKey': 'sort'; // 「'sort': '${keyA}:asc,${keyB}:desc,${keyC}:desc'」の値の構造はキメ。
     }
   };
   'x-pages': [
@@ -71,10 +72,78 @@ paths: {
   '/users': {
     get: {
       operationId: 'listUsers',
-      parameters: [],
-      requestBody: {},
+      parameters: [
+        {
+          name: 'sort',// info['x-table'].sort.requestKeyと同じ値に。
+          in: 'query',
+          schema: {
+            type: 'array',
+            items: {
+              type: 'string',
+            },
+            example: ['id:asc', 'name:desc']をstyleに通したもの
+          } | {
+            type: 'object',
+            properties: {// sort対象のkey群。
+              id: {
+                type: 'string'
+                enum: ['asc', 'desc']
+              },
+              name {
+                type: 'string',
+                enum: ['asc', 'desc']
+              }
+            },
+            example: {
+              id: 'asc',
+              name: 'desc'
+            }をstyleに通したもの
+          } | {
+            type: 'string',
+            example: 'id:asc,name:desc'をstyleに通したもの
+          }
+        },
+        {
+          name: 'page',// info['x-table'].pager.requestPageKeyと同じ値に。
+          in: 'query',
+          schema: {
+            type: 'number' | 'integer',
+          }
+        },
+        {
+          name: 'size',// info['x-table'].pager.requestSizeKeyと同じ値に。
+          in: 'query',
+          schema: {
+            type: 'number' | 'integer',
+          }
+        }
+      ],
+      requestBody: {
+        // parametersと同様の決まりなら、代わりにここに書いてもよい。
+      },
       response: {
-
+        200.content.application/json: {
+          schema: {
+            type: 'object',
+            properties: {
+              list: {// info['x-table'].responseListKeyと同じ値に。
+                type: 'array',
+                items: {
+                  type: 'object'// ここは絶対objectね
+                  properties: {
+                    ご自由に。 keyがテーブルcolumnになる。valueが各rowのcellになる。
+                  }
+                }
+              },
+              maxpage: {// info['x-table'].pager.responseMaxpageKeyと同じ値に。
+                type: 'number'
+              },
+              page: {// info['x-table'].pager.responsePageKeyと同じ値に。
+                type: 'number'
+              }
+            }
+          }
+        }
       }
     }
   }

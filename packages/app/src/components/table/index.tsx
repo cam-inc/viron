@@ -4,20 +4,16 @@ import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import { ON, On } from '$constants/index';
 import { ClassName } from '$types/index';
-import { Schema } from '$types/oas';
+import { TableColumn, TableSort, TABLE_SORT } from '$types/oas';
 
 type Key = string;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Value = any;
 type Data = Record<Key, Value>;
-type Column = {
-  type: Schema['type'] | 'actions';
-  name: string;
-  key: Key;
-  isSortable?: boolean;
-  sort?: Sort;
+type Column = Omit<TableColumn, 'type'> & {
+  type: TableColumn['type'] | 'actions';
+  sort: TableSort;
 };
-type Sort = 'asc' | 'desc';
 
 export type Props = {
   on: On;
@@ -39,16 +35,19 @@ const Table: React.FC<Props> = ({
 }) => {
   const handleColumnHeadClick = useCallback<NonNullable<ThProps['onClick']>>(
     function (column) {
+      if (!column.isSortable) {
+        return;
+      }
       let sort: Column['sort'];
       switch (column.sort) {
-        case 'asc':
-          sort = 'desc';
+        case TABLE_SORT.ASC:
+          sort = TABLE_SORT.DESC;
           break;
-        case 'desc':
-          sort = undefined;
+        case TABLE_SORT.DESC:
+          sort = TABLE_SORT.NONE;
           break;
-        case undefined:
-          sort = 'asc';
+        case TABLE_SORT.NONE:
+          sort = TABLE_SORT.ASC;
           break;
       }
       onRequestSortChange?.(column.key, sort);
@@ -81,6 +80,8 @@ const Table: React.FC<Props> = ({
                     name: 'actions',
                     // TODO: 重複しないように。
                     key: 'actions',
+                    isSortable: false,
+                    sort: TABLE_SORT.NONE,
                   }}
                 />
               )}
@@ -178,12 +179,13 @@ const Th: React.FC<ThProps> = ({ on, column, onClick }) => {
             <div
               className={classnames({
                 'text-on-background-faint':
-                  on === ON.BACKGROUND && column.sort !== 'asc',
+                  on === ON.BACKGROUND && column.sort !== TABLE_SORT.ASC,
                 'text-on-background':
-                  on === ON.BACKGROUND && column.sort === 'asc',
+                  on === ON.BACKGROUND && column.sort === TABLE_SORT.ASC,
                 'text-on-surface-faint':
-                  on === ON.SURFACE && column.sort !== 'asc',
-                'text-on-surface': on === ON.SURFACE && column.sort === 'asc',
+                  on === ON.SURFACE && column.sort !== TABLE_SORT.ASC,
+                'text-on-surface':
+                  on === ON.SURFACE && column.sort === TABLE_SORT.ASC,
               })}
             >
               <BiCaretUp />
@@ -191,12 +193,13 @@ const Th: React.FC<ThProps> = ({ on, column, onClick }) => {
             <div
               className={classnames({
                 'text-on-background-faint':
-                  on === ON.BACKGROUND && column.sort !== 'desc',
+                  on === ON.BACKGROUND && column.sort !== TABLE_SORT.DESC,
                 'text-on-background':
-                  on === ON.BACKGROUND && column.sort === 'desc',
+                  on === ON.BACKGROUND && column.sort === TABLE_SORT.DESC,
                 'text-on-surface-faint':
-                  on === ON.SURFACE && column.sort !== 'desc',
-                'text-on-surface': on === ON.SURFACE && column.sort === 'desc',
+                  on === ON.SURFACE && column.sort !== TABLE_SORT.DESC,
+                'text-on-surface':
+                  on === ON.SURFACE && column.sort === TABLE_SORT.DESC,
               })}
             >
               <BiCaretDown />

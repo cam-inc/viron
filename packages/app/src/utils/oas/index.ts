@@ -24,6 +24,9 @@ import {
   RequestValue,
   Server,
   Schema,
+  TableColumn,
+  TableSort,
+  TABLE_SORT,
   X_Table,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
@@ -103,6 +106,144 @@ export const getTableSetting = function (
     return new Failure(new OASError('TODO'));
   }
   return new Success(info['x-table']);
+};
+
+export const getTableColumns = function (
+  document: Document,
+  content: Info['x-pages'][number]['contents'][number]
+): TableColumn[] {
+  const columns: TableColumn[] = [];
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return columns;
+  }
+  const isSortable = !!getTableSettingResult.value.sort;
+  const fields = getContentBaseOperationResponseKeys(document, content);
+  fields.forEach(function (field) {
+    columns.push({
+      type: field.type,
+      name: field.name,
+      key: field.name,
+      isSortable,
+    });
+  });
+  return columns;
+};
+
+export const getTableRows = function (
+  document: Document,
+  content: Info['x-pages'][number]['contents'][number],
+  data: any
+): Record<string, any>[] {
+  const rows: Record<string, any>[] = [];
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return rows;
+  }
+  // TODO: response['200'].content['application/json'].schema.properties[{responseListKey}].items.typeって、objectかもしれないしnumberかもしれないよ。
+  data[getTableSettingResult.value.responseListKey].forEach(function (
+    item: any
+  ) {
+    const row: Record<string, any> = {};
+    const fields = getContentBaseOperationResponseKeys(document, content);
+    fields.forEach(function (field) {
+      row[field.name] = item[field.name];
+    });
+    rows.push(row);
+  });
+  return rows;
+};
+
+export const mergeTableSortRequestValue = function (
+  document: Document,
+  request: Request,
+  baseRequestValue: RequestValue,
+  sorts: Record<TableColumn['key'], TableSort>
+): RequestValue {
+  const requestValue = _.cloneDeep<RequestValue>(baseRequestValue);
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return requestValue;
+  }
+  if (!getTableSettingResult.value.sort) {
+    return requestValue;
+  }
+  const { requestKey } = getTableSettingResult.value.sort;
+  const requestParameter = getRequestParameter(request.operation, requestKey);
+  // TODO: rquestParameter.schemaだけじゃなく、requestParameter.contentなパターンにも対応すること。
+  if (requestParameter && requestParameter.schema) {
+    switch (requestParameter.schema.type) {
+      case 'string':
+        requestValue.parameters = {
+          ...requestValue.parameters,
+          [requestKey]: (function (): string {
+            const arr: string[] = [];
+            _.forEach(sorts, function (sort, key) {
+              if (sort === TABLE_SORT.ASC || sort === TABLE_SORT.DESC) {
+                arr.push(`${key}:${sort}`);
+              }
+            });
+            return arr.join(',');
+          })(),
+        };
+        break;
+      case 'object':
+        requestValue.parameters = {
+          ...requestValue.parameters,
+          [requestKey]: (function (): Record<string, TableSort> {
+            return _.omitBy(sorts, function (sort) {
+              if (sort === TABLE_SORT.ASC || sort === TABLE_SORT.DESC) {
+                return false;
+              }
+              return true;
+            });
+          })(),
+        };
+        break;
+      case 'array':
+        requestValue.parameters = {
+          ...requestValue.parameters,
+          [requestKey]: (function (): string[] {
+            const arr: string[] = [];
+            _.forEach(sorts, function (sort, key) {
+              if (sort === TABLE_SORT.ASC || sort === TABLE_SORT.DESC) {
+                arr.push(`${key}:${sort}`);
+              }
+            });
+            return arr;
+          })(),
+        };
+        break;
+      case 'number':
+      case 'integer':
+      case 'boolean':
+        break;
+    }
+  }
+  // TODO: requestBodyにも対応すること。
+  return requestValue;
+};
+
+export const mergeTablePagerRequestValue = function (
+  document: Document,
+  baseRequestValue: RequestValue,
+  page: number
+): RequestValue {
+  const requestValue = _.cloneDeep<RequestValue>(baseRequestValue);
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return requestValue;
+  }
+  const requestPageKey = getTableSettingResult.value.pager?.requestPageKey;
+  if (!requestPageKey) {
+    return requestValue;
+  }
+  requestValue.parameters = {
+    ...requestValue.parameters,
+    [requestPageKey]: page,
+  };
+  // TODO: requestBodyにも対応すること。
+  return requestValue;
 };
 
 export const getPathItem = function (
@@ -207,6 +348,22 @@ export const getRequestByOperationId = function (
     method: method as Method,
     operation,
   });
+};
+
+export const getRequestParameter = function (
+  operation: Operation,
+  name: Parameter['name']
+): Parameter | null {
+  if (!operation.parameters) {
+    return null;
+  }
+  const parameter = operation.parameters.find(function (p) {
+    return p.name === name;
+  });
+  if (!parameter) {
+    return null;
+  }
+  return parameter;
 };
 
 export const getRequestParameterKeys = function (

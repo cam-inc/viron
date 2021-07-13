@@ -21,7 +21,7 @@ const Tail: React.FC<Props> = ({ document, content, base, className = '' }) => {
       ) {
         return null;
       }
-      return <Pagination pager={document.info['x-table'].pager} base={base} />;
+      return <Pagination document={document} base={base} />;
     },
     [document, base]
   );
