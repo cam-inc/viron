@@ -26,6 +26,19 @@ components:
       schema:
         type: integer
       required: false
+    SortQueryParam:
+      name: sort
+      in: query
+      description: Sort specification of list
+      schema:
+        type: array
+        minItems: 1
+        items:
+          type: string
+          pattern: "^.+?:(asc|desc)$"
+      style: form
+      explode: false
+
     IdQueryParam:
       name: id
       in: query

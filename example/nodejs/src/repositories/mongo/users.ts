@@ -3,6 +3,7 @@ import {
   ListWithPager,
   getPagerResults,
   getMongoQueryOptions,
+  getMongoSortOptions,
 } from '@viron/lib';
 import {
   User,
@@ -22,9 +23,12 @@ export const findOneById = async (id: string): Promise<User | null> => {
 
 export const find = async (
   conditions: FilterQuery<User> = {},
+  sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<User[]> => {
   const model = getModel();
+  options = options ?? {};
+  options.sort = getMongoSortOptions(sort);
   const docs = await model.find(conditions, null, options);
   return docs.map((doc) => doc.toJSON());
 };
@@ -32,11 +36,12 @@ export const find = async (
 export const findWithPager = async (
   conditions: FilterQuery<User> = {},
   size?: number,
-  page?: number
+  page?: number,
+  sort: string[] | null = null
 ): Promise<ListWithPager<User>> => {
   const options = getMongoQueryOptions(size, page);
   const [list, totalCount] = await Promise.all([
-    find(conditions, options),
+    find(conditions, sort, options),
     count(conditions),
   ]);
   return {

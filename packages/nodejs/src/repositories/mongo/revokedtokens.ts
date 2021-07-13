@@ -4,6 +4,7 @@ import { domainsAuth } from '../../domains';
 import { repositoryContainer } from '..';
 import {
   getMongoQueryOptions,
+  getMongoSortOptions,
   getPagerResults,
   ListWithPager,
 } from '../../helpers';
@@ -24,9 +25,12 @@ export const findOneById = async (
 
 export const find = async (
   conditions: FilterQuery<domainsAuth.RevokedToken> = {},
+  sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<domainsAuth.RevokedToken[]> => {
   const model = getModel();
+  options = options ?? {};
+  options.sort = getMongoSortOptions(sort);
   const docs = await model.find(conditions, null, options);
   return docs.map((doc) => doc.toJSON());
 };
@@ -34,11 +38,12 @@ export const find = async (
 export const findWithPager = async (
   conditions: FilterQuery<domainsAuth.RevokedToken> = {},
   size?: number,
-  page?: number
+  page?: number,
+  sort: string[] | null = null
 ): Promise<ListWithPager<domainsAuth.RevokedToken>> => {
   const options = getMongoQueryOptions(size, page);
   const [list, totalCount] = await Promise.all([
-    find(conditions, options),
+    find(conditions, sort, options),
     count(conditions),
   ]);
   return {

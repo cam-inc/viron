@@ -28,10 +28,11 @@ export type AuditLogUpdateAttributes = AuditLogCreateAttributes;
 export const list = async (
   conditions?: FindConditions<AuditLog>,
   size?: number,
-  page?: number
+  page?: number,
+  sort?: string[]
 ): Promise<ListWithPager<AuditLog>> => {
   const repository = repositoryContainer.getAuditLogRepository();
-  return repository.findWithPager(conditions, size, page);
+  return repository.findWithPager(conditions, size, page, sort);
 };
 
 // 1件作成

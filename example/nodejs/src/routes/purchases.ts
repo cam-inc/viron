@@ -9,9 +9,9 @@ import {
 
 // 購買情報一覧
 export const listPurchases = async (context: RouteContext): Promise<void> => {
-  const { size, page, purchaseId } = context.params.query;
+  const { size, page, sort, purchaseId } = context.params.query;
   const conditions = purchaseId ? { id: purchaseId } : {};
-  const result = await list(conditions, size, page);
+  const result = await list(conditions, size, page, sort);
   context.res.json(result);
 };
 
@@ -37,9 +37,9 @@ export const removePurchase = async (context: RouteContext): Promise<void> => {
 export const listUserPurchases = async (
   context: RouteContext
 ): Promise<void> => {
-  const { limit, offset } = context.params.query;
+  const { size, page, sort } = context.params.query;
   const { userId } = context.params.path;
-  const result = await list({ userId }, limit, offset);
+  const result = await list({ userId }, size, page, sort);
   context.res.json(result);
 };
 

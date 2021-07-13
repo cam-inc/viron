@@ -40,6 +40,19 @@ components:
         type: integer
       required: false
 
+    VironSortQueryParam:
+      name: sort
+      in: query
+      description: Sort specification of list
+      schema:
+        type: array
+        minItems: 1
+        items:
+          type: string
+          pattern: '^.+?:(asc|desc)$'
+      style: form
+      explode: false
+
     VironIdQueryParam:
       name: id
       in: query

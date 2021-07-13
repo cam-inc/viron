@@ -4,6 +4,7 @@ import { storeDefinitions } from '../../stores';
 import { domainsAdminUser } from '../../domains';
 import {
   getMysqlFindOptions,
+  getMysqlSortOptions,
   getPagerResults,
   ListWithPager,
 } from '../../helpers';
@@ -40,10 +41,12 @@ export const findOneById = async (
 
 export const find = async (
   conditions: WhereOptionsWithUserIds = {},
+  sort: string[] | null = null,
   options: FindOptions<domainsAdminUser.AdminUser> = {}
 ): Promise<domainsAdminUser.AdminUser[]> => {
   const model = getModel();
   options.where = convertConditions(conditions);
+  options.order = getMysqlSortOptions(sort);
   const docs = await model.findAll(options);
   return docs.map((doc) => doc.toJSON() as domainsAdminUser.AdminUser);
 };
@@ -51,11 +54,13 @@ export const find = async (
 export const findWithPager = async (
   conditions: WhereOptionsWithUserIds = {},
   size?: number,
-  page?: number
+  page?: number,
+  sort: string[] | null = null
 ): Promise<ListWithPager<domainsAdminUser.AdminUser>> => {
   const model = getModel();
   const options = getMysqlFindOptions(size, page);
   options.where = convertConditions(conditions);
+  options.order = getMysqlSortOptions(sort);
   const result = await model.findAndCountAll(options);
   return {
     ...getPagerResults(result.count, size, page),

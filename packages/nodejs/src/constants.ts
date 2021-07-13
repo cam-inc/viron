@@ -132,3 +132,5 @@ export const THEME = {
   TERMINAL: 'terminal',
 } as const;
 export type Theme = typeof THEME[keyof typeof THEME];
+
+export const TABLE_SORT_DELIMITER = ':';
